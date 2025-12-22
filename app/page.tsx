@@ -38,6 +38,7 @@ export default function Home() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 400);
@@ -148,34 +149,36 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden relative">
-      {/* Animated Background with Radial Gradients */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        {/* Dynamic gradient that follows mouse */}
+    <div className="min-h-screen bg-black text-white overflow-hidden relative" style={{ background: '#000000' }}>
+      {/* Background with Grid and Radial Gradient */}
+      <div className="fixed inset-0 -z-10 overflow-hidden" style={{ background: '#000000' }}>
+        {/* Radial gradient: 1) Inner - light blue glow (very faint shadow), 2) Middle - navy blue (biggest), 3) Outer - faint black */}
         <div 
-          className="absolute w-[800px] h-[800px] rounded-full blur-3xl opacity-30 transition-all duration-1000 ease-out"
+          className="absolute top-1/2 left-1/2 w-[2000px] h-[2000px] -translate-x-1/2 -translate-y-1/2 rounded-full"
           style={{
-            left: `${mousePosition.x - 400}px`,
-            top: `${mousePosition.y - 400}px`,
-            background: 'radial-gradient(circle, rgba(30, 58, 138, 0.25), rgba(15, 23, 42, 0.3), rgba(0, 0, 0, 0.4), transparent 70%)',
+            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.06) 0%, rgba(59, 130, 246, 0.04) 12%, rgba(30, 58, 138, 0.5) 20%, rgba(30, 58, 138, 0.7) 35%, rgba(30, 58, 138, 0.8) 50%, rgba(15, 23, 42, 0.85) 70%, rgba(0, 0, 0, 0.9) 85%, black 100%)',
+            filter: 'blur(80px)',
           }}
         />
         
-        {/* Static radial gradients */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-950/30 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-slate-950/40 rounded-full blur-3xl animate-pulse delay-1000" />
-          <div className="absolute bottom-1/4 left-1/3 w-[700px] h-[700px] bg-black/50 rounded-full blur-3xl animate-pulse delay-2000" />
-        </div>
-        
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
+        {/* Grid pattern that fades to transparent at edges */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              radial-gradient(ellipse 80% 80% at center, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 40%, rgba(255,255,255,0.01) 60%, transparent 75%),
+              linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)
+            `,
+            backgroundSize: '100% 100%, 60px 60px, 60px 60px',
+          }}
+        />
       </div>
 
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24">
+      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-36">
         <div className="max-w-7xl mx-auto text-center relative z-10">
           {/* Animated badge */}
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 mb-8 backdrop-blur-sm transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -236,21 +239,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Floating particles */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-blue-400/30 rounded-full animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${5 + Math.random() * 5}s`,
-              }}
-            />
-          ))}
-        </div>
       </section>
 
       {/* Installation Stats Section */}

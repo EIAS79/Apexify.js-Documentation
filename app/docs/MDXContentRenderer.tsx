@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableCell
 } from '@/components/mdx';
+import ChangelogRenderer from '@/components/ChangelogRenderer';
 import { ReactElement } from 'react';
 
 interface ComponentData {
@@ -311,6 +312,13 @@ function renderComponent(component: ComponentData, index: number): ReactElement 
 
 export function MDXContentRenderer({ content }: { content: string }) {
   const segments = parseMDXContent(content);
+  
+  // Check if this is the changelog page
+  const isChangelog = content.includes('# Changelog') || content.match(/^##\s+\[/m);
+  
+  if (isChangelog) {
+    return <ChangelogRenderer content={content} />;
+  }
 
   return (
     <>
