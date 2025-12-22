@@ -145,7 +145,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         key={file.filename}
         href={`/docs#${file.filename}`}
         onClick={(e) => handleFileClick(file.filename, e)}
-        className={`group flex items-center gap-2 py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all duration-150 ${
+        className={`group flex items-center gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg text-sm sm:text-base transition-all duration-150 min-w-0 ${
           level > 0 ? 'ml-6' : ''
         } ${
           active
@@ -154,14 +154,14 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         }`}
       >
         {/* MDX/MD File Icon Badge */}
-        <div className={`flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[10px] font-mono font-bold transition-all duration-150 ${
+        <div className={`flex items-center justify-center min-w-[24px] h-6 px-2 rounded-md text-xs font-mono font-bold transition-all duration-150 flex-shrink-0 ${
           active 
             ? 'bg-white/20 text-white border border-white/30' 
             : 'bg-slate-800/60 text-gray-400 border border-slate-700/50 group-hover:bg-blue-500/20 group-hover:text-blue-400 group-hover:border-blue-500/30'
         }`}>
           MD
         </div>
-        <span>{file.name}</span>
+        <span className="truncate min-w-0 flex-1">{file.name}</span>
       </Link>
     );
   };
@@ -188,17 +188,17 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         <div className="flex items-center group">
           <button
             onClick={() => toggleExpanded(folder.name)}
-            className="p-1 hover:bg-slate-800/60 rounded-lg transition-colors duration-150"
+            className="p-1.5 hover:bg-slate-800/60 rounded-lg transition-colors duration-150"
           >
             {isExpanded ? (
-              <ChevronDownIcon className="h-4 w-4 text-gray-500 group-hover:text-blue-400 transition-colors duration-150" />
+              <ChevronDownIcon className="h-5 w-5 text-gray-500 group-hover:text-blue-400 transition-colors duration-150" />
             ) : (
-              <ChevronRightIcon className="h-4 w-4 text-gray-500 group-hover:text-blue-400 transition-colors duration-150" />
+              <ChevronRightIcon className="h-5 w-5 text-gray-500 group-hover:text-blue-400 transition-colors duration-150" />
             )}
           </button>
           <button
             onClick={() => toggleExpanded(folder.name)}
-            className={`flex-1 flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm transition-all duration-150 text-left font-semibold ${
+            className={`flex-1 flex items-center gap-2.5 py-3 px-3 sm:px-4 rounded-lg text-base sm:text-lg transition-all duration-150 text-left font-semibold min-w-0 ${
               hasActiveFile && isExpanded
                 ? 'text-blue-300 bg-blue-900/40 border border-blue-700/30'
                 : hasActiveFile
@@ -206,11 +206,11 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
                 : 'text-gray-300 hover:text-blue-300 hover:bg-slate-800/60'
             }`}
           >
-            <span className="text-base">{emoji}</span>
-            <FolderIcon className={`h-4 w-4 flex-shrink-0 transition-colors duration-150 ${
+            <span className="text-lg sm:text-xl flex-shrink-0">{emoji}</span>
+            <FolderIcon className={`h-5 w-5 sm:h-5 sm:w-5 flex-shrink-0 transition-colors duration-150 ${
               hasActiveFile ? 'text-blue-400' : 'text-gray-500 group-hover:text-blue-400'
             }`} />
-            <span>{folder.name}</span>
+            <span className="truncate min-w-0">{folder.name}</span>
           </button>
         </div>
         {isExpanded && (
@@ -224,8 +224,8 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
 
   if (loading) {
     return (
-      <aside className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-slate-950/98 backdrop-blur-md border-r border-slate-800/50 overflow-y-auto transition-all duration-300 z-40 ${
-        isOpen ? 'w-64 translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0'
+      <aside className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-slate-950/98 backdrop-blur-md border-r border-slate-800/50 overflow-y-auto overflow-x-hidden transition-all duration-300 z-40 ${
+        isOpen ? 'w-72 translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0'
       }`}>
         <div className="p-4">
           <div className="text-gray-400 text-base">Loading...</div>
@@ -260,26 +260,26 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900/95 backdrop-blur-xl border-r border-slate-800/60 transition-all duration-300 z-40 shadow-xl lg:shadow-none ${
           isMobile
             ? isOpen
-              ? 'w-64 translate-x-0 overflow-y-auto'
+              ? 'w-72 translate-x-0 overflow-y-auto overflow-x-hidden'
               : '-translate-x-full overflow-hidden'
             : isCollapsed
             ? 'w-0 translate-x-0 overflow-hidden border-r-0'
             : isOpen
-            ? 'w-64 translate-x-0 overflow-y-auto'
+            ? 'w-72 translate-x-0 overflow-y-auto overflow-x-hidden'
             : '-translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden'
         }`}>
         {/* Sidebar content - show when open (or when not collapsed on desktop) */}
         {((isMobile && isOpen) || (!isMobile && !isCollapsed && isOpen)) && (
-          <div className="p-4">
+          <div className="p-4 overflow-x-hidden">
             {/* Desktop Header */}
             <div className="hidden lg:flex items-center justify-between mb-6 pb-4 border-b border-slate-800/50">
               <div className="flex items-center gap-2">
                 <BookOpenIcon className="h-5 w-5 text-blue-400" />
-                <span className="text-sm font-bold text-gray-300 uppercase tracking-wider">
+                <span className="text-base sm:text-lg font-bold text-gray-300 uppercase tracking-wider mr-1">
                   Documentation
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
                   v5.1.0
                 </span>
