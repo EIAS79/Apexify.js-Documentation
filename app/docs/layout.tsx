@@ -19,7 +19,7 @@ export default function DocsLayout({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_20%,rgba(0,0,0,0.3),transparent_50%)]" />
       </div>
       
-      <DocHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} isMenuOpen={sidebarOpen} />
+      <DocHeader />
       {children}
     </div>
   );

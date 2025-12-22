@@ -3,7 +3,15 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { ChevronRightIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { 
+  ChevronRightIcon, 
+  ChevronDownIcon, 
+  XMarkIcon,
+  FolderIcon,
+  DocumentTextIcon,
+  BookOpenIcon,
+  SparklesIcon
+} from '@heroicons/react/24/outline';
 
 interface DocFile {
   name: string;
@@ -36,7 +44,12 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
   useEffect(() => {
     const checkMobile = () => {
       if (typeof window !== 'undefined') {
-        setIsMobile(window.innerWidth < 1024);
+        const mobile = window.innerWidth < 1024;
+        setIsMobile(mobile);
+        // Reset collapsed state when switching to mobile
+        if (mobile) {
+          setIsCollapsed(false);
+        }
       }
     };
     
@@ -115,8 +128,11 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 100);
       
-      if (window.innerWidth < 1024 && onClose) {
-        onClose();
+      // Close sidebar on mobile after clicking a file
+      if (isMobile && onClose) {
+        setTimeout(() => {
+          onClose();
+        }, 150);
       }
     }
   };
@@ -129,15 +145,23 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         key={file.filename}
         href={`/docs#${file.filename}`}
         onClick={(e) => handleFileClick(file.filename, e)}
-        className={`block py-2 px-3 rounded-lg text-base transition-all duration-200 ${
-          level > 0 ? 'ml-4' : ''
+        className={`group flex items-center gap-2 py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg text-xs sm:text-sm transition-all duration-150 ${
+          level > 0 ? 'ml-6' : ''
         } ${
           active
-            ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 font-medium shadow-md'
-            : 'text-gray-300 hover:text-blue-600 hover:bg-slate-950'
+            ? 'text-white bg-gradient-to-r from-blue-600 to-purple-600 font-semibold shadow-lg shadow-blue-500/30'
+            : 'text-gray-300 hover:text-blue-300 hover:bg-slate-800/60'
         }`}
       >
-        {file.name}
+        {/* MDX/MD File Icon Badge */}
+        <div className={`flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[10px] font-mono font-bold transition-all duration-150 ${
+          active 
+            ? 'bg-white/20 text-white border border-white/30' 
+            : 'bg-slate-800/60 text-gray-400 border border-slate-700/50 group-hover:bg-blue-500/20 group-hover:text-blue-400 group-hover:border-blue-500/30'
+        }`}>
+          MD
+        </div>
+        <span>{file.name}</span>
       </Link>
     );
   };
@@ -146,34 +170,51 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
     const isExpanded = expanded[folder.name] ?? false;
     const hasActiveFile = folder.files.some(f => activeHash === f.filename);
 
+    // Map folder names to emojis for better visual appeal
+    const folderEmoji: Record<string, string> = {
+      'Background': '🎨',
+      'Charts': '📊',
+      'Custom': '✨',
+      'Extras': '🎯',
+      'Image': '🖼️',
+      'Text': '📝',
+      'Video': '🎬',
+    };
+
+    const emoji = folderEmoji[folder.name] || '📁';
+
     return (
-      <div key={folder.name}>
-        <div className="flex items-center">
+      <div key={folder.name} className="mb-1">
+        <div className="flex items-center group">
           <button
             onClick={() => toggleExpanded(folder.name)}
-            className="p-1.5 hover:bg-slate-950 rounded-lg mr-1 transition-colors duration-200"
+            className="p-1 hover:bg-slate-800/60 rounded-lg transition-colors duration-150"
           >
             {isExpanded ? (
-              <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-200" />
+              <ChevronDownIcon className="h-4 w-4 text-gray-500 group-hover:text-blue-400 transition-colors duration-150" />
             ) : (
-              <ChevronRightIcon className="h-5 w-5 text-gray-400 transition-transform duration-200" />
+              <ChevronRightIcon className="h-4 w-4 text-gray-500 group-hover:text-blue-400 transition-colors duration-150" />
             )}
           </button>
           <button
             onClick={() => toggleExpanded(folder.name)}
-            className={`flex-1 py-2 px-3 rounded-lg text-base transition-all duration-200 text-left font-medium ${
+            className={`flex-1 flex items-center gap-2 py-2.5 px-3 rounded-lg text-sm transition-all duration-150 text-left font-semibold ${
               hasActiveFile && isExpanded
-                ? 'text-blue-400 bg-blue-900/20'
+                ? 'text-blue-300 bg-blue-900/40 border border-blue-700/30'
                 : hasActiveFile
-                ? 'text-blue-400 bg-blue-900/10'
-                : 'text-gray-300 hover:text-blue-600 hover:bg-slate-950'
+                ? 'text-blue-400 bg-blue-900/25'
+                : 'text-gray-300 hover:text-blue-300 hover:bg-slate-800/60'
             }`}
           >
-            {folder.name}
+            <span className="text-base">{emoji}</span>
+            <FolderIcon className={`h-4 w-4 flex-shrink-0 transition-colors duration-150 ${
+              hasActiveFile ? 'text-blue-400' : 'text-gray-500 group-hover:text-blue-400'
+            }`} />
+            <span>{folder.name}</span>
           </button>
         </div>
         {isExpanded && (
-          <div className="ml-2 mt-1 space-y-1 animate-fade-in">
+          <div className="ml-6 mt-1 space-y-0.5 animate-fade-in">
             {folder.files.map((file) => renderFile(file, 1))}
           </div>
         )}
@@ -183,7 +224,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
 
   if (loading) {
     return (
-      <aside className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-black/95 backdrop-blur-md border-r border-slate-900 overflow-y-auto transition-all duration-300 z-40 ${
+      <aside className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-slate-950/98 backdrop-blur-md border-r border-slate-800/50 overflow-y-auto transition-all duration-300 z-40 ${
         isOpen ? 'w-64 translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0'
       }`}>
         <div className="p-4">
@@ -216,47 +257,57 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
       
       <aside 
         data-sidebar="left"
-        className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-black/95 backdrop-blur-md border-r border-slate-900 transition-all duration-300 z-40 shadow-lg lg:shadow-none ${
-          isOpen && !isCollapsed
-            ? 'w-64 translate-x-0 overflow-y-auto' 
-            : isCollapsed && !isMobile
+        className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900/95 backdrop-blur-xl border-r border-slate-800/60 transition-all duration-300 z-40 shadow-xl lg:shadow-none ${
+          isMobile
+            ? isOpen
+              ? 'w-64 translate-x-0 overflow-y-auto'
+              : '-translate-x-full overflow-hidden'
+            : isCollapsed
             ? 'w-0 translate-x-0 overflow-hidden border-r-0'
-            : '-translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden border-r-0'
+            : isOpen
+            ? 'w-64 translate-x-0 overflow-y-auto'
+            : '-translate-x-full lg:translate-x-0 lg:w-0 overflow-hidden'
         }`}>
-        {/* Collapse/Expand button (desktop only) - only show when not collapsed */}
-        {!isCollapsed && isOpen && (
+        {/* Sidebar content - show when open (or when not collapsed on desktop) */}
+        {((isMobile && isOpen) || (!isMobile && !isCollapsed && isOpen)) && (
           <div className="p-4">
-            <div className="hidden lg:flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                v5.1.0
-              </span>
-              <button
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors duration-200"
-                aria-label="Collapse sidebar"
-              >
-                <ChevronRightIcon className="h-6 w-6 text-gray-400 rotate-180" />
-              </button>
+            {/* Desktop Header */}
+            <div className="hidden lg:flex items-center justify-between mb-6 pb-4 border-b border-slate-800/50">
+              <div className="flex items-center gap-2">
+                <BookOpenIcon className="h-5 w-5 text-blue-400" />
+                <span className="text-sm font-bold text-gray-300 uppercase tracking-wider">
+                  Documentation
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                  v5.1.0
+                </span>
+                <button
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                  className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors duration-150"
+                  aria-label="Collapse sidebar"
+                >
+                  <ChevronRightIcon className="h-5 w-5 text-gray-400 rotate-180 hover:text-white" />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Sidebar content - only show when not collapsed */}
-        {!isCollapsed && isOpen && (
-          <div className="p-4">
 
             {/* Mobile close button */}
             {isMobile && (
-              <div className="flex items-center justify-between mb-4 lg:hidden">
-                <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-                  Documentation
-                </span>
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-800/50 lg:hidden">
+                <div className="flex items-center gap-2">
+                  <BookOpenIcon className="h-5 w-5 text-blue-400" />
+                  <span className="text-sm font-bold text-gray-300 uppercase tracking-wider">
+                    Documentation
+                  </span>
+                </div>
                 <button
                   onClick={onClose}
-                  className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors duration-200"
+                  className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors duration-150"
                   aria-label="Close sidebar"
                 >
-                  <XMarkIcon className="h-6 w-6 text-gray-400" />
+                  <XMarkIcon className="h-6 w-6 text-gray-400 hover:text-white" />
                 </button>
               </div>
             )}

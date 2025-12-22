@@ -64,14 +64,16 @@ export function Alert({ type = 'info', title, children }: AlertProps) {
   const { icon: Icon, bgColor, borderColor, iconColor, titleColor, textColor } = config[validType];
 
       return (
-        <div className={`my-4 rounded-lg border ${borderColor} ${bgColor} p-4 transition-all duration-300 shadow-sm hover:shadow-md`}>
-          <div className="flex items-start gap-3">
-            <Icon className={`h-5 w-5 ${iconColor} flex-shrink-0 mt-0.5 transition-transform duration-200 hover:scale-110`} />
-            <div className="flex-1">
+        <div className={`my-4 sm:my-6 rounded-xl border-2 ${borderColor} ${bgColor} p-4 sm:p-5 transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm`}>
+          <div className="flex items-start gap-3 sm:gap-4">
+            <div className={`p-1.5 sm:p-2 rounded-lg bg-opacity-20 ${bgColor} border ${borderColor} flex-shrink-0`}>
+              <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${iconColor}`} />
+            </div>
+            <div className="flex-1 min-w-0">
               {title && (
-                <h4 className={`font-semibold mb-2 ${titleColor} transition-colors duration-200`}>{title}</h4>
+                <h4 className={`font-bold text-base sm:text-lg mb-2 sm:mb-3 ${titleColor} transition-colors duration-200`}>{title}</h4>
               )}
-              <div className={`${textColor} transition-colors duration-200`}>{children}</div>
+              <div className={`text-sm sm:text-base ${textColor} leading-relaxed transition-colors duration-200`}>{children}</div>
             </div>
           </div>
         </div>

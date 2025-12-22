@@ -70,12 +70,29 @@ export default function DocLayout({ children, headings = [] }: DocLayoutProps) {
 
   return (
     <div className="flex min-h-screen relative">
-      <main className={`flex-1 w-full transition-all duration-300 pt-16 ${
+      {/* Professional Background */}
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-950 via-navy-950 to-slate-900">
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/5 to-purple-950/5"></div>
+        {/* Grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px',
+          }}
+        />
+      </div>
+
+      <main className={`flex-1 w-full transition-all duration-300 pt-16 relative ${
         leftCollapsed ? 'lg:ml-0' : 'lg:ml-64'
       } ${
         rightCollapsed ? 'lg:mr-0' : 'lg:mr-64'
       }`}>
-        <div className="w-full max-w-4xl pt-8 pb-12 lg:pt-10 lg:pb-16 lg:ml-[135px] lg:mr-auto px-6 sm:px-8 lg:px-10 xl:px-12">
+        <div className="w-full max-w-4xl pt-4 sm:pt-8 pb-8 sm:pb-12 lg:pt-12 lg:pb-20 lg:ml-[135px] lg:mr-auto px-4 sm:px-6 lg:px-10 xl:px-12">
           {children}
         </div>
       </main>

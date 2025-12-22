@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { 
   BoltIcon, 
   CubeIcon, 
@@ -9,21 +12,50 @@ import {
   ExclamationTriangleIcon,
   PlusIcon,
   XMarkIcon,
-  CalendarIcon
+  CalendarIcon,
+  PhotoIcon,
+  DocumentTextIcon,
+  ChartBarIcon,
+  CpuChipIcon,
+  SparklesIcon,
+  PaintBrushIcon,
+  FilmIcon,
+  CommandLineIcon,
+  CodeBracketIcon,
+  BeakerIcon,
+  AdjustmentsHorizontalIcon,
+  RectangleStackIcon
 } from '@heroicons/react/24/outline';
+
+interface SubsectionItem {
+  content: string;
+  subItems?: string[];
+}
+
+interface Subsection {
+  title: string;
+  items: SubsectionItem[];
+}
+
+interface ChangeSection {
+  type: string;
+  subsections: Subsection[];
+  flatItems?: string[]; // For sections without subsections
+}
 
 interface ChangelogEntry {
   version: string;
   date: string;
   type: 'major' | 'minor' | 'patch';
   changes: {
-    added?: string[];
-    fixed?: string[];
-    changed?: string[];
-    improved?: string[];
-    enhanced?: string[];
-    removed?: string[];
-    [key: string]: string[] | undefined;
+    added?: ChangeSection | string[];
+    fixed?: ChangeSection | string[];
+    changed?: ChangeSection | string[];
+    improved?: ChangeSection | string[];
+    enhanced?: ChangeSection | string[];
+    removed?: ChangeSection | string[];
+    features?: ChangeSection | string[];
+    [key: string]: ChangeSection | string[] | undefined;
   };
 }
 
@@ -56,83 +88,283 @@ const changeTypeConfig = {
   improved: { label: 'Improved', icon: CheckCircleIcon, color: 'text-green-400', bgColor: 'bg-green-500/10' },
   enhanced: { label: 'Enhanced', icon: BoltIcon, color: 'text-purple-400', bgColor: 'bg-purple-500/10' },
   removed: { label: 'Removed', icon: XMarkIcon, color: 'text-red-400', bgColor: 'bg-red-500/10' },
+  features: { label: 'Features', icon: PlusIcon, color: 'text-blue-400', bgColor: 'bg-blue-500/10' },
 };
+
+// Function to get icon for subsection titles
+function getSubsectionIcon(title: string) {
+  const lowerTitle = title.toLowerCase();
+  
+  if (lowerTitle.includes('background') || lowerTitle.includes('bg')) {
+    return PhotoIcon;
+  }
+  if (lowerTitle.includes('image') || lowerTitle.includes('photo') || lowerTitle.includes('picture')) {
+    return PhotoIcon;
+  }
+  if (lowerTitle.includes('video') || lowerTitle.includes('frame') || lowerTitle.includes('media')) {
+    return FilmIcon;
+  }
+  if (lowerTitle.includes('text') || lowerTitle.includes('font') || lowerTitle.includes('typography')) {
+    return DocumentTextIcon;
+  }
+  if (lowerTitle.includes('chart') || lowerTitle.includes('graph') || lowerTitle.includes('plot')) {
+    return ChartBarIcon;
+  }
+  if (lowerTitle.includes('line') || lowerTitle.includes('path') || lowerTitle.includes('draw')) {
+    return PaintBrushIcon;
+  }
+  if (lowerTitle.includes('utility') || lowerTitle.includes('method') || lowerTitle.includes('function')) {
+    return CommandLineIcon;
+  }
+  if (lowerTitle.includes('technical') || lowerTitle.includes('performance') || lowerTitle.includes('optimization')) {
+    return CpuChipIcon;
+  }
+  if (lowerTitle.includes('documentation') || lowerTitle.includes('doc') || lowerTitle.includes('readme')) {
+    return DocumentTextIcon;
+  }
+  if (lowerTitle.includes('filter') || lowerTitle.includes('effect') || lowerTitle.includes('enhancement')) {
+    return SparklesIcon;
+  }
+  if (lowerTitle.includes('code') || lowerTitle.includes('api') || lowerTitle.includes('sdk')) {
+    return CodeBracketIcon;
+  }
+  if (lowerTitle.includes('test') || lowerTitle.includes('experimental')) {
+    return BeakerIcon;
+  }
+  if (lowerTitle.includes('setting') || lowerTitle.includes('config') || lowerTitle.includes('option')) {
+    return AdjustmentsHorizontalIcon;
+  }
+  if (lowerTitle.includes('batch') || lowerTitle.includes('collection') || lowerTitle.includes('multiple')) {
+    return RectangleStackIcon;
+  }
+  
+  // Default icon
+  return SparklesIcon;
+}
 
 function parseChangelog(content: string): ChangelogEntry[] {
   const entries: ChangelogEntry[] = [];
   
-  // Split by version headers
+  // Split by version headers - format: ## [version] - date
   const versionRegex = /^##\s+\[(.+?)\]\s*-\s*(.+?)$/gm;
-  const matches = Array.from(content.matchAll(versionRegex));
+  const versionMatches = Array.from(content.matchAll(versionRegex));
 
-  for (const match of matches) {
+  for (const match of versionMatches) {
     const version = match[1];
-    const date = match[2];
+    const date = match[2].trim();
     const startIndex = match.index! + match[0].length;
-    const nextMatch = matches[matches.indexOf(match) + 1];
+    const nextMatch = versionMatches[versionMatches.indexOf(match) + 1];
     const endIndex = nextMatch ? nextMatch.index! : content.length;
-    const sectionContent = content.substring(startIndex, endIndex);
+    let sectionContent = content.substring(startIndex, endIndex).trim();
 
     // Determine release type from version
     const versionParts = version.split('.');
     let type: 'major' | 'minor' | 'patch' = 'patch';
-    if (versionParts.length >= 1 && parseInt(versionParts[0]) > 0) {
+    const major = parseInt(versionParts[0]) || 0;
+    const minor = parseInt(versionParts[1]) || 0;
+    const patch = parseInt(versionParts[2]) || 0;
+    
+    if (major > 0 || (major === 0 && minor === 0 && patch === 0)) {
       type = 'major';
-    } else if (versionParts.length >= 2 && parseInt(versionParts[1]) > 0) {
+    } else if (minor > 0) {
       type = 'minor';
+    } else {
+      type = 'patch';
     }
 
     const changes: ChangelogEntry['changes'] = {};
 
-    // Parse sections - handle emoji and text variations
+    // Map emoji patterns to change types - handle both ### and #### headers
     const sectionPatterns = [
-      { key: 'added', regex: /###\s+.*?[✨➕]\s*Added\s*\n([\s\S]*?)(?=###|##|---|$)/i },
-      { key: 'fixed', regex: /###\s+.*?[🐛🔧]\s*Fixed\s*\n([\s\S]*?)(?=###|##|---|$)/i },
-      { key: 'changed', regex: /###\s+.*?[🔄⚡]\s*Changed\s*\n([\s\S]*?)(?=###|##|---|$)/i },
-      { key: 'improved', regex: /###\s+.*?[🔧✨]\s*Improved\s*\n([\s\S]*?)(?=###|##|---|$)/i },
-      { key: 'enhanced', regex: /###\s+.*?[✨🚀]\s*Enhanced\s*\n([\s\S]*?)(?=###|##|---|$)/i },
+      { key: 'added', regex: /^#{3,4}\s+.*?(?:✨|➕)?\s*Added\s*$/mi },
+      { key: 'fixed', regex: /^#{3,4}\s+.*?(?:🐛|🔧)?\s*Fixed\s*$/mi },
+      { key: 'changed', regex: /^#{3,4}\s+.*?(?:🔄|⚡)?\s*Changed\s*$/mi },
+      { key: 'improved', regex: /^#{3,4}\s+.*?(?:🔧|✨)?\s*Improved\s*$/mi },
+      { key: 'enhanced', regex: /^#{3,4}\s+.*?(?:✨|🚀)?\s*Enhanced\s*$/mi },
+      { key: 'removed', regex: /^#{3,4}\s+.*?(?:🗑️|➖)?\s*Removed\s*$/mi },
+      { key: 'features', regex: /^###\s+Features\s*$/mi }, // Handle generic "Features" sections (map to added)
     ];
 
-    const parseItems = (text: string): string[] => {
-      const items: string[] = [];
-      const lines = text.split('\n');
-      let currentItem = '';
-      
-      for (const line of lines) {
+    // Find all section matches in order
+    interface SectionMatch {
+      key: string;
+      index: number;
+      endIndex: number;
+    }
+    
+    const allSectionMatches: SectionMatch[] = [];
+    for (const pattern of sectionPatterns) {
+      const regex = new RegExp(pattern.regex.source, pattern.regex.flags + 'g');
+      let match;
+      while ((match = regex.exec(sectionContent)) !== null) {
+        allSectionMatches.push({
+          key: pattern.key,
+          index: match.index! + match[0].length,
+          endIndex: match.index! + match[0].length,
+        });
+      }
+    }
+
+    // Sort by index
+    allSectionMatches.sort((a, b) => a.index - b.index);
+
+    // Determine end indices
+    for (let i = 0; i < allSectionMatches.length; i++) {
+      const current = allSectionMatches[i];
+      if (i < allSectionMatches.length - 1) {
+        current.endIndex = allSectionMatches[i + 1].index;
+      } else {
+        // Check for version headers and horizontal rules
+        const nextVersionMatch = sectionContent.substring(current.index).match(/^(---|##\s+\[)/m);
+        current.endIndex = nextVersionMatch ? current.index + nextVersionMatch.index! : sectionContent.length;
+      }
+    }
+
+    // Parse each section
+    for (const sectionMatch of allSectionMatches) {
+      const sectionText = sectionContent.substring(sectionMatch.index, sectionMatch.endIndex).trim();
+      if (!sectionText) continue;
+
+      // Parse section with subsections
+      const lines = sectionText.split('\n');
+      const subsections: Subsection[] = [];
+      let currentSubsection: Subsection | null = null;
+      let currentItem: SubsectionItem | null = null;
+      let flatItems: string[] = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
         const trimmed = line.trim();
-        // Handle list items (with or without markdown bold)
-        if (trimmed.match(/^[-*]\s+/)) {
-          if (currentItem) items.push(currentItem.trim());
-          currentItem = trimmed.replace(/^[-*]\s+/, '');
-        } else if (trimmed.startsWith('#####') || trimmed.startsWith('####')) {
-          // Skip subheadings but keep current item if exists
+        const originalIndent = line.match(/^(\s*)/)?.[1].length || 0;
+
+        // Skip empty lines and horizontal rules
+        if (!trimmed || trimmed.match(/^---+$/)) {
           if (currentItem) {
-            items.push(currentItem.trim());
-            currentItem = '';
+            if (currentSubsection) {
+              currentSubsection.items.push(currentItem);
+            } else {
+              flatItems.push(currentItem.content);
+            }
+            currentItem = null;
           }
-        } else if (trimmed && !trimmed.startsWith('#') && currentItem) {
-          // Continue item on next line
-          currentItem += ' ' + trimmed;
-        } else if (trimmed && !trimmed.startsWith('#')) {
-          currentItem = trimmed;
+          continue;
+        }
+
+        // Check for subsection header (#####)
+        const subsectionMatch = trimmed.match(/^#####\s+(.+)$/);
+        if (subsectionMatch) {
+          // Save current item if exists
+          if (currentItem) {
+            if (currentSubsection) {
+              currentSubsection.items.push(currentItem);
+            } else {
+              flatItems.push(currentItem.content);
+            }
+            currentItem = null;
+          }
+          // Start new subsection
+          currentSubsection = {
+            title: subsectionMatch[1],
+            items: []
+          };
+          subsections.push(currentSubsection);
+          continue;
+        }
+
+        // Check if this is a list item (starts with - or *)
+        const listItemMatch = trimmed.match(/^[-*]\s+(.+)$/);
+        if (listItemMatch) {
+          // Save previous item
+          if (currentItem) {
+            if (currentSubsection) {
+              currentSubsection.items.push(currentItem);
+            } else {
+              flatItems.push(currentItem.content);
+            }
+          }
+          // Start new item
+          currentItem = {
+            content: listItemMatch[1],
+            subItems: []
+          };
+        } else if (currentItem && originalIndent >= 2) {
+          // Nested sub-item (indented with 2+ spaces)
+          const subItemMatch = trimmed.match(/^[-*]\s+(.+)$/);
+          if (subItemMatch) {
+            if (!currentItem.subItems) currentItem.subItems = [];
+            currentItem.subItems.push(subItemMatch[1]);
+          } else if (trimmed) {
+            // Continuation of sub-item or main item
+            if (currentItem.subItems && currentItem.subItems.length > 0) {
+              // Append to last sub-item
+              const lastSubItem = currentItem.subItems[currentItem.subItems.length - 1];
+              currentItem.subItems[currentItem.subItems.length - 1] = lastSubItem + ' ' + trimmed;
+            } else {
+              // Append to main item
+              currentItem.content += ' ' + trimmed;
+            }
+          }
+        } else if (currentItem && trimmed && !trimmed.startsWith('#')) {
+          // Continuation of current item
+          currentItem.content += ' ' + trimmed;
         }
       }
-      if (currentItem) items.push(currentItem.trim());
-      return items.filter(item => item.length > 10); // Filter out very short items
-    };
 
-    for (const pattern of sectionPatterns) {
-      const match = sectionContent.match(pattern.regex);
-      if (match && match[1]) {
-        const parsed = parseItems(match[1]);
-        if (parsed.length > 0) {
-          changes[pattern.key as keyof typeof changes] = parsed;
+      // Save last item
+      if (currentItem) {
+        if (currentSubsection) {
+          currentSubsection.items.push(currentItem);
+        } else {
+          flatItems.push(currentItem.content);
+        }
+      }
+
+      // Build change section
+      const changeKey = sectionMatch.key === 'features' ? 'added' : sectionMatch.key;
+      if (subsections.length > 0) {
+        // Has subsections - use structured format
+        const changeSection: ChangeSection = {
+          type: changeKey,
+          subsections: subsections
+        };
+        // Merge if exists
+        const existing = changes[changeKey as keyof typeof changes];
+        if (existing && Array.isArray(existing)) {
+          changes[changeKey as keyof typeof changes] = changeSection;
+        } else if (existing && !Array.isArray(existing)) {
+          // Merge subsections
+          const existingSection = existing as ChangeSection;
+          existingSection.subsections = [...existingSection.subsections, ...subsections];
+        } else {
+          changes[changeKey as keyof typeof changes] = changeSection;
+        }
+      } else if (flatItems.length > 0) {
+        // No subsections - use flat list
+        const validItems = flatItems.filter(item => item.length > 3);
+        if (validItems.length > 0) {
+          if (changes[changeKey as keyof typeof changes] && Array.isArray(changes[changeKey as keyof typeof changes])) {
+            // Merge arrays
+            (changes[changeKey as keyof typeof changes] as string[]).push(...validItems);
+          } else {
+            changes[changeKey as keyof typeof changes] = validItems;
+          }
         }
       }
     }
 
-    const totalChanges = Object.values(changes).reduce((sum, arr) => sum + (arr?.length || 0), 0);
-
+    // Only add entry if it has changes - use same logic as getTotalChanges
+    const totalChanges = Object.values(changes).reduce((sum, changeData) => {
+      if (!changeData) return sum;
+      if (Array.isArray(changeData)) {
+        return sum + changeData.length;
+      }
+      if (typeof changeData === 'object' && 'subsections' in changeData) {
+        const section = changeData as ChangeSection;
+        return sum + section.subsections.reduce((subSum, sub) => subSum + sub.items.length, 0);
+      }
+      return sum;
+    }, 0);
+    
     if (totalChanges > 0) {
       entries.push({ version, date, type, changes });
     }
@@ -150,34 +382,58 @@ export default function ChangelogRenderer({ content }: ChangelogRendererProps) {
   };
 
   const formatDate = (dateStr: string) => {
+    // Handle special date strings
+    const trimmed = dateStr.trim();
+    if (trimmed === 'Previous Release' || trimmed === 'Initial Major Release') {
+      return trimmed;
+    }
     try {
-      const date = new Date(dateStr);
+      const date = new Date(trimmed);
+      if (isNaN(date.getTime())) return trimmed;
       return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     } catch {
-      return dateStr;
+      return trimmed;
     }
   };
 
   const getTotalChanges = (changes: ChangelogEntry['changes']) => {
-    return Object.values(changes).reduce((sum, arr) => sum + (arr?.length || 0), 0);
+    return Object.values(changes).reduce((sum, changeData) => {
+      if (!changeData) return sum;
+      if (Array.isArray(changeData)) {
+        return sum + changeData.length;
+      }
+      if (typeof changeData === 'object' && 'subsections' in changeData) {
+        const section = changeData as ChangeSection;
+        return sum + section.subsections.reduce((subSum, sub) => subSum + sub.items.length, 0);
+      }
+      return sum;
+    }, 0);
   };
 
+  if (entries.length === 0) {
+    return (
+      <div className="text-center py-12 text-gray-400">
+        <p>No changelog entries found.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {entries.map((entry, index) => {
         const TypeIcon = typeConfig[entry.type].icon;
-        const isExpanded = expanded[entry.version] ?? (index === 1); // Expand second entry by default
+        const isExpanded = expanded[entry.version] ?? (index === 0); // Expand first entry by default
         const totalChanges = getTotalChanges(entry.changes);
 
         return (
           <div
             key={entry.version}
-            className="bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 hover:border-slate-600/50 transition-all duration-300"
+            className="bg-slate-900/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 lg:p-8 hover:border-slate-600/50 transition-all duration-300 shadow-lg"
           >
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="flex-1">
-                <div className="flex items-center gap-4 mb-3">
-                  <h3 className="text-3xl font-bold text-white">{entry.version}</h3>
+                <div className="flex flex-wrap items-center gap-3 mb-3">
+                  <h3 className="text-3xl lg:text-4xl font-bold text-white">{entry.version}</h3>
                   <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${typeConfig[entry.type].color}`}>
                     <TypeIcon className="w-4 h-4" />
                     <span className="text-sm font-semibold">{typeConfig[entry.type].label}</span>
@@ -211,36 +467,112 @@ export default function ChangelogRenderer({ content }: ChangelogRendererProps) {
             </div>
 
             {isExpanded && (
-              <div className="mt-6 space-y-6 pt-6 border-t border-slate-700/50 animate-fade-in">
-                {Object.entries(entry.changes).map(([changeType, items]) => {
-                  if (!items || items.length === 0) return null;
+              <div className="mt-6 space-y-6 pt-6 border-t border-slate-700/50">
+                {Object.entries(entry.changes).map(([changeType, changeData]) => {
+                  if (!changeData) return null;
                   
                   const config = changeTypeConfig[changeType as keyof typeof changeTypeConfig];
                   if (!config) return null;
 
                   const Icon = config.icon;
+                  const isStructured = changeData && typeof changeData === 'object' && 'subsections' in changeData;
+                  const changeSection = isStructured ? changeData as ChangeSection : null;
+                  const flatItems = !isStructured && Array.isArray(changeData) ? changeData : [];
 
                   return (
-                    <div key={changeType} className="space-y-3">
-                      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${config.bgColor}`}>
+                    <div key={changeType} className="space-y-5">
+                      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${config.bgColor} border border-transparent`}>
                         <Icon className={`w-5 h-5 ${config.color}`} />
-                        <h4 className={`font-semibold ${config.color}`}>{config.label}</h4>
+                        <h4 className={`font-semibold text-base ${config.color}`}>{config.label}</h4>
                       </div>
-                      <ul className="space-y-2.5 ml-2">
-                        {items.map((item, idx) => {
-                          // Convert markdown bold to HTML
-                          const htmlContent = item
-                            .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
-                            .replace(/`(.*?)`/g, '<code class="bg-slate-800 text-cyan-400 px-1.5 py-0.5 rounded text-sm">$1</code>');
-                          
-                          return (
-                            <li key={idx} className="flex items-start gap-3 text-gray-300 text-base leading-relaxed">
-                              <span className="mt-2.5 w-1.5 h-1.5 rounded-full bg-gray-500 flex-shrink-0" />
-                              <span className="flex-1" dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                      
+                      {changeSection && changeSection.subsections.length > 0 ? (
+                        // Structured format with subsections
+                        <div className="space-y-6 ml-2">
+                          {changeSection.subsections.map((subsection, subIdx) => {
+                            const SubsectionIcon = getSubsectionIcon(subsection.title);
+                            return (
+                            <div key={subIdx} className="space-y-3">
+                              <div className="flex items-center gap-2 text-lg font-semibold text-gray-200 border-b border-slate-700/50 pb-2">
+                                <SubsectionIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                                <h5>{subsection.title}</h5>
+                              </div>
+                              <ol className="space-y-3 ml-6 list-decimal">
+                                {subsection.items.map((item, itemIdx) => (
+                                  <li key={itemIdx} className="text-gray-300 leading-relaxed pl-2">
+                                    <div className="prose prose-invert max-w-none">
+                                      <ReactMarkdown 
+                                        remarkPlugins={[remarkGfm]} 
+                                        rehypePlugins={[rehypeRaw]}
+                                        components={{
+                                          p: ({ children }) => <span className="inline">{children}</span>,
+                                          strong: ({ children }) => <strong className="text-white font-semibold">{children}</strong>,
+                                          code: ({ children }) => (
+                                            <code className="bg-slate-800/80 text-cyan-400 px-1.5 py-0.5 rounded text-sm font-mono">
+                                              {children}
+                                            </code>
+                                          ),
+                                        }}
+                                      >
+                                        {item.content}
+                                      </ReactMarkdown>
+                                    </div>
+                                    {item.subItems && item.subItems.length > 0 && (
+                                      <ul className="mt-2 ml-6 space-y-1.5 list-disc list-inside">
+                                        {item.subItems.map((subItem, subItemIdx) => (
+                                          <li key={subItemIdx} className="text-gray-400 text-sm">
+                                            <ReactMarkdown 
+                                              remarkPlugins={[remarkGfm]} 
+                                              rehypePlugins={[rehypeRaw]}
+                                              components={{
+                                                p: ({ children }) => <span className="inline">{children}</span>,
+                                                strong: ({ children }) => <strong className="text-gray-300 font-medium">{children}</strong>,
+                                                code: ({ children }) => (
+                                                  <code className="bg-slate-800/80 text-cyan-400 px-1 py-0.5 rounded text-xs font-mono">
+                                                    {children}
+                                                  </code>
+                                                ),
+                                              }}
+                                            >
+                                              {subItem}
+                                            </ReactMarkdown>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    )}
+                                  </li>
+                                ))}
+                              </ol>
+                            </div>
+                            );
+                          })}
+                        </div>
+                      ) : flatItems.length > 0 ? (
+                        // Flat list format (no subsections)
+                        <ul className="space-y-3 ml-2 list-disc list-inside">
+                          {flatItems.map((item, idx) => (
+                            <li key={idx} className="text-gray-300 leading-relaxed pl-2">
+                              <div className="prose prose-invert max-w-none">
+                                <ReactMarkdown 
+                                  remarkPlugins={[remarkGfm]} 
+                                  rehypePlugins={[rehypeRaw]}
+                                  components={{
+                                    p: ({ children }) => <span className="inline">{children}</span>,
+                                    strong: ({ children }) => <strong className="text-white font-semibold">{children}</strong>,
+                                    code: ({ children }) => (
+                                      <code className="bg-slate-800/80 text-cyan-400 px-1.5 py-0.5 rounded text-sm font-mono">
+                                        {children}
+                                      </code>
+                                    ),
+                                  }}
+                                >
+                                  {item}
+                                </ReactMarkdown>
+                              </div>
                             </li>
-                          );
-                        })}
-                      </ul>
+                          ))}
+                        </ul>
+                      ) : null}
                     </div>
                   );
                 })}
@@ -255,7 +587,7 @@ export default function ChangelogRenderer({ content }: ChangelogRendererProps) {
           href="https://github.com/EIAS79/apexify.js"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 hover:bg-slate-800/70 border border-slate-700/50 rounded-lg text-gray-300 hover:text-white transition-all duration-200"
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800/70 border border-slate-700/50 rounded-lg text-gray-300 hover:text-white transition-all duration-200"
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
@@ -266,4 +598,3 @@ export default function ChangelogRenderer({ content }: ChangelogRendererProps) {
     </div>
   );
 }
-

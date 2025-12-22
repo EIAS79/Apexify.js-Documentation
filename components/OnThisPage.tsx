@@ -73,7 +73,7 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
       {/* Mobile toggle button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed bottom-6 right-6 z-50 lg:hidden bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 hover:scale-110"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 lg:hidden bg-blue-500 text-white p-2.5 sm:p-3 rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 hover:scale-110"
         aria-label="Toggle table of contents"
       >
         {isMobileOpen ? (
@@ -104,7 +104,7 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
 
       <aside 
         data-sidebar="right"
-        className={`fixed right-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-black/95 backdrop-blur-md border-l border-slate-900 transition-all duration-300 z-40 shadow-lg lg:shadow-none ${
+        className={`fixed right-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900/95 backdrop-blur-xl border-l border-slate-800/60 transition-all duration-300 z-40 shadow-xl lg:shadow-none ${
           isCollapsed 
             ? 'w-0 lg:w-0 overflow-hidden border-l-0' 
             : 'w-0 lg:w-64 overflow-y-auto'
@@ -114,8 +114,9 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
         {!isCollapsed && (
           <div className="p-4">
             {/* Collapse/Expand button (desktop only) */}
-            <div className="hidden lg:flex items-center justify-between mb-4">
-              <h3 className="text-base font-semibold text-gray-400 uppercase tracking-wider">
+            <div className="hidden lg:flex items-center justify-between mb-6 pb-4 border-b border-slate-800/50">
+              <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                <span className="text-blue-400">📑</span>
                 ON THIS PAGE
               </h3>
               <button
@@ -153,12 +154,12 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
                       setIsMobileOpen(false);
                     }
                   }}
-                  className={`block py-2 px-3 rounded-lg text-base transition-all duration-200 ${
-                    heading.level === 1 ? 'font-medium' : heading.level === 2 ? 'ml-3' : 'ml-6'
+                  className={`block py-2.5 px-3 rounded-lg text-sm transition-all duration-150 ${
+                    heading.level === 1 ? 'font-semibold' : heading.level === 2 ? 'ml-4 font-medium' : 'ml-6'
                   } ${
                     activeId === heading.id
-                      ? 'text-blue-400 bg-blue-900/20 font-medium'
-                      : 'text-gray-400 hover:text-blue-600 hover:bg-slate-950'
+                      ? 'text-white bg-gradient-to-r from-blue-600 to-purple-600 font-semibold shadow-lg shadow-blue-500/30'
+                      : 'text-gray-400 hover:text-blue-300 hover:bg-slate-800/60'
                   }`}
                 >
                   {heading.text}

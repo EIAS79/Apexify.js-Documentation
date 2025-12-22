@@ -58,7 +58,7 @@ export default function SearchResults({ results, query, onClose, isOpen }: Searc
   return (
     <div
       ref={resultsRef}
-      className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50"
+      className="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-lg shadow-xl max-h-[calc(100vh-200px)] sm:max-h-96 overflow-y-auto z-[101]"
     >
       {results.length === 0 ? (
         <div className="p-4 text-center text-gray-400">

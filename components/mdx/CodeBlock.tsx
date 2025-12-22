@@ -45,11 +45,11 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
   const borderClass = hideHeader ? 'border-t-0' : '';
 
   return (
-    <div className={`relative group ${hideHeader ? 'my-0' : 'my-4'}`}>
-      <div className={`bg-gray-800 dark:bg-gray-800 ${roundedClass} border border-gray-700 dark:border-gray-700 ${borderClass} overflow-hidden shadow-lg transition-colors duration-300`}>
+    <div className={`relative group ${hideHeader ? 'my-0' : 'my-4 sm:my-6'}`}>
+      <div className={`bg-slate-900 ${roundedClass} border-2 border-slate-800/80 ${borderClass} overflow-hidden shadow-2xl transition-colors duration-200`}>
         {/* macOS-style window header */}
         {!hideHeader && (
-          <div className="bg-gray-800/90 dark:bg-gray-800/90 px-4 py-3 border-b border-gray-700 dark:border-gray-700 flex items-center justify-between transition-colors duration-300">
+          <div className="bg-gradient-to-r from-slate-800 to-slate-800/90 px-3 sm:px-4 py-2 sm:py-3 border-b-2 border-slate-800/80 flex items-center justify-between transition-colors duration-200 flex-wrap gap-2">
             <div className="flex items-center gap-2">
               {/* macOS window controls */}
               <div className="flex gap-1.5">
@@ -58,14 +58,14 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
                 <div className="w-3 h-3 rounded-full bg-green-500 transition-all duration-200 hover:brightness-110"></div>
               </div>
               {filename && (
-                <span className="ml-3 text-xs text-gray-400 dark:text-gray-400 font-mono">{filename}</span>
+                <span className="ml-3 text-xs text-blue-300 font-mono font-semibold">{filename}</span>
               )}
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-400 dark:text-gray-400 uppercase font-medium">{normalizeLanguage(language)}</span>
+              <span className="text-xs text-emerald-400 uppercase font-bold px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30">{normalizeLanguage(language)}</span>
               <button
                 onClick={copyToClipboard}
-                className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-400 hover:text-white dark:hover:text-white transition-all duration-200 px-2 py-1 rounded hover:bg-gray-700 dark:hover:bg-gray-700"
+                className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors duration-150 px-3 py-1.5 rounded-lg hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50"
               >
                 {copied ? (
                   <>
@@ -84,17 +84,18 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
         )}
         
         {/* Code content with Prism syntax highlighting */}
-        <div className="relative bg-[#1f2937] dark:bg-[#1f2937] transition-colors duration-300">
-          <SyntaxHighlighter
-            language={normalizeLanguage(language)}
-            style={vscDarkPlus}
-            customStyle={{
-              margin: 0,
-              padding: '1rem',
-              background: 'transparent',
-              fontSize: '0.875rem',
-              lineHeight: '1.5',
-            }}
+        <div className="relative bg-slate-950 transition-colors duration-200">
+          <div className="p-3 sm:p-4">
+            <SyntaxHighlighter
+              language={normalizeLanguage(language)}
+              style={vscDarkPlus}
+              customStyle={{
+                margin: 0,
+                padding: 0,
+                background: 'transparent',
+                fontSize: 'clamp(0.7rem, 2vw, 0.875rem)',
+                lineHeight: '1.6',
+              }}
             showLineNumbers={true}
             lineNumberStyle={{
               color: '#6b7280',
@@ -108,10 +109,11 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
                 background: 'transparent',
               }
             }}
-            PreTag="div"
-          >
-            {code}
-          </SyntaxHighlighter>
+              PreTag="div"
+            >
+              {code}
+            </SyntaxHighlighter>
+          </div>
           
           {/* Copy button for when header is hidden */}
           {hideHeader && (

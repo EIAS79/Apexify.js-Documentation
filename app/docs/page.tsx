@@ -4,30 +4,14 @@ import { useEffect, useState } from 'react';
 import DocSidebar from '@/components/DocSidebar';
 import DocLayout from '@/components/DocLayout';
 import { MDXContentRenderer } from './MDXContentRenderer';
+import { useSidebar } from '@/contexts/SidebarContext';
 
 export default function DocsHome() {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [hasHash, setHasHash] = useState(false);
   const [currentHash, setCurrentHash] = useState<string>('');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    
-    const checkScreenSize = () => {
-      if (window.innerWidth >= 1024) {
-        setSidebarOpen(true);
-      } else {
-        setSidebarOpen(false);
-      }
-    };
-    
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
+  const { sidebarOpen, setSidebarOpen } = useSidebar();
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -99,9 +83,13 @@ export default function DocsHome() {
       <>
         <DocSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <DocLayout headings={[]}>
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-400"></div>
-            <div className="text-gray-600 dark:text-gray-400 mt-4">Loading...</div>
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="relative">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-500/20 border-t-blue-500"></div>
+              <div className="absolute inset-0 inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-500/20 border-r-purple-500" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+            </div>
+            <div className="text-blue-300 font-semibold mt-6 text-lg">Loading documentation...</div>
+            <div className="text-gray-500 text-sm mt-2">Please wait a moment</div>
           </div>
         </DocLayout>
       </>
@@ -113,9 +101,20 @@ export default function DocsHome() {
       <>
         <DocSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <DocLayout headings={[]}>
-          <div className="text-center py-12">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Documentation Not Found</h1>
-            <p className="text-gray-600 dark:text-gray-400">The requested documentation page could not be found.</p>
+          <div className="text-center py-20">
+            <div className="text-6xl mb-6">📚</div>
+            <h1 className="text-4xl font-black bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-4">
+              Documentation Not Found
+            </h1>
+            <p className="text-gray-400 text-lg mb-8">
+              The requested documentation page could not be found.
+            </p>
+            <a
+              href="/docs#Getting-Started"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-500 hover:to-purple-500 transition-all duration-150 shadow-lg"
+            >
+              Go to Getting Started
+            </a>
           </div>
         </DocLayout>
       </>
