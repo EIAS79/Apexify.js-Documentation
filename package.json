@@ -2,6 +2,7 @@
   "name": "apexify.js-website",
   "version": "1.0.0",
   "private": true,
+  "author": "zenith-79",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -36,8 +36,8 @@ export default function DocsHome() {
       let hash = window.location.hash.slice(1);
       
       if (!hash) {
-        window.location.hash = '#Getting-started';
-        hash = 'Getting-started';
+        window.location.hash = '#Getting-Started';
+        hash = 'Getting-Started';
       }
       
       if (hash === currentHash && content) {

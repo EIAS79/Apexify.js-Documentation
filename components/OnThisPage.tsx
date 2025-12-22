@@ -95,7 +95,7 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
       {isCollapsed && !isMobile && (
         <button
           onClick={() => setIsCollapsed(false)}
-          className="fixed right-4 top-24 z-[60] p-3 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 transition-all duration-200 shadow-xl hover:scale-110 backdrop-blur-sm"
+          className="fixed right-4 top-24 z-[60] p-3 bg-slate-950 hover:bg-slate-900 rounded-lg border border-slate-800 transition-all duration-200 shadow-xl hover:scale-110 backdrop-blur-sm"
           aria-label="Expand sidebar"
         >
           <ChevronLeftIcon className="h-6 w-6 text-gray-300 hover:text-white" />
@@ -104,7 +104,7 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
 
       <aside 
         data-sidebar="right"
-        className={`fixed right-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-gray-900/95 backdrop-blur-md border-l border-gray-800 transition-all duration-300 z-40 shadow-lg lg:shadow-none ${
+        className={`fixed right-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-black/95 backdrop-blur-md border-l border-slate-900 transition-all duration-300 z-40 shadow-lg lg:shadow-none ${
           isCollapsed 
             ? 'w-0 lg:w-0 overflow-hidden border-l-0' 
             : 'w-0 lg:w-64 overflow-y-auto'
@@ -115,26 +115,26 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
           <div className="p-4">
             {/* Collapse/Expand button (desktop only) */}
             <div className="hidden lg:flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+              <h3 className="text-base font-semibold text-gray-400 uppercase tracking-wider">
                 ON THIS PAGE
               </h3>
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors duration-200"
+                className="p-1.5 hover:bg-slate-950 rounded-lg transition-colors duration-200"
                 aria-label="Collapse"
               >
-                <ChevronRightIcon className="h-5 w-5 text-gray-400" />
+                <ChevronRightIcon className="h-6 w-6 text-gray-400" />
               </button>
             </div>
 
             {/* Mobile header */}
             <div className="flex lg:hidden items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
+              <h3 className="text-base font-semibold text-gray-400 uppercase tracking-wider">
                 ON THIS PAGE
               </h3>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors duration-200"
+                className="p-1.5 hover:bg-slate-950 rounded-lg transition-colors duration-200"
                 aria-label="Close"
               >
                 <ChevronRightIcon className="h-6 w-6 text-gray-400" />
@@ -153,12 +153,12 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
                       setIsMobileOpen(false);
                     }
                   }}
-                  className={`block py-2 px-3 rounded-lg text-sm transition-all duration-200 ${
+                  className={`block py-2 px-3 rounded-lg text-base transition-all duration-200 ${
                     heading.level === 1 ? 'font-medium' : heading.level === 2 ? 'ml-3' : 'ml-6'
                   } ${
                     activeId === heading.id
                       ? 'text-blue-400 bg-blue-900/20 font-medium'
-                      : 'text-gray-400 hover:text-blue-400 hover:bg-gray-800'
+                      : 'text-gray-400 hover:text-blue-600 hover:bg-slate-950'
                   }`}
                 >
                   {heading.text}

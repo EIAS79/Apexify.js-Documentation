@@ -50,15 +50,15 @@ export function MDXRenderer({ content }: MDXRendererProps) {
       components={{
         h1: ({ node, ...props }: any) => {
           const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-          return <h1 className="text-4xl font-bold text-white mb-8 mt-8" id={id} {...props} />;
+          return <h1 className="text-5xl font-bold text-white mb-8 mt-8" id={id} {...props} />;
         },
         h2: ({ node, ...props }: any) => {
           const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-          return <h2 className="text-3xl font-semibold text-white mb-4 mt-8" id={id} {...props} />;
+          return <h2 className="text-4xl font-semibold text-white mb-4 mt-8" id={id} {...props} />;
         },
         h3: ({ node, ...props }: any) => {
           const id = props.children?.toString().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-          return <h3 className="text-2xl font-semibold text-white mb-3 mt-6" id={id} {...props} />;
+          return <h3 className="text-3xl font-semibold text-white mb-3 mt-6" id={id} {...props} />;
         },
         code: ({ node, inline, className, children, ...props }: any) => {
           const match = /language-(\w+)/.exec(className || '');
@@ -70,22 +70,22 @@ export function MDXRenderer({ content }: MDXRendererProps) {
           }
           
           return (
-            <code className="bg-gray-800 text-green-400 px-1.5 py-0.5 rounded text-sm" {...props}>
+            <code className="bg-gray-800 text-green-400 px-1.5 py-0.5 rounded text-base" {...props}>
               {children}
             </code>
           );
         },
         p: ({ node, ...props }: any) => (
-          <p className="text-gray-400 mb-4 leading-relaxed" {...props} />
+          <p className="text-gray-400 mb-4 leading-relaxed text-lg" {...props} />
         ),
         ul: ({ node, ...props }: any) => (
-          <ul className="list-disc list-inside text-gray-400 mb-4 space-y-2 ml-4" {...props} />
+          <ul className="list-disc list-inside text-gray-400 mb-4 space-y-2 ml-4 text-lg" {...props} />
         ),
         ol: ({ node, ...props }: any) => (
-          <ol className="list-decimal list-inside text-gray-400 mb-4 space-y-2 ml-4" {...props} />
+          <ol className="list-decimal list-inside text-gray-400 mb-4 space-y-2 ml-4 text-lg" {...props} />
         ),
         li: ({ node, ...props }: any) => (
-          <li className="text-gray-400" {...props} />
+          <li className="text-gray-400 text-lg" {...props} />
         ),
         strong: ({ node, ...props }: any) => (
           <strong className="text-white font-semibold" {...props} />

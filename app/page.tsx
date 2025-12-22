@@ -148,7 +148,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white overflow-hidden relative">
+    <div className="min-h-screen bg-black text-white overflow-hidden relative">
       {/* Animated Background with Radial Gradients */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
         {/* Dynamic gradient that follows mouse */}
@@ -157,15 +157,15 @@ export default function Home() {
           style={{
             left: `${mousePosition.x - 400}px`,
             top: `${mousePosition.y - 400}px`,
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4), rgba(147, 51, 234, 0.3), transparent 70%)',
+            background: 'radial-gradient(circle, rgba(30, 58, 138, 0.25), rgba(15, 23, 42, 0.3), rgba(0, 0, 0, 0.4), transparent 70%)',
           }}
         />
         
         {/* Static radial gradients */}
         <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-          <div className="absolute bottom-1/4 left-1/3 w-[700px] h-[700px] bg-pink-500/15 rounded-full blur-3xl animate-pulse delay-2000" />
+          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-950/30 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-slate-950/40 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute bottom-1/4 left-1/3 w-[700px] h-[700px] bg-black/50 rounded-full blur-3xl animate-pulse delay-2000" />
         </div>
         
         {/* Grid pattern overlay */}
@@ -175,7 +175,7 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-20">
+      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24">
         <div className="max-w-7xl mx-auto text-center relative z-10">
           {/* Animated badge */}
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 mb-8 backdrop-blur-sm transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -185,7 +185,7 @@ export default function Home() {
 
           {/* Main heading with glow effect */}
           <h1 className={`text-6xl md:text-8xl lg:text-9xl font-extrabold mb-6 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <span className="bg-gradient-to-r from-blue-400 via-purple-500 via-pink-500 to-cyan-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto] drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]">
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 via-pink-600 to-cyan-600 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto] drop-shadow-[0_0_30px_rgba(30,58,138,0.6)]">
               Apexify.js
             </span>
           </h1>
@@ -202,8 +202,8 @@ export default function Home() {
           {/* CTA Buttons */}
           <div className={`flex flex-col sm:flex-row gap-4 justify-center mb-16 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <Link
-              href="/docs#Getting-started"
-              className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 transition-all duration-300 shadow-lg shadow-blue-500/50 hover:shadow-blue-500/70 hover:scale-105"
+              href="/docs#Getting-Started"
+              className="group relative inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-700 to-purple-700 hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg shadow-blue-900/50 hover:shadow-blue-900/70 hover:scale-105"
             >
               <RocketLaunchIcon className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               Get Started
@@ -771,7 +771,7 @@ export default function Home() {
 
           <div className="text-center">
             <Link
-              href="/docs#Getting-started"
+              href="/docs#Getting-Started"
               className="group inline-flex items-center px-10 py-5 text-lg font-semibold rounded-xl text-white bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:from-blue-500 hover:via-purple-500 hover:to-pink-500 transition-all duration-300 shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50 hover:scale-105"
             >
               <RocketLaunchIcon className="mr-2 h-6 w-6 group-hover:rotate-12 transition-transform" />
@@ -798,7 +798,7 @@ export default function Home() {
               </p>
               <div className="flex space-x-4">
                 <a
-                  href="https://github.com/zenith-79/apexify.js"
+                  href="https://github.com/EIAS79/apexify.js"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500/50 flex items-center justify-center transition-all duration-300 hover:scale-110 group"
@@ -827,7 +827,7 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Documentation</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/docs#Getting-started" className="text-gray-400 hover:text-white transition-colors duration-200">
+                  <Link href="/docs#Getting-Started" className="text-gray-400 hover:text-white transition-colors duration-200">
                     Getting Started
                   </Link>
                 </li>
@@ -850,7 +850,7 @@ export default function Home() {
               <ul className="space-y-3">
                 <li>
                   <a
-                    href="https://github.com/zenith-79/apexify.js"
+                    href="https://github.com/EIAS79/apexify.js"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-white transition-colors duration-200"
@@ -870,7 +870,7 @@ export default function Home() {
                 </li>
                 <li>
                   <a
-                    href="https://github.com/zenith-79/apexify.js/issues"
+                    href="https://github.com/EIAS79/apexify.js"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-gray-400 hover:text-white transition-colors duration-200"

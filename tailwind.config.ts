@@ -22,6 +22,11 @@ const config: Config = {
           800: '#075985',
           900: '#0c4a6e',
         },
+        navy: {
+          950: '#0a1628',
+          900: '#0f1b2d',
+          800: '#1a2740',
+        },
       },
       transitionProperty: {
         'width': 'width',

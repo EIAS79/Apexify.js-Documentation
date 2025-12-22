@@ -75,7 +75,7 @@ export default function DocLayout({ children, headings = [] }: DocLayoutProps) {
       } ${
         rightCollapsed ? 'lg:mr-0' : 'lg:mr-64'
       }`}>
-        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-10 xl:px-12 pt-8 pb-12 lg:pt-10 lg:pb-16">
+        <div className="w-full max-w-4xl pt-8 pb-12 lg:pt-10 lg:pb-16 lg:ml-[135px] lg:mr-auto px-6 sm:px-8 lg:px-10 xl:px-12">
           {children}
         </div>
       </main>

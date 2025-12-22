@@ -129,12 +129,12 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         key={file.filename}
         href={`/docs#${file.filename}`}
         onClick={(e) => handleFileClick(file.filename, e)}
-        className={`block py-2 px-3 rounded-lg text-sm transition-all duration-200 ${
+        className={`block py-2 px-3 rounded-lg text-base transition-all duration-200 ${
           level > 0 ? 'ml-4' : ''
         } ${
           active
             ? 'text-white bg-gradient-to-r from-blue-500 to-purple-500 font-medium shadow-md'
-            : 'text-gray-300 hover:text-blue-400 hover:bg-gray-800'
+            : 'text-gray-300 hover:text-blue-600 hover:bg-slate-950'
         }`}
       >
         {file.name}
@@ -151,22 +151,22 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         <div className="flex items-center">
           <button
             onClick={() => toggleExpanded(folder.name)}
-            className="p-1.5 hover:bg-gray-800 rounded-lg mr-1 transition-colors duration-200"
+            className="p-1.5 hover:bg-slate-950 rounded-lg mr-1 transition-colors duration-200"
           >
             {isExpanded ? (
-              <ChevronDownIcon className="h-4 w-4 text-gray-400 transition-transform duration-200" />
+              <ChevronDownIcon className="h-5 w-5 text-gray-400 transition-transform duration-200" />
             ) : (
-              <ChevronRightIcon className="h-4 w-4 text-gray-400 transition-transform duration-200" />
+              <ChevronRightIcon className="h-5 w-5 text-gray-400 transition-transform duration-200" />
             )}
           </button>
           <button
             onClick={() => toggleExpanded(folder.name)}
-            className={`flex-1 py-2 px-3 rounded-lg text-sm transition-all duration-200 text-left font-medium ${
+            className={`flex-1 py-2 px-3 rounded-lg text-base transition-all duration-200 text-left font-medium ${
               hasActiveFile && isExpanded
                 ? 'text-blue-400 bg-blue-900/20'
                 : hasActiveFile
                 ? 'text-blue-400 bg-blue-900/10'
-                : 'text-gray-300 hover:text-blue-400 hover:bg-gray-800'
+                : 'text-gray-300 hover:text-blue-600 hover:bg-slate-950'
             }`}
           >
             {folder.name}
@@ -183,11 +183,11 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
 
   if (loading) {
     return (
-      <aside className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-gray-900/95 backdrop-blur-md border-r border-gray-800 overflow-y-auto transition-all duration-300 z-40 ${
+      <aside className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-black/95 backdrop-blur-md border-r border-slate-900 overflow-y-auto transition-all duration-300 z-40 ${
         isOpen ? 'w-64 translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0'
       }`}>
         <div className="p-4">
-          <div className="text-gray-400 text-sm">Loading...</div>
+          <div className="text-gray-400 text-base">Loading...</div>
         </div>
       </aside>
     );
@@ -207,7 +207,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
       {isCollapsed && !isMobile && (
         <button
           onClick={() => setIsCollapsed(false)}
-          className="fixed left-4 top-24 z-[60] p-3 bg-gray-800 hover:bg-gray-700 rounded-lg border border-gray-700 transition-all duration-200 shadow-xl hover:scale-110 backdrop-blur-sm"
+          className="fixed left-4 top-24 z-[60] p-3 bg-slate-950 hover:bg-slate-900 rounded-lg border border-slate-800 transition-all duration-200 shadow-xl hover:scale-110 backdrop-blur-sm"
           aria-label="Expand sidebar"
         >
           <ChevronRightIcon className="h-6 w-6 text-gray-300 hover:text-white" />
@@ -216,7 +216,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
       
       <aside 
         data-sidebar="left"
-        className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-gray-900/95 backdrop-blur-md border-r border-gray-800 transition-all duration-300 z-40 shadow-lg lg:shadow-none ${
+        className={`fixed left-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-black/95 backdrop-blur-md border-r border-slate-900 transition-all duration-300 z-40 shadow-lg lg:shadow-none ${
           isOpen && !isCollapsed
             ? 'w-64 translate-x-0 overflow-y-auto' 
             : isCollapsed && !isMobile
@@ -227,7 +227,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         {!isCollapsed && isOpen && (
           <div className="p-4">
             <div className="hidden lg:flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
                 v5.1.0
               </span>
               <button
@@ -235,7 +235,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
                 className="p-1.5 hover:bg-gray-800 rounded-lg transition-colors duration-200"
                 aria-label="Collapse sidebar"
               >
-                <ChevronRightIcon className="h-5 w-5 text-gray-400 rotate-180" />
+                <ChevronRightIcon className="h-6 w-6 text-gray-400 rotate-180" />
               </button>
             </div>
           </div>
@@ -248,7 +248,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
             {/* Mobile close button */}
             {isMobile && (
               <div className="flex items-center justify-between mb-4 lg:hidden">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
                   Documentation
                 </span>
                 <button
