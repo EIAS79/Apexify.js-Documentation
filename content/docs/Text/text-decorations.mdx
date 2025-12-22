@@ -1,0 +1,691 @@
+# Text Decorations
+
+Apexify.js provides comprehensive text decoration options including bold, italic, underline, overline, strikethrough, and highlight effects. Decorations can use solid colors or gradients for enhanced visual appeal.
+
+## Overview
+
+Text decorations enhance your text with visual styling:
+- **Bold** - Make text bold
+- **Italic** - Make text italic
+- **Underline** - Add underline with color or gradient
+- **Overline** - Add overline with color or gradient
+- **Strikethrough** - Add strikethrough with color or gradient
+- **Highlight** - Add background highlight with color or gradient
+
+## Bold and Italic
+
+Simple boolean properties to make text bold or italic:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Bold text
+const bold = await painter.createText({
+  text: 'Bold Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  bold: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Italic text
+const italic = await painter.createText({
+  text: 'Italic Text',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  italic: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Bold and italic
+const boldItalic = await painter.createText({
+  text: 'Bold & Italic',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  bold: true,
+  italic: true,
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Bold text
+const bold = await painter.createText({
+  text: 'Bold Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  bold: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Italic text
+const italic = await painter.createText({
+  text: 'Italic Text',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  italic: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Bold and italic
+const boldItalic = await painter.createText({
+  text: 'Bold & Italic',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  bold: true,
+  italic: true,
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Underline
+
+Add underline decoration with simple boolean or advanced configuration:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple underline (uses text color)
+const simpleUnderline = await painter.createText({
+  text: 'Underlined Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  underline: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Custom underline color
+const coloredUnderline = await painter.createText({
+  text: 'Colored Underline',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  underline: {
+    color: '#ff6b6b',
+    width: 2
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Gradient underline
+const gradientUnderline = await painter.createText({
+  text: 'Gradient Underline',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  underline: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 200,
+      endY: 0
+    },
+    width: 3
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple underline (uses text color)
+const simpleUnderline = await painter.createText({
+  text: 'Underlined Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  underline: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Custom underline color
+const coloredUnderline = await painter.createText({
+  text: 'Colored Underline',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  underline: {
+    color: '#ff6b6b',
+    width: 2
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Gradient underline
+const gradientUnderline = await painter.createText({
+  text: 'Gradient Underline',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  underline: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 200,
+      endY: 0
+    },
+    width: 3
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Overline
+
+Add overline decoration above the text:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple overline
+const simpleOverline = await painter.createText({
+  text: 'Overlined Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  overline: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Custom overline
+const customOverline = await painter.createText({
+  text: 'Custom Overline',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  overline: {
+    color: '#4ecdc4',
+    width: 2
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Gradient overline
+const gradientOverline = await painter.createText({
+  text: 'Gradient Overline',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  overline: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff6b6b' }
+      ]
+    },
+    width: 3
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple overline
+const simpleOverline = await painter.createText({
+  text: 'Overlined Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  overline: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Custom overline
+const customOverline = await painter.createText({
+  text: 'Custom Overline',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  overline: {
+    color: '#4ecdc4',
+    width: 2
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Gradient overline
+const gradientOverline = await painter.createText({
+  text: 'Gradient Overline',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  overline: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff6b6b' }
+      ]
+    },
+    width: 3
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Strikethrough
+
+Add strikethrough decoration through the text:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple strikethrough
+const simpleStrikethrough = await painter.createText({
+  text: 'Strikethrough Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  strikethrough: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Custom strikethrough
+const customStrikethrough = await painter.createText({
+  text: 'Custom Strikethrough',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  strikethrough: {
+    color: '#ff6b6b',
+    width: 2
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Gradient strikethrough
+const gradientStrikethrough = await painter.createText({
+  text: 'Gradient Strikethrough',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  strikethrough: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ]
+    },
+    width: 3
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple strikethrough
+const simpleStrikethrough = await painter.createText({
+  text: 'Strikethrough Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  strikethrough: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Custom strikethrough
+const customStrikethrough = await painter.createText({
+  text: 'Custom Strikethrough',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  strikethrough: {
+    color: '#ff6b6b',
+    width: 2
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Gradient strikethrough
+const gradientStrikethrough = await painter.createText({
+  text: 'Gradient Strikethrough',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  strikethrough: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ]
+    },
+    width: 3
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Highlight
+
+Add a background highlight behind the text:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple highlight
+const simpleHighlight = await painter.createText({
+  text: 'Highlighted Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  highlight: {
+    color: '#ffd700',
+    opacity: 0.3
+  },
+  color: '#000000'
+}, canvasBuffer);
+
+// Custom highlight
+const customHighlight = await painter.createText({
+  text: 'Custom Highlight',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  highlight: {
+    color: '#ff6b6b',
+    opacity: 0.5
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Gradient highlight
+const gradientHighlight = await painter.createText({
+  text: 'Gradient Highlight',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  highlight: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff6b6b' }
+      ]
+    },
+    opacity: 0.4
+  },
+  color: '#000000'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple highlight
+const simpleHighlight = await painter.createText({
+  text: 'Highlighted Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  highlight: {
+    color: '#ffd700',
+    opacity: 0.3
+  },
+  color: '#000000'
+}, canvasBuffer);
+
+// Custom highlight
+const customHighlight = await painter.createText({
+  text: 'Custom Highlight',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  highlight: {
+    color: '#ff6b6b',
+    opacity: 0.5
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Gradient highlight
+const gradientHighlight = await painter.createText({
+  text: 'Gradient Highlight',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  highlight: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff6b6b' }
+      ]
+    },
+    opacity: 0.4
+  },
+  color: '#000000'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Combining Decorations
+
+You can combine multiple decorations for rich text styling:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const decorated = await painter.createText({
+  text: 'Fully Decorated Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  bold: true,
+  italic: true,
+  underline: {
+    color: '#ff6b6b',
+    width: 2
+  },
+  overline: {
+    color: '#4ecdc4',
+    width: 2
+  },
+  highlight: {
+    color: '#ffd700',
+    opacity: 0.3
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const decorated = await painter.createText({
+  text: 'Fully Decorated Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  bold: true,
+  italic: true,
+  underline: {
+    color: '#ff6b6b',
+    width: 2
+  },
+  overline: {
+    color: '#4ecdc4',
+    width: 2
+  },
+  highlight: {
+    color: '#ffd700',
+    opacity: 0.3
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+const result = await painter.createText([
+  {
+    text: 'Bold & Underlined',
+    x: 100,
+    y: 100,
+    fontSize: 28,
+    bold: true,
+    underline: { color: '#ff6b6b', width: 2 },
+    color: '#ffffff'
+  },
+  {
+    text: 'Italic & Highlighted',
+    x: 100,
+    y: 200,
+    fontSize: 28,
+    italic: true,
+    highlight: { color: '#ffd700', opacity: 0.4 },
+    color: '#000000'
+  },
+  {
+    text: 'Gradient Decorations',
+    x: 100,
+    y: 300,
+    fontSize: 28,
+    underline: {
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ]
+      },
+      width: 3
+    },
+    highlight: {
+      gradient: {
+        type: 'radial',
+        colors: [
+          { stop: 0, color: '#ffd700' },
+          { stop: 1, color: '#ff6b6b' }
+        ]
+      },
+      opacity: 0.3
+    },
+    color: '#ffffff'
+  }
+], canvas.buffer);
+
+fs.writeFileSync('decorations.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createDecorations() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  const result = await painter.createText([
+    {
+      text: 'Bold & Underlined',
+      x: 100,
+      y: 100,
+      fontSize: 28,
+      bold: true,
+      underline: { color: '#ff6b6b', width: 2 },
+      color: '#ffffff'
+    },
+    {
+      text: 'Italic & Highlighted',
+      x: 100,
+      y: 200,
+      fontSize: 28,
+      italic: true,
+      highlight: { color: '#ffd700', opacity: 0.4 },
+      color: '#000000'
+    },
+    {
+      text: 'Gradient Decorations',
+      x: 100,
+      y: 300,
+      fontSize: 28,
+      underline: {
+        gradient: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        },
+        width: 3
+      },
+      highlight: {
+        gradient: {
+          type: 'radial',
+          colors: [
+            { stop: 0, color: '#ffd700' },
+            { stop: 1, color: '#ff6b6b' }
+          ]
+        },
+        opacity: 0.3
+      },
+      color: '#ffffff'
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('decorations.png', result);
+}
+
+createDecorations();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Text Spacing and Alignment](/docs#text-spacing-and-alignment) - Control spacing, wrapping, and alignment
+- [Text Effects](/docs#text-effects) - Add glow, shadow, and stroke effects
+
+

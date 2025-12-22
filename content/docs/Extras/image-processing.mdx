@@ -1,0 +1,656 @@
+# Image Processing Utilities
+
+Apexify.js provides advanced image processing utilities including masking, blending, background removal, color analysis, color removal, cropping, and gradient blending.
+
+## Overview
+
+Image processing utilities include:
+- **Masking** - Apply masks with alpha, luminance, or color modes
+- **Blending** - Blend multiple images with blend modes
+- **Gradient Blending** - Apply gradient overlays to images
+- **Background Removal** - Remove backgrounds from images
+- **Color Analysis** - Analyze and extract color information
+- **Color Removal** - Remove specific colors from images
+- **Image Cropping** - Crop images with custom shapes
+- **Color Filters** - Apply color overlays to images
+- **Effects** - Apply image effects and filters
+
+## Image Masking
+
+Apply masks to images with multiple modes:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Alpha mask (uses mask's alpha channel)
+const masked1 = await painter.masking(
+  './image.jpg',
+  './mask.png',
+  {
+    type: 'alpha',  // 'alpha' | 'grayscale' | 'color'
+    invert: false
+  }
+);
+
+// Grayscale mask
+const masked2 = await painter.masking(
+  './image.jpg',
+  './mask.png',
+  {
+    type: 'grayscale',
+    threshold: 128,  // 0-255, pixels above threshold become visible
+    invert: false
+  }
+);
+
+// Color mask (remove specific color)
+const masked3 = await painter.masking(
+  './image.jpg',
+  './mask.png',
+  {
+    type: 'color',
+    colorKey: '#ffffff',  // Remove this color
+    invert: false
+  }
+);
+
+fs.writeFileSync('masked-alpha.png', masked1);
+fs.writeFileSync('masked-grayscale.png', masked2);
+fs.writeFileSync('masked-color.png', masked3);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function applyMasking() {
+  // Alpha mask (uses mask's alpha channel)
+  const masked1 = await painter.masking(
+    './image.jpg',
+    './mask.png',
+    {
+      type: 'alpha',  // 'alpha' | 'grayscale' | 'color'
+      invert: false
+    }
+  );
+
+  // Grayscale mask
+  const masked2 = await painter.masking(
+    './image.jpg',
+    './mask.png',
+    {
+      type: 'grayscale',
+      threshold: 128,  // 0-255, pixels above threshold become visible
+      invert: false
+    }
+  );
+
+  // Color mask (remove specific color)
+  const masked3 = await painter.masking(
+    './image.jpg',
+    './mask.png',
+    {
+      type: 'color',
+      colorKey: '#ffffff',  // Remove this color
+      invert: false
+    }
+  );
+
+  fs.writeFileSync('masked-alpha.png', masked1);
+  fs.writeFileSync('masked-grayscale.png', masked2);
+  fs.writeFileSync('masked-color.png', masked3);
+}
+
+applyMasking();
+```
+</js>
+</CodeSwitcher>
+
+## Image Blending
+
+Blend multiple images with blend modes:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Load base image
+const baseImage = fs.readFileSync('./base.jpg');
+
+// Blend multiple layers
+const blended = await painter.blend(
+  [
+    {
+      image: './overlay1.png',
+      blendMode: 'multiply',
+      position: { x: 0, y: 0 },
+      opacity: 0.5
+    },
+    {
+      image: './overlay2.png',
+      blendMode: 'overlay',
+      position: { x: 100, y: 100 },
+      opacity: 0.7
+    }
+  ],
+  baseImage,
+  'source-over'  // Default blend mode
+);
+
+fs.writeFileSync('blended.png', blended);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function blendImages() {
+  // Load base image
+  const baseImage = fs.readFileSync('./base.jpg');
+
+  // Blend multiple layers
+  const blended = await painter.blend(
+    [
+      {
+        image: './overlay1.png',
+        blendMode: 'multiply',
+        position: { x: 0, y: 0 },
+        opacity: 0.5
+      },
+      {
+        image: './overlay2.png',
+        blendMode: 'overlay',
+        position: { x: 100, y: 100 },
+        opacity: 0.7
+      }
+    ],
+    baseImage,
+    'source-over'  // Default blend mode
+  );
+
+  fs.writeFileSync('blended.png', blended);
+}
+
+blendImages();
+```
+</js>
+</CodeSwitcher>
+
+### Blend Modes
+
+- **multiply** - Multiply colors
+- **overlay** - Overlay blend
+- **screen** - Screen blend
+- **darken** - Darken blend
+- **lighten** - Lighten blend
+- **difference** - Difference blend
+- **source-over** - Normal blend (default)
+
+## Gradient Blending
+
+Apply gradient overlays to images:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Linear gradient blend
+const linearBlend = await painter.gradientBlend('./image.jpg', {
+  type: 'linear',
+  angle: 45,  // Gradient angle in degrees
+  colors: [
+    { stop: 0, color: 'rgba(255, 0, 0, 0.5)' },
+    { stop: 1, color: 'rgba(0, 0, 255, 0.5)' }
+  ],
+  blendMode: 'multiply'
+});
+
+// Radial gradient blend
+const radialBlend = await painter.gradientBlend('./image.jpg', {
+  type: 'radial',
+  colors: [
+    { stop: 0, color: 'rgba(255, 255, 0, 0.3)' },
+    { stop: 1, color: 'rgba(255, 0, 0, 0.3)' }
+  ],
+  blendMode: 'overlay'
+});
+
+// Conic gradient blend
+const conicBlend = await painter.gradientBlend('./image.jpg', {
+  type: 'conic',
+  colors: [
+    { stop: 0, color: 'rgba(255, 0, 0, 0.2)' },
+    { stop: 0.5, color: 'rgba(0, 255, 0, 0.2)' },
+    { stop: 1, color: 'rgba(0, 0, 255, 0.2)' }
+  ],
+  blendMode: 'screen',
+  maskSource: './mask.png'  // Optional mask
+});
+
+fs.writeFileSync('linear-blend.png', linearBlend);
+fs.writeFileSync('radial-blend.png', radialBlend);
+fs.writeFileSync('conic-blend.png', conicBlend);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function gradientBlend() {
+  // Linear gradient blend
+  const linearBlend = await painter.gradientBlend('./image.jpg', {
+    type: 'linear',
+    angle: 45,  // Gradient angle in degrees
+    colors: [
+      { stop: 0, color: 'rgba(255, 0, 0, 0.5)' },
+      { stop: 1, color: 'rgba(0, 0, 255, 0.5)' }
+    ],
+    blendMode: 'multiply'
+  });
+
+  // Radial gradient blend
+  const radialBlend = await painter.gradientBlend('./image.jpg', {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: 'rgba(255, 255, 0, 0.3)' },
+      { stop: 1, color: 'rgba(255, 0, 0, 0.3)' }
+    ],
+    blendMode: 'overlay'
+  });
+
+  // Conic gradient blend
+  const conicBlend = await painter.gradientBlend('./image.jpg', {
+    type: 'conic',
+    colors: [
+      { stop: 0, color: 'rgba(255, 0, 0, 0.2)' },
+      { stop: 0.5, color: 'rgba(0, 255, 0, 0.2)' },
+      { stop: 1, color: 'rgba(0, 0, 255, 0.2)' }
+    ],
+    blendMode: 'screen',
+    maskSource: './mask.png'  // Optional mask
+  });
+
+  fs.writeFileSync('linear-blend.png', linearBlend);
+  fs.writeFileSync('radial-blend.png', radialBlend);
+  fs.writeFileSync('conic-blend.png', conicBlend);
+}
+
+gradientBlend();
+```
+</js>
+</CodeSwitcher>
+
+## Background Removal
+
+Remove backgrounds from images (requires API key):
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Remove background (requires API key from background removal service)
+const noBackground = await painter.removeBackground(
+  'https://example.com/image.jpg',  // Image URL
+  'your-api-key'  // API key for background removal service
+);
+
+if (noBackground) {
+  fs.writeFileSync('no-background.png', noBackground);
+}
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function removeBackground() {
+  // Remove background (requires API key from background removal service)
+  const noBackground = await painter.removeBackground(
+    'https://example.com/image.jpg',  // Image URL
+    'your-api-key'  // API key for background removal service
+  );
+
+  if (noBackground) {
+    fs.writeFileSync('no-background.png', noBackground);
+  }
+}
+
+removeBackground();
+```
+</js>
+</CodeSwitcher>
+
+## Color Analysis
+
+Analyze colors in an image:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Analyze colors in image
+const colors = await painter.colorAnalysis('./image.jpg');
+
+// colors is an array of { color: string, frequency: string }
+console.log(colors);
+// [
+//   { color: '#ff6b6b', frequency: '25.5%' },
+//   { color: '#4ecdc4', frequency: '18.2%' },
+//   { color: '#45b7d1', frequency: '12.8%' },
+//   ...
+// ]
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function analyzeColors() {
+  // Analyze colors in image
+  const colors = await painter.colorAnalysis('./image.jpg');
+
+  // colors is an array of { color: string, frequency: string }
+  console.log(colors);
+  // [
+  //   { color: '#ff6b6b', frequency: '25.5%' },
+  //   { color: '#4ecdc4', frequency: '18.2%' },
+  //   { color: '#45b7d1', frequency: '12.8%' },
+  //   ...
+  // ]
+}
+
+analyzeColors();
+```
+</js>
+</CodeSwitcher>
+
+## Color Removal
+
+Remove specific colors from images:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Remove white background (RGB: 255, 255, 255)
+const result = await painter.colorsRemover(
+  './image.jpg',
+  { red: 255, green: 255, blue: 255 }
+);
+
+if (result) {
+  fs.writeFileSync('color-removed.png', result);
+}
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function removeColor() {
+  // Remove white background (RGB: 255, 255, 255)
+  const result = await painter.colorsRemover(
+    './image.jpg',
+    { red: 255, green: 255, blue: 255 }
+  );
+
+  if (result) {
+    fs.writeFileSync('color-removed.png', result);
+  }
+}
+
+removeColor();
+```
+</js>
+</CodeSwitcher>
+
+## Color Filters
+
+Apply color overlays to images:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Solid color filter
+const solidFilter = await painter.colorsFilter(
+  './image.jpg',
+  '#ff6b6b',  // Color overlay
+  0.5  // Opacity (0-1)
+);
+
+// Gradient filter
+const gradientFilter = await painter.colorsFilter(
+  './image.jpg',
+  {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ]
+  },
+  0.3  // Opacity
+);
+
+fs.writeFileSync('solid-filter.png', solidFilter);
+fs.writeFileSync('gradient-filter.png', gradientFilter);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function applyColorFilters() {
+  // Solid color filter
+  const solidFilter = await painter.colorsFilter(
+    './image.jpg',
+    '#ff6b6b',  // Color overlay
+    0.5  // Opacity (0-1)
+  );
+
+  // Gradient filter
+  const gradientFilter = await painter.colorsFilter(
+    './image.jpg',
+    {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ]
+    },
+    0.3  // Opacity
+  );
+
+  fs.writeFileSync('solid-filter.png', solidFilter);
+  fs.writeFileSync('gradient-filter.png', gradientFilter);
+}
+
+applyColorFilters();
+```
+</js>
+</CodeSwitcher>
+
+## Image Cropping
+
+Crop images with custom shapes:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Inner crop (keep inside coordinates)
+const innerCrop = await painter.cropImage({
+  imageSource: './image.jpg',
+  coordinates: [
+    { from: { x: 100, y: 100 }, to: { x: 500, y: 400 } },
+    { from: { x: 200, y: 200 }, to: { x: 400, y: 300 } }
+  ],
+  crop: 'inner',
+  radius: 10  // Border radius or 'circular'
+});
+
+// Outer crop (remove inside coordinates)
+const outerCrop = await painter.cropImage({
+  imageSource: './image.jpg',
+  coordinates: [
+    { from: { x: 100, y: 100 }, to: { x: 500, y: 400 } }
+  ],
+  crop: 'outer',
+  radius: 'circular'
+});
+
+fs.writeFileSync('inner-crop.png', innerCrop);
+fs.writeFileSync('outer-crop.png', outerCrop);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function cropImages() {
+  // Inner crop (keep inside coordinates)
+  const innerCrop = await painter.cropImage({
+    imageSource: './image.jpg',
+    coordinates: [
+      { from: { x: 100, y: 100 }, to: { x: 500, y: 400 } },
+      { from: { x: 200, y: 200 }, to: { x: 400, y: 300 } }
+    ],
+    crop: 'inner',
+    radius: 10  // Border radius or 'circular'
+  });
+
+  // Outer crop (remove inside coordinates)
+  const outerCrop = await painter.cropImage({
+    imageSource: './image.jpg',
+    coordinates: [
+      { from: { x: 100, y: 100 }, to: { x: 500, y: 400 } }
+    ],
+    crop: 'outer',
+    radius: 'circular'
+  });
+
+  fs.writeFileSync('inner-crop.png', innerCrop);
+  fs.writeFileSync('outer-crop.png', outerCrop);
+}
+
+cropImages();
+```
+</js>
+</CodeSwitcher>
+
+## Image Effects
+
+Apply effects and filters to images:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Apply multiple effects
+const filtered = await painter.effects('./image.jpg', [
+  { type: 'brightness', value: 1.2 },
+  { type: 'contrast', value: 1.1 },
+  { type: 'saturation', value: 1.3 },
+  { type: 'gaussianBlur', radius: 2 }
+]);
+
+fs.writeFileSync('filtered.png', filtered);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function applyEffects() {
+  // Apply multiple effects
+  const filtered = await painter.effects('./image.jpg', [
+    { type: 'brightness', value: 1.2 },
+    { type: 'contrast', value: 1.1 },
+    { type: 'saturation', value: 1.3 },
+    { type: 'gaussianBlur', radius: 2 }
+  ]);
+
+  fs.writeFileSync('filtered.png', filtered);
+}
+
+applyEffects();
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="warning" title="Background Removal API">
+The `removeBackground` method requires an API key from a background removal service. Make sure you have a valid API key before using this feature.
+</Alert>
+
+<Alert type="tip" title="Image Processing Tips">
+- Use masking for creative compositing effects
+- Combine blending modes for professional image editing
+- Use gradient blending for color grading effects
+- Color analysis helps match designs to image palettes
+- Color removal is useful for removing solid backgrounds
+- Cropping with custom shapes enables creative layouts
+</Alert>
+
+

@@ -1,0 +1,538 @@
+# GIF Creation & Animation
+
+Apexify.js provides powerful tools for creating animated GIFs and frame-based animations. Create dynamic, engaging visual content with full control over timing, quality, and output formats.
+
+## Overview
+
+Apexify.js supports two main animation approaches:
+- **GIF Creation** - Create animated GIFs from image sequences
+- **Frame Animation** - Create frame-based animations with custom drawing
+
+## Creating GIFs
+
+Create animated GIFs from a sequence of images with customizable duration, quality, and output formats:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create GIF from image frames
+const gif = await painter.createGIF(
+  [
+    { background: './frame1.png', duration: 100 },  // 100ms per frame
+    { background: './frame2.png', duration: 100 },
+    { background: './frame3.png', duration: 100 },
+    { background: './frame4.png', duration: 100 }
+  ],
+  {
+    outputFormat: 'buffer',  // 'file' | 'base64' | 'attachment' | 'buffer'
+    outputFile: './animation.gif',  // Only needed if outputFormat is 'file'
+    width: 800,
+    height: 600,
+    repeat: 0,  // 0 = infinite, or number of times to repeat
+    quality: 10,  // 1-20, lower = better quality (default: 10)
+    watermark: {
+      enable: true,
+      url: './watermark.png'
+    },
+    textOverlay: {
+      text: 'Animated GIF',
+      fontSize: 24,
+      fontColor: '#ffffff',
+      x: 10,
+      y: 30
+    }
+  }
+);
+
+// Save if buffer format (buffer format requires manual saving)
+if (Buffer.isBuffer(gif)) {
+  fs.writeFileSync('animation.gif', gif);
+}
+
+// Alternative: Use 'file' format for direct saving
+await painter.createGIF(
+  [
+    { background: './frame1.png', duration: 100 },
+    { background: './frame2.png', duration: 100 }
+  ],
+  {
+    outputFormat: 'file',
+    outputFile: './animation.gif',  // Required for 'file' format
+    width: 800,
+    height: 600
+  }
+);
+// File is automatically saved to './animation.gif'
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createGIF() {
+  // Create GIF from image frames
+  const gif = await painter.createGIF(
+    [
+      { background: './frame1.png', duration: 100 },  // 100ms per frame
+      { background: './frame2.png', duration: 100 },
+      { background: './frame3.png', duration: 100 },
+      { background: './frame4.png', duration: 100 }
+    ],
+    {
+      outputFormat: 'buffer',  // 'file' | 'base64' | 'attachment' | 'buffer'
+      outputFile: './animation.gif',  // Required if outputFormat is 'file'
+      width: 800,
+      height: 600,
+      repeat: 0,  // 0 = infinite, or number of times to repeat
+      quality: 10,  // 1-20, lower = better quality (default: 10)
+      watermark: {
+        enable: true,
+        url: './watermark.png'
+      },
+      textOverlay: {
+        text: 'Animated GIF',
+        fontSize: 24,
+        fontColor: '#ffffff',
+        x: 10,
+        y: 30
+      }
+    }
+  );
+
+  // Save if buffer format
+  if (Buffer.isBuffer(gif)) {
+    fs.writeFileSync('animation.gif', gif);
+  }
+}
+
+createGIF();
+```
+</js>
+</CodeSwitcher>
+
+### Output Formats
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Save to file (returns undefined - file is saved directly)
+await painter.createGIF(frames, {
+  outputFormat: 'file',
+  outputFile: './animation.gif'
+});
+// File is saved to './animation.gif'
+
+// Get as base64 string
+const base64 = await painter.createGIF(frames, {
+  outputFormat: 'base64'
+});
+// base64 is a string
+
+// Get as buffer
+const buffer = await painter.createGIF(frames, {
+  outputFormat: 'buffer'
+});
+// buffer is a Buffer - save it manually
+if (Buffer.isBuffer(buffer)) {
+  fs.writeFileSync('animation.gif', buffer);
+}
+
+// Get as attachment (for Discord bots)
+const attachment = await painter.createGIF(frames, {
+  outputFormat: 'attachment'
+});
+// attachment is an array: [{ attachment: stream, name: "gif.js" }]
+```
+</ts>
+<js>
+```javascript
+// Save to file (returns undefined - file is saved directly)
+await painter.createGIF(frames, {
+  outputFormat: 'file',
+  outputFile: './animation.gif'
+});
+// File is saved to './animation.gif'
+
+// Get as base64 string
+const base64 = await painter.createGIF(frames, {
+  outputFormat: 'base64'
+});
+// base64 is a string
+
+// Get as buffer
+const buffer = await painter.createGIF(frames, {
+  outputFormat: 'buffer'
+});
+// buffer is a Buffer - save it manually
+if (Buffer.isBuffer(buffer)) {
+  fs.writeFileSync('animation.gif', buffer);
+}
+
+// Get as attachment (for Discord bots)
+const attachment = await painter.createGIF(frames, {
+  outputFormat: 'attachment'
+});
+// attachment is an array: [{ attachment: stream, name: "gif.js" }]
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Output Format Behavior">
+- **file**: Saves directly to the specified path, returns `undefined`. Make sure to provide `outputFile` path.
+- **buffer**: Returns a `Buffer` object. You need to save it manually using `fs.writeFileSync()`.
+- **base64**: Returns a base64-encoded string.
+- **attachment**: Returns an array with Discord.js-compatible attachment format.
+</Alert>
+
+## Frame Animation
+
+Create frame-based animations with custom drawing, transformations, and effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Create animation frames
+const buffers = await painter.animate(
+  [
+    {
+      backgroundColor: '#ff6b6b',
+      width: 800,
+      height: 600,
+      duration: 200,
+      transformations: {
+        scaleX: 1,
+        scaleY: 1,
+        rotate: 0,
+        translateX: 0,
+        translateY: 0
+      }
+    },
+    {
+      backgroundColor: '#4ecdc4',
+      width: 800,
+      height: 600,
+      duration: 200,
+      transformations: {
+        scaleX: 1.2,
+        scaleY: 1.2,
+        rotate: 45,
+        translateX: 50,
+        translateY: 50
+      }
+    },
+    {
+      gradient: {
+        type: 'linear',
+        startX: 0,
+        startY: 0,
+        endX: 800,
+        endY: 600,
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ]
+      },
+      width: 800,
+      height: 600,
+      duration: 200
+    },
+    {
+      source: './background.jpg',
+      blendMode: 'multiply',
+      width: 800,
+      height: 600,
+      duration: 200,
+      onDrawCustom: (ctx, canvas) => {
+        // Custom drawing code
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(100, 100, 200, 200);
+      }
+    }
+  ],
+  200,  // Default duration (ms)
+  800,  // Default width
+  600,  // Default height
+  {
+    gif: true,  // Export as GIF
+    gifPath: './animation.gif',
+    onStart: () => console.log('Animation started'),
+    onFrame: (index) => console.log(`Frame ${index}`),
+    onEnd: () => console.log('Animation completed')
+  }
+);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function createAnimation() {
+  // Create animation frames
+  const buffers = await painter.animate(
+    [
+      {
+        backgroundColor: '#ff6b6b',
+        width: 800,
+        height: 600,
+        duration: 200,
+        transformations: {
+          scaleX: 1,
+          scaleY: 1,
+          rotate: 0,
+          translateX: 0,
+          translateY: 0
+        }
+      },
+      {
+        backgroundColor: '#4ecdc4',
+        width: 800,
+        height: 600,
+        duration: 200,
+        transformations: {
+          scaleX: 1.2,
+          scaleY: 1.2,
+          rotate: 45,
+          translateX: 50,
+          translateY: 50
+        }
+      },
+      {
+        gradient: {
+          type: 'linear',
+          startX: 0,
+          startY: 0,
+          endX: 800,
+          endY: 600,
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        },
+        width: 800,
+        height: 600,
+        duration: 200
+      },
+      {
+        source: './background.jpg',
+        blendMode: 'multiply',
+        width: 800,
+        height: 600,
+        duration: 200,
+        onDrawCustom: (ctx, canvas) => {
+          // Custom drawing code
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(100, 100, 200, 200);
+        }
+      }
+    ],
+    200,  // Default duration (ms)
+    800,  // Default width
+    600,  // Default height
+    {
+      gif: true,  // Export as GIF
+      gifPath: './animation.gif',
+      onStart: () => console.log('Animation started'),
+      onFrame: (index) => console.log(`Frame ${index}`),
+      onEnd: () => console.log('Animation completed')
+    }
+  );
+}
+
+createAnimation();
+```
+</js>
+</CodeSwitcher>
+
+### Frame Properties
+
+Each frame can have:
+- **backgroundColor** - Solid color background
+- **gradient** - Gradient background
+- **pattern** - Pattern background
+- **source** - Image source
+- **blendMode** - Blend mode for compositing
+- **transformations** - Scale, rotate, translate
+- **onDrawCustom** - Custom drawing function
+- **duration** - Frame duration in milliseconds
+- **width/height** - Frame dimensions
+
+<Alert type="tip" title="Animation Tips">
+- Use consistent frame dimensions for smooth animations
+- Lower duration values create faster animations
+- Use `onDrawCustom` for complex frame-by-frame animations
+- Export as GIF using `gif: true` option for easy sharing
+</Alert>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create frames using createCanvas and save them as files
+const frames: { background: string; duration: number }[] = [];
+for (let i = 0; i < 10; i++) {
+  const canvas = await painter.createCanvas({
+    width: 400,
+    height: 400,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 200,
+      startY: 200,
+      startRadius: 0,
+      endX: 200,
+      endY: 200,
+      endRadius: 200
+    }
+  });
+  
+  // Add animated text
+  const text = await painter.createText({
+    text: `Frame ${i + 1}`,
+    x: 200,
+    y: 200,
+    fontSize: 32,
+    bold: true,
+    color: '#ffffff',
+    textAlign: 'center',
+    textBaseline: 'middle'
+  }, canvas.buffer);
+  
+  // Save frame as file
+  const framePath = `frame-${i + 1}.png`;
+  fs.writeFileSync(framePath, text);
+  frames.push({ background: framePath, duration: 100 });
+  console.log(`Frame ${i + 1} saved!`);
+}
+
+// Create GIF from saved frame files
+console.log('Creating GIF animation...');
+const gif = await painter.createGIF(frames, {
+  outputFormat: 'buffer',
+  width: 400,
+  height: 400,
+  repeat: 0,
+  quality: 10
+});
+
+// Save if buffer format
+if (Buffer.isBuffer(gif)) {
+  fs.writeFileSync('animated-text.gif', gif);
+  console.log('GIF animation saved as animated-text.gif!');
+  
+  // Clean up frame files (optional)
+  for (let i = 0; i < 10; i++) {
+    const framePath = `frame-${i + 1}.png`;
+    if (fs.existsSync(framePath)) {
+      fs.unlinkSync(framePath);
+    }
+  }
+  console.log('Temporary frame files cleaned up!');
+} else {
+  console.error('GIF creation failed or returned unexpected type');
+}
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createAnimatedGIF() {
+  // Create frames using createCanvas and save them as files
+  const frames = [];
+  for (let i = 0; i < 10; i++) {
+    const canvas = await painter.createCanvas({
+      width: 400,
+      height: 400,
+      gradientBg: {
+        type: 'radial',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ],
+        startX: 200,
+        startY: 200,
+        startRadius: 0,
+        endX: 200,
+        endY: 200,
+        endRadius: 200
+      }
+    });
+    
+    // Add animated text
+    const text = await painter.createText({
+      text: `Frame ${i + 1}`,
+      x: 200,
+      y: 200,
+      fontSize: 32,
+      bold: true,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle'
+    }, canvas.buffer);
+    
+    // Save frame as file
+    const framePath = `frame-${i + 1}.png`;
+    fs.writeFileSync(framePath, text);
+    frames.push({ background: framePath, duration: 100 });
+    console.log(`Frame ${i + 1} saved!`);
+  }
+
+  // Create GIF from saved frame files
+  console.log('Creating GIF animation...');
+  const gif = await painter.createGIF(frames, {
+    outputFormat: 'buffer',
+    width: 400,
+    height: 400,
+    repeat: 0,
+    quality: 10
+  });
+
+  // Save if buffer format
+  if (Buffer.isBuffer(gif)) {
+    fs.writeFileSync('animated-text.gif', gif);
+    console.log('GIF animation saved as animated-text.gif!');
+    
+    // Clean up frame files (optional)
+    for (let i = 0; i < 10; i++) {
+      const framePath = `frame-${i + 1}.png`;
+      if (fs.existsSync(framePath)) {
+        fs.unlinkSync(framePath);
+      }
+    }
+    console.log('Temporary frame files cleaned up!');
+  } else {
+    console.error('GIF creation failed or returned unexpected type');
+  }
+}
+
+createAnimatedGIF();
+```
+</js>
+</CodeSwitcher>
+

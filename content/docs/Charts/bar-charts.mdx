@@ -1,0 +1,792 @@
+# Bar Charts
+
+Apexify.js provides powerful bar chart generation capabilities through the `createChart()` method. Create professional vertical bar charts with customizable styling, backgrounds, grids, and labels.
+
+## Overview
+
+Bar charts are created using `createChart()` with `chartType: 'bar'` and `chartNumber: 1`. The method accepts comprehensive configuration for data, styling, and layout.
+
+## Basic Bar Chart
+
+Create a simple bar chart with minimal configuration:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const chart = await painter.createChart({
+  chartData: {
+    width: 800,
+    height: 600,
+    title: {
+      title: 'Sales Data',
+      color: '#000000',
+      size: 24
+    },
+    bg: {
+      bgColor: '#ffffff'
+    }
+  },
+  xLabels: [0, 100, 200, 300, 400, 500],
+  yLabels: [0, 20, 40, 60, 80, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Q1',
+        value: 45,
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      },
+      {
+        label: 'Q2',
+        value: 65,
+        position: { startsXLabel: 100, endsXLabel: 200 }
+      },
+      {
+        label: 'Q3',
+        value: 35,
+        position: { startsXLabel: 200, endsXLabel: 300 }
+      },
+      {
+        label: 'Q4',
+        value: 85,
+        position: { startsXLabel: 300, endsXLabel: 400 }
+      }
+    ],
+    yAxis: [0, 20, 40, 60, 80, 100],
+    xTitle: 'Quarters',
+    yTitle: 'Sales (in thousands)'
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+
+fs.writeFileSync('bar-chart.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createBarChart() {
+  const chart = await painter.createChart({
+    chartData: {
+      width: 800,
+      height: 600,
+      title: {
+        title: 'Sales Data',
+        color: '#000000',
+        size: 24
+      },
+      bg: {
+        bgColor: '#ffffff'
+      }
+    },
+    xLabels: [0, 100, 200, 300, 400, 500],
+    yLabels: [0, 20, 40, 60, 80, 100],
+    data: {
+      xAxis: [
+        {
+          label: 'Q1',
+          value: 45,
+          position: { startsXLabel: 0, endsXLabel: 100 }
+        },
+        {
+          label: 'Q2',
+          value: 65,
+          position: { startsXLabel: 100, endsXLabel: 200 }
+        },
+        {
+          label: 'Q3',
+          value: 35,
+          position: { startsXLabel: 200, endsXLabel: 300 }
+        },
+        {
+          label: 'Q4',
+          value: 85,
+          position: { startsXLabel: 300, endsXLabel: 400 }
+        }
+      ],
+      yAxis: [0, 20, 40, 60, 80, 100],
+      xTitle: 'Quarters',
+      yTitle: 'Sales (in thousands)'
+    }
+  }, {
+    chartType: 'bar',
+    chartNumber: 1
+  });
+
+  fs.writeFileSync('bar-chart.png', chart);
+}
+
+createBarChart();
+```
+</js>
+</CodeSwitcher>
+
+## Chart Configuration
+
+### Chart Data
+
+The `chartData` object controls the overall chart appearance:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chartData = {
+  width: 1200,        // Canvas width
+  height: 800,         // Canvas height
+  widthPerc: 0.8,      // Chart width percentage (0-1)
+  heightPerc: 0.8,     // Chart height percentage (0-1)
+  title: {
+    title: 'My Chart',
+    color: '#000000',
+    size: 28
+  },
+  bg: {
+    bgColor: '#ffffff',  // Background color
+    image: './bg.jpg'     // Or use background image
+  },
+  grid: {
+    enable: true,
+    color: '#e0e0e0',
+    width: 1
+  },
+  axis: {
+    color: '#000000',
+    size: 2
+  },
+  labels: {
+    color: '#666666',
+    fontSize: 12
+  }
+};
+```
+</ts>
+<js>
+```javascript
+const chartData = {
+  width: 1200,        // Canvas width
+  height: 800,         // Canvas height
+  widthPerc: 0.8,      // Chart width percentage (0-1)
+  heightPerc: 0.8,     // Chart height percentage (0-1)
+  title: {
+    title: 'My Chart',
+    color: '#000000',
+    size: 28
+  },
+  bg: {
+    bgColor: '#ffffff',  // Background color
+    image: './bg.jpg'     // Or use background image
+  },
+  grid: {
+    enable: true,
+    color: '#e0e0e0',
+    width: 1
+  },
+  axis: {
+    color: '#000000',
+    size: 2
+  },
+  labels: {
+    color: '#666666',
+    fontSize: 12
+  }
+};
+```
+</js>
+</CodeSwitcher>
+
+### Bar Data
+
+Each bar is defined with position, value, and styling:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const barData = {
+  label: 'Q1',                    // Bar label
+  value: 45,                      // Bar value (Y-axis)
+  barColor: '#ff6b6b',            // Bar fill color
+  position: {
+    startsXLabel: 0,              // Start X position
+    endsXLabel: 100               // End X position
+  },
+  stroke: {
+    color: '#000000',             // Bar border color
+    width: 2                      // Bar border width
+  }
+};
+```
+</ts>
+<js>
+```javascript
+const barData = {
+  label: 'Q1',                    // Bar label
+  value: 45,                      // Bar value (Y-axis)
+  barColor: '#ff6b6b',            // Bar fill color
+  position: {
+    startsXLabel: 0,              // Start X position
+    endsXLabel: 100               // End X position
+  },
+  stroke: {
+    color: '#000000',             // Bar border color
+    width: 2                      // Bar border width
+  }
+};
+```
+</js>
+</CodeSwitcher>
+
+## Advanced Features
+
+### Custom Bar Colors
+
+Set individual colors for each bar:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart({
+  chartData: {
+    width: 800,
+    height: 600
+  },
+  xLabels: [0, 100, 200, 300, 400],
+  yLabels: [0, 25, 50, 75, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Jan',
+        value: 30,
+        barColor: '#ff6b6b',
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      },
+      {
+        label: 'Feb',
+        value: 50,
+        barColor: '#4ecdc4',
+        position: { startsXLabel: 100, endsXLabel: 200 }
+      },
+      {
+        label: 'Mar',
+        value: 70,
+        barColor: '#45b7d1',
+        position: { startsXLabel: 200, endsXLabel: 300 }
+      },
+      {
+        label: 'Apr',
+        value: 40,
+        barColor: '#ffd700',
+        position: { startsXLabel: 300, endsXLabel: 400 }
+      }
+    ],
+    yAxis: [0, 25, 50, 75, 100]
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart({
+  chartData: {
+    width: 800,
+    height: 600
+  },
+  xLabels: [0, 100, 200, 300, 400],
+  yLabels: [0, 25, 50, 75, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Jan',
+        value: 30,
+        barColor: '#ff6b6b',
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      },
+      {
+        label: 'Feb',
+        value: 50,
+        barColor: '#4ecdc4',
+        position: { startsXLabel: 100, endsXLabel: 200 }
+      },
+      {
+        label: 'Mar',
+        value: 70,
+        barColor: '#45b7d1',
+        position: { startsXLabel: 200, endsXLabel: 300 }
+      },
+      {
+        label: 'Apr',
+        value: 40,
+        barColor: '#ffd700',
+        position: { startsXLabel: 300, endsXLabel: 400 }
+      }
+    ],
+    yAxis: [0, 25, 50, 75, 100]
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+```
+</js>
+</CodeSwitcher>
+
+### Bar Strokes
+
+Add borders to bars:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart({
+  chartData: {
+    width: 800,
+    height: 600
+  },
+  xLabels: [0, 100, 200, 300],
+  yLabels: [0, 50, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Product A',
+        value: 75,
+        barColor: '#ff6b6b',
+        stroke: {
+          color: '#000000',
+          width: 3
+        },
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      },
+      {
+        label: 'Product B',
+        value: 60,
+        barColor: '#4ecdc4',
+        stroke: {
+          color: '#333333',
+          width: 2
+        },
+        position: { startsXLabel: 100, endsXLabel: 200 }
+      }
+    ],
+    yAxis: [0, 50, 100]
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart({
+  chartData: {
+    width: 800,
+    height: 600
+  },
+  xLabels: [0, 100, 200, 300],
+  yLabels: [0, 50, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Product A',
+        value: 75,
+        barColor: '#ff6b6b',
+        stroke: {
+          color: '#000000',
+          width: 3
+        },
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      },
+      {
+        label: 'Product B',
+        value: 60,
+        barColor: '#4ecdc4',
+        stroke: {
+          color: '#333333',
+          width: 2
+        },
+        position: { startsXLabel: 100, endsXLabel: 200 }
+      }
+    ],
+    yAxis: [0, 50, 100]
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+```
+</js>
+</CodeSwitcher>
+
+### Legend/Keys
+
+Add a legend to explain bar colors:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart({
+  chartData: {
+    width: 800,
+    height: 600
+  },
+  xLabels: [0, 100, 200, 300],
+  yLabels: [0, 50, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Q1',
+        value: 50,
+        barColor: '#ff6b6b',
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      },
+      {
+        label: 'Q2',
+        value: 70,
+        barColor: '#4ecdc4',
+        position: { startsXLabel: 100, endsXLabel: 200 }
+      }
+    ],
+    yAxis: [0, 50, 100],
+    keys: {
+      '#ff6b6b': 'Q1 Sales',
+      '#4ecdc4': 'Q2 Sales'
+    }
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart({
+  chartData: {
+    width: 800,
+    height: 600
+  },
+  xLabels: [0, 100, 200, 300],
+  yLabels: [0, 50, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Q1',
+        value: 50,
+        barColor: '#ff6b6b',
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      },
+      {
+        label: 'Q2',
+        value: 70,
+        barColor: '#4ecdc4',
+        position: { startsXLabel: 100, endsXLabel: 200 }
+      }
+    ],
+    yAxis: [0, 50, 100],
+    keys: {
+      '#ff6b6b': 'Q1 Sales',
+      '#4ecdc4': 'Q2 Sales'
+    }
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+```
+</js>
+</CodeSwitcher>
+
+### Background Images
+
+Use images as chart backgrounds:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart({
+  chartData: {
+    width: 1200,
+    height: 800,
+    bg: {
+      image: './chart-background.jpg'  // Local file
+      // or
+      // image: 'https://example.com/bg.jpg'  // Online URL
+    }
+  },
+  xLabels: [0, 100, 200, 300],
+  yLabels: [0, 50, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Jan',
+        value: 60,
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      }
+    ],
+    yAxis: [0, 50, 100]
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart({
+  chartData: {
+    width: 1200,
+    height: 800,
+    bg: {
+      image: './chart-background.jpg'  // Local file
+      // or
+      // image: 'https://example.com/bg.jpg'  // Online URL
+    }
+  },
+  xLabels: [0, 100, 200, 300],
+  yLabels: [0, 50, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Jan',
+        value: 60,
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      }
+    ],
+    yAxis: [0, 50, 100]
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const chart = await painter.createChart({
+  chartData: {
+    width: 1200,
+    height: 800,
+    widthPerc: 0.85,
+    heightPerc: 0.75,
+    title: {
+      title: 'Monthly Sales Report 2024',
+      color: '#2c3e50',
+      size: 32
+    },
+    bg: {
+      bgColor: '#f8f9fa'
+    },
+    grid: {
+      enable: true,
+      color: '#dee2e6',
+      width: 1
+    },
+    axis: {
+      color: '#495057',
+      size: 2
+    },
+    labels: {
+      color: '#6c757d',
+      fontSize: 14
+    }
+  },
+  xLabels: [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
+  yLabels: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+  data: {
+    xAxis: [
+      {
+        label: 'Jan',
+        value: 45,
+        barColor: '#ff6b6b',
+        stroke: { color: '#c92a2a', width: 2 },
+        position: { startsXLabel: 0, endsXLabel: 100 }
+      },
+      {
+        label: 'Feb',
+        value: 62,
+        barColor: '#4ecdc4',
+        stroke: { color: '#087f5b', width: 2 },
+        position: { startsXLabel: 100, endsXLabel: 200 }
+      },
+      {
+        label: 'Mar',
+        value: 38,
+        barColor: '#45b7d1',
+        stroke: { color: '#1864ab', width: 2 },
+        position: { startsXLabel: 200, endsXLabel: 300 }
+      },
+      {
+        label: 'Apr',
+        value: 71,
+        barColor: '#ffd700',
+        stroke: { color: '#f59f00', width: 2 },
+        position: { startsXLabel: 300, endsXLabel: 400 }
+      },
+      {
+        label: 'May',
+        value: 55,
+        barColor: '#ff9ff3',
+        stroke: { color: '#c2255c', width: 2 },
+        position: { startsXLabel: 400, endsXLabel: 500 }
+      },
+      {
+        label: 'Jun',
+        value: 68,
+        barColor: '#a8e6cf',
+        stroke: { color: '#2b8a3e', width: 2 },
+        position: { startsXLabel: 500, endsXLabel: 600 }
+      }
+    ],
+    yAxis: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+    xTitle: 'Months',
+    yTitle: 'Sales (in thousands)',
+    labelStyle: {
+      color: '#495057',
+      size: 16
+    }
+  }
+}, {
+  chartType: 'bar',
+  chartNumber: 1
+});
+
+fs.writeFileSync('sales-chart.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createSalesChart() {
+  const chart = await painter.createChart({
+    chartData: {
+      width: 1200,
+      height: 800,
+      widthPerc: 0.85,
+      heightPerc: 0.75,
+      title: {
+        title: 'Monthly Sales Report 2024',
+        color: '#2c3e50',
+        size: 32
+      },
+      bg: {
+        bgColor: '#f8f9fa'
+      },
+      grid: {
+        enable: true,
+        color: '#dee2e6',
+        width: 1
+      },
+      axis: {
+        color: '#495057',
+        size: 2
+      },
+      labels: {
+        color: '#6c757d',
+        fontSize: 14
+      }
+    },
+    xLabels: [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
+    yLabels: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+    data: {
+      xAxis: [
+        {
+          label: 'Jan',
+          value: 45,
+          barColor: '#ff6b6b',
+          stroke: { color: '#c92a2a', width: 2 },
+          position: { startsXLabel: 0, endsXLabel: 100 }
+        },
+        {
+          label: 'Feb',
+          value: 62,
+          barColor: '#4ecdc4',
+          stroke: { color: '#087f5b', width: 2 },
+          position: { startsXLabel: 100, endsXLabel: 200 }
+        },
+        {
+          label: 'Mar',
+          value: 38,
+          barColor: '#45b7d1',
+          stroke: { color: '#1864ab', width: 2 },
+          position: { startsXLabel: 200, endsXLabel: 300 }
+        },
+        {
+          label: 'Apr',
+          value: 71,
+          barColor: '#ffd700',
+          stroke: { color: '#f59f00', width: 2 },
+          position: { startsXLabel: 300, endsXLabel: 400 }
+        },
+        {
+          label: 'May',
+          value: 55,
+          barColor: '#ff9ff3',
+          stroke: { color: '#c2255c', width: 2 },
+          position: { startsXLabel: 400, endsXLabel: 500 }
+        },
+        {
+          label: 'Jun',
+          value: 68,
+          barColor: '#a8e6cf',
+          stroke: { color: '#2b8a3e', width: 2 },
+          position: { startsXLabel: 500, endsXLabel: 600 }
+        }
+      ],
+      yAxis: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+      xTitle: 'Months',
+      yTitle: 'Sales (in thousands)',
+      labelStyle: {
+        color: '#495057',
+        size: 16
+      }
+    }
+  }, {
+    chartType: 'bar',
+    chartNumber: 1
+  });
+
+  fs.writeFileSync('sales-chart.png', chart);
+}
+
+createSalesChart();
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="X and Y Labels">
+The `xLabels` and `yLabels` arrays define the scale of your chart. The `position.startsXLabel` and `position.endsXLabel` values must fall within the range of your `xLabels` array, and `value` must fall within the range of your `yLabels` array.
+</Alert>
+
+## Next Steps
+
+- [Pie Charts](/docs#pie-charts) - Create circular pie charts
+- [Line Charts](/docs#line-charts) - Create line graphs with multiple datasets
+
+

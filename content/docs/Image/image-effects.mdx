@@ -1,0 +1,573 @@
+# Image Effects
+
+Image effects are advanced visual enhancements that go beyond basic filters. Apexify.js provides a powerful effects stack including vignette, lens flare, chromatic aberration, and film grain.
+
+## Overview
+
+Effects are applied using the `effects` property, which can contain multiple effect types:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    vignette: { intensity: 0.5, size: 0.8 },
+    lensFlare: { x: 200, y: 150, intensity: 0.7 }
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    vignette: { intensity: 0.5, size: 0.8 },
+    lensFlare: { x: 200, y: 150, intensity: 0.7 }
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Vignette
+
+Creates a darkening effect around the edges, drawing focus to the center:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Light vignette
+const lightVignette = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    vignette: {
+      intensity: 0.3,  // 0-1, higher = darker edges
+      size: 0.7        // 0-1, higher = larger vignette area
+    }
+  }
+}, canvasBuffer);
+
+// Strong vignette
+const strongVignette = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    vignette: {
+      intensity: 0.8,
+      size: 0.9
+    }
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Light vignette
+const lightVignette = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    vignette: {
+      intensity: 0.3,  // 0-1, higher = darker edges
+      size: 0.7        // 0-1, higher = larger vignette area
+    }
+  }
+}, canvasBuffer);
+
+// Strong vignette
+const strongVignette = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    vignette: {
+      intensity: 0.8,
+      size: 0.9
+    }
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Vignette Use Cases">
+Vignette is perfect for creating cinematic looks, portrait photography, and drawing attention to the center of an image.
+</Alert>
+
+## Lens Flare
+
+Adds a realistic lens flare effect at a specific position:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Lens flare at top-right
+const lensFlare = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    lensFlare: {
+      x: 350,        // X position relative to image
+      y: 50,         // Y position relative to image
+      intensity: 0.6 // 0-1, higher = brighter flare
+    }
+  }
+}, canvasBuffer);
+
+// Multiple lens flares (apply multiple times)
+const multipleFlares = await painter.createImage([
+  {
+    source: './image.jpg',
+    x: 100,
+    y: 100,
+    width: 400,
+    height: 300,
+    effects: {
+      lensFlare: { x: 200, y: 100, intensity: 0.5 }
+    }
+  },
+  {
+    source: './image.jpg',
+    x: 100,
+    y: 100,
+    width: 400,
+    height: 300,
+    effects: {
+      lensFlare: { x: 300, y: 150, intensity: 0.3 }
+    }
+  }
+], canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Lens flare at top-right
+const lensFlare = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    lensFlare: {
+      x: 350,        // X position relative to image
+      y: 50,         // Y position relative to image
+      intensity: 0.6 // 0-1, higher = brighter flare
+    }
+  }
+}, canvasBuffer);
+
+// Multiple lens flares (apply multiple times)
+const multipleFlares = await painter.createImage([
+  {
+    source: './image.jpg',
+    x: 100,
+    y: 100,
+    width: 400,
+    height: 300,
+    effects: {
+      lensFlare: { x: 200, y: 100, intensity: 0.5 }
+    }
+  },
+  {
+    source: './image.jpg',
+    x: 100,
+    y: 100,
+    width: 400,
+    height: 300,
+    effects: {
+      lensFlare: { x: 300, y: 150, intensity: 0.3 }
+    }
+  }
+], canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Lens Flare Positioning">
+Position lens flares near bright light sources in your image for the most realistic effect. The coordinates are relative to the image's position (x, y).
+</Alert>
+
+## Chromatic Aberration
+
+Creates a color separation effect, simulating lens distortion:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Subtle chromatic aberration
+const subtleCA = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    chromaticAberration: {
+      intensity: 0.2  // 0-1, higher = more separation
+    }
+  }
+}, canvasBuffer);
+
+// Strong chromatic aberration
+const strongCA = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    chromaticAberration: {
+      intensity: 0.8
+    }
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Subtle chromatic aberration
+const subtleCA = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    chromaticAberration: {
+      intensity: 0.2  // 0-1, higher = more separation
+    }
+  }
+}, canvasBuffer);
+
+// Strong chromatic aberration
+const strongCA = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    chromaticAberration: {
+      intensity: 0.8
+    }
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="warning" title="Chromatic Aberration">
+Use chromatic aberration sparingly. High intensity values can make images look distorted. It's best used for artistic or retro effects.
+</Alert>
+
+## Film Grain
+
+Adds realistic film grain texture to images:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Light film grain
+const lightGrain = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    filmGrain: {
+      intensity: 0.05  // 0-1, higher = more grain
+    }
+  }
+}, canvasBuffer);
+
+// Heavy film grain (vintage look)
+const heavyGrain = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    filmGrain: {
+      intensity: 0.2
+    }
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Light film grain
+const lightGrain = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    filmGrain: {
+      intensity: 0.05  // 0-1, higher = more grain
+    }
+  }
+}, canvasBuffer);
+
+// Heavy film grain (vintage look)
+const heavyGrain = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  effects: {
+    filmGrain: {
+      intensity: 0.2
+    }
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Combining Effects
+
+You can combine multiple effects for complex visual styles:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Cinematic portrait
+const cinematic = await painter.createImage({
+  source: './portrait.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 500,
+  effects: {
+    vignette: { intensity: 0.6, size: 0.8 },
+    filmGrain: { intensity: 0.1 },
+    chromaticAberration: { intensity: 0.1 }
+  }
+}, canvasBuffer);
+
+// Dramatic landscape
+const dramatic = await painter.createImage({
+  source: './landscape.jpg',
+  x: 100,
+  y: 100,
+  width: 800,
+  height: 600,
+  effects: {
+    vignette: { intensity: 0.4, size: 0.7 },
+    lensFlare: { x: 600, y: 100, intensity: 0.5 },
+    filmGrain: { intensity: 0.08 }
+  }
+}, canvasBuffer);
+
+// Vintage photo effect
+const vintage = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'sepia' },
+    { type: 'contrast', value: 1.2 }
+  ],
+  effects: {
+    vignette: { intensity: 0.7, size: 0.9 },
+    filmGrain: { intensity: 0.15 },
+    chromaticAberration: { intensity: 0.2 }
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Cinematic portrait
+const cinematic = await painter.createImage({
+  source: './portrait.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 500,
+  effects: {
+    vignette: { intensity: 0.6, size: 0.8 },
+    filmGrain: { intensity: 0.1 },
+    chromaticAberration: { intensity: 0.1 }
+  }
+}, canvasBuffer);
+
+// Dramatic landscape
+const dramatic = await painter.createImage({
+  source: './landscape.jpg',
+  x: 100,
+  y: 100,
+  width: 800,
+  height: 600,
+  effects: {
+    vignette: { intensity: 0.4, size: 0.7 },
+    lensFlare: { x: 600, y: 100, intensity: 0.5 },
+    filmGrain: { intensity: 0.08 }
+  }
+}, canvasBuffer);
+
+// Vintage photo effect
+const vintage = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'sepia' },
+    { type: 'contrast', value: 1.2 }
+  ],
+  effects: {
+    vignette: { intensity: 0.7, size: 0.9 },
+    filmGrain: { intensity: 0.15 },
+    chromaticAberration: { intensity: 0.2 }
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Effects vs Filters
+
+**Filters** are applied to pixel data and modify colors/values:
+- Blur, sharpen, brightness, contrast, etc.
+- Applied before or after transformations
+- Can be combined with `filterIntensity`
+
+**Effects** are visual overlays and enhancements:
+- Vignette, lens flare, chromatic aberration, film grain
+- Applied after all transformations
+- Create atmospheric and stylistic effects
+
+<Alert type="info" title="Best Practices">
+Combine filters for color correction and effects for atmosphere. For example: use filters to adjust brightness/contrast, then add effects for the final look.
+</Alert>
+
+## Complete Example
+
+Here's a complete example combining filters and effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create canvas
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#000000'
+});
+
+// Apply image with filters and effects
+const result = await painter.createImage({
+  source: './photo.jpg',
+  x: 200,
+  y: 100,
+  width: 800,
+  height: 600,
+  // Color correction filters
+  filters: [
+    { type: 'contrast', value: 1.3 },
+    { type: 'saturation', value: 0.9 },
+    { type: 'brightness', value: -0.1 }
+  ],
+  // Atmospheric effects
+  effects: {
+    vignette: { intensity: 0.5, size: 0.8 },
+    lensFlare: { x: 700, y: 150, intensity: 0.6 },
+    filmGrain: { intensity: 0.1 },
+    chromaticAberration: { intensity: 0.15 }
+  }
+}, canvas.buffer);
+
+fs.writeFileSync('cinematic-photo.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createCinematicPhoto() {
+  // Create canvas
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#000000'
+  });
+
+  // Apply image with filters and effects
+  const result = await painter.createImage({
+    source: './photo.jpg',
+    x: 200,
+    y: 100,
+    width: 800,
+    height: 600,
+    // Color correction filters
+    filters: [
+      { type: 'contrast', value: 1.3 },
+      { type: 'saturation', value: 0.9 },
+      { type: 'brightness', value: -0.1 }
+    ],
+    // Atmospheric effects
+    effects: {
+      vignette: { intensity: 0.5, size: 0.8 },
+      lensFlare: { x: 700, y: 150, intensity: 0.6 },
+      filmGrain: { intensity: 0.1 },
+      chromaticAberration: { intensity: 0.15 }
+    }
+  }, canvas.buffer);
+
+  fs.writeFileSync('cinematic-photo.png', result);
+}
+
+createCinematicPhoto();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Image Filters](/docs#image-filters) - Learn about all available filters
+- [Advanced Features](/docs#advanced-image-features) - Combine effects with shadows, strokes, and more
+
+

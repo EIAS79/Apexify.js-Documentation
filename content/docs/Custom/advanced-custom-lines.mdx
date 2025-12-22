@@ -1,0 +1,790 @@
+# Advanced Custom Lines
+
+Apexify.js provides advanced custom line features including arrows, markers, smooth paths, patterns, textures, shadows, and strokes. Create professional diagrams, flowcharts, and technical drawings.
+
+## Overview
+
+Advanced features include:
+- **Arrows** - Start/end arrows with customizable styles
+- **Markers** - Path markers at any position
+- **Smooth Paths** - Ultra-smooth bezier, smooth, and Catmull-Rom interpolation (graph-quality)
+- **Line Patterns** - Dots, dashes, and custom patterns
+- **Line Textures** - Apply texture images to lines
+- **Shadows & Strokes** - Advanced line effects
+- **Line Radius** - Rounded line ends for polished appearance
+
+<Alert type="info" title="Graph-Quality Smoothness">
+All custom lines automatically use high-quality anti-aliasing and ultra-high resolution smoothing (50-60 segments per curve) for professional graph-like smoothness. No configuration needed!
+</Alert>
+
+## Arrows
+
+Add arrows to line start and/or end:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 200 },
+  endCoordinates: { x: 500, y: 200 },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  },
+  arrow: {
+    start: true,              // Arrow at start
+    end: true,                // Arrow at end
+    size: 15,                 // Arrow size
+    style: 'filled',          // 'filled' | 'outline'
+    color: '#ff6b6b'          // Arrow color (defaults to line color)
+  }
+}, canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 200 },
+  endCoordinates: { x: 500, y: 200 },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  },
+  arrow: {
+    start: true,              // Arrow at start
+    end: true,                // Arrow at end
+    size: 15,                 // Arrow size
+    style: 'filled',          // 'filled' | 'outline'
+    color: '#ff6b6b'          // Arrow color (defaults to line color)
+  }
+}, canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+## Markers
+
+Add markers at any position along the line (0-1):
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 200 },
+  endCoordinates: { x: 500, y: 200 },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  },
+  markers: [
+    {
+      position: 0.25,         // 25% along the line
+      shape: 'circle',        // 'circle' | 'square' | 'diamond' | 'arrow'
+      size: 10,
+      color: '#ff6b6b'
+    },
+    {
+      position: 0.5,          // 50% along the line
+      shape: 'square',
+      size: 12,
+      color: '#4ecdc4'
+    },
+    {
+      position: 0.75,         // 75% along the line
+      shape: 'diamond',
+      size: 10,
+      color: '#45b7d1'
+    }
+  ]
+}, canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 200 },
+  endCoordinates: { x: 500, y: 200 },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  },
+  markers: [
+    {
+      position: 0.25,         // 25% along the line
+      shape: 'circle',        // 'circle' | 'square' | 'diamond' | 'arrow'
+      size: 10,
+      color: '#ff6b6b'
+    },
+    {
+      position: 0.5,          // 50% along the line
+      shape: 'square',
+      size: 12,
+      color: '#4ecdc4'
+    },
+    {
+      position: 0.75,         // 75% along the line
+      shape: 'diamond',
+      size: 10,
+      color: '#45b7d1'
+    }
+  ]
+}, canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+## Smooth Paths
+
+Create smooth curved lines using different interpolation methods:
+
+### Smooth Path (Single Segment)
+
+For a single smooth curve between two points using Cardinal Spline with 50 segments for ultra-smooth rendering:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 200 },
+  endCoordinates: { x: 500, y: 300 },
+  path: {
+    type: 'smooth',      // Cardinal Spline (50 segments, graph quality)
+    tension: 0.5,        // 0-1, lower = smoother
+    closed: false
+  },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  }
+}, canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 200 },
+  endCoordinates: { x: 500, y: 300 },
+  path: {
+    type: 'smooth',      // Cardinal Spline (50 segments, graph quality)
+    tension: 0.5,        // 0-1, lower = smoother
+    closed: false
+  },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  }
+}, canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+### Catmull-Rom Path (Ultra-Smooth)
+
+Catmull-Rom spline with 60 segments - the smoothest option, perfect for graphs. Passes through all control points with maximum smoothness:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 200 },
+  endCoordinates: { x: 500, y: 300 },
+  path: {
+    type: 'catmull-rom',  // 60 segments, ultra-smooth (best for graphs)
+    tension: 0.5,         // 0-1, lower = tighter curves
+    closed: false
+  },
+  lineStyle: {
+    width: 3,
+    color: '#4ecdc4'
+  }
+}, canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 200 },
+  endCoordinates: { x: 500, y: 300 },
+  path: {
+    type: 'catmull-rom',  // 60 segments, ultra-smooth (best for graphs)
+    tension: 0.5,         // 0-1, lower = tighter curves
+    closed: false
+  },
+  lineStyle: {
+    width: 3,
+    color: '#4ecdc4'
+  }
+}, canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Best for Graphs">
+`catmull-rom` with 60 segments per curve provides the smoothest possible rendering, perfect for graphing applications. It passes through all control points with no sharp edges.
+</Alert>
+
+### Continuous Smooth Curves (Graph Quality)
+
+Create ultra-smooth continuous curves through multiple points with professional graph-quality smoothness. Apexify.js uses high-resolution smoothing (50-60 segments per curve) and automatic anti-aliasing for the smoothest possible curves:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Ultra-smooth continuous curve (graph quality)
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 200 },
+    endCoordinates: { x: 200, y: 150 },
+    path: {
+      type: 'catmull-rom',  // Best for smooth continuous curves (60 segments)
+      // or 'smooth' for Cardinal Spline (50 segments)
+      tension: 0.5,         // 0.3-0.7 works best (lower = smoother)
+      closed: false
+    },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: true,     // Connect to next segment
+      lineJoin: 'round',    // Smooth joins at connection points
+      lineCap: 'round'      // Smooth line caps
+    }
+  },
+  {
+    startCoordinates: { x: 200, y: 150 },
+    endCoordinates: { x: 300, y: 250 },
+    // Path smoothing applies to entire connected sequence
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: true,     // Still connected
+      lineJoin: 'round',
+      lineCap: 'round'
+    }
+  },
+  {
+    startCoordinates: { x: 300, y: 250 },
+    endCoordinates: { x: 400, y: 200 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: false,    // End the continuous line
+      lineJoin: 'round',
+      lineCap: 'round'
+    }
+  }
+], canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+// Ultra-smooth continuous curve (graph quality)
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 200 },
+    endCoordinates: { x: 200, y: 150 },
+    path: {
+      type: 'catmull-rom',  // Best for smooth continuous curves (60 segments)
+      // or 'smooth' for Cardinal Spline (50 segments)
+      tension: 0.5,         // 0.3-0.7 works best (lower = smoother)
+      closed: false
+    },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: true,     // Connect to next segment
+      lineJoin: 'round',    // Smooth joins at connection points
+      lineCap: 'round'      // Smooth line caps
+    }
+  },
+  {
+    startCoordinates: { x: 200, y: 150 },
+    endCoordinates: { x: 300, y: 250 },
+    // Path smoothing applies to entire connected sequence
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: true,     // Still connected
+      lineJoin: 'round',
+      lineCap: 'round'
+    }
+  },
+  {
+    startCoordinates: { x: 300, y: 250 },
+    endCoordinates: { x: 400, y: 200 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: false,    // End the continuous line
+      lineJoin: 'round',
+      lineCap: 'round'
+    }
+  }
+], canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="success" title="Graph-Quality Smoothness">
+Apexify.js automatically provides:
+- **High-quality anti-aliasing** - Enabled by default for ultra-smooth rendering
+- **Ultra-high resolution** - 50-60 segments per curve for professional graph quality
+- **Cardinal Spline & Catmull-Rom** - Advanced algorithms for maximum smoothness
+- **No sharp edges** - Smooth transitions at all connection points when using `singleLine: true`
+
+The `catmull-rom` type (60 segments) produces the smoothest results, perfect for graphing applications.
+</Alert>
+
+### Bezier Path
+
+For explicit bezier curves, you need at least 4 points (start, control1, control2, end):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// For bezier, you need multiple line segments
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 200 },
+    endCoordinates: { x: 200, y: 150 }  // Control point 1
+  },
+  {
+    startCoordinates: { x: 200, y: 150 },
+    endCoordinates: { x: 300, y: 250 }  // Control point 2
+  },
+  {
+    startCoordinates: { x: 300, y: 250 },
+    endCoordinates: { x: 400, y: 200 }  // End point
+  }
+], canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+// For bezier, you need multiple line segments
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 200 },
+    endCoordinates: { x: 200, y: 150 }  // Control point 1
+  },
+  {
+    startCoordinates: { x: 200, y: 150 },
+    endCoordinates: { x: 300, y: 250 }  // Control point 2
+  },
+  {
+    startCoordinates: { x: 300, y: 250 },
+    endCoordinates: { x: 400, y: 200 }  // End point
+  }
+], canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+## Line Patterns
+
+Apply built-in or custom patterns:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Dots pattern
+lineStyle: {
+  width: 3,
+  color: '#ff6b6b',
+  pattern: {
+    type: 'dots',
+    offset: 0
+  }
+}
+
+// Dashes pattern
+lineStyle: {
+  width: 3,
+  color: '#4ecdc4',
+  pattern: {
+    type: 'dashes',
+    offset: 0
+  }
+}
+
+// Custom pattern
+lineStyle: {
+  width: 3,
+  color: '#45b7d1',
+  pattern: {
+    type: 'custom',
+    segments: [20, 5, 10, 5],  // Custom dash pattern
+    offset: 0
+  }
+}
+```
+</ts>
+<js>
+```javascript
+// Dots pattern
+lineStyle: {
+  width: 3,
+  color: '#ff6b6b',
+  pattern: {
+    type: 'dots',
+    offset: 0
+  }
+}
+
+// Dashes pattern
+lineStyle: {
+  width: 3,
+  color: '#4ecdc4',
+  pattern: {
+    type: 'dashes',
+    offset: 0
+  }
+}
+
+// Custom pattern
+lineStyle: {
+  width: 3,
+  color: '#45b7d1',
+  pattern: {
+    type: 'custom',
+    segments: [20, 5, 10, 5],  // Custom dash pattern
+    offset: 0
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Line Textures
+
+Apply texture images to lines:
+
+<CodeSwitcher>
+<ts>
+```typescript
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  texture: './texture.png'  // Local file path
+  // or
+  // texture: 'https://example.com/texture.jpg'  // Online URL
+}
+```
+</ts>
+<js>
+```javascript
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  texture: './texture.png'  // Local file path
+  // or
+  // texture: 'https://example.com/texture.jpg'  // Online URL
+}
+```
+</js>
+</CodeSwitcher>
+
+## Shadows
+
+Add shadows to lines:
+
+<CodeSwitcher>
+<ts>
+```typescript
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  shadow: {
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10,
+    color: 'rgba(0,0,0,0.5)',
+    gradient: {  // Optional gradient shadow
+      type: 'linear',
+      colors: [
+        { stop: 0, color: 'rgba(0,0,0,0.3)' },
+        { stop: 1, color: 'rgba(0,0,0,0.7)' }
+      ]
+    },
+    lineRadius: 2  // Shadow line radius
+  }
+}
+```
+</ts>
+<js>
+```javascript
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  shadow: {
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10,
+    color: 'rgba(0,0,0,0.5)',
+    gradient: {  // Optional gradient shadow
+      type: 'linear',
+      colors: [
+        { stop: 0, color: 'rgba(0,0,0,0.3)' },
+        { stop: 1, color: 'rgba(0,0,0,0.7)' }
+      ]
+    },
+    lineRadius: 2  // Shadow line radius
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Line Radius
+
+Add rounded ends to lines for a polished, professional appearance:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Numeric radius (rounded caps)
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  lineRadius: 10  // Radius in pixels for rounded ends
+}
+
+// Circular radius (fully rounded)
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  lineRadius: 'circular'  // Creates circular caps
+}
+```
+</ts>
+<js>
+```javascript
+// Numeric radius (rounded caps)
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  lineRadius: 10  // Radius in pixels for rounded ends
+}
+
+// Circular radius (fully rounded)
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  lineRadius: 'circular'  // Creates circular caps
+}
+```
+</js>
+</CodeSwitcher>
+
+## Strokes
+
+Add strokes/outlines to lines:
+
+<CodeSwitcher>
+<ts>
+```typescript
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  stroke: {
+    color: '#000000',  // Stroke color
+    width: 2,          // Stroke width
+    gradient: {        // Optional gradient stroke
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#000000' },
+        { stop: 1, color: '#333333' }
+      ]
+    },
+    lineRadius: 1,     // Stroke line radius
+    lineCap: 'round'   // Stroke line cap
+  }
+}
+```
+</ts>
+<js>
+```javascript
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  stroke: {
+    color: '#000000',  // Stroke color
+    width: 2,          // Stroke width
+    gradient: {        // Optional gradient stroke
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#000000' },
+        { stop: 1, color: '#333333' }
+      ]
+    },
+    lineRadius: 1,     // Stroke line radius
+    lineCap: 'round'   // Stroke line cap
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 200 },
+    endCoordinates: { x: 500, y: 200 },
+    lineStyle: {
+      width: 4,
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ]
+      },
+      shadow: {
+        offsetX: 5,
+        offsetY: 5,
+        blur: 10,
+        color: 'rgba(0,0,0,0.4)'
+      }
+    },
+    arrow: {
+      end: true,
+      size: 15,
+      style: 'filled',
+      color: '#4ecdc4'
+    },
+    markers: [
+      { position: 0.5, shape: 'circle', size: 8, color: '#ffffff' }
+    ]
+  },
+  {
+    startCoordinates: { x: 100, y: 400 },
+    endCoordinates: { x: 500, y: 400 },
+    path: {
+      type: 'smooth',
+      tension: 0.6
+    },
+    lineStyle: {
+      width: 3,
+      color: '#ffd700',
+      pattern: {
+        type: 'dashes',
+        offset: 0
+      },
+      stroke: {
+        color: '#000000',
+        width: 1
+      }
+    },
+    arrow: {
+      start: true,
+      end: true,
+      size: 12,
+      style: 'outline',
+      color: '#ffd700'
+    }
+  }
+], canvas.buffer);
+
+fs.writeFileSync('advanced-lines.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createAdvancedLines() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  const result = await painter.createCustom([
+    {
+      startCoordinates: { x: 100, y: 200 },
+      endCoordinates: { x: 500, y: 200 },
+      lineStyle: {
+        width: 4,
+        gradient: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        },
+        shadow: {
+          offsetX: 5,
+          offsetY: 5,
+          blur: 10,
+          color: 'rgba(0,0,0,0.4)'
+        }
+      },
+      arrow: {
+        end: true,
+        size: 15,
+        style: 'filled',
+        color: '#4ecdc4'
+      },
+      markers: [
+        { position: 0.5, shape: 'circle', size: 8, color: '#ffffff' }
+      ]
+    },
+    {
+      startCoordinates: { x: 100, y: 400 },
+      endCoordinates: { x: 500, y: 400 },
+      path: {
+        type: 'smooth',
+        tension: 0.6
+      },
+      lineStyle: {
+        width: 3,
+        color: '#ffd700',
+        pattern: {
+          type: 'dashes',
+          offset: 0
+        },
+        stroke: {
+          color: '#000000',
+          width: 1
+        }
+      },
+      arrow: {
+        start: true,
+        end: true,
+        size: 12,
+        style: 'outline',
+        color: '#ffd700'
+      }
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('advanced-lines.png', result);
+}
+
+createAdvancedLines();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Basic Custom Lines](/docs#basic-custom-lines) - Review basic line drawing
+- [ApexPainter Overview](/docs#apexpainter-overview) - Learn about the main class
+

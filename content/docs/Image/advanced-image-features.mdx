@@ -1,0 +1,1002 @@
+# Advanced Image Features
+
+Apexify.js provides a comprehensive set of advanced features for images and shapes, including shadows, strokes, backgrounds, transformations, and visual effects.
+
+## Overview
+
+Advanced features enhance your images with:
+- **Shadows**: Add depth with customizable shadows
+- **Strokes**: Outline images with borders
+- **Box Backgrounds**: Add backgrounds behind images
+- **Transformations**: Rotate, scale, and position
+- **Visual Effects**: Opacity, blur, and border radius
+
+## Shadows
+
+Shadows add depth and dimension to images. Apexify.js supports both solid color and gradient shadows.
+
+### Basic Shadow
+
+<CodeSwitcher>
+<ts>
+```typescript
+const shadowed = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',  // Shadow color with opacity
+    offsetX: 10,                // Horizontal offset
+    offsetY: 10,                // Vertical offset
+    blur: 20                    // Blur radius
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const shadowed = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',  // Shadow color with opacity
+    offsetX: 10,                // Horizontal offset
+    offsetY: 10,                // Vertical offset
+    blur: 20                    // Blur radius
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Gradient Shadows
+
+<CodeSwitcher>
+<ts>
+```typescript
+const gradientShadow = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  shadow: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: 'rgba(255,0,0,0.8)' },
+        { stop: 1, color: 'rgba(0,0,255,0.8)' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 400,
+      endY: 300
+    },
+    offsetX: 15,
+    offsetY: 15,
+    blur: 25
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const gradientShadow = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  shadow: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: 'rgba(255,0,0,0.8)' },
+        { stop: 1, color: 'rgba(0,0,255,0.8)' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 400,
+      endY: 300
+    },
+    offsetX: 15,
+    offsetY: 15,
+    blur: 25
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Shadow with Opacity
+
+<CodeSwitcher>
+<ts>
+```typescript
+const transparentShadow = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  shadow: {
+    color: '#000000',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20,
+    opacity: 0.3  // Overall shadow opacity (0-1)
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const transparentShadow = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  shadow: {
+    color: '#000000',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20,
+    opacity: 0.3  // Overall shadow opacity (0-1)
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Strokes
+
+Strokes add borders around images. Supports solid colors, gradients, and multiple styles.
+
+### Basic Stroke
+
+<CodeSwitcher>
+<ts>
+```typescript
+const stroked = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 5
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const stroked = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 5
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Gradient Strokes
+
+<CodeSwitcher>
+<ts>
+```typescript
+const gradientStroke = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 400,
+      endY: 300
+    },
+    width: 8
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const gradientStroke = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 400,
+      endY: 300
+    },
+    width: 8
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Stroke Styles
+
+Apexify.js supports 6 stroke styles:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Solid (default)
+const solid = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 5,
+    style: 'solid'
+  }
+}, canvasBuffer);
+
+// Dashed
+const dashed = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 5,
+    style: 'dashed'
+  }
+}, canvasBuffer);
+
+// Dotted
+const dotted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 5,
+    style: 'dotted'
+  }
+}, canvasBuffer);
+
+// Groove (3D effect)
+const groove = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 8,
+    style: 'groove'
+  }
+}, canvasBuffer);
+
+// Ridge (3D effect)
+const ridge = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 8,
+    style: 'ridge'
+  }
+}, canvasBuffer);
+
+// Double (two parallel lines)
+const double = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 8,
+    style: 'double'
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Solid (default)
+const solid = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 5,
+    style: 'solid'
+  }
+}, canvasBuffer);
+
+// Dashed
+const dashed = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 5,
+    style: 'dashed'
+  }
+}, canvasBuffer);
+
+// Dotted
+const dotted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 5,
+    style: 'dotted'
+  }
+}, canvasBuffer);
+
+// Groove (3D effect)
+const groove = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 8,
+    style: 'groove'
+  }
+}, canvasBuffer);
+
+// Ridge (3D effect)
+const ridge = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 8,
+    style: 'ridge'
+  }
+}, canvasBuffer);
+
+// Double (two parallel lines)
+const double = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  stroke: {
+    color: '#ffffff',
+    width: 8,
+    style: 'double'
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Box Backgrounds
+
+Box backgrounds add a background color or gradient behind the image, inside the clipping area:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Solid color background
+const withBg = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  boxBackground: {
+    color: '#ff6b6b'
+  }
+}, canvasBuffer);
+
+// Gradient background
+const withGradientBg = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  boxBackground: {
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 200,
+      startY: 150,
+      startRadius: 0,
+      endX: 200,
+      endY: 150,
+      endRadius: 200
+    }
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Solid color background
+const withBg = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  boxBackground: {
+    color: '#ff6b6b'
+  }
+}, canvasBuffer);
+
+// Gradient background
+const withGradientBg = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  boxBackground: {
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 200,
+      startY: 150,
+      startRadius: 0,
+      endX: 200,
+      endY: 150,
+      endRadius: 200
+    }
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Rotation
+
+Rotate images around their center point:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// 45 degree rotation
+const rotated = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  rotation: 45  // Degrees (0-360)
+}, canvasBuffer);
+
+// 90 degree rotation (portrait to landscape)
+const portrait = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 400,
+  rotation: 90
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// 45 degree rotation
+const rotated = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  rotation: 45  // Degrees (0-360)
+}, canvasBuffer);
+
+// 90 degree rotation (portrait to landscape)
+const portrait = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 400,
+  rotation: 90
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Rotation Center">
+Images rotate around their center point. The rotation affects the image, shadow, and stroke together.
+</Alert>
+
+## Opacity
+
+Control image transparency:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Semi-transparent
+const transparent = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  opacity: 0.5  // 0-1, 0 = fully transparent, 1 = fully opaque
+}, canvasBuffer);
+
+// Fade effect
+const faded = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  opacity: 0.7
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Semi-transparent
+const transparent = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  opacity: 0.5  // 0-1, 0 = fully transparent, 1 = fully opaque
+}, canvasBuffer);
+
+// Fade effect
+const faded = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  opacity: 0.7
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Blur
+
+Apply blur effect to images:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Light blur
+const lightBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  blur: 5  // Blur radius in pixels
+}, canvasBuffer);
+
+// Heavy blur
+const heavyBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  blur: 20
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Light blur
+const lightBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  blur: 5  // Blur radius in pixels
+}, canvasBuffer);
+
+// Heavy blur
+const heavyBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  blur: 20
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Border Radius
+
+Round the corners of images:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Rounded corners
+const rounded = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  borderRadius: 20  // Radius in pixels
+}, canvasBuffer);
+
+// Circular image
+const circular = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 300,  // Must be square for perfect circle
+  borderRadius: 'circular'
+}, canvasBuffer);
+
+// Selective corner rounding
+const selective = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  borderRadius: 30,
+  borderPosition: 'top-left,top-right'  // Only round top corners
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Rounded corners
+const rounded = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  borderRadius: 20  // Radius in pixels
+}, canvasBuffer);
+
+// Circular image
+const circular = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 300,  // Must be square for perfect circle
+  borderRadius: 'circular'
+}, canvasBuffer);
+
+// Selective corner rounding
+const selective = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  borderRadius: 30,
+  borderPosition: 'top-left,top-right'  // Only round top corners
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Combining All Features
+
+Combine multiple advanced features for stunning results:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const advanced = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  // Transformations
+  rotation: 5,
+  opacity: 0.95,
+  blur: 1,
+  borderRadius: 20,
+  // Visual enhancements
+  shadow: {
+    color: 'rgba(0,0,0,0.4)',
+    offsetX: 15,
+    offsetY: 15,
+    blur: 25
+  },
+  stroke: {
+    color: '#ffffff',
+    width: 3,
+    style: 'solid'
+  },
+  boxBackground: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
+    }
+  },
+  // Filters
+  filters: [
+    { type: 'contrast', value: 1.1 }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const advanced = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  // Transformations
+  rotation: 5,
+  opacity: 0.95,
+  blur: 1,
+  borderRadius: 20,
+  // Visual enhancements
+  shadow: {
+    color: 'rgba(0,0,0,0.4)',
+    offsetX: 15,
+    offsetY: 15,
+    blur: 25
+  },
+  stroke: {
+    color: '#ffffff',
+    width: 3,
+    style: 'solid'
+  },
+  boxBackground: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
+    }
+  },
+  // Filters
+  filters: [
+    { type: 'contrast', value: 1.1 }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create canvas
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#f5f5f5'
+});
+
+// Add image with all advanced features
+const result = await painter.createImage({
+  source: './photo.jpg',
+  x: 200,
+  y: 150,
+  width: 800,
+  height: 500,
+  // Transformations
+  rotation: 2,
+  opacity: 0.98,
+  borderRadius: 15,
+  // Shadow
+  shadow: {
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: 'rgba(0,0,0,0.6)' },
+        { stop: 1, color: 'rgba(0,0,0,0.2)' }
+      ]
+    },
+    offsetX: 20,
+    offsetY: 20,
+    blur: 30,
+    opacity: 0.8
+  },
+  // Stroke
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffffff' },
+        { stop: 1, color: '#f0f0f0' }
+      ]
+    },
+    width: 4,
+    style: 'solid'
+  },
+  // Box background
+  boxBackground: {
+    color: '#ffffff'
+  },
+  // Filters
+  filters: [
+    { type: 'contrast', value: 1.15 },
+    { type: 'saturation', value: 1.05 }
+  ]
+}, canvas.buffer);
+
+fs.writeFileSync('advanced-features.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createAdvanced() {
+  // Create canvas
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#f5f5f5'
+  });
+
+  // Add image with all advanced features
+  const result = await painter.createImage({
+    source: './photo.jpg',
+    x: 200,
+    y: 150,
+    width: 800,
+    height: 500,
+    // Transformations
+    rotation: 2,
+    opacity: 0.98,
+    borderRadius: 15,
+    // Shadow
+    shadow: {
+      gradient: {
+        type: 'radial',
+        colors: [
+          { stop: 0, color: 'rgba(0,0,0,0.6)' },
+          { stop: 1, color: 'rgba(0,0,0,0.2)' }
+        ]
+      },
+      offsetX: 20,
+      offsetY: 20,
+      blur: 30,
+      opacity: 0.8
+    },
+    // Stroke
+    stroke: {
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ffffff' },
+          { stop: 1, color: '#f0f0f0' }
+        ]
+      },
+      width: 4,
+      style: 'solid'
+    },
+    // Box background
+    boxBackground: {
+      color: '#ffffff'
+    },
+    // Filters
+    filters: [
+      { type: 'contrast', value: 1.15 },
+      { type: 'saturation', value: 1.05 }
+    ]
+  }, canvas.buffer);
+
+  fs.writeFileSync('advanced-features.png', result);
+}
+
+createAdvanced();
+```
+</js>
+</CodeSwitcher>
+
+## Feature Summary
+
+| Feature | Property | Description |
+|---------|----------|-------------|
+| **Shadow** | `shadow` | Add depth with color or gradient shadows |
+| **Stroke** | `stroke` | Outline with 6 styles (solid, dashed, dotted, groove, ridge, double) |
+| **Box Background** | `boxBackground` | Add color or gradient behind image |
+| **Rotation** | `rotation` | Rotate image in degrees (0-360) |
+| **Opacity** | `opacity` | Control transparency (0-1) |
+| **Blur** | `blur` | Apply blur effect (pixels) |
+| **Border Radius** | `borderRadius` | Round corners (pixels or 'circular') |
+| **Border Position** | `borderPosition` | Select which corners to round |
+
+## Next Steps
+
+- [Basic Image Operations](/docs#basic-image-operations) - Learn the fundamentals
+- [Image Filters](/docs#image-filters) - Apply professional filters
+- [Image Effects](/docs#image-effects) - Add atmospheric effects
+
+

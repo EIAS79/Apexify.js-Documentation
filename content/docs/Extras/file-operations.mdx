@@ -1,0 +1,434 @@
+# File Operations
+
+Apexify.js provides advanced file saving capabilities with smart naming, format conversion, batch support, and extensive customization options.
+
+## Overview
+
+File operations include:
+- **Save** - Save single buffers with smart naming
+- **Save Multiple** - Save multiple buffers in batch
+- **Auto-naming** - Timestamp, counter, or custom naming
+- **Format Conversion** - Automatic format conversion on save
+- **Directory Management** - Auto-create directories
+
+## Saving Files
+
+Save buffers to local files with extensive customization:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Create a canvas
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#ff6b6b'
+});
+
+// Simple save with auto-generated timestamp name
+const result1 = await painter.save(canvas.buffer);
+// Saves to: ./ApexPainter_output/20241220_143025_123.png
+
+// Custom filename and directory
+const result2 = await painter.save(canvas.buffer, {
+  directory: './my-images',
+  filename: 'my-canvas',
+  format: 'jpg',
+  quality: 95
+});
+// Saves to: ./my-images/my-canvas.jpg
+
+// Save with counter naming
+const result3 = await painter.save(canvas.buffer, {
+  naming: 'counter',
+  prefix: 'image-',
+  counterStart: 1
+});
+// Saves to: ./ApexPainter_output/image-1.png, image-2.png, etc.
+
+console.log(result1.path);  // Full path to saved file
+console.log(result1.filename);  // Filename
+console.log(result1.size);  // File size in bytes
+console.log(result1.format);  // File format
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function saveFiles() {
+  // Create a canvas
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#ff6b6b'
+  });
+
+  // Simple save with auto-generated timestamp name
+  const result1 = await painter.save(canvas.buffer);
+  // Saves to: ./ApexPainter_output/20241220_143025_123.png
+
+  // Custom filename and directory
+  const result2 = await painter.save(canvas.buffer, {
+    directory: './my-images',
+    filename: 'my-canvas',
+    format: 'jpg',
+    quality: 95
+  });
+  // Saves to: ./my-images/my-canvas.jpg
+
+  // Save with counter naming
+  const result3 = await painter.save(canvas.buffer, {
+    naming: 'counter',
+    prefix: 'image-',
+    counterStart: 1
+  });
+  // Saves to: ./ApexPainter_output/image-1.png, image-2.png, etc.
+
+  console.log(result1.path);  // Full path to saved file
+  console.log(result1.filename);  // Filename
+  console.log(result1.size);  // File size in bytes
+  console.log(result1.format);  // File format
+}
+
+saveFiles();
+```
+</js>
+</CodeSwitcher>
+
+## Save Options
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.save(buffer, {
+  directory: './output',  // Output directory (default: './ApexPainter_output')
+  filename: 'my-file',  // Custom filename (auto-generated if not provided)
+  format: 'png',  // 'png' | 'jpg' | 'jpeg' | 'webp' | 'avif' | 'gif'
+  quality: 90,  // Quality for JPEG/WebP (0-100, default: 90)
+  naming: 'timestamp',  // 'timestamp' | 'counter' | 'custom'
+  prefix: 'img-',  // Prefix for filename
+  suffix: '-final',  // Suffix for filename
+  counterStart: 1,  // Starting counter value
+  createDirectory: true,  // Auto-create directory (default: true)
+  overwrite: false  // Overwrite existing files (default: false, auto-renames)
+});
+```
+</ts>
+<js>
+```javascript
+await painter.save(buffer, {
+  directory: './output',  // Output directory (default: './ApexPainter_output')
+  filename: 'my-file',  // Custom filename (auto-generated if not provided)
+  format: 'png',  // 'png' | 'jpg' | 'jpeg' | 'webp' | 'avif' | 'gif'
+  quality: 90,  // Quality for JPEG/WebP (0-100, default: 90)
+  naming: 'timestamp',  // 'timestamp' | 'counter' | 'custom'
+  prefix: 'img-',  // Prefix for filename
+  suffix: '-final',  // Suffix for filename
+  counterStart: 1,  // Starting counter value
+  createDirectory: true,  // Auto-create directory (default: true)
+  overwrite: false  // Overwrite existing files (default: false, auto-renames)
+});
+```
+</js>
+</CodeSwitcher>
+
+## Naming Patterns
+
+### Timestamp Naming (Default)
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Auto-generates: YYYYMMDD_HHMMSS_mmm.png
+const result = await painter.save(buffer, {
+  naming: 'timestamp',
+  prefix: 'canvas-',
+  suffix: '-export'
+});
+// Example: ./ApexPainter_output/canvas-20241220_143025_123-export.png
+```
+</ts>
+<js>
+```javascript
+// Auto-generates: YYYYMMDD_HHMMSS_mmm.png
+const result = await painter.save(buffer, {
+  naming: 'timestamp',
+  prefix: 'canvas-',
+  suffix: '-export'
+});
+// Example: ./ApexPainter_output/canvas-20241220_143025_123-export.png
+```
+</js>
+</CodeSwitcher>
+
+### Counter Naming
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Sequential numbering: image-1.png, image-2.png, etc.
+const result1 = await painter.save(buffer1, {
+  naming: 'counter',
+  prefix: 'image-',
+  counterStart: 1
+});
+
+const result2 = await painter.save(buffer2, {
+  naming: 'counter',
+  prefix: 'image-',
+  counterStart: 1  // Counter continues from previous save
+});
+```
+</ts>
+<js>
+```javascript
+// Sequential numbering: image-1.png, image-2.png, etc.
+const result1 = await painter.save(buffer1, {
+  naming: 'counter',
+  prefix: 'image-',
+  counterStart: 1
+});
+
+const result2 = await painter.save(buffer2, {
+  naming: 'counter',
+  prefix: 'image-',
+  counterStart: 1  // Counter continues from previous save
+});
+```
+</js>
+</CodeSwitcher>
+
+### Custom Naming
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Use custom filename
+const result = await painter.save(buffer, {
+  naming: 'custom',
+  filename: 'my-custom-name',
+  format: 'png'
+});
+```
+</ts>
+<js>
+```javascript
+// Use custom filename
+const result = await painter.save(buffer, {
+  naming: 'custom',
+  filename: 'my-custom-name',
+  format: 'png'
+});
+```
+</js>
+</CodeSwitcher>
+
+## Save Multiple Files
+
+Save multiple buffers at once with batch options:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Create multiple canvases
+const canvas1 = await painter.createCanvas({ width: 800, height: 600, colorBg: '#ff6b6b' });
+const canvas2 = await painter.createCanvas({ width: 800, height: 600, colorBg: '#4ecdc4' });
+const canvas3 = await painter.createCanvas({ width: 800, height: 600, colorBg: '#45b7d1' });
+
+// Save all at once
+const results = await painter.saveMultiple(
+  [canvas1.buffer, canvas2.buffer, canvas3.buffer],
+  {
+    directory: './batch-output',
+    prefix: 'batch-',
+    naming: 'counter',
+    counterStart: 1,
+    format: 'png'
+  }
+);
+
+// results is an array of SaveResult objects
+results.forEach((result, index) => {
+  console.log(`Saved: ${result.filename} (${result.size} bytes)`);
+});
+// Saves: batch-1.png, batch-2.png, batch-3.png
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function saveMultiple() {
+  // Create multiple canvases
+  const canvas1 = await painter.createCanvas({ width: 800, height: 600, colorBg: '#ff6b6b' });
+  const canvas2 = await painter.createCanvas({ width: 800, height: 600, colorBg: '#4ecdc4' });
+  const canvas3 = await painter.createCanvas({ width: 800, height: 600, colorBg: '#45b7d1' });
+
+  // Save all at once
+  const results = await painter.saveMultiple(
+    [canvas1.buffer, canvas2.buffer, canvas3.buffer],
+    {
+      directory: './batch-output',
+      prefix: 'batch-',
+      naming: 'counter',
+      counterStart: 1,
+      format: 'png'
+    }
+  );
+
+  // results is an array of SaveResult objects
+  results.forEach((result, index) => {
+    console.log(`Saved: ${result.filename} (${result.size} bytes)`);
+  });
+  // Saves: batch-1.png, batch-2.png, batch-3.png
+}
+
+saveMultiple();
+```
+</js>
+</CodeSwitcher>
+
+## Format Conversion on Save
+
+Automatically convert formats when saving:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Save PNG buffer as JPEG
+await painter.save(pngBuffer, {
+  format: 'jpg',
+  quality: 90
+});
+
+// Save as WebP
+await painter.save(buffer, {
+  format: 'webp',
+  quality: 85
+});
+
+// Save as AVIF
+await painter.save(buffer, {
+  format: 'avif',
+  quality: 80
+});
+```
+</ts>
+<js>
+```javascript
+// Save PNG buffer as JPEG
+await painter.save(pngBuffer, {
+  format: 'jpg',
+  quality: 90
+});
+
+// Save as WebP
+await painter.save(buffer, {
+  format: 'webp',
+  quality: 85
+});
+
+// Save as AVIF
+await painter.save(buffer, {
+  format: 'avif',
+  quality: 80
+});
+```
+</js>
+</CodeSwitcher>
+
+## File Overwrite Handling
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Auto-rename if file exists (default)
+await painter.save(buffer, {
+  filename: 'my-file',
+  overwrite: false
+});
+// If my-file.png exists, saves as my-file_1.png
+
+// Overwrite existing file
+await painter.save(buffer, {
+  filename: 'my-file',
+  overwrite: true
+});
+// Overwrites my-file.png if it exists
+```
+</ts>
+<js>
+```javascript
+// Auto-rename if file exists (default)
+await painter.save(buffer, {
+  filename: 'my-file',
+  overwrite: false
+});
+// If my-file.png exists, saves as my-file_1.png
+
+// Overwrite existing file
+await painter.save(buffer, {
+  filename: 'my-file',
+  overwrite: true
+});
+// Overwrites my-file.png if it exists
+```
+</js>
+</CodeSwitcher>
+
+## Reset Save Counter
+
+Reset the internal save counter when using counter naming:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Reset counter to start from 1 again
+painter.resetSaveCounter();
+
+// Now next save with counter naming will start at 1
+await painter.save(buffer, {
+  naming: 'counter',
+  prefix: 'new-'
+});
+// Saves as: new-1.png (instead of continuing from previous counter)
+```
+</ts>
+<js>
+```javascript
+// Reset counter to start from 1 again
+painter.resetSaveCounter();
+
+// Now next save with counter naming will start at 1
+await painter.save(buffer, {
+  naming: 'counter',
+  prefix: 'new-'
+});
+// Saves as: new-1.png (instead of continuing from previous counter)
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="File Operations Tips">
+- Use timestamp naming for unique file names
+- Use counter naming for sequential exports
+- Use `saveMultiple` for batch processing
+- Format conversion happens automatically on save
+- Directories are auto-created if they don't exist
+- Files are auto-renamed if they exist (unless `overwrite: true`)
+</Alert>
+
+

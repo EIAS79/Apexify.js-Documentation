@@ -1,0 +1,411 @@
+# Video Backgrounds
+
+Video backgrounds allow you to use video frames as dynamic backgrounds for your canvas. The `videoBg` property in `createCanvas` extracts a specific frame from a video and uses it as the canvas background.
+
+<Alert type="info" title="FFmpeg Required">
+Video processing features require FFmpeg to be installed on your system. See the [FFmpeg Installation Guide](#ffmpeg-installation) for setup instructions.
+</Alert>
+
+## Basic Usage
+
+The `videoBg` property accepts video file paths, URLs, or Buffers, and extracts a frame to use as the background:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create a canvas with a video frame as background (using frame 0)
+const canvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    frame: 0  // Extract first frame
+  }
+});
+
+fs.writeFileSync('video-bg.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+// Create a canvas with a video frame as background
+async function createVideoBackground() {
+  const canvas = await painter.createCanvas({
+    width: 1920,
+    height: 1080,
+    videoBg: {
+      source: './video.mp4',
+      frame: 0  // Extract first frame
+    }
+  });
+
+  fs.writeFileSync('video-bg.png', canvas.buffer);
+}
+
+createVideoBackground();
+```
+</js>
+</CodeSwitcher>
+
+## Video Source Types
+
+You can use various source types for video backgrounds:
+
+### Local File Path
+
+```typescript
+videoBg: {
+  source: './videos/my-video.mp4',
+  frame: 0
+}
+```
+
+### Remote URL
+
+```typescript
+videoBg: {
+  source: 'https://example.com/video.mp4',
+  frame: 0
+}
+```
+
+### Buffer
+
+```typescript
+const videoBuffer = fs.readFileSync('./video.mp4');
+
+videoBg: {
+  source: videoBuffer,
+  frame: 0
+}
+```
+
+## Frame Extraction Options
+
+### Extract by Frame Number
+
+Extract a specific frame by its frame number (0-based index):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Extract frame 60 (about 2 seconds at 30 FPS)
+const canvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    frame: 60
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Extract frame 60 (about 2 seconds at 30 FPS)
+const canvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    frame: 60
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Frame Number Calculation">
+Frame numbers are 0-based. To calculate the frame number from time:
+- Frame Number = Time (seconds) × FPS
+- Example: At 30 FPS, 2 seconds = frame 60, 5 seconds = frame 150
+</Alert>
+
+### Extract by Time (Recommended)
+
+Extract a frame at a specific time in seconds. This is more accurate than frame numbers:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Extract frame at 5.5 seconds
+const canvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    time: 5.5  // Time in seconds (more accurate than frame number)
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Extract frame at 5.5 seconds
+const canvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    time: 5.5  // Time in seconds (more accurate than frame number)
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="warning" title="Time vs Frame">
+When both `time` and `frame` are provided, `time` takes priority. The `time` option is recommended for accuracy as it doesn't depend on knowing the video's FPS.
+</Alert>
+
+## Output Format and Quality
+
+### Output Format
+
+Choose between PNG (higher quality, larger size) or JPEG (smaller size, good quality):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// PNG format (default for videoBg, best quality)
+const canvasPNG = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    time: 5.5,
+    format: 'png'  // PNG format (always used for videoBg internally)
+  }
+});
+
+// Note: videoBg always uses PNG internally for best compatibility
+```
+</ts>
+<js>
+```javascript
+// PNG format (default for videoBg, best quality)
+const canvasPNG = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    time: 5.5,
+    format: 'png'  // PNG format (always used for videoBg internally)
+  }
+});
+
+// Note: videoBg always uses PNG internally for best compatibility
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Internal Format">
+The `videoBg` property always uses PNG format internally to ensure proper color rendering and compatibility. The `format` option is reserved for future use or other video extraction methods.
+</Alert>
+
+### Opacity Control
+
+Control the opacity of the video background:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Semi-transparent video background
+const canvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    time: 5.5,
+    opacity: 0.7  // 70% opacity
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Semi-transparent video background
+const canvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    time: 5.5,
+    opacity: 0.7  // 70% opacity
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Complete Video Background Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create canvas with video background and add text overlay
+const canvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: 'https://example.com/intro-video.mp4',
+    time: 3.0,        // Extract frame at 3 seconds
+    opacity: 0.9      // 90% opacity
+  },
+  borderRadius: 20,
+  shadow: {
+    color: '#000',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+});
+
+// Add text overlay on video background
+const result = await painter.createText({
+  text: 'Video Background',
+  x: 960,
+  y: 540,
+  fontSize: 72,
+  bold: true,
+  color: '#FFFFFF',
+  textAlign: 'center',
+  textBaseline: 'middle',
+  shadow: {
+    color: '#000',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 15
+  }
+}, canvas.buffer);
+
+fs.writeFileSync('video-background-with-text.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+// Create canvas with video background and add text overlay
+async function createVideoBackgroundWithText() {
+  const canvas = await painter.createCanvas({
+    width: 1920,
+    height: 1080,
+    videoBg: {
+      source: 'https://example.com/intro-video.mp4',
+      time: 3.0,        // Extract frame at 3 seconds
+      opacity: 0.9      // 90% opacity
+    },
+    borderRadius: 20,
+    shadow: {
+      color: '#000',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  });
+
+  // Add text overlay on video background
+  const result = await painter.createText({
+    text: 'Video Background',
+    x: 960,
+    y: 540,
+    fontSize: 72,
+    bold: true,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    shadow: {
+      color: '#000',
+      offsetX: 5,
+      offsetY: 5,
+      blur: 15
+    }
+  }, canvas.buffer);
+
+  fs.writeFileSync('video-background-with-text.png', result);
+}
+
+createVideoBackgroundWithText();
+```
+</js>
+</CodeSwitcher>
+
+## Video Background Properties
+
+| Property | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `source` | `string \| Buffer` | Yes | - | Video file path, URL, or Buffer |
+| `frame` | `number` | No | `0` | Frame number to extract (0-based) |
+| `time` | `number` | No | - | Time in seconds (overrides `frame` if provided) |
+| `opacity` | `number` | No | `1` | Opacity of video background (0-1) |
+| `format` | `'jpg' \| 'png'` | No | `'png'` | Output format (always PNG internally) |
+| `quality` | `number` | No | `2` | JPEG quality 1-31 (lower = better) |
+
+<Alert type="info" title="Priority Order">
+Video backgrounds take priority over other background types. The order is: `videoBg` > `customBg` > `gradientBg` > `colorBg`.
+</Alert>
+
+## Canvas Sizing with Video Backgrounds
+
+When using video backgrounds, the canvas dimensions can be:
+
+1. **Explicitly Set**: You provide `width` and `height`:
+```typescript
+videoBg: {
+  source: './video.mp4',
+  time: 5.5
+},
+width: 1920,
+height: 1080
+```
+
+2. **Auto-Sized from Video**: If you don't specify dimensions, the canvas will use the video frame's dimensions (when using `inherit` or automatic sizing).
+
+## Error Handling
+
+Video background extraction will throw errors if:
+
+- FFmpeg is not installed (see [FFmpeg Installation Guide](#ffmpeg-installation))
+- Video file not found
+- Invalid video format
+- Frame extraction fails
+- Invalid time/frame number
+
+<Alert type="warning" title="Error Messages">
+All errors include helpful FFmpeg installation instructions if FFmpeg is not found. Make sure FFmpeg is properly installed and accessible from your system PATH.
+</Alert>
+
+## Best Practices
+
+1. **Use `time` instead of `frame`** for accuracy, especially with variable frame rate videos
+2. **Cache video info** if extracting multiple frames using `getVideoInfo()`
+3. **Handle errors gracefully** with try-catch blocks
+4. **Use appropriate canvas dimensions** to match your video's aspect ratio
+5. **Consider opacity** when layering video backgrounds with other elements
+
+## Related Documentation
+
+- [Getting Video Info](#getting-video-info) - Learn how to get video metadata
+- [Extracting Frames](#extracting-frames) - Extract multiple frames from videos
+- [FFmpeg Installation](#ffmpeg-installation) - Setup guide for FFmpeg
+
+

@@ -1,0 +1,500 @@
+# Basic Custom Lines
+
+Apexify.js provides powerful custom line drawing capabilities through the `createCustom()` method. Draw lines with custom styles, gradients, patterns, and advanced features like arrows and markers.
+
+## Overview
+
+Custom lines are created using `createCustom()` which accepts an array of line options. Each line can have its own style, color, gradient, and advanced features.
+
+## Basic Line
+
+Draw a simple line:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create a canvas first
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#ffffff'
+});
+
+// Draw a simple line
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 100 },
+  endCoordinates: { x: 500, y: 300 },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  }
+}, canvas.buffer);
+
+fs.writeFileSync('custom-line.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createCustomLine() {
+  // Create a canvas first
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#ffffff'
+  });
+
+  // Draw a simple line
+  const result = await painter.createCustom({
+    startCoordinates: { x: 100, y: 100 },
+    endCoordinates: { x: 500, y: 300 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b'
+    }
+  }, canvas.buffer);
+
+  fs.writeFileSync('custom-line.png', result);
+}
+
+createCustomLine();
+```
+</js>
+</CodeSwitcher>
+
+## Multiple Lines
+
+Draw multiple lines in one call:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 100 },
+    endCoordinates: { x: 300, y: 200 },
+    lineStyle: {
+      width: 2,
+      color: '#ff6b6b'
+    }
+  },
+  {
+    startCoordinates: { x: 300, y: 200 },
+    endCoordinates: { x: 500, y: 150 },
+    lineStyle: {
+      width: 2,
+      color: '#4ecdc4'
+    }
+  },
+  {
+    startCoordinates: { x: 500, y: 150 },
+    endCoordinates: { x: 700, y: 250 },
+    lineStyle: {
+      width: 2,
+      color: '#45b7d1'
+    }
+  }
+], canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 100 },
+    endCoordinates: { x: 300, y: 200 },
+    lineStyle: {
+      width: 2,
+      color: '#ff6b6b'
+    }
+  },
+  {
+    startCoordinates: { x: 300, y: 200 },
+    endCoordinates: { x: 500, y: 150 },
+    lineStyle: {
+      width: 2,
+      color: '#4ecdc4'
+    }
+  },
+  {
+    startCoordinates: { x: 500, y: 150 },
+    endCoordinates: { x: 700, y: 250 },
+    lineStyle: {
+      width: 2,
+      color: '#45b7d1'
+    }
+  }
+], canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+## Line Styles
+
+### Basic Style Properties
+
+<CodeSwitcher>
+<ts>
+```typescript
+lineStyle: {
+  width: 5,                    // Line width in pixels
+  color: '#ff6b6b',            // Line color
+  lineJoin: 'round',           // 'round' | 'bevel' | 'miter'
+  lineCap: 'round',            // 'butt' | 'round' | 'square'
+  singleLine: false,           // Connect multiple lines
+  lineRadius: 5                 // Rounded line ends (number) or 'circular'
+}
+```
+</ts>
+<js>
+```javascript
+lineStyle: {
+  width: 5,                    // Line width in pixels
+  color: '#ff6b6b',            // Line color
+  lineJoin: 'round',           // 'round' | 'bevel' | 'miter'
+  lineCap: 'round',            // 'butt' | 'round' | 'square'
+  singleLine: false,           // Connect multiple lines
+  lineRadius: 5                 // Rounded line ends (number) or 'circular'
+}
+```
+</js>
+</CodeSwitcher>
+
+### Gradient Lines
+
+<CodeSwitcher>
+<ts>
+```typescript
+lineStyle: {
+  width: 5,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 0
+  }
+}
+```
+</ts>
+<js>
+```javascript
+lineStyle: {
+  width: 5,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 0
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+### Dashed Lines
+
+<CodeSwitcher>
+<ts>
+```typescript
+lineStyle: {
+  width: 3,
+  color: '#ff6b6b',
+  lineDash: {
+    dashArray: [10, 5],  // [dash length, gap length]
+    offset: 0            // Dash offset
+  }
+}
+```
+</ts>
+<js>
+```javascript
+lineStyle: {
+  width: 3,
+  color: '#ff6b6b',
+  lineDash: {
+    dashArray: [10, 5],  // [dash length, gap length]
+    offset: 0            // Dash offset
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Single Line Mode
+
+Connect multiple line segments into one continuous line:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 100 },
+    endCoordinates: { x: 200, y: 150 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: true  // Connect to next line
+    }
+  },
+  {
+    startCoordinates: { x: 200, y: 150 },
+    endCoordinates: { x: 300, y: 120 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: true  // Still connected
+    }
+  },
+  {
+    startCoordinates: { x: 300, y: 120 },
+    endCoordinates: { x: 400, y: 180 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: false  // End connection
+    }
+  }
+], canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 100 },
+    endCoordinates: { x: 200, y: 150 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: true  // Connect to next line
+    }
+  },
+  {
+    startCoordinates: { x: 200, y: 150 },
+    endCoordinates: { x: 300, y: 120 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: true  // Still connected
+    }
+  },
+  {
+    startCoordinates: { x: 300, y: 120 },
+    endCoordinates: { x: 400, y: 180 },
+    lineStyle: {
+      width: 3,
+      color: '#ff6b6b',
+      singleLine: false  // End connection
+    }
+  }
+], canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 1, color: '#764ba2' }
+    ]
+  }
+});
+
+const result = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 200 },
+    endCoordinates: { x: 400, y: 300 },
+    lineStyle: {
+      width: 4,
+      color: '#ffffff',
+      lineCap: 'round',
+      lineJoin: 'round'
+    }
+  },
+  {
+    startCoordinates: { x: 400, y: 300 },
+    endCoordinates: { x: 700, y: 250 },
+    lineStyle: {
+      width: 4,
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ]
+      },
+      lineCap: 'round'
+    }
+  },
+  {
+    startCoordinates: { x: 700, y: 250 },
+    endCoordinates: { x: 1000, y: 350 },
+    lineStyle: {
+      width: 4,
+      color: '#ffd700',
+      lineDash: {
+        dashArray: [15, 5],
+        offset: 0
+      }
+    }
+  }
+], canvas.buffer);
+
+fs.writeFileSync('custom-lines.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createCustomLines() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    gradientBg: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#667eea' },
+        { stop: 1, color: '#764ba2' }
+      ]
+    }
+  });
+
+  const result = await painter.createCustom([
+    {
+      startCoordinates: { x: 100, y: 200 },
+      endCoordinates: { x: 400, y: 300 },
+      lineStyle: {
+        width: 4,
+        color: '#ffffff',
+        lineCap: 'round',
+        lineJoin: 'round'
+      }
+    },
+    {
+      startCoordinates: { x: 400, y: 300 },
+      endCoordinates: { x: 700, y: 250 },
+      lineStyle: {
+        width: 4,
+        gradient: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        },
+        lineCap: 'round'
+      }
+    },
+    {
+      startCoordinates: { x: 700, y: 250 },
+      endCoordinates: { x: 1000, y: 350 },
+      lineStyle: {
+        width: 4,
+        color: '#ffd700',
+        lineDash: {
+          dashArray: [15, 5],
+          offset: 0
+        }
+      }
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('custom-lines.png', result);
+}
+
+createCustomLines();
+```
+</js>
+</CodeSwitcher>
+
+### Line Radius
+
+Add rounded ends to lines for a polished look:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Numeric radius (rounded caps)
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  lineRadius: 10  // Radius in pixels for rounded ends
+}
+
+// Circular radius (fully rounded)
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  lineRadius: 'circular'  // Creates circular caps
+}
+```
+</ts>
+<js>
+```javascript
+// Numeric radius (rounded caps)
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  lineRadius: 10  // Radius in pixels for rounded ends
+}
+
+// Circular radius (fully rounded)
+lineStyle: {
+  width: 5,
+  color: '#ff6b6b',
+  lineRadius: 'circular'  // Creates circular caps
+}
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Canvas Buffer Required">
+Like `createText()` and `createImage()`, `createCustom()` requires a canvas buffer as the second parameter. Create a canvas first using `createCanvas()`, then draw lines on it.
+</Alert>
+
+<Alert type="tip" title="High-Quality Rendering">
+Apexify.js automatically enables high-quality anti-aliasing for all custom lines, ensuring ultra-smooth, graph-quality rendering without any additional configuration.
+</Alert>
+
+## Next Steps
+
+- [Advanced Custom Lines](/docs#advanced-custom-lines) - Arrows, markers, smooth paths, patterns, and textures
+

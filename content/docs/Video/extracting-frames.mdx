@@ -1,0 +1,522 @@
+# Extracting Video Frames
+
+Apexify.js provides multiple methods for extracting frames from videos. Extract single frames, multiple frames at specific times, frames at intervals, or all frames from a video.
+
+<Alert type="info" title="FFmpeg Required">
+Video processing features require FFmpeg to be installed on your system. See the [FFmpeg Installation Guide](#ffmpeg-installation) for setup instructions.
+</Alert>
+
+## Frame Extraction Methods Overview
+
+| Method | Description | Use Case |
+|--------|-------------|----------|
+| `extractFrameAtTime()` | Extract a frame at a specific time (seconds) | Single frame extraction |
+| `extractFrameByNumber()` | Extract a frame by frame number | Frame-based extraction |
+| `extractMultipleFrames()` | Extract frames at multiple specific times | Multiple timestamps |
+| `extractFrames()` | Extract frames at intervals (e.g., every second) | Time-lapse, regular intervals |
+| `extractAllFrames()` | Extract every frame from the video | Complete frame extraction |
+| `createVideo()` | Create a canvas from a video frame | Quick canvas creation |
+
+## Extract Frame at Specific Time
+
+Extract a single frame at a specific time in seconds (most accurate method):
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Extract frame at 5.5 seconds
+const frame = await painter.extractFrameAtTime(
+  './video.mp4',
+  5.5,              // Time in seconds
+  'png',            // Output format: 'jpg' | 'png'
+  2                 // JPEG quality 1-31 (lower = better, only for JPEG)
+);
+
+if (frame) {
+  fs.writeFileSync('frame-at-5.5s.png', frame);
+  console.log('Frame extracted successfully!');
+}
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function extractFrame() {
+  // Extract frame at 5.5 seconds
+  const frame = await painter.extractFrameAtTime(
+    './video.mp4',
+    5.5,              // Time in seconds
+    'png',            // Output format: 'jpg' | 'png'
+    2                 // JPEG quality 1-31 (lower = better, only for JPEG)
+  );
+
+  if (frame) {
+    fs.writeFileSync('frame-at-5.5s.png', frame);
+    console.log('Frame extracted successfully!');
+  }
+}
+
+extractFrame();
+```
+</js>
+</CodeSwitcher>
+
+## Extract Frame by Frame Number
+
+Extract a frame by its frame number (1-based: frame 1 = first frame):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Extract frame 150 (1-based indexing)
+const frame = await painter.extractFrameByNumber(
+  './video.mp4',
+  150,              // Frame number (1-based: frame 1 = first frame)
+  'png',            // Output format
+  2                 // JPEG quality (only for JPEG)
+);
+
+if (frame) {
+  fs.writeFileSync('frame-150.png', frame);
+}
+```
+</ts>
+<js>
+```javascript
+// Extract frame 150 (1-based indexing)
+const frame = await painter.extractFrameByNumber(
+  './video.mp4',
+  150,              // Frame number (1-based: frame 1 = first frame)
+  'png',            // Output format
+  2                 // JPEG quality (only for JPEG)
+);
+
+if (frame) {
+  fs.writeFileSync('frame-150.png', frame);
+}
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Frame Number vs Time">
+- **Frame Number**: 1-based indexing (frame 1 = first frame). Requires video FPS knowledge.
+- **Time**: More accurate, doesn't require FPS. Recommended for most use cases.
+</Alert>
+
+## Extract Multiple Frames at Specific Times
+
+Extract frames at multiple specific timestamps:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Extract frames at multiple specific times
+const frames = await painter.extractMultipleFrames(
+  './video.mp4',
+  [0, 5, 10, 15, 30, 60],  // Array of times in seconds
+  'png',                    // Output format
+  2                         // JPEG quality
+);
+
+console.log(`Extracted ${frames.length} frames`);
+
+// Save all frames
+frames.forEach((frame, index) => {
+  fs.writeFileSync(`frame-${index + 1}.png`, frame);
+});
+```
+</ts>
+<js>
+```javascript
+async function extractMultipleFrames() {
+  // Extract frames at multiple specific times
+  const frames = await painter.extractMultipleFrames(
+    './video.mp4',
+    [0, 5, 10, 15, 30, 60],  // Array of times in seconds
+    'png',                    // Output format
+    2                         // JPEG quality
+  );
+
+  console.log(`Extracted ${frames.length} frames`);
+
+  // Save all frames
+  frames.forEach((frame, index) => {
+    fs.writeFileSync(`frame-${index + 1}.png`, frame);
+  });
+}
+
+extractMultipleFrames();
+```
+</js>
+</CodeSwitcher>
+
+## Extract Frames at Intervals
+
+Extract frames at regular intervals (e.g., every 1 second):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Extract frames every 1 second (1000ms interval)
+const frames = await painter.extractFrames(
+  './video.mp4',
+  {
+    interval: 1000,           // Interval in milliseconds (1000ms = 1 second)
+    outputFormat: 'jpg',      // 'jpg' | 'png'
+    frameSelection: {         // Optional: limit frame range
+      start: 0,               // Start frame index (optional)
+      end: 100                // End frame index (optional)
+    }
+  }
+);
+
+// frames is an array of { source: string, isRemote: boolean }
+console.log(`Extracted ${frames.length} frames`);
+
+// Access frame paths
+frames.forEach((frameInfo, index) => {
+  console.log(`Frame ${index + 1}: ${frameInfo.source}`);
+  // Frame files are saved automatically, access via frameInfo.source
+});
+```
+</ts>
+<js>
+```javascript
+async function extractFramesAtInterval() {
+  // Extract frames every 1 second (1000ms interval)
+  const frames = await painter.extractFrames(
+    './video.mp4',
+    {
+      interval: 1000,           // Interval in milliseconds (1000ms = 1 second)
+      outputFormat: 'jpg',      // 'jpg' | 'png'
+      frameSelection: {         // Optional: limit frame range
+        start: 0,               // Start frame index (optional)
+        end: 100                // End frame index (optional)
+      }
+    }
+  );
+
+  // frames is an array of { source: string, isRemote: boolean }
+  console.log(`Extracted ${frames.length} frames`);
+
+  // Access frame paths
+  frames.forEach((frameInfo, index) => {
+    console.log(`Frame ${index + 1}: ${frameInfo.source}`);
+    // Frame files are saved automatically, access via frameInfo.source
+  });
+}
+
+extractFramesAtInterval();
+```
+</js>
+</CodeSwitcher>
+
+## Extract All Frames
+
+Extract every single frame from the video (may take time for long videos):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Extract all frames from video
+const frames = await painter.extractAllFrames(
+  './video.mp4',
+  {
+    outputFormat: 'png',           // 'jpg' | 'png'
+    outputDirectory: './frames',   // Output directory (default: './extracted-frames')
+    prefix: 'frame',               // Filename prefix (default: 'frame')
+    quality: 2,                    // JPEG quality 1-31 (lower = better, default: 2)
+    startTime: 0,                  // Start time in seconds (default: 0)
+    endTime: 60                    // End time in seconds (default: video duration)
+  }
+);
+
+// frames is an array of { source: string, frameNumber: number, time: number }
+console.log(`Extracted ${frames.length} frames`);
+
+frames.forEach((frameInfo) => {
+  console.log(`Frame ${frameInfo.frameNumber}: ${frameInfo.source} (at ${frameInfo.time}s)`);
+});
+```
+</ts>
+<js>
+```javascript
+async function extractAllFrames() {
+  // Extract all frames from video
+  const frames = await painter.extractAllFrames(
+    './video.mp4',
+    {
+      outputFormat: 'png',           // 'jpg' | 'png'
+      outputDirectory: './frames',   // Output directory (default: './extracted-frames')
+      prefix: 'frame',               // Filename prefix (default: 'frame')
+      quality: 2,                    // JPEG quality 1-31 (lower = better, default: 2)
+      startTime: 0,                  // Start time in seconds (default: 0)
+      endTime: 60                    // End time in seconds (default: video duration)
+    }
+  );
+
+  // frames is an array of { source: string, frameNumber: number, time: number }
+  console.log(`Extracted ${frames.length} frames`);
+
+  frames.forEach((frameInfo) => {
+    console.log(`Frame ${frameInfo.frameNumber}: ${frameInfo.source} (at ${frameInfo.time}s)`);
+  });
+}
+
+extractAllFrames();
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="warning" title="Performance Note">
+Extracting all frames from long or high-resolution videos can take significant time and disk space. Consider using `extractFrames()` with intervals or `extractMultipleFrames()` for selective extraction.
+</Alert>
+
+## Create Video Canvas (Quick Method)
+
+The `createVideo()` method creates a canvas directly from a video frame (convenience method):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create canvas from video frame
+const canvas = await painter.createVideo({
+  source: './video.mp4',
+  time: 5.5,               // Time in seconds
+  width: 1920,             // Canvas width (default: video width)
+  height: 1080,            // Canvas height (default: video height)
+  outputFormat: 'png',     // Frame extraction format
+  quality: 2               // JPEG quality (only for JPEG)
+});
+
+// canvas.buffer contains the frame as a PNG buffer
+fs.writeFileSync('video-frame.png', canvas.buffer);
+console.log(`Canvas size: ${canvas.canvas.width}x${canvas.canvas.height}`);
+```
+</ts>
+<js>
+```javascript
+async function createVideoCanvas() {
+  // Create canvas from video frame
+  const canvas = await painter.createVideo({
+    source: './video.mp4',
+    time: 5.5,               // Time in seconds
+    width: 1920,             // Canvas width (default: video width)
+    height: 1080,            // Canvas height (default: video height)
+    outputFormat: 'png',     // Frame extraction format
+    quality: 2               // JPEG quality (only for JPEG)
+  });
+
+  // canvas.buffer contains the frame as a PNG buffer
+  fs.writeFileSync('video-frame.png', canvas.buffer);
+  console.log(`Canvas size: ${canvas.canvas.width}x${canvas.canvas.height}`);
+}
+
+createVideoCanvas();
+```
+</js>
+</CodeSwitcher>
+
+## Video Source Types
+
+All frame extraction methods support multiple source types:
+
+### Local File Path
+
+```typescript
+const frame = await painter.extractFrameAtTime('./video.mp4', 5.5);
+```
+
+### Remote URL
+
+```typescript
+const frame = await painter.extractFrameAtTime('https://example.com/video.mp4', 5.5);
+```
+
+### Buffer
+
+```typescript
+const videoBuffer = fs.readFileSync('./video.mp4');
+const frame = await painter.extractFrameAtTime(videoBuffer, 5.5);
+```
+
+## Output Formats
+
+### PNG Format (Recommended)
+
+- **Best quality** with lossless compression
+- **Larger file size**
+- **Best for**: High-quality thumbnails, backgrounds, processing
+
+```typescript
+const frame = await painter.extractFrameAtTime('./video.mp4', 5.5, 'png');
+```
+
+### JPEG Format
+
+- **Smaller file size**
+- **Good quality** with configurable compression
+- **Quality setting**: 1-31 (lower = better quality, default: 2)
+- **Best for**: Web thumbnails, storage efficiency
+
+```typescript
+const frame = await painter.extractFrameAtTime('./video.mp4', 5.5, 'jpg', 2);
+```
+
+## Complete Example: Create Video Thumbnails
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+async function createVideoThumbnails(videoPath: string) {
+  // Get video info
+  const videoInfo = await painter.getVideoInfo(videoPath);
+  console.log(`Video: ${videoInfo.duration}s, ${videoInfo.fps} FPS`);
+
+  // Extract frames at key moments (0%, 25%, 50%, 75%, 100%)
+  const keyTimes = [
+    0,
+    videoInfo.duration * 0.25,
+    videoInfo.duration * 0.5,
+    videoInfo.duration * 0.75,
+    videoInfo.duration
+  ];
+
+  const frames = await painter.extractMultipleFrames(
+    videoPath,
+    keyTimes,
+    'png'
+  );
+
+  // Save thumbnails
+  frames.forEach((frame, index) => {
+    const filename = `thumbnail-${index + 1}-${keyTimes[index].toFixed(1)}s.png`;
+    fs.writeFileSync(filename, frame);
+    console.log(`Saved: ${filename}`);
+  });
+
+  console.log(`Created ${frames.length} thumbnails`);
+}
+
+createVideoThumbnails('./video.mp4');
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createVideoThumbnails(videoPath) {
+  // Get video info
+  const videoInfo = await painter.getVideoInfo(videoPath);
+  console.log(`Video: ${videoInfo.duration}s, ${videoInfo.fps} FPS`);
+
+  // Extract frames at key moments (0%, 25%, 50%, 75%, 100%)
+  const keyTimes = [
+    0,
+    videoInfo.duration * 0.25,
+    videoInfo.duration * 0.5,
+    videoInfo.duration * 0.75,
+    videoInfo.duration
+  ];
+
+  const frames = await painter.extractMultipleFrames(
+    videoPath,
+    keyTimes,
+    'png'
+  );
+
+  // Save thumbnails
+  frames.forEach((frame, index) => {
+    const filename = `thumbnail-${index + 1}-${keyTimes[index].toFixed(1)}s.png`;
+    fs.writeFileSync(filename, frame);
+    console.log(`Saved: ${filename}`);
+  });
+
+  console.log(`Created ${frames.length} thumbnails`);
+}
+
+createVideoThumbnails('./video.mp4');
+```
+</js>
+</CodeSwitcher>
+
+## Error Handling
+
+<Alert type="warning" title="FFmpeg Required">
+All frame extraction methods require FFmpeg. Errors include installation instructions if FFmpeg is missing.
+</Alert>
+
+<CodeSwitcher>
+<ts>
+```typescript
+try {
+  const frame = await painter.extractFrameAtTime('./video.mp4', 5.5);
+  if (frame) {
+    fs.writeFileSync('frame.png', frame);
+  }
+} catch (error) {
+  if (error.message.includes('FFMPEG NOT FOUND')) {
+    console.error('FFmpeg is required. Please install FFmpeg first.');
+    console.error(error.message); // Includes installation instructions
+  } else if (error.message.includes('not found')) {
+    console.error('Video file not found');
+  } else {
+    console.error('Frame extraction failed:', error.message);
+  }
+}
+```
+</ts>
+<js>
+```javascript
+try {
+  const frame = await painter.extractFrameAtTime('./video.mp4', 5.5);
+  if (frame) {
+    fs.writeFileSync('frame.png', frame);
+  }
+} catch (error) {
+  if (error.message.includes('FFMPEG NOT FOUND')) {
+    console.error('FFmpeg is required. Please install FFmpeg first.');
+    console.error(error.message); // Includes installation instructions
+  } else if (error.message.includes('not found')) {
+    console.error('Video file not found');
+  } else {
+    console.error('Frame extraction failed:', error.message);
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Best Practices
+
+1. **Use `extractFrameAtTime()`** for single frame extraction (most accurate)
+2. **Get video info first** if you need to calculate frame numbers or validate duration
+3. **Choose appropriate format**: PNG for quality, JPEG for file size
+4. **Handle errors gracefully** with try-catch blocks
+5. **Consider disk space** when extracting all frames or many frames
+6. **Use intervals** for time-lapse sequences instead of extracting all frames
+
+## Related Documentation
+
+- [Video Backgrounds](#video-backgrounds) - Use frames as canvas backgrounds
+- [Getting Video Info](#getting-video-info) - Get video metadata
+- [FFmpeg Installation](#ffmpeg-installation) - Setup guide for FFmpeg
+
+

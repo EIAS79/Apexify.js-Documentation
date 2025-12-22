@@ -1,0 +1,412 @@
+# Getting Started with Apexify.js
+
+Welcome to **Apexify.js** - the most powerful, versatile canvas rendering library for Node.js, Next.js, Discord bots, and beyond. Create stunning visuals, generate images on-the-fly, build design tools, and power your applications with professional-grade canvas rendering and image processing.
+
+## Why Apexify.js?
+
+**Apexify.js is not just another canvas library** - it's a complete visual creation toolkit that works everywhere:
+
+- ✅ **Next.js** - Perfect for both frontend and backend image generation
+- ✅ **Discord Bots** - Create dynamic images, welcome cards, level-up cards, and more
+- ✅ **Server-Side Rendering** - Generate images in API routes, server actions, and edge functions
+- ✅ **Design Tools** - Build Photoshop-like applications with code export capabilities
+- ✅ **Web Applications** - Power your websites with dynamic image generation
+- ✅ **Automation** - Batch process images, create thumbnails, generate social media assets
+- ✅ **E-commerce** - Generate product images, banners, and marketing materials
+- ✅ **Social Media** - Create profile pictures, cover images, and post graphics
+- ✅ **Gaming** - Generate game assets, UI elements, and character cards
+- ✅ **Business** - Create business cards, certificates, and professional documents
+
+**One library. Every use case. Zero compromises.**
+
+<Alert type="info" title="Versatile & Powerful">
+Apexify.js provides everything you need for professional canvas rendering and image processing in a single, easy-to-use package. No need for multiple libraries or complex setups.
+</Alert>
+
+## Installation
+
+Get started with Apexify.js in seconds:
+
+<CodeBlock lang="bash">
+```bash
+npm install apexify.js
+```
+</CodeBlock>
+
+Or using yarn:
+
+<CodeBlock lang="bash">
+```bash
+yarn add apexify.js
+```
+</CodeBlock>
+
+Or using pnpm:
+
+<CodeBlock lang="bash">
+```bash
+pnpm add apexify.js
+```
+</CodeBlock>
+
+## Requirements
+
+- **Node.js** 16.0.0 or higher
+- **TypeScript** 5.0+ (optional but recommended)
+
+<Alert type="warning" title="Node.js Version">
+This package requires Node.js 16 or higher to work properly. Make sure you have the correct version installed before proceeding.
+</Alert>
+
+## Platform Support
+
+Apexify.js works everywhere:
+
+✅ **Node.js** - Full support (v16+)  
+✅ **Next.js** - Frontend & Backend (App Router & Pages Router)  
+✅ **Discord.js** - Perfect for Discord bots  
+✅ **Express.js** - API endpoints and server-side rendering  
+✅ **Serverless** - AWS Lambda, Vercel, Netlify Functions  
+✅ **Docker** - Containerized applications  
+✅ **Edge Runtime** - Vercel Edge, Cloudflare Workers (with limitations)
+
+## Quick Start
+
+Here's a simple example to get you started:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create a canvas with gradient background
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 0.5, color: '#4ECDC4' },
+      { stop: 1, color: '#45B7D1' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 800,
+    endY: 600
+  },
+  borderRadius: 20,
+  shadow: {
+    color: '#000',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+});
+
+// Save the canvas
+fs.writeFileSync('output.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+// Create a canvas with gradient background
+async function createArtwork() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    gradientBg: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#FF6B6B' },
+        { stop: 0.5, color: '#4ECDC4' },
+        { stop: 1, color: '#45B7D1' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 800,
+      endY: 600
+    },
+    borderRadius: 20,
+    shadow: {
+      color: '#000',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  });
+
+  // Save the canvas
+  fs.writeFileSync('output.png', canvas.buffer);
+}
+
+createArtwork();
+```
+</js>
+</CodeSwitcher>
+
+## Perfect For
+
+### 🚀 Next.js Applications
+
+Generate images in your Next.js app - both client and server-side:
+
+- **API Routes**: Generate images on-demand via API endpoints
+- **Server Actions**: Create images in server-side functions
+- **Static Generation**: Pre-generate images at build time
+- **Edge Functions**: Lightweight image generation at the edge
+- **ISR (Incremental Static Regeneration)**: Update images dynamically
+
+<CodeBlock lang="typescript">
+```typescript
+// Next.js API Route Example
+// app/api/generate-image/route.ts
+import { ApexPainter } from 'apexify.js';
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  const painter = new ApexPainter();
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 630,
+    gradientBg: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#667EEA' },
+        { stop: 1, color: '#764BA2' }
+      ]
+    }
+  });
+  return new NextResponse(canvas.buffer, {
+    headers: { 'Content-Type': 'image/png' }
+  });
+}
+```
+</CodeBlock>
+
+### 🤖 Discord Bots
+
+Create stunning visuals for your Discord bot:
+
+- **Welcome Cards**: Personalized welcome images for new members
+- **Level-Up Cards**: Celebrate user achievements with custom graphics
+- **Profile Cards**: Generate user profile images with stats
+- **Leaderboards**: Visual leaderboard images
+- **Custom Commands**: Generate images on-demand via slash commands
+- **Event Graphics**: Create event banners and announcements
+
+<CodeBlock lang="typescript">
+```typescript
+// Discord Bot Example (discord.js)
+import { ApexPainter } from 'apexify.js';
+import { AttachmentBuilder } from 'discord.js';
+
+const painter = new ApexPainter();
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 400,
+  customBg: { source: userAvatar }
+});
+
+const attachment = new AttachmentBuilder(canvas.buffer, { name: 'welcome.png' });
+await channel.send({ files: [attachment] });
+```
+</CodeBlock>
+
+### 🎨 Design Tools & Photoshop-Like Apps
+
+Build powerful design applications:
+
+- **Visual Design Editors**: Create drag-and-drop design tools
+- **Code Export**: Convert visual designs into Apexify.js code
+- **Template Systems**: Pre-built templates for common designs
+- **Layer Management**: Complex compositions with multiple layers
+- **Export Options**: Multiple formats (PNG, JPEG, WebP, AVIF)
+- **Batch Processing**: Process multiple designs at once
+
+### 🌐 Web Applications
+
+Power your websites with dynamic image generation:
+
+- **OG Images**: Generate Open Graph images for social sharing
+- **Thumbnails**: Auto-generate thumbnails for content
+- **Banners**: Create dynamic banners and headers
+- **User Avatars**: Generate custom avatars with initials
+- **Charts & Graphs**: Visualize data with beautiful charts
+- **QR Codes**: Generate QR codes with custom styling
+
+### 📱 Social Media & Marketing
+
+Create professional marketing materials:
+
+- **Social Media Posts**: Generate posts for Instagram, Twitter, Facebook
+- **Story Graphics**: Create engaging story images
+- **Banner Ads**: Design eye-catching banner advertisements
+- **Email Graphics**: Generate images for email campaigns
+- **Product Images**: Create product showcases and catalogs
+
+### 🎮 Gaming Applications
+
+Generate game assets and UI elements:
+
+- **Character Cards**: Create character profile cards
+- **Achievement Badges**: Design achievement and trophy graphics
+- **Game UI**: Generate UI elements and HUD components
+- **Loading Screens**: Create dynamic loading screen graphics
+- **Leaderboards**: Visual leaderboard displays
+
+## Key Features
+
+### 🖼️ Advanced Image Processing
+
+- **Professional Filters**: 22+ filters including blur, sharpen, vintage, cinematic effects
+- **Image Masking**: Apply masks with alpha, luminance, or inverse modes
+- **Image Distortion**: Perspective, bulge, pinch, and mesh warping effects
+- **Effects Stack**: Vignette, lens flare, chromatic aberration, film grain
+- **Shape Drawing**: 8+ shapes (rectangle, circle, heart, star, polygon, etc.)
+- **Gradient Support**: Linear and radial gradients for fills and strokes
+- **Shadow & Stroke Effects**: Customizable shadows and strokes for all shapes
+- **Rotation & Positioning**: Full control over image placement and rotation
+- **Image Stitching**: Combine multiple images into panoramas or grids
+- **Collage Maker**: Create beautiful collages with multiple layout options
+- **Image Compression**: Optimize images with quality control (JPEG, WebP, AVIF)
+- **Color Palette Extraction**: Extract color palettes using multiple algorithms
+
+### 🎨 Rich Background System
+
+- **Multiple Background Types**: Solid colors, gradients, custom images
+- **Video Backgrounds**: Extract frames from videos for dynamic backgrounds
+- **Background Filters**: Apply filters directly to background images
+- **Pattern Overlays**: 12+ built-in patterns (grid, dots, stripes, hexagons, etc.)
+- **Custom Patterns**: Use your own images as repeating patterns
+- **Blend Modes**: 11+ blend modes for professional compositing
+- **Noise Effects**: Add texture with customizable noise intensity
+
+### 📝 Enhanced Text Rendering
+
+- **Font Management**: Custom fonts, sizes, families, and styles
+- **Text on Paths**: Render text along curves (line, arc, bezier, quadratic)
+- **Text Decorations**: Bold, italic, underline, overline, strikethrough, highlight
+- **Advanced Effects**: Glow, shadow, stroke with gradient support
+- **Spacing Control**: Letter spacing, word spacing, line height
+- **Text Wrapping**: Automatic text wrapping with size constraints
+- **Rotation**: Full 360° text rotation support
+
+### 🎯 Advanced Custom Lines
+
+- **Smooth Paths**: Bezier, Catmull-Rom, and smooth interpolation
+- **Arrow Markers**: Customizable start/end arrows with multiple styles
+- **Path Markers**: Add markers at any position along paths
+- **Line Patterns**: Dots, dashes, and custom pattern segments
+- **Line Textures**: Apply texture images to lines
+
+### 🔧 Professional Tools
+
+- **Chart Generation**: Bar charts, pie charts, line charts
+- **GIF Creation**: Animated GIFs from image sequences
+- **Format Conversion**: Convert between PNG, JPEG, WebP, AVIF, and more
+- **Image Manipulation**: Crop, resize, background removal
+- **Color Detection**: Extract and analyze colors from images
+- **Batch Operations**: Process multiple operations in parallel
+- **Chain Operations**: Chain operations sequentially for complex workflows
+- **Advanced File Saving**: Save buffers to local files with smart naming, format conversion, and batch support
+
+### 🎬 Comprehensive Video Processing (25+ Features)
+
+Apexify.js includes a powerful video processing suite with **25+ professional video features**:
+
+- **Frame Extraction**: Extract single frames, multiple frames at intervals, or all frames
+- **Video Information**: Get detailed metadata (duration, resolution, FPS, bitrate, format)
+- **Format Conversion**: Convert between MP4, WebM, AVI, MOV, MKV formats
+- **Video Editing**: Trim, crop, rotate, flip videos
+- **Effects & Filters**: Apply blur, brightness, contrast, saturation, grayscale, sepia, sharpen, and more
+- **Audio Processing**: Extract audio, adjust volume, mute videos
+- **Advanced Features**: Video stabilization, scene detection, color correction, time-lapse creation
+- **Compositing**: Picture-in-picture, split-screen, merge multiple videos
+- **Thumbnail Generation**: Create grid thumbnails from multiple frames
+- **Video Enhancement**: Add watermarks, text overlays, fade effects, create seamless loops
+- **Batch Processing**: Process multiple videos simultaneously
+
+## Benefits of Using Apexify.js
+
+<Dropdown title="Why Choose Apexify.js?">
+- **All-in-One Solution**: No need for multiple libraries - everything you need in one package
+- **Type-Safe**: Full TypeScript support with comprehensive type definitions
+- **High Performance**: Built on native Node.js modules for optimal speed
+- **Flexible**: Works in Node.js, Next.js, Discord bots, and more
+- **Professional Quality**: Enterprise-grade features for production use
+- **Well Documented**: Comprehensive documentation and examples
+- **Active Development**: Regularly updated with new features and improvements
+- **Community Support**: Active Discord community for help and support
+- **Easy to Use**: Simple API that's intuitive and developer-friendly
+- **Production Ready**: Battle-tested in real-world applications
+</Dropdown>
+
+## What's New in v5.0.0
+
+### 🎉 Major Feature Release
+
+#### Background Enhancements
+- ✨ **Video Backgrounds**: Use video frames as dynamic backgrounds
+- 🎨 **Background Filters**: Apply filters directly to background images
+- 🔧 **Background Opacity**: Control transparency of background images
+
+#### Image Processing
+- 🎭 **Image Masking**: Apply masks with multiple modes (alpha, luminance, inverse)
+- 🔄 **Image Distortion**: Perspective, bulge, pinch, and mesh warping effects
+- ✨ **Effects Stack**: Vignette, lens flare, chromatic aberration, film grain
+- 🎛️ **Enhanced Filters**: Filter intensity and order control
+
+#### Text Features
+- 📐 **Text on Paths**: Render text along curves and custom paths
+
+#### Custom Lines
+- ➡️ **Arrow Markers**: Start/end arrows with customizable styles
+- 📍 **Path Markers**: Add markers at any position along paths
+- 🎨 **Line Patterns**: Dots, dashes, and custom patterns
+- 🖼️ **Line Textures**: Apply texture images to lines
+
+#### New Utilities
+- ⚡ **Batch Operations**: Process multiple operations in parallel
+- 🔗 **Chain Operations**: Chain operations sequentially
+- 🖼️ **Image Stitching**: Combine images into panoramas
+- 🎨 **Collage Maker**: Create beautiful image collages
+- 📦 **Image Compression**: Optimize images with quality control
+- 🎨 **Color Palette Extraction**: Extract color palettes from images
+- 💾 **Advanced Save Method**: Save buffers to files with smart naming, format conversion, and batch support
+
+## Next Steps
+
+<Alert type="success" title="Ready to Get Started?">
+Now that you understand what Apexify.js can do, check out the [Background Documentation](/docs#solid-backgrounds) to learn how to create stunning canvas backgrounds, or explore the full API reference for detailed documentation on all available methods and options.
+</Alert>
+
+<Dropdown title="Learning Resources">
+- **Documentation**: Comprehensive guides and API reference
+- **Examples**: Real-world examples and use cases
+- **Video Tutorials**: Step-by-step video guides
+- **Community**: Join our Discord for support and discussions
+- **GitHub**: View source code and contribute
+</Dropdown>
+
+## Support & Community
+
+Need help? Join our community:
+
+- **Discord**: [Jedi Studio](https://discord.gg/CS2NRSPyze) | [FresedGPT](https://discord.gg/94qUZWhwFE) | [ElectronHub](https://discord.gg/83XcjD8vgW)
+- **Documentation**: [Full API Reference](http://apexifyjs.jedi-studio.com)
+- **Support Server**: [Discord Support](https://discord.gg/mDyXV9hzXw)
+
+---
+
+**Made with ❤️ by [Jedi Studio](https://discord.gg/CS2NRSPyze)**
+
+*Create stunning visuals with Apexify.js - The ultimate canvas library for Node.js*

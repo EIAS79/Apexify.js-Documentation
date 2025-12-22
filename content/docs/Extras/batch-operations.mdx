@@ -1,0 +1,581 @@
+# Batch & Chain Operations
+
+Apexify.js provides powerful batch and chain operation capabilities for processing multiple operations efficiently. Process multiple canvases, images, or text in parallel, or chain operations sequentially for complex workflows.
+
+## Overview
+
+- **Batch Operations** - Process multiple operations in parallel for maximum performance
+- **Chain Operations** - Chain operations sequentially, passing results between steps
+
+## Batch Operations
+
+Process multiple operations in parallel:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Process multiple canvases in parallel
+const results = await painter.batch([
+  {
+    type: 'canvas',
+    config: {
+      width: 800,
+      height: 600,
+      gradientBg: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ]
+      }
+    }
+  },
+  {
+    type: 'canvas',
+    config: {
+      width: 800,
+      height: 600,
+      colorBg: '#1a1a1a'
+    }
+  },
+  {
+    type: 'image',
+    config: {
+      source: 'circle',
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 200,
+      shape: {
+        fill: true,
+        color: '#ff6b6b'
+      }
+    }
+  },
+  {
+    type: 'text',
+    config: {
+      text: 'Hello World',
+      x: 400,
+      y: 300,
+      fontSize: 32,
+      color: '#ffffff'
+    }
+  },
+  {
+    type: 'chart',
+    config: {
+      chartData: { width: 800, height: 400 },
+      xLabels: [0, 1, 2, 3, 4],
+      yLabels: [0, 25, 50, 75, 100],
+      data: {
+        xAxis: [
+          { label: 'A', value: 50, position: { startsXLabel: 0, endsXLabel: 160 } },
+          { label: 'B', value: 75, position: { startsXLabel: 160, endsXLabel: 320 } }
+        ],
+        yAxis: [50, 75]
+      }
+    }
+  }
+]);
+
+// results is an array of Buffers
+results.forEach((buffer, index) => {
+  fs.writeFileSync(`batch-result-${index}.png`, buffer);
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function batchOperations() {
+  // Process multiple canvases in parallel
+  const results = await painter.batch([
+    {
+      type: 'canvas',
+      config: {
+        width: 800,
+        height: 600,
+        gradientBg: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        }
+      }
+    },
+    {
+      type: 'canvas',
+      config: {
+        width: 800,
+        height: 600,
+        colorBg: '#1a1a1a'
+      }
+    },
+    {
+      type: 'image',
+      config: {
+        source: 'circle',
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+        shape: {
+          fill: true,
+          color: '#ff6b6b'
+        }
+      }
+    },
+    {
+      type: 'text',
+      config: {
+        text: 'Hello World',
+        x: 400,
+        y: 300,
+        fontSize: 32,
+        color: '#ffffff'
+      }
+    },
+    {
+      type: 'chart',
+      config: {
+        chartData: { width: 800, height: 400 },
+        xLabels: [0, 1, 2, 3, 4],
+        yLabels: [0, 25, 50, 75, 100],
+        data: {
+          xAxis: [
+            { label: 'A', value: 50, position: { startsXLabel: 0, endsXLabel: 160 } },
+            { label: 'B', value: 75, position: { startsXLabel: 160, endsXLabel: 320 } }
+          ],
+          yAxis: [50, 75]
+        }
+      }
+    }
+  ]);
+
+  // results is an array of Buffers
+  results.forEach((buffer, index) => {
+    fs.writeFileSync(`batch-result-${index}.png`, buffer);
+  });
+}
+
+batchOperations();
+```
+</js>
+</CodeSwitcher>
+
+### Batch Operation Types
+
+- **canvas** - Create canvas with configuration
+- **image** - Create image/shape (requires base canvas)
+- **text** - Create text (requires base canvas)
+- **chart** - Create chart
+
+## Chain Operations
+
+Chain operations sequentially, passing results between steps:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Chain operations: canvas -> image -> text
+const result = await painter.chain([
+  {
+    method: 'createCanvas',
+    args: [{
+      width: 800,
+      height: 600,
+      gradientBg: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ]
+      }
+    }]
+  },
+  {
+    method: 'createImage',
+    args: [
+      {
+        source: 'circle',
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+        shape: {
+          fill: true,
+          color: '#ffffff'
+        }
+      },
+      'current'  // Use result from previous step
+    ]
+  },
+  {
+    method: 'createText',
+    args: [
+      {
+        text: 'Chained Operations',
+        x: 400,
+        y: 300,
+        fontSize: 32,
+        bold: true,
+        color: '#ffffff',
+        textAlign: 'center',
+        textBaseline: 'middle'
+      },
+      'current'  // Use result from previous step
+    ]
+  }
+]);
+
+fs.writeFileSync('chained-result.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function chainOperations() {
+  // Chain operations: canvas -> image -> text
+  const result = await painter.chain([
+    {
+      method: 'createCanvas',
+      args: [{
+        width: 800,
+        height: 600,
+        gradientBg: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        }
+      }]
+    },
+    {
+      method: 'createImage',
+      args: [
+        {
+          source: 'circle',
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 200,
+          shape: {
+            fill: true,
+            color: '#ffffff'
+          }
+        },
+        'current'  // Use result from previous step
+      ]
+    },
+    {
+      method: 'createText',
+      args: [
+        {
+          text: 'Chained Operations',
+          x: 400,
+          y: 300,
+          fontSize: 32,
+          bold: true,
+          color: '#ffffff',
+          textAlign: 'center',
+          textBaseline: 'middle'
+        },
+        'current'  // Use result from previous step
+      ]
+    }
+  ]);
+
+  fs.writeFileSync('chained-result.png', result);
+}
+
+chainOperations();
+```
+</js>
+</CodeSwitcher>
+
+### Using 'current' in Chain Operations
+
+The special value `'current'` represents the result from the previous step in the chain. This allows you to build complex workflows where each operation uses the output of the previous one.
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Complex chain: canvas -> image -> text -> image -> text
+const result = await painter.chain([
+  { method: 'createCanvas', args: [{ width: 800, height: 600, colorBg: '#1a1a1a' }] },
+  { method: 'createImage', args: [{ source: 'rectangle', x: 50, y: 50, width: 200, height: 150, shape: { fill: true, color: '#ff6b6b' } }, 'current'] },
+  { method: 'createText', args: [{ text: 'Step 1', x: 150, y: 125, fontSize: 24, color: '#ffffff' }, 'current'] },
+  { method: 'createImage', args: [{ source: 'circle', x: 550, y: 450, width: 150, height: 150, shape: { fill: true, color: '#4ecdc4' } }, 'current'] },
+  { method: 'createText', args: [{ text: 'Step 2', x: 625, y: 525, fontSize: 24, color: '#ffffff' }, 'current'] }
+]);
+```
+</ts>
+<js>
+```javascript
+// Complex chain: canvas -> image -> text -> image -> text
+const result = await painter.chain([
+  { method: 'createCanvas', args: [{ width: 800, height: 600, colorBg: '#1a1a1a' }] },
+  { method: 'createImage', args: [{ source: 'rectangle', x: 50, y: 50, width: 200, height: 150, shape: { fill: true, color: '#ff6b6b' } }, 'current'] },
+  { method: 'createText', args: [{ text: 'Step 1', x: 150, y: 125, fontSize: 24, color: '#ffffff' }, 'current'] },
+  { method: 'createImage', args: [{ source: 'circle', x: 550, y: 450, width: 150, height: 150, shape: { fill: true, color: '#4ecdc4' } }, 'current'] },
+  { method: 'createText', args: [{ text: 'Step 2', x: 625, y: 525, fontSize: 24, color: '#ffffff' }, 'current'] }
+]);
+```
+</js>
+</CodeSwitcher>
+
+## Real-World Examples
+
+### Batch Generate Multiple Canvases
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Generate multiple gradient canvases in parallel
+const gradients = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#feca57', '#ff9ff3'];
+const canvases = await painter.batch(
+  gradients.map(color => ({
+    type: 'canvas',
+    config: {
+      width: 400,
+      height: 400,
+      colorBg: color
+    }
+  }))
+);
+
+canvases.forEach((buffer, i) => {
+  fs.writeFileSync(`gradient-${i}.png`, buffer);
+});
+```
+</ts>
+<js>
+```javascript
+// Generate multiple gradient canvases in parallel
+const gradients = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#feca57', '#ff9ff3'];
+const canvases = await painter.batch(
+  gradients.map(color => ({
+    type: 'canvas',
+    config: {
+      width: 400,
+      height: 400,
+      colorBg: color
+    }
+  }))
+);
+
+canvases.forEach((buffer, i) => {
+  fs.writeFileSync(`gradient-${i}.png`, buffer);
+});
+```
+</js>
+</CodeSwitcher>
+
+### Complex Workflow with Chain
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create a complete design workflow
+const design = await painter.chain([
+  // 1. Create base canvas
+  {
+    method: 'createCanvas',
+    args: [{
+      width: 1200,
+      height: 800,
+      gradientBg: {
+        type: 'radial',
+        colors: [
+          { stop: 0, color: '#667eea' },
+          { stop: 1, color: '#764ba2' }
+        ]
+      }
+    }]
+  },
+  // 2. Add background pattern
+  {
+    method: 'createImage',
+    args: [{
+      source: 'star',
+      x: 0,
+      y: 0,
+      width: 1200,
+      height: 800,
+      shape: {
+        fill: true,
+        color: '#ffffff'
+      },
+      opacity: 0.1
+    }, 'current']
+  },
+  // 3. Add main shape
+  {
+    method: 'createImage',
+    args: [{
+      source: 'circle',
+      x: 400,
+      y: 300,
+      width: 400,
+      height: 400,
+      shape: {
+        fill: true,
+        gradient: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        }
+      },
+      shadow: {
+        color: 'rgba(0,0,0,0.3)',
+        offsetX: 10,
+        offsetY: 10,
+        blur: 20
+      }
+    }, 'current']
+  },
+  // 4. Add title text
+  {
+    method: 'createText',
+    args: [{
+      text: 'Apexify.js',
+      x: 600,
+      y: 450,
+      fontSize: 64,
+      bold: true,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      shadow: {
+        color: 'rgba(0,0,0,0.5)',
+        offsetX: 2,
+        offsetY: 2,
+        blur: 4
+      }
+    }, 'current']
+  }
+]);
+
+fs.writeFileSync('complete-design.png', design);
+```
+</ts>
+<js>
+```javascript
+// Create a complete design workflow
+const design = await painter.chain([
+  // 1. Create base canvas
+  {
+    method: 'createCanvas',
+    args: [{
+      width: 1200,
+      height: 800,
+      gradientBg: {
+        type: 'radial',
+        colors: [
+          { stop: 0, color: '#667eea' },
+          { stop: 1, color: '#764ba2' }
+        ]
+      }
+    }]
+  },
+  // 2. Add background pattern
+  {
+    method: 'createImage',
+    args: [{
+      source: 'star',
+      x: 0,
+      y: 0,
+      width: 1200,
+      height: 800,
+      shape: {
+        fill: true,
+        color: '#ffffff'
+      },
+      opacity: 0.1
+    }, 'current']
+  },
+  // 3. Add main shape
+  {
+    method: 'createImage',
+    args: [{
+      source: 'circle',
+      x: 400,
+      y: 300,
+      width: 400,
+      height: 400,
+      shape: {
+        fill: true,
+        gradient: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        }
+      },
+      shadow: {
+        color: 'rgba(0,0,0,0.3)',
+        offsetX: 10,
+        offsetY: 10,
+        blur: 20
+      }
+    }, 'current']
+  },
+  // 4. Add title text
+  {
+    method: 'createText',
+    args: [{
+      text: 'Apexify.js',
+      x: 600,
+      y: 450,
+      fontSize: 64,
+      bold: true,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      shadow: {
+        color: 'rgba(0,0,0,0.5)',
+        offsetX: 2,
+        offsetY: 2,
+        blur: 4
+      }
+    }, 'current']
+  }
+]);
+
+fs.writeFileSync('complete-design.png', design);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Performance Tips">
+- Use **batch** operations for independent tasks that can run in parallel
+- Use **chain** operations for dependent workflows where each step needs the previous result
+- Batch operations are faster for generating multiple independent images
+- Chain operations are better for complex multi-step designs
+</Alert>
+
+

@@ -1,0 +1,945 @@
+# Text Effects
+
+Apexify.js provides powerful text effects including glow, shadow, and stroke. These effects add depth, dimension, and visual appeal to your text, and all support gradient fills for stunning results.
+
+## Overview
+
+Text effects include:
+- **Glow** - Add a glowing effect around text
+- **Shadow** - Add drop shadows for depth
+- **Stroke** - Add outlines/borders around text
+
+All effects support both solid colors and gradients!
+
+## Glow Effect
+
+Create a glowing effect around your text:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple glow
+const simpleGlow = await painter.createText({
+  text: 'Glowing Text',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    color: '#ff6b6b',
+    intensity: 10,
+    opacity: 0.8
+  }
+}, canvasBuffer);
+
+// Strong glow
+const strongGlow = await painter.createText({
+  text: 'Strong Glow',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    color: '#4ecdc4',
+    intensity: 20,
+    opacity: 0.9
+  }
+}, canvasBuffer);
+
+// Gradient glow
+const gradientGlow = await painter.createText({
+  text: 'Gradient Glow',
+  x: 100,
+  y: 300,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 300,
+      endY: 0
+    },
+    intensity: 15,
+    opacity: 0.8
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple glow
+const simpleGlow = await painter.createText({
+  text: 'Glowing Text',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    color: '#ff6b6b',
+    intensity: 10,
+    opacity: 0.8
+  }
+}, canvasBuffer);
+
+// Strong glow
+const strongGlow = await painter.createText({
+  text: 'Strong Glow',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    color: '#4ecdc4',
+    intensity: 20,
+    opacity: 0.9
+  }
+}, canvasBuffer);
+
+// Gradient glow
+const gradientGlow = await painter.createText({
+  text: 'Gradient Glow',
+  x: 100,
+  y: 300,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 300,
+      endY: 0
+    },
+    intensity: 15,
+    opacity: 0.8
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Shadow Effect
+
+Add drop shadows to create depth:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple shadow
+const simpleShadow = await painter.createText({
+  text: 'Shadow Text',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  color: '#ffffff',
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, canvasBuffer);
+
+// Strong shadow
+const strongShadow = await painter.createText({
+  text: 'Strong Shadow',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff',
+  shadow: {
+    color: 'rgba(0,0,0,0.7)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, canvasBuffer);
+
+// Colored shadow
+const coloredShadow = await painter.createText({
+  text: 'Colored Shadow',
+  x: 100,
+  y: 300,
+  fontSize: 48,
+  color: '#ffffff',
+  shadow: {
+    color: 'rgba(255, 107, 107, 0.6)',
+    offsetX: 8,
+    offsetY: 8,
+    blur: 15
+  }
+}, canvasBuffer);
+
+// Shadow with opacity control
+const transparentShadow = await painter.createText({
+  text: 'Transparent Shadow',
+  x: 100,
+  y: 400,
+  fontSize: 48,
+  color: '#ffffff',
+  shadow: {
+    color: '#000000',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10,
+    opacity: 0.4  // Overall shadow opacity
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple shadow
+const simpleShadow = await painter.createText({
+  text: 'Shadow Text',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  color: '#ffffff',
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, canvasBuffer);
+
+// Strong shadow
+const strongShadow = await painter.createText({
+  text: 'Strong Shadow',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff',
+  shadow: {
+    color: 'rgba(0,0,0,0.7)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, canvasBuffer);
+
+// Colored shadow
+const coloredShadow = await painter.createText({
+  text: 'Colored Shadow',
+  x: 100,
+  y: 300,
+  fontSize: 48,
+  color: '#ffffff',
+  shadow: {
+    color: 'rgba(255, 107, 107, 0.6)',
+    offsetX: 8,
+    offsetY: 8,
+    blur: 15
+  }
+}, canvasBuffer);
+
+// Shadow with opacity control
+const transparentShadow = await painter.createText({
+  text: 'Transparent Shadow',
+  x: 100,
+  y: 400,
+  fontSize: 48,
+  color: '#ffffff',
+  shadow: {
+    color: '#000000',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10,
+    opacity: 0.4  // Overall shadow opacity
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Stroke Effect
+
+Add outlines/borders around text:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple stroke
+const simpleStroke = await painter.createText({
+  text: 'Stroked Text',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 2
+  }
+}, canvasBuffer);
+
+// Thick stroke
+const thickStroke = await painter.createText({
+  text: 'Thick Stroke',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    color: '#ff6b6b',
+    width: 5
+  }
+}, canvasBuffer);
+
+// Gradient stroke
+const gradientStroke = await painter.createText({
+  text: 'Gradient Stroke',
+  x: 100,
+  y: 300,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 300,
+      endY: 0
+    },
+    width: 4
+  }
+}, canvasBuffer);
+
+// Stroke with opacity
+const transparentStroke = await painter.createText({
+  text: 'Transparent Stroke',
+  x: 100,
+  y: 400,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3,
+    opacity: 0.5
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple stroke
+const simpleStroke = await painter.createText({
+  text: 'Stroked Text',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 2
+  }
+}, canvasBuffer);
+
+// Thick stroke
+const thickStroke = await painter.createText({
+  text: 'Thick Stroke',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    color: '#ff6b6b',
+    width: 5
+  }
+}, canvasBuffer);
+
+// Gradient stroke
+const gradientStroke = await painter.createText({
+  text: 'Gradient Stroke',
+  x: 100,
+  y: 300,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 300,
+      endY: 0
+    },
+    width: 4
+  }
+}, canvasBuffer);
+
+// Stroke with opacity
+const transparentStroke = await painter.createText({
+  text: 'Transparent Stroke',
+  x: 100,
+  y: 400,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3,
+    opacity: 0.5
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Stroke Styles
+
+Strokes support 6 different styles:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Solid (default)
+const solid = await painter.createText({
+  text: 'Solid Stroke',
+  x: 100,
+  y: 100,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3,
+    style: 'solid'
+  }
+}, canvasBuffer);
+
+// Dashed
+const dashed = await painter.createText({
+  text: 'Dashed Stroke',
+  x: 100,
+  y: 150,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3,
+    style: 'dashed'
+  }
+}, canvasBuffer);
+
+// Dotted
+const dotted = await painter.createText({
+  text: 'Dotted Stroke',
+  x: 100,
+  y: 200,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3,
+    style: 'dotted'
+  }
+}, canvasBuffer);
+
+// Groove (3D effect)
+const groove = await painter.createText({
+  text: 'Groove Stroke',
+  x: 100,
+  y: 250,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 5,
+    style: 'groove'
+  }
+}, canvasBuffer);
+
+// Ridge (3D effect)
+const ridge = await painter.createText({
+  text: 'Ridge Stroke',
+  x: 100,
+  y: 300,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 5,
+    style: 'ridge'
+  }
+}, canvasBuffer);
+
+// Double (two parallel lines)
+const double = await painter.createText({
+  text: 'Double Stroke',
+  x: 100,
+  y: 350,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 5,
+    style: 'double'
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Solid (default)
+const solid = await painter.createText({
+  text: 'Solid Stroke',
+  x: 100,
+  y: 100,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3,
+    style: 'solid'
+  }
+}, canvasBuffer);
+
+// Dashed
+const dashed = await painter.createText({
+  text: 'Dashed Stroke',
+  x: 100,
+  y: 150,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3,
+    style: 'dashed'
+  }
+}, canvasBuffer);
+
+// Dotted
+const dotted = await painter.createText({
+  text: 'Dotted Stroke',
+  x: 100,
+  y: 200,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3,
+    style: 'dotted'
+  }
+}, canvasBuffer);
+
+// Groove (3D effect)
+const groove = await painter.createText({
+  text: 'Groove Stroke',
+  x: 100,
+  y: 250,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 5,
+    style: 'groove'
+  }
+}, canvasBuffer);
+
+// Ridge (3D effect)
+const ridge = await painter.createText({
+  text: 'Ridge Stroke',
+  x: 100,
+  y: 300,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 5,
+    style: 'ridge'
+  }
+}, canvasBuffer);
+
+// Double (two parallel lines)
+const double = await painter.createText({
+  text: 'Double Stroke',
+  x: 100,
+  y: 350,
+  fontSize: 32,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 5,
+    style: 'double'
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Combining Effects
+
+Combine multiple effects for stunning results:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Glow + Shadow
+const glowShadow = await painter.createText({
+  text: 'Glow & Shadow',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    color: '#ff6b6b',
+    intensity: 15,
+    opacity: 0.8
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, canvasBuffer);
+
+// Stroke + Shadow
+const strokeShadow = await painter.createText({
+  text: 'Stroke & Shadow',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.4)',
+    offsetX: 8,
+    offsetY: 8,
+    blur: 15
+  }
+}, canvasBuffer);
+
+// All effects combined
+const allEffects = await painter.createText({
+  text: 'All Effects',
+  x: 100,
+  y: 300,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ]
+    },
+    intensity: 12,
+    opacity: 0.7
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.6)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  },
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff1744' }
+      ]
+    },
+    width: 4
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Glow + Shadow
+const glowShadow = await painter.createText({
+  text: 'Glow & Shadow',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    color: '#ff6b6b',
+    intensity: 15,
+    opacity: 0.8
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, canvasBuffer);
+
+// Stroke + Shadow
+const strokeShadow = await painter.createText({
+  text: 'Stroke & Shadow',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 3
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.4)',
+    offsetX: 8,
+    offsetY: 8,
+    blur: 15
+  }
+}, canvasBuffer);
+
+// All effects combined
+const allEffects = await painter.createText({
+  text: 'All Effects',
+  x: 100,
+  y: 300,
+  fontSize: 48,
+  color: '#ffffff',
+  glow: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ]
+    },
+    intensity: 12,
+    opacity: 0.7
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.6)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  },
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff1744' }
+      ]
+    },
+    width: 4
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+const result = await painter.createText([
+  {
+    text: 'Glowing Text',
+    x: 600,
+    y: 150,
+    fontSize: 64,
+    color: '#ffffff',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    glow: {
+      color: '#ff6b6b',
+      intensity: 20,
+      opacity: 0.9
+    }
+  },
+  {
+    text: 'Shadowed Text',
+    x: 600,
+    y: 300,
+    fontSize: 64,
+    color: '#ffffff',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    shadow: {
+      color: 'rgba(0,0,0,0.6)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  },
+  {
+    text: 'Stroked Text',
+    x: 600,
+    y: 450,
+    fontSize: 64,
+    color: '#ffffff',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    stroke: {
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ]
+      },
+      width: 5
+    }
+  },
+  {
+    text: 'All Effects Combined',
+    x: 600,
+    y: 600,
+    fontSize: 48,
+    color: '#ffffff',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    glow: {
+      color: '#ffd700',
+      intensity: 15,
+      opacity: 0.8
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.5)',
+      offsetX: 8,
+      offsetY: 8,
+      blur: 15
+    },
+    stroke: {
+      color: '#000000',
+      width: 3
+    }
+  }
+], canvas.buffer);
+
+fs.writeFileSync('text-effects.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createEffectsExample() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  const result = await painter.createText([
+    {
+      text: 'Glowing Text',
+      x: 600,
+      y: 150,
+      fontSize: 64,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      glow: {
+        color: '#ff6b6b',
+        intensity: 20,
+        opacity: 0.9
+      }
+    },
+    {
+      text: 'Shadowed Text',
+      x: 600,
+      y: 300,
+      fontSize: 64,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      shadow: {
+        color: 'rgba(0,0,0,0.6)',
+        offsetX: 10,
+        offsetY: 10,
+        blur: 20
+      }
+    },
+    {
+      text: 'Stroked Text',
+      x: 600,
+      y: 450,
+      fontSize: 64,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      stroke: {
+        gradient: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        },
+        width: 5
+      }
+    },
+    {
+      text: 'All Effects Combined',
+      x: 600,
+      y: 600,
+      fontSize: 48,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      glow: {
+        color: '#ffd700',
+        intensity: 15,
+        opacity: 0.8
+      },
+      shadow: {
+        color: 'rgba(0,0,0,0.5)',
+        offsetX: 8,
+        offsetY: 8,
+        blur: 15
+      },
+      stroke: {
+        color: '#000000',
+        width: 3
+      }
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('text-effects.png', result);
+}
+
+createEffectsExample();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Text on Paths](/docs#text-on-paths) - Render text along curves
+- [Advanced Features](/docs#advanced-text-features) - Combine all features together
+
+

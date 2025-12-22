@@ -1,0 +1,728 @@
+# Shapes
+
+Apexify.js supports 8 built-in shape types that you can use instead of loading image files. Shapes are created using the `createImage()` method with a shape name as the `source` property.
+
+## Available Shapes
+
+- `'rectangle'` - Standard rectangle
+- `'square'` - Perfect square
+- `'circle'` - Perfect circle
+- `'triangle'` - Equilateral triangle
+- `'trapezium'` - Trapezoid shape
+- `'star'` - 5-pointed star
+- `'heart'` - Heart shape with bezier curves
+- `'polygon'` - Custom polygon with configurable sides
+
+## Basic Shape Usage
+
+All shapes use the same basic structure with the `shape` property to define fill and styling:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const shape = await painter.createImage({
+  source: 'circle',  // Shape type
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,      // Fill the shape
+    color: '#ff6b6b' // Fill color
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const shape = await painter.createImage({
+  source: 'circle',  // Shape type
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,      // Fill the shape
+    color: '#ff6b6b' // Fill color
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Rectangle
+
+The most basic shape - a standard rectangle:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const rectangle = await painter.createImage({
+  source: 'rectangle',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#4ecdc4'
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const rectangle = await painter.createImage({
+  source: 'rectangle',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#4ecdc4'
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Square
+
+A perfect square (width and height should be equal):
+
+<CodeSwitcher>
+<ts>
+```typescript
+const square = await painter.createImage({
+  source: 'square',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,  // Should match width for perfect square
+  shape: {
+    fill: true,
+    color: '#45b7d1'
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const square = await painter.createImage({
+  source: 'square',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,  // Should match width for perfect square
+  shape: {
+    fill: true,
+    color: '#45b7d1'
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Circle
+
+A perfect circle (width and height should be equal):
+
+<CodeSwitcher>
+<ts>
+```typescript
+const circle = await painter.createImage({
+  source: 'circle',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,  // Should match width for perfect circle
+  shape: {
+    fill: true,
+    color: '#feca57',
+    radius: 100  // Optional: explicit radius
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const circle = await painter.createImage({
+  source: 'circle',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,  // Should match width for perfect circle
+  shape: {
+    fill: true,
+    color: '#feca57',
+    radius: 100  // Optional: explicit radius
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Triangle
+
+An equilateral triangle:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const triangle = await painter.createImage({
+  source: 'triangle',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ff9ff3'
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const triangle = await painter.createImage({
+  source: 'triangle',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ff9ff3'
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Trapezium
+
+A trapezoid shape:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const trapezium = await painter.createImage({
+  source: 'trapezium',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#96ceb4'
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const trapezium = await painter.createImage({
+  source: 'trapezium',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#96ceb4'
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Star
+
+A 5-pointed star with configurable inner and outer radius:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Basic star
+const star = await painter.createImage({
+  source: 'star',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ffd700'
+  }
+}, canvasBuffer);
+
+// Custom star with specific radii
+const customStar = await painter.createImage({
+  source: 'star',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ff6b6b',
+    innerRadius: 40,   // Inner radius of star points
+    outerRadius: 100   // Outer radius of star points
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Basic star
+const star = await painter.createImage({
+  source: 'star',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ffd700'
+  }
+}, canvasBuffer);
+
+// Custom star with specific radii
+const customStar = await painter.createImage({
+  source: 'star',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ff6b6b',
+    innerRadius: 40,   // Inner radius of star points
+    outerRadius: 100   // Outer radius of star points
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Heart
+
+A heart shape created with bezier curves:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const heart = await painter.createImage({
+  source: 'heart',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ff1744'
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const heart = await painter.createImage({
+  source: 'heart',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ff1744'
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Polygon
+
+A custom polygon with configurable number of sides:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Hexagon (6 sides)
+const hexagon = await painter.createImage({
+  source: 'polygon',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#667eea',
+    sides: 6  // Number of sides
+  }
+}, canvasBuffer);
+
+// Octagon (8 sides)
+const octagon = await painter.createImage({
+  source: 'polygon',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#764ba2',
+    sides: 8
+  }
+}, canvasBuffer);
+
+// Custom polygon with specific points
+const customPolygon = await painter.createImage({
+  source: 'polygon',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#f093fb',
+    points: [
+      { x: 100, y: 50 },
+      { x: 200, y: 100 },
+      { x: 150, y: 200 },
+      { x: 50, y: 200 },
+      { x: 0, y: 100 }
+    ]
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Hexagon (6 sides)
+const hexagon = await painter.createImage({
+  source: 'polygon',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#667eea',
+    sides: 6  // Number of sides
+  }
+}, canvasBuffer);
+
+// Octagon (8 sides)
+const octagon = await painter.createImage({
+  source: 'polygon',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#764ba2',
+    sides: 8
+  }
+}, canvasBuffer);
+
+// Custom polygon with specific points
+const customPolygon = await painter.createImage({
+  source: 'polygon',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#f093fb',
+    points: [
+      { x: 100, y: 50 },
+      { x: 200, y: 100 },
+      { x: 150, y: 200 },
+      { x: 50, y: 200 },
+      { x: 0, y: 100 }
+    ]
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Gradient Fills
+
+All shapes support gradient fills using the `gradient` property:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Linear gradient
+const gradientShape = await painter.createImage({
+  source: 'circle',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 200,
+      endY: 200
+    }
+  }
+}, canvasBuffer);
+
+// Radial gradient
+const radialGradientShape = await painter.createImage({
+  source: 'star',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff1744' }
+      ],
+      startX: 100,
+      startY: 100,
+      startRadius: 0,
+      endX: 100,
+      endY: 100,
+      endRadius: 100
+    }
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Linear gradient
+const gradientShape = await painter.createImage({
+  source: 'circle',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 200,
+      endY: 200
+    }
+  }
+}, canvasBuffer);
+
+// Radial gradient
+const radialGradientShape = await painter.createImage({
+  source: 'star',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff1744' }
+      ],
+      startX: 100,
+      startY: 100,
+      startRadius: 0,
+      endX: 100,
+      endY: 100,
+      endRadius: 100
+    }
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Combining Shapes with Effects
+
+Shapes work seamlessly with all image effects like shadows, strokes, rotation, and more:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const styledShape = await painter.createImage({
+  source: 'heart',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#ff1744' }
+      ]
+    }
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  },
+  stroke: {
+    color: '#ffffff',
+    width: 5
+  },
+  rotation: 15,
+  borderRadius: 10
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const styledShape = await painter.createImage({
+  source: 'heart',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#ff1744' }
+      ]
+    }
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  },
+  stroke: {
+    color: '#ffffff',
+    width: 5
+  },
+  rotation: 15,
+  borderRadius: 10
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Multiple Shapes Example
+
+Create a composition with multiple shapes:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const composition = await painter.createImage([
+  {
+    source: 'circle',
+    x: 100,
+    y: 100,
+    width: 150,
+    height: 150,
+    shape: { fill: true, color: '#ff6b6b' }
+  },
+  {
+    source: 'star',
+    x: 200,
+    y: 150,
+    width: 100,
+    height: 100,
+    shape: { fill: true, color: '#ffd700' }
+  },
+  {
+    source: 'heart',
+    x: 300,
+    y: 100,
+    width: 150,
+    height: 150,
+    shape: { fill: true, color: '#ff1744' }
+  },
+  {
+    source: 'polygon',
+    x: 500,
+    y: 100,
+    width: 150,
+    height: 150,
+    shape: { fill: true, color: '#667eea', sides: 6 }
+  }
+], canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const composition = await painter.createImage([
+  {
+    source: 'circle',
+    x: 100,
+    y: 100,
+    width: 150,
+    height: 150,
+    shape: { fill: true, color: '#ff6b6b' }
+  },
+  {
+    source: 'star',
+    x: 200,
+    y: 150,
+    width: 100,
+    height: 100,
+    shape: { fill: true, color: '#ffd700' }
+  },
+  {
+    source: 'heart',
+    x: 300,
+    y: 100,
+    width: 150,
+    height: 150,
+    shape: { fill: true, color: '#ff1744' }
+  },
+  {
+    source: 'polygon',
+    x: 500,
+    y: 100,
+    width: 150,
+    height: 150,
+    shape: { fill: true, color: '#667eea', sides: 6 }
+  }
+], canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+Now that you understand shapes, explore:
+
+- [Image Filters](/docs#image-filters) - Apply professional filters to shapes
+- [Advanced Features](/docs#advanced-image-features) - Add shadows, strokes, and transformations
+- [Image Effects](/docs#image-effects) - Add vignette, lens flare, and other effects
+
+

@@ -1,0 +1,494 @@
+# Gradient Backgrounds
+
+Gradient backgrounds allow you to create smooth color transitions on your canvas. Apexify.js supports both **linear** and **radial** gradients with advanced features like rotation, custom pivot points, and multiple color stops.
+
+## Overview
+
+Gradients are defined using the `gradientBg` property with either a `linear` or `radial` type. Each gradient requires an array of color stops that define the transition.
+
+## Linear Gradients
+
+Linear gradients create a smooth transition along a straight line between two or more colors.
+
+### Basic Linear Gradient
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create a simple linear gradient from left to right
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#FF6B6B' },    // Start color (left)
+      { stop: 1, color: '#4ECDC4' }     // End color (right)
+    ]
+  }
+});
+
+fs.writeFileSync('linear-gradient.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createGradient() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    gradientBg: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#FF6B6B' },
+        { stop: 1, color: '#4ECDC4' }
+      ]
+    }
+  });
+
+  fs.writeFileSync('linear-gradient.png', canvas.buffer);
+}
+createGradient();
+```
+</js>
+</CodeSwitcher>
+
+### Custom Gradient Direction
+
+Control the gradient direction using `startX`, `startY`, `endX`, and `endY`:
+
+<CodeBlock lang="typescript">
+```typescript
+// Top to bottom gradient
+const topToBottom = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,      // Start at top
+    endX: 0,
+    endY: 600,      // End at bottom
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 1, color: '#4ECDC4' }
+    ]
+  }
+});
+
+// Diagonal gradient (top-left to bottom-right)
+const diagonal = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,      // Top-left corner
+    endX: 800,
+    endY: 600,      // Bottom-right corner
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 1, color: '#4ECDC4' }
+    ]
+  }
+});
+```
+</CodeBlock>
+
+### Multiple Color Stops
+
+Create complex gradients with multiple color stops:
+
+<CodeBlock lang="typescript">
+```typescript
+const multiColorGradient = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#FF6B6B' },    // Red at 0%
+      { stop: 0.3, color: '#FFE66D' },  // Yellow at 30%
+      { stop: 0.6, color: '#4ECDC4' },  // Teal at 60%
+      { stop: 1, color: '#45B7D1' }     // Blue at 100%
+    ]
+  }
+});
+```
+</CodeBlock>
+
+### Rotating Linear Gradients
+
+Use the `rotate` property to rotate the gradient around a pivot point:
+
+<CodeBlock lang="typescript">
+```typescript
+// 45-degree rotated gradient
+const rotatedGradient = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 800,
+    endY: 0,
+    rotate: 45,      // Rotate 45 degrees
+    pivotX: 400,     // Rotation center X (defaults to canvas center)
+    pivotY: 300,     // Rotation center Y (defaults to canvas center)
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 1, color: '#4ECDC4' }
+    ]
+  }
+});
+```
+</CodeBlock>
+
+## Radial Gradients
+
+Radial gradients create a smooth transition from a center point outward in a circular or elliptical pattern.
+
+### Basic Radial Gradient
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create a radial gradient from center
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#FF6B6B' },    // Center color
+      { stop: 1, color: '#4ECDC4' }     // Outer color
+    ]
+  }
+});
+
+fs.writeFileSync('radial-gradient.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createRadialGradient() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#FF6B6B' },
+        { stop: 1, color: '#4ECDC4' }
+      ]
+    }
+  });
+
+  fs.writeFileSync('radial-gradient.png', canvas.buffer);
+}
+createRadialGradient();
+```
+</js>
+</CodeSwitcher>
+
+### Custom Radial Gradient Position
+
+Control the gradient center and radius:
+
+<CodeBlock lang="typescript">
+```typescript
+// Gradient centered at specific point
+const customRadial = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'radial',
+    startX: 400,      // Center X
+    startY: 300,      // Center Y
+    startRadius: 0,   // Inner circle radius
+    endX: 400,
+    endY: 300,
+    endRadius: 300,   // Outer circle radius
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 1, color: '#4ECDC4' }
+    ]
+  }
+});
+```
+</CodeBlock>
+
+### Elliptical Radial Gradients
+
+Create elliptical gradients by using different centers for inner and outer circles:
+
+<CodeBlock lang="typescript">
+```typescript
+// Elliptical gradient (offset centers)
+const ellipticalGradient = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'radial',
+    startX: 400,      // Inner circle center X
+    startY: 300,      // Inner circle center Y
+    startRadius: 0,
+    endX: 500,        // Outer circle center X (offset)
+    endY: 400,        // Outer circle center Y (offset)
+    endRadius: 400,   // Outer circle radius
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 1, color: '#4ECDC4' }
+    ]
+  }
+});
+```
+</CodeBlock>
+
+### Multiple Color Stops in Radial Gradients
+
+<CodeBlock lang="typescript">
+```typescript
+const complexRadial = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#FF6B6B' },    // Center
+      { stop: 0.4, color: '#FFE66D' },  // Mid-outer
+      { stop: 0.8, color: '#4ECDC4' },  // Outer
+      { stop: 1, color: '#2C3E50' }     // Edge
+    ]
+  }
+});
+```
+</CodeBlock>
+
+## Color Stop Values
+
+Color stops use values between `0` and `1`, where:
+- `0` represents the start of the gradient
+- `1` represents the end of the gradient
+- Values in between represent positions along the gradient
+
+<CodeBlock lang="typescript">
+```typescript
+// Example with various stop positions
+const gradient = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#FF6B6B' },      // 0% - Start
+      { stop: 0.25, color: '#FFE66D' },   // 25%
+      { stop: 0.5, color: '#4ECDC4' },    // 50% - Middle
+      { stop: 0.75, color: '#45B7D1' },   // 75%
+      { stop: 1, color: '#2C3E50' }       // 100% - End
+    ]
+  }
+});
+```
+</CodeBlock>
+
+## Gradient Rotation
+
+Both linear and radial gradients support rotation around a pivot point:
+
+<CodeBlock lang="typescript">
+```typescript
+// Rotated linear gradient
+const rotated = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 800,
+    endY: 0,
+    rotate: 90,           // Rotate 90 degrees
+    pivotX: 400,          // Pivot X (defaults to center)
+    pivotY: 300,          // Pivot Y (defaults to center)
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 1, color: '#4ECDC4' }
+    ]
+  }
+});
+```
+</CodeBlock>
+
+## Default Values
+
+If you don't specify certain properties, Apexify.js uses intelligent defaults:
+
+### Linear Gradients
+- `startX`: `0`
+- `startY`: `0`
+- `endX`: `width` (canvas width)
+- `endY`: `0`
+- `pivotX`: `width / 2` (center)
+- `pivotY`: `height / 2` (center)
+
+### Radial Gradients
+- `startX`: `width / 2` (center)
+- `startY`: `height / 2` (center)
+- `startRadius`: `0`
+- `endX`: `width / 2` (center)
+- `endY`: `height / 2` (center)
+- `endRadius`: `Math.max(width, height) / 2`
+
+## Combining with Other Features
+
+Gradients work seamlessly with other canvas features:
+
+<CodeBlock lang="typescript">
+```typescript
+const styledGradient = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 1, color: '#4ECDC4' }
+    ]
+  },
+  borderRadius: 20,
+  shadow: {
+    color: 'rgba(0, 0, 0, 0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  },
+  stroke: {
+    color: '#FFF',
+    width: 3
+  }
+});
+```
+</CodeBlock>
+
+## Common Gradient Patterns
+
+### Sunset Gradient
+
+<CodeBlock lang="typescript">
+```typescript
+const sunsetGradient = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 600,
+    colors: [
+      { stop: 0, color: '#FF6B6B' },      // Red-orange
+      { stop: 0.3, color: '#FFE66D' },    // Yellow
+      { stop: 0.6, color: '#4ECDC4' },    // Teal
+      { stop: 1, color: '#45B7D1' }       // Blue
+    ]
+  }
+});
+```
+</CodeBlock>
+
+### Spotlight Effect
+
+<CodeBlock lang="typescript">
+```typescript
+const spotlight = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'radial',
+    startX: 400,
+    startY: 300,
+    startRadius: 0,
+    endRadius: 400,
+    colors: [
+      { stop: 0, color: '#FFFFFF' },      // Bright center
+      { stop: 0.5, color: '#E0E0E0' },    // Light gray
+      { stop: 1, color: '#2C3E50' }       // Dark outer
+    ]
+  }
+});
+```
+</CodeBlock>
+
+### Ocean Gradient
+
+<CodeBlock lang="typescript">
+```typescript
+const oceanGradient = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 600,
+    colors: [
+      { stop: 0, color: '#87CEEB' },      // Sky blue
+      { stop: 0.5, color: '#4682B4' },    // Steel blue
+      { stop: 1, color: '#191970' }       // Midnight blue
+    ]
+  }
+});
+```
+</CodeBlock>
+
+## Important Notes
+
+<Alert type="warning" title="Background Conflicts">
+You can only use one background type at a time. If you specify both `gradientBg` and `colorBg` or `customBg`, an error will be thrown. Choose one background type per canvas.
+</Alert>
+
+<Alert type="info" title="Performance Tip">
+Radial gradients with offset centers (elliptical) can be slightly more performance-intensive than standard circular gradients. Use them judiciously in performance-critical applications.
+</Alert>
+
+<Dropdown title="When to use gradients?">
+Gradients are perfect for:
+- **Visual appeal**: Creating depth and dimension
+- **Modern design**: Contemporary UI/UX patterns
+- **Branding**: Smooth color transitions
+- **Artistic effects**: Sunset, ocean, and abstract backgrounds
+- **Depth perception**: Simulating light and shadow
+</Dropdown>
+
+## Best Practices
+
+1. **Use meaningful color stops**: Space color stops logically for smooth transitions
+2. **Consider color harmony**: Use complementary or analogous colors
+3. **Test on different sizes**: Gradients may look different on various canvas sizes
+4. **Combine with opacity**: Use rgba colors for subtle gradient effects
+5. **Rotate for variety**: Experiment with rotation angles for different effects
+
+

@@ -1,0 +1,576 @@
+# Image Masking and Clipping
+
+Apexify.js provides powerful masking and clipping capabilities to control which parts of an image are visible. Use masks for complex transparency effects and clip paths for custom shapes.
+
+## Overview
+
+- **Masking**: Uses an image to control transparency (alpha channel)
+- **Clipping**: Uses a custom path to define visible areas
+
+## Image Masking
+
+Masking allows you to use one image to control the transparency of another image. The mask image determines which parts of the source image are visible.
+
+### Mask Modes
+
+Apexify.js supports three mask modes:
+
+- `'alpha'` - Uses the mask image's alpha channel (default)
+- `'luminance'` - Uses the mask image's brightness/luminance
+- `'inverse'` - Inverts the mask (swaps visible/invisible areas)
+
+### Alpha Channel Masking
+
+Uses the mask image's transparency to control visibility:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const masked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: './mask.png',  // Mask image with alpha channel
+    mode: 'alpha'          // Default mode
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const masked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: './mask.png',  // Mask image with alpha channel
+    mode: 'alpha'          // Default mode
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Alpha Masking">
+The mask image should have an alpha channel. White/opaque areas show the image, transparent areas hide it.
+</Alert>
+
+### Luminance Masking
+
+Uses the mask image's brightness to control visibility:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const luminanceMasked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: './gradient-mask.jpg',  // Grayscale gradient
+    mode: 'luminance'                // Bright areas = visible
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const luminanceMasked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: './gradient-mask.jpg',  // Grayscale gradient
+    mode: 'luminance'                // Bright areas = visible
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Luminance Masking">
+Use grayscale images for luminance masks. Bright areas (white) show the image, dark areas (black) hide it. Perfect for gradient transitions.
+</Alert>
+
+### Inverse Masking
+
+Inverts the mask, swapping visible and invisible areas:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const inverseMasked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: './mask.png',
+    mode: 'inverse'  // Inverts the mask
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const inverseMasked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: './mask.png',
+    mode: 'inverse'  // Inverts the mask
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Mask from Buffer
+
+You can also use a Buffer as a mask source:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create mask programmatically
+const maskBuffer = /* ... create mask buffer ... */;
+
+const masked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: maskBuffer,
+    mode: 'alpha'
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Create mask programmatically
+const maskBuffer = /* ... create mask buffer ... */;
+
+const masked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: maskBuffer,
+    mode: 'alpha'
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Custom Clip Paths
+
+Clip paths allow you to define custom shapes for visible areas using polygon coordinates:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Triangle clip path
+const triangleClip = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  clipPath: [
+    { x: 200, y: 0 },      // Top point
+    { x: 400, y: 300 },    // Bottom-right
+    { x: 0, y: 300 }       // Bottom-left
+  ]
+}, canvasBuffer);
+
+// Hexagon clip path
+const hexagonClip = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  clipPath: [
+    { x: 200, y: 0 },      // Top
+    { x: 350, y: 75 },     // Top-right
+    { x: 350, y: 225 },    // Bottom-right
+    { x: 200, y: 300 },    // Bottom
+    { x: 50, y: 225 },     // Bottom-left
+    { x: 50, y: 75 }       // Top-left
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Triangle clip path
+const triangleClip = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  clipPath: [
+    { x: 200, y: 0 },      // Top point
+    { x: 400, y: 300 },    // Bottom-right
+    { x: 0, y: 300 }       // Bottom-left
+  ]
+}, canvasBuffer);
+
+// Hexagon clip path
+const hexagonClip = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  clipPath: [
+    { x: 200, y: 0 },      // Top
+    { x: 350, y: 75 },     // Top-right
+    { x: 350, y: 225 },    // Bottom-right
+    { x: 200, y: 300 },    // Bottom
+    { x: 50, y: 225 },     // Bottom-left
+    { x: 50, y: 75 }       // Top-left
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="warning" title="Clip Path Requirements">
+Clip paths require at least 3 points to form a polygon. Coordinates are relative to the image's position (x, y).
+</Alert>
+
+### Complex Clip Paths
+
+Create intricate shapes with many points:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Star-shaped clip path
+const starClip = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 400,
+  clipPath: [
+    { x: 200, y: 0 },      // Top point
+    { x: 240, y: 140 },    // Top-right inner
+    { x: 400, y: 160 },    // Right point
+    { x: 260, y: 240 },    // Right inner
+    { x: 300, y: 400 },    // Bottom-right
+    { x: 200, y: 300 },    // Bottom center
+    { x: 100, y: 400 },    // Bottom-left
+    { x: 140, y: 240 },    // Left inner
+    { x: 0, y: 160 },      // Left point
+    { x: 160, y: 140 }     // Top-left inner
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Star-shaped clip path
+const starClip = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 400,
+  clipPath: [
+    { x: 200, y: 0 },      // Top point
+    { x: 240, y: 140 },    // Top-right inner
+    { x: 400, y: 160 },    // Right point
+    { x: 260, y: 240 },    // Right inner
+    { x: 300, y: 400 },    // Bottom-right
+    { x: 200, y: 300 },    // Bottom center
+    { x: 100, y: 400 },    // Bottom-left
+    { x: 140, y: 240 },    // Left inner
+    { x: 0, y: 160 },      // Left point
+    { x: 160, y: 140 }     // Top-left inner
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Masking vs Clipping
+
+**Masking**:
+- Uses an image to control transparency
+- Supports multiple modes (alpha, luminance, inverse)
+- Great for complex, organic shapes
+- Can create smooth gradients
+
+**Clipping**:
+- Uses polygon coordinates
+- Precise geometric shapes
+- Faster for simple shapes
+- No external mask image needed
+
+<Alert type="info" title="When to Use Each">
+- Use **masking** for complex shapes, gradients, or when you have a mask image ready
+- Use **clipping** for simple geometric shapes or when you need precise control
+</Alert>
+
+## Combining with Other Features
+
+Masks and clip paths work with all other image features:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Masked image with filters and effects
+const advancedMasked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: './mask.png',
+    mode: 'alpha'
+  },
+  filters: [
+    { type: 'contrast', value: 1.2 },
+    { type: 'saturation', value: 1.1 }
+  ],
+  effects: {
+    vignette: { intensity: 0.4, size: 0.8 }
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, canvasBuffer);
+
+// Clipped image with rotation
+const rotatedClip = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 400,
+  clipPath: [
+    { x: 200, y: 0 },
+    { x: 400, y: 200 },
+    { x: 200, y: 400 },
+    { x: 0, y: 200 }
+  ],
+  rotation: 45,
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 15
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Masked image with filters and effects
+const advancedMasked = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  mask: {
+    source: './mask.png',
+    mode: 'alpha'
+  },
+  filters: [
+    { type: 'contrast', value: 1.2 },
+    { type: 'saturation', value: 1.1 }
+  ],
+  effects: {
+    vignette: { intensity: 0.4, size: 0.8 }
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, canvasBuffer);
+
+// Clipped image with rotation
+const rotatedClip = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 400,
+  clipPath: [
+    { x: 200, y: 0 },
+    { x: 400, y: 200 },
+    { x: 200, y: 400 },
+    { x: 0, y: 200 }
+  ],
+  rotation: 45,
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 15
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create canvas
+const canvas = await painter.createCanvas({
+  width: 1000,
+  height: 800,
+  colorBg: '#f0f0f0'
+});
+
+// Add masked image
+const masked = await painter.createImage({
+  source: './portrait.jpg',
+  x: 100,
+  y: 100,
+  width: 300,
+  height: 400,
+  mask: {
+    source: './portrait-mask.png',
+    mode: 'alpha'
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, canvas.buffer);
+
+// Add clipped image
+const clipped = await painter.createImage({
+  source: './landscape.jpg',
+  x: 500,
+  y: 200,
+  width: 400,
+  height: 400,
+  clipPath: [
+    { x: 200, y: 0 },
+    { x: 400, y: 200 },
+    { x: 200, y: 400 },
+    { x: 0, y: 200 }
+  ],
+  rotation: 45,
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, masked);
+
+fs.writeFileSync('masked-and-clipped.png', clipped);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createMaskedAndClipped() {
+  // Create canvas
+  const canvas = await painter.createCanvas({
+    width: 1000,
+    height: 800,
+    colorBg: '#f0f0f0'
+  });
+
+  // Add masked image
+  const masked = await painter.createImage({
+    source: './portrait.jpg',
+    x: 100,
+    y: 100,
+    width: 300,
+    height: 400,
+    mask: {
+      source: './portrait-mask.png',
+      mode: 'alpha'
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  }, canvas.buffer);
+
+  // Add clipped image
+  const clipped = await painter.createImage({
+    source: './landscape.jpg',
+    x: 500,
+    y: 200,
+    width: 400,
+    height: 400,
+    clipPath: [
+      { x: 200, y: 0 },
+      { x: 400, y: 200 },
+      { x: 200, y: 400 },
+      { x: 0, y: 200 }
+    ],
+    rotation: 45,
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  }, masked);
+
+  fs.writeFileSync('masked-and-clipped.png', clipped);
+}
+
+createMaskedAndClipped();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Image Distortion](/docs#image-distortion) - Learn about perspective, bulge, pinch, and mesh warping
+- [Advanced Features](/docs#advanced-image-features) - Combine masking with shadows, strokes, and more
+
+

@@ -1,0 +1,1021 @@
+# Image Filters
+
+Apexify.js provides 22+ professional image filters that you can apply to images and shapes. Filters are applied using the `filters` array property in `ImageProperties`.
+
+## Overview
+
+Filters are applied in the order they appear in the array. You can combine multiple filters for complex effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const filteredImage = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'grayscale' },
+    { type: 'contrast', value: 1.2 },
+    { type: 'brightness', value: 0.1 }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const filteredImage = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'grayscale' },
+    { type: 'contrast', value: 1.2 },
+    { type: 'brightness', value: 0.1 }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Filter Intensity
+
+Most filters support an `intensity` property to control the strength of the effect:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Light blur
+const lightBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'gaussianBlur', intensity: 2 }
+  ]
+}, canvasBuffer);
+
+// Heavy blur
+const heavyBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'gaussianBlur', intensity: 10 }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Light blur
+const lightBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'gaussianBlur', intensity: 2 }
+  ]
+}, canvasBuffer);
+
+// Heavy blur
+const heavyBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'gaussianBlur', intensity: 10 }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Global Filter Intensity
+
+Use `filterIntensity` to control all filters at once:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'gaussianBlur', intensity: 5 },
+    { type: 'contrast', value: 1.5 }
+  ],
+  filterIntensity: 0.5  // Reduces all filter intensities by 50%
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'gaussianBlur', intensity: 5 },
+    { type: 'contrast', value: 1.5 }
+  ],
+  filterIntensity: 0.5  // Reduces all filter intensities by 50%
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Filter Order
+
+Control when filters are applied using `filterOrder`:
+
+- `'pre'` - Apply filters before transformations (rotation, scaling)
+- `'post'` - Apply filters after transformations (default)
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Apply filters before rotation
+const preFilter = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  rotation: 45,
+  filters: [
+    { type: 'gaussianBlur', intensity: 5 }
+  ],
+  filterOrder: 'pre'
+}, canvasBuffer);
+
+// Apply filters after rotation (default)
+const postFilter = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  rotation: 45,
+  filters: [
+    { type: 'gaussianBlur', intensity: 5 }
+  ],
+  filterOrder: 'post'  // or omit for default
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Apply filters before rotation
+const preFilter = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  rotation: 45,
+  filters: [
+    { type: 'gaussianBlur', intensity: 5 }
+  ],
+  filterOrder: 'pre'
+}, canvasBuffer);
+
+// Apply filters after rotation (default)
+const postFilter = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  rotation: 45,
+  filters: [
+    { type: 'gaussianBlur', intensity: 5 }
+  ],
+  filterOrder: 'post'  // or omit for default
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Blur Filters
+
+### Gaussian Blur
+
+Smooth, uniform blur effect:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const blurred = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'gaussianBlur', intensity: 5 }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const blurred = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'gaussianBlur', intensity: 5 }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Motion Blur
+
+Creates a directional blur effect simulating motion:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const motionBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { 
+      type: 'motionBlur', 
+      intensity: 10,
+      angle: 45  // Direction in degrees (0-360)
+    }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const motionBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { 
+      type: 'motionBlur', 
+      intensity: 10,
+      angle: 45  // Direction in degrees (0-360)
+    }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Radial Blur
+
+Creates a circular blur effect radiating from a center point:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const radialBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { 
+      type: 'radialBlur', 
+      intensity: 5,
+      centerX: 200,  // Center X coordinate
+      centerY: 150   // Center Y coordinate
+    }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const radialBlur = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { 
+      type: 'radialBlur', 
+      intensity: 5,
+      centerX: 200,  // Center X coordinate
+      centerY: 150   // Center Y coordinate
+    }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Sharpening
+
+### Sharpen
+
+Enhances image details and edges:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const sharpened = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'sharpen', intensity: 2 }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const sharpened = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'sharpen', intensity: 2 }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Color Adjustments
+
+### Brightness
+
+Adjusts image brightness:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Increase brightness
+const brighter = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'brightness', value: 0.2 }  // Positive = brighter
+  ]
+}, canvasBuffer);
+
+// Decrease brightness
+const darker = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'brightness', value: -0.2 }  // Negative = darker
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Increase brightness
+const brighter = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'brightness', value: 0.2 }  // Positive = brighter
+  ]
+}, canvasBuffer);
+
+// Decrease brightness
+const darker = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'brightness', value: -0.2 }  // Negative = darker
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Contrast
+
+Adjusts image contrast:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Increase contrast
+const highContrast = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'contrast', value: 1.5 }  // > 1 = more contrast
+  ]
+}, canvasBuffer);
+
+// Decrease contrast
+const lowContrast = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'contrast', value: 0.5 }  // < 1 = less contrast
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Increase contrast
+const highContrast = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'contrast', value: 1.5 }  // > 1 = more contrast
+  ]
+}, canvasBuffer);
+
+// Decrease contrast
+const lowContrast = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'contrast', value: 0.5 }  // < 1 = less contrast
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Saturation
+
+Adjusts color saturation:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Increase saturation (more vibrant)
+const vibrant = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'saturation', value: 1.5 }  // > 1 = more saturated
+  ]
+}, canvasBuffer);
+
+// Decrease saturation (more muted)
+const muted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'saturation', value: 0.5 }  // < 1 = less saturated
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Increase saturation (more vibrant)
+const vibrant = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'saturation', value: 1.5 }  // > 1 = more saturated
+  ]
+}, canvasBuffer);
+
+// Decrease saturation (more muted)
+const muted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'saturation', value: 0.5 }  // < 1 = less saturated
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Hue Shift
+
+Shifts the hue of all colors:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const hueShifted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'hueShift', value: 30 }  // Degrees (0-360)
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const hueShifted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'hueShift', value: 30 }  // Degrees (0-360)
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Color Effects
+
+### Grayscale
+
+Converts image to grayscale:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const grayscale = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'grayscale' }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const grayscale = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'grayscale' }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Sepia
+
+Applies a warm sepia tone:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const sepia = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'sepia' }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const sepia = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'sepia' }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Invert
+
+Inverts all colors:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const inverted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'invert' }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const inverted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'invert' }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Artistic Effects
+
+### Posterize
+
+Reduces the number of colors, creating a poster-like effect:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const posterized = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'posterize', levels: 4 }  // Number of color levels (2-256)
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const posterized = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'posterize', levels: 4 }  // Number of color levels (2-256)
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Pixelate
+
+Creates a pixelated effect:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const pixelated = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'pixelate', size: 10 }  // Pixel size in pixels
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const pixelated = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'pixelate', size: 10 }  // Pixel size in pixels
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Texture Effects
+
+### Noise
+
+Adds random noise to the image:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const noisy = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'noise', intensity: 0.1 }  // 0-1, higher = more noise
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const noisy = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'noise', intensity: 0.1 }  // 0-1, higher = more noise
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Grain
+
+Adds film grain texture:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const grainy = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'grain', intensity: 0.05 }  // 0-1, higher = more grain
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const grainy = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'grain', intensity: 0.05 }  // 0-1, higher = more grain
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Edge Detection
+
+### Edge Detection
+
+Detects and highlights edges in the image:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const edges = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'edgeDetection', intensity: 1 }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const edges = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'edgeDetection', intensity: 1 }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Emboss
+
+Creates a 3D embossed effect:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const embossed = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'emboss', intensity: 1 }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const embossed = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'emboss', intensity: 1 }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Combining Filters
+
+You can combine multiple filters for complex effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Vintage photo effect
+const vintage = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'sepia' },
+    { type: 'grain', intensity: 0.1 },
+    { type: 'contrast', value: 1.2 },
+    { type: 'brightness', value: -0.1 }
+  ]
+}, canvasBuffer);
+
+// Cinematic effect
+const cinematic = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'contrast', value: 1.3 },
+    { type: 'saturation', value: 0.8 },
+    { type: 'brightness', value: -0.1 },
+    { type: 'gaussianBlur', intensity: 0.5 }
+  ]
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Vintage photo effect
+const vintage = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'sepia' },
+    { type: 'grain', intensity: 0.1 },
+    { type: 'contrast', value: 1.2 },
+    { type: 'brightness', value: -0.1 }
+  ]
+}, canvasBuffer);
+
+// Cinematic effect
+const cinematic = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  filters: [
+    { type: 'contrast', value: 1.3 },
+    { type: 'saturation', value: 0.8 },
+    { type: 'brightness', value: -0.1 },
+    { type: 'gaussianBlur', intensity: 0.5 }
+  ]
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Filter Reference
+
+| Filter | Properties | Description |
+|--------|-----------|-------------|
+| `gaussianBlur` | `intensity` | Smooth, uniform blur |
+| `motionBlur` | `intensity`, `angle` | Directional motion blur |
+| `radialBlur` | `intensity`, `centerX`, `centerY` | Circular blur from center |
+| `sharpen` | `intensity` | Enhance details and edges |
+| `brightness` | `value` | Adjust brightness (-1 to 1) |
+| `contrast` | `value` | Adjust contrast (0 to 2+) |
+| `saturation` | `value` | Adjust color saturation (0 to 2+) |
+| `hueShift` | `value` | Shift hue in degrees (0-360) |
+| `grayscale` | - | Convert to grayscale |
+| `sepia` | - | Apply sepia tone |
+| `invert` | - | Invert all colors |
+| `posterize` | `levels` | Reduce color levels (2-256) |
+| `pixelate` | `size` | Pixelate effect (pixel size) |
+| `noise` | `intensity` | Add random noise (0-1) |
+| `grain` | `intensity` | Add film grain (0-1) |
+| `edgeDetection` | `intensity` | Detect and highlight edges |
+| `emboss` | `intensity` | Create 3D embossed effect |
+
+## Next Steps
+
+- [Image Effects](/docs#image-effects) - Add vignette, lens flare, and other effects
+- [Advanced Features](/docs#advanced-image-features) - Combine filters with shadows, strokes, and transformations
+
+

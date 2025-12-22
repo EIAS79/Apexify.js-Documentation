@@ -1,0 +1,428 @@
+# Custom Image Backgrounds
+
+Custom image backgrounds allow you to use any image file (local or remote) as your canvas background. Apexify.js provides extensive control over how the image is displayed, including sizing, alignment, opacity, and filters.
+
+## Overview
+
+The `customBg` property accepts an image source (local path or URL) and provides options for how the image should be fitted and displayed on the canvas.
+
+## Basic Usage
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Use a local image file
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './path/to/image.jpg'
+  }
+});
+
+fs.writeFileSync('custom-bg.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createCustomBg() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    customBg: {
+      source: './path/to/image.jpg'
+    }
+  });
+
+  fs.writeFileSync('custom-bg.png', canvas.buffer);
+}
+createCustomBg();
+```
+</js>
+</CodeSwitcher>
+
+## Using Remote Images
+
+You can use images from URLs:
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: 'https://example.com/image.jpg'
+  }
+});
+```
+</CodeBlock>
+
+<Alert type="info" title="Supported Formats">
+Apexify.js supports all common image formats including JPEG, PNG, WebP, GIF, and more. The format is automatically detected from the image file.
+</Alert>
+
+## Image Fitting Modes
+
+Control how the image is scaled to fit the canvas using the `fit` property.
+
+### Fill Mode (Default)
+
+The `fill` mode stretches the image to exactly match the canvas dimensions, potentially distorting the aspect ratio:
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    fit: 'fill'  // Stretches to fill entire canvas
+  }
+});
+```
+</CodeBlock>
+
+### Contain Mode
+
+The `contain` mode scales the image to fit entirely within the canvas while maintaining aspect ratio:
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    fit: 'contain'  // Scales to fit, maintains aspect ratio
+  }
+});
+```
+</CodeBlock>
+
+### Cover Mode
+
+The `cover` mode scales the image to cover the entire canvas while maintaining aspect ratio (may crop):
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    fit: 'cover'  // Scales to cover, maintains aspect ratio
+  }
+});
+```
+</CodeBlock>
+
+## Image Alignment
+
+When using `contain` or `cover` modes, use the `align` property to control where the image is positioned:
+
+<CodeBlock lang="typescript">
+```typescript
+// Center alignment (default)
+const centerAligned = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    fit: 'contain',
+    align: 'center'
+  }
+});
+
+// Top-left alignment
+const topLeft = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    fit: 'contain',
+    align: 'top-left'
+  }
+});
+```
+</CodeBlock>
+
+### Available Alignment Options
+
+- `'center'` - Centers the image (default)
+- `'top'` - Aligns to top center
+- `'bottom'` - Aligns to bottom center
+- `'left'` - Aligns to left center
+- `'right'` - Aligns to right center
+- `'top-left'` - Aligns to top-left corner
+- `'top-right'` - Aligns to top-right corner
+- `'bottom-left'` - Aligns to bottom-left corner
+- `'bottom-right'` - Aligns to bottom-right corner
+
+<CodeBlock lang="typescript">
+```typescript
+// Example with different alignments
+const alignments = [
+  'center', 'top', 'bottom', 'left', 'right',
+  'top-left', 'top-right', 'bottom-left', 'bottom-right'
+];
+
+for (const align of alignments) {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    customBg: {
+      source: './image.jpg',
+      fit: 'contain',
+      align: align as any
+    }
+  });
+  fs.writeFileSync(`bg-${align}.png`, canvas.buffer);
+}
+```
+</CodeBlock>
+
+## Inherit Canvas Size
+
+Use `inherit: true` to automatically size the canvas to match the image dimensions:
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  // Width and height will be set to image dimensions
+  customBg: {
+    source: './image.jpg',
+    inherit: true  // Canvas matches image size
+  }
+});
+
+// Canvas dimensions are now equal to image dimensions
+console.log(canvas.canvas.width, canvas.canvas.height);
+```
+</CodeBlock>
+
+<Alert type="info" title="Inherit Behavior">
+When `inherit: true` is used, the canvas width and height are automatically set to match the source image dimensions. The image is drawn at 1:1 scale without any scaling or cropping.
+</Alert>
+
+## Background Opacity
+
+Control the opacity of the background image:
+
+<CodeBlock lang="typescript">
+```typescript
+// Semi-transparent background
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    opacity: 0.7  // 70% opacity (0-1 range)
+  }
+});
+```
+</CodeBlock>
+
+## Applying Filters to Backgrounds
+
+Apply professional image filters directly to background images:
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    filters: [
+      { type: 'grayscale', intensity: 1 },
+      { type: 'brightness', value: 1.2 },
+      { type: 'contrast', value: 1.1 }
+    ]
+  }
+});
+```
+</CodeBlock>
+
+### Available Filters
+
+You can apply multiple filters to background images:
+
+<CodeBlock lang="typescript">
+```typescript
+const filteredCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    filters: [
+      // Blur effects
+      { type: 'gaussianBlur', radius: 5 },
+      { type: 'motionBlur', angle: 45, intensity: 10 },
+      { type: 'radialBlur', centerX: 400, centerY: 300, intensity: 20 },
+      
+      // Enhancement
+      { type: 'sharpen', intensity: 1.5 },
+      
+      // Color effects
+      { type: 'grayscale', intensity: 1 },
+      { type: 'sepia', intensity: 1 },
+      { type: 'invert', intensity: 1 },
+      { type: 'brightness', value: 1.2 },
+      { type: 'contrast', value: 1.1 },
+      { type: 'saturation', value: 1.3 },
+      { type: 'hueShift', value: 30 },
+      
+      // Artistic effects
+      { type: 'posterize', levels: 8 },
+      { type: 'pixelate', size: 10 },
+      { type: 'noise', intensity: 0.1 },
+      { type: 'grain', intensity: 0.2 },
+      
+      // Detection
+      { type: 'edgeDetection', intensity: 1 },
+      { type: 'emboss', intensity: 1 }
+    ]
+  }
+});
+```
+</CodeBlock>
+
+## Combining Features
+
+Combine multiple features for sophisticated backgrounds:
+
+<CodeBlock lang="typescript">
+```typescript
+const advancedBackground = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  customBg: {
+    source: './image.jpg',
+    fit: 'cover',
+    align: 'center',
+    opacity: 0.9,
+    filters: [
+      { type: 'blur', radius: 3 },
+      { type: 'brightness', value: 1.1 }
+    ]
+  },
+  borderRadius: 20,
+  shadow: {
+    color: 'rgba(0, 0, 0, 0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+});
+```
+</CodeBlock>
+
+## Complete Example
+
+<CodeBlock lang="typescript">
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+async function createStyledBackground() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    customBg: {
+      source: 'https://example.com/landscape.jpg',
+      fit: 'cover',           // Cover entire canvas
+      align: 'center',        // Center the image
+      opacity: 0.85,          // 85% opacity
+      filters: [
+        { type: 'brightness', value: 1.1 },
+        { type: 'saturation', value: 1.2 },
+        { type: 'contrast', value: 1.05 }
+      ]
+    },
+    borderRadius: 30,
+    shadow: {
+      color: 'rgba(0, 0, 0, 0.4)',
+      offsetX: 15,
+      offsetY: 15,
+      blur: 30
+    }
+  });
+
+  fs.writeFileSync('styled-background.png', canvas.buffer);
+  console.log('Background created successfully!');
+}
+
+createStyledBackground();
+```
+</CodeBlock>
+
+## Error Handling
+
+<Alert type="warning" title="Image Loading Errors">
+If the image file cannot be loaded (file not found, invalid URL, etc.), the background will fail silently. Always ensure your image paths are correct and accessible.
+</Alert>
+
+<CodeBlock lang="typescript">
+```typescript
+try {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    customBg: {
+      source: './nonexistent.jpg'  // This will fail
+    }
+  });
+} catch (error) {
+  console.error('Failed to create canvas:', error);
+  // Handle error appropriately
+}
+```
+</CodeBlock>
+
+## Performance Considerations
+
+<Alert type="info" title="Performance Tips">
+- **Local files** are faster than remote URLs
+- **Large images** may take time to load and process
+- **Multiple filters** increase processing time
+- **Cover/contain** modes require more calculations than fill
+- Consider **pre-processing** images for optimal performance
+</Alert>
+
+## Important Notes
+
+<Alert type="warning" title="Background Conflicts">
+You can only use one background type at a time. If you specify both `customBg` and `colorBg` or `gradientBg`, an error will be thrown. Choose one background type per canvas.
+</Alert>
+
+<Dropdown title="When to use custom backgrounds?">
+Custom image backgrounds are perfect for:
+- **Photography**: Using photos as canvas backgrounds
+- **Textures**: Adding texture and depth to designs
+- **Overlays**: Combining images with other elements
+- **Branding**: Incorporating brand imagery
+- **Artistic compositions**: Creating complex visual layouts
+</Dropdown>
+
+## Best Practices
+
+1. **Optimize images**: Use appropriately sized images for your canvas
+2. **Choose the right fit mode**: Consider aspect ratios and desired effect
+3. **Use opacity judiciously**: Subtle opacity can create elegant overlays
+4. **Combine with filters**: Enhance images with filters for better visual impact
+5. **Test alignment**: Ensure important parts of images aren't cropped
+6. **Handle errors**: Always handle potential image loading failures gracefully
+
+

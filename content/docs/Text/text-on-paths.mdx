@@ -1,0 +1,766 @@
+# Text on Paths
+
+Apexify.js allows you to render text along custom paths including lines, arcs, bezier curves, and quadratic curves. Create dynamic, curved text layouts for artistic and practical applications.
+
+## Overview
+
+Text on paths enables you to:
+- Render text along **straight lines**
+- Follow **arcs** and **circles**
+- Curve along **bezier** paths
+- Follow **quadratic** curves
+
+## Basic Usage
+
+To render text on a path, set `textOnPath: true` and provide a `path` configuration:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const textOnPath = await painter.createText({
+  text: 'Text on Path',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 100 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const textOnPath = await painter.createText({
+  text: 'Text on Path',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 100 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Line Paths
+
+Render text along a straight line:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Horizontal line
+const horizontal = await painter.createText({
+  text: 'Text on Horizontal Line',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 400, y: 0 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Diagonal line
+const diagonal = await painter.createText({
+  text: 'Text on Diagonal',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 150 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Horizontal line
+const horizontal = await painter.createText({
+  text: 'Text on Horizontal Line',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 400, y: 0 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Diagonal line
+const diagonal = await painter.createText({
+  text: 'Text on Diagonal',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 150 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Arc Paths
+
+Render text along an arc or circle:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Circular arc (top half)
+const arc = await painter.createText({
+  text: 'Text on Arc',
+  x: 400,
+  y: 300,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'arc',
+    points: [
+      { x: 0, y: -100 },    // Start point (relative to x, y)
+      { x: 200, y: -100 }   // End point
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Full circle (requires multiple arcs or bezier)
+const circle = await painter.createText({
+  text: 'Text Around Circle',
+  x: 400,
+  y: 400,
+  fontSize: 20,
+  color: '#ffffff',
+  path: {
+    type: 'arc',
+    points: [
+      { x: 0, y: -150 },
+      { x: 150, y: 0 },
+      { x: 0, y: 150 },
+      { x: -150, y: 0 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Circular arc (top half)
+const arc = await painter.createText({
+  text: 'Text on Arc',
+  x: 400,
+  y: 300,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'arc',
+    points: [
+      { x: 0, y: -100 },    // Start point (relative to x, y)
+      { x: 200, y: -100 }   // End point
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Full circle (requires multiple arcs or bezier)
+const circle = await painter.createText({
+  text: 'Text Around Circle',
+  x: 400,
+  y: 400,
+  fontSize: 20,
+  color: '#ffffff',
+  path: {
+    type: 'arc',
+    points: [
+      { x: 0, y: -150 },
+      { x: 150, y: 0 },
+      { x: 0, y: 150 },
+      { x: -150, y: 0 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Bezier Curves
+
+Render text along smooth bezier curves:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple bezier curve
+const bezier = await painter.createText({
+  text: 'Text on Bezier Curve',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'bezier',
+    points: [
+      { x: 0, y: 0 },        // Start point
+      { x: 100, y: -50 },    // Control point 1
+      { x: 200, y: 50 },     // Control point 2
+      { x: 300, y: 0 }       // End point
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Wave-like bezier
+const wave = await painter.createText({
+  text: 'Wave Text',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'bezier',
+    points: [
+      { x: 0, y: 0 },
+      { x: 100, y: -80 },
+      { x: 200, y: 80 },
+      { x: 300, y: 0 },
+      { x: 400, y: -80 },
+      { x: 500, y: 80 },
+      { x: 600, y: 0 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple bezier curve
+const bezier = await painter.createText({
+  text: 'Text on Bezier Curve',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'bezier',
+    points: [
+      { x: 0, y: 0 },        // Start point
+      { x: 100, y: -50 },    // Control point 1
+      { x: 200, y: 50 },     // Control point 2
+      { x: 300, y: 0 }       // End point
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Wave-like bezier
+const wave = await painter.createText({
+  text: 'Wave Text',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'bezier',
+    points: [
+      { x: 0, y: 0 },
+      { x: 100, y: -80 },
+      { x: 200, y: 80 },
+      { x: 300, y: 0 },
+      { x: 400, y: -80 },
+      { x: 500, y: 80 },
+      { x: 600, y: 0 }
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Quadratic Curves
+
+Render text along quadratic curves:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Simple quadratic curve
+const quadratic = await painter.createText({
+  text: 'Text on Quadratic Curve',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'quadratic',
+    points: [
+      { x: 0, y: 0 },        // Start point
+      { x: 150, y: -100 },   // Control point
+      { x: 300, y: 0 }       // End point
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Simple quadratic curve
+const quadratic = await painter.createText({
+  text: 'Text on Quadratic Curve',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'quadratic',
+    points: [
+      { x: 0, y: 0 },        // Start point
+      { x: 150, y: -100 },   // Control point
+      { x: 300, y: 0 }       // End point
+    ]
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Path Offset
+
+Control the distance of text from the path:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Text on path (default offset: 0)
+const onPath = await painter.createText({
+  text: 'On Path',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 0 }
+    ],
+    offset: 0  // On the path
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Text above path
+const abovePath = await painter.createText({
+  text: 'Above Path',
+  x: 100,
+  y: 250,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 0 }
+    ],
+    offset: -30  // Negative = above path
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Text below path
+const belowPath = await painter.createText({
+  text: 'Below Path',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 0 }
+    ],
+    offset: 30  // Positive = below path
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Text on path (default offset: 0)
+const onPath = await painter.createText({
+  text: 'On Path',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 0 }
+    ],
+    offset: 0  // On the path
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Text above path
+const abovePath = await painter.createText({
+  text: 'Above Path',
+  x: 100,
+  y: 250,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 0 }
+    ],
+    offset: -30  // Negative = above path
+  },
+  textOnPath: true
+}, canvasBuffer);
+
+// Text below path
+const belowPath = await painter.createText({
+  text: 'Below Path',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  color: '#ffffff',
+  path: {
+    type: 'line',
+    points: [
+      { x: 0, y: 0 },
+      { x: 300, y: 0 }
+    ],
+    offset: 30  // Positive = below path
+  },
+  textOnPath: true
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Combining with Effects
+
+Text on paths works with all text effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const styledPath = await painter.createText({
+  text: 'Styled Text on Path',
+  x: 100,
+  y: 200,
+  fontSize: 32,
+  color: '#ffffff',
+  path: {
+    type: 'bezier',
+    points: [
+      { x: 0, y: 0 },
+      { x: 150, y: -80 },
+      { x: 300, y: 80 },
+      { x: 450, y: 0 }
+    ]
+  },
+  textOnPath: true,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ]
+  },
+  glow: {
+    color: '#ffd700',
+    intensity: 10,
+    opacity: 0.8
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const styledPath = await painter.createText({
+  text: 'Styled Text on Path',
+  x: 100,
+  y: 200,
+  fontSize: 32,
+  color: '#ffffff',
+  path: {
+    type: 'bezier',
+    points: [
+      { x: 0, y: 0 },
+      { x: 150, y: -80 },
+      { x: 300, y: 80 },
+      { x: 450, y: 0 }
+    ]
+  },
+  textOnPath: true,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ]
+  },
+  glow: {
+    color: '#ffd700',
+    intensity: 10,
+    opacity: 0.8
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+const result = await painter.createText([
+  {
+    text: 'Text on Line',
+    x: 100,
+    y: 100,
+    fontSize: 24,
+    color: '#ffffff',
+    path: {
+      type: 'line',
+      points: [
+        { x: 0, y: 0 },
+        { x: 400, y: 0 }
+      ]
+    },
+    textOnPath: true
+  },
+  {
+    text: 'Text on Arc',
+    x: 600,
+    y: 200,
+    fontSize: 24,
+    color: '#ff6b6b',
+    path: {
+      type: 'arc',
+      points: [
+        { x: 0, y: -100 },
+        { x: 200, y: -100 }
+      ]
+    },
+    textOnPath: true
+  },
+  {
+    text: 'Text on Bezier Curve',
+    x: 100,
+    y: 400,
+    fontSize: 28,
+    color: '#4ecdc4',
+    path: {
+      type: 'bezier',
+      points: [
+        { x: 0, y: 0 },
+        { x: 150, y: -100 },
+        { x: 300, y: 100 },
+        { x: 450, y: 0 }
+      ]
+    },
+    textOnPath: true,
+    glow: {
+      color: '#4ecdc4',
+      intensity: 10,
+      opacity: 0.7
+    }
+  },
+  {
+    text: 'Text on Quadratic',
+    x: 600,
+    y: 500,
+    fontSize: 24,
+    color: '#ffd700',
+    path: {
+      type: 'quadratic',
+      points: [
+        { x: 0, y: 0 },
+        { x: 200, y: -120 },
+        { x: 400, y: 0 }
+      ]
+    },
+    textOnPath: true
+  }
+], canvas.buffer);
+
+fs.writeFileSync('text-on-paths.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createPathExample() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  const result = await painter.createText([
+    {
+      text: 'Text on Line',
+      x: 100,
+      y: 100,
+      fontSize: 24,
+      color: '#ffffff',
+      path: {
+        type: 'line',
+        points: [
+          { x: 0, y: 0 },
+          { x: 400, y: 0 }
+        ]
+      },
+      textOnPath: true
+    },
+    {
+      text: 'Text on Arc',
+      x: 600,
+      y: 200,
+      fontSize: 24,
+      color: '#ff6b6b',
+      path: {
+        type: 'arc',
+        points: [
+          { x: 0, y: -100 },
+          { x: 200, y: -100 }
+        ]
+      },
+      textOnPath: true
+    },
+    {
+      text: 'Text on Bezier Curve',
+      x: 100,
+      y: 400,
+      fontSize: 28,
+      color: '#4ecdc4',
+      path: {
+        type: 'bezier',
+        points: [
+          { x: 0, y: 0 },
+          { x: 150, y: -100 },
+          { x: 300, y: 100 },
+          { x: 450, y: 0 }
+        ]
+      },
+      textOnPath: true,
+      glow: {
+        color: '#4ecdc4',
+        intensity: 10,
+        opacity: 0.7
+      }
+    },
+    {
+      text: 'Text on Quadratic',
+      x: 600,
+      y: 500,
+      fontSize: 24,
+      color: '#ffd700',
+      path: {
+        type: 'quadratic',
+        points: [
+          { x: 0, y: 0 },
+          { x: 200, y: -120 },
+          { x: 400, y: 0 }
+        ]
+      },
+      textOnPath: true
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('text-on-paths.png', result);
+}
+
+createPathExample();
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Path Coordinates">
+Path coordinates are relative to the text's `x` and `y` position. The first point should typically be at `{ x: 0, y: 0 }` to start at the text position.
+</Alert>
+
+## Next Steps
+
+- [Advanced Features](/docs#advanced-text-features) - Combine all text features together
+- [Text Effects](/docs#text-effects) - Add glow, shadow, and stroke to path text
+
+

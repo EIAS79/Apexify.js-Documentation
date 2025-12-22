@@ -1,0 +1,567 @@
+# Font Management
+
+Apexify.js provides comprehensive font management capabilities, allowing you to use system fonts, custom fonts, and control font properties through an organized font object structure.
+
+## Overview
+
+Font properties can be set using either:
+- **New Font Object** (recommended) - Organized `font` object with `size`, `family`, `name`, and `path`
+- **Legacy Properties** - Individual properties like `fontSize`, `fontFamily`, `fontName`, `fontPath` (still supported)
+
+## Font Object Structure
+
+The new font object provides a cleaner, more organized way to manage fonts:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const text = await painter.createText({
+  text: 'Organized Font',
+  x: 100,
+  y: 100,
+  font: {
+    size: 24,           // Font size in pixels
+    family: 'Arial',    // Font family name
+    name: 'customFont', // Custom font name (for registration)
+    path: './fonts/custom.ttf' // Path to custom font file
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const text = await painter.createText({
+  text: 'Organized Font',
+  x: 100,
+  y: 100,
+  font: {
+    size: 24,           // Font size in pixels
+    family: 'Arial',    // Font family name
+    name: 'customFont', // Custom font name (for registration)
+    path: './fonts/custom.ttf' // Path to custom font file
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## System Fonts
+
+Use built-in system fonts by specifying the `fontFamily`:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Arial
+const arial = await painter.createText({
+  text: 'Arial Font',
+  x: 100,
+  y: 100,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Times New Roman
+const times = await painter.createText({
+  text: 'Times New Roman',
+  x: 100,
+  y: 150,
+  font: {
+    size: 24,
+    family: 'Times New Roman'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Helvetica
+const helvetica = await painter.createText({
+  text: 'Helvetica',
+  x: 100,
+  y: 200,
+  font: {
+    size: 24,
+    family: 'Helvetica'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Georgia
+const georgia = await painter.createText({
+  text: 'Georgia',
+  x: 100,
+  y: 250,
+  font: {
+    size: 24,
+    family: 'Georgia'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Arial
+const arial = await painter.createText({
+  text: 'Arial Font',
+  x: 100,
+  y: 100,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Times New Roman
+const times = await painter.createText({
+  text: 'Times New Roman',
+  x: 100,
+  y: 150,
+  font: {
+    size: 24,
+    family: 'Times New Roman'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Helvetica
+const helvetica = await painter.createText({
+  text: 'Helvetica',
+  x: 100,
+  y: 200,
+  font: {
+    size: 24,
+    family: 'Helvetica'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Georgia
+const georgia = await painter.createText({
+  text: 'Georgia',
+  x: 100,
+  y: 250,
+  font: {
+    size: 24,
+    family: 'Georgia'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Custom Fonts
+
+Load and use custom font files (.ttf, .otf, .woff, etc.):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Load custom font from local file
+const customFont = await painter.createText({
+  text: 'Custom Font Text',
+  x: 100,
+  y: 100,
+  font: {
+    size: 32,
+    name: 'MyCustomFont',
+    path: './fonts/custom-font.ttf'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Custom font with family name
+const customWithFamily = await painter.createText({
+  text: 'Custom Font',
+  x: 100,
+  y: 150,
+  font: {
+    size: 32,
+    family: 'CustomFontFamily',
+    name: 'MyCustomFont',
+    path: './fonts/custom-font.otf'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Load custom font from local file
+const customFont = await painter.createText({
+  text: 'Custom Font Text',
+  x: 100,
+  y: 100,
+  font: {
+    size: 32,
+    name: 'MyCustomFont',
+    path: './fonts/custom-font.ttf'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Custom font with family name
+const customWithFamily = await painter.createText({
+  text: 'Custom Font',
+  x: 100,
+  y: 150,
+  font: {
+    size: 32,
+    family: 'CustomFontFamily',
+    name: 'MyCustomFont',
+    path: './fonts/custom-font.otf'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Supported Font Formats">
+Apexify.js supports all common font formats: TTF, OTF, WOFF, WOFF2, and more.
+</Alert>
+
+## Font Size
+
+Control text size using the `size` property in the font object:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Small text
+const small = await painter.createText({
+  text: 'Small (12px)',
+  x: 100,
+  y: 100,
+  font: {
+    size: 12,
+    family: 'Arial'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Medium text
+const medium = await painter.createText({
+  text: 'Medium (24px)',
+  x: 100,
+  y: 150,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Large text
+const large = await painter.createText({
+  text: 'Large (48px)',
+  x: 100,
+  y: 200,
+  font: {
+    size: 48,
+    family: 'Arial'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Small text
+const small = await painter.createText({
+  text: 'Small (12px)',
+  x: 100,
+  y: 100,
+  font: {
+    size: 12,
+    family: 'Arial'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Medium text
+const medium = await painter.createText({
+  text: 'Medium (24px)',
+  x: 100,
+  y: 150,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Large text
+const large = await painter.createText({
+  text: 'Large (48px)',
+  x: 100,
+  y: 200,
+  font: {
+    size: 48,
+    family: 'Arial'
+  },
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Legacy Font Properties
+
+For backward compatibility, you can still use individual font properties:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Using legacy properties
+const legacy = await painter.createText({
+  text: 'Legacy Properties',
+  x: 100,
+  y: 100,
+  fontSize: 24,         // Instead of font.size
+  fontFamily: 'Arial',  // Instead of font.family
+  fontName: 'customFont', // Instead of font.name
+  fontPath: './fonts/custom.ttf', // Instead of font.path
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Using legacy properties
+const legacy = await painter.createText({
+  text: 'Legacy Properties',
+  x: 100,
+  y: 100,
+  fontSize: 24,         // Instead of font.size
+  fontFamily: 'Arial',  // Instead of font.family
+  fontName: 'customFont', // Instead of font.name
+  fontPath: './fonts/custom.ttf', // Instead of font.path
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="warning" title="Property Priority">
+If both `font` object and legacy properties are provided, the `font` object takes priority. Legacy properties are ignored when `font` object is present.
+</Alert>
+
+## Font Styles
+
+Combine font properties with text styles:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Bold text
+const bold = await painter.createText({
+  text: 'Bold Text',
+  x: 100,
+  y: 100,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  bold: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Italic text
+const italic = await painter.createText({
+  text: 'Italic Text',
+  x: 100,
+  y: 150,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  italic: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Bold and italic
+const boldItalic = await painter.createText({
+  text: 'Bold & Italic',
+  x: 100,
+  y: 200,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  bold: true,
+  italic: true,
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Bold text
+const bold = await painter.createText({
+  text: 'Bold Text',
+  x: 100,
+  y: 100,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  bold: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Italic text
+const italic = await painter.createText({
+  text: 'Italic Text',
+  x: 100,
+  y: 150,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  italic: true,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Bold and italic
+const boldItalic = await painter.createText({
+  text: 'Bold & Italic',
+  x: 100,
+  y: 200,
+  font: {
+    size: 24,
+    family: 'Arial'
+  },
+  bold: true,
+  italic: true,
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+const result = await painter.createText([
+  {
+    text: 'System Font (Arial)',
+    x: 100,
+    y: 100,
+    font: {
+      size: 32,
+      family: 'Arial'
+    },
+    color: '#ffffff'
+  },
+  {
+    text: 'Custom Font',
+    x: 100,
+    y: 200,
+    font: {
+      size: 36,
+      name: 'MyCustomFont',
+      path: './fonts/custom.ttf'
+    },
+    color: '#ff6b6b',
+    bold: true
+  },
+  {
+    text: 'Large Bold Text',
+    x: 100,
+    y: 300,
+    font: {
+      size: 48,
+      family: 'Helvetica'
+    },
+    bold: true,
+    color: '#4ecdc4'
+  }
+], canvas.buffer);
+
+fs.writeFileSync('fonts-example.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createFontExample() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  const result = await painter.createText([
+    {
+      text: 'System Font (Arial)',
+      x: 100,
+      y: 100,
+      font: {
+        size: 32,
+        family: 'Arial'
+      },
+      color: '#ffffff'
+    },
+    {
+      text: 'Custom Font',
+      x: 100,
+      y: 200,
+      font: {
+        size: 36,
+        name: 'MyCustomFont',
+        path: './fonts/custom.ttf'
+      },
+      color: '#ff6b6b',
+      bold: true
+    },
+    {
+      text: 'Large Bold Text',
+      x: 100,
+      y: 300,
+      font: {
+        size: 48,
+        family: 'Helvetica'
+      },
+      bold: true,
+      color: '#4ecdc4'
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('fonts-example.png', result);
+}
+
+createFontExample();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Text Decorations](/docs#text-decorations) - Add underline, overline, strikethrough, and highlights
+- [Text Effects](/docs#text-effects) - Apply glow, shadow, and stroke effects
+
+

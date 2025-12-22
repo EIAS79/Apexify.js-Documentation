@@ -1,0 +1,701 @@
+# Advanced Text Features
+
+Apexify.js provides advanced text features including rotation, transformations, and the ability to combine all features for stunning text effects. This guide covers everything you need to create professional text compositions.
+
+## Overview
+
+Advanced features include:
+- **Rotation** - Rotate text in degrees
+- **Combining Features** - Use all features together
+- **Best Practices** - Tips for optimal results
+
+## Text Rotation
+
+Rotate text around its position point:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// No rotation (default)
+const normal = await painter.createText({
+  text: 'Normal Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// 45 degree rotation
+const rotated45 = await painter.createText({
+  text: 'Rotated 45°',
+  x: 200,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  rotation: 45
+}, canvasBuffer);
+
+// 90 degree rotation
+const rotated90 = await painter.createText({
+  text: 'Rotated 90°',
+  x: 300,
+  y: 300,
+  fontSize: 24,
+  color: '#ffffff',
+  rotation: 90
+}, canvasBuffer);
+
+// 180 degree rotation (upside down)
+const rotated180 = await painter.createText({
+  text: 'Upside Down',
+  x: 400,
+  y: 400,
+  fontSize: 24,
+  color: '#ffffff',
+  rotation: 180
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// No rotation (default)
+const normal = await painter.createText({
+  text: 'Normal Text',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// 45 degree rotation
+const rotated45 = await painter.createText({
+  text: 'Rotated 45°',
+  x: 200,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  rotation: 45
+}, canvasBuffer);
+
+// 90 degree rotation
+const rotated90 = await painter.createText({
+  text: 'Rotated 90°',
+  x: 300,
+  y: 300,
+  fontSize: 24,
+  color: '#ffffff',
+  rotation: 90
+}, canvasBuffer);
+
+// 180 degree rotation (upside down)
+const rotated180 = await painter.createText({
+  text: 'Upside Down',
+  x: 400,
+  y: 400,
+  fontSize: 24,
+  color: '#ffffff',
+  rotation: 180
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Rotation Point">
+Text rotates around its `x` and `y` position point. The rotation affects the text, glow, shadow, and stroke together.
+</Alert>
+
+## Combining All Features
+
+Combine multiple features for professional text effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const advanced = await painter.createText({
+  text: 'Advanced Text',
+  x: 600,
+  y: 400,
+  fontSize: 64,
+  // Font
+  font: {
+    size: 64,
+    family: 'Arial'
+  },
+  bold: true,
+  // Color
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 0
+  },
+  // Decorations
+  underline: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff1744' }
+      ]
+    },
+    width: 3
+  },
+  highlight: {
+    color: '#ffd700',
+    opacity: 0.3
+  },
+  // Effects
+  glow: {
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff6b6b' }
+      ]
+    },
+    intensity: 15,
+    opacity: 0.8
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.6)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  },
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffffff' },
+        { stop: 1, color: '#f0f0f0' }
+      ]
+    },
+    width: 3
+  },
+  // Spacing
+  letterSpacing: 2,
+  // Alignment
+  textAlign: 'center',
+  textBaseline: 'middle',
+  // Transformation
+  rotation: 2,
+  opacity: 0.95
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const advanced = await painter.createText({
+  text: 'Advanced Text',
+  x: 600,
+  y: 400,
+  fontSize: 64,
+  // Font
+  font: {
+    size: 64,
+    family: 'Arial'
+  },
+  bold: true,
+  // Color
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 0
+  },
+  // Decorations
+  underline: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff1744' }
+      ]
+    },
+    width: 3
+  },
+  highlight: {
+    color: '#ffd700',
+    opacity: 0.3
+  },
+  // Effects
+  glow: {
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff6b6b' }
+      ]
+    },
+    intensity: 15,
+    opacity: 0.8
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.6)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  },
+  stroke: {
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffffff' },
+        { stop: 1, color: '#f0f0f0' }
+      ]
+    },
+    width: 3
+  },
+  // Spacing
+  letterSpacing: 2,
+  // Alignment
+  textAlign: 'center',
+  textBaseline: 'middle',
+  // Transformation
+  rotation: 2,
+  opacity: 0.95
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Workflow Example
+
+Here's a complete example showing the full workflow from background to final text composition:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// 1. Create background canvas
+const background = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 1, color: '#764ba2' }
+    ],
+    startX: 600,
+    startY: 400,
+    startRadius: 0,
+    endX: 600,
+    endY: 400,
+    endRadius: 600
+  }
+});
+
+// 2. Get the buffer
+const bgBuffer = background.buffer;
+
+// 3. Add image layer (optional)
+const withImage = await painter.createImage({
+  source: './background-pattern.png',
+  x: 0,
+  y: 0,
+  width: 1200,
+  height: 800,
+  opacity: 0.3
+}, bgBuffer);
+
+// 4. Add multiple text elements
+const final = await painter.createText([
+  // Main title
+  {
+    text: 'Apexify.js',
+    x: 600,
+    y: 250,
+    fontSize: 96,
+    font: {
+      family: 'Arial'
+    },
+    bold: true,
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffffff' },
+        { stop: 1, color: '#f0f0f0' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 500,
+      endY: 0
+    },
+    textAlign: 'center',
+    textBaseline: 'middle',
+    glow: {
+      color: '#ffd700',
+      intensity: 20,
+      opacity: 0.9
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.6)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 25
+    },
+    stroke: {
+      color: '#000000',
+      width: 2,
+      opacity: 0.3
+    }
+  },
+  // Subtitle
+  {
+    text: 'The Ultimate Canvas Library',
+    x: 600,
+    y: 350,
+    fontSize: 36,
+    color: '#ffffff',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    shadow: {
+      color: 'rgba(0,0,0,0.5)',
+      offsetX: 5,
+      offsetY: 5,
+      blur: 15
+    }
+  },
+  // Description with wrapping
+  {
+    text: 'Create stunning visuals, generate images on-the-fly, build design tools, and power your applications with professional-grade canvas rendering.',
+    x: 600,
+    y: 450,
+    fontSize: 20,
+    color: '#f0f0f0',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    maxWidth: 800,
+    lineHeight: 1.6,
+    letterSpacing: 0.5
+  },
+  // Footer text
+  {
+    text: 'Made with ❤️ by Jedi Studio',
+    x: 600,
+    y: 700,
+    fontSize: 18,
+    color: '#cccccc',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    italic: true
+  }
+], withImage);
+
+// 5. Save the result
+fs.writeFileSync('complete-text-composition.png', final);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createCompleteComposition() {
+  // 1. Create background canvas
+  const background = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#667eea' },
+        { stop: 1, color: '#764ba2' }
+      ],
+      startX: 600,
+      startY: 400,
+      startRadius: 0,
+      endX: 600,
+      endY: 400,
+      endRadius: 600
+    }
+  });
+
+  // 2. Get the buffer
+  const bgBuffer = background.buffer;
+
+  // 3. Add image layer (optional)
+  const withImage = await painter.createImage({
+    source: './background-pattern.png',
+    x: 0,
+    y: 0,
+    width: 1200,
+    height: 800,
+    opacity: 0.3
+  }, bgBuffer);
+
+  // 4. Add multiple text elements
+  const final = await painter.createText([
+    // Main title
+    {
+      text: 'Apexify.js',
+      x: 600,
+      y: 250,
+      fontSize: 96,
+      font: {
+        family: 'Arial'
+      },
+      bold: true,
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ffffff' },
+          { stop: 1, color: '#f0f0f0' }
+        ],
+        startX: 0,
+        startY: 0,
+        endX: 500,
+        endY: 0
+      },
+      textAlign: 'center',
+      textBaseline: 'middle',
+      glow: {
+        color: '#ffd700',
+        intensity: 20,
+        opacity: 0.9
+      },
+      shadow: {
+        color: 'rgba(0,0,0,0.6)',
+        offsetX: 10,
+        offsetY: 10,
+        blur: 25
+      },
+      stroke: {
+        color: '#000000',
+        width: 2,
+        opacity: 0.3
+      }
+    },
+    // Subtitle
+    {
+      text: 'The Ultimate Canvas Library',
+      x: 600,
+      y: 350,
+      fontSize: 36,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      shadow: {
+        color: 'rgba(0,0,0,0.5)',
+        offsetX: 5,
+        offsetY: 5,
+        blur: 15
+      }
+    },
+    // Description with wrapping
+    {
+      text: 'Create stunning visuals, generate images on-the-fly, build design tools, and power your applications with professional-grade canvas rendering.',
+      x: 600,
+      y: 450,
+      fontSize: 20,
+      color: '#f0f0f0',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      maxWidth: 800,
+      lineHeight: 1.6,
+      letterSpacing: 0.5
+    },
+    // Footer text
+    {
+      text: 'Made with ❤️ by Jedi Studio',
+      x: 600,
+      y: 700,
+      fontSize: 18,
+      color: '#cccccc',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      italic: true
+    }
+  ], withImage);
+
+  // 5. Save the result
+  fs.writeFileSync('complete-text-composition.png', final);
+}
+
+createCompleteComposition();
+```
+</js>
+</CodeSwitcher>
+
+## Best Practices
+
+### Performance Tips
+
+1. **Combine Multiple Text Elements**: Use arrays to add multiple text elements in one call
+2. **Reuse Buffers**: Chain operations efficiently by reusing buffers
+3. **Optimize Effects**: Use effects sparingly for better performance
+
+### Design Tips
+
+1. **Contrast**: Ensure text is readable against backgrounds
+2. **Hierarchy**: Use different font sizes and weights to create visual hierarchy
+3. **Spacing**: Use appropriate line height and letter spacing for readability
+4. **Effects**: Don't overuse effects - sometimes less is more
+
+### Common Patterns
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Pattern 1: Title + Subtitle
+const titleSubtitle = await painter.createText([
+  {
+    text: 'Main Title',
+    x: 600,
+    y: 300,
+    fontSize: 64,
+    bold: true,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    color: '#ffffff'
+  },
+  {
+    text: 'Subtitle Text',
+    x: 600,
+    y: 380,
+    fontSize: 24,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    color: '#cccccc'
+  }
+], canvasBuffer);
+
+// Pattern 2: Watermark
+const watermark = await painter.createText({
+  text: '© 2024 Apexify.js',
+  x: 1100,
+  y: 750,
+  fontSize: 14,
+  color: '#ffffff',
+  textAlign: 'right',
+  textBaseline: 'bottom',
+  opacity: 0.5
+}, canvasBuffer);
+
+// Pattern 3: Call-to-Action Button Text
+const ctaText = await painter.createText({
+  text: 'GET STARTED',
+  x: 600,
+  y: 500,
+  fontSize: 32,
+  bold: true,
+  textAlign: 'center',
+  textBaseline: 'middle',
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 2
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 3,
+    offsetY: 3,
+    blur: 8
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Pattern 1: Title + Subtitle
+const titleSubtitle = await painter.createText([
+  {
+    text: 'Main Title',
+    x: 600,
+    y: 300,
+    fontSize: 64,
+    bold: true,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    color: '#ffffff'
+  },
+  {
+    text: 'Subtitle Text',
+    x: 600,
+    y: 380,
+    fontSize: 24,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    color: '#cccccc'
+  }
+], canvasBuffer);
+
+// Pattern 2: Watermark
+const watermark = await painter.createText({
+  text: '© 2024 Apexify.js',
+  x: 1100,
+  y: 750,
+  fontSize: 14,
+  color: '#ffffff',
+  textAlign: 'right',
+  textBaseline: 'bottom',
+  opacity: 0.5
+}, canvasBuffer);
+
+// Pattern 3: Call-to-Action Button Text
+const ctaText = await painter.createText({
+  text: 'GET STARTED',
+  x: 600,
+  y: 500,
+  fontSize: 32,
+  bold: true,
+  textAlign: 'center',
+  textBaseline: 'middle',
+  color: '#ffffff',
+  stroke: {
+    color: '#000000',
+    width: 2
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 3,
+    offsetY: 3,
+    blur: 8
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Feature Summary
+
+| Feature | Property | Description |
+|---------|----------|-------------|
+| **Font** | `font` | Organized font object (size, family, name, path) |
+| **Bold/Italic** | `bold`, `italic` | Text style modifiers |
+| **Decorations** | `underline`, `overline`, `strikethrough`, `highlight` | Text decorations with gradient support |
+| **Spacing** | `lineHeight`, `letterSpacing`, `wordSpacing` | Control text spacing |
+| **Wrapping** | `maxWidth`, `maxHeight` | Automatic text wrapping |
+| **Alignment** | `textAlign`, `textBaseline` | Horizontal and vertical alignment |
+| **Color** | `color`, `gradient` | Solid colors or gradients |
+| **Opacity** | `opacity` | Text transparency (0-1) |
+| **Glow** | `glow` | Glowing effect with gradient support |
+| **Shadow** | `shadow` | Drop shadow effect |
+| **Stroke** | `stroke` | Text outline with 6 styles |
+| **Rotation** | `rotation` | Rotate text in degrees |
+| **Path** | `path`, `textOnPath` | Render text along curves |
+
+## Next Steps
+
+- [Basic Text Operations](/docs#basic-text-operations) - Review the fundamentals
+- [Font Management](/docs#font-management) - Learn about custom fonts
+- [Text Effects](/docs#text-effects) - Master glow, shadow, and stroke
+
+

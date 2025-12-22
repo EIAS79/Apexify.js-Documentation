@@ -1,0 +1,418 @@
+# Pattern Rendering
+
+Apexify.js provides 12+ built-in patterns and support for custom image patterns. Patterns can be used as canvas backgrounds or standalone overlays with full control over colors, sizing, rotation, and blend modes.
+
+## Overview
+
+Patterns are automatically rendered when used in `createCanvas()` via the `patternBg` property. This guide covers standalone pattern usage and advanced pattern features.
+
+## Built-in Patterns
+
+Apexify.js includes 12 built-in pattern types:
+
+- **grid** - Grid pattern
+- **dots** - Dot pattern
+- **diagonal** - Diagonal lines
+- **stripes** - Horizontal/vertical stripes
+- **waves** - Wave pattern
+- **crosses** - Cross pattern
+- **hexagons** - Hexagonal pattern
+- **checkerboard** - Checkerboard pattern
+- **diamonds** - Diamond pattern
+- **triangles** - Triangle pattern
+- **stars** - Star pattern
+- **polka** - Polka dot pattern
+- **custom** - Custom image pattern
+
+## Basic Pattern Usage
+
+Use patterns as canvas backgrounds:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Grid pattern
+const canvas1 = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#1a1a1a',
+  patternBg: {
+    type: 'grid',
+    color: '#ffffff',
+    opacity: 0.2,
+    size: 20,
+    spacing: 10
+  }
+});
+
+// Dots pattern
+const canvas2 = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ]
+  },
+  patternBg: {
+    type: 'dots',
+    color: '#ffffff',
+    opacity: 0.3,
+    size: 5,
+    spacing: 15
+  }
+});
+
+fs.writeFileSync('pattern-grid.png', canvas1.buffer);
+fs.writeFileSync('pattern-dots.png', canvas2.buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createPatterns() {
+  // Grid pattern
+  const canvas1 = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#1a1a1a',
+    patternBg: {
+      type: 'grid',
+      color: '#ffffff',
+      opacity: 0.2,
+      size: 20,
+      spacing: 10
+    }
+  });
+
+  // Dots pattern
+  const canvas2 = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    gradientBg: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ]
+    },
+    patternBg: {
+      type: 'dots',
+      color: '#ffffff',
+      opacity: 0.3,
+      size: 5,
+      spacing: 15
+    }
+  });
+
+  fs.writeFileSync('pattern-grid.png', canvas1.buffer);
+  fs.writeFileSync('pattern-dots.png', canvas2.buffer);
+}
+
+createPatterns();
+```
+</js>
+</CodeSwitcher>
+
+## Pattern Configuration
+
+<CodeSwitcher>
+<ts>
+```typescript
+patternBg: {
+  type: 'grid',  // Pattern type
+  color: '#ffffff',  // Primary pattern color
+  secondaryColor: '#000000',  // Secondary color (for two-color patterns)
+  opacity: 0.3,  // Pattern opacity (0-1)
+  size: 20,  // Pattern element size in pixels
+  spacing: 10,  // Spacing between elements
+  rotation: 45,  // Rotation angle in degrees
+  offsetX: 0,  // Horizontal offset
+  offsetY: 0,  // Vertical offset
+  blendMode: 'overlay',  // Blend mode
+  gradient: {  // Optional gradient (overrides color)
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ]
+  }
+}
+```
+</ts>
+<js>
+```javascript
+patternBg: {
+  type: 'grid',  // Pattern type
+  color: '#ffffff',  // Primary pattern color
+  secondaryColor: '#000000',  // Secondary color (for two-color patterns)
+  opacity: 0.3,  // Pattern opacity (0-1)
+  size: 20,  // Pattern element size in pixels
+  spacing: 10,  // Spacing between elements
+  rotation: 45,  // Rotation angle in degrees
+  offsetX: 0,  // Horizontal offset
+  offsetY: 0,  // Vertical offset
+  blendMode: 'overlay',  // Blend mode
+  gradient: {  // Optional gradient (overrides color)
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ]
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Custom Image Patterns
+
+Use your own images as repeating patterns:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#ffffff',
+  patternBg: {
+    type: 'custom',
+    customPatternImage: './pattern-tile.png',  // Path or URL to pattern image
+    repeat: 'repeat',  // 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat'
+    scale: 1.0,  // Scale multiplier
+    opacity: 0.5,
+    offsetX: 0,
+    offsetY: 0
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#ffffff',
+  patternBg: {
+    type: 'custom',
+    customPatternImage: './pattern-tile.png',  // Path or URL to pattern image
+    repeat: 'repeat',  // 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat'
+    scale: 1.0,  // Scale multiplier
+    opacity: 0.5,
+    offsetX: 0,
+    offsetY: 0
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Pattern Examples
+
+### Checkerboard Pattern
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  patternBg: {
+    type: 'checkerboard',
+    color: '#000000',
+    secondaryColor: '#ffffff',
+    size: 50,
+    spacing: 0,
+    opacity: 1.0
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  patternBg: {
+    type: 'checkerboard',
+    color: '#000000',
+    secondaryColor: '#ffffff',
+    size: 50,
+    spacing: 0,
+    opacity: 1.0
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Hexagon Pattern
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 1, color: '#764ba2' }
+    ]
+  },
+  patternBg: {
+    type: 'hexagons',
+    color: '#ffffff',
+    opacity: 0.1,
+    size: 30,
+    spacing: 5
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 1, color: '#764ba2' }
+    ]
+  },
+  patternBg: {
+    type: 'hexagons',
+    color: '#ffffff',
+    opacity: 0.1,
+    size: 30,
+    spacing: 5
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Gradient Pattern
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#1a1a1a',
+  patternBg: {
+    type: 'waves',
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 0.5, color: '#4ecdc4' },
+        { stop: 1, color: '#45b7d1' }
+      ]
+    },
+    opacity: 0.4,
+    size: 40,
+    spacing: 20
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#1a1a1a',
+  patternBg: {
+    type: 'waves',
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 0.5, color: '#4ecdc4' },
+        { stop: 1, color: '#45b7d1' }
+      ]
+    },
+    opacity: 0.4,
+    size: 40,
+    spacing: 20
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Blend Modes
+
+Patterns support all canvas blend modes:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Overlay blend mode (default)
+patternBg: {
+  type: 'dots',
+  blendMode: 'overlay'
+}
+
+// Multiply blend mode
+patternBg: {
+  type: 'grid',
+  blendMode: 'multiply'
+}
+
+// Screen blend mode
+patternBg: {
+  type: 'stripes',
+  blendMode: 'screen'
+}
+```
+</ts>
+<js>
+```javascript
+// Overlay blend mode (default)
+patternBg: {
+  type: 'dots',
+  blendMode: 'overlay'
+}
+
+// Multiply blend mode
+patternBg: {
+  type: 'grid',
+  blendMode: 'multiply'
+}
+
+// Screen blend mode
+patternBg: {
+  type: 'stripes',
+  blendMode: 'screen'
+}
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Pattern Tips">
+- Use lower opacity (0.1-0.3) for subtle texture overlays
+- Combine patterns with gradients for dynamic backgrounds
+- Use custom patterns for brand-specific designs
+- Rotate patterns for unique visual effects
+- Adjust spacing to control pattern density
+</Alert>
+
+

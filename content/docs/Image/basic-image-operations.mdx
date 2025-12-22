@@ -1,0 +1,1210 @@
+# Basic Image Operations
+
+The `createImage()` method is the core function for adding images and shapes to your canvas. This guide covers the fundamental operations: loading images, positioning, sizing, and fitting modes.
+
+## Overview
+
+The `createImage()` method accepts either a single `ImageProperties` object or an array of objects, allowing you to add multiple images/shapes in one call:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Single image
+const result = await painter.createImage({
+  source: './path/to/image.png',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200
+}, canvasBuffer);
+
+// Multiple images
+const result = await painter.createImage([
+  { source: './image1.png', x: 50, y: 50, width: 100, height: 100 },
+  { source: './image2.png', x: 200, y: 50, width: 100, height: 100 }
+], canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Single image
+const result = await painter.createImage({
+  source: './path/to/image.png',
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 200
+}, canvasBuffer);
+
+// Multiple images
+const result = await painter.createImage([
+  { source: './image1.png', x: 50, y: 50, width: 100, height: 100 },
+  { source: './image2.png', x: 200, y: 50, width: 100, height: 100 }
+], canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Understanding Canvas Buffers
+
+The `createImage()` method requires a **canvas buffer** as its second parameter. This buffer represents the canvas you're drawing on. Understanding how buffers work is essential for building layered compositions.
+
+### What is a Canvas Buffer?
+
+A canvas buffer is a `Buffer` object that contains the pixel data of your canvas. It's what you get when you create a canvas with `createCanvas()` or when you add images/shapes to an existing canvas.
+
+### Creating a Background Canvas
+
+The most common workflow is to:
+1. Create a background canvas using `createCanvas()`
+2. Get the buffer from that canvas
+3. Add images/shapes on top using `createImage()`
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Step 1: Create a background canvas
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 1, color: '#764ba2' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 1200,
+    endY: 800
+  }
+});
+
+// Step 2: Get the buffer from the canvas
+const canvasBuffer = canvas.buffer;
+
+// Step 3: Add images on top of the background
+const result = await painter.createImage({
+  source: './photo.jpg',
+  x: 200,
+  y: 150,
+  width: 800,
+  height: 500
+}, canvasBuffer);
+
+// Save the final result
+fs.writeFileSync('output.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createComposition() {
+  // Step 1: Create a background canvas
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    gradientBg: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#667eea' },
+        { stop: 1, color: '#764ba2' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 1200,
+      endY: 800
+    }
+  });
+
+  // Step 2: Get the buffer from the canvas
+  const canvasBuffer = canvas.buffer;
+
+  // Step 3: Add images on top of the background
+  const result = await painter.createImage({
+    source: './photo.jpg',
+    x: 200,
+    y: 150,
+    width: 800,
+    height: 500
+  }, canvasBuffer);
+
+  // Save the final result
+  fs.writeFileSync('output.png', result);
+}
+
+createComposition();
+```
+</js>
+</CodeSwitcher>
+
+### Chaining Multiple Layers
+
+You can chain multiple `createImage()` calls to build complex compositions. Each call returns a new buffer that you can use for the next layer:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create background
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#f0f0f0'
+});
+
+// Add first image
+const layer1 = await painter.createImage({
+  source: './background-image.jpg',
+  x: 0,
+  y: 0,
+  width: 1200,
+  height: 800
+}, canvas.buffer);
+
+// Add second image on top
+const layer2 = await painter.createImage({
+  source: './overlay.png',
+  x: 400,
+  y: 200,
+  width: 400,
+  height: 400
+}, layer1);
+
+// Add third image on top
+const final = await painter.createImage({
+  source: './logo.png',
+  x: 50,
+  y: 50,
+  width: 200,
+  height: 100
+}, layer2);
+
+fs.writeFileSync('final-composition.png', final);
+```
+</ts>
+<js>
+```javascript
+// Create background
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#f0f0f0'
+});
+
+// Add first image
+const layer1 = await painter.createImage({
+  source: './background-image.jpg',
+  x: 0,
+  y: 0,
+  width: 1200,
+  height: 800
+}, canvas.buffer);
+
+// Add second image on top
+const layer2 = await painter.createImage({
+  source: './overlay.png',
+  x: 400,
+  y: 200,
+  width: 400,
+  height: 400
+}, layer1);
+
+// Add third image on top
+const final = await painter.createImage({
+  source: './logo.png',
+  x: 50,
+  y: 50,
+  width: 200,
+  height: 100
+}, layer2);
+
+fs.writeFileSync('final-composition.png', final);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Buffer Workflow">
+Each `createImage()` call returns a new `Buffer`. Use this buffer as the input for the next `createImage()` call to build layered compositions.
+</Alert>
+
+### Using Custom Images as Backgrounds
+
+You can use any image (local file or online URL) as a background by loading it and using it as the base canvas:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Method 1: Use a local image as background
+const backgroundImage = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: './my-background.jpg',
+    fit: 'cover'
+  }
+});
+
+// Now add images on top
+const result = await painter.createImage({
+  source: './foreground.png',
+  x: 300,
+  y: 200,
+  width: 600,
+  height: 400
+}, backgroundImage.buffer);
+
+// Method 2: Use an online image as background
+const onlineBackground = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: 'https://example.com/background.jpg',
+    fit: 'cover'
+  }
+});
+
+// Add images on top
+const result2 = await painter.createImage({
+  source: './logo.png',
+  x: 50,
+  y: 50,
+  width: 200,
+  height: 100
+}, onlineBackground.buffer);
+```
+</ts>
+<js>
+```javascript
+// Method 1: Use a local image as background
+const backgroundImage = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: './my-background.jpg',
+    fit: 'cover'
+  }
+});
+
+// Now add images on top
+const result = await painter.createImage({
+  source: './foreground.png',
+  x: 300,
+  y: 200,
+  width: 600,
+  height: 400
+}, backgroundImage.buffer);
+
+// Method 2: Use an online image as background
+const onlineBackground = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: 'https://example.com/background.jpg',
+    fit: 'cover'
+  }
+});
+
+// Add images on top
+const result2 = await painter.createImage({
+  source: './logo.png',
+  x: 50,
+  y: 50,
+  width: 200,
+  height: 100
+}, onlineBackground.buffer);
+```
+</js>
+</CodeSwitcher>
+
+### Converting Images to Buffers for Layering
+
+If you have an existing image file or URL that you want to use as a base, you can load it as a canvas and then draw on it:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Load an existing image and use it as a canvas
+// Option 1: Load local image as background canvas
+const existingImage = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  customBg: {
+    source: './existing-photo.jpg',
+    inherit: true  // Use image's original dimensions
+  }
+});
+
+// Now you can add more images on top
+const withOverlay = await painter.createImage({
+  source: './watermark.png',
+  x: 1600,
+  y: 900,
+  width: 200,
+  height: 100,
+  opacity: 0.7
+}, existingImage.buffer);
+
+// Option 2: Load online image as background
+const onlineImage = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: 'https://images.unsplash.com/photo-1234567890',
+    fit: 'cover'
+  }
+});
+
+// Add text, shapes, or other images on top
+const final = await painter.createImage([
+  {
+    source: 'circle',
+    x: 100,
+    y: 100,
+    width: 150,
+    height: 150,
+    shape: { fill: true, color: '#ff6b6b' }
+  },
+  {
+    source: './logo.png',
+    x: 50,
+    y: 50,
+    width: 200,
+    height: 100
+  }
+], onlineImage.buffer);
+```
+</ts>
+<js>
+```javascript
+// Load an existing image and use it as a canvas
+// Option 1: Load local image as background canvas
+const existingImage = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  customBg: {
+    source: './existing-photo.jpg',
+    inherit: true  // Use image's original dimensions
+  }
+});
+
+// Now you can add more images on top
+const withOverlay = await painter.createImage({
+  source: './watermark.png',
+  x: 1600,
+  y: 900,
+  width: 200,
+  height: 100,
+  opacity: 0.7
+}, existingImage.buffer);
+
+// Option 2: Load online image as background
+const onlineImage = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: 'https://images.unsplash.com/photo-1234567890',
+    fit: 'cover'
+  }
+});
+
+// Add text, shapes, or other images on top
+const final = await painter.createImage([
+  {
+    source: 'circle',
+    x: 100,
+    y: 100,
+    width: 150,
+    height: 150,
+    shape: { fill: true, color: '#ff6b6b' }
+  },
+  {
+    source: './logo.png',
+    x: 50,
+    y: 50,
+    width: 200,
+    height: 100
+  }
+], onlineImage.buffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Background Images">
+You can use any image (local file path or online URL) as a background by setting it as `customBg.source` in `createCanvas()`. Then use the canvas buffer to add more layers on top!
+</Alert>
+
+### Complete Workflow Example
+
+Here's a complete example showing the typical workflow:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// 1. Create a background (gradient, solid color, or image)
+const background = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 600,
+    startY: 400,
+    startRadius: 0,
+    endX: 600,
+    endY: 400,
+    endRadius: 600
+  },
+  borderRadius: 20
+});
+
+// 2. Get the buffer from the background
+const bgBuffer = background.buffer;
+
+// 3. Add multiple images/shapes on top
+const composition = await painter.createImage([
+  // Add a photo
+  {
+    source: './photo.jpg',
+    x: 200,
+    y: 150,
+    width: 400,
+    height: 300,
+    borderRadius: 15,
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  },
+  // Add a shape
+  {
+    source: 'star',
+    x: 700,
+    y: 200,
+    width: 150,
+    height: 150,
+    shape: {
+      fill: true,
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ffd700' },
+          { stop: 1, color: '#ff6b6b' }
+        ]
+      }
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.4)',
+      offsetX: 5,
+      offsetY: 5,
+      blur: 15
+    }
+  },
+  // Add another image
+  {
+    source: './logo.png',
+    x: 50,
+    y: 50,
+    width: 150,
+    height: 75,
+    opacity: 0.9
+  }
+], bgBuffer);
+
+// 4. Save the final result
+fs.writeFileSync('composition.png', composition);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createComposition() {
+  // 1. Create a background (gradient, solid color, or image)
+  const background = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 600,
+      startY: 400,
+      startRadius: 0,
+      endX: 600,
+      endY: 400,
+      endRadius: 600
+    },
+    borderRadius: 20
+  });
+
+  // 2. Get the buffer from the background
+  const bgBuffer = background.buffer;
+
+  // 3. Add multiple images/shapes on top
+  const composition = await painter.createImage([
+    // Add a photo
+    {
+      source: './photo.jpg',
+      x: 200,
+      y: 150,
+      width: 400,
+      height: 300,
+      borderRadius: 15,
+      shadow: {
+        color: 'rgba(0,0,0,0.3)',
+        offsetX: 10,
+        offsetY: 10,
+        blur: 20
+      }
+    },
+    // Add a shape
+    {
+      source: 'star',
+      x: 700,
+      y: 200,
+      width: 150,
+      height: 150,
+      shape: {
+        fill: true,
+        gradient: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ffd700' },
+            { stop: 1, color: '#ff6b6b' }
+          ]
+        }
+      },
+      shadow: {
+        color: 'rgba(0,0,0,0.4)',
+        offsetX: 5,
+        offsetY: 5,
+        blur: 15
+      }
+    },
+    // Add another image
+    {
+      source: './logo.png',
+      x: 50,
+      y: 50,
+      width: 150,
+      height: 75,
+      opacity: 0.9
+    }
+  ], bgBuffer);
+
+  // 4. Save the final result
+  fs.writeFileSync('composition.png', composition);
+}
+
+createComposition();
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="success" title="Key Takeaway">
+**The workflow is simple:**
+1. Create a background with `createCanvas()` → get `canvas.buffer`
+2. Add images/shapes with `createImage()` → returns a new `Buffer`
+3. Use that buffer for the next layer, or save it as your final image
+
+You can use any image (local or online) as a background by setting it as `customBg.source` in `createCanvas()`!
+</Alert>
+
+## Image Sources
+
+You can load images from various sources:
+
+### Local File Paths
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: './assets/photo.jpg',
+  x: 0,
+  y: 0,
+  width: 800,
+  height: 600
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: './assets/photo.jpg',
+  x: 0,
+  y: 0,
+  width: 800,
+  height: 600
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Remote URLs
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: 'https://example.com/image.png',
+  x: 0,
+  y: 0,
+  width: 800,
+  height: 600
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: 'https://example.com/image.png',
+  x: 0,
+  y: 0,
+  width: 800,
+  height: 600
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Buffer Objects
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Using a Buffer from another operation
+const canvas = await painter.createCanvas({ width: 800, height: 600 });
+const imageBuffer = Buffer.from(/* ... */);
+
+const image = await painter.createImage({
+  source: imageBuffer,
+  x: 0,
+  y: 0,
+  width: 400,
+  height: 300
+}, canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+// Using a Buffer from another operation
+const canvas = await painter.createCanvas({ width: 800, height: 600 });
+const imageBuffer = Buffer.from(/* ... */);
+
+const image = await painter.createImage({
+  source: imageBuffer,
+  x: 0,
+  y: 0,
+  width: 400,
+  height: 300
+}, canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Supported Formats">
+Apexify.js supports all common image formats: PNG, JPEG, GIF, WebP, BMP, TIFF, and SVG.
+</Alert>
+
+## Positioning
+
+Images are positioned using `x` and `y` coordinates, which represent the top-left corner of the image:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Position at top-left corner
+const image1 = await painter.createImage({
+  source: './image.png',
+  x: 0,
+  y: 0,
+  width: 200,
+  height: 200
+}, canvasBuffer);
+
+// Position at center (assuming 800x600 canvas)
+const image2 = await painter.createImage({
+  source: './image.png',
+  x: 300,  // (800 - 200) / 2
+  y: 200,  // (600 - 200) / 2
+  width: 200,
+  height: 200
+}, canvasBuffer);
+
+// Position at bottom-right
+const image3 = await painter.createImage({
+  source: './image.png',
+  x: 600,  // 800 - 200
+  y: 400,  // 600 - 200
+  width: 200,
+  height: 200
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Position at top-left corner
+const image1 = await painter.createImage({
+  source: './image.png',
+  x: 0,
+  y: 0,
+  width: 200,
+  height: 200
+}, canvasBuffer);
+
+// Position at center (assuming 800x600 canvas)
+const image2 = await painter.createImage({
+  source: './image.png',
+  x: 300,  // (800 - 200) / 2
+  y: 200,  // (600 - 200) / 2
+  width: 200,
+  height: 200
+}, canvasBuffer);
+
+// Position at bottom-right
+const image3 = await painter.createImage({
+  source: './image.png',
+  x: 600,  // 800 - 200
+  y: 400,  // 600 - 200
+  width: 200,
+  height: 200
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Sizing
+
+### Explicit Width and Height
+
+Specify exact dimensions:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,   // Explicit width
+  height: 300   // Explicit height
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,   // Explicit width
+  height: 300   // Explicit height
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Inherit Original Dimensions
+
+Use the `inherit` property to use the image's original dimensions:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  inherit: true  // Uses original image dimensions
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  inherit: true  // Uses original image dimensions
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Partial Inheritance
+
+You can inherit only width or height:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Inherit width, specify height
+const image1 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  inherit: true,
+  height: 300  // Override height only
+}, canvasBuffer);
+
+// Specify width, inherit height
+const image2 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  inherit: true  // Height will be inherited
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Inherit width, specify height
+const image1 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  inherit: true,
+  height: 300  // Override height only
+}, canvasBuffer);
+
+// Specify width, inherit height
+const image2 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  inherit: true  // Height will be inherited
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Fitting Modes
+
+The `fit` property controls how the image is scaled to fit within the specified dimensions:
+
+### Fill (Default)
+
+Stretches the image to fill the entire area, potentially distorting aspect ratio:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'fill'  // Default - stretches to fill
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'fill'  // Default - stretches to fill
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Contain
+
+Scales the image to fit entirely within the area while maintaining aspect ratio:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'contain'  // Fits entire image, may have empty space
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'contain'  // Fits entire image, may have empty space
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Cover
+
+Scales the image to cover the entire area while maintaining aspect ratio (may crop):
+
+<CodeSwitcher>
+<ts>
+```typescript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'cover'  // Covers entire area, may crop edges
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const image = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'cover'  // Covers entire area, may crop edges
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Alignment
+
+The `align` property controls how the image is positioned within its bounding box when using `contain` or `cover`:
+
+### Available Alignments
+
+- `'center'` - Center aligned (default)
+- `'top'` - Top aligned
+- `'bottom'` - Bottom aligned
+- `'left'` - Left aligned
+- `'right'` - Right aligned
+- `'top-left'` - Top-left corner
+- `'top-right'` - Top-right corner
+- `'bottom-left'` - Bottom-left corner
+- `'bottom-right'` - Bottom-right corner
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Center aligned (default)
+const image1 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'contain',
+  align: 'center'
+}, canvasBuffer);
+
+// Top-left aligned
+const image2 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'contain',
+  align: 'top-left'
+}, canvasBuffer);
+
+// Bottom-right aligned
+const image3 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'cover',
+  align: 'bottom-right'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Center aligned (default)
+const image1 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'contain',
+  align: 'center'
+}, canvasBuffer);
+
+// Top-left aligned
+const image2 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'contain',
+  align: 'top-left'
+}, canvasBuffer);
+
+// Bottom-right aligned
+const image3 = await painter.createImage({
+  source: './image.png',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  fit: 'cover',
+  align: 'bottom-right'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+Here's a complete example combining all basic operations:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create canvas
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#f0f0f0'
+});
+
+// Add multiple images with different configurations
+const result = await painter.createImage([
+  // Local file, explicit size, fill mode
+  {
+    source: './assets/photo1.jpg',
+    x: 50,
+    y: 50,
+    width: 300,
+    height: 200,
+    fit: 'cover',
+    align: 'center'
+  },
+  // Remote URL, inherit dimensions
+  {
+    source: 'https://example.com/image.png',
+    x: 400,
+    y: 50,
+    inherit: true
+  },
+  // Buffer source, contain mode
+  {
+    source: someImageBuffer,
+    x: 700,
+    y: 50,
+    width: 400,
+    height: 300,
+    fit: 'contain',
+    align: 'top-right'
+  }
+], canvas.buffer);
+
+fs.writeFileSync('output.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createImage() {
+  // Create canvas
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#f0f0f0'
+  });
+
+  // Add multiple images with different configurations
+  const result = await painter.createImage([
+    // Local file, explicit size, fill mode
+    {
+      source: './assets/photo1.jpg',
+      x: 50,
+      y: 50,
+      width: 300,
+      height: 200,
+      fit: 'cover',
+      align: 'center'
+    },
+    // Remote URL, inherit dimensions
+    {
+      source: 'https://example.com/image.png',
+      x: 400,
+      y: 50,
+      inherit: true
+    },
+    // Buffer source, contain mode
+    {
+      source: someImageBuffer,
+      x: 700,
+      y: 50,
+      width: 400,
+      height: 300,
+      fit: 'contain',
+      align: 'top-right'
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('output.png', result);
+}
+
+createImage();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+Now that you understand basic image operations, explore:
+
+- [Shapes](/docs#shapes) - Create geometric shapes instead of loading images
+- [Image Filters](/docs#image-filters) - Apply professional filters to images
+- [Advanced Features](/docs#advanced-image-features) - Add shadows, strokes, rotation, and more
+

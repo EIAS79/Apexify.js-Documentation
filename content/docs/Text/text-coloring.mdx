@@ -1,0 +1,670 @@
+# Text Coloring
+
+Apexify.js provides powerful text coloring options including solid colors, gradients, and opacity control. Create vibrant, eye-catching text with gradient fills and transparency effects.
+
+## Overview
+
+Text coloring features include:
+- **Solid Colors** - Hex, RGB, RGBA, HSL, and named colors
+- **Gradient Fills** - Linear and radial gradients
+- **Opacity** - Control text transparency (0-1)
+
+## Solid Colors
+
+Use various color formats for text:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Hex color
+const hex = await painter.createText({
+  text: 'Hex Color',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ff6b6b'
+}, canvasBuffer);
+
+// RGB color
+const rgb = await painter.createText({
+  text: 'RGB Color',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  color: 'rgb(255, 107, 107)'
+}, canvasBuffer);
+
+// RGBA color (with transparency)
+const rgba = await painter.createText({
+  text: 'RGBA Color',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: 'rgba(255, 107, 107, 0.7)'
+}, canvasBuffer);
+
+// HSL color
+const hsl = await painter.createText({
+  text: 'HSL Color',
+  x: 100,
+  y: 250,
+  fontSize: 24,
+  color: 'hsl(0, 100%, 71%)'
+}, canvasBuffer);
+
+// Named color
+const named = await painter.createText({
+  text: 'Named Color',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  color: 'white'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Hex color
+const hex = await painter.createText({
+  text: 'Hex Color',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ff6b6b'
+}, canvasBuffer);
+
+// RGB color
+const rgb = await painter.createText({
+  text: 'RGB Color',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  color: 'rgb(255, 107, 107)'
+}, canvasBuffer);
+
+// RGBA color (with transparency)
+const rgba = await painter.createText({
+  text: 'RGBA Color',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: 'rgba(255, 107, 107, 0.7)'
+}, canvasBuffer);
+
+// HSL color
+const hsl = await painter.createText({
+  text: 'HSL Color',
+  x: 100,
+  y: 250,
+  fontSize: 24,
+  color: 'hsl(0, 100%, 71%)'
+}, canvasBuffer);
+
+// Named color
+const named = await painter.createText({
+  text: 'Named Color',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  color: 'white'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Gradient Fills
+
+Create stunning gradient text effects with linear or radial gradients:
+
+### Linear Gradients
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Horizontal linear gradient
+const horizontal = await painter.createText({
+  text: 'Horizontal Gradient',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 0
+  }
+}, canvasBuffer);
+
+// Vertical linear gradient
+const vertical = await painter.createText({
+  text: 'Vertical\nGradient',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ffd700' },
+      { stop: 1, color: '#ff1744' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 100
+  }
+}, canvasBuffer);
+
+// Diagonal linear gradient
+const diagonal = await painter.createText({
+  text: 'Diagonal Gradient',
+  x: 100,
+  y: 350,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 0.5, color: '#764ba2' },
+      { stop: 1, color: '#f093fb' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 100
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Horizontal linear gradient
+const horizontal = await painter.createText({
+  text: 'Horizontal Gradient',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 0
+  }
+}, canvasBuffer);
+
+// Vertical linear gradient
+const vertical = await painter.createText({
+  text: 'Vertical\nGradient',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ffd700' },
+      { stop: 1, color: '#ff1744' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 0,
+    endY: 100
+  }
+}, canvasBuffer);
+
+// Diagonal linear gradient
+const diagonal = await painter.createText({
+  text: 'Diagonal Gradient',
+  x: 100,
+  y: 350,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 0.5, color: '#764ba2' },
+      { stop: 1, color: '#f093fb' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 100
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Radial Gradients
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Center-based radial gradient
+const radial = await painter.createText({
+  text: 'Radial Gradient',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  gradient: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#ffd700' },
+      { stop: 1, color: '#ff1744' }
+    ],
+    startX: 200,
+    startY: 25,
+    startRadius: 0,
+    endX: 200,
+    endY: 25,
+    endRadius: 100
+  }
+}, canvasBuffer);
+
+// Offset radial gradient
+const offsetRadial = await painter.createText({
+  text: 'Offset Radial',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  gradient: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 50,
+    startY: 25,
+    startRadius: 0,
+    endX: 200,
+    endY: 25,
+    endRadius: 150
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Center-based radial gradient
+const radial = await painter.createText({
+  text: 'Radial Gradient',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  gradient: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#ffd700' },
+      { stop: 1, color: '#ff1744' }
+    ],
+    startX: 200,
+    startY: 25,
+    startRadius: 0,
+    endX: 200,
+    endY: 25,
+    endRadius: 100
+  }
+}, canvasBuffer);
+
+// Offset radial gradient
+const offsetRadial = await painter.createText({
+  text: 'Offset Radial',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  gradient: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 50,
+    startY: 25,
+    startRadius: 0,
+    endX: 200,
+    endY: 25,
+    endRadius: 150
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Multiple Color Stops
+
+Create complex gradients with multiple color stops:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const rainbow = await painter.createText({
+  text: 'Rainbow Gradient',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff0000' },    // Red
+      { stop: 0.17, color: '#ff7f00' }, // Orange
+      { stop: 0.33, color: '#ffff00' },  // Yellow
+      { stop: 0.5, color: '#00ff00' },   // Green
+      { stop: 0.67, color: '#0000ff' },  // Blue
+      { stop: 0.83, color: '#4b0082' },   // Indigo
+      { stop: 1, color: '#9400d3' }      // Violet
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 0
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const rainbow = await painter.createText({
+  text: 'Rainbow Gradient',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ff0000' },    // Red
+      { stop: 0.17, color: '#ff7f00' }, // Orange
+      { stop: 0.33, color: '#ffff00' },  // Yellow
+      { stop: 0.5, color: '#00ff00' },   // Green
+      { stop: 0.67, color: '#0000ff' },  // Blue
+      { stop: 0.83, color: '#4b0082' },   // Indigo
+      { stop: 1, color: '#9400d3' }      // Violet
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 400,
+    endY: 0
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Opacity
+
+Control text transparency:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Fully opaque (default)
+const opaque = await painter.createText({
+  text: 'Fully Opaque',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff',
+  opacity: 1.0
+}, canvasBuffer);
+
+// Semi-transparent
+const semiTransparent = await painter.createText({
+  text: 'Semi-Transparent',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  color: '#ffffff',
+  opacity: 0.7
+}, canvasBuffer);
+
+// Very transparent
+const transparent = await painter.createText({
+  text: 'Very Transparent',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  opacity: 0.3
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Fully opaque (default)
+const opaque = await painter.createText({
+  text: 'Fully Opaque',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff',
+  opacity: 1.0
+}, canvasBuffer);
+
+// Semi-transparent
+const semiTransparent = await painter.createText({
+  text: 'Semi-Transparent',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  color: '#ffffff',
+  opacity: 0.7
+}, canvasBuffer);
+
+// Very transparent
+const transparent = await painter.createText({
+  text: 'Very Transparent',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: '#ffffff',
+  opacity: 0.3
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Combining Color and Opacity
+
+Combine gradients with opacity for subtle effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const subtleGradient = await painter.createText({
+  text: 'Subtle Gradient',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ffffff' },
+      { stop: 1, color: '#cccccc' }
+    ]
+  },
+  opacity: 0.8
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const subtleGradient = await painter.createText({
+  text: 'Subtle Gradient',
+  x: 100,
+  y: 100,
+  fontSize: 48,
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#ffffff' },
+      { stop: 1, color: '#cccccc' }
+    ]
+  },
+  opacity: 0.8
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+const result = await painter.createText([
+  {
+    text: 'Solid Color',
+    x: 100,
+    y: 100,
+    fontSize: 32,
+    color: '#ff6b6b'
+  },
+  {
+    text: 'Linear Gradient',
+    x: 100,
+    y: 200,
+    fontSize: 48,
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 400,
+      endY: 0
+    }
+  },
+  {
+    text: 'Radial Gradient',
+    x: 100,
+    y: 300,
+    fontSize: 48,
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ffd700' },
+        { stop: 1, color: '#ff1744' }
+      ],
+      startX: 200,
+      startY: 25,
+      startRadius: 0,
+      endX: 200,
+      endY: 25,
+      endRadius: 100
+    }
+  },
+  {
+    text: 'Transparent Text',
+    x: 100,
+    y: 400,
+    fontSize: 32,
+    color: '#ffffff',
+    opacity: 0.5
+  }
+], canvas.buffer);
+
+fs.writeFileSync('text-coloring.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createColoringExample() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  const result = await painter.createText([
+    {
+      text: 'Solid Color',
+      x: 100,
+      y: 100,
+      fontSize: 32,
+      color: '#ff6b6b'
+    },
+    {
+      text: 'Linear Gradient',
+      x: 100,
+      y: 200,
+      fontSize: 48,
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ],
+        startX: 0,
+        startY: 0,
+        endX: 400,
+        endY: 0
+      }
+    },
+    {
+      text: 'Radial Gradient',
+      x: 100,
+      y: 300,
+      fontSize: 48,
+      gradient: {
+        type: 'radial',
+        colors: [
+          { stop: 0, color: '#ffd700' },
+          { stop: 1, color: '#ff1744' }
+        ],
+        startX: 200,
+        startY: 25,
+        startRadius: 0,
+        endX: 200,
+        endY: 25,
+        endRadius: 100
+      }
+    },
+    {
+      text: 'Transparent Text',
+      x: 100,
+      y: 400,
+      fontSize: 32,
+      color: '#ffffff',
+      opacity: 0.5
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('text-coloring.png', result);
+}
+
+createColoringExample();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Text Effects](/docs#text-effects) - Add glow, shadow, and stroke effects
+- [Advanced Features](/docs#advanced-text-features) - Combine all features together
+
+

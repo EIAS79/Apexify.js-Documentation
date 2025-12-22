@@ -1,0 +1,782 @@
+# ApexPainter Overview
+
+ApexPainter is the main class of Apexify.js, providing a comprehensive API for canvas rendering, image processing, text rendering, chart generation, and more.
+
+## Overview
+
+`ApexPainter` is a powerful, all-in-one canvas rendering library that works in Node.js, Next.js, Discord bots, and beyond. It provides professional-grade features for creating stunning visuals programmatically.
+
+## Initialization
+
+Create an instance of ApexPainter:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+// Basic initialization
+const painter = new ApexPainter();
+
+// With output format
+const painter = new ApexPainter({ type: 'buffer' });
+// Options: 'buffer', 'base64', 'url', 'dataURL', 'blob', 'arraybuffer'
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+// Basic initialization
+const painter = new ApexPainter();
+
+// With output format
+const painter = new ApexPainter({ type: 'buffer' });
+// Options: 'buffer', 'base64', 'url', 'dataURL', 'blob', 'arraybuffer'
+```
+</js>
+</CodeSwitcher>
+
+## Core Methods
+
+### Canvas Creation
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create a canvas with background
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#ffffff'
+  // or gradientBg, customBg, videoBg
+});
+
+// Returns: { buffer: Buffer, canvas: CanvasConfig }
+```
+</ts>
+<js>
+```javascript
+// Create a canvas with background
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#ffffff'
+  // or gradientBg, customBg, videoBg
+});
+
+// Returns: { buffer: Buffer, canvas: CanvasConfig }
+```
+</js>
+</CodeSwitcher>
+
+### Image/Shape Drawing
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Draw images or shapes on canvas
+const result = await painter.createImage({
+  source: 'rectangle',  // or image path/URL
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 150,
+  shape: { fill: true, color: '#ff6b6b' }
+}, canvas.buffer);
+
+// Returns: Buffer
+```
+</ts>
+<js>
+```javascript
+// Draw images or shapes on canvas
+const result = await painter.createImage({
+  source: 'rectangle',  // or image path/URL
+  x: 100,
+  y: 100,
+  width: 200,
+  height: 150,
+  shape: { fill: true, color: '#ff6b6b' }
+}, canvas.buffer);
+
+// Returns: Buffer
+```
+</js>
+</CodeSwitcher>
+
+### Text Rendering
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Add text to canvas
+const result = await painter.createText({
+  text: 'Hello, World!',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvas.buffer);
+
+// Returns: Buffer
+```
+</ts>
+<js>
+```javascript
+// Add text to canvas
+const result = await painter.createText({
+  text: 'Hello, World!',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvas.buffer);
+
+// Returns: Buffer
+```
+</js>
+</CodeSwitcher>
+
+### Custom Lines
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Draw custom lines
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 100 },
+  endCoordinates: { x: 500, y: 300 },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  }
+}, canvas.buffer);
+
+// Returns: Buffer
+```
+</ts>
+<js>
+```javascript
+// Draw custom lines
+const result = await painter.createCustom({
+  startCoordinates: { x: 100, y: 100 },
+  endCoordinates: { x: 500, y: 300 },
+  lineStyle: {
+    width: 3,
+    color: '#ff6b6b'
+  }
+}, canvas.buffer);
+
+// Returns: Buffer
+```
+</js>
+</CodeSwitcher>
+
+### Chart Generation
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create charts
+const chart = await painter.createChart(chartData, {
+  chartType: 'bar',    // 'bar' | 'pie' | 'line'
+  chartNumber: 1
+});
+
+// Returns: Buffer
+```
+</ts>
+<js>
+```javascript
+// Create charts
+const chart = await painter.createChart(chartData, {
+  chartType: 'bar',    // 'bar' | 'pie' | 'line'
+  chartNumber: 1
+});
+
+// Returns: Buffer
+```
+</js>
+</CodeSwitcher>
+
+### Video Processing (25+ Features)
+
+Apexify.js provides comprehensive video processing with 25+ features through the `createVideo()` method:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Get video information
+const info = await painter.createVideo({
+  source: './video.mp4',
+  getInfo: true
+});
+
+// Extract frame
+const frame = await painter.createVideo({
+  source: './video.mp4',
+  extractFrame: { time: 5.5 }
+});
+
+// Convert format
+const converted = await painter.createVideo({
+  source: './video.mp4',
+  convert: {
+    outputPath: './output.webm',
+    format: 'webm',
+    quality: 'high'
+  }
+});
+
+// Apply effects
+const filtered = await painter.createVideo({
+  source: './video.mp4',
+  applyEffects: {
+    filters: [
+      { type: 'blur', intensity: 5 },
+      { type: 'brightness', value: 20 }
+    ],
+    outputPath: './filtered.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Get video information
+const info = await painter.createVideo({
+  source: './video.mp4',
+  getInfo: true
+});
+
+// Extract frame
+const frame = await painter.createVideo({
+  source: './video.mp4',
+  extractFrame: { time: 5.5 }
+});
+
+// Convert format
+const converted = await painter.createVideo({
+  source: './video.mp4',
+  convert: {
+    outputPath: './output.webm',
+    format: 'webm',
+    quality: 'high'
+  }
+});
+
+// Apply effects
+const filtered = await painter.createVideo({
+  source: './video.mp4',
+  applyEffects: {
+    filters: [
+      { type: 'blur', intensity: 5 },
+      { type: 'brightness', value: 20 }
+    ],
+    outputPath: './filtered.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="25+ Video Features">
+Video processing includes: frame extraction, format conversion, trimming, cropping, rotation, effects, filters, merging, stabilization, color correction, picture-in-picture, split-screen, time-lapse, audio processing, and more. See [Video Processing Documentation](/docs#video-processing) for complete details.
+</Alert>
+
+## Utility Methods
+
+### Image Processing
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Resize images
+const resized = await painter.resize({
+  imagePath: './image.jpg',
+  size: { width: 800, height: 600 }
+});
+
+// Convert formats
+const converted = await painter.imgConverter('./image.jpg', 'png');
+
+// Apply filters
+const filtered = await painter.effects('./image.jpg', [
+  { type: 'gaussianBlur', radius: 5 }
+]);
+
+// Color filters
+const colored = await painter.colorsFilter('./image.jpg', '#ff6b6b', 0.5);
+```
+</ts>
+<js>
+```javascript
+// Resize images
+const resized = await painter.resize({
+  imagePath: './image.jpg',
+  size: { width: 800, height: 600 }
+});
+
+// Convert formats
+const converted = await painter.imgConverter('./image.jpg', 'png');
+
+// Apply filters
+const filtered = await painter.effects('./image.jpg', [
+  { type: 'gaussianBlur', radius: 5 }
+]);
+
+// Color filters
+const colored = await painter.colorsFilter('./image.jpg', '#ff6b6b', 0.5);
+```
+</js>
+</CodeSwitcher>
+
+### Advanced Operations
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Batch operations (parallel)
+const results = await painter.batch([
+  { type: 'image', config: { /* ... */ } },
+  { type: 'text', config: { /* ... */ } }
+]);
+
+// Chain operations (sequential)
+const result = await painter.chain([
+  { type: 'image', config: { /* ... */ } },
+  { type: 'text', config: { /* ... */ } }
+]);
+
+// Stitch images
+const stitched = await painter.stitchImages([
+  './image1.jpg',
+  './image2.jpg'
+]);
+
+// Create collage
+const collage = await painter.createCollage([
+  { source: './img1.jpg' },
+  { source: './img2.jpg' }
+], { layout: 'grid' });
+
+// Compress images
+const compressed = await painter.compress('./image.jpg', {
+  quality: 80,
+  format: 'webp'
+});
+
+// Extract color palette
+const palette = await painter.extractPalette('./image.jpg');
+```
+</ts>
+<js>
+```javascript
+// Batch operations (parallel)
+const results = await painter.batch([
+  { type: 'image', config: { /* ... */ } },
+  { type: 'text', config: { /* ... */ } }
+]);
+
+// Chain operations (sequential)
+const result = await painter.chain([
+  { type: 'image', config: { /* ... */ } },
+  { type: 'text', config: { /* ... */ } }
+]);
+
+// Stitch images
+const stitched = await painter.stitchImages([
+  './image1.jpg',
+  './image2.jpg'
+]);
+
+// Create collage
+const collage = await painter.createCollage([
+  { source: './img1.jpg' },
+  { source: './img2.jpg' }
+], { layout: 'grid' });
+
+// Compress images
+const compressed = await painter.compress('./image.jpg', {
+  quality: 80,
+  format: 'webp'
+});
+
+// Extract color palette
+const palette = await painter.extractPalette('./image.jpg');
+```
+</js>
+</CodeSwitcher>
+
+### File Operations
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Save buffer to file
+const saveResult = await painter.save(buffer, {
+  directory: './output',
+  filename: 'my-image',
+  format: 'png',
+  quality: 90
+});
+
+// Save multiple buffers
+const results = await painter.saveMultiple([buffer1, buffer2], {
+  prefix: 'batch-',
+  naming: 'counter'
+});
+```
+</ts>
+<js>
+```javascript
+// Save buffer to file
+const saveResult = await painter.save(buffer, {
+  directory: './output',
+  filename: 'my-image',
+  format: 'png',
+  quality: 90
+});
+
+// Save multiple buffers
+const results = await painter.saveMultiple([buffer1, buffer2], {
+  prefix: 'batch-',
+  naming: 'counter'
+});
+```
+</js>
+</CodeSwitcher>
+
+## Complete Workflow Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// 1. Create background
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 1, color: '#764ba2' }
+    ]
+  }
+});
+
+// 2. Add shapes
+const withShapes = await painter.createImage([
+  {
+    source: 'circle',
+    x: 200,
+    y: 200,
+    width: 150,
+    height: 150,
+    shape: {
+      fill: true,
+      gradient: {
+        type: 'radial',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#ff1744' }
+        ]
+      }
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.5)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  },
+  {
+    source: 'star',
+    x: 500,
+    y: 300,
+    width: 200,
+    height: 200,
+    shape: {
+      fill: true,
+      color: '#ffd700'
+    }
+  }
+], canvas.buffer);
+
+// 3. Add text
+const withText = await painter.createText([
+  {
+    text: 'Apexify.js',
+    x: 600,
+    y: 400,
+    fontSize: 64,
+    bold: true,
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#ffffff' },
+        { stop: 1, color: '#f0f0f0' }
+      ]
+    },
+    textAlign: 'center',
+    textBaseline: 'middle',
+    glow: {
+      color: '#ffd700',
+      intensity: 20,
+      opacity: 0.9
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.6)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 25
+    }
+  }
+], withShapes);
+
+// 4. Add custom lines
+const withLines = await painter.createCustom([
+  {
+    startCoordinates: { x: 100, y: 600 },
+    endCoordinates: { x: 1100, y: 600 },
+    lineStyle: {
+      width: 4,
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ff6b6b' },
+          { stop: 1, color: '#4ecdc4' }
+        ]
+      }
+    },
+    arrow: {
+      end: true,
+      size: 15,
+      style: 'filled'
+    }
+  }
+], withText);
+
+// 5. Save the result
+const saveResult = await painter.save(withLines, {
+  directory: './output',
+  filename: 'complete-composition',
+  format: 'png'
+});
+
+console.log(`Saved to: ${saveResult.path}`);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createCompleteComposition() {
+  // 1. Create background
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#667eea' },
+        { stop: 1, color: '#764ba2' }
+      ]
+    }
+  });
+
+  // 2. Add shapes
+  const withShapes = await painter.createImage([
+    {
+      source: 'circle',
+      x: 200,
+      y: 200,
+      width: 150,
+      height: 150,
+      shape: {
+        fill: true,
+        gradient: {
+          type: 'radial',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#ff1744' }
+          ]
+        }
+      },
+      shadow: {
+        color: 'rgba(0,0,0,0.5)',
+        offsetX: 10,
+        offsetY: 10,
+        blur: 20
+      }
+    },
+    {
+      source: 'star',
+      x: 500,
+      y: 300,
+      width: 200,
+      height: 200,
+      shape: {
+        fill: true,
+        color: '#ffd700'
+      }
+    }
+  ], canvas.buffer);
+
+  // 3. Add text
+  const withText = await painter.createText([
+    {
+      text: 'Apexify.js',
+      x: 600,
+      y: 400,
+      fontSize: 64,
+      bold: true,
+      gradient: {
+        type: 'linear',
+        colors: [
+          { stop: 0, color: '#ffffff' },
+          { stop: 1, color: '#f0f0f0' }
+        ]
+      },
+      textAlign: 'center',
+      textBaseline: 'middle',
+      glow: {
+        color: '#ffd700',
+        intensity: 20,
+        opacity: 0.9
+      },
+      shadow: {
+        color: 'rgba(0,0,0,0.6)',
+        offsetX: 10,
+        offsetY: 10,
+        blur: 25
+      }
+    }
+  ], withShapes);
+
+  // 4. Add custom lines
+  const withLines = await painter.createCustom([
+    {
+      startCoordinates: { x: 100, y: 600 },
+      endCoordinates: { x: 1100, y: 600 },
+      lineStyle: {
+        width: 4,
+        gradient: {
+          type: 'linear',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ]
+        }
+      },
+      arrow: {
+        end: true,
+        size: 15,
+        style: 'filled'
+      }
+    }
+  ], withText);
+
+  // 5. Save the result
+  const saveResult = await painter.save(withLines, {
+    directory: './output',
+    filename: 'complete-composition',
+    format: 'png'
+  });
+
+  console.log(`Saved to: ${saveResult.path}`);
+}
+
+createCompleteComposition();
+```
+</js>
+</CodeSwitcher>
+
+## Method Categories
+
+### Canvas & Background
+- `createCanvas()` - Create canvas with backgrounds
+
+### Drawing
+- `createImage()` - Draw images and shapes
+- `createText()` - Render text with advanced styling
+- `createCustom()` - Draw custom lines with arrows and markers
+
+### Charts
+- `createChart()` - Generate bar, pie, and line charts
+
+### Image Processing
+- `resize()` - Resize images
+- `imgConverter()` - Convert image formats
+- `effects()` - Apply filters
+- `colorsFilter()` - Apply color filters
+- `colorAnalysis()` - Analyze colors
+- `colorsRemover()` - Remove specific colors
+- `removeBackground()` - Remove backgrounds
+- `masking()` - Apply masks
+- `gradientBlend()` - Apply gradient blends
+- `cropImage()` - Crop images
+
+### Advanced Operations
+- `batch()` - Parallel operations
+- `chain()` - Sequential operations
+- `stitchImages()` - Stitch images together
+- `createCollage()` - Create image collages
+- `compress()` - Compress images
+- `extractPalette()` - Extract color palettes
+- `blend()` - Blend multiple images
+
+### Animation
+- `createGIF()` - Create animated GIFs
+- `animate()` - Create frame-based animations
+- `createVideo()` - Comprehensive video processing (25+ features)
+- `getVideoInfo()` - Get video metadata
+- `extractFrameAtTime()` - Extract frame at specific time
+- `extractFrameByNumber()` - Extract frame by frame number
+- `extractMultipleFrames()` - Extract frames at multiple timestamps
+- `extractFrames()` - Extract frames at intervals
+- `extractAllFrames()` - Extract all frames from video
+
+### File Operations
+- `save()` - Save buffers to files
+- `saveMultiple()` - Save multiple buffers
+- `outPut()` - Convert to different formats
+
+## Type Safety
+
+Apexify.js is built with TypeScript and provides comprehensive type definitions for all methods and options.
+
+## Performance
+
+- Built on native Node.js modules (`@napi-rs/canvas`)
+- Optimized for server-side rendering
+- Supports batch and parallel operations
+- Efficient memory management
+
+## Platform Support
+
+✅ **Node.js** (v16+)  
+✅ **Next.js** (App Router & Pages Router)  
+✅ **Discord.js**  
+✅ **Express.js**  
+✅ **Serverless** (AWS Lambda, Vercel, Netlify)  
+✅ **Docker**  
+✅ **Edge Runtime** (with limitations)
+
+## Next Steps
+
+- [Background Documentation](/docs#solid-backgrounds) - Learn about canvas backgrounds
+- [Image Documentation](/docs#basic-image-operations) - Learn about image operations
+- [Text Documentation](/docs#basic-text-operations) - Learn about text rendering
+- [Charts Documentation](/docs#bar-charts) - Learn about chart generation
+- [Custom Lines Documentation](/docs#basic-custom-lines) - Learn about custom line drawing
+

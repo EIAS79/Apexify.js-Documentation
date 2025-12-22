@@ -1,0 +1,843 @@
+# Basic Text Operations
+
+The `createText()` method allows you to add text to your canvas with comprehensive styling options. This guide covers the fundamental operations: adding text, positioning, and understanding canvas buffers.
+
+## Overview
+
+The `createText()` method accepts either a single `TextProperties` object or an array of objects, allowing you to add multiple text elements in one call:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Single text element
+const result = await painter.createText({
+  text: 'Hello, World!',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Multiple text elements
+const result = await painter.createText([
+  {
+    text: 'Title',
+    x: 100,
+    y: 50,
+    fontSize: 32,
+    bold: true,
+    color: '#ffffff'
+  },
+  {
+    text: 'Subtitle',
+    x: 100,
+    y: 100,
+    fontSize: 18,
+    color: '#cccccc'
+  }
+], canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Single text element
+const result = await painter.createText({
+  text: 'Hello, World!',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Multiple text elements
+const result = await painter.createText([
+  {
+    text: 'Title',
+    x: 100,
+    y: 50,
+    fontSize: 32,
+    bold: true,
+    color: '#ffffff'
+  },
+  {
+    text: 'Subtitle',
+    x: 100,
+    y: 100,
+    fontSize: 18,
+    color: '#cccccc'
+  }
+], canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Understanding Canvas Buffers
+
+The `createText()` method requires a **canvas buffer** as its second parameter. This buffer represents the canvas you're drawing on. Understanding how buffers work is essential for building layered compositions with text.
+
+### What is a Canvas Buffer?
+
+A canvas buffer is a `Buffer` object that contains the pixel data of your canvas. It's what you get when you create a canvas with `createCanvas()` or when you add images/shapes/text to an existing canvas.
+
+### Creating a Background Canvas
+
+The most common workflow is to:
+1. Create a background canvas using `createCanvas()`
+2. Get the buffer from that canvas
+3. Add text on top using `createText()`
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Step 1: Create a background canvas
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#667eea' },
+      { stop: 1, color: '#764ba2' }
+    ],
+    startX: 0,
+    startY: 0,
+    endX: 1200,
+    endY: 800
+  }
+});
+
+// Step 2: Get the buffer from the canvas
+const canvasBuffer = canvas.buffer;
+
+// Step 3: Add text on top of the background
+const result = await painter.createText({
+  text: 'Welcome to Apexify.js',
+  x: 600,
+  y: 400,
+  fontSize: 48,
+  bold: true,
+  color: '#ffffff',
+  textAlign: 'center'
+}, canvasBuffer);
+
+// Save the final result
+fs.writeFileSync('output.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createText() {
+  // Step 1: Create a background canvas
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    gradientBg: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#667eea' },
+        { stop: 1, color: '#764ba2' }
+      ],
+      startX: 0,
+      startY: 0,
+      endX: 1200,
+      endY: 800
+    }
+  });
+
+  // Step 2: Get the buffer from the canvas
+  const canvasBuffer = canvas.buffer;
+
+  // Step 3: Add text on top of the background
+  const result = await painter.createText({
+    text: 'Welcome to Apexify.js',
+    x: 600,
+    y: 400,
+    fontSize: 48,
+    bold: true,
+    color: '#ffffff',
+    textAlign: 'center'
+  }, canvasBuffer);
+
+  // Save the final result
+  fs.writeFileSync('output.png', result);
+}
+
+createText();
+```
+</js>
+</CodeSwitcher>
+
+### Chaining Multiple Layers
+
+You can chain multiple operations to build complex compositions. Each call returns a new buffer that you can use for the next layer:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create background
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+// Add an image first
+const withImage = await painter.createImage({
+  source: './background.jpg',
+  x: 0,
+  y: 0,
+  width: 1200,
+  height: 800
+}, canvas.buffer);
+
+// Add text on top of the image
+const withText = await painter.createText({
+  text: 'Beautiful Text',
+  x: 600,
+  y: 400,
+  fontSize: 64,
+  bold: true,
+  color: '#ffffff',
+  textAlign: 'center',
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, withImage);
+
+fs.writeFileSync('final.png', withText);
+```
+</ts>
+<js>
+```javascript
+// Create background
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+// Add an image first
+const withImage = await painter.createImage({
+  source: './background.jpg',
+  x: 0,
+  y: 0,
+  width: 1200,
+  height: 800
+}, canvas.buffer);
+
+// Add text on top of the image
+const withText = await painter.createText({
+  text: 'Beautiful Text',
+  x: 600,
+  y: 400,
+  fontSize: 64,
+  bold: true,
+  color: '#ffffff',
+  textAlign: 'center',
+  shadow: {
+    color: 'rgba(0,0,0,0.5)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, withImage);
+
+fs.writeFileSync('final.png', withText);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Buffer Workflow">
+Each `createText()` call returns a new `Buffer`. Use this buffer as the input for the next operation to build layered compositions.
+</Alert>
+
+### Using Custom Images as Backgrounds
+
+You can use any image (local file or online URL) as a background and then add text on top:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Method 1: Use a local image as background
+const backgroundImage = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: './my-background.jpg',
+    fit: 'cover'
+  }
+});
+
+// Add text on top
+const result = await painter.createText({
+  text: 'Text Over Image',
+  x: 600,
+  y: 400,
+  fontSize: 48,
+  bold: true,
+  color: '#ffffff',
+  textAlign: 'center',
+  shadow: {
+    color: 'rgba(0,0,0,0.7)',
+    offsetX: 3,
+    offsetY: 3,
+    blur: 8
+  }
+}, backgroundImage.buffer);
+
+// Method 2: Use an online image as background
+const onlineBackground = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: 'https://example.com/background.jpg',
+    fit: 'cover'
+  }
+});
+
+// Add text on top
+const result2 = await painter.createText({
+  text: 'Online Background',
+  x: 600,
+  y: 400,
+  fontSize: 48,
+  color: '#ffffff',
+  textAlign: 'center'
+}, onlineBackground.buffer);
+```
+</ts>
+<js>
+```javascript
+// Method 1: Use a local image as background
+const backgroundImage = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: './my-background.jpg',
+    fit: 'cover'
+  }
+});
+
+// Add text on top
+const result = await painter.createText({
+  text: 'Text Over Image',
+  x: 600,
+  y: 400,
+  fontSize: 48,
+  bold: true,
+  color: '#ffffff',
+  textAlign: 'center',
+  shadow: {
+    color: 'rgba(0,0,0,0.7)',
+    offsetX: 3,
+    offsetY: 3,
+    blur: 8
+  }
+}, backgroundImage.buffer);
+
+// Method 2: Use an online image as background
+const onlineBackground = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  customBg: {
+    source: 'https://example.com/background.jpg',
+    fit: 'cover'
+  }
+});
+
+// Add text on top
+const result2 = await painter.createText({
+  text: 'Online Background',
+  x: 600,
+  y: 400,
+  fontSize: 48,
+  color: '#ffffff',
+  textAlign: 'center'
+}, onlineBackground.buffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Background Images">
+You can use any image (local file path or online URL) as a background by setting it as `customBg.source` in `createCanvas()`. Then use the canvas buffer to add text on top!
+</Alert>
+
+## Basic Text Properties
+
+### Required Properties
+
+Every text element requires three properties:
+
+- `text` - The text content to render (string)
+- `x` - X position on canvas (number)
+- `y` - Y position on canvas (number)
+
+<CodeSwitcher>
+<ts>
+```typescript
+const basicText = await painter.createText({
+  text: 'Hello, World!',
+  x: 100,
+  y: 100
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const basicText = await painter.createText({
+  text: 'Hello, World!',
+  x: 100,
+  y: 100
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Positioning
+
+Text is positioned using `x` and `y` coordinates. The exact position depends on the `textAlign` and `textBaseline` properties:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Position at top-left (default alignment)
+const topLeft = await painter.createText({
+  text: 'Top Left',
+  x: 50,
+  y: 50,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Position at center (using textAlign and textBaseline)
+const center = await painter.createText({
+  text: 'Centered',
+  x: 600,  // Canvas center X
+  y: 400,  // Canvas center Y
+  fontSize: 32,
+  color: '#ffffff',
+  textAlign: 'center',
+  textBaseline: 'middle'
+}, canvasBuffer);
+
+// Position at bottom-right
+const bottomRight = await painter.createText({
+  text: 'Bottom Right',
+  x: 1150,  // Near right edge
+  y: 750,   // Near bottom edge
+  fontSize: 24,
+  color: '#ffffff',
+  textAlign: 'right',
+  textBaseline: 'bottom'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Position at top-left (default alignment)
+const topLeft = await painter.createText({
+  text: 'Top Left',
+  x: 50,
+  y: 50,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Position at center (using textAlign and textBaseline)
+const center = await painter.createText({
+  text: 'Centered',
+  x: 600,  // Canvas center X
+  y: 400,  // Canvas center Y
+  fontSize: 32,
+  color: '#ffffff',
+  textAlign: 'center',
+  textBaseline: 'middle'
+}, canvasBuffer);
+
+// Position at bottom-right
+const bottomRight = await painter.createText({
+  text: 'Bottom Right',
+  x: 1150,  // Near right edge
+  y: 750,   // Near bottom edge
+  fontSize: 24,
+  color: '#ffffff',
+  textAlign: 'right',
+  textBaseline: 'bottom'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Font Size
+
+Control text size with the `fontSize` property:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Small text
+const small = await painter.createText({
+  text: 'Small Text',
+  x: 100,
+  y: 100,
+  fontSize: 12,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Medium text (default: 16)
+const medium = await painter.createText({
+  text: 'Medium Text',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Large text
+const large = await painter.createText({
+  text: 'Large Text',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Extra large text
+const xlarge = await painter.createText({
+  text: 'Extra Large',
+  x: 100,
+  y: 300,
+  fontSize: 72,
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Small text
+const small = await painter.createText({
+  text: 'Small Text',
+  x: 100,
+  y: 100,
+  fontSize: 12,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Medium text (default: 16)
+const medium = await painter.createText({
+  text: 'Medium Text',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Large text
+const large = await painter.createText({
+  text: 'Large Text',
+  x: 100,
+  y: 200,
+  fontSize: 48,
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Extra large text
+const xlarge = await painter.createText({
+  text: 'Extra Large',
+  x: 100,
+  y: 300,
+  fontSize: 72,
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Text Color
+
+Set text color using the `color` property:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Hex color
+const hexColor = await painter.createText({
+  text: 'Hex Color',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ff6b6b'
+}, canvasBuffer);
+
+// RGB color
+const rgbColor = await painter.createText({
+  text: 'RGB Color',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  color: 'rgb(255, 107, 107)'
+}, canvasBuffer);
+
+// RGBA color (with transparency)
+const rgbaColor = await painter.createText({
+  text: 'RGBA Color',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: 'rgba(255, 107, 107, 0.7)'
+}, canvasBuffer);
+
+// Named color
+const namedColor = await painter.createText({
+  text: 'Named Color',
+  x: 100,
+  y: 250,
+  fontSize: 24,
+  color: 'white'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Hex color
+const hexColor = await painter.createText({
+  text: 'Hex Color',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  color: '#ff6b6b'
+}, canvasBuffer);
+
+// RGB color
+const rgbColor = await painter.createText({
+  text: 'RGB Color',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  color: 'rgb(255, 107, 107)'
+}, canvasBuffer);
+
+// RGBA color (with transparency)
+const rgbaColor = await painter.createText({
+  text: 'RGBA Color',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  color: 'rgba(255, 107, 107, 0.7)'
+}, canvasBuffer);
+
+// Named color
+const namedColor = await painter.createText({
+  text: 'Named Color',
+  x: 100,
+  y: 250,
+  fontSize: 24,
+  color: 'white'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+Here's a complete example showing the typical workflow:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// 1. Create a background
+const background = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#ff6b6b' },
+      { stop: 1, color: '#4ecdc4' }
+    ],
+    startX: 600,
+    startY: 400,
+    startRadius: 0,
+    endX: 600,
+    endY: 400,
+    endRadius: 600
+  }
+});
+
+// 2. Get the buffer from the background
+const bgBuffer = background.buffer;
+
+// 3. Add multiple text elements
+const composition = await painter.createText([
+  // Title
+  {
+    text: 'Welcome to Apexify.js',
+    x: 600,
+    y: 300,
+    fontSize: 64,
+    bold: true,
+    color: '#ffffff',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    shadow: {
+      color: 'rgba(0,0,0,0.5)',
+      offsetX: 5,
+      offsetY: 5,
+      blur: 15
+    }
+  },
+  // Subtitle
+  {
+    text: 'The Ultimate Canvas Library',
+    x: 600,
+    y: 400,
+    fontSize: 32,
+    color: '#f0f0f0',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    shadow: {
+      color: 'rgba(0,0,0,0.4)',
+      offsetX: 3,
+      offsetY: 3,
+      blur: 10
+    }
+  },
+  // Footer text
+  {
+    text: 'Create stunning visuals with code',
+    x: 600,
+    y: 700,
+    fontSize: 20,
+    color: '#cccccc',
+    textAlign: 'center',
+    textBaseline: 'middle'
+  }
+], bgBuffer);
+
+// 4. Save the final result
+fs.writeFileSync('text-composition.png', composition);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createTextComposition() {
+  // 1. Create a background
+  const background = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#4ecdc4' }
+      ],
+      startX: 600,
+      startY: 400,
+      startRadius: 0,
+      endX: 600,
+      endY: 400,
+      endRadius: 600
+    }
+  });
+
+  // 2. Get the buffer from the background
+  const bgBuffer = background.buffer;
+
+  // 3. Add multiple text elements
+  const composition = await painter.createText([
+    // Title
+    {
+      text: 'Welcome to Apexify.js',
+      x: 600,
+      y: 300,
+      fontSize: 64,
+      bold: true,
+      color: '#ffffff',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      shadow: {
+        color: 'rgba(0,0,0,0.5)',
+        offsetX: 5,
+        offsetY: 5,
+        blur: 15
+      }
+    },
+    // Subtitle
+    {
+      text: 'The Ultimate Canvas Library',
+      x: 600,
+      y: 400,
+      fontSize: 32,
+      color: '#f0f0f0',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      shadow: {
+        color: 'rgba(0,0,0,0.4)',
+        offsetX: 3,
+        offsetY: 3,
+        blur: 10
+      }
+    },
+    // Footer text
+    {
+      text: 'Create stunning visuals with code',
+      x: 600,
+      y: 700,
+      fontSize: 20,
+      color: '#cccccc',
+      textAlign: 'center',
+      textBaseline: 'middle'
+    }
+  ], bgBuffer);
+
+  // 4. Save the final result
+  fs.writeFileSync('text-composition.png', composition);
+}
+
+createTextComposition();
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="success" title="Key Takeaway">
+**The workflow is simple:**
+1. Create a background with `createCanvas()` → get `canvas.buffer`
+2. Add text with `createText()` → returns a new `Buffer`
+3. Use that buffer for the next layer, or save it as your final image
+
+You can use any image (local or online) as a background by setting it as `customBg.source` in `createCanvas()`, then add text on top!
+</Alert>
+
+## Next Steps
+
+Now that you understand basic text operations, explore:
+
+- [Font Management](/docs#font-management) - Custom fonts, sizes, and families
+- [Text Decorations](/docs#text-decorations) - Bold, italic, underline, and more
+- [Text Effects](/docs#text-effects) - Glow, shadow, and stroke effects
+- [Text on Paths](/docs#text-on-paths) - Render text along curves
+
+

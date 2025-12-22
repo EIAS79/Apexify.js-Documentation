@@ -1,0 +1,673 @@
+# Text Spacing and Alignment
+
+Apexify.js provides comprehensive control over text spacing, alignment, and wrapping. Fine-tune letter spacing, word spacing, line height, and control how text aligns both horizontally and vertically.
+
+## Overview
+
+Spacing and alignment features include:
+- **Line Height** - Control vertical spacing between lines
+- **Letter Spacing** - Space between individual characters
+- **Word Spacing** - Space between words
+- **Text Wrapping** - Automatic text wrapping with `maxWidth`
+- **Text Alignment** - Horizontal alignment (left, center, right)
+- **Text Baseline** - Vertical baseline positioning
+
+## Line Height
+
+Control the vertical spacing between lines of text:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Tight line spacing
+const tight = await painter.createText({
+  text: 'Line 1\nLine 2\nLine 3',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  lineHeight: 1.2,  // Tighter spacing
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Normal line spacing (default: 1.4)
+const normal = await painter.createText({
+  text: 'Line 1\nLine 2\nLine 3',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  lineHeight: 1.4,  // Default
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Loose line spacing
+const loose = await painter.createText({
+  text: 'Line 1\nLine 2\nLine 3',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  lineHeight: 2.0,  // Loose spacing
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Tight line spacing
+const tight = await painter.createText({
+  text: 'Line 1\nLine 2\nLine 3',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  lineHeight: 1.2,  // Tighter spacing
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Normal line spacing (default: 1.4)
+const normal = await painter.createText({
+  text: 'Line 1\nLine 2\nLine 3',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  lineHeight: 1.4,  // Default
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Loose line spacing
+const loose = await painter.createText({
+  text: 'Line 1\nLine 2\nLine 3',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  lineHeight: 2.0,  // Loose spacing
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Letter Spacing
+
+Control the space between individual characters:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Tight letter spacing
+const tight = await painter.createText({
+  text: 'Tight Spacing',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  letterSpacing: -1,  // Negative = tighter
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Normal letter spacing (default: 0)
+const normal = await painter.createText({
+  text: 'Normal Spacing',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  letterSpacing: 0,  // Default
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Wide letter spacing
+const wide = await painter.createText({
+  text: 'Wide Spacing',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  letterSpacing: 5,  // Positive = wider
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Tight letter spacing
+const tight = await painter.createText({
+  text: 'Tight Spacing',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  letterSpacing: -1,  // Negative = tighter
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Normal letter spacing (default: 0)
+const normal = await painter.createText({
+  text: 'Normal Spacing',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  letterSpacing: 0,  // Default
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Wide letter spacing
+const wide = await painter.createText({
+  text: 'Wide Spacing',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  letterSpacing: 5,  // Positive = wider
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Word Spacing
+
+Control the space between words:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Tight word spacing
+const tight = await painter.createText({
+  text: 'Tight Word Spacing',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  wordSpacing: -2,  // Negative = tighter
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Normal word spacing (default: 0)
+const normal = await painter.createText({
+  text: 'Normal Word Spacing',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  wordSpacing: 0,  // Default
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Wide word spacing
+const wide = await painter.createText({
+  text: 'Wide Word Spacing',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  wordSpacing: 10,  // Positive = wider
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Tight word spacing
+const tight = await painter.createText({
+  text: 'Tight Word Spacing',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  wordSpacing: -2,  // Negative = tighter
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Normal word spacing (default: 0)
+const normal = await painter.createText({
+  text: 'Normal Word Spacing',
+  x: 100,
+  y: 150,
+  fontSize: 24,
+  wordSpacing: 0,  // Default
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Wide word spacing
+const wide = await painter.createText({
+  text: 'Wide Word Spacing',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  wordSpacing: 10,  // Positive = wider
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Text Wrapping
+
+Automatically wrap text to fit within a maximum width:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Text with wrapping
+const wrapped = await painter.createText({
+  text: 'This is a long text that will automatically wrap to fit within the specified maximum width. The text will break at word boundaries to ensure readability.',
+  x: 100,
+  y: 100,
+  fontSize: 20,
+  maxWidth: 400,  // Maximum width in pixels
+  color: '#ffffff',
+  lineHeight: 1.5
+}, canvasBuffer);
+
+// Text without wrapping (default)
+const noWrap = await painter.createText({
+  text: 'This text will not wrap and will continue on a single line',
+  x: 100,
+  y: 300,
+  fontSize: 20,
+  // No maxWidth = no wrapping
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Text with wrapping
+const wrapped = await painter.createText({
+  text: 'This is a long text that will automatically wrap to fit within the specified maximum width. The text will break at word boundaries to ensure readability.',
+  x: 100,
+  y: 100,
+  fontSize: 20,
+  maxWidth: 400,  // Maximum width in pixels
+  color: '#ffffff',
+  lineHeight: 1.5
+}, canvasBuffer);
+
+// Text without wrapping (default)
+const noWrap = await painter.createText({
+  text: 'This text will not wrap and will continue on a single line',
+  x: 100,
+  y: 300,
+  fontSize: 20,
+  // No maxWidth = no wrapping
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Maximum Height
+
+Limit text height and truncate with ellipsis if it exceeds:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const truncated = await painter.createText({
+  text: 'This is a very long text that will be truncated if it exceeds the maximum height. The text will be cut off and an ellipsis will be added at the end.',
+  x: 100,
+  y: 100,
+  fontSize: 20,
+  maxWidth: 400,
+  maxHeight: 100,  // Maximum height in pixels
+  color: '#ffffff',
+  lineHeight: 1.5
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const truncated = await painter.createText({
+  text: 'This is a very long text that will be truncated if it exceeds the maximum height. The text will be cut off and an ellipsis will be added at the end.',
+  x: 100,
+  y: 100,
+  fontSize: 20,
+  maxWidth: 400,
+  maxHeight: 100,  // Maximum height in pixels
+  color: '#ffffff',
+  lineHeight: 1.5
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Text Alignment
+
+Control horizontal text alignment:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Left aligned (default)
+const left = await painter.createText({
+  text: 'Left Aligned',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  textAlign: 'left',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Center aligned
+const center = await painter.createText({
+  text: 'Center Aligned',
+  x: 600,  // Center X position
+  y: 150,
+  fontSize: 24,
+  textAlign: 'center',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Right aligned
+const right = await painter.createText({
+  text: 'Right Aligned',
+  x: 1100,  // Right edge
+  y: 200,
+  fontSize: 24,
+  textAlign: 'right',
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Left aligned (default)
+const left = await painter.createText({
+  text: 'Left Aligned',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  textAlign: 'left',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Center aligned
+const center = await painter.createText({
+  text: 'Center Aligned',
+  x: 600,  // Center X position
+  y: 150,
+  fontSize: 24,
+  textAlign: 'center',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Right aligned
+const right = await painter.createText({
+  text: 'Right Aligned',
+  x: 1100,  // Right edge
+  y: 200,
+  fontSize: 24,
+  textAlign: 'right',
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Text Baseline
+
+Control vertical text baseline positioning:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Top baseline
+const top = await painter.createText({
+  text: 'Top Baseline',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  textBaseline: 'top',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Middle baseline (perfect for centering)
+const middle = await painter.createText({
+  text: 'Middle Baseline',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  textBaseline: 'middle',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Bottom baseline
+const bottom = await painter.createText({
+  text: 'Bottom Baseline',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  textBaseline: 'bottom',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Alphabetic baseline (default)
+const alphabetic = await painter.createText({
+  text: 'Alphabetic Baseline',
+  x: 100,
+  y: 400,
+  fontSize: 24,
+  textBaseline: 'alphabetic',  // Default
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Top baseline
+const top = await painter.createText({
+  text: 'Top Baseline',
+  x: 100,
+  y: 100,
+  fontSize: 24,
+  textBaseline: 'top',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Middle baseline (perfect for centering)
+const middle = await painter.createText({
+  text: 'Middle Baseline',
+  x: 100,
+  y: 200,
+  fontSize: 24,
+  textBaseline: 'middle',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Bottom baseline
+const bottom = await painter.createText({
+  text: 'Bottom Baseline',
+  x: 100,
+  y: 300,
+  fontSize: 24,
+  textBaseline: 'bottom',
+  color: '#ffffff'
+}, canvasBuffer);
+
+// Alphabetic baseline (default)
+const alphabetic = await painter.createText({
+  text: 'Alphabetic Baseline',
+  x: 100,
+  y: 400,
+  fontSize: 24,
+  textBaseline: 'alphabetic',  // Default
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Perfect Centering">
+For perfect text centering, use `textAlign: 'center'` with `textBaseline: 'middle'`. The x and y coordinates will be the exact center point.
+</Alert>
+
+## Combining Spacing and Alignment
+
+Combine all spacing and alignment features for precise text control:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const precise = await painter.createText({
+  text: 'This is a perfectly formatted text block with custom spacing, alignment, and wrapping. It will automatically wrap to fit the maximum width while maintaining proper line height and word spacing.',
+  x: 600,
+  y: 400,
+  fontSize: 20,
+  textAlign: 'center',
+  textBaseline: 'middle',
+  maxWidth: 500,
+  lineHeight: 1.6,
+  letterSpacing: 0.5,
+  wordSpacing: 2,
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const precise = await painter.createText({
+  text: 'This is a perfectly formatted text block with custom spacing, alignment, and wrapping. It will automatically wrap to fit the maximum width while maintaining proper line height and word spacing.',
+  x: 600,
+  y: 400,
+  fontSize: 20,
+  textAlign: 'center',
+  textBaseline: 'middle',
+  maxWidth: 500,
+  lineHeight: 1.6,
+  letterSpacing: 0.5,
+  wordSpacing: 2,
+  color: '#ffffff'
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#1a1a1a'
+});
+
+const result = await painter.createText([
+  // Centered title
+  {
+    text: 'Perfectly Centered Title',
+    x: 600,
+    y: 100,
+    fontSize: 48,
+    bold: true,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    color: '#ffffff'
+  },
+  // Wrapped paragraph
+  {
+    text: 'This is a long paragraph that demonstrates automatic text wrapping. The text will automatically break at word boundaries to fit within the specified maximum width, ensuring readability and proper formatting.',
+    x: 100,
+    y: 250,
+    fontSize: 18,
+    maxWidth: 500,
+    lineHeight: 1.6,
+    letterSpacing: 0.3,
+    color: '#cccccc'
+  },
+  // Right-aligned text
+  {
+    text: 'Right Aligned Text',
+    x: 1100,
+    y: 500,
+    fontSize: 24,
+    textAlign: 'right',
+    textBaseline: 'top',
+    color: '#ffffff'
+  },
+  // Wide letter spacing
+  {
+    text: 'W I D E   S P A C I N G',
+    x: 600,
+    y: 600,
+    fontSize: 32,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    letterSpacing: 8,
+    color: '#ff6b6b'
+  }
+], canvas.buffer);
+
+fs.writeFileSync('spacing-alignment.png', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createSpacingExample() {
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  const result = await painter.createText([
+    // Centered title
+    {
+      text: 'Perfectly Centered Title',
+      x: 600,
+      y: 100,
+      fontSize: 48,
+      bold: true,
+      textAlign: 'center',
+      textBaseline: 'middle',
+      color: '#ffffff'
+    },
+    // Wrapped paragraph
+    {
+      text: 'This is a long paragraph that demonstrates automatic text wrapping. The text will automatically break at word boundaries to fit within the specified maximum width, ensuring readability and proper formatting.',
+      x: 100,
+      y: 250,
+      fontSize: 18,
+      maxWidth: 500,
+      lineHeight: 1.6,
+      letterSpacing: 0.3,
+      color: '#cccccc'
+    },
+    // Right-aligned text
+    {
+      text: 'Right Aligned Text',
+      x: 1100,
+      y: 500,
+      fontSize: 24,
+      textAlign: 'right',
+      textBaseline: 'top',
+      color: '#ffffff'
+    },
+    // Wide letter spacing
+    {
+      text: 'W I D E   S P A C I N G',
+      x: 600,
+      y: 600,
+      fontSize: 32,
+      textAlign: 'center',
+      textBaseline: 'middle',
+      letterSpacing: 8,
+      color: '#ff6b6b'
+    }
+  ], canvas.buffer);
+
+  fs.writeFileSync('spacing-alignment.png', result);
+}
+
+createSpacingExample();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Text Coloring](/docs#text-coloring) - Use colors and gradients for text
+- [Text Effects](/docs#text-effects) - Add glow, shadow, and stroke effects
+
+

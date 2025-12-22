@@ -1,0 +1,245 @@
+# FFmpeg Installation Guide
+
+FFmpeg is required for all video processing features in Apexify.js, including video backgrounds, frame extraction, and video information retrieval. This guide provides installation instructions for all major operating systems.
+
+<Alert type="warning" title="FFmpeg Required">
+All video-related features in Apexify.js require FFmpeg to be installed and accessible from your system PATH. If FFmpeg is not found, methods will throw errors with installation instructions.
+</Alert>
+
+## Verify FFmpeg Installation
+
+Before installing, check if FFmpeg is already installed:
+
+```bash
+ffmpeg -version
+```
+
+If you see version information, FFmpeg is installed. If you get a "command not found" error, follow the installation instructions below.
+
+## Windows Installation
+
+### Option 1: Using Chocolatey (Recommended)
+
+1. **Install Chocolatey** (if not already installed):
+   - Open PowerShell as Administrator
+   - Run: 
+   ```powershell
+   Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+   ```
+
+2. **Install FFmpeg**:
+   ```powershell
+   choco install ffmpeg
+   ```
+
+3. **Restart your terminal** and verify:
+   ```bash
+   ffmpeg -version
+   ```
+
+### Option 2: Using Winget
+
+1. Open PowerShell
+2. Run:
+   ```powershell
+   winget install ffmpeg
+   ```
+3. Restart your terminal and verify installation
+
+### Option 3: Manual Installation
+
+1. **Download FFmpeg**:
+   - Visit: https://www.gyan.dev/ffmpeg/builds/
+   - Download "ffmpeg-release-essentials.zip"
+
+2. **Extract**:
+   - Extract to `C:\ffmpeg`
+
+3. **Add to PATH**:
+   - Press `Win + X` → **System** → **Advanced** → **Environment Variables**
+   - Edit the "Path" variable under "System variables"
+   - Add: `C:\ffmpeg\bin`
+   - Click **OK** to save
+
+4. **Restart terminal** and verify:
+   ```bash
+   ffmpeg -version
+   ```
+
+### Option 4: Using Scoop
+
+```powershell
+scoop install ffmpeg
+```
+
+## macOS Installation
+
+### Option 1: Using Homebrew (Recommended)
+
+1. **Install Homebrew** (if not already installed):
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+
+2. **Install FFmpeg**:
+   ```bash
+   brew install ffmpeg
+   ```
+
+3. **Verify installation**:
+   ```bash
+   ffmpeg -version
+   ```
+
+### Option 2: Using MacPorts
+
+1. Install MacPorts from: https://www.macports.org/
+2. Run:
+   ```bash
+   sudo port install ffmpeg
+   ```
+
+### Option 3: Manual Installation
+
+1. Download FFmpeg from: https://evermeet.cx/ffmpeg/
+2. Extract and move to `/usr/local/bin/`
+3. Verify installation
+
+## Linux Installation
+
+### Ubuntu/Debian
+
+```bash
+sudo apt-get update
+sudo apt-get install ffmpeg
+```
+
+### RHEL/CentOS/Fedora
+
+**For older versions (RHEL/CentOS)**:
+```bash
+sudo yum install ffmpeg
+```
+
+**For newer versions (Fedora)**:
+```bash
+sudo dnf install ffmpeg
+```
+
+### Arch Linux
+
+```bash
+sudo pacman -S ffmpeg
+```
+
+### openSUSE
+
+```bash
+sudo zypper install ffmpeg
+```
+
+## Docker Installation
+
+If you're using Docker, add FFmpeg to your Dockerfile:
+
+```dockerfile
+# Debian/Ubuntu based
+RUN apt-get update && apt-get install -y ffmpeg
+
+# Alpine based
+RUN apk add --no-cache ffmpeg
+```
+
+## Troubleshooting
+
+### FFmpeg Not Found After Installation
+
+1. **Restart your terminal/IDE** - PATH changes require restart
+2. **Verify PATH** - Ensure FFmpeg is in your system PATH
+3. **Check installation**:
+   ```bash
+   which ffmpeg        # Linux/macOS
+   where ffmpeg        # Windows PowerShell
+   ```
+
+### Version Conflicts
+
+If you have multiple FFmpeg installations, ensure the correct one is in your PATH:
+
+```bash
+# Check which FFmpeg is being used
+ffmpeg -version
+
+# Check all FFmpeg locations (Linux/macOS)
+which -a ffmpeg
+```
+
+### Permission Issues
+
+If you get permission errors on Linux/macOS:
+
+```bash
+# Add execute permissions (if needed)
+sudo chmod +x /usr/local/bin/ffmpeg
+```
+
+## Verification in Apexify.js
+
+After installing FFmpeg, verify it works with Apexify.js:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+try {
+  const videoInfo = await painter.getVideoInfo('./test-video.mp4');
+  console.log('FFmpeg is working!', videoInfo);
+} catch (error) {
+  if (error.message.includes('FFMPEG NOT FOUND')) {
+    console.error('FFmpeg installation issue:', error.message);
+  } else {
+    console.error('Error:', error.message);
+  }
+}
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function testFFmpeg() {
+  try {
+    const videoInfo = await painter.getVideoInfo('./test-video.mp4');
+    console.log('FFmpeg is working!', videoInfo);
+  } catch (error) {
+    if (error.message.includes('FFMPEG NOT FOUND')) {
+      console.error('FFmpeg installation issue:', error.message);
+    } else {
+      console.error('Error:', error.message);
+    }
+  }
+}
+
+testFFmpeg();
+```
+</js>
+</CodeSwitcher>
+
+## Resources
+
+- **Official FFmpeg Website**: https://ffmpeg.org/
+- **FFmpeg Documentation**: https://ffmpeg.org/documentation.html
+- **FFmpeg Wiki**: https://trac.ffmpeg.org/
+
+## Related Documentation
+
+- [Video Backgrounds](#video-backgrounds) - Use video frames as canvas backgrounds
+- [Getting Video Info](#getting-video-info) - Get video metadata
+- [Extracting Frames](#extracting-frames) - Extract frames from videos
+
+

@@ -1,0 +1,215 @@
+# Solid Backgrounds
+
+Solid color backgrounds are the simplest way to style your canvas. Use the `colorBg` property to set a solid background color for your canvas.
+
+## Basic Usage
+
+The `colorBg` property accepts any valid CSS color value:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create a canvas with a solid color background
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#FF6B6B'
+});
+
+fs.writeFileSync('solid-bg.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+// Create a canvas with a solid color background
+async function createCanvas() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#FF6B6B'
+  });
+
+  fs.writeFileSync('solid-bg.png', canvas.buffer);
+}
+createCanvas();
+```
+</js>
+</CodeSwitcher>
+
+## Color Formats
+
+Apexify.js supports multiple color formats:
+
+### Hexadecimal Colors
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#FF6B6B'  // Hex format
+});
+```
+</CodeBlock>
+
+### RGB and RGBA
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: 'rgb(255, 107, 107)'      // RGB
+});
+
+// With alpha transparency
+const canvasWithAlpha = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: 'rgba(255, 107, 107, 0.8)' // RGBA with opacity
+});
+```
+</CodeBlock>
+
+### HSL and HSLA
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: 'hsl(0, 100%, 71%)'      // HSL
+});
+
+// With alpha transparency
+const canvasWithAlpha = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: 'hsla(0, 100%, 71%, 0.8)' // HSLA with opacity
+});
+```
+</CodeBlock>
+
+### Named Colors
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: 'red'    // CSS named colors
+});
+
+// Other examples
+const colors = [
+  'blue',
+  'green',
+  'yellow',
+  'purple',
+  'cyan',
+  'magenta',
+  'white',
+  'black',
+  'transparent'
+];
+```
+</CodeBlock>
+
+## Transparent Backgrounds
+
+To create a canvas with a transparent background, use `'transparent'` or `rgba(0, 0, 0, 0)`:
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: 'transparent'  // Transparent background
+});
+
+// Or use rgba
+const transparentCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: 'rgba(0, 0, 0, 0)'  // Also transparent
+});
+```
+</CodeBlock>
+
+<Alert type="info" title="Note">
+When using `transparent` or `rgba(0, 0, 0, 0)`, the canvas will have a transparent background. This is useful when you want to overlay the canvas on other images or backgrounds.
+</Alert>
+
+## Default Background
+
+If no `colorBg` is specified and no other background type is provided, the canvas defaults to black (`#000`):
+
+<CodeBlock lang="typescript">
+```typescript
+// This will create a canvas with a black background
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600
+  // colorBg defaults to '#000'
+});
+```
+</CodeBlock>
+
+## Combining with Other Features
+
+Solid backgrounds work well with other canvas features like `borderRadius`, `shadow`, and `stroke`:
+
+<CodeBlock lang="typescript">
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  borderRadius: 20,
+  shadow: {
+    color: 'rgba(0, 0, 0, 0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  },
+  stroke: {
+    color: '#FFF',
+    width: 3
+  }
+});
+```
+</CodeBlock>
+
+## Important Notes
+
+<Alert type="warning" title="Background Conflicts">
+You can only use one background type at a time. If you specify both `colorBg` and `gradientBg` or `customBg`, an error will be thrown. Choose one background type per canvas.
+</Alert>
+
+<Dropdown title="Why use solid backgrounds?">
+Solid color backgrounds are:
+- **Fast**: No complex rendering calculations
+- **Simple**: Easy to use and understand
+- **Flexible**: Support all CSS color formats
+- **Lightweight**: Minimal memory usage
+- **Perfect for**: Solid color designs, overlays, and base layers
+</Dropdown>
+
+## Best Practices
+
+1. **Use hex colors for consistency**: Hex colors are easy to read and share
+2. **Consider contrast**: Ensure text and elements have sufficient contrast against the background
+3. **Use transparent for overlays**: Use transparent backgrounds when compositing multiple layers
+4. **Combine with other features**: Solid backgrounds work great with borders, shadows, and rounded corners
+
+

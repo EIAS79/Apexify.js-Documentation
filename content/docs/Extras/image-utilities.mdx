@@ -1,0 +1,413 @@
+# Image Utilities
+
+Apexify.js provides powerful image utility functions for stitching, collage creation, compression, format conversion, resizing, and color palette extraction.
+
+## Overview
+
+Image utilities include:
+- **Image Stitching** - Combine images into panoramas or grids
+- **Collage Creation** - Create beautiful image collages
+- **Image Compression** - Optimize images with quality control
+- **Format Conversion** - Convert between image formats
+- **Resizing** - Resize images with quality control
+- **Color Palette Extraction** - Extract color palettes from images
+
+## Image Stitching
+
+Combine multiple images into panoramas or grids:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Stitch images horizontally
+const panorama = await painter.stitchImages(
+  ['./image1.jpg', './image2.jpg', './image3.jpg'],
+  {
+    direction: 'horizontal',  // 'horizontal' | 'vertical' | 'grid'
+    spacing: 0,  // Spacing between images in pixels
+    overlap: 10,  // Percentage overlap for auto-alignment (0-100)
+    blend: false  // Blend overlapping areas
+  }
+);
+
+fs.writeFileSync('panorama.png', panorama);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function stitchImages() {
+  // Stitch images horizontally
+  const panorama = await painter.stitchImages(
+    ['./image1.jpg', './image2.jpg', './image3.jpg'],
+    {
+      direction: 'horizontal',  // 'horizontal' | 'vertical' | 'grid'
+      spacing: 0,  // Spacing between images in pixels
+      overlap: 10,  // Percentage overlap for auto-alignment (0-100)
+      blend: false  // Blend overlapping areas
+    }
+  );
+
+  fs.writeFileSync('panorama.png', panorama);
+}
+
+stitchImages();
+```
+</js>
+</CodeSwitcher>
+
+### Stitching Directions
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Horizontal panorama
+const horizontal = await painter.stitchImages(images, {
+  direction: 'horizontal'
+});
+
+// Vertical stack
+const vertical = await painter.stitchImages(images, {
+  direction: 'vertical'
+});
+
+// Grid layout
+const grid = await painter.stitchImages(images, {
+  direction: 'grid'
+});
+```
+</ts>
+<js>
+```javascript
+// Horizontal panorama
+const horizontal = await painter.stitchImages(images, {
+  direction: 'horizontal'
+});
+
+// Vertical stack
+const vertical = await painter.stitchImages(images, {
+  direction: 'vertical'
+});
+
+// Grid layout
+const grid = await painter.stitchImages(images, {
+  direction: 'grid'
+});
+```
+</js>
+</CodeSwitcher>
+
+## Collage Creation
+
+Create beautiful image collages with multiple layout options:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create grid collage
+const collage = await painter.createCollage(
+  [
+    { source: './image1.jpg', width: 400, height: 300 },
+    { source: './image2.jpg', width: 400, height: 300 },
+    { source: './image3.jpg', width: 400, height: 300 },
+    { source: './image4.jpg', width: 400, height: 300 }
+  ],
+  {
+    type: 'grid',  // 'grid' | 'masonry' | 'carousel' | 'custom'
+    columns: 2,
+    rows: 2,
+    spacing: 10,
+    background: '#ffffff',
+    borderRadius: 10
+  }
+);
+
+fs.writeFileSync('collage.png', collage);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createCollage() {
+  // Create grid collage
+  const collage = await painter.createCollage(
+    [
+      { source: './image1.jpg', width: 400, height: 300 },
+      { source: './image2.jpg', width: 400, height: 300 },
+      { source: './image3.jpg', width: 400, height: 300 },
+      { source: './image4.jpg', width: 400, height: 300 }
+    ],
+    {
+      type: 'grid',  // 'grid' | 'masonry' | 'carousel' | 'custom'
+      columns: 2,
+      rows: 2,
+      spacing: 10,
+      background: '#ffffff',
+      borderRadius: 10
+    }
+  );
+
+  fs.writeFileSync('collage.png', collage);
+}
+
+createCollage();
+```
+</js>
+</CodeSwitcher>
+
+## Image Compression
+
+Optimize images with quality control:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Compress image
+const compressed = await painter.compress('./large-image.jpg', {
+  quality: 80,  // 0-100 (default: 90)
+  format: 'jpeg',  // 'jpeg' | 'webp' | 'avif'
+  maxWidth: 1920,  // Optional max width
+  maxHeight: 1080,  // Optional max height
+  progressive: true  // Progressive JPEG (default: false)
+});
+
+fs.writeFileSync('compressed.jpg', compressed);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function compressImage() {
+  // Compress image
+  const compressed = await painter.compress('./large-image.jpg', {
+    quality: 80,  // 0-100 (default: 90)
+    format: 'jpeg',  // 'jpeg' | 'webp' | 'avif'
+    maxWidth: 1920,  // Optional max width
+    maxHeight: 1080,  // Optional max height
+    progressive: true  // Progressive JPEG (default: false)
+  });
+
+  fs.writeFileSync('compressed.jpg', compressed);
+}
+
+compressImage();
+```
+</js>
+</CodeSwitcher>
+
+## Format Conversion
+
+Convert images between different formats:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Convert PNG to JPEG
+const jpeg = await painter.imgConverter('./image.png', 'jpeg');
+fs.writeFileSync('image.jpg', jpeg);
+
+// Convert to WebP
+const webp = await painter.imgConverter('./image.jpg', 'webp');
+fs.writeFileSync('image.webp', webp);
+
+// Convert to AVIF
+const avif = await painter.imgConverter('./image.png', 'avif');
+fs.writeFileSync('image.avif', avif);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function convertImages() {
+  // Convert PNG to JPEG
+  const jpeg = await painter.imgConverter('./image.png', 'jpeg');
+  fs.writeFileSync('image.jpg', jpeg);
+
+  // Convert to WebP
+  const webp = await painter.imgConverter('./image.jpg', 'webp');
+  fs.writeFileSync('image.webp', webp);
+
+  // Convert to AVIF
+  const avif = await painter.imgConverter('./image.png', 'avif');
+  fs.writeFileSync('image.avif', avif);
+}
+
+convertImages();
+```
+</js>
+</CodeSwitcher>
+
+### Supported Formats
+
+- **jpeg** / **jpg**
+- **png**
+- **webp**
+- **avif**
+- **tiff**
+- **gif**
+- **heif**
+- **raw**
+- **pdf**
+- **svg**
+
+## Image Resizing
+
+Resize images with quality control:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Resize image
+const resized = await painter.resize({
+  imagePath: './image.jpg',
+  size: {
+    width: 800,
+    height: 600
+  },
+  maintainAspectRatio: true,  // Maintain aspect ratio
+  quality: 90,  // 0-100
+  outputFormat: 'png'  // 'png' | 'jpeg'
+});
+
+fs.writeFileSync('resized.png', resized);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function resizeImage() {
+  // Resize image
+  const resized = await painter.resize({
+    imagePath: './image.jpg',
+    size: {
+      width: 800,
+      height: 600
+    },
+    maintainAspectRatio: true,  // Maintain aspect ratio
+    quality: 90,  // 0-100
+    outputFormat: 'png'  // 'png' | 'jpeg'
+  });
+
+  fs.writeFileSync('resized.png', resized);
+}
+
+resizeImage();
+```
+</js>
+</CodeSwitcher>
+
+## Color Palette Extraction
+
+Extract color palettes from images using multiple algorithms:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Extract color palette
+const palette = await painter.extractPalette('./image.jpg', {
+  count: 10,  // Number of colors (default: 10)
+  method: 'kmeans',  // 'kmeans' | 'median-cut' | 'octree'
+  format: 'hex'  // 'hex' | 'rgb' | 'hsl'
+});
+
+// palette is an array of { color: string, percentage: number }
+console.log(palette);
+// [
+//   { color: '#ff6b6b', percentage: 25.5 },
+//   { color: '#4ecdc4', percentage: 18.2 },
+//   ...
+// ]
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function extractPalette() {
+  // Extract color palette
+  const palette = await painter.extractPalette('./image.jpg', {
+    count: 10,  // Number of colors (default: 10)
+    method: 'kmeans',  // 'kmeans' | 'median-cut' | 'octree'
+    format: 'hex'  // 'hex' | 'rgb' | 'hsl'
+  });
+
+  // palette is an array of { color: string, percentage: number }
+  console.log(palette);
+  // [
+  //   { color: '#ff6b6b', percentage: 25.5 },
+  //   { color: '#4ecdc4', percentage: 18.2 },
+  //   ...
+  // ]
+}
+
+extractPalette();
+```
+</js>
+</CodeSwitcher>
+
+### Palette Extraction Methods
+
+- **kmeans** - K-means clustering (good for general use)
+- **median-cut** - Median cut algorithm (fast, good quality)
+- **octree** - Octree quantization (memory efficient)
+
+<Alert type="tip" title="Image Utilities Tips">
+- Use `stitchImages` for creating panoramas from multiple photos
+- Use `createCollage` for social media post layouts
+- Compress images before uploading to reduce file size
+- Extract color palettes to match designs to image colors
+- Use format conversion to optimize for web (WebP, AVIF)
+</Alert>
+
+

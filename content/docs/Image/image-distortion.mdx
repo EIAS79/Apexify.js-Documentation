@@ -1,0 +1,640 @@
+# Image Distortion
+
+Apexify.js provides powerful distortion effects to transform images in creative ways. Use perspective distortion, bulge/pinch effects, and mesh warping for artistic and practical image manipulation.
+
+## Overview
+
+Distortion effects allow you to:
+- Apply perspective transformations
+- Create bulge and pinch effects
+- Perform mesh warping for complex transformations
+
+## Perspective Distortion
+
+Perspective distortion allows you to transform an image using 4 control points, creating a perspective effect:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const perspective = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: 0, y: 0 },      // Top-left
+      { x: 400, y: 0 },    // Top-right
+      { x: 400, y: 300 },  // Bottom-right
+      { x: 0, y: 300 }     // Bottom-left
+    ]
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const perspective = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: 0, y: 0 },      // Top-left
+      { x: 400, y: 0 },    // Top-right
+      { x: 400, y: 300 },  // Bottom-right
+      { x: 0, y: 300 }     // Bottom-left
+    ]
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Perspective Examples
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Tilted perspective (top wider than bottom)
+const tilted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: -50, y: 0 },    // Top-left (extended)
+      { x: 450, y: 0 },    // Top-right (extended)
+      { x: 400, y: 300 },  // Bottom-right
+      { x: 0, y: 300 }     // Bottom-left
+    ]
+  }
+}, canvasBuffer);
+
+// Bottom-up perspective
+const bottomUp = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: 0, y: 0 },      // Top-left
+      { x: 400, y: 0 },   // Top-right
+      { x: 450, y: 300 }, // Bottom-right (extended)
+      { x: -50, y: 300 }  // Bottom-left (extended)
+    ]
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Tilted perspective (top wider than bottom)
+const tilted = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: -50, y: 0 },    // Top-left (extended)
+      { x: 450, y: 0 },    // Top-right (extended)
+      { x: 400, y: 300 },  // Bottom-right
+      { x: 0, y: 300 }     // Bottom-left
+    ]
+  }
+}, canvasBuffer);
+
+// Bottom-up perspective
+const bottomUp = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: 0, y: 0 },      // Top-left
+      { x: 400, y: 0 },   // Top-right
+      { x: 450, y: 300 }, // Bottom-right (extended)
+      { x: -50, y: 300 }  // Bottom-left (extended)
+    ]
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="warning" title="Perspective Points">
+Perspective distortion requires exactly 4 points in this order: top-left, top-right, bottom-right, bottom-left. Coordinates are relative to the image's position (x, y).
+</Alert>
+
+## Bulge Effect
+
+Creates a bulging effect, pushing pixels outward from a center point:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const bulge = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'bulge',
+    intensity: 0.5  // 0-1, higher = more bulge
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const bulge = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'bulge',
+    intensity: 0.5  // 0-1, higher = more bulge
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Bulge Center">
+The bulge effect is centered on the image. Use mesh warping for custom bulge positions.
+</Alert>
+
+## Pinch Effect
+
+Creates a pinching effect, pulling pixels inward toward a center point:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const pinch = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'pinch',
+    intensity: 0.5  // 0-1, higher = more pinch
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const pinch = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'pinch',
+    intensity: 0.5  // 0-1, higher = more pinch
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Bulge and Pinch Intensity
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Subtle bulge
+const subtleBulge = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'bulge',
+    intensity: 0.2
+  }
+}, canvasBuffer);
+
+// Strong pinch
+const strongPinch = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'pinch',
+    intensity: 0.8
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Subtle bulge
+const subtleBulge = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'bulge',
+    intensity: 0.2
+  }
+}, canvasBuffer);
+
+// Strong pinch
+const strongPinch = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'pinch',
+    intensity: 0.8
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Mesh Warping
+
+Mesh warping provides the most flexible distortion option, allowing you to define a grid of control points for complex transformations:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const meshWarp = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  meshWarp: {
+    gridX: 10,  // Number of grid divisions horizontally
+    gridY: 10, // Number of grid divisions vertically
+    controlPoints: [
+      // Array of rows, each row is an array of control points
+      [
+        { x: 0, y: 0 }, { x: 40, y: 0 }, { x: 80, y: 0 }, /* ... */
+      ],
+      [
+        { x: 0, y: 30 }, { x: 40, y: 30 }, { x: 80, y: 30 }, /* ... */
+      ],
+      // ... more rows
+    ]
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+const meshWarp = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  meshWarp: {
+    gridX: 10,  // Number of grid divisions horizontally
+    gridY: 10, // Number of grid divisions vertically
+    controlPoints: [
+      // Array of rows, each row is an array of control points
+      [
+        { x: 0, y: 0 }, { x: 40, y: 0 }, { x: 80, y: 0 }, /* ... */
+      ],
+      [
+        { x: 0, y: 30 }, { x: 40, y: 30 }, { x: 80, y: 30 }, /* ... */
+      ],
+      // ... more rows
+    ]
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+### Simple Mesh Warp Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create a wave effect with mesh warping
+function createWaveMesh(width: number, height: number, amplitude: number) {
+  const gridX = 10;
+  const gridY = 10;
+  const stepX = width / gridX;
+  const stepY = height / gridY;
+  const controlPoints: Array<Array<{ x: number; y: number }>> = [];
+
+  for (let y = 0; y <= gridY; y++) {
+    const row: Array<{ x: number; y: number }> = [];
+    for (let x = 0; x <= gridX; x++) {
+      const waveOffset = Math.sin((x / gridX) * Math.PI * 2) * amplitude;
+      row.push({
+        x: x * stepX,
+        y: y * stepY + waveOffset
+      });
+    }
+    controlPoints.push(row);
+  }
+  return controlPoints;
+}
+
+const waveMesh = createWaveMesh(400, 300, 20);
+
+const waved = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  meshWarp: {
+    gridX: 10,
+    gridY: 10,
+    controlPoints: waveMesh
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Create a wave effect with mesh warping
+function createWaveMesh(width, height, amplitude) {
+  const gridX = 10;
+  const gridY = 10;
+  const stepX = width / gridX;
+  const stepY = height / gridY;
+  const controlPoints = [];
+
+  for (let y = 0; y <= gridY; y++) {
+    const row = [];
+    for (let x = 0; x <= gridX; x++) {
+      const waveOffset = Math.sin((x / gridX) * Math.PI * 2) * amplitude;
+      row.push({
+        x: x * stepX,
+        y: y * stepY + waveOffset
+      });
+    }
+    controlPoints.push(row);
+  }
+  return controlPoints;
+}
+
+const waveMesh = createWaveMesh(400, 300, 20);
+
+const waved = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  meshWarp: {
+    gridX: 10,
+    gridY: 10,
+    controlPoints: waveMesh
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Mesh Warp Grid">
+The `gridX` and `gridY` values determine the number of divisions. A 10x10 grid means 11x11 control points (including edges). The `controlPoints` array must match: `(gridY + 1) x (gridX + 1)` points.
+</Alert>
+
+## Combining Distortions
+
+<Alert type="warning" title="Single Distortion Type">
+Only one distortion type can be applied per image. Use mesh warping for complex effects that combine multiple transformations.
+</Alert>
+
+## Distortion with Other Features
+
+Distortion works with all other image features:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Perspective with filters
+const filteredPerspective = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: -50, y: 0 },
+      { x: 450, y: 0 },
+      { x: 400, y: 300 },
+      { x: 0, y: 300 }
+    ]
+  },
+  filters: [
+    { type: 'contrast', value: 1.2 }
+  ],
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Perspective with filters
+const filteredPerspective = await painter.createImage({
+  source: './image.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: -50, y: 0 },
+      { x: 450, y: 0 },
+      { x: 400, y: 300 },
+      { x: 0, y: 300 }
+    ]
+  },
+  filters: [
+    { type: 'contrast', value: 1.2 }
+  ],
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Create canvas
+const canvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  colorBg: '#f0f0f0'
+});
+
+// Perspective distortion
+const perspective = await painter.createImage({
+  source: './photo.jpg',
+  x: 100,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'perspective',
+    points: [
+      { x: -30, y: 0 },
+      { x: 430, y: 0 },
+      { x: 400, y: 300 },
+      { x: 0, y: 300 }
+    ]
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, canvas.buffer);
+
+// Bulge effect
+const bulge = await painter.createImage({
+  source: './photo2.jpg',
+  x: 600,
+  y: 100,
+  width: 400,
+  height: 300,
+  distortion: {
+    type: 'bulge',
+    intensity: 0.4
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+}, perspective);
+
+fs.writeFileSync('distorted.png', bulge);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createDistorted() {
+  // Create canvas
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 800,
+    colorBg: '#f0f0f0'
+  });
+
+  // Perspective distortion
+  const perspective = await painter.createImage({
+    source: './photo.jpg',
+    x: 100,
+    y: 100,
+    width: 400,
+    height: 300,
+    distortion: {
+      type: 'perspective',
+      points: [
+        { x: -30, y: 0 },
+        { x: 430, y: 0 },
+        { x: 400, y: 300 },
+        { x: 0, y: 300 }
+      ]
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  }, canvas.buffer);
+
+  // Bulge effect
+  const bulge = await painter.createImage({
+    source: './photo2.jpg',
+    x: 600,
+    y: 100,
+    width: 400,
+    height: 300,
+    distortion: {
+      type: 'bulge',
+      intensity: 0.4
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    }
+  }, perspective);
+
+  fs.writeFileSync('distorted.png', bulge);
+}
+
+createDistorted();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Advanced Features](/docs#advanced-image-features) - Combine distortion with shadows, strokes, rotation, and more
+- [Image Masking](/docs#image-masking-and-clipping) - Apply masks to distorted images
+
+

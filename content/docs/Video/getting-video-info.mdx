@@ -1,0 +1,284 @@
+# Getting Video Information
+
+The `getVideoInfo()` method retrieves comprehensive metadata about a video file, including duration, resolution, frame rate, bitrate, and format. This is essential for working with video backgrounds and frame extraction.
+
+<Alert type="info" title="FFmpeg Required">
+Video processing features require FFmpeg to be installed on your system. See the [FFmpeg Installation Guide](#ffmpeg-installation) for setup instructions.
+</Alert>
+
+## Basic Usage
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Get video information
+const videoInfo = await painter.getVideoInfo('./video.mp4');
+
+console.log('Video Duration:', videoInfo.duration, 'seconds');
+console.log('Resolution:', videoInfo.width, 'x', videoInfo.height);
+console.log('Frame Rate:', videoInfo.fps, 'FPS');
+console.log('Bitrate:', videoInfo.bitrate);
+console.log('Format:', videoInfo.format);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+// Get video information
+async function getInfo() {
+  const videoInfo = await painter.getVideoInfo('./video.mp4');
+
+  console.log('Video Duration:', videoInfo.duration, 'seconds');
+  console.log('Resolution:', videoInfo.width, 'x', videoInfo.height);
+  console.log('Frame Rate:', videoInfo.fps, 'FPS');
+  console.log('Bitrate:', videoInfo.bitrate);
+  console.log('Format:', videoInfo.format);
+}
+
+getInfo();
+```
+</js>
+</CodeSwitcher>
+
+## Video Source Types
+
+### Local File Path
+
+```typescript
+const info = await painter.getVideoInfo('./videos/my-video.mp4');
+```
+
+### Remote URL
+
+```typescript
+const info = await painter.getVideoInfo('https://example.com/video.mp4');
+```
+
+### Buffer
+
+```typescript
+const videoBuffer = fs.readFileSync('./video.mp4');
+const info = await painter.getVideoInfo(videoBuffer);
+```
+
+## Return Value
+
+The `getVideoInfo()` method returns an object with the following properties:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `duration` | `number` | Video duration in seconds |
+| `width` | `number` | Video width in pixels |
+| `height` | `number` | Video height in pixels |
+| `fps` | `number` | Frames per second (frame rate) |
+| `bitrate` | `number` | Video bitrate in bits per second |
+| `format` | `string` | Video container format (e.g., 'mp4', 'webm', 'avi') |
+
+## Practical Examples
+
+### Calculate Total Frames
+
+<CodeSwitcher>
+<ts>
+```typescript
+const videoInfo = await painter.getVideoInfo('./video.mp4');
+const totalFrames = Math.floor(videoInfo.duration * videoInfo.fps);
+
+console.log(`Video has ${totalFrames} frames`);
+console.log(`Duration: ${videoInfo.duration.toFixed(2)} seconds`);
+console.log(`Frame rate: ${videoInfo.fps} FPS`);
+```
+</ts>
+<js>
+```javascript
+const videoInfo = await painter.getVideoInfo('./video.mp4');
+const totalFrames = Math.floor(videoInfo.duration * videoInfo.fps);
+
+console.log(`Video has ${totalFrames} frames`);
+console.log(`Duration: ${videoInfo.duration.toFixed(2)} seconds`);
+console.log(`Frame rate: ${videoInfo.fps} FPS`);
+```
+</js>
+</CodeSwitcher>
+
+### Determine Best Frame for Thumbnail
+
+<CodeSwitcher>
+<ts>
+```typescript
+const videoInfo = await painter.getVideoInfo('./video.mp4');
+
+// Extract frame at 25% of video duration
+const thumbnailTime = videoInfo.duration * 0.25;
+
+const canvas = await painter.createCanvas({
+  width: videoInfo.width,
+  height: videoInfo.height,
+  videoBg: {
+    source: './video.mp4',
+    time: thumbnailTime
+  }
+});
+
+fs.writeFileSync('thumbnail.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const videoInfo = await painter.getVideoInfo('./video.mp4');
+
+// Extract frame at 25% of video duration
+const thumbnailTime = videoInfo.duration * 0.25;
+
+const canvas = await painter.createCanvas({
+  width: videoInfo.width,
+  height: videoInfo.height,
+  videoBg: {
+    source: './video.mp4',
+    time: thumbnailTime
+  }
+});
+
+fs.writeFileSync('thumbnail.png', canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+### Validate Video Before Processing
+
+<CodeSwitcher>
+<ts>
+```typescript
+async function processVideo(videoPath: string) {
+  try {
+    const videoInfo = await painter.getVideoInfo(videoPath);
+    
+    // Validate video meets requirements
+    if (videoInfo.duration < 1) {
+      throw new Error('Video too short (minimum 1 second)');
+    }
+    
+    if (videoInfo.width < 640 || videoInfo.height < 480) {
+      throw new Error('Video resolution too low (minimum 640x480)');
+    }
+    
+    if (videoInfo.fps < 24) {
+      console.warn('Low frame rate detected:', videoInfo.fps, 'FPS');
+    }
+    
+    console.log('Video validated successfully:', videoInfo);
+    return videoInfo;
+  } catch (error) {
+    console.error('Video validation failed:', error);
+    throw error;
+  }
+}
+```
+</ts>
+<js>
+```javascript
+async function processVideo(videoPath) {
+  try {
+    const videoInfo = await painter.getVideoInfo(videoPath);
+    
+    // Validate video meets requirements
+    if (videoInfo.duration < 1) {
+      throw new Error('Video too short (minimum 1 second)');
+    }
+    
+    if (videoInfo.width < 640 || videoInfo.height < 480) {
+      throw new Error('Video resolution too low (minimum 640x480)');
+    }
+    
+    if (videoInfo.fps < 24) {
+      console.warn('Low frame rate detected:', videoInfo.fps, 'FPS');
+    }
+    
+    console.log('Video validated successfully:', videoInfo);
+    return videoInfo;
+  } catch (error) {
+    console.error('Video validation failed:', error);
+    throw error;
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Error Handling
+
+<Alert type="warning" title="FFmpeg Required">
+If FFmpeg is not installed, `getVideoInfo()` will throw an error with detailed installation instructions.
+</Alert>
+
+<CodeSwitcher>
+<ts>
+```typescript
+try {
+  const videoInfo = await painter.getVideoInfo('./video.mp4');
+  console.log('Video info:', videoInfo);
+} catch (error) {
+  if (error.message.includes('FFMPEG NOT FOUND')) {
+    console.error('FFmpeg is required. Please install FFmpeg first.');
+    // Error message includes installation instructions
+    console.error(error.message);
+  } else if (error.message.includes('not found')) {
+    console.error('Video file not found');
+  } else {
+    console.error('Error getting video info:', error.message);
+  }
+}
+```
+</ts>
+<js>
+```javascript
+try {
+  const videoInfo = await painter.getVideoInfo('./video.mp4');
+  console.log('Video info:', videoInfo);
+} catch (error) {
+  if (error.message.includes('FFMPEG NOT FOUND')) {
+    console.error('FFmpeg is required. Please install FFmpeg first.');
+    // Error message includes installation instructions
+    console.error(error.message);
+  } else if (error.message.includes('not found')) {
+    console.error('Video file not found');
+  } else {
+    console.error('Error getting video info:', error.message);
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Performance Considerations
+
+1. **Cache Results**: If you need video info multiple times, cache the result:
+```typescript
+let cachedInfo: any = null;
+
+async function getCachedVideoInfo(videoPath: string) {
+  if (!cachedInfo) {
+    cachedInfo = await painter.getVideoInfo(videoPath);
+  }
+  return cachedInfo;
+}
+```
+
+2. **Remote Videos**: Downloading remote videos can take time. Consider caching the video file locally.
+
+3. **Large Videos**: Getting info from very large videos may take longer due to FFprobe processing.
+
+## Related Documentation
+
+- [Video Backgrounds](#video-backgrounds) - Use video frames as canvas backgrounds
+- [Extracting Frames](#extracting-frames) - Extract frames using video metadata
+- [FFmpeg Installation](#ffmpeg-installation) - Setup guide for FFmpeg
+
+

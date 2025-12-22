@@ -1,0 +1,545 @@
+# Line Charts
+
+Apexify.js provides powerful line chart generation with support for multiple datasets, smooth curves, filled areas, plot points, and comprehensive styling options.
+
+## Overview
+
+Line charts are created using `createChart()` with `chartType: 'line'` and `chartNumber: 1`. Support multiple lines, smooth curves, filled areas, and customizable grids.
+
+## Basic Line Chart
+
+Create a simple line chart:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const chart = await painter.createChart({
+  data: [
+    [
+      { label: 'Jan', y: 30 },
+      { label: 'Feb', y: 45 },
+      { label: 'Mar', y: 35 },
+      { label: 'Apr', y: 60 },
+      { label: 'May', y: 50 }
+    ]
+  ],
+  lineConfig: {
+    yLabels: ['0', '20', '40', '60', '80', '100'],
+    fillArea: [{ color: 'rgba(255, 107, 107, 0.2)' }],
+    lineColor: ['#ff6b6b'],
+    lineTension: [0.3],
+    plot: {
+      enable: true,
+      color: ['#ff6b6b'],
+      size: 5
+    },
+    grid: {
+      type: 'both',
+      color: '#e0e0e0',
+      width: 1
+    },
+    canvas: {
+      width: 800,
+      height: 600,
+      bgColor: '#ffffff'
+    }
+  }
+}, {
+  chartType: 'line',
+  chartNumber: 1
+});
+
+fs.writeFileSync('line-chart.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createLineChart() {
+  const chart = await painter.createChart({
+    data: [
+      [
+        { label: 'Jan', y: 30 },
+        { label: 'Feb', y: 45 },
+        { label: 'Mar', y: 35 },
+        { label: 'Apr', y: 60 },
+        { label: 'May', y: 50 }
+      ]
+    ],
+    lineConfig: {
+      yLabels: ['0', '20', '40', '60', '80', '100'],
+      fillArea: [{ color: 'rgba(255, 107, 107, 0.2)' }],
+      lineColor: ['#ff6b6b'],
+      lineTension: [0.3],
+      plot: {
+        enable: true,
+        color: ['#ff6b6b'],
+        size: 5
+      },
+      grid: {
+        type: 'both',
+        color: '#e0e0e0',
+        width: 1
+      },
+      canvas: {
+        width: 800,
+        height: 600,
+        bgColor: '#ffffff'
+      }
+    }
+  }, {
+    chartType: 'line',
+    chartNumber: 1
+  });
+
+  fs.writeFileSync('line-chart.png', chart);
+}
+
+createLineChart();
+```
+</js>
+</CodeSwitcher>
+
+## Multiple Lines
+
+Create charts with multiple datasets:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart({
+  data: [
+    // First line
+    [
+      { label: 'Jan', y: 30 },
+      { label: 'Feb', y: 45 },
+      { label: 'Mar', y: 35 }
+    ],
+    // Second line
+    [
+      { label: 'Jan', y: 20 },
+      { label: 'Feb', y: 35 },
+      { label: 'Mar', y: 50 }
+    ],
+    // Third line
+    [
+      { label: 'Jan', y: 40 },
+      { label: 'Feb', y: 30 },
+      { label: 'Mar', y: 45 }
+    ]
+  ],
+  lineConfig: {
+    yLabels: ['0', '20', '40', '60', '80', '100'],
+    fillArea: [
+      { color: 'rgba(255, 107, 107, 0.2)' },
+      { color: 'rgba(78, 205, 196, 0.2)' },
+      { color: 'rgba(69, 183, 209, 0.2)' }
+    ],
+    lineColor: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
+    lineTension: [0.3, 0.3, 0.3],
+    plot: {
+      enable: true,
+      color: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
+      size: 5
+    },
+    grid: {
+      type: 'both',
+      color: '#e0e0e0',
+      width: 1
+    },
+    canvas: {
+      width: 1200,
+      height: 800,
+      bgColor: '#ffffff'
+    }
+  }
+}, {
+  chartType: 'line',
+  chartNumber: 1
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart({
+  data: [
+    // First line
+    [
+      { label: 'Jan', y: 30 },
+      { label: 'Feb', y: 45 },
+      { label: 'Mar', y: 35 }
+    ],
+    // Second line
+    [
+      { label: 'Jan', y: 20 },
+      { label: 'Feb', y: 35 },
+      { label: 'Mar', y: 50 }
+    ],
+    // Third line
+    [
+      { label: 'Jan', y: 40 },
+      { label: 'Feb', y: 30 },
+      { label: 'Mar', y: 45 }
+    ]
+  ],
+  lineConfig: {
+    yLabels: ['0', '20', '40', '60', '80', '100'],
+    fillArea: [
+      { color: 'rgba(255, 107, 107, 0.2)' },
+      { color: 'rgba(78, 205, 196, 0.2)' },
+      { color: 'rgba(69, 183, 209, 0.2)' }
+    ],
+    lineColor: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
+    lineTension: [0.3, 0.3, 0.3],
+    plot: {
+      enable: true,
+      color: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
+      size: 5
+    },
+    grid: {
+      type: 'both',
+      color: '#e0e0e0',
+      width: 1
+    },
+    canvas: {
+      width: 1200,
+      height: 800,
+      bgColor: '#ffffff'
+    }
+  }
+}, {
+  chartType: 'line',
+  chartNumber: 1
+});
+```
+</js>
+</CodeSwitcher>
+
+## Line Configuration
+
+### Grid Types
+
+<CodeSwitcher>
+<ts>
+```typescript
+grid: {
+  type: 'vertical' | 'horizontal' | 'both',  // Grid type
+  color: '#e0e0e0',                          // Grid line color
+  width: 1                                   // Grid line width
+}
+```
+</ts>
+<js>
+```javascript
+grid: {
+  type: 'vertical' | 'horizontal' | 'both',  // Grid type
+  color: '#e0e0e0',                          // Grid line color
+  width: 1                                   // Grid line width
+}
+```
+</js>
+</CodeSwitcher>
+
+### Line Tension
+
+Control curve smoothness (0 = straight, 1 = very curved):
+
+<CodeSwitcher>
+<ts>
+```typescript
+lineTension: [0.1, 0.3, 0.5]  // One value per line
+```
+</ts>
+<js>
+```javascript
+lineTension: [0.1, 0.3, 0.5]  // One value per line
+```
+</js>
+</CodeSwitcher>
+
+### Filled Areas
+
+Fill area under each line:
+
+<CodeSwitcher>
+<ts>
+```typescript
+fillArea: [
+  { color: 'rgba(255, 107, 107, 0.2)' },  // First line fill
+  { color: 'rgba(78, 205, 196, 0.2)' },   // Second line fill
+  { color: 'transparent' }                 // No fill
+]
+```
+</ts>
+<js>
+```javascript
+fillArea: [
+  { color: 'rgba(255, 107, 107, 0.2)' },  // First line fill
+  { color: 'rgba(78, 205, 196, 0.2)' },   // Second line fill
+  { color: 'transparent' }                 // No fill
+]
+```
+</js>
+</CodeSwitcher>
+
+### Plot Points
+
+Show data points on lines:
+
+<CodeSwitcher>
+<ts>
+```typescript
+plot: {
+  enable: true,                    // Enable plot points
+  color: ['#ff6b6b', '#4ecdc4'],  // One color per line
+  size: 5                          // Point size
+}
+```
+</ts>
+<js>
+```javascript
+plot: {
+  enable: true,                    // Enable plot points
+  color: ['#ff6b6b', '#4ecdc4'],  // One color per line
+  size: 5                          // Point size
+}
+```
+</js>
+</CodeSwitcher>
+
+### Y-Axis Label
+
+<CodeSwitcher>
+<ts>
+```typescript
+yaxisLabel: {
+  label: 'Sales (in thousands)',
+  x: 0,
+  y: 0,
+  color: '#000000',
+  fontSize: '16px'
+}
+```
+</ts>
+<js>
+```javascript
+yaxisLabel: {
+  label: 'Sales (in thousands)',
+  x: 0,
+  y: 0,
+  color: '#000000',
+  fontSize: '16px'
+}
+```
+</js>
+</CodeSwitcher>
+
+### Legend/Keys
+
+<CodeSwitcher>
+<ts>
+```typescript
+keys: {
+  '#ff6b6b': 'Product A',
+  '#4ecdc4': 'Product B',
+  '#45b7d1': 'Product C'
+},
+keysConfig: {
+  radius: 10,           // Key circle radius
+  keyPadding: 30,       // Padding between keys
+  textPadding: 60,      // Padding before text
+  lineWidth: 3,         // Key line width
+  fontColor: '#000000'  // Key text color
+}
+```
+</ts>
+<js>
+```javascript
+keys: {
+  '#ff6b6b': 'Product A',
+  '#4ecdc4': 'Product B',
+  '#45b7d1': 'Product C'
+},
+keysConfig: {
+  radius: 10,           // Key circle radius
+  keyPadding: 30,        // Padding between keys
+  textPadding: 60,       // Padding before text
+  lineWidth: 3,          // Key line width
+  fontColor: '#000000'   // Key text color
+}
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const chart = await painter.createChart({
+  data: [
+    [
+      { label: 'Q1', y: 45 },
+      { label: 'Q2', y: 62 },
+      { label: 'Q3', y: 38 },
+      { label: 'Q4', y: 71 }
+    ],
+    [
+      { label: 'Q1', y: 30 },
+      { label: 'Q2', y: 55 },
+      { label: 'Q3', y: 48 },
+      { label: 'Q4', y: 65 }
+    ]
+  ],
+  lineConfig: {
+    yLabels: ['0', '20', '40', '60', '80', '100'],
+    fillArea: [
+      { color: 'rgba(255, 107, 107, 0.15)' },
+      { color: 'rgba(78, 205, 196, 0.15)' }
+    ],
+    lineColor: ['#ff6b6b', '#4ecdc4'],
+    lineTension: [0.4, 0.4],
+    plot: {
+      enable: true,
+      color: ['#ff6b6b', '#4ecdc4'],
+      size: 6
+    },
+    grid: {
+      type: 'both',
+      color: '#dee2e6',
+      width: 1
+    },
+    yaxisLabel: {
+      label: 'Revenue (in thousands)',
+      color: '#495057',
+      fontSize: '18px'
+    },
+    keys: {
+      '#ff6b6b': '2023 Sales',
+      '#4ecdc4': '2024 Sales'
+    },
+    keysConfig: {
+      radius: 12,
+      keyPadding: 40,
+      textPadding: 70,
+      lineWidth: 4,
+      fontColor: '#2c3e50'
+    },
+    canvas: {
+      width: 1200,
+      height: 800,
+      bgColor: '#f8f9fa',
+      fontColor: '#495057',
+      fontSize: 16
+    }
+  }
+}, {
+  chartType: 'line',
+  chartNumber: 1
+});
+
+fs.writeFileSync('revenue-comparison.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createRevenueChart() {
+  const chart = await painter.createChart({
+    data: [
+      [
+        { label: 'Q1', y: 45 },
+        { label: 'Q2', y: 62 },
+        { label: 'Q3', y: 38 },
+        { label: 'Q4', y: 71 }
+      ],
+      [
+        { label: 'Q1', y: 30 },
+        { label: 'Q2', y: 55 },
+        { label: 'Q3', y: 48 },
+        { label: 'Q4', y: 65 }
+      ]
+    ],
+    lineConfig: {
+      yLabels: ['0', '20', '40', '60', '80', '100'],
+      fillArea: [
+        { color: 'rgba(255, 107, 107, 0.15)' },
+        { color: 'rgba(78, 205, 196, 0.15)' }
+      ],
+      lineColor: ['#ff6b6b', '#4ecdc4'],
+      lineTension: [0.4, 0.4],
+      plot: {
+        enable: true,
+        color: ['#ff6b6b', '#4ecdc4'],
+        size: 6
+      },
+      grid: {
+        type: 'both',
+        color: '#dee2e6',
+        width: 1
+      },
+      yaxisLabel: {
+        label: 'Revenue (in thousands)',
+        color: '#495057',
+        fontSize: '18px'
+      },
+      keys: {
+        '#ff6b6b': '2023 Sales',
+        '#4ecdc4': '2024 Sales'
+      },
+      keysConfig: {
+        radius: 12,
+        keyPadding: 40,
+        textPadding: 70,
+        lineWidth: 4,
+        fontColor: '#2c3e50'
+      },
+      canvas: {
+        width: 1200,
+        height: 800,
+        bgColor: '#f8f9fa',
+        fontColor: '#495057',
+        fontSize: 16
+      }
+    }
+  }, {
+    chartType: 'line',
+    chartNumber: 1
+  });
+
+  fs.writeFileSync('revenue-comparison.png', chart);
+}
+
+createRevenueChart();
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="warning" title="Array Lengths">
+All arrays in `lineConfig` (fillArea, lineColor, lineTension) must have the same length as the `data` array (number of lines).
+</Alert>
+
+## Next Steps
+
+- [Bar Charts](/docs#bar-charts) - Create vertical bar charts
+- [Pie Charts](/docs#pie-charts) - Create circular pie charts
+
+

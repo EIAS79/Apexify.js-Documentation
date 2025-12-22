@@ -1,0 +1,753 @@
+# Advanced Background Features
+
+Beyond basic backgrounds, Apexify.js provides advanced features to enhance your canvas backgrounds including strokes, shadows, patterns, noise, zoom effects, rotation, border radius, opacity, blur, blend modes, and video backgrounds.
+
+## Border Radius
+
+Add rounded corners to your canvas using `borderRadius`:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Simple rounded corners
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  borderRadius: 20  // 20px radius on all corners
+});
+
+fs.writeFileSync('rounded-corners.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createRoundedCanvas() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#4ECDC4',
+    borderRadius: 20
+  });
+
+  fs.writeFileSync('rounded-corners.png', canvas.buffer);
+}
+createRoundedCanvas();
+```
+</js>
+</CodeSwitcher>
+
+### Circular Canvas
+
+Use `'circular'` to create a perfect circle:
+
+<CodeBlock lang="typescript">
+```typescript
+// Square canvas becomes a circle
+const circle = await painter.createCanvas({
+  width: 600,
+  height: 600,
+  colorBg: '#FF6B6B',
+  borderRadius: 'circular'
+});
+```
+</CodeBlock>
+
+### Selective Corner Rounding
+
+Use `borderPosition` to round specific corners:
+
+<CodeBlock lang="typescript">
+```typescript
+// Round only top corners
+const topRounded = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  borderRadius: 30,
+  borderPosition: 'top'  // Only top-left and top-right
+});
+
+// Round only bottom-left corner
+const singleCorner = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  borderRadius: 40,
+  borderPosition: 'bottom-left'
+});
+```
+</CodeBlock>
+
+### Available Border Positions
+
+- `'all'` - All corners (default)
+- `'top'` - Top-left and top-right
+- `'bottom'` - Bottom-left and bottom-right
+- `'left'` - Top-left and bottom-left
+- `'right'` - Top-right and bottom-right
+- `'top-left'` - Only top-left corner
+- `'top-right'` - Only top-right corner
+- `'bottom-left'` - Only bottom-left corner
+- `'bottom-right'` - Only bottom-right corner
+
+## Canvas Stroke
+
+Add borders around your canvas with the `stroke` property:
+
+<CodeBlock lang="typescript">
+```typescript
+// Simple solid stroke
+const strokedCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  stroke: {
+    color: '#2C3E50',
+    width: 5
+  }
+});
+```
+</CodeBlock>
+
+### Stroke Styles
+
+<CodeBlock lang="typescript">
+```typescript
+// Dashed stroke
+const dashedStroke = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  stroke: {
+    color: '#2C3E50',
+    width: 3,
+    style: 'dashed'
+  }
+});
+
+// Dotted stroke
+const dottedStroke = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  stroke: {
+    color: '#2C3E50',
+    width: 3,
+    style: 'dotted'
+  }
+});
+
+// Double stroke
+const doubleStroke = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  stroke: {
+    color: '#2C3E50',
+    width: 4,
+    style: 'double'
+  }
+});
+```
+</CodeBlock>
+
+### Gradient Stroke
+
+Use gradients for strokes:
+
+<CodeBlock lang="typescript">
+```typescript
+const gradientStroke = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  stroke: {
+    width: 8,
+    gradient: {
+      type: 'linear',
+      colors: [
+        { stop: 0, color: '#FF6B6B' },
+        { stop: 1, color: '#4ECDC4' }
+      ]
+    }
+  }
+});
+```
+</CodeBlock>
+
+### Advanced Stroke Options
+
+<CodeBlock lang="typescript">
+```typescript
+const advancedStroke = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  stroke: {
+    color: '#2C3E50',
+    width: 5,
+    position: 0,           // 0 = center, positive = outside, negative = inside
+    blur: 2,               // Blur the stroke
+    opacity: 0.9,          // Stroke opacity
+    borderRadius: 20,      // Match canvas border radius
+    borderPosition: 'all',
+    style: 'solid'
+  }
+});
+```
+</CodeBlock>
+
+## Canvas Shadow
+
+Add drop shadows to your canvas:
+
+<CodeBlock lang="typescript">
+```typescript
+// Basic shadow
+const shadowedCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  shadow: {
+    color: 'rgba(0, 0, 0, 0.3)',
+    offsetX: 10,
+    offsetY: 10,
+    blur: 20
+  }
+});
+```
+</CodeBlock>
+
+### Gradient Shadow
+
+Create colorful shadows with gradients:
+
+<CodeBlock lang="typescript">
+```typescript
+const gradientShadow = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  shadow: {
+    offsetX: 15,
+    offsetY: 15,
+    blur: 25,
+    opacity: 0.6,
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: 'rgba(255, 107, 107, 0.8)' },
+        { stop: 1, color: 'rgba(44, 62, 80, 0.2)' }
+      ]
+    }
+  }
+});
+```
+</CodeBlock>
+
+### Advanced Shadow Options
+
+<CodeBlock lang="typescript">
+```typescript
+const advancedShadow = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  shadow: {
+    color: 'rgba(0, 0, 0, 0.4)',
+    offsetX: 20,           // Horizontal offset
+    offsetY: 20,           // Vertical offset
+    blur: 30,              // Blur radius
+    opacity: 0.8,          // Shadow opacity
+    borderRadius: 20,      // Match canvas border radius
+    borderPosition: 'all'
+  }
+});
+```
+</CodeBlock>
+
+## Pattern Backgrounds
+
+Add pattern overlays to your backgrounds using the `patternBg` property:
+
+<CodeBlock lang="typescript">
+```typescript
+// Grid pattern
+const gridPattern = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#2C3E50',
+  patternBg: {
+    type: 'grid',
+    color: '#34495E',
+    size: 20,
+    spacing: 5,
+    opacity: 0.5
+  }
+});
+```
+</CodeBlock>
+
+### Available Pattern Types
+
+<CodeBlock lang="typescript">
+```typescript
+// Dots pattern
+const dotsPattern = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#FFF',
+  patternBg: {
+    type: 'dots',
+    color: '#333',
+    size: 10,
+    spacing: 15,
+    opacity: 0.3
+  }
+});
+
+// Diagonal stripes
+const diagonalPattern = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#FFF',
+  patternBg: {
+    type: 'diagonal',
+    color: '#4ECDC4',
+    size: 20,
+    spacing: 10,
+    rotation: 45
+  }
+});
+
+// Checkerboard
+const checkerboard = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#FFF',
+  patternBg: {
+    type: 'checkerboard',
+    color: '#333',
+    secondaryColor: '#FFF',
+    size: 40,
+    opacity: 1
+  }
+});
+```
+</CodeBlock>
+
+### All Pattern Types
+
+- `'grid'` - Grid lines pattern
+- `'dots'` - Circular dots
+- `'diagonal'` - Diagonal stripes
+- `'stripes'` - Horizontal/vertical stripes
+- `'waves'` - Wave pattern
+- `'crosses'` - Cross pattern
+- `'hexagons'` - Hexagonal pattern
+- `'checkerboard'` - Checkerboard pattern
+- `'diamonds'` - Diamond pattern
+- `'triangles'` - Triangle pattern
+- `'stars'` - Star pattern
+- `'polka'` - Polka dots
+- `'custom'` - Custom image pattern
+
+### Custom Image Patterns
+
+<CodeBlock lang="typescript">
+```typescript
+const customPattern = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#2C3E50',
+  patternBg: {
+    type: 'custom',
+    customPatternImage: './pattern.png',
+    repeat: 'repeat',
+    scale: 1,
+    opacity: 0.5,
+    offsetX: 0,
+    offsetY: 0
+  }
+});
+```
+</CodeBlock>
+
+### Pattern with Gradient
+
+<CodeBlock lang="typescript">
+```typescript
+const gradientPattern = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#2C3E50',
+  patternBg: {
+    type: 'dots',
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#FF6B6B' },
+        { stop: 1, color: '#4ECDC4' }
+      ]
+    },
+    size: 15,
+    spacing: 20,
+    opacity: 0.6
+  }
+});
+```
+</CodeBlock>
+
+## Noise Backgrounds
+
+Add texture with noise using `noiseBg`:
+
+<CodeBlock lang="typescript">
+```typescript
+const noiseCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#2C3E50',
+  noiseBg: {
+    intensity: 0.1  // 0-1, higher = more noise
+  }
+});
+```
+</CodeBlock>
+
+## Canvas Rotation
+
+Rotate the entire canvas:
+
+<CodeBlock lang="typescript">
+```typescript
+const rotatedCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  rotation: 45  // Rotate 45 degrees clockwise
+});
+```
+</CodeBlock>
+
+## Canvas Zoom
+
+Apply zoom effects to the canvas:
+
+<CodeBlock lang="typescript">
+```typescript
+const zoomedCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  zoom: {
+    scale: 1.5,        // 1.5x zoom
+    centerX: 400,      // Zoom center X (defaults to canvas center)
+    centerY: 300       // Zoom center Y (defaults to canvas center)
+  }
+});
+```
+</CodeBlock>
+
+## Canvas Opacity
+
+Control the overall opacity of the canvas:
+
+<CodeBlock lang="typescript">
+```typescript
+const transparentCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  opacity: 0.7  // 70% opacity (0-1 range)
+});
+```
+</CodeBlock>
+
+## Canvas Blur
+
+Apply blur to the entire canvas:
+
+<CodeBlock lang="typescript">
+```typescript
+const blurredCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  blur: 5  // Blur radius in pixels
+});
+```
+</CodeBlock>
+
+## Blend Modes
+
+Use blend modes to combine backgrounds:
+
+<CodeBlock lang="typescript">
+```typescript
+// Multiply blend mode
+const blendedCanvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#4ECDC4',
+  blendMode: 'multiply'
+});
+
+// Available blend modes:
+// 'source-over', 'source-in', 'source-out', 'source-atop',
+// 'destination-over', 'destination-in', 'destination-out', 'destination-atop',
+// 'lighter', 'copy', 'xor', 'multiply', 'screen', 'overlay',
+// 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light',
+// 'soft-light', 'difference', 'exclusion', 'hue', 'saturation',
+// 'color', 'luminosity'
+```
+</CodeBlock>
+
+## Video Backgrounds
+
+Use video frames as backgrounds with `videoBg`. Video backgrounds extract a specific frame from a video file and use it as the canvas background.
+
+<Alert type="info" title="Complete Video Documentation">
+For comprehensive documentation on video backgrounds, including installation requirements, all options, frame extraction methods, and best practices, see the [Video Backgrounds Guide](/docs#video-backgrounds) in the Video documentation section.
+</Alert>
+
+### Quick Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+const videoCanvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    time: 5.5,       // Extract frame at 5.5 seconds (recommended)
+    opacity: 0.9     // 90% opacity
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const videoCanvas = await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './video.mp4',
+    time: 5.5,       // Extract frame at 5.5 seconds (recommended)
+    opacity: 0.9     // 90% opacity
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Video Background Priority
+
+Video backgrounds take priority over other background types. The order is: **videoBg > customBg > gradientBg > colorBg**.
+
+<Alert type="warning" title="FFmpeg Required">
+Video backgrounds require FFmpeg to be installed on your system. See the [FFmpeg Installation Guide](/docs#ffmpeg-installation) for setup instructions.
+</Alert>
+
+### Related Video Features
+
+- **[Video Backgrounds](/docs#video-backgrounds)** - Complete guide to video backgrounds
+- **[Getting Video Info](/docs#getting-video-info)** - Get video metadata (duration, FPS, resolution)
+- **[Extracting Frames](/docs#extracting-frames)** - Extract frames from videos
+- **[FFmpeg Installation](/docs#ffmpeg-installation)** - Setup guide for FFmpeg
+
+## Combining Multiple Features
+
+Combine all these features for sophisticated designs:
+
+<CodeBlock lang="typescript">
+```typescript
+const advancedCanvas = await painter.createCanvas({
+  width: 1200,
+  height: 800,
+  gradientBg: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#FF6B6B' },
+      { stop: 1, color: '#4ECDC4' }
+    ]
+  },
+  patternBg: {
+    type: 'dots',
+    color: '#FFF',
+    size: 5,
+    spacing: 15,
+    opacity: 0.2
+  },
+  noiseBg: {
+    intensity: 0.05
+  },
+  borderRadius: 30,
+  borderPosition: 'all',
+  rotation: 2,
+  opacity: 0.95,
+  shadow: {
+    color: 'rgba(0, 0, 0, 0.3)',
+    offsetX: 20,
+    offsetY: 20,
+    blur: 40,
+    borderRadius: 30
+  },
+  stroke: {
+    color: '#FFF',
+    width: 3,
+    style: 'solid',
+    borderRadius: 30
+  },
+  zoom: {
+    scale: 1.1,
+    centerX: 600,
+    centerY: 400
+  }
+});
+```
+</CodeBlock>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+async function createAdvancedBackground() {
+  const canvas = await painter.createCanvas({
+    width: 1000,
+    height: 700,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#FF6B6B' },
+        { stop: 0.5, color: '#4ECDC4' },
+        { stop: 1, color: '#2C3E50' }
+      ]
+    },
+    patternBg: {
+      type: 'grid',
+      color: 'rgba(255, 255, 255, 0.1)',
+      size: 30,
+      spacing: 10,
+      opacity: 0.5
+    },
+    borderRadius: 25,
+    shadow: {
+      color: 'rgba(0, 0, 0, 0.4)',
+      offsetX: 15,
+      offsetY: 15,
+      blur: 30,
+      borderRadius: 25
+    },
+    stroke: {
+      color: '#FFF',
+      width: 4,
+      style: 'solid',
+      borderRadius: 25
+    },
+    opacity: 0.98
+  });
+
+  fs.writeFileSync('advanced-background.png', canvas.buffer);
+  console.log('Advanced background created!');
+}
+
+createAdvancedBackground();
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createAdvancedBackground() {
+  const canvas = await painter.createCanvas({
+    width: 1000,
+    height: 700,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#FF6B6B' },
+        { stop: 0.5, color: '#4ECDC4' },
+        { stop: 1, color: '#2C3E50' }
+      ]
+    },
+    patternBg: {
+      type: 'grid',
+      color: 'rgba(255, 255, 255, 0.1)',
+      size: 30,
+      spacing: 10,
+      opacity: 0.5
+    },
+    borderRadius: 25,
+    shadow: {
+      color: 'rgba(0, 0, 0, 0.4)',
+      offsetX: 15,
+      offsetY: 15,
+      blur: 30,
+      borderRadius: 25
+    },
+    stroke: {
+      color: '#FFF',
+      width: 4,
+      style: 'solid',
+      borderRadius: 25
+    },
+    opacity: 0.98
+  });
+
+  fs.writeFileSync('advanced-background.png', canvas.buffer);
+  console.log('Advanced background created!');
+}
+
+createAdvancedBackground();
+```
+</js>
+</CodeSwitcher>
+
+## Important Notes
+
+<Alert type="info" title="Feature Layering">
+Features are applied in this order:
+1. Background (color/gradient/custom)
+2. Pattern overlay
+3. Noise overlay
+4. Border radius clipping
+5. Shadow
+6. Stroke
+</Alert>
+
+<Alert type="warning" title="Performance Considerations">
+- Multiple effects (patterns, noise, filters) can impact performance
+- Large canvases with many effects may take longer to render
+- Use effects judiciously for optimal performance
+</Alert>
+
+<Dropdown title="Best Practices">
+- **Start simple**: Add effects gradually to see their impact
+- **Test combinations**: Some effects work better together than others
+- **Consider performance**: Too many effects can slow rendering
+- **Use opacity wisely**: Subtle effects often look more professional
+- **Match border radius**: Ensure stroke and shadow match canvas border radius for consistency
+</Dropdown>
+

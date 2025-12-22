@@ -1,0 +1,1358 @@
+# Comprehensive Video Processing
+
+Apexify.js provides **25+ comprehensive video processing features** through the `createVideo()` method. This unified API gives you complete control over video manipulation, frame extraction, effects, and more.
+
+<Alert type="info" title="FFmpeg Required">
+All video processing features require FFmpeg to be installed on your system. See the [FFmpeg Installation Guide](#ffmpeg-installation) for setup instructions.
+</Alert>
+
+## Overview
+
+The `createVideo()` method is a comprehensive video processing API that supports:
+
+- **Frame Extraction**: Extract single frames, multiple frames, or all frames
+- **Video Information**: Get detailed video metadata
+- **Format Conversion**: Convert between video formats
+- **Video Editing**: Trim, crop, rotate, and merge videos
+- **Effects & Filters**: Apply visual effects and color correction
+- **Audio Processing**: Extract audio, adjust volume, mute
+- **Advanced Features**: Stabilization, scene detection, time-lapse, and more
+
+## Method Signature
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: string | Buffer,  // Video source (path, URL, or Buffer)
+  // ... operation options (see below)
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: string | Buffer,  // Video source (path, URL, or Buffer)
+  // ... operation options (see below)
+});
+```
+</js>
+</CodeSwitcher>
+
+## Video Features
+
+### 1. Get Video Information
+
+Retrieve comprehensive video metadata:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const info = await painter.createVideo({
+  source: './video.mp4',
+  getInfo: true
+});
+
+console.log('Duration:', info.duration, 'seconds');
+console.log('Resolution:', info.width, 'x', info.height);
+console.log('Frame Rate:', info.fps, 'FPS');
+console.log('Bitrate:', info.bitrate);
+console.log('Format:', info.format);
+```
+</ts>
+<js>
+```javascript
+const info = await painter.createVideo({
+  source: './video.mp4',
+  getInfo: true
+});
+
+console.log('Duration:', info.duration, 'seconds');
+console.log('Resolution:', info.width, 'x', info.height);
+console.log('Frame Rate:', info.fps, 'FPS');
+console.log('Bitrate:', info.bitrate);
+console.log('Format:', info.format);
+```
+</js>
+</CodeSwitcher>
+
+### 2. Extract Single Frame
+
+Extract a single frame and create a canvas:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createVideo({
+  source: './video.mp4',
+  extractFrame: {
+    time: 5.5,           // Time in seconds (recommended)
+    // frame: 150,       // OR frame number (1-based)
+    width: 1920,         // Canvas width (default: video width)
+    height: 1080,        // Canvas height (default: video height)
+    outputFormat: 'png', // 'jpg' | 'png'
+    quality: 2           // JPEG quality 1-31 (lower = better)
+  }
+});
+
+// Returns: { buffer: Buffer, canvas: { width, height } }
+fs.writeFileSync('frame.png', canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createVideo({
+  source: './video.mp4',
+  extractFrame: {
+    time: 5.5,           // Time in seconds (recommended)
+    // frame: 150,       // OR frame number (1-based)
+    width: 1920,         // Canvas width (default: video width)
+    height: 1080,        // Canvas height (default: video height)
+    outputFormat: 'png', // 'jpg' | 'png'
+    quality: 2           // JPEG quality 1-31 (lower = better)
+  }
+});
+
+// Returns: { buffer: Buffer, canvas: { width, height } }
+fs.writeFileSync('frame.png', canvas.buffer);
+```
+</js>
+</CodeSwitcher>
+
+### 3. Extract Multiple Frames
+
+Extract frames at specific times or intervals:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Extract frames at specific times
+const frames = await painter.createVideo({
+  source: './video.mp4',
+  extractFrames: {
+    times: [0, 5, 10, 15, 30, 60],  // Array of times in seconds
+    outputFormat: 'png',
+    quality: 2
+  }
+});
+
+// OR extract frames at intervals
+const frames = await painter.createVideo({
+  source: './video.mp4',
+  extractFrames: {
+    interval: 1000,  // Extract every 1000ms (1 second)
+    frameSelection: {
+      start: 0,      // Start frame index
+      end: 100       // End frame index
+    },
+    outputFormat: 'jpg',
+    outputDirectory: './frames'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Extract frames at specific times
+const frames = await painter.createVideo({
+  source: './video.mp4',
+  extractFrames: {
+    times: [0, 5, 10, 15, 30, 60],  // Array of times in seconds
+    outputFormat: 'png',
+    quality: 2
+  }
+});
+
+// OR extract frames at intervals
+const frames = await painter.createVideo({
+  source: './video.mp4',
+  extractFrames: {
+    interval: 1000,  // Extract every 1000ms (1 second)
+    frameSelection: {
+      start: 0,      // Start frame index
+      end: 100       // End frame index
+    },
+    outputFormat: 'jpg',
+    outputDirectory: './frames'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 4. Extract All Frames
+
+Extract every frame from the video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const frames = await painter.createVideo({
+  source: './video.mp4',
+  extractAllFrames: {
+    outputFormat: 'png',
+    outputDirectory: './all-frames',
+    prefix: 'frame',
+    quality: 2,
+    startTime: 0,      // Start time in seconds (default: 0)
+    endTime: 60        // End time in seconds (default: video duration)
+  }
+});
+
+// Returns: Array<{ source: string, frameNumber: number, time: number }>
+```
+</ts>
+<js>
+```javascript
+const frames = await painter.createVideo({
+  source: './video.mp4',
+  extractAllFrames: {
+    outputFormat: 'png',
+    outputDirectory: './all-frames',
+    prefix: 'frame',
+    quality: 2,
+    startTime: 0,      // Start time in seconds (default: 0)
+    endTime: 60        // End time in seconds (default: video duration)
+  }
+});
+
+// Returns: Array<{ source: string, frameNumber: number, time: number }>
+```
+</js>
+</CodeSwitcher>
+
+### 5. Generate Video Thumbnail
+
+Create a grid thumbnail with multiple frames:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const thumbnail = await painter.createVideo({
+  source: './video.mp4',
+  generateThumbnail: {
+    count: 9,              // Number of frames (default: 9)
+    grid: { cols: 3, rows: 3 },  // Grid layout (default: 3x3)
+    width: 320,            // Thumbnail width (default: 320)
+    height: 180,           // Thumbnail height (default: 180)
+    outputFormat: 'jpg',
+    quality: 2
+  }
+});
+
+// Returns: { buffer: Buffer, canvas: { width, height } }
+fs.writeFileSync('thumbnail.jpg', thumbnail.buffer);
+```
+</ts>
+<js>
+```javascript
+const thumbnail = await painter.createVideo({
+  source: './video.mp4',
+  generateThumbnail: {
+    count: 9,              // Number of frames (default: 9)
+    grid: { cols: 3, rows: 3 },  // Grid layout (default: 3x3)
+    width: 320,            // Thumbnail width (default: 320)
+    height: 180,           // Thumbnail height (default: 180)
+    outputFormat: 'jpg',
+    quality: 2
+  }
+});
+
+// Returns: { buffer: Buffer, canvas: { width, height } }
+fs.writeFileSync('thumbnail.jpg', thumbnail.buffer);
+```
+</js>
+</CodeSwitcher>
+
+### 6. Convert Video Format
+
+Convert videos between formats:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  convert: {
+    outputPath: './output.webm',
+    format: 'webm',        // 'mp4' | 'webm' | 'avi' | 'mov' | 'mkv'
+    quality: 'high',       // 'low' | 'medium' | 'high' | 'ultra'
+    // bitrate: 2000,      // Custom bitrate in kbps (overrides quality)
+    fps: 30,               // Output FPS (default: source FPS)
+    resolution: {          // Output resolution
+      width: 1920,
+      height: 1080
+    }
+  }
+});
+
+// Returns: { outputPath: string, success: boolean }
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  convert: {
+    outputPath: './output.webm',
+    format: 'webm',        // 'mp4' | 'webm' | 'avi' | 'mov' | 'mkv'
+    quality: 'high',       // 'low' | 'medium' | 'high' | 'ultra'
+    // bitrate: 2000,      // Custom bitrate in kbps (overrides quality)
+    fps: 30,               // Output FPS (default: source FPS)
+    resolution: {          // Output resolution
+      width: 1920,
+      height: 1080
+    }
+  }
+});
+
+// Returns: { outputPath: string, success: boolean }
+```
+</js>
+</CodeSwitcher>
+
+### 7. Trim/Cut Video
+
+Trim videos to specific time ranges:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  trim: {
+    startTime: 10,         // Start time in seconds
+    endTime: 60,           // End time in seconds
+    outputPath: './trimmed.mp4'
+  }
+});
+
+// Returns: { outputPath: string, success: boolean }
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  trim: {
+    startTime: 10,         // Start time in seconds
+    endTime: 60,           // End time in seconds
+    outputPath: './trimmed.mp4'
+  }
+});
+
+// Returns: { outputPath: string, success: boolean }
+```
+</js>
+</CodeSwitcher>
+
+### 8. Extract Audio from Video
+
+Extract audio track from video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  extractAudio: {
+    outputPath: './audio.mp3',
+    format: 'mp3',         // 'mp3' | 'wav' | 'aac' | 'ogg'
+    bitrate: 128           // Audio bitrate in kbps (default: 128)
+  }
+});
+
+// Returns: { outputPath: string, success: boolean }
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  extractAudio: {
+    outputPath: './audio.mp3',
+    format: 'mp3',         // 'mp3' | 'wav' | 'aac' | 'ogg'
+    bitrate: 128           // Audio bitrate in kbps (default: 128)
+  }
+});
+
+// Returns: { outputPath: string, success: boolean }
+```
+</js>
+</CodeSwitcher>
+
+### 9. Add Watermark to Video
+
+Add image watermark to video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  addWatermark: {
+    watermarkPath: './logo.png',
+    position: 'bottom-right',  // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'
+    opacity: 0.7,              // 0-1 (default: 0.5)
+    size: {                     // Watermark size (optional)
+      width: 200,
+      height: 100
+    },
+    outputPath: './watermarked.mp4'
+  }
+});
+
+// Returns: { outputPath: string, success: boolean }
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  addWatermark: {
+    watermarkPath: './logo.png',
+    position: 'bottom-right',  // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'
+    opacity: 0.7,              // 0-1 (default: 0.5)
+    size: {                     // Watermark size (optional)
+      width: 200,
+      height: 100
+    },
+    outputPath: './watermarked.mp4'
+  }
+});
+
+// Returns: { outputPath: string, success: boolean }
+```
+</js>
+</CodeSwitcher>
+
+### 10. Adjust Video Speed
+
+Change video playback speed:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Slow motion (0.5x = half speed)
+const result = await painter.createVideo({
+  source: './video.mp4',
+  changeSpeed: {
+    speed: 0.5,           // Speed multiplier (0.5 = half, 2 = double)
+    outputPath: './slow-motion.mp4'
+  }
+});
+
+// Fast forward (2x = double speed)
+const result2 = await painter.createVideo({
+  source: './video.mp4',
+  changeSpeed: {
+    speed: 2.0,
+    outputPath: './fast-forward.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Slow motion (0.5x = half speed)
+const result = await painter.createVideo({
+  source: './video.mp4',
+  changeSpeed: {
+    speed: 0.5,           // Speed multiplier (0.5 = half, 2 = double)
+    outputPath: './slow-motion.mp4'
+  }
+});
+
+// Fast forward (2x = double speed)
+const result2 = await painter.createVideo({
+  source: './video.mp4',
+  changeSpeed: {
+    speed: 2.0,
+    outputPath: './fast-forward.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 11. Generate Video Preview
+
+Extract multiple preview frames:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const previews = await painter.createVideo({
+  source: './video.mp4',
+  generatePreview: {
+    count: 10,            // Number of preview frames (default: 10)
+    outputDirectory: './previews',
+    outputFormat: 'png',
+    quality: 2
+  }
+});
+
+// Returns: Array<{ source: string, frameNumber: number, time: number }>
+```
+</ts>
+<js>
+```javascript
+const previews = await painter.createVideo({
+  source: './video.mp4',
+  generatePreview: {
+    count: 10,            // Number of preview frames (default: 10)
+    outputDirectory: './previews',
+    outputFormat: 'png',
+    quality: 2
+  }
+});
+
+// Returns: Array<{ source: string, frameNumber: number, time: number }>
+```
+</js>
+</CodeSwitcher>
+
+### 12. Apply Video Effects/Filters
+
+Apply visual effects to video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  applyEffects: {
+    filters: [
+      { type: 'blur', intensity: 5 },
+      { type: 'brightness', value: 20 },        // -100 to 100
+      { type: 'contrast', value: 15 },          // -100 to 100
+      { type: 'saturation', value: -10 },       // -100 to 100
+      { type: 'grayscale' },
+      { type: 'sepia' },
+      { type: 'invert' },
+      { type: 'sharpen', intensity: 1.5 },
+      { type: 'noise', intensity: 20 }
+    ],
+    outputPath: './filtered.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  applyEffects: {
+    filters: [
+      { type: 'blur', intensity: 5 },
+      { type: 'brightness', value: 20 },        // -100 to 100
+      { type: 'contrast', value: 15 },          // -100 to 100
+      { type: 'saturation', value: -10 },       // -100 to 100
+      { type: 'grayscale' },
+      { type: 'sepia' },
+      { type: 'invert' },
+      { type: 'sharpen', intensity: 1.5 },
+      { type: 'noise', intensity: 20 }
+    ],
+    outputPath: './filtered.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 13. Merge/Concatenate Videos
+
+Combine multiple videos:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Sequential merge (one after another)
+const result = await painter.createVideo({
+  source: './video1.mp4',
+  merge: {
+    videos: ['./video1.mp4', './video2.mp4', './video3.mp4'],
+    outputPath: './merged.mp4',
+    mode: 'sequential'  // 'sequential' | 'side-by-side' | 'grid'
+  }
+});
+
+// Side-by-side
+const result2 = await painter.createVideo({
+  source: './video1.mp4',
+  merge: {
+    videos: ['./video1.mp4', './video2.mp4'],
+    outputPath: './side-by-side.mp4',
+    mode: 'side-by-side'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Sequential merge (one after another)
+const result = await painter.createVideo({
+  source: './video1.mp4',
+  merge: {
+    videos: ['./video1.mp4', './video2.mp4', './video3.mp4'],
+    outputPath: './merged.mp4',
+    mode: 'sequential'  // 'sequential' | 'side-by-side' | 'grid'
+  }
+});
+
+// Side-by-side
+const result2 = await painter.createVideo({
+  source: './video1.mp4',
+  merge: {
+    videos: ['./video1.mp4', './video2.mp4'],
+    outputPath: './side-by-side.mp4',
+    mode: 'side-by-side'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 14. Rotate/Flip Video
+
+Rotate or flip videos:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Rotate 90 degrees
+const result = await painter.createVideo({
+  source: './video.mp4',
+  rotate: {
+    angle: 90,           // 90 | 180 | 270
+    outputPath: './rotated.mp4'
+  }
+});
+
+// Flip horizontally
+const result2 = await painter.createVideo({
+  source: './video.mp4',
+  rotate: {
+    flip: 'horizontal',  // 'horizontal' | 'vertical' | 'both'
+    outputPath: './flipped.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Rotate 90 degrees
+const result = await painter.createVideo({
+  source: './video.mp4',
+  rotate: {
+    angle: 90,           // 90 | 180 | 270
+    outputPath: './rotated.mp4'
+  }
+});
+
+// Flip horizontally
+const result2 = await painter.createVideo({
+  source: './video.mp4',
+  rotate: {
+    flip: 'horizontal',  // 'horizontal' | 'vertical' | 'both'
+    outputPath: './flipped.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 15. Crop Video
+
+Crop video to specific region:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  crop: {
+    x: 100,              // Start X position
+    y: 50,               // Start Y position
+    width: 800,          // Crop width
+    height: 600,         // Crop height
+    outputPath: './cropped.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  crop: {
+    x: 100,              // Start X position
+    y: 50,               // Start Y position
+    width: 800,          // Crop width
+    height: 600,         // Crop height
+    outputPath: './cropped.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 16. Compress/Optimize Video
+
+Reduce video file size:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  compress: {
+    outputPath: './compressed.mp4',
+    quality: 'medium',   // 'low' | 'medium' | 'high' | 'ultra'
+    // targetSize: 10,   // Target file size in MB (optional)
+    // maxBitrate: 1000  // Max bitrate in kbps (optional)
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  compress: {
+    outputPath: './compressed.mp4',
+    quality: 'medium',   // 'low' | 'medium' | 'high' | 'ultra'
+    // targetSize: 10,   // Target file size in MB (optional)
+    // maxBitrate: 1000  // Max bitrate in kbps (optional)
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 17. Add Text Overlay
+
+Add text overlay to video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  addText: {
+    text: 'Hello World',
+    position: 'top-left',  // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' | 'top-center' | 'bottom-center'
+    fontSize: 48,
+    fontColor: '#FFFFFF',
+    backgroundColor: '#000000',  // Text background color (optional)
+    startTime: 0,         // Start time in seconds (optional)
+    endTime: 10,          // End time in seconds (optional)
+    outputPath: './with-text.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  addText: {
+    text: 'Hello World',
+    position: 'top-left',  // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' | 'top-center' | 'bottom-center'
+    fontSize: 48,
+    fontColor: '#FFFFFF',
+    backgroundColor: '#000000',  // Text background color (optional)
+    startTime: 0,         // Start time in seconds (optional)
+    endTime: 10,          // End time in seconds (optional)
+    outputPath: './with-text.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 18. Add Fade Effects
+
+Add fade in/out effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  addFade: {
+    fadeIn: 2,           // Fade in duration in seconds
+    fadeOut: 2,          // Fade out duration in seconds
+    outputPath: './faded.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  addFade: {
+    fadeIn: 2,           // Fade in duration in seconds
+    fadeOut: 2,          // Fade out duration in seconds
+    outputPath: './faded.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 19. Reverse Video Playback
+
+Reverse video playback:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  reverse: {
+    outputPath: './reversed.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  reverse: {
+    outputPath: './reversed.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 20. Create Seamless Loop
+
+Create a seamless looping video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  createLoop: {
+    outputPath: './loop.mp4',
+    smooth: true  // Try to create smooth loop (optional)
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  createLoop: {
+    outputPath: './loop.mp4',
+    smooth: true  // Try to create smooth loop (optional)
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 21. Batch Process Videos
+
+Process multiple videos at once:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const results = await painter.createVideo({
+  source: './video1.mp4',
+  batch: {
+    videos: [
+      {
+        source: './video1.mp4',
+        operations: { compress: { outputPath: './compressed1.mp4', quality: 'medium' } }
+      },
+      {
+        source: './video2.mp4',
+        operations: { compress: { outputPath: './compressed2.mp4', quality: 'medium' } }
+      }
+    ],
+    outputDirectory: './batch-output'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const results = await painter.createVideo({
+  source: './video1.mp4',
+  batch: {
+    videos: [
+      {
+        source: './video1.mp4',
+        operations: { compress: { outputPath: './compressed1.mp4', quality: 'medium' } }
+      },
+      {
+        source: './video2.mp4',
+        operations: { compress: { outputPath: './compressed2.mp4', quality: 'medium' } }
+      }
+    ],
+    outputDirectory: './batch-output'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 22. Detect Scene Changes
+
+Detect scene changes in video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const scenes = await painter.createVideo({
+  source: './video.mp4',
+  detectScenes: {
+    threshold: 0.3,      // Scene change threshold 0-1 (default: 0.3)
+    outputPath: './scenes.json'  // Optional: save scene markers to file
+  }
+});
+
+// Returns: Array of scene change timestamps or file path
+```
+</ts>
+<js>
+```javascript
+const scenes = await painter.createVideo({
+  source: './video.mp4',
+  detectScenes: {
+    threshold: 0.3,      // Scene change threshold 0-1 (default: 0.3)
+    outputPath: './scenes.json'  // Optional: save scene markers to file
+  }
+});
+
+// Returns: Array of scene change timestamps or file path
+```
+</js>
+</CodeSwitcher>
+
+### 23. Stabilize Video
+
+Reduce camera shake and stabilize video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  stabilize: {
+    outputPath: './stabilized.mp4',
+    smoothing: 10  // Smoothing factor (default: 10)
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  stabilize: {
+    outputPath: './stabilized.mp4',
+    smoothing: 10  // Smoothing factor (default: 10)
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 24. Color Correction
+
+Advanced color correction:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  colorCorrect: {
+    brightness: 10,      // -100 to 100
+    contrast: 15,        // -100 to 100
+    saturation: -5,      // -100 to 100
+    hue: 10,             // -180 to 180
+    temperature: 500,    // Color temperature adjustment
+    outputPath: './corrected.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  colorCorrect: {
+    brightness: 10,      // -100 to 100
+    contrast: 15,        // -100 to 100
+    saturation: -5,      // -100 to 100
+    hue: 10,             // -180 to 180
+    temperature: 500,    // Color temperature adjustment
+    outputPath: './corrected.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 25. Picture-in-Picture
+
+Add picture-in-picture overlay:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  pictureInPicture: {
+    overlayVideo: './overlay.mp4',
+    position: 'bottom-right',  // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'
+    size: {                     // Overlay size
+      width: 320,
+      height: 180
+    },
+    opacity: 0.9,               // 0-1
+    outputPath: './pip.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  pictureInPicture: {
+    overlayVideo: './overlay.mp4',
+    position: 'bottom-right',  // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'
+    size: {                     // Overlay size
+      width: 320,
+      height: 180
+    },
+    opacity: 0.9,               // 0-1
+    outputPath: './pip.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 26. Split Screen
+
+Create split-screen videos:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video1.mp4',
+  splitScreen: {
+    videos: ['./video1.mp4', './video2.mp4', './video3.mp4'],
+    layout: 'grid',      // 'side-by-side' | 'top-bottom' | 'grid'
+    grid: { cols: 2, rows: 2 },  // For grid layout
+    outputPath: './split-screen.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video1.mp4',
+  splitScreen: {
+    videos: ['./video1.mp4', './video2.mp4', './video3.mp4'],
+    layout: 'grid',      // 'side-by-side' | 'top-bottom' | 'grid'
+    grid: { cols: 2, rows: 2 },  // For grid layout
+    outputPath: './split-screen.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 27. Create Time-Lapse
+
+Create time-lapse videos:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  createTimeLapse: {
+    speed: 10,           // Speed multiplier (default: 10x)
+    outputPath: './timelapse.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  createTimeLapse: {
+    speed: 10,           // Speed multiplier (default: 10x)
+    outputPath: './timelapse.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 28. Mute Video
+
+Remove audio from video:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  mute: {
+    outputPath: './muted.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  mute: {
+    outputPath: './muted.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 29. Adjust Audio Volume
+
+Adjust video audio volume:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  adjustVolume: {
+    volume: 0.5,         // Volume multiplier (0.0 = mute, 1.0 = original, 2.0 = double)
+    outputPath: './adjusted-volume.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  adjustVolume: {
+    volume: 0.5,         // Volume multiplier (0.0 = mute, 1.0 = original, 2.0 = double)
+    outputPath: './adjusted-volume.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 30. Detect Video Format and Codec
+
+Get detailed format information:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const formatInfo = await painter.createVideo({
+  source: './video.mp4',
+  detectFormat: true
+});
+
+console.log('Format:', formatInfo.format);
+console.log('Codec:', formatInfo.codec);
+console.log('Container:', formatInfo.container);
+console.log('Resolution:', formatInfo.width, 'x', formatInfo.height);
+console.log('FPS:', formatInfo.fps);
+console.log('Bitrate:', formatInfo.bitrate);
+console.log('Duration:', formatInfo.duration);
+
+// Returns: { format, codec, container, width, height, fps, bitrate, duration }
+```
+</ts>
+<js>
+```javascript
+const formatInfo = await painter.createVideo({
+  source: './video.mp4',
+  detectFormat: true
+});
+
+console.log('Format:', formatInfo.format);
+console.log('Codec:', formatInfo.codec);
+console.log('Container:', formatInfo.container);
+console.log('Resolution:', formatInfo.width, 'x', formatInfo.height);
+console.log('FPS:', formatInfo.fps);
+console.log('Bitrate:', formatInfo.bitrate);
+console.log('Duration:', formatInfo.duration);
+
+// Returns: { format, codec, container, width, height, fps, bitrate, duration }
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+async function processVideo() {
+  // 1. Get video information
+  const info = await painter.createVideo({
+    source: './video.mp4',
+    getInfo: true
+  });
+  console.log('Video info:', info);
+
+  // 2. Extract frame for thumbnail
+  const frame = await painter.createVideo({
+    source: './video.mp4',
+    extractFrame: {
+      time: info.duration * 0.5,  // Middle of video
+      outputFormat: 'png'
+    }
+  });
+  fs.writeFileSync('thumbnail.png', frame.buffer);
+
+  // 3. Compress video
+  const compressed = await painter.createVideo({
+    source: './video.mp4',
+    compress: {
+      outputPath: './compressed.mp4',
+      quality: 'medium'
+    }
+  });
+
+  // 4. Add watermark
+  const watermarked = await painter.createVideo({
+    source: './compressed.outputPath',
+    addWatermark: {
+      watermarkPath: './logo.png',
+      position: 'bottom-right',
+      opacity: 0.7,
+      outputPath: './final.mp4'
+    }
+  });
+
+  console.log('Video processing complete!');
+}
+
+processVideo();
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function processVideo() {
+  // 1. Get video information
+  const info = await painter.createVideo({
+    source: './video.mp4',
+    getInfo: true
+  });
+  console.log('Video info:', info);
+
+  // 2. Extract frame for thumbnail
+  const frame = await painter.createVideo({
+    source: './video.mp4',
+    extractFrame: {
+      time: info.duration * 0.5,  // Middle of video
+      outputFormat: 'png'
+    }
+  });
+  fs.writeFileSync('thumbnail.png', frame.buffer);
+
+  // 3. Compress video
+  const compressed = await painter.createVideo({
+    source: './video.mp4',
+    compress: {
+      outputPath: './compressed.mp4',
+      quality: 'medium'
+    }
+  });
+
+  // 4. Add watermark
+  const watermarked = await painter.createVideo({
+    source: './compressed.outputPath',
+    addWatermark: {
+      watermarkPath: './logo.png',
+      position: 'bottom-right',
+      opacity: 0.7,
+      outputPath: './final.mp4'
+    }
+  });
+
+  console.log('Video processing complete!');
+}
+
+processVideo();
+```
+</js>
+</CodeSwitcher>
+
+## Feature Summary
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 1 | Get Info | Get video metadata (duration, resolution, FPS, etc.) |
+| 2 | Extract Frame | Extract single frame and create canvas |
+| 3 | Extract Frames | Extract frames at specific times or intervals |
+| 4 | Extract All Frames | Extract every frame from video |
+| 5 | Generate Thumbnail | Create grid thumbnail with multiple frames |
+| 6 | Convert Format | Convert between video formats (MP4, WebM, AVI, etc.) |
+| 7 | Trim | Cut video to specific time range |
+| 8 | Extract Audio | Extract audio track from video |
+| 9 | Add Watermark | Add image watermark to video |
+| 10 | Change Speed | Adjust video playback speed (slow motion/fast forward) |
+| 11 | Generate Preview | Extract multiple preview frames |
+| 12 | Apply Effects | Apply visual filters (blur, brightness, contrast, etc.) |
+| 13 | Merge Videos | Combine multiple videos (sequential, side-by-side, grid) |
+| 14 | Rotate/Flip | Rotate or flip video |
+| 15 | Crop | Crop video to specific region |
+| 16 | Compress | Reduce video file size |
+| 17 | Add Text | Add text overlay to video |
+| 18 | Add Fade | Add fade in/out effects |
+| 19 | Reverse | Reverse video playback |
+| 20 | Create Loop | Create seamless looping video |
+| 21 | Batch Process | Process multiple videos at once |
+| 22 | Detect Scenes | Detect scene changes in video |
+| 23 | Stabilize | Reduce camera shake and stabilize video |
+| 24 | Color Correct | Advanced color correction |
+| 25 | Picture-in-Picture | Add picture-in-picture overlay |
+| 26 | Split Screen | Create split-screen videos |
+| 27 | Create Time-Lapse | Create time-lapse videos |
+| 28 | Mute | Remove audio from video |
+| 29 | Adjust Volume | Adjust video audio volume |
+| 30 | Detect Format | Get detailed format and codec information |
+
+## Related Documentation
+
+- [Video Backgrounds](#video-backgrounds) - Use video frames as canvas backgrounds
+- [Getting Video Info](#getting-video-info) - Standalone method for video metadata
+- [Extracting Frames](#extracting-frames) - Frame extraction methods
+- [FFmpeg Installation](#ffmpeg-installation) - Setup guide for FFmpeg
+
