@@ -86,16 +86,16 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
         {/* Code content with Prism syntax highlighting */}
         <div className="relative bg-slate-950 transition-colors duration-200">
           <div className="p-3 sm:p-4">
-            <SyntaxHighlighter
-              language={normalizeLanguage(language)}
-              style={vscDarkPlus}
-              customStyle={{
-                margin: 0,
+          <SyntaxHighlighter
+            language={normalizeLanguage(language)}
+            style={vscDarkPlus}
+            customStyle={{
+              margin: 0,
                 padding: 0,
-                background: 'transparent',
+              background: 'transparent',
                 fontSize: 'clamp(0.7rem, 2vw, 0.875rem)',
                 lineHeight: '1.6',
-              }}
+            }}
             showLineNumbers={true}
             lineNumberStyle={{
               color: '#6b7280',
@@ -109,10 +109,10 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
                 background: 'transparent',
               }
             }}
-              PreTag="div"
-            >
-              {code}
-            </SyntaxHighlighter>
+            PreTag="div"
+          >
+            {code}
+          </SyntaxHighlighter>
           </div>
           
           {/* Copy button for when header is hidden */}

@@ -192,6 +192,293 @@ const attachment = await painter.createGIF(frames, {
 - **attachment**: Returns an array with Discord.js-compatible attachment format.
 </Alert>
 
+## Programmatic Frame Generation (New in v5.2.5)
+
+Generate GIF frames programmatically using Apexify.js APIs with the `onStart` callback. No file I/O needed - all frames generated in memory!
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Generate frames using onStart callback
+const result = await painter.createGIF(undefined, {
+  outputFormat: 'buffer',
+  width: 800,
+  height: 600,
+  frameCount: 30,  // Number of frames to generate
+  delay: 100,      // Delay between frames (ms)
+  onStart: async (frameCount, painter) => {
+    // Generate frames using Apexify.js APIs
+    const frames = [];
+    
+    for (let i = 0; i < frameCount; i++) {
+      // Create canvas for each frame
+      const canvas = await painter.createCanvas({
+        width: 800,
+        height: 600,
+        gradientBg: {
+          type: 'radial',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ],
+          startX: 400,
+          startY: 300,
+          startRadius: 0,
+          endX: 400,
+          endY: 300,
+          endRadius: 400
+        }
+      });
+      
+      // Add animated content
+      const angle = (i / frameCount) * Math.PI * 2;
+      const x = 400 + Math.cos(angle) * 200;
+      const y = 300 + Math.sin(angle) * 200;
+      
+      const frame = await painter.createImage({
+        source: 'circle',
+        x: x - 25,
+        y: y - 25,
+        width: 50,
+        height: 50,
+        shape: { fill: true, color: '#ffffff' }
+      }, canvas.buffer);
+      
+      frames.push({
+        buffer: frame,
+        duration: 100  // Duration for this frame (ms)
+      });
+    }
+    
+    return frames;
+  }
+});
+
+// Save GIF
+if (Buffer.isBuffer(result)) {
+  fs.writeFileSync('animated.gif', result);
+}
+```
+</ts>
+<js>
+```javascript
+// Generate frames using onStart callback
+const result = await painter.createGIF(undefined, {
+  outputFormat: 'buffer',
+  width: 800,
+  height: 600,
+  frameCount: 30,  // Number of frames to generate
+  delay: 100,      // Delay between frames (ms)
+  onStart: async (frameCount, painter) => {
+    // Generate frames using Apexify.js APIs
+    const frames = [];
+    
+    for (let i = 0; i < frameCount; i++) {
+      // Create canvas for each frame
+      const canvas = await painter.createCanvas({
+        width: 800,
+        height: 600,
+        gradientBg: {
+          type: 'radial',
+          colors: [
+            { stop: 0, color: '#ff6b6b' },
+            { stop: 1, color: '#4ecdc4' }
+          ],
+          startX: 400,
+          startY: 300,
+          startRadius: 0,
+          endX: 400,
+          endY: 300,
+          endRadius: 400
+        }
+      });
+      
+      // Add animated content
+      const angle = (i / frameCount) * Math.PI * 2;
+      const x = 400 + Math.cos(angle) * 200;
+      const y = 300 + Math.sin(angle) * 200;
+      
+      const frame = await painter.createImage({
+        source: 'circle',
+        x: x - 25,
+        y: y - 25,
+        width: 50,
+        height: 50,
+        shape: { fill: true, color: '#ffffff' }
+      }, canvas.buffer);
+      
+      frames.push({
+        buffer: frame,
+        duration: 100  // Duration for this frame (ms)
+      });
+    }
+    
+    return frames;
+  }
+});
+
+// Save GIF
+if (Buffer.isBuffer(result)) {
+  fs.writeFileSync('animated.gif', result);
+}
+```
+</js>
+</CodeSwitcher>
+
+### Frame Count Options
+
+You can specify frame count in multiple ways:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Option 1: Explicit frame count
+await painter.createGIF(undefined, {
+  frameCount: 60,  // 60 frames
+  onStart: async (frameCount, painter) => { /* ... */ }
+});
+
+// Option 2: Calculate from duration and delay
+await painter.createGIF(undefined, {
+  duration: 3000,  // 3 seconds total
+  delay: 50,       // 50ms per frame
+  // frameCount = 3000 / 50 = 60 frames
+  onStart: async (frameCount, painter) => { /* ... */ }
+});
+
+// Option 3: Duration only (defaults to 30 fps)
+await painter.createGIF(undefined, {
+  duration: 2000,  // 2 seconds
+  // frameCount = (2000 / 1000) * 30 = 60 frames (estimated)
+  onStart: async (frameCount, painter) => { /* ... */ }
+});
+
+// Option 4: Default (30 frames)
+await painter.createGIF(undefined, {
+  // frameCount defaults to 30
+  onStart: async (frameCount, painter) => { /* ... */ }
+});
+```
+</ts>
+<js>
+```javascript
+// Option 1: Explicit frame count
+await painter.createGIF(undefined, {
+  frameCount: 60,  // 60 frames
+  onStart: async (frameCount, painter) => { /* ... */ }
+});
+
+// Option 2: Calculate from duration and delay
+await painter.createGIF(undefined, {
+  duration: 3000,  // 3 seconds total
+  delay: 50,       // 50ms per frame
+  // frameCount = 3000 / 50 = 60 frames
+  onStart: async (frameCount, painter) => { /* ... */ }
+});
+
+// Option 3: Duration only (defaults to 30 fps)
+await painter.createGIF(undefined, {
+  duration: 2000,  // 2 seconds
+  // frameCount = (2000 / 1000) * 30 = 60 frames (estimated)
+  onStart: async (frameCount, painter) => { /* ... */ }
+});
+
+// Option 4: Default (30 frames)
+await painter.createGIF(undefined, {
+  // frameCount defaults to 30
+  onStart: async (frameCount, painter) => { /* ... */ }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Static Final Frame (New in v5.2.5)
+
+Generate a static image from the final frame using the `onEnd` callback:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create GIF with static final frame
+const result = await painter.createGIF(undefined, {
+  outputFormat: 'buffer',
+  width: 800,
+  height: 600,
+  frameCount: 30,
+  delay: 100,
+  onStart: async (frameCount, painter) => {
+    // Generate frames...
+    return frames;
+  },
+  onEnd: async (finalFrameBuffer, painter) => {
+    // Process final frame (add effects, text, etc.)
+    const processed = await painter.createText({
+      text: 'Winner!',
+      x: 400,
+      y: 300,
+      fontSize: 48,
+      color: '#ffffff',
+      bold: true,
+      textAlign: 'center',
+      textBaseline: 'middle'
+    }, finalFrameBuffer);
+    
+    // Return static image buffer
+    return processed;
+  }
+});
+
+// Result includes both GIF and static image
+if (result && typeof result === 'object' && 'gif' in result && 'static' in result) {
+  fs.writeFileSync('animation.gif', result.gif);
+  fs.writeFileSync('final-frame.png', result.static);
+}
+```
+</ts>
+<js>
+```javascript
+// Create GIF with static final frame
+const result = await painter.createGIF(undefined, {
+  outputFormat: 'buffer',
+  width: 800,
+  height: 600,
+  frameCount: 30,
+  delay: 100,
+  onStart: async (frameCount, painter) => {
+    // Generate frames...
+    return frames;
+  },
+  onEnd: async (finalFrameBuffer, painter) => {
+    // Process final frame (add effects, text, etc.)
+    const processed = await painter.createText({
+      text: 'Winner!',
+      x: 400,
+      y: 300,
+      fontSize: 48,
+      color: '#ffffff',
+      bold: true,
+      textAlign: 'center',
+      textBaseline: 'middle'
+    }, finalFrameBuffer);
+    
+    // Return static image buffer
+    return processed;
+  }
+});
+
+// Result includes both GIF and static image
+if (result && typeof result === 'object' && 'gif' in result && 'static' in result) {
+  fs.writeFileSync('animation.gif', result.gif);
+  fs.writeFileSync('final-frame.png', result.static);
+}
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Perfect for Animations and Wheels">
+The `onStart` callback is perfect for creating roulette wheels, spinners, animated counters, and any dynamic content. The `onEnd` callback is ideal for showing "winner" frames or final states after animations.
+</Alert>
+
 ## Frame Animation
 
 Create frame-based animations with custom drawing, transformations, and effects:

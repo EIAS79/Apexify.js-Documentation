@@ -1,0 +1,550 @@
+# Text Metrics API
+
+Apexify.js provides a comprehensive text measurement API (`measureText`) that matches the Canvas API standards while adding powerful extensions. Perfect for dynamic layouts, text centering, and precise text positioning.
+
+## Overview
+
+The `measureText()` method provides complete text metrics including:
+
+- **Standard Canvas API metrics**: Width, bounding boxes, font metrics
+- **Advanced Canvas API metrics**: Baseline measurements (when available)
+- **Enhanced Apexify.js metrics**: Height, line height, center points
+- **Multi-line support**: Line-by-line metrics when text wraps
+- **Character-level metrics**: Per-character width and position data
+
+## Basic Usage
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Basic text measurement
+const metrics = await painter.measureText({
+  text: "Hello World",
+  fontSize: 24,
+  font: { family: 'Arial' },
+  bold: true
+});
+
+console.log(metrics.width);        // Text width in pixels
+console.log(metrics.height);       // Text height
+console.log(metrics.baseline);     // Baseline position
+console.log(metrics.centerX);      // Center X coordinate
+console.log(metrics.centerY);      // Center Y coordinate
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function measureText() {
+  // Basic text measurement
+  const metrics = await painter.measureText({
+    text: "Hello World",
+    fontSize: 24,
+    font: { family: 'Arial' },
+    bold: true
+  });
+
+  console.log(metrics.width);        // Text width in pixels
+  console.log(metrics.height);       // Text height
+  console.log(metrics.baseline);     // Baseline position
+  console.log(metrics.centerX);      // Center X coordinate
+  console.log(metrics.centerY);      // Center Y coordinate
+}
+
+measureText();
+```
+</js>
+</CodeSwitcher>
+
+## Standard Canvas API Metrics
+
+The method returns all standard Canvas TextMetrics properties:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const metrics = await painter.measureText({
+  text: "Hello World",
+  fontSize: 24
+});
+
+// Standard Canvas API metrics
+console.log(metrics.width);                      // Total width of text
+console.log(metrics.actualBoundingBoxAscent);    // Distance from baseline to top
+console.log(metrics.actualBoundingBoxDescent);   // Distance from baseline to bottom
+console.log(metrics.actualBoundingBoxLeft);      // Distance from alignment point to left edge
+console.log(metrics.actualBoundingBoxRight);     // Distance from alignment point to right edge
+console.log(metrics.fontBoundingBoxAscent);      // Font's bounding box ascent
+console.log(metrics.fontBoundingBoxDescent);     // Font's bounding box descent
+
+// Advanced Canvas API metrics (when available)
+console.log(metrics.alphabeticBaseline);         // Alphabetic baseline (if supported)
+console.log(metrics.emHeightAscent);             // Em square height above baseline
+console.log(metrics.emHeightDescent);            // Em square height below baseline
+console.log(metrics.hangingBaseline);            // Hanging baseline (if supported)
+console.log(metrics.ideographicBaseline);        // Ideographic baseline (if supported)
+```
+</ts>
+<js>
+```javascript
+const metrics = await painter.measureText({
+  text: "Hello World",
+  fontSize: 24
+});
+
+// Standard Canvas API metrics
+console.log(metrics.width);                      // Total width of text
+console.log(metrics.actualBoundingBoxAscent);    // Distance from baseline to top
+console.log(metrics.actualBoundingBoxDescent);   // Distance from baseline to bottom
+console.log(metrics.actualBoundingBoxLeft);      // Distance from alignment point to left edge
+console.log(metrics.actualBoundingBoxRight);     // Distance from alignment point to right edge
+console.log(metrics.fontBoundingBoxAscent);      // Font's bounding box ascent
+console.log(metrics.fontBoundingBoxDescent);     // Font's bounding box descent
+
+// Advanced Canvas API metrics (when available)
+console.log(metrics.alphabeticBaseline);         // Alphabetic baseline (if supported)
+console.log(metrics.emHeightAscent);             // Em square height above baseline
+console.log(metrics.emHeightDescent);            // Em square height below baseline
+console.log(metrics.hangingBaseline);            // Hanging baseline (if supported)
+console.log(metrics.ideographicBaseline);        // Ideographic baseline (if supported)
+```
+</js>
+</CodeSwitcher>
+
+## Enhanced Apexify.js Metrics
+
+Additional metrics for easier text positioning:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const metrics = await painter.measureText({
+  text: "Hello World",
+  fontSize: 24
+});
+
+// Enhanced metrics
+console.log(metrics.height);       // Text height (ascent + descent)
+console.log(metrics.lineHeight);   // Line height (fontSize * lineHeight multiplier)
+console.log(metrics.baseline);     // Baseline position from top
+console.log(metrics.top);          // Top position (negative value from baseline)
+console.log(metrics.bottom);       // Bottom position (positive value from baseline)
+console.log(metrics.centerX);      // Center X coordinate (width / 2)
+console.log(metrics.centerY);      // Center Y coordinate relative to baseline
+```
+</ts>
+<js>
+```javascript
+const metrics = await painter.measureText({
+  text: "Hello World",
+  fontSize: 24
+});
+
+// Enhanced metrics
+console.log(metrics.height);       // Text height (ascent + descent)
+console.log(metrics.lineHeight);   // Line height (fontSize * lineHeight multiplier)
+console.log(metrics.baseline);     // Baseline position from top
+console.log(metrics.top);          // Top position (negative value from baseline)
+console.log(metrics.bottom);       // Bottom position (positive value from baseline)
+console.log(metrics.centerX);      // Center X coordinate (width / 2)
+console.log(metrics.centerY);      // Center Y coordinate relative to baseline
+```
+</js>
+</CodeSwitcher>
+
+## Multi-Line Text Metrics
+
+When `maxWidth` is provided, text wraps and you get line-by-line metrics:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const metrics = await painter.measureText({
+  text: "This is a longer text that will wrap to multiple lines when maxWidth is provided",
+  fontSize: 24,
+  maxWidth: 300  // Text will wrap at 300px
+});
+
+console.log(metrics.width);         // Width of the widest line
+console.log(metrics.totalHeight);   // Total height of all lines
+console.log(metrics.lineCount);     // Number of lines
+console.log(metrics.lines);         // Array of line metrics
+
+// Access individual line metrics
+metrics.lines?.forEach((line, index) => {
+  console.log(`Line ${index + 1}:`);
+  console.log(`  Width: ${line.width}`);
+  console.log(`  Height: ${line.height}`);
+  console.log(`  Text: "${line.text}"`);
+});
+```
+</ts>
+<js>
+```javascript
+const metrics = await painter.measureText({
+  text: "This is a longer text that will wrap to multiple lines when maxWidth is provided",
+  fontSize: 24,
+  maxWidth: 300  // Text will wrap at 300px
+});
+
+console.log(metrics.width);         // Width of the widest line
+console.log(metrics.totalHeight);   // Total height of all lines
+console.log(metrics.lineCount);     // Number of lines
+console.log(metrics.lines);         // Array of line metrics
+
+// Access individual line metrics
+metrics.lines?.forEach((line, index) => {
+  console.log(`Line ${index + 1}:`);
+  console.log(`  Width: ${line.width}`);
+  console.log(`  Height: ${line.height}`);
+  console.log(`  Text: "${line.text}"`);
+});
+```
+</js>
+</CodeSwitcher>
+
+## Character-Level Metrics
+
+Get per-character width and position data:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const metrics = await painter.measureText({
+  text: "Hello",
+  fontSize: 24,
+  includeCharMetrics: true  // Enable character-level metrics
+});
+
+// Character widths
+console.log(metrics.charWidths);     // Array of widths: [48, 36, 36, 36, 48]
+
+// Character positions
+console.log(metrics.charPositions);  // Array of { x, width } for each character
+metrics.charPositions?.forEach((char, index) => {
+  console.log(`Character ${index} at x=${char.x}, width=${char.width}`);
+});
+```
+</ts>
+<js>
+```javascript
+const metrics = await painter.measureText({
+  text: "Hello",
+  fontSize: 24,
+  includeCharMetrics: true  // Enable character-level metrics
+});
+
+// Character widths
+console.log(metrics.charWidths);     // Array of widths: [48, 36, 36, 36, 48]
+
+// Character positions
+console.log(metrics.charPositions);  // Array of { x, width } for each character
+metrics.charPositions?.forEach((char, index) => {
+  console.log(`Character ${index} at x=${char.x}, width=${char.width}`);
+});
+```
+</js>
+</CodeSwitcher>
+
+## Custom Fonts
+
+Full support for custom fonts, bold, italic, and spacing:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const metrics = await painter.measureText({
+  text: "Custom Font Text",
+  fontSize: 24,
+  fontPath: './fonts/CustomFont.ttf',
+  fontName: 'CustomFont',
+  bold: true,
+  italic: true,
+  letterSpacing: 2,
+  wordSpacing: 5
+});
+
+console.log(metrics.width);  // Width with custom font and spacing
+```
+</ts>
+<js>
+```javascript
+const metrics = await painter.measureText({
+  text: "Custom Font Text",
+  fontSize: 24,
+  fontPath: './fonts/CustomFont.ttf',
+  fontName: 'CustomFont',
+  bold: true,
+  italic: true,
+  letterSpacing: 2,
+  wordSpacing: 5
+});
+
+console.log(metrics.width);  // Width with custom font and spacing
+```
+</js>
+</CodeSwitcher>
+
+## Memory Optimization
+
+Customize measurement canvas size for memory optimization:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Auto-calculated canvas (default)
+const metrics1 = await painter.measureText({
+  text: "Very long text...",
+  fontSize: 24
+});
+
+// Custom canvas size (for memory optimization)
+const metrics2 = await painter.measureText({
+  text: "Very long text...",
+  fontSize: 24,
+  measurementCanvas: {
+    width: 5000,   // Custom width (1000-10000px)
+    height: 2000   // Custom height (500-5000px)
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Auto-calculated canvas (default)
+const metrics1 = await painter.measureText({
+  text: "Very long text...",
+  fontSize: 24
+});
+
+// Custom canvas size (for memory optimization)
+const metrics2 = await painter.measureText({
+  text: "Very long text...",
+  fontSize: 24,
+  measurementCanvas: {
+    width: 5000,   // Custom width (1000-10000px)
+    height: 2000   // Custom height (500-5000px)
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="info" title="Canvas Size Bounds">
+The measurement canvas size is automatically calculated based on text length, font size, and wrapping. If you specify `measurementCanvas`, bounds are enforced: width (1000-10000px), height (500-5000px).
+</Alert>
+
+## Centering Text
+
+Use metrics for perfect text centering:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#ffffff'
+});
+
+// Measure text first
+const metrics = await painter.measureText({
+  text: "Centered Text",
+  fontSize: 32,
+  font: { family: 'Arial' },
+  bold: true
+});
+
+// Center horizontally and vertically
+const centeredX = (canvas.canvas.width - metrics.width) / 2;
+const centeredY = (canvas.canvas.height / 2) + metrics.baseline;
+
+// Draw centered text
+const result = await painter.createText({
+  text: "Centered Text",
+  x: centeredX,
+  y: centeredY,
+  fontSize: 32,
+  font: { family: 'Arial' },
+  bold: true,
+  color: '#000000',
+  textAlign: 'left',
+  textBaseline: 'alphabetic'
+}, canvas.buffer);
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#ffffff'
+});
+
+async function centerText() {
+  // Measure text first
+  const metrics = await painter.measureText({
+    text: "Centered Text",
+    fontSize: 32,
+    font: { family: 'Arial' },
+    bold: true
+  });
+
+  // Center horizontally and vertically
+  const centeredX = (canvas.canvas.width - metrics.width) / 2;
+  const centeredY = (canvas.canvas.height / 2) + metrics.baseline;
+
+  // Draw centered text
+  const result = await painter.createText({
+    text: "Centered Text",
+    x: centeredX,
+    y: centeredY,
+    fontSize: 32,
+    font: { family: 'Arial' },
+    bold: true,
+    color: '#000000',
+    textAlign: 'left',
+    textBaseline: 'alphabetic'
+  }, canvas.buffer);
+}
+
+centerText();
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+async function example() {
+  // Create canvas
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 400,
+    colorBg: '#1a1a1a'
+  });
+
+  // Measure text with all features
+  const metrics = await painter.measureText({
+    text: "Hello World\nThis is a multi-line text",
+    fontSize: 28,
+    font: { family: 'Arial' },
+    bold: true,
+    maxWidth: 600,
+    lineHeight: 1.5,
+    includeCharMetrics: true
+  });
+
+  console.log('Text Metrics:');
+  console.log(`Width: ${metrics.width}px`);
+  console.log(`Height: ${metrics.height}px`);
+  console.log(`Total Height: ${metrics.totalHeight}px`);
+  console.log(`Line Count: ${metrics.lineCount}`);
+  console.log(`Center: (${metrics.centerX}, ${metrics.centerY})`);
+
+  // Draw text centered
+  const centeredX = (canvas.canvas.width - metrics.width) / 2;
+  const centeredY = (canvas.canvas.height / 2) + metrics.baseline;
+
+  const result = await painter.createText({
+    text: "Hello World\nThis is a multi-line text",
+    x: centeredX,
+    y: centeredY,
+    fontSize: 28,
+    font: { family: 'Arial' },
+    bold: true,
+    color: '#ffffff',
+    textAlign: 'left',
+    textBaseline: 'alphabetic',
+    maxWidth: 600,
+    lineHeight: 1.5
+  }, canvas.buffer);
+
+  // Save result
+  fs.writeFileSync('text-metrics-example.png', result);
+}
+
+example();
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function example() {
+  // Create canvas
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 400,
+    colorBg: '#1a1a1a'
+  });
+
+  // Measure text with all features
+  const metrics = await painter.measureText({
+    text: "Hello World\nThis is a multi-line text",
+    fontSize: 28,
+    font: { family: 'Arial' },
+    bold: true,
+    maxWidth: 600,
+    lineHeight: 1.5,
+    includeCharMetrics: true
+  });
+
+  console.log('Text Metrics:');
+  console.log(`Width: ${metrics.width}px`);
+  console.log(`Height: ${metrics.height}px`);
+  console.log(`Total Height: ${metrics.totalHeight}px`);
+  console.log(`Line Count: ${metrics.lineCount}`);
+  console.log(`Center: (${metrics.centerX}, ${metrics.centerY})`);
+
+  // Draw text centered
+  const centeredX = (canvas.canvas.width - metrics.width) / 2;
+  const centeredY = (canvas.canvas.height / 2) + metrics.baseline;
+
+  const result = await painter.createText({
+    text: "Hello World\nThis is a multi-line text",
+    x: centeredX,
+    y: centeredY,
+    fontSize: 28,
+    font: { family: 'Arial' },
+    bold: true,
+    color: '#ffffff',
+    textAlign: 'left',
+    textBaseline: 'alphabetic',
+    maxWidth: 600,
+    lineHeight: 1.5
+  }, canvas.buffer);
+
+  // Save result
+  fs.writeFileSync('text-metrics-example.png', result);
+}
+
+example();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Pixel Data API](/docs#pixel-data-api) - Pixel-level manipulation
+- [Path2D API](/docs#path2d-api) - Complex path creation
+- [Hit Detection API](/docs#hit-detection-api) - Point-in-path detection
+- [Advanced Text Features](/docs#advanced-text-features) - Text styling and effects
+

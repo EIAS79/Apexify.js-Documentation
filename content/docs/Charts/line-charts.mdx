@@ -1,14 +1,12 @@
 # Line Charts
 
-Apexify.js provides powerful line chart generation with support for multiple datasets, smooth curves, filled areas, plot points, and comprehensive styling options.
+Apexify.js provides powerful line chart generation with support for multiple series, smooth curves, markers, filled areas, error bars, correlation lines, and comprehensive styling options.
 
 ## Overview
 
-Line charts are created using `createChart()` with `chartType: 'line'` and `chartNumber: 1`. Support multiple lines, smooth curves, filled areas, and customizable grids.
+Line charts are created using the unified `createChart()` method with `chartType: 'line'`. Support multiple lines/series, smooth curves (bezier, spline), filled areas, error bars, correlation/regression lines, and customizable markers.
 
-## Basic Line Chart
-
-Create a simple line chart:
+## Basic Usage
 
 <CodeSwitcher>
 <ts>
@@ -18,41 +16,21 @@ import fs from 'fs';
 
 const painter = new ApexPainter();
 
-const chart = await painter.createChart({
-  data: [
-    [
-      { label: 'Jan', y: 30 },
-      { label: 'Feb', y: 45 },
-      { label: 'Mar', y: 35 },
-      { label: 'Apr', y: 60 },
-      { label: 'May', y: 50 }
-    ]
-  ],
-  lineConfig: {
-    yLabels: ['0', '20', '40', '60', '80', '100'],
-    fillArea: [{ color: 'rgba(255, 107, 107, 0.2)' }],
-    lineColor: ['#ff6b6b'],
-    lineTension: [0.3],
-    plot: {
-      enable: true,
-      color: ['#ff6b6b'],
-      size: 5
-    },
-    grid: {
-      type: 'both',
-      color: '#e0e0e0',
-      width: 1
-    },
-    canvas: {
-      width: 800,
-      height: 600,
-      bgColor: '#ffffff'
-    }
+const data = [
+  {
+    label: 'Sales',
+    data: [
+      { x: 1, y: 10 },
+      { x: 2, y: 20 },
+      { x: 3, y: 15 },
+      { x: 4, y: 25 },
+      { x: 5, y: 30 }
+    ],
+    color: '#4A90E2'
   }
-}, {
-  chartType: 'line',
-  chartNumber: 1
-});
+];
+
+const chart = await painter.createChart('line', data);
 
 fs.writeFileSync('line-chart.png', chart);
 ```
@@ -64,318 +42,626 @@ const fs = require('fs');
 
 const painter = new ApexPainter();
 
-async function createLineChart() {
-  const chart = await painter.createChart({
-    data: [
-      [
-        { label: 'Jan', y: 30 },
-        { label: 'Feb', y: 45 },
-        { label: 'Mar', y: 35 },
-        { label: 'Apr', y: 60 },
-        { label: 'May', y: 50 }
-      ]
-    ],
-    lineConfig: {
-      yLabels: ['0', '20', '40', '60', '80', '100'],
-      fillArea: [{ color: 'rgba(255, 107, 107, 0.2)' }],
-      lineColor: ['#ff6b6b'],
-      lineTension: [0.3],
-      plot: {
-        enable: true,
-        color: ['#ff6b6b'],
-        size: 5
-      },
-      grid: {
-        type: 'both',
-        color: '#e0e0e0',
-        width: 1
-      },
-      canvas: {
-        width: 800,
-        height: 600,
-        bgColor: '#ffffff'
-      }
+async function createChart() {
+  const data = [
+    {
+      label: 'Sales',
+      data: [
+        { x: 1, y: 10 },
+        { x: 2, y: 20 },
+        { x: 3, y: 15 },
+        { x: 4, y: 25 },
+        { x: 5, y: 30 }
+      ],
+      color: '#4A90E2'
     }
-  }, {
-    chartType: 'line',
-    chartNumber: 1
-  });
+  ];
 
+  const chart = await painter.createChart('line', data);
   fs.writeFileSync('line-chart.png', chart);
 }
 
-createLineChart();
+createChart();
 ```
 </js>
 </CodeSwitcher>
 
-## Multiple Lines
+## Data Structure
 
-Create charts with multiple datasets:
+### Line Series
 
 <CodeSwitcher>
 <ts>
 ```typescript
-const chart = await painter.createChart({
+interface LineDataPoint {
+  x: number;                  // X-axis value
+  y: number;                  // Y-axis value
+  label?: string;             // Optional label for this point
+  markerColor?: string;       // Optional custom marker color
+  showMarker?: boolean;       // Override marker visibility
+  errorBar?: ErrorBarConfig;  // Error bar for this point
+}
+
+interface LineSeries {
+  label: string;              // Series label (for legend)
+  data: LineDataPoint[];      // Array of data points
+  color?: string;             // Line color (overridden by gradient if provided)
+  gradient?: gradient;        // Gradient for line (overrides color)
+  lineWidth?: number;         // Line width (default: 2)
+  lineStyle?: LineStyle;      // 'solid' | 'dashed' | 'dotted' | etc.
+  smoothness?: SmoothnessType; // 'none' | 'bezier' | 'spline'
+  showLine?: boolean;         // Show/hide line (default: true)
+  marker?: {
+    type?: MarkerType;        // 'circle' | 'square' | 'triangle' | 'diamond' | 'cross' | 'none'
+    size?: number;            // Marker size (default: 6)
+    color?: string;           // Marker color
+    show?: boolean;           // Show/hide markers (default: true)
+    filled?: boolean;         // Fill markers (default: true)
+  };
+  errorBar?: {
+    show?: boolean;           // Show error bars (default: false)
+    color?: string;           // Error bar color
+    width?: number;           // Error bar line width
+    capSize?: number;         // Error bar cap size
+  };
+  area?: AreaConfig;          // Area shading configuration
+  correlation?: {
+    type?: CorrelationType;   // 'none' | 'linear' | 'polynomial' | 'exponential' | 'logarithmic'
+    degree?: number;          // Polynomial degree (for polynomial regression)
+    color?: string;           // Correlation line color
+    lineWidth?: number;       // Correlation line width
+    lineStyle?: LineStyle;    // Correlation line style
+    show?: boolean;           // Show/hide correlation line
+  };
+}
+```
+</ts>
+<js>
+```javascript
+{
+  label: 'Sales',
   data: [
-    // First line
-    [
-      { label: 'Jan', y: 30 },
-      { label: 'Feb', y: 45 },
-      { label: 'Mar', y: 35 }
-    ],
-    // Second line
-    [
-      { label: 'Jan', y: 20 },
-      { label: 'Feb', y: 35 },
-      { label: 'Mar', y: 50 }
-    ],
-    // Third line
-    [
-      { label: 'Jan', y: 40 },
-      { label: 'Feb', y: 30 },
-      { label: 'Mar', y: 45 }
-    ]
+    { x: 1, y: 10 },
+    { x: 2, y: 20 }
   ],
-  lineConfig: {
-    yLabels: ['0', '20', '40', '60', '80', '100'],
-    fillArea: [
-      { color: 'rgba(255, 107, 107, 0.2)' },
-      { color: 'rgba(78, 205, 196, 0.2)' },
-      { color: 'rgba(69, 183, 209, 0.2)' }
-    ],
-    lineColor: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
-    lineTension: [0.3, 0.3, 0.3],
-    plot: {
-      enable: true,
-      color: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
-      size: 5
-    },
-    grid: {
-      type: 'both',
-      color: '#e0e0e0',
-      width: 1
-    },
-    canvas: {
-      width: 1200,
-      height: 800,
-      bgColor: '#ffffff'
+  color: '#4A90E2',
+  lineWidth: 2,
+  lineStyle: 'solid',
+  smoothness: 'none',
+  marker: {
+    type: 'circle',
+    size: 6,
+    show: true,
+    filled: true
+  }
+}
+```
+</js>
+</CodeSwitcher>
+
+## Line Styles
+
+<CodeSwitcher>
+<ts>
+```typescript
+type LineStyle = 
+  | 'solid' 
+  | 'dashed' 
+  | 'dotted' 
+  | 'dashdot' 
+  | 'longdash' 
+  | 'shortdash' 
+  | 'dashdotdot' 
+  | 'step' 
+  | 'stepline';
+```
+</ts>
+<js>
+```javascript
+// Line style options:
+// 'solid', 'dashed', 'dotted', 'dashdot', 'longdash', 
+// 'shortdash', 'dashdotdot', 'step', 'stepline'
+```
+</js>
+</CodeSwitcher>
+
+## Smooth Curves
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    smoothness: 'bezier'      // 'none' | 'bezier' | 'spline'
+  }
+];
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    smoothness: 'bezier'      // 'none' | 'bezier' | 'spline'
+  }
+];
+```
+</js>
+</CodeSwitcher>
+
+## Markers
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    marker: {
+      type: 'circle',         // 'circle' | 'square' | 'triangle' | 'diamond' | 'cross' | 'none'
+      size: 8,
+      color: '#4A90E2',
+      show: true,
+      filled: true
     }
   }
-}, {
-  chartType: 'line',
-  chartNumber: 1
+];
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    marker: {
+      type: 'circle',
+      size: 8,
+      color: '#4A90E2',
+      show: true,
+      filled: true
+    }
+  }
+];
+```
+</js>
+</CodeSwitcher>
+
+## Gradient Lines
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    gradient: {
+      type: 'linear',
+      colors: ['#4A90E2', '#50C878'],
+      stops: [0, 1],
+      angle: 0
+    }
+  }
+];
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    gradient: {
+      type: 'linear',
+      colors: ['#4A90E2', '#50C878'],
+      stops: [0, 1],
+      angle: 0
+    }
+  }
+];
+```
+</js>
+</CodeSwitcher>
+
+## Filled Areas
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    area: {
+      type: 'below',          // 'none' | 'below' | 'above' | 'between' | 'around'
+      color: '#4A90E2',
+      opacity: 0.3,
+      show: true
+    }
+  }
+];
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    area: {
+      type: 'below',          // 'none' | 'below' | 'above' | 'between' | 'around'
+      color: '#4A90E2',
+      opacity: 0.3,
+      show: true
+    }
+  }
+];
+```
+</js>
+</CodeSwitcher>
+
+### Area Types
+
+- **below**: Fill area below the line (to baseline/x-axis)
+- **above**: Fill area above the line (to baseline/x-axis)
+- **between**: Fill area between two lines (requires `secondLine`)
+- **around**: Fill area around confidence interval (requires `upperBound` and `lowerBound`)
+- **none**: No area filling
+
+## Error Bars
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Sales',
+    data: [
+      { 
+        x: 1, 
+        y: 10,
+        errorBar: {
+          positive: 2,
+          negative: 1,
+          color: '#ff0000',
+          width: 1,
+          capSize: 5
+        }
+      }
+    ],
+    errorBar: {
+      show: true,             // Global error bar config
+      color: '#000000',
+      width: 1,
+      capSize: 5
+    }
+  }
+];
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Sales',
+    data: [
+      { 
+        x: 1, 
+        y: 10,
+        errorBar: {
+          positive: 2,
+          negative: 1
+        }
+      }
+    ],
+    errorBar: {
+      show: true,
+      color: '#000000',
+      width: 1,
+      capSize: 5
+    }
+  }
+];
+```
+</js>
+</CodeSwitcher>
+
+## Correlation/Regression Lines
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    correlation: {
+      type: 'linear',         // 'none' | 'linear' | 'polynomial' | 'exponential' | 'logarithmic'
+      degree: 2,              // For polynomial regression
+      color: '#ff0000',
+      lineWidth: 2,
+      lineStyle: 'dashed',
+      show: true
+    }
+  }
+];
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Sales',
+    data: [...],
+    correlation: {
+      type: 'linear',
+      color: '#ff0000',
+      lineWidth: 2,
+      lineStyle: 'dashed',
+      show: true
+    }
+  }
+];
+```
+</js>
+</CodeSwitcher>
+
+## Chart Options
+
+### Dimensions
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('line', data, {
+  dimensions: {
+    width: 800,
+    height: 600,
+    padding: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 20
+    }
+  }
 });
 ```
 </ts>
 <js>
 ```javascript
-const chart = await painter.createChart({
-  data: [
-    // First line
-    [
-      { label: 'Jan', y: 30 },
-      { label: 'Feb', y: 45 },
-      { label: 'Mar', y: 35 }
-    ],
-    // Second line
-    [
-      { label: 'Jan', y: 20 },
-      { label: 'Feb', y: 35 },
-      { label: 'Mar', y: 50 }
-    ],
-    // Third line
-    [
-      { label: 'Jan', y: 40 },
-      { label: 'Feb', y: 30 },
-      { label: 'Mar', y: 45 }
-    ]
-  ],
-  lineConfig: {
-    yLabels: ['0', '20', '40', '60', '80', '100'],
-    fillArea: [
-      { color: 'rgba(255, 107, 107, 0.2)' },
-      { color: 'rgba(78, 205, 196, 0.2)' },
-      { color: 'rgba(69, 183, 209, 0.2)' }
-    ],
-    lineColor: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
-    lineTension: [0.3, 0.3, 0.3],
-    plot: {
-      enable: true,
-      color: ['#ff6b6b', '#4ecdc4', '#45b7d1'],
-      size: 5
-    },
-    grid: {
-      type: 'both',
-      color: '#e0e0e0',
-      width: 1
-    },
-    canvas: {
-      width: 1200,
-      height: 800,
-      bgColor: '#ffffff'
+const chart = await painter.createChart('line', data, {
+  dimensions: {
+    width: 800,
+    height: 600,
+    padding: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 20
     }
   }
-}, {
-  chartType: 'line',
-  chartNumber: 1
 });
 ```
 </js>
 </CodeSwitcher>
 
-## Line Configuration
-
-### Grid Types
+### Background
 
 <CodeSwitcher>
 <ts>
 ```typescript
-grid: {
-  type: 'vertical' | 'horizontal' | 'both',  // Grid type
-  color: '#e0e0e0',                          // Grid line color
-  width: 1                                   // Grid line width
-}
+const chart = await painter.createChart('line', data, {
+  appearance: {
+    backgroundColor: '#ffffff',
+    // OR
+    backgroundGradient: {
+      type: 'linear',
+      colors: ['#f0f0f0', '#e0e0e0'],
+      stops: [0, 1]
+    },
+    // OR
+    backgroundImage: './bg.png'
+  }
+});
 ```
 </ts>
 <js>
 ```javascript
-grid: {
-  type: 'vertical' | 'horizontal' | 'both',  // Grid type
-  color: '#e0e0e0',                          // Grid line color
-  width: 1                                   // Grid line width
-}
+const chart = await painter.createChart('line', data, {
+  appearance: {
+    backgroundColor: '#ffffff',
+    backgroundGradient: {
+      type: 'linear',
+      colors: ['#f0f0f0', '#e0e0e0'],
+      stops: [0, 1]
+    }
+  }
+});
 ```
 </js>
 </CodeSwitcher>
 
-### Line Tension
-
-Control curve smoothness (0 = straight, 1 = very curved):
+## Axes Configuration
 
 <CodeSwitcher>
 <ts>
 ```typescript
-lineTension: [0.1, 0.3, 0.5]  // One value per line
+const chart = await painter.createChart('line', data, {
+  axes: {
+    x: {
+      label: 'Time',
+      labelColor: '#333333',
+      range: {
+        min: 0,
+        max: 10,
+        step: 1
+      },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 12
+    },
+    y: {
+      label: 'Value',
+      labelColor: '#333333',
+      range: {
+        min: 0,
+        max: 100,
+        step: 10
+      },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 12
+    }
+  }
+});
 ```
 </ts>
 <js>
 ```javascript
-lineTension: [0.1, 0.3, 0.5]  // One value per line
+const chart = await painter.createChart('line', data, {
+  axes: {
+    x: {
+      label: 'Time',
+      labelColor: '#333333',
+      range: { min: 0, max: 10, step: 1 },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 12
+    },
+    y: {
+      label: 'Value',
+      labelColor: '#333333',
+      range: { min: 0, max: 100, step: 10 },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 12
+    }
+  }
+});
 ```
 </js>
 </CodeSwitcher>
 
-### Filled Areas
-
-Fill area under each line:
+## Labels
 
 <CodeSwitcher>
 <ts>
 ```typescript
-fillArea: [
-  { color: 'rgba(255, 107, 107, 0.2)' },  // First line fill
-  { color: 'rgba(78, 205, 196, 0.2)' },   // Second line fill
-  { color: 'transparent' }                 // No fill
-]
+const chart = await painter.createChart('line', data, {
+  labels: {
+    title: {
+      text: 'Sales Over Time',
+      fontSize: 24,
+      color: '#333333',
+      gradient: { ... },        // Optional: Text gradient
+      textStyle: {              // Optional: Enhanced styling
+        bold: true,
+        shadow: { ... }
+      }
+    },
+    pointLabels: {
+      fontSize: 12,
+      color: '#000000',
+      textStyle: { ... }        // Optional: Enhanced styling
+    }
+  }
+});
 ```
 </ts>
 <js>
 ```javascript
-fillArea: [
-  { color: 'rgba(255, 107, 107, 0.2)' },  // First line fill
-  { color: 'rgba(78, 205, 196, 0.2)' },   // Second line fill
-  { color: 'transparent' }                 // No fill
-]
+const chart = await painter.createChart('line', data, {
+  labels: {
+    title: {
+      text: 'Sales Over Time',
+      fontSize: 24,
+      color: '#333333',
+      textStyle: {
+        bold: true
+      }
+    }
+  }
+});
 ```
 </js>
 </CodeSwitcher>
 
-### Plot Points
-
-Show data points on lines:
+## Legend
 
 <CodeSwitcher>
 <ts>
 ```typescript
-plot: {
-  enable: true,                    // Enable plot points
-  color: ['#ff6b6b', '#4ecdc4'],  // One color per line
-  size: 5                          // Point size
-}
+const chart = await painter.createChart('line', data, {
+  legend: {
+    show: true,
+    position: 'right',          // 'top' | 'bottom' | 'left' | 'right'
+    entries: [
+      { color: '#4A90E2', label: 'Series 1' },
+      { gradient: { ... }, label: 'Series 2' }
+    ],
+    fontSize: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundGradient: { ... }, // Optional
+    borderColor: '#000000',
+    textColor: '#000000',
+    textGradient: { ... },      // Optional
+    textStyle: { ... },         // Optional
+    spacing: 20,
+    padding: 8,
+    wrapText: true
+  }
+});
 ```
 </ts>
 <js>
 ```javascript
-plot: {
-  enable: true,                    // Enable plot points
-  color: ['#ff6b6b', '#4ecdc4'],  // One color per line
-  size: 5                          // Point size
-}
+const chart = await painter.createChart('line', data, {
+  legend: {
+    show: true,
+    position: 'right',
+    entries: [
+      { color: '#4A90E2', label: 'Series 1' }
+    ],
+    fontSize: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderColor: '#000000',
+    textColor: '#000000',
+    spacing: 20,
+    padding: 8
+  }
+});
 ```
 </js>
 </CodeSwitcher>
 
-### Y-Axis Label
+## Grid
 
 <CodeSwitcher>
 <ts>
 ```typescript
-yaxisLabel: {
-  label: 'Sales (in thousands)',
-  x: 0,
-  y: 0,
-  color: '#000000',
-  fontSize: '16px'
-}
+const chart = await painter.createChart('line', data, {
+  grid: {
+    show: true,
+    color: '#E0E0E0',
+    width: 1
+  }
+});
 ```
 </ts>
 <js>
 ```javascript
-yaxisLabel: {
-  label: 'Sales (in thousands)',
-  x: 0,
-  y: 0,
-  color: '#000000',
-  fontSize: '16px'
-}
-```
-</js>
-</CodeSwitcher>
-
-### Legend/Keys
-
-<CodeSwitcher>
-<ts>
-```typescript
-keys: {
-  '#ff6b6b': 'Product A',
-  '#4ecdc4': 'Product B',
-  '#45b7d1': 'Product C'
-},
-keysConfig: {
-  radius: 10,           // Key circle radius
-  keyPadding: 30,       // Padding between keys
-  textPadding: 60,      // Padding before text
-  lineWidth: 3,         // Key line width
-  fontColor: '#000000'  // Key text color
-}
-```
-</ts>
-<js>
-```javascript
-keys: {
-  '#ff6b6b': 'Product A',
-  '#4ecdc4': 'Product B',
-  '#45b7d1': 'Product C'
-},
-keysConfig: {
-  radius: 10,           // Key circle radius
-  keyPadding: 30,        // Padding between keys
-  textPadding: 60,       // Padding before text
-  lineWidth: 3,          // Key line width
-  fontColor: '#000000'   // Key text color
-}
+const chart = await painter.createChart('line', data, {
+  grid: {
+    show: true,
+    color: '#E0E0E0',
+    width: 1
+  }
+});
 ```
 </js>
 </CodeSwitcher>
@@ -390,69 +676,109 @@ import fs from 'fs';
 
 const painter = new ApexPainter();
 
-const chart = await painter.createChart({
-  data: [
-    [
-      { label: 'Q1', y: 45 },
-      { label: 'Q2', y: 62 },
-      { label: 'Q3', y: 38 },
-      { label: 'Q4', y: 71 }
+const data = [
+  {
+    label: 'Sales',
+    data: [
+      { x: 1, y: 10 },
+      { x: 2, y: 20 },
+      { x: 3, y: 15 },
+      { x: 4, y: 25 },
+      { x: 5, y: 30 }
     ],
-    [
-      { label: 'Q1', y: 30 },
-      { label: 'Q2', y: 55 },
-      { label: 'Q3', y: 48 },
-      { label: 'Q4', y: 65 }
-    ]
-  ],
-  lineConfig: {
-    yLabels: ['0', '20', '40', '60', '80', '100'],
-    fillArea: [
-      { color: 'rgba(255, 107, 107, 0.15)' },
-      { color: 'rgba(78, 205, 196, 0.15)' }
-    ],
-    lineColor: ['#ff6b6b', '#4ecdc4'],
-    lineTension: [0.4, 0.4],
-    plot: {
-      enable: true,
-      color: ['#ff6b6b', '#4ecdc4'],
-      size: 6
+    gradient: {
+      type: 'linear',
+      colors: ['#4A90E2', '#50C878'],
+      stops: [0, 1],
+      angle: 0
     },
-    grid: {
-      type: 'both',
-      color: '#dee2e6',
-      width: 1
+    lineWidth: 3,
+    smoothness: 'bezier',
+    marker: {
+      type: 'circle',
+      size: 8,
+      color: '#4A90E2',
+      show: true,
+      filled: true
     },
-    yaxisLabel: {
-      label: 'Revenue (in thousands)',
-      color: '#495057',
-      fontSize: '18px'
-    },
-    keys: {
-      '#ff6b6b': '2023 Sales',
-      '#4ecdc4': '2024 Sales'
-    },
-    keysConfig: {
-      radius: 12,
-      keyPadding: 40,
-      textPadding: 70,
-      lineWidth: 4,
-      fontColor: '#2c3e50'
-    },
-    canvas: {
-      width: 1200,
-      height: 800,
-      bgColor: '#f8f9fa',
-      fontColor: '#495057',
-      fontSize: 16
+    area: {
+      type: 'below',
+      color: '#4A90E2',
+      opacity: 0.2,
+      show: true
     }
   }
-}, {
-  chartType: 'line',
-  chartNumber: 1
+];
+
+const chart = await painter.createChart('line', data, {
+  dimensions: {
+    width: 1000,
+    height: 600,
+    padding: { top: 40, right: 40, bottom: 60, left: 60 }
+  },
+  appearance: {
+    backgroundGradient: {
+      type: 'radial',
+      colors: ['#ffffff', '#f5f5f5'],
+      stops: [0, 1]
+    }
+  },
+  axes: {
+    x: {
+      label: 'Month',
+      labelColor: '#333333',
+      range: { min: 0, max: 6, step: 1 },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 14
+    },
+    y: {
+      label: 'Sales ($)',
+      labelColor: '#333333',
+      range: { min: 0, max: 40, step: 5 },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 14
+    }
+  },
+  labels: {
+    title: {
+      text: 'Sales Trend',
+      fontSize: 28,
+      gradient: {
+        type: 'linear',
+        colors: ['#4A90E2', '#50C878'],
+        stops: [0, 1]
+      },
+      textStyle: {
+        bold: true,
+        shadow: {
+          color: 'rgba(0,0,0,0.2)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4
+        }
+      }
+    }
+  },
+  legend: {
+    show: true,
+    position: 'right',
+    fontSize: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderColor: '#cccccc',
+    textColor: '#333333',
+    spacing: 20,
+    padding: 10
+  },
+  grid: {
+    show: true,
+    color: '#E0E0E0',
+    width: 1
+  }
 });
 
-fs.writeFileSync('revenue-comparison.png', chart);
+fs.writeFileSync('line-chart.png', chart);
 ```
 </ts>
 <js>
@@ -462,84 +788,120 @@ const fs = require('fs');
 
 const painter = new ApexPainter();
 
-async function createRevenueChart() {
-  const chart = await painter.createChart({
-    data: [
-      [
-        { label: 'Q1', y: 45 },
-        { label: 'Q2', y: 62 },
-        { label: 'Q3', y: 38 },
-        { label: 'Q4', y: 71 }
+async function createChart() {
+  const data = [
+    {
+      label: 'Sales',
+      data: [
+        { x: 1, y: 10 },
+        { x: 2, y: 20 },
+        { x: 3, y: 15 },
+        { x: 4, y: 25 },
+        { x: 5, y: 30 }
       ],
-      [
-        { label: 'Q1', y: 30 },
-        { label: 'Q2', y: 55 },
-        { label: 'Q3', y: 48 },
-        { label: 'Q4', y: 65 }
-      ]
-    ],
-    lineConfig: {
-      yLabels: ['0', '20', '40', '60', '80', '100'],
-      fillArea: [
-        { color: 'rgba(255, 107, 107, 0.15)' },
-        { color: 'rgba(78, 205, 196, 0.15)' }
-      ],
-      lineColor: ['#ff6b6b', '#4ecdc4'],
-      lineTension: [0.4, 0.4],
-      plot: {
-        enable: true,
-        color: ['#ff6b6b', '#4ecdc4'],
-        size: 6
+      gradient: {
+        type: 'linear',
+        colors: ['#4A90E2', '#50C878'],
+        stops: [0, 1],
+        angle: 0
       },
-      grid: {
-        type: 'both',
-        color: '#dee2e6',
-        width: 1
+      lineWidth: 3,
+      smoothness: 'bezier',
+      marker: {
+        type: 'circle',
+        size: 8,
+        color: '#4A90E2',
+        show: true,
+        filled: true
       },
-      yaxisLabel: {
-        label: 'Revenue (in thousands)',
-        color: '#495057',
-        fontSize: '18px'
-      },
-      keys: {
-        '#ff6b6b': '2023 Sales',
-        '#4ecdc4': '2024 Sales'
-      },
-      keysConfig: {
-        radius: 12,
-        keyPadding: 40,
-        textPadding: 70,
-        lineWidth: 4,
-        fontColor: '#2c3e50'
-      },
-      canvas: {
-        width: 1200,
-        height: 800,
-        bgColor: '#f8f9fa',
-        fontColor: '#495057',
-        fontSize: 16
+      area: {
+        type: 'below',
+        color: '#4A90E2',
+        opacity: 0.2,
+        show: true
       }
     }
-  }, {
-    chartType: 'line',
-    chartNumber: 1
+  ];
+
+  const chart = await painter.createChart('line', data, {
+    dimensions: {
+      width: 1000,
+      height: 600,
+      padding: { top: 40, right: 40, bottom: 60, left: 60 }
+    },
+    appearance: {
+      backgroundGradient: {
+        type: 'radial',
+        colors: ['#ffffff', '#f5f5f5'],
+        stops: [0, 1]
+      }
+    },
+    axes: {
+      x: {
+        label: 'Month',
+        labelColor: '#333333',
+        range: { min: 0, max: 6, step: 1 },
+        color: '#000000',
+        width: 2,
+        tickFontSize: 14
+      },
+      y: {
+        label: 'Sales ($)',
+        labelColor: '#333333',
+        range: { min: 0, max: 40, step: 5 },
+        color: '#000000',
+        width: 2,
+        tickFontSize: 14
+      }
+    },
+    labels: {
+      title: {
+        text: 'Sales Trend',
+        fontSize: 28,
+        gradient: {
+          type: 'linear',
+          colors: ['#4A90E2', '#50C878'],
+          stops: [0, 1]
+        },
+        textStyle: {
+          bold: true,
+          shadow: {
+            color: 'rgba(0,0,0,0.2)',
+            offsetX: 2,
+            offsetY: 2,
+            blur: 4
+          }
+        }
+      }
+    },
+    legend: {
+      show: true,
+      position: 'right',
+      fontSize: 14,
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#cccccc',
+      textColor: '#333333',
+      spacing: 20,
+      padding: 10
+    },
+    grid: {
+      show: true,
+      color: '#E0E0E0',
+      width: 1
+    }
   });
 
-  fs.writeFileSync('revenue-comparison.png', chart);
+  fs.writeFileSync('line-chart.png', chart);
 }
 
-createRevenueChart();
+createChart();
 ```
 </js>
 </CodeSwitcher>
 
-<Alert type="warning" title="Array Lengths">
-All arrays in `lineConfig` (fillArea, lineColor, lineTension) must have the same length as the `data` array (number of lines).
-</Alert>
+## Related Documentation
 
-## Next Steps
-
-- [Bar Charts](/docs#bar-charts) - Create vertical bar charts
-- [Pie Charts](/docs#pie-charts) - Create circular pie charts
-
-
+- [Pie Charts](./pie-charts) - Create pie and donut charts
+- [Bar Charts](./bar-charts) - Create vertical bar charts
+- [Horizontal Bar Charts](./horizontal-bar-charts) - Create horizontal bar charts
+- [Comparison Charts](./comparison-charts) - Compare two charts side by side

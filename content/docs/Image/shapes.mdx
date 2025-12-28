@@ -1,6 +1,6 @@
 # Shapes
 
-Apexify.js supports 8 built-in shape types that you can use instead of loading image files. Shapes are created using the `createImage()` method with a shape name as the `source` property.
+Apexify.js supports 10 built-in shape types that you can use instead of loading image files. Shapes are created using the `createImage()` method with a shape name as the `source` property.
 
 ## Available Shapes
 
@@ -12,6 +12,8 @@ Apexify.js supports 8 built-in shape types that you can use instead of loading i
 - `'star'` - 5-pointed star
 - `'heart'` - Heart shape with bezier curves
 - `'polygon'` - Custom polygon with configurable sides
+- `'arc'` - Arc segment (new in v5.2.5)
+- `'pieSlice'` - Pie slice sector (new in v5.2.5)
 
 ## Basic Shape Usage
 
@@ -716,6 +718,240 @@ const composition = await painter.createImage([
 ```
 </js>
 </CodeSwitcher>
+
+## Arc Shape
+
+Draw arc segments (new in v5.2.5):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Basic arc
+const arc = await painter.createImage({
+  source: 'arc',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ff6b6b',
+    startAngle: 0,           // Start angle in radians
+    endAngle: Math.PI / 2,   // End angle in radians (90 degrees)
+    centerX: 200,            // Optional: Custom center X
+    centerY: 200             // Optional: Custom center Y
+  }
+}, canvasBuffer);
+
+// Arc with custom pivot point
+const customArc = await painter.createImage({
+  source: 'arc',
+  x: 0,
+  y: 0,
+  width: 400,
+  height: 400,
+  shape: {
+    fill: true,
+    color: '#4ecdc4',
+    startAngle: Math.PI / 4,    // 45 degrees
+    endAngle: (3 * Math.PI) / 4, // 135 degrees
+    centerX: 200,                // Center X of arc
+    centerY: 200                 // Center Y of arc
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Basic arc
+const arc = await painter.createImage({
+  source: 'arc',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#ff6b6b',
+    startAngle: 0,           // Start angle in radians
+    endAngle: Math.PI / 2,   // End angle in radians (90 degrees)
+    centerX: 200,            // Optional: Custom center X
+    centerY: 200             // Optional: Custom center Y
+  }
+}, canvasBuffer);
+
+// Arc with custom pivot point
+const customArc = await painter.createImage({
+  source: 'arc',
+  x: 0,
+  y: 0,
+  width: 400,
+  height: 400,
+  shape: {
+    fill: true,
+    color: '#4ecdc4',
+    startAngle: Math.PI / 4,    // 45 degrees
+    endAngle: (3 * Math.PI) / 4, // 135 degrees
+    centerX: 200,                // Center X of arc
+    centerY: 200                 // Center Y of arc
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+## Pie Slice Shape
+
+Draw pie slice sectors (new in v5.2.5):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Basic pie slice
+const pieSlice = await painter.createImage({
+  source: 'pieSlice',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#feca57',
+    startAngle: 0,              // Start angle in radians
+    endAngle: Math.PI / 3,      // End angle in radians (60 degrees)
+    centerX: 200,               // Optional: Custom center X
+    centerY: 200                // Optional: Custom center Y
+  }
+}, canvasBuffer);
+
+// Donut slice (pie slice with inner radius)
+const donutSlice = await painter.createImage({
+  source: 'pieSlice',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#48dbfb',
+    startAngle: Math.PI / 4,    // 45 degrees
+    endAngle: (3 * Math.PI) / 4, // 135 degrees
+    innerRadius: 50,             // Inner radius (creates donut effect)
+    centerX: 200,
+    centerY: 200
+  }
+}, canvasBuffer);
+
+// Pie slice with gradient
+const gradientPieSlice = await painter.createImage({
+  source: 'pieSlice',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#ff1744' }
+      ],
+      startX: 200,
+      startY: 200,
+      startRadius: 0,
+      endX: 200,
+      endY: 200,
+      endRadius: 100
+    },
+    startAngle: 0,
+    endAngle: Math.PI / 2
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, canvasBuffer);
+```
+</ts>
+<js>
+```javascript
+// Basic pie slice
+const pieSlice = await painter.createImage({
+  source: 'pieSlice',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#feca57',
+    startAngle: 0,              // Start angle in radians
+    endAngle: Math.PI / 3,      // End angle in radians (60 degrees)
+    centerX: 200,               // Optional: Custom center X
+    centerY: 200                // Optional: Custom center Y
+  }
+}, canvasBuffer);
+
+// Donut slice (pie slice with inner radius)
+const donutSlice = await painter.createImage({
+  source: 'pieSlice',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    color: '#48dbfb',
+    startAngle: Math.PI / 4,    // 45 degrees
+    endAngle: (3 * Math.PI) / 4, // 135 degrees
+    innerRadius: 50,             // Inner radius (creates donut effect)
+    centerX: 200,
+    centerY: 200
+  }
+}, canvasBuffer);
+
+// Pie slice with gradient
+const gradientPieSlice = await painter.createImage({
+  source: 'pieSlice',
+  x: 200,
+  y: 200,
+  width: 200,
+  height: 200,
+  shape: {
+    fill: true,
+    gradient: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#ff1744' }
+      ],
+      startX: 200,
+      startY: 200,
+      startRadius: 0,
+      endX: 200,
+      endY: 200,
+      endRadius: 100
+    },
+    startAngle: 0,
+    endAngle: Math.PI / 2
+  },
+  shadow: {
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 5,
+    offsetY: 5,
+    blur: 10
+  }
+}, canvasBuffer);
+```
+</js>
+</CodeSwitcher>
+
+<Alert type="tip" title="Perfect for Charts and Wheels">
+Arc and pieSlice shapes are perfect for creating pie charts, roulette wheels, spinners, and circular segments. Use `innerRadius` for donut slices and `centerX`/`centerY` for custom pivot points.
+</Alert>
 
 ## Next Steps
 

@@ -1,0 +1,1019 @@
+# Group Transform Operations
+
+Apexify.js supports grouped transformations that allow you to transform multiple elements together as a single unit. Perfect for roulette wheels, clocks, spinners, and grouped UI elements.
+
+## Overview
+
+Group transforms let you:
+
+- **Rotate multiple elements together** around a shared pivot point
+- **Scale multiple elements together** from a common center
+- **Translate multiple elements together** as a group
+- **Combine transformations** (rotate, scale, translate) in a single operation
+
+<Alert type="info" title="New in v5.2.5">
+Group transform operations are new in v5.2.5. Use the `isGrouped` option with `createImage()` when passing an array of elements.
+</Alert>
+
+<Alert type="success" title="Major Update in v5.2.9 - Full Feature Parity!">
+In v5.2.9, group transforms now support ALL properties available in normal `createImage`, including filters, effects, shadows, strokes, masks, clip paths, and distortions. Groups now have complete feature parity with individual elements!
+</Alert>
+
+## Basic Usage
+
+Enable grouped mode by setting `isGrouped: true` in the options:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const canvas = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#ffffff'
+});
+
+// Create multiple elements
+const elements = [
+  {
+    source: 'circle',
+    x: 350,
+    y: 250,
+    width: 100,
+    height: 100,
+    shape: { fill: true, color: '#ff6b6b' }
+  },
+  {
+    source: 'rectangle',
+    x: 400,
+    y: 200,
+    width: 50,
+    height: 150,
+    shape: { fill: true, color: '#4ecdc4' }
+  },
+  {
+    source: 'star',
+    x: 375,
+    y: 275,
+    width: 50,
+    height: 50,
+    shape: { fill: true, color: '#ffd700' }
+  }
+];
+
+// Draw with grouped rotation
+const result = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,  // Rotate all elements together 45 degrees
+    pivotX: 400,   // Pivot point X (center of group)
+    pivotY: 300    // Pivot point Y (center of group)
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function groupTransform() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#ffffff'
+  });
+
+  // Create multiple elements
+  const elements = [
+    {
+      source: 'circle',
+      x: 350,
+      y: 250,
+      width: 100,
+      height: 100,
+      shape: { fill: true, color: '#ff6b6b' }
+    },
+    {
+      source: 'rectangle',
+      x: 400,
+      y: 200,
+      width: 50,
+      height: 150,
+      shape: { fill: true, color: '#4ecdc4' }
+    },
+    {
+      source: 'star',
+      x: 375,
+      y: 275,
+      width: 50,
+      height: 50,
+      shape: { fill: true, color: '#ffd700' }
+    }
+  ];
+
+  // Draw with grouped rotation
+  const result = await painter.createImage(elements, canvas.buffer, {
+    isGrouped: true,
+    groupTransform: {
+      rotation: 45,  // Rotate all elements together 45 degrees
+      pivotX: 400,   // Pivot point X (center of group)
+      pivotY: 300    // Pivot point Y (center of group)
+    }
+  });
+}
+
+groupTransform();
+```
+</js>
+</CodeSwitcher>
+
+## Rotation
+
+Rotate all elements together around a shared pivot point:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Rotate 90 degrees around center
+const rotated = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 90,
+    pivotX: 400,  // Center X
+    pivotY: 300   // Center Y
+  }
+});
+
+// Rotate around custom pivot point
+const customRotation = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 180,
+    pivotX: 100,  // Custom pivot X
+    pivotY: 100   // Custom pivot Y
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Rotate 90 degrees around center
+const rotated = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 90,
+    pivotX: 400,  // Center X
+    pivotY: 300   // Center Y
+  }
+});
+
+// Rotate around custom pivot point
+const customRotation = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 180,
+    pivotX: 100,  // Custom pivot X
+    pivotY: 100   // Custom pivot Y
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Scaling
+
+Scale all elements together from a common center:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Scale uniformly (both X and Y)
+const scaled = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    scaleX: 1.5,   // 150% size
+    scaleY: 1.5,
+    pivotX: 400,
+    pivotY: 300
+  }
+});
+
+// Scale non-uniformly
+const stretched = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    scaleX: 2.0,   // Double width
+    scaleY: 0.5,   // Half height
+    pivotX: 400,
+    pivotY: 300
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Scale uniformly (both X and Y)
+const scaled = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    scaleX: 1.5,   // 150% size
+    scaleY: 1.5,
+    pivotX: 400,
+    pivotY: 300
+  }
+});
+
+// Scale non-uniformly
+const stretched = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    scaleX: 2.0,   // Double width
+    scaleY: 0.5,   // Half height
+    pivotX: 400,
+    pivotY: 300
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Translation
+
+Move all elements together as a group:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Translate (move) all elements together
+const translated = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    translateX: 100,  // Move 100px right
+    translateY: 50    // Move 50px down
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Translate (move) all elements together
+const translated = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    translateX: 100,  // Move 100px right
+    translateY: 50    // Move 50px down
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Combined Transformations
+
+Combine rotation, scale, and translation:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Combine all transformations
+const combined = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,      // Rotate 45 degrees
+    scaleX: 1.2,       // Scale to 120%
+    scaleY: 1.2,
+    translateX: 50,    // Move 50px right
+    translateY: -30,   // Move 30px up
+    pivotX: 400,       // Rotation/scale center
+    pivotY: 300
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Combine all transformations
+const combined = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,      // Rotate 45 degrees
+    scaleX: 1.2,       // Scale to 120%
+    scaleY: 1.2,
+    translateX: 50,    // Move 50px right
+    translateY: -30,   // Move 30px up
+    pivotX: 400,       // Rotation/scale center
+    pivotY: 300
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Pivot Point
+
+The pivot point determines the center of rotation and scaling:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Default pivot: center of canvas
+const defaultPivot = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 90
+    // pivotX and pivotY default to canvas center
+  }
+});
+
+// Custom pivot point
+const customPivot = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 90,
+    pivotX: 100,   // Top-left corner
+    pivotY: 100
+  }
+});
+
+// Pivot at center of group bounds
+const groupCenterPivot = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 90,
+    pivotX: 400,   // Calculated group center X
+    pivotY: 300    // Calculated group center Y
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Default pivot: center of canvas
+const defaultPivot = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 90
+    // pivotX and pivotY default to canvas center
+  }
+});
+
+// Custom pivot point
+const customPivot = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 90,
+    pivotX: 100,   // Top-left corner
+    pivotY: 100
+  }
+});
+
+// Pivot at center of group bounds
+const groupCenterPivot = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 90,
+    pivotX: 400,   // Calculated group center X
+    pivotY: 300    // Calculated group center Y
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Advanced Group Properties (v5.2.9+)
+
+Group transforms now support ALL properties available in normal `createImage`. Apply these properties to the entire group as a single unit:
+
+### Visual Properties
+
+Apply visual effects to the entire group:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const grouped = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Visual properties applied to entire group
+    opacity: 0.8,           // Group opacity (0-1)
+    blur: 5,                // Group blur in pixels
+    borderRadius: 20,       // Group border radius
+    borderPosition: 'all'   // Border position
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const grouped = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Visual properties applied to entire group
+    opacity: 0.8,           // Group opacity (0-1)
+    blur: 5,                // Group blur in pixels
+    borderRadius: 20,       // Group border radius
+    borderPosition: 'all'   // Border position
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Image Filters
+
+Apply filters to the entire group:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const filteredGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Filters applied to entire group
+    filters: [
+      { type: 'gaussianBlur', intensity: 5 },
+      { type: 'contrast', value: 1.2 }
+    ],
+    filterIntensity: 0.8,  // Global filter intensity multiplier
+    filterOrder: 'post'    // Apply filters after transformations
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const filteredGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Filters applied to entire group
+    filters: [
+      { type: 'gaussianBlur', intensity: 5 },
+      { type: 'contrast', value: 1.2 }
+    ],
+    filterIntensity: 0.8,  // Global filter intensity multiplier
+    filterOrder: 'post'    // Apply filters after transformations
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Image Effects
+
+Apply effects (vignette, lens flare, etc.) to the entire group:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const effectGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Effects applied to entire group
+    effects: {
+      vignette: { intensity: 0.5, size: 0.8 },
+      lensFlare: { x: 400, y: 300, intensity: 0.7 },
+      chromaticAberration: { intensity: 0.1 },
+      filmGrain: { intensity: 0.7 }
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const effectGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Effects applied to entire group
+    effects: {
+      vignette: { intensity: 0.5, size: 0.8 },
+      lensFlare: { x: 400, y: 300, intensity: 0.7 },
+      chromaticAberration: { intensity: 0.1 },
+      filmGrain: { intensity: 0.7 }
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Group Styling
+
+Apply shadows, strokes, and backgrounds to the entire group:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const styledGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Group-level styling
+    shadow: {
+      color: 'rgba(0, 0, 0, 0.3)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 3
+    },
+    boxBackground: {
+      type: 'color',
+      value: 'rgba(255, 255, 255, 0.1)'
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const styledGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Group-level styling
+    shadow: {
+      color: 'rgba(0, 0, 0, 0.3)',
+      offsetX: 10,
+      offsetY: 10,
+      blur: 20
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 3
+    },
+    boxBackground: {
+      type: 'color',
+      value: 'rgba(255, 255, 255, 0.1)'
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Group Masking and Clipping
+
+Apply masks and clip paths to the entire group:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const maskedGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Group masking
+    mask: {
+      source: './mask.png',
+      mode: 'alpha'
+    },
+    // Or use clip path
+    clipPath: [
+      { x: 0, y: 0 },
+      { x: 400, y: 0 },
+      { x: 400, y: 300 },
+      { x: 0, y: 300 }
+    ]
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const maskedGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Group masking
+    mask: {
+      source: './mask.png',
+      mode: 'alpha'
+    },
+    // Or use clip path
+    clipPath: [
+      { x: 0, y: 0 },
+      { x: 400, y: 0 },
+      { x: 400, y: 300 },
+      { x: 0, y: 300 }
+    ]
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Group Distortion
+
+Apply distortions to the entire group:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const distortedGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Group distortion
+    distortion: {
+      type: 'perspective',
+      points: [
+        { x: -50, y: 0 },
+        { x: 450, y: 0 },
+        { x: 400, y: 300 },
+        { x: 0, y: 300 }
+      ]
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const distortedGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    pivotX: 400,
+    pivotY: 300,
+    // Group distortion
+    distortion: {
+      type: 'perspective',
+      points: [
+        { x: -50, y: 0 },
+        { x: 450, y: 0 },
+        { x: 400, y: 300 },
+        { x: 0, y: 300 }
+      ]
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Combined Advanced Properties
+
+Combine multiple group properties for complex effects:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const advancedGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    scaleX: 1.2,
+    scaleY: 1.2,
+    pivotX: 400,
+    pivotY: 300,
+    opacity: 0.9,
+    blur: 2,
+    borderRadius: 20,
+    filters: [
+      { type: 'contrast', value: 1.2 }
+    ],
+    effects: {
+      vignette: { intensity: 0.3, size: 0.9 }
+    },
+    shadow: {
+      color: 'rgba(0, 0, 0, 0.2)',
+      offsetX: 5,
+      offsetY: 5,
+      blur: 15
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const advancedGroup = await painter.createImage(elements, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 45,
+    scaleX: 1.2,
+    scaleY: 1.2,
+    pivotX: 400,
+    pivotY: 300,
+    opacity: 0.9,
+    blur: 2,
+    borderRadius: 20,
+    filters: [
+      { type: 'contrast', value: 1.2 }
+    ],
+    effects: {
+      vignette: { intensity: 0.3, size: 0.9 }
+    },
+    shadow: {
+      color: 'rgba(0, 0, 0, 0.2)',
+      offsetX: 5,
+      offsetY: 5,
+      blur: 15
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Important Notes
+
+<Alert type="warning" title="Individual Rotation">
+When `isGrouped` is true, individual `rotation` properties on elements are ignored (set to 0). All rotation is handled by the group transform.
+</Alert>
+
+<Alert type="info" title="Transform Order">
+Group properties are applied in this order:
+1. Group opacity and blur applied first
+2. Group box background and shadow applied before transformations
+3. Group clip path/border radius applied before element drawing
+4. Transformations applied (rotation, scale, translation)
+5. Elements drawn with individual properties (except rotation)
+6. Post-filters and effects applied to transformed group
+7. Group stroke applied after all drawing with transform accounting
+</Alert>
+
+<Alert type="success" title="Feature Parity">
+Groups now have complete feature parity with individual elements! All properties that work on individual images/shapes also work on groups. Individual element properties (like shadows, filters, effects) still work and are applied after group properties.
+</Alert>
+
+## Roulette Wheel Example
+
+Perfect use case: Create a roulette wheel with numbered segments:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+async function createRouletteWheel() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  // Create wheel segments
+  const segments = [];
+  const segmentCount = 12;
+  const centerX = 400;
+  const centerY = 400;
+  const radius = 300;
+
+  for (let i = 0; i < segmentCount; i++) {
+    const angle = (i / segmentCount) * Math.PI * 2;
+    const startAngle = angle;
+    const endAngle = angle + (Math.PI * 2 / segmentCount);
+    
+    segments.push({
+      source: 'pieSlice',
+      x: 0,
+      y: 0,
+      width: 800,
+      height: 800,
+      shape: {
+        fill: true,
+        color: i % 2 === 0 ? '#ff6b6b' : '#4ecdc4',
+        startAngle: startAngle,
+        endAngle: endAngle,
+        centerX: centerX,
+        centerY: centerY
+      }
+    });
+  }
+
+  // Draw wheel rotated 45 degrees
+  const wheel = await painter.createImage(segments, canvas.buffer, {
+    isGrouped: true,
+    groupTransform: {
+      rotation: 45,
+      pivotX: centerX,
+      pivotY: centerY
+    }
+  });
+
+  // Add center circle
+  const final = await painter.createImage({
+    source: 'circle',
+    x: centerX - 50,
+    y: centerY - 50,
+    width: 100,
+    height: 100,
+    shape: { fill: true, color: '#ffffff' }
+  }, wheel);
+
+  fs.writeFileSync('roulette-wheel.png', final);
+}
+
+createRouletteWheel();
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createRouletteWheel() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 800,
+    colorBg: '#1a1a1a'
+  });
+
+  // Create wheel segments
+  const segments: any[] = [];
+  const segmentCount = 12;
+  const centerX = 400;
+  const centerY = 400;
+  const radius = 300;
+
+  for (let i = 0; i < segmentCount; i++) {
+    const angle = (i / segmentCount) * Math.PI * 2;
+    const startAngle = angle;
+    const endAngle = angle + (Math.PI * 2 / segmentCount);
+    
+    segments.push({
+      source: 'pieSlice',
+      x: 0,
+      y: 0,
+      width: 800,
+      height: 800,
+      shape: {
+        fill: true,
+        color: i % 2 === 0 ? '#ff6b6b' : '#4ecdc4',
+        startAngle: startAngle,
+        endAngle: endAngle,
+        centerX: centerX,
+        centerY: centerY
+      }
+    });
+  }
+
+  // Draw wheel rotated 45 degrees
+  const wheel = await painter.createImage(segments, canvas.buffer, {
+    isGrouped: true,
+    groupTransform: {
+      rotation: 45,
+      pivotX: centerX,
+      pivotY: centerY
+    }
+  });
+
+  // Add center circle
+  const final = await painter.createImage({
+    source: 'circle',
+    x: centerX - 50,
+    y: centerY - 50,
+    width: 100,
+    height: 100,
+    shape: { fill: true, color: '#ffffff' }
+  }, wheel);
+
+  fs.writeFileSync('roulette-wheel.png', final);
+}
+
+createRouletteWheel();
+```
+</js>
+</CodeSwitcher>
+
+## Clock Face Example
+
+Create a clock with hour markers:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({
+  width: 600,
+  height: 600,
+  colorBg: '#ffffff'
+});
+
+// Create hour markers
+const markers = [];
+const centerX = 300;
+const centerY = 300;
+
+for (let i = 0; i < 12; i++) {
+  const angle = (i / 12) * Math.PI * 2;
+  const x = centerX + Math.cos(angle) * 250 - 5;
+  const y = centerY + Math.sin(angle) * 250 - 20;
+  
+  markers.push({
+    source: 'rectangle',
+    x: x,
+    y: y,
+    width: 10,
+    height: 40,
+    shape: { fill: true, color: '#000000' }
+  });
+}
+
+// Draw markers rotated as a group
+const clock = await painter.createImage(markers, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 0,  // Can rotate entire clock face
+    pivotX: centerX,
+    pivotY: centerY
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({
+  width: 600,
+  height: 600,
+  colorBg: '#ffffff'
+});
+
+// Create hour markers
+const markers = [];
+const centerX = 300;
+const centerY = 300;
+
+for (let i = 0; i < 12; i++) {
+  const angle = (i / 12) * Math.PI * 2;
+  const x = centerX + Math.cos(angle) * 250 - 5;
+  const y = centerY + Math.sin(angle) * 250 - 20;
+  
+  markers.push({
+    source: 'rectangle',
+    x: x,
+    y: y,
+    width: 10,
+    height: 40,
+    shape: { fill: true, color: '#000000' }
+  });
+}
+
+// Draw markers rotated as a group
+const clock = await painter.createImage(markers, canvas.buffer, {
+  isGrouped: true,
+  groupTransform: {
+    rotation: 0,  // Can rotate entire clock face
+    pivotX: centerX,
+    pivotY: centerY
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Shapes](/docs#shapes) - Learn about all available shape types including arc and pieSlice
+- [Image Operations](/docs#basic-image-operations) - Learn about basic image operations
+- [Advanced Features](/docs#advanced-image-features) - Add shadows, strokes, and transformations
+

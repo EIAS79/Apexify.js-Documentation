@@ -1,0 +1,583 @@
+# Pixel Data API
+
+Apexify.js provides comprehensive pixel-level manipulation APIs for complete control over canvas pixels. Perfect for custom effects, color adjustments, and advanced image processing.
+
+## Overview
+
+The Pixel Data API includes:
+
+- **`getPixelData()`** - Extract pixel data from any region
+- **`setPixelData()`** - Set pixel data back to canvas
+- **`manipulatePixels()`** - Apply filters or custom processors
+- **`getPixelColor()`** - Get pixel color at specific coordinates
+- **`setPixelColor()`** - Set pixel color at specific coordinates
+
+## Getting Pixel Data
+
+Extract pixel data from any region of the canvas:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Get pixel data from entire canvas
+const pixelData = await painter.getPixelData(canvasBuffer);
+
+// Get pixel data from specific region
+const regionData = await painter.getPixelData(canvasBuffer, {
+  x: 0,
+  y: 0,
+  width: 100,
+  height: 100
+});
+
+// Access RGBA values
+// pixelData.data is a Uint8ClampedArray with RGBA values
+// Format: [R, G, B, A, R, G, B, A, ...]
+const r = pixelData.data[0];  // Red value of first pixel
+const g = pixelData.data[1];  // Green value of first pixel
+const b = pixelData.data[2];  // Blue value of first pixel
+const a = pixelData.data[3];  // Alpha value of first pixel
+
+console.log(`Pixel data dimensions: ${pixelData.width} x ${pixelData.height}`);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function getPixels() {
+  // Get pixel data from entire canvas
+  const pixelData = await painter.getPixelData(canvasBuffer);
+
+  // Get pixel data from specific region
+  const regionData = await painter.getPixelData(canvasBuffer, {
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100
+  });
+
+  // Access RGBA values
+  // pixelData.data is a Uint8ClampedArray with RGBA values
+  // Format: [R, G, B, A, R, G, B, A, ...]
+  const r = pixelData.data[0];  // Red value of first pixel
+  const g = pixelData.data[1];  // Green value of first pixel
+  const b = pixelData.data[2];  // Blue value of first pixel
+  const a = pixelData.data[3];  // Alpha value of first pixel
+
+  console.log(`Pixel data dimensions: ${pixelData.width} x ${pixelData.height}`);
+}
+
+getPixels();
+```
+</js>
+</CodeSwitcher>
+
+## Setting Pixel Data
+
+Set pixel data back to the canvas:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Get pixel data
+const pixelData = await painter.getPixelData(canvasBuffer, {
+  x: 0,
+  y: 0,
+  width: 100,
+  height: 100
+});
+
+// Modify pixels
+for (let i = 0; i < pixelData.data.length; i += 4) {
+  // Make all pixels red
+  pixelData.data[i] = 255;     // Red
+  pixelData.data[i + 1] = 0;   // Green
+  pixelData.data[i + 2] = 0;   // Blue
+  // Alpha stays the same
+}
+
+// Set pixel data back to canvas
+const updated = await painter.setPixelData(canvasBuffer, pixelData, {
+  x: 0,
+  y: 0
+});
+```
+</ts>
+<js>
+```javascript
+async function setPixels() {
+  // Get pixel data
+  const pixelData = await painter.getPixelData(canvasBuffer, {
+    x: 0,
+    y: 0,
+    width: 100,
+    height: 100
+  });
+
+  // Modify pixels
+  for (let i = 0; i < pixelData.data.length; i += 4) {
+    // Make all pixels red
+    pixelData.data[i] = 255;     // Red
+    pixelData.data[i + 1] = 0;   // Green
+    pixelData.data[i + 2] = 0;   // Blue
+    // Alpha stays the same
+  }
+
+  // Set pixel data back to canvas
+  const updated = await painter.setPixelData(canvasBuffer, pixelData, {
+    x: 0,
+    y: 0
+  });
+}
+
+setPixels();
+```
+</js>
+</CodeSwitcher>
+
+## Pixel Manipulation with Filters
+
+Apply built-in filters or custom processors:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Apply built-in grayscale filter
+const grayscale = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'grayscale',
+  intensity: 1.0  // 0-1, 1.0 = full effect
+});
+
+// Apply brightness filter
+const brightened = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'brightness',
+  intensity: 0.8  // 0-1, 0.8 = 80% brightness
+});
+
+// Apply to specific region
+const regionFiltered = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'contrast',
+  intensity: 0.9,
+  region: {
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 200
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Apply built-in grayscale filter
+const grayscale = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'grayscale',
+  intensity: 1.0  // 0-1, 1.0 = full effect
+});
+
+// Apply brightness filter
+const brightened = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'brightness',
+  intensity: 0.8  // 0-1, 0.8 = 80% brightness
+});
+
+// Apply to specific region
+const regionFiltered = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'contrast',
+  intensity: 0.9,
+  region: {
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 200
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Built-in Filters
+
+Available built-in filters:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Grayscale
+const grayscale = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'grayscale',
+  intensity: 1.0
+});
+
+// Invert colors
+const inverted = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'invert',
+  intensity: 1.0
+});
+
+// Sepia tone
+const sepia = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'sepia',
+  intensity: 1.0
+});
+
+// Brightness adjustment
+const bright = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'brightness',
+  intensity: 0.8  // 0 = black, 1 = original, >1 = brighter
+});
+
+// Contrast adjustment
+const contrast = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'contrast',
+  intensity: 0.9  // 0 = no contrast, 1 = original, >1 = more contrast
+});
+
+// Saturation adjustment
+const saturated = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'saturate',
+  intensity: 0.7  // 0 = grayscale, 1 = original, >1 = more saturated
+});
+```
+</ts>
+<js>
+```javascript
+// Grayscale
+const grayscale = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'grayscale',
+  intensity: 1.0
+});
+
+// Invert colors
+const inverted = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'invert',
+  intensity: 1.0
+});
+
+// Sepia tone
+const sepia = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'sepia',
+  intensity: 1.0
+});
+
+// Brightness adjustment
+const bright = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'brightness',
+  intensity: 0.8  // 0 = black, 1 = original, >1 = brighter
+});
+
+// Contrast adjustment
+const contrast = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'contrast',
+  intensity: 0.9  // 0 = no contrast, 1 = original, >1 = more contrast
+});
+
+// Saturation adjustment
+const saturated = await painter.manipulatePixels(canvasBuffer, {
+  filter: 'saturate',
+  intensity: 0.7  // 0 = grayscale, 1 = original, >1 = more saturated
+});
+```
+</js>
+</CodeSwitcher>
+
+## Custom Pixel Processors
+
+Create custom pixel manipulation functions:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Custom processor function
+// Parameters: r, g, b, a, x, y
+// Returns: [r, g, b, a]
+const customProcessed = await painter.manipulatePixels(canvasBuffer, {
+  processor: (r, g, b, a, x, y) => {
+    // Example: Invert colors
+    return [255 - r, 255 - g, 255 - b, a];
+  }
+});
+
+// Example: Create a gradient effect
+const gradientProcessed = await painter.manipulatePixels(canvasBuffer, {
+  processor: (r, g, b, a, x, y, pixelData) => {
+    // Darken pixels based on Y position
+    const factor = y / pixelData.height;
+    return [
+      Math.floor(r * factor),
+      Math.floor(g * factor),
+      Math.floor(b * factor),
+      a
+    ];
+  }
+});
+
+// Example: Edge detection (simplified)
+const edgeDetected = await painter.manipulatePixels(canvasBuffer, {
+  processor: (r, g, b, a, x, y, pixelData) => {
+    // Simplified edge detection using luminance
+    const luminance = (r + g + b) / 3;
+    const threshold = 128;
+    const edge = luminance > threshold ? 255 : 0;
+    return [edge, edge, edge, a];
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Custom processor function
+// Parameters: r, g, b, a, x, y
+// Returns: [r, g, b, a]
+const customProcessed = await painter.manipulatePixels(canvasBuffer, {
+  processor: (r, g, b, a, x, y) => {
+    // Example: Invert colors
+    return [255 - r, 255 - g, 255 - b, a];
+  }
+});
+
+// Example: Create a gradient effect
+const gradientProcessed = await painter.manipulatePixels(canvasBuffer, {
+  processor: (r, g, b, a, x, y, pixelData) => {
+    // Darken pixels based on Y position
+    const factor = y / pixelData.height;
+    return [
+      Math.floor(r * factor),
+      Math.floor(g * factor),
+      Math.floor(b * factor),
+      a
+    ];
+  }
+});
+
+// Example: Edge detection (simplified)
+const edgeDetected = await painter.manipulatePixels(canvasBuffer, {
+  processor: (r, g, b, a, x, y, pixelData) => {
+    // Simplified edge detection using luminance
+    const luminance = (r + g + b) / 3;
+    const threshold = 128;
+    const edge = luminance > threshold ? 255 : 0;
+    return [edge, edge, edge, a];
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Pixel Color Utilities
+
+Quick access to individual pixel colors:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Get pixel color at specific coordinates
+const color = await painter.getPixelColor(canvasBuffer, 100, 200);
+console.log(`RGBA: (${color.r}, ${color.g}, ${color.b}, ${color.a})`);
+
+// Set pixel color at specific coordinates
+const updated = await painter.setPixelColor(canvasBuffer, 100, 200, {
+  r: 255,
+  g: 0,
+  b: 0,
+  a: 255  // Optional, defaults to 255
+});
+```
+</ts>
+<js>
+```javascript
+async function pixelColors() {
+  // Get pixel color at specific coordinates
+  const color = await painter.getPixelColor(canvasBuffer, 100, 200);
+  console.log(`RGBA: (${color.r}, ${color.g}, ${color.b}, ${color.a})`);
+
+  // Set pixel color at specific coordinates
+  const updated = await painter.setPixelColor(canvasBuffer, 100, 200, {
+    r: 255,
+    g: 0,
+    b: 0,
+    a: 255  // Optional, defaults to 255
+  });
+}
+
+pixelColors();
+```
+</js>
+</CodeSwitcher>
+
+## Working with ImageData
+
+The pixel data is fully compatible with Canvas ImageData:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Get pixel data (returns ImageData-like object)
+const pixelData = await painter.getPixelData(canvasBuffer);
+
+// pixelData has:
+// - data: Uint8ClampedArray (RGBA values)
+// - width: number
+// - height: number
+
+// Iterate through all pixels
+for (let y = 0; y < pixelData.height; y++) {
+  for (let x = 0; x < pixelData.width; x++) {
+    const index = (y * pixelData.width + x) * 4;
+    const r = pixelData.data[index];
+    const g = pixelData.data[index + 1];
+    const b = pixelData.data[index + 2];
+    const a = pixelData.data[index + 3];
+    
+    // Process pixel at (x, y)
+    // ...
+  }
+}
+```
+</ts>
+<js>
+```javascript
+async function iteratePixels() {
+  // Get pixel data (returns ImageData-like object)
+  const pixelData = await painter.getPixelData(canvasBuffer);
+
+  // pixelData has:
+  // - data: Uint8ClampedArray (RGBA values)
+  // - width: number
+  // - height: number
+
+  // Iterate through all pixels
+  for (let y = 0; y < pixelData.height; y++) {
+    for (let x = 0; x < pixelData.width; x++) {
+      const index = (y * pixelData.width + x) * 4;
+      const r = pixelData.data[index];
+      const g = pixelData.data[index + 1];
+      const b = pixelData.data[index + 2];
+      const a = pixelData.data[index + 3];
+      
+      // Process pixel at (x, y)
+      // ...
+    }
+  }
+}
+
+iteratePixels();
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+async function pixelManipulationExample() {
+  // Create canvas with an image
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#ffffff'
+  });
+
+  // Apply grayscale filter to entire canvas
+  const grayscale = await painter.manipulatePixels(canvas.buffer, {
+    filter: 'grayscale',
+    intensity: 1.0
+  });
+
+  // Apply brightness to a region
+  const brightRegion = await painter.manipulatePixels(grayscale, {
+    filter: 'brightness',
+    intensity: 1.2,
+    region: {
+      x: 200,
+      y: 200,
+      width: 400,
+      height: 200
+    }
+  });
+
+  // Custom processor: Color shift
+  const colorShifted = await painter.manipulatePixels(brightRegion, {
+    processor: (r, g, b, a) => {
+      // Shift colors: red -> blue, green -> red, blue -> green
+      return [b, r, g, a];
+    }
+  });
+
+  // Save result
+  fs.writeFileSync('pixel-manipulation.png', colorShifted);
+}
+
+pixelManipulationExample();
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function pixelManipulationExample() {
+  // Create canvas with an image
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#ffffff'
+  });
+
+  // Apply grayscale filter to entire canvas
+  const grayscale = await painter.manipulatePixels(canvas.buffer, {
+    filter: 'grayscale',
+    intensity: 1.0
+  });
+
+  // Apply brightness to a region
+  const brightRegion = await painter.manipulatePixels(grayscale, {
+    filter: 'brightness',
+    intensity: 1.2,
+    region: {
+      x: 200,
+      y: 200,
+      width: 400,
+      height: 200
+    }
+  });
+
+  // Custom processor: Color shift
+  const colorShifted = await painter.manipulatePixels(brightRegion, {
+    processor: (r, g, b, a) => {
+      // Shift colors: red -> blue, green -> red, blue -> green
+      return [b, r, g, a];
+    }
+  });
+
+  // Save result
+  fs.writeFileSync('pixel-manipulation.png', colorShifted);
+}
+
+pixelManipulationExample();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Text Metrics API](/docs#text-metrics-api) - Text measurement and positioning
+- [Path2D API](/docs#path2d-api) - Complex path creation
+- [Hit Detection API](/docs#hit-detection-api) - Point-in-path detection
+- [Image Effects](/docs#image-effects) - Image processing effects
+

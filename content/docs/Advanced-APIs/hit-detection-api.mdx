@@ -1,0 +1,710 @@
+# Hit Detection API
+
+Apexify.js provides advanced hit detection APIs for checking if points are inside paths or regions. Perfect for interactive graphics, collision detection, UI elements, and user interaction.
+
+## Overview
+
+The Hit Detection API includes:
+
+- **`isPointInPath()`** - Check if a point is inside a Path2D object
+- **`isPointInRegion()`** - Check if a point is inside a custom region
+- **`isPointInAnyRegion()`** - Check if a point is inside any of multiple regions
+- **`getDistanceToRegion()`** - Calculate distance from a point to a region
+
+## Point-in-Path Detection
+
+Check if a point is inside a Path2D object:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Create a path
+const path = painter.createPath2D([
+  { type: 'circle', x: 200, y: 200, radius: 100 }
+]);
+
+// Check if point is in path
+const result = await painter.isPointInPath(path, 200, 200);
+
+console.log(result.hit);        // true (point is inside)
+console.log(result.hitType);    // 'fill' | 'stroke' | 'outside'
+console.log(result.distance);   // Distance to nearest edge (if hit)
+
+// With stroke detection
+const resultWithStroke = await painter.isPointInPath(path, 200, 300, {
+  includeStroke: true,
+  strokeWidth: 5
+});
+
+console.log(resultWithStroke.hit);     // true if in fill or stroke
+console.log(resultWithStroke.hitType); // 'fill', 'stroke', or 'outside'
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function checkPointInPath() {
+  // Create a path
+  const path = painter.createPath2D([
+    { type: 'circle', x: 200, y: 200, radius: 100 }
+  ]);
+
+  // Check if point is in path
+  const result = await painter.isPointInPath(path, 200, 200);
+
+  console.log(result.hit);        // true (point is inside)
+  console.log(result.hitType);    // 'fill' | 'stroke' | 'outside'
+  console.log(result.distance);   // Distance to nearest edge (if hit)
+
+  // With stroke detection
+  const resultWithStroke = await painter.isPointInPath(path, 200, 300, {
+    includeStroke: true,
+    strokeWidth: 5
+  });
+
+  console.log(resultWithStroke.hit);     // true if in fill or stroke
+  console.log(resultWithStroke.hitType); // 'fill', 'stroke', or 'outside'
+}
+
+checkPointInPath();
+```
+</js>
+</CodeSwitcher>
+
+## Region Types
+
+Multiple region types are supported:
+
+### Rectangle Region
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.isPointInRegion(
+  {
+    type: 'rect',
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 150
+  },
+  150,  // Test X
+  150   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside rectangle
+```
+</ts>
+<js>
+```javascript
+const result = await painter.isPointInRegion(
+  {
+    type: 'rect',
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 150
+  },
+  150,  // Test X
+  150   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside rectangle
+```
+</js>
+</CodeSwitcher>
+
+### Circle Region
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.isPointInRegion(
+  {
+    type: 'circle',
+    x: 200,
+    y: 200,
+    radius: 100
+  },
+  250,  // Test X
+  250   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside circle
+```
+</ts>
+<js>
+```javascript
+const result = await painter.isPointInRegion(
+  {
+    type: 'circle',
+    x: 200,
+    y: 200,
+    radius: 100
+  },
+  250,  // Test X
+  250   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside circle
+```
+</js>
+</CodeSwitcher>
+
+### Ellipse Region
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.isPointInRegion(
+  {
+    type: 'ellipse',
+    x: 200,
+    y: 200,
+    radiusX: 150,
+    radiusY: 100,
+    rotation: Math.PI / 4  // Optional rotation in radians
+  },
+  250,  // Test X
+  250   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside ellipse
+```
+</ts>
+<js>
+```javascript
+const result = await painter.isPointInRegion(
+  {
+    type: 'ellipse',
+    x: 200,
+    y: 200,
+    radiusX: 150,
+    radiusY: 100,
+    rotation: Math.PI / 4  // Optional rotation in radians
+  },
+  250,  // Test X
+  250   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside ellipse
+```
+</js>
+</CodeSwitcher>
+
+### Polygon Region
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.isPointInRegion(
+  {
+    type: 'polygon',
+    points: [
+      { x: 100, y: 100 },
+      { x: 300, y: 100 },
+      { x: 300, y: 200 },
+      { x: 100, y: 200 }
+    ]
+  },
+  200,  // Test X
+  150   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside polygon
+```
+</ts>
+<js>
+```javascript
+const result = await painter.isPointInRegion(
+  {
+    type: 'polygon',
+    points: [
+      { x: 100, y: 100 },
+      { x: 300, y: 100 },
+      { x: 300, y: 200 },
+      { x: 100, y: 200 }
+    ]
+  },
+  200,  // Test X
+  150   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside polygon
+```
+</js>
+</CodeSwitcher>
+
+### Path Region
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create a path
+const path = painter.createPath2D([
+  { type: 'star', x: 200, y: 200, outerRadius: 80, innerRadius: 40, points: 5 }
+]);
+
+const result = await painter.isPointInRegion(
+  {
+    type: 'path',
+    path: path,
+    fillRule: 'nonzero'  // or 'evenodd'
+  },
+  200,  // Test X
+  200   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside path
+```
+</ts>
+<js>
+```javascript
+// Create a path
+const path = painter.createPath2D([
+  { type: 'star', x: 200, y: 200, outerRadius: 80, innerRadius: 40, points: 5 }
+]);
+
+const result = await painter.isPointInRegion(
+  {
+    type: 'path',
+    path: path,
+    fillRule: 'nonzero'  // or 'evenodd'
+  },
+  200,  // Test X
+  200   // Test Y
+);
+
+console.log(result.hit);  // true if point is inside path
+```
+</js>
+</CodeSwitcher>
+
+### Custom Function Region
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.isPointInRegion(
+  {
+    type: 'custom',
+    check: (x, y) => {
+      // Custom logic: check if point is inside a custom shape
+      const distance = Math.sqrt((x - 200) ** 2 + (y - 200) ** 2);
+      return distance < 100;  // Circle check
+    }
+  },
+  250,  // Test X
+  250   // Test Y
+);
+
+console.log(result.hit);  // true if custom function returns true
+```
+</ts>
+<js>
+```javascript
+const result = await painter.isPointInRegion(
+  {
+    type: 'custom',
+    check: (x, y) => {
+      // Custom logic: check if point is inside a custom shape
+      const distance = Math.sqrt((x - 200) ** 2 + (y - 200) ** 2);
+      return distance < 100;  // Circle check
+    }
+  },
+  250,  // Test X
+  250   // Test Y
+);
+
+console.log(result.hit);  // true if custom function returns true
+```
+</js>
+</CodeSwitcher>
+
+## Multi-Region Detection
+
+Check if a point is inside any of multiple regions:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const regions = [
+  {
+    type: 'rect',
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 150
+  },
+  {
+    type: 'circle',
+    x: 400,
+    y: 400,
+    radius: 100
+  },
+  {
+    type: 'polygon',
+    points: [
+      { x: 500, y: 100 },
+      { x: 600, y: 200 },
+      { x: 500, y: 300 },
+      { x: 400, y: 200 }
+    ]
+  }
+];
+
+const result = await painter.isPointInAnyRegion(regions, 150, 150);
+
+console.log(result.hit);        // true if point is in any region
+console.log(result.hitRegion);  // Index of the region that was hit (0, 1, or 2)
+```
+</ts>
+<js>
+```javascript
+const regions = [
+  {
+    type: 'rect',
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 150
+  },
+  {
+    type: 'circle',
+    x: 400,
+    y: 400,
+    radius: 100
+  },
+  {
+    type: 'polygon',
+    points: [
+      { x: 500, y: 100 },
+      { x: 600, y: 200 },
+      { x: 500, y: 300 },
+      { x: 400, y: 200 }
+    ]
+  }
+];
+
+const result = await painter.isPointInAnyRegion(regions, 150, 150);
+
+console.log(result.hit);        // true if point is in any region
+console.log(result.hitRegion);  // Index of the region that was hit (0, 1, or 2)
+```
+</js>
+</CodeSwitcher>
+
+## Distance Calculation
+
+Calculate the distance from a point to a region:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const distance = await painter.getDistanceToRegion(
+  {
+    type: 'circle',
+    x: 200,
+    y: 200,
+    radius: 100
+  },
+  350,  // Point X (outside circle)
+  350   // Point Y (outside circle)
+);
+
+console.log(distance);  // Distance from point to nearest edge of circle
+```
+</ts>
+<js>
+```javascript
+const distance = await painter.getDistanceToRegion(
+  {
+    type: 'circle',
+    x: 200,
+    y: 200,
+    radius: 100
+  },
+  350,  // Point X (outside circle)
+  350   // Point Y (outside circle)
+);
+
+console.log(distance);  // Distance from point to nearest edge of circle
+```
+</js>
+</CodeSwitcher>
+
+## Hit Detection Options
+
+Configure hit detection behavior:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.isPointInPath(path, x, y, {
+  includeStroke: true,    // Check stroke edges
+  strokeWidth: 5,         // Stroke width for detection
+  tolerance: 2            // Tolerance in pixels for edge cases
+});
+
+console.log(result.hit);      // true/false
+console.log(result.hitType);  // 'fill' | 'stroke' | 'outside'
+console.log(result.distance); // Distance to nearest edge
+```
+</ts>
+<js>
+```javascript
+const result = await painter.isPointInPath(path, x, y, {
+  includeStroke: true,    // Check stroke edges
+  strokeWidth: 5,         // Stroke width for detection
+  tolerance: 2            // Tolerance in pixels for edge cases
+});
+
+console.log(result.hit);      // true/false
+console.log(result.hitType);  // 'fill' | 'stroke' | 'outside'
+console.log(result.distance); // Distance to nearest edge
+```
+</js>
+</CodeSwitcher>
+
+## Interactive Graphics Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+async function interactiveExample() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#ffffff'
+  });
+
+  // Create interactive regions
+  const buttonRegion = {
+    type: 'rect',
+    x: 300,
+    y: 250,
+    width: 200,
+    height: 100
+  };
+
+  const circleRegion = {
+    type: 'circle',
+    x: 600,
+    y: 400,
+    radius: 75
+  };
+
+  // Simulate mouse click at (400, 300)
+  const clickX = 400;
+  const clickY = 300;
+
+  // Check which region was clicked
+  const buttonHit = await painter.isPointInRegion(buttonRegion, clickX, clickY);
+  const circleHit = await painter.isPointInRegion(circleRegion, clickX, clickY);
+
+  if (buttonHit.hit) {
+    console.log('Button clicked!');
+  }
+
+  if (circleHit.hit) {
+    console.log('Circle clicked!');
+  }
+
+  // Or check all regions at once
+  const allRegions = [buttonRegion, circleRegion];
+  const anyHit = await painter.isPointInAnyRegion(allRegions, clickX, clickY);
+
+  if (anyHit.hit) {
+    console.log(`Region ${anyHit.hitRegion} was clicked!`);
+  }
+}
+
+interactiveExample();
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function interactiveExample() {
+  const canvas = await painter.createCanvas({
+    width: 800,
+    height: 600,
+    colorBg: '#ffffff'
+  });
+
+  // Create interactive regions
+  const buttonRegion = {
+    type: 'rect',
+    x: 300,
+    y: 250,
+    width: 200,
+    height: 100
+  };
+
+  const circleRegion = {
+    type: 'circle',
+    x: 600,
+    y: 400,
+    radius: 75
+  };
+
+  // Simulate mouse click at (400, 300)
+  const clickX = 400;
+  const clickY = 300;
+
+  // Check which region was clicked
+  const buttonHit = await painter.isPointInRegion(buttonRegion, clickX, clickY);
+  const circleHit = await painter.isPointInRegion(circleRegion, clickX, clickY);
+
+  if (buttonHit.hit) {
+    console.log('Button clicked!');
+  }
+
+  if (circleHit.hit) {
+    console.log('Circle clicked!');
+  }
+
+  // Or check all regions at once
+  const allRegions = [buttonRegion, circleRegion];
+  const anyHit = await painter.isPointInAnyRegion(allRegions, clickX, clickY);
+
+  if (anyHit.hit) {
+    console.log(`Region ${anyHit.hitRegion} was clicked!`);
+  }
+}
+
+interactiveExample();
+```
+</js>
+</CodeSwitcher>
+
+## Collision Detection Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+async function collisionDetection() {
+  // Define game objects
+  const player = {
+    type: 'circle',
+    x: 200,
+    y: 200,
+    radius: 30
+  };
+
+  const obstacles = [
+    {
+      type: 'rect',
+      x: 400,
+      y: 300,
+      width: 100,
+      height: 100
+    },
+    {
+      type: 'circle',
+      x: 600,
+      y: 400,
+      radius: 50
+    }
+  ];
+
+  // Check collision
+  const collision = await painter.isPointInAnyRegion(obstacles, player.x, player.y);
+
+  if (collision.hit) {
+    console.log(`Collision with obstacle ${collision.hitRegion}!`);
+  }
+
+  // Calculate distance to nearest obstacle
+  const distances = await Promise.all(
+    obstacles.map(obstacle =>
+      painter.getDistanceToRegion(obstacle, player.x, player.y)
+    )
+  );
+
+  const nearestDistance = Math.min(...distances);
+  console.log(`Distance to nearest obstacle: ${nearestDistance}`);
+}
+
+collisionDetection();
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+async function collisionDetection() {
+  // Define game objects
+  const player = {
+    type: 'circle',
+    x: 200,
+    y: 200,
+    radius: 30
+  };
+
+  const obstacles = [
+    {
+      type: 'rect',
+      x: 400,
+      y: 300,
+      width: 100,
+      height: 100
+    },
+    {
+      type: 'circle',
+      x: 600,
+      y: 400,
+      radius: 50
+    }
+  ];
+
+  // Check collision
+  const collision = await painter.isPointInAnyRegion(obstacles, player.x, player.y);
+
+  if (collision.hit) {
+    console.log(`Collision with obstacle ${collision.hitRegion}!`);
+  }
+
+  // Calculate distance to nearest obstacle
+  const distances = await Promise.all(
+    obstacles.map(obstacle =>
+      painter.getDistanceToRegion(obstacle, player.x, player.y)
+    )
+  );
+
+  const nearestDistance = Math.min(...distances);
+  console.log(`Distance to nearest obstacle: ${nearestDistance}`);
+}
+
+collisionDetection();
+```
+</js>
+</CodeSwitcher>
+
+## Next Steps
+
+- [Path2D API](/docs#path2d-api) - Complex path creation
+- [Text Metrics API](/docs#text-metrics-api) - Text measurement and positioning
+- [Pixel Data API](/docs#pixel-data-api) - Pixel-level manipulation
+- [Shapes](/docs#shapes) - Built-in shape types
+

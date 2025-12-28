@@ -1,12 +1,12 @@
 # Pie Charts
 
-Apexify.js provides comprehensive pie chart generation with customizable slices, labels, legends, and styling. Create professional pie charts to visualize proportional data.
+Apexify.js provides comprehensive pie chart generation with customizable slices, labels, legends, gradients, and enhanced text styling. Create professional pie charts (including donut charts) to visualize proportional data.
 
 ## Overview
 
-Pie charts are created using `createChart()` with `chartType: 'pie'` and `chartNumber: 1`. Each slice represents a portion of the whole, with automatic percentage calculation.
+Pie charts are created using the unified `createChart()` method with `chartType: 'pie'`. Each slice represents a portion of the whole, with automatic percentage calculation. Pie charts support gradients, custom fonts, enhanced text styling, and two types of legends.
 
-## Basic Pie Chart
+## Basic Usage
 
 Create a simple pie chart:
 
@@ -18,24 +18,12 @@ import fs from 'fs';
 
 const painter = new ApexPainter();
 
-const chart = await painter.createChart({
-  data: [
-    { label: 'Desktop', color: '#ff6b6b', value: 45, key: 'Desktop' },
-    { label: 'Mobile', color: '#4ecdc4', value: 30, key: 'Mobile' },
-    { label: 'Tablet', color: '#45b7d1', value: 15, key: 'Tablet' },
-    { label: 'Other', color: '#ffd700', value: 10, key: 'Other' }
-  ],
-  pieConfig: {
-    canvas: {
-      width: 1200,
-      height: 600,
-      bgcolor: '#ffffff'
-    }
-  }
-}, {
-  chartType: 'pie',
-  chartNumber: 1
-});
+const chart = await painter.createChart('pie', [
+  { label: 'Desktop', value: 45, color: '#ff6b6b' },
+  { label: 'Mobile', value: 30, color: '#4ecdc4' },
+  { label: 'Tablet', value: 15, color: '#45b7d1' },
+  { label: 'Other', value: 10, color: '#ffd700' }
+]);
 
 fs.writeFileSync('pie-chart.png', chart);
 ```
@@ -48,24 +36,12 @@ const fs = require('fs');
 const painter = new ApexPainter();
 
 async function createPieChart() {
-  const chart = await painter.createChart({
-    data: [
-      { label: 'Desktop', color: '#ff6b6b', value: 45, key: 'Desktop' },
-      { label: 'Mobile', color: '#4ecdc4', value: 30, key: 'Mobile' },
-      { label: 'Tablet', color: '#45b7d1', value: 15, key: 'Tablet' },
-      { label: 'Other', color: '#ffd700', value: 10, key: 'Other' }
-    ],
-    pieConfig: {
-      canvas: {
-        width: 1200,
-        height: 600,
-        bgcolor: '#ffffff'
-      }
-    }
-  }, {
-    chartType: 'pie',
-    chartNumber: 1
-  });
+  const chart = await painter.createChart('pie', [
+    { label: 'Desktop', value: 45, color: '#ff6b6b' },
+    { label: 'Mobile', value: 30, color: '#4ecdc4' },
+    { label: 'Tablet', value: 15, color: '#45b7d1' },
+    { label: 'Other', value: 10, color: '#ffd700' }
+  ]);
 
   fs.writeFileSync('pie-chart.png', chart);
 }
@@ -77,182 +53,891 @@ createPieChart();
 
 ## Data Structure
 
-Each pie slice requires:
+Each pie slice is defined as a `PieSlice` object:
 
 <CodeSwitcher>
 <ts>
 ```typescript
-{
-  label: 'Category Name',  // Display label
-  color: '#ff6b6b',         // Slice color
-  value: 45,                // Numeric value (percentage calculated automatically)
-  key: 'Category Key'       // Key for legend
+interface PieSlice {
+  label: string;              // Display label for the slice
+  value: number;              // Numeric value (percentage calculated automatically)
+  color?: string;             // Solid color (overridden by gradient if provided)
+  gradient?: gradient;        // Gradient fill for slice (overrides color)
+  showValue?: boolean;        // Show/hide value label on slice (default: true)
+  showLabel?: boolean;        // Show/hide slice label on slice (default: false)
+  valueLabel?: string;        // Custom value label (default: auto-generated)
+  opacity?: number;           // Slice opacity (0-1, default: 1)
+  shadow?: {
+    color?: string;
+    offsetX?: number;
+    offsetY?: number;
+    blur?: number;
+  };
+  stroke?: {
+    color?: string;
+    width?: number;
+    gradient?: gradient;      // Stroke gradient (overrides color)
+  };
 }
 ```
 </ts>
 <js>
 ```javascript
+// Pie slice object
 {
-  label: 'Category Name',  // Display label
-  color: '#ff6b6b',         // Slice color
-  value: 45,                // Numeric value (percentage calculated automatically)
-  key: 'Category Key'       // Key for legend
+  label: 'Category Name',     // Display label for the slice
+  value: 45,                  // Numeric value (percentage calculated automatically)
+  color: '#ff6b6b',           // Optional: Solid color
+  gradient: { ... },          // Optional: Gradient fill (overrides color)
+  showValue: true,            // Optional: Show value label (default: true)
+  showLabel: false,           // Optional: Show label on slice (default: false)
+  opacity: 1,                 // Optional: Slice opacity 0-1 (default: 1)
+  shadow: { ... },            // Optional: Shadow configuration
+  stroke: { ... }             // Optional: Stroke configuration
 }
 ```
 </js>
 </CodeSwitcher>
 
-## Pie Configuration
+## Chart Options
 
-### Canvas Settings
+### Basic Options
 
 <CodeSwitcher>
 <ts>
 ```typescript
-pieConfig: {
-  canvas: {
-    width: 1200,        // Canvas width
-    height: 600,        // Canvas height
-    bgcolor: '#ffffff'  // Background color
-  }
-}
+const chart = await painter.createChart('pie', data, {
+  dimensions: {
+    width: 800,               // Canvas width (default: 800)
+    height: 600,              // Canvas height (default: 600)
+    padding: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 20
+    }
+  },
+  type: 'pie'                 // 'pie' | 'donut' (default: 'pie')
+});
 ```
 </ts>
 <js>
 ```javascript
-pieConfig: {
-  canvas: {
-    width: 1200,        // Canvas width
-    height: 600,        // Canvas height
-    bgcolor: '#ffffff'  // Background color
-  }
-}
+const chart = await painter.createChart('pie', data, {
+  dimensions: {
+    width: 800,               // Canvas width (default: 800)
+    height: 600,              // Canvas height (default: 600)
+    padding: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 20
+    }
+  },
+  type: 'pie'                 // 'pie' | 'donut' (default: 'pie')
+});
 ```
 </js>
 </CodeSwitcher>
 
-### Pie Data Configuration
+### Donut Charts
+
+Donut charts are a variation of pie charts with a hollow center. They're created by setting `type: 'donut'` in the options. All pie chart features (gradients, labels, legends, enhanced text styling) work with donut charts.
 
 <CodeSwitcher>
 <ts>
 ```typescript
-pieConfig: {
-  pieData: {
-    x: 0,              // X offset from center
-    y: 0,              // Y offset from center
-    radius: 200,       // Pie radius (default: auto-calculated)
-    stroke: {
-      color: '#000000', // Slice border color
-      size: 2           // Slice border width
-    },
+// Basic donut chart
+const donutChart = await painter.createChart('pie', data, {
+  type: 'donut',
+  donutInnerRadius: 0.6       // Inner radius ratio 0-1 (default: 0.6)
+});
+
+// Advanced donut chart with custom styling
+const advancedDonut = await painter.createChart('pie', data, {
+  type: 'donut',
+  donutInnerRadius: 0.5,      // Larger hole (50% of radius)
+  dimensions: {
+    width: 1000,
+    height: 800
+  },
+  labels: {
     title: {
-      text: 'Chart Title',
-      color: '#000000',
-      fontSize: 24,
-      x: 0,            // Title X offset
-      y: 0             // Title Y offset
+      text: 'Sales Distribution',
+      fontSize: 28,
+      color: '#333333'
     },
-    boxes: {
-      labelDistance: 50,    // Distance from pie edge to label box
-      width: 100,           // Label box width
-      height: 40,           // Label box height
-      fontSize: 14,         // Label font size
-      labelColor: '#ffffff', // Label text color
-      boxColor: '#000000',   // Label box background
-      strokeColor: '#000000' // Label line color
+    valueLabels: {
+      fontSize: 14,
+      color: '#ffffff',
+      textStyle: { bold: true }
+    },
+    showValues: true
+  },
+  legends: {
+    standard: {
+      show: true,
+      position: 'right',
+      fontSize: 16
+    }
+  },
+  slices: {
+    shadow: {
+      color: 'rgba(0,0,0,0.2)',
+      offsetX: 3,
+      offsetY: 3,
+      blur: 6
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2
     }
   }
-}
+});
 ```
 </ts>
 <js>
 ```javascript
-pieConfig: {
-  pieData: {
-    x: 0,              // X offset from center
-    y: 0,              // Y offset from center
-    radius: 200,       // Pie radius (default: auto-calculated)
-    stroke: {
-      color: '#000000', // Slice border color
-      size: 2           // Slice border width
-    },
+// Basic donut chart
+const donutChart = await painter.createChart('pie', data, {
+  type: 'donut',
+  donutInnerRadius: 0.6       // Inner radius ratio 0-1 (default: 0.6)
+});
+
+// Advanced donut chart with custom styling
+const advancedDonut = await painter.createChart('pie', data, {
+  type: 'donut',
+  donutInnerRadius: 0.5,      // Larger hole (50% of radius)
+  dimensions: {
+    width: 1000,
+    height: 800
+  },
+  labels: {
     title: {
-      text: 'Chart Title',
-      color: '#000000',
-      fontSize: 24,
-      x: 0,            // Title X offset
-      y: 0             // Title Y offset
+      text: 'Sales Distribution',
+      fontSize: 28,
+      color: '#333333'
     },
-    boxes: {
-      labelDistance: 50,    // Distance from pie edge to label box
-      width: 100,           // Label box width
-      height: 40,           // Label box height
-      fontSize: 14,         // Label font size
-      labelColor: '#ffffff', // Label text color
-      boxColor: '#000000',   // Label box background
-      strokeColor: '#000000' // Label line color
+    valueLabels: {
+      fontSize: 14,
+      color: '#ffffff',
+      textStyle: { bold: true }
+    },
+    showValues: true
+  },
+  legends: {
+    standard: {
+      show: true,
+      position: 'right',
+      fontSize: 16
+    }
+  },
+  slices: {
+    shadow: {
+      color: 'rgba(0,0,0,0.2)',
+      offsetX: 3,
+      offsetY: 3,
+      blur: 6
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2
     }
   }
-}
+});
 ```
 </js>
 </CodeSwitcher>
 
-### Key Box (Legend)
+**Donut Inner Radius:**
+- `donutInnerRadius` controls the size of the hollow center
+- Value range: `0.0` to `1.0` (ratio of inner radius to outer radius)
+- `0.6` = 60% of the radius (default, creates a moderate donut hole)
+- `0.3` = 30% (thin ring, larger hole)
+- `0.8` = 80% (thick ring, smaller hole)
+
+**Complete Donut Example with Gradients:**
 
 <CodeSwitcher>
 <ts>
 ```typescript
-pieConfig: {
-  keyBox: {
-    width: 200,              // Legend box width
-    height: 300,             // Legend box height
-    radius: 20,              // Legend box border radius
-    bgcolor: '#ffffff',      // Legend background color
-    x: 0,                    // Legend X position
-    y: 0,                    // Legend Y position
-    content: {
-      keyTitle: {
-        text: 'Keys',        // Legend title
-        fontSize: 16,
-        x: 0,                // Title X offset
-        y: 0                 // Title Y offset
+const data = [
+  {
+    label: 'Desktop',
+    value: 45,
+    gradient: {
+      type: 'linear',
+      colors: ['#ff6b6b', '#ee5a6f'],
+      stops: [0, 1],
+      angle: 45
+    }
+  },
+  {
+    label: 'Mobile',
+    value: 30,
+    gradient: {
+      type: 'radial',
+      colors: ['#4ecdc4', '#3bb3ac'],
+      stops: [0, 1]
+    }
+  },
+  {
+    label: 'Tablet',
+    value: 25,
+    color: '#45b7d1'
+  }
+];
+
+const donutChart = await painter.createChart('pie', data, {
+  type: 'donut',
+  donutInnerRadius: 0.55,
+  dimensions: {
+    width: 900,
+    height: 900
+  },
+  appearance: {
+    backgroundGradient: {
+      type: 'radial',
+      colors: ['#f8f9fa', '#e9ecef'],
+      stops: [0, 1]
+    }
+  },
+  labels: {
+    title: {
+      text: 'Device Usage (Donut)',
+      fontSize: 26,
+      gradient: {
+        type: 'linear',
+        colors: ['#667eea', '#764ba2'],
+        stops: [0, 1]
       },
-      keys: {
-        x: 0,                // Keys X offset
-        y: 0,                // Keys Y offset
-        fontSize: 14         // Key font size
+      textStyle: {
+        bold: true,
+        shadow: {
+          color: 'rgba(0,0,0,0.2)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4
+        }
+      }
+    },
+    valueLabels: {
+      fontSize: 13,
+      color: '#ffffff',
+      textStyle: { bold: true }
+    },
+    showValues: true
+  },
+  legends: {
+    standard: {
+      show: true,
+      position: 'right',
+      fontSize: 15,
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#dee2e6',
+      textColor: '#333333',
+      spacing: 18,
+      padding: 12
+    }
+  },
+  slices: {
+    shadow: {
+      color: 'rgba(0,0,0,0.25)',
+      offsetX: 4,
+      offsetY: 4,
+      blur: 8
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 3
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Desktop',
+    value: 45,
+    gradient: {
+      type: 'linear',
+      colors: ['#ff6b6b', '#ee5a6f'],
+      stops: [0, 1],
+      angle: 45
+    }
+  },
+  {
+    label: 'Mobile',
+    value: 30,
+    gradient: {
+      type: 'radial',
+      colors: ['#4ecdc4', '#3bb3ac'],
+      stops: [0, 1]
+    }
+  },
+  {
+    label: 'Tablet',
+    value: 25,
+    color: '#45b7d1'
+  }
+];
+
+const donutChart = await painter.createChart('pie', data, {
+  type: 'donut',
+  donutInnerRadius: 0.55,
+  dimensions: {
+    width: 900,
+    height: 900
+  },
+  appearance: {
+    backgroundGradient: {
+      type: 'radial',
+      colors: ['#f8f9fa', '#e9ecef'],
+      stops: [0, 1]
+    }
+  },
+  labels: {
+    title: {
+      text: 'Device Usage (Donut)',
+      fontSize: 26,
+      gradient: {
+        type: 'linear',
+        colors: ['#667eea', '#764ba2'],
+        stops: [0, 1]
+      },
+      textStyle: {
+        bold: true,
+        shadow: {
+          color: 'rgba(0,0,0,0.2)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4
+        }
+      }
+    },
+    valueLabels: {
+      fontSize: 13,
+      color: '#ffffff',
+      textStyle: { bold: true }
+    },
+    showValues: true
+  },
+  legends: {
+    standard: {
+      show: true,
+      position: 'right',
+      fontSize: 15,
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#dee2e6',
+      textColor: '#333333',
+      spacing: 18,
+      padding: 12
+    }
+  },
+  slices: {
+    shadow: {
+      color: 'rgba(0,0,0,0.25)',
+      offsetX: 4,
+      offsetY: 4,
+      blur: 8
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 3
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Background Styling
+
+### Solid Background
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  appearance: {
+    backgroundColor: '#ffffff'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  appearance: {
+    backgroundColor: '#ffffff'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Gradient Background
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  appearance: {
+    backgroundGradient: {
+      type: 'linear',
+      colors: ['#667eea', '#764ba2'],
+      stops: [0, 1],
+      angle: 45
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  appearance: {
+    backgroundGradient: {
+      type: 'linear',
+      colors: ['#667eea', '#764ba2'],
+      stops: [0, 1],
+      angle: 45
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Background Image
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  appearance: {
+    backgroundImage: './background.png'  // Path to image file
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  appearance: {
+    backgroundImage: './background.png'  // Path to image file
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Labels
+
+### Title
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  labels: {
+    title: {
+      text: 'Revenue Distribution',
+      fontSize: 24,
+      color: '#333333',
+      gradient: {              // Optional: Text gradient
+        type: 'linear',
+        colors: ['#667eea', '#764ba2'],
+        stops: [0, 1]
+      },
+      textStyle: {             // Optional: Enhanced text styling
+        bold: true,
+        shadow: {
+          color: 'rgba(0,0,0,0.3)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4
+        }
       }
     }
   }
-}
+});
 ```
 </ts>
 <js>
 ```javascript
-pieConfig: {
-  keyBox: {
-    width: 200,              // Legend box width
-    height: 300,             // Legend box height
-    radius: 20,              // Legend box border radius
-    bgcolor: '#ffffff',      // Legend background color
-    x: 0,                    // Legend X position
-    y: 0,                    // Legend Y position
-    content: {
-      keyTitle: {
-        text: 'Keys',        // Legend title
-        fontSize: 16,
-        x: 0,                // Title X offset
-        y: 0                 // Title Y offset
+const chart = await painter.createChart('pie', data, {
+  labels: {
+    title: {
+      text: 'Revenue Distribution',
+      fontSize: 24,
+      color: '#333333',
+      gradient: {              // Optional: Text gradient
+        type: 'linear',
+        colors: ['#667eea', '#764ba2'],
+        stops: [0, 1]
       },
-      keys: {
-        x: 0,                // Keys X offset
-        y: 0,                // Keys Y offset
-        fontSize: 14         // Key font size
+      textStyle: {             // Optional: Enhanced text styling
+        bold: true,
+        shadow: {
+          color: 'rgba(0,0,0,0.3)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4
+        }
       }
     }
   }
-}
+});
+```
+</js>
+</CodeSwitcher>
+
+### Slice Labels
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  labels: {
+    sliceLabels: {
+      fontSize: 14,
+      color: '#333333',
+      gradient: { ... },       // Optional: Text gradient
+      textStyle: { ... }       // Optional: Enhanced text styling
+    },
+    showLabels: true           // Show labels on slices (default: false)
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  labels: {
+    sliceLabels: {
+      fontSize: 14,
+      color: '#333333',
+      gradient: { ... },       // Optional: Text gradient
+      textStyle: { ... }       // Optional: Enhanced text styling
+    },
+    showLabels: true           // Show labels on slices (default: false)
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Value Labels
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  labels: {
+    valueLabels: {
+      fontSize: 11,            // Smaller for small slices, 14 for normal
+      color: '#ffffff',
+      gradient: { ... },       // Optional: Text gradient
+      textStyle: { ... }       // Optional: Enhanced text styling
+    },
+    showValues: true,          // Show value labels (default: true)
+    valueFormat: (value, percentage) => {
+      return `${value} (${percentage.toFixed(1)}%)`;
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  labels: {
+    valueLabels: {
+      fontSize: 11,            // Smaller for small slices, 14 for normal
+      color: '#ffffff',
+      gradient: { ... },       // Optional: Text gradient
+      textStyle: { ... }       // Optional: Enhanced text styling
+    },
+    showValues: true,          // Show value labels (default: true)
+    valueFormat: (value, percentage) => {
+      return `${value} (${percentage.toFixed(1)}%)`;
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Legends
+
+Pie charts support two types of legends: **Standard Legend** and **Connected Legend** (with lines connecting to slices).
+
+### Standard Legend
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  legends: {
+    standard: {
+      show: true,
+      position: 'right',       // 'top' | 'bottom' | 'left' | 'right'
+      fontSize: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundGradient: { ... },  // Optional: Gradient background
+      borderColor: '#000000',
+      textColor: '#000000',
+      textGradient: { ... },   // Optional: Text gradient
+      textStyle: { ... },      // Optional: Enhanced text styling
+      spacing: 15,
+      padding: 8,
+      wrapText: true
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  legends: {
+    standard: {
+      show: true,
+      position: 'right',       // 'top' | 'bottom' | 'left' | 'right'
+      fontSize: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundGradient: { ... },  // Optional: Gradient background
+      borderColor: '#000000',
+      textColor: '#000000',
+      textGradient: { ... },   // Optional: Text gradient
+      textStyle: { ... },      // Optional: Enhanced text styling
+      spacing: 15,
+      padding: 8,
+      wrapText: true
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Connected Legend
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  legends: {
+    connected: {
+      show: true,
+      fontSize: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundGradient: { ... },  // Optional: Gradient background
+      borderColor: '#000000',
+      textColor: '#000000',
+      textGradient: { ... },   // Optional: Text gradient
+      textStyle: { ... },      // Optional: Enhanced text styling
+      lineColor: '#000000',
+      lineGradient: { ... },   // Optional: Line gradient
+      lineWidth: 1,
+      padding: 5,
+      maxWidth: 150,
+      wrapText: true
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  legends: {
+    connected: {
+      show: true,
+      fontSize: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundGradient: { ... },  // Optional: Gradient background
+      borderColor: '#000000',
+      textColor: '#000000',
+      textGradient: { ... },   // Optional: Text gradient
+      textStyle: { ... },      // Optional: Enhanced text styling
+      lineColor: '#000000',
+      lineGradient: { ... },   // Optional: Line gradient
+      lineWidth: 1,
+      padding: 5,
+      maxWidth: 150,
+      wrapText: true
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Slice Styling
+
+### Gradient Slices
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Desktop',
+    value: 45,
+    gradient: {
+      type: 'linear',
+      colors: ['#ff6b6b', '#ee5a6f'],
+      stops: [0, 1],
+      angle: 45
+    }
+  },
+  // ... more slices
+];
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Desktop',
+    value: 45,
+    gradient: {
+      type: 'linear',
+      colors: ['#ff6b6b', '#ee5a6f'],
+      stops: [0, 1],
+      angle: 45
+    }
+  },
+  // ... more slices
+];
+```
+</js>
+</CodeSwitcher>
+
+### Slice Shadows and Strokes
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  slices: {
+    opacity: 1,               // Default opacity for all slices
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 2,
+      offsetY: 2,
+      blur: 4
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2,
+      gradient: { ... }       // Optional: Stroke gradient
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  slices: {
+    opacity: 1,               // Default opacity for all slices
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 2,
+      offsetY: 2,
+      blur: 4
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2,
+      gradient: { ... }       // Optional: Stroke gradient
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Enhanced Text Styling
+
+All text elements support enhanced styling with custom fonts, shadows, strokes, and glows:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('pie', data, {
+  labels: {
+    title: {
+      text: 'Revenue Distribution',
+      textStyle: {
+        fontPath: './fonts/custom-font.ttf',  // Custom font file
+        fontName: 'CustomFont',                // Font name
+        fontFamily: 'Arial',                   // Fallback font family
+        fontSize: 24,
+        bold: true,
+        italic: false,
+        shadow: {
+          color: 'rgba(0,0,0,0.5)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4,
+          opacity: 1
+        },
+        stroke: {
+          color: '#ffffff',
+          width: 1,
+          gradient: { ... }    // Optional: Stroke gradient
+        },
+        glow: {
+          color: '#ff6b6b',
+          intensity: 10,
+          opacity: 0.8
+        }
+      }
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('pie', data, {
+  labels: {
+    title: {
+      text: 'Revenue Distribution',
+      textStyle: {
+        fontPath: './fonts/custom-font.ttf',  // Custom font file
+        fontName: 'CustomFont',                // Font name
+        fontFamily: 'Arial',                   // Fallback font family
+        fontSize: 24,
+        bold: true,
+        italic: false,
+        shadow: {
+          color: 'rgba(0,0,0,0.5)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4,
+          opacity: 1
+        },
+        stroke: {
+          color: '#ffffff',
+          width: 1,
+          gradient: { ... }    // Optional: Stroke gradient
+        },
+        glow: {
+          color: '#ff6b6b',
+          intensity: 10,
+          opacity: 0.8
+        }
+      }
+    }
+  }
+});
 ```
 </js>
 </CodeSwitcher>
@@ -267,69 +952,108 @@ import fs from 'fs';
 
 const painter = new ApexPainter();
 
-const chart = await painter.createChart({
-  data: [
-    { label: 'Desktop', color: '#ff6b6b', value: 45, key: 'Desktop' },
-    { label: 'Mobile', color: '#4ecdc4', value: 30, key: 'Mobile' },
-    { label: 'Tablet', color: '#45b7d1', value: 15, key: 'Tablet' },
-    { label: 'Other', color: '#ffd700', value: 10, key: 'Other' }
-  ],
-  pieConfig: {
-    canvas: {
-      width: 1200,
-      height: 600,
-      bgcolor: '#f8f9fa'
+const data = [
+  {
+    label: 'Desktop',
+    value: 45,
+    gradient: {
+      type: 'linear',
+      colors: ['#ff6b6b', '#ee5a6f'],
+      stops: [0, 1],
+      angle: 45
     },
-    pieData: {
-      radius: 180,
-      stroke: {
-        color: '#ffffff',
-        size: 3
+    showValue: true,
+    showLabel: false
+  },
+  {
+    label: 'Mobile',
+    value: 30,
+    color: '#4ecdc4',
+    showValue: true
+  },
+  {
+    label: 'Tablet',
+    value: 15,
+    color: '#45b7d1'
+  },
+  {
+    label: 'Other',
+    value: 10,
+    color: '#ffd700'
+  }
+];
+
+const chart = await painter.createChart('pie', data, {
+  dimensions: {
+    width: 1000,
+    height: 800
+  },
+  type: 'pie',
+  appearance: {
+    backgroundGradient: {
+      type: 'radial',
+      colors: ['#f0f0f0', '#e0e0e0'],
+      stops: [0, 1],
+      centerX: 0.5,
+      centerY: 0.5
+    }
+  },
+  labels: {
+    title: {
+      text: 'Device Usage Statistics',
+      fontSize: 28,
+      gradient: {
+        type: 'linear',
+        colors: ['#667eea', '#764ba2'],
+        stops: [0, 1]
       },
-      title: {
-        text: 'Device Usage Distribution',
-        color: '#2c3e50',
-        fontSize: 28,
-        y: -250
-      },
-      boxes: {
-        labelDistance: 60,
-        width: 120,
-        height: 45,
-        fontSize: 16,
-        labelColor: '#ffffff',
-        boxColor: '#2c3e50',
-        strokeColor: '#495057'
-      }
-    },
-    keyBox: {
-      width: 220,
-      height: 320,
-      radius: 15,
-      bgcolor: '#ffffff',
-      x: 900,
-      y: 140,
-      content: {
-        keyTitle: {
-          text: 'Device Types',
-          fontSize: 18,
-          x: 0,
-          y: 0
-        },
-        keys: {
-          x: 0,
-          y: 0,
-          fontSize: 14
+      textStyle: {
+        bold: true,
+        shadow: {
+          color: 'rgba(0,0,0,0.3)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4
         }
       }
+    },
+    valueLabels: {
+      fontSize: 12,
+      color: '#ffffff',
+      textStyle: {
+        bold: true
+      }
+    },
+    showValues: true,
+    showLabels: false
+  },
+  legends: {
+    standard: {
+      show: true,
+      position: 'right',
+      fontSize: 14,
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      borderColor: '#cccccc',
+      textColor: '#333333',
+      spacing: 20,
+      padding: 10
+    }
+  },
+  slices: {
+    shadow: {
+      color: 'rgba(0,0,0,0.2)',
+      offsetX: 3,
+      offsetY: 3,
+      blur: 6
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2
     }
   }
-}, {
-  chartType: 'pie',
-  chartNumber: 1
 });
 
-fs.writeFileSync('device-usage-chart.png', chart);
+fs.writeFileSync('pie-chart.png', chart);
 ```
 </ts>
 <js>
@@ -339,84 +1063,119 @@ const fs = require('fs');
 
 const painter = new ApexPainter();
 
-async function createDeviceChart() {
-  const chart = await painter.createChart({
-    data: [
-      { label: 'Desktop', color: '#ff6b6b', value: 45, key: 'Desktop' },
-      { label: 'Mobile', color: '#4ecdc4', value: 30, key: 'Mobile' },
-      { label: 'Tablet', color: '#45b7d1', value: 15, key: 'Tablet' },
-      { label: 'Other', color: '#ffd700', value: 10, key: 'Other' }
-    ],
-    pieConfig: {
-      canvas: {
-        width: 1200,
-        height: 600,
-        bgcolor: '#f8f9fa'
+async function createChart() {
+  const data = [
+    {
+      label: 'Desktop',
+      value: 45,
+      gradient: {
+        type: 'linear',
+        colors: ['#ff6b6b', '#ee5a6f'],
+        stops: [0, 1],
+        angle: 45
       },
-      pieData: {
-        radius: 180,
-        stroke: {
-          color: '#ffffff',
-          size: 3
+      showValue: true,
+      showLabel: false
+    },
+    {
+      label: 'Mobile',
+      value: 30,
+      color: '#4ecdc4',
+      showValue: true
+    },
+    {
+      label: 'Tablet',
+      value: 15,
+      color: '#45b7d1'
+    },
+    {
+      label: 'Other',
+      value: 10,
+      color: '#ffd700'
+    }
+  ];
+
+  const chart = await painter.createChart('pie', data, {
+    dimensions: {
+      width: 1000,
+      height: 800
+    },
+    type: 'pie',
+    appearance: {
+      backgroundGradient: {
+        type: 'radial',
+        colors: ['#f0f0f0', '#e0e0e0'],
+        stops: [0, 1],
+        centerX: 0.5,
+        centerY: 0.5
+      }
+    },
+    labels: {
+      title: {
+        text: 'Device Usage Statistics',
+        fontSize: 28,
+        gradient: {
+          type: 'linear',
+          colors: ['#667eea', '#764ba2'],
+          stops: [0, 1]
         },
-        title: {
-          text: 'Device Usage Distribution',
-          color: '#2c3e50',
-          fontSize: 28,
-          y: -250
-        },
-        boxes: {
-          labelDistance: 60,
-          width: 120,
-          height: 45,
-          fontSize: 16,
-          labelColor: '#ffffff',
-          boxColor: '#2c3e50',
-          strokeColor: '#495057'
-        }
-      },
-      keyBox: {
-        width: 220,
-        height: 320,
-        radius: 15,
-        bgcolor: '#ffffff',
-        x: 900,
-        y: 140,
-        content: {
-          keyTitle: {
-            text: 'Device Types',
-            fontSize: 18,
-            x: 0,
-            y: 0
-          },
-          keys: {
-            x: 0,
-            y: 0,
-            fontSize: 14
+        textStyle: {
+          bold: true,
+          shadow: {
+            color: 'rgba(0,0,0,0.3)',
+            offsetX: 2,
+            offsetY: 2,
+            blur: 4
           }
         }
+      },
+      valueLabels: {
+        fontSize: 12,
+        color: '#ffffff',
+        textStyle: {
+          bold: true
+        }
+      },
+      showValues: true,
+      showLabels: false
+    },
+    legends: {
+      standard: {
+        show: true,
+        position: 'right',
+        fontSize: 14,
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderColor: '#cccccc',
+        textColor: '#333333',
+        spacing: 20,
+        padding: 10
+      }
+    },
+    slices: {
+      shadow: {
+        color: 'rgba(0,0,0,0.2)',
+        offsetX: 3,
+        offsetY: 3,
+        blur: 6
+      },
+      stroke: {
+        color: '#ffffff',
+        width: 2
       }
     }
-  }, {
-    chartType: 'pie',
-    chartNumber: 1
   });
 
-  fs.writeFileSync('device-usage-chart.png', chart);
+  fs.writeFileSync('pie-chart.png', chart);
 }
 
-createDeviceChart();
+createChart();
 ```
 </js>
 </CodeSwitcher>
 
-<Alert type="info" title="Automatic Percentage Calculation">
-The pie chart automatically calculates slice sizes based on the ratio of each value to the total. You don't need to provide percentages - just provide the raw values.
-</Alert>
+## Related Documentation
 
-## Next Steps
-
-- [Line Charts](/docs#line-charts) - Create line graphs with multiple datasets
-- [Bar Charts](/docs#bar-charts) - Create vertical bar charts
-
-
+- [Bar Charts](./bar-charts) - Create vertical bar charts
+- [Horizontal Bar Charts](./horizontal-bar-charts) - Create horizontal bar charts
+- [Line Charts](./line-charts) - Create line charts
+- [Comparison Charts](./comparison-charts) - Compare two charts side by side

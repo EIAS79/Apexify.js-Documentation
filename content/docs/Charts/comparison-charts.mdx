@@ -1,0 +1,738 @@
+# Comparison Charts
+
+Apexify.js provides powerful comparison chart functionality that allows you to compare any two chart types side by side or top-to-bottom. Each chart can be of any type (pie, bar, horizontalBar, line, donut) with its own data, configuration, and legend.
+
+## Overview
+
+Comparison charts are created using the `createComparisonChart()` method. This feature enables you to create side-by-side or top-bottom layouts comparing different datasets or chart types, perfect for data analysis and presentation.
+
+## Supported Chart Combinations
+
+You can compare any combination of chart types:
+- Pie vs Bar
+- Line vs Bar
+- Pie vs Line
+- Line vs Line
+- Bar vs Bar
+- Pie vs Pie
+- Pie vs Donut
+- Horizontal Bar vs Bar
+- Horizontal Bar vs Horizontal Bar
+- Horizontal Bar vs Line
+- Horizontal Bar vs Pie
+
+## Basic Usage
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Pie chart data
+const pieData = [
+  { label: 'A', value: 30, color: '#ff6b6b' },
+  { label: 'B', value: 40, color: '#4ecdc4' },
+  { label: 'C', value: 30, color: '#45b7d1' }
+];
+
+// Bar chart data
+const barData = [
+  { label: 'Jan', value: 45, xStart: 0, xEnd: 1, color: '#4A90E2' },
+  { label: 'Feb', value: 65, xStart: 1, xEnd: 2, color: '#50C878' },
+  { label: 'Mar', value: 55, xStart: 2, xEnd: 3, color: '#FF6B6B' }
+];
+
+const chart = await painter.createComparisonChart({
+  layout: 'sideBySide',        // 'sideBySide' | 'topBottom'
+  spacing: 20,                 // Spacing between charts
+  chart1: {
+    type: 'pie',
+    data: pieData,
+    options: {
+      dimensions: { width: 400, height: 400 }
+    },
+    title: {
+      text: 'Quarter 1',
+      fontSize: 20,
+      color: '#333333'
+    }
+  },
+  chart2: {
+    type: 'bar',
+    data: barData,
+    options: {
+      dimensions: { height: 400 }
+    },
+    title: {
+      text: 'Quarter 2',
+      fontSize: 20,
+      color: '#333333'
+    }
+  }
+});
+
+fs.writeFileSync('comparison-chart.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createComparison() {
+  // Pie chart data
+  const pieData = [
+    { label: 'A', value: 30, color: '#ff6b6b' },
+    { label: 'B', value: 40, color: '#4ecdc4' },
+    { label: 'C', value: 30, color: '#45b7d1' }
+  ];
+
+  // Bar chart data
+  const barData = [
+    { label: 'Jan', value: 45, xStart: 0, xEnd: 1, color: '#4A90E2' },
+    { label: 'Feb', value: 65, xStart: 1, xEnd: 2, color: '#50C878' },
+    { label: 'Mar', value: 55, xStart: 2, xEnd: 3, color: '#FF6B6B' }
+  ];
+
+  const chart = await painter.createComparisonChart({
+    layout: 'sideBySide',
+    spacing: 20,
+    chart1: {
+      type: 'pie',
+      data: pieData,
+      options: {
+        dimensions: { width: 400, height: 400 }
+      },
+      title: {
+        text: 'Quarter 1',
+        fontSize: 20,
+        color: '#333333'
+      }
+    },
+    chart2: {
+      type: 'bar',
+      data: barData,
+      options: {
+        dimensions: { height: 400 }
+      },
+      title: {
+        text: 'Quarter 2',
+        fontSize: 20,
+        color: '#333333'
+      }
+    }
+  });
+
+  fs.writeFileSync('comparison-chart.png', chart);
+}
+
+createComparison();
+```
+</js>
+</CodeSwitcher>
+
+## Layout Options
+
+### Side by Side Layout
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createComparisonChart({
+  layout: 'sideBySide',        // Charts placed horizontally
+  spacing: 30,
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createComparisonChart({
+  layout: 'sideBySide',
+  spacing: 30,
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Top Bottom Layout
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createComparisonChart({
+  layout: 'topBottom',         // Charts placed vertically
+  spacing: 30,
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createComparisonChart({
+  layout: 'topBottom',
+  spacing: 30,
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Shared Background
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createComparisonChart({
+  appearance: {
+    backgroundColor: '#ffffff',
+    // OR
+    backgroundGradient: {
+      type: 'linear',
+      colors: ['#f0f0f0', '#e0e0e0'],
+      stops: [0, 1]
+    },
+    // OR
+    backgroundImage: './bg.png'
+  },
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createComparisonChart({
+  appearance: {
+    backgroundColor: '#ffffff',
+    backgroundGradient: {
+      type: 'linear',
+      colors: ['#f0f0f0', '#e0e0e0'],
+      stops: [0, 1]
+    }
+  },
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</js>
+</CodeSwitcher>
+
+## General Title
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createComparisonChart({
+  generalTitle: {
+    text: 'Year-over-Year Comparison',
+    fontSize: 32,
+    color: '#333333',
+    gradient: { ... },         // Optional: Text gradient
+    textStyle: {               // Optional: Enhanced styling
+      bold: true,
+      shadow: {
+        color: 'rgba(0,0,0,0.3)',
+        offsetX: 2,
+        offsetY: 2,
+        blur: 4
+      }
+    }
+  },
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createComparisonChart({
+  generalTitle: {
+    text: 'Year-over-Year Comparison',
+    fontSize: 32,
+    color: '#333333',
+    textStyle: {
+      bold: true,
+      shadow: {
+        color: 'rgba(0,0,0,0.3)',
+        offsetX: 2,
+        offsetY: 2,
+        blur: 4
+      }
+    }
+  },
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Individual Chart Configuration
+
+Each chart in the comparison has its own configuration:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createComparisonChart({
+  chart1: {
+    type: 'pie',               // Chart type
+    data: pieData,             // Chart data
+    options: {                 // Chart-specific options (same as createChart options)
+      dimensions: { width: 400, height: 400 },
+      labels: {
+        title: {
+          text: 'Chart 1 Title',
+          fontSize: 20
+        }
+      }
+      // ... all chart options available
+    },
+    title: {                   // Individual chart title (optional, overrides options.title)
+      text: 'Q1 2024',
+      fontSize: 18,
+      color: '#333333',
+      gradient: { ... },       // Optional
+      textStyle: { ... }       // Optional
+    },
+    barType: 'standard',       // For bar charts: 'standard' | 'grouped' | 'stacked' | etc.
+    lineStyle: 'solid',        // For line charts: 'solid' | 'dashed' | etc.
+    lineSmoothness: 'bezier'   // For line charts: 'none' | 'bezier' | 'spline'
+  },
+  chart2: {
+    type: 'bar',
+    data: barData,
+    options: { ... },
+    title: { ... },
+    barType: 'grouped'         // Bar chart type specification
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createComparisonChart({
+  chart1: {
+    type: 'pie',
+    data: pieData,
+    options: {
+      dimensions: { width: 400, height: 400 },
+      labels: {
+        title: {
+          text: 'Chart 1 Title',
+          fontSize: 20
+        }
+      }
+    },
+    title: {
+      text: 'Q1 2024',
+      fontSize: 18,
+      color: '#333333'
+    }
+  },
+  chart2: {
+    type: 'bar',
+    data: barData,
+    options: { ... },
+    title: { ... },
+    barType: 'grouped'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Chart Dimensions
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createComparisonChart({
+  dimensions: {
+    width: 1600,               // Overall width
+    height: 800,               // Overall height
+    padding: {
+      top: 60,                 // Space for general title
+      right: 40,
+      bottom: 40,
+      left: 40
+    }
+  },
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createComparisonChart({
+  dimensions: {
+    width: 1600,
+    height: 800,
+    padding: {
+      top: 60,
+      right: 40,
+      bottom: 40,
+      left: 40
+    }
+  },
+  chart1: { ... },
+  chart2: { ... }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Pie chart data
+const pieData = [
+  { label: 'Desktop', value: 45, color: '#ff6b6b' },
+  { label: 'Mobile', value: 30, color: '#4ecdc4' },
+  { label: 'Tablet', value: 25, color: '#45b7d1' }
+];
+
+// Bar chart data
+const barData = [
+  { label: 'Jan', value: 45, xStart: 0, xEnd: 1, color: '#4A90E2' },
+  { label: 'Feb', value: 65, xStart: 1, xEnd: 2, color: '#50C878' },
+  { label: 'Mar', value: 55, xStart: 2, xEnd: 3, color: '#FF6B6B' },
+  { label: 'Apr', value: 75, xStart: 3, xEnd: 4, color: '#FFA500' }
+];
+
+const chart = await painter.createComparisonChart({
+  dimensions: {
+    width: 1600,
+    height: 800,
+    padding: {
+      top: 80,
+      right: 40,
+      bottom: 40,
+      left: 40
+    }
+  },
+  layout: 'sideBySide',
+  spacing: 40,
+  appearance: {
+    backgroundGradient: {
+      type: 'radial',
+      colors: ['#ffffff', '#f5f5f5'],
+      stops: [0, 1]
+    }
+  },
+  generalTitle: {
+    text: 'Q1 vs Q2 Performance Comparison',
+    fontSize: 36,
+    gradient: {
+      type: 'linear',
+      colors: ['#4A90E2', '#50C878'],
+      stops: [0, 1]
+    },
+    textStyle: {
+      bold: true,
+      shadow: {
+        color: 'rgba(0,0,0,0.3)',
+        offsetX: 3,
+        offsetY: 3,
+        blur: 6
+      }
+    }
+  },
+  chart1: {
+    type: 'pie',
+    data: pieData,
+    options: {
+      dimensions: { width: 700, height: 700 },
+      appearance: {
+        backgroundColor: 'transparent'
+      },
+      labels: {
+        title: {
+          text: 'Q1 Device Distribution',
+          fontSize: 24,
+          color: '#333333'
+        },
+        valueLabels: {
+          fontSize: 14,
+          color: '#ffffff',
+          textStyle: { bold: true }
+        },
+        showValues: true
+      },
+      legends: {
+        standard: {
+          show: true,
+          position: 'right',
+          fontSize: 16,
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          borderColor: '#cccccc',
+          textColor: '#333333',
+          spacing: 20,
+          padding: 10
+        }
+      },
+      slices: {
+        shadow: {
+          color: 'rgba(0,0,0,0.2)',
+          offsetX: 3,
+          offsetY: 3,
+          blur: 6
+        },
+        stroke: {
+          color: '#ffffff',
+          width: 2
+        }
+      }
+    },
+    title: {
+      text: 'Q1 2024',
+      fontSize: 20,
+      color: '#4A90E2',
+      textStyle: { bold: true }
+    }
+  },
+  chart2: {
+    type: 'bar',
+    data: barData,
+    barType: 'standard',
+    options: {
+      dimensions: { height: 700 },
+      appearance: {
+        backgroundColor: 'transparent'
+      },
+      axes: {
+        x: {
+          label: 'Month',
+          labelColor: '#333333',
+          color: '#000000',
+          width: 2,
+          tickFontSize: 14
+        },
+        y: {
+          label: 'Sales ($)',
+          labelColor: '#333333',
+          range: { min: 0, max: 100, step: 10 },
+          color: '#000000',
+          width: 2,
+          tickFontSize: 14
+        }
+      },
+      labels: {
+        title: {
+          text: 'Q2 Monthly Sales',
+          fontSize: 24,
+          color: '#333333'
+        },
+        barLabelDefaults: {
+          show: true,
+          defaultPosition: 'bottom',
+          fontSize: 14,
+          defaultColor: '#333333'
+        },
+        valueLabelDefaults: {
+          show: true,
+          fontSize: 12,
+          defaultColor: '#000000',
+          textStyle: { bold: true }
+        }
+      },
+      bars: {
+        spacing: 20,
+        shadow: {
+          color: 'rgba(0,0,0,0.2)',
+          offsetX: 3,
+          offsetY: 3,
+          blur: 6
+        },
+        stroke: {
+          color: '#ffffff',
+          width: 2
+        }
+      },
+      grid: {
+        show: true,
+        color: '#E0E0E0',
+        width: 1
+      }
+    },
+    title: {
+      text: 'Q2 2024',
+      fontSize: 20,
+      color: '#50C878',
+      textStyle: { bold: true }
+    }
+  }
+});
+
+fs.writeFileSync('comparison-chart.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createComparison() {
+  // Pie chart data
+  const pieData = [
+    { label: 'Desktop', value: 45, color: '#ff6b6b' },
+    { label: 'Mobile', value: 30, color: '#4ecdc4' },
+    { label: 'Tablet', value: 25, color: '#45b7d1' }
+  ];
+
+  // Bar chart data
+  const barData = [
+    { label: 'Jan', value: 45, xStart: 0, xEnd: 1, color: '#4A90E2' },
+    { label: 'Feb', value: 65, xStart: 1, xEnd: 2, color: '#50C878' },
+    { label: 'Mar', value: 55, xStart: 2, xEnd: 3, color: '#FF6B6B' },
+    { label: 'Apr', value: 75, xStart: 3, xEnd: 4, color: '#FFA500' }
+  ];
+
+  const chart = await painter.createComparisonChart({
+    dimensions: {
+      width: 1600,
+      height: 800,
+      padding: {
+        top: 80,
+        right: 40,
+        bottom: 40,
+        left: 40
+      }
+    },
+    layout: 'sideBySide',
+    spacing: 40,
+    appearance: {
+      backgroundGradient: {
+        type: 'radial',
+        colors: ['#ffffff', '#f5f5f5'],
+        stops: [0, 1]
+      }
+    },
+    generalTitle: {
+      text: 'Q1 vs Q2 Performance Comparison',
+      fontSize: 36,
+      gradient: {
+        type: 'linear',
+        colors: ['#4A90E2', '#50C878'],
+        stops: [0, 1]
+      },
+      textStyle: {
+        bold: true,
+        shadow: {
+          color: 'rgba(0,0,0,0.3)',
+          offsetX: 3,
+          offsetY: 3,
+          blur: 6
+        }
+      }
+    },
+    chart1: {
+      type: 'pie',
+      data: pieData,
+      options: {
+        dimensions: { width: 700, height: 700 },
+        labels: {
+          title: {
+            text: 'Q1 Device Distribution',
+            fontSize: 24,
+            color: '#333333'
+          }
+        },
+        legends: {
+          standard: {
+            show: true,
+            position: 'right',
+            fontSize: 16
+          }
+        }
+      },
+      title: {
+        text: 'Q1 2024',
+        fontSize: 20,
+        color: '#4A90E2'
+      }
+    },
+    chart2: {
+      type: 'bar',
+      data: barData,
+      barType: 'standard',
+      options: {
+        dimensions: { height: 700 },
+        axes: {
+          x: {
+            label: 'Month',
+            labelColor: '#333333'
+          },
+          y: {
+            label: 'Sales ($)',
+            labelColor: '#333333',
+            range: { min: 0, max: 100, step: 10 }
+          }
+        },
+        labels: {
+          title: {
+            text: 'Q2 Monthly Sales',
+            fontSize: 24
+          }
+        },
+        grid: {
+          show: true,
+          color: '#E0E0E0'
+        }
+      },
+      title: {
+        text: 'Q2 2024',
+        fontSize: 20,
+        color: '#50C878'
+      }
+    }
+  });
+
+  fs.writeFileSync('comparison-chart.png', chart);
+}
+
+createComparison();
+```
+</js>
+</CodeSwitcher>
+
+## Features
+
+- **Any Chart Type Combination**: Compare pie, bar, horizontalBar, line, or donut charts
+- **Flexible Layouts**: Side-by-side or top-bottom arrangements
+- **Individual Configuration**: Each chart maintains its own data, options, and legend
+- **Shared Background**: Common background styling across both charts
+- **General Title**: Overall title for the comparison
+- **Full Feature Support**: All chart features available (gradients, enhanced text styling, etc.)
+- **Customizable Spacing**: Control spacing between charts
+
+## Related Documentation
+
+- [Pie Charts](./pie-charts) - Create pie and donut charts
+- [Bar Charts](./bar-charts) - Create vertical bar charts
+- [Horizontal Bar Charts](./horizontal-bar-charts) - Create horizontal bar charts
+- [Line Charts](./line-charts) - Create line charts
+
+
+

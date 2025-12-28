@@ -281,7 +281,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-xs font-semibold px-2 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                  v5.1.0
+                  v5.2.0
                 </span>
                 <button
                   onClick={() => setIsCollapsed(!isCollapsed)}

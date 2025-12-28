@@ -1,6 +1,10 @@
 # Image Filters
 
-Apexify.js provides 22+ professional image filters that you can apply to images and shapes. Filters are applied using the `filters` array property in `ImageProperties`.
+Apexify.js provides 22+ professional image filters that you can apply to images and shapes. All filters use high-quality Sharp library processing for professional results. Filters are applied using the `filters` array property in `ImageProperties`.
+
+<Alert type="success" title="Updated in v5.2.9">
+All filters now use professional Sharp library processing with improved quality. Filter parameters have been standardized - use `intensity` for blur/sharpening filters and `value` for color adjustments. Pre-filters now work correctly with proper filter order support.
+</Alert>
 
 ## Overview
 
@@ -41,9 +45,17 @@ const filteredImage = await painter.createImage({
 </js>
 </CodeSwitcher>
 
-## Filter Intensity
+## Filter Parameters
 
-Most filters support an `intensity` property to control the strength of the effect:
+Filters use different parameter types depending on their function:
+
+- **`intensity`**: Used for blur, sharpening, and texture filters (gaussianBlur, sharpen, motionBlur, radialBlur, noise, grain, edgeDetection, emboss)
+- **`value`**: Used for color adjustments (brightness, contrast, saturation, hueShift)
+- **Special parameters**: `levels` for posterize, `size` for pixelate, `centerX/centerY` for radialBlur
+
+<Alert type="info" title="Parameter Types">
+Use `intensity` for filters that control the strength of an effect (blur, sharpening, noise). Use `value` for filters that adjust color properties (brightness percentage, contrast multiplier, saturation multiplier, hue degrees).
+</Alert>
 
 <CodeSwitcher>
 <ts>
@@ -379,12 +391,12 @@ const sharpened = await painter.createImage({
 
 ### Brightness
 
-Adjusts image brightness:
+Adjusts image brightness. Use `value` parameter (range: -100 to 100, representing percentage change):
 
 <CodeSwitcher>
 <ts>
 ```typescript
-// Increase brightness
+// Increase brightness by 20%
 const brighter = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -392,11 +404,11 @@ const brighter = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'brightness', value: 0.2 }  // Positive = brighter
+    { type: 'brightness', value: 20 }  // Positive = brighter (percentage)
   ]
 }, canvasBuffer);
 
-// Decrease brightness
+// Decrease brightness by 20%
 const darker = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -404,14 +416,14 @@ const darker = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'brightness', value: -0.2 }  // Negative = darker
+    { type: 'brightness', value: -20 }  // Negative = darker (percentage)
   ]
 }, canvasBuffer);
 ```
 </ts>
 <js>
 ```javascript
-// Increase brightness
+// Increase brightness by 20%
 const brighter = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -419,11 +431,11 @@ const brighter = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'brightness', value: 0.2 }  // Positive = brighter
+    { type: 'brightness', value: 20 }  // Positive = brighter (percentage)
   ]
 }, canvasBuffer);
 
-// Decrease brightness
+// Decrease brightness by 20%
 const darker = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -431,7 +443,7 @@ const darker = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'brightness', value: -0.2 }  // Negative = darker
+    { type: 'brightness', value: -20 }  // Negative = darker (percentage)
   ]
 }, canvasBuffer);
 ```
@@ -440,12 +452,12 @@ const darker = await painter.createImage({
 
 ### Contrast
 
-Adjusts image contrast:
+Adjusts image contrast. Use `value` parameter (range: -100 to 100, representing percentage change):
 
 <CodeSwitcher>
 <ts>
 ```typescript
-// Increase contrast
+// Increase contrast by 50%
 const highContrast = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -453,11 +465,11 @@ const highContrast = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'contrast', value: 1.5 }  // > 1 = more contrast
+    { type: 'contrast', value: 50 }  // Positive = more contrast (percentage)
   ]
 }, canvasBuffer);
 
-// Decrease contrast
+// Decrease contrast by 50%
 const lowContrast = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -465,14 +477,14 @@ const lowContrast = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'contrast', value: 0.5 }  // < 1 = less contrast
+    { type: 'contrast', value: -50 }  // Negative = less contrast (percentage)
   ]
 }, canvasBuffer);
 ```
 </ts>
 <js>
 ```javascript
-// Increase contrast
+// Increase contrast by 50%
 const highContrast = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -480,11 +492,11 @@ const highContrast = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'contrast', value: 1.5 }  // > 1 = more contrast
+    { type: 'contrast', value: 50 }  // Positive = more contrast (percentage)
   ]
 }, canvasBuffer);
 
-// Decrease contrast
+// Decrease contrast by 50%
 const lowContrast = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -492,7 +504,7 @@ const lowContrast = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'contrast', value: 0.5 }  // < 1 = less contrast
+    { type: 'contrast', value: -50 }  // Negative = less contrast (percentage)
   ]
 }, canvasBuffer);
 ```
@@ -501,12 +513,12 @@ const lowContrast = await painter.createImage({
 
 ### Saturation
 
-Adjusts color saturation:
+Adjusts color saturation. Use `value` parameter (range: -100 to 100, representing percentage change):
 
 <CodeSwitcher>
 <ts>
 ```typescript
-// Increase saturation (more vibrant)
+// Increase saturation by 50% (more vibrant)
 const vibrant = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -514,11 +526,11 @@ const vibrant = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'saturation', value: 1.5 }  // > 1 = more saturated
+    { type: 'saturation', value: 50 }  // Positive = more saturated (percentage)
   ]
 }, canvasBuffer);
 
-// Decrease saturation (more muted)
+// Decrease saturation by 50% (more muted)
 const muted = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -526,14 +538,14 @@ const muted = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'saturation', value: 0.5 }  // < 1 = less saturated
+    { type: 'saturation', value: -50 }  // Negative = less saturated (percentage)
   ]
 }, canvasBuffer);
 ```
 </ts>
 <js>
 ```javascript
-// Increase saturation (more vibrant)
+// Increase saturation by 50% (more vibrant)
 const vibrant = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -541,11 +553,11 @@ const vibrant = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'saturation', value: 1.5 }  // > 1 = more saturated
+    { type: 'saturation', value: 50 }  // Positive = more saturated (percentage)
   ]
 }, canvasBuffer);
 
-// Decrease saturation (more muted)
+// Decrease saturation by 50% (more muted)
 const muted = await painter.createImage({
   source: './image.jpg',
   x: 100,
@@ -553,7 +565,7 @@ const muted = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'saturation', value: 0.5 }  // < 1 = less saturated
+    { type: 'saturation', value: -50 }  // Negative = less saturated (percentage)
   ]
 }, canvasBuffer);
 ```
@@ -562,7 +574,7 @@ const muted = await painter.createImage({
 
 ### Hue Shift
 
-Shifts the hue of all colors:
+Shifts the hue of all colors. Use `value` parameter (range: 0-360 degrees):
 
 <CodeSwitcher>
 <ts>
@@ -778,7 +790,7 @@ const pixelated = await painter.createImage({
 
 ### Noise
 
-Adds random noise to the image:
+Adds random noise to the image. Use `intensity` parameter (range: 0-1, clamped automatically):
 
 <CodeSwitcher>
 <ts>
@@ -813,7 +825,7 @@ const noisy = await painter.createImage({
 
 ### Grain
 
-Adds film grain texture:
+Adds film grain texture. Use `intensity` parameter (range: 0-1, clamped automatically):
 
 <CodeSwitcher>
 <ts>
@@ -935,8 +947,8 @@ const vintage = await painter.createImage({
   filters: [
     { type: 'sepia' },
     { type: 'grain', intensity: 0.1 },
-    { type: 'contrast', value: 1.2 },
-    { type: 'brightness', value: -0.1 }
+    { type: 'contrast', value: 20 },      // 20% more contrast
+    { type: 'brightness', value: -10 }    // 10% darker
   ]
 }, canvasBuffer);
 
@@ -948,9 +960,9 @@ const cinematic = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'contrast', value: 1.3 },
-    { type: 'saturation', value: 0.8 },
-    { type: 'brightness', value: -0.1 },
+    { type: 'contrast', value: 30 },      // 30% more contrast
+    { type: 'saturation', value: -20 },   // 20% less saturation
+    { type: 'brightness', value: -10 },   // 10% darker
     { type: 'gaussianBlur', intensity: 0.5 }
   ]
 }, canvasBuffer);
@@ -968,8 +980,8 @@ const vintage = await painter.createImage({
   filters: [
     { type: 'sepia' },
     { type: 'grain', intensity: 0.1 },
-    { type: 'contrast', value: 1.2 },
-    { type: 'brightness', value: -0.1 }
+    { type: 'contrast', value: 20 },      // 20% more contrast
+    { type: 'brightness', value: -10 }    // 10% darker
   ]
 }, canvasBuffer);
 
@@ -981,9 +993,9 @@ const cinematic = await painter.createImage({
   width: 400,
   height: 300,
   filters: [
-    { type: 'contrast', value: 1.3 },
-    { type: 'saturation', value: 0.8 },
-    { type: 'brightness', value: -0.1 },
+    { type: 'contrast', value: 30 },      // 30% more contrast
+    { type: 'saturation', value: -20 },   // 20% less saturation
+    { type: 'brightness', value: -10 },   // 10% darker
     { type: 'gaussianBlur', intensity: 0.5 }
   ]
 }, canvasBuffer);
@@ -995,23 +1007,27 @@ const cinematic = await painter.createImage({
 
 | Filter | Properties | Description |
 |--------|-----------|-------------|
-| `gaussianBlur` | `intensity` | Smooth, uniform blur |
-| `motionBlur` | `intensity`, `angle` | Directional motion blur |
-| `radialBlur` | `intensity`, `centerX`, `centerY` | Circular blur from center |
-| `sharpen` | `intensity` | Enhance details and edges |
-| `brightness` | `value` | Adjust brightness (-1 to 1) |
-| `contrast` | `value` | Adjust contrast (0 to 2+) |
-| `saturation` | `value` | Adjust color saturation (0 to 2+) |
+| `gaussianBlur` | `intensity` | Smooth, uniform blur (uses Sharp library) |
+| `motionBlur` | `intensity`, `angle` | Directional motion blur with proper convolution kernels (uses Sharp) |
+| `radialBlur` | `intensity`, `centerX`, `centerY` | Circular blur from center with proper convolution kernels (uses Sharp) |
+| `sharpen` | `intensity` | Enhance details and edges (uses Sharp library) |
+| `brightness` | `value` | Adjust brightness (-100 to 100, percentage) |
+| `contrast` | `value` | Adjust contrast (-100 to 100, percentage) |
+| `saturation` | `value` | Adjust color saturation (-100 to 100, percentage) |
 | `hueShift` | `value` | Shift hue in degrees (0-360) |
 | `grayscale` | - | Convert to grayscale |
 | `sepia` | - | Apply sepia tone |
-| `invert` | - | Invert all colors |
+| `invert` | - | Invert all colors (dimension-preserving, fixed in v5.2.9) |
 | `posterize` | `levels` | Reduce color levels (2-256) |
-| `pixelate` | `size` | Pixelate effect (pixel size) |
-| `noise` | `intensity` | Add random noise (0-1) |
-| `grain` | `intensity` | Add film grain (0-1) |
-| `edgeDetection` | `intensity` | Detect and highlight edges |
-| `emboss` | `intensity` | Create 3D embossed effect |
+| `pixelate` | `size` | Pixelate effect (pixel size, 2+) |
+| `noise` | `intensity` | Add random noise (0-1, automatically clamped) |
+| `grain` | `intensity` | Add film grain (0-1, automatically clamped, uses Jimp) |
+| `edgeDetection` | `intensity` | Detect and highlight edges using Sobel kernel algorithm (uses Sharp) |
+| `emboss` | `intensity` | Create 3D embossed effect using proper emboss kernel (uses Sharp) |
+
+<Alert type="info" title="Professional Processing (v5.2.9+)">
+All filters now use professional Sharp library processing for high-quality results. Motion blur, radial blur, edge detection, and emboss use proper convolution kernels. Noise and grain use Jimp for pixel-level manipulation. All filters include comprehensive parameter validation and value clamping.
+</Alert>
 
 ## Next Steps
 

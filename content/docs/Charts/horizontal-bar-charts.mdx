@@ -1,0 +1,832 @@
+# Horizontal Bar Charts
+
+Apexify.js provides comprehensive horizontal bar chart generation with support for multiple chart types (standard, grouped, stacked, lollipop), gradients, enhanced text styling, and customizable axes.
+
+## Overview
+
+Horizontal bar charts are created using the unified `createChart()` method with `chartType: 'horizontalBar'`. They support 4 types: standard, grouped, stacked, and lollipop. Charts are fully responsive with automatic height calculation.
+
+## Chart Types
+
+- **Standard**: Single value per category
+- **Grouped**: Multiple series grouped side-by-side
+- **Stacked**: Multiple series stacked on top of each other
+- **Lollipop**: Bars with circular markers at the end
+
+## Basic Usage
+
+### Standard Horizontal Bar Chart
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const data = [
+  {
+    label: 'Product A',
+    value: 150,
+    color: '#4A90E2'
+  },
+  {
+    label: 'Product B',
+    value: 200,
+    color: '#50C878'
+  },
+  {
+    label: 'Product C',
+    value: 120,
+    color: '#FF6B6B'
+  }
+];
+
+const chart = await painter.createChart('horizontalBar', data);
+
+fs.writeFileSync('horizontal-bar-chart.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createChart() {
+  const data = [
+    {
+      label: 'Product A',
+      value: 150,
+      color: '#4A90E2'
+    },
+    {
+      label: 'Product B',
+      value: 200,
+      color: '#50C878'
+    },
+    {
+      label: 'Product C',
+      value: 120,
+      color: '#FF6B6B'
+    }
+  ];
+
+  const chart = await painter.createChart('horizontalBar', data);
+  fs.writeFileSync('horizontal-bar-chart.png', chart);
+}
+
+createChart();
+```
+</js>
+</CodeSwitcher>
+
+## Data Structure
+
+### Standard Horizontal Bar Chart
+
+<CodeSwitcher>
+<ts>
+```typescript
+interface HorizontalBarChartData {
+  label: string;              // Category label (displayed on Y-axis)
+  value?: number;             // Bar value (for standard charts)
+  values?: HorizontalBarSegment[]; // Array of segments (for grouped/stacked)
+  xStart?: number;            // Optional: X-axis start position
+  xEnd?: number;              // Optional: X-axis end position
+  color?: string;             // Bar color (overridden by gradient if provided)
+  gradient?: gradient;        // Gradient fill (overrides color)
+  labelColor?: string;        // Label text color
+  labelPosition?: 'top' | 'left' | 'right' | 'inside' | 'bottom';
+  valueColor?: string;        // Value label text color
+  showValue?: boolean;        // Show/hide value label
+}
+```
+</ts>
+<js>
+```javascript
+{
+  label: 'Product A',         // Category label
+  value: 150,                 // Bar value
+  color: '#4A90E2',           // Optional: Bar color
+  gradient: { ... },          // Optional: Gradient fill
+  labelColor: '#333',         // Optional: Label color
+  labelPosition: 'left',      // Optional: Label position
+  valueColor: '#000',         // Optional: Value label color
+  showValue: true             // Optional: Show value (default: true)
+}
+```
+</js>
+</CodeSwitcher>
+
+### Grouped/Stacked Horizontal Bar Chart
+
+<CodeSwitcher>
+<ts>
+```typescript
+interface HorizontalBarSegment {
+  value: number;              // Segment value
+  color?: string;             // Segment color
+  gradient?: gradient;        // Segment gradient
+  label?: string;             // Optional segment label
+  valueColor?: string;        // Value label color
+  showValue?: boolean;        // Show/hide value
+}
+
+interface HorizontalBarChartData {
+  label: string;              // Category label
+  values: HorizontalBarSegment[]; // Array of segments
+  // ... other properties
+}
+```
+</ts>
+<js>
+```javascript
+{
+  label: 'Q1',
+  values: [
+    { value: 45, color: '#4A90E2' },
+    { value: 30, color: '#50C878' },
+    { value: 25, color: '#FF6B6B' }
+  ]
+}
+```
+</js>
+</CodeSwitcher>
+
+## Chart Types
+
+### Standard Chart
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'standard'            // Default type
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'standard'            // Default type
+});
+```
+</js>
+</CodeSwitcher>
+
+### Grouped Chart
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Q1',
+    values: [
+      { value: 45, color: '#4A90E2' },
+      { value: 30, color: '#50C878' }
+    ]
+  }
+];
+
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'grouped'
+});
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Q1',
+    values: [
+      { value: 45, color: '#4A90E2' },
+      { value: 30, color: '#50C878' }
+    ]
+  }
+];
+
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'grouped'
+});
+```
+</js>
+</CodeSwitcher>
+
+### Stacked Chart
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'stacked'
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'stacked'
+});
+```
+</js>
+</CodeSwitcher>
+
+### Lollipop Chart
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'lollipop',
+  bars: {
+    lineWidth: 2,             // Line width (default: 2)
+    dotSize: 8                // Dot/circle size (default: 8)
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'lollipop',
+  bars: {
+    lineWidth: 2,
+    dotSize: 8
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Chart Options
+
+### Dimensions
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  dimensions: {
+    width: 800,               // Fixed width (height is auto-calculated)
+    padding: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 20
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  dimensions: {
+    width: 800,               // Fixed width (height is auto-calculated)
+    padding: {
+      top: 20,
+      right: 20,
+      bottom: 20,
+      left: 20
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Background
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  appearance: {
+    backgroundColor: '#ffffff',
+    // OR
+    backgroundGradient: {
+      type: 'linear',
+      colors: ['#f0f0f0', '#e0e0e0'],
+      stops: [0, 1]
+    },
+    // OR
+    backgroundImage: './bg.png'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  appearance: {
+    backgroundColor: '#ffffff',
+    backgroundGradient: {
+      type: 'linear',
+      colors: ['#f0f0f0', '#e0e0e0'],
+      stops: [0, 1]
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Axes Configuration
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  axes: {
+    x: {
+      label: 'Sales ($)',
+      labelColor: '#333333',
+      range: {
+        min: 0,
+        max: 200,
+        step: 20
+      },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 12
+    },
+    y: {
+      label: 'Products',
+      labelColor: '#333333',
+      color: '#000000',
+      width: 2,
+      tickFontSize: 12
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  axes: {
+    x: {
+      label: 'Sales ($)',
+      labelColor: '#333333',
+      range: { min: 0, max: 200, step: 20 },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 12
+    },
+    y: {
+      label: 'Products',
+      labelColor: '#333333',
+      color: '#000000',
+      width: 2,
+      tickFontSize: 12
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Labels
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  labels: {
+    title: {
+      text: 'Product Sales',
+      fontSize: 24,
+      color: '#333333',
+      gradient: { ... },        // Optional: Text gradient
+      textStyle: {              // Optional: Enhanced styling
+        bold: true,
+        shadow: { ... }
+      }
+    },
+    barLabelDefaults: {
+      show: true,
+      defaultPosition: 'left',  // 'top' | 'left' | 'right' | 'inside' | 'bottom'
+      fontSize: 14,
+      defaultColor: '#333333',
+      gradient: { ... },        // Optional
+      textStyle: { ... }        // Optional
+    },
+    valueLabelDefaults: {
+      show: true,
+      fontSize: 12,
+      defaultColor: '#000000',
+      gradient: { ... },        // Optional
+      textStyle: { ... }        // Optional
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  labels: {
+    title: {
+      text: 'Product Sales',
+      fontSize: 24,
+      color: '#333333',
+      textStyle: {
+        bold: true
+      }
+    },
+    barLabelDefaults: {
+      show: true,
+      defaultPosition: 'left',
+      fontSize: 14,
+      defaultColor: '#333333'
+    },
+    valueLabelDefaults: {
+      show: true,
+      fontSize: 12,
+      defaultColor: '#000000'
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Legend
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  legend: {
+    show: true,
+    position: 'right',          // 'top' | 'bottom' | 'left' | 'right'
+    entries: [
+      { color: '#4A90E2', label: 'Product A' },
+      { gradient: { ... }, label: 'Product B' }
+    ],
+    fontSize: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundGradient: { ... }, // Optional
+    borderColor: '#000000',
+    textColor: '#000000',
+    textGradient: { ... },      // Optional
+    textStyle: { ... },         // Optional
+    spacing: 20,
+    padding: 8,
+    wrapText: true
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  legend: {
+    show: true,
+    position: 'right',
+    entries: [
+      { color: '#4A90E2', label: 'Product A' }
+    ],
+    fontSize: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderColor: '#000000',
+    textColor: '#000000',
+    spacing: 20,
+    padding: 8
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+## Bar Styling
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart('horizontalBar', data, {
+  bars: {
+    spacing: 10,                // Spacing between bars
+    minWidth: 20,               // Minimum bar width (height in horizontal)
+    groupSpacing: 10,           // Spacing between groups
+    segmentSpacing: 2,          // Spacing between segments
+    opacity: 1,
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 2,
+      offsetY: 2,
+      blur: 4
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2,
+      gradient: { ... }         // Optional: Stroke gradient
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart('horizontalBar', data, {
+  bars: {
+    spacing: 10,
+    minWidth: 20,
+    opacity: 1,
+    shadow: {
+      color: 'rgba(0,0,0,0.3)',
+      offsetX: 2,
+      offsetY: 2,
+      blur: 4
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Gradient Bars
+
+<CodeSwitcher>
+<ts>
+```typescript
+const data = [
+  {
+    label: 'Product A',
+    value: 150,
+    gradient: {
+      type: 'linear',
+      colors: ['#4A90E2', '#357ABD'],
+      stops: [0, 1],
+      angle: 0
+    }
+  }
+];
+```
+</ts>
+<js>
+```javascript
+const data = [
+  {
+    label: 'Product A',
+    value: 150,
+    gradient: {
+      type: 'linear',
+      colors: ['#4A90E2', '#357ABD'],
+      stops: [0, 1],
+      angle: 0
+    }
+  }
+];
+```
+</js>
+</CodeSwitcher>
+
+## Complete Example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const data = [
+  {
+    label: 'Product A',
+    value: 150,
+    gradient: {
+      type: 'linear',
+      colors: ['#4A90E2', '#357ABD'],
+      stops: [0, 1],
+      angle: 0
+    }
+  },
+  {
+    label: 'Product B',
+    value: 200,
+    color: '#50C878'
+  },
+  {
+    label: 'Product C',
+    value: 120,
+    color: '#FF6B6B'
+  }
+];
+
+const chart = await painter.createChart('horizontalBar', data, {
+  type: 'standard',
+  dimensions: {
+    width: 800,
+    padding: { top: 40, right: 60, bottom: 40, left: 100 }
+  },
+  appearance: {
+    backgroundGradient: {
+      type: 'radial',
+      colors: ['#ffffff', '#f5f5f5'],
+      stops: [0, 1]
+    }
+  },
+  axes: {
+    x: {
+      label: 'Sales ($)',
+      labelColor: '#333333',
+      range: { min: 0, max: 250, step: 25 },
+      color: '#000000',
+      width: 2,
+      tickFontSize: 14
+    },
+    y: {
+      label: 'Products',
+      labelColor: '#333333',
+      color: '#000000',
+      width: 2,
+      tickFontSize: 14
+    }
+  },
+  labels: {
+    title: {
+      text: 'Product Sales Report',
+      fontSize: 28,
+      gradient: {
+        type: 'linear',
+        colors: ['#4A90E2', '#50C878'],
+        stops: [0, 1]
+      },
+      textStyle: {
+        bold: true,
+        shadow: {
+          color: 'rgba(0,0,0,0.2)',
+          offsetX: 2,
+          offsetY: 2,
+          blur: 4
+        }
+      }
+    },
+    barLabelDefaults: {
+      show: true,
+      defaultPosition: 'left',
+      fontSize: 14,
+      defaultColor: '#333333'
+    },
+    valueLabelDefaults: {
+      show: true,
+      fontSize: 12,
+      defaultColor: '#000000',
+      textStyle: { bold: true }
+    }
+  },
+  bars: {
+    spacing: 15,
+    minWidth: 25,
+    shadow: {
+      color: 'rgba(0,0,0,0.2)',
+      offsetX: 3,
+      offsetY: 3,
+      blur: 6
+    },
+    stroke: {
+      color: '#ffffff',
+      width: 2
+    }
+  }
+});
+
+fs.writeFileSync('horizontal-bar-chart.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function createChart() {
+  const data = [
+    {
+      label: 'Product A',
+      value: 150,
+      gradient: {
+        type: 'linear',
+        colors: ['#4A90E2', '#357ABD'],
+        stops: [0, 1],
+        angle: 0
+      }
+    },
+    {
+      label: 'Product B',
+      value: 200,
+      color: '#50C878'
+    },
+    {
+      label: 'Product C',
+      value: 120,
+      color: '#FF6B6B'
+    }
+  ];
+
+  const chart = await painter.createChart('horizontalBar', data, {
+    type: 'standard',
+    dimensions: {
+      width: 800,
+      padding: { top: 40, right: 60, bottom: 40, left: 100 }
+    },
+    appearance: {
+      backgroundGradient: {
+        type: 'radial',
+        colors: ['#ffffff', '#f5f5f5'],
+        stops: [0, 1]
+      }
+    },
+    axes: {
+      x: {
+        label: 'Sales ($)',
+        labelColor: '#333333',
+        range: { min: 0, max: 250, step: 25 },
+        color: '#000000',
+        width: 2,
+        tickFontSize: 14
+      },
+      y: {
+        label: 'Products',
+        labelColor: '#333333',
+        color: '#000000',
+        width: 2,
+        tickFontSize: 14
+      }
+    },
+    labels: {
+      title: {
+        text: 'Product Sales Report',
+        fontSize: 28,
+        gradient: {
+          type: 'linear',
+          colors: ['#4A90E2', '#50C878'],
+          stops: [0, 1]
+        },
+        textStyle: {
+          bold: true,
+          shadow: {
+            color: 'rgba(0,0,0,0.2)',
+            offsetX: 2,
+            offsetY: 2,
+            blur: 4
+          }
+        }
+      },
+      barLabelDefaults: {
+        show: true,
+        defaultPosition: 'left',
+        fontSize: 14,
+        defaultColor: '#333333'
+      },
+      valueLabelDefaults: {
+        show: true,
+        fontSize: 12,
+        defaultColor: '#000000',
+        textStyle: { bold: true }
+      }
+    },
+    bars: {
+      spacing: 15,
+      minWidth: 25,
+      shadow: {
+        color: 'rgba(0,0,0,0.2)',
+        offsetX: 3,
+        offsetY: 3,
+        blur: 6
+      },
+      stroke: {
+        color: '#ffffff',
+        width: 2
+      }
+    }
+  });
+
+  fs.writeFileSync('horizontal-bar-chart.png', chart);
+}
+
+createChart();
+```
+</js>
+</CodeSwitcher>
+
+## Related Documentation
+
+- [Pie Charts](./pie-charts) - Create pie and donut charts
+- [Bar Charts](./bar-charts) - Create vertical bar charts
+- [Line Charts](./line-charts) - Create line charts
+- [Comparison Charts](./comparison-charts) - Compare two charts side by side
+
+
+

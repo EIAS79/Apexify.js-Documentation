@@ -707,7 +707,7 @@ createCompleteComposition();
 - `createCanvas()` - Create canvas with backgrounds
 
 ### Drawing
-- `createImage()` - Draw images and shapes
+- `createImage()` - Draw images and shapes (supports group transforms)
 - `createText()` - Render text with advanced styling
 - `createCustom()` - Draw custom lines with arrows and markers
 
@@ -735,8 +735,19 @@ createCompleteComposition();
 - `extractPalette()` - Extract color palettes
 - `blend()` - Blend multiple images
 
+### Advanced APIs (New in v5.2.5)
+- `measureText()` - Comprehensive text metrics API (Canvas API + extensions)
+- `getPixelData()` / `setPixelData()` - Pixel-level manipulation
+- `manipulatePixels()` - Apply filters or custom pixel processors
+- `getPixelColor()` / `setPixelColor()` - Quick pixel color access
+- `createPath2D()` - Create Path2D objects from commands
+- `drawPath()` - Draw paths with advanced styling
+- `isPointInPath()` - Point-in-path hit detection
+- `isPointInRegion()` / `isPointInAnyRegion()` - Region-based hit detection
+- `getDistanceToRegion()` - Calculate distance to region edges
+
 ### Animation
-- `createGIF()` - Create animated GIFs
+- `createGIF()` - Create animated GIFs (with programmatic frame generation via `onStart` callback)
 - `animate()` - Create frame-based animations
 - `createVideo()` - Comprehensive video processing (25+ features)
 - `getVideoInfo()` - Get video metadata
@@ -779,4 +790,6 @@ Apexify.js is built with TypeScript and provides comprehensive type definitions 
 - [Text Documentation](/docs#basic-text-operations) - Learn about text rendering
 - [Charts Documentation](/docs#bar-charts) - Learn about chart generation
 - [Custom Lines Documentation](/docs#basic-custom-lines) - Learn about custom line drawing
+- [Advanced APIs](/docs#text-metrics-api) - New in v5.2.5: Text Metrics, Pixel Data, Path2D, Hit Detection
+- [Group Transforms](/docs#group-transform-operations) - Transform multiple elements together
 

@@ -1,6 +1,6 @@
 # Comprehensive Video Processing
 
-Apexify.js provides **25+ comprehensive video processing features** through the `createVideo()` method. This unified API gives you complete control over video manipulation, frame extraction, effects, and more.
+Apexify.js provides **35+ comprehensive video processing features** through the `createVideo()` method. This unified API gives you complete control over video manipulation, frame extraction, effects, transitions, and professional editing capabilities.
 
 <Alert type="info" title="FFmpeg Required">
 All video processing features require FFmpeg to be installed on your system. See the [FFmpeg Installation Guide](#ffmpeg-installation) for setup instructions.
@@ -10,13 +10,15 @@ All video processing features require FFmpeg to be installed on your system. See
 
 The `createVideo()` method is a comprehensive video processing API that supports:
 
-- **Frame Extraction**: Extract single frames, multiple frames, or all frames
-- **Video Information**: Get detailed video metadata
-- **Format Conversion**: Convert between video formats
-- **Video Editing**: Trim, crop, rotate, and merge videos
-- **Effects & Filters**: Apply visual effects and color correction
-- **Audio Processing**: Extract audio, adjust volume, mute
-- **Advanced Features**: Stabilization, scene detection, time-lapse, and more
+- **Frame Extraction**: Extract single frames, multiple frames, or all frames, and create videos from frames
+- **Video Information**: Get detailed video metadata and format detection
+- **Format Conversion**: Convert between video formats with platform-optimized presets
+- **Video Editing**: Trim, crop, rotate, merge, and replace video segments
+- **Effects & Filters**: Apply visual effects, color correction, and LUT color grading
+- **Audio Processing**: Extract audio, adjust volume, mute (full or partial), normalize audio levels
+- **Transitions**: Professional transitions between videos (fade, wipe, slide, zoom, and more)
+- **Text Animations**: Add animated text overlays with custom fonts and animations
+- **Advanced Features**: Stabilization, scene detection, time-lapse, freeze frames, and more
 
 ## Method Signature
 
@@ -1108,27 +1110,53 @@ const result = await painter.createVideo({
 </js>
 </CodeSwitcher>
 
-### 28. Mute Video
+### 28. Mute Video (Full or Partial)
 
-Remove audio from video:
+Remove audio from video (entire video or specific time ranges):
 
 <CodeSwitcher>
 <ts>
 ```typescript
+// Full mute (remove entire audio track)
 const result = await painter.createVideo({
   source: './video.mp4',
   mute: {
     outputPath: './muted.mp4'
   }
 });
+
+// Partial mute (mute specific time ranges)
+const result2 = await painter.createVideo({
+  source: './video.mp4',
+  mute: {
+    outputPath: './partially-muted.mp4',
+    ranges: [
+      { start: 5, end: 10 },   // Mute from 5 to 10 seconds
+      { start: 15, end: 20 }    // Mute from 15 to 20 seconds
+    ]
+  }
+});
 ```
 </ts>
 <js>
 ```javascript
+// Full mute (remove entire audio track)
 const result = await painter.createVideo({
   source: './video.mp4',
   mute: {
     outputPath: './muted.mp4'
+  }
+});
+
+// Partial mute (mute specific time ranges)
+const result2 = await painter.createVideo({
+  source: './video.mp4',
+  mute: {
+    outputPath: './partially-muted.mp4',
+    ranges: [
+      { start: 5, end: 10 },   // Mute from 5 to 10 seconds
+      { start: 15, end: 20 }    // Mute from 15 to 20 seconds
+    ]
   }
 });
 ```
@@ -1203,6 +1231,433 @@ console.log('Bitrate:', formatInfo.bitrate);
 console.log('Duration:', formatInfo.duration);
 
 // Returns: { format, codec, container, width, height, fps, bitrate, duration }
+```
+</js>
+</CodeSwitcher>
+
+### 31. Create Video from Frames
+
+Compile frames/images into a video (perfect for frame-by-frame editing workflows):
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Create video from edited frames
+const editedFrames = [buffer1, buffer2, buffer3, ...]; // Buffers from createImage/createText
+
+const result = await painter.createVideo({
+  source: './input.mp4', // Source required but not used
+  createFromFrames: {
+    frames: editedFrames, // Array of Buffers or file paths
+    outputPath: './output.mp4',
+    fps: 30,              // Frames per second (default: 30)
+    format: 'mp4',        // 'mp4' | 'webm' | 'avi' | 'mov' | 'mkv' (default: 'mp4')
+    quality: 'high',      // 'low' | 'medium' | 'high' | 'ultra' (default: 'medium')
+    resolution: {         // Optional: auto-detected from first frame if not specified
+      width: 1920,
+      height: 1080
+    }
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Create video from edited frames
+const editedFrames = [buffer1, buffer2, buffer3, ...]; // Buffers from createImage/createText
+
+const result = await painter.createVideo({
+  source: './input.mp4', // Source required but not used
+  createFromFrames: {
+    frames: editedFrames, // Array of Buffers or file paths
+    outputPath: './output.mp4',
+    fps: 30,              // Frames per second (default: 30)
+    format: 'mp4',        // 'mp4' | 'webm' | 'avi' | 'mov' | 'mkv' (default: 'mp4')
+    quality: 'high',      // 'low' | 'medium' | 'high' | 'ultra' (default: 'medium')
+    resolution: {         // Optional: auto-detected from first frame if not specified
+      width: 1920,
+      height: 1080
+    }
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 32. Replace Video Segments
+
+Replace a specific segment in a video with another video segment or edited frames:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Replace segment with segment from another video
+const result = await painter.createVideo({
+  source: './main-video.mp4',
+  replaceSegment: {
+    replacementVideo: './replacement-video.mp4',
+    replacementStartTime: 5,      // Start at 5 seconds in replacement video
+    replacementDuration: 3,       // Take 3 seconds (default: same as target duration)
+    targetStartTime: 10,          // Replace from 10 seconds in main video
+    targetEndTime: 13,            // Replace until 13 seconds in main video
+    outputPath: './output.mp4'
+  }
+});
+
+// Replace segment with edited frames
+const editedFrames = [buffer1, buffer2, buffer3, ...];
+const result2 = await painter.createVideo({
+  source: './main-video.mp4',
+  replaceSegment: {
+    replacementFrames: editedFrames,
+    replacementFps: 30,           // FPS for replacement frames
+    targetStartTime: 10,
+    targetEndTime: 13,
+    outputPath: './output.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Replace segment with segment from another video
+const result = await painter.createVideo({
+  source: './main-video.mp4',
+  replaceSegment: {
+    replacementVideo: './replacement-video.mp4',
+    replacementStartTime: 5,      // Start at 5 seconds in replacement video
+    replacementDuration: 3,       // Take 3 seconds (default: same as target duration)
+    targetStartTime: 10,          // Replace from 10 seconds in main video
+    targetEndTime: 13,            // Replace until 13 seconds in main video
+    outputPath: './output.mp4'
+  }
+});
+
+// Replace segment with edited frames
+const editedFrames = [buffer1, buffer2, buffer3, ...];
+const result2 = await painter.createVideo({
+  source: './main-video.mp4',
+  replaceSegment: {
+    replacementFrames: editedFrames,
+    replacementFps: 30,           // FPS for replacement frames
+    targetStartTime: 10,
+    targetEndTime: 13,
+    outputPath: './output.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 33. Freeze Frame
+
+Freeze video at a specific time for a dramatic effect:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  freezeFrame: {
+    time: 5.5,           // Time to freeze at (in seconds)
+    duration: 2,         // How long to hold the freeze (in seconds)
+    outputPath: './frozen.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Processing: ${progress.percent}%`);
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  freezeFrame: {
+    time: 5.5,           // Time to freeze at (in seconds)
+    duration: 2,         // How long to hold the freeze (in seconds)
+    outputPath: './frozen.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Processing: ${progress.percent}%`);
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 34. Export Presets
+
+Quick export with platform-optimized settings:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Export for YouTube
+const result = await painter.createVideo({
+  source: './video.mp4',
+  exportPreset: {
+    preset: 'youtube',   // 'youtube' | 'instagram' | 'tiktok' | 'twitter' | 'facebook' | 
+                         // '4k' | '1080p' | '720p' | 'mobile' | 'web'
+    outputPath: './youtube-ready.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Exporting: ${progress.percent}%`);
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Export for YouTube
+const result = await painter.createVideo({
+  source: './video.mp4',
+  exportPreset: {
+    preset: 'youtube',   // 'youtube' | 'instagram' | 'tiktok' | 'twitter' | 'facebook' | 
+                         // '4k' | '1080p' | '720p' | 'mobile' | 'web'
+    outputPath: './youtube-ready.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Exporting: ${progress.percent}%`);
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 35. Audio Normalization
+
+Professional audio leveling with multiple normalization methods:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  normalizeAudio: {
+    method: 'lufs',      // 'lufs' | 'peak' | 'rms' (default: 'lufs')
+    targetLevel: -23,    // Target level (-23 LUFS is broadcast standard)
+    outputPath: './normalized.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Normalizing: ${progress.percent}%`);
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  normalizeAudio: {
+    method: 'lufs',      // 'lufs' | 'peak' | 'rms' (default: 'lufs')
+    targetLevel: -23,    // Target level (-23 LUFS is broadcast standard)
+    outputPath: './normalized.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Normalizing: ${progress.percent}%`);
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 36. Apply LUT (Look-Up Table)
+
+Cinematic color grading using LUT files:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  applyLUT: {
+    lutPath: './cinematic-lut.cube',  // Path to .cube LUT file
+    intensity: 0.8,                    // Intensity 0-1 (default: 1.0)
+    outputPath: './color-graded.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Color grading: ${progress.percent}%`);
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  applyLUT: {
+    lutPath: './cinematic-lut.cube',  // Path to .cube LUT file
+    intensity: 0.8,                    // Intensity 0-1 (default: 1.0)
+    outputPath: './color-graded.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Color grading: ${progress.percent}%`);
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 37. Video Transitions
+
+Professional transitions between videos:
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Transition between two videos
+const result = await painter.createVideo({
+  source: './video1.mp4',
+  addTransition: {
+    type: 'fade',        // 'fade' | 'wipe' | 'slide' | 'zoom' | 'rotate' | 
+                         // 'dissolve' | 'blur' | 'circle' | 'pixelize'
+    duration: 1,         // Transition duration in seconds
+    direction: 'right',  // 'left' | 'right' | 'up' | 'down' | 'in' | 'out' (for wipe/slide/zoom)
+    secondVideo: './video2.mp4',
+    outputPath: './transitioned.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Creating transition: ${progress.percent}%`);
+  }
+});
+
+// Single video fade in/out
+const result2 = await painter.createVideo({
+  source: './video.mp4',
+  addTransition: {
+    type: 'fade',
+    duration: 2,
+    outputPath: './faded.mp4'
+  }
+});
+```
+</ts>
+<js>
+```javascript
+// Transition between two videos
+const result = await painter.createVideo({
+  source: './video1.mp4',
+  addTransition: {
+    type: 'fade',        // 'fade' | 'wipe' | 'slide' | 'zoom' | 'rotate' | 
+                         // 'dissolve' | 'blur' | 'circle' | 'pixelize'
+    duration: 1,         // Transition duration in seconds
+    direction: 'right',  // 'left' | 'right' | 'up' | 'down' | 'in' | 'out' (for wipe/slide/zoom)
+    secondVideo: './video2.mp4',
+    outputPath: './transitioned.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Creating transition: ${progress.percent}%`);
+  }
+});
+
+// Single video fade in/out
+const result2 = await painter.createVideo({
+  source: './video.mp4',
+  addTransition: {
+    type: 'fade',
+    duration: 2,
+    outputPath: './faded.mp4'
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### 38. Animated Text
+
+Add animated text overlays with custom fonts and animations:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  addAnimatedText: {
+    text: 'Hello World',
+    animation: 'fadeIn',  // 'fadeIn' | 'fadeOut' | 'slideIn' | 'slideOut' | 
+                          // 'typewriter' | 'bounce' | 'zoom' | 'rotate'
+    startTime: 2,         // Start time in seconds
+    endTime: 8,           // End time in seconds
+    position: 'top-center', // Coordinates { x, y } or preset: 'top-left' | 'top-right' | 
+                            // 'bottom-left' | 'bottom-right' | 'center' | 'top-center' | 'bottom-center'
+    fontSize: 48,
+    fontColor: '#FFFFFF',
+    fontPath: './custom-font.ttf',  // Optional: custom font file (.ttf, .otf, .woff)
+    fontName: 'CustomFont',         // Optional: font name
+    fontFamily: 'Arial',            // Optional: font family fallback
+    backgroundColor: '#000000',     // Optional: text background color
+    outputPath: './animated-text.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Adding text: ${progress.percent}%`);
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  addAnimatedText: {
+    text: 'Hello World',
+    animation: 'fadeIn',  // 'fadeIn' | 'fadeOut' | 'slideIn' | 'slideOut' | 
+                          // 'typewriter' | 'bounce' | 'zoom' | 'rotate'
+    startTime: 2,         // Start time in seconds
+    endTime: 8,           // End time in seconds
+    position: 'top-center', // Coordinates { x, y } or preset: 'top-left' | 'top-right' | 
+                            // 'bottom-left' | 'bottom-right' | 'center' | 'top-center' | 'bottom-center'
+    fontSize: 48,
+    fontColor: '#FFFFFF',
+    fontPath: './custom-font.ttf',  // Optional: custom font file (.ttf, .otf, .woff)
+    fontName: 'CustomFont',         // Optional: font name
+    fontFamily: 'Arial',            // Optional: font family fallback
+    backgroundColor: '#000000',     // Optional: text background color
+    outputPath: './animated-text.mp4'
+  },
+  onProgress: (progress) => {
+    console.log(`Adding text: ${progress.percent}%`);
+  }
+});
+```
+</js>
+</CodeSwitcher>
+
+### Progress Tracking
+
+All video operations support progress callbacks for real-time progress tracking:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  compress: {
+    outputPath: './compressed.mp4',
+    quality: 'high'
+  },
+  onProgress: (progress) => {
+    console.log(`Progress: ${progress.percent}%`);
+    console.log(`Time elapsed: ${progress.time}s`);
+    console.log(`Speed: ${progress.speed}x`);
+  }
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  compress: {
+    outputPath: './compressed.mp4',
+    quality: 'high'
+  },
+  onProgress: (progress) => {
+    console.log(`Progress: ${progress.percent}%`);
+    console.log(`Time elapsed: ${progress.time}s`);
+    console.log(`Speed: ${progress.speed}x`);
+  }
+});
 ```
 </js>
 </CodeSwitcher>
@@ -1345,9 +1800,17 @@ processVideo();
 | 25 | Picture-in-Picture | Add picture-in-picture overlay |
 | 26 | Split Screen | Create split-screen videos |
 | 27 | Create Time-Lapse | Create time-lapse videos |
-| 28 | Mute | Remove audio from video |
+| 28 | Mute | Remove audio from video (full or partial time ranges) |
 | 29 | Adjust Volume | Adjust video audio volume |
 | 30 | Detect Format | Get detailed format and codec information |
+| 31 | Create from Frames | Compile frames/images into video |
+| 32 | Replace Segment | Replace video segments with another video or frames |
+| 33 | Freeze Frame | Freeze video at specific time for dramatic effect |
+| 34 | Export Presets | Quick export with platform-optimized settings |
+| 35 | Normalize Audio | Professional audio leveling (LUFS, Peak, RMS) |
+| 36 | Apply LUT | Cinematic color grading with Look-Up Tables |
+| 37 | Add Transition | Professional transitions between videos |
+| 38 | Animated Text | Add animated text overlays with custom fonts |
 
 ## Related Documentation
 

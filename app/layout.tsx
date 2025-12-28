@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <SidebarProvider>
-            {children}
+          {children}
           </SidebarProvider>
         </ThemeProvider>
       </body>

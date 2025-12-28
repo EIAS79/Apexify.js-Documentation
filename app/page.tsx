@@ -18,7 +18,17 @@ import {
   HeartIcon,
   ShieldCheckIcon,
   ArrowUpIcon,
-  StarIcon
+  StarIcon,
+  EnvelopeIcon,
+  MapPinIcon,
+  PaperAirplaneIcon,
+  ClipboardIcon,
+  CheckIcon,
+  BriefcaseIcon,
+  AcademicCapIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  UserIcon
 } from '@heroicons/react/24/outline';
 import Navbar from '@/components/Navbar';
 
@@ -48,6 +58,8 @@ export default function Home() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [particles, setParticles] = useState<Array<{ x: number; y: number; size: number; delay: number; duration: number }>>([]);
+  const [emailCopied, setEmailCopied] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const heroRef = useRef<HTMLDivElement>(null);
 
   // Generate particles - Reduced for performance
@@ -125,6 +137,27 @@ export default function Home() {
     });
   };
 
+  const copyEmail = () => {
+    navigator.clipboard.writeText('contact@apexify.dev');
+    setEmailCopied(true);
+    setTimeout(() => setEmailCopied(false), 2000);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Handle form submission here
+    console.log('Form submitted:', formData);
+    // Reset form
+    setFormData({ name: '', email: '', message: '' });
+  };
+
   const features = [
     {
       name: 'Advanced Image Processing',
@@ -152,7 +185,7 @@ export default function Home() {
     },
     {
       name: 'Video Processing',
-      description: '30+ video features including frame extraction, effects, merging, stabilization, and professional color correction.',
+      description: '35+ video features including frame extraction, effects, merging, stabilization, and professional color correction.',
       icon: PlayIcon,
       gradient: 'from-red-500 via-orange-500 to-red-600',
       glow: 'glow-pink',
@@ -183,7 +216,7 @@ export default function Home() {
     { text: 'Text Rendering with Advanced Effects', icon: '📝', color: 'from-cyan-500 to-blue-500' },
     { text: 'Chart Generation (Bar, Pie, Line)', icon: '📊', color: 'from-green-500 to-emerald-500' },
     { text: 'GIF Creation from Image Sequences', icon: '🎬', color: 'from-orange-500 to-red-500' },
-    { text: 'Video Processing (30+ Features)', icon: '🎥', color: 'from-red-500 to-pink-500' },
+    { text: 'Video Processing (35+ Features)', icon: '🎥', color: 'from-red-500 to-pink-500' },
     { text: 'Image Stitching & Collage Making', icon: '🖼️', color: 'from-indigo-500 to-purple-500' },
     { text: 'Background Removal & Color Detection', icon: '🎯', color: 'from-blue-500 to-indigo-500' },
     { text: 'Batch Operations & Chain Operations', icon: '⚡', color: 'from-yellow-500 to-amber-500' },
@@ -213,7 +246,7 @@ export default function Home() {
             `,
           }}
         />
-
+        
         {/* Static grid - No animation for better performance */}
         <div 
           className="absolute inset-0 opacity-20"
@@ -295,7 +328,7 @@ export default function Home() {
             }}
           >
             <StarIcon className="h-5 w-5 text-yellow-400 animate-pulse" />
-            <span className="text-sm text-blue-300 font-semibold">v5.1.0 - Now with 30+ Video Features</span>
+            <span className="text-sm text-blue-300 font-semibold">v5.2.9 - Now with 35+ Video Features</span>
             <SparklesIcon className="h-4 w-4 text-cyan-400 animate-pulse" />
           </div>
 
@@ -330,7 +363,7 @@ export default function Home() {
                   zIndex: -1,
                 }}
               >
-                Apexify.js
+              Apexify.js
               </span>
             </span>
           </h1>
@@ -345,7 +378,7 @@ export default function Home() {
             }}
           >
             <span className="bg-gradient-to-r from-gray-200 via-white to-gray-200 bg-clip-text text-transparent">
-              The Ultimate Canvas Library
+            The Ultimate Canvas Library
             </span>
           </p>
 
@@ -403,8 +436,8 @@ export default function Home() {
             {stats.map((stat, index) => {
               const IconComponent = stat.icon;
               return (
-                <div 
-                  key={index}
+              <div 
+                key={index}
                   className="group relative glass border border-gray-700/50 rounded-2xl p-8 hover:border-blue-500/40 transition-colors duration-150 hover-lift overflow-hidden"
                   style={{
                     boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)',
@@ -423,10 +456,10 @@ export default function Home() {
                       </div>
                     </div>
                     <div className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-2`}>
-                      {stat.value}
-                    </div>
+                  {stat.value}
+                </div>
                     <div className="text-sm text-gray-400 font-medium">{stat.label}</div>
-                  </div>
+              </div>
                 </div>
               );
             })}
@@ -464,7 +497,7 @@ export default function Home() {
               <div className="text-center mb-12">
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
                   <span className="bg-gradient-to-r from-green-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent text-glow-blue">
-                    Trusted by Developers Worldwide
+                  Trusted by Developers Worldwide
                   </span>
                 </h2>
                 <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -487,13 +520,13 @@ export default function Home() {
                   >
                     <div className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-3`}>
                       {stat.value}
-                    </div>
+                  </div>
                     <div className="text-gray-300 mb-2 font-semibold text-base sm:text-lg">{stat.label}</div>
                     <div className="text-xs sm:text-sm text-gray-500">{stat.sublabel}</div>
-                  </div>
+                </div>
                 ))}
-              </div>
-            </div>
+                  </div>
+                </div>
           </div>
         </div>
       </section>
@@ -512,7 +545,7 @@ export default function Home() {
           <div className="text-center mb-20">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Powerful Features
+              Powerful Features
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -524,21 +557,21 @@ export default function Home() {
             {features.map((feature, index) => {
               const IconComponent = feature.icon;
               return (
-                <div
-                  key={feature.name}
+              <div
+                key={feature.name}
                   className="group relative glass-strong border border-gray-700/50 rounded-3xl p-8 hover:border-blue-500/30 transition-colors duration-150 hover-lift overflow-hidden"
-                  style={{
-                    animationDelay: `${index * 100}ms`,
+                style={{
+                  animationDelay: `${index * 100}ms`,
                     boxShadow: '0 0 30px rgba(0, 0, 0, 0.2)',
-                  }}
-                >
+                }}
+              >
                   {/* Light gradient glow on hover - No blur for performance */}
                   <div 
                     className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-150 -z-10`}
                     style={{ willChange: 'opacity' }}
                   />
-                  
-                  <div className="relative z-10">
+                
+                <div className="relative z-10">
                     <div 
                       className={`inline-flex p-5 rounded-2xl bg-gradient-to-r ${feature.gradient} mb-6 transition-transform duration-150 group-hover:scale-105`}
                       style={{
@@ -547,13 +580,13 @@ export default function Home() {
                       }}
                     >
                       <IconComponent className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-4 transition-colors duration-150 group-hover:text-blue-300">
-                      {feature.name}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-300 leading-relaxed">{feature.description}</p>
                   </div>
+                    <h3 className="text-2xl font-bold text-white mb-4 transition-colors duration-150 group-hover:text-blue-300">
+                    {feature.name}
+                  </h3>
+                    <p className="text-sm sm:text-base text-gray-300 leading-relaxed">{feature.description}</p>
                 </div>
+              </div>
               );
             })}
           </div>
@@ -579,7 +612,7 @@ export default function Home() {
             <div className="relative z-10">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-center mb-8 sm:mb-12">
                 <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  What You Can Build
+                What You Can Build
                 </span>
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -614,7 +647,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Why Choose Apexify.js?
+              Why Choose Apexify.js?
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -649,7 +682,7 @@ export default function Home() {
                     { feature: 'Performance (Rust-based)', apexify: true, nodeCanvas: true, sharp: true, jimp: false, fabric: false },
                     { feature: 'Memory Efficiency (Optimized RAM)', apexify: true, nodeCanvas: true, sharp: true, jimp: false, fabric: false },
                     { feature: 'TypeScript Support', apexify: true, nodeCanvas: true, sharp: true, jimp: false, fabric: true },
-                    { feature: 'Video Processing (30+ Features)', apexify: true, nodeCanvas: false, sharp: false, jimp: false, fabric: false },
+                    { feature: 'Video Processing (35+ Features)', apexify: true, nodeCanvas: false, sharp: false, jimp: false, fabric: false },
                     { feature: 'Image Filters (22+ Professional)', apexify: true, nodeCanvas: false, sharp: true, jimp: true, fabric: false },
                     { feature: 'Chart Generation', apexify: true, nodeCanvas: false, sharp: false, jimp: false, fabric: false },
                     { feature: 'GIF Creation', apexify: true, nodeCanvas: false, sharp: false, jimp: false, fabric: false },
@@ -660,36 +693,36 @@ export default function Home() {
                       <td className="py-3 sm:py-4 px-3 sm:px-4 lg:px-6 text-gray-300 text-xs sm:text-sm">{row.feature}</td>
                       <td className="text-center py-3 sm:py-4 px-3 sm:px-4 lg:px-6">
                         <CheckCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-400 mx-auto" />
-                      </td>
+                    </td>
                       <td className="text-center py-3 sm:py-4 px-3 sm:px-4 lg:px-6">
                         {row.nodeCanvas ? (
                           <CheckCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-400/50 mx-auto" />
                         ) : (
                           <XCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-red-400/50 mx-auto" />
                         )}
-                      </td>
+                    </td>
                       <td className="text-center py-3 sm:py-4 px-3 sm:px-4 lg:px-6">
                         {row.sharp ? (
                           <CheckCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-400/50 mx-auto" />
                         ) : (
                           <XCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-red-400/50 mx-auto" />
                         )}
-                      </td>
+                    </td>
                       <td className="text-center py-3 sm:py-4 px-3 sm:px-4 lg:px-6">
                         {row.jimp ? (
                           <CheckCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-400/50 mx-auto" />
                         ) : (
                           <XCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-red-400/50 mx-auto" />
                         )}
-                      </td>
+                    </td>
                       <td className="text-center py-3 sm:py-4 px-3 sm:px-4 lg:px-6">
                         {row.fabric ? (
                           <CheckCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-green-400/50 mx-auto" />
                         ) : (
                           <XCircleIcon className="h-5 w-5 sm:h-6 sm:w-6 text-red-400/50 mx-auto" />
                         )}
-                      </td>
-                    </tr>
+                    </td>
+                  </tr>
                   ))}
                 </tbody>
               </table>
@@ -727,7 +760,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
               <span className="bg-gradient-to-r from-green-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                Always Supported, Never Abandoned
+              Always Supported, Never Abandoned
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -785,17 +818,17 @@ export default function Home() {
                 >
                   <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-150`} style={{ boxShadow: `0 0 20px rgba(59, 130, 246, 0.4)`, willChange: 'transform' }}>
                     <IconComponent className="h-8 w-8 text-white" />
-                  </div>
+              </div>
                   <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
                   <p className="text-gray-300 mb-4 leading-relaxed">{item.description}</p>
                   <div className={`flex items-center gap-2 ${item.textColor} font-semibold`}>
-                    <ClockIcon className="h-5 w-5" />
+                <ClockIcon className="h-5 w-5" />
                     <span>{idx === 0 ? '24/7 Support Available' : idx === 1 ? 'Active Development' : idx === 2 ? 'Rapid Response Time' : 'Feature-Rich Updates'}</span>
-                  </div>
-                </div>
+              </div>
+            </div>
               );
             })}
-          </div>
+            </div>
 
           <div className="mt-12 text-center p-8 glass border border-green-500/30 rounded-2xl hover-lift">
             <p className="text-lg text-gray-200 mb-4">
@@ -822,7 +855,7 @@ export default function Home() {
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
               <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Ready to Get Started?
+              Ready to Get Started?
               </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -871,14 +904,14 @@ export default function Home() {
                 >
                   <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-150`} style={{ boxShadow: `0 0 20px rgba(59, 130, 246, 0.4)`, willChange: 'transform' }}>
                     <IconComponent className="h-8 w-8 text-white" />
-                  </div>
+              </div>
                   <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
                   <p className="text-gray-300 mb-6 leading-relaxed">{item.description}</p>
                   <div className={`${item.textColor} font-semibold`}>{item.command}</div>
                 </div>
               );
             })}
-          </div>
+            </div>
 
           <div className="text-center">
             <Link
@@ -895,9 +928,12 @@ export default function Home() {
               Start Building Now
               <ArrowRightIcon className="ml-3 h-7 w-7 group-hover:translate-x-1 transition-transform duration-150" style={{ willChange: 'transform' }} />
             </Link>
-          </div>
+              </div>
         </div>
       </section>
+
+   
+
 
       {/* Footer - Enhanced */}
       <footer className="relative border-t border-gray-800/50 mt-16 sm:mt-24 lg:mt-32 bg-gradient-to-b from-transparent via-gray-900/30 to-black">
@@ -1006,7 +1042,7 @@ export default function Home() {
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full glass border border-blue-500/30">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                  v5.1.0
+                  v5.2.9
                 </span>
               </div>
             </div>
