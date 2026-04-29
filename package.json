@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "author": "zenith-79",
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
