@@ -639,7 +639,11 @@ function GalleryModal({ item, onClose }: { item: GalleryItem; onClose: () => voi
                 Run executes your edited code in a locked-down server sandbox (ApexPainter and safe builtins — no{' '}
                 <code className="text-slate-300">require</code>, raw <code className="text-slate-300">fs</code>, or{' '}
                 <code className="text-slate-300">process</code>). Return PNG (<code className="text-slate-300">canvas.buffer</code>
-                ), GIF, or MP4 bytes — GIF/MP4 spins need FFmpeg on the server.
+                ), GIF, or MP4 bytes. Spin-wheel GIF/MP4 use FFmpeg internally for encoding —{' '}
+                <span className="text-amber-200/90">
+                  Vercel and most serverless hosts do not ship FFmpeg, so MP4 (and some GIF paths) fail there; run locally or on a host with FFmpeg.
+                </span>{' '}
+                Canvas text uses bundled DejaVu fonts (Arial/Georgia in snippets are aliased) so labels render on Linux.
               </p>
             )}
             {previewError && (
