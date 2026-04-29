@@ -23,6 +23,7 @@
     "apexify.js": "^5.3.12",
     "dejavu-fonts-ttf": "^2.37.3",
     "esbuild": "^0.28.0",
+    "ffmpeg-static": "^5.2.0",
     "monaco-editor": "^0.55.1",
     "next": "^14.2.0",
     "prismjs": "^1.30.0",

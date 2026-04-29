@@ -1,0 +1,277 @@
+# Complete API catalog
+
+This page maps **every public capability** in `apexify.js` (as shipped in the installed package types) to the documentation topic that covers it. Use it when you know what you want to do but not which page to open, or when auditing whether a feature is documented.
+
+<Alert type="info" title="Source of truth">
+Method names and signatures match **`ApexPainter`** in `apexify.js` **v5.3.x** (`dist/esm/Canvas/ApexPainter.d.ts`). **`CanvasUtils`** lists follow `dist/esm/Canvas/utils/canvasUtils.d.ts`. If the package upgrades, regenerate this mapping from those files.
+</Alert>
+
+## Package exports
+
+```typescript
+import { ApexPainter, CanvasUtils, CanvasTypes } from 'apexify.js';
+// Named helpers and types are also re-exported from canvasUtils (url, base64, …)
+```
+
+| Export | Role |
+|--------|------|
+| **`ApexPainter`** | Main class — canvas, text, images, charts, GIF, video, pixels, paths, hit tests, batch utilities. |
+| **`CanvasUtils`** | Low-level helpers used by the engine and available for advanced pipelines (background drawing, shapes, filters, stitching, …). |
+| **`CanvasTypes`** | Shared TypeScript types (`CanvasConfig`, `ImageProperties`, `TextProperties`, …). |
+
+---
+
+## ApexPainter — full method index
+
+Each row links to the **primary** doc page for that API. Some methods appear in more than one guide (e.g. shapes under Image and under Background).
+
+| Method | What it does | Documentation |
+|--------|----------------|-----------------|
+| **`createCanvas`** | New canvas: size, solid/gradient/custom/**video**/pattern/noise backgrounds, **`bgLayers`**, zoom, border, shadow, stroke. | [Solid backgrounds](/docs#solid-backgrounds), [Gradients](/docs#gradient-backgrounds), [Custom backgrounds](/docs#custom-backgrounds), [Advanced backgrounds](/docs#advanced-background-features), [Video backgrounds](/docs#video-backgrounds), [ApexPainter overview](/docs#overview) |
+| **`createImage`** | Draw images, **shapes**, filters, masks, shadows, strokes, **`isGrouped`** / **`groupTransform`**, **`blendMode`**. | [Basic image](/docs#basic-image-operations), [Advanced image](/docs#advanced-image-features), [Shapes](/docs#shapes), [Filters](/docs#image-filters), [Masking](/docs#image-masking-and-clipping), [Group transform](/docs#group-transform-operations) |
+| **`createText`** | Rich text: fonts, wrap, align, gradients, stroke, shadow, glow, decorations, **`textOnCurve`**. | [Basic text](/docs#basic-text-operations), [Advanced text](/docs#advanced-text-features), [Coloring](/docs#text-coloring), [Effects](/docs#text-effects), [Decorations](/docs#text-decorations), [Fonts](/docs#font-management), [Spacing](/docs#text-spacing-and-alignment), [Text on paths](/docs#text-on-paths) |
+| **`measureText`** | Layout metrics for the same props as `createText` (width/height/lines/optional per-char). | [Text metrics API](/docs#text-metrics-api) |
+| **`getPixelData`** / **`setPixelData`** | Read/write raw RGBA regions. | [Pixel data API](/docs#pixel-data-api) |
+| **`manipulatePixels`** | Per-pixel processor or built-in filters on a region. | [Pixel data API](/docs#pixel-data-api) |
+| **`getPixelColor`** / **`setPixelColor`** | Single-pixel read/write. | [Pixel data API](/docs#pixel-data-api) |
+| **`createPath2D`** / **`drawPath`** | Vector path from commands, rasterize to canvas. | [Path2D API](/docs#path2d-api) |
+| **`isPointInPath`** / **`isPointInRegion`** / **`isPointInAnyRegion`** / **`getDistanceToRegion`** | Hit testing for paths and regions. | [Hit detection API](/docs#hit-detection-api) |
+| **`createCustom`** | Polylines, arrows, markers, smooth paths (custom line system). | [Basic custom lines](/docs#basic-custom-lines), [Advanced custom lines](/docs#advanced-custom-lines) |
+| **`createGIF`** | Encode GIF from frames: delays, disposal, transparency, watermark, streaming **`onStart`**. | [GIF and animation](/docs#gif-and-animation) |
+| **`resize`** | Resize pipeline (paths/buffers). | [Basic image](/docs#basic-image-operations), [Extras](/docs#image-utilities) |
+| **`imgConverter`** | Convert image extension/format. | [Basic image](/docs#basic-image-operations), [File operations](/docs#file-operations) |
+| **`effects`** | Apply **`ImageFilter`** list to a raster source. | [Image filters](/docs#image-filters), [Image effects](/docs#image-effects) |
+| **`colorsFilter`** | Tint with solid color or gradient overlay. | [Image effects](/docs#image-effects) |
+| **`colorAnalysis`** | Dominant colors / frequency. | [Image processing](/docs#image-processing) |
+| **`colorsRemover`** | Remove chroma near a target RGB. | [Image processing](/docs#image-processing) |
+| **`removeBackground`** | External API–based background removal (**requires API key**). | [Image processing](/docs#image-processing) |
+| **`blend`** | Multi-layer **`GlobalCompositeOperation`** blend over a base buffer. | [Advanced image](/docs#advanced-image-features) |
+| **`cropImage`** | **`crop: 'inner' \| 'outer'`** crop modes. | [Basic image](/docs#basic-image-operations) |
+| **`masking`** | Image + mask alpha composite. | [Masking](/docs#image-masking-and-clipping) |
+| **`gradientBlend`** | Blend with gradient parameters. | [Advanced image](/docs#advanced-image-features) |
+| **`animate`** | Frame list → sequence / optional GIF side path. | [GIF and animation](/docs#gif-and-animation) |
+| **`batch`** | Parallel **`BatchOperation`** list. | [Batch operations](/docs#batch-operations) |
+| **`chain`** | Sequential **`ChainOperation`** pipeline. | [Batch operations](/docs#batch-operations) |
+| **`stitchImages`** | Tile images with **`StitchOptions`**. | [Batch operations](/docs#batch-operations) |
+| **`createCollage`** | Grid collage from sources + **`CollageLayout`**. | [Batch operations](/docs#batch-operations) |
+| **`compress`** | Lossy compression / quality targets. | [Image processing](/docs#image-processing) |
+| **`extractPalette`** | Color palette + percentages. | [Image processing](/docs#image-processing) |
+| **`validHex`** | Validate `#RRGGBB` strings. | [ApexPainter overview](/docs#overview) |
+| **`outPut`** | Convert buffer to constructor **`type`** (`buffer`, `base64`, `url`, …). | [ApexPainter overview](/docs#overview) |
+| **`save`** / **`saveMultiple`** | Write buffers to disk with naming options. | [File operations](/docs#file-operations) |
+| **`createChart`** | **`'pie' \| 'bar' \| 'horizontalBar' \| 'line'`** typed chart data + options (includes **`appearance`**). | [Pie](/docs#pie-charts), [Bar](/docs#bar-charts), [Horizontal bar](/docs#horizontal-bar-charts), [Line](/docs#line-charts) |
+| **`createComparisonChart`** | Two charts in one image (shared **`appearance`** model). | [Comparison charts](/docs#comparison-charts) |
+| **`getVideoInfo`** | Duration, resolution, fps, bitrate, format (FFmpeg/ffprobe). | [Getting video info](/docs#getting-video-info), [Video processing](/docs#video-processing) |
+| **`extractFrames`** | Interval / directory-based frame export. | [Extracting frames](/docs#extracting-frames), [Video processing](/docs#video-processing) |
+| **`extractFrameAtTime`** / **`extractFrameByNumber`** / **`extractMultipleFrames`** / **`extractAllFrames`** | Convenience frame extraction APIs. | [Extracting frames](/docs#extracting-frames), [Video processing](/docs#video-processing) |
+| **`createVideo`** | Unified router: metadata, extract, convert, trim, merge, effects, **createFromFrames**, … | [Video processing](/docs#video-processing) — see **Create video from frames** and the operation-key table |
+| **`resetSaveCounter`** | Reset internal save naming counter. | [File operations](/docs#file-operations) |
+
+### `createVideo` reminder
+
+`createVideo` accepts **`source`** plus **one** operation key (`getInfo`, `extractFrame`, `createFromFrames`, `convert`, …). **Encode from frames** is documented in depth under [Video processing → Create video from frames](/docs#video-processing) (search the on-page outline).
+
+---
+
+## CanvasUtils (named exports)
+
+Use these when building custom pipelines or tooling; ApexPainter calls them internally.
+
+**Conversions:** `url`, `arrayBuffer`, `base64`, `dataURL`, `blob`  
+
+**Backgrounds:** `drawBackgroundColor`, `drawBackgroundGradient`, `drawBackgroundLayers`, `customBackground`, `drawPattern`, `applyNoise`, `applyCanvasZoom`, `resolveMediaPath`  
+
+**Image drawing:** `buildPath`, `applyRotation`, `createGradientFill`, `fitInto`, `loadImageCached`, `applyStroke`, `applyShadow`, `drawBoxBackground`, `drawShape`, `isShapeSource`, `createShapePath`, `applyImageFilters`, `applyProfessionalImageFilters`  
+
+**Masking / warp:** `applyImageMask`, `applyClipPath`, `applyPerspectiveDistortion`, `applyBulgeDistortion`, `applyMeshWarp`  
+
+**Effects:** `applyVignette`, `applyLensFlare`, `applyChromaticAberration`, `applyFilmGrain`  
+
+**Text (low-level):** `drawText`, `WrappedText`  
+
+**General image:** `loadImages`, `resizingImg`, `converter`, `applyColorFilters`, `imgEffects`, `cropInner`, `cropOuter`, `detectColors`, `removeColor`, `bgRemoval`  
+
+**Custom lines:** `customLines`, `drawArrow`, `drawMarker`, `createSmoothPath`, `createCatmullRomPath`, `applyLinePattern`, `applyLineTexture`, `getPointOnLinePath`  
+
+**Batch / layout:** `batchOperations`, `chainOperations`, `stitchImages`, `createCollage`, `compressImage`, `extractPalette`  
+
+**Charts namespace:** `Charts` — sub-exports for chart internals (advanced use). See [Bar charts](/docs#bar-charts) and sibling chart pages.
+
+**Errors / canvas:** `getErrorMessage`, `getCanvasContext`  
+
+| Topic | Where to read |
+|-------|----------------|
+| Patterns on canvas | [Patterns](/docs#patterns) |
+| Extras / utilities | [Image utilities](/docs#image-utilities), [Image processing](/docs#image-processing) |
+
+---
+
+## All documentation pages by category
+
+Use `/docs#<filename>` where **filename** is the MDX basename (e.g. `video-processing` for `Video/video-processing.mdx`).
+
+### Getting started & reference
+
+| Page | Filename hash |
+|------|----------------|
+| [Getting Started](/docs#Getting-Started) | `Getting-Started` |
+| [ApexPainter overview](/docs#overview) | `overview` |
+| **This catalog** | `complete-api-catalog` |
+| [Changelog](/docs#Change-Log) | `Change-Log` |
+
+### Background
+
+| Page | Filename hash |
+|------|----------------|
+| [Solid backgrounds](/docs#solid-backgrounds) | `solid-backgrounds` |
+| [Gradient backgrounds](/docs#gradient-backgrounds) | `gradient-backgrounds` |
+| [Custom backgrounds](/docs#custom-backgrounds) | `custom-backgrounds` |
+| [Advanced background features](/docs#advanced-background-features) | `advanced-background-features` |
+
+### Image
+
+| Page | Filename hash |
+|------|----------------|
+| [Basic image operations](/docs#basic-image-operations) | `basic-image-operations` |
+| [Advanced image features](/docs#advanced-image-features) | `advanced-image-features` |
+| [Shapes](/docs#shapes) | `shapes` |
+| [Image filters](/docs#image-filters) | `image-filters` |
+| [Image effects](/docs#image-effects) | `image-effects` |
+| [Masking and clipping](/docs#image-masking-and-clipping) | `image-masking-and-clipping` |
+| [Image distortion](/docs#image-distortion) | `image-distortion` |
+| [Group transform](/docs#group-transform-operations) | `group-transform-operations` |
+
+### Text
+
+| Page | Filename hash |
+|------|----------------|
+| [Basic text](/docs#basic-text-operations) | `basic-text-operations` |
+| [Advanced text](/docs#advanced-text-features) | `advanced-text-features` |
+| [Text coloring](/docs#text-coloring) | `text-coloring` |
+| [Text effects](/docs#text-effects) | `text-effects` |
+| [Text decorations](/docs#text-decorations) | `text-decorations` |
+| [Font management](/docs#font-management) | `font-management` |
+| [Spacing and alignment](/docs#text-spacing-and-alignment) | `text-spacing-and-alignment` |
+| [Text on paths](/docs#text-on-paths) | `text-on-paths` |
+
+### Charts
+
+| Page | Filename hash |
+|------|----------------|
+| [Bar charts](/docs#bar-charts) | `bar-charts` |
+| [Horizontal bar charts](/docs#horizontal-bar-charts) | `horizontal-bar-charts` |
+| [Line charts](/docs#line-charts) | `line-charts` |
+| [Pie charts](/docs#pie-charts) | `pie-charts` |
+| [Comparison charts](/docs#comparison-charts) | `comparison-charts` |
+
+### Video
+
+| Page | Filename hash |
+|------|----------------|
+| [Video processing (`createVideo`)](/docs#video-processing) | `video-processing` |
+| [Extracting frames](/docs#extracting-frames) | `extracting-frames` |
+| [Getting video info](/docs#getting-video-info) | `getting-video-info` |
+| [Video backgrounds](/docs#video-backgrounds) | `video-backgrounds` |
+| [FFmpeg installation](/docs#ffmpeg-installation) | `ffmpeg-installation` |
+
+### GIF, batch, patterns, files, extras
+
+| Page | Filename hash |
+|------|----------------|
+| [GIF and animation](/docs#gif-and-animation) | `gif-and-animation` |
+| [Batch operations](/docs#batch-operations) | `batch-operations` |
+| [Patterns](/docs#patterns) | `patterns` |
+| [File operations](/docs#file-operations) | `file-operations` |
+| [Image processing](/docs#image-processing) | `image-processing` |
+| [Image utilities](/docs#image-utilities) | `image-utilities` |
+
+### Custom lines
+
+| Page | Filename hash |
+|------|----------------|
+| [Basic custom lines](/docs#basic-custom-lines) | `basic-custom-lines` |
+| [Advanced custom lines](/docs#advanced-custom-lines) | `advanced-custom-lines` |
+
+### Advanced APIs
+
+| Page | Filename hash |
+|------|----------------|
+| [Pixel data API](/docs#pixel-data-api) | `pixel-data-api` |
+| [Text metrics API](/docs#text-metrics-api) | `text-metrics-api` |
+| [Path2D API](/docs#path2d-api) | `path2d-api` |
+| [Hit detection API](/docs#hit-detection-api) | `hit-detection-api` |
+
+---
+
+## Minimal end-to-end usage (correct imports)
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter(); // default PNG buffer output
+
+async function demo() {
+  const { buffer } = await painter.createCanvas({
+    width: 400,
+    height: 200,
+    colorBg: '#1e293b',
+  });
+
+  const withLabel = await painter.createText(
+    {
+      text: 'Apexify.js',
+      x: 40,
+      y: 110,
+      fontSize: 28,
+      color: '#e2e8f0',
+    },
+    buffer
+  );
+
+  fs.writeFileSync('demo.png', withLabel);
+}
+
+demo();
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+async function demo() {
+  const { buffer } = await painter.createCanvas({
+    width: 400,
+    height: 200,
+    colorBg: '#1e293b',
+  });
+
+  const withLabel = await painter.createText(
+    {
+      text: 'Apexify.js',
+      x: 40,
+      y: 110,
+      fontSize: 28,
+      color: '#e2e8f0',
+    },
+    buffer
+  );
+
+  fs.writeFileSync('demo.png', withLabel);
+}
+
+demo();
+```
+</js>
+</CodeSwitcher>
+
+## Related
+
+- [Getting Started](/docs#Getting-Started) — install, platforms, quick start  
+- [ApexPainter overview](/docs#overview) — constructor options and common patterns  
+- [Change Log](/docs#Change-Log) — version history  

@@ -5,6 +5,10 @@ export function formatGalleryRunError(err: unknown): string {
   if (err instanceof Error) {
     let m = err.message.replace(/\s+/g, ' ').trim();
     if (!m) return 'Run failed.';
+    if (/ffmpeg/i.test(m) && process.env.VERCEL) {
+      m +=
+        ' Vercel serverless does not include FFmpeg; MP4 (and some GIF paths) will not encode there. Run locally or use a host with FFmpeg on PATH.';
+    }
     if (m.length > MAX_MSG) m = `${m.slice(0, MAX_MSG - 3)}...`;
     return m;
   }

@@ -285,22 +285,24 @@ Extracting all frames from long or high-resolution videos can take significant t
 
 ## Create Video Canvas (Quick Method)
 
-The `createVideo()` method creates a canvas directly from a video frame (convenience method):
+The same **`createVideo()`** router used for trimming, merging, and **encoding from frames** also exposes **single-frame extraction** via the **`extractFrame`** option. Open **[Comprehensive Video Processing](/docs#video-processing)** and use the on-page outline: **Create video from frames** (frame → MP4/WebM) and **2. Extract Single Frame** (video → PNG buffer).
 
 <CodeSwitcher>
 <ts>
 ```typescript
-// Create canvas from video frame
+// One frame → PNG buffer + dimensions (nested extractFrame options)
 const canvas = await painter.createVideo({
   source: './video.mp4',
-  time: 5.5,               // Time in seconds
-  width: 1920,             // Canvas width (default: video width)
-  height: 1080,            // Canvas height (default: video height)
-  outputFormat: 'png',     // Frame extraction format
-  quality: 2               // JPEG quality (only for JPEG)
+  extractFrame: {
+    time: 5.5,               // Time in seconds (or use frame: n)
+    width: 1920,             // Canvas width (default: video width)
+    height: 1080,            // Canvas height (default: video height)
+    outputFormat: 'png',     // 'jpg' | 'png'
+    quality: 2               // JPEG quality 1–31 (lower = better)
+  }
 });
 
-// canvas.buffer contains the frame as a PNG buffer
+// { buffer, canvas: { width, height } }
 fs.writeFileSync('video-frame.png', canvas.buffer);
 console.log(`Canvas size: ${canvas.canvas.width}x${canvas.canvas.height}`);
 ```
@@ -308,17 +310,17 @@ console.log(`Canvas size: ${canvas.canvas.width}x${canvas.canvas.height}`);
 <js>
 ```javascript
 async function createVideoCanvas() {
-  // Create canvas from video frame
   const canvas = await painter.createVideo({
     source: './video.mp4',
-    time: 5.5,               // Time in seconds
-    width: 1920,             // Canvas width (default: video width)
-    height: 1080,            // Canvas height (default: video height)
-    outputFormat: 'png',     // Frame extraction format
-    quality: 2               // JPEG quality (only for JPEG)
+    extractFrame: {
+      time: 5.5,
+      width: 1920,
+      height: 1080,
+      outputFormat: 'png',
+      quality: 2
+    }
   });
 
-  // canvas.buffer contains the frame as a PNG buffer
   fs.writeFileSync('video-frame.png', canvas.buffer);
   console.log(`Canvas size: ${canvas.canvas.width}x${canvas.canvas.height}`);
 }

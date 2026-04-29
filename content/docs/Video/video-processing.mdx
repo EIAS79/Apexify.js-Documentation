@@ -10,7 +10,7 @@ All video processing features require FFmpeg to be installed on your system. See
 
 The `createVideo()` method is a comprehensive video processing API that supports:
 
-- **Frame Extraction**: Extract single frames, multiple frames, or all frames, and create videos from frames
+- **Frame extraction & assembly**: Extract single/multiple/all frames from video, and **[encode a new video from image frames](#create-video-from-frames)** (`createFromFrames` — canvas/PNG sequences → MP4/WebM/etc.)
 - **Video Information**: Get detailed video metadata and format detection
 - **Format Conversion**: Convert between video formats with platform-optimized presets
 - **Video Editing**: Trim, crop, rotate, merge, and replace video segments
@@ -41,7 +41,152 @@ const result = await painter.createVideo({
 </js>
 </CodeSwitcher>
 
+## Create video from frames
+
+In Apexify’s source, `VideoCreator.createVideo()` is a **router**: it checks which **single** operation object you passed (`getInfo`, `extractFrame`, `createFromFrames`, …) and delegates to the matching helper. The **encode from frames** path calls `ApexPainter`’s private `#createVideoFromFrames`: it writes each supplied image to a numbered PNG sequence under `.temp-frames`, runs **FFmpeg** with the **image2** pattern (`frame-%06d.png`), applies optional scale/pad, then deletes the temp tree. **FFmpeg must be available** (for example `ffmpeg` on `PATH`, or a bundled static binary whose directory is prepended to `PATH`).
+
+### Why this was easy to miss in the docs
+
+The same page documents **many** `createVideo` branches in numbered order. **`createFromFrames` appears as [§31](#31-create-video-from-frames)** in the reference list below. This section pulls it up so **frame → video** workflows (animations, motion graphics, sandboxes) are discoverable without scrolling past thirty other features.
+
+### Why `source` is still required
+
+TypeScript’s `VideoCreationOptions` always includes **`source: string | Buffer`** because every `createVideo` branch shares one options object. **When your only operation is `createFromFrames`, Apexify does not read or decode `source` for the encode** — only `createFromFrames` is used. You still need a value for the type checker and runtime validation. Common choices: any small existing file (many projects use `package.json`), a known-safe path helper in locked-down sandboxes, or a real video path if you already have one in scope.
+
+### `createFromFrames` fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `frames` | `(string \| Buffer)[]` | Ordered frames. Each item may be a **PNG/JPEG `Buffer`**, or a **local filesystem path** to an image (relative paths are resolved under `process.cwd()` like other file-based video APIs). |
+| `outputPath` | `string` | Output file path FFmpeg writes (e.g. `./out.mp4`). |
+| `fps` | `number` (optional) | Output frame rate; default **30**. |
+| `format` | `'mp4' \| 'webm' \| 'avi' \| 'mov' \| 'mkv'` (optional) | Container format; default **`mp4`**. |
+| `quality` | `'low' \| 'medium' \| 'high' \| 'ultra'` (optional) | Quality preset mapped to FFmpeg `-crf`; default **`medium`**. |
+| `bitrate` | `number` (optional) | Video bitrate in **kbps** (`-b:v …k`). When set, it **overrides** the `quality` preset. |
+| `resolution` | `{ width, height }` (optional) | Target size. If omitted, dimensions come from the **first frame** (via `loadImage`, with an `ffprobe` fallback in Apexify when needed). If set, frames are **scaled and letterboxed** to that size. |
+
+### Return value
+
+Resolves to **`{ outputPath, success: true }`**. Read the file from disk (`fs.readFileSync`, streams, etc.) like any other export.
+
+### Example (same shape as gallery “Spin wheel — MP4”)
+
+Build frames with normal Apexify canvas APIs, push each PNG buffer into an array, then encode:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import fs from 'fs';
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+const W = 420;
+const H = 420;
+
+// …your loop: const framePng = await painter.createImage(...); frames.push(framePng);
+
+const frames: Buffer[] = []; // fill with PNG buffers from createImage / createText / charts
+
+const outputPath = './spin-wheel.mp4';
+
+await painter.createVideo({
+  // Dummy path — not read for createFromFrames-only calls; use any existing small file.
+  source: './package.json',
+  createFromFrames: {
+    frames,
+    outputPath,
+    fps: 24,
+    format: 'mp4',
+    quality: 'medium',
+    resolution: { width: W, height: H },
+  },
+});
+
+const mp4 = fs.readFileSync(outputPath);
+// mp4 is a Buffer suitable for writeFile, HTTP response, etc.
+```
+</ts>
+<js>
+```javascript
+const fs = require('fs');
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+const W = 420;
+const H = 420;
+
+const frames = []; // fill with PNG buffers
+
+const outputPath = './spin-wheel.mp4';
+
+await painter.createVideo({
+  source: './package.json',
+  createFromFrames: {
+    frames,
+    outputPath,
+    fps: 24,
+    format: 'mp4',
+    quality: 'medium',
+    resolution: { width: W, height: H },
+  },
+});
+
+const mp4 = fs.readFileSync(outputPath);
+```
+</js>
+</CodeSwitcher>
+
+### Related APIs
+
+- **GIF output** from frames: use **`createGIF`** (or related GIF options), not `createFromFrames`.
+- **Splicing frames into an existing timeline**: see **`replaceSegment`** with **`replacementFrames`** in [§32](#32-replace-video-segments).
+
+The numbered walkthrough below includes the same `createFromFrames` example for consistency.
+
 ## Video Features
+
+Each call to `createVideo` should specify **`source`** plus **exactly one** of the operation keys below (unless the docs note combinations such as `onProgress` on the same object). Use this table to jump to the section that documents that key.
+
+| Operation key | Topic | § |
+|---------------|--------|---|
+| `getInfo` | Video metadata | [1](#1-get-video-information) |
+| `extractFrame` | Single frame → canvas buffer | [2](#2-extract-single-frame) |
+| `extractFrames` | Many frames by time or interval | [3](#3-extract-multiple-frames) |
+| `extractAllFrames` | Export every frame | [4](#4-extract-all-frames) |
+| `generateThumbnail` | Grid / multi-thumb | [5](#5-generate-video-thumbnail) |
+| `convert` | Container / codec conversion | [6](#6-convert-video-format) |
+| `trim` | Cut time range | [7](#7-trim-cut-video) |
+| `extractAudio` | Audio track to file | [8](#8-extract-audio-from-video) |
+| `addWatermark` | Image watermark | [9](#9-add-watermark-to-video) |
+| `changeSpeed` | Speed multiplier | [10](#10-adjust-video-speed) |
+| `generatePreview` | Preview frame strip | [11](#11-generate-video-preview) |
+| `applyEffects` | FFmpeg-style filters | [12](#12-apply-video-effects-filters) |
+| `merge` | Concat / grid / side-by-side | [13](#13-merge-concatenate-videos) |
+| `rotate` | Rotate / flip | [14](#14-rotate-flip-video) |
+| `crop` | Pixel crop | [15](#15-crop-video) |
+| `compress` | Size / bitrate targets | [16](#16-compress-optimize-video) |
+| `addText` | Static text overlay | [17](#17-add-text-overlay) |
+| `addFade` | Fade in/out | [18](#18-add-fade-effects) |
+| `reverse` | Reverse playback | [19](#19-reverse-video-playback) |
+| `createLoop` | Seamless loop | [20](#20-create-seamless-loop) |
+| `batch` | Many sources / ops | [21](#21-batch-process-videos) |
+| `detectScenes` | Scene detection | [22](#22-detect-scene-changes) |
+| `stabilize` | Stabilization | [23](#23-stabilize-video) |
+| `colorCorrect` | Color wheels / sliders | [24](#24-color-correction) |
+| `pictureInPicture` | PiP overlay | [25](#25-picture-in-picture) |
+| `splitScreen` | Split layouts | [26](#26-split-screen) |
+| `createTimeLapse` | Time-lapse | [27](#27-create-time-lapse) |
+| `mute` | Strip or gate audio | [28](#28-mute-video-full-or-partial) |
+| `adjustVolume` | Gain change | [29](#29-adjust-audio-volume) |
+| `detectFormat` | Codec / container probe | [30](#30-detect-video-format-and-codec) |
+| `createFromFrames` | **Images → new video** | [Above](#create-video-from-frames) · [31](#31-create-video-from-frames) |
+| `replaceSegment` | Patch timeline | [32](#32-replace-video-segments) |
+| `freezeFrame` | Hold one frame | [33](#33-freeze-frame) |
+| `exportPreset` | Social / resolution presets | [34](#34-export-presets) |
+| `normalizeAudio` | Loudness normalize | [35](#35-audio-normalization) |
+| `applyLUT` | LUT file | [36](#36-apply-lut-look-up-table) |
+| `addTransition` | Transitions between clips | [37](#37-video-transitions) |
+| `addAnimatedText` | Motion typography | [38](#38-animated-text) |
 
 ### 1. Get Video Information
 
@@ -1237,7 +1382,9 @@ console.log('Duration:', formatInfo.duration);
 
 ### 31. Create Video from Frames
 
-Compile frames/images into a video (perfect for frame-by-frame editing workflows):
+Full narrative (dummy `source`, FFmpeg behavior, return value) lives in **[Create video from frames](#create-video-from-frames)** above. This subsection is the numbered reference.
+
+Compile frames/images into a video (frame-by-frame animation, motion graphics, or “render queue” exports):
 
 <CodeSwitcher>
 <ts>
@@ -1246,19 +1393,23 @@ Compile frames/images into a video (perfect for frame-by-frame editing workflows
 const editedFrames = [buffer1, buffer2, buffer3, ...]; // Buffers from createImage/createText
 
 const result = await painter.createVideo({
-  source: './input.mp4', // Source required but not used
+  // Required by the shared options type; not decoded for a createFromFrames-only call.
+  source: './package.json',
   createFromFrames: {
-    frames: editedFrames, // Array of Buffers or file paths
+    frames: editedFrames, // Array of Buffers or image file paths
     outputPath: './output.mp4',
     fps: 30,              // Frames per second (default: 30)
     format: 'mp4',        // 'mp4' | 'webm' | 'avi' | 'mov' | 'mkv' (default: 'mp4')
     quality: 'high',      // 'low' | 'medium' | 'high' | 'ultra' (default: 'medium')
+    // bitrate: 8000,    // optional kbps; overrides quality when set
     resolution: {         // Optional: auto-detected from first frame if not specified
       width: 1920,
       height: 1080
     }
   }
 });
+
+// result: { outputPath: './output.mp4', success: true }
 ```
 </ts>
 <js>
@@ -1267,14 +1418,14 @@ const result = await painter.createVideo({
 const editedFrames = [buffer1, buffer2, buffer3, ...]; // Buffers from createImage/createText
 
 const result = await painter.createVideo({
-  source: './input.mp4', // Source required but not used
+  source: './package.json',
   createFromFrames: {
-    frames: editedFrames, // Array of Buffers or file paths
+    frames: editedFrames,
     outputPath: './output.mp4',
-    fps: 30,              // Frames per second (default: 30)
-    format: 'mp4',        // 'mp4' | 'webm' | 'avi' | 'mov' | 'mkv' (default: 'mp4')
-    quality: 'high',      // 'low' | 'medium' | 'high' | 'ultra' (default: 'medium')
-    resolution: {         // Optional: auto-detected from first frame if not specified
+    fps: 30,
+    format: 'mp4',
+    quality: 'high',
+    resolution: {
       width: 1920,
       height: 1080
     }

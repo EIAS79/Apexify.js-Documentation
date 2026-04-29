@@ -12,6 +12,10 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   experimental: {
     serverComponentsExternalPackages: ['apexify.js', '@napi-rs/canvas', 'esbuild'],
+    /** Ship ffmpeg-static binary with gallery API lambdas (apexify shells out to `ffmpeg`). */
+    outputFileTracingIncludes: {
+      '/api/gallery/**': ['./node_modules/ffmpeg-static/**/*'],
+    },
   },
   webpack: (config, { dev, isServer }) => {
     // Windows dev: filesystem cache can reference stale numbered chunks (e.g. ./276.js MODULE_NOT_FOUND).
@@ -32,7 +36,8 @@ const nextConfig = {
       config.externals.push(
         { 'apexify.js': 'commonjs apexify.js' },
         { '@napi-rs/canvas': 'commonjs @napi-rs/canvas' },
-        { esbuild: 'commonjs esbuild' }
+        { esbuild: 'commonjs esbuild' },
+        { 'ffmpeg-static': 'commonjs ffmpeg-static' }
       );
     }
     return config;

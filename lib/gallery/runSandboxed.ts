@@ -3,6 +3,7 @@ import { randomInt as cryptoRandomInt } from 'crypto';
 import { transformSync } from 'esbuild';
 import { ApexPainter } from 'apexify.js';
 import { assertSafeCode } from './security';
+import { ensureBundledFfmpegOnPath } from './ensureBundledFfmpegOnPath';
 import { ensureGalleryFontsRegistered } from './registerGalleryFonts';
 import { galleryPackageJsonPath, galleryTmpPath, readGalleryTemp } from './sandboxTemp';
 import {
@@ -125,6 +126,7 @@ export function getGallerySandboxTimeoutMs(): number {
  * Transpile TS → JS (esbuild), strip imports/fs usage, validate, run in Node vm with only ApexPainter + safe builtins.
  */
 export async function runUserGalleryCode(code: string, language: 'ts' | 'js'): Promise<GalleryRunMedia> {
+  ensureBundledFfmpegOnPath();
   ensureGalleryFontsRegistered();
 
   let js = stripStaticImports(code);

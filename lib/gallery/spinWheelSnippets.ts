@@ -657,7 +657,7 @@ export const spinWheelGalleryItems: SpinWheelGalleryCard[] = [
     title: 'Spin wheel — MP4 video',
     category: 'videos',
     description:
-      'Same flow as `spin-wheel-video.ts`: PNG frames → `createVideo` + `createFromFrames` (FFmpeg). Temp MP4 is read via sandbox helpers and returned as `video/mp4`. **Requires `ffmpeg` on the server PATH.** Vercel and many serverless hosts do not include FFmpeg — use local/VPS/Docker, or skip MP4 on those platforms.',
+      'Same flow as `spin-wheel-video.ts`: PNG frames → `createVideo` + `createFromFrames` (FFmpeg). Temp MP4 is read via sandbox helpers and returned as `video/mp4`. **This site bundles `ffmpeg-static` for the gallery API** so `ffmpeg` is on PATH during Run; very large jobs may still hit serverless size/time limits. Other hosts without the bundle still need FFmpeg installed.',
     thumbnail: svgThumb('MP4 • Run plays in Output'),
     featured: true,
     code: {

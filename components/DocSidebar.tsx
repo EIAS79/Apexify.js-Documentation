@@ -177,6 +177,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
       'Custom': '✨',
       'Extras': '🎯',
       'Image': '🖼️',
+      'Reference': '📚',
       'Text': '📝',
       'Video': '🎬',
     };
