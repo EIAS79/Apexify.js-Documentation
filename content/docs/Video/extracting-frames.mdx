@@ -17,6 +17,8 @@ Video processing features require FFmpeg to be installed on your system. See the
 | `extractAllFrames()` | Extract every frame from the video | Complete frame extraction |
 | `createVideo()` | Create a canvas from a video frame | Quick canvas creation |
 
+**Paths:** Local video paths can be absolute or relative to the current working directory; absolute paths are not prefixed with `cwd` twice. **HTTP(S) sources** are downloaded to a temporary file under the frames output directory before processing (they are not written as raw URL strings).
+
 ## Extract Frame at Specific Time
 
 Extract a single frame at a specific time in seconds (most accurate method):

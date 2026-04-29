@@ -175,26 +175,24 @@ const result = await painter.createCustom({
 
 ### Chart Generation
 
+`createChart(chartType, data, options?)` is typed per chart kind. Chart options include `appearance` for canvas backgrounds aligned with `createCanvas` (`customBg`, `bgLayers`, gradients, patterns, noise). Use `createComparisonChart(options)` for two-panel layouts.
+
 <CodeSwitcher>
 <ts>
 ```typescript
-// Create charts
-const chart = await painter.createChart(chartData, {
-  chartType: 'bar',    // 'bar' | 'pie' | 'line'
-  chartNumber: 1
-});
-
+const bar = await painter.createChart('bar', barData, { type: 'standard' });
+const pie = await painter.createChart('pie', pieSlices, { dimensions: { width: 800, height: 600 } });
+const line = await painter.createChart('line', series, { appearance: { backgroundColor: '#fff' } });
+const dual = await painter.createComparisonChart({ layout: 'sideBySide', chart1: { ... }, chart2: { ... } });
 // Returns: Buffer
 ```
 </ts>
 <js>
 ```javascript
-// Create charts
-const chart = await painter.createChart(chartData, {
-  chartType: 'bar',    // 'bar' | 'pie' | 'line'
-  chartNumber: 1
-});
-
+const bar = await painter.createChart('bar', barData, { type: 'standard' });
+const pie = await painter.createChart('pie', pieSlices, { dimensions: { width: 800, height: 600 } });
+const line = await painter.createChart('line', series, { appearance: { backgroundColor: '#fff' } });
+const dual = await painter.createComparisonChart({ layout: 'sideBySide', chart1: { ... }, chart2: { ... } });
 // Returns: Buffer
 ```
 </js>
@@ -712,7 +710,8 @@ createCompleteComposition();
 - `createCustom()` - Draw custom lines with arrows and markers
 
 ### Charts
-- `createChart()` - Generate bar, pie, and line charts
+- `createChart()` — pie, bar, horizontalBar, or line (`chartType` first argument)
+- `createComparisonChart()` — two charts in one image (side-by-side or top-bottom)
 
 ### Image Processing
 - `resize()` - Resize images
@@ -735,21 +734,28 @@ createCompleteComposition();
 - `extractPalette()` - Extract color palettes
 - `blend()` - Blend multiple images
 
-### Advanced APIs (New in v5.2.5)
-- `measureText()` - Comprehensive text metrics API (Canvas API + extensions)
+### Advanced APIs (v5.2.5+)
+- `measureText()` - Comprehensive text metrics API (Canvas API + extensions); absolute font paths respected
 - `getPixelData()` / `setPixelData()` - Pixel-level manipulation
 - `manipulatePixels()` - Apply filters or custom pixel processors
 - `getPixelColor()` / `setPixelColor()` - Quick pixel color access
-- `createPath2D()` - Create Path2D objects from commands
-- `drawPath()` - Draw paths with advanced styling
+- `createPath2D()` / `drawPath()` - Path commands shared with hit-testing (`pathCmd`)
 - `isPointInPath()` - Point-in-path hit detection
-- `isPointInRegion()` / `isPointInAnyRegion()` - Region-based hit detection
+- `isPointInRegion()` / `isPointInAnyRegion()` - Region-based hit detection (path regions use the same command set as drawing)
 - `getDistanceToRegion()` - Calculate distance to region edges
 
+### Canvas config (v5.3+)
+- `bgLayers` - Stacked background overlays after the base fill
+- `stroke` / `shadow` on canvas - Full `StrokeOptions` / `ShadowOptions` (edge vs corner semantics for box strokes)
+
+### Layer compositing & charts (v5.3.1+)
+- `createImage()` - Optional **`blendMode`** per image/shape layer; grouped mode supports **`groupTransform.blendMode`**
+- Line charts - Tick colors respect **`axes.*.color`** / **`appearance.axisColor`**; improved axis title layout; optional appearance **`borderRadius`** / **`borderWidth`** / **`borderColor`** frame around the plot
+
 ### Animation
-- `createGIF()` - Create animated GIFs (with programmatic frame generation via `onStart` callback)
+- `createGIF()` - Create animated GIFs (typed frames, programmatic **`onStart`** with optional async iteration, per-frame disposal/transparency/watermark)
 - `animate()` - Create frame-based animations
-- `createVideo()` - Comprehensive video processing (25+ features)
+- `createVideo()` - Comprehensive video processing (35+ features), including **`createFromFrames`** (image sequence → MP4/WebM via FFmpeg)
 - `getVideoInfo()` - Get video metadata
 - `extractFrameAtTime()` - Extract frame at specific time
 - `extractFrameByNumber()` - Extract frame by frame number

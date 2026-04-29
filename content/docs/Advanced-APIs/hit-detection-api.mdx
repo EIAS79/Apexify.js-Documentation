@@ -11,6 +11,8 @@ The Hit Detection API includes:
 - **`isPointInAnyRegion()`** - Check if a point is inside any of multiple regions
 - **`getDistanceToRegion()`** - Calculate distance from a point to a region
 
+Regions of type `path` use **`buildPath2DFromCommands`** with the **same command vocabulary** as `createPath2D()` (rounded rect, star, arrow, etc.), so hit targets match what you draw.
+
 ## Point-in-Path Detection
 
 Check if a point is inside a Path2D object:
@@ -707,5 +709,7 @@ collisionDetection();
 - [Text Metrics API](/docs#text-metrics-api) - Text measurement and positioning
 - [Pixel Data API](/docs#pixel-data-api) - Pixel-level manipulation
 - [Shapes](/docs#shapes) - Built-in shape types
+
+
 
 

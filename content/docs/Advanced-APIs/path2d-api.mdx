@@ -10,6 +10,8 @@ The Path2D API includes:
 - **`drawPath()`** - Draw paths with advanced styling (stroke, fill, transforms)
 - **Command Set** - Comprehensive path commands including standard Canvas commands and extended shape commands
 
+Path commands are implemented in one place (`pathCmd.ts`: `PathCommand`, `appendPathCommands`, `buildPath2DFromCommands`) so **Path2D drawing and hit-testing stay in sync**. Stroke and fill each apply `globalAlpha` **before** `stroke()` / `fill()`, and fill/stroke opacity default to **1** when omitted.
+
 ## Creating Paths
 
 Create paths using command arrays:
@@ -567,5 +569,7 @@ complexPathExample();
 - [Text Metrics API](/docs#text-metrics-api) - Text measurement and positioning
 - [Pixel Data API](/docs#pixel-data-api) - Pixel-level manipulation
 - [Shapes](/docs#shapes) - Built-in shape types
+
+
 
 

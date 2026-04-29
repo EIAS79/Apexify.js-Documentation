@@ -4,7 +4,9 @@ Apexify.js provides powerful comparison chart functionality that allows you to c
 
 ## Overview
 
-Comparison charts are created using the `createComparisonChart()` method. This feature enables you to create side-by-side or top-bottom layouts comparing different datasets or chart types, perfect for data analysis and presentation.
+Comparison charts are created with `ApexPainter.prototype.createComparisonChart(options)` (delegated to `ChartCreator.createComparisonChart`). They produce a single image with two panels laid out side-by-side or top-bottom. Each panel can be pie, bar, horizontalBar, line, or donut, with its own data and options.
+
+**Backgrounds:** The composite canvas uses `options.appearance` (`ChartAppearanceExtended`) for the outer frame — same fields as standalone charts (`customBg`, `bgLayers`, `patternBg`, `noiseBg`, etc.). Each panel can also set `chart1.options.appearance` / `chart2.options.appearance`; missing fields inherit from the top-level `appearance` (including axis styling defaults). Chart buffers are **scaled uniformly** into their cells (letterboxed; no non-uniform stretching).
 
 ## Supported Chart Combinations
 
@@ -188,22 +190,28 @@ const chart = await painter.createComparisonChart({
 </js>
 </CodeSwitcher>
 
-## Shared Background
+## Shared background (`appearance`)
+
+Top-level `appearance` paints the **full comparison canvas** (via `paintChartCanvasBackground`), using the same options as [bar charts](./bar-charts#chart-canvas-background-appearance): base fill (`customBg` or `backgroundImage` or gradient/color), then `bgLayers`, `patternBg`, `noiseBg`. Gradients use `colors: { stop: number; color: string }[]`.
+
+Panel-level `options.appearance` on `chart1` / `chart2` is **merged** with this: any field you omit on a panel inherits from the shared `appearance` (e.g. shared `bgLayers` or `axisColor`).
 
 <CodeSwitcher>
 <ts>
 ```typescript
 const chart = await painter.createComparisonChart({
   appearance: {
-    backgroundColor: '#ffffff',
-    // OR
+    // Base layer: use one of customBg | backgroundImage | backgroundGradient | backgroundColor
     backgroundGradient: {
       type: 'linear',
-      colors: ['#f0f0f0', '#e0e0e0'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
     },
-    // OR
-    backgroundImage: './bg.png'
+    bgLayers: [{ type: 'color', value: 'rgba(255,255,255,0.06)', opacity: 1 }],
+    axisColor: '#222222',
+    axisWidth: 2
   },
   chart1: { ... },
   chart2: { ... }
@@ -217,8 +225,10 @@ const chart = await painter.createComparisonChart({
     backgroundColor: '#ffffff',
     backgroundGradient: {
       type: 'linear',
-      colors: ['#f0f0f0', '#e0e0e0'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
     }
   },
   chart1: { ... },
@@ -733,6 +743,8 @@ createComparison();
 - [Bar Charts](./bar-charts) - Create vertical bar charts
 - [Horizontal Bar Charts](./horizontal-bar-charts) - Create horizontal bar charts
 - [Line Charts](./line-charts) - Create line charts
+
+
 
 
 

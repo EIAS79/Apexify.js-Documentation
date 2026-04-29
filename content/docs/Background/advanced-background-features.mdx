@@ -1,6 +1,27 @@
 # Advanced Background Features
 
-Beyond basic backgrounds, Apexify.js provides advanced features to enhance your canvas backgrounds including strokes, shadows, patterns, noise, zoom effects, rotation, border radius, opacity, blur, blend modes, and video backgrounds.
+Beyond basic backgrounds, Apexify.js provides advanced features to enhance your canvas backgrounds including strokes, shadows, patterns, noise, **stacked background layers (`bgLayers`)**, zoom effects, rotation, border radius, opacity, blur, blend modes, and video backgrounds.
+
+## Layered backgrounds (`bgLayers`)
+
+After the primary background pass (`colorBg`, `gradientBg`, `customBg`, `videoBg`, etc.), you can paint **additional layers** in order (bottom → top). Each layer is a small discriminated union: `color`, `gradient`, `image`, `pattern`, or `noise`. Use `opacity` and `blendMode` per layer for tints and compositing without changing the whole canvas blend mode.
+
+<CodeBlock lang="typescript">
+```typescript
+const layered = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#1a1a2e',
+  bgLayers: [
+    { type: 'gradient', value: { type: 'linear', colors: [{ stop: 0, color: 'rgba(255,255,255,0.08)' }, { stop: 1, color: 'transparent' }] }, opacity: 1 },
+    { type: 'noise', intensity: 0.04 },
+    { type: 'image', source: './watermark.png', fit: 'contain', align: 'bottom-right', opacity: 0.35 }
+  ]
+});
+```
+</CodeBlock>
+
+Chart `options.appearance` supports the same `bgLayers` field (see [Bar charts](../Charts/bar-charts#chart-canvas-background-appearance)). Layers are implemented with `drawBackgroundLayers()` in the background utilities.
 
 ## Border Radius
 
@@ -200,13 +221,16 @@ const advancedStroke = await painter.createCanvas({
     position: 0,           // 0 = center, positive = outside, negative = inside
     blur: 2,               // Blur the stroke
     opacity: 0.9,          // Stroke opacity
-    borderRadius: 20,      // Match canvas border radius
-    borderPosition: 'all',
+    borderRadius: 20,      // Radius on the stroke outline (per-corner via roundedCorners)
+    borderPosition: 'all', // Which **edges** get a stroke: 'all' | 'top' | 'left' | 'top-left' | comma list, …
+    roundedCorners: 'all', // Which corners use borderRadius on the stroke (same vocabulary as clip)
     style: 'solid'
   }
 });
 ```
 </CodeBlock>
+
+**Box strokes vs text:** `stroke` on the canvas frame is a **rounded-rectangle outline**. `borderPosition` controls **which sides** are drawn; `roundedCorners` controls **which corners** use `borderRadius` on that outline. Glyph-level text strokes (`strokeText`, enhanced renderer) are separate and unchanged.
 
 ## Canvas Shadow
 
@@ -270,8 +294,9 @@ const advancedShadow = await painter.createCanvas({
     offsetY: 20,           // Vertical offset
     blur: 30,              // Blur radius
     opacity: 0.8,          // Shadow opacity
-    borderRadius: 20,      // Match canvas border radius
-    borderPosition: 'all'
+    borderRadius: 20,      // Rounded shadow shape
+    roundedCorners: 'all', // Which corners use borderRadius on the shadow shape
+    borderPosition: 'all' // Legacy: corner mask; prefer roundedCorners when set
   }
 });
 ```

@@ -328,7 +328,7 @@ export default function Home() {
             }}
           >
             <StarIcon className="h-5 w-5 text-yellow-400 animate-pulse" />
-            <span className="text-sm text-blue-300 font-semibold">v5.2.9 - Now with 35+ Video Features</span>
+            <span className="text-sm text-blue-300 font-semibold">v5.3.12 — Blend modes, charts, GIF & frame-to-video</span>
             <SparklesIcon className="h-4 w-4 text-cyan-400 animate-pulse" />
           </div>
 
@@ -1042,7 +1042,7 @@ export default function Home() {
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full glass border border-blue-500/30">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                  v5.2.9
+                  v5.3.12
                 </span>
               </div>
             </div>

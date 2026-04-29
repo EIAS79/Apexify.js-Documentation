@@ -4,7 +4,9 @@ Apexify.js provides comprehensive pie chart generation with customizable slices,
 
 ## Overview
 
-Pie charts are created using the unified `createChart()` method with `chartType: 'pie'`. Each slice represents a portion of the whole, with automatic percentage calculation. Pie charts support gradients, custom fonts, enhanced text styling, and two types of legends.
+Pie charts are created using `ApexPainter.prototype.createChart()` with `chartType: 'pie'` (delegated to `ChartCreator`). Each slice represents a portion of the whole, with automatic percentage calculation. Pie charts support gradients, custom fonts, enhanced text styling, and two types of legends.
+
+**Canvas background:** Use `options.appearance` (`ChartAppearanceExtended`) — the same `paintChartCanvasBackground()` pipeline as other charts and `createCanvas`: base fill, optional `bgLayers`, `patternBg`, and `noiseBg`.
 
 ## Basic Usage
 
@@ -267,9 +269,11 @@ const data = [
     value: 45,
     gradient: {
       type: 'linear',
-      colors: ['#ff6b6b', '#ee5a6f'],
-      stops: [0, 1],
-      angle: 45
+      rotate: 45,
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#ee5a6f' }
+      ]
     }
   },
   {
@@ -277,8 +281,10 @@ const data = [
     value: 30,
     gradient: {
       type: 'radial',
-      colors: ['#4ecdc4', '#3bb3ac'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#4ecdc4' },
+        { stop: 1, color: '#3bb3ac' }
+      ]
     }
   },
   {
@@ -298,8 +304,10 @@ const donutChart = await painter.createChart('pie', data, {
   appearance: {
     backgroundGradient: {
       type: 'radial',
-      colors: ['#f8f9fa', '#e9ecef'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f8f9fa' },
+        { stop: 1, color: '#e9ecef' }
+      ]
     }
   },
   labels: {
@@ -308,8 +316,10 @@ const donutChart = await painter.createChart('pie', data, {
       fontSize: 26,
       gradient: {
         type: 'linear',
-        colors: ['#667eea', '#764ba2'],
-        stops: [0, 1]
+        colors: [
+          { stop: 0, color: '#667eea' },
+          { stop: 1, color: '#764ba2' }
+        ]
       },
       textStyle: {
         bold: true,
@@ -363,9 +373,11 @@ const data = [
     value: 45,
     gradient: {
       type: 'linear',
-      colors: ['#ff6b6b', '#ee5a6f'],
-      stops: [0, 1],
-      angle: 45
+      rotate: 45,
+      colors: [
+        { stop: 0, color: '#ff6b6b' },
+        { stop: 1, color: '#ee5a6f' }
+      ]
     }
   },
   {
@@ -373,8 +385,10 @@ const data = [
     value: 30,
     gradient: {
       type: 'radial',
-      colors: ['#4ecdc4', '#3bb3ac'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#4ecdc4' },
+        { stop: 1, color: '#3bb3ac' }
+      ]
     }
   },
   {
@@ -394,8 +408,10 @@ const donutChart = await painter.createChart('pie', data, {
   appearance: {
     backgroundGradient: {
       type: 'radial',
-      colors: ['#f8f9fa', '#e9ecef'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f8f9fa' },
+        { stop: 1, color: '#e9ecef' }
+      ]
     }
   },
   labels: {
@@ -404,8 +420,10 @@ const donutChart = await painter.createChart('pie', data, {
       fontSize: 26,
       gradient: {
         type: 'linear',
-        colors: ['#667eea', '#764ba2'],
-        stops: [0, 1]
+        colors: [
+          { stop: 0, color: '#667eea' },
+          { stop: 1, color: '#764ba2' }
+        ]
       },
       textStyle: {
         bold: true,
@@ -453,9 +471,11 @@ const donutChart = await painter.createChart('pie', data, {
 </js>
 </CodeSwitcher>
 
-## Background Styling
+## Chart canvas background (`appearance`)
 
-### Solid Background
+Backgrounds use `ChartAppearanceExtended` and the same paint order as `createCanvas`: if `customBg` is set it is used as the base; otherwise `backgroundImage`, otherwise `backgroundGradient` / `backgroundColor`. Then `bgLayers` (stacked overlays), then `patternBg`, then `noiseBg`. Optional `blur` applies when painting `customBg`.
+
+### Solid color
 
 <CodeSwitcher>
 <ts>
@@ -478,7 +498,9 @@ const chart = await painter.createChart('pie', data, {
 </js>
 </CodeSwitcher>
 
-### Gradient Background
+### Gradient
+
+Gradients use `colors: { stop: number; color: string }[]`. For a linear gradient, use `rotate` (degrees) for orientation.
 
 <CodeSwitcher>
 <ts>
@@ -487,9 +509,11 @@ const chart = await painter.createChart('pie', data, {
   appearance: {
     backgroundGradient: {
       type: 'linear',
-      colors: ['#667eea', '#764ba2'],
-      stops: [0, 1],
-      angle: 45
+      rotate: 45,
+      colors: [
+        { stop: 0, color: '#667eea' },
+        { stop: 1, color: '#764ba2' }
+      ]
     }
   }
 });
@@ -501,9 +525,11 @@ const chart = await painter.createChart('pie', data, {
   appearance: {
     backgroundGradient: {
       type: 'linear',
-      colors: ['#667eea', '#764ba2'],
-      stops: [0, 1],
-      angle: 45
+      rotate: 45,
+      colors: [
+        { stop: 0, color: '#667eea' },
+        { stop: 1, color: '#764ba2' }
+      ]
     }
   }
 });
@@ -511,14 +537,18 @@ const chart = await painter.createChart('pie', data, {
 </js>
 </CodeSwitcher>
 
-### Background Image
+### Image, `customBg`, and overlays
 
 <CodeSwitcher>
 <ts>
 ```typescript
 const chart = await painter.createChart('pie', data, {
   appearance: {
-    backgroundImage: './background.png'  // Path to image file
+    backgroundImage: './background.png',
+    // OR use customBg (same fields as createCanvas — fit, align, filters, opacity)
+    // customBg: { source: './bg.jpg', fit: 'cover', opacity: 0.85 },
+    bgLayers: [{ type: 'noise', intensity: 0.03 }],
+    patternBg: { type: 'dots', opacity: 0.1, size: 12 }
   }
 });
 ```
@@ -527,7 +557,7 @@ const chart = await painter.createChart('pie', data, {
 ```javascript
 const chart = await painter.createChart('pie', data, {
   appearance: {
-    backgroundImage: './background.png'  // Path to image file
+    backgroundImage: './background.png'
   }
 });
 ```

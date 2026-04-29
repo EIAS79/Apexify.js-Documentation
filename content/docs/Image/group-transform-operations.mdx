@@ -430,6 +430,8 @@ const grouped = await painter.createImage(elements, canvas.buffer, {
 </js>
 </CodeSwitcher>
 
+Group-level **`stroke`** and **`shadow`** use the same **`StrokeOptions`** / **`ShadowOptions`** as single images and canvas frames (v5.3+): use **`stroke.borderPosition`** for which **edges** are outlined and **`stroke.roundedCorners`** for which corners participate in the stroke outline; **`shadow.roundedCorners`** masks the shadow shape.
+
 ### Image Filters
 
 Apply filters to the entire group:

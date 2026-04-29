@@ -12,6 +12,8 @@ The `measureText()` method provides complete text metrics including:
 - **Multi-line support**: Line-by-line metrics when text wraps
 - **Character-level metrics**: Per-character width and position data
 
+Custom font registration respects **absolute** `fontPath` values (they are not joined with `process.cwd()`). If registration fails, a warning is logged.
+
 ## Basic Usage
 
 <CodeSwitcher>
@@ -547,5 +549,7 @@ example();
 - [Path2D API](/docs#path2d-api) - Complex path creation
 - [Hit Detection API](/docs#hit-detection-api) - Point-in-path detection
 - [Advanced Text Features](/docs#advanced-text-features) - Text styling and effects
+
+
 
 

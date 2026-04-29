@@ -4,7 +4,9 @@ Apexify.js provides powerful bar chart generation with support for multiple char
 
 ## Overview
 
-Bar charts are created using the unified `createChart()` method with `chartType: 'bar'`. Bar charts support 5 types: standard, grouped, stacked, waterfall, and lollipop. Charts are fully responsive with automatic width calculation.
+Bar charts are created using `ApexPainter.prototype.createChart()` with `chartType: 'bar'` (implemented in `ChartCreator`). Bar charts support five types: standard, grouped, stacked, waterfall, and lollipop. Charts are fully responsive with automatic width calculation.
+
+**Canvas background (5.3+):** Use `options.appearance` (`ChartAppearanceExtended`) for the same building blocks as `createCanvas`: a base fill (`customBg`, or `backgroundImage`, or `backgroundGradient` / `backgroundColor`), then optional stacked `bgLayers`, optional `patternBg` and `noiseBg`, and optional `blur` when using `customBg`. Axis defaults can come from `appearance.axisColor`, `appearance.axisWidth`, and `appearance.arrowSize` when not set on `axes`.
 
 ## Chart Types
 
@@ -346,22 +348,35 @@ const chart = await painter.createChart('bar', data, {
 </js>
 </CodeSwitcher>
 
-### Background
+### Chart canvas background (`appearance`)
+
+The chart modules call `paintChartCanvasBackground()` so backgrounds stay aligned with `CanvasConfig`. **Priority for the base layer:** if `customBg` is set, it wins; otherwise `backgroundImage`; otherwise `backgroundGradient` or `backgroundColor` (default `#FFFFFF`). After that, `bgLayers` are drawn in order, then `patternBg`, then `noiseBg`.
 
 <CodeSwitcher>
 <ts>
 ```typescript
 const chart = await painter.createChart('bar', data, {
   appearance: {
-    backgroundColor: '#ffffff',  // Solid color
+    backgroundColor: '#ffffff',
     // OR
-    backgroundGradient: {        // Gradient
+    backgroundGradient: {
       type: 'linear',
-      colors: ['#f0f0f0', '#e0e0e0'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
     },
     // OR
-    backgroundImage: './bg.png'  // Image
+    backgroundImage: './bg.png',
+    // Optional: same shape as createCanvas customBg (path/URL, fit, align, filters, opacity)
+    customBg: { source: './photo.jpg', fit: 'cover', align: 'center', opacity: 0.9 },
+    blur: 2,
+    // Stacked overlays after the base pass (color, gradient, image, pattern, or noise)
+    bgLayers: [
+      { type: 'color', value: 'rgba(100, 80, 200, 0.08)', opacity: 1 }
+    ],
+    patternBg: { type: 'dots', opacity: 0.12, size: 14 },
+    noiseBg: { intensity: 0.04 }
   }
 });
 ```
@@ -370,20 +385,21 @@ const chart = await painter.createChart('bar', data, {
 ```javascript
 const chart = await painter.createChart('bar', data, {
   appearance: {
-    backgroundColor: '#ffffff',  // Solid color
-    // OR
-    backgroundGradient: {        // Gradient
+    backgroundColor: '#ffffff',
+    backgroundGradient: {
       type: 'linear',
-      colors: ['#f0f0f0', '#e0e0e0'],
-      stops: [0, 1]
-    },
-    // OR
-    backgroundImage: './bg.png'  // Image
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
+    }
   }
 });
 ```
 </js>
 </CodeSwitcher>
+
+Gradients use `colors: { stop: number; color: string }[]` (linear, radial, or conic). For partial axis styling from `appearance`, see the axes sections below.
 
 ## Axes Configuration
 

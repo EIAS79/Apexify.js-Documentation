@@ -8,6 +8,8 @@ Font properties can be set using either:
 - **New Font Object** (recommended) - Organized `font` object with `size`, `family`, `name`, and `path`
 - **Legacy Properties** - Individual properties like `fontSize`, `fontFamily`, `fontName`, `fontPath` (still supported)
 
+If `path` / `fontPath` is an **absolute** file path, it is loaded as-is (not concatenated with the working directory).
+
 ## Font Object Structure
 
 The new font object provides a cleaner, more organized way to manage fonts:

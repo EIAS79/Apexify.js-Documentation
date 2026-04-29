@@ -84,8 +84,8 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
         )}
         
         {/* Code content with Prism syntax highlighting */}
-        <div className="relative bg-slate-950 transition-colors duration-200">
-          <div className="p-3 sm:p-4">
+        <div className="relative bg-slate-950 transition-colors duration-200 overflow-x-auto max-w-full">
+          <div className="p-3 sm:p-4 min-w-0">
           <SyntaxHighlighter
             language={normalizeLanguage(language)}
             style={vscDarkPlus}

@@ -70,6 +70,26 @@ Apexify.js works everywhere:
 ✅ **Docker** - Containerized applications  
 ✅ **Edge Runtime** - Vercel Edge, Cloudflare Workers (with limitations)
 
+## Latest API highlights (v5.3.x)
+
+Install `apexify.js@5.3.12` (or `^5.3.12`) to align with this documentation site.
+
+**5.3.0 foundations**
+
+- **`bgLayers`** — Stack color, gradient, image, pattern, or noise overlays after the main background on `createCanvas()`.
+- **Charts** — `options.appearance` uses the same background model as canvas (`customBg`, `bgLayers`, patterns, noise); comparison charts merge shared `appearance` into each panel.
+- **Box strokes & shadows** — `CanvasConfig.stroke` / `shadow` use full **`StrokeOptions`** / **`ShadowOptions`**: `stroke.borderPosition` selects **edges** to outline; `stroke.roundedCorners` selects **corners** that use the stroke radius (distinct from **text glyph** strokes).
+- **Paths & hit testing** — One **`pathCmd`** implementation backs Path2D and path regions in hit detection.
+
+**New in 5.3.1**
+
+- **`createImage`** — Optional **`blendMode`** per layer (`GlobalCompositeOperation`); grouped **`createImage`** supports **`groupTransform.blendMode`** for the whole pass.
+- **Line charts** — Tick label colors follow axis theme; better spacing for rotated Y-axis titles and bottom legend; optional **chart frame** (`borderRadius`, `borderWidth`, `borderColor`).
+- **GIF** — Typed **`GIFInputFrame`** / **`GIFEncodedFrame`**, streaming **`onStart`** (`AsyncIterable` frames), per-frame disposal / transparency / watermark, encoder helpers.
+- **Video** — **`createFromFrames`** builds MP4/WebM from a sequence of image paths or buffers (requires FFmpeg on the host).
+
+See [Changelog](./Change-Log) for the full list.
+
 ## Quick Start
 
 Here's a simple example to get you started:

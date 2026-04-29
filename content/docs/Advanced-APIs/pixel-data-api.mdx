@@ -12,6 +12,8 @@ The Pixel Data API includes:
 - **`getPixelColor()`** - Get pixel color at specific coordinates
 - **`setPixelColor()`** - Set pixel color at specific coordinates
 
+Built-in pixel filters (e.g. **sepia**, **grayscale**) follow the same color math as the rest of the pipeline; sepia uses consistent RGB channel mixing across the output.
+
 ## Getting Pixel Data
 
 Extract pixel data from any region of the canvas:
@@ -580,5 +582,7 @@ pixelManipulationExample();
 - [Path2D API](/docs#path2d-api) - Complex path creation
 - [Hit Detection API](/docs#hit-detection-api) - Point-in-path detection
 - [Image Effects](/docs#image-effects) - Image processing effects
+
+
 
 

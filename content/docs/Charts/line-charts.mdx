@@ -4,7 +4,9 @@ Apexify.js provides powerful line chart generation with support for multiple ser
 
 ## Overview
 
-Line charts are created using the unified `createChart()` method with `chartType: 'line'`. Support multiple lines/series, smooth curves (bezier, spline), filled areas, error bars, correlation/regression lines, and customizable markers.
+Line charts are created using `ApexPainter.prototype.createChart()` with `chartType: 'line'` (`ChartCreator`). They support multiple series, smooth curves (bezier, spline), filled areas, error bars, correlation/regression lines, and customizable markers.
+
+**Canvas background:** Use `options.appearance` (`ChartAppearanceExtended`) — same `paintChartCanvasBackground()` pipeline as other charts (`customBg`, `bgLayers`, `patternBg`, `noiseBg`, etc.). See [Bar charts — Chart canvas background](./bar-charts#chart-canvas-background-appearance).
 
 ## Basic Usage
 
@@ -450,22 +452,23 @@ const chart = await painter.createChart('line', data, {
 </js>
 </CodeSwitcher>
 
-### Background
+### Chart canvas background (`appearance`)
+
+Same `ChartAppearanceExtended` fields as bar charts. Gradients use `colors: { stop: number; color: string }[]`.
 
 <CodeSwitcher>
 <ts>
 ```typescript
 const chart = await painter.createChart('line', data, {
   appearance: {
-    backgroundColor: '#ffffff',
-    // OR
     backgroundGradient: {
       type: 'linear',
-      colors: ['#f0f0f0', '#e0e0e0'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
     },
-    // OR
-    backgroundImage: './bg.png'
+    bgLayers: [{ type: 'noise', intensity: 0.025 }]
   }
 });
 ```
@@ -477,8 +480,10 @@ const chart = await painter.createChart('line', data, {
     backgroundColor: '#ffffff',
     backgroundGradient: {
       type: 'linear',
-      colors: ['#f0f0f0', '#e0e0e0'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
     }
   }
 });

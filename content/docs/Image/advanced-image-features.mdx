@@ -752,6 +752,11 @@ const selective = await painter.createImage({
 </js>
 </CodeSwitcher>
 
+### Clipping vs box stroke (5.3+)
+
+- **`borderRadius` + `borderPosition` (on the image)** control the **clipped** shape: which corners of the bitmap are rounded.
+- **`stroke`** on the image is a **rounded-rectangle outline** around that box. Use **`stroke.borderPosition`** to stroke only certain **edges** (e.g. `'top'`, `'left'`, `'top-left'` for two edges). Use **`stroke.roundedCorners`** to choose which corners use **`stroke.borderRadius`** on the outline. This is separate from **glyph** strokes on text (`strokeText`).
+
 ## Combining All Features
 
 Combine multiple advanced features for stunning results:
@@ -984,14 +989,14 @@ createAdvanced();
 
 | Feature | Property | Description |
 |---------|----------|-------------|
-| **Shadow** | `shadow` | Add depth with color or gradient shadows |
-| **Stroke** | `stroke` | Outline with 6 styles (solid, dashed, dotted, groove, ridge, double) |
+| **Shadow** | `shadow` | Color or gradient shadows; `roundedCorners` masks the shadow shape (see `ShadowOptions`) |
+| **Stroke** | `stroke` | Box outline styles; `borderPosition` = which **edges**; `roundedCorners` = which corners use stroke radius |
 | **Box Background** | `boxBackground` | Add color or gradient behind image |
 | **Rotation** | `rotation` | Rotate image in degrees (0-360) |
 | **Opacity** | `opacity` | Control transparency (0-1) |
 | **Blur** | `blur` | Apply blur effect (pixels) |
-| **Border Radius** | `borderRadius` | Round corners (pixels or 'circular') |
-| **Border Position** | `borderPosition` | Select which corners to round |
+| **Border Radius** | `borderRadius` | Round the **image clip** (pixels or `'circular'`) |
+| **Border Position (clip)** | `borderPosition` | Which **corners** of the image box use `borderRadius` for clipping |
 
 ## Next Steps
 

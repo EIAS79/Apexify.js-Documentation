@@ -1,0 +1,153 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "blendMode": "source-over",
+  "gradientBg": {
+    "type": "linear",
+    "startX": 384,
+    "startY": 1080,
+    "endX": 1632,
+    "endY": 0,
+    "colors": [
+      {
+        "stop": 0,
+        "color": "#4a044e"
+      },
+      {
+        "stop": 0.35,
+        "color": "#9d174d"
+      },
+      {
+        "stop": 0.65,
+        "color": "#fbcfe8"
+      },
+      {
+        "stop": 1,
+        "color": "#fdf2f8"
+      }
+    ]
+  },
+  "bgLayers": [
+    {
+      "type": "gradient",
+      "opacity": 0.45,
+      "blendMode": "screen",
+      "value": {
+        "type": "radial",
+        "startX": 1248,
+        "startY": 378,
+        "startRadius": 0,
+        "endX": 1248,
+        "endY": 378,
+        "endRadius": 594,
+        "colors": [
+          {
+            "stop": 0,
+            "color": "rgba(253, 242, 248, 0.45)"
+          },
+          {
+            "stop": 0.5,
+            "color": "rgba(244, 114, 182, 0.15)"
+          },
+          {
+            "stop": 1,
+            "color": "rgba(76, 5, 25, 0)"
+          }
+        ]
+      }
+    },
+    {
+      "type": "gradient",
+      "opacity": 0.35,
+      "blendMode": "overlay",
+      "value": {
+        "type": "linear",
+        "startX": 0,
+        "startY": 540,
+        "endX": 1920,
+        "endY": 594,
+        "colors": [
+          {
+            "stop": 0,
+            "color": "rgba(131, 24, 67, 0.4)"
+          },
+          {
+            "stop": 0.5,
+            "color": "rgba(255, 255, 255, 0.08)"
+          },
+          {
+            "stop": 1,
+            "color": "rgba(76, 29, 149, 0.25)"
+          }
+        ]
+      }
+    },
+    {
+      "type": "image",
+      "source": "output/.demo-assets/hero-texture.png",
+      "opacity": 0.22,
+      "fit": "cover",
+      "blendMode": "soft-light"
+    },
+    {
+      "type": "pattern",
+      "source": "output/.demo-assets/hero-tile.png",
+      "repeat": "repeat",
+      "opacity": 0.06,
+      "blendMode": "multiply"
+    },
+    {
+      "type": "noise",
+      "intensity": 0.032,
+      "blendMode": "overlay"
+    }
+  ],
+  "patternBg": {
+    "type": "waves",
+    "color": "rgba(255, 255, 255, 0.2)",
+    "secondaryColor": "rgba(251, 207, 232, 0.15)",
+    "opacity": 0.28,
+    "size": 14,
+    "spacing": 8,
+    "rotation": 4,
+    "blendMode": "soft-light"
+  },
+  "noiseBg": {
+    "intensity": 0.02
+  },
+  "borderRadius": 48,
+  "shadow": {
+    "color": "rgba(76, 5, 49, 0.35)",
+    "offsetX": 0,
+    "offsetY": 32,
+    "blur": 68,
+    "opacity": 0.9,
+    "borderRadius": 48
+  },
+  "stroke": {
+    "width": 2,
+    "opacity": 0.85,
+    "borderRadius": 48,
+    "gradient": {
+      "type": "linear",
+      "startX": 0,
+      "startY": 1080,
+      "endX": 1920,
+      "endY": 0,
+      "colors": [
+        {
+          "stop": 0,
+          "color": "rgba(251, 207, 232, 0.9)"
+        },
+        {
+          "stop": 0.5,
+          "color": "rgba(244, 114, 182, 0.75)"
+        },
+        {
+          "stop": 1,
+          "color": "rgba(167, 139, 250, 0.7)"
+        }
+      ]
+    }
+  }
+}

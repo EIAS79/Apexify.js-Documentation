@@ -4,7 +4,7 @@ Custom image backgrounds allow you to use any image file (local or remote) as yo
 
 ## Overview
 
-The `customBg` property accepts an image source (local path or URL) and provides options for how the image should be fitted and displayed on the canvas.
+The `customBg` property accepts an image source (local path or URL) and provides options for how the image should be fitted and displayed on the canvas. It is painted in the **main** background pass. For stacked overlays after that (tints, extra images, grain), use `bgLayers` on `CanvasConfig` — see [Advanced background features — Layered backgrounds](./advanced-background-features#layered-backgrounds-bglayers).
 
 ## Basic Usage
 

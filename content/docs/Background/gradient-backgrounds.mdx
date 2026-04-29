@@ -4,7 +4,7 @@ Gradient backgrounds allow you to create smooth color transitions on your canvas
 
 ## Overview
 
-Gradients are defined using the `gradientBg` property with either a `linear` or `radial` type. Each gradient requires an array of color stops that define the transition.
+Gradients are defined using the `gradientBg` property with either a `linear` or `radial` type. Each gradient requires an array of color stops (`{ stop, color }`) that define the transition. Combine `gradientBg` (or `colorBg` / `customBg`) with **`bgLayers`** if you need extra stacked overlays — see [Layered backgrounds](./advanced-background-features#layered-backgrounds-bglayers).
 
 ## Linear Gradients
 

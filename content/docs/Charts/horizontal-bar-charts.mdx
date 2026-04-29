@@ -4,7 +4,9 @@ Apexify.js provides comprehensive horizontal bar chart generation with support f
 
 ## Overview
 
-Horizontal bar charts are created using the unified `createChart()` method with `chartType: 'horizontalBar'`. They support 4 types: standard, grouped, stacked, and lollipop. Charts are fully responsive with automatic height calculation.
+Horizontal bar charts are created using `ApexPainter.prototype.createChart()` with `chartType: 'horizontalBar'` (`ChartCreator`). They support four types: standard, grouped, stacked, and lollipop. Charts are fully responsive with automatic height calculation.
+
+**Canvas background:** Use `options.appearance` (`ChartAppearanceExtended`) — same pipeline as `createCanvas` via `paintChartCanvasBackground()` (base fill, optional `customBg`, `bgLayers`, `patternBg`, `noiseBg`, `blur` for `customBg`). See [Bar charts — Chart canvas background](./bar-charts#chart-canvas-background-appearance) for the full option list.
 
 ## Chart Types
 
@@ -299,22 +301,24 @@ const chart = await painter.createChart('horizontalBar', data, {
 </js>
 </CodeSwitcher>
 
-### Background
+### Chart canvas background (`appearance`)
+
+Same `ChartAppearanceExtended` behavior as bar charts: base layer (`customBg` | `backgroundImage` | gradient / solid), then `bgLayers`, `patternBg`, `noiseBg`. Gradients use `colors: { stop: number; color: string }[]`.
 
 <CodeSwitcher>
 <ts>
 ```typescript
 const chart = await painter.createChart('horizontalBar', data, {
   appearance: {
-    backgroundColor: '#ffffff',
-    // OR
     backgroundGradient: {
       type: 'linear',
-      colors: ['#f0f0f0', '#e0e0e0'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
     },
-    // OR
-    backgroundImage: './bg.png'
+    bgLayers: [{ type: 'color', value: 'rgba(0,0,0,0.04)', opacity: 1 }]
+    // Base: pick one of customBg | backgroundImage | gradient | solid — not all at once
   }
 });
 ```
@@ -326,8 +330,10 @@ const chart = await painter.createChart('horizontalBar', data, {
     backgroundColor: '#ffffff',
     backgroundGradient: {
       type: 'linear',
-      colors: ['#f0f0f0', '#e0e0e0'],
-      stops: [0, 1]
+      colors: [
+        { stop: 0, color: '#f0f0f0' },
+        { stop: 1, color: '#e0e0e0' }
+      ]
     }
   }
 });
@@ -827,6 +833,8 @@ createChart();
 - [Bar Charts](./bar-charts) - Create vertical bar charts
 - [Line Charts](./line-charts) - Create line charts
 - [Comparison Charts](./comparison-charts) - Compare two charts side by side
+
+
 
 
 
