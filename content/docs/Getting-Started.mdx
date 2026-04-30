@@ -317,7 +317,7 @@ Generate game assets and UI elements:
 ### 📝 Enhanced Text Rendering
 
 - **Font Management**: Custom fonts, sizes, families, and styles
-- **Text on Paths**: Render text along curves (line, arc, bezier, quadratic)
+- **Curved text (`textOnCurve`)**: Circular arc / “badge” bending (`sweepAngle`, `radius`, `up`); arbitrary Bézier/line path-following is DIY via [Path2D](/docs#path2d-api) + per-glyph `createText` (see [curved text guide](/docs#text-on-paths))
 - **Text Decorations**: Bold, italic, underline, overline, strikethrough, highlight
 - **Advanced Effects**: Glow, shadow, stroke with gradient support
 - **Spacing Control**: Letter spacing, word spacing, line height
@@ -390,7 +390,7 @@ Apexify.js includes a powerful video processing suite with **25+ professional vi
 - 🎛️ **Enhanced Filters**: Filter intensity and order control
 
 #### Text Features
-- 📐 **Text on Paths**: Render text along curves and custom paths
+- 📐 **Curved text (`textOnCurve`)**: Arc-based bending on `createText`; custom 2D paths via Path2D + layout patterns
 
 #### Custom Lines
 - ➡️ **Arrow Markers**: Start/end arrows with customizable styles

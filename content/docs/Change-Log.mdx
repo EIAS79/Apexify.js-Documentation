@@ -852,10 +852,8 @@ The showcase pins **`apexify.js@5.3.12`** on npm; entries below follow the packa
   - `filterOrder` - Control when filters are applied (`pre` or `post` transformation)
 
 ##### Text Enhancements
-- **Text on Paths**: Render text along curves and paths
-  - Support for line, arc, bezier, and quadratic curve paths
-  - Offset control for text distance from path
-  - Automatic text distribution along path
+- **`textOnCurve` (circular arc text)** — shipped in current `dist` (`EnhancedTextRenderer`): `sweepAngle`, optional `radius`, `up`; per-glyph stroke/shadow/glow; multi-line via `\n`. See docs: [Curved text](/docs#text-on-paths).
+- Earlier notes referred to a **`textOnPath` / `path:{type}`** API for line/bezier/quadratic sampling; that surface is **not** present in published **`apexify.js` 5.3.12** — use **`textOnCurve`** for arcs, or **Path2D** + manual glyph placement for general paths.
 
 ##### Custom Lines Enhancements
 - **Advanced Path Options**:

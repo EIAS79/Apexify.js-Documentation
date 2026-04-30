@@ -29,7 +29,7 @@ Each row links to the **primary** doc page for that API. Some methods appear in 
 |--------|----------------|-----------------|
 | **`createCanvas`** | New canvas: size, solid/gradient/custom/**video**/pattern/noise backgrounds, **`bgLayers`**, zoom, border, shadow, stroke. | [Solid backgrounds](/docs#solid-backgrounds), [Gradients](/docs#gradient-backgrounds), [Custom backgrounds](/docs#custom-backgrounds), [Advanced backgrounds](/docs#advanced-background-features), [Video backgrounds](/docs#video-backgrounds), [ApexPainter overview](/docs#overview) |
 | **`createImage`** | Draw images, **shapes**, filters, masks, shadows, strokes, **`isGrouped`** / **`groupTransform`**, **`blendMode`**. | [Basic image](/docs#basic-image-operations), [Advanced image](/docs#advanced-image-features), [Shapes](/docs#shapes), [Filters](/docs#image-filters), [Masking](/docs#image-masking-and-clipping), [Group transform](/docs#group-transform-operations) |
-| **`createText`** | Rich text: fonts, wrap, align, gradients, stroke, shadow, glow, decorations, **`textOnCurve`**. | [Basic text](/docs#basic-text-operations), [Advanced text](/docs#advanced-text-features), [Coloring](/docs#text-coloring), [Effects](/docs#text-effects), [Decorations](/docs#text-decorations), [Fonts](/docs#font-management), [Spacing](/docs#text-spacing-and-alignment), [Text on paths](/docs#text-on-paths) |
+| **`createText`** | Rich text: fonts, wrap, align, gradients, stroke, shadow, glow, decorations; **arc bending** via **`textOnCurve`** (`sweepAngle`, `radius`, `up`). | [Basic text](/docs#basic-text-operations), [Advanced text](/docs#advanced-text-features), [Coloring](/docs#text-coloring), [Effects](/docs#text-effects), [Decorations](/docs#text-decorations), [Fonts](/docs#font-management), [Spacing](/docs#text-spacing-and-alignment), [Curved text (`textOnCurve`)](/docs#text-on-paths) |
 | **`measureText`** | Layout metrics for the same props as `createText` (width/height/lines/optional per-char). | [Text metrics API](/docs#text-metrics-api) |
 | **`getPixelData`** / **`setPixelData`** | Read/write raw RGBA regions. | [Pixel data API](/docs#pixel-data-api) |
 | **`manipulatePixels`** | Per-pixel processor or built-in filters on a region. | [Pixel data API](/docs#pixel-data-api) |
@@ -152,7 +152,7 @@ Use `/docs#<filename>` where **filename** is the MDX basename (e.g. `video-proce
 | [Text decorations](/docs#text-decorations) | `text-decorations` |
 | [Font management](/docs#font-management) | `font-management` |
 | [Spacing and alignment](/docs#text-spacing-and-alignment) | `text-spacing-and-alignment` |
-| [Text on paths](/docs#text-on-paths) | `text-on-paths` |
+| [Curved text (`textOnCurve`)](/docs#text-on-paths) | `text-on-paths` |
 
 ### Charts
 
