@@ -1,11 +1,16 @@
 /**
- * Spin-wheel demos (from repo `index.ts` GIF + `spin-wheel-video.ts` MP4), adapted for the gallery sandbox:
- * no `fs`/`path`/`import` — uses injected helpers (`galleryTmpPath`, `readGalleryTemp`, `randomInt`, …).
- * Smaller canvas + fewer frames so Run finishes in reasonable time (still requires FFmpeg on the server).
+ * Spin-wheel demos — static source shown in the gallery. Run locally with Node + FFmpeg (MP4) / Apexify GIF encoder.
+ * Output paths match `public/gallery-outputs/{gifs,videos}/`.
  */
 
-/** Shared logic lives in these strings; JS duplicates TS (esbuild transpiles TS for Run TypeScript tab). */
-const SPIN_WHEEL_GIF_TS = `const painter = new ApexPainter();
+import type { GalleryCardBase } from './galleryTypes';
+
+export const SPIN_WHEEL_GIF_TS = `import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+import path from 'path';
+import { randomInt } from 'crypto';
+
+const painter = new ApexPainter();
 
 const W = 420;
 const H = 420;
@@ -311,10 +316,21 @@ async function main() {
   return gifBytes;
 }
 
-return await main();
+(async () => {
+  const result = await main();
+  const out = path.join(process.cwd(), 'public', 'gallery-outputs', 'gifs', 'spin-wheel.gif');
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  const buf = Buffer.isBuffer(result) ? result : Buffer.from(result as Uint8Array);
+  fs.writeFileSync(out, buf);
+})().catch(console.error);
 `;
 
-const SPIN_WHEEL_VIDEO_TS = `const painter = new ApexPainter();
+export const SPIN_WHEEL_VIDEO_TS = `import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+import path from 'path';
+import { randomInt } from 'crypto';
+
+const painter = new ApexPainter();
 
 const W = 420;
 const H = 420;
@@ -603,10 +619,11 @@ async function main() {
     frames.push(holdBuffer);
   }
 
-  const mp4Path = galleryTmpPath('mp4');
+  const mp4Path = path.join(process.cwd(), 'public', 'gallery-outputs', 'videos', 'spin-wheel.mp4');
+  fs.mkdirSync(path.dirname(mp4Path), { recursive: true });
 
   await painter.createVideo({
-    source: galleryPackageJsonPath(),
+    source: path.join(process.cwd(), 'package.json'),
     createFromFrames: {
       frames,
       outputPath: mp4Path,
@@ -616,25 +633,15 @@ async function main() {
       resolution: { width: W, height: H },
     },
   });
-
-  return readGalleryTemp(mp4Path);
 }
 
-return await main();
+(async () => {
+  await main();
+})().catch(console.error);
 `;
 
-const svgThumb = (label: string) =>
-  `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#312e81"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="50%" y="42%" fill="#e2e8f0" font-family="system-ui,sans-serif" font-size="22" text-anchor="middle">Spin wheel</text><text x="50%" y="58%" fill="#94a3b8" font-family="system-ui,sans-serif" font-size="15" text-anchor="middle">${label}</text></svg>`
-  )}`;
-
-export type SpinWheelGalleryCard = {
-  id: string;
-  title: string;
+export type SpinWheelGalleryCard = GalleryCardBase & {
   category: 'gifs' | 'videos';
-  description: string;
-  thumbnail: string;
-  featured?: boolean;
   code: { ts: string; js: string };
 };
 
@@ -644,8 +651,9 @@ export const spinWheelGalleryItems: SpinWheelGalleryCard[] = [
     title: 'Spin wheel — animated GIF',
     category: 'gifs',
     description:
-      'Same flow as `index.ts`: frames from ApexPainter, assembled with `createGIF` (`outputFormat: \'buffer\'`). Requires FFmpeg for palette steps used internally; Run returns a GIF blob shown in Output.',
-    thumbnail: svgThumb('GIF preview • Run for animated output'),
+      '**GIF export from painted frames.** Builds each frame with ApexPainter (wheel slices + motion), then **`createGIF`** with **`outputFormat`** set to buffer-friendly output.\n\n**Takeaway:** Offline render writes to `public/gallery-outputs/gifs/spin-wheel.gif`; palette quantization may lean on FFmpeg internally depending on your environment.',
+    thumbnail: '/gallery-outputs/gifs/spin-wheel.gif',
+    thumbnailMedia: 'gif',
     featured: true,
     code: {
       ts: SPIN_WHEEL_GIF_TS,
@@ -657,8 +665,9 @@ export const spinWheelGalleryItems: SpinWheelGalleryCard[] = [
     title: 'Spin wheel — MP4 video',
     category: 'videos',
     description:
-      'Same flow as `spin-wheel-video.ts`: PNG frames → `createVideo` + `createFromFrames` (FFmpeg). Temp MP4 is read via sandbox helpers and returned as `video/mp4`. **This site bundles `ffmpeg-static` for the gallery API** so `ffmpeg` is on PATH during Run; very large jobs may still hit serverless size/time limits. Other hosts without the bundle still need FFmpeg installed.',
-    thumbnail: svgThumb('MP4 • Run plays in Output'),
+      '**MP4 from sequential buffers.** Same spin artwork encoded with **`createVideo`** and **`createFromFrames`** so FFmpeg stitches timed frames without hand-exporting PNGs.\n\n**Takeaway:** Output lands at `public/gallery-outputs/videos/spin-wheel.mp4`; **`ffmpeg`** must be on `PATH` when you run the gallery build script locally.',
+    thumbnail: '/gallery-outputs/videos/spin-wheel.mp4',
+    thumbnailMedia: 'video',
     featured: true,
     code: {
       ts: SPIN_WHEEL_VIDEO_TS,

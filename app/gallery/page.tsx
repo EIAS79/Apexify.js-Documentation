@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 
-/** Client-only — keeps the heavy gallery + Monaco out of the Node/server webpack graph in dev. */
+/** Client-only — keeps the gallery bundle out of the server graph in dev. */
 const GalleryClient = dynamic(() => import('./GalleryClient'), {
   ssr: false,
   loading: () => (

@@ -11,11 +11,7 @@ const nextConfig = {
   reactStrictMode: true,
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   experimental: {
-    serverComponentsExternalPackages: ['apexify.js', '@napi-rs/canvas', 'esbuild'],
-    /** Ship ffmpeg-static binary with gallery API lambdas (apexify shells out to `ffmpeg`). */
-    outputFileTracingIncludes: {
-      '/api/gallery/**': ['./node_modules/ffmpeg-static/**/*'],
-    },
+    serverComponentsExternalPackages: ['apexify.js', '@napi-rs/canvas'],
   },
   webpack: (config, { dev, isServer }) => {
     // Windows dev: filesystem cache can reference stale numbered chunks (e.g. ./276.js MODULE_NOT_FOUND).
@@ -35,9 +31,7 @@ const nextConfig = {
       config.externals = config.externals || [];
       config.externals.push(
         { 'apexify.js': 'commonjs apexify.js' },
-        { '@napi-rs/canvas': 'commonjs @napi-rs/canvas' },
-        { esbuild: 'commonjs esbuild' },
-        { 'ffmpeg-static': 'commonjs ffmpeg-static' }
+        { '@napi-rs/canvas': 'commonjs @napi-rs/canvas' }
       );
     }
     return config;
