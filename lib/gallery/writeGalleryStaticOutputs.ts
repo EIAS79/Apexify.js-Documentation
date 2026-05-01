@@ -483,13 +483,13 @@ export async function writeGalleryStaticOutputs(): Promise<void> {
       width: 176,
       height: 176,
       shape: { fill: true, color: '#f472b6', radius: 88 },
-      stroke: { width: 3, color: '#fef08a', opacity: 1, borderRadius: 'circular' },
+      stroke: { width: 3, color: '#fef08a', opacity: 1, borderRadius: 'circular' as const },
       shadow: {
         color: 'rgba(244, 114, 182, 0.45)',
         offsetY: 18,
         blur: 36,
         opacity: 1,
-        borderRadius: 'circular',
+        borderRadius: 'circular' as const,
       },
     },
     {
