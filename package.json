@@ -20,6 +20,7 @@
     "@next/mdx": "^16.1.0",
     "@types/prismjs": "^1.26.5",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@vercel/speed-insights": "^1.1.0",
     "apexify.js": "^5.3.13",
     "next": "^14.2.0",
     "prismjs": "^1.30.0",
