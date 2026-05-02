@@ -8,6 +8,10 @@ Comparison charts are created with `ApexPainter.prototype.createComparisonChart(
 
 **Backgrounds:** The composite canvas uses `options.appearance` (`ChartAppearanceExtended`) for the outer frame — same fields as standalone charts (`customBg`, `bgLayers`, `patternBg`, `noiseBg`, etc.). Each panel can also set `chart1.options.appearance` / `chart2.options.appearance`; missing fields inherit from the top-level `appearance` (including axis styling defaults). Chart buffers are **scaled uniformly** into their cells (letterboxed; no non-uniform stretching).
 
+**Combo vs comparison:** [Combo charts](./combo-charts) draw **bars and lines in one coordinate system** (`createComboChart`). Comparison charts are **two independent charts** in one image — use them when you need different chart types or scales side by side, not overlay bars and lines.
+
+On dark **`appearance`** backgrounds, set **per-chart** axis **`labelColor`** / **`color`** and legend **`textColor`** / **`backgroundColor`** so ticks and legends stay readable (same guidance as [Bar charts — axes](./bar-charts#axes-configuration)).
+
 ## Supported Chart Combinations
 
 You can compare any combination of chart types:
@@ -743,6 +747,7 @@ createComparison();
 - [Bar Charts](./bar-charts) - Create vertical bar charts
 - [Horizontal Bar Charts](./horizontal-bar-charts) - Create horizontal bar charts
 - [Line Charts](./line-charts) - Create line charts
+- [Combo Charts](./combo-charts) - Bars + lines on one plot (`createComboChart`)
 
 
 

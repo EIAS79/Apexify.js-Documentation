@@ -8,6 +8,10 @@ Line charts are created using `ApexPainter.prototype.createChart()` with `chartT
 
 **Canvas background:** Use `options.appearance` (`ChartAppearanceExtended`) — same `paintChartCanvasBackground()` pipeline as other charts (`customBg`, `bgLayers`, `patternBg`, `noiseBg`, etc.). See [Bar charts — Chart canvas background](./bar-charts#chart-canvas-background-appearance).
 
+### Axis tick & title colors
+
+For **dark** canvases, set **`axes.x`** / **`axes.y`** **`color`** (ticks and spine) and **`labelColor`** explicitly — defaults assume a light plot area. Match **`appearance.axisColor`** when you want shared chrome styling. **Legends:** use **`legend.backgroundColor`**, **`textColor`**, **`borderColor`** (and **`position`** corner keys like `top-left`) so the panel is visible on your background.
+
 ## Basic Usage
 
 <CodeSwitcher>
@@ -909,4 +913,5 @@ createChart();
 - [Pie Charts](./pie-charts) - Create pie and donut charts
 - [Bar Charts](./bar-charts) - Create vertical bar charts
 - [Horizontal Bar Charts](./horizontal-bar-charts) - Create horizontal bar charts
+- [Combo Charts](./combo-charts) - Bars + lines with dual Y-axis (`createComboChart`)
 - [Comparison Charts](./comparison-charts) - Compare two charts side by side

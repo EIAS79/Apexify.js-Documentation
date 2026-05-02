@@ -12,6 +12,10 @@
 /.next/
 /out/
 
+# runtime temp (video/frame pipelines may recreate)
+.temp-frames/
+.gallery-build-temp/
+
 # production
 /build
 

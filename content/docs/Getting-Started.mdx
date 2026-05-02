@@ -77,7 +77,7 @@ Install `apexify.js@5.3.12` (or `^5.3.12`) to align with this documentation site
 **5.3.0 foundations**
 
 - **`bgLayers`** — Stack color, gradient, image, pattern, or noise overlays after the main background on `createCanvas()`.
-- **Charts** — `options.appearance` uses the same background model as canvas (`customBg`, `bgLayers`, patterns, noise); comparison charts merge shared `appearance` into each panel.
+- **Charts** — `options.appearance` uses the same background model as canvas (`customBg`, `bgLayers`, patterns, noise); comparison charts merge shared `appearance` into each panel. **`createComboChart`** overlays bars and lines on one X scale with **`barsType`** (`standard` | `grouped` | `stacked`) and optional **`yAxis: 'primary' | 'secondary'`** on line series — see [Combo charts](/docs#combo-charts).
 - **Box strokes & shadows** — `CanvasConfig.stroke` / `shadow` use full **`StrokeOptions`** / **`ShadowOptions`**: `stroke.borderPosition` selects **edges** to outline; `stroke.roundedCorners` selects **corners** that use the stroke radius (distinct from **text glyph** strokes).
 - **Paths & hit testing** — One **`pathCmd`** implementation backs Path2D and path regions in hit detection.
 

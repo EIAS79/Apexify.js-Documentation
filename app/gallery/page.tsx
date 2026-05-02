@@ -1,16 +1,9 @@
-import dynamic from 'next/dynamic';
+import GalleryClient from './components/GalleryClient';
 
-/** Client-only — keeps the gallery bundle out of the server graph in dev. */
-const GalleryClient = dynamic(() => import('./GalleryClient'), {
-  ssr: false,
-  loading: () => (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-3 text-gray-400">
-      <div className="h-8 w-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
-      <p>Loading gallery…</p>
-    </div>
-  ),
-});
-
+/**
+ * Static import avoids `next/dynamic` async chunks in dev. On Windows those chunks are often orphaned
+ * during HMR (`Cannot find module './276.js'`) even when webpack `splitChunks` is disabled.
+ */
 export default function GalleryPage() {
   return <GalleryClient />;
 }

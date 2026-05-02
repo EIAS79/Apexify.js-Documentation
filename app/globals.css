@@ -290,3 +290,35 @@ html {
   animation-delay: 2s;
 }
 
+/* Gallery sandbox: CodeMirror needs a bounded flex column so .cm-scroller scrolls */
+.gallery-snippet-editor-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.gallery-snippet-editor-root > div {
+  flex: 1 1 0%;
+  min-height: 0;
+  display: flex !important;
+  flex-direction: column;
+}
+
+.gallery-snippet-editor-root .cm-editor {
+  flex: 1 1 0%;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100%;
+  display: flex !important;
+  flex-direction: column;
+}
+
+.gallery-snippet-editor-root .cm-editor .cm-scroller {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace !important;
+}
+

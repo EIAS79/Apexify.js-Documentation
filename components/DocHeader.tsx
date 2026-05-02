@@ -169,12 +169,6 @@ export default function DocHeader({ }: DocHeaderProps) {
             >
               Home
             </Link>
-              <Link
-                href="/gallery"
-                className="text-base text-gray-300 hover:text-blue-400 transition-colors font-medium"
-              >
-                Gallery
-              </Link>
             <Link
               href="/docs"
               className="text-base text-gray-300 hover:text-blue-400 transition-colors font-medium"

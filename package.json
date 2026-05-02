@@ -10,36 +10,33 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "gallery:build": "tsx index.ts"
+    "lint": "next lint"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.5",
     "@heroicons/react": "^2.2.0",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^16.1.0",
-    "@types/prismjs": "^1.26.5",
     "@types/react-syntax-highlighter": "^15.5.13",
-    "apexify.js": "^5.3.13",
+    "@uiw/codemirror-extensions-basic-setup": "^4.25.9",
+    "@uiw/react-codemirror": "^4.25.9",
+    "@vercel/speed-insights": "^2.0.0",
+    "apexify.js": "^5.3.19",
     "next": "^14.2.0",
-    "prismjs": "^1.30.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.0",
     "rehype-raw": "^7.0.0",
-    "rehype-react": "^8.0.0",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
     "autoprefixer": "^10.4.17",
-    "patch-package": "^8.0.1",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
-    "tsx": "^4.20.6",
     "typescript": "^5.3.3"
   }
 }

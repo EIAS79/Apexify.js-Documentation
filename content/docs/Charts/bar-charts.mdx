@@ -403,6 +403,10 @@ Gradients use `colors: { stop: number; color: string }[]` (linear, radial, or co
 
 ## Axes Configuration
 
+### Readable ticks on dark backgrounds
+
+When **`appearance`** uses a dark gradient, solid fill, or pattern, **axis ink stays dark by default** unless you override it. Set **`axes.x.color`** / **`axes.y.color`** (tick marks and spine) and **`labelColor`** on each axis to **light** values so ticks and titles stay readable. **`appearance.axisColor`** also feeds defaults for chart chrome where applicable — align it with your tick colors for a coherent look.
+
 ### X-Axis
 
 <CodeSwitcher>
@@ -1005,4 +1009,5 @@ createChart();
 - [Pie Charts](./pie-charts) - Create pie and donut charts
 - [Horizontal Bar Charts](./horizontal-bar-charts) - Create horizontal bar charts
 - [Line Charts](./line-charts) - Create line charts
+- [Combo Charts](./combo-charts) - Bars + lines with dual Y-axis (`createComboChart`)
 - [Comparison Charts](./comparison-charts) - Compare two charts side by side

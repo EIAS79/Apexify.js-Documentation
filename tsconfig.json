@@ -23,7 +23,7 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "apexify.js", "index.ts", "spin-wheel-video.ts"]
+  "exclude": ["node_modules"]
 }
 
 

@@ -14,18 +14,19 @@ const nextConfig = {
     serverComponentsExternalPackages: ['apexify.js', '@napi-rs/canvas'],
   },
   webpack: (config, { dev, isServer }) => {
-    // Windows dev: filesystem cache can reference stale numbered chunks (e.g. ./276.js MODULE_NOT_FOUND).
+    // Windows dev: HMR + antivirus can delete numbered chunk files while webpack-runtime still references them
+    // (`Cannot find module './276.js'`). Disable chunk splitting in dev + avoid `next/dynamic` on /gallery for fewer async chunks.
     if (dev) {
       config.cache = false;
-    }
-    // Dev server bundles: disable async chunk splitting so runtime never does require("./276.js").
-    // (Otherwise HMR + antivirus can leave the manifest pointing at deleted chunk files.)
-    if (dev && isServer) {
       config.optimization = {
         ...config.optimization,
         splitChunks: false,
         runtimeChunk: false,
       };
+      // Fewer parallel builds → less chance of torn writes on Windows watchers (marginal; safe to remove if slow).
+      if (process.platform === 'win32') {
+        config.parallelism = Math.min(config.parallelism ?? 100, 4);
+      }
     }
     if (isServer) {
       config.externals = config.externals || [];
