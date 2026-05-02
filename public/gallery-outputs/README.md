@@ -1,6 +1,14 @@
 # Gallery previews (static assets)
 
-The gallery reads **paths only** — PNG / GIF / MP4 files committed here are served as static assets.
+The gallery reads **paths only** — generated PNG / GIF / MP4 files live here.
+
+Regenerate everything from the snippets:
+
+```bash
+npm run gallery:build
+```
+
+(requires Node + `apexify.js`; MP4 outputs need **FFmpeg** on `PATH`.)
 
 ## Expected paths
 
