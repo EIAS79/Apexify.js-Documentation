@@ -26,6 +26,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
+import { GallerySnippetEditor } from './GallerySnippetEditor';
 import { backgroundGalleryItems } from '@/lib/gallery/background/backgroundSnippets';
 import { spinWheelGalleryItems } from '@/lib/gallery/spin-wheel/spinWheelSnippets';
 import { extraMotionGalleryItems } from '@/lib/gallery/motion/motionSnippets';
@@ -55,6 +56,27 @@ function inferMediaKind(src: string, explicit?: GalleryMediaKind): GalleryMediaK
   if (/\.(mp4|webm|mov)(\?|#|$)/i.test(src)) return 'video';
   if (/\.gif(\?|#|$)/i.test(src)) return 'gif';
   return 'image';
+}
+
+async function decodeDataUrlForDraw(src: string): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      if (typeof img.decode === 'function') {
+        img.decode().then(() => resolve()).catch(() => resolve());
+      } else {
+        resolve();
+      }
+    };
+    img.onerror = () => reject(new Error('Preview image failed to decode'));
+    img.src = src;
+  });
+}
+
+function waitPaintTwice(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
 }
 
 const galleryItems: GalleryItem[] = [
@@ -431,7 +453,7 @@ export default function GalleryClient() {
       <section className="sticky top-16 z-30 border-b border-white/[0.06] bg-black/75 backdrop-blur-xl supports-[backdrop-filter]:bg-black/55">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col gap-2 sm:gap-3">
-            <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-center sm:justify-start">
+            <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-center sm:justify-end">
               <button
                 type="button"
                 onClick={() => setSelectedCategory('all')}
@@ -505,7 +527,7 @@ export default function GalleryClient() {
                 );
               })}
             </div>
-            <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-center w-full">
+            <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-center sm:justify-end w-full">
               {FILTER_ORDER_SECONDARY.map((key) => {
                 const config = categoryConfig[key];
                 const IconComponent = config.icon;
@@ -649,16 +671,34 @@ const codePaneTypography = {
 
 function GalleryIosCodeWindow({
   code,
+  onCodeChange,
+  editable,
   codeLang,
   hasTs,
   hasJs,
   onLangChange,
+  sandboxEligible,
+  runnerEnabled,
+  onRunSandbox,
+  onResetSandbox,
+  sandboxRunning,
+  runProgress,
+  drawMs,
 }: {
   code: string;
+  onCodeChange?: (next: string) => void;
+  editable: boolean;
   codeLang: 'ts' | 'js';
   hasTs: boolean;
   hasJs: boolean;
   onLangChange: (lang: 'ts' | 'js') => void;
+  sandboxEligible: boolean;
+  runnerEnabled: boolean;
+  onRunSandbox: () => void;
+  onResetSandbox: () => void;
+  sandboxRunning: boolean;
+  runProgress: number;
+  drawMs: number | null;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -673,6 +713,8 @@ function GalleryIosCodeWindow({
       window.setTimeout(() => setCopied(false), 2000);
     });
   };
+
+  const showSandboxBar = editable && sandboxEligible;
 
   return (
     <div
@@ -725,38 +767,86 @@ function GalleryIosCodeWindow({
         </button>
       </div>
 
-      <div className="flex-1 min-h-0 bg-[#0d1117] overflow-hidden overscroll-contain touch-pan-y flex flex-col">
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto [scrollbar-gutter:stable]">
-          <div className="p-3 sm:p-4 min-w-0">
-            <SyntaxHighlighter
-              language={prismLang}
-              style={vscDarkPlus}
-              customStyle={{
-                margin: 0,
-                padding: 0,
-                background: 'transparent',
-                fontSize: codePaneTypography.fontSize,
-                lineHeight: codePaneTypography.lineHeight,
-              }}
-              showLineNumbers
-              lineNumberStyle={{
-                color: 'rgba(235,235,245,0.22)',
-                paddingRight: '0.85rem',
-                minWidth: '2.35em',
-                userSelect: 'none',
-              }}
-              codeTagProps={{
-                style: {
-                  fontFamily: galleryMono,
-                  background: 'transparent',
-                },
-              }}
-              PreTag="div"
-            >
-              {code || ' '}
-            </SyntaxHighlighter>
-          </div>
+      {showSandboxBar && (
+        <div className="flex-shrink-0 flex flex-wrap items-center gap-2 px-3 py-2 bg-slate-900/95 border-b border-slate-700/90">
+          <button
+            type="button"
+            onClick={onRunSandbox}
+            disabled={!runnerEnabled || sandboxRunning || !code.trim()}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-700/90 px-3 py-1.5 text-[12px] font-semibold text-white hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-45"
+          >
+            <PlayIcon className="h-4 w-4 shrink-0" aria-hidden />
+            Run
+          </button>
+          <button
+            type="button"
+            onClick={onResetSandbox}
+            disabled={sandboxRunning}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-[12px] font-medium text-slate-200 hover:bg-slate-700 disabled:opacity-45"
+          >
+            <ArrowPathIcon className="h-4 w-4 shrink-0" aria-hidden />
+            Reset
+          </button>
+          {drawMs != null && (
+            <span className="text-[11px] text-slate-400 tabular-nums">
+              {drawMs} ms <span className="text-slate-600">to preview</span>
+            </span>
+          )}
+          {!runnerEnabled && (
+            <span className="text-[11px] text-amber-200/90">
+              Sandbox runner is off (set ENABLE_GALLERY_CODE_RUN in production, or use local dev).
+            </span>
+          )}
+          <span className="flex-1 min-w-[2rem]" />
+          {(sandboxRunning || runProgress > 0) && (
+            <div className="h-1.5 w-full sm:w-40 rounded-full bg-slate-800 overflow-hidden shrink-0">
+              <div
+                className="h-full rounded-full bg-emerald-500/90 transition-[width] duration-150 ease-out"
+                style={{ width: `${Math.min(100, runProgress)}%` }}
+              />
+            </div>
+          )}
         </div>
+      )}
+
+      <div className="flex-1 min-h-0 bg-[#0d1117] overflow-hidden overscroll-contain touch-pan-y flex flex-col">
+        {editable && onCodeChange ? (
+          <div className="flex-1 min-h-[220px] flex flex-col p-2 sm:p-3">
+            <GallerySnippetEditor value={code} codeLang={codeLang} onChange={onCodeChange} />
+          </div>
+        ) : (
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto [scrollbar-gutter:stable]">
+            <div className="p-3 sm:p-4 min-w-0">
+              <SyntaxHighlighter
+                language={prismLang}
+                style={vscDarkPlus}
+                customStyle={{
+                  margin: 0,
+                  padding: 0,
+                  background: 'transparent',
+                  fontSize: codePaneTypography.fontSize,
+                  lineHeight: codePaneTypography.lineHeight,
+                }}
+                showLineNumbers
+                lineNumberStyle={{
+                  color: 'rgba(235,235,245,0.22)',
+                  paddingRight: '0.85rem',
+                  minWidth: '2.35em',
+                  userSelect: 'none',
+                }}
+                codeTagProps={{
+                  style: {
+                    fontFamily: galleryMono,
+                    background: 'transparent',
+                  },
+                }}
+                PreTag="div"
+              >
+                {code || ' '}
+              </SyntaxHighlighter>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1046,7 +1136,17 @@ function ZoomableStillPreview({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-function ModalMediaPane({ item }: { item: GalleryItem }) {
+function ModalMediaPane({
+  item,
+  sandboxDataUrl,
+  sandboxError,
+  sandboxActive,
+}: {
+  item: GalleryItem;
+  sandboxDataUrl: string | null;
+  sandboxError: string | null;
+  sandboxActive: boolean;
+}) {
   const mediaKind = inferMediaKind(item.thumbnail, item.thumbnailMedia);
 
   if (mediaKind === 'video') {
@@ -1063,9 +1163,24 @@ function ModalMediaPane({ item }: { item: GalleryItem }) {
     );
   }
 
+  const previewSrc = sandboxActive && sandboxDataUrl ? sandboxDataUrl : item.thumbnail;
+
   return (
     <div className="flex flex-1 min-h-0 min-w-0 flex-col p-3 sm:p-4 lg:p-6 max-lg:min-h-[min(44vh,280px)]">
-      <ZoomableStillPreview src={item.thumbnail} alt={item.title} />
+      {sandboxActive && sandboxDataUrl && (
+        <p className="mb-3 shrink-0 rounded-xl border border-emerald-500/25 bg-emerald-950/35 px-3 py-2 text-[11px] font-medium leading-snug text-emerald-100/90">
+          Preview shows your last sandbox run (PNG/GIF buffer). Reset code clears this overlay.
+        </p>
+      )}
+      <ZoomableStillPreview src={previewSrc} alt={sandboxActive && sandboxDataUrl ? `${item.title} — sandbox output` : item.title} />
+      {sandboxError && sandboxActive && (
+        <div
+          role="alert"
+          className="mt-3 shrink-0 rounded-xl border border-red-500/35 bg-red-950/45 px-3 py-2.5 text-[12px] leading-relaxed text-red-100/95 whitespace-pre-wrap"
+        >
+          {sandboxError}
+        </div>
+      )}
     </div>
   );
 }
@@ -1077,9 +1192,42 @@ function GalleryModal({ item, onClose }: { item: GalleryItem; onClose: () => voi
   const hasCode = hasTs || hasJs;
 
   const modalMediaKind = inferMediaKind(item.thumbnail, item.thumbnailMedia);
+  const sandboxEligible = hasCode && modalMediaKind !== 'video';
 
   const [layoutMode, setLayoutMode] = useState<ModalLayoutMode>('split');
   const [codeLang, setCodeLang] = useState<'ts' | 'js'>('ts');
+  const [editedCode, setEditedCode] = useState('');
+  const [sandboxDataUrl, setSandboxDataUrl] = useState<string | null>(null);
+  const [sandboxError, setSandboxError] = useState<string | null>(null);
+  const [drawMs, setDrawMs] = useState<number | null>(null);
+  const [runProgress, setRunProgress] = useState(0);
+  const [sandboxRunning, setSandboxRunning] = useState(false);
+  const [runnerEnabled, setRunnerEnabled] = useState(false);
+  const sandboxProgressRafRef = useRef(0);
+
+  useEffect(() => {
+    return () => {
+      if (sandboxProgressRafRef.current) {
+        cancelAnimationFrame(sandboxProgressRafRef.current);
+        sandboxProgressRafRef.current = 0;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/gallery/run')
+      .then((r) => r.json())
+      .then((d: { enabled?: boolean }) => {
+        if (!cancelled) setRunnerEnabled(Boolean(d.enabled));
+      })
+      .catch(() => {
+        if (!cancelled) setRunnerEnabled(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     setLayoutMode(hasCode ? 'split' : 'media');
@@ -1090,6 +1238,95 @@ function GalleryModal({ item, onClose }: { item: GalleryItem; onClose: () => voi
   const showMedia = layoutMode !== 'code';
 
   const codeText = codeLang === 'ts' ? (item.code?.ts ?? '') : (item.code?.js ?? '');
+
+  useEffect(() => {
+    setEditedCode(codeText);
+    setSandboxDataUrl(null);
+    setSandboxError(null);
+    setDrawMs(null);
+    setRunProgress(0);
+  }, [item.id, codeLang, codeText]);
+
+  const resetSandbox = () => {
+    if (sandboxProgressRafRef.current) {
+      cancelAnimationFrame(sandboxProgressRafRef.current);
+      sandboxProgressRafRef.current = 0;
+    }
+    setEditedCode(codeText);
+    setSandboxDataUrl(null);
+    setSandboxError(null);
+    setDrawMs(null);
+    setRunProgress(0);
+  };
+
+  const stopSandboxProgressLoop = () => {
+    if (sandboxProgressRafRef.current) {
+      cancelAnimationFrame(sandboxProgressRafRef.current);
+      sandboxProgressRafRef.current = 0;
+    }
+  };
+
+  const startSandboxProgressLoop = () => {
+    const loop = () => {
+      setRunProgress((p) => (p >= 92 ? p : Math.min(p + (92 - p) * 0.06 + 0.35, 92)));
+      sandboxProgressRafRef.current = requestAnimationFrame(loop);
+    };
+    sandboxProgressRafRef.current = requestAnimationFrame(loop);
+  };
+
+  const runSandbox = async () => {
+    if (!sandboxEligible || !editedCode.trim() || sandboxRunning) return;
+    const tClick = performance.now();
+    stopSandboxProgressLoop();
+    setSandboxRunning(true);
+    setSandboxError(null);
+    setDrawMs(null);
+    setRunProgress(0);
+    startSandboxProgressLoop();
+
+    try {
+      const res = await fetch('/api/gallery/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: editedCode, lang: codeLang }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        mime?: string;
+        base64?: string;
+        error?: string;
+      };
+
+      stopSandboxProgressLoop();
+
+      if (!res.ok || !data.ok) {
+        setSandboxDataUrl(null);
+        setSandboxError(data.error ?? `Run failed (${res.status})`);
+        setDrawMs(null);
+        setRunProgress(0);
+        return;
+      }
+
+      setRunProgress(100);
+
+      const mime = data.mime ?? 'image/png';
+      const dataUrl = `data:${mime};base64,${data.base64 ?? ''}`;
+      await decodeDataUrlForDraw(dataUrl);
+      setSandboxDataUrl(dataUrl);
+      await waitPaintTwice();
+      setDrawMs(Math.round(performance.now() - tClick));
+      window.setTimeout(() => setRunProgress(0), 550);
+    } catch (e) {
+      stopSandboxProgressLoop();
+      setSandboxError(e instanceof Error ? e.message : 'Network error');
+      setSandboxDataUrl(null);
+      setDrawMs(null);
+      setRunProgress(0);
+    } finally {
+      stopSandboxProgressLoop();
+      setSandboxRunning(false);
+    }
+  };
 
   const codeShellClass = [
     'flex flex-col min-h-0 min-w-0 bg-slate-950',
@@ -1180,11 +1417,20 @@ function GalleryModal({ item, onClose }: { item: GalleryItem; onClose: () => voi
                       </div>
                     )}
                     <GalleryIosCodeWindow
-                      code={codeText}
+                      code={editedCode}
+                      onCodeChange={setEditedCode}
+                      editable={sandboxEligible}
                       codeLang={codeLang}
                       hasTs={hasTs}
                       hasJs={hasJs}
                       onLangChange={setCodeLang}
+                      sandboxEligible={sandboxEligible}
+                      runnerEnabled={runnerEnabled}
+                      onRunSandbox={runSandbox}
+                      onResetSandbox={resetSandbox}
+                      sandboxRunning={sandboxRunning}
+                      runProgress={runProgress}
+                      drawMs={drawMs}
                     />
                   </>
                 ) : (
@@ -1196,7 +1442,12 @@ function GalleryModal({ item, onClose }: { item: GalleryItem; onClose: () => voi
             </div>
 
             <div className={mediaShellClass}>
-              <ModalMediaPane item={item} />
+              <ModalMediaPane
+                item={item}
+                sandboxDataUrl={sandboxDataUrl}
+                sandboxError={sandboxError}
+                sandboxActive={sandboxEligible}
+              />
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { MagnifyingGlassIcon, Bars3Icon } from '@heroicons/react/24/outline';
 import SearchResults from './SearchResults';
@@ -19,6 +20,7 @@ interface SearchResult {
 }
 
 export default function DocHeader({ }: DocHeaderProps) {
+  const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -162,16 +164,38 @@ export default function DocHeader({ }: DocHeaderProps) {
               Apexify.js
             </span>
           </Link>
-          <nav className="hidden md:flex space-x-6">
+          <Link
+            href="/gallery"
+            className={`md:hidden ml-1 text-sm font-semibold whitespace-nowrap transition-colors ${
+              pathname === '/gallery' ? 'text-blue-400' : 'text-gray-300 hover:text-blue-400'
+            }`}
+          >
+            Gallery
+          </Link>
+          <nav className="hidden md:flex items-center space-x-6" aria-label="Primary">
             <Link
               href="/"
-              className="text-base text-gray-300 hover:text-blue-400 transition-colors font-medium"
+              className={`text-base transition-colors font-medium ${
+                pathname === '/' ? 'text-blue-400' : 'text-gray-300 hover:text-blue-400'
+              }`}
             >
               Home
             </Link>
             <Link
+              href="/gallery"
+              className={`text-base transition-colors font-medium ${
+                pathname === '/gallery' ? 'text-blue-400' : 'text-gray-300 hover:text-blue-400'
+              }`}
+            >
+              Gallery
+            </Link>
+            <Link
               href="/docs"
-              className="text-base text-gray-300 hover:text-blue-400 transition-colors font-medium"
+              className={`text-base transition-colors font-medium ${
+                pathname === '/docs' || pathname?.startsWith('/docs/')
+                  ? 'text-blue-400'
+                  : 'text-gray-300 hover:text-blue-400'
+              }`}
             >
               Docs
             </Link>
