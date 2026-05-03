@@ -21,6 +21,8 @@ const nextConfig = {
       '/app/api/gallery/run': [
         './node_modules/tsx/**/*',
         './node_modules/esbuild/**/*',
+        /** Native binary; optional dep — not under `esbuild/` so tracing misses it otherwise (Vercel = linux-x64). */
+        './node_modules/@esbuild/linux-x64/**/*',
         './node_modules/get-tsconfig/**/*',
         /** Peer of get-tsconfig; required at runtime by its CJS bundle — must be traced separately */
         './node_modules/resolve-pkg-maps/**/*',
