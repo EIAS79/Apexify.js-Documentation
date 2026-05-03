@@ -1,51 +1,98 @@
 # Charts: comparison & combo
 
+**Sources:** `lib/Canvas/utils/Charts/comparisonchart.ts`, `combochart.ts` · **`ChartCreator`** in `lib/Canvas/extended/ChartCreator.ts`.
+
+Single-chart tutorials live in [Charts complete guide](/docs#charts-complete-guide).
+
+---
+
 ## `createComparisonChart`
 
-Renders **two** charts on one canvas (**`ComparisonChartOptions`** in **`comparisonchart.ts`**).
+Renders **two independent charts** on **one** PNG. Each panel is scaled uniformly into its cell.
 
-- **`layout`**: **`sideBySide`** (default) or **`topBottom`**
-- **`chart1`**, **`chart2`**: **`ComparisonChartConfig`** — each has **`type`**, **`data`**, **`options`** (must match that chart family’s shapes)
-- **`ComparisonChartType`** includes **`donut`** — comparison maps that to **`PieChartOptions.type: 'donut'`**. **`createChart`** only accepts **`'pie'`**; pass **`options.type: 'donut'`** (and **`donutInnerRadius`**, etc.) for standalone donuts
-- **`appearance`** at root sets shared **`ChartAppearanceExtended`**; per-panel fields merge where omitted
-- Optional **`generalTitle`** and **`dimensions`** / **`spacing`**
+### `ComparisonChartOptions`
 
-Charts are **scaled uniformly** into each cell.
+| Field | Role |
+|-------|------|
+| **`layout`** | **`sideBySide`** (default) or **`topBottom`**. |
+| **`spacing`** | Gap between panels (pixels). |
+| **`dimensions`**, **`padding`** | Overall canvas size / outer inset. |
+| **`appearance`** | Shared **`ChartAppearanceExtended`** (see [Charts hub](/docs#charts)). |
+| **`generalTitle`** | Banner title above both charts. |
+| **`chart1`**, **`chart2`** | **`ComparisonChartConfig`** each (below). |
 
-**Errors:** failures wrap as **`createComparisonChart failed: …`**.
+### `ComparisonChartConfig`
+
+| Field | Role |
+|-------|------|
+| **`type`** | **`ComparisonChartType`**: **`pie`**, **`bar`**, **`horizontalBar`**, **`line`**, **`scatter`**, **`radar`**, **`polarArea`**, or **`donut`**. |
+| **`data`** | Shape must match that chart family (same as **`createChart`**). |
+| **`options`** | That family’s **`*ChartOptions`** (pie/bar/line/…). |
+| **`title`** | Panel subtitle. |
+| **`barType`** | For bar-ish panels: **`standard`**, **`grouped`**, **`stacked`**, **`lollipop`**, **`waterfall`**. |
+| **`lineStyle`**, **`lineSmoothness`** | Hint fields used when wiring line-like panels (see implementation). |
+
+**Donut:** only **`type: 'donut'`** is accepted here for donut rings. Standalone **`createChart('pie', …)`** uses **`options.type: 'donut'`** instead — see [Charts comparison note](/docs#charts-comparison-combo).
+
+**Errors:** **`createComparisonChart failed: …`**.
+
+### Example A — pie vs bar
 
 <CodeSwitcher>
 <ts>
 ```typescript
 import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
 
 const painter = new ApexPainter();
 
 const buf = await painter.createComparisonChart({
   layout: 'sideBySide',
+  dimensions: { width: 960, height: 420 },
+  generalTitle: { text: 'Executive snapshot', fontSize: 22, color: '#0f172a' },
   chart1: {
     type: 'pie',
+    title: { text: 'Mix' },
     data: [
       { label: 'East', value: 55, color: '#60a5fa' },
       { label: 'West', value: 45, color: '#f472b6' },
     ],
-    options: { dimensions: { width: 400, height: 320 } },
+    options: {
+      dimensions: { width: 460, height: 380 },
+      labels: { title: { text: 'Regional mix' } },
+    },
   },
   chart2: {
     type: 'bar',
-    data: [{ label: 'A', value: 12, xStart: 0, xEnd: 1, color: '#34d399' }],
-    options: { dimensions: { width: 400, height: 320 } },
+    title: { text: 'Throughput' },
+    barType: 'standard',
+    data: [
+      { label: 'A', value: 42, xStart: 0, xEnd: 1, color: '#34d399' },
+      { label: 'B', value: 58, xStart: 1, xEnd: 2, color: '#22d3ee' },
+      { label: 'C', value: 51, xStart: 2, xEnd: 3, color: '#a78bfa' },
+    ],
+    options: {
+      dimensions: { width: 460, height: 380 },
+      axes: {
+        x: { range: { min: 0, max: 3 } },
+        y: { label: 'Units', range: { min: 0, max: 70 } },
+      },
+      grid: { show: true },
+    },
   },
 });
+
+fs.writeFileSync('./charts/comparison-ab.png', buf);
 ```
 </ts>
 <js>
 ```javascript
 const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
 
 (async () => {
   const painter = new ApexPainter();
-  await painter.createComparisonChart({
+  const buf = await painter.createComparisonChart({
     layout: 'sideBySide',
     chart1: {
       type: 'pie',
@@ -61,84 +108,312 @@ const { ApexPainter } = require('apexify.js');
       options: { dimensions: { width: 400, height: 320 } },
     },
   });
+  fs.writeFileSync('./charts/comparison-ab.png', buf);
 })();
 ```
 </js>
 </CodeSwitcher>
 
----
-
-## `createComboChart`
-
-Single plot with **bars** (primary / left **Y**) and **lines** (**`ComboLineSeries[]`**). Implemented in **`combochart.ts`**.
-
-- **`barsType`**: **`standard`** \| **`grouped`** \| **`stacked`** — applies when bars use **`values`** (**`BarSegment[]`**)
-- **Secondary axis:** line series default to **`yAxis: 'secondary'`** (right scale). Set **`yAxis: 'primary'`** to share the bar scale
-- **`opacity`**: **`ComboChartOpacity`** — multipliers for bars, lines, grid, axes, legend, labels
-- **`axes`**: **`x`**, **`y`** (primary), **`ySecondary`** — **`AxisConfig`** from line chart conventions
-- **`secondaryYAxis.show`**: toggles right axis (defaults on when any line uses secondary)
-- **`legend`**, **`grid`**, **`labels`**, **`appearance`**, **`dimensions`** — same vocabulary as other Cartesian charts where applicable
-
-**Errors:** **`createComboChart failed: …`**.
+### Example B — **`donut`** + **`line`** (donut via comparison only)
 
 <CodeSwitcher>
 <ts>
 ```typescript
 import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
 
 const painter = new ApexPainter();
 
-const buf = await painter.createComboChart({
-  dimensions: { width: 640, height: 400 },
-  bars: [
-    { label: 'Q1', value: 10, xStart: 0, xEnd: 1, color: '#818cf8' },
-    { label: 'Q2', value: 18, xStart: 1, xEnd: 2, color: '#818cf8' },
-  ],
-  lines: [
-    {
-      label: 'Target',
-      data: [
-        { x: 0, y: 12 },
-        { x: 1, y: 15 },
-      ],
-      color: '#fbbf24',
-      // default yAxis: 'secondary' — right scale
+const buf = await painter.createComparisonChart({
+  layout: 'topBottom',
+  spacing: 16,
+  appearance: { backgroundColor: '#f8fafc' },
+  chart1: {
+    type: 'donut',
+    data: [
+      { label: 'Pro', value: 62, color: '#6366f1' },
+      { label: 'Business', value: 28, color: '#22c55e' },
+      { label: 'Free', value: 10, color: '#94a3b8' },
+    ],
+    options: {
+      dimensions: { width: 640, height: 280 },
+      donutInnerRadius: 0.55,
+      labels: { title: { text: 'Plan mix' }, showValues: true },
     },
-  ],
+  },
+  chart2: {
+    type: 'line',
+    data: [
+      {
+        label: 'MAU',
+        data: [
+          { x: 0, y: 120 },
+          { x: 1, y: 156 },
+          { x: 2, y: 189 },
+          { x: 3, y: 210 },
+        ],
+        color: '#0ea5e9',
+        smoothness: 'bezier',
+        marker: { show: true, type: 'circle', size: 6 },
+      },
+    ],
+    options: {
+      dimensions: { width: 640, height: 320 },
+      axes: {
+        x: { label: 'Quarter', range: { min: -0.2, max: 3.2 } },
+        y: { label: 'k users', range: { min: 100, max: 230 } },
+      },
+      grid: { show: true },
+      labels: { title: { text: 'Growth' } },
+    },
+  },
 });
+
+fs.writeFileSync('./charts/comparison-donut-line.png', buf);
 ```
 </ts>
 <js>
 ```javascript
 const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
 
 (async () => {
   const painter = new ApexPainter();
-  await painter.createComboChart({
-    dimensions: { width: 640, height: 400 },
-    bars: [
-      { label: 'Q1', value: 10, xStart: 0, xEnd: 1, color: '#818cf8' },
-      { label: 'Q2', value: 18, xStart: 1, xEnd: 2, color: '#818cf8' },
-    ],
-    lines: [
-      {
-        label: 'Target',
-        data: [
-          { x: 0, y: 12 },
-          { x: 1, y: 15 },
-        ],
-        color: '#fbbf24',
-      },
-    ],
+  const buf = await painter.createComparisonChart({
+    layout: 'topBottom',
+    chart1: {
+      type: 'donut',
+      data: [
+        { label: 'Pro', value: 62, color: '#6366f1' },
+        { label: 'Free', value: 10, color: '#94a3b8' },
+      ],
+      options: { donutInnerRadius: 0.55 },
+    },
+    chart2: {
+      type: 'line',
+      data: [{ label: 'MAU', data: [{ x: 0, y: 120 }, { x: 1, y: 156 }], color: '#0ea5e9' }],
+      options: { dimensions: { width: 640, height: 320 } },
+    },
   });
+  fs.writeFileSync('./charts/comparison-donut-line.png', buf);
 })();
 ```
 </js>
 </CodeSwitcher>
 
+### Namespace
+
+```typescript
+import { Charts } from 'apexify.js';
+const png = await Charts.createComparisonChart({ /* same options */ });
+```
+
+---
+
+## `createComboChart`
+
+**Bars + lines** on **one** Cartesian plot. Bars always use the **primary (left) Y** scale. Lines default to **`yAxis: 'secondary'`** (right).
+
+### `ComboChartOptions` (essential fields)
+
+| Field | Role |
+|-------|------|
+| **`bars`** | **`BarChartData[]`** — **`value`** or **`values`** + **`xStart`**/**`xEnd`**. |
+| **`lines`** | **`ComboLineSeries[]`** — extends **`LineSeries`** with **`yAxis?: 'primary' \| 'secondary'`**. |
+| **`barsType`** | **`standard`**, **`grouped`**, **`stacked`** when **`bars`** use **`values`**. |
+| **`axes.x`**, **`axes.y`**, **`axes.ySecondary`** | **`AxisConfig`** (line-chart style). |
+| **`opacity`** | **`ComboChartOpacity`** — **`bars`**, **`lines`**, **`grid`**, **`primaryAxis`**, **`secondaryAxis`**, **`legend`**, etc. |
+| **`secondaryYAxis.show`** | Force-hide right axis when no line needs it. |
+| **`barStyle`** | **`groupSpacing`**, **`minWidth`**, **`opacity`**, **`shadow`**, **`stroke`** defaults for bars. |
+| **`legend`**, **`grid`**, **`labels`**, **`appearance`**, **`dimensions`** | Same vocabulary as [line](/docs#charts-complete-guide) / [bar](/docs#charts-complete-guide) charts. |
+
+**Errors:** **`createComboChart failed: …`**.
+
+### Example A — simple bars + target line (secondary Y)
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const buf = await painter.createComboChart({
+  dimensions: { width: 720, height: 440 },
+  bars: [
+    { label: 'Q1', value: 42, xStart: 0, xEnd: 1, color: '#818cf8' },
+    { label: 'Q2', value: 56, xStart: 1, xEnd: 2, color: '#818cf8' },
+    { label: 'Q3', value: 49, xStart: 2, xEnd: 3, color: '#818cf8' },
+  ],
+  lines: [
+    {
+      label: 'Target',
+      data: [
+        { x: 0, y: 50 },
+        { x: 1, y: 50 },
+        { x: 2, y: 50 },
+      ],
+      color: '#f59e0b',
+      lineStyle: 'dashed',
+      lineWidth: 2,
+      yAxis: 'secondary',
+    },
+  ],
+  axes: {
+    x: { label: 'Quarter', range: { min: -0.2, max: 2.2 } },
+    y: { label: 'Actual units', range: { min: 0, max: 70 } },
+    ySecondary: { label: 'Target line scale', range: { min: 40, max: 60 } },
+  },
+  labels: { title: { text: 'Actual vs target' } },
+  legend: { position: 'bottom' },
+  grid: { show: true },
+});
+
+fs.writeFileSync('./charts/combo-basic.png', buf);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const buf = await painter.createComboChart({
+    dimensions: { width: 720, height: 440 },
+    bars: [
+      { label: 'Q1', value: 42, xStart: 0, xEnd: 1, color: '#818cf8' },
+      { label: 'Q2', value: 56, xStart: 1, xEnd: 2, color: '#818cf8' },
+    ],
+    lines: [
+      {
+        label: 'Target',
+        data: [
+          { x: 0, y: 50 },
+          { x: 1, y: 50 },
+        ],
+        color: '#f59e0b',
+        yAxis: 'secondary',
+      },
+    ],
+    axes: {
+      y: { range: { min: 0, max: 70 } },
+      ySecondary: { range: { min: 40, max: 60 } },
+    },
+  });
+  fs.writeFileSync('./charts/combo-basic.png', buf);
+})();
+```
+</js>
+</CodeSwitcher>
+
+### Example B — grouped bars + line on primary scale
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const buf = await painter.createComboChart({
+  dimensions: { width: 800, height: 460 },
+  barsType: 'grouped',
+  bars: [
+    {
+      label: 'North',
+      xStart: 0,
+      xEnd: 1,
+      values: [
+        { value: 24, color: '#38bdf8', label: 'A' },
+        { value: 18, color: '#a78bfa', label: 'B' },
+      ],
+    },
+    {
+      label: 'South',
+      xStart: 1,
+      xEnd: 2,
+      values: [
+        { value: 30, color: '#38bdf8' },
+        { value: 22, color: '#a78bfa' },
+      ],
+    },
+  ],
+  lines: [
+    {
+      label: 'Trend',
+      data: [
+        { x: 0.5, y: 35 },
+        { x: 1.5, y: 42 },
+      ],
+      color: '#f97316',
+      smoothness: 'bezier',
+      yAxis: 'primary',
+      marker: { show: true, type: 'triangle', size: 8 },
+    },
+  ],
+  axes: {
+    x: { range: { min: 0, max: 2 } },
+    y: { label: 'Score', range: { min: 0, max: 60 } },
+  },
+  legend: { show: true, position: 'top' },
+  grid: { show: true },
+  opacity: { bars: 1, lines: 1, grid: 0.35 },
+});
+
+fs.writeFileSync('./charts/combo-grouped.png', buf);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const buf = await painter.createComboChart({
+    dimensions: { width: 800, height: 460 },
+    barsType: 'grouped',
+    bars: [
+      {
+        label: 'North',
+        xStart: 0,
+        xEnd: 1,
+        values: [
+          { value: 24, color: '#38bdf8' },
+          { value: 18, color: '#a78bfa' },
+        ],
+      },
+    ],
+    lines: [
+      {
+        label: 'Trend',
+        data: [{ x: 0.5, y: 35 }],
+        yAxis: 'primary',
+        color: '#f97316',
+      },
+    ],
+    axes: { x: { range: { min: 0, max: 1 } }, y: { range: { min: 0, max: 60 } } },
+  });
+  fs.writeFileSync('./charts/combo-grouped.png', buf);
+})();
+```
+</js>
+</CodeSwitcher>
+
+### Namespace
+
+```typescript
+import { Charts } from 'apexify.js';
+await Charts.createComboChart({ bars: [...], lines: [...] });
+```
+
 ---
 
 ## See also
 
-- [Charts hub](/docs#charts) — module table, **`appearance`**, imports
-- [Charts: createChart & namespace](/docs#charts-create-chart) — façade dispatch & **`Charts`** exports
+- [Charts hub](/docs#charts) — modules, **`appearance`**, imports
+- [Charts complete guide](/docs#charts-complete-guide) — every **`createChart`** type with examples
+- [Charts: createChart & namespace](/docs#charts-create-chart) — overload table

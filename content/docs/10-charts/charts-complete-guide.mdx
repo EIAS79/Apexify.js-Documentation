@@ -1,0 +1,786 @@
+# Charts: complete guide (every `createChart` type)
+
+**Implementation:** `lib/Canvas/extended/ChartCreator.ts` dispatches to `lib/Canvas/utils/Charts/*.ts`. **`ApexPainter.createChart(type, data, options)`** and **`Charts.create*Chart`** return the same **PNG `Buffer`**.
+
+Use this page when you need **one chart image**. For **two charts** on one canvas see [comparison & combo](/docs#charts-comparison-combo). For **bars + lines + dual Y** see **`createComboChart`** on that page.
+
+**Types:** Per-chart **`data`** / **`options`** interfaces live beside each module under **`lib/Canvas/utils/Charts/`** (also re-exported from **`Charts`**). Deep contracts are in TypeScript — treat tables below as the fields people set most often.
+
+---
+
+## Shared building blocks
+
+### `dimensions`
+
+| Field | Role |
+|-------|------|
+| **`width`**, **`height`** | Canvas size (defaults vary by chart; bar charts infer width from X span if omitted — set explicitly for fixed layouts). |
+| **`padding`** | **`top`**, **`right`**, **`bottom`**, **`left`** — extra outer inset around title + legend + plot. |
+
+### `appearance` (`ChartAppearanceExtended`)
+
+Same vocabulary as rich canvases — see [Charts hub](/docs#charts) **Appearance** section. Highlights:
+
+| Field | Role |
+|-------|------|
+| **`backgroundColor`**, **`backgroundGradient`** | Base fill when no image. |
+| **`backgroundImage`** | Full-bleed image (`resolveMediaPath`). |
+| **`customBg`** | Same shape as **`CanvasConfig.customBg`** (fit, align, opacity, filters). |
+| **`bgLayers`** | Stacked overlays after base. |
+| **`patternBg`** | Preset / custom pattern overlay. |
+| **`noiseBg`** | Grain overlay (`intensity`). |
+| **`axisColor`**, **`axisWidth`**, **`arrowSize`** | Axis styling where used. |
+| **`borderRadius`**, **`borderWidth`**, **`borderColor`** | Optional outer frame (line chart and others). |
+
+### Legends (cartesian charts)
+
+Typical keys: **`show`**, **`position`** ([legend placement](/docs#charts) — `bottom`, `topRight`, aliases like **`top_left`**), **`entries`** (**`{ label, color?, gradient? }[]`**), **`fontSize`**, **`spacing`**, **`padding`**, **`maxWidth`**, **`wrapText`**, **`backgroundColor`**, **`textColor`**, **`textGradient`**, **`textStyle`**.
+
+Line / scatter also support **`fit`**: **`content`** (default) vs **`stretch`**, plus **`minWidth`**, **`width`**.
+
+### Grid
+
+**`grid.show`**, **`grid.color`**, **`grid.width`** — dashed/solid grid behind plot on bar / line / scatter / combo where implemented.
+
+---
+
+## Pie (`createChart('pie', …)`)
+
+**Module:** `piechart.ts` · **`PieSlice[]`** + **`PieChartOptions`**.
+
+### Data: `PieSlice`
+
+| Field | Role |
+|-------|------|
+| **`label`**, **`value`** | Required slice identity and size. |
+| **`color`**, **`gradient`** | Fill (gradient wins when both set per renderer rules). |
+| **`showValue`**, **`showLabel`**, **`valueLabel`** | Per-slice label overrides. |
+| **`opacity`** | 0–1 fill multiplier. |
+| **`shadow`**, **`stroke`** | Drop shadow and outline (stroke supports **`gradient`**). |
+
+### Options highlights
+
+| Section | Role |
+|---------|------|
+| **`type`**, **`donutInnerRadius`** | **`'pie'`** (default) vs **`'donut'`**; inner radius ratio for donut. |
+| **`labels.title`** | Chart title text + font / color / **`textStyle`**. |
+| **`labels.sliceLabels`**, **`valueLabels`**, **`showValues`**, **`showLabels`**, **`valueFormat`** | Segment annotations; **`valueFormat(value, pct)`** customizes numbers. |
+| **`legends.standard`** | Box legend: **`position`**, **`show?: false`** to hide, **`wrapText`**, **`maxWidth`**, colors. |
+| **`legends.connected`** | Pie-only “connected” legend with leader lines (**`lineColor`**, **`lineWidth`**). |
+| **`slices`** | Default **`opacity`**, **`shadow`**, **`stroke`** for all slices. |
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const pie = await painter.createChart(
+  'pie',
+  [
+    { label: 'Desktop', value: 48, color: '#38bdf8' },
+    { label: 'Mobile', value: 35, color: '#a78bfa' },
+    { label: 'Tablet', value: 17, color: '#34d399' },
+  ],
+  {
+    dimensions: { width: 720, height: 480 },
+    appearance: { backgroundColor: '#0f172a', axisColor: '#94a3b8' },
+    type: 'donut',
+    donutInnerRadius: 0.52,
+    labels: {
+      title: { text: 'Traffic by device', fontSize: 22, color: '#f8fafc' },
+      showValues: true,
+      valueFormat: (v, pct) => `${v} (${pct.toFixed(1)}%)`,
+    },
+    legends: {
+      standard: {
+        position: 'bottom',
+        textColor: '#e2e8f0',
+        backgroundColor: 'rgba(15,23,42,0.6)',
+      },
+    },
+  }
+);
+
+fs.writeFileSync('./charts/devices.png', pie);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const pie = await painter.createChart(
+    'pie',
+    [
+      { label: 'Desktop', value: 48, color: '#38bdf8' },
+      { label: 'Mobile', value: 35, color: '#a78bfa' },
+      { label: 'Tablet', value: 17, color: '#34d399' },
+    ],
+    {
+      dimensions: { width: 720, height: 480 },
+      type: 'donut',
+      donutInnerRadius: 0.52,
+      labels: { title: { text: 'Traffic by device' }, showValues: true },
+    }
+  );
+  fs.writeFileSync('./charts/devices.png', pie);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Bar — vertical (`createChart('bar', …)`)
+
+**Module:** `barchart.ts` · **`BarChartData[]`** + **`BarChartOptions`**.
+
+### `BarChartType`
+
+**`standard`** | **`grouped`** | **`stacked`** | **`waterfall`** | **`lollipop`**
+
+Set with **`options.type`**. **`grouped`** / **`stacked`** / **`waterfall`** expect **`values: BarSegment[]`** on each row.
+
+### Data: `BarChartData`
+
+| Field | Role |
+|-------|------|
+| **`label`** | Category name (X band). |
+| **`xStart`**, **`xEnd`** | Continuous X span for that bar (e.g. `0–1`, `1–2`). |
+| **`value`** | Single column height (**`standard`**, **`lollipop`**). |
+| **`values`** | **`BarSegment[]`** for grouped/stacked/waterfall (**`value`**, **`color`**, **`label`**, **`showValue`**, …). |
+| **`color`**, **`gradient`** | Bar fill when not using per-segment colors. |
+| **`labelPosition`**, **`showValue`**, **`valueColor`** | Annotation controls. |
+
+### Options highlights
+
+| Section | Role |
+|---------|------|
+| **`waterfall.initialValue`** | Starting baseline for waterfall sums. |
+| **`axes.x`**, **`axes.y`** | **`label`**, **`range`**, **`values`**, **`tickFontSize`**, **`baseline`** on **Y**. |
+| **`labels.barLabelDefaults`**, **`valueLabelDefaults`** | Default annotation behavior. |
+| **`legend`** | Entries + placement (see shared). |
+| **`bars.spacing`**, **`groupSpacing`**, **`segmentSpacing`**, **`minWidth`**, **`lineWidth`**, **`dotSize`** | Geometry (**`lollipop`** uses line + dot). |
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// Standard vertical bars
+const bars = await painter.createChart(
+  'bar',
+  [
+    { label: 'Jan', value: 42, xStart: 0, xEnd: 1, color: '#6366f1' },
+    { label: 'Feb', value: 58, xStart: 1, xEnd: 2, color: '#818cf8' },
+    { label: 'Mar', value: 49, xStart: 2, xEnd: 3, color: '#a5b4fc' },
+  ],
+  {
+    type: 'standard',
+    dimensions: { width: 640, height: 420 },
+    axes: {
+      x: { label: 'Month', range: { min: 0, max: 3 } },
+      y: { label: 'Units', range: { min: 0, max: 70, step: 10 } },
+    },
+    labels: { title: { text: 'Quarterly units' } },
+    grid: { show: true, color: '#e2e8f0' },
+  }
+);
+
+// Grouped bars — multiple segments per category
+const grouped = await painter.createChart(
+  'bar',
+  [
+    {
+      label: 'Q1',
+      xStart: 0,
+      xEnd: 1,
+      values: [
+        { value: 12, color: '#22c55e', label: 'New' },
+        { value: 8, color: '#eab308', label: 'Returning' },
+      ],
+    },
+    {
+      label: 'Q2',
+      xStart: 1,
+      xEnd: 2,
+      values: [
+        { value: 18, color: '#22c55e' },
+        { value: 11, color: '#eab308' },
+      ],
+    },
+  ],
+  {
+    type: 'grouped',
+    dimensions: { width: 720, height: 440 },
+    axes: {
+      x: { range: { min: 0, max: 2 } },
+      y: { label: 'Customers', range: { min: 0, max: 35 } },
+    },
+    legend: {
+      show: true,
+      entries: [
+        { label: 'New', color: '#22c55e' },
+        { label: 'Returning', color: '#eab308' },
+      ],
+      position: 'top',
+    },
+  }
+);
+
+fs.writeFileSync('./charts/bar-standard.png', bars);
+fs.writeFileSync('./charts/bar-grouped.png', grouped);
+
+// Stacked — segments sum upward in one column
+const stacked = await painter.createChart(
+  'bar',
+  [
+    {
+      label: 'Team',
+      xStart: 0,
+      xEnd: 1,
+      values: [
+        { value: 14, color: '#22c55e' },
+        { value: 9, color: '#eab308' },
+        { value: 6, color: '#64748b' },
+      ],
+    },
+  ],
+  {
+    type: 'stacked',
+    dimensions: { width: 560, height: 400 },
+    axes: { x: { range: { min: 0, max: 1 } }, y: { label: 'Total', range: { min: 0, max: 35 } } },
+    labels: { title: { text: 'Stacked composition' } },
+  }
+);
+fs.writeFileSync('./charts/bar-stacked.png', stacked);
+
+// Waterfall — cumulative from waterfall.initialValue; each row’s segment sum is a delta
+const waterfall = await painter.createChart(
+  'bar',
+  [
+    { label: '+ Sales', xStart: 0, xEnd: 1, values: [{ value: 35, color: '#22c55e' }] },
+    { label: '- Costs', xStart: 1, xEnd: 2, values: [{ value: -22, color: '#ef4444' }] },
+    { label: '+ Upsell', xStart: 2, xEnd: 3, values: [{ value: 10, color: '#38bdf8' }] },
+  ],
+  {
+    type: 'waterfall',
+    waterfall: { initialValue: 100 },
+    dimensions: { width: 720, height: 420 },
+    axes: { x: { range: { min: 0, max: 3 } }, y: { range: { min: 80, max: 140 } } },
+    labels: { title: { text: 'Waterfall from base 100 → 135 → 113 → 123' } },
+  }
+);
+fs.writeFileSync('./charts/bar-waterfall.png', waterfall);
+
+// Lollipop — stem + dot using bars.lineWidth / bars.dotSize
+const lollipop = await painter.createChart(
+  'bar',
+  [
+    { label: 'A', value: 55, xStart: 0, xEnd: 1, color: '#8b5cf6' },
+    { label: 'B', value: 72, xStart: 1, xEnd: 2, color: '#ec4899' },
+    { label: 'C', value: 41, xStart: 2, xEnd: 3, color: '#06b6d4' },
+  ],
+  {
+    type: 'lollipop',
+    dimensions: { width: 640, height: 400 },
+    bars: { lineWidth: 3, dotSize: 12 },
+    axes: { x: { range: { min: 0, max: 3 } }, y: { range: { min: 0, max: 80 } } },
+    labels: { title: { text: 'Lollipop ranking' } },
+  }
+);
+fs.writeFileSync('./charts/bar-lollipop.png', lollipop);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const bars = await painter.createChart(
+    'bar',
+    [
+      { label: 'Jan', value: 42, xStart: 0, xEnd: 1, color: '#6366f1' },
+      { label: 'Feb', value: 58, xStart: 1, xEnd: 2, color: '#818cf8' },
+    ],
+    {
+      dimensions: { width: 640, height: 420 },
+      axes: { x: { range: { min: 0, max: 2 } }, y: { range: { min: 0, max: 70 } } },
+    }
+  );
+  fs.writeFileSync('./charts/bar-standard.png', bars);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Bar — horizontal (`createChart('horizontalBar', …)`)
+
+**Module:** `horizontalbarchart.ts` · **`HorizontalBarChartData[]`** + **`HorizontalBarChartOptions`**.
+
+Same **`standard` | `grouped` | `stacked` | `lollipop`** modes as vertical bars, but categories run on **Y**. Use **`yStart`** / **`yEnd`** for each row’s band (analogous to **`xStart`**/**`xEnd`**). **`axes.x`** is the **value** axis; **`axes.y`** carries category ticks.
+
+**`grid.style`**: **`solid`** | **`dashed`** | **`dotted`** (horizontal grid).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const hbar = await painter.createChart(
+  'horizontalBar',
+  [
+    { label: 'Research', value: 64, yStart: 0, yEnd: 1, color: '#0ea5e9' },
+    { label: 'Design', value: 48, yStart: 1, yEnd: 2, color: '#8b5cf6' },
+    { label: 'Build', value: 72, yStart: 2, yEnd: 3, color: '#10b981' },
+  ],
+  {
+    type: 'standard',
+    dimensions: { width: 700, height: 380 },
+    axes: {
+      x: { label: 'Hours', range: { min: 0, max: 80, step: 20 }, baseline: 0 },
+      y: { label: 'Team' },
+    },
+    labels: { title: { text: 'Effort by workstream' } },
+    grid: { show: true, color: '#cbd5e1', style: 'dashed' },
+  }
+);
+
+fs.writeFileSync('./charts/hbar.png', hbar);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const hbar = await painter.createChart(
+    'horizontalBar',
+    [
+      { label: 'Research', value: 64, yStart: 0, yEnd: 1, color: '#0ea5e9' },
+      { label: 'Design', value: 48, yStart: 1, yEnd: 2, color: '#8b5cf6' },
+    ],
+    { dimensions: { width: 700, height: 380 }, axes: { x: { range: { min: 0, max: 80 } } } }
+  );
+  fs.writeFileSync('./charts/hbar.png', hbar);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Line (`createChart('line', …)`)
+
+**Module:** `linechart.ts` · **`LineSeries[]`** + **`LineChartOptions`**.
+
+### `LineSeries`
+
+| Field | Role |
+|-------|------|
+| **`label`**, **`data`** | **`LineDataPoint[]`** with **`x`**, **`y`**, optional **`label`**, **`errorBar`**. |
+| **`color`**, **`gradient`**, **`lineWidth`**, **`lineStyle`** | Stroke (**`solid`**, **`dashed`**, **`step`**, …). |
+| **`smoothness`** | **`none`**, **`bezier`**, **`spline`**. |
+| **`smoothnessTension`** | 0–1 curve amount for bezier-style paths. |
+| **`marker`** | **`type`**: circle/square/triangle/…, **`size`**, **`color`**, **`filled`**, **`show`**. |
+| **`area`** | **`type`**: **`below`** / **`above`** / **`between`** / **`around`** / **`none`**; **`color`**, **`opacity`**; **`secondLine`** for bands. |
+| **`correlation`** | Trend overlay: **`linear`**, **`polynomial`**, **`exponential`**, **`logarithmic`**, **`none`**. |
+| **`opacity`** | Whole-series multiplier. |
+
+### Axes (`AxisConfig`)
+
+Supports **`range`**, **`scale: 'linear' | 'log'`**, **`dateTime`**, **`dateFormat`**, **`showTickMarks`**, **`showTickLabels`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const line = await painter.createChart(
+  'line',
+  [
+    {
+      label: 'Revenue',
+      data: [
+        { x: 0, y: 12 },
+        { x: 1, y: 19 },
+        { x: 2, y: 17 },
+        { x: 3, y: 24 },
+      ],
+      color: '#3b82f6',
+      lineWidth: 3,
+      smoothness: 'bezier',
+      smoothnessTension: 0.35,
+      marker: { type: 'circle', size: 7, show: true, filled: true },
+      area: { type: 'below', color: '#3b82f6', opacity: 0.12 },
+    },
+    {
+      label: 'Costs',
+      data: [
+        { x: 0, y: 8 },
+        { x: 1, y: 11 },
+        { x: 2, y: 10 },
+        { x: 3, y: 14 },
+      ],
+      color: '#f97316',
+      lineStyle: 'dashed',
+      marker: { type: 'square', size: 6, show: true },
+    },
+  ],
+  {
+    dimensions: { width: 800, height: 460 },
+    axes: {
+      x: { label: 'Quarter', range: { min: -0.2, max: 3.2 } },
+      y: { label: 'M$', range: { min: 0, max: 30 } },
+    },
+    labels: { title: { text: 'Revenue vs costs' } },
+    legend: { show: true, position: 'bottom' },
+    grid: { show: true },
+  }
+);
+
+fs.writeFileSync('./charts/line-multi.png', line);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const line = await painter.createChart(
+    'line',
+    [
+      {
+        label: 'Revenue',
+        data: [
+          { x: 0, y: 12 },
+          { x: 1, y: 19 },
+          { x: 2, y: 17 },
+        ],
+        color: '#3b82f6',
+        smoothness: 'bezier',
+        marker: { type: 'circle', size: 7, show: true },
+      },
+    ],
+    { dimensions: { width: 800, height: 460 }, grid: { show: true } }
+  );
+  fs.writeFileSync('./charts/line-multi.png', line);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Scatter (`createChart('scatter', …)`)
+
+**Module:** `scatterchart.ts` · **`ScatterSeries[]`** + **`ScatterChartOptions`**.
+
+### `ScatterSeries`
+
+| Field | Role |
+|-------|------|
+| **`data`** | **`ScatterPoint[]`** — **`x`**, **`y`**, optional **`label`**. |
+| **`markerType`** | **`circle`**, **`square`**, **`diamond`**, **`cross`**, **`none`**. |
+| **`markerSize`**, **`color`**, **`gradient`**, **`opacity`** | Marker styling. |
+| **`correlation`** | Trend line: **`show`**, **`type`**: **`auto`** \| **`linear`** \| **`polynomial`** \| …, **`flatThreshold`** (for **`auto`**), **`color`**, **`lineWidth`**, **`lineStyle`**, **`degree`**. |
+
+**`axisPaddingRatio`** on options pads auto domains (default **0.06**).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const scatter = await painter.createChart(
+  'scatter',
+  [
+    {
+      label: 'Campaign A',
+      data: [
+        { x: 1.2, y: 8.1 },
+        { x: 2.1, y: 12.4 },
+        { x: 3.4, y: 14.9 },
+        { x: 4.8, y: 21.2 },
+      ],
+      markerType: 'circle',
+      markerSize: 10,
+      color: '#6366f1',
+      correlation: { show: true, type: 'linear', color: '#ef4444', lineWidth: 2 },
+    },
+    {
+      label: 'Campaign B',
+      data: [
+        { x: 1.5, y: 6 },
+        { x: 2.8, y: 9 },
+        { x: 4.1, y: 11 },
+      ],
+      markerType: 'diamond',
+      markerSize: 11,
+      color: '#14b8a6',
+    },
+  ],
+  {
+    dimensions: { width: 760, height: 480 },
+    axes: {
+      x: { label: 'Spend (k)', range: { min: 0, max: 6 } },
+      y: { label: 'Leads', range: { min: 0, max: 25 } },
+    },
+    labels: { title: { text: 'Spend vs leads' } },
+    legend: { position: 'bottom' },
+    grid: { show: true },
+    axisPaddingRatio: 0.05,
+  }
+);
+
+fs.writeFileSync('./charts/scatter.png', scatter);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const scatter = await painter.createChart(
+    'scatter',
+    [
+      {
+        label: 'A',
+        data: [
+          { x: 1, y: 5 },
+          { x: 2, y: 9 },
+          { x: 3, y: 12 },
+        ],
+        correlation: { show: true, type: 'linear' },
+      },
+    ],
+    { dimensions: { width: 760, height: 480 }, grid: { show: true } }
+  );
+  fs.writeFileSync('./charts/scatter.png', scatter);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Radar (`createChart('radar', …)`)
+
+**Module:** `radarchart.ts` · **`RadarSeries[]`** + **`RadarChartOptions`**.
+
+**Rules:**
+
+- **`options.radar.categories`** — **≥ 3** axis labels.
+- Each **`RadarSeries.values`** must have **exactly `categories.length`** numbers.
+
+### `radar` option bucket
+
+| Field | Role |
+|-------|------|
+| **`maxValue`** | Scale ceiling (defaults ~ max × 1.05). |
+| **`gridLevels`** | Number of concentric rings. |
+| **`fill`**, **`fillOpacity`** | Polygon fill (series can override **`fillOpacity`**). |
+| **`showPoints`**, **`pointRadius`** | Vertices. |
+| **`gridColor`**, **`gridWidth`**, **`axisLabelFontSize`**, **`axisLabelColor`** | Cosmetics. |
+| **`labelMarginRatio`** | Space outside outer labels. |
+| **`opacity`** | Default series opacity; **`RadarSeries.opacity`** overrides per series. |
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const radar = await painter.createChart(
+  'radar',
+  [
+    {
+      label: 'Product A',
+      values: [8, 7, 9, 6, 8],
+      color: 'rgba(99,102,241,0.35)',
+      stroke: '#6366f1',
+      lineWidth: 2,
+      fillOpacity: 0.35,
+    },
+    {
+      label: 'Product B',
+      values: [6, 9, 7, 8, 7],
+      color: 'rgba(16,185,129,0.3)',
+      stroke: '#10b981',
+      lineWidth: 2,
+    },
+  ],
+  {
+    dimensions: { width: 720, height: 520 },
+    radar: {
+      categories: ['Speed', 'Quality', 'Support', 'Price', 'Design'],
+      maxValue: 10,
+      gridLevels: 5,
+      fill: true,
+      showPoints: true,
+      pointRadius: 5,
+      gridColor: '#cbd5e1',
+    },
+    labels: { title: { text: 'Capability profile' } },
+    legend: { position: 'bottom' },
+  }
+);
+
+fs.writeFileSync('./charts/radar.png', radar);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const radar = await painter.createChart(
+    'radar',
+    [
+      { label: 'A', values: [8, 7, 9, 6, 8], stroke: '#6366f1' },
+      { label: 'B', values: [6, 9, 7, 8, 7], stroke: '#10b981' },
+    ],
+    {
+      dimensions: { width: 720, height: 520 },
+      radar: {
+        categories: ['Speed', 'Quality', 'Support', 'Price', 'Design'],
+        maxValue: 10,
+      },
+    }
+  );
+  fs.writeFileSync('./charts/radar.png', radar);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Polar area (`createChart('polarArea', …)`)
+
+**Module:** `polarareachart.ts` · **`PolarAreaSlice[]`** + **`PolarAreaChartOptions`**.
+
+Slices behave like a **polar bar** chart: each slice’s **angular width** is uniform; **radius** encodes **`value`**.
+
+| Option | Role |
+|--------|------|
+| **`scale`** | **`radius`** (linear radius) vs **`area`** (radius ∝ √value so areas feel proportional). |
+| **`polar.innerRadiusRatio`** | Donut-style hole (0 = solid center). |
+| **`polar.startAngleDeg`** | Rotation (default **-90** = first slice from top). |
+| **`polar.labelBandRatio`** | Space for outer labels. |
+| **`polar.sliceStrokeWidth`**, **`sliceStrokeColor`** | Outlines. |
+| **`labels.showValues`**, **`valueFormat`**, **`sliceLabelFontSize`** | Value annotations on slices. |
+
+All **`value`** entries must sum to a **positive** total.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const polar = await painter.createChart(
+  'polarArea',
+  [
+    { label: 'North', value: 42, color: '#38bdf8' },
+    { label: 'South', value: 28, color: '#f472b6' },
+    { label: 'East', value: 35, color: '#34d399' },
+    { label: 'West', value: 22, color: '#fbbf24' },
+  ],
+  {
+    dimensions: { width: 680, height: 520 },
+    scale: 'area',
+    polar: {
+      innerRadiusRatio: 0.12,
+      startAngleDeg: -90,
+      sliceStrokeWidth: 2,
+      sliceStrokeColor: '#0f172a',
+    },
+    labels: {
+      title: { text: 'Regional mix' },
+      showValues: true,
+      valueFormat: (v, frac) => `${(frac * 100).toFixed(0)}%`,
+    },
+    legend: { position: 'bottom' },
+  }
+);
+
+fs.writeFileSync('./charts/polar-area.png', polar);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const polar = await painter.createChart(
+    'polarArea',
+    [
+      { label: 'North', value: 42, color: '#38bdf8' },
+      { label: 'South', value: 28, color: '#f472b6' },
+    ],
+    { dimensions: { width: 680, height: 520 }, scale: 'area' }
+  );
+  fs.writeFileSync('./charts/polar-area.png', polar);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Namespace equivalents (`Charts.*`)
+
+Each example above works with **`Charts.createPieChart(data, options)`**, **`Charts.createBarChart`**, … — same arguments as **`createChart`** without the **`type`** string.
+
+```typescript
+import { Charts } from 'apexify.js';
+
+const png = await Charts.createBarChart(
+  [{ label: 'A', value: 10, xStart: 0, xEnd: 1, color: '#64748b' }],
+  { dimensions: { width: 500, height: 320 } }
+);
+```
+
+---
+
+## See also
+
+- [Charts hub](/docs#charts) — architecture, **`appearance`**, imports
+- [Charts: createChart & namespace](/docs#charts-create-chart) — overload table & **`Charts` exports**
+- [Charts: comparison & combo](/docs#charts-comparison-combo) — **`createComparisonChart`**, **`createComboChart`**, donut via comparison **`type: 'donut'`**

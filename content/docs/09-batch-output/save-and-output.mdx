@@ -1,8 +1,18 @@
 # Save & output
 
-Convert PNG **`Buffer`**s for APIs (**`outPut`**) or persist them to disk with Sharp-backed encoding (**`save`**, **`saveMultiple`**).
+Convert PNG **`Buffer`**s with **`outPut`** (base64, data URL, Blob, ArrayBuffer, **or hosted Imgur URL**) — or persist to disk with **`save`** / **`saveMultiple`** (Sharp-backed encoding).
 
 Hub: [Batch, chain, save & output](/docs#batch-chain-save-output).
+
+---
+
+## How **`outPut`** works
+
+1. **`createCanvas`**, **`createImage`**, **`createText`**, **`batch`**, etc. still give you a raw **PNG `Buffer`** (same regardless of ctor **`type`**).
+2. Pass that **`Buffer`** to **`await painter.outPut(buffer)`**.
+3. **`outPut`** reads **`new ApexPainter({ type: … })`** and returns the matching shape.
+
+So **`type`** does **not** change what draw APIs return — it only configures **`outPut`**.
 
 ---
 
@@ -14,20 +24,22 @@ const painter = new ApexPainter({ type: 'base64' });
 
 | Constructor `type` | `await painter.outPut(buffer)` returns |
 |--------------------|------------------------------------------|
-| **`buffer`** (default) | Same **`Buffer`** |
-| **`base64`** | **`string`** |
-| **`dataURL`** | Data URL **`string`** |
-| **`blob`** | **`Blob`** (browser-friendly) |
-| **`arraybuffer`** | **`ArrayBuffer`** |
-| **`url`** | Hosted URL **`string`** via **`url()`** helper — see hub alert |
-
-Most drawing methods still return **`Buffer`**; call **`outPut`** when you need the serialized form.
+| **`buffer`** (default) | Same **`Buffer`** (no-op pass-through) |
+| **`base64`** | Base64 **`string`** |
+| **`dataURL`** | **`data:image/png;base64,...`** **`string`** |
+| **`blob`** | **`Blob`** |
+| **`arraybuffer`** | **`ArrayBuffer`** view of the buffer |
+| **`url`** | **HTTPS link **`string`** — uploads via **`url()`** in **`conversion.ts`** (Imgur API, bundled credentials) |
 
 ---
 
 ## `outPut(results: Buffer)`
 
-**Requires** a **`Buffer`**. Uses **`this.format.type`** (constructor) to pick the converter.
+**Requires** a **`Buffer`**. Uses **`this.format.type`** from the constructor.
+
+**Throws:** wrong input → **`outPut: results must be a Buffer.`** · unknown **`type`** → lists supported kinds · wrapper → **`outPut failed: …`**.
+
+### Example: base64
 
 <CodeSwitcher>
 <ts>
@@ -43,7 +55,7 @@ const { buffer } = await painter.createCanvas({
 });
 
 const payload = await painter.outPut(buffer);
-console.log(typeof payload === 'string');
+console.log(typeof payload === 'string'); // true — base64 text
 ```
 </ts>
 <js>
@@ -64,7 +76,62 @@ const { ApexPainter } = require('apexify.js');
 </js>
 </CodeSwitcher>
 
-**Throws:** non-buffer → **`outPut: results must be a Buffer.`** Unknown format → lists supported kinds.
+---
+
+## Example: **`outPut` → Imgur URL {#save-and-output-imgur-url}
+
+Use this when you want a **public URL** for a generated image (Discord embeds, quick shares, prototypes) **without** implementing upload yourself. The library calls **`url(buffer)`** (**`lib/Canvas/utils/general/conversion.ts`**) which uses the **Imgur API** with credentials shipped in that module.
+
+**Requirements:** outbound **HTTPS** at runtime; Imgur must accept the upload (limits / account status per Imgur).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter({ type: 'url' });
+
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: '#0f172a',
+});
+
+const imageUrl = await painter.outPut(buffer);
+console.log(imageUrl);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter({ type: 'url' });
+  const { buffer } = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    colorBg: '#0f172a',
+  });
+  const imageUrl = await painter.outPut(buffer);
+  console.log(imageUrl);
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Same pattern after any pipeline:** `createImage`, `createText`, **`batch`**/**`chain`** results, **`GIF`** buffers — anything that ends as **`Buffer`**, pass into **`outPut`**.
+
+```typescript
+const painter = new ApexPainter({ type: 'url' });
+const { buffer: scene } = await painter.createCanvas({ width: 400, height: 200, colorBg: '#ffffff' });
+const png = await painter.createText(
+  { text: 'Hello', x: 80, y: 120, font: { size: 48, family: 'Arial' } },
+  scene,
+);
+const link = await painter.outPut(png);
+```
+
+If you need **your own** Imgur app or a different host, use **`type: 'base64'`** / **`dataURL`** and upload with your SDK, or maintain a fork that swaps **`url()`** implementation — the **`outPut`** switch stays the same (`case 'url'`).
 
 ---
 

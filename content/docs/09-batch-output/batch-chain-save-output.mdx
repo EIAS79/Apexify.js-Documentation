@@ -90,9 +90,13 @@ Layout / encode helpers (**`stitchImages`**, **`createCollage`**, **`compress`**
 
 **`painter.validHex('#RRGGBB')`** returns **`true`** or **throws** — useful before feeding hex into configs.
 
-<Alert type="warning" title="`url()` helper">
-The **`url()`** conversion path (used when ctor **`type`** is **`'url'`**) relies on bundled Imgur-oriented flow — treat as **demo-only**; production uploads should use your own storage.
-</Alert>
+---
+
+## Hosted URL via **`outPut`** (**`type: 'url'`**)
+
+Apexify ships **`conversion.ts`** **`url(buffer)`** (Imgur upload) so you can turn any PNG **`Buffer`** into a **shareable HTTPS link** without wiring storage yourself. Set **`new ApexPainter({ type: 'url' })`**, then **`await painter.outPut(buffer)`** — see [Save & output → Imgur URL example](/docs#save-and-output-imgur-url).
+
+**Operational:** requires **network** at runtime; respect Imgur account/API limits and their terms. To use **your own** Imgur app or another host, replace or wrap **`url()`** in a fork, or upload the **`Buffer`** / **`base64`** / **`dataURL`** output from **`outPut`** with your provider.
 
 ---
 
