@@ -1,0 +1,120 @@
+# Charts
+
+PNG chart rendering via **`ChartCreator`** (`lib/Canvas/extended/ChartCreator.ts`), backed by **`lib/Canvas/utils/Charts/*.ts`**. **`ApexPainter`** exposes **`createChart`**, **`createComparisonChart`**, and **`createComboChart`**; the same implementations are available as **`Charts.create*`** without constructing a painter.
+
+**Return shape:** each API resolves to a **PNG `Buffer`** via **`canvas.toBuffer('image/png')`**.
+
+---
+
+## Quick start
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const buf = await painter.createChart(
+  'pie',
+  [
+    { label: 'A', value: 40, color: '#38bdf8' },
+    { label: 'B', value: 35, color: '#a78bfa' },
+    { label: 'C', value: 25, color: '#34d399' },
+  ],
+  { dimensions: { width: 480, height: 320 }, labels: { title: { text: 'Share' } } },
+);
+
+// buf — PNG Buffer
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const buf = await painter.createChart(
+    'pie',
+    [
+      { label: 'A', value: 40, color: '#38bdf8' },
+      { label: 'B', value: 35, color: '#a78bfa' },
+      { label: 'C', value: 25, color: '#34d399' },
+    ],
+    { dimensions: { width: 480, height: 320 }, labels: { title: { text: 'Share' } } },
+  );
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Documentation map
+
+| Topic | Page |
+|-------|------|
+| **`createChart`** typed dispatch & **`Charts`** namespace | [Charts: createChart & namespace](/docs#charts-create-chart) |
+| **`createComparisonChart`** & **`createComboChart`** | [Charts: comparison & combo](/docs#charts-comparison-combo) |
+
+---
+
+## Facade methods (summary)
+
+| Method | Role |
+|--------|------|
+| **`createChart(type, data, options?)`** | Dispatches to **`createPieChart`** … **`createPolarAreaChart`** by **`type`** |
+| **`createComparisonChart(options)`** | Two charts in one canvas (**`sideBySide`** \| **`topBottom`**); panels may mix kinds (**`donut`** only here, not in **`createChart`**) |
+| **`createComboChart(options)`** | Bars + lines; optional **secondary Y**; **`barsType`** **`standard`** \| **`grouped`** \| **`stacked`** |
+
+**Supported `createChart` literals:** `'pie'`, `'bar'`, `'horizontalBar'`, `'line'`, `'scatter'`, `'radar'`, `'polarArea'`.
+
+---
+
+## Chart modules (one file per family)
+
+| Module | Notes |
+|--------|------|
+| **`piechart`** | Slices, donut radius, standard vs connected legend, slice stroke/shadow/**opacity** |
+| **`barchart`** | Vertical bars, **`BarChartType`**, waterfall optional, dual axes, stacked/clustered/lollipop/dot modes |
+| **`horizontalbarchart`** | Horizontal layout + legend inset rules |
+| **`linechart`** | Lines, areas, markers, error bars, correlation ribbon; legend **`fit`** |
+| **`scatterchart`** | Points + optional regression/correlation |
+| **`radarchart`** | Radar / spider series |
+| **`polarareachart`** | Polar area slices |
+| **`combochart`** | Shares bar + line drawing; **`ComboChartOpacity`**; dual **Y** |
+| **`comparisonchart`** | **`ComparisonLayout`**, **`ComparisonChartConfig`** per panel + optional **`generalTitle`** |
+
+**Supporting modules** (used internally; not all re-exported on **`Charts`**): **`chartPadding.ts`**, **`legendTextLayout.ts`**, **`cartesianLegendLayout.ts`**, **`axisTitleLayout.ts`**, **`segmentValueLabel.ts`**.
+
+---
+
+## Appearance & backgrounds
+
+**`options.appearance` (`ChartAppearanceExtended`)** mirrors **`CanvasConfig`**-style backgrounds so charts can match scene canvases:
+
+1. Base **`customBg`** / **`backgroundImage`** / **`backgroundGradient`** / **`backgroundColor`**
+2. **`bgLayers`** (**`drawBackgroundLayers`**)
+3. **`patternBg`** (**`EnhancedPatternRenderer`**)
+4. **`noiseBg`**
+
+Comparison panels can override **`appearance`** per cell where the merger allows; combo and single charts pass **`appearance`** at the top level (**`combochart.ts`**, **`comparisonchart.ts`**).
+
+**`Charts.paintChartCanvasBackground`** — same stack for custom **`SKRSContext2D`** drawing next to Apexify charts.
+
+---
+
+## Imports: façade vs namespace
+
+| Need | Call |
+|------|------|
+| Typed **`createChart`** overloads + wrapped errors (**`ChartCreator`**) | **`painter.createChart(...)`** |
+| Direct module (no **`ApexPainter`**) | **`Charts.createLineChart`** (etc.) from **`import { Charts } from 'apexify.js'`** |
+| Dual-axis bar + line | **`painter.createComboChart`** or **`Charts.createComboChart`** |
+| Two charts in one image | **`painter.createComparisonChart`** or **`Charts.createComparisonChart`** |
+
+Individual **`create*Chart`** functions are **not** flat-exported from the package root — use the **`Charts`** namespace (**`lib/Canvas/utils/Charts/index.ts`**).
+
+Per-chart **data** / **options** types live next to each module under **`lib/Canvas/utils/Charts/`** — they are **not** duplicated inside **`types/index.ts`**.
+
+**Unified tooling types:** **`ChartType`**, **`ChartData`**, **`ChartOptions`** (discriminated unions) are exported from **`Charts`** for wrappers and generators.

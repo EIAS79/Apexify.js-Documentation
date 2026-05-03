@@ -1,0 +1,358 @@
+# Line styles (`lineStyle`)
+
+Shape how each **`CustomOptions`** segment renders: width, solid vs gradient stroke, caps and joins, dashes, bitmap textures, rounded “tube” joins, and an optional second outline pass.
+
+Overview: [Custom lines](/docs#custom-lines).
+
+---
+
+## Width, color, caps & joins
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 60, y: 180 },
+    endCoordinates: { x: 540, y: 180 },
+    lineStyle: {
+      width: 10,
+      color: '#f97316',
+      lineCap: 'round',
+      lineJoin: 'round',
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 60, y: 180 },
+    endCoordinates: { x: 540, y: 180 },
+    lineStyle: {
+      width: 10,
+      color: '#f97316',
+      lineCap: 'round',
+      lineJoin: 'round',
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+| Property | Values |
+|----------|--------|
+| **`lineCap`** | **`butt`**, **`round`**, **`square`** |
+| **`lineJoin`** | **`round`**, **`bevel`**, **`miter`** |
+
+---
+
+## Gradient stroke
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 100, y: 220 },
+    endCoordinates: { x: 620, y: 220 },
+    lineStyle: {
+      width: 14,
+      lineCap: 'round',
+      gradient: {
+        type: 'linear',
+        startX: 100,
+        startY: 220,
+        endX: 620,
+        endY: 220,
+        colors: [
+          { stop: 0, color: '#22d3ee' },
+          { stop: 1, color: '#818cf8' },
+        ],
+      },
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 100, y: 220 },
+    endCoordinates: { x: 620, y: 220 },
+    lineStyle: {
+      width: 14,
+      lineCap: 'round',
+      gradient: {
+        type: 'linear',
+        startX: 100,
+        startY: 220,
+        endX: 620,
+        endY: 220,
+        colors: [
+          { stop: 0, color: '#22d3ee' },
+          { stop: 1, color: '#818cf8' },
+        ],
+      },
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Manual dashes (`lineDash`)
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 80, y: 260 },
+    endCoordinates: { x: 640, y: 260 },
+    lineStyle: {
+      width: 4,
+      color: '#e2e8f0',
+      lineCap: 'butt',
+      lineDash: { dashArray: [18, 10, 4, 10], offset: 0 },
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 80, y: 260 },
+    endCoordinates: { x: 640, y: 260 },
+    lineStyle: {
+      width: 4,
+      color: '#e2e8f0',
+      lineCap: 'butt',
+      lineDash: { dashArray: [18, 10, 4, 10], offset: 0 },
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+If both **`pattern`** and **`lineDash`** are absent, dashes are cleared (**solid** stroke).
+
+---
+
+## Preset patterns (`pattern`)
+
+**`applyLinePattern`** maps **`dots`** and **`dashes`** to built-in dash arrays; **`custom`** uses **`segments`** for **`setLineDash`**. Optional **`offset`** feeds **`lineDashOffset`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 70, y: 140 },
+    endCoordinates: { x: 650, y: 140 },
+    lineStyle: {
+      width: 3,
+      color: '#bef264',
+      pattern: { type: 'dots', offset: 2 },
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 70, y: 140 },
+    endCoordinates: { x: 650, y: 140 },
+    lineStyle: {
+      width: 3,
+      color: '#bef264',
+      pattern: { type: 'dots', offset: 2 },
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Textured stroke (`texture`)
+
+**`texture`** may be a **`Buffer`**, **`http(s)`** URL, or a **working-directory-relative** file path (joined with **`process.cwd()`** and read from disk). On failure the helper logs **`console.error`** and the stroke may fall back silently — validate assets in production.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 90, y: 300 },
+    endCoordinates: { x: 610, y: 300 },
+    lineStyle: {
+      width: 24,
+      color: '#cbd5f5',
+      lineCap: 'butt',
+      texture: './assets/brush-stroke.png',
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 90, y: 300 },
+    endCoordinates: { x: 610, y: 300 },
+    lineStyle: {
+      width: 24,
+      color: '#cbd5f5',
+      lineCap: 'butt',
+      texture: './assets/brush-stroke.png',
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Rounded stroke body (`lineRadius`)
+
+| Value | Effect |
+|-------|--------|
+| **Number `> 0`** | After the main **`stroke()`**, draws filled round caps along the segment axis (chunky “hose” look). |
+| **`'circular'`** | Uses **`arcTo`** pair to round the corner between endpoints. |
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 120, y: 200 },
+    endCoordinates: { x: 520, y: 200 },
+    lineStyle: {
+      width: 12,
+      color: '#fb7185',
+      lineCap: 'round',
+      lineRadius: 16,
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 120, y: 200 },
+    endCoordinates: { x: 520, y: 200 },
+    lineStyle: {
+      width: 12,
+      color: '#fb7185',
+      lineCap: 'round',
+      lineRadius: 16,
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Nested outline (`lineStyle.stroke`)
+
+A second pass draws another stroke using **`lineStyle.stroke`** (supports **`color`**, **`gradient`**, **`width`**, **`lineCap`**, **`lineRadius`**).
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 150, y: 320 },
+    endCoordinates: { x: 550, y: 320 },
+    lineStyle: {
+      width: 12,
+      color: '#fef08a',
+      lineCap: 'round',
+      stroke: {
+        color: '#422006',
+        width: 18,
+        lineCap: 'round',
+      },
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 150, y: 320 },
+    endCoordinates: { x: 550, y: 320 },
+    lineStyle: {
+      width: 12,
+      color: '#fef08a',
+      lineCap: 'round',
+      stroke: {
+        color: '#422006',
+        width: 18,
+        lineCap: 'round',
+      },
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `lineStyle.shadow` (types vs renderer)
+
+**`CustomOptions.lineStyle.shadow`** exists on the **TypeScript** shape for future styling, but **`customLines.ts`** does **not** read it yet — expect **no shadow** from that field until wiring lands. Use compositing (draw connectors on a layer in **`createImage`**) if you need blur-offset shadows today.
+
+---
+
+## Style cheat sheet
+
+| Key | Role |
+|-----|------|
+| **`width`** | Stroke thickness |
+| **`color`** / **`gradient`** | Stroke paint |
+| **`lineCap`**, **`lineJoin`** | Canvas caps / joins |
+| **`lineDash`** | Custom dash array + offset |
+| **`pattern`** | Preset **`dots`** / **`dashes`** / **`custom`** segments |
+| **`texture`** | Repeated bitmap pattern along stroke |
+| **`lineRadius`** | Pill / circular rounding helpers |
+| **`singleLine`** | Chain segments (see [Pipeline](/docs#custom-lines-pipeline)) |
+| **`stroke`** | Nested outline stroke |
+
+Next: [Arrows & markers](/docs#custom-lines-arrows-markers) · [Pipeline](/docs#custom-lines-pipeline).

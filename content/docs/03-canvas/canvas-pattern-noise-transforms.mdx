@@ -1,0 +1,78 @@
+# Canvas patterns, noise & transforms
+
+Full-canvas **`patternBg`**, **`noiseBg`**, and geometry / composite styling on the canvas rect. Pipeline position: [Canvas pipeline](/docs#canvas-pipeline).
+
+---
+
+## Full-canvas procedural pattern (`patternBg`)
+
+Applied **after** **`bgLayers`**. Uses **`EnhancedPatternRenderer`** — same **`PatternOptions`** vocabulary as charts’ **`patternBg`**. Default blend behavior differs from stacked layers (renderer may use **`overlay`** when not stacked — see implementation in **`lib/Canvas/utils/Patterns/enhancedPatternRenderer.ts`**).
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#111827',
+  patternBg: {
+    type: 'grid',
+    color: '#374151',
+    secondaryColor: '#4b5563',
+    size: 24,
+    spacing: 8,
+    opacity: 0.35,
+  },
+});
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({
+  width: 800,
+  height: 600,
+  colorBg: '#111827',
+  patternBg: {
+    type: 'grid',
+    color: '#374151',
+    secondaryColor: '#4b5563',
+    size: 24,
+    spacing: 8,
+    opacity: 0.35,
+  },
+});
+```
+</js>
+</CodeSwitcher>
+
+**Note:** **`PatternOptions.gradient`** is declared in types but **not** consumed by **`EnhancedPatternRenderer`** today — use **`color`** / **`secondaryColor`** for meshes.
+
+---
+
+## Whole-canvas noise (`noiseBg`)
+
+```typescript
+noiseBg: { intensity: 0.08 },
+```
+
+---
+
+## Transform & styling on the canvas rect
+
+| Key | Effect |
+|-----|--------|
+| **`x`**, **`y`** | Translation applied before draw (**default 0**) |
+| **`rotation`** | Degrees around box center (**`applyRotation`**) |
+| **`borderRadius`** | Number or **`'circular'`** — clips **all** background painting |
+| **`borderPosition`** | Which corners/edges participate in rounding (comma-separated tokens, **`all`**, …) |
+| **`zoom`** | **`scale`** (**≠ 1**), **`centerX`**, **`centerY`** — scale about pivot (**default canvas center**) |
+| **`blendMode`** | Initial **`globalCompositeOperation`** inside clip |
+| **`opacity`** | **`ctx.globalAlpha`** for the main block |
+| **`blur`** | **`ctx.filter`** blur on **gradient** / **color** fills and **`customBackground`** |
+
+Edge effects **after** **`restore`**:
+
+| Key | Effect |
+|-----|--------|
+| **`shadow`** | **`ShadowOptions`** — **`applyShadow`** |
+| **`stroke`** | **`StrokeOptions`** — **`applyStroke`** |

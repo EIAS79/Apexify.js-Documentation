@@ -1,0 +1,162 @@
+# Canvas primary fills
+
+Solid (**`colorBg`**), gradient (**`gradientBg`**), image (**`customBg`**), and video frame (**`videoBg`**). Validation and mutex rules: [Canvas pipeline](/docs#canvas-pipeline).
+
+---
+
+## 1. Solid color (`colorBg`)
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: '#0f172a',
+});
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: '#0f172a',
+});
+```
+</js>
+</CodeSwitcher>
+
+**Transparent base** (no default black): combine **`colorBg: 'transparent'`** or **`transparentBase: true`** with **`bgLayers`** / **`patternBg`** / **`noiseBg`** as needed.
+
+---
+
+## 2. Gradient (`gradientBg`)
+
+Supports **`linear`**, **`radial`**, **`conic`** with **`colors: [{ stop, color }, …]`**. Optional **`repeat`**: **`repeat`** / **`reflect`** (linear & radial) builds a tiled **`CanvasPattern`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({
+  width: 800,
+  height: 400,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 800,
+    endY: 400,
+    colors: [
+      { stop: 0, color: '#1e293b' },
+      { stop: 1, color: '#0ea5e9' },
+    ],
+  },
+});
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({
+  width: 800,
+  height: 400,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 800,
+    endY: 400,
+    colors: [
+      { stop: 0, color: '#1e293b' },
+      { stop: 1, color: '#0ea5e9' },
+    ],
+  },
+});
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## 3. Image background (`customBg`)
+
+**Mutex:** cannot combine **`customBg`** with **`colorBg`** or **`gradientBg`** as the primary fill.
+
+| Field | Role |
+|-------|------|
+| **`source`** | Path, **`http(s)` URL**, or absolute path (after **`cwd`** join) |
+| **`inherit`** | **`true`** → canvas size = image size; draw image at intrinsic dimensions |
+| **`fit`** | **`fill`** (stretch) \| **`contain`** \| **`cover`** |
+| **`align`** | **`center`**, **`top-left`**, … (see types) |
+| **`filters`** | **`ImageFilter[]`** — applied via **`applyProfessionalImageFilters`** after first paint |
+| **`opacity`** | Opacity pass on the image |
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({
+  width: 1200,
+  height: 630,
+  customBg: {
+    source: './assets/photo.jpg',
+    fit: 'cover',
+    align: 'center',
+    opacity: 0.85,
+  },
+});
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({
+  width: 1200,
+  height: 630,
+  customBg: {
+    source: './assets/photo.jpg',
+    fit: 'cover',
+    align: 'center',
+    opacity: 0.85,
+  },
+});
+```
+</js>
+</CodeSwitcher>
+
+If **`loadImage`** fails, **`customBackground`** logs **`console.error`** and leaves that area empty — prefer validating paths in app code.
+
+---
+
+## 4. Video frame (`videoBg`)
+
+Requires **FFmpeg** and **`ApexPainter`**’s injected **`extractVideoFrame`**. Failures **throw** (except FFmpeg-not-found propagates). **`opacity`**, **`frame`**, **`time`**, **`format`**, **`quality`** mirror video-bg typings.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({
+  videoBg: {
+    source: './promo.mp4',
+    time: 2.5,
+    format: 'jpg',
+    quality: 2,
+    opacity: 1,
+  },
+  // width/height optional — inferred from frame when extraction succeeds
+});
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({
+  videoBg: {
+    source: './promo.mp4',
+    time: 2.5,
+    format: 'jpg',
+    quality: 2,
+  },
+});
+```
+</js>
+</CodeSwitcher>
+
+See [Video & FFmpeg](/docs#video-ffmpeg).

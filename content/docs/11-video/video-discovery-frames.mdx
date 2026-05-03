@@ -1,0 +1,63 @@
+# Video: discovery & frames
+
+## `getVideoInfo(source, skipFFmpegCheck?)`
+
+**`ffprobe`**-based metadata (**`ApexPainter`**). Used directly for discovery, and internally prefetched when **`createVideo`** runs **`getInfo`**, or needs **`videoInfo`** for **`extractFrame`** (by frame index), **`generateThumbnail`**, or **`generatePreview`**.
+
+**Caveat:** **`getVideoInfo`** checks **`existsSync(videoSource)`** without always applying the same **`cwd`** join as **`#extractVideoFrame`** — a **relative path** can fail metadata while frame extraction still works. Prefer **absolute paths** or **`Buffer`** — [Video FFmpeg internals](/docs#video-ffmpeg-internals).
+
+---
+
+## Class method: `extractFrames(options)` — `ExtractFramesOptions`
+
+**Not** the same object as **`createVideo({ extractFrames: … })`** (see below).
+
+- **`interval`** (milliseconds) drives **`fps ≈ 1000 / interval`** — must be **positive**.
+- Frames are written under **`process.cwd()/.temp-frames/frames-<timestamp>/`** (implementation detail; verify in source if you rely on paths).
+
+Some typings may list fields **not** consumed by **`ApexPainter.extractFrames`** — verify against **`lib/Canvas/ApexPainter.ts`** and **`ExtractFramesOptions`** in **`types/index.ts`** (possible type drift).
+
+---
+
+## Frame helper shortcuts
+
+| Method | Role |
+|--------|------|
+| **`extractFrameAtTime`** | Single frame at **`time`** seconds |
+| **`extractFrameByNumber`** | Frame by index (**uses FPS from probe when possible**) |
+| **`extractMultipleFrames`** | Several times or indices |
+| **`extractAllFrames`** | Directory sweep / range helpers |
+
+These wrap the private **`#extractVideoFrame`** pipeline on **`ApexPainter`**.
+
+---
+
+## `createVideo` frame branches (`VideoCreationOptions`)
+
+<Alert type="info" title="Two different `extractFrames` configs">
+**`ApexPainter.extractFrames`** uses **`ExtractFramesOptions`** from **`types/index.ts`**. **`createVideo({ extractFrames: … })`** uses **`VideoCreationOptions.extractFrames`** — supports **`times[]`**, **`interval`**, **`outputDirectory`**, **`frameSelection`**, **`outputFormat`**, **`quality`**, etc. **Do not** copy options between the two APIs blindly.
+</Alert>
+
+### `extractFrame`
+
+Single frame: FFmpeg extract → **`loadImage`** → optional resize → **`{ buffer: PNG, canvas: { width, height } }`**.
+
+- Pass **`time`** or **`frame`** (frame index path consult **`VideoCreator`** — uses **`extractVideoFrame`** with **`frame ?? 0`** and optional **`time`**).
+- **`outputFormat`**: **`jpg`** \| **`png`**; **`quality`** applies to JPEG (**FFmpeg `q:v`** — lower values typically mean higher quality).
+
+### `extractFrames`
+
+1. If **`times`** is set: loops **`extractVideoFrame`** at each timestamp → **`Buffer[]`**.
+2. Else if **`interval`** is set **and** the interval **`extractFrames`** dependency was wired: delegates to **`ApexPainter`**’s **`extractFrames`**-style helper with **`outputDirectory`**, **`frameSelection`**, etc.
+3. If **`extractFrames: {}`** or another incomplete shape: **no inner branch runs** — execution **falls through** the router and can end with **`No video operation specified`**. Always pass **`times`** or **`interval`** (plus needed fields) intentionally.
+
+### `extractAllFrames`
+
+Delegates to **`extractAllFrames`** dependency — optional **`outputDirectory`**, **`prefix`**, **`startTime`** / **`endTime`**, format, quality (**see **`VideoCreationOptions`** in **`VideoCreator.ts`**).
+
+---
+
+## See also
+
+- [Video & FFmpeg hub](/docs#video-ffmpeg)
+- [`createVideo` router & options](/docs#video-create-video) — full branch order (**`getInfo`** wins before **`extractFrame`**, …)

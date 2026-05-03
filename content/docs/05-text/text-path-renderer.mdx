@@ -1,0 +1,112 @@
+# Text path renderer (`renderTextOnPath`)
+
+Places each character of a string along a **line**, **arc**, **cubic Bézier**, or **quadratic** path by stepping evenly by approximate glyph width. Letters are rotated to match the path tangent at each sample point.
+
+**Source:** `lib/Canvas/utils/Texts/textPathRenderer.ts`.
+
+---
+
+## Not part of the public npm API
+
+The published **`apexify.js`** tarball only ships **`dist/`** — **`renderTextOnPath`** is **not** re-exported from `apexify.js` or **`CanvasUtils`**. It is **not** used by **`TextCreator`** / **`createText`** (those use **`textOnCurve`** for circular arcs only).
+
+| Audience | How to use |
+|----------|------------|
+| **App authors on npm** | Prefer **`textOnCurve`** on **`TextProperties`** ([Curved text & metrics](/docs#text-curved-and-metrics)), or draw with **`createPath2D`** / **`drawPath`** as guides ([Path2D](/docs#path2d-draw)). |
+| **Forks / monorepos linking this repo** | Import from **`lib/Canvas/utils/Texts/textPathRenderer.ts`** (path relative to your bundler setup). |
+
+---
+
+## Signature
+
+```typescript
+renderTextOnPath(
+  ctx: SKRSContext2D,
+  text: string,
+  pathConfig: {
+    type: 'line' | 'arc' | 'bezier' | 'quadratic';
+    points: Array<{ x: number; y: number }>;
+    offset?: number; // reserved in config; spacing uses the next argument
+  },
+  offset: number = 0 // perpendicular offset passed to fillText (default 0)
+): void;
+```
+
+Set **`font`**, **`fillStyle`**, etc. on **`ctx`** **before** calling — the helper only issues **`fillText`** per character.
+
+---
+
+## Path geometry (`points`)
+
+| `type` | `points` layout |
+|--------|------------------|
+| **`line`** | Polyline: **`[p0, p1, …]`** — consecutive segments. |
+| **`arc`** | **`[center, startPoint, endPoint]`** — radius from center→start; arc from start angle to end angle. |
+| **`bezier`** | At least **4** points per segment: start, two controls, end; additional segments use triplets of control/control/end after the first **`moveTo`** chunk (matches internal **`Path2D`** construction). |
+| **`quadratic`** | **3** points per segment: start, control, end (chained in pairs after the first segment). |
+
+Approximate path length drives spacing; **Bézier / quadratic** length uses **100** linear samples along the parameter (**implementation detail** — long strings may look slightly uneven on sharp curves).
+
+---
+
+## Example (Apexify.js repo checkout only)
+
+Point the import at **`lib/Canvas/utils/Texts/textPathRenderer`** inside your clone (path depends on your script location). **`npm install apexify.js`** does **not** publish **`lib/`**, so this snippet is for contributors and vendor forks.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { createCanvas } from '@napi-rs/canvas';
+import { renderTextOnPath } from './lib/Canvas/utils/Texts/textPathRenderer';
+
+const canvas = createCanvas(400, 200);
+const ctx = canvas.getContext('2d');
+ctx.font = '20px Arial';
+ctx.fillStyle = '#fff';
+
+renderTextOnPath(
+  ctx,
+  'Along the curve',
+  {
+    type: 'quadratic',
+    points: [
+      { x: 40, y: 140 },
+      { x: 200, y: 40 },
+      { x: 360, y: 140 },
+    ],
+  },
+  0
+);
+```
+</ts>
+<js>
+```javascript
+const { createCanvas } = require('@napi-rs/canvas');
+const { renderTextOnPath } = require('./lib/Canvas/utils/Texts/textPathRenderer');
+
+const canvas = createCanvas(400, 200);
+const ctx = canvas.getContext('2d');
+ctx.font = '20px Arial';
+ctx.fillStyle = '#fff';
+
+renderTextOnPath(ctx, 'Along the curve', {
+  type: 'quadratic',
+  points: [
+    { x: 40, y: 140 },
+    { x: 200, y: 40 },
+    { x: 360, y: 140 },
+  ],
+});
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Related
+
+| Page | Topic |
+|------|--------|
+| [Create text](/docs#create-text) | **`createText`**, **`textOnCurve`** |
+| [Curved text & metrics](/docs#text-curved-and-metrics) | Arc-based curved labels |
+| [lib module charter](/docs#lib-module-charter) | Where this file sits in **`lib/`** |

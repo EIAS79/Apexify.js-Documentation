@@ -1,0 +1,22 @@
+# Create canvas (`createCanvas`)
+
+**API:** `await painter.createCanvas(canvas: CanvasConfig)` → **`CanvasResults`**.
+
+**Implementation:** `lib/Canvas/extended/CanvasCreator.ts` draws in a fixed order using **`lib/Canvas/utils/Background/bg.ts`** (solid / gradient / image / layers / bitmap pattern / noise / zoom) plus **`lib/Canvas/utils/Patterns/enhancedPatternRenderer.ts`** for **`patternBg`** and **`presetPattern`** layers.
+
+<Alert type="info" title="Deep references">
+Draw order and validation: [Canvas pipeline](/docs#canvas-pipeline). Background primitives: **`lib/Canvas/utils/Background/bg.ts`**. Procedural meshes: [Canvas patterns, noise & transforms](/docs#canvas-pattern-noise-transforms). Types: **`CanvasConfig`**, **`BackgroundLayer`**, **`PatternOptions`** in **`CanvasTypes`** ([Canvas utils & types](/docs#canvas-utils-and-types)).
+</Alert>
+
+---
+
+## Canvas docs by topic
+
+| Topic | Page |
+|-------|------|
+| **`CanvasResults`**, **`validateCanvasConfig`**, sizing, paint pipeline order, **`resolveMediaPath`** | [Canvas pipeline](/docs#canvas-pipeline) |
+| **`colorBg`**, **`gradientBg`**, **`customBg`**, **`videoBg`** | [Canvas primary fills](/docs#canvas-primary-fills) |
+| Stacked **`bgLayers`** (color, gradient, image, pattern, preset pattern, noise) | [Canvas background layers](/docs#canvas-bg-layers) |
+| **`patternBg`**, **`noiseBg`**, transforms, **`shadow`** / **`stroke`** | [Canvas patterns, noise & transforms](/docs#canvas-pattern-noise-transforms) |
+| **`buildPathbg`** (rounded paths, source-only helper in **`bg.ts`**) | [Canvas buildPathbg](/docs#canvas-buildpathbg) |
+| Full recipe, **`CanvasUtils`**, next-step links | [Canvas recipes & CanvasUtils](/docs#canvas-recipes-and-utils) |

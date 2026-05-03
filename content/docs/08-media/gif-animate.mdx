@@ -1,0 +1,206 @@
+# `animate` & `Frame`
+
+Render a sequence of canvases from **`Frame`** descriptors — useful for tweens, slideshows, or prototypes. Optionally mirror the same frames into a **GIF file** on disk.
+
+Overview: [GIF & animation](/docs#gif-and-animation).
+
+---
+
+## Signature
+
+```text
+await painter.animate(
+  frames,
+  defaultDuration,
+  defaultWidth?,   // default 800
+  defaultHeight?, // default 600
+  options?
+)
+```
+
+**Returns**
+
+- **`Promise<Buffer[]>`** — one PNG **`Buffer`** per frame when **`options.gif`** is **not** **`true`**.  
+- **`Promise<undefined>`** when **`gif: true`** (frames are written only to **`gifPath`**).
+
+---
+
+## `Frame` fields
+
+| Field | Role |
+|-------|------|
+| **`backgroundColor`** | Solid CSS color behind everything |
+| **`gradient`** | **`GradientConfig`** — implementation builds **`linear`** or **`radial`** gradients only (**conic** is not wired in **`animate`**) |
+| **`pattern`** | **`{ source, repeat? }`** tiled **`createPattern`** |
+| **`source`** | Full-bleed image path/URL drawn after background |
+| **`blendMode`** | Composites **`source`** (**default `source-over`**) |
+| **`transformations`** | **`scaleX/Y`**, **`rotate`** (degrees), **`translateX/Y`** — wraps bg + image + custom draw |
+| **`duration`** | Overrides **`defaultDuration`** for pacing + GIF delay |
+| **`width`**, **`height`** | Override **`defaultWidth`** / **`defaultHeight`** per frame |
+| **`onDrawCustom(ctx, canvas)`** | Extra vector/text/shapes using the raw context |
+
+---
+
+## PNG sequence (no GIF file)
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const buffers = await painter.animate(
+  [
+    {
+      backgroundColor: '#0f172a',
+      duration: 200,
+      onDrawCustom: (ctx, canvas) => {
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 48px Arial';
+        ctx.fillText('1', canvas.width / 2 - 16, canvas.height / 2);
+      },
+    },
+    {
+      gradient: {
+        type: 'linear',
+        startX: 0,
+        startY: 0,
+        endX: 400,
+        endY: 300,
+        colors: [
+          { stop: 0, color: '#312e81' },
+          { stop: 1, color: '#be185d' },
+        ],
+      },
+      duration: 200,
+    },
+  ],
+  200,
+  400,
+  300
+);
+
+buffers?.forEach((buf, i) => fs.writeFileSync(`frame-${i}.png`, buf));
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const buffers = await painter.animate(
+    [
+      {
+        backgroundColor: '#0f172a',
+        duration: 200,
+        onDrawCustom: (ctx, canvas) => {
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = 'bold 48px Arial';
+          ctx.fillText('1', canvas.width / 2 - 16, canvas.height / 2);
+        },
+      },
+      {
+        gradient: {
+          type: 'linear',
+          startX: 0,
+          startY: 0,
+          endX: 400,
+          endY: 300,
+          colors: [
+            { stop: 0, color: '#312e81' },
+            { stop: 1, color: '#be185d' },
+          ],
+        },
+        duration: 200,
+      },
+    ],
+    200,
+    400,
+    300
+  );
+
+  buffers?.forEach((buf, i) => fs.writeFileSync(`frame-${i}.png`, buf));
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## GIF sidecar (`gif` + `gifPath`)
+
+Setting **`gif: true`** requires **`gifPath`**. **`animate`** configures **`GIFEncoder`** (**`repeat: 0`**, **`quality: 10`**) and pushes each composed frame. The Promise resolves **`undefined`** — read the file from disk afterward.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.animate(
+  [
+    { backgroundColor: '#111827', duration: 250 },
+    { backgroundColor: '#1f2937', duration: 250 },
+    { backgroundColor: '#334155', duration: 250 },
+  ],
+  250,
+  320,
+  200,
+  { gif: true, gifPath: './sequence.gif' }
+);
+```
+</ts>
+<js>
+```javascript
+await painter.animate(
+  [
+    { backgroundColor: '#111827', duration: 250 },
+    { backgroundColor: '#1f2937', duration: 250 },
+    { backgroundColor: '#334155', duration: 250 },
+  ],
+  250,
+  320,
+  200,
+  { gif: true, gifPath: './sequence.gif' }
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Lifecycle hooks
+
+**`options.onStart`**, **`onFrame(index)`**, **`onEnd`** fire around the loop (**`onFrame`** receives the frame index).
+
+---
+
+## Timing note
+
+After each frame, **`animate`** **`await`s `setTimeout`** for **`frame.duration || defaultDuration`** ms — real clock pacing. For fastest batch encoding of static buffers prefer **`createGIF`** instead.
+
+---
+
+## Validation
+
+| Issue | Message |
+|-------|---------|
+| Empty **`frames`** | `animate: frames array with at least one frame is required.` |
+| Invalid **`defaultDuration`** | `animate: defaultDuration must be a non-negative number.` |
+| Bad default width/height | `animate: defaultWidth/defaultHeight must be positive numbers.` |
+| **`gif`** without **`gifPath`** | `animate: gifPath is required when gif is enabled.` |
+
+Failures wrap as **`animate failed: …`**.
+
+---
+
+## When to prefer `createGIF`
+
+| Need | Use |
+|------|-----|
+| Exact disposal / transparency / watermark / **`onEnd`** still | **`createGIF`** |
+| Per-frame **`GIFInputFrame`** from disk | **`createGIF`** |
+| Quick sketch + optional GIF dump | **`animate`** |
+
+Next: [Create GIF](/docs#gif-create) · [Create canvas](/docs#create-canvas).

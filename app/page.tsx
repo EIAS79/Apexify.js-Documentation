@@ -1133,7 +1133,7 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/docs#Changelog" className="text-gray-400 hover:text-white transition-colors duration-200">
+                  <Link href="/docs#Change-Log" className="text-gray-400 hover:text-white transition-colors duration-200">
                     Changelog
                   </Link>
                 </li>

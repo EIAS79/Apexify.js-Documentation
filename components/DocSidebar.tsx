@@ -22,6 +22,7 @@ interface DocFile {
 
 interface DocFolder {
   name: string;
+  displayName?: string;
   path: string;
   files: DocFile[];
 }
@@ -166,23 +167,31 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
     );
   };
 
+  const folderLabel = (folder: DocFolder) => folder.displayName ?? folder.name;
+
+  const folderEmojiFor = (displayName: string) => {
+    const map: Record<string, string> = {
+      Introduction: '📌',
+      Package: '📦',
+      Canvas: '🎨',
+      Images: '🖼️',
+      Text: '📝',
+      Lines: '✨',
+      'Advanced Raster': '🔬',
+      Media: '🎞️',
+      'Batch Output': '🗂️',
+      Charts: '📊',
+      Video: '🎬',
+      Reference: '📚',
+    };
+    return map[displayName] ?? '📁';
+  };
+
   const renderFolder = (folder: DocFolder) => {
     const isExpanded = expanded[folder.name] ?? false;
     const hasActiveFile = folder.files.some(f => activeHash === f.filename);
-
-    // Map folder names to emojis for better visual appeal
-    const folderEmoji: Record<string, string> = {
-      'Background': '🎨',
-      'Charts': '📊',
-      'Custom': '✨',
-      'Extras': '🎯',
-      'Image': '🖼️',
-      'Reference': '📚',
-      'Text': '📝',
-      'Video': '🎬',
-    };
-
-    const emoji = folderEmoji[folder.name] || '📁';
+    const label = folderLabel(folder);
+    const emoji = folderEmojiFor(label);
 
     return (
       <div key={folder.name} className="mb-1">
@@ -211,7 +220,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
             <FolderIcon className={`h-5 w-5 sm:h-5 sm:w-5 flex-shrink-0 transition-colors duration-150 ${
               hasActiveFile ? 'text-blue-400' : 'text-gray-500 group-hover:text-blue-400'
             }`} />
-            <span className="truncate min-w-0">{folder.name}</span>
+            <span className="truncate min-w-0">{label}</span>
           </button>
         </div>
         {isExpanded && (

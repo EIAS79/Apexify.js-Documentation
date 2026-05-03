@@ -1,0 +1,234 @@
+# Filters & grouped drawings
+
+Stack **`filters`** on each bitmap layer, choose whether they run **before** or **after** compositing, optionally scale them with **`filterIntensity`**, and — when you draw **several** layers as one unit — wrap them in **`groupTransform`**.
+
+Overview: [Create image & shapes](/docs#create-image-and-shapes).
+
+---
+
+## `ImageFilter` reference
+
+Each entry is **`{ type, …params }`**. Intensity / value ranges follow the comments on **`ImageFilter`** in your TypeScript types.
+
+| `type` | Parameters | What it does |
+|--------|-------------|--------------|
+| **`gaussianBlur`** | **`intensity`** (~0–100+, blur radius) | Soft blur |
+| **`motionBlur`** | **`intensity`**, **`angle`** (0–360°) | Directional streak blur |
+| **`radialBlur`** | **`intensity`**, optional **`centerX`**, **`centerY`** | Zoom-style blur from a center |
+| **`sharpen`** | **`intensity`** | Crisp edges |
+| **`noise`** | **`intensity`** (0–1) | RGB noise |
+| **`grain`** | **`intensity`** (0–1) | Film grain |
+| **`edgeDetection`** | **`intensity`** (~0–10+) | Edge emphasis |
+| **`emboss`** | **`intensity`** (~0–10+) | Relief / emboss |
+| **`invert`** | — | Color inversion |
+| **`grayscale`** | — | Remove saturation |
+| **`sepia`** | — | Warm tone |
+| **`pixelate`** | **`size`** (block size, ≥ 2) | Mosaic blocks |
+| **`brightness`** | **`value`** (−100…100) | Lift / crush luminance |
+| **`contrast`** | **`value`** (−100…100) | Contrast |
+| **`saturation`** | **`value`** (−100…100) | Saturation |
+| **`hueShift`** | **`value`** (0–360°, hue rotate) | Hue rotation |
+| **`posterize`** | **`levels`** (2–256) | Poster / banded colors |
+
+Implementation mixes **canvas kernels**, **Sharp**, and fallbacks depending on the filter — treat **`Promise`** timing as **async** work inside **`createImage`**.
+
+---
+
+## Chaining filters
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './portrait.jpg',
+    x: 32,
+    y: 32,
+    width: 420,
+    height: 420,
+    fit: 'cover',
+    borderRadius: 24,
+    filters: [
+      { type: 'grayscale' },
+      { type: 'contrast', value: 18 },
+      { type: 'gaussianBlur', intensity: 1.2 },
+    ],
+    filterIntensity: 1,
+    filterOrder: 'post',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './portrait.jpg',
+    x: 32,
+    y: 32,
+    width: 420,
+    height: 420,
+    fit: 'cover',
+    borderRadius: 24,
+    filters: [
+      { type: 'grayscale' },
+      { type: 'contrast', value: 18 },
+      { type: 'gaussianBlur', intensity: 1.2 },
+    ],
+    filterIntensity: 1,
+    filterOrder: 'post',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Grouped mode (`CreateImageOptions`)
+
+Use this when you want **multiple** layers to share **one** rotation, shadow, stroke, mask, filters, etc.
+
+**Requirements:** pass an **array** with **at least two** items, set **`isGrouped: true`**, and supply **`groupTransform`**. If any condition is missing, layers render **one-by-one** instead.
+
+**`GroupTransformOptions`** mirrors the big knobs from **`ImageProperties`**: **`rotation`**, **`translateX/Y`**, **`scaleX/Y`**, **`pivotX/Y`**, **`opacity`**, **`blur`**, **`blendMode`**, **`borderRadius`**, **`borderPosition`**, **`filters`**, **`filterIntensity`**, **`filterOrder`**, **`mask`**, **`clipPath`**, **`distortion`**, **`meshWarp`**, **`effects`**, **`shadow`**, **`stroke`**, **`boxBackground`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 720,
+  height: 380,
+  colorBg: '#312e81',
+});
+
+const out = await painter.createImage(
+  [
+    {
+      source: 'rectangle',
+      x: 180,
+      y: 90,
+      width: 140,
+      height: 100,
+      shape: { fill: true, color: '#fde68a' },
+    },
+    {
+      source: 'circle',
+      x: 360,
+      y: 100,
+      width: 90,
+      height: 90,
+      shape: { fill: true, color: '#fca5a5' },
+    },
+    {
+      source: 'triangle',
+      x: 500,
+      y: 85,
+      width: 110,
+      height: 110,
+      shape: { fill: true, color: '#93c5fd' },
+    },
+  ],
+  buffer,
+  {
+    isGrouped: true,
+    groupTransform: {
+      rotation: -6,
+      opacity: 0.95,
+      stroke: { color: '#f8fafc', width: 3 },
+      shadow: {
+        color: 'rgba(15,23,42,0.45)',
+        offsetX: 0,
+        offsetY: 18,
+        blur: 28,
+        opacity: 1,
+      },
+      filters: [{ type: 'sharpen', intensity: 8 }],
+      filterOrder: 'post',
+    },
+  }
+);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer } = await painter.createCanvas({
+    width: 720,
+    height: 380,
+    colorBg: '#312e81',
+  });
+
+  const out = await painter.createImage(
+    [
+      {
+        source: 'rectangle',
+        x: 180,
+        y: 90,
+        width: 140,
+        height: 100,
+        shape: { fill: true, color: '#fde68a' },
+      },
+      {
+        source: 'circle',
+        x: 360,
+        y: 100,
+        width: 90,
+        height: 90,
+        shape: { fill: true, color: '#fca5a5' },
+      },
+      {
+        source: 'triangle',
+        x: 500,
+        y: 85,
+        width: 110,
+        height: 110,
+        shape: { fill: true, color: '#93c5fd' },
+      },
+    ],
+    buffer,
+    {
+      isGrouped: true,
+      groupTransform: {
+        rotation: -6,
+        opacity: 0.95,
+        stroke: { color: '#f8fafc', width: 3 },
+        shadow: {
+          color: 'rgba(15,23,42,0.45)',
+          offsetX: 0,
+          offsetY: 18,
+          blur: 28,
+          opacity: 1,
+        },
+        filters: [{ type: 'sharpen', intensity: 8 }],
+        filterOrder: 'post',
+      },
+    }
+  );
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Import helpers for custom canvases
+
+If you manage your own **`@napi-rs/canvas`** context, you can import the same helpers **`createImage` uses**, for example **`applyImageMask`**, **`applyClipPath`**, **`applyPerspectiveDistortion`**, **`applyBulgeDistortion`**, **`applyMeshWarp`**, **`applyProfessionalImageFilters`**, **`applyImageFilters`**, **`applyVignette`**, **`applyLensFlare`**, **`applyChromaticAberration`**, **`applyFilmGrain`**, **`fitInto`**, **`drawBoxBackground`**, **`buildPath`**, **`applyShadow`**, **`applyStroke`** — all exported from **`apexify.js`**.
+
+---
+
+## Where to go next
+
+| Topic | Link |
+|-------|------|
+| Pipeline & stacking | [How `createImage` works](/docs#image-pipeline) |
+| Shape recipes | [Shapes](/docs#image-shapes) |
+| Placement, masks, warps, effects | [Placement & effects](/docs#image-properties-and-effects) |
+| Add typography | [Create text](/docs#create-text) |

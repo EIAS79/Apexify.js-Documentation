@@ -1,0 +1,336 @@
+# Complete developer guide
+
+This page is the **guided tour** for **Apexify.js**. It explains **how pieces fit together**, gives **copy-paste examples**, and links to **topic pages** under **`docs/`**. The repo file **`features-forDocs.md`** is only a **short backlog** of topics not yet written up on this site.
+
+<Alert type="info" title="How to use this page">
+1. Read **Mental model** once.  
+2. Follow **Step-by-step first project**.  
+3. Skim **Feature map** when you need a specific API.  
+4. Use [Documentation map](/docs#documentation-map) for reading order; **`features-forDocs.md`** for **documentation gaps**; [Video FFmpeg internals](/docs#video-ffmpeg-internals) for **`VideoHelpers`** / FFmpeg recipes.
+</Alert>
+
+---
+
+## Mental model
+
+```
+  ApexPainter                    CanvasUtils (flat imports)
+       |                                  |
+       v                                  v
+  createCanvas ──► createImage ──►    drawShape / drawText / Charts...
+       |               |
+       └───────────────┴──► createText ──► Buffer (PNG)
+                                    |
+                             save() / outPut()
+```
+
+| Idea | Explanation |
+|------|-------------|
+| **`ApexPainter`** | One class with **~51 public methods** — canvas scene, layers, text, GIF, charts, video router, batch/chain, save/**`outPut`**. Implementation wires internal **creators** under `lib/Canvas/extended/` (**you don’t import those**). Wiring overview: [Package surface](/docs#package-surface). |
+| **`CanvasUtils` / flat exports** | Same helpers **without** `ApexPainter` — e.g. **`drawShape`**, **`drawText`**, **`Charts.createPieChart`**, backgrounds. Use when you already hold a **`SKRSContext2D`**. |
+| **`CanvasTypes`** | Type-only namespace from **`types/index.ts`** — **`CanvasConfig`**, **`ImageProperties`**, **`TextProperties`**, … — see [Canvas utils & types](/docs#canvas-utils-and-types). |
+| **Buffer pipeline** | Most draw methods return **`Promise<Buffer>`** (PNG). **`createCanvas`** returns **`{ buffer, canvas }`** (**`CanvasResults`**). Pass buffers forward into **`createImage`**, **`createText`**, **`createCustom`**, etc. |
+
+---
+
+## Prerequisites
+
+| Requirement | Why |
+|-------------|-----|
+| **Node.js ≥ 16** | Stated in **`package.json`** `engines`. |
+| **`apexify.js`** | Pulls **`@napi-rs/canvas`**, **Sharp**, etc. |
+| **FFmpeg + ffprobe on `PATH`** | Only for **`getVideoInfo`**, **`extractFrames`**, **`createVideo`**, and related APIs. |
+| **Optional: TypeScript** | Better autocomplete for **`CanvasTypes`**. |
+
+Install:
+
+<CodeBlock lang="bash">
+```bash
+npm install apexify.js
+```
+</CodeBlock>
+
+---
+
+## Step-by-step: first project
+
+### Step 1 — Create the painter
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+// `type` affects `outPut()` only — most methods still return Buffer.
+const painter = new ApexPainter({ type: 'buffer' });
+```
+
+### Step 2 — Allocate a scene (`createCanvas`)
+
+`createCanvas` applies **`CanvasConfig`**: size, **`colorBg`** / **`gradientBg`** / **`customBg`** / **`patternBg`**, **`bgLayers`**, stroke/shadow on the canvas edge, optional **`videoBg`**, **`zoom`**, …
+
+Canvas options: [Create canvas](/docs#create-canvas) hub → pipeline, fills, layers, patterns.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer: scene, canvas } = await painter.createCanvas({
+  width: 800,
+  height: 450,
+  colorBg: '#111827',
+});
+// scene = PNG Buffer; canvas = { width, height }
+```
+</ts>
+<js>
+```javascript
+const { buffer: scene, canvas } = await painter.createCanvas({
+  width: 800,
+  height: 450,
+  colorBg: '#111827',
+});
+```
+</js>
+</CodeSwitcher>
+
+### Step 3 — Composite images (`createImage`)
+
+Pass **the previous buffer** (or **`CanvasResults.buffer`**) as **`canvasBuffer`**. Each item is **`ImageProperties`**: **`source`** (path, URL, **Buffer**, or **shape name** like **`'circle'`**), **`x`**, **`y`**, optional **`width`/`height`**, **`fit`**, **`align`**, **`filters`**, **`rotation`**, **`mask`**, **`clipPath`**, **`shape`** when **`source`** is a vector shape, …
+
+<CodeSwitcher>
+<ts>
+```typescript
+const logoPath = './assets/logo.png'; // or Buffer / https URL
+
+const withImage = await painter.createImage(
+  {
+    source: logoPath,
+    x: 40,
+    y: 80,
+    width: 200,
+    fit: 'contain',
+    align: 'center',
+  },
+  scene,
+);
+```
+</ts>
+<js>
+```javascript
+const withImage = await painter.createImage(
+  {
+    source: './assets/logo.png',
+    x: 40,
+    y: 80,
+    width: 200,
+    fit: 'contain',
+    align: 'center',
+  },
+  scene,
+);
+```
+</js>
+</CodeSwitcher>
+
+### Step 4 — Draw rich text (`createText`)
+
+Each object is **`TextProperties`**: required **`text`**, **`x`**, **`y`**; optional **`font.path`** (custom font file — async registration), **`gradient`**, **`stroke`**, **`shadow`**, **`textOnCurve`**, …
+
+<CodeSwitcher>
+<ts>
+```typescript
+const finalBuffer = await painter.createText(
+  [
+    {
+      text: 'Apexify.js',
+      x: 400,
+      y: 260,
+      font: { size: 56, family: 'Arial' },
+      color: '#f9fafb',
+      textAlign: 'center',
+    },
+  ],
+  withImage,
+);
+```
+</ts>
+<js>
+```javascript
+const finalBuffer = await painter.createText(
+  [
+    {
+      text: 'Apexify.js',
+      x: 400,
+      y: 260,
+      font: { size: 56, family: 'Arial' },
+      color: '#f9fafb',
+      textAlign: 'center',
+    },
+  ],
+  withImage,
+);
+```
+</js>
+</CodeSwitcher>
+
+Lower-level imperative text (**no** `ApexPainter`): **`drawText`** / **`WrappedText`** — see [Canvas utils & types](/docs#canvas-utils-and-types) and [Text pipeline](/docs#text-pipeline).
+
+### Step 5 — Persist or convert
+
+<CodeSwitcher>
+<ts>
+```typescript
+import fs from 'fs';
+
+// Raw PNG buffer (already have it)
+fs.writeFileSync('slide.png', finalBuffer);
+
+// Or use save() — Sharp encoding for jpg/webp/avif, naming modes
+await painter.save(finalBuffer, {
+  directory: './output',
+  format: 'png',
+  naming: 'timestamp',
+});
+
+// Or serialize via constructor `type`
+const asBase64 = await painter.outPut(finalBuffer); // if painter was new ApexPainter({ type: 'base64' })
+```
+</ts>
+<js>
+```javascript
+const fs = require('fs');
+fs.writeFileSync('slide.png', finalBuffer);
+await painter.save(finalBuffer, { directory: './output', format: 'png' });
+```
+</js>
+</CodeSwitcher>
+
+### Step 6 — Optional: measure before drawing
+
+```typescript
+const metrics = await painter.measureText({
+  text: 'Hello',
+  x: 0,
+  y: 0,
+  font: { size: 24 },
+  maxWidth: 400,
+});
+// metrics.width, metrics.lines, metrics.totalHeight, …
+```
+
+---
+
+## Feature map (where to learn more)
+
+| You want | Doc page | Types / notes |
+|----------|----------|----------------|
+| Imports, **`outPut`**, **`CanvasUtils`** | [Package surface](/docs#package-surface) | [Canvas utils & types](/docs#canvas-utils-and-types), **`lib/Canvas/utils/canvasUtils.ts`** |
+| Backgrounds, **`bgLayers`**, patterns | [Create canvas](/docs#create-canvas) | **`CanvasConfig`** in **`CanvasTypes`** |
+| Images, shapes, filters, group transform | [Create image & shapes](/docs#create-image-and-shapes) | **`ImageProperties`**, **`CreateImageOptions`** |
+| Rich text, **`measureText`** | [Create text](/docs#create-text) | **`TextProperties`**; imperative **`drawText`**: [Text pipeline](/docs#text-pipeline) |
+| Text on Bézier / polyline (**not** **`createText`**) | [Text path renderer](/docs#text-path-renderer) | **`renderTextOnPath`** — repo source only |
+| Rounded clip/stroke paths (**not** **`CanvasUtils`**) | [Canvas buildPathbg](/docs#canvas-buildpathbg) | **`bg.ts`** helper |
+| **`lib/Canvas/`** layout | [lib module charter](/docs#lib-module-charter) | Creators vs **`utils/`** |
+| Connectors, arrows | [Custom lines](/docs#custom-lines) | **`CustomOptions`** |
+| **`Path2D`**, pixels, hit testing | [Advanced raster APIs](/docs#advanced-raster-apis) | **`PathCommand`**, **`HitRegion`** — [Path2D & drawPath](/docs#path2d-draw), [Hit testing](/docs#hit-testing) |
+| GIF, **`animate`** | [GIF & animation](/docs#gif-and-animation) | **`GIFOptions`** |
+| Resize, blend, crop, masking (no scene) | [Standalone image operations](/docs#standalone-image-operations) | Sharp / canvas helpers via façade |
+| **`batch`**, **`chain`**, **`save`** | [Batch, chain, save, output](/docs#batch-chain-save-output) | [Batch & chain](/docs#batch-and-chain) (**800×600** image/text seed caveat) |
+| Charts | [Charts](/docs#charts) | **`lib/Canvas/utils/Charts/`** |
+| FFmpeg, **`createVideo`** | [Video & FFmpeg](/docs#video-ffmpeg) hub — [discovery & frames](/docs#video-discovery-frames), [`createVideo` router](/docs#video-create-video), [FFmpeg internals](/docs#video-ffmpeg-internals) | **`VideoHelpers`** recipes, temp IO |
+| All **`ApexPainter`** methods → topic | [API index](/docs#api-index) | — |
+| Types barrel overview | [Canvas utils & types](/docs#canvas-utils-and-types) | **`types/index.ts`** |
+| Errors, FFmpeg, npm | [Troubleshooting](/docs#troubleshooting) | — |
+
+---
+
+## Code patterns you’ll reuse
+
+### Charts (typed overloads)
+
+```typescript
+const pie = await painter.createChart(
+  'pie',
+  [
+    { label: 'A', value: 40, color: '#4e79a7' },
+    { label: 'B', value: 60, color: '#f28e2b' },
+  ],
+  { dimensions: { width: 640, height: 480 } },
+);
+```
+
+### `CanvasUtils` without `ApexPainter`
+
+```typescript
+import { createCanvas } from '@napi-rs/canvas';
+import { drawShape, drawText, getCanvasContext } from 'apexify.js';
+
+const canvas = createCanvas(300, 200);
+const ctx = getCanvasContext(canvas);
+drawShape(ctx, 'rectangle', 10, 10, 280, 180, { color: '#334155' });
+drawText(ctx, {
+  text: 'Direct draw',
+  x: 20,
+  y: 100,
+  fontSize: 24,
+  color: '#fff',
+});
+```
+
+### Video: one operation per call
+
+**Only one** of **`getInfo`**, **`convert`**, **`trim`**, … may run per **`createVideo`** invocation (first matching key wins). **`source`** is path or **`Buffer`**.
+
+```typescript
+const meta = await painter.createVideo({
+  source: './clip.mp4',
+  getInfo: true,
+});
+
+await painter.createVideo({
+  source: './clip.mp4',
+  trim: { startTime: 1, endTime: 5, outputPath: './out-trim.mp4' },
+});
+```
+
+Branch priority table, **`mixAudio`**, **`onProgress`**: [`createVideo` router](/docs#video-create-video). Maintainer FFmpeg detail: [Video FFmpeg internals](/docs#video-ffmpeg-internals).
+
+---
+
+## Where maintainer notes live
+
+| Need | Location |
+|------|----------|
+| Undocumented APIs / gaps to migrate into **`docs/`** | **`features-forDocs.md`** scratchpad; contributor-only APIs — [Text path renderer](/docs#text-path-renderer), [Canvas buildPathbg](/docs#canvas-buildpathbg), [lib module charter](/docs#lib-module-charter) |
+| FFmpeg filter strings, timeouts, **`mergeVideos`** grid caveat, **`batchProcessVideos`** **`outputPath`** behavior | [Video FFmpeg internals](/docs#video-ffmpeg-internals) |
+| Internal **`VideoHelpers`** / **`GIFCreator.setPainter`** pointers | [Troubleshooting](/docs#troubleshooting) |
+
+---
+
+## Pitfalls (read once)
+
+1. **`extractFrames` on `ApexPainter`** uses **`ExtractFramesOptions`** (`interval` in **ms**, **`fps = 1000/interval`**). **`createVideo({ extractFrames })`** uses a **different** shape — [Video: discovery & frames](/docs#video-discovery-frames).  
+2. **`batch` / `chain`** helpers use fixed scratch sizes for some branches — [Batch & chain](/docs#batch-and-chain) (**800×600** image/text seed).  
+3. **Remote video URLs** with **`createVideo`** branches that use **`ApexPainter`** private FFmpeg helpers may **fail** unless you pass a **`Buffer`**; **`mixAudio`** paths resolve URLs differently — [Video & FFmpeg](/docs#video-ffmpeg), [FFmpeg internals](/docs#video-ffmpeg-internals).  
+4. **`VideoCreationOptions`** / **`MixAudio*`** types ship from **`extended`** — not always on root type exports; infer from **`Parameters<ApexPainter['createVideo']>[0]`** if needed — [Canvas utils & types](/docs#canvas-utils-and-types).
+
+---
+
+## Where these docs live on disk
+
+| Area | Path |
+|------|------|
+| Introduction | **`docs/01-introduction/`** — map, getting started, changelog, this guide |
+| Package | **`docs/02-package/`** — imports and ctor surface |
+| Topics | **`docs/03-*` … `docs/11-*`** — hubs often link sub-pages (batch, charts, video, GIF, raster) |
+| Reference | **`docs/12-reference/`** — API index, CanvasUtils/types, troubleshooting |
+
+Hub ↔ sub-page reading order: [Documentation map](/docs#documentation-map).
+
+---
+
+## Next steps
+
+| Priority | Action |
+|----------|--------|
+| 1 | Bookmark [Documentation map](/docs#documentation-map) for reading order. |
+| 2 | When adding site docs for a gap, remove the matching row from **`features-forDocs.md`**. |
+| 3 | Run FFmpeg **`ffmpeg -version`** before investing in **`createVideo`** pipelines. |

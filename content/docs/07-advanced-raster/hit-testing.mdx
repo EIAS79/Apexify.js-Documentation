@@ -1,0 +1,175 @@
+# Hit testing
+
+Answer “did this **`(x, y)`** land inside my control?” using **`PathCommand[]`**, primitive **`HitRegion`** shapes, or a custom predicate.
+
+Overview: [Advanced raster APIs](/docs#advanced-raster-apis).
+
+All **`ApexPainter`** façade methods are **`async`** (they delegate to synchronous math).
+
+---
+
+## `isPointInPath(path, x, y, options?)`
+
+| Argument | Accepted |
+|----------|-----------|
+| **`path`** | **`PathCommand[]`** or native **`Path2D`** |
+| **`options`** | Optional **`includeStroke`**, **`strokeWidth`**, and **`fillRule`** (**`'nonzero'`** default — pass **`'evenodd'`** when you need Canvas parity) |
+
+**Behavior**
+
+- Converts command lists with **`buildPath2DFromCommands`**.  
+- Tests fill via **`ctx.isPointInPath`**.  
+- When **`includeStroke`** and **`strokeWidth`** are set, also tests **`isPointInStroke`**.  
+- Returns **`HitDetectionResult`**: **`hit`**, **`hitType`** (`fill` \| `stroke` \| `outside`), **`distance`** is **`0`** when hit else omitted.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const path = [
+  { type: 'roundedRect', x: 100, y: 80, width: 220, height: 140, radius: 20 },
+];
+
+const inside = await painter.isPointInPath(path, 190, 150);
+console.log(inside.hit, inside.hitType);
+
+const nearEdge = await painter.isPointInPath(path, 320, 150, {
+  includeStroke: true,
+  strokeWidth: 8,
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const path = [{ type: 'roundedRect', x: 100, y: 80, width: 220, height: 140, radius: 20 }];
+  const inside = await painter.isPointInPath(path, 190, 150);
+  console.log(inside.hit, inside.hitType);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `HitRegion` variants (`isPointInRegion`)
+
+| `type` | Fields | Notes |
+|--------|--------|--------|
+| **`rect`** | **`x`**, **`y`**, **`width`**, **`height`** | With **`includeStroke`**, distinguishes **`fill`** vs **`stroke`** ring |
+| **`circle`** | **`x`**, **`y`**, **`radius`** | Center + radius |
+| **`ellipse`** | **`x`**, **`y`**, **`radiusX`**, **`radiusY`**, **`rotation?`** | Fill test only — **no stroke refinement** |
+| **`polygon`** | **`points[]`** | Requires **≥ 3** vertices; fewer ⇒ never hit |
+| **`path`** | **`path`**, **`fillRule?`** | Delegates to **`isPointInPath`** |
+| **`custom`** | **`check(x, y)`** | Arbitrary predicate |
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const poly = await painter.isPointInRegion(
+  {
+    type: 'polygon',
+    points: [
+      { x: 300, y: 120 },
+      { x: 420, y: 200 },
+      { x: 360, y: 280 },
+      { x: 240, y: 220 },
+    ],
+  },
+  330,
+  200
+);
+
+console.log(poly.hit);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const poly = await painter.isPointInRegion(
+    {
+      type: 'polygon',
+      points: [
+        { x: 300, y: 120 },
+        { x: 420, y: 200 },
+        { x: 360, y: 280 },
+        { x: 240, y: 220 },
+      ],
+    },
+    330,
+    200
+  );
+  console.log(poly.hit);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `isPointInAnyRegion(regions, x, y, options?)`
+
+Walks **`regions`** in order — first hit wins. Successful hits include **`hitRegion`** with the **index** into the array.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const zones = [
+  { type: 'rect' as const, x: 0, y: 0, width: 160, height: 120 },
+  { type: 'circle' as const, x: 300, y: 300, radius: 48 },
+];
+
+const pick = await painter.isPointInAnyRegion(zones, 305, 298);
+console.log(pick.hit, pick.hitRegion);
+```
+</ts>
+<js>
+```javascript
+const zones = [
+  { type: 'rect', x: 0, y: 0, width: 160, height: 120 },
+  { type: 'circle', x: 300, y: 300, radius: 48 },
+];
+
+const pick = await painter.isPointInAnyRegion(zones, 305, 298);
+console.log(pick.hit, pick.hitRegion);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `getDistanceToRegion(region, x, y)`
+
+Returns a pixel distance for **`rect`**, **`circle`**, **`ellipse`**, and **`polygon`**.
+
+**`path`**, **`custom`**, and unknown branches currently return **`0`** — use **`isPointInPath`** / your own math when you need geometric distance for arbitrary paths.
+
+---
+
+## `HitDetectionResult` cheat sheet
+
+| Field | Meaning |
+|-------|---------|
+| **`hit`** | Boolean hit |
+| **`hitType`** | **`fill`**, **`stroke`**, or **`outside`** |
+| **`distance`** | Often **`0`** on hits; **`circle`** fill returns radial distance for diagnostics |
+| **`hitRegion`** | Index from **`isPointInAnyRegion`** |
+
+---
+
+## Practical limits
+
+- **`ellipse`** / **`polygon`** **`isPointInRegion`** paths **do not** refine **`includeStroke`** the way **`rect`** / **`circle`** do — if stroke-hit precision matters, approximate with **`path`** + **`isPointInPath`** or widen tests manually.  
+- **`isPointInPath`** uses an internal scratch canvas — extremely large coordinates vs tiny bounds may behave unexpectedly; keep paths near your logical scene space.
+
+Next: [Path2D & drawPath](/docs#path2d-draw) · [Pixel APIs](/docs#pixel-apis).

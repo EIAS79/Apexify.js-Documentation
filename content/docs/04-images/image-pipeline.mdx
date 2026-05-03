@@ -1,0 +1,192 @@
+# How `createImage` works
+
+`createImage` **never creates an empty canvas**. It loads your existing PNG buffer, draws it full-size as the bottom layer, then paints each **`ImageProperties`** entry **on top** in array order (later entries cover earlier ones).
+
+Back to overview: [Create image & shapes](/docs#create-image-and-shapes).
+
+---
+
+## Inputs
+
+| Argument | Accepted values |
+|----------|------------------|
+| **`images`** | One object or an **array** of **`ImageProperties`**. |
+| **`canvasBuffer`** | A **`Buffer`** (PNG), **or** the object returned from **`createCanvas`** (`CanvasResults`). The code reads **`.buffer`** when you pass that object. |
+| **`options`** | Optional **`CreateImageOptions`** — used for **grouped** transforms ([Filters & groups](/docs#image-filters-groups-and-helpers)). |
+
+Every layer **must** include **`source`**, **`x`**, and **`y`**. Arrays must have **at least one** layer.
+
+---
+
+## Stacking example (two images)
+
+The second **`createImage`** call receives the **result** of the first, so layers accumulate.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: '#0c4a6e',
+});
+
+const step1 = await painter.createImage(
+  {
+    source: './photo-a.jpg',
+    x: 40,
+    y: 40,
+    width: 260,
+    height: 280,
+    fit: 'cover',
+    borderRadius: 16,
+  },
+  buffer
+);
+
+const final = await painter.createImage(
+  {
+    source: './photo-b.jpg',
+    x: 320,
+    y: 40,
+    width: 280,
+    height: 280,
+    fit: 'contain',
+    align: 'center',
+    opacity: 0.9,
+    blendMode: 'screen',
+  },
+  step1
+);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer } = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    colorBg: '#0c4a6e',
+  });
+
+  const step1 = await painter.createImage(
+    {
+      source: './photo-a.jpg',
+      x: 40,
+      y: 40,
+      width: 260,
+      height: 280,
+      fit: 'cover',
+      borderRadius: 16,
+    },
+    buffer
+  );
+
+  const final = await painter.createImage(
+    {
+      source: './photo-b.jpg',
+      x: 320,
+      y: 40,
+      width: 280,
+      height: 280,
+      fit: 'contain',
+      align: 'center',
+      opacity: 0.9,
+      blendMode: 'screen',
+    },
+    step1
+  );
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Single call, multiple layers
+
+Same idea — order inside the array is bottom → top.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer: scene } = await painter.createCanvas({
+  width: 700,
+  height: 400,
+  colorBg: '#18181b',
+});
+
+const out = await painter.createImage(
+  [
+    { source: './bg-art.png', x: 0, y: 0, width: 700, height: 400, fit: 'cover' },
+    { source: './badge.png', x: 520, y: 24, width: 140, height: 140, fit: 'contain' },
+  ],
+  scene
+);
+```
+</ts>
+<js>
+```javascript
+const { buffer: scene } = await painter.createCanvas({
+  width: 700,
+  height: 400,
+  colorBg: '#18181b',
+});
+
+const out = await painter.createImage(
+  [
+    { source: './bg-art.png', x: 0, y: 0, width: 700, height: 400, fit: 'cover' },
+    { source: './badge.png', x: 520, y: 24, width: 140, height: 140, fit: 'contain' },
+  ],
+  scene
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Passing `Buffer` vs `createCanvas` result
+
+Both work. Use whichever is convenient after **`await painter.createCanvas(...)`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({ width: 500, height: 500, colorBg: '#fff' });
+
+const a = await painter.createImage({ source: './icon.png', x: 50, y: 50, width: 120, height: 120 }, canvas.buffer);
+
+const b = await painter.createImage({ source: './icon.png', x: 200, y: 50, width: 120, height: 120 }, canvas);
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({ width: 500, height: 500, colorBg: '#fff' });
+
+const a = await painter.createImage({ source: './icon.png', x: 50, y: 50, width: 120, height: 120 }, canvas.buffer);
+
+const b = await painter.createImage({ source: './icon.png', x: 200, y: 50, width: 120, height: 120 }, canvas);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## If something is wrong (validation)
+
+You’ll get clear errors before drawing starts:
+
+| Situation | Message |
+|-----------|---------|
+| No buffer passed | `createImage: canvasBuffer is required.` |
+| Empty array | `createImage: At least one image/shape is required.` |
+| Missing **`source`** / **`x`** / **`y`** | `createImage: source, x, and y are required.` |
+
+Other failures are wrapped as **`createImage failed: …`** with the underlying reason.
+
+Next: [Shapes](/docs#image-shapes) · [Placement & effects](/docs#image-properties-and-effects) · [Filters & groups](/docs#image-filters-groups-and-helpers).

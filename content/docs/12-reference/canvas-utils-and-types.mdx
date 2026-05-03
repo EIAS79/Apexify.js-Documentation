@@ -1,0 +1,55 @@
+# CanvasUtils & types
+
+Reference page under **`docs/12-reference/`**. For **`import { ApexPainter }`** and ctor options, see [Package surface](/docs#package-surface). For **which painter method → which doc**, see [API index](/docs#api-index).
+
+---
+
+## CanvasUtils groups (flat exports)
+
+Grouped from **`lib/Canvas/utils/canvasUtils.ts`** — treat that barrel as **source of truth** for names (new helpers land there first).
+
+| Group | Examples |
+|-------|-----------|
+| Background | **`drawBackgroundColor`**, **`drawBackgroundGradient`**, **`drawBackgroundLayers`**, **`customBackground`**, **`drawPattern`**, **`applyNoise`**, **`applyCanvasZoom`**, **`resolveMediaPath`** |
+| Image geometry | **`buildPath`**, **`applyRotation`**, **`createGradientFill`**, **`fitInto`**, **`loadImageCached`**, **`applyStroke`**, **`applyShadow`**, **`drawBoxBackground`** |
+| Filters | **`applyImageFilters`**, **`applyProfessionalImageFilters`** |
+| Mask / warp | **`applyImageMask`**, **`applyClipPath`**, **`applyPerspectiveDistortion`**, **`applyBulgeDistortion`**, **`applyMeshWarp`** |
+| Lens effects | **`applyVignette`**, **`applyLensFlare`**, **`applyChromaticAberration`**, **`applyFilmGrain`** |
+| Text | **`drawText`**, **`WrappedText`** |
+| Shapes | **`drawShape`**, **`isShapeSource`**, **`createShapePath`** |
+| Lines | **`customLines`** + **`advancedLines`** exports |
+| General raster | **`loadImages`**, **`resizingImg`**, **`converter`**, **`applyColorFilters`**, **`imgEffects`**, **`cropInner`**, **`cropOuter`**, **`detectColors`**, **`removeColor`**, **`bgRemoval`** — behavior & **`cropImage`** geometry: [Standalone image operations](/docs#standalone-image-operations) |
+| Batch / layout | **`batchOperations`**, **`chainOperations`** (same behavior as **`painter.batch`** / **`painter.chain`** — [Batch & chain](/docs#batch-and-chain)), **`stitchImages`**, **`createCollage`**, **`compressImage`**, **`extractPalette`** |
+| Conversion | **`url`**, **`base64`**, **`dataURL`**, **`blob`**, **`arrayBuffer`** |
+| Charts namespace | **`Charts`** — same implementations as **`painter.createChart`** family; see [Charts hub](/docs#charts) |
+
+---
+
+## Types barrel (`CanvasTypes`)
+
+Primary contracts live in **`lib/Canvas/utils/types/index.ts`** (~1190 LOC):
+
+- Scene: **`CanvasConfig`**, **`BackgroundLayer`**, **`PatternOptions`**
+- Raster layers: **`ImageProperties`**, **`CreateImageOptions`**, **`GroupTransformOptions`**, **`ImageFilter`**
+- Text: **`TextProperties`**, **`TextObject`** (legacy alias)
+- GIF / batch / stitch / palette / mask / blend / animation frames — see import hints inside the file
+
+**Naming traps**
+
+- **`cropOptions`** vs **`CropOptions`** — different structs for different entry points.
+- **`VideoCreationOptions`** — declared beside **`VideoCreator`**, not inside **`types/index.ts`** ([`createVideo` router](/docs#video-create-video)).
+- **`CanvasResults`** — defined near **`CanvasCreator`**.
+
+Import types from **`apexify.js`** the same way as runtime helpers when re-exported.
+
+---
+
+## Related
+
+| Page | Use |
+|------|-----|
+| [Documentation map](/docs#documentation-map) | Hubs and sub-pages |
+| [Troubleshooting](/docs#troubleshooting) | Dependencies, pitfalls |
+| [lib module charter](/docs#lib-module-charter) | **`lib/Canvas/`** layout vs **`CanvasUtils`** barrel |
+| [Canvas buildPathbg](/docs#canvas-buildpathbg) | Rounded path helper in **`bg.ts`** (**not** re-exported here) |
+| **`features-forDocs.md`** | Future **documentation gaps** scratchpad |

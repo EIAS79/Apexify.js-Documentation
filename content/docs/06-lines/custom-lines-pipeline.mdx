@@ -1,0 +1,203 @@
+# Custom lines pipeline (`createCustom`)
+
+**`createCustom`** loads your scene buffer, draws it full-size, runs **`customLines`** on the 2D context, then returns a new PNG **`Buffer`**.
+
+Overview: [Custom lines](/docs#custom-lines).
+
+---
+
+## Inputs
+
+| Argument | Accepted |
+|----------|-----------|
+| **`options`** | One **`CustomOptions`** or an **array** (processed **in order**, like stacking layers). |
+| **`buffer`** | PNG **`Buffer`** or **`CanvasResults`** (**`.buffer`** is read when you pass the object). |
+
+Every segment **must** include numeric **`startCoordinates.x/y`** and **`endCoordinates.x/y`**.
+
+---
+
+## Validation (throws)
+
+| Situation | Message |
+|-----------|---------|
+| Missing buffer | `createCustom: buffer is required.` |
+| Empty array | `createCustom: At least one custom option is required.` |
+| Bad **`startCoordinates`** | `createCustom: startCoordinates with valid x and y are required.` |
+| Bad **`endCoordinates`** | `createCustom: endCoordinates with valid x and y are required.` |
+| Bad buffer shape | `Invalid canvasBuffer provided…` / `Unable to load image from buffer` |
+
+Wrapped failures: **`createCustom failed: …`**.
+
+---
+
+## Two independent connectors
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: '#18181b',
+});
+
+const wired = await painter.createCustom(
+  [
+    {
+      startCoordinates: { x: 80, y: 280 },
+      endCoordinates: { x: 320, y: 120 },
+      lineStyle: { width: 4, color: '#a78bfa', lineCap: 'round' },
+    },
+    {
+      startCoordinates: { x: 380, y: 120 },
+      endCoordinates: { x: 560, y: 280 },
+      lineStyle: { width: 4, color: '#34d399', lineCap: 'round' },
+      arrow: { end: true, size: 14 },
+    },
+  ],
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer } = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    colorBg: '#18181b',
+  });
+
+  const wired = await painter.createCustom(
+    [
+      {
+        startCoordinates: { x: 80, y: 280 },
+        endCoordinates: { x: 320, y: 120 },
+        lineStyle: { width: 4, color: '#a78bfa', lineCap: 'round' },
+      },
+      {
+        startCoordinates: { x: 380, y: 120 },
+        endCoordinates: { x: 560, y: 280 },
+        lineStyle: { width: 4, color: '#34d399', lineCap: 'round' },
+        arrow: { end: true, size: 14 },
+      },
+    ],
+    buffer
+  );
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## **`singleLine: true`** (shared stroke polyline)
+
+When **`lineStyle.singleLine`** is **`true`**, consecutive entries **reuse** the same **`beginPath`** stroke so corners share caps/joins. Keep **`lineStyle`** compatible segment-to-segment (same width/colors) for predictable joins.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const style = {
+  width: 5,
+  color: '#fde047',
+  lineCap: 'round',
+  lineJoin: 'round',
+  singleLine: true as const,
+};
+
+const diagram = await painter.createCustom(
+  [
+    {
+      startCoordinates: { x: 100, y: 260 },
+      endCoordinates: { x: 260, y: 120 },
+      lineStyle: style,
+    },
+    {
+      startCoordinates: { x: 260, y: 120 },
+      endCoordinates: { x: 420, y: 260 },
+      lineStyle: style,
+    },
+    {
+      startCoordinates: { x: 420, y: 260 },
+      endCoordinates: { x: 580, y: 140 },
+      lineStyle: style,
+      arrow: { end: true, size: 16, color: '#fef08a' },
+    },
+  ],
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+const style = {
+  width: 5,
+  color: '#fde047',
+  lineCap: 'round',
+  lineJoin: 'round',
+  singleLine: true,
+};
+
+const diagram = await painter.createCustom(
+  [
+    {
+      startCoordinates: { x: 100, y: 260 },
+      endCoordinates: { x: 260, y: 120 },
+      lineStyle: style,
+    },
+    {
+      startCoordinates: { x: 260, y: 120 },
+      endCoordinates: { x: 420, y: 260 },
+      lineStyle: style,
+    },
+    {
+      startCoordinates: { x: 420, y: 260 },
+      endCoordinates: { x: 580, y: 140 },
+      lineStyle: style,
+      arrow: { end: true, size: 16, color: '#fef08a' },
+    },
+  ],
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## **`Buffer`** vs **`CanvasResults`**
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({ width: 400, height: 400, colorBg: '#fff' });
+
+await painter.createCustom({ startCoordinates: { x: 40, y: 200 }, endCoordinates: { x: 360, y: 200 }, lineStyle: { width: 3 } }, canvas.buffer);
+
+await painter.createCustom({ startCoordinates: { x: 40, y: 240 }, endCoordinates: { x: 360, y: 240 }, lineStyle: { width: 3 } }, canvas);
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({ width: 400, height: 400, colorBg: '#fff' });
+
+await painter.createCustom({ startCoordinates: { x: 40, y: 200 }, endCoordinates: { x: 360, y: 200 }, lineStyle: { width: 3 } }, canvas.buffer);
+
+await painter.createCustom({ startCoordinates: { x: 40, y: 240 }, endCoordinates: { x: 360, y: 240 }, lineStyle: { width: 3 } }, canvas);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Call `customLines` yourself
+
+If you already hold a **`SKRSContext2D`**, import **`CanvasUtils.customLines`** (async) and pass **`CustomOptions[]`** — same drawing rules as **`createCustom`**.
+
+Next: [Line styles](/docs#custom-lines-style) · [Arrows & markers](/docs#custom-lines-arrows-markers).

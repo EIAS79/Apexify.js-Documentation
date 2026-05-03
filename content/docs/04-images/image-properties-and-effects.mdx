@@ -1,0 +1,710 @@
+# Placement, masks, warps & effects
+
+Use these fields on **`ImageProperties`** when **`source`** is a **bitmap** (path, URL, or **`Buffer`**). Shapes support rotation, opacity, blur, **`blendMode`**, rounded clips, **`boxBackground`**, **`stroke`**, **`shadow`**, and **`filters`** — but not the bitmap-only paths below.
+
+Overview: [Create image & shapes](/docs#create-image-and-shapes).
+
+---
+
+## Fit & align inside `width` × `height`
+
+Defaults: **`fit: 'fill'`**, **`align: 'center'`**.
+
+| `fit` | Behavior |
+|-------|-----------|
+| **`fill`** | Stretch to the box |
+| **`contain`** | Uniform scale; letterboxing inside the box |
+| **`cover`** | Uniform scale; crop overflow |
+
+**`align`** accepts **`center`**, edges (**`top`**, **`left`**, …), and corners (**`top-left`**, …).
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './photo.jpg',
+    x: 24,
+    y: 24,
+    width: 400,
+    height: 280,
+    fit: 'cover',
+    align: 'top',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './photo.jpg',
+    x: 24,
+    y: 24,
+    width: 400,
+    height: 280,
+    fit: 'cover',
+    align: 'top',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `inherit` (use the file’s natural size)
+
+When **`inherit: true`**, omit **`width`** / **`height`** to draw at the decoded image’s pixel size inside the box anchored at **`x`**, **`y`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './sprite@2x.png',
+    x: 100,
+    y: 80,
+    inherit: true,
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './sprite@2x.png',
+    x: 100,
+    y: 80,
+    inherit: true,
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Rotation, opacity, blur & blend mode
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './overlay.png',
+    x: 160,
+    y: 120,
+    width: 260,
+    height: 260,
+    rotation: -12,
+    opacity: 0.85,
+    blur: 1.5,
+    blendMode: 'multiply',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './overlay.png',
+    x: 160,
+    y: 120,
+    width: 260,
+    height: 260,
+    rotation: -12,
+    opacity: 0.85,
+    blur: 1.5,
+    blendMode: 'multiply',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+Try Canvas composite names you already know: **`screen`**, **`overlay`**, **`soft-light`**, **`lighter`**, etc.
+
+---
+
+## Rounded clip (`borderRadius`, `borderPosition`)
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './avatar.jpg',
+    x: 48,
+    y: 48,
+    width: 160,
+    height: 160,
+    fit: 'cover',
+    borderRadius: 'circular',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './avatar.jpg',
+    x: 48,
+    y: 48,
+    width: 160,
+    height: 160,
+    fit: 'cover',
+    borderRadius: 'circular',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+**`borderPosition`** selects which corners participate (same tokens as canvas docs: **`all`**, **`top-left`**, combined edges, …).
+
+---
+
+## `filterOrder`: `'pre'` vs `'post'`
+
+- **`post`** (default): draw the image, then run **`filters`** on the painted pixels inside the clip.
+- **`pre`**: decode → scale into the destination rect → **filter that raster** → composite (helpful when you want blur/sharpen before masking).
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './hero.jpg',
+    x: 0,
+    y: 0,
+    width: 800,
+    height: 420,
+    fit: 'cover',
+    filters: [{ type: 'gaussianBlur', intensity: 6 }],
+    filterOrder: 'pre',
+    filterIntensity: 0.8,
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './hero.jpg',
+    x: 0,
+    y: 0,
+    width: 800,
+    height: 420,
+    fit: 'cover',
+    filters: [{ type: 'gaussianBlur', intensity: 6 }],
+    filterOrder: 'pre',
+    filterIntensity: 0.8,
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+Full filter list & parameters: [Filters & groups](/docs#image-filters-groups-and-helpers).
+
+---
+
+## Mask image (`mask`)
+
+**`source`** is a separate grayscale/RGBA image (**path** or **`Buffer`**). **`mode`**:
+
+| Mode | Effect |
+|------|--------|
+| **`alpha`** (default) | Uses mask alpha |
+| **`luminance`** | Uses perceived brightness |
+| **`inverse`** | Flips the mask |
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './subject.png',
+    x: 120,
+    y: 80,
+    width: 320,
+    height: 320,
+    fit: 'contain',
+    mask: { source: './subject-mask.png', mode: 'alpha' },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './subject.png',
+    x: 120,
+    y: 80,
+    width: 320,
+    height: 320,
+    fit: 'contain',
+    mask: { source: './subject-mask.png', mode: 'alpha' },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Polygon clip (`clipPath`)
+
+Provide **at least three** points in **canvas coordinates** (absolute `x`/`y`). This replaces the default rounded-rectangle clip when supplied.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './texture.png',
+    x: 80,
+    y: 60,
+    width: 360,
+    height: 280,
+    fit: 'cover',
+    clipPath: [
+      { x: 200, y: 70 },
+      { x: 420, y: 180 },
+      { x: 320, y: 320 },
+      { x: 120, y: 240 },
+    ],
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './texture.png',
+    x: 80,
+    y: 60,
+    width: 360,
+    height: 280,
+    fit: 'cover',
+    clipPath: [
+      { x: 200, y: 70 },
+      { x: 420, y: 180 },
+      { x: 320, y: 320 },
+      { x: 120, y: 240 },
+    ],
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Distortion (`distortion`)
+
+Implemented **`createImage`** paths today:
+
+| Type | What to pass |
+|------|----------------|
+| **`perspective`** | Exactly **four** points — destination quad matching source corners **top-left → top-right → bottom-right → bottom-left** (canvas coordinates). |
+| **`bulge`** | Optional **`intensity`** (default ~**0.5**); magnifies from center. |
+| **`pinch`** | Same field; negative intensity inside implementation / pinch behavior. |
+
+Types also declare **`warp`** on **`distortion.type`**; prefer **`meshWarp`** or **`perspective`** for controlled warps.
+
+**Bulge example**
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './face.jpg',
+    x: 60,
+    y: 40,
+    width: 280,
+    height: 280,
+    fit: 'cover',
+    borderRadius: 24,
+    distortion: { type: 'bulge', intensity: 0.55 },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './face.jpg',
+    x: 60,
+    y: 40,
+    width: 280,
+    height: 280,
+    fit: 'cover',
+    borderRadius: 24,
+    distortion: { type: 'bulge', intensity: 0.55 },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+**Perspective example** (adjust corners to taste)
+
+<CodeSwitcher>
+<ts>
+```typescript
+const x = 80,
+  y = 100,
+  w = 260,
+  h = 180;
+await painter.createImage(
+  {
+    source: './poster.png',
+    x,
+    y,
+    width: w,
+    height: h,
+    fit: 'fill',
+    distortion: {
+      type: 'perspective',
+      points: [
+        { x: x + 12, y: y + 8 },
+        { x: x + w - 8, y: y + 18 },
+        { x: x + w - 22, y: y + h - 12 },
+        { x: x + 18, y: y + h - 20 },
+      ],
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+const x = 80,
+  y = 100,
+  w = 260,
+  h = 180;
+await painter.createImage(
+  {
+    source: './poster.png',
+    x,
+    y,
+    width: w,
+    height: h,
+    fit: 'fill',
+    distortion: {
+      type: 'perspective',
+      points: [
+        { x: x + 12, y: y + 8 },
+        { x: x + w - 8, y: y + 18 },
+        { x: x + w - 22, y: y + h - 12 },
+        { x: x + 18, y: y + h - 20 },
+      ],
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Mesh warp (`meshWarp`)
+
+**Advanced.** **`gridX`** / **`gridY`** split the drawn image into cells (defaults **10×10**). **`controlPoints`** is a **2D array** `[row][col]` with **`gridY`** rows and **`gridX`** columns — tweak offsets per cell to bend pixels (experiment on small grids first).
+
+<CodeSwitcher>
+<ts>
+```typescript
+const gx = 3,
+  gy = 3;
+// Example skeleton: replace with your own offsets per cell
+const controlPoints = Array.from({ length: gy }, (_, r) =>
+  Array.from({ length: gx }, (_, c) => ({
+    x: c * 12 + r * 2,
+    y: r * 10 - c * 3,
+  }))
+);
+
+await painter.createImage(
+  {
+    source: './fabric.jpg',
+    x: 40,
+    y: 40,
+    width: 360,
+    height: 240,
+    fit: 'cover',
+    meshWarp: { gridX: gx, gridY: gy, controlPoints },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+const gx = 3,
+  gy = 3;
+const controlPoints = Array.from({ length: gy }, (_, r) =>
+  Array.from({ length: gx }, (_, c) => ({
+    x: c * 12 + r * 2,
+    y: r * 10 - c * 3,
+  }))
+);
+
+await painter.createImage(
+  {
+    source: './fabric.jpg',
+    x: 40,
+    y: 40,
+    width: 360,
+    height: 240,
+    fit: 'cover',
+    meshWarp: { gridX: gx, gridY: gy, controlPoints },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Lens-style stack (`effects`)
+
+All optional — combine as needed.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './scene.jpg',
+    x: 0,
+    y: 0,
+    width: 720,
+    height: 400,
+    fit: 'cover',
+    effects: {
+      vignette: { intensity: 0.45, size: 0.65 },
+      lensFlare: { x: 520, y: 110, intensity: 0.35 },
+      chromaticAberration: { intensity: 0.12 },
+      filmGrain: { intensity: 0.08 },
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './scene.jpg',
+    x: 0,
+    y: 0,
+    width: 720,
+    height: 400,
+    fit: 'cover',
+    effects: {
+      vignette: { intensity: 0.45, size: 0.65 },
+      lensFlare: { x: 520, y: 110, intensity: 0.35 },
+      chromaticAberration: { intensity: 0.12 },
+      filmGrain: { intensity: 0.08 },
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `boxBackground`, `stroke`, `shadow`
+
+Paint **behind** the bitmap (inside the same clip), outline it, or cast a canvas shadow.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createImage(
+  {
+    source: './product.png',
+    x: 140,
+    y: 110,
+    width: 320,
+    height: 240,
+    fit: 'contain',
+    borderRadius: 28,
+    boxBackground: {
+      gradient: {
+        type: 'linear',
+        startX: 0,
+        startY: 0,
+        endX: 320,
+        endY: 240,
+        colors: [
+          { stop: 0, color: '#fef08a' },
+          { stop: 1, color: '#f97316' },
+        ],
+      },
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.35)',
+      offsetX: 0,
+      offsetY: 26,
+      blur: 42,
+      opacity: 1,
+      borderRadius: 28,
+    },
+    stroke: { color: '#fff7ed', width: 4, style: 'solid' },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createImage(
+  {
+    source: './product.png',
+    x: 140,
+    y: 110,
+    width: 320,
+    height: 240,
+    fit: 'contain',
+    borderRadius: 28,
+    boxBackground: {
+      gradient: {
+        type: 'linear',
+        startX: 0,
+        startY: 0,
+        endX: 320,
+        endY: 240,
+        colors: [
+          { stop: 0, color: '#fef08a' },
+          { stop: 1, color: '#f97316' },
+        ],
+      },
+    },
+    shadow: {
+      color: 'rgba(0,0,0,0.35)',
+      offsetX: 0,
+      offsetY: 26,
+      blur: 42,
+      opacity: 1,
+      borderRadius: 28,
+    },
+    stroke: { color: '#fff7ed', width: 4, style: 'solid' },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+**`stroke`** supports **`gradient`**, **`opacity`**, **`blur`**, per-edge **`borderPosition`**, corner **`roundedCorners`**, and **`style`** (`solid`, `dashed`, `dotted`, `groove`, `ridge`, `double`). **`shadow`** supports **`gradient`** fills too.
+
+---
+
+## Full-card example (bitmap)
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 720,
+  height: 420,
+  colorBg: '#020617',
+});
+
+const card = await painter.createImage(
+  {
+    source: './cover.jpg',
+    x: 48,
+    y: 48,
+    width: 624,
+    height: 300,
+    fit: 'cover',
+    borderRadius: 20,
+    blendMode: 'source-over',
+    filters: [
+      { type: 'saturation', value: -15 },
+      { type: 'brightness', value: -5 },
+    ],
+    effects: {
+      vignette: { intensity: 0.35, size: 0.75 },
+    },
+    stroke: { color: 'rgba(248,250,252,0.35)', width: 2 },
+  },
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer } = await painter.createCanvas({
+    width: 720,
+    height: 420,
+    colorBg: '#020617',
+  });
+
+  const card = await painter.createImage(
+    {
+      source: './cover.jpg',
+      x: 48,
+      y: 48,
+      width: 624,
+      height: 300,
+      fit: 'cover',
+      borderRadius: 20,
+      blendMode: 'source-over',
+      filters: [
+        { type: 'saturation', value: -15 },
+        { type: 'brightness', value: -5 },
+      ],
+      effects: {
+        vignette: { intensity: 0.35, size: 0.75 },
+      },
+      stroke: { color: 'rgba(248,250,252,0.35)', width: 2 },
+    },
+    buffer
+  );
+})();
+```
+</js>
+</CodeSwitcher>
+
+Next: [Filters & grouped drawings](/docs#image-filters-groups-and-helpers) · [Shapes](/docs#image-shapes).

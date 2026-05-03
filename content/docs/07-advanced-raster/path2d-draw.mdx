@@ -1,0 +1,218 @@
+# Path2D & `drawPath`
+
+Build canvas paths from a **`PathCommand[]`** list, optionally reuse the native **`Path2D`** object, and composite stroke/fill onto an existing bitmap.
+
+Overview: [Advanced raster APIs](/docs#advanced-raster-apis).
+
+---
+
+## `createPath2D(commands)` — synchronous
+
+Returns a native **`Path2D`** from **`buildPath2DFromCommands`**. Throws **`createPath2D failed: …`** if command parsing fails.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const chip = painter.createPath2D([
+  { type: 'moveTo', x: 40, y: 40 },
+  { type: 'lineTo', x: 120, y: 40 },
+  { type: 'lineTo', x: 80, y: 100 },
+  { type: 'closePath' },
+]);
+
+// Pass `chip` to drawPath or store for repeated hits with isPointInPath
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+const chip = painter.createPath2D([
+  { type: 'moveTo', x: 40, y: 40 },
+  { type: 'lineTo', x: 120, y: 40 },
+  { type: 'lineTo', x: 80, y: 100 },
+  { type: 'closePath' },
+]);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `drawPath(canvasBuffer, path, options?)` — asynchronous
+
+1. Loads **`canvasBuffer`** (**`Buffer`** or **`CanvasResults`**) as the bottom layer.  
+2. Converts **`path`** — either **`PathCommand[]`** or an existing **`Path2D`** — for drawing.  
+3. Applies optional **`transform`** (pivot via **`originX`/`originY`**, or plain translate / rotate / scale).  
+4. Draws **`stroke`** first (dash array, opacity, caps, joins, miter limit), then **`fill`** (optional **`evenodd`** / **`nonzero`** rule).  
+5. Returns a fresh **PNG **`Buffer`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 520,
+  height: 360,
+  colorBg: '#18181b',
+});
+
+const badge = await painter.drawPath(
+  buffer,
+  [
+    { type: 'circle', x: 260, y: 180, radius: 90 },
+  ],
+  {
+    transform: { rotate: -8, originX: 260, originY: 180 },
+    stroke: {
+      color: '#f472b6',
+      width: 6,
+      lineCap: 'round',
+      dashArray: [14, 10],
+      dashOffset: 2,
+      opacity: 1,
+    },
+    fill: {
+      color: 'rgba(244, 114, 182, 0.15)',
+      rule: 'evenodd',
+      opacity: 1,
+    },
+  }
+);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer } = await painter.createCanvas({
+    width: 520,
+    height: 360,
+    colorBg: '#18181b',
+  });
+
+  const badge = await painter.drawPath(
+    buffer,
+    [{ type: 'circle', x: 260, y: 180, radius: 90 }],
+    {
+      transform: { rotate: -8, originX: 260, originY: 180 },
+      stroke: {
+        color: '#f472b6',
+        width: 6,
+        lineCap: 'round',
+        dashArray: [14, 10],
+        dashOffset: 2,
+        opacity: 1,
+      },
+      fill: {
+        color: 'rgba(244, 114, 182, 0.15)',
+        rule: 'evenodd',
+        opacity: 1,
+      },
+    }
+  );
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Validation:** missing buffer → **`drawPath: canvasBuffer is required.`**
+
+---
+
+## `PathCommand` verbs (DSL)
+
+| `type` | Role |
+|--------|------|
+| **`moveTo`**, **`lineTo`** | Segment moves |
+| **`arc`**, **`arcTo`** | Circular arcs |
+| **`quadraticCurveTo`**, **`bezierCurveTo`** | Curves |
+| **`rect`**, **`ellipse`** | Primitives |
+| **`closePath`** | Close current subpath |
+| **`circle`** | Center + radius helper |
+| **`roundedRect`** | Uniform or per-corner radii (`tl`, `tr`, `br`, `bl`) |
+| **`polygon`** | Point list |
+| **`star`** | Center, radii, point count |
+| **`arrow`** | Parametric arrow geometry |
+
+Full discriminant definitions ship with **`PathCommand`** from **`apexify.js`**.
+
+---
+
+## `Path2DDrawOptions`
+
+### `stroke`
+
+**`color`**, **`width`**, **`lineCap`**, **`lineJoin`**, **`miterLimit`**, **`dashArray`**, **`dashOffset`**, **`opacity`**.
+
+### `fill`
+
+**`color`**, **`opacity`**, **`rule`**: **`nonzero`** (default when omitted in canvas) or **`evenodd`**.
+
+### `transform`
+
+Either:
+
+- **`originX` + `originY`** set pivot for **`rotate`** / **`scaleX`** / **`scaleY`**, or  
+- **`translateX` / `translateY`** plus **`rotate`** / **`scale`** without pivot.
+
+---
+
+## Bézier ribbon example
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.drawPath(
+  baseBuffer,
+  [
+    { type: 'moveTo', x: 60, y: 280 },
+    {
+      type: 'bezierCurveTo',
+      cp1x: 180,
+      cp1y: 80,
+      cp2x: 340,
+      cp2y: 320,
+      x: 460,
+      y: 120,
+    },
+  ],
+  {
+    stroke: { color: '#a78bfa', width: 5, lineCap: 'round', lineJoin: 'round' },
+  }
+);
+```
+</ts>
+<js>
+```javascript
+await painter.drawPath(
+  baseBuffer,
+  [
+    { type: 'moveTo', x: 60, y: 280 },
+    {
+      type: 'bezierCurveTo',
+      cp1x: 180,
+      cp1y: 80,
+      cp2x: 340,
+      cp2y: 320,
+      x: 460,
+      y: 120,
+    },
+  ],
+  {
+    stroke: { color: '#a78bfa', width: 5, lineCap: 'round', lineJoin: 'round' },
+  }
+);
+```
+</js>
+</CodeSwitcher>
+
+Next: [Pixel APIs](/docs#pixel-apis) · [Hit testing](/docs#hit-testing).

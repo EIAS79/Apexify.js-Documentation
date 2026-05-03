@@ -1,0 +1,88 @@
+# Canvas `buildPathbg` (rounded rectangle path)
+
+**`buildPathbg`** builds a **`Path2D`-style path** on an existing **`SKRSContext2D`**: sharp rectangle, uniform corner radius, **pill / circle** mode, or **per-corner** rounding via a **`borderPosition`** string.
+
+**Source:** `lib/Canvas/utils/Background/bg.ts`.
+
+---
+
+## Availability
+
+| Surface | Exported? |
+|---------|-----------|
+| **`apexify.js`** barrel | **No** — same file exports **`drawBackgroundColor`**, **`customBackground`**, … via **`CanvasUtils`**, but **`buildPathbg`** itself is **not** re-exported through **`canvasUtils.ts`**. |
+| **`bg.ts`** | **`export function buildPathbg`** — import only from **source** inside this repo (or a fork). |
+
+As of the current tree, no other file under **`lib/`** calls **`buildPathbg`** — it is a standalone helper for clipping or stroking custom UI shapes. Confirm with **`rg buildPathbg lib`** before relying on long-term presence.
+
+---
+
+## Signature
+
+```typescript
+buildPathbg(
+  ctx: SKRSContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  borderRadius: number | 'circular' = 0,
+  borderPosition: string = 'all'
+): void;
+```
+
+- **`beginPath`** … **`closePath`** run inside the function — **does not** **`fill`** or **`stroke`**; apply **`clip()`**, **`fill()`**, or **`stroke()`** yourself afterward.
+- **`borderRadius === 'circular'`** — draws an ellipse inscribed in **`[x,y,width,height]`** (uses **`min(width,height)/2`** as radius).
+- **`borderRadius` number > 0** — capped to **`min(borderRadius, width/2, height/2)`**.
+- **`borderRadius === 0`** — plain **`rect(x, y, width, height)`**.
+
+---
+
+## `borderPosition`
+
+Parsed as **comma-separated**, **case-insensitive** tokens (trimmed). **`all`** rounds every corner.
+
+Otherwise corners are rounded when **any** of these patterns match:
+
+| Corner | Recognized tokens |
+|--------|-------------------|
+| Top-left | **`top-left`**, or both **`top`** and **`left`** |
+| Top-right | **`top-right`**, or both **`top`** and **`right`** |
+| Bottom-right | **`bottom-right`**, or both **`bottom`** and **`right`** |
+| Bottom-left | **`bottom-left`**, or both **`bottom`** and **`left`** |
+
+Example: **`"top-left, bottom-right"`** rounds two opposing corners only.
+
+---
+
+## Usage sketch
+
+```typescript
+import { createCanvas } from '@napi-rs/canvas';
+import { buildPathbg } from './lib/Canvas/utils/Background/bg';
+
+const canvas = createCanvas(320, 180);
+const ctx = canvas.getContext('2d');
+
+buildPathbg(ctx, 16, 16, 288, 148, 24, 'all');
+ctx.fillStyle = '#1e293b';
+ctx.fill();
+
+buildPathbg(ctx, 260, 40, 48, 48, 'circular');
+ctx.strokeStyle = '#94a3b8';
+ctx.lineWidth = 2;
+ctx.stroke();
+```
+
+Adjust the **`bg`** import path for your project layout.
+
+---
+
+## Related
+
+| Page | Topic |
+|------|--------|
+| [Canvas primary fills](/docs#canvas-primary-fills) | **`createCanvas`** backgrounds |
+| [Canvas utils & types](/docs#canvas-utils-and-types) | **`CanvasUtils`** background helpers that **are** exported |
+| [Troubleshooting](/docs#troubleshooting) | Internal symbols |
+| [lib module charter](/docs#lib-module-charter) | **`Background/`** folder role |

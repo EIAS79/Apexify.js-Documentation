@@ -1,0 +1,375 @@
+# Shapes with `createImage`
+
+Set **`source`** to a **shape name** (not a file path) and describe geometry + fill with **`shape`**: **`ShapeProperties`**.
+
+Overview: [Create image & shapes](/docs#create-image-and-shapes).
+
+---
+
+## Shape names (`ShapeType`)
+
+| Shape | Typical use |
+|-------|----------------|
+| **`rectangle`**, **`square`** | Panels, bars, cards |
+| **`circle`** | Avatars, dots, knobs |
+| **`triangle`**, **`trapezium`** | Arrows, banners |
+| **`star`**, **`heart`** | Badges, icons (extra stroke/shadow handling inside the library) |
+| **`polygon`** | Custom outlines via **`shape.points`** |
+| **`arc`**, **`pieSlice`** | Rings, gauges — use **`startAngle`**, **`endAngle`** (radians), optional **`centerX`/`centerY`** |
+
+---
+
+## Filled rectangle & circle
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+const { buffer } = await painter.createCanvas({ width: 600, height: 320, colorBg: '#f8fafc' });
+
+const out = await painter.createImage(
+  [
+    {
+      source: 'rectangle',
+      x: 40,
+      y: 40,
+      width: 200,
+      height: 100,
+      shape: {
+        fill: true,
+        color: '#3b82f6',
+      },
+      borderRadius: 12,
+      shadow: { color: 'rgba(15,23,42,0.25)', offsetX: 0, offsetY: 8, blur: 24, opacity: 1 },
+    },
+    {
+      source: 'circle',
+      x: 320,
+      y: 60,
+      width: 120,
+      height: 120,
+      shape: {
+        fill: true,
+        gradient: {
+          type: 'radial',
+          colors: [
+            { stop: 0, color: '#fda4af' },
+            { stop: 1, color: '#be123c' },
+          ],
+        },
+      },
+      stroke: { color: '#881337', width: 4 },
+    },
+  ],
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer } = await painter.createCanvas({ width: 600, height: 320, colorBg: '#f8fafc' });
+
+  const out = await painter.createImage(
+    [
+      {
+        source: 'rectangle',
+        x: 40,
+        y: 40,
+        width: 200,
+        height: 100,
+        shape: { fill: true, color: '#3b82f6' },
+        borderRadius: 12,
+        shadow: { color: 'rgba(15,23,42,0.25)', offsetX: 0, offsetY: 8, blur: 24, opacity: 1 },
+      },
+      {
+        source: 'circle',
+        x: 320,
+        y: 60,
+        width: 120,
+        height: 120,
+        shape: {
+          fill: true,
+          gradient: {
+            type: 'radial',
+            colors: [
+              { stop: 0, color: '#fda4af' },
+              { stop: 1, color: '#be123c' },
+            ],
+          },
+        },
+        stroke: { color: '#881337', width: 4 },
+      },
+    ],
+    buffer
+  );
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Star & rounded rectangle with stroke styles
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({ width: 520, height: 260, colorBg: '#111827' });
+
+const out = await painter.createImage(
+  [
+    {
+      source: 'star',
+      x: 60,
+      y: 50,
+      width: 140,
+      height: 140,
+      shape: {
+        fill: true,
+        color: '#fbbf24',
+        innerRadius: 28,
+        outerRadius: 68,
+      },
+      stroke: { color: '#fef3c7', width: 3, style: 'solid' },
+    },
+    {
+      source: 'rectangle',
+      x: 260,
+      y: 60,
+      width: 200,
+      height: 120,
+      rotation: -4,
+      shape: { fill: true, color: '#1f2937' },
+      borderRadius: 20,
+      stroke: { color: '#6366f1', width: 6, style: 'dashed' },
+    },
+  ],
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({ width: 520, height: 260, colorBg: '#111827' });
+
+const out = await painter.createImage(
+  [
+    {
+      source: 'star',
+      x: 60,
+      y: 50,
+      width: 140,
+      height: 140,
+      shape: {
+        fill: true,
+        color: '#fbbf24',
+        innerRadius: 28,
+        outerRadius: 68,
+      },
+      stroke: { color: '#fef3c7', width: 3, style: 'solid' },
+    },
+    {
+      source: 'rectangle',
+      x: 260,
+      y: 60,
+      width: 200,
+      height: 120,
+      rotation: -4,
+      shape: { fill: true, color: '#1f2937' },
+      borderRadius: 20,
+      stroke: { color: '#6366f1', width: 6, style: 'dashed' },
+    },
+  ],
+  buffer
+);
+```
+</js>
+</CodeSwitcher>
+
+**Stroke styles** on shapes include **`solid`**, **`dashed`**, **`dotted`**, **`groove`**, **`ridge`**, **`double`** (see **`StrokeOptions`** in your editor).
+
+---
+
+## Polygon (custom points)
+
+**`shape.points`** uses **absolute canvas coordinates** (same space as **`x`/`y`** on the layer). Omit **`points`** and set **`sides`** for a regular polygon centered in the box.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({ width: 480, height: 280, colorBg: '#ecfdf5' });
+
+const out = await painter.createImage(
+  {
+    source: 'polygon',
+    x: 90,
+    y: 40,
+    width: 300,
+    height: 200,
+    shape: {
+      fill: true,
+      color: '#059669',
+      points: [
+        { x: 240, y: 60 },
+        { x: 360, y: 140 },
+        { x: 315, y: 210 },
+        { x: 165, y: 210 },
+        { x: 120, y: 140 },
+      ],
+    },
+    opacity: 0.95,
+  },
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({ width: 480, height: 280, colorBg: '#ecfdf5' });
+
+const out = await painter.createImage(
+  {
+    source: 'polygon',
+    x: 90,
+    y: 40,
+    width: 300,
+    height: 200,
+    shape: {
+      fill: true,
+      color: '#059669',
+      points: [
+        { x: 240, y: 60 },
+        { x: 360, y: 140 },
+        { x: 315, y: 210 },
+        { x: 165, y: 210 },
+        { x: 120, y: 140 },
+      ],
+    },
+    opacity: 0.95,
+  },
+  buffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Arc & pie slice
+
+Angles are in **radians** (`Math.PI`, etc.).
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({ width: 560, height: 240, colorBg: '#fafafa' });
+
+const out = await painter.createImage(
+  [
+    {
+      source: 'arc',
+      x: 40,
+      y: 40,
+      width: 180,
+      height: 180,
+      shape: {
+        fill: true,
+        color: '#0ea5e9',
+        startAngle: 0,
+        endAngle: Math.PI * 1.25,
+      },
+    },
+    {
+      source: 'pieSlice',
+      x: 280,
+      y: 40,
+      width: 180,
+      height: 180,
+      shape: {
+        fill: true,
+        gradient: {
+          type: 'conic',
+          centerX: 90,
+          centerY: 90,
+          colors: [
+            { stop: 0, color: '#a855f7' },
+            { stop: 1, color: '#6366f1' },
+          ],
+        },
+        startAngle: -Math.PI / 2,
+        endAngle: Math.PI / 2,
+      },
+    },
+  ],
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({ width: 560, height: 240, colorBg: '#fafafa' });
+
+const out = await painter.createImage(
+  [
+    {
+      source: 'arc',
+      x: 40,
+      y: 40,
+      width: 180,
+      height: 180,
+      shape: {
+        fill: true,
+        color: '#0ea5e9',
+        startAngle: 0,
+        endAngle: Math.PI * 1.25,
+      },
+    },
+    {
+      source: 'pieSlice',
+      x: 280,
+      y: 40,
+      width: 180,
+      height: 180,
+      shape: {
+        fill: true,
+        gradient: {
+          type: 'conic',
+          centerX: 90,
+          centerY: 90,
+          colors: [
+            { stop: 0, color: '#a855f7' },
+            { stop: 1, color: '#6366f1' },
+          ],
+        },
+        startAngle: -Math.PI / 2,
+        endAngle: Math.PI / 2,
+      },
+    },
+  ],
+  buffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Shape layer checklist (`ShapeProperties`)
+
+| Field | Role |
+|-------|------|
+| **`fill`** | Draw filled region |
+| **`color`** | Solid fill |
+| **`gradient`** | Linear / radial / conic gradient fill |
+| **`points`** | Polygon vertices (**absolute** canvas **`x`/`y`**) |
+| **`radius`**, **`sides`** | Regular polygons / star tuning |
+| **`innerRadius`**, **`outerRadius`** | Star tip / valley radii in **pixels** (defaults apply if omitted) |
+| **`startAngle`**, **`endAngle`** | **`arc`** / **`pieSlice`** sweep |
+| **`centerX`**, **`centerY`** | Arc center inside local box (defaults to middle) |
+
+Shapes support **`rotation`**, **`opacity`**, **`blur`**, **`blendMode`**, **`borderRadius`** clip, **`boxBackground`**, **`stroke`**, **`shadow`**, and **`filters`**. They **do not** use bitmap-only paths like **`mask`**, **`meshWarp`**, or **`distortion`** the same way files do — use an image if you need those.
+
+Next: [Placement & effects](/docs#image-properties-and-effects) · [Filters & groups](/docs#image-filters-groups-and-helpers).

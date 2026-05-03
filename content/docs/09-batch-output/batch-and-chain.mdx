@@ -1,0 +1,174 @@
+# Batch & chain
+
+**`batch`** runs independent jobs **in parallel** (**`Promise.all`**). **`chain`** runs **`ApexPainter`** methods **one after another**, piping the previous **`Buffer`** into the next step.
+
+Hub: [Batch, chain, save & output](/docs#batch-chain-save-output).
+
+---
+
+## `batch(operations: BatchOperation[])`
+
+Returns **`Promise<Buffer[]>`** in the **same order** as **`operations`**.
+
+### `BatchOperation`
+
+| `type` | `config` | What runs |
+|--------|-----------|-----------|
+| **`canvas`** | **`CanvasConfig`** | **`createCanvas`** → result **`.buffer`** |
+| **`image`** | **`ImageProperties`** or array | Seeds **800×600** blank canvas, then **`createImage`** |
+| **`text`** | **`TextProperties`** or array | Same **800×600** seed, then **`createText`** |
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const [hero, badge] = await painter.batch([
+  {
+    type: 'canvas',
+    config: { width: 900, height: 500, colorBg: '#020617' },
+  },
+  {
+    type: 'image',
+    config: {
+      source: './logo.png',
+      x: 48,
+      y: 48,
+      width: 200,
+      height: 80,
+      fit: 'contain',
+    },
+  },
+]);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const [hero, badge] = await painter.batch([
+    { type: 'canvas', config: { width: 900, height: 500, colorBg: '#020617' } },
+    {
+      type: 'image',
+      config: {
+        source: './logo.png',
+        x: 48,
+        y: 48,
+        width: 200,
+        height: 80,
+        fit: 'contain',
+      },
+    },
+  ]);
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Errors:** empty array → **`batch: operations array is required`**. Per-op failures → **`batch: Failed to process …`**. ApexPainter wraps as **`batch failed: …`**.
+
+**Also:** **`CanvasUtils.batchOperations(painter, operations)`** — same behavior.
+
+---
+
+## `chain(operations: ChainOperation[])`
+
+Returns **`Promise<Buffer>`** — the **last** step’s raster.
+
+### `ChainOperation`
+
+| Field | Meaning |
+|-------|---------|
+| **`method`** | **Public** **`ApexPainter`** method **name** (string), e.g. **`'createCanvas'`**, **`'createImage'`**, **`'createText'`** |
+| **`args`** | Argument array passed to **`painter[method](...args)`**, except placeholders |
+
+### Buffer placeholder
+
+Replace the running buffer with:
+
+- the literal **`'current'`**, or  
+- **`{ __isCurrentBuffer: true }`** (same effect)
+
+The runner substitutes the **previous** step’s **`Buffer`** (or **`CanvasResults.buffer`**).
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const flyer = await painter.chain([
+  {
+    method: 'createCanvas',
+    args: [{ width: 800, height: 600, colorBg: '#f8fafc' }],
+  },
+  {
+    method: 'createText',
+    args: [
+      {
+        text: 'Drop saved',
+        x: 400,
+        y: 320,
+        font: { size: 56, family: 'Arial' },
+        color: '#0f172a',
+        textAlign: 'center',
+        textBaseline: 'middle',
+      },
+      'current',
+    ],
+  },
+]);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const flyer = await painter.chain([
+    { method: 'createCanvas', args: [{ width: 800, height: 600, colorBg: '#f8fafc' }] },
+    {
+      method: 'createText',
+      args: [
+        {
+          text: 'Drop saved',
+          x: 400,
+          y: 320,
+          font: { size: 56, family: 'Arial' },
+          color: '#0f172a',
+          textAlign: 'center',
+          textBaseline: 'middle',
+        },
+        'current',
+      ],
+    },
+  ]);
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Rules**
+
+- Each step must resolve to **`Buffer`** or **`{ buffer }`** or the chain throws.  
+- **`method`** must exist on **`ApexPainter`** (**`typeof … === 'function'`**).
+
+**Errors:** empty ops → **`chain: operations array is required`**. Missing method → **`chain: Method "…" does not exist`**. Bad return → **`chain: Operation "…" did not return a buffer`**.
+
+**Also:** **`CanvasUtils.chainOperations(painter, operations)`**.
+
+---
+
+## Choosing batch vs chain
+
+| Pattern | Use |
+|---------|-----|
+| Independent posters / thumbnails | **`batch`** |
+| Single pipeline (scene → text → export) | **`chain`** |
+
+Remember **`batch`** image/text branches always use the **fixed 800×600** scratch canvas — override by chaining **`createCanvas`** first if you need exact dimensions before **`createImage`** / **`createText`**.
+
+Next: [Save & output](/docs#save-and-output).

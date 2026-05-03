@@ -1,0 +1,116 @@
+# Create text (`createText`)
+
+Draw styled strings on top of an existing canvas (**`createCanvas`**, **`createImage`**, …). Each entry is **`TextProperties`**: fonts, wrapping, gradients, decorations, glow/shadow/stroke, rotation, and optional **curved** layout.
+
+**API:** `await painter.createText(textArray, canvasBuffer)` → PNG **`Buffer`**.
+
+**Implementation:** `lib/Canvas/extended/TextCreator.ts` delegates to **`lib/Canvas/utils/Texts/enhancedTextRenderer.ts`**.
+
+---
+
+## Quick start
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const { buffer: base } = await painter.createCanvas({
+  width: 900,
+  height: 280,
+  colorBg: '#0f172a',
+});
+
+const out = await painter.createText(
+  {
+    text: 'Apexify.js',
+    x: 450,
+    y: 160,
+    font: { size: 72, family: 'Arial' },
+    bold: true,
+    color: '#f8fafc',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    shadow: { color: 'rgba(0,0,0,0.45)', offsetX: 0, offsetY: 14, blur: 28, opacity: 1 },
+  },
+  base
+);
+
+fs.writeFileSync('hero-title.png', out);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer: base } = await painter.createCanvas({
+    width: 900,
+    height: 280,
+    colorBg: '#0f172a',
+  });
+
+  const out = await painter.createText(
+    {
+      text: 'Apexify.js',
+      x: 450,
+      y: 160,
+      font: { size: 72, family: 'Arial' },
+      bold: true,
+      color: '#f8fafc',
+      textAlign: 'center',
+      textBaseline: 'middle',
+      shadow: { color: 'rgba(0,0,0,0.45)', offsetX: 0, offsetY: 14, blur: 28, opacity: 1 },
+    },
+    base
+  );
+
+  fs.writeFileSync('hero-title.png', out);
+})();
+```
+</js>
+</CodeSwitcher>
+
+Measure layout **without** drawing: **`await painter.measureText(textProps)`** → **`TextMetrics`** — full guide on [Curved text & metrics](/docs#text-curved-and-metrics).
+
+---
+
+## Everything you can set (`TextProperties`)
+
+| Area | Fields |
+|------|--------|
+| **Required** | **`text`**, **`x`**, **`y`** |
+| **Font** | **`font.size`**, **`font.family`**, **`font.name`**, **`font.path`** — or legacy **`fontSize`**, **`fontFamily`**, **`fontName`**, **`fontPath`** |
+| **Face style** | **`bold`**, **`italic`** |
+| **Spacing / wrap** | **`lineHeight`**, **`letterSpacing`**, **`wordSpacing`**, **`maxWidth`**, **`maxHeight`** |
+| **Alignment** | **`textAlign`** (`left` \| `center` \| `right` \| `start` \| `end`), **`textBaseline`** (`alphabetic` \| `bottom` \| `top` \| `middle` \| …) |
+| **Fill** | **`color`**, **`gradient`**, **`opacity`** |
+| **Decorations** | **`underline`**, **`overline`**, **`strikethrough`** — boolean or **`{ color?, gradient?, width? }`** |
+| **Highlight** | **`highlight`**: **`color`**, **`gradient`**, **`opacity`** |
+| **Effects** | **`glow`**, **`shadow`**, **`stroke`** (stroke supports **`style`**: solid / dashed / dotted / groove / ridge / double) |
+| **Transform** | **`rotation`** (degrees) |
+| **Curved line** | **`textOnCurve`**: **`sweepAngle`**, optional **`radius`**, **`up`** (smile vs frown arc) |
+| **Measurement helpers** (for **`measureText`**) | **`includeCharMetrics`**, **`measurementCanvas`** |
+
+---
+
+## Documentation map
+
+| Guide | What’s inside |
+|-------|----------------|
+| [Text pipeline](/docs#text-pipeline) | Stacking order, **`canvasBuffer`** rules, validation, multi-layer examples |
+| [Fonts & layout](/docs#text-fonts-and-layout) | Font registration, wrapping, alignment, fills |
+| [Decorations & effects](/docs#text-decorations-effects) | Under/over/strike, highlight, glow, shadow, stroke, rotation |
+| [Curved text & metrics](/docs#text-curved-and-metrics) | **`textOnCurve`**, **`measureText`**, line breaks, character metrics |
+| [Text path renderer](/docs#text-path-renderer) | **`renderTextOnPath`** — Bézier / polyline arcs (**source-only**) |
+
+**Compose first:** [Create canvas](/docs#create-canvas) · [Create image & shapes](/docs#create-image-and-shapes).
+
+<Alert type="warning" title="Text along an arbitrary path">
+**`textOnCurve`** lays glyphs on a **circular arc** (great for badges and banners). **`createText`** does not accept a generic path string. For line / arc / Bézier placement see [Text path renderer](/docs#text-path-renderer) (**`renderTextOnPath`** — source-only, not on **`apexify.js`** exports). You can also sketch paths with **`createPath2D`** / **`drawPath`** ([advanced raster](/docs#advanced-raster-apis)).
+</Alert>

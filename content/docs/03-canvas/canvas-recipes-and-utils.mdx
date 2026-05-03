@@ -1,0 +1,94 @@
+# Canvas recipes & `CanvasUtils`
+
+Full **`createCanvas`** walkthrough, direct use of background helpers, and where to go next.
+
+Related topics: [Canvas pipeline](/docs#canvas-pipeline), [Primary fills](/docs#canvas-primary-fills), [Background layers](/docs#canvas-bg-layers), [Patterns & styling](/docs#canvas-pattern-noise-transforms).
+
+---
+
+## End-to-end composition example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 900,
+  height: 500,
+  gradientBg: {
+    type: 'radial',
+    colors: [
+      { stop: 0, color: '#1e1b4b' },
+      { stop: 1, color: '#312e81' },
+    ],
+  },
+  bgLayers: [
+    { type: 'noise', intensity: 0.04, blendMode: 'overlay' },
+  ],
+  patternBg: {
+    type: 'dots',
+    color: '#c7d2fe',
+    opacity: 0.15,
+    size: 8,
+    spacing: 28,
+  },
+  borderRadius: 24,
+  stroke: { color: '#6366f1', width: 3 },
+});
+
+fs.writeFileSync('hero-bg.png', buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createCanvas({
+    width: 900,
+    height: 500,
+    gradientBg: {
+      type: 'radial',
+      colors: [
+        { stop: 0, color: '#1e1b4b' },
+        { stop: 1, color: '#312e81' },
+      ],
+    },
+    bgLayers: [{ type: 'noise', intensity: 0.04, blendMode: 'overlay' }],
+    patternBg: {
+      type: 'dots',
+      color: '#c7d2fe',
+      opacity: 0.15,
+      size: 8,
+      spacing: 28,
+    },
+    borderRadius: 24,
+    stroke: { color: '#6366f1', width: 3 },
+  });
+  fs.writeFileSync('hero-bg.png', buffer);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Using `CanvasUtils` directly (advanced)
+
+For custom **`SKRSContext2D`** pipelines you can call **`drawBackgroundColor`**, **`drawBackgroundGradient`**, **`customBackground`**, **`drawBackgroundLayers`**, **`drawPattern`**, **`applyNoise`**, **`applyCanvasZoom`** from **`apexify.js`** — same primitives **`CanvasCreator`** uses (**`lib/Canvas/utils/Background/bg.ts`**).
+
+---
+
+## Next steps
+
+| Topic | Link |
+|-------|------|
+| Layer images & shapes on this buffer | [Create image & shapes](/docs#create-image-and-shapes) |
+| Procedural pattern field reference | [Canvas patterns, noise & transforms](/docs#canvas-pattern-noise-transforms) |
+| Full **`CanvasConfig`** topic split | [Create canvas](/docs#create-canvas) hub (pipeline, fills, layers, patterns) |

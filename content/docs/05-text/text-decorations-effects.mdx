@@ -1,0 +1,350 @@
+# Decorations & effects
+
+Underline-style decorations, highlight bands, glow, shadow, outline stroke, and rotation — all on **`TextProperties`**.
+
+Overview: [Create text](/docs#create-text).
+
+---
+
+## **`underline`**, **`overline`**, **`strikethrough`**
+
+Each can be **`true`** (default styling) or an object with **`color`**, **`gradient`**, **`width`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'Limited · while supplies last',
+    x: 80,
+    y: 120,
+    font: { size: 30, family: 'Arial' },
+    color: '#fefce8',
+    underline: { color: '#fbbf24', width: 3 },
+    overline: { color: 'rgba(254,243,199,0.45)', width: 2 },
+    strikethrough: true,
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'Limited · while supplies last',
+    x: 80,
+    y: 120,
+    font: { size: 30, family: 'Arial' },
+    color: '#fefce8',
+    underline: { color: '#fbbf24', width: 3 },
+    overline: { color: 'rgba(254,243,199,0.45)', width: 2 },
+    strikethrough: true,
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+On **`textOnCurve`**, decorations follow each glyph along the arc (see [Curved text & metrics](/docs#text-curved-and-metrics)).
+
+---
+
+## **`highlight`** (background band)
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'NEW',
+    x: 520,
+    y: 96,
+    font: { size: 34, family: 'Arial Black' },
+    color: '#ffffff',
+    highlight: { color: '#ef4444', opacity: 0.85 },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'NEW',
+    x: 520,
+    y: 96,
+    font: { size: 34, family: 'Arial Black' },
+    color: '#ffffff',
+    highlight: { color: '#ef4444', opacity: 0.85 },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+Use **`highlight.gradient`** instead of **`color`** for a ramp behind the glyphs.
+
+---
+
+## **`glow`**
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'Neon sign',
+    x: 400,
+    y: 200,
+    font: { size: 72, family: 'Arial Black' },
+    color: '#ecfccb',
+    glow: {
+      color: '#84cc16',
+      intensity: 22,
+      opacity: 0.9,
+    },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'Neon sign',
+    x: 400,
+    y: 200,
+    font: { size: 72, family: 'Arial Black' },
+    color: '#ecfccb',
+    glow: {
+      color: '#84cc16',
+      intensity: 22,
+      opacity: 0.9,
+    },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## **`shadow`**
+
+Supports solid **`color`** or **`gradient`**, offsets, blur, and opacity.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'Depth without Photoshop',
+    x: 120,
+    y: 180,
+    font: { size: 48, family: 'Georgia' },
+    color: '#fef3c7',
+    shadow: {
+      color: 'rgba(76,29,29,0.55)',
+      offsetX: 6,
+      offsetY: 12,
+      blur: 18,
+      opacity: 1,
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'Depth without Photoshop',
+    x: 120,
+    y: 180,
+    font: { size: 48, family: 'Georgia' },
+    color: '#fef3c7',
+    shadow: {
+      color: 'rgba(76,29,29,0.55)',
+      offsetX: 6,
+      offsetY: 12,
+      blur: 18,
+      opacity: 1,
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## **`stroke`** (outline)
+
+**`style`** accepts **`solid`**, **`dashed`**, **`dotted`**, **`groove`**, **`ridge`**, **`double`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'OUTLINE',
+    x: 420,
+    y: 200,
+    font: { size: 86, family: 'Impact' },
+    color: '#fde047',
+    stroke: {
+      color: '#1e293b',
+      width: 8,
+      opacity: 1,
+      style: 'solid',
+    },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'OUTLINE',
+    x: 420,
+    y: 200,
+    font: { size: 86, family: 'Impact' },
+    color: '#fde047',
+    stroke: {
+      color: '#1e293b',
+      width: 8,
+      opacity: 1,
+      style: 'solid',
+    },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## **`rotation`**
+
+Degrees around the **`(x, y)`** anchor (same convention as images).
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: '-12° tilt',
+    x: 520,
+    y: 260,
+    font: { size: 56, family: 'Arial' },
+    color: '#ffffff',
+    rotation: -12,
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: '-12° tilt',
+    x: 520,
+    y: 260,
+    font: { size: 56, family: 'Arial' },
+    color: '#ffffff',
+    rotation: -12,
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Poster combo (stroke + shadow + gradient fill)
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'APEXIFY',
+    x: 480,
+    y: 220,
+    font: { size: 92, family: 'Arial Black' },
+    gradient: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: 480,
+      endY: 0,
+      colors: [
+        { stop: 0, color: '#f472b6' },
+        { stop: 1, color: '#818cf8' },
+      ],
+    },
+    stroke: { color: '#0f172a', width: 6 },
+    shadow: { color: 'rgba(15,23,42,0.4)', offsetX: 0, offsetY: 16, blur: 30, opacity: 1 },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'APEXIFY',
+    x: 480,
+    y: 220,
+    font: { size: 92, family: 'Arial Black' },
+    gradient: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: 480,
+      endY: 0,
+      colors: [
+        { stop: 0, color: '#f472b6' },
+        { stop: 1, color: '#818cf8' },
+      ],
+    },
+    stroke: { color: '#0f172a', width: 6 },
+    shadow: { color: 'rgba(15,23,42,0.4)', offsetX: 0, offsetY: 16, blur: 30, opacity: 1 },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+Next: [Curved text & metrics](/docs#text-curved-and-metrics) · [Fonts & layout](/docs#text-fonts-and-layout).

@@ -1,0 +1,200 @@
+# Video FFmpeg internals (`VideoHelpers`)
+
+This page is for **maintainers** and **advanced debugging**. Everyday usage stays on [Video & FFmpeg](/docs#video-ffmpeg), [discovery & frames](/docs#video-discovery-frames), and [`createVideo` router](/docs#video-create-video).
+
+**Sources:**
+
+- **`lib/Canvas/utils/Video/videoHelpers.ts`** — class **`VideoHelpers`** (**FFmpeg** graphs, **`resolveVideoSource`**, audio helpers).
+- **`lib/Canvas/extended/VideoCreator.ts`** — **`createVideo`** **`if`** router + **`VideoCreationOptions`** / **`MixAudio*`** types.
+- **`lib/Canvas/ApexPainter.ts`** — constructs **`VideoHelpers`** with injected **`VideoHelpersDependencies`**; **`VideoCreator.setHelperMethods`** maps each **`createVideo`** branch to **`#…`** methods on **`ApexPainter`** **or** **`this.videoHelpers.*`**.
+
+---
+
+## Who calls what
+
+**Apps** only need **`import { ApexPainter } from 'apexify.js'`** and **`painter.createVideo({ … })`**. **`VideoHelpers`** is **not** exported from the npm entry.
+
+Wiring in **`ApexPainter`** (constructor):
+
+1. **`videoCreator.setDependencies({ … })`** — **`getVideoInfo`**, **`#extractVideoFrame`**, **`extractFrames`**, **`extractAllFrames`**, FFmpeg checks.
+2. **`new VideoHelpers({ checkFFmpegAvailable, getFFmpegInstallInstructions, getVideoInfo, extractVideoFrame, createVideo })`** — used when **`VideoHelpers`** runs **`batchProcessVideos`** (recursive **`createVideo`**).
+3. **`videoCreator.setHelperMethods({ … })`** — almost every branch forwards to **`this.#convertVideo`**, **`this.#mergeVideos`**, … **Exceptions** that delegate to **`this.videoHelpers`** directly: **`mixVideoAudio`**, **`adjustVideoVolume`**, **`freezeVideoFrame`**, **`exportVideoPreset`**, **`normalizeVideoAudio`**, **`applyLUTToVideo`**, **`addVideoTransition`**, **`addAnimatedTextToVideo`**.
+
+So: many encode paths are implemented twice in spirit — **`ApexPainter`** **`#`** methods **and** **`VideoHelpers`** methods — they are meant to align but **path / URL handling can differ** (see below).
+
+---
+
+## Example: user API only (progress + branch that hits `VideoHelpers`)
+
+Branches that accept **`onProgress`** forward it into **`VideoHelpers.executeFFmpegWithProgress`** when implemented there — e.g. **`freezeFrame`**, **`exportPreset`**, **`normalizeAudio`**, **`applyLUT`**, **`addTransition`**, **`addAnimatedText`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+await painter.createVideo({
+  source: './input.mp4',
+  freezeFrame: {
+    time: 2,
+    duration: 5,
+    outputPath: './frozen-segment.mp4',
+  },
+  onProgress: ({ percent, time, speed }) => {
+    console.log(`encode ~${percent.toFixed(1)}%`, `time=${time.toFixed(1)}s`, `speed=${speed}x`);
+  },
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  await painter.createVideo({
+    source: './input.mp4',
+    freezeFrame: { time: 2, duration: 5, outputPath: './frozen-segment.mp4' },
+    onProgress: ({ percent, time, speed }) => {
+      console.log(`encode ~${percent.toFixed(1)}%`, `time=${time.toFixed(1)}s`, `speed=${speed}x`);
+    },
+  });
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Mix audio** (timeline overlays) also runs through **`VideoHelpers.mixVideoAudio`** — **`resolveVideoSource`** handles **`Buffer`** and **`http(s)`** for overlay clips:
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+await painter.createVideo({
+  source: './main.mp4',
+  mixAudio: {
+    outputPath: './with-bed.mp4',
+    keepOriginalAudio: true,
+    originalVolume: 0.85,
+    overlays: [
+      {
+        source: './music.mp3',
+        startTime: 0,
+        volume: 0.4,
+      },
+    ],
+  },
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  await painter.createVideo({
+    source: './main.mp4',
+    mixAudio: {
+      outputPath: './with-bed.mp4',
+      keepOriginalAudio: true,
+      overlays: [{ source: './music.mp3', startTime: 0, volume: 0.4 }],
+    },
+  });
+})();
+```
+</js>
+</CodeSwitcher>
+
+Do **not** deep-import **`VideoHelpers`** in application code unless you maintain a fork — the class contract can change without semver guarantees on internal paths.
+
+---
+
+## Temp files and `resolveVideoSource`
+
+Implemented in **`videoHelpers.ts`** (and relied on by **`mixVideoAudio`** and other helpers that call it).
+
+| Mechanism | Behavior |
+|-----------|----------|
+| **`resolveVideoSource(videoSource, frameDir, timestamp)`** | **`Buffer`** → writes **`frameDir/temp-video-{timestamp}.mp4`**, **`shouldCleanup: true`**. **`http(s)` URL** → **`axios`** download → same temp name. Else **local path**: **`path.join(process.cwd(), …)`** if not absolute; **`existsSync`** or throws. |
+| **`frameDir`** | Typically **`path.join(process.cwd(), '.temp-frames')`** (created with **`mkdirSync`**, **`recursive: true`**). |
+| **Quotes / Windows** | Paths passed to **`ffmpeg`** / **`ffprobe`** are wrapped in quotes; embedded **`"`** escaped as **`\"`**. |
+
+**`getVideoInfo` (on `ApexPainter`)** — **`ffprobe`** JSON (**30s** timeout, **10MB** stdout cap): streams **`width`/`height`/`r_frame_rate`/`bit_rate`**, format **`duration`/`format_name`**. **`Buffer`** / **`http`** → temp file then deleted. **Relative path caveat:** **`existsSync(videoSource)`** may run **without** the same **`cwd`** join as **`#extractVideoFrame`** — metadata can fail while frame extraction succeeds. Prefer **absolute paths** or **`Buffer`**.
+
+**`#extractVideoFrame` (on `ApexPainter`)** — **`ffmpeg -ss {time} -frames:v 1`**: **`png`** adds **`-pix_fmt rgba`**; **`jpg`** uses **`-q:v {quality}`** (defaults often **`quality: 2`** — **lower `q:v` tends to mean higher quality** in FFmpeg). **`time`** from **`timeSeconds`**, else **`frameNumber / fps`** from **`getVideoInfo`** when possible, else **30 fps** fallback (**`console.warn`**).
+
+---
+
+## Audio tempo / pitch helpers (inside `videoHelpers.ts`)
+
+| Helper | Role |
+|--------|------|
+| **`chainAtempoSegments(factor)`** | Chains **`atempo=`** stages so each stays in FFmpeg’s **~0.5–2.0** band. |
+| **`buildPitchSemitonesChain(semitones)`** | **`asetrate`** + **`aresample=48000`** + compensating **`atempo`** — **no** **`rubberband`**. |
+| **`buildMixPitchSpeedSegment(pitch?, speed?)`** | Used when building **`mixVideoAudio`** stems (**`atempo`** / pitch chain — not **`rubberband`**). |
+
+---
+
+## Progress parsing (`executeFFmpegWithProgress`)
+
+Private helper on **`VideoHelpers`**. Uses Node **`child_process.exec`** (not a spawned TTY pipeline). When **`onProgress`** is set, **stderr** is scanned for **`Duration:`**, **`time=`**, and **`speed=`** to emit **`{ percent, time, speed }`**. Quality depends on FFmpeg’s **stderr** format for that encode.
+
+---
+
+## Branch-by-branch notes (`VideoHelpers` recipes)
+
+Unless noted, success is often **`{ outputPath, success: true }`**. Typical **`timeout` / `maxBuffer`**: many encodes **300000 ms** / **10 MB**; **`mixVideoAudio`** **600000 ms** / **30 MB**; **`mergeVideos`** / **`stabilizeVideo`** may use **600000 ms** / **20 MB** — confirm in **`videoHelpers.ts`** when patching.
+
+| Method | Command / filter highlights |
+|--------|---------------------------|
+| **`generateVideoThumbnail`** | **`deps.extractVideoFrame`** at **`duration/(count+1)`** steps → **`@napi-rs/canvas`** grid (**default 3×3**, **320×180** cells) → **PNG** **`CanvasResults`**. |
+| **`convertVideo`** | **`ffmpeg -i …`** + **`CRF`** presets (**low** / **medium** / **high** / **ultra** → **28** / **23** / **18** / **15**) or **`-b:v {bitrate}k`**; optional **`-r`**, **`-vf scale=`**. Does **not** always force **`-c:v libx264`** — defaults depend on output extension / FFmpeg build. |
+| **`trimVideo`** | **`-ss start -t (end-start) -c copy`** (fast; keyframe boundaries apply). |
+| **`extractAudio`** | Requires audio stream **`a:0`** via **`ffprobe`**; **`ffmpeg -vn`** + **`libmp3lame`/`pcm_s16le`/`aac`/`libvorbis`**, **`-ab {bitrate}k`**. |
+| **`addWatermarkToVideo`** | **`filter_complex`**: scale watermark, **`format=rgba`**, **`colorchannelmixer`**, **`overlay`**. Local watermark path gets **`cwd`** join; **URLs not fetched** here. |
+| **`changeVideoSpeed`** | Video **`setpts`**. Audio: **`atempo`** chains when speed **>2** or **<0.5**; no audio → video-only graph. |
+| **`generateVideoPreview`** | Writes frames under **`outputDirectory`** (**default `./video-preview`**); returns **`{ source, frameNumber, time }[]`**. |
+| **`applyVideoEffects`** | **`-vf`** from **`filters[]`**. |
+| **`mergeVideos`** | **`sequential`**: **`concat`** demuxer **`-c copy`**. **`side-by-side`**: **`hstack`** (two inputs). **`grid`**: still **two-input `hstack`** in implementation — **not** a real **N×M** grid. |
+| **`replaceVideoSegment`** | Temp segments + **`concat`**; **`replacementVideo`** vs **`replacementFrames`** mutually exclusive. |
+| **`rotateVideo`** | **`transpose`** / flip family for 90° steps. |
+| **`cropVideo`** | **`crop=w:h:x:y`**. |
+| **`compressVideo`** | **`CRF`** + optional size/bitrate heuristics (**read source**). |
+| **`addTextToVideo`** | **`drawtext`** (**`fontfile`** via **`cwd`** when relative). |
+| **`addFadeToVideo`** | **`fade=t=in` / `fade=t=out`**. |
+| **`reverseVideo`** | **`reverse`** + **`areverse`** when audio exists. |
+| **`createVideoLoop`** | **`loop`** / **`concat`** (**`smooth`** branch — see source). |
+| **`batchProcessVideos`** | Calls injected **`createVideo({ source, …operations })`** per job — **does not** inject a default **`outputPath`** into **`operations`**. Each job must set **`outputPath`** inside **`operations`**. |
+| **`detectVideoScenes`** | **`ffmpeg … \| grep \| awk \| sed`** — **Unix-oriented**; fragile on **Windows**. |
+| **`stabilizeVideo`** | **`vidstabdetect`** → **`vidstabtransform`**; fallback **`hqdn3d`**. Needs **vid.stab** in FFmpeg. |
+| **`colorCorrectVideo`** | **`eq=`** + hue/temperature-style filters (**see source**). |
+| **`addPictureInPicture`**, **`createSplitScreen`** | **`overlay`**, **`hstack`**, **`vstack`** (**see source** for limits). |
+| **`createTimeLapseVideo`** | **`setpts`** / **`fps`** speed-up (**see source**). |
+| **`muteVideo`** | **`ranges`** → volume envelope **or** **`-an`**. |
+| **`mixVideoAudio`** | **`resolveVideoSource`** per overlay; **`atrim`**, **`asetpts`**, **`aresample=48000`**, optional pitch/speed segment filters (**not `rubberband`**), **`adelay`**, **`volume`**; **`amix`** → **AAC** mapping (**see source**). Skips very short overlays (**~0.04s** window). |
+| **`adjustVideoVolume`** | Global **`volume`**. **`ranges`** with **`speed`**/**`pitchSemitones`** → **`rubberband`** filter segments (**requires FFmpeg rubberband**). |
+| **`createVideoFromFrames`** | Image sequence → video (**see source** for **`fps`**, codecs). |
+| **`freezeVideoFrame`** | Multiple **`ffmpeg`** passes (before / hold / after). |
+| **`exportVideoPreset`**, **`normalizeVideoAudio`**, **`applyLUTToVideo`**, **`addVideoTransition`**, **`addAnimatedTextToVideo`** | **`executeFFmpegWithProgress`** when **`onProgress`** set (**presets**, **LUFS**, **xfade**, **LUT**, animated **drawtext** — **see source**). |
+
+---
+
+## HTTP `source` and divergent paths
+
+**`getVideoInfo`**, **`#extractVideoFrame`**, and **`VideoHelpers.resolveVideoSource`** can materialize remote media. Many **`ApexPainter.#`** encode helpers only **`cwd`**-join plain paths — **`createVideo({ source: 'https://…', convert: … })`** may fail with **file not found**. Safer: download to **`Buffer`** or use branches that consistently call **`resolveVideoSource`** (e.g. **`mixAudio`** overlays, **`adjustVolume`** when routed through **`videoHelpers`**, **`freezeFrame`**, … — **verify in source** before relying on URL **`source`**).
+
+**`VideoHelpersDependencies.createVideo`** is injected so **`batchProcessVideos`** can recurse. Avoid surprising **re-entrancy** if wrapping **`createVideo`**.
+
+---
+
+## See also
+
+- [Video & FFmpeg](/docs#video-ffmpeg) — hub and quick starts  
+- [`createVideo` router](/docs#video-create-video) — **first-match** branch order  
+- [Troubleshooting](/docs#troubleshooting) — dependencies, **`VideoHelpers`** file pointer  

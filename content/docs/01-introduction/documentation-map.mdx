@@ -1,0 +1,64 @@
+# Documentation map
+
+**Start here for step-by-step usage + examples:** [Complete developer guide](/docs#complete-developer-guide).
+
+This page is the **reading-order map**: topic hubs match how **`ApexPainter`** work usually flows (scene → layers → export → video/charts as needed).
+
+---
+
+## Folder layout (`docs/`)
+
+| Folder | Role |
+|--------|------|
+| **`01-introduction`** | [Getting started](/docs#Getting-Started), [Documentation map](/docs#documentation-map) (this page), [Complete developer guide](/docs#complete-developer-guide), [Changelog](/docs#Change-Log) |
+| **`02-package`** | [Package surface](/docs#package-surface) — **`import`**, **`ApexPainter`** ctor / **`outPut`** channel |
+| **`12-reference`** | [API index](/docs#api-index), [CanvasUtils & types](/docs#canvas-utils-and-types), [Troubleshooting](/docs#troubleshooting), [lib module charter](/docs#lib-module-charter) |
+
+Domain chapters (**canvas**, **images**, **text**, **video**, **charts**, **batch**, …) live under **`docs/03-*`** … **`docs/11-*`** with **hub** MDX files that link **topic** MDX files (same pattern everywhere).
+
+---
+
+## Topic hubs (multi-page tracks)
+
+Some areas split into a **hub** plus **focused** pages — use the hub first, then drill down.
+
+| Area | Hub | Topic pages |
+|------|------|-------------|
+| **Batch, chain, save, layout helpers** | [batch-chain-save-output](/docs#batch-chain-save-output) | [Batch & chain](/docs#batch-and-chain) · [Save & output](/docs#save-and-output) |
+| **Charts** | [Charts](/docs#charts) | [createChart & Charts namespace](/docs#charts-create-chart) · [Comparison & combo](/docs#charts-comparison-combo) |
+| **Video / FFmpeg** | [Video & FFmpeg](/docs#video-ffmpeg) | [Discovery & frames](/docs#video-discovery-frames) · [`createVideo` router](/docs#video-create-video) · [FFmpeg internals (`VideoHelpers`)](/docs#video-ffmpeg-internals) |
+| **GIF** | [GIF & animation](/docs#gif-and-animation) | [Create GIF](/docs#gif-create) · [`animate` & Frame](/docs#gif-animate) |
+| **Advanced raster** | [advanced-raster-apis](/docs#advanced-raster-apis) | [Path2D & drawPath](/docs#path2d-draw) · [Pixel APIs](/docs#pixel-apis) · [Hit testing](/docs#hit-testing) |
+
+---
+
+## Full topic table (learning sequence)
+
+Read top to bottom — sections match typical pipelines.
+
+| # | Topic | Entry hash | Main APIs |
+|---|--------|------------|-----------|
+| 0 | **Guided tour** | [complete-developer-guide](/docs#complete-developer-guide) | Steps, feature map, pitfalls |
+| 1 | Introduction | [Getting started](/docs#Getting-Started), [Changelog](/docs#Change-Log) | Install, minimal example |
+| 2 | Package surface | [package-surface](/docs#package-surface) | `ApexPainter`, `CanvasUtils`, `CanvasTypes`, flat exports |
+| 3 | Canvas | [create-canvas](/docs#create-canvas) | `createCanvas` → **`CanvasConfig`** |
+| 4 | Images & shapes | [create-image-and-shapes](/docs#create-image-and-shapes) | `createImage` → **`ImageProperties`**; off-canvas ops → [standalone image operations](/docs#standalone-image-operations) (**`docs/04-images/`**) |
+| 5 | Text | [create-text](/docs#create-text) | `createText`, `measureText` |
+| 6 | Custom lines | [custom-lines](/docs#custom-lines) | `createCustom`, **`CanvasUtils.customLines`** |
+| 7 | Paths, pixels, hits | [advanced-raster-apis](/docs#advanced-raster-apis) | Path2D, pixels, hit tests |
+| 8 | GIF & motion | [gif-and-animation](/docs#gif-and-animation) | `createGIF`, `animate` |
+| 9 | Images (standalone / off-canvas) | [standalone-image-operations](/docs#standalone-image-operations) | `resize`, `cropImage`, `effects`, `blend`, … — **`docs/04-images/`** |
+| 10 | Batch & I/O | [batch-chain-save-output](/docs#batch-chain-save-output) | `batch`, `chain`, `save`, `outPut`, stitch/collage/compress |
+| 11 | Charts | [charts](/docs#charts) | `createChart`, comparison, combo, **`Charts.*`** |
+| 12 | Video | [video-ffmpeg](/docs#video-ffmpeg) | `getVideoInfo`, `extractFrames`, `createVideo` (+ [internals](/docs#video-ffmpeg-internals)) |
+| 13 | Deep reference | [api-index](/docs#api-index), [canvas-utils-and-types](/docs#canvas-utils-and-types), [troubleshooting](/docs#troubleshooting), [lib-module-charter](/docs#lib-module-charter) | Method → doc routing, flat helpers + types, deps & pitfalls, **`lib/`** map |
+
+---
+
+## Maintainers & backlog
+
+| Resource | Use |
+|----------|-----|
+| **`features-forDocs.md`** (repo root) | Scratchpad for **future** doc gaps — former backlog items are covered under **Contributor & source-only topics** above |
+| **[Video FFmpeg internals](/docs#video-ffmpeg-internals)** | **`VideoHelpers`** recipes, timeouts, **`resolveVideoSource`**, **`ApexPainter`** vs **`videoHelpers`** delegation |
+| **`lib/`** sources | Ground truth when docs and types disagree |

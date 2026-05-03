@@ -1,0 +1,325 @@
+# Fonts & layout
+
+Configure typography, word wrapping, and fills on **`TextProperties`**.
+
+Overview: [Create text](/docs#create-text).
+
+---
+
+## Modern **`font`** object (recommended)
+
+| Field | Role |
+|-------|------|
+| **`font.size`** | Pixel size (default **16** if omitted everywhere). |
+| **`font.family`** | Built-in family name (e.g. **`Arial`**, **`Georgia`**). |
+| **`font.path`** | Absolute path, or relative to **`process.cwd()`**, to **`.ttf` / `.otf` / `.woff`** … |
+| **`font.name`** | Logical name passed to **`registerFromPath`** (you’ll reference it like a family). |
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'Custom font headline',
+    x: 400,
+    y: 120,
+    font: {
+      size: 52,
+      path: './fonts/Inter-Bold.ttf',
+      name: 'InterBold',
+    },
+    color: '#111827',
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'Custom font headline',
+    x: 400,
+    y: 120,
+    font: {
+      size: 52,
+      path: './fonts/Inter-Bold.ttf',
+      name: 'InterBold',
+    },
+    color: '#111827',
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+If registration fails at runtime you’ll see a **warning** and metrics/rendering may fall back — verify the file path from your app’s working directory.
+
+---
+
+## Legacy font keys (still supported)
+
+Older snippets may use **`fontSize`**, **`fontFamily`**, **`fontName`**, **`fontPath`**. Prefer **`font: { … }`** in new code; behavior is the same after normalization inside **`EnhancedTextRenderer`** / **`measureText`**.
+
+---
+
+## **`bold`** & **`italic`**
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'Semi-important note',
+    x: 60,
+    y: 80,
+    font: { size: 28, family: 'Georgia' },
+    bold: true,
+    italic: true,
+    color: '#422006',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'Semi-important note',
+    x: 60,
+    y: 80,
+    font: { size: 28, family: 'Georgia' },
+    bold: true,
+    italic: true,
+    color: '#422006',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Spacing & wrapping
+
+| Field | Effect |
+|-------|--------|
+| **`lineHeight`** | Multiplier × font size (default **1.4**). |
+| **`letterSpacing`** | Extra pixels between glyphs (**`ctx.letterSpacing`**). |
+| **`wordSpacing`** | Extra pixels between words (**`ctx.wordSpacing`**). |
+| **`maxWidth`** | Soft-wrap long lines by word (ties into **`measureText`** line arrays). |
+| **`maxHeight`** | Caps how many lines render (overflow eventually collapses to **`...`** when wrapping logic hits the cap). |
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text:
+      'Wrap copy naturally without guessing widths by hand. Apexify breaks at word boundaries until the box is filled.',
+    x: 48,
+    y: 64,
+    font: { size: 26, family: 'Arial' },
+    color: '#f1f5f9',
+    maxWidth: 520,
+    lineHeight: 1.35,
+    letterSpacing: 0.4,
+    wordSpacing: 3,
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text:
+      'Wrap copy naturally without guessing widths by hand. Apexify breaks at word boundaries until the box is filled.',
+    x: 48,
+    y: 64,
+    font: { size: 26, family: 'Arial' },
+    color: '#f1f5f9',
+    maxWidth: 520,
+    lineHeight: 1.35,
+    letterSpacing: 0.4,
+    wordSpacing: 3,
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+Combine with manual **`'\n'`** characters for paragraph breaks.
+
+---
+
+## **`textAlign`** & **`textBaseline`**
+
+They behave like the Canvas 2D API:
+
+- **`textAlign`**: **`left`**, **`center`**, **`right`**, **`start`**, **`end`** — relative to **`x`**.
+- **`textBaseline`**: **`alphabetic`**, **`top`**, **`hanging`**, **`middle`**, **`bottom`**, **`ideographic`** — anchoring on **`y`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'CENTER / MIDDLE',
+    x: 400,
+    y: 220,
+    font: { size: 40, family: 'Arial' },
+    color: '#0f172a',
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'CENTER / MIDDLE',
+    x: 400,
+    y: 220,
+    font: { size: 40, family: 'Arial' },
+    color: '#0f172a',
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Solid fill, opacity & gradient
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'Gradient fill',
+    x: 420,
+    y: 160,
+    font: { size: 64, family: 'Arial Black' },
+    gradient: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: 420,
+      endY: 0,
+      colors: [
+        { stop: 0, color: '#38bdf8' },
+        { stop: 1, color: '#6366f1' },
+      ],
+    },
+    opacity: 0.95,
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'Gradient fill',
+    x: 420,
+    y: 160,
+    font: { size: 64, family: 'Arial Black' },
+    gradient: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: 420,
+      endY: 0,
+      colors: [
+        { stop: 0, color: '#38bdf8' },
+        { stop: 1, color: '#6366f1' },
+      ],
+    },
+    opacity: 0.95,
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+**`gradient`** wins over **`color`** when both are present.
+
+---
+
+## Card copy block (realistic)
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({
+  width: 560,
+  height: 360,
+  colorBg: '#fdf4ff',
+});
+
+const card = await painter.createText(
+  {
+    text: 'Pricing\nEverything you need to ship creatives faster.',
+    x: 56,
+    y: 72,
+    font: { size: 22, family: 'Arial' },
+    color: '#581c87',
+    maxWidth: 448,
+    lineHeight: 1.45,
+    textAlign: 'left',
+    textBaseline: 'top',
+  },
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({
+  width: 560,
+  height: 360,
+  colorBg: '#fdf4ff',
+});
+
+const card = await painter.createText(
+  {
+    text: 'Pricing\nEverything you need to ship creatives faster.',
+    x: 56,
+    y: 72,
+    font: { size: 22, family: 'Arial' },
+    color: '#581c87',
+    maxWidth: 448,
+    lineHeight: 1.45,
+    textAlign: 'left',
+    textBaseline: 'top',
+  },
+  buffer
+);
+```
+</js>
+</CodeSwitcher>
+
+Next: [Decorations & effects](/docs#text-decorations-effects) · [Curved text & metrics](/docs#text-curved-and-metrics).

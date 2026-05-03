@@ -1,0 +1,114 @@
+# Video & FFmpeg
+
+**Implementation:** **`lib/Canvas/extended/VideoCreator.ts`** (**`createVideo`** router, **`VideoCreationOptions`**, **`MixAudio*`** types) · FFmpeg-heavy logic in **`lib/Canvas/utils/Video/videoHelpers.ts`** (**`VideoHelpers`** — internal, not a dedicated npm export). **`ApexPainter`** wires **`VideoCreator.setDependencies`** and **`setHelperMethods`**; normal apps call **`getVideoInfo`**, **`extractFrames`**, and **`createVideo`** on the painter only.
+
+<Alert type="warning" title="System dependency">
+All video flows require **FFmpeg** and **ffprobe** on **`PATH`**. If binaries are missing, **`createVideo`** throws a message beginning **`❌ FFMPEG NOT FOUND`** plus install hints from the façade.
+</Alert>
+
+---
+
+## Quick start: metadata
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+// Replace with your file path or pass a Buffer
+const meta = await painter.createVideo({
+  source: './video.mp4',
+  getInfo: true,
+});
+
+console.log(meta.duration, meta.width, meta.height, meta.fps);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const meta = await painter.createVideo({
+    source: './video.mp4',
+    getInfo: true,
+  });
+  console.log(meta.duration, meta.width, meta.height, meta.fps);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Quick start: grab one frame as PNG
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createVideo({
+  source: './video.mp4',
+  extractFrame: {
+    time: 2.5,
+    outputFormat: 'png',
+    width: 640,
+    height: 360,
+  },
+});
+
+fs.writeFileSync('./frame.png', buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createVideo({
+    source: './video.mp4',
+    extractFrame: { time: 2.5, outputFormat: 'png', width: 640, height: 360 },
+  });
+  fs.writeFileSync('./frame.png', buffer);
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Return shape:** **`{ buffer, canvas: { width, height } }`** — **`buffer`** is PNG (**`@napi-rs/canvas`** resize path in **`VideoCreator`**).
+
+---
+
+## Documentation map
+
+| Topic | Page |
+|-------|------|
+| **`getVideoInfo`**, **`extractFrames`**, **`extractFrameAtTime`**, … vs **`createVideo`** frame keys | [Video: discovery & frames](/docs#video-discovery-frames) |
+| **`createVideo`** branch order, **`MixAudio*`**, **`onProgress`**, caveats | [`createVideo` router & options](/docs#video-create-video) |
+| **`VideoHelpers`**, **`resolveVideoSource`**, FFmpeg recipes, **`ApexPainter`** vs **`videoHelpers`** delegation | [Video FFmpeg internals](/docs#video-ffmpeg-internals) |
+
+---
+
+## Errors
+
+| Case | Message shape |
+|------|----------------|
+| FFmpeg missing | **`❌ FFMPEG NOT FOUND`** (rethrown as-is) |
+| Other failures | **`createVideo failed: …`** (**`getErrorMessage`**) |
+| Internal wiring bug | **`VideoCreator dependencies not set`** / **`… helper method not set`** — should not appear when using **`ApexPainter`** normally |
+
+---
+
+## High-level cautions
+
+- **`source`**: **`string`** (path or URL) or **`Buffer`**. URL / relative-path behavior can differ between **`getVideoInfo`** and some **`ApexPainter`** **`#`** FFmpeg helpers — prefer **absolute paths** or **buffers** — [Video FFmpeg internals](/docs#video-ffmpeg-internals) (**Temp files** / HTTP **`source`**).
+- **Exactly one `createVideo` operation** per call: the router uses a **first-match `if` chain**; extra keys are ignored. Example: **`getInfo: true`** with **`extractFrame`** returns **only** metadata — see [router doc](/docs#video-create-video).

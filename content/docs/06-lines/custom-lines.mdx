@@ -1,0 +1,101 @@
+# Custom lines (`createCustom`)
+
+Draw connectors on top of an existing PNG scene: straight or chained segments, dashed / patterned / textured strokes, arrowheads, and markers along each segment.
+
+**API:** `await painter.createCustom(options, buffer)` → PNG **`Buffer`**. **`options`** is one **`CustomOptions`** object or an **array** of segments.
+
+**Implementation:** `lib/Canvas/utils/Custom/customLines.ts` (**`CanvasUtils.customLines`** calls it). Low-level helpers live in **`advancedLines.ts`**.
+
+---
+
+## Quick start
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const { buffer: base } = await painter.createCanvas({
+  width: 900,
+  height: 400,
+  colorBg: '#0f172a',
+});
+
+const out = await painter.createCustom(
+  {
+    startCoordinates: { x: 120, y: 200 },
+    endCoordinates: { x: 780, y: 200 },
+    lineStyle: {
+      width: 6,
+      color: '#38bdf8',
+      lineCap: 'round',
+      lineJoin: 'round',
+    },
+    arrow: { end: true, size: 18, style: 'filled', color: '#7dd3fc' },
+  },
+  base
+);
+
+fs.writeFileSync('connector.png', out);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer: base } = await painter.createCanvas({
+    width: 900,
+    height: 400,
+    colorBg: '#0f172a',
+  });
+
+  const out = await painter.createCustom(
+    {
+      startCoordinates: { x: 120, y: 200 },
+      endCoordinates: { x: 780, y: 200 },
+      lineStyle: {
+        width: 6,
+        color: '#38bdf8',
+        lineCap: 'round',
+        lineJoin: 'round',
+      },
+      arrow: { end: true, size: 18, style: 'filled', color: '#7dd3fc' },
+    },
+    base
+  );
+
+  fs.writeFileSync('connector.png', out);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## What each segment supports (`CustomOptions`)
+
+| Area | Fields |
+|------|--------|
+| **Required** | **`startCoordinates`**, **`endCoordinates`** (`{ x, y }` numbers) |
+| **Path hint** | **`path.type`**: **`smooth`** \| **`bezier`** \| **`catmull-rom`**, optional **`tension`**, **`closed`** — see [Arrows & paths](/docs#custom-lines-arrows-markers) for how this interacts with **two-point** segments |
+| **Arrowheads** | **`arrow`**: **`start`**, **`end`**, **`size`**, **`style`** (`filled` \| `outline`), **`color`** |
+| **Markers** | **`markers[]`**: **`position`** `0…1` along the segment, **`shape`**, **`size`**, **`color`** |
+| **Stroke look** | **`lineStyle`**: **`width`**, **`color`**, **`gradient`**, **`lineCap`**, **`lineJoin`**, **`lineRadius`**, **`lineDash`**, **`pattern`**, **`texture`**, **`singleLine`**, nested **`stroke`**, **`shadow`** (see [Line styles](/docs#custom-lines-style)) |
+
+---
+
+## Documentation map
+
+| Guide | What’s inside |
+|-------|----------------|
+| [Pipeline](/docs#custom-lines-pipeline) | **`canvasBuffer`** rules, validation, multi-segment arrays, **`singleLine`** chains |
+| [Line styles](/docs#custom-lines-style) | Width, gradients, caps/joins, dashes, patterns, textures, **`lineRadius`**, outline **`stroke`**, **`shadow`** typing |
+| [Arrows, markers & paths](/docs#custom-lines-arrows-markers) | Arrowheads, markers, **`path`** behavior, **`CanvasUtils`** helpers |
+
+Compose underneath anything that exports a buffer: [Create canvas](/docs#create-canvas), [Create image](/docs#create-image-and-shapes), [Create text](/docs#create-text).

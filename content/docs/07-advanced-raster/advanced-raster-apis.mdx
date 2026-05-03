@@ -1,0 +1,122 @@
+# Paths, pixels & hit testing
+
+Low-level tools on top of **`@napi-rs/canvas`**: build **`Path2D`** objects from a command list, **stroke/fill** them onto an existing PNG scene, read/write **RGBA** pixels, and answer **point-in-shape** questions for interactive UIs.
+
+**Implementation:** `lib/Canvas/extended/Path2DCreator.ts`, **`PixelDataCreator.ts`**, **`HitDetectionCreator.ts`** · command DSL **`lib/Canvas/utils/core/pathCmd.ts`**.
+
+---
+
+## Quick picks
+
+**Stroke + fill a rounded rectangle on a canvas**
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 480,
+  height: 320,
+  colorBg: '#0f172a',
+});
+
+const outlined = await painter.drawPath(
+  buffer,
+  [
+    { type: 'roundedRect', x: 80, y: 70, width: 320, height: 180, radius: 24 },
+  ],
+  {
+    stroke: { color: '#38bdf8', width: 4, lineJoin: 'round' },
+    fill: { color: 'rgba(56, 189, 248, 0.12)', rule: 'nonzero' },
+  }
+);
+
+fs.writeFileSync('frame.png', outlined);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createCanvas({
+    width: 480,
+    height: 320,
+    colorBg: '#0f172a',
+  });
+
+  const outlined = await painter.drawPath(
+    buffer,
+    [{ type: 'roundedRect', x: 80, y: 70, width: 320, height: 180, radius: 24 }],
+    {
+      stroke: { color: '#38bdf8', width: 4, lineJoin: 'round' },
+      fill: { color: 'rgba(56, 189, 248, 0.12)', rule: 'nonzero' },
+    }
+  );
+
+  fs.writeFileSync('frame.png', outlined);
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Hit-test a click inside a circle**
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const hit = await painter.isPointInRegion(
+  { type: 'circle', x: 200, y: 200, radius: 80 },
+  210,
+  205
+);
+
+console.log(hit.hit, hit.hitType);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const hit = await painter.isPointInRegion(
+    { type: 'circle', x: 200, y: 200, radius: 80 },
+    210,
+    205
+  );
+
+  console.log(hit.hit, hit.hitType);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## APIs covered here
+
+| Area | Methods | Types |
+|------|---------|--------|
+| **Paths** | **`createPath2D`** (sync), **`drawPath`** (async) | **`PathCommand[]`**, **`Path2DDrawOptions`** |
+| **Pixels** | **`getPixelData`**, **`setPixelData`**, **`manipulatePixels`**, **`getPixelColor`**, **`setPixelColor`** | **`PixelData`**, **`PixelManipulationOptions`** |
+| **Hits** | **`isPointInPath`**, **`isPointInRegion`**, **`isPointInAnyRegion`**, **`getDistanceToRegion`** | **`HitRegion`**, **`HitDetectionOptions`**, **`HitDetectionResult`** |
+
+---
+
+## Documentation map
+
+| Guide | What’s inside |
+|-------|----------------|
+| [Path2D & `drawPath`](/docs#path2d-draw) | **`PathCommand`** DSL, **`Path2DDrawOptions`** (stroke / fill / transform), sync **`createPath2D`** |
+| [Pixel APIs](/docs#pixel-apis) | Regions, **`processor`**, built-in **`filter`**, single-pixel helpers |
+| [Hit testing](/docs#hit-testing) | **`HitRegion`** variants, stroke-aware rects/circles, distances, limits |
+
+**Typography:** [Curved text & metrics](/docs#text-curved-and-metrics) · **Connectors:** [Custom lines](/docs#custom-lines).

@@ -1,0 +1,102 @@
+# GIF & animation
+
+Encode animated **GIF** files from PNG frames (**`createGIF`**) or render **frame sequences** with optional GIF sidecar (**`animate`**). Both use **`gifencoder`** under the hood.
+
+**GIF pipeline:** `lib/Canvas/extended/GIFCreator.ts` · **`animate`:** `lib/Canvas/ApexPainter.ts`.
+
+---
+
+## Quick start (`createGIF` → buffer)
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const a = await painter.createCanvas({ width: 320, height: 200, colorBg: '#0ea5e9' });
+const b = await painter.createCanvas({ width: 320, height: 200, colorBg: '#6366f1' });
+
+const gifBytes = await painter.createGIF(
+  [
+    { duration: 400, buffer: a.buffer },
+    { duration: 400, buffer: b.buffer },
+  ],
+  {
+    outputFormat: 'buffer',
+    width: 320,
+    height: 200,
+    repeat: 0,
+    quality: 12,
+  }
+);
+
+if (Buffer.isBuffer(gifBytes)) {
+  fs.writeFileSync('./flip.gif', gifBytes);
+}
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const a = await painter.createCanvas({ width: 320, height: 200, colorBg: '#0ea5e9' });
+  const b = await painter.createCanvas({ width: 320, height: 200, colorBg: '#6366f1' });
+
+  const gifBytes = await painter.createGIF(
+    [
+      { duration: 400, buffer: a.buffer },
+      { duration: 400, buffer: b.buffer },
+    ],
+    {
+      outputFormat: 'buffer',
+      width: 320,
+      height: 200,
+      repeat: 0,
+      quality: 12,
+    }
+  );
+
+  if (Buffer.isBuffer(gifBytes)) {
+    fs.writeFileSync('./flip.gif', gifBytes);
+  }
+})();
+```
+</js>
+</CodeSwitcher>
+
+Always **`await`** **`createGIF`** and **narrow** the result — the Promise resolves to **`Buffer`**, **`string`** (base64), **`{ gif, static }`**, Discord-style **`{ attachment, name }[]`**, **`undefined`** (file mode), etc., depending on **`outputFormat`**.
+
+---
+
+## APIs at a glance
+
+| Method | Role |
+|--------|------|
+| **`createGIF(gifFrames?, options)`** | Encode **`GIFInputFrame[]`** **or** frames produced by **`onStart`** (**`GIFEncodedFrame[]`** / **`AsyncIterable`**) |
+| **`animate(frames, defaultDuration, defaultWidth?, defaultHeight?, options?)`** | Build **`Frame[]`** PNGs; optionally stream to **`gifPath`** when **`gif: true`** |
+
+---
+
+## Documentation map
+
+| Guide | Contents |
+|-------|-----------|
+| [Create GIF (`createGIF`)](/docs#gif-create) | **`GIFOptions`**, **`GIFInputFrame`**, **`onStart`** / **`onEnd`**, validation, outputs, watermarks, transparency |
+| [`animate` & `Frame`](/docs#gif-animate) | Scene **`Frame`** shape, **`onDrawCustom`**, GIF sidecar, timing |
+
+---
+
+## Types (from `apexify.js`)
+
+| Type | Use |
+|------|-----|
+| **`GIFOptions`** | Encoder size, **`outputFormat`**, **`quality`** (1–20), **`repeat`**, **`delay`**, watermarks, **`transparentColor`**, **`defaultDispose`**, **`onStart`**, **`onEnd`**, … |
+| **`GIFInputFrame`** | **`duration`**, **`buffer`** and/or **`background`** (path / URL / **`Buffer`**) |
+| **`GIFEncodedFrame`** | **`buffer`**, optional **`duration`**, **`dispose`**, **`transparentColor`**, **`watermark`** — returned from **`onStart`** |
+| **`Frame`** | Per-step canvas for **`animate`** (**`GradientConfig`** bg, **`pattern`**, **`source`**, **`blendMode`**, **`transformations`**, **`duration`**, **`width`**, **`height`**, **`onDrawCustom`**) |

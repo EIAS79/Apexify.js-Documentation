@@ -1,0 +1,236 @@
+# Pixel APIs
+
+Read and write **`ImageData`**-compatible RGBA buffers on top of any PNG scene (**`Buffer`** or **`CanvasResults`**).
+
+Overview: [Advanced raster APIs](/docs#advanced-raster-apis).
+
+---
+
+## `getPixelData(buffer, options?)`
+
+Returns **`PixelData`**: **`data`** (**`Uint8ClampedArray`** RGBA row-major), **`width`**, **`height`**, **`colorSpace: 'srgb'`**.
+
+Optional region **`{ x, y, width, height }`** defaults to the **full** image. Regions **must** stay inside bounds or you get:
+
+**`getPixelData: Region out of bounds. Image: WxH, Region: …`**
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 320,
+  height: 240,
+  colorBg: '#1e293b',
+});
+
+const crop = await painter.getPixelData(buffer, {
+  x: 40,
+  y: 60,
+  width: 120,
+  height: 80,
+});
+
+console.log(crop.width, crop.height, crop.data.length); // w*h*4
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createCanvas({
+    width: 320,
+    height: 240,
+    colorBg: '#1e293b',
+  });
+
+  const crop = await painter.getPixelData(buffer, {
+    x: 40,
+    y: 60,
+    width: 120,
+    height: 80,
+  });
+
+  console.log(crop.width, crop.height, crop.data.length);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `setPixelData(buffer, pixelData, options?)`
+
+Writes **`pixelData.data`** into a fresh canvas copy via **`putImageData`**.
+
+| Option | Role |
+|--------|------|
+| **`x`**, **`y`** | Destination top-left (**default 0**) |
+| **`dirtyX`**, **`dirtyY`**, **`dirtyWidth`**, **`dirtyHeight`** | Sub-rectangle of **`pixelData`** (both **`dirtyX`** and **`dirtyY`** must be defined to activate the overload) |
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+const { buffer } = await painter.createCanvas({ width: 200, height: 200, colorBg: '#000' });
+
+const tile = await painter.getPixelData(buffer, { x: 0, y: 0, width: 32, height: 32 });
+// …mutate tile.data…
+
+const patched = await painter.setPixelData(buffer, tile, { x: 84, y: 96 });
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer } = await painter.createCanvas({ width: 200, height: 200, colorBg: '#000' });
+  const tile = await painter.getPixelData(buffer, { x: 0, y: 0, width: 32, height: 32 });
+  const patched = await painter.setPixelData(buffer, tile, { x: 84, y: 96 });
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `manipulatePixels(buffer, options)`
+
+Two modes:
+
+1. **`processor(r, g, b, a, x, y)`** → returns **`[r, g, b, a]`** per pixel (values clamped **0–255**).  
+2. **`filter`** + optional **`intensity`** (**default 1**) using built-ins:
+
+| `filter` | Effect |
+|----------|--------|
+| **`grayscale`** | Luminance weights |
+| **`invert`** | Channel flip |
+| **`sepia`** | Classic matrix tone |
+| **`brightness`** | Offset uses **`(intensity - 0.5) * 255`** |
+| **`contrast`** | Curve around mid-gray |
+| **`saturate`** | Scale chroma vs gray |
+
+Optional **`region`** `{ x, y, width, height }`:
+
+- **With region:** copies original buffer, patches only that rectangle.  
+- **Without region:** replaces entire bitmap via **`setPixelData`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+const { buffer } = await painter.createCanvas({ width: 400, height: 300, colorBg: '#334155' });
+
+const gray = await painter.manipulatePixels(buffer, { filter: 'grayscale' });
+
+const tinted = await painter.manipulatePixels(buffer, {
+  filter: 'saturate',
+  intensity: 1.35,
+  region: { x: 50, y: 40, width: 200, height: 160 },
+});
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer } = await painter.createCanvas({ width: 400, height: 300, colorBg: '#334155' });
+  const gray = await painter.manipulatePixels(buffer, { filter: 'grayscale' });
+  const tinted = await painter.manipulatePixels(buffer, {
+    filter: 'saturate',
+    intensity: 1.35,
+    region: { x: 50, y: 40, width: 200, height: 160 },
+  });
+})();
+```
+</js>
+</CodeSwitcher>
+
+<CodeSwitcher>
+<ts>
+```typescript
+const posterized = await painter.manipulatePixels(buffer, {
+  processor: (r, g, b, a, x, y) => {
+    const step = 64;
+    return [
+      Math.floor(r / step) * step,
+      Math.floor(g / step) * step,
+      Math.floor(b / step) * step,
+      a,
+    ];
+  },
+});
+```
+</ts>
+<js>
+```javascript
+const posterized = await painter.manipulatePixels(buffer, {
+  processor: (r, g, b, a, x, y) => {
+    const step = 64;
+    return [
+      Math.floor(r / step) * step,
+      Math.floor(g / step) * step,
+      Math.floor(b / step) * step,
+      a,
+    ];
+  },
+});
+```
+</js>
+</CodeSwitcher>
+
+Do **not** pass both **`processor`** and **`filter`** — **`processor`** wins when present.
+
+---
+
+## `getPixelColor` / `setPixelColor`
+
+Sample or poke a **single** pixel (**1×1** **`getPixelData`** under the hood).
+
+<CodeSwitcher>
+<ts>
+```typescript
+const rgba = await painter.getPixelColor(buffer, 120, 88);
+console.log(rgba);
+
+const stamped = await painter.setPixelColor(buffer, 120, 88, {
+  r: 255,
+  g: 99,
+  b: 71,
+  a: 255,
+});
+```
+</ts>
+<js>
+```javascript
+const rgba = await painter.getPixelColor(buffer, 120, 88);
+const stamped = await painter.setPixelColor(buffer, 120, 88, {
+  r: 255,
+  g: 99,
+  b: 71,
+  a: 255,
+});
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Validation snippets
+
+| Call | Missing input |
+|------|----------------|
+| **`getPixelData`** | **`getPixelData: canvasBuffer is required.`** |
+| **`setPixelData`** | **`setPixelData: canvasBuffer and pixelData are required.`** |
+| **`manipulatePixels`** | **`manipulatePixels: canvasBuffer is required.`** |
+
+Failures also surface as **`… failed: …`** wrappers.
+
+Next: [Hit testing](/docs#hit-testing) · [Path2D & drawPath](/docs#path2d-draw).

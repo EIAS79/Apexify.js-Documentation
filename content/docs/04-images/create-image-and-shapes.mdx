@@ -1,0 +1,134 @@
+# Create image & shapes (`createImage`)
+
+Paint **photos**, **buffers**, or **vector shapes** on top of an existing canvas (usually one you made with **`createCanvas`**). Each layer can use fit modes, filters, masks, warps, shadows, and more.
+
+**API:** `await painter.createImage(images, canvasBuffer, options?)` → PNG **`Buffer`**.
+
+---
+
+## Quick start
+
+You always pass **something already drawn** as the second argument (a **`Buffer`** from **`createCanvas`**, or the whole **`createCanvas`** result). Then you describe **what** to draw and **where**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+// 1) Base scene
+const { buffer: base } = await painter.createCanvas({
+  width: 800,
+  height: 450,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 800,
+    endY: 0,
+    colors: [
+      { stop: 0, color: '#0f172a' },
+      { stop: 1, color: '#334155' },
+    ],
+  },
+});
+
+// 2) Overlay an image file (replace path with your asset)
+const withLogo = await painter.createImage(
+  {
+    source: './assets/logo.png',
+    x: 48,
+    y: 48,
+    width: 220,
+    height: 120,
+    fit: 'contain',
+    align: 'center',
+    opacity: 0.95,
+  },
+  base
+);
+
+fs.writeFileSync('output.png', withLogo);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer: base } = await painter.createCanvas({
+    width: 800,
+    height: 450,
+    gradientBg: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: 800,
+      endY: 0,
+      colors: [
+        { stop: 0, color: '#0f172a' },
+        { stop: 1, color: '#334155' },
+      ],
+    },
+  });
+
+  const withLogo = await painter.createImage(
+    {
+      source: './assets/logo.png',
+      x: 48,
+      y: 48,
+      width: 220,
+      height: 120,
+      fit: 'contain',
+      align: 'center',
+      opacity: 0.95,
+    },
+    base
+  );
+
+  fs.writeFileSync('output.png', withLogo);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## What `createImage` can do (full checklist)
+
+These map directly to **`ImageProperties`** (per layer) and **`CreateImageOptions`** / **`GroupTransformOptions`** (optional group pass).
+
+| Area | What you set |
+|------|----------------|
+| **Source** | Image path, **`http(s)`** URL, **`Buffer`**, or a **shape name** (`rectangle`, `square`, `circle`, `triangle`, `trapezium`, `star`, `heart`, `polygon`, `arc`, `pieSlice`). |
+| **Position & box** | **`x`**, **`y`** (required). **`width`**, **`height`**, optional **`inherit: true`** to use the bitmap’s natural size. |
+| **Fit inside the box** | **`fit`**: `fill` \| `contain` \| `cover`. **`align`**: `center`, corners, edges (`top-left`, …). |
+| **Look** | **`rotation`** (degrees), **`opacity`**, **`blur`** (px), **`blendMode`** (canvas composite mode). |
+| **Rounded clip** | **`borderRadius`** (number or `'circular'`), **`borderPosition`** for which corners participate. |
+| **Filters** | **`filters`**: blur / sharpen / color / pixel ops — **`filterIntensity`**, **`filterOrder`** `'pre'` \| `'post'`. |
+| **Mask & clip** | **`mask`**: image **`source`** + **`mode`** `alpha` \| `luminance` \| `inverse`. **`clipPath`**: polygon points `{x,y}[]` (bitmap layers). |
+| **Warp** | **`distortion`**: **`perspective`** (needs **4** corner points), **`bulge`**, **`pinch`** (+ **`intensity`**). **`meshWarp`**: grid + **`controlPoints`**. |
+| **Lens-style effects** | **`effects`**: **`vignette`**, **`lensFlare`**, **`chromaticAberration`**, **`filmGrain`**. |
+| **Behind / outline / glow** | **`boxBackground`** (`color` or **`gradient`**), **`stroke`**, **`shadow`**. |
+| **Vector shapes** | When **`source`** is a shape string, fill **`shape`**: **`ShapeProperties`** (`fill`, `color`, **`gradient`**, **`points`** as **canvas x/y**, radii, arc angles, …). |
+| **Group several layers** | **`CreateImageOptions`**: **`isGrouped: true`** + **`groupTransform`** — one shared transform, opacity, filters, mask, warp, effects, stroke, shadow, box background for **multiple** items. |
+
+**Bitmap-only:** masking, polygon **`clipPath`**, **`distortion`**, **`meshWarp`**, and **`filterOrder`** pre/post behave as documented for **image** sources. **Shape** layers still support rotation, blur, opacity, **`blendMode`**, **`borderRadius`** clip, **`boxBackground`**, **`stroke`**, **`shadow`**, and **`filters`** (applied on the shape draw path).
+
+---
+
+## Documentation map (read in order)
+
+| Guide | You’ll learn |
+|-------|----------------|
+| [How `createImage` runs](/docs#image-pipeline) | Buffer vs **`CanvasResults`**, stacking order, validation messages |
+| [Shapes](/docs#image-shapes) | Every **`ShapeType`**, **`shape`** props, code for circles, stars, polygons |
+| [Placement, effects & styling](/docs#image-properties-and-effects) | **`fit`/`align`**, **`inherit`**, **`effects`**, **`stroke`/`shadow`/`boxBackground`**, mask, clip, warp |
+| [Filters & grouped drawings](/docs#image-filters-groups-and-helpers) | Every **`ImageFilter.type`**, parameters, **`filterOrder`**, **`groupTransform`** example |
+| [Standalone image operations](/docs#standalone-image-operations) | Off-canvas **`resize`**, **`cropImage`**, **`blend`**, façade **`effects`** vs **`createImage`** **`filters`**, **`CanvasUtils`** parity |
+
+Related: build the base with [Create canvas](/docs#create-canvas).

@@ -1,0 +1,68 @@
+# `lib/` module charter
+
+High-level map of **`lib/Canvas/`** for **contributors** and advanced readers. End-user imports stay **`apexify.js`** → **`ApexPainter`**, **`CanvasUtils`**, **`CanvasTypes`** ([Package surface](/docs#package-surface)).
+
+---
+
+## Top level
+
+| Unit | Role |
+|------|------|
+| **`lib/index.ts`** | Barrel — **`ApexPainter`**, **`CanvasUtils`**, **`CanvasTypes`**, flat helpers; npm **`fetch`** version hint side effect. |
+| **`lib/Canvas/ApexPainter.ts`** | Public façade — wires **`extended/*`** creators, exposes **`create*`**, GIF, charts, video router, batch/chain, save/**`outPut`**. |
+
+---
+
+## `lib/Canvas/extended/` (creators)
+
+Internal classes — **not** exported from **`apexify.js`**. **`ApexPainter`** constructs or delegates to them.
+
+| File | Responsibility |
+|------|----------------|
+| **`CanvasCreator.ts`** | **`createCanvas`** — orchestrates **`Background/bg.ts`**, patterns, noise, zoom. |
+| **`ImageCreator.ts`** | **`createImage`**, image stacking / transforms. |
+| **`TextCreator.ts`** | **`createText`** — **`enhancedTextRenderer`** (not **`textPathRenderer`**). |
+| **`TextMetricsCreator.ts`** | **`measureText`**. |
+| **`GIFCreator.ts`** | **`createGIF`**, **`animate`** GIF path. |
+| **`ChartCreator.ts`** | Chart facade → **`utils/Charts/*`**. |
+| **`VideoCreator.ts`** | **`createVideo`** router → **`VideoHelpers`** ([internals](/docs#video-ffmpeg-internals)). |
+| **`Path2DCreator.ts`** | **`createPath2D`**, **`drawPath`**. |
+| **`PixelDataCreator.ts`** | Pixel buffers / **`ImageData`**. |
+| **`HitDetectionCreator.ts`** | Hit testing helpers on **`ApexPainter`**. |
+
+---
+
+## `lib/Canvas/utils/` (implementation library)
+
+| Folder / file | Responsibility |
+|---------------|----------------|
+| **`Background/bg.ts`** | Solid / gradient / image backgrounds, **`buildPathbg`**, noise, pattern fill helpers — see also [Canvas buildPathbg](/docs#canvas-buildpathbg). |
+| **`Patterns/enhancedPatternRenderer.ts`** | **`patternBg`**, preset meshes. |
+| **`Texts/`** | **`enhancedTextRenderer.ts`** (pipeline), **`textProperties.ts`**, **`textPathRenderer.ts`** ([advanced paths](/docs#text-path-renderer)). |
+| **`Shapes/`** | **`drawShape`** geometry. |
+| **`Custom/`** | **`customLines`**, **`advancedLines`**. |
+| **`Image/`** | Filters, masking, effects, **`ImageProperties`** helpers. |
+| **`Charts/`** | **`Charts`** namespace implementations (`Charts.*` mirrors **`createChart`**). |
+| **`Video/videoHelpers.ts`** | FFmpeg orchestration (**`VideoHelpers`** — [internals](/docs#video-ffmpeg-internals)). |
+| **`general/`** | Batch/chain, conversion (**`url`**, **`base64`**, …), stitching, compression, **`generalFunctions`** — see [Standalone image operations](/docs#standalone-image-operations). |
+| **`core/`** | **`pathUtils`**, **`pathCmd`**, **`errorUtils`**. |
+| **`canvasUtils.ts`** | Barrel re-exported as **`CanvasUtils`** + flat exports from **`apexify.js`**. |
+| **`types/index.ts`** | **`CanvasTypes`** — primary typings (**~1190** LOC). |
+
+---
+
+## Where behavior diverges from docs
+
+1. **`types/index.ts`** and **`extended/*`** are authoritative when comments drift.  
+2. **`VideoCreationOptions`** — typed beside **`VideoCreator`**, not always mirrored on **`CanvasTypes`** ([Canvas utils & types](/docs#canvas-utils-and-types)).  
+3. Source-only helpers — **`renderTextOnPath`**, **`buildPathbg`** — documented on dedicated pages; **not** in npm **`dist`** entry behavior as named exports.
+
+---
+
+## Related
+
+| Page | Topic |
+|------|--------|
+| [Documentation map](/docs#documentation-map) | Reading order |
+| [Troubleshooting](/docs#troubleshooting) | Dependencies, internal pointers |
+| [API index](/docs#api-index) | **`ApexPainter`** → doc hashes |

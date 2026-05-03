@@ -1,0 +1,144 @@
+# Charts: comparison & combo
+
+## `createComparisonChart`
+
+Renders **two** charts on one canvas (**`ComparisonChartOptions`** in **`comparisonchart.ts`**).
+
+- **`layout`**: **`sideBySide`** (default) or **`topBottom`**
+- **`chart1`**, **`chart2`**: **`ComparisonChartConfig`** — each has **`type`**, **`data`**, **`options`** (must match that chart family’s shapes)
+- **`ComparisonChartType`** includes **`donut`** — comparison maps that to **`PieChartOptions.type: 'donut'`**. **`createChart`** only accepts **`'pie'`**; pass **`options.type: 'donut'`** (and **`donutInnerRadius`**, etc.) for standalone donuts
+- **`appearance`** at root sets shared **`ChartAppearanceExtended`**; per-panel fields merge where omitted
+- Optional **`generalTitle`** and **`dimensions`** / **`spacing`**
+
+Charts are **scaled uniformly** into each cell.
+
+**Errors:** failures wrap as **`createComparisonChart failed: …`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const buf = await painter.createComparisonChart({
+  layout: 'sideBySide',
+  chart1: {
+    type: 'pie',
+    data: [
+      { label: 'East', value: 55, color: '#60a5fa' },
+      { label: 'West', value: 45, color: '#f472b6' },
+    ],
+    options: { dimensions: { width: 400, height: 320 } },
+  },
+  chart2: {
+    type: 'bar',
+    data: [{ label: 'A', value: 12, xStart: 0, xEnd: 1, color: '#34d399' }],
+    options: { dimensions: { width: 400, height: 320 } },
+  },
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  await painter.createComparisonChart({
+    layout: 'sideBySide',
+    chart1: {
+      type: 'pie',
+      data: [
+        { label: 'East', value: 55, color: '#60a5fa' },
+        { label: 'West', value: 45, color: '#f472b6' },
+      ],
+      options: { dimensions: { width: 400, height: 320 } },
+    },
+    chart2: {
+      type: 'bar',
+      data: [{ label: 'A', value: 12, xStart: 0, xEnd: 1, color: '#34d399' }],
+      options: { dimensions: { width: 400, height: 320 } },
+    },
+  });
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `createComboChart`
+
+Single plot with **bars** (primary / left **Y**) and **lines** (**`ComboLineSeries[]`**). Implemented in **`combochart.ts`**.
+
+- **`barsType`**: **`standard`** \| **`grouped`** \| **`stacked`** — applies when bars use **`values`** (**`BarSegment[]`**)
+- **Secondary axis:** line series default to **`yAxis: 'secondary'`** (right scale). Set **`yAxis: 'primary'`** to share the bar scale
+- **`opacity`**: **`ComboChartOpacity`** — multipliers for bars, lines, grid, axes, legend, labels
+- **`axes`**: **`x`**, **`y`** (primary), **`ySecondary`** — **`AxisConfig`** from line chart conventions
+- **`secondaryYAxis.show`**: toggles right axis (defaults on when any line uses secondary)
+- **`legend`**, **`grid`**, **`labels`**, **`appearance`**, **`dimensions`** — same vocabulary as other Cartesian charts where applicable
+
+**Errors:** **`createComboChart failed: …`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const buf = await painter.createComboChart({
+  dimensions: { width: 640, height: 400 },
+  bars: [
+    { label: 'Q1', value: 10, xStart: 0, xEnd: 1, color: '#818cf8' },
+    { label: 'Q2', value: 18, xStart: 1, xEnd: 2, color: '#818cf8' },
+  ],
+  lines: [
+    {
+      label: 'Target',
+      data: [
+        { x: 0, y: 12 },
+        { x: 1, y: 15 },
+      ],
+      color: '#fbbf24',
+      // default yAxis: 'secondary' — right scale
+    },
+  ],
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  await painter.createComboChart({
+    dimensions: { width: 640, height: 400 },
+    bars: [
+      { label: 'Q1', value: 10, xStart: 0, xEnd: 1, color: '#818cf8' },
+      { label: 'Q2', value: 18, xStart: 1, xEnd: 2, color: '#818cf8' },
+    ],
+    lines: [
+      {
+        label: 'Target',
+        data: [
+          { x: 0, y: 12 },
+          { x: 1, y: 15 },
+        ],
+        color: '#fbbf24',
+      },
+    ],
+  });
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## See also
+
+- [Charts hub](/docs#charts) — module table, **`appearance`**, imports
+- [Charts: createChart & namespace](/docs#charts-create-chart) — façade dispatch & **`Charts`** exports

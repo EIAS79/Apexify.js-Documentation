@@ -1,0 +1,764 @@
+# Standalone image operations
+
+This page lives under **`docs/04-images/`** with [Create image & shapes](/docs#create-image-and-shapes), pipelines, and filters — but covers **`ApexPainter`** methods that **do not** require a prior **`createCanvas`** scene.
+
+Use these when you already have a **file path**, **URL**, or **`Buffer`** and want resize, crop, format change, palette extraction, compositing, etc. **without** building a canvas scene first.
+
+**Path resolution:** Most string paths are joined with **`process.cwd()`** when they are not **`http(s)`** URLs. **`colorAnalysis`** uses **`path.resolve`** for local paths (see below).
+
+---
+
+## When to use standalone APIs vs `createImage`
+
+| Goal | Use |
+|------|-----|
+| Drop images/text/shapes **onto a designed canvas** | [Create image & shapes](/docs#create-image-and-shapes) |
+| **Whole-file** resize, convert, punch alpha hole, blend buffers, extract palette | This page (**`painter.resize`**, **`cropImage`**, **`blend`**, …) |
+| Typed **`ImageFilter`** stack (blur kernels, sharpen, …) | **`createImage`** **`filters`** ([Filters reference](/docs#image-filters-groups-and-helpers)) |
+| Legacy flip / pixel-level **`effects`** on a path string | **`painter.effects`** (see [comparison](#effects-vs-createimage-filters)) |
+
+---
+
+## Implementation map
+
+| Area | Files |
+|------|--------|
+| Resize, convert, color overlay, legacy **`effects`**, crop helpers, dominant colors, chroma removal, remove.bg API | **`lib/Canvas/utils/general/generalFunctions.ts`** |
+| **`compress`**, **`extractPalette`** | **`lib/Canvas/utils/general/imageCompression.ts`** |
+| **`stitchImages`**, **`createCollage`** | **`lib/Canvas/utils/general/imageStitching.ts`** |
+| **`batch`**, **`chain`** | **`lib/Canvas/utils/general/batchOperations.ts`** |
+| **`base64`**, **`dataURL`**, **`blob`**, **`arrayBuffer`**, **`url`** (Imgur) | **`lib/Canvas/utils/general/conversion.ts`** |
+| **`masking`**, **`gradientBlend`** | **`ApexPainter`** (canvas compositing, not under **`general/`**) |
+
+Flat **`CanvasUtils`** re-exports the **`general/`** helpers — see [Canvas utils & types](/docs#canvas-utils-and-types).
+
+---
+
+## Method overview
+
+| Method | Role |
+|--------|------|
+| **`resize`** | **`ResizeOptions`** — Sharp (**`resizingImg`**) |
+| **`imgConverter`** | Format change (**`converter`**) |
+| **`effects`** | Legacy canvas pixel pipeline (**`imgEffects`**) |
+| **`colorsFilter`** | Solid or **`GradientConfig`** overlay (**`applyColorFilters`**) |
+| **`colorAnalysis`** | Dominant RGB buckets + frequency (**`detectColors`**) |
+| **`colorsRemover`** | Exact RGB → transparent (**`removeColor`**) |
+| **`removeBackground`** | remove.bg HTTP API (**`bgRemoval`**) |
+| **`blend`** | Layers **over** a **base** **`Buffer`** |
+| **`cropImage`** | **`cropOptions`** — inner box / outer punch |
+| **`compress`** | **`CompressionOptions`** |
+| **`extractPalette`** | **`PaletteOptions`** |
+| **`stitchImages`**, **`createCollage`** | Layout helpers |
+| **`batch`**, **`chain`** | Parallel / sequential **`ApexPainter`** calls |
+| **`masking`**, **`gradientBlend`** | Alpha / gradient passes |
+
+<Alert type="warning" title="`blend` argument order">
+**`blend(layers, baseImageBuffer, defaultBlendMode?)`** — **`baseImageBuffer`** is the **bottom** of the stack; each **`layers`** entry draws **above** it.
+</Alert>
+
+---
+
+## Resize (`resize`)
+
+Sharp resizes to **`size`**, PNG output by default. **`maintainAspectRatio: true`** maps to **`fit: inside`** so the image **fits within** the box without enlarging beyond the original (**`withoutEnlargement: true`** in implementation).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const thumb = await painter.resize({
+  imagePath: './assets/photo.jpg',
+  size: { width: 320, height: 320 },
+  maintainAspectRatio: true,
+  quality: 90,
+});
+
+fs.writeFileSync('./out/thumb.png', thumb);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const thumb = await painter.resize({
+    imagePath: './assets/photo.jpg',
+    size: { width: 320, height: 320 },
+    maintainAspectRatio: true,
+    quality: 90,
+  });
+  fs.writeFileSync('./out/thumb.png', thumb);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Convert format (`imgConverter`)
+
+**`newExtension`** is a Sharp format key: **`jpeg`**, **`png`**, **`webp`**, **`avif`**, etc.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const webp = await painter.imgConverter('./exports/layer.png', 'webp');
+fs.writeFileSync('./exports/layer.webp', webp);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const webp = await painter.imgConverter('./exports/layer.png', 'webp');
+  fs.writeFileSync('./exports/layer.webp', webp);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Legacy effects pipeline (`effects`)
+
+Runs **`imgEffects`**: loads the image onto a canvas and applies filters **in order**. Common **`type`** values include **`flip`**, **`rotate`**, **`brightness`**, **`contrast`**, **`greyscale`**, **`blur`**, **`posterize`**, **`pixelate`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const styled = await painter.effects('./assets/photo.jpg', [
+  { type: 'greyscale' },
+  { type: 'contrast', value: 25 },
+  { type: 'brightness', value: 0.05 },
+]);
+
+fs.writeFileSync('./out/mono.png', styled);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const styled = await painter.effects('./assets/photo.jpg', [
+    { type: 'greyscale' },
+    { type: 'contrast', value: 25 },
+    { type: 'brightness', value: 0.05 },
+  ]);
+  fs.writeFileSync('./out/mono.png', styled);
+})();
+```
+</js>
+</CodeSwitcher>
+
+Prefer **`createImage`** **`filters`** when you need the full **`ImageFilter`** catalog ([filters doc](/docs#image-filters-groups-and-helpers)).
+
+---
+
+## Color overlay (`colorsFilter`)
+
+Overlays a **flat color** string or a **`GradientConfig`** on top of the image (Sharp composite **`over`**).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const tinted = await painter.colorsFilter('./assets/hero.png', 'rgba(14,165,233,0.25)', 1);
+
+const vignetteTint = await painter.colorsFilter('./assets/hero.png', {
+  type: 'radial',
+  startX: 400,
+  startY: 250,
+  endX: 400,
+  endY: 250,
+  startRadius: 0,
+  endRadius: 420,
+  colors: [
+    { stop: 0, color: 'rgba(15,23,42,0)' },
+    { stop: 1, color: 'rgba(15,23,42,0.65)' },
+  ],
+});
+
+fs.writeFileSync('./out/tinted.png', tinted);
+fs.writeFileSync('./out/vignette.png', vignetteTint);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const tinted = await painter.colorsFilter('./assets/hero.png', 'rgba(14,165,233,0.25)', 1);
+  fs.writeFileSync('./out/tinted.png', tinted);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Dominant colors (`colorAnalysis`)
+
+Returns **`{ color: 'r,g,b', frequency }`** sorted by frequency (percent string). **Local paths** are resolved with **`path.resolve`** (not **`cwd`** join) — use absolute paths or paths relative to how Node resolves them.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const histogram = await painter.colorAnalysis('./assets/swatches.jpg');
+histogram.slice(0, 5).forEach((row) => {
+  console.log(row.color, row.frequency + '%');
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const histogram = await painter.colorAnalysis('./assets/swatches.jpg');
+  histogram.slice(0, 5).forEach((row) => {
+    console.log(row.color, row.frequency + '%');
+  });
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Palette extraction (`extractPalette`)
+
+Downsamples internally (**200×200**), then clusters colors. **`method`**: **`kmeans`** (default), **`median-cut`**, or **`octree`** (**octree** currently follows the kmeans path in code).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const palette = await painter.extractPalette('./assets/poster.jpg', {
+  count: 8,
+  format: 'hex',
+  method: 'kmeans',
+});
+
+palette.forEach((swatch) => console.log(swatch.color, swatch.percentage.toFixed(1) + '%'));
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const palette = await painter.extractPalette('./assets/poster.jpg', {
+    count: 8,
+    format: 'hex',
+    method: 'kmeans',
+  });
+  palette.forEach((swatch) => console.log(swatch.color, swatch.percentage.toFixed(1) + '%'));
+})();
+```
+</js>
+</CodeSwitcher>
+
+More batch context: [Batch, chain, save & output](/docs#batch-chain-save-output).
+
+---
+
+## Knock out one RGB (`colorsRemover`)
+
+**Exact** match on **`red`**, **`green`**, **`blue`** (0–255) sets alpha to **0**. Near-miss colors stay opaque — use **`createImage`** masking or a paint tool if you need tolerance.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const keyed = await painter.colorsRemover('./assets/icon.png', {
+  red: 0,
+  green: 255,
+  blue: 0,
+});
+if (keyed) fs.writeFileSync('./out/icon-keyed.png', keyed);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const keyed = await painter.colorsRemover('./assets/icon.png', {
+    red: 0,
+    green: 255,
+    blue: 0,
+  });
+  if (keyed) fs.writeFileSync('./out/icon-keyed.png', keyed);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## remove.bg (`removeBackground`)
+
+Passes **`imageURL`** and **`apiKey`** to remove.bg. Requires network access and a valid API key.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const cutout = await painter.removeBackground('https://example.com/product.jpg', process.env.REMOVEBG_KEY!);
+if (cutout) fs.writeFileSync('./out/cutout.png', cutout);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const cutout = await painter.removeBackground(
+    'https://example.com/product.jpg',
+    process.env.REMOVEBG_KEY
+  );
+  if (cutout) fs.writeFileSync('./out/cutout.png', cutout);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Compress (`compress`)
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const jpeg = await painter.compress('./exports/large.png', {
+  format: 'jpeg',
+  quality: 82,
+  maxWidth: 1920,
+  progressive: true,
+});
+fs.writeFileSync('./exports/large.jpg', jpeg);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const jpeg = await painter.compress('./exports/large.png', {
+    format: 'jpeg',
+    quality: 82,
+    maxWidth: 1920,
+    progressive: true,
+  });
+  fs.writeFileSync('./exports/large.jpg', jpeg);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Stitch & collage
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const row = await painter.stitchImages(['./shots/a.png', './shots/b.png', './shots/c.png'], {
+  direction: 'horizontal',
+  spacing: 12,
+});
+
+const collage = await painter.createCollage(
+  ['./gallery/1.jpg', './gallery/2.jpg', './gallery/3.jpg'],
+  { type: 'grid', columns: 2, spacing: 8, background: '#0f172a' }
+);
+
+fs.writeFileSync('./out/strip.png', row);
+fs.writeFileSync('./out/collage.png', collage);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const row = await painter.stitchImages(['./shots/a.png', './shots/b.png', './shots/c.png'], {
+    direction: 'horizontal',
+    spacing: 12,
+  });
+  const collage = await painter.createCollage(
+    ['./gallery/1.jpg', './gallery/2.jpg', './gallery/3.jpg'],
+    { type: 'grid', columns: 2, spacing: 8, background: '#0f172a' }
+  );
+  fs.writeFileSync('./out/strip.png', row);
+  fs.writeFileSync('./out/collage.png', collage);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Composite (`blend`)
+
+<CodeSwitcher>
+<ts>
+```typescript
+import fs from 'fs';
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+const base = fs.readFileSync('./backgrounds/card.png');
+
+const composed = await painter.blend(
+  [
+    {
+      image: './logos/mark.png',
+      blendMode: 'source-over',
+      position: { x: 48, y: 52 },
+      opacity: 0.92,
+    },
+  ],
+  base
+);
+
+fs.writeFileSync('./out/card-branded.png', composed);
+```
+</ts>
+<js>
+```javascript
+const fs = require('fs');
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const base = fs.readFileSync('./backgrounds/card.png');
+  const composed = await painter.blend(
+    [{ image: './logos/mark.png', blendMode: 'source-over', position: { x: 48, y: 52 }, opacity: 0.92 }],
+    base
+  );
+  fs.writeFileSync('./out/card-branded.png', composed);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Crop (`cropImage`, **`cropOptions`**)
+
+**API:** **`await painter.cropImage(options)`** → PNG **`Buffer`**.
+
+**Validation:** at least **three** **`coordinates`** entries; **`crop`** **`'inner'`** \| **`'outer'`**; **`imageSource`** required.
+
+### Inner crop (`crop: 'inner'`)
+
+Computes the **axis-aligned bounding box** over **all** **`from`** / **`to`** points, copies that rectangle, then optionally applies **`radius`** (**`'circular'`** or corner radius number). Use **`0`** for square corners.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import fs from 'fs';
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const avatar = await painter.cropImage({
+  imageSource: './uploads/photo.jpg',
+  crop: 'inner',
+  radius: 24,
+  coordinates: [
+    { from: { x: 120, y: 80 }, to: { x: 120, y: 80 } },
+    { from: { x: 520, y: 80 }, to: { x: 520, y: 80 } },
+    { from: { x: 520, y: 420 }, to: { x: 520, y: 420 } },
+  ],
+});
+
+fs.writeFileSync('./out/crop-inner.png', avatar);
+```
+</ts>
+<js>
+```javascript
+const fs = require('fs');
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const avatar = await painter.cropImage({
+    imageSource: './uploads/photo.jpg',
+    crop: 'inner',
+    radius: 24,
+    coordinates: [
+      { from: { x: 120, y: 80 }, to: { x: 120, y: 80 } },
+      { from: { x: 520, y: 80 }, to: { x: 520, y: 80 } },
+      { from: { x: 520, y: 420 }, to: { x: 520, y: 420 } },
+    ],
+  });
+  fs.writeFileSync('./out/crop-inner.png', avatar);
+})();
+```
+</js>
+</CodeSwitcher>
+
+### Outer crop (`crop: 'outer'`)
+
+Builds a smooth polygon from **`coordinates`** (**`tension`** controls Bézier smoothing), **cuts a hole** (transparent inside). **`radius`** is ignored.
+
+### Path / URL loading
+
+URLs load directly; local paths use **`path.join(process.cwd(), imageSource)`** for **`cropInner`** / **`cropOuter`**.
+
+---
+
+## `effects` vs `createImage` filters
+
+| Entry point | Pipeline | Best for |
+|-------------|----------|----------|
+| **`painter.effects(source, filters)`** | **`imgEffects`** canvas pixel loop | Quick legacy ops on a **path/URL** |
+| **`createImage` → `filters: ImageFilter[]`** | Sharp / professional pipeline | Documented **`ImageFilter`** types |
+
+Not every **`ImageFilter.type`** exists in **`imgEffects`** — use **`createImage`** when you need [the full filter table](/docs#image-filters-groups-and-helpers).
+
+---
+
+## `colorAnalysis` vs `extractPalette`
+
+| API | Implementation | Output |
+|-----|----------------|--------|
+| **`colorAnalysis`** | **`getImageData`** histogram | **`'r,g,b'`** keys + frequency **`%`** strings |
+| **`extractPalette`** | **200×200** resize + clustering | **`hex` / `rgb` / `hsl`** swatches + **`percentage`** numbers |
+
+---
+
+## Flat helpers (`CanvasUtils` / `general/`)
+
+Same behavior as **`ApexPainter`** when names align. **`batchOperations`** / **`chainOperations`** require the **`painter`** instance as the **first** argument.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter, CanvasUtils } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const panels = await CanvasUtils.batchOperations(painter, [
+  { type: 'canvas', config: { width: 200, height: 120, colorBg: '#ef4444' } },
+  { type: 'canvas', config: { width: 200, height: 120, colorBg: '#22c55e' } },
+]);
+
+const sharpPipeline = await CanvasUtils.loadImages('./assets/photo.jpg');
+const meta = await sharpPipeline.metadata();
+console.log(meta.width, meta.height);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter, CanvasUtils } = require('apexify.js');
+
+const painter = new ApexPainter();
+
+(async () => {
+  const panels = await CanvasUtils.batchOperations(painter, [
+    { type: 'canvas', config: { width: 200, height: 120, colorBg: '#ef4444' } },
+    { type: 'canvas', config: { width: 200, height: 120, colorBg: '#22c55e' } },
+  ]);
+})();
+```
+</js>
+</CodeSwitcher>
+
+| Flat export | Typical façade | Notes |
+|-------------|----------------|-------|
+| **`loadImages`** | — | Returns **`sharp.Sharp`**, not **`Buffer`**. |
+| **`resizingImg`**, **`converter`**, … | **`resize`**, **`imgConverter`**, … | |
+| **`cropInner`**, **`cropOuter`** | **`cropImage`** | Prefer **`cropImage`** for validated **`cropOptions`**. |
+
+Full parity list: [Canvas utils & types](/docs#canvas-utils-and-types).
+
+---
+
+## Binary helpers (`conversion.ts`)
+
+Use these when you already hold a **`Buffer`** (for example after **`createCanvas`**).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter, base64, dataURL } from 'apexify.js';
+
+const painter = new ApexPainter();
+const { buffer: png } = await painter.createCanvas({ width: 10, height: 10, colorBg: '#000' });
+
+const asB64 = base64(png);
+const asDataUrl = dataURL(png);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter, base64, dataURL } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer: png } = await painter.createCanvas({ width: 10, height: 10, colorBg: '#000' });
+  console.log(dataURL(png).slice(0, 40) + '…');
+})();
+```
+</js>
+</CodeSwitcher>
+
+Avoid **`url()`** in production — it uploads via bundled Imgur credentials ([Batch hub](/docs#batch-chain-save-output)).
+
+Ctor **`type`** + **`outPut()`**: [Package surface](/docs#package-surface).
+
+---
+
+## Masking (`masking`)
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const cut = await painter.masking('./subject.png', './alpha-mask.png', {
+  type: 'alpha',
+});
+
+const keyed = await painter.masking('./greenscreen.png', './greenscreen.png', {
+  type: 'color',
+  colorKey: '#00ff00',
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  await painter.masking('./subject.png', './alpha-mask.png', { type: 'alpha' });
+})();
+```
+</js>
+</CodeSwitcher>
+
+- **`alpha`** — samples mask **alpha** channel.  
+- **`grayscale`** — mask luminance vs **`threshold`** (default **128**).  
+- **`color`** — **`colorKey`** **`#RRGGBB`** exact match becomes transparent (unless **`invert`**).
+
+---
+
+## Gradient wash (`gradientBlend`)
+
+Applies a gradient with **`blendMode`** (default **`multiply`**). Optional **`maskSource`** masks the final pass.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const moody = await painter.gradientBlend('./still.jpg', {
+  type: 'linear',
+  angle: 25,
+  colors: [
+    { stop: 0, color: 'rgba(255,255,255,0)' },
+    { stop: 1, color: 'rgba(30,27,75,0.55)' },
+  ],
+  blendMode: 'multiply',
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  await painter.gradientBlend('./still.jpg', {
+    type: 'linear',
+    angle: 25,
+    colors: [
+      { stop: 0, color: 'rgba(255,255,255,0)' },
+      { stop: 1, color: 'rgba(30,27,75,0.55)' },
+    ],
+    blendMode: 'multiply',
+  });
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Related utilities
+
+**`batch`**, **`chain`**, **`save`**, **`validHex`**: [Batch & chain](/docs#batch-and-chain) · [Batch hub](/docs#batch-chain-save-output).
+
+Types **`cropOptions`**, **`MaskOptions`**, **`BlendOptions`**: [Canvas utils & types](/docs#canvas-utils-and-types).

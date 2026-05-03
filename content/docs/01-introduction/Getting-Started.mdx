@@ -1,0 +1,101 @@
+# Getting started
+
+**Apexify.js** is a Node.js canvas toolkit built on **`@napi-rs/canvas`**. You compose PNG (and related) outputs with **`ApexPainter`**, optional FFmpeg for video, and Sharp-backed helpers for raster work.
+
+<Alert type="info" title="How these docs are organized">
+- **Introduction** (**`docs/01-introduction/`**) — this page, [Documentation map](/docs#documentation-map), [Complete developer guide](/docs#complete-developer-guide), [Changelog](/docs#Change-Log).  
+- **Package** (**`docs/02-package/`**) — [Package surface](/docs#package-surface) (`import`, ctor, what is not exported).  
+- **Reference** (**`docs/12-reference/`**) — [API index](/docs#api-index), [CanvasUtils & types](/docs#canvas-utils-and-types), [Troubleshooting](/docs#troubleshooting), [lib module charter](/docs#lib-module-charter).  
+- **Topic chapters** — hubs under **`docs/03-*` … `docs/11-*`**; many hubs link **sub-pages** (batch, charts, video, GIF, raster — see [map](/docs#documentation-map)).
+
+Repo **`features-forDocs.md`** lists **gaps** still to migrate into **`docs/`**. **`VideoHelpers`** depth: [Video FFmpeg internals](/docs#video-ffmpeg-internals).
+</Alert>
+
+## Install
+
+<CodeBlock lang="bash">
+```bash
+npm install apexify.js
+```
+</CodeBlock>
+
+- **Node.js** 16+
+- **TypeScript** recommended (`CanvasTypes` mirrors contracts)
+
+## Minimal usage
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter(); // default output channel for `outPut()` — see [Package surface](/docs#package-surface)
+
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: '#0f172a',
+});
+
+const withTitle = await painter.createText(
+  [{ text: 'Hello', x: 48, y: 200, font: { size: 42 }, color: '#e2e8f0' }],
+  buffer,
+);
+
+fs.writeFileSync('out.png', withTitle);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    colorBg: '#0f172a',
+  });
+  const withTitle = await painter.createText(
+    [{ text: 'Hello', x: 48, y: 200, font: { size: 42 }, color: '#e2e8f0' }],
+    buffer,
+  );
+  fs.writeFileSync('out.png', withTitle);
+})();
+```
+</js>
+</CodeSwitcher>
+
+## Where to read next
+
+### Introduction & package
+
+| Goal | Page |
+|------|------|
+| **Reading order + hub/sub-page index** | [Documentation map](/docs#documentation-map) |
+| **Full walkthrough (steps, pitfalls)** | [Complete developer guide](/docs#complete-developer-guide) |
+| **Imports, `CanvasUtils`, ctor `type`** | [Package surface](/docs#package-surface) |
+| **Release themes (links to deeper docs)** | [Changelog](/docs#Change-Log) |
+
+### Reference (lookup)
+
+| Goal | Page |
+|------|------|
+| **Every `ApexPainter` method → topic** | [API index](/docs#api-index) |
+| **Flat helpers + `CanvasTypes` overview** | [CanvasUtils & types](/docs#canvas-utils-and-types) |
+| **Deps, pitfalls, internal symbols** | [Troubleshooting](/docs#troubleshooting) |
+
+### Common topic hubs
+
+| Goal | Hub |
+|------|-----|
+| Backgrounds & layers | [Create canvas](/docs#create-canvas) |
+| Batch / save / `outPut` | [Batch, chain, save & output](/docs#batch-chain-save-output) |
+| Charts | [Charts](/docs#charts) |
+| Video | [Video & FFmpeg](/docs#video-ffmpeg) → [router](/docs#video-create-video), [internals](/docs#video-ffmpeg-internals) if debugging FFmpeg |
+
+## npm entry note
+
+`apexify.js` **`lib/index.ts`** may call **`fetch`** once against the npm registry to log if a newer version exists — expect a harmless network attempt in online CI; offline builds can ignore failed checks.

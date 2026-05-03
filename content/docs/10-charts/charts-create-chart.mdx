@@ -1,0 +1,86 @@
+# Charts: createChart & namespace
+
+## `createChart`
+
+**`ChartCreator.createChart`** switches on **`chartType`** and awaits the matching **`create*Chart`** in **`lib/Canvas/utils/Charts/`**. **`ApexPainter`** forwards to the same class.
+
+**Errors:**
+
+- Unknown **`chartType`** → **`Unsupported chart type: …`**
+- Any renderer failure → **`createChart failed for type '…': …`** (inner message from **`getErrorMessage`**)
+
+---
+
+## Typed dispatch
+
+Overload pairs (**`chartType`** → data / options types) match the modules:
+
+| `chartType` | Data type | Options module |
+|-------------|-----------|----------------|
+| **`pie`** | **`PieSlice[]`** | **`PieChartOptions`** |
+| **`bar`** | **`BarChartData[]`** | **`BarChartOptions`** |
+| **`horizontalBar`** | **`HorizontalBarChartData[]`** | **`HorizontalBarChartOptions`** |
+| **`line`** | **`LineSeries[]`** | **`LineChartOptions`** |
+| **`scatter`** | **`ScatterSeries[]`** | **`ScatterChartOptions`** |
+| **`radar`** | **`RadarSeries[]`** | **`RadarChartOptions`** |
+| **`polarArea`** | **`PolarAreaSlice[]`** | **`PolarAreaChartOptions`** |
+
+---
+
+## Example: namespace vs façade
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter, Charts } from 'apexify.js';
+
+// Façade — same PNG Buffer as below
+const painter = new ApexPainter();
+const viaPainter = await painter.createChart('line', [{ label: 's', data: [{ x: 0, y: 1 }, { x: 1, y: 4 }] }], {
+  dimensions: { width: 560, height: 360 },
+});
+
+// Namespace — tree-shake friendly if you import only what you need from apexify.js in your bundler setup
+const direct = await Charts.createLineChart([{ label: 's', data: [{ x: 0, y: 1 }, { x: 1, y: 4 }] }], {
+  dimensions: { width: 560, height: 360 },
+});
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter, Charts } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const viaPainter = await painter.createChart('line', [{ label: 's', data: [{ x: 0, y: 1 }, { x: 1, y: 4 }] }], {
+    dimensions: { width: 560, height: 360 },
+  });
+  const direct = await Charts.createLineChart([{ label: 's', data: [{ x: 0, y: 1 }, { x: 1, y: 4 }] }], {
+    dimensions: { width: 560, height: 360 },
+  });
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `Charts` exports (`index.ts`)
+
+**Create functions:** **`createPieChart`**, **`createBarChart`**, **`createHorizontalBarChart`**, **`createLineChart`**, **`createScatterChart`**, **`createRadarChart`**, **`createPolarAreaChart`**, **`createComboChart`**, **`createComparisonChart`**.
+
+**Background:** **`paintChartCanvasBackground`**, type **`ChartAppearanceExtended`**.
+
+**Legend placement:** **`normalizeLegendPosition`**, **`legendConsumesLeftEdge`**, **`legendConsumesRightEdge`**, **`legendConsumesTopEdge`**, **`legendConsumesBottomEdge`**, type **`LegendPlacement`**.
+
+**Unified aliases:** **`ChartType`**, **`ChartData`**, **`ChartOptions`**.
+
+**Re-exported types** include per-chart **`*Options`**, data structs, and renamed legend entries (**`PieLegendEntry`**, **`BarLegendEntry`**, …) to avoid TypeScript name clashes when importing everything from **`Charts`**.
+
+---
+
+## Bar data reminder (`combo` / `bar`)
+
+**`BarChartData`** uses **`xStart`** / **`xEnd`** for category span on Cartesian plots; **`value`** for a single column, or **`values`** (**`BarSegment[]`**) with **`barsType`** **`grouped`** \| **`stacked`** in **`ComboChartOptions`**.
+
+See [Charts: comparison & combo](/docs#charts-comparison-combo) for **`createComboChart`**.

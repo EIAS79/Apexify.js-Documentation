@@ -1,0 +1,100 @@
+# `createVideo` router & options
+
+**Signature:** **`await painter.createVideo(options)`** where **`options`** includes **`source`** (**`string`** \| **`Buffer`**) plus fields for **one** operation.
+
+**Types:** **`VideoCreationOptions`**, **`MixAudioOperation`**, **`MixAudioOverlayClip`** are declared in **`lib/Canvas/extended/VideoCreator.ts`** (re-exported from **`extended/index.ts`**). They may not appear on every root **`apexify.js`** type barrel — use **`Parameters<ApexPainter['createVideo']>[0]`** or copy shapes locally if needed (**`lib/Canvas/extended/VideoCreator.ts`**).
+
+---
+
+## One branch per call
+
+The implementation is a **top-to-bottom `if` chain**. The **first** truthy operation group **wins**; later keys are ignored. Example: **`getInfo: true`** together with **`convert`** returns **only** metadata — **`convert`** never runs.
+
+**Prefetch:** When **`getInfo`**, **`extractFrame.frame`**, **`generateThumbnail`**, or **`generatePreview`** is used, **`getVideoInfo`** may run once up front (**skip FFmpeg check** path) to supply **`videoInfo`** to thumbnail/preview helpers (**`VideoCreator`**).
+
+---
+
+## Branch order (first match executes)
+
+| Order | Option key | Typical return / behavior |
+|------:|------------|---------------------------|
+| 1 | **`getInfo`** | **`getVideoInfo`** result object |
+| 2 | **`extractFrame`** | **`{ buffer: PNG, canvas: { width, height } }`** |
+| 3 | **`extractFrames`** | **`times`** → **`Buffer[]`**; else **`interval`** path → helper / directory output; see [discovery & frames](/docs#video-discovery-frames) |
+| 4 | **`extractAllFrames`** | Directory sweep (delegated) |
+| 5 | **`generateThumbnail`** | Grid thumbnail (**`CanvasResults`**-style from helper) |
+| 6 | **`convert`** | Transcode → **`outputPath`** |
+| 7 | **`trim`** | Time-range cut → **`outputPath`** |
+| 8 | **`extractAudio`** | Audio-only file |
+| 9 | **`addWatermark`** | Raster overlay → **`outputPath`** |
+| 10 | **`changeSpeed`** | Video/audio tempo → **`outputPath`** |
+| 11 | **`generatePreview`** | Multi-frame preview files |
+| 12 | **`applyEffects`** | **`filters[]`** FFmpeg **`vf`** graph → **`outputPath`** |
+| 13 | **`merge`** | Concat / **`side-by-side`** / **`grid`** → **`outputPath`** |
+| 14 | **`replaceSegment`** | Splice replacement clip or frame sequence |
+| 15 | **`rotate`** | 90° / 180° / 270° + optional flip |
+| 16 | **`crop`** | **`crop`** filter |
+| 17 | **`compress`** | Re-encode / bitrate targets |
+| 18 | **`addText`** | **`drawtext`** burn-in |
+| 19 | **`addFade`** | Fade in / out |
+| 20 | **`reverse`** | Reverse video (+ audio when present) |
+| 21 | **`createLoop`** | Loop encode (**`smooth`**) |
+| 22 | **`batch`** | **`batchProcessVideos`** — per-item **`operations`** spread into **`createVideo`** |
+| 23 | **`detectScenes`** | Scene detection (**Unix-oriented pipeline** — fragile on Windows — [internals](/docs#video-ffmpeg-internals), **`detectVideoScenes`**) |
+| 24 | **`stabilize`** | Stabilization (**`vidstab`** when available) |
+| 25 | **`colorCorrect`** | EQ-style filters |
+| 26 | **`pictureInPicture`** | Overlay video |
+| 27 | **`splitScreen`** | Multi-input layout |
+| 28 | **`createTimeLapse`** | Speed-up |
+| 29 | **`removeAudio`** | Strip all audio (**`-an`** path via **`muteVideo`**) |
+| 30 | **`mixAudio`** | Timeline overlays (**`MixAudioOperation`**) |
+| 31 | **`mute`** | Silence **`ranges`** or full-track handling via **`muteVideo`** |
+| 32 | **`adjustVolume`** | Global **`volume`** % or per-**`ranges`** (**`rubberband`** when pitch/speed per interval — requires FFmpeg support) |
+| 33 | **`createFromFrames`** | Image sequence → video |
+| 34 | **`detectFormat`** | **`{ format, codec, container, width, height, fps, bitrate, duration }`** |
+| 35 | **`freezeFrame`** | Hold frame — passes **`onProgress`** |
+| 36 | **`exportPreset`** | Preset encode — passes **`onProgress`** |
+| 37 | **`normalizeAudio`** | Peak / RMS / LUFS — passes **`onProgress`** |
+| 38 | **`applyLUT`** | LUT file — passes **`onProgress`** |
+| 39 | **`addTransition`** | Between clips — passes **`onProgress`** |
+| 40 | **`addAnimatedText`** | Animated text — passes **`onProgress`** |
+
+If none match → **`No video operation specified`**.
+
+---
+
+## `mixAudio` (`MixAudioOperation` / `MixAudioOverlayClip`)
+
+**`mixAudio`** mixes **external** clips onto the timeline:
+
+- **`outputPath`** — mixed output file
+- **`overlays`** — **`MixAudioOverlayClip[]`**: **`source`** (**`string`** \| **`Buffer`**), **`startTime`**, optional **`duration`**, **`sourceStart`**, **`volume`**, **`speed`** (**`atempo`**, clamped ~**0.25–4**), **`pitchSemitones`** (**`asetrate`** + compensating **`atempo`** — not **`rubberband`**)
+- **`keepOriginalAudio`** (default **`true`**), **`originalVolume`**, **`originalSpeed`**, **`originalPitchSemitones`**
+
+Interval **pitch/speed** on **`adjustVolume.ranges`** uses **`rubberband`** when set — different machinery than overlay **`pitchSemitones`** / **`speed`** on **`mixAudio`** ([internals](/docs#video-ffmpeg-internals), **`adjustVideoVolume`** / **`mixVideoAudio`** rows).
+
+---
+
+## `onProgress`
+
+**`options.onProgress`** is forwarded only for **`freezeFrame`**, **`exportPreset`**, **`normalizeAudio`**, **`applyLUT`**, **`addTransition`**, and **`addAnimatedText`** — payload shape **`{ percent, time, speed }`** (parsed from FFmpeg stderr where available).
+
+---
+
+## Known caveats (summary)
+
+| Topic | Note |
+|-------|------|
+| **`merge`** **`grid`** | May not be a true **N×M** grid — verify [internals](/docs#video-ffmpeg-internals) (**`mergeVideos`**) / source |
+| **`batch`** | Each item’s **`operations`** must include its own **`outputPath`** (and desired paths); the helper does not automatically inject computed batch filenames |
+| **`detectScenes`** | Shell pipeline assumptions — weak on **Windows** without compatible tooling |
+| **HTTP **`source`** ** | Some **`ApexPainter`** **`#`** branches resolve URLs inconsistently vs **`VideoHelpers.resolveVideoSource`** — prefer **buffer** or local file for reliability |
+
+Full FFmpeg notes: [Video FFmpeg internals](/docs#video-ffmpeg-internals).
+
+---
+
+## See also
+
+- [Video & FFmpeg hub](/docs#video-ffmpeg)
+- [Video: discovery & frames](/docs#video-discovery-frames)

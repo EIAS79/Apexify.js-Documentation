@@ -1,0 +1,264 @@
+# Curved text & metrics
+
+Use **`textOnCurve`** for circular banners, and **`measureText`** to preview widths, wrapped lines, and optional per-character sizes **without** exporting a PNG.
+
+Overview: [Create text](/docs#create-text).
+
+---
+
+## Curved text (`textOnCurve`)
+
+| Field | Meaning |
+|-------|---------|
+| **`sweepAngle`** | Total arc in **degrees** covered by the full string (try **40–140** for readable bends). Must be **\> 0** and **\< 360** for the measurement adjustments in **`measureText`**. |
+| **`radius`** | Circle radius in px. Omit to auto-pick **`≈ textWidth / sweepRadians`** so arc length matches measured width. |
+| **`up`** | **`true`** (default): arc bulges **upward** (∩). **`false`**: bulges **downward** (∪). |
+
+**`(x, y)`** is the **center** of the layout — the middle glyph sits near the arc apex.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({
+  width: 900,
+  height: 320,
+  colorBg: '#022c22',
+});
+
+const badge = await painter.createText(
+  {
+    text: 'LIMITED DROP · SPRING 2026',
+    x: 450,
+    y: 200,
+    font: { size: 38, family: 'Arial' },
+    bold: true,
+    color: '#ecfdf5',
+    letterSpacing: 3,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    textOnCurve: {
+      sweepAngle: 88,
+      radius: 260,
+      up: true,
+    },
+    shadow: { color: 'rgba(0,0,0,0.45)', offsetX: 0, offsetY: 10, blur: 22, opacity: 1 },
+  },
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({
+  width: 900,
+  height: 320,
+  colorBg: '#022c22',
+});
+
+const badge = await painter.createText(
+  {
+    text: 'LIMITED DROP · SPRING 2026',
+    x: 450,
+    y: 200,
+    font: { size: 38, family: 'Arial' },
+    bold: true,
+    color: '#ecfdf5',
+    letterSpacing: 3,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    textOnCurve: {
+      sweepAngle: 88,
+      radius: 260,
+      up: true,
+    },
+    shadow: { color: 'rgba(0,0,0,0.45)', offsetX: 0, offsetY: 10, blur: 22, opacity: 1 },
+  },
+  buffer
+);
+```
+</js>
+</CodeSwitcher>
+
+**Downward** arc:
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createText(
+  {
+    text: 'Sad arc demo',
+    x: 400,
+    y: 180,
+    font: { size: 36, family: 'Arial' },
+    color: '#e2e8f0',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    textOnCurve: { sweepAngle: 110, radius: 220, up: false },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createText(
+  {
+    text: 'Sad arc demo',
+    x: 400,
+    y: 180,
+    font: { size: 36, family: 'Arial' },
+    color: '#e2e8f0',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    textOnCurve: { sweepAngle: 110, radius: 220, up: false },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+**`maxWidth`** is ignored on curved strings — keep each curved label as **one visual line** (embed **`'\n'`** only if you intend stacked arcs).
+
+---
+
+## Measure text (`measureText`)
+
+**API:** `await painter.measureText(textProps)` → **`TextMetrics`**.
+
+- Allocates an **internal** canvas — nothing is drawn on your scene buffer.
+- Registers custom fonts the same way **`createText`** does when **`font.path`** / **`fontPath`** is set (relative paths join **`process.cwd()`**; failures **warn**).
+- With **`maxWidth`**, you receive **`lines[]`**, **`lineCount`**, and **`totalHeight`** matching the wrap helper used by **`EnhancedTextRenderer`**.
+- With **`includeCharMetrics: true`**, you also get **`charWidths`** and **`charPositions`** for each glyph.
+- With **`measurementCanvas`**, cap the scratch surface **`width`** / **`height`** instead of auto-estimating from string length.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const metrics = await painter.measureText({
+  text: 'Measure me before you reserve layout space.',
+  font: { size: 28, family: 'Arial' },
+  maxWidth: 420,
+  lineHeight: 1.35,
+  letterSpacing: 0.5,
+});
+
+console.log(metrics.width, metrics.totalHeight, metrics.lineCount);
+if (metrics.lines) {
+  metrics.lines.forEach((line) => console.log(line.text, line.width));
+}
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const metrics = await painter.measureText({
+    text: 'Measure me before you reserve layout space.',
+    font: { size: 28, family: 'Arial' },
+    maxWidth: 420,
+    lineHeight: 1.35,
+    letterSpacing: 0.5,
+  });
+
+  console.log(metrics.width, metrics.totalHeight, metrics.lineCount);
+  if (metrics.lines) {
+    metrics.lines.forEach((line) => console.log(line.text, line.width));
+  }
+})();
+```
+</js>
+</CodeSwitcher>
+
+### Character metrics
+
+<CodeSwitcher>
+<ts>
+```typescript
+const glyphStats = await painter.measureText({
+  text: 'TRACK',
+  font: { size: 64, family: 'Arial Black' },
+  includeCharMetrics: true,
+});
+
+console.log(glyphStats.charWidths, glyphStats.charPositions);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const glyphStats = await painter.measureText({
+    text: 'TRACK',
+    font: { size: 64, family: 'Arial Black' },
+    includeCharMetrics: true,
+  });
+
+  console.log(glyphStats.charWidths, glyphStats.charPositions);
+})();
+```
+</js>
+</CodeSwitcher>
+
+### Curved sizing preview
+
+When **`textOnCurve`** is present and **`0 < sweepAngle < 360`**, **`measureText`** adjusts reported **`width`** / **`height`** to approximate the chord / sagitta of the arc — use it to reserve bounding boxes before drawing.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const curvedBox = await painter.measureText({
+  text: 'CURVED METRICS',
+  font: { size: 42, family: 'Arial' },
+  textOnCurve: { sweepAngle: 75, radius: 240, up: true },
+});
+
+console.log(curvedBox.width, curvedBox.height);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const curvedBox = await painter.measureText({
+    text: 'CURVED METRICS',
+    font: { size: 42, family: 'Arial' },
+    textOnCurve: { sweepAngle: 75, radius: 240, up: true },
+  });
+
+  console.log(curvedBox.width, curvedBox.height);
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## What returns on **`TextMetrics`**
+
+Always includes Canvas **`measureText`** fields (**`width`**, bounding boxes, baselines when available) plus Apexify extras **`height`**, **`lineHeight`**, **`baseline`**, **`top`**, **`bottom`**, **`centerX`**, **`centerY`**.
+
+Optional arrays:
+
+- **`lines`** / **`lineCount`** / **`totalHeight`** — when **`maxWidth`** is set.
+- **`charWidths`** / **`charPositions`** — when **`includeCharMetrics`** is **`true`**.
+
+---
+
+## Low-level sync helper
+
+If you already own a **`SKRSContext2D`**, **`CanvasUtils.drawText`** / **`WrappedText`** expose a smaller synchronous subset (no **`textOnCurve`** stack). Reach for **`createText`** when you need the full renderer.
+
+---
+
+## Related docs
+
+| Topic | Link |
+|-------|------|
+| Raster extras (pixels / paths) | [Advanced raster APIs](/docs#advanced-raster-apis) |
+| Scene composition | [Text pipeline](/docs#text-pipeline) |

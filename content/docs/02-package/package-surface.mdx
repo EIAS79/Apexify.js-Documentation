@@ -1,0 +1,50 @@
+# Package surface
+
+This page belongs with **`docs/02-package/`** — how you **import** the library and what is **not** exported. For reading order and hubs, use [Documentation map](/docs#documentation-map). For **method → doc** routing, use [API index](/docs#api-index). For **`CanvasUtils`** groups and **`CanvasTypes`**, see [CanvasUtils & types](/docs#canvas-utils-and-types). For **`lib/`** internals (contributors), see [lib module charter](/docs#lib-module-charter).
+
+---
+
+## Imports
+
+```typescript
+import { ApexPainter, CanvasUtils, CanvasTypes } from 'apexify.js';
+// Same helpers/types are also flat-exported from the barrel:
+import type { CanvasConfig, ImageProperties } from 'apexify.js';
+import { drawShape, url, base64 } from 'apexify.js';
+```
+
+| Export | Role | Source |
+|--------|------|--------|
+| **`ApexPainter`** | User façade — **`create*`** scene APIs, GIF, charts, video router (**`createVideo`**), batch/chain, standalone raster helpers, save/**`outPut`** | `lib/Canvas/ApexPainter.ts` |
+| **`CanvasUtils`** | Namespace object re-exporting **`canvasUtils`** | `lib/Canvas/utils/canvasUtils.ts` |
+| **`CanvasTypes`** | Types barrel (`CanvasConfig`, …) | `lib/Canvas/utils/types/index.ts` |
+| **Flat `export *`** | Same symbols as **`CanvasUtils`** without nesting | `canvasUtils.ts` via `lib/index.ts` |
+
+---
+
+## Not exported from `apexify.js`
+
+| Kind | Location | Notes |
+|------|-----------|--------|
+| **Creator classes** | **`lib/Canvas/extended/*.ts`** (**`CanvasCreator`**, **`GIFCreator`**, **`VideoCreator`**, …) | Wired internally by **`ApexPainter`** — see [Troubleshooting](/docs#troubleshooting) for pointers |
+| **`VideoHelpers`** | **`lib/Canvas/utils/Video/videoHelpers.ts`** | FFmpeg implementation — behavior summarized in [Video FFmpeg internals](/docs#video-ffmpeg-internals) |
+| Some **`VideoCreationOptions`** typings | Declared next to **`VideoCreator`** | May infer **`Parameters<ApexPainter['createVideo']>[0]`** — [CanvasUtils & types](/docs#canvas-utils-and-types) |
+
+---
+
+## Constructor & default serialization
+
+```typescript
+const painter = new ApexPainter({ type: 'buffer' }); // default
+// type drives `outPut()` conversions: 'buffer' | 'base64' | 'dataURL' | 'blob' | 'url' | 'arraybuffer'
+```
+
+Most methods still return raw **`Buffer`** (PNG) regardless of **`type`**; **`outPut`** applies the constructor channel when you need a string/Blob/URL.
+
+**Related:** [Save & output](/docs#save-and-output), [Batch & I/O hub](/docs#batch-chain-save-output).
+
+---
+
+## Entry side effect
+
+**`lib/index.ts`** may **`fetch`** npm once to print a newer-version hint — see [Getting started](/docs#Getting-Started).

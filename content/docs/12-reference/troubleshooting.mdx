@@ -1,0 +1,44 @@
+# Troubleshooting & dependencies
+
+Part of **`docs/12-reference/`** — pair with [API index](/docs#api-index) (method routing) and [CanvasUtils & types](/docs#canvas-utils-and-types) (helpers + types). [Documentation map](/docs#documentation-map) lists topic hubs and maintainer pointers.
+
+---
+
+## Runtime packages
+
+| Package | Role |
+|---------|------|
+| **`@napi-rs/canvas`** | All Canvas2D drawing |
+| **`sharp`** | Resize, encode/decode, many filters |
+| **`jimp`** | Legacy/general-function paths |
+| **`axios`** | Remote assets (`extractFrames`, downloads, **`removeBackground`**, …) |
+| **`gifencoder`** | **`createGIF`**, **`animate`** GIF branch |
+| **`fs-extra`**, **`jszip`** | IO / zip flows as used internally |
+| **`imgur`** | **`url()`** upload helper |
+| **FFmpeg / ffprobe** (system) | Video surface |
+
+---
+
+## Common pitfalls
+
+1. **Relative paths** — Most loaders join **`process.cwd()`**. Bundle/working-directory surprises ≠ library bugs.
+2. **`blend` argument order** — Layers stack **over** explicit base buffer ([Standalone ops](/docs#standalone-image-operations)).
+3. **GIF return unions** — Always narrow **`createGIF`** results ([GIF](/docs#gif-and-animation)).
+4. **Video URLs vs `#` helpers** — Prefer **`Buffer`** or absolute paths when a branch does not call **`resolveVideoSource`** ([Video hub](/docs#video-ffmpeg), [FFmpeg internals](/docs#video-ffmpeg-internals)).
+5. **Offline CI** — npm entry **`fetch`** version check may fail silently; Imgur **`url()`** requires network + trusting bundled credentials.
+
+---
+
+## Internal maintainers
+
+Symbols **not** exported from **`apexify.js`** but relevant when patching the library:
+
+| Symbol | File |
+|--------|------|
+| **`VideoHelpers`** | `lib/Canvas/utils/Video/videoHelpers.ts` — [Video FFmpeg internals](/docs#video-ffmpeg-internals) |
+| **`GIFCreator.setPainter`** | `lib/Canvas/extended/GIFCreator.ts` |
+| **`VideoCreator.setDependencies`**, **`setHelperMethods`** | `lib/Canvas/extended/VideoCreator.ts` |
+
+**Background (`bg.ts`):** **`buildPathbg`** — rounded-rect path helper; not on **`CanvasUtils`**; see [Canvas buildPathbg](/docs#canvas-buildpathbg).
+
+**Documentation gaps:** repo-root **`features-forDocs.md`** — add a row when something still needs a **`docs/`** page; remove after publishing.

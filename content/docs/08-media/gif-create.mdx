@@ -1,0 +1,228 @@
+# Create GIF (`createGIF`)
+
+Turn raster frames into an animated GIF: supply **`GIFInputFrame[]`**, or generate pixels in **`onStart`** (same **`ApexPainter`** instance is passed in).
+
+Overview: [GIF & animation](/docs#gif-and-animation).
+
+---
+
+## Two input modes
+
+| Mode | When to use |
+|------|-------------|
+| **Static list** | You already have **`Buffer`**s or paths / URLs per frame — pass **`gifFrames`**. |
+| **`onStart`** | Build frames in code — return **`GIFEncodedFrame[]`** or **`AsyncIterable<GIFEncodedFrame>`** (streaming). When **`onStart`** is set, **`gifFrames`** is **ignored** for sourcing pixels. |
+
+---
+
+## Frames from buffers (`GIFInputFrame`)
+
+Each frame needs **`duration`** (ms GIF delay) and image data from **`buffer`** **and/or** **`background`**:
+
+- **`buffer`**: PNG/JPEG/WebP **`Buffer`** (preferred for generated art).  
+- **`background`**: filesystem path, **`http(s)`** URL, or **`Buffer`** (legacy alias).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const f1 = await painter.createCanvas({ width: 400, height: 240, colorBg: '#1e293b' });
+const f2 = await painter.createImage(
+  { source: './logo.png', x: 120, y: 70, width: 160, height: 100, fit: 'contain' },
+  f1.buffer
+);
+
+const result = await painter.createGIF(
+  [
+    { duration: 500, buffer: f1.buffer },
+    { duration: 500, buffer: f2 },
+  ],
+  {
+    outputFormat: 'buffer',
+    width: 400,
+    height: 240,
+    quality: 14,
+    repeat: 0,
+  }
+);
+
+if (Buffer.isBuffer(result)) fs.writeFileSync('banner.gif', result);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+(async () => {
+  const painter = new ApexPainter();
+  const f1 = await painter.createCanvas({ width: 400, height: 240, colorBg: '#1e293b' });
+  const f2 = await painter.createImage(
+    { source: './logo.png', x: 120, y: 70, width: 160, height: 100, fit: 'contain' },
+    f1.buffer
+  );
+
+  const result = await painter.createGIF(
+    [
+      { duration: 500, buffer: f1.buffer },
+      { duration: 500, buffer: f2 },
+    ],
+    {
+      outputFormat: 'buffer',
+      width: 400,
+      height: 240,
+      quality: 14,
+      repeat: 0,
+    }
+  );
+
+  if (Buffer.isBuffer(result)) fs.writeFileSync('banner.gif', result);
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Resolution:** **`options.width`** / **`options.height`** default **1200×1200** if omitted — match your frames or accept resizing.
+
+---
+
+## Programmatic frames (`onStart`)
+
+**`onStart(frameCountHint, painter)`** receives:
+
+1. A **hint** derived from **`frameCount`**, **`duration`/`delay`**, or defaults (**~30**).  
+2. The **`ApexPainter`** instance (**`GIFCreator.setPainter`**) so you can call **`createCanvas`**, **`createImage`**, etc.
+
+Return **`GIFEncodedFrame[]`** or **`AsyncIterable<GIFEncodedFrame>`** (yield frames one-by-one for large animations).
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const gif = await painter.createGIF(undefined, {
+  outputFormat: 'buffer',
+  width: 280,
+  height: 280,
+  delay: 120,
+  quality: 12,
+  repeat: 0,
+  onStart: async (_hint, p) => {
+    const frames: { buffer: Buffer; duration?: number }[] = [];
+    const hues = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
+    for (const hex of hues) {
+      const { buffer } = await p.createCanvas({
+        width: 280,
+        height: 280,
+        colorBg: hex,
+      });
+      frames.push({ buffer, duration: 140 });
+    }
+    return frames;
+  },
+});
+
+if (Buffer.isBuffer(gif)) {
+  require('fs').writeFileSync('cycle.gif', gif);
+}
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+const fs = require('fs');
+
+(async () => {
+  const gif = await painter.createGIF(undefined, {
+    outputFormat: 'buffer',
+    width: 280,
+    height: 280,
+    delay: 120,
+    quality: 12,
+    repeat: 0,
+    onStart: async (_hint, p) => {
+      const frames = [];
+      const hues = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
+      for (const hex of hues) {
+        const { buffer } = await p.createCanvas({
+          width: 280,
+          height: 280,
+          colorBg: hex,
+        });
+        frames.push({ buffer, duration: 140 });
+      }
+      return frames;
+    },
+  });
+
+  if (Buffer.isBuffer(gif)) fs.writeFileSync('cycle.gif', gif);
+})();
+```
+</js>
+</CodeSwitcher>
+
+If **`onStart`** yields an empty **`AsyncIterable`**, encoding throws.
+
+---
+
+## Encoder options (`GIFOptions`)
+
+| Field | Notes |
+|-------|--------|
+| **`outputFormat`** | **`'buffer'`**, **`'base64'`**, **`'file'`**, **`'attachment'`** (stream tuple for bots) |
+| **`outputFile`** | **Required** when **`outputFormat === 'file'`** |
+| **`width`**, **`height`** | GIF canvas (**defaults 1200×1200**) |
+| **`repeat`** | Loop count passed to **`setRepeat`** (**≥ 0** when set) |
+| **`quality`** | **1–20** when set; encoder uses **`quality || 10`** |
+| **`delay`** | Fallback ms when a frame omits **`duration`** (**`GIFEncodedFrame`** / **`GIFInputFrame`**) |
+| **`transparentColor`** | Chroma key **`#RRGGBB`** / **`0xRRGGBB`** — invalid strings throw |
+| **`defaultDispose`** | **`GIFDisposalMethod`** **0–3** when frames omit **`dispose`** |
+| **`skipResizeWhenDimensionsMatch`** | **`true`** by default — skips resize when frame already matches GIF size |
+| **`watermark`** | Global **`enable`**, **`url`**, **`x`**, **`y`** |
+| **`textOverlay`** | Simple canvas text on **every** frame (not **`createText`** styling) |
+| **`onEnd`** | Receives **last composited** PNG **`Buffer`** + **`painter`**; optional extra still |
+
+Per-frame overrides on **`GIFInputFrame`** / **`GIFEncodedFrame`**: **`dispose`**, **`transparentColor`**, **`watermark`** (**`enable: false`** skips overlay).
+
+---
+
+## Validation messages
+
+| Rule | Error |
+|------|--------|
+| No **`onStart`** and no frames | `createGIF: Either gifFrames array or onStart callback is required.` |
+| **`onStart`** missing but empty **`gifFrames`** | `createGIF: At least one frame is required when onStart callback is not provided.` |
+| Frame missing raster | `createGIF: Each frame must include buffer and/or background …` |
+| Bad **`duration`** | `createGIF: Each frame duration must be a non-negative number.` |
+| File output without path | `createGIF: outputFile is required when outputFormat is 'file'.` |
+| **`repeat`** / **`quality`** out of range | See **`GIFCreator`** messages |
+
+---
+
+## Return shapes (narrow after `await`)
+
+- **`'buffer'`** → **`Buffer`** (most CLI/server uses).  
+- **`'base64'`** → **`string`**.  
+- **`'file'`** → **`undefined`** after stream finishes (bytes on disk).  
+- **`'attachment'`** → **`[{ attachment, name }]`** stream payload.  
+- **`onEnd`** returns a still **`Buffer`** → may yield **`{ gif, static }`** when GIF bytes exist, or **only** the still when file mode left **`gif`** undefined.
+
+Wrap failures: **`createGIF failed: …`**.
+
+---
+
+## Watermark & transparency
+
+Watermarks load like other raster assets (**`http`** via axios, otherwise path / URL handling in **`GIFCreator`**). Transparency uses **`setTransparent`** with parsed RGB (**alpha not supported** on the key color).
+
+---
+
+## Performance tip
+
+Match exported **`createCanvas`** dimensions to **`GIFOptions.width`/`height`** so **`skipResizeWhenDimensionsMatch`** (default **on**) avoids extra **`drawImage`** scaling every frame.
+
+Next: [`animate`](/docs#gif-animate) · [Troubleshooting](/docs#troubleshooting) (GIF return unions).

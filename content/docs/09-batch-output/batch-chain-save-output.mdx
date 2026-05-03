@@ -1,0 +1,101 @@
+# Batch, chain, save & output
+
+Run **parallel** canvas/image/text jobs (**`batch`**), pipe **buffers through sequential `ApexPainter` calls** (**`chain`**), **serialize** PNGs (**`outPut`**), and **write files** with naming helpers (**`save`**, **`saveMultiple`**).
+
+**Implementation:** `lib/Canvas/utils/general/batchOperations.ts` (**`batchOperations`**, **`chainOperations`**) · **`ApexPainter`** **`save`/`outPut`** use Sharp for non-PNG encodes.
+
+---
+
+## Constructor default for `outPut`
+
+```typescript
+new ApexPainter({ type: 'buffer' }) // default — outPut returns Buffer unchanged
+```
+
+**`type`** may be **`'buffer'`** | **`'base64'`** | **`'dataURL'`** | **`'blob'`** | **`'url'`** | **`'arraybuffer'`**. This controls **`outPut()`** only — **`createCanvas`** and friends still return raw **`Buffer`** unless you wrap them.
+
+---
+
+## Quick start
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const layers = await painter.batch([
+  { type: 'canvas', config: { width: 320, height: 200, colorBg: '#0ea5e9' } },
+  { type: 'canvas', config: { width: 320, height: 200, colorBg: '#6366f1' } },
+]);
+
+const meta = await painter.saveMultiple(layers, {
+  directory: './renders',
+  naming: 'counter',
+  prefix: 'slide-',
+  format: 'png',
+});
+
+console.log(meta.map((m) => m.path));
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const layers = await painter.batch([
+    { type: 'canvas', config: { width: 320, height: 200, colorBg: '#0ea5e9' } },
+    { type: 'canvas', config: { width: 320, height: 200, colorBg: '#6366f1' } },
+  ]);
+  const meta = await painter.saveMultiple(layers, {
+    directory: './renders',
+    naming: 'counter',
+    prefix: 'slide-',
+    format: 'png',
+  });
+  console.log(meta.map((m) => m.path));
+})();
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Documentation map
+
+| Topic | Page |
+|-------|------|
+| **`batch`** & **`chain`** | [Batch & chain](/docs#batch-and-chain) |
+| **`outPut`**, **`save`**, **`saveMultiple`**, **`resetSaveCounter`** | [Save & output](/docs#save-and-output) |
+
+Layout / encode helpers (**`stitchImages`**, **`createCollage`**, **`compress`**, **`extractPalette`**) stay summarized here — detail lives with [Standalone image operations](/docs#standalone-image-operations).
+
+---
+
+## Layout & compression (reference)
+
+| Method | Role |
+|--------|------|
+| **`stitchImages`** | Horizontal / vertical / grid (**`StitchOptions`**) |
+| **`createCollage`** | **`CollageLayout`**: grid, masonry, carousel, … |
+| **`compress`** | **`CompressionOptions`** (JPEG/WebP/AVIF, resize caps) |
+| **`extractPalette`** | **`PaletteOptions`** — dominant colors |
+
+---
+
+## `validHex`
+
+**`painter.validHex('#RRGGBB')`** returns **`true`** or **throws** — useful before feeding hex into configs.
+
+<Alert type="warning" title="`url()` helper">
+The **`url()`** conversion path (used when ctor **`type`** is **`'url'`**) relies on bundled Imgur-oriented flow — treat as **demo-only**; production uploads should use your own storage.
+</Alert>
+
+---
+
+## Flat exports (`CanvasUtils`)
+
+**`CanvasUtils.batchOperations(painter, ops)`** and **`CanvasUtils.chainOperations(painter, ops)`** mirror **`painter.batch`** / **`painter.chain`**.

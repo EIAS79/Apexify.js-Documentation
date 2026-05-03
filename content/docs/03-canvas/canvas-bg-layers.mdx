@@ -1,0 +1,125 @@
+# Canvas background layers (`bgLayers`)
+
+Painted **after** the primary fill, **before** **`patternBg`** and **`noiseBg`**. Paint order and validation: [Canvas pipeline](/docs#canvas-pipeline). Primary fills: [Canvas primary fills](/docs#canvas-primary-fills).
+
+Each layer supports **`opacity`** and **`blendMode`** (**`GlobalCompositeOperation`**).
+
+---
+
+## Color layer
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCanvas({
+  width: 600,
+  height: 400,
+  colorBg: '#000',
+  bgLayers: [
+    {
+      type: 'color',
+      value: 'rgba(59, 130, 246, 0.35)',
+      opacity: 1,
+      blendMode: 'screen',
+    },
+  ],
+});
+```
+</ts>
+<js>
+```javascript
+await painter.createCanvas({
+  width: 600,
+  height: 400,
+  colorBg: '#000',
+  bgLayers: [{ type: 'color', value: 'rgba(59,130,246,0.35)', blendMode: 'screen' }],
+});
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Gradient layer
+
+Uses the same **`gradient`** union as **`gradientBg`**.
+
+---
+
+## Image layer
+
+**`source`**, **`fit`**, **`align`** — same fit/align behavior as **`customBg`** (non-inherit).
+
+---
+
+## Bitmap tile layer (`pattern`)
+
+Uses **`drawPattern`**: **`createPattern`** from an image — **not** the procedural **`PatternOptions`** mesh.
+
+<CodeSwitcher>
+<ts>
+```typescript
+bgLayers: [
+  {
+    type: 'pattern',
+    source: './assets/tile.png',
+    repeat: 'repeat',
+    opacity: 0.4,
+  },
+],
+```
+</ts>
+<js>
+```javascript
+bgLayers: [{ type: 'pattern', source: './assets/tile.png', repeat: 'repeat', opacity: 0.4 }],
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Procedural mesh (`presetPattern`)
+
+**`pattern`** is **`PatternOptions`** — **`grid`**, **`dots`**, **`stripes`**, **`hexagons`**, **`custom`** (with **`customPatternImage`**), etc. Rendered with **`stackedInLayer: true`** (**`drawBackgroundLayers`** in **`bg.ts`**).
+
+<CodeSwitcher>
+<ts>
+```typescript
+bgLayers: [
+  {
+    type: 'presetPattern',
+    pattern: {
+      type: 'dots',
+      color: '#ffffff',
+      opacity: 0.25,
+      size: 12,
+      spacing: 20,
+    },
+    opacity: 1,
+  },
+],
+```
+</ts>
+<js>
+```javascript
+bgLayers: [
+  {
+    type: 'presetPattern',
+    pattern: { type: 'dots', color: '#ffffff', opacity: 0.25, size: 12, spacing: 20 },
+  },
+],
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Noise layer
+
+Default **`intensity`** for a **`noise`** layer is **0.08** if omitted. Top-level **`noiseBg`** defaults to **0.05** when intensity is omitted — the two defaults differ slightly.
+
+```typescript
+bgLayers: [{ type: 'noise', intensity: 0.06, blendMode: 'overlay' }],
+```
+
+Failed layers **warn** with **`console.warn`** and painting continues.

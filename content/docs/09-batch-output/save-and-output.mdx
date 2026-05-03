@@ -1,0 +1,203 @@
+# Save & output
+
+Convert PNG **`Buffer`**s for APIs (**`outPut`**) or persist them to disk with Sharp-backed encoding (**`save`**, **`saveMultiple`**).
+
+Hub: [Batch, chain, save & output](/docs#batch-chain-save-output).
+
+---
+
+## Default output channel (`new ApexPainter`)
+
+```typescript
+const painter = new ApexPainter({ type: 'base64' });
+```
+
+| Constructor `type` | `await painter.outPut(buffer)` returns |
+|--------------------|------------------------------------------|
+| **`buffer`** (default) | Same **`Buffer`** |
+| **`base64`** | **`string`** |
+| **`dataURL`** | Data URL **`string`** |
+| **`blob`** | **`Blob`** (browser-friendly) |
+| **`arraybuffer`** | **`ArrayBuffer`** |
+| **`url`** | Hosted URL **`string`** via **`url()`** helper — see hub alert |
+
+Most drawing methods still return **`Buffer`**; call **`outPut`** when you need the serialized form.
+
+---
+
+## `outPut(results: Buffer)`
+
+**Requires** a **`Buffer`**. Uses **`this.format.type`** (constructor) to pick the converter.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter({ type: 'base64' });
+
+const { buffer } = await painter.createCanvas({
+  width: 120,
+  height: 120,
+  colorBg: '#22c55e',
+});
+
+const payload = await painter.outPut(buffer);
+console.log(typeof payload === 'string');
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter({ type: 'base64' });
+  const { buffer } = await painter.createCanvas({
+    width: 120,
+    height: 120,
+    colorBg: '#22c55e',
+  });
+  const payload = await painter.outPut(buffer);
+  console.log(typeof payload === 'string');
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Throws:** non-buffer → **`outPut: results must be a Buffer.`** Unknown format → lists supported kinds.
+
+---
+
+## `save(buffer, options?)`
+
+Writes **`./ApexPainter_output`** by default (creates directories when **`createDirectory`** is **`true`**).
+
+### `SaveOptions`
+
+| Field | Default | Notes |
+|-------|---------|--------|
+| **`directory`** | **`./ApexPainter_output`** | Target folder |
+| **`filename`** | auto | If set without extension, **`.${format}`** appended |
+| **`format`** | **`png`** | **`jpg`/`jpeg`**, **`webp`**, **`avif`**, **`gif`** |
+| **`quality`** | **90** | JPEG/WebP/AVIF |
+| **`createDirectory`** | **`true`** | **`fs.mkdirSync`** recursive |
+| **`naming`** | **`timestamp`** | **`counter`**, **`custom`** |
+| **`counterStart`** | **1** | Stored on options (counter filenames still advance **`painter`**’s internal counter) |
+| **`prefix`**, **`suffix`** | **`''`** | Applied to generated names |
+| **`overwrite`** | **`false`** | When **`false`**, appends **`_1`**, **`_2`**, … if file exists |
+
+Non-PNG formats run through **Sharp** before **`writeFileSync`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+const { buffer } = await painter.createCanvas({ width: 640, height: 360, colorBg: '#111' });
+
+const saved = await painter.save(buffer, {
+  directory: './exports',
+  filename: 'hero.webp',
+  format: 'webp',
+  quality: 88,
+});
+
+console.log(saved.path, saved.size);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createCanvas({ width: 640, height: 360, colorBg: '#111' });
+  const saved = await painter.save(buffer, {
+    directory: './exports',
+    filename: 'hero.webp',
+    format: 'webp',
+    quality: 88,
+  });
+  console.log(saved.path, saved.size);
+})();
+```
+</js>
+</CodeSwitcher>
+
+### `SaveResult`
+
+**`path`**, **`filename`**, **`size`**, **`format`**.
+
+---
+
+## `saveMultiple(buffers, options?)`
+
+Saves **each** buffer sequentially with shared **`SaveOptions`**. Requires a **non-empty** array.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const shots = await painter.batch([
+  { type: 'canvas', config: { width: 200, height: 200, colorBg: '#ef4444' } },
+  { type: 'canvas', config: { width: 200, height: 200, colorBg: '#3b82f6' } },
+]);
+
+const files = await painter.saveMultiple(shots, {
+  directory: './shots',
+  naming: 'counter',
+  prefix: 'frame-',
+  format: 'png',
+});
+
+files.forEach((f) => console.log(f.filename));
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const shots = await painter.batch([
+    { type: 'canvas', config: { width: 200, height: 200, colorBg: '#ef4444' } },
+    { type: 'canvas', config: { width: 200, height: 200, colorBg: '#3b82f6' } },
+  ]);
+  const files = await painter.saveMultiple(shots, {
+    directory: './shots',
+    naming: 'counter',
+    prefix: 'frame-',
+    format: 'png',
+  });
+  files.forEach((f) => console.log(f.filename));
+})();
+```
+</js>
+</CodeSwitcher>
+
+**Throws:** **`saveMultiple: buffers must be a non-empty array.`**
+
+---
+
+## `resetSaveCounter()`
+
+Sets the internal **`saveCounter`** back to **1** — useful before another **`save`** / **`saveMultiple`** run with **`naming: 'counter'`** so numbering restarts cleanly.
+
+---
+
+## Flat conversion helpers
+
+Import **`base64`**, **`dataURL`**, **`blob`**, **`arrayBuffer`**, **`url`** from **`apexify.js`** / **`CanvasUtils`** when you want conversions **without** going through **`outPut`**.
+
+---
+
+## Error wrappers
+
+| Call | Prefix |
+|------|--------|
+| **`outPut`** | **`outPut failed:`** |
+| **`save`** | **`save failed:`** |
+| **`saveMultiple`** | **`saveMultiple failed:`** |
+
+Next: [Batch & chain](/docs#batch-and-chain).

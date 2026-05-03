@@ -1,0 +1,216 @@
+# Text pipeline (`createText`)
+
+**`createText`** never allocates a fresh scene: it loads your PNG buffer, paints it at **`(0,0)`**, then draws each **`TextProperties`** entry **in order** on the shared canvas context.
+
+Back to overview: [Create text](/docs#create-text).
+
+---
+
+## Inputs
+
+| Argument | Accepted values |
+|----------|------------------|
+| **`textArray`** | One **`TextProperties`** object or an **array** (later entries paint over earlier ones where they overlap). |
+| **`canvasBuffer`** | PNG **`Buffer`**, or **`CanvasResults`** from **`createCanvas`** (uses **`.buffer`**). |
+
+Every entry needs **`text`** (non-empty string you want to render), **`x`**, and **`y`**.
+
+---
+
+## Validation (throws)
+
+| Situation | Message |
+|-----------|---------|
+| Missing buffer | `createText: canvasBuffer is required.` |
+| Empty array | `createText: At least one text object is required.` |
+| Missing **`text`** / **`x`** / **`y`** | `createText: text, x, and y are required.` |
+| Bad buffer shape | `Invalid canvasBuffer provided…` / `Unable to load image from buffer` |
+
+Other failures surface as **`createText failed: …`**.
+
+---
+
+## One caption on a photo
+
+<CodeSwitcher>
+<ts>
+```typescript
+const painter = new ApexPainter();
+
+const { buffer: scene } = await painter.createCanvas({
+  width: 960,
+  height: 540,
+  customBg: { source: './backdrop.jpg', fit: 'cover', align: 'center' },
+});
+
+const titled = await painter.createText(
+  {
+    text: 'Summer drop · 2026',
+    x: 48,
+    y: 480,
+    font: { size: 44, family: 'Arial' },
+    color: '#ffffff',
+    shadow: { color: 'rgba(0,0,0,0.55)', offsetX: 0, offsetY: 6, blur: 18, opacity: 1 },
+  },
+  scene
+);
+```
+</ts>
+<js>
+```javascript
+const painter = new ApexPainter();
+
+(async () => {
+  const { buffer: scene } = await painter.createCanvas({
+    width: 960,
+    height: 540,
+    customBg: { source: './backdrop.jpg', fit: 'cover', align: 'center' },
+  });
+
+  const titled = await painter.createText(
+    {
+      text: 'Summer drop · 2026',
+      x: 48,
+      y: 480,
+      font: { size: 44, family: 'Arial' },
+      color: '#ffffff',
+      shadow: { color: 'rgba(0,0,0,0.55)', offsetX: 0, offsetY: 6, blur: 18, opacity: 1 },
+    },
+    scene
+  );
+})();
+```
+</js>
+</CodeSwitcher>
+
+Replace **`customBg`** with **`colorBg`** if you only need a flat color underneath.
+
+---
+
+## Several text layers in one call
+
+<CodeSwitcher>
+<ts>
+```typescript
+const { buffer } = await painter.createCanvas({
+  width: 720,
+  height: 400,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 720,
+    endY: 400,
+    colors: [
+      { stop: 0, color: '#1e1b4b' },
+      { stop: 1, color: '#312e81' },
+    ],
+  },
+});
+
+const poster = await painter.createText(
+  [
+    {
+      text: 'RELEASE',
+      x: 360,
+      y: 140,
+      font: { size: 56, family: 'Arial' },
+      bold: true,
+      color: '#e0e7ff',
+      textAlign: 'center',
+      letterSpacing: 8,
+    },
+    {
+      text: 'Midnight edition',
+      x: 360,
+      y: 220,
+      font: { size: 28, family: 'Arial' },
+      color: '#c7d2fe',
+      opacity: 0.92,
+      textAlign: 'center',
+    },
+  ],
+  buffer
+);
+```
+</ts>
+<js>
+```javascript
+const { buffer } = await painter.createCanvas({
+  width: 720,
+  height: 400,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 720,
+    endY: 400,
+    colors: [
+      { stop: 0, color: '#1e1b4b' },
+      { stop: 1, color: '#312e81' },
+    ],
+  },
+});
+
+const poster = await painter.createText(
+  [
+    {
+      text: 'RELEASE',
+      x: 360,
+      y: 140,
+      font: { size: 56, family: 'Arial' },
+      bold: true,
+      color: '#e0e7ff',
+      textAlign: 'center',
+      letterSpacing: 8,
+    },
+    {
+      text: 'Midnight edition',
+      x: 360,
+      y: 220,
+      font: { size: 28, family: 'Arial' },
+      color: '#c7d2fe',
+      opacity: 0.92,
+      textAlign: 'center',
+    },
+  ],
+  buffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Pass **`Buffer`** or **`CanvasResults`**
+
+Both work — match whatever your previous step returned.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const canvas = await painter.createCanvas({ width: 600, height: 200, colorBg: '#fff' });
+
+await painter.createText({ text: 'A', x: 80, y: 110, font: { size: 48, family: 'Arial' } }, canvas.buffer);
+
+await painter.createText({ text: 'B', x: 200, y: 110, font: { size: 48, family: 'Arial' } }, canvas);
+```
+</ts>
+<js>
+```javascript
+const canvas = await painter.createCanvas({ width: 600, height: 200, colorBg: '#fff' });
+
+await painter.createText({ text: 'A', x: 80, y: 110, font: { size: 48, family: 'Arial' } }, canvas.buffer);
+
+await painter.createText({ text: 'B', x: 200, y: 110, font: { size: 48, family: 'Arial' } }, canvas);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Line breaks inside **`text`**
+
+Use **`\n`** for manual breaks. With **`maxWidth`**, words wrap per line; explicit newlines always start a new row first.
+
+Next: [Fonts & layout](/docs#text-fonts-and-layout) · [Decorations & effects](/docs#text-decorations-effects) · [Curved text & metrics](/docs#text-curved-and-metrics).

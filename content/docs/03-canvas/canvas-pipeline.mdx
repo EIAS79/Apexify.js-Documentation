@@ -1,0 +1,70 @@
+# Canvas pipeline
+
+**`CanvasResults`**, **`validateCanvasConfig`**, sizing before paint, **`CanvasCreator`** draw order, and **`resolveMediaPath`**. For primary fills, **`bgLayers`**, **`patternBg`**, and styling, see the sibling pages linked from [Create canvas](/docs#create-canvas).
+
+---
+
+## What you get back
+
+```typescript
+interface CanvasResults {
+  buffer: Buffer;   // PNG — always from this stage
+  canvas: CanvasConfig; // echoes your config object
+}
+```
+
+Use **`buffer`** as input to **`createImage`**, **`createText`**, **`createCustom`**, or **`fs.writeFileSync`**.
+
+---
+
+## Rules that throw (`validateCanvasConfig`)
+
+| Rule | Error pattern |
+|------|----------------|
+| Missing config | `canvas configuration is required` |
+| **`width` / `height`** | Must be **positive numbers** if present |
+| **`opacity`** | **[0, 1]** if set |
+| **`zoom.scale`** | Must be **> 0** if set |
+| **`bgLayers`** | Array only; each **`type`** ∈ **`color` \| `gradient` \| `image` \| `pattern` \| `presetPattern` \| `noise`**; layer **`opacity`** ∈ **[0, 1]**; **`color`** needs string **`value`**; **`gradient`** needs object with **`type`**; **`image`/`pattern`** need non-empty **`source`** string; **`presetPattern`** needs **`PatternOptions`** with **`type`**; **`noise.intensity`** ∈ **[0, 1]** if set |
+| **Primary fill mutex** | **At most one** of **`colorBg`**, **`gradientBg`**, **`customBg`** — if two or more are set: `only one of colorBg, gradientBg, or customBg can be used` |
+
+---
+
+## How sizing works (before paint)
+
+1. **`customBg.inherit: true`** — loads **`customBg.source`** (via **`resolveMediaPath`**) and sets **`width`/`height`** from the image. **Throws** if the image cannot load.
+2. **`videoBg`** + frame extractor — tries to extract a frame; if successful and **`width`/`height`** missing, fills them from the frame. On failure, **warns** and continues (defaults apply later).
+3. Any remaining missing dimension defaults to **500**.
+
+---
+
+## Paint pipeline order (`CanvasCreator`)
+
+Order is **fixed**. Anything listed later draws **on top** of earlier steps (within the clipped canvas).
+
+1. **`globalAlpha`** ← canvas **`opacity`** (default **1**).
+2. **`save`** → **`applyRotation`** → **`buildPath`** clip (**`borderRadius`**, **`borderPosition`**) → **`applyCanvasZoom`** → **`translate(x, y)`**.
+3. Optional **`globalCompositeOperation`** from **`blendMode`**.
+4. **Exactly one base** (first that applies):
+   - **`videoBg`** → extract frame, **`drawImage`** scaled to full canvas (**requires FFmpeg** when using file/URL sources).
+   - **`customBg`** → **`customBackground`**; optional **`customBg.filters`** → Sharp **`applyProfessionalImageFilters`** on a temp copy; optional **`customBg.opacity`** handling.
+   - **`gradientBg`** → **`drawBackgroundGradient`**.
+   - **`colorBg`** → **`drawBackgroundColor`** (supports **`'transparent'`** as literal — skips opaque fill).
+   - **`transparentBase: true`** → skip opaque base (you compose from **`bgLayers`** / **`patternBg`** / **`noiseBg`** only).
+   - **Else** → opaque **`#000`** fill.
+5. **`drawBackgroundLayers`** — each **`BackgroundLayer`** bottom → top.
+6. **`patternBg`** — **`EnhancedPatternRenderer.renderPattern`** (**`PatternOptions`** procedural mesh or custom bitmap tile — [patterns doc](/docs#canvas-pattern-noise-transforms)).
+7. **`noiseBg`** — grain overlay (default intensity **0.05** when omitted).
+8. **`restore`** — end clip/zoom/rotation block.
+9. **Canvas-edge **`shadow`**** — clip path again, **`applyShadow`**.
+10. **Canvas-edge **`stroke`**** — clip path again, **`applyStroke`**.
+11. **`toBuffer('image/png')`**.
+
+---
+
+## Paths and URLs (`resolveMediaPath`)
+
+Used by **`customBg`**, layer **`image`/`pattern`**, and **`drawPattern`**.
+
+- **`http(s)://`** → passed through unchanged.
+- Anything else → **`path.join(process.cwd(), source)`** — paths are **working-directory relative**, not relative to your repo folder unless **`cwd`** is set there.

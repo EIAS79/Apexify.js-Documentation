@@ -1,0 +1,174 @@
+# Arrows, markers & paths
+
+Arrowheads at segment ends, decorative markers along straight segments, **`path`** hints, and the **`advancedLines`** helpers **`CanvasUtils`** re-exports.
+
+Overview: [Custom lines](/docs#custom-lines).
+
+---
+
+## Arrowheads (`arrow`)
+
+| Field | Meaning |
+|-------|---------|
+| **`start`** / **`end`** | Toggle arrowheads at the segment beginning / tip |
+| **`size`** | Pixel-ish scale (**default ~10**) |
+| **`style`** | **`filled`** (default) or **`outline`** |
+| **`color`** | Falls back to **`lineStyle.color`** then black |
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 520, y: 320 },
+    endCoordinates: { x: 220, y: 120 },
+    lineStyle: { width: 4, color: '#93c5fd', lineCap: 'round' },
+    arrow: {
+      start: true,
+      end: true,
+      size: 20,
+      style: 'outline',
+      color: '#e0f2fe',
+    },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 520, y: 320 },
+    endCoordinates: { x: 220, y: 120 },
+    lineStyle: { width: 4, color: '#93c5fd', lineCap: 'round' },
+    arrow: {
+      start: true,
+      end: true,
+      size: 20,
+      style: 'outline',
+      color: '#e0f2fe',
+    },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## Markers along the segment (`markers`)
+
+**`position`** is **`0`** at **`startCoordinates`** → **`1`** at **`endCoordinates`**. **`shape`**: **`circle`**, **`square`**, **`diamond`**, **`arrow`**.
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 100, y: 200 },
+    endCoordinates: { x: 620, y: 200 },
+    lineStyle: { width: 3, color: '#fcd34d', lineCap: 'round' },
+    markers: [
+      { position: 0.15, shape: 'circle', size: 12, color: '#fef9c3' },
+      { position: 0.5, shape: 'diamond', size: 18, color: '#fbbf24' },
+      { position: 0.85, shape: 'square', size: 14, color: '#fde68a' },
+    ],
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 100, y: 200 },
+    endCoordinates: { x: 620, y: 200 },
+    lineStyle: { width: 3, color: '#fcd34d', lineCap: 'round' },
+    markers: [
+      { position: 0.15, shape: 'circle', size: 12, color: '#fef9c3' },
+      { position: 0.5, shape: 'diamond', size: 18, color: '#fbbf24' },
+      { position: 0.85, shape: 'square', size: 14, color: '#fde68a' },
+    ],
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+Markers sample the **straight chord** between endpoints — they do not march along **`smooth`** curves.
+
+---
+
+## Path keys (`path`)
+
+Each **`CustomOptions`** entry only supplies **two** knots (**`startCoordinates`**, **`endCoordinates`**). The renderer builds **`allPoints = [start, end]`**, so:
+
+| **`path.type`** | What you get today |
+|-----------------|---------------------|
+| **`smooth`** | Two-point spline collapses to a **straight** segment (needs ≥3 points for visible curvature). |
+| **`catmull-rom`** | Same two-point limitation → **straight** segment. |
+| **`bezier`** | Implementation expects **≥4** points per segment → condition never met → falls back to **`lineTo`**. |
+
+Use **`path`** keys when experimenting or preparing for richer geometry; for reliable arcs prefer **`createPath2D`** / **`drawPath`** ([Path2D & drawPath](/docs#path2d-draw)) or compose Bézier guides manually.
+
+<CodeSwitcher>
+<ts>
+```typescript
+// Typed example — renders as a straight wire today between the two anchors
+await painter.createCustom(
+  {
+    startCoordinates: { x: 140, y: 260 },
+    endCoordinates: { x: 560, y: 120 },
+    path: { type: 'smooth', tension: 0.35, closed: false },
+    lineStyle: { width: 4, color: '#34d399', lineCap: 'round' },
+  },
+  baseBuffer
+);
+```
+</ts>
+<js>
+```javascript
+await painter.createCustom(
+  {
+    startCoordinates: { x: 140, y: 260 },
+    endCoordinates: { x: 560, y: 120 },
+    path: { type: 'smooth', tension: 0.35, closed: false },
+    lineStyle: { width: 4, color: '#34d399', lineCap: 'round' },
+  },
+  baseBuffer
+);
+```
+</js>
+</CodeSwitcher>
+
+---
+
+## `advancedLines.ts` helpers (flat export)
+
+Import these from **`apexify.js`** when scripting raw **`SKRSContext2D`** pipelines:
+
+| Symbol | Role |
+|--------|------|
+| **`drawArrow`** | Place arrowhead at angle (**`filled`** / **`outline`**) |
+| **`drawMarker`** | Stamp **`circle`**, **`square`**, **`diamond`**, **`arrow`** glyphs |
+| **`createSmoothPath`** | Cardinal spline through **`points[]`** |
+| **`createCatmullRomPath`** | Catmull-Rom spline through **`points[]`** |
+| **`applyLinePattern`** | Map **`dots` / `dashes` / `custom`** dash arrays |
+| **`applyLineTexture`** | Async bitmap **`createPattern`** for strokes |
+| **`getPointOnLinePath`** | Interpolate **`position`** ∈ **`[0,1]`** across polyline segments |
+
+**`CanvasUtils.customLines`** remains the high-level batch runner used by **`createCustom`**.
+
+---
+
+## Related
+
+| Topic | Link |
+|-------|------|
+| Stroke details | [Line styles](/docs#custom-lines-style) |
+| Ordering / chaining | [Pipeline](/docs#custom-lines-pipeline) |
+| Vector overlays | [Path2D & drawPath](/docs#path2d-draw) |
