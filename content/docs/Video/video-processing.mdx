@@ -15,7 +15,7 @@ The `createVideo()` method is a comprehensive video processing API that supports
 - **Format Conversion**: Convert between video formats with platform-optimized presets
 - **Video Editing**: Trim, crop, rotate, merge, and replace video segments
 - **Effects & Filters**: Apply visual effects, color correction, and LUT color grading
-- **Audio Processing**: Extract audio, adjust volume, mute (full or partial), normalize audio levels
+- **Audio Processing**: Extract audio; **`removeAudio`** (video-only); **`mute`** (full strip or per-range silence); **`mixAudio`** (multiple overlays with trim/gain); **`adjustVolume`** (**percentage** gain — **100** = unity; see **§29**); normalize audio levels
 - **Transitions**: Professional transitions between videos (fade, wipe, slide, zoom, and more)
 - **Text Animations**: Add animated text overlays with custom fonts and animations
 - **Advanced Features**: Stabilization, scene detection, time-lapse, freeze frames, and more
@@ -176,8 +176,10 @@ Each call to `createVideo` should specify **`source`** plus **exactly one** of t
 | `pictureInPicture` | PiP overlay | [25](#25-picture-in-picture) |
 | `splitScreen` | Split layouts | [26](#26-split-screen) |
 | `createTimeLapse` | Time-lapse | [27](#27-create-time-lapse) |
-| `mute` | Strip or gate audio | [28](#28-mute-video-full-or-partial) |
-| `adjustVolume` | Gain change | [29](#29-adjust-audio-volume) |
+| `removeAudio` | Drop all audio streams (video-only) | [27a](#27a-remove-audio-video-only) |
+| `mixAudio` | Mix external audio clips on the timeline | [27b](#27b-mix-audio-overlays) |
+| `mute` | Full strip or mute time ranges | [28](#28-mute-video-full-or-partial) |
+| `adjustVolume` | Gain (**%**, 100 = unity) | [29](#29-adjust-audio-volume) |
 | `detectFormat` | Codec / container probe | [30](#30-detect-video-format-and-codec) |
 | `createFromFrames` | **Images → new video** | [Above](#create-video-from-frames) · [31](#31-create-video-from-frames) |
 | `replaceSegment` | Patch timeline | [32](#32-replace-video-segments) |
@@ -1255,9 +1257,105 @@ const result = await painter.createVideo({
 </js>
 </CodeSwitcher>
 
+### 27a. Remove audio (video-only)
+
+Write a new file with **no audio streams** — same FFmpeg path as a full mute (`-an`), keyed separately for clarity:
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createVideo({
+  source: './video.mp4',
+  removeAudio: {
+    outputPath: './video-no-audio.mp4',
+  },
+});
+```
+</ts>
+<js>
+```javascript
+await painter.createVideo({
+  source: './video.mp4',
+  removeAudio: {
+    outputPath: './video-no-audio.mp4',
+  },
+});
+```
+</js>
+</CodeSwitcher>
+
+Equivalent end state to **`mute`** **without** **`ranges`** (see [§28](#28-mute-video-full-or-partial)); use whichever reads clearer in your pipeline.
+
+### 27b. Mix audio overlays
+
+Mix **one or more** external audio sources (file path, URL, or **`Buffer`**) onto the video timeline. The **`mixAudio`** branch delegates to **`mixVideoAudio`**.
+
+| Field | Purpose |
+|-------|---------|
+| **`outputPath`** | Destination media file |
+| **`overlays`** | Non-empty list of clips — each needs **`source`**, **`startTime`** (seconds on the output timeline), optional **`duration`**, **`sourceStart`** (trim into the file), **`volume`** (linear gain, default **1**), **`speed`**, **`pitchSemitones`** |
+| **`keepOriginalAudio`** | **`true`** (default): mix with the video’s existing track. **`false`**: silence the original and play only overlays (plus padding). |
+| **`originalVolume`** | Gain on the video’s audio before mixing (default **1**). |
+| **`originalSpeed`** / **`originalPitchSemitones`** | Optional processing on the **original** soundtrack |
+
+<CodeSwitcher>
+<ts>
+```typescript
+await painter.createVideo({
+  source: './main.mp4',
+  mixAudio: {
+    outputPath: './main-with-bed.mp4',
+    keepOriginalAudio: true,
+    originalVolume: 0.85,
+    overlays: [
+      {
+        source: './music.mp3',
+        startTime: 0,
+        volume: 0.35,
+      },
+      {
+        source: './voice.wav',
+        startTime: 12,
+        sourceStart: 0.5,
+        duration: 8,
+        volume: 1,
+      },
+    ],
+  },
+});
+```
+</ts>
+<js>
+```javascript
+await painter.createVideo({
+  source: './main.mp4',
+  mixAudio: {
+    outputPath: './main-with-bed.mp4',
+    keepOriginalAudio: true,
+    originalVolume: 0.85,
+    overlays: [
+      {
+        source: './music.mp3',
+        startTime: 0,
+        volume: 0.35,
+      },
+      {
+        source: './voice.wav',
+        startTime: 12,
+        sourceStart: 0.5,
+        duration: 8,
+        volume: 1,
+      },
+    ],
+  },
+});
+```
+</js>
+</CodeSwitcher>
+
 ### 28. Mute Video (Full or Partial)
 
-Remove audio from video (entire video or specific time ranges):
+Remove audio from the entire video, **or** silence **only** specific time ranges (`ranges` in seconds). Without **`ranges`**, behavior matches [§27a](#27a-remove-audio-video-only) (stream copy of video, no audio).
 
 <CodeSwitcher>
 <ts>
@@ -1310,7 +1408,13 @@ const result2 = await painter.createVideo({
 
 ### 29. Adjust Audio Volume
 
-Adjust video audio volume:
+Adjust **overall** loudness or apply **per-interval** gain (and optional **pitch** / **tempo** per interval via FFmpeg **`rubberband`** when those fields are set).
+
+<Alert type="warning" title="Breaking change (5.3.20)">
+**`adjustVolume.volume`** is a **percentage**: **100** = unchanged level (**unity**). Older ApexPainter-only examples sometimes used a **0–10** linear scale; migrate by mapping **10 → 100**, **5 → 50**, etc., or multiply your old value by **10** when it was expressed as “tenths” of full scale.
+</Alert>
+
+**Whole-file gain** — **`volume`** as percent (**200** ≈ double, **50** ≈ half):
 
 <CodeSwitcher>
 <ts>
@@ -1318,9 +1422,9 @@ Adjust video audio volume:
 const result = await painter.createVideo({
   source: './video.mp4',
   adjustVolume: {
-    volume: 0.5,         // Volume multiplier (0.0 = mute, 1.0 = original, 2.0 = double)
-    outputPath: './adjusted-volume.mp4'
-  }
+    volume: 75,        // 75% of original level (100 = unchanged)
+    outputPath: './quieter.mp4',
+  },
 });
 ```
 </ts>
@@ -1329,13 +1433,50 @@ const result = await painter.createVideo({
 const result = await painter.createVideo({
   source: './video.mp4',
   adjustVolume: {
-    volume: 0.5,         // Volume multiplier (0.0 = mute, 1.0 = original, 2.0 = double)
-    outputPath: './adjusted-volume.mp4'
-  }
+    volume: 75,
+    outputPath: './quieter.mp4',
+  },
 });
 ```
 </js>
 </CodeSwitcher>
+
+**Per-interval loudness** — pass **`ranges`**: each entry has **`start`**, **`end`**, **`volume`** (still **percent** within that interval), and optional **`speed`** / **`pitchSemitones`** for rubberband processing inside that window:
+
+<CodeSwitcher>
+<ts>
+```typescript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  adjustVolume: {
+    outputPath: './ducked.mp4',
+    ranges: [
+      { start: 0, end: 10, volume: 100 },
+      { start: 10, end: 40, volume: 35 },
+      { start: 40, end: 120, volume: 100 },
+    ],
+  },
+});
+```
+</ts>
+<js>
+```javascript
+const result = await painter.createVideo({
+  source: './video.mp4',
+  adjustVolume: {
+    outputPath: './ducked.mp4',
+    ranges: [
+      { start: 0, end: 10, volume: 100 },
+      { start: 10, end: 40, volume: 35 },
+      { start: 40, end: 120, volume: 100 },
+    ],
+  },
+});
+```
+</js>
+</CodeSwitcher>
+
+When **`ranges`** is provided, the top-level **`volume`** field is not used for the filter graph (see **`VideoCreationOptions`** in the installed typings).
 
 ### 30. Detect Video Format and Codec
 

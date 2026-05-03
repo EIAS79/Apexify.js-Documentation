@@ -8,6 +8,14 @@ Bar charts are created using `ApexPainter.prototype.createChart()` with `chartTy
 
 **Canvas background (5.3+):** Use `options.appearance` (`ChartAppearanceExtended`) for the same building blocks as `createCanvas`: a base fill (`customBg`, or `backgroundImage`, or `backgroundGradient` / `backgroundColor`), then optional stacked `bgLayers`, optional `patternBg` and `noiseBg`, and optional `blur` when using `customBg`. Axis defaults can come from `appearance.axisColor`, `appearance.axisWidth`, and `appearance.arrowSize` when not set on `axes`.
 
+## Plot opacity
+
+As of **5.3.20**, bar geometry can be drawn with **0–1** opacity: a chart-level **`bars.opacity`**, and finer control per **row** or **segment** (grouped/stacked) where the bar type supports it. Values are clamped to **[0, 1]** like other chart modules.
+
+- **Line charts:** use **`lines.opacity`** (per series or default) — see [Line charts](./line-charts#line-opacity).
+- **Pie / donut:** **`slices.opacity`** on the chart or per slice — see [Pie charts](./pie-charts#slice-opacity).
+- **Horizontal bars:** same **`bars`** opacity model as vertical bars — see [Horizontal bar charts](./horizontal-bar-charts#plot-opacity).
+
 ## Chart Types
 
 - **Standard**: Single value per category

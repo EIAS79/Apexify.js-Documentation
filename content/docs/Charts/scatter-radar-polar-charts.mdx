@@ -1,0 +1,204 @@
+# Scatter, radar, and polar area charts
+
+From **apexify.js 5.3.20**, `ApexPainter.prototype.createChart()` accepts three additional chart kinds — **`scatter`**, **`radar`**, and **`polarArea`** — alongside pie, bar, horizontal bar, and line. Each uses the same **`appearance`** / legend / padding conventions as the other chart modules.
+
+## Scatter (`createChart('scatter', …)`)
+
+Scatter plots expect **one or more series**. Each series has **`label`**, **`data`** as `{ x, y }[]`, optional **`color`** / **`gradient`**, **`markerType`** (`circle` \| `square` \| `diamond` \| `cross` \| `none`), **`markerSize`**, and **`opacity`** (0–1). Cartesian axes follow the **line chart** model (`axes`, `grid`, `labels.title`, `legend`).
+
+- **Marker opacity:** `options.points.opacity` sets the default; **`ScatterSeries.opacity`** overrides per series.
+- **Trend lines:** optional **`series[].correlation`** supports **`type: 'auto'`** (weak linear correlation → horizontal mean line; otherwise least-squares fit) or the same regression modes as line charts (`linear`, `polynomial`, …).
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const chart = await painter.createChart(
+  'scatter',
+  [
+    {
+      label: 'Samples',
+      markerType: 'circle',
+      color: '#38bdf8',
+      data: [
+        { x: 1, y: 2 },
+        { x: 2, y: 3.5 },
+        { x: 3, y: 3 },
+      ],
+      correlation: { show: true, type: 'auto' },
+    },
+  ],
+  {
+    dimensions: { width: 720, height: 480 },
+    labels: { title: { text: 'Scatter' } },
+    points: { opacity: 0.9 },
+    axes: {
+      x: { label: 'X' },
+      y: { label: 'Y' },
+    },
+  }
+);
+
+fs.writeFileSync('scatter.png', chart);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+const painter = new ApexPainter();
+
+const chart = await painter.createChart(
+  'scatter',
+  [
+    {
+      label: 'Samples',
+      markerType: 'circle',
+      color: '#38bdf8',
+      data: [
+        { x: 1, y: 2 },
+        { x: 2, y: 3.5 },
+        { x: 3, y: 3 },
+      ],
+      correlation: { show: true, type: 'auto' },
+    },
+  ],
+  {
+    dimensions: { width: 720, height: 480 },
+    labels: { title: { text: 'Scatter' } },
+    points: { opacity: 0.9 },
+    axes: {
+      x: { label: 'X' },
+      y: { label: 'Y' },
+    },
+  }
+);
+
+fs.writeFileSync('scatter.png', chart);
+```
+</js>
+</CodeSwitcher>
+
+## Radar (`createChart('radar', …)`)
+
+Radar (spider) charts plot **one polygon per series** on **N radial axes**. Requirements:
+
+- **`options.radar.categories`**: string array with **at least three** entries — these label each axis.
+- Each **`RadarSeries`** has **`label`**, **`values`** (length **must equal** `categories.length`), optional **`color`**, **`stroke`**, **`gradient`**, **`fillOpacity`**, **`lineWidth`**, **`opacity`** (0–1 multiplier for fill/stroke/dots).
+
+Tune the web with **`radar.maxValue`**, **`gridLevels`**, **`fill`**, **`showPoints`**, **`pointRadius`**, **`gridColor`**, **`axisLabelFontSize`**, etc.
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart(
+  'radar',
+  [
+    { label: 'Q1', values: [8, 7, 9, 6, 8], color: '#38bdf8' },
+    { label: 'Q2', values: [6, 8, 7, 7, 9], color: '#f472b6' },
+  ],
+  {
+    dimensions: { width: 640, height: 640 },
+    radar: {
+      categories: ['Speed', 'Reliability', 'UX', 'Docs', 'Price'],
+      maxValue: 10,
+      fill: true,
+      showPoints: true,
+      opacity: 0.35,
+    },
+    labels: { title: { text: 'Feature scores' } },
+  }
+);
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart(
+  'radar',
+  [
+    { label: 'Q1', values: [8, 7, 9, 6, 8], color: '#38bdf8' },
+    { label: 'Q2', values: [6, 8, 7, 7, 9], color: '#f472b6' },
+  ],
+  {
+    dimensions: { width: 640, height: 640 },
+    radar: {
+      categories: ['Speed', 'Reliability', 'UX', 'Docs', 'Price'],
+      maxValue: 10,
+      fill: true,
+      showPoints: true,
+      opacity: 0.35,
+    },
+    labels: { title: { text: 'Feature scores' } },
+  }
+);
+```
+</js>
+</CodeSwitcher>
+
+## Polar area (`createChart('polarArea', …)`)
+
+Polar area charts use **equal-angle slices**; radial extent encodes **value**. Pass an array of **`PolarAreaSlice`**: **`label`**, **`value`**, optional **`color`** / **`gradient`** / **`opacity`**.
+
+- **`options.scale`**: `'radius'` (default) or **`'area'`** — when **`area`**, radius scales like √ so **areas** feel proportional to value.
+- **`options.polar`**: **`innerRadiusRatio`** (donut hole), **`labelBandRatio`**, **`startAngleDeg`** (default **-90** = top), **`sliceStrokeWidth`**, **`sliceStrokeColor`**, and **`opacity`** (0–1 multiplier applied with each slice’s opacity).
+
+<CodeSwitcher>
+<ts>
+```typescript
+const chart = await painter.createChart(
+  'polarArea',
+  [
+    { label: 'A', value: 40, color: '#4f46e5' },
+    { label: 'B', value: 28, color: '#0ea5e9' },
+    { label: 'C', value: 32, color: '#22c55e' },
+  ],
+  {
+    dimensions: { width: 560, height: 560 },
+    scale: 'area',
+    polar: {
+      innerRadiusRatio: 0.12,
+      opacity: 0.92,
+    },
+    labels: {
+      title: { text: 'Share by segment' },
+      showValues: true,
+    },
+  }
+);
+```
+</ts>
+<js>
+```javascript
+const chart = await painter.createChart(
+  'polarArea',
+  [
+    { label: 'A', value: 40, color: '#4f46e5' },
+    { label: 'B', value: 28, color: '#0ea5e9' },
+    { label: 'C', value: 32, color: '#22c55e' },
+  ],
+  {
+    dimensions: { width: 560, height: 560 },
+    scale: 'area',
+    polar: {
+      innerRadiusRatio: 0.12,
+      opacity: 0.92,
+    },
+    labels: {
+      title: { text: 'Share by segment' },
+      showValues: true,
+    },
+  }
+);
+```
+</js>
+</CodeSwitcher>
+
+## Comparison charts and opacity elsewhere
+
+- **[Comparison charts](./comparison-charts)** panels may use **`scatter`**, **`radar`**, and **`polarArea`** as well as pie, bar, horizontalBar, line, and donut.
+- **Bar / line / pie opacity** (shared **`bars`**, **`lines`**, **`slices`** knobs) is summarized under **[Bar charts — Plot opacity](./bar-charts#plot-opacity)**.

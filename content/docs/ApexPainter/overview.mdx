@@ -41,6 +41,109 @@ const painter = new ApexPainter({ type: 'buffer' });
 </js>
 </CodeSwitcher>
 
+## Output formats (`type`) and `outPut`
+
+Drawing methods (`createCanvas`, `createImage`, `createText`, …) **always pass around a raw PNG `Buffer`** while you compose. The constructor option **`new ApexPainter({ type: '…' })`** only affects what **`await painter.outPut(buffer)`** returns when you want the final bytes in another shape (base64, URL, etc.).
+
+| Constructor `type` | `await painter.outPut(buffer)` returns | Typical use |
+|--------------------|----------------------------------------|-------------|
+| `'buffer'` (default) | `Buffer` | `fs.writeFile`, HTTP/binary responses, Sharp, any API that accepts `Buffer` |
+| `'base64'` | `string` (raw base64, no prefix) | JSON APIs, env vars |
+| `'dataURL'` | `string` (`data:image/png;base64,…`) | `<img src>`, inline HTML/CSS |
+| `'arraybuffer'` | `ArrayBuffer` | Typed arrays, WebAssembly, some APIs |
+| `'blob'` | `Blob` | Browser `fetch` / `FormData` (mainly client-side) |
+| `'url'` | `Promise<string>` | **HTTPS URL** after upload (uses the package’s hosted upload helper; requires network) |
+
+**How to use it**
+
+1. Pick **`type`** when you create `ApexPainter` based on what you need **at the very end** (e.g. `'url'` for a link, `'base64'` for an API).
+2. Keep composing with **`Buffer`** variables (`mine = await painter.createImage(…, mine)`).
+3. Call **`const final = await painter.outPut(mine)`** once when you need the converted form. If **`type` is `'buffer'`**, `outPut` returns the same buffer (still safe to call for a consistent pattern).
+
+If you only need a file on disk or a raw binary, you often **do not** need `outPut`: use the final **`Buffer`** directly (see below).
+
+<Alert type="info" title="Buffers vs. `outPut`">
+Use the **`Buffer`** from your last draw step whenever something expects **bytes** (write a file, pipe to a stream, pass to another image tool). Call **`outPut`** when you need the same image as a **string** (`base64`, `dataURL`) or a **hosted URL** (`type: 'url'`), e.g. for JSON APIs or `<img src>`.
+</Alert>
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+/** Same pipeline: Buffer for disk / binaries; `outPut` matches constructor `type` (here: base64 for APIs). */
+async function exportBadge(title: string) {
+  const painter = new ApexPainter({ type: 'base64' });
+
+  let buf = (
+    await painter.createCanvas({
+      width: 520,
+      height: 160,
+      colorBg: '#0f172a',
+    })
+  ).buffer;
+
+  buf = await painter.createText(
+    {
+      text: title,
+      x: 260,
+      y: 96,
+      fontSize: 32,
+      color: '#e2e8f0',
+      textAlign: 'center',
+      textBaseline: 'middle',
+    },
+    buf,
+  );
+
+  fs.writeFileSync('badge.png', buf);
+  const base64ForJson = await painter.outPut(buf);
+
+  return { savedAs: 'badge.png', base64ForJson };
+}
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require('apexify.js');
+const fs = require('fs');
+
+async function exportBadge(title) {
+  const painter = new ApexPainter({ type: 'base64' });
+
+  let buf = (
+    await painter.createCanvas({
+      width: 520,
+      height: 160,
+      colorBg: '#0f172a',
+    })
+  ).buffer;
+
+  buf = await painter.createText(
+    {
+      text: title,
+      x: 260,
+      y: 96,
+      fontSize: 32,
+      color: '#e2e8f0',
+      textAlign: 'center',
+      textBaseline: 'middle',
+    },
+    buf,
+  );
+
+  fs.writeFileSync('badge.png', buf);
+  const base64ForJson = await painter.outPut(buf);
+
+  return { savedAs: 'badge.png', base64ForJson };
+}
+```
+</js>
+</CodeSwitcher>
+
+**`buf`** is always a **`Buffer`** until you convert it—here it is written as **`badge.png`** and the **same** buffer is passed to **`outPut`**, which returns a **base64 string** because **`type`** was **`'base64'`**. For only a PNG file you could use `new ApexPainter()` (default **`buffer`**) and skip **`outPut`**. For a shareable link, use **`type: 'url'`** and `await painter.outPut(buf)` (network upload).
+
 ## Core Methods
 
 ### Canvas Creation

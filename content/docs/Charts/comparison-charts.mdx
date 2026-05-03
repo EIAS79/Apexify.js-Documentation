@@ -1,10 +1,10 @@
 # Comparison Charts
 
-Apexify.js provides powerful comparison chart functionality that allows you to compare any two chart types side by side or top-to-bottom. Each chart can be of any type (pie, bar, horizontalBar, line, donut) with its own data, configuration, and legend.
+Apexify.js provides powerful comparison chart functionality that allows you to compare any two chart types side by side or top-to-bottom. Each chart can be of any type (pie, bar, horizontalBar, line, donut, **scatter**, **radar**, **polarArea**) with its own data, configuration, and legend.
 
 ## Overview
 
-Comparison charts are created with `ApexPainter.prototype.createComparisonChart(options)` (delegated to `ChartCreator.createComparisonChart`). They produce a single image with two panels laid out side-by-side or top-bottom. Each panel can be pie, bar, horizontalBar, line, or donut, with its own data and options.
+Comparison charts are created with `ApexPainter.prototype.createComparisonChart(options)` (delegated to `ChartCreator.createComparisonChart`). They produce a single image with two panels laid out side-by-side or top-bottom. Each panel can be pie, bar, horizontalBar, line, donut, scatter, radar, or polarArea, with its own data and options.
 
 **Backgrounds:** The composite canvas uses `options.appearance` (`ChartAppearanceExtended`) for the outer frame — same fields as standalone charts (`customBg`, `bgLayers`, `patternBg`, `noiseBg`, etc.). Each panel can also set `chart1.options.appearance` / `chart2.options.appearance`; missing fields inherit from the top-level `appearance` (including axis styling defaults). Chart buffers are **scaled uniformly** into their cells (letterboxed; no non-uniform stretching).
 
@@ -14,7 +14,7 @@ On dark **`appearance`** backgrounds, set **per-chart** axis **`labelColor`** / 
 
 ## Supported Chart Combinations
 
-You can compare any combination of chart types:
+You can compare any combination of chart types, including the **5.3.20** additions (**scatter**, **radar**, **polarArea**):
 - Pie vs Bar
 - Line vs Bar
 - Pie vs Line
@@ -26,6 +26,10 @@ You can compare any combination of chart types:
 - Horizontal Bar vs Horizontal Bar
 - Horizontal Bar vs Line
 - Horizontal Bar vs Pie
+- Scatter vs Line / Bar (same coordinate-style layouts)
+- Radar vs Radar / polarArea vs pie (radial layouts)
+
+See **[Scatter, radar, polar area](./scatter-radar-polar-charts)** for data shapes and options specific to those kinds.
 
 ## Basic Usage
 

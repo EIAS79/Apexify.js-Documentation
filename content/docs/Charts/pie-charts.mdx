@@ -8,6 +8,10 @@ Pie charts are created using `ApexPainter.prototype.createChart()` with `chartTy
 
 **Canvas background:** Use `options.appearance` (`ChartAppearanceExtended`) — the same `paintChartCanvasBackground()` pipeline as other charts and `createCanvas`: base fill, optional `bgLayers`, `patternBg`, and `noiseBg`.
 
+### Slice opacity
+
+From **5.3.20**, use **`slices.opacity`** for a global donut/pie alpha multiplier and **`opacity`** on individual slices where supported (values clamped **0–1**). See also [Plot opacity](./bar-charts#plot-opacity).
+
 ## Basic Usage
 
 Create a simple pie chart:

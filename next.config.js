@@ -12,6 +12,19 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   experimental: {
     serverComponentsExternalPackages: ['apexify.js', '@napi-rs/canvas'],
+    /**
+     * Gallery `/api/gallery/run` spawns `tsx` via path — not a JS import, so the default
+     * server trace omits it from the Vercel function bundle unless listed here.
+     */
+    outputFileTracingIncludes: {
+      // normalizeAppPath strips the leaf `route` segment → route id is `/app/api/gallery/run`
+      '/app/api/gallery/run': [
+        './node_modules/tsx/**/*',
+        './node_modules/esbuild/**/*',
+        './node_modules/get-tsconfig/**/*',
+        './node_modules/apexify.js/**/*',
+      ],
+    },
   },
   webpack: (config, { dev, isServer }) => {
     // Windows dev: HMR + antivirus can delete numbered chunk files while webpack-runtime still references them

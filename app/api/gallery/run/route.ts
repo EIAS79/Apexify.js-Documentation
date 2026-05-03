@@ -1,10 +1,10 @@
 import { randomUUID } from 'crypto';
+import { spawnSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { pathToFileURL } from 'url';
-import { spawnSync } from 'child_process';
 import { NextRequest, NextResponse } from 'next/server';
+import { pathToFileURL } from 'url';
 import {
   assertSnippetAllowed,
   detectImageMime,
@@ -68,6 +68,8 @@ export async function POST(req: NextRequest) {
   }
 
   const projectRoot = process.cwd();
+
+  /** CLI path — package must be shipped via `outputFileTracingIncludes` in next.config (see comment there). */
   const tsxCli = join(projectRoot, 'node_modules', 'tsx', 'dist', 'cli.mjs');
   if (!existsSync(tsxCli)) {
     return NextResponse.json({ ok: false, error: 'tsx CLI missing on server (add dependency `tsx`).' }, { status: 500 });

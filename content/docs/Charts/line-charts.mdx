@@ -8,6 +8,10 @@ Line charts are created using `ApexPainter.prototype.createChart()` with `chartT
 
 **Canvas background:** Use `options.appearance` (`ChartAppearanceExtended`) — same `paintChartCanvasBackground()` pipeline as other charts (`customBg`, `bgLayers`, `patternBg`, `noiseBg`, etc.). See [Bar charts — Chart canvas background](./bar-charts#chart-canvas-background-appearance).
 
+### Line opacity
+
+From **5.3.20**, set **`lines.opacity`** (0–1) for all series, or **`opacity`** on individual **`LineSeries`** entries where supported. This complements combo charts’ layer opacity and the shared [plot opacity](./bar-charts#plot-opacity) notes for bars and slices.
+
 ### Axis tick & title colors
 
 For **dark** canvases, set **`axes.x`** / **`axes.y`** **`color`** (ticks and spine) and **`labelColor`** explicitly — defaults assume a light plot area. Match **`appearance.axisColor`** when you want shared chrome styling. **Legends:** use **`legend.backgroundColor`**, **`textColor`**, **`borderColor`** (and **`position`** corner keys like `top-left`) so the panel is visible on your background.
