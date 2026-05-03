@@ -794,7 +794,7 @@ function GalleryIosCodeWindow({
           )}
           {!runnerEnabled && (
             <span className="text-[11px] text-amber-200/90">
-              Sandbox runner is off (set ENABLE_GALLERY_CODE_RUN in production, or use local dev).
+              Sandbox runner disabled (unset DISABLE_GALLERY_CODE_RUN to enable).
             </span>
           )}
           <span className="flex-1 min-w-[2rem]" />
@@ -1202,7 +1202,7 @@ function GalleryModal({ item, onClose }: { item: GalleryItem; onClose: () => voi
   const [drawMs, setDrawMs] = useState<number | null>(null);
   const [runProgress, setRunProgress] = useState(0);
   const [sandboxRunning, setSandboxRunning] = useState(false);
-  const [runnerEnabled, setRunnerEnabled] = useState(false);
+  const [runnerEnabled, setRunnerEnabled] = useState(true);
   const sandboxProgressRafRef = useRef(0);
 
   useEffect(() => {
@@ -1222,7 +1222,7 @@ function GalleryModal({ item, onClose }: { item: GalleryItem; onClose: () => voi
         if (!cancelled) setRunnerEnabled(Boolean(d.enabled));
       })
       .catch(() => {
-        if (!cancelled) setRunnerEnabled(false);
+        if (!cancelled) setRunnerEnabled(true);
       });
     return () => {
       cancelled = true;

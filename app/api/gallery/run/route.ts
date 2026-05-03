@@ -11,14 +11,24 @@ import {
   wrapSnippetForRunner,
 } from '@/lib/gallery/core/wrapSnippetForRunner';
 
+/**
+ * Side-effect import so Next.js **output file tracing** copies `apexify.js` and most
+ * transitive **JavaScript** dependencies into the serverless bundle. The gallery runner
+ * spawns `tsx` + `apexify` by path; without this, Vercel’s `/var/task` can miss `node_modules`
+ * that aren’t reachable from static analysis. **Native optional packages** (esbuild, canvas,
+ * sharp) are still listed in `next.config.js` → `outputFileTracingIncludes` for `/api/gallery/run`.
+ */
+import 'apexify.js';
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 const MAX_SOURCE_CHARS = 280_000;
 const MAX_OUTPUT_BYTES = 25 * 1024 * 1024;
 
+/** Sandbox on by default (production, preview, CI). Set `DISABLE_GALLERY_CODE_RUN=true` to turn off. */
 function isRunnerEnabled(): boolean {
-  return process.env.ENABLE_GALLERY_CODE_RUN === 'true' || process.env.NODE_ENV === 'development';
+  return process.env.DISABLE_GALLERY_CODE_RUN !== 'true';
 }
 
 export async function GET() {
@@ -31,7 +41,7 @@ export async function POST(req: NextRequest) {
       {
         ok: false,
         error:
-          'Gallery runner is off. For production set ENABLE_GALLERY_CODE_RUN=true. Local dev enables it automatically.',
+          'Gallery runner is disabled (DISABLE_GALLERY_CODE_RUN is set). Remove it to enable sandbox runs.',
       },
       { status: 503 }
     );
@@ -122,12 +132,20 @@ export async function POST(req: NextRequest) {
     }
 
     if (!existsSync(outPath)) {
+      const stderr = result.stderr?.trim() ?? '';
+      const parts = [
+        stderr || null,
+        stderr ? null : 'No image file was written — `main()` must finish and return a PNG or GIF Buffer.',
+        typeof result.status === 'number' ? `exit ${result.status}` : null,
+        result.signal ? `signal ${String(result.signal)}` : null,
+      ].filter(Boolean) as string[];
       return NextResponse.json(
         {
           ok: false,
-          error: result.stderr?.trim() || 'No output produced',
+          error: parts.join(' · ') || 'No output produced',
           elapsedMs,
           exitCode: result.status ?? undefined,
+          stderr: stderr || undefined,
         },
         { status: 422 }
       );

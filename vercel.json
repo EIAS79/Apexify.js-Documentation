@@ -1,8 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "bash scripts/vercel-use-node20.sh npm install",
-  "buildCommand": "bash scripts/vercel-use-node20.sh npm run build",
-  "env": {
-    "ENABLE_GALLERY_CODE_RUN": "true"
-  }
+  "buildCommand": "bash scripts/vercel-use-node20.sh npm run build"
 }

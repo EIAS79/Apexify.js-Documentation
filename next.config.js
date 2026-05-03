@@ -6,6 +6,34 @@ const withMDX = require('@next/mdx')({
   },
 })
 
+/**
+ * Native / sibling optional deps are never pulled in by static analysis alone.
+ * Covers Vercel Linux **glibc + musl**, **x64 + arm64** (match lockfile package names).
+ */
+const galleryRunNativeIncludes = [
+  './node_modules/tsx/**/*',
+  './node_modules/esbuild/**/*',
+  './node_modules/@esbuild/linux-x64/**/*',
+  './node_modules/@esbuild/linux-arm64/**/*',
+  './node_modules/get-tsconfig/**/*',
+  './node_modules/resolve-pkg-maps/**/*',
+  './node_modules/apexify.js/**/*',
+  './node_modules/@napi-rs/canvas/**/*',
+  './node_modules/@napi-rs/canvas-linux-x64-gnu/**/*',
+  './node_modules/@napi-rs/canvas-linux-arm64-gnu/**/*',
+  './node_modules/@napi-rs/canvas-linux-x64-musl/**/*',
+  './node_modules/@napi-rs/canvas-linux-arm64-musl/**/*',
+  './node_modules/sharp/**/*',
+  './node_modules/@img/sharp-linux-x64/**/*',
+  './node_modules/@img/sharp-linux-arm64/**/*',
+  './node_modules/@img/sharp-linuxmusl-x64/**/*',
+  './node_modules/@img/sharp-linuxmusl-arm64/**/*',
+  './node_modules/@img/sharp-libvips-linux-x64/**/*',
+  './node_modules/@img/sharp-libvips-linux-arm64/**/*',
+  './node_modules/@img/sharp-libvips-linuxmusl-x64/**/*',
+  './node_modules/@img/sharp-libvips-linuxmusl-arm64/**/*',
+]
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -13,21 +41,11 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['apexify.js', '@napi-rs/canvas'],
     /**
-     * Gallery `/api/gallery/run` spawns `tsx` via path — not a JS import, so the default
-     * server trace omits it from the Vercel function bundle unless listed here.
+     * Gallery `/api/gallery/run` spawns `tsx` + loads apexify by path. Include toolchain +
+     * native optional deps (see `galleryRunNativeIncludes`). Pure-JS deps follow `import 'apexify.js'` in the route.
      */
     outputFileTracingIncludes: {
-      // normalizeAppPath strips the leaf `route` segment → route id is `/app/api/gallery/run`
-      '/app/api/gallery/run': [
-        './node_modules/tsx/**/*',
-        './node_modules/esbuild/**/*',
-        /** Native binary; optional dep — not under `esbuild/` so tracing misses it otherwise (Vercel = linux-x64). */
-        './node_modules/@esbuild/linux-x64/**/*',
-        './node_modules/get-tsconfig/**/*',
-        /** Peer of get-tsconfig; required at runtime by its CJS bundle — must be traced separately */
-        './node_modules/resolve-pkg-maps/**/*',
-        './node_modules/apexify.js/**/*',
-      ],
+      '/app/api/gallery/run': galleryRunNativeIncludes,
     },
   },
   webpack: (config, { dev, isServer }) => {

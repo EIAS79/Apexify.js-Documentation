@@ -20,6 +20,24 @@ export function detectImageMime(buf: Buffer): string {
 }
 
 /**
+ * Gallery snippets often include `import fs from 'fs'`, `import path from 'path'`, etc.
+ * Those must stay at **module top level**. Previously they were injected inside the async IIFE,
+ * which is invalid ESM and breaks esbuild/tsx (`Unexpected "fs"`).
+ */
+function hoistLeadingImports(src: string): { hoisted: string; rest: string } {
+  let rest = src.trimStart();
+  const blocks: string[] = [];
+  const oneImport = /^import\s[\s\S]*?;\s*/;
+  while (rest.length > 0) {
+    const m = rest.match(oneImport);
+    if (!m) break;
+    blocks.push(m[0].trim());
+    rest = rest.slice(m[0].length).trimStart();
+  }
+  return { hoisted: blocks.join('\n'), rest };
+}
+
+/**
  * Apexify gallery snippets: `import { ApexPainter } from 'apexify.js'`, `async function main()` returning Buffer.
  * Strips trailing `return await main();` and writes PNG/GIF to `process.env.GALLERY_OUT`.
  */
@@ -30,14 +48,17 @@ export function wrapSnippetForRunner(
   let body = code.replace(/^import\s*\{\s*ApexPainter\s*\}\s*from\s*['"]apexify\.js['"]\s*;?\s*\r?\n/m, '').trim();
   body = body.replace(/\s*return\s+await\s+main\s*\(\)\s*;?\s*$/m, '').trim();
 
-  // No top-level await: tsx/esbuild target CJS cannot transform it. Run inside an async IIFE instead.
-  return `import fs from 'fs';
+  const { hoisted, rest: inner } = hoistLeadingImports(body);
+  const hoistedBlock = hoisted ? `${hoisted}\n\n` : '';
 
-void (async () => {
+  // Named import avoids clashing with user `import fs from 'fs'`. No top-level await: run inside an async IIFE.
+  return `import { writeFileSync as __galleryWrite } from 'fs';
+
+${hoistedBlock}void (async () => {
   const __apexMod = await import(${JSON.stringify(apexifyImportHref)});
   const ApexPainter = __apexMod.ApexPainter ?? __apexMod.default?.ApexPainter ?? __apexMod.default;
 
-${body}
+${inner}
 
   async function __run(): Promise<Buffer> {
     const buf = await main();
@@ -48,11 +69,11 @@ ${body}
   }
 
   const __out = await __run();
-  fs.writeFileSync(process.env.GALLERY_OUT!, __out);
+  __galleryWrite(process.env.GALLERY_OUT!, __out);
 })().catch((err: unknown) => {
   const msg = err instanceof Error ? err.stack || err.message : String(err);
   try {
-    if (process.env.GALLERY_ERR) fs.writeFileSync(process.env.GALLERY_ERR, msg);
+    if (process.env.GALLERY_ERR) __galleryWrite(process.env.GALLERY_ERR, msg);
   } catch {
     /* ignore */
   }
