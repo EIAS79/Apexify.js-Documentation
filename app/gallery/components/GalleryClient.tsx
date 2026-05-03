@@ -316,8 +316,21 @@ export default function GalleryClient() {
   );
 
   const sortedGridItems = useMemo(() => {
-    return [...filteredItems].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
-  }, [filteredItems]);
+    const cat = selectedCategory;
+    return [...filteredItems].sort((a, b) => {
+      const featuredDelta = Number(!!b.featured) - Number(!!a.featured);
+      if (featuredDelta !== 0) return featuredDelta;
+
+      if (cat !== 'all') {
+        const primaryBoost = (item: GalleryItem) =>
+          Number(primaryBadgeCategory(item) === cat);
+        const primaryDelta = primaryBoost(b) - primaryBoost(a);
+        if (primaryDelta !== 0) return primaryDelta;
+      }
+
+      return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
+    });
+  }, [filteredItems, selectedCategory]);
 
   const spotlightItem = useMemo(() => sortedGridItems.find((i) => i.featured) ?? null, [sortedGridItems]);
 
@@ -527,7 +540,7 @@ export default function GalleryClient() {
                 );
               })}
             </div>
-            <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-center sm:justify-end w-full">
+            <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-center w-full">
               {FILTER_ORDER_SECONDARY.map((key) => {
                 const config = categoryConfig[key];
                 const IconComponent = config.icon;

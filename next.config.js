@@ -17,6 +17,7 @@ const galleryRunNativeIncludes = [
   './node_modules/@esbuild/linux-arm64/**/*',
   './node_modules/get-tsconfig/**/*',
   './node_modules/resolve-pkg-maps/**/*',
+  './node_modules/dejavu-fonts-ttf/**/*',
   './node_modules/apexify.js/**/*',
   './node_modules/@napi-rs/canvas/**/*',
   './node_modules/@napi-rs/canvas-linux-x64-gnu/**/*',

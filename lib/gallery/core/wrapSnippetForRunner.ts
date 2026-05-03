@@ -52,9 +52,39 @@ export function wrapSnippetForRunner(
   const hoistedBlock = hoisted ? `${hoisted}\n\n` : '';
 
   // Named import avoids clashing with user `import fs from 'fs'`. No top-level await: run inside an async IIFE.
+  // Register DejaVu under common sans-serif names so charts/text render on Linux serverless (no Arial/Segoe).
   return `import { writeFileSync as __galleryWrite } from 'fs';
+import * as __galleryPath from 'node:path';
+import { GlobalFonts as __galleryGlobalFonts } from '@napi-rs/canvas';
 
-${hoistedBlock}void (async () => {
+${hoistedBlock}function __galleryRegisterFonts(): void {
+  try {
+    const ttf = __galleryPath.join(process.cwd(), 'node_modules', 'dejavu-fonts-ttf', 'ttf', 'DejaVuSans.ttf');
+    const families = [
+      'DejaVu Sans',
+      'Arial',
+      'Helvetica',
+      'sans-serif',
+      'Segoe UI',
+      'system-ui',
+      'ui-sans-serif',
+      'Verdana',
+      'Tahoma',
+    ];
+    for (const family of families) {
+      try {
+        __galleryGlobalFonts.registerFromPath(ttf, family);
+      } catch {
+        /* ignore duplicate / platform quirks */
+      }
+    }
+  } catch {
+    /* package missing — dev without optional deps */
+  }
+}
+
+void (async () => {
+  __galleryRegisterFonts();
   const __apexMod = await import(${JSON.stringify(apexifyImportHref)});
   const ApexPainter = __apexMod.ApexPainter ?? __apexMod.default?.ApexPainter ?? __apexMod.default;
 
