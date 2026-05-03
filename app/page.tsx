@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
 import { 
   ArrowRightIcon, 
@@ -31,6 +32,16 @@ import {
   UserIcon
 } from '@heroicons/react/24/outline';
 import Navbar from '@/components/Navbar';
+import {
+  MotionSection,
+  MotionFooter,
+  HoverGlowTitle,
+  TypewriterCycle,
+  heroContainer,
+  heroItem,
+  heroStatsGrid,
+  staggerCard,
+} from '@/components/home/HomeMotion';
 
 // Particle Component
 function Particle({ x, y, size, delay, duration }: { x: number; y: number; size: number; delay: number; duration: number }) {
@@ -52,11 +63,72 @@ function Particle({ x, y, size, delay, duration }: { x: number; y: number; size:
 
 // Floating Orb Component - Removed to improve performance
 
+/** Themed ambient layers so sections aren’t “flat black only” */
+function SectionAtmosphere({ variant }: { variant: 'emerald' | 'violet' | 'amber' | 'slate' | 'rose' | 'aurora' }) {
+  switch (variant) {
+    case 'emerald':
+      return (
+        <>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-emerald-950/[0.28] via-transparent to-transparent" aria-hidden />
+          <div className="pointer-events-none absolute -top-48 left-[12%] h-[min(56vw,440px)] w-[min(56vw,440px)] rounded-full bg-emerald-500/[0.14] blur-[100px]" aria-hidden />
+          <div className="pointer-events-none absolute bottom-0 right-[8%] h-80 w-80 rounded-full bg-teal-400/[0.1] blur-[88px]" aria-hidden />
+        </>
+      );
+    case 'violet':
+      return (
+        <>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-violet-950/[0.22] via-fuchsia-950/[0.06] to-transparent" aria-hidden />
+          <div className="pointer-events-none absolute top-1/4 -right-24 h-[420px] w-[420px] rounded-full bg-violet-600/[0.12] blur-[110px]" aria-hidden />
+          <div className="pointer-events-none absolute bottom-8 left-[20%] h-64 w-64 rounded-full bg-indigo-500/[0.09] blur-[72px]" aria-hidden />
+        </>
+      );
+    case 'amber':
+      return (
+        <>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-amber-950/[0.18] via-transparent to-orange-950/[0.12]" aria-hidden />
+          <div className="pointer-events-none absolute -top-32 right-1/4 h-96 w-96 rounded-full bg-amber-500/[0.1] blur-[96px]" aria-hidden />
+          <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-[min(90vw,520px)] rounded-full bg-orange-600/[0.08] blur-[80px]" aria-hidden />
+        </>
+      );
+    case 'slate':
+      return (
+        <>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-slate-900/[0.45] via-[#030712]/80 to-transparent" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 opacity-[0.07] bg-[linear-gradient(rgba(148,163,184,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.15)_1px,transparent_1px)] bg-[size:48px_48px]" aria-hidden />
+          <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[min(120vw,680px)] w-[min(120vw,680px)] rounded-full bg-cyan-500/[0.06] blur-[120px]" aria-hidden />
+        </>
+      );
+    case 'rose':
+      return (
+        <>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-rose-950/[0.2] via-transparent to-emerald-950/[0.15]" aria-hidden />
+          <div className="pointer-events-none absolute -top-24 right-[18%] h-80 w-80 rounded-full bg-rose-500/[0.11] blur-[88px]" aria-hidden />
+          <div className="pointer-events-none absolute bottom-12 left-[10%] h-72 w-72 rounded-full bg-emerald-500/[0.09] blur-[76px]" aria-hidden />
+        </>
+      );
+    case 'aurora':
+      return (
+        <>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-950/[0.35] via-violet-950/[0.2] to-fuchsia-950/[0.25]" aria-hidden />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" aria-hidden />
+          <div className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[min(95vw,900px)] -translate-x-1/2 rounded-full bg-gradient-to-r from-sky-500/[0.15] via-violet-500/[0.12] to-fuchsia-500/[0.14] blur-[90px]" aria-hidden />
+        </>
+      );
+    default:
+      return null;
+  }
+}
+
+const HERO_TYPEWRITER_PHRASES = [
+  'Charts • GIFs • Video • 22+ filters',
+  'Rust-fast rendering on Node',
+  'Ship visuals in TypeScript',
+  'One library — canvas to MP4',
+] as const;
+
 export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isVisible, setIsVisible] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [particles, setParticles] = useState<Array<{ x: number; y: number; size: number; delay: number; duration: number }>>([]);
   const [emailCopied, setEmailCopied] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -75,8 +147,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    setIsVisible(true);
-    
     let rafId: number;
     const handleMouseMove = (e: MouseEvent) => {
       if (rafId) cancelAnimationFrame(rafId);
@@ -100,33 +170,11 @@ export default function Home() {
       setShowScrollTop(window.scrollY > 400);
     };
 
-    const observerOptions = {
-      threshold: 0.15,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setVisibleSections((prev) => new Set(prev).add(entry.target.id));
-        }
-      });
-    }, observerOptions);
-
-    const timer = setTimeout(() => {
-      const sections = document.querySelectorAll('[data-section]');
-      sections.forEach((section) => {
-        observer.observe(section);
-      });
-    }, 100);
-
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); 
+    handleScroll();
 
     return () => {
-      clearTimeout(timer);
       window.removeEventListener('scroll', handleScroll);
-      observer.disconnect();
     };
   }, []);
 
@@ -232,7 +280,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden relative">
+    <div className="home-root-bg min-h-screen text-white overflow-hidden relative">
       {/* Animated Starfield Background */}
       <div className="fixed inset-0 -z-10 overflow-hidden">
         {/* Simplified base gradient - Reduced layers for performance */}
@@ -247,57 +295,56 @@ export default function Home() {
           }}
         />
         
-        {/* Static grid - No animation for better performance */}
-        <div 
-          className="absolute inset-0 opacity-20"
+        {/* Subtle drifting grid */}
+        <div
+          className="absolute inset-0 opacity-[0.22] home-grid-animated pointer-events-none"
           style={{
             backgroundImage: `
-              linear-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px)
+              linear-gradient(rgba(59, 130, 246, 0.09) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(59, 130, 246, 0.09) 1px, transparent 1px)
             `,
             backgroundSize: '80px 80px',
           }}
         />
 
-        {/* Minimal static orbs - Reduced for performance */}
+        {/* Slow-moving color pools — depth without heavy JS */}
         <div
-          className="absolute rounded-full opacity-8 pointer-events-none"
+          className="absolute pointer-events-none home-mesh-a"
           style={{
-            left: '20%',
-            top: '20%',
-            width: '300px',
-            height: '300px',
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent)',
-            transform: 'translate(-50%, -50%)',
-            filter: 'blur(30px)',
+            left: '8%',
+            top: '12%',
+            width: 'min(72vw, 520px)',
+            height: 'min(72vw, 520px)',
+            background: 'radial-gradient(circle at 30% 30%, rgba(56, 189, 248, 0.35), rgba(139, 92, 246, 0.12) 45%, transparent 70%)',
+            filter: 'blur(42px)',
           }}
         />
         <div
-          className="absolute rounded-full opacity-8 pointer-events-none"
+          className="absolute pointer-events-none home-mesh-b home-mesh-delay"
           style={{
-            left: '80%',
-            top: '60%',
-            width: '300px',
-            height: '300px',
-            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.2), transparent)',
-            transform: 'translate(-50%, -50%)',
-            filter: 'blur(30px)',
+            right: '5%',
+            bottom: '18%',
+            width: 'min(65vw, 480px)',
+            height: 'min(65vw, 480px)',
+            background: 'radial-gradient(circle at 70% 60%, rgba(192, 132, 252, 0.28), rgba(236, 72, 153, 0.1) 50%, transparent 68%)',
+            filter: 'blur(44px)',
           }}
         />
-        
-        {/* Minimal mouse-following effect - Very light for performance */}
+
+        {/* Cursor-adjacent bloom */}
         <div
-          className="absolute rounded-full opacity-10 pointer-events-none"
+          className="absolute rounded-full opacity-[0.14] pointer-events-none mix-blend-screen"
           style={{
             left: `${mousePosition.x}%`,
             top: `${mousePosition.y}%`,
-            width: '250px',
-            height: '250px',
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent)',
+            width: '280px',
+            height: '280px',
+            background:
+              'radial-gradient(circle, rgba(125, 211, 252, 0.35) 0%, rgba(59, 130, 246, 0.12) 42%, transparent 68%)',
             transform: 'translate3d(-50%, -50%, 0)',
-            filter: 'blur(20px)',
+            filter: 'blur(22px)',
             willChange: 'left, top',
-            transition: 'left 0.3s cubic-bezier(0.4, 0, 0.2, 1), top 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: 'left 0.35s cubic-bezier(0.4, 0, 0.2, 1), top 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         />
 
@@ -309,35 +356,43 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="fixed inset-0 z-[1] pointer-events-none home-texture-noise opacity-[0.035]" aria-hidden />
+
       <Navbar />
 
       {/* Hero Section - Completely Redesigned */}
       <section 
         ref={heroRef}
-        className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 lg:pt-36"
+        className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 lg:pt-36 pb-16 sm:pb-20 lg:pb-28"
       >
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#030712] via-[#030712]/90 to-transparent z-[5]" aria-hidden />
         {/* Hero Content Container */}
-        <div className="max-w-7xl mx-auto text-center relative z-10">
+        <motion.div
+          className="max-w-7xl mx-auto text-center relative z-10"
+          variants={heroContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {/* Animated badge with glow */}
-          <div 
-            className={`inline-flex items-center gap-3 px-6 py-3 rounded-full glass border border-blue-500/50 mb-8 backdrop-blur-md transition-all duration-700 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
+          <motion.div
+            variants={heroItem}
+            className="group/badge inline-flex items-center gap-3 px-6 py-3 rounded-full glass border border-blue-400/45 mb-8 backdrop-blur-md transition-all duration-700 hover:border-cyan-400/50 hover:shadow-[0_0_48px_-8px_rgba(56,189,248,0.55)] hover:scale-[1.02] cursor-default"
             style={{
-              boxShadow: '0 0 30px rgba(59, 130, 246, 0.4)',
+              boxShadow: '0 0 28px rgba(59, 130, 246, 0.35)',
             }}
           >
             <StarIcon className="h-5 w-5 text-yellow-400 animate-pulse" />
-            <span className="text-sm text-blue-300 font-semibold">v5.3.12 — Blend modes, charts, GIF & frame-to-video</span>
+            <span className="text-sm text-blue-300 font-semibold">v5.3.18 — Blend modes, charts, GIF & frame-to-video</span>
             <SparklesIcon className="h-4 w-4 text-cyan-400 animate-pulse" />
-          </div>
+          </motion.div>
 
           {/* Main heading with advanced glow and animation */}
-          <h1 
-            className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[12rem] font-black mb-6 sm:mb-8 transition-all duration-1000 delay-200 leading-none ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+          <motion.h1
+            variants={heroItem}
+            className="relative text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[12rem] font-black mb-6 sm:mb-8 leading-none"
           >
+            <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(92vw,880px)] h-[min(42vw,320px)] rounded-[2.5rem] border border-white/[0.07] hero-ring-pulse md:h-[min(38vw,380px)]" aria-hidden />
+            <span className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(96vw,940px)] h-[min(48vw,360px)] rounded-[3rem] border border-violet-500/10 hero-ring-pulse home-mesh-delay opacity-60 md:h-[min(42vw,400px)]" aria-hidden />
             <span 
               className="relative inline-block"
               style={{
@@ -366,40 +421,44 @@ export default function Home() {
               Apexify.js
               </span>
             </span>
-          </h1>
+          </motion.h1>
 
           {/* Subtitle with text glow */}
-          <p 
-            className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6 transition-all duration-1000 delay-300 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+          <motion.p
+            variants={heroItem}
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-4 sm:mb-6"
             style={{
               textShadow: '0 0 20px rgba(255, 255, 255, 0.3)',
             }}
           >
-            <span className="bg-gradient-to-r from-gray-200 via-white to-gray-200 bg-clip-text text-transparent">
-            The Ultimate Canvas Library
-            </span>
-          </p>
+            <HoverGlowTitle className="bg-gradient-to-r from-gray-200 via-white to-gray-200 bg-clip-text text-transparent">
+              The Ultimate Canvas Library
+            </HoverGlowTitle>
+          </motion.p>
 
-          <p 
-            className={`text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-12 sm:mb-16 max-w-4xl mx-auto leading-relaxed px-2 transition-all duration-1000 delay-400 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+          <motion.p
+            variants={heroItem}
+            className="flex flex-wrap justify-center gap-x-2 gap-y-1 text-base sm:text-lg md:text-xl font-semibold text-cyan-300/95 mb-6 min-h-[2.25rem] mx-auto max-w-3xl px-2"
+          >
+            <TypewriterCycle phrases={HERO_TYPEWRITER_PHRASES} />
+          </motion.p>
+
+          <motion.p
+            variants={heroItem}
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-300 mb-12 sm:mb-16 max-w-4xl mx-auto leading-relaxed px-2"
           >
             Create stunning visuals with professional-grade canvas rendering, image processing, 
             and text effects. Built with <span className="text-blue-400 font-semibold">TypeScript</span> & <span className="text-orange-400 font-semibold">Rust</span> for blazing-fast performance.
-          </p>
+          </motion.p>
 
           {/* Enhanced CTA Buttons */}
-          <div 
-            className={`flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-12 sm:mb-20 transition-all duration-1000 delay-500 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+          <motion.div
+            variants={heroItem}
+            className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-12 sm:mb-20"
           >
             <Link
               href="/docs#Getting-Started"
-              className="group relative inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl text-white overflow-hidden hover-lift w-full sm:w-auto"
+              className="group/herocta relative inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl text-white overflow-hidden hover-lift w-full sm:w-auto transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
               style={{
                 background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899)',
                 backgroundSize: '200% 200%',
@@ -407,7 +466,7 @@ export default function Home() {
                 boxShadow: '0 0 30px rgba(59, 130, 246, 0.5), 0 0 60px rgba(139, 92, 246, 0.3)',
               }}
             >
-              <span className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+              <span className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-16deg] bg-gradient-to-r from-transparent via-white/35 to-transparent opacity-0 transition-all duration-700 group-hover/herocta:translate-x-full group-hover/herocta:opacity-100" aria-hidden />
               <RocketLaunchIcon className="relative z-10 mr-3 h-6 w-6 group-hover:translate-x-1 transition-transform duration-150" style={{ willChange: 'transform' }} />
               <span className="relative z-10">Get Started</span>
               <ArrowRightIcon className="relative z-10 ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform duration-150" style={{ willChange: 'transform' }} />
@@ -417,28 +476,28 @@ export default function Home() {
               href="https://www.npmjs.com/package/apexify.js"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl text-white glass border-2 border-gray-600/50 hover:border-gray-400/60 backdrop-blur-md hover-lift transition-colors duration-150 w-full sm:w-auto"
+              className="group inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl text-white glass border-2 border-gray-600/45 hover:border-cyan-400/35 hover:shadow-[0_0_28px_-6px_rgba(34,211,238,0.25)] backdrop-blur-md hover-lift transition-all duration-300 w-full sm:w-auto hover:bg-white/[0.04]"
               style={{
-                boxShadow: '0 0 20px rgba(255, 255, 255, 0.1)',
+                boxShadow: '0 0 20px rgba(255, 255, 255, 0.08)',
               }}
             >
               <CpuChipIcon className="mr-3 h-6 w-6 group-hover:rotate-6 transition-transform duration-150" style={{ willChange: 'transform' }} />
               View on npm
             </a>
-          </div>
+          </motion.div>
 
           {/* Enhanced Stats with Icons */}
-          <div 
-            className={`grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto transition-all duration-1000 delay-600 ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-            }`}
+          <motion.div
+            variants={heroStatsGrid}
+            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto"
           >
             {stats.map((stat, index) => {
               const IconComponent = stat.icon;
               return (
-              <div 
+              <motion.div
                 key={index}
-                  className="group relative glass border border-gray-700/50 rounded-2xl p-8 hover:border-blue-500/40 transition-colors duration-150 hover-lift overflow-hidden"
+                variants={heroItem}
+                  className="group relative glass border border-gray-700/45 rounded-2xl p-8 hover:border-cyan-500/35 transition-all duration-300 hover-lift overflow-hidden hover:shadow-[0_0_32px_-10px_rgba(56,189,248,0.22)]"
                   style={{
                     boxShadow: '0 0 20px rgba(0, 0, 0, 0.3)',
                   }}
@@ -460,50 +519,45 @@ export default function Home() {
                 </div>
                     <div className="text-sm text-gray-400 font-medium">{stat.label}</div>
               </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div 
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-50"
-          style={{ animationDuration: '2s' }}
-        >
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/50 rounded-full mt-2" />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Installation Stats Section - Enhanced */}
-      <section 
+      <MotionSection
         id="stats-section"
-        data-section
-        className={`relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 transition-all duration-700 ${
-          visibleSections.has('stats-section') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-10'
-        }`}
+        className="relative overflow-hidden py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8"
       >
-        <div className="max-w-6xl mx-auto">
-          <div className="relative glass-strong border border-gray-700/50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 overflow-hidden hover-lift">
+        <SectionAtmosphere variant="emerald" />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <div className="relative glass-strong border border-gray-700/50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 overflow-hidden hover-lift ring-1 ring-white/[0.06] shadow-[0_0_80px_-24px_rgba(16,185,129,0.25)]">
             {/* Static background glows - Reduced blur */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-green-500/10 rounded-full blur-2xl -z-10 opacity-50" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-2xl -z-10 opacity-50" />
             
             <div className="relative z-10">
-              <div className="text-center mb-12">
+              <motion.div
+                className="mb-12 max-w-3xl mx-auto text-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.28em] text-emerald-400/85 mb-4">
+                  Adoption
+                </p>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-                  <span className="bg-gradient-to-r from-green-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent text-glow-blue">
-                  Trusted by Developers Worldwide
-                  </span>
+                  <HoverGlowTitle className="bg-gradient-to-r from-green-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent text-glow-blue">
+                    Trusted by Developers Worldwide
+                  </HoverGlowTitle>
                 </h2>
-                <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                <p className="text-xl text-gray-300">
                   Join thousands of developers who rely on Apexify.js for their projects
                 </p>
-              </div>
+              </motion.div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
                 {[
@@ -511,60 +565,87 @@ export default function Home() {
                   { value: '2+', label: 'Years Active', sublabel: 'Consistently maintained', gradient: 'from-blue-400 to-cyan-400', border: 'border-blue-500/50' },
                   { value: '100%', label: 'Uptime', sublabel: 'Always available', gradient: 'from-purple-400 to-pink-400', border: 'border-purple-500/50' },
                 ].map((stat, index) => (
-                  <div 
+                  <motion.div
                     key={index}
+                    custom={index}
+                    variants={staggerCard}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.2 }}
                     className={`text-center p-8 glass border ${stat.border} rounded-2xl transition-colors duration-150 hover-lift`}
                     style={{
                       boxShadow: '0 0 20px rgba(0, 0, 0, 0.2)',
                     }}
+                    whileHover={{ y: -4 }}
                   >
                     <div className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-3`}>
                       {stat.value}
                   </div>
                     <div className="text-gray-300 mb-2 font-semibold text-base sm:text-lg">{stat.label}</div>
                     <div className="text-xs sm:text-sm text-gray-500">{stat.sublabel}</div>
-                </div>
+                </motion.div>
                 ))}
                   </div>
                 </div>
           </div>
         </div>
-      </section>
+      </MotionSection>
 
       {/* Features Section - Premium Design */}
-      <section 
+      <MotionSection
         id="features-section"
-        data-section
-        className={`relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 transition-all duration-700 ${
-          visibleSections.has('features-section') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-10'
-        }`}
+        className="relative overflow-hidden py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8"
       >
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Powerful Features
-              </span>
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Everything you need to create professional graphics and visual content
-            </p>
+        <SectionAtmosphere variant="violet" />
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <div className="mb-20 flex flex-col gap-8 md:flex-row md:items-end md:justify-between md:gap-12">
+            <motion.div
+              className="max-w-2xl text-center md:text-left"
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '0px 0px -12% 0px' }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.28em] text-violet-400/85 mb-4">
+                Toolkit
+              </p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
+                <HoverGlowTitle className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Powerful Features
+                </HoverGlowTitle>
+              </h2>
+              <p className="text-xl text-gray-300 md:max-w-xl">
+                Everything you need to create professional graphics and visual content
+              </p>
+            </motion.div>
+            <motion.div
+              className="hidden md:block h-px flex-1 max-w-md bg-gradient-to-r from-violet-500/40 via-fuchsia-500/25 to-transparent rounded-full self-center"
+              initial={{ scaleX: 0, opacity: 0 }}
+              whileInView={{ scaleX: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              style={{ originX: 0 }}
+            />
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {features.map((feature, index) => {
               const IconComponent = feature.icon;
               return (
-              <div
+              <motion.div
                 key={feature.name}
-                  className="group relative glass-strong border border-gray-700/50 rounded-3xl p-8 hover:border-blue-500/30 transition-colors duration-150 hover-lift overflow-hidden"
+                custom={index}
+                variants={staggerCard}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.15 }}
+                  className="group relative glass-strong border border-gray-700/50 rounded-3xl p-8 hover:border-blue-500/30 transition-colors duration-150 hover-lift overflow-hidden ring-1 ring-white/[0.05]"
                 style={{
-                  animationDelay: `${index * 100}ms`,
                     boxShadow: '0 0 30px rgba(0, 0, 0, 0.2)',
                 }}
+                whileHover={{ y: -6, transition: { type: 'spring', stiffness: 400, damping: 22 } }}
               >
+                  <div className={`pointer-events-none absolute inset-x-0 top-0 h-[3px] rounded-t-3xl bg-gradient-to-r ${feature.gradient} opacity-95`} aria-hidden />
                   {/* Light gradient glow on hover - No blur for performance */}
                   <div 
                     className={`absolute inset-0 rounded-3xl bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-150 -z-10`}
@@ -586,76 +667,100 @@ export default function Home() {
                   </h3>
                     <p className="text-sm sm:text-base text-gray-300 leading-relaxed">{feature.description}</p>
                 </div>
-              </div>
+              </motion.div>
               );
             })}
           </div>
         </div>
-      </section>
+      </MotionSection>
 
       {/* Capabilities Section - Enhanced */}
-      <section 
+      <MotionSection
         id="capabilities-section"
-        data-section
-        className={`relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 transition-all duration-700 ${
-          visibleSections.has('capabilities-section') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-10'
-        }`}
+        className="relative overflow-hidden py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8"
       >
-        <div className="max-w-7xl mx-auto">
-          <div className="relative glass-strong border border-gray-700/50 rounded-3xl p-8 md:p-12 overflow-hidden">
+        <SectionAtmosphere variant="amber" />
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <div className="relative glass-strong border border-gray-700/50 rounded-3xl px-8 pt-8 pb-12 md:px-12 md:pt-12 md:pb-14 overflow-hidden ring-1 ring-amber-500/10 shadow-[0_0_70px_-28px_rgba(245,158,11,0.35)]">
             {/* Static background glows - Reduced blur */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-2xl -z-10 opacity-50" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-2xl -z-10 opacity-50" />
             
             <div className="relative z-10">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-center mb-8 sm:mb-12">
-                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                What You Can Build
-                </span>
-              </h2>
+              <motion.div
+                className="mb-8 sm:mb-12 max-w-4xl mx-auto text-center"
+                initial={{ opacity: 0, y: 22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '0px 0px -12% 0px' }}
+                transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.28em] text-amber-400/85 mb-4">
+                  Possibilities
+                </p>
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black">
+                  <HoverGlowTitle className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    What You Can Build
+                  </HoverGlowTitle>
+                </h2>
+              </motion.div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {capabilities.map((capability, index) => (
-                  <div 
-                    key={index} 
+                  <motion.div
+                    key={index}
+                    custom={index}
+                    variants={staggerCard}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, amount: 0.12 }}
                     className="group flex items-start gap-4 p-5 glass border border-gray-700/30 hover:border-blue-500/40 rounded-xl transition-colors duration-150 hover-lift"
+                    whileHover={{ scale: 1.02, borderColor: 'rgba(96, 165, 250, 0.35)' }}
                   >
                     <span className="text-3xl flex-shrink-0 group-hover:scale-110 transition-transform duration-150" style={{ willChange: 'transform' }}>
                       {capability.icon}
                     </span>
                     <p className="text-gray-300 group-hover:text-white transition-colors duration-150 font-medium">{capability.text}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </MotionSection>
 
       {/* Why Choose Section - Keep existing design but enhance */}
-      <section 
+      <MotionSection
         id="comparison-section"
-        data-section
-        className={`relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 transition-all duration-700 ${
-          visibleSections.has('comparison-section') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-10'
-        }`}
+        className="relative overflow-hidden py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8"
       >
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+        <SectionAtmosphere variant="slate" />
+        <div className="relative z-10 max-w-7xl mx-auto">
+          <motion.div
+            className="mb-16 max-w-3xl mx-auto text-center"
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.28em] text-slate-400 mb-4">
+              Comparison
+            </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Why Choose Apexify.js?
-              </span>
+              <HoverGlowTitle className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Why Choose Apexify.js?
+              </HoverGlowTitle>
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300">
               See how we compare to other canvas and image processing libraries
             </p>
-          </div>
+          </motion.div>
 
-          <div className="relative glass-strong border border-gray-700/50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 overflow-hidden hover-lift">
+          <motion.div
+            className="relative glass-strong border border-gray-700/50 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 overflow-hidden hover-lift backdrop-blur-xl ring-1 ring-cyan-500/15 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_0_80px_-30px_rgba(56,189,248,0.2)]"
+            initial={{ opacity: 0, scale: 0.97 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+          >
             {/* Static background glows - Reduced blur */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-2xl -z-10 opacity-50" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-2xl -z-10 opacity-50" />
@@ -742,31 +847,36 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </MotionSection>
 
       {/* Owner Support Section - Enhanced */}
-      <section 
+      <MotionSection
         id="support-section"
-        data-section
-        className={`relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 transition-all duration-700 ${
-          visibleSections.has('support-section') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-10'
-        }`}
+        className="relative overflow-hidden py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8"
       >
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+        <SectionAtmosphere variant="rose" />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <motion.div
+            className="mb-16 max-w-3xl md:mr-auto md:text-left text-center"
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.28em] text-rose-400/80 mb-4">
+              Commitment
+            </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
-              <span className="bg-gradient-to-r from-green-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-              Always Supported, Never Abandoned
-              </span>
+              <HoverGlowTitle className="bg-gradient-to-r from-green-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                Always Supported, Never Abandoned
+              </HoverGlowTitle>
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300">
               Unlike many npm packages that get deprecated or left unmaintained, Apexify.js is actively developed and supported
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {[
@@ -809,59 +919,76 @@ export default function Home() {
             ].map((item, idx) => {
               const IconComponent = item.icon;
               return (
-                <div 
+                <motion.div
                   key={idx}
+                  custom={idx}
+                  variants={staggerCard}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.15 }}
                   className={`glass-strong border ${item.borderColor} rounded-2xl p-8 transition-colors duration-150 hover-lift group overflow-hidden`}
                   style={{
                     boxShadow: '0 0 30px rgba(0, 0, 0, 0.2)',
                   }}
+                  whileHover={{ y: -5 }}
                 >
                   <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-150`} style={{ boxShadow: `0 0 20px rgba(59, 130, 246, 0.4)`, willChange: 'transform' }}>
                     <IconComponent className="h-8 w-8 text-white" />
               </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                  <h3 className="text-2xl font-bold text-white mb-4 transition-colors duration-200 group-hover:text-cyan-200">{item.title}</h3>
                   <p className="text-gray-300 mb-4 leading-relaxed">{item.description}</p>
                   <div className={`flex items-center gap-2 ${item.textColor} font-semibold`}>
                 <ClockIcon className="h-5 w-5" />
                     <span>{idx === 0 ? '24/7 Support Available' : idx === 1 ? 'Active Development' : idx === 2 ? 'Rapid Response Time' : 'Feature-Rich Updates'}</span>
               </div>
-            </div>
+            </motion.div>
               );
             })}
             </div>
 
-          <div className="mt-12 text-center p-8 glass border border-green-500/30 rounded-2xl hover-lift">
+          <motion.div
+            className="mt-12 text-center p-8 glass border border-green-500/30 rounded-2xl hover-lift"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          >
             <p className="text-lg text-gray-200 mb-4">
               <strong className="text-white text-xl">Never deprecated. Never abandoned. Always improving.</strong>
             </p>
             <p className="text-gray-400">
               Choose a package that's here to stay and grow with your projects
             </p>
-          </div>
+          </motion.div>
         </div>
-      </section>
+      </MotionSection>
 
       {/* Get Started Section - Enhanced */}
-      <section 
+      <MotionSection
         id="get-started-section"
-        data-section
-        className={`relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8 transition-all duration-700 ${
-          visibleSections.has('get-started-section') 
-            ? 'opacity-100 translate-y-0' 
-            : 'opacity-0 translate-y-10'
-        }`}
+        className="relative overflow-hidden py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-8"
       >
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+        <SectionAtmosphere variant="aurora" />
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <motion.div
+            className="mb-16 text-center"
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.28em] text-sky-400/85 mb-4">
+              Next step
+            </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-4 sm:mb-6">
-              <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Ready to Get Started?
-              </span>
+              <HoverGlowTitle className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Ready to Get Started?
+              </HoverGlowTitle>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Join thousands of developers building amazing visuals with Apexify.js
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
             {[
@@ -894,26 +1021,44 @@ export default function Home() {
               },
             ].map((item, idx) => {
               const IconComponent = item.icon;
+              const borderAccent =
+                item.color === 'blue'
+                  ? 'border-blue-500/35 ring-blue-500/10'
+                  : item.color === 'purple'
+                    ? 'border-purple-500/35 ring-purple-500/10'
+                    : 'border-pink-500/35 ring-pink-500/10';
               return (
-                <div 
+                <motion.div
                   key={idx}
-                  className={`glass-strong border border-${item.color}-500/30 rounded-2xl p-8 transition-colors duration-150 hover-lift group`}
+                  custom={idx}
+                  variants={staggerCard}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.12 }}
+                  className={`glass-strong border rounded-2xl p-8 transition-colors duration-150 hover-lift group ring-1 ${borderAccent}`}
                   style={{
                     boxShadow: '0 0 30px rgba(0, 0, 0, 0.2)',
                   }}
+                  whileHover={{ y: -8, rotate: idx === 1 ? -1 : idx === 2 ? 1 : 0 }}
                 >
                   <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-150`} style={{ boxShadow: `0 0 20px rgba(59, 130, 246, 0.4)`, willChange: 'transform' }}>
                     <IconComponent className="h-8 w-8 text-white" />
               </div>
-                  <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                  <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-white">{item.title}</h3>
                   <p className="text-gray-300 mb-6 leading-relaxed">{item.description}</p>
                   <div className={`${item.textColor} font-semibold`}>{item.command}</div>
-                </div>
+                </motion.div>
               );
             })}
             </div>
 
-          <div className="text-center">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.15, duration: 0.55 }}
+          >
             <Link
               href="/docs#Getting-Started"
               className="group inline-flex items-center justify-center px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 text-lg sm:text-xl font-bold rounded-xl sm:rounded-2xl text-white hover-lift w-full sm:w-auto"
@@ -928,15 +1073,15 @@ export default function Home() {
               Start Building Now
               <ArrowRightIcon className="ml-3 h-7 w-7 group-hover:translate-x-1 transition-transform duration-150" style={{ willChange: 'transform' }} />
             </Link>
-              </div>
+              </motion.div>
         </div>
-      </section>
+      </MotionSection>
 
    
 
 
       {/* Footer - Enhanced */}
-      <footer className="relative border-t border-gray-800/50 mt-16 sm:mt-24 lg:mt-32 bg-gradient-to-b from-transparent via-gray-900/30 to-black">
+      <MotionFooter className="relative border-t border-gray-800/50 mt-16 sm:mt-24 lg:mt-32 bg-gradient-to-b from-transparent via-gray-900/30 to-[#030712]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
             <div className="col-span-1 sm:col-span-2 md:col-span-2">
@@ -1042,21 +1187,22 @@ export default function Home() {
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full glass border border-blue-500/30">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                  v5.3.12
+                  v5.3.18
                 </span>
               </div>
             </div>
           </div>
         </div>
-      </footer>
+      </MotionFooter>
 
       {/* Enhanced Scroll to Top Button */}
-      <button
+      <motion.button
+        type="button"
         onClick={scrollToTop}
         className={`fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 p-4 sm:p-5 rounded-full hover-lift group ${
           showScrollTop 
-            ? 'opacity-100 translate-y-0 pointer-events-auto' 
-            : 'opacity-0 translate-y-4 pointer-events-none'
+            ? 'pointer-events-auto' 
+            : 'pointer-events-none'
         }`}
         style={{
           background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899)',
@@ -1065,9 +1211,18 @@ export default function Home() {
           boxShadow: '0 0 30px rgba(59, 130, 246, 0.6), 0 0 60px rgba(139, 92, 246, 0.4)',
         }}
         aria-label="Scroll to top"
+        initial={false}
+        animate={
+          showScrollTop
+            ? { opacity: 1, y: 0, scale: 1 }
+            : { opacity: 0, y: 16, scale: 0.85 }
+        }
+        transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.94 }}
       >
         <ArrowUpIcon className="h-6 w-6 text-white group-hover:-translate-y-1 transition-transform duration-150" style={{ willChange: 'transform' }} />
-      </button>
+      </motion.button>
     </div>
   );
 }
