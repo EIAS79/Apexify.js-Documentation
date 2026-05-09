@@ -45,6 +45,7 @@ const nextConfig = {
      * Gallery `/api/gallery/run` spawns `tsx` + loads apexify by path. Include toolchain +
      * native optional deps (see `galleryRunNativeIncludes`). Pure-JS deps follow `import 'apexify.js'` in the route.
      */
+    /** Gallery + `/studio` (`POST /api/gallery/run`). On Vercel: keep runner enabled (omit `DISABLE_GALLERY_CODE_RUN`). */
     outputFileTracingIncludes: {
       '/app/api/gallery/run': galleryRunNativeIncludes,
     },

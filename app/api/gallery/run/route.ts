@@ -3,6 +3,7 @@ import { spawnSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
+import { galleryRunnerNodePath } from '@/lib/gallery/core/runnerNodePath';
 import { NextRequest, NextResponse } from 'next/server';
 import { pathToFileURL } from 'url';
 import {
@@ -111,6 +112,7 @@ export async function POST(req: NextRequest) {
     maxBuffer: 20 * 1024 * 1024,
     env: {
       ...process.env,
+      NODE_PATH: galleryRunnerNodePath(projectRoot),
       GALLERY_OUT: outPath,
       GALLERY_ERR: errPath,
     },
@@ -120,10 +122,18 @@ export async function POST(req: NextRequest) {
   try {
     if (existsSync(errPath)) {
       const errTxt = readFileSync(errPath, 'utf8').trim();
+      const stderr = result.stderr?.trim() ?? '';
+      let error = errTxt || stderr || 'Runner failed';
+      if (stderr && errTxt && stderr.length > 0 && !errTxt.includes(stderr.slice(0, Math.min(120, stderr.length)))) {
+        error = `${errTxt}\n\n━━ process stderr ━━\n${stderr}`;
+      } else if (!errTxt && stderr) {
+        error = stderr;
+      }
       return NextResponse.json(
         {
           ok: false,
-          error: errTxt || result.stderr?.trim() || 'Runner failed',
+          error,
+          stderr: stderr || undefined,
           elapsedMs,
           exitCode: result.status ?? undefined,
         },
@@ -133,19 +143,23 @@ export async function POST(req: NextRequest) {
 
     if (!existsSync(outPath)) {
       const stderr = result.stderr?.trim() ?? '';
-      const parts = [
-        stderr || null,
-        stderr ? null : 'No image file was written — `main()` must finish and return a PNG or GIF Buffer.',
-        typeof result.status === 'number' ? `exit ${result.status}` : null,
+      const explain =
+        'No image file was written — `main()` must finish and return a PNG or GIF Buffer.';
+      const meta = [
+        typeof result.status === 'number' ? `exit code ${result.status}` : null,
         result.signal ? `signal ${String(result.signal)}` : null,
       ].filter(Boolean) as string[];
+      const error =
+        [stderr || null, stderr ? null : explain, meta.length ? `(${meta.join(', ')})` : null]
+          .filter(Boolean)
+          .join('\n') || 'No output produced';
       return NextResponse.json(
         {
           ok: false,
-          error: parts.join(' · ') || 'No output produced',
+          error,
+          stderr: stderr || undefined,
           elapsedMs,
           exitCode: result.status ?? undefined,
-          stderr: stderr || undefined,
         },
         { status: 422 }
       );

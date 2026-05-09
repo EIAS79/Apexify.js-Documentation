@@ -24,6 +24,11 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /** Extra bottom padding on iOS home-indicator devices (Code Studio). */
+  .pb-studio-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  }
 }
 
 /* Custom scrollbar styling */
