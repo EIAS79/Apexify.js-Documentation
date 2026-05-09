@@ -457,7 +457,7 @@ export default function Home() {
             className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-12 sm:mb-20"
           >
             <Link
-              href="/docs#Getting-Started"
+              href="/docs#start-here"
               className="group/herocta relative inline-flex items-center justify-center px-6 sm:px-8 lg:px-10 py-3 sm:py-4 lg:py-5 text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl text-white overflow-hidden hover-lift w-full sm:w-auto transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
               style={{
                 background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899)',
@@ -1060,7 +1060,7 @@ export default function Home() {
             transition={{ delay: 0.15, duration: 0.55 }}
           >
             <Link
-              href="/docs#Getting-Started"
+              href="/docs#start-here"
               className="group inline-flex items-center justify-center px-8 sm:px-10 lg:px-12 py-4 sm:py-5 lg:py-6 text-lg sm:text-xl font-bold rounded-xl sm:rounded-2xl text-white hover-lift w-full sm:w-auto"
               style={{
                 background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899)',
@@ -1123,7 +1123,7 @@ export default function Home() {
               <h3 className="text-white font-semibold mb-4">Documentation</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/docs#Getting-Started" className="text-gray-400 hover:text-white transition-colors duration-200">
+                  <Link href="/docs#start-here" className="text-gray-400 hover:text-white transition-colors duration-200">
                     Getting Started
                   </Link>
                 </li>

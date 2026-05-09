@@ -1,0 +1,25 @@
+# Batch & image I/O internals
+
+## Batch / chain
+
+**Implementation:** `lib/Canvas/utils/general/batchOperations.ts` (**`batchOperations`**, **`chainOperations`**) · **`ApexPainter`** **`save`/`outPut`** use Sharp for non-PNG encodes where applicable.
+
+User docs: **[Batch & chain](/docs#batch-and-chain)**, **[Batch chain save output](/docs#batch-chain-save-output)**.
+
+## Save / URL output
+
+When **`outPut`** / **`url`** style helpers upload buffers for a quick public URL, the library may call **`url(buffer)`** (**`lib/Canvas/utils/general/conversion.ts`**) which uses the **Imgur API** with credentials shipped in that module — suitable for prototypes, not a substitute for your own CDN policy.
+
+User docs: **[Save & output](/docs#save-and-output)**.
+
+## Standalone image operations — module map
+
+| Capability area | Primary module |
+|----------------|----------------|
+| Resize, convert, color overlay, legacy **`effects`**, crop helpers, dominant colors, chroma removal, remove.bg API | **`lib/Canvas/utils/general/generalFunctions.ts`** |
+| **`compress`**, **`extractPalette`** | **`lib/Canvas/utils/general/imageCompression.ts`** |
+| **`stitchImages`**, **`createCollage`** | **`lib/Canvas/utils/general/imageStitching.ts`** |
+| **`batch`**, **`chain`** | **`lib/Canvas/utils/general/batchOperations.ts`** |
+| **`base64`**, **`dataURL`**, **`blob`**, **`arrayBuffer`**, **`url`** (Imgur) | **`lib/Canvas/utils/general/conversion.ts`** |
+
+User-facing overview: **[Standalone image operations](/docs#standalone-image-operations)**.

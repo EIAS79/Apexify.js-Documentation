@@ -88,7 +88,7 @@ export default function DocLayout({ children, headings = [] }: DocLayoutProps) {
       </div>
 
       <main className={`flex-1 w-full transition-all duration-300 pt-16 relative ${
-        leftCollapsed ? 'lg:ml-0' : 'lg:ml-72'
+        leftCollapsed ? 'lg:ml-0' : 'lg:ml-80 xl:ml-96'
       } ${
         rightCollapsed ? 'lg:mr-0' : 'lg:mr-64'
       }`}>

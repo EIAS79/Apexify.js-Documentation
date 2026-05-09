@@ -34,7 +34,8 @@ import { presentationSlideGalleryItems } from '@/lib/gallery/presentation/presen
 import { advanceGalleryItems } from '@/lib/gallery/advance/advanceSnippets';
 import type { BackgroundGalleryCard } from '@/lib/gallery/background/backgroundSnippets';
 import type { SpinWheelGalleryCard } from '@/lib/gallery/spin-wheel/spinWheelSnippets';
-import type { AdvanceGalleryCard, GalleryMediaKind } from '@/lib/gallery/core/galleryTypes';
+import type { AdvanceGalleryCard } from '@/lib/gallery/core/galleryTypes';
+import { inferMediaKind, buildGalleryHash } from '@/lib/gallery/core/galleryDocLink';
 
 type GalleryItem = BackgroundGalleryCard | SpinWheelGalleryCard | AdvanceGalleryCard;
 
@@ -50,13 +51,6 @@ type FilterCategory =
   | 'extras'
   | 'mix'
   | 'advance';
-
-function inferMediaKind(src: string, explicit?: GalleryMediaKind): GalleryMediaKind {
-  if (explicit) return explicit;
-  if (/\.(mp4|webm|mov)(\?|#|$)/i.test(src)) return 'video';
-  if (/\.gif(\?|#|$)/i.test(src)) return 'gif';
-  return 'image';
-}
 
 async function decodeDataUrlForDraw(src: string): Promise<void> {
   await new Promise<void>((resolve, reject) => {
@@ -283,6 +277,36 @@ function primaryBadgeCategory(item: GalleryItem): Exclude<FilterCategory, 'all'>
   return 'advance';
 }
 
+const hashTypeToFilter: Record<string, FilterCategory> = {
+  background: 'background',
+  image: 'images',
+  chart: 'charts',
+  text: 'text',
+  gif: 'gifs',
+  video: 'videos',
+  extra: 'extras',
+  mix: 'mix',
+  advance: 'advance',
+};
+
+function parseGalleryHash(rawHash: string): { id: string; type: string | null } | null {
+  const hash = rawHash.replace(/^#/, '').trim();
+  if (!hash) return null;
+  let decoded = hash;
+  try {
+    decoded = decodeURIComponent(hash);
+  } catch {
+    decoded = hash;
+  }
+  const plusIdx = decoded.lastIndexOf('+');
+  if (plusIdx <= 0) return { id: decoded, type: null };
+
+  const id = decoded.slice(0, plusIdx).trim();
+  const type = decoded.slice(plusIdx + 1).trim().toLowerCase();
+  if (!id) return null;
+  return { id, type: type || null };
+}
+
 export default function GalleryClient() {
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
@@ -385,6 +409,46 @@ export default function GalleryClient() {
       document.body.style.overflow = 'unset';
     };
   }, [selectedItem]);
+
+  useEffect(() => {
+    const applyHashState = () => {
+      const parsed = parseGalleryHash(window.location.hash);
+      if (!parsed) {
+        setSelectedItem(null);
+        return;
+      }
+
+      const item = galleryItems.find((candidate) => candidate.id === parsed.id);
+      if (!item) return;
+
+      if (parsed.type) {
+        const targetFilter = hashTypeToFilter[parsed.type];
+        if (targetFilter) setSelectedCategory(targetFilter);
+      }
+
+      setSelectedItem(item);
+    };
+
+    applyHashState();
+    window.addEventListener('hashchange', applyHashState);
+    return () => {
+      window.removeEventListener('hashchange', applyHashState);
+    };
+  }, []);
+
+  const openItemModal = (item: GalleryItem) => {
+    setSelectedItem(item);
+    const nextHash = `#${encodeURIComponent(buildGalleryHash(item))}`;
+    if (window.location.hash !== nextHash) {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}${nextHash}`);
+    }
+  };
+
+  const closeItemModal = () => {
+    setSelectedItem(null);
+    if (!window.location.hash) return;
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden relative">
@@ -613,7 +677,7 @@ export default function GalleryClient() {
                   item={spotlightItem}
                   index={sortedGridItems.findIndex((i) => i.id === spotlightItem.id)}
                   isVisible={visibleItems.has(spotlightItem.id)}
-                  onOpen={() => setSelectedItem(spotlightItem)}
+                  onOpen={() => openItemModal(spotlightItem)}
                 />
               )}
 
@@ -625,7 +689,7 @@ export default function GalleryClient() {
                       item={item}
                       index={index}
                       isVisible={visibleItems.has(item.id)}
-                      onClick={() => setSelectedItem(item)}
+                      onClick={() => openItemModal(item)}
                     />
                   ))}
                 </div>
@@ -656,7 +720,7 @@ export default function GalleryClient() {
             </h2>
             <p className="text-xl text-gray-300 mb-8">Start building stunning visuals with Apexify.js today</p>
             <Link
-              href="/docs#Getting-Started"
+              href="/docs#start-here"
               className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white text-lg font-bold rounded-xl transition-all duration-300 shadow-xl shadow-blue-500/40 hover:shadow-blue-500/60 hover:scale-105"
             >
               <RocketLaunchIcon className="h-6 w-6" />
@@ -666,7 +730,7 @@ export default function GalleryClient() {
         </div>
       </section>
 
-      {selectedItem && <GalleryModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+      {selectedItem && <GalleryModal item={selectedItem} onClose={closeItemModal} />}
     </div>
   );
 }

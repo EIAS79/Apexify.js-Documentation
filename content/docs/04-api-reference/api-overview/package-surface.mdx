@@ -1,0 +1,44 @@
+# Package surface
+
+How you **import** Apexify.js and what ships on the public **`apexify.js`** bundle.
+
+Use **[API Reference hub](/docs#api-reference)** as the routing index for docs pages. **`CanvasUtils`** groups and **`CanvasTypes`** are summarized on **[Canvas utils & types](/docs#canvas-utils-and-types)**.
+
+Contributor-only **export → source file** mapping, creators, **`VideoHelpers`**, and entry-point side effects: **[Package implementation reference](/docs#package-implementation-reference)**.
+
+---
+
+## Imports
+
+```typescript
+import { ApexPainter, CanvasUtils, CanvasTypes } from 'apexify.js';
+// Same helpers/types are also flat-exported from the barrel:
+import type { CanvasConfig, ImageProperties } from 'apexify.js';
+import { drawShape, url, base64 } from 'apexify.js';
+```
+
+---
+
+## Main exports
+
+| Export | Role |
+|--------|------|
+| **`ApexPainter`** | Main façade — **`create*`** scene APIs, GIF, charts, **`createVideo`**, batch/chain, standalone raster helpers, **`save`** / **`outPut`** |
+| **`CanvasUtils`** | Namespace of draw/layout/filter helpers (same symbols as many flat exports) |
+| **`CanvasTypes`** | Types barrel (`CanvasConfig`, **`ImageProperties`**, …) |
+| **Flat exports** | Individual helpers (same surface as **`CanvasUtils`**, without nesting) |
+
+Some internal **creator** classes and FFmpeg helpers are **not** re-exported — see [Troubleshooting](/docs#troubleshooting) when calls fail deep in the stack.
+
+---
+
+## Constructor & default serialization
+
+```typescript
+const painter = new ApexPainter({ type: 'buffer' }); // default
+// type drives `outPut()` conversions: 'buffer' | 'base64' | 'dataURL' | 'blob' | 'url' | 'arraybuffer'
+```
+
+Most methods still return raw **`Buffer`** (PNG) regardless of **`type`**; **`outPut`** applies the constructor channel when you need a string, **`Blob`**, or URL-shaped output.
+
+**Related:** [Save & output](/docs#save-and-output), [Batch & I/O hub](/docs#batch-chain-save-output).

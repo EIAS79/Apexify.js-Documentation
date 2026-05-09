@@ -1,0 +1,63 @@
+# createImage()
+
+## Description
+
+Draws one or more **`ImageProperties`** entries (images **or** vector shapes) onto an existing **`Buffer`** or **`CanvasResults`**.
+
+## Syntax
+
+```ts
+await painter.createImage(
+  images: ImageProperties | ImageProperties[],
+  canvasBuffer: CanvasResults | Buffer,
+  options?: CreateImageOptions,
+): Promise<Buffer>
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`images`** | **`ImageProperties` \| **`ImageProperties[]`** | Yes | — | Raster sources, shapes, filters, transforms, shadows, etc. |
+| **`canvasBuffer`** | **`CanvasResults` \| **`Buffer`** | Yes | — | Base scene to paint onto. |
+| **`options`** | **`CreateImageOptions`** | No | — | Extra compose options (types re-export from **`apexify.js`**). |
+
+### Important `ImageProperties` fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **`source`** | **`string` \| **`Buffer`** \| shape key | Asset path/URL/buffer **or** primitive shape name. |
+| **`x`**, **`y`** | **`number`** | Position (required per typings / runtime validation). |
+
+## Returns
+
+PNG **`Buffer`** of the updated canvas.
+
+## Example
+
+```typescript
+const base = await painter.createCanvas({ width: 400, height: 240, colorBg: '#0f172a' });
+
+const out = await painter.createImage(
+  {
+    source: 'rectangle',
+    x: 40,
+    y: 60,
+    width: 120,
+    height: 80,
+    shape: { fill: true, color: '#38bdf8' },
+  },
+  base.buffer,
+);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Missing **`source`**, **`x`**, or **`y`** | Invalid **`ImageProperties`** | Supply required fields — see [Create image & shapes](/docs#create-image-and-shapes). |
+
+## Related docs
+
+- [Create image & shapes](/docs#create-image-and-shapes)  
+- [Image filters & helpers](/docs#image-filters-groups-and-helpers)  

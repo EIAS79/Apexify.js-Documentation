@@ -1,0 +1,13 @@
+# Canvas & text internals
+
+## Canvas (`createCanvas`)
+
+**`lib/Canvas/extended/CanvasCreator.ts`** paints in a fixed order using **`lib/Canvas/utils/Background/bg.ts`** (solid / gradient / image / layers / bitmap pattern / noise / zoom) plus **`lib/Canvas/utils/Patterns/enhancedPatternRenderer.ts`** for **`patternBg`** and **`presetPattern`** layers.
+
+Draw order and validation from a user perspective: **[Canvas pipeline](/docs#canvas-pipeline)**. Background topics: **[Canvas primary fills](/docs#canvas-primary-fills)**, **[Canvas BG layers](/docs#canvas-bg-layers)**, **[Patterns & noise](/docs#canvas-pattern-noise-transforms)**.
+
+## Text (`createText`)
+
+**`lib/Canvas/extended/TextCreator.ts`** delegates to **`lib/Canvas/utils/Texts/enhancedTextRenderer.ts`**.
+
+User-facing API: **[Create text](/docs#create-text)**.

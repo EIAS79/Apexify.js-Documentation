@@ -1,0 +1,54 @@
+# outPut()
+
+## Description
+
+Serializes a PNG **`Buffer`** according to the **`ApexPainter`** constructor’s **`OutputFormat.type`** channel (**pass-through buffer**, **base64**, **data URL**, **`Blob`**, **`ArrayBuffer`**, or **hosted URL** prototype).
+
+## Syntax
+
+```ts
+await painter.outPut(results: Buffer): Promise<Buffer | string | Blob | ArrayBuffer>
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`results`** | **`Buffer`** | Yes | — | Typically the **`buffer`** field from **`createCanvas`** / **`createImage`** / **`createText`**. |
+
+Encoding is controlled by **`new ApexPainter({ type })`** — **not** by this method’s arguments.
+
+## Returns
+
+| Constructor **`type`** | Return |
+|------------------------|--------|
+| **`buffer`** | Same **`Buffer`** |
+| **`base64`** | Base64 **`string`** |
+| **`dataURL`** | Data URL **`string`** |
+| **`blob`** | **`Blob`** |
+| **`arraybuffer`** | **`ArrayBuffer`** |
+| **`url`** | HTTPS **`string`** via bundled upload helper |
+
+## Example
+
+```typescript
+const painter64 = new ApexPainter({ type: 'base64' });
+const { buffer } = await painter64.createCanvas({
+  width: 64,
+  height: 64,
+  colorBg: '#10b981',
+});
+const b64 = await painter64.outPut(buffer);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| **`outPut: results must be a Buffer.`** | Wrong input | Wrap results so you pass a **`Buffer`**. |
+| Wrapper **`outPut failed:`** | Serializer/network failure | Especially for **`url`** mode — see [Save & output](/docs#save-and-output). |
+
+## Related docs
+
+- [Save & output](/docs#save-and-output)  
+- [Package surface](/docs#package-surface)  

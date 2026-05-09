@@ -1,0 +1,113 @@
+# Start here
+
+## What this does
+
+This documentation helps you turn ideas into **PNG images** (and later charts, GIFs, or video) using **Apexify.js** on Node.js.
+
+## When to use it
+
+Use Apexify.js when you want **programmable graphics**: social posts, banners, thumbnails, charts for reports, short animations, or batch-generated artwork — without clicking around in a design tool.
+
+## Quick example
+
+**`ApexPainter`** is the entry point. **`createCanvas`** makes the blank image; **`createText`** draws on it; **`fs.writeFileSync`** saves a PNG.
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "fs";
+
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 800,
+  height: 450,
+  colorBg: "#0f172a",
+});
+
+const withText = await painter.createText(
+  {
+    text: "Hello Apexify.js",
+    x: 400,
+    y: 225,
+    font: { size: 48, family: "Arial" },
+    color: "#ffffff",
+    textAlign: "center",
+    textBaseline: "middle",
+  },
+  buffer
+);
+
+fs.writeFileSync("output.png", withText);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require("apexify.js");
+const fs = require("fs");
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createCanvas({
+    width: 800,
+    height: 450,
+    colorBg: "#0f172a",
+  });
+  const withText = await painter.createText(
+    {
+      text: "Hello Apexify.js",
+      x: 400,
+      y: 225,
+      font: { size: 48, family: "Arial" },
+      color: "#ffffff",
+      textAlign: "center",
+      textBaseline: "middle",
+    },
+    buffer
+  );
+  fs.writeFileSync("output.png", withText);
+})();
+```
+</js>
+</CodeSwitcher>
+
+## Output preview
+
+Below is real output from the **gallery** (different composition, same APIs — canvas + text + polish):
+
+<GalleryExample id="advance-text-glow-plaque" />
+
+## How it works
+
+1. **`ApexPainter`** — your main tool for this library.
+2. **`createCanvas`** — builds the **base image** (size and background).
+3. **`createText`** — draws **text on top** of that image buffer.
+4. **`fs.writeFileSync`** — writes the final buffer to **`output.png`** on disk.
+
+Every step uses **`await`** because drawing returns **Promises**.
+
+## Common changes
+
+- **Size:** change **`width`** / **`height`** on **`createCanvas`**.
+- **Background color:** change **`colorBg`** (hex string).
+- **Message:** change **`text`**, **`font.size`**, or **`color`** on **`createText`**.
+
+## Common mistakes
+
+- **Forgetting `await`** — you get a Promise object instead of a buffer.
+- **Wrong coordinates** — **`x` / `y`** are where the text anchors (controlled by **`textAlign`** and **`textBaseline`**).
+- **Overwriting the buffer** — always pass the **latest** buffer into the **next** draw call.
+
+## Next steps
+
+Follow this order once — each page adds **one** skill on top of the last buffer:
+
+1. **[Your First Image](/docs#your-first-image)** — walkthrough of the code above  
+2. **[Add Text](/docs#add-text)** — typography and placement  
+3. **[Add Images](/docs#add-images)** — drop assets onto the canvas  
+4. **[Save & Export](/docs#save-export)** — write PNGs and encode outputs  
+
+Then explore **[Add Backgrounds](/docs#add-backgrounds)** and **[Recipes](/docs#recipes)** when you want richer compositions.
+
+<RelatedGallery ids="bg-chromatic-depth,advance-shape-collage,advance-chart-donut-glow" />

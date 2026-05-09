@@ -1,0 +1,55 @@
+# createChart()
+
+## Description
+
+Renders a typed chart (**`pie`**, **`bar`**, **`horizontalBar`**, **`line`**, **`scatter`**, **`radar`**, **`polarArea`**) to a PNG **`Buffer`**. **`chartType`** selects overload-specific **`data`** / **`options`** shapes.
+
+## Syntax
+
+```ts
+await painter.createChart<T extends ChartLiteral>(
+  chartType: T,
+  data: ChartDataFor<T>,
+  options?: ChartOptionsFor<T>,
+): Promise<Buffer>
+```
+
+*(Exact conditional typings ship in **`apexify.js`** — mirror them in your editor.)*
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`chartType`** | **`'pie' \| 'bar' \| 'horizontalBar' \| 'line' \| 'scatter' \| 'radar' \| 'polarArea'`** | Yes | — | Selects renderer + typings. |
+| **`data`** | per-chart union | Yes | — | e.g. **`PieSlice[]`**, **`BarChartData[]`**, **`LineSeries[]`**, … |
+| **`options`** | per-chart union | No | — | Dimensions, labels, appearance, axes, legends, etc. |
+
+## Returns
+
+PNG **`Buffer`**.
+
+## Example
+
+```typescript
+const chart = await painter.createChart(
+  'pie',
+  [
+    { label: 'A', value: 40, color: '#38bdf8' },
+    { label: 'B', value: 35, color: '#a78bfa' },
+  ],
+  { dimensions: { width: 480, height: 320 } },
+);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| **`Unsupported chart type`** | Unknown **`chartType`** literal | Use one of the supported literals above. |
+| Renderer-thrown errors | Bad data/options pairing | Consult per-chart tables in [Charts complete guide](/docs#charts-complete-guide). |
+
+## Related docs
+
+- [Charts hub](/docs#charts)  
+- [Charts: createChart](/docs#charts-create-chart)  
+- [Charts internals](/docs#internals-charts)  

@@ -1,0 +1,125 @@
+# Add Text
+
+## What this does
+
+**`createText`** paints typography onto an existing canvas buffer — headings, labels, captions, or multi-line stacks.
+
+## When to use it
+
+Titles on posters, watermarks, infographic labels, UI chrome drawn offline, or any image where **words** carry the story.
+
+## Quick example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "fs";
+
+const painter = new ApexPainter();
+
+let { buffer } = await painter.createCanvas({
+  width: 720,
+  height: 280,
+  colorBg: "#020617",
+});
+
+buffer = await painter.createText(
+  [
+    {
+      text: "Ship posters overnight",
+      x: 360,
+      y: 120,
+      font: { family: "Arial", size: 42 },
+      bold: true,
+      color: "#f8fafc",
+      textAlign: "center",
+      textBaseline: "middle",
+    },
+    {
+      text: "Apexify.js",
+      x: 360,
+      y: 188,
+      font: { family: "Arial", size: 20 },
+      color: "#94a3b8",
+      textAlign: "center",
+      textBaseline: "middle",
+    },
+  ],
+  buffer
+);
+
+fs.writeFileSync("headline.png", buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require("apexify.js");
+const fs = require("fs");
+
+(async () => {
+  const painter = new ApexPainter();
+  let { buffer } = await painter.createCanvas({
+    width: 720,
+    height: 280,
+    colorBg: "#020617",
+  });
+  buffer = await painter.createText(
+    [
+      {
+        text: "Ship posters overnight",
+        x: 360,
+        y: 120,
+        font: { family: "Arial", size: 42 },
+        bold: true,
+        color: "#f8fafc",
+        textAlign: "center",
+        textBaseline: "middle",
+      },
+      {
+        text: "Apexify.js",
+        x: 360,
+        y: 188,
+        font: { family: "Arial", size: 20 },
+        color: "#94a3b8",
+        textAlign: "center",
+        textBaseline: "middle",
+      },
+    ],
+    buffer
+  );
+  fs.writeFileSync("headline.png", buffer);
+})();
+```
+</js>
+</CodeSwitcher>
+
+## Output preview
+
+Gallery piece showing expressive lettering (same APIs — **`createCanvas`** then **`createText`**):
+
+<PreviewWithCode id="advance-text-glow-plaque" />
+
+## How it works
+
+1. Start from **`createCanvas`** so text has a real buffer to paint into.
+2. Pass an **array** of text objects to **`createText`** when you need multiple lines or weights.
+3. Reassign **`buffer = await painter.createText(...)`** each time so the next draw sees the updated pixels.
+
+## Common changes
+
+- Increase **`font.size`** for hero titles.
+- Tune **`color`** or add **`bold`** for hierarchy.
+- Adjust **`y`** spacing between lines (try **`+48`** pixels between headline and subcopy).
+
+## Common mistakes
+
+- **Forgetting to pass the latest buffer** — always feed **`createText`** the buffer returned from the previous step.
+- **Mis-aligned anchors** — pair **`textAlign`** / **`textBaseline`** with predictable **`x`** / **`y`** (center/middle is friendliest).
+
+## Next steps
+
+- **[Add Images](/docs#add-images)** — layer assets with your typography  
+- **[Save & Export](/docs#save-export)** — persist buffers safely  
+
+Optional typography depth: **[Fonts & layout](/docs#text-fonts-and-layout)** · **[Decorations & effects](/docs#text-decorations-effects)** · **[Draw shapes](/docs#draw-shapes)**  

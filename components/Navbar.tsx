@@ -33,7 +33,7 @@ export default function Navbar() {
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/gallery', label: 'Gallery' },
-    { href: '/docs#Getting-Started', label: 'Documentation', shortLabel: 'Docs' },
+    { href: '/docs#start-here', label: 'Documentation', shortLabel: 'Docs' },
   ];
 
   const linkClass = (isActive: boolean) =>
@@ -120,7 +120,7 @@ export default function Navbar() {
                 </a>
 
                 <Link
-                  href="/docs#Getting-Started"
+                  href="/docs#start-here"
                   className="group/cta relative inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 overflow-hidden rounded-xl text-white text-[11px] sm:text-sm font-bold whitespace-nowrap touch-manipulation max-[380px]:px-2 bg-gradient-to-r from-blue-600 via-violet-600 to-fuchsia-600 bg-[length:200%_100%] animate-gradient shadow-[0_0_24px_-6px_rgba(59,130,246,0.55)] hover:shadow-[0_0_32px_-4px_rgba(139,92,246,0.55)]"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 translate-x-[-120%] skew-x-[-14deg] transition-all duration-700 group-hover/cta:opacity-100 group-hover/cta:translate-x-[120%]" aria-hidden />

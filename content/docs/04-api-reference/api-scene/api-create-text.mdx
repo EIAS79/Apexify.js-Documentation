@@ -1,0 +1,64 @@
+# createText()
+
+## Description
+
+Renders styled text layers onto an existing **`Buffer`** or **`CanvasResults`** using **`TextProperties`** (fonts, wraps, gradients, decorations, glow/shadow/stroke, rotation, optional arc layout).
+
+## Syntax
+
+```ts
+await painter.createText(
+  textArray: TextProperties | TextProperties[],
+  canvasBuffer: CanvasResults | Buffer,
+): Promise<Buffer>
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`textArray`** | **`TextProperties` \| array | Yes | — | One or more text objects. |
+| **`canvasBuffer`** | **`CanvasResults` \| **`Buffer`** | Yes | — | Base canvas buffer. |
+
+### Important `TextProperties` fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **`text`** | **`string`** | Content (required). |
+| **`x`**, **`y`** | **`number`** | Anchor position (required). |
+| **`font`** / legacy **`fontSize`**, **`fontFamily`** | varies | Typography — see feature guide. |
+
+## Returns
+
+PNG **`Buffer`** after text is composited.
+
+## Example
+
+```typescript
+const { buffer } = await painter.createCanvas({ width: 600, height: 200, colorBg: '#020617' });
+
+const titled = await painter.createText(
+  {
+    text: 'Hello',
+    x: 300,
+    y: 120,
+    font: { size: 56, family: 'Arial' },
+    color: '#e2e8f0',
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  buffer,
+);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Missing **`text`**, **`x`**, or **`y`** | Incomplete **`TextProperties`** | Fill required fields — see [Create text](/docs#create-text). |
+| Invalid / missing canvas | Wrong buffer type | Pass latest **`Buffer`** or **`CanvasResults`**. |
+
+## Related docs
+
+- [Create text](/docs#create-text)  
+- [Text pipeline](/docs#text-pipeline)  

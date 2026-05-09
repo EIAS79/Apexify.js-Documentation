@@ -1,0 +1,51 @@
+# measureText()
+
+## Description
+
+Computes layout metrics for **`TextProperties`** **without** drawing — widths, line wraps, heights, optional per-character metrics.
+
+## Syntax
+
+```ts
+await painter.measureText(textProps: TextProperties): Promise<TextMetrics>
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`textProps`** | **`TextProperties`** | Yes | — | Same vocabulary as **`createText`** (including **`maxWidth`**, **`measurementCanvas`**, **`includeCharMetrics`**). |
+
+### Measurement-only flags
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **`includeCharMetrics`** | **`boolean`** | Per-glyph metrics when supported. |
+| **`measurementCanvas`** | **`{ width?, height? }`** | Optional measurement surface sizing. |
+
+## Returns
+
+**`TextMetrics`** (see **`CanvasTypes`** / typings for full fields: **`width`**, **`height`**, **`lines`**, etc.).
+
+## Example
+
+```typescript
+const metrics = await painter.measureText({
+  text: 'Hello Apexify.js',
+  font: { size: 32, family: 'Arial' },
+  maxWidth: 420,
+});
+
+console.log(metrics.width, metrics.height);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Validation failures | Missing **`text`** or impossible layout props | Mirror the same constraints as **`createText`**. |
+
+## Related docs
+
+- [Curved text & metrics](/docs#text-curved-and-metrics)  
+- [Create text](/docs#create-text)  

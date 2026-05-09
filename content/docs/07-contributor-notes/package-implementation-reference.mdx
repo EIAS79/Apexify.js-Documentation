@@ -1,0 +1,37 @@
+# Package implementation reference
+
+Contributor-facing mapping from **public exports** to **source files**. End-user imports remain **`apexify.js`** — see simplified **[Package surface](/docs#package-surface)**.
+
+---
+
+## Export → source
+
+| Export | Role | Source file |
+|--------|------|-------------|
+| **`ApexPainter`** | User façade — **`create*`** scene APIs, GIF, charts, video router (**`createVideo`**), batch/chain, standalone raster helpers, save/**`outPut`** | `lib/Canvas/ApexPainter.ts` |
+| **`CanvasUtils`** | Namespace object re-exporting **`canvasUtils`** | `lib/Canvas/utils/canvasUtils.ts` |
+| **`CanvasTypes`** | Types barrel (`CanvasConfig`, …) | `lib/Canvas/utils/types/index.ts` |
+| **Flat `export *`** | Same symbols as **`CanvasUtils`** without nesting | `canvasUtils.ts` via `lib/index.ts` |
+
+---
+
+## Not exported from `apexify.js`
+
+| Kind | Location | Notes |
+|------|-----------|-------|
+| **Creator classes** | **`lib/Canvas/extended/*.ts`** (**`CanvasCreator`**, **`GIFCreator`**, **`VideoCreator`**, …) | Wired internally by **`ApexPainter`** — see **[Troubleshooting](/docs#troubleshooting)** |
+| **`VideoHelpers`** | **`lib/Canvas/utils/Video/videoHelpers.ts`** | FFmpeg implementation — **[Video FFmpeg internals](/docs#video-ffmpeg-internals)** |
+| Some **`VideoCreationOptions`** typings | Declared next to **`VideoCreator`** | May infer **`Parameters<ApexPainter['createVideo']>[0]`** — **[Canvas utils & types](/docs#canvas-utils-and-types)** |
+
+---
+
+## Entry side effect
+
+**`lib/index.ts`** may **`fetch`** npm once to print a newer-version hint — harmless for apps but relevant if you audit network behavior in constrained environments.
+
+---
+
+## See also
+
+- **[Lib module charter](/docs#lib-module-charter)** — full `lib/` layout  
+- **[Internals overview](/docs#internals-overview)** — implementation routing topics  

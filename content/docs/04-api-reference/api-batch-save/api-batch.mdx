@@ -1,0 +1,50 @@
+# batch()
+
+## Description
+
+Runs **`BatchOperation[]`** **in parallel**. Each operation is **`type: 'canvas' | 'image' | 'text'`** with a **`config`** payload interpreted like the matching **`create*`** call.
+
+## Syntax
+
+```ts
+await painter.batch(operations: BatchOperation[]): Promise<Buffer[]>
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`operations`** | **`BatchOperation[]`** | Yes | — | Non-empty array; each entry `{ type, config }`. |
+
+### `BatchOperation`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **`type`** | **`'canvas' \| 'image' \| 'text'`** | Which façade method to invoke. |
+| **`config`** | **`any`** | Passed through — **`canvas`** → **`createCanvas(config)`**; **`image`/`text`** use internal helper canvases (**800×600** seed in library implementation — confirm before relying on layout). |
+
+## Returns
+
+Array of PNG **`Buffer`** results (order matches input array).
+
+## Example
+
+```typescript
+const layers = await painter.batch([
+  { type: 'canvas', config: { width: 320, height: 200, colorBg: '#0ea5e9' } },
+  { type: 'canvas', config: { width: 320, height: 200, colorBg: '#6366f1' } },
+]);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| **`batch: operations array is required`** | Empty / missing array | Pass ≥1 operation. |
+| **`batch: Unknown operation type`** | Invalid **`type`** literal | Use **`canvas`**, **`image`**, or **`text`**. |
+| Wrapped **`batch: Failed…`** | Underlying **`create*`** threw | Inspect inner message; fix **`config`**. |
+
+## Related docs
+
+- [Batch & chain](/docs#batch-and-chain)  
+- [Batch, chain, save & output](/docs#batch-chain-save-output)  

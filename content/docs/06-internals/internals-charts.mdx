@@ -1,0 +1,28 @@
+# Charts internals
+
+## ChartCreator routing
+
+**`ChartCreator.createChart`** switches on **`chartType`** and awaits the matching **`create*Chart`** implementation under **`lib/Canvas/utils/Charts/`**. **`ApexPainter`** forwards to the same class.
+
+## Namespace vs package root
+
+Individual **`create*Chart`** functions are **not** flat-exported from the package root — use the **`Charts`** namespace (**`lib/Canvas/utils/Charts/index.ts`**).
+
+Per-chart **data** / **options** types live beside each module under **`lib/Canvas/utils/Charts/`** — they are **not** duplicated inside **`types/index.ts`**.
+
+## Comparison & combo sources
+
+**`createComparisonChart`** / **`createComboChart`** implementations draw from:
+
+- `lib/Canvas/utils/Charts/comparisonchart.ts`
+- `lib/Canvas/utils/Charts/combochart.ts`
+
+**`ChartCreator`** orchestrates from **`lib/Canvas/extended/ChartCreator.ts`**.
+
+## Complete guide note
+
+The **[Charts complete guide](/docs#charts-complete-guide)** focuses on **options and examples**. Implementation wiring matches **`ChartCreator`** dispatch to **`lib/Canvas/utils/Charts/*.ts`**. **`ApexPainter.createChart(type, data, options)`** and **`Charts.create*Chart`** return the same **PNG `Buffer`**.
+
+## User-facing entry points
+
+Use **[Charts hub](/docs#charts)** and **[Charts: createChart](/docs#charts-create-chart)** for APIs — not this page.

@@ -1,0 +1,66 @@
+# animate()
+
+## Description
+
+Builds frame buffers using the **`Frame[]`** DSL (draw callbacks per frame) with uniform or per-frame sizing — optionally emitting GIF output via embedded **`GIFEncoder`** when **`options.gif`** is enabled.
+
+## Syntax
+
+```ts
+await painter.animate(
+  frames: Frame[],
+  defaultDuration: number,
+  defaultWidth?: number,
+  defaultHeight?: number,
+  options?: {
+    gif?: boolean;
+    gifPath?: string;
+    onStart?: () => void;
+    onFrame?: (index: number) => void;
+    onEnd?: () => void;
+  },
+): Promise<Buffer[] | undefined>
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`frames`** | **`Frame[]`** | Yes | — | Each frame supplies **`duration`** and **`draw`** (and optional overrides). |
+| **`defaultDuration`** | **`number`** | Yes | — | Fallback duration (ms) when a frame omits its own. |
+| **`defaultWidth`**, **`defaultHeight`** | **`number`** | No | — | Canvas defaults for frames that don’t override size. |
+| **`options.gif`** | **`boolean`** | No | **`false`** | When **`true`**, runs GIF encoding path (may yield different return behavior — see runtime). |
+
+## Returns
+
+**`Promise<Buffer[] | undefined>`** per published typings. **`undefined`** may occur when GIF mode finishes without returning per-frame buffers — **needs runtime confirmation** for your **`outputFormat`** / frame pipeline.
+
+## Example
+
+```typescript
+const frames = await painter.animate(
+  [
+    {
+      duration: 100,
+      draw: (ctx, w, h) => {
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, w, h);
+      },
+    },
+  ],
+  100,
+  320,
+  180,
+);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Drawing callback errors | Exceptions inside **`draw`** | Keep **`draw`** synchronous-safe; inspect stderr/logs. |
+
+## Related docs
+
+- [`animate` & Frame](/docs#gif-animate)  
+- [GIF & animation](/docs#gif-and-animation)  

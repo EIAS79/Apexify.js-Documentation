@@ -1,0 +1,52 @@
+# drawPath()
+
+## Description
+
+Rasterizes a previously built path (or raw **`PathCommand[]`**) onto a canvas **`Buffer`** / **`CanvasResults`** with optional **`Path2DDrawOptions`**.
+
+## Syntax
+
+```ts
+await painter.drawPath(
+  canvasBuffer: CanvasResults | Buffer,
+  path: any | PathCommand[],
+  options?: Path2DDrawOptions,
+): Promise<Buffer>
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`canvasBuffer`** | **`CanvasResults` \| **`Buffer`** | Yes | — | Target raster. |
+| **`path`** | opaque path **or** **`PathCommand[]`** | Yes | — | Output of **`createPath2D`** **or** explicit commands. |
+| **`options`** | **`Path2DDrawOptions`** | No | — | Stroke/fill styling — see typings. |
+
+## Returns
+
+PNG **`Buffer`**.
+
+## Example
+
+```typescript
+const base = await painter.createCanvas({ width: 400, height: 240, colorBg: '#ffffff' });
+const path = painter.createPath2D([
+  { type: 'moveTo', x: 40, y: 40 },
+  { type: 'lineTo', x: 360, y: 200 },
+]);
+
+await painter.drawPath(base.buffer, path, {
+  stroke: { color: '#0f172a', width: 4 },
+});
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Creator/runtime validation errors | Invalid **`path`** / options pairing | Cross-check with [Path2D & drawPath](/docs#path2d-draw). |
+
+## Related docs
+
+- [Path2D & drawPath](/docs#path2d-draw)  
+- [createPath2D](/docs#api-create-path2d)  

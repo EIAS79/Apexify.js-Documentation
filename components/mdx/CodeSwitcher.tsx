@@ -9,6 +9,8 @@ interface CodeSwitcherProps {
   tsLabel?: string;
   jsLabel?: string;
   children?: React.ReactNode;
+  /** Outer spacing (default `my-4`; use `my-0` when nested inside cards). */
+  className?: string;
 }
 
 export function CodeSwitcher({ 
@@ -16,7 +18,8 @@ export function CodeSwitcher({
   js, 
   tsLabel = 'TypeScript', 
   jsLabel = 'JavaScript',
-  children 
+  children,
+  className = 'my-4',
 }: CodeSwitcherProps) {
   let tsCode = ts;
   let jsCode = js;
@@ -33,7 +36,7 @@ export function CodeSwitcher({
   const [active, setActive] = useState<'ts' | 'js'>(defaultActive);
 
   return (
-    <div className="my-4">
+    <div className={className}>
       {/* Language switcher tabs */}
       <div className="flex gap-0 mb-0 bg-gray-800 dark:bg-gray-800 border border-gray-700 dark:border-gray-700 border-b-0 rounded-t-lg p-1 transition-colors duration-300">
         <button

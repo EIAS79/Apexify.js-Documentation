@@ -1,0 +1,73 @@
+# Common Mistakes
+
+## What this does
+
+A cheat sheet of errors beginners hit most often — **quick fixes**, no digging through long references.
+
+## When to use it
+
+Skim this page when something **silently looks wrong**, throws at runtime, or saves an empty/unexpected file.
+
+## Quick example
+
+There is no single snippet — jump to the mistake that matches your symptom below.
+
+## Output preview
+
+Seeing real outputs helps confirm **what “good” looks like**:
+
+<RelatedGallery ids="advance-chart-bar-quarterly,motion-conic-drift-gif,bg-aurora-grid" />
+
+## How it works
+
+Each mistake pairs **symptom → fix** so you can correct course without undoing your whole project.
+
+## Symptom → fix
+
+### “It prints `[object Promise]` or TypeErrors inside Apex calls”
+
+You forgot **`await`**. Every **`createCanvas`**, **`createImage`**, **`createText`**, **`createChart`** call returns a **Promise** — wrap usage in an **`async`** function.
+
+### “My PNG is empty / unchanged after drawing”
+
+You saved the **old buffer**. Always capture the **latest** return:
+
+`buffer = await painter.createText(..., buffer)` — then save **`buffer`**.
+
+### “Text is clipped or sits off-screen”
+
+**`x` / `y`** plus **`textAlign` / `textBaseline`** describe **anchor points**, not automatic margins. Start centered using **`textAlign: "center"`**, **`textBaseline: "middle"`**, **`x = width / 2`**, **`y = height / 2`**.
+
+### “Shapes overlap weirdly”
+
+**Draw order = stacking order.** Earlier **`createImage`** calls sit underneath later ones.
+
+### “Gradients look muddy”
+
+Reduce **`noiseBg`** intensity or simplify **`gradientBg` stops** — contrast disappears when too many effects compete.
+
+### “GIF or MP4 exports fail on my laptop”
+
+Animated GIFs still need valid frames. **Video encoding** generally requires **FFmpeg installed** and available on your **`PATH`** — verify with your OS package manager before debugging code.
+
+### “Batch jobs overwrite each other”
+
+Generate **unique filenames** (slug + timestamp) or write into separate folders per job.
+
+## Common changes
+
+- Wrap experiments in **`try/catch`** so Apexify errors surface clearly.
+- Log **`buffer.length`** after each draw to confirm growth.
+
+## Common mistakes
+
+Even this page has meta mistakes:
+
+- **Changing ten knobs at once** — adjust **one** property between renders.
+- **Skipping the beginner golden example** — confirm **[Your First Image](/docs#your-first-image)** works before layering complexity.
+
+## Next steps
+
+- **[Your First Image](/docs#your-first-image)** — baseline pipeline  
+- **[Save & Export](/docs#save-export)** — persist buffers reliably  
+- **[Troubleshooting](/docs#troubleshooting)** — deeper diagnostics when you graduate past beginner issues  

@@ -83,8 +83,8 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
           </div>
         )}
         
-        {/* Code content with Prism syntax highlighting */}
-        <div className="relative bg-slate-950 transition-colors duration-200 overflow-x-auto max-w-full">
+        {/* Code content — capped height so long snippets scroll inside the block */}
+        <div className="relative bg-slate-950 transition-colors duration-200 overflow-x-auto overflow-y-auto max-h-[min(65vh,28rem)] max-w-full">
           <div className="p-3 sm:p-4 min-w-0">
           <SyntaxHighlighter
             language={normalizeLanguage(language)}

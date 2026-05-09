@@ -32,29 +32,53 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
   useEffect(() => {
     if (headings.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: '-100px 0px -66%',
-      }
-    );
+    /**
+     * Scroll-spy uses heading nodes under `[data-doc-article]` in **document order**
+     * (avoids accidentally targeting unrelated `.markdown-content` wrappers).
+     * Anchor line sits ~under fixed nav (`top-16`); headings use `scroll-mt-28`.
+     */
+    const NAV_ANCHOR_PX = 100;
+    const tocIds = new Set(headings.map((h) => h.id));
 
-    headings.forEach(({ id }) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
+    const headingElementsInArticle = (): HTMLElement[] => {
+      const root = document.querySelector('[data-doc-article]');
+      if (!root) return [];
+      const nodes = root.querySelectorAll<HTMLElement>('h1[id], h2[id], h3[id]');
+      return Array.from(nodes).filter((el) => tocIds.has(el.id));
+    };
+
+    const updateActive = () => {
+      const els = headingElementsInArticle();
+      if (els.length === 0) {
+        setActiveId((prev) => (prev === (headings[0]?.id ?? '') ? prev : (headings[0]?.id ?? '')));
+        return;
+      }
+
+      let active = els[0].id;
+      for (const el of els) {
+        const top = el.getBoundingClientRect().top;
+        if (top <= NAV_ANCHOR_PX) active = el.id;
+      }
+      setActiveId((prev) => (prev === active ? prev : active));
+    };
+
+    updateActive();
+    requestAnimationFrame(() => requestAnimationFrame(updateActive));
+
+    window.addEventListener('scroll', updateActive, { passive: true });
+    window.addEventListener('resize', updateActive);
+
+    const resizeRoot = document.querySelector('[data-doc-article]');
+    let resizeObserver: ResizeObserver | null = null;
+    if (resizeRoot && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(() => updateActive());
+      resizeObserver.observe(resizeRoot);
+    }
 
     return () => {
-      headings.forEach(({ id }) => {
-        const element = document.getElementById(id);
-        if (element) observer.unobserve(element);
-      });
+      window.removeEventListener('scroll', updateActive);
+      window.removeEventListener('resize', updateActive);
+      resizeObserver?.disconnect();
     };
   }, [headings]);
 
@@ -62,6 +86,7 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.history.replaceState(null, '', `#${id}`);
       setActiveId(id);
     }
   };

@@ -1,0 +1,47 @@
+# validHex()
+
+## Description
+
+Validates **`#RRGGBB`** hexadecimal colors using a strict pattern check.
+
+## Syntax
+
+```ts
+painter.validHex(hexColor: string): boolean
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`hexColor`** | **`string`** | Yes | — | Must match **`/^#[0-9a-fA-F]{6}$/`** (implementation in **`apexify.js` 5.3.20). |
+
+## Returns
+
+**`true`** when valid.
+
+## Throws
+
+Throws **`Error`** when:
+
+- **`hexColor`** is not a **`string`**, or  
+- The pattern does not match **`#RRGGBB`**.
+
+*(Despite older docstrings implying boolean-only behavior, invalid values **throw** rather than returning **`false`**.)*
+
+## Example
+
+```typescript
+painter.validHex('#ff0000'); // true
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| **`validHex: hexColor must be a string.`** | Non-string input | Coerce / guard input. |
+| **`validHex: Invalid hexadecimal color format…`** | Missing **`#`**, wrong length, illegal chars | Normalize to **`#` + 6 hex digits**. |
+
+## Related docs
+
+- [Canvas utils & types](/docs#canvas-utils-and-types) *(color validation helpers elsewhere)*  

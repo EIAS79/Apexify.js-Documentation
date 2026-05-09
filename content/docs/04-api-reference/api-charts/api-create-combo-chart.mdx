@@ -1,0 +1,62 @@
+# createComboChart()
+
+## Description
+
+Renders a **single** axes canvas that mixes **bars + lines**, including optional **secondary Y axis** and stacked/grouped bar modes.
+
+## Syntax
+
+```ts
+await painter.createComboChart(options: ComboChartOptions): Promise<Buffer>
+```
+
+**`ComboChartOptions`** ships beside the combo chart implementation — use editor hints from **`apexify.js`** / tables in the feature guide.
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`options`** | **`ComboChartOptions`** | Yes | — | Bar series, line series, axes, legends, **`appearance`**, **`barsType`**, opacity helpers, etc. |
+
+## Returns
+
+PNG **`Buffer`**.
+
+## Example
+
+```typescript
+const combo = await painter.createComboChart({
+  dimensions: { width: 900, height: 480 },
+  bars: [
+    {
+      label: 'North',
+      data: [
+        { xStart: 1, xEnd: 2, values: [{ value: 12, color: '#38bdf8' }] },
+      ],
+    },
+  ],
+  lines: [
+    {
+      label: 'Target',
+      data: [
+        { x: 1, y: 10 },
+        { x: 2, y: 14 },
+      ],
+      color: '#f97316',
+    },
+  ],
+});
+```
+
+*(Shape trimmed for illustration — validate against **`ComboChartOptions`** for your version.)*
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Axis/series pairing errors | **`bars`**/**`lines`** data doesn’t match declared **`barsType`** / scales | See [Charts: comparison & combo](/docs#charts-comparison-combo) combo section. |
+
+## Related docs
+
+- [Charts: comparison & combo](/docs#charts-comparison-combo)  
+- [Charts hub](/docs#charts)  

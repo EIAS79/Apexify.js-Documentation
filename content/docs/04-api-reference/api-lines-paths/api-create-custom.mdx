@@ -1,0 +1,60 @@
+# createCustom()
+
+## Description
+
+Draws connector-style custom lines (smooth / Bézier / Catmull-Rom paths, arrows, markers, dash/pattern styles) onto an existing canvas buffer.
+
+## Syntax
+
+```ts
+await painter.createCustom(
+  options: CustomOptions | CustomOptions[],
+  buffer: CanvasResults | Buffer,
+): Promise<Buffer>
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`options`** | **`CustomOptions` \| **`CustomOptions[]`** | Yes | — | Line geometry (**`startCoordinates`**, **`endCoordinates`**), optional **`path`**, **`arrow`**, **`markers`**, **`lineStyle`**, etc. |
+| **`buffer`** | **`CanvasResults` \| **`Buffer`** | Yes | — | Base canvas. |
+
+### Important `CustomOptions` fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **`startCoordinates`**, **`endCoordinates`** | **`{ x, y }`** | Endpoints (required in typings). |
+
+Full surface: **`CanvasTypes.CustomOptions`**.
+
+## Returns
+
+PNG **`Buffer`**.
+
+## Example
+
+```typescript
+const base = await painter.createCanvas({ width: 640, height: 360, colorBg: '#ffffff' });
+
+await painter.createCustom(
+  {
+    startCoordinates: { x: 80, y: 280 },
+    endCoordinates: { x: 560, y: 80 },
+    arrow: { end: true, size: 14 },
+    lineStyle: { width: 4, color: '#1e293b' },
+  },
+  base.buffer,
+);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Missing endpoints | Incomplete **`CustomOptions`** | Provide **`startCoordinates`** / **`endCoordinates`**. |
+
+## Related docs
+
+- [Custom lines](/docs#custom-lines)  
+- [Custom lines style](/docs#custom-lines-style)  

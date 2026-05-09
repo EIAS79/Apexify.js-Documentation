@@ -1,0 +1,121 @@
+# Add Images
+
+## What this does
+
+**`createImage`** composites shapes, stickers, or bitmaps onto your canvas — rectangles with rounding, circles, imported logos, and more.
+
+## When to use it
+
+Product shots with badges, social posts with avatar chips, diagrams with icons, or layered marketing layouts.
+
+## Quick example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "fs";
+
+const painter = new ApexPainter();
+
+let { buffer } = await painter.createCanvas({
+  width: 800,
+  height: 450,
+  colorBg: "#0f172a",
+});
+
+buffer = await painter.createImage(
+  {
+    source: "rectangle",
+    x: 120,
+    y: 140,
+    width: 560,
+    height: 180,
+    shape: {
+      fill: true,
+      color: "#38bdf8",
+    },
+    stroke: {
+      color: "#e2e8f0",
+      width: 3,
+      borderRadius: 24,
+    },
+    shadow: {
+      color: "rgba(15,23,42,0.55)",
+      offsetY: 18,
+      blur: 36,
+      opacity: 0.9,
+      borderRadius: 24,
+    },
+  },
+  buffer
+);
+
+fs.writeFileSync("card.png", buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require("apexify.js");
+const fs = require("fs");
+
+(async () => {
+  const painter = new ApexPainter();
+  let { buffer } = await painter.createCanvas({
+    width: 800,
+    height: 450,
+    colorBg: "#0f172a",
+  });
+  buffer = await painter.createImage(
+    {
+      source: "rectangle",
+      x: 120,
+      y: 140,
+      width: 560,
+      height: 180,
+      shape: { fill: true, color: "#38bdf8" },
+      stroke: { color: "#e2e8f0", width: 3, borderRadius: 24 },
+      shadow: {
+        color: "rgba(15,23,42,0.55)",
+        offsetY: 18,
+        blur: 36,
+        opacity: 0.9,
+        borderRadius: 24,
+      },
+    },
+    buffer
+  );
+  fs.writeFileSync("card.png", buffer);
+})();
+```
+</js>
+</CodeSwitcher>
+
+## Output preview
+
+Multi-shape composition from the gallery:
+
+<PreviewWithCode id="advance-shape-collage" />
+
+## How it works
+
+1. **`source: "rectangle"`** tells Apexify.js to draw a vector rectangle (not a file path).
+2. **`shape.fill`** controls interior color; **`stroke`** outlines with rounding.
+3. **`shadow`** lifts the element visually — tweak **`blur`** and **`offsetY`** for depth.
+
+## Common changes
+
+- Swap **`source`** to **`circle`**, **`triangle`**, or **`star`** for quick variation.
+- Lower **`width`** / **`height`** to create badges beside text.
+- Stack multiple **`createImage`** calls for collage layouts.
+
+## Common mistakes
+
+- **Drawing before a canvas exists** — always **`createCanvas`** first.
+- **Coordinates off-canvas** — keep **`x` + width** ≤ canvas **`width`**.
+
+## Next steps
+
+- **[Save & Export](/docs#save-export)** — finish the beginner pipeline  
+
+Then drill deeper when needed: **[Create image & shapes](/docs#create-image-and-shapes)** · **[Image shapes](/docs#image-shapes)** · **[Draw shapes](/docs#draw-shapes)**  

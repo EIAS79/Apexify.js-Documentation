@@ -1,0 +1,49 @@
+# new ApexPainter()
+
+## Description
+
+Constructs the main façade used for canvas scenes, charts, GIF/video helpers, batch/chain, standalone image utilities, and **`outPut`** serialization.
+
+## Syntax
+
+```ts
+new ApexPainter(options?: OutputFormat)
+```
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`options`** | **`OutputFormat`** | No | **`{ type: 'buffer' }`** | Sets the serializer channel used by **`outPut()`** only (not draw-method return types). |
+
+### `OutputFormat`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **`type`** | **`'buffer'` \| `'url'` \| `'blob'` \| `'base64'` \| `'dataURL'` \| `'arraybuffer'`** | Controls **`await painter.outPut(buffer)`** return shape. Default **`'buffer'`**. |
+
+*(Source: `apexify.js` `OutputFormat` in published typings.)*
+
+## Returns
+
+An **`ApexPainter`** instance.
+
+## Example
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter({ type: 'base64' });
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Serializer errors from **`outPut`** | Unsupported ctor **`type`** or failed conversion | Match **`type`** to a supported literal; ensure input is a **`Buffer`** — see [Save & output](/docs#save-and-output). |
+
+## Related docs
+
+- [Package surface](/docs#package-surface)  
+- [Save & output](/docs#save-and-output)  
+- [API Reference hub](/docs#api-reference)  

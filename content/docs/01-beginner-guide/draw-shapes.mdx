@@ -1,0 +1,134 @@
+# Draw Shapes
+
+## What this does
+
+Shapes are drawn through **`createImage`** by choosing a **`source`** primitive (rectangle, circle, star, …) and styling **`shape`**, **`stroke`**, and **`shadow`**.
+
+## When to use it
+
+Buttons on synthetic UI shots, infographic highlights, badges, flow diagrams, or masking frames before dropping text.
+
+## Quick example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "fs";
+
+const painter = new ApexPainter();
+
+let { buffer } = await painter.createCanvas({
+  width: 700,
+  height: 420,
+  colorBg: "#020617",
+});
+
+buffer = await painter.createImage(
+  {
+    source: "circle",
+    x: 260,
+    y: 110,
+    width: 180,
+    height: 180,
+    shape: {
+      fill: true,
+      color: "#f472b6",
+    },
+    stroke: {
+      color: "#fef08a",
+      width: 4,
+      borderRadius: "circular",
+    },
+  },
+  buffer
+);
+
+buffer = await painter.createImage(
+  {
+    source: "triangle",
+    x: 470,
+    y: 220,
+    width: 140,
+    height: 140,
+    rotation: 12,
+    shape: { fill: true, color: "#34d399" },
+    stroke: { color: "#064e3b", width: 2 },
+  },
+  buffer
+);
+
+fs.writeFileSync("shapes.png", buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require("apexify.js");
+const fs = require("fs");
+
+(async () => {
+  const painter = new ApexPainter();
+  let { buffer } = await painter.createCanvas({
+    width: 700,
+    height: 420,
+    colorBg: "#020617",
+  });
+  buffer = await painter.createImage(
+    {
+      source: "circle",
+      x: 260,
+      y: 110,
+      width: 180,
+      height: 180,
+      shape: { fill: true, color: "#f472b6" },
+      stroke: { color: "#fef08a", width: 4, borderRadius: "circular" },
+    },
+    buffer
+  );
+  buffer = await painter.createImage(
+    {
+      source: "triangle",
+      x: 470,
+      y: 220,
+      width: 140,
+      height: 140,
+      rotation: 12,
+      shape: { fill: true, color: "#34d399" },
+      stroke: { color: "#064e3b", width: 2 },
+    },
+    buffer
+  );
+  fs.writeFileSync("shapes.png", buffer);
+})();
+```
+</js>
+</CodeSwitcher>
+
+## Output preview
+
+Gallery collage combining multiple primitives:
+
+<GalleryExample id="advance-shape-collage" />
+
+## How it works
+
+1. Each **`createImage`** call adds **one** primitive layer.
+2. **`rotation`** spins shapes around their origin — handy for playful layouts.
+3. Order matters: earlier draws sit **under** later draws.
+
+## Common changes
+
+- Add **`shadow`** blocks for floating stickers.
+- Lower opacity via **`opacity`** when shapes should feel subtle.
+- Pair with **`createText`** for labeled diagrams.
+
+## Common mistakes
+
+- **Mixing up width/height for circles** — keep them equal for perfect discs.
+- **Huge strokes on tiny shapes** — reduce **`stroke.width`** when icons get cramped.
+
+## Next steps
+
+- **[Custom lines](/docs#custom-lines)** — connectors beyond primitives  
+- **[Add Text](/docs#add-text)** — label the shapes you draw  
+- **[Charts](/docs#charts)** — when numbers need visuals  

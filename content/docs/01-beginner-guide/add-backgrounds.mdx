@@ -1,0 +1,97 @@
+# Add Backgrounds
+
+## What this does
+
+Backgrounds control **everything behind your content** — flat color, gradients, patterns, and subtle texture — all configured when you call **`createCanvas`**.
+
+## When to use it
+
+Any time the canvas should **feel designed**, not empty: landing heroes, slides, thumbnails, or chart backdrops.
+
+## Quick example
+
+<CodeSwitcher>
+<ts>
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "fs";
+
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 960,
+  height: 540,
+  gradientBg: {
+    type: "linear",
+    startX: 0,
+    startY: 0,
+    endX: 960,
+    endY: 540,
+    colors: [
+      { stop: 0, color: "#020617" },
+      { stop: 1, color: "#1e3a8a" },
+    ],
+    rotate: 48,
+  },
+});
+
+fs.writeFileSync("gradient-bg.png", buffer);
+```
+</ts>
+<js>
+```javascript
+const { ApexPainter } = require("apexify.js");
+const fs = require("fs");
+
+(async () => {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createCanvas({
+    width: 960,
+    height: 540,
+    gradientBg: {
+      type: "linear",
+      startX: 0,
+      startY: 0,
+      endX: 960,
+      endY: 540,
+      colors: [
+        { stop: 0, color: "#020617" },
+        { stop: 1, color: "#1e3a8a" },
+      ],
+      rotate: 48,
+    },
+  });
+  fs.writeFileSync("gradient-bg.png", buffer);
+})();
+```
+</js>
+</CodeSwitcher>
+
+## Output preview
+
+Full gallery composition (gradient stacks, patterns, noise — still **`createCanvas`** only):
+
+<PreviewWithCode id="bg-chromatic-depth" />
+
+## How it works
+
+1. **`gradientBg`** replaces **`colorBg`** with a **linear blend** between two colors.
+2. **`rotate`** tilts the gradient so highlights move across the frame.
+3. The returned **`buffer`** is already a PNG-ready raster — draw text or shapes on top next.
+
+## Common changes
+
+- Swap **`colors`** for brand hues.
+- Add **`noiseBg: { intensity: 0.03 }`** for gentle grain.
+- Return to **`colorBg: "#020617"`** when you want a perfectly flat matte.
+
+## Common mistakes
+
+- **Huge canvases for tests** — start near **960×540** so iterations stay fast.
+- **Expecting JPEG by default** — examples save **PNG**; change format only when you intentionally convert elsewhere.
+
+## Next steps
+
+Replay **[Your First Image](/docs#your-first-image)** with your richer **`createCanvas`** config — keep chaining **[Add Text](/docs#add-text)** → **[Add Images](/docs#add-images)** → **[Save & Export](/docs#save-export)**.
+
+Deep dives: **[Canvas BG layers](/docs#canvas-bg-layers)** · **[Canvas patterns, noise & transforms](/docs#canvas-pattern-noise-transforms)**  

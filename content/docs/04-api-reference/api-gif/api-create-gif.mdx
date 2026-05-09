@@ -1,0 +1,72 @@
+# createGIF()
+
+## Description
+
+Encodes an animated GIF either from explicit **`GIFInputFrame[]`** **or** programmatic frames via **`GIFOptions.onStart`** ( **`onStart` overrides** the **`gifFrames`** argument when supplied).
+
+## Syntax
+
+```ts
+await painter.createGIF(
+  gifFrames: GIFInputFrame[] | undefined,
+  options: GIFOptions,
+): Promise<
+  | GIFResults
+  | Buffer
+  | string
+  | Array<{ attachment: NodeJS.ReadableStream | any; name: string }>
+  | { gif: Buffer | string; static: Buffer }
+  | undefined
+>
+```
+
+*(Union copied from **`apexify.js` `ApexPainter.d.ts`**.)*
+
+## Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| **`gifFrames`** | **`GIFInputFrame[]` \| **`undefined`** | No* | — | Static frames (delay, buffers/paths, per-frame transparency/watermark). Ignored when **`options.onStart`** is provided. |
+| **`options`** | **`GIFOptions`** | Yes | — | Dimensions, **`outputFormat`**, **`delay`**, **`repeat`**, **`watermark`**, **`onStart`**, **`onEnd`**, etc. |
+
+\* **`gifFrames`** may be **`undefined`** when **`onStart`** supplies frames.
+
+### Important `GIFOptions` fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| **`outputFormat`** | **`'file' \| 'base64' \| 'attachment' \| 'buffer' \| string`** | Determines side effects / return shape (see typings). |
+| **`width`**, **`height`** | **`number`** | Target GIF geometry. |
+| **`onStart`** | callback | Async frame generator (**`GIFEncodedFrame[]`** or async iterable). |
+
+## Returns
+
+One of several shapes depending on **`GIFOptions.outputFormat`** and callbacks — see union above. Treat **`GIFResults`** (**`buffer`**, **`base64`**, **`attachment`**) as the structured case.
+
+## Example
+
+```typescript
+const gif = await painter.createGIF(
+  [
+    { duration: 80, buffer: frameA },
+    { duration: 80, buffer: frameB },
+  ],
+  {
+    outputFormat: 'buffer',
+    width: 320,
+    height: 200,
+    repeat: 0,
+  },
+);
+```
+
+## Common errors
+
+| Error | Cause | Fix |
+|-------|--------|-----|
+| Encoder / IO errors | Invalid frames, missing dimensions, bad **`outputFormat`** combo | Follow [Create GIF](/docs#gif-create) recipes; ensure buffers decode. |
+
+## Related docs
+
+- [GIF & animation](/docs#gif-and-animation)  
+- [Create GIF](/docs#gif-create)  
