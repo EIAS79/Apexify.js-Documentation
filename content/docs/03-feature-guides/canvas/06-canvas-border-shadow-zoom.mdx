@@ -1,0 +1,79 @@
+# Border clip, zoom, rotation & canvas blur {#06-canvas-border-shadow-zoom}
+
+Back: [Canvas overview](/docs#00-create-canvas-overview)
+
+This page covers **canvas-level** geometry and painting blend — not every nested field of **`shadow`** / **`stroke`** (those have dedicated pages).
+
+---
+
+## Rounded clip — `borderRadius`, `borderPosition` (on `CanvasConfig`)
+
+Background painting is clipped to a rounded rectangle (or **`borderRadius: 'circular'`**).
+
+**`borderPosition`** (canvas): which **corners** take rounding (`'all'`, `'top-left'`, `'top'`, sides — full **`borderPosition`** union in **`types/index.ts`**).
+
+```typescript
+await painter.createCanvas({
+  width: 500,
+  height: 300,
+  colorBg: '#f8fafc',
+  borderRadius: 24,
+  borderPosition: 'all',
+});
+```
+
+---
+
+## Zoom — `zoom`
+
+| Field | Role |
+|-------|------|
+| **`scale`** | Positive factor (**required effect** when zooming). |
+| **`centerX`**, **`centerY`** | Anchor for **`applyCanvasZoom`** — defaults handled inside helper. |
+
+Painted **inside** the clip **before** backgrounds fill.
+
+```typescript
+zoom: { scale: 1.08, centerX: 250, centerY: 150 },
+```
+
+---
+
+## Rotation — `rotation`
+
+Degrees around **`(x,y)`** with **`width`** × **`height`** box (**`applyRotation`**).
+
+---
+
+## Canvas opacity — `opacity`
+
+**`0…1`** → **`ctx.globalAlpha`** for the **main** drawing block (background stack).
+
+---
+
+## Blend mode — `blendMode`
+
+Any **`GlobalCompositeOperation`** string (**`'multiply'`**, **`'screen'`**, **`'overlay'`**, …) applied after translate inside **`CanvasCreator`**.
+
+---
+
+## Canvas blur — `blur`
+
+Number → **`ctx.filter = blur(Npx)`** during **`drawBackgroundColor`** / **`drawBackgroundGradient`** (see **`bg.ts`**). Not the same as **`stroke.blur`** or **`shadow.blur`** — those live on **`StrokeOptions`** / **`ShadowOptions`**.
+
+---
+
+## Shadow & stroke (overview only)
+
+**`canvas.shadow`** and **`canvas.stroke`** use **`ShadowOptions`** and **`StrokeOptions`** — **many fields each** (gradients, partial edges, dash styles, …).
+
+| Topic | Full reference |
+|-------|----------------|
+| **`shadow`** | **[Shadow — every option](/docs#07-canvas-shadow-options)** |
+| **`stroke`** | **[Stroke — every option](/docs#08-canvas-stroke-options)** |
+
+Quick reminder: **`createCanvas`** does **not** auto-copy **`canvas.borderRadius`** onto **`shadow`** / **`stroke`** paths — set **`shadow.borderRadius`** / **`stroke.borderRadius`** when you want rounded shadow/outline.
+
+---
+
+Next: **[Shadow options](/docs#07-canvas-shadow-options)** · **[Stroke options](/docs#08-canvas-stroke-options)** · **[Paint order](/docs#09-canvas-paint-order)**.

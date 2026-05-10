@@ -1,0 +1,69 @@
+# Background layers (`bgLayers`) {#04-backgrounds-bg-layers}
+
+Back: [Canvas overview](/docs#00-create-canvas-overview)
+
+---
+
+## What they are
+
+**`bgLayers`** is an **array** painted **after** the primary background (**`colorBg`** / **`gradientBg`** / **`customBg`** / **`videoBg`** or transparent base), **before** **`patternBg`** and **`noiseBg`**.
+
+**Order:** index **0** = bottom, last index = top.
+
+---
+
+## Allowed `type` values
+
+| `type` | What you provide |
+|--------|------------------|
+| **`color`** | **`value`**: CSS color string |
+| **`gradient`** | **`value`**: full **`gradient`** object |
+| **`image`** | **`source`**: path/URL; **`fit`**, **`align`** |
+| **`pattern`** | **`source`**: image for tiling; **`repeat`** |
+| **`presetPattern`** | **`pattern`**: **`PatternOptions`** — same procedural **`type`** values as **`patternBg`** ([catalogue](/docs#05-backgrounds-pattern-noise-pattern-types)) |
+| **`noise`** | **`intensity`** between **0** and **1** |
+
+Every layer may include **`opacity`** and **`blendMode`** (**`GlobalCompositeOperation`**).
+
+---
+
+## Example — tint + grain
+
+```typescript
+await painter.createCanvas({
+  width: 1080,
+  height: 1080,
+  colorBg: '#1e1b4b',
+  bgLayers: [
+    { type: 'noise', intensity: 0.05, blendMode: 'overlay' },
+    {
+      type: 'presetPattern',
+      pattern: {
+        type: 'dots',
+        color: '#c7d2fe',
+        opacity: 0.15,
+        size: 8,
+        spacing: 24,
+      },
+      blendMode: 'soft-light',
+    },
+  ],
+});
+```
+
+---
+
+## Validation errors
+
+**`createCanvas`** validates each layer:
+
+- **`type`** must be one of the allowed strings.
+- **`color`** layers need string **`value`**.
+- **`gradient`** layers need **`value.type`**.
+- **`image`** / **`pattern`** need non-empty **`source`** string.
+- **`presetPattern`** needs **`pattern`** object with **`type`** string.
+- **`noise`** **`intensity`** must be **0–1** if set.
+
+---
+
+Next: **[Pattern & noise](/docs#05-backgrounds-pattern-noise)**.

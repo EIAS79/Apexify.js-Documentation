@@ -1,0 +1,49 @@
+# `onEnd`, return values & performance flags {#06-create-gif-onend-results}
+
+Back: [GIF overview](/docs#00-create-gif-overview)
+
+---
+
+## `onEnd`
+
+```typescript
+onEnd?: (
+  finalFrameBuffer: Buffer,
+  painter: ApexPainter
+) => Promise<Buffer | undefined>;
+```
+
+**`finalFrameBuffer`** — PNG bytes of the **last composite** after resize, watermark, and **`textOverlay`** (the encoder canvas snapshot).
+
+Use it to ship a **still preview**, upload a poster frame, etc.
+
+### Pairing with **`gif`**
+
+- When **`outputFormat`** is **`buffer`** or **`base64`** **and** **`onEnd`** returns a **`Buffer`**, **`createGIF`** resolves **`{ gif, static }`**.
+- When **`outputFormat`** is **`file`**, **`gifResult`** is **`undefined`** (GIF already written). If **`onEnd`** returns a buffer, the method returns **only** that **`static`** **`Buffer`** — **not** an object with paths — the GIF lives on disk at **`outputFile`**.
+- When **`outputFormat`** is **`attachment`**, the method **returns early** with the stream tuple — **`onEnd` is never called** in the current implementation.
+
+---
+
+## `skipResizeWhenDimensionsMatch`
+
+| Value | Behaviour |
+|-------|-----------|
+| **`true`** or **omitted** | If **`loadImage`** dimensions equal **`options.width` × `height`**, **`drawImage`** **without** intermediate resize canvas (**faster**). |
+| **`false`** | Always **`resizeImage`** path (**consistent scaling**). |
+
+---
+
+## Validation recap
+
+| Rule | Error |
+|------|--------|
+| No **`onStart`** and empty **`gifFrames`** | Frames required |
+| **`outputFormat === 'file'`** without **`outputFile`** | **`outputFile` required** |
+| **`repeat < 0`** | Invalid |
+| **`quality`** outside **`1…20`** | Invalid |
+| **`duration`** negative on input frame | Invalid |
+
+---
+
+Next: **[Encode pipeline](/docs#07-create-gif-encode-pipeline)**.

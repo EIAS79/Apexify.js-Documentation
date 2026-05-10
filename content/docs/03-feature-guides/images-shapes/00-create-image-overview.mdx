@@ -1,0 +1,62 @@
+# Images & shapes (`createImage`) — overview {#00-create-image-overview}
+
+**`await painter.createImage(images, canvasBuffer, options?)`** draws **bitmaps** (paths, URLs, buffers) or **vector shapes** (rectangle, circle, star, …) onto an **existing** canvas produced by **`createCanvas`** (or any **`Buffer`** / **`CanvasResults`** with compatible dimensions).
+
+Back: [Feature guides hub](/docs#feature-guides-hub) · [Canvas overview](/docs#00-create-canvas-overview)
+
+---
+
+## What you pass in
+
+| Argument | Role |
+|----------|------|
+| **`images`** | One **`ImageProperties`** object **or** an array (drawn in order). |
+| **`canvasBuffer`** | **`Buffer`** PNG from **`createCanvas`**, or **`{ buffer }`** (`CanvasResults`). |
+| **`options`** | Optional **`CreateImageOptions`** — **`isGrouped`** + **`groupTransform`** for treating several layers as one transformed unit. |
+
+Return value: **`Promise<Buffer>`** — full canvas PNG after compositing.
+
+---
+
+## Mental model
+
+1. Build a **base** with **`createCanvas`** (size + backgrounds).
+2. Call **`createImage`** to **composite** one or more layers on top (each layer = **`ImageProperties`**).
+3. Chain **`createText`**, more **`createImage`**, **`save`**, etc., as needed.
+
+**Whole-file resize / crop / palette removal outside compositing:** [Standalone image tools](/docs#00-standalone-image-tools-overview) (**`resize`**, **`cropImage`**, **`colorAnalysis`**, …).
+
+---
+
+## Topics (read in order)
+
+| # | Page | Covers |
+|---|------|--------|
+| 1 | [Basics — source, box, fit](/docs#01-create-image-basics) | **`source`**, **`x`/`y`**, **`width`/`height`**, **`inherit`**, **`fit`**, **`align`** |
+| 2 | [Shapes reference](/docs#02-shapes-reference) | Every **`ShapeType`**, **`shape`** fields, stroke/shadow quirks (**heart**, **star**) |
+| 3 | [Styling, clip & blend](/docs#03-create-image-styling-clip) | **`rotation`**, **`opacity`**, **`blur`**, **`borderRadius`**, **`clipPath`**, **`boxBackground`**, **`blendMode`** |
+| 4 | [Shadow & stroke on layers](/docs#04-create-image-shadow-stroke) | **`shadow`**, **`stroke`** on bitmap boxes vs shapes |
+| 5 | [Professional filters](/docs#05-create-image-filters) | **`ImageFilter`** types, **`filterIntensity`**, **`filterOrder`** (**pre** / **post**) |
+| 6 | [Mask & distortion](/docs#06-create-image-mask-distortion) | **`mask`**, **`distortion`**, **`meshWarp`** — what works today |
+| 7 | [Cinematic effects](/docs#07-create-image-effects) | **`effects`** — vignette, lens flare, chromatic aberration, grain |
+| 8 | [Grouped layers](/docs#08-create-image-groups) | **`isGrouped`**, **`groupTransform`** — pivots, filters, limits |
+| 9 | [Paint order (reference)](/docs#09-create-image-paint-order) | Exact pipeline inside **`ImageCreator`** |
+
+---
+
+## Where the code lives
+
+| Piece | File |
+|-------|------|
+| Public API | **`lib/Canvas/ApexPainter.ts`** (`createImage`) |
+| Composer | **`lib/Canvas/extended/ImageCreator.ts`** |
+| Types | **`lib/Canvas/utils/types/index.ts`** — **`ImageProperties`**, **`ShapeProperties`**, **`CreateImageOptions`**, **`GroupTransformOptions`**, **`ImageFilter`** |
+| Shape geometry | **`lib/Canvas/utils/Shapes/shapes.ts`** |
+| Fit / shadow / stroke / gradients | **`lib/Canvas/utils/Image/imageProperties.ts`** |
+| Filters | **`lib/Canvas/utils/Image/professionalImageFilters.ts`** |
+| Mask / warp | **`lib/Canvas/utils/Image/imageMasking.ts`** |
+| Vignette / flare / grain | **`lib/Canvas/utils/Image/imageEffects.ts`** |
+
+---
+
+Start with **[Basics](/docs#01-create-image-basics)**.

@@ -1,0 +1,156 @@
+# Polar area chart {#08-chart-polar-area}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+Equal **angular** slices; **radius** encodes **value** (or **√** scaled for **area** proportionality).
+
+```typescript
+await painter.createChart('polarArea', slices, options);
+```
+
+---
+
+## `PolarAreaSlice`
+
+**`label`**, **`value`** (**> 0** contributes to total), **`color`**, **`gradient`**, **`opacity`**.
+
+**Throws** if no slices or **total ≤ 0**.
+
+---
+
+## `PolarAreaChartOptions`
+
+| Field | Purpose |
+|-------|---------|
+| **`scale`** | **`radius`** (linear radius, default) vs **`area`** (**`sqrt(value/max)`** feel). |
+| **`polar.innerRadiusRatio`** | Donut hole (**0** = solid centre). |
+| **`polar.labelBandRatio`** | Outer band for labels (**default ~0.18**). |
+| **`polar.sliceStrokeWidth`**, **`sliceStrokeColor`** | Divider strokes. |
+| **`polar.startAngleDeg`** | **Default -90°** (first slice from **top**). |
+| **`polar.opacity`** | Global multiplier × per-slice **`opacity`**. |
+| **`labels.showValues`**, **`valueFormat`**, **`sliceLabelFontSize`**, **`sliceLabelColor`** | Numeric overlay on wedges. |
+
+---
+
+## `labels.valueFormat`
+
+When **`labels.showValues`** is **`true`**, each wedge draws **`valueFormat(slice.value, slice.value / total)`** at mid‑radius. **`total`** is the sum of **`Math.max(0, value)`** across slices (same total used for angles).
+
+| Concern | Detail |
+|---------|--------|
+| **Arguments** | **`value`** — raw slice value; **`fraction`** — share of total (**0…1**). |
+| **Default** | If omitted: **`(v) => String(Math.round(v * 100) / 100)`** — **only `value` is formatted**; the second argument is still passed if you replace the function. |
+| **Styling** | **`sliceLabelFontSize`**, **`sliceLabelColor`** apply to that text. |
+
+---
+
+## Example — budget split (area scaling)
+
+```typescript
+await painter.createChart(
+  'polarArea',
+  [
+    { label: 'Engineering', value: 42, color: '#6366f1' },
+    { label: 'Marketing', value: 28, color: '#ec4899' },
+    { label: 'Ops', value: 18, color: '#14b8a6' },
+    { label: 'Legal', value: 12, color: '#f97316' },
+  ],
+  {
+    scale: 'area',
+    dimensions: { width: 640, height: 640 },
+    polar: {
+      innerRadiusRatio: 0.12,
+      sliceStrokeWidth: 2,
+      startAngleDeg: -90,
+    },
+    labels: {
+      title: { text: 'Budget mix', fontSize: 24 },
+      showValues: true,
+      valueFormat: (v, frac) => `${(frac * 100).toFixed(0)}%`,
+    },
+  }
+);
+```
+
+---
+
+## Example — **`valueFormat`**: percent with one decimal
+
+```typescript
+await painter.createChart(
+  'polarArea',
+  [
+    { label: 'North', value: 210, color: '#6366f1' },
+    { label: 'South', value: 165, color: '#818cf8' },
+    { label: 'East', value: 142, color: '#a5b4fc' },
+    { label: 'West', value: 118, color: '#c7d2fe' },
+  ],
+  {
+    scale: 'radius',
+    dimensions: { width: 560, height: 560 },
+    labels: {
+      title: { text: 'Regional mix', fontSize: 20 },
+      showValues: true,
+      valueFormat: (_value, fraction) => `${(fraction * 100).toFixed(1)}%`,
+      sliceLabelFontSize: 13,
+      sliceLabelColor: '#0f172a',
+    },
+  }
+);
+```
+
+---
+
+## Example — **`valueFormat`**: raw count **and** percent
+
+```typescript
+await painter.createChart(
+  'polarArea',
+  [
+    { label: 'Issues', value: 37, color: '#ef4444' },
+    { label: 'Features', value: 52, color: '#22c55e' },
+    { label: 'Chores', value: 21, color: '#94a3b8' },
+  ],
+  {
+    dimensions: { width: 520, height: 520 },
+    polar: { innerRadiusRatio: 0.15 },
+    labels: {
+      showValues: true,
+      valueFormat: (v, frac) => `${v} (${(frac * 100).toFixed(0)}%)`,
+      sliceLabelFontSize: 11,
+      sliceLabelColor: '#f8fafc',
+    },
+  }
+);
+```
+
+---
+
+## Example — **`valueFormat`**: compact SI‑style counts
+
+```typescript
+const fmtK = (n: number) =>
+  n >= 1_000_000 ? `${(n / 1_000_000).toFixed(1)}M` : n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+
+await painter.createChart(
+  'polarArea',
+  [
+    { label: 'Mobile', value: 125000, color: '#0ea5e9' },
+    { label: 'Web', value: 98000, color: '#38bdf8' },
+    { label: 'API', value: 41000, color: '#7dd3fc' },
+  ],
+  {
+    scale: 'area',
+    labels: {
+      title: { text: 'Sessions by surface', fontSize: 18 },
+      showValues: true,
+      valueFormat: (v, frac) => `${fmtK(v)} · ${(frac * 100).toFixed(0)}%`,
+      sliceLabelFontSize: 12,
+    },
+  }
+);
+```
+
+---
+
+Next: **[Combo](/docs#09-chart-combo)**.

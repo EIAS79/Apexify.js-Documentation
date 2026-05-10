@@ -1,0 +1,63 @@
+# Watermark & simple text overlay {#04-create-gif-watermark-overlay}
+
+Back: [GIF overview](/docs#00-create-gif-overview)
+
+Applied **after** each frame is drawn onto the encoder canvas, **before** **`encoder.addFrame`**.
+
+---
+
+## Global watermark — `options.watermark`
+
+```typescript
+watermark?: {
+  enable: boolean;
+  url: string;       // path or http(s) — same loader as frames
+  x?: number;        // default 10
+  y?: number;        // default canvasHeight - imageHeight - 10 (bottom band)
+};
+```
+
+When **`enable`** is truthy and **`url`** set, the image is composited every frame **unless** a frame overrides (below).
+
+---
+
+## Per-frame watermark — `GIFWatermarkSpec`
+
+```typescript
+watermark?: {
+  enable?: boolean;  // false → skip watermark this frame (even if global on)
+  url: string;
+  x?: number;
+  y?: number;
+};
+```
+
+**`drawWatermarkOverlay`** logic:
+
+1. If **`frame.watermark?.enable === false`** → **skip**.
+2. Else if **`frame.watermark?.url`** → load & draw at **`fw.x ?? global.x ?? 10`**, **`fw.y ?? global.y ?? bottom-default`**.
+3. Else if **global** watermark **`enable` + `url`** → draw global image.
+
+---
+
+## `textOverlay` — **not** rich text
+
+```typescript
+textOverlay?: {
+  text: string;
+  fontName?: string;   // ⚠ not applied by GIFCreator today
+  fontPath?: string;   // ⚠ not applied
+  fontSize?: number;   // default 20
+  fontColor?: string;  // default white
+  x?: number;          // default 10
+  y?: number;          // default 30
+};
+```
+
+Implementation **`GIFCreator`** sets:
+
+**`ctx.font = `${fontSize}px Arial`** — **`fontName`** / **`fontPath`** on the type are **unused** in this path. For branded typography, bake text into each frame with **`createText`** first, or extend **`GIFCreator`**.
+
+---
+
+Next: **[Programmatic `onStart`](/docs#05-create-gif-onstart)**.

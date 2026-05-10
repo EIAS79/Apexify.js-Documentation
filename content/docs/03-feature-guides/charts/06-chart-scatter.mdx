@@ -1,0 +1,92 @@
+# Scatter chart {#06-chart-scatter}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+```typescript
+await painter.createChart('scatter', series, options);
+```
+
+Shares Cartesian helpers with **`linechart.ts`** (**`AxisConfig`**, grid, legend layout), so ticks, padding, and legend **`fit`** modes behave like line charts.
+
+---
+
+## `ScatterPoint`
+
+**`x`**, **`y`**, optional **`label`**.
+
+---
+
+## `ScatterSeries`
+
+| Field | Purpose |
+|-------|---------|
+| **`label`**, **`data`** | Points. |
+| **`color`**, **`gradient`** | Marker fill (**gradient** mapped like line strokes). |
+| **`markerSize`**, **`markerType`** | **`circle` \| `square` \| `diamond` \| `cross` \| `none`**. |
+| **`opacity`** | Per-series (**overrides **`options.points.opacity`**). |
+| **`correlation`** | Trend line — **`ScatterCorrelationConfig`**. |
+
+### `ScatterCorrelationConfig`
+
+| Key | Role |
+|-----|------|
+| **`show`** | Draw trend under markers. |
+| **`type`** | **`auto`** or **`CorrelationType`** (**`linear`**, **`polynomial`**, **`exponential`**, **`logarithmic`**, **`none`**). |
+| **`flatThreshold`** | **`auto`** only — if Pearson **|r| < threshold** (default **0.15**), draw **horizontal** line at **mean(Y)** instead of sloped fit. |
+| **`degree`** | Polynomial degree. |
+| **`color`**, **`lineWidth`**, **`lineStyle`** | Curve styling (**`LineStyle`** enum from line chart). |
+
+---
+
+## `ScatterChartOptions`
+
+**`dimensions`**, **`appearance`**, **`axes.{x,y}`**, **`labels.title`**, **`legend`** (full cartesian set incl. **`fit`**/**`width`**), **`grid`**, **`points.opacity`**, **`axisPaddingRatio`** (extra range pad around data — default **~0.06**).
+
+---
+
+## Example — two clouds + **`auto`** trend
+
+```typescript
+await painter.createChart(
+  'scatter',
+  [
+    {
+      label: 'Experiment A',
+      data: [
+        { x: 1, y: 2.1 },
+        { x: 2, y: 2.8 },
+        { x: 3, y: 3.6 },
+        { x: 4, y: 4.4 },
+      ],
+      markerType: 'circle',
+      markerSize: 14,
+      color: '#6366f1',
+      correlation: { show: true, type: 'auto', lineWidth: 2, color: '#312e81' },
+    },
+    {
+      label: 'Experiment B',
+      data: [
+        { x: 1, y: 5 },
+        { x: 2, y: 4.2 },
+        { x: 3, y: 3.5 },
+      ],
+      markerType: 'square',
+      markerSize: 12,
+      color: '#f97316',
+      correlation: { show: true, type: 'linear', color: '#9a3412' },
+    },
+  ],
+  {
+    dimensions: { width: 760, height: 520 },
+    axes: {
+      x: { label: 'Dose', range: { min: 0, max: 5 } },
+      y: { label: 'Response', range: { min: 0, max: 8 } },
+    },
+    grid: { show: true },
+  }
+);
+```
+
+---
+
+Next: **[Radar](/docs#07-chart-radar)**.

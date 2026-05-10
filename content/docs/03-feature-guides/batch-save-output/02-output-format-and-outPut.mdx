@@ -1,0 +1,44 @@
+# Constructor format & `outPut` {#02-output-format-and-outPut}
+
+Back: [Batch / save overview](/docs#00-batch-save-output-overview)
+
+---
+
+## `OutputFormat` — `new ApexPainter({ type })`
+
+| **`type`** | **`outPut`** returns |
+|------------|----------------------|
+| **`buffer`** *(default)* | Same **`Buffer`** |
+| **`base64`** | Base64 **string** |
+| **`dataURL`** | **`data:image/png;base64,...`** string |
+| **`url`** | **`file://`** URL string *(via **`conversion.ts`** helper)* |
+| **`blob`** | **`Blob` |
+| **`arraybuffer`** | **`ArrayBuffer`** |
+
+Unsupported **`type`** throws from **`outPut`**.
+
+---
+
+## `outPut(results: Buffer)`
+
+Reads **`this.format.type`** and converts **`results`** accordingly. **`results`** must be a **`Buffer`**.
+
+Typical pattern:
+
+```typescript
+const painter = new ApexPainter({ type: 'base64' });
+const { buffer } = await painter.createCanvas({ width: 100, height: 50, colorBg: '#000' });
+const encoded = await painter.outPut(buffer); // string
+```
+
+Disk writes stay **`save`** / **`fs`** — **`outPut`** is for **encoding**, not paths.
+
+---
+
+## `validHex(hexColor: string): boolean`
+
+Requires **`#RRGGBB`** (**exactly six** hex digits). Throws on invalid input; returns **`true`** when valid.
+
+---
+
+Next: **[Standalone image tools](/docs#00-standalone-image-tools-overview)** · **[Raster utilities](/docs#03-batch-stitch-compress-output)**.

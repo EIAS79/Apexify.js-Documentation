@@ -10,11 +10,12 @@ interface DocFile {
   filename: string;
 }
 
-/** Nested group under Feature Guides (one subdirectory level). */
+/** Nested group under Feature Guides (supports multiple levels, e.g. `video-ffmpeg/options`). */
 export interface DocSubfolder {
   name: string;
   displayName: string;
   files: DocFile[];
+  subfolders?: DocSubfolder[];
 }
 
 export interface DocFolder {
@@ -60,6 +61,18 @@ const FEATURE_SUBFOLDER_LABELS: Record<string, string> = {
   'gif-animation': 'GIF & Animation',
   'video-ffmpeg': 'Video & FFmpeg',
   'batch-save-output': 'Batch / Save / Output',
+};
+
+/** Optional sort order for nested folders under a feature-guide topic (e.g. `options` under `video-ffmpeg`). */
+const FEATURE_GUIDE_NESTED_SUBORDER: Record<string, string[]> = {
+  'video-ffmpeg': ['options'],
+};
+
+/** Sidebar labels for nested segments when `formatName` is too generic. */
+const FEATURE_GUIDE_NESTED_LABELS: Record<string, Record<string, string>> = {
+  'video-ffmpeg': {
+    options: 'Options',
+  },
 };
 
 const TOP_LEVEL_LABELS: Record<string, string> = {
@@ -241,6 +254,65 @@ function getDirectMdxFiles(folderPath: string, docsDir: string): DocFile[] {
   return out;
 }
 
+function featureNestedSubfolderSortKey(parentSegment: string, childName: string): number {
+  const order = FEATURE_GUIDE_NESTED_SUBORDER[parentSegment];
+  if (!order) return 999;
+  const i = order.indexOf(childName);
+  return i === -1 ? 500 : i;
+}
+
+function featureGuideNestedDisplayName(parentSegmentName: string | undefined, segmentName: string): string {
+  if (parentSegmentName && FEATURE_GUIDE_NESTED_LABELS[parentSegmentName]?.[segmentName]) {
+    return FEATURE_GUIDE_NESTED_LABELS[parentSegmentName][segmentName];
+  }
+  if (!parentSegmentName && FEATURE_SUBFOLDER_LABELS[segmentName]) {
+    return FEATURE_SUBFOLDER_LABELS[segmentName];
+  }
+  return formatName(segmentName);
+}
+
+/**
+ * One topic node under Feature Guides — includes direct `.mdx` files and recursively nested folders.
+ */
+function buildFeatureGuideTopicTree(
+  dirPath: string,
+  folderRelative: string,
+  segmentName: string,
+  docsDir: string,
+  parentSegmentName?: string,
+): DocSubfolder {
+  const posixFolder = folderRelative.split(path.sep).join('/');
+  const files = getDirectMdxFiles(dirPath, docsDir).map((f) => ({
+    ...f,
+    folder: posixFolder,
+  }));
+  sortFilesWithOrder(files, null, segmentName);
+
+  const nested: DocSubfolder[] = [];
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const childPath = path.join(dirPath, entry.name);
+    const childRel = path.join(folderRelative, entry.name);
+    const child = buildFeatureGuideTopicTree(childPath, childRel, entry.name, docsDir, segmentName);
+    if (child.files.length === 0 && (!child.subfolders || child.subfolders.length === 0)) continue;
+    nested.push(child);
+  }
+
+  nested.sort((a, b) => {
+    const da = featureNestedSubfolderSortKey(segmentName, a.name);
+    const db = featureNestedSubfolderSortKey(segmentName, b.name);
+    if (da !== db) return da - db;
+    return a.name.localeCompare(b.name, undefined, { numeric: true });
+  });
+
+  return {
+    name: segmentName,
+    displayName: featureGuideNestedDisplayName(parentSegmentName, segmentName),
+    files,
+    subfolders: nested.length > 0 ? nested : undefined,
+  };
+}
+
 function buildFeatureGuideSubfolders(
   folderPath: string,
   topFolderName: string,
@@ -252,17 +324,10 @@ function buildFeatureGuideSubfolders(
   for (const entry of fs.readdirSync(folderPath, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     const subPath = path.join(folderPath, entry.name);
-    const files = getDirectMdxFiles(subPath, docsDir).map((f) => ({
-      ...f,
-      folder: `${topFolderName}/${entry.name}`,
-    }));
-    if (files.length === 0) continue;
-    sortFilesWithOrder(files, null, entry.name);
-    subfolders.push({
-      name: entry.name,
-      displayName: FEATURE_SUBFOLDER_LABELS[entry.name] ?? formatName(entry.name),
-      files,
-    });
+    const folderRelative = path.join(topFolderName, entry.name);
+    const node = buildFeatureGuideTopicTree(subPath, folderRelative, entry.name, docsDir);
+    if (node.files.length === 0 && (!node.subfolders || node.subfolders.length === 0)) continue;
+    subfolders.push(node);
   }
 
   subfolders.sort(

@@ -1,0 +1,61 @@
+# `measureText` — layout metrics {#07-measure-text}
+
+Back: [Text overview](/docs#00-create-text-overview)
+
+```typescript
+const metrics = await painter.measureText(textProps);
+```
+
+Implementation: **`TextMetricsCreator`** (`lib/Canvas/extended/TextMetricsCreator.ts`) — creates a scratch canvas, registers fonts like **`EnhancedTextRenderer`**, applies **`letterSpacing`**, **`wordSpacing`**, **`textAlign`**, **`textBaseline`**, then **`ctx.measureText`**.
+
+---
+
+## Core fields (`TextMetrics`)
+
+Mirrors **`CanvasTextMetrics`** plus Apexify helpers:
+
+| Field | Meaning |
+|-------|---------|
+| **`width`** | Primary **`measureText(text).width`** (single line) **or** chord width after arc adjustment (below). |
+| **`actualBoundingBoxAscent`** … **`fontBoundingBoxDescent`** | Forwarded when present. |
+| **`height`** | **`fontSize`** baseline helper |
+| **`lineHeight`** | Multiplier × **`fontSize`** (**`1.4`** default when property omitted) |
+| **`baseline`**, **`top`**, **`bottom`** | Derived vertical scaffolding |
+| **`centerX`**, **`centerY`** | Local centroid estimates |
+
+When **`maxWidth`** set:
+
+- Builds **`lines`** array — each entry `{ text, width, height, metrics }`.
+- **`totalHeight = lines.length * lineHeight`**
+- **`lineCount`**
+
+Wrapping matches **`EnhancedTextRenderer`** / **`wrapText`** (word split + ellipsis).
+
+---
+
+## Optional extras
+
+| Flag | Effect |
+|------|--------|
+| **`includeCharMetrics: true`** | Adds **`charWidths: number[]`** and **`charPositions: {x,width}[]`** using naive cumulative **`measureText(char)`** (does not simulate kerning sequences). |
+
+---
+
+## Measurement canvas size
+
+**`measurementCanvas?: { width?, height? }`** overrides scratch surface dimensions.
+
+Otherwise auto-estimates from text length × **`fontSize * 0.6`**, **`maxWidth`**, **`maxHeight`**, clamped between **`1000–10000`** wide and **`500–5000`** tall.
+
+---
+
+## Arc-aware sizing
+
+If **`textOnCurve`** with **`0 < sweepAngle < 360`**:
+
+- Replaces **`metrics.width`** with **chord length** **`2·R·sin(θ/2)`**.
+- Increases **`metrics.height`** by sagitta **`R·(1 - cos(θ/2))`** approximating vertical rise.
+
+---
+
+Next: **[Paint order](/docs#08-create-text-paint-order)**.

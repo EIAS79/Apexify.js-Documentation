@@ -1,0 +1,84 @@
+# Shared chart appearance & layout {#01-charts-shared-appearance}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+Almost every chart accepts **`dimensions`**, **`appearance`**, **`labels.title`**, **`legend`**, and **`grid`** with the same *ideas* (exact keys vary slightly — see each chart page).
+
+---
+
+## `dimensions`
+
+```typescript
+dimensions?: {
+  width?: number;
+  height?: number;
+  padding?: { top?: number; right?: number; bottom?: number; left?: number };
+};
+```
+
+**Defaults** are typically **800×600** (or inferred for wide bar plots — set **`width`** explicitly for dashboards).
+
+**Vertical bar charts:** doc comment in **`BarChartOptions`** — if **`width`** omitted, width may be inferred from **X-axis span** (~10px per unit). For fixed layouts (comparison cells, exports), **always set `dimensions.width`**.
+
+---
+
+## `appearance` — `ChartAppearanceExtended`
+
+Painted first via **`paintChartCanvasBackground`** (`chartBackground.ts`) — aligned with **`createCanvas`** backgrounds:
+
+| Field | Role |
+|-------|------|
+| **`backgroundColor`** | Flat fill when no image / **`customBg`**. |
+| **`backgroundGradient`** | **`gradient`** union over full canvas. |
+| **`backgroundImage`** | Path/URL stretched to canvas (**`resolveMediaPath`**). |
+| **`customBg`** | Same shape as **`CanvasConfig.customBg`** — **`source`**, **`fit`**, **`align`**, **`opacity`**, **`filters`**. |
+| **`blur`** | Applied with **`customBg`** pipeline. |
+| **`bgLayers`** | **`BackgroundLayer[]`** — color / gradient / image / **`pattern`** / **`presetPattern`** / **`noise`**. |
+| **`patternBg`** | **`PatternOptions`** procedural overlay (after layers). |
+| **`noiseBg`** | **`{ intensity? }`** grain. |
+| **`axisColor`**, **`axisWidth`** | Default axis stroke styling (charts apply where relevant). |
+| **`arrowSize`** | Axis arrow geometry where enabled. |
+| **`borderRadius`**, **`borderWidth`**, **`borderColor`** | Optional outer frame (e.g. line chart). |
+
+**Unused today (reserved):** **`yAxisArrowExtensionPastMaxTickPx`**, **`yAxisArrowTipOffsetY`** — Y-axis arrow disabled in line renderer comments.
+
+---
+
+## Legend block (cartesian family pattern)
+
+Common fields across **bar**, **horizontal bar**, **line**, **scatter**, **combo**, **radar**, **polar area**:
+
+| Field | Notes |
+|-------|------|
+| **`show`** | Default **`true`** where legend auto-built from series/slices. |
+| **`entries`** | Override **`LegendEntry[]`** (**`label`**, **`color`**, **`gradient`**). |
+| **`position`** | **`LegendPlacement`** — corners/edges; aliases **`topLeft`**, **`bottom_right`**, … normalized internally. |
+| **`spacing`**, **`fontSize`**, **`padding`** | Box layout. |
+| **`backgroundColor`**, **`backgroundGradient`**, **`borderColor`** | Box chrome. |
+| **`textColor`**, **`textGradient`**, **`textStyle`** | Label rendering (**`EnhancedTextStyle`**). |
+| **`maxWidth`**, **`wrapText`** | Wrapping. |
+| **`fit`**, **`minWidth`**, **`width`** | **`content`** vs **`stretch`** legend sizing (line/scatter/combo/radar/polar). |
+
+**Pie** splits **`legends.standard`** vs **`legends.connected`** (leader lines) — see **[Pie](/docs#02-chart-pie-and-donut)**.
+
+---
+
+## `EnhancedTextStyle` (labels)
+
+Used inside **`labels.*`** and **`legend.textStyle`**:
+
+**`fontPath`**, **`fontName`**, **`fontFamily`**, **`fontSize`**, **`bold`**, **`italic`**, **`shadow`**, **`stroke`**, **`glow`** — renders via **`renderEnhancedText`** helpers (**`GlobalFonts.registerFromPath`** when **`fontPath`** + **`fontName`**).
+
+---
+
+## `grid` (cartesian)
+
+```typescript
+grid?: { show?: boolean; color?: string; width?: number };
+```
+
+**Horizontal bar** adds **`lineWidth`**, **`style`**: **`solid` \| `dashed` \| `dotted`**.
+
+---
+
+Next: **[Pie & donut](/docs#02-chart-pie-and-donut)**.

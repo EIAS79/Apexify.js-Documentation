@@ -1,0 +1,60 @@
+# `onProgress` callback {#11-on-progress}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+---
+
+## Type
+
+```typescript
+onProgress?: (progress: {
+  percent: number; // ~0–100 from stderr time/duration parse
+  time: number;   // seconds FFmpeg reports as encoded position
+  speed: number; // e.g. 2.3 meaning ~2.3× realtime
+}) => void;
+```
+
+---
+
+## When it runs
+
+Forwarded only on operations that call **`executeFFmpegWithProgress`**:
+
+| Operation |
+|-----------|
+| **`freezeFrame`** (concat phase) |
+| **`exportPreset`** |
+| **`normalizeAudio`** |
+| **`applyLUT`** |
+| **`addTransition`** |
+| **`addAnimatedText`** |
+
+Other **`createVideo`** branches **do not** invoke **`onProgress`** even if you pass it.
+
+---
+
+## Behaviour & limits
+
+**How it works:** Parses FFmpeg **stderr** for **`time=`** vs **`Duration:`** and **`speed=`**. Rough ETA — **not** frame-sample accurate.
+
+**Edge cases:** Very short jobs may never emit parseable lines; **`percent`** may jump or stick at **100** early.
+
+### Example
+
+```typescript
+await painter.createVideo({
+  source: './long.mp4',
+  normalizeAudio: {
+    method: 'lufs',
+    targetLevel: -23,
+    outputPath: './norm.mp4',
+  },
+  onProgress: ({ percent, speed }) => {
+    process.stdout.write(`\r${percent.toFixed(1)}% @ ${speed.toFixed(2)}x`);
+  },
+});
+```
+
+---
+
+Back: [Options hub](/docs#00-video-options-hub) · [Video overview](/docs#00-video-overview)

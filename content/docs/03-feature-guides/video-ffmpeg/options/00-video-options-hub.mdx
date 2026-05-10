@@ -1,0 +1,34 @@
+# Video options — deep-dive guides {#00-video-options-hub}
+
+These pages explain **what each `createVideo` operation does**, **how every option affects output**, and include **copy-paste examples**. They complement the topic tutorials (**[overview](/docs#00-video-overview)**, metadata, transcode, …).
+
+The old single-page matrix was hard to read — operations are split below by job.
+
+**Rules:** one primary operation per **`createVideo`** call ([router order](/docs#00-video-overview)). **`source`** is always required by TypeScript even when an operation ignores it.
+
+---
+
+## Guide index
+
+| Guide | What it covers |
+|-------|----------------|
+| [Discovery & metadata](/docs#01-discovery-metadata) | **`getInfo`**, **`detectFormat`** |
+| [Frame extraction suite](/docs#02-frame-extraction) | **`extractFrame`**, **`extractFrames`**, **`extractAllFrames`**, **`generateThumbnail`**, **`generatePreview`**, **`detectScenes`** |
+| [Imperative **`painter.*`** API](/docs#08-imperative-video-helpers) | **`getVideoInfo`**, **`extractFrameAtTime`**, **`extractFrameByNumber`**, **`extractMultipleFrames`**, **`extractFrames`**, **`extractAllFrames`** |
+| [Transcode & export presets](/docs#03-transcode-export) | **`convert`**, **`compress`**, **`exportPreset`** |
+| [Timeline edits](/docs#04-timeline-edits) | **`trim`**, **`replaceSegment`**, **`freezeFrame`**, **`reverse`**, **`changeSpeed`**, **`createTimeLapse`** |
+| [Geometry](/docs#05-geometry) | **`rotate`**, **`crop`** |
+| [Audio (full)](/docs#06-audio-deep-dive) | **`extractAudio`**, **`removeAudio`**, **`mute`**, **`mixAudio`**, **`adjustVolume`**, **`normalizeAudio`** ← loudness explained |
+| [Visual filters & overlays](/docs#07-visual-filters) | **`applyEffects`**, **`colorCorrect`**, **`applyLUT`**, **`addWatermark`**, **`addFade`** |
+| [Text overlays](/docs#08-text-overlays) | **`addText`**, **`addAnimatedText`** |
+| [Compositing & build](/docs#09-compositing) | **`merge`**, **`splitScreen`**, **`pictureInPicture`**, **`createFromFrames`**, **`createLoop`** |
+| [Transitions, stabilize, batch](/docs#10-advanced-ops) | **`addTransition`**, **`stabilize`**, **`batch`** |
+| [Progress callback](/docs#11-on-progress) | **`onProgress`** |
+
+---
+
+## Quick reference only
+
+Compact top-level key → topic map: **[Options reference card](/docs#07-video-creation-options-matrix)** (no long tables).
+
+Back: [Video overview](/docs#00-video-overview)

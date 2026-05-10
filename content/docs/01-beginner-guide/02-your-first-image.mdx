@@ -1,0 +1,62 @@
+# Your first image {#02-your-first-image}
+
+Back: [Beginner guide](/docs#00-beginner-guide)
+
+---
+
+## Goal
+
+Produce **`first.png`** on disk using **`ApexPainter.createCanvas`**.
+
+---
+
+## Full example
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+async function main() {
+  const painter = new ApexPainter();
+
+  const { buffer } = await painter.createCanvas({
+    width: 800,
+    height: 450,
+    colorBg: '#0f172a',
+  });
+
+  fs.writeFileSync('first.png', buffer);
+  console.log('Wrote first.png');
+}
+
+main();
+```
+
+---
+
+## What each part does
+
+| Piece | Why |
+|-------|-----|
+| **`async function`** | **`createCanvas`** returns a **Promise** — you **`await`** it. |
+| **`createCanvas({ … })`** | Builds a bitmap with **width**, **height**, and **background**. |
+| **`colorBg`** | Easiest primary fill — any CSS-style color string. |
+| **`buffer`** | Raw **PNG** bytes — what you save or pass onward. |
+| **`fs.writeFileSync`** | Writes the buffer to a file (Node.js built-in). |
+
+---
+
+## Result
+
+You get an **800×450** image filled with **slate** **`#0f172a`**.
+
+---
+
+## Try changing
+
+- **`width`** / **`height`** — canvas size in pixels.
+- **`colorBg`** — try **`'#ffffff'`**, **`'rgb(255,99,71)'`**, **`'#6366f133'`** (alpha).
+
+---
+
+Next: **[How buffers work](/docs#03-how-buffers-work)** — then **[Canvas backgrounds](/docs#00-create-canvas-overview)** for gradients, photos, and layers.

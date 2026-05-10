@@ -1,0 +1,90 @@
+# Start here {#00-start-here}
+
+Welcome to **Apexify.js** — a Node.js library for building **images** (PNGs), **GIFs**, **charts**, and **video helpers** with code instead of a design tool.
+
+**Deep links:** anchors match **`docs/00-start-here/*.mdx`** basenames — **`00-start-here.mdx`** → **`/docs#00-start-here`**, **`01-feature-tracks.mdx`** → **`/docs#01-feature-tracks`**.
+
+---
+
+## Who this is for
+
+- You know basic **JavaScript** or **TypeScript**.
+- You want **repeatable** graphics: banners, thumbnails, social posts, batch exports.
+- You are okay using **`async`/`await`** (most APIs return **Promises**).
+
+---
+
+## Install
+
+```bash
+npm install apexify.js
+```
+
+**Optional:** for video backgrounds and **`createVideo`**, install **FFmpeg** and **ffprobe** and ensure they are on your **`PATH`**.
+
+---
+
+## The entry point
+
+Everything flows through **`ApexPainter`**:
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+```
+
+---
+
+## Read in this order
+
+| Step | Where | What you learn |
+|------|--------|----------------|
+| **1** | [Beginner guide hub](/docs#00-beginner-guide) | Install, first image, buffers, mistakes, saving files |
+| **2** | [Canvas & backgrounds](/docs#00-create-canvas-overview) | **`createCanvas`** — sizes, fills, layers, patterns |
+| **3** | [Images](/docs#00-create-image-overview) · [Text](/docs#00-create-text-overview) · [GIF](/docs#00-create-gif-overview) · guides | **`createImage`**, **`createText`**, **`createGIF`** — charts / video as needed |
+
+Do **not** skip the beginner steps if you are new: **`createCanvas`** is the base layer for almost everything else.
+
+---
+
+## Pick a feature track
+
+When you know **what** you want (charts, video, pixels, …), use **summaries + links** in one place:
+
+**[Feature tracks — navigation hub](/docs#01-feature-tracks)**
+
+That page lists every major **`03-feature-guides`** lane with a one-line **what you can do**, the **overview link**, and the **folder path**.
+
+High-level folder map: **[Documentation root](/docs#readme)** · index of feature folders: **[Feature guides hub](/docs#feature-guides-hub)**.
+
+---
+
+## What can I build?
+
+Browse outcomes by feature (**banners, GIFs, charts, video thumbs, batch exports**, …) and jump straight into the right guide:
+
+**[What you can build with Apexify.js](/docs#01-what-you-can-build)**
+
+Then open **[Recipes](/docs#00-recipes-overview)** when you add or follow **`recipe-*.mdx`** tutorials.
+
+---
+
+## Quick smallest example
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'fs';
+
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: '#0f172a',
+});
+
+fs.writeFileSync('out.png', buffer);
+```
+
+Next: **[Beginner guide](/docs#00-beginner-guide)**.

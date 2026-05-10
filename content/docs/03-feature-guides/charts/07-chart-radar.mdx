@@ -1,0 +1,168 @@
+# Radar chart {#07-chart-radar}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+```typescript
+await painter.createChart('radar', seriesList, options);
+```
+
+---
+
+## Requirements
+
+- **`options.radar.categories`** — **≥ 3** strings (**throws** otherwise).
+- Each **`RadarSeries.values`** length **must equal** **`categories.length`**.
+
+---
+
+## `RadarSeries`
+
+| Field | Purpose |
+|-------|---------|
+| **`label`** | Legend text. |
+| **`values`** | Numeric polygon vertices (same order as **`categories`**). |
+| **`color`** | Fill tint (preset palette + golden-angle HSL fallback by index). |
+| **`stroke`** | Outline colour (distinct from **`color`** fill when set). |
+| **`gradient`** | Fill gradient. |
+| **`fillOpacity`** | Polygon fill alpha. |
+| **`lineWidth`** | Edge stroke width. |
+| **`opacity`** | Multiplier on fill/stroke/dots (**overrides chart-level **`radar.opacity`**). |
+
+When **`color`** and **`stroke`** are **both omitted**, stroke/fill tint and legend swatches use the **built‑in preset by series index** (see below). Setting **`gradient`** still fills from that gradient when **`radar.fill`** is not **`false`**.
+
+---
+
+## Built‑in colour preset (series index)
+
+`radarSeriesColor` in **`radarchart.ts`** assigns colours in order:
+
+1. **Fixed palette** (indices **0…8**): **`#38bdf8`**, **`#a78bfa`**, **`#f472b6`**, **`#34d399`**, **`#fbbf24`**, **`#fb7185`**, **`#22d3ee`**, **`#f97316`**, **`#a3e635`**
+2. **Golden‑angle HSL** for index **≥ 9**: **`hue = (index × 137.508) % 360`** with stepped saturation/lightness
+
+Use this when you want distinct series **without** hand‑picking hex values — legend entries pick up the same colours automatically.
+
+---
+
+## `RadarChartOptions.radar`
+
+| Field | Default / notes |
+|-------|----------------|
+| **`maxValue`** | Ceiling — defaults **niceMax(maxData × 1.05)**. |
+| **`gridLevels`** | Concentric polygons (**≥ 3**, default **5**). |
+| **`labelMarginRatio`** | Outer label padding (**default ~0.12**). |
+| **`fill`** | Fill under polygon (**default true**). |
+| **`showPoints`**, **`pointRadius`** | Vertex dots. |
+| **`gridColor`**, **`gridWidth`** | Web styling. |
+| **`axisLabelFontSize`**, **`axisLabelColor`** | Category captions. |
+| **`opacity`** | Global series multiplier (**0…1**). |
+
+---
+
+## Example — skills matrix
+
+```typescript
+await painter.createChart(
+  'radar',
+  [
+    {
+      label: 'Candidate A',
+      values: [85, 70, 90, 65, 80],
+      color: 'rgba(56,189,248,0.35)',
+      stroke: '#0284c7',
+      lineWidth: 2,
+    },
+    {
+      label: 'Candidate B',
+      values: [72, 88, 74, 82, 77],
+      color: 'rgba(244,114,182,0.35)',
+      stroke: '#db2777',
+      lineWidth: 2,
+    },
+  ],
+  {
+    dimensions: { width: 720, height: 560 },
+    radar: {
+      categories: ['Math', 'Coding', 'Design', 'Comm', 'Leadership'],
+      maxValue: 100,
+      gridLevels: 5,
+      showPoints: true,
+      pointRadius: 5,
+    },
+    labels: {
+      title: { text: 'Interview radar', fontSize: 22 },
+    },
+  }
+);
+```
+
+---
+
+## Example — preset colours only (omit `color` / `stroke`)
+
+Three polygons share no explicit colours; strokes and light fills follow the **preset order** above.
+
+```typescript
+await painter.createChart(
+  'radar',
+  [
+    { label: 'Sprint 1', values: [70, 60, 75, 65, 80], lineWidth: 2 },
+    { label: 'Sprint 2', values: [82, 72, 68, 78, 74], lineWidth: 2 },
+    { label: 'Sprint 3', values: [65, 85, 88, 70, 72], lineWidth: 2 },
+  ],
+  {
+    dimensions: { width: 760, height: 560 },
+    radar: {
+      categories: ['Build', 'Test', 'Docs', 'Review', 'Deploy'],
+      maxValue: 100,
+      gridLevels: 5,
+      opacity: 1,
+    },
+    labels: { title: { text: 'Preset palette — no manual colours', fontSize: 20 } },
+  }
+);
+```
+
+---
+
+## Example — outline‑first preset (`fill: false`)
+
+Turn off polygon fill to emphasize **spokes** and shared grid; **`stroke`** still defaults through **`color`** or the **preset**.
+
+```typescript
+await painter.createChart(
+  'radar',
+  [
+    {
+      label: 'Baseline',
+      values: [50, 55, 48, 52, 49],
+      lineWidth: 3,
+      stroke: '#64748b',
+    },
+    {
+      label: 'Target',
+      values: [88, 90, 85, 92, 87],
+      lineWidth: 3,
+      stroke: '#16a34a',
+    },
+  ],
+  {
+    dimensions: { width: 700, height: 540 },
+    radar: {
+      categories: ['Reliability', 'Speed', 'Cost', 'Safety', 'UX'],
+      maxValue: 100,
+      fill: false,
+      showPoints: true,
+      pointRadius: 6,
+      gridColor: 'rgba(71, 85, 105, 0.35)',
+      gridWidth: 1.5,
+      axisLabelColor: '#334155',
+      axisLabelFontSize: 13,
+    },
+    labels: { title: { text: 'Wireframe radar', fontSize: 22 } },
+  }
+);
+```
+
+---
+
+Next: **[Polar area](/docs#08-chart-polar-area)**.

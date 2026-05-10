@@ -1,0 +1,61 @@
+# `createCustom` — segments & validation {#01-create-custom-api}
+
+Back: [Lines overview](/docs#00-custom-lines-overview)
+
+```typescript
+const buffer = await painter.createCustom(
+  customOptionsObjectOrArray,
+  canvasBuffer /* Buffer | CanvasResults */
+);
+```
+
+Loads **`canvasBuffer`** onto a fresh canvas, runs **`customLines(ctx, opts)`**, returns PNG **`Buffer`**.
+
+---
+
+## Required fields (every entry)
+
+| Field | Rule |
+|-------|------|
+| **`startCoordinates`** | **`{ x, y }`** numbers |
+| **`endCoordinates`** | **`{ x, y }`** numbers |
+
+Validation is strict — missing **`x`/`y`** throws (**`ApexPainter.#validateCustomOptions`**).
+
+---
+
+## Batch processing
+
+Pass **array** of **`CustomOptions`** — processed **in order**. Later segments can **chain** when **`lineStyle.singleLine`** is **`true`** (see below).
+
+---
+
+## **`singleLine`** chains
+
+When **`lineStyle.singleLine`** is set:
+
+- First segment: **`moveTo(start)`**; later segments reuse **`previousEndCoordinates`** as implicit **`start`** so **poly-lines** share one context sub-path until **`singleLine`** ends.
+- Leaving **`singleLine`** (next item without it) triggers **`stroke`** + optional **`applyStroke`** cleanup.
+
+Use this for **multi-segment** connectors without lifting the pen.
+
+---
+
+## Minimal example
+
+```typescript
+const base = await painter.createCanvas({ width: 400, height: 300, colorBg: '#f8fafc' });
+
+const withLine = await painter.createCustom(
+  {
+    startCoordinates: { x: 40, y: 260 },
+    endCoordinates: { x: 360, y: 40 },
+    lineStyle: { width: 4, color: '#2563eb', lineCap: 'round' },
+  },
+  base.buffer
+);
+```
+
+---
+
+Next: **[Line style & paths](/docs#02-custom-line-style-path)** · **[Arrows & markers](/docs#03-custom-lines-arrows-markers-textures)**.

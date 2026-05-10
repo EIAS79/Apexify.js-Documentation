@@ -1,0 +1,235 @@
+# Audio operations (full guide) {#06-audio-deep-dive}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+---
+
+## `extractAudio`
+
+**What it does:** Saves **only** the **first audio stream** to a file. **Fails** if the container has **no** audio.
+
+### Options
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`outputPath`** | ✓ | Where to write the audio file. |
+| **`format`** | **`mp3`** | **`wav`** (PCM), **`aac`**, **`ogg`** (Vorbis). Chooses FFmpeg encoder (**libmp3lame**, **pcm_s16le**, …). |
+| **`bitrate`** | **128** | **`kbps`** audio bitrate (**`-ab`**). Stronger effect on **mp3/aac/ogg** than WAV. |
+
+```typescript
+await painter.createVideo({
+  source: './zoom-recording.mp4',
+  extractAudio: {
+    outputPath: './meeting.wav',
+    format: 'wav',
+  },
+});
+```
+
+---
+
+## `removeAudio`
+
+**What it does:** Copies **video streams only** (**`-an -c:v copy`**) — shortest path to a silent MP4.
+
+```typescript
+await painter.createVideo({
+  source: './captures.mp4',
+  removeAudio: { outputPath: './captures-video-only.mp4' },
+});
+```
+
+---
+
+## `mute`
+
+### Full mute
+
+Omit **`ranges`** → same as **`removeAudio`** (**`-an`**).
+
+### Partial mute
+
+**`ranges`** lists **[`start`, `end`]** in **seconds**. Audio volume **0** only inside those windows; video unchanged (**`-c:v copy`**).
+
+```typescript
+await painter.createVideo({
+  source: './podcast.mp4',
+  mute: {
+    outputPath: './podcast-redacted.mp4',
+    ranges: [
+      { start: 45, end: 52 },
+      { start: 180, end: 190 },
+    ],
+  },
+});
+```
+
+---
+
+## `adjustVolume`
+
+### Whole-track gain
+
+Omit **`ranges`**. **`volume`** is **percent**: **100** = unity, **50** = half loudness, **200** = double.
+
+```typescript
+await painter.createVideo({
+  source: './quiet.mp4',
+  adjustVolume: {
+    outputPath: './louder.mp4',
+    volume: 160,
+  },
+});
+```
+
+### Interval automation
+
+**`ranges`** entries apply **`volume`** inside **`[start, end]`** only.
+
+If **`speed`** or **`pitchSemitones`** differ from neutral on a range, FFmpeg **`rubberband`** is appended — **requires** FFmpeg built with **librubberband**.
+
+```typescript
+await painter.createVideo({
+  source: './mix.mp4',
+  adjustVolume: {
+    outputPath: './ducked.mp4',
+    ranges: [
+      { start: 0, end: 10, volume: 100 },
+      { start: 10, end: 40, volume: 35 },
+      { start: 40, end: 99999, volume: 100 },
+    ],
+  },
+});
+```
+
+---
+
+## `normalizeAudio` — detailed
+
+**What it does:** Adjusts loudness so playback levels are more consistent **without** you hand-tuning **`volume`**.
+
+### Options
+
+| Field | Default | Meaning |
+|-------|---------|---------|
+| **`method`** | **`lufs`** | Which algorithm FFmpeg applies (see below). |
+| **`targetLevel`** | Depends on method | Interpretation **changes by method** — see below. |
+| **`outputPath`** | ✓ | Output media (**`-c:v copy`** — video untouched). |
+
+Supports **`onProgress`**.
+
+---
+
+### Method **`lufs`** (recommended for podcasts / dialogue)
+
+**What it means:** **LUFS** measures **perceived** loudness over time. **`normalizeVideoAudio`** runs FFmpeg **`loudnorm`**:
+
+- **`I=`** integrated loudness target (**`targetLevel`**).
+- **`TP=-1.5`** true peak ceiling (fixed in code).
+- **`LRA=11`** loudness range parameter (fixed).
+
+**Default **`targetLevel`**:** **`-23`** — common broadcast/podcast target (EBU R128 style).
+
+**Effect:** Quiet passages get boosted; hot passages pulled down; overall **more consistent** listening level on speakers and earbuds.
+
+**Example — podcast to streaming loudness**
+
+```typescript
+await painter.createVideo({
+  source: './raw-podcast.mp4',
+  normalizeAudio: {
+    method: 'lufs',
+    targetLevel: -16,
+    outputPath: './podcast-loud.mp4',
+  },
+  onProgress: (p) => console.log(`${p.percent}%`),
+});
+```
+
+**Note:** **`-16`** LUFS is **louder** than **`-23`** (smaller negative = louder). Pick **`-23`** for conservative broadcast; **`-14`** to **`-16`** is common for YouTube-style dialogue — taste + platform guidelines.
+
+---
+
+### Methods **`peak`** and **`rms`**
+
+In **`videoHelpers.ts`** today, **`peak`** and **`rms`** both map to:
+
+```text
+-af "volume=${targetLevel}dB"
+```
+
+So **`targetLevel`** is treated as a **fixed dB offset**, **not** a measured-normalise step.
+
+**Default **`targetLevel`**:** **`-1`** when using those branches.
+
+**What that feels like:** **`-6`** cuts roughly half perceived loudness; **`+6`** boosts (watch clipping).
+
+**Limitation:** There is **no separate RMS-detector path** in code despite the type name — if you need true RMS-based levelling, use **`lufs`** or post-process with dedicated mastering tools.
+
+```typescript
+await painter.createVideo({
+  source: './clip.mp4',
+  normalizeAudio: {
+    method: 'peak',
+    targetLevel: -3,
+    outputPath: './clip-gain.mp4',
+  },
+});
+```
+
+---
+
+## `mixAudio` — **`MixAudioOperation`
+
+**What it does:** Places **multiple external audio files** on a timeline **over** your video’s duration. Optional **keep** original mix or replace with **silence + overlays**.
+
+### Top-level fields
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`outputPath`** | ✓ | Mixed output (**video copied**, **AAC 192k** audio). |
+| **`overlays`** | ✓ | List of clips — see next section. |
+| **`keepOriginalAudio`** | **`true`** | **`false`** → builds silence baseline then mixes overlays only. |
+| **`originalVolume`** | **1** | Scales **video’s** soundtrack before **`amix`**. |
+| **`originalSpeed`** | **1** | **`atempo`** on original audio (**clamped ~0.25–4**). |
+| **`originalPitchSemitones`** | **0** | Pitch via **`asetrate` + compensating atempo** (no rubberband). |
+
+### Each **`MixAudioOverlayClip`**
+
+| Field | Effect |
+|-------|--------|
+| **`source`** | Path, URL, or **Buffer** — resolved like video sources. |
+| **`startTime`** | When this clip **starts** on the **output** timeline (seconds). |
+| **`duration`** | How many seconds to **play** after trim — **default** = min(remaining file, remaining video). |
+| **`sourceStart`** | Skip seconds **into** the clip before playing. |
+| **`volume`** | Linear multiplier (**1** = unity). |
+| **`speed`** | **`atempo`** chain on **that** overlay — faster playback **shortens** wall time inside **`duration`**. |
+| **`pitchSemitones`** | Semitone shift **without rubberband** (rate trick). |
+
+Clips entirely outside usable window are **skipped**.
+
+### Example — score under VO
+
+```typescript
+await painter.createVideo({
+  source: './voiceover.mp4',
+  mixAudio: {
+    outputPath: './cinematic.mp4',
+    keepOriginalAudio: true,
+    originalVolume: 1,
+    overlays: [
+      {
+        source: './score.mp3',
+        startTime: 0,
+        duration: 180,
+        sourceStart: 0,
+        volume: 0.25,
+      },
+    ],
+  },
+});
+```
+
+---
+
+Next: **[Visual filters](/docs#07-visual-filters)**.

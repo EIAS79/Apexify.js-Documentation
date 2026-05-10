@@ -1,0 +1,63 @@
+# Canvas size, encoder & output formats {#02-create-gif-options-output}
+
+Back: [GIF overview](/docs#00-create-gif-overview)
+
+---
+
+## Dimensions
+
+| Field | Default | Role |
+|-------|---------|------|
+| **`width`** | **1200** | GIF encoder canvas width. |
+| **`height`** | **1200** | GIF encoder canvas height. |
+
+Every resolved frame is drawn into this canvas (**clear → draw**). Smaller/larger rasters are scaled unless **`skipResizeWhenDimensionsMatch`** applies — see **[Callbacks](/docs#06-create-gif-onend-results)**.
+
+---
+
+## Encoder tuning
+
+| Field | Default | Role |
+|-------|---------|------|
+| **`repeat`** | **0** | **`encoder.setRepeat`** — loop count (**`0`** = infinite in gifencoder semantics). |
+| **`quality`** | **10** | **`encoder.setQuality`** — **`1…20`** validated when provided (semantics follow **`gifencoder`**; tweak empirically). |
+
+---
+
+## Timing defaults
+
+| Field | Role |
+|-------|------|
+| **`delay`** | Fallback ms when a **`GIFEncodedFrame`** omits **`duration`** (**then `100`** ms). **`GIFInputFrame`** always supplies **`duration`** on each frame. |
+
+---
+
+## **`outputFormat`** (required)
+
+| Value | Behaviour |
+|-------|-----------|
+| **`file`** | Streams encoded GIF to **`outputFile`** (**required**). Resolves **`undefined`** unless **`onEnd`** changes return shape — see **[Callbacks](/docs#06-create-gif-onend-results)**. |
+| **`buffer`** | Collects stream into **`Buffer`**. |
+| **`base64`** | Same buffer → **`toString('base64')`**. |
+| **`attachment`** | Returns **`[{ attachment: encoder.createReadStream(), name: 'gif.js' }]`** immediately (**filename is fixed** in source — override in your mailer if needed). |
+
+Unsupported **`outputFormat`** throws.
+
+---
+
+```typescript
+await painter.createGIF(undefined, {
+  outputFormat: 'file',
+  outputFile: './out/animation.gif',
+  width: 640,
+  height: 360,
+  repeat: 0,
+  quality: 8,
+  delay: 80,
+  // ...
+});
+```
+
+---
+
+Next: **[Transparency & disposal](/docs#03-create-gif-transparency-disposal)**.

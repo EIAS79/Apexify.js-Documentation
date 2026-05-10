@@ -1,0 +1,41 @@
+# Video options — reference card {#07-video-creation-options-matrix}
+
+This page is a **compact map**. **Do not stop here** for learning — every operation is explained with examples in the **[options deep-dive hub](/docs#00-video-options-hub)** (`video-ffmpeg/options/`).
+
+Back: [Video overview](/docs#00-video-overview)
+
+---
+
+## Read this first
+
+1. **[Options hub](/docs#00-video-options-hub)** — organised guides (**what / why / examples**).
+2. [Router order](/docs#00-video-overview) — only **one** operation runs per **`createVideo`** call.
+
+---
+
+## Top-level key → detailed guide
+
+| Key | Deep-dive |
+|-----|-----------|
+| **`getInfo`**, **`detectFormat`** | [Discovery](/docs#01-discovery-metadata) |
+| **`extractFrame`**, **`extractFrames`**, **`extractAllFrames`**, **`generateThumbnail`**, **`generatePreview`**, **`detectScenes`** | [Frames](/docs#02-frame-extraction) |
+| *(direct)* **`getVideoInfo`**, **`extractFrameAtTime`**, **`extractFrameByNumber`**, **`extractMultipleFrames`**, **`extractFrames`**, **`extractAllFrames`** | [Imperative helpers](/docs#08-imperative-video-helpers) |
+| **`convert`**, **`compress`**, **`exportPreset`** | [Transcode & export](/docs#03-transcode-export) |
+| **`trim`**, **`replaceSegment`**, **`freezeFrame`**, **`reverse`**, **`changeSpeed`**, **`createTimeLapse`** | [Timeline](/docs#04-timeline-edits) |
+| **`rotate`**, **`crop`** | [Geometry](/docs#05-geometry) |
+| **`extractAudio`**, **`removeAudio`**, **`mute`**, **`mixAudio`**, **`adjustVolume`**, **`normalizeAudio`** | [Audio](/docs#06-audio-deep-dive) |
+| **`applyEffects`**, **`colorCorrect`**, **`applyLUT`**, **`addWatermark`**, **`addFade`** | [Visual](/docs#07-visual-filters) |
+| **`addText`**, **`addAnimatedText`** | [Text](/docs#08-text-overlays) |
+| **`merge`**, **`splitScreen`**, **`pictureInPicture`**, **`createFromFrames`**, **`createLoop`**, **`batch`** | [Compose](/docs#09-compositing) |
+| **`addTransition`**, **`stabilize`** | [Advanced](/docs#10-advanced-ops) |
+| **`onProgress`** | [Progress](/docs#11-on-progress) |
+
+---
+
+## Types source
+
+**`VideoCreationOptions`**, **`MixAudioOperation`**, **`MixAudioOverlayClip`** — **`lib/Canvas/extended/VideoCreator.ts`**.
+
+---
+
+Go to **[Options hub](/docs#00-video-options-hub)**.

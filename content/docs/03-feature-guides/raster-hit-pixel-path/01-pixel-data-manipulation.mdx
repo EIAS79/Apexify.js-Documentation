@@ -1,0 +1,72 @@
+# Pixel data — read, write, manipulate {#01-pixel-data-manipulation}
+
+Back: [Raster overview](/docs#00-advanced-raster-overview)
+
+All methods delegate to **`PixelDataCreator`** (**`lib/Canvas/extended/PixelDataCreator.ts`**). They decode the incoming PNG (or **`CanvasResults.buffer`**) onto an internal canvas, run **`getImageData`** / **`putImageData`**, and return fresh **`Buffer`** / **`PixelData`** as documented below.
+
+---
+
+## `PixelData`
+
+| Field | Meaning |
+|-------|---------|
+| **`data`** | **`Uint8ClampedArray`**, row-major RGBA (**4 × width × height** bytes) |
+| **`width`**, **`height`** | Region size in pixels |
+| **`colorSpace`** | Set to **`'srgb'`** on read |
+
+Indices for pixel **`(x, y)`** inside the region: **`idx = (y * width + x) * 4`**, then **`r,g,b,a`** at **`idx … idx+3`**.
+
+---
+
+## `getPixelData(canvasBuffer, options?)`
+
+**`options`**: **`x`**, **`y`**, **`width`**, **`height`** — crop of the image to sample (defaults: full image). Throws if the rectangle exceeds image bounds.
+
+Returns **`PixelData`** for that rectangle only ( **`data.length === width × height × 4`** ).
+
+---
+
+## `setPixelData(canvasBuffer, pixelData, options?)`
+
+Pastes **`pixelData`** onto a copy of **`canvasBuffer`**.
+
+| Option | Role |
+|--------|------|
+| **`x`**, **`y`** | Top-left destination (default **`0`**) |
+| **`dirtyX`**, **`dirtyY`**, **`dirtyWidth`**, **`dirtyHeight`** | Sub-rectangle of **`pixelData`** passed to **`putImageData`**. If **`dirtyX`** and **`dirtyY`** are both set, the dirty path is used; **`dirtyWidth`** / **`dirtyHeight`** default to **`pixelData.width`** / **`height`**. |
+
+**Note:** **`pixelData.width`** / **`height`** define the backing **`ImageData`** size; the paste position is **`options.x`**, **`options.y`**.
+
+Returns a new **PNG **`Buffer`**.
+
+---
+
+## `manipulatePixels(canvasBuffer, options)`
+
+**`PixelManipulationOptions`**:
+
+| Key | Purpose |
+|-----|---------|
+| **`processor`** | **`(r, g, b, a, x, y) => [r, g, b, a]`** — per-pixel; outputs clamped to **`[0,255]`** |
+| **`filter`** | One of **`grayscale`**, **`invert`**, **`sepia`**, **`brightness`**, **`contrast`**, **`saturate`** (mutually exclusive with **`processor`** in normal use) |
+| **`intensity`** | Used by filters (default **`1`**). For **`brightness`**, **`0.5`** ≈ no shift (**`(intensity - 0.5) * 255`** added to RGB). **`contrast`** / **`saturate`** scale from this value per implementation |
+| **`region`** | Optional **`{ x, y, width, height }`**. If set, only that region is read and written back; the rest of the image is preserved |
+
+Flow: **`getPixelData`** (with **`region`** if provided) → mutate → **`putImageData`** at **`region.x/y`** when **`region`** is set, otherwise **`setPixelData`** replacing full bitmap content.
+
+---
+
+## `getPixelColor` / `setPixelColor`
+
+- **`getPixelColor(buffer, x, y)`** — **`getPixelData`** with a **1×1** region; returns **`{ r, g, b, a }`**.
+- **`setPixelColor(buffer, x, y, color)`** — updates one pixel; **`a`** defaults to **`255`** if omitted.
+
+---
+
+## Performance notes
+
+These APIs iterate pixels in **CPU** (**JavaScript** loops or **`putImageData`**). Prefer **`createImage`** filters (**Sharp** / convolution) for heavy lifting on full frames; use this track when you need exact **`ImageData`** semantics, small regions, or custom **`processor`** logic.
+
+---
+
+Next: **[Hit testing](/docs#02-hit-testing-paths)** · then **[Batch & utilities](/docs#03-batch-stitch-compress-output)**.

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import {
   ChevronRightIcon,
   ChevronDownIcon,
@@ -22,6 +22,7 @@ interface DocSubfolder {
   name: string;
   displayName: string;
   files: DocFile[];
+  subfolders?: DocSubfolder[];
 }
 
 interface DocFolder {
@@ -32,8 +33,25 @@ interface DocFolder {
   subfolders?: DocSubfolder[];
 }
 
-function subfolderKey(folderName: string, subName: string) {
-  return `${folderName}::${subName}`;
+/** Full path under the section, e.g. `video-ffmpeg` or `video-ffmpeg/options`. */
+function subfolderKey(folderName: string, pathUnderSection: string) {
+  return `${folderName}::${pathUnderSection}`;
+}
+
+function subfolderContainsActiveDoc(sub: DocSubfolder, canonicalFilename: string): boolean {
+  if (sub.files.some((f) => f.filename === canonicalFilename)) return true;
+  return sub.subfolders?.some((s) => subfolderContainsActiveDoc(s, canonicalFilename)) ?? false;
+}
+
+function walkFeatureSubfoldersSetExpanded(
+  folderName: string,
+  sub: DocSubfolder,
+  pathPrefix: string,
+  expandedSub: Record<string, boolean>,
+) {
+  const segmentPath = pathPrefix ? `${pathPrefix}/${sub.name}` : sub.name;
+  expandedSub[subfolderKey(folderName, segmentPath)] = true;
+  sub.subfolders?.forEach((ch) => walkFeatureSubfoldersSetExpanded(folderName, ch, segmentPath, expandedSub));
 }
 
 function initialExpandedState(folderList: DocFolder[], hash: string) {
@@ -44,7 +62,7 @@ function initialExpandedState(folderList: DocFolder[], hash: string) {
   for (const folder of folderList) {
     const hit =
       folder.files.some((f) => f.filename === c) ||
-      Boolean(folder.subfolders?.some((sub) => sub.files.some((f) => f.filename === c)));
+      Boolean(folder.subfolders?.some((sub) => subfolderContainsActiveDoc(sub, c)));
 
     if (
       folder.name === '05-advanced' ||
@@ -60,8 +78,14 @@ function initialExpandedState(folderList: DocFolder[], hash: string) {
       (folder.name === '03-feature-guides' || folder.name === '04-api-reference') &&
       folder.subfolders
     ) {
-      for (const sub of folder.subfolders) {
-        expandedSub[subfolderKey(folder.name, sub.name)] = true;
+      if (folder.name === '03-feature-guides') {
+        for (const sub of folder.subfolders) {
+          walkFeatureSubfoldersSetExpanded(folder.name, sub, '', expandedSub);
+        }
+      } else {
+        for (const sub of folder.subfolders) {
+          expandedSub[subfolderKey(folder.name, sub.name)] = true;
+        }
       }
     }
   }
@@ -167,6 +191,32 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
     }
   }, [activeHash, folders, canonicalActive]);
 
+  /** Keep Feature Guides nested branches open when the active doc lives under them (e.g. `video-ffmpeg/options`). */
+  useEffect(() => {
+    if (folders.length === 0) return;
+    const c = canonicalActive;
+    const fg = folders.find((f) => f.name === '03-feature-guides');
+    if (!fg?.subfolders?.length) return;
+
+    const keysToOpen: string[] = [];
+    const collect = (sub: DocSubfolder, prefix: string) => {
+      const segmentPath = prefix ? `${prefix}/${sub.name}` : sub.name;
+      if (subfolderContainsActiveDoc(sub, c)) {
+        keysToOpen.push(subfolderKey('03-feature-guides', segmentPath));
+      }
+      sub.subfolders?.forEach((ch) => collect(ch, segmentPath));
+    };
+    fg.subfolders.forEach((sub) => collect(sub, ''));
+    if (keysToOpen.length === 0) return;
+
+    setExpandedSub((prev) => {
+      const next = { ...prev };
+      for (const k of keysToOpen) next[k] = true;
+      return next;
+    });
+    setExpanded((p) => ({ ...p, '03-feature-guides': true }));
+  }, [canonicalActive, folders]);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash.slice(1);
@@ -180,8 +230,8 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
     setExpanded((prev) => ({ ...prev, [folderName]: !prev[folderName] }));
   };
 
-  const toggleSubExpanded = (folderName: string, subName: string) => {
-    const key = subfolderKey(folderName, subName);
+  const toggleSubExpanded = (folderName: string, pathUnderSection: string) => {
+    const key = subfolderKey(folderName, pathUnderSection);
     setExpandedSub((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
@@ -262,9 +312,93 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
   const folderHasActive = (folder: DocFolder): boolean => {
     if (folder.files.some((f) => canonicalActive === f.filename)) return true;
     if (folder.subfolders) {
-      return folder.subfolders.some((sub) => sub.files.some((f) => canonicalActive === f.filename));
+      return folder.subfolders.some((sub) => subfolderContainsActiveDoc(sub, canonicalActive));
     }
     return false;
+  };
+
+  const renderApiReferenceSubfolder = (folderName: string, sub: DocSubfolder) => {
+    const sk = subfolderKey(folderName, sub.name);
+    const subEx = expandedSub[sk] ?? true;
+    const subActive = sub.files.some((f) => canonicalActive === f.filename);
+    return (
+      <div key={sk} className="mb-2 min-w-0">
+        <div className="flex items-start gap-0 min-w-0">
+          <button
+            type="button"
+            onClick={() => toggleSubExpanded(folderName, sub.name)}
+            className="mt-1.5 p-1 shrink-0 hover:bg-slate-800/50 rounded-md"
+          >
+            {subEx ? (
+              <ChevronDownIcon className="h-4 w-4 text-slate-500" />
+            ) : (
+              <ChevronRightIcon className="h-4 w-4 text-slate-500" />
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => toggleSubExpanded(folderName, sub.name)}
+            className={`min-w-0 flex-1 text-left py-2 px-1 rounded-lg text-sm font-semibold leading-snug break-words ${
+              subActive ? 'text-blue-300 bg-blue-950/40' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {sub.displayName}
+          </button>
+        </div>
+        {subEx && (
+          <div className="ml-2 sm:ml-3 space-y-0.5 border-l border-slate-800/80 pl-2 sm:pl-3">
+            {sub.files.map((file) => renderFile(file, 2))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /** Recursive sidebar branch for Feature Guides (multi-level subfolders). */
+  const renderFeatureGuideSubTree = (
+    folderName: string,
+    pathPrefix: string,
+    sub: DocSubfolder,
+    fileIndentLevel: number,
+  ): ReactNode => {
+    const segmentPath = pathPrefix ? `${pathPrefix}/${sub.name}` : sub.name;
+    const sk = subfolderKey(folderName, segmentPath);
+    const subEx = expandedSub[sk] ?? true;
+    const subActive = subfolderContainsActiveDoc(sub, canonicalActive);
+    return (
+      <div key={sk} className="mb-2 min-w-0">
+        <div className="flex items-start gap-0 min-w-0">
+          <button
+            type="button"
+            onClick={() => toggleSubExpanded(folderName, segmentPath)}
+            className="mt-1.5 p-1 shrink-0 hover:bg-slate-800/50 rounded-md"
+          >
+            {subEx ? (
+              <ChevronDownIcon className="h-4 w-4 text-slate-500" />
+            ) : (
+              <ChevronRightIcon className="h-4 w-4 text-slate-500" />
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => toggleSubExpanded(folderName, segmentPath)}
+            className={`min-w-0 flex-1 text-left py-2 px-1 rounded-lg text-sm font-semibold leading-snug break-words ${
+              subActive ? 'text-blue-300 bg-blue-950/40' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {sub.displayName}
+          </button>
+        </div>
+        {subEx && (
+          <div className="ml-2 sm:ml-3 space-y-0.5 border-l border-slate-800/80 pl-2 sm:pl-3">
+            {sub.files.map((file) => renderFile(file, fileIndentLevel))}
+            {sub.subfolders?.map((nested) =>
+              renderFeatureGuideSubTree(folderName, segmentPath, nested, fileIndentLevel + 1),
+            )}
+          </div>
+        )}
+      </div>
+    );
   };
 
   const renderFolder = (folder: DocFolder) => {
@@ -307,42 +441,11 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
         {isExpanded && (
           <div className="ml-1 sm:ml-2 mt-1 space-y-0.5 animate-fade-in">
             {folder.files.map((file) => renderFile(file, 1))}
-            {folder.subfolders?.map((sub) => {
-              const sk = subfolderKey(folder.name, sub.name);
-              const subEx = expandedSub[sk] ?? true;
-              const subActive = sub.files.some((f) => canonicalActive === f.filename);
-              return (
-                <div key={sk} className="mb-2 min-w-0">
-                  <div className="flex items-start gap-0 min-w-0">
-                    <button
-                      type="button"
-                      onClick={() => toggleSubExpanded(folder.name, sub.name)}
-                      className="mt-1.5 p-1 shrink-0 hover:bg-slate-800/50 rounded-md"
-                    >
-                      {subEx ? (
-                        <ChevronDownIcon className="h-4 w-4 text-slate-500" />
-                      ) : (
-                        <ChevronRightIcon className="h-4 w-4 text-slate-500" />
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleSubExpanded(folder.name, sub.name)}
-                      className={`min-w-0 flex-1 text-left py-2 px-1 rounded-lg text-sm font-semibold leading-snug break-words ${
-                        subActive ? 'text-blue-300 bg-blue-950/40' : 'text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      {sub.displayName}
-                    </button>
-                  </div>
-                  {subEx && (
-                    <div className="ml-2 sm:ml-3 space-y-0.5 border-l border-slate-800/80 pl-2 sm:pl-3">
-                      {sub.files.map((file) => renderFile(file, 2))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+            {folder.subfolders?.map((sub) =>
+              folder.name === '03-feature-guides'
+                ? renderFeatureGuideSubTree(folder.name, '', sub, 2)
+                : renderApiReferenceSubfolder(folder.name, sub),
+            )}
           </div>
         )}
       </div>

@@ -1,0 +1,138 @@
+# Patterns & film noise {#05-backgrounds-pattern-noise}
+
+Back: [Canvas overview](/docs#00-create-canvas-overview)
+
+There are **three** pattern-related mechanisms — do not confuse them:
+
+| Mechanism | Config | When it paints | Implementation |
+|-----------|--------|----------------|----------------|
+| **`patternBg`** | **`PatternOptions`** | **After** all **`bgLayers`**, **before** **`noiseBg`** (`CanvasCreator`) | **`EnhancedPatternRenderer.renderPattern`** — procedural mesh |
+| **`bgLayers[]`** **`presetPattern`** | **`pattern: PatternOptions`** | In **`bgLayers`** order (with **`opacity`** / **`blendMode`** per layer) | Same renderer; **`stackedInLayer: true`** changes blend default |
+| **`bgLayers[]`** **`pattern`** | **`source`**, **`repeat`**, **`opacity`** | Same stack order | **`drawPattern`** — **`createPattern`** tiled **bitmap** (`bg.ts`) |
+
+Types: **`PatternOptions`**, **`BackgroundLayer`** in **`lib/Canvas/utils/types/index.ts`**. Procedural drawing: **`lib/Canvas/utils/Patterns/enhancedPatternRenderer.ts`**.
+
+---
+
+## Procedural presets — every `PatternOptions.type` {#05-backgrounds-pattern-noise-pattern-types}
+
+These are the **only** string literals **`EnhancedPatternRenderer`** recognises (`switch` + **`default`** logs **`Unknown pattern type`**).
+
+| **`type`** | What gets drawn | **`color`** | **`secondaryColor`** | **`size` / `spacing`** (defaults **20** / **10**) |
+|------------|-----------------|-------------|----------------------|---------------------------------------------------|
+| **`grid`** | Vertical lines (`color`) + horizontal lines (`secondary` or `color`) | Line strokes | Second axis strokes | Cell pitch ≈ **`size + spacing`** |
+| **`dots`** | Filled circles on a grid | Dot fill | *(unused)* | Dot centres spaced **`size+spacing`**; radius **`size/4`** |
+| **`diagonal`** | Parallel **`↗`** strokes across canvas | Stroke | *(unused)* | Line spacing **`size+spacing`** |
+| **`stripes`** | Horizontal bands | Even rows | Odd rows if **`secondaryColor`** set & ≠ **`transparent`** | Band height **`size`**, pitch **`size+spacing`** |
+| **`waves`** | Horizontal sine polylines | Stroke | *(unused)* | Row pitch **`size+spacing`**; amplitude tied to **`size`** |
+| **`crosses`** | `+` marks per tile | Horizontal bar | Vertical bar (or **`color`**) | Tile **`size+spacing`** |
+| **`hexagons`** | Outlined hex lattice | Stroke | *(unused)* | Geometry from **`size`** + **`spacing`** |
+| **`checkerboard`** | Filled squares | “Even” tiles | “Odd” tiles (default **`transparent`**) | Square edge **`size`** **only** (**`spacing`** not used in loops) |
+| **`diamonds`** | Outlined diamonds | Stroke | *(unused)* | Tile **`size+spacing`** |
+| **`triangles`** | Outlined upward triangles | Stroke | *(unused)* | Tile **`size+spacing`** |
+| **`stars`** | Filled 5-point stars | Fill | *(unused)* | Tile **`size+spacing`**; arm radius **`size/4`** |
+| **`polka`** | Large filled circles (touching grid) | Fill | *(unused)* | Centres spaced **`size+spacing`**; radius **`size/2`** |
+| **`custom`** | Manual tile of an image | *(via image)* | *(via image)* | **`customPatternImage`**, **`repeat`**, **`scale`** — see below |
+
+---
+
+## `PatternOptions` — all fields
+
+| Property | Role |
+|----------|------|
+| **`type`** | One of the literals above (**required** for renderer entry). |
+| **`color`** | Primary ink (**default `#ffffff`** where used). |
+| **`secondaryColor`** | Second ink for **`grid`**, **`crosses`**, **`stripes`**, **`checkerboard`**; use **`'transparent'`** to disable checker dark squares (falls back to **`color`** for strokes where coded). |
+| **`opacity`** | **0…1** multiplied into **`ctx.globalAlpha`** (**default `0.3`** *inside* **`renderPattern`**). |
+| **`size`** | Feature scale in px (**default `20`**). |
+| **`spacing`** | Gap between repeats (**default `10`**), except **`checkerboard`** uses **`size`** only. |
+| **`rotation`** | Degrees — rotates **whole** overlay around **canvas centre** before tiling. |
+| **`offsetX`**, **`offsetY`** | Extra **`translate`** after rotation. |
+| **`blendMode`** | **`globalCompositeOperation`** for this overlay. **Default:** **`overlay`** when using top-level **`patternBg`**; when embedded in **`bgLayers`** **`presetPattern`**, missing **`blendMode`** on **`pattern`** leaves the **layer’s** **`blendMode`** (via **`stackedInLayer: true`**). |
+| **`customPatternImage`** | Path or **`http(s)`** URL — **`custom`** only; relative paths joined with **`process.cwd()`**. |
+| **`repeat`** | **`repeat` \| `repeat-x` \| `repeat-y` \| `no-repeat`** — **`custom`** only (**default `repeat`**). |
+| **`scale`** | Multiplier on drawn tile (**default `1`**) — **`custom`** only. |
+| **`gradient`** | Declared on **`PatternOptions`** as **`GradientConfig`** — **not read** by **`EnhancedPatternRenderer`** today. Use flat **`color`** / **`secondaryColor`** for meshes; use a **`bgLayers`** **`gradient`** layer underneath for colour ramps. |
+
+---
+
+## `patternBg` example
+
+```typescript
+await painter.createCanvas({
+  width: 600,
+  height: 400,
+  colorBg: '#020617',
+  patternBg: {
+    type: 'hexagons',
+    color: '#94a3b8',
+    size: 24,
+    spacing: 6,
+    opacity: 0.22,
+    blendMode: 'soft-light',
+  },
+});
+```
+
+---
+
+## `bgLayers` — bitmap tile vs preset
+
+**Bitmap tile (`type: 'pattern'`)** — any image **`createPattern`** can digest:
+
+```typescript
+bgLayers: [
+  {
+    type: 'pattern',
+    source: './textures/paper.png',
+    repeat: 'repeat',
+    opacity: 0.35,
+    blendMode: 'multiply',
+  },
+];
+```
+
+**Preset mesh (`type: 'presetPattern'`)** — shares **`PatternOptions`** with **`patternBg`**:
+
+```typescript
+bgLayers: [
+  {
+    type: 'presetPattern',
+    opacity: 1,
+    blendMode: 'overlay',
+    pattern: {
+      type: 'dots',
+      color: '#f8fafc',
+      size: 14,
+      spacing: 28,
+      opacity: 0.4,
+    },
+  },
+];
+```
+
+**Opacity stacking:** the layer sets **`ctx.globalAlpha`**; **`renderPattern`** multiplies again by **`pattern.opacity ?? 0.3`**.
+
+---
+
+## `noiseBg` & layer noise {#05-backgrounds-pattern-noise-noise-bg}
+
+**`noiseBg`** — applied **after** **`patternBg`** (`CanvasCreator`). **`applyNoise`** default intensity **~0.05** if omitted.
+
+**`bgLayers`** **`type: 'noise'`** — same grain helper with per-layer **`blendMode`** / **`opacity`**; default intensity in **`drawBackgroundLayers`** **~0.08**.
+
+```typescript
+noiseBg: { intensity: 0.06 },
+```
+
+Typical **`intensity`**: **0.02–0.15**.
+
+---
+
+## Charts
+
+**`patternBg`** / **`noiseBg`** on chart configs follow the same procedural renderer (`chartBackground.ts`).
+
+---
+
+Next: **[Border clip & motion](/docs#06-canvas-border-shadow-zoom)**.

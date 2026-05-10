@@ -99,7 +99,8 @@ export async function POST(req: NextRequest) {
   mkdirSync(dir, { recursive: true });
   const outPath = join(dir, 'out.bin');
   const errPath = join(dir, 'err.txt');
-  const entry = join(dir, lang === 'ts' ? 'snippet.ts' : 'snippet.js');
+  /** Always `.ts`: the injected wrapper uses TS syntax (`: Promise<Buffer>`, etc.). User JS is valid TS input. */
+  const entry = join(dir, 'snippet.ts');
 
   const wrapped = wrapSnippetForRunner(code, { apexifyImportHref });
   writeFileSync(entry, wrapped, 'utf8');

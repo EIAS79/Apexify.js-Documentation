@@ -1,0 +1,149 @@
+# Compositing & building videos {#09-compositing}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+---
+
+## `merge`
+
+**Ignores** top-level **`source`** — uses **`videos`** only.
+
+| **`mode`** | Behaviour |
+|------------|-----------|
+| **`sequential`** (**default**) | **`concat`** demuxer **`-c copy`** — fast; clips should match codecs for reliability. |
+| **`side-by-side`** | **`hstack`** **first two** inputs only. |
+| **`grid`** | **Currently same as side-by-side** in code (two-input **`hstack`**) — **`grid`** dims reserved. |
+
+```typescript
+await painter.createVideo({
+  source: './placeholder.mp4',
+  merge: {
+    videos: ['./part1.mp4', './part2.mp4'],
+    mode: 'sequential',
+    outputPath: './full.mp4',
+  },
+});
+```
+
+---
+
+## `splitScreen`
+
+**Ignores** top-level **`source`**.
+
+| **`layout`** | Needs | Behaviour |
+|--------------|-------|-----------|
+| **`side-by-side`** | ≥2 | **`hstack`**. |
+| **`top-bottom`** | ≥2 | **`vstack`**. |
+| **`grid`** | ≥4 | **2×2** pipeline. |
+
+```typescript
+await painter.createVideo({
+  source: './placeholder.mp4',
+  splitScreen: {
+    videos: ['./a.mp4', './b.mp4'],
+    layout: 'top-bottom',
+    outputPath: './stacked.mp4',
+  },
+});
+```
+
+---
+
+## `pictureInPicture`
+
+**Uses** **`source`** as **background** and **`overlayVideo`** as inset.
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`overlayVideo`** | ✓ | Path / buffer / URL. |
+| **`position`** | **`bottom-right`** | Corner placement. |
+| **`size`** | **320×180** | Scales overlay before composite. |
+| **`opacity`** | **1** | Alpha via **`colorchannelmixer`**. |
+| **`outputPath`** | ✓ | |
+
+```typescript
+await painter.createVideo({
+  source: './slides.mp4',
+  pictureInPicture: {
+    overlayVideo: './presenter.mp4',
+    position: 'bottom-right',
+    size: { width: 480, height: 270 },
+    opacity: 1,
+    outputPath: './webinar-layout.mp4',
+  },
+});
+```
+
+---
+
+## `createFromFrames`
+
+**Ignores** **`source`** for logic — still required by type.
+
+**What it does:** Writes frames as **`frame-%06d.png`**, runs FFmpeg **`-framerate`** → encoded video **`-pix_fmt yuv420p`**.
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`frames`** | ✓ | Paths or **Buffers**. |
+| **`fps`** | **30** | Timeline speed. |
+| **`quality`** | **`medium`** | CRF ladder unless **`bitrate`** set. |
+| **`bitrate`** | — | Overrides CRF. |
+| **`resolution`** | auto | **`scale`+`pad`** from first frame or forced WxH. |
+| **`format`** | typed | Container hint; encode uses libx264-style path. |
+
+```typescript
+await painter.createVideo({
+  source: Buffer.alloc(0),
+  createFromFrames: {
+    frames: ['./renders/f_001.png', './renders/f_002.png'],
+    fps: 24,
+    outputPath: './anim.mp4',
+    quality: 'high',
+  },
+});
+```
+
+---
+
+## `createLoop`
+
+**What it does:** **Concat** demuxer plays **`source`** **twice** (**`-c copy`**). **`smooth`** flag **unused** in helper.
+
+```typescript
+await painter.createVideo({
+  source: './sting.mp4',
+  createLoop: { outputPath: './sting-doubled.mp4' },
+});
+```
+
+---
+
+## `batch`
+
+**What it does:** Loops **`videos[]`** calling **`createVideo({ source, ...operations })`** per row.
+
+**Important:** Put **`outputPath`** **inside** each nested operation (**`trim.outputPath`**, etc.). The **`outputDirectory`** helper field **does not** auto-inject paths into **`operations`**.
+
+Prefer your own **`for`** loop until batch wiring saves outputs predictably.
+
+```typescript
+await painter.createVideo({
+  source: './unused.mp4',
+  batch: {
+    outputDirectory: './batch',
+    videos: [
+      {
+        source: './a.mp4',
+        operations: {
+          trim: { startTime: 0, endTime: 5, outputPath: './batch/a.mp4' },
+        },
+      },
+    ],
+  },
+});
+```
+
+---
+
+Next: **[Transitions & stabilize](/docs#10-advanced-ops)**.

@@ -1,0 +1,68 @@
+# Path2D · `createPath2D` & `drawPath` {#04-path2d-draw-path}
+
+Back: [Lines overview](/docs#00-custom-lines-overview) · [Raster / utilities hub](/docs#00-advanced-raster-overview)
+
+Low-level vector API — independent of **`createCustom`** (**`Path2DCreator`** in **`lib/Canvas/extended/Path2DCreator.ts`**).
+
+---
+
+## `createPath2D(commands: PathCommand[])`
+
+Returns a **`Path2D`**-like object from **`buildPath2DFromCommands`** (**`lib/Canvas/utils/core/pathCmd.ts`**).
+
+### **`PathCommand`** variants
+
+| **`type`** | Payload |
+|------------|---------|
+| **`moveTo`** | **`x`**, **`y`** |
+| **`lineTo`** | **`x`**, **`y`** |
+| **`arc`** | Centre **`x`/`y`**, **`radius`**, **`startAngle`**, **`endAngle`**, optional **`counterclockwise`** |
+| **`arcTo`** | **`x1`/`y1`/`x2`/`y2`**, **`radius`** |
+| **`quadraticCurveTo`** | **`cpx`/`cpy`**, endpoint **`x`/`y`** |
+| **`bezierCurveTo`** | Two control points + endpoint **`x`/`y`** |
+| **`rect`** | **`x`/`y`/`width`/`height`** |
+| **`ellipse`** | Centre, **`radiusX`/`radiusY`**, optional rotation & arc sweep |
+| **`closePath`** | — |
+| **`circle`** | **`x`/`y`/`radius`** shorthand |
+| **`roundedRect`** | Unified or per-corner radii |
+| **`polygon`** | **`points[]`** |
+| **`star`** | **`outerRadius`**, **`innerRadius`**, vertex **`points`** count |
+| **`arrow`** | **`x`/`y`/`length`/`angle`** + optional head sizing |
+
+---
+
+## `drawPath(canvasBuffer, path | commands[], options?)`
+
+1. Rasterises **`canvasBuffer`** onto working canvas.  
+2. **`path`** may be **built Path2D** or raw **`commands`** (auto **`createPath2D`**).  
+3. Applies optional **`transform`** then **`stroke`** and/or **`fill`**.
+
+### **`Path2DDrawOptions`**
+
+| Block | Keys |
+|-------|------|
+| **`stroke`** | **`color`**, **`width`**, **`lineCap`**, **`lineJoin`**, **`miterLimit`**, **`dashArray`**, **`dashOffset`**, **`opacity`** |
+| **`fill`** | **`color`**, **`opacity`**, **`rule`** (**`nonzero`/`evenodd`**) |
+| **`transform`** | **`translateX/Y`**, **`rotate`** (deg), **`scaleX/Y`**, optional **`originX/Y`** pivot |
+
+Returns **PNG **`Buffer`**.
+
+---
+
+```typescript
+const cmds = [
+  { type: 'moveTo' as const, x: 50, y: 50 },
+  { type: 'lineTo' as const, x: 350, y: 280 },
+  { type: 'quadraticCurveTo' as const, cpx: 200, cpy: 20, x: 350, y: 280 },
+];
+
+const path = painter.createPath2D(cmds);
+
+const buf = await painter.drawPath(canvasBuffer, path, {
+  stroke: { color: '#0ea5e9', width: 3, lineCap: 'round' },
+});
+```
+
+---
+
+Next: **[Hit testing](/docs#02-hit-testing-paths)**.

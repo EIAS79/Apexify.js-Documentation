@@ -1,0 +1,244 @@
+# Metadata, frames & discovery {#01-metadata-and-frames}
+
+Back: [Video overview](/docs#00-video-overview)
+
+**See also:** [Discovery & metadata](/docs#01-discovery-metadata) · [Frame extraction suite](/docs#02-frame-extraction) (option-by-option explanations + examples) · [Imperative **`painter.*`** helpers](/docs#08-imperative-video-helpers).
+
+---
+
+## `getInfo`
+
+Returns **`getVideoInfo`** payload (**duration**, **width**, **height**, **fps**, **bitrate**, **format**).
+
+### Fields (runtime)
+
+| Field | Meaning |
+|-------|---------|
+| **`duration`** | Seconds (**float**). |
+| **`width`**, **`height`** | Pixel dimensions of primary video stream. |
+| **`fps`** | Parsed from **`r_frame_rate`** (defaults **30** if missing). |
+| **`bitrate`** | Stream or container bitrate when exposed by ffprobe. |
+| **`format`** | **`format_name`** string (e.g. **`mov,mp4,m4a...`**). |
+
+### Example
+
+```typescript
+const meta = await painter.createVideo({
+  source: 'https://example.com/file.mp4',
+  getInfo: true,
+});
+console.log(meta.duration, `${meta.width}x${meta.height}`, meta.fps);
+```
+
+---
+
+## `detectFormat`
+
+Runs **`getVideoInfo`** plus **`ffprobe`** **codec_name** for **`v:0`**.
+
+### Return shape
+
+| Field | Notes |
+|-------|------|
+| **`format`**, **`container`** | From **`getVideoInfo.format`**. |
+| **`codec`** | Video codec short name (**`h264`**, **`vp9`**, …) or **`unknown`**. |
+| **`width`**, **`height`**, **`fps`**, **`bitrate`**, **`duration`** | Same as **`getInfo`**. |
+
+### Example
+
+```typescript
+const probe = await painter.createVideo({
+  source: './movie.mkv',
+  detectFormat: true,
+});
+console.log(probe.codec, probe.container, probe.duration);
+```
+
+---
+
+## `extractFrame`
+
+Single raster grab at **`time`** (seconds) **or** **`frame`** index (**0-based** in API; implementation forwards to **`extractVideoFrame`**).
+
+| Option | Type | Notes |
+|--------|------|------|
+| **`time`** | `number` | Seconds — **overrides** **`frame`** when set (pass via **`extractVideoFrame`** ordering). |
+| **`frame`** | `number` | Default **0**. |
+| **`width`**, **`height`** | `number` | Scale on **canvas** after decode (default = native frame size). |
+| **`outputFormat`** | **`jpg` \| `png`** | JPEG vs PNG **decode** path; **return value** from **`createVideo`** is always a **PNG buffer** composited on canvas (`VideoCreator`). |
+| **`quality`** | `number` | JPEG **`-q:v`** style (**lower = better**, default **2**). |
+
+### Example
+
+```typescript
+const shot = await painter.createVideo({
+  source: './talk.mp4',
+  extractFrame: {
+    time: 45.5,
+    width: 1280,
+    height: 720,
+    outputFormat: 'jpg',
+    quality: 3,
+  },
+});
+// shot.buffer — PNG
+// shot.canvas — { width, height }
+```
+
+---
+
+## `extractFrames` — two modes
+
+### A) Explicit timestamps → **`Buffer[]`**
+
+Set **`times: number[]`** (seconds). Uses **`extractVideoFrame`** per entry.
+
+| Option | Notes |
+|--------|------|
+| **`times`** | Required for this mode. |
+| **`outputFormat`** | **`jpg`** / **`png`**. |
+| **`quality`** | Per-frame quality. |
+
+```typescript
+const buffers = await painter.createVideo({
+  source: './clip.mp4',
+  extractFrames: {
+    times: [0, 1.5, 3.0],
+    outputFormat: 'png',
+    quality: 2,
+  },
+});
+```
+
+### B) Interval sampling → file paths
+
+Set **`interval`** (**milliseconds**, **must be > 0**). Uses **`ApexPainter.extractFrames`** internally.
+
+| Option | Notes |
+|--------|------|
+| **`interval`** | **Ms** between samples → derived **`fps = 1000 / interval`** for FFmpeg **`-vf fps=`**. |
+| **`frameSelection.start`**, **`end`** | **Frame indices** clamped to extracted range. |
+| **`outputFormat`** | **`jpg`** / **`png`**. |
+| **`outputDirectory`** | Declared on **`VideoCreationOptions`** but **interval mode writes under** **`.temp-frames/frames-<timestamp>/`** — treat **`outputDirectory`** as **reserved / unused** today. |
+
+```typescript
+const frames = await painter.createVideo({
+  source: './walk.mp4',
+  extractFrames: {
+    interval: 500, // every 500 ms → ~2 fps sampling
+    outputFormat: 'jpg',
+    frameSelection: { start: 0, end: 40 },
+  },
+});
+// frames: { source: string; isRemote: boolean }[]
+```
+
+---
+
+## `extractAllFrames`
+
+Delegates to **`ApexPainter.extractAllFrames`** — dumps **every** decoded frame in a window (**heavy** on long clips).
+
+| Option | Default | Notes |
+|--------|---------|------|
+| **`outputFormat`** | **`png`** | **`jpg`** / **`png`**. |
+| **`outputDirectory`** | **`./extracted-frames`** | Destination folder (created). |
+| **`quality`** | **2** | JPEG **`-q:v`**. |
+| **`prefix`** | **`frame`** | **`prefix-%06d.ext`**. |
+| **`startTime`**, **`endTime`** | **0 … duration** | Seconds slice. |
+
+Returns **`{ source, frameNumber, time }[]`** (**`time`** increments by **1/fps** from metadata).
+
+### Example
+
+```typescript
+const list = await painter.createVideo({
+  source: './short.mp4',
+  extractAllFrames: {
+    outputFormat: 'png',
+    outputDirectory: './dump',
+    prefix: 'anim',
+    startTime: 0,
+    endTime: 2,
+  },
+});
+```
+
+---
+
+## `generateThumbnail`
+
+Montage of **`count`** evenly spaced grabs on a single canvas (**PNG**).
+
+| Option | Default | Notes |
+|--------|---------|------|
+| **`count`** | **9** | Timeline stride **`duration / (count + 1)`**. |
+| **`grid`** | **`{ cols: 3, rows: 3 }`** | Tile layout. |
+| **`width`**, **`height`** per cell | **320×180** | Each thumbnail cell size. |
+| **`outputFormat`** | **`jpg`** | Feed into **`extractVideoFrame`**. |
+| **`quality`** | **2** | JPEG quality. |
+
+```typescript
+const grid = await painter.createVideo({
+  source: './film.mp4',
+  generateThumbnail: {
+    count: 6,
+    grid: { cols: 3, rows: 2 },
+    width: 480,
+    height: 270,
+  },
+});
+// grid.buffer — PNG sheet
+```
+
+---
+
+## `generatePreview`
+
+Writes **`count`** stills under **`outputDirectory`** (**default `./video-preview`**).
+
+| Option | Default |
+|--------|---------|
+| **`count`** | **10** |
+| **`outputDirectory`** | **`./video-preview`** |
+| **`outputFormat`** | **`png`** |
+| **`quality`** | **2** |
+
+```typescript
+const previews = await painter.createVideo({
+  source: './talk.mp4',
+  generatePreview: {
+    count: 12,
+    outputDirectory: './storyboard',
+    outputFormat: 'jpg',
+  },
+});
+// [{ source, frameNumber, time }, ...]
+```
+
+---
+
+## `detectScenes`
+
+Runs FFmpeg **`select='gt(scene,threshold)'`** pipeline (shell **`grep` / `awk` / `sed`** — **most reliable on POSIX**).
+
+| Option | Default | Notes |
+|--------|---------|------|
+| **`threshold`** | **0.3** | Scene detect sensitivity. |
+| **`outputPath`** | — | Optional JSON dump of **`[{ time, scene }]`**. |
+
+```typescript
+const cuts = await painter.createVideo({
+  source: './interview.mp4',
+  detectScenes: {
+    threshold: 0.35,
+    outputPath: './scenes.json',
+  },
+});
+```
+
+On failure / empty parse, implementation returns **`[]`**.
+
+---
+
+Next: **[Transcode & geometry](/docs#02-transcode-trim-transform)**.

@@ -1,0 +1,115 @@
+# Primary backgrounds (pick exactly one) {#02-backgrounds-primary}
+
+Back: [Canvas overview](/docs#00-create-canvas-overview)
+
+---
+
+## The rule
+
+Among **`colorBg`**, **`gradientBg`**, and **`customBg`**, you may set **only one** per call.
+
+**`videoBg`** is separate: if present, it becomes the **primary** raster background **before** custom/gradient/color branches.
+
+If you combine **`colorBg`** + **`gradientBg`** (etc.), **`createCanvas`** throws:
+
+`only one of colorBg, gradientBg, or customBg can be used`.
+
+---
+
+## Option A — Solid color (`colorBg`)
+
+```typescript
+await painter.createCanvas({
+  width: 800,
+  height: 450,
+  colorBg: '#0f172a',
+});
+```
+
+**Special:** **`colorBg: 'transparent'`** skips painting opaque color on that branch (often paired with **[transparent base](/docs#03-backgrounds-transparent-base)** or layers).
+
+---
+
+## Option B — Gradient (`gradientBg`)
+
+Uses **`GradientConfig`**: **`linear`**, **`radial`**, or **`conic`** with **`colors`** stops.
+
+```typescript
+await painter.createCanvas({
+  width: 900,
+  height: 500,
+  gradientBg: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 900,
+    endY: 500,
+    colors: [
+      { stop: 0, color: '#312e81' },
+      { stop: 1, color: '#1e1b4b' },
+    ],
+  },
+});
+```
+
+---
+
+## Option C — Image (`customBg`)
+
+| Field | Purpose |
+|-------|---------|
+| **`source`** | File path or **`http(s)`** URL |
+| **`inherit`** | **`true`** → set **`width`/`height`** from image |
+| **`fit`** | **`fill`** \| **`contain`** \| **`cover`** |
+| **`align`** | Position when letterboxing |
+| **`opacity`** | Layer alpha |
+| **`filters`** | Optional **`ImageFilter[]`** |
+
+```typescript
+await painter.createCanvas({
+  width: 1200,
+  height: 630,
+  customBg: {
+    source: './assets/hero.jpg',
+    fit: 'cover',
+    align: 'center',
+  },
+});
+```
+
+---
+
+## Option D — Video frame (`videoBg`)
+
+Requires **FFmpeg**. One frame fills the background.
+
+| Field | Purpose |
+|-------|---------|
+| **`source`** | Path, URL, or **`Buffer`** |
+| **`time`** | Seconds (**overrides** **`frame`** if set) |
+| **`frame`** | Frame index |
+| **`format`**, **`quality`** | **`jpg`** \| **`png`**, JPEG quality **1–31** (lower = better) |
+| **`opacity`** | Alpha when drawing |
+
+```typescript
+await painter.createCanvas({
+  width: 1920,
+  height: 1080,
+  videoBg: {
+    source: './clip.mp4',
+    time: 1.0,
+    format: 'jpg',
+    quality: 2,
+  },
+});
+```
+
+---
+
+## After the primary fill
+
+You can still add **[`bgLayers`](/docs#04-backgrounds-bg-layers)**, **`patternBg`**, **`noiseBg`** on top — see the following pages.
+
+---
+
+Next: **[Transparent base](/docs#03-backgrounds-transparent-base)**.

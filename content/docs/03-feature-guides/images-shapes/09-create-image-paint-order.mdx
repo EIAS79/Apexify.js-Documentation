@@ -1,0 +1,55 @@
+# Bitmap paint order — implementation reference {#09-create-image-paint-order}
+
+Back: [Images overview](/docs#00-create-image-overview)
+
+This page mirrors **`ImageCreator.drawImageBitmap`** (**`lib/Canvas/extended/ImageCreator.ts`**) for **raster** layers. **Shapes** follow **`drawShape`** — same broad phases with geometry-specific shadow/stroke branches.
+
+---
+
+## Shape-as-source (`isShapeSource`)
+
+1. **`ctx.save`**, optional **`blendMode`**
+2. **`rotation`**, **`opacity`**, **`blur`**
+3. **Shadow** — complex (**heart/star**) vs **`applyShadow(box)`**
+4. **`boxBackground`**
+5. Inner **`save`** → **`borderRadius` clip**
+6. **`filters`** (professional stack pre-fill)
+7. **`drawShape`** fill
+8. **`restore`** clip stack
+9. **`stroke`** via **`applyShapeStroke`** (geometry path)
+10. Clear filters / alpha, **`restore`**
+
+---
+
+## Bitmap pipeline (happy path)
+
+| Step | Action |
+|------|--------|
+| 1 | **`ctx.save`**, **`blendMode`** |
+| 2 | **`applyRotation`** |
+| 3 | **`applyShadow`** |
+| 4 | **`drawBoxBackground`** |
+| 5 | Inner **`save`** → **`clipPath`** **or** **`buildPath` + clip** |
+| 6 | **`fitInto`** → **`dx,dy,dw,dh`** source crop math |
+| 7a | **`filterOrder:'pre'`** | Temp canvas draw → filters → paste → **`return`** (**⚠️ skips stroke & effects**) |
+| 7b | **`distortion.perspective`** (4 pts) | Warp → **`return`** (**⚠️ skips stroke & effects**) |
+| 7c | **`distortion` bulge/pinch** | **`return`** (**⚠️ skips stroke & effects**) |
+| 7d | **`meshWarp`** | **`return`** (**⚠️ skips stroke & effects**) |
+| 7e | **`mask`** | **`applyImageMask`** else **`drawImage`** |
+| 8 | Restore clip **`restore`** |
+| 9 | **`filterOrder:'post'`** filters tile extraction |
+|10 | **`effects`** stack |
+|11 | **`applyStroke`** |
+|12 | Outer **`restore`** |
+
+---
+
+## Practical implications
+
+- Prefer **`filterOrder:'post'`** when you still need **`stroke`** / **`effects`**.
+- **`distortion`** / **`meshWarp`** are **demo-grade exits**: compose those layers separately if you require outlines afterwards.
+- **`effects`** mutate pixels already blended — lens flare uses **`screen`**; combine thoughtfully with **`blendMode`** on the layer.
+
+---
+
+Back to **[overview](/docs#00-create-image-overview)**.

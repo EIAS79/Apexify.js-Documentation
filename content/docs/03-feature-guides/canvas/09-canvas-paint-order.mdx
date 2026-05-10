@@ -1,0 +1,38 @@
+# Canvas paint order (reference) {#09-canvas-paint-order}
+
+Back: [Canvas overview](/docs#00-create-canvas-overview)
+
+This page describes **`CanvasCreator.createCanvas`** so you can predict **what covers what**.
+
+---
+
+## Steps
+
+1. **Validate** **`CanvasConfig`** (sizes, **`bgLayers`** shapes, primary-background mutex).
+2. **Optional:** resize canvas from **`customBg.inherit`** or **`videoBg`** frame dimensions.
+3. **Defaults:** **`width`** / **`height`** fall back to **500** if still unset.
+4. **Context:** opacity, save, **rotation**, **`buildPath`** + **clip**, **zoom**, translate, **blendMode**.
+5. **Primary background** (first match):
+   - **`videoBg`** → extract frame, **`drawImage`** full rect
+   - else **`customBg`** → **`customBackground`** (+ optional filters / opacity path)
+   - else **`gradientBg`** → **`drawBackgroundGradient`**
+   - else **`colorBg`** defined → **`drawBackgroundColor`**
+   - else **`transparentBase`** → skip fill
+   - else → **`drawBackgroundColor`** with **`#000`**
+6. **`bgLayers`** → **`drawBackgroundLayers`** in order.
+7. **`patternBg`** → **`EnhancedPatternRenderer.renderPattern`**
+8. **`noiseBg`** → **`applyNoise`**
+9. Restore clip group.
+10. **`shadow`** (if set) — clip path again, **`applyShadow`**
+11. **`stroke`** (if set) — clip path again, **`applyStroke`**
+12. **`toBuffer('image/png')`**
+
+---
+
+## Design takeaway
+
+**Later steps paint on top:** **`noiseBg`** beats **`patternBg`** beats **`bgLayers`** beats primary fill — except **shadow/stroke** are post-effects around the **shape edge**.
+
+---
+
+Back to **[Canvas overview](/docs#00-create-canvas-overview)**.

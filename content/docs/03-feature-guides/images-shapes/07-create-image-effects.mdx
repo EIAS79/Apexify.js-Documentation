@@ -1,0 +1,63 @@
+# Cinematic effects — `effects` stack {#07-create-image-effects}
+
+Back: [Images overview](/docs#00-create-image-overview)
+
+**`effects`** post-processes the **already drawn pixels** inside the layer bounding **`box`** (same **`x,y,width,height`** used for **`getImageData`** snapshots).
+
+Implementations: **`lib/Canvas/utils/Image/imageEffects.ts`**.
+
+---
+
+## Fields (`ImageProperties.effects`)
+
+| Key | Shape | What it does |
+|-----|-------|----------------|
+| **`vignette`** | **`{ intensity; size }`** | **`intensity`** darkening strength (**`0…1`** style); **`size`** scales vignette radius vs diagonal (`applyVignette`). |
+| **`lensFlare`** | **`{ x; y; intensity }`** | Coordinates **added** to **`box.x`/`box.y`** — offsets inside/outside layer bounds (`applyLensFlare`). Uses **`screen`** composite internally for bursts. |
+| **`chromaticAberration`** | **`{ intensity }`** | Splits RGB channels horizontally (**offset ~ intensity × 15 px**) (`applyChromaticAberration`). |
+| **`filmGrain`** | **`{ intensity }`** | Adds RGB jitter (**scaled**) (`applyFilmGrain`). **Deterministic randomness:** differs each render pass. |
+
+```typescript
+await painter.createImage(
+  {
+    source: './hero.jpg',
+    x: 0,
+    y: 0,
+    width: 960,
+    height: 540,
+    fit: 'cover',
+    effects: {
+      vignette: { intensity: 0.45, size: 0.92 },
+      filmGrain: { intensity: 0.08 },
+      chromaticAberration: { intensity: 0.06 },
+      lensFlare: { x: 420, y: 140, intensity: 0.35 },
+    },
+  },
+  buffer
+);
+```
+
+---
+
+## Order inside `ImageCreator`
+
+Applied **after** bitmap drawn **unless** an earlier branch returned ( **`filterOrder:'pre'`**, **`distortion`**, **`meshWarp`** ). Effects sequence:
+
+1. **`vignette`** (mutates pixels in-place via **`putImageData`** region interpretation depends on helper — operates full **`width,height`** passed)
+2. **`lensFlare`** (gradient overlays)
+3. **`chromaticAberration`** (temp canvas swap-in)
+4. **`filmGrain`** (temp canvas swap-in)
+
+Then **`applyStroke`** runs — vignette/flare affect pixels **before** outline.
+
+---
+
+## Coordinate quirks (implementation)
+
+**`chromaticAberration`** and **`filmGrain`** snapshot **`getImageData(box.x, box.y, box.w, box.h)`** — correct for layers anywhere on the canvas.
+
+**`vignette`** and **`lensFlare`** delegate to helpers that sample / shade from **`(0,0)`** using **`box.w`/`box.h`** — visually aligned only when the layer hugs the **top-left** of the canvas (or you accept global-ish behaviour). Prefer **`x = 0`**, **`y = 0`** with **`width`/`height`** equal your vignette region until upstream fixes land.
+
+---
+
+Next: **[Grouped layers](/docs#08-create-image-groups)** · **[Paint order](/docs#09-create-image-paint-order)**.

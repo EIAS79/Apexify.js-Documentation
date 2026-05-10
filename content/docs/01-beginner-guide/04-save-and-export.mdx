@@ -1,0 +1,48 @@
+# Save & export {#04-save-and-export}
+
+Back: [Beginner guide](/docs#00-beginner-guide)
+
+---
+
+## Save a PNG file (Node.js)
+
+```typescript
+import fs from 'fs';
+
+fs.writeFileSync('./output/scene.png', buffer);
+```
+
+Ensure the **`output`** folder exists or use a path that already exists:
+
+```typescript
+import fs from 'fs';
+import path from 'path';
+
+const dir = './output';
+if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+fs.writeFileSync(path.join(dir, 'scene.png'), buffer);
+```
+
+---
+
+## Typical workflow
+
+1. **`createCanvas`** → base **`buffer`**
+2. **`createImage`** / **`createText`** / … → replace **`buffer`** with return value
+3. **`writeFileSync`** once at the end **or** after each milestone for debugging
+
+---
+
+## Library `save` (optional)
+
+For **built-in paths**, naming, and formats (**WebP**, **JPEG**, …), use **`await painter.save(buffer, options)`** — see **[Disk save](/docs#01-save-disk-and-multiple)** and **[Batch / save overview](/docs#00-batch-save-output-overview)**.
+
+---
+
+## Other outputs (later)
+
+The library also supports **`outPut`** encoding, **`batch`**, **`chain`**, **GIF**, **charts**, **video**, **standalone image tools** (crop, palette, …) — see **`03-feature-guides`**. The beginner track stops at **manual PNG writes** above plus pointers.
+
+---
+
+Next: **[Common mistakes](/docs#05-common-mistakes)**.

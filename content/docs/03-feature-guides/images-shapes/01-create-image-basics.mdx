@@ -1,0 +1,96 @@
+# `createImage` basics — source, placement & fit {#01-create-image-basics}
+
+Back: [Images overview](/docs#00-create-image-overview)
+
+---
+
+## Required fields
+
+Every **`ImageProperties`** entry **must** include:
+
+| Field | Type | Notes |
+|-------|------|--------|
+| **`source`** | **`string | Buffer | ShapeType`** | Image path/URL/buffer **or** a shape name (see [Shapes](/docs#02-shapes-reference)). |
+| **`x`** | **`number`** | Top-left of the **layout box** (unless overridden by shape-specific geometry). |
+| **`y`** | **`number`** | Same. |
+
+If **`source`**, **`x`**, or **`y`** is missing, **`ImageCreator`** throws.
+
+---
+
+## Bitmap sizing — `width`, `height`, `inherit`
+
+After the image loads, the **layout box** size is:
+
+| Situation | Width / height used |
+|-----------|---------------------|
+| **`inherit: true`** and **`width`** omitted | Intrinsic image width |
+| **`inherit: true`** and **`height`** omitted | Intrinsic image height |
+| Otherwise **`width`/`height` omitted** | Also falls back to intrinsic size |
+| Explicit **`width`/`height`** | Forces box dimensions |
+
+Use **`inherit`** when you want “natural” pixels but still allow **`fit`** / **`align`** inside an explicit box.
+
+---
+
+## Fit & align — how bitmaps land in the box
+
+**Types today:** **`FitMode`** = **`'fill' | 'contain' | 'cover'`** (see **`lib/Canvas/utils/types/index.ts`**).  
+Implementation: **`fitInto`** in **`lib/Canvas/utils/Image/imageProperties.ts`**.
+
+| **`fit`** | Behaviour |
+|-----------|-----------|
+| **`fill`** | Stretch source rect to **exactly** **`width` × `height`** (may distort). |
+| **`contain`** | Uniform scale so the whole image fits **inside** the box (letterboxing). |
+| **`cover`** | Uniform scale so the image **covers** the box (cropping via source rect). |
+
+**`align`** (**`AlignMode`**) n **`contain` / `cover`** only — `'center'`, `'top'`, `'bottom'`, `'left'`, `'right'`, corner combos (`'top-left'`, …).
+
+```typescript
+const { buffer } = await painter.createCanvas({ width: 800, height: 450, colorBg: '#111' });
+
+const next = await painter.createImage(
+  {
+    source: './photo.jpg',
+    x: 40,
+    y: 40,
+    width: 320,
+    height: 200,
+    fit: 'cover',
+    align: 'center',
+  },
+  buffer
+);
+```
+
+**Beginner tip:** Start with **`fit: 'contain'`** + fixed **`width`/`height`** so nothing gets cropped unexpectedly.
+
+---
+
+## Loading paths & URLs
+
+**`loadImageCached`** resolves filesystem paths relative to **`process.cwd()`** for non-HTTP strings; HTTP(S) URLs load remotely. Buffers bypass the string cache.
+
+---
+
+## Quick shape teaser
+
+When **`source`** is a **`ShapeType`** string (e.g. **`'circle'`**), **`width`** / **`height`** default to **100** if omitted inside **`drawShape`**. Use **`shape: { ... }`** for fill colour, gradients, radii — full table on the [Shapes](/docs#02-shapes-reference) page.
+
+```typescript
+await painter.createImage(
+  {
+    source: 'rectangle',
+    x: 100,
+    y: 80,
+    width: 220,
+    height: 120,
+    shape: { fill: true, color: '#4f46e5' },
+  },
+  buffer
+);
+```
+
+---
+
+Next: **[Shapes reference](/docs#02-shapes-reference)** · **[Styling & clip](/docs#03-create-image-styling-clip)**.

@@ -1,0 +1,66 @@
+# Font, alignment & transforms {#01-create-text-font-and-position}
+
+Back: [Text overview](/docs#00-create-text-overview)
+
+---
+
+## Font configuration
+
+Prefer the nested **`font`** object; legacy top-level fields remain for compatibility.
+
+| Field | Purpose |
+|-------|---------|
+| **`font.size`** | Pixels (default **16**). |
+| **`font.family`** | Installed family name (e.g. **`Arial`**). |
+| **`font.name`** | Logical name used when registering **`font.path`**. |
+| **`font.path`** | `.ttf` / `.otf` / `.woff` path — resolved vs **`process.cwd()`** unless absolute. |
+
+Legacy aliases: **`fontSize`**, **`fontFamily`**, **`fontName`**, **`fontPath`** (same precedence as **`font.*`** in **`EnhancedTextRenderer.setupFont`**).
+
+```typescript
+await painter.createText(
+  {
+    text: 'Hello',
+    x: 120,
+    y: 96,
+    font: { size: 42, path: './fonts/Inter-Bold.ttf', name: 'InterDisplay' },
+    bold: false,
+  },
+  buffer
+);
+```
+
+**`GlobalFonts.registerFromPath`** runs per render when **`path`** set — failures log **`console.warn`** and fall through.
+
+---
+
+## Weight & slant
+
+| Field | Effect |
+|-------|--------|
+| **`bold`** | Prefixes **`bold`** in CSS font string. |
+| **`italic`** | Prefixes **`italic`**. |
+
+---
+
+## Alignment & baseline
+
+| Field | Values |
+|-------|--------|
+| **`textAlign`** | **`'left' \| 'center' \| 'right' \| 'start' \| 'end'`** |
+| **`textBaseline`** | **`'alphabetic' \| 'bottom' \| 'hanging' \| 'ideographic' \| 'middle' \| 'top'`** |
+
+These map directly to the canvas context **before** measuring or drawing.
+
+---
+
+## Layer transforms
+
+| Field | Behaviour |
+|-------|-----------|
+| **`rotation`** | Degrees — **`translate(x,y) → rotate → translate(-x,-y)`** around anchor **`(x,y)`**. |
+| **`opacity`** | **`globalAlpha`** clamped **`0…1`** (applied once per **`renderText`** **`save`**). |
+
+---
+
+Next: **[Wrapping & spacing](/docs#02-create-text-wrapping-spacing)** · **[Colour & gradients](/docs#03-create-text-color-gradients)**.

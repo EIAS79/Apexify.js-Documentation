@@ -1,0 +1,60 @@
+# Input frames (`GIFInputFrame`) {#01-create-gif-input-frames}
+
+Back: [GIF overview](/docs#00-create-gif-overview)
+
+Used when **not** using **`options.onStart`**. **`GIFCreator.validateGIFOptions`** requires at least one frame and valid raster sources.
+
+---
+
+## Required per frame
+
+| Field | Rule |
+|-------|------|
+| **`duration`** | Non-negative **number** (milliseconds → **`encoder.setDelay`**). |
+| **Pixels** | At least one of **`buffer`** or **`background`** (path, URL, or **`Buffer`**). |
+
+---
+
+## Resolution order (`resolveFrameToBuffer`)
+
+Implementation picks the first available:
+
+1. **`frame.buffer`** (**`Buffer`**) — used as-is.
+2. **`frame.background`** as **`Buffer`**.
+3. **`frame.background`** as **`string`**:
+   - **`http`/`https`** → **`axios`** GET → **`Buffer`**
+   - otherwise **`fs.readFileSync(background)`** (filesystem path; **not** cwd-normalised in this helper — pass absolute or correct relative paths from process cwd).
+
+---
+
+## Optional per-frame overrides
+
+| Field | Purpose |
+|-------|---------|
+| **`dispose`** | **`GIFDisposalMethod`** for this frame — overrides global **`defaultDispose`** when set. |
+| **`transparentColor`** | Chroma key for this frame (`#RRGGBB`, **`0xRRGGBB`**, etc.). **`null`** forces **no** transparency for this frame. |
+| **`watermark`** | **`GIFWatermarkSpec`** — see **[Watermark](/docs#04-create-gif-watermark-overlay)**. |
+
+---
+
+## Example
+
+```typescript
+await painter.createGIF(
+  [
+    { duration: 120, buffer: frame1Png },
+    { duration: 120, background: './frames/step2.png' },
+    { duration: 200, background: 'https://example.com/frame3.png' },
+  ],
+  {
+    outputFormat: 'buffer',
+    width: 480,
+    height: 270,
+    quality: 12,
+  }
+);
+```
+
+---
+
+Next: **[Size, encoder & output](/docs#02-create-gif-options-output)**.

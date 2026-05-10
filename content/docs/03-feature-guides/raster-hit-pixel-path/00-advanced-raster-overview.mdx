@@ -1,0 +1,49 @@
+# Raster, pixels & hit testing {#00-advanced-raster-overview}
+
+Back: [Feature guides hub](/docs#feature-guides-hub)
+
+These **`ApexPainter`** APIs sit beside the main **canvas / image / text / GIF / lines / charts / video** tracks: raw **RGBA** access, **vector paths** rasterised with **`drawPath`**, **hit testing**, and **batch / IO helpers** wired through **`lib/Canvas/utils/general`**.
+
+---
+
+## When to use this track
+
+| Goal | Lead APIs |
+|------|-----------|
+| Read or write **`ImageData`**-style buffers | **`getPixelData`**, **`setPixelData`**, **`getPixelColor`**, **`setPixelColor`** |
+| Per-pixel or built-in CPU filters on a region | **`manipulatePixels`** |
+| Build geometry then stroke/fill on an existing PNG | **`createPath2D`**, **`drawPath`** — full command table in **[Path2D](/docs#04-path2d-draw-path)** |
+| Click maps, hover zones, distance-to-edge | **`isPointInPath`**, **`isPointInRegion`**, **`isPointInAnyRegion`**, **`getDistanceToRegion`** |
+| Parallel canvas/image/text renders, pipelines, stitching, compression | **`batch`**, **`chain`**, **`stitchImages`**, **`createCollage`**, **`compress`**, **`extractPalette`**, **`outPut`** |
+
+Implementation anchors:
+
+- **`PixelDataCreator`** — **`lib/Canvas/extended/PixelDataCreator.ts`**
+- **`Path2DCreator`** — **`lib/Canvas/extended/Path2DCreator.ts`**
+- **`HitDetectionCreator`** — **`lib/Canvas/extended/HitDetectionCreator.ts`**
+- **`batchOperations`**, **`chainOperations`**, **`stitchImages`**, **`createCollage`**, **`compressImage`**, **`extractPalette`** — **`lib/Canvas/utils/general/`**
+
+---
+
+## Chapters
+
+| # | Page |
+|---|------|
+| 1 | [Pixel read / write / **`manipulatePixels`**](/docs#01-pixel-data-manipulation) |
+| 2 | [Hit testing — paths & **`HitRegion`**](/docs#02-hit-testing-paths) |
+| 3 | [**`batch`**, **`chain`**, stitch, collage, compress, palette, **`outPut`**](/docs#03-batch-stitch-compress-output) · [Disk **`save`**](/docs#00-batch-save-output-overview) |
+
+Path2D command catalogue and **`Path2DDrawOptions`** remain under **[Lines & connectors](/docs#00-custom-lines-overview)** → **[Path2D · `drawPath`](/docs#04-path2d-draw-path)** (same primitives **`HitDetectionCreator`** uses for **`path`** regions).
+
+---
+
+## Types
+
+- **`PixelData`**, **`PixelManipulationOptions`** — **`lib/Canvas/utils/types`** (re-exported via **`canvasUtils`**)
+- **`HitRegion`**, **`HitDetectionOptions`**, **`HitDetectionResult`** — **`HitDetectionCreator.ts`**
+- **`PathCommand`**, **`buildPath2DFromCommands`** — **`lib/Canvas/utils/core/pathCmd.ts`**
+- **`BatchOperation`**, **`ChainOperation`**, **`StitchOptions`**, **`CollageLayout`**, **`CompressionOptions`**, **`PaletteOptions`** — **`lib/Canvas/utils/types`**
+
+---
+
+Next: **[Pixel APIs](/docs#01-pixel-data-manipulation)**.

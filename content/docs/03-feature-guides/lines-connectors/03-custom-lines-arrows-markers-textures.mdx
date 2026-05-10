@@ -1,0 +1,60 @@
+# Arrows, markers, dash presets & textures {#03-custom-lines-arrows-markers-textures}
+
+Back: [Lines overview](/docs#00-custom-lines-overview)
+
+Helpers live in **`lib/Canvas/utils/Custom/advancedLines.ts`**.
+
+---
+
+## `arrow`
+
+```typescript
+arrow?: {
+  start?: boolean;
+  end?: boolean;
+  size?: number;              // default 10
+  style?: 'filled' | 'outline';
+  color?: string;             // fallback lineStyle.color || 'black'
+};
+```
+
+**`drawArrow`** places head at **`start`** / **`end`** using segment angle **`atan2(dy,dx)`**. Outline heads use **`lineWidth: 2`**.
+
+---
+
+## `markers`
+
+```typescript
+markers?: Array<{
+  position: number; // 0–1 along **straight chord** start→end
+  shape: 'circle' | 'square' | 'diamond' | 'arrow';
+  size: number;
+  color: string;
+}>;
+```
+
+**Implementation caveat:** **`getPointOnLinePath`** receives **`[start, end]`** only — **not** the subdivided spline geometry. If **`path`** curves the stroke visually, markers **still sit on the straight line** between anchors.
+
+---
+
+## Dash **`pattern`** presets
+
+| **`pattern.type`** | **`setLineDash`** |
+|--------------------|-------------------|
+| **`dots`** | **`[2, 4]`** |
+| **`dashes`** | **`[10, 5]`** |
+| **`custom`** | **`segments`** array when provided |
+
+Optional **`pattern.offset`** → **`lineDashOffset`**.
+
+---
+
+## **`texture`**
+
+**`string`** path / URL or **`Buffer`** → **`loadImage`** → **`ctx.strokeStyle = ctx.createPattern(img, 'repeat')`**.
+
+Relative filesystem paths join **`process.cwd()`**. Failures **`console.error`** — stroke falls back depending on prior **`strokeStyle`**.
+
+---
+
+Next: **[Path2D · drawPath](/docs#04-path2d-draw-path)**.

@@ -1,0 +1,65 @@
+# How buffers work {#03-how-buffers-work}
+
+Back: [Beginner guide](/docs#00-beginner-guide)
+
+---
+
+## What `createCanvas` returns
+
+```typescript
+const { buffer, canvas } = await painter.createCanvas({ ... });
+```
+
+| Field | Meaning |
+|-------|---------|
+| **`buffer`** | **`Buffer`** — PNG image bytes. |
+| **`canvas`** | Copy of the **config** you passed (**`CanvasConfig`**) — handy for debugging. |
+
+---
+
+## Chaining operations
+
+Later methods take **that buffer** (or **`CanvasResults`**) and return a **new** buffer:
+
+```typescript
+let { buffer } = await painter.createCanvas({
+  width: 600,
+  height: 400,
+  colorBg: '#111827',
+});
+
+buffer = await painter.createText(
+  {
+    text: 'Hello',
+    x: 300,
+    y: 220,
+    font: { size: 42, family: 'Arial' },
+    color: '#f9fafb',
+    textAlign: 'center',
+    textBaseline: 'middle',
+  },
+  buffer
+);
+
+fs.writeFileSync('step2.png', buffer);
+```
+
+**Why:** each step **composites** on top of the previous image. If you pass an **old** buffer, you **lose** newer work.
+
+---
+
+## `CanvasResults` shorthand
+
+Some APIs accept **`CanvasResults`** (object with **`.buffer`**) **or** a raw **`Buffer`**:
+
+```typescript
+const scene = await painter.createCanvas({ width: 400, height: 300, colorBg: '#fff' });
+await painter.createText({ text: 'A', x: 50, y: 50, font: { size: 24, family: 'Arial' } }, scene);
+await painter.createText({ text: 'B', x: 50, y: 100, font: { size: 24, family: 'Arial' } }, scene.buffer);
+```
+
+Both styles work — use whichever is clearer.
+
+---
+
+Next: **[Save & export](/docs#04-save-and-export)**.

@@ -1,0 +1,206 @@
+# Combo chart (bars + lines) {#09-chart-combo}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+One Cartesian canvas: **bars use the primary (left) Y-axis**; **lines default to the secondary (right) Y-axis**. Override per series with **`ComboLineSeries.yAxis`**.
+
+```typescript
+await painter.createComboChart(options);
+```
+
+Implementation: **`lib/Canvas/utils/Charts/combochart.ts`**.
+
+**Layout note:** combo charts always draw **vertical** bars (same path as **`createChart('bar', …)`**). For **horizontal** bars (**`horizontalBar`** types, **`axes.x`/`axes.y`**, **`grid.style`**, **`bars.borderRadius`**, …), use **`createChart('horizontalBar', …)`** standalone or as a **`createComparisonChart`** panel — see **[Horizontal bar chart](/docs#04-chart-horizontal-bar)**.
+
+---
+
+## Data shape
+
+| Layer | Type | Notes |
+|-------|------|-------|
+| **`bars`** | **`BarChartData[]`** | Same rows as vertical bar chart — **`value`** for a single column, or **`values`** (**`BarSegment[]`**) when **`barsType`** is **`grouped`** or **`stacked`**. |
+| **`lines`** | **`ComboLineSeries[]`** | Extends **`LineSeries`** — see below. |
+
+**`barsType`**: **`standard`** (default) · **`grouped`** · **`stacked`** — only affects bars that define **`values`**.
+
+---
+
+## `ComboLineSeries`
+
+Everything from **`LineSeries`** (**`data`**, **`smoothness`**, **`marker`**, **`area`**, **`correlation`**, **`errorBar`**, **`lineStyle`**, **`opacity`**, …) plus:
+
+| Field | Default | Meaning |
+|-------|---------|---------|
+| **`yAxis`** | **`secondary`** | **`primary`** — scale lines like bars (left ticks). **`secondary`** — right-hand scale (created automatically when any line uses it). |
+| **`opacity`** | **`1`** | Multiplies **`ComboChartOpacity.lines`** for that series only. |
+
+Right axis colour **defaults from the first line** whose **`yAxis`** is **`secondary`** (or omitted) when **`axes.ySecondary.color`** is unset.
+
+Left axis colour **defaults from the first bar colour** when **`axes.y.color`** is unset.
+
+---
+
+## `ComboChartOpacity`
+
+Optional **`opacity`** bag — each key is **0…1**, applied with **`globalAlpha`** while drawing that layer:
+
+| Key | Targets |
+|-----|---------|
+| **`bars`**, **`lines`** | Bar fills/strokes; line strokes, markers, areas, correlation, error bars. |
+| **`grid`** | Grid lines. |
+| **`primaryAxis`**, **`secondaryAxis`**, **`xAxis`** | Spines + tick labels for each axis. |
+| **`chartTitle`**, **`legend`** | Title block; legend box contents. |
+| **`barLabels`**, **`valueLabels`**, **`pointLabels`** | Category labels; segment values; line point labels. |
+
+---
+
+## Axes & layout
+
+**`axes`**: **`x`**, **`y`** (primary / bars), **`ySecondary`** (right).
+
+Uses **`AxisConfig`** from **`linechart`** — **`range`**, **`values`**, **`scale: 'linear' \| 'log'`**, **`showTickMarks`**, **`showTickLabels`**, **`dateFormat`**, **`dateTime`**, **`baseline`**, …
+
+**`dimensions`**: Same pattern as other charts; **`width`** / **`height`** / **`padding`**. If **`width`** is omitted, combo logic may derive a minimum from X span — **set explicit dimensions** for predictable exports.
+
+**`secondaryYAxis`**: **`{ show?: boolean }`** — hide right axis even when lines default to secondary scale (**default**: shown when any line uses **`secondary`**).
+
+---
+
+## Legend, grid, labels
+
+**`legend`**: Cartesian-style (**`entries`**, **`position`**, **`fit`**, **`minWidth`**, **`width`**, **`maxWidth`**, **`wrapText`**, gradients, …). If **`legend.entries`** is omitted, entries are **auto-built** from bar segments + line labels (**`defaultLegendEntries`**).
+
+**`grid`**: **`show`**, **`color`**, **`width`**.
+
+**`labels`**: **`title`**, **`barLabelDefaults`**, **`valueLabelDefaults`**, **`pointLabelDefaults`** (positions **`top` \| `bottom` \| `left` \| `right`** for points).
+
+**`barStyle`**: Global bar tweaks — **`minWidth`**, **`groupSpacing`** (grouped gap, default **10**), **`opacity`**, **`shadow`**, **`stroke`** — per-bar props still win.
+
+---
+
+## Example — standard bars + trend line on secondary axis
+
+```typescript
+await painter.createComboChart({
+  barsType: 'standard',
+  bars: [
+    { label: 'Q1', value: 120, color: '#6366f1' },
+    { label: 'Q2', value: 95, color: '#6366f1' },
+    { label: 'Q3', value: 140, color: '#6366f1' },
+    { label: 'Q4', value: 110, color: '#6366f1' },
+  ],
+  lines: [
+    {
+      label: 'Moving avg',
+      color: '#f97316',
+      lineWidth: 3,
+      marker: { type: 'circle', size: 8, show: true },
+      data: [
+        { x: 0, y: 118 },
+        { x: 1, y: 112 },
+        { x: 2, y: 125 },
+        { x: 3, y: 115 },
+      ],
+      // yAxis omitted → secondary (right)
+    },
+  ],
+  dimensions: { width: 900, height: 520 },
+  axes: {
+    x: { label: 'Quarter', range: { min: 0, max: 3, step: 1 } },
+    y: { label: 'Revenue (k)', range: { min: 0, max: 160, step: 40 } },
+    ySecondary: { label: 'Index', range: { min: 100, max: 130, step: 10 } },
+  },
+  grid: { show: true, color: '#f1f5f9' },
+});
+```
+
+---
+
+## Example — stacked bars + line on **primary** scale
+
+```typescript
+await painter.createComboChart({
+  barsType: 'stacked',
+  bars: [
+    {
+      label: 'North',
+      values: [
+        { label: 'A', value: 30, color: '#93c5fd' },
+        { label: 'B', value: 20, color: '#3b82f6' },
+      ],
+    },
+    {
+      label: 'South',
+      values: [
+        { label: 'A', value: 25, color: '#93c5fd' },
+        { label: 'B', value: 35, color: '#3b82f6' },
+      ],
+    },
+  ],
+  lines: [
+    {
+      label: 'Total target',
+      yAxis: 'primary',
+      lineStyle: 'dashed',
+      color: '#dc2626',
+      data: [
+        { x: 0, y: 55 },
+        { x: 1, y: 62 },
+      ],
+    },
+  ],
+  axes: {
+    x: { range: { min: 0, max: 1 } },
+    y: { range: { min: 0, max: 80 } },
+  },
+});
+```
+
+---
+
+## Example — grouped bars + area line + layer opacity
+
+```typescript
+await painter.createComboChart({
+  barsType: 'grouped',
+  bars: [
+    {
+      label: 'Jan',
+      values: [
+        { label: 'Online', value: 40, color: '#22c55e' },
+        { label: 'Retail', value: 28, color: '#84cc16' },
+      ],
+    },
+    {
+      label: 'Feb',
+      values: [
+        { label: 'Online', value: 44, color: '#22c55e' },
+        { label: 'Retail', value: 31, color: '#84cc16' },
+      ],
+    },
+  ],
+  lines: [
+    {
+      label: 'Forecast',
+      data: [
+        { x: 0, y: 62 },
+        { x: 1, y: 68 },
+      ],
+      color: '#a855f7',
+      area: { type: 'below', color: '#c084fc', opacity: 0.2, show: true },
+      correlation: { type: 'linear', show: true, color: '#6b21a8', lineWidth: 2 },
+    },
+  ],
+  opacity: { bars: 0.95, lines: 0.9, grid: 0.35 },
+  dimensions: { width: 820, height: 480 },
+  axes: {
+    x: { range: { min: 0, max: 1 } },
+    y: { range: { min: 0, max: 90 } },
+    ySecondary: { range: { min: 50, max: 90 } },
+  },
+});
+```
+
+---
+
+Next: **[Comparison (two charts)](/docs#10-chart-comparison)**.

@@ -1,0 +1,138 @@
+# What you can build with Apexify.js {#01-what-you-can-build}
+
+Back: [Recipes hub](/docs#00-recipes-overview) · [Feature tracks](/docs#01-feature-tracks)
+
+This page is an **idea catalog**: real products and assets people ship with **`ApexPainter`**, grouped by **feature area**. Use it for inspiration, then open the linked **feature guide** for options and examples.
+
+**Workflow:** pick an outcome below → read the **guide** → optionally turn it into a **`recipe-*.mdx`** snippet under **`docs/02-recipes/`**.
+
+---
+
+## Canvas & backgrounds
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Branded scene bases (solid, gradient, image BG) | **`createCanvas`**, background layers, patterns, noise | [Canvas overview](/docs#00-create-canvas-overview) |
+| Multi-layer “wallpaper” stacks | **`drawBackgroundLayers`**, zoom, borders | [BG layers](/docs#04-backgrounds-bg-layers) · [Canvas hub](/docs#00-create-canvas-overview) |
+| Poster / slide templates | **`createCanvas`** + reproducible **`CanvasConfig`** | [Beginner → first image](/docs#02-your-first-image) |
+
+---
+
+## Images & shapes
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Avatars, logos on canvas, product shots | **`createImage`**, **`fit`**, **`align`**, crop | [Images overview](/docs#00-create-image-overview) |
+| Badges, stickers, icons (vector shapes) | **`createImage`** **`shape`** (**`ShapeType`**) | [Shapes reference](/docs#02-shapes-reference) |
+| Filtered thumbnails (blur, sharpen, colour) | **`createImage`** **`filters`** | [Image filters](/docs#05-create-image-filters) |
+| Masked / warped / vignette scenes | masks, distortion, effects | [Mask & distortion](/docs#06-create-image-mask-distortion) · [Effects](/docs#07-create-image-effects) |
+| Grouped layers (move as one) | **`CreateImageOptions`** **`isGrouped`** | [Groups](/docs#08-create-image-groups) |
+
+---
+
+## Text
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Headlines, captions, multi-line blocks | **`createText`**, fonts, **`maxWidth`** | [Text overview](/docs#00-create-text-overview) |
+| Gradient / stroke / glow typography | text styling chapters | [Colour & gradients](/docs#03-create-text-color-gradients) · [Glow & stroke](/docs#04-create-text-glow-shadow-stroke) |
+| Curved or path-based lettering | curved text APIs | [Curved text](/docs#06-create-text-curved) |
+| Dynamic layouts (measure before draw) | **`measureText`** | [Measure text](/docs#07-measure-text) |
+
+---
+
+## GIF & motion
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Animated banners, sticker GIFs, loaders | **`createGIF`**, **`GIFInputFrame`** | [GIF overview](/docs#00-create-gif-overview) |
+| Programmatic frame cartoons (canvas-drawn) | **`animate`**, **`Frame[]`**, optional GIF file | [**`animate`**](/docs#08-animate-api) |
+| Frame pipelines with **`onStart` / `onEnd`** | **`createGIF`** callbacks | [Callbacks](/docs#05-create-gif-onstart) · [Results](/docs#06-create-gif-onend-results) |
+
+---
+
+## Lines, paths & hit regions
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Connectors, arrows, dashed UI lines | **`createCustom`** | [Lines overview](/docs#00-custom-lines-overview) |
+| Bézier / arc geometry drawn on bitmaps | **`createPath2D`**, **`drawPath`** | [Path2D](/docs#04-path2d-draw-path) |
+| Click maps, hover zones (UI exporters) | **`isPointInPath`**, **`HitRegion`** | [Hit testing](/docs#02-hit-testing-paths) |
+
+---
+
+## Charts
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Pie / donut, bar, line, scatter, radar, polar reports | **`createChart`** | [Charts overview](/docs#00-charts-overview) |
+| Side-by-side comparisons | **`createComparisonChart`** | [Comparison charts](/docs#10-chart-comparison) |
+| Bars + lines with dual axis | **`createComboChart`** | [Combo charts](/docs#09-chart-combo) |
+
+---
+
+## Video (FFmpeg)
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Thumbnails, frame strips, posters | **`createVideo`** **`extractFrame`** / **`extractFrames`** | [Frames](/docs#02-frame-extraction) |
+| Quick probes (duration, fps, resolution) | **`createVideo`** **`getInfo`** or **`getVideoInfo`** | [Metadata](/docs#01-metadata-and-frames) · [Imperative](/docs#08-imperative-video-helpers) |
+| Trim, transcode, overlays, PiP, audio mix | **`createVideo`** branches | [Video overview](/docs#00-video-overview) · [Options hub](/docs#00-video-options-hub) |
+
+---
+
+## Pixels, batch & layout utilities
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Colour pickers, fog/lighting tweaks on regions | **`getPixelData`**, **`manipulatePixels`** | [Pixel APIs](/docs#01-pixel-data-manipulation) |
+| Sprite sheets from PNG sequence math | **`getPixelColor`** / **`setPixelColor`** (precision edits) | [Pixel APIs](/docs#01-pixel-data-manipulation) |
+| Many canvases in parallel | **`batch`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
+| Multi-step pipelines (buffer handoff) | **`chain`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
+| Filmstrips, grids of images | **`stitchImages`**, **`createCollage`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
+
+---
+
+## Save, encode & disk
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Timestamped exports, WebP/JPEG pipelines | **`save`**, **`saveMultiple`** | [Disk save](/docs#01-save-disk-and-multiple) |
+| API responses (**base64**, **data URL**) | **`new ApexPainter({ type })`**, **`outPut`** | [Encoded output](/docs#02-output-format-and-outPut) |
+
+---
+
+## Standalone image tools (no canvas scene)
+
+| You can build | Primary APIs | Learn |
+|---------------|--------------|--------|
+| Resize / convert batches | **`resize`**, **`imgConverter`** | [Standalone methods](/docs#01-standalone-image-methods) |
+| Sharp-style filter stacks | **`effects`** | [Standalone methods](/docs#01-standalone-image-methods) |
+| Dominant colours, palettes | **`colorAnalysis`**, **`extractPalette`** | [Standalone](/docs#01-standalone-image-methods) · [compress](/docs#03-batch-stitch-compress-output) |
+| Chroma knock-out, remote BG removal | **`colorsRemover`**, **`removeBackground`** | [Standalone methods](/docs#01-standalone-image-methods) |
+| Polygon crops, multi-layer blends | **`cropImage`**, **`blend`**, **`masking`**, **`gradientBlend`** | [Standalone methods](/docs#01-standalone-image-methods) |
+
+---
+
+## Combined builds (common stacks)
+
+| Idea | Stack |
+|------|--------|
+| **Social cover (Twitter / LinkedIn)** | **`createCanvas`** + **`createImage`** + **`createText`** + **`save`** |
+| **Discord welcome card** | Canvas + image + rich text + shadows → **`save`** or **`outPut`** |
+| **Daily chart PNG for Slack** | **`createChart`** → **`save`** or attach **`Buffer`** |
+| **Short promo GIF** | **`createGIF`** or **`animate`** → file |
+| **Product catalogue JPEGs** | **`batch`** (**`image`**) + **`compress`** |
+| **Video teaser montage** | **`createVideo`** **`generateThumbnail`** or **`extractFrames`** |
+
+---
+
+## Next steps
+
+1. **[Recipes hub](/docs#00-recipes-overview)** — conventions for **`recipe-*.mdx`** files.  
+2. **[Feature tracks](/docs#01-feature-tracks)** — one-page map into every guide folder.  
+3. **[Advanced overview](/docs#00-advanced-overview)** — how canvas → layers → **`save`** fits together.
+
+---
+
+Back to **[Recipes](/docs#00-recipes-overview)**.

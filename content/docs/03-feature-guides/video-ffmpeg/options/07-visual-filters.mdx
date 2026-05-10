@@ -1,0 +1,143 @@
+# Visual filters, colour & watermark {#07-visual-filters}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+---
+
+## `applyEffects`
+
+**What it does:** Runs a **chain** of FFmpeg **`-vf`** filters left-to-right.
+
+### Each **`filters[]` entry**
+
+| **`type`** | **`intensity`** / **`value`** | Visual effect |
+|------------|-------------------------------|---------------|
+| **`blur`** | **`intensity`** default **5** | **`boxblur`** — soft focus; higher = soupier. |
+| **`brightness`** | **`value`** −100…100 | **`eq=brightness=value/100`** — shifts exposure mid-tones. |
+| **`contrast`** | **`value`** | **`eq=contrast=1+value/100`** — **100** doubles contrast slope vs neutral. |
+| **`saturation`** | **`value`** | **`eq=saturation=1+value/100`** — **−100** → grayscale via zero sat if paired; **`grayscale`** type also exists. |
+| **`grayscale`** | — | **`hue=s=0`** |
+| **`sepia`** | — | Sepia **`colorchannelmixer`** preset. |
+| **`invert`** | — | **`negate`** — colour negative. |
+| **`sharpen`** | **`intensity`** default **1** | **`unsharp`** — edge emphasis; too high = halos. |
+| **`noise`** | **`intensity`** default **20** | **`noise`** film grain style. |
+
+```typescript
+await painter.createVideo({
+  source: './flat.mp4',
+  applyEffects: {
+    outputPath: './styled.mp4',
+    filters: [
+      { type: 'contrast', value: 15 },
+      { type: 'saturation', value: -10 },
+      { type: 'sharpen', intensity: 1.1 },
+    ],
+  },
+});
+```
+
+---
+
+## `colorCorrect`
+
+**What it does:** **`eq`**, **`hue`**, **`colorbalance`** — finer than **`applyEffects`** for grading-style tweaks.
+
+| Field | FFmpeg mapping | Effect |
+|-------|----------------|--------|
+| **`brightness`** | **`eq=brightness=brightness/100`** | Shift exposure around mid-grey. |
+| **`contrast`** | **`eq=contrast=1+contrast/100`** | Stretch tonal range. |
+| **`saturation`** | **`eq=saturation=1+saturation/100`** | Colour intensity. |
+| **`hue`** | **`hue=h=hue`** | Rotate hues (degrees). |
+| **`temperature`** | **`colorbalance`** offsets | Warmer/cooler cast via RGB gains. |
+| **`outputPath`** | ✓ | |
+
+```typescript
+await painter.createVideo({
+  source: './log-flat.mp4',
+  colorCorrect: {
+    brightness: 5,
+    contrast: 8,
+    saturation: 12,
+    hue: 0,
+    temperature: 12,
+    outputPath: './warm-grade.mp4',
+  },
+});
+```
+
+---
+
+## `applyLUT`
+
+**What it does:** Applies a **3D LUT** (**.cube**). **Re-encodes** video (**`libx264`**, **`-crf 18`**).
+
+| Field | Effect |
+|-------|--------|
+| **`lutPath`** | Path resolved vs **`cwd`**; must exist. |
+| **`intensity`** | Declared in types — **blend not wired** in helper (ignored today). |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './flat-log.mp4',
+  applyLUT: {
+    lutPath: './luts/cinematic.cube',
+    outputPath: './graded.mp4',
+  },
+  onProgress: (p) => console.log(p.percent),
+});
+```
+
+---
+
+## `addWatermark`
+
+**What it does:** Overlays a **second image** (PNG with alpha ideal) with configurable **position** and **alpha**.
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`watermarkPath`** | ✓ | Resolved locally (**non-URL** joined with **`cwd`**). |
+| **`position`** | **`bottom-right`** | Anchor corner / centre. |
+| **`opacity`** | **0.5** | **`colorchannelmixer=aa=`** on overlay plane. |
+| **`size`** | native | **`scale=w:h`** before composite. |
+| **`outputPath`** | ✓ | |
+
+```typescript
+await painter.createVideo({
+  source: './lesson.mp4',
+  addWatermark: {
+    watermarkPath: './logo.png',
+    position: 'top-left',
+    opacity: 0.7,
+    size: { width: 160, height: 160 },
+    outputPath: './lesson-branded.mp4',
+  },
+});
+```
+
+---
+
+## `addFade`
+
+**What it does:** **Video-only** fade in/out (**`-vf fade`**). Audio **not** ducked here.
+
+| Field | Effect |
+|-------|--------|
+| **`fadeIn`** | Seconds of fade **from black at start**. |
+| **`fadeOut`** | Fade **to black** ending **`fadeOut`** seconds before EOF (uses probed duration). |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './chapter.mp4',
+  addFade: {
+    fadeIn: 0.8,
+    fadeOut: 1.2,
+    outputPath: './chapter-soft.mp4',
+  },
+});
+```
+
+---
+
+Next: **[Text overlays](/docs#08-text-overlays)**.

@@ -1,0 +1,80 @@
+# Transitions, stabilize & batch {#10-advanced-ops}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+---
+
+## `addTransition`
+
+### Single-clip fade (**no **`secondVideo`****)
+
+**`type: 'fade'`** only.
+
+| **`direction`** | Effect |
+|-----------------|--------|
+| **`out`** | Fade **out** from start (**t=out**). |
+| Other / omit | Fade **in** from black (**t=in**). |
+
+```typescript
+await painter.createVideo({
+  source: './intro.mp4',
+  addTransition: {
+    type: 'fade',
+    duration: 1,
+    direction: 'in',
+    outputPath: './intro-softstart.mp4',
+  },
+  onProgress: (p) => console.log(p.percent),
+});
+```
+
+### Between two videos (**`xfade`**)
+
+Requires **`secondVideo`**. Videos scaled to **max width × max height**, then **`xfade`** placed so transition spans **last `duration` seconds** of **`source`**.
+
+**`type`** maps to **`xfade`** transition names; **`direction`** refines **wipe/slide/zoom** variants (see [advanced topic](/docs#06-advanced-presets-transitions)).
+
+```typescript
+await painter.createVideo({
+  source: './shot-a.mp4',
+  addTransition: {
+    type: 'fade',
+    duration: 0.75,
+    secondVideo: './shot-b.mp4',
+    outputPath: './ab.mp4',
+  },
+});
+```
+
+---
+
+## `stabilize`
+
+**What it does:** Two-pass **vidstab** when FFmpeg supports it (`vidstabdetect` → **`vidstabtransform`**).
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`smoothing`** | **10** | Higher → smoother but more crop/wobble compensation feel. |
+| **`outputPath`** | ✓ | |
+
+If vidstab fails, falls back to **`hqdn3d`** spatial/temporal smoothing (**not** true mechanical stabilisation).
+
+```typescript
+await painter.createVideo({
+  source: './walking.mp4',
+  stabilize: {
+    outputPath: './walking-stable.mp4',
+    smoothing: 12,
+  },
+});
+```
+
+---
+
+## `batch`
+
+See **[Compositing](/docs#09-compositing)** — same caveats (**output paths inside each **`operations`****).
+
+---
+
+Next: **[onProgress](/docs#11-on-progress)**.

@@ -1,0 +1,56 @@
+# Common mistakes {#05-common-mistakes}
+
+Back: [Beginner guide](/docs#00-beginner-guide)
+
+---
+
+## Forgetting `await`
+
+**Symptom:** **`buffer`** is a Promise, **`writeFileSync`** writes garbage or throws.
+
+**Fix:** mark **`main`** as **`async`** and **`await`** every painter call.
+
+```typescript
+const { buffer } = await painter.createCanvas({ ... }); // correct
+```
+
+---
+
+## Passing the wrong buffer
+
+**Symptom:** text or image appears **missing** because an **older** buffer was passed.
+
+**Fix:** always pass the **latest** variable:
+
+```typescript
+let { buffer } = await painter.createCanvas(...);
+buffer = await painter.createText(..., buffer);
+```
+
+---
+
+## Relative file paths
+
+**Symptom:** **`customBg`** or assets **not found**.
+
+**Fix:** paths are often resolved from **`process.cwd()`** (where you run **`node`**). Use **`path.join(process.cwd(), 'assets', 'x.png')`** or run from the project root.
+
+---
+
+## Mixing primary backgrounds
+
+**Symptom:** **`createCanvas` fails** — only one primary fill allowed.
+
+You **cannot** set **`colorBg`** and **`gradientBg`** and **`customBg`** together. Pick **one**. See [Primary backgrounds](/docs#02-backgrounds-primary).
+
+---
+
+## Video without FFmpeg
+
+**Symptom:** error mentioning **FFmpeg not found**.
+
+**Fix:** install FFmpeg + ffprobe, or avoid **`videoBg`** / **`createVideo`** until installed.
+
+---
+
+Continue learning: **[Canvas & backgrounds overview](/docs#00-create-canvas-overview)**.

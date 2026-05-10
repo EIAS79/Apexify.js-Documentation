@@ -1,0 +1,27 @@
+# Standalone image tools {#00-standalone-image-tools-overview}
+
+Back: [Feature guides hub](/docs#feature-guides-hub)
+
+These **`ApexPainter`** methods operate on **whole images** (paths, URLs, or **`Buffer`s**) via **`lib/Canvas/utils/general/`** (**Sharp**, loaders, helpers). They are **not** the same as layering **`createImage`** on a canvas — use them when you want **resize**, **crop**, **palette analysis**, **removal**, **composite blending**, etc. **outside** a scene graph.
+
+---
+
+## Guide entry
+
+| Page |
+|------|
+| [Methods & options](/docs#01-standalone-image-methods) |
+
+---
+
+## Relation to other tracks
+
+| Need | Track |
+|------|--------|
+| Draw images **onto** a canvas with shadows, filters, masks inside **`createImage`** | [Images overview](/docs#00-create-image-overview) |
+| **`batch`** / **`chain`** / stitch / **`compress`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
+| **`save`** / **`outPut`** | [Batch / save overview](/docs#00-batch-save-output-overview) |
+
+---
+
+Next: **[Standalone methods](/docs#01-standalone-image-methods)**.

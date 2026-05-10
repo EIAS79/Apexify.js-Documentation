@@ -1,0 +1,87 @@
+# Grouped layers — `CreateImageOptions` {#08-create-image-groups}
+
+Back: [Images overview](/docs#00-create-image-overview)
+
+```typescript
+await painter.createImage(imageLayers, buffer, {
+  isGrouped: true,
+  groupTransform: { /* GroupTransformOptions */ },
+});
+```
+
+**Requirements**
+
+- **`isGrouped: true`**
+- **≥ 2** images in the array  
+
+If **`isGrouped`** is false **or** the array has **one** element, each layer uses the normal **`drawImageBitmap`** path.
+
+Source: **`lib/Canvas/extended/ImageCreator.ts`** grouped branch (~689–944).
+
+---
+
+## What grouping buys you
+
+Single pivot transforms (**rotation**, uniform/nonuniform **scale**, **translate**), plus optional shared **`blur`**, **`opacity`**, **`blendMode`**, **`shadow`**, **`boxBackground`**, **`filters`** (**pre/post**), **`effects`**, **`stroke`** around the **axis-aligned bounding box** of all member layers **before** transforms.
+
+Individual **`rotation`** on each **`ImageProperties`** is **forced to `0`** during grouped raster passes — only **`groupTransform.rotation`** spins the ensemble.
+
+---
+
+## `GroupTransformOptions` — fields & usage
+
+### Transform core
+
+| Field | Role |
+|-------|------|
+| **`rotation`** | Degrees around **`pivotX/pivotY`** (defaults to bbox centre). |
+| **`scaleX`**, **`scaleY`** | Post-pivot scaling. |
+| **`translateX`**, **`translateY`** | Extra translation after rotate/scale block. |
+| **`pivotX`**, **`pivotY`** | Anchor for rotate/scale composition. |
+
+### Shared visuals
+
+| Field | Applied in group mode? |
+|-------|-------------------------|
+| **`opacity`** | ✅ (`globalAlpha`) |
+| **`blur`** | ✅ (`ctx.filter`) |
+| **`blendMode`** | ✅ |
+| **`borderRadius`**, **`borderPosition`** | ✅ clip path on bbox |
+| **`clipPath`** | ✅ polygon clip **if ≥ 3 points** (replaces radius clip) |
+| **`boxBackground`** | ✅ behind stack |
+| **`shadow`** | ✅ rectangular shadow of bbox |
+| **`filters`**, **`filterIntensity`**, **`filterOrder`** | ✅ (`pre` short-circuit renders filtered bbox then returns PNG early; **`post`** samples transformed pixels — see source) |
+| **`effects`** | ✅ vignette / flare / CA / grain — uses scaled **`effectBox`** heuristic |
+| **`stroke`** | ✅ **`applyStroke`** after pops transform — reapplies rotation block solely for stroke when transforms active |
+
+### Present on type but **not read** in grouped branch
+
+The interface **`GroupTransformOptions`** also lists **`mask`**, **`distortion`**, **`meshWarp`** — **`createImage`** **does not** invoke those keys today. Use per-layer fields instead **outside** grouped mode.
+
+---
+
+## Minimal example
+
+```typescript
+const layered = await painter.createImage(
+  [
+    { source: './bg.png', x: 100, y: 120, width: 220, height: 140 },
+    { source: 'circle', x: 160, y: 150, width: 120, height: 120, shape: { fill: true, color: '#f472b6' } },
+  ],
+  buffer,
+  {
+    isGrouped: true,
+    groupTransform: {
+      pivotX: 260,
+      pivotY: 220,
+      rotation: -6,
+      opacity: 0.95,
+      shadow: { offsetY: 10, blur: 28, opacity: 0.35 },
+    },
+  }
+);
+```
+
+---
+
+Next: **[Paint order](/docs#09-create-image-paint-order)**.

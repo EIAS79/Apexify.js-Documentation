@@ -1,0 +1,74 @@
+# Geometry: rotate & crop {#05-geometry}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+---
+
+## `rotate`
+
+**What it does:** Applies **`transpose`** for 90° steps and/or **`hflip`**/**`vflip`**.
+
+### Options
+
+| Field | Effect |
+|-------|--------|
+| **`angle`** | **`90`** → **`transpose=1`** (clockwise-like mapping used in code); **`180`** → double transpose; **`270`** → **`transpose=2`**. |
+| **`flip`** | **`horizontal`** — mirror left/right; **`vertical`** — flip upside down; **`both`** — apply both. |
+| **`outputPath`** | ✓ |
+
+You can combine **`angle`** and **`flip`**.
+
+### Example — upright phone video
+
+```typescript
+await painter.createVideo({
+  source: './phone-vertical.mp4',
+  rotate: {
+    angle: 270,
+    outputPath: './phone-upright.mp4',
+  },
+});
+```
+
+---
+
+## `crop`
+
+**What it does:** **`crop=w:h:x:y`** — keeps a **width×height** rectangle whose **top-left** is **(x, y)** in pixels.
+
+### Options
+
+| Field | Meaning |
+|-------|---------|
+| **`x`**, **`y`** | Origin of crop window (pixels from top-left). |
+| **`width`**, **`height`** | Size of output (pixels). |
+| **`outputPath`** | ✓ |
+
+Values **outside** frame bounds will error or clamp depending on FFmpeg — prefer validating against **`getInfo`** first.
+
+### Example — 16:9 centre crop from 4K
+
+```typescript
+const painter = new ApexPainter();
+const info = await painter.createVideo({ source: './uhd.mp4', getInfo: true });
+
+const targetW = 1920;
+const targetH = 1080;
+const x = Math.floor((info.width - targetW) / 2);
+const y = Math.floor((info.height - targetH) / 2);
+
+await painter.createVideo({
+  source: './uhd.mp4',
+  crop: {
+    x,
+    y,
+    width: targetW,
+    height: targetH,
+    outputPath: './hd-centre.mp4',
+  },
+});
+```
+
+---
+
+Next: **[Audio (deep dive)](/docs#06-audio-deep-dive)**.

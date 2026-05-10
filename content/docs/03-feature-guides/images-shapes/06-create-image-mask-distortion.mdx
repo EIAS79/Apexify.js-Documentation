@@ -1,0 +1,75 @@
+# Mask, perspective warp & mesh warp {#06-create-image-mask-distortion}
+
+Back: [Images overview](/docs#00-create-image-overview)
+
+Implementation lives in **`lib/Canvas/utils/Image/imageMasking.ts`**. **`ImageCreator.drawImageBitmap`** chooses branches — **mutually exclusive with stacking**: whichever specialised branch fires **`return`**s early.
+
+---
+
+## Alpha / luminance mask — `mask`
+
+```typescript
+mask?: {
+  source: string | Buffer;
+  mode?: 'alpha' | 'luminance' | 'inverse'; // default 'alpha'
+};
+```
+
+**Modes**
+
+| **`mode`** | Behaviour |
+|------------|-----------|
+| **`alpha`** | Multiply destination alpha by mask pixel alpha (**`/255`**). |
+| **`luminance`** | Uses luminance **`0.299R + 0.587G + 0.114B`** as opacity multiplier. |
+| **`inverse`** | Uses **`1 - alpha`** from mask. |
+
+Mask image stretched to **`dw × dh`** (same fitted rectangle as bitmap).
+
+---
+
+## Perspective — `distortion`
+
+```typescript
+distortion?: {
+  type: 'perspective' | 'warp' | 'bulge' | 'pinch';
+  points?: Array<{ x: number; y: number }>;
+  intensity?: number;
+};
+```
+
+**What `createImage` actually runs**
+
+| **`type`** | Requirements | Effect |
+|------------|--------------|--------|
+| **`perspective`** | **`points.length === 4`** | **`applyPerspectiveDistortion`** maps quad → fitted rect. |
+| **`bulge` / `pinch`** | — | **`applyBulgeDistortion`** centred on bitmap with **`intensity ?? 0.5`** (pinch negates bulge). |
+| **`warp`** | — | **Not wired** inside **`drawImageBitmap`** today — reserved type only. |
+
+Each implemented branch **`return`**s **before** normal **`drawImage`**, **`effects`**, and **`applyStroke`** — see **[Paint order](/docs#09-create-image-paint-order)**.
+
+---
+
+## Mesh warp — `meshWarp`
+
+```typescript
+meshWarp?: {
+  gridX?: number;  // default 10
+  gridY?: number;  // default 10
+  controlPoints?: Array<Array<{ x: number; y: number }>>;
+};
+```
+
+**`applyMeshWarp`** expects **`controlPoints`** aligned with **`gridX+1`** by **`gridY+1`** lattice when applying deformation sampling.
+
+Also triggers early **`return`** (skips stroke / cinematic **`effects`** in Bitmap pipeline).
+
+---
+
+## Clip vs mask
+
+- **`clipPath`** → vector polygon clip **before** paint (still draws **`mask`** afterwards if both set — rarely desirable).
+- **`mask`** → per-pixel alpha modulation **during** draw.
+
+---
+
+Next: **[Cinematic effects](/docs#07-create-image-effects)** · **[Grouped layers](/docs#08-create-image-groups)**.

@@ -1,0 +1,142 @@
+# Timeline edits {#04-timeline-edits}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+---
+
+## `trim`
+
+**What it does:** Copies **[`startTime`, `endTime`]** into a new file with **stream copy** (**`-c copy`**) — **fast**, **no re-encode**, but cuts must land on keyframes for frame-accuracy.
+
+| Field | Effect |
+|-------|--------|
+| **`startTime`** | Where output starts (seconds). |
+| **`endTime`** | Where output ends — **not** duration; length = **`endTime - startTime`**. |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './livestream.mp4',
+  trim: {
+    startTime: 120,
+    endTime: 180,
+    outputPath: './highlight-2min.mp4',
+  },
+});
+```
+
+---
+
+## `replaceSegment`
+
+**What it does:** Splices **replacement** footage into **[`targetStartTime`, `targetEndTime`]** of **`source`**, keeping head/tail.
+
+### Modes
+
+| You provide | Behaviour |
+|-------------|-----------|
+| **`replacementVideo`** | Trims **`replacementStartTime`** for **`replacementDuration`** (default = gap length). |
+| **`replacementFrames`** | Builds a temp clip at **`replacementFps`** (default **30**) via **`createVideoFromFrames`**. |
+
+**Cannot** pass both **`replacementVideo`** and **`replacementFrames`**.
+
+### Options
+
+| Field | Effect |
+|-------|--------|
+| **`targetStartTime`**, **`targetEndTime`** | Region replaced in **main** timeline (seconds). |
+| **`replacementStartTime`** | In-point inside replacement file (default **0**). |
+| **`replacementDuration`** | Length taken from replacement (default matches gap). |
+| **`replacementFps`** | FPS for frame sequence mode. |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './main.mp4',
+  replaceSegment: {
+    targetStartTime: 10,
+    targetEndTime: 25,
+    replacementVideo: './broll.mp4',
+    replacementStartTime: 0,
+    replacementDuration: 15,
+    outputPath: './main-with-broll.mp4',
+  },
+});
+```
+
+---
+
+## `freezeFrame`
+
+**What it does:** Output = **before clip** + **still image held `duration` seconds** + **after clip** (concat).
+
+| Field | Effect |
+|-------|--------|
+| **`time`** | Which frame to freeze (seconds). |
+| **`duration`** | How long the freeze lasts on the output. |
+| **`outputPath`** | ✓ |
+
+Supports **`onProgress`** on final concat.
+
+```typescript
+await painter.createVideo({
+  source: './slides.mp4',
+  freezeFrame: {
+    time: 8,
+    duration: 2.5,
+    outputPath: './slides-pause.mp4',
+  },
+  onProgress: (p) => console.log(p.percent),
+});
+```
+
+---
+
+## `reverse`
+
+**What it does:** Plays video **backwards** (**`-vf reverse -af areverse`**). **CPU heavy**, long runs on big files.
+
+```typescript
+await painter.createVideo({
+  source: './clip.mp4',
+  reverse: { outputPath: './clip-rev.mp4' },
+});
+```
+
+---
+
+## `changeSpeed`
+
+**What it does:** **`setpts`** on video; **`atempo`** (possibly chained) on audio. **>2×** or **<0.5×** speed uses multiple **`atempo`** stages (FFmpeg limit **0.5–2** per stage).
+
+| Field | Effect |
+|-------|--------|
+| **`speed`** | **2** = double speed (half duration); **0.5** = slow motion. |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './slow.mp4',
+  changeSpeed: { speed: 2, outputPath: './fast-review.mp4' },
+});
+```
+
+---
+
+## `createTimeLapse`
+
+**What it does:** Same helper as **`changeSpeed`** — **`speed`** defaults to **10** if omitted.
+
+```typescript
+await painter.createVideo({
+  source: './clouds.mp4',
+  createTimeLapse: {
+    speed: 30,
+    outputPath: './clouds-tl.mp4',
+  },
+});
+```
+
+---
+
+Next: **[Geometry](/docs#05-geometry)**.

@@ -1,0 +1,66 @@
+# Disk save — `save` & `saveMultiple` {#01-save-disk-and-multiple}
+
+Back: [Batch / save overview](/docs#00-batch-save-output-overview)
+
+Implemented on **`ApexPainter`** (**`lib/Canvas/ApexPainter.ts`**). Non-PNG formats go through **Sharp** before **`writeFileSync`**.
+
+---
+
+## `save(buffer, options?): Promise<SaveResult>`
+
+**`buffer`** must be a **`Buffer`** (e.g. from **`createCanvas`**.**`buffer`**).
+
+### **`SaveOptions`** (all optional except behaviour defaults)
+
+| Option | Default (runtime) | Role |
+|--------|-------------------|------|
+| **`directory`** | **`./ApexPainter_output`** | Output folder; created when **`createDirectory`** is true |
+| **`filename`** | *(generated)* | If set and has no **`.`**, **`.${format}`** is appended |
+| **`format`** | **`png`** | **`png`**, **`jpg`**/**`jpeg`**, **`webp`**, **`avif`**, **`gif`** (GIF branch is conservative — see source comments) |
+| **`quality`** | **`90`** | JPEG / WebP / AVIF |
+| **`createDirectory`** | **`true`** | **`mkdirSync`** recursive |
+| **`naming`** | **`timestamp`** | **`timestamp`** \| **`counter`** \| **`custom`** |
+| **`counterStart`** | **`1`** | Stored on options; **`counter`** naming uses the painter’s internal **`saveCounter`** (see below) |
+| **`prefix`**, **`suffix`** | **`''`** | Wrapped around auto-generated base name |
+| **`overwrite`** | **`false`** | If false and file exists, appends **`_1`**, **`_2`**, … before extension |
+
+### **`SaveResult`**
+
+**`path`**, **`filename`**, **`size`** (bytes), **`format`**.
+
+### **`naming: 'counter'`**
+
+Each **`save`** uses **`this.saveCounter`** in the filename and then increments it. Use **`resetSaveCounter()`** when you want numbering to restart.
+
+---
+
+## `saveMultiple(buffers, options?): Promise<SaveResult[]>`
+
+Loops **`buffers`** and calls **`save`** per entry with merged **`SaveOptions`**. Empty array throws.
+
+For predictable names across many files, prefer **`timestamp`** naming, explicit **`filename`** per call in separate **`save`** invocations, or **`prefix` + counter`** pattern after **`resetSaveCounter()`**.
+
+---
+
+## `resetSaveCounter(): void`
+
+Sets internal **`saveCounter`** back to **`1`**. Call before a batch of **`naming: 'counter'`** saves if you need a fresh sequence.
+
+---
+
+```typescript
+const painter = new ApexPainter();
+
+const { buffer } = await painter.createCanvas({ width: 400, height: 200, colorBg: '#111' });
+const result = await painter.save(buffer, {
+  directory: './out',
+  format: 'webp',
+  quality: 85,
+  naming: 'timestamp',
+});
+console.log(result.path);
+```
+
+---
+
+Next: **[Encoded output](/docs#02-output-format-and-outPut)** · parallel helpers: **[Raster utilities](/docs#03-batch-stitch-compress-output)**.

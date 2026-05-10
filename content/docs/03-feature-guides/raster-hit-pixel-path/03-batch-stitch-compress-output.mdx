@@ -1,0 +1,114 @@
+# Batch, stitch, compression & `outPut` {#03-batch-stitch-compress-output}
+
+Back: [Raster overview](/docs#00-advanced-raster-overview)
+
+**Disk files:** **`save`** / **`saveMultiple`** / **`OutputFormat`** are documented under **[Batch, save & output](/docs#00-batch-save-output-overview)** — this page focuses on **parallel **`batch`****, **`chain`**, **layout**, **Sharp compression**, **palette**, **`validHex`**, and **`outPut`** encoding details duplicated below for convenience.
+
+Helpers implemented under **`lib/Canvas/utils/general/`** and exposed on **`ApexPainter`**. Use them for **parallel renders**, **pipelines**, **multi-image layout**, and **buffer conversion** (**`outPut`**).
+
+---
+
+## `batch(operations: BatchOperation[]): Promise<Buffer[]>`
+
+**`batchOperations`** runs one **`Promise`** per entry via **`Promise.all`** (parallel).
+
+Each **`BatchOperation`**:
+
+| **`type`** | **`config`** passed to |
+|------------|-------------------------|
+| **`canvas`** | **`createCanvas(config)`** → **`buffer`** |
+| **`image`** | Temporary **`createCanvas({ width:800, height:600 })`** then **`createImage(config, base)`** |
+| **`text`** | Same base canvas pattern with **`createText(config, base)`** |
+
+Throws if **`operations`** is empty or **`type`** is unknown.
+
+---
+
+## `chain(operations: ChainOperation[]): Promise<Buffer>`
+
+Runs **`ApexPainter`** methods **sequentially**. Each operation:
+
+```typescript
+{ method: string; args: any[] }
+```
+
+**`method`** must name a real **`ApexPainter`** function (e.g. **`createCanvas`**, **`createImage`**). **`args`** are forwarded with **`apply`**.
+
+**Pipe prior output:** pass **`'current'`** (string) **or** **`{ __isCurrentBuffer: true }`** in **`args`** where the next step should receive the **previous **`Buffer`**. The helper substitutes **`currentBuffer`** after each step.
+
+The **return value** of each step must be a **`Buffer`** **or** **`{ buffer }`** (e.g. **`createCanvas`** results); otherwise **`chain`** throws.
+
+---
+
+## `stitchImages(images, options?): Promise<Buffer>`
+
+**`images`**: **`string`** (URL or path relative to **`process.cwd()`**) or **`Buffer`**.
+
+**`StitchOptions`** (defaults in parentheses):
+
+| Key | Role |
+|-----|------|
+| **`direction`** | **`horizontal`** (**default**), **`vertical`**, **`grid`** (**sqrt** tiling) |
+| **`overlap`** | **Pixels** subtracted between successive placements along the axis (also used in **`blend`** overlay math). *Comment in types mentions “percentage”; implementation treats it as a pixel delta.* |
+| **`spacing`** | Gap between images (**`0`** default) |
+| **`blend`** | When **`true`** and **`overlap > 0`**, an extra **`multiply`** pass at **`globalAlpha 0.5`** between neighbours (**horizontal** / **vertical** only) |
+
+---
+
+## `createCollage(images, layout): Promise<Buffer>`
+
+**`images`**: **`{ source, width?, height? }[]`** — **`source`** URL, path, or **`Buffer`**.
+
+**`CollageLayout`**:
+
+| Key | Role |
+|-----|------|
+| **`type`** | **`grid`** (**default**), **`masonry`**, **`carousel`**, **`custom`** |
+| **`columns`**, **`rows`** | **`grid`** / **`masonry`** (**`3`** default when omitted in destructuring) |
+| **`spacing`** | Gap (**`10`** default in **`createCollage`**) |
+| **`background`** | Canvas fill (**`'#ffffff'`** default) |
+| **`borderRadius`** | Optional rounded clip per tile |
+
+**`custom`** currently falls back to **800×600** canvas sizing in code — treat **`custom`** as reserved / minimal unless you extend it.
+
+---
+
+## `compress(image, options?): Promise<Buffer>`
+
+**Sharp**-based re-encode (**`lib/Canvas/utils/general/imageCompression.ts`**).
+
+**`CompressionOptions`**: **`quality`** (**`90`**), **`format`** (**`'jpeg'`** \| **`webp`** \| **`avif`**), optional **`maxWidth`** / **`maxHeight`** (**`inside`** resize, **`withoutEnlargement`**), **`progressive`** (**JPEG**).
+
+---
+
+## `extractPalette(image, options?): Promise<{ color, percentage }[]>`
+
+Dominant colours via **`Sharp`** stats pipelines (**implementation file**: **`imageCompression.ts`**).
+
+**`PaletteOptions`**: **`count`** (**`10`**), **`method`** (**`'kmeans'`** \| **`median-cut`** \| **`octree`**), **`format`** (**`'hex'`** \| **`rgb`** \| **`hsl`**).
+
+---
+
+## `validHex(hexColor: string): boolean`
+
+Throws unless **`hexColor`** matches **`/^#[0-9a-fA-F]{6}$/`**; otherwise returns **`true`**.
+
+---
+
+## `outPut(results: Buffer)`
+
+Uses **`lib/Canvas/utils/general/conversion.ts`** helpers to match **`ApexPainter`** **`format.type`**:
+
+**`buffer`** \| **`url`** \| **`dataURL`** \| **`blob`** \| **`base64`** \| **`arraybuffer`**.
+
+Construct **`new ApexPainter({ type: 'base64' })`** (etc.) so **`outPut`** matches consumer expectations.
+
+---
+
+## Importing **`general`** helpers directly
+
+**`canvasUtils`** re-exports **`loadImages`**, **`resizingImg`**, **`converter`**, **`url`**, **`base64`**, etc., for **standalone** Sharp/image workflows without an **`ApexPainter`** instance. The **`ApexPainter`** surface for multi-job workflows is the **`batch`** / **`chain`** / **`stitchImages`** / **`createCollage`** / **`compress`** / **`extractPalette`** / **`outPut`** family above.
+
+---
+
+Back to **[overview](/docs#00-advanced-raster-overview)**.

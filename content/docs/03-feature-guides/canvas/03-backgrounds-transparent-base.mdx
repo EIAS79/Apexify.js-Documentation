@@ -1,0 +1,44 @@
+# Transparent base (`transparentBase`) {#03-backgrounds-transparent-base}
+
+Back: [Canvas overview](/docs#00-create-canvas-overview)
+
+---
+
+## Problem it solves
+
+If you **do not** set **`colorBg`**, **`gradientBg`**, **`customBg`**, or **`videoBg`**, **`CanvasCreator`** would normally fill with **opaque black `#000`**.
+
+---
+
+## What `transparentBase: true` does
+
+Skips that **default black** so your scene can start from **transparency**, then build visibility using **`bgLayers`** and/or **`patternBg`** / **`noiseBg`**.
+
+```typescript
+await painter.createCanvas({
+  width: 400,
+  height: 400,
+  transparentBase: true,
+  bgLayers: [
+    { type: 'color', value: 'rgba(99, 102, 241, 0.4)' },
+  ],
+});
+```
+
+---
+
+## When to use
+
+- PNG exports that need **real alpha** outside UI widgets.
+- Stickers or overlays where **only** stacked layers should define visible pixels.
+
+---
+
+## When **not** to use
+
+- Simple solid banners → just set **`colorBg`**.
+- Full-bleed photos → use **`customBg`**.
+
+---
+
+Next: **[Background layers](/docs#04-backgrounds-bg-layers)**.

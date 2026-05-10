@@ -1,0 +1,71 @@
+# Install & setup {#01-install-and-setup}
+
+Back: [Beginner guide](/docs#00-beginner-guide)
+
+---
+
+## Requirements
+
+- **Node.js** — use an **LTS** version when possible.
+- **npm**, **pnpm**, or **yarn**.
+- A folder for your project.
+
+---
+
+## Create a project
+
+```bash
+mkdir my-apexify-app && cd my-apexify-app
+npm init -y
+npm install apexify.js
+```
+
+---
+
+## TypeScript (optional)
+
+```bash
+npm install -D typescript @types/node tsx
+npx tsc --init
+```
+
+Run scripts with **`npx tsx your-file.ts`** or compile then **`node dist/your-file.js`**.
+
+---
+
+## FFmpeg (only if you use video)
+
+Video frame backgrounds (**`videoBg`**) and **`createVideo`** need **ffmpeg** and **ffprobe** on **`PATH`**.
+
+- Windows: install FFmpeg and add its **`bin`** folder to environment variables.
+- macOS: **`brew install ffmpeg`**
+
+If FFmpeg is missing, video calls fail with a clear **not found** error.
+
+---
+
+## Sanity check
+
+Create **`hello.ts`**:
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+async function main() {
+  const painter = new ApexPainter();
+  const { buffer } = await painter.createCanvas({
+    width: 100,
+    height: 100,
+    colorBg: '#ffffff',
+  });
+  console.log('PNG bytes:', buffer.length);
+}
+
+main();
+```
+
+Run **`npx tsx hello.ts`** — you should see a byte length printed.
+
+---
+
+Next: **[Your first image](/docs#02-your-first-image)**.

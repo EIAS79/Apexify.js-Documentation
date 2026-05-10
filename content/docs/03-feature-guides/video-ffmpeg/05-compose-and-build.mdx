@@ -1,0 +1,191 @@
+# Compose, PiP & frame builds {#05-compose-and-build}
+
+Back: [Video overview](/docs#00-video-overview)
+
+**See also:** [Compositing & build](/docs#09-compositing) (**`merge`**, **`splitScreen`**, **`pictureInPicture`**, **`createFromFrames`**, **`createLoop`**, **`batch`**).
+
+---
+
+## `merge`
+
+Concatenate or simple horizontal stacks (**ignores** top-level **`source`** — uses **`videos`** array).
+
+| **`mode`** | Inputs | Behaviour |
+|------------|--------|-----------|
+| **`sequential`** (**default**) | **N** | **`concat` demuxer**, **`-c copy`**. |
+| **`side-by-side`** | **≥2** | **`hstack`** two inputs (**first + second**). |
+| **`grid`** | **≥2** | **Implementation currently mirrors side-by-side** (two-input **`hstack`**) — **`grid`** dims are **not expanded** yet. |
+
+```typescript
+await painter.createVideo({
+  source: './dummy.mp4',
+  merge: {
+    videos: ['./part1.mp4', './part2.mp4', './part3.mp4'],
+    mode: 'sequential',
+    outputPath: './joined.mp4',
+  },
+});
+```
+
+```typescript
+await painter.createVideo({
+  source: './dummy.mp4',
+  merge: {
+    videos: ['./cam-a.mp4', './cam-b.mp4'],
+    mode: 'side-by-side',
+    outputPath: './dual.mp4',
+  },
+});
+```
+
+**Tip:** **`concat -c copy`** needs compatible codecs/parameters across clips.
+
+---
+
+## `splitScreen`
+
+Dedicated layouts (**also ignores** top-level **`source`**).
+
+| **`layout`** | Minimum clips |
+|--------------|---------------|
+| **`side-by-side`** | **2** — **`hstack`**. |
+| **`top-bottom`** | **2** — **`vstack`**. |
+| **`grid`** | **4** — **2×2** (**two `hstack` → `vstack`**). |
+
+```typescript
+await painter.createVideo({
+  source: './dummy.mp4',
+  splitScreen: {
+    videos: ['./q1.mp4', './q2.mp4', './q3.mp4', './q4.mp4'],
+    layout: 'grid',
+    grid: { cols: 2, rows: 2 },
+    outputPath: './quad.mp4',
+  },
+});
+```
+
+---
+
+## `pictureInPicture`
+
+Main **`source`** + **`overlayVideo`** (path/buffer/URL).
+
+| Field | Default |
+|-------|---------|
+| **`position`** | **`bottom-right`** |
+| **`size`** | **320×180** |
+| **`opacity`** | **1** (**alpha via `colorchannelmixer`**) |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './gameplay.mp4',
+  pictureInPicture: {
+    overlayVideo: './facecam.mp4',
+    position: 'top-left',
+    size: { width: 420, height: 236 },
+    opacity: 1,
+    outputPath: './stream-layout.mp4',
+  },
+});
+```
+
+---
+
+## `createFromFrames`
+
+Build video from **PNG/JPEG buffers or paths** (**sequence renamed internally** `frame-%06d.png`).
+
+| Field | Default | Notes |
+|-------|---------|------|
+| **`frames`** | ✓ | Ordered array (**≥1**). |
+| **`outputPath`** | ✓ | Container by extension. |
+| **`fps`** | **30** | **`-framerate`** input hint. |
+| **`format`** | — | Declared in types; encode uses **CRF/bitrate** path (**`-pix_fmt yuv420p`**). |
+| **`quality`** | **`medium`** | CRF ladder (**low→ultra**). |
+| **`bitrate`** | — | Overrides CRF when set. |
+| **`resolution`** | auto | **`scale` + `pad` centre** from first frame dims **or** forced WxH. |
+
+```typescript
+await painter.createVideo({
+  source: './unused-can-be-main.mp4',
+  createFromFrames: {
+    frames: ['./renders/frame-001.png', './renders/frame-002.png'],
+    outputPath: './anim-from-files.mp4',
+    fps: 24,
+    quality: 'high',
+    resolution: { width: 1920, height: 1080 },
+  },
+});
+```
+
+Buffers:
+
+```typescript
+import fs from 'fs';
+
+const buffers = [fs.readFileSync('./a.png'), fs.readFileSync('./b.png')];
+
+await painter.createVideo({
+  source: Buffer.alloc(0),
+  createFromFrames: {
+    frames: buffers,
+    outputPath: './anim-from-buffers.mp4',
+    fps: 12,
+  },
+});
+```
+
+---
+
+## `createLoop`
+
+Concat demuxer plays **`source` twice** back-to-back (**`-c copy`**). **`smooth`** flag **not used** in helper (reserved).
+
+```typescript
+await painter.createVideo({
+  source: './loop-base.mp4',
+  createLoop: {
+    outputPath: './looped.mp4',
+    smooth: false,
+  },
+});
+```
+
+---
+
+## `batch`
+
+Runs **`createVideo`** per item with **`{ source, ...operations }`**.
+
+| Issue | Detail |
+|-------|--------|
+| **`outputPath`** | Must live **inside** each **`operations`** payload (**e.g. **`trim.outputPath`**) — top-level **`batch` outputDirectory name is not injected automatically**. |
+| **Return value** | **`results[].output`** paths may **not** match actual FFmpeg outputs until helper wires paths — **verify files on disk** or **avoid **`batch`**** and loop **`createVideo`** yourself. |
+
+```typescript
+await painter.createVideo({
+  source: './dummy.mp4',
+  batch: {
+    outputDirectory: './batch-out',
+    videos: [
+      {
+        source: './a.mp4',
+        operations: {
+          trim: { startTime: 0, endTime: 5, outputPath: './batch-out/a-cut.mp4' },
+        },
+      },
+      {
+        source: './b.mp4',
+        operations: {
+          compress: { outputPath: './batch-out/b-small.mp4', quality: 'low' },
+        },
+      },
+    ],
+  },
+});
+```
+
+---
+
+Next: **[Advanced & presets](/docs#06-advanced-presets-transitions)**.

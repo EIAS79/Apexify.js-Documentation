@@ -1,0 +1,132 @@
+# Vertical bar chart {#03-chart-bar-vertical}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+```typescript
+await painter.createChart('bar', data, options);
+```
+
+---
+
+## `BarChartType`
+
+**`standard`** | **`grouped`** | **`stacked`** | **`waterfall`** | **`lollipop`**
+
+Set via **`options.type`**.
+
+---
+
+## `BarChartData` — positioning & values
+
+| Field | Role |
+|-------|------|
+| **`label`** | Category label (X band). |
+| **`value`** | Single column (**`standard`**, **`waterfall`**, **`lollipop`**). |
+| **`values`** | **`BarSegment[]`** for **`grouped`** / **`stacked`**. |
+| **`xStart`**, **`xEnd`** | **Numeric X extent** of the bar along the axis (continuous positioning). |
+| **`color`**, **`gradient`** | Bar / row fallback fill. |
+| **`labelColor`**, **`labelPosition`** | **`top` \| `left` \| `right` \| `inside` \| `bottom`**. |
+| **`valueColor`**, **`showValue`** | Value label styling. |
+| **`opacity`**, **`shadow`**, **`stroke`** | Per-bar overrides. |
+
+### `BarSegment`
+
+**`value`** (required), **`color`**, **`gradient`**, **`label`** (custom value text), **`valueColor`**, **`showValue`**, **`opacity`**, **`shadow`**, **`stroke`**.
+
+---
+
+## `BarChartOptions` highlights
+
+| Block | Keys |
+|-------|------|
+| **`type`** | **`BarChartType`**. |
+| **`waterfall`** | **`initialValue`** — starting baseline for waterfall stepping. |
+| **`axes.x`**, **`axes.y`** | **`AxisConfig`** (**`range`**, **`values`** ticks, **`label`**, **`tickFontSize`**, …). Y supports **`baseline`**. |
+| **`bars`** | **`spacing`**, **`minWidth`**, **`groupSpacing`**, **`segmentSpacing`**, **`lineWidth`**, **`dotSize`** (lollipop), **`opacity`**, **`shadow`**, **`stroke`**. |
+| **`labels`** | **`title`**, **`barLabelDefaults`**, **`valueLabelDefaults`**. |
+| **`legend`**, **`grid`** | See **[shared](/docs#01-charts-shared-appearance)**. |
+
+---
+
+## Example — standard columns
+
+```typescript
+await painter.createChart(
+  'bar',
+  [
+    { label: 'Q1', value: 120, xStart: 0, xEnd: 1, color: '#3b82f6' },
+    { label: 'Q2', value: 180, xStart: 1, xEnd: 2, color: '#8b5cf6' },
+    { label: 'Q3', value: 150, xStart: 2, xEnd: 3, color: '#10b981' },
+  ],
+  {
+    type: 'standard',
+    dimensions: { width: 720, height: 420 },
+    axes: {
+      y: { label: 'Revenue (k)', range: { min: 0, max: 200, step: 50 } },
+    },
+    grid: { show: true, color: '#e2e8f0' },
+  }
+);
+```
+
+---
+
+## Example — grouped (`values`)
+
+```typescript
+await painter.createChart(
+  'bar',
+  [
+    {
+      label: 'North',
+      xStart: 0,
+      xEnd: 1,
+      values: [
+        { value: 40, color: '#60a5fa' },
+        { value: 55, color: '#34d399' },
+      ],
+    },
+    {
+      label: 'South',
+      xStart: 1,
+      xEnd: 2,
+      values: [
+        { value: 30, color: '#60a5fa' },
+        { value: 48, color: '#34d399' },
+      ],
+    },
+  ],
+  {
+    type: 'grouped',
+    bars: { groupSpacing: 8, segmentSpacing: 4 },
+    legend: {
+      entries: [
+        { label: 'Product A', color: '#60a5fa' },
+        { label: 'Product B', color: '#34d399' },
+      ],
+    },
+  }
+);
+```
+
+---
+
+## Example — stacked + waterfall snippet
+
+**Stacked:** **`type: 'stacked'`** — segment heights **sum** vertically.
+
+**Waterfall:**
+
+```typescript
+options: {
+  type: 'waterfall',
+  waterfall: { initialValue: 100 },
+  // rows: use value as delta from running total per renderer logic
+}
+```
+
+*(Tune **`axes.y.range`** so negative deltas remain visible.)*
+
+---
+
+Next: **[Horizontal bar](/docs#04-chart-horizontal-bar)**.

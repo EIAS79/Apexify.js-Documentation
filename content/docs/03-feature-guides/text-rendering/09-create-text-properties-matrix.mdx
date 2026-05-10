@@ -1,0 +1,497 @@
+# `TextProperties` — full field matrix {#09-create-text-properties-matrix}
+
+Single-page reference for **`TextProperties`** exactly as defined in **`lib/Canvas/utils/types/index.ts`**. Use it beside **`createText`** / **`measureText`**; narrative guides stay in the numbered topics.
+
+Back: [Text overview](/docs#00-create-text-overview)
+
+---
+
+## How this maps to the API
+
+| API | Accepts |
+|-----|---------|
+| **`await painter.createText(props \| props[], canvasBuffer)`** | One or many **`TextProperties`** (**required:** **`text`**, **`x`**, **`y`**). |
+| **`await painter.measureText(props)`** | Same shape — honours **`includeCharMetrics`** and **`measurementCanvas`**. |
+
+**`gradient`** everywhere below is the shared **`gradient`** union (**`linear` \| `radial` \| `conic`**) with **`colors: { stop; color }[]`** — see **[Colour & gradients](/docs#03-create-text-color-gradients)**.
+
+---
+
+## Core geometry
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`text`** | `string` | Content (**`\n`** starts a new line; wrapping also uses **`maxWidth`**). |
+| **`x`** | `number` | Anchor **X** (meaning refined by **`textAlign`**). |
+| **`y`** | `number` | Anchor **Y** (meaning refined by **`textBaseline`**). |
+
+### Example — minimal draw
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+let buf = (await painter.createCanvas({ width: 480, height: 160, colorBg: '#ffffff' }))
+  .buffer;
+
+buf = await painter.createText(
+  {
+    text: 'Minimal label',
+    x: 240,
+    y: 80,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: { size: 28, family: 'Arial' },
+    color: '#0f172a',
+  },
+  buf
+);
+```
+
+---
+
+## `font` (preferred)
+
+| Key | Type | Default / notes |
+|-----|------|------------------|
+| **`size`** | `number` | **16** px if omitted downstream. |
+| **`family`** | `string` | CSS font family (e.g. **`Arial`**). |
+| **`name`** | `string` | Logical name after registering **`path`**. |
+| **`path`** | `string` | Filesystem path to **`.ttf` / `.otf` / `.woff`**, … |
+
+### Example — custom font file
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Registered face',
+    x: 32,
+    y: 96,
+    font: {
+      size: 42,
+      path: './assets/fonts/MyFont.ttf',
+      name: 'MyFont',
+      family: 'MyFont',
+    },
+    color: '#1e293b',
+  },
+  buf
+);
+```
+
+---
+
+## Legacy font keys (**deprecated**)
+
+Prefer **`font.*`**; these remain for backward compatibility.
+
+| Key | Replaced by |
+|-----|-------------|
+| **`fontSize`** | **`font.size`** |
+| **`fontFamily`** | **`font.family`** |
+| **`fontName`** | **`font.name`** |
+| **`fontPath`** | **`font.path`** |
+
+### Example — legacy still works
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Legacy sizing',
+    x: 40,
+    y: 140,
+    fontSize: 36,
+    fontFamily: 'Georgia',
+    color: '#44403c',
+  },
+  buf
+);
+```
+
+---
+
+## Decoration flags & rich decorations
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`bold`** | `boolean` | Bolder glyph outline. |
+| **`italic`** | `boolean` | Italic style. |
+| **`underline`** | `boolean` \| object | **`true`** = default line; or **`{ color?, gradient?, width? }`** (**`width`** defaults **1** px). |
+| **`overline`** | `boolean` \| object | Same shape as **`underline`**. |
+| **`strikethrough`** | `boolean` \| object | Same shape as **`underline`**. |
+| **`highlight`** | object | **`{ color?, gradient?, opacity? }`** — **`opacity`** default **0.3**. **`gradient`** wins over **`color`**. |
+
+### Example — boolean decorations
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Sale · TODAY ONLY',
+    x: 60,
+    y: 200,
+    font: { size: 26, family: 'Arial' },
+    bold: true,
+    italic: true,
+    underline: true,
+    strikethrough: true,
+    color: '#b91c1c',
+  },
+  buf
+);
+```
+
+### Example — coloured lines + highlight
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Terms apply',
+    x: 60,
+    y: 260,
+    font: { size: 22, family: 'Arial' },
+    underline: { color: '#2563eb', width: 2 },
+    overline: { color: '#94a3b8', width: 1 },
+    strikethrough: { color: '#f97316', width: 2 },
+    highlight: { color: '#fef08a', opacity: 0.55 },
+    color: '#0f172a',
+  },
+  buf
+);
+```
+
+### Example — gradient underline (overrides **`color`** on that line)
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Gradient rule',
+    x: 60,
+    y: 320,
+    font: { size: 24, family: 'Arial' },
+    color: '#334155',
+    underline: {
+      width: 3,
+      gradient: {
+        type: 'linear',
+        startX: 0,
+        startY: 0,
+        endX: 220,
+        endY: 0,
+        colors: [
+          { stop: 0, color: '#22d3ee' },
+          { stop: 1, color: '#a855f7' },
+        ],
+      },
+    },
+  },
+  buf
+);
+```
+
+---
+
+## Spacing & box limits
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`lineHeight`** | `number` | Multiplier vs font size (**~1.4** default behaviour in renderer). |
+| **`letterSpacing`** | `number` | Extra px between **glyphs**. |
+| **`wordSpacing`** | `number` | Extra px between **words**. |
+| **`maxWidth`** | `number` | Wrap lines to this width (**ignored when **`textOnCurve`** is set**). |
+| **`maxHeight`** | `number` | Clip tall blocks; ellipsis when exceeding (per type comment). |
+
+### Example — wrap + tight line height
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'This paragraph wraps when it hits the right edge of maxWidth.\\nHard breaks still work.',
+    x: 40,
+    y: 380,
+    maxWidth: 280,
+    lineHeight: 1.25,
+    letterSpacing: 0.5,
+    wordSpacing: 4,
+    font: { size: 16, family: 'Arial' },
+    color: '#1e293b',
+  },
+  buf
+);
+```
+
+---
+
+## Alignment
+
+| Key | Type | Allowed values |
+|-----|------|----------------|
+| **`textAlign`** | string | **`left`**, **`center`**, **`right`**, **`start`**, **`end`** |
+| **`textBaseline`** | string | **`alphabetic`**, **`bottom`**, **`hanging`**, **`ideographic`**, **`middle`**, **`top`** |
+
+### Example — centred title block
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Centered',
+    x: 400,
+    y: 120,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: { size: 48, family: 'Arial' },
+    color: '#0f172a',
+  },
+  buf
+);
+```
+
+---
+
+## Fill colour & alpha
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`color`** | `string` | Solid fill (**hex**, **rgb**, **hsl**, …). |
+| **`gradient`** | `gradient` | Fills glyphs; overrides **`color`** when both supplied (see gradient guide). |
+| **`opacity`** | `number` | **0…1** overall fill alpha (**default 1**). |
+
+### Example — semi-transparent fill
+
+```typescript
+buf = await painter.createText(
+  {
+    text: '60% opaque',
+    x: 400,
+    y: 220,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: { size: 40, family: 'Arial' },
+    color: '#6366f1',
+    opacity: 0.6,
+  },
+  buf
+);
+```
+
+### Example — conic gradient fill
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Rainbow',
+    x: 400,
+    y: 300,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: { size: 56, family: 'Arial Black' },
+    gradient: {
+      type: 'conic',
+      centerX: 400,
+      centerY: 300,
+      startAngle: 0,
+      colors: [
+        { stop: 0, color: '#ef4444' },
+        { stop: 0.33, color: '#22c55e' },
+        { stop: 0.66, color: '#3b82f6' },
+        { stop: 1, color: '#ef4444' },
+      ],
+    },
+  },
+  buf
+);
+```
+
+---
+
+## `glow`
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`color`** | `string` | Glow tint. |
+| **`gradient`** | `gradient` | Overrides **`color`**. |
+| **`intensity`** | `number` | Blur / strength. |
+| **`opacity`** | `number` | **0…1**. |
+
+### Example
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'NEON',
+    x: 400,
+    y: 400,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: { size: 64, family: 'Arial Black' },
+    color: '#ecfeff',
+    glow: { color: '#22d3ee', intensity: 18, opacity: 0.9 },
+  },
+  buf
+);
+```
+
+---
+
+## `shadow`
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`color`** | `string` | Drop shadow colour. |
+| **`gradient`** | `gradient` | Gradient shadow fill. |
+| **`offsetX`**, **`offsetY`** | `number` | Pixel offset. |
+| **`blur`** | `number` | Blur radius. |
+| **`opacity`** | `number` | **0…1**. |
+
+### Example
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Lifted type',
+    x: 400,
+    y: 500,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: { size: 36, family: 'Arial' },
+    color: '#ffffff',
+    shadow: {
+      color: 'rgba(0,0,0,0.45)',
+      offsetX: 4,
+      offsetY: 6,
+      blur: 10,
+      opacity: 1,
+    },
+  },
+  buf
+);
+```
+
+---
+
+## `stroke` (outline)
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`color`** | `string` | Stroke colour. |
+| **`width`** | `number` | Px width. |
+| **`gradient`** | `gradient` | Gradient stroke. |
+| **`opacity`** | `number` | **0…1**. |
+| **`style`** | string | **`solid`**, **`dashed`**, **`dotted`**, **`groove`**, **`ridge`**, **`double`**. |
+
+### Example — thick outline + dashed stroke
+
+```typescript
+buf = await painter.createText(
+  {
+    text: 'Outlined',
+    x: 400,
+    y: 600,
+    textAlign: 'center',
+    textBaseline: 'middle',
+    font: { size: 52, family: 'Arial Black' },
+    color: '#fef08a',
+    stroke: { color: '#854d0e', width: 5, style: 'solid', opacity: 1 },
+  },
+  buf
+);
+```
+
+---
+
+## Transforms
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`rotation`** | `number` | Degrees around **`(x, y)`** — **`applyTransformations`** does **`translate(x,y) → rotate → translate(-x,-y)`**, so **`textAlign`** / **`textBaseline`** still anchor the box before spin. |
+| **`textOnCurve`** | object | Circular arc layout — **`newlines`** become stacked arcs; **`maxWidth`** ignored. |
+
+### `textOnCurve`
+
+| Sub-key | Type | Notes |
+|---------|------|--------|
+| **`sweepAngle`** | `number` | Degrees spanned by whole string at circle centre (**typical 40–120**). |
+| **`radius`** | `number` | Optional px radius; omitted ⇒ **`radius ≈ textWidth / sweepRadians`**. |
+| **`up`** | `boolean` | **`true`** (default): ∩ smile arc; **`false`**: ∪ frown arc. |
+
+Deep dive: **[Text on a circular arc](/docs#06-create-text-curved)**.
+
+### Example — rotation + arc badge
+
+```typescript
+buf = await painter.createText(
+  [
+    {
+      text: 'ROTATED',
+      x: 200,
+      y: 200,
+      rotation: -12,
+      font: { size: 28, family: 'Arial Black' },
+      color: '#1e40af',
+    },
+    {
+      text: '· CURVED ·',
+      x: 420,
+      y: 200,
+      textAlign: 'center',
+      textBaseline: 'middle',
+      font: { size: 22, family: 'Arial' },
+      color: '#fff',
+      textOnCurve: { sweepAngle: 110, up: true },
+    },
+  ],
+  buf
+);
+```
+
+---
+
+## Measurement helpers (**`measureText`**)
+
+These keys mainly affect **`painter.measureText(...)`**; they do not change paint logic unless you branch on metrics yourself.
+
+| Key | Type | Notes |
+|-----|------|--------|
+| **`includeCharMetrics`** | `boolean` | When **`true`**, response may include **`charWidths`**, **`charPositions`** on **`TextMetrics`**. |
+| **`measurementCanvas`** | object | Optional **`{ width?, height? }`** backing canvas for measurement (defaults auto-sized). |
+
+**`TextMetrics`** itself lives beside **`TextProperties`** in **`types/index.ts`** (canvas-standard boxes **plus** **`lines`**, **`totalHeight`**, **`lineCount`**, etc.). Tutorial: **[measureText](/docs#07-measure-text)**.
+
+### Example — metrics-driven layout
+
+```typescript
+const props = {
+  text: 'Measure me',
+  x: 0,
+  y: 0,
+  font: { size: 32, family: 'Arial' },
+  maxWidth: 400,
+  includeCharMetrics: true,
+  measurementCanvas: { width: 1200, height: 400 },
+};
+
+const m = await painter.measureText(props);
+console.log(m.width, m.totalHeight, m.lineCount, m.charWidths?.length);
+```
+
+---
+
+## `TextObject` (**deprecated**)
+
+**`TextObject extends TextProperties`** adds legacy aliases (**`isBold`** → prefer **`bold`**; **`outlined`** → prefer **`stroke`**). Prefer **`TextProperties`** in new code.
+
+---
+
+## Topic map (where behaviour is explained)
+
+| Concern | Guide |
+|---------|--------|
+| Fonts, **`rotation`**, **`opacity`**, alignment | [Font & placement](/docs#01-create-text-font-and-position) |
+| **`maxWidth`**, **`maxHeight`**, spacing | [Wrapping & spacing](/docs#02-create-text-wrapping-spacing) |
+| **`gradient`**, **`color`** | [Colour & gradients](/docs#03-create-text-color-gradients) |
+| **`glow`**, **`shadow`**, **`stroke`** | [Glow, shadow & stroke](/docs#04-create-text-glow-shadow-stroke) |
+| **`underline`**, **`highlight`**, … | [Decorations & highlight](/docs#05-create-text-decorations-highlight) |
+| **`textOnCurve`** | [Arc text](/docs#06-create-text-curved) |
+| **`measureText`** fields | [measureText](/docs#07-measure-text) |
+| Composite paint order | [Paint order](/docs#08-create-text-paint-order) |
+
+Back to **[Text overview](/docs#00-create-text-overview)**.

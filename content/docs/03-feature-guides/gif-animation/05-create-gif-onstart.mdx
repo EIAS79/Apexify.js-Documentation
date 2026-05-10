@@ -1,0 +1,73 @@
+# Programmatic frames (`onStart`) {#05-create-gif-onstart}
+
+Back: [GIF overview](/docs#00-create-gif-overview)
+
+When **`GIFOptions.onStart`** is defined, **`createGIF`** ignores the **`gifFrames`** argument and builds **`GIFCanonicalFrame[]`** from your callback (or async iterator).
+
+---
+
+## Callback shape
+
+```typescript
+onStart?: (
+  frameCountHint: number,
+  painter: ApexPainter   // typed as `any` in `GIFOptions`
+) => Promise<GIFEncodedFrame[] | AsyncIterable<GIFEncodedFrame>>;
+```
+
+**`frameCountHint`** is informational — streaming ignores a fixed length.
+
+**Hint derivation** (`GIFCreator.createGIF`):
+
+1. **`options.frameCount`** if set  
+2. Else **`floor(options.duration / options.delay)`** when both present  
+3. Else **`floor((duration / 1000) * 30)`** if **`duration`** only  
+4. Else **`30`**
+
+---
+
+## `GIFEncodedFrame`
+
+| Field | Notes |
+|-------|------|
+| **`buffer`** | **Required** — PNG/JPEG/WebP (anything **`loadImage`** accepts). |
+| **`duration`** | Optional → **`options.delay`**, then **`100`** ms. |
+| **`dispose`**, **`transparentColor`**, **`watermark`** | Same semantics as **`GIFInputFrame`**. |
+
+---
+
+## Array vs streaming
+
+**Array** — all frames materialised in memory before encode loop.
+
+**`AsyncIterable<GIFEncodedFrame>`** — **`for await`** collects frames; yields **one at a time** to reduce peak RAM on long animations (still collected into an array internally before encoding today — check **`GIFCreator.collectFramesFromOnStart`** if that matters for huge jobs).
+
+---
+
+## Example — generate frames with **`createCanvas`**
+
+```typescript
+await painter.createGIF(undefined, {
+  outputFormat: 'buffer',
+  width: 320,
+  height: 180,
+  quality: 10,
+  delay: 100,
+  onStart: async (_hint, p) => {
+    const frames: Array<{ buffer: Buffer; duration: number }> = [];
+    for (let i = 0; i < 12; i++) {
+      const { buffer } = await p.createCanvas({
+        width: 320,
+        height: 180,
+        colorBg: `hsl(${i * 30} 70% 45%)`,
+      });
+      frames.push({ buffer, duration: 100 });
+    }
+    return frames;
+  },
+});
+```
+
+---
+
+Next: **[Callbacks & results](/docs#06-create-gif-onend-results)** · **[Pipeline](/docs#07-create-gif-encode-pipeline)**.

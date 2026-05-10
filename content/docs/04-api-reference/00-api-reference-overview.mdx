@@ -1,0 +1,41 @@
+# API reference — how to read Apexify {#00-api-reference-overview}
+
+Back: [Documentation root](/docs#readme)
+
+There is **no separate mega-reference** site tree here yet. **Authoritative method behaviour** lives in **`docs/03-feature-guides/`** (narrative + options). **Signatures and types** live in **`lib/Canvas/`** TypeScript sources.
+
+Use this page as a **routing index**.
+
+---
+
+## Where definitions actually are
+
+| Need | Look here |
+|------|-----------|
+| **`ApexPainter`** methods | **`lib/Canvas/ApexPainter.ts`** |
+| Shared types (`CanvasConfig`, `ImageProperties`, …) | **`lib/Canvas/utils/types/index.ts`** |
+| Re-export barrel | **`lib/Canvas/utils/canvasUtils.ts`** |
+| Path commands (`PathCommand`) | **`lib/Canvas/utils/core/pathCmd.ts`** |
+
+---
+
+## Map methods → feature guides
+
+| Concern | Guide entry |
+|---------|-------------|
+| Canvas | [Canvas overview](/docs#00-create-canvas-overview) |
+| Images | [Images overview](/docs#00-create-image-overview) |
+| Text | [Text overview](/docs#00-create-text-overview) |
+| GIF / **`animate`** | [GIF overview](/docs#00-create-gif-overview) · [**`animate`**](/docs#08-animate-api) |
+| Lines / Path2D | [Lines overview](/docs#00-custom-lines-overview) · [Path2D](/docs#04-path2d-draw-path) |
+| Charts | [Charts overview](/docs#00-charts-overview) |
+| Video | [Video overview](/docs#00-video-overview) · [Imperative helpers](/docs#08-imperative-video-helpers) |
+| Pixels, hit testing, batch | [Raster overview](/docs#00-advanced-raster-overview) |
+| Disk **`save`**, **`outPut`** | [Batch / save hub](/docs#00-batch-save-output-overview) |
+| Resize, crop, colour, **`blend`** | [Standalone image tools](/docs#01-standalone-image-methods) |
+
+---
+
+## Optional future layout
+
+If you later split terse API sheets from narratives, add files such as **`api-scene.mdx`**, **`api-batch-save.mdx`** under this folder and link them from here — keep **one index** (`{#00-api-reference-overview}`) as the entry point.

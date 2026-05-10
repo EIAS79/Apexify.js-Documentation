@@ -1,0 +1,87 @@
+# Professional image filters (`ImageFilter[]`) {#05-create-image-filters}
+
+Back: [Images overview](/docs#00-create-image-overview)
+
+**`filters`** runs **`applyProfessionalImageFilters`** (**`lib/Canvas/utils/Image/professionalImageFilters.ts`**) — Sharp-based pipeline plus Jimp for some noise paths. **`filterIntensity`** scales **`intensity`**, **`value`**, and **`radius`** per filter before application.
+
+---
+
+## Global knobs
+
+| Field | Purpose |
+|-------|---------|
+| **`filters`** | Ordered array of **`ImageFilter`** objects. |
+| **`filterIntensity`** | Multiplier (**default `1`**) applied to numeric strengths. |
+| **`filterOrder`** | **`'pre'`** — filter **before** compositing main bitmap (temp canvas). **`'post'`** (**default**) — sample drawn pixels from main canvas, filter, paste back. |
+
+---
+
+## Filter catalogue (`ImageFilter.type`)
+
+| **`type`** | Parameters | Notes |
+|------------|------------|------|
+| **`gaussianBlur`** | **`intensity`** | Blur radius-ish strength (Sharp). |
+| **`motionBlur`** | **`intensity`**, **`angle`** (deg) | Directional blur. |
+| **`radialBlur`** | **`intensity`**, **`centerX`**, **`centerY`** | Zoom-style blur. |
+| **`sharpen`** | **`intensity`** | Unsharp strength. |
+| **`brightness`** | **`value`** (**`-100…100`**) | Percent-style adjustment. |
+| **`contrast`** | **`value`** | Same scale. |
+| **`saturation`** | **`value`** | Same scale. |
+| **`hueShift`** | **`value`** (**`0…360`**) | Degrees. |
+| **`grayscale`** | — | Early-outs to **`applyBasicFilters`** path when present in list. |
+| **`sepia`** | — | Tone preset. |
+| **`invert`** | — | Colour invert. |
+| **`posterize`** | **`levels`** (**`2…256`**, default **4**) | Colour bands. |
+| **`pixelate`** | **`size`** (block px, default **10**) | Mosaic. |
+| **`noise`** | **`intensity`** (**`0…1`**) | Jimp noise (clamped). |
+| **`grain`** | **`intensity`** (**`0…1`**) | Film grain via Sharp path. |
+| **`edgeDetection`** | **`intensity`** | Convolution strength. |
+| **`emboss`** | **`intensity`** | Relief strength. |
+
+**`radius`** exists on the interface for future use — most filters ignore it today.
+
+---
+
+## Examples
+
+**Post stack (default)**
+
+```typescript
+await painter.createImage(
+  {
+    source: './scene.jpg',
+    x: 0,
+    y: 0,
+    width: 640,
+    height: 360,
+    fit: 'cover',
+    filterOrder: 'post',
+    filterIntensity: 1,
+    filters: [
+      { type: 'brightness', value: -5 },
+      { type: 'saturation', value: 18 },
+      { type: 'gaussianBlur', intensity: 0.8 },
+    ],
+  },
+  buffer
+);
+```
+
+**Pre stack** (renders image to temp canvas, filters, draws result — **skips** stroke & effects later — see caveats)
+
+```typescript
+filters: [{ type: 'sharpen', intensity: 12 }],
+filterOrder: 'pre',
+```
+
+---
+
+## Caveats
+
+1. **`filterOrder: 'pre'`** exits **`drawImageBitmap`** before **`effects`** and **`applyStroke`** — plan order accordingly.
+2. **`grayscale`** triggers a separate **`applyBasicFilters`** branch — composition differs from pure Sharp loop (documented in source).
+3. Shapes apply **`filters`** inside the clipped region before **`drawShape`** fills — still subject to **`filterOrder`** semantics.
+
+---
+
+Next: **[Mask & distortion](/docs#06-create-image-mask-distortion)** · **[Paint order](/docs#09-create-image-paint-order)**.

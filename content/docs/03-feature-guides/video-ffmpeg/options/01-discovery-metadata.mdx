@@ -1,0 +1,71 @@
+# Discovery & metadata options {#01-discovery-metadata}
+
+Back: [Options hub](/docs#00-video-options-hub) · [Video overview](/docs#00-video-overview)
+
+---
+
+## `getInfo`
+
+**What it does:** Reads container + primary video stream via **ffprobe** (duration, size, fps, bitrate, format name). **Does not** write a file.
+
+**When to use:** Before cropping/scaling, choosing trim points, or sizing thumbnails.
+
+### Effect of the flag
+
+| Input | Behaviour |
+|-------|-----------|
+| **`getInfo: true`** | Returns **`{ duration, width, height, fps, bitrate, format }`**. **`duration`** is seconds; **`fps`** from **`r_frame_rate`** (fallback **30**). |
+
+No other fields on **`VideoCreationOptions`** matter for this branch besides **`source`**.
+
+### Example
+
+```typescript
+const painter = new ApexPainter();
+
+const info = await painter.createVideo({
+  source: './episode.mp4',
+  getInfo: true,
+});
+
+console.log(
+  `Duration ${info.duration}s, ${info.width}x${info.height} @ ${info.fps}fps`
+);
+```
+
+---
+
+## `detectFormat`
+
+**What it does:** Same metadata as **`getInfo`**, plus a **video codec** tag (**`h264`**, **`vp9`**, …) from **`ffprobe`** stream **`codec_name`**.
+
+**When to use:** Logging, conditional pipelines (“if HEVC, transcode first”), or debugging uploads.
+
+### Options
+
+There are **no sub-options** — only **`detectFormat: true`**.
+
+### Return shape
+
+| Field | Meaning |
+|-------|---------|
+| **`codec`** | Video codec short name or **`unknown`**. |
+| **`format`**, **`container`** | Container **`format_name`** from **`getInfo`**. |
+| **`width`**, **`height`**, **`fps`**, **`bitrate`**, **`duration`** | Same as **`getInfo`**. |
+
+### Example
+
+```typescript
+const probe = await painter.createVideo({
+  source: './upload.bin', // buffer or path
+  detectFormat: true,
+});
+
+if (probe.codec === 'hevc') {
+  console.warn('HEVC — consider converting for web');
+}
+```
+
+---
+
+Next: **[Frame extraction](/docs#02-frame-extraction)**.

@@ -1,0 +1,75 @@
+# Shadow & stroke on `createImage` layers {#04-create-image-shadow-stroke}
+
+Back: [Images overview](/docs#00-create-image-overview)
+
+Field types are **`ShadowOptions`** and **`StrokeOptions`** (**`lib/Canvas/utils/types/index.ts`**). Rendering shares **`applyShadow`** / **`applyStroke`** from **`lib/Canvas/utils/Image/imageProperties.ts`** for **rectangular** layers.
+
+For **full property tables** (every key, defaults, corner semantics), read:
+
+- **[Canvas shadow options](/docs#07-canvas-shadow-options)**
+- **[Canvas stroke options](/docs#08-canvas-stroke-options)**
+
+---
+
+## Bitmap layers
+
+**Shadow**
+
+- Painted **first** (under bitmap), offset/blurred rounded rect matching the **layout box**.
+- Respects **`shadow.borderRadius`** / **`roundedCorners`** for the **silhouette** of the shadow itself.
+
+**Stroke**
+
+- Painted **last** (`applyStroke(ctx, box, stroke)`) after filters/effects — outline wraps the **same axis-aligned box** (with **`stroke.borderRadius`** controlling stroke path corners).
+
+```typescript
+await painter.createImage(
+  {
+    source: './card-art.png',
+    x: 60,
+    y: 60,
+    width: 320,
+    height: 180,
+    fit: 'cover',
+    borderRadius: 16,
+    shadow: {
+      color: 'rgba(15,23,42,0.35)',
+      offsetX: 6,
+      offsetY: 12,
+      blur: 24,
+      opacity: 0.45,
+    },
+    stroke: {
+      color: '#e2e8f0',
+      width: 3,
+      borderRadius: 16,
+      roundedCorners: 'all',
+      style: 'solid',
+    },
+  },
+  buffer
+);
+```
+
+---
+
+## Shape layers
+
+**Shadow**
+
+- Most shapes → **rectangular shadow** (same as bitmap).
+- **`heart`** & **`star`** → custom **`applyShapeShadow`** along true outline (gradient supported). Corner radius fields on **`ShadowOptions`** do **not** shape that silhouette.
+
+**Stroke**
+
+- Always follows **`createShapePath`** — outside corners match geometry (**dash**, **groove**, **gradient** stroke supported via shape-specific stroke helper in **`ImageCreator`**).
+
+---
+
+## Implementation caveat (early-return paths)
+
+If you use **`filterOrder: 'pre'`**, **`distortion`** (perspective / bulge/pinch), or **`meshWarp`**, **`drawImageBitmap`** may **`return`** before **`applyStroke`** runs — **no outline** on those branches today. See **[Paint order](/docs#09-create-image-paint-order)**.
+
+---
+
+Next: **[Filters](/docs#05-create-image-filters)** · **[Mask & distortion](/docs#06-create-image-mask-distortion)**.

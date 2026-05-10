@@ -1,0 +1,65 @@
+# Glow, shadow & stroke {#04-create-text-glow-shadow-stroke}
+
+Back: [Text overview](/docs#00-create-text-overview)
+
+Per **line** (or per **glyph** on arcs), **`renderTextLine`** composites in this order — see **[Paint order](/docs#08-create-text-paint-order)**:
+
+**highlight → glow → shadow → stroke → fill → decorations**
+
+---
+
+## Glow — `glow`
+
+| Key | Role |
+|-----|------|
+| **`color`** | **`shadowColor`** when no **`gradient`** branch. |
+| **`gradient`** | First pass applies blurred **`fillText`** using placeholder **`shadowColor`**, then a second **`fillText`** with the gradient fill (approximates a coloured aura). |
+| **`intensity`** | **`shadowBlur`** pixels (default **10**). |
+| **`opacity`** | **`globalAlpha`** for glow passes (default **0.8**). |
+
+Glow passes call **`fillText`** **before** the main **`renderFill`** — the final opaque colours appear when **`renderFill`** runs.
+
+---
+
+## Shadow — `shadow`
+
+| Key | Default | Notes |
+|-----|---------|------|
+| **`color`** | **`rgba(0,0,0,0.5)`** | **`shadowColor`** when not using **`gradient`**. |
+| **`gradient`** | — | Builds horizontal gradient; **`shadowColor`** is tinted from the first gradient stop for the blur composite. |
+| **`offsetX`**, **`offsetY`** | **`2`** | **`shadowOffsetX` / `shadowOffsetY`**. |
+| **`blur`** | **`4`** | **`shadowBlur`**. |
+| **`opacity`** | **`1`** when solid | Sets **`globalAlpha`** when provided. |
+
+This stack uses native canvas **shadow** properties — **different API** from **`ShadowOptions`** on **`createCanvas`** / **`createImage`**.
+
+---
+
+## Stroke — `stroke`
+
+| Key | Role |
+|-----|------|
+| **`color`** | **`strokeStyle`** fallback (**`#000`**). |
+| **`width`** | **`lineWidth`** (default **1**). |
+| **`gradient`** | Horizontal gradient across measured advance. |
+| **`opacity`** | **`globalAlpha`** during **`strokeText`**. |
+| **`style`** | **`solid`**, **`dashed`**, **`dotted`**, **`groove`**, **`ridge`**, **`double`** — dash gaps scale with stroke **`width`**; **`groove`/`ridge`/`double`** use double **`strokeText`** passes with colour/lightening tweaks (same idea as image strokes). |
+
+```typescript
+await painter.createText(
+  {
+    text: 'Outlined headline',
+    x: 64,
+    y: 160,
+    font: { size: 52, family: 'Arial' },
+    stroke: { color: '#0f172a', width: 3, style: 'solid', opacity: 1 },
+    shadow: { offsetX: 0, offsetY: 6, blur: 14, opacity: 0.4, color: '#020617' },
+    color: '#f8fafc',
+  },
+  buffer
+);
+```
+
+---
+
+Next: **[Decorations & highlight](/docs#05-create-text-decorations-highlight)** · **[Arc text](/docs#06-create-text-curved)**.

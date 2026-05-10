@@ -1,0 +1,200 @@
+# Audio tracks {#03-audio}
+
+Back: [Video overview](/docs#00-video-overview)
+
+**See also:** [Audio operations (full guide)](/docs#06-audio-deep-dive) — especially **`normalizeAudio`** (**LUFS**, **`peak`/`rms`**) and **`mixAudio`** overlays.
+
+---
+
+## `extractAudio`
+
+Demux first audio stream (**requires audio track**).
+
+| Option | Default | Notes |
+|--------|---------|------|
+| **`outputPath`** | ✓ | Target file. |
+| **`format`** | **`mp3`** | **`mp3`** (**libmp3lame**), **`wav`** (**pcm_s16le**), **`aac`**, **`ogg`** (**libvorbis**). |
+| **`bitrate`** | **128** | **`kbps`** (**`-ab`**). |
+
+```typescript
+await painter.createVideo({
+  source: './talk.mp4',
+  extractAudio: {
+    outputPath: './talk.wav',
+    format: 'wav',
+  },
+});
+```
+
+---
+
+## `removeAudio`
+
+Video-only output (**`-an -c:v copy`**).
+
+```typescript
+await painter.createVideo({
+  source: './with-sound.mp4',
+  removeAudio: { outputPath: './silent.mp4' },
+});
+```
+
+---
+
+## `mute`
+
+| Mode | Behaviour |
+|------|-----------|
+| **No **`ranges`**** | Same strip as **`removeAudio`** (**`-an`**). |
+| **`ranges: [{ start, end }]`** | **`volume=enable='between(t,...)'`:volume=0`** segments on audio (**`-c:v copy`**). |
+
+```typescript
+await painter.createVideo({
+  source: './podcast.mp4',
+  mute: {
+    outputPath: './podcast-beeped.mp4',
+    ranges: [
+      { start: 30, end: 35 },
+      { start: 120, end: 125 },
+    ],
+  },
+});
+```
+
+---
+
+## `mixAudio` — **`MixAudioOperation`**
+
+Mixes **N overlay clips** onto the output timeline while optionally keeping the original mix.
+
+### Top-level
+
+| Field | Default | Notes |
+|-------|---------|------|
+| **`outputPath`** | ✓ | Mixed MP4 (**`-c:v copy`**, **AAC 192k**). |
+| **`overlays`** | ✓ | **`MixAudioOverlayClip[]`** — see below. |
+| **`keepOriginalAudio`** | **`true`** | **`false`** → silence pad + overlays only ( **`anullsrc`** baseline ). |
+| **`originalVolume`** | **1** | Linear gain on **[0:a]** before **`amix`**. |
+| **`originalSpeed`** | **1** | **`atempo`** chain (**~0.25–4** clamp). |
+| **`originalPitchSemitones`** | **0** | **`asetrate`** trick **without rubberband**. |
+
+### `MixAudioOverlayClip`
+
+| Field | Notes |
+|-------|------|
+| **`source`** | Path / URL / **Buffer** (resolved like video). |
+| **`startTime`** | Seconds on **output** timeline when clip begins. |
+| **`duration`** | Seconds from overlay **after trim** — **default** **`min(fileRemainder, videoEnd-start)`** logic inside helper. |
+| **`sourceStart`** | Skip seconds into overlay file (**default 0**). |
+| **`volume`** | Linear gain (**default 1**). |
+| **`speed`** | **`atempo`** chain (**~0.25–4**) — changes playback speed of trimmed overlay audio. |
+| **`pitchSemitones`** | **`asetrate` + compensating `atempo`** (duration-preserving, **no rubberband**). |
+
+Skips overlays whose playable window **< ~0.04s** or start past video end.
+
+### Example — bed music under narrator
+
+```typescript
+await painter.createVideo({
+  source: './voice.mp4',
+  mixAudio: {
+    outputPath: './voice-plus-bed.mp4',
+    keepOriginalAudio: true,
+    originalVolume: 1,
+    overlays: [
+      {
+        source: './music-loop.mp3',
+        startTime: 0,
+        duration: 120,
+        sourceStart: 5,
+        volume: 0.35,
+      },
+      {
+        source: './whoosh.wav',
+        startTime: 8.5,
+        duration: 1.2,
+        volume: 0.9,
+      },
+    ],
+  },
+});
+```
+
+### Example — replace soundtrack entirely
+
+```typescript
+await painter.createVideo({
+  source: './reference.mp4',
+  mixAudio: {
+    outputPath: './rescored.mp4',
+    keepOriginalAudio: false,
+    overlays: [{ source: './score.mp3', startTime: 0 }],
+  },
+});
+```
+
+---
+
+## `adjustVolume`
+
+### Global mode (**no **`ranges`****)
+
+**`volume`** is **percentage** of unity (**100 = unchanged**) → **`volume={volume/100}`**.
+
+```typescript
+await painter.createVideo({
+  source: './quiet.mp4',
+  adjustVolume: {
+    outputPath: './boosted.mp4',
+    volume: 180,
+  },
+});
+```
+
+### Interval mode (**`ranges`**)
+
+Each range:
+
+| Field | Notes |
+|-------|------|
+| **`start`**, **`end`** | Seconds inclusive window (**FFmpeg `between(t,...)`**). |
+| **`volume`** | **Percent /100** multiplier inside window. |
+| **`speed`**, **`pitchSemitones`** | Optional — triggers **`rubberband`** filter substring (**needs FFmpeg + librubberband**). |
+
+```typescript
+await painter.createVideo({
+  source: './mix.mp4',
+  adjustVolume: {
+    outputPath: './ducked.mp4',
+    ranges: [
+      { start: 0, end: 10, volume: 100 },
+      { start: 10, end: 20, volume: 35 },
+      { start: 20, end: 9999, volume: 100 },
+    ],
+  },
+});
+```
+
+---
+
+## `normalizeAudio`
+
+**`-c:v copy`** audio pipeline — **video pixels unchanged**.
+
+For **what each option does**, **LUFS vs peak**, and **honest limits** of **`peak`/`rms`**, see the dedicated guide: **[Audio operations (full)](/docs#06-audio-deep-dive)**.
+
+```typescript
+await painter.createVideo({
+  source: './podcast.mp4',
+  normalizeAudio: {
+    outputPath: './podcast-loudnorm.mp4',
+    method: 'lufs',
+    targetLevel: -16,
+  },
+  onProgress: (p) => console.log(p.percent),
+});
+```
+
+---
+
+Next: **[Effects & overlays](/docs#04-effects-overlays)** · **[Audio deep dive](/docs#06-audio-deep-dive)**.

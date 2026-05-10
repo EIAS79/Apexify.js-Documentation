@@ -45,7 +45,12 @@ export function wrapSnippetForRunner(
   code: string,
   { apexifyImportHref }: { apexifyImportHref: string }
 ): string {
-  let body = code.replace(/^import\s*\{\s*ApexPainter\s*\}\s*from\s*['"]apexify\.js['"]\s*;?\s*\r?\n/m, '').trim();
+  let body = code
+    .replace(/^import\s*\{\s*ApexPainter\s*\}\s*from\s*['"]apexify\.js['"]\s*;?\s*\r?\n/m, '')
+    /** Same as ESM strip — runner injects `ApexPainter`; duplicate binding breaks JS/CJS pastes. */
+    .replace(/^const\s*\{\s*ApexPainter\s*\}\s*=\s*require\s*\(\s*['"]apexify\.js['"]\s*\)\s*;?\s*\r?\n/m, '')
+    .replace(/^const\s+ApexPainter\s*=\s*require\s*\(\s*['"]apexify\.js['"]\s*\)\s*\.(?:default|ApexPainter)\s*;?\s*\r?\n/m, '')
+    .trim();
   body = body.replace(/\s*return\s+await\s+main\s*\(\)\s*;?\s*$/m, '').trim();
 
   const { hoisted, rest: inner } = hoistLeadingImports(body);

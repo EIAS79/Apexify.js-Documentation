@@ -1,0 +1,58 @@
+# Charts — overview {#00-charts-overview}
+
+**`ApexPainter`** delegates to **`ChartCreator`** (`lib/Canvas/extended/ChartCreator.ts`). All chart functions return a **PNG `Buffer`**.
+
+Back: [Feature guides hub](/docs#feature-guides-hub)
+
+---
+
+## Entry points
+
+```typescript
+await painter.createChart(chartType, data, options?);
+await painter.createComparisonChart(options);
+await painter.createComboChart(options);
+```
+
+| Method | Purpose |
+|--------|---------|
+| **`createChart`** | Single chart — **`pie`**, **`bar`**, **`horizontalBar`**, **`line`**, **`scatter`**, **`radar`**, **`polarArea`**. |
+| **`createComparisonChart`** | **Two** charts (any supported types incl. **`donut`**) — **`sideBySide`** or **`topBottom`**. |
+| **`createComboChart`** | **Bars + lines** on one Cartesian plot — optional **secondary Y-axis** (right). |
+
+---
+
+## `createChart` type → module
+
+| **`chartType`** | Data type | Options type | Source file |
+|-----------------|-----------|--------------|-------------|
+| **`pie`** | **`PieSlice[]`** | **`PieChartOptions`** | **`piechart.ts`** |
+| **`bar`** | **`BarChartData[]`** | **`BarChartOptions`** | **`barchart.ts`** |
+| **`horizontalBar`** | **`HorizontalBarChartData[]`** | **`HorizontalBarChartOptions`** | **`horizontalbarchart.ts`** |
+| **`line`** | **`LineSeries[]`** | **`LineChartOptions`** | **`linechart.ts`** |
+| **`scatter`** | **`ScatterSeries[]`** | **`ScatterChartOptions`** | **`scatterchart.ts`** |
+| **`radar`** | **`RadarSeries[]`** | **`RadarChartOptions`** | **`radarchart.ts`** |
+| **`polarArea`** | **`PolarAreaSlice[]`** | **`PolarAreaChartOptions`** | **`polarareachart.ts`** |
+
+**Donut:** use **`createChart('pie', slices, { type: 'donut', donutInnerRadius?: number })`** — not a separate **`chartType`**.
+
+---
+
+## Topics (read in order)
+
+| # | Page |
+|---|------|
+| 1 | [Shared appearance & layout](/docs#01-charts-shared-appearance) |
+| 2 | [Pie & donut](/docs#02-chart-pie-and-donut) |
+| 3 | [Vertical bar](/docs#03-chart-bar-vertical) |
+| 4 | [Horizontal bar](/docs#04-chart-horizontal-bar) |
+| 5 | [Line](/docs#05-chart-line) |
+| 6 | [Scatter](/docs#06-chart-scatter) |
+| 7 | [Radar](/docs#07-chart-radar) |
+| 8 | [Polar area](/docs#08-chart-polar-area) |
+| 9 | [Combo (bar + line)](/docs#09-chart-combo) |
+| 10 | [Comparison (two charts)](/docs#10-chart-comparison) |
+
+---
+
+Start **[Shared appearance](/docs#01-charts-shared-appearance)**.

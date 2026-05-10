@@ -1,0 +1,106 @@
+# Layer styling — rotation, opacity, blur, clip, box fill {#03-create-image-styling-clip}
+
+Back: [Images overview](/docs#00-create-image-overview)
+
+These fields apply to **both** bitmaps and shapes unless noted.
+
+---
+
+## Transform & atmosphere
+
+| Field | Type | What it does |
+|-------|------|----------------|
+| **`rotation`** | **`number`** (degrees) | Rotates around the **centre of the layout box** (**`applyRotation`**). |
+| **`opacity`** | **`number`** (**`0…1`**) | **`globalAlpha`** while drawing the bitmap/shape content. |
+| **`blur`** | **`number`** (px) | Canvas **`filter: blur(...)`** during raster/shape paint phase. |
+| **`blendMode`** | **`GlobalCompositeOperation`** | Porter–Duff mode for **this layer** vs what's already on the canvas (`'multiply'`, `'screen'`, …). |
+
+```typescript
+await painter.createImage(
+  {
+    source: './logo.png',
+    x: 120,
+    y: 80,
+    width: 200,
+    height: 200,
+    fit: 'contain',
+    rotation: -8,
+    opacity: 0.92,
+    blur: 0.5,
+    blendMode: 'multiply',
+  },
+  buffer
+);
+```
+
+---
+
+## Rounded clip — `borderRadius`, `borderPosition`
+
+Bitmap pipeline (**`drawImageBitmap`**):
+
+1. **`applyRotation`**
+2. **`applyShadow`** (underneath)
+3. **`drawBoxBackground`** (inside box)
+4. **Clip**: either **`clipPath`** **or** **`buildPath`** from **`borderRadius`** + **`borderPosition`**
+
+So **`borderRadius`** clips **the image**, not the shadow (shadow is painted **before** clip — correct drop-shadow behaviour).
+
+**`borderPosition`** follows the same union as canvas (**`'all'`**, **`'top-left'`**, edges, … — see **`borderPosition`** in **`types/index.ts`**).
+
+```typescript
+await painter.createImage(
+  {
+    source: './avatar.jpg',
+    x: 40,
+    y: 40,
+    width: 160,
+    height: 160,
+    fit: 'cover',
+    borderRadius: 'circular',
+    borderPosition: 'all',
+  },
+  buffer
+);
+```
+
+Shapes use the same **`borderRadius`** / **`borderPosition`** for **clip + boxBackground** inside **`drawShape`** (**`ImageCreator`**).
+
+---
+
+## Polygon clip — `clipPath`
+
+**`clipPath`** is an array of **`{x,y}`** vertices (**≥ 3**). When present it **replaces** the rounded-rect clip (**`applyClipPath`**).
+
+Throws if fewer than three points.
+
+```typescript
+await painter.createImage(
+  {
+    source: './texture.png',
+    x: 0,
+    y: 0,
+    width: 400,
+    height: 400,
+    fit: 'cover',
+    clipPath: [
+      { x: 200, y: 40 },
+      { x: 380, y: 340 },
+      { x: 20, y: 340 },
+    ],
+  },
+  buffer
+);
+```
+
+---
+
+## Behind the pixels — `boxBackground`
+
+**`boxBackground?: { color?: string; gradient?: gradient }`**
+
+Painted **after shadow**, **before** clip, **inside** the eventual rounded/bitmap region — useful for letterboxing or tinted plates.
+
+---
+
+Next: **[Shadow & stroke](/docs#04-create-image-shadow-stroke)** · **[Filters](/docs#05-create-image-filters)**.

@@ -1,0 +1,62 @@
+# Fill colour & gradients {#03-create-text-color-gradients}
+
+Back: [Text overview](/docs#00-create-text-overview)
+
+**`color`** is the fallback **`fillStyle`** when **`gradient`** absent (default **`#000000`** in **`renderFill`**).
+
+---
+
+## `gradient` union (`types/index.ts`)
+
+Same **`gradient`** shape as canvas backgrounds:
+
+| **`type`** | Highlights |
+|------------|------------|
+| **`linear`** | **`startX/Y`**, **`endX/Y`**, optional **`rotate`**, **`pivotX/Y`**, **`repeat`** (**`'repeat' \| 'reflect' \| 'no-repeat'`**). |
+| **`radial`** | Inner / outer circles + optional **`repeat`**. |
+| **`conic`** | **`centerX/Y`**, **`startAngle`**, **`rotate`**, **`pivotX/Y`**. |
+
+Stops: **`colors: { stop: number; color: string }[]`**.
+
+**`EnhancedTextRenderer.createGradient`** builds **`CanvasGradient`** or **`CanvasPattern`** when **`repeat`** ≠ **`no-repeat`** (tiles via helper canvas).
+
+---
+
+## Gradient bounds for straight lines
+
+For a horizontal line of text from **`x`** spanning measured **`width`**, fills/strokes use:
+
+- **`gx0 = x`** (or centred glyph mode on arcs — see curved doc)
+- **`gx1 = x + width`**
+- Vertical anchors typically **`y`** baseline row.
+
+Radial/conic centres default intelligently from bbox corners passed into **`createGradient`**.
+
+---
+
+```typescript
+await painter.createText(
+  {
+    text: 'Gradient title',
+    x: 80,
+    y: 120,
+    font: { size: 56, family: 'Arial' },
+    gradient: {
+      type: 'linear',
+      startX: 80,
+      startY: 120,
+      endX: 520,
+      endY: 120,
+      colors: [
+        { stop: 0, color: '#38bdf8' },
+        { stop: 1, color: '#a855f7' },
+      ],
+    },
+  },
+  buffer
+);
+```
+
+---
+
+Next: **[Glow, shadow & stroke](/docs#04-create-text-glow-shadow-stroke)**.

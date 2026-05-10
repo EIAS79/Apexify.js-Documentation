@@ -1,0 +1,93 @@
+# Canvas shadow — every `ShadowOptions` field {#07-canvas-shadow-options}
+
+Back: [Canvas overview](/docs#00-create-canvas-overview) · [Border & motion](/docs#06-canvas-border-shadow-zoom)
+
+Types live in **`lib/Canvas/utils/types/index.ts`** (**`ShadowOptions`**). Rendering: **`applyShadow`** in **`lib/Canvas/utils/Image/imageProperties.ts`**.
+
+**Important:** `createCanvas` calls **`applyShadow(ctx, shadow, x, y, width, height)`** — only **`shadow`** controls **corner rounding on the shadow shape**. If you omit **`shadow.borderRadius`**, it defaults to **0** (sharp rectangle). Match **`canvas.borderRadius`** when you want a rounded shadow.
+
+---
+
+## Field reference (`ShadowOptions`)
+
+| Property | Type | Purpose |
+|----------|------|---------|
+| **`color`** | **`string`** | Fill color for the shadow shape (CSS color). Default inside **`applyShadow`**: **`rgba(0,0,0,1)`** if unset — combined with **`opacity`**. |
+| **`gradient`** | **`gradient`** | Alternative to **`color`**. Same **`linear`** \| **`radial`** \| **`conic`** shape as **`gradientBg`** — rasterised via **`createGradientFill`** into the shadow path. |
+| **`offsetX`** | **`number`** | Moves the shadow box horizontally from **`(x, y)`** (default **0**). |
+| **`offsetY`** | **`number`** | Moves the shadow box vertically (default **0**). |
+| **`blur`** | **`number`** | **`ctx.filter = blur(...px)`** on the shadow fill (default **20** in **`applyShadow`**). Use **0** for crisp edges. |
+| **`opacity`** | **`number`** | **`0…1`** — **`globalAlpha`** while drawing (default **0.4**). |
+| **`borderRadius`** | **`number`** \| **`'circular'`** | Corner radius of the **shadow** rectangle itself — **not** inherited from **`canvas.borderRadius`**. |
+| **`roundedCorners`** | **`borderPosition`** | Which corners use **`borderRadius`** (**`'all'`**, **`'top-left'`**, …). Default **`'all'`**. |
+| **`borderPosition`** | **`borderPosition`** | **Deprecated** — same intent as **`roundedCorners`**; prefer **`roundedCorners`**. |
+
+---
+
+## Defaults (inside `applyShadow`)
+
+If you omit fields, the destructuring defaults are roughly:
+
+- **`color`**: **`rgba(0,0,0,1)`**
+- **`opacity`**: **`0.4`**
+- **`offsetX`**, **`offsetY`**: **`0`**
+- **`blur`**: **`20`**
+
+---
+
+## Examples
+
+**Soft neutral shadow**
+
+```typescript
+shadow: {
+  color: 'rgba(15, 23, 42, 0.35)',
+  offsetX: 0,
+  offsetY: 14,
+  blur: 28,
+  opacity: 1,
+  borderRadius: 24,
+  roundedCorners: 'all',
+}
+```
+
+**Gradient shadow (instead of flat color)**
+
+```typescript
+shadow: {
+  gradient: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 600,
+    endY: 0,
+    colors: [
+      { stop: 0, color: 'rgba(99,102,241,0.5)' },
+      { stop: 1, color: 'rgba(168,85,247,0.2)' },
+    ],
+  },
+  offsetY: 8,
+  blur: 22,
+  opacity: 0.9,
+  borderRadius: 32,
+}
+```
+
+**Heavy bloom**
+
+```typescript
+shadow: {
+  color: '#38bdf8',
+  blur: 40,
+  opacity: 0.35,
+  offsetY: 0,
+  borderRadius: 48,
+}
+```
+
+---
+
+## See also
+
+- **`gradient`** object variants — next to **`gradientBg`** on **`GradientConfig`** / **`gradient`** in **`types/index.ts`** ( **`repeat`** on linear/radial, **`rotate`**, conic **`centerX`**, **`startAngle`**, … ).
+- [Stroke options](/docs#08-canvas-stroke-options) — pairing outline + shadow.

@@ -1,0 +1,217 @@
+# Effects, colour & overlays {#04-effects-overlays}
+
+Back: [Video overview](/docs#00-video-overview)
+
+**See also:** [Visual filters & overlays](/docs#07-visual-filters) · [Text overlays](/docs#08-text-overlays) (**`addText`**, **`addAnimatedText`**).
+
+---
+
+## `applyEffects`
+
+Sequential **`-vf`** filters (**comma-separated**).
+
+| **`type`** | Parameter | FFmpeg mapping |
+|------------|-----------|----------------|
+| **`blur`** | **`intensity`** (default **5**) | **`boxblur=`** |
+| **`brightness`** | **`value`** (−100…100) | **`eq=brightness=value/100`** |
+| **`contrast`** | **`value`** | **`eq=contrast=1+value/100`** |
+| **`saturation`** | **`value`** | **`eq=saturation=1+value/100`** |
+| **`grayscale`** | — | **`hue=s=0`** |
+| **`sepia`** | — | **`colorchannelmixer=…`** preset matrix |
+| **`invert`** | — | **`negate`** |
+| **`sharpen`** | **`intensity`** (default **1**) | **`unsharp=5:5:intensity:…`** |
+| **`noise`** | **`intensity`** (default **20**) | **`noise=alls=intensity:allf=t+u`** |
+
+```typescript
+await painter.createVideo({
+  source: './flat.mp4',
+  applyEffects: {
+    outputPath: './graded-quick.mp4',
+    filters: [
+      { type: 'brightness', value: -5 },
+      { type: 'contrast', value: 12 },
+      { type: 'saturation', value: -15 },
+      { type: 'sharpen', intensity: 1.2 },
+    ],
+  },
+});
+```
+
+---
+
+## `colorCorrect`
+
+Uses **`eq`**, **`hue`**, **`colorbalance`** for warmth.
+
+| Field | Mapping |
+|-------|---------|
+| **`brightness`** | **`eq=brightness=brightness/100`** |
+| **`contrast`** | **`eq=contrast=1+contrast/100`** |
+| **`saturation`** | **`eq=saturation=1+saturation/100`** |
+| **`hue`** | **`hue=h=hue`** (degrees) |
+| **`temperature`** | **`colorbalance`** offsets (**positive = warmer**, negative = cooler heuristic). |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './flat.mp4',
+  colorCorrect: {
+    brightness: 6,
+    contrast: 10,
+    saturation: -8,
+    hue: 0,
+    temperature: 15,
+    outputPath: './warm.mp4',
+  },
+});
+```
+
+---
+
+## `applyLUT`
+
+Applies **3D LUT** file (**`.cube`** typical).
+
+| Field | Notes |
+|-------|------|
+| **`lutPath`** | Resolved vs **`cwd`** when not URL. |
+| **`intensity`** | Present in types — **blend strength not wired** in helper today (reserved). |
+| **`outputPath`** | ✓ — **re-encodes** **`libx264`** **`-crf 18`**. |
+
+```typescript
+await painter.createVideo({
+  source: './log.mp4',
+  applyLUT: {
+    lutPath: './luts/teal-orange.cube',
+    outputPath: './graded.mp4',
+  },
+  onProgress: (p) => console.log(p.percent),
+});
+```
+
+---
+
+## `addWatermark`
+
+Second input image overlaid with alpha multiplier.
+
+| Field | Default | Notes |
+|-------|---------|------|
+| **`watermarkPath`** | ✓ | Local path (**non-URL** resolved vs **`cwd`**). |
+| **`position`** | **`bottom-right`** | **`top-left`**, **`top-right`**, **`bottom-left`**, **`bottom-right`**, **`center`**. |
+| **`opacity`** | **0.5** | **`colorchannelmixer=aa=`** |
+| **`size`** | native | **`scale=w:h`** before overlay. |
+| **`outputPath`** | ✓ | |
+
+```typescript
+await painter.createVideo({
+  source: './episode.mp4',
+  addWatermark: {
+    watermarkPath: './brand-mark.png',
+    position: 'top-right',
+    opacity: 0.65,
+    size: { width: 200, height: 80 },
+    outputPath: './episode-branded.mp4',
+  },
+});
+```
+
+---
+
+## `addText`
+
+Static **`drawtext`** (**requires FFmpeg default font / OS fonts**).
+
+| Field | Default |
+|-------|---------|
+| **`text`** | ✓ |
+| **`position`** | **`bottom-center`** |
+| **`fontSize`** | **24** |
+| **`fontColor`** | **`white`** |
+| **`backgroundColor`** | **`black@0.5`** (**drawtext box**) |
+| **`startTime`**, **`endTime`** | Omit → always on |
+| **`outputPath`** | ✓ |
+
+Colon **`:`** and **`'`** escaped for ffmpeg filter syntax.
+
+```typescript
+await painter.createVideo({
+  source: './talk.mp4',
+  addText: {
+    text: 'Episode 12 · Spoilers ahead',
+    position: 'top-center',
+    fontSize: 28,
+    fontColor: 'yellow',
+    backgroundColor: 'black@0.65',
+    startTime: 0,
+    endTime: 6,
+    outputPath: './talk-caption.mp4',
+  },
+});
+```
+
+---
+
+## `addFade`
+
+Video fade (**`-vf fade`**). Audio untouched.
+
+| Field | Notes |
+|-------|------|
+| **`fadeIn`** | Seconds from **t=0**. |
+| **`fadeOut`** | Ends **`duration - fadeOut`** when duration known via **`getVideoInfo`**. |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './intro.mp4',
+  addFade: {
+    fadeIn: 1.2,
+    fadeOut: 2,
+    outputPath: './intro-soft.mp4',
+  },
+});
+```
+
+---
+
+## `addAnimatedText`
+
+Drawtext with **`enable=between(start,end)`**.
+
+### Position
+
+Either **named** (**same set as **`addText`** minus finer granularity**) **or** **`{ x, y }`** pixel coords.
+
+### **`animation`** — type vs runtime
+
+| **`VideoCreationOptions` union** | Actually honoured in **`addAnimatedTextToVideo`** |
+|----------------------------------|---------------------------------------------------|
+| **`fadeIn`**, **`fadeOut`**, … | Implementation checks **`fade`** and **`slide`** **only** — extra expressions appended to **`drawtext`**. |
+| Missing / others | Static visibility window only. |
+
+**Working animated keywords today:** **`fade`**, **`slide`** (plus **`none`** / omitted).
+
+```typescript
+await painter.createVideo({
+  source: './promo.mp4',
+  addAnimatedText: {
+    text: 'Coming soon',
+    animation: 'fade',
+    startTime: 2,
+    endTime: 7,
+    position: 'center',
+    fontSize: 54,
+    fontColor: 'white',
+    backgroundColor: 'black@0.4',
+    outputPath: './promo-title.mp4',
+  },
+  onProgress: (p) => console.log(p.percent),
+});
+```
+
+**`fontPath`**, **`fontName`**, **`fontFamily`** appear on **`VideoCreationOptions`** but are **not injected into the FFmpeg `drawtext` filter** in **`addAnimatedTextToVideo`** today (reserved). **`addText`** uses the same limitation — system default font only unless you extend the helper.
+
+---
+
+Next: **[Compose & build](/docs#05-compose-and-build)** · **[Advanced](/docs#06-advanced-presets-transitions)**.

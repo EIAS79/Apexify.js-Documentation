@@ -1,0 +1,40 @@
+# Canvas & `createCanvas` — overview {#00-create-canvas-overview}
+
+**`await painter.createCanvas(config)`** builds your **first** image: width, height, and everything drawn **behind** later text/images.
+
+---
+
+## What you get back
+
+```typescript
+const { buffer, canvas } = await painter.createCanvas({ ... });
+```
+
+- **`buffer`** — PNG **`Buffer`** (save or pass to **`createText`** / **`createImage`**).
+- **`canvas`** — the **`CanvasConfig`** you passed (echo for debugging).
+
+---
+
+## Topics (read in order)
+
+| # | Page | Covers |
+|---|------|--------|
+| 1 | [Size & coordinates](/docs#01-canvas-size-and-coordinates) | **`width`**, **`height`**, **`x`**, **`y`**, inherit sizing |
+| 2 | [Primary backgrounds](/docs#02-backgrounds-primary) | **`colorBg`**, **`gradientBg`**, **`customBg`**, **`videoBg`** — **pick one** |
+| 3 | [Transparent base](/docs#03-backgrounds-transparent-base) | **`transparentBase`** + when to use it |
+| 4 | [Background layers (`bgLayers`)](/docs#04-backgrounds-bg-layers) | Stacked color / gradient / image / pattern / noise |
+| 5 | [Patterns & noise — full catalogue](/docs#05-backgrounds-pattern-noise) | **`patternBg`**, **`bgLayers`** **`pattern`** / **`presetPattern`**, every **`PatternOptions.type`**, **`noiseBg`** |
+| 6 | [Border clip & motion](/docs#06-canvas-border-shadow-zoom) | **`borderRadius`**, **`zoom`**, **`rotation`**, **`opacity`**, **`blendMode`**, canvas **`blur`** |
+| 7 | [Shadow — all fields](/docs#07-canvas-shadow-options) | **`ShadowOptions`**: **`gradient`**, **`blur`**, **`borderRadius`**, **`roundedCorners`**, … |
+| 8 | [Stroke — all fields](/docs#08-canvas-stroke-options) | **`StrokeOptions`**: **`gradient`**, **`style`**, **`borderPosition`** edges, **`position`**, … |
+| 9 | [Paint order (reference)](/docs#09-canvas-paint-order) | Exact pipeline inside **`CanvasCreator`** |
+
+---
+
+## Implementation note
+
+Logic lives in **`lib/Canvas/extended/CanvasCreator.ts`**. Types: **`CanvasConfig`** in **`lib/Canvas/utils/types/index.ts`**.
+
+---
+
+Start with **[Size & coordinates](/docs#01-canvas-size-and-coordinates)**.

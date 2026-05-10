@@ -1,0 +1,114 @@
+# Pie & donut {#02-chart-pie-and-donut}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+```typescript
+await painter.createChart('pie', slices, options);
+```
+
+---
+
+## `PieSlice` (required fields **`label`**, **`value`**)
+
+| Field | Purpose |
+|-------|---------|
+| **`color`**, **`gradient`** | Fill (**`gradient`** wins via **`createGradientFill`**). |
+| **`opacity`** | Slice fill multiplier. |
+| **`showValue`**, **`showLabel`** | Per-slice overrides (defaults bubble from **`options.labels`**). |
+| **`valueLabel`** | Custom text instead of raw **`value`**. |
+| **`shadow`**, **`stroke`** | Per-slice effects. |
+
+---
+
+## `PieChartOptions` highlights
+
+| Block | Keys |
+|-------|------|
+| **`type`** | **`pie`** (default) or **`donut`**. |
+| **`donutInnerRadius`** | Inner hole radius when **`type: 'donut'`**. |
+| **`dimensions`** | **`width`/`height`/`padding`**. |
+| **`appearance`** | **[Shared](/docs#01-charts-shared-appearance)**. |
+| **`labels.title`** | Chart title. |
+| **`labels.sliceLabels`**, **`valueLabels`** | **`fontSize`**, **`color`**, **`gradient`**, **`textStyle`**. |
+| **`labels.showValues`**, **`showLabels`**, **`valueFormat(value, percentage)`** | Global toggles / formatter. |
+| **`legends.standard`** | **`show`**, **`position`**, box styling, **`wrapText`**, **`maxWidth`**, … |
+| **`legends.connected`** | Pie-specific **leader-line** legend — **`lineColor`**, **`lineGradient`**, **`lineWidth`**. |
+| **`slices`** | Global **`opacity`**, **`shadow`**, **`stroke`** defaults for all arcs. |
+
+---
+
+## Example — simple pie
+
+```typescript
+const buf = await painter.createChart(
+  'pie',
+  [
+    { label: 'Desktop', value: 58, color: '#6366f1' },
+    { label: 'Mobile', value: 32, color: '#22c55e' },
+    { label: 'Tablet', value: 10, color: '#f97316' },
+  ],
+  {
+    dimensions: { width: 640, height: 480 },
+    labels: {
+      title: { text: 'Traffic share', fontSize: 22 },
+      showValues: true,
+      valueFormat: (v, pct) => `${pct.toFixed(1)}%`,
+    },
+    legends: {
+      standard: { position: 'right', fontSize: 14 },
+    },
+  }
+);
+```
+
+---
+
+## Example — donut + gradients + appearance
+
+```typescript
+const donut = await painter.createChart(
+  'pie',
+  [
+    {
+      label: 'A',
+      value: 40,
+      gradient: {
+        type: 'linear',
+        startX: 0,
+        startY: 0,
+        endX: 200,
+        endY: 200,
+        colors: [
+          { stop: 0, color: '#a855f7' },
+          { stop: 1, color: '#ec4899' },
+        ],
+      },
+    },
+    { label: 'B', value: 35, color: '#38bdf8' },
+    { label: 'C', value: 25, color: '#34d399' },
+  ],
+  {
+    type: 'donut',
+    donutInnerRadius: 70,
+    appearance: {
+      backgroundColor: '#0f172a',
+      noiseBg: { intensity: 0.04 },
+    },
+    labels: {
+      title: { text: 'Mix', fontSize: 20, color: '#f8fafc' },
+      sliceLabels: { fontSize: 11, color: '#e2e8f0' },
+    },
+    legends: {
+      standard: {
+        position: 'bottom',
+        textColor: '#f1f5f9',
+        backgroundColor: 'rgba(30,41,59,0.6)',
+      },
+    },
+  }
+);
+```
+
+---
+
+Next: **[Vertical bar](/docs#03-chart-bar-vertical)**.

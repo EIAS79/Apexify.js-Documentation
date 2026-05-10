@@ -1,0 +1,197 @@
+# Frame extraction & previews {#02-frame-extraction}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+**Same jobs without `createVideo`:** **[Imperative video helpers](/docs#08-imperative-video-helpers)** (`getVideoInfo`, `extractFrameAtTime`, `extractFrameByNumber`, …).
+
+---
+
+## `extractFrame`
+
+**What it does:** Decodes **one** image from the video at a chosen **time** or **frame index**, optionally scales it.
+
+### Options explained
+
+| Field | Effect |
+|-------|--------|
+| **`time`** | Seek to this **second** before grabbing (most intuitive). **If set**, it drives extraction; **`frame`** is ignored for positioning. |
+| **`frame`** | **Index** (0 = start). Converted to time with **`frame / fps`** when **`time`** is omitted (fps from probe or assumed **30**). |
+| **`width`**, **`height`** | Resize on a **canvas** after decode. Omit = native resolution. |
+| **`outputFormat`** | **`jpg`** or **`png`** for the **intermediate** FFmpeg output. |
+| **`quality`** | JPEG **`-q:v`** (**lower = better quality**, typical **2–5**). PNG path ignores quality in practice. |
+
+**Return value:** **`createVideo`** wraps the bitmap in a **PNG buffer** plus **`canvas: { width, height }`** (`VideoCreator`), even if you asked **`jpg`** internally.
+
+### Example — poster at 10s
+
+```typescript
+import fs from 'fs';
+
+const poster = await painter.createVideo({
+  source: './film.mp4',
+  extractFrame: {
+    time: 10,
+    width: 1920,
+    height: 1080,
+    outputFormat: 'jpg',
+    quality: 3,
+  },
+});
+
+fs.writeFileSync('poster.png', poster.buffer);
+```
+
+---
+
+## `extractFrames` — mode A: **`times`**
+
+**What it does:** Calls **`extractVideoFrame`** once per timestamp → **`Buffer[]`** in order.
+
+| Field | Effect |
+|-------|--------|
+| **`times`** | Array of **seconds**. |
+| **`outputFormat`**, **`quality`** | Same semantics as **`extractFrame`**. |
+
+```typescript
+import fs from 'fs';
+
+const stills = await painter.createVideo({
+  source: './clip.mp4',
+  extractFrames: {
+    times: [0, 2.5, 5.0, 7.5],
+    outputFormat: 'png',
+    quality: 2,
+  },
+});
+
+stills.forEach((buf, i) => fs.writeFileSync(`grab-${i}.png`, buf));
+```
+
+---
+
+## `extractFrames` — mode B: **`interval`**
+
+**What it does:** Runs **`ApexPainter.extractFrames`** — FFmpeg **`-vf fps=`** derived from **`interval`** in **milliseconds** (**`fps = 1000 / interval`**).
+
+| Field | Effect |
+|-------|--------|
+| **`interval`** | **Ms** between samples (**must be > 0**). Smaller = more frames, larger disk use. |
+| **`frameSelection.start`**, **`end`** | **Frame indices** within the extracted sequence (trim the list). |
+| **`outputFormat`**, **`quality`** | JPEG/PNG quality flags. |
+| **`outputDirectory`** | Typed on **`VideoCreationOptions`** but **not** used by current **`extractFrames`** implementation — files land under **`.temp-frames/frames-<id>/`**. |
+
+```typescript
+const paths = await painter.createVideo({
+  source: './motion.mp4',
+  extractFrames: {
+    interval: 250, // ~4 fps sampling
+    outputFormat: 'jpg',
+    frameSelection: { start: 0, end: 48 },
+  },
+});
+console.log(paths.map((p) => p.source));
+```
+
+---
+
+## `extractAllFrames`
+
+**What it does:** Dumps **every** frame in **[`startTime`, `endTime`]** to disk (**large** outputs).
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`outputDirectory`** | **`./extracted-frames`** | Where **`prefix-%06d.ext`** files go. |
+| **`outputFormat`** | **`png`** | **`jpg`** smaller but lossy. |
+| **`quality`** | **2** | JPEG **`-q:v`**. |
+| **`prefix`** | **`frame`** | Filename prefix. |
+| **`startTime`**, **`endTime`** | **0 … duration** | Time window in seconds. |
+
+Returns **`{ source, frameNumber, time }[]`** with **`time`** stepped by **1/fps** (approximate).
+
+```typescript
+const frames = await painter.createVideo({
+  source: './short.mp4',
+  extractAllFrames: {
+    outputDirectory: './all-frames',
+    outputFormat: 'png',
+    prefix: 'cell',
+    startTime: 0,
+    endTime: 1,
+  },
+});
+```
+
+---
+
+## `generateThumbnail`
+
+**What it does:** Builds **one PNG sheet**: **`count`** thumbnails evenly spaced in time, arranged in **`grid`**.
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`count`** | **9** | How many stills. |
+| **`grid`** | **3×3** | **`cols` × `rows`** must fit **`count`** sensibly. |
+| **`width`**, **`height`** | **320×180** | **Per-cell** size (total canvas = cell × grid). |
+| **`outputFormat`**, **`quality`** | Passed through frame extraction. |
+
+```typescript
+const sheet = await painter.createVideo({
+  source: './tutorial.mp4',
+  generateThumbnail: {
+    count: 12,
+    grid: { cols: 4, rows: 3 },
+    width: 320,
+    height: 180,
+  },
+});
+fs.writeFileSync('sheet.png', sheet.buffer);
+```
+
+---
+
+## `generatePreview`
+
+**What it does:** Writes **`count`** images to **`outputDirectory`** (like a storyboard dump, not one montage).
+
+| Field | Default |
+|-------|---------|
+| **`count`** | **10** |
+| **`outputDirectory`** | **`./video-preview`** |
+| **`outputFormat`** | **`png`** |
+| **`quality`** | **2** |
+
+```typescript
+const previews = await painter.createVideo({
+  source: './draft.mp4',
+  generatePreview: {
+    count: 15,
+    outputDirectory: './storyboard',
+    outputFormat: 'jpg',
+  },
+});
+```
+
+---
+
+## `detectScenes`
+
+**What it does:** Runs FFmpeg scene-detection filter and parses timestamps (**shell pipeline** — **most reliable on Unix/Git Bash/WSL**).
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`threshold`** | **0.3** | Higher → fewer cuts detected. |
+| **`outputPath`** | — | Optional JSON file **`[{ time, scene }]`**. |
+
+```typescript
+const cuts = await painter.createVideo({
+  source: './interview.mp4',
+  detectScenes: {
+    threshold: 0.4,
+    outputPath: './cuts.json',
+  },
+});
+```
+
+---
+
+Next: **[Transcode & export](/docs#03-transcode-export)**.

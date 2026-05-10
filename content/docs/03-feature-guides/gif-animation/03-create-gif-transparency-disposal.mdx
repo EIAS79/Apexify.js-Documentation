@@ -1,0 +1,55 @@
+# Chroma transparency & frame disposal {#03-create-gif-transparency-disposal}
+
+Back: [GIF overview](/docs#00-create-gif-overview)
+
+GIF transparency here is **indexed colour / single matte**: **`gifencoder.setTransparent(rgb)`** — **one** RGB triplet keyed out after quantization (**no alpha channel** per pixel).
+
+---
+
+## `transparentColor`
+
+**Global:** **`GIFOptions.transparentColor`**  
+**Per frame:** **`GIFInputFrame.transparentColor`** / **`GIFEncodedFrame.transparentColor`**
+
+Accepted forms:
+
+- **`#RRGGBB`** or **`RRGGBB`** string (leading **`#`** stripped)
+- **`0xRRGGBB`** style **number**
+- **`null`** on a frame → **disables** chroma transparency for **that** encode step (encoder gets **`null`**)
+
+**`parseTransparentForEncoder`** rejects invalid hex strings.
+
+---
+
+## Precedence
+
+For each frame, **`applyGifEncoderFrameOptions`** uses:
+
+**`frame.transparentColor`** if **`!== undefined`**, else **`options.transparentColor`**, else **`null`** (no keyed colour).
+
+---
+
+## Disposal (`GIFDisposalMethod`)
+
+Forwarded to **`encoder.setDispose`** before **`addFrame`**:
+
+| Code | Typical meaning |
+|------|-----------------|
+| **0** | No disposal specified |
+| **1** | Do not dispose |
+| **2** | Restore to background |
+| **3** | Restore to previous |
+
+**Per frame:** **`dispose`** on **`GIFInputFrame`** / **`GIFEncodedFrame`**.  
+**Default:** **`GIFOptions.defaultDispose`** when frame omits **`dispose`**.
+
+---
+
+## Design notes
+
+- Match **`transparentColor`** to a flat border colour you’re okay losing (e.g. `#00FF00` greenscreen).
+- Halos appear if anti‑aliased pixels blend — prefer hard edges or tolerance post‑processing outside Apexify.
+
+---
+
+Next: **[Watermark & overlay](/docs#04-create-gif-watermark-overlay)**.

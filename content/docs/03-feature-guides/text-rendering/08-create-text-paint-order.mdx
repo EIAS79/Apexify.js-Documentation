@@ -1,0 +1,50 @@
+# Paint order, utilities & legacy helpers {#08-create-text-paint-order}
+
+Back: [Text overview](/docs#00-create-text-overview)
+
+---
+
+## `EnhancedTextRenderer.renderText` (what `createText` uses)
+
+Outer **`ctx.save` / `restore`** wraps everything.
+
+| Stage | Notes |
+|-------|------|
+| Font registration | **`GlobalFonts.registerFromPath`** when **`font.path`** / **`fontPath`** set. |
+| **`applyTransformations`** | Rotation around **`(x,y)`**, then **`opacity`**. |
+| **`setupFont`** | CSS **`font`** string + **`letterSpacing`** / **`wordSpacing`**. |
+| **`setupAlignment`** | **`textAlign`**, **`textBaseline`**. |
+| Branch | **`textOnCurve`** → curved lines · else **`maxWidth`** → wrap · else single-line (**still honours `\\n`**). |
+
+### Per straight-line segment (`renderTextLine`)
+
+1. **`highlight`** (`fillRect` backdrop)
+2. **`glow`** (shadow-blur **`fillText`** passes)
+3. **`shadow`** (offset **`fillText`** with **`shadowBlur`**)
+4. **`stroke`** (**`strokeText`**, complex styles multi-pass)
+5. **`fill`** (**`fillText`** — **`color`** / **`gradient`**)
+6. **`decorations`** (underline / overline / strikethrough segments)
+
+### Arc glyphs (`renderRotatedGlyph`)
+
+Same conceptual ordering in **local** tangent space: highlight → glow → shadow → stroke → fill → decorations.
+
+---
+
+## `textPathRenderer.ts` (not wired to `createText`)
+
+**`renderTextOnPath`** builds **`Path2D`** samples (**line**, **arc**, **bezier**, **quadratic**) and places characters by approximate equal spacing (**`textWidth / length`**).
+
+Nothing in **`TextCreator`** or **`EnhancedTextRenderer`** imports it — useful only if you extend the library yourself.
+
+---
+
+## Legacy `textProperties.ts`
+
+**`drawText`**, **`WrappedText`**, **`createGradient`** operate on **`TextObject`** (extends **`TextProperties`** with deprecated **`isBold`**, **`outlined`**).
+
+Prefer **`createText`** + **`TextProperties`** for new work.
+
+---
+
+Back to **[overview](/docs#00-create-text-overview)**.

@@ -1,0 +1,90 @@
+# Horizontal bar chart {#04-chart-horizontal-bar}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+```typescript
+await painter.createChart('horizontalBar', data, options);
+```
+
+---
+
+## `HorizontalBarChartType`
+
+**`standard`** | **`grouped`** | **`stacked`** | **`lollipop`** — **`options.type`**.
+
+---
+
+## `HorizontalBarChartData`
+
+| Field | Role |
+|-------|------|
+| **`label`** | Row label. |
+| **`value`** | Single bar length. |
+| **`values`** | **`HorizontalBarSegment[]`** for grouped/stacked. |
+| **`xStart`**, **`xEnd`** | Optional **value-axis** extent (category axis is vertical). |
+| **`yStart`**, **`yEnd`** | Optional **row band** on Y (numeric category positioning). |
+| **`color`**, **`gradient`**, **`labelColor`**, **`labelPosition`** | Same spirit as vertical bar. |
+| **`opacity`** | Overrides **`options.bars.opacity`**. |
+
+### `HorizontalAxisConfig` (`axes.x` / `axes.y`)
+
+**`label`**, **`labelColor`**, **`range`**, **`values`**, **`color`**, **`width`**, **`tickFontSize`**, **`tickColor`**, **`valueSpacing`**.
+
+**`axes.x`** adds **`baseline`** (value spine alignment).
+
+---
+
+## `HorizontalBarChartOptions` extras vs vertical
+
+**`grid.style`**: **`solid` \| `dashed` \| `dotted`** plus **`lineWidth`**.
+
+**`bars`**: **`minHeight`**, **`borderRadius`** (rounded bar ends), **`spacing`**, **`groupSpacing`**, **`segmentSpacing`**, **`lineWidth`**, **`dotSize`**, **`opacity`**.
+
+---
+
+## Example — simple horizontal ranking
+
+```typescript
+await painter.createChart(
+  'horizontalBar',
+  [
+    { label: 'TypeScript', value: 92, yStart: 0, yEnd: 1, color: '#3178c6' },
+    { label: 'Rust', value: 88, yStart: 1, yEnd: 2, color: '#dea584' },
+    { label: 'Go', value: 74, yStart: 2, yEnd: 3, color: '#00add8' },
+  ],
+  {
+    type: 'standard',
+    dimensions: { width: 680, height: 360 },
+    axes: {
+      x: { label: 'Score', range: { min: 0, max: 100, step: 25 } },
+    },
+    bars: { borderRadius: 6 },
+  }
+);
+```
+
+---
+
+## Example — stacked rows
+
+```typescript
+await painter.createChart(
+  'horizontalBar',
+  [
+    {
+      label: 'Team A',
+      yStart: 0,
+      yEnd: 1,
+      values: [
+        { value: 20, color: '#94a3b8' },
+        { value: 35, color: '#64748b' },
+      ],
+    },
+  ],
+  { type: 'stacked', bars: { segmentSpacing: 0 } }
+);
+```
+
+---
+
+Next: **[Line chart](/docs#05-chart-line)**.

@@ -1,0 +1,64 @@
+# Decorations & highlight {#05-create-text-decorations-highlight}
+
+Back: [Text overview](/docs#00-create-text-overview)
+
+---
+
+## Highlight — `highlight`
+
+Drawn **before** glow/shadow/stroke/fill.
+
+| Key | Default |
+|-----|---------|
+| **`color`** | **`#ffff00`** |
+| **`gradient`** | Overrides **`color`** |
+| **`opacity`** | **0.3** |
+
+**Straight lines:** rectangle **`fillRect(x, highlightY, width, height)`** with **`highlightY = y - height * 0.8`** — tuned for alphabetic baseline geometry.
+
+**Arc mode:** each glyph gets **`renderHighlightLocal`** in tangent space (width = measured glyph advance).
+
+---
+
+## Underline / overline / strikethrough
+
+Each may be **`true`** (inherits **`color`** + default thickness ~**`fontSize * 0.05`**) **or** an object:
+
+```typescript
+underline?: boolean | {
+  color?: string;
+  gradient?: gradient;
+  width?: number;
+};
+```
+
+**Placement** (straight baseline, **`renderDecorations`**):
+
+| Decoration | Y offset formula |
+|------------|------------------|
+| Underline | **`y + fontSize * 0.1`** |
+| Overline | **`y - fontSize * 0.8`** |
+| Strikethrough | **`y - fontSize * 0.3`** |
+
+Gradient strokes span **`x → x + measuredWidth`** at fixed **`decorationY`**.
+
+---
+
+```typescript
+await painter.createText(
+  {
+    text: 'Sale · Today only',
+    x: 72,
+    y: 140,
+    font: { size: 36, family: 'Arial' },
+    highlight: { color: '#fef08a', opacity: 0.55 },
+    underline: { color: '#dc2626', width: 3 },
+    strikethrough: true,
+  },
+  buffer
+);
+```
+
+---
+
+Next: **[Text on arc](/docs#06-create-text-curved)** · **[Paint order](/docs#08-create-text-paint-order)**.

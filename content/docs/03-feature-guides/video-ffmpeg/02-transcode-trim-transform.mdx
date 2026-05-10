@@ -1,0 +1,248 @@
+# Transcode, trim & geometry {#02-transcode-trim-transform}
+
+Back: [Video overview](/docs#00-video-overview)
+
+**See also:** [Transcode & export presets](/docs#03-transcode-export) · [Timeline edits](/docs#04-timeline-edits) · [Geometry](/docs#05-geometry).
+
+---
+
+## `convert`
+
+Re-encodes with **CRF** presets **or** explicit **video bitrate**.
+
+| Option | Required | Notes |
+|--------|----------|------|
+| **`outputPath`** | ✓ | Container inferred from **extension** (FFmpeg default muxer). |
+| **`format`** | — | Declared in types (**`mp4`**, **`webm`**, …) — **not forwarded as `-f`** in current **`convertVideo`**; rely on **`outputPath`** suffix (e.g. **`.webm`**). |
+| **`quality`** | — | **`low`** (**`-crf 28`**), **`medium`** (**23**), **`high`** (**18**), **`ultra`** (**15**). Default **`medium`**. |
+| **`bitrate`** | — | **`kbps`** video (`-b:v …k`) — **wins over CRF** when set. |
+| **`fps`** | — | **`-r`** output frame rate. |
+| **`resolution`** | — | **`-vf scale=w:h`**. |
+
+### Example — web-friendly MP4
+
+```typescript
+await painter.createVideo({
+  source: './master.mov',
+  convert: {
+    outputPath: './dist/delivery.mp4',
+    quality: 'high',
+    fps: 30,
+    resolution: { width: 1920, height: 1080 },
+  },
+});
+```
+
+### Example — capped bitrate
+
+```typescript
+await painter.createVideo({
+  source: './raw.mp4',
+  convert: {
+    outputPath: './small.mp4',
+    bitrate: 2500,
+    fps: 24,
+  },
+});
+```
+
+---
+
+## `trim`
+
+Stream copy slice (**`-c copy`**) from **`startTime`** for **`endTime - startTime`** seconds.
+
+| Field | Notes |
+|-------|------|
+| **`startTime`**, **`endTime`** | Seconds (**absolute** end marker). |
+| **`outputPath`** | Destination path. |
+
+### Example
+
+```typescript
+await painter.createVideo({
+  source: './long.mp4',
+  trim: {
+    startTime: 60,
+    endTime: 125,
+    outputPath: './highlight.mp4',
+  },
+});
+```
+
+---
+
+## `compress`
+
+CRF-based shrink **or** hard bitrate cap.
+
+| Option | Notes |
+|--------|------|
+| **`quality`** | **`low` … `ultra`** maps to **`-crf`** + **`-preset`** (**`fast` → veryslow**). Default **`medium`**. |
+| **`maxBitrate`** | **`kbps`** triplet **`-b:v -maxrate -bufsize`**. |
+| **`targetSize`** | Present on type — **not applied** in **`compressVideo`** today (reserved). |
+
+Returns **`{ outputPath, success, originalSize?, compressedSize? }`**.
+
+### Example
+
+```typescript
+const stat = await painter.createVideo({
+  source: './big.mp4',
+  compress: {
+    outputPath: './lite.mp4',
+    quality: 'low',
+    maxBitrate: 1200,
+  },
+});
+console.log(stat.originalSize, stat.compressedSize);
+```
+
+---
+
+## `rotate`
+
+Right-angle transpose + optional flips.
+
+| Option | Values |
+|--------|--------|
+| **`angle`** | **`90`**, **`180`**, **`270`** — **`transpose`** chain. |
+| **`flip`** | **`horizontal`** (**`hflip`**), **`vertical`** (**`vflip`**), **`both`**. |
+| **`outputPath`** | ✓ |
+
+### Example
+
+```typescript
+await painter.createVideo({
+  source: './phone.mp4',
+  rotate: {
+    angle: 270,
+    flip: 'horizontal',
+    outputPath: './corrected.mp4',
+  },
+});
+```
+
+---
+
+## `crop`
+
+**`-vf crop=w:h:x:y`** (width/height/top-left).
+
+```typescript
+await painter.createVideo({
+  source: './wide.mp4',
+  crop: {
+    x: 320,
+    y: 180,
+    width: 1280,
+    height: 720,
+    outputPath: './tight.mp4',
+  },
+});
+```
+
+---
+
+## `changeSpeed`
+
+Video **`setpts`**, audio **`atempo`** chain when audio exists (**chained `atempo` >2× / <0.5×**).
+
+| Field | Notes |
+|-------|------|
+| **`speed`** | **>1** faster, **<1** slower. |
+| **`outputPath`** | ✓ |
+
+```typescript
+await painter.createVideo({
+  source: './demo.mp4',
+  changeSpeed: { speed: 1.5, outputPath: './demo-fast.mp4' },
+});
+```
+
+---
+
+## `createTimeLapse`
+
+Alias → **`changeVideoSpeed`** with **`speed`** (**default 10**).
+
+```typescript
+await painter.createVideo({
+  source: './clouds.mp4',
+  createTimeLapse: { speed: 20, outputPath: './clouds-tl.mp4' },
+});
+```
+
+---
+
+## `reverse`
+
+**`-vf reverse -af areverse`** — **heavy**; needs FFmpeg decode of full stream.
+
+```typescript
+await painter.createVideo({
+  source: './clip.mp4',
+  reverse: { outputPath: './clip-rev.mp4' },
+});
+```
+
+---
+
+## `replaceSegment`
+
+Splices **replacement** media into **[`targetStartTime`, `targetEndTime`]** of **`source`**.
+
+**Exactly one** replacement source:
+
+| Mode | Fields |
+|------|--------|
+| **Clip from another video** | **`replacementVideo`**, optional **`replacementStartTime`**, **`replacementDuration`** (**defaults** to gap length). |
+| **Frame sequence** | **`replacementFrames`** (**paths/buffers**), **`replacementFps`** (**default 30**) → internal **`createVideoFromFrames`**. |
+
+Validates window vs parent duration; concatenates **part1 | replacement | part3** with **`-c copy`**.
+
+### Example — overlay B-roll
+
+```typescript
+await painter.createVideo({
+  source: './main.mp4',
+  replaceSegment: {
+    targetStartTime: 10,
+    targetEndTime: 18,
+    replacementVideo: './broll.mp4',
+    replacementStartTime: 0,
+    replacementDuration: 8,
+    outputPath: './main-edited.mp4',
+  },
+});
+```
+
+---
+
+## `freezeFrame`
+
+Inserts a **held still** of **`time`** lasting **`duration`** seconds mid-timeline.
+
+| Field | Notes |
+|-------|------|
+| **`time`** | Freeze capture instant (**seconds**). |
+| **`duration`** | Hold length on output. |
+| **`outputPath`** | ✓ |
+
+Supports **`onProgress`** on final concat.
+
+```typescript
+await painter.createVideo({
+  source: './pitch.mp4',
+  freezeFrame: {
+    time: 12,
+    duration: 3,
+    outputPath: './pitch-pause.mp4',
+  },
+  onProgress: (p) => console.log(Math.round(p.percent)),
+});
+```
+
+---
+
+Next: **[Audio](/docs#03-audio)** · **[Effects](/docs#04-effects-overlays)**.

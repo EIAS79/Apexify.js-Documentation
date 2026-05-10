@@ -1,0 +1,131 @@
+# Transcode, compress & export presets {#03-transcode-export}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+---
+
+## `convert`
+
+**What it does:** Re-encodes the video with a **quality preset** or **explicit bitrate**, optional **fps** and **resolution**.
+
+### Options
+
+| Field | Required | Effect |
+|-------|----------|--------|
+| **`outputPath`** | ✓ | Destination file. **Container** is chosen by FFmpeg from the **extension** (**.mp4**, **.webm**, …). |
+| **`format`** | — | Listed in types (**mp4/webm/avi/mov/mkv**) but **not passed as `-f`** in **`convertVideo`** — rely on **`outputPath`** suffix for mux format. |
+| **`quality`** | — | **`low` → `-crf 28`**, **`medium` → 23**, **`high` → 18**, **`ultra` → 15**. Lower CRF = higher quality, bigger files. |
+| **`bitrate`** | — | **`kbps`** for **`-b:v`** — **overrides** the CRF preset when set. |
+| **`fps`** | — | Output frame rate **`-r`**. Drops or duplicates frames as FFmpeg sees fit. |
+| **`resolution`** | — | **`scale=w:h`** — stretches to exact size (no letterbox in this helper). |
+
+### Example — archive master to HD MP4
+
+```typescript
+await painter.createVideo({
+  source: './master.mov',
+  convert: {
+    outputPath: './deliver/hd.mp4',
+    quality: 'high',
+    fps: 30,
+    resolution: { width: 1920, height: 1080 },
+  },
+});
+```
+
+### Example — fixed bitrate for streaming
+
+```typescript
+await painter.createVideo({
+  source: './raw.mp4',
+  convert: {
+    outputPath: './stream/meeting.mp4',
+    bitrate: 3500,
+    fps: 25,
+  },
+});
+```
+
+---
+
+## `compress`
+
+**What it does:** Shrinks file size using **CRF + encoder preset**, or caps **max bitrate**.
+
+### Options
+
+| Field | Effect |
+|-------|--------|
+| **`quality`** | **`low`** (**`-crf 32 -preset fast`**) through **`ultra`** (**`-crf 18 -preset veryslow`**). **`medium`** default — balances size vs time. |
+| **`maxBitrate`** | **`kbps`** cap (**`-b:v -maxrate -bufsize`**). Wins over CRF-style flags when set. |
+| **`targetSize`** | Present in TypeScript — **not implemented** in **`compressVideo`** (ignored today). |
+
+### Return value
+
+Includes **`originalSize`** and **`compressedSize`** bytes when stat succeeds.
+
+### Example
+
+```typescript
+const out = await painter.createVideo({
+  source: './huge-screen-recording.mp4',
+  compress: {
+    outputPath: './shareable.mp4',
+    quality: 'medium',
+    maxBitrate: 2000,
+  },
+});
+
+console.log(
+  `Saved ${((out.originalSize - out.compressedSize) / 1e6).toFixed(1)} MB`
+);
+```
+
+---
+
+## `exportPreset`
+
+**What it does:** Calls **`convertVideo`** with **fixed resolution, fps, bitrate, and container** tuned for a platform.
+
+### Presets (from code)
+
+| **`preset`** | Resolution | FPS | Bitrate (kbps) | Container |
+|--------------|------------|-----|----------------|-----------|
+| **`youtube`** | 1920×1080 | 30 | 8000 | mp4 |
+| **`instagram`** | 1080×1080 | 30 | 3500 | mp4 |
+| **`tiktok`** | 1080×1920 | 30 | 4000 | mp4 |
+| **`twitter`** | 1280×720 | 30 | 5000 | mp4 |
+| **`facebook`** | 1280×720 | 30 | 4000 | mp4 |
+| **`4k`** | 3840×2160 | 30 | 50000 | mp4 |
+| **`1080p`** | 1920×1080 | 30 | 8000 | mp4 |
+| **`720p`** | 1280×720 | 30 | 5000 | mp4 |
+| **`mobile`** | 720×1280 | 30 | 2500 | mp4 |
+| **`web`** | 1280×720 | 30 | 3000 | webm |
+
+Names are **case-insensitive**.
+
+### Options
+
+| Field | Effect |
+|-------|--------|
+| **`preset`** | Chooses row above. Unknown preset → **throws**. |
+| **`outputPath`** | ✓ |
+
+Supports **`onProgress`**.
+
+### Example
+
+```typescript
+await painter.createVideo({
+  source: './landscape.mp4',
+  exportPreset: {
+    preset: 'tiktok',
+    outputPath: './out/vertical-for-tiktok.mp4',
+  },
+  onProgress: (p) => process.stdout.write(`\r${p.percent.toFixed(0)}%`),
+});
+```
+
+---
+
+Next: **[Timeline edits](/docs#04-timeline-edits)**.

@@ -1,0 +1,111 @@
+# Canvas stroke — every `StrokeOptions` field {#08-canvas-stroke-options}
+
+Back: [Canvas overview](/docs#00-create-canvas-overview) · [Border & motion](/docs#06-canvas-border-shadow-zoom)
+
+Types: **`StrokeOptions`** in **`lib/Canvas/utils/types/index.ts`**. Rendering: **`applyStroke`** in **`lib/Canvas/utils/Image/imageProperties.ts`**.
+
+**Important:** Like shadow, **`createCanvas`** passes **`applyStroke(ctx, stroke, x, y, width, height)`** without merging **`canvas.borderRadius`** into stroke — **`stroke.borderRadius`** drives how **thick outline corners** bend (**defaults to `0`** if omitted). **`stroke.roundedCorners`** selects **which corners** use that radius (default **`'all'`**).
+
+The **canvas clip** still uses **`canvas.borderRadius`**; **`stroke`** draws **outside** the filled inner geometry using **`position`** (inset/outset).
+
+---
+
+## Field reference (`StrokeOptions`)
+
+| Property | Type | Purpose |
+|----------|------|---------|
+| **`color`** | **`string`** | Stroke color (default **`'#000'`**). Ignored when **`gradient`** is set. |
+| **`gradient`** | **`gradient`** | Gradient **`strokeStyle`** via **`createGradientFill`** over the stroke bounding rect **`r`**. |
+| **`width`** | **`number`** | **`ctx.lineWidth`** (default **2**). |
+| **`position`** | **`number`** | Expands the stroke rectangle outward (**positive**) — rect becomes **`x - position`**, **`y - position`**, **`w + 2*position`**, **`h + 2*position`** (default **0**). |
+| **`blur`** | **`number`** | **`ctx.filter` blur** before **`stroke()`** (default **0**). |
+| **`opacity`** | **`number`** | **`0…1`** while stroking (default **1**). |
+| **`borderRadius`** | **`number`** \| **`'circular'`** | Radius used when building the stroke path. **`'circular'`** gives capsule-like rounding rules (**`buildPath`**). |
+| **`borderPosition`** | **`borderPosition`** | Which **edges** draw a stroke — **`'all'`** (full outline), **`'top'`**, **`'bottom'`**, **`'left'`**, **`'right'`**, or comma-separated combinations (**`'top,bottom'`**). Different from canvas **`borderPosition`** (corner radius zones): here it gates **partial edge strokes**. |
+| **`roundedCorners`** | **`borderPosition`** | Which corners participate when **`borderRadius`** applies (**`'all'`** default). Ignored when **`borderRadius`** is **0** or **`'circular'`**. |
+| **`style`** | **`'solid'` \| `'dashed'` \| `'dotted'` \| `'groove'` \| `'ridge'` \| `'double'`** | Dash geometry (**width‑scaled** dashes/dots) or multi-pass styles (**`'groove'`**, **`'ridge'`**, **`'double'`** use **`applyComplexStrokeStyle`**). Default **`'solid'`**. |
+
+---
+
+## Partial strokes (`borderPosition` on stroke)
+
+Use **`stroke.borderPosition`** to outline **only some edges** (top banner underline effect, etc.). Internally **`parseStrokeSideSet`** → **`buildPartialRectStrokeEdges`**.
+
+Example keywords align with **`borderPosition`** string unions (**`'top'`**, **`'bottom'`**, **`'left'`**, **`'right'`**, **`'top-left'`**, combined lists).
+
+---
+
+## Examples
+
+**Simple brand outline**
+
+```typescript
+stroke: {
+  color: '#6366f1',
+  width: 4,
+  borderRadius: 20,
+  roundedCorners: 'all',
+}
+```
+
+**Gradient stroke**
+
+```typescript
+stroke: {
+  width: 6,
+  gradient: {
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: 800,
+    endY: 0,
+    colors: [
+      { stop: 0, color: '#22d3ee' },
+      { stop: 1, color: '#a78bfa' },
+    ],
+  },
+  borderRadius: 16,
+}
+```
+
+**Dashed border**
+
+```typescript
+stroke: {
+  color: '#64748b',
+  width: 3,
+  style: 'dashed',
+  borderRadius: 12,
+}
+```
+
+**Outer ring (expand outline)**
+
+```typescript
+stroke: {
+  color: '#f97316',
+  width: 8,
+  position: 4,
+  borderRadius: 24,
+}
+```
+
+**Groove / ridge / double**
+
+These styles trigger **`applyComplexStrokeStyle`** — heavier passes than plain **`ctx.stroke()`**.
+
+```typescript
+stroke: {
+  color: '#cbd5e1',
+  width: 6,
+  style: 'groove',
+  borderRadius: 8,
+}
+```
+
+---
+
+## See also
+
+- [Shadow options](/docs#07-canvas-shadow-options)
+- **`gradient`** discriminated union — **`types/index.ts`** (**`linear`** **`repeat`**, **`radial`**, **`conic`** fields).

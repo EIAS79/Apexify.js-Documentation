@@ -1,0 +1,40 @@
+# Lines & connectors — overview {#00-custom-lines-overview}
+
+Apexify exposes **two** complementary APIs:
+
+| API | Entry | Best for |
+|-----|-------|----------|
+| **`createCustom`** | **`await painter.createCustom(options, buffer)`** | Styled segments & connectors: gradients, dashes, arrows, smooth paths, textures (`CustomOptions`). |
+| **Path2D pipeline** | **`painter.createPath2D(commands)`**, **`drawPath`**, hit helpers | Explicit geometry from **`PathCommand[]`** (primitives, rounded rects, stars), stroke/fill/transform per **`drawPath`**. |
+
+Back: [Feature guides hub](/docs#feature-guides-hub)
+
+---
+
+## Code map
+
+| Piece | File |
+|-------|------|
+| **`createCustom`** orchestration | **`lib/Canvas/ApexPainter.ts`** |
+| Segment loop / styling | **`lib/Canvas/utils/Custom/customLines.ts`** |
+| Arrows, splines, dash presets, textures | **`lib/Canvas/utils/Custom/advancedLines.ts`** |
+| **`CustomOptions`** type | **`lib/Canvas/utils/types/index.ts`** |
+| **`PathCommand`**, **`buildPath2DFromCommands`** | **`lib/Canvas/utils/core/pathCmd.ts`** |
+| **`drawPath`** | **`lib/Canvas/extended/Path2DCreator.ts`** |
+| Hit testing | **`lib/Canvas/extended/HitDetectionCreator.ts`** |
+
+---
+
+## Topics (read in order)
+
+| # | Page | Covers |
+|---|------|--------|
+| 1 | [`createCustom` API](/docs#01-create-custom-api) | **`startCoordinates` / `endCoordinates`**, batch rules, **`singleLine`** chains |
+| 2 | [Line style & paths](/docs#02-custom-line-style-path) | **`lineStyle`** fields, **`path`** (**smooth**, **catmull-rom**, **bezier** caveats), **`lineRadius`** |
+| 3 | [Arrows, markers & textures](/docs#03-custom-lines-arrows-markers-textures) | **`arrow`**, **`markers`**, **`pattern`**, **`texture`**, inner **`stroke`** |
+| 4 | [Path2D · `drawPath`](/docs#04-path2d-draw-path) | **`PathCommand`** catalogue, **`Path2DDrawOptions`** |
+| 5 | [Hit testing](/docs#05-hit-testing-paths) | **`isPointInPath`**, **`HitRegion`**, **`getDistanceToRegion`** (**[Raster track](/docs#00-advanced-raster-overview)**) |
+
+---
+
+Start **[createCustom](/docs#01-create-custom-api)**.

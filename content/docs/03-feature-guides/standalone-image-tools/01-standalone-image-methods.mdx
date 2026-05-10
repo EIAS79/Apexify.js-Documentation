@@ -1,0 +1,93 @@
+# Standalone image APIs — reference {#01-standalone-image-methods}
+
+Back: [Standalone overview](/docs#00-standalone-image-tools-overview)
+
+Implementation files (**general**): **`generalFunctions.ts`**, **`imageCompression.ts`**, **`imageStitching.ts`**, **`conversion.ts`**, **`batchOperations.ts`** — wired through **`canvasUtils`** and **`ApexPainter`**.
+
+Sources are typically **`string`** paths (resolved vs **`process.cwd()`** where helpers use filesystem), **HTTP URLs**, or **`Buffer`** as documented per method.
+
+---
+
+## Resize & format
+
+| Method | Summary |
+|--------|---------|
+| **`resize(resizeOptions)`** | **`ResizeOptions`** — **`imagePath`**, **`size`**, **`maintainAspectRatio`**, **`quality`**, **`outputFormat`** · delegates **`resizingImg`** (**Sharp**) |
+| **`imgConverter(source, newExtension)`** | Converts image file/URL to another format (**`jpeg`**, **`png`**, **`webp`**, **`tiff`**, **`gif`**, **`avif`**, **`heif`**, **`raw`**, **`pdf`**, **`svg`**) · **`converter`** |
+
+---
+
+## Convolution-style filters (standalone)
+
+| Method | Summary |
+|--------|---------|
+| **`effects(source, filters)`** | **`ImageFilter[]`** pipeline (**Sharp** / kernels — same family as **`createImage`** filters). At least one filter required |
+
+See **`ImageFilter`** in **`lib/Canvas/utils/types/index.ts`** for **`type`** / **`intensity`** / **`value`** fields.
+
+---
+
+## Colour overlay & analysis
+
+| Method | Summary |
+|--------|---------|
+| **`colorsFilter(source, filterColor, opacity?)`** | Tint / overlay — **`filterColor`** **`string`** or **`GradientConfig`** · **`opacity`** **`0…1`** · **`applyColorFilters`** |
+| **`colorAnalysis(source)`** | Dominant colours · returns **`{ color, frequency }[]`** · **`detectColors`** |
+| **`colorsRemover(source, colorToRemove)`** | **`{ red, green, blue }`** each **`0…255`** · makes matching pixels transparent · **`removeColor`** · may return **`undefined`** on failure |
+
+---
+
+## Background removal (API)
+
+| Method | Summary |
+|--------|---------|
+| **`removeBackground(imageURL, apiKey)`** | Remote **remove.bg**-style workflow · **`imageURL`** + **`apiKey`** required · **`bgRemoval`** · **`Buffer`** \| **`undefined`** |
+
+---
+
+## Composite blending
+
+| Method | Summary |
+|--------|---------|
+| **`blend(layers, baseImageBuffer, defaultBlendMode?)`** | Draw **`baseImageBuffer`**, then each **`layers[]`** entry: **`image`**, **`blendMode`** (**`GlobalCompositeOperation`**), optional **`position`**, **`opacity`** **`0…1`**. Returns PNG **`Buffer`**.
+
+---
+
+## Polygon crop
+
+| Method | Summary |
+|--------|---------|
+| **`cropImage(options)`** | **`cropOptions`** — **`imageSource`** (**`string`**), **`coordinates`** (**≥ 3** **`cropCoordinate`** segments **`from`/`to`**, optional **`tension`**), **`crop`**: **`inner`** \| **`outer`**, **`radius`** **`number`** \| **`"circular"`**. **`inner`** → **`cropInner`**, **`outer`** → **`cropOuter`** |
+
+---
+
+## Mask & gradient blend
+
+| Method | Summary |
+|--------|---------|
+| **`masking(source, maskSource, options?)`** | Applies **`maskSource`** alpha / luminance / chroma key into **`source`** alpha. **`MaskOptions`**: **`type`** **`alpha`** \| **`grayscale`** \| **`color`** (**`colorKey`** **`#RRGGBB`** required for **`color`**), **`threshold`**, **`invert`** |
+| **`gradientBlend(source, options)`** | Overlays **`linear`** \| **`radial`** \| **`conic`** gradient using **`BlendOptions`**: **`colors`** stops **`0…1`**, **`blendMode`** (multiply / overlay / …), optional **`maskSource`** |
+
+---
+
+## Quick examples
+
+```typescript
+// Resize from path
+const resized = await painter.resize({
+  imagePath: './in.png',
+  size: { width: 400, height: 400 },
+  maintainAspectRatio: true,
+  quality: 92,
+});
+
+// Dominant colours
+const stats = await painter.colorAnalysis('https://example.com/poster.jpg');
+
+// Remove specific RGB (0–255)
+const cutOut = await painter.colorsRemover('./sprite.png', { red: 255, green: 0, blue: 255 });
+```
+
+---
+
+Back to **[overview](/docs#00-standalone-image-tools-overview)** · **[Disk save](/docs#01-save-disk-and-multiple)**.

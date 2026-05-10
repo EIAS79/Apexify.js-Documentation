@@ -1,0 +1,45 @@
+# Beginner guide {#00-beginner-guide}
+
+Short lessons in **order**. Finish each page before the next.
+
+Files in this folder use **`00–`** prefixes so they appear in **reading order** in the sidebar.
+
+**Deep links:** each page’s stable anchor matches its **filename without `.mdx`** (for example **`01-install-and-setup.mdx`** → **`/docs#01-install-and-setup`**). The hub is **`{#00-beginner-guide}`**.
+
+---
+
+## Lessons
+
+| # | Page | Topic |
+|---|------|--------|
+| 1 | [Install & setup](/docs#01-install-and-setup) | Node, package, editor |
+| 2 | [Your first image](/docs#02-your-first-image) | **`createCanvas`** + save PNG |
+| 3 | [How buffers work](/docs#03-how-buffers-work) | **`CanvasResults`**, chaining draws |
+| 4 | [Save & export](/docs#04-save-and-export) | Writing files, typical workflow |
+| 5 | [Common mistakes](/docs#05-common-mistakes) | **`await`**, paths, wrong buffer |
+
+---
+
+## After this track
+
+Open **[Canvas & backgrounds — overview](/docs#00-create-canvas-overview)** under **`03-feature-guides/canvas/`** for every background option (solid, gradient, image, video, layers, patterns).
+
+Open **[Images & shapes (`createImage`)](/docs#00-create-image-overview)** under **`03-feature-guides/images-shapes/`** for bitmap layers, shapes, masks, filters, distortion, and grouped transforms.
+
+Open **[Text rendering (`createText`)](/docs#00-create-text-overview)** under **`03-feature-guides/text-rendering/`** for fonts, wrapping, gradients, glow/shadow/stroke, arc text, and **`measureText`**.
+
+Open **[GIF & animation (`createGIF`)](/docs#00-create-gif-overview)** under **`03-feature-guides/gif-animation/`** for frames, transparency, **`onStart`** / **`onEnd`**, and output formats.
+
+For connectors and vector paths, see **[Lines & connectors](/docs#00-custom-lines-overview)** (**`createCustom`**, **`drawPath`**, hit testing).
+
+For **ideas** mapped to APIs (social banners, Discord cards, chart PNGs, GIFs, video thumbnails, …), see **[What you can build](/docs#01-what-you-can-build)** and the **[Recipes hub](/docs#00-recipes-overview)**.
+
+Then use **`03-feature-guides`** for charts, video, pixels, and every deep topic.
+
+---
+
+## One rule to remember
+
+**Always pass the latest `buffer`** into the next draw call (`createText`, `createImage`, …). Each step returns a **new** PNG buffer.
+
+Start lesson 1: **[Install & setup](/docs#01-install-and-setup)**.

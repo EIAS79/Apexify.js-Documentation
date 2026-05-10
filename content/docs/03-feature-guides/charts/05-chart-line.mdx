@@ -1,0 +1,285 @@
+# Line chart {#05-chart-line}
+
+Back: [Charts overview](/docs#00-charts-overview)
+
+```typescript
+await painter.createChart('line', series, options);
+```
+
+---
+
+## `LineDataPoint`
+
+**`x`**, **`y`** (required), **`label`**, **`markerColor`**, **`showMarker`**, **`errorBar`** (**`positive`**, **`negative`**, **`color`**, **`width`**, **`capSize`**, **`show`**).
+
+---
+
+## `LineSeries`
+
+| Field | Purpose |
+|-------|---------|
+| **`label`**, **`data`** | Series identity + points. |
+| **`color`**, **`gradient`** | Stroke (**`gradient`** via **`createGradientFill`** along bbox). |
+| **`lineWidth`**, **`lineStyle`** | **`LineStyle`**: **`solid`**, **`dashed`**, **`dotted`**, **`dashdot`**, **`longdash`**, **`shortdash`**, **`dashdotdot`**, **`step`**, **`stepline`**. |
+| **`smoothness`** | **`none` \| `bezier` \| `spline`**. |
+| **`smoothnessTension`** | **0…1** (Chart.js-style); feeds Bézier spacing (**default ~0.35** when omitted internally). |
+| **`showLine`** | Toggle polyline. |
+| **`marker`** | **`type`**: **`circle` \| `square` \| `triangle` \| `diamond` \| `cross` \| `none`** — **`size`**, **`color`**, **`show`**, **`filled`**. |
+| **`area`** | **`AreaConfig`** — fill under/over/between — see below. |
+| **`correlation`** | Regression overlay (**`linear`**, **`polynomial`**, **`exponential`**, **`logarithmic`**, **`none`**) — **`degree`** for polynomial. |
+| **`errorBar`** | Series-level defaults for caps (**point **`errorBar`** overrides). |
+| **`opacity`** | **0…1** for line + markers + area + correlation (**overrides **`options.lines.opacity`**). |
+
+---
+
+## `AreaConfig`
+
+| **`type`** | Meaning |
+|------------|---------|
+| **`none`** | No fill |
+| **`below`** | To baseline |
+| **`above`** | Above baseline |
+| **`between`** | Between series and **`secondLine`** (**another **`LineSeries`**) |
+| **`around`** | Band-style (uses **`upperBound`**/**`lowerBound`** arrays when wired) |
+
+Also **`color`**, **`opacity`**, **`show`**, **`toValue`**, **`showAreaSize`**, **`areaSizeColor`**.
+
+---
+
+## `AxisConfig` (rich — X / Y)
+
+Beyond **[bar Axis](/docs#03-chart-bar-vertical)** subset:
+
+| Field | Notes |
+|-------|------|
+| **`showTickMarks`**, **`showTickLabels`** | Toggle numeric/grid labeling on X. |
+| **`scale`** | **`linear`** (default) or **`log`**. |
+| **`dateFormat`**, **`dateTime`** | Timestamp **`fillText`** formatting (**`YYYY/MM/DD`**, **`HH:mm:ss`**, …). |
+| **`baseline`** | Y baseline intercept where applicable. |
+| **`arrowExtensionPastMaxTickPx`**, **`arrowTipOffsetY`** | Declared; **Y-axis arrow currently disabled** in renderer — ignore until wired. |
+
+---
+
+## `LineChartOptions`
+
+**`dimensions`**, **`appearance`**, **`axes.{x,y}`**, **`labels.title`**, **`labels.pointLabelDefaults`** (**`position`**: **`top`…`), **`legend`** (**`fit`**, **`minWidth`**, **`width`**), **`grid`**, **`lines.opacity`** (series default).
+
+---
+
+## Example — multi-series + markers
+
+```typescript
+await painter.createChart(
+  'line',
+  [
+    {
+      label: 'Alpha',
+      data: [
+        { x: 0, y: 12 },
+        { x: 1, y: 18 },
+        { x: 2, y: 15 },
+        { x: 3, y: 22 },
+      ],
+      color: '#6366f1',
+      lineWidth: 3,
+      marker: { type: 'circle', size: 10, show: true },
+    },
+    {
+      label: 'Beta',
+      data: [
+        { x: 0, y: 8 },
+        { x: 1, y: 10 },
+        { x: 2, y: 16 },
+        { x: 3, y: 14 },
+      ],
+      color: '#f472b6',
+      smoothness: 'bezier',
+      smoothnessTension: 0.4,
+    },
+  ],
+  {
+    dimensions: { width: 800, height: 480 },
+    axes: {
+      x: { label: 'Week', range: { min: 0, max: 3, step: 1 } },
+      y: { label: 'Units', range: { min: 0, max: 25, step: 5 } },
+    },
+    grid: { show: true, color: '#f1f5f9' },
+  }
+);
+```
+
+---
+
+## Example — area below + correlation
+
+```typescript
+await painter.createChart(
+  'line',
+  [
+    {
+      label: 'Signal',
+      data: [
+        { x: 0, y: 2 },
+        { x: 1, y: 5 },
+        { x: 2, y: 4 },
+        { x: 3, y: 9 },
+      ],
+      color: '#0ea5e9',
+      area: { type: 'below', color: '#38bdf8', opacity: 0.25, show: true },
+      correlation: { type: 'linear', show: true, color: '#991b1b', lineWidth: 2, lineStyle: 'dashed' },
+    },
+  ],
+  {
+    axes: {
+      x: { range: { min: 0, max: 3 } },
+      y: { range: { min: 0, max: 10 } },
+    },
+  }
+);
+```
+
+---
+
+## Example — per-point error bars
+
+Point-level **`errorBar`** overrides series defaults; caps respect **`positive`** / **`negative`** magnitudes.
+
+```typescript
+await painter.createChart(
+  'line',
+  [
+    {
+      label: 'Measurements',
+      color: '#059669',
+      errorBar: { show: true, color: '#064e3b', width: 1, capSize: 6 },
+      data: [
+        { x: 0, y: 10, errorBar: { positive: 2, negative: 1.5, show: true } },
+        { x: 1, y: 14, errorBar: { positive: 1, negative: 3, show: true } },
+        { x: 2, y: 12 },
+      ],
+      marker: { type: 'square', size: 9, show: true },
+    },
+  ],
+  {
+    axes: {
+      x: { range: { min: 0, max: 2 } },
+      y: { range: { min: 0, max: 20 } },
+    },
+    grid: { show: true },
+  }
+);
+```
+
+---
+
+## Example — log Y axis
+
+Both axes support **`scale: 'log'`** when domain stays **positive** where log mapping applies.
+
+```typescript
+await painter.createChart(
+  'line',
+  [
+    {
+      label: 'Growth',
+      data: [
+        { x: 1, y: 10 },
+        { x: 2, y: 100 },
+        { x: 3, y: 1000 },
+      ],
+      color: '#7c3aed',
+    },
+  ],
+  {
+    axes: {
+      x: { label: 'Stage', range: { min: 1, max: 3 } },
+      y: { label: 'Count (log)', scale: 'log', range: { min: 1, max: 2000 } },
+    },
+  }
+);
+```
+
+---
+
+## Example — datetime X (`dateTime` + `dateFormat`)
+
+Use **`axes.x.dateTime: true`** with **`dateFormat`** for tick **`fillText`** (see **`AxisConfig`** in **`linechart.ts`**).
+
+```typescript
+const day = 24 * 60 * 60 * 1000;
+const t0 = Date.UTC(2026, 0, 1);
+
+await painter.createChart(
+  'line',
+  [
+    {
+      label: 'Visitors',
+      data: [
+        { x: t0, y: 400 },
+        { x: t0 + day, y: 620 },
+        { x: t0 + 2 * day, y: 580 },
+      ],
+      color: '#2563eb',
+    },
+  ],
+  {
+    axes: {
+      x: {
+        label: 'Day',
+        dateTime: true,
+        dateFormat: 'MM/DD',
+        range: { min: t0, max: t0 + 2 * day },
+      },
+      y: { range: { min: 0, max: 800, step: 200 } },
+    },
+  }
+);
+```
+
+---
+
+## Example — **`area.type: 'between'`** (two series)
+
+**`between`** fills between the host series and **`area.secondLine`** — aligned **`x`** on both **`LineSeries`** **`data`** arrays.
+
+```typescript
+await painter.createChart(
+  'line',
+  [
+    {
+      label: 'Upper band',
+      color: '#94a3b8',
+      showLine: true,
+      data: [
+        { x: 0, y: 8 },
+        { x: 1, y: 10 },
+        { x: 2, y: 9 },
+      ],
+      area: {
+        type: 'between',
+        show: true,
+        color: 'rgba(148,163,184,0.35)',
+        secondLine: {
+          label: '_lower',
+          color: '#64748b',
+          data: [
+            { x: 0, y: 4 },
+            { x: 1, y: 5 },
+            { x: 2, y: 5 },
+          ],
+        },
+      },
+    },
+  ],
+  {
+    axes: {
+      x: { range: { min: 0, max: 2 } },
+      y: { range: { min: 0, max: 12 } },
+    },
+  }
+);
+```
+
+---
+
+Next: **[Scatter](/docs#06-chart-scatter)**.

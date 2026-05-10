@@ -1,0 +1,39 @@
+# Encode pipeline (reference) {#07-create-gif-encode-pipeline}
+
+Back: [GIF overview](/docs#00-create-gif-overview)
+
+Order inside **`GIFCreator.createGIF`** for **each** canonical frame — mirrors **`lib/Canvas/extended/GIFCreator.ts`**.
+
+---
+
+## Per-frame steps
+
+| Step | What happens |
+|------|----------------|
+| 1 | **`drawFrameOntoEncoderCanvas`** — **`clearRect`**, then **`drawImage`** (direct if dimensions match & **`skipResizeWhenDimensionsMatch`**, else resize-to-cover-style stretch to **`width`×`height`**). |
+| 2 | **`drawWatermarkOverlay`** — per-frame or global PNG/WebP overlay. |
+| 3 | **`textOverlay`** — plain **`fillText`** (**Arial** + **`fontSize`** only). |
+| 4 | **`applyGifEncoderFrameOptions`** — **`setDispose`**, **`setTransparent`** from frame + options merge. |
+| 5 | **`encoder.setDelay(frame.duration)`** |
+| 6 | **`encoder.addFrame(ctx)`** |
+
+After the **last** iteration, **`finalFrameBuffer = canvas.toBuffer('image/png')`** for **`onEnd`**.
+
+---
+
+## Stream lifecycle
+
+- Encoder **`createReadStream()`** pipes to buffer accumulator (**non-file**) or **`fs.WriteStream`** (**file**).
+- **`encoder.finish()`** after loop.
+- **`buffer`/`base64`** modes **`end()`** the PassThrough and await **`end`** before reading **`getBuffer()`**.
+
+---
+
+## Dependencies
+
+- **`gifencoder`** for **`GIFEncoder`**
+- **`axios`** for HTTP **`background`** / watermark URLs (dynamic **`require`** in **`GIFCreator`**)
+
+---
+
+Back to **[overview](/docs#00-create-gif-overview)**.

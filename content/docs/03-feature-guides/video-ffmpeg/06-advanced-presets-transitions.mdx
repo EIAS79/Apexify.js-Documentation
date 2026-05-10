@@ -1,0 +1,140 @@
+# Presets, transitions, stabilize & batch caveats {#06-advanced-presets-transitions}
+
+Back: [Video overview](/docs#00-video-overview)
+
+**See also:** [Transcode & export presets](/docs#03-transcode-export) (**`exportPreset`**, **`convert`**, **`compress`**) · [Transitions & stabilize](/docs#10-advanced-ops) · [Progress callback](/docs#11-on-progress).
+
+---
+
+## `exportPreset`
+
+Calls **`convertVideo`** with fixed **resolution / fps / bitrate / format** presets.
+
+| **`preset`** | Resolution | FPS | Bitrate (kbps) | Format |
+|--------------|------------|-----|----------------|--------|
+| **`youtube`** | 1920×1080 | 30 | 8000 | mp4 |
+| **`instagram`** | 1080×1080 | 30 | 3500 | mp4 |
+| **`tiktok`** | 1080×1920 | 30 | 4000 | mp4 |
+| **`twitter`** | 1280×720 | 30 | 5000 | mp4 |
+| **`facebook`** | 1280×720 | 30 | 4000 | mp4 |
+| **`4k`** | 3840×2160 | 30 | 50000 | mp4 |
+| **`1080p`** | 1920×1080 | 30 | 8000 | mp4 |
+| **`720p`** | 1280×720 | 30 | 5000 | mp4 |
+| **`mobile`** | 720×1280 | 30 | 2500 | mp4 |
+| **`web`** | 1280×720 | 30 | 3000 | webm |
+
+Names matched **case-insensitively**.
+
+```typescript
+await painter.createVideo({
+  source: './master.mp4',
+  exportPreset: {
+    preset: 'tiktok',
+    outputPath: './out/vertical.mp4',
+  },
+  onProgress: (p) => console.log(`${p.percent}%`),
+});
+```
+
+---
+
+## `stabilize`
+
+Two-pass **`vidstab`** when available:
+
+1. **`vidstabdetect`** → transforms **`.trf`**
+2. **`vidstabtransform=smoothing=N`** (**default **`smoothing` 10**)
+
+Fallback: **`hqdn3d`** spatial/temporal denoise if analyse/transform throws.
+
+```typescript
+await painter.createVideo({
+  source: './handheld.mp4',
+  stabilize: {
+    outputPath: './stable.mp4',
+    smoothing: 15,
+  },
+});
+```
+
+---
+
+## `addTransition`
+
+### Fade-in / fade-out **single** clip
+
+**`type: 'fade'`** **without** **`secondVideo`**:
+
+| **`direction`** | Filter |
+|-----------------|--------|
+| **`out`** (**default behaviour if you choose fade-out semantics**) | **`fade=t=out:st=0:d=duration`** |
+| **`in`** / other | **`fade=t=in:st=0:d=duration`** |
+
+```typescript
+await painter.createVideo({
+  source: './clip.mp4',
+  addTransition: {
+    type: 'fade',
+    duration: 1.5,
+    direction: 'in',
+    outputPath: './clip-fadein.mp4',
+  },
+});
+```
+
+### Between two clips (**`xfade`**)
+
+Requires **`secondVideo`**. Videos scaled to **max(width)×max(height)** then **`xfade`** at **`offset = duration(video1) - duration`** (**transition straddles cut point**).
+
+**`type`** → **`xfade`** transition name mapping (defaults **`fade`**):
+
+| Requested | Mapped |
+|-----------|--------|
+| **`fade`**, **`dissolve`**, **`blur`** | **`fade`** |
+| **`wipe`** + **`direction`** | **`wipeleft`** / **`wiperight`** / **`wipeup`** / **`wipedown`** |
+| **`slide`** + **`direction`** | **`slideleft`**, … |
+| **`zoom`** + **`in`/`out`** | **`zoomin`** / **`zoomout`** |
+| **`circle`** | **`circleopen`** |
+| **`pixelize`** | **`pixelize`** |
+
+```typescript
+await painter.createVideo({
+  source: './a.mp4',
+  addTransition: {
+    type: 'fade',
+    duration: 0.8,
+    secondVideo: './b.mp4',
+    outputPath: './ab-crossfade.mp4',
+  },
+  onProgress: (p) => console.log(p.speed),
+});
+```
+
+---
+
+## `batch` — recap
+
+Prefer explicit **`for`** loops calling **`createVideo`** until **`batchProcessVideos`** assigns outputs automatically.
+
+---
+
+## Related ApexPainter helpers (outside **`createVideo`**)
+
+These exist on **`ApexPainter`** for lower-level control:
+
+- **`extractFrames(videoSource, options)`** — **always** interval mode (**ms**).
+- **`extractAllFrames`** — same engine as **`createVideo.extractAllFrames`**.
+- **`extractFrameAtTime`**, **`extractMultipleFrames`** — convenience wrappers.
+- **`#createVideoFromFrames`** / **`#createVideoLoop`** — internal; **`createVideo`** already exposes **`createFromFrames`** / **`createLoop`**.
+
+---
+
+## Operational checklist
+
+1. **Install FFmpeg** on **`PATH`** (**`ffmpeg`**, **`ffprobe`**).
+2. **One primary operation key** per **`createVideo`** call — see [router table](/docs#00-video-overview).
+3. **`source`** required by TypeScript even when unused (**merge**, **splitScreen**, **createFromFrames**, **batch**).
+4. **Windows vs POSIX** — **`detectScenes`** shell pipeline may need **Git Bash / WSL** for **`grep|awk|sed`** reliability.
+5. **Heavy ops** — **`reverse`**, **`extractAllFrames`**, **`stabilize`** — plan timeouts & disk space (**`.temp-frames`** grows).
+
+Back to **[Video overview](/docs#00-video-overview)**.

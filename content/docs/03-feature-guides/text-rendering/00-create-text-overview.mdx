@@ -1,0 +1,50 @@
+# Text rendering (`createText`) — overview {#00-create-text-overview}
+
+**`await painter.createText(textPropsOrArray, canvasBuffer)`** draws styled Unicode strings onto an existing PNG **`canvasBuffer`** (from **`createCanvas`**, **`createImage`**, etc.). Each draw returns a **new** **`Buffer`**.
+
+Back: [Feature guides hub](/docs#feature-guides-hub)
+
+---
+
+## What you pass
+
+| Argument | Role |
+|----------|------|
+| **`textProps`** | One **`TextProperties`** **or** **array** (processed **top → bottom**). |
+| **`canvasBuffer`** | **`Buffer`** or **`CanvasResults`** with **`buffer`**. |
+
+**Required on each object:** **`text`**, **`x`**, **`y`**.
+
+---
+
+## Renderer stack
+
+**`TextCreator`** (`lib/Canvas/extended/TextCreator.ts`) is thin: it loads the bitmap into a fresh canvas and calls **`EnhancedTextRenderer.renderText`** (`lib/Canvas/utils/Texts/enhancedTextRenderer.ts`) for every entry.
+
+Legacy **`drawText`** / **`WrappedText`** in **`lib/Canvas/utils/Texts/textProperties.ts`** power **`TextObject`** helpers elsewhere — **`createText` does not call them**.
+
+---
+
+## Topics (read in order)
+
+| # | Page | Covers |
+|---|------|--------|
+| 1 | [Font & placement](/docs#01-create-text-font-and-position) | **`font`**, legacy **`fontSize`** … **`fontPath`**, **`bold`**, **`italic`**, **`rotation`**, **`opacity`**, **`textAlign`**, **`textBaseline`** |
+| 2 | [Wrapping & spacing](/docs#02-create-text-wrapping-spacing) | **`maxWidth`**, **`maxHeight`**, **`lineHeight`**, **`letterSpacing`**, **`wordSpacing`**, explicit **`\\n`** |
+| 3 | [Colour & gradients](/docs#03-create-text-color-gradients) | **`color`**, **`gradient`** (**linear** / **radial** / **conic**, **`repeat`**) |
+| 4 | [Glow, shadow & stroke](/docs#04-create-text-glow-shadow-stroke) | **`glow`**, **`shadow`** (+ gradient tint), **`stroke`** (**solid** … **double**) |
+| 5 | [Decorations & highlight](/docs#05-create-text-decorations-highlight) | **`underline`**, **`overline`**, **`strikethrough`**, **`highlight`** |
+| 6 | [Text on a circular arc](/docs#06-create-text-curved) | **`textOnCurve`** — **`sweepAngle`**, **`radius`**, **`up`** |
+| 7 | [`measureText`](/docs#07-measure-text) | **`TextMetrics`**, **`includeCharMetrics`**, **`measurementCanvas`** |
+| 8 | [Paint order & extras](/docs#08-create-text-paint-order) | Per-line composite order; **`textPathRenderer`** (not wired to **`createText`**) |
+| 9 | [`TextProperties` field matrix](/docs#09-create-text-properties-matrix) | Every **`TextProperties`** key in one reference (parity with **`lib/Canvas/utils/types/index.ts`**) + condensed examples |
+
+---
+
+## Measurement API
+
+**`await painter.measureText(textProps)`** mirrors font/spacing setup and wrapping geometry — details on **[measureText](/docs#07-measure-text)**.
+
+---
+
+Start **[Font & placement](/docs#01-create-text-font-and-position)**. Quick lookup: **[`TextProperties` matrix](/docs#09-create-text-properties-matrix)**.

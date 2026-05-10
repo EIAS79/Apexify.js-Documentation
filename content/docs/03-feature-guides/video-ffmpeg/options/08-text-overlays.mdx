@@ -1,0 +1,81 @@
+# Text overlays (`drawtext`) {#08-text-overlays}
+
+Back: [Options hub](/docs#00-video-options-hub)
+
+Uses FFmpeg **`drawtext`**. **Requires** a font FFmpeg can find on your OS/build.
+
+---
+
+## `addText`
+
+**What it does:** Burns in **static** caption text with optional **boxed** background.
+
+### Options
+
+| Field | Default | Effect |
+|-------|---------|--------|
+| **`text`** | ✓ | Shown string — **`:`** and **`'`** escaped for filter syntax. |
+| **`position`** | **`bottom-center`** | **`top-left`**, **`top-center`**, **`top-right`**, **`center`**, **`bottom-left`**, **`bottom-center`**, **`bottom-right`**. |
+| **`fontSize`** | **24** | Pixel size. |
+| **`fontColor`** | **`white`** | FFmpeg colour string. |
+| **`backgroundColor`** | **`black@0.5`** | **`drawtext` box** fill with alpha. |
+| **`startTime`**, **`endTime`** | omit = always | **`enable='between(t,start,end)'`** — hide outside window. |
+| **`outputPath`** | ✓ | |
+
+```typescript
+await painter.createVideo({
+  source: './demo.mp4',
+  addText: {
+    text: 'Confidential — internal only',
+    position: 'top-center',
+    fontSize: 22,
+    fontColor: 'yellow',
+    backgroundColor: 'black@0.6',
+    startTime: 0,
+    endTime: 8,
+    outputPath: './demo-labelled.mp4',
+  },
+});
+```
+
+---
+
+## `addAnimatedText`
+
+**What it does:** Same **`drawtext`** baseline, but **`enable=between(start,end)`** always; optional **expression** fragments for motion/fade.
+
+### **`animation`** — types vs implementation
+
+The TypeScript union lists **`fadeIn`**, **`slideIn`**, etc. **`addAnimatedTextToVideo`** only adds extra filter math when **`animation`** is exactly **`fade`** or **`slide`**. Other values still show text **statically** in the time window.
+
+**Use today:** **`fade`** or **`slide`** for motion; omit/`none` for plain timed text.
+
+### Position
+
+Either a **named** anchor (same names as **`addText`**) **or** **`{ x, y }`** pixel coords.
+
+### Font fields
+
+**`fontPath`**, **`fontName`**, **`fontFamily`** — **not wired** into **`drawtext`** in current helper (reserved).
+
+```typescript
+await painter.createVideo({
+  source: './promo.mp4',
+  addAnimatedText: {
+    text: 'Summer Sale',
+    animation: 'fade',
+    startTime: 1,
+    endTime: 6,
+    position: 'center',
+    fontSize: 48,
+    fontColor: 'white',
+    backgroundColor: 'red@0.45',
+    outputPath: './promo-titled.mp4',
+  },
+  onProgress: (p) => console.log(p.percent),
+});
+```
+
+---
+
+Next: **[Compositing](/docs#09-compositing)**.
