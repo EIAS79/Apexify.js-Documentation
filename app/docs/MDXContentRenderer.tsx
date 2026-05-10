@@ -115,6 +115,14 @@ function createMarkdownAwareComponents(getNextHeadingId: () => string | undefine
             backgroundColor: 'var(--bg-sunken)',
             color: 'var(--accent-magenta)',
             border: '1px solid var(--border-subtle)',
+            /**
+             * Allow long inline code (file paths, hash routes, identifiers
+             * with slashes / dots) to break across lines instead of forcing
+             * the whole paragraph to overflow horizontally and slide under
+             * the docs sidebars.
+             */
+            overflowWrap: 'anywhere',
+            wordBreak: 'break-word',
           }}
           {...props}
         >

@@ -79,7 +79,20 @@ export default function CodeStudio() {
 
   /* ---------- bootstrap (storage + share-link + incoming) ---------- */
 
+  /**
+   * Strict-mode guard. `bootstrapStudio` has destructive side effects —
+   * it consumes (and removes) the incoming gallery snippet from
+   * localStorage and rewrites the URL hash for share-link payloads.
+   * In dev React fires this effect twice; without the ref the second
+   * run sees an empty localStorage and reverts the buffer back to
+   * the default starter, losing the gallery handoff.
+   */
+  const bootstrappedRef = useRef(false);
+
   useEffect(() => {
+    if (bootstrappedRef.current) return;
+    bootstrappedRef.current = true;
+
     const boot = bootstrapStudio();
     setBuffers(boot.buffers);
     setActiveBufferId(boot.activeBufferId);

@@ -263,11 +263,18 @@ export default function GalleryModal({
   const openInStudio = () => {
     if (!hasCode) return;
     try {
-      /** Studio picks this up on mount, opens it as a new tab, and clears the slot. */
+      /**
+       * Send the user's edits for the language they're actively viewing,
+       * and keep the original for the other language. If they never typed,
+       * `editedCode` still equals the original `codeText` so this is a no-op.
+       * Studio picks this payload up on mount, opens it as a new tab, and
+       * clears the slot.
+       */
+      const liveCode = editedCode || codeText;
       const payload = {
         name: item.title || 'Gallery snippet',
-        ts: item.code?.ts ?? '',
-        js: item.code?.js ?? '',
+        ts: codeLang === 'ts' ? liveCode : item.code?.ts ?? '',
+        js: codeLang === 'js' ? liveCode : item.code?.js ?? '',
         lang: codeLang,
       };
       localStorage.setItem(STUDIO_INCOMING_SNIPPET_KEY, JSON.stringify(payload));
