@@ -12,6 +12,7 @@ import {
   ClipboardIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
+import { BrandBanner } from '@/components/Brand';
 
 type Showcase = {
   src: string;
@@ -127,6 +128,16 @@ export default function HeroShowcase() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
+          {/* Brand banner — homepage-only, theme-aware lockup of icon + wordmark */}
+          <motion.div
+            className="mb-6 sm:mb-7"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <BrandBanner maxWidth={460} className="w-full max-w-[420px] sm:max-w-[460px]" />
+          </motion.div>
+
           {/* Eyebrow */}
           <motion.div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[12px] font-semibold mb-7"
@@ -137,7 +148,7 @@ export default function HeroShowcase() {
             }}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05, duration: 0.6 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
           >
             <SparklesIcon className="h-3.5 w-3.5" />
             <span className="tracking-wide">v5.3.20 · charts · GIFs · video · 22+ filters</span>
@@ -151,7 +162,11 @@ export default function HeroShowcase() {
             Draw{' '}
             <span className="text-grad-aurora animate-gradient inline-block">anything</span>.
             <br />
-            From a <span className="italic text-grad-ember">script</span>.
+            From a{' '}
+            <span className="italic text-grad-ember inline-block leading-[1.05] pb-[0.08em] align-baseline">
+              script
+            </span>
+            .
           </h1>
 
           {/* Subtitle */}
@@ -171,7 +186,7 @@ export default function HeroShowcase() {
               Open the Studio
               <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link href="/docs#start-here" className="btn btn-secondary !py-3.5 !px-6 !text-base">
+            <Link href="/docs#00-start-here" className="btn btn-secondary !py-3.5 !px-6 !text-base">
               <BookOpenIcon className="h-5 w-5" />
               Read the docs
             </Link>

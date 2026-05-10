@@ -13,7 +13,11 @@ import { DocBreadcrumbs } from '@/components/docs/DocBreadcrumbs';
 import { DocPager } from '@/components/docs/DocPager';
 import { MDXContentRenderer } from './MDXContentRenderer';
 import { useSidebar } from '@/contexts/SidebarContext';
-import { resolveDocFilename } from '@/lib/doc-filename-aliases';
+import {
+  DEFAULT_DOC_FILENAME,
+  DOC_FILENAME_ALIASES,
+  resolveDocFilename,
+} from '@/lib/doc-filename-aliases';
 import { extractHeadingsFromMdxRaw } from '@/lib/docs-heading-utils';
 import {
   DocFile,
@@ -29,7 +33,7 @@ export default function DocsHome() {
   const [hashWarning, setHashWarning] = useState<string | null>(null);
   const [folders, setFolders] = useState<DocFolder[]>([]);
   const [rootFiles, setRootFiles] = useState<DocFile[]>([]);
-  const [activeFilename, setActiveFilename] = useState<string>('start-here');
+  const [activeFilename, setActiveFilename] = useState<string>(DEFAULT_DOC_FILENAME);
   const { sidebarOpen, setSidebarOpen } = useSidebar();
 
   const flatDocs = useMemo(() => flattenDocs(folders, rootFiles), [folders, rootFiles]);
@@ -63,15 +67,27 @@ export default function DocsHome() {
 
     const loadDoc = async () => {
       let hash = window.location.hash.slice(1);
+      /** Strip a deep-link `?h=heading-id` suffix so we can resolve the doc. */
+      const queryIdx = hash.indexOf('?');
+      const headingSuffix = queryIdx >= 0 ? hash.slice(queryIdx) : '';
+      const docFile = queryIdx >= 0 ? hash.slice(0, queryIdx) : hash;
 
-      if (!hash) {
+      if (!docFile) {
         const base = `${window.location.pathname}${window.location.search}`;
-        window.history.replaceState(null, '', `${base}#start-here`);
-        hash = 'start-here';
+        window.history.replaceState(null, '', `${base}#${DEFAULT_DOC_FILENAME}`);
+        hash = DEFAULT_DOC_FILENAME;
         window.dispatchEvent(new CustomEvent('docHashChange'));
       }
 
-      const fetchName = resolveDocFilename(hash);
+      const fetchName = resolveDocFilename(docFile || DEFAULT_DOC_FILENAME);
+
+      /** Canonicalize old aliases (e.g. `#start-here`) → `#00-start-here`
+          in the URL bar so refreshes stay on the canonical hash. */
+      if (docFile && DOC_FILENAME_ALIASES[docFile] && fetchName !== docFile) {
+        const base = `${window.location.pathname}${window.location.search}`;
+        window.history.replaceState(null, '', `${base}#${fetchName}${headingSuffix}`);
+      }
+
       setActiveFilename(fetchName);
 
       setLoading(true);
@@ -85,16 +101,20 @@ export default function DocsHome() {
           return;
         }
 
-        if (fetchName !== 'start-here') {
-          const res2 = await fetch(`/api/docs?filename=${encodeURIComponent('start-here')}`);
+        if (fetchName !== DEFAULT_DOC_FILENAME) {
+          const res2 = await fetch(
+            `/api/docs?filename=${encodeURIComponent(DEFAULT_DOC_FILENAME)}`,
+          );
           const data2 = await res2.json();
           if (data2.content) {
             const base = `${window.location.pathname}${window.location.search}`;
-            window.history.replaceState(null, '', `${base}#start-here`);
+            window.history.replaceState(null, '', `${base}#${DEFAULT_DOC_FILENAME}`);
             window.dispatchEvent(new CustomEvent('docHashChange'));
-            setActiveFilename('start-here');
+            setActiveFilename(DEFAULT_DOC_FILENAME);
             setContent(data2.content);
-            setHashWarning(`No documentation section matches "${hash}". Showing Start Here.`);
+            setHashWarning(
+              `No documentation section matches "${docFile}". Showing Start Here.`,
+            );
             return;
           }
         }
@@ -181,7 +201,7 @@ export default function DocsHome() {
               <code style={{ color: 'var(--text-secondary)' }}>content/docs</code>.
             </p>
             <Link
-              href="/docs#start-here"
+              href={`/docs#${DEFAULT_DOC_FILENAME}`}
               className="btn btn-primary"
               style={{ padding: '0.6rem 1.1rem' }}
             >

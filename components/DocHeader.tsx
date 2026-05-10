@@ -16,7 +16,7 @@ const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/studio', label: 'Studio' },
-  { href: '/docs#start-here', label: 'Docs' },
+  { href: '/docs#00-start-here', label: 'Docs' },
 ] as const;
 
 const PACKAGE_VERSION = 'v5.3.20';

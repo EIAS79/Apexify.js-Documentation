@@ -250,7 +250,7 @@ function CallToAction() {
                 <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
-                href="/docs#start-here"
+                href="/docs#00-start-here"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-white font-bold text-base border-2 border-white/40 hover:bg-white/10 transition-colors"
               >
                 Read the docs

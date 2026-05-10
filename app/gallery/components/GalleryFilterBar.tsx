@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   MagnifyingGlassIcon,
   XMarkIcon,
   Squares2X2Icon,
   AdjustmentsHorizontalIcon,
   ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from '@heroicons/react/24/outline';
 import {
   CATEGORY_CONFIG,
@@ -81,6 +83,95 @@ export default function GalleryFilterBar({
 
   const hasActiveFilter = selected !== 'all' || query.trim().length > 0;
   const sortLabel = SORT_OPTIONS.find((s) => s.id === sort)?.label ?? 'Sort';
+
+  /* ---------------------------------------------------------------
+     Chip rail drag-to-scroll
+     - Mouse / pen: convert horizontal drag into scrollLeft delta.
+     - Touch: pass through to native horizontal scrolling (don't hijack).
+     - Suppress the trailing click on the chip the user lifted off
+       inside, so a drag never accidentally toggles a category.
+     - Track edge state so the gradient fade indicators only render
+       when there's actually content hidden in that direction.
+     --------------------------------------------------------------- */
+  const railRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{
+    phase: 'idle' | 'pending' | 'dragging';
+    startX: number;
+    startScroll: number;
+    pointerId: number;
+  }>({ phase: 'idle', startX: 0, startScroll: 0, pointerId: -1 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [edges, setEdges] = useState<{ left: boolean; right: boolean }>({ left: false, right: true });
+
+  useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const measure = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setEdges({ left: el.scrollLeft > 4, right: el.scrollLeft < max - 4 });
+    };
+    measure();
+    el.addEventListener('scroll', measure, { passive: true });
+    window.addEventListener('resize', measure);
+    return () => {
+      el.removeEventListener('scroll', measure);
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+
+  const stepRail = useCallback((dir: 1 | -1) => {
+    const el = railRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.max(160, el.clientWidth * 0.6), behavior: 'smooth' });
+  }, []);
+
+  const onRailPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'touch') return;
+    const el = railRef.current;
+    if (!el) return;
+    dragRef.current = {
+      phase: 'pending',
+      startX: e.clientX,
+      startScroll: el.scrollLeft,
+      pointerId: e.pointerId,
+    };
+    el.setPointerCapture(e.pointerId);
+  };
+  const onRailPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const ds = dragRef.current;
+    if (ds.phase === 'idle') return;
+    const el = railRef.current;
+    if (!el) return;
+    const dx = e.clientX - ds.startX;
+    if (ds.phase === 'pending' && Math.abs(dx) > 5) {
+      ds.phase = 'dragging';
+      setIsDragging(true);
+    }
+    if (ds.phase === 'dragging') {
+      el.scrollLeft = ds.startScroll - dx;
+    }
+  };
+  const endRailPointer = () => {
+    const ds = dragRef.current;
+    const el = railRef.current;
+    const wasDragging = ds.phase === 'dragging';
+    if (el && ds.pointerId !== -1) {
+      try {
+        el.releasePointerCapture(ds.pointerId);
+      } catch {
+        /* already released */
+      }
+    }
+    dragRef.current = { phase: 'idle', startX: 0, startScroll: 0, pointerId: -1 };
+    setIsDragging(false);
+    if (wasDragging) {
+      const swallow = (ev: MouseEvent) => {
+        ev.stopPropagation();
+        ev.preventDefault();
+      };
+      window.addEventListener('click', swallow, { capture: true, once: true });
+    }
+  };
 
   return (
     <div
@@ -201,40 +292,108 @@ export default function GalleryFilterBar({
           </div>
         </div>
 
-        {/* Chip rail — horizontal scroll on mobile */}
-        <div
-          className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 -mx-1 px-1"
-          style={{ scrollbarWidth: 'none' }}
-        >
-          {/* All */}
-          <FilterChip
-            active={selected === 'all'}
-            onClick={() => onSelect('all')}
-            Icon={Squares2X2Icon}
-            label="All"
-            count={totalCount}
-            accent="var(--accent-magenta)"
-          />
-          <span
-            className="h-6 w-px shrink-0 mx-1"
-            style={{ backgroundColor: 'var(--border-default)' }}
+        {/* Chip rail — drag-to-scroll horizontally; arrows on wider screens */}
+        <div className="relative">
+          {/* Edge fades */}
+          <div
             aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 transition-opacity"
+            style={{
+              background:
+                'linear-gradient(to right, color-mix(in srgb, var(--bg-base) 92%, transparent), transparent)',
+              opacity: edges.left ? 1 : 0,
+            }}
           />
-          {[...FILTER_ORDER_PRIMARY, ...FILTER_ORDER_SECONDARY].map((key) => {
-            const cfg = CATEGORY_CONFIG[key];
-            return (
-              <FilterChip
-                key={key}
-                active={selected === key}
-                onClick={() => onSelect(key)}
-                Icon={cfg.icon}
-                label={cfg.label}
-                shortLabel={cfg.short}
-                count={counts[key]}
-                accent={cfg.accent}
-              />
-            );
-          })}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 transition-opacity"
+            style={{
+              background:
+                'linear-gradient(to left, color-mix(in srgb, var(--bg-base) 92%, transparent), transparent)',
+              opacity: edges.right ? 1 : 0,
+            }}
+          />
+
+          {/* Prev arrow */}
+          <button
+            type="button"
+            onClick={() => stepRail(-1)}
+            disabled={!edges.left}
+            aria-label="Scroll filters left"
+            className="hidden md:grid absolute left-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 place-items-center rounded-full transition-opacity disabled:opacity-0"
+            style={{
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'var(--bg-elevated)',
+              color: 'var(--text-secondary)',
+              boxShadow: 'var(--shadow-md)',
+            }}
+          >
+            <ChevronLeftIcon className="h-4 w-4" aria-hidden />
+          </button>
+          {/* Next arrow */}
+          <button
+            type="button"
+            onClick={() => stepRail(1)}
+            disabled={!edges.right}
+            aria-label="Scroll filters right"
+            className="hidden md:grid absolute right-0 top-1/2 -translate-y-1/2 z-20 h-8 w-8 place-items-center rounded-full transition-opacity disabled:opacity-0"
+            style={{
+              border: '1px solid var(--border-default)',
+              backgroundColor: 'var(--bg-elevated)',
+              color: 'var(--text-secondary)',
+              boxShadow: 'var(--shadow-md)',
+            }}
+          >
+            <ChevronRightIcon className="h-4 w-4" aria-hidden />
+          </button>
+
+          <div
+            ref={railRef}
+            onPointerDown={onRailPointerDown}
+            onPointerMove={onRailPointerMove}
+            onPointerUp={endRailPointer}
+            onPointerCancel={endRailPointer}
+            role="tablist"
+            aria-label="Gallery categories"
+            className="drag-scroll-x flex items-center gap-1.5 sm:gap-2 overflow-x-auto overflow-y-hidden pb-1 -mx-1 px-1 md:px-10"
+            style={{
+              cursor: isDragging ? 'grabbing' : 'grab',
+              userSelect: isDragging ? 'none' : 'auto',
+              scrollSnapType: 'x proximity',
+            }}
+          >
+            {/* All */}
+            <FilterChip
+              active={selected === 'all'}
+              onClick={() => onSelect('all')}
+              isDragging={isDragging}
+              Icon={Squares2X2Icon}
+              label="All"
+              count={totalCount}
+              accent="var(--accent-magenta)"
+            />
+            <span
+              className="h-6 w-px shrink-0 mx-1"
+              style={{ backgroundColor: 'var(--border-default)' }}
+              aria-hidden
+            />
+            {[...FILTER_ORDER_PRIMARY, ...FILTER_ORDER_SECONDARY].map((key) => {
+              const cfg = CATEGORY_CONFIG[key];
+              return (
+                <FilterChip
+                  key={key}
+                  active={selected === key}
+                  onClick={() => onSelect(key)}
+                  isDragging={isDragging}
+                  Icon={cfg.icon}
+                  label={cfg.label}
+                  shortLabel={cfg.short}
+                  count={counts[key]}
+                  accent={cfg.accent}
+                />
+              );
+            })}
+          </div>
         </div>
 
         {/* Status row */}
@@ -280,6 +439,7 @@ export default function GalleryFilterBar({
 function FilterChip({
   active,
   onClick,
+  isDragging,
   Icon,
   label,
   shortLabel,
@@ -288,6 +448,8 @@ function FilterChip({
 }: {
   active: boolean;
   onClick: () => void;
+  /** Suppresses the trailing click that follows a drag-to-scroll. */
+  isDragging?: boolean;
   Icon: typeof Squares2X2Icon;
   label: string;
   shortLabel?: string;
@@ -297,9 +459,19 @@ function FilterChip({
   return (
     <button
       type="button"
-      onClick={onClick}
+      role="tab"
+      aria-selected={active}
+      onClick={(e) => {
+        if (isDragging) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+        onClick();
+      }}
+      onDragStart={(e) => e.preventDefault()}
       data-active={active || undefined}
-      className="group shrink-0 h-9 inline-flex items-center gap-1.5 px-3 rounded-full text-[13px] font-semibold transition-all snap-start"
+      className="group shrink-0 h-9 inline-flex items-center gap-1.5 px-3 rounded-full text-[13px] font-semibold transition-all snap-start select-none"
       style={
         active
           ? {

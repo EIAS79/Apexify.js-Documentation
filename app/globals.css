@@ -193,14 +193,17 @@ body {
   background: var(--accent-iris);
 }
 
-/* Drag-to-scroll tracks (e.g. Recipes deck) hide their scrollbars
-   while keeping native horizontal scrolling alive for touch + wheel. */
-.recipes-track::-webkit-scrollbar {
+/* Drag-to-scroll tracks hide their scrollbars while keeping
+   native horizontal scrolling alive for touch + wheel.
+   Used by the homepage Recipes deck and the Gallery filter rail. */
+.recipes-track::-webkit-scrollbar,
+.drag-scroll-x::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
 }
-.recipes-track {
+.recipes-track,
+.drag-scroll-x {
   scrollbar-width: none;
   -ms-overflow-style: none;
   overscroll-behavior-x: contain;

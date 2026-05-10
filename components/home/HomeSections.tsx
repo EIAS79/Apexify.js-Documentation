@@ -781,10 +781,18 @@ export function RecipesDeck() {
         </div>
 
         <div className="relative">
-          {/* Edge fades */}
+          {/*
+            Edge fades sit in the section's bleed gutter — width matches the
+            page padding (16/24/32 px) and they're pushed outside the content
+            edge with a matching negative offset, so they end EXACTLY at the
+            card edge and never sit on top of a card in its resting position.
+            When the deck is scrolled, cards slide into the gutter and fade
+            naturally under the gradient — proper scroll affordance, no
+            "black shadow on the card" effect.
+          */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 transition-opacity"
+            className="pointer-events-none absolute inset-y-0 -left-4 sm:-left-6 lg:-left-8 z-10 w-4 sm:w-6 lg:w-8 transition-opacity"
             style={{
               background:
                 'linear-gradient(to right, var(--bg-base), transparent)',
@@ -793,7 +801,7 @@ export function RecipesDeck() {
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 transition-opacity"
+            className="pointer-events-none absolute inset-y-0 -right-4 sm:-right-6 lg:-right-8 z-10 w-4 sm:w-6 lg:w-8 transition-opacity"
             style={{
               background:
                 'linear-gradient(to left, var(--bg-base), transparent)',
@@ -1089,7 +1097,7 @@ export function CTABanner() {
                 <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
-                href="/docs#start-here"
+                href="/docs#00-start-here"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-white font-bold text-base border-2 border-white/40 hover:bg-white/10 transition-colors"
               >
                 Read the docs
@@ -1164,7 +1172,7 @@ export function SiteFooter() {
             <ul className="space-y-2.5 text-sm">
               <li><Link href="/gallery" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>Gallery</Link></li>
               <li><Link href="/studio" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>Studio</Link></li>
-              <li><Link href="/docs#start-here" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>Docs</Link></li>
+              <li><Link href="/docs#00-start-here" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>Docs</Link></li>
               <li><Link href="/docs#00-recipes-overview" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>Recipes</Link></li>
             </ul>
           </div>

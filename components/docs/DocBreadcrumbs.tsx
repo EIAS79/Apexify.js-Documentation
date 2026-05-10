@@ -24,7 +24,7 @@ export function DocBreadcrumbs({ entry }: { entry: FlatDocEntry | null }) {
       </Link>
       <ChevronRightIcon className="h-3 w-3 shrink-0" style={{ color: 'var(--border-strong)' }} aria-hidden />
       <Link
-        href="/docs#start-here"
+        href="/docs#00-start-here"
         className="rounded-md px-1.5 py-1 transition-colors"
         style={{ color: 'var(--text-tertiary)' }}
       >

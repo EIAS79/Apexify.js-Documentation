@@ -5,12 +5,13 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import ThemeToggle from './ThemeToggle';
+import { BrandIcon } from './Brand';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/studio', label: 'Studio' },
-  { href: '/docs#start-here', label: 'Docs' },
+  { href: '/docs#00-start-here', label: 'Docs' },
 ] as const;
 
 export default function Navbar() {
@@ -77,16 +78,14 @@ export default function Navbar() {
               <Link
                 href="/"
                 className="group/logo flex items-center gap-2 flex-shrink-0 min-w-0"
+                aria-label="Apexify.js — home"
               >
                 <span
-                  className="relative inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg text-white text-[11px] sm:text-xs font-black"
-                  style={{
-                    backgroundImage: 'var(--gradient-sunset)',
-                    boxShadow: 'var(--glow-magenta)',
-                  }}
+                  className="relative inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg overflow-hidden transition-transform duration-300 group-hover/logo:scale-105"
+                  style={{ boxShadow: 'var(--glow-magenta)' }}
                   aria-hidden
                 >
-                  Aπ
+                  <BrandIcon />
                 </span>
                 <span
                   className="text-base sm:text-lg lg:text-xl font-black tracking-tight bg-[length:200%_auto] bg-clip-text text-transparent transition-[background-position] duration-700 group-hover/logo:bg-[position:100%_50%]"
