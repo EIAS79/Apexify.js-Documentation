@@ -7,7 +7,9 @@ import { canvasBackgroundPipelineGalleryItems } from './canvasBackgroundGalleryS
 const CHROMATIC_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -81,10 +83,13 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const CHROMATIC_JS = `const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -158,12 +163,15 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const CRT_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -231,14 +239,17 @@ const canvas = await painter.createCanvas({
   borderRadius: 12,
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const CRT_JS = CRT_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
 const SOLSTICE_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -285,14 +296,17 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const SOLSTICE_JS = SOLSTICE_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
 const HEX_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -348,14 +362,17 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const HEX_JS = HEX_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
 const TIDE_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -413,14 +430,17 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const TIDE_JS = TIDE_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
 const AURORA_GRID_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -491,14 +511,17 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const AURORA_GRID_JS = AURORA_GRID_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
 const MOLTEN_CORE_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -565,14 +588,17 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const MOLTEN_CORE_JS = MOLTEN_CORE_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
 const CRYSTAL_FOG_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
-const canvas = await painter.createCanvas({
+
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -636,7 +662,8 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const CRYSTAL_FOG_JS = CRYSTAL_FOG_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
@@ -644,7 +671,8 @@ const CROSSWEAVE_TS = `import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter();
 
-const canvas = await painter.createCanvas({
+async function main() {
+  const canvas = await painter.createCanvas({
   width: 960,
   height: 540,
   gradientBg: {
@@ -686,7 +714,8 @@ const canvas = await painter.createCanvas({
   },
 });
 
-return canvas.buffer;`;
+  return canvas.buffer;
+}`;
 
 const CROSSWEAVE_JS = CROSSWEAVE_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
