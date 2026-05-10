@@ -178,6 +178,6 @@ export async function renderAllCanvasBackgroundPipelinePicks(painter: Painter): 
   m.set(CANVAS_BG_PIPELINE_FILENAMES[1], await renderPipelineLayerDotsMultiply(painter));
   m.set(CANVAS_BG_PIPELINE_FILENAMES[2], await renderPipelineGradientGridCrosses(painter));
   m.set(CANVAS_BG_PIPELINE_FILENAMES[3], await renderPipelineColorStripes(painter));
-  m.set(CANVAS_BG_2PIPELINE_FILENAMES[4], await renderPipelineFramedChrome(painter));
+  m.set(CANVAS_BG_PIPELINE_FILENAMES[4], await renderPipelineFramedChrome(painter));
   return m;
 }
