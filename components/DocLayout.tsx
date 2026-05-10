@@ -43,14 +43,22 @@ export default function DocLayout({ children, headings = [] }: DocLayoutProps) {
         code paths like `00-start-here/*.mdx`) push the main wider than
         its margin reservation, sliding article content under the right
         sidebar. With `min-w-0` the main is allowed to shrink to the
-        space left by `lg:ml-80` + `lg:mr-64`, and the inner article
+        space left by `lg:ml-80` + the right margin, and the inner article
         wraps properly within that box. `overflow-x-clip` is a safety net
         for any rare element that still refuses to wrap.
+
+        Right margin is intentionally LARGER than the right sidebar's
+        own width (`w-64` = 16rem). The extra 2rem at `lg` (4rem at `xl`)
+        is dedicated gutter between the article column and the
+        "On this page" rail — independent of whether the left sidebar
+        is currently open or collapsed.
+          - lg: mr = 18rem  → sidebar 16rem + 2rem gap
+          - xl: mr = 20rem  → sidebar 16rem + 4rem gap
       */}
       <main
         className={`relative w-full flex-1 min-w-0 overflow-x-clip pt-16 transition-[margin] duration-300 ${
           leftActive ? 'lg:ml-80 xl:ml-[22rem]' : 'lg:ml-0'
-        } ${rightActive ? 'lg:mr-64' : 'lg:mr-0'}`}
+        } ${rightActive ? 'lg:mr-72 xl:mr-80' : 'lg:mr-0'}`}
       >
         <div className="mx-auto w-full max-w-3xl min-w-0 px-4 pb-16 pt-6 sm:px-6 lg:px-10 lg:pt-10 xl:px-12">
           {children}
