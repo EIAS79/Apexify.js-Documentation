@@ -2,21 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowPathIcon,
-  ArrowsPointingOutIcon,
-  MagnifyingGlassMinusIcon,
   MagnifyingGlassPlusIcon,
+  MagnifyingGlassMinusIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 
 function clampZoom(z: number) {
   return Math.min(4, Math.max(0.25, Math.round(z * 100) / 100));
 }
 
-/**
- * Zoom + scroll pan + drag-to-pan (hand) for PNG/GIF previews. Shares
- * its visual language with the gallery modal.
- */
-export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
+export default function GalleryZoomablePreview({ src, alt }: { src: string; alt: string }) {
   const [zoom, setZoom] = useState(1);
   const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
   const [grabPan, setGrabPan] = useState(false);
@@ -92,11 +87,7 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
   const zoomIn = () => setZoom((z) => clampZoom(z + 0.25));
   const zoomOut = () => setZoom((z) => clampZoom(z - 0.25));
   const resetZoom = () => setZoom(1);
-  const fit = () => setZoom(1);
-
-  const onDoubleClick = () => {
-    setZoom((z) => (z <= 1.01 ? 2 : 1));
-  };
+  const onDoubleClick = () => setZoom((z) => (z <= 1.01 ? 2 : 1));
 
   const endMousePan = (el: HTMLDivElement, pointerId: number) => {
     if (mousePanRef.current.phase === 'idle') return;
@@ -109,39 +100,37 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
     }
   };
 
-  const btnBase =
-    'touch-manipulation rounded-md p-2 transition-colors active:scale-[0.97] disabled:pointer-events-none disabled:opacity-35';
-
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-1.5 px-1 pb-1.5 pt-0.5 sm:gap-2 sm:px-2 sm:pb-2 sm:pt-1">
-      <div className="flex shrink-0 flex-col gap-2 min-[420px]:flex-row min-[420px]:flex-wrap min-[420px]:items-center min-[420px]:justify-between">
+    <div className="flex flex-col flex-1 min-h-0 min-w-0 gap-2">
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-between shrink-0 px-0.5">
         <p
-          className="order-2 text-[10px] leading-snug min-[420px]:order-1 sm:text-[11px]"
-          style={{ color: 'var(--text-muted)' }}
+          className="text-[11px] order-last sm:order-first w-full sm:w-auto text-center sm:text-left leading-snug"
+          style={{ color: 'var(--text-tertiary)' }}
         >
-          <span className="hidden sm:inline" style={{ color: 'var(--text-tertiary)' }}>
-            Hand: drag · {' '}
-          </span>
-          <span className="sm:hidden" style={{ color: 'var(--text-tertiary)' }}>Pinch · drag · </span>
-          <kbd className="kbd hidden sm:inline-flex">Ctrl</kbd>
-          <span className="hidden sm:inline"> / </span>
-          <kbd className="kbd hidden sm:inline-flex">⌘</kbd>
-          <span className="hidden sm:inline"> scroll · double-click to toggle</span>
+          Drag to pan · pinch zoom · <span className="kbd">Ctrl</span> /{' '}
+          <span className="kbd">⌘</span> + scroll
         </p>
         <div
-          className="order-1 flex w-full max-w-full items-center justify-center gap-0.5 rounded-lg p-0.5 min-[420px]:order-2 min-[420px]:w-auto min-[420px]:justify-end"
+          className="flex items-center gap-1 rounded-lg p-0.5 border"
           style={{
-            border: '1px solid var(--border-default)',
-            backgroundColor: 'color-mix(in srgb, var(--bg-raised) 70%, transparent)',
-            color: 'var(--text-secondary)',
+            backgroundColor: 'var(--bg-sunken)',
+            borderColor: 'var(--border-default)',
           }}
         >
           <button
             type="button"
             onClick={zoomOut}
             disabled={zoom <= 0.26}
-            className={btnBase}
-            style={{ color: 'inherit' }}
+            className="p-2 rounded-md transition-colors disabled:opacity-35 disabled:pointer-events-none"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--bg-raised)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
             aria-label="Zoom out"
             title="Zoom out"
           >
@@ -149,8 +138,8 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
           </button>
           <span
             className="tabular-nums text-xs font-semibold min-w-[3rem] text-center"
+            style={{ color: 'var(--text-tertiary)' }}
             aria-live="polite"
-            style={{ color: 'var(--text-secondary)' }}
           >
             {Math.round(zoom * 100)}%
           </span>
@@ -158,8 +147,16 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
             type="button"
             onClick={zoomIn}
             disabled={zoom >= 3.99}
-            className={btnBase}
-            style={{ color: 'inherit' }}
+            className="p-2 rounded-md transition-colors disabled:opacity-35 disabled:pointer-events-none"
+            style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--bg-raised)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
             aria-label="Zoom in"
             title="Zoom in"
           >
@@ -167,19 +164,20 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
           </button>
           <button
             type="button"
-            onClick={fit}
-            className={`${btnBase} ml-0.5 border-l`}
-            style={{ borderColor: 'var(--border-default)', color: 'inherit' }}
-            aria-label="Fit"
-            title="Fit"
-          >
-            <ArrowsPointingOutIcon className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
             onClick={resetZoom}
-            className={btnBase}
-            style={{ color: 'inherit' }}
+            className="p-2 rounded-md transition-colors border-l ml-0.5 pl-2"
+            style={{
+              color: 'var(--text-secondary)',
+              borderColor: 'var(--border-default)',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--bg-raised)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
             aria-label="Reset zoom"
             title="Reset zoom"
           >
@@ -190,16 +188,12 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
 
       <div
         ref={scrollRef}
-        className={`min-h-[160px] flex-1 touch-pan-x touch-pan-y overflow-auto rounded-lg p-2 sm:min-h-[200px] sm:rounded-xl sm:p-4 md:p-5 ${
+        className={`flex-1 min-h-[180px] overflow-auto rounded-xl touch-pan-x touch-pan-y p-4 sm:p-6 ${
           natural ? (grabPan ? 'cursor-grabbing' : 'cursor-grab') : ''
         }`}
         style={{
-          backgroundImage:
-            'linear-gradient(45deg, color-mix(in srgb, var(--bg-sunken) 70%, transparent) 25%, transparent 25%), linear-gradient(-45deg, color-mix(in srgb, var(--bg-sunken) 70%, transparent) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, color-mix(in srgb, var(--bg-sunken) 70%, transparent) 75%), linear-gradient(-45deg, transparent 75%, color-mix(in srgb, var(--bg-sunken) 70%, transparent) 75%)',
-          backgroundSize: '20px 20px',
-          backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px',
-          backgroundColor: 'var(--bg-canvas)',
-          boxShadow: '0 0 0 1px var(--border-subtle) inset',
+          backgroundColor: 'var(--bg-sunken)',
+          border: '1px solid var(--border-subtle)',
         }}
         onPointerDown={(e) => {
           if (e.pointerType !== 'mouse' || e.button !== 0) return;
@@ -250,7 +244,7 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
               : { minWidth: '100%', minHeight: '100%' }
           }
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- blob URL preview */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={src}
             alt={alt}
@@ -266,18 +260,16 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
                     width: natural.w * zoom,
                     height: natural.h * zoom,
                     maxWidth: 'none',
-                    boxShadow: 'var(--shadow-lg)',
-                    borderRadius: '0.5rem',
                   }
                 : {
-                    maxHeight: 'min(55vh, 560px)',
+                    maxHeight: 'min(70vh, 800px)',
                     width: 'auto',
                     height: 'auto',
-                    boxShadow: 'var(--shadow-lg)',
-                    borderRadius: '0.5rem',
                   }
             }
-            className={`select-none ${natural ? 'block max-w-none shrink-0 cursor-[inherit]' : 'object-contain'}`}
+            className={`rounded-lg shadow-2xl select-none ${
+              natural ? 'block max-w-none shrink-0 cursor-[inherit]' : 'object-contain'
+            }`}
           />
         </div>
       </div>

@@ -1,27 +1,61 @@
 'use client';
 
 import DocHeader from '@/components/DocHeader';
-import { useState } from 'react';
 
 export default function DocsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black text-white transition-colors duration-300 relative overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(30,58,138,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(15,23,42,0.2),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_40%_20%,rgba(0,0,0,0.3),transparent_50%)]" />
+    <div
+      className="relative min-h-screen overflow-hidden transition-colors duration-300"
+      style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
+    >
+      {/* Twilight backdrop — matches home / studio */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+        <div
+          className="absolute inset-0"
+          style={{ background: 'var(--gradient-twilight)' }}
+        />
+        <div
+          className="absolute -left-[20%] -top-[15%] h-[60vh] w-[55vw] rounded-full blur-3xl"
+          style={{
+            background:
+              'radial-gradient(closest-side, color-mix(in srgb, var(--accent-iris) 28%, transparent), transparent 70%)',
+            opacity: 0.55,
+          }}
+        />
+        <div
+          className="absolute right-[-15%] top-[25%] h-[50vh] w-[45vw] rounded-full blur-3xl"
+          style={{
+            background:
+              'radial-gradient(closest-side, color-mix(in srgb, var(--accent-magenta) 25%, transparent), transparent 70%)',
+            opacity: 0.45,
+          }}
+        />
+        <div
+          className="absolute left-[10%] bottom-[-10%] h-[40vh] w-[45vw] rounded-full blur-3xl"
+          style={{
+            background:
+              'radial-gradient(closest-side, color-mix(in srgb, var(--accent-amber) 18%, transparent), transparent 70%)',
+            opacity: 0.4,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(color-mix(in srgb, var(--border-subtle) 100%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border-subtle) 100%, transparent) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+            opacity: 0.45,
+            maskImage: 'radial-gradient(ellipse at center, black 35%, transparent 80%)',
+          }}
+        />
       </div>
-      
+
       <DocHeader />
       {children}
     </div>
   );
 }
-

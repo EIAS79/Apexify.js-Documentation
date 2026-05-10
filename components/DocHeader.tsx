@@ -2,273 +2,299 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
-import { MagnifyingGlassIcon, Bars3Icon } from '@heroicons/react/24/outline';
-import SearchResults from './SearchResults';
+import { useEffect, useState } from 'react';
+import {
+  Bars3Icon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
+import ThemeToggle from './ThemeToggle';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { DocsSearchPalette } from './DocsSearchPalette';
 
-interface DocHeaderProps {
-  // Props removed - no menu button needed
-}
+const NAV_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/studio', label: 'Studio' },
+  { href: '/docs#start-here', label: 'Docs' },
+] as const;
 
-interface SearchResult {
-  filename: string;
-  name: string;
-  folder: string;
-  matchType: 'filename' | 'folder' | 'content';
-  snippet?: string;
-}
+const PACKAGE_VERSION = 'v5.3.20';
 
-export default function DocHeader({ }: DocHeaderProps) {
+export default function DocHeader() {
   const pathname = usePathname();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const { toggleSidebar, sidebarOpen } = useSidebar();
+  const { toggleSidebar } = useSidebar();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
-        event.preventDefault();
-        setIsMobileSearchOpen(true);
-        setTimeout(() => {
-        searchInputRef.current?.focus();
-        }, 100);
-        setIsSearchOpen(true);
-      }
-    };
+    setMobileNavOpen(false);
+  }, [pathname]);
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
-    if (isMobileSearchOpen && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [isMobileSearchOpen]);
-
-  useEffect(() => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
-    }
-
-    if (searchQuery.trim().length < 2) {
-      setSearchResults([]);
-      setIsSearchOpen(false);
-      return;
-    }
-
-    setIsSearching(true);
-    
-    searchTimeoutRef.current = setTimeout(async () => {
-      try {
-        const response = await fetch(`/api/docs/search?q=${encodeURIComponent(searchQuery)}`);
-        const data = await response.json();
-        setSearchResults(data.results || []);
-        setIsSearchOpen(true);
-      } catch (error) {
-        console.error('Search error:', error);
-        setSearchResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 300);
-
-    return () => {
-      if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleSidebar();
       }
     };
-  }, [searchQuery]);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [toggleSidebar]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchFocus = () => {
-    if (searchQuery.trim().length >= 2 && searchResults.length > 0) {
-      setIsSearchOpen(true);
-    }
+  const navIsActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    if (href.startsWith('/docs')) return pathname === '/docs' || pathname?.startsWith('/docs/');
+    return pathname === href;
   };
 
   return (
     <>
-      {/* Mobile search overlay */}
-      {isMobileSearchOpen && (
-        <div 
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] lg:hidden"
-          onClick={() => setIsMobileSearchOpen(false)}
-        >
-          <div 
-            className="absolute top-0 left-0 right-0 bg-black/95 backdrop-blur-md border-b border-slate-900/70 p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Search documentation..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onFocus={handleSearchFocus}
-                className="w-full pl-12 pr-4 py-3 bg-slate-950 border-2 border-blue-500/50 rounded-lg text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-              />
-              {isSearching && (
-                <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400"></div>
-                </div>
-              )}
-              <button
-                onClick={() => setIsMobileSearchOpen(false)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white p-1"
-                aria-label="Close search"
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <SearchResults
-                results={searchResults}
-                query={searchQuery}
-                onClose={() => {
-                  setIsSearchOpen(false);
-                  setIsMobileSearchOpen(false);
-                }}
-                isOpen={isSearchOpen}
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <header
+        className="fixed left-0 right-0 top-0 z-[60]"
+        style={{
+          backgroundColor: scrolled
+            ? 'color-mix(in srgb, var(--bg-raised) 92%, transparent)'
+            : 'color-mix(in srgb, var(--bg-base) 80%, transparent)',
+          backdropFilter: 'blur(18px) saturate(140%)',
+          WebkitBackdropFilter: 'blur(18px) saturate(140%)',
+          borderBottom: '1px solid var(--border-default)',
+          boxShadow: scrolled ? 'var(--shadow-md)' : 'none',
+          transition: 'background-color 0.25s ease, box-shadow 0.25s ease',
+        }}
+      >
+        {/* Animated rim — sunset gradient that brightens on scroll */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 -bottom-px h-[2px]"
+          style={{
+            background: 'var(--gradient-aurora)',
+            opacity: scrolled ? 0.55 : 0.18,
+            transition: 'opacity 0.3s ease',
+            filter: 'blur(0.4px)',
+          }}
+        />
 
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-md border-b border-slate-900/70 transition-all duration-300 shadow-sm">
-        <div className="flex items-center justify-between h-16 px-3 sm:px-4 lg:px-6">
-        {/* Left side - Logo and nav */}
-          <div className="flex items-center space-x-3 sm:space-x-4 lg:space-x-8 flex-shrink-0">
-            {/* Mobile menu button to toggle sidebar */}
+        <div className="mx-auto flex h-16 max-w-[1600px] items-center gap-2 px-3 sm:gap-4 sm:px-5 lg:px-8">
+          {/* Sidebar toggle (mobile + desktop) */}
           <button
-              onClick={toggleSidebar}
-              className="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors duration-200 flex-shrink-0"
-              aria-label="Toggle sidebar"
-            >
-              <Bars3Icon className="h-6 w-6" />
+            type="button"
+            onClick={toggleSidebar}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg transition-colors"
+            style={{
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-secondary)',
+              backgroundColor: 'var(--bg-raised)',
+            }}
+            aria-label="Toggle docs navigation"
+            title="Toggle sidebar (⌘B)"
+          >
+            <Bars3Icon className="h-5 w-5" aria-hidden />
           </button>
-            <Link href="/" className="flex items-center group flex-shrink-0">
-              <span className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent transition-all duration-300 group-hover:from-blue-500 group-hover:to-purple-500">
-              Apexify.js
+
+          {/* Logo + brand */}
+          <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+            <span
+              aria-hidden
+              className="grid h-9 w-9 place-items-center rounded-xl text-base font-black"
+              style={{
+                background: 'var(--gradient-sunset)',
+                color: 'white',
+                boxShadow: 'var(--glow-magenta)',
+              }}
+            >
+              Aπ
+            </span>
+            <span className="hidden flex-col leading-tight sm:flex">
+              <span
+                className="text-[10px] font-semibold uppercase tracking-[0.28em]"
+                style={{ color: 'var(--text-tertiary)' }}
+              >
+                Apexify
+              </span>
+              <span className="text-[15px] font-bold text-grad-aurora">Docs</span>
             </span>
           </Link>
-          <Link
-            href="/gallery"
-            className={`md:hidden ml-1 text-sm font-semibold whitespace-nowrap transition-colors ${
-              pathname === '/gallery' ? 'text-blue-400' : 'text-gray-300 hover:text-blue-400'
-            }`}
-          >
-            Gallery
-          </Link>
-          <nav className="hidden md:flex items-center space-x-6" aria-label="Primary">
-            <Link
-              href="/"
-              className={`text-base transition-colors font-medium ${
-                pathname === '/' ? 'text-blue-400' : 'text-gray-300 hover:text-blue-400'
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/gallery"
-              className={`text-base transition-colors font-medium ${
-                pathname === '/gallery' ? 'text-blue-400' : 'text-gray-300 hover:text-blue-400'
-              }`}
-            >
-              Gallery
-            </Link>
-            <Link
-              href="/docs"
-              className={`text-base transition-colors font-medium ${
-                pathname === '/docs' || pathname?.startsWith('/docs/')
-                  ? 'text-blue-400'
-                  : 'text-gray-300 hover:text-blue-400'
-              }`}
-            >
-              Docs
-            </Link>
+
+          <span
+            aria-hidden
+            className="hidden h-8 w-px shrink-0 md:block"
+            style={{ backgroundColor: 'var(--border-default)' }}
+          />
+
+          {/* Primary nav (desktop) */}
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+            {NAV_LINKS.map((link) => {
+              const active = navIsActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="relative rounded-lg px-3 py-1.5 text-[13px] font-semibold transition-colors"
+                  style={{
+                    color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  }}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    {active && (
+                      <span
+                        aria-hidden
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ background: 'var(--accent-magenta)' }}
+                      />
+                    )}
+                    {link.label}
+                  </span>
+                </Link>
+              );
+            })}
           </nav>
-        </div>
 
-          {/* Center - Search - Desktop/Tablet only */}
-        <div className="hidden lg:flex flex-1 max-w-md mx-8">
-          <div className="relative w-full">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-500 transition-colors" />
-            <input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search documentation... (Ctrl+K)"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={handleSearchFocus}
-              className="w-full pl-11 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-base text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-900 focus:border-transparent transition-all duration-200"
-            />
-            {isSearching && (
-              <div className="absolute right-12 top-1/2 transform -translate-y-1/2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
-              </div>
-            )}
-            {!isSearching && searchQuery.trim().length === 0 && (
-              <kbd className="absolute right-3 top-1/2 transform -translate-y-1/2 hidden xl:inline-flex items-center px-2 py-1 text-xs font-semibold text-gray-400 bg-gray-700 border border-gray-600 rounded">
-                Ctrl+K
-              </kbd>
-            )}
-            <SearchResults
-              results={searchResults}
-              query={searchQuery}
-              onClose={() => setIsSearchOpen(false)}
-              isOpen={isSearchOpen}
-            />
-          </div>
-        </div>
+          <span aria-hidden className="flex-1" />
 
-          {/* Right side - Search button (mobile) + GitHub, npm */}
-          <div className="flex items-center space-x-2 lg:space-x-4 flex-shrink-0">
-            {/* Mobile search button */}
-            <button
-              onClick={() => setIsMobileSearchOpen(true)}
-              className="lg:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors duration-200"
-              aria-label="Search"
-            >
-              <MagnifyingGlassIcon className="h-6 w-6" />
-            </button>
+          {/* Search trigger */}
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            className="hidden items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors sm:inline-flex"
+            style={{
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-tertiary)',
+              backgroundColor: 'color-mix(in srgb, var(--bg-raised) 80%, transparent)',
+              minWidth: '14rem',
+            }}
+            aria-label="Search documentation"
+            title="Search docs (⌘K)"
+          >
+            <MagnifyingGlassIcon className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="flex-1 text-left">Search docs…</span>
+            <span className="inline-flex shrink-0 items-center gap-1">
+              <kbd className="kbd">⌘</kbd>
+              <kbd className="kbd">K</kbd>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPaletteOpen(true)}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg transition-colors sm:hidden"
+            style={{
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-secondary)',
+              backgroundColor: 'var(--bg-raised)',
+            }}
+            aria-label="Search documentation"
+          >
+            <MagnifyingGlassIcon className="h-5 w-5" aria-hidden />
+          </button>
+
+          {/* Version pill (desktop) */}
+          <span
+            className="hidden items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold lg:inline-flex"
+            style={{
+              background: 'var(--gradient-sunset)',
+              color: 'white',
+              boxShadow: 'var(--shadow-sm)',
+            }}
+            title={`Apexify.js ${PACKAGE_VERSION}`}
+          >
+            <span aria-hidden>●</span>
+            {PACKAGE_VERSION}
+          </span>
+
+          <ThemeToggle />
+
           <a
             href="https://github.com/EIAS79/apexify.js"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-all duration-200 p-2 rounded-lg hover:bg-gray-800"
+            className="hidden h-10 w-10 shrink-0 place-items-center rounded-lg transition-colors lg:grid"
+            style={{
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-secondary)',
+              backgroundColor: 'var(--bg-raised)',
+            }}
             aria-label="GitHub"
+            title="Open on GitHub"
           >
-              <svg className="h-6 w-6 lg:h-7 lg:w-7" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
             </svg>
           </a>
-          <a
-            href="https://www.npmjs.com/package/apexify.js"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-all duration-200 p-2 rounded-lg hover:bg-gray-800"
-            aria-label="npm"
+
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen((v) => !v)}
+            aria-expanded={mobileNavOpen}
+            aria-label="Toggle menu"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg transition-colors md:hidden"
+            style={{
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-secondary)',
+              backgroundColor: 'var(--bg-raised)',
+            }}
           >
-              <svg className="h-6 w-6 lg:h-7 lg:w-7" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M0 7.334v8h6.666v1.332H12v-1.332h12v-8H0zm6.666 6.666H5.334v-4H3.999v4H1.335V8.667h5.331v5.333zm4 0v1.336H8.001V8.667h5.334v5.332h-2.669v-.001zm12.001 0h-1.33v-4h-1.337v4h-1.335v-4h-1.33v4h-2.671V8.667h8.003v5.333z" />
-            </svg>
-          </a>
+            {mobileNavOpen ? (
+              <XMarkIcon className="h-5 w-5" aria-hidden />
+            ) : (
+              <span className="text-[10px] font-bold tracking-wider">{PACKAGE_VERSION}</span>
+            )}
+          </button>
         </div>
-      </div>
-    </header>
+
+        {/* Mobile nav drawer */}
+        {mobileNavOpen && (
+          <nav
+            className="md:hidden"
+            style={{
+              borderTop: '1px solid var(--border-subtle)',
+              backgroundColor: 'var(--bg-raised)',
+            }}
+          >
+            <ul className="flex flex-col gap-0.5 px-3 py-2">
+              {NAV_LINKS.map((link) => {
+                const active = navIsActive(link.href);
+                return (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-semibold"
+                      style={{
+                        color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        backgroundColor: active
+                          ? 'color-mix(in srgb, var(--accent-iris) 14%, transparent)'
+                          : 'transparent',
+                      }}
+                    >
+                      <span>{link.label}</span>
+                      {active && (
+                        <span
+                          aria-hidden
+                          className="h-2 w-2 rounded-full"
+                          style={{ background: 'var(--accent-magenta)' }}
+                        />
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        )}
+      </header>
+
+      <DocsSearchPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </>
   );
 }

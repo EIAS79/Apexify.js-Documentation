@@ -1,137 +1,117 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ArrowPathIcon,
-  CodeBracketIcon,
-  CommandLineIcon,
-  PhotoIcon,
-  PlayIcon,
-  ViewColumnsIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
-import Navbar from '@/components/Navbar';
 import { GallerySnippetEditor } from '@/app/gallery/components/GallerySnippetEditor';
-import { StudioPreviewZoom } from '@/components/studio/StudioPreviewZoom';
-import { StudioRunnerTerminal } from '@/components/studio/StudioRunnerTerminal';
+import { StudioCommandPalette } from '@/components/studio/StudioCommandPalette';
+import { StudioFileTabs } from '@/components/studio/StudioFileTabs';
+import { StudioOutputPanel, OutputTab } from '@/components/studio/StudioOutputPanel';
+import { StudioResizableSplit } from '@/components/studio/StudioResizableSplit';
+import { StudioShortcutOverlay } from '@/components/studio/StudioShortcutOverlay';
+import { StudioStatusBar } from '@/components/studio/StudioStatusBar';
+import { StudioTopBar } from '@/components/studio/StudioTopBar';
 import {
+  LayoutMode,
+  RunHistoryEntry,
   STUDIO_STARTER_JS,
   STUDIO_STARTER_TS,
-  STUDIO_STORAGE_KEY,
-} from '@/lib/studio/starterSnippets';
+  StudioActionId,
+  StudioBuffer,
+  StudioLang,
+  StudioTemplate,
+  bufferFromTemplate,
+  createBlankBuffer,
+  makeId,
+} from '@/lib/studio/studioConfig';
+import {
+  bootstrapStudio,
+  encodeShareLink,
+  loadRunHistory,
+  pushRunHistory,
+  saveRunHistory,
+  savePersistedStudio,
+} from '@/lib/studio/studioStorage';
 
-type LayoutMode = 'code' | 'split' | 'media';
-
-type PersistedStudio = {
-  ts?: string;
-  js?: string;
-  lang?: 'ts' | 'js';
-  layout?: LayoutMode;
-  autoRun?: boolean;
-};
-
-function LayoutToolbar({
-  mode,
-  onChange,
-}: {
-  mode: LayoutMode;
-  onChange: (m: LayoutMode) => void;
-}) {
-  const pill =
-    'touch-manipulation flex flex-1 select-none items-center justify-center gap-1 rounded-lg px-2 py-2.5 text-[11px] font-semibold transition-colors min-w-0 sm:flex-none sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm active:scale-[0.98]';
-  const active = 'bg-blue-600 text-white shadow-md';
-  const idle = 'bg-transparent text-gray-400 hover:text-white hover:bg-slate-700/80';
-
-  return (
-    <div
-      className="flex w-full max-w-full gap-0.5 rounded-xl border border-slate-700/60 bg-slate-800/90 p-1 sm:max-w-md"
-      role="group"
-      aria-label="Layout: code, split, or preview"
-    >
-      <button
-        type="button"
-        className={`${pill} ${mode === 'code' ? active : idle}`}
-        aria-pressed={mode === 'code'}
-        onClick={() => onChange('code')}
-        title="Code only"
-      >
-        <CodeBracketIcon className="h-4 w-4 shrink-0 sm:h-[1.125rem] sm:w-[1.125rem]" aria-hidden />
-        <span className="hidden min-[360px]:inline sm:inline">Code</span>
-      </button>
-      <button
-        type="button"
-        className={`${pill} ${mode === 'split' ? active : idle}`}
-        aria-pressed={mode === 'split'}
-        onClick={() => onChange('split')}
-        title="Code and preview"
-      >
-        <ViewColumnsIcon className="h-4 w-4 shrink-0 sm:h-[1.125rem] sm:w-[1.125rem]" aria-hidden />
-        <span className="hidden min-[360px]:inline sm:inline">Split</span>
-      </button>
-      <button
-        type="button"
-        className={`${pill} ${mode === 'media' ? active : idle}`}
-        aria-pressed={mode === 'media'}
-        onClick={() => onChange('media')}
-        title="Preview only"
-      >
-        <PhotoIcon className="h-4 w-4 shrink-0 sm:h-[1.125rem] sm:w-[1.125rem]" aria-hidden />
-        <span className="hidden min-[360px]:inline sm:inline">Preview</span>
-      </button>
-    </div>
-  );
-}
+type Toast = { kind: 'info' | 'success' | 'warning'; text: string } | null;
 
 export default function CodeStudio() {
-  const [codeTs, setCodeTs] = useState(STUDIO_STARTER_TS);
-  const [codeJs, setCodeJs] = useState(STUDIO_STARTER_JS);
-  const [codeLang, setCodeLang] = useState<'ts' | 'js'>('ts');
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>('split');
-  const [autoRun, setAutoRun] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [buffers, setBuffers] = useState<StudioBuffer[]>([]);
+  const [activeBufferId, setActiveBufferId] = useState<string>('');
+  const [lang, setLang] = useState<StudioLang>('ts');
+  const [layout, setLayout] = useState<LayoutMode>('split');
+  const [autoRun, setAutoRun] = useState(false);
+  const [splitRatio, setSplitRatio] = useState(0.5);
 
   const [runnerEnabled, setRunnerEnabled] = useState(true);
   const [running, setRunning] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewMime, setPreviewMime] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorExitCode, setErrorExitCode] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
 
+  const [outputTab, setOutputTab] = useState<OutputTab>('preview');
+  const [history, setHistory] = useState<RunHistoryEntry[]>([]);
+
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [toast, setToast] = useState<Toast>(null);
+  const [shareCopied, setShareCopied] = useState(false);
+
   const previewObjectUrlRef = useRef<string | null>(null);
   const autoRunTimerRef = useRef<number>(0);
+  const toastTimerRef = useRef<number>(0);
 
-  const activeCode = codeLang === 'ts' ? codeTs : codeJs;
+  const activeBuffer = useMemo(
+    () => buffers.find((b) => b.id === activeBufferId) ?? buffers[0],
+    [buffers, activeBufferId]
+  );
+  const activeCode = useMemo(
+    () => (activeBuffer ? (lang === 'ts' ? activeBuffer.ts : activeBuffer.js) : ''),
+    [activeBuffer, lang]
+  );
+
+  /* ---------- bootstrap (storage + share-link + incoming) ---------- */
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STUDIO_STORAGE_KEY);
-      if (!raw) return;
-      const p = JSON.parse(raw) as PersistedStudio;
-      if (typeof p.ts === 'string' && p.ts.trim()) setCodeTs(p.ts);
-      if (typeof p.js === 'string' && p.js.trim()) setCodeJs(p.js);
-      if (p.lang === 'js' || p.lang === 'ts') setCodeLang(p.lang);
-      if (p.layout === 'code' || p.layout === 'split' || p.layout === 'media') setLayoutMode(p.layout);
-      if (typeof p.autoRun === 'boolean') setAutoRun(p.autoRun);
-    } catch {
-      /* ignore corrupt storage */
-    }
+    const boot = bootstrapStudio();
+    setBuffers(boot.buffers);
+    setActiveBufferId(boot.activeBufferId);
+    setLang(boot.lang);
+    setLayout(boot.layout ?? 'split');
+    setAutoRun(boot.autoRun);
+    setSplitRatio(boot.splitRatio);
+    setHistory(loadRunHistory());
     setHydrated(true);
+
+    if (boot.source === 'share') {
+      flashToast('info', 'Loaded snippet from share link');
+    } else if (boot.source === 'incoming') {
+      flashToast('info', 'Loaded snippet from gallery');
+    }
   }, []);
+
+  /* ---------- persist on change ---------- */
 
   useEffect(() => {
     if (!hydrated) return;
-    const payload: PersistedStudio = {
-      ts: codeTs,
-      js: codeJs,
-      lang: codeLang,
-      layout: layoutMode,
+    savePersistedStudio({
+      buffers,
+      activeBufferId,
+      lang,
+      layout,
       autoRun,
-    };
-    try {
-      localStorage.setItem(STUDIO_STORAGE_KEY, JSON.stringify(payload));
-    } catch {
-      /* quota */
-    }
-  }, [hydrated, codeTs, codeJs, codeLang, layoutMode, autoRun]);
+      splitRatio,
+    });
+  }, [hydrated, buffers, activeBufferId, lang, layout, autoRun, splitRatio]);
+
+  /* ---------- runner availability probe ---------- */
 
   useEffect(() => {
     let cancelled = false;
@@ -148,6 +128,14 @@ export default function CodeStudio() {
     };
   }, []);
 
+  /* ---------- helpers ---------- */
+
+  const flashToast = useCallback((kind: 'info' | 'success' | 'warning', text: string) => {
+    setToast({ kind, text });
+    window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToast(null), 2400);
+  }, []);
+
   const revokePreview = useCallback(() => {
     if (previewObjectUrlRef.current) {
       URL.revokeObjectURL(previewObjectUrlRef.current);
@@ -155,8 +143,39 @@ export default function CodeStudio() {
     }
   }, []);
 
+  /** Render the response into a 256×144-ish thumbnail data URL for run history. */
+  const makeThumbnail = useCallback(async (mime: string, base64: string): Promise<string | null> => {
+    if (!mime.startsWith('image/')) return null;
+    try {
+      const dataUrl = `data:${mime};base64,${base64}`;
+      const img = new Image();
+      const ready = new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error('thumb load'));
+      });
+      img.src = dataUrl;
+      await ready;
+      const maxW = 256;
+      const ratio = img.width > 0 ? img.width / img.height : 16 / 9;
+      const w = Math.min(maxW, img.width);
+      const h = Math.max(40, Math.round(w / ratio));
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext('2d');
+      if (!ctx) return null;
+      ctx.drawImage(img, 0, 0, w, h);
+      return c.toDataURL('image/jpeg', 0.72);
+    } catch {
+      return null;
+    }
+  }, []);
+
+  /* ---------- run pipeline ---------- */
+
   const runCode = useCallback(async () => {
-    const code = codeLang === 'ts' ? codeTs : codeJs;
+    if (!activeBuffer) return;
+    const code = lang === 'ts' ? activeBuffer.ts : activeBuffer.js;
     if (!runnerEnabled || !code.trim() || running) return;
 
     setRunning(true);
@@ -168,8 +187,9 @@ export default function CodeStudio() {
       const res = await fetch('/api/gallery/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, lang: codeLang }),
+        body: JSON.stringify({ code, lang }),
       });
+
       let data: {
         ok?: boolean;
         mime?: string;
@@ -182,10 +202,18 @@ export default function CodeStudio() {
       try {
         data = (await res.json()) as typeof data;
       } catch {
+        const message = `Run failed (HTTP ${res.status}) — response was not JSON.`;
         setPreviewUrl(null);
-        setError(`Run failed (HTTP ${res.status}) — response was not JSON.`);
+        setError(message);
         setErrorExitCode(null);
         setElapsedMs(null);
+        setOutputTab('terminal');
+        setHistory((cur) =>
+          pushRunHistory(
+            historyEntry(activeBuffer, lang, false, null, null, message, null, null, code),
+            cur
+          )
+        );
         return;
       }
 
@@ -198,63 +226,73 @@ export default function CodeStudio() {
         } else if (stderr && !message) {
           message = stderr;
         }
+        const exitCode = typeof data.exitCode === 'number' ? data.exitCode : 1;
         setError(message || `Run failed (HTTP ${res.status})`);
-        setErrorExitCode(typeof data.exitCode === 'number' ? data.exitCode : 1);
+        setErrorExitCode(exitCode);
         setElapsedMs(typeof data.elapsedMs === 'number' ? data.elapsedMs : null);
+        setOutputTab('terminal');
+        setHistory((cur) =>
+          pushRunHistory(
+            historyEntry(activeBuffer, lang, false, typeof data.elapsedMs === 'number' ? data.elapsedMs : null, exitCode, message || `Run failed (HTTP ${res.status})`, null, null, code),
+            cur
+          )
+        );
         return;
       }
 
       const mime = data.mime ?? 'image/png';
-      const bin = atob(data.base64 ?? '');
+      const base64 = data.base64 ?? '';
+      const bin = atob(base64);
       const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
       revokePreview();
       const blob = new Blob([bytes], { type: mime });
       const url = URL.createObjectURL(blob);
       previewObjectUrlRef.current = url;
       setPreviewUrl(url);
+      setPreviewMime(mime);
       setErrorExitCode(null);
-      setElapsedMs(typeof data.elapsedMs === 'number' ? data.elapsedMs : Math.round(performance.now() - t0));
+      const elapsed = typeof data.elapsedMs === 'number' ? data.elapsedMs : Math.round(performance.now() - t0);
+      setElapsedMs(elapsed);
+      setOutputTab('preview');
+
+      const thumb = await makeThumbnail(mime, base64);
+      setHistory((cur) =>
+        pushRunHistory(
+          historyEntry(activeBuffer, lang, true, elapsed, null, null, thumb, mime, code),
+          cur
+        )
+      );
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Network error');
+      const message = e instanceof Error ? e.message : 'Network error';
+      setError(message);
       setErrorExitCode(null);
       setPreviewUrl(null);
       setElapsedMs(null);
+      setOutputTab('terminal');
+      setHistory((cur) =>
+        pushRunHistory(
+          historyEntry(activeBuffer, lang, false, null, null, message, null, null, code),
+          cur
+        )
+      );
     } finally {
       setRunning(false);
     }
-  }, [codeTs, codeJs, codeLang, runnerEnabled, running, revokePreview]);
+  }, [activeBuffer, lang, runnerEnabled, running, revokePreview, makeThumbnail]);
 
   const runCodeRef = useRef(runCode);
   runCodeRef.current = runCode;
 
-  const scheduleDebouncedRun = useCallback(() => {
+  const scheduleAutoRun = useCallback(() => {
     if (!autoRun || !runnerEnabled) return;
     window.clearTimeout(autoRunTimerRef.current);
     autoRunTimerRef.current = window.setTimeout(() => void runCodeRef.current(), 1300);
   }, [autoRun, runnerEnabled]);
 
-  const handleCodeChange = useCallback(
-    (next: string) => {
-      if (codeLang === 'ts') setCodeTs(next);
-      else setCodeJs(next);
-      scheduleDebouncedRun();
-    },
-    [codeLang, scheduleDebouncedRun]
-  );
-
-  useEffect(() => () => revokePreview(), [revokePreview]);
-
-  useEffect(
-    () => () => {
-      window.clearTimeout(autoRunTimerRef.current);
-    },
-    []
-  );
-
-  /** Initial preview: after localStorage hydrate + runner GET, run starter or restored code once */
+  /** Initial run after hydrate + sandbox probe — same UX as old studio. */
   useEffect(() => {
-    if (!hydrated || !runnerEnabled) return;
+    if (!hydrated || !runnerEnabled || !activeBuffer) return;
     let cancelled = false;
     const id = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -265,224 +303,567 @@ export default function CodeStudio() {
       cancelled = true;
       cancelAnimationFrame(id);
     };
-  }, [hydrated, runnerEnabled]);
+  }, [hydrated, runnerEnabled, activeBuffer?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const resetToStarter = () => {
-    setCodeTs(STUDIO_STARTER_TS);
-    setCodeJs(STUDIO_STARTER_JS);
+  useEffect(() => () => revokePreview(), [revokePreview]);
+  useEffect(
+    () => () => {
+      window.clearTimeout(autoRunTimerRef.current);
+      window.clearTimeout(toastTimerRef.current);
+    },
+    []
+  );
+
+  /* ---------- buffer mutation helpers ---------- */
+
+  const updateActiveCode = useCallback(
+    (next: string) => {
+      setBuffers((cur) =>
+        cur.map((b) =>
+          b.id === activeBufferId ? { ...b, [lang]: next } : b
+        )
+      );
+      scheduleAutoRun();
+    },
+    [activeBufferId, lang, scheduleAutoRun]
+  );
+
+  const newBuffer = useCallback(() => {
+    const b = createBlankBuffer(`Untitled ${buffers.length + 1}`);
+    setBuffers((cur) => [...cur, b]);
+    setActiveBufferId(b.id);
+    setOutputTab('preview');
+  }, [buffers.length]);
+
+  const closeBuffer = useCallback(
+    (id: string) => {
+      setBuffers((cur) => {
+        if (cur.length <= 1) return cur;
+        const next = cur.filter((b) => b.id !== id);
+        if (id === activeBufferId) {
+          const closingIdx = cur.findIndex((b) => b.id === id);
+          const fallback = next[Math.max(0, Math.min(next.length - 1, closingIdx))];
+          if (fallback) setActiveBufferId(fallback.id);
+        }
+        return next;
+      });
+    },
+    [activeBufferId]
+  );
+
+  const renameBuffer = useCallback(
+    (id: string, name: string) => {
+      setBuffers((cur) => cur.map((b) => (b.id === id ? { ...b, name } : b)));
+    },
+    []
+  );
+
+  const duplicateBuffer = useCallback(() => {
+    if (!activeBuffer) return;
+    const dup: StudioBuffer = {
+      id: makeId(),
+      name: `${activeBuffer.name} copy`,
+      ts: activeBuffer.ts,
+      js: activeBuffer.js,
+    };
+    setBuffers((cur) => [...cur, dup]);
+    setActiveBufferId(dup.id);
+  }, [activeBuffer]);
+
+  const loadTemplate = useCallback((template: StudioTemplate) => {
+    const buf = bufferFromTemplate(template);
+    setBuffers((cur) => [...cur, buf]);
+    setActiveBufferId(buf.id);
+    setOutputTab('preview');
+    flashToast('success', `Loaded template · ${template.name}`);
+    /** Auto-run the freshly loaded template after one frame. */
+    requestAnimationFrame(() => requestAnimationFrame(() => void runCodeRef.current()));
+  }, [flashToast]);
+
+  const replayHistory = useCallback(
+    (entry: RunHistoryEntry) => {
+      const buf: StudioBuffer = {
+        id: makeId(),
+        name: `${entry.bufferName} · replay`,
+        ts: entry.lang === 'ts' ? entry.snippet : activeBuffer?.ts ?? STUDIO_STARTER_TS,
+        js: entry.lang === 'js' ? entry.snippet : activeBuffer?.js ?? STUDIO_STARTER_JS,
+      };
+      setBuffers((cur) => [...cur, buf]);
+      setActiveBufferId(buf.id);
+      setLang(entry.lang);
+      setOutputTab('preview');
+      requestAnimationFrame(() => requestAnimationFrame(() => void runCodeRef.current()));
+    },
+    [activeBuffer]
+  );
+
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+    saveRunHistory([]);
+    flashToast('info', 'Run history cleared');
+  }, [flashToast]);
+
+  const resetActiveToStarter = useCallback(() => {
+    setBuffers((cur) =>
+      cur.map((b) =>
+        b.id === activeBufferId ? { ...b, ts: STUDIO_STARTER_TS, js: STUDIO_STARTER_JS } : b
+      )
+    );
     setError(null);
     setErrorExitCode(null);
-  };
+    flashToast('info', 'Reset to starter snippet');
+  }, [activeBufferId, flashToast]);
 
-  const showCode = layoutMode !== 'media';
-  const showPreview = layoutMode !== 'code';
+  /* ---------- share / download ---------- */
 
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      void runCode();
+  const copyShareLink = useCallback(() => {
+    if (!activeBuffer) return;
+    try {
+      const encoded = encodeShareLink({
+        name: activeBuffer.name,
+        ts: activeBuffer.ts,
+        js: activeBuffer.js,
+        lang,
+      });
+      const url = `${window.location.origin}${window.location.pathname}#snippet=${encodeURIComponent(encoded)}`;
+      void navigator.clipboard.writeText(url).then(
+        () => {
+          setShareCopied(true);
+          flashToast('success', 'Share link copied to clipboard');
+          window.setTimeout(() => setShareCopied(false), 1800);
+        },
+        () => flashToast('warning', 'Clipboard blocked — copy from the URL bar')
+      );
+    } catch {
+      flashToast('warning', 'Could not generate share link');
     }
-  };
+  }, [activeBuffer, lang, flashToast]);
 
-  return (
-    <div
-      className="relative flex min-h-0 h-dvh max-h-dvh flex-col overflow-hidden overscroll-none bg-black text-white"
-      onKeyDown={onKeyDown}
-      tabIndex={-1}
-    >
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(ellipse 80% 50% at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-              radial-gradient(ellipse 80% 50% at 50% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
-              #000000
-            `,
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px)
-            `,
-            backgroundSize: '80px 80px',
-          }}
-        />
-      </div>
+  const downloadOutput = useCallback(() => {
+    if (!previewUrl) return flashToast('warning', 'Run the snippet first to download output');
+    const a = document.createElement('a');
+    a.href = previewUrl;
+    const ext = previewMime?.includes('gif') ? 'gif' : previewMime?.includes('webp') ? 'webp' : 'png';
+    a.download = `${(activeBuffer?.name ?? 'apexify').replace(/[^a-z0-9-_]/gi, '-').toLowerCase()}.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    flashToast('success', `Saved ${a.download}`);
+  }, [previewUrl, previewMime, activeBuffer, flashToast]);
 
-      <Navbar />
+  const copyActiveCode = useCallback(() => {
+    if (!activeCode) return;
+    void navigator.clipboard.writeText(activeCode).then(
+      () => flashToast('success', 'Snippet copied to clipboard'),
+      () => flashToast('warning', 'Clipboard blocked')
+    );
+  }, [activeCode, flashToast]);
 
-      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-studio-safe pt-[calc(4.5rem+env(safe-area-inset-top,0px))] sm:px-6 sm:pt-28 md:pt-[7.25rem] lg:px-8">
-        <div className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 flex-col overflow-hidden">
-          <header className="mb-3 flex shrink-0 flex-col gap-3 sm:mb-5 md:mb-6 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
-            <div className="min-w-0 flex-1">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-slate-500 sm:mb-2 sm:text-xs">
-                Playground
-              </p>
-              <h1 className="text-2xl font-black tracking-tight text-transparent sm:text-3xl md:text-4xl bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text">
-                Code studio
-              </h1>
-              <p className="mt-1.5 max-w-2xl text-xs leading-relaxed text-slate-400 line-clamp-4 sm:mt-2 sm:text-sm md:line-clamp-none">
-                Edit Apexify.js; preview runs on the same server sandbox as the gallery (
-                <code className="text-sky-300/90">main()</code> → PNG/GIF <code className="text-sky-300/90">Buffer</code>
-                ). Video/FFmpeg is not available here — canvas/image flows are.
-              </p>
-            </div>
-            <div className="shrink-0 lg:max-w-[min(100%,28rem)] lg:self-end">
-              <LayoutToolbar mode={layoutMode} onChange={setLayoutMode} />
-            </div>
-          </header>
+  /* ---------- command-palette dispatch ---------- */
 
-          {!runnerEnabled && (
-            <div className="mb-3 shrink-0 rounded-lg border border-amber-500/40 bg-amber-950/40 px-3 py-2.5 text-xs text-amber-100 sm:rounded-xl sm:px-4 sm:py-3 sm:text-sm">
-              Code execution is disabled on this deployment (<code className="text-amber-200/90">DISABLE_GALLERY_CODE_RUN</code>
-              ). Remove it on Vercel to enable Studio runs.
-            </div>
-          )}
+  const dispatchAction = useCallback(
+    (id: StudioActionId) => {
+      switch (id) {
+        case 'run':
+          void runCode();
+          break;
+        case 'reset':
+          resetActiveToStarter();
+          break;
+        case 'newBuffer':
+          newBuffer();
+          break;
+        case 'closeBuffer':
+          if (activeBuffer) closeBuffer(activeBuffer.id);
+          break;
+        case 'duplicateBuffer':
+          duplicateBuffer();
+          break;
+        case 'renameBuffer':
+          flashToast('info', 'Double-click any tab to rename it');
+          break;
+        case 'toggleAutoRun':
+          setAutoRun((v) => !v);
+          break;
+        case 'toggleLang':
+          setLang((l) => (l === 'ts' ? 'js' : 'ts'));
+          break;
+        case 'layoutCode':
+          setLayout('code');
+          break;
+        case 'layoutSplit':
+          setLayout('split');
+          break;
+        case 'layoutMedia':
+          setLayout('media');
+          break;
+        case 'copyCode':
+          copyActiveCode();
+          break;
+        case 'copyShareLink':
+          copyShareLink();
+          break;
+        case 'downloadOutput':
+          downloadOutput();
+          break;
+        case 'openShortcuts':
+          setShortcutsOpen(true);
+          break;
+        case 'gotoGallery':
+          window.location.href = '/gallery';
+          break;
+        case 'gotoDocs':
+          window.location.href = '/docs';
+          break;
+        case 'clearHistory':
+          clearHistory();
+          break;
+      }
+    },
+    [
+      runCode,
+      resetActiveToStarter,
+      newBuffer,
+      activeBuffer,
+      closeBuffer,
+      duplicateBuffer,
+      flashToast,
+      copyActiveCode,
+      copyShareLink,
+      downloadOutput,
+      clearHistory,
+    ]
+  );
 
-          <div
-            className={`flex min-h-0 flex-1 flex-col gap-3 overflow-hidden rounded-xl border border-white/[0.08] bg-slate-950/80 backdrop-blur-xl shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] sm:gap-4 md:gap-0 md:rounded-2xl ${
-              layoutMode === 'split' ? 'md:flex-row' : 'md:flex-col'
-            }`}
-          >
-            {showCode && (
-            <section
-              className={`flex min-h-[200px] flex-col overflow-hidden border-white/[0.06] min-[380px]:min-h-[220px] md:min-h-0 ${
-                layoutMode === 'split'
-                  ? 'md:w-1/2 md:flex-1 md:border-r md:border-white/[0.06]'
-                  : 'flex-1'
-              }`}
-            >
-              <div className="flex shrink-0 flex-col gap-2 border-b border-white/[0.06] bg-[#0d1117]/95 px-2 py-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:px-3 sm:py-2.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex rounded-lg border border-slate-700/60 bg-slate-800/90 p-0.5">
-                    <button
-                      type="button"
-                      className={`touch-manipulation rounded-md px-2.5 py-2 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:px-3 sm:py-1.5 sm:text-xs ${
-                        codeLang === 'ts' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-                      }`}
-                      onClick={() => setCodeLang('ts')}
-                    >
-                      TS
-                    </button>
-                    <button
-                      type="button"
-                      className={`touch-manipulation rounded-md px-2.5 py-2 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:px-3 sm:py-1.5 sm:text-xs ${
-                        codeLang === 'js' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'
-                      }`}
-                      onClick={() => setCodeLang('js')}
-                    >
-                      JS
-                    </button>
-                  </div>
+  /* ---------- global keyboard shortcuts ---------- */
 
-                  <button
-                    type="button"
-                    onClick={() => void runCode()}
-                    disabled={running || !runnerEnabled}
-                    className="touch-manipulation inline-flex min-h-[40px] items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white shadow-lg shadow-emerald-900/30 hover:bg-emerald-500 disabled:pointer-events-none disabled:opacity-45 active:scale-[0.98] sm:min-h-0 sm:py-1.5"
-                  >
-                    <PlayIcon className="h-4 w-4 shrink-0" aria-hidden />
-                    Run
-                  </button>
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const isTextInput =
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable;
+      const editorFocused = !!target?.closest?.('.cm-editor');
+      const cmd = e.ctrlKey || e.metaKey;
 
-                  <button
-                    type="button"
-                    onClick={resetToStarter}
-                    className="touch-manipulation inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-slate-600 bg-slate-800/80 px-3 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700/80 active:scale-[0.98] sm:min-h-0 sm:py-1.5"
-                  >
-                    <ArrowPathIcon className="h-4 w-4 shrink-0" aria-hidden />
-                    <span className="hidden min-[380px]:inline">Reset sample</span>
-                    <span className="min-[380px]:hidden">Reset</span>
-                  </button>
-                </div>
+      if (cmd && e.key === 'k') {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+        return;
+      }
+      if (cmd && e.key === 'Enter') {
+        e.preventDefault();
+        void runCode();
+        return;
+      }
+      if (cmd && e.key.toLowerCase() === 't') {
+        e.preventDefault();
+        newBuffer();
+        return;
+      }
+      if (cmd && e.key.toLowerCase() === 'w') {
+        e.preventDefault();
+        if (activeBuffer) closeBuffer(activeBuffer.id);
+        return;
+      }
+      if (cmd && e.key.toLowerCase() === 'l') {
+        e.preventDefault();
+        setLang((l) => (l === 'ts' ? 'js' : 'ts'));
+        return;
+      }
+      if (cmd && e.key === '1') {
+        e.preventDefault();
+        setLayout('code');
+        return;
+      }
+      if (cmd && e.key === '2') {
+        e.preventDefault();
+        setLayout('split');
+        return;
+      }
+      if (cmd && e.key === '3') {
+        e.preventDefault();
+        setLayout('media');
+        return;
+      }
+      if (cmd && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        copyShareLink();
+        return;
+      }
+      if (cmd && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
+        downloadOutput();
+        return;
+      }
+      if (!cmd && e.key === '?' && !isTextInput && !editorFocused) {
+        e.preventDefault();
+        setShortcutsOpen(true);
+        return;
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [runCode, newBuffer, closeBuffer, activeBuffer, copyShareLink, downloadOutput]);
 
-                <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
-                  <label className="inline-flex cursor-pointer select-none items-center gap-2 text-[11px] text-slate-400 sm:text-xs">
-                    <input
-                      type="checkbox"
-                      className="rounded border-slate-600 bg-slate-800 text-blue-500 focus:ring-blue-500"
-                      checked={autoRun}
-                      onChange={(e) => setAutoRun(e.target.checked)}
-                    />
-                    <span>
-                      Auto-run · <span className="text-slate-500">debounced</span>
-                    </span>
-                  </label>
+  /* ---------- derived display values ---------- */
 
-                  <span className="hidden items-center gap-1 text-[11px] text-slate-500 md:inline-flex">
-                    <CommandLineIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                    <kbd className="rounded border border-slate-700 bg-slate-800 px-1 py-0.5 font-mono">⌘</kbd>
-                    <kbd className="rounded border border-slate-700 bg-slate-800 px-1 py-0.5 font-mono">↵</kbd>
-                  </span>
-                </div>
-              </div>
+  const lineCount = activeCode ? activeCode.split('\n').length : 0;
+  const charCount = activeCode ? new Blob([activeCode]).size : 0;
+  const showCode = layout !== 'media';
+  const showPreview = layout !== 'code';
+  const splitEnabled = layout === 'split';
 
-              <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#0d1117]">
-                <div className="mx-auto flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden px-1.5 py-1.5 sm:max-w-4xl sm:px-4 sm:py-3">
-                  <GallerySnippetEditor
-                    fillParent
-                    value={activeCode}
-                    codeLang={codeLang}
-                    onChange={handleCodeChange}
-                  />
-                </div>
-              </div>
-            </section>
-            )}
-
-            {showPreview && (
-            <section
-              className={`flex min-h-[200px] flex-col overflow-hidden bg-slate-900/50 min-[380px]:min-h-[220px] md:min-h-0 ${
-                layoutMode === 'split' ? 'md:w-1/2 md:flex-1' : 'flex-1'
-              }`}
-            >
-              <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-white/[0.06] px-2 py-2 sm:gap-2 sm:px-3 sm:py-2.5">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 sm:text-xs">
-                  {error ? 'Terminal' : 'Preview'}
-                </span>
-                {elapsedMs != null && (
-                  <span className="text-[10px] text-slate-500 tabular-nums sm:text-[11px]">{elapsedMs} ms</span>
-                )}
-                {running && (
-                  <span className="inline-flex items-center gap-1.5 text-xs text-emerald-400">
-                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden />
-                    Running…
-                  </span>
-                )}
-              </div>
-
-              <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-[length:20px_20px] bg-[linear-gradient(45deg,#1e293b_25%,transparent_25%),linear-gradient(-45deg,#1e293b_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#1e293b_75%),linear-gradient(-45deg,transparent_75%,#1e293b_75%)] bg-[0_0,0_10px,10px_-10px,-10px_0px] bg-slate-950/90">
-                {running && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/35 backdrop-blur-[2px]">
-                    <div className="h-10 w-10 rounded-full border-2 border-emerald-400/30 border-t-emerald-400 animate-spin" />
-                  </div>
-                )}
-
-                {error && (
-                  <div className="relative z-[5] flex-1 min-h-0 flex flex-col">
-                    <StudioRunnerTerminal rawMessage={error} exitCode={errorExitCode} />
-                  </div>
-                )}
-
-                {previewUrl && !error && <StudioPreviewZoom src={previewUrl} alt="Rendered output from your snippet" />}
-
-                {!previewUrl && !error && !running && (
-                  <div className="flex-1 flex items-center justify-center p-4">
-                    <p className="text-sm text-slate-500 text-center px-4">
-                      Run your code to see PNG or GIF output here.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </section>
-            )}
-          </div>
+  const codeSection = activeBuffer ? (
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <StudioFileTabs
+        buffers={buffers}
+        activeId={activeBufferId}
+        onSelect={(id) => {
+          setActiveBufferId(id);
+          setOutputTab('preview');
+        }}
+        onClose={closeBuffer}
+        onRename={renameBuffer}
+        onNew={newBuffer}
+      />
+      <div
+        className="flex min-h-0 flex-1 flex-col overflow-hidden"
+        style={{ backgroundColor: 'var(--bg-canvas)' }}
+      >
+        <div className="mx-auto flex min-h-0 w-full max-w-full flex-1 flex-col overflow-hidden px-1 py-1 sm:px-2 sm:py-2">
+          <GallerySnippetEditor
+            fillParent
+            value={activeCode}
+            codeLang={lang}
+            onChange={updateActiveCode}
+          />
         </div>
       </div>
     </div>
+  ) : null;
+
+  const previewSection = (
+    <StudioOutputPanel
+      tab={outputTab}
+      onTabChange={setOutputTab}
+      running={running}
+      previewUrl={previewUrl}
+      error={error}
+      errorExitCode={errorExitCode}
+      elapsedMs={elapsedMs}
+      history={history}
+      onReplayHistory={replayHistory}
+      onClearHistory={clearHistory}
+    />
   );
+
+  return (
+    <div
+      className="relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden overscroll-none"
+      style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
+    >
+      {/* Backdrop — twilight gradient + soft aurora glows + grid */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'var(--gradient-twilight)',
+          }}
+        />
+        <div
+          className="absolute -left-[20%] -top-[20%] h-[55vh] w-[55vw] rounded-full blur-3xl"
+          style={{
+            background:
+              'radial-gradient(closest-side, color-mix(in srgb, var(--accent-iris) 38%, transparent), transparent 70%)',
+            opacity: 0.7,
+          }}
+        />
+        <div
+          className="absolute -right-[18%] top-[35%] h-[48vh] w-[48vw] rounded-full blur-3xl"
+          style={{
+            background:
+              'radial-gradient(closest-side, color-mix(in srgb, var(--accent-magenta) 32%, transparent), transparent 70%)',
+            opacity: 0.6,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(color-mix(in srgb, var(--border-subtle) 100%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border-subtle) 100%, transparent) 1px, transparent 1px)',
+            backgroundSize: '64px 64px',
+            opacity: 0.55,
+            maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
+          }}
+        />
+      </div>
+
+      <StudioTopBar
+        layout={layout}
+        onLayoutChange={setLayout}
+        lang={lang}
+        onLangChange={setLang}
+        running={running}
+        runnerEnabled={runnerEnabled}
+        autoRun={autoRun}
+        onAutoRunChange={setAutoRun}
+        onRun={() => void runCode()}
+        onReset={resetActiveToStarter}
+        onLoadTemplate={loadTemplate}
+        onCopyShareLink={copyShareLink}
+        shareCopied={shareCopied}
+        onDownloadOutput={downloadOutput}
+        hasOutput={!!previewUrl}
+        onOpenPalette={() => setPaletteOpen(true)}
+        onOpenShortcuts={() => setShortcutsOpen(true)}
+      />
+
+      {!runnerEnabled && (
+        <div
+          className="flex shrink-0 items-center gap-2 px-3 py-2 text-xs sm:px-4"
+          style={{
+            backgroundColor: 'color-mix(in srgb, var(--warning) 14%, transparent)',
+            borderBottom: '1px solid color-mix(in srgb, var(--warning) 35%, transparent)',
+            color: 'var(--text-primary)',
+          }}
+        >
+          <ExclamationTriangleIcon className="h-4 w-4 shrink-0" style={{ color: 'var(--warning)' }} aria-hidden />
+          <span>
+            Code execution is disabled on this deployment (
+            <code style={{ color: 'var(--warning)' }}>DISABLE_GALLERY_CODE_RUN</code>
+            ). Remove it to enable Studio runs.
+          </span>
+        </div>
+      )}
+
+      <main
+        className="relative flex min-h-0 flex-1 flex-col overflow-hidden p-2 pb-studio-safe sm:p-3 lg:p-4"
+        tabIndex={-1}
+      >
+        <div
+          className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl shadow-[var(--shadow-md)] sm:rounded-2xl"
+          style={{
+            backgroundColor: 'color-mix(in srgb, var(--bg-raised) 92%, transparent)',
+            backdropFilter: 'blur(18px) saturate(140%)',
+            WebkitBackdropFilter: 'blur(18px) saturate(140%)',
+            border: '1px solid var(--border-default)',
+          }}
+        >
+          {showCode && showPreview ? (
+            <StudioResizableSplit
+              ratio={splitRatio}
+              onRatioChange={setSplitRatio}
+              enabled={splitEnabled}
+              left={codeSection}
+              right={previewSection}
+            />
+          ) : showCode ? (
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{codeSection}</div>
+          ) : (
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{previewSection}</div>
+          )}
+        </div>
+      </main>
+
+      <StudioStatusBar
+        lang={lang}
+        onToggleLang={() => setLang((l) => (l === 'ts' ? 'js' : 'ts'))}
+        bufferName={activeBuffer?.name ?? '—'}
+        lineCount={lineCount}
+        charCount={charCount}
+        autoRun={autoRun}
+        onToggleAutoRun={() => setAutoRun((v) => !v)}
+        runnerEnabled={runnerEnabled}
+        running={running}
+        lastError={!!error}
+        elapsedMs={elapsedMs}
+        hasOutput={!!previewUrl}
+      />
+
+      <StudioCommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        onAction={dispatchAction}
+        onLoadTemplate={loadTemplate}
+      />
+
+      <StudioShortcutOverlay open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key={toast.text}
+            initial={{ opacity: 0, y: 14, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 14, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+            className="pointer-events-auto fixed bottom-12 left-1/2 z-[90] flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold shadow-[var(--shadow-lg)]"
+            style={{
+              backgroundColor: 'var(--bg-raised)',
+              border: '1px solid var(--border-default)',
+              color: 'var(--text-primary)',
+            }}
+          >
+            <span
+              className="grid h-5 w-5 place-items-center rounded-full"
+              style={{
+                background:
+                  toast.kind === 'success'
+                    ? 'var(--success)'
+                    : toast.kind === 'warning'
+                      ? 'var(--warning)'
+                      : 'var(--gradient-iris)',
+                color: 'white',
+              }}
+              aria-hidden
+            >
+              <InformationCircleIcon className="h-3 w-3" />
+            </span>
+            <span>{toast.text}</span>
+            <button
+              type="button"
+              onClick={() => setToast(null)}
+              aria-label="Dismiss"
+              style={{ color: 'var(--text-tertiary)' }}
+            >
+              <XMarkIcon className="h-3.5 w-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ----------------------------------------------------------------- *
+ *  small helpers
+ * ----------------------------------------------------------------- */
+
+function historyEntry(
+  buffer: StudioBuffer,
+  lang: StudioLang,
+  ok: boolean,
+  elapsedMs: number | null,
+  exitCode: number | null,
+  error: string | null,
+  thumbDataUrl: string | null,
+  mime: string | null,
+  snippet: string
+): RunHistoryEntry {
+  return {
+    id: makeId('run'),
+    bufferId: buffer.id,
+    bufferName: buffer.name,
+    lang,
+    ok,
+    elapsedMs,
+    exitCode,
+    error,
+    thumbDataUrl,
+    mime,
+    ts: Date.now(),
+    snippet,
+  };
 }

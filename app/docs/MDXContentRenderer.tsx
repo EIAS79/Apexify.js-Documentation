@@ -20,6 +20,7 @@ import {
   PreviewWithCode,
 } from '@/components/mdx';
 import ChangelogRenderer from '@/components/ChangelogRenderer';
+import { DocHeadingAnchor } from '@/components/docs/DocHeadingAnchor';
 import React, { ReactElement } from 'react';
 import type { DocHeading } from '@/lib/docs-heading-utils';
 import { slugifyHeading, stripExplicitHeadingIdsFromMarkdown } from '@/lib/docs-heading-utils';
@@ -58,11 +59,14 @@ function createMarkdownAwareComponents(getNextHeadingId: () => string | undefine
         <h1
           {...props}
           id={id}
-          className="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-white via-blue-50 to-white bg-clip-text text-transparent mb-6 sm:mb-8 mt-4 sm:mt-8 pb-4 border-b border-slate-800/50 scroll-mt-28"
+          className="group not-prose mb-6 mt-4 scroll-mt-28 pb-4 text-3xl font-black leading-tight tracking-tight sm:mb-8 sm:mt-8 sm:text-4xl md:text-5xl text-grad-aurora"
           style={{
-            textShadow: '0 0 30px rgba(59, 130, 246, 0.2)',
+            borderBottom: '1px solid var(--border-default)',
           }}
-        />
+        >
+          <span>{props.children}</span>
+          <DocHeadingAnchor id={id} />
+        </h1>
       );
     },
     h2: ({ node, ...props }: any) => {
@@ -71,10 +75,12 @@ function createMarkdownAwareComponents(getNextHeadingId: () => string | undefine
         <h2
           {...props}
           id={id}
-          className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6 mt-8 sm:mt-12 flex items-center gap-2 sm:gap-3 flex-wrap scroll-mt-28"
+          className="group not-prose mb-4 mt-8 flex scroll-mt-28 flex-wrap items-center gap-2 text-2xl font-bold leading-snug sm:mb-6 sm:mt-12 sm:gap-3 sm:text-3xl md:text-4xl"
+          style={{ color: 'var(--text-primary)' }}
         >
-          <span className="text-blue-400">#</span>
+          <span aria-hidden style={{ color: 'var(--accent-magenta)' }}>#</span>
           <span>{props.children}</span>
+          <DocHeadingAnchor id={id} />
         </h2>
       );
     },
@@ -84,10 +90,12 @@ function createMarkdownAwareComponents(getNextHeadingId: () => string | undefine
         <h3
           {...props}
           id={id}
-          className="text-xl sm:text-2xl font-bold text-gray-100 mb-3 sm:mb-4 mt-6 sm:mt-8 flex items-center gap-2 flex-wrap scroll-mt-28"
+          className="group not-prose mb-3 mt-6 flex scroll-mt-28 flex-wrap items-center gap-2 text-xl font-bold leading-snug sm:mb-4 sm:mt-8 sm:text-2xl"
+          style={{ color: 'var(--text-primary)' }}
         >
-          <span className="text-purple-400">##</span>
+          <span aria-hidden style={{ color: 'var(--accent-iris)' }}>##</span>
           <span>{props.children}</span>
+          <DocHeadingAnchor id={id} />
         </h3>
       );
     },
@@ -101,41 +109,73 @@ function createMarkdownAwareComponents(getNextHeadingId: () => string | undefine
       }
 
       return (
-        <code className="bg-slate-800/80 text-emerald-300 px-2 py-1 rounded-md text-sm font-mono border border-slate-700/50" {...props}>
+        <code
+          className="rounded-md px-2 py-1 font-mono text-sm"
+          style={{
+            backgroundColor: 'var(--bg-sunken)',
+            color: 'var(--accent-magenta)',
+            border: '1px solid var(--border-subtle)',
+          }}
+          {...props}
+        >
           {children}
         </code>
       );
     },
     p: ({ node, ...props }: any) => (
-      <p className="text-gray-300 mb-4 sm:mb-6 leading-relaxed text-base sm:text-lg" {...props} />
+      <p
+        className="mb-4 text-base leading-relaxed sm:mb-6 sm:text-lg"
+        style={{ color: 'var(--text-secondary)' }}
+        {...props}
+      />
     ),
     ul: ({ node, ...props }: any) => (
-      <ul className="list-disc list-inside text-gray-300 mb-4 sm:mb-6 space-y-2 ml-4 sm:ml-6 text-base sm:text-lg" {...props} />
+      <ul
+        className="mb-4 ml-4 list-disc list-inside space-y-2 text-base sm:mb-6 sm:ml-6 sm:text-lg"
+        style={{ color: 'var(--text-secondary)' }}
+        {...props}
+      />
     ),
     ol: ({ node, ...props }: any) => (
-      <ol className="list-decimal list-inside text-gray-300 mb-4 sm:mb-6 space-y-2 ml-4 sm:ml-6 text-base sm:text-lg" {...props} />
+      <ol
+        className="mb-4 ml-4 list-decimal list-inside space-y-2 text-base sm:mb-6 sm:ml-6 sm:text-lg"
+        style={{ color: 'var(--text-secondary)' }}
+        {...props}
+      />
     ),
     li: ({ node, ...props }: any) => (
-      <li className="text-gray-300 leading-relaxed" {...props} />
+      <li className="leading-relaxed" style={{ color: 'var(--text-secondary)' }} {...props} />
     ),
     strong: ({ node, ...props }: any) => (
-      <strong className="text-white font-bold" {...props} />
+      <strong className="font-bold" style={{ color: 'var(--text-primary)' }} {...props} />
     ),
     em: ({ node, ...props }: any) => (
-      <em className="text-blue-200 italic" {...props} />
+      <em className="italic" style={{ color: 'var(--accent-iris)' }} {...props} />
     ),
     a: ({ node, href, ...props }: any) => (
       <a
         href={href}
-        className="text-blue-400 hover:text-blue-300 font-medium underline decoration-blue-500/50 hover:decoration-blue-400 transition-colors duration-150"
+        className="font-medium underline transition-colors"
+        style={{
+          color: 'var(--accent-iris)',
+          textDecorationColor: 'color-mix(in srgb, var(--accent-iris) 50%, transparent)',
+        }}
         {...props}
       />
     ),
     blockquote: ({ node, ...props }: any) => (
-      <blockquote className="border-l-4 border-blue-500/60 bg-blue-950/20 pl-6 pr-4 py-4 italic text-blue-100 my-6 rounded-r-lg" {...props} />
+      <blockquote
+        className="my-6 rounded-r-lg pl-6 pr-4 py-4 italic"
+        style={{
+          borderLeft: '4px solid var(--accent-magenta)',
+          backgroundColor: 'color-mix(in srgb, var(--accent-magenta) 8%, transparent)',
+          color: 'var(--text-secondary)',
+        }}
+        {...props}
+      />
     ),
     hr: (props: any) => (
-      <hr className="border-t-2 border-slate-800 my-12" {...props} />
+      <hr className="my-12" style={{ border: 0, borderTop: '1px solid var(--border-default)' }} {...props} />
     ),
     table: ({ node, ...props }: any) => (
       <div className="my-6 overflow-x-auto">

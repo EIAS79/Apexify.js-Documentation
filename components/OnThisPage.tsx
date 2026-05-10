@@ -1,7 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Bars3BottomRightIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 
 interface Heading {
   id: string;
@@ -15,15 +18,12 @@ interface OnThisPageProps {
 
 export default function OnThisPage({ headings }: OnThisPageProps) {
   const [activeId, setActiveId] = useState<string>('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const railRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
@@ -32,11 +32,6 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
   useEffect(() => {
     if (headings.length === 0) return;
 
-    /**
-     * Scroll-spy uses heading nodes under `[data-doc-article]` in **document order**
-     * (avoids accidentally targeting unrelated `.markdown-content` wrappers).
-     * Anchor line sits ~under fixed nav (`top-16`); headings use `scroll-mt-28`.
-     */
     const NAV_ANCHOR_PX = 100;
     const tocIds = new Set(headings.map((h) => h.id));
 
@@ -53,7 +48,6 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
         setActiveId((prev) => (prev === (headings[0]?.id ?? '') ? prev : (headings[0]?.id ?? '')));
         return;
       }
-
       let active = els[0].id;
       for (const el of els) {
         const top = el.getBoundingClientRect().top;
@@ -69,130 +63,156 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
     window.addEventListener('resize', updateActive);
 
     const resizeRoot = document.querySelector('[data-doc-article]');
-    let resizeObserver: ResizeObserver | null = null;
+    let ro: ResizeObserver | null = null;
     if (resizeRoot && typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(() => updateActive());
-      resizeObserver.observe(resizeRoot);
+      ro = new ResizeObserver(() => updateActive());
+      ro.observe(resizeRoot);
     }
 
     return () => {
       window.removeEventListener('scroll', updateActive);
       window.removeEventListener('resize', updateActive);
-      resizeObserver?.disconnect();
+      ro?.disconnect();
     };
   }, [headings]);
 
   const handleClick = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      window.history.replaceState(null, '', `#${id}`);
-      setActiveId(id);
-    }
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.history.replaceState(null, '', `#${id}`);
+    setActiveId(id);
   };
 
   if (headings.length === 0) return null;
 
+  const renderTocList = () => (
+    <nav ref={railRef} className="relative" aria-label="On this page">
+      {/* Inactive vertical rail */}
+      <span
+        aria-hidden
+        className="absolute left-[0.4375rem] top-1.5 bottom-1.5 w-px"
+        style={{ backgroundColor: 'var(--border-subtle)' }}
+      />
+      <ul className="relative space-y-0.5">
+        {headings.map((heading) => {
+          const isActive = activeId === heading.id;
+          const indent = heading.level === 1 ? 0 : heading.level === 2 ? 0.75 : 1.5;
+          return (
+            <li key={heading.id} style={{ paddingLeft: `${indent}rem` }}>
+              <a
+                href={`#${heading.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleClick(heading.id);
+                  if (isMobile) setIsMobileOpen(false);
+                }}
+                className="group relative flex items-center gap-2 rounded-md py-1.5 pl-3 pr-2 text-[12px] transition-colors"
+                style={{
+                  color: isActive ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                  fontWeight: isActive || heading.level === 1 ? 600 : 500,
+                }}
+              >
+                {/* Active dot — sits on the rail */}
+                <span
+                  aria-hidden
+                  className="absolute -left-[0.0625rem] top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all"
+                  style={{
+                    backgroundColor: isActive ? 'var(--accent-magenta)' : 'transparent',
+                    boxShadow: isActive ? 'var(--glow-magenta)' : 'none',
+                    transform: 'translate(calc(-50% + 0.4375rem), -50%)',
+                  }}
+                />
+                <span className="min-w-0 flex-1 truncate leading-snug">{heading.text}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+
   return (
     <>
-      {/* Mobile toggle button */}
+      {/* Mobile floating button */}
       <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 lg:hidden bg-blue-500 text-white p-2.5 sm:p-3 rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 hover:scale-110"
-        aria-label="Toggle table of contents"
+        onClick={() => setIsMobileOpen(true)}
+        className="fixed bottom-5 right-5 z-50 grid h-12 w-12 place-items-center rounded-full transition-transform hover:scale-110 active:scale-95 lg:hidden"
+        style={{
+          background: 'var(--gradient-sunset)',
+          color: 'white',
+          boxShadow: 'var(--glow-magenta)',
+        }}
+        aria-label="On this page"
       >
-        {isMobileOpen ? (
-          <ChevronRightIcon className="h-6 w-6" />
-        ) : (
-          <ChevronLeftIcon className="h-6 w-6" />
-        )}
+        <Bars3BottomRightIcon className="h-5 w-5" aria-hidden />
       </button>
 
-      {/* Mobile overlay */}
+      {/* Mobile bottom sheet */}
       {isMobileOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setIsMobileOpen(false)}
-        />
-      )}
-
-      {/* Expand button when collapsed (floating icon) - OUTSIDE the sidebar */}
-      {isCollapsed && !isMobile && (
-        <button
-          onClick={() => setIsCollapsed(false)}
-          className="fixed right-4 top-24 z-[60] p-3 bg-slate-950 hover:bg-slate-900 rounded-lg border border-slate-800 transition-all duration-200 shadow-xl hover:scale-110 backdrop-blur-sm"
-          aria-label="Expand sidebar"
-        >
-          <ChevronLeftIcon className="h-6 w-6 text-gray-300 hover:text-white" />
-        </button>
-      )}
-
-      <aside 
-        data-sidebar="right"
-        className={`fixed right-0 top-16 bottom-0 h-[calc(100vh-4rem)] bg-gradient-to-b from-slate-950 via-slate-950 to-slate-900/95 backdrop-blur-xl border-l border-slate-800/60 transition-all duration-300 z-40 shadow-xl lg:shadow-none ${
-          isCollapsed 
-            ? 'w-0 lg:w-0 overflow-hidden border-l-0' 
-            : 'w-0 lg:w-64 overflow-y-auto'
-        } ${isMobileOpen ? 'w-64 translate-x-0 overflow-y-auto' : 'translate-x-full lg:translate-x-0'}`}>
-
-        {/* Sidebar content - only show when not collapsed */}
-        {!isCollapsed && (
-          <div className="p-4">
-            {/* Collapse/Expand button (desktop only) */}
-            <div className="hidden lg:flex items-center justify-between mb-6 pb-4 border-b border-slate-800/50">
-              <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
-                <span className="text-blue-400">📑</span>
-                ON THIS PAGE
-              </h3>
-              <button
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                className="p-1.5 hover:bg-slate-950 rounded-lg transition-colors duration-200"
-                aria-label="Collapse"
+        <>
+          <div
+            className="fixed inset-0 z-40 lg:hidden"
+            onClick={() => setIsMobileOpen(false)}
+            aria-hidden
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--bg-base) 60%, black)',
+              backdropFilter: 'blur(4px)',
+            }}
+          />
+          <div
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-hidden rounded-t-2xl lg:hidden"
+            style={{
+              backgroundColor: 'var(--bg-raised)',
+              borderTop: '1px solid var(--border-default)',
+              boxShadow: 'var(--shadow-xl)',
+            }}
+          >
+            <div
+              className="flex items-center justify-between px-4 py-3"
+              style={{ borderBottom: '1px solid var(--border-subtle)' }}
+            >
+              <p
+                className="text-[10px] font-semibold uppercase tracking-[0.32em]"
+                style={{ color: 'var(--accent-magenta)' }}
               >
-                <ChevronRightIcon className="h-6 w-6 text-gray-400" />
-              </button>
-            </div>
-
-            {/* Mobile header */}
-            <div className="flex lg:hidden items-center justify-between mb-4">
-              <h3 className="text-base font-semibold text-gray-400 uppercase tracking-wider">
-                ON THIS PAGE
-              </h3>
+                On this page
+              </p>
               <button
                 onClick={() => setIsMobileOpen(false)}
-                className="p-1.5 hover:bg-slate-950 rounded-lg transition-colors duration-200"
+                className="grid h-8 w-8 place-items-center rounded-md"
+                style={{ color: 'var(--text-tertiary)' }}
                 aria-label="Close"
               >
-                <ChevronRightIcon className="h-6 w-6 text-gray-400" />
+                <XMarkIcon className="h-5 w-5" aria-hidden />
               </button>
             </div>
-
-            <nav className="space-y-1 animate-fade-in">
-              {headings.map((heading) => (
-                <a
-                  key={heading.id}
-                  href={`#${heading.id}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleClick(heading.id);
-                    if (isMobile) {
-                      setIsMobileOpen(false);
-                    }
-                  }}
-                  className={`block py-2.5 px-3 rounded-lg text-sm transition-all duration-150 ${
-                    heading.level === 1 ? 'font-semibold' : heading.level === 2 ? 'ml-4 font-medium' : 'ml-6'
-                  } ${
-                    activeId === heading.id
-                      ? 'text-white bg-gradient-to-r from-blue-600 to-purple-600 font-semibold shadow-lg shadow-blue-500/30'
-                      : 'text-gray-400 hover:text-blue-300 hover:bg-slate-800/60'
-                  }`}
-                >
-                  {heading.text}
-                </a>
-              ))}
-            </nav>
+            <div className="overflow-y-auto px-4 py-3" style={{ maxHeight: 'calc(70vh - 3.25rem)' }}>
+              {renderTocList()}
+            </div>
           </div>
-        )}
+        </>
+      )}
+
+      <aside
+        data-sidebar="right"
+        className="fixed right-0 top-16 bottom-0 z-30 hidden h-[calc(100vh-4rem)] w-64 overflow-hidden lg:block"
+        style={{
+          backgroundColor: 'color-mix(in srgb, var(--bg-base) 70%, transparent)',
+          backdropFilter: 'blur(12px) saturate(130%)',
+          WebkitBackdropFilter: 'blur(12px) saturate(130%)',
+          borderLeft: '1px solid var(--border-subtle)',
+        }}
+      >
+        <div className="h-full overflow-y-auto px-4 py-5">
+          <p
+            className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em]"
+            style={{ color: 'var(--accent-magenta)' }}
+          >
+            On this page
+          </p>
+          {renderTocList()}
+        </div>
       </aside>
     </>
   );
