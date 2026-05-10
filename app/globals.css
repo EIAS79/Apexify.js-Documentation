@@ -193,6 +193,19 @@ body {
   background: var(--accent-iris);
 }
 
+/* Drag-to-scroll tracks (e.g. Recipes deck) hide their scrollbars
+   while keeping native horizontal scrolling alive for touch + wheel. */
+.recipes-track::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.recipes-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+}
+
 /* ============================================================
    Design system component classes
    ============================================================ */

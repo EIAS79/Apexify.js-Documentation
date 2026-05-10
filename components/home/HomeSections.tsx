@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ChartBarIcon,
@@ -20,6 +21,8 @@ import {
   BoltIcon,
   CodeBracketIcon,
   ArrowRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   CheckIcon,
   XMarkIcon,
   MinusSmallIcon,
@@ -636,10 +639,99 @@ const RECIPES = [
 ];
 
 export function RecipesDeck() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState<{ left: boolean; right: boolean }>({ left: false, right: true });
+  const dragRef = useRef<{
+    phase: 'idle' | 'pending' | 'dragging';
+    startX: number;
+    startScroll: number;
+    pointerId: number;
+  }>({ phase: 'idle', startX: 0, startScroll: 0, pointerId: -1 });
+  const [isDragging, setIsDragging] = useState(false);
+
+  /** Recompute the edge fades + arrow disabled state on scroll / resize. */
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const measure = () => {
+      const max = el.scrollWidth - el.clientWidth;
+      setEdges({
+        left: el.scrollLeft > 4,
+        right: el.scrollLeft < max - 4,
+      });
+    };
+    measure();
+    el.addEventListener('scroll', measure, { passive: true });
+    window.addEventListener('resize', measure);
+    return () => {
+      el.removeEventListener('scroll', measure);
+      window.removeEventListener('resize', measure);
+    };
+  }, []);
+
+  /** Step roughly one card width per arrow click. */
+  const step = (dir: 1 | -1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const card = el.querySelector<HTMLElement>('[data-recipe-card]');
+    const delta = (card?.offsetWidth ?? 300) + 16;
+    el.scrollBy({ left: dir * delta, behavior: 'smooth' });
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'touch') return;
+    const el = trackRef.current;
+    if (!el) return;
+    dragRef.current = {
+      phase: 'pending',
+      startX: e.clientX,
+      startScroll: el.scrollLeft,
+      pointerId: e.pointerId,
+    };
+    el.setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const ds = dragRef.current;
+    if (ds.phase === 'idle') return;
+    const el = trackRef.current;
+    if (!el) return;
+    const dx = e.clientX - ds.startX;
+    if (ds.phase === 'pending' && Math.abs(dx) > 5) {
+      ds.phase = 'dragging';
+      setIsDragging(true);
+    }
+    if (ds.phase === 'dragging') {
+      el.scrollLeft = ds.startScroll - dx;
+    }
+  };
+  const endPointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    const ds = dragRef.current;
+    const el = trackRef.current;
+    const wasDragging = ds.phase === 'dragging';
+    if (el && ds.pointerId !== -1) {
+      try {
+        el.releasePointerCapture(ds.pointerId);
+      } catch {
+        /* already released */
+      }
+    }
+    dragRef.current = { phase: 'idle', startX: 0, startScroll: 0, pointerId: -1 };
+    setIsDragging(false);
+    /** Swallow the click that would otherwise fire after a drag. */
+    if (wasDragging) {
+      const swallow = (ev: MouseEvent) => {
+        ev.stopPropagation();
+        ev.preventDefault();
+      };
+      window.addEventListener('click', swallow, { capture: true, once: true });
+    }
+    void e;
+  };
+
   return (
     <section className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 sm:mb-14">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-12">
           <SectionHeader
             eyebrow="Recipes"
             title={
@@ -649,65 +741,136 @@ export function RecipesDeck() {
               </>
             }
           />
-          <Link
-            href="/docs#00-recipes-overview"
-            className="btn btn-ghost !text-sm self-start sm:self-end mb-1"
-          >
-            All recipes
-            <ArrowRightIcon className="h-4 w-4" />
-          </Link>
+          <div className="flex items-center gap-2 self-start sm:self-end mb-1">
+            <button
+              type="button"
+              onClick={() => step(-1)}
+              disabled={!edges.left}
+              aria-label="Previous recipes"
+              className="hidden sm:grid h-10 w-10 place-items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+              style={{
+                border: '1px solid var(--border-default)',
+                background: 'var(--bg-raised)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <ChevronLeftIcon className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={() => step(1)}
+              disabled={!edges.right}
+              aria-label="Next recipes"
+              className="hidden sm:grid h-10 w-10 place-items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+              style={{
+                border: '1px solid var(--border-default)',
+                background: 'var(--bg-raised)',
+                color: 'var(--text-secondary)',
+              }}
+            >
+              <ChevronRightIcon className="h-4 w-4" aria-hidden />
+            </button>
+            <Link
+              href="/docs#00-recipes-overview"
+              className="btn btn-ghost !text-sm ml-1"
+            >
+              All recipes
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
 
-        <div
-          className="flex gap-4 overflow-x-auto pb-4 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 snap-x snap-mandatory"
-          style={{ scrollbarWidth: 'thin' }}
-        >
-          {RECIPES.map((r, i) => {
-            const Icon = r.Icon;
-            return (
-              <motion.div
-                key={r.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.5, delay: i * 0.04 }}
-                className="snap-start shrink-0 w-[280px] sm:w-[300px]"
-              >
-                <Link
-                  href={r.href}
-                  className="group block surface-elevated rounded-2xl p-6 h-full lift"
-                  style={{ borderColor: 'var(--border-default)' }}
+        <div className="relative">
+          {/* Edge fades */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 transition-opacity"
+            style={{
+              background:
+                'linear-gradient(to right, var(--bg-base), transparent)',
+              opacity: edges.left ? 1 : 0,
+            }}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 transition-opacity"
+            style={{
+              background:
+                'linear-gradient(to left, var(--bg-base), transparent)',
+              opacity: edges.right ? 1 : 0,
+            }}
+          />
+
+          <div
+            ref={trackRef}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endPointer}
+            onPointerCancel={endPointer}
+            className="recipes-track flex gap-4 overflow-x-auto overflow-y-hidden -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2 snap-x snap-mandatory"
+            style={{
+              cursor: isDragging ? 'grabbing' : 'grab',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              userSelect: isDragging ? 'none' : 'auto',
+            }}
+          >
+            {RECIPES.map((r, i) => {
+              const Icon = r.Icon;
+              return (
+                <motion.div
+                  key={r.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ duration: 0.5, delay: i * 0.04 }}
+                  data-recipe-card
+                  className="snap-start shrink-0 w-[280px] sm:w-[300px]"
+                  /** Stop click navigation while a drag was in progress. */
+                  onClickCapture={(e) => {
+                    if (isDragging) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }
+                  }}
                 >
-                  <div
-                    className="inline-flex h-11 w-11 items-center justify-center rounded-xl mb-4 transition-transform group-hover:rotate-6"
-                    style={{
-                      backgroundColor: `${r.accent}1f`,
-                      border: `1px solid ${r.accent}55`,
-                      color: r.accent,
-                    }}
+                  <Link
+                    href={r.href}
+                    draggable={false}
+                    className="group block surface-elevated rounded-2xl p-6 h-full lift select-none"
+                    style={{ borderColor: 'var(--border-default)' }}
                   >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="text-lg font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>
-                    {r.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                    {r.blurb}
-                  </p>
-                  <div
-                    className="mt-5 pt-4 border-t inline-flex items-center gap-1 text-[12px] font-bold uppercase tracking-wider transition-colors w-full"
-                    style={{
-                      borderColor: 'var(--border-subtle)',
-                      color: r.accent,
-                    }}
-                  >
-                    Open recipe
-                    <ArrowRightIcon className="h-3 w-3 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </Link>
-              </motion.div>
-            );
-          })}
+                    <div
+                      className="inline-flex h-11 w-11 items-center justify-center rounded-xl mb-4 transition-transform group-hover:rotate-6"
+                      style={{
+                        backgroundColor: `${r.accent}1f`,
+                        border: `1px solid ${r.accent}55`,
+                        color: r.accent,
+                      }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-lg font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>
+                      {r.title}
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      {r.blurb}
+                    </p>
+                    <div
+                      className="mt-5 pt-4 border-t inline-flex items-center gap-1 text-[12px] font-bold uppercase tracking-wider transition-colors w-full"
+                      style={{
+                        borderColor: 'var(--border-subtle)',
+                        color: r.accent,
+                      }}
+                    >
+                      Open recipe
+                      <ArrowRightIcon className="h-3 w-3 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
