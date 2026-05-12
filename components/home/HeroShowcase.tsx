@@ -12,7 +12,6 @@ import {
   ClipboardIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
-import { BrandBanner } from '@/components/Brand';
 
 type Showcase = {
   src: string;
@@ -128,16 +127,6 @@ export default function HeroShowcase() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          {/* Brand banner — homepage-only, theme-aware lockup of icon + wordmark */}
-          <motion.div
-            className="mb-6 sm:mb-7"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <BrandBanner maxWidth={460} className="w-full max-w-[420px] sm:max-w-[460px]" />
-          </motion.div>
-
           {/* Eyebrow */}
           <motion.div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[12px] font-semibold mb-7"
