@@ -2,11 +2,16 @@
 
 Back: [Text overview](/docs#00-create-text-overview)
 
+Shape: **`TextCurveConfig`** in **`lib-next/types/text.ts`** (field **`textOnCurve`** on **`TextProperties`**).
+
 ```typescript
 textOnCurve?: {
-  sweepAngle: number;   // degrees — total arc covered by full string
-  radius?: number;      // px — optional; defaults so arc length ≈ measured width
-  up?: boolean;         // default true = ∩ smile; false = ∪ frown
+  sweepAngle: number;                    // degrees — user sweep at circle centre
+  radius?: number;                        // px — optional; interacts with layoutMode
+  up?: boolean;                           // default true = ∩ smile; false = ∪ frown
+  layoutMode?: "fit" | "clamp" | "override";
+  baselineOffset?: number;                // px — added to R for draw radius (radial shift)
+  startAngleDeg?: number;                 // degrees — rotates whole arc around (x, y)
 };
 ```
 
@@ -14,20 +19,26 @@ textOnCurve?: {
 
 ## Anchor semantics
 
-**`(x, y)`** is the **centre of the string**: the middle glyph sits at the arc midpoint (`EnhancedTextRenderer.renderCurvedLine`).
+**`(x, y)`** is the **mid-string anchor** on the arc: the middle grapheme sits at the arc midpoint (**`computeCircularArcPlacements`** in **`lib-next/text/text-curved.ts`**, called from **`EnhancedTextRenderer.renderCurvedLine`**).
 
-- **`up !== false`**: centre **`cy = y + R`** (arc bulges upward).
+- **`up !== false`**: circle centre **`cy = y + R`** (arc bulges upward).
 - **`up === false`**: **`cy = y - R`** (bulge downward).
 
 ---
 
-## Geometry
+## Geometry & `layoutMode`
 
-Let **`θ = sweepAngle * π / 180`**, **`W = measureText(line).width`**.
+Let **`θ_user = sweepAngle * π / 180`**, **`W`** = measured typographic width of the line (grapheme-centre math in **`text-curved.ts`**). **`resolveArcRadiusAndSweep(W, θ_user, radius, layoutMode)`** picks final **`R`** and may **widen** **`θ`** in **`override`** when the arc is too tight.
 
-Default radius **`R = W / θ`** so arc length **`R·θ`** matches measured width (when **`radius`** omitted).
+| **`layoutMode`** | **`R`** | **`θ`** (final sweep) |
+|------------------|---------|------------------------|
+| **`fit`** | **`R = W / θ_user`** | **`θ_user`** — arc length matches width; **`radius`** is ignored for geometry. |
+| **`clamp`** (default) | **`R = max(radius ?? R_fit, R_fit)`** where **`R_fit = W / θ_user`** | **`θ_user`** — never shorter than the text needs; a larger **`radius`** simply opens the curve. |
+| **`override`** | **`R = radius ?? R_fit`** | **`max(θ_user, W/R)`** — if **`R·θ_user < W`**, sweep grows so the string still fits without crowding. |
 
-Each character:
+Drawing uses **`R_draw = R + (baselineOffset ?? 0)`** for glyph positions (**`startAngleDeg`** rotates the whole layout around **`(x, y)`**).
+
+Each grapheme:
 
 1. Computes cumulative substring widths (**left**, **right**) so **kerning-aware** centres beat naive fixed pitch (`chars.join` measurement — comment in source warns per-char sums ignore kerning).
 2. Maps arc length **`centerDist`** → angle **`α`** along circle.
@@ -37,7 +48,7 @@ Each character:
 
 ## Sweep limits
 
-If **`sweepAngle <= 0`**, **`>= 360`**, or line empty → falls back to **straight** **`renderTextLine`**.
+If **`sweepAngle <= 0`**, **`>= 360`**, or line empty → falls back to **straight** single-line render (**`renderEnhancedTextLine`**).
 
 ---
 
@@ -56,8 +67,14 @@ await painter.createText(
     x: 400,
     y: 280,
     font: { size: 44, family: 'Arial' },
-    textAlign: 'center',
-    textOnCurve: { sweepAngle: 68, up: true },
+    placement: { textAlign: 'center', textBaseline: 'middle' },
+    textOnCurve: {
+      sweepAngle: 68,
+      up: true,
+      layoutMode: 'clamp',
+      baselineOffset: 0,
+      startAngleDeg: 0,
+    },
     gradient: {
       type: 'linear',
       colors: [
@@ -72,5 +89,3 @@ await painter.createText(
 ```
 
 ---
-
-Next: **[measureText](/docs#07-measure-text)** · **[Paint order](/docs#08-create-text-paint-order)**.

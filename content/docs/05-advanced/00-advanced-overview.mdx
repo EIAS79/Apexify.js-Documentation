@@ -13,8 +13,10 @@ For **what to ship** (social covers, Discord cards, chart PNGs, GIFs, …) organ
 Most flows are:
 
 1. **`createCanvas`** → base bitmap (+ backgrounds).  
-2. **`createImage`** / **`createText`** / **`createCustom`** / **`drawPath`** → layers on that buffer.  
+2. **`createImage`** / **`createText`** / **`path2d.custom`** / **`path2d.draw`** → layers on that buffer.  
 3. **`save`** / **`outPut`** → files or encoded strings — see [Raster · batch & utilities](/docs#03-batch-stitch-compress-output).
+
+For **declarative** multi-layer stacks (charts, nested surfaces, one-shot PNG/GIF/video), use the **[Scene overview](/docs#00-scene-composition)** (`05-advanced/scene/`: `createScene`, `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames`).
 
 Charts and GIF/video helpers either return buffers or orchestrate their own pipelines; each track documents ordering.
 
@@ -33,7 +35,7 @@ Charts and GIF/video helpers either return buffers or orchestrate their own pipe
 ## Performance intuition
 
 - **`createImage`** filters often use **Sharp** (good for full-frame work).  
-- **`getPixelData`** / **`manipulatePixels`** are **CPU loops** — best for small regions or custom logic ([Raster](/docs#00-advanced-raster-overview)).  
+- **`pixels.getData`** / **`pixels.manipulate`** (or legacy names in older docs) are **CPU loops** — best for small regions or custom logic ([Raster](/docs#00-advanced-raster-overview)).  
 - **`batch`** runs independent jobs in **parallel** (`Promise.all`); **`chain`** runs **sequentially** and pipes buffers — [utilities](/docs#03-batch-stitch-compress-output).
 
 ---
@@ -42,6 +44,7 @@ Charts and GIF/video helpers either return buffers or orchestrate their own pipe
 
 | Topic | Link |
 |-------|------|
+| **Scene** — layer graph, GIF/video export | [Scene overview](/docs#00-scene-composition) · `05-advanced/scene/` |
 | Paint order & layering | Feature guides for canvas / image / text |
 | Video internals | [Video overview](/docs#00-video-overview) |
 | Repo structure | [Internals overview](/docs#00-internals-overview) |

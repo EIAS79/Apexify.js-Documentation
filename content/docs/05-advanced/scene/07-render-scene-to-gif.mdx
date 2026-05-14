@@ -1,0 +1,147 @@
+# `renderSceneToGIF` {#07-render-scene-to-gif}
+
+Back: [Scene overview](/docs#00-scene-composition) · [GIF overview](/docs#00-create-gif-overview)
+
+**Signature (conceptual):**
+
+```typescript
+renderSceneToGIF(
+  scene: SceneRenderInput,
+  gif: {
+    options: GIFOptions;
+    gifFrames?: SceneGifInputFrame[];
+    prependComposedRaster?: boolean;
+    composedFrameDuration?: number;
+    composedFrameRepeat?: number;
+  }
+): Promise<GIFResults | Buffer | string | undefined>
+```
+
+**Pipeline:** `scene` → **`SceneCreator.render`** → composed PNG → build **`GIFInputFrame[]`** → **`GIFCreator.createGIF(frames, options)`**.
+
+---
+
+## Rules that differ from plain `createGIF`
+
+| Rule | Why |
+|------|-----|
+| **`gif.options.onStart` must be absent** | **`SceneCreate.renderSceneToGIF`** throws: use **`createGIF`** alone if you need **`onStart`**. |
+| **At least one frame** after expansion | Either **prepended** composed raster and/or **`gifFrames`** (after **`repeat`** expansion). |
+
+**`SceneGifInputFrame`** = **`GIFInputFrame` & { `repeat`?: number }** — each logical frame can be duplicated **`repeat`** times in the final list.
+
+---
+
+## Variant: composed only (hold on first frame)
+
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "fs";
+
+const painter = new ApexPainter();
+
+const scene = {
+  width: 320,
+  height: 200,
+  background: { colorBg: "#312e81" },
+  layers: [{ type: "text", texts: [{ content: "Hold", x: 24, y: 80, fontSize: 36, color: "#fff" }] }],
+};
+
+const out = await painter.renderSceneToGIF(scene, {
+  gifFrames: [],
+  options: { width: 320, height: 200, delay: 500 },
+  prependComposedRaster: true,
+  composedFrameDuration: 800,
+  composedFrameRepeat: 3,
+});
+
+if (Buffer.isBuffer(out)) await fs.promises.writeFile("hold.gif", out);
+```
+
+---
+
+## Variant: composed + extra frames with `repeat`
+
+```typescript
+const out = await painter.renderSceneToGIF(scene, {
+  gifFrames: [
+    { buffer: await fs.promises.readFile("./f1.png"), duration: 120, repeat: 2 },
+    { buffer: await fs.promises.readFile("./f2.png"), duration: 120 },
+  ],
+  options: { width: 320, height: 200, delay: 120 },
+  prependComposedRaster: true,
+  composedFrameDuration: 200,
+  composedFrameRepeat: 1,
+});
+```
+
+Frame order: **`[composed × repeat?, …expanded gifFrames]`** when prepend is true.
+
+---
+
+## Variant: no composed — only `gifFrames`
+
+```typescript
+const out = await painter.renderSceneToGIF(scene, {
+  gifFrames: [
+    { buffer: frameA, duration: 100 },
+    { buffer: frameB, duration: 100 },
+  ],
+  options: { width: 400, height: 300, delay: 100 },
+  prependComposedRaster: false,
+});
+```
+
+**Still** renders **`scene`** internally (for consistency / future use), but **only** expanded **`gifFrames`** go to the encoder — you **must** supply non-empty **`gifFrames`**.
+
+---
+
+## Variant: `composedFrameDuration` vs `options.delay`
+
+- **`composedFrameDuration`**: ms for the **prepended** composed PNG frame(s).  
+- **`options.delay`**: used as default for **`composedFrameDuration`** when **`composedFrameDuration`** is omitted **and** **`options.delay`** is a **number**; else default **100** ms.
+
+```typescript
+await painter.renderSceneToGIF(scene, {
+  gifFrames: [{ buffer: extra, duration: 50 }],
+  options: { width: 200, height: 200, delay: 33 },
+  composedFrameDuration: 1000,
+});
+```
+
+---
+
+## Variant: handle non-`Buffer` return
+
+`createGIF` may return **`GIFResults`**, **`Buffer`**, **`string`**, etc.
+
+```typescript
+const out = await painter.renderSceneToGIF(scene, { gifFrames: [], options: { width: 100, height: 100 } });
+
+if (Buffer.isBuffer(out)) {
+  await fs.promises.writeFile("a.gif", out);
+} else if (out && typeof out === "object" && "gif" in out && Buffer.isBuffer((out as { gif: Buffer }).gif)) {
+  await fs.promises.writeFile("a.gif", (out as { gif: Buffer }).gif);
+}
+```
+
+---
+
+## Variant: `onEnd` still allowed
+
+```typescript
+await painter.renderSceneToGIF(scene, {
+  gifFrames: [{ buffer: b, duration: 100 }],
+  options: {
+    width: 200,
+    height: 200,
+    delay: 100,
+    onEnd: (results) => {
+      console.log("done", results);
+    },
+  },
+});
+```
+
+---
+

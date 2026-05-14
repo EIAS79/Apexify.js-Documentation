@@ -1,11 +1,11 @@
 # Lines & connectors — overview {#00-custom-lines-overview}
 
-Apexify exposes **two** complementary APIs:
+Apexify exposes **two** complementary APIs on **`lib-next`** **`ApexPainter`**:
 
 | API | Entry | Best for |
 |-----|-------|----------|
-| **`createCustom`** | **`await painter.createCustom(options, buffer)`** | Styled segments & connectors: gradients, dashes, arrows, smooth paths, textures (`CustomOptions`). |
-| **Path2D pipeline** | **`painter.createPath2D(commands)`**, **`drawPath`**, hit helpers | Explicit geometry from **`PathCommand[]`** (primitives, rounded rects, stars), stroke/fill/transform per **`drawPath`**. |
+| **Custom lines** | **`await painter.path2d.custom(options, buffer)`** | Styled segments & connectors: gradients, dashes, arrows, smooth paths, textures (**`CustomOptions`**). Same behaviour as the historical **`createCustom`** name. |
+| **Path2D pipeline** | **`painter.path2d.create`**, **`await painter.path2d.draw`**, **`await painter.detect.*`** | Explicit geometry from **`PathCommand[]`** (primitives, rounded rects, stars), stroke/fill/transform per **`draw`**. |
 
 Back: [Feature guides hub](/docs#feature-guides-hub)
 
@@ -15,13 +15,13 @@ Back: [Feature guides hub](/docs#feature-guides-hub)
 
 | Piece | File |
 |-------|------|
-| **`createCustom`** orchestration | **`lib/Canvas/ApexPainter.ts`** |
-| Segment loop / styling | **`lib/Canvas/utils/Custom/customLines.ts`** |
-| Arrows, splines, dash presets, textures | **`lib/Canvas/utils/Custom/advancedLines.ts`** |
-| **`CustomOptions`** type | **`lib/Canvas/utils/types/index.ts`** |
-| **`PathCommand`**, **`buildPath2DFromCommands`** | **`lib/Canvas/utils/core/pathCmd.ts`** |
-| **`drawPath`** | **`lib/Canvas/extended/Path2DCreator.ts`** |
-| Hit testing | **`lib/Canvas/extended/HitDetectionCreator.ts`** |
+| **Custom** orchestration | **`lib-next/apex-painter/path-custom-lines.ts`** (`runDrawCustomLines`) |
+| Segment loop / styling | **`lib-next/path/custom-lines.ts`** |
+| Arrows, splines, dash presets, textures | **`lib-next/path/advanced-lines.ts`** |
+| **`CustomOptions`** | **`lib-next/types/path.ts`** |
+| **`PathCommand`**, **`buildPath2DFromCommands`** | **`lib-next/types/pathCommands.ts`**, **`lib-next/foundation/path-cmd.ts`** |
+| **`draw`** (rasterise path) | **`lib-next/path/path2d-creator.ts`** |
+| Hit testing | **`lib-next/pixels/hit-detection-creator.ts`** (facet **`painter.detect`**) |
 
 ---
 
@@ -29,12 +29,12 @@ Back: [Feature guides hub](/docs#feature-guides-hub)
 
 | # | Page | Covers |
 |---|------|--------|
-| 1 | [`createCustom` API](/docs#01-create-custom-api) | **`startCoordinates` / `endCoordinates`**, batch rules, **`singleLine`** chains |
+| 1 | [Custom lines API](/docs#01-create-custom-api) | **`path2d.custom`** — **`startCoordinates` / `endCoordinates`**, batch rules, **`singleLine`** chains |
 | 2 | [Line style & paths](/docs#02-custom-line-style-path) | **`lineStyle`** fields, **`path`** (**smooth**, **catmull-rom**, **bezier** caveats), **`lineRadius`** |
 | 3 | [Arrows, markers & textures](/docs#03-custom-lines-arrows-markers-textures) | **`arrow`**, **`markers`**, **`pattern`**, **`texture`**, inner **`stroke`** |
-| 4 | [Path2D · `drawPath`](/docs#04-path2d-draw-path) | **`PathCommand`** catalogue, **`Path2DDrawOptions`** |
-| 5 | [Hit testing](/docs#05-hit-testing-paths) | **`isPointInPath`**, **`HitRegion`**, **`getDistanceToRegion`** (**[Raster track](/docs#00-advanced-raster-overview)**) |
+| 4 | [Path2D · `create` / `draw`](/docs#04-path2d-draw-path) | **`PathCommand`** catalogue, **`Path2DDrawOptions`**, **`path2d.custom`** vs vector **`draw`** |
+| 5 | [Hit testing](/docs#05-hit-testing-paths) | **`painter.detect.path`**, **`HitRegion`**, **`getDistanceToRegion`** (**[Raster track](/docs#00-advanced-raster-overview)**) |
 
 ---
 
-Start **[createCustom](/docs#01-create-custom-api)**.
+Start **[Custom lines API](/docs#01-create-custom-api)**.

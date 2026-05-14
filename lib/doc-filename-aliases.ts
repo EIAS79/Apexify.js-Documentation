@@ -10,6 +10,8 @@ export const DOC_FILENAME_ALIASES: Record<string, string> = {
   'start-here': '00-start-here',
   'Getting-Started': '00-start-here',
   'api-index': 'api-reference',
+  /** Changelog doc (hash was `Change-Log` before `changelog.mdx` existed). */
+  'Change-Log': 'changelog',
   /** Friendly hubs → existing topic hashes */
   'create-charts': 'charts',
   'create-gifs': 'gif-and-animation',

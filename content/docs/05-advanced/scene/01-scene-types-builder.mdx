@@ -1,0 +1,154 @@
+# Scene — types & `SceneBuilder` {#01-scene-types-builder}
+
+Back: [Scene overview](/docs#00-scene-composition)
+
+---
+
+## `SceneRenderInput`
+
+Used by **`renderScene`**, **`renderSceneToGIF`**, and **`renderSceneToVideoFrames`** (the **`scene`** argument).
+
+| Field | Type | Notes |
+|-------|------|--------|
+| **`width`** | `number` | Root surface width (pixels). |
+| **`height`** | `number` | Root surface height (pixels). |
+| **`background`** | Optional; `Omit<CanvasConfig, "width" \| "height"> & Partial<Pick<CanvasConfig, "width" \| "height">>` | Width/height for the **root** still come from **`width`** / **`height`**; extra **`background.width`** is rarely needed. |
+| **`layers`** | **`SceneLayer[]`** | Bottom → top: index **0** drawn first. |
+
+**`SceneRenderResult`** is always **`Buffer`** (PNG bytes).
+
+---
+
+## `SceneBuilder`
+
+Mutable wrapper around the same data as **`SceneRenderInput`**:
+
+| Method | Returns | Role |
+|--------|---------|------|
+| **`setBackground(bg)`** | `this` | Root background (optional). |
+| **`addLayer(layer)`** | `this` | Append a **`SceneLayer`** (painted above previous layers). |
+| **`render()`** | `Promise<Buffer>` | Calls **`SceneCreator.render`** with `{ width, height, background, layers }`. |
+
+**Read-only on builder:** **`width`**, **`height`** (constructor arguments).
+
+---
+
+## `createScene` overloads
+
+### 1) Config object (initial layers / background)
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter();
+
+const builder = painter.createScene({
+  width: 1920,
+  height: 1080,
+  background: { colorBg: "#020617" },
+  layers: [
+    {
+      type: "text",
+      texts: [{ content: "Title", x: 80, y: 100, fontSize: 72, color: "#f8fafc" }],
+    },
+  ],
+});
+
+const png = await builder.render();
+```
+
+Use this when your scene is mostly **data-driven** (e.g. JSON config) and you already have a **`layers`** array.
+
+### 2) Width + height, then chain
+
+```typescript
+const b = painter
+  .createScene(800, 600)
+  .setBackground({ colorBg: "#f1f5f9" })
+  .addLayer({
+    type: "text",
+    texts: [{ content: "Step 1", x: 24, y: 40, fontSize: 28, color: "#0f172a" }],
+  })
+  .addLayer({
+    type: "text",
+    texts: [{ content: "Step 2", x: 24, y: 90, fontSize: 20, color: "#334155" }],
+  });
+
+const png2 = await b.render();
+```
+
+Use this for **incremental** UI composition (add labels as you compute layout).
+
+### 3) Invalid: width only
+
+```typescript
+// Throws: "createScene: height is required when the first argument is numeric width."
+// painter.createScene(800);
+```
+
+Always pass **`(width, height)`** or the **object** form.
+
+---
+
+## Variant: build layers in a loop
+
+```typescript
+const labels = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+let b = painter.createScene(600, 200).setBackground({ colorBg: "#fff" });
+
+let y = 24;
+for (const label of labels) {
+  b = b.addLayer({
+    type: "text",
+    texts: [{ content: label, x: 32, y, fontSize: 22, color: "#111" }],
+  });
+  y += 36;
+}
+
+const strip = await b.render();
+```
+
+---
+
+## Variant: merge static layers + dynamic layer
+
+```typescript
+const baseLayers = [
+  { type: "image" as const, images: { source: "./bg.png", x: 0, y: 0, width: 1200, height: 630 } },
+];
+
+const headline = `Generated at ${new Date().toISOString()}`;
+
+const png = await painter
+  .createScene({
+    width: 1200,
+    height: 630,
+    layers: [
+      ...baseLayers,
+      {
+        type: "text",
+        texts: [{ content: headline, x: 48, y: 540, fontSize: 18, color: "#e2e8f0" }],
+      },
+    ],
+  })
+  .render();
+```
+
+---
+
+## Type-only import (optional)
+
+If you annotate config objects:
+
+```typescript
+import type { SceneRenderInput, SceneLayer } from "apexify.js";
+
+const layers: SceneLayer[] = [
+  { type: "text", texts: [{ content: "x", x: 0, y: 0, fontSize: 12, color: "#000" }] },
+];
+
+const input: SceneRenderInput = { width: 100, height: 50, layers };
+await painter.renderScene(input);
+```
+
+---

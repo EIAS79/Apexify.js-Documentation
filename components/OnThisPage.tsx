@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Bars3BottomRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 
@@ -14,9 +16,19 @@ interface Heading {
 
 interface OnThisPageProps {
   headings: Heading[];
+  /** lg+ viewport — from DocLayout resize listener. */
+  isDesktop: boolean;
+  /** When false on desktop, the fixed TOC rail slides off-screen and main gets a slimmer right margin. */
+  desktopTocExpanded: boolean;
+  onDesktopTocExpandedChange: (expanded: boolean) => void;
 }
 
-export default function OnThisPage({ headings }: OnThisPageProps) {
+export default function OnThisPage({
+  headings,
+  isDesktop,
+  desktopTocExpanded,
+  onDesktopTocExpandedChange,
+}: OnThisPageProps) {
   const [activeId, setActiveId] = useState<string>('');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -195,25 +207,64 @@ export default function OnThisPage({ headings }: OnThisPageProps) {
       )}
 
       <aside
+        id="docs-on-this-page-aside"
         data-sidebar="right"
-        className="fixed right-0 top-16 bottom-0 z-30 hidden h-[calc(100vh-4rem)] w-64 overflow-hidden lg:block"
+        className={`fixed right-0 top-16 bottom-0 z-30 hidden h-[calc(100vh-4rem)] w-64 overflow-hidden lg:block lg:transition-transform lg:duration-300 lg:ease-out ${
+          isDesktop && !desktopTocExpanded ? 'lg:translate-x-full' : 'lg:translate-x-0'
+        }`}
         style={{
           backgroundColor: 'color-mix(in srgb, var(--bg-base) 70%, transparent)',
           backdropFilter: 'blur(12px) saturate(130%)',
           WebkitBackdropFilter: 'blur(12px) saturate(130%)',
           borderLeft: '1px solid var(--border-subtle)',
         }}
+        aria-hidden={isDesktop && !desktopTocExpanded}
       >
         <div className="h-full overflow-y-auto px-4 py-5">
-          <p
-            className="mb-3 text-[10px] font-semibold uppercase tracking-[0.32em]"
-            style={{ color: 'var(--accent-magenta)' }}
-          >
-            On this page
-          </p>
-          {renderTocList()}
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p
+              className="text-[10px] font-semibold uppercase tracking-[0.32em]"
+              style={{ color: 'var(--accent-magenta)' }}
+            >
+              On this page
+            </p>
+            <button
+              type="button"
+              onClick={() => onDesktopTocExpandedChange(false)}
+              className="grid h-8 w-8 shrink-0 place-items-center rounded-lg transition-colors hover:bg-white/5"
+              style={{ color: 'var(--text-tertiary)' }}
+              aria-expanded={desktopTocExpanded}
+              aria-controls="docs-on-this-page-aside"
+              title="Hide table of contents"
+              aria-label="Collapse on this page sidebar"
+            >
+              <ChevronRightIcon className="h-5 w-5" aria-hidden />
+            </button>
+          </div>
+          <div id="docs-toc-rail">{renderTocList()}</div>
         </div>
       </aside>
+
+      {/* Desktop: bring TOC back when collapsed */}
+      {isDesktop && headings.length > 0 && !desktopTocExpanded && (
+        <button
+          type="button"
+          onClick={() => onDesktopTocExpandedChange(true)}
+          className="fixed right-0 top-28 z-[31] hidden h-28 w-10 items-center justify-center gap-1 rounded-l-xl border border-r-0 transition-colors hover:bg-white/5 lg:flex lg:flex-col"
+          style={{
+            backgroundColor: 'color-mix(in srgb, var(--bg-raised) 88%, transparent)',
+            borderColor: 'var(--border-default)',
+            color: 'var(--text-secondary)',
+            boxShadow: 'var(--shadow-md)',
+          }}
+          aria-label="Expand on this page sidebar"
+          aria-controls="docs-on-this-page-aside"
+          title="Show table of contents"
+        >
+          <Bars3BottomRightIcon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+          <ChevronLeftIcon className="h-4 w-4 shrink-0" aria-hidden />
+        </button>
+      )}
     </>
   );
 }

@@ -103,8 +103,17 @@ export function DocsSearchPalette({
   const flat = useMemo(() => grouped.flatMap(([, items]) => items), [grouped]);
 
   const goTo = (filename: string) => {
-    router.push(`/docs#${filename}`);
     onClose();
+    if (typeof window === 'undefined') return;
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    if (path === '/docs') {
+      // Same route: `router.push` updates the hash via the History API but does not
+      // fire `hashchange`, and `app/docs/page.tsx` only reloads MDX on `hashchange`.
+      window.location.hash = filename;
+      window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+    } else {
+      router.push(`/docs#${filename}`);
+    }
   };
 
   useEffect(() => {

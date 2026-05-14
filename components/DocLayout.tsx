@@ -18,8 +18,10 @@ interface DocLayoutProps {
 
 export default function DocLayout({ children, headings = [] }: DocLayoutProps) {
   const { sidebarOpen } = useSidebar();
-  const [hasToc] = useState<boolean>(headings.length > 0);
+  const hasToc = headings.length > 0;
   const [isDesktop, setIsDesktop] = useState(false);
+  /** Desktop-only: hide the fixed “On this page” rail to give the article more width. */
+  const [tocExpanded, setTocExpanded] = useState(true);
 
   useEffect(() => {
     const sync = () => setIsDesktop(window.innerWidth >= 1024);
@@ -31,41 +33,46 @@ export default function DocLayout({ children, headings = [] }: DocLayoutProps) {
   /** Mirror of the sidebar's open state — only matters on desktop because the
    *  drawer is overlay-only on mobile. */
   const leftActive = isDesktop ? sidebarOpen : false;
-  const rightActive = isDesktop && hasToc;
+  const rightRailOpen = isDesktop && hasToc && tocExpanded;
+  /** Narrow gutter when TOC exists but is collapsed (room for the expand tab). */
+  const rightRailCollapsed = isDesktop && hasToc && !tocExpanded;
 
   return (
-    <div className="relative flex min-h-screen">
+    <div className="relative flex min-h-screen w-full min-w-0">
       <DocReadingProgress />
 
       {/*
-        `min-w-0` is critical: as a flex child, <main> defaults to
-        `min-width: auto`, which lets long unbreakable strings (inline
-        code paths like `00-start-here/*.mdx`) push the main wider than
-        its margin reservation, sliding article content under the right
-        sidebar. With `min-w-0` the main is allowed to shrink to the
-        space left by `lg:ml-80` + the right margin, and the inner article
-        wraps properly within that box. `overflow-x-clip` is a safety net
-        for any rare element that still refuses to wrap.
+        The right TOC is `position: fixed`, so it does not consume width in this
+        flex row — <main> is effectively the only in-flow flex child. Do not use
+        `w-full` on <main>: width: 100% + large horizontal margins makes the
+        margin box wider than the viewport when the left sidebar is open, so
+        article text slides under the fixed "On this page" rail. `flex-1 min-w-0`
+        lets the flex algorithm assign a width that already fits between margins.
 
-        Right margin is intentionally LARGER than the right sidebar's
-        own width (`w-64` = 16rem). The extra 2rem at `lg` (4rem at `xl`)
-        is dedicated gutter between the article column and the
-        "On this page" rail — independent of whether the left sidebar
-        is currently open or collapsed.
-          - lg: mr = 18rem  → sidebar 16rem + 2rem gap
-          - xl: mr = 20rem  → sidebar 16rem + 4rem gap
+        `min-w-0` on the flex wrapper avoids the parent flexbox min-width:auto
+        clamp that can block shrinking.
+
+        Right margin: wide when the TOC rail is open (`w-64` + gutter), slim when
+        the user collapses the rail (expand tab only).
       */}
       <main
-        className={`relative w-full flex-1 min-w-0 overflow-x-clip pt-16 transition-[margin] duration-300 ${
+        className={`relative flex-1 min-w-0 overflow-x-clip pt-16 transition-[margin] duration-300 ${
           leftActive ? 'lg:ml-80 xl:ml-[22rem]' : 'lg:ml-0'
-        } ${rightActive ? 'lg:mr-72 xl:mr-80' : 'lg:mr-0'}`}
+        } ${
+          rightRailOpen ? 'lg:mr-72 xl:mr-80' : rightRailCollapsed ? 'lg:mr-14 xl:mr-14' : 'lg:mr-0'
+        }`}
       >
-        <div className="mx-auto w-full max-w-3xl min-w-0 px-4 pb-16 pt-6 sm:px-6 lg:px-10 lg:pt-10 xl:px-12">
+        <div className="mx-auto w-full min-w-0 max-w-[min(48rem,100%)] px-4 pb-16 pt-6 sm:px-6 lg:px-10 lg:pt-10 xl:px-12">
           {children}
         </div>
       </main>
 
-      <OnThisPage headings={headings} />
+      <OnThisPage
+        headings={headings}
+        isDesktop={isDesktop}
+        desktopTocExpanded={tocExpanded}
+        onDesktopTocExpandedChange={setTocExpanded}
+      />
     </div>
   );
 }

@@ -1,114 +1,127 @@
-# Batch, stitch, compression & `outPut` {#03-batch-stitch-compress-output}
+# Batch, stitch, compression & output encoding {#03-batch-stitch-compress-output}
 
 Back: [Raster overview](/docs#00-advanced-raster-overview)
 
-**Disk files:** **`save`** / **`saveMultiple`** / **`OutputFormat`** are documented under **[Batch, save & output](/docs#00-batch-save-output-overview)** — this page focuses on **parallel **`batch`****, **`chain`**, **layout**, **Sharp compression**, **palette**, **`validHex`**, and **`outPut`** encoding details duplicated below for convenience.
+**Disk files:** **`painter.save`**, **`saveMultiple`**, and **`OutputFormat`** are documented under **[Batch, save & output](/docs#00-batch-save-output-overview)**.
 
-Helpers implemented under **`lib/Canvas/utils/general/`** and exposed on **`ApexPainter`**. Use them for **parallel renders**, **pipelines**, **multi-image layout**, and **buffer conversion** (**`outPut`**).
+This page covers **`painter.batch`**, **`painter.chain`**, the **`painter.image`** utility bundle (Sharp-backed layout and compression), and the two ways to turn a **PNG** **`Buffer`** into other representations: constructor-driven **`painter.outPut`** vs explicit **`painter.output.*`** helpers.
 
 ---
 
 ## `batch(operations: BatchOperation[]): Promise<Buffer[]>`
 
-**`batchOperations`** runs one **`Promise`** per entry via **`Promise.all`** (parallel).
+**`lib-next/batch/batch-operations.ts`** — **`Promise.all`** over one job per operation (parallel).
 
-Each **`BatchOperation`**:
+| **`type`** | Behaviour |
+|------------|-----------|
+| **`canvas`** | **`createCanvas(config)`** → take **`.buffer`** |
+| **`image`** | Temporary **`800×600`** canvas, then **`createImage(config, base)`** |
+| **`text`** | Same base pattern with **`createText(config, base)`** |
 
-| **`type`** | **`config`** passed to |
-|------------|-------------------------|
-| **`canvas`** | **`createCanvas(config)`** → **`buffer`** |
-| **`image`** | Temporary **`createCanvas({ width:800, height:600 })`** then **`createImage(config, base)`** |
-| **`text`** | Same base canvas pattern with **`createText(config, base)`** |
-
-Throws if **`operations`** is empty or **`type`** is unknown.
+```typescript
+const [a, b] = await painter.batch([
+  { type: "canvas", config: { width: 120, height: 40, color: "#0f172a" } },
+  { type: "text", config: { text: "B", x: 60, y: 24, font: { size: 22, family: "Arial" } } },
+]);
+```
 
 ---
 
 ## `chain(operations: ChainOperation[]): Promise<Buffer>`
 
-Runs **`ApexPainter`** methods **sequentially**. Each operation:
+Sequential pipeline. Each step:
 
 ```typescript
-{ method: string; args: any[] }
+{ method: string; args: unknown[] }
 ```
 
-**`method`** must name a real **`ApexPainter`** function (e.g. **`createCanvas`**, **`createImage`**). **`args`** are forwarded with **`apply`**.
+**`method`** names a function on **`painter`**. **Dotted paths** resolve nested facets (e.g. **`path2d.draw`**, **`pixels.setColor`**) via **`lib-next/batch/batch-operations.ts`**.
 
-**Pipe prior output:** pass **`'current'`** (string) **or** **`{ __isCurrentBuffer: true }`** in **`args`** where the next step should receive the **previous **`Buffer`**. The helper substitutes **`currentBuffer`** after each step.
+**Pipe prior output:** use the string **`'current'`** or **`{ __isCurrentBuffer: true }`** in **`args`** where the next step should receive the **previous **`Buffer`**.
 
-The **return value** of each step must be a **`Buffer`** **or** **`{ buffer }`** (e.g. **`createCanvas`** results); otherwise **`chain`** throws.
+Each step must return a **`Buffer`** or **`{ buffer }`** (e.g. **`createCanvas`**).
+
+```typescript
+const out = await painter.chain([
+  { method: "createCanvas", args: [{ width: 400, height: 200, color: "#111827" }] },
+  {
+    method: "path2d.draw",
+    args: [
+      "current",
+      [
+        { type: "moveTo", x: 40, y: 100 },
+        { type: "lineTo", x: 360, y: 100 },
+      ],
+      { stroke: { color: "#f472b6", width: 3 } },
+    ],
+  },
+]);
+```
 
 ---
 
-## `stitchImages(images, options?): Promise<Buffer>`
+## `painter.image` — stitch, collage, compress, palette, `validHex`
+
+Implemented in **`lib-next/image/painter-image-utils.ts`** (Sharp + shared **`lib-next/output/*`** helpers). These methods do **not** require a prior **`createCanvas`** unless you compose them in **`chain`**.
+
+**Full method list** (resize, crop, **`effects`**, **`colorsRemover`**, **`blend`**, **`masking`**, …): **[Standalone image methods](/docs#01-standalone-image-methods)**.
+
+### `stitchImages(images, options?)`
 
 **`images`**: **`string`** (URL or path relative to **`process.cwd()`**) or **`Buffer`**.
 
-**`StitchOptions`** (defaults in parentheses):
+**`StitchOptions`** (see **`lib-next/types/batch.ts`**): **`direction`** (**`horizontal`** default, **`vertical`**, **`grid`**), **`overlap`**, **`spacing`**, **`blend`**, etc.
 
-| Key | Role |
-|-----|------|
-| **`direction`** | **`horizontal`** (**default**), **`vertical`**, **`grid`** (**sqrt** tiling) |
-| **`overlap`** | **Pixels** subtracted between successive placements along the axis (also used in **`blend`** overlay math). *Comment in types mentions “percentage”; implementation treats it as a pixel delta.* |
-| **`spacing`** | Gap between images (**`0`** default) |
-| **`blend`** | When **`true`** and **`overlap > 0`**, an extra **`multiply`** pass at **`globalAlpha 0.5`** between neighbours (**horizontal** / **vertical** only) |
+```typescript
+const strip = await painter.image.stitchImages(["./a.png", "./b.png"], {
+  direction: "horizontal",
+  spacing: 4,
+});
+```
 
----
+### `createCollage(images, layout)`
 
-## `createCollage(images, layout): Promise<Buffer>`
+**`CollageLayout`**: **`type`** (**`grid`**, **`masonry`**, **`carousel`**, **`custom`**), **`columns`**, **`rows`**, **`spacing`**, **`background`**, **`borderRadius`**, …
 
-**`images`**: **`{ source, width?, height? }[]`** — **`source`** URL, path, or **`Buffer`**.
+### `compress(image, options?)`
 
-**`CollageLayout`**:
+**`CompressionOptions`**: **`quality`**, **`format`** (**`jpeg`**, **`webp`**, **`avif`**, …), optional **`maxWidth`** / **`maxHeight`**, **`progressive`** (JPEG).
 
-| Key | Role |
-|-----|------|
-| **`type`** | **`grid`** (**default**), **`masonry`**, **`carousel`**, **`custom`** |
-| **`columns`**, **`rows`** | **`grid`** / **`masonry`** (**`3`** default when omitted in destructuring) |
-| **`spacing`** | Gap (**`10`** default in **`createCollage`**) |
-| **`background`** | Canvas fill (**`'#ffffff'`** default) |
-| **`borderRadius`** | Optional rounded clip per tile |
+```typescript
+const webp = await painter.image.compress(buf, { format: "webp", quality: 82 });
+```
 
-**`custom`** currently falls back to **800×600** canvas sizing in code — treat **`custom`** as reserved / minimal unless you extend it.
+### `extractPalette(image, options?)`
 
----
+Dominant colours — **`PaletteOptions`**: **`count`**, **`method`**, **`format`**.
 
-## `compress(image, options?): Promise<Buffer>`
+### `painter.image.validHex(hexColor: string): boolean`
 
-**Sharp**-based re-encode (**`lib/Canvas/utils/general/imageCompression.ts`**).
-
-**`CompressionOptions`**: **`quality`** (**`90`**), **`format`** (**`'jpeg'`** \| **`webp`** \| **`avif`**), optional **`maxWidth`** / **`maxHeight`** (**`inside`** resize, **`withoutEnlargement`**), **`progressive`** (**JPEG**).
+Validates **`/^#[0-9a-fA-F]{6}$/`** (throws on mismatch per **`lib-next/core/color.ts`** usage in **`painterImageUtils`**). Also documented under [Encoded output](/docs#02-output-format-and-outPut).
 
 ---
 
-## `extractPalette(image, options?): Promise<{ color, percentage }[]>`
+## Two output surfaces
 
-Dominant colours via **`Sharp`** stats pipelines (**implementation file**: **`imageCompression.ts`**).
+### 1. **`painter.outPut(buffer)`** — constructor **`type`**
 
-**`PaletteOptions`**: **`count`** (**`10`**), **`method`** (**`'kmeans'`** \| **`median-cut`** \| **`octree`**), **`format`** (**`'hex'`** \| **`rgb`** \| **`hsl`**).
+**`new ApexPainter({ type: 'base64' })`** then **`await painter.outPut(buf)`** returns whatever **`lib-next/output/buffer-output.ts`** maps for that **`type`** (**`buffer`**, **`dataURL`**, **`blob`**, **`base64`**, **`arraybuffer`**, **`url`**, …).
 
----
+### 2. **`painter.output`** — explicit encoders
 
-## `validHex(hexColor: string): boolean`
+**`PainterOutput`** (**`public-types.ts`**): **`dataURL`**, **`base64`**, **`blob`**, **`arrayBuffer`** — pure transforms, **ignore** constructor **`type`**. **`output.url`** uploads a PNG to Imgur (env credentials required).
 
-Throws unless **`hexColor`** matches **`/^#[0-9a-fA-F]{6}$/`**; otherwise returns **`true`**.
+```typescript
+const dataUrl = painter.output.dataURL(buf);
+const b64 = painter.output.base64(buf);
+```
 
----
-
-## `outPut(results: Buffer)`
-
-Uses **`lib/Canvas/utils/general/conversion.ts`** helpers to match **`ApexPainter`** **`format.type`**:
-
-**`buffer`** \| **`url`** \| **`dataURL`** \| **`blob`** \| **`base64`** \| **`arraybuffer`**.
-
-Construct **`new ApexPainter({ type: 'base64' })`** (etc.) so **`outPut`** matches consumer expectations.
+Use **`output`** when you want **multiple encodings** from one painter instance without re-instantiating for each **`type`**.
 
 ---
 
-## Importing **`general`** helpers directly
+## Importing utilities without `ApexPainter`
 
-**`canvasUtils`** re-exports **`loadImages`**, **`resizingImg`**, **`converter`**, **`url`**, **`base64`**, etc., for **standalone** Sharp/image workflows without an **`ApexPainter`** instance. The **`ApexPainter`** surface for multi-job workflows is the **`batch`** / **`chain`** / **`stitchImages`** / **`createCollage`** / **`compress`** / **`extractPalette`** / **`outPut`** family above.
+Low-level Sharp / conversion helpers still live under **`lib-next/core/general-functions.ts`**, **`lib-next/output/*`**, etc. **`painter.image`** is the supported **ergonomic** surface for apps already holding an **`ApexPainter`**.
 
 ---
-
-Back to **[overview](/docs#00-advanced-raster-overview)**.

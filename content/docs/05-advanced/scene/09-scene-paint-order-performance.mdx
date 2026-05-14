@@ -1,0 +1,51 @@
+# Scene — paint order & performance {#09-scene-paint-order-performance}
+
+Back: [Scene overview](/docs#00-scene-composition)
+
+---
+
+## Paint order (root)
+
+1. **`composeCanvasForScene`** — **`background`** (clip, zoom, primary fill **`colorBg`/`gradientBg`/`customBg`/`videoBg`**, **`bgLayers`**, **`patternBg`**, **`noiseBg`**, then shadow/stroke per **`CanvasCreator`**).
+2. **`layers[0]` … `layers[n-1]`** — each **`SceneLayer`** in order on the **same** 2D context.
+3. **`surface`** — for each surface layer: **child** background + **child** layers → bitmap → **`drawSurfaceOntoParent`** (opacity, rotation, scale, blend).
+
+Nested **`surface`** repeats: **deepest** child is rasterised first, then parent surfaces bottom-up within their own **`layers`** arrays.
+
+---
+
+## Z-order cheatsheet
+
+| Need | Pattern |
+|------|---------|
+| Background image with text on top | `image` (full bleed) then `text` **after** in **`layers`**. |
+| Watermark last | Push **`image`** / **`imageBuffer`** **last**. |
+| Chart behind panel | `chart` **before** **`surface`** card that covers part of it, or put chart **inside** surface. |
+
+---
+
+## Performance
+
+| Cost | Mitigation |
+|------|------------|
+| **Each `chart` layer** | Full chart render + decode; **cache** with **`createChart`** → **`imageBuffer`**. |
+| **Large `surface` trees** | Each node = extra full-size **`toBuffer('png')`** for child; flatten when possible. |
+| **Huge `customLines` batches** | Same as **`path2d.custom`** — many segments = more CPU. |
+| **Remote `image.source`** | Network + decode latency; prefetch to **Buffer** when generating many scenes. |
+
+---
+
+## Pitfalls
+
+- **`renderSceneToGIF` + `onStart`:** **throws by design** — use **`createGIF`** for **`onStart`** workflows.  
+- **`videoBg` without `setExtractVideoFrame`:** may not paint or size; use **`customBg`** with a still.  
+- **`chartComparison` / `chartCombo` `options`:** typed **`unknown`** — bad options surface as runtime errors inside **`ChartCreator`**.  
+- **Scene does not auto-trim** transparent margins — size **`width`/`height`** explicitly.
+
+---
+
+## Testing tip
+
+Snapshot **`renderScene`** PNGs in CI (golden files) for layout regressions; keep **`width`/`height`** fixed.
+
+---

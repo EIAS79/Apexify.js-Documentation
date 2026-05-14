@@ -2,7 +2,29 @@
 
 Back: [Raster overview](/docs#00-advanced-raster-overview)
 
-All methods delegate to **`PixelDataCreator`** (**`lib/Canvas/extended/PixelDataCreator.ts`**). They decode the incoming PNG (or **`CanvasResults.buffer`**) onto an internal canvas, run **`getImageData`** / **`putImageData`**, and return fresh **`Buffer`** / **`PixelData`** as documented below.
+All pixel IO goes through **`painter.pixels`**, implemented by **`PixelDataCreator`** (**`lib-next/pixels/pixel-data-creator.ts`**). The incoming argument is always a **PNG** **`Buffer`** or a **`CanvasResults`** object whose **`.buffer`** is decoded; work happens on an internal **`@napi-rs/canvas`** surface via **`getImageData`** / **`putImageData`**.
+
+---
+
+## Why use this instead of Sharp-only helpers?
+
+- You need **exact `ImageData` layout** (RGBA, row-major) for algorithms, game maps, or custom shaders ported to JS.
+- You want a **small region** or **per-pixel** updates without pulling in heavier pipelines.
+- **`painter.pixels.manipulate`** exposes a simple **`processor`** callback or a fixed set of **CPU filters** for quick experiments.
+
+For whole-image convolution, resize-at-scale, or format conversion, **`painter.image`** (Sharp-backed) is usually faster — combine both: sample with **`pixels`**, bulk work with **`image`**.
+
+---
+
+## API surface (`PainterPixels`)
+
+| Method | Returns |
+|--------|---------|
+| **`getData(buffer, options?)`** | **`Promise<PixelData>`** — optional crop **`{ x, y, width, height }`** |
+| **`setData(buffer, pixelData, options?)`** | **`Promise<Buffer>`** (PNG) — paste **`ImageData`**-shaped bytes at **`x,y`**, optional dirty sub-rect |
+| **`manipulate(buffer, options)`** | **`Promise<Buffer>`** — **`processor`** or **`filter`** + optional **`region`** |
+| **`getColor(buffer, x, y)`** | **`Promise<{ r, g, b, a }>`** |
+| **`setColor(buffer, x, y, color)`** | **`Promise<Buffer>`** |
 
 ---
 
@@ -10,63 +32,88 @@ All methods delegate to **`PixelDataCreator`** (**`lib/Canvas/extended/PixelData
 
 | Field | Meaning |
 |-------|---------|
-| **`data`** | **`Uint8ClampedArray`**, row-major RGBA (**4 × width × height** bytes) |
+| **`data`** | **`Uint8ClampedArray`**, row-major RGBA (**`4 × width × height`** bytes) |
 | **`width`**, **`height`** | Region size in pixels |
 | **`colorSpace`** | Set to **`'srgb'`** on read |
 
-Indices for pixel **`(x, y)`** inside the region: **`idx = (y * width + x) * 4`**, then **`r,g,b,a`** at **`idx … idx+3`**.
+Index for pixel **`(x, y)`** inside the region: **`idx = (y * width + x) * 4`**, then **`r,g,b,a`** at **`idx`…`idx+3`**.
 
 ---
 
-## `getPixelData(canvasBuffer, options?)`
+## `getData(canvasBuffer, options?)`
 
-**`options`**: **`x`**, **`y`**, **`width`**, **`height`** — crop of the image to sample (defaults: full image). Throws if the rectangle exceeds image bounds.
+**`options`**: **`x`**, **`y`**, **`width`**, **`height`** — crop (defaults: full image). Throws if the rectangle exceeds image bounds.
 
-Returns **`PixelData`** for that rectangle only ( **`data.length === width × height × 4`** ).
+```typescript
+const region = await painter.pixels.getData(buf, { x: 10, y: 10, width: 64, height: 64 });
+// region.data.length === 64 * 64 * 4
+```
 
 ---
 
-## `setPixelData(canvasBuffer, pixelData, options?)`
+## `setData(canvasBuffer, pixelData, options?)`
 
-Pastes **`pixelData`** onto a copy of **`canvasBuffer`**.
+Copies **`canvasBuffer`** to a working canvas, then **`putImageData`** for **`pixelData`**.
 
 | Option | Role |
 |--------|------|
 | **`x`**, **`y`** | Top-left destination (default **`0`**) |
-| **`dirtyX`**, **`dirtyY`**, **`dirtyWidth`**, **`dirtyHeight`** | Sub-rectangle of **`pixelData`** passed to **`putImageData`**. If **`dirtyX`** and **`dirtyY`** are both set, the dirty path is used; **`dirtyWidth`** / **`dirtyHeight`** default to **`pixelData.width`** / **`height`**. |
+| **`dirtyX`**, **`dirtyY`**, **`dirtyWidth`**, **`dirtyHeight`** | Sub-rectangle of **`pixelData`** forwarded to **`putImageData`**. If **`dirtyX`** and **`dirtyY`** are both set, the dirty overload is used; **`dirtyWidth`** / **`dirtyHeight`** default to **`pixelData.width`** / **`height`**. |
 
-**Note:** **`pixelData.width`** / **`height`** define the backing **`ImageData`** size; the paste position is **`options.x`**, **`options.y`**.
+**`pixelData.width`** / **`height`** are the **`ImageData`** dimensions; placement is **`options.x`**, **`options.y`**.
 
-Returns a new **PNG **`Buffer`**.
+```typescript
+const tile = await painter.pixels.getData(buf, { x: 0, y: 0, width: 32, height: 32 });
+// …mutate tile.data in place…
+const out = await painter.pixels.setData(buf, tile, { x: 100, y: 40 });
+```
 
 ---
 
-## `manipulatePixels(canvasBuffer, options)`
+## `manipulate(canvasBuffer, options)`
 
-**`PixelManipulationOptions`**:
+**`PixelManipulationOptions`** (**`lib-next/types/pixels.ts`**):
 
 | Key | Purpose |
 |-----|---------|
-| **`processor`** | **`(r, g, b, a, x, y) => [r, g, b, a]`** — per-pixel; outputs clamped to **`[0,255]`** |
-| **`filter`** | One of **`grayscale`**, **`invert`**, **`sepia`**, **`brightness`**, **`contrast`**, **`saturate`** (mutually exclusive with **`processor`** in normal use) |
-| **`intensity`** | Used by filters (default **`1`**). For **`brightness`**, **`0.5`** ≈ no shift (**`(intensity - 0.5) * 255`** added to RGB). **`contrast`** / **`saturate`** scale from this value per implementation |
-| **`region`** | Optional **`{ x, y, width, height }`**. If set, only that region is read and written back; the rest of the image is preserved |
+| **`processor`** | **`(r, g, b, a, x, y) => [r, g, b, a]`** — per-pixel; channels clamped **`0…255`** |
+| **`filter`** | **`grayscale`**, **`invert`**, **`sepia`**, **`brightness`**, **`contrast`**, **`saturate`** (implementation uses **`processor`** *or* **`filter`**, not both mixed in one path) |
+| **`intensity`** | Scalar for filters (default **`1`**). **`brightness`** uses **`(intensity - 0.5) * 255`** added to RGB |
+| **`region`** | **`{ x, y, width, height }`** — only that window is read and written back; rest of image preserved |
 
-Flow: **`getPixelData`** (with **`region`** if provided) → mutate → **`putImageData`** at **`region.x/y`** when **`region`** is set, otherwise **`setPixelData`** replacing full bitmap content.
+```typescript
+const warmed = await painter.pixels.manipulate(buf, {
+  region: { x: 0, y: 0, width: 200, height: 200 },
+  processor: (r, g, b, a) => {
+    return [Math.min(255, r + 12), Math.min(255, g + 4), b, a];
+  },
+});
 
----
-
-## `getPixelColor` / `setPixelColor`
-
-- **`getPixelColor(buffer, x, y)`** — **`getPixelData`** with a **1×1** region; returns **`{ r, g, b, a }`**.
-- **`setPixelColor(buffer, x, y, color)`** — updates one pixel; **`a`** defaults to **`255`** if omitted.
-
----
-
-## Performance notes
-
-These APIs iterate pixels in **CPU** (**JavaScript** loops or **`putImageData`**). Prefer **`createImage`** filters (**Sharp** / convolution) for heavy lifting on full frames; use this track when you need exact **`ImageData`** semantics, small regions, or custom **`processor`** logic.
+const gray = await painter.pixels.manipulate(buf, { filter: "grayscale" });
+```
 
 ---
 
-Next: **[Hit testing](/docs#02-hit-testing-paths)** · then **[Batch & utilities](/docs#03-batch-stitch-compress-output)**.
+## `getColor` / `setColor`
+
+Convenience wrappers around a **1×1** **`getData`** / **`setData`** cycle.
+
+```typescript
+const { r, g, b, a } = await painter.pixels.getColor(buf, 42, 42);
+
+const stamped = await painter.pixels.setColor(buf, 42, 42, {
+  r: 255,
+  g: 0,
+  b: 0,
+  a: 255,
+});
+```
+
+---
+
+## Performance
+
+These paths use **CPU loops** in JavaScript for **`processor`** / filters. Prefer **`painter.image`** (Sharp) for heavy full-frame work; use **`painter.pixels`** when you need **`ImageData`** semantics, tight regions, or teaching/debugging.
+
+---
+

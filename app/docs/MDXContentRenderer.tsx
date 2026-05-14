@@ -23,6 +23,7 @@ import ChangelogRenderer from '@/components/ChangelogRenderer';
 import { DocHeadingAnchor } from '@/components/docs/DocHeadingAnchor';
 import React, { ReactElement } from 'react';
 import type { DocHeading } from '@/lib/docs-heading-utils';
+import { resolveDocFilename } from '@/lib/doc-filename-aliases';
 import { slugifyHeading, stripExplicitHeadingIdsFromMarkdown } from '@/lib/docs-heading-utils';
 
 interface ComponentData {
@@ -455,13 +456,50 @@ function renderComponent(
   }
 }
 
+/** Split intro markdown from Keep-a-Changelog body in `changelog.mdx`. */
+const CHANGELOG_VERSION_MARKER = '<!-- changelog-versions -->';
+
 export function MDXContentRenderer({
   content,
   headings = [],
+  docFilename,
 }: {
   content: string;
   headings?: DocHeading[];
+  docFilename?: string;
 }) {
+  const resolvedDoc =
+    docFilename != null && docFilename.length > 0 ? resolveDocFilename(docFilename) : '';
+
+  if (resolvedDoc === 'changelog') {
+    let headingCursor = 0;
+    const getNextHeadingId = () => headings[headingCursor++]?.id;
+    const markdownComponents = createMarkdownAwareComponents(getNextHeadingId);
+    const markerIdx = content.indexOf(CHANGELOG_VERSION_MARKER);
+    const introMd = markerIdx >= 0 ? content.slice(0, markerIdx).trimEnd() : '';
+    const versionMd =
+      markerIdx >= 0
+        ? content.slice(markerIdx + CHANGELOG_VERSION_MARKER.length).trimStart()
+        : content;
+
+    return (
+      <>
+        {introMd ? (
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+            components={markdownComponents}
+          >
+            {stripExplicitHeadingIdsFromMarkdown(introMd)}
+          </ReactMarkdown>
+        ) : null}
+        <div className="not-prose mt-10 border-t pt-10" style={{ borderColor: 'var(--border-default)' }}>
+          <ChangelogRenderer content={versionMd} />
+        </div>
+      </>
+    );
+  }
+
   const segments = parseMDXContent(content);
 
   const isChangelog = content.includes('# Changelog') || content.match(/^##\s+\[/m);

@@ -2,7 +2,22 @@
 
 Back: [Feature guides hub](/docs#feature-guides-hub)
 
-These **`ApexPainter`** APIs sit beside the main **canvas / image / text / GIF / lines / charts / video** tracks: raw **RGBA** access, **vector paths** rasterised with **`drawPath`**, **hit testing**, and **batch / IO helpers** wired through **`lib/Canvas/utils/general`**.
+In **`lib-next`**, **`ApexPainter`** exposes raster work through **small grouped surfaces** (facades) instead of a flat list of methods on the class root. That keeps **pixels**, **vector paths**, **hit testing**, and **encode / upload helpers** discoverable without crowding **`createCanvas` / `createImage` / `createText`**.
+
+---
+
+## Facades at a glance
+
+| Facet | Property | Typical use |
+|-------|----------|-------------|
+| **Pixels** | **`painter.pixels`** | **`ImageData`**-style **`Uint8ClampedArray`**, CPU filters, single-pixel reads/writes |
+| **Path2D** | **`painter.path2d`** | Build **`PathCommand[]`** → **`Path2D`**, **`draw`** stroke/fill onto an existing PNG, or **`custom`** connector lines |
+| **Hit test** | **`painter.detect`** | **`isPointInPath`** / **`isPointInRegion`** equivalents for UI hit targets |
+| **Image utils** | **`painter.image`** | **`stitchImages`**, **`createCollage`**, **`compress`**, **`extractPalette`**, **`validHex`**, resize, blend, … |
+| **Structured output** | **`painter.output`** | **`dataURL`**, **`base64`**, **`blob`**, **`arrayBuffer`**, **`url`** (Imgur) from a finished **PNG** buffer |
+| **Format `outPut`** | **`painter.outPut(buf)`** | Still driven by **`new ApexPainter({ type: '…' })`** — same idea as before: one buffer → string/Blob/ArrayBuffer matching constructor **`type`** |
+
+**Orchestration** (unchanged on the class): **`painter.batch`**, **`painter.chain`** — see [Batch & utilities](/docs#03-batch-stitch-compress-output).
 
 ---
 
@@ -10,18 +25,26 @@ These **`ApexPainter`** APIs sit beside the main **canvas / image / text / GIF /
 
 | Goal | Lead APIs |
 |------|-----------|
-| Read or write **`ImageData`**-style buffers | **`getPixelData`**, **`setPixelData`**, **`getPixelColor`**, **`setPixelColor`** |
-| Per-pixel or built-in CPU filters on a region | **`manipulatePixels`** |
-| Build geometry then stroke/fill on an existing PNG | **`createPath2D`**, **`drawPath`** — full command table in **[Path2D](/docs#04-path2d-draw-path)** |
-| Click maps, hover zones, distance-to-edge | **`isPointInPath`**, **`isPointInRegion`**, **`isPointInAnyRegion`**, **`getDistanceToRegion`** |
-| Parallel canvas/image/text renders, pipelines, stitching, compression | **`batch`**, **`chain`**, **`stitchImages`**, **`createCollage`**, **`compress`**, **`extractPalette`**, **`outPut`** |
+| Read or write RGBA buffers | **`await painter.pixels.getData`**, **`setData`**, **`getColor`**, **`setColor`** |
+| Per-pixel or built-in CPU filters on a region | **`await painter.pixels.manipulate`** |
+| Build geometry then stroke/fill on an existing raster | **`painter.path2d.create`**, **`await painter.path2d.draw`** — command table in **[Path2D](/docs#04-path2d-draw-path)** |
+| Decorative connectors (smooth / bezier / markers) on top of a buffer | **`await painter.path2d.custom`** (**`CustomOptions`**) — see [Custom lines](/docs#03-custom-lines-arrows-markers-textures) |
+| Click maps, hover zones, distance-to-edge | **`await painter.detect.path`**, **`region`**, **`anyRegion`**, **`distance`** |
+| Parallel canvas/image/text jobs, pipelines, layout, compression | **`painter.batch`**, **`painter.chain`**, **`painter.image.*`** |
 
-Implementation anchors:
+---
 
-- **`PixelDataCreator`** — **`lib/Canvas/extended/PixelDataCreator.ts`**
-- **`Path2DCreator`** — **`lib/Canvas/extended/Path2DCreator.ts`**
-- **`HitDetectionCreator`** — **`lib/Canvas/extended/HitDetectionCreator.ts`**
-- **`batchOperations`**, **`chainOperations`**, **`stitchImages`**, **`createCollage`**, **`compressImage`**, **`extractPalette`** — **`lib/Canvas/utils/general/`**
+## Implementation anchors (`lib-next`)
+
+| Concern | Module |
+|---------|--------|
+| Pixel read/write | **`lib-next/pixels/pixel-data-creator.ts`** (`PixelDataCreator`) |
+| Path2D build + draw | **`lib-next/path/path2d-creator.ts`** (`Path2DCreator`) |
+| Custom lines on buffer | **`lib-next/apex-painter/path-custom-lines.ts`** (`runDrawCustomLines` → **`path/custom-lines.ts`**) |
+| Hit testing | **`lib-next/pixels/hit-detection-creator.ts`** (`HitDetectionCreator`) |
+| Facet wiring | **`lib-next/apex-painter/facets.ts`**, **`public-types.ts`**, **`main.ts`** |
+| Batch / chain | **`lib-next/batch/batch-operations.ts`**, **`apex-painter/creates/batch-create.ts`** |
+| Stitch, collage, compress, palette | **`lib-next/image/painter-image-utils.ts`**, **`lib-next/output/stitch.ts`**, **`lib-next/output/compression.ts`** |
 
 ---
 
@@ -29,21 +52,46 @@ Implementation anchors:
 
 | # | Page |
 |---|------|
-| 1 | [Pixel read / write / **`manipulatePixels`**](/docs#01-pixel-data-manipulation) |
+| 1 | [Pixel read / write / **`manipulate`**](/docs#01-pixel-data-manipulation) |
 | 2 | [Hit testing — paths & **`HitRegion`**](/docs#02-hit-testing-paths) |
-| 3 | [**`batch`**, **`chain`**, stitch, collage, compress, palette, **`outPut`**](/docs#03-batch-stitch-compress-output) · [Disk **`save`**](/docs#00-batch-save-output-overview) |
+| 3 | [**`batch`**, **`chain`**, **`painter.image`**, **`outPut` / `output`**](/docs#03-batch-stitch-compress-output) · [Disk **`save`**](/docs#00-batch-save-output-overview) |
 
-Path2D command catalogue and **`Path2DDrawOptions`** remain under **[Lines & connectors](/docs#00-custom-lines-overview)** → **[Path2D · `drawPath`](/docs#04-path2d-draw-path)** (same primitives **`HitDetectionCreator`** uses for **`path`** regions).
-
----
-
-## Types
-
-- **`PixelData`**, **`PixelManipulationOptions`** — **`lib/Canvas/utils/types`** (re-exported via **`canvasUtils`**)
-- **`HitRegion`**, **`HitDetectionOptions`**, **`HitDetectionResult`** — **`HitDetectionCreator.ts`**
-- **`PathCommand`**, **`buildPath2DFromCommands`** — **`lib/Canvas/utils/core/pathCmd.ts`**
-- **`BatchOperation`**, **`ChainOperation`**, **`StitchOptions`**, **`CollageLayout`**, **`CompressionOptions`**, **`PaletteOptions`** — **`lib/Canvas/utils/types`**
+Path2D command catalogue and **`Path2DDrawOptions`** live under **[Lines & connectors](/docs#00-custom-lines-overview)** → **[Path2D · `draw`](/docs#04-path2d-draw-path)** (same **`PathCommand`** shapes **`painter.detect`** accepts for path tests).
 
 ---
 
-Next: **[Pixel APIs](/docs#01-pixel-data-manipulation)**.
+## Types (source of truth)
+
+- **`PixelData`**, **`PixelManipulationOptions`** — **`lib-next/types/pixels.ts`**
+- **`HitRegion`**, **`HitDetectionOptions`**, **`HitDetectionResult`** — **`lib-next/types/hit-detection.ts`**
+- **`PathCommand`** — **`lib-next/types/pathCommands.ts`** (built via **`lib-next/foundation/path-cmd.ts`**)
+- **`Path2DDrawOptions`** — **`lib-next/types/path2d-draw.ts`**
+- **`CustomOptions`** — **`lib-next/types/path.ts`**
+- **`BatchOperation`**, **`ChainOperation`**, **`StitchOptions`**, **`CollageLayout`**, **`CompressionOptions`**, **`PaletteOptions`** — **`lib-next/types/batch.ts`**
+
+---
+
+## Minimal usage sketch
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+const { buffer } = await painter.createCanvas({ width: 400, height: 200, color: "#1e293b" });
+
+const path = painter.path2d.create([
+  { type: "moveTo", x: 40, y: 100 },
+  { type: "lineTo", x: 360, y: 100 },
+]);
+
+const drawn = await painter.path2d.draw(buffer, path, {
+  stroke: { color: "#38bdf8", width: 4, lineCap: "round" },
+});
+
+const { hit, hitType } = await painter.detect.path(path, 200, 100, { fillRule: "nonzero" });
+
+const px = await painter.pixels.getColor(drawn, 200, 100);
+```
+
+---

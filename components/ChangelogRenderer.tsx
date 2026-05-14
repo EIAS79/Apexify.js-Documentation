@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
@@ -24,7 +24,10 @@ import {
   CodeBracketIcon,
   BeakerIcon,
   AdjustmentsHorizontalIcon,
-  RectangleStackIcon
+  RectangleStackIcon,
+  ArrowPathIcon,
+  ShieldCheckIcon,
+  ChevronDownIcon,
 } from '@heroicons/react/24/outline';
 
 interface SubsectionItem {
@@ -47,6 +50,8 @@ interface ChangelogEntry {
   version: string;
   date: string;
   type: 'major' | 'minor' | 'patch';
+  /** Intro text, tables, or other content before the first ### section. */
+  preamble?: string;
   changes: {
     added?: ChangeSection | string[];
     fixed?: ChangeSection | string[];
@@ -55,6 +60,10 @@ interface ChangelogEntry {
     enhanced?: ChangeSection | string[];
     removed?: ChangeSection | string[];
     features?: ChangeSection | string[];
+    breaking?: ChangeSection | string[];
+    migration?: ChangeSection | string[];
+    deprecated?: ChangeSection | string[];
+    security?: ChangeSection | string[];
     [key: string]: ChangeSection | string[] | undefined;
   };
 }
@@ -89,6 +98,15 @@ const changeTypeConfig = {
   enhanced: { label: 'Enhanced', icon: BoltIcon, color: 'text-purple-400', bgColor: 'bg-purple-500/10' },
   removed: { label: 'Removed', icon: XMarkIcon, color: 'text-red-400', bgColor: 'bg-red-500/10' },
   features: { label: 'Features', icon: PlusIcon, color: 'text-blue-400', bgColor: 'bg-blue-500/10' },
+  breaking: {
+    label: 'Breaking changes',
+    icon: ExclamationTriangleIcon,
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-500/10',
+  },
+  migration: { label: 'Migration', icon: ArrowPathIcon, color: 'text-teal-400', bgColor: 'bg-teal-500/10' },
+  deprecated: { label: 'Deprecated', icon: XMarkIcon, color: 'text-amber-400', bgColor: 'bg-amber-500/10' },
+  security: { label: 'Security', icon: ShieldCheckIcon, color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' },
 };
 
 // Function to get icon for subsection titles
@@ -142,10 +160,47 @@ function getSubsectionIcon(title: string) {
   return SparklesIcon;
 }
 
+function semverReleaseType(version: string): 'major' | 'minor' | 'patch' {
+  const m = /^(\d+)\.(\d+)\.(\d+)/.exec(version.trim());
+  if (!m) return 'patch';
+  const minor = parseInt(m[2], 10);
+  const patch = parseInt(m[3], 10);
+  if (minor === 0 && patch === 0) return 'major';
+  if (patch === 0) return 'minor';
+  return 'patch';
+}
+
+/** First index in `block` where a recognised ### change section begins. */
+function findFirstSectionHeaderIndex(block: string): number {
+  const sectionLineRes = [
+    /^#{3,4}\s+.*\bAdded\s*$/i,
+    /^#{3,4}\s+.*\bFixed\s*$/i,
+    /^#{3,4}\s+.*\bChanged\s*$/i,
+    /^#{3,4}\s+.*\bImproved\s*$/i,
+    /^#{3,4}\s+.*\bEnhanced\s*$/i,
+    /^#{3,4}\s+.*\bRemoved\s*$/i,
+    /^#{3,4}\s+.*\bDeprecated\s*$/i,
+    /^#{3,4}\s+.*\bSecurity\s*$/i,
+    /^#{3,4}\s+.*\bBreaking\s+changes\s*$/i,
+    /^#{3,4}\s+.*\bMigration\s*$/i,
+    /^#{3,4}\s+.*\bFeatures\s*$/i,
+  ];
+  let offset = 0;
+  for (const line of block.split('\n')) {
+    const t = line.trim();
+    if (t) {
+      for (const re of sectionLineRes) {
+        if (re.test(t)) return offset;
+      }
+    }
+    offset += line.length + 1;
+  }
+  return block.length;
+}
+
 function parseChangelog(content: string): ChangelogEntry[] {
   const entries: ChangelogEntry[] = [];
-  
-  // Split by version headers - format: ## [version] - date
+
   const versionRegex = /^##\s+\[(.+?)\]\s*-\s*(.+?)$/gm;
   const versionMatches = Array.from(content.matchAll(versionRegex));
 
@@ -155,77 +210,64 @@ function parseChangelog(content: string): ChangelogEntry[] {
     const startIndex = match.index! + match[0].length;
     const nextMatch = versionMatches[versionMatches.indexOf(match) + 1];
     const endIndex = nextMatch ? nextMatch.index! : content.length;
-    let sectionContent = content.substring(startIndex, endIndex).trim();
+    const fullBlock = content.substring(startIndex, endIndex).trim();
 
-    // Determine release type from version
-    const versionParts = version.split('.');
-    let type: 'major' | 'minor' | 'patch' = 'patch';
-    const major = parseInt(versionParts[0]) || 0;
-    const minor = parseInt(versionParts[1]) || 0;
-    const patch = parseInt(versionParts[2]) || 0;
-    
-    if (major > 0 || (major === 0 && minor === 0 && patch === 0)) {
-      type = 'major';
-    } else if (minor > 0) {
-      type = 'minor';
-    } else {
-      type = 'patch';
-    }
+    const firstHdr = findFirstSectionHeaderIndex(fullBlock);
+    const preamble = fullBlock.substring(0, firstHdr).trim();
+    const sectionContent = fullBlock.substring(firstHdr).trim();
 
+    const type = semverReleaseType(version);
     const changes: ChangelogEntry['changes'] = {};
 
-    // Map emoji patterns to change types - handle both ### and #### headers
     const sectionPatterns = [
-      { key: 'added', regex: /^#{3,4}\s+.*?(?:✨|➕)?\s*Added\s*$/mi },
-      { key: 'fixed', regex: /^#{3,4}\s+.*?(?:🐛|🔧)?\s*Fixed\s*$/mi },
-      { key: 'changed', regex: /^#{3,4}\s+.*?(?:🔄|⚡)?\s*Changed\s*$/mi },
-      { key: 'improved', regex: /^#{3,4}\s+.*?(?:🔧|✨)?\s*Improved\s*$/mi },
-      { key: 'enhanced', regex: /^#{3,4}\s+.*?(?:✨|🚀)?\s*Enhanced\s*$/mi },
-      { key: 'removed', regex: /^#{3,4}\s+.*?(?:🗑️|➖)?\s*Removed\s*$/mi },
-      { key: 'features', regex: /^###\s+Features\s*$/mi }, // Handle generic "Features" sections (map to added)
+      { key: 'added', regex: /^#{3,4}\s+.*\bAdded\s*$/gim },
+      { key: 'fixed', regex: /^#{3,4}\s+.*\bFixed\s*$/gim },
+      { key: 'changed', regex: /^#{3,4}\s+.*\bChanged\s*$/gim },
+      { key: 'improved', regex: /^#{3,4}\s+.*\bImproved\s*$/gim },
+      { key: 'enhanced', regex: /^#{3,4}\s+.*\bEnhanced\s*$/gim },
+      { key: 'removed', regex: /^#{3,4}\s+.*\bRemoved\s*$/gim },
+      { key: 'deprecated', regex: /^#{3,4}\s+.*\bDeprecated\s*$/gim },
+      { key: 'security', regex: /^#{3,4}\s+.*\bSecurity\s*$/gim },
+      { key: 'breaking', regex: /^#{3,4}\s+.*\bBreaking\s+changes\s*$/gim },
+      { key: 'migration', regex: /^#{3,4}\s+.*\bMigration\s*$/gim },
+      { key: 'features', regex: /^#{3,4}\s+.*\bFeatures\s*$/gim },
     ];
 
-    // Find all section matches in order
     interface SectionMatch {
       key: string;
       index: number;
       endIndex: number;
     }
-    
+
     const allSectionMatches: SectionMatch[] = [];
     for (const pattern of sectionPatterns) {
-      const regex = new RegExp(pattern.regex.source, pattern.regex.flags + 'g');
-      let match;
-      while ((match = regex.exec(sectionContent)) !== null) {
+      const regex = new RegExp(pattern.regex.source, pattern.regex.flags);
+      let sm: RegExpExecArray | null;
+      while ((sm = regex.exec(sectionContent)) !== null) {
         allSectionMatches.push({
           key: pattern.key,
-          index: match.index! + match[0].length,
-          endIndex: match.index! + match[0].length,
+          index: sm.index + sm[0].length,
+          endIndex: sm.index + sm[0].length,
         });
       }
     }
 
-    // Sort by index
     allSectionMatches.sort((a, b) => a.index - b.index);
 
-    // Determine end indices
     for (let i = 0; i < allSectionMatches.length; i++) {
       const current = allSectionMatches[i];
       if (i < allSectionMatches.length - 1) {
         current.endIndex = allSectionMatches[i + 1].index;
       } else {
-        // Check for version headers and horizontal rules
         const nextVersionMatch = sectionContent.substring(current.index).match(/^(---|##\s+\[)/m);
         current.endIndex = nextVersionMatch ? current.index + nextVersionMatch.index! : sectionContent.length;
       }
     }
 
-    // Parse each section
     for (const sectionMatch of allSectionMatches) {
       const sectionText = sectionContent.substring(sectionMatch.index, sectionMatch.endIndex).trim();
       if (!sectionText) continue;
 
-      // Parse section with subsections
       const lines = sectionText.split('\n');
       const subsections: Subsection[] = [];
       let currentSubsection: Subsection | null = null;
@@ -237,7 +279,6 @@ function parseChangelog(content: string): ChangelogEntry[] {
         const trimmed = line.trim();
         const originalIndent = line.match(/^(\s*)/)?.[1].length || 0;
 
-        // Skip empty lines and horizontal rules
         if (!trimmed || trimmed.match(/^---+$/)) {
           if (currentItem) {
             if (currentSubsection) {
@@ -250,10 +291,8 @@ function parseChangelog(content: string): ChangelogEntry[] {
           continue;
         }
 
-        // Check for subsection header (#####)
         const subsectionMatch = trimmed.match(/^#####\s+(.+)$/);
         if (subsectionMatch) {
-          // Save current item if exists
           if (currentItem) {
             if (currentSubsection) {
               currentSubsection.items.push(currentItem);
@@ -262,19 +301,16 @@ function parseChangelog(content: string): ChangelogEntry[] {
             }
             currentItem = null;
           }
-          // Start new subsection
           currentSubsection = {
             title: subsectionMatch[1],
-            items: []
+            items: [],
           };
           subsections.push(currentSubsection);
           continue;
         }
 
-        // Check if this is a list item (starts with - or *)
         const listItemMatch = trimmed.match(/^[-*]\s+(.+)$/);
         if (listItemMatch) {
-          // Save previous item
           if (currentItem) {
             if (currentSubsection) {
               currentSubsection.items.push(currentItem);
@@ -282,35 +318,28 @@ function parseChangelog(content: string): ChangelogEntry[] {
               flatItems.push(currentItem.content);
             }
           }
-          // Start new item
           currentItem = {
             content: listItemMatch[1],
-            subItems: []
+            subItems: [],
           };
         } else if (currentItem && originalIndent >= 2) {
-          // Nested sub-item (indented with 2+ spaces)
           const subItemMatch = trimmed.match(/^[-*]\s+(.+)$/);
           if (subItemMatch) {
             if (!currentItem.subItems) currentItem.subItems = [];
             currentItem.subItems.push(subItemMatch[1]);
           } else if (trimmed) {
-            // Continuation of sub-item or main item
             if (currentItem.subItems && currentItem.subItems.length > 0) {
-              // Append to last sub-item
               const lastSubItem = currentItem.subItems[currentItem.subItems.length - 1];
               currentItem.subItems[currentItem.subItems.length - 1] = lastSubItem + ' ' + trimmed;
             } else {
-              // Append to main item
               currentItem.content += ' ' + trimmed;
             }
           }
         } else if (currentItem && trimmed && !trimmed.startsWith('#')) {
-          // Continuation of current item
           currentItem.content += ' ' + trimmed;
         }
       }
 
-      // Save last item
       if (currentItem) {
         if (currentSubsection) {
           currentSubsection.items.push(currentItem);
@@ -319,31 +348,25 @@ function parseChangelog(content: string): ChangelogEntry[] {
         }
       }
 
-      // Build change section
       const changeKey = sectionMatch.key === 'features' ? 'added' : sectionMatch.key;
       if (subsections.length > 0) {
-        // Has subsections - use structured format
         const changeSection: ChangeSection = {
           type: changeKey,
-          subsections: subsections
+          subsections: subsections,
         };
-        // Merge if exists
         const existing = changes[changeKey as keyof typeof changes];
         if (existing && Array.isArray(existing)) {
           changes[changeKey as keyof typeof changes] = changeSection;
         } else if (existing && !Array.isArray(existing)) {
-          // Merge subsections
           const existingSection = existing as ChangeSection;
           existingSection.subsections = [...existingSection.subsections, ...subsections];
         } else {
           changes[changeKey as keyof typeof changes] = changeSection;
         }
       } else if (flatItems.length > 0) {
-        // No subsections - use flat list
-        const validItems = flatItems.filter(item => item.length > 3);
+        const validItems = flatItems.filter((item) => item.trim().length > 0);
         if (validItems.length > 0) {
           if (changes[changeKey as keyof typeof changes] && Array.isArray(changes[changeKey as keyof typeof changes])) {
-            // Merge arrays
             (changes[changeKey as keyof typeof changes] as string[]).push(...validItems);
           } else {
             changes[changeKey as keyof typeof changes] = validItems;
@@ -352,7 +375,6 @@ function parseChangelog(content: string): ChangelogEntry[] {
       }
     }
 
-    // Only add entry if it has changes - use same logic as getTotalChanges
     const totalChanges = Object.values(changes).reduce((sum, changeData) => {
       if (!changeData) return sum;
       if (Array.isArray(changeData)) {
@@ -364,13 +386,45 @@ function parseChangelog(content: string): ChangelogEntry[] {
       }
       return sum;
     }, 0);
-    
-    if (totalChanges > 0) {
-      entries.push({ version, date, type, changes });
+
+    if (totalChanges > 0 || preamble.length > 0) {
+      entries.push({
+        version,
+        date,
+        type,
+        changes,
+        ...(preamble.length > 0 ? { preamble } : {}),
+      });
     }
   }
 
   return entries;
+}
+
+const SECTION_DISPLAY_ORDER = [
+  'added',
+  'changed',
+  'fixed',
+  'breaking',
+  'migration',
+  'deprecated',
+  'security',
+  'removed',
+  'improved',
+  'enhanced',
+];
+
+function orderedChangeKeys(ch: ChangelogEntry['changes']): string[] {
+  const keys = Object.keys(ch).filter((k) => ch[k as keyof typeof ch] != null);
+  keys.sort((a, b) => {
+    const ia = SECTION_DISPLAY_ORDER.indexOf(a);
+    const ib = SECTION_DISPLAY_ORDER.indexOf(b);
+    if (ia === -1 && ib === -1) return a.localeCompare(b);
+    if (ia === -1) return 1;
+    if (ib === -1) return -1;
+    return ia - ib;
+  });
+  return keys;
 }
 
 export default function ChangelogRenderer({ content }: ChangelogRendererProps) {
@@ -412,160 +466,223 @@ export default function ChangelogRenderer({ content }: ChangelogRendererProps) {
 
   if (entries.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-400">
-        <p>No changelog entries found.</p>
+      <div
+        className="not-prose rounded-xl border px-6 py-10 text-center text-sm leading-relaxed"
+        style={{ borderColor: 'var(--border-default)', color: 'var(--text-tertiary)' }}
+      >
+        <p>
+          No changelog versions were parsed. Confirm{' '}
+          <code className="rounded px-1.5 py-0.5 font-mono text-xs" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--bg-sunken)' }}>
+            content/docs/06-internals/changelog.mdx
+          </code>{' '}
+          includes the{' '}
+          <code className="rounded px-1.5 py-0.5 font-mono text-xs" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--bg-sunken)' }}>
+            {'<!-- changelog-versions -->'}
+          </code>{' '}
+          marker before the first{' '}
+          <code className="rounded px-1.5 py-0.5 font-mono text-xs" style={{ color: 'var(--text-secondary)', backgroundColor: 'var(--bg-sunken)' }}>
+            ## [5.4.0] - 2026-05-13
+          </code>{' '}
+          line, and that version lines use that format.
+        </p>
       </div>
     );
   }
 
+  const mdInline = {
+    p: ({ children }: { children?: ReactNode }) => <span className="inline">{children}</span>,
+    strong: ({ children }: { children?: ReactNode }) => (
+      <strong className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+        {children}
+      </strong>
+    ),
+    code: ({ children }: { children?: ReactNode }) => (
+      <code
+        className="rounded px-1.5 py-0.5 font-mono text-sm"
+        style={{
+          backgroundColor: 'var(--bg-sunken)',
+          color: 'var(--accent-magenta)',
+          border: '1px solid var(--border-subtle)',
+        }}
+      >
+        {children}
+      </code>
+    ),
+  };
+
+  const mdPreamble = {
+    ...mdInline,
+    h3: ({ children }: { children?: ReactNode }) => (
+      <h3 className="mt-6 mb-2 text-lg font-bold first:mt-0" style={{ color: 'var(--text-primary)' }}>
+        {children}
+      </h3>
+    ),
+    table: ({ children }: { children?: ReactNode }) => (
+      <div className="my-4 overflow-x-auto rounded-lg border" style={{ borderColor: 'var(--border-default)' }}>
+        <table className="min-w-full border-collapse text-left text-sm">{children}</table>
+      </div>
+    ),
+    thead: ({ children }: { children?: ReactNode }) => (
+      <thead style={{ backgroundColor: 'var(--bg-sunken)', color: 'var(--text-secondary)' }}>{children}</thead>
+    ),
+    th: ({ children }: { children?: ReactNode }) => (
+      <th className="border-b px-3 py-2 font-semibold" style={{ borderColor: 'var(--border-subtle)' }}>
+        {children}
+      </th>
+    ),
+    td: ({ children }: { children?: ReactNode }) => (
+      <td className="border-b px-3 py-2 align-top" style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-secondary)' }}>
+        {children}
+      </td>
+    ),
+    tr: ({ children }: { children?: ReactNode }) => <tr>{children}</tr>,
+    tbody: ({ children }: { children?: ReactNode }) => <tbody>{children}</tbody>,
+    p: ({ children }: { children?: ReactNode }) => (
+      <p className="mb-3 leading-relaxed last:mb-0" style={{ color: 'var(--text-secondary)' }}>
+        {children}
+      </p>
+    ),
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="not-prose space-y-4">
       {entries.map((entry, index) => {
         const TypeIcon = typeConfig[entry.type].icon;
-        const isExpanded = expanded[entry.version] ?? (index === 0); // Expand first entry by default
+        const isExpanded = expanded[entry.version] ?? index === 0;
         const totalChanges = getTotalChanges(entry.changes);
 
         return (
           <div
             key={entry.version}
-            className="bg-slate-900/60 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-6 lg:p-8 hover:border-slate-600/50 transition-all duration-300 shadow-lg"
+            className="overflow-hidden rounded-2xl transition-shadow"
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--bg-raised) 92%, transparent)',
+              border: '1px solid var(--border-default)',
+              boxShadow: 'var(--shadow-md)',
+            }}
           >
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-3 mb-3">
-                  <h3 className="text-3xl lg:text-4xl font-bold text-white">{entry.version}</h3>
-                  <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border ${typeConfig[entry.type].color}`}>
-                    <TypeIcon className="w-4 h-4" />
-                    <span className="text-sm font-semibold">{typeConfig[entry.type].label}</span>
-                  </div>
+            <button
+              type="button"
+              onClick={() => toggleExpand(entry.version)}
+              className="flex w-full flex-col gap-3 p-5 text-left transition-colors sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+              style={{ color: 'var(--text-primary)' }}
+              aria-expanded={isExpanded}
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <span className="text-2xl font-black tracking-tight sm:text-3xl">{entry.version}</span>
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold sm:text-sm ${typeConfig[entry.type].color}`}
+                  >
+                    <TypeIcon className="h-4 w-4 shrink-0" aria-hidden />
+                    {typeConfig[entry.type].label}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-400 mb-4">
-                  <CalendarIcon className="w-4 h-4" />
-                  <span className="text-sm">{formatDate(entry.date)}</span>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                  <CalendarIcon className="h-4 w-4 shrink-0" aria-hidden />
+                  <span>{formatDate(entry.date)}</span>
+                  <span aria-hidden className="opacity-40">
+                    ·
+                  </span>
+                  <span className="tabular-nums">{totalChanges} items</span>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <button className="px-4 py-1.5 border border-cyan-500/40 text-cyan-400 rounded-full text-sm font-medium hover:bg-cyan-500/10 transition-colors">
-                  {totalChanges} changes
-                </button>
-                <button
-                  onClick={() => toggleExpand(entry.version)}
-                  className="p-2 hover:bg-slate-800/50 rounded-lg transition-colors"
-                  aria-label={isExpanded ? 'Collapse' : 'Expand'}
-                >
-                  {isExpanded ? (
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  )}
-                </button>
+              <div className="flex shrink-0 items-center gap-2 self-end sm:self-auto">
+                <span className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>
+                  {isExpanded ? 'Collapse' : 'Expand'}
+                </span>
+                <ChevronDownIcon
+                  className="h-5 w-5 shrink-0 transition-transform duration-200"
+                  style={{
+                    color: 'var(--text-tertiary)',
+                    transform: isExpanded ? 'rotate(180deg)' : undefined,
+                  }}
+                  aria-hidden
+                />
               </div>
-            </div>
+            </button>
 
             {isExpanded && (
-              <div className="mt-6 space-y-6 pt-6 border-t border-slate-700/50">
-                {Object.entries(entry.changes).map(([changeType, changeData]) => {
+              <div className="space-y-8 border-t px-5 pb-6 pt-5 sm:px-6" style={{ borderColor: 'var(--border-subtle)' }}>
+                {entry.preamble ? (
+                  <div className="max-w-none text-sm leading-relaxed sm:text-base">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdPreamble}>
+                      {entry.preamble}
+                    </ReactMarkdown>
+                  </div>
+                ) : null}
+
+                {orderedChangeKeys(entry.changes).map((changeType) => {
+                  const changeData = entry.changes[changeType as keyof typeof entry.changes];
                   if (!changeData) return null;
-                  
-                  const config = changeTypeConfig[changeType as keyof typeof changeTypeConfig];
-                  if (!config) return null;
+
+                  const config =
+                    changeTypeConfig[changeType as keyof typeof changeTypeConfig] ?? {
+                      label: changeType.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+                      icon: DocumentTextIcon,
+                      color: 'text-slate-400',
+                      bgColor: 'bg-slate-500/10',
+                    };
 
                   const Icon = config.icon;
                   const isStructured = changeData && typeof changeData === 'object' && 'subsections' in changeData;
-                  const changeSection = isStructured ? changeData as ChangeSection : null;
+                  const changeSection = isStructured ? (changeData as ChangeSection) : null;
                   const flatItems = !isStructured && Array.isArray(changeData) ? changeData : [];
 
                   return (
-                    <div key={changeType} className="space-y-5">
-                      <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${config.bgColor} border border-transparent`}>
-                        <Icon className={`w-5 h-5 ${config.color}`} />
-                        <h4 className={`font-semibold text-base ${config.color}`}>{config.label}</h4>
+                    <div key={changeType} className="space-y-4">
+                      <div
+                        className={`inline-flex items-center gap-2 rounded-lg border border-transparent px-3 py-1.5 ${config.bgColor}`}
+                      >
+                        <Icon className={`h-5 w-5 shrink-0 ${config.color}`} aria-hidden />
+                        <h4 className={`text-base font-bold ${config.color}`}>{config.label}</h4>
                       </div>
-                      
+
                       {changeSection && changeSection.subsections.length > 0 ? (
-                        // Structured format with subsections
-                        <div className="space-y-6 ml-2">
+                        <div className="ml-0 space-y-6 sm:ml-1">
                           {changeSection.subsections.map((subsection, subIdx) => {
                             const SubsectionIcon = getSubsectionIcon(subsection.title);
                             return (
-                            <div key={subIdx} className="space-y-3">
-                              <div className="flex items-center gap-2 text-lg font-semibold text-gray-200 border-b border-slate-700/50 pb-2">
-                                <SubsectionIcon className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                                <h5>{subsection.title}</h5>
+                              <div key={subIdx} className="space-y-3">
+                                <div
+                                  className="flex items-center gap-2 border-b pb-2 text-base font-semibold"
+                                  style={{ borderColor: 'var(--border-subtle)', color: 'var(--text-primary)' }}
+                                >
+                                  <SubsectionIcon className="h-5 w-5 shrink-0" style={{ color: 'var(--text-tertiary)' }} aria-hidden />
+                                  <h5>{subsection.title}</h5>
+                                </div>
+                                <ol className="ml-4 list-decimal space-y-3 sm:ml-6">
+                                  {subsection.items.map((item, itemIdx) => (
+                                    <li key={itemIdx} className="pl-1 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                                      <div className="max-w-none">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdInline}>
+                                          {item.content}
+                                        </ReactMarkdown>
+                                      </div>
+                                      {item.subItems && item.subItems.length > 0 && (
+                                        <ul className="mt-2 ml-4 list-disc space-y-1.5 sm:ml-6">
+                                          {item.subItems.map((subItem, subItemIdx) => (
+                                            <li key={subItemIdx} className="text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                                              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdInline}>
+                                                {subItem}
+                                              </ReactMarkdown>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      )}
+                                    </li>
+                                  ))}
+                                </ol>
                               </div>
-                              <ol className="space-y-3 ml-6 list-decimal">
-                                {subsection.items.map((item, itemIdx) => (
-                                  <li key={itemIdx} className="text-gray-300 leading-relaxed pl-2">
-                                    <div className="prose prose-invert max-w-none">
-                                      <ReactMarkdown 
-                                        remarkPlugins={[remarkGfm]} 
-                                        rehypePlugins={[rehypeRaw]}
-                                        components={{
-                                          p: ({ children }) => <span className="inline">{children}</span>,
-                                          strong: ({ children }) => <strong className="text-white font-semibold">{children}</strong>,
-                                          code: ({ children }) => (
-                                            <code className="bg-slate-800/80 text-cyan-400 px-1.5 py-0.5 rounded text-sm font-mono">
-                                              {children}
-                                            </code>
-                                          ),
-                                        }}
-                                      >
-                                        {item.content}
-                                      </ReactMarkdown>
-                                    </div>
-                                    {item.subItems && item.subItems.length > 0 && (
-                                      <ul className="mt-2 ml-6 space-y-1.5 list-disc list-inside">
-                                        {item.subItems.map((subItem, subItemIdx) => (
-                                          <li key={subItemIdx} className="text-gray-400 text-sm">
-                                            <ReactMarkdown 
-                                              remarkPlugins={[remarkGfm]} 
-                                              rehypePlugins={[rehypeRaw]}
-                                              components={{
-                                                p: ({ children }) => <span className="inline">{children}</span>,
-                                                strong: ({ children }) => <strong className="text-gray-300 font-medium">{children}</strong>,
-                                                code: ({ children }) => (
-                                                  <code className="bg-slate-800/80 text-cyan-400 px-1 py-0.5 rounded text-xs font-mono">
-                                                    {children}
-                                                  </code>
-                                                ),
-                                              }}
-                                            >
-                                              {subItem}
-                                            </ReactMarkdown>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    )}
-                                  </li>
-                                ))}
-                              </ol>
-                            </div>
                             );
                           })}
                         </div>
                       ) : flatItems.length > 0 ? (
-                        // Flat list format (no subsections)
-                        <ul className="space-y-3 ml-2 list-disc list-inside">
+                        <ul className="ml-2 list-disc space-y-3 sm:ml-4">
                           {flatItems.map((item, idx) => (
-                            <li key={idx} className="text-gray-300 leading-relaxed pl-2">
-                              <div className="prose prose-invert max-w-none">
-                                <ReactMarkdown 
-                                  remarkPlugins={[remarkGfm]} 
-                                  rehypePlugins={[rehypeRaw]}
-                                  components={{
-                                    p: ({ children }) => <span className="inline">{children}</span>,
-                                    strong: ({ children }) => <strong className="text-white font-semibold">{children}</strong>,
-                                    code: ({ children }) => (
-                                      <code className="bg-slate-800/80 text-cyan-400 px-1.5 py-0.5 rounded text-sm font-mono">
-                                        {children}
-                                      </code>
-                                    ),
-                                  }}
-                                >
+                            <li key={idx} className="pl-1 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                              <div className="max-w-none">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]} components={mdInline}>
                                   {item}
                                 </ReactMarkdown>
                               </div>
@@ -582,12 +699,17 @@ export default function ChangelogRenderer({ content }: ChangelogRendererProps) {
         );
       })}
 
-      <div className="mt-8 pt-6 border-t border-slate-700/50">
+      <div className="border-t pt-6" style={{ borderColor: 'var(--border-subtle)' }}>
         <a
           href="https://github.com/EIAS79/apexify.js"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800/50 hover:bg-slate-800/70 border border-slate-700/50 rounded-lg text-gray-300 hover:text-white transition-all duration-200"
+          className="inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors"
+          style={{
+            borderColor: 'var(--border-default)',
+            backgroundColor: 'var(--bg-sunken)',
+            color: 'var(--text-secondary)',
+          }}
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />

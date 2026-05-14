@@ -1,16 +1,21 @@
-# Path2D · `createPath2D` & `drawPath` {#04-path2d-draw-path}
+# Path2D · `create`, `draw` & `custom` {#04-path2d-draw-path}
 
 Back: [Lines overview](/docs#00-custom-lines-overview) · [Raster / utilities hub](/docs#00-advanced-raster-overview)
 
-Low-level vector API — independent of **`createCustom`** (**`Path2DCreator`** in **`lib/Canvas/extended/Path2DCreator.ts`**).
+Vector path work is exposed as **`painter.path2d`** (**`PainterPath2D`**), wired in **`lib-next/apex-painter/facets.ts`** to:
+
+- **`Path2DCreator`** — **`lib-next/path/path2d-creator.ts`** (**`create`**, **`draw`**)
+- **`runDrawCustomLines`** — **`lib-next/apex-painter/path-custom-lines.ts`** (**`custom`**), delegating to **`lib-next/path/custom-lines.ts`**
+
+This is **independent** of scene **`path`** layers or **`createImage`** — you bring a **raster buffer**, optionally a **`Path2D`** or **`PathCommand[]`**, and receive a new **PNG** **`Buffer`**.
 
 ---
 
-## `createPath2D(commands: PathCommand[])`
+## `painter.path2d.create(commands: PathCommand[])`
 
-Returns a **`Path2D`**-like object from **`buildPath2DFromCommands`** (**`lib/Canvas/utils/core/pathCmd.ts`**).
+Builds a native **`Path2D`** from **`PathCommand[]`** using **`buildPath2DFromCommands`** (**`lib-next/foundation/path-cmd.ts`**). Throws are wrapped as **`createPath2D failed: …`**.
 
-### **`PathCommand`** variants
+### `PathCommand` variants
 
 | **`type`** | Payload |
 |------------|---------|
@@ -19,50 +24,88 @@ Returns a **`Path2D`**-like object from **`buildPath2DFromCommands`** (**`lib/Ca
 | **`arc`** | Centre **`x`/`y`**, **`radius`**, **`startAngle`**, **`endAngle`**, optional **`counterclockwise`** |
 | **`arcTo`** | **`x1`/`y1`/`x2`/`y2`**, **`radius`** |
 | **`quadraticCurveTo`** | **`cpx`/`cpy`**, endpoint **`x`/`y`** |
-| **`bezierCurveTo`** | Two control points + endpoint **`x`/`y`** |
+| **`bezierCurveTo`** | Two control points + endpoint |
 | **`rect`** | **`x`/`y`/`width`/`height`** |
-| **`ellipse`** | Centre, **`radiusX`/`radiusY`**, optional rotation & arc sweep |
+| **`ellipse`** | Centre, **`radiusX`/`radiusY`**, optional rotation & sweep |
 | **`closePath`** | — |
 | **`circle`** | **`x`/`y`/`radius`** shorthand |
-| **`roundedRect`** | Unified or per-corner radii |
+| **`roundedRect`** | Single **`radius`** or per-corner **`{ tl, tr, br, bl }`** |
 | **`polygon`** | **`points[]`** |
-| **`star`** | **`outerRadius`**, **`innerRadius`**, vertex **`points`** count |
+| **`star`** | **`outerRadius`**, **`innerRadius`**, **`points`** count |
 | **`arrow`** | **`x`/`y`/`length`/`angle`** + optional head sizing |
+
+Types live in **`lib-next/types/pathCommands.ts`**.
 
 ---
 
-## `drawPath(canvasBuffer, path | commands[], options?)`
+## `painter.path2d.draw(canvasBuffer, path, options?)`
 
-1. Rasterises **`canvasBuffer`** onto working canvas.  
-2. **`path`** may be **built Path2D** or raw **`commands`** (auto **`createPath2D`**).  
-3. Applies optional **`transform`** then **`stroke`** and/or **`fill`**.
+**Argument order:** **(1)** existing **`Buffer`** or **`CanvasResults`**, **(2)** **`Path2D`** **or** **`PathCommand[]`** (arrays are auto-built), **(3)** optional **`Path2DDrawOptions`**.
 
-### **`Path2DDrawOptions`**
+Flow:
+
+1. **`loadImage`** the buffer onto a same-sized canvas.
+2. **`drawPathOntoContext`** — optional **`transform`**, **`globalCompositeOperation`**, **`shadow`**, then **`stroke`** and/or **`fill`** with optional **gradients** (**`gradientBounds`** default to full canvas).
+
+Returns a **PNG** **`Buffer`**.
+
+### `Path2DDrawOptions` highlights
 
 | Block | Keys |
 |-------|------|
-| **`stroke`** | **`color`**, **`width`**, **`lineCap`**, **`lineJoin`**, **`miterLimit`**, **`dashArray`**, **`dashOffset`**, **`opacity`** |
-| **`fill`** | **`color`**, **`opacity`**, **`rule`** (**`nonzero`/`evenodd`**) |
-| **`transform`** | **`translateX/Y`**, **`rotate`** (deg), **`scaleX/Y`**, optional **`originX/Y`** pivot |
+| **`opacity`** | Root multiplier (**`0…1`**) applied with stroke/fill alpha |
+| **`globalCompositeOperation`** | Canvas blend mode string |
+| **`shadow`** | **`color`**, **`gradient`**, **`blur`**, **`offsetX`**, **`offsetY`** |
+| **`gradientBounds`** | **`{ x, y, w, h }`** for gradient paint when stroking/filling |
+| **`stroke`** | **`color`**, **`gradient`**, **`width`**, **`lineCap`**, **`lineJoin`**, **`miterLimit`**, **`dashArray`**, **`dashOffset`**, **`style`** (**`dashed`/`dotted`** presets), **`opacity`** |
+| **`fill`** | **`color`**, **`gradient`**, **`opacity`**, **`rule`** (**`nonzero`/`evenodd`**) |
+| **`transform`** | **`translateX/Y`**, **`rotate`** (degrees), **`scaleX/Y`**, or **`originX/Y`** pivot block |
 
-Returns **PNG **`Buffer`**.
+Full interface: **`lib-next/types/path2d-draw.ts`**.
+
+```typescript
+const { buffer } = await painter.createCanvas({ width: 400, height: 240, color: "#0f172a" });
+
+const cmds = [
+  { type: "moveTo" as const, x: 60, y: 120 },
+  { type: "lineTo" as const, x: 340, y: 120 },
+  { type: "quadraticCurveTo" as const, cpx: 200, cpy: 40, x: 340, y: 120 },
+];
+
+const path = painter.path2d.create(cmds);
+
+const buf = await painter.path2d.draw(buffer, path, {
+  stroke: { color: "#38bdf8", width: 3, lineCap: "round" },
+  fill: { color: "#1e293b", opacity: 0.35, rule: "nonzero" },
+});
+```
+
+You can skip **`create`** and pass **`cmds`** directly into **`draw`** — the creator normalises **`PathCommand[]`** internally.
 
 ---
 
+## `painter.path2d.custom(options, buffer)`
+
+Draws **connector-style** polylines (smooth / bezier / catmull-rom), **arrows**, **markers**, dashed styles, textures, etc., on **top** of an existing raster. **`CustomOptions`** requires **`startCoordinates`** and **`endCoordinates`**; see **`lib-next/types/path.ts`** and **[Custom lines](/docs#03-custom-lines-arrows-markers-textures)**.
+
 ```typescript
-const cmds = [
-  { type: 'moveTo' as const, x: 50, y: 50 },
-  { type: 'lineTo' as const, x: 350, y: 280 },
-  { type: 'quadraticCurveTo' as const, cpx: 200, cpy: 20, x: 350, y: 280 },
-];
-
-const path = painter.createPath2D(cmds);
-
-const buf = await painter.drawPath(canvasBuffer, path, {
-  stroke: { color: '#0ea5e9', width: 3, lineCap: 'round' },
-});
+const withConnector = await painter.path2d.custom(
+  {
+    startCoordinates: { x: 40, y: 180 },
+    endCoordinates: { x: 360, y: 60 },
+    path: { type: "bezier" },
+    lineStyle: { width: 2, color: "#a78bfa" },
+    arrow: { end: true, size: 14, style: "filled", color: "#c4b5fd" },
+  },
+  buffer
+);
 ```
 
 ---
 
-Next: **[Hit testing](/docs#02-hit-testing-paths)**.
+## Hit testing the same geometry
+
+**`painter.detect.path`** accepts the same **`Path2D`** or **`PathCommand[]`** as **`draw`** — keep one command list as the single source of truth for “drawn” vs “clickable” shapes. See **[Hit testing](/docs#02-hit-testing-paths)** and **[Lines hit testing](/docs#05-hit-testing-paths)**.
+
+---
+

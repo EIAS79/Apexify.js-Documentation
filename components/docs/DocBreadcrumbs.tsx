@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline';
+import { SectionAccentIcon } from '@/components/docs/SectionAccentIcon';
 import { FlatDocEntry, sectionAccent } from '@/lib/docs-nav-utils';
 
 export function DocBreadcrumbs({ entry }: { entry: FlatDocEntry | null }) {
@@ -41,10 +42,10 @@ export function DocBreadcrumbs({ entry }: { entry: FlatDocEntry | null }) {
       >
         <span
           aria-hidden
-          className="grid h-4 w-4 place-items-center rounded-sm text-[9px] font-bold"
+          className="grid h-4 w-4 shrink-0 place-items-center rounded-sm"
           style={{ background: accent.color, color: 'white' }}
         >
-          {accent.glyph}
+          <SectionAccentIcon sectionName={entry.sectionName} className="h-3 w-3 text-white" />
         </span>
         {entry.sectionDisplayName}
       </span>

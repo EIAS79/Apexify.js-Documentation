@@ -2,11 +2,11 @@
 
 Back: [Text overview](/docs#00-create-text-overview)
 
-**`color`** is the fallback **`fillStyle`** when **`gradient`** absent (default **`#000000`** in **`renderFill`**).
+Prefer **`fill.color`** / **`fill.gradient`**; legacy top-level **`color`** / **`gradient`** are merged by **`resolveTextFill`** (**`lib-next/types/text.ts`**). **`color`** is the fallback **`fillStyle`** when no gradient (default **`#000000`** in **`renderFill`**).
 
 ---
 
-## `gradient` union (`types/index.ts`)
+## `gradient` union (`lib-next/types/gradient.ts`)
 
 Same **`gradient`** shape as canvas backgrounds:
 
@@ -58,5 +58,3 @@ await painter.createText(
 ```
 
 ---
-
-Next: **[Glow, shadow & stroke](/docs#04-create-text-glow-shadow-stroke)**.

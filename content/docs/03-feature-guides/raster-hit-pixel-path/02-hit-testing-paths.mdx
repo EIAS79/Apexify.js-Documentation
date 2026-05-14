@@ -1,8 +1,54 @@
 # Hit testing — paths & regions {#02-hit-testing-paths}
 
-Back: [Raster overview](/docs#00-advanced-raster-overview) · [Path2D · `drawPath`](/docs#04-path2d-draw-path)
+Back: [Raster overview](/docs#00-advanced-raster-overview) · [Path2D · `draw`](/docs#04-path2d-draw-path)
 
-**`ApexPainter`** wraps **`HitDetectionCreator`** (**`lib/Canvas/extended/HitDetectionCreator.ts`**). Methods are **`async`** on the painter but the underlying logic is **synchronous**; the **`Promise`** resolves immediately.
+Hit testing is grouped on **`painter.detect`** (**`PainterHitDetect`** in **`lib-next/apex-painter/public-types.ts`**), backed by **`HitDetectionCreator`** (**`lib-next/pixels/hit-detection-creator.ts`**).
+
+Methods are typed as **`async`** so they match the rest of the painter surface; the underlying **`HitDetectionCreator`** work is **synchronous** (a **`Promise`** resolves on the next microtask with the same result).
+
+---
+
+## `painter.detect` methods
+
+| Method | Purpose |
+|--------|---------|
+| **`path(path, x, y, options?)`** | **`Path2D`** or **`PathCommand[]`** — fill (and optional stroke) test at **`(x,y)`** in **canvas space** |
+| **`region(region, x, y, options?)`** | One **`HitRegion`** discriminated union |
+| **`anyRegion(regions, x, y, options?)`** | First matching region wins; result may include **`hitRegion`** index |
+| **`distance(region, x, y)`** | Numeric distance helper for **`rect`**, **`circle`**, **`ellipse`**, **`polygon`** (see below) |
+
+```typescript
+import type { PathCommand } from "apexify.js"; // or your types import path
+
+const cmds: PathCommand[] = [
+  { type: "moveTo", x: 0, y: 0 },
+  { type: "lineTo", x: 100, y: 0 },
+  { type: "lineTo", x: 50, y: 80 },
+  { type: "closePath" },
+];
+
+const { hit, hitType } = await painter.detect.path(cmds, 50, 40, { fillRule: "nonzero" });
+
+const zone = await painter.detect.region(
+  { type: "rect", x: 10, y: 10, width: 120, height: 48 },
+  64,
+  32
+);
+
+const multi = await painter.detect.anyRegion(
+  [
+    { type: "circle", x: 100, y: 100, radius: 30 },
+    { type: "rect", x: 200, y: 50, width: 40, height: 40 },
+  ],
+  105,
+  98
+);
+if (multi.hit && multi.hitRegion !== undefined) {
+  // index into the regions array
+}
+
+const d = await painter.detect.distance({ type: "circle", x: 0, y: 0, radius: 50 }, 80, 0);
+```
 
 ---
 
@@ -10,10 +56,10 @@ Back: [Raster overview](/docs#00-advanced-raster-overview) · [Path2D · `drawPa
 
 | Field | Meaning |
 |-------|---------|
-| **`hit`** | **`true`** if the point matches the region / path test |
-| **`hitType`** | **`'fill'`**, **`'stroke'`**, or **`'outside'`** (when **`hit`** is false, expect **`'outside'`**) |
-| **`distance`** | Populated for some region types when **`hit`** is true (e.g. circle stores centre distance); often **`0`** or **`undefined`** when not computed |
-| **`hitRegion`** | Set by **`isPointInAnyRegion`** — index into the **`regions`** array |
+| **`hit`** | **`true`** if the point matches |
+| **`hitType`** | **`'fill'`**, **`'stroke'`**, or **`'outside'`** |
+| **`distance`** | For **`circle`** fill hit, centre distance; often **`0`** or **`undefined`** when not meaningful |
+| **`hitRegion`** | Set by **`anyRegion`** — **number** index into the **`regions`** array |
 
 ---
 
@@ -21,23 +67,18 @@ Back: [Raster overview](/docs#00-advanced-raster-overview) · [Path2D · `drawPa
 
 | Option | Role |
 |--------|------|
-| **`includeStroke`** | When **`true`** together with **`strokeWidth`**, attempts stroke-vs-fill discrimination **where implemented** |
-| **`strokeWidth`** | Numeric stroke thickness used by **rect** (stroke band) and **circle** (annulus) logic; also required for **`isPointInPath`** stroke branch |
+| **`includeStroke`** | With **`strokeWidth`**, enables stroke band logic where implemented |
+| **`strokeWidth`** | Used for **rect** / **circle** stroke rings and **`path`** stroke branch |
 | **`tolerance`** | Extra slack on **rect** stroke detection (default **`0`**) |
-| **`fillRule`** | Passed through on **`path`** **`HitRegion`** into **`isPointInPath`** (**`'nonzero'`** default) |
+| **`fillRule`** | **`'nonzero'`** / **`'evenodd'`** for **`path`** tests and **`{ type: 'path', … }`** regions |
 
-The **`region`** field on **`HitDetectionOptions`** is **not** read by **`isPointInPath`** itself — attach geometry via **`HitRegion`** APIs below.
+The **`region`** field on **`HitDetectionOptions`** is **not** used by **`detect.path`** — pass geometry as the first argument or embed a **`{ type: 'path', path }`** **`HitRegion`**.
 
 ---
 
-## `isPointInPath(path, x, y, options?)`
+## `detect.path` — stroke caveat
 
-- **`path`**: **`Path2D`** instance **or** **`PathCommand[]`** (see **`buildPath2DFromCommands`** in **`pathCmd.ts`**).
-- Uses a small off-screen canvas **`isPointInPath`** / **`isPointInStroke`** (**`@napi-rs/canvas`**).
-
-**Stroke caveat:** The implementation gates stroke testing on **`includeStroke`** and a truthy **`strokeWidth`**, but **`ctx.lineWidth`** is **not** set from **`strokeWidth`** before **`isPointInStroke`**. Expect stroke hits to follow the context **default** line width unless you rely primarily on **fill** hits or approximate strokes with thicker **`drawPath`** + separate testing.
-
-**`distance`:** **`0`** when **`hit`**, otherwise **`undefined`** in current code.
+Stroke testing is gated on **`includeStroke`** and a truthy **`strokeWidth`**. The implementation calls **`ctx.isPointInStroke(path2D, x, y)`** without mirroring your real-world **`lineWidth`** from **`drawPath`** into that scratch context, so **stroke hits follow the engine default width** unless your visual stroke matches that behaviour. For precise “fat line” picking, prefer **fill**-expanded hit geometry or test a parallel **`PathCommand[]`** outline.
 
 ---
 
@@ -45,47 +86,25 @@ The **`region`** field on **`HitDetectionOptions`** is **not** read by **`isPoin
 
 | **`type`** | Behaviour |
 |------------|-----------|
-| **`rect`** | Axis-aligned rectangle **`x,y,width,height`**. With **`includeStroke`** + **`strokeWidth`**, **`hitType`** distinguishes stroke band vs interior |
-| **`circle`** | Centre **`x,y`**, **`radius`**. Stroke ring uses **`strokeWidth`** annulus when options enabled |
-| **`ellipse`** | **`radiusX`**, **`radiusY`**, optional **`rotation`** (radians). **Fill** hit-test only in **`isPointInRegion`** — **`includeStroke`** does **not** refine **`hitType`** here |
-| **`polygon`** | **`points[]`** (≥ **3**), winding ray-cast. **`hitType`** stays **`fill`** when **`hit`** |
-| **`path`** | Delegates to **`isPointInPath`** with **`region.path`** and **`fillRule`** |
-| **`custom`** | **`check(x, y) => boolean`** — your arbitrary logic |
+| **`rect`** | Axis-aligned **`x,y,width,height`**. With **`includeStroke`** + **`strokeWidth`**, **`hitType`** can be **`stroke`** vs **`fill`** |
+| **`circle`** | Centre **`x,y`**, **`radius`**; optional annulus when stroke options set |
+| **`ellipse`** | **`radiusX`**, **`radiusY`**, optional **`rotation`** (radians). Fill test; **`includeStroke`** does not refine **`hitType`** |
+| **`polygon`** | **`points[]`** (≥ **3**), ray casting |
+| **`path`** | Delegates to **`detect.path`** with **`region.path`** and optional **`fillRule`** |
+| **`custom`** | **`check(x, y) => boolean`** |
 
 ---
 
-## `isPointInRegion` / `isPointInAnyRegion`
+## `getDistanceToRegion`
 
-- **`isPointInRegion(region, x, y, options?)`** — single **`HitRegion`**.
-- **`isPointInAnyRegion(regions, x, y, options?)`** — sequential scan; first hit wins; **`hitRegion`** is the winning index.
+| **`type`** | Metric |
+|------------|--------|
+| **`rect`** | Distance to axis-aligned box (outside **0** when inside) |
+| **`circle`** | **`abs(distanceToCentre − radius)`** |
+| **`ellipse`** | Approximate distance to ellipse boundary |
+| **`polygon`** | Minimum distance to polygon edges |
+| **`path`**, **`custom`** | Returns **`0`** (no analytic distance) |
 
----
-
-## `getDistanceToRegion(region, x, y)`
-
-Minimum distance to the **boundary** (outside distance-to-edge helpers):
-
-| **`type`** | Supported |
-|------------|-----------|
-| **`rect`** | ✅ axis-aligned distance to edge |
-| **`circle`** | ✅ **`abs(distanceToCentre − radius)`** |
-| **`ellipse`** | ✅ approximate boundary distance (**comment in source**: simplified) |
-| **`polygon`** | ✅ minimum distance to segments |
-| **`path`**, **`custom`** | Returns **`0`** (no metric) |
-
-Useful for snap-to-outline UX **only** for **`rect` / `circle` / `ellipse` / `polygon`**.
+Useful for hover “glow” or snap UX for primitives — not for arbitrary **`Path2D`** distance fields.
 
 ---
-
-```typescript
-const inside = await painter.isPointInRegion(
-  { type: 'rect', x: 10, y: 10, width: 100, height: 40 },
-  50,
-  25
-);
-console.log(inside.hit, inside.hitType);
-```
-
----
-
-Next: **[Batch & utilities](/docs#03-batch-stitch-compress-output)**.

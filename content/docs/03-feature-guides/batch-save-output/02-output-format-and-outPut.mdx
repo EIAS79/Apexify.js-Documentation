@@ -12,7 +12,7 @@ Back: [Batch / save overview](/docs#00-batch-save-output-overview)
 | **`base64`** | Base64 **string** |
 | **`dataURL`** | **`data:image/png;base64,...`** string |
 | **`url`** | **`file://`** URL string *(via **`conversion.ts`** helper)* |
-| **`blob`** | **`Blob` |
+| **`blob`** | **`Blob`** |
 | **`arraybuffer`** | **`ArrayBuffer`** |
 
 Unsupported **`type`** throws from **`outPut`**.
@@ -31,14 +31,19 @@ const { buffer } = await painter.createCanvas({ width: 100, height: 50, colorBg:
 const encoded = await painter.outPut(buffer); // string
 ```
 
-Disk writes stay **`save`** / **`fs`** — **`outPut`** is for **encoding**, not paths.
+Disk writes stay **`save`** / **`fs`** — **`outPut`** is for **encoding**, not paths. For **`dataURL` / `base64` / `blob` / `arrayBuffer`** without tying to constructor **`type`**, use **`painter.output`** (**`lib-next/apex-painter/public-types.ts`**) — see [Raster utilities](/docs#03-batch-stitch-compress-output).
 
 ---
 
-## `validHex(hexColor: string): boolean`
+## `painter.image.validHex(hexColor: string): boolean`
 
-Requires **`#RRGGBB`** (**exactly six** hex digits). Throws on invalid input; returns **`true`** when valid.
+Hex validation used by colour tooling lives on **`painter.image`**, not on the class root. Requires **`#RRGGBB`** (**exactly six** hex digits). Throws on invalid input; returns **`true`** when valid.
+
+Full **`painter.image`** catalogue: [Standalone image methods](/docs#01-standalone-image-methods).
 
 ---
 
-Next: **[Standalone image tools](/docs#00-standalone-image-tools-overview)** · **[Raster utilities](/docs#03-batch-stitch-compress-output)**.
+## Legacy note
+
+Older snippets may call **`validHex`** or **`resize`** directly on **`painter`**. In **`lib-next`**, use **`painter.image.validHex`**, **`painter.image.resize`**, etc.
+

@@ -1,0 +1,189 @@
+# Scene layers — `customLines` & `surface` {#04-scene-layers-custom-lines-surface}
+
+Back: [Scene overview](/docs#00-scene-composition) · [Chart layers](/docs#03-scene-layers-charts)
+
+---
+
+## `customLines`
+
+Same **`CustomOptions`** model as **`painter.path2d.custom`** (see [createCustom API](/docs#01-create-custom-api)): **`startCoordinates`**, **`endCoordinates`**, **`lineStyle`**, arrows, dash patterns, splines, etc.
+
+**`lines`:** a single **`CustomOptions`** or **`CustomOptions[]`**.  
+Validation: **`validateSceneCustomLinesOptions`** — every entry needs numeric **`startCoordinates`** / **`endCoordinates`**.
+
+### Variant: single connector
+
+```typescript
+{
+  type: "customLines",
+  lines: {
+    startCoordinates: { x: 80, y: 400 },
+    endCoordinates: { x: 720, y: 120 },
+    lineStyle: { width: 3, color: "#64748b", lineCap: "round" },
+  },
+}
+```
+
+### Variant: polyline-style chain (`singleLine`)
+
+```typescript
+{
+  type: "customLines",
+  lines: [
+    {
+      startCoordinates: { x: 50, y: 300 },
+      endCoordinates: { x: 200, y: 300 },
+      lineStyle: { width: 2, color: "#94a3b8", singleLine: true },
+    },
+    {
+      startCoordinates: { x: 0, y: 0 },
+      endCoordinates: { x: 350, y: 250 },
+      lineStyle: { width: 2, color: "#94a3b8", singleLine: true },
+    },
+    {
+      startCoordinates: { x: 0, y: 0 },
+      endCoordinates: { x: 500, y: 300 },
+      lineStyle: { width: 2, color: "#2563eb", singleLine: true },
+    },
+  ],
+}
+```
+
+*(When **`singleLine`** is set, later segments reuse **`previousEndCoordinates`** as in the custom-lines guides.)*
+
+### Variant: dashed separator + arrow head
+
+Use the same fields as **`CustomOptions`** in [Arrows & markers](/docs#03-custom-lines-arrows-markers-textures).
+
+```typescript
+{
+  type: "customLines",
+  lines: {
+    startCoordinates: { x: 40, y: 100 },
+    endCoordinates: { x: 760, y: 100 },
+    lineStyle: {
+      width: 2,
+      color: "#cbd5e1",
+      dash: { dashArray: [8, 6] },
+    },
+    arrow: { /* see lines guide */ },
+  },
+}
+```
+
+---
+
+## `surface` — nested mini-canvas
+
+A **child** scene: **`placement`** (geometry + transforms on the parent), optional **`background`**, **`layers`** (full **`SceneLayer[]`** including more **`surface`**s).
+
+### `SceneSurfacePlacement`
+
+| Field | Default | Role |
+|-------|---------|------|
+| **`x`**, **`y`** | — | Top-left on **parent** |
+| **`width`**, **`height`** | — | Child canvas size |
+| **`opacity`** | `1` | |
+| **`rotation`** | `0` | **Degrees** |
+| **`scaleX`**, **`scaleY`** | `1` | |
+| **`globalCompositeOperation`** | — | e.g. **`"multiply"`** |
+
+### Variant: simple card (solid bg + text)
+
+```typescript
+{
+  type: "surface",
+  placement: { x: 520, y: 80, width: 360, height: 200 },
+  background: { colorBg: "#1e293b", borderRadius: 12 },
+  layers: [
+    {
+      type: "text",
+      texts: [{ content: "Card title", x: 20, y: 28, fontSize: 20, color: "#f8fafc" }],
+    },
+    {
+      type: "text",
+      texts: [{ content: "Body copy…", x: 20, y: 64, fontSize: 14, color: "#94a3b8" }],
+    },
+  ],
+}
+```
+
+### Variant: rotated badge
+
+```typescript
+{
+  type: "surface",
+  placement: {
+    x: 900,
+    y: 40,
+    width: 160,
+    height: 160,
+    rotation: -8,
+    opacity: 1,
+  },
+  background: { colorBg: "#fef3c7" },
+  layers: [
+    { type: "text", texts: [{ content: "NEW", x: 40, y: 60, fontSize: 28, color: "#b45309" }] },
+  ],
+}
+```
+
+### Variant: picture-in-picture (surface over full-bleed image)
+
+```typescript
+const layers = [
+  {
+    type: "image" as const,
+    images: { source: "./map.png", x: 0, y: 0, width: 1200, height: 675 },
+  },
+  {
+    type: "surface" as const,
+    placement: { x: 780, y: 380, width: 380, height: 260 },
+    background: { colorBg: "#0c0a09", opacity: 0.92 },
+    layers: [
+      {
+        type: "text",
+        texts: [{ content: "Detail", x: 16, y: 16, fontSize: 18, color: "#fafaf9" }],
+      },
+      {
+        type: "chart",
+        chartType: "pie",
+        data: [
+          { label: "A", value: 60, color: "#22c55e" },
+          { label: "B", value: 40, color: "#eab308" },
+        ],
+        options: {},
+        x: 20,
+        y: 48,
+        width: 200,
+        height: 200,
+      },
+    ],
+  },
+];
+```
+
+### Variant: nested surface (surface inside surface)
+
+```typescript
+{
+  type: "surface",
+  placement: { x: 0, y: 0, width: 400, height: 300 },
+  background: { colorBg: "#f8fafc" },
+  layers: [
+    {
+      type: "surface",
+      placement: { x: 40, y: 40, width: 120, height: 120 },
+      background: { colorBg: "#e2e8f0", borderRadius: 12 },
+      layers: [
+        { type: "text", texts: [{ content: "L2", x: 36, y: 48, fontSize: 16, color: "#334155" }] },
+      ],
+    },
+  ],
+}
+```
+
+**Note:** Rounded **child** rects use **`background.borderRadius`** on the surface’s **`CanvasConfig`**, not fields on **`SceneSurfacePlacement`** (placement only has **x, y, width, height**, opacity, rotation, scale, blend mode).
+
+---
+

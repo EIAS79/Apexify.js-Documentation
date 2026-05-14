@@ -55,9 +55,9 @@ This page is an **idea catalog**: real products and assets people ship with **`A
 
 | You can build | Primary APIs | Learn |
 |---------------|--------------|--------|
-| Connectors, arrows, dashed UI lines | **`createCustom`** | [Lines overview](/docs#00-custom-lines-overview) |
-| Bézier / arc geometry drawn on bitmaps | **`createPath2D`**, **`drawPath`** | [Path2D](/docs#04-path2d-draw-path) |
-| Click maps, hover zones (UI exporters) | **`isPointInPath`**, **`HitRegion`** | [Hit testing](/docs#02-hit-testing-paths) |
+| Connectors, arrows, dashed UI lines | **`path2d.custom`** | [Lines overview](/docs#00-custom-lines-overview) |
+| Bézier / arc geometry drawn on bitmaps | **`path2d.create`**, **`path2d.draw`** | [Path2D](/docs#04-path2d-draw-path) |
+| Click maps, hover zones (UI exporters) | **`detect.path`**, **`detect.region`**, **`HitRegion`** | [Hit testing](/docs#02-hit-testing-paths) |
 
 ---
 
@@ -85,11 +85,11 @@ This page is an **idea catalog**: real products and assets people ship with **`A
 
 | You can build | Primary APIs | Learn |
 |---------------|--------------|--------|
-| Colour pickers, fog/lighting tweaks on regions | **`getPixelData`**, **`manipulatePixels`** | [Pixel APIs](/docs#01-pixel-data-manipulation) |
-| Sprite sheets from PNG sequence math | **`getPixelColor`** / **`setPixelColor`** (precision edits) | [Pixel APIs](/docs#01-pixel-data-manipulation) |
+| Colour pickers, fog/lighting tweaks on regions | **`pixels.getData`**, **`pixels.manipulate`** | [Pixel APIs](/docs#01-pixel-data-manipulation) |
+| Sprite sheets from PNG sequence math | **`pixels.getColor`** / **`pixels.setColor`** (precision edits) | [Pixel APIs](/docs#01-pixel-data-manipulation) |
 | Many canvases in parallel | **`batch`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
 | Multi-step pipelines (buffer handoff) | **`chain`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
-| Filmstrips, grids of images | **`stitchImages`**, **`createCollage`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
+| Filmstrips, grids of images | **`image.stitchImages`**, **`image.createCollage`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
 
 ---
 
@@ -109,8 +109,8 @@ This page is an **idea catalog**: real products and assets people ship with **`A
 | Resize / convert batches | **`resize`**, **`imgConverter`** | [Standalone methods](/docs#01-standalone-image-methods) |
 | Sharp-style filter stacks | **`effects`** | [Standalone methods](/docs#01-standalone-image-methods) |
 | Dominant colours, palettes | **`colorAnalysis`**, **`extractPalette`** | [Standalone](/docs#01-standalone-image-methods) · [compress](/docs#03-batch-stitch-compress-output) |
-| Chroma knock-out, remote BG removal | **`colorsRemover`**, **`removeBackground`** | [Standalone methods](/docs#01-standalone-image-methods) |
-| Polygon crops, multi-layer blends | **`cropImage`**, **`blend`**, **`masking`**, **`gradientBlend`** | [Standalone methods](/docs#01-standalone-image-methods) |
+| Chroma knock-out, remote BG removal | **`image.colorsRemover`**, **`image.removeBackground`** | [Standalone methods](/docs#01-standalone-image-methods) |
+| Polygon crops, multi-layer blends | **`image.cropImage`**, **`image.blend`**, **`image.masking`**, **`image.gradientBlend`** | [Standalone methods](/docs#01-standalone-image-methods) |
 
 ---
 
@@ -135,4 +135,3 @@ This page is an **idea catalog**: real products and assets people ship with **`A
 
 ---
 
-Back to **[Recipes](/docs#00-recipes-overview)**.

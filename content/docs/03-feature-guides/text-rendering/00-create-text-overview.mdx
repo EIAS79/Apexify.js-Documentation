@@ -1,6 +1,6 @@
 # Text rendering (`createText`) — overview {#00-create-text-overview}
 
-**`await painter.createText(textPropsOrArray, canvasBuffer)`** draws styled Unicode strings onto an existing PNG **`canvasBuffer`** (from **`createCanvas`**, **`createImage`**, etc.). Each draw returns a **new** **`Buffer`**.
+**`await painter.createText(textPropsOrArray, canvasBuffer)`** draws styled Unicode strings onto an existing PNG **`canvasBuffer`** (from **`createCanvas`**, **`createImage`**, etc.). Each call returns a **new** **`Buffer`**.
 
 Back: [Feature guides hub](/docs#feature-guides-hub)
 
@@ -10,18 +10,35 @@ Back: [Feature guides hub](/docs#feature-guides-hub)
 
 | Argument | Role |
 |----------|------|
-| **`textProps`** | One **`TextProperties`** **or** **array** (processed **top → bottom**). |
+| **`textProps`** | One **`TextProperties`** **or** **array** (processed **in order**, top → bottom on the canvas). |
 | **`canvasBuffer`** | **`Buffer`** or **`CanvasResults`** with **`buffer`**. |
 
 **Required on each object:** **`text`**, **`x`**, **`y`**.
 
 ---
 
+## `TextProperties`: nested vs flat
+
+Types live in **`lib-next/types/text.ts`** (exported from **`apexify.js`** / **`apexify.js/types`**).
+
+| Prefer (grouped) | Replaces legacy top-level |
+|--------------------|---------------------------|
+| **`font.{ size, family, name, path }`** | **`fontSize`**, **`fontFamily`**, **`fontName`**, **`fontPath`** |
+| **`decorations.{ underline, overline, strikethrough, bold, italic }`** | flat **`underline`**, **`bold`**, … |
+| **`effects.{ highlight, glow, shadow }`** | flat **`highlight`**, **`glow`**, **`shadow`** |
+| **`layout.{ lineHeight, letterSpacing, wordSpacing, maxWidth, maxHeight }`** | same names at root |
+| **`placement.{ textAlign, textBaseline, rotation }`** | flat **`textAlign`**, **`rotation`**, … |
+| **`fill.{ color, gradient, opacity }`** | flat **`color`**, **`gradient`**, **`opacity`** |
+
+If both nested and flat are set, **nested wins** (see **`resolveText*`** helpers in **`text.ts`**). New examples in the **[field matrix](/docs#09-create-text-properties-matrix)** use the grouped style; older guides still show flat keys — both work.
+
+---
+
 ## Renderer stack
 
-**`TextCreator`** (`lib/Canvas/extended/TextCreator.ts`) is thin: it loads the bitmap into a fresh canvas and calls **`EnhancedTextRenderer.renderText`** (`lib/Canvas/utils/Texts/enhancedTextRenderer.ts`) for every entry.
+**`TextCreator`** (`lib-next/text/text-creator.ts`) loads the bitmap, draws it onto a working canvas, and calls **`EnhancedTextRenderer.renderText`** (`lib-next/text/enhanced-text-renderer.ts`) for each entry.
 
-Legacy **`drawText`** / **`WrappedText`** in **`lib/Canvas/utils/Texts/textProperties.ts`** power **`TextObject`** helpers elsewhere — **`createText` does not call them**.
+**`measureText`** uses **`TextMetricsCreator`** with the same **`TextProperties`** shape and **`resolveText*`** rules where applicable.
 
 ---
 
@@ -29,21 +46,21 @@ Legacy **`drawText`** / **`WrappedText`** in **`lib/Canvas/utils/Texts/textPrope
 
 | # | Page | Covers |
 |---|------|--------|
-| 1 | [Font & placement](/docs#01-create-text-font-and-position) | **`font`**, legacy **`fontSize`** … **`fontPath`**, **`bold`**, **`italic`**, **`rotation`**, **`opacity`**, **`textAlign`**, **`textBaseline`** |
-| 2 | [Wrapping & spacing](/docs#02-create-text-wrapping-spacing) | **`maxWidth`**, **`maxHeight`**, **`lineHeight`**, **`letterSpacing`**, **`wordSpacing`**, explicit **`\\n`** |
-| 3 | [Colour & gradients](/docs#03-create-text-color-gradients) | **`color`**, **`gradient`** (**linear** / **radial** / **conic**, **`repeat`**) |
-| 4 | [Glow, shadow & stroke](/docs#04-create-text-glow-shadow-stroke) | **`glow`**, **`shadow`** (+ gradient tint), **`stroke`** (**solid** … **double**) |
-| 5 | [Decorations & highlight](/docs#05-create-text-decorations-highlight) | **`underline`**, **`overline`**, **`strikethrough`**, **`highlight`** |
-| 6 | [Text on a circular arc](/docs#06-create-text-curved) | **`textOnCurve`** — **`sweepAngle`**, **`radius`**, **`up`** |
+| 1 | [Font & placement](/docs#01-create-text-font-and-position) | **`font`**, legacy font keys, weight/slant, **`textAlign`**, **`rotation`**, **`opacity`** — also **`placement.*`** when grouping |
+| 2 | [Wrapping & spacing](/docs#02-create-text-wrapping-spacing) | **`maxWidth`**, **`maxHeight`**, **`lineHeight`**, **`letterSpacing`**, **`wordSpacing`**, **`\\n`** — or **`layout.*`** |
+| 3 | [Colour & gradients](/docs#03-create-text-color-gradients) | **`color`**, **`gradient`** — or **`fill.*`** |
+| 4 | [Glow, shadow & stroke](/docs#04-create-text-glow-shadow-stroke) | **`glow`**, **`shadow`**, **`stroke`** — glow/shadow also under **`effects.*`** |
+| 5 | [Decorations & highlight](/docs#05-create-text-decorations-highlight) | **`underline`**, **`overline`**, **`strikethrough`**, **`highlight`** — or **`decorations.*`** / **`effects.highlight`** |
+| 6 | [Text on a circular arc](/docs#06-create-text-curved) | **`textOnCurve`** — **`sweepAngle`**, **`radius`**, **`up`**, **`layoutMode`**, … |
 | 7 | [`measureText`](/docs#07-measure-text) | **`TextMetrics`**, **`includeCharMetrics`**, **`measurementCanvas`** |
-| 8 | [Paint order & extras](/docs#08-create-text-paint-order) | Per-line composite order; **`textPathRenderer`** (not wired to **`createText`**) |
-| 9 | [`TextProperties` field matrix](/docs#09-create-text-properties-matrix) | Every **`TextProperties`** key in one reference (parity with **`lib/Canvas/utils/types/index.ts`**) + condensed examples |
+| 8 | [Paint order & extras](/docs#08-create-text-paint-order) | Per-glyph composite order; **`textPathRenderer`** (not wired to **`createText`**) |
+| 9 | [`TextProperties` field matrix](/docs#09-create-text-properties-matrix) | Full reference + grouped vs legacy + examples |
 
 ---
 
 ## Measurement API
 
-**`await painter.measureText(textProps)`** mirrors font/spacing setup and wrapping geometry — details on **[measureText](/docs#07-measure-text)**.
+**`await painter.measureText(textProps)`** — same **`TextProperties`** shape; details on **[measureText](/docs#07-measure-text)**.
 
 ---
 

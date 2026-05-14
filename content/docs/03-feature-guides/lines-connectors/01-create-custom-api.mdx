@@ -1,15 +1,17 @@
-# `createCustom` — segments & validation {#01-create-custom-api}
+# `path2d.custom` — custom lines, segments & validation {#01-create-custom-api}
 
 Back: [Lines overview](/docs#00-custom-lines-overview)
 
+On **`ApexPainter`**, connector lines are drawn with **`painter.path2d.custom`** (**`(options, buffer)`** order). Internally this runs **`runDrawCustomLines`** (**`lib-next/apex-painter/path-custom-lines.ts`**) → **`customLines`** (**`lib-next/path/custom-lines.ts`**).
+
 ```typescript
-const buffer = await painter.createCustom(
+const buffer = await painter.path2d.custom(
   customOptionsObjectOrArray,
   canvasBuffer /* Buffer | CanvasResults */
 );
 ```
 
-Loads **`canvasBuffer`** onto a fresh canvas, runs **`customLines(ctx, opts)`**, returns PNG **`Buffer`**.
+Loads **`canvasBuffer`** onto a working canvas, renders **`customLines(ctx, opts)`**, returns a new **PNG** **`Buffer`**.
 
 ---
 
@@ -20,13 +22,13 @@ Loads **`canvasBuffer`** onto a fresh canvas, runs **`customLines(ctx, opts)`**,
 | **`startCoordinates`** | **`{ x, y }`** numbers |
 | **`endCoordinates`** | **`{ x, y }`** numbers |
 
-Validation is strict — missing **`x`/`y`** throws (**`ApexPainter.#validateCustomOptions`**).
+Validation is strict — missing **`x`/`y`** throws (**`validateCustomOptions`** in **`path-custom-lines.ts`**).
 
 ---
 
 ## Batch processing
 
-Pass **array** of **`CustomOptions`** — processed **in order**. Later segments can **chain** when **`lineStyle.singleLine`** is **`true`** (see below).
+Pass an **array** of **`CustomOptions`** — segments are processed **in order**. Later segments can **chain** when **`lineStyle.singleLine`** is **`true`** (see below).
 
 ---
 
@@ -34,7 +36,7 @@ Pass **array** of **`CustomOptions`** — processed **in order**. Later segments
 
 When **`lineStyle.singleLine`** is set:
 
-- First segment: **`moveTo(start)`**; later segments reuse **`previousEndCoordinates`** as implicit **`start`** so **poly-lines** share one context sub-path until **`singleLine`** ends.
+- First segment: **`moveTo(start)`**; later segments reuse **`previousEndCoordinates`** as implicit **`start`** so **polylines** share one context sub-path until **`singleLine`** ends.
 - Leaving **`singleLine`** (next item without it) triggers **`stroke`** + optional **`applyStroke`** cleanup.
 
 Use this for **multi-segment** connectors without lifting the pen.
@@ -46,7 +48,7 @@ Use this for **multi-segment** connectors without lifting the pen.
 ```typescript
 const base = await painter.createCanvas({ width: 400, height: 300, colorBg: '#f8fafc' });
 
-const withLine = await painter.createCustom(
+const withLine = await painter.path2d.custom(
   {
     startCoordinates: { x: 40, y: 260 },
     endCoordinates: { x: 360, y: 40 },
@@ -58,4 +60,8 @@ const withLine = await painter.createCustom(
 
 ---
 
-Next: **[Line style & paths](/docs#02-custom-line-style-path)** · **[Arrows & markers](/docs#03-custom-lines-arrows-markers-textures)**.
+## Naming note
+
+Older docs and snippets refer to **`createCustom`**; in **`lib-next`** the same capability lives on **`painter.path2d.custom`** so vector **`create`/`draw`** and connector **`custom`** stay grouped.
+
+---

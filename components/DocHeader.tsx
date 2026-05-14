@@ -19,7 +19,7 @@ const NAV_LINKS = [
   { href: '/docs#00-start-here', label: 'Docs' },
 ] as const;
 
-const PACKAGE_VERSION = 'v5.3.20';
+const PACKAGE_VERSION = 'v5.4.0';
 
 export default function DocHeader() {
   const pathname = usePathname();

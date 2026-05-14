@@ -1,0 +1,105 @@
+# `renderScene` {#06-render-scene}
+
+Back: [Scene overview](/docs#00-scene-composition) · [Backgrounds](/docs#05-scene-backgrounds)
+
+**`renderScene(input: SceneRenderInput): Promise<Buffer>`** — synchronous **API shape** (async because chart/image loads are async). Returns **PNG** bytes.
+
+---
+
+## Variant: plain object (config / CMS JSON)
+
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "fs";
+
+const painter = new ApexPainter();
+
+const png = await painter.renderScene({
+  width: 1200,
+  height: 630,
+  background: { colorBg: "#1d4ed8" },
+  layers: [
+    {
+      type: "text",
+      texts: [
+        { content: "Social card", x: 60, y: 200, fontSize: 64, color: "#ffffff" },
+        { content: "apexify.js", x: 60, y: 300, fontSize: 28, color: "#bfdbfe" },
+      ],
+    },
+  ],
+});
+
+await fs.promises.writeFile("card.png", png);
+```
+
+---
+
+## Variant: `SceneBuilder` then `render`
+
+```typescript
+const png = await painter
+  .createScene(960, 540)
+  .setBackground({ colorBg: "#020617" })
+  .addLayer({
+    type: "path",
+    path: [
+      { type: "moveTo", x: 48, y: 120 },
+      { type: "lineTo", x: 400, y: 120 },
+    ],
+    options: { stroke: { color: "#38bdf8", width: 4 } },
+  })
+  .addLayer({
+    type: "text",
+    texts: [{ content: "Builder", x: 48, y: 160, fontSize: 48, color: "#f1f5f9" }],
+  })
+  .render();
+```
+
+---
+
+## Variant: reuse `SceneRenderInput` for PNG + GIF + video
+
+```typescript
+import type { SceneRenderInput } from "apexify.js";
+
+const baseScene = {
+  width: 1080,
+  height: 1080,
+  background: { colorBg: "#111827" },
+  layers: [
+    /* shared layers */
+  ],
+} satisfies SceneRenderInput;
+
+const png = await painter.renderScene(baseScene);
+// await painter.renderSceneToGIF(baseScene, { ... });
+// await painter.renderSceneToVideoFrames(baseScene, { ... });
+```
+
+---
+
+## Variant: dynamic layers from a function
+
+```typescript
+function buildScene(theme: "light" | "dark") {
+  const bg = theme === "dark" ? "#0f172a" : "#f8fafc";
+  const fg = theme === "dark" ? "#e2e8f0" : "#0f172a";
+  return {
+    width: 400,
+    height: 200,
+    background: { colorBg: bg },
+    layers: [{ type: "text" as const, texts: [{ content: theme, x: 24, y: 80, fontSize: 32, color: fg }] }],
+  };
+}
+
+const darkPng = await painter.renderScene(buildScene("dark"));
+const lightPng = await painter.renderScene(buildScene("light"));
+```
+
+---
+
+## Error handling
+
+Failures wrap as **`SceneCreator.render failed: …`**. Validate **`customLines`** and file paths **before** render in production to avoid partial work.
+
+---

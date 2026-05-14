@@ -38,29 +38,38 @@ await painter.createText(
 
 | Field | Effect |
 |-------|--------|
-| **`bold`** | Prefixes **`bold`** in CSS font string. |
-| **`italic`** | Prefixes **`italic`**. |
+| **`bold`** / **`decorations.bold`** | Prefixes **`bold`** in CSS font string (nested wins if both set). |
+| **`italic`** / **`decorations.italic`** | Prefixes **`italic`**. |
 
 ---
 
-## Alignment & baseline
+## Alignment, baseline & rotation
+
+Prefer **`placement`**; flat **`textAlign`**, **`textBaseline`**, and **`rotation`** remain aliases (**`resolveTextPlacement`** in **`lib-next/types/text.ts`**).
 
 | Field | Values |
 |-------|--------|
 | **`textAlign`** | **`'left' \| 'center' \| 'right' \| 'start' \| 'end'`** |
 | **`textBaseline`** | **`'alphabetic' \| 'bottom' \| 'hanging' \| 'ideographic' \| 'middle' \| 'top'`** |
+| **`rotation`** | Degrees around **`(x, y)`** — applied in **`applyTextTransformations`** before measure/draw. |
 
-These map directly to the canvas context **before** measuring or drawing.
+```typescript
+await painter.createText(
+  {
+    text: 'Centered',
+    x: 320,
+    y: 120,
+    font: { size: 28, family: 'Arial' },
+    placement: { textAlign: 'center', textBaseline: 'middle', rotation: -4 },
+  },
+  buffer
+);
+```
 
 ---
 
-## Layer transforms
+## Fill opacity
 
-| Field | Behaviour |
-|-------|-----------|
-| **`rotation`** | Degrees — **`translate(x,y) → rotate → translate(-x,-y)`** around anchor **`(x,y)`**. |
-| **`opacity`** | **`globalAlpha`** clamped **`0…1`** (applied once per **`renderText`** **`save`**). |
+Overall glyph fill alpha: prefer **`fill.opacity`**, or legacy top-level **`opacity`** (**`resolveTextFill`** → **`text-layout`** sets **`ctx.globalAlpha`** when defined).
 
 ---
-
-Next: **[Wrapping & spacing](/docs#02-create-text-wrapping-spacing)** · **[Colour & gradients](/docs#03-create-text-color-gradients)**.

@@ -1041,7 +1041,7 @@ export function ComparisonGrid() {
                 <span>Not included</span>
               </span>
             </div>
-            <span className="font-mono">last reviewed · v5.3.20</span>
+            <span className="font-mono">last reviewed · v5.4.0</span>
           </div>
         </div>
       </div>
@@ -1185,7 +1185,7 @@ export function SiteFooter() {
               <li><a href="https://github.com/EIAS79/apexify.js" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>GitHub</a></li>
               <li><a href="https://www.npmjs.com/package/apexify.js" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>npm</a></li>
               <li><a href="https://github.com/EIAS79/apexify.js/issues" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>Report issue</a></li>
-              <li><Link href="/docs#Change-Log" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>Changelog</Link></li>
+              <li><Link href="/docs#changelog" className="hover:text-[var(--accent-magenta)] transition-colors" style={{ color: 'var(--text-secondary)' }}>Changelog</Link></li>
             </ul>
           </div>
         </div>
@@ -1198,7 +1198,7 @@ export function SiteFooter() {
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-mono" style={{ backgroundColor: 'var(--bg-sunken)', color: 'var(--text-secondary)' }}>
               <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: 'var(--success)' }} />
-              v5.3.20
+              v5.4.0
             </span>
             <span className="font-mono">MIT licensed</span>
           </div>

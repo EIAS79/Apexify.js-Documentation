@@ -17,14 +17,19 @@ export const viewport: Viewport = {
 /**
  * Site-wide metadata.
  *
- * Favicon + Apple touch icon are picked up automatically by Next.js from
- * `app/icon.svg` and `app/apple-icon.svg` (file convention) — no `icons`
- * field needed here. The actual SVG sources live in `public/brand/` so
- * the in-page <BrandIcon /> and <BrandBanner /> components share them.
+ * Favicon: set explicitly via `metadata.icons` pointing at `public/brand/icon.svg`.
+ * (Relying only on `app/icon.svg` can produce `<link rel="icon" … sizes="…">` that
+ * Chromium ignores for SVG, so the tab shows a generic document icon.)
+ *
+ * Apple touch icon: `app/apple-icon.tsx` (PNG via `ImageResponse`).
  */
 export const metadata: Metadata = {
   title: "Apexify.js - Advanced Canvas Rendering Library",
-  description: "Professional-grade TypeScript canvas library for Node.js. Create stunning visuals with image processing, shapes, text effects, patterns, filters, and charts.",
+  description:
+    "Professional-grade TypeScript canvas library for Node.js. Create stunning visuals with image processing, shapes, text effects, patterns, filters, and charts.",
+  icons: {
+    icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({

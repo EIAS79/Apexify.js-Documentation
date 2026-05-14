@@ -6,7 +6,7 @@ Back: [Text overview](/docs#00-create-text-overview)
 const metrics = await painter.measureText(textProps);
 ```
 
-Implementation: **`TextMetricsCreator`** (`lib/Canvas/extended/TextMetricsCreator.ts`) — creates a scratch canvas, registers fonts like **`EnhancedTextRenderer`**, applies **`letterSpacing`**, **`wordSpacing`**, **`textAlign`**, **`textBaseline`**, then **`ctx.measureText`**.
+Implementation: **`TextMetricsCreator`** in **`lib-next/text/text-metrics.ts`** — scratch canvas, font registration like **`EnhancedTextRenderer`**, **`resolveTextLayout`** / **`resolveTextPlacement`** / **`resolveTextDecorations`**, then **`ctx.measureText`**. Types: **`TextMetrics`** in **`lib-next/types/text.ts`**.
 
 ---
 
@@ -23,7 +23,7 @@ Mirrors **`CanvasTextMetrics`** plus Apexify helpers:
 | **`baseline`**, **`top`**, **`bottom`** | Derived vertical scaffolding |
 | **`centerX`**, **`centerY`** | Local centroid estimates |
 
-When **`maxWidth`** set:
+When **`maxWidth`** set (including via **`layout.maxWidth`**):
 
 - Builds **`lines`** array — each entry `{ text, width, height, metrics }`.
 - **`totalHeight = lines.length * lineHeight`**
@@ -57,5 +57,3 @@ If **`textOnCurve`** with **`0 < sweepAngle < 360`**:
 - Increases **`metrics.height`** by sagitta **`R·(1 - cos(θ/2))`** approximating vertical rise.
 
 ---
-
-Next: **[Paint order](/docs#08-create-text-paint-order)**.

@@ -254,7 +254,7 @@ export default function DocsHome() {
 
         <div className="prose prose-xl max-w-none">
           <div className="markdown-content" data-doc-article>
-            <MDXContentRenderer content={content} headings={headings} />
+            <MDXContentRenderer content={content} headings={headings} docFilename={activeFilename} />
           </div>
           <DocPager neighbors={neighbors} />
         </div>

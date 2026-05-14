@@ -10,11 +10,10 @@
  *                     /public/brand/banner-dark.svg.
  *
  * The actual artwork lives at:
- *   - /public/brand/icon.svg
+ *   - /public/brand/icon.svg          (favicon via `app/layout.tsx` → `metadata.icons`)
  *   - /public/brand/banner-light.svg
  *   - /public/brand/banner-dark.svg
- *   - /app/icon.svg            (Next.js auto-favicon, mirror of brand/icon.svg)
- *   - /app/apple-icon.svg      (iOS home-screen icon, mirror)
+ *   - /app/apple-icon.tsx             (iOS home-screen PNG via ImageResponse)
  *
  * Swap the SVGs in /public/brand to update the brand site-wide.
  */

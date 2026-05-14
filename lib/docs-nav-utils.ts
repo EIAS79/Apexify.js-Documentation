@@ -121,24 +121,22 @@ export function neighborsFor(flat: FlatDocEntry[], filename: string): DocPagerNe
 export type SectionAccent = {
   /** CSS variable referenced in styles (e.g. `var(--accent-magenta)`). */
   color: string;
-  /** Single-letter tile for the sidebar / breadcrumb. */
-  glyph: string;
 };
 
 const ACCENT_BY_SECTION: Record<string, SectionAccent> = {
-  '00-start-here': { color: 'var(--accent-magenta)', glyph: 'S' },
-  '01-beginner-guide': { color: 'var(--accent-iris)', glyph: 'B' },
-  '02-recipes': { color: 'var(--accent-amber)', glyph: 'R' },
-  '03-feature-guides': { color: 'var(--accent-coral)', glyph: 'F' },
-  '04-api-reference': { color: 'var(--accent-iris-soft)', glyph: 'A' },
-  '05-advanced': { color: 'var(--accent-rose)', glyph: 'X' },
-  '06-internals': { color: 'var(--accent-magenta-soft)', glyph: 'I' },
-  '07-contributor-notes': { color: 'var(--accent-amber-soft)', glyph: 'C' },
-  root: { color: 'var(--accent-iris)', glyph: '•' },
+  '00-start-here': { color: 'var(--accent-magenta)' },
+  '01-beginner-guide': { color: 'var(--accent-iris)' },
+  '02-recipes': { color: 'var(--accent-amber)' },
+  '03-feature-guides': { color: 'var(--accent-coral)' },
+  '04-api-reference': { color: 'var(--accent-iris-soft)' },
+  '05-advanced': { color: 'var(--accent-rose)' },
+  '06-internals': { color: 'var(--accent-magenta-soft)' },
+  '07-contributor-notes': { color: 'var(--accent-amber-soft)' },
+  root: { color: 'var(--accent-iris)' },
 };
 
 export function sectionAccent(sectionName: string): SectionAccent {
-  return ACCENT_BY_SECTION[sectionName] ?? { color: 'var(--accent-iris)', glyph: '•' };
+  return ACCENT_BY_SECTION[sectionName] ?? { color: 'var(--accent-iris)' };
 }
 
 /* ----------------------------------------------------------------- *

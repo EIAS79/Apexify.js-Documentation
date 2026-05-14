@@ -16,6 +16,7 @@ import {
   DocSubfolder,
   sectionAccent,
 } from '@/lib/docs-nav-utils';
+import { SectionAccentIcon } from '@/components/docs/SectionAccentIcon';
 
 /** Full path under the section, e.g. `video-ffmpeg` or `video-ffmpeg/options`. */
 function subfolderKey(folderName: string, pathUnderSection: string) {
@@ -377,7 +378,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
               boxShadow: hasActiveFile ? 'var(--glow-magenta)' : 'none',
             }}
           >
-            {accent.glyph}
+            <SectionAccentIcon sectionName={folder.name} className="h-4 w-4 shrink-0" />
           </span>
           <span className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-snug">
             {label}

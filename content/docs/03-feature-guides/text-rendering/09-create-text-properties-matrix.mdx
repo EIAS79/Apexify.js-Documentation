@@ -1,6 +1,6 @@
 # `TextProperties` — full field matrix {#09-create-text-properties-matrix}
 
-Single-page reference for **`TextProperties`** exactly as defined in **`lib/Canvas/utils/types/index.ts`**. Use it beside **`createText`** / **`measureText`**; narrative guides stay in the numbered topics.
+Single-page reference for **`TextProperties`** as defined in **`lib-next/types/text.ts`** (package export **`apexify.js`** / **`apexify.js/types`**). Use beside **`createText`** / **`measureText`** and scene **`text`** layers; narrative guides stay in the numbered topics.
 
 Back: [Text overview](/docs#00-create-text-overview)
 
@@ -14,6 +14,84 @@ Back: [Text overview](/docs#00-create-text-overview)
 | **`await painter.measureText(props)`** | Same shape — honours **`includeCharMetrics`** and **`measurementCanvas`**. |
 
 **`gradient`** everywhere below is the shared **`gradient`** union (**`linear` \| `radial` \| `conic`**) with **`colors: { stop; color }[]`** — see **[Colour & gradients](/docs#03-create-text-color-gradients)**.
+
+---
+
+## Grouped fields (preferred)
+
+When a nested object is present, its fields **override** the matching legacy top-level keys. The merge helpers **`resolveTextDecorations`**, **`resolveTextEffects`**, **`resolveTextLayout`**, **`resolveTextPlacement`**, and **`resolveTextFill`** are **defined** in **`lib-next/types/text.ts`** and **imported** by **`lib-next/text/text-layout.ts`**, **`enhanced-text-renderer.ts`**, **`text-style.ts`**, **`text-metrics.ts`**, and **`draw-text-legacy.ts`**.
+
+### `decorations`
+
+| Nested key | Role |
+|------------|------|
+| **`underline`**, **`overline`**, **`strikethrough`** | `boolean` or **`{ color?, gradient?, width? }`** |
+| **`bold`**, **`italic`** | Canvas font string flags |
+
+### `effects`
+
+| Nested key | Role |
+|------------|------|
+| **`highlight`** | Behind-text tint **`{ color?, gradient?, opacity? }`** |
+| **`glow`**, **`shadow`** | Same shapes as top-level **`glow`** / **`shadow`** |
+
+### `layout`
+
+| Nested key | Role |
+|------------|------|
+| **`lineHeight`**, **`letterSpacing`**, **`wordSpacing`** | Spacing (see wrapping guide) |
+| **`maxWidth`**, **`maxHeight`** | Wrap / clip box |
+
+### `placement`
+
+| Nested key | Role |
+|------------|------|
+| **`textAlign`**, **`textBaseline`** | Canvas alignment |
+| **`rotation`** | Degrees around **`(x, y)`** |
+
+### `fill`
+
+| Nested key | Role |
+|------------|------|
+| **`color`**, **`gradient`**, **`opacity`** | Glyph fill paint |
+
+### Example — one object, all groups
+
+```typescript
+buf = await painter.createText(
+  {
+    text: "Grouped API",
+    x: 240,
+    y: 100,
+    font: { size: 32, family: "Arial" },
+    fill: { color: "#0f172a", opacity: 1 },
+    placement: { textAlign: "center", textBaseline: "middle", rotation: -3 },
+    layout: { maxWidth: 400, lineHeight: 1.3 },
+    decorations: { bold: true, underline: { color: "#2563eb", width: 2 } },
+    effects: {
+      shadow: { color: "rgba(0,0,0,0.25)", offsetX: 2, offsetY: 3, blur: 6, opacity: 1 },
+    },
+  },
+  buf
+);
+```
+
+### Example — nested wins over flat
+
+```typescript
+// fill.color wins; top-level `color` is ignored when both are set
+buf = await painter.createText(
+  {
+    text: "White wins",
+    x: 60,
+    y: 160,
+    font: { size: 24, family: "Arial" },
+    color: "#ef4444",
+    fill: { color: "#f8fafc" },
+  },
+  buf
+);
+```
 
 ---
 
@@ -112,10 +190,12 @@ buf = await painter.createText(
 
 ## Decoration flags & rich decorations
 
+Legacy top-level **`bold`**, **`italic`**, **`underline`**, … still work; prefer **`decorations.*`** (and **`effects.*`** for highlight) for new code.
+
 | Key | Type | Notes |
 |-----|------|--------|
-| **`bold`** | `boolean` | Bolder glyph outline. |
-| **`italic`** | `boolean` | Italic style. |
+| **`bold`** | `boolean` | Bolder glyph outline (**or** **`decorations.bold`**). |
+| **`italic`** | `boolean` | Italic style (**or** **`decorations.italic`**). |
 | **`underline`** | `boolean` \| object | **`true`** = default line; or **`{ color?, gradient?, width? }`** (**`width`** defaults **1** px). |
 | **`overline`** | `boolean` \| object | Same shape as **`underline`**. |
 | **`strikethrough`** | `boolean` \| object | Same shape as **`underline`**. |
@@ -192,6 +272,8 @@ buf = await painter.createText(
 
 ## Spacing & box limits
 
+Legacy keys **`lineHeight`**, **`maxWidth`**, … work; prefer **`layout.*`**.
+
 | Key | Type | Notes |
 |-----|------|--------|
 | **`lineHeight`** | `number` | Multiplier vs font size (**~1.4** default behaviour in renderer). |
@@ -223,6 +305,8 @@ buf = await painter.createText(
 
 ## Alignment
 
+Prefer **`placement.textAlign`** / **`placement.textBaseline`**; flat keys below are equivalent when **`placement`** is omitted.
+
 | Key | Type | Allowed values |
 |-----|------|----------------|
 | **`textAlign`** | string | **`left`**, **`center`**, **`right`**, **`start`**, **`end`** |
@@ -248,6 +332,8 @@ buf = await painter.createText(
 ---
 
 ## Fill colour & alpha
+
+Prefer **`fill.color`** / **`fill.gradient`** / **`fill.opacity`**; flat **`color`** / **`gradient`** / **`opacity`** remain for compatibility.
 
 | Key | Type | Notes |
 |-----|------|--------|
@@ -305,6 +391,8 @@ buf = await painter.createText(
 
 ## `glow`
 
+May live under **`effects.glow`**; same fields as top-level **`glow`**.
+
 | Key | Type | Notes |
 |-----|------|--------|
 | **`color`** | `string` | Glow tint. |
@@ -333,6 +421,8 @@ buf = await painter.createText(
 ---
 
 ## `shadow`
+
+May live under **`effects.shadow`**.
 
 | Key | Type | Notes |
 |-----|------|--------|
@@ -402,16 +492,19 @@ buf = await painter.createText(
 
 | Key | Type | Notes |
 |-----|------|--------|
-| **`rotation`** | `number` | Degrees around **`(x, y)`** — **`applyTransformations`** does **`translate(x,y) → rotate → translate(-x,-y)`**, so **`textAlign`** / **`textBaseline`** still anchor the box before spin. |
+| **`rotation`** | `number` | Degrees around **`(x, y)`** — or **`placement.rotation`**. |
 | **`textOnCurve`** | object | Circular arc layout — **`newlines`** become stacked arcs; **`maxWidth`** ignored. |
 
-### `textOnCurve`
+### `textOnCurve` (`TextCurveConfig`)
 
 | Sub-key | Type | Notes |
 |---------|------|--------|
-| **`sweepAngle`** | `number` | Degrees spanned by whole string at circle centre (**typical 40–120**). |
-| **`radius`** | `number` | Optional px radius; omitted ⇒ **`radius ≈ textWidth / sweepRadians`**. |
+| **`sweepAngle`** | `number` | **Degrees** spanned by the whole string at the circle centre. |
+| **`radius`** | `number` | Optional px radius; omitted ⇒ fit geometry (see [Arc text](/docs#06-create-text-curved)). |
 | **`up`** | `boolean` | **`true`** (default): ∩ smile arc; **`false`**: ∪ frown arc. |
+| **`layoutMode`** | **`fit` \| `clamp` \| `override`** | How measured width, **`radius`**, and sweep interact (**`clamp`** is default in arc math). |
+| **`baselineOffset`** | `number` | Radial nudge of glyphs (+ = outward from centre). |
+| **`startAngleDeg`** | `number` | Rotates the whole arc around **`(x, y)`** (degrees). |
 
 Deep dive: **[Text on a circular arc](/docs#06-create-text-curved)**.
 
@@ -454,7 +547,7 @@ These keys mainly affect **`painter.measureText(...)`**; they do not change pain
 | **`includeCharMetrics`** | `boolean` | When **`true`**, response may include **`charWidths`**, **`charPositions`** on **`TextMetrics`**. |
 | **`measurementCanvas`** | object | Optional **`{ width?, height? }`** backing canvas for measurement (defaults auto-sized). |
 
-**`TextMetrics`** itself lives beside **`TextProperties`** in **`types/index.ts`** (canvas-standard boxes **plus** **`lines`**, **`totalHeight`**, **`lineCount`**, etc.). Tutorial: **[measureText](/docs#07-measure-text)**.
+**`TextMetrics`** is defined next to **`TextProperties`** in **`lib-next/types/text.ts`**. Tutorial: **[measureText](/docs#07-measure-text)**.
 
 ### Example — metrics-driven layout
 
@@ -494,4 +587,3 @@ console.log(m.width, m.totalHeight, m.lineCount, m.charWidths?.length);
 | **`measureText`** fields | [measureText](/docs#07-measure-text) |
 | Composite paint order | [Paint order](/docs#08-create-text-paint-order) |
 
-Back to **[Text overview](/docs#00-create-text-overview)**.

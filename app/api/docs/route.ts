@@ -155,11 +155,11 @@ const ADVANCED_ORDER = [
   'video-ffmpeg-internals',
   'video-discovery-frames',
   'complete-developer-guide',
-  'Change-Log',
 ];
 
 const INTERNALS_ORDER = [
   'internals-overview',
+  'changelog',
   'internals-charts',
   'internals-canvas-and-text',
   'internals-video-router',
