@@ -31,6 +31,7 @@ import {
   CursorArrowRaysIcon,
   ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/outline';
+import { BrandIcon } from '@/components/Brand';
 
 /* =====================================================================
    Section header — reused across home sections
@@ -1124,12 +1125,13 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
           <div className="col-span-2">
-            <Link href="/" className="inline-flex items-center gap-2 mb-4">
+            <Link href="/" className="inline-flex items-center gap-2 mb-4 group/footlogo" aria-label="Apexify.js — home">
               <span
-                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-white text-xs font-black"
-                style={{ backgroundImage: 'var(--gradient-sunset)' }}
+                className="relative inline-flex h-8 w-8 items-center justify-center rounded-lg overflow-hidden transition-transform duration-300 group-hover/footlogo:scale-105"
+                style={{ boxShadow: 'var(--glow-magenta)' }}
+                aria-hidden
               >
-                Aπ
+                <BrandIcon />
               </span>
               <span className="text-2xl font-black text-grad-aurora">Apexify.js</span>
             </Link>
