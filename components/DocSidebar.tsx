@@ -62,10 +62,10 @@ function initialExpandedState(folderList: DocFolder[], hash: string) {
     }
 
     if (
-      (folder.name === '03-feature-guides' || folder.name === '04-api-reference') &&
+      (folder.name === '03-feature-guides' || folder.name === '04-api-reference' || folder.name === '05-advanced') &&
       folder.subfolders
     ) {
-      if (folder.name === '03-feature-guides') {
+      if (folder.name === '03-feature-guides' || folder.name === '05-advanced') {
         for (const sub of folder.subfolders) {
           walkFeatureSubfoldersSetExpanded(folder.name, sub, '', expandedSub);
         }
@@ -155,7 +155,9 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
     const adv = folders.find((f) => f.name === '05-advanced');
     const internal = folders.find((f) => f.name === '06-internals');
     const contrib = folders.find((f) => f.name === '07-contributor-notes');
-    const openAdv = adv?.files.some((f) => f.filename === c) ?? false;
+    const openAdv =
+      (adv?.files.some((f) => f.filename === c) ?? false) ||
+      (adv?.subfolders?.some((sub) => subfolderContainsActiveDoc(sub, c)) ?? false);
     const openInt = internal?.files.some((f) => f.filename === c) ?? false;
     const openCon = contrib?.files.some((f) => f.filename === c) ?? false;
     if (openAdv || openInt || openCon) {
@@ -171,26 +173,32 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
   useEffect(() => {
     if (folders.length === 0) return;
     const c = canonicalActive;
-    const fg = folders.find((f) => f.name === '03-feature-guides');
-    if (!fg?.subfolders?.length) return;
 
-    const keysToOpen: string[] = [];
-    const collect = (sub: DocSubfolder, prefix: string) => {
-      const segmentPath = prefix ? `${prefix}/${sub.name}` : sub.name;
-      if (subfolderContainsActiveDoc(sub, c)) {
-        keysToOpen.push(subfolderKey('03-feature-guides', segmentPath));
-      }
-      sub.subfolders?.forEach((ch) => collect(ch, segmentPath));
+    const expandNested = (section: '03-feature-guides' | '05-advanced') => {
+      const folder = folders.find((f) => f.name === section);
+      if (!folder?.subfolders?.length) return;
+
+      const keysToOpen: string[] = [];
+      const collect = (sub: DocSubfolder, prefix: string) => {
+        const segmentPath = prefix ? `${prefix}/${sub.name}` : sub.name;
+        if (subfolderContainsActiveDoc(sub, c)) {
+          keysToOpen.push(subfolderKey(section, segmentPath));
+        }
+        sub.subfolders?.forEach((ch) => collect(ch, segmentPath));
+      };
+      folder.subfolders.forEach((sub) => collect(sub, ''));
+      if (keysToOpen.length === 0) return;
+
+      setExpandedSub((prev) => {
+        const next = { ...prev };
+        for (const k of keysToOpen) next[k] = true;
+        return next;
+      });
+      setExpanded((p) => ({ ...p, [section]: true }));
     };
-    fg.subfolders.forEach((sub) => collect(sub, ''));
-    if (keysToOpen.length === 0) return;
 
-    setExpandedSub((prev) => {
-      const next = { ...prev };
-      for (const k of keysToOpen) next[k] = true;
-      return next;
-    });
-    setExpanded((p) => ({ ...p, '03-feature-guides': true }));
+    expandNested('03-feature-guides');
+    expandNested('05-advanced');
   }, [canonicalActive, folders]);
 
   useEffect(() => {
@@ -403,7 +411,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
           <div className="mt-1 ml-1 space-y-0.5 sm:ml-2">
             {folder.files.map((file) => renderFile(file, 1, accent.color))}
             {folder.subfolders?.map((sub) =>
-              folder.name === '03-feature-guides'
+              folder.name === '03-feature-guides' || folder.name === '05-advanced'
                 ? renderFeatureGuideSubTree(folder.name, '', sub, 2, accent.color)
                 : renderApiReferenceSubfolder(folder.name, sub, accent.color),
             )}

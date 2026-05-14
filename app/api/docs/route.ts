@@ -157,6 +157,9 @@ const ADVANCED_ORDER = [
   'complete-developer-guide',
 ];
 
+/** Nested topic folders under `05-advanced` (sidebar order). */
+const ADVANCED_SUBFOLDER_ORDER = ['scene'];
+
 const INTERNALS_ORDER = [
   'internals-overview',
   'changelog',
@@ -336,6 +339,34 @@ function buildFeatureGuideSubfolders(
   return subfolders;
 }
 
+function advancedSubfolderSortKey(name: string): number {
+  const i = ADVANCED_SUBFOLDER_ORDER.indexOf(name);
+  return i === -1 ? 999 : i;
+}
+
+/** Nested dirs under Advanced — same recursive tree as Feature Guides (`scene/`, etc.). */
+function buildAdvancedNestedSubfolders(folderPath: string, topFolderName: string, docsDir: string): DocSubfolder[] {
+  const subfolders: DocSubfolder[] = [];
+  if (!fs.existsSync(folderPath)) return subfolders;
+
+  for (const entry of fs.readdirSync(folderPath, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const subPath = path.join(folderPath, entry.name);
+    const folderRelative = path.join(topFolderName, entry.name);
+    const node = buildFeatureGuideTopicTree(subPath, folderRelative, entry.name, docsDir);
+    if (node.files.length === 0 && (!node.subfolders || node.subfolders.length === 0)) continue;
+    subfolders.push(node);
+  }
+
+  subfolders.sort((a, b) => {
+    const da = advancedSubfolderSortKey(a.name);
+    const db = advancedSubfolderSortKey(b.name);
+    if (da !== db) return da - db;
+    return a.name.localeCompare(b.name, undefined, { numeric: true });
+  });
+  return subfolders;
+}
+
 function featureSubfolderSortKey(name: string): number {
   const i = FEATURE_GUIDE_SUBFOLDER_ORDER.indexOf(name);
   return i === -1 ? 999 : i;
@@ -429,6 +460,25 @@ function getFolderStructure(docsDir: string): { folders: DocFolder[]; rootFiles:
             path: folderPath,
             files: looseFiles,
             subfolders,
+          });
+        }
+        continue;
+      }
+
+      if (entry.name === '05-advanced') {
+        const subfolders = buildAdvancedNestedSubfolders(folderPath, entry.name, docsDir);
+        const looseFiles = getDirectMdxFiles(folderPath, docsDir).map((f) => ({
+          ...f,
+          folder: entry.name,
+        }));
+        sortFilesWithOrder(looseFiles, ADVANCED_ORDER, entry.name);
+        if (subfolders.length > 0 || looseFiles.length > 0) {
+          folders.push({
+            name: entry.name,
+            displayName: TOP_LEVEL_LABELS[entry.name] ?? folderDisplayName(entry.name),
+            path: folderPath,
+            files: looseFiles,
+            subfolders: subfolders.length > 0 ? subfolders : undefined,
           });
         }
         continue;

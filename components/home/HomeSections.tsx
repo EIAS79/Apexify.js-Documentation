@@ -25,10 +25,9 @@ import {
   ChevronRightIcon,
   CheckIcon,
   XMarkIcon,
-  MinusSmallIcon,
+  MinusIcon,
   RocketLaunchIcon,
   CpuChipIcon,
-  CursorArrowRaysIcon,
   ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/outline';
 import { BrandIcon } from '@/components/Brand';
@@ -928,7 +927,7 @@ function CellMark({ value }: { value: Cell }) {
           border: '1px solid color-mix(in srgb, var(--accent-amber) 50%, transparent)',
         }}
       >
-        <MinusSmallIcon className="h-4 w-4 stroke-[3]" />
+        <MinusIcon className="h-4 w-4 stroke-[3]" />
       </span>
     );
   return (
