@@ -11,6 +11,7 @@ import {
 import ThemeToggle from './ThemeToggle';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { DocsSearchPalette } from './DocsSearchPalette';
+import { BrandIcon } from './Brand';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -104,17 +105,13 @@ export default function DocHeader() {
           </button>
 
           {/* Logo + brand */}
-          <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+          <Link href="/" className="group/logo flex shrink-0 items-center gap-2.5" aria-label="Apexify.js — home">
             <span
               aria-hidden
-              className="grid h-9 w-9 place-items-center rounded-xl text-base font-black"
-              style={{
-                background: 'var(--gradient-sunset)',
-                color: 'white',
-                boxShadow: 'var(--glow-magenta)',
-              }}
+              className="relative inline-flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover/logo:scale-105"
+              style={{ boxShadow: 'var(--glow-magenta)' }}
             >
-              Aπ
+              <BrandIcon />
             </span>
             <span className="hidden flex-col leading-tight sm:flex">
               <span
