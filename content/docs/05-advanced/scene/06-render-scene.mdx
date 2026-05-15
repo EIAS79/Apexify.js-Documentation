@@ -1,8 +1,10 @@
 # `renderScene` {#06-render-scene}
 
-Back: [Scene overview](/docs#00-scene-composition) · [Backgrounds](/docs#05-scene-backgrounds)
+Back: [Scene overview](/docs#00-scene-composition) · [Backgrounds](/docs#05-scene-backgrounds) · [Types & builder](/docs#01-scene-types-builder)
 
-**`renderScene(input: SceneRenderInput): Promise<Buffer>`** — synchronous **API shape** (async because chart/image loads are async). Returns **PNG** bytes.
+**`renderScene(input: SceneRenderInput, options?: SceneRenderOptions): Promise<Buffer>`** — async because chart/image loads are async. Returns **PNG** bytes.
+
+**`SceneCreator.render`** (used internally) accepts the same **`options`**: by default it runs **`validateSceneRenderInput`** (dimensions, **`layers`** array, nested **`surface`** depth). Pass **`{ validate: false }`** only for trusted hot paths; use **`{ maxSurfaceDepth: n }`** to cap nesting (default **64**).
 
 ---
 
@@ -22,8 +24,8 @@ const png = await painter.renderScene({
     {
       type: "text",
       texts: [
-        { content: "Social card", x: 60, y: 200, fontSize: 64, color: "#ffffff" },
-        { content: "apexify.js", x: 60, y: 300, fontSize: 28, color: "#bfdbfe" },
+        { text: "Social card", x: 60, y: 200, fontSize: 64, color: "#ffffff" },
+        { text: "apexify.js", x: 60, y: 300, fontSize: 28, color: "#bfdbfe" },
       ],
     },
   ],
@@ -34,25 +36,54 @@ await fs.promises.writeFile("card.png", png);
 
 ---
 
-## Variant: `SceneBuilder` then `render`
+## Variant: validate before work (untrusted JSON)
+
+```typescript
+import { ApexPainter, validateSceneRenderInput } from "apexify.js";
+import type { SceneRenderInput } from "apexify.js";
+
+const painter = new ApexPainter();
+
+function parseScene(json: unknown): SceneRenderInput {
+  const input = json as SceneRenderInput;
+  validateSceneRenderInput(input, { maxSurfaceDepth: 16 });
+  return input;
+}
+
+// or: painter.validateSceneRenderInput(input, { maxSurfaceDepth: 16 });
+```
+
+---
+
+## Variant: skip validation (trusted pipeline)
+
+```typescript
+await painter.renderScene(trustedInput, { validate: false });
+```
+
+---
+
+## Variant: `SceneBuilder` then `render` (`addLayers` + options)
 
 ```typescript
 const png = await painter
   .createScene(960, 540)
   .setBackground({ colorBg: "#020617" })
-  .addLayer({
-    type: "path",
-    path: [
-      { type: "moveTo", x: 48, y: 120 },
-      { type: "lineTo", x: 400, y: 120 },
-    ],
-    options: { stroke: { color: "#38bdf8", width: 4 } },
-  })
-  .addLayer({
-    type: "text",
-    texts: [{ content: "Builder", x: 48, y: 160, fontSize: 48, color: "#f1f5f9" }],
-  })
-  .render();
+  .addLayers([
+    {
+      type: "path",
+      path: [
+        { type: "moveTo", x: 48, y: 120 },
+        { type: "lineTo", x: 400, y: 120 },
+      ],
+      options: { stroke: { color: "#38bdf8", width: 4 } },
+    },
+    {
+      type: "text",
+      texts: [{ text: "Builder", x: 48, y: 160, fontSize: 48, color: "#f1f5f9" }],
+    },
+  ])
+  .render({ maxSurfaceDepth: 32 });
 ```
 
 ---
@@ -72,8 +103,8 @@ const baseScene = {
 } satisfies SceneRenderInput;
 
 const png = await painter.renderScene(baseScene);
-// await painter.renderSceneToGIF(baseScene, { ... });
-// await painter.renderSceneToVideoFrames(baseScene, { ... });
+// await painter.renderSceneToGIF(baseScene, { options: { … }, sceneRender: { maxSurfaceDepth: 32 } });
+// await painter.renderSceneToVideoFrames(baseScene, { options: { … }, sceneRender: { validate: false } });
 ```
 
 ---
@@ -88,7 +119,7 @@ function buildScene(theme: "light" | "dark") {
     width: 400,
     height: 200,
     background: { colorBg: bg },
-    layers: [{ type: "text" as const, texts: [{ content: theme, x: 24, y: 80, fontSize: 32, color: fg }] }],
+    layers: [{ type: "text" as const, texts: [{ text: theme, x: 24, y: 80, fontSize: 32, color: fg }] }],
   };
 }
 
@@ -100,6 +131,6 @@ const lightPng = await painter.renderScene(buildScene("light"));
 
 ## Error handling
 
-Failures wrap as **`SceneCreator.render failed: …`**. Validate **`customLines`** and file paths **before** render in production to avoid partial work.
+Failures wrap as **`SceneCreator.render failed: …`**. **`validateSceneRenderInput`** throws earlier with **`Scene: …`** messages for bad dimensions or excessive **`surface`** nesting. Validate **`customLines`** and file paths **before** render in production when validation alone is not enough.
 
 ---

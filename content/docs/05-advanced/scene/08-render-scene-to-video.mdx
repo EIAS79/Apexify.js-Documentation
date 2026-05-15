@@ -10,13 +10,13 @@ Encodes a **frame sequence** into video via **`VideoCreator.createVideo`** with 
 
 ## Pipeline (summary)
 
-1. **`composedPng = await sceneCreator.render(scene)`**  
+1. **`composedPng = await sceneCreator.render(scene, video.sceneRender)`** — optional **`SceneRenderOptions`** (same as **`renderScene`** second argument).  
 2. **`body`** = **`expandSceneVideoFrames(framesWithRepeats)`** *or* **`[...createFromFrames.frames]`**  
 3. **`frames`** = prepend **`[composedPng, ...body]`** unless **`prependComposedToFrames === false`**  
 4. **`merged`** = `{ ...video.options, source: video.options.source ?? composedPng, createFromFrames: { ...cf, frames } }`  
 5. **`videoCreator.createVideo(merged)`**
 
-**`SceneVideoFrameSlot`:** `string | Buffer | { source: string | Buffer; repeat?: number }`
+**`SceneVideoFrameSlot`:** `string | Buffer | { source: string | Buffer; repeat?: number }` · Optional **`video.sceneRender`** forwards **`SceneRenderOptions`** to that inner scene render step.
 
 ---
 
@@ -32,7 +32,7 @@ const scene = {
   height: 1080,
   background: { colorBg: "#020617" },
   layers: [
-    { type: "text", texts: [{ content: "Intro", x: 120, y: 420, fontSize: 96, color: "#f8fafc" }] },
+    { type: "text", texts: [{ text: "Intro", x: 120, y: 420, fontSize: 96, color: "#f8fafc" }] },
   ],
 };
 
@@ -47,6 +47,7 @@ await painter.renderSceneToVideoFrames(scene, {
     },
     prependComposedToFrames: true,
   },
+  sceneRender: { maxSurfaceDepth: 24 },
 });
 ```
 

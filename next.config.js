@@ -1,11 +1,3 @@
-const withMDX = require('@next/mdx')({
-  extension: /\.mdx?$/,
-  options: {
-    remarkPlugins: [],
-    rehypePlugins: [],
-  },
-})
-
 /**
  * Native / sibling optional deps are never pulled in by static analysis alone.
  * Covers Vercel Linux **glibc + musl**, **x64 + arm64** (match lockfile package names).
@@ -38,7 +30,7 @@ const galleryRunNativeIncludes = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
+  pageExtensions: ['ts', 'tsx', 'js', 'jsx'],
   experimental: {
     serverComponentsExternalPackages: ['apexify.js', '@napi-rs/canvas'],
     /**
@@ -76,5 +68,4 @@ const nextConfig = {
   },
 }
 
-module.exports = withMDX(nextConfig)
-
+module.exports = nextConfig

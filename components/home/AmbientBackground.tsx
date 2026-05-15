@@ -13,33 +13,19 @@ import { useTheme } from '@/components/ThemeProvider';
  *      defined in globals.css.
  *   3. Slow-panning isometric grid.
  *   4. SVG grain overlay (very subtle).
- *   5. Cursor-follow bloom (only on dark mode; light mode reads cleaner
- *      without it).
+ *
+ * The cursor-follow bloom previously lived here but caused a re-render on
+ * every mouse move. It now lives in `CustomCursor` (see
+ * `components/CustomCursor.tsx`) where it's driven by direct DOM
+ * transforms inside a RAF loop — buttery smooth and decoupled from React.
  */
 export default function AmbientBackground() {
   const { theme } = useTheme();
-  const [mouse, setMouse] = useState({ x: 50, y: 30 });
   const [prefersReducedMotion, setPRM] = useState(false);
 
   useEffect(() => {
     setPRM(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    if (theme !== 'dark') return;
-    let raf = 0;
-    const onMove = (e: MouseEvent) => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        setMouse({
-          x: (e.clientX / window.innerWidth) * 100,
-          y: (e.clientY / window.innerHeight) * 100,
-        });
-      });
-    };
-    window.addEventListener('mousemove', onMove, { passive: true });
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      cancelAnimationFrame(raf);
-    };
-  }, [theme]);
+  }, []);
 
   const isDark = theme === 'dark';
 
@@ -116,25 +102,6 @@ export default function AmbientBackground() {
           style={{
             backgroundImage:
               "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-          }}
-        />
-      )}
-
-      {/* Layer 5 — cursor bloom (dark only, gentle) */}
-      {isDark && !prefersReducedMotion && (
-        <div
-          className="absolute rounded-full mix-blend-screen pointer-events-none"
-          style={{
-            left: `${mouse.x}%`,
-            top: `${mouse.y}%`,
-            width: '320px',
-            height: '320px',
-            transform: 'translate3d(-50%, -50%, 0)',
-            background:
-              'radial-gradient(circle, rgba(255, 122, 200, 0.18), rgba(123, 108, 255, 0.08) 45%, transparent 70%)',
-            filter: 'blur(28px)',
-            transition: 'left 0.4s cubic-bezier(0.16, 1, 0.3, 1), top 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-            opacity: 0.9,
           }}
         />
       )}

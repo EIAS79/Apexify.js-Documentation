@@ -171,6 +171,85 @@ body {
   .pb-studio-safe {
     padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Custom cursor — only active on hover-capable, fine-pointer devices
+   (toggled by the CustomCursor component via .has-custom-cursor)
+   ============================================================ */
+
+@media (hover: hover) and (pointer: fine) {
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+  /* Keep system text-input cursor for caret usability inside fields */
+  html.has-custom-cursor input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]),
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor [contenteditable="true"] {
+    cursor: text !important;
+  }
+}
+
+.custom-cursor-dot,
+.custom-cursor-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: transform, width, height, border-radius, opacity;
+  z-index: 99999;
+}
+
+.custom-cursor-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--accent-magenta);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--accent-magenta) 60%, transparent);
+  mix-blend-mode: difference;
+  transition: opacity 0.18s ease, transform 0s;
+}
+
+.custom-cursor-wrap {
+  background: transparent;
+  border: 1.5px solid color-mix(in srgb, var(--accent-iris) 65%, transparent);
+  box-shadow: 0 0 12px -2px color-mix(in srgb, var(--accent-iris) 35%, transparent);
+  /* opacity, border-color, border-width transition; geometry is driven by JS */
+  transition: opacity 0.2s ease, border-color 0.25s ease, background-color 0.25s ease, border-width 0.15s ease, box-shadow 0.25s ease;
+}
+
+/* Magnet — wraps a hovered button/link */
+.custom-cursor-wrap[data-mode="magnet"] {
+  border-color: color-mix(in srgb, var(--accent-magenta) 80%, transparent);
+  background: color-mix(in srgb, var(--accent-magenta) 6%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--accent-magenta) 18%, transparent),
+    0 0 22px -4px color-mix(in srgb, var(--accent-magenta) 45%, transparent);
+}
+
+/* Text — minimal underline accent near pointer */
+.custom-cursor-wrap[data-mode="text"] {
+  border: none;
+  background: var(--gradient-sunset);
+  box-shadow: 0 0 8px -1px color-mix(in srgb, var(--accent-magenta) 50%, transparent);
+}
+
+/* Pressed — flash deeper */
+.custom-cursor-wrap[data-pressed="true"][data-mode="magnet"] {
+  background: color-mix(in srgb, var(--accent-magenta) 16%, transparent);
+  border-color: var(--accent-magenta);
+}
+.custom-cursor-wrap[data-pressed="true"][data-mode="default"] {
+  background: color-mix(in srgb, var(--accent-magenta) 18%, transparent);
+  border-color: var(--accent-magenta);
 }
 
 /* ============================================================

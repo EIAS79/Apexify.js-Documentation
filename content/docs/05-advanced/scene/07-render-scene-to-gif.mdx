@@ -13,11 +13,13 @@ renderSceneToGIF(
     prependComposedRaster?: boolean;
     composedFrameDuration?: number;
     composedFrameRepeat?: number;
+    /** Forwarded to `SceneCreator.render` when rasterizing `scene` (e.g. `maxSurfaceDepth`, `validate`). */
+    sceneRender?: SceneRenderOptions;
   }
 ): Promise<GIFResults | Buffer | string | undefined>
 ```
 
-**Pipeline:** `scene` → **`SceneCreator.render`** → composed PNG → build **`GIFInputFrame[]`** → **`GIFCreator.createGIF(frames, options)`**.
+**Pipeline:** `scene` → **`SceneCreator.render(scene, gif.sceneRender)`** → composed PNG → build **`GIFInputFrame[]`** → **`GIFCreator.createGIF(frames, options)`**.
 
 ---
 
@@ -27,8 +29,24 @@ renderSceneToGIF(
 |------|-----|
 | **`gif.options.onStart` must be absent** | **`SceneCreate.renderSceneToGIF`** throws: use **`createGIF`** alone if you need **`onStart`**. |
 | **At least one frame** after expansion | Either **prepended** composed raster and/or **`gifFrames`** (after **`repeat`** expansion). |
+| **`gif.sceneRender`** | Optional **`SceneRenderOptions`** passed to the inner **`SceneCreator.render`** when rasterizing **`scene`** (default validation, **`maxSurfaceDepth`**, or **`validate: false`**). |
 
 **`SceneGifInputFrame`** = **`GIFInputFrame` & { `repeat`?: number }** — each logical frame can be duplicated **`repeat`** times in the final list.
+
+---
+
+## Variant: `sceneRender` on the composed frame
+
+```typescript
+await painter.renderSceneToGIF(scene, {
+  gifFrames: [],
+  options: { width: scene.width, height: scene.height, delay: 400 },
+  prependComposedRaster: true,
+  sceneRender: { maxSurfaceDepth: 12 },
+});
+```
+
+Same shape for **`renderSceneToVideoFrames`** — **`video.sceneRender`** is passed into **`SceneCreator.render`** before FFmpeg.
 
 ---
 
@@ -44,7 +62,7 @@ const scene = {
   width: 320,
   height: 200,
   background: { colorBg: "#312e81" },
-  layers: [{ type: "text", texts: [{ content: "Hold", x: 24, y: 80, fontSize: 36, color: "#fff" }] }],
+  layers: [{ type: "text", texts: [{ text: "Hold", x: 24, y: 80, fontSize: 36, color: "#fff" }] }],
 };
 
 const out = await painter.renderSceneToGIF(scene, {

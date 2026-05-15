@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarProvider } from "@/contexts/SidebarContext";
+import CustomCursor from "@/components/CustomCursor";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,6 +45,7 @@ export default function RootLayout({
           <SidebarProvider>
           {children}
           </SidebarProvider>
+          <CustomCursor />
         </ThemeProvider>
         <SpeedInsights />
       </body>

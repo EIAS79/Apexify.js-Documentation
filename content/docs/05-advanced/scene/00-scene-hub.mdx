@@ -4,8 +4,13 @@ Back: [Advanced hub](/docs#00-advanced-overview) · [Feature tracks](/docs#01-fe
 
 The **Scene** API is a **declarative layer graph**: **width**, **height**, optional **background**, and an ordered **`layers`** list. **`SceneCreator`** paints everything into **one PNG `Buffer`** in one pass. You can pipe that raster into **GIF** (`renderSceneToGIF`) or **video** (`renderSceneToVideoFrames`).
 
-**Code:** `lib-next/scene/scene-creator.ts`, `gif-scene.ts`, `video-scene.ts`, `render-scene-to-video.ts` · **Types:** `lib-next/types/scene.ts`  
-**`ApexPainter`:** `createScene`, `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames`
+**Composition:** **`SceneCreator`** + **`SceneBuilder`**, with optional validation before rasterizing. Scene→GIF and scene→video reuse the same composed PNG step.
+
+**Types:** **`SceneRenderInput`**, **`SceneRenderOptions`**, **`SceneLayer`** — import from **`apexify.js`** (or your bundler’s type-only import path).
+
+**`ApexPainter`:** `createScene`, `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames`, **`validateSceneRenderInput`**
+
+**Builder:** prefer **`addLayers([...])`** for batches; **`addLayer`** remains for single appends. **`toRenderInput()`**, **`insertLayer`**, **`removeLayer`**, **`moveLayer`**, **`replaceLayers`**, **`clearLayers`**, **`layerCount`**. Renders default to **validated** inputs unless **`{ validate: false }`**.
 
 ---
 
@@ -46,10 +51,12 @@ const painter = new ApexPainter();
 const png = await painter
   .createScene(640, 360)
   .setBackground({ colorBg: "#0f172a" })
-  .addLayer({
-    type: "text",
-    texts: [{ content: "Hello, Scene", x: 48, y: 160, fontSize: 36, color: "#e2e8f0" }],
-  })
+  .addLayers([
+    {
+      type: "text",
+      texts: [{ text: "Hello, Scene", x: 48, y: 160, fontSize: 36, color: "#e2e8f0" }],
+    },
+  ])
   .render();
 
 fs.writeFileSync("./scene.png", png);

@@ -180,6 +180,7 @@ export default function GalleryClient() {
             onQueryChange={setQuery}
             sort={sort}
             onSortChange={setSort}
+            onPickItem={openItem}
           />
         </div>
 

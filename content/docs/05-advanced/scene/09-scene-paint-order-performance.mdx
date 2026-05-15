@@ -31,7 +31,7 @@ Nested **`surface`** repeats: **deepest** child is rasterised first, then parent
 | **Each `chart` layer** | Full chart render + decode; **cache** with **`createChart`** → **`imageBuffer`**. |
 | **Large `surface` trees** | Each node = extra full-size **`toBuffer('png')`** for child; flatten when possible. |
 | **Huge `customLines` batches** | Same as **`path2d.custom`** — many segments = more CPU. |
-| **Remote `image.source`** | Network + decode latency; prefetch to **Buffer** when generating many scenes. |
+| **Default scene validation** | **`renderScene`** / **`SceneBuilder.render`** run **`validateSceneRenderInput`** unless **`{ validate: false }`**. Tiny cost vs canvas work; turn off only for trusted batches. |
 
 ---
 

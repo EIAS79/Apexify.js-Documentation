@@ -4,9 +4,19 @@ Back: [Advanced hub](/docs#00-advanced-overview) · [Feature tracks](/docs#01-fe
 
 This page is the **entry point** for Scene: a **declarative layer graph** where you set **width**, **height**, an optional **background**, and an ordered **`layers`** array. **`SceneCreator`** composites everything into **one PNG `Buffer`** in a single pass. From there you can call **`renderScene`**, **`renderSceneToGIF`**, or **`renderSceneToVideoFrames`** depending on whether you need a still, an animated GIF, or a video file.
 
-**Implementation:** `lib-next/scene/scene-creator.ts` (**`SceneCreator`**, **`SceneBuilder`**), `gif-scene.ts`, `video-scene.ts`, `render-scene-to-video.ts` · **Types:** `lib-next/types/scene.ts`
+**Implementation:** **`SceneCreator`** draws the full layer stack to one PNG. **`SceneBuilder`** is a fluent wrapper over the same fields as **`SceneRenderInput`**. Optional **`validateSceneRenderInput`** runs before rasterizing unless you pass **`{ validate: false }`**. Scene→GIF and scene→video helpers call the same composition step, then encode frames.
 
-**On `ApexPainter`:** `createScene`, `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames`
+**Types:** **`SceneRenderInput`**, **`SceneLayer`**, **`SceneRenderOptions`** — import from the package (e.g. **`import type { … } from "apexify.js"`**).
+
+**On `ApexPainter`:** `createScene`, `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames`, **`validateSceneRenderInput`**
+
+### Builder & render extras
+
+- **`addLayers([...])`** — append many layers at once; **`addLayer(x)`** is equivalent to **`addLayers([x])`**.
+- **Layer stack editing:** **`insertLayer`**, **`insertLayers`**, **`removeLayer`**, **`moveLayer`**, **`replaceLayers`**, **`clearLayers`**, read **`layerCount`**.
+- **`toRenderInput()`** — returns a plain **`SceneRenderInput`** (copied **`layers`** array) for **`renderScene`**, GIF/video helpers, caching, or tests.
+- **Validation:** default **`renderScene`** / **`SceneBuilder.render`** runs **`validateSceneRenderInput`** (dimensions + max nested **`surface`** depth). Pass **`{ validate: false }`** only for trusted hot paths; tune depth with **`{ maxSurfaceDepth: n }`**.
+- **GIF / video:** optional **`sceneRender`** on the second argument forwards the same options to the inner scene PNG step.
 
 ---
 
@@ -38,12 +48,12 @@ Read in order the first time; later jump by topic.
 
 | # | Topic | Link |
 |---|--------|------|
-| 1 | **`SceneRenderInput`**, **`SceneBuilder`**, **`createScene`** overloads & patterns | [Types & builder](/docs#01-scene-types-builder) |
+| 1 | **`SceneRenderInput`**, **`SceneRenderOptions`**, **`SceneBuilder`** (`addLayers`, stack edits, **`toRenderInput`**), **`createScene`** | [Types & builder](/docs#01-scene-types-builder) |
 | 2 | **`image`**, **`text`**, **`path`**, **`imageBuffer`** | [Raster & vector layers](/docs#02-scene-layers-raster-text-path) |
 | 3 | **`chart`**, **`chartComparison`**, **`chartCombo`** | [Chart layers](/docs#03-scene-layers-charts) |
 | 4 | **`customLines`**, **`surface`** (nesting, placement) | [Connectors & surfaces](/docs#04-scene-layers-custom-lines-surface) |
 | 5 | **`background`** as **`CanvasConfig`** | [Scene backgrounds](/docs#05-scene-backgrounds) |
-| 6 | **`renderScene`** | [Render scene](/docs#06-render-scene) |
+| 6 | **`renderScene`**, validation, **`SceneCreator.render`** options | [Render scene](/docs#06-render-scene) |
 | 7 | **`renderSceneToGIF`** | [Scene → GIF](/docs#07-render-scene-to-gif) |
 | 8 | **`renderSceneToVideoFrames`** | [Scene → video](/docs#08-render-scene-to-video) |
 | 9 | Paint order, performance, pitfalls | [Paint order & performance](/docs#09-scene-paint-order-performance) |
@@ -61,10 +71,12 @@ const painter = new ApexPainter();
 const png = await painter
   .createScene(640, 360)
   .setBackground({ colorBg: "#0f172a" })
-  .addLayer({
-    type: "text",
-    texts: [{ content: "Hello, Scene", x: 48, y: 160, fontSize: 36, color: "#e2e8f0" }],
-  })
+  .addLayers([
+    {
+      type: "text",
+      texts: [{ text: "Hello, Scene", x: 48, y: 160, fontSize: 36, color: "#e2e8f0" }],
+    },
+  ])
   .render();
 
 fs.writeFileSync("./scene.png", png);
