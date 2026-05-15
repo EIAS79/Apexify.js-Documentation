@@ -1,4 +1,7 @@
-import type { MDXComponents } from 'mdx/types';
+import type { ComponentType } from 'react';
+
+/** Maps tag / component names used by MDX; mirrors `mdx/types` without the `mdx` package. */
+type MDXComponents = Record<string, ComponentType<any> | undefined>;
 import { 
   CodeBlock, 
   CodeSwitcher, 
