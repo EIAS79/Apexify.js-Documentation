@@ -253,7 +253,7 @@ export function StudioTopBar(props: TopBarProps) {
 
   return (
     <header
-      className="relative z-40 flex shrink-0 flex-col gap-2 px-3 py-2.5 sm:px-4 md:flex-row md:items-center md:gap-3"
+      className="relative z-40 flex shrink-0 flex-col gap-2 px-3 py-2 sm:px-4 md:flex-row md:items-center md:gap-3"
       style={{
         backgroundColor: 'color-mix(in srgb, var(--bg-raised) 92%, transparent)',
         backdropFilter: 'blur(16px) saturate(140%)',
@@ -262,91 +262,100 @@ export function StudioTopBar(props: TopBarProps) {
         boxShadow: 'var(--shadow-sm)',
       }}
     >
-      <Link
-        href="/"
-        className="group inline-flex shrink-0 items-center gap-2 rounded-lg px-1.5 py-1 transition-colors"
-        title="Back to home"
-      >
+      {/* Left — Logo + view controls */}
+      <div className="flex items-center gap-2 sm:gap-3">
+        <Link
+          href="/"
+          className="group inline-flex shrink-0 items-center gap-2 rounded-lg px-1.5 py-1 transition-colors"
+          title="Back to home"
+        >
+          <span
+            aria-hidden
+            className="grid h-7 w-7 place-items-center rounded-lg font-black"
+            style={{
+              background: 'var(--gradient-sunset)',
+              color: 'white',
+              boxShadow: 'var(--glow-magenta)',
+              fontSize: '0.85rem',
+            }}
+          >
+            A
+          </span>
+          <span className="hidden flex-col leading-tight sm:flex">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.28em]" style={{ color: 'var(--text-tertiary)' }}>
+              Apexify
+            </span>
+            <span className="text-sm font-bold text-grad-aurora">Studio</span>
+          </span>
+        </Link>
+
         <span
           aria-hidden
-          className="grid h-7 w-7 place-items-center rounded-lg font-black"
-          style={{
-            background: 'var(--gradient-sunset)',
-            color: 'white',
-            boxShadow: 'var(--glow-magenta)',
-            fontSize: '0.85rem',
-          }}
-        >
-          A
-        </span>
-        <span className="hidden flex-col leading-tight sm:flex">
-          <span className="text-[10px] font-semibold uppercase tracking-[0.28em]" style={{ color: 'var(--text-tertiary)' }}>
-            Apexify
-          </span>
-          <span className="text-sm font-bold text-grad-aurora">Studio</span>
-        </span>
-      </Link>
+          className="hidden h-6 w-px shrink-0 md:block"
+          style={{ backgroundColor: 'var(--border-default)' }}
+        />
 
-      <span
-        aria-hidden
-        className="hidden h-7 w-px shrink-0 md:block"
-        style={{ backgroundColor: 'var(--border-default)' }}
-      />
+        <LangPills lang={lang} onChange={onLangChange} />
+        <LayoutPills mode={layout} onChange={onLayoutChange} />
+      </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <span aria-hidden className="hidden flex-1 md:block" />
+
+      {/* Center — Execution controls */}
+      <div
+        className="flex items-center gap-1 rounded-xl p-1"
+        style={{
+          border: '1px solid var(--border-default)',
+          backgroundColor: 'color-mix(in srgb, var(--bg-base) 60%, transparent)',
+        }}
+      >
         <button
           type="button"
           onClick={onRun}
           disabled={running || !runnerEnabled}
-          className="btn btn-primary text-[12px] sm:text-sm disabled:cursor-not-allowed disabled:opacity-60"
-          style={{ padding: '0.5rem 0.875rem', borderRadius: '0.625rem' }}
-          title="Run snippet"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[12px] sm:text-[13px] font-bold transition-all active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
+          style={{
+            background: 'var(--gradient-sunset)',
+            color: 'white',
+            boxShadow: running ? 'none' : '0 2px 12px -3px rgba(236, 72, 153, 0.5)',
+          }}
+          title="Run snippet (⌘↵)"
         >
           <PlayIcon className="h-4 w-4 shrink-0" aria-hidden />
           <span>{running ? 'Running…' : 'Run'}</span>
-          <span className="hidden items-center gap-1 sm:inline-flex">
-            <kbd className="kbd" style={{ background: 'rgba(255,255,255,0.18)', borderColor: 'rgba(255,255,255,0.32)', color: 'white' }}>
-              ⌘
-            </kbd>
-            <kbd className="kbd" style={{ background: 'rgba(255,255,255,0.18)', borderColor: 'rgba(255,255,255,0.32)', color: 'white' }}>
-              ↵
-            </kbd>
-          </span>
         </button>
 
-        <label
-          className="inline-flex cursor-pointer select-none items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px] font-medium sm:text-xs"
+        <button
+          type="button"
+          onClick={() => onAutoRunChange(!autoRun)}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
           style={{
-            border: '1px solid var(--border-default)',
-            color: autoRun ? 'var(--text-primary)' : 'var(--text-tertiary)',
-            backgroundColor: autoRun ? 'color-mix(in srgb, var(--accent-iris) 14%, transparent)' : 'transparent',
+            background: autoRun
+              ? 'linear-gradient(135deg, var(--accent-iris), var(--accent-magenta))'
+              : 'transparent',
+            color: autoRun ? 'white' : 'var(--text-secondary)',
+            boxShadow: autoRun ? '0 2px 10px -3px var(--accent-iris)' : 'none',
           }}
-          title="Re-run automatically while you type (debounced)"
+          title={autoRun ? 'Auto-run active — click to disable' : 'Enable auto-run on typing'}
         >
-          <span
-            className="relative inline-block h-3.5 w-7 rounded-full transition-colors"
-            style={{ backgroundColor: autoRun ? 'var(--accent-iris)' : 'var(--border-strong)' }}
-          >
+          <SparklesIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          <span>Auto</span>
+          {autoRun && (
             <span
-              className="absolute top-0.5 h-2.5 w-2.5 rounded-full bg-white transition-transform"
-              style={{ transform: autoRun ? 'translateX(14px)' : 'translateX(2px)' }}
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
             />
-          </span>
-          <span>Auto-run</span>
-          <input
-            type="checkbox"
-            className="sr-only"
-            checked={autoRun}
-            onChange={(e) => onAutoRunChange(e.target.checked)}
-          />
-        </label>
+          )}
+        </button>
 
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
-          style={{ border: '1px solid var(--border-default)', color: 'var(--text-primary)', background: 'var(--bg-raised)' }}
-          title="Reset active tab to starter snippet"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
+          style={{
+            color: 'var(--text-secondary)',
+          }}
+          title="Reset to starter snippet"
         >
           <ArrowPathIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
           <span className="hidden min-[420px]:inline">Reset</span>
@@ -355,9 +364,8 @@ export function StudioTopBar(props: TopBarProps) {
 
       <span aria-hidden className="hidden flex-1 md:block" />
 
+      {/* Right — Templates + utils */}
       <div className="flex flex-wrap items-center gap-2">
-        <LangPills lang={lang} onChange={onLangChange} />
-        <LayoutPills mode={layout} onChange={onLayoutChange} />
         <TemplatesMenu onLoad={onLoadTemplate} />
 
         <div
@@ -369,14 +377,10 @@ export function StudioTopBar(props: TopBarProps) {
             onClick={onOpenPalette}
             className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98]"
             style={{ color: 'var(--text-secondary)' }}
-            title="Open command palette"
+            title="Open command palette (⌘K)"
           >
             <CommandLineIcon className="h-3.5 w-3.5" aria-hidden />
             <span className="hidden min-[480px]:inline">Cmd</span>
-            <span className="hidden items-center gap-0.5 min-[480px]:inline-flex">
-              <kbd className="kbd">⌘</kbd>
-              <kbd className="kbd">K</kbd>
-            </span>
           </button>
 
           <button
@@ -387,7 +391,6 @@ export function StudioTopBar(props: TopBarProps) {
             title="Copy share link"
           >
             <ShareIcon className="h-3.5 w-3.5" aria-hidden />
-            <span className="hidden min-[420px]:inline">{shareCopied ? 'Copied!' : 'Share'}</span>
           </button>
 
           <button
@@ -399,7 +402,6 @@ export function StudioTopBar(props: TopBarProps) {
             title="Download last preview"
           >
             <ArrowDownTrayIcon className="h-3.5 w-3.5" aria-hidden />
-            <span className="hidden min-[420px]:inline">Save</span>
           </button>
 
           <button
@@ -410,7 +412,6 @@ export function StudioTopBar(props: TopBarProps) {
             title="Show keyboard shortcuts (?)"
           >
             <QuestionMarkCircleIcon className="h-3.5 w-3.5" aria-hidden />
-            <span className="hidden min-[480px]:inline">Help</span>
           </button>
         </div>
 

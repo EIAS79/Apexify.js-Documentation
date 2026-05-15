@@ -143,7 +143,7 @@ export default function GalleryFilterBar({
     const el = railRef.current;
     if (!el) return;
     const dx = e.clientX - ds.startX;
-    if (ds.phase === 'pending' && Math.abs(dx) > 5) {
+    if (ds.phase === 'pending' && Math.abs(dx) > 12) {
       ds.phase = 'dragging';
       setIsDragging(true);
     }
@@ -471,46 +471,49 @@ function FilterChip({
       }}
       onDragStart={(e) => e.preventDefault()}
       data-active={active || undefined}
-      className="group shrink-0 h-9 inline-flex items-center gap-1.5 px-3 rounded-full text-[13px] font-semibold transition-all snap-start select-none"
+      className="group shrink-0 h-9 inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 rounded-xl text-[12px] sm:text-[13px] font-semibold transition-all snap-start select-none"
       style={
         active
           ? {
-              backgroundImage: `linear-gradient(135deg, ${accent}, var(--accent-magenta))`,
+              background: `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 60%, var(--accent-magenta)))`,
               color: 'white',
-              boxShadow: `0 0 22px -6px ${accent}`,
+              boxShadow: `0 2px 16px -4px ${accent}`,
               border: '1px solid transparent',
             }
           : {
-              backgroundColor: 'var(--bg-raised)',
+              backgroundColor: 'color-mix(in srgb, var(--bg-raised) 80%, transparent)',
               color: 'var(--text-secondary)',
-              border: '1px solid var(--border-default)',
+              border: `1px solid var(--border-default)`,
+              backdropFilter: 'blur(8px)',
             }
       }
       onMouseEnter={(e) => {
         if (!active) {
           e.currentTarget.style.borderColor = accent;
           e.currentTarget.style.color = 'var(--text-primary)';
+          e.currentTarget.style.backgroundColor = `color-mix(in srgb, ${accent} 8%, var(--bg-raised))`;
         }
       }}
       onMouseLeave={(e) => {
         if (!active) {
           e.currentTarget.style.borderColor = 'var(--border-default)';
           e.currentTarget.style.color = 'var(--text-secondary)';
+          e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--bg-raised) 80%, transparent)';
         }
       }}
     >
       <Icon
-        className="h-3.5 w-3.5 transition-transform group-hover:scale-110"
+        className="h-3.5 w-3.5 shrink-0"
         style={{ color: active ? 'white' : accent }}
       />
       <span className="hidden sm:inline">{label}</span>
       <span className="sm:hidden">{shortLabel ?? label}</span>
       <span
-        className="tabular-nums text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+        className="tabular-nums text-[10px] font-bold px-1.5 py-0.5 rounded-md"
         style={
           active
             ? { backgroundColor: 'rgba(0,0,0,0.22)', color: 'white' }
-            : { backgroundColor: 'var(--bg-sunken)', color: 'var(--text-tertiary)' }
+            : { backgroundColor: `color-mix(in srgb, ${accent} 12%, var(--bg-sunken))`, color: accent }
         }
       >
         {count}
