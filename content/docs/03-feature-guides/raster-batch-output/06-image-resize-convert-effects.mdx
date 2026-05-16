@@ -1,37 +1,71 @@
 # Resize, convert & effects {#06-image-resize-convert-effects}
 
-**`painter.image`** (**`painter-image-utils.ts`**) **`→`** **`core/general-functions`** **`/`** **`core/color`**. Most **`source`** **`/`** **`imagePath`** args accept **filesystem paths** (**resolved vs **`process.cwd()`**) **or **`http(s)`** URLs** where **`axios`** **`/`** **`fetch`** **`/`** **`loadImage`** is used (**see each helper**).
+**`painter.image.resize`** and **`painter.image.imgConverter`** resolve inputs with **`sharpFromResolvableInput`** (**`lib-next/core/general-functions.ts`**): **`Buffer`** bytes, **`http(s):`** URLs (**fetched**), **`data:image/...;base64,...`** (**`;base64,`** may be preceded by parameters such as **`charset`**), filesystem paths (**absolute paths are used as-is **`/`** relative **`→`** **`path.join(process.cwd(), …)`**).
+
+Other **`painter.image`** helpers (**`effects`**, **`colorsFilter`**, **`colorAnalysis`**, …**) still use their own loaders (**filesystem **`/`** **`axios`** **`/`** **`canvas`** **) **`—`** see those sections below.
 
 ---
 
 ## `resize(resizeOptions)`
 
-**`ResizeOptions`** (**`lib-next/types/video.ts`**): **`imagePath`** required; **`size`**; **`maintainAspectRatio`**; **`quality`** **`0`** **`–`** **`100`**; **`outputFormat`** **`png`** **`|`** **`jpeg`**.
+**`ResizeOptions`** (**`lib-next/types/video.ts`** **`/`** **`Sharp`** pipeline **)**:
+
+| Field | Role |
+|-------|------|
+| **`imagePath`** | **`string`** **`|`** **`Buffer`** (**sources matrix **`/`** opening paragraph**) |
+| **`size`** | **`width`** **`/`** **`height`** (**defaults **`/`** **`Sharp`** **`/`** **`general-functions`** **`resizingImg`** **) |
+| **`maintainAspectRatio`** | **`sharp.fit.inside`** vs **`fill`** |
+| **`quality`** | **`0`** **`–`** **`100`** (**PNG compression **`/`** **`sharp`** **) |
+| **`outputFormat`** | Typed **`png`** **`/`** **`jpeg`** (**reserved **`/`** **`resizingImg`** currently emits PNG **`Buffer`** **) |
 
 ```typescript
 import { ApexPainter } from 'apexify.js';
+import fs from 'node:fs';
 
 const painter = new ApexPainter();
 
-const jpegBuf = await painter.image.resize({
+const fromPath = await painter.image.resize({
   imagePath: './uploads/poster.png',
   size: { width: 1280 },
   maintainAspectRatio: true,
   quality: 88,
-  outputFormat: 'jpeg',
 });
+
+const fromBuf = await painter.image.resize({
+  imagePath: fs.readFileSync('./raw.webp'),
+  size: { width: 512, height: 512 },
+});
+
+const fromUrl = await painter.image.resize({
+  imagePath: 'https://cdn.example.com/assets/banner.jpg',
+  size: { height: 600 },
+  maintainAspectRatio: true,
+});
+
+const dataUrl = `data:image/png;base64,${fs.readFileSync('./icon.png').toString('base64')}`;
+const fromDataUrl = await painter.image.resize({ imagePath: dataUrl, size: { width: 64 } });
 ```
 
 ---
 
 ## `imgConverter(source, newExtension)`
 
-**`source`** non-empty **string** path **`/`** URL. **`newExtension`**: **`jpeg`**, **`png`**, **`webp`**, **`tiff`**, **`gif`**, **`avif`**, **`heif`**, **`raw`**, **`pdf`**, **`svg`** (**case-insensitive**).
+**`source`** **`string`** **`|`** **`Buffer`** — **same matrix as **`resize(imagePath)`**. **`newExtension`**: **`jpeg`**, **`png`**, **`webp`**, **`tiff`**, **`gif`**, **`avif`**, **`heif`**, **`raw`**, **`pdf`**, **`svg`** (**case-insensitive **`/`** **`sharp.toFormat`** **)**.
 
 ```typescript
+import { ApexPainter } from 'apexify.js';
+import fs from 'node:fs';
+
 const painter = new ApexPainter();
 
 const webpBuf = await painter.image.imgConverter('./exports/frame.png', 'webp');
+
+const webpFromBytes = await painter.image.imgConverter(fs.readFileSync('./frame.png'), 'webp');
+
+const pngFromRemote = await painter.image.imgConverter('https://cdn.example.com/x.jpg', 'png');
+
+const inline = `data:image/jpeg;base64,${fs.readFileSync('./snap.jpg').toString('base64')}`;
+const pngFromDataUrl = await painter.image.imgConverter(inline, 'png');
 ```
 
 ---

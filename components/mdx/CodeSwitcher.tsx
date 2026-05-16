@@ -11,6 +11,8 @@ interface CodeSwitcherProps {
   children?: React.ReactNode;
   /** Outer spacing (default `my-4`; use `my-0` when nested inside cards). */
   className?: string;
+  /** When true (documentation), show “Open in Studio” on TS/JS panes when runnable. */
+  docsStudio?: boolean;
 }
 
 export function CodeSwitcher({ 
@@ -20,6 +22,7 @@ export function CodeSwitcher({
   jsLabel = 'JavaScript',
   children,
   className = 'my-4',
+  docsStudio = false,
 }: CodeSwitcherProps) {
   let tsCode = ts;
   let jsCode = js;
@@ -70,10 +73,14 @@ export function CodeSwitcher({
       {/* Code block - hide header since we have tabs */}
       <div className="mt-0">
         {active === 'ts' && tsCode && (
-          <CodeBlock lang="typescript" hideHeader={true}>{tsCode}</CodeBlock>
+          <CodeBlock lang="typescript" hideHeader docsStudio={docsStudio}>
+            {tsCode}
+          </CodeBlock>
         )}
         {active === 'js' && jsCode && (
-          <CodeBlock lang="javascript" hideHeader={true}>{jsCode}</CodeBlock>
+          <CodeBlock lang="javascript" hideHeader docsStudio={docsStudio}>
+            {jsCode}
+          </CodeBlock>
         )}
       </div>
     </div>

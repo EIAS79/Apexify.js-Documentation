@@ -44,11 +44,25 @@ await fs.promises.writeFile('./blended.png', blended);
 
 ## `cropImage(options)`
 
-**`cropOptions`** (**`types/common.ts`**): **`coordinates`** — **at least three** **`cropCoordinate`** segments (**each **`from`** **`/`** **`to`**); **`imageSource`** — path **`/`** URL **`/`** identifier **`cropRasterImage`** can load; **`crop`** **`inner`** **`|`** **`outer`**; **`radius`** **`number`** **`|`** **`circular`**.
+**`cropRasterImage`** (**`crop-raster.ts`**) delegates to **`cropInner`** **`/`** **`cropOuter`** (**`core/general-functions.ts`**). **`imageSource`**: **`http`** **`/`** **`https`** loads remotely; otherwise the path is **`path.join(process.cwd(), imageSource)`** (**relative to the process working directory**).
 
-**`inner`**: rectangular crop using the bounding box of every **`from`** **`/`** **`to`** pair (**optional rounded clip via **`radius`** **`/`** **`circular`**). **`outer`**: builds a closed polygon through the coordinate segments (**optional **`tension`** per segment for Bézier smoothing**) and clears pixels **inside** that shape (**surrounding image remains**).
+**`cropOptions`** (**`types/common.ts`**): **`coordinates`** (**≥** **`3`** **`cropCoordinate`** rows **`{ from, to, tension? }`**); **`crop`** **`inner`** **`|`** **`outer`**; **`radius`** (**required **`—`** interpreted only for **`inner`**, **`0`** when **`crop`** **`=`** **`outer`**).
+
+### What **`coordinates`** actually do
+
+**`inner`** (**rectangle crop**): **every** **`from`** **`/`** **`to`** **`x`** **`/`** **`y`** across **all** rows feeds **`min`** **`/`** **`max`** **`→`** axis-aligned bbox **`[minX, minY]`** **`→`** **`[maxX, maxY]`** in **image pixel space**. Segment geometry beyond those extremes does **not** change the rectangle (**four edge-like rows are conventional**; you could add redundant probes). **`radius`** **`/`** **`circular`** clips that bbox (**square corners **`=`** **`radius`** **`0`**).
+
+**`outer`** (**punch a hole**): Builds **one closed path**: **`moveTo(coordinates[0].from)`**, then for each index **`i`** a **`bezierCurveTo`** ending at **`coordinates[i].to`**, using **`coordinates[i].tension`** and the **next** segment’s **`from`** **`/`** **`to`** (**the loop wraps from the last segment back to the first**). **`clip`** to interior **`→`** **`clearRect`** clears **inside** the polygon **`→`** **transparent hole**; pixels **outside** stay (**output keeps source **`width`** **`×`** **`height`**).
+
+### Pick **`inner`** vs **`outer`**
+
+| Goal | Mode |
+|------|------|
+| Export a smaller raster (**boxed region**, optional rounded corners) | **`inner`** |
+| Erase **`/`** knock out an irregular region (**frame **`/`** sticker **`/`** blob**) | **`outer`** |
 
 ```typescript
+// Inner: bbox over ALL points → cropped PNG (rounded corners via radius).
 const innerCrop = await painter.image.cropImage({
   imageSource: './poster.jpg',
   crop: 'inner',
@@ -61,14 +75,15 @@ const innerCrop = await painter.image.cropImage({
   ],
 });
 
+// Outer: triangle hole; tension smooths transitions between anchors (try 0–0.25).
 const outerCrop = await painter.image.cropImage({
   imageSource: './texture.png',
   crop: 'outer',
   radius: 0,
   coordinates: [
-    { from: { x: 0, y: 0 }, to: { x: 400, y: 0 } },
-    { from: { x: 400, y: 0 }, to: { x: 200, y: 300 } },
-    { from: { x: 200, y: 300 }, to: { x: 0, y: 0 } },
+    { from: { x: 0, y: 0 }, to: { x: 400, y: 0 }, tension: 0 },
+    { from: { x: 400, y: 0 }, to: { x: 200, y: 300 }, tension: 0.15 },
+    { from: { x: 200, y: 300 }, to: { x: 0, y: 0 }, tension: 0 },
   ],
 });
 ```
@@ -133,6 +148,8 @@ const spotlight = await painter.image.gradientBlend('./product.png', {
   maskSource: './spot-alpha.png',
 });
 ```
+
+---
 
 ## Composition mindset
 

@@ -1041,7 +1041,7 @@ export function ComparisonGrid() {
                 <span>Not included</span>
               </span>
             </div>
-            <span className="font-mono">last reviewed · v5.4.3</span>
+            <span className="font-mono">last reviewed · v5.4.4</span>
           </div>
         </div>
       </div>
@@ -1199,7 +1199,7 @@ export function SiteFooter() {
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-mono" style={{ backgroundColor: 'var(--bg-sunken)', color: 'var(--text-secondary)' }}>
               <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: 'var(--success)' }} />
-              v5.4.3
+              v5.4.4
             </span>
             <span className="font-mono">MIT licensed</span>
           </div>

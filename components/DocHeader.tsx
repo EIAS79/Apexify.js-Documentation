@@ -20,7 +20,7 @@ const NAV_LINKS = [
   { href: '/docs#00-start-here', label: 'Docs' },
 ] as const;
 
-const PACKAGE_VERSION = 'v5.4.3';
+const PACKAGE_VERSION = '4';
 
 export default function DocHeader() {
   const pathname = usePathname();
@@ -40,11 +40,17 @@ export default function DocHeader() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const isDocsRoute = pathname === '/docs' || pathname?.startsWith('/docs/');
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setPaletteOpen((v) => !v);
+        if (isDocsRoute) {
+          document.getElementById('docs-sidebar-search-input')?.focus();
+        } else {
+          setPaletteOpen((v) => !v);
+        }
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
         e.preventDefault();
         toggleSidebar();
@@ -52,7 +58,7 @@ export default function DocHeader() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [toggleSidebar]);
+  }, [toggleSidebar, isDocsRoute]);
 
   const navIsActive = (href: string) => {
     if (href === '/') return pathname === '/';
@@ -160,41 +166,45 @@ export default function DocHeader() {
 
           <span aria-hidden className="flex-1" />
 
-          {/* Search trigger */}
-          <button
-            type="button"
-            onClick={() => setPaletteOpen(true)}
-            className="hidden items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors sm:inline-flex"
-            style={{
-              border: '1px solid var(--border-default)',
-              color: 'var(--text-tertiary)',
-              backgroundColor: 'color-mix(in srgb, var(--bg-raised) 80%, transparent)',
-              minWidth: '14rem',
-            }}
-            aria-label="Search documentation"
-            title="Search docs (⌘K)"
-          >
-            <MagnifyingGlassIcon className="h-4 w-4 shrink-0" aria-hidden />
-            <span className="flex-1 text-left">Search docs…</span>
-            <span className="inline-flex shrink-0 items-center gap-1">
-              <kbd className="kbd">⌘</kbd>
-              <kbd className="kbd">K</kbd>
-            </span>
-          </button>
+          {/* Search: modal palette elsewhere; on docs the sidebar search is primary */}
+          {!isDocsRoute && (
+            <>
+              <button
+                type="button"
+                onClick={() => setPaletteOpen(true)}
+                className="hidden items-center gap-2 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors sm:inline-flex"
+                style={{
+                  border: '1px solid var(--border-default)',
+                  color: 'var(--text-tertiary)',
+                  backgroundColor: 'color-mix(in srgb, var(--bg-raised) 80%, transparent)',
+                  minWidth: '14rem',
+                }}
+                aria-label="Search documentation"
+                title="Search docs (⌘K)"
+              >
+                <MagnifyingGlassIcon className="h-4 w-4 shrink-0" aria-hidden />
+                <span className="flex-1 text-left">Search docs…</span>
+                <span className="inline-flex shrink-0 items-center gap-1">
+                  <kbd className="kbd">⌘</kbd>
+                  <kbd className="kbd">K</kbd>
+                </span>
+              </button>
 
-          <button
-            type="button"
-            onClick={() => setPaletteOpen(true)}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-lg transition-colors sm:hidden"
-            style={{
-              border: '1px solid var(--border-default)',
-              color: 'var(--text-secondary)',
-              backgroundColor: 'var(--bg-raised)',
-            }}
-            aria-label="Search documentation"
-          >
-            <MagnifyingGlassIcon className="h-5 w-5" aria-hidden />
-          </button>
+              <button
+                type="button"
+                onClick={() => setPaletteOpen(true)}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-lg transition-colors sm:hidden"
+                style={{
+                  border: '1px solid var(--border-default)',
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'var(--bg-raised)',
+                }}
+                aria-label="Search documentation"
+              >
+                <MagnifyingGlassIcon className="h-5 w-5" aria-hidden />
+              </button>
+            </>
+          )}
 
           {/* Version pill (desktop) */}
           <span
@@ -291,7 +301,7 @@ export default function DocHeader() {
         )}
       </header>
 
-      <DocsSearchPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+      <DocsSearchPalette open={paletteOpen && !isDocsRoute} onClose={() => setPaletteOpen(false)} />
     </>
   );
 }

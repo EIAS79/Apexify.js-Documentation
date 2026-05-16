@@ -1,30 +1,38 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
 /**
- * Custom cursor — magnetic shape-morph design.
+ * Feather Icons “mouse-pointer” polygon geometry (same classic silhouette adopted by Lucide;
+ * ISC — https://feathericons.com ). We only draw the arrow outline; hotspot matches the pixel
+ * tip at `(3,3)` in their 24×24 view box.
  *
- *   • Dot         — precise pointer indicator (zero-lag, blends with bg).
- *   • Wrap        — a single morphing shape:
- *                     · default → small circle eased toward pointer
- *                     · hovering an interactive element → snaps to that
- *                       element's bounding rect + border-radius (magnetic
- *                       wrap), with smooth lerped width/height/x/y/radius
- *                     · hovering text  → tiny accent underline near pointer
+ *   • Idle: gradient-outlined arrow + neon glow pass.
+ *   • Dot  — precise centre when hovering text / magnetic targets.
+ *   • Wrap — morphing ring (magnet / text underline).
  *
- * No ambient bloom. All driven by direct DOM transforms in a RAF loop —
- * no React state churn during movement.
+ * Driven with direct DOM + RAF (no React state per frame).
  */
+const POINTER_VIEWBOX = 24;
+const POINTER_DISPLAY_PX = 28;
+/** Click point at the arrow tip in user space `(3,3)` → raster coordinates for our ~28px render. */
+const POINTER_HOTSPOT_X = (3 / POINTER_VIEWBOX) * POINTER_DISPLAY_PX;
+const POINTER_HOTSPOT_Y = (3 / POINTER_VIEWBOX) * POINTER_DISPLAY_PX;
+/** Feather ISC: closed arrow pointer silhouette (absolute coords). */
+const POINTER_PATH_D = 'M3 3 L10.07 19.97 L12.58 12.58 L19.97 10.07 Z';
+
 export default function CustomCursor() {
+  const cursorUid = useId().replace(/:/g, '');
+  const gradientId = `apex-cursor-grad-${cursorUid}`;
+  const pointerRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
   /* Magnet shape-morph is gated to homepage + docs only.
-     Everywhere else (gallery, studio, etc.) keeps the default
-     dot + small ring + text accent — no element-wrap behavior. */
+     Everywhere else (gallery, studio, etc.) keeps the arrow + dot + text
+     accent — no element-wrap behavior. */
   const magnetEnabledRef = useRef(false);
   magnetEnabledRef.current =
     pathname === '/' || pathname === '' || (pathname?.startsWith('/docs') ?? false);
@@ -37,9 +45,10 @@ export default function CustomCursor() {
 
     document.documentElement.classList.add('has-custom-cursor');
 
+    const pointer = pointerRef.current;
     const dot = dotRef.current;
     const wrap = wrapRef.current;
-    if (!dot || !wrap) return;
+    if (!pointer || !dot || !wrap) return;
 
     /* ---- mouse target ---- */
     const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -120,6 +129,24 @@ export default function CustomCursor() {
       return Boolean(text);
     };
 
+    const applyLayerVisibility = () => {
+      if (!visible) {
+        pointer.style.opacity = '0';
+        dot.style.opacity = '0';
+        wrap.style.opacity = '0';
+        return;
+      }
+      if (mode === 'default') {
+        pointer.style.opacity = '1';
+        dot.style.opacity = '0';
+        wrap.style.opacity = '0';
+      } else {
+        pointer.style.opacity = '0';
+        dot.style.opacity = '1';
+        wrap.style.opacity = '1';
+      }
+    };
+
     const recompute = (el: Element | null) => {
       const newMagnet = findMagnetTarget(el);
       if (newMagnet) {
@@ -129,6 +156,7 @@ export default function CustomCursor() {
           wrap.dataset.mode = 'magnet';
         }
         updateMagnetTarget();
+        applyLayerVisibility();
         return;
       }
       magnetEl = null;
@@ -138,6 +166,7 @@ export default function CustomCursor() {
           wrap.dataset.mode = 'text';
         }
         setTextTarget();
+        applyLayerVisibility();
         return;
       }
       if (mode !== 'default') {
@@ -145,6 +174,7 @@ export default function CustomCursor() {
         wrap.dataset.mode = 'default';
       }
       setDefaultTarget();
+      applyLayerVisibility();
     };
 
     const onMove = (e: MouseEvent) => {
@@ -152,21 +182,25 @@ export default function CustomCursor() {
       target.y = e.clientY;
       if (!visible) {
         visible = true;
-        dot.style.opacity = '1';
-        wrap.style.opacity = '1';
       }
+      pointer.style.transform = `translate3d(${e.clientX - POINTER_HOTSPOT_X}px, ${e.clientY - POINTER_HOTSPOT_Y}px, 0)`;
       dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
       recompute(e.target as Element);
     };
 
     const onLeave = () => {
       visible = false;
-      dot.style.opacity = '0';
-      wrap.style.opacity = '0';
+      applyLayerVisibility();
     };
 
-    const onDown = () => { wrap.dataset.pressed = 'true'; };
-    const onUp = () => { delete wrap.dataset.pressed; };
+    const onDown = () => {
+      wrap.dataset.pressed = 'true';
+      pointer.dataset.pressed = 'true';
+    };
+    const onUp = () => {
+      delete wrap.dataset.pressed;
+      delete pointer.dataset.pressed;
+    };
 
     /* Recompute magnet target on scroll/resize since the bound element moves */
     const onScrollOrResize = () => {
@@ -183,10 +217,12 @@ export default function CustomCursor() {
       cur.h += (tgt.h - cur.h) * sizeEase;
       cur.r += (tgt.r - cur.r) * sizeEase;
 
-      wrap.style.width = `${cur.w}px`;
-      wrap.style.height = `${cur.h}px`;
-      wrap.style.borderRadius = `${cur.r}px`;
-      wrap.style.transform = `translate3d(${cur.x}px, ${cur.y}px, 0) translate(-50%, -50%)`;
+      if (mode !== 'default') {
+        wrap.style.width = `${cur.w}px`;
+        wrap.style.height = `${cur.h}px`;
+        wrap.style.borderRadius = `${cur.r}px`;
+        wrap.style.transform = `translate3d(${cur.x}px, ${cur.y}px, 0) translate(-50%, -50%)`;
+      }
 
       raf = requestAnimationFrame(tick);
     };
@@ -213,6 +249,50 @@ export default function CustomCursor() {
 
   return (
     <>
+      <div
+        ref={pointerRef}
+        aria-hidden
+        className="custom-cursor-pointer"
+        style={{ opacity: 0 }}
+      >
+        <svg
+          className="custom-cursor-pointer__svg"
+          width={POINTER_DISPLAY_PX}
+          height={POINTER_DISPLAY_PX}
+          viewBox={`0 0 ${POINTER_VIEWBOX} ${POINTER_VIEWBOX}`}
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden
+        >
+          <defs>
+            <linearGradient id={gradientId} x1="2" y1="3" x2="22" y2="21" gradientUnits="userSpaceOnUse">
+              <stop stopColor="var(--accent-iris)" />
+              <stop offset="0.5" stopColor="var(--accent-magenta)" />
+              <stop offset="1" stopColor="var(--accent-amber)" />
+            </linearGradient>
+          </defs>
+          {/* Glow pass beneath the crisp stroke (neon halo without adding a runtime dependency). */}
+          <path
+            aria-hidden
+            d={POINTER_PATH_D}
+            fill="none"
+            stroke={`url(#${gradientId})`}
+            strokeWidth="3.2"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            opacity={0.22}
+          />
+          <path
+            className="custom-cursor-pointer__shape"
+            d={POINTER_PATH_D}
+            stroke={`url(#${gradientId})`}
+            strokeWidth="1.25"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            paintOrder="stroke fill"
+          />
+        </svg>
+      </div>
       <div
         ref={wrapRef}
         aria-hidden

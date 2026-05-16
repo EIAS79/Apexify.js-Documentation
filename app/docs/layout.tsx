@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import DocHeader from '@/components/DocHeader';
 
 export default function DocsLayout({
@@ -7,6 +8,11 @@ export default function DocsLayout({
 }: {
   children: React.ReactNode;
 }) {
+  useEffect(() => {
+    document.documentElement.classList.add('docs-scrollbar-theme');
+    return () => document.documentElement.classList.remove('docs-scrollbar-theme');
+  }, []);
+
   return (
     <div
       className="relative min-h-screen overflow-hidden transition-colors duration-300"

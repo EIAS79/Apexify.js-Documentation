@@ -54,7 +54,7 @@ export function DocsSearchPalette({
   const [searching, setSearching] = useState(false);
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<number>(0);
 
   useEffect(() => {
@@ -107,9 +107,8 @@ export function DocsSearchPalette({
     if (typeof window === 'undefined') return;
     const path = window.location.pathname.replace(/\/$/, '') || '/';
     if (path === '/docs') {
-      // Same route: `router.push` updates the hash via the History API but does not
-      // fire `hashchange`, and `app/docs/page.tsx` only reloads MDX on `hashchange`.
       window.location.hash = filename;
+      window.dispatchEvent(new CustomEvent('docHashChange'));
       window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
     } else {
       router.push(`/docs#${filename}`);
@@ -171,7 +170,7 @@ export function DocsSearchPalette({
             role="dialog"
             aria-modal="true"
             aria-label="Search documentation"
-            className="w-full max-w-2xl overflow-hidden rounded-2xl"
+            className="flex max-h-[min(92vh,40rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl"
             style={{
               backgroundColor: 'var(--bg-raised)',
               border: '1px solid var(--border-default)',
@@ -179,7 +178,7 @@ export function DocsSearchPalette({
             }}
           >
             <div
-              className="flex items-center gap-2 px-4 py-3.5"
+              className="flex shrink-0 items-center gap-2 px-4 py-3.5"
               style={{ borderBottom: '1px solid var(--border-subtle)' }}
             >
               <MagnifyingGlassIcon
@@ -211,54 +210,58 @@ export function DocsSearchPalette({
               <kbd className="kbd hidden sm:inline-flex">esc</kbd>
             </div>
 
-            <ul
+            <div
               ref={listRef}
-              className="max-h-[60vh] overflow-y-auto py-1"
+              className="apex-scroll min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain px-2 py-1"
               role="listbox"
+              style={{ scrollbarGutter: 'stable' }}
+              aria-label="Documentation search results"
             >
               {!searching && query.trim().length < 2 && (
-                <li className="px-5 py-10 text-center" style={{ color: 'var(--text-tertiary)' }}>
+                <div className="px-4 py-10 text-center" style={{ color: 'var(--text-tertiary)' }}>
                   <p className="text-sm">Start typing to search documentation</p>
                   <p className="mt-1 text-[11px]" style={{ color: 'var(--text-muted)' }}>
                     Try “canvas”, “gif”, or “createChart”
                   </p>
-                </li>
+                </div>
               )}
 
               {!searching && query.trim().length >= 2 && results.length === 0 && (
-                <li className="px-5 py-10 text-center text-sm" style={{ color: 'var(--text-tertiary)' }}>
+                <div className="px-4 py-10 text-center text-sm" style={{ color: 'var(--text-tertiary)' }}>
                   No matches for <span style={{ color: 'var(--text-secondary)' }}>“{query}”</span>.
-                </li>
+                </div>
               )}
 
               {grouped.map(([groupName, items]) => {
                 const startIdx = flat.findIndex((r) => r === items[0]);
                 return (
-                  <li key={groupName}>
+                  <div key={groupName} className="min-w-0" role="presentation">
                     <p
-                      className="sticky top-0 z-10 px-5 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em]"
+                      className="sticky top-0 z-10 border-b px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.22em]"
                       style={{
                         color: 'var(--accent-magenta)',
                         backgroundColor: 'color-mix(in srgb, var(--bg-raised) 96%, transparent)',
+                        borderBottomColor: 'color-mix(in srgb, var(--border-default) 72%, transparent)',
                         backdropFilter: 'blur(8px)',
                       }}
                     >
                       {groupName}
                     </p>
-                    <ul>
+                    <div className="mx-1 mb-2 min-w-0 space-y-1">
                       {items.map((r, i) => {
                         const idx = startIdx + i;
                         const isActive = idx === active;
                         return (
-                          <li
+                          <button
                             key={`${r.filename}-${idx}`}
+                            type="button"
                             id={`docs-palette-${idx}`}
                             data-idx={idx}
                             role="option"
                             aria-selected={isActive}
                             onMouseEnter={() => setActive(idx)}
                             onClick={() => goTo(r.filename)}
-                            className="mx-2 flex cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 transition-colors"
+                            className="flex min-w-0 w-full cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors"
                             style={{
                               backgroundColor: isActive
                                 ? 'color-mix(in srgb, var(--accent-iris) 14%, transparent)'
@@ -266,7 +269,7 @@ export function DocsSearchPalette({
                             }}
                           >
                             <span
-                              className="mt-0.5 inline-flex h-5 items-center rounded-md px-1.5 text-[9px] font-bold uppercase tracking-wider"
+                              className="mt-0.5 inline-flex h-5 shrink-0 items-center rounded-md px-1.5 text-[9px] font-bold uppercase tracking-wider"
                               style={{
                                 background: `color-mix(in srgb, ${MATCH_COLOR[r.matchType]} 18%, transparent)`,
                                 color: MATCH_COLOR[r.matchType],
@@ -278,14 +281,14 @@ export function DocsSearchPalette({
                             </span>
                             <span className="min-w-0 flex-1">
                               <span
-                                className="block truncate text-sm font-semibold"
+                                className="block break-words text-sm font-semibold line-clamp-2"
                                 style={{ color: 'var(--text-primary)' }}
                               >
                                 {r.name}
                               </span>
                               {r.snippet && (
                                 <span
-                                  className="mt-0.5 block line-clamp-2 text-[11px] leading-snug"
+                                  className="mt-0.5 block break-words line-clamp-2 text-[11px] leading-snug"
                                   style={{ color: 'var(--text-tertiary)' }}
                                 >
                                   …{r.snippet}…
@@ -295,17 +298,17 @@ export function DocsSearchPalette({
                             {isActive && (
                               <kbd className="kbd ml-auto hidden shrink-0 sm:inline-flex">↵</kbd>
                             )}
-                          </li>
+                          </button>
                         );
                       })}
-                    </ul>
-                  </li>
+                    </div>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
 
             <div
-              className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px]"
+              className="flex shrink-0 flex-wrap items-center justify-between gap-2 px-4 py-2 text-[11px]"
               style={{
                 borderTop: '1px solid var(--border-subtle)',
                 color: 'var(--text-tertiary)',

@@ -16,6 +16,7 @@ import {
   DocSubfolder,
   sectionAccent,
 } from '@/lib/docs-nav-utils';
+import { DocsSidebarSearch } from '@/components/docs/DocsSidebarSearch';
 import { SectionAccentIcon } from '@/components/docs/SectionAccentIcon';
 
 /** Full path under the section, e.g. `video-ffmpeg` or `video-ffmpeg/options`. */
@@ -455,7 +456,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
 
       <aside
         data-sidebar="left"
-        className={`fixed left-0 top-16 bottom-0 z-40 h-[calc(100vh-4rem)] transition-transform duration-300 ${
+        className={`fixed left-0 top-16 bottom-0 z-40 flex h-[calc(100vh-4rem)] flex-col overflow-hidden transition-transform duration-300 ${
           visible ? `${SIDEBAR_WIDTH_OPEN} translate-x-0` : '-translate-x-full lg:translate-x-0 lg:w-0'
         }`}
         style={{
@@ -464,11 +465,11 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
           WebkitBackdropFilter: 'blur(18px) saturate(140%)',
           borderRight: visible ? '1px solid var(--border-default)' : 'none',
           boxShadow: visible ? 'var(--shadow-md)' : 'none',
-          overflow: visible ? 'auto' : 'hidden',
         }}
       >
         {visible && (
-          <div className="min-w-0 px-3 pb-8 pt-4 sm:px-4">
+          <div className="apex-scroll flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain">
+            <div className="min-w-0 px-3 pb-8 pt-4 sm:px-4">
             {isMobile && (
               <div
                 className="mb-3 flex items-center justify-between pb-3"
@@ -507,6 +508,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
               </div>
             ) : (
               <nav className="space-y-1">
+                <DocsSidebarSearch />
                 {rootFiles.length > 0 && (
                   <div className="mb-2">
                     {rootFiles.map((file) => renderFile(file, 0, 'var(--accent-iris)'))}
@@ -515,6 +517,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
                 {folders.map((folder) => renderFolder(folder))}
               </nav>
             )}
+            </div>
           </div>
         )}
       </aside>

@@ -198,6 +198,7 @@ body {
   }
 }
 
+.custom-cursor-pointer,
 .custom-cursor-dot,
 .custom-cursor-wrap {
   position: fixed;
@@ -206,6 +207,33 @@ body {
   pointer-events: none;
   will-change: transform, width, height, border-radius, opacity;
   z-index: 99999;
+}
+
+/* Idle “normal” cursor: arrow outline matches sunset palette */
+.custom-cursor-pointer {
+  transition: opacity 0.18s ease;
+}
+
+.custom-cursor-pointer__svg {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent-magenta) 22%, transparent))
+    drop-shadow(0 2px 6px color-mix(in srgb, var(--accent-iris) 16%, transparent));
+  transform-origin: 12.5% 12.5%;
+  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.custom-cursor-pointer__shape {
+  fill: color-mix(in srgb, var(--bg-raised) 86%, transparent);
+}
+
+.dark .custom-cursor-pointer__shape {
+  fill: color-mix(in srgb, var(--bg-elevated) 42%, transparent);
+  opacity: 0.97;
+}
+
+.custom-cursor-pointer[data-pressed="true"] .custom-cursor-pointer__svg {
+  transform: scale(0.92);
 }
 
 .custom-cursor-dot {
@@ -247,29 +275,75 @@ body {
   background: color-mix(in srgb, var(--accent-magenta) 16%, transparent);
   border-color: var(--accent-magenta);
 }
-.custom-cursor-wrap[data-pressed="true"][data-mode="default"] {
-  background: color-mix(in srgb, var(--accent-magenta) 18%, transparent);
-  border-color: var(--accent-magenta);
-}
 
 /* ============================================================
-   Scrollbars (token-driven so they swap with theme)
+   Scrollbars — default (whole app) + slim nested `.apex-scroll`
+   Token-driven; nested panels use thinner rails so sidebars /
+   overlays don’t feel “broken” next to chunky system scrollbars.
    ============================================================ */
 
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-sunken);
+  background: color-mix(in srgb, var(--bg-base) 80%, transparent);
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 6px;
-  border: 2px solid var(--bg-sunken);
+  background: color-mix(in srgb, var(--accent-magenta) 28%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-iris);
+  background: color-mix(in srgb, var(--accent-iris) 45%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox — page / generic scroll surfaces */
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent-magenta) 40%, transparent)
+    color-mix(in srgb, var(--bg-sunken) 35%, transparent);
+}
+
+/* Narrow rail for docs sidebars, search dropdown, TOC, code drawers */
+.apex-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent-iris) 50%, transparent)
+    color-mix(in srgb, var(--border-subtle) 80%, transparent);
+}
+.apex-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.apex-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  margin-block: 2px;
+}
+.apex-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--accent-magenta) 38%, transparent);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  border-radius: 999px;
+}
+.apex-scroll::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--accent-iris) 55%, transparent);
+}
+
+/** Docs routes: softer window scrollbar alongside `.apex-scroll` panels */
+html.docs-scrollbar-theme {
+  scrollbar-color: color-mix(in srgb, var(--accent-magenta) 35%, transparent)
+    color-mix(in srgb, var(--bg-canvas) 40%, transparent);
+}
+html.docs-scrollbar-theme::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--border-subtle) 45%, transparent);
 }
 
 /* Drag-to-scroll tracks hide their scrollbars while keeping

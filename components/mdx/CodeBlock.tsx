@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { ClipboardIcon, CheckIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ClipboardIcon, CheckIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { composeStudioSnippetFromDocs, STUDIO_INCOMING_SNIPPET_KEY } from '@/lib/studio/studioConfig';
 
 interface CodeBlockProps {
   children?: React.ReactNode;
@@ -11,9 +14,19 @@ interface CodeBlockProps {
   lang?: string;
   filename?: string;
   hideHeader?: boolean;
+  /** When true (documentation pages), show “Open in Studio” for runnable TS/JS fences. */
+  docsStudio?: boolean;
 }
 
-export function CodeBlock({ children, className, lang, filename, hideHeader = false }: CodeBlockProps) {
+export function CodeBlock({
+  children,
+  className,
+  lang,
+  filename,
+  hideHeader = false,
+  docsStudio = false,
+}: CodeBlockProps) {
+  const router = useRouter();
   const [copied, setCopied] = useState(false);
   let code = typeof children === 'string' 
     ? children 
@@ -24,6 +37,18 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
   code = code.replace(/^```[\w]*\n?/, '').replace(/\n?```$/, '').trim();
   
   const language = lang || className?.replace('language-', '') || 'text';
+
+  const studioPayload = docsStudio ? composeStudioSnippetFromDocs(code, language) : null;
+
+  const openInStudio = () => {
+    if (!studioPayload) return;
+    try {
+      localStorage.setItem(STUDIO_INCOMING_SNIPPET_KEY, JSON.stringify(studioPayload));
+    } catch {
+      /* ignore quota / privacy mode */
+    }
+    router.push('/studio');
+  };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(code);
@@ -63,6 +88,20 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
             </div>
             <div className="flex items-center gap-3">
               <span className="text-xs text-emerald-400 uppercase font-bold px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30">{normalizeLanguage(language)}</span>
+              {studioPayload && (
+                <Link
+                  href="/studio"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    openInStudio();
+                  }}
+                  className="flex items-center gap-1.5 text-xs text-violet-300 hover:text-white transition-colors duration-150 px-3 py-1.5 rounded-lg hover:bg-slate-700 border border-violet-500/35 hover:border-violet-400/60"
+                  title="Open this snippet in Studio and run it"
+                >
+                  <RocketLaunchIcon className="h-3.5 w-3.5" aria-hidden />
+                  <span>Studio</span>
+                </Link>
+              )}
               <button
                 onClick={copyToClipboard}
                 className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition-colors duration-150 px-3 py-1.5 rounded-lg hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50"
@@ -115,24 +154,41 @@ export function CodeBlock({ children, className, lang, filename, hideHeader = fa
           </SyntaxHighlighter>
           </div>
           
-          {/* Copy button for when header is hidden */}
+          {/* Toolbar when header is hidden */}
           {hideHeader && (
-            <button
-              onClick={copyToClipboard}
-              className="absolute top-2 right-2 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-400 hover:text-white dark:hover:text-white transition-all duration-200 px-2 py-1 rounded bg-gray-800/80 dark:bg-gray-800/80 hover:bg-gray-700 dark:hover:bg-gray-700"
-            >
-              {copied ? (
-                <>
-                  <CheckIcon className="h-3.5 w-3.5 text-green-400" />
-                  <span className="text-green-400">Copied</span>
-                </>
-              ) : (
-                <>
-                  <ClipboardIcon className="h-3.5 w-3.5" />
-                  <span>Copy</span>
-                </>
+            <div className="absolute top-2 right-2 z-[1] flex flex-wrap items-center justify-end gap-2">
+              {studioPayload && (
+                <Link
+                  href="/studio"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    openInStudio();
+                  }}
+                  className="flex items-center gap-1.5 text-xs text-violet-300 hover:text-white transition-all px-2 py-1 rounded bg-gray-800/80 hover:bg-gray-700 border border-violet-500/35"
+                  title="Open in Studio"
+                >
+                  <RocketLaunchIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                  <span>Studio</span>
+                </Link>
               )}
-            </button>
+              <button
+                type="button"
+                onClick={copyToClipboard}
+                className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-400 hover:text-white dark:hover:text-white transition-all duration-200 px-2 py-1 rounded bg-gray-800/80 dark:bg-gray-800/80 hover:bg-gray-700 dark:hover:bg-gray-700"
+              >
+                {copied ? (
+                  <>
+                    <CheckIcon className="h-3.5 w-3.5 text-green-400" />
+                    <span className="text-green-400">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <ClipboardIcon className="h-3.5 w-3.5" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
+            </div>
           )}
         </div>
       </div>

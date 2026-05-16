@@ -106,7 +106,11 @@ function createMarkdownAwareComponents(getNextHeadingId: () => string | undefine
       const codeString = String(children).replace(/\n$/, '');
 
       if (!inline && lang) {
-        return <CodeBlock lang={lang}>{codeString}</CodeBlock>;
+        return (
+          <CodeBlock lang={lang} docsStudio>
+            {codeString}
+          </CodeBlock>
+        );
       }
 
       return (
@@ -425,6 +429,7 @@ function renderComponent(
           js={component.props.js}
           tsLabel={component.props.tsLabel}
           jsLabel={component.props.jsLabel}
+          docsStudio
         />
       );
     case 'Dropdown':

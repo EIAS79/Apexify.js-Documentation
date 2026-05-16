@@ -199,7 +199,10 @@ export default function OnThisPage({
                 <XMarkIcon className="h-5 w-5" aria-hidden />
               </button>
             </div>
-            <div className="overflow-y-auto px-4 py-3" style={{ maxHeight: 'calc(70vh - 3.25rem)' }}>
+            <div
+              className="apex-scroll overflow-y-auto overscroll-y-contain px-4 py-3"
+              style={{ maxHeight: 'calc(70vh - 3.25rem)' }}
+            >
               {renderTocList()}
             </div>
           </div>
@@ -220,7 +223,7 @@ export default function OnThisPage({
         }}
         aria-hidden={isDesktop && !desktopTocExpanded}
       >
-        <div className="h-full overflow-y-auto px-4 py-5">
+        <div className="apex-scroll h-full overflow-y-auto overscroll-y-contain px-4 py-5">
           <div className="mb-3 flex items-center justify-between gap-2">
             <p
               className="text-[10px] font-semibold uppercase tracking-[0.32em]"

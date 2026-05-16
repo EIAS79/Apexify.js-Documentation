@@ -64,6 +64,44 @@ const wrapTs = (body: string): string =>
 const wrapJs = (body: string): string =>
   `import { ApexPainter } from 'apexify.js';\n\nasync function main() {\n  const painter = new ApexPainter();\n${body}\n}\n`;
 
+/**
+ * Build a studio handoff payload from documentation code fences.
+ * Returns `null` for non-executable languages (bash, json, …).
+ */
+export function composeStudioSnippetFromDocs(
+  raw: string,
+  prismLang: string
+): { name: string; ts: string; js: string; lang: StudioLang } | null {
+  const L = prismLang.toLowerCase();
+  const lang: StudioLang | null =
+    L === 'ts' || L === 'tsx' || L === 'typescript' ? 'ts'
+    : L === 'js' || L === 'jsx' || L === 'javascript' ? 'js'
+    : null;
+  if (!lang) return null;
+
+  const trimmed = raw.trim();
+  const apexImport = /import\s*\{\s*ApexPainter\s*\}\s*from\s*['"]apexify\.js['"]/;
+  const hasMain = /\basync\s+function\s+main\s*\(/.test(trimmed);
+  const complete = apexImport.test(trimmed) && hasMain;
+
+  const name = 'Documentation example';
+
+  if (complete) {
+    return lang === 'js'
+      ? { name, ts: '', js: trimmed, lang: 'js' }
+      : { name, ts: trimmed, js: '', lang: 'ts' };
+  }
+
+  const body = trimmed
+    .split('\n')
+    .map((line) => `  ${line}`)
+    .join('\n');
+
+  return lang === 'js'
+    ? { name, ts: '', js: wrapJs(body), lang: 'js' }
+    : { name, ts: wrapTs(body), js: '', lang: 'ts' };
+}
+
 const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'group'> & { body: string }> = [
   {
     id: 'gradient-sunset',
