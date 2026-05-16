@@ -1,67 +1,73 @@
 # Text rendering (`createText`) — overview {#00-create-text-overview}
 
-**`await painter.createText(textPropsOrArray, canvasBuffer)`** draws styled Unicode strings onto an existing PNG **`canvasBuffer`** (from **`createCanvas`**, **`createImage`**, etc.). Each call returns a **new** **`Buffer`**.
+**`await painter.createText(textPropsOrArray, canvasBuffer[, painterOpts])`** draws styled Unicode strings onto an existing PNG **`canvasBuffer`** (from **`createCanvas`**, **`createImage`**, etc.). Each call returns a **new** **`Buffer`**.
 
-Back: [Feature guides hub](/docs#feature-guides-hub)
+The runtime pipeline is **`TextCreator`** → **`EnhancedTextRenderer.renderText`** (`lib-next/text/`).
 
 ---
 
-## What you pass
+## Arguments
 
 | Argument | Role |
 |----------|------|
-| **`textProps`** | One **`TextProperties`** **or** **array** (processed **in order**, top → bottom on the canvas). |
-| **`canvasBuffer`** | **`Buffer`** or **`CanvasResults`** with **`buffer`**. |
+| **`textPropsOrArray`** | One **`TextProperties`** **or** an **array** (processed **in order**: earlier entries paint underneath later ones). |
+| **`canvasBuffer`** | **`Buffer`** or **`CanvasResults`** whose **`buffer`** field holds PNG (or compatible raster) bytes. |
+| **`painterOpts`** | Optional **`PainterAssetRefsOptions`** — same placeholder-resolution hooks as **`createImage`** when your props reference assets by ref. |
 
 **Required on each object:** **`text`**, **`x`**, **`y`**.
 
 ---
 
+## Related APIs
+
+| API | Purpose |
+|-----|---------|
+| **`await painter.measureText(textProps)`** | Layout metrics without drawing (**`TextMetricsCreator`** — same font/spacing/wrap rules). |
+| **`TextCreator.renderTextsOntoContext(ctx, texts)`** | Paint onto an existing **`SKRSContext2D`** (used internally by **`SceneCreator`** for **`type: 'text'`** layers). |
+
+---
+
 ## `TextProperties`: nested vs flat
 
-Types live in **`lib-next/types/text.ts`** (exported from **`apexify.js`** / **`apexify.js/types`**).
+Prefer grouped objects **`font`**, **`decorations`**, **`effects`**, **`layout`**, **`placement`**, and **`fill`**. Legacy flat fields (**`fontSize`**, **`color`**, **`maxWidth`**, …) still work.
 
-| Prefer (grouped) | Replaces legacy top-level |
-|--------------------|---------------------------|
-| **`font.{ size, family, name, path }`** | **`fontSize`**, **`fontFamily`**, **`fontName`**, **`fontPath`** |
-| **`decorations.{ underline, overline, strikethrough, bold, italic }`** | flat **`underline`**, **`bold`**, … |
-| **`effects.{ highlight, glow, shadow }`** | flat **`highlight`**, **`glow`**, **`shadow`** |
-| **`layout.{ lineHeight, letterSpacing, wordSpacing, maxWidth, maxHeight }`** | same names at root |
-| **`placement.{ textAlign, textBaseline, rotation }`** | flat **`textAlign`**, **`rotation`**, … |
-| **`fill.{ color, gradient, opacity }`** | flat **`color`**, **`gradient`**, **`opacity`** |
-
-If both nested and flat are set, **nested wins** (see **`resolveText*`** helpers in **`text.ts`**). New examples in the **[field matrix](/docs#09-create-text-properties-matrix)** use the grouped style; older guides still show flat keys — both work.
+**Merge rule:** when both nested and flat exist for the same concept, **the nested value wins** (**`resolveTextDecorations`**, **`resolveTextEffects`**, **`resolveTextLayout`**, **`resolveTextPlacement`**, **`resolveTextFill`** in **`apexify.js`** / **`types/text`**).
 
 ---
 
-## Renderer stack
+## Guide map
 
-**`TextCreator`** (`lib-next/text/text-creator.ts`) loads the bitmap, draws it onto a working canvas, and calls **`EnhancedTextRenderer.renderText`** (`lib-next/text/enhanced-text-renderer.ts`) for each entry.
-
-**`measureText`** uses **`TextMetricsCreator`** with the same **`TextProperties`** shape and **`resolveText*`** rules where applicable.
-
----
-
-## Topics (read in order)
-
-| # | Page | Covers |
-|---|------|--------|
-| 1 | [Font & placement](/docs#01-create-text-font-and-position) | **`font`**, legacy font keys, weight/slant, **`textAlign`**, **`rotation`**, **`opacity`** — also **`placement.*`** when grouping |
-| 2 | [Wrapping & spacing](/docs#02-create-text-wrapping-spacing) | **`maxWidth`**, **`maxHeight`**, **`lineHeight`**, **`letterSpacing`**, **`wordSpacing`**, **`\\n`** — or **`layout.*`** |
-| 3 | [Colour & gradients](/docs#03-create-text-color-gradients) | **`color`**, **`gradient`** — or **`fill.*`** |
-| 4 | [Glow, shadow & stroke](/docs#04-create-text-glow-shadow-stroke) | **`glow`**, **`shadow`**, **`stroke`** — glow/shadow also under **`effects.*`** |
-| 5 | [Decorations & highlight](/docs#05-create-text-decorations-highlight) | **`underline`**, **`overline`**, **`strikethrough`**, **`highlight`** — or **`decorations.*`** / **`effects.highlight`** |
-| 6 | [Text on a circular arc](/docs#06-create-text-curved) | **`textOnCurve`** — **`sweepAngle`**, **`radius`**, **`up`**, **`layoutMode`**, … |
+| # | Topic | What it covers |
+|---|--------|----------------|
+| 1 | [Font & placement](/docs#01-create-text-font-and-position) | **`font`**, **`decorations.bold`/`italic`**, **`placement`** (**`textAlign`**, **`textBaseline`**, **`rotation`**), custom **`font.path`** |
+| 2 | [Wrapping & spacing](/docs#02-create-text-wrapping-spacing) | **`layout.maxWidth`**, **`maxHeight`**, **`lineHeight`**, **`letterSpacing`**, **`wordSpacing`** |
+| 3 | [Colour & gradients](/docs#03-create-text-color-gradients) | **`fill`**, **`gradient`** types (**linear** / **radial** / **conic**) |
+| 4 | [Glow, shadow & stroke](/docs#04-create-text-glow-shadow-stroke) | **`effects.glow`**, **`effects.shadow`**, **`stroke`** |
+| 5 | [Decorations & highlight](/docs#05-create-text-decorations-highlight) | **`effects.highlight`**, underline / overline / strikethrough |
+| 6 | [Circular arc text](/docs#06-create-text-curved) | **`textOnCurve`** (**`TextCurveConfig`**), **`layoutMode`** |
 | 7 | [`measureText`](/docs#07-measure-text) | **`TextMetrics`**, **`includeCharMetrics`**, **`measurementCanvas`** |
-| 8 | [Paint order & extras](/docs#08-create-text-paint-order) | Per-glyph composite order; **`textPathRenderer`** (not wired to **`createText`**) |
-| 9 | [`TextProperties` field matrix](/docs#09-create-text-properties-matrix) | Full reference + grouped vs legacy + examples |
+| 8 | [Paint order](/docs#08-create-text-paint-order) | Exact compositing order per line vs per arc glyph |
+| 9 | [Field matrix](/docs#09-create-text-properties-matrix) | Full **`TextProperties`** checklist |
 
 ---
 
-## Measurement API
+## Minimal example
 
-**`await painter.measureText(textProps)`** — same **`TextProperties`** shape; details on **[measureText](/docs#07-measure-text)**.
+```typescript
+const { buffer } = await painter.createCanvas({ width: 800, height: 400 });
+
+await painter.createText(
+  {
+    text: 'Apexify.js',
+    x: 400,
+    y: 220,
+    placement: { textAlign: 'center', textBaseline: 'middle' },
+    font: { size: 56, family: 'Arial' },
+    fill: { color: '#e2e8f0' },
+    stroke: { color: '#0f172a', width: 2 },
+  },
+  buffer
+);
+```
 
 ---
-
-Start **[Font & placement](/docs#01-create-text-font-and-position)**. Quick lookup: **[`TextProperties` matrix](/docs#09-create-text-properties-matrix)**.

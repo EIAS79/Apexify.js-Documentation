@@ -1,50 +1,52 @@
-# Shadow & stroke on `createImage` layers {#04-create-image-shadow-stroke}
+# Drop shadow & stroke (`ShadowOptions`, `StrokeOptions`) {#04-create-image-shadow-stroke}
 
-Back: [Images overview](/docs#00-create-image-overview)
 
-Field types are **`ShadowOptions`** and **`StrokeOptions`** (**`lib/Canvas/utils/types/index.ts`**). Rendering shares **`applyShadow`** / **`applyStroke`** from **`lib/Canvas/utils/Image/imageProperties.ts`** for **rectangular** layers.
+Shadows and strokes are **layer-level** options on **`ImageProperties`** (and on **`groupTransform`** for grouped composites). They apply to **bitmaps** and **shapes**, with one shadow quirk for complex shapes.
 
-For **full property tables** (every key, defaults, corner semantics), read:
-
-- **[Canvas shadow options](/docs#07-canvas-shadow-options)**
-- **[Canvas stroke options](/docs#08-canvas-stroke-options)**
+Types **`ShadowOptions`** and **`StrokeOptions`** are exported from **`apexify.js`** (see **`types/common`**).
 
 ---
 
-## Bitmap layers
+## Shadow — `shadow?: ShadowOptions`
 
-**Shadow**
+| Field | Type | Role |
+|-------|------|------|
+| **`color`** | **`string`** | Shadow colour |
+| **`gradient`** | **`gradient`** | Optional shadow fill as gradient |
+| **`offsetX`** / **`offsetY`** | **`number`** | Pixel offset from the layer |
+| **`blur`** | **`number`** | Blur radius |
+| **`opacity`** | **`number`** | Opacity multiplier where supported |
+| **`borderRadius`** | **`number \| 'circular'`** | Rounded shadow **only for the rectangular** fast path |
+| **`roundedCorners`** | **`borderPosition`** | Which corners get **`borderRadius`** on the shadow rect |
+| **`borderPosition`** | **`borderPosition`** | Deprecated alias of **`roundedCorners`** |
 
-- Painted **first** (under bitmap), offset/blurred rounded rect matching the **layout box**.
-- Respects **`shadow.borderRadius`** / **`roundedCorners`** for the **silhouette** of the shadow itself.
+### Bitmap shadow
 
-**Stroke**
+For **images**, the shadow is cast from the **layout box** (`x`, `y`, `width`, `height`) **before** the image is clipped — so **`borderRadius`** / **`clipPath`** crop the bitmap but the shadow still reads as a natural drop shadow.
 
-- Painted **last** (`applyStroke(ctx, box, stroke)`) after filters/effects — outline wraps the **same axis-aligned box** (with **`stroke.borderRadius`** controlling stroke path corners).
+### Shape shadow
+
+- **`rectangle`**, **`circle`**, **`triangle`**, **`trapezium`**, **`polygon`**, **`arc`**, **`pieSlice`**, **`square`**: use the **rectangular** shadow (same as bitmaps) for the layout box.
+- **`heart`** and **`star`**: use a **geometry-accurate** shadow (outline-based), so **`borderRadius`** on **`shadow`** does not apply the same way.
 
 ```typescript
 await painter.createImage(
   {
-    source: './card-art.png',
-    x: 60,
-    y: 60,
+    source: './card.png',
+    x: 48,
+    y: 48,
     width: 320,
     height: 180,
     fit: 'cover',
     borderRadius: 16,
+    borderPosition: 'all',
     shadow: {
-      color: 'rgba(15,23,42,0.35)',
-      offsetX: 6,
+      color: '#00000055',
+      offsetX: 0,
       offsetY: 12,
       blur: 24,
-      opacity: 0.45,
-    },
-    stroke: {
-      color: '#e2e8f0',
-      width: 3,
       borderRadius: 16,
       roundedCorners: 'all',
-      style: 'solid',
     },
   },
   buffer
@@ -53,22 +55,47 @@ await painter.createImage(
 
 ---
 
-## Shape layers
+## Stroke — `stroke?: StrokeOptions`
 
-**Shadow**
+| Field | Type | Role |
+|-------|------|------|
+| **`color`** | **`string`** | Stroke colour |
+| **`gradient`** | **`gradient`** | Stroke along path with gradient |
+| **`width`** | **`number`** | Line width in pixels |
+| **`position`** | **`number`** | Inset/outset tuning (renderer-specific) |
+| **`blur`** | **`number`** | Extra softness on stroke |
+| **`opacity`** | **`number`** | Stroke opacity |
+| **`borderRadius`** | **`number \| 'circular'`** | For **box** strokes (bitmaps / rect shadow box) |
+| **`borderPosition`** / **`roundedCorners`** | **`borderPosition`** | Which edges or corners participate (see [Styling & clip](/docs#03-create-image-styling-clip)) |
+| **`style`** | **`'solid' \| 'dashed' \| …`** | Line style |
 
-- Most shapes → **rectangular shadow** (same as bitmap).
-- **`heart`** & **`star`** → custom **`applyShapeShadow`** along true outline (gradient supported). Corner radius fields on **`ShadowOptions`** do **not** shape that silhouette.
+### Bitmap stroke
 
-**Stroke**
+Strokes run **after** the image itself, **filters**, and **`effects`** — see [Paint order](/docs#09-create-image-paint-order). The stroke follows the **layout box** (with optional rounded corners), not the alpha silhouette of the PNG.
 
-- Always follows **`createShapePath`** — outside corners match geometry (**dash**, **groove**, **gradient** stroke supported via shape-specific stroke helper in **`ImageCreator`**).
+### Shape stroke
+
+Stroke follows the **real shape path** (star, heart, polygon, arc, …), using the same **`shape`** fields as the fill so outline and fill stay aligned.
+
+```typescript
+await painter.createImage(
+  {
+    source: 'circle',
+    x: 100,
+    y: 80,
+    width: 160,
+    height: 160,
+    shape: { fill: true, color: '#e0e7ff' },
+    stroke: { color: '#3730a3', width: 6, style: 'solid' },
+  },
+  buffer
+);
+```
 
 ---
 
-## Implementation caveat (early-return paths)
+## Known limitations (bitmaps)
 
-If you use **`filterOrder: 'pre'`**, **`distortion`** (perspective / bulge/pinch), or **`meshWarp`**, **`drawImageBitmap`** may **`return`** before **`applyStroke`** runs — **no outline** on those branches today. See **[Paint order](/docs#09-create-image-paint-order)**.
+If you use **`filterOrder: 'pre'`**, **`distortion`**, or **`meshWarp`**, the bitmap path **returns early** in the implementation: **`stroke`**, **`effects`**, and **post** filters may **not** run. See [Paint order](/docs#09-create-image-paint-order) for the exact table.
 
 ---
-

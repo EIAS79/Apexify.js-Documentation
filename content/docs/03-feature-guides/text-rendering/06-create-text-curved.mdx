@@ -1,91 +1,88 @@
 # Text on a circular arc (`textOnCurve`) {#06-create-text-curved}
 
-Back: [Text overview](/docs#00-create-text-overview)
+When **`textOnCurve`** is set (**`TextCurveConfig`**), **`EnhancedTextRenderer`** routes each newline-separated row through **`renderCurvedLine`**.
 
-Shape: **`TextCurveConfig`** in **`lib-next/types/text.ts`** (field **`textOnCurve`** on **`TextProperties`**).
+---
+
+## Activating arc layout
 
 ```typescript
-textOnCurve?: {
-  sweepAngle: number;                    // degrees — user sweep at circle centre
-  radius?: number;                        // px — optional; interacts with layoutMode
-  up?: boolean;                           // default true = ∩ smile; false = ∪ frown
-  layoutMode?: "fit" | "clamp" | "override";
-  baselineOffset?: number;                // px — added to R for draw radius (radial shift)
-  startAngleDeg?: number;                 // degrees — rotates whole arc around (x, y)
-};
+textOnCurve?: TextCurveConfig;
+
+interface TextCurveConfig {
+  sweepAngle: number;       // degrees — arc span along which glyphs distribute
+  radius?: number;
+  up?: boolean;             // default true — bend toward −y (“smile”) vs inverted
+  layoutMode?: CurvedTextLayoutMode;
+  baselineOffset?: number;  // radial outward shift (pixels)
+  startAngleDeg?: number;   // rotate entire arc around anchor (degrees)
+}
 ```
 
 ---
 
-## Anchor semantics
+## Degenerate cases → straight text
 
-**`(x, y)`** is the **mid-string anchor** on the arc: the middle grapheme sits at the arc midpoint (**`computeCircularArcPlacements`** in **`lib-next/text/text-curved.ts`**, called from **`EnhancedTextRenderer.renderCurvedLine`**).
-
-- **`up !== false`**: circle centre **`cy = y + R`** (arc bulges upward).
-- **`up === false`**: **`cy = y - R`** (bulge downward).
+If **`sweepAngle <= 0`**, **`sweepAngle >= 360`**, **`computeCircularArcPlacements`** returns **`null`**, or there are zero graphemes, the renderer falls back to **`renderEnhancedTextLine`** at **`(x, y)`** — same styling stack as normal horizontal text.
 
 ---
 
-## Geometry & `layoutMode`
+## Geometry model (`lib-next/text/text-curved.ts`)
 
-Let **`θ_user = sweepAngle * π / 180`**, **`W`** = measured typographic width of the line (grapheme-centre math in **`text-curved.ts`**). **`resolveArcRadiusAndSweep(W, θ_user, radius, layoutMode)`** picks final **`R`** and may **widen** **`θ`** in **`override`** when the arc is too tight.
-
-| **`layoutMode`** | **`R`** | **`θ`** (final sweep) |
-|------------------|---------|------------------------|
-| **`fit`** | **`R = W / θ_user`** | **`θ_user`** — arc length matches width; **`radius`** is ignored for geometry. |
-| **`clamp`** (default) | **`R = max(radius ?? R_fit, R_fit)`** where **`R_fit = W / θ_user`** | **`θ_user`** — never shorter than the text needs; a larger **`radius`** simply opens the curve. |
-| **`override`** | **`R = radius ?? R_fit`** | **`max(θ_user, W/R)`** — if **`R·θ_user < W`**, sweep grows so the string still fits without crowding. |
-
-Drawing uses **`R_draw = R + (baselineOffset ?? 0)`** for glyph positions (**`startAngleDeg`** rotates the whole layout around **`(x, y)`**).
-
-Each grapheme:
-
-1. Computes cumulative substring widths (**left**, **right**) so **kerning-aware** centres beat naive fixed pitch (`chars.join` measurement — comment in source warns per-char sums ignore kerning).
-2. Maps arc length **`centerDist`** → angle **`α`** along circle.
-3. Positions glyph at **`(px, py)`**, rotates tangent via **`renderRotatedGlyph`**.
+- Graphemes come from **`Intl.Segmenter`** when available — combining marks stay attached.
+- Horizontal centres along the straight baseline (**`measureGraphemeCenters`**) drive proportional spacing along the arc.
+- **`anchor (x, y)`** is the **mid-string anchor on the arc** (apex when **`up: true`** at **`startAngleDeg: 0`**).
+- **`baselineOffset`** expands/contracts **`Rdraw = R + baselineOffset`** without changing angular spacing.
 
 ---
 
-## Sweep limits
+## `layoutMode` (`CurvedTextLayoutMode`)
 
-If **`sweepAngle <= 0`**, **`>= 360`**, or line empty → falls back to **straight** single-line render (**`renderEnhancedTextLine`**).
+Relates measured typographic width **W**, user sweep **θ**, and optional radius (**documented on **`CurvedTextLayoutMode`** in **`types/text.ts`**):
+
+| Mode | Radius rule |
+|------|-------------|
+| **`fit`** | **`R = W / θ`** — **`radius`** ignored for geometry; arc length matches measured width. |
+| **`clamp`** (**default**) | **`R = max(radius ?? R_fit, R_fit)`** — never tighter than **`fit`**. |
+| **`override`** | **`R = radius ?? R_fit`**; if **`R·θ < W`**, sweep expands so spacing never crowds. |
+
+---
+
+## Multi-line arcs
+
+**`text.split('\n')`** feeds independent arcs. **`y`** advances per line by **`lineHeight * fontSize`** where **`lineHeight`** defaults **`1.4`** (**`resolveTextLayout`**).
 
 ---
 
-## Newlines
-
-**`text.split('\n')`** — each row becomes its **own** arc with **`y += lineHeight * index`**.
-
-**`maxWidth`** does **not** word-wrap in curve mode — keep lines short or insert **`\\n`** yourself.
-
----
+## Example — badge arc
 
 ```typescript
 await painter.createText(
   {
-    text: 'APEXIFY.JS',
+    text: 'PREMIUM QUALITY',
     x: 400,
-    y: 280,
-    font: { size: 44, family: 'Arial' },
-    placement: { textAlign: 'center', textBaseline: 'middle' },
+    y: 340,
+    font: { size: 28, family: 'Arial' },
+    placement: { textAlign: 'center', textBaseline: 'alphabetic' },
+    fill: { color: '#fefce8' },
+    stroke: { color: '#422006', width: 2 },
     textOnCurve: {
-      sweepAngle: 68,
+      sweepAngle: 140,
+      radius: 220,
       up: true,
       layoutMode: 'clamp',
-      baselineOffset: 0,
       startAngleDeg: 0,
+      baselineOffset: 4,
     },
-    gradient: {
-      type: 'linear',
-      colors: [
-        { stop: 0, color: '#fef3c7' },
-        { stop: 1, color: '#fb923c' },
-      ],
-    },
-    stroke: { color: '#451a03', width: 2 },
   },
   buffer
 );
 ```
+
+---
+
+## Interaction with **`maxWidth`**
+
+Arc mode **does not** word-wrap — **`layout.maxWidth`** is ignored for branching (**`textOnCurve`** wins first). Insert **`\\n`** manually if you need stacked arcs.
 
 ---

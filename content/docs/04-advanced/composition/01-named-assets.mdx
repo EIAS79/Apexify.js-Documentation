@@ -1,0 +1,123 @@
+# Named assets (`painter.assets`) {#01-named-assets}
+
+
+**`AssetManager`** hangs on **`painter.assets`**. It registers **images** (**`string` path, URL, or `Buffer`**), **font file paths**, and **named color palettes**. Other systems resolve **`$`** **string leaves** through it:
+
+- **`renderScene`**, **`renderSceneToGIF`**, **`renderSceneToVideoFrames`** — **on by default** (opt out with **`resolveAssetRefs: false`**).
+- **Templates** — during **`TemplateHandle.render`** / **`toRenderInput`** via **`resolveAssetRef`** (defaults to **`assets.resolve`**).
+- **Imperative** **`create*`** / **`batch`** / **`chain`** — **off** unless you flag them; see the [next chapter](/docs#05-imperative-batch-chain-assets).
+
+---
+
+## Registering material
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+// Image: path, URL, or Buffer
+painter.assets.loadImage("logo", "./brand/logo.png");
+
+// Font file for text layers (path your runtime can read)
+painter.assets.loadFont("heading", "./fonts/Inter-Bold.ttf");
+
+// Palette: arbitrary string keys → hex (or other color strings)
+painter.assets.loadPalette("theme", {
+  bg: "#020617",
+  text: "#f8fafc",
+  muted: "#64748b",
+});
+```
+
+**Updates / cleanup**
+
+- **`unregisterImage`**, **`unregisterFont`**, **`unregisterPalette`** — drop one id.
+- **`clear()`** — empty all three maps (rare; mostly tests or long-lived servers).
+
+---
+
+## Reference syntax (no leading `$` inside `resolve`)
+
+In **JSON-like config**, you write **`"$logo"`** or **`"$theme.text"`** as a **string value**. The resolver **strips **`$`** internally** and splits **palette** paths on the **first dot**:
+
+| String in config | Lookup |
+|------------------|--------|
+| **`"$logo"`** | **`images.get("logo")`** (else fonts) |
+| **`"$theme.text"`** | Palette **`theme`**, key **`text`** |
+| **`"$heading"`** | Font id **`heading`** (registered with **`loadFont`**) |
+
+If nothing matches, **`assets.resolve(...)`** throws with **`unknown reference`**. Register **before** rendering.
+
+---
+
+## Example — scene + palette colors
+
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "node:fs";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+painter.assets
+  .loadImage("avatar", "./fixtures/user.png") // use any readable image path
+  .loadPalette("brand", { panel: "#1e293b", ink: "#e2e8f0" });
+
+const png = await painter.renderScene({
+  width: 480,
+  height: 240,
+  colorBg: "$brand.panel",
+  layers: [
+    {
+      type: "text",
+      texts: {
+        text: "Signed in",
+        x: 24,
+        y: 36,
+        fontSize: 22,
+        color: "$brand.ink",
+      },
+    },
+    {
+      type: "image",
+      images: { source: "$avatar", x: 320, y: 40, width: 112, height: 112 },
+    },
+  ],
+});
+
+fs.writeFileSync("card.png", png);
+```
+
+Use **`loadFont`** plus **`fontPath: "$myFontId"`** inside **`texts`** when you want typography to go through the asset registry the same way as colors and images.
+
+---
+
+## `prepareForRender` — resolve once, call many APIs
+
+**`painter.prepareForRender<T>(value): T`** walks **plain objects and arrays** (JSON-like) and replaces **`$`** **string leaves** using **`assets.resolve`**. Use it when you:
+
+- Build config with **`$`** but call APIs that **do not** accept **`resolveAssetRefs: true`**, or  
+- Want to **reuse** the same resolved object across several calls without repeated walks.
+
+```typescript
+const base = painter.prepareForRender({
+  width: 720,
+  height: 400,
+  colorBg: "$brand.panel",
+});
+
+await painter.createCanvas(base);
+```
+
+Typed **return** is the same shape you passed in; only **string** leaves that look like asset refs change.
+
+---
+
+## Relationship to templates
+
+Templates run **placeholder** interpolation (**`{{name}}`**) **and** **`$`** resolution in one pass. Prefer **either**:
+
+- Let the **template** resolve assets (usual), or  
+- **`prepareForRender`** on your **data** before stuffing it into a template field — avoid **double-applying** **`$`** unintentionally on the same string.
+
+---

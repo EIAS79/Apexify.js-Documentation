@@ -1,67 +1,85 @@
-# `path2d.custom` — custom lines, segments & validation {#01-create-custom-api}
+# `path2d.custom` — API & validation {#01-create-custom-api}
 
-Back: [Lines overview](/docs#00-custom-lines-overview)
 
-On **`ApexPainter`**, connector lines are drawn with **`painter.path2d.custom`** (**`(options, buffer)`** order). Internally this runs **`runDrawCustomLines`** (**`lib-next/apex-painter/path-custom-lines.ts`**) → **`customLines`** (**`lib-next/path/custom-lines.ts`**).
+**Signature:** **`await painter.path2d.custom(options, canvasBuffer)`**
+
+- **`options`** — one **`CustomOptions`** object **or** an **array** processed **in order** (later segments paint above earlier ones unless **`singleLine`** chains geometry).
+- **`canvasBuffer`** — **`Buffer`** or **`CanvasResults`** (**.buffer** PNG bytes).
+
+Implementation: **`runDrawCustomLines`** (**`apex-painter/path-custom-lines.ts`**) loads the buffer into a fresh canvas, runs **`customLines(ctx, opts)`**, returns **`image/png`** **`Buffer`**.
+
+---
+
+## Validation
+
+Throws if:
+
+| Condition | Message prefix |
+|-----------|----------------|
+| Missing **`buffer`** | **`createCustom: buffer is required.`** |
+| Empty **`options`** array | **`createCustom: At least one custom option is required.`** |
+| **`startCoordinates.x`/`y`** not finite numbers | **`createCustom: startCoordinates with valid x and y are required.`** |
+| **`endCoordinates.x`/`y`** not finite numbers | **`createCustom: endCoordinates with valid x and y are required.`** |
+
+---
+
+## **`CustomOptions`** shape (top level)
+
+| Field | Required | Role |
+|-------|----------|------|
+| **`startCoordinates`** | Yes | **`{ x, y }`** segment start |
+| **`endCoordinates`** | Yes | **`{ x, y }`** segment end |
+| **`path`** | No | Curve generator (**`smooth`**, **`catmull-rom`**, **`bezier`**) — see [Line style & path](/docs#02-custom-line-style-path) |
+| **`arrow`** | No | **`start`/`end`** arrowheads |
+| **`markers`** | No | Samples along the polyline **[start→end]** |
+| **`lineStyle`** | No | Stroke appearance (**defaults** mimic thin black stroke) |
+
+Full **`lineStyle`** / **`arrow`** / **`markers`** tables live in the next chapters.
+
+---
+
+## Batch drawing
+
+Pass **`CustomOptions[]`** to paint multiple independent connectors (flowcharts, timelines). Order matters for overlaps — draw guides **before** foreground strokes.
+
+---
+
+## Chained segments (`lineStyle.singleLine`)
+
+When **`singleLine: true`**, **`customLines`** keeps **`beginPath`** open across consecutive rows:
+
+- Row **`i > 0`** reuses **`previousEndCoordinates`** as the effective **`moveTo`** anchor (**start vertex omitted from **`lineTo`** chain** except on the first row of the sequence).
+- Stroke executes when **`singleLine`** ends or on the **last** row of the batch.
+
+Use this for **one continuous stroke** through several **`endCoordinates`** knots while varying **`arrow`**/**`markers`** only on relevant rows.
+
+---
+
+## Scene parity
+
+**`SceneLayer`** **`{ type: 'customLines', lines: CustomOptions | CustomOptions[] }`** uses the same validation (**`scene-normalizer`**) before **`customLines`** runs.
+
+---
+
+## Example — two hops + arrow
 
 ```typescript
-const buffer = await painter.path2d.custom(
-  customOptionsObjectOrArray,
-  canvasBuffer /* Buffer | CanvasResults */
+await painter.path2d.custom(
+  [
+    {
+      startCoordinates: { x: 60, y: 180 },
+      endCoordinates: { x: 260, y: 180 },
+      lineStyle: { width: 3, color: '#cbd5e1', lineCap: 'round' },
+    },
+    {
+      startCoordinates: { x: 260, y: 180 },
+      endCoordinates: { x: 460, y: 280 },
+      lineStyle: { width: 3, color: '#cbd5e1', lineCap: 'round' },
+      arrow: { end: true, size: 12 },
+    },
+  ],
+  buffer
 );
 ```
-
-Loads **`canvasBuffer`** onto a working canvas, renders **`customLines(ctx, opts)`**, returns a new **PNG** **`Buffer`**.
-
----
-
-## Required fields (every entry)
-
-| Field | Rule |
-|-------|------|
-| **`startCoordinates`** | **`{ x, y }`** numbers |
-| **`endCoordinates`** | **`{ x, y }`** numbers |
-
-Validation is strict — missing **`x`/`y`** throws (**`validateCustomOptions`** in **`path-custom-lines.ts`**).
-
----
-
-## Batch processing
-
-Pass an **array** of **`CustomOptions`** — segments are processed **in order**. Later segments can **chain** when **`lineStyle.singleLine`** is **`true`** (see below).
-
----
-
-## **`singleLine`** chains
-
-When **`lineStyle.singleLine`** is set:
-
-- First segment: **`moveTo(start)`**; later segments reuse **`previousEndCoordinates`** as implicit **`start`** so **polylines** share one context sub-path until **`singleLine`** ends.
-- Leaving **`singleLine`** (next item without it) triggers **`stroke`** + optional **`applyStroke`** cleanup.
-
-Use this for **multi-segment** connectors without lifting the pen.
-
----
-
-## Minimal example
-
-```typescript
-const base = await painter.createCanvas({ width: 400, height: 300, colorBg: '#f8fafc' });
-
-const withLine = await painter.path2d.custom(
-  {
-    startCoordinates: { x: 40, y: 260 },
-    endCoordinates: { x: 360, y: 40 },
-    lineStyle: { width: 4, color: '#2563eb', lineCap: 'round' },
-  },
-  base.buffer
-);
-```
-
----
-
-## Naming note
-
-Older docs and snippets refer to **`createCustom`**; in **`lib-next`** the same capability lives on **`painter.path2d.custom`** so vector **`create`/`draw`** and connector **`custom`** stay grouped.
 
 ---

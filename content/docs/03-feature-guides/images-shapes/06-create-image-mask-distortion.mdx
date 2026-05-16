@@ -1,33 +1,47 @@
-# Mask, perspective warp & mesh warp {#06-create-image-mask-distortion}
+# Masking, distortion & mesh warp {#06-create-image-mask-distortion}
 
-Back: [Images overview](/docs#00-create-image-overview)
 
-Implementation lives in **`lib/Canvas/utils/Image/imageMasking.ts`**. **`ImageCreator.drawImageBitmap`** chooses branches — **mutually exclusive with stacking**: whichever specialised branch fires **`return`**s early.
+These options apply only when **`source`** is a **bitmap** (`string` / **`Buffer`**). Shape layers use **`drawShape`** — use **`clipPath`** / **`borderRadius`** on the layer instead.
 
 ---
 
-## Alpha / luminance mask — `mask`
+## Mask compositing — `mask`
 
 ```typescript
 mask?: {
   source: string | Buffer;
-  mode?: 'alpha' | 'luminance' | 'inverse'; // default 'alpha'
+  mode?: 'alpha' | 'luminance' | 'inverse';
 };
 ```
 
-**Modes**
+| Field | Role |
+|-------|------|
+| **`source`** | Secondary image used as mask channel |
+| **`mode`** | **`alpha`** (default): mask alpha drives visibility · **`luminance`**: brightness drives visibility · **`inverse`**: flips the contribution |
 
-| **`mode`** | Behaviour |
-|------------|-----------|
-| **`alpha`** | Multiply destination alpha by mask pixel alpha (**`/255`**). |
-| **`luminance`** | Uses luminance **`0.299R + 0.587G + 0.114B`** as opacity multiplier. |
-| **`inverse`** | Uses **`1 - alpha`** from mask. |
+The masked bitmap still honours **`fit`** / **`align`** into the layout box before masking runs.
 
-Mask image stretched to **`dw × dh`** (same fitted rectangle as bitmap).
+```typescript
+await painter.createImage(
+  {
+    source: './subject.png',
+    x: 40,
+    y: 40,
+    width: 280,
+    height: 280,
+    fit: 'cover',
+    mask: {
+      source: './mask-soft.png',
+      mode: 'luminance',
+    },
+  },
+  buffer
+);
+```
 
 ---
 
-## Perspective — `distortion`
+## Distortion — `distortion`
 
 ```typescript
 distortion?: {
@@ -37,15 +51,42 @@ distortion?: {
 };
 ```
 
-**What `createImage` actually runs**
+### Implemented today
 
-| **`type`** | Requirements | Effect |
-|------------|--------------|--------|
-| **`perspective`** | **`points.length === 4`** | **`applyPerspectiveDistortion`** maps quad → fitted rect. |
-| **`bulge` / `pinch`** | — | **`applyBulgeDistortion`** centred on bitmap with **`intensity ?? 0.5`** (pinch negates bulge). |
-| **`warp`** | — | **Not wired** inside **`drawImageBitmap`** today — reserved type only. |
+| `type` | Requirements | Notes |
+|--------|----------------|-------|
+| **`perspective`** | Exactly **four** `{ x, y }` corners in **`points`** | Maps the fitted quad into those canvas coordinates |
+| **`bulge`** | Optional **`intensity`** (default **`0.5`**) | Lens bulge centred on the fitted bitmap |
+| **`pinch`** | Optional **`intensity`** | Negative bulge |
 
-Each implemented branch **`return`**s **before** normal **`drawImage`**, **`effects`**, and **`applyStroke`** — see **[Paint order](/docs#09-create-image-paint-order)**.
+### Not wired on the bitmap path
+
+The union includes **`warp`**, but **`ImageCreator.drawImageBitmap`** currently handles **`perspective`**, **`bulge`**, and **`pinch`** only. **`warp`** falls through — leave **`meshWarp`** for grid deformation instead.
+
+Distortion branches **return immediately** after drawing — **`stroke`**, **`effects`**, and **`filterOrder: 'post'`** filters **do not** run afterward for that layer (see [Paint order](/docs#09-create-image-paint-order)).
+
+```typescript
+await painter.createImage(
+  {
+    source: './poster.jpg',
+    x: 60,
+    y: 80,
+    width: 320,
+    height: 220,
+    fit: 'cover',
+    distortion: {
+      type: 'perspective',
+      points: [
+        { x: 40, y: 40 },
+        { x: 380, y: 20 },
+        { x: 360, y: 260 },
+        { x: 20, y: 240 },
+      ],
+    },
+  },
+  buffer
+);
+```
 
 ---
 
@@ -53,21 +94,25 @@ Each implemented branch **`return`**s **before** normal **`drawImage`**, **`effe
 
 ```typescript
 meshWarp?: {
-  gridX?: number;  // default 10
-  gridY?: number;  // default 10
+  gridX?: number;
+  gridY?: number;
   controlPoints?: Array<Array<{ x: number; y: number }>>;
 };
 ```
 
-**`applyMeshWarp`** expects **`controlPoints`** aligned with **`gridX+1`** by **`gridY+1`** lattice when applying deformation sampling.
+| Field | Default | Role |
+|-------|---------|------|
+| **`gridX`** / **`gridY`** | **`10`** | Warp subdivision grid |
+| **`controlPoints`** | Required for warp | Nested arrays of displaced lattice nodes |
 
-Also triggers early **`return`** (skips stroke / cinematic **`effects`** in Bitmap pipeline).
+Like **`distortion`**, **`meshWarp`** ends the bitmap pipeline early — combine stroke/effects only if you redesign ordering or split layers.
 
 ---
 
-## Clip vs mask
+## Interaction summary
 
-- **`clipPath`** → vector polygon clip **before** paint (still draws **`mask`** afterwards if both set — rarely desirable).
-- **`mask`** → per-pixel alpha modulation **during** draw.
+Use **either** **`mask`** **or** the straight **`drawImage`** path — mesh/distortion branches skip masks.
+
+Do **not** combine **`meshWarp`** + **`distortion`** expecting automatic chaining — whichever branch triggers **first** wins (`distortion` is evaluated before **`meshWarp`**).
 
 ---

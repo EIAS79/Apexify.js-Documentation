@@ -1,28 +1,34 @@
 # Wrapping, line breaks & spacing {#02-create-text-wrapping-spacing}
 
-Back: [Text overview](/docs#00-create-text-overview)
-
 Branching inside **`EnhancedTextRenderer.renderText`**:
 
-1. If **`textOnCurve`** → curved renderer (**ignores** **`maxWidth`** wrapping — use **`\\n`** only for stacked arcs).
-2. Else if **`maxWidth`** → word-wrap pipeline.
+1. If **`textOnCurve`** is set → curved renderer (**auto word-wrap is skipped** — use **`\\n`** only for stacked arcs).
+2. Else if **`layout.maxWidth`** (or legacy **`maxWidth`**) is set → **`computeWrappedTextLines`** + **`renderWrappedText`**.
 3. Else **`renderSingleLine`** — still splits on **`\\n`** for manual multi-line blocks.
 
----
-
-## Word wrap (`maxWidth`)
-
-- Splits on **spaces** per word; **`measureText`** decides overflow.
-- Hard **`\\n`** in **`text`** starts a new explicit segment — blank lines preserved when multiple **`\\n`** segments exist (same trimming rules as **`renderWrappedText`**).
-- When adding the next word would exceed **`maxWidth`**, current line commits and the word starts a fresh line.
+Prefer **`layout`**; nested keys override flat **`lineHeight`**, **`letterSpacing`**, **`wordSpacing`**, **`maxWidth`**, **`maxHeight`** (**`resolveTextLayout`**).
 
 ---
 
-## Height cap (`maxHeight`)
+## Word wrap (`layout.maxWidth`)
 
-**`maxLines = floor(maxHeight / lineHeight)`** where **`lineHeight`** on **`TextProperties`** defaults to multiplier **`1.4`** times **`fontSize`** when omitted.
+- Words come from **`explicitLine.split(' ')`**; **`ctx.measureText(testLine)`** decides overflow.
+- Hard **`\\n`** in **`text`** starts a new paragraph segment; empty segments between newlines can yield blank lines when multiple **`\\n`** groups exist (same trimming rules as **`computeWrappedTextLines`** in **`text-layout.ts`**).
+- When adding the next word would exceed **`maxWidth`**, the current line commits and the word starts a new line.
 
-When **`maxLines`** is exceeded mid-wrap, remaining content collapses to **`'...'`** on that line (same behaviour in **`TextMetricsCreator.wrapText`**).
+---
+
+## Height cap (`layout.maxHeight`)
+
+**`maxLines = floor(maxHeight / lineHeightPx)`** where **`lineHeightPx = (layout.lineHeight || 1.4) * fontSize`**.
+
+When **`maxLines`** is exceeded mid-wrap, the remainder collapses to **`'...'`** on that line (**`computeWrappedTextLines`**).
+
+---
+
+## Line height multiplier (`layout.lineHeight`)
+
+Unitless multiplier × **`font.size`** for vertical stride between wrapped lines **and** explicit **`\\n`** rows (**defaults `1.4`** when omitted).
 
 ---
 
@@ -30,10 +36,10 @@ When **`maxLines`** is exceeded mid-wrap, remaining content collapses to **`'...
 
 | Field | Canvas mapping |
 |-------|----------------|
-| **`letterSpacing`** | **`ctx.letterSpacing = '${n}px'`** |
-| **`wordSpacing`** | **`ctx.wordSpacing = '${n}px'`** |
+| **`layout.letterSpacing`** | **`ctx.letterSpacing = '${n}px'`** |
+| **`layout.wordSpacing`** | **`ctx.wordSpacing = '${n}px'`** |
 
-Included automatically in **`measureText`** widths — affects curved layout too.
+Spacing participates in **`measureText`** — including **arc layout** (**grapheme centres** use cumulative widths with the same context settings).
 
 ---
 
@@ -48,7 +54,7 @@ await painter.createText(
     x: 40,
     y: 60,
     font: { size: 28, family: 'Arial' },
-    lineHeight: 1.35,
+    layout: { lineHeight: 1.35 },
   },
   buffer
 );
@@ -62,11 +68,13 @@ await painter.createText(
     text: longParagraph,
     x: 40,
     y: 80,
-    maxWidth: 520,
-    maxHeight: 220,
-    lineHeight: 1.45,
-    letterSpacing: 0.5,
-    wordSpacing: 2,
+    layout: {
+      maxWidth: 520,
+      maxHeight: 220,
+      lineHeight: 1.45,
+      letterSpacing: 0.5,
+      wordSpacing: 2,
+    },
   },
   buffer
 );

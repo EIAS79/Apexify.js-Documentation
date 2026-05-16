@@ -1,0 +1,77 @@
+# Recipe — social share card (OG-style PNG) {#recipe-share-card}
+
+
+**Goal:** A **`1200×630`** Open-Graph-style card — dark background + headline — written to disk with **`painter.save`**.
+
+**Prerequisites:** Node **`≥16`**, **`apexify.js`** installed, writable **`./out`** (or change **`directory`**).
+
+---
+
+## Steps
+
+1. Instantiate **`ApexPainter`** (constructor **`type`** optional here — we save raw PNG bytes).  
+2. **`createCanvas`** — wide banner **`/`** **`colorBg`**.  
+3. **`createText`** — large headline onto the **`CanvasResults`**.  
+4. **`save`** — timestamped **`/`** counter filename under **`directory`**.
+
+---
+
+## Full example
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+async function main() {
+  const painter = new ApexPainter({ type: "buffer" });
+
+  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 630,
+    colorBg: "#0f172a",
+  });
+
+  const png = await painter.createText(
+    [
+      {
+        text: "Ship graphics from Node",
+        x: 72,
+        y: 340,
+        font: { size: 64, family: "Arial" },
+        color: "#f8fafc",
+        bold: true,
+      },
+      {
+        text: "apexify.js · buffers · save · charts · GIF",
+        x: 72,
+        y: 420,
+        font: { size: 28, family: "Arial" },
+        color: "#94a3b8",
+      },
+    ],
+    canvas
+  );
+
+  const meta = await painter.save(png, {
+    directory: "./out",
+    naming: "timestamp",
+    prefix: "share-card-",
+    format: "png",
+  });
+
+  console.log("Wrote:", meta.path);
+}
+
+main().catch(console.error);
+```
+
+---
+
+## Variations
+
+| Want | Change |
+|------|--------|
+| Logo **`/`** avatar | Add **`createImage`** — [Images overview](/docs#00-create-image-overview) |
+| Gradient backdrop | **`createCanvas`** gradients **`/`** BG layers — [Canvas overview](/docs#00-create-canvas-overview) |
+| Return **base64** for an API | **`new ApexPainter({ type: 'base64' })`** + **`await painter.outPut(png)`** — [Output encoding](/docs#03-output-format-and-encoding) |
+
+---

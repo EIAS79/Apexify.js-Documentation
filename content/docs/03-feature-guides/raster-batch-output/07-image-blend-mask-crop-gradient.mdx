@@ -1,0 +1,141 @@
+# Blend, mask, crop & gradient {#07-image-blend-mask-crop-gradient}
+
+Facet helpers (**`lib-next/image/`**) composing **`layer-blend`**, **`crop-raster`**, **`raster-masking`**, **`gradient-blend`**.
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+```
+
+---
+
+## `blend(layers, baseImageBuffer, defaultBlendMode?)`
+
+Stacks **`ImageBlendLayer`** entries over a **`baseImageBuffer`** (**must be a **`Buffer`**). Each layer needs **`image`** (**path **`/`** **`Buffer`**) and **`blendMode`** (**`GlobalCompositeOperation`**); optional **`position`**, **`opacity`** **`0`** **`–`** **`1`**.
+
+```typescript
+import fs from 'node:fs';
+
+const base = fs.readFileSync('./base-photo.jpg');
+
+const blended = await painter.image.blend(
+  [
+    {
+      image: './overlay-flare.png',
+      blendMode: 'screen',
+      position: { x: 40, y: 20 },
+      opacity: 0.75,
+    },
+    {
+      image: './grain.png',
+      blendMode: 'overlay',
+      opacity: 0.25,
+    },
+  ],
+  base,
+  'source-over'
+);
+
+await fs.promises.writeFile('./blended.png', blended);
+```
+
+---
+
+## `cropImage(options)`
+
+**`cropOptions`** (**`types/common.ts`**): **`coordinates`** — **at least three** **`cropCoordinate`** segments (**each **`from`** **`/`** **`to`**); **`imageSource`** — path **`/`** URL **`/`** identifier **`cropRasterImage`** can load; **`crop`** **`inner`** **`|`** **`outer`**; **`radius`** **`number`** **`|`** **`circular`**.
+
+**`inner`**: rectangular crop using the bounding box of every **`from`** **`/`** **`to`** pair (**optional rounded clip via **`radius`** **`/`** **`circular`**). **`outer`**: builds a closed polygon through the coordinate segments (**optional **`tension`** per segment for Bézier smoothing**) and clears pixels **inside** that shape (**surrounding image remains**).
+
+```typescript
+const innerCrop = await painter.image.cropImage({
+  imageSource: './poster.jpg',
+  crop: 'inner',
+  radius: 16,
+  coordinates: [
+    { from: { x: 80, y: 60 }, to: { x: 520, y: 60 } },
+    { from: { x: 520, y: 60 }, to: { x: 520, y: 380 } },
+    { from: { x: 520, y: 380 }, to: { x: 80, y: 380 } },
+    { from: { x: 80, y: 380 }, to: { x: 80, y: 60 } },
+  ],
+});
+
+const outerCrop = await painter.image.cropImage({
+  imageSource: './texture.png',
+  crop: 'outer',
+  radius: 0,
+  coordinates: [
+    { from: { x: 0, y: 0 }, to: { x: 400, y: 0 } },
+    { from: { x: 400, y: 0 }, to: { x: 200, y: 300 } },
+    { from: { x: 200, y: 300 }, to: { x: 0, y: 0 } },
+  ],
+});
+```
+
+---
+
+## `masking(source, maskSource, options?)`
+
+**`MaskOptions`** (**`types/image`**): **`type`** **`alpha`** (**default**) **`/`** **`grayscale`** **`/`** **`color`** (**requires **`colorKey`** **`#RRGGBB`**); **`threshold`** (**grayscale**, **`0`** **`–`** **`255`**); **`invert`**.
+
+```typescript
+const alphaMasked = await painter.image.masking('./photo.jpg', './soft-mask.png', {
+  type: 'alpha',
+});
+
+const thresholdMask = await painter.image.masking('./photo.jpg', './heightmap.png', {
+  type: 'grayscale',
+  threshold: 128,
+});
+
+const keyed = await painter.image.masking('./photo.jpg', './greenscreen-solid.png', {
+  type: 'color',
+  colorKey: '#00ff00',
+  invert: false,
+});
+```
+
+---
+
+## `gradientBlend(source, options)`
+
+**`BlendOptions`**: **`colors`** (**required**, **`stop`** **`0`** **`–`** **`1`** **`+`** **`color`** string); **`type`** **`linear`** **`/`** **`radial`** **`/`** **`conic`**; **`angle`** (**degrees**, linear); **`blendMode`** (**narrow union**: **`multiply`**, **`overlay`**, **`screen`**, **`darken`**, **`lighten`**, **`difference`**); optional **`maskSource`**.
+
+```typescript
+const graded = await painter.image.gradientBlend('./hero.jpg', {
+  type: 'linear',
+  angle: 120,
+  colors: [
+    { stop: 0, color: 'rgba(59,130,246,0)' },
+    { stop: 1, color: 'rgba(59,130,246,0.45)' },
+  ],
+  blendMode: 'multiply',
+});
+
+const vignette = await painter.image.gradientBlend('./still.jpg', {
+  type: 'radial',
+  colors: [
+    { stop: 0.35, color: 'rgba(2,6,23,0)' },
+    { stop: 1, color: 'rgba(2,6,23,0.55)' },
+  ],
+  blendMode: 'overlay',
+});
+
+const spotlight = await painter.image.gradientBlend('./product.png', {
+  type: 'conic',
+  colors: [
+    { stop: 0, color: 'rgba(255,255,255,0.15)' },
+    { stop: 0.5, color: 'rgba(255,255,255,0)' },
+    { stop: 1, color: 'rgba(255,255,255,0.15)' },
+  ],
+  blendMode: 'screen',
+  maskSource: './spot-alpha.png',
+});
+```
+
+## Composition mindset
+
+These helpers run **outside** **`createImage`** layering — use them when you already have **`Buffer`** bytes (**exports**, **`chain`**, server pipelines).
+
+---

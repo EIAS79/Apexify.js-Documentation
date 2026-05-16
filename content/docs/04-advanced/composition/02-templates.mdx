@@ -1,0 +1,206 @@
+# Templates (`createTemplate`) {#02-templates}
+
+
+**`ApexPainter#createTemplate(definition, options?)`** returns **`TemplateHandle`** with:
+
+| Method | Returns | Purpose |
+|--------|---------|---------|
+| **`toRenderInput(data, opts?)`** | **`Promise<SceneRenderInput>`** | Declarative PNG **without** rasterizing — feed **[GIF](/docs#07-render-scene-to-gif)** / **[video](/docs#08-render-scene-to-video)** / tests |
+| **`render(data, opts?)`** | **`Promise<Buffer>`** (PNG) | **One-shot** raster after resolution |
+
+**Important:** **`TemplateHandle.render`** calls **`renderScene`** with **`resolveAssetRefs: false`** on the final pass because **asset **`$`** tokens are already resolved** during template expansion. Do not assume you need to “re-resolve” unless you hand-build **`SceneRenderInput`** yourself.
+
+---
+
+## Placeholders
+
+- **`{{key}}`** — required; missing keys throw **`TemplateResolveError`** with the token name.
+- **`{{key | default}}`** — uses **`default`** when **`key`** is absent or empty.
+
+**Data** is a **`Record<string, unknown>`** (**`TemplateData`**): nested keys can be addressed if your placeholder helper supports dotted paths (follow runtime errors for unsupported paths).
+
+```typescript
+const data = {
+  title: "Weekly digest",
+  subtitle: "You have 3 unread items",
+  accent: "#38bdf8",
+};
+```
+
+---
+
+## Shorthand layers
+
+Inside **`layers`**, you may use **document-style** rows; they normalize to **`SceneLayer`** shapes:
+
+- **`{ type: "text", text: "…", … }`** → **`{ type: "text", texts: { … } }`**
+- **`{ type: "image", source: "…", … }`** → **`{ type: "image", images: { … } }`**
+
+---
+
+## Optional fields
+
+- **`id`** (string) — target for **`overrides`** at render time (**deep merge** into that layer).
+- **`visible`** — boolean, or **`"{{flag}}"`** string; falsy hides the layer.
+- **`overrides`** — on **`render`** / **`toRenderInput`**: `{ [layerId]: Partial<…> }`.
+
+---
+
+## Minimal example — headline + body
+
+```typescript
+import { ApexPainter } from "apexify.js";
+import fs from "node:fs";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+painter.assets.loadPalette("ui", {
+  bg: "#0f172a",
+  fg: "#f8fafc",
+});
+
+const card = painter.createTemplate({
+  width: 560,
+  height: 220,
+  colorBg: "$ui.bg",
+  layers: [
+    {
+      id: "title",
+      type: "text",
+      text: "{{title}}",
+      x: 32,
+      y: 48,
+      fontSize: 28,
+      color: "$ui.fg",
+    },
+    {
+      type: "text",
+      text: "{{body | Nothing to show}}",
+      x: 32,
+      y: 110,
+      fontSize: 16,
+      color: "$ui.fg",
+      opacity: 0.85,
+    },
+  ],
+});
+
+const png = await card.render({
+  title: "Ada",
+  body: "Your graph is ready.",
+});
+
+fs.writeFileSync("template.png", png);
+```
+
+---
+
+## Flex layout (`type: "layout"`, `layout.type: "flex"`)
+
+**Layout** expands to **absolutely positioned** text/image/surface children. The engine **measures**:
+
+- **Text** — **`measureText`** on the resolved **`TextProperties`**.
+- **Image** — **`width`** and **`height`** on the **`images`** object (**required** for layout).
+- Nested **layout** with explicit **`width`** / **`height`** on the node.
+
+Container fields: **`x`**, **`y`**, **`width`**, **`height`**, **`layout`**, **`children`**.
+
+**`layout`** object (flex):
+
+| Field | Meaning |
+|-------|---------|
+| **`type`** | **`"flex"`** |
+| **`direction`** | **`"row"`** (default) or **`"column"`** |
+| **`gap`**, **`padding`** | Pixels between children / inset |
+| **`align`** | Cross-axis: **`start`**, **`center`**, **`end`** |
+| **`justify`** | Main axis: **`start`**, **`center`**, **`end`**, **`space-between`** |
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+const hero = painter.createTemplate({
+  width: 640,
+  height: 200,
+  colorBg: "#020617",
+  layers: [
+    {
+      type: "layout",
+      x: 40,
+      y: 32,
+      width: 560,
+      height: 136,
+      layout: {
+        type: "flex",
+        direction: "column",
+        gap: 10,
+        padding: 12,
+        align: "start",
+        justify: "center",
+      },
+      children: [
+        { type: "text", text: "{{headline}}", x: 0, y: 0, fontSize: 26, color: "#f8fafc" },
+        { type: "text", text: "{{tagline}}", x: 0, y: 0, fontSize: 15, color: "#94a3b8" },
+      ],
+    },
+  ],
+});
+
+await hero.render({ headline: "Ship faster", tagline: "One scene, many rows." });
+```
+
+**Grid** (**`layout.type: "grid"`**) is also supported (see runtime errors for required **`columns`** and sizing rules).
+
+---
+
+## Runtime overrides (by `id`)
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+const tpl = painter.createTemplate({
+  width: 400,
+  height: 120,
+  colorBg: "#0b1220",
+  layers: [{ id: "kicker", type: "text", text: "Status", x: 20, y: 24, fontSize: 14, color: "#94a3b8" }],
+});
+
+await tpl.render(
+  {},
+  {
+    overrides: {
+      kicker: { text: "Build #4821 passed", color: "#4ade80" },
+    },
+  }
+);
+```
+
+---
+
+## Custom `resolveAssetRef` (per template)
+
+Pass **`createTemplate(def, { resolveAssetRef })`** to **bypass** **`painter.assets`** for that template only (CDN fetch, DB lookup, A/B theme bucket, …). The hook receives the path **without** the **`$`** prefix.
+
+---
+
+## `toRenderInput` — plug into GIF / video
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+const tpl = painter.createTemplate({
+  width: 200,
+  height: 80,
+  colorBg: "#020617",
+  layers: [{ type: "text", text: "{{title}}", x: 12, y: 28, fontSize: 18, color: "#f8fafc" }],
+});
+
+const input = await tpl.toRenderInput({ title: "Export" });
+// `input` is a plain SceneRenderInput — pass to renderSceneToGIF, video frame slots, etc.
+```
+
+---

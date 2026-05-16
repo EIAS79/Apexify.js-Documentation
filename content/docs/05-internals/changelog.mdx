@@ -1,0 +1,104 @@
+# Changelog {#changelog}
+
+All notable changes to Apexify.js will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+Version history is mirrored here for the docs site. For the **canonical** file (including exact diffs, contributor tables, and full history), see the **[CHANGELOG in the Apexify.js repository](https://github.com/EIAS79/Apexify.js/blob/main/CHANGELOG.md)**.
+
+<!-- changelog-versions -->
+
+## [5.4.03] - 2026-05-13
+
+Higher-level composition: **templates** (placeholders + named assets + flex layout), **`painter.assets`**, **`painter.components`** (preset **`SceneLayer[]`** snippets), **`painter.plugins`**, **opt-in `$` resolution** on imperative **`ApexPainter`** APIs and **batch/chain**, **`prepareForRender`**, and **`SceneBuilder.render`** aligned with **`renderScene`**.
+
+### ✨ Added (user-facing)
+
+- **`createTemplate(definition, options?)`** → **`TemplateHandle`** with **`render`**, **`toRenderInput`** — **`{{key}}`**, **`{{key | default}}`**, **`$`** refs (optional custom **`resolveAssetRef`**); flex **`layout`**; **`visible`**; layer **`id`**; runtime **`overrides`**
+- **`painter.assets`** — **`loadImage`**, **`loadFont`**, **`loadPalette`**, **`resolve`**, clears / unregister helpers
+- **`painter.components`** — **`badge`**, **`progressBar`**, **`avatar`**, **`card`**, **`watermark`** (**`toLayers`** → **`SceneLayer[]`**)
+- **`painter.plugins`** — **`use`**, **`get`**, **`has`**, **`remove`**; **`painter.use(plugin)`** (**`ApexifyPlugin`**, synchronous **`install`**)
+- **`prepareForRender(payload)`** — deep **`$`** walk for JSON-like configs (same semantics as **`renderScene`**)
+- Optional trailing **`{ resolveAssetRefs: true }`** on **`createCanvas`**, **`createImage`**, **`createText`**, **`measureText`**, **`createChart`** / comparison / combo, **`createGIF`**, **`animate`**, **`createVideo`** (**off** by default on those helpers; **`renderScene`** / scene steps in **`renderSceneToGIF`** / **`renderSceneToVideoFrames`** resolve **by default**)
+- **`createScene`** / **`SceneBuilder`** receives **`painter.assets`’** resolver; **`SceneBuilder.render({ resolveAssetRefs: true })`** when layers carry **`$…`**
+- **`batch(operations, opts?)`** / **`chain`** — **`resolveAssetRefs`** and **`resolve`**; **`resolve`** is required when **`resolveAssetRefs`** is **true** (**`assets.resolve`** is the usual default)
+
+### 🔧 Changed / 🐛 Fixed
+
+- **`ApexPainter.use`** — synchronous **`install`** only (removed async **`catch`** that could hide failures)
+- **`SceneRenderOptions`** typing — **`resolveAssetRefs`** next to **`validate`** / **`maxSurfaceDepth`**
+
+---
+
+## [5.4.02] - 2026-05-13
+
+Scene composition is easier to discover and safer by default: **`SceneBuilder`** is its own façade, fluent APIs can append or reorder layers in bulk, and **`renderScene`** / **`SceneCreator.render`** optionally **validate** before allocating the root canvas.
+
+### ✨ Added
+
+##### Scene — **`SceneBuilder`**
+
+- **`addLayers(layers)`** — append many layers in paint order; **`addLayer(layer)`** ↔ **`addLayers([layer])`**
+- Stack editing — **`insertLayer`**, **`insertLayers`**, **`removeLayer`**, **`moveLayer`**, **`replaceLayers`**, **`clearLayers`**, **`layerCount`**
+- **`toRenderInput()`** — plain **`SceneRenderInput`** with a **copied** **`layers`** array (**`renderScene`**, **`renderSceneToGIF`**, **`renderSceneToVideoFrames`**, tests)
+
+##### Scene — validation
+
+- **`SceneRenderOptions`** (**`SceneCreator.render`**, **`ApexPainter.renderScene`**, **`SceneBuilder.render`**) — **`validate`** (default **`true`**) and **`maxSurfaceDepth`** (default **64**); **`{ validate: false }`** only when inputs are trusted
+- **`validateSceneRenderInput`** on **`apexify.js`**; **`ApexPainter.validateSceneRenderInput`** delegates to the same implementation
+
+##### Scene — GIF / video helpers
+
+- **`renderSceneToGIF`** — **`gif.sceneRender`** (same options bucket as **`renderScene`** during rasterization)
+- **`renderSceneToVideoFrames`** — **`video.sceneRender`** forwarded for the raster step before FFmpeg
+
+### 🔧 Changed
+
+- **`SceneBuilder`** separated from **`SceneCreator`** (**builder façade** vs **compositor runtime**)
+
+### 📚 Documentation
+
+- Scene docs: **`addLayers`**, stack editing, **`toRenderInput`**, validation, **`resolveAssetRefs`**, **`sceneRender`** on GIF/video
+
+---
+
+## [5.4.0] - 2026-05-13
+
+Structural packaging pivot on **5.x**: **`apexify.js`** publishes the **modern façade** (**pre-5.4** used a broader legacy layout). Typical **`ApexPainter`** workflows stay familiar; **where helpers hang on the instance** changed.
+
+### ✨ Highlights (user-facing)
+
+- **`apexify.js/types`** — **`import type { … } from "apexify.js/types"`**
+- **`painter.image`** — stitch, collage, compress, palette / **`validHex`**, resize, blend, Sharp helpers
+- **`painter.video`** — FFmpeg-backed **`VideoStack`**, **`createVideo`**, probe / extract helpers (**flat delegates**)
+- **`painter.path2d`** — **`create`**, **`draw`**, **`custom`** (**replaces **`createPath2D`**, **`drawPath`**, **`createCustom`****)
+- **`painter.detect`** — **`path`**, **`region`**, **`anyRegion`**, **`distance`** (**replaces flat hit-test helpers**)
+- Scene entry points unchanged in product terms — **`createScene`**, **`renderScene`**, **`renderSceneToGIF`**, **`renderSceneToVideoFrames`**
+
+### ⚠️ Breaking changes (summary)
+
+- Published **`apexify.js`** barrel is **`ApexPainter`** + **types**; importing deep implementation modules from npm is unsupported unless you own **`exports`**. Chart/internals forks should patch **`package.json`** locally.
+- **`chain`** favors **dotted** step identifiers (**`"image.resize"`**, **`"image.stitchImages"`**, …).
+
+### Migration
+
+```ts
+import { ApexPainter } from "apexify.js";
+import type { SceneRenderInput, CanvasConfig } from "apexify.js";
+// or: import type { … } from "apexify.js/types";
+
+const painter = new ApexPainter({ type: "buffer" });
+await painter.createVideo({
+  source: "./in.mov",
+  convert: { outputPath: "./out.mp4", quality: "high" },
+});
+await painter.image.stitchImages([a, b], { direction: "horizontal" });
+const path = painter.path2d.create(commands);
+await painter.path2d.draw(canvasBuffer, path);
+const hit = await painter.detect.path(path, x, y);
+```
+
+**Older versions** (**5.3.x** and earlier): see the **[complete CHANGELOG on GitHub](https://github.com/EIAS79/Apexify.js/blob/main/CHANGELOG.md)**.
+
+---

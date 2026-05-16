@@ -1,6 +1,6 @@
 # Apexify.js documentation {#readme}
 
-This directory is the **human-readable docs** for **Apexify.js**: tutorials, feature guides, API sheets, and contributor notes.
+This directory is the **human-readable docs** for **Apexify.js**: tutorials, feature guides, contributor notes, and goal-first recipes.
 
 ---
 
@@ -9,9 +9,9 @@ This directory is the **human-readable docs** for **Apexify.js**: tutorials, fea
 1. **[Start here](/docs#00-start-here)** — what the library is, install, **`ApexPainter`**, minimal example (**`00-start-here/00-start-here.mdx`**).
 2. **[Feature tracks](/docs#01-feature-tracks)** — every major topic with a **short summary** and **links** into the right overview (**`00-start-here/01-feature-tracks.mdx`**).
 3. **[Beginner guide](/docs#00-beginner-guide)** — first real images and buffers (**`01-beginner-guide/00-beginner-guide.mdx`**).
-4. **[What you can build](/docs#01-what-you-can-build)** — idea catalog (products → APIs) across **all** features; then **[Recipes hub](/docs#00-recipes-overview)** for copy-paste **`recipe-*.mdx`** flows as you add them.
+4. **[What you can build](/docs#01-what-you-can-build)** — idea catalog (products → APIs); **[Why ApexPainter](/docs#02-philosophy-goals-and-when-to-use)** — goals **`/`** stack; **[Recipes hub](/docs#00-recipes-overview)** — **`recipe-*.mdx`** walkthroughs.
 
-Learning flow lives in **`docs/00-start-here/`** and **`docs/01-beginner-guide/`**. Inspiration and goal-oriented pages live under **`docs/02-recipes/`**.
+Learning flow lives in **`docs/00-start-here/`** and **`docs/01-beginner-guide/`**. Inspiration and philosophy live under **`docs/02-recipes/`**.
 
 ---
 
@@ -23,9 +23,23 @@ Numbered folders follow a rough learning path. Each row links to a **hub page** 
 |--------|-----|------|
 | **`00-start-here`** | [Start here](/docs#00-start-here), [Feature tracks](/docs#01-feature-tracks) | Orientation + navigation |
 | **`01-beginner-guide`** | [Beginner hub](/docs#00-beginner-guide) | Lessons **`01-`…`05-`** — anchors match **`basename`** |
-| **`02-recipes`** | [Recipes](/docs#00-recipes-overview) · [What you can build](/docs#01-what-you-can-build) | Idea catalog + future **`recipe-*.mdx`** snippets |
-| **`03-feature-guides`** | [Feature guides hub](/docs#feature-guides-hub) | Full feature narratives (**includes** [save/output](/docs#00-batch-save-output-overview), [standalone image APIs](/docs#00-standalone-image-tools-overview)) |
-| **`04-api-reference`** | [API reference hub](/docs#00-api-reference-overview) | Types / TS map → guides |
-| **`05-advanced`** | [Advanced hub](/docs#00-advanced-overview) | Cross-cutting composition & performance · [Scene overview](/docs#00-scene-composition) (`05-advanced/scene/`) |
+| **`02-recipes`** | [Recipes](/docs#00-recipes-overview) · [Philosophy](/docs#02-philosophy-goals-and-when-to-use) · [What you can build](/docs#01-what-you-can-build) | Goals, idea catalog, **`recipe-*.mdx`** |
+| **`03-feature-guides`** | [Feature guides hub](/docs#feature-guides-hub) | Full feature narratives (**includes** [raster, batch, output & **`painter.image**](/docs#00-raster-batch-output-overview)) |
+| **`05-advanced`** | [Advanced hub](/docs#00-advanced-overview) | Cross-cutting composition & performance · [Scene overview](/docs#00-scene-composition) · [Composition hub](/docs#00-composition-hub) |
 | **`06-internals`** | [Internals hub](/docs#00-internals-overview) | Code layout for contributors |
 | **`07-contributor-notes`** | [Contributing hub](/docs#00-contributing-overview) | Doc style, build, pointers |
+
+---
+
+## TypeScript signatures & types
+
+There is **no separate generated API micro-site** in this repo: behaviour is documented in **`03-feature-guides/`**, and **signatures** live in **`lib-next/`** (published as **`apexify.js`** and **`apexify.js/types`**).
+
+| Looking for | Where |
+|-------------|--------|
+| **`ApexPainter`** methods | **`lib-next/apex-painter/main.ts`** |
+| Exported surface and re-exports | **`lib-next/index.ts`** |
+| Public types | **`lib-next/types/`** (package export **`apexify.js/types`**) |
+| Domain internals | **`lib-next/canvas/`**, **`gif/`**, **`video/`**, **`chart/`**, … |
+
+---

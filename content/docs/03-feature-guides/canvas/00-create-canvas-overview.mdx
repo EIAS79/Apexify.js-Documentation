@@ -1,17 +1,68 @@
 # Canvas & `createCanvas` — overview {#00-create-canvas-overview}
 
-**`await painter.createCanvas(config)`** builds your **first** image: width, height, and everything drawn **behind** later text/images.
+**`await painter.createCanvas(config[, painterOpts])`** allocates a **`@napi-rs/canvas`** surface, paints backgrounds (layers, gradients, images, patterns, noise), applies clip, zoom, rotation, blur, optional shadow and stroke, and returns PNG bytes. Most Apexify pipelines start here — **`createImage`**, **`createText`**, and charts composite on top of **`CanvasResults.buffer`** (or a plain **`Buffer`** from elsewhere).
 
 ---
 
-## What you get back
+## Signature & types
 
 ```typescript
-const { buffer, canvas } = await painter.createCanvas({ ... });
+await painter.createCanvas(
+  config: CanvasConfig,
+  painterOpts?: { resolveAssetRefs?: boolean }
+): Promise<CanvasResults>;
 ```
 
-- **`buffer`** — PNG **`Buffer`** (save or pass to **`createText`** / **`createImage`**).
-- **`canvas`** — the **`CanvasConfig`** you passed (echo for debugging).
+**`CanvasConfig`**, **`BackgroundLayer`**, **`CanvasResults`** — **`apexify.js`** (**`lib-next/types/canvas.ts`**). With **`resolveAssetRefs: true`**, **`$…`** placeholders in **`config`** resolve via **`painter.assets`** (**same **`maybeResolveRefs`** path as **`main.ts`**).
+
+---
+
+## Return value (**`CanvasResults`**)
+
+```typescript
+const { buffer, canvas } = await painter.createCanvas({
+  width: 800,
+  height: 450,
+  colorBg: '#0f172a',
+});
+```
+
+| Field | Meaning |
+|-------|---------|
+| **`buffer`** | **`image/png`** **`Buffer`** — save, **`outPut`**, or pass to **`createImage`** **`/`** **`createText`**. |
+| **`canvas`** | The **`CanvasConfig`** reference you passed (**may be mutated**: **`customBg.inherit`** sets **`width`** **`/`** **`height`** from the image; **`videoBg`** can fill missing dimensions). Useful for inspecting the effective size after those steps. |
+
+---
+
+## Defaults & validation (quick rules)
+
+| Topic | Behaviour |
+|-------|-----------|
+| **Size** | If **`width`** **`/`** **`height`** stay unset after **`inherit`** **`/`** **`videoBg`** sizing, they default to **`500`** each — prefer explicit dimensions in production. |
+| **Primary fill mutex** | At most **one** of **`colorBg`**, **`gradientBg`**, **`customBg`** — supplying more than one throws (**see [Primary backgrounds](/docs#02-backgrounds-primary)**). |
+| **`opacity`** | Canvas global alpha must be **`0`** **`–`** **`1`**. |
+| **`zoom.scale`** | Must be **`> 0`** when set. |
+| **`bgLayers`** | Each layer **`type`** is **`color`**, **`gradient`**, **`image`**, **`pattern`**, **`presetPattern`**, or **`noise`** (**per-entry validation**). |
+
+**`videoBg`**, **`patternBg`**, **`noiseBg`**, **`transparentBase`**, and **`bgLayers`** interact with primary fills as documented in **[Paint order](/docs#09-canvas-paint-order)**.
+
+---
+
+## Minimal example
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter({ type: 'buffer' });
+
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: '#020617',
+});
+
+// buffer → save, createImage, createText, charts…
+```
 
 ---
 
@@ -19,22 +70,30 @@ const { buffer, canvas } = await painter.createCanvas({ ... });
 
 | # | Page | Covers |
 |---|------|--------|
-| 1 | [Size & coordinates](/docs#01-canvas-size-and-coordinates) | **`width`**, **`height`**, **`x`**, **`y`**, inherit sizing |
-| 2 | [Primary backgrounds](/docs#02-backgrounds-primary) | **`colorBg`**, **`gradientBg`**, **`customBg`**, **`videoBg`** — **pick one** |
-| 3 | [Transparent base](/docs#03-backgrounds-transparent-base) | **`transparentBase`** + when to use it |
-| 4 | [Background layers (`bgLayers`)](/docs#04-backgrounds-bg-layers) | Stacked color / gradient / image / pattern / noise |
-| 5 | [Patterns & noise — full catalogue](/docs#05-backgrounds-pattern-noise) | **`patternBg`**, **`bgLayers`** **`pattern`** / **`presetPattern`**, every **`PatternOptions.type`**, **`noiseBg`** |
-| 6 | [Border clip & motion](/docs#06-canvas-border-shadow-zoom) | **`borderRadius`**, **`zoom`**, **`rotation`**, **`opacity`**, **`blendMode`**, canvas **`blur`** |
-| 7 | [Shadow — all fields](/docs#07-canvas-shadow-options) | **`ShadowOptions`**: **`gradient`**, **`blur`**, **`borderRadius`**, **`roundedCorners`**, … |
-| 8 | [Stroke — all fields](/docs#08-canvas-stroke-options) | **`StrokeOptions`**: **`gradient`**, **`style`**, **`borderPosition`** edges, **`position`**, … |
-| 9 | [Paint order (reference)](/docs#09-canvas-paint-order) | Exact pipeline inside **`CanvasCreator`** |
+| 1 | [Size & coordinates](/docs#01-canvas-size-and-coordinates) | **`width`**, **`height`**, **`x`**, **`y`**, **`customBg.inherit`**, **`videoBg`** sizing |
+| 2 | [Primary backgrounds (pick one)](/docs#02-backgrounds-primary) | **`colorBg`**, **`gradientBg`**, **`customBg`**, **`videoBg`** vs **`patternBg`** **`/`** **`noiseBg`** |
+| 3 | [Transparent base](/docs#03-backgrounds-transparent-base) | **`transparentBase`** |
+| 4 | [Background layers (`bgLayers`)](/docs#04-backgrounds-bg-layers) | Stacked colour, gradient, image, pattern, procedural, noise |
+| 5 | [Patterns & film noise](/docs#05-backgrounds-pattern-noise) | **`patternBg`**, **`presetPattern`**, **`noiseBg`** |
+| 6 | [Border clip, zoom, rotation & canvas blur](/docs#06-canvas-border-shadow-zoom) | **`borderRadius`**, **`zoom`**, **`rotation`**, **`opacity`**, **`blendMode`**, **`blur`** |
+| 7 | [Shadow (`ShadowOptions`)](/docs#07-canvas-shadow-options) | **`shadow`** |
+| 8 | [Stroke (`StrokeOptions`)](/docs#08-canvas-stroke-options) | **`stroke`** |
+| 9 | [Paint order (reference)](/docs#09-canvas-paint-order) | **`CanvasCreator`** pipeline |
 
 ---
 
-## Implementation note
+## Next surfaces
 
-Logic lives in **`lib/Canvas/extended/CanvasCreator.ts`**. Types: **`CanvasConfig`** in **`lib/Canvas/utils/types/index.ts`**.
+| Step | Docs |
+|------|------|
+| Photos / shapes | [Images overview](/docs#00-create-image-overview) |
+| Typography | [Text overview](/docs#00-create-text-overview) |
+| Save / encode / batch | [Raster, batch & output](/docs#00-raster-batch-output-overview) |
 
 ---
 
-Start with **[Size & coordinates](/docs#01-canvas-size-and-coordinates)**.
+## Implementation (`lib-next`)
+
+**`CanvasCreator.createCanvas`** (**`canvas/canvas-creator.ts`**) **`→`** **`composeCanvasForScene`** **`/`** **`paintConfiguredCanvasSurface`**. Helpers:** **`canvas/background-renderer.ts`**, **`canvas/pattern-renderer.ts`**, **`render/shadow-renderer.ts`**, **`render/stroke-renderer.ts`**, **`render/clip-path.ts`**.
+
+---

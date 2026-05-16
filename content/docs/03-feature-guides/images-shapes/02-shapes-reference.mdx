@@ -1,119 +1,134 @@
-# Shapes — every `ShapeType` & `ShapeProperties` field {#02-shapes-reference}
+# Shapes — every `ShapeType` & `ShapeProperties` {#02-shapes-reference}
 
-Back: [Images overview](/docs#00-create-image-overview)
 
-Use **`createImage`** with **`source`** set to a **`ShapeType`**. Optional styling lives under **`shape?: ShapeProperties`**.
-
-Types: **`ShapeType`**, **`ShapeProperties`** in **`lib/Canvas/utils/types/index.ts`**. Drawing: **`drawShape`** / **`createShapePath`** in **`lib/Canvas/utils/Shapes/shapes.ts`**.
+Vector shapes are drawn through the same **`createImage`** pipeline as bitmaps: set **`source`** to a **`ShapeType`** string and put geometry/styling under **`shape?: ShapeProperties`**.
 
 ---
 
-## Shape catalogue
-
-| **`ShapeType`** | Geometry | Notes |
-|-----------------|----------|--------|
-| **`rectangle`** | Axis-aligned rect **`x,y,width,height`** | Full box. |
-| **`square`** | **`min(width,height)`** side | Anchored at **`x,y`**. |
-| **`circle`** | **`arc`** | Radius from **`shape.radius`** or **`min(w,h)/2`**. |
-| **`triangle`** | Up-pointing triangle | Base along bottom edge of box. |
-| **`trapezium`** | Isosceles trapezoid | Top width ≈ **60%** of box width (fixed proportion). |
-| **`star`** | 5-point star | **`innerRadius`** / **`outerRadius`** (defaults derived from box). |
-| **`heart`** | Bézier heart | Fills bounding box. |
-| **`polygon`** | Regular **or** custom | **`sides`** for regular; **`points`** for arbitrary polygon (**absolute canvas coords** — see below). |
-| **`arc`** | Annulus sector | **`innerRadius`**, **`outerRadius`** / **`radius`**, angles in **radians**. |
-| **`pieSlice`** | Same path as **`arc`** | Pie / donut slice style fill. |
-
----
-
-## `ShapeProperties` — universal fields
-
-| Field | Applies to | Purpose |
-|-------|------------|---------|
-| **`fill`** | All | **`false`** → path constructed but **no** **`fill()`** (stroke-only workflows). Default filled. |
-| **`color`** | All | Solid **`fillStyle`** when **`gradient`** absent. Default **`#000000`**. |
-| **`gradient`** | All | Same **`gradient`** union as canvas backgrounds — filled via **`createGradientFill`**. |
-| **`radius`** | **`circle`**, **`arc`/`pieSlice`** | Circle radius or outer arc radius fallback. |
-| **`sides`** | **`polygon`** (regular) | Count of vertices (default **6**). Ignored when **`points`** set. |
-| **`innerRadius`** | **`star`**, **`arc`/`pieSlice`** | Star valleys / annulus inner radius. **`0`** → solid pie slice. |
-| **`outerRadius`** | **`star`**, **`arc`/`pieSlice`** | Star tips / outer arc. |
-| **`points`** | **`polygon`** | **`{x,y}[]`** — **canvas-space coordinates**, **not** relative to **`ImageProperties.x/y`**. |
-| **`startAngle`** | **`arc`/`pieSlice`** | Radians (default **0**). |
-| **`endAngle`** | **`arc`/`pieSlice`** | Radians (default **`2π`**). |
-| **`centerX`**, **`centerY`** | **`arc`/`pieSlice`** | Arc centre (default: centre of **`x,y,width,height`** box). |
-
----
-
-## Polygon — critical: `points` are absolute
+## Quick usage
 
 ```typescript
 await painter.createImage(
   {
-    source: 'polygon',
-    x: 0,
-    y: 0,
-    width: 400,
-    height: 400,
+    source: 'star',
+    x: 40,
+    y: 40,
+    width: 180,
+    height: 180,
     shape: {
       fill: true,
-      color: '#22c55e',
-      points: [
-        { x: 120, y: 80 },
-        { x: 280, y: 60 },
-        { x: 320, y: 200 },
-        { x: 200, y: 280 },
-        { x: 80, y: 180 },
-      ],
+      color: '#f59e0b',
+      outerRadius: 70,
+      innerRadius: 28,
     },
+    stroke: { color: '#1f2937', width: 3 },
+    shadow: { color: '#00000066', offsetX: 4, offsetY: 6, blur: 12 },
   },
   buffer
 );
 ```
 
-The **`width`/`height`** on **`ImageProperties`** still matter for **shadow**, **filters**, and layout bookkeeping — but the outline follows **`points`** verbatim.
+Required layer fields **`x`** and **`y`** always anchor the **layout rectangle**. Most primitives derive geometry from **`width`** / **`height`** (defaults **`100`** each when omitted).
 
 ---
 
-## Arc / pie slice example
+## Shape catalogue (`ShapeType`)
 
-Angles are **radians** (use **`Math.PI`**):
+| `ShapeType` | Layout box | Main `shape` fields |
+|-------------|------------|---------------------|
+| **`rectangle`** | Full **`width` × `height`** | **`fill`**, **`color`**, **`gradient`** |
+| **`square`** | Side = **`min(width, height)`** from **`(x, y)`** | Same as rectangle |
+| **`circle`** | Ellipse inscribed in box | **`radius`** (defaults to **`min(w,h)/2`**), **`color`**, **`gradient`** |
+| **`triangle`** | Up-pointing triangle | **`color`**, **`gradient`** |
+| **`trapezium`** | Isosceles trapezoid | **`color`**, **`gradient`** |
+| **`star`** | 5-point star centred in box | **`outerRadius`**, **`innerRadius`** (optional; defaults scale from box) |
+| **`heart`** | Heart fitting the box | **`color`**, **`gradient`** |
+| **`polygon`** | Regular polygon **or** custom path | **`sides`** (default **`6`**) **or** **`points`** |
+| **`arc`** | Arc / annulus sector | **`centerX`**, **`centerY`**, **`radius`** / **`outerRadius`**, **`innerRadius`**, **`startAngle`**, **`endAngle`** (radians) |
+| **`pieSlice`** | Same geometry path as **`arc`** | Use **`innerRadius: 0`** for a filled wedge |
+
+---
+
+## `ShapeProperties` reference
+
+| Field | Applies to | Role |
+|-------|------------|------|
+| **`fill`** | All | **`false`** skips **`fill()`** (outline-only useful with **`stroke`**) |
+| **`color`** | All | Fill colour when **`gradient`** is omitted |
+| **`gradient`** | All | Gradient fill (**`gradient`** type from **`apexify.js`**) |
+| **`radius`** | **`circle`** | Overrides automatic radius |
+| **`outerRadius`** / **`innerRadius`** | **`star`**, **`arc`**, **`pieSlice`** | Star tips/valleys; arc outer/inner radii |
+| **`sides`** | **`polygon`** (regular mode) | Number of vertices (default **`6`**) |
+| **`points`** | **`polygon`** (custom mode) | **`{ x, y }[]`** — **canvas-absolute** coordinates (see below) |
+| **`centerX`** / **`centerY`** | **`arc`**, **`pieSlice`** | Arc centre (default: centre of layout box) |
+| **`startAngle`** / **`endAngle`** | **`arc`**, **`pieSlice`** | Radians; default full turn **`0` → `2π`** |
+
+---
+
+## Important behaviour notes
+
+1. **`star`** is always **5** points; `shape.points` is **not** used for stars.
+2. **Custom `polygon.points`** are **absolute** canvas coordinates — they are **not** interpreted as offsets from **`x, y`**. Omit **`points`** to get a regular polygon centred in the layout box.
+3. **`arc`** vs **`pieSlice`** share the same implementation: with **`innerRadius > 0`** you get an annulus sector; with **`innerRadius`** omitted or **`0`**, the path includes the centre (pie wedge).
+4. **Shape layers** support **`filters`**, **`shadow`**, **`stroke`**, **`boxBackground`**, **`borderRadius`**, and **`borderPosition`** from the parent **`ImageProperties`**, but they **do not** use the bitmap-only features **`mask`**, **`distortion`**, **`meshWarp`**, **`clipPath`**, **`effects`**, **`filterOrder`**, or **`filterIntensity`** (see [Paint order](/docs#09-create-image-paint-order)).
+5. **Shadows:** **`heart`** and **`star`** use a **shape-aware** shadow path; other shapes use the **rectangular** shadow for the layout box.
+
+---
+
+## More examples
+
+**Regular hexagon**
 
 ```typescript
-await painter.createImage(
-  {
-    source: 'pieSlice',
-    x: 50,
-    y: 50,
-    width: 200,
-    height: 200,
-    shape: {
-      fill: true,
-      gradient: {
-        type: 'linear',
-        startX: 0,
-        startY: 0,
-        endX: 200,
-        endY: 200,
-        colors: [
-          { stop: 0, color: '#f97316' },
-          { stop: 1, color: '#7c3aed' },
-        ],
-      },
-      startAngle: 0,
-      endAngle: Math.PI * 1.25,
-      innerRadius: 40,
-    },
-  },
-  buffer
-);
+{
+  source: 'polygon',
+  x: 50,
+  y: 50,
+  width: 200,
+  height: 200,
+  shape: { color: '#6366f1', sides: 6 },
+}
 ```
 
----
+**Custom polygon (absolute vertices)**
 
-## Shadow & stroke on shapes
+```typescript
+{
+  source: 'polygon',
+  x: 0,
+  y: 0,
+  width: 400,
+  height: 400,
+  shape: {
+    color: '#10b981',
+    points: [
+      { x: 200, y: 60 },
+      { x: 320, y: 320 },
+      { x: 80, y: 320 },
+    ],
+  },
+}
+```
 
-- **Simple shapes** (rectangle, circle, triangle, …): **`shadow`** uses the same rounded-rect **`applyShadow`** as bitmaps (**bounding box**).
-- **Complex shapes** (**`heart`**, **`star`**): **`ImageCreator`** uses **`applyShapeShadow`** — gradient/colour blob follows **real outline**, **not** including **`shadow.borderRadius`** / **`roundedCorners`** from **`ShadowOptions`** (those keys exist on the type but this branch ignores corner rounding on the shadow silhouette).
+**Donut arc segment**
 
-**Stroke** on any shape: outline traced with **`createShapePath`** so it follows real geometry (stars/hearts included). **`StrokeOptions`** fields match [canvas stroke](/docs#08-canvas-stroke-options).
+```typescript
+{
+  source: 'arc',
+  x: 0,
+  y: 0,
+  width: 300,
+  height: 300,
+  shape: {
+    color: '#f472b6',
+    startAngle: 0,
+    endAngle: Math.PI,
+    outerRadius: 120,
+    innerRadius: 70,
+    centerX: 150,
+    centerY: 150,
+  },
+}
+```
 
 ---

@@ -1,0 +1,89 @@
+# Batch & chain {#01-batch-and-chain}
+
+**`painter.batch`** runs **independent** canvas **`/`** image **`/`** text jobs **in parallel** (`Promise.all`). **`painter.chain`** runs **named painter methods sequentially**, passing the **previous step’s `Buffer`** into the next when you use the placeholder **`'current'`** or **`{ __isCurrentBuffer: true }`**.
+
+Types: **`BatchOperation`**, **`ChainOperation`**, **`BatchChainAssetOpts`** (**`lib-next/types/batch.ts`**, **`lib-next/batch/batch-operations.ts`**).
+
+---
+
+## `batch(operations, opts?)`
+
+```typescript
+await painter.batch(operations: BatchOperation[], opts?: BatchChainAssetOpts): Promise<Buffer[]>;
+```
+
+| Field | Meaning |
+|-------|---------|
+| **`operations`** | Non-empty array of **`{ type, config }`**. |
+| **`opts.resolveAssetRefs`** | When **`true`**, each **`config`** is **`resolveAssetRefsDeep`** — **`opts.resolve`** **must** be set unless you rely on **`ApexPainter`** wiring (**defaults** **`painter.assets.resolve`**). |
+
+### Operation types
+
+| **`type`** | Behaviour |
+|------------|-----------|
+| **`canvas`** | **`await painter.createCanvas(config)`** → returns **`canvasResult.buffer`**. |
+| **`image`** | Builds a temporary **`800×600`** canvas, then **`createImage(config, baseCanvas)`**. |
+| **`text`** | Same temporary canvas pattern with **`createText(config, baseCanvas)`**. |
+
+```typescript
+const [badge, label] = await painter.batch(
+  [
+    { type: 'canvas', config: { width: 120, height: 40, color: '#0f172a' } },
+    {
+      type: 'text',
+      config: [{ text: 'Hi', x: 12, y: 26, font: { size: 18, family: 'Arial', color: '#fff' } }],
+    },
+  ],
+  { resolveAssetRefs: true }
+);
+```
+
+---
+
+## `chain(operations, opts?)`
+
+```typescript
+await painter.chain(operations: ChainOperation[], opts?: BatchChainAssetOpts): Promise<Buffer>;
+```
+
+Each step **`{ method: string; args: unknown[] }`**:
+
+| **`method`** | Resolution |
+|--------------|------------|
+| Top-level name | **`painter[method]`** (must be a **`function`**). |
+| Dotted path (**e.g.** **`path2d.draw`**) | Walks **`painter`** properties (**facet methods** supported). |
+
+### Args & **`resolveAssetRefs`**
+
+- Placeholders **`'current'`** or **`{ __isCurrentBuffer: true }`** → replaced by **`currentBuffer`** from the previous successful step (**first step:** **`undefined`** unless you pass real buffers).
+- Other arguments: when **`resolveAssetRefs`** is **`true`**, deep **`$…`** resolution runs (**requires **`resolve`****, same rule as **`batch`**).
+
+### Return shape contract
+
+Each step must resolve to **`Buffer`** **or** **`{ buffer: Buffer }`** (**e.g.** **`createCanvas`** returns **`CanvasResults`**). Anything else throws (**`chain: Operation … did not return a buffer`**).
+
+```typescript
+const ribbon = await painter.chain([
+  { method: 'createCanvas', args: [{ width: 400, height: 80, color: '#111827' }] },
+  {
+    method: 'path2d.draw',
+    args: [
+      'current',
+      [
+        { type: 'moveTo', x: 20, y: 40 },
+        { type: 'lineTo', x: 380, y: 40 },
+      ],
+      { stroke: { color: '#f472b6', width: 4 } },
+    ],
+  },
+]);
+```
+
+---
+
+## Design notes
+
+- **`batch`** **`/`** **`chain`** only cover **`createCanvas`** **`/`** **`createImage`** **`/`** **`createText`** **syntactic sugar** for **`batch`** — not arbitrary methods. **`chain`** is the escape hatch for **`path2d`**, **`pixels`**, **`createImage`** on a prior buffer, etc.
+- Errors wrap the failing op: **`batch: Failed to process …`**, **`chain: Failed to execute "…"`**.
+
+---

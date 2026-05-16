@@ -1,8 +1,7 @@
 # Feature tracks — where to go next {#01-feature-tracks}
 
-Back: [Start here](/docs#00-start-here)
 
-These tracks live under **`docs/03-feature-guides/`**. Each row is a **topic lane**: open the linked overview, then follow the numbered chapters inside that folder.
+Each row is a **topic lane**: open the linked overview first, then follow the numbered chapters in that topic from the **[Feature guides hub](/docs#feature-guides-hub)**.
 
 You already learned **`ApexPainter`** on **[Start here](/docs#00-start-here)**. Use this page when you know **what** you want to build and need the **right guide**.
 
@@ -12,16 +11,15 @@ You already learned **`ApexPainter`** on **[Start here](/docs#00-start-here)**. 
 
 | Track | What you can do | Hub |
 |-------|-----------------|-----|
-| **Canvas** | Sizes, coordinates, solid / gradient / image backgrounds, layers, patterns, noise, borders, shadows, zoom | **[Canvas overview](/docs#00-create-canvas-overview)** · `03-feature-guides/canvas/` |
-| **Images & shapes** | **`createImage`** — placement, crop, filters, masks, groups, effects, clip, shapes | **[Images overview](/docs#00-create-image-overview)** · `03-feature-guides/images-shapes/` |
-| **Text** | **`createText`** — fonts, layout, gradients, stroke/glow, curved text, **`measureText`** | **[Text overview](/docs#00-create-text-overview)** · `03-feature-guides/text-rendering/` |
-| **GIF & animation** | **`createGIF`**, **`animate`**, frames, disposal, watermarks, encode pipeline | **[GIF overview](/docs#00-create-gif-overview)** · [`animate` API](/docs#08-animate-api) · `03-feature-guides/gif-animation/` |
-| **Lines & Path2D** | **`path2d.custom`** connectors, **`path2d.create`**, **`path2d.draw`**, **`detect.path`**, arrows, textures | **[Lines overview](/docs#00-custom-lines-overview)** · `03-feature-guides/lines-connectors/` |
-| **Charts** | Bar, line, pie, radar, polar, combo / comparison charts | **[Charts overview](/docs#00-charts-overview)** · `03-feature-guides/charts/` |
-| **Video & FFmpeg** | **`createVideo`**, discovery, transcode, overlays, compose — optional FFmpeg on **`PATH`** | **[Video overview](/docs#00-video-overview)** · `03-feature-guides/video-ffmpeg/` · [Option guides](/docs#00-video-options-hub) |
-| **Pixels & utilities** | **`pixels.getData`**, **`pixels.manipulate`**, **`detect.path`**, **`batch`** / **`chain`**, **`image.stitchImages`**, compress | **[Raster overview](/docs#00-advanced-raster-overview)** · `03-feature-guides/raster-hit-pixel-path/` |
-| **Save & encoded output** | **`save`**, **`saveMultiple`**, **`outPut`**, **`output.dataURL`**, constructor **`type`** | **[Batch / save hub](/docs#00-batch-save-output-overview)** · `03-feature-guides/batch-save-output/` |
-| **Standalone image tools** | **`image.resize`**, **`image.cropImage`**, **`image.colorAnalysis`**, **`image.colorsRemover`**, **`image.effects`**, **`image.blend`**, **`image.masking`**, **`image.gradientBlend`**, **`image.stitchImages`**, … | **[Standalone tools](/docs#00-standalone-image-tools-overview)** · `03-feature-guides/standalone-image-tools/` |
+| **Canvas** | Sizes, coordinates, solid / gradient / image backgrounds, layers, patterns, noise, borders, shadows, zoom | **[Canvas overview](/docs#00-create-canvas-overview)** |
+| **Images & shapes** | **`createImage`** — placement, crop, filters, masks, groups, effects, clip, shapes | **[Images overview](/docs#00-create-image-overview)** |
+| **Text** | **`createText`** — fonts, layout, gradients, stroke/glow, curved text, **`measureText`** | **[Text overview](/docs#00-create-text-overview)** |
+| **GIF & animation** | **`createGIF`**, **`animate`**, frames, disposal, watermarks, encode pipeline | **[GIF overview](/docs#00-create-gif-overview)** · [`animate` API](/docs#08-animate-api) |
+| **Lines & Path2D** | **`path2d.custom`** connectors, **`path2d.create`**, **`path2d.draw`**, **`detect.path`**, arrows, textures | **[Lines overview](/docs#00-custom-lines-overview)** |
+| **Charts** | Bar, line, pie, radar, polar, combo / comparison charts | **[Charts overview](/docs#00-charts-overview)** |
+| **Video & FFmpeg** | **`createVideo`**, discovery, transcode, overlays, compose — optional FFmpeg on **`PATH`** | **[Video overview](/docs#00-video-overview)** · [Option guides](/docs#00-video-options-hub) |
+| **Raster · batch · save · output · `painter.image`** | **`pixels`**, **`path2d`**, **`detect`**, **`batch`** **`/`** **`chain`**, **`save`**, **`outPut`**, **`image.*`** | **[Raster, batch & output](/docs#00-raster-batch-output-overview)** |
+| **Templates · assets · components · plugins** (**5.4+**) | **`createTemplate`**, **`painter.assets`**, **`prepareForRender`**, **`$`** toggles on paints, **`painter.components`**, **`painter.plugins`**, **`painter.use`** | **[Composition hub](/docs#00-composition-hub)** · [Scene overview](/docs#00-scene-composition) |
 
 ---
 
@@ -30,21 +28,21 @@ You already learned **`ApexPainter`** on **[Start here](/docs#00-start-here)**. 
 1. **[Beginner guide](/docs#00-beginner-guide)** — first PNG, buffers, saving, mistakes.
 2. **[Canvas](/docs#00-create-canvas-overview)** — almost everything draws onto a canvas you create first.
 3. Pick **one** of Images, Text, or GIF next (whatever matches your project).
-4. Add **Lines**, **Charts**, **Video**, or **Pixels** only when you need that capability.
+4. Add **Recipes** (**[philosophy](/docs#02-philosophy-goals-and-when-to-use)**, **[what you can build](/docs#01-what-you-can-build)**) when you need outcome framing **`/`** **`recipe-*`** snippets.
+5. Add **Lines**, **Charts**, **Video**, **[Raster / batch / save](/docs#00-raster-batch-output-overview)**, or **Composition** (templates · assets · **[hub](/docs#00-composition-hub)**) when you need that capability.
 
 ---
 
-## Other doc folders (outside feature guides)
+## Other hubs (beyond feature guides)
 
-| Folder | Hub | Use when |
+| Topic | Hub | Use when |
 |--------|-----|----------|
-| **`02-recipes`** | [Recipes](/docs#00-recipes-overview) · [What you can build](/docs#01-what-you-can-build) | Idea catalog per feature + **`recipe-*.mdx`** tutorials. |
-| **`04-api-reference`** | [API reference](/docs#00-api-reference-overview) | Find TS sources & map methods → guides. |
-| **`05-advanced`** | [Advanced](/docs#00-advanced-overview) · [Scene overview](/docs#00-scene-composition) | Composition, engines, performance intuition; **Scene** layer graph & GIF/video export (`05-advanced/scene/`). |
-| **`06-internals`** | [Internals](/docs#00-internals-overview) | **`ApexPainter`** / **`extended`** / **`utils`** map. |
-| **`07-contributor-notes`** | [Contributing](/docs#00-contributing-overview) | Doc conventions, build, maintainer notes. |
+| **Recipes & ideas** | [Recipes](/docs#00-recipes-overview) · [Philosophy](/docs#02-philosophy-goals-and-when-to-use) · [What you can build](/docs#01-what-you-can-build) | Outcomes, **`recipe-*`**, catalog → guides. |
+| **Types & source** | **[Docs README](/docs#readme)** (**TypeScript signatures & types**) · [Internals](/docs#00-internals-overview) | Where **`lib-next`** implementations live. |
+| **Advanced · Scene · Composition** | [Advanced](/docs#00-advanced-overview) · [Scene](/docs#00-scene-composition) · [Composition hub](/docs#00-composition-hub) | Layer graphs, GIF/video exports, templates & **`$`** assets. |
+| **Internals · contributing** | [Internals](/docs#00-internals-overview) · [Contributing](/docs#00-contributing-overview) | Maintainer notes — prefer product docs above for everyday use. |
 
-Full index of **`03-feature-guides`** subfolders: **[Feature guides hub](/docs#feature-guides-hub)**.
+Full topic index: **[Feature guides hub](/docs#feature-guides-hub)**.
 
 ---
 

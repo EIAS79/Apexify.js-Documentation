@@ -1,0 +1,152 @@
+# `renderSceneToVideoFrames` {#08-render-scene-to-video}
+
+
+Encodes a **frame sequence** into video via **`VideoCreator.createVideo`** with **`createFromFrames`**. The **composed scene PNG** can be **prepended** to your frame list.
+
+**Requirements:** FFmpeg on **`PATH`**. **`video.options.createFromFrames`** is **mandatory** (throws if missing).
+
+---
+
+## Pipeline (summary)
+
+1. **`composedPng = await sceneCreator.render(scene, video.sceneRender)`** — optional **`SceneRenderOptions`** (same as **`renderScene`** second argument).  
+2. **`body`** = **`expandSceneVideoFrames(framesWithRepeats)`** *or* **`[...createFromFrames.frames]`**  
+3. **`frames`** = prepend **`[composedPng, ...body]`** unless **`prependComposedToFrames === false`**  
+4. **`merged`** = `{ ...video.options, source: video.options.source ?? composedPng, createFromFrames: { ...cf, frames } }`  
+5. **`videoCreator.createVideo(merged)`**
+
+**`SceneVideoFrameSlot`:** `string | Buffer | { source: string | Buffer; repeat?: number }` · Optional **`video.sceneRender`** forwards **`SceneRenderOptions`** to that inner scene render step.
+
+---
+
+## Variant: intro card + only composed frame
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter();
+
+const scene = {
+  width: 1920,
+  height: 1080,
+  background: { colorBg: "#020617" },
+  layers: [
+    { type: "text", texts: [{ text: "Intro", x: 120, y: 420, fontSize: 96, color: "#f8fafc" }] },
+  ],
+};
+
+await painter.renderSceneToVideoFrames(scene, {
+  options: {
+    createFromFrames: {
+      frames: [],
+      outputPath: "./out/intro-only.mp4",
+      fps: 30,
+      format: "mp4",
+      quality: "high",
+    },
+    prependComposedToFrames: true,
+  },
+  sceneRender: { maxSurfaceDepth: 24 },
+});
+```
+
+With **empty** **`frames`** and **default prepend**, the list is **`[composedPng]`** — a **very short** clip (one image at **`fps`**).
+
+---
+
+## Variant: composed + file paths / buffers
+
+```typescript
+await painter.renderSceneToVideoFrames(scene, {
+  options: {
+    createFromFrames: {
+      frames: ["./frames/a.png", "./frames/b.png"],
+      outputPath: "./out/slideshow.mp4",
+      fps: 12,
+      format: "mp4",
+      quality: "medium",
+    },
+    prependComposedToFrames: true,
+  },
+});
+```
+
+Final order: **`[composedPng, a.png, b.png]`**.
+
+---
+
+## Variant: `framesWithRepeats` (holds / timelapse feel)
+
+```typescript
+await painter.renderSceneToVideoFrames(scene, {
+  options: {
+    createFromFrames: {
+      frames: [],
+      outputPath: "./out/with-holds.mp4",
+      fps: 24,
+      format: "mp4",
+      quality: "high",
+    },
+    prependComposedToFrames: true,
+    framesWithRepeats: [
+      { source: "./segment1.png", repeat: 48 },
+      { source: "./segment2.png", repeat: 24 },
+      someBuffer,
+    ],
+  },
+});
+```
+
+**`expandSceneVideoFrames`** flattens **`repeat`** into consecutive identical frames for FFmpeg.
+
+---
+
+## Variant: no composed — only explicit frames
+
+```typescript
+await painter.renderSceneToVideoFrames(scene, {
+  options: {
+    createFromFrames: {
+      frames: ["./only/001.png", "./only/002.png"],
+      outputPath: "./out/no-prepend.mp4",
+      fps: 30,
+      format: "mp4",
+    },
+    prependComposedToFrames: false,
+  },
+});
+```
+
+**Must** have non-empty **`frames`** or **`framesWithRepeats`** after expansion, or you get **“no frames after expansion”** (composed is **not** added).
+
+---
+
+## Variant: optional `source` on `VideoCreationOptions`
+
+If you omit **`source`**, it defaults to **`composedPng`** so **`VideoCreationOptions`** stays valid for branches that read **`source`**.
+
+```typescript
+options: {
+  // source omitted on purpose
+  createFromFrames: { /* … */ },
+},
+```
+
+---
+
+## Variant: extra `VideoCreationOptions` keys
+
+The merge does **`{ ...opt, source, createFromFrames }`**. **`VideoCreator.createVideo`** typically follows **one** operation branch — extra keys are usually ignored unless they collide with detection order. Keep **`createFromFrames`** as the **primary** operation for this path.
+
+---
+
+## Troubleshooting
+
+| Symptom | Check |
+|---------|--------|
+| FFmpeg not found | Install FFmpeg, restart shell, **`ffmpeg -version`**. |
+| Empty frames error | Prepend on + non-empty **`frames`** / **`framesWithRepeats`**, or prepend off + non-empty **`frames`**. |
+| Wrong duration | Lower **`fps`** or add **`repeat`** slots to lengthen. |
+
+---
+

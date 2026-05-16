@@ -1,30 +1,11 @@
 # Batch, save & encoded output {#00-batch-save-output-overview}
 
-Back: [Feature guides hub](/docs#feature-guides-hub)
+This track **merged** into **[Raster, batch & output hub](/docs#00-raster-batch-output-overview)** (`docs/03-feature-guides/raster-batch-output/`).
 
-This track covers **writing files to disk**, **`outPut`** encoding, and **where** parallel **`batch`** / **`chain`** helpers are documented.
-
----
-
-## Chapters
-
-| Topic | Page |
-|-------|------|
-| **`save`**, **`saveMultiple`**, **`resetSaveCounter`**, **`SaveOptions`** | [Disk save](/docs#01-save-disk-and-multiple) |
-| **`OutputFormat`**, **`outPut`**, **`painter.output.*`**, **`painter.image.validHex`** | [Encoded output](/docs#02-output-format-and-outPut) · [Standalone `painter.image`](/docs#01-standalone-image-methods) |
-| **`batch`**, **`chain`**, **`painter.image.stitchImages`**, **`createCollage`**, **`compress`**, **`extractPalette`** | [Raster · utilities](/docs#03-batch-stitch-compress-output) *(parallel pipelines + Sharp helpers)* |
-
----
-
-## Mental model
-
-| Flow | APIs |
-|------|------|
-| **PNG `Buffer` → file** | **`save`**, **`saveMultiple`** |
-| **`Buffer` → base64 / data URL / …** | Constructor **`OutputFormat`** + **`outPut`** |
-| **Many independent renders** | **`batch`** |
-| **Sequential pipe (`current` buffer)** | **`chain`** |
-
-Standalone image utilities (**resize**, **crop**, **color analysis**, …) live in **[Standalone image tools](/docs#00-standalone-image-tools-overview)** — different from **`createImage`** compositing.
+| Former chapter | New page |
+|----------------|----------|
+| Disk **`save`** **`/`** **`saveMultiple`** | [Save to disk](/docs#02-save-disk) |
+| **`outPut`**, constructor **`type`**, **`painter.output`** | [Output encoding](/docs#03-output-format-and-encoding) |
+| **`batch`** **`/`** **`chain`** | [Batch & chain](/docs#01-batch-and-chain) |
 
 ---

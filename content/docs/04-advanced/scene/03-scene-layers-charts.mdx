@@ -1,0 +1,183 @@
+# Scene layers — charts {#03-scene-layers-charts}
+
+
+Chart layers call **`ChartCreator`** internally, **`loadImage`** on the returned PNG, then **`drawImage`** at **`x,y`** with optional **`width`**, **`height`**, **`opacity`**.
+
+**`chartType`:** `"pie" | "bar" | "horizontalBar" | "line" | "scatter" | "radar" | "polarArea"`.
+
+**Typing note:** In **`SceneLayer`**, **`data`** and **`options`** are **`unknown`** for **`chart`** / **`chartComparison`** / **`chartCombo`** — you are responsible for shapes that match **`ChartCreator`**. See [Charts overview](/docs#00-charts-overview) and per-chart guides under `03-feature-guides/charts/`.
+
+---
+
+## `chart`
+
+### Variant: pie (simple slices)
+
+```typescript
+{
+  type: "chart",
+  chartType: "pie",
+  data: [
+    { label: "North", value: 40, color: "#3b82f6" },
+    { label: "South", value: 35, color: "#10b981" },
+    { label: "East", value: 25, color: "#f59e0b" },
+  ],
+  options: { title: "Regions" },
+  x: 60,
+  y: 120,
+  width: 400,
+  height: 400,
+  opacity: 1,
+}
+```
+
+### Variant: pie + smaller footprint (thumbnail chart)
+
+```typescript
+{
+  type: "chart",
+  chartType: "pie",
+  data: [
+    { label: "A", value: 1, color: "#ccc" },
+    { label: "B", value: 3, color: "#333" },
+  ],
+  options: { dimensions: { width: 200, height: 200 } },
+  x: 500,
+  y: 40,
+  width: 200,
+  height: 200,
+  opacity: 0.95,
+}
+```
+
+### Variant: line chart (numeric `LineDataPoint[]`)
+
+```typescript
+{
+  type: "chart",
+  chartType: "line",
+  data: [
+    {
+      label: "Revenue",
+      color: "#6366f1",
+      data: [
+        { x: 0, y: 12 },
+        { x: 1, y: 18 },
+        { x: 2, y: 15 },
+        { x: 3, y: 22 },
+      ],
+    },
+  ],
+  options: { title: "Trend" },
+  x: 40,
+  y: 280,
+  width: 520,
+  height: 260,
+}
+```
+
+See [Line chart](/docs#05-chart-line) for **`LineChartOptions`**, multiple series, markers, and area fills.
+
+### Variant: bar chart
+
+Bar data uses **`BarChartData`** (**`label`**, **`xStart`**, **`xEnd`**, **`value`/`values`**, …). Prefer copying a working config from [Bar chart](/docs#03-chart-bar-vertical) into **`data`** / **`options`**.
+
+```typescript
+{
+  type: "chart",
+  chartType: "bar",
+  data: [
+    /* BarChartData[] from the bar chart guide */
+  ],
+  options: {
+    /* BarChartOptions */
+  },
+  x: 32,
+  y: 200,
+  width: 700,
+  height: 380,
+}
+```
+
+### Variant: radar / polarArea / scatter / horizontalBar
+
+Switch **`chartType`** and swap **`data`** / **`options`** per [Charts hub](/docs#00-charts-overview). Position with **`x,y,width,height`** the same way.
+
+---
+
+## `chartComparison`
+
+Calls **`createComparisonChart(layer.options)`** — no separate **`data`** field.
+
+```typescript
+{
+  type: "chartComparison",
+  options: {
+    // ComparisonChartOptions — see docs/03-feature-guides/charts/10-chart-comparison.mdx
+    title: "Plan vs actual",
+    // …series, dimensions, appearance…
+  },
+  x: 0,
+  y: 420,
+  width: 900,
+  height: 320,
+  opacity: 1,
+}
+```
+
+### Variant: two comparison tiles (two layers)
+
+```typescript
+const layers = [
+  {
+    type: "chartComparison" as const,
+    options: { /* first comparison config */ },
+    x: 0,
+    y: 0,
+    width: 480,
+    height: 300,
+  },
+  {
+    type: "chartComparison" as const,
+    options: { /* second comparison config */ },
+    x: 500,
+    y: 0,
+    width: 480,
+    height: 300,
+  },
+];
+```
+
+---
+
+## `chartCombo`
+
+```typescript
+{
+  type: "chartCombo",
+  options: {
+    // ComboChartOptions — see charts/09-chart-combo
+  },
+  x: 40,
+  y: 500,
+  width: 880,
+  height: 360,
+}
+```
+
+---
+
+## Caching pattern (heavy static charts)
+
+Each chart layer **re-renders** the chart on every **`render()`**. If the chart is static, **pre-render** with **`createChart`** once, then use **`imageBuffer`** instead of **`chart`**:
+
+```typescript
+const chartPng = await painter.createChart("pie", pieData, pieOptions);
+
+const layers = [
+  { type: "imageBuffer" as const, buffer: chartPng, x: 40, y: 80, width: 400, height: 400 },
+];
+```
+
+---
+

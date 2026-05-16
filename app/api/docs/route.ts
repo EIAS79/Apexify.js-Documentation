@@ -34,10 +34,14 @@ const TOP_LEVEL_FOLDER_ORDER = [
   '02-recipes',
   '03-feature-guides',
   '04-api-reference',
+  '04-advanced',
   '05-advanced',
   '06-internals',
   '07-contributor-notes',
 ];
+
+/** `04-advanced` and `05-advanced` share the same nested tree behaviour (`scene/`, `composition/`, …). */
+const ADVANCED_FOLDER_NAMES = new Set(['04-advanced', '05-advanced']);
 
 const FEATURE_GUIDE_SUBFOLDER_ORDER = [
   'canvas',
@@ -81,6 +85,7 @@ const TOP_LEVEL_LABELS: Record<string, string> = {
   '02-recipes': 'Recipes',
   '03-feature-guides': 'Feature Guides',
   '04-api-reference': 'API Reference',
+  '04-advanced': 'Advanced',
   '05-advanced': 'Advanced',
   '06-internals': 'Internals',
   '07-contributor-notes': 'Contributor Notes',
@@ -157,8 +162,8 @@ const ADVANCED_ORDER = [
   'complete-developer-guide',
 ];
 
-/** Nested topic folders under `05-advanced` (sidebar order). */
-const ADVANCED_SUBFOLDER_ORDER = ['scene'];
+/** Nested topic folders under Advanced sections (`04-advanced`, `05-advanced`) — sidebar order. */
+const ADVANCED_SUBFOLDER_ORDER = ['composition', 'scene'];
 
 const INTERNALS_ORDER = [
   'internals-overview',
@@ -465,7 +470,7 @@ function getFolderStructure(docsDir: string): { folders: DocFolder[]; rootFiles:
         continue;
       }
 
-      if (entry.name === '05-advanced') {
+      if (ADVANCED_FOLDER_NAMES.has(entry.name)) {
         const subfolders = buildAdvancedNestedSubfolders(folderPath, entry.name, docsDir);
         const looseFiles = getDirectMdxFiles(folderPath, docsDir).map((f) => ({
           ...f,
@@ -542,7 +547,7 @@ function sortFilesForTopLevelFolder(folderName: string, files: DocFile[]): void 
     sortFilesWithOrder(files, RECIPES_ORDER, folderName);
     return;
   }
-  if (folderName === '05-advanced') {
+  if (ADVANCED_FOLDER_NAMES.has(folderName)) {
     sortFilesWithOrder(files, ADVANCED_ORDER, folderName);
     return;
   }

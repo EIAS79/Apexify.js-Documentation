@@ -1,6 +1,5 @@
 # Vertical bar chart {#03-chart-bar-vertical}
 
-Back: [Charts overview](/docs#00-charts-overview)
 
 ```typescript
 await painter.createChart('bar', data, options);
@@ -48,7 +47,13 @@ Set via **`options.type`**.
 
 ---
 
-## Example — standard columns
+## Axes (`axes`)
+
+Vertical **`AxisConfig`** (**`impl/barchart.ts`**) supports **`label`**, **`labelColor`**, **`range`**, **`values`**, **`color`**, **`width`**, **`tickFontSize`**, **`valueSpacing`**. **`axes.y`** adds **`baseline`** for waterfall/spine alignment.
+
+Richer behaviour (**`scale: 'log'`**, **`dateTime`**, **`showTickMarks`/`showTickLabels`**) belongs to **line / scatter / combo** (**`impl/linechart.ts`** **`AxisConfig`**). Comparison **`bar`** panels still use this bar subset unless you switch the panel **`type`**.
+
+---
 
 ```typescript
 await painter.createChart(

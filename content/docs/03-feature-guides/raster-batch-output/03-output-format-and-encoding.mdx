@@ -1,0 +1,133 @@
+# Constructor output type, `outPut` & `painter.output` {#03-output-format-and-encoding}
+
+
+
+**Rendering does not depend on constructor **`type`**.** Canvas **`/`** image **`/`** chart **`/`** scene **`/`** batch **`/`** **`chain`** paths always build raster data the same way and expose results as **`Buffer`** (**typically PNG**) **`/`** structures that carry a **`.buffer`** (**see each API**). The constructor option **`OutputFormat.type`** is **only** read when you call **`await painter.outPut(buffer)`** (**`apex-painter/creates/output-save.ts`** **`→`** **`bufferToPainterOutput`**).
+
+
+
+So you **do not** pick a painter “mode” for drawing — you optionally pick how **`outPut`** should encode an existing buffer. Most codebases keep **`new ApexPainter()`** (**default **`type`: **`buffer`**) and encode explicitly when needed.
+
+
+
+---
+
+
+
+## Optional constructor **`OutputFormat`**
+
+
+
+```typescript
+
+new ApexPainter({ type?: 'buffer' | 'url' | 'blob' | 'base64' | 'dataURL' | 'arraybuffer' });
+
+```
+
+
+
+Default **`type`**:** **`buffer`**. **`outputFormat`** (**getter**) returns the stored **`{ type }`** (**same object reference as internally held** **`/`** **`main.ts`**).
+
+
+
+Use this **only** if you want **`outPut`** to default to a non-buffer encoding without passing format arguments (**there are none on **`outPut`** — it always uses stored **`type`**).
+
+
+
+---
+
+
+
+## `await painter.outPut(results)`
+
+
+
+Single consumer of constructor **`type`**: **`bufferToPainterOutput`** (**`lib-next/output/buffer-output.ts`**). Input must be a **`Buffer`** (**usually PNG bytes from **`createCanvas`** **`/`** **`createImage`** **`/`** **`chain`** **`/`** **`batch`** results).
+
+
+
+| **`type`** | Return |
+
+|------------|--------|
+
+| **`buffer`** | **`Buffer`** unchanged |
+
+| **`base64`** | Base64 **string** (**no** data-URL prefix) |
+
+| **`dataURL`** | **`data:image/png;base64,…`** |
+
+| **`blob`** | **`Blob`** (**browser **`/`** polyfilled**) |
+
+| **`arraybuffer`** | **`ArrayBuffer`** |
+
+| **`url`** | **`Promise<string>`** — uploads PNG via Imgur (**`upload-imgur.ts`**); credentials **`/`** env **/** quotas **/** **`PainterOutput.url`** JSDoc (**`public-types.ts`**) |
+
+
+
+Unsupported **`type`** throws listing allowed values.
+
+
+
+**`save`** **`/`** **`saveMultiple`** write files via **`save-buffer`** and **do not** use constructor **`type`** (**paths **`/`** filenames come from **`SaveOptions`**).
+
+
+
+---
+
+
+
+## `painter.output` (**`PainterOutput`**)
+
+
+
+Explicit encoders (**`facets.ts`** **`/`** **`buffer-encoding`**): **`dataURL`**, **`base64`**, **`blob`**, **`arrayBuffer`**, **`url`** (**async Imgur**, same as **`outPut`** **`url`** mode). These **ignore** constructor **`type`** — handy when one painter produces **many** encodings or you never set **`type`** away from **`buffer`**.
+
+
+
+```typescript
+
+import { ApexPainter } from 'apexify.js';
+
+
+
+const painter = new ApexPainter();
+
+
+
+const { buffer } = await painter.createCanvas({ width: 64, height: 64, colorBg: '#111827' });
+
+
+
+const dataUrl = painter.output.dataURL(buffer);
+
+const b64 = painter.output.base64(buffer);
+
+
+
+// Equivalent to painter.output.dataURL(buffer), without touching constructor type:
+
+const viaOutPut = await new ApexPainter({ type: 'dataURL' }).outPut(buffer);
+
+```
+
+
+
+---
+
+
+
+## Practical takeaway
+
+
+
+| Goal | Approach |
+
+|------|-----------|
+
+| Keep buffers everywhere | **`new ApexPainter()`** (**default**) **`/`** use **`.buffer`** from results |
+
+| Encode ad hoc | **`painter.output.*`** |
+
+| One global encoding for **`outPut`** only | **`new ApexPainter({ type: '…' })`** then **`await painter.outPut(buf)`** |
+
+---

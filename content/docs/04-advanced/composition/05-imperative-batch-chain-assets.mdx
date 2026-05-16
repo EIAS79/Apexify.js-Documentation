@@ -1,0 +1,106 @@
+# Imperative APIs, `SceneBuilder.render`, batch & chain {#05-imperative-batch-chain-assets}
+
+
+**`$`** strings are convenient in **scenes** because **`renderScene`** resolves them **by default**. **Imperative** helpers (**`createCanvas`**, **`createImage`**, **`createText`**, **`measureText`**, charts, **`createGIF`**, **`animate`**, **`createVideo`**) and **`SceneBuilder.render`** default to **no** resolution so literal paths like **`"$not-a-ref"`** remain untouched unless you opt in.
+
+---
+
+## Matrix — where resolution runs
+
+| Entry point | Default | Opt out / opt in |
+|-------------|---------|------------------|
+| **`renderScene`**, **`renderSceneToGIF`** (scene step), **`renderSceneToVideoFrames`** (scene step) | **Resolves `$` strings** | **`{ resolveAssetRefs: false }`** to skip |
+| **`SceneBuilder.render`** (**`createScene`** from **`ApexPainter`**) | **No** resolution | **`{ resolveAssetRefs: true }`** (requires injected resolver — **built-in** when using **`painter.createScene`**) |
+| **`createCanvas`**, **`createImage`**, **`createText`**, **`measureText`**, chart helpers, **`createGIF`**, **`animate`**, **`createVideo`** | **No** resolution | Trailing **`PainterAssetRefsOptions`** — **`{ resolveAssetRefs: true }`** where implemented |
+| **`batch`**, **`chain`** | **No** | Second arg **`{ resolveAssetRefs?: boolean; resolve?: (ref: string) => string | Buffer }`** |
+
+**Templates:** **`TemplateHandle.render`** resolves during template expansion, then calls **`renderScene(..., { resolveAssetRefs: false })`** for the final raster pass.
+
+---
+
+## Imperative example — one-off canvas
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+painter.assets.loadPalette("app", { canvas: "#020617", fg: "#f8fafc" });
+
+await painter.createCanvas(
+  {
+    width: 400,
+    height: 240,
+    colorBg: "$app.canvas",
+  },
+  { resolveAssetRefs: true }
+);
+```
+
+Without **`{ resolveAssetRefs: true }`**, **`colorBg: "$app.canvas"`** stays a **literal string** (and may fail or paint incorrectly depending on API).
+
+---
+
+## `SceneBuilder` example
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+painter.assets.loadImage("badge", "./badge.png");
+
+const scene = painter.createScene({
+  width: 320,
+  height: 180,
+  colorBg: "#0f172a",
+  layers: [
+    { type: "image", images: { source: "$badge", x: 24, y: 24, width: 48, height: 48 } },
+  ],
+});
+
+const png = await scene.render({ resolveAssetRefs: true });
+```
+
+If **`resolveAssetRefs: true`** on a builder **without** a resolver (**not** constructed through **`createScene`**), Apexify throws guiding you toward **`createScene`** or wiring **`assetResolve`** yourself.
+
+---
+
+## `batch` with asset passthrough
+
+Full **`batch`** **`/`** **`chain`** behaviour (**parallel vs sequential**, **`'current'`** buffer pipe): **[Batch & chain](/docs#01-batch-and-chain)**.
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+painter.assets.loadPalette("app", { canvas: "#020617", fg: "#f8fafc" });
+
+await painter.batch(
+  [
+    { type: "canvas", config: { width: 200, height: 120, colorBg: "$app.canvas" } },
+    { type: "text", config: { texts: { text: "Hi", x: 10, y: 24, fontSize: 18, color: "$app.fg" } } },
+  ],
+  { resolveAssetRefs: true }
+);
+```
+
+**`chain`** honours the same second-argument **`BatchChainAssetOpts`**. When **`resolveAssetRefs`** is **`true`**, Apexify walks **`config`** objects (batch) or **non-current** **`args`** (chain) similarly to **`prepareForRender`**. Supply **`resolve`** when you need a **custom** lookup.
+
+---
+
+## When to prefer `prepareForRender`
+
+If you build a **shared config object** and pass it to **several** APIs (or mix resolved + non-resolved fields), run **`prepareForRender`** once and keep imperative calls at their default **`resolveAssetRefs: false`**.
+
+```typescript
+const cfg = painter.prepareForRender({
+  width: 600,
+  height: 400,
+  colorBg: "$app.canvas",
+});
+await painter.createCanvas(cfg);
+```
+
+Back to hub: [Composition hub](/docs#00-composition-hub).
+
+---

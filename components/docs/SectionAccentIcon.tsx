@@ -21,6 +21,7 @@ const ICON_BY_SECTION: Record<string, Icon> = {
   '02-recipes': ClipboardDocumentListIcon,
   '03-feature-guides': CubeIcon,
   '04-api-reference': CodeBracketSquareIcon,
+  '04-advanced': AdjustmentsHorizontalIcon,
   '05-advanced': AdjustmentsHorizontalIcon,
   '06-internals': CpuChipIcon,
   '07-contributor-notes': PencilSquareIcon,

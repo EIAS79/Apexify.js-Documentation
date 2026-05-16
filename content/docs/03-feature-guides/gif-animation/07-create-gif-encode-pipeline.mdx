@@ -1,38 +1,52 @@
 # Encode pipeline (reference) {#07-create-gif-encode-pipeline}
 
-Back: [GIF overview](/docs#00-create-gif-overview)
 
-Order inside **`GIFCreator.createGIF`** for **each** canonical frame — mirrors **`lib/Canvas/extended/GIFCreator.ts`**.
-
----
-
-## Per-frame steps
-
-| Step | What happens |
-|------|----------------|
-| 1 | **`drawFrameOntoEncoderCanvas`** — **`clearRect`**, then **`drawImage`** (direct if dimensions match & **`skipResizeWhenDimensionsMatch`**, else resize-to-cover-style stretch to **`width`×`height`**). |
-| 2 | **`drawWatermarkOverlay`** — per-frame or global PNG/WebP overlay. |
-| 3 | **`textOverlay`** — plain **`fillText`** (**Arial** + **`fontSize`** only). |
-| 4 | **`applyGifEncoderFrameOptions`** — **`setDispose`**, **`setTransparent`** from frame + options merge. |
-| 5 | **`encoder.setDelay(frame.duration)`** |
-| 6 | **`encoder.addFrame(ctx)`** |
-
-After the **last** iteration, **`finalFrameBuffer = canvas.toBuffer('image/png')`** for **`onEnd`**.
+End-to-end order inside **`GIFCreator.createGIF`** (**`gif-creator.ts`**).
 
 ---
 
-## Stream lifecycle
+## 1. Resolve **`finalFrames`**
 
-- Encoder **`createReadStream()`** pipes to buffer accumulator (**non-file**) or **`fs.WriteStream`** (**file**).
-- **`encoder.finish()`** after loop.
-- **`buffer`/`base64`** modes **`end()`** the PassThrough and await **`end`** before reading **`getBuffer()`**.
+| Branch | Behaviour |
+|--------|-----------|
+| **`options.onStart`** | **`collectFramesFromOnStart`** → **`GIFCanonicalFrame[]`** (**array** or **`AsyncIterable`**); **`GIFEncodedFrame.duration`** defaults **`options.delay`** then **`100`** ms. |
+| Else | **`validateGIFOptions`** then **`resolveFrameToBuffer`** each **`GIFInputFrame`** (**`axios`** for **`http`**, **`fs.readFileSync`** for paths). |
 
----
-
-## Dependencies
-
-- **`gifencoder`** for **`GIFEncoder`**
-- **`axios`** for HTTP **`background`** / watermark URLs (dynamic **`require`** in **`GIFCreator`**)
+**Encoder canvas:** **`options.width || 1200`**, **`options.height || 1200`**.
 
 ---
 
+## 2. Encoder setup
+
+- **`GIFEncoder(canvasWidth, canvasHeight)`**
+- Pipe to **`fs.WriteStream`** (**`file`**) or in-memory **`PassThrough`** (**`buffer`**, **`base64`**)
+- **`encoder.start()`**, **`setRepeat(options.repeat || 0)`**, **`setQuality(options.quality || 10)`**
+- One **`createCanvas`** reused for **all** frames (**clear → draw → composite → `addFrame`**).
+
+---
+
+## 3. Per-frame loop
+
+For each **`GIFCanonicalFrame`**:
+
+1. **`drawFrameOntoEncoderCanvas`** — **`clearRect`**, **`loadImage(frame.buffer)`**, scale via **`resizeImage`** unless **`skipResizeWhenDimensionsMatch`** and dimensions already match (**default: skip when sizes equal**).
+2. **`drawWatermarkOverlay`** — per-frame **`GIFWatermarkSpec`** then global **`options.watermark`** (**`loadRasterUrl`** supports **`http`**).
+3. **`textOverlay`** — **`fillText`** with **`${fontSize}px Arial`** (**`fontPath`/`fontName`** ignored — see [Watermark](/docs#04-create-gif-watermark-overlay)).
+4. **`applyGifEncoderFrameOptions`** — **`setDispose`** (**`frame.dispose ?? options.defaultDispose`**), **`setTransparent`** (**per-frame chroma overrides global**).
+5. **`encoder.setDelay(frame.duration)`**, **`encoder.addFrame(ctx)`**.
+6. On **last** frame only — snapshot **`canvas.toBuffer('image/png')`** as **`finalFrameBuffer`** for **`onEnd`**.
+
+---
+
+## 4. Finish & return
+
+- **`encoder.finish()`**, then drain **`outputStream`** for **`buffer`**/**`base64`** (**await **`end`**). (**`attachment`** skips draining — see **[attachment shortcut](#attachment-shortcut)** below.)
+- If **`onEnd(finalFrameBuffer)`** returns **`Buffer`**, combine with GIF bytes per **[onEnd](/docs#06-create-gif-onend-results)** (**`{ gif, static }`** or **`static` only** when **`file`**).
+
+---
+
+## **`attachment`** shortcut {#attachment-shortcut}
+
+When **`outputFormat === 'attachment'`**, **`encoder.finish()`** has **already** run (same loop as other formats). **`createGIF`** then returns **`[{ attachment: encoder.createReadStream(), name: 'gif.js' }]`** **without** draining **`outputStream`** **and** **without** invoking **`onEnd`**. Read from **`attachment`** for encoded bytes — the usual **`buffer`**, **`base64`**, **`file`**, and **`onEnd`** return paths do **not** run in this branch.
+
+---

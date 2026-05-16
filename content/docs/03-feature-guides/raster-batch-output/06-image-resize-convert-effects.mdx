@@ -1,0 +1,152 @@
+# Resize, convert & effects {#06-image-resize-convert-effects}
+
+**`painter.image`** (**`painter-image-utils.ts`**) **`→`** **`core/general-functions`** **`/`** **`core/color`**. Most **`source`** **`/`** **`imagePath`** args accept **filesystem paths** (**resolved vs **`process.cwd()`**) **or **`http(s)`** URLs** where **`axios`** **`/`** **`fetch`** **`/`** **`loadImage`** is used (**see each helper**).
+
+---
+
+## `resize(resizeOptions)`
+
+**`ResizeOptions`** (**`lib-next/types/video.ts`**): **`imagePath`** required; **`size`**; **`maintainAspectRatio`**; **`quality`** **`0`** **`–`** **`100`**; **`outputFormat`** **`png`** **`|`** **`jpeg`**.
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+const jpegBuf = await painter.image.resize({
+  imagePath: './uploads/poster.png',
+  size: { width: 1280 },
+  maintainAspectRatio: true,
+  quality: 88,
+  outputFormat: 'jpeg',
+});
+```
+
+---
+
+## `imgConverter(source, newExtension)`
+
+**`source`** non-empty **string** path **`/`** URL. **`newExtension`**: **`jpeg`**, **`png`**, **`webp`**, **`tiff`**, **`gif`**, **`avif`**, **`heif`**, **`raw`**, **`pdf`**, **`svg`** (**case-insensitive**).
+
+```typescript
+const painter = new ApexPainter();
+
+const webpBuf = await painter.image.imgConverter('./exports/frame.png', 'webp');
+```
+
+---
+
+## `effects(source, filters)`
+
+**Implementation note:** **`imgEffects`** (**`general-functions.ts`**) currently applies **only** filters handled by its **`switch`** — use these **`type`** values so each stage runs (**others log “Unsupported filter type”** and are skipped):
+
+**Working types:** **`flip`**, **`rotate`**, **`brightness`**, **`contrast`**, **`invert`**, **`greyscale`**, **`sepia`**, **`blur`**, **`posterize`**, **`pixelate`**.
+
+```typescript
+const painter = new ApexPainter();
+
+const toned = await painter.image.effects('./raw.jpg', [
+  { type: 'blur', radius: 1.2 },
+  { type: 'brightness', value: 12 },
+  { type: 'contrast', value: 8 },
+]);
+
+const thumb = await painter.image.effects('./hero.png', [
+  { type: 'pixelate', size: 12 },
+]);
+```
+
+**`flip`**: **`horizontal`**, **`vertical`**. **`rotate`**: **`deg`**. **`blur`**: **`radius`**. **`posterize`**: **`levels`**. **`pixelate`**: **`size`** **`/`** optional **`x`**, **`y`**, **`w`**, **`h`**.
+
+---
+
+## `colorsFilter(source, filterColor, opacity?)`
+
+Tint **`/`** wash using **`applyColorFilters`** — **`filterColor`** CSS **`/`** hex **string** **or **`GradientConfig`**.
+
+```typescript
+const painter = new ApexPainter();
+
+const tinted = await painter.image.colorsFilter('./bw.png', '#6366f1', 0.35);
+
+const vignetteTint = await painter.image.colorsFilter('./scene.jpg', {
+  type: 'radial',
+  startX: 400,
+  startY: 300,
+  endX: 400,
+  endY: 300,
+  startRadius: 0,
+  endRadius: 420,
+  colors: [
+    { stop: 0, color: 'rgba(0,0,0,0)' },
+    { stop: 1, color: 'rgba(15,23,42,0.65)' },
+  ],
+});
+```
+
+---
+
+## `colorAnalysis(source)`
+
+Dominant colours (**histogram helper**) **`→`** **`{ color, frequency }[]`** (**string **`frequency`** field).
+
+```typescript
+const painter = new ApexPainter();
+
+const paletteHints = await painter.image.colorAnalysis('./brand-asset.png');
+console.log(paletteHints.slice(0, 8));
+```
+
+---
+
+## `colorsRemover(source, colorToRemove)`
+
+**`RGB`** triple **`0`** **`–`** **`255`**. Result **`Buffer`** **or** **`undefined`** if the underlying **`removeColor`** returns nothing.
+
+```typescript
+const painter = new ApexPainter();
+
+const keyFilled = await painter.image.colorsRemover('./sprite.png', {
+  red: 255,
+  green: 0,
+  blue: 255,
+});
+if (keyFilled) {
+  await Bun.write('./sprite-no-magenta.png', keyFilled); // or fs.writeFileSync
+}
+```
+
+---
+
+## `removeBackground(imageURL, apiKey)`
+
+Calls **`bgRemoval`** (**external HTTP API** **`/`** quotas **`/`** keys depend on that helper — pass a remote **`imageURL`** your backend exposes **`/`** allows).
+
+```typescript
+const painter = new ApexPainter();
+
+const cutout = await painter.image.removeBackground(
+  'https://cdn.example.com/uploads/portrait.jpg',
+  process.env.REMOVAL_API_KEY!
+);
+if (cutout) await Bun.write('./cutout.png', cutout);
+```
+
+---
+
+## `validHex(hexColor)`
+
+Validates **`#RRGGBB`**. **`throws`** if not a string **`/`** wrong shape **`/`** **`boolean`** **`true`** when valid (**`core/color.ts`**).
+
+```typescript
+const painter = new ApexPainter();
+
+try {
+  painter.image.validHex('#0ea5e9');
+  console.log('OK');
+} catch {
+  console.log('Bad hex');
+}
+```
+
+---

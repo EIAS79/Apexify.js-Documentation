@@ -1,10 +1,11 @@
 # What you can build with Apexify.js {#01-what-you-can-build}
 
-Back: [Recipes hub](/docs#00-recipes-overview) · [Feature tracks](/docs#01-feature-tracks)
 
 This page is an **idea catalog**: real products and assets people ship with **`ApexPainter`**, grouped by **feature area**. Use it for inspiration, then open the linked **feature guide** for options and examples.
 
-**Workflow:** pick an outcome below → read the **guide** → optionally turn it into a **`recipe-*.mdx`** snippet under **`docs/02-recipes/`**.
+**Workflow:** pick an outcome below → read the **guide** → optionally capture it as a **`recipe-*.mdx`** (**see [Recipes hub](/docs#00-recipes-overview)**).
+
+For **why** ApexPainter exists and **when** to use it, read **[Philosophy & goals](/docs#02-philosophy-goals-and-when-to-use)** first.
 
 ---
 
@@ -57,7 +58,7 @@ This page is an **idea catalog**: real products and assets people ship with **`A
 |---------------|--------------|--------|
 | Connectors, arrows, dashed UI lines | **`path2d.custom`** | [Lines overview](/docs#00-custom-lines-overview) |
 | Bézier / arc geometry drawn on bitmaps | **`path2d.create`**, **`path2d.draw`** | [Path2D](/docs#04-path2d-draw-path) |
-| Click maps, hover zones (UI exporters) | **`detect.path`**, **`detect.region`**, **`HitRegion`** | [Hit testing](/docs#02-hit-testing-paths) |
+| Click maps, hover zones (UI exporters) | **`detect.path`**, **`detect.region`**, **`HitRegion`** | [Hit detection](/docs#10-hit-detection) |
 
 ---
 
@@ -85,11 +86,11 @@ This page is an **idea catalog**: real products and assets people ship with **`A
 
 | You can build | Primary APIs | Learn |
 |---------------|--------------|--------|
-| Colour pickers, fog/lighting tweaks on regions | **`pixels.getData`**, **`pixels.manipulate`** | [Pixel APIs](/docs#01-pixel-data-manipulation) |
-| Sprite sheets from PNG sequence math | **`pixels.getColor`** / **`pixels.setColor`** (precision edits) | [Pixel APIs](/docs#01-pixel-data-manipulation) |
-| Many canvases in parallel | **`batch`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
-| Multi-step pipelines (buffer handoff) | **`chain`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
-| Filmstrips, grids of images | **`image.stitchImages`**, **`image.createCollage`** | [Raster utilities](/docs#03-batch-stitch-compress-output) |
+| Colour pickers, fog/lighting tweaks on regions | **`pixels.getData`**, **`pixels.manipulate`** | [Pixel data](/docs#08-pixel-data) |
+| Sprite sheets from PNG sequence math | **`pixels.getColor`** / **`pixels.setColor`** (precision edits) | [Pixel data](/docs#08-pixel-data) |
+| Many canvases in parallel | **`batch`** | [Batch & chain](/docs#01-batch-and-chain) |
+| Multi-step pipelines (buffer handoff) | **`chain`** | [Batch & chain](/docs#01-batch-and-chain) |
+| Filmstrips, grids of images | **`image.stitchImages`**, **`image.createCollage`** | [Stitch & collage](/docs#04-image-stitch-and-collage) |
 
 ---
 
@@ -97,20 +98,21 @@ This page is an **idea catalog**: real products and assets people ship with **`A
 
 | You can build | Primary APIs | Learn |
 |---------------|--------------|--------|
-| Timestamped exports, WebP/JPEG pipelines | **`save`**, **`saveMultiple`** | [Disk save](/docs#01-save-disk-and-multiple) |
-| API responses (**base64**, **data URL**) | **`new ApexPainter({ type })`**, **`outPut`** | [Encoded output](/docs#02-output-format-and-outPut) |
+| Timestamped exports, WebP/JPEG pipelines | **`save`**, **`saveMultiple`** | [Save to disk](/docs#02-save-disk) |
+| API responses (**base64**, **data URL**) | **`new ApexPainter({ type })`**, **`outPut`** | [Output encoding](/docs#03-output-format-and-encoding) |
 
 ---
 
-## Standalone image tools (no canvas scene)
+## `painter.image` utilities (whole files / buffers)
 
+Operations below skip **`createImage`** composition — they run through **`painter.image`** (**[Raster hub](/docs#00-raster-batch-output-overview)**, chapters [04](/docs#04-image-stitch-and-collage)–[07](/docs#07-image-blend-mask-crop-gradient)).
 | You can build | Primary APIs | Learn |
 |---------------|--------------|--------|
-| Resize / convert batches | **`resize`**, **`imgConverter`** | [Standalone methods](/docs#01-standalone-image-methods) |
-| Sharp-style filter stacks | **`effects`** | [Standalone methods](/docs#01-standalone-image-methods) |
-| Dominant colours, palettes | **`colorAnalysis`**, **`extractPalette`** | [Standalone](/docs#01-standalone-image-methods) · [compress](/docs#03-batch-stitch-compress-output) |
-| Chroma knock-out, remote BG removal | **`image.colorsRemover`**, **`image.removeBackground`** | [Standalone methods](/docs#01-standalone-image-methods) |
-| Polygon crops, multi-layer blends | **`image.cropImage`**, **`image.blend`**, **`image.masking`**, **`image.gradientBlend`** | [Standalone methods](/docs#01-standalone-image-methods) |
+| Resize / convert batches | **`resize`**, **`imgConverter`** | [Resize & effects](/docs#06-image-resize-convert-effects) |
+| Sharp-style filter stacks | **`effects`** | [Resize & effects](/docs#06-image-resize-convert-effects) |
+| Dominant colours, palettes | **`colorAnalysis`**, **`extractPalette`** | [Resize & effects](/docs#06-image-resize-convert-effects) · [Compress & palette](/docs#05-image-compress-and-palette) |
+| Chroma knock-out, remote BG removal | **`image.colorsRemover`**, **`image.removeBackground`** | [Resize & effects](/docs#06-image-resize-convert-effects) |
+| Polygon crops, multi-layer blends | **`image.cropImage`**, **`image.blend`**, **`image.masking`**, **`image.gradientBlend`** | [Blend & mask](/docs#07-image-blend-mask-crop-gradient) |
 
 ---
 
@@ -124,14 +126,6 @@ This page is an **idea catalog**: real products and assets people ship with **`A
 | **Short promo GIF** | **`createGIF`** or **`animate`** → file |
 | **Product catalogue JPEGs** | **`batch`** (**`image`**) + **`compress`** |
 | **Video teaser montage** | **`createVideo`** **`generateThumbnail`** or **`extractFrames`** |
-
----
-
-## Next steps
-
-1. **[Recipes hub](/docs#00-recipes-overview)** — conventions for **`recipe-*.mdx`** files.  
-2. **[Feature tracks](/docs#01-feature-tracks)** — one-page map into every guide folder.  
-3. **[Advanced overview](/docs#00-advanced-overview)** — how canvas → layers → **`save`** fits together.
 
 ---
 

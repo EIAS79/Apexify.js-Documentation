@@ -1,111 +1,94 @@
 # Canvas stroke — every `StrokeOptions` field {#08-canvas-stroke-options}
 
-Back: [Canvas overview](/docs#00-create-canvas-overview) · [Border & motion](/docs#06-canvas-border-shadow-zoom)
 
-Types: **`StrokeOptions`** in **`lib/Canvas/utils/types/index.ts`**. Rendering: **`applyStroke`** in **`lib/Canvas/utils/Image/imageProperties.ts`**.
+Set **`stroke`** on **`CanvasConfig`** with **`await painter.createCanvas({ … })`**. Apexify strokes the **same logical rectangle** as your clipped canvas (**`x`**, **`y`**, **`width`**, **`height`**) — optionally inset/outset, dashed, blurred, gradient-coloured, or limited to specific edges.
 
-**Important:** Like shadow, **`createCanvas`** passes **`applyStroke(ctx, stroke, x, y, width, height)`** without merging **`canvas.borderRadius`** into stroke — **`stroke.borderRadius`** drives how **thick outline corners** bend (**defaults to `0`** if omitted). **`stroke.roundedCorners`** selects **which corners** use that radius (default **`'all'`**).
+**Naming caveat:** **`stroke.borderPosition`** chooses **which edges** get ink (`top`, `left`, comma-separated lists, …). **`canvas.borderPosition`** controls **which corners** use **`canvas.borderRadius`** on the **clip** — different meaning. Outline corner rounding uses **`stroke.roundedCorners`** + **`stroke.borderRadius`**.
 
-The **canvas clip** still uses **`canvas.borderRadius`**; **`stroke`** draws **outside** the filled inner geometry using **`position`** (inset/outset).
+Type **`StrokeOptions`** ships from **`apexify.js`** / **`apexify.js/types`**.
+
+---
+
+## Minimal example
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+await painter.createCanvas({
+  width: 400,
+  height: 240,
+  colorBg: "#e2e8f0",
+  borderRadius: 16,
+  stroke: {
+    color: "#334155",
+    width: 3,
+    opacity: 1,
+    style: "solid",
+    borderRadius: 16,
+    roundedCorners: "all",
+  },
+});
+```
 
 ---
 
 ## Field reference (`StrokeOptions`)
 
-| Property | Type | Purpose |
-|----------|------|---------|
-| **`color`** | **`string`** | Stroke color (default **`'#000'`**). Ignored when **`gradient`** is set. |
-| **`gradient`** | **`gradient`** | Gradient **`strokeStyle`** via **`createGradientFill`** over the stroke bounding rect **`r`**. |
-| **`width`** | **`number`** | **`ctx.lineWidth`** (default **2**). |
-| **`position`** | **`number`** | Expands the stroke rectangle outward (**positive**) — rect becomes **`x - position`**, **`y - position`**, **`w + 2*position`**, **`h + 2*position`** (default **0**). |
-| **`blur`** | **`number`** | **`ctx.filter` blur** before **`stroke()`** (default **0**). |
-| **`opacity`** | **`number`** | **`0…1`** while stroking (default **1**). |
-| **`borderRadius`** | **`number`** \| **`'circular'`** | Radius used when building the stroke path. **`'circular'`** gives capsule-like rounding rules (**`buildPath`**). |
-| **`borderPosition`** | **`borderPosition`** | Which **edges** draw a stroke — **`'all'`** (full outline), **`'top'`**, **`'bottom'`**, **`'left'`**, **`'right'`**, or comma-separated combinations (**`'top,bottom'`**). Different from canvas **`borderPosition`** (corner radius zones): here it gates **partial edge strokes**. |
-| **`roundedCorners`** | **`borderPosition`** | Which corners participate when **`borderRadius`** applies (**`'all'`** default). Ignored when **`borderRadius`** is **0** or **`'circular'`**. |
-| **`style`** | **`'solid'` \| `'dashed'` \| `'dotted'` \| `'groove'` \| `'ridge'` \| `'double'`** | Dash geometry (**width‑scaled** dashes/dots) or multi-pass styles (**`'groove'`**, **`'ridge'`**, **`'double'`** use **`applyComplexStrokeStyle`**). Default **`'solid'`**. |
+| Field | Type | Default | What it does |
+|-------|------|---------|----------------|
+| **`color`** | `string` | **`"#000"`** | Stroke colour when **`gradient`** is absent. |
+| **`gradient`** | **`gradient`** | — | Linear / radial / conic stroke paint (overrides **`color`**). |
+| **`width`** | `number` | **`2`** | **`lineWidth`** in CSS pixels. |
+| **`position`** | `number` | **`0`** | Expands or contracts the stroked rectangle **before** **`width`** is applied: the engine builds a rect **`position`** pixels **outward** on each side (**negative** pulls the outline inward). |
+| **`blur`** | `number` | **`0`** | Gaussian blur on the stroke pass — soft halo around the outline (**independent** from **`canvas.blur`** on fills). |
+| **`opacity`** | `number` | **`1`** | Alpha multiplier for the entire stroke pass. |
+| **`borderRadius`** | `number \| "circular"` | **`0`** | Corner rounding for the stroked path (**match **`canvas.borderRadius`** for aligned rims). |
+| **`roundedCorners`** | **`borderPosition`** | **`"all"`** | Which corners receive **`borderRadius`** (same vocabulary as canvas **`borderPosition`**). |
+| **`borderPosition`** | **`borderPosition`** | **`"all"`** | **Edge mask:** which sides actually draw (`"top"`, `"bottom"`, `"left"`, `"right"`, or comma-separated lists like **`"top, bottom"`**). Corner keywords (**`"top-left"`**, …) expand to **two adjacent edges**. **`"all"`** = full rectangle. |
+| **`style`** | **union** below | **`"solid"`** | Dash / faux-CSS border personality (see next section). |
 
 ---
 
-## Partial strokes (`borderPosition` on stroke)
+## Line styles (`style`)
 
-Use **`stroke.borderPosition`** to outline **only some edges** (top banner underline effect, etc.). Internally **`parseStrokeSideSet`** → **`buildPartialRectStrokeEdges`**.
+| **`style`** | Appearance |
+|-------------|------------|
+| **`solid`** | Continuous line (`lineDash` cleared). |
+| **`dashed`** | Long dashes (**`width * 3`** gap **`width * 2`**). |
+| **`dotted`** | Round caps with **`width`**-spaced dots. |
+| **`groove`** | **Double-pass**: darker stroke then lighter stroke (**simulates inset**). Gradients reuse both passes. |
+| **`ridge`** | **Double-pass**: light then dark (**simulates raised** edge). |
+| **`double`** | Two parallel strokes each **`width / 2`** thick. |
 
-Example keywords align with **`borderPosition`** string unions (**`'top'`**, **`'bottom'`**, **`'left'`**, **`'right'`**, **`'top-left'`**, combined lists).
+**Groove / ridge / double** ignore simple **`lineDash`** — they paint **two** strokes with computed colours derived from **`color`** when no **`gradient`** is set.
 
 ---
 
-## Examples
+## Partial borders (`borderPosition` on stroke)
 
-**Simple brand outline**
+Unlike **`roundedCorners`** (corner rounding mask), **`stroke.borderPosition`** selects **which edges** receive ink:
 
 ```typescript
 stroke: {
-  color: '#6366f1',
+  color: "#6366f1",
   width: 4,
-  borderRadius: 20,
-  roundedCorners: 'all',
-}
-```
-
-**Gradient stroke**
-
-```typescript
-stroke: {
-  width: 6,
-  gradient: {
-    type: 'linear',
-    startX: 0,
-    startY: 0,
-    endX: 800,
-    endY: 0,
-    colors: [
-      { stop: 0, color: '#22d3ee' },
-      { stop: 1, color: '#a78bfa' },
-    ],
-  },
-  borderRadius: 16,
-}
-```
-
-**Dashed border**
-
-```typescript
-stroke: {
-  color: '#64748b',
-  width: 3,
-  style: 'dashed',
+  borderPosition: "top, bottom",
   borderRadius: 12,
 }
 ```
 
-**Outer ring (expand outline)**
-
-```typescript
-stroke: {
-  color: '#f97316',
-  width: 8,
-  position: 4,
-  borderRadius: 24,
-}
-```
-
-**Groove / ridge / double**
-
-These styles trigger **`applyComplexStrokeStyle`** — heavier passes than plain **`ctx.stroke()`**.
-
-```typescript
-stroke: {
-  color: '#cbd5e1',
-  width: 6,
-  style: 'groove',
-  borderRadius: 8,
-}
-```
+Corner tokens (**`top-left`**, …) map to **two** sides internally. Use **`"all"`** for a full frame.
 
 ---
 
-## See also
+## Combining with canvas corners
 
-- [Shadow options](/docs#07-canvas-shadow-options)
-- **`gradient`** discriminated union — **`types/index.ts`** (**`linear`** **`repeat`**, **`radial`**, **`conic`** fields).
+- **`canvas.borderRadius`** clips **fills**.  
+- **`stroke.borderRadius`** + **`stroke.roundedCorners`** shape the **outline**.  
+
+For a rounded rectangle outline that tracks the card, keep **`stroke.borderRadius`** aligned with **`canvas.borderRadius`** unless you intentionally want a mismatched rim.
+
+---
+

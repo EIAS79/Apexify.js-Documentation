@@ -1,0 +1,74 @@
+# Advanced topics {#00-advanced-overview}
+
+
+**Advanced** here means **cross-cutting behaviour**: how pieces combine, performance intuition, and pointers — **not** repeating full option matrices (those live in each linked **feature guide** from the **[Feature guides hub](/docs#feature-guides-hub)**).
+
+For **what to ship** (social covers, Discord cards, chart PNGs, GIFs, …) organized by feature, see **[What you can build](/docs#01-what-you-can-build)**.
+
+---
+
+## Composition model
+
+Most flows are:
+
+1. **`createCanvas`** → base bitmap (+ backgrounds).  
+2. **`createImage`** / **`createText`** / **`path2d.custom`** / **`path2d.draw`** → layers on that buffer.  
+3. **`save`** / **`outPut`** → files or encoded strings — see [Raster, batch & output](/docs#00-raster-batch-output-overview).
+
+For **declarative** multi-layer stacks (charts, nested surfaces, one-shot PNG/GIF/video), use **[Scene overview](/docs#00-scene-composition)** (**`createScene`**, **`renderScene`**, **`renderSceneToGIF`**, **`renderSceneToVideoFrames`**).
+
+**5.4+** adds reusable **templates** (**`{{placeholders}}`**, flex/grid **layout**), **`painter.assets`** for **`$name`** / **`$palette.key`**, **`painter.components`** (badge, progress bar, avatar, card, watermark → **`SceneLayer[]`**), **`painter.plugins`** / **`painter.use`**, and **opt-in **`$`** resolution** on imperative paints and **batch / chain**. Those topics are written up in the **composition** chapter set (first file is the hub below).
+
+Charts and GIF/video helpers either return buffers or orchestrate their own pipelines; each topic guide explains ordering.
+
+---
+
+## Composition · templates · assets · components (5.4+) {#10-templates-assets-components}
+
+**Start here:** **[Composition hub](/docs#00-composition-hub)** — reading order and mental model (**`$`** defaults on **`renderScene`** vs imperative APIs).
+
+| Chapter | Anchor |
+|---------|--------|
+| Named assets (`painter.assets`, **`prepareForRender`**) | [01 — Named assets](/docs#01-named-assets) |
+| Templates (`createTemplate`, **`toRenderInput`**) | [02 — Templates](/docs#02-templates) |
+| Preset UI fragments (`painter.components`) | [03 — Preset components](/docs#03-preset-components) |
+| Plugins (`painter.plugins`, **`painter.use`**) | [04 — Plugins](/docs#04-plugins) |
+| Imperative / **`SceneBuilder.render`** / **batch** / **chain** + **`$`** | [05 — Imperative & batch](/docs#05-imperative-batch-chain-assets) |
+
+**With Scene:** layers from templates or **`toLayers`** are normal **`SceneLayer[]`** — see [Scene overview](/docs#00-scene-composition) · [Render scene](/docs#06-render-scene).
+
+---
+
+## Engines you touch indirectly
+
+| Engine | Role |
+|--------|------|
+| **`@napi-rs/canvas`** | Raster canvas, paths, text rendering |
+| **Sharp** | Image filters, compression, palette extraction, many URL/path loads |
+| **FFmpeg / ffprobe** | Optional; video discovery, transcode, compose — [Video](/docs#00-video-overview) |
+
+---
+
+## Performance intuition
+
+- **`createImage`** filters often use **Sharp** (good for full-frame work).  
+- **`pixels.getData`** / **`pixels.manipulate`** (or legacy names in older docs) are **CPU loops** — best for small regions or custom logic ([Pixel data](/docs#08-pixel-data)).  
+- **`batch`** runs independent jobs in **parallel** (`Promise.all`); **`chain`** runs **sequentially** and pipes buffers — [Batch & chain](/docs#01-batch-and-chain).
+
+---
+
+## Where to go deeper
+
+| Topic | Link |
+|-------|------|
+| **Composition** (templates, **`$`**, components, plugins, batch) | [Composition hub](/docs#00-composition-hub) |
+| **Scene** — layer graph, GIF/video export | [Scene overview](/docs#00-scene-composition) |
+| Paint order & layering | Feature guides for canvas / image / text |
+| Video internals | [Video overview](/docs#00-video-overview) |
+| **Repo layout** | [Internals hub](/docs#00-internals-overview) | Maintainer / contributor pointers only |
+
+---
+
+Add topic pages under **Advanced** as needed (migration notes, engine deep dives) and link them from this hub.
+
+---

@@ -1,125 +1,55 @@
 # Recipes {#00-recipes-overview}
 
+**Recipes** (`recipe-*.mdx` in this folder) are **goal-first walkthroughs**: what you want on disk **`/`** in an API response, prerequisites, steps, and a **full runnable snippet**. They sit **above** copy-paste noise and **below** option-by-option manuals.
 
-
-Back: [Documentation root](/docs#readme) · [Feature tracks](/docs#01-feature-tracks)
-
-
-
-**Recipes** are **copy-paste-ready flows**: one goal, one narrative, runnable snippet. They complement **`03-feature-guides/`**, which explains **every option**.
-
-
+**Feature guides** (`docs/03-feature-guides/`) explain **every flag**. **Recipes** explain **why this combination of APIs** solves one product-shaped problem.
 
 ---
 
+## Start here
 
-
-## Inspiration first
-
-
-
-Not sure where to start? Browse **what people build** with each feature area (products → APIs → links):
-
-
-
-**[What you can build with Apexify.js](/docs#01-what-you-can-build)**
-
-
+| Page | Purpose |
+|------|---------|
+| [Why ApexPainter exists — goals & stack](/docs#02-philosophy-goals-and-when-to-use) | Problem Apexify solves, how the façade fits Node **`/`** buffers, when **`not`** to reach for it |
+| [What you can build](/docs#01-what-you-can-build) | Idea catalog (**products → APIs → guides**) across canvas, images, text, GIF, charts, video, batch, save |
 
 ---
 
+## Before you copy code
 
-
-## Before you code
-
-
-
-1. [Start here](/docs#00-start-here) — **`ApexPainter`**, install, minimal PNG  
-
-2. [Beginner guide](/docs#00-beginner-guide) — buffers, mistakes, **[save](/docs#01-save-disk-and-multiple)** basics  
-
-3. [Feature tracks](/docs#01-feature-tracks) — jump to canvas, images, text, GIF, charts, video, pixels, …
-
-
+1. [Start here](/docs#00-start-here) — install, **`ApexPainter`**, minimal PNG  
+2. [Beginner guide](/docs#00-beginner-guide) — buffers, pitfalls, **[save](/docs#02-save-disk)**  
+3. [Feature tracks](/docs#01-feature-tracks) — one map into every topic  
 
 ---
-
-
 
 ## Folder conventions
 
-
-
 | Rule | Why |
-
 |------|-----|
-
 | **One recipe per file** | Stable anchors; easier reviews |
-
 | **Name** | **`recipe-<topic>.mdx`** (kebab-case) |
-
-| **Structure** | Title → **Goal** → **Prerequisites** → **Steps** → **Full example** → **See also** (guide links) |
-
-| **Anchor** | Heading **`{#recipe-<topic>}`** on the **`#`** title for deep links |
-
-
+| **Structure** | Title → **Goal** → **Prerequisites** → **Steps** → **Full example** → **See also** |
+| **Anchor** | **`{#recipe-<topic>}`** on the **`#`** title |
 
 ---
 
+## Published recipes
 
+| Recipe | Builds |
+|--------|--------|
+| [Social share card (PNG + disk)](/docs#recipe-share-card) | Og-style **`1200×630`** card → **`save`** |
 
-## Recipe backlog (add as `recipe-*.mdx`)
-
-
-
-When you publish a file, add a row with its anchor link.
-
-
-
-| Recipe file (planned) | Builds | Main APIs |
-
-|----------------------|--------|-----------|
-
-| **`recipe-social-banner.mdx`** | Twitter/X / LinkedIn covers | **`createCanvas`**, **`createImage`**, **`createText`**, **`save`** |
-
-| **`recipe-quote-card.mdx`** | Shareable quote PNGs | Gradients, **`createText`**, shadows |
-
-| **`recipe-discord-welcome.mdx`** | Welcome cards | Layers, **`createImage`**, styled text |
-
-| **`recipe-thumbnail-sheet.mdx`** | Grid of thumbs | **`createCanvas`** layout loop **or** **`createCollage`** |
-
-| **`recipe-chart-daily.mdx`** | Automated KPI image | **`createChart`**, **`save`** |
-
-| **`recipe-gif-loader.mdx`** | Small animated GIF | **`createGIF`** **or** **`animate`** |
-
-| **`recipe-batch-assets.mdx`** | Many sizes from one template | **`batch`**, **`chain`**, **`saveMultiple`** |
-
-| **`recipe-video-poster.mdx`** | Poster frame MP4 | **`createVideo`** **`extractFrame`** **or** **`extractFrameAtTime`** |
-
-
-
-Starter ideas only — extend the table as you ship files.
-
-
+Extend this table whenever you add **`recipe-*.mdx`** files.
 
 ---
-
-
 
 ## Related hubs
 
-
-
 | Hub | Use |
-
 |-----|-----|
+| [Feature guides](/docs#feature-guides-hub) | Depth per topic |
+| [Raster, batch & output](/docs#00-raster-batch-output-overview) | **`save`**, **`outPut`**, **`batch`**, **`pixels`**, **`path2d`**, **`detect`**, **`painter.image`** |
+| [Advanced overview](/docs#00-advanced-overview) | Scenes, composition, **`$`** assets |
 
-| [Feature guides](/docs#feature-guides-hub) | Full depth per topic |
-
-| [Advanced overview](/docs#00-advanced-overview) | Composition & engines |
-
-| [Batch / save](/docs#00-batch-save-output-overview) | **`save`**, **`outPut`**, **`batch`** |
-
-| [Standalone image tools](/docs#00-standalone-image-tools-overview) | Resize, crop, colour outside **`createImage`** |
-
-
+---

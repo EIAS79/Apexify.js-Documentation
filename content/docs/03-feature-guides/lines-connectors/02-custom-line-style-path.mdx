@@ -1,30 +1,31 @@
 # `lineStyle` & `path` {#02-custom-line-style-path}
 
-Back: [Lines overview](/docs#00-custom-lines-overview)
+
+Optional **`lineStyle`** on each **`CustomOptions`** controls stroke appearance (**`custom-lines.ts`**). **`path`** selects how the canvas builds geometry between **`start`** and **`end`**.
 
 ---
 
-## `lineStyle` fields (implemented)
+## `lineStyle` (implemented)
 
 | Field | Role |
 |-------|------|
-| **`width`** | **`ctx.lineWidth`** (default **1**). |
-| **`color`** | **`strokeStyle`** when **`gradient`** absent. |
-| **`gradient`** | **`createGradientFill`** over bbox **`start→end`** — same **`gradient`** union as canvas backgrounds. |
-| **`lineJoin`** | **`round` \| `bevel` \| `miter`** (default **`miter`**). |
-| **`lineCap`** | **`butt` \| `round` \| `square`** (default **`butt`**; **`lineRadius`** numeric forces **`round`** before stroke). |
-| **`singleLine`** | Chain segments — see **[createCustom](/docs#01-create-custom-api)**. |
-| **`lineDash`** | **`dashArray`**, **`offset`** — skipped when **`pattern`** is set ( **`pattern`** wins **)**. |
-| **`pattern`** | **`applyLinePattern`** — presets **`dots`**, **`dashes`**, **`custom`** **`segments`**. |
-| **`texture`** | **`applyLineTexture`** — **`strokeStyle = createPattern(image,'repeat')`** (async load). |
-| **`lineRadius`** | **`number`** → rounded “tube” caps via paired **`arc`** fills; **`'circular'`** → **`arcTo`** capsule outline *(distinct geometry)*. |
-| **`stroke`** | Second pass **`applyStroke`** — outline **around** same segment with own **`color`/`gradient`/`width`/`lineCap`/`lineRadius`**. |
+| **`width`** | **`ctx.lineWidth`** (**default `1`**). |
+| **`color`** | **`strokeStyle`** when **`gradient`** omitted (**default `'black'`**). |
+| **`gradient`** | **`createGradientFill`** with bbox **`{ x: start.x, y: start.y, w: end.x-start.x, h: end.y-start.y }`** — same **`gradient`** union as backgrounds. |
+| **`lineJoin`** | **`round` \| `bevel` \| `miter`** (**default `miter`**). |
+| **`lineCap`** | **`butt` \| `round` \| `square`** (**default `butt`**). Numeric **`lineRadius`** forces **`round`** caps before the tube fill pass. |
+| **`singleLine`** | Chain consecutive **`CustomOptions`** into **one** open path — see [Custom API](/docs#01-create-custom-api). |
+| **`lineDash`** | **`dashArray`**, **`offset`** — **`ctx.setLineDash`**. Ignored when **`pattern`** is set (**`pattern`** wins). |
+| **`pattern`** | **`applyLinePattern`** presets **`dots`**, **`dashes`**, **`custom`** **`segments`** — see [Markers chapter](/docs#03-custom-lines-arrows-markers-textures). |
+| **`texture`** | **`applyLineTexture`** — loads image (**URL**, **`Buffer`**, or filesystem path via **`process.cwd()`**) and sets **`strokeStyle`** to **`createPattern(..., 'repeat')`**. |
+| **`lineRadius`** | **`number`** — rounded “tube”: stroke segment then **`arc`** fills at both endpoints · **`'circular'`** — **`arcTo`** capsule outline (**different geometry**, separate **`stroke`** only). |
+| **`stroke`** | Second-pass halo outline sharing the **same** segment (**`applyStroke`** helper): optional **`color`/`gradient`/`width`/`lineCap`/`lineRadius`**. |
 
 ---
 
 ## Declared but **not** wired
 
-**`lineStyle.shadow`** exists on **`CustomOptions`** in **`types/index.ts`** — **`customLines.ts`** never reads it. Use **`dropShadow`-style** preprocessing or bake shadows externally until implemented.
+**`lineStyle.shadow`** exists on **`CustomOptions`** but **`custom-lines.ts`** never reads it. Bake shadows via **`path2d.draw`** (**`Path2DDrawOptions.shadow`**) or external blur until wired.
 
 ---
 
@@ -38,23 +39,22 @@ path?: {
 };
 ```
 
-Per iteration **`customLines`** builds **`allPoints = [startCoordinates, endCoordinates]`** (two anchors).
+Each **`CustomOptions`** row contributes **`allPoints = [startCoordinates, endCoordinates]`** (two anchors).
 
 | **`type`** | Behaviour with **two** points |
-|------------|--------------------------------|
-| **`smooth`** | Cardinal spline builder → straight **`lineTo`** (length **2** shortcut). |
-| **`catmull-rom`** | Same — straight line for **2** points. |
-| **`bezier`** | Needs **`≥ 4`** points for **`bezierCurveTo`** chain — **never true** with current **`CustomOptions`** shape, so this falls through to **`lineTo(end)`** (**straight**). |
+|------------|-------------------------------|
+| **`smooth`** | **`createSmoothPath`** → **`lineTo`** shortcut (**needs ≥ 3** points for curvature). |
+| **`catmull-rom`** | **`createCatmullRomPath`** → straight **`lineTo`** for **two** knots. |
+| **`bezier`** | Requires **`≥ 4`** points for the **`bezierCurveTo`** branch — **never satisfied** by the current **`CustomOptions`** shape, so execution falls through to **`lineTo(end)`**. |
 
-Because each **`CustomOptions`** row only contributes **two** anchors into **`allPoints`**, **`smooth`** / **`catmull-rom`** almost always degenerate to a **straight** segment (the spline helpers need **≥ 3** knots for curvature). **`path.type: 'bezier'`** likewise never receives four control points through this API.
-
-For real Bézier / arc geometry use **`drawPath`** + **`PathCommand[]`** — see **[Path2D](/docs#04-path2d-draw-path)**.
+For real Bézier chains, arcs, or stars use **`path2d.create`** + **`PathCommand[]`** — see [Path2D](/docs#04-path2d-draw-path).
 
 ---
 
-## Inner **`stroke`** helper
+## Execution order (per segment)
 
-After **`ctx.stroke()`**, **`applyStroke`** may **`stroke()` again** using **`lineStyle.stroke`** — useful for **double-outline** or halo strokes.
+Rough order: dash/pattern → texture **`strokeStyle`** → stroke (**possibly twice** when numeric **`lineRadius`** adds tube **`fill`**) → **`lineStyle.stroke`** halo → arrows → markers.
 
+Consult **`custom-lines.ts`** when stacking **`texture`** + **`gradient`** — **`texture`** replaces **`strokeStyle`** after gradients are assigned.
 
 ---

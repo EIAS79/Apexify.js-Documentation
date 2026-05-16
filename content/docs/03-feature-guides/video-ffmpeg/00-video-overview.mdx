@@ -1,134 +1,60 @@
 # Video & FFmpeg (`createVideo`) — overview {#00-video-overview}
 
-**`await painter.createVideo(options)`** is the single entry point for FFmpeg-backed media operations: probe metadata, extract frames, transcode, trim, filters, audio mixes, compositing, and more.
+**`await painter.createVideo(options[, painterOpts])`** routes FFmpeg/ffprobe-backed work: probe clips, extract frames (single, timed lists, intervals, full dumps), thumbnails and previews, transcode and compress, trim and timeline edits, geometry (`rotate`, `crop`), audio extraction and mixes, filters and colour (`applyEffects`, `colorCorrect`, `applyLUT`), watermarks and fades, raster text (`addText`, `addAnimatedText`), compositing (`merge`, `splitScreen`, `pictureInPicture`, `createFromFrames`, `createLoop`), scene detection, stabilization, transitions, batched pipelines, optional **`onProgress`** on branches that forward it (see **[Progress](/docs#11-on-progress)**).
 
-Back: [Feature guides hub](/docs#feature-guides-hub)
+**Requirements:** **`ffmpeg`** and **`ffprobe`** on **`PATH`**; missing binaries throw an install hint. **`Buffer`** and **`http(s)`** sources are staged through temp files where FFmpeg needs paths (**more:** [Imperative helpers](/docs#08-imperative-video-helpers)).
 
-**Canonical types:** **`lib/Canvas/extended/VideoCreator.ts`** — **`VideoCreationOptions`**, **`MixAudioOperation`**, **`MixAudioOverlayClip`**.
-
-**Implementation:** **`VideoCreator`** delegates to **`VideoHelpers`** (`lib/Canvas/utils/Video/videoHelpers.ts`) and **`ApexPainter`** frame helpers (`extractFrames`, `extractAllFrames`, `getVideoInfo`, …).
-
-**Direct API:** **[Imperative video helpers](/docs#08-imperative-video-helpers)** — **`getVideoInfo`**, **`extractFrameAtTime`**, **`extractFrameByNumber`**, **`extractMultipleFrames`**, **`extractFrames`**, **`extractAllFrames`**.
+**Implementation:** **`VideoCreator.createVideo`** in **`lib-next/video/video-creator.ts`**, wired via **`VideoStack`** (**`lib-next/video/video-stack.ts`**) into **`VideoHelpers`** (**`lib-next/video/video-helpers.ts`**).
 
 ---
 
-## Requirements
-
-- **FFmpeg** and **ffprobe** on **`PATH`**. If missing, **`createVideo`** throws with install hints from **`getFFmpegInstallInstructions`**.
-- Optional **vidstab** filters for **`stabilize`** (first pass); FFmpeg falls back to **`hqdn3d`** denoise if analyse/transform fails.
-- Per-interval **pitch/speed** in **`adjustVolume`** uses **`rubberband`** — FFmpeg must be built with **librubberband**.
-
----
-
-## `source`
-
-Every call includes **`source: string | Buffer`**:
-
-| Form | Behaviour |
-|------|-----------|
-| **Local path** | Resolved vs **`process.cwd()`** when not absolute (same pattern across helpers). |
-| **`http(s)` URL** | Downloaded into **`.temp-frames`** for the duration of the command. |
-| **`Buffer`** | Written to a temp **`.mp4`** under **`.temp-frames`**, then deleted when safe. |
-
-Some branches **ignore** top-level **`source`** (they only use nested inputs): **`merge`**, **`splitScreen`**, **`batch`**, **`createFromFrames`**. The type still requires **`source`** — pass any placeholder buffer/path if your operation does not use it.
-
----
-
-## One operation per call (router precedence)
-
-**`VideoCreator.createVideo`** evaluates **`options`** top → bottom and runs **the first matching branch only**. If you set **`convert`** and **`trim`** together, **`convert`** wins.
-
-| Order | Key | Topic |
-|------:|-----|--------|
-| 1 | **`getInfo`** | [Metadata & frames](/docs#01-metadata-and-frames) |
-| 2 | **`extractFrame`** | [Metadata & frames](/docs#01-metadata-and-frames) |
-| 3 | **`extractFrames`** | [Metadata & frames](/docs#01-metadata-and-frames) |
-| 4 | **`extractAllFrames`** | [Metadata & frames](/docs#01-metadata-and-frames) |
-| 5 | **`generateThumbnail`** | [Metadata & frames](/docs#01-metadata-and-frames) |
-| 6 | **`convert`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 7 | **`trim`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 8 | **`extractAudio`** | [Audio](/docs#03-audio) |
-| 9 | **`addWatermark`** | [Effects & overlays](/docs#04-effects-overlays) |
-| 10 | **`changeSpeed`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 11 | **`generatePreview`** | [Metadata & frames](/docs#01-metadata-and-frames) |
-| 12 | **`applyEffects`** | [Effects & overlays](/docs#04-effects-overlays) |
-| 13 | **`merge`** | [Compose & build](/docs#05-compose-and-build) |
-| 14 | **`replaceSegment`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 15 | **`rotate`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 16 | **`crop`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 17 | **`compress`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 18 | **`addText`** | [Effects & overlays](/docs#04-effects-overlays) |
-| 19 | **`addFade`** | [Effects & overlays](/docs#04-effects-overlays) |
-| 20 | **`reverse`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 21 | **`createLoop`** | [Compose & build](/docs#05-compose-and-build) |
-| 22 | **`batch`** | [Advanced & presets](/docs#06-advanced-presets-transitions) |
-| 23 | **`detectScenes`** | [Metadata & frames](/docs#01-metadata-and-frames) |
-| 24 | **`stabilize`** | [Advanced & presets](/docs#06-advanced-presets-transitions) |
-| 25 | **`colorCorrect`** | [Effects & overlays](/docs#04-effects-overlays) |
-| 26 | **`pictureInPicture`** | [Compose & build](/docs#05-compose-and-build) |
-| 27 | **`splitScreen`** | [Compose & build](/docs#05-compose-and-build) |
-| 28 | **`createTimeLapse`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 29 | **`removeAudio`** | [Audio](/docs#03-audio) |
-| 30 | **`mixAudio`** | [Audio](/docs#03-audio) |
-| 31 | **`mute`** | [Audio](/docs#03-audio) |
-| 32 | **`adjustVolume`** | [Audio](/docs#03-audio) |
-| 33 | **`createFromFrames`** | [Compose & build](/docs#05-compose-and-build) |
-| 34 | **`detectFormat`** | [Metadata & frames](/docs#01-metadata-and-frames) |
-| 35 | **`freezeFrame`** | [Transcode & geometry](/docs#02-transcode-trim-transform) |
-| 36 | **`exportPreset`** | [Advanced & presets](/docs#06-advanced-presets-transitions) |
-| 37 | **`normalizeAudio`** | [Audio](/docs#03-audio) |
-| 38 | **`applyLUT`** | [Effects & overlays](/docs#04-effects-overlays) |
-| 39 | **`addTransition`** | [Advanced & presets](/docs#06-advanced-presets-transitions) |
-| 40 | **`addAnimatedText`** | [Effects & overlays](/docs#04-effects-overlays) |
-
-If none match, **`createVideo`** throws **“No video operation specified”**.
-
----
-
-## Shared callback
-
-**`onProgress?: (progress: { percent, time, speed }) => void`** is passed through on **`freezeFrame`**, **`exportPreset`**, **`normalizeAudio`**, **`applyLUT`**, **`addTransition`**, **`addAnimatedText`** (FFmpeg stderr parsing — rough ETA).
-
----
-
-## Minimal example
+## Signature & asset refs
 
 ```typescript
-import { ApexPainter } from 'apexify.js';
-import path from 'path';
-
-const painter = new ApexPainter();
-
-const info = await painter.createVideo({
-  source: './input.mp4',
-  getInfo: true,
-});
-console.log(info.duration, info.width, info.height, info.fps);
-
-await painter.createVideo({
-  source: './input.mp4',
-  trim: {
-    startTime: 2,
-    endTime: 12,
-    outputPath: path.join('out', 'clip.mp4'),
-  },
-});
+await painter.createVideo(options: VideoCreationOptions, painterOpts?: PainterAssetRefsOptions);
 ```
+
+When **`painterOpts.resolveAssetRefs`** is **`true`**, **`options`** is passed through **`maybeResolveRefs`** (**`$…`** placeholders, same pattern as **`createImage`** and **`createGIF`** on **`ApexPainter`**, **`lib-next/apex-painter/main.ts`**). To resolve refs yourself with the flag off, use **`prepareForRender`**.
 
 ---
 
-## Topic index
+## One operation per call (router)
 
-| # | Page |
-|---|------|
-| 1 | [Metadata, frames & discovery](/docs#01-metadata-and-frames) |
-| 2 | [Transcode, trim & geometry](/docs#02-transcode-trim-transform) |
-| 3 | [Audio](/docs#03-audio) |
-| 4 | [Effects, colour & overlays](/docs#04-effects-overlays) |
-| 5 | [Compose, PiP & from frames](/docs#05-compose-and-build) |
-| 6 | [Presets, transitions, stabilize, batch](/docs#06-advanced-presets-transitions) |
-| 7 | [Option guides (deep dive)](/docs#00-video-options-hub) | Per-operation **explanations + examples** (`video-ffmpeg/options/`) |
-| 8 | [Imperative **`painter.*`** helpers](/docs#08-imperative-video-helpers) | Probe + extract without **`createVideo`** branches |
-| — | [Options reference card](/docs#07-video-creation-options-matrix) | Compact key → guide map only |
+Design for **exactly one** operation key in **`options`** besides **`source`** (and **`onProgress`** when used). **`VideoCreator.createVideo`** is a linear **`if`** chain: **the first truthy branch wins**; later keys are ignored. For example **`getInfo`** is checked **before** **`extractFrame`**, **`convert`**, **`trim`**, **`merge`**, **`createFromFrames`**, **`detectFormat`**, **`exportPreset`**, **`addAnimatedText`**, and so on—**`detectFormat`** is **late** in the chain, **after** **`createFromFrames`**. Full order is defined in **`lib-next/video/video-creator.ts`**. The **[options reference card](/docs#07-video-creation-options-matrix)** maps each key to its deep-dive page.
 
-Start **[Metadata & frames](/docs#01-metadata-and-frames)**. Full **`normalizeAudio`** / **`convert`** / etc.: **[Options hub](/docs#00-video-options-hub)**.
+Some operations ignore top-level **`source`** (they use their own paths or **`videos`** arrays)—the type still requires **`source`**; tutorials call that out (**`merge`**, **`splitScreen`**, **`batch`**, …).
+
+---
+
+## Topic tutorials
+
+| Guide | Covers |
+|-------|--------|
+| [Metadata, frames & discovery](/docs#01-metadata-and-frames) | **`getInfo`**, **`detectFormat`**, **`extractFrame`**, **`extractFrames`**, **`extractAllFrames`**, thumbnails, previews, scene detection |
+| [Transcode, trim & geometry](/docs#02-transcode-trim-transform) | **`convert`**, **`compress`**, **`trim`**, **`rotate`**, **`crop`**, **`changeSpeed`**, … |
+| [Audio tracks](/docs#03-audio) | **`extractAudio`**, **`removeAudio`**, **`mute`**, **`mixAudio`**, **`adjustVolume`** (**`normalizeAudio`**: [Audio deep-dive](/docs#06-audio-deep-dive)) |
+| [Effects, colour & overlays](/docs#04-effects-overlays) | **`applyEffects`**, **`colorCorrect`**, **`applyLUT`**, **`addWatermark`**, **`addFade`** |
+| [Compose, PiP & frame builds](/docs#05-compose-and-build) | **`merge`**, **`splitScreen`**, **`pictureInPicture`**, **`createFromFrames`**, **`createLoop`** |
+| [Presets, transitions, stabilize & batch](/docs#06-advanced-presets-transitions) | **`exportPreset`**, **`stabilize`**, **`addTransition`**, **`batch`**, **`onProgress`** examples |
+| [Options reference card](/docs#07-video-creation-options-matrix) | Compact key → **`options/`** guide index |
+| [Imperative helpers (`painter.*`)](/docs#08-imperative-video-helpers) | **`getVideoInfo`**, **`extractFrameAtTime`**, **`extractFrameByNumber`**, **`extractMultipleFrames`**, **`extractFrames`**, **`extractAllFrames`** |
+
+---
+
+## Option-by-option manuals (`options/`)
+
+For **every flag** with behaviour notes and examples, start at the **[Video options hub](/docs#00-video-options-hub)** (`video-ffmpeg/options/`): discovery, frames, transcode, timeline, geometry, audio (including **`normalizeAudio`** and **`mixAudio`**), visuals, text, compositing, transitions, stabilize, **`batch`**, and **`onProgress`**.
+
+---
+
+## Scenes → video
+
+**`painter.renderSceneToVideoFrames(scene, video)`** renders the scene to PNG, merges optional frame slots, and delegates to **`createVideo`**. **`video.options.createFromFrames`** is **required** (**`lib-next/scene/render-scene-to-video.ts`**). **`video.sceneRender.resolveAssetRefs`** defaults **`true`** — **`scene`** asset refs use **`resolveSceneRenderInputAssets`** unless you opt out (**`main.ts`**).
+
+---
+
+## Types
+
+**`VideoCreationOptions`**, **`MixAudioOperation`**, and **`MixAudioOverlayClip`** live in **`lib-next/video/video-creator.ts`** and are re-exported via **`lib-next/video/video-stack.ts`** and **`lib-next/video/video-types.ts`**.
+
+---

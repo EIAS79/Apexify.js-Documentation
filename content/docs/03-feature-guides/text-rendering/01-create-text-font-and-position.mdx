@@ -1,21 +1,21 @@
 # Font, alignment & transforms {#01-create-text-font-and-position}
 
-Back: [Text overview](/docs#00-create-text-overview)
+Placement is anchored at **`(x, y)`** using Canvas **`textAlign`** and **`textBaseline`**. Optional **`rotation`** spins the entire block around **`(x, y)`** before lines are laid out.
 
 ---
 
-## Font configuration
+## Font configuration (`font`)
 
-Prefer the nested **`font`** object; legacy top-level fields remain for compatibility.
+Prefer the nested **`font`** object; legacy top-level aliases remain.
 
 | Field | Purpose |
 |-------|---------|
-| **`font.size`** | Pixels (default **16**). |
-| **`font.family`** | Installed family name (e.g. **`Arial`**). |
-| **`font.name`** | Logical name used when registering **`font.path`**. |
-| **`font.path`** | `.ttf` / `.otf` / `.woff` path — resolved vs **`process.cwd()`** unless absolute. |
+| **`font.size`** | Pixels (**default `16`**). |
+| **`font.family`** | Installed face family (e.g. **`Arial`**). Passed through to the CSS font string as **`"${size}px \"${family}\""`**. |
+| **`font.name`** | Logical font family **name** used **together with** **`font.path`** when registering the file (**`GlobalFonts.registerFromPath`**). |
+| **`font.path`** | Path to **`.ttf`**, **`.otf`**, **`.woff`** — resolved relative to **`process.cwd()`** unless absolute. |
 
-Legacy aliases: **`fontSize`**, **`fontFamily`**, **`fontName`**, **`fontPath`** (same precedence as **`font.*`** in **`EnhancedTextRenderer.setupFont`**).
+Legacy aliases: **`fontSize`**, **`fontFamily`**, **`fontName`**, **`fontPath`** (nested **`font.*`** wins when both are set).
 
 ```typescript
 await painter.createText(
@@ -24,43 +24,50 @@ await painter.createText(
     x: 120,
     y: 96,
     font: { size: 42, path: './fonts/Inter-Bold.ttf', name: 'InterDisplay' },
-    bold: false,
+    decorations: { bold: false, italic: false },
   },
   buffer
 );
 ```
 
-**`GlobalFonts.registerFromPath`** runs per render when **`path`** set — failures log **`console.warn`** and fall through.
+When **`font.path`** is set, **`registerTextFontFromPath`** runs **before** each layer paints. Registration failures **`console.warn`** and drawing continues with the fallback family string.
 
 ---
 
-## Weight & slant
+## Weight & slant (`decorations`)
 
 | Field | Effect |
 |-------|--------|
-| **`bold`** / **`decorations.bold`** | Prefixes **`bold`** in CSS font string (nested wins if both set). |
-| **`italic`** / **`decorations.italic`** | Prefixes **`italic`**. |
+| **`decorations.bold`** | Prefix **`bold`** on the CSS font string. |
+| **`decorations.italic`** | Prefix **`italic`**. |
+
+Legacy **`bold`** / **`italic`** at the top level work the same way; **`decorations`** wins if both are provided (**`resolveTextDecorations`**).
 
 ---
 
-## Alignment, baseline & rotation
+## Placement (`placement`)
 
-Prefer **`placement`**; flat **`textAlign`**, **`textBaseline`**, and **`rotation`** remain aliases (**`resolveTextPlacement`** in **`lib-next/types/text.ts`**).
+Prefer **`placement`**; flat **`textAlign`**, **`textBaseline`**, and **`rotation`** are aliases (**`resolveTextPlacement`**).
 
-| Field | Values |
-|-------|--------|
-| **`textAlign`** | **`'left' \| 'center' \| 'right' \| 'start' \| 'end'`** |
-| **`textBaseline`** | **`'alphabetic' \| 'bottom' \| 'hanging' \| 'ideographic' \| 'middle' \| 'top'`** |
-| **`rotation`** | Degrees around **`(x, y)`** — applied in **`applyTextTransformations`** before measure/draw. |
+| Field | Type | Role |
+|-------|------|------|
+| **`textAlign`** | **`TextAlignMode`** | **`left`**, **`center`**, **`right`**, **`start`**, **`end`** — Canvas **`ctx.textAlign`**. |
+| **`textBaseline`** | **`TextBaselineMode`** | **`alphabetic`** (default), **`top`**, **`hanging`**, **`middle`**, **`ideographic`**, **`bottom`** — Canvas **`ctx.textBaseline`**. |
+| **`rotation`** | **`number`** (degrees) | Rotates **around **`(x, y)`**: **`translate(x,y)` → `rotate` → `translate(-x,-y)`**. |
 
 ```typescript
 await painter.createText(
   {
-    text: 'Centered',
-    x: 320,
-    y: 120,
-    font: { size: 28, family: 'Arial' },
-    placement: { textAlign: 'center', textBaseline: 'middle', rotation: -4 },
+    text: 'Rotated label',
+    x: 400,
+    y: 240,
+    placement: {
+      textAlign: 'center',
+      textBaseline: 'middle',
+      rotation: -12,
+    },
+    font: { size: 36, family: 'Arial' },
+    fill: { color: '#1e293b' },
   },
   buffer
 );
@@ -68,8 +75,14 @@ await painter.createText(
 
 ---
 
-## Fill opacity
+## Fill opacity (`fill.opacity`)
 
-Overall glyph fill alpha: prefer **`fill.opacity`**, or legacy top-level **`opacity`** (**`resolveTextFill`** → **`text-layout`** sets **`ctx.globalAlpha`** when defined).
+**`placement.rotation`** runs first (**`applyTextTransformations`**), then **`fill.opacity`** clamps **`ctx.globalAlpha`** to **`[0, 1]`**. Use **`fill.opacity`** (or legacy **`opacity`**) for uniform transparency over highlight/glow/shadow/stroke/fill/decoration passes **within that layer**.
+
+---
+
+## Implementation reference
+
+Font string assembly and spacing hooks live in **`setupTextFont`**; alignment in **`setupTextAlignment`** (**`lib-next/text/text-layout.ts`**).
 
 ---

@@ -1,37 +1,52 @@
 # Border clip, zoom, rotation & canvas blur {#06-canvas-border-shadow-zoom}
 
-Back: [Canvas overview](/docs#00-create-canvas-overview)
 
-This page covers **canvas-level** geometry and painting blend — not every nested field of **`shadow`** / **`stroke`** (those have dedicated pages).
+Everything here is configured on **`CanvasConfig`** and passed to **`await painter.createCanvas({ … })`**. You never touch the raw canvas drawing API — Apexify scales and clips for you, then draws **`shadow`** / **`stroke`** after the background stack.
+
+This page covers **layout-level** fields only. **`canvas.shadow`** and **`canvas.stroke`** have their own references (**full option lists**):
+
+| Topic | Details |
+|-------|---------|
+| Drop shadow behind the card | **[Shadow — every option](/docs#07-canvas-shadow-options)** (`ShadowOptions`) |
+| Outline around the clipped shape | **[Stroke — every option](/docs#08-canvas-stroke-options)** (`StrokeOptions`) |
 
 ---
 
-## Rounded clip — `borderRadius`, `borderPosition` (on `CanvasConfig`)
+## Rounded rectangle clip — `borderRadius`, `borderPosition`
 
-Background painting is clipped to a rounded rectangle (or **`borderRadius: 'circular'`**).
+Backgrounds (**solid**, **gradient**, **custom image**, **`bgLayers`**, **`patternBg`**, **`noiseBg`**) are painted **inside** a clip path.
 
-**`borderPosition`** (canvas): which **corners** take rounding (`'all'`, `'top-left'`, `'top'`, sides — full **`borderPosition`** union in **`types/index.ts`**).
+| Field | Meaning |
+|-------|---------|
+| **`borderRadius`** | Corner rounding in px, or **`"circular"`** for a pill/circle when width ≈ height. |
+| **`borderPosition`** | Which corners participate (`"all"`, `"top-left"`, `"top"` + `"left"` combos, `"bottom-right"`, …). Matches **`borderPosition`** in **`apexify.js`** types. |
 
 ```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
 await painter.createCanvas({
   width: 500,
   height: 300,
-  colorBg: '#f8fafc',
+  colorBg: "#f8fafc",
   borderRadius: 24,
-  borderPosition: 'all',
+  borderPosition: "all",
 });
 ```
+
+**Independence from shadow/stroke:** The clip uses **`canvas.borderRadius`** / **`canvas.borderPosition`**. A rounded card shadow needs **`shadow.borderRadius`** (and matching **`roundedCorners`**) set explicitly — Apexify does **not** copy canvas corners onto **`shadow`** / **`stroke`** automatically.
 
 ---
 
 ## Zoom — `zoom`
 
+Applied **inside** the clip **before** backgrounds are painted — useful for a subtle “zoom into” hero crop without resizing **`width`** / **`height`**.
+
 | Field | Role |
 |-------|------|
-| **`scale`** | Positive factor (**required effect** when zooming). |
-| **`centerX`**, **`centerY`** | Anchor for **`applyCanvasZoom`** — defaults handled inside helper. |
-
-Painted **inside** the clip **before** backgrounds fill.
+| **`scale`** | Uniform scale (**`1`** = no-op). Values **`> 1`** zoom in (content grows); **`< 1`** zoom out. |
+| **`centerX`**, **`centerY`** | Pivot in **canvas coordinates** (defaults: centre of the canvas). |
 
 ```typescript
 zoom: { scale: 1.08, centerX: 250, centerY: 150 },
@@ -41,38 +56,37 @@ zoom: { scale: 1.08, centerX: 250, centerY: 150 },
 
 ## Rotation — `rotation`
 
-Degrees around **`(x,y)`** with **`width`** × **`height`** box (**`applyRotation`**).
+Degrees around the **centre** of your **`x`**, **`y`**, **`width`**, **`height`** rectangle (same box used for clipping). **`0`** means no rotation.
 
 ---
 
 ## Canvas opacity — `opacity`
 
-**`0…1`** → **`ctx.globalAlpha`** for the **main** drawing block (background stack).
+**`0…1`** — transparency for the **main background painting phase** (primary fill + **`bgLayers`** + **`patternBg`** + **`noiseBg`**). **`1`** is fully opaque.
 
 ---
 
 ## Blend mode — `blendMode`
 
-Any **`GlobalCompositeOperation`** string (**`'multiply'`**, **`'screen'`**, **`'overlay'`**, …) applied after translate inside **`CanvasCreator`**.
+A **`GlobalCompositeOperation`** string (`"multiply"`, `"screen"`, `"overlay"`, …) applied during that same background phase (after translate into **`x`**, **`y`**).
 
 ---
 
 ## Canvas blur — `blur`
 
-Number → **`ctx.filter = blur(Npx)`** during **`drawBackgroundColor`** / **`drawBackgroundGradient`** (see **`bg.ts`**). Not the same as **`stroke.blur`** or **`shadow.blur`** — those live on **`StrokeOptions`** / **`ShadowOptions`**.
+**Pixels**, not vectors: a numeric **Gaussian blur radius** applied **only while painting** the **primary** background (**`colorBg`**, **`gradientBg`**, **`customBg`** fill paths inside `createCanvas`). It does **not** automatically blur **`bgLayers`** entries or **`patternBg`** / **`noiseBg`**.
+
+This is **different** from:
+
+- **`stroke.blur`** — soft glow **around the outline** ([stroke doc](/docs#08-canvas-stroke-options)).
+- **`shadow.blur`** — softness of the **drop shadow** ([shadow doc](/docs#07-canvas-shadow-options)).
 
 ---
 
-## Shadow & stroke (overview only)
+## Drop shadow & outline — quick reminder
 
-**`canvas.shadow`** and **`canvas.stroke`** use **`ShadowOptions`** and **`StrokeOptions`** — **many fields each** (gradients, partial edges, dash styles, …).
+After backgrounds finish, **`CanvasCreator`** draws **shadow** then **stroke** on paths aligned with **`x`**, **`y`**, **`width`**, **`height`**, using each option bag’s own **`borderRadius`** / corner masks.
 
-| Topic | Full reference |
-|-------|----------------|
-| **`shadow`** | **[Shadow — every option](/docs#07-canvas-shadow-options)** |
-| **`stroke`** | **[Stroke — every option](/docs#08-canvas-stroke-options)** |
-
-Quick reminder: **`createCanvas`** does **not** auto-copy **`canvas.borderRadius`** onto **`shadow`** / **`stroke`** paths — set **`shadow.borderRadius`** / **`stroke.borderRadius`** when you want rounded shadow/outline.
+→ **[Shadow — every option](/docs#07-canvas-shadow-options)** · **[Stroke — every option](/docs#08-canvas-stroke-options)** · **[Paint order](/docs#09-canvas-paint-order)**
 
 ---
-

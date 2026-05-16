@@ -1,0 +1,59 @@
+# Compress & palette {#05-image-compress-and-palette}
+
+**Sharp**-backed helpers exposed as **`await painter.image.compress(image, options?)`** and **`await painter.image.extractPalette(image, options?)`** (**`lib-next/output/compression.ts`**).
+
+Sources:** **`Buffer`**, **`http(s)`** URL, **or** filesystem path (**joined with **`process.cwd()`** when not absolute **`/`** URL).
+
+---
+
+## `compress(image, options?)`
+
+### `CompressionOptions`
+
+| Field | Default | Notes |
+|-------|---------|------|
+| **`quality`** | **`90`** | Passed to **`jpeg`**, **`webp`**, **`avif`** pipelines. |
+| **`format`** | **`jpeg`** | **`jpeg`** **`|`** **`webp`** **`|`** **`avif`** — unknown falls back **JPEG**. |
+| **`maxWidth`** **`/`** **`maxHeight`** | — | **`fit: 'inside'`**, **`withoutEnlargement: true`**. |
+| **`progressive`** | **`false`** | JPEG progressive scan. |
+
+Returns **encoded** **`Buffer`** (**not** necessarily PNG).
+
+```typescript
+const webp = await painter.image.compress(buf, { format: 'webp', quality: 82, maxWidth: 1024 });
+```
+
+---
+
+## `extractPalette(image, options?)`
+
+Downsamples internally to **~200×200** raw RGB, then clusters.
+
+### `PaletteOptions`
+
+| Field | Default | Notes |
+|-------|---------|------|
+| **`count`** | **`10`** | Target swatch count (algorithms clamp **`/`** approximate). |
+| **`method`** | **`kmeans`** | **`kmeans`** (**iterative**) **`|`** **`median-cut`** **`|`** **`octree`** (**implementation note:** **`octree`** currently delegates to the **`kmeans`** path). |
+| **`format`** | **`hex`** | **`hex`** **`|`** **`rgb`** **`|`** **`hsl`** string for each swatch. |
+
+### Return shape
+
+**`Array<{ color: string; percentage: number }>`** sorted **descending** by **`percentage`**.
+
+```typescript
+const swatches = await painter.image.extractPalette('./hero.png', {
+  count: 8,
+  method: 'median-cut',
+  format: 'hsl',
+});
+```
+
+---
+
+## Operational notes
+
+- **Network **`/`** disk IO** failures surface as **`compress failed:`** **`/`** **`extractPalette failed:`** wraps.
+- **`extractPalette`** **`percentage`** derives from clustered pixel assignments vs total sample count (see implementation for details).
+
+---

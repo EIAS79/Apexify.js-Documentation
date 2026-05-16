@@ -1,12 +1,11 @@
 # Arrows, markers, dash presets & textures {#03-custom-lines-arrows-markers-textures}
 
-Back: [Lines overview](/docs#00-custom-lines-overview)
 
-Helpers live in **`lib/Canvas/utils/Custom/advancedLines.ts`**.
+Helpers live in **`lib-next/path/advanced-lines.ts`** and are invoked from **`custom-lines.ts`** **after** the main stroke for each **`CustomOptions`** row.
 
 ---
 
-## `arrow`
+## Arrows (`arrow`)
 
 ```typescript
 arrow?: {
@@ -14,45 +13,101 @@ arrow?: {
   end?: boolean;
   size?: number;              // default 10
   style?: 'filled' | 'outline';
-  color?: string;             // fallback lineStyle.color || 'black'
+  color?: string;             // fallback: line colour → black
 };
 ```
 
-**`drawArrow`** places head at **`start`** / **`end`** using segment angle **`atan2(dy,dx)`**. Outline heads use **`lineWidth: 2`**.
+**`drawArrow`** translates to **`(x,y)`**, rotates by segment angle, draws a triangular head:
+
+- **`filled`** — **`fillStyle = color`**
+- **`outline`** — **`strokeStyle`**, **`lineWidth = 2`**
+
+Angles derive from **`atan2(end.y - start.y, end.x - start.x)`** where **`start`** respects **`singleLine`** chaining (**previous row end**).
 
 ---
 
-## `markers`
+## Markers (`markers`)
 
 ```typescript
 markers?: Array<{
-  position: number; // 0–1 along **straight chord** start→end
+  position: number;        // 0 … 1 along polyline length [start → end]
   shape: 'circle' | 'square' | 'diamond' | 'arrow';
   size: number;
   color: string;
 }>;
 ```
 
-**Implementation caveat:** **`getPointOnLinePath`** receives **`[start, end]`** only — **not** the subdivided spline geometry. If **`path`** curves the stroke visually, markers **still sit on the straight line** between anchors.
+**`getPointOnLinePath`** walks straight segments (**currently only **`[start, end]`** pair per row**) and interpolates **`position`** clamped **`[0,1]`**.
+
+**`drawMarker`** shapes:
+
+| Shape | Drawing |
+|-------|---------|
+| **`circle`** | Filled **`arc`** (**`radius = size/2`**) |
+| **`square`** | **`fillRect`** centred |
+| **`diamond`** | Four **`lineTo`** polygon |
+| **`arrow`** | Up-pointing triangle |
+
+Markers paint **above** the connector stroke.
 
 ---
 
-## Dash **`pattern`** presets
+## Dash presets (`pattern`)
 
-| **`pattern.type`** | **`setLineDash`** |
-|--------------------|-------------------|
+```typescript
+pattern?: {
+  type: 'dots' | 'dashes' | 'custom';
+  segments?: number[];   // custom dash array
+  offset?: number;       // lineDashOffset
+};
+```
+
+| **`type`** | **`setLineDash`** |
+|------------|-------------------|
 | **`dots`** | **`[2, 4]`** |
 | **`dashes`** | **`[10, 5]`** |
-| **`custom`** | **`segments`** array when provided |
+| **`custom`** | **`segments`** array (**must be non-empty**) |
 
-Optional **`pattern.offset`** → **`lineDashOffset`**.
+When **`pattern`** is present **`lineDash`** from **`lineStyle`** is skipped.
 
 ---
 
-## **`texture`**
+## Image texture (`texture`)
 
-**`string`** path / URL or **`Buffer`** → **`loadImage`** → **`ctx.strokeStyle = ctx.createPattern(img, 'repeat')`**.
+**`texture?: string | Buffer`**
 
-Relative filesystem paths join **`process.cwd()`**. Failures **`console.error`** — stroke falls back depending on prior **`strokeStyle`**.
+**`applyLineTexture`** resolves sources:
+
+| Input | Resolution |
+|-------|------------|
+| **`Buffer`** | **`loadImage(buffer)`** |
+| **`http…`** URL | **`loadImage(url)`** |
+| Else filesystem path | **`path.join(process.cwd(), texture)`** + **`fs.readFileSync`** |
+
+On success **`strokeStyle = ctx.createPattern(image, 'repeat')`**. Errors **`console.error`** and leave prior **`strokeStyle`**.
+
+---
+
+## Example — dashed lane + markers
+
+```typescript
+await painter.path2d.custom(
+  {
+    startCoordinates: { x: 40, y: 120 },
+    endCoordinates: { x: 560, y: 120 },
+    lineStyle: {
+      width: 3,
+      color: '#475569',
+      pattern: { type: 'dashes', offset: 4 },
+    },
+    markers: [
+      { position: 0.25, shape: 'circle', size: 12, color: '#22c55e' },
+      { position: 0.75, shape: 'diamond', size: 14, color: '#eab308' },
+    ],
+    arrow: { end: true, style: 'outline', color: '#0f172a', size: 16 },
+  },
+  buffer
+);
+```
 
 ---

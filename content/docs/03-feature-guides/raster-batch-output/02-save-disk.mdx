@@ -1,0 +1,76 @@
+# Save to disk {#02-save-disk}
+
+**`await painter.save(buffer, options?)`** and **`await painter.saveMultiple(buffers, options?)`** write **image** bytes to disk, optionally transcode with **Sharp** (**JPEG** **`/`** **WebP** **`/`** **AVIF**). Session state: a per-painter **`saveCounter`** (**starts at `1`**) increments for **`naming: 'counter'`** (**`lib-next/output/save-buffer.ts`**, **`SaveOptions`** **`lib-next/types/output.ts`**).
+
+**`resetSaveCounter`** is **not** exposed on **`lib-next`** **`ApexPainter`** — create a new painter or control names with **`filename`**, **`timestamp`**, or **`custom`** naming.
+
+---
+
+## `save(buffer, options?)`
+
+```typescript
+await painter.save(buffer: Buffer, options?: SaveOptions): Promise<SaveResult>;
+```
+
+### `SaveOptions`
+
+| Field | Default | Notes |
+|-------|---------|------|
+| **`directory`** | **`./ApexPainter_output`** | Created when **`createDirectory`** (**default `true`**). |
+| **`filename`** | — | If set and has **no** extension, **`.${format}`** appended. |
+| **`format`** | **`png`** | **`png`** writes buffer as-is; other formats pipe through **Sharp**. |
+| **`quality`** | **`90`** | JPEG **`/`** WebP **`/`** AVIF quality. |
+| **`createDirectory`** | **`true`** | **`mkdir -p`** semantics. |
+| **`naming`** | **`timestamp`** | **`timestamp`** **`|`** **`counter`** **`|`** **`custom`**. |
+| **`counterStart`** | **`1`** | Merged into options in **`saveMultiple`**; **counter** mode still uses **`session.saveCounter`** internally (see behaviour below). |
+| **`prefix`** **`/`** **`suffix`** | **`""`** | Applied to generated names. |
+| **`overwrite`** | **`false`** | When **`false`**, appends **`_1`**, **`_2`**, … before extension if path exists. |
+
+### `SaveResult`
+
+**`{ path, filename, size, format }`**
+
+### Naming modes
+
+| Mode | Filename pattern |
+|------|------------------|
+| **`timestamp`** | **`prefix` + `YYYYMMDD_HHMMSS_mmm` + `suffix` + `.format`** |
+| **`counter`** | **`prefix` + live **`saveCounter`** + `suffix` + `.format`**, then **`saveCounter++`** |
+| **`custom`** | **`prefix` + `suffix` + `.format`** (**empty base** if both blank). |
+
+---
+
+## `saveMultiple(buffers, options?)`
+
+```typescript
+await painter.saveMultiple(buffers: Buffer[], options?: SaveOptions): Promise<SaveResult[]>;
+```
+
+- Requires a **non-empty** array.
+- Iterates **`saveImageBuffer`** per entry. For **`naming: 'counter'`**, the session counter advances **once per file** (sequential **`1`**, **`2`**, **`3`**, … from the shared session).
+
+---
+
+## Formats & Sharp
+
+- **`png`**: direct write (**no** Sharp re-encode).
+- **`jpg`** **`/`** **`jpeg`**, **`webp`**, **`avif`**: **`require('sharp')`** must be available at runtime.
+- **`gif`**: special-cased (**non-GIF** input logs a warning; buffer may pass through unchanged).
+
+---
+
+## Example
+
+```typescript
+const { buffer } = await painter.createCanvas({ width: 200, height: 200, color: '#1e293b' });
+const meta = await painter.save(buffer, {
+  directory: './out',
+  naming: 'counter',
+  prefix: 'frame-',
+  format: 'webp',
+  quality: 85,
+});
+console.log(meta.path, meta.size);
+```
+
+---

@@ -140,7 +140,7 @@ export default function HeroShowcase() {
             transition={{ delay: 0.1, duration: 0.6 }}
           >
             <SparklesIcon className="h-3.5 w-3.5" />
-            <span className="tracking-wide">v5.4.0 · charts · GIFs · video · 22+ filters</span>
+            <span className="tracking-wide">v5.4.3 · charts · GIFs · video · 22+ filters</span>
           </motion.div>
 
           {/* Title */}

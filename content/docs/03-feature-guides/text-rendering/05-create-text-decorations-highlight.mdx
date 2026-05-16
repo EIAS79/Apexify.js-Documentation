@@ -1,28 +1,28 @@
 # Decorations & highlight {#05-create-text-decorations-highlight}
 
-Back: [Text overview](/docs#00-create-text-overview)
+Put backdrop tint under **`effects.highlight`** and typographic rules under **`decorations`** (**underline**, **overline**, **strikethrough**). Legacy flat **`highlight`** / **`underline`** / … still resolve via **`resolveTextEffects`** / **`resolveTextDecorations`** (**nested wins**).
 
 ---
 
-## Highlight — `highlight`
+## Highlight — `effects.highlight`
 
-Drawn **before** glow/shadow/stroke/fill.
+Drawn **before** glow, shadow, stroke, fill, and line decorations (**`renderEnhancedTextLine`**).
 
 | Key | Default |
 |-----|---------|
 | **`color`** | **`#ffff00`** |
 | **`gradient`** | Overrides **`color`** |
-| **`opacity`** | **0.3** |
+| **`opacity`** | **`0.3`** |
 
-**Straight lines:** rectangle **`fillRect(x, highlightY, width, height)`** with **`highlightY = y - height * 0.8`** — tuned for alphabetic baseline geometry.
+**Straight baseline:** **`renderTextHighlight`** draws **`fillRect(x, highlightY, width, height)`** with **`highlightY = y - height * 0.8`** — tuned for **`alphabetic`** baseline geometry.
 
-**Arc mode:** each glyph gets **`renderHighlightLocal`** in tangent space (width = measured glyph advance).
+**Arc text:** each glyph uses **`renderTextHighlightLocal`** in tangent coordinates (**width** = measured advance for that grapheme).
 
 ---
 
-## Underline / overline / strikethrough
+## Underline / overline / strikethrough (`TextLineDecoration`)
 
-Each may be **`true`** (inherits **`color`** + default thickness ~**`fontSize * 0.05`**) **or** an object:
+Each may be **`true`** (inherits fill **`color`** + thickness **`≈ fontSize * 0.05`**) **or** an object:
 
 ```typescript
 underline?: boolean | {
@@ -32,10 +32,14 @@ underline?: boolean | {
 };
 ```
 
-**Placement** (straight baseline, **`renderDecorations`**):
+Same shape for **`overline`** and **`strikethrough`**.
 
-| Decoration | Y offset formula |
-|------------|------------------|
+### Placement on straight lines (`renderTextDecorations`)
+
+Uses **`ctx.measureText`** width from **`x`** as **`textAlign`** defines origin:
+
+| Decoration | Y offset |
+|------------|-----------|
 | Underline | **`y + fontSize * 0.1`** |
 | Overline | **`y - fontSize * 0.8`** |
 | Strikethrough | **`y - fontSize * 0.3`** |
@@ -44,6 +48,8 @@ Gradient strokes span **`x → x + measuredWidth`** at fixed **`decorationY`**.
 
 ---
 
+## Example
+
 ```typescript
 await painter.createText(
   {
@@ -51,9 +57,14 @@ await painter.createText(
     x: 72,
     y: 140,
     font: { size: 36, family: 'Arial' },
-    highlight: { color: '#fef08a', opacity: 0.55 },
-    underline: { color: '#dc2626', width: 3 },
-    strikethrough: true,
+    effects: {
+      highlight: { color: '#fef08a', opacity: 0.55 },
+    },
+    decorations: {
+      underline: { color: '#dc2626', width: 3 },
+      strikethrough: true,
+    },
+    fill: { color: '#0f172a' },
   },
   buffer
 );

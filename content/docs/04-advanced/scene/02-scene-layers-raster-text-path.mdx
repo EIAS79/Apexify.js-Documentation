@@ -1,0 +1,228 @@
+# Scene layers — `image`, `text`, `path`, `imageBuffer` {#02-scene-layers-raster-text-path}
+
+
+These layers use **`ImageCreator`**, **`TextCreator`**, and **`Path2DCreator`** under the hood — same concepts as **`createImage`**, **`createText`**, and **`path2d.draw`** on a buffer.
+
+---
+
+## `image`
+
+**`images`:** `ImageProperties | ImageProperties[]` — same as **`createImage`**.  
+**`options`:** optional **`CreateImageOptions`** (grouped mode, clip, filters, etc. — see [Create image basics](/docs#01-create-image-basics)).
+
+### Variant: single full-bleed image
+
+```typescript
+{
+  type: "image",
+  images: {
+    source: "./photo.jpg",
+    x: 0,
+    y: 0,
+    width: 1280,
+    height: 720,
+  },
+}
+```
+
+### Variant: multiple image entries (stacked in one layer)
+
+```typescript
+{
+  type: "image",
+  images: [
+    { source: "./sky.png", x: 0, y: 0, width: 800, height: 400 },
+    { source: "./logo.png", x: 620, y: 24, width: 140, height: 140, opacity: 0.95 },
+  ],
+}
+```
+
+Order inside **`images[]`** is paint order **within** that layer (before the next **`SceneLayer`**).
+
+### Variant: URL or cwd-relative path
+
+```typescript
+{
+  type: "image",
+  images: {
+    source: "https://example.com/asset.png",
+    x: 100,
+    y: 100,
+    width: 200,
+    height: 200,
+  },
+}
+```
+
+Resolution rules match **`ImageCreator`** (see image guides).
+
+---
+
+## `text`
+
+**`texts`:** `TextProperties | TextProperties[]` — rendered with **`TextCreator.renderTextsOntoContext`**.
+
+### Variant: single headline
+
+```typescript
+{
+  type: "text",
+  texts: [
+    {
+      content: "Dashboard",
+      x: 48,
+      y: 72,
+      fontSize: 56,
+      color: "#0f172a",
+      fontPath: "./fonts/Bold.ttf",
+    },
+  ],
+}
+```
+
+### Variant: stacked lines (subtitle + title)
+
+```typescript
+{
+  type: "text",
+  texts: [
+    { content: "Q4 Report", x: 48, y: 48, fontSize: 20, color: "#64748b" },
+    { content: "Revenue", x: 48, y: 88, fontSize: 44, color: "#0f172a" },
+  ],
+}
+```
+
+### Variant: two separate `text` layers (control z-order)
+
+Putting subtitles in a **separate** **`SceneLayer`** lets you insert an **`image`** layer **between** title and subtitle if needed.
+
+```typescript
+const layers = [
+  { type: "text" as const, texts: [{ content: "Back", x: 10, y: 10, fontSize: 14, color: "#888" }] },
+  { type: "image" as const, images: { source: "./divider.png", x: 0, y: 40, width: 400, height: 4 } },
+  { type: "text" as const, texts: [{ content: "Front", x: 10, y: 52, fontSize: 24, color: "#000" }] },
+];
+```
+
+---
+
+## `path`
+
+**`path`:** `PathCommand[]` (or a path handle typed as `unknown`).  
+**`options`:** optional **`Path2DDrawOptions`** — **`stroke`**, **`fill`**, **`transform`**.
+
+### Variant: stroke only
+
+```typescript
+{
+  type: "path",
+  path: [
+    { type: "moveTo", x: 40, y: 200 },
+    { type: "lineTo", x: 360, y: 200 },
+    { type: "lineTo", x: 200, y: 40 },
+    { type: "closePath" },
+  ],
+  options: {
+    stroke: { color: "#2563eb", width: 3, lineJoin: "round" },
+  },
+}
+```
+
+### Variant: fill + rounded rect command
+
+```typescript
+{
+  type: "path",
+  path: [
+    {
+      type: "roundedRect",
+      x: 50,
+      y: 50,
+      width: 200,
+      height: 100,
+      borderRadius: 16,
+    },
+  ],
+  options: {
+    fill: { color: "#dbeafe", rule: "nonzero" },
+    stroke: { color: "#1d4ed8", width: 2 },
+  },
+}
+```
+
+### Variant: raw commands array passed from a helper
+
+```typescript
+function badgePath(cx: number, cy: number, r: number) {
+  return [
+    { type: "moveTo" as const, x: cx + r, y: cy },
+    { type: "arc" as const, x: cx, y: cy, radius: r, startAngle: 0, endAngle: Math.PI * 2 },
+  ];
+}
+
+{
+  type: "path",
+  path: badgePath(100, 100, 40),
+  options: { fill: { color: "#ef4444" } },
+}
+```
+
+---
+
+## `imageBuffer`
+
+Draws an already-decoded **PNG/JPEG `Buffer`** at **`x,y`**. Useful for **badges**, **QR codes**, or **thumbnails** produced elsewhere.
+
+| Field | Role |
+|-------|------|
+| **`buffer`** | Raster bytes |
+| **`x`**, **`y`** | Top-left |
+| **`width`**, **`height`** | Optional draw size (defaults to image intrinsic size) |
+| **`globalAlpha`**, **`globalCompositeOperation`** | Optional compositing |
+
+### Variant: logo buffer on top of gradient (another layer)
+
+```typescript
+import fs from "fs";
+
+const logo = await fs.promises.readFile("./logo.png");
+
+const layer = {
+  type: "imageBuffer" as const,
+  buffer: logo,
+  x: 700,
+  y: 30,
+  width: 120,
+  height: 120,
+  globalAlpha: 1,
+};
+```
+
+### Variant: soft watermark (`multiply`)
+
+```typescript
+{
+  type: "imageBuffer",
+  buffer: watermarkBuf,
+  x: 0,
+  y: 0,
+  width: 800,
+  height: 450,
+  globalAlpha: 0.35,
+  globalCompositeOperation: "multiply",
+}
+```
+
+### Variant: natural size (omit width/height)
+
+```typescript
+{
+  type: "imageBuffer",
+  buffer: iconBuf,
+  x: 16,
+  y: 16,
+}
+```
+
+---
+

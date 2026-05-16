@@ -1,0 +1,135 @@
+# Path2D draw & custom lines {#09-path2d-draw-and-custom-lines}
+
+Tutorial-style chapters (**field-by-field **`CustomOptions`**, scenes**) live under **[Lines & connectors](/docs#00-custom-lines-overview)**. Below: **`painter.path2d`** API (**`path/path2d-creator.ts`**, **`apex-painter/path-custom-lines.ts`**).
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+```
+
+---
+
+## `create(commands)`
+
+Returns a native **`Path2D`** from **`PathCommand[]`** (**`foundation/path-cmd.ts`** **`/`** **`types/pathCommands.ts`** mirror).
+
+```typescript
+const path = painter.path2d.create([
+  { type: 'roundedRect', x: 24, y: 24, width: 320, height: 160, radius: 18 },
+]);
+
+const poly = painter.path2d.create([
+  {
+    type: 'polygon',
+    points: [
+      { x: 60, y: 20 },
+      { x: 140, y: 180 },
+      { x: 10, y: 70 },
+      { x: 190, y: 70 },
+      { x: 60, y: 180 },
+    ],
+  },
+]);
+```
+
+---
+
+## `draw(canvasBuffer, path, options?)`
+
+Rasterizes **`stroke`** **`/`** **`fill`** **`/`** **`shadow`** **`/`** **`transform`** onto **`CanvasResults`** **|** **`Buffer`**. **`path`** may be **`Path2D`** or **`PathCommand[]`** (**built internally**).
+
+```typescript
+const { buffer } = await painter.createCanvas({ width: 480, height: 280, colorBg: '#0f172a' });
+
+const ribbon = painter.path2d.create([
+  { type: 'moveTo', x: 40, y: 200 },
+  { type: 'quadraticCurveTo', cpx: 240, cpy: 40, x: 440, y: 200 },
+]);
+
+const framed = await painter.path2d.draw(buffer, ribbon, {
+  stroke: { color: '#38bdf8', width: 6, lineCap: 'round', lineJoin: 'round' },
+  shadow: { color: 'rgba(0,0,0,0.45)', blur: 12, offsetX: 0, offsetY: 6 },
+});
+
+const badge = painter.path2d.create([{ type: 'circle', x: 120, y: 120, radius: 72 }]);
+
+const filled = await painter.path2d.draw(framed, badge, {
+  fill: { color: '#334155', opacity: 0.85, rule: 'nonzero' },
+  stroke: { color: '#e2e8f0', width: 3 },
+});
+```
+
+**`Path2DDrawOptions`** (**`types/path2d-draw.ts`**): **`stroke`**, **`fill`**, **`shadow`** (**supports **`shadow.gradient`**), **`opacity`**, **`globalCompositeOperation`**, **`transform`** (**`translateX`** **`/`** **`translateY`**, **`rotate`** (**degrees**), **`scaleX`** **`/`** **`scaleY`**, **`originX`** **`/`** **`originY`** pivot).
+
+Returns **`Promise<Buffer>`** (**PNG**).
+
+---
+
+## `custom(options | options[], buffer)`
+
+Decorative connectors (**`smooth`** **`/`** **`bezier`**, arrows, markers, dashed **`/`** textured **`lineStyle`** — **`CustomOptions`** **`types/path`**).
+
+```typescript
+const { buffer } = await painter.createCanvas({ width: 640, height: 360, colorBg: '#020617' });
+
+const single = await painter.path2d.custom(
+  {
+    startCoordinates: { x: 80, y: 180 },
+    endCoordinates: { x: 560, y: 180 },
+    lineStyle: { width: 5, color: '#94a3b8', lineDash: { dashArray: [14, 10], offset: 0 } },
+    arrow: { end: true, size: 18, style: 'filled', color: '#f472b6' },
+  },
+  buffer
+);
+
+const multi = await painter.path2d.custom(
+  [
+    {
+      startCoordinates: { x: 40, y: 280 },
+      endCoordinates: { x: 220, y: 120 },
+      path: { type: 'bezier', tension: 0.35 },
+      lineStyle: { width: 4, color: '#38bdf8' },
+    },
+    {
+      startCoordinates: { x: 220, y: 120 },
+      endCoordinates: { x: 520, y: 260 },
+      path: { type: 'smooth', tension: 0.45 },
+      markers: [{ position: 0.5, shape: 'circle', size: 10, color: '#fde047' }],
+      lineStyle: { width: 3, color: '#a78bfa' },
+    },
+  ],
+  single
+);
+```
+
+---
+
+## Pipeline with **`chain`**
+
+Pipe **`createCanvas`** **`→`** **`path2d.custom`** using **`'current'`**:
+
+```typescript
+const out = await painter.chain([
+  { method: 'createCanvas', args: [{ width: 400, height: 240, colorBg: '#111827' }] },
+  {
+    method: 'path2d.custom',
+    args: [
+      {
+        startCoordinates: { x: 48, y: 120 },
+        endCoordinates: { x: 352, y: 120 },
+        lineStyle: { width: 4, color: '#cbd5f5' },
+        arrow: { end: true, size: 14 },
+      },
+      'current',
+    ],
+  },
+]);
+```
+
+## Command reference
+
+**`PathCommand`** variants (**`moveTo`**, **`lineTo`**, **`arc`**, **`ellipse`**, **`roundedRect`**, **`polygon`**, **`star`**, **`arrow`**, **`closePath`**, …): authoritative builder **`lib-next/foundation/path-cmd.ts`** (**also **`types/pathCommands.ts`**).
+
+---
+

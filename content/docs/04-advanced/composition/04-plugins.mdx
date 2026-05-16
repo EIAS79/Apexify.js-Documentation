@@ -1,0 +1,81 @@
+# Plugins (`painter.plugins`, `painter.use`) {#04-plugins}
+
+
+Two related mechanisms:
+
+1. **`PluginHost`** — **`painter.plugins`** — a **name → object** registry for **opaque** helper APIs (QR, barcode, custom exporters, …).
+2. **`ApexifyPlugin`** — **`painter.use(plugin)`** — runs an **`install`** function **once per plugin name** so you can register facades or patch behavior without editing core sources.
+
+**`ApexPainter.use`** is **synchronous** — if **`install`** returns a **`Promise`**, the core **does not await** it; keep **`install`** sync for predictable startup.
+
+---
+
+## `painter.plugins.use` / `get` / `has` / `remove`
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+const myToolkit = painter.plugins.use("analytics", {
+  track(_event: string, _payload?: Record<string, unknown>) {
+    /* ... */
+  },
+});
+
+// elsewhere
+const tk = painter.plugins.get<typeof myToolkit>("analytics");
+tk?.track("render_ok");
+```
+
+- **`use(name, api)`** throws if **`name`** is already registered.
+- **`remove(name)`** deletes the entry (**`true`** if existed).
+
+---
+
+## `painter.use` — install hook
+
+```typescript
+import { ApexPainter, type ApexifyPlugin, type SceneLayer } from "apexify.js";
+
+const watermarkHelper: ApexifyPlugin<ApexPainter> = {
+  name: "watermark-kit",
+  install(p) {
+    p.plugins.use("watermark-kit", {
+      cornerLabel(text: string): SceneLayer[] {
+        return p.components.watermark.toLayers({
+          text,
+          canvasWidth: 640,
+          canvasHeight: 360,
+          position: "bottom-right",
+          margin: 16,
+          fontSize: 12,
+          color: "#94a3b81a",
+        });
+      },
+    });
+  },
+};
+
+const painter = new ApexPainter({ type: "buffer" });
+painter.use(watermarkHelper);
+
+const kit = painter.plugins.get<{ cornerLabel: (text: string) => SceneLayer[] }>("watermark-kit");
+const layers = kit?.cornerLabel("staging") ?? [];
+
+await painter.renderScene({ width: 640, height: 360, colorBg: "#020617", layers });
+```
+
+- Calling **`painter.use`** twice with the **same **`plugin.name`** throws.
+- **`install`** receives the **`ApexPainter`** instance (the **`host`** parameter).
+
+---
+
+## When to use which
+
+| Goal | Tool |
+|------|------|
+| Attach a **plain object** collaborators can fetch by string id | **`plugins.use`** |
+| Run **setup** once (register multiple facades, subscribe, seed defaults) | **`painter.use`** + optional internal **`plugins.use`** calls |
+
+---

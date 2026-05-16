@@ -1,0 +1,77 @@
+# Stitch & collage {#04-image-stitch-and-collage}
+
+**`await painter.image.stitchImages(images, options?)`** concatenates images **horizontally**, **vertically**, or on a **square grid**. **`await painter.image.createCollage(images, layout)`** lays out **sized** cells with backgrounds and optional **rounded clips**.
+
+Implementation:** **`lib-next/output/stitch.ts`** (**PNG** output **`/`** **`canvas.toBuffer('image/png')`**).
+
+**Sources:** **`string`** (**`http`** **`/`** **`https`** URL **or** path relative **`/`** joined with **`process.cwd()``**) **`/`** **`Buffer`**.
+
+---
+
+## `stitchImages(images, options?)`
+
+### `StitchOptions` (**`lib-next/types/batch.ts`**)
+
+| Field | Default | Behaviour |
+|-------|---------|-----------|
+| **`direction`** | **`horizontal`** | **`horizontal`** **`|`** **`vertical`** **`|`** **`grid`**. |
+| **`overlap`** | **`0`** | Pixels subtracted between neighbours (**horizontal **`/`** vertical**). |
+| **`spacing`** | **`0`** | Extra gap (**pixels**) inserted between tiles. |
+| **`blend`** | **`false`** | When **`true`** **`overlap > 0`**, redraws overlap zone with **`multiply`** **`/`** **`globalAlpha 0.5`** (**approximate** blend). |
+
+### Layout rules
+
+- **Horizontal **`/`** vertical:** canvas spans **sum of sides** minus overlaps **plus** spacing; orthogonal extent is **max** edge among images.
+- **Grid:** **`cols = ceil(sqrt(n))`**, **`rows = ceil(n / cols)`**; each cell **`maxWidth`** **`×`** **`maxHeight`** of inputs (**images keep intrinsic size**, top-left anchored per cell).
+
+```typescript
+const strip = await painter.image.stitchImages(['./a.png', './b.png'], {
+  direction: 'horizontal',
+  spacing: 8,
+});
+
+const sheet = await painter.image.stitchImages(urls, { direction: 'grid' });
+```
+
+---
+
+## `createCollage(images, layout)`
+
+### Images argument
+
+```typescript
+Array<{ source: string | Buffer; width?: number; height?: number }>;
+```
+
+Optional **`width`** **`/`** **`height`** scale draws (**defaults:** raster dimensions).
+
+### `CollageLayout`
+
+| Field | Default | Notes |
+|-------|---------|------|
+| **`type`** | **`grid`** | **`grid`** **`|`** **`masonry`** **`|`** **`carousel`** **`|`** **`custom`**. |
+| **`columns`** **`/`** **`rows`** | **`3`** **`/`** **`3`** | **`grid`** tile counts. |
+| **`spacing`** | **`10`** | Gap (**pixels**) between cells **`/`** strips. |
+| **`background`** | **`#ffffff`** | Filled before drawing. |
+| **`borderRadius`** | **`0`** | Uses **`ctx.roundRect`** + **`clip`** per tile when **`> 0`**. |
+
+### Layout behaviour
+
+| **`type`** | Algorithm (summary) |
+|------------|---------------------|
+| **`grid`** | Uniform cell **`max(width)` **`×`** **`max(height)`** across **all** images; tiles indexed row-major. |
+| **`masonry`** | Column stripping (**shortest column** receives next image **`/`** heights accumulate). |
+| **`carousel`** | Single horizontal strip with vertical centering (**full widths summed **+** spacing). |
+| **`custom`** | Canvas defaults **`800×600`** — **warning:** placement logic does **not** position **`custom`** tiles beyond **`grid`** **`/`** **`masonry`** **`/`** **`carousel`** branches; prefer **`grid`** **`/`** **`carousel`** unless you extend upstream. |
+
+```typescript
+const board = await painter.image.createCollage(
+  [
+    { source: './photo-a.jpg', width: 320, height: 240 },
+    { source: './photo-b.jpg' },
+  ],
+  { type: 'grid', columns: 2, rows: 2, spacing: 12, background: '#0f172a', borderRadius: 8 }
+);
+```
+
+---

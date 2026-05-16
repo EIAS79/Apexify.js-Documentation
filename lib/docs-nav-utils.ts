@@ -129,6 +129,7 @@ const ACCENT_BY_SECTION: Record<string, SectionAccent> = {
   '02-recipes': { color: 'var(--accent-amber)' },
   '03-feature-guides': { color: 'var(--accent-coral)' },
   '04-api-reference': { color: 'var(--accent-iris-soft)' },
+  '04-advanced': { color: 'var(--accent-rose)' },
   '05-advanced': { color: 'var(--accent-rose)' },
   '06-internals': { color: 'var(--accent-magenta-soft)' },
   '07-contributor-notes': { color: 'var(--accent-amber-soft)' },

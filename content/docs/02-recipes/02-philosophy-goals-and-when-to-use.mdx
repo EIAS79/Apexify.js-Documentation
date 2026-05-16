@@ -1,0 +1,56 @@
+# Why ApexPainter — goals & when to use {#02-philosophy-goals-and-when-to-use}
+
+Apexify.js centers on **`ApexPainter`**: a **Node-friendly** façade over **`@napi-rs/canvas`** (and optional FFmpeg-backed **`createVideo`**). You describe **what** should appear on a bitmap — backgrounds, images, text, charts, paths — and get **`Buffer`** outputs you can **save**, **upload**, **`base64`**-encode, or pipe into **GIF **`/`** video** tooling.
+
+---
+
+## What problem Apexify solves
+
+| Need | How ApexPainter helps |
+|------|-------------------------|
+| **Server-side thumbnails, cards, OG images** | **`createCanvas`** → **`createImage`** **`/`** **`createText`** → **`save`** **`/`** **`outPut`** |
+| **_repeatable branded layouts** | **`CanvasConfig`** (and **`SceneBuilder`** **`/`** templates when you want graphs **`/`** **`$`** assets) |
+| **Data viz as PNG** | **`createBarChart`** **`/`** **`createPieChart`** **`/`** … → same buffer pipeline |
+| **Short motion** | **`createGIF`**, **`animate`** |
+| **Media housekeeping** | **`createVideo`** (probe, trim, filters, …) when FFmpeg is available |
+| **Batch **`/`** pipelines** | **`batch`** (parallel), **`chain`** (sequential buffer handoff), **`painter.image`** (stitch, compress, resize, …) |
+
+The library’s **goal** is to keep **one mental model**: **canvas-sized bitmap → layered draws → PNG bytes**, plus helpers that **orbit** that core (pixels, hit tests, standalone **`painter.image`** file ops).
+
+---
+
+## Why a single façade (`ApexPainter`)
+
+- **Shared defaults** — output **`type`** (**`buffer`**, **`base64`**, …), **`save`** counter session, **`assets`** for **`$`** resolution.  
+- **Discoverability** — **`painter.path2d`**, **`painter.pixels`**, **`painter.detect`**, **`painter.image`**, **`painter.video`** group related APIs instead of flat dozens of imports.  
+- **Composable pipelines** — **`chain`** can mix **`createCanvas`**, **`path2d.draw`**, **`createText`** without juggling hidden global state.
+
+Implementation detail (`lib-next/`): logic is split into **`creates/`**, **`facets.ts`**, domain folders (**`gif/`**, **`video/`**, **`chart/`**) — **`ApexPainter`** stays the stable surface for consumers.
+
+---
+
+## What you can realistically achieve
+
+- **Automation**: cron **`/`** CI **`/`** bots generating images from JSON **`/`** DB rows.  
+- **Products**: invite cards, leaderboards, coupon graphics, progress badges (**`components`**), chart snapshots for Slack **`/`** email.  
+- **Tooling**: bulk resize **`/`** palette extract **`/`** stitch (**`painter.image`**), lightweight FFmpeg scripts via **`createVideo`**.
+
+See **[What you can build](/docs#01-what-you-can-build)** for a **feature-by-feature** mapping.
+
+---
+
+## When something else might fit better
+
+| Situation | Alternative mindset |
+|-----------|---------------------|
+| **Browser-only UI** (live DOM canvas, no Node buffers) | Native **`canvas`** **`/`** Skia **`/`** WebGL in the client — Apexify targets **server **`/`** worker-with-node-canvas** workflows. |
+| **Print-first PDF **`/`** CMYK **`/`** multipage layout** | Dedicated layout **`/`** PDF engines — Apexify focuses **raster PNG **`/`** JPEG **`/`** WebP**. |
+| **Full video editors** | Apexify **`createVideo`** wraps FFmpeg helpers — great for **transcode **`/`** slice **`/`** overlay**, not a timeline NLE. |
+
+---
+
+## How recipes fit
+
+**Recipes** encode **one vertical slice** (“social card”, “daily chart PNG”) using the mental model above. **Feature guides** document **every option**. Read **[Recipes hub](/docs#00-recipes-overview)** for **`recipe-*.mdx`** conventions.
+
+---

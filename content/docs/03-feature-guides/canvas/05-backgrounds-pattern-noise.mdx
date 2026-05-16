@@ -1,137 +1,181 @@
 # Patterns & film noise {#05-backgrounds-pattern-noise}
 
-Back: [Canvas overview](/docs#00-create-canvas-overview)
 
-There are **three** pattern-related mechanisms — do not confuse them:
+Use **`await painter.createCanvas(config)`** with fields on **`CanvasConfig`** (`apexify.js`). **Patterns** and **noise** are **not** separate ApexPainter methods — they are **pure config**: either **top-level** **`patternBg`** / **`noiseBg`**, or entries inside **`bgLayers[]`**.
 
-| Mechanism | Config | When it paints | Implementation |
+---
+
+## Paint order (what goes on top)
+
+Inside **`CanvasCreator`**, after clipping and optional **`zoom`**, backgrounds are painted in this **fixed** order:
+
+1. **Exactly one primary fill** — **`videoBg`**, or **`customBg`**, or **`gradientBg`**, or **`colorBg`**, or **`transparentBase: true`** (no automatic fill), or **default opaque `#000`** if you set none of those.
+2. **`bgLayers[]`** — each layer in **array order** (bottom → top). Supports **`color`**, **`gradient`**, **`image`**, **`pattern`** (tiled **bitmap**), **`presetPattern`** (procedural **`PatternOptions`**), and **`noise`**.
+3. **`patternBg`** — **full-canvas procedural pattern** (`PatternOptions`). Runs **after** every **`bgLayers`** row.
+4. **`noiseBg`** — **film grain** overlay (`applyNoise`). Runs **last** among background paints (still **before** canvas **`shadow`** / **`stroke`**).
+
+So: **`patternBg`** is **never** “between” two **`bgLayers`** — if you need a pattern **sandwiched** between colors, model it as **`bgLayers`** (`presetPattern` / `pattern`) or reorder **`bgLayers`** + skip **`patternBg`**.
+
+See also **[Paint order](/docs#09-canvas-paint-order)** for the full pipeline.
+
+---
+
+## Three pattern mechanisms (do not mix them up)
+
+| Mechanism | Where | What it draws | Blend default |
 |-----------|--------|----------------|----------------|
-| **`patternBg`** | **`PatternOptions`** | **After** all **`bgLayers`**, **before** **`noiseBg`** (`CanvasCreator`) | **`EnhancedPatternRenderer.renderPattern`** — procedural mesh |
-| **`bgLayers[]`** **`presetPattern`** | **`pattern: PatternOptions`** | In **`bgLayers`** order (with **`opacity`** / **`blendMode`** per layer) | Same renderer; **`stackedInLayer: true`** changes blend default |
-| **`bgLayers[]`** **`pattern`** | **`source`**, **`repeat`**, **`opacity`** | Same stack order | **`drawPattern`** — **`createPattern`** tiled **bitmap** (`bg.ts`) |
+| **`patternBg`** | Top-level **`CanvasConfig`** | Procedural mesh from **`PatternOptions`** (`EnhancedPatternRenderer`) | If **`pattern.blendMode`** is omitted → **`overlay`** |
+| **`bgLayers[]`** **`presetPattern`** | Layer stack | Same procedural renderer as **`patternBg`**, but scoped like any other layer | **`stackedInLayer: true`** → missing **`blendMode`** does **not** force **`overlay`**; uses normal **`source-over`** unless you set **`pattern.blendMode`** or **`layer.blendMode`** |
+| **`bgLayers[]`** **`pattern`** | Layer stack | **`createPattern`** over a **loaded image** (**`source`** path/URL); tiled (`repeat`) | Standard layer opacity / **`blendMode`** |
 
-Types: **`PatternOptions`**, **`BackgroundLayer`** in **`lib/Canvas/utils/types/index.ts`**. Procedural drawing: **`lib/Canvas/utils/Patterns/enhancedPatternRenderer.ts`**.
+**Summary**
 
----
-
-## Procedural presets — every `PatternOptions.type` {#05-backgrounds-pattern-noise-pattern-types}
-
-These are the **only** string literals **`EnhancedPatternRenderer`** recognises (`switch` + **`default`** logs **`Unknown pattern type`**).
-
-| **`type`** | What gets drawn | **`color`** | **`secondaryColor`** | **`size` / `spacing`** (defaults **20** / **10**) |
-|------------|-----------------|-------------|----------------------|---------------------------------------------------|
-| **`grid`** | Vertical lines (`color`) + horizontal lines (`secondary` or `color`) | Line strokes | Second axis strokes | Cell pitch ≈ **`size + spacing`** |
-| **`dots`** | Filled circles on a grid | Dot fill | *(unused)* | Dot centres spaced **`size+spacing`**; radius **`size/4`** |
-| **`diagonal`** | Parallel **`↗`** strokes across canvas | Stroke | *(unused)* | Line spacing **`size+spacing`** |
-| **`stripes`** | Horizontal bands | Even rows | Odd rows if **`secondaryColor`** set & ≠ **`transparent`** | Band height **`size`**, pitch **`size+spacing`** |
-| **`waves`** | Horizontal sine polylines | Stroke | *(unused)* | Row pitch **`size+spacing`**; amplitude tied to **`size`** |
-| **`crosses`** | `+` marks per tile | Horizontal bar | Vertical bar (or **`color`**) | Tile **`size+spacing`** |
-| **`hexagons`** | Outlined hex lattice | Stroke | *(unused)* | Geometry from **`size`** + **`spacing`** |
-| **`checkerboard`** | Filled squares | “Even” tiles | “Odd” tiles (default **`transparent`**) | Square edge **`size`** **only** (**`spacing`** not used in loops) |
-| **`diamonds`** | Outlined diamonds | Stroke | *(unused)* | Tile **`size+spacing`** |
-| **`triangles`** | Outlined upward triangles | Stroke | *(unused)* | Tile **`size+spacing`** |
-| **`stars`** | Filled 5-point stars | Fill | *(unused)* | Tile **`size+spacing`**; arm radius **`size/4`** |
-| **`polka`** | Large filled circles (touching grid) | Fill | *(unused)* | Centres spaced **`size+spacing`**; radius **`size/2`** |
-| **`custom`** | Manual tile of an image | *(via image)* | *(via image)* | **`customPatternImage`**, **`repeat`**, **`scale`** — see below |
+- Want a **dots / grid / stripes** overlay drawn **after** all **`bgLayers`**? → **`patternBg`**.
+- Want that **between** an image wash and a vignette? → **`bgLayers`** with **`presetPattern`** (and optional **`blendMode`** per layer).
+- Want **your own seamless PNG/JPG** tiled? → **`bgLayers`** **`type: "pattern"`** with **`source`** + **`repeat`**.
 
 ---
 
-## `PatternOptions` — all fields
+## `patternBg` — procedural overlay after `bgLayers`
 
-| Property | Role |
-|----------|------|
-| **`type`** | One of the literals above (**required** for renderer entry). |
-| **`color`** | Primary ink (**default `#ffffff`** where used). |
-| **`secondaryColor`** | Second ink for **`grid`**, **`crosses`**, **`stripes`**, **`checkerboard`**; use **`'transparent'`** to disable checker dark squares (falls back to **`color`** for strokes where coded). |
-| **`opacity`** | **0…1** multiplied into **`ctx.globalAlpha`** (**default `0.3`** *inside* **`renderPattern`**). |
-| **`size`** | Feature scale in px (**default `20`**). |
-| **`spacing`** | Gap between repeats (**default `10`**), except **`checkerboard`** uses **`size`** only. |
-| **`rotation`** | Degrees — rotates **whole** overlay around **canvas centre** before tiling. |
-| **`offsetX`**, **`offsetY`** | Extra **`translate`** after rotation. |
-| **`blendMode`** | **`globalCompositeOperation`** for this overlay. **Default:** **`overlay`** when using top-level **`patternBg`**; when embedded in **`bgLayers`** **`presetPattern`**, missing **`blendMode`** on **`pattern`** leaves the **layer’s** **`blendMode`** (via **`stackedInLayer: true`**). |
-| **`customPatternImage`** | Path or **`http(s)`** URL — **`custom`** only; relative paths joined with **`process.cwd()`**. |
-| **`repeat`** | **`repeat` \| `repeat-x` \| `repeat-y` \| `no-repeat`** — **`custom`** only (**default `repeat`**). |
-| **`scale`** | Multiplier on drawn tile (**default `1`**) — **`custom`** only. |
-| **`gradient`** | Declared on **`PatternOptions`** as **`GradientConfig`** — **not read** by **`EnhancedPatternRenderer`** today. Use flat **`color`** / **`secondaryColor`** for meshes; use a **`bgLayers`** **`gradient`** layer underneath for colour ramps. |
+**Type:** **`PatternOptions`** (see **catalog** below). Typical use: subtle texture on top of **`colorBg`** or stacked **`bgLayers`**.
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+const { buffer } = await painter.createCanvas({
+  width: 640,
+  height: 360,
+  colorBg: "#0f172a",
+  bgLayers: [
+    { type: "gradient", value: { type: "linear", rotate: 135, colors: [{ stop: 0, color: "#1e293b" }, { stop: 1, color: "#020617" }] } },
+  ],
+  patternBg: {
+    type: "dots",
+    color: "#ffffff",
+    size: 14,
+    spacing: 22,
+    opacity: 0.12,
+    blendMode: "soft-light",
+  },
+});
+```
+
+If you omit **`blendMode`** on **`patternBg`**, the renderer defaults to **`overlay`** so light textures sit on photographs or gradients without repainting the whole canvas math yourself.
 
 ---
 
-## `patternBg` example
+## `bgLayers` — `presetPattern` vs `pattern`
+
+### `presetPattern` (vector-style presets)
+
+Same **`PatternOptions`** as **`patternBg`**, but **honours stack order** and per-layer **`opacity`** / **`blendMode`**.
 
 ```typescript
 await painter.createCanvas({
-  width: 600,
-  height: 400,
-  colorBg: '#020617',
-  patternBg: {
-    type: 'hexagons',
-    color: '#94a3b8',
-    size: 24,
-    spacing: 6,
-    opacity: 0.22,
-    blendMode: 'soft-light',
-  },
+  width: 400,
+  height: 240,
+  colorBg: "#020617",
+  bgLayers: [
+    {
+      type: "presetPattern",
+      opacity: 0.35,
+      blendMode: "multiply",
+      pattern: {
+        type: "stripes",
+        color: "#38bdf8",
+        secondaryColor: "#0ea5e9",
+        size: 12,
+        spacing: 8,
+        rotation: 12,
+      },
+    },
+    { type: "color", value: "rgba(2, 6, 23, 0.35)", blendMode: "source-over" },
+  ],
+});
+```
+
+### `pattern` (tiled bitmap)
+
+Loads **`source`** as an image (path / URL resolved like other backgrounds), builds a **`CanvasPattern`**, fills the canvas.
+
+```typescript
+await painter.createCanvas({
+  width: 500,
+  height: 280,
+  colorBg: "#f8fafc",
+  bgLayers: [
+    {
+      type: "pattern",
+      source: "./assets/seamless-noise.png",
+      repeat: "repeat",
+      opacity: 0.4,
+    },
+  ],
 });
 ```
 
 ---
 
-## `bgLayers` — bitmap tile vs preset
+## `PatternOptions` — `type` catalogue
 
-**Bitmap tile (`type: 'pattern'`)** — any image **`createPattern`** can digest:
+Common fields across types (defaults vary per **`type`**): **`color`**, **`secondaryColor`**, **`opacity`**, **`size`**, **`spacing`**, **`rotation`**, **`offsetX`**, **`offsetY`**, **`blendMode`**, **`gradient`**. **`custom`** additionally uses **`customPatternImage`**, **`repeat`**, **`scale`**.
 
-```typescript
-bgLayers: [
-  {
-    type: 'pattern',
-    source: './textures/paper.png',
-    repeat: 'repeat',
-    opacity: 0.35,
-    blendMode: 'multiply',
-  },
-];
-```
+| **`type`** | Role |
+|------------|------|
+| **`grid`** | Line grid (**`size`** ≈ cell feel; **`spacing`** gap between lines). |
+| **`dots`** | Filled dots on a lattice. |
+| **`diagonal`** | Diagonal hatch lines. |
+| **`stripes`** | Horizontal stripes alternating **`color`** / **`secondaryColor`**. |
+| **`waves`** | Sinusoidal strokes. |
+| **`crosses`** | Cross / plus motifs. |
+| **`hexagons`** | Hex lattice outline fill. |
+| **`checkerboard`** | Checker squares. |
+| **`diamonds`** | Diamond tessellation. |
+| **`triangles`** | Triangle motif tiling. |
+| **`stars`** | Star shapes on a grid. |
+| **`polka`** | Larger “polka” dots variant. |
+| **`custom`** | Tile **`customPatternImage`** manually (**`scale`**, **`repeat`** like **`repeat-x`**). |
 
-**Preset mesh (`type: 'presetPattern'`)** — shares **`PatternOptions`** with **`patternBg`**:
-
-```typescript
-bgLayers: [
-  {
-    type: 'presetPattern',
-    opacity: 1,
-    blendMode: 'overlay',
-    pattern: {
-      type: 'dots',
-      color: '#f8fafc',
-      size: 14,
-      spacing: 28,
-      opacity: 0.4,
-    },
-  },
-];
-```
-
-**Opacity stacking:** the layer sets **`ctx.globalAlpha`**; **`renderPattern`** multiplies again by **`pattern.opacity ?? 0.3`**.
+Import typings from **`apexify.js`** / **`apexify.js/types`** — **`PatternOptions`** ships with the package.
 
 ---
 
-## `noiseBg` & layer noise {#05-backgrounds-pattern-noise-noise-bg}
+## Noise — `noiseBg` vs `bgLayers` `noise`
 
-**`noiseBg`** — applied **after** **`patternBg`** (`CanvasCreator`). **`applyNoise`** default intensity **~0.05** if omitted.
+Both call the same **`applyNoise`** helper: random **grayscale** pixels drawn into a scratch bitmap, then **`drawImage`** onto the canvas; **`intensity`** scales **alpha** (`255 * intensity` per pixel).
 
-**`bgLayers`** **`type: 'noise'`** — same grain helper with per-layer **`blendMode`** / **`opacity`**; default intensity in **`drawBackgroundLayers`** **~0.08**.
+| Location | Default **`intensity`** if omitted |
+|----------|-----------------------------------|
+| **`noiseBg`** | **0.05** |
+| **`bgLayers`** **`{ type: "noise" }`** | **0.08** |
+
+Top-level **`noiseBg`** runs **after** **`patternBg`**. A **`noise`** **inside** **`bgLayers`** runs **where that layer sits** in the stack — use it for grain **between** washes without affecting layers above.
 
 ```typescript
-noiseBg: { intensity: 0.06 },
+await painter.createCanvas({
+  width: 480,
+  height: 270,
+  colorBg: "#111827",
+  patternBg: { type: "grid", color: "#94a3b8", opacity: 0.08, size: 24, spacing: 16 },
+  noiseBg: { intensity: 0.06 },
+});
 ```
 
-Typical **`intensity`**: **0.02–0.15**.
+---
+
+## Transparent canvases
+
+With **`transparentBase: true`**, there is **no** automatic **`colorBg`** fill — compose visibility only via **`bgLayers`**, **`patternBg`**, and **`noiseBg`**. See **[Transparent base](/docs#03-backgrounds-transparent-base)**.
 
 ---
 
-## Charts
+## Types reference
 
-**`patternBg`** / **`noiseBg`** on chart configs follow the same procedural renderer (`chartBackground.ts`).
+- **`PatternOptions`** — procedural / custom tiled presets.  
+- **`BackgroundLayer`** — union for **`bgLayers`** (`color`, `gradient`, `image`, `pattern`, `presetPattern`, `noise`).  
+- **`CanvasConfig`** — **`patternBg`**, **`noiseBg`**, **`bgLayers`**.
 
 ---
-

@@ -1,93 +1,59 @@
 # Canvas shadow — every `ShadowOptions` field {#07-canvas-shadow-options}
 
-Back: [Canvas overview](/docs#00-create-canvas-overview) · [Border & motion](/docs#06-canvas-border-shadow-zoom)
 
-Types live in **`lib/Canvas/utils/types/index.ts`** (**`ShadowOptions`**). Rendering: **`applyShadow`** in **`lib/Canvas/utils/Image/imageProperties.ts`**.
+Set **`shadow`** on **`CanvasConfig`** when calling **`await painter.createCanvas({ … })`**. Apexify paints a **filled silhouette** behind your clipped rectangle — offset, softened, and optionally gradient-filled — mimicking a card drop shadow.
 
-**Important:** `createCanvas` calls **`applyShadow(ctx, shadow, x, y, width, height)`** — only **`shadow`** controls **corner rounding on the shadow shape**. If you omit **`shadow.borderRadius`**, it defaults to **0** (sharp rectangle). Match **`canvas.borderRadius`** when you want a rounded shadow.
+Type **`ShadowOptions`** is exported from **`apexify.js`** / **`apexify.js/types`** (`common.ts`).
+
+---
+
+## Minimal example
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+await painter.createCanvas({
+  width: 340,
+  height: 180,
+  colorBg: "#ffffff",
+  borderRadius: 20,
+  borderPosition: "all",
+  shadow: {
+    color: "rgba(15,23,42,0.35)",
+    offsetX: 4,
+    offsetY: 12,
+    blur: 28,
+    opacity: 0.55,
+    borderRadius: 20,
+    roundedCorners: "all",
+  },
+});
+```
 
 ---
 
 ## Field reference (`ShadowOptions`)
 
-| Property | Type | Purpose |
-|----------|------|---------|
-| **`color`** | **`string`** | Fill color for the shadow shape (CSS color). Default inside **`applyShadow`**: **`rgba(0,0,0,1)`** if unset — combined with **`opacity`**. |
-| **`gradient`** | **`gradient`** | Alternative to **`color`**. Same **`linear`** \| **`radial`** \| **`conic`** shape as **`gradientBg`** — rasterised via **`createGradientFill`** into the shadow path. |
-| **`offsetX`** | **`number`** | Moves the shadow box horizontally from **`(x, y)`** (default **0**). |
-| **`offsetY`** | **`number`** | Moves the shadow box vertically (default **0**). |
-| **`blur`** | **`number`** | **`ctx.filter = blur(...px)`** on the shadow fill (default **20** in **`applyShadow`**). Use **0** for crisp edges. |
-| **`opacity`** | **`number`** | **`0…1`** — **`globalAlpha`** while drawing (default **0.4**). |
-| **`borderRadius`** | **`number`** \| **`'circular'`** | Corner radius of the **shadow** rectangle itself — **not** inherited from **`canvas.borderRadius`**. |
-| **`roundedCorners`** | **`borderPosition`** | Which corners use **`borderRadius`** (**`'all'`**, **`'top-left'`**, …). Default **`'all'`**. |
-| **`borderPosition`** | **`borderPosition`** | **Deprecated** — same intent as **`roundedCorners`**; prefer **`roundedCorners`**. |
+| Field | Type | Default (if omitted) | What it does |
+|-------|------|----------------------|----------------|
+| **`color`** | `string` | **`"rgba(0,0,0,1)"`** | Solid fill for the shadow shape before **`opacity`** multiplies it. Ignored when **`gradient`** is set. |
+| **`gradient`** | **`gradient`** | — | Linear / radial / conic gradient fill for the shadow (same **`gradient`** discriminated union as backgrounds). Overrides **`color`**. |
+| **`offsetX`**, **`offsetY`** | `number` | **`0`** | Shifts the shadow **rectangle** from the canvas **`x`/`y`** box (positive **`offsetY`** → shadow sits lower). |
+| **`blur`** | `number` | **`20`** | Gaussian blur (**CSS px**) applied **only** to the shadow pass (`blur(…)`) — **`0`** = hard-edged silhouette. |
+| **`opacity`** | `number` | **`0.4`** | Multiplies **`globalAlpha`** for the shadow fill (**`0…1`** typical). |
+| **`borderRadius`** | `number \| "circular"` | **`0`** | Corner rounding of the **shadow shape itself** — match **`canvas.borderRadius`** for consistent rounded cards. |
+| **`roundedCorners`** | **`borderPosition`** | **`"all"`** | Which corners of the shadow path use **`borderRadius`** (same vocabulary as **`canvas.borderPosition`** — **`"top-left"`**, **`"top"`**, comma-separated combos, …). |
+| **`borderPosition`** | **`borderPosition`** | — | **Deprecated** alias for **`roundedCorners`** — prefer **`roundedCorners`** for new code. |
 
 ---
 
-## Defaults (inside `applyShadow`)
+## Behaviour notes
 
-If you omit fields, the destructuring defaults are roughly:
-
-- **`color`**: **`rgba(0,0,0,1)`**
-- **`opacity`**: **`0.4`**
-- **`offsetX`**, **`offsetY`**: **`0`**
-- **`blur`**: **`20`**
+1. **Paint order:** Background stack finishes **first**; **shadow** is drawn **after** backgrounds but **before** **`stroke`** ([paint order](/docs#09-canvas-paint-order)).
+2. **Clip vs shadow:** The **visible card** uses **`canvas.borderRadius`**. The **shadow** uses **`shadow.borderRadius`** / **`shadow.roundedCorners`** — set both when you want the blur to hug rounded corners.
+3. **Gradient shadows:** Useful for coloured ambient light (`linear` / `radial` / `conic` — same shapes as **`gradientBg`**).
+4. **Blur:** Large **`blur`** values are visually heavier; tune together with **`opacity`**.
 
 ---
-
-## Examples
-
-**Soft neutral shadow**
-
-```typescript
-shadow: {
-  color: 'rgba(15, 23, 42, 0.35)',
-  offsetX: 0,
-  offsetY: 14,
-  blur: 28,
-  opacity: 1,
-  borderRadius: 24,
-  roundedCorners: 'all',
-}
-```
-
-**Gradient shadow (instead of flat color)**
-
-```typescript
-shadow: {
-  gradient: {
-    type: 'linear',
-    startX: 0,
-    startY: 0,
-    endX: 600,
-    endY: 0,
-    colors: [
-      { stop: 0, color: 'rgba(99,102,241,0.5)' },
-      { stop: 1, color: 'rgba(168,85,247,0.2)' },
-    ],
-  },
-  offsetY: 8,
-  blur: 22,
-  opacity: 0.9,
-  borderRadius: 32,
-}
-```
-
-**Heavy bloom**
-
-```typescript
-shadow: {
-  color: '#38bdf8',
-  blur: 40,
-  opacity: 0.35,
-  offsetY: 0,
-  borderRadius: 48,
-}
-```
-
----
-
-## See also
-
-- **`gradient`** object variants — next to **`gradientBg`** on **`GradientConfig`** / **`gradient`** in **`types/index.ts`** ( **`repeat`** on linear/radial, **`rotate`**, conic **`centerX`**, **`startAngle`**, … ).
-- [Stroke options](/docs#08-canvas-stroke-options) — pairing outline + shadow.

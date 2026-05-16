@@ -2,7 +2,6 @@
 
 **`await painter.createImage(images, canvasBuffer, options?)`** draws **bitmaps** (paths, URLs, buffers) or **vector shapes** (rectangle, circle, star, …) onto an **existing** canvas produced by **`createCanvas`** (or any **`Buffer`** / **`CanvasResults`** with compatible dimensions).
 
-Back: [Feature guides hub](/docs#feature-guides-hub) · [Canvas overview](/docs#00-create-canvas-overview)
 
 ---
 
@@ -24,7 +23,7 @@ Return value: **`Promise<Buffer>`** — full canvas PNG after compositing.
 2. Call **`createImage`** to **composite** one or more layers on top (each layer = **`ImageProperties`**).
 3. Chain **`createText`**, more **`createImage`**, **`save`**, etc., as needed.
 
-**Whole-file resize / crop / palette removal outside compositing:** [Standalone image tools](/docs#00-standalone-image-tools-overview) — **`painter.image.resize`**, **`painter.image.cropImage`**, **`painter.image.colorAnalysis`**, **`painter.image.colorsRemover`**, **`painter.image.stitchImages`**, etc.
+**Whole-file resize / crop / stitch outside compositing:** **[Raster, batch & output](/docs#00-raster-batch-output-overview)** — **`painter.image`** (**chapters [04](/docs#04-image-stitch-and-collage)–[07](/docs#07-image-blend-mask-crop-gradient)**).
 
 ---
 
@@ -46,17 +45,9 @@ Return value: **`Promise<Buffer>`** — full canvas PNG after compositing.
 
 ## Where the code lives
 
-| Piece | File |
-|-------|------|
-| Public API | **`lib/Canvas/ApexPainter.ts`** (`createImage`) |
-| Composer | **`lib/Canvas/extended/ImageCreator.ts`** |
-| Types | **`lib/Canvas/utils/types/index.ts`** — **`ImageProperties`**, **`ShapeProperties`**, **`CreateImageOptions`**, **`GroupTransformOptions`**, **`ImageFilter`** |
-| Shape geometry | **`lib/Canvas/utils/Shapes/shapes.ts`** |
-| Fit / shadow / stroke / gradients | **`lib/Canvas/utils/Image/imageProperties.ts`** |
-| Filters | **`lib/Canvas/utils/Image/professionalImageFilters.ts`** |
-| Mask / warp | **`lib/Canvas/utils/Image/imageMasking.ts`** |
-| Vignette / flare / grain | **`lib/Canvas/utils/Image/imageEffects.ts`** |
+| Piece | Package / entry |
+|-------|------------------|
+| Public API | **`apexify.js`** — `createImage`, `ImageCreator`, and `ImageProperties` |
+| Types | Exported from **`apexify.js`** — `ImageProperties`, `CreateImageOptions`, `ImageFilter`, `ShapeType`, etc. |
 
 ---
-
-Start with **[Basics](/docs#01-create-image-basics)**.

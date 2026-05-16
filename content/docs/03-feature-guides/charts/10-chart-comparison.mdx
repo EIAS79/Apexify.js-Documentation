@@ -1,290 +1,210 @@
 # Comparison chart (two panels) {#10-chart-comparison}
 
-Back: [Charts overview](/docs#00-charts-overview)
 
-Renders **two** standalone charts into one image (**side-by-side** or **stacked**). Each panel calls the same engines as **`createChart`** (`createPieChart`, `createBarChart`, …). Sub-images are **uniformly scaled** and **centered** inside their cells (**contain** — no stretching).
+Renders **two** standalone charts into **one** PNG — **`chart1`** and **`chart2`** each call the same engines as **`createChart`** (**`createPieChart`**, **`createBarChart`**, …). Sub-chart buffers are **uniformly scaled** and **centered** inside their cells (**contain** — aspect preserved, letterboxed).
 
 ```typescript
-await painter.createComparisonChart(options);
+const buf = await painter.createComparisonChart(options);
 ```
 
-Implementation: **`lib/Canvas/utils/Charts/comparisonchart.ts`**.
+Implementation: **`createComparisonChart`** in **`lib-next/chart/impl/comparisonchart.ts`**.
 
 ---
 
-## Top-level `ComparisonChartOptions`
+## Top-level (`ComparisonChartOptions`)
+
+| Field | Default | Role |
+|-------|---------|------|
+| **`dimensions.width`** | **`2400`** | Outer canvas width. |
+| **`dimensions.height`** | **`1200`** | Outer canvas height. |
+| **`dimensions.padding`** | **`top ~100`, others ~60** | Outer margins around title + chart strip. |
+| **`layout`** | **`sideBySide`** | **`sideBySide`** \| **`topBottom`**. |
+| **`spacing`** | **`40`** | Gap between cells (horizontal or vertical). |
+| **`appearance`** | — | **`ChartAppearanceExtended`** painted **once** on the outer canvas; merged **into** each child **`options.appearance`** when panels omit colours (**`mergeInheritedChartAppearance`**). |
+| **`generalTitle`** | optional | Banner heading spanning full width (**`text`** required when present). |
+| **`chart1`**, **`chart2`** | required | **`ComparisonChartConfig`** each. |
+
+---
+
+## Panel config (`ComparisonChartConfig`)
 
 | Field | Role |
 |-------|------|
-| **`dimensions`** | Outer **`width`** (default **2400**), **`height`** (**1200**), **`padding`**. |
-| **`layout`** | **`sideBySide`** (default) or **`topBottom`**. |
-| **`spacing`** | Gap between cells (default **40**). |
-| **`appearance`** | **`ChartAppearanceExtended`** on the **outer** canvas; merged into each panel via **`mergeInheritedChartAppearance`** (child **`appearance`** overrides parent for **`backgroundColor`**, **`customBg`**, **`bgLayers`**, **`patternBg`**, **`noiseBg`**, **`blur`**, axis colours, …). |
-| **`generalTitle`** | Centered title above both panels (**`text`**, **`fontSize`**, **`color`**, **`gradient`**, **`textStyle`**). |
-| **`chart1`**, **`chart2`** | **`ComparisonChartConfig`** each. |
+| **`type`** | **`ComparisonChartType`** — **`pie`**, **`bar`**, **`horizontalBar`**, **`line`**, **`scatter`**, **`radar`**, **`polarArea`**, **`donut`**. |
+| **`data`** | Correct union for **`type`** (**`PieSlice[]`**, **`BarChartData[]`**, **`LineSeries[]`**, …). |
+| **`options`** | Matching **`PieChartOptions`**, **`BarChartOptions`**, **`LineChartOptions`**, … |
+| **`title`** | Optional panel subtitle merged into **`options.labels.title`** ( **`text`** plus styling fields). |
+| **`barType`** | When **`type === 'bar'`**, overrides **`BarChartOptions.type`** (**`standard`**, **`grouped`**, **`stacked`**, **`lollipop`**, **`waterfall`**). |
+| **`lineStyle`**, **`lineSmoothness`** | When **`type === 'line'`**, applied to **`LineSeries`** missing **`lineStyle`** / **`smoothness`**. |
+
+### **`donut`** panels
+
+Use **`type: 'donut'`**. Renderer maps to **`createPieChart`** and forces **`PieChartOptions.type = 'donut'`**. Put **`donutInnerRadius`** etc. inside **`options`** like a normal pie chart.
 
 ---
 
-## `ComparisonChartConfig`
+## Layout maths
 
-| Field | Purpose |
-|-------|---------|
-| **`type`** | **`pie`**, **`bar`**, **`horizontalBar`**, **`line`**, **`donut`**, **`scatter`**, **`radar`**, **`polarArea`**. |
-| **`data`** | **`ComparisonChartData`** — must match **`type`** (same unions as standalone charts). |
-| **`options`** | **`IndividualChartOptions`** — the usual **`PieChartOptions`**, **`BarChartOptions`**, … for that chart. |
-| **`title`** | Panel subtitle merged into **`options.labels.title`** ( **`text`** required here). |
+**`sideBySide`:** each cell width **`(availableWidth - spacing) / 2`**, full **`availableHeight`**.
 
-### Bar panels — **`barType`**
+**`topBottom`:** full **`availableWidth`**, cell height **`(availableHeight - spacing) / 2`**.
 
-When **`type === 'bar'`**, optional **`barType`** is copied onto merged options as **`type`**, so you can request **`standard`**, **`grouped`**, **`stacked`**, **`lollipop`**, **`waterfall`** **without** duplicating that field inside **`options`**.
-
-### Line panels — **`lineStyle`** / **`lineSmoothness`**
-
-When **`type === 'line'`**, **`lineStyle`** and **`lineSmoothness`** are applied to **each **`LineSeries`** that does not already set **`lineStyle`** / **`smoothness`**.
-
-### Donut vs pie
-
-- **`type: 'pie'`** → **`createPieChart`** with merged options.
-- **`type: 'donut'`** → same, but merged options get **`type: 'donut'`** (inner radius etc. come from **`PieChartOptions`** like standalone donut).
-
-Pie/donut legends: outer merger passes through **`options.legends`** (pie API) when present; Cartesian charts use **`options.legend.entries`** when non-empty.
-
-### Horizontal bar panels
-
-Use **`type: 'horizontalBar'`** with **`HorizontalBarChartData[]`** and **`HorizontalBarChartOptions`** (**`type`**: **`standard` \| `grouped` \| `stacked` \| `lollipop`**, **`axes`**, **`grid.style`**, **`bars.*`**, …). The **`barType`** shortcut on **`ComparisonChartConfig`** applies **only** when **`type === 'bar'`** (vertical); for horizontal charts set **`options.type`** inside that panel’s options.
-
-Full reference: **[Horizontal bar chart](/docs#04-chart-horizontal-bar)**.
+**`generalTitle`** reserves **`fontSize + 40`** px below **`padding.top`**.
 
 ---
 
 ## Cell sizing & padding
 
-Each panel’s **`dimensions.width` / `height`** are **overridden** by the computed cell size. **`paddingForCell`** scales inner padding from your **`options.dimensions.padding`** based on cell dimensions (defaults if omitted).
+Each panel receives **`dimensions.width`/`height`** replaced by **computed cell size**. Inner **`padding`** is **`paddingForCell(...)`** — scales your requested padding (~850 px reference) so margins stay sane inside small cells.
 
-Charts are drawn at their natural resolution then **letterboxed** into the cell — aspect preserved.
+Charts render **native PNG size ≈ cell size**, then **`drawChartImageContain`** fits without distortion.
 
 ---
 
-## Example — donut vs vertical bar
+## Legend forwarding
+
+Pie panels forward **`PieChartOptions.legends`**. Cartesian panels forward **`legend`** **only when **`legend.entries`** is non-empty** — supply **`entries`** explicitly when you need a legend inside comparison cells.
+
+---
+
+## Example — **`sideBySide`** donut vs grouped bar
 
 ```typescript
 await painter.createComparisonChart({
+  dimensions: { width: 1400, height: 720 },
   layout: 'sideBySide',
-  spacing: 48,
-  dimensions: { width: 1400, height: 720, padding: { top: 72, bottom: 48, left: 48, right: 48 } },
-  generalTitle: {
-    text: 'FY share vs bookings',
-    fontSize: 26,
-    color: '#0f172a',
-  },
+  spacing: 36,
   appearance: {
     backgroundColor: '#f8fafc',
+    noiseBg: { intensity: 0.03 },
+  },
+  generalTitle: {
+    text: 'Share vs throughput',
+    fontSize: 26,
+    color: '#0f172a',
   },
   chart1: {
     type: 'donut',
     data: [
-      { label: 'Cloud', value: 45, color: '#6366f1' },
-      { label: 'On‑prem', value: 30, color: '#94a3b8' },
-      { label: 'Services', value: 25, color: '#22c55e' },
+      { label: 'API', value: 45, color: '#6366f1' },
+      { label: 'Web', value: 35, color: '#22c55e' },
+      { label: 'CLI', value: 20, color: '#f97316' },
     ],
     options: {
-      type: 'donut',
-      donutInnerRadius: 0.45,
-      dimensions: { width: 600, height: 600 },
-      legends: { show: true, position: 'bottom' },
-      labels: { title: { text: 'Revenue mix' } },
+      donutInnerRadius: 72,
+      labels: { title: { text: 'Traffic mix', fontSize: 18 } },
+      legends: { standard: { position: 'bottom', fontSize: 13 } },
     },
-    title: { text: 'Revenue mix', fontSize: 18 },
   },
   chart2: {
     type: 'bar',
     barType: 'grouped',
     data: [
       {
-        label: 'Q1',
+        label: 'EU',
+        xStart: 0,
+        xEnd: 1,
         values: [
-          { label: 'New', value: 12, color: '#38bdf8' },
-          { label: 'Renew', value: 18, color: '#0369a1' },
+          { value: 120, color: '#38bdf8' },
+          { value: 95, color: '#34d399' },
         ],
       },
       {
-        label: 'Q2',
+        label: 'US',
+        xStart: 1,
+        xEnd: 2,
         values: [
-          { label: 'New', value: 15, color: '#38bdf8' },
-          { label: 'Renew', value: 20, color: '#0369a1' },
+          { value: 140, color: '#38bdf8' },
+          { value: 110, color: '#34d399' },
         ],
       },
     ],
     options: {
-      dimensions: { width: 600, height: 600 },
-      axes: {
-        x: { label: 'Quarter' },
-        y: { label: 'Bookings', range: { min: 0, max: 40, step: 10 } },
+      labels: { title: { text: 'Regional orders', fontSize: 18 } },
+      axes: { y: { label: 'Units', range: { min: 0, max: 280 } } },
+      legend: {
+        show: true,
+        entries: [
+          { label: 'Retail', color: '#38bdf8' },
+          { label: 'Wholesale', color: '#34d399' },
+        ],
+        position: 'bottom',
       },
-      labels: { title: { text: 'Bookings' } },
       grid: { show: true },
     },
-    title: { text: 'Quarterly bookings', fontSize: 18 },
   },
 });
 ```
 
 ---
 
-## Example — vertical bar vs horizontal bar (**mixed layouts**)
-
-Compare **column** counts with a **horizontal** leaderboard in one image — each panel keeps its own axes and options.
+## Example — **`topBottom`** lines with propagated **`lineStyle`**
 
 ```typescript
 await painter.createComparisonChart({
-  layout: 'sideBySide',
-  spacing: 40,
-  dimensions: { width: 1280, height: 520 },
-  generalTitle: { text: 'SKU units vs satisfaction rank', fontSize: 24 },
-  chart1: {
-    type: 'bar',
-    data: [
-      { label: 'SKU A', value: 40, color: '#6366f1' },
-      { label: 'SKU B', value: 55, color: '#6366f1' },
-      { label: 'SKU C', value: 35, color: '#6366f1' },
-    ],
-    options: {
-      axes: {
-        x: { label: 'Product' },
-        y: { label: 'Units', range: { min: 0, max: 60, step: 15 } },
-      },
-      labels: { title: { text: 'Shipments (vertical)' } },
-      grid: { show: true },
-    },
-    title: { text: 'Monthly units' },
-  },
-  chart2: {
-    type: 'horizontalBar',
-    data: [
-      { label: 'Alpha', value: 92, yStart: 0, yEnd: 1, color: '#14b8a6' },
-      { label: 'Beta', value: 78, yStart: 1, yEnd: 2, color: '#0d9488' },
-      { label: 'Gamma', value: 65, yStart: 2, yEnd: 3, color: '#0f766e' },
-    ],
-    options: {
-      type: 'standard',
-      axes: {
-        x: { label: 'Score', range: { min: 0, max: 100, step: 25 } },
-      },
-      labels: { title: { text: 'CSAT (horizontal)' } },
-      bars: { borderRadius: 8 },
-    },
-    title: { text: 'Satisfaction rank' },
-  },
-});
-```
-
----
-
-## Example — line vs scatter (stacked layout)
-
-```typescript
-await painter.createComparisonChart({
+  dimensions: { width: 1100, height: 980 },
   layout: 'topBottom',
-  dimensions: { width: 960, height: 1100 },
+  spacing: 28,
   chart1: {
     type: 'line',
-    lineStyle: 'solid',
+    lineStyle: 'dashed',
     lineSmoothness: 'bezier',
     data: [
       {
         label: 'Latency',
+        color: '#dc2626',
         data: [
-          { x: 0, y: 120 },
-          { x: 1, y: 95 },
-          { x: 2, y: 102 },
+          { x: 0, y: 42 },
+          { x: 1, y: 38 },
+          { x: 2, y: 36 },
         ],
-        color: '#e11d48',
       },
     ],
     options: {
+      labels: { title: { text: 'p95 latency (ms)', fontSize: 16 } },
       axes: {
         x: { range: { min: 0, max: 2 } },
-        y: { range: { min: 80, max: 130 } },
+        y: { range: { min: 0, max: 50 } },
       },
-      labels: { title: { text: 'p95 latency (ms)' } },
     },
-    title: { text: 'Latency trend' },
   },
   chart2: {
     type: 'scatter',
     data: [
       {
-        label: 'Samples',
+        label: 'Errors',
+        markerSize: 12,
         markerType: 'circle',
-        markerSize: 10,
-        color: '#0ea5e9',
+        color: '#7c3aed',
         data: [
           { x: 1, y: 2 },
-          { x: 2, y: 3 },
-          { x: 3, y: 2.5 },
-          { x: 4, y: 4 },
+          { x: 2, y: 5 },
+          { x: 3, y: 4 },
         ],
       },
     ],
     options: {
+      labels: { title: { text: 'Incidents vs build', fontSize: 16 } },
       axes: {
-        x: { label: 'Load', range: { min: 0, max: 5 } },
-        y: { label: 'Errors', range: { min: 0, max: 5 } },
+        x: { range: { min: 0, max: 4 } },
+        y: { range: { min: 0, max: 8 } },
       },
-      labels: { title: { text: 'Error rate vs load' } },
       grid: { show: true },
     },
-    title: { text: 'Scatter sanity check' },
   },
 });
 ```
 
 ---
 
-## Example — radar vs polar area
+## Scenes
 
-```typescript
-await painter.createComparisonChart({
-  layout: 'sideBySide',
-  chart1: {
-    type: 'radar',
-    data: [
-      {
-        label: 'Team A',
-        values: [80, 70, 90, 75],
-        color: 'rgba(99,102,241,0.35)',
-        stroke: '#4f46e5',
-      },
-    ],
-    options: {
-      radar: {
-        categories: ['Speed', 'Quality', 'Cost', 'Risk'],
-        maxValue: 100,
-        showPoints: true,
-      },
-      labels: { title: { text: 'Radar' } },
-    },
-    title: { text: 'Capability radar' },
-  },
-  chart2: {
-    type: 'polarArea',
-    data: [
-      { label: 'A', value: 40, color: '#34d399' },
-      { label: 'B', value: 35, color: '#fbbf24' },
-      { label: 'C', value: 25, color: '#fb7185' },
-    ],
-    options: {
-      scale: 'area',
-      labels: {
-        title: { text: 'Polar split' },
-        showValues: true,
-      },
-    },
-    title: { text: 'Polar mix' },
-  },
-});
-```
+Use **`SceneLayer`** **`type: 'chartComparison'`** with the same **`options`** object (**`x`**, **`y`**, **`width`**, **`height`**, **`opacity`** placement fields per **`scene.ts`**).
 
 ---
 
-You’ve reached the end of the charts topic chain. Return to **[Charts overview](/docs#00-charts-overview)** or the **[feature guides hub](/docs#feature-guides-hub)**.
+## Types
+
+**`ComparisonChartOptions`**, **`ComparisonChartConfig`**, **`ComparisonLayout`**, **`ComparisonChartType`** live in **`lib-next/chart/impl/comparisonchart.ts`** (re-exported through **`apexify.js`** chart surface).
+
+---

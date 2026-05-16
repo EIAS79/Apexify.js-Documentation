@@ -1,40 +1,74 @@
 # Lines & connectors — overview {#00-custom-lines-overview}
 
-Apexify exposes **two** complementary APIs on **`lib-next`** **`ApexPainter`**:
+**`lib-next`** exposes three related surfaces:
 
-| API | Entry | Best for |
-|-----|-------|----------|
-| **Custom lines** | **`await painter.path2d.custom(options, buffer)`** | Styled segments & connectors: gradients, dashes, arrows, smooth paths, textures (**`CustomOptions`**). Same behaviour as the historical **`createCustom`** name. |
-| **Path2D pipeline** | **`painter.path2d.create`**, **`await painter.path2d.draw`**, **`await painter.detect.*`** | Explicit geometry from **`PathCommand[]`** (primitives, rounded rects, stars), stroke/fill/transform per **`draw`**. |
+| Surface | **`ApexPainter` API** | Best for |
+|---------|----------------------|----------|
+| **Styled connector segments** | **`await painter.path2d.custom(options, canvasBuffer)`** | Straight or lightly smoothed segments between **`startCoordinates`** / **`endCoordinates`**, gradients, dashes, arrows, markers, image textures (**`CustomOptions`**). |
+| **Vector geometry** | **`painter.path2d.create(commands)`**, **`await painter.path2d.draw(buffer, path, options?)`** | Exact **`PathCommand[]`** shapes (arcs, Béziers, rounded rects, stars, arrows), shared fill/stroke/transform (**`Path2DDrawOptions`**). |
+| **Hit testing** | **`await painter.detect.path(…)`**, **`.region`**, **`.anyRegion`**, **`.distance`** | **`Path2D`** / **`PathCommand[]`** / **`HitRegion`** primitives — same command vocabulary as **`create`** where **`type: 'path'`**. |
 
-Back: [Feature guides hub](/docs#feature-guides-hub)
-
----
-
-## Code map
-
-| Piece | File |
-|-------|------|
-| **Custom** orchestration | **`lib-next/apex-painter/path-custom-lines.ts`** (`runDrawCustomLines`) |
-| Segment loop / styling | **`lib-next/path/custom-lines.ts`** |
-| Arrows, splines, dash presets, textures | **`lib-next/path/advanced-lines.ts`** |
-| **`CustomOptions`** | **`lib-next/types/path.ts`** |
-| **`PathCommand`**, **`buildPath2DFromCommands`** | **`lib-next/types/pathCommands.ts`**, **`lib-next/foundation/path-cmd.ts`** |
-| **`draw`** (rasterise path) | **`lib-next/path/path2d-creator.ts`** |
-| Hit testing | **`lib-next/pixels/hit-detection-creator.ts`** (facet **`painter.detect`**) |
+Types **`CustomOptions`**, **`PathCommand`**, **`Path2DDrawOptions`**, **`HitRegion`**, **`HitDetectionOptions`** export from **`apexify.js`**.
 
 ---
 
-## Topics (read in order)
+## How they relate
 
-| # | Page | Covers |
-|---|------|--------|
-| 1 | [Custom lines API](/docs#01-create-custom-api) | **`path2d.custom`** — **`startCoordinates` / `endCoordinates`**, batch rules, **`singleLine`** chains |
-| 2 | [Line style & paths](/docs#02-custom-line-style-path) | **`lineStyle`** fields, **`path`** (**smooth**, **catmull-rom**, **bezier** caveats), **`lineRadius`** |
-| 3 | [Arrows, markers & textures](/docs#03-custom-lines-arrows-markers-textures) | **`arrow`**, **`markers`**, **`pattern`**, **`texture`**, inner **`stroke`** |
-| 4 | [Path2D · `create` / `draw`](/docs#04-path2d-draw-path) | **`PathCommand`** catalogue, **`Path2DDrawOptions`**, **`path2d.custom`** vs vector **`draw`** |
-| 5 | [Hit testing](/docs#05-hit-testing-paths) | **`painter.detect.path`**, **`HitRegion`**, **`getDistanceToRegion`** (**[Raster track](/docs#00-advanced-raster-overview)**) |
+1. **`path2d.custom`** rasterises **polylines** built per **`CustomOptions`** row (**`custom-lines.ts`**). It does **not** emit a reusable **`Path2D`** for hit-testing; for picks you typically model the same geometry with **`detect.region`** (**`rect`**, **`polygon`**, **`path`**) or rebuild **`PathCommand[]`**.
+2. **`path2d.draw`** composites **`Path2D`** onto an existing **`canvasBuffer`** (**path is painted above existing pixels**).
+3. **`detect.path`** rebuilds **`Path2D`** from commands when needed and calls **`isPointInPath`** / **`isPointInStroke`** on an internal scratch canvas.
 
 ---
 
-Start **[Custom lines API](/docs#01-create-custom-api)**.
+## Scenes
+
+**`SceneCreator`** accepts **`type: 'path'`** (**`path`**, **`options?: Path2DDrawOptions`**) and **`type: 'customLines'`** (**`lines`** — **`CustomOptions | CustomOptions[]`**) — same behaviour as **`path2d.draw`** / **`path2d.custom`** on a shared context.
+
+---
+
+## Guide map
+
+| # | Topic |
+|---|--------|
+| 1 | [Custom lines API](/docs#01-create-custom-api) |
+| 2 | [`lineStyle` & `path`](/docs#02-custom-line-style-path) |
+| 3 | [Arrows, markers, patterns & textures](/docs#03-custom-lines-arrows-markers-textures) |
+| 4 | [Path2D **`create`** / **`draw`**](/docs#04-path2d-draw-path) |
+| 5 | [Hit testing](/docs#05-hit-testing-paths) |
+
+---
+
+## Minimal examples
+
+**Custom segment**
+
+```typescript
+const { buffer } = await painter.createCanvas({ width: 600, height: 400 });
+
+await painter.path2d.custom(
+  {
+    startCoordinates: { x: 80, y: 200 },
+    endCoordinates: { x: 520, y: 200 },
+    lineStyle: { width: 4, color: '#64748b' },
+    arrow: { end: true, size: 14, style: 'filled', color: '#0f172a' },
+  },
+  buffer
+);
+```
+
+**Path2D stroke + fill**
+
+```typescript
+const path = painter.path2d.create([
+  { type: 'moveTo', x: 100, y: 100 },
+  { type: 'lineTo', x: 400, y: 160 },
+  { type: 'quadraticCurveTo', cpx: 480, cpy: 80, x: 500, y: 200 },
+]);
+
+await painter.path2d.draw(buffer, path, {
+  stroke: { color: '#94a3b8', width: 3 },
+  fill: { color: '#1e293b', opacity: 0.35, rule: 'nonzero' },
+});
+```
+
+---

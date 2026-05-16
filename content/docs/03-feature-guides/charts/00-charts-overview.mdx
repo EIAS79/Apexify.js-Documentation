@@ -1,58 +1,88 @@
 # Charts — overview {#00-charts-overview}
 
-**`ApexPainter`** delegates to **`ChartCreator`** (`lib/Canvas/extended/ChartCreator.ts`). All chart functions return a **PNG `Buffer`**.
-
-Back: [Feature guides hub](/docs#feature-guides-hub)
+**`ApexPainter`** charts route through **`ChartCreator`** (**`lib-next/chart/chart-creator.ts`**) and render PNG **`Buffer`** outputs via **`@napi-rs/canvas`**.
 
 ---
 
 ## Entry points
 
-```typescript
-await painter.createChart(chartType, data, options?);
-await painter.createComparisonChart(options);
-await painter.createComboChart(options);
-```
-
 | Method | Purpose |
 |--------|---------|
-| **`createChart`** | Single chart — **`pie`**, **`bar`**, **`horizontalBar`**, **`line`**, **`scatter`**, **`radar`**, **`polarArea`**. |
-| **`createComparisonChart`** | **Two** charts (any supported types incl. **`donut`**) — **`sideBySide`** or **`topBottom`**. |
-| **`createComboChart`** | **Bars + lines** on one Cartesian plot — optional **secondary Y-axis** (right). |
+| **`await painter.createChart(type, data, options?, painterOpts?)`** | Single chart (**pie**, **bar**, **horizontalBar**, **line**, **scatter**, **radar**, **polarArea**). |
+| **`await painter.createComboChart(options, painterOpts?)`** | One Cartesian canvas: **bars** + **lines** with dual Y scales (**`ComboChartOptions`**). |
+| **`await painter.createComparisonChart(options, painterOpts?)`** | Two standalone charts in one image (**side-by-side** or **stacked**) (**`ComparisonChartOptions`**). |
+
+Optional **`painterOpts`** follows other painters (**`resolveAssetRefs`** / **`prepareForRender`** when you embed **`$…`** asset refs).
 
 ---
 
-## `createChart` type → module
+## Implementation layout
 
-| **`chartType`** | Data type | Options type | Source file |
-|-----------------|-----------|--------------|-------------|
-| **`pie`** | **`PieSlice[]`** | **`PieChartOptions`** | **`piechart.ts`** |
-| **`bar`** | **`BarChartData[]`** | **`BarChartOptions`** | **`barchart.ts`** |
-| **`horizontalBar`** | **`HorizontalBarChartData[]`** | **`HorizontalBarChartOptions`** | **`horizontalbarchart.ts`** |
-| **`line`** | **`LineSeries[]`** | **`LineChartOptions`** | **`linechart.ts`** |
-| **`scatter`** | **`ScatterSeries[]`** | **`ScatterChartOptions`** | **`scatterchart.ts`** |
-| **`radar`** | **`RadarSeries[]`** | **`RadarChartOptions`** | **`radarchart.ts`** |
-| **`polarArea`** | **`PolarAreaSlice[]`** | **`PolarAreaChartOptions`** | **`polarareachart.ts`** |
-
-**Donut:** use **`createChart('pie', slices, { type: 'donut', donutInnerRadius?: number })`** — not a separate **`chartType`**.
-
----
-
-## Topics (read in order)
-
-| # | Page |
-|---|------|
-| 1 | [Shared appearance & layout](/docs#01-charts-shared-appearance) |
-| 2 | [Pie & donut](/docs#02-chart-pie-and-donut) |
-| 3 | [Vertical bar](/docs#03-chart-bar-vertical) |
-| 4 | [Horizontal bar](/docs#04-chart-horizontal-bar) |
-| 5 | [Line](/docs#05-chart-line) |
-| 6 | [Scatter](/docs#06-chart-scatter) |
-| 7 | [Radar](/docs#07-chart-radar) |
-| 8 | [Polar area](/docs#08-chart-polar-area) |
-| 9 | [Combo (bar + line)](/docs#09-chart-combo) |
-| 10 | [Comparison (two charts)](/docs#10-chart-comparison) |
+| Area | Location |
+|------|----------|
+| Router | **`lib-next/chart/chart-creator.ts`** |
+| Pie / donut | **`lib-next/chart/impl/piechart.ts`** (+ **`types/chart-pie`**) |
+| Vertical bar | **`impl/barchart.ts`** |
+| Horizontal bar | **`impl/horizontalbarchart.ts`** |
+| Line | **`impl/linechart.ts`** (**shared **`AxisConfig`**, legend helpers) |
+| Scatter | **`impl/scatterchart.ts`** |
+| Radar | **`impl/radarchart.ts`** |
+| Polar area | **`impl/polarareachart.ts`** |
+| Combo | **`impl/combochart.ts`** |
+| Comparison | **`impl/comparisonchart.ts`** |
+| Backgrounds | **`helpers/chartBackground.ts`** (**`paintChartCanvasBackground`**) |
 
 ---
 
-Start **[Shared appearance](/docs#01-charts-shared-appearance)**.
+## Scenes
+
+**`SceneCreator`** layers **`type: 'chart'`**, **`chartComparison`**, **`chartCombo`** call the same creators — options shapes match **`createChart`** / **`createComparisonChart`** / **`createComboChart`**.
+
+---
+
+## Guide map
+
+| # | Topic |
+|---|--------|
+| — | [Shared appearance & legend](/docs#01-charts-shared-appearance) |
+| 02 | [Pie & donut](/docs#02-chart-pie-and-donut) |
+| 03 | [Vertical bar](/docs#03-chart-bar-vertical) |
+| 04 | [Horizontal bar](/docs#04-chart-horizontal-bar) |
+| 05 | [Line](/docs#05-chart-line) |
+| 06 | [Scatter](/docs#06-chart-scatter) |
+| 07 | [Radar](/docs#07-chart-radar) |
+| 08 | [Polar area](/docs#08-chart-polar-area) |
+| 09 | [Combo (bars + lines)](/docs#09-chart-combo) |
+| 10 | [Comparison (two panels)](/docs#10-chart-comparison) |
+
+---
+
+## Minimal **`createChart`** calls
+
+```typescript
+const pie = await painter.createChart(
+  'pie',
+  [
+    { label: 'A', value: 60, color: '#6366f1' },
+    { label: 'B', value: 40, color: '#22c55e' },
+  ],
+  { dimensions: { width: 560, height: 420 }, labels: { title: { text: 'Mix' } } }
+);
+
+const bars = await painter.createChart(
+  'bar',
+  [
+    { label: 'Q1', value: 100, xStart: 0, xEnd: 1, color: '#3b82f6' },
+    { label: 'Q2', value: 140, xStart: 1, xEnd: 2, color: '#8b5cf6' },
+  ],
+  {
+    dimensions: { width: 720, height: 440 },
+    axes: { y: { label: 'Units', range: { min: 0, max: 160, step: 40 } } },
+    grid: { show: true },
+  }
+);
+```
+
+Donut is **`createChart('pie', slices, { type: 'donut', donutInnerRadius: … })`** — see [Pie](/docs#02-chart-pie-and-donut).
+
+---

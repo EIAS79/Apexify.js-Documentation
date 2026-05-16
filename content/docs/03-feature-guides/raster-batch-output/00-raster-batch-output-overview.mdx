@@ -1,0 +1,38 @@
+# Raster, batch & output {#00-raster-batch-output-overview}
+
+This section is the **single home** for **`lib-next`** workflows that turn **`Canvas`** **`/`** **`Buffer`** results into files **`/`** encoded strings, run **parallel batch** or **sequential chain** pipelines, manipulate **pixels** **`/`** **paths** **`/`** **hit regions**, and call **`painter.image`** helpers (**stitch**, **collage**, **Sharp** compression, palette, resize, blend, …).
+
+**Composition vs utilities:** layering assets with **`createImage`** **`/`** **`createCanvas`** is documented under **images **`/`** shapes**. **`painter.image`** (**whole-file **`/`** **`Buffer`** helpers — resize, stitch, compress, blend, …) is **[§04–§07](#guide-index)** in this folder only.
+
+**Implementation map**
+
+| Area | Code |
+|------|------|
+| Batch **`/`** chain | **`lib-next/batch/batch-operations.ts`**, **`apex-painter/creates/batch-create.ts`** |
+| Save **`/`** **`outPut`** | **`lib-next/output/save-buffer.ts`**, **`buffer-output.ts`**, **`apex-painter/creates/output-save.ts`** |
+| **`painter.output`** | **`apex-painter/facets.ts`** · **`output/buffer-encoding.ts`**, **`upload-imgur.ts`** |
+| **`painter.image`** | **`lib-next/image/painter-image-utils.ts`**, **`output/stitch.ts`**, **`output/compression.ts`** |
+| **`painter.pixels`** | **`pixels/pixel-data-creator.ts`** |
+| **`painter.path2d`** | **`path/path2d-creator.ts`**, **`apex-painter/path-custom-lines.ts`** (**`custom`**) |
+| **`painter.detect`** | **`pixels/hit-detection-creator.ts`** |
+
+---
+
+## Guide index
+
+| # | Topic |
+|---|--------|
+| 01 | [Batch & chain](/docs#01-batch-and-chain) |
+| 02 | [Save to disk (`save`, `saveMultiple`)](/docs#02-save-disk) |
+| 03 | [Constructor output type, `outPut`, `painter.output`](/docs#03-output-format-and-encoding) |
+| 04 | [Stitch & collage](/docs#04-image-stitch-and-collage) |
+| 05 | [Compress & palette (`Sharp`)](/docs#05-image-compress-and-palette) |
+| 06 | [Resize, convert & effects](/docs#06-image-resize-convert-effects) |
+| 07 | [Blend, mask, crop & gradient](/docs#07-image-blend-mask-crop-gradient) |
+| 08 | [Pixel data (`getData`, `manipulate`, …)](/docs#08-pixel-data) |
+| 09 | [Path2D draw & custom lines](/docs#09-path2d-draw-and-custom-lines) |
+| 10 | [Hit detection (`detect`)](/docs#10-hit-detection) |
+
+Legacy **`batch-save-output/`** stubs still redirect here (**older bookmarks**).
+
+---

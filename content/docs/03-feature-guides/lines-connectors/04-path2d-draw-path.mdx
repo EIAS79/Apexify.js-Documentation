@@ -1,111 +1,102 @@
-# Path2D · `create`, `draw` & `custom` {#04-path2d-draw-path}
+# Path2D — `create`, `draw` & command reference {#04-path2d-draw-path}
 
-Back: [Lines overview](/docs#00-custom-lines-overview) · [Raster / utilities hub](/docs#00-advanced-raster-overview)
 
-Vector path work is exposed as **`painter.path2d`** (**`PainterPath2D`**), wired in **`lib-next/apex-painter/facets.ts`** to:
+**`painter.path2d`** (**`PainterPath2D`** facet):
 
-- **`Path2DCreator`** — **`lib-next/path/path2d-creator.ts`** (**`create`**, **`draw`**)
-- **`runDrawCustomLines`** — **`lib-next/apex-painter/path-custom-lines.ts`** (**`custom`**), delegating to **`lib-next/path/custom-lines.ts`**
-
-This is **independent** of scene **`path`** layers or **`createImage`** — you bring a **raster buffer**, optionally a **`Path2D`** or **`PathCommand[]`**, and receive a new **PNG** **`Buffer`**.
+| Method | Signature | Role |
+|--------|-----------|------|
+| **`create`** | **`(commands: PathCommand[]) => Path2D`** | **`buildPath2DFromCommands`** via **`appendPathCommands`**. |
+| **`draw`** | **`(canvasBuffer, path: Path2D \| PathCommand[], options?) => Promise<Buffer>`** | Raster composite onto existing PNG (**`Path2DCreator.drawPath`**). |
+| **`custom`** | **`(options, canvasBuffer)`** | Styled connectors (**previous chapters**). |
 
 ---
 
-## `painter.path2d.create(commands: PathCommand[])`
+## Drawing pipeline (`drawPath` / `drawPathOntoContext`)
 
-Builds a native **`Path2D`** from **`PathCommand[]`** using **`buildPath2DFromCommands`** (**`lib-next/foundation/path-cmd.ts`**). Throws are wrapped as **`createPath2D failed: …`**.
+1. Decode **`canvasBuffer`** dimensions.
+2. **`ctx.drawImage`** snapshot → **`save()`**.
+3. Optional **`transform`** (**origin-centred** rotation/scale **or** translate-first ordering — mirrors **`path2d-creator`**).
+4. Optional **`shadow`** (**colour or gradient** via **`createGradientFill`** + **`gradientBounds`**).
+5. Optional **`stroke`** — **`stroke(path)`** with dash presets (**`dashed`** ⇒ **`[10,6]`**, **`dotted`** ⇒ **`[2,5]`**) unless **`dashArray`** supplied.
+6. Optional **`fill`** — **`fill(path[, rule])`** (**`rule`** **`nonzero`/`evenodd`**).
+7. **`restore()`**.
 
-### `PathCommand` variants
+**Opacity:** root **`options.opacity`** clamps **`[0,1]`** and multiplies stroke/fill alphas independently (**per-channel multiply against **`stroke.opacity`** / **`fill.opacity`**).
+
+---
+
+## `Path2DDrawOptions` quick reference
+
+| Block | Fields |
+|-------|--------|
+| **`stroke`** | **`color`**, **`gradient`**, **`width`**, **`lineCap`**, **`lineJoin`**, **`miterLimit`**, **`style`** (**solid**/dashed/dotted), **`dashArray`**, **`dashOffset`**, **`opacity`** |
+| **`fill`** | **`color`**, **`gradient`**, **`opacity`**, **`rule`** |
+| **`shadow`** | **`color`**, **`gradient`**, **`blur`**, **`offsetX`**, **`offsetY`** |
+| **`transform`** | **`translateX/Y`**, **`rotate`**, **`scaleX/Y`**, **`originX/Y`** |
+| Root | **`opacity`**, **`globalCompositeOperation`**, **`gradientBounds`** (**bbox for paints**) |
+
+---
+
+## `PathCommand[]` primitives
+
+Commands append in order (**`foundation/path-cmd.ts`**):
 
 | **`type`** | Payload |
 |------------|---------|
 | **`moveTo`** | **`x`**, **`y`** |
 | **`lineTo`** | **`x`**, **`y`** |
-| **`arc`** | Centre **`x`/`y`**, **`radius`**, **`startAngle`**, **`endAngle`**, optional **`counterclockwise`** |
-| **`arcTo`** | **`x1`/`y1`/`x2`/`y2`**, **`radius`** |
-| **`quadraticCurveTo`** | **`cpx`/`cpy`**, endpoint **`x`/`y`** |
-| **`bezierCurveTo`** | Two control points + endpoint |
-| **`rect`** | **`x`/`y`/`width`/`height`** |
-| **`ellipse`** | Centre, **`radiusX`/`radiusY`**, optional rotation & sweep |
-| **`closePath`** | — |
-| **`circle`** | **`x`/`y`/`radius`** shorthand |
-| **`roundedRect`** | Single **`radius`** or per-corner **`{ tl, tr, br, bl }`** |
-| **`polygon`** | **`points[]`** |
-| **`star`** | **`outerRadius`**, **`innerRadius`**, **`points`** count |
-| **`arrow`** | **`x`/`y`/`length`/`angle`** + optional head sizing |
+| **`arc`** | **`x`**, **`y`**, **`radius`**, **`startAngle`**, **`endAngle`**, optional **`counterclockwise`** — angles **radians** (Canvas convention) |
+| **`arcTo`** | **`x1`**, **`y1`**, **`x2`**, **`y2`**, **`radius`** |
+| **`quadraticCurveTo`** | **`cpx`**, **`cpy`**, **`x`**, **`y`** |
+| **`bezierCurveTo`** | **`cp1x`**, **`cp1y`**, **`cp2x`**, **`cp2y`**, **`x`**, **`y`** |
+| **`rect`** | **`x`**, **`y`**, **`width`**, **`height`** |
+| **`ellipse`** | **`x`**, **`y`**, **`radiusX`**, **`radiusY`**, optional **`rotation`**, **`startAngle`**, **`endAngle`**, **`counterclockwise`** — angles **radians** |
+| **`closePath`** | closes current contour |
+| **`circle`** | **`x`**, **`y`**, **`radius`** (full circle) |
+| **`roundedRect`** | **`x`**, **`y`**, **`width`**, **`height`**, **`radius`** (**number** or **`{ tl, tr, br, bl }`**) |
+| **`polygon`** | **`points`** — auto **`closePath`** |
+| **`star`** | **`x`**, **`y`**, **`outerRadius`**, **`innerRadius`**, **`points`** (tip count) |
+| **`arrow`** | **`x`**, **`y`**, **`length`**, **`angle`** (**degrees**), optional **`headLength`**, **`headAngle`** (**degrees**) |
 
-Types live in **`lib-next/types/pathCommands.ts`**.
+Composite diagrams by interleaving **`moveTo`** segments so strokes don’t unintentionally close.
 
 ---
 
-## `painter.path2d.draw(canvasBuffer, path, options?)`
-
-**Argument order:** **(1)** existing **`Buffer`** or **`CanvasResults`**, **(2)** **`Path2D`** **or** **`PathCommand[]`** (arrays are auto-built), **(3)** optional **`Path2DDrawOptions`**.
-
-Flow:
-
-1. **`loadImage`** the buffer onto a same-sized canvas.
-2. **`drawPathOntoContext`** — optional **`transform`**, **`globalCompositeOperation`**, **`shadow`**, then **`stroke`** and/or **`fill`** with optional **gradients** (**`gradientBounds`** default to full canvas).
-
-Returns a **PNG** **`Buffer`**.
-
-### `Path2DDrawOptions` highlights
-
-| Block | Keys |
-|-------|------|
-| **`opacity`** | Root multiplier (**`0…1`**) applied with stroke/fill alpha |
-| **`globalCompositeOperation`** | Canvas blend mode string |
-| **`shadow`** | **`color`**, **`gradient`**, **`blur`**, **`offsetX`**, **`offsetY`** |
-| **`gradientBounds`** | **`{ x, y, w, h }`** for gradient paint when stroking/filling |
-| **`stroke`** | **`color`**, **`gradient`**, **`width`**, **`lineCap`**, **`lineJoin`**, **`miterLimit`**, **`dashArray`**, **`dashOffset`**, **`style`** (**`dashed`/`dotted`** presets), **`opacity`** |
-| **`fill`** | **`color`**, **`gradient`**, **`opacity`**, **`rule`** (**`nonzero`/`evenodd`**) |
-| **`transform`** | **`translateX/Y`**, **`rotate`** (degrees), **`scaleX/Y`**, or **`originX/Y`** pivot block |
-
-Full interface: **`lib-next/types/path2d-draw.ts`**.
+## Example — rounded badge + arrow axis
 
 ```typescript
-const { buffer } = await painter.createCanvas({ width: 400, height: 240, color: "#0f172a" });
+const badge = painter.path2d.create([
+  { type: 'roundedRect', x: 48, y: 48, width: 240, height: 96, radius: 18 },
+]);
 
-const cmds = [
-  { type: "moveTo" as const, x: 60, y: 120 },
-  { type: "lineTo" as const, x: 340, y: 120 },
-  { type: "quadraticCurveTo" as const, cpx: 200, cpy: 40, x: 340, y: 120 },
-];
+await painter.path2d.draw(buffer, badge, {
+  fill: { color: '#1e293b', opacity: 0.85 },
+  stroke: { color: '#94a3b8', width: 2 },
+});
 
-const path = painter.path2d.create(cmds);
+const axis = painter.path2d.create([
+  { type: 'moveTo', x: 320, y: 120 },
+  { type: 'lineTo', x: 520, y: 120 },
+  {
+    type: 'arrow',
+    x: 520,
+    y: 120,
+    length: 40,
+    angle: 0,
+    headLength: 14,
+    headAngle: 40,
+  },
+]);
 
-const buf = await painter.path2d.draw(buffer, path, {
-  stroke: { color: "#38bdf8", width: 3, lineCap: "round" },
-  fill: { color: "#1e293b", opacity: 0.35, rule: "nonzero" },
+await painter.path2d.draw(buffer, axis, {
+  stroke: { color: '#cbd5e1', width: 3, lineCap: 'round' },
 });
 ```
 
-You can skip **`create`** and pass **`cmds`** directly into **`draw`** — the creator normalises **`PathCommand[]`** internally.
-
 ---
 
-## `painter.path2d.custom(options, buffer)`
+## Scenes
 
-Draws **connector-style** polylines (smooth / bezier / catmull-rom), **arrows**, **markers**, dashed styles, textures, etc., on **top** of an existing raster. **`CustomOptions`** requires **`startCoordinates`** and **`endCoordinates`**; see **`lib-next/types/path.ts`** and **[Custom lines](/docs#03-custom-lines-arrows-markers-textures)**.
-
-```typescript
-const withConnector = await painter.path2d.custom(
-  {
-    startCoordinates: { x: 40, y: 180 },
-    endCoordinates: { x: 360, y: 60 },
-    path: { type: "bezier" },
-    lineStyle: { width: 2, color: "#a78bfa" },
-    arrow: { end: true, size: 14, style: "filled", color: "#c4b5fd" },
-  },
-  buffer
-);
-```
+**`{ type: 'path', path: PathCommand[], options?: Path2DDrawOptions }`** paints via **`drawPathOntoContext`** with canvas **`width`/`height`**.
 
 ---
-
-## Hit testing the same geometry
-
-**`painter.detect.path`** accepts the same **`Path2D`** or **`PathCommand[]`** as **`draw`** — keep one command list as the single source of truth for “drawn” vs “clickable” shapes. See **[Hit testing](/docs#02-hit-testing-paths)** and **[Lines hit testing](/docs#05-hit-testing-paths)**.
-
----
-

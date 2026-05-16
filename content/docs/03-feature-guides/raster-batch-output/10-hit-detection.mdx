@@ -1,0 +1,123 @@
+# Hit detection {#10-hit-detection}
+
+**`painter.detect`** (**`PainterHitDetect`**) wraps **`HitDetectionCreator`** (**`lib-next/pixels/hit-detection-creator.ts`**): point-inside tests for **`Path2D`**, **`PathCommand[]`**, and **`HitRegion`** primitives, plus **`distance`** for several shapes.
+
+---
+
+## Methods
+
+```typescript
+await painter.detect.path(path, x, y, options?): Promise<HitDetectionResult>;
+await painter.detect.region(region, x, y, options?): Promise<HitDetectionResult>;
+await painter.detect.anyRegion(regions, x, y, options?): Promise<HitDetectionResult>;
+await painter.detect.distance(region, x, y): Promise<number>;
+```
+
+**`path`** accepts **`Path2D`** or **`PathCommand[]`**.
+
+| Method | Purpose |
+|--------|---------|
+| **`detect.path`** | Fill (**and optional stroke**) hit against vector path |
+| **`detect.region`** | **`HitRegion`** primitive |
+| **`detect.anyRegion`** | First matching region (**index** in **`hitRegion`**) |
+| **`detect.distance`** | Proximity (**limited types**, see below) |
+
+---
+
+## Example (**path**)
+
+```typescript
+const path = painter.path2d.create([
+  { type: 'roundedRect', x: 20, y: 40, width: 200, height: 80, radius: 12 },
+]);
+
+await painter.path2d.draw(canvasBuf, path, {
+  stroke: { color: '#e2e8f0', width: 2 },
+  fill: { color: '#334155', opacity: 0.9 },
+});
+
+const pick = await painter.detect.path(path, 120, 80, { fillRule: 'nonzero' });
+console.log(pick.hit, pick.hitType); // 'fill' | 'stroke' | 'outside'
+```
+
+---
+
+## `HitDetectionOptions`
+
+| Field | Role |
+|-------|------|
+| **`fillRule`** | Passed to **`isPointInPath`** (**default **`nonzero`**) |
+| **`includeStroke`** | Enables stroke-ring logic **where implemented** |
+| **`strokeWidth`** | Tolerance math on **`rect`** **`/`** **`circle`** stroke rings · **does not set Canvas `lineWidth` for `detect.path`** |
+| **`tolerance`** | Extra slack on **`rect`** stroke borders |
+
+### Path stroke caveat
+
+For **`detect.path`**, **`includeStroke: true`** calls **`ctx.isPointInStroke(path2D, x, y)`** on a scratch canvas **without setting `ctx.lineWidth`**, so stroke picking follows the implementation default (**often `1`**). For thick **`path2d.draw`** strokes, approximate with inflated **`polygon`** **`/`** **`circle`** regions or external distance checks.
+
+---
+
+## `HitDetectionResult`
+
+| Field | Meaning |
+|-------|---------|
+| **`hit`** | **`boolean`** |
+| **`hitType`** | **`fill`**, **`stroke`**, **`outside`** |
+| **`distance`** | **`0`** when hit (**circle** keeps radial helper); **`undefined`** on miss (**path**) |
+| **`hitRegion`** | **`number`** index from **`anyRegion`** |
+
+### `hitType` vs **`ellipse`** **`/`** **`polygon`**
+
+**`isPointInRegion`** only upgrades **`hitType`** for **`rect`**, **`circle`**, and **`path`**. **`ellipse`** **`/`** **`polygon`** fills may show **`hit: true`** while **`hitType`** stays **`outside`** — trust **`hit`** for those shapes.
+
+---
+
+## `HitRegion` variants
+
+| **`type`** | Fields | Notes |
+|------------|--------|-------|
+| **`rect`** | **`x`**, **`y`**, **`width`**, **`height`** | Axis-aligned (**stroke ring optional**) |
+| **`circle`** | **`x`**, **`y`**, **`radius`** | Centre + radius |
+| **`ellipse`** | **`x`**, **`y`**, **`radiusX`**, **`radiusY`**, **`rotation?`** | Filled ellipse |
+| **`polygon`** | **`points`** | Ray cast (**≥ 3** vertices) |
+| **`path`** | **`path`**, **`fillRule?`** | Delegates to **`isPointInPath`** |
+| **`custom`** | **`check(x, y) => boolean`** | Arbitrary predicate |
+
+---
+
+## `detect.distance(region, x, y)`
+
+| Type | Meaning |
+|------|---------|
+| **`rect`** | Euclidean distance to closest edge **`/`** outside |
+| **`circle`** | **`abs(distanceFromCentre - radius)`** |
+| **`ellipse`** | Approximate distance to contour |
+| **`polygon`** | Minimum distance to edge segments |
+
+**Returns `0`** for **`path`** **`/`** **`custom`** (`default` branch).
+
+---
+
+## Scratch canvas caveat (**`path`**)
+
+**`isPointInPath`** uses an internal **`100×100`** scratch surface. Path coordinates must share **the same coordinate space** as **`(x, y)`** — the scratch canvas **does not** rescale your **`Path2D`** **`/`** commands.
+
+---
+
+## Layer stacking (**`anyRegion`**)
+
+Build **`HitRegion[]`** in UI stacking order. **`anyRegion`** returns the **first** hit in array order — reverse **`/`** sort consciously (**see **`hitRegion`** index**).
+
+---
+
+## Types
+
+**`HitRegion`**, **`HitDetectionOptions`**, **`HitDetectionResult`** export from **`apexify.js`** (**hit-detection types**).
+
+---
+
+## Workflow (**lines **`/`** connectors)
+
+How **`detect`** relates to **`path2d.custom`** **`/`** **`path2d.draw`**: **[Lines overview](/docs#00-custom-lines-overview)**.
+
+---

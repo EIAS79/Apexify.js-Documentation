@@ -1,0 +1,36 @@
+# Composition hub — templates, assets, components {#00-composition-hub}
+
+**Read this first.** This folder is the **long-form** companion to [Scene — overview](/docs#00-scene-composition): it explains **named assets** (**`$…`**), **templates** (**`{{…}}`** layouts), **preset scene components**, **plugins**, and **where** optional **`$`** resolution applies on imperative APIs and **batch / chain**.
+
+
+---
+
+## Who this is for
+
+| You want to… | Start here |
+|----------------|------------|
+| Register **one logo / font / palette** and reuse it everywhere as **`"$id"`** strings | [Named assets](/docs#01-named-assets) |
+| Build a **design once**, fill **`{{placeholders}}`** per user/row, optionally use flex/grid **layout** | [Templates](/docs#02-templates) |
+| Drop in **badges, progress bars, avatars, cards, watermarks** as **`SceneLayer[]`** | [Preset components](/docs#03-preset-components) |
+| Hang **extra helpers** off the painter without forking the core class | [Plugins](/docs#04-plugins) |
+| Use **`$`** inside **`createCanvas`** / **`batch`** / **`chain`** (not only **`renderScene`**) | [Imperative & batch resolution](/docs#05-imperative-batch-chain-assets) |
+
+**Version note:** **5.4.2+** scene stack improvements; **5.4.3+** adds **`painter.assets`**, **`createTemplate`**, **`painter.components`**, **`painter.plugins`**, **`prepareForRender`**, and **opt-in **`$`** resolution** on paints and batch operations.
+
+---
+
+## Reading order (recommended)
+
+1. **[Named assets](/docs#01-named-assets)** — without this, **`$logo`** and **`$theme.text`** cannot resolve.
+2. **[Templates](/docs#02-templates)** — builds on assets + **`measureText`** for layout.
+3. **[Preset components](/docs#03-preset-components)** — small **fragments** you merge into **`renderScene`** or **`SceneBuilder`**.
+4. **[Plugins](/docs#04-plugins)** — optional; skip if you only use core APIs.
+5. **[Imperative & batch](/docs#05-imperative-batch-chain-assets)** — default resolution rules for **`renderScene`** vs **`createCanvas`** / **`batch`**.
+
+---
+
+## Mental model (one paragraph)
+
+**`painter.assets`** is a **registry** (images, font paths, palettes). Any **string leaf** in a **scene** or **template** can carry **`$`** references; **`renderScene`** resolves them **by default**, while **imperative** methods and **`SceneBuilder.render`** stay **strict** unless you pass **`{ resolveAssetRefs: true }`** or run **`prepareForRender(...)`** once. **Templates** interpolate **`{{keys}}`**, expand **layout** nodes, then delegate to **`renderScene`** with asset resolution already applied inside the template pipeline.
+
+---

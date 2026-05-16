@@ -1,37 +1,88 @@
-# Cinematic effects — `effects` stack {#07-create-image-effects}
+# Cinematic effects (`effects`) {#07-create-image-effects}
 
-Back: [Images overview](/docs#00-create-image-overview)
 
-**`effects`** post-processes the **already drawn pixels** inside the layer bounding **`box`** (same **`x,y,width,height`** used for **`getImageData`** snapshots).
+The **`effects`** bag hosts lightweight **screen-space** treatments rendered **after** the bitmap pixels land (still **before** **`stroke`** on bitmap layers).
 
-Implementations: **`lib/Canvas/utils/Image/imageEffects.ts`**.
+Shape layers (`source` as **`ShapeType`**) **do not** execute this **`effects`** block — bake glow/grain into textures or duplicate as an underlying bitmap layer.
 
 ---
 
-## Fields (`ImageProperties.effects`)
+## Shape of `effects`
 
-| Key | Shape | What it does |
-|-----|-------|----------------|
-| **`vignette`** | **`{ intensity; size }`** | **`intensity`** darkening strength (**`0…1`** style); **`size`** scales vignette radius vs diagonal (`applyVignette`). |
-| **`lensFlare`** | **`{ x; y; intensity }`** | Coordinates **added** to **`box.x`/`box.y`** — offsets inside/outside layer bounds (`applyLensFlare`). Uses **`screen`** composite internally for bursts. |
-| **`chromaticAberration`** | **`{ intensity }`** | Splits RGB channels horizontally (**offset ~ intensity × 15 px**) (`applyChromaticAberration`). |
-| **`filmGrain`** | **`{ intensity }`** | Adds RGB jitter (**scaled**) (`applyFilmGrain`). **Deterministic randomness:** differs each render pass. |
+```typescript
+effects?: {
+  vignette?: { intensity: number; size: number };
+  lensFlare?: { x: number; y: number; intensity: number };
+  chromaticAberration?: { intensity: number };
+  filmGrain?: { intensity: number };
+};
+```
+
+You may combine keys — each helper operates sequentially inside one **`save`/`restore`** pair.
+
+---
+
+## `vignette`
+
+Darkens edges toward transparency while preserving the centre.
+
+| Field | Typical range | Meaning |
+|-------|----------------|---------|
+| **`intensity`** | **`0 … ~1`** | How strongly corners darken |
+| **`size`** | **`> 0`** | Relative radial extent (implementation interprets across **`width`/`height`**) |
+
+---
+
+## `lensFlare`
+
+Adds a directional glare originating near **`x`**, **`y`** **relative to the layer box origin** (**`box.x + x`**, **`box.y + y`**).
+
+| Field | Notes |
+|-------|-------|
+| **`intensity`** | Strength multiplier |
+
+---
+
+## `chromaticAberration`
+
+Splits colour channels slightly for a prism fringe look.
+
+| Field | Notes |
+|-------|-------|
+| **`intensity`** | Larger ⇒ stronger separation |
+
+Uses an internal **`ImageData`** copy buffer — slightly heavier than vignette alone.
+
+---
+
+## `filmGrain`
+
+Adds animated-feeling monochrome grain via **`ImageData`** manipulation.
+
+| Field | Notes |
+|-------|-------|
+| **`intensity`** | Grain visibility |
+
+---
+
+## Example — stacked mood grade
 
 ```typescript
 await painter.createImage(
   {
-    source: './hero.jpg',
+    source: './scene.jpg',
     x: 0,
     y: 0,
     width: 960,
     height: 540,
     fit: 'cover',
     effects: {
-      vignette: { intensity: 0.45, size: 0.92 },
-      filmGrain: { intensity: 0.08 },
-      chromaticAberration: { intensity: 0.06 },
-      lensFlare: { x: 420, y: 140, intensity: 0.35 },
+      vignette: { intensity: 0.45, size: 220 },
+      chromaticAberration: { intensity: 1.4 },
+      filmGrain: { intensity: 0.12 },
+      lensFlare: { x: 720, y: 80, intensity: 0.35 },
     },
+    stroke: { color: '#ffffff22', width: 2 },
   },
   buffer
 );
@@ -39,23 +90,8 @@ await painter.createImage(
 
 ---
 
-## Order inside `ImageCreator`
+## Known limitation
 
-Applied **after** bitmap drawn **unless** an earlier branch returned ( **`filterOrder:'pre'`**, **`distortion`**, **`meshWarp`** ). Effects sequence:
-
-1. **`vignette`** (mutates pixels in-place via **`putImageData`** region interpretation depends on helper — operates full **`width,height`** passed)
-2. **`lensFlare`** (gradient overlays)
-3. **`chromaticAberration`** (temp canvas swap-in)
-4. **`filmGrain`** (temp canvas swap-in)
-
-Then **`applyStroke`** runs — vignette/flare affect pixels **before** outline.
-
----
-
-## Coordinate quirks (implementation)
-
-**`chromaticAberration`** and **`filmGrain`** snapshot **`getImageData(box.x, box.y, box.w, box.h)`** — correct for layers anywhere on the canvas.
-
-**`vignette`** and **`lensFlare`** delegate to helpers that sample / shade from **`(0,0)`** using **`box.w`/`box.h`** — visually aligned only when the layer hugs the **top-left** of the canvas (or you accept global-ish behaviour). Prefer **`x = 0`**, **`y = 0`** with **`width`/`height`** equal your vignette region until upstream fixes land.
+When **`filterOrder: 'pre'`**, **`distortion`**, or **`meshWarp`** triggers an early return, **`effects`** **never** execute on that bitmap layer.
 
 ---

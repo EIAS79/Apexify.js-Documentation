@@ -1,6 +1,5 @@
 # Layer styling — rotation, opacity, blur, clip, box fill {#03-create-image-styling-clip}
 
-Back: [Images overview](/docs#00-create-image-overview)
 
 These fields apply to **both** bitmaps and shapes unless noted.
 
@@ -10,10 +9,10 @@ These fields apply to **both** bitmaps and shapes unless noted.
 
 | Field | Type | What it does |
 |-------|------|----------------|
-| **`rotation`** | **`number`** (degrees) | Rotates around the **centre of the layout box** (**`applyRotation`**). |
-| **`opacity`** | **`number`** (**`0…1`**) | **`globalAlpha`** while drawing the bitmap/shape content. |
-| **`blur`** | **`number`** (px) | Canvas **`filter: blur(...)`** during raster/shape paint phase. |
-| **`blendMode`** | **`GlobalCompositeOperation`** | Porter–Duff mode for **this layer** vs what's already on the canvas (`'multiply'`, `'screen'`, …). |
+| **`rotation`** | **`number`** (degrees) | Rotates around the **centre** of the layout box **`(x + width/2, y + height/2)`**. |
+| **`opacity`** | **`number`** (**`0…1`**) | **`globalAlpha`** while drawing bitmap pixels / vector fill. |
+| **`blur`** | **`number`** (px) | Canvas **`filter: blur(...)`** during the raster/shape paint phase. |
+| **`blendMode`** | **`GlobalCompositeOperation`** | Porter–Duff compositing vs pixels already on the canvas (`multiply`, `screen`, …). |
 
 ```typescript
 await painter.createImage(
@@ -35,20 +34,35 @@ await painter.createImage(
 
 ---
 
-## Rounded clip — `borderRadius`, `borderPosition`
+## Rounded rectangle clip — `borderRadius`
 
-Bitmap pipeline (**`drawImageBitmap`**):
+Controls how **`drawImageBitmap`** (and **`drawShape`**) builds the **clip path** **unless** you supply **`clipPath`**.
 
-1. **`applyRotation`**
-2. **`applyShadow`** (underneath)
-3. **`drawBoxBackground`** (inside box)
-4. **Clip**: either **`clipPath`** **or** **`buildPath`** from **`borderRadius`** + **`borderPosition`**
+| Value | Behaviour |
+|-------|-----------|
+| **`0`** / omitted | Sharp rectangle matching **`width × height`**. |
+| **`number > 0`** | Corner radius in pixels. Internally clamped so arcs never overlap: **`radius ≤ min(width, height) / 2`**. |
+| **`'circular'`** | Ignores numeric radius and clips to the **circle inscribed** in the box (**diameter = min(width, height)**). **`borderPosition` is ignored** in this mode — every corner is rounded equally into one circle. |
 
-So **`borderRadius`** clips **the image**, not the shadow (shadow is painted **before** clip — correct drop-shadow behaviour).
-
-**`borderPosition`** follows the same union as canvas (**`'all'`**, **`'top-left'`**, edges, … — see **`borderPosition`** in **`types/index.ts`**).
+The shadow (**`shadow`**) for bitmaps is painted **before** this clip, so you still see a soft halo outside rounded thumbs — desirable for UI cards.
 
 ```typescript
+// Numeric radius — only chosen corners round (see borderPosition below)
+await painter.createImage(
+  {
+    source: './photo.jpg',
+    x: 40,
+    y: 40,
+    width: 220,
+    height: 140,
+    fit: 'cover',
+    borderRadius: 28,
+    borderPosition: 'top-left, bottom-right',
+  },
+  buffer
+);
+
+// Perfect avatar bubble
 await painter.createImage(
   {
     source: './avatar.jpg',
@@ -58,21 +72,38 @@ await painter.createImage(
     height: 160,
     fit: 'cover',
     borderRadius: 'circular',
-    borderPosition: 'all',
   },
   buffer
 );
 ```
 
-Shapes use the same **`borderRadius`** / **`borderPosition`** for **clip + boxBackground** inside **`drawShape`** (**`ImageCreator`**).
+---
+
+## Corner selection — `borderPosition`
+
+Strings are **case-insensitive** and may list **multiple corners separated by commas**.
+
+Tokens understood by **`computeCornerRadii`**:
+
+| Token | Meaning |
+|-------|---------|
+| **`all`** | Every corner uses the computed radius (**default**). |
+| **`top`**, **`right`**, **`bottom`**, **`left`** | Enables **both** corners touching that edge (e.g. **`top`** ⇒ **`top-left`** + **`top-right`**). |
+| **`top-left`**, **`top-right`**, **`bottom-right`**, **`bottom-left`** | Single corner only. |
+
+Examples:
+
+- **`borderPosition: 'bottom'`** — floor-card look (only bottom corners rounded).
+- **`borderPosition: 'top-left, bottom-right'`** — diagonal styling with **`borderRadius: 24`**.
+- Omit **`borderPosition`** → behaves like **`all`**.
+
+Shapes reuse the same helper for **`borderRadius`** clipping **around their layout box** before **`drawShape`** runs — the vector geometry itself stays sharp unless you approximate with filters.
 
 ---
 
 ## Polygon clip — `clipPath`
 
-**`clipPath`** is an array of **`{x,y}`** vertices (**≥ 3**). When present it **replaces** the rounded-rect clip (**`applyClipPath`**).
-
-Throws if fewer than three points.
+**`clipPath`** is **`{ x, y }[]`** with **≥ 3** vertices in **canvas space**. When present it **replaces** the rounded-rect clip entirely (**Bitmap pipeline only** — shape layers ignore **`clipPath`** today).
 
 ```typescript
 await painter.createImage(
@@ -93,12 +124,24 @@ await painter.createImage(
 );
 ```
 
+Fewer than three points throws **`Clip path must have at least 3 points`**.
+
 ---
 
 ## Behind the pixels — `boxBackground`
 
 **`boxBackground?: { color?: string; gradient?: gradient }`**
 
-Painted **after shadow**, **before** clip, **inside** the eventual rounded/bitmap region — useful for letterboxing or tinted plates.
+Rendered **after** shadow, **before** clipping. Visible wherever the bitmap does not fully cover the layout box (**letterboxing** under **`contain`**) or when **`opacity`** exposes the plate.
+
+---
+
+## Pipeline cheat sheet (bitmaps)
+
+1. Rotation → shadow plate → **`boxBackground`**
+2. Clip (**`clipPath`** **or** **`borderRadius`** path)
+3. Draw masked/distorted bitmap (see other chapters)
+
+Shapes skip **`clipPath`** but otherwise mirror **`borderRadius`** clipping around **`width × height`**.
 
 ---

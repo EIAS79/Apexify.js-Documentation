@@ -1,60 +1,72 @@
 # Fill colour & gradients {#03-create-text-color-gradients}
 
-Back: [Text overview](/docs#00-create-text-overview)
-
-Prefer **`fill.color`** / **`fill.gradient`**; legacy top-level **`color`** / **`gradient`** are merged by **`resolveTextFill`** (**`lib-next/types/text.ts`**). **`color`** is the fallback **`fillStyle`** when no gradient (default **`#000000`** in **`renderFill`**).
+Prefer **`fill.color`** / **`fill.gradient`** / **`fill.opacity`**; legacy **`color`**, **`gradient`**, **`opacity`** merge through **`resolveTextFill`** (**nested wins**).
 
 ---
 
-## `gradient` union (`lib-next/types/gradient.ts`)
-
-Same **`gradient`** shape as canvas backgrounds:
-
-| **`type`** | Highlights |
-|------------|------------|
-| **`linear`** | **`startX/Y`**, **`endX/Y`**, optional **`rotate`**, **`pivotX/Y`**, **`repeat`** (**`'repeat' \| 'reflect' \| 'no-repeat'`**). |
-| **`radial`** | Inner / outer circles + optional **`repeat`**. |
-| **`conic`** | **`centerX/Y`**, **`startAngle`**, **`rotate`**, **`pivotX/Y`**. |
-
-Stops: **`colors: { stop: number; color: string }[]`**.
-
-**`EnhancedTextRenderer.createGradient`** builds **`CanvasGradient`** or **`CanvasPattern`** when **`repeat`** ≠ **`no-repeat`** (tiles via helper canvas).
-
----
-
-## Gradient bounds for straight lines
-
-For a horizontal line of text from **`x`** spanning measured **`width`**, fills/strokes use:
-
-- **`gx0 = x`** (or centred glyph mode on arcs — see curved doc)
-- **`gx1 = x + width`**
-- Vertical anchors typically **`y`** baseline row.
-
-Radial/conic centres default intelligently from bbox corners passed into **`createGradient`**.
-
----
+## Solid fill
 
 ```typescript
 await painter.createText(
   {
-    text: 'Gradient title',
-    x: 80,
+    text: 'Solid',
+    x: 48,
     y: 120,
-    font: { size: 56, family: 'Arial' },
-    gradient: {
-      type: 'linear',
-      startX: 80,
-      startY: 120,
-      endX: 520,
-      endY: 120,
-      colors: [
-        { stop: 0, color: '#38bdf8' },
-        { stop: 1, color: '#a855f7' },
-      ],
-    },
+    fill: { color: '#6366f1' },
+    font: { size: 44, family: 'Arial' },
   },
   buffer
 );
 ```
+
+---
+
+## Gradients (`gradient` type)
+
+Supported **`gradient.type`** values: **`linear`**, **`radial`**, **`conic`** (**`lib-next/types/gradient`**).
+
+Shared concepts:
+
+| Concept | Notes |
+|---------|--------|
+| **`colors`** | **`{ stop: number; color: string }[]`** — required on every gradient. |
+| **`repeat`** | **`linear`** / **`radial`** only: **`no-repeat`** (default), **`repeat`**, **`reflect`** — builds a tiled **`CanvasPattern`** when not **`no-repeat`**. |
+| **`rotate`**, **`pivotX`**, **`pivotY`** | **`radial`**/**`conic`** read centres/radii/angles from **`gradient.*`** fields; **`linear`** fills/strokes use **`gx0`/`gx1`/`y`** from **`renderTextFill`** (**`gradient.startX`** etc. on **`linear`** are not applied there today — use **`conic`** if you need a rotated sweep across glyphs). |
+
+### Linear
+
+Uses **`createLinearGradient(startX, startY, endX, endY)`**. For plain lines, **`renderTextFill`** spans **`gx0 → gx1`** at baseline **`y`** (left/right edges of measured advance unless **`centerGlyph`** mode).
+
+```typescript
+fill: {
+  gradient: {
+    type: 'linear',
+    colors: [
+      { stop: 0, color: '#f97316' },
+      { stop: 1, color: '#db2777' },
+    ],
+  },
+},
+```
+
+### Radial
+
+Passes **`startX`/`startY`/`startRadius`** and **`endX`/`endY`/`endRadius`** through to **`createRadialGradient`** (defaults fold toward measured bounds).
+
+### Conic
+
+Uses **`createConicGradient(angleRad, centerX, centerY)`** — **`centerX`/`centerY`** default to the midpoint between **`startX`/`startY`** and **`endX`/`endY`** when omitted (**`createTextGradient`**).
+
+---
+
+## Stroke & decoration gradients
+
+**`stroke.gradient`** and decoration **`underline`/`overline`/`strikethrough`** object **`gradient`** use the same **`gradient`** union via **`createTextGradient`** (**`text-style.ts`**).
+
+---
+
+## Implementation note
+
+Invalid **`gradient`** (missing **`type`** or **`colors`**) throws **`Invalid gradient options`** from **`createTextGradient`**.
 
 ---

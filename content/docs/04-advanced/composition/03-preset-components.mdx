@@ -1,0 +1,130 @@
+# Preset scene components (`painter.components`) {#03-preset-components}
+
+
+**`painter.components`** returns **small factories** — each **`toLayers(options)`** expands to **`SceneLayer[]`** you can **spread** into **`renderScene`**, **`SceneBuilder#addLayers`**, or merge with template output.
+
+They are **not** magic widgets on a DOM: they emit **static scene data** ( rects, text, optional image clips ) that **`SceneCreator`** paints like any other layers.
+
+---
+
+## Common pattern
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+
+const layers = [
+  ...painter.components.badge.toLayers({
+    text: "Beta",
+    x: 24,
+    y: 24,
+    paddingX: 10,
+    paddingY: 6,
+    radius: 999,
+    background: "#312e81",
+    color: "#e0e7ff",
+    fontSize: 13,
+  }),
+  ...painter.components.progressBar.toLayers({
+    x: 24,
+    y: 64,
+    width: 320,
+    height: 14,
+    value: 72,
+    max: 100,
+    background: "#1e293b",
+    fill: "#38bdf8",
+    radius: 6,
+    showLabel: true,
+    labelColor: "#e2e8f0",
+  }),
+];
+
+const png = await painter.renderScene({
+  width: 420,
+  height: 140,
+  colorBg: "#020617",
+  layers,
+});
+```
+
+**Order:** Earlier entries in the **`layers`** array paint **below** later ones (same as **[scene paint order](/docs#09-scene-paint-order-performance)**).
+
+---
+
+## `badge.toLayers`
+
+**`BadgeToLayersOptions`**: **`text`**, **`x`**, **`y`**, optional **`paddingX`**, **`paddingY`**, **`radius`**, **`background`**, **`color`**, **`fontSize`**.
+
+Rounded pill label suitable for “NEW”, tier names, environment tags.
+
+---
+
+## `progressBar.toLayers`
+
+**`ProgressBarToLayersOptions`**: **`x`**, **`y`**, **`width`**, **`height`**, **`value`**, optional **`max`** (defaults to **100**), track **`background`**, **`fill`**, **`radius`**, **`showLabel`**, **`labelColor`**.
+
+**`value`** is clamped against **`max`** during layout.
+
+---
+
+## `avatar.toLayers`
+
+**`AvatarToLayersOptions`**: **`source`** (**path, URL, or `Buffer`**), **`x`**, **`y`**, **`size`**, optional **`borderColor`**, **`borderWidth`** for a circular ring.
+
+Circular clip; place before/after other layers depending on whether the ring should sit above artwork.
+
+---
+
+## `card.toLayers`
+
+**`CardToLayersOptions`**: **`x`**, **`y`**, **`width`**, **`height`**, **`radius`**, **`background`**, border **`borderColor`** / **`borderWidth`**, **`title`**, **`body`**, font sizing **(`titleFontSize`**, **`bodyFontSize`**) and colors, **`padding`**.
+
+Emits a rounded panel with optional **title** and **body** text blocks.
+
+---
+
+## `watermark.toLayers`
+
+**`WatermarkToLayersOptions`**: **`text`**, **`canvasWidth`**, **`canvasHeight`** (required for corner math), **`position`** (**`bottom-right`**, **`bottom-left`**, **`top-right`**, **`top-left`**, **`center`**), **`fontSize`**, **`color`** (semi-transparent hex recommended, e.g. **`#f8fafc40`**), **`margin`**.
+
+Typical last layer in **`layers`** so it paints on top.
+
+---
+
+## Mixing with arbitrary `SceneLayer` rows
+
+```typescript
+const ui = [
+  ...painter.components.card.toLayers({
+    x: 32,
+    y: 32,
+    width: 360,
+    height: 200,
+    radius: 16,
+    background: "#0f172a",
+    borderColor: "#334155",
+    borderWidth: 1,
+    title: "Usage",
+    titleFontSize: 18,
+    body: "You are at 72% of your quota.",
+    bodyFontSize: 14,
+    padding: 16,
+  }),
+  ...painter.components.watermark.toLayers({
+    text: "CONFIDENTIAL",
+    canvasWidth: 480,
+    canvasHeight: 280,
+    position: "center",
+    fontSize: 36,
+    color: "#f9731644",
+  }),
+];
+
+await painter.renderScene({ width: 480, height: 280, colorBg: "#020617", layers: ui });
+```
+
+Types for every options object ship as **`BadgeToLayersOptions`**, … from **`apexify.js`** / **`apexify.js/types`**.
+
+---

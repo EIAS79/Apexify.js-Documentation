@@ -23,6 +23,11 @@ function subfolderKey(folderName: string, pathUnderSection: string) {
   return `${folderName}::${pathUnderSection}`;
 }
 
+/** Advanced docs use recursive topic trees (`scene/`, `composition/`, …) for both prefixes. */
+function isRecursiveAdvancedDocs(folderName: string): boolean {
+  return folderName === '04-advanced' || folderName === '05-advanced';
+}
+
 function subfolderContainsActiveDoc(sub: DocSubfolder, canonicalFilename: string): boolean {
   if (sub.files.some((f) => f.filename === canonicalFilename)) return true;
   return sub.subfolders?.some((s) => subfolderContainsActiveDoc(s, canonicalFilename)) ?? false;
@@ -52,7 +57,7 @@ function initialExpandedState(folderList: DocFolder[], hash: string) {
       Boolean(folder.subfolders?.some((sub) => subfolderContainsActiveDoc(sub, c)));
 
     if (
-      folder.name === '05-advanced' ||
+      isRecursiveAdvancedDocs(folder.name) ||
       folder.name === '06-internals' ||
       folder.name === '07-contributor-notes'
     ) {
@@ -62,10 +67,12 @@ function initialExpandedState(folderList: DocFolder[], hash: string) {
     }
 
     if (
-      (folder.name === '03-feature-guides' || folder.name === '04-api-reference' || folder.name === '05-advanced') &&
+      (folder.name === '03-feature-guides' ||
+        folder.name === '04-api-reference' ||
+        isRecursiveAdvancedDocs(folder.name)) &&
       folder.subfolders
     ) {
-      if (folder.name === '03-feature-guides' || folder.name === '05-advanced') {
+      if (folder.name === '03-feature-guides' || isRecursiveAdvancedDocs(folder.name)) {
         for (const sub of folder.subfolders) {
           walkFeatureSubfoldersSetExpanded(folder.name, sub, '', expandedSub);
         }
@@ -152,18 +159,26 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
   useEffect(() => {
     if (folders.length === 0) return;
     const c = canonicalActive;
-    const adv = folders.find((f) => f.name === '05-advanced');
+    const advSections = folders.filter((f) => isRecursiveAdvancedDocs(f.name));
     const internal = folders.find((f) => f.name === '06-internals');
     const contrib = folders.find((f) => f.name === '07-contributor-notes');
-    const openAdv =
-      (adv?.files.some((f) => f.filename === c) ?? false) ||
-      (adv?.subfolders?.some((sub) => subfolderContainsActiveDoc(sub, c)) ?? false);
+    const expandedAdvPatches: Record<string, boolean> = {};
+    let openAdv = false;
+    for (const adv of advSections) {
+      const hit =
+        adv.files.some((f) => f.filename === c) ||
+        (adv.subfolders?.some((sub) => subfolderContainsActiveDoc(sub, c)) ?? false);
+      if (hit) {
+        openAdv = true;
+        expandedAdvPatches[adv.name] = true;
+      }
+    }
     const openInt = internal?.files.some((f) => f.filename === c) ?? false;
     const openCon = contrib?.files.some((f) => f.filename === c) ?? false;
     if (openAdv || openInt || openCon) {
       setExpanded((p) => ({
         ...p,
-        ...(openAdv ? { '05-advanced': true } : {}),
+        ...(openAdv ? expandedAdvPatches : {}),
         ...(openInt ? { '06-internals': true } : {}),
         ...(openCon ? { '07-contributor-notes': true } : {}),
       }));
@@ -174,7 +189,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
     if (folders.length === 0) return;
     const c = canonicalActive;
 
-    const expandNested = (section: '03-feature-guides' | '05-advanced') => {
+    const expandNested = (section: '03-feature-guides' | '04-advanced' | '05-advanced') => {
       const folder = folders.find((f) => f.name === section);
       if (!folder?.subfolders?.length) return;
 
@@ -198,6 +213,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
     };
 
     expandNested('03-feature-guides');
+    expandNested('04-advanced');
     expandNested('05-advanced');
   }, [canonicalActive, folders]);
 
@@ -411,7 +427,7 @@ export default function DocSidebar({ isOpen = true, onClose }: DocSidebarProps) 
           <div className="mt-1 ml-1 space-y-0.5 sm:ml-2">
             {folder.files.map((file) => renderFile(file, 1, accent.color))}
             {folder.subfolders?.map((sub) =>
-              folder.name === '03-feature-guides' || folder.name === '05-advanced'
+              folder.name === '03-feature-guides' || isRecursiveAdvancedDocs(folder.name)
                 ? renderFeatureGuideSubTree(folder.name, '', sub, 2, accent.color)
                 : renderApiReferenceSubfolder(folder.name, sub, accent.color),
             )}

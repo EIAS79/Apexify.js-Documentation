@@ -1,59 +1,69 @@
 # `measureText` — layout metrics {#07-measure-text}
 
-Back: [Text overview](/docs#00-create-text-overview)
-
 ```typescript
-const metrics = await painter.measureText(textProps);
+const metrics = await painter.measureText(textProps[, painterOpts]);
 ```
 
-Implementation: **`TextMetricsCreator`** in **`lib-next/text/text-metrics.ts`** — scratch canvas, font registration like **`EnhancedTextRenderer`**, **`resolveTextLayout`** / **`resolveTextPlacement`** / **`resolveTextDecorations`**, then **`ctx.measureText`**. Types: **`TextMetrics`** in **`lib-next/types/text.ts`**.
+**`TextMetricsCreator`** (**`lib-next/text/text-metrics.ts`**) mirrors **`EnhancedTextRenderer`** font registration, **`ctx.font`**, **`letterSpacing`**, **`wordSpacing`**, **`textAlign`**, and **`textBaseline`** — then derives boxes using **`measureText`** + optional wrapping (**`computeWrappedTextLines`**).
 
 ---
 
-## Core fields (`TextMetrics`)
+## Options that affect measurement only
 
-Mirrors **`CanvasTextMetrics`** plus Apexify helpers:
+| Field | Role |
+|-------|------|
+| **`includeCharMetrics`** | When **`true`**, fills **`charWidths[]`** and **`charPositions[]`** by iterating **`measureText`** per UTF-16 code unit (**not** grapheme clusters). |
+| **`measurementCanvas`** | **`{ width?, height? }`** overrides internal scratch canvas dimensions (defaults derive from text length / **`maxWidth`** heuristics). |
+
+Painting-related fields (**`effects`**, **`stroke`**) **do not** change **`measureText`** output — measurement reflects typography only.
+
+---
+
+## Returned shape (`TextMetrics`)
+
+Always includes Canvas **`TextMetrics`** fields copied through (**`actualBoundingBox*`**, **`fontBoundingBox*`**, optional baseline extras when the runtime exposes them).
+
+Derived convenience fields:
 
 | Field | Meaning |
 |-------|---------|
-| **`width`** | Primary **`measureText(text).width`** (single line) **or** chord width after arc adjustment (below). |
-| **`actualBoundingBoxAscent`** … **`fontBoundingBoxDescent`** | Forwarded when present. |
-| **`height`** | **`fontSize`** baseline helper |
-| **`lineHeight`** | Multiplier × **`fontSize`** (**`1.4`** default when property omitted) |
-| **`baseline`**, **`top`**, **`bottom`** | Derived vertical scaffolding |
-| **`centerX`**, **`centerY`** | Local centroid estimates |
+| **`width`** | **`measureText(text).width`** on the **whole string** before wrapping adjustments |
+| **`height`** | **`fontSize`** scalar |
+| **`lineHeight`** | **`(layout.lineHeight || 1.4) * fontSize`** |
+| **`baseline`**, **`top`**, **`bottom`** | Authoring helpers derived from ascent/descent |
+| **`centerX`**, **`centerY`** | Based on **`width`** / **`height`** / **`baseline`** |
 
-When **`maxWidth`** set (including via **`layout.maxWidth`**):
+When **`layout.maxWidth`** is set:
 
-- Builds **`lines`** array — each entry `{ text, width, height, metrics }`.
-- **`totalHeight = lines.length * lineHeight`**
-- **`lineCount`**
+| Field | Meaning |
+|-------|---------|
+| **`lines`** | Each wrapped row with **`text`**, **`width`**, **`height`**, nested **`metrics`** |
+| **`totalHeight`** | **`lines.length * lineHeight`** |
+| **`lineCount`** | **`lines.length`** |
 
-Wrapping matches **`EnhancedTextRenderer`** / **`wrapText`** (word split + ellipsis).
-
----
-
-## Optional extras
-
-| Flag | Effect |
-|------|--------|
-| **`includeCharMetrics: true`** | Adds **`charWidths: number[]`** and **`charPositions: {x,width}[]`** using naive cumulative **`measureText(char)`** (does not simulate kerning sequences). |
-
----
-
-## Measurement canvas size
-
-**`measurementCanvas?: { width?, height? }`** overrides scratch surface dimensions.
-
-Otherwise auto-estimates from text length × **`fontSize * 0.6`**, **`maxWidth`**, **`maxHeight`**, clamped between **`1000–10000`** wide and **`500–5000`** tall.
+Use **`lines[i].width`** for accurate per-line widths — top-level **`width`** remains the **unwrapped** **`measureText`** width.
 
 ---
 
 ## Arc-aware sizing
 
-If **`textOnCurve`** with **`0 < sweepAngle < 360`**:
+If **`textOnCurve`** has **`0 < sweepAngle < 360`**, **`measureText`** adjusts **`width`**/**`height`** using **`resolveArcRadiusAndSweep`** + **`curvedArcBoundingChord`** to approximate chord length and sagitta (**horizontal footprint grows vs straight measurement**).
 
-- Replaces **`metrics.width`** with **chord length** **`2·R·sin(θ/2)`**.
-- Increases **`metrics.height`** by sagitta **`R·(1 - cos(θ/2))`** approximating vertical rise.
+---
+
+## Example
+
+```typescript
+const m = await painter.measureText({
+  text: longCopy,
+  x: 0,
+  y: 0,
+  font: { size: 18, family: 'Arial' },
+  layout: { maxWidth: 400, lineHeight: 1.5 },
+  includeCharMetrics: true,
+});
+
+console.log(m.lineCount, m.totalHeight, m.lines?.[0]?.width);
+```
 
 ---

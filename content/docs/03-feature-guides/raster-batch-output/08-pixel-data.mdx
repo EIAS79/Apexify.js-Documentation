@@ -1,0 +1,69 @@
+# Pixel data {#08-pixel-data}
+
+**`painter.pixels`** (**`PainterPixels`**, **`pixels/pixel-data-creator.ts`**) exposes **`ImageData`**-style **`Uint8ClampedArray`** buffers (**RGBA**, **`SRGB`** tagged).
+
+Accepts **`CanvasResults`** **`|`** **`Buffer`** (**PNG **`/`** raster bytes **`/`** embedded **`canvas`** surface).
+
+---
+
+## `getData(canvasBuffer, options?)`
+
+Returns **`Promise<PixelData>`**:
+
+```typescript
+interface PixelData {
+  data: Uint8ClampedArray;
+  width: number;
+  height: number;
+  colorSpace?: 'srgb' | 'display-p3' | 'rec2020';
+}
+```
+
+Optional **`{ x, y, width, height }`** selects a **sub-rectangle** (**bounds-checked** vs decoded bitmap).
+
+---
+
+## `setData(canvasBuffer, pixelData, options?)`
+
+Writes **`pixelData`** via **`putImageData`**.
+
+Optional placement **`x`**, **`y`**, **`dirtyX`**, **`dirtyY`**, **`dirtyWidth`**, **`dirtyHeight`** for partial blit.
+
+Returns **new** PNG **`Buffer`**.
+
+---
+
+## `manipulate(canvasBuffer, options)`
+
+**`PixelManipulationOptions`** (**`types/pixels.ts`**):
+
+| Branch | Behaviour |
+|--------|-----------|
+| **`processor`** | Per-pixel **`(r,g,b,a,x,y) => [r,g,b,a]`** clamped **`0–255`**. |
+| **`filter`** | Built-ins:** **`grayscale`**, **`invert`**, **`sepia`**, **`brightness`**, **`contrast`**, **`saturate`** — uses **`intensity`** (**default **`1`**). |
+
+Optional **`region`** limits read **`/`** write window when present.
+
+---
+
+## `getColor` **`/`** `setColor`
+
+- **`getColor(buf, x, y)`** — single pixel via **`getData`** **`1×1`**.
+- **`setColor(buf, x, y, { r, g, b, a? })`** — **`a`** defaults **`255`**.
+
+Both return **`Promise`**.
+
+---
+
+## Example
+
+```typescript
+const canvas = await painter.createCanvas({ width: 10, height: 10, color: '#fff' });
+const region = await painter.pixels.getData(canvas, { x: 0, y: 0, width: 5, height: 5 });
+const tinted = await painter.pixels.manipulate(canvas, {
+  filter: 'brightness',
+  intensity: 1.2,
+});
+```
+
+---

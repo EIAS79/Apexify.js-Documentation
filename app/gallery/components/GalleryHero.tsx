@@ -104,7 +104,7 @@ export default function GalleryHero({ counts }: { counts: Counts }) {
                   className="font-mono text-[10px] uppercase tracking-wider"
                   style={{ color: 'var(--text-muted)' }}
                 >
-                  v5.4.0
+                  v5.4.3
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3">

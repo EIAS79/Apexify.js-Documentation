@@ -1,43 +1,7 @@
 # Hit testing — paths & regions {#05-hit-testing-paths}
 
-Back: [Lines overview](/docs#00-custom-lines-overview)
+Hit-testing reference (**methods**, **`HitRegion`**, **`detect.distance`**, stroke **`/`** **`hitType`** caveats) lives in **[Hit detection](/docs#10-hit-detection)** (**`raster-batch-output`**).
 
-Vector **lines** chapters focus on **`painter.path2d`** and **`painter.detect`** working from the same **`PathCommand[]`** / **`Path2D`** shapes: whatever you **draw** can be **tested** with **`await painter.detect.path(…)`**.
-
----
-
-## API entry point
-
-Use **`painter.detect`** (not legacy top-level **`isPointInPath`** names on **`ApexPainter`**):
-
-| Method | Use when |
-|--------|----------|
-| **`detect.path(path, x, y, options?)`** | Arbitrary **`Path2D`** or **`PathCommand[]`** |
-| **`detect.region(region, x, y, options?)`** | **`HitRegion`** primitives (**`rect`**, **`circle`**, **`ellipse`**, **`polygon`**, **`path`**, **`custom`**) |
-| **`detect.anyRegion(regions, x, y, options?)`** | UI layers — first hit wins; read **`hitRegion`** |
-| **`detect.distance(region, x, y)`** | Proximity to **`rect` / `circle` / `ellipse` / `polygon`** |
-
-```typescript
-const path = painter.path2d.create([
-  { type: "roundedRect", x: 20, y: 40, width: 200, height: 80, radius: 12 },
-]);
-
-const rendered = await painter.path2d.draw(canvasBuf, path, {
-  stroke: { color: "#e2e8f0", width: 2 },
-  fill: { color: "#334155", opacity: 0.9 },
-});
-
-const pick = await painter.detect.path(path, 120, 80, { fillRule: "nonzero" });
-```
+Stay in **Lines & connectors** for how **`detect`** pairs with **`path2d.custom`** **`/`** **`path2d.draw`**: **[Lines overview](/docs#00-custom-lines-overview)** (**guide map row 5** keeps this anchor beside Path2D chapters).
 
 ---
-
-## Full reference
-
-Canonical tables (**`HitRegion`**, **`HitDetectionOptions`**, stroke caveats, **`getDistanceToRegion`**): **[Raster — Hit testing](/docs#02-hit-testing-paths)**.
-
-Types: **`lib-next/types/hit-detection.ts`**. Implementation: **`lib-next/pixels/hit-detection-creator.ts`**.
-
----
-
-Next: [Raster overview](/docs#00-advanced-raster-overview) · [Path2D draw](/docs#04-path2d-draw-path).

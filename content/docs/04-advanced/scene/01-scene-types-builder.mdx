@@ -1,0 +1,242 @@
+# Scene — types & `SceneBuilder` {#01-scene-types-builder}
+
+
+
+## `SceneRenderInput`
+
+Used by **`renderScene`**, **`renderSceneToGIF`**, and **`renderSceneToVideoFrames`** (the **`scene`** argument).
+
+| Field | Type | Notes |
+|-------|------|--------|
+| **`width`** | `number` | Root surface width (pixels). |
+| **`height`** | `number` | Root surface height (pixels). |
+| **`background`** | Optional; `Omit<CanvasConfig, "width" \| "height"> & Partial<Pick<CanvasConfig, "width" \| "height">>` | Width/height for the **root** still come from **`width`** / **`height`**; extra **`background.width`** is rarely needed. |
+| **`layers`** | **`SceneLayer[]`** | Bottom → top: index **0** drawn first. |
+
+**`SceneRenderResult`** is always **`Buffer`** (PNG bytes).
+
+---
+
+## `SceneRenderOptions` (optional on render)
+
+Passed as the **second argument** to **`renderScene`**, **`SceneBuilder.render`**, and forwarded from GIF/video helpers via **`sceneRender`** (see [GIF](/docs#07-render-scene-to-gif) / [video](/docs#08-render-scene-to-video)).
+
+| Field | Default | Role |
+|-------|---------|------|
+| **`validate`** | `true` | When `true`, runs **`validateSceneRenderInput`** before allocating the root canvas (finite **`width`/`height`** ≥ 1, **`layers`** is an array, nested **`surface`** depth cap). |
+| **`maxSurfaceDepth`** | `64` | Maximum nested **`surface`** levels; only used when **`validate`** is not `false`. |
+| **`resolveAssetRefs`** | **`renderScene`** / GIF / video wrappers: **`true`** (scenes resolve **`$name`** / **`$palette.key`** strings by default). **`SceneBuilder.render`**: **`false`** unless you pass **`true`**. Forwarded unchanged on **`gif.sceneRender`** / **`video.sceneRender`**. |
+
+Use **`{ validate: false }`** only for **trusted** high-volume paths. For user/JSON input, keep validation on or call **`validateSceneRenderInput`** / **`painter.validateSceneRenderInput`** up front.
+
+```typescript
+import { ApexPainter, validateSceneRenderInput } from "apexify.js";
+
+const painter = new ApexPainter();
+
+const input = { width: 800, height: 600, layers: [] /* … */ };
+validateSceneRenderInput(input, { maxSurfaceDepth: 8 });
+// or
+painter.validateSceneRenderInput(input, { maxSurfaceDepth: 8 });
+
+await painter.renderScene(input, { validate: false });
+```
+
+---
+
+## `SceneBuilder`
+
+Mutable wrapper around the same data as **`SceneRenderInput`**. **`SceneCreator.render`** receives **`{ width, height, background, layers }`** whether you use the builder or a plain object.
+
+### Background & append
+
+| Method | Returns | Role |
+|--------|---------|------|
+| **`setBackground(bg)`** | `this` | Root background (optional). |
+| **`addLayer(layer)`** | `this` | Append one **`SceneLayer`** (same as **`addLayers([layer])`**). |
+| **`addLayers(layers)`** | `this` | Append **many** layers in order (preferred when you already have an array). |
+
+### Stack editing (z-order without rebuilding the whole array)
+
+| Method | Returns | Role |
+|--------|---------|------|
+| **`insertLayer(index, layer)`** | `this` | Insert at **`index`** (`0` = bottom). **`index === layerCount`** appends. |
+| **`insertLayers(index, layers)`** | `this` | Insert several layers at **`index`**, preserving their order. |
+| **`removeLayer(index)`** | `this` | Remove one layer by index. |
+| **`moveLayer(fromIndex, toIndex)`** | `this` | Reorder: indices refer to the array **before** the move (same result as remove + insert). |
+| **`replaceLayers(layers)`** | `this` | Replace the entire stack (copied). |
+| **`clearLayers()`** | `this` | Remove all layers. |
+
+### Snapshot & render
+
+| Method | Returns | Role |
+|--------|---------|------|
+| **`toRenderInput()`** | **`SceneRenderInput`** | Plain object with **copied** **`layers`** — use for **`renderScene`**, **`renderSceneToGIF`**, **`renderSceneToVideoFrames`**, caching, or tests. |
+| **`render(options?)`** | `Promise<Buffer>` | Calls **`SceneCreator.render`**; optional **`SceneRenderOptions`**. Strip **`resolveAssetRefs`** internally before **`SceneCreator`** (same splitting rule as **`ApexPainter.renderScene`**). Asset **`$`** resolution on **`render()`** defaults **off** — use **`render({ resolveAssetRefs: true })`** when stacking **`$…`** placeholders (builders from **`painter.createScene`** carry the asset resolver). |
+
+**Read-only on builder:** **`width`**, **`height`** (constructor arguments). **`layerCount`** — number of layers currently in the stack.
+
+---
+
+## `createScene` overloads
+
+### 1) Config object (initial layers / background)
+
+```typescript
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter();
+
+const builder = painter.createScene({
+  width: 1920,
+  height: 1080,
+  background: { colorBg: "#020617" },
+  layers: [
+    {
+      type: "text",
+      texts: [{ text: "Title", x: 80, y: 100, fontSize: 72, color: "#f8fafc" }],
+    },
+  ],
+});
+
+const png = await builder.render();
+```
+
+Use this when your scene is mostly **data-driven** (e.g. JSON config) and you already have a **`layers`** array.
+
+### 2) Width + height, then chain (prefer `addLayers` for batches)
+
+```typescript
+const b = painter
+  .createScene(800, 600)
+  .setBackground({ colorBg: "#f1f5f9" })
+  .addLayers([
+    {
+      type: "text",
+      texts: [{ text: "Step 1", x: 24, y: 40, fontSize: 28, color: "#0f172a" }],
+    },
+    {
+      type: "text",
+      texts: [{ text: "Step 2", x: 24, y: 90, fontSize: 20, color: "#334155" }],
+    },
+  ]);
+
+const png2 = await b.render();
+```
+
+**`addLayer`** is still available for one-off appends; internally it delegates to **`addLayers([layer])`** so there is a single append path.
+
+### 3) Invalid: width only
+
+```typescript
+// Throws: "createScene: height is required when the first argument is numeric width."
+// painter.createScene(800);
+```
+
+Always pass **`(width, height)`** or the **object** form.
+
+---
+
+## Variant: build layers in a loop
+
+Either mutate a **`SceneLayer[]`** and call **`addLayers`** once, or call **`addLayer`** per iteration:
+
+```typescript
+import type { SceneLayer } from "apexify.js";
+
+const labels = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+const stack: SceneLayer[] = [];
+let y = 24;
+for (const label of labels) {
+  stack.push({
+    type: "text",
+    texts: [{ text: label, x: 32, y, fontSize: 22, color: "#111" }],
+  });
+  y += 36;
+}
+
+const strip = await painter.createScene(600, 200).setBackground({ colorBg: "#fff" }).addLayers(stack).render();
+```
+
+---
+
+## Variant: `toRenderInput()` → GIF / video / second `renderScene`
+
+```typescript
+import type { SceneRenderInput } from "apexify.js";
+
+const builder = painter
+  .createScene({ width: 1080, height: 1080, background: { colorBg: "#111827" } })
+  .addLayers([/* … */]);
+
+const input: SceneRenderInput = builder.toRenderInput();
+
+const png = await painter.renderScene(input);
+// await painter.renderSceneToGIF(input, { options: { … }, sceneRender: { maxSurfaceDepth: 16 } });
+```
+
+**`toRenderInput()`** copies the **`layers`** array so mutating **`input.layers`** does not change the builder’s internal list.
+
+---
+
+## Variant: insert / remove / move (e.g. editor UI)
+
+```typescript
+const card = painter.createScene(400, 300).setBackground({ colorBg: "#0f172a" });
+
+card.addLayers([{ type: "text", texts: { text: "Back", x: 8, y: 8, fontSize: 12, color: "#94a3b8" } }]);
+card.insertLayer(0, {
+  type: "text",
+  texts: { text: "Watermark", x: 200, y: 260, fontSize: 11, color: "#64748b" },
+});
+card.moveLayer(1, 0);
+card.removeLayer(card.layerCount - 1);
+await card.render();
+```
+
+Each **`render()`** still recomposites the **full** stack from scratch; these methods only change **order / membership** of layer descriptions.
+
+---
+
+## Variant: merge static layers + dynamic layer
+
+```typescript
+const baseLayers = [
+  { type: "image" as const, images: { source: "./bg.png", x: 0, y: 0, width: 1200, height: 630 } },
+];
+
+const headline = `Generated at ${new Date().toISOString()}`;
+
+const png = await painter
+  .createScene({
+    width: 1200,
+    height: 630,
+    layers: [
+      ...baseLayers,
+      {
+        type: "text",
+        texts: [{ text: headline, x: 48, y: 540, fontSize: 18, color: "#e2e8f0" }],
+      },
+    ],
+  })
+  .render();
+```
+
+---
+
+## Type-only import (optional)
+
+If you annotate config objects:
+
+```typescript
+import type { SceneRenderInput, SceneLayer } from "apexify.js";
+
+const layers: SceneLayer[] = [
+  { type: "text", texts: [{ text: "x", x: 0, y: 0, fontSize: 12, color: "#000" }] },
+];
+
+const input: SceneRenderInput = { width: 100, height: 50, layers };
+await painter.renderScene(input);
+```
+
+---
