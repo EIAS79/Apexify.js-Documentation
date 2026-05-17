@@ -1,0 +1,210 @@
+# Procedural audio (`createAudio`) {#01-create-audio}
+
+**`painter.createAudio`** synthesizes **16-bit PCM WAV `Buffer`s** — presets, custom multi-layer sounds, timelines, and mixes. Output is ready for **`mixAudio`**, **`videoPipeline().audio()`**, disk via **`save`**, or any API that accepts a WAV buffer.
+
+**Hub:** [Audio (advanced)](/docs#00-audio-advanced-hub) · **Mux on video:** [Video audio operations](/docs#06-audio-deep-dive) · **Pipeline tracks:** [Video pipeline](/docs#01-video-pipeline)
+
+---
+
+## Entry points
+
+| Method | Returns | Use when |
+|--------|---------|----------|
+| **`preset(name, overrides?)`** | **`Buffer`** | Built-in SFX (`laser`, `coin`, `jump`, …) |
+| **`synth(options)`** / **`custom(options)`** | **`Buffer`** | Full **`SynthSoundOptions`** (layers, ADSR, filters) |
+| **`sequence({ events })`** | **`Buffer`** | Timed preset/custom events on one WAV |
+| **`compose({ clips })`** | **`Buffer`** | Overlapping clips with pitch, pan, fades, tone |
+| **`mix(inputs, options?)`** | **`Buffer`** | Sum buffers at **t = 0** or with per-input **`at`** |
+| **`save(wav, filePath)`** | **`Promise<void>`** | Write WAV to disk |
+| **`listPresets()`** | **`SynthPresetInfo[]`** | Names, descriptions, default durations |
+| **`presetNames`** | readonly array | All **`SynthPresetName`** values |
+
+Types export from **`apexify.js/types`**: **`SynthPresetName`**, **`SynthSoundOptions`**, **`SynthLayer`**, **`SynthSequenceOptions`**, **`SynthComposeOptions`**, …
+
+---
+
+## Presets
+
+**39** built-in names (game/UI oriented): **`laser`**, **`explosion`**, **`coin`**, **`jump`**, **`whoosh`**, **`menuSelect`**, **`footstep`**, **`thunder`**, …
+
+```typescript
+const pew = painter.createAudio.preset('laser', { volume: 0.8, transpose: 2 });
+
+for (const info of painter.createAudio.listPresets()) {
+  console.log(info.name, info.description, info.defaultDuration);
+}
+```
+
+**`SynthPresetOverrides`:** **`volume`**, **`transpose`**, plus any **`SynthSoundOptions`** field layered on the preset definition.
+
+---
+
+## Custom sounds — `synth` / `custom`
+
+Each **`SynthLayer`** can use waveforms **`sine`**, **`square`**, **`sawtooth`**, **`triangle`**, **`noise`**, **`pink`**:
+
+| Field | Role |
+|-------|------|
+| **`frequency`** / **`frequencyEnd`** | Start Hz and optional sweep |
+| **`duration`** | Layer length (seconds) |
+| **`delay`** | Offset before layer starts |
+| **`gain`**, **`detune`**, **`pan`** | Level, cents, stereo pan |
+| **`adsr`** | Attack / decay / sustain / release |
+| **`vibrato`**, **`tremolo`** | LFO depth + rate |
+| **`filter`** | **`lowpass`** / **`highpass`** + cutoff |
+| **`noiseMix`**, **`partials`** | Noise blend, harmonic ratios |
+
+```typescript
+const uiTick = painter.createAudio.synth({
+  layers: [
+    {
+      waveform: 'square',
+      frequency: 880,
+      frequencyEnd: 440,
+      duration: 0.06,
+      gain: 0.35,
+      adsr: { attack: 0.001, decay: 0.02, sustain: 0, release: 0.02 },
+    },
+  ],
+  masterGain: 1,
+  limiter: true,
+});
+```
+
+**`sampleRate`** (default **44100**), **`channels`** (**`1`** or **`2`**), **`limiter`** (default **`true`**) apply at the sound level.
+
+---
+
+## Timelines — `sequence`
+
+Events fire at **`at`** (seconds). Each event uses **`preset`** and/or **`options`** (**`SynthSoundOptions`**), plus optional **`gain`**.
+
+```typescript
+const combo = painter.createAudio.sequence({
+  events: [
+    { at: 0, preset: 'hit' },
+    { at: 0.08, preset: 'coin', gain: 0.85 },
+    { at: 0.2, preset: 'powerup' },
+  ],
+  tail: 0.2,
+  masterGain: 0.95,
+});
+```
+
+**`tail`** pads silence after the last event ends. Overlapping events **sum** in the same buffer (limiter applied).
+
+---
+
+## Overlapping clips — `compose`
+
+**`compose`** is for **dense beds**: multiple presets, custom sounds, or existing WAV buffers on one timeline with per-clip shaping.
+
+| **`SynthComposeClip`** field | Effect |
+|------------------------------|--------|
+| **`at`**, **`duration`**, **`sourceStart`** | Placement and trim |
+| **`preset`** / **`sound`** / **`wav`** | Source (one required) |
+| **`gain`**, **`volume`**, **`transpose`**, **`detune`**, **`pitch`**, **`speed`** | Level and pitch |
+| **`pan`**, **`fadeIn`**, **`fadeOut`** | Stereo and edges |
+| **`noise`**, **`filter`**, **`quality`** | Post-tone on the clip |
+| **`overrides`** | Preset tweaks |
+
+Top-level **`SynthComposeOptions`**: **`duration`**, **`tail`**, **`masterGain`**, **`postHighpassHz`** (rumble cleanup), **`noiseGateThreshold`** (quiet overlap hiss).
+
+```typescript
+const bossIntro = painter.createAudio.compose({
+  clips: [
+    { at: 0, preset: 'rumble', duration: 1.2, gain: 0.5 },
+    { at: 0.4, preset: 'alarm', gain: 0.4, fadeIn: 0.1 },
+    { at: 0.9, preset: 'explosion', gain: 0.75 },
+  ],
+  postHighpassHz: 220,
+  tail: 0.3,
+});
+```
+
+---
+
+## `mix`
+
+Combine one or more **`Buffer`s** (or inline preset/sound definitions where supported):
+
+```typescript
+const layered = painter.createAudio.mix(
+  [painter.createAudio.preset('beep'), painter.createAudio.preset('whoosh', { volume: 0.5 })],
+  { masterGain: 0.9 }
+);
+```
+
+Use when you already have WAV buffers and need a single file without a full **`compose`** timeline.
+
+---
+
+## Put audio on video
+
+### Single operation — `mixAudio`
+
+Pass any **`createAudio`** **`Buffer`** as **`MixAudioOverlayClip.source`**:
+
+```typescript
+const sfx = painter.createAudio.preset('laser');
+
+await painter.createVideo({
+  source: './clip.mp4',
+  mixAudio: {
+    outputPath: './clip-sfx.mp4',
+    keepOriginalAudio: false,
+    overlays: [{ source: sfx, startTime: 1.5, volume: 1 }],
+  },
+});
+```
+
+**`keepOriginalAudio: false`** → overlays only (no silent bed under SFX). Full field reference: [Video audio operations](/docs#06-audio-deep-dive).
+
+### Editor stack — `videoPipeline().audio()`
+
+Declare tracks without pre-building every buffer:
+
+| `type` | Fields |
+|--------|--------|
+| **`preset`** | **`preset`**, **`startTime`**, **`gain`**, **`volume`**, **`transpose`** |
+| **`synth`** | **`sound`**, **`startTime`**, **`gain`** |
+| **`sequence`** | **`events`**, **`startTime`**, **`tail`**, **`masterGain`** |
+| **`wav`** | Pre-built **`Buffer`**, **`startTime`**, **`volume`** |
+| **`file`** | Path, URL, or buffer (external assets) |
+
+See [Video pipeline — Audio layers](/docs#01-video-pipeline).
+
+---
+
+## Standalone export
+
+```typescript
+await painter.createAudio.save(
+  painter.createAudio.sequence({
+    events: [{ at: 0, preset: 'menuSelect' }],
+  }),
+  './ui/select.wav'
+);
+```
+
+---
+
+## vs FFmpeg video audio
+
+| | **`createAudio`** | **`createVideo` audio keys** |
+|--|-------------------|------------------------------|
+| **Input** | Generated PCM | Existing video/audio files |
+| **Output** | WAV **`Buffer`** | MP4 (or extracted audio file) |
+| **FFmpeg** | Only when muxing to video | Always for video ops |
+| **Typical use** | Game SFX, UI sounds, bots | Podcast normalize, ducking, strip track |
+
+---
+
+## Tips
+
+- **`listPresets()`** before hard-coding names in editor UIs.
+- Prefer **`sequence`** for linear SFX chains; **`compose`** when clips **overlap** with independent pitch/fades.
+- For long gameplay videos, generate SFX once, then **`mixAudio`** or pipeline **`type: 'wav'`** — avoid re-synthesizing on every export pass.
+- Pair with **[GIF / `animate`](/docs#08-animate-api)** by muxing SFX after frame encode.
+
+---

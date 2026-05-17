@@ -150,20 +150,45 @@ const API_REFERENCE_FILES_ORDER_BY_SUBFOLDER: Record<string, string[]> = {
   'api-batch-save': ['api-batch', 'api-chain', 'api-save', 'api-save-multiple', 'api-output', 'api-valid-hex'],
 };
 
-const ADVANCED_ORDER = [
-  'advanced',
-  'canvas-pipeline',
-  'advanced-raster-apis',
-  'pixel-apis',
-  'hit-testing',
-  'path2d-draw',
-  'video-ffmpeg-internals',
-  'video-discovery-frames',
-  'complete-developer-guide',
-];
+/** Loose `.mdx` files directly under `04-advanced` / `05-advanced`. */
+const ADVANCED_ORDER = ['00-advanced-overview'];
 
-/** Nested topic folders under Advanced sections (`04-advanced`, `05-advanced`) — sidebar order. */
-const ADVANCED_SUBFOLDER_ORDER = ['composition', 'scene'];
+/** Nested topic folders under Advanced (`04-advanced`, `05-advanced`) — sidebar order. */
+const ADVANCED_SUBFOLDER_ORDER = ['composition', 'scene', 'video', 'audio'];
+
+const ADVANCED_SUBFOLDER_LABELS: Record<string, string> = {
+  composition: 'Composition',
+  scene: 'Scene',
+  video: 'Video (advanced)',
+  audio: 'Audio (advanced)',
+};
+
+/** Per-topic page order inside each Advanced subfolder (basename without `.mdx`). */
+const ADVANCED_FILES_ORDER_BY_SUBFOLDER: Record<string, string[]> = {
+  composition: [
+    '00-composition-hub',
+    '01-named-assets',
+    '02-templates',
+    '03-preset-components',
+    '04-plugins',
+    '05-imperative-batch-chain-assets',
+  ],
+  scene: [
+    '00-scene-composition',
+    '00-scene-hub',
+    '01-scene-types-builder',
+    '02-scene-layers-raster-text-path',
+    '03-scene-layers-charts',
+    '04-scene-layers-custom-lines-surface',
+    '05-scene-backgrounds',
+    '06-render-scene',
+    '07-render-scene-to-gif',
+    '08-render-scene-to-video',
+    '09-scene-paint-order-performance',
+  ],
+  video: ['00-video-advanced-hub', '01-video-pipeline'],
+  audio: ['00-audio-advanced-hub', '01-create-audio'],
+};
 
 const INTERNALS_ORDER = [
   'internals-overview',
@@ -349,7 +374,52 @@ function advancedSubfolderSortKey(name: string): number {
   return i === -1 ? 999 : i;
 }
 
-/** Nested dirs under Advanced — same recursive tree as Feature Guides (`scene/`, etc.). */
+function advancedGuideNestedDisplayName(segmentName: string): string {
+  return ADVANCED_SUBFOLDER_LABELS[segmentName] ?? formatName(segmentName);
+}
+
+/**
+ * Advanced topic tree — same recursion as Feature Guides, but Advanced labels and file order.
+ */
+function buildAdvancedTopicTree(
+  dirPath: string,
+  folderRelative: string,
+  segmentName: string,
+  docsDir: string,
+): DocSubfolder {
+  const posixFolder = folderRelative.split(path.sep).join('/');
+  const files = getDirectMdxFiles(dirPath, docsDir).map((f) => ({
+    ...f,
+    folder: posixFolder,
+  }));
+  sortFilesWithOrder(files, ADVANCED_FILES_ORDER_BY_SUBFOLDER[segmentName] ?? null, segmentName);
+
+  const nested: DocSubfolder[] = [];
+  for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const childPath = path.join(dirPath, entry.name);
+    const childRel = path.join(folderRelative, entry.name);
+    const child = buildAdvancedTopicTree(childPath, childRel, entry.name, docsDir);
+    if (child.files.length === 0 && (!child.subfolders || child.subfolders.length === 0)) continue;
+    nested.push(child);
+  }
+
+  nested.sort((a, b) => {
+    const da = advancedSubfolderSortKey(a.name);
+    const db = advancedSubfolderSortKey(b.name);
+    if (da !== db) return da - db;
+    return a.name.localeCompare(b.name, undefined, { numeric: true });
+  });
+
+  return {
+    name: segmentName,
+    displayName: advancedGuideNestedDisplayName(segmentName),
+    files,
+    subfolders: nested.length > 0 ? nested : undefined,
+  };
+}
+
+/** Nested dirs under Advanced (`composition/`, `scene/`, `video/`, `audio/`, …). */
 function buildAdvancedNestedSubfolders(folderPath: string, topFolderName: string, docsDir: string): DocSubfolder[] {
   const subfolders: DocSubfolder[] = [];
   if (!fs.existsSync(folderPath)) return subfolders;
@@ -358,7 +428,7 @@ function buildAdvancedNestedSubfolders(folderPath: string, topFolderName: string
     if (!entry.isDirectory()) continue;
     const subPath = path.join(folderPath, entry.name);
     const folderRelative = path.join(topFolderName, entry.name);
-    const node = buildFeatureGuideTopicTree(subPath, folderRelative, entry.name, docsDir);
+    const node = buildAdvancedTopicTree(subPath, folderRelative, entry.name, docsDir);
     if (node.files.length === 0 && (!node.subfolders || node.subfolders.length === 0)) continue;
     subfolders.push(node);
   }

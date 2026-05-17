@@ -78,6 +78,8 @@ For **why** ApexPainter exists and **when** to use it, read **[Philosophy & goal
 |---------------|--------------|--------|
 | Thumbnails, frame strips, posters | **`createVideo`** **`extractFrame`** / **`extractFrames`** | [Frames](/docs#02-frame-extraction) |
 | Quick probes (duration, fps, resolution) | **`createVideo`** **`getInfo`** or **`getVideoInfo`** | [Metadata](/docs#01-metadata-and-frames) · [Imperative](/docs#08-imperative-video-helpers) |
+| Multi-step trim, splice, captions, music + SFX | **`videoPipeline()`** | [Video pipeline (advanced)](/docs#01-video-pipeline) |
+| Game / UI SFX without sound files | **`createAudio`** → **`mixAudio`** or pipeline | [`createAudio` (advanced)](/docs#01-create-audio) |
 | Trim, transcode, overlays, PiP, audio mix | **`createVideo`** branches | [Video overview](/docs#00-video-overview) · [Options hub](/docs#00-video-options-hub) |
 
 ---
@@ -125,7 +127,8 @@ Operations below skip **`createImage`** composition — they run through **`pain
 | **Daily chart PNG for Slack** | **`createChart`** → **`save`** or attach **`Buffer`** |
 | **Short promo GIF** | **`createGIF`** or **`animate`** → file |
 | **Product catalogue JPEGs** | **`batch`** (**`image`**) + **`compress`** |
-| **Video teaser montage** | **`createVideo`** **`generateThumbnail`** or **`extractFrames`** |
+| **Video teaser montage** | **`createVideo`** **`generateThumbnail`** or **`extractFrames`** · [Video overview](/docs#00-video-overview) |
+| **Gameplay clip + generated SFX** | **`animate`** or Scene → MP4, then **`createAudio`** + **`videoPipeline`** | [Animate](/docs#08-animate-api) · [`createAudio`](/docs#01-create-audio) · [Pipeline](/docs#01-video-pipeline) |
 
 ---
 

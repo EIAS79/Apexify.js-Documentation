@@ -1,6 +1,12 @@
 # Timeline edits {#04-timeline-edits}
 
+Trim, splice, freeze, reverse, and speed changes on the **timeline**.
 
+**Several timeline steps in one project?** Use **[`videoPipeline()` (advanced)](/docs#01-video-pipeline)** instead of chaining **`createVideo`** calls.
+
+**Single operation:** use the **`createVideo`** keys below (one per call).
+
+---
 
 ## `trim`
 
@@ -25,9 +31,9 @@ await painter.createVideo({
 
 ---
 
-## `replaceSegment`
+## `replaceSegment` (splice)
 
-**What it does:** Splices **replacement** footage into **[`targetStartTime`, `targetEndTime`]** of **`source`**, keeping head/tail.
+**What it does:** Splices **replacement** footage into **[`targetStartTime`, `targetEndTime`]** of **`source`**, keeping head/tail. Same operation as **`videoPipeline().splice({ … })`**.
 
 ### Modes
 

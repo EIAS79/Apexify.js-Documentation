@@ -1,7 +1,8 @@
 # Audio tracks {#03-audio}
 
+**See also:** [Video audio operations (full)](/docs#06-audio-deep-dive) — **`normalizeAudio`**, **`mixAudio`**.
 
-**See also:** [Audio operations (full guide)](/docs#06-audio-deep-dive) — especially **`normalizeAudio`** (**LUFS**, **`peak`/`rms`**) and **`mixAudio`** overlays.
+**Multi-step edits:** [Video pipeline](/docs#01-video-pipeline). **Generated SFX:** [Advanced → `createAudio`](/docs#01-create-audio) → mux with **`mixAudio`** or pipeline **`.audio()`**.
 
 ---
 
@@ -72,7 +73,7 @@ Mixes **N overlay clips** onto the output timeline while optionally keeping the 
 |-------|---------|------|
 | **`outputPath`** | ✓ | Mixed MP4 (**`-c:v copy`**, **AAC 192k**). |
 | **`overlays`** | ✓ | **`MixAudioOverlayClip[]`** — see below. |
-| **`keepOriginalAudio`** | **`true`** | **`false`** → silence pad + overlays only ( **`anullsrc`** baseline ). |
+| **`keepOriginalAudio`** | **`true`** | **`false`** → **overlays only** (no silent bed mixed under SFX — avoids quiet/muddy mixes). |
 | **`originalVolume`** | **1** | Linear gain on **[0:a]** before **`amix`**. |
 | **`originalSpeed`** | **1** | **`atempo`** chain (**~0.25–4** clamp). |
 | **`originalPitchSemitones`** | **0** | **`asetrate`** trick **without rubberband**. |
@@ -180,7 +181,7 @@ await painter.createVideo({
 
 **`-c:v copy`** audio pipeline — **video pixels unchanged**.
 
-For **what each option does**, **LUFS vs peak**, and **honest limits** of **`peak`/`rms`**, see the dedicated guide: **[Audio operations (full)](/docs#06-audio-deep-dive)**.
+For **what each option does**, **LUFS vs peak**, and **honest limits** of **`peak`/`rms`**, see **[Video audio operations (full)](/docs#06-audio-deep-dive)**.
 
 ```typescript
 await painter.createVideo({

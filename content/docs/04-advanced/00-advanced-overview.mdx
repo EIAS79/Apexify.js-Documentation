@@ -57,14 +57,41 @@ Charts and GIF/video helpers either return buffers or orchestrate their own pipe
 
 ---
 
+## Video — editor pipelines (5.4+) {#11-video-advanced}
+
+**Start here:** **[Video (advanced) hub](/docs#00-video-advanced-hub)** — when to use **`videoPipeline()`** vs **`createVideo`** vs Scene export.
+
+| Chapter | Topic |
+|---------|--------|
+| [Video pipeline](/docs#01-video-pipeline) | Layer stack: trim, splice, **`createText`** captions, file + synth audio tracks |
+| [Render scene to video](/docs#08-render-scene-to-video) | **`renderSceneToVideoFrames`** |
+| Single FFmpeg operations | [Video feature guide](/docs#00-video-overview) |
+
+---
+
+## Audio — procedural SFX (5.4+) {#12-audio-advanced}
+
+**Start here:** **[Audio (advanced) hub](/docs#00-audio-advanced-hub)** — **`createAudio`** vs FFmpeg **`mixAudio`** on video.
+
+| Chapter | Topic |
+|---------|--------|
+| [`createAudio`](/docs#01-create-audio) | Presets, **`synth`**, **`sequence`**, **`compose`**, **`mix`**, **`save`** |
+| Mux / normalize on video | [Video audio operations](/docs#06-audio-deep-dive) (feature guide) |
+| Editor audio layers | [Video pipeline](/docs#01-video-pipeline) |
+
+---
+
 ## Where to go deeper
 
 | Topic | Link |
 |-------|------|
 | **Composition** (templates, **`$`**, components, plugins, batch) | [Composition hub](/docs#00-composition-hub) |
 | **Scene** — layer graph, GIF/video export | [Scene overview](/docs#00-scene-composition) |
+| **Video** — **`videoPipeline`**, Scene → MP4 | [Video (advanced) hub](/docs#00-video-advanced-hub) |
+| **Audio** — **`createAudio`**, SFX timelines | [Audio (advanced) hub](/docs#00-audio-advanced-hub) |
 | Paint order & layering | Feature guides for canvas / image / text |
-| Video internals | [Video overview](/docs#00-video-overview) |
+| **`createVideo`** options (one op per call) | [Video overview](/docs#00-video-overview) |
+| FFmpeg audio on video | [Video audio operations](/docs#06-audio-deep-dive) |
 | **Repo layout** | [Internals hub](/docs#00-internals-overview) | Maintainer / contributor pointers only |
 
 ---

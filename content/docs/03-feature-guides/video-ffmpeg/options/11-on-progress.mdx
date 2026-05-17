@@ -26,8 +26,10 @@ Forwarded only on operations that call **`executeFFmpegWithProgress`**:
 | **`applyLUT`** |
 | **`addTransition`** |
 | **`addAnimatedText`** |
+| **`addTextOverlay`** |
+| **`videoPipeline().render({ onProgress })`** |
 
-Other **`createVideo`** branches **do not** invoke **`onProgress`** even if you pass it.
+Other **`createVideo`** branches **do not** invoke **`onProgress`** even if you pass it. **`mixAudio`** and **`trim`** do not report progress today.
 
 ---
 

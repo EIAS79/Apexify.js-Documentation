@@ -9,6 +9,57 @@ Version history is mirrored here for the docs site. For the **canonical** file (
 
 <!-- changelog-versions -->
 
+## [5.4.5] - 2026-05-13
+
+### ✨ Added
+
+##### Procedural audio — `painter.createAudio`
+
+- **`painter.createAudio`** on **`ApexPainter`** — server-side **SFX synthesis** (16-bit PCM **WAV `Buffer`**, no external sound files required).
+- **`preset(name, overrides?)`** — **39** built-in presets (`laser`, `explosion`, `coin`, `jump`, `gameOver`, `whoosh`, `engine`, …); overrides: **`volume`**, **`transpose`**, full layer overrides.
+- **`synth(options)`** / **`custom()`** — multi-layer sounds: waveforms (`sine`, `square`, `sawtooth`, `triangle`, `noise`, `pink`), **ADSR**, frequency sweeps, **vibrato** / **tremolo**, **filters**, **partials**, **pan**, per-layer delay/gain.
+- **`sequence({ events })`** — timeline of presets or custom sounds at **`at`** (seconds) with per-event **`gain`**.
+- **`compose({ clips })`** — one WAV from overlapping clips: **`at`**, **`duration`**, **`sourceStart`**, **`preset`** / **`sound`** / **`wav`**, pitch/volume/pan/fades, **`noise`**, **`filter`**, **`quality`**; optional **`postHighpassHz`**, **`noiseGateThreshold`** on the master mix.
+- **`mix(inputs)`** — simultaneous mix at **t = 0**, or timeline mix when clips include compose fields.
+- **`save(wav, path)`**, **`listPresets()`**, **`presetNames`**.
+- Types: **`SynthPresetName`**, **`SynthSoundOptions`**, **`SynthSequenceOptions`**, **`SynthComposeOptions`**, … — **`apexify.js/types`**.
+
+##### Video pipeline — `videoPipeline()`
+
+- **`painter.videoPipeline(source?)`** / **`painter.video.videoPipeline()`** — declarative edit stack for editor workflows; fewer redundant encodes than chaining many **`createVideo`** calls.
+- Layer types: **`source`**, **`trim`**, **`splice`**, **`text`** (full **`TextProperties`**), **`audio`** (files + **`createAudio`** presets / synth / sequence / WAV).
+- **Upsert by `id`** — same **`id`** **replaces** trim/splice/source; **`text`** / **`audio`** with the same **`id`** **merge** unless **`{ replace: true }`**.
+- **`pipeline.render({ outputPath })`** — compiles layers; returns **`passes`** count.
+
+##### Video text overlays — `createVideo({ addTextOverlay })`
+
+- **`addTextOverlay`** — timed captions using the same **`TextProperties`** model as **`createText`** (fonts, gradients, glow, shadow, stroke, wrap, curved text, decorations, placement, …). Each **`overlays[]`** entry is a **`VideoTextOverlayClip`**: style + **`startTime`**, **`endTime`**, **`transitionIn`** / **`transitionOut`**, **`overlayOpacity`**.
+- **Multiple overlays** — overlapping time ranges at different **`x`** / **`y`**; later array items stack on top.
+- **Transitions** — **`fade`**, **`slideLeft`** / **`Right`** / **`Up`** / **`Down`**, **`zoomIn`** / **`zoomOut`**, **`bounce`**, aliases (**`fadeIn`**, **`slideIn`**, …); **`VideoTextTransition.custom`** for FFmpeg expression overrides.
+- Canvas render → transparent PNG per overlay → FFmpeg **`overlay`** chain.
+
+### 🔧 Changed
+
+- **`AudioCreate`** / **`TemplateCreate`** facades on **`ApexPainter`** (same pattern as **`VideoCreate`**, **`GifCreate`**, **`SceneCreate`**).
+- **`createVideo({ addText })`** and **`createVideo({ addAnimatedText })`** — still available (FFmpeg **`drawtext`**) but **deprecated**; prefer **`addTextOverlay`** or **`videoPipeline().text()`**.
+- Procedural SFX entry is **`painter.createAudio`** (aligned with **`createVideo`**, **`createCanvas`**, **`createGIF`**).
+- **`createVideo({ mixAudio })`** when **`keepOriginalAudio: false`**: no silent **`anullsrc`** bed under overlays (fixes quiet/muddy SFX). Overlay-only mixes use **`amix` `normalize=0`** plus light **`alimiter`**.
+- **`mixAudio` buffers**: temp files use correct extension (**.wav** / **.mp4** / **.mp3**) from buffer magic bytes.
+
+### 🐛 Fixed
+
+- **`mixAudio`** with WAV **`Buffer`** overlays previously written as **`.mp4`**, causing missing or silent audio tracks.
+- Space shooter demo: removed continuous ambience drone, tuned SFX levels, reliable mux from **`.wav`**, post-mux audio stream check on output MP4.
+
+### 📚 Documentation
+
+- **README** — **`videoPipeline`**, **`addTextOverlay`**, **`createAudio`**, API table, media-pipeline use case; **package.json** keywords/description.
+- **Video (feature guide)** — [Video overview](/docs#00-video-overview), [Text overlays](/docs#08-text-overlays), [Video audio (FFmpeg)](/docs#06-audio-deep-dive).
+- **Video (advanced)** — [Video pipeline](/docs#01-video-pipeline), [Video (advanced) hub](/docs#00-video-advanced-hub).
+- **Audio (advanced)** — [`createAudio`](/docs#01-create-audio), [Audio (advanced) hub](/docs#00-audio-advanced-hub).
+
+---
+
 ## [5.4.4] - 2026-05-13
 
 ### 🔧 Changed
@@ -18,7 +69,7 @@ Version history is mirrored here for the docs site. For the **canonical** file (
 
 ### 📚 Documentation
 
-- Raster **`06-image-resize-convert-effects`** (**`docs`** **`/`** **`03-feature-guides`** **`/`** **`raster-batch-output`**) — **`resize`** **`/`** **`imgConverter`** document unified **`Buffer`** **`/`** URL **`/`** data URL **`/`** path inputs.
+- [Image resize & convert](/docs#06-image-resize-convert-effects) — **`resize`** / **`imgConverter`** unified **`Buffer`** / URL / data URL / path inputs.
 
 ---
 
@@ -41,6 +92,11 @@ Higher-level composition: **templates** (placeholders + named assets + flex layo
 
 - **`ApexPainter.use`** — synchronous **`install`** only (removed async **`catch`** that could hide failures)
 - **`SceneRenderOptions`** typing — **`resolveAssetRefs`** next to **`validate`** / **`maxSurfaceDepth`**
+
+### 📚 Documentation
+
+- **README** — named assets (**`$name`**, **`$palette.key`**): scenes vs templates vs **`SceneBuilder`**, **`prepareForRender`**, **`batch`** / **`chain`**.
+- **Composition (advanced)** — [Composition hub](/docs#00-composition-hub), templates, assets, components, plugins, imperative **`$`** resolution.
 
 ---
 
@@ -72,7 +128,7 @@ Scene composition is easier to discover and safer by default: **`SceneBuilder`**
 
 ### 📚 Documentation
 
-- Scene docs: **`addLayers`**, stack editing, **`toRenderInput`**, validation, **`resolveAssetRefs`**, **`sceneRender`** on GIF/video
+- **Scene (advanced)** — [Scene overview](/docs#00-scene-composition): **`addLayers`**, stack editing, **`toRenderInput`**, validation, **`resolveAssetRefs`**, **`sceneRender`** on GIF/video.
 
 ---
 

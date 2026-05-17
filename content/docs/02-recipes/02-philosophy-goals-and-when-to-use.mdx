@@ -12,7 +12,7 @@ Apexify.js centers on **`ApexPainter`**: a **Node-friendly** façade over **`@na
 | **_repeatable branded layouts** | **`CanvasConfig`** (and **`SceneBuilder`** **`/`** templates when you want graphs **`/`** **`$`** assets) |
 | **Data viz as PNG** | **`createBarChart`** **`/`** **`createPieChart`** **`/`** … → same buffer pipeline |
 | **Short motion** | **`createGIF`**, **`animate`** |
-| **Media housekeeping** | **`createVideo`** (probe, trim, filters, …) when FFmpeg is available |
+| **Media housekeeping** | **`createVideo`** (probe, trim, filters, …); **`videoPipeline`** + **`createAudio`** for editor-style stacks when FFmpeg is available |
 | **Batch **`/`** pipelines** | **`batch`** (parallel), **`chain`** (sequential buffer handoff), **`painter.image`** (stitch, compress, resize, …) |
 
 The library’s **goal** is to keep **one mental model**: **canvas-sized bitmap → layered draws → PNG bytes**, plus helpers that **orbit** that core (pixels, hit tests, standalone **`painter.image`** file ops).
@@ -45,7 +45,7 @@ See **[What you can build](/docs#01-what-you-can-build)** for a **feature-by-fea
 |-----------|---------------------|
 | **Browser-only UI** (live DOM canvas, no Node buffers) | Native **`canvas`** **`/`** Skia **`/`** WebGL in the client — Apexify targets **server **`/`** worker-with-node-canvas** workflows. |
 | **Print-first PDF **`/`** CMYK **`/`** multipage layout** | Dedicated layout **`/`** PDF engines — Apexify focuses **raster PNG **`/`** JPEG **`/`** WebP**. |
-| **Full video editors** | Apexify **`createVideo`** wraps FFmpeg helpers — great for **transcode **`/`** slice **`/`** overlay**, not a timeline NLE. |
+| **Full video editors (NLE)** | **`createVideo`** + **`videoPipeline`** cover transcode, trim, captions, and SFX — not a drag-and-drop timeline UI; you build the editor UX yourself. |
 
 ---
 

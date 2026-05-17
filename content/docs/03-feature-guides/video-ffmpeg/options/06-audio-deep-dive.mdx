@@ -1,6 +1,10 @@
-# Audio operations (full guide) {#06-audio-deep-dive}
+# Video audio operations (FFmpeg) {#06-audio-deep-dive}
 
+Mux, strip, duck, and normalize **existing** audio on video via **`createVideo`**. **`mixAudio`** accepts path/URL/buffer overlays — including WAV **`Buffer`s** from **`painter.createAudio`**.
 
+**Procedural SFX (generate WAV in code):** [Advanced → `createAudio`](/docs#01-create-audio) · [Audio hub](/docs#00-audio-advanced-hub). **Editor stacks:** [Video pipeline](/docs#01-video-pipeline).
+
+---
 
 ## `extractAudio`
 
@@ -187,7 +191,7 @@ await painter.createVideo({
 |-------|---------|--------|
 | **`outputPath`** | ✓ | Mixed output (**video copied**, **AAC 192k** audio). |
 | **`overlays`** | ✓ | List of clips — see next section. |
-| **`keepOriginalAudio`** | **`true`** | **`false`** → builds silence baseline then mixes overlays only. |
+| **`keepOriginalAudio`** | **`true`** | **`false`** → **overlay tracks only** (original soundtrack omitted; no extra silent bed under SFX). |
 | **`originalVolume`** | **1** | Scales **video’s** soundtrack before **`amix`**. |
 | **`originalSpeed`** | **1** | **`atempo`** on original audio (**clamped ~0.25–4**). |
 | **`originalPitchSemitones`** | **0** | Pitch via **`asetrate` + compensating atempo** (no rubberband). |

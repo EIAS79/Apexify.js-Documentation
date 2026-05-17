@@ -17,7 +17,9 @@ You already learned **`ApexPainter`** on **[Start here](/docs#00-start-here)**. 
 | **GIF & animation** | **`createGIF`**, **`animate`**, frames, disposal, watermarks, encode pipeline | **[GIF overview](/docs#00-create-gif-overview)** · [`animate` API](/docs#08-animate-api) |
 | **Lines & Path2D** | **`path2d.custom`** connectors, **`path2d.create`**, **`path2d.draw`**, **`detect.path`**, arrows, textures | **[Lines overview](/docs#00-custom-lines-overview)** |
 | **Charts** | Bar, line, pie, radar, polar, combo / comparison charts | **[Charts overview](/docs#00-charts-overview)** |
-| **Video & FFmpeg** | **`createVideo`**, discovery, transcode, overlays, compose — optional FFmpeg on **`PATH`** | **[Video overview](/docs#00-video-overview)** · [Option guides](/docs#00-video-options-hub) |
+| **Video & FFmpeg** | **`createVideo`**, discovery, transcode, **`addTextOverlay`**, audio/SFX — FFmpeg on **`PATH`** | **[Video overview](/docs#00-video-overview)** · [Options hub](/docs#00-video-options-hub) |
+| **Video pipeline (advanced)** | **`videoPipeline()`** layer stack for editor backends | **[Video (advanced)](/docs#00-video-advanced-hub)** · [Pipeline](/docs#01-video-pipeline) |
+| **Procedural audio (advanced)** | **`createAudio`** — presets, sequences, compose; no sound files | **[Audio (advanced)](/docs#00-audio-advanced-hub)** · [`createAudio`](/docs#01-create-audio) |
 | **Raster · batch · save · output · `painter.image`** | **`pixels`**, **`path2d`**, **`detect`**, **`batch`** **`/`** **`chain`**, **`save`**, **`outPut`**, **`image.*`** | **[Raster, batch & output](/docs#00-raster-batch-output-overview)** |
 | **Templates · assets · components · plugins** (**5.4+**) | **`createTemplate`**, **`painter.assets`**, **`prepareForRender`**, **`$`** toggles on paints, **`painter.components`**, **`painter.plugins`**, **`painter.use`** | **[Composition hub](/docs#00-composition-hub)** · [Scene overview](/docs#00-scene-composition) |
 
@@ -29,7 +31,7 @@ You already learned **`ApexPainter`** on **[Start here](/docs#00-start-here)**. 
 2. **[Canvas](/docs#00-create-canvas-overview)** — almost everything draws onto a canvas you create first.
 3. Pick **one** of Images, Text, or GIF next (whatever matches your project).
 4. Add **Recipes** (**[philosophy](/docs#02-philosophy-goals-and-when-to-use)**, **[what you can build](/docs#01-what-you-can-build)**) when you need outcome framing **`/`** **`recipe-*`** snippets.
-5. Add **Lines**, **Charts**, **Video**, **[Raster / batch / save](/docs#00-raster-batch-output-overview)**, or **Composition** (templates · assets · **[hub](/docs#00-composition-hub)**) when you need that capability.
+5. Add **Lines**, **Charts**, **[Video](/docs#00-video-overview)**, **[Raster / batch / save](/docs#00-raster-batch-output-overview)**, or **Advanced** ([Composition](/docs#00-composition-hub) · [Scene](/docs#00-scene-composition) · [Video pipeline](/docs#01-video-pipeline) · [`createAudio`](/docs#01-create-audio)) when you need that capability.
 
 ---
 
@@ -39,7 +41,7 @@ You already learned **`ApexPainter`** on **[Start here](/docs#00-start-here)**. 
 |--------|-----|----------|
 | **Recipes & ideas** | [Recipes](/docs#00-recipes-overview) · [Philosophy](/docs#02-philosophy-goals-and-when-to-use) · [What you can build](/docs#01-what-you-can-build) | Outcomes, **`recipe-*`**, catalog → guides. |
 | **Types & source** | **[Docs README](/docs#readme)** (**TypeScript signatures & types**) · [Internals](/docs#00-internals-overview) | Where **`lib-next`** implementations live. |
-| **Advanced · Scene · Composition** | [Advanced](/docs#00-advanced-overview) · [Scene](/docs#00-scene-composition) · [Composition hub](/docs#00-composition-hub) | Layer graphs, GIF/video exports, templates & **`$`** assets. |
+| **Advanced · Scene · Composition · Video · Audio** | [Advanced](/docs#00-advanced-overview) · [Scene](/docs#00-scene-composition) · [Composition](/docs#00-composition-hub) · [Video](/docs#00-video-advanced-hub) · [Audio](/docs#00-audio-advanced-hub) | Layer graphs, **`videoPipeline`**, **`createAudio`**, templates & **`$`** assets. |
 | **Internals · contributing** | [Internals](/docs#00-internals-overview) · [Contributing](/docs#00-contributing-overview) | Maintainer notes — prefer product docs above for everyday use. |
 
 Full topic index: **[Feature guides hub](/docs#feature-guides-hub)**.

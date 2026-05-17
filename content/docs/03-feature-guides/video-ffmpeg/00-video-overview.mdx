@@ -1,10 +1,12 @@
 # Video & FFmpeg (`createVideo`) — overview {#00-video-overview}
 
-**`await painter.createVideo(options[, painterOpts])`** routes FFmpeg/ffprobe-backed work: probe clips, extract frames (single, timed lists, intervals, full dumps), thumbnails and previews, transcode and compress, trim and timeline edits, geometry (`rotate`, `crop`), audio extraction and mixes, filters and colour (`applyEffects`, `colorCorrect`, `applyLUT`), watermarks and fades, raster text (`addText`, `addAnimatedText`), compositing (`merge`, `splitScreen`, `pictureInPicture`, `createFromFrames`, `createLoop`), scene detection, stabilization, transitions, batched pipelines, optional **`onProgress`** on branches that forward it (see **[Progress](/docs#11-on-progress)**).
+**`await painter.createVideo(options[, painterOpts])`** is the main entry for FFmpeg/ffprobe work: probe clips, extract frames, transcode, trim, audio mixes, **`addTextOverlay`**, compositing, and more.
 
-**Requirements:** **`ffmpeg`** and **`ffprobe`** on **`PATH`**; missing binaries throw an install hint. **`Buffer`** and **`http(s)`** sources are staged through temp files where FFmpeg needs paths (**more:** [Imperative helpers](/docs#08-imperative-video-helpers)).
+**Multi-step editor workflows** (trim → splice → captions → audio in one stack) live under **[Advanced → Video pipeline](/docs#01-video-pipeline)** — not in this feature guide.
 
-**Implementation:** **`VideoCreator.createVideo`** in **`lib-next/video/video-creator.ts`**, wired via **`VideoStack`** (**`lib-next/video/video-stack.ts`**) into **`VideoHelpers`** (**`lib-next/video/video-helpers.ts`**).
+**Requirements:** **`ffmpeg`** and **`ffprobe`** on **`PATH`**. **`Buffer`** and **`http(s)`** sources are staged to temp files when required (**more:** [Imperative helpers](/docs#08-imperative-video-helpers)).
+
+**Low-level stack:** **`painter.video`** — **`getVideoInfo`**, frame extract helpers, and **`videoPipeline()`** ([advanced](/docs#00-video-advanced-hub)).
 
 ---
 
@@ -20,7 +22,7 @@ When **`painterOpts.resolveAssetRefs`** is **`true`**, **`options`** is passed t
 
 ## One operation per call (router)
 
-Design for **exactly one** operation key in **`options`** besides **`source`** (and **`onProgress`** when used). **`VideoCreator.createVideo`** is a linear **`if`** chain: **the first truthy branch wins**; later keys are ignored. For example **`getInfo`** is checked **before** **`extractFrame`**, **`convert`**, **`trim`**, **`merge`**, **`createFromFrames`**, **`detectFormat`**, **`exportPreset`**, **`addAnimatedText`**, and so on—**`detectFormat`** is **late** in the chain, **after** **`createFromFrames`**. Full order is defined in **`lib-next/video/video-creator.ts`**. The **[options reference card](/docs#07-video-creation-options-matrix)** maps each key to its deep-dive page.
+Design for **exactly one** operation key in **`options`** besides **`source`** (and **`onProgress`** when used). **`VideoCreator.createVideo`** is a linear **`if`** chain: **the first truthy branch wins**; later keys are ignored. For example **`getInfo`** is checked **before** **`extractFrame`**, **`convert`**, **`trim`**, **`merge`**, **`createFromFrames`**, **`detectFormat`**, **`exportPreset`**, **`addTextOverlay`**, and so on—**`detectFormat`** is **late** in the chain, **after** **`createFromFrames`**. The **[options reference card](/docs#07-video-creation-options-matrix)** maps each key to its deep-dive page.
 
 Some operations ignore top-level **`source`** (they use their own paths or **`videos`** arrays)—the type still requires **`source`**; tutorials call that out (**`merge`**, **`splitScreen`**, **`batch`**, …).
 
@@ -32,7 +34,7 @@ Some operations ignore top-level **`source`** (they use their own paths or **`vi
 |-------|--------|
 | [Metadata, frames & discovery](/docs#01-metadata-and-frames) | **`getInfo`**, **`detectFormat`**, **`extractFrame`**, **`extractFrames`**, **`extractAllFrames`**, thumbnails, previews, scene detection |
 | [Transcode, trim & geometry](/docs#02-transcode-trim-transform) | **`convert`**, **`compress`**, **`trim`**, **`rotate`**, **`crop`**, **`changeSpeed`**, … |
-| [Audio tracks](/docs#03-audio) | **`extractAudio`**, **`removeAudio`**, **`mute`**, **`mixAudio`**, **`adjustVolume`** (**`normalizeAudio`**: [Audio deep-dive](/docs#06-audio-deep-dive)) |
+| [Audio tracks](/docs#03-audio) | **`extractAudio`**, **`removeAudio`**, **`mute`**, **`mixAudio`**, **`adjustVolume`** (**`normalizeAudio`**: [Video audio](/docs#06-audio-deep-dive)) |
 | [Effects, colour & overlays](/docs#04-effects-overlays) | **`applyEffects`**, **`colorCorrect`**, **`applyLUT`**, **`addWatermark`**, **`addFade`** |
 | [Compose, PiP & frame builds](/docs#05-compose-and-build) | **`merge`**, **`splitScreen`**, **`pictureInPicture`**, **`createFromFrames`**, **`createLoop`** |
 | [Presets, transitions, stabilize & batch](/docs#06-advanced-presets-transitions) | **`exportPreset`**, **`stabilize`**, **`addTransition`**, **`batch`**, **`onProgress`** examples |
@@ -43,7 +45,9 @@ Some operations ignore top-level **`source`** (they use their own paths or **`vi
 
 ## Option-by-option manuals (`options/`)
 
-For **every flag** with behaviour notes and examples, start at the **[Video options hub](/docs#00-video-options-hub)** (`video-ffmpeg/options/`): discovery, frames, transcode, timeline, geometry, audio (including **`normalizeAudio`** and **`mixAudio`**), visuals, text, compositing, transitions, stabilize, **`batch`**, and **`onProgress`**.
+For **every `createVideo` flag**, start at the **[Video options hub](/docs#00-video-options-hub)**: discovery, frames, transcode, timeline, geometry, audio, visuals, **`addTextOverlay`**, compositing, transitions, stabilize, **`batch`**, and **`onProgress`**.
+
+**Editor / multi-step edits:** [Video pipeline (advanced)](/docs#01-video-pipeline). **Procedural SFX:** [Advanced → `createAudio`](/docs#01-create-audio) — pair with **`mixAudio`** or pipeline **`.audio()`**.
 
 ---
 
@@ -53,8 +57,15 @@ For **every flag** with behaviour notes and examples, start at the **[Video opti
 
 ---
 
-## Types
+## Types (package exports)
 
-**`VideoCreationOptions`**, **`MixAudioOperation`**, and **`MixAudioOverlayClip`** live in **`lib-next/video/video-creator.ts`** and are re-exported via **`lib-next/video/video-stack.ts`** and **`lib-next/video/video-types.ts`**.
+| Area | Types |
+|------|--------|
+| **`createVideo`** | **`VideoCreationOptions`**, **`MixAudioOperation`**, **`MixAudioOverlayClip`** |
+| **`addTextOverlay`** | **`VideoTextOverlayClip`**, **`VideoTextOverlayOperation`**, **`VideoTextTransition`** |
+| **`videoPipeline`** | **`VideoPipelineLayer`**, **`VideoPipelineAudioTrack`**, **`VideoPipelineSnapshot`** |
+| **`createAudio`** | **`SynthPresetName`**, **`SynthSoundOptions`**, … — [Advanced](/docs#01-create-audio) |
+
+Import from **`apexify.js`** or **`apexify.js/types`**.
 
 ---

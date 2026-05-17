@@ -1,79 +1,185 @@
-# Text overlays (`drawtext`) {#08-text-overlays}
+# Text overlays on video {#08-text-overlays}
 
+Burn captions and titles onto video on a **timeline**. Apexify offers two tiers:
 
-Uses FFmpeg **`drawtext`**. **Requires** a font FFmpeg can find on your OS/build.
+| API | Styling | When to use |
+|-----|---------|-------------|
+| **`addTextOverlay`** (recommended) | Full **`TextProperties`** — same as **`createText`** | Product UI, brand type, gradients, glow, wrap, curved text |
+| **`addText`** / **`addAnimatedText`** (legacy) | FFmpeg **`drawtext`** only | Quick labels; **deprecated** |
+
+**Pipeline:** **`videoPipeline().text(...)`** uses the **same overlay types** as **`addTextOverlay`** — best when combined with trim/splice/audio ([Advanced → Video pipeline](/docs#01-video-pipeline)).
 
 ---
 
-## `addText`
+## `addTextOverlay` — `createText` on video
 
-**What it does:** Burns in **static** caption text with optional **boxed** background.
+**What it does:**
 
-### Options
+1. Renders each overlay with the **canvas text engine** (identical styling path to **`painter.createText`**).
+2. Composites **transparent PNGs** over the video with FFmpeg **`overlay`**.
+3. Applies **enter/exit** motion via filter expressions (**`fade`**, **slide**, **zoom**, …).
+
+**When to use:** Any time subtitle/caption look must **match** generated images, cards, or scenes.
+
+### Per-overlay fields
+
+Besides normal **`TextProperties`** (**`text`**, **`x`**, **`y`**, **`font`**, **`fill`**, **`effects`**, **`decorations`**, **`layout`**, **`placement`**, **`stroke`**, **`textOnCurve`**, …):
+
+| Field | Required | Effect |
+|-------|----------|--------|
+| **`startTime`** | ✓ | Seconds when overlay **appears**. |
+| **`endTime`** | ✓ | Seconds when overlay **hides**. |
+| **`transitionIn`** | — | Enter preset or **`custom`** expressions. |
+| **`transitionOut`** | — | Exit preset or **`custom`** expressions. |
+| **`overlayOpacity`** | — | Master 0–1 (default **1**), multiplied with transition fades. |
+
+### Transitions
+
+**Presets:** **`fade`**, **`fadeIn`**, **`fadeOut`**, **`slideLeft`**, **`slideRight`**, **`slideUp`**, **`slideDown`**, **`slideIn`**, **`slideOut`**, **`zoomIn`**, **`zoomOut`**, **`bounce`**.
+
+**`transitionIn.custom` / `transitionOut.custom`** (advanced):
+
+| Key | FFmpeg role |
+|-----|-------------|
+| **`x`**, **`y`** | Position expressions (`t` = seconds). |
+| **`alpha`** | Layer opacity 0–1. |
+| **`scale`** | Layer scale multiplier. |
+
+**`typewriter`** is listed for forward compatibility; true per-glyph typing needs a frame pipeline — today it behaves like a timed fade unless you customize.
+
+### Multiple overlays at once
+
+Pass several objects in **`overlays[]`**. Overlapping **`startTime`–`endTime`** windows are allowed — use different **`x`** / **`y`**. **Later** array entries stack **above** earlier ones.
+
+### Example — styled caption
+
+```typescript
+await painter.createVideo({
+  source: './talk.mp4',
+  addTextOverlay: {
+    outputPath: './talk-captioned.mp4',
+    overlays: [
+      {
+        text: 'Key takeaway',
+        x: 64,
+        y: 900,
+        startTime: 4,
+        endTime: 12,
+        font: { size: 40, family: 'Arial' },
+        decorations: { bold: true },
+        fill: { color: '#ffffff' },
+        effects: {
+          shadow: {
+            color: 'rgba(0,0,0,0.55)',
+            offsetX: 0,
+            offsetY: 4,
+            blur: 14,
+          },
+        },
+        layout: { maxWidth: 920 },
+        transitionIn: { type: 'slideLeft', duration: 0.35 },
+        transitionOut: { type: 'fade', duration: 0.25 },
+      },
+    ],
+  },
+});
+```
+
+### Example — gradient + two lines same window
+
+```typescript
+await painter.createVideo({
+  source: './promo.mp4',
+  addTextOverlay: {
+    outputPath: './promo-titled.mp4',
+    overlays: [
+      {
+        text: 'NEW',
+        x: 48,
+        y: 120,
+        startTime: 0.5,
+        endTime: 5,
+        font: { size: 28, family: 'Arial' },
+        fill: { color: '#fbbf24' },
+      },
+      {
+        text: 'Summer drop',
+        x: 48,
+        y: 170,
+        startTime: 0.5,
+        endTime: 5,
+        font: { size: 56, family: 'Arial' },
+        decorations: { bold: true },
+        fill: {
+          gradient: {
+            type: 'linear',
+            colors: [
+              { stop: 0, color: '#ffffff' },
+              { stop: 1, color: '#e2e8f0' },
+            ],
+          },
+        },
+        transitionIn: { type: 'fade', duration: 0.4 },
+      },
+    ],
+  },
+});
+```
+
+**Note:** **`addTextOverlay`** **re-encodes** video (**H.264**). Plan for CPU time on long 4K clips.
+
+---
+
+## Legacy: `addText` (deprecated)
+
+Uses FFmpeg **`drawtext`** only — preset positions, solid **`fontColor`**, boxed background. **No** gradients, glow, or wrap parity.
+
+**When (if ever):** Tiny server without canvas text deps — prefer **`addTextOverlay`** in current releases.
 
 | Field | Default | Effect |
 |-------|---------|--------|
-| **`text`** | ✓ | Shown string — **`:`** and **`'`** escaped for filter syntax. |
-| **`position`** | **`bottom-center`** | **`top-left`**, **`top-center`**, **`top-right`**, **`center`**, **`bottom-left`**, **`bottom-center`**, **`bottom-right`**. |
-| **`fontSize`** | **24** | Pixel size. |
-| **`fontColor`** | **`white`** | FFmpeg colour string. |
-| **`backgroundColor`** | **`black@0.5`** | **`drawtext` box** fill with alpha. |
-| **`startTime`**, **`endTime`** | omit = always | **`enable='between(t,start,end)'`** — hide outside window. |
-| **`outputPath`** | ✓ | |
+| **`text`** | ✓ | Caption string. |
+| **`position`** | **`bottom-center`** | Named anchors only — **not** free **`x,y`**. |
+| **`fontSize`**, **`fontColor`**, **`backgroundColor`** | basic | FFmpeg styling. |
+| **`startTime`**, **`endTime`** | always on | Visibility window. |
 
 ```typescript
 await painter.createVideo({
   source: './demo.mp4',
   addText: {
-    text: 'Confidential — internal only',
-    position: 'top-center',
-    fontSize: 22,
-    fontColor: 'yellow',
-    backgroundColor: 'black@0.6',
+    text: 'DRAFT',
+    position: 'top-right',
+    fontSize: 20,
     startTime: 0,
-    endTime: 8,
-    outputPath: './demo-labelled.mp4',
+    endTime: 999,
+    outputPath: './demo-draft.mp4',
   },
 });
 ```
 
 ---
 
-## `addAnimatedText`
+## Legacy: `addAnimatedText` (deprecated)
 
-**What it does:** Same **`drawtext`** baseline, but **`enable=between(start,end)`** always; optional **expression** fragments for motion/fade.
+**`drawtext`** with optional **`fade`** or **`slide`** expression motion. TypeScript lists many animation names; only **`fade`** and **`slide`** add motion filters today.
 
-### **`animation`** — types vs implementation
+**`{ x, y }`** position is supported. **`fontPath`** fields are reserved (not wired).
 
-The TypeScript union lists **`fadeIn`**, **`slideIn`**, etc. **`addAnimatedTextToVideo`** only adds extra filter math when **`animation`** is exactly **`fade`** or **`slide`**. Other values still show text **statically** in the time window.
+Prefer **`addTextOverlay`** with **`transitionIn`** / **`transitionOut`**.
 
-**Use today:** **`fade`** or **`slide`** for motion; omit/`none` for plain timed text.
+---
 
-### Position
-
-Either a **named** anchor (same names as **`addText`**) **or** **`{ x, y }`** pixel coords.
-
-### Font fields
-
-**`fontPath`**, **`fontName`**, **`fontFamily`** — **not wired** into **`drawtext`** in current helper (reserved).
+## Choose an API (summary)
 
 ```typescript
-await painter.createVideo({
-  source: './promo.mp4',
-  addAnimatedText: {
-    text: 'Summer Sale',
-    animation: 'fade',
-    startTime: 1,
-    endTime: 6,
-    position: 'center',
-    fontSize: 48,
-    fontColor: 'white',
-    backgroundColor: 'red@0.45',
-    outputPath: './promo-titled.mp4',
-  },
-  onProgress: (p) => console.log(p.percent),
-});
+// ✅ Editor / brand / multi-caption
+await painter.videoPipeline(src).text([...]).render({ outputPath });
+
+// ✅ Single-pass captions on existing file
+await painter.createVideo({ source: src, addTextOverlay: { overlays: [...], outputPath } });
+
+// ⚠️ Legacy simple burned text only
+await painter.createVideo({ source: src, addText: { ... } });
 ```
 
 ---
-

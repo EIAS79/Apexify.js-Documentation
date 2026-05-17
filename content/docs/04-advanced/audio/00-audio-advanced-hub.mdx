@@ -1,0 +1,59 @@
+# Audio — advanced workflows {#00-audio-advanced-hub}
+
+**Procedural SFX** with **`painter.createAudio`** — WAV **`Buffer`s** on the server without sound files. Pair with video muxing or use standalone (games, bots, notifications).
+
+**FFmpeg audio on video** (`extractAudio`, `mixAudio`, `normalizeAudio`, …) stays in the **[Video & FFmpeg feature guide](/docs#00-video-overview)** — those are **`createVideo`** keys, not synthesis.
+
+---
+
+## Reading order
+
+| Chapter | Topic |
+|---------|--------|
+| [01 — `createAudio`](/docs#01-create-audio) | Presets, **`synth`**, **`sequence`**, **`compose`**, **`mix`**, **`save`** |
+| [Video pipeline](/docs#01-video-pipeline) | **`videoPipeline().audio()`** — file + **`preset`** / **`sequence`** / **`wav`** tracks |
+| [Video audio (FFmpeg)](/docs#06-audio-deep-dive) | **`mixAudio`**, **`normalizeAudio`**, strip/mute/duck on **`createVideo`** |
+
+---
+
+## When to use which API
+
+| Goal | API |
+|------|-----|
+| **Generate** laser/coin/UI bleeps in code | **`painter.createAudio`** |
+| **Mux** music or WAV onto one video file | **`createVideo({ mixAudio })`** — [Video audio (FFmpeg)](/docs#06-audio-deep-dive) |
+| **Editor** stack (trim + SFX + bed) | **`videoPipeline().audio([...])`** — [Video pipeline](/docs#01-video-pipeline) |
+| **Only** demux / normalize / strip existing soundtrack | **`createVideo`** — no **`createAudio`** needed |
+
+**No FFmpeg required** for **`createAudio`** itself (PCM → WAV). **Muxing onto video** needs **`ffmpeg`** on **`PATH`**.
+
+---
+
+## Quick start
+
+```typescript
+const painter = new ApexPainter({ type: 'buffer' });
+
+const coin = painter.createAudio.preset('coin');
+await painter.createAudio.save(coin, './coin.wav');
+
+const levelComplete = painter.createAudio.sequence({
+  events: [
+    { at: 0, preset: 'success' },
+    { at: 0.2, preset: 'coin', gain: 0.9 },
+    { at: 0.35, preset: 'powerup' },
+  ],
+  tail: 0.15,
+});
+
+await painter.createVideo({
+  source: './gameplay.mp4',
+  mixAudio: {
+    outputPath: './gameplay-sfx.mp4',
+    keepOriginalAudio: false,
+    overlays: [{ source: levelComplete, startTime: 0 }],
+  },
+});
+```
+
+---

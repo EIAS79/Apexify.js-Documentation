@@ -1,0 +1,32 @@
+# Video — advanced workflows {#00-video-advanced-hub}
+
+Cross-cutting video topics: **multi-step edits** for editor backends, and how they relate to **Scene → video** export.
+
+**Prerequisites:** FFmpeg/ffprobe on **`PATH`**. For single-operation APIs (probe, trim, one `mixAudio`, …), see the **[Video & FFmpeg feature guide](/docs#00-video-overview)** and **[options hub](/docs#00-video-options-hub)**.
+
+---
+
+## Reading order
+
+| Chapter | Topic |
+|---------|--------|
+| [01 — Video pipeline](/docs#01-video-pipeline) | **`videoPipeline()`** layer stack (trim, splice, text, audio) |
+| [`createAudio`](/docs#01-create-audio) | Procedural WAV for pipeline / **`mixAudio`** |
+| [Video audio (FFmpeg)](/docs#06-audio-deep-dive) | **`mixAudio`**, normalize, strip — **`createVideo`** |
+| [Render scene to video](/docs#08-render-scene-to-video) | **`renderSceneToVideoFrames`** — composed PNG + frame slots |
+| [Video overview](/docs#00-video-overview) | **`createVideo`** one-op router, frames, transcode |
+
+**Related composition:** [Templates](/docs#02-templates) · [Named assets](/docs#01-named-assets) · [Scene overview](/docs#00-scene-composition)
+
+---
+
+## When to use which API
+
+| Goal | API |
+|------|-----|
+| **Video editor**, saved edit JSON, server render farm | **`videoPipeline()`** |
+| **One** FFmpeg operation | **`createVideo({ … })`** |
+| **Designed in Scene**, then encode | **`renderSceneToVideoFrames`** |
+| **Generated** frames (`animate`) | **`animate`** → **`createFromFrames`** or pipeline |
+
+---

@@ -2,6 +2,8 @@
 
 **`await painter.createText(textPropsOrArray, canvasBuffer[, painterOpts])`** draws styled Unicode strings onto an existing PNG **`canvasBuffer`** (from **`createCanvas`**, **`createImage`**, etc.). Each call returns a **new** **`Buffer`**.
 
+**On video:** the same **`TextProperties`** shape powers **`createVideo({ addTextOverlay })`** and **`videoPipeline().text()`** — see [Text overlays](/docs#08-text-overlays) and [Video pipeline](/docs#01-video-pipeline).
+
 The runtime pipeline is **`TextCreator`** → **`EnhancedTextRenderer.renderText`** (`lib-next/text/`).
 
 ---

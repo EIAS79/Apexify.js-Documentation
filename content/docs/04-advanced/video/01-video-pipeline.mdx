@@ -1,0 +1,206 @@
+# Video pipeline (`videoPipeline`) {#01-video-pipeline}
+
+**`painter.videoPipeline(source?)`** is the **recommended** API when you combine **several** video steps (trim, splice B-roll, captions, music, procedural SFX). It uses a **layer stack** — similar in spirit to **`SceneBuilder`** and **composition templates** — instead of chaining many **`createVideo`** calls that each write a new file and re-encode.
+
+**Also on:** **`painter.video.videoPipeline()`** (same **`VideoStack`** entry).
+
+**Basics (single ops):** [Video overview](/docs#00-video-overview) · [Timeline](/docs#04-timeline-edits) · [Text overlays](/docs#08-text-overlays) · [Video audio](/docs#06-audio-deep-dive) · [`createAudio`](/docs#01-create-audio)
+
+---
+
+## When to use what
+
+| Situation | API |
+|-----------|-----|
+| Building a **video editor**, server render farm, or **saved edit JSON** | **`videoPipeline()`** |
+| **One** FFmpeg job (probe, trim only, single `mixAudio`, …) | **`createVideo({ … })`** |
+| **Generated** motion (gameplay, `animate`, scenes) | **`animate`** / **`renderSceneToVideoFrames`** → then pipeline or **`mixAudio`** |
+| Rich captions matching **`createText`** | **`addTextOverlay`** or **`pipeline.text()`** |
+| Procedural SFX (no sound files) | **`painter.createAudio`** + **`pipeline.audio()`** or **`mixAudio`** |
+
+**Requirements:** Same as **`createVideo`** — **`ffmpeg`** and **`ffprobe`** on **`PATH`**.
+
+---
+
+## Layer stack model
+
+Each call on the pipeline **adds or updates** a layer:
+
+| Layer kind | Builder method | Purpose |
+|------------|----------------|---------|
+| **`source`** | `.source(path \| Buffer, id?)` | Input video (required once). |
+| **`trim`** | `.trim(start, end, id?)` | Keep only **`[startTime, endTime]`** on the timeline. |
+| **`splice`** | `.splice({ targetStartTime, targetEndTime, replacementVideo, … }, id?)` | Replace a range with another clip or frame sequence. |
+| **`text`** | `.text(overlay \| overlays[], id?)` | Timed captions — **same types as `createText`**. |
+| **`audio`** | `.audio(tracks[], { keepOriginalAudio, … }, id?)` | File music/SFX **and** procedural **`createAudio`** tracks. |
+
+### Layer `id` — avoid duplicates
+
+- **Same `id`** on a **trim** / **splice** / **source** layer → **replaces** the previous layer with that id (good for editor undo/redo).
+- **Same `id`** on **`text`** or **`audio`** → **merges** overlays or tracks into one layer (append).
+- Pass **`{ replace: true }`** on **`pushLayer`** if you need to overwrite instead of merge (advanced).
+
+---
+
+## Full example — trim, B-roll, titles, music + synth SFX
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter({ type: 'buffer' });
+
+const result = await painter
+  .videoPipeline('./uploads/user-clip.mp4')
+  .trim(0, 60, 'trim')
+  .splice(
+    {
+      targetStartTime: 10,
+      targetEndTime: 15,
+      replacementVideo: './uploads/b-roll.mp4',
+      replacementStartTime: 0,
+      replacementDuration: 5,
+    },
+    'broll'
+  )
+  .text(
+    [
+      {
+        text: 'Before B-roll',
+        x: 48,
+        y: 80,
+        startTime: 0,
+        endTime: 10,
+        font: { size: 42, family: 'Arial' },
+        decorations: { bold: true },
+        fill: { color: '#ffffff' },
+        effects: {
+          shadow: { color: 'rgba(0,0,0,0.5)', offsetY: 3, blur: 8 },
+        },
+        transitionIn: { type: 'fade', duration: 0.3 },
+      },
+      {
+        text: 'B-roll',
+        x: 48,
+        y: 80,
+        startTime: 10,
+        endTime: 15,
+        font: { size: 42, family: 'Arial' },
+        fill: { color: '#fbbf24' },
+        transitionIn: { type: 'slideLeft', duration: 0.4 },
+      },
+    ],
+    'titles'
+  )
+  .audio(
+    [
+      { type: 'file', source: './music.mp3', startTime: 0, volume: 0.35 },
+      { type: 'preset', preset: 'whoosh', startTime: 9.8, gain: 1.1 },
+    ],
+    { keepOriginalAudio: true, originalVolume: 0.85 },
+    'sound'
+  )
+  .render({ outputPath: './out/final.mp4' });
+
+console.log('Done:', result.outputPath, 'passes:', result.passes);
+```
+
+**`result.passes`** reports how many internal FFmpeg stages ran. The pipeline **reduces** round-trips vs manually chaining **`createVideo`**; a future compiler may lower this further with a single filter graph.
+
+---
+
+## Text layers — `createText` parity
+
+**`.text()`** accepts **`VideoTextOverlayClip`**: every **`TextProperties`** field (**`font`**, **`fill`**, **`effects`**, **`layout`**, **`placement`**, **`stroke`**, curved text, …) plus:
+
+| Field | Meaning |
+|-------|---------|
+| **`startTime`**, **`endTime`** | Visible window (seconds) on the **current** timeline. |
+| **`transitionIn`**, **`transitionOut`** | **`fade`**, **`slideLeft`**, **`zoomIn`**, … or **`custom`** FFmpeg expressions. |
+| **`overlayOpacity`** | Master 0–1 multiplier (separate from glyph **`fill.opacity`**). |
+
+**Multiple overlays** may share the **same time range** at different **`x`** / **`y`**. Later items in the array paint **on top**.
+
+**Single-op equivalent:** [Text overlays](/docs#08-text-overlays) (**`addTextOverlay`** on **`createVideo`**).
+
+---
+
+## Audio layers — files + `createAudio`
+
+**`.audio(tracks, options?, id?)`** merges:
+
+| Track `type` | Purpose |
+|--------------|---------|
+| **`file`** | Path, URL, or **Buffer** (same as **`mixAudio` overlays**). |
+| **`preset`** | **`createAudio`** preset name at **`startTime`**. |
+| **`synth`** | Custom **`SynthSoundOptions`** at **`startTime`**. |
+| **`sequence`** | Event timeline; placed at **`startTime`** on the video. |
+| **`wav`** | Pre-built **Buffer** (e.g. from **`painter.createAudio.preset()`**). |
+
+Top-level audio options mirror **`mixAudio`**: **`keepOriginalAudio`**, **`originalVolume`**, **`originalSpeed`**, **`originalPitchSemitones`**.
+
+```typescript
+pipeline.audio(
+  [
+    { type: 'file', source: './bed.mp3', startTime: 0, volume: 0.3 },
+    { type: 'preset', preset: 'coin', startTime: 2.5, gain: 0.9 },
+    { type: 'sequence', startTime: 0, events: [{ at: 0, preset: 'laser' }, { at: 0.2, preset: 'explosionSmall' }] },
+  ],
+  { keepOriginalAudio: false },
+  'sfx'
+);
+```
+
+Use **`painter.createAudio`** when you only need WAV output ([full guide](/docs#01-create-audio)); mux with **`pipeline.audio()`** or **`createVideo({ mixAudio })`** ([FFmpeg audio](/docs#06-audio-deep-dive)).
+
+---
+
+## Saved projects (editors)
+
+```typescript
+const snapshot = pipeline.toJSON();
+// Persist snapshot.layers in your DB (JSON column)
+
+// Later on server:
+const restored = painter.videoPipeline(undefined, snapshot.layers);
+await restored.render({ outputPath: './export.mp4' });
+```
+
+**`id`** fields on layers map cleanly to timeline UI rows (replace vs merge rules still apply).
+
+---
+
+## `render` options
+
+```typescript
+await pipeline.render({
+  outputPath: './out/final.mp4',
+  preset: 'export', // reserved — 'preview' for future proxy renders
+  onProgress: (p) => console.log(p.percent, p.speed),
+});
+```
+
+---
+
+## vs chained `createVideo`
+
+| Chained `createVideo` | `videoPipeline` |
+|----------------------|-----------------|
+| You manage temp paths | Pipeline manages internal temps |
+| Easy to accidentally **re-encode** every step | Fewer internal **passes** |
+| One operation per call | Declarative **stack** |
+| Fine for scripts | Better for **editor backends** |
+
+You can still call **`createVideo`** for ops not on the pipeline yet (LUT, stabilize, **`batch`**, …) — export pipeline output, then run a final **`createVideo`** pass.
+
+---
+
+## Combine with Scene export
+
+Typical product flow:
+
+1. **`renderSceneToVideoFrames`** or **`animate`** for branded/generated segments.  
+2. **`videoPipeline`** to trim user uploads, splice segments, burn captions, mix **`createAudio`** SFX.
+
+See [Render scene to video](/docs#08-render-scene-to-video).
+
+---

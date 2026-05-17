@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowPathIcon,
   ArrowsPointingOutIcon,
@@ -10,6 +10,28 @@ import {
 
 function clampZoom(z: number) {
   return Math.min(4, Math.max(0.25, Math.round(z * 100) / 100));
+}
+
+/** Scale so the full image fits inside the scroll viewport (with a little inset). */
+function fitZoomForContainer(
+  naturalW: number,
+  naturalH: number,
+  containerW: number,
+  containerH: number,
+  insetPx = 12,
+): number {
+  const availW = Math.max(1, containerW - insetPx * 2);
+  const availH = Math.max(1, containerH - insetPx * 2);
+  return clampZoom(Math.min(availW / naturalW, availH / naturalH));
+}
+
+function centerScrollViewport(sc: HTMLDivElement) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      sc.scrollLeft = Math.max(0, (sc.scrollWidth - sc.clientWidth) / 2);
+      sc.scrollTop = Math.max(0, (sc.scrollHeight - sc.clientHeight) / 2);
+    });
+  });
 }
 
 /**
@@ -33,10 +55,31 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
 
   zoomRef.current = zoom;
 
+  const applyFitToView = useCallback(() => {
+    if (!natural) return;
+    const run = () => {
+      const sc = scrollRef.current;
+      if (!sc || !natural) return;
+      if (sc.clientWidth < 2 || sc.clientHeight < 2) {
+        requestAnimationFrame(run);
+        return;
+      }
+      const z = fitZoomForContainer(natural.w, natural.h, sc.clientWidth, sc.clientHeight);
+      setZoom(z);
+      centerScrollViewport(sc);
+    };
+    run();
+  }, [natural]);
+
   useEffect(() => {
-    setZoom(1);
     setNatural(null);
   }, [src]);
+
+  /** After each new run / preview URL, fit the full image in the panel. */
+  useEffect(() => {
+    if (!natural) return;
+    applyFitToView();
+  }, [natural, src, applyFitToView]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -92,7 +135,7 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
   const zoomIn = () => setZoom((z) => clampZoom(z + 0.25));
   const zoomOut = () => setZoom((z) => clampZoom(z - 0.25));
   const resetZoom = () => setZoom(1);
-  const fit = () => setZoom(1);
+  const fit = () => applyFitToView();
 
   const onDoubleClick = () => {
     setZoom((z) => (z <= 1.01 ? 2 : 1));
@@ -170,8 +213,8 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
             onClick={fit}
             className={`${btnBase} ml-0.5 border-l`}
             style={{ borderColor: 'var(--border-default)', color: 'inherit' }}
-            aria-label="Fit"
-            title="Fit"
+            aria-label="Fit image in view"
+            title="Fit image in view"
           >
             <ArrowsPointingOutIcon className="h-4 w-4" />
           </button>
