@@ -12,6 +12,7 @@ import ThemeToggle from './ThemeToggle';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { DocsSearchPalette } from './DocsSearchPalette';
 import { BrandIcon } from './Brand';
+import { apexifyVersionLabel } from '@/lib/apexify-version';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
@@ -20,7 +21,7 @@ const NAV_LINKS = [
   { href: '/docs#00-start-here', label: 'Docs' },
 ] as const;
 
-const PACKAGE_VERSION = '4';
+const PACKAGE_VERSION = apexifyVersionLabel();
 
 export default function DocHeader() {
   const pathname = usePathname();
@@ -208,7 +209,7 @@ export default function DocHeader() {
 
           {/* Version pill (desktop) */}
           <span
-            className="hidden items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold lg:inline-flex"
+            className="hidden shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold tabular-nums lg:inline-flex"
             style={{
               background: 'var(--gradient-sunset)',
               color: 'white',
