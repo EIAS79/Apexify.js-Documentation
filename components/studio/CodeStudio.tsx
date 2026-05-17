@@ -200,7 +200,7 @@ export default function CodeStudio() {
       const res = await fetch('/api/gallery/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, lang }),
+        body: JSON.stringify({ code, lang, context: 'studio' }),
       });
 
       let data: {

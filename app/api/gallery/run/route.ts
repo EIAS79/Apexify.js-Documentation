@@ -9,6 +9,8 @@ import { pathToFileURL } from 'url';
 import {
   assertSnippetAllowed,
   detectImageMime,
+  detectStudioVideoUsage,
+  studioVideoBlockedMessage,
   wrapSnippetForRunner,
 } from '@/lib/gallery/core/wrapSnippetForRunner';
 
@@ -56,7 +58,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let body: { code?: string; lang?: string };
+  let body: { code?: string; lang?: string; context?: string };
   try {
     body = await req.json();
   } catch {
@@ -65,6 +67,7 @@ export async function POST(req: NextRequest) {
 
   const code = typeof body.code === 'string' ? body.code : '';
   const lang = body.lang === 'js' ? 'js' : 'ts';
+  const context = body.context === 'studio' ? 'studio' : 'gallery';
 
   if (!code.trim()) {
     return NextResponse.json({ ok: false, error: 'Empty code' }, { status: 400 });
@@ -76,6 +79,23 @@ export async function POST(req: NextRequest) {
   const blocked = assertSnippetAllowed(code);
   if (blocked) {
     return NextResponse.json({ ok: false, error: blocked }, { status: 400 });
+  }
+
+  if (context === 'studio') {
+    const videoApis = detectStudioVideoUsage(code);
+    if (videoApis) {
+      const error = studioVideoBlockedMessage(videoApis);
+      return NextResponse.json(
+        {
+          ok: false,
+          error,
+          stderr: error,
+          elapsedMs: 0,
+          exitCode: 1,
+        },
+        { status: 422 },
+      );
+    }
   }
 
   const projectRoot = process.cwd();

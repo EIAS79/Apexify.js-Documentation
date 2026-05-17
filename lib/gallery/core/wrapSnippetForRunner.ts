@@ -8,6 +8,60 @@ export function assertSnippetAllowed(code: string): string | null {
   return null;
 }
 
+/** Strip comments so docs/examples mentioning `createVideo` do not false-positive. */
+function stripCommentsForScan(code: string): string {
+  return code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+}
+
+const STUDIO_VIDEO_CHECKS: Array<{ re: RegExp; label: string }> = [
+  { re: /\bcreateVideo\s*\(/, label: 'createVideo()' },
+  { re: /\brenderSceneToVideoFrames\s*\(/, label: 'renderSceneToVideoFrames()' },
+  { re: /\brenderSceneToVideo\b/, label: 'renderSceneToVideo' },
+  { re: /\bvideoPipeline\s*\(/, label: 'videoPipeline()' },
+  { re: /\bpainter\.video\b/, label: 'painter.video (FFmpeg router)' },
+  { re: /\bgetVideoInfo\s*\(/, label: 'getVideoInfo()' },
+  { re: /\bcreateFromFrames\s*\(/, label: 'createFromFrames()' },
+  { re: /\bextractFrames?\s*\(/i, label: 'extractFrame(s)()' },
+  { re: /\bmixAudio\s*\(/, label: 'mixAudio()' },
+  { re: /\bnormalizeAudio\s*\(/, label: 'normalizeAudio()' },
+  { re: /\bffprobe\b|\bffmpeg\b/i, label: 'FFmpeg / ffprobe' },
+];
+
+/**
+ * Studio sandbox only accepts PNG/GIF buffers — video APIs need local FFmpeg.
+ * Returns detected API names when the snippet should not run in Studio.
+ */
+export function detectStudioVideoUsage(code: string): string[] | null {
+  const scanned = stripCommentsForScan(code);
+  const detected: string[] = [];
+  for (const { re, label } of STUDIO_VIDEO_CHECKS) {
+    if (re.test(scanned)) detected.push(label);
+  }
+  return detected.length > 0 ? [...new Set(detected)] : null;
+}
+
+export function studioVideoBlockedMessage(detected: string[]): string {
+  const list = detected.map((d) => `  • ${d}`).join('\n');
+  return [
+    'Video encoding is not available in Studio.',
+    '',
+    'Why:',
+    '  Studio runs your snippet in a server sandbox. main() must return a PNG or GIF Buffer.',
+    '  Apexify video APIs rely on FFmpeg/ffprobe on the host — that',
+    '  toolchain is not installed in the Studio runner (and is unreliable on serverless).',
+    '',
+    'Detected in your code:',
+    list,
+    '',
+    'What works in Studio:',
+    '  • createCanvas, createImage, createText, renderScene, createGIF → Buffer output',
+    '',
+    'For MP4, videoPipeline, or renderSceneToVideoFrames:',
+    '  • Run the same script with Node on your machine (FFmpeg on PATH)',
+    '  • Or open pre-built video demos in the Gallery',
+  ].join('\n');
+}
+
 export function detectImageMime(buf: Buffer): string {
   if (buf.length >= 8 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) {
     return 'image/png';

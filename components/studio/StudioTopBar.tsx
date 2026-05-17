@@ -14,6 +14,7 @@ import {
   SparklesIcon,
   ViewColumnsIcon,
 } from '@heroicons/react/24/outline';
+import { BrandIcon } from '@/components/Brand';
 import ThemeToggle from '@/components/ThemeToggle';
 import {
   STUDIO_TEMPLATES,
@@ -266,23 +267,22 @@ export function StudioTopBar(props: TopBarProps) {
       <div className="flex items-center gap-2 sm:gap-3">
         <Link
           href="/"
-          className="group inline-flex shrink-0 items-center gap-2 rounded-lg px-1.5 py-1 transition-colors"
+          className="group/logo flex shrink-0 items-center gap-2.5 rounded-lg px-1.5 py-1 transition-colors"
+          aria-label="Apexify.js — home"
           title="Back to home"
         >
           <span
             aria-hidden
-            className="grid h-7 w-7 place-items-center rounded-lg font-black"
-            style={{
-              background: 'var(--gradient-sunset)',
-              color: 'white',
-              boxShadow: 'var(--glow-magenta)',
-              fontSize: '0.85rem',
-            }}
+            className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover/logo:scale-105 sm:h-9 sm:w-9"
+            style={{ boxShadow: 'var(--glow-magenta)' }}
           >
-            A
+            <BrandIcon />
           </span>
           <span className="hidden flex-col leading-tight sm:flex">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.28em]" style={{ color: 'var(--text-tertiary)' }}>
+            <span
+              className="text-[10px] font-semibold uppercase tracking-[0.28em]"
+              style={{ color: 'var(--text-tertiary)' }}
+            >
               Apexify
             </span>
             <span className="text-sm font-bold text-grad-aurora">Studio</span>
