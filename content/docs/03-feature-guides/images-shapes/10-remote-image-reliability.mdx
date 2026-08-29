@@ -1,0 +1,74 @@
+# Remote images, CDN URLs & retries {#10-remote-image-reliability}
+
+Apexify.js can render bitmap sources from **filesystem paths**, **`Buffer`** values, **base64 image data URLs**, and **HTTP(S) URLs**. The **5.4.5 remote-image hotfix** makes HTTP(S) loading more predictable and prevents a temporary CDN failure from permanently poisoning the in-process image cache.
+
+## What changed in the 5.4.5 hotfix
+
+Remote image loads used by canvas/custom-background rendering now:
+
+- use a **15 second request timeout**;
+- make up to **3 attempts** for transient failures;
+- retry **408**, **425**, **429**, **500**, **502**, **503**, and **504** responses;
+- preserve useful HTTP/network failure information instead of reducing every failure to `Failed to load image`;
+- reject empty HTTP responses before handing them to Sharp;
+- **evict rejected cache promises**, so a temporary failure can be retried on the next render;
+- detect already-expired Discord signed attachment URLs before attempting the request.
+
+`painter.image.resize(...)` and `painter.image.imgConverter(...)` use the same resilient source resolver for URL, data-URL, path, and `Buffer` inputs.
+
+## Failed requests are no longer cached forever
+
+Previously, the image cache stored the in-flight **`Promise<Image>`**. If the first request rejected, that rejected promise remained cached. Every later render of the same URL then failed immediately until the process restarted.
+
+The hotfix keeps successful request de-duplication but removes a cache entry when its promise rejects. This means a temporary CDN outage, rate limit, or network failure does not permanently break that image source inside a long-running bot or server process.
+
+## Discord attachment URLs expire
+
+Discord attachment CDN URLs can contain signed query parameters such as:
+
+```text
+?ex=...&is=...&hm=...
+```
+
+The **`ex`** value is an expiry timestamp. Once it expires, Apexify.js cannot manufacture a replacement signature. The caller must obtain a **fresh attachment URL** from Discord or use a stable image host/object-storage URL.
+
+When an already-expired Discord URL is supplied, Apexify.js now reports an error similar to:
+
+```text
+Discord attachment URL expired at 2026-08-24T11:44:22.000Z.
+Obtain a fresh attachment URL before rendering.
+```
+
+This is different from a transient `503` or timeout: an expired signed URL is not retried because retries cannot make the signature valid again.
+
+## Recommended source strategy
+
+For images that must keep working across bot restarts or for days/weeks, prefer:
+
+1. a local asset bundled with your application;
+2. your own object storage/CDN with a stable public URL;
+3. a durable image-hosting URL;
+4. a Discord attachment URL only when you can refresh it before it expires.
+
+Do not persist a signed Discord CDN URL in a database and assume it is permanent.
+
+## `customBg.inherit`
+
+The same loader is used when Apexify.js must fetch a custom background first to determine its intrinsic dimensions:
+
+```ts
+const canvas = await painter.createCanvas({
+  customBg: {
+    source: imageUrl,
+    inherit: true,
+  },
+});
+```
+
+If the first request temporarily fails, a later call can now fetch the image again instead of reusing a permanently rejected cache entry.
+
+## Custom background opacity and filters
+
+The 5.4.5 hotfix also removes a duplicate custom-background draw in the canvas compositor. A custom background is rendered **once**. Its opacity is combined with canvas opacity, and filtered backgrounds are processed on an isolated temporary canvas before being composited back onto the destination.
+
+This prevents double-rendering from unintentionally changing opacity or blending results.
