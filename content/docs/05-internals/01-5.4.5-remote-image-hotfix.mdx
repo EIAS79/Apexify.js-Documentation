@@ -1,0 +1,19 @@
+# 5.4.5 remote-image hotfix {#01-5-4-5-remote-image-hotfix}
+
+This maintenance update remains recorded under the **Apexify.js 5.4.5** release line. It addresses remote-image loading failures observed in long-running Discord bots and server deployments.
+
+## Fixed
+
+- Failed image-cache promises are evicted instead of remaining permanently rejected.
+- HTTP(S) raster sources use a 15 second timeout and up to 3 attempts for transient `408`, `425`, `429`, `500`, `502`, `503`, and `504` responses.
+- HTTP/network error context is preserved.
+- Empty remote image bodies are rejected explicitly.
+- Expired signed Discord attachment URLs are detected from their `ex` timestamp and fail with actionable guidance.
+- `painter.image.resize(...)` and `painter.image.imgConverter(...)` use the resilient URL/data-URL/path/`Buffer` resolver.
+- Custom canvas backgrounds are no longer drawn twice; custom-background opacity and filter composition are applied once.
+
+See **[Remote images, CDN URLs & retries](/docs#10-remote-image-reliability)** for usage and deployment guidance.
+
+## npm note
+
+The npm registry does **not** allow an already-published version tarball to be overwritten. `apexify.js@5.4.5` is already published, so the existing npm artifact cannot be replaced under the exact same version number. The source/docs hotfix can remain grouped under **5.4.5**, but shipping these bytes through npm requires a distinct semantic version such as `5.4.5-hotfix.1` or `5.4.6`.
