@@ -1,11 +1,15 @@
 # Install & setup {#01-install-and-setup}
 
-
 ## Requirements
 
-- **Node.js** — use an **LTS** version when possible.
-- **npm**, **pnpm**, or **yarn**.
+For **Apexify.js 6**, the supported Node.js release lines are:
+
+- **Node.js 22.x, 24.x, or 26.x**.
+- **npm 10+**, **pnpm**, or **yarn**.
 - A folder for your project.
+- **FFmpeg/ffprobe** only when you use video features.
+
+> **Release status:** Apexify.js 6.0.0 is currently staged as an unreleased package while the runtime/package release gate is completed. The npm stable version remains **5.4.5** until 6.0.0 is explicitly published. Do not assume the unpublished 6.0.0 package is available from npm yet.
 
 ---
 
@@ -19,11 +23,51 @@ npm install apexify.js
 
 ---
 
+## ESM and CommonJS
+
+Apexify.js 6 is packaged with separate native ESM and CommonJS runtime entrypoints. The supported package-root runtime export is **`ApexPainter`**.
+
+### ESM
+
+```javascript
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter({ type: 'buffer' });
+```
+
+### CommonJS
+
+```javascript
+const { ApexPainter } = require('apexify.js');
+
+const painter = new ApexPainter({ type: 'buffer' });
+```
+
+The `apexify.js/types` subpath is **type-only**. Use it for advanced TypeScript imports; do not `import()` or `require()` it at runtime.
+
+---
+
 ## TypeScript (optional)
 
 ```bash
 npm install -D typescript @types/node tsx
 npx tsc --init
+```
+
+For the Apexify.js 6 runtime baseline, use Node 22-compatible or newer Node type definitions.
+
+```typescript
+import { ApexPainter } from 'apexify.js';
+import type { CanvasConfig } from 'apexify.js';
+import type { VideoPipelineLayer } from 'apexify.js/types';
+
+const painter = new ApexPainter({ type: 'buffer' });
+const canvas: CanvasConfig = { width: 100, height: 100 };
+let layer!: VideoPipelineLayer;
+
+void painter;
+void canvas;
+void layer;
 ```
 
 Run scripts with **`npx tsx your-file.ts`** or compile then **`node dist/your-file.js`**.
@@ -36,6 +80,7 @@ Video frame backgrounds (**`videoBg`**) and **`createVideo`** need **ffmpeg** an
 
 - Windows: install FFmpeg and add its **`bin`** folder to environment variables.
 - macOS: **`brew install ffmpeg`**
+- Ubuntu/Debian: **`sudo apt-get install ffmpeg`**
 
 If FFmpeg is missing, video calls fail with a clear **not found** error.
 
@@ -49,7 +94,7 @@ Create **`hello.ts`**:
 import { ApexPainter } from 'apexify.js';
 
 async function main() {
-  const painter = new ApexPainter();
+  const painter = new ApexPainter({ type: 'buffer' });
   const { buffer } = await painter.createCanvas({
     width: 100,
     height: 100,
