@@ -6,6 +6,7 @@ on:
       - reengineering/phase-2-runtime-docs
     paths:
       - .github/workflows/phase-2-docs-lock.yml
+      - package.json
 
 permissions:
   contents: write
@@ -32,7 +33,7 @@ jobs:
           git add package-lock.json
           git diff --cached --check
           if ! git diff --cached --quiet; then
-            git commit -m "chore(runtime): lock docs to Phase 2 source"
+            git commit -m "chore(runtime): lock docs to final Phase 2 source"
             git push origin HEAD:reengineering/phase-2-runtime-docs
           fi
       - name: Install locked graph with normal lifecycle
