@@ -4,8 +4,10 @@
   "private": true,
   "author": "zenith-79",
   "engines": {
-    "node": "20.x"
+    "node": "22.x || 24.x || 26.x",
+    "npm": ">=10"
   },
+  "packageManager": "npm@11.19.1",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -34,7 +36,7 @@
     "tsx": "^4.19.2"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
+    "@types/node": "^22.20.1",
     "@types/react": "^18.2.0",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.33",
