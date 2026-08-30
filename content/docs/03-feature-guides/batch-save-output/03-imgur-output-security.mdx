@@ -1,0 +1,56 @@
+# Imgur output credentials & security {#03-imgur-output-security}
+
+`painter.output.url(buffer[, credentials])` uploads a PNG buffer to Imgur and returns the public image URL.
+
+Apexify.js does **not** contain built-in Imgur credentials. You must configure the integration explicitly.
+
+## Option 1: environment variables
+
+Configure all four values in the process environment:
+
+```bash
+IMGUR_CLIENT_ID=your_client_id
+IMGUR_CLIENT_SECRET=your_client_secret
+IMGUR_ACCESS_TOKEN=your_access_token
+IMGUR_REFRESH_TOKEN=your_refresh_token
+```
+
+Then call:
+
+```ts
+const publicUrl = await painter.output.url(buffer);
+```
+
+Use your deployment platform's secret manager or encrypted environment configuration. Do not commit real values to `.env`, examples, source files, CI logs, or documentation.
+
+## Option 2: explicit credentials
+
+You can pass credentials directly for applications that obtain them from a secret manager at runtime:
+
+```ts
+const publicUrl = await painter.output.url(buffer, {
+  clientId,
+  clientSecret,
+  accessToken,
+  refreshToken,
+});
+```
+
+Explicit values override environment values for the fields you provide. Apexify.js validates that all required credentials are present before creating the Imgur client and does not log their values.
+
+## Required fields
+
+The integration requires:
+
+- `clientId`
+- `clientSecret`
+- `accessToken`
+- `refreshToken`
+
+If any value is missing, `painter.output.url()` throws instead of falling back to package-owned credentials.
+
+## Credential rotation notice
+
+If you used or copied Imgur credentials that appeared in an older Apexify.js source revision, repository history, package artifact, example, or deployment configuration, treat those credentials as exposed. Revoke or rotate them in the Imgur account and replace them in your secret manager. Do not reuse historical values.
+
+See also: [Batch, save & encoded output](/docs#00-batch-save-output-overview).
