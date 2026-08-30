@@ -4,7 +4,7 @@
 
 **Multi-step editor workflows** (trim → splice → captions → audio in one stack) live under **[Advanced → Video pipeline](/docs#01-video-pipeline)** — not in this feature guide.
 
-**Requirements:** **`ffmpeg`** and **`ffprobe`** on **`PATH`**. **`Buffer`** and **`http(s)`** sources are staged to temp files when required (**more:** [Imperative helpers](/docs#08-imperative-video-helpers)).
+**Requirements:** **`ffmpeg`** and **`ffprobe`** on **`PATH`**, or configure **`APEXIFY_FFMPEG_PATH`** and **`APEXIFY_FFPROBE_PATH`**. **`Buffer`** and **`http(s)`** sources are staged in isolated temporary workspaces when required. See **[Video security & runtime configuration](/docs#09-video-security-runtime-configuration)** and [Imperative helpers](/docs#08-imperative-video-helpers).
 
 **Low-level stack:** **`painter.video`** — **`getVideoInfo`**, frame extract helpers, and **`videoPipeline()`** ([advanced](/docs#00-video-advanced-hub)).
 
@@ -40,6 +40,7 @@ Some operations ignore top-level **`source`** (they use their own paths or **`vi
 | [Presets, transitions, stabilize & batch](/docs#06-advanced-presets-transitions) | **`exportPreset`**, **`stabilize`**, **`addTransition`**, **`batch`**, **`onProgress`** examples |
 | [Options reference card](/docs#07-video-creation-options-matrix) | Compact key → **`options/`** guide index |
 | [Imperative helpers (`painter.*`)](/docs#08-imperative-video-helpers) | **`getVideoInfo`**, **`extractFrameAtTime`**, **`extractFrameByNumber`**, **`extractMultipleFrames`**, **`extractFrames`**, **`extractAllFrames`** |
+| [Security & runtime configuration](/docs#09-video-security-runtime-configuration) | Safe FFmpeg execution model, custom binary paths, temp workspace root, hostile filenames and operational guidance |
 
 ---
 
