@@ -1,0 +1,46 @@
+# Video security & runtime configuration {#09-video-security-runtime-configuration}
+
+Apexify.js video operations use one internal FFmpeg/ffprobe process boundary. FFmpeg and ffprobe are started with argument arrays and `shell: false`; Apexify.js does not construct a user-controlled shell command string for media execution.
+
+## FFmpeg and ffprobe paths
+
+By default, Apexify.js looks for `ffmpeg` and `ffprobe` on `PATH` and may probe common installation locations when no explicit binary path is configured.
+
+For custom installations, set:
+
+```bash
+APEXIFY_FFMPEG_PATH=/absolute/path/to/ffmpeg
+APEXIFY_FFPROBE_PATH=/absolute/path/to/ffprobe
+```
+
+These values are executable paths, not shell command fragments. Do not include shell operators, quoting syntax, or extra command-line arguments in either variable.
+
+## Temporary workspace root
+
+Video operations that need staged inputs or intermediate files use a separate `fs.mkdtemp()` workspace per operation. Workspaces are removed after success or failure.
+
+To place those workspaces under a custom root directory, set:
+
+```bash
+APEXIFY_TEMP_DIR=/absolute/path/to/apexify-temp
+```
+
+The directory should be writable only by the service account that runs Apexify.js where practical. Do not point it at a directory that is served publicly by your application.
+
+## Filenames and text input
+
+Paths containing spaces, quotes, Unicode characters, semicolons, `$()`-style text, and other shell metacharacters are passed as process arguments rather than interpolated into a shell command.
+
+Apexify.js also avoids placing arbitrary user text directly into FFmpeg `drawtext` expressions for the compatibility text-overlay operations; text is rendered through the canvas layer and composited as an image instead.
+
+Advanced filter expressions are still FFmpeg filter syntax, not shell syntax. Apexify.js validates the supported custom-filter surface and rejects expressions outside that restricted syntax. Treat a validation error as an invalid filter request rather than attempting to add shell escaping.
+
+## Operational guidance
+
+- Keep FFmpeg/ffprobe patched through your operating-system or container image update process.
+- Run media processing with the minimum filesystem permissions it needs.
+- Keep temporary storage outside web roots and shared user-writable directories.
+- Do not log signed media URLs or credentials. Apexify.js strips URL query strings/fragments from retained media-process stderr before surfacing process errors.
+- Apply your own request limits around untrusted media until the later Apexify.js resource-policy phases add centralized byte, pixel, duration, and concurrency budgets.
+
+See also: [Video & FFmpeg overview](/docs#00-video-overview) and [Imperative video helpers](/docs#08-imperative-video-helpers).
