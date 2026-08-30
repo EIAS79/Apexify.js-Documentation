@@ -1,0 +1,38 @@
+name: Documentation Runtime Build Gate
+
+on:
+  push:
+    branches:
+      - main
+      - reengineering/phase-2-runtime-docs
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Node ${{ matrix.node }} / docs build
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24, 26]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          package-manager-cache: false
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Install locked documentation graph
+        run: npm ci
+      - name: Verify Apexify runtime used by docs tooling
+        run: |
+          node --input-type=module -e "import { ApexPainter } from 'apexify.js'; if (typeof ApexPainter !== 'function') process.exit(1); console.log('docs ApexPainter runtime ok')"
+      - name: Build documentation site
+        run: npm run build
