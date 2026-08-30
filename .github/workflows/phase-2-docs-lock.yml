@@ -38,6 +38,7 @@ jobs:
       - name: Install locked graph with normal lifecycle
         run: npm ci
       - name: Verify Apexify runtime used by docs tooling
-        run: node --input-type=module -e "import { ApexPainter } from 'apexify.js'; if (typeof ApexPainter !== 'function') process.exit(1); console.log('docs ApexPainter runtime: ok')"
+        run: |
+          node --input-type=module -e "import { ApexPainter } from 'apexify.js'; if (typeof ApexPainter !== 'function') process.exit(1); console.log('docs ApexPainter runtime ok')"
       - name: Build documentation site
         run: npm run build
