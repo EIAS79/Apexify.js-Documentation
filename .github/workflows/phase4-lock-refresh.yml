@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - reengineering/phase-4-runtime-governance-docs
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
