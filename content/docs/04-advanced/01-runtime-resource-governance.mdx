@@ -1,0 +1,145 @@
+# Runtime validation & resource governance {#01-runtime-resource-governance}
+
+Apexify.js 6 validates resource-intensive public operations at runtime. TypeScript types are not treated as a security boundary: malformed JavaScript values, JSON-driven configuration, `NaN`, infinities, negative dimensions, oversized collections, and configurations that would exceed server resource budgets are rejected before expensive work whenever the relevant value is knowable in advance.
+
+Use the runtime policy exports from the package root:
+
+```ts
+import {
+  configureApexifyRuntime,
+  getDefaultApexifyRuntimeConfig,
+  resetApexifyRuntimeConfig,
+  ApexifyInputError,
+  ApexifyConfigError,
+  ApexifyResourceLimitError,
+} from "apexify.js";
+```
+
+## Why this exists
+
+Rendering and media APIs can allocate native canvases, decoded image memory, GIF frames, audio sample arrays, temporary files, and FFmpeg processes. Apexify.js therefore applies two layers of protection:
+
+1. **Input validation** rejects invalid types, non-finite numbers, invalid enums, impossible ranges, and inconsistent option combinations.
+2. **Resource governance** rejects otherwise valid work that exceeds configured `RenderLimits`.
+
+Resource-limit failures use `ApexifyResourceLimitError`. Invalid caller data generally uses `ApexifyInputError`; invalid runtime-policy configuration uses `ApexifyConfigError`.
+
+## Default `RenderLimits`
+
+The defaults are intended to be usable for normal server workloads while placing explicit ceilings on pathological requests. They are global defaults and are overrideable through `configureApexifyRuntime`.
+
+| Limit | Default | Governs |
+|---|---:|---|
+| `maxCanvasDimension` | 16,384 | Maximum canvas/surface width or height |
+| `maxTotalPixels` | 67,108,864 | Maximum pixels in a canvas/surface |
+| `maxCollectionItems` | 2,048 | Generic bounded arrays/collections used by high-cost APIs |
+| `maxBackgroundLayers` | 128 | Canvas background layers |
+| `maxFiltersPerOperation` | 64 | Filter lists on one operation |
+| `maxSceneLayers` | 2,000 | Total scene layer work |
+| `maxNestedSurfaces` | 64 | Nested scene surfaces |
+| `maxSceneDepth` | 32 | Scene nesting depth |
+| `maxTextLength` | 1,000,000 | Aggregate/pathological text content budget |
+| `maxRemoteAssets` | 128 | Remote asset references in governed compositions |
+| `maxRemoteImageBytes` | 32 MiB | Remote image transfer bytes |
+| `maxRemoteVideoBytes` | 512 MiB | Remote video transfer bytes |
+| `maxDecodedImagePixels` | 67,108,864 | Decoded raster pixels before full image decode/render |
+| `maxGifFrames` | 1,000 | GIF input/generated frame count |
+| `maxGifDimension` | 4,096 | GIF width or height |
+| `maxGifResourceCost` | 268,435,456 | Width × height × effective frame-count budget |
+| `maxAudioDurationSeconds` | 600 | Procedural/combined audio duration |
+| `maxAudioSampleRate` | 192,000 | Audio sample rate |
+| `maxAudioEvents` | 20,000 | Audio sequence/timeline events |
+| `maxAudioLayers` | 1,024 | Audio synthesis/composition layers |
+| `maxAudioPartials` | 4,096 | Harmonic partial budget |
+| `maxAudioBytes` | 256 MiB | Estimated decoded/generated audio sample memory |
+| `maxVideoDurationSeconds` | 14,400 | Video duration |
+| `maxVideoFps` | 240 | Video frame rate |
+| `maxVideoBitrateKbps` | 200,000 | Video bitrate |
+| `maxVideoOverlays` | 256 | Video overlays/layers |
+| `maxBatchOperations` | 256 | Batch operation count |
+| `maxBatchConcurrency` | 4 | Concurrent batch workers |
+| `maxConcurrentRemoteFetches` | 8 | Concurrent remote media requests |
+
+All limit values must be finite positive integers. `maxSceneDepth` cannot exceed `maxNestedSurfaces`, and `maxBatchConcurrency` cannot exceed `maxBatchOperations`.
+
+## Override limits deliberately
+
+Read the current effective policy before changing it:
+
+```ts
+const current = getDefaultApexifyRuntimeConfig();
+console.log(current.limits.maxTotalPixels);
+```
+
+Override only the limits your deployment can safely support:
+
+```ts
+configureApexifyRuntime({
+  limits: {
+    maxCanvasDimension: 8192,
+    maxTotalPixels: 32_000_000,
+    maxDecodedImagePixels: 32_000_000,
+    maxBatchOperations: 100,
+    maxBatchConcurrency: 2,
+    maxAudioBytes: 128 * 1024 * 1024,
+  },
+});
+```
+
+`configureApexifyRuntime` merges partial sections into the current policy and validates the resulting configuration. To restore built-in defaults:
+
+```ts
+resetApexifyRuntimeConfig();
+```
+
+Do not raise a limit just to silence `ApexifyResourceLimitError`. Raising canvas, decoded-image, GIF, audio, or concurrency budgets directly increases worst-case CPU and/or memory exposure. Set deployment-specific values from the memory and concurrency available to the Node.js process.
+
+## Where validation happens
+
+The runtime policy is enforced across the public high-cost surface, including:
+
+- canvas dimensions, inherited backgrounds, gradients, patterns, filters, and background-layer counts;
+- image placement, dimensions, crop/mask/distortion/mesh/filter options, decoded input images, collage/stitch/blend/crop/masking and other image utilities;
+- text arrays, total text length, coordinates, typography metrics, gradients, strokes, shadows, curves, and opacity;
+- scene dimensions, total/nested layers, surfaces, depth, remote references, image/chart/text counts, aggregate text, transforms, filters/effects, and child-surface budgets;
+- GIF dimensions, frames, generated frames, delays, repeat/quality/disposal, overlays, and final frame-resource cost;
+- procedural audio duration, sample rate, channels, layers/events/partials, frequency/gain/pan/filter/ADSR values, timeline offsets, and estimated sample memory before large `Float32Array` allocation;
+- video operation combinations, time ranges, speed, FPS, dimensions, bitrate, overlays, audio tracks and declarative pipeline layers before FFmpeg work where practical;
+- charts, pixels, Path2D/custom paths, hit-detection collections, batch/chain work, output encoding/upload, and save/save-multiple validation.
+
+Apexify.js also inspects decoded image metadata so an input can be rejected by decoded-pixel/canvas budgets before a full native canvas decode where practical.
+
+## Early rejection and error handling
+
+Treat resource-limit errors as request-policy failures, not transient renderer failures:
+
+```ts
+try {
+  await painter.createCanvas({ width: 50_000, height: 50_000 });
+} catch (error) {
+  if (error instanceof ApexifyResourceLimitError) {
+    console.error(error.limit, error.maximum, error.actual);
+  }
+}
+```
+
+Do not blindly retry the same request. Reduce the requested work or deliberately change the server policy after confirming the deployment has sufficient capacity.
+
+Validation is intentionally placed before dangerous boundaries when possible: native canvas allocation, full image decode, generated GIF work, large audio sample allocation, FFmpeg execution, filesystem writes for invalid save requests, and unbounded batch fan-out.
+
+## Concurrency behavior
+
+`batch()` is bounded by `maxBatchOperations` and `maxBatchConcurrency`; it no longer fans every operation out through an unbounded `Promise.all(operations.map(...))`. Remote media acquisition is separately governed by `maxConcurrentRemoteFetches`.
+
+These controls are independent. A deployment can, for example, allow 100 batch operations while processing only two concurrently.
+
+## Operational guidance
+
+- Keep `trustedNetworkAccess` disabled unless an explicit allowlist is required and understood.
+- Keep decoded-image and total-pixel limits aligned with the process memory available to native raster libraries.
+- Remember that GIF resource cost multiplies pixels by frame count.
+- Remember that audio memory scales approximately with duration × sample rate × channels × 4 bytes for `Float32Array` samples, before additional working buffers.
+- Prefer lower concurrency for memory-heavy image/video workloads even when CPU capacity is available.
+- Log structured error `code` and limit metadata, but do not expose internal paths, credentials, or sensitive request details to untrusted clients.
+
+The default policy is a baseline, not a promise that every server should use the maximum values simultaneously. For multi-tenant or hostile-input services, use stricter deployment-specific limits.

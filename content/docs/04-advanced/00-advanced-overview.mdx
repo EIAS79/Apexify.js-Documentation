@@ -49,11 +49,19 @@ Charts and GIF/video helpers either return buffers or orchestrate their own pipe
 
 ---
 
+## Runtime safety & resource budgets
+
+Apexify.js 6 applies runtime validation and configurable resource ceilings before high-cost work such as native canvas allocation, full image decode, GIF generation, large audio sample allocation, FFmpeg execution, and invalid save requests.
+
+See **[Runtime validation & resource governance](/docs#01-runtime-resource-governance)** for the complete default `RenderLimits`, override examples, structured errors, decoded-image budgets, and batch/remote concurrency policy.
+
+---
+
 ## Performance intuition
 
 - **`createImage`** filters often use **Sharp** (good for full-frame work).  
 - **`pixels.getData`** / **`pixels.manipulate`** (or legacy names in older docs) are **CPU loops** — best for small regions or custom logic ([Pixel data](/docs#08-pixel-data)).  
-- **`batch`** runs independent jobs in **parallel** (`Promise.all`); **`chain`** runs **sequentially** and pipes buffers — [Batch & chain](/docs#01-batch-and-chain).
+- **`batch`** processes independent jobs with bounded concurrency controlled by **`maxBatchConcurrency`**; **`chain`** runs **sequentially** and pipes buffers — [Batch & chain](/docs#01-batch-and-chain).
 
 ---
 
@@ -85,6 +93,7 @@ Charts and GIF/video helpers either return buffers or orchestrate their own pipe
 
 | Topic | Link |
 |-------|------|
+| **Runtime validation & resource governance** | [Runtime safety](/docs#01-runtime-resource-governance) |
 | **Composition** (templates, **`$`**, components, plugins, batch) | [Composition hub](/docs#00-composition-hub) |
 | **Scene** — layer graph, GIF/video export | [Scene overview](/docs#00-scene-composition) |
 | **Video** — **`videoPipeline`**, Scene → MP4 | [Video (advanced) hub](/docs#00-video-advanced-hub) |
