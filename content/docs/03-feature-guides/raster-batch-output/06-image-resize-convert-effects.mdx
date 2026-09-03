@@ -1,22 +1,24 @@
 # Resize, convert & effects {#06-image-resize-convert-effects}
 
-**`painter.image.resize`** and **`painter.image.imgConverter`** resolve inputs with **`sharpFromResolvableInput`** (**`lib-next/core/general-functions.ts`**): **`Buffer`** bytes, **`http(s):`** URLs (**fetched**), **`data:image/...;base64,...`** (**`;base64,`** may be preceded by parameters such as **`charset`**), filesystem paths (**absolute paths are used as-is **`/`** relative **`→`** **`path.join(process.cwd(), …)`**).
+The raster helpers on **`painter.image`** now share the same image-source boundary used by canvas/image rendering. Supported sources are **`Buffer`** bytes, **`http(s):`** URLs, **`data:image/...;base64,...`** values, and filesystem paths. Image metadata is preflighted before decode against the configured source-byte, decoded-dimension, decoded-pixel, frame/page, and SVG-complexity limits. Remote inputs continue through the shared network policy rather than a helper-specific HTTP client.
 
-Other **`painter.image`** helpers (**`effects`**, **`colorsFilter`**, **`colorAnalysis`**, …**) still use their own loaders (**filesystem **`/`** **`axios`** **`/`** **`canvas`** **) **`—`** see those sections below.
+This means resize, conversion, effects, color filtering, color analysis, masking, crop, and the other raster helpers no longer maintain separate ad-hoc filesystem/HTTP/canvas loaders.
 
 ---
 
 ## `resize(resizeOptions)`
 
-**`ResizeOptions`** (**`lib-next/types/video.ts`** **`/`** **`Sharp`** pipeline **)**:
+**`ResizeOptions`**:
 
 | Field | Role |
 |-------|------|
-| **`imagePath`** | **`string`** **`|`** **`Buffer`** (**sources matrix **`/`** opening paragraph**) |
-| **`size`** | **`width`** **`/`** **`height`** (**defaults **`/`** **`Sharp`** **`/`** **`general-functions`** **`resizingImg`** **) |
-| **`maintainAspectRatio`** | **`sharp.fit.inside`** vs **`fill`** |
-| **`quality`** | **`0`** **`–`** **`100`** (**PNG compression **`/`** **`sharp`** **) |
-| **`outputFormat`** | Typed **`png`** **`/`** **`jpeg`** (**reserved **`/`** **`resizingImg`** currently emits PNG **`Buffer`** **) |
+| **`imagePath`** | **`string | Buffer`** using the shared image-source policy above. |
+| **`size`** | Positive integer **`width`** / **`height`**. An omitted axis defaults to **`500`**. The requested dimensions may enlarge the source. |
+| **`maintainAspectRatio`** | **`true`** uses Sharp **inside/contain** semantics; **`false`** uses **fill** and produces the exact requested dimensions. |
+| **`quality`** | Integer **`1`–`100`** for the selected encoder. |
+| **`outputFormat`** | **`png`** (default) or **`jpeg`**. The option is applied to the emitted bytes. |
+
+EXIF orientation is applied before fitting, so portrait/landscape sizing uses the effective displayed dimensions rather than unrotated metadata.
 
 ```typescript
 import { ApexPainter } from 'apexify.js';
@@ -24,83 +26,90 @@ import fs from 'node:fs';
 
 const painter = new ApexPainter();
 
-const fromPath = await painter.image.resize({
+const contained = await painter.image.resize({
   imagePath: './uploads/poster.png',
-  size: { width: 1280 },
+  size: { width: 1280, height: 720 },
   maintainAspectRatio: true,
+  outputFormat: 'jpeg',
   quality: 88,
 });
 
-const fromBuf = await painter.image.resize({
+const exact = await painter.image.resize({
   imagePath: fs.readFileSync('./raw.webp'),
   size: { width: 512, height: 512 },
+  maintainAspectRatio: false,
+  outputFormat: 'png',
 });
 
 const fromUrl = await painter.image.resize({
   imagePath: 'https://cdn.example.com/assets/banner.jpg',
-  size: { height: 600 },
+  size: { width: 1200, height: 630 },
   maintainAspectRatio: true,
 });
 
 const dataUrl = `data:image/png;base64,${fs.readFileSync('./icon.png').toString('base64')}`;
-const fromDataUrl = await painter.image.resize({ imagePath: dataUrl, size: { width: 64 } });
+const fromDataUrl = await painter.image.resize({
+  imagePath: dataUrl,
+  size: { width: 64, height: 64 },
+});
 ```
+
+Invalid, fractional, zero, over-limit, or otherwise unsafe target dimensions reject before the expensive resize work begins.
 
 ---
 
 ## `imgConverter(source, newExtension)`
 
-**`source`** **`string`** **`|`** **`Buffer`** — **same matrix as **`resize(imagePath)`**. **`newExtension`**: **`jpeg`**, **`png`**, **`webp`**, **`tiff`**, **`gif`**, **`avif`**, **`heif`**, **`raw`**, **`pdf`**, **`svg`** (**case-insensitive **`/`** **`sharp.toFormat`** **)**.
+**`source`** is **`string | Buffer`** and uses the same metadata/decode preflight as `resize`.
+
+Accepted extension names are **`jpeg`**, **`jpg`**, **`png`**, **`webp`**, **`tiff`**, **`gif`**, **`avif`**, **`heif`**, **`raw`**, **`jp2`**, and **`jxl`**. `jpg` is normalized to `jpeg`. Actual codec availability can still depend on the Sharp/libvips build used by the platform.
 
 ```typescript
-import { ApexPainter } from 'apexify.js';
-import fs from 'node:fs';
-
-const painter = new ApexPainter();
-
 const webpBuf = await painter.image.imgConverter('./exports/frame.png', 'webp');
-
-const webpFromBytes = await painter.image.imgConverter(fs.readFileSync('./frame.png'), 'webp');
-
+const jpegFromBytes = await painter.image.imgConverter(fs.readFileSync('./frame.png'), 'jpg');
 const pngFromRemote = await painter.image.imgConverter('https://cdn.example.com/x.jpg', 'png');
-
-const inline = `data:image/jpeg;base64,${fs.readFileSync('./snap.jpg').toString('base64')}`;
-const pngFromDataUrl = await painter.image.imgConverter(inline, 'png');
 ```
 
 ---
 
 ## `effects(source, filters)`
 
-**Implementation note:** **`imgEffects`** (**`general-functions.ts`**) currently applies **only** filters handled by its **`switch`** — use these **`type`** values so each stage runs (**others log “Unsupported filter type”** and are skipped):
+`effects` resolves and caches the decoded source through the shared image pipeline, then applies the requested filter stack.
 
-**Working types:** **`flip`**, **`rotate`**, **`brightness`**, **`contrast`**, **`invert`**, **`greyscale`**, **`sepia`**, **`blur`**, **`posterize`**, **`pixelate`**.
+Legacy effect names remain supported for compatibility:
+
+- **`flip`**, **`rotate`**, **`brightness`**, **`contrast`**, **`invert`**, **`greyscale`**, **`sepia`**, **`blur`**, **`posterize`**, **`pixelate`**
+
+The typed raster-filter pipeline is also supported:
+
+- **`grayscale`**, **`gaussianBlur`**, **`motionBlur`**, **`radialBlur`**, **`sharpen`**, **`noise`**, **`grain`**, **`edgeDetection`**, **`emboss`**, **`saturation`**, **`hueShift`**
+
+Noise/grain operations are deterministic for reproducible renders, and the legacy blur path delegates to the shared native filter implementation instead of running a quadratic JavaScript blur loop.
 
 ```typescript
 const painter = new ApexPainter();
 
 const toned = await painter.image.effects('./raw.jpg', [
   { type: 'blur', radius: 1.2 },
-  { type: 'brightness', value: 12 },
+  { type: 'brightness', value: 0.12 },
   { type: 'contrast', value: 8 },
 ]);
 
-const thumb = await painter.image.effects('./hero.png', [
-  { type: 'pixelate', size: 12 },
+const detailed = await painter.image.effects('./hero.png', [
+  { type: 'sharpen', intensity: 0.35 },
+  { type: 'grain', intensity: 0.05 },
 ]);
 ```
 
-**`flip`**: **`horizontal`**, **`vertical`**. **`rotate`**: **`deg`**. **`blur`**: **`radius`**. **`posterize`**: **`levels`**. **`pixelate`**: **`size`** **`/`** optional **`x`**, **`y`**, **`w`**, **`h`**.
+Explicit zero values are preserved; for example, zero intensity is a no-op instead of being replaced with a default intensity.
 
 ---
 
 ## `colorsFilter(source, filterColor, opacity?)`
 
-Tint **`/`** wash using **`applyColorFilters`** — **`filterColor`** CSS **`/`** hex **string** **or **`GradientConfig`**.
+Tint / wash using a CSS color string or **`GradientConfig`**. **`opacity`** is **`0–1`**, and explicit **`0`** remains fully transparent.
 
 ```typescript
-const painter = new ApexPainter();
-
 const tinted = await painter.image.colorsFilter('./bw.png', '#6366f1', 0.35);
 
 const vignetteTint = await painter.image.colorsFilter('./scene.jpg', {
@@ -118,15 +127,17 @@ const vignetteTint = await painter.image.colorsFilter('./scene.jpg', {
 });
 ```
 
+Gradient stops must be finite, monotonic, and in **`0–1`**. Linear/radial gradients support **`repeat: 'repeat' | 'reflect' | 'no-repeat'`**; `reflect` mirrors each adjacent period rather than merely repeating it.
+
 ---
 
 ## `colorAnalysis(source)`
 
-Dominant colours (**histogram helper**) **`→`** **`{ color, frequency }[]`** (**string **`frequency`** field).
+Returns a bounded dominant-color list in the historical **`{ color, frequency }[]`** shape.
+
+For large images the implementation metadata-preflights first, downsamples to at most **`160×160`**, quantizes nearby RGB values, and returns at most **`16`** dominant colors. Transparent pixels are not emitted as colors; `frequency` keeps the compatibility denominator based on all sampled pixels.
 
 ```typescript
-const painter = new ApexPainter();
-
 const paletteHints = await painter.image.colorAnalysis('./brand-asset.png');
 console.log(paletteHints.slice(0, 8));
 ```
@@ -135,52 +146,37 @@ console.log(paletteHints.slice(0, 8));
 
 ## `colorsRemover(source, colorToRemove)`
 
-**`RGB`** triple **`0`** **`–`** **`255`**. Result **`Buffer`** **or** **`undefined`** if the underlying **`removeColor`** returns nothing.
+Removes one exact RGB color. Each channel is **`0–255`**.
 
 ```typescript
-const painter = new ApexPainter();
-
 const keyFilled = await painter.image.colorsRemover('./sprite.png', {
   red: 255,
   green: 0,
   blue: 255,
 });
-if (keyFilled) {
-  await Bun.write('./sprite-no-magenta.png', keyFilled); // or fs.writeFileSync
-}
 ```
 
 ---
 
 ## `removeBackground(imageURL, apiKey)`
 
-Calls **`bgRemoval`** (**external HTTP API** **`/`** quotas **`/`** keys depend on that helper — pass a remote **`imageURL`** your backend exposes **`/`** allows).
+Calls the remove.bg service through Apexify.js's bounded remote transport. The API key and remote service quotas remain external concerns.
 
 ```typescript
-const painter = new ApexPainter();
-
 const cutout = await painter.image.removeBackground(
   'https://cdn.example.com/uploads/portrait.jpg',
   process.env.REMOVAL_API_KEY!
 );
-if (cutout) await Bun.write('./cutout.png', cutout);
 ```
 
 ---
 
 ## `validHex(hexColor)`
 
-Validates **`#RRGGBB`**. **`throws`** if not a string **`/`** wrong shape **`/`** **`boolean`** **`true`** when valid (**`core/color.ts`**).
+Validates **`#RRGGBB`** and throws for invalid input.
 
 ```typescript
-const painter = new ApexPainter();
-
-try {
-  painter.image.validHex('#0ea5e9');
-  console.log('OK');
-} catch {
-  console.log('Bad hex');
-}
+painter.image.validHex('#0ea5e9');
 ```
 
 ---
