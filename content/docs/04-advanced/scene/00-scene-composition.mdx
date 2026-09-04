@@ -1,79 +1,137 @@
 # Scene — overview {#00-scene-composition}
 
+Scene is Apexify.js's declarative composition graph: a positive **`width`**, positive **`height`**, optional **`background`**, and an ordered **`layers`** array. The same scene can render to PNG directly or feed the scene→GIF / scene→video helpers.
 
-This page is the **single entry point** for Scene: a **declarative layer graph** — **width**, **height**, optional **background**, and an ordered **`layers`** array. **`SceneCreator`** composites everything into **one PNG `Buffer`** in a single pass. From there you can call **`renderScene`**, **`renderSceneToGIF`**, or **`renderSceneToVideoFrames`** depending on whether you need a still, an animated GIF, or a video file.
+**Types:** `SceneRenderInput`, `SceneLayer`, `SceneRenderOptions` from `apexify.js` (or the type-only `apexify.js/types` subpath).
 
-**Legacy slug:** [Scene hub](/docs#00-scene-hub) still resolves (short redirect file); all content is maintained here.
+**On `ApexPainter`:** `createScene`, `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames`, `validateSceneRenderInput`.
 
-**Implementation:** **`SceneCreator`** draws the full layer stack to one PNG. **`SceneBuilder`** is a fluent wrapper over the same fields as **`SceneRenderInput`**. Optional **`validateSceneRenderInput`** runs before rasterizing unless you pass **`{ validate: false }`**. Scene→GIF and scene→video helpers call the same composition step, then encode frames.
-
-**Higher-level building blocks** (templates **`{{…}}`**, **`painter.assets`** **`$…`**, preset **`painter.components`**, plugins) are documented in the **[Composition hub](/docs#00-composition-hub)** — Scene consumes their output as normal **`SceneRenderInput`** / **`SceneLayer[]`**.
-
-**Types:** **`SceneRenderInput`**, **`SceneLayer`**, **`SceneRenderOptions`** — import from the package (**`import type { … } from "apexify.js"`** or **`apexify.js/types`**).
-
-**On `ApexPainter`:** `createScene`, `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames`, **`validateSceneRenderInput`**.
-
-### Builder & render extras
-
-- **`addLayers([...])`** — append many layers at once; **`addLayer(x)`** is equivalent to **`addLayers([x])`**.
-- **Layer stack editing:** **`insertLayer`**, **`insertLayers`**, **`removeLayer`**, **`moveLayer`**, **`replaceLayers`**, **`clearLayers`**, read **`layerCount`**.
-- **`toRenderInput()`** — returns a plain **`SceneRenderInput`** (copied **`layers`** array) for **`renderScene`**, GIF/video helpers, caching, or tests.
-- **Validation:** default **`renderScene`** / **`SceneBuilder.render`** runs **`validateSceneRenderInput`** (dimensions + max nested **`surface`** depth). Pass **`{ validate: false }`** only for trusted hot paths; tune depth with **`{ maxSurfaceDepth: n }`**.
-- **GIF / video:** optional **`sceneRender`** on the second argument forwards the same options to the inner scene PNG step.
+Higher-level templates, named assets, components, and plugins are documented in the [Composition hub](/docs#00-composition-hub); they ultimately produce or transform normal scene data.
 
 ---
 
-## What you get in one sentence each
+## Validation is mandatory
 
-| Output | API | Idea |
-|--------|-----|------|
-| **PNG** | **`renderScene`** or **`SceneBuilder.render()`** | Final poster / card / dashboard bitmap. |
-| **GIF** | **`renderSceneToGIF`** | Renders the scene once, optionally **prepends** that frame, merges **`gifFrames`** (with **`repeat`**), runs **`createGIF`**. |
-| **Video** | **`renderSceneToVideoFrames`** | Same composed PNG, merged with **`createFromFrames`** + optional **`framesWithRepeats`** → FFmpeg. |
+Scene validation runs before rendering. There is **no public `validate: false` bypass**.
 
----
+Validation covers more than root dimensions:
 
-## When to use Scene
+- finite positive canvas/surface dimensions and canvas resource budgets,
+- aggregate **scene pixel budget** across the root and nested surfaces,
+- total scene layer count,
+- nested surface count/depth,
+- image count,
+- text-layer count and aggregate text content,
+- chart count,
+- remote asset count,
+- image/text domain validation,
+- finite numeric transform leaves and opacity ranges,
+- authoritative scene/surface dimensions (background configs may not redefine width/height).
 
-| Goal / situation | Prefer |
-|-----------------|--------|
-| One background + a couple of images/text | **`createCanvas`** + **`createImage`** / **`createText`** — fewer moving parts. |
-| Many layers, **charts as layers**, **nested cards** (`surface`), one export | **Scene** |
-| Same visual design → **GIF** or **MP4** | **`renderSceneToGIF`** / **`renderSceneToVideoFrames`** after designing **`layers`**. |
+`SceneRenderOptions.maxSurfaceDepth` may lower the configured maximum for one render, but cannot raise the global runtime limit.
 
-Scene reuses the same engines as the rest of the library (**`@napi-rs/canvas`**, **`ChartCreator`**, **`ImageCreator`**, **`TextCreator`**, **`Path2DCreator`**, **`CanvasCreator`** for backgrounds).
-
----
-
-## Chapter guide (`01`–`09`)
-
-Read in order the first time; later jump by topic.
-
-| # | Topic | Link |
-|---|--------|------|
-| 1 | **`SceneRenderInput`**, **`SceneRenderOptions`**, **`SceneBuilder`** (`addLayers`, stack edits, **`toRenderInput`**), **`createScene`** | [Types & builder](/docs#01-scene-types-builder) |
-| 2 | **`image`**, **`text`**, **`path`**, **`imageBuffer`** — variants & examples | [Raster & vector layers](/docs#02-scene-layers-raster-text-path) |
-| 3 | **`chart`**, **`chartComparison`**, **`chartCombo`** | [Chart layers](/docs#03-scene-layers-charts) |
-| 4 | **`customLines`**, **`surface`** (nesting, placement) | [Connectors & surfaces](/docs#04-scene-layers-custom-lines-surface) |
-| 5 | **`background`** as **`CanvasConfig`** (color, gradient, layers, transparency) | [Scene backgrounds](/docs#05-scene-backgrounds) |
-| 6 | **`renderScene`** — object vs builder, reuse, **`$`** resolution | [Render scene](/docs#06-render-scene) |
-| 7 | **`renderSceneToGIF`** — prepend, repeat, `onStart` rule | [Scene → GIF](/docs#07-render-scene-to-gif) |
-| 8 | **`renderSceneToVideoFrames`** — `createFromFrames`, `framesWithRepeats` | [Scene → video](/docs#08-render-scene-to-video) |
-| 9 | Paint order, performance, pitfalls | [Paint order & performance](/docs#09-scene-paint-order-performance) |
+Use `validateSceneRenderInput(input, { maxSurfaceDepth? })` when you want to reject untrusted composition data before entering a larger workflow; the renderer will validate again at its own boundary.
 
 ---
 
-## Also read · templates, **`$`** assets, components
+## `SceneBuilder` contract
 
-**[Composition hub](/docs#00-composition-hub)** — **`createTemplate`**, **`painter.assets`**, **`prepareForRender`**, **`painter.components`**, **`$`** defaults on **`renderScene`** vs **`SceneBuilder.render`**. Older bookmark: [templates / assets](/docs#10-templates-assets-components) (section on [Advanced overview](/docs#00-advanced-overview)).
+`createScene()` returns a mutable builder with **copy-on-ingress** semantics. Caller-owned layer/background objects and Buffers are copied when added. A later mutation of the original input does not silently change the builder.
+
+Stack methods include:
+
+- `addLayer`, `addLayers`
+- `insertLayer`, `insertLayers`
+- `insertBefore`, `insertAfter`
+- `replaceLayer`, `replaceLayers`
+- `moveLayer`
+- `removeLayer`, `clearLayers`
+- `setBackground`, `clearBackground`
+- `layerCount`
+
+Invalid indices throw `ApexifyInputError` instead of being silently clamped.
+
+**`toRenderInput()`** returns an isolated snapshot. Mutating the returned structure does not mutate the builder. `render()` also renders a snapshot, so later caller mutation cannot affect an already-started render.
+
+`SceneBuilder.render()` leaves asset references unchanged by default. A builder created by `ApexPainter.createScene()` can opt in with **`{ resolveAssetRefs: true }`**.
 
 ---
 
-## Minimal example
+## Paint order
+
+Layer array order is stable **bottom → top**. Earlier entries paint first; later entries paint over them.
+
+```typescript
+const png = await painter.renderScene({
+  width: 640,
+  height: 360,
+  background: { colorBg: "#0f172a" },
+  layers: [
+    // painted first
+    { type: "imageBuffer", buffer: backgroundTile, x: 0, y: 0, width: 640, height: 360 },
+    // painted on top
+    { type: "text", texts: { text: "Hello", x: 48, y: 80, fontSize: 36, color: "#fff" } },
+  ],
+});
+```
+
+Builder insert/move/replace operations change this array order directly; no hidden z-index is applied.
+
+---
+
+## Nested surfaces
+
+A `surface` is a child scene with explicit placement dimensions. Its background and child layers render into a child canvas, then that canvas is composited directly onto the parent with placement opacity/composite mode/rotation/scale.
+
+Child surfaces remain canvases until parent compositing; Apexify.js does **not** PNG-encode then decode every nested surface. This avoids a major composition roundtrip while preserving clipping and transform isolation.
+
+```typescript
+const scene = {
+  width: 800,
+  height: 450,
+  background: { colorBg: "#020617" },
+  layers: [
+    {
+      type: "surface",
+      placement: { x: 40, y: 40, width: 320, height: 180, opacity: 0.9 },
+      background: { colorBg: "#0f172a" },
+      layers: [
+        { type: "text", texts: { text: "Nested", x: 20, y: 40, fontSize: 24, color: "#f8fafc" } },
+      ],
+    },
+  ],
+};
+```
+
+The placement width/height are authoritative; a surface background must not define its own width/height.
+
+---
+
+## Asset references
+
+- `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames`: **`$refs` resolve by default**.
+- Pass `resolveAssetRefs: false` in the matching scene-render options when the scene is already resolved or when `$` should remain literal data.
+- `SceneBuilder.render`: resolution is opt-in.
+
+See [Named assets](/docs#01-named-assets) for `$$` escaping, dotted paths, Buffer refs, embedded scalar refs, and replacement semantics.
+
+---
+
+## Outputs
+
+| Output | API | Behavior |
+|---|---|---|
+| PNG | `renderScene` / `SceneBuilder.render()` | Validate, compose ordered layers, encode final root PNG. |
+| GIF | `renderSceneToGIF` | Validate scene/GIF inputs, compose the scene frame, merge optional repeated tail frames, then encode GIF. |
+| Video | `renderSceneToVideoFrames` | Validate frame configuration before wasting scene raster work; compose/merge frames, then delegate to the video creator/FFmpeg. |
+
+---
+
+## Minimal builder example
 
 ```typescript
 import { ApexPainter } from "apexify.js";
-import fs from "fs";
+import fs from "node:fs";
 
 const painter = new ApexPainter();
 
@@ -83,7 +141,7 @@ const png = await painter
   .addLayers([
     {
       type: "text",
-      texts: [{ text: "Hello, Scene", x: 48, y: 160, fontSize: 36, color: "#e2e8f0" }],
+      texts: { text: "Hello, Scene", x: 48, y: 160, fontSize: 36, color: "#e2e8f0" },
     },
   ])
   .render();
@@ -93,13 +151,18 @@ fs.writeFileSync("./scene.png", png);
 
 ---
 
-## See also (other doc folders)
+## Chapter guide
 
-- [Canvas overview](/docs#00-create-canvas-overview) — **`CanvasConfig`** / backgrounds used by scenes  
-- [Charts overview](/docs#00-charts-overview) — data shapes per **`chartType`**  
-- [GIF overview](/docs#00-create-gif-overview) — **`GIFOptions`**, **`GIFInputFrame`**  
-- [Video overview](/docs#00-video-overview) — FFmpeg, **`createFromFrames`**  
-- [Video (advanced)](/docs#00-video-advanced-hub) — **`videoPipeline`**, post-export edits  
-- [Compose & build](/docs#05-compose-and-build) — **`createVideo`** and assets  
+| # | Topic | Link |
+|---|---|---|
+| 1 | Scene types & builder | [Types & builder](/docs#01-scene-types-builder) |
+| 2 | Image/text/path/imageBuffer | [Raster & vector layers](/docs#02-scene-layers-raster-text-path) |
+| 3 | Chart layers | [Chart layers](/docs#03-scene-layers-charts) |
+| 4 | Custom lines & surfaces | [Connectors & surfaces](/docs#04-scene-layers-custom-lines-surface) |
+| 5 | Backgrounds | [Scene backgrounds](/docs#05-scene-backgrounds) |
+| 6 | Rendering & asset resolution | [Render scene](/docs#06-render-scene) |
+| 7 | Scene → GIF | [Scene → GIF](/docs#07-render-scene-to-gif) |
+| 8 | Scene → video | [Scene → video](/docs#08-render-scene-to-video) |
+| 9 | Paint order & performance | [Paint order & performance](/docs#09-scene-paint-order-performance) |
 
 ---
