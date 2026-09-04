@@ -1,57 +1,85 @@
 # Named assets (`painter.assets`) {#01-named-assets}
 
+**`AssetManager`** is the named composition registry on **`painter.assets`**. It stores images, font paths, palettes, and arbitrary JSON-like values, then resolves **`$name`** / dotted **`$value.path`** references for scenes, templates, and opt-in imperative APIs.
 
-**`AssetManager`** hangs on **`painter.assets`**. It registers **images** (**`string` path, URL, or `Buffer`**), **font file paths**, and **named color palettes**. Other systems resolve **`$`** **string leaves** through it:
-
-- **`renderScene`**, **`renderSceneToGIF`**, **`renderSceneToVideoFrames`** — **on by default** (opt out with **`resolveAssetRefs: false`**).
-- **Templates** — during **`TemplateHandle.render`** / **`toRenderInput`** via **`resolveAssetRef`** (defaults to **`assets.resolve`**).
-- **Imperative** **`create*`** / **`batch`** / **`chain`** — **off** unless you flag them; see the [next chapter](/docs#05-imperative-batch-chain-assets).
+- **`renderScene`**, **`renderSceneToGIF`**, **`renderSceneToVideoFrames`** — asset resolution is **on by default**; pass **`resolveAssetRefs: false`** to skip it.
+- **Templates** — placeholders resolve first, then asset references resolve during **`TemplateHandle.render`** / **`toRenderInput`**.
+- **`SceneBuilder.render`** — asset resolution is **off by default**; opt in with **`{ resolveAssetRefs: true }`**.
+- **Imperative create APIs / batch / chain** — resolution is opt-in; see [Imperative & batch resolution](/docs#05-imperative-batch-chain-assets).
 
 ---
 
-## Registering material
+## Registering assets
 
 ```typescript
 import { ApexPainter } from "apexify.js";
 
 const painter = new ApexPainter({ type: "buffer" });
 
-// Image: path, URL, or Buffer
 painter.assets.loadImage("logo", "./brand/logo.png");
-
-// Font file for text layers (path your runtime can read)
 painter.assets.loadFont("heading", "./fonts/Inter-Bold.ttf");
-
-// Palette: arbitrary string keys → hex (or other color strings)
 painter.assets.loadPalette("theme", {
   bg: "#020617",
   text: "#f8fafc",
   muted: "#64748b",
 });
+painter.assets.loadValue("copy", {
+  hero: { title: "Apexify", enabled: true },
+  spacing: [8, 16, 24],
+});
 ```
 
-**Updates / cleanup**
+### Duplicate and replacement contract
 
-- **`unregisterImage`**, **`unregisterFont`**, **`unregisterPalette`** — drop one id.
-- **`clear()`** — empty all three maps (rare; mostly tests or long-lived servers).
+Root names are unique across the whole registry. **`loadImage`**, **`loadFont`**, **`loadPalette`**, and **`loadValue`** throw **`ApexifyAssetError`** when that name is already registered. Replacement is explicit:
+
+- **`replaceImage(name, source)`**
+- **`replaceFont(name, path)`**
+- **`replacePalette(name, colors)`**
+- **`replaceValue(name, value)`**
+
+A replace call also throws when the target name does not exist. This prevents accidental overwrite during application startup.
+
+Cleanup/introspection:
+
+- **`has(name)`** — root-name existence check.
+- **`delete(name)`** — remove any asset kind by root name.
+- **`unregisterImage`**, **`unregisterFont`**, **`unregisterPalette`** — kind-specific removal helpers.
+- **`list()`** — returns `{ name, kind }` registrations.
+- **`clear()`** — empties the registry.
+
+Registered JSON-like data and Buffers are copied on ingress, and **`resolve()`** returns an isolated copy. Mutating the original registration value or a resolved Buffer does not mutate registry storage.
 
 ---
 
-## Reference syntax (no leading `$` inside `resolve`)
+## Reference syntax
 
-In **JSON-like config**, you write **`"$logo"`** or **`"$theme.text"`** as a **string value**. The resolver **strips **`$`** internally** and splits **palette** paths on the **first dot**:
+Call **`assets.resolve()`** without the leading dollar sign:
 
-| String in config | Lookup |
-|------------------|--------|
-| **`"$logo"`** | **`images.get("logo")`** (else fonts) |
-| **`"$theme.text"`** | Palette **`theme`**, key **`text`** |
-| **`"$heading"`** | Font id **`heading`** (registered with **`loadFont`**) |
+```typescript
+painter.assets.resolve("logo");
+painter.assets.resolve("theme.text");
+painter.assets.resolve("copy.hero.title");
+painter.assets.resolve("copy.spacing.1");
+```
 
-If nothing matches, **`assets.resolve(...)`** throws with **`unknown reference`**. Register **before** rendering.
+In composition data, use the leading **`$`**:
+
+| Value in config | Meaning |
+|---|---|
+| **`"$logo"`** | Resolve the complete `logo` asset. A lone reference may return a string, scalar, object/array value, or `Buffer`. |
+| **`"$theme.text"`** | Dotted own-property lookup. |
+| **`"$copy.spacing.1"`** | Array indices are allowed in dotted paths. |
+| **`"color=$theme.text"`** | Embedded references are allowed only when they resolve to string/number/boolean scalars. |
+| **`"$$theme.text"`** | Literal **`$theme.text`**; **`$$`** escapes a dollar sign. |
+
+Unknown roots, missing nested properties, unsafe path segments, and attempts to embed a non-scalar asset inside a longer string throw **`ApexifyAssetError`**. Use a non-scalar reference as the entire field value instead.
+
+The deep resolver rejects cyclic arrays/plain objects rather than recursing indefinitely. Opaque runtime objects are preserved; JSON-like arrays/records are traversed.
 
 ---
 
-## Example — scene + palette colors
+## Example — scene + palette + image
 
 ```typescript
 import { ApexPainter } from "apexify.js";
@@ -60,13 +88,13 @@ import fs from "node:fs";
 const painter = new ApexPainter({ type: "buffer" });
 
 painter.assets
-  .loadImage("avatar", "./fixtures/user.png") // use any readable image path
+  .loadImage("avatar", "./fixtures/user.png")
   .loadPalette("brand", { panel: "#1e293b", ink: "#e2e8f0" });
 
 const png = await painter.renderScene({
   width: 480,
   height: 240,
-  colorBg: "$brand.panel",
+  background: { colorBg: "$brand.panel" },
   layers: [
     {
       type: "text",
@@ -88,36 +116,32 @@ const png = await painter.renderScene({
 fs.writeFileSync("card.png", png);
 ```
 
-Use **`loadFont`** plus **`fontPath: "$myFontId"`** inside **`texts`** when you want typography to go through the asset registry the same way as colors and images.
+Use **`loadFont`** plus a full-field font path reference when a text API accepts a font path string.
 
 ---
 
-## `prepareForRender` — resolve once, call many APIs
+## `prepareForRender`
 
-**`painter.prepareForRender<T>(value): T`** walks **plain objects and arrays** (JSON-like) and replaces **`$`** **string leaves** using **`assets.resolve`**. Use it when you:
-
-- Build config with **`$`** but call APIs that **do not** accept **`resolveAssetRefs: true`**, or  
-- Want to **reuse** the same resolved object across several calls without repeated walks.
+**`painter.prepareForRender<T>(value): T`** deep-resolves asset references in JSON-like arrays/records without rendering anything. It is useful when an imperative API does not expose an asset-resolution option or when you want one resolved snapshot reused across calls.
 
 ```typescript
 const base = painter.prepareForRender({
   width: 720,
   height: 400,
-  colorBg: "$brand.panel",
+  colorBg: "$theme.bg",
 });
 
 await painter.createCanvas(base);
 ```
 
-Typed **return** is the same shape you passed in; only **string** leaves that look like asset refs change.
+Because resolution returns a new composition structure, the input object is not mutated.
 
 ---
 
 ## Relationship to templates
 
-Templates run **placeholder** interpolation (**`{{name}}`**) **and** **`$`** resolution in one pass. Prefer **either**:
+Templates use one deterministic pipeline: **visibility filtering → placeholder resolution → asset resolution → numeric/layout normalization → scene validation**. A whole placeholder or asset reference can preserve native values such as `false`, `0`, arrays, objects, or Buffers where the target field accepts them.
 
-- Let the **template** resolve assets (usual), or  
-- **`prepareForRender`** on your **data** before stuffing it into a template field — avoid **double-applying** **`$`** unintentionally on the same string.
+Use **`createTemplate(definition, { resolveAssetRef })`** when one template needs a custom asset resolver instead of `painter.assets`.
 
 ---
