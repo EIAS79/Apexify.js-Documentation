@@ -1,68 +1,79 @@
 # Templates (`createTemplate`) {#02-templates}
 
-
-**`ApexPainter#createTemplate(definition, options?)`** returns **`TemplateHandle`** with:
+**`ApexPainter#createTemplate(definition, options?)`** captures an immutable copy of a scene-shaped definition and returns a **`TemplateHandle`**.
 
 | Method | Returns | Purpose |
-|--------|---------|---------|
-| **`toRenderInput(data, opts?)`** | **`Promise<SceneRenderInput>`** | Declarative PNG **without** rasterizing — feed **[GIF](/docs#07-render-scene-to-gif)** / **[video](/docs#08-render-scene-to-video)** / tests |
-| **`render(data, opts?)`** | **`Promise<Buffer>`** (PNG) | **One-shot** raster after resolution |
+|---|---|---|
+| **`toRenderInput(data, opts?)`** | **`Promise<SceneRenderInput>`** | Resolve the template without rasterizing; useful for tests and scene→GIF/video workflows. |
+| **`render(data, opts?)`** | **`Promise<Buffer>`** | Resolve, validate, then render one PNG. |
 
-**Important:** **`TemplateHandle.render`** calls **`renderScene`** with **`resolveAssetRefs: false`** on the final pass because **asset **`$`** tokens are already resolved** during template expansion. Do not assume you need to “re-resolve” unless you hand-build **`SceneRenderInput`** yourself.
+`TemplateHandle` snapshots both the definition and each render's data before asynchronous layout work. Mutating caller-owned objects after `createTemplate()` or after starting a render does not change that render.
+
+---
+
+## Resolution order
+
+The supported pipeline is deterministic:
+
+1. Apply render-time **insertions**.
+2. Validate unique literal layer **`id`** values.
+3. Apply **overrides** by id.
+4. Evaluate **`visible`** and remove hidden subtrees.
+5. Resolve **`{{placeholders}}`**.
+6. Resolve **`$assets`**.
+7. Normalize numeric layout fields and shorthand layers.
+8. Expand **flex/grid** layouts.
+9. Validate the resulting **`SceneRenderInput`** with the normal scene limits.
+
+Hidden layers are removed before their other placeholders/assets are resolved, so a missing value inside an intentionally hidden layer does not fail the render.
 
 ---
 
 ## Placeholders
 
-- **`{{key}}`** — required; missing keys throw **`TemplateResolveError`** with the token name.
-- **`{{key | default}}`** — uses **`default`** when **`key`** is absent or empty.
-
-**Data** is a **`Record<string, unknown>`** (**`TemplateData`**): nested keys can be addressed if your placeholder helper supports dotted paths (follow runtime errors for unsupported paths).
+- **`{{key}}`** — required. Missing or `null`/`undefined` values throw **`TemplateResolveError`**.
+- **`{{key | default}}`** — the explicit default is used only for missing/nullish values.
+- Dotted own-property paths such as **`{{user.name}}`** are supported.
+- A placeholder that occupies the **entire string field** preserves the native value. `0`, `false`, and `""` are not treated as missing.
+- An embedded placeholder inside a longer string is stringified.
 
 ```typescript
 const data = {
-  title: "Weekly digest",
-  subtitle: "You have 3 unread items",
-  accent: "#38bdf8",
+  position: { x: 0 },
+  enabled: false,
+  label: "",
+  user: { name: "Ada" },
 };
 ```
+
+Unsafe prototype-path segments are not traversed.
 
 ---
 
 ## Shorthand layers
 
-Inside **`layers`**, you may use **document-style** rows; they normalize to **`SceneLayer`** shapes:
+Template definitions may use document-style shorthand:
 
-- **`{ type: "text", text: "…", … }`** → **`{ type: "text", texts: { … } }`**
-- **`{ type: "image", source: "…", … }`** → **`{ type: "image", images: { … } }`**
+- **`{ type: "text", text: "…", … }`** → scene **`texts`** form.
+- **`{ type: "image", source: "…", … }`** → scene **`images`** form.
 
----
-
-## Optional fields
-
-- **`id`** (string) — target for **`overrides`** at render time (**deep merge** into that layer).
-- **`visible`** — boolean, or **`"{{flag}}"`** string; falsy hides the layer.
-- **`overrides`** — on **`render`** / **`toRenderInput`**: `{ [layerId]: Partial<…> }`.
+The final `SceneRenderInput` contains normal scene layers.
 
 ---
 
-## Minimal example — headline + body
+## Minimal example
 
 ```typescript
 import { ApexPainter } from "apexify.js";
 import fs from "node:fs";
 
 const painter = new ApexPainter({ type: "buffer" });
-
-painter.assets.loadPalette("ui", {
-  bg: "#0f172a",
-  fg: "#f8fafc",
-});
+painter.assets.loadPalette("ui", { bg: "#0f172a", fg: "#f8fafc" });
 
 const card = painter.createTemplate({
   width: 560,
   height: 220,
-  colorBg: "$ui.bg",
+  background: { colorBg: "$ui.bg" },
   layers: [
     {
       id: "title",
@@ -74,19 +85,21 @@ const card = painter.createTemplate({
       color: "$ui.fg",
     },
     {
+      id: "body",
       type: "text",
+      visible: "{{showBody}}",
       text: "{{body | Nothing to show}}",
       x: 32,
       y: 110,
       fontSize: 16,
       color: "$ui.fg",
-      opacity: 0.85,
     },
   ],
 });
 
 const png = await card.render({
   title: "Ada",
+  showBody: true,
   body: "Your graph is ready.",
 });
 
@@ -95,35 +108,80 @@ fs.writeFileSync("template.png", png);
 
 ---
 
-## Flex layout (`type: "layout"`, `layout.type: "flex"`)
+## Visibility
 
-**Layout** expands to **absolutely positioned** text/image/surface children. The engine **measures**:
+**`visible`** accepts booleans, numbers, literal strings, or placeholder strings. Common string values are interpreted explicitly: `true`, `1`, `yes` are true; `false`, `0`, `no`, and the empty string are false.
 
-- **Text** — **`measureText`** on the resolved **`TextProperties`**.
-- **Image** — **`width`** and **`height`** on the **`images`** object (**required** for layout).
-- Nested **layout** with explicit **`width`** / **`height`** on the node.
+For a whole placeholder such as **`visible: "{{feature.enabled}}"`**, the native boolean/number/string value drives visibility.
 
-Container fields: **`x`**, **`y`**, **`width`**, **`height`**, **`layout`**, **`children`**.
+---
 
-**`layout`** object (flex):
+## Overrides and insertions
 
-| Field | Meaning |
-|-------|---------|
-| **`type`** | **`"flex"`** |
-| **`direction`** | **`"row"`** (default) or **`"column"`** |
-| **`gap`**, **`padding`** | Pixels between children / inset |
-| **`align`** | Cross-axis: **`start`**, **`center`**, **`end`** |
-| **`justify`** | Main axis: **`start`**, **`center`**, **`end`**, **`space-between`** |
+Every targetable layer id must be a unique, non-empty **literal** string. Placeholder ids are rejected.
+
+### Deep overrides
 
 ```typescript
-import { ApexPainter } from "apexify.js";
+await card.render(
+  { title: "Build", showBody: false },
+  {
+    overrides: {
+      title: { color: "#4ade80", fontSize: 32 },
+    },
+  }
+);
+```
 
-const painter = new ApexPainter({ type: "buffer" });
+Overrides use the **authored template-layer shape** and deep-merge plain nested objects. Unknown ids are rejected instead of being silently ignored.
 
+### Deterministic insertions
+
+```typescript
+await card.render(
+  { title: "Build", showBody: false },
+  {
+    insertions: [
+      {
+        targetId: "title",
+        position: "after",
+        layers: {
+          id: "status",
+          type: "text",
+          text: "Passed",
+          x: 32,
+          y: 82,
+          fontSize: 14,
+          color: "#4ade80",
+        },
+      },
+    ],
+  }
+);
+```
+
+Each insertion target must exist exactly once, and insertions may not introduce duplicate ids.
+
+---
+
+## Flex layout
+
+A **`type: "layout"`** node with **`layout.type: "flex"`** expands to absolutely positioned children.
+
+| Field | Meaning |
+|---|---|
+| **`direction`** | `row` (default) or `column` |
+| **`gap`**, **`padding`** | Non-negative pixels |
+| **`align`** | Cross axis: `start`, `center`, `end` |
+| **`justify`** | Main axis: `start`, `center`, `end`, `space-between` |
+
+Text children are measured with `measureText`; image children require positive explicit width/height. Layout containers also require positive width/height.
+
+```typescript
 const hero = painter.createTemplate({
   width: 640,
   height: 200,
-  colorBg: "#020617",
+  background: { colorBg: "#020617" },
   layers: [
     {
       type: "layout",
@@ -146,61 +204,51 @@ const hero = painter.createTemplate({
     },
   ],
 });
-
-await hero.render({ headline: "Ship faster", tagline: "One scene, many rows." });
 ```
-
-**Grid** (**`layout.type: "grid"`**) is also supported (see runtime errors for required **`columns`** and sizing rules).
 
 ---
 
-## Runtime overrides (by `id`)
+## Grid layout
+
+**`layout.type: "grid"`** supports positive integer **`columns`**, non-negative **`gap`** / **`padding`**, and `start` / `center` / `end` alignment and justification. Cell width is derived from the container; row height is the tallest child in that row. Invalid geometry that leaves no positive cell area throws `TemplateResolveError`.
 
 ```typescript
-import { ApexPainter } from "apexify.js";
-
-const painter = new ApexPainter({ type: "buffer" });
-
-const tpl = painter.createTemplate({
+{
+  type: "layout",
+  x: 20,
+  y: 20,
   width: 400,
-  height: 120,
-  colorBg: "#0b1220",
-  layers: [{ id: "kicker", type: "text", text: "Status", x: 20, y: 24, fontSize: 14, color: "#94a3b8" }],
-});
-
-await tpl.render(
-  {},
-  {
-    overrides: {
-      kicker: { text: "Build #4821 passed", color: "#4ade80" },
-    },
-  }
-);
+  height: 220,
+  layout: { type: "grid", columns: 2, gap: 12, padding: 8, align: "center", justify: "center" },
+  children: [
+    { type: "image", source: "rectangle", width: 120, height: 60, shape: { fill: true, color: "#334155" } },
+    { type: "image", source: "rectangle", width: 120, height: 60, shape: { fill: true, color: "#475569" } },
+  ],
+}
 ```
 
 ---
 
-## Custom `resolveAssetRef` (per template)
+## Asset resolution
 
-Pass **`createTemplate(def, { resolveAssetRef })`** to **bypass** **`painter.assets`** for that template only (CDN fetch, DB lookup, A/B theme bucket, …). The hook receives the path **without** the **`$`** prefix.
+After placeholders, the shared asset-reference engine resolves **`$name`**, dotted paths, `$$` escaping, whole-field structured/Buffer references, and scalar embedded references. Unknown assets become `TemplateResolveError` with the asset token and original cause.
+
+Pass **`createTemplate(definition, { resolveAssetRef })`** when a template needs a custom resolver instead of `painter.assets`.
+
+`render()` deliberately calls the final scene render with **`resolveAssetRefs: false`** because the template stage already resolved its assets.
 
 ---
 
-## `toRenderInput` — plug into GIF / video
+## `toRenderInput`
 
 ```typescript
-import { ApexPainter } from "apexify.js";
+const input = await hero.toRenderInput({ headline: "Ship faster", tagline: "One scene, many rows." });
 
-const painter = new ApexPainter({ type: "buffer" });
-const tpl = painter.createTemplate({
-  width: 200,
-  height: 80,
-  colorBg: "#020617",
-  layers: [{ type: "text", text: "{{title}}", x: 12, y: 28, fontSize: 18, color: "#f8fafc" }],
+await painter.renderSceneToGIF(input, {
+  options: { width: 640, height: 200, outputFormat: "buffer" },
 });
-
-const input = await tpl.toRenderInput({ title: "Export" });
-// `input` is a plain SceneRenderInput — pass to renderSceneToGIF, video frame slots, etc.
 ```
+
+The returned object is an isolated, validated **`SceneRenderInput`** snapshot. Mutating it does not mutate the template definition or later renders.
 
 ---
