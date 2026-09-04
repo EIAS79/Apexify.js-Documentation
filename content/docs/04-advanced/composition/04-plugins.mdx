@@ -84,7 +84,7 @@ await painter.renderScene({
 
 - Calling **`painter.use()`** twice with the same **`plugin.name`** is rejected.
 - A second same-name call is also rejected while the first installation is still pending.
-- Different plugin installations are serialized. This prevents a failed rollback from erasing another plugin's concurrently completed registry work.
+- Different plugin installations are serialized so plugin transactions do not overlap.
 - A failed plugin name is released after cleanup, so the application may retry that plugin later.
 - The current lifecycle is **install-only**. Apexify.js does not provide plugin uninstall/teardown hooks.
 
@@ -92,13 +92,15 @@ await painter.renderScene({
 
 ## Failure rollback
 
-Installation snapshots the **PluginHost registry** before invoking the plugin. If `install()` throws or rejects:
+PluginHost uses an async-context transaction around `plugin.install(host)`. If `install()` throws or rejects:
 
-- API registrations made through **`host.plugins.use(...)`** during that installation are rolled back.
+- API registrations made through **`host.plugins.use(...)`** inside that plugin installation are removed.
+- Pre-existing PluginHost APIs removed by the failing plugin are restored.
+- Unrelated application registry writes that happen concurrently while the plugin is awaiting are preserved.
 - The plugin is not marked installed.
 - The caller receives **`ApexifyPluginError`** with the original error as its cause.
 
-Rollback is intentionally limited to **PluginHost registrations**. Apexify.js cannot automatically undo arbitrary external side effects performed by plugin code (files, network calls, timers, mutations to unrelated application state). Plugins should perform irreversible side effects only after their own prerequisites are known to have succeeded, or provide their own compensation logic.
+Rollback is intentionally limited to **PluginHost registry mutations performed in the plugin installation context**. Apexify.js cannot automatically undo arbitrary external side effects performed by plugin code (files, network calls, timers, mutations to unrelated application state). Plugins should perform irreversible side effects only after their own prerequisites are known to have succeeded, or provide their own compensation logic.
 
 ---
 
