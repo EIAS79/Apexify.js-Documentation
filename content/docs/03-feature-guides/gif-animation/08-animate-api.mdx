@@ -1,15 +1,14 @@
 # `animate` — declarative frame sequences {#08-animate-api}
 
+**`await painter.animate(frames, defaultDuration, defaultWidth?, defaultHeight?, options?, painterOpts?)`** renders declarative `Frame` definitions. It either returns PNG `Buffer[]` or writes a GIF file through `@skyra/gifenc`.
 
-**`await painter.animate(frames, defaultDuration, defaultWidth?, defaultHeight?, options?, painterOpts?)`** renders **each** **`Frame`** on its own canvas, optionally sleeps between ticks, and either collects **PNG** **`Buffer`s** **or** streams frames into **`gifPath`** via **`gifencoder`**.
+This helper is separate from `createGIF`: it does not expose per-frame GIF disposal/transparency, `GIFWatermarkSpec`, `onStart` frame producers, attachment/base64 outputs, or GIF encoder tuning. Use `createGIF` for the full GIF-specific API.
 
-This path is **not** **`createGIF`**: no per-frame **`dispose`**, **`transparentColor`**, **`GIFWatermarkSpec`**, **`onStart`** streaming, or **`skipResizeWhenDimensionsMatch`**. Use **`createGIF`** when you need GIF89a disposal/transparency semantics or Apexify watermark overlays.
-
-Implementation: **`animateFrames`** (**`lib-next/gif/animate-frames.ts`**). **`Frame`** types live in **`types/gif.ts`**.
+Implementation: **`lib-next/gif/animate-frames.ts`**. `Frame` lives in **`types/gif.ts`**.
 
 ---
 
-## Signature & validation
+## Signature
 
 ```typescript
 animate(
@@ -22,16 +21,9 @@ animate(
 ): Promise<Buffer[] | undefined>;
 ```
 
-**`validateAnimateInputs`** throws when:
+`frames` must be non-empty and stay within central collection/GIF resource limits. Durations are milliseconds and may be zero.
 
-| Condition | Error |
-|-----------|--------|
-| **`frames`** missing / empty | **`animate: frames array with at least one frame is required.`** |
-| **`defaultDuration < 0`** | **`defaultDuration must be a non-negative number`** |
-| **`defaultWidth`/`height` ≤ 0** | must be **positive** |
-| **`options.gif`** truthy **without** **`gifPath`** | **`gifPath is required when gif is enabled`** |
-
-Optional **`painterOpts`**: when **`resolveAssetRefs: true`**, **`frames`** are deep-resolved (**`maybeResolveRefs`**); **`AnimateOptions`** is processed with **`prepareForRender`** **only** when **`options`** is passed (**same **`resolveAssetRefsDeep`** as **`createGIF`** **`GIFOptions`**).
+Optional `painterOpts.resolveAssetRefs` resolves supported `$…` asset references before animation rendering.
 
 ---
 
@@ -40,64 +32,96 @@ Optional **`painterOpts`**: when **`resolveAssetRefs: true`**, **`frames`** are 
 ```typescript
 type AnimateOptions = {
   gif?: boolean;
-  gifPath?: string;        // required when gif === true — filesystem path for output .gif
+  gifPath?: string;
   onStart?: () => void;
   onFrame?: (index: number) => void;
   onEnd?: () => void;
+  signal?: AbortSignal;
 };
 ```
 
-Hooks fire **around** the loop: **`onStart`** once before iteration; **`onFrame(i)`** after each frame’s **`toBuffer`** **and** optional **`encoder.addFrame`**; **`onEnd`** once after the loop (**preceded by **`encoder.finish()`** when **`gif: true`**).
+When `gif: true`, `gifPath` is required.
+
+### Hook order
+
+- `onStart` fires after validation/cancellation checks and before frame iteration.
+- `onFrame(i)` fires after that frame has been drawn and, in GIF mode, handed to the encoder.
+- `onEnd` fires only after the loop. In GIF mode it runs **after** `encoder.finish()`, destination-stream completion, and GIF signature validation.
+
+An already-aborted signal prevents `onStart` and output allocation. Failures after GIF output begins destroy the stream and remove the partial file.
 
 ---
 
-## Return value
+## Return value and timing behavior
 
-| **`options.gif`** | Return |
-|-------------------|--------|
-| **`false`** / omitted | **`Buffer[]`** — one **PNG** per frame (**`canvas.toBuffer('image/png')`**). |
-| **`true`** | **`undefined`** — GIF bytes written **only** to **`gifPath`** (PNG buffers are still produced internally but **not** returned). |
+| `options.gif` | Return / pacing |
+|---------------|-----------------|
+| false / omitted | `Buffer[]`, one PNG per frame. After each frame, `animate` waits `frame.duration ?? defaultDuration` ms when the value is positive. |
+| true | `undefined`. Frames are encoded directly to `gifPath`; the helper does **not** sleep between encoder submissions. The GIF frame delay still uses `frame.duration ?? defaultDuration`. |
 
----
+GIF mode resolves only after the output file is complete and its header is verified as `GIF87a`/`GIF89a`.
 
-## Per-frame rendering order (`Frame`)
-
-Each iteration uses **`frame.width ?? defaultWidth`**, **`frame.height ?? defaultHeight`**:
-
-1. **`clearRect`** full canvas.
-2. **`transformations`** (**optional**) — **`save` → `translate` → `rotate` → `scale`** (**degrees** for **`rotate`**).
-3. Background paint (**first match wins building **`fillStyle`**):
-   - **`gradient`** — **`GradientConfig`** — **only `linear` and `radial`** branches exist (**`conic`** on the type is **ignored** today).
-   - else **`pattern`** — **`loadImage(pattern.source)`**, **`createPattern`** (**`repeat`** default **`repeat`**).
-   - else **`backgroundColor`** — flat **`fillRect`**.
-4. **`source`** (**optional**) — **`loadImage`**, **`globalCompositeOperation`** (**default **`source-over`**), **`drawImage`** full bounds.
-5. **`onDrawCustom(ctx, canvas)`** — imperative drawing hook.
-6. **`restore`** if transformations were applied.
-7. Push **`canvas.toBuffer('image/png')`** to **`buffers`**.
-8. GIF branch:** **`encoder.setDelay(frame.duration ?? defaultDuration)`**, **`encoder.addFrame(ctx)`**.
-9. **`await sleep(frame.duration ?? defaultDuration)`** — **`setTimeout`** pacing (**milliseconds**) **after every frame**.
-
-Fixed GIF encoder settings when **`gif: true`**: **`setRepeat(0)`**, **`setQuality(10)`** (no API exposure).
+The fixed encoder settings for this convenience path are repeat `0` (loop indefinitely) and quality `10`.
 
 ---
 
-## `Frame` fields reference
+## GIF dimensions are fixed
+
+A GIF encoder has one logical screen size, so GIF mode uses exactly `defaultWidth × defaultHeight` for every frame.
+
+A frame-level `width`/`height` override that would differ from those GIF dimensions is rejected. This prevents silent cropping or stale pixels from a previous frame.
+
+Frame-level dimensions remain supported when `gif` is false, where each PNG frame has its own canvas.
+
+---
+
+## Rendering order
+
+For each frame:
+
+1. choose `frame.width/height` or the defaults (non-GIF mode); GIF mode has already required the fixed output size
+2. clear the canvas
+3. apply optional transform (`translate` → `rotate` → `scale`)
+4. resolve background paint:
+   - gradient through Apexify's **shared gradient renderer** (linear, radial, and conic)
+   - pattern, when supplied, replaces the gradient fill
+   - otherwise `backgroundColor`
+5. draw optional `source` with `blendMode` (default `source-over`)
+6. invoke `onDrawCustom(ctx, canvas)`
+7. restore the transform
+8. encode the GIF frame or snapshot PNG bytes
+9. invoke `onFrame`
+10. non-GIF mode only: apply the requested wall-clock delay
+
+`GradientConfig.angle` remains supported as the legacy conic-angle alias when `startAngle` is not provided.
+
+---
+
+## Media sources use central policy
+
+`Frame.source` and `Frame.pattern.source` are strings. Paths, data-image URLs, and allowed remote URLs are resolved through Apexify's shared media layer.
+
+Remote animation sources therefore use the same protocol/host trust policy, SSRF protections, redirect/timeout rules, remote-byte limits, and global remote concurrency controls as other Apexify image workflows. Per-frame animation media is not retained in the shared byte/decode cache solely for reuse inside the sequence.
+
+---
+
+## `Frame` reference
 
 | Field | Role |
 |-------|------|
-| **`width`**, **`height`** | Override **`defaultWidth`/`Height`** for **this** tick only. |
-| **`duration`** | Frame delay (**GIF delay** **and** **`setTimeout`** sleep); falls back to **`defaultDuration`**. |
-| **`backgroundColor`** | Solid backdrop. |
-| **`gradient`** | **`GradientConfig`** (**linear**/radial implemented). |
-| **`pattern`** | **`{ source, repeat? }`** tiled fill. |
-| **`source`** | Full-frame raster (**path**, URL, buffer-friendly **`loadImage`** input). |
-| **`blendMode`** | **`GlobalCompositeOperation`** when drawing **`source`**. |
-| **`transformations`** | **`scaleX/Y`, `rotate`, `translateX/Y`**. |
-| **`onDrawCustom`** | Receive **`SKRSContext2D`** + **`Canvas`** for extra vectors/text/shapes. |
+| `width`, `height` | Per-frame PNG dimensions; in GIF mode they must equal the configured GIF dimensions. |
+| `duration` | GIF delay and, for non-GIF mode, optional wall-clock pacing delay. |
+| `backgroundColor` | Solid background. |
+| `gradient` | Shared linear/radial/conic `GradientConfig`. |
+| `pattern` | `{ source, repeat? }` tiled image fill. |
+| `source` | Full-frame raster source. |
+| `blendMode` | `GlobalCompositeOperation` for `source`. |
+| `transformations` | `scaleX/Y`, `rotate` (degrees), `translateX/Y`. |
+| `onDrawCustom` | Imperative drawing hook receiving canvas context + canvas. |
 
 ---
 
-## Example — PNG strip only
+## Example — PNG frames
 
 ```typescript
 const pngs = await painter.animate(
@@ -105,57 +129,34 @@ const pngs = await painter.animate(
     { backgroundColor: '#1e293b' },
     {
       gradient: {
-        type: 'linear',
-        startX: 0,
-        startY: 0,
-        endX: 400,
-        endY: 300,
+        type: 'conic',
+        centerX: 240,
+        centerY: 160,
+        startAngle: 45,
         colors: [
           { stop: 0, color: '#6366f1' },
-          { stop: 1, color: '#ec4899' },
+          { stop: 0.5, color: '#ec4899' },
+          { stop: 1, color: '#6366f1' },
         ],
       },
       duration: 150,
-    },
-    {
-      backgroundColor: '#0f172a',
-      source: './logo.png',
-      blendMode: 'screen',
-      duration: 200,
     },
   ],
   120,
   480,
   320
 );
-// pngs is Buffer[] length 3
 ```
 
 ---
 
-## Example — GIF file output
+## Example — GIF file
 
 ```typescript
 await painter.animate(
   [
-    {
-      backgroundColor: '#020617',
-      onDrawCustom: (ctx, canvas) => {
-        ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 48px Arial';
-        ctx.fillText('Tick', canvas.width / 2 - 60, canvas.height / 2);
-      },
-      duration: 180,
-    },
-    {
-      backgroundColor: '#0f172a',
-      onDrawCustom: (ctx, canvas) => {
-        ctx.fillStyle = '#f472b6';
-        ctx.font = 'bold 48px Arial';
-        ctx.fillText('Tock', canvas.width / 2 - 60, canvas.height / 2);
-      },
-      duration: 180,
-    },
+    { backgroundColor: '#020617', duration: 180 },
+    { backgroundColor: '#0f172a', source: './logo.png', duration: 180 },
   ],
   200,
   640,
@@ -164,24 +165,21 @@ await painter.animate(
     gif: true,
     gifPath: './out/tick-tock.gif',
     onFrame: (i) => console.log('encoded frame', i),
-    onEnd: () => console.log('gif closed'),
+    onEnd: () => console.log('complete GIF is now on disk'),
   }
 );
-// resolves undefined — open ./out/tick-tock.gif
 ```
 
 ---
 
-## Choosing **`animate`** vs **`createGIF`**
+## Choosing `animate` vs `createGIF`
 
 | Need | Prefer |
 |------|--------|
-| Chroma transparency / disposal codes | **`createGIF`** |
-| Watermarks / **`textOverlay`** on every encoded frame | **`createGIF`** |
-| **`onStart`** streaming / huge batch sizes | **`createGIF`** |
-| Quick procedural **`Frame`** defs + optional GIF sidecar | **`animate`** |
-| Already have **`Buffer`** PNG/JPEG frames | **`createGIF`** + **`GIFInputFrame`** |
-| Encode frames to MP4 | **`createVideo({ createFromFrames })`** or [Scene → video](/docs#08-render-scene-to-video) |
-| MP4 + trim / captions / SFX | [Video pipeline (advanced)](/docs#01-video-pipeline) |
-
----
+| Chroma transparency / disposal codes | `createGIF` |
+| Watermarks / rich `textOverlay` | `createGIF` |
+| Generated `AsyncIterable` streaming / backpressure | `createGIF` |
+| Buffer/base64/attachment output | `createGIF` |
+| Quick declarative `Frame` sequence + optional GIF file | `animate` |
+| Separate PNG frames with per-frame dimensions | `animate` |
+| Encode frames to MP4 | `createVideo({ createFromFrames })` or Scene → video |

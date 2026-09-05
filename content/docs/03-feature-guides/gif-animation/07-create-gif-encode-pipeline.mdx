@@ -1,52 +1,101 @@
 # Encode pipeline (reference) {#07-create-gif-encode-pipeline}
 
-
-End-to-end order inside **`GIFCreator.createGIF`** (**`gif-creator.ts`**).
-
----
-
-## 1. Resolve **`finalFrames`**
-
-| Branch | Behaviour |
-|--------|-----------|
-| **`options.onStart`** | **`collectFramesFromOnStart`** → **`GIFCanonicalFrame[]`** (**array** or **`AsyncIterable`**); **`GIFEncodedFrame.duration`** defaults **`options.delay`** then **`100`** ms. |
-| Else | **`validateGIFOptions`** then **`resolveFrameToBuffer`** each **`GIFInputFrame`** (**`axios`** for **`http`**, **`fs.readFileSync`** for paths). |
-
-**Encoder canvas:** **`options.width || 1200`**, **`options.height || 1200`**.
+This page describes the Phase 7 order inside **`GIFCreator.createGIF`**.
 
 ---
 
-## 2. Encoder setup
+## 1. Validate common/output/overlay options
 
-- **`GIFEncoder(canvasWidth, canvasHeight)`**
-- Pipe to **`fs.WriteStream`** (**`file`**) or in-memory **`PassThrough`** (**`buffer`**, **`base64`**)
-- **`encoder.start()`**, **`setRepeat(options.repeat || 0)`**, **`setQuality(options.quality || 10)`**
-- One **`createCanvas`** reused for **all** frames (**clear → draw → composite → `addFrame`**).
+`validateGIFOptions` runs before `onStart`, output-stream creation, or encoder allocation.
 
----
+It validates, among other things:
 
-## 3. Per-frame loop
+- output mode / required file path / attachment filename
+- width + height pairing and GIF resource limits
+- repeat / quality / delay / generated-frame hints
+- global disposal/transparency
+- watermark geometry/source fields
+- `textOverlay` through the authoritative text-property validator
+- `signal` shape
 
-For each **`GIFCanonicalFrame`**:
-
-1. **`drawFrameOntoEncoderCanvas`** — **`clearRect`**, **`loadImage(frame.buffer)`**, scale via **`resizeImage`** unless **`skipResizeWhenDimensionsMatch`** and dimensions already match (**default: skip when sizes equal**).
-2. **`drawWatermarkOverlay`** — per-frame **`GIFWatermarkSpec`** then global **`options.watermark`** (**`loadRasterUrl`** supports **`http`**).
-3. **`textOverlay`** — **`fillText`** with **`${fontSize}px Arial`** (**`fontPath`/`fontName`** ignored — see [Watermark](/docs#04-create-gif-watermark-overlay)).
-4. **`applyGifEncoderFrameOptions`** — **`setDispose`** (**`frame.dispose ?? options.defaultDispose`**), **`setTransparent`** (**per-frame chroma overrides global**).
-5. **`encoder.setDelay(frame.duration)`**, **`encoder.addFrame(ctx)`**.
-6. On **last** frame only — snapshot **`canvas.toBuffer('image/png')`** as **`finalFrameBuffer`** for **`onEnd`**.
+This ordering is deliberate: generated-frame mode cannot bypass output validation or trigger user callbacks before obviously invalid options fail.
 
 ---
 
-## 4. Finish & return
+## 2. Prepare the frame source
 
-- **`encoder.finish()`**, then drain **`outputStream`** for **`buffer`**/**`base64`** (**await **`end`**). (**`attachment`** skips draining — see **[attachment shortcut](#attachment-shortcut)** below.)
-- If **`onEnd(finalFrameBuffer)`** returns **`Buffer`**, combine with GIF bytes per **[onEnd](/docs#06-create-gif-onend-results)** (**`{ gif, static }`** or **`static` only** when **`file`**).
+There are three internal source modes:
+
+| Source mode | Behavior |
+|-------------|----------|
+| static `GIFInputFrame[]` | Validate the list and known frame resource cost; resolve frames through a bounded ordered queue. |
+| generated `GIFEncodedFrame[]` | Validate the returned array and reject it when it exceeds the generated-frame bound. |
+| generated `AsyncIterable<GIFEncodedFrame>` | Keep the iterator lazy; no collection and no prefetch. |
+
+Static arrays use at most the central batch/network concurrency bound for source resolution. Generated async streams pull exactly one item at a time.
+
+Every remote source goes through the central media/network resolver rather than a GIF-specific HTTP implementation.
 
 ---
 
-## **`attachment`** shortcut {#attachment-shortcut}
+## 3. Resolve reusable overlays
 
-When **`outputFormat === 'attachment'`**, **`encoder.finish()`** has **already** run (same loop as other formats). **`createGIF`** then returns **`[{ attachment: encoder.createReadStream(), name: 'gif.js' }]`** **without** draining **`outputStream`** **and** **without** invoking **`onEnd`**. Read from **`attachment`** for encoded bytes — the usual **`buffer`**, **`base64`**, **`file`**, and **`onEnd`** return paths do **not** run in this branch.
+A configured global watermark is resolved before encoding and reused through a bounded per-operation image cache. One-use remote frame payloads are resolved with shared remote-byte caching disabled so a long animation does not fill the general media cache with frame data.
 
 ---
+
+## 4. Create encoder/output lifecycle
+
+Output dimensions default to **1200 × 1200** and are validated before allocation.
+
+- create one `GifEncoder(width, height)`
+- create one encoder read stream
+- `file`: pipe to `fs.WriteStream` and track completion with `finished()`
+- all non-file modes: drain the encoder stream into a `Buffer`
+- configure repeat/quality and start the encoder
+- create one canvas/context reused across all GIF frames
+
+The same encoder/canvas is reused for the operation; Apexify does not allocate a separate output canvas for every encoded frame.
+
+---
+
+## 5. Incremental per-frame loop
+
+For each canonical frame:
+
+1. check cancellation
+2. assert incremental GIF resource cost for `frameCount + 1`
+3. resolve/decode the source (generated streams do this only after the producer yields the current item)
+4. clear the output canvas
+5. draw the frame; different source dimensions are stretched to output dimensions
+6. apply frame/global watermark
+7. render `textOverlay` through `EnhancedTextRenderer`
+8. reset transparency + disposal + delay for this frame
+9. `encoder.addFrame(ctx)`
+10. increment the encoded frame count
+
+For `AsyncIterable`, control returns to the producer for the next `next()` call only after these steps complete. That is the backpressure boundary.
+
+---
+
+## 6. Finish and validate output
+
+After at least one frame has been encoded:
+
+1. `encoder.finish()` writes the trailer and ends the encoder stream.
+2. `file` waits for the destination stream to finish; non-file modes await complete encoded bytes.
+3. Apexify verifies the output begins with `GIF87a` or `GIF89a`.
+4. `base64` converts the validated Buffer.
+5. `attachment` wraps the validated Buffer with `.gif` name and `image/gif` MIME type.
+6. if configured, `onEnd` receives a PNG snapshot of the final composited canvas.
+7. return the primary GIF result, or `{ gif, static }` / static-only file result when `onEnd` returns a Buffer.
+
+There is no Phase 7 attachment early-return shortcut: attachment output follows the same encoder-drain/signature/onEnd lifecycle as the other in-memory outputs.
+
+---
+
+## Failure cleanup
+
+Any failure aborts the operation controller, destroys active encoder/file streams, observes the pending output promise, and removes a partially written file output. Existing structured Apexify errors are preserved; unexpected backend failures are wrapped as GIF decode errors with the original cause.
+
+This cleanup also applies to generated-producer errors and cancellation.

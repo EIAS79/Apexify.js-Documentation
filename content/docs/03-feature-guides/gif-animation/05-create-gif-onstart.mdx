@@ -1,7 +1,8 @@
 # Programmatic frames (`onStart`) {#05-create-gif-onstart}
 
+Use **`GIFOptions.onStart`** when frames are generated programmatically instead of supplied as a static `GIFInputFrame[]`.
 
-When **`GIFOptions.onStart`** is defined, **`createGIF`** ignores the **`gifFrames`** argument and builds **`GIFCanonicalFrame[]`** from your callback (or async iterator).
+The modes are exclusive: if `onStart` is present, pass **`undefined`** for `gifFrames`. Supplying a non-empty static frame list and `onStart` together is rejected.
 
 ---
 
@@ -10,61 +11,98 @@ When **`GIFOptions.onStart`** is defined, **`createGIF`** ignores the **`gifFram
 ```typescript
 onStart?: (
   frameCountHint: number,
-  painter: ApexPainter   // typed as `any` in `GIFOptions`
+  painter: unknown
 ) => Promise<GIFEncodedFrame[] | AsyncIterable<GIFEncodedFrame>>;
 ```
 
-**`frameCountHint`** is informational — streaming ignores a fixed length.
+The runtime passes the active `ApexPainter` instance as the second argument.
 
-**Hint derivation** (`GIFCreator.createGIF`):
+`frameCountHint` is advisory and always bounded by the configured `maxGifFrames`. It is derived from:
 
-1. **`options.frameCount`** if set  
-2. Else **`floor(options.duration / options.delay)`** when both present  
-3. Else **`floor((duration / 1000) * 30)`** if **`duration`** only  
-4. Else **`30`**
+1. `options.frameCount`, when provided
+2. otherwise `ceil(options.duration / options.delay)` when a positive delay makes that calculation possible
+3. otherwise `30`
+
+The hint does not weaken the actual generated-frame limit. The creator checks the real number of frames independently.
 
 ---
 
 ## `GIFEncodedFrame`
 
-| Field | Notes |
-|-------|------|
-| **`buffer`** | **Required** — PNG/JPEG/WebP (anything **`loadImage`** accepts). |
-| **`duration`** | Optional → **`options.delay`**, then **`100`** ms. |
-| **`dispose`**, **`transparentColor`**, **`watermark`** | Same semantics as **`GIFInputFrame`**. |
+```typescript
+interface GIFEncodedFrame {
+  buffer: string | Buffer | Uint8Array | URL;
+  duration?: number;
+  dispose?: 0 | 1 | 2 | 3;
+  transparentColor?: number | string | null;
+  watermark?: GIFWatermarkSpec;
+}
+```
+
+`buffer` is required but is a **`GIFFrameSource`**, so it is not limited to an in-memory `Buffer`. The same central media/network policy used for static frames applies.
+
+`duration` falls back to `options.delay`, then `100` ms.
 
 ---
 
-## Array vs streaming
+## Array mode
 
-**Array** — all frames materialised in memory before encode loop.
+Returning `GIFEncodedFrame[]` materializes the generated source list before encoding. Apexify validates every generated frame and rejects an array that exceeds the applicable generated-frame bound.
 
-**`AsyncIterable<GIFEncodedFrame>`** — **`for await`** collects frames; yields **one at a time** to reduce peak RAM on long animations (still collected into an array internally before encoding today — check **`GIFCreator.collectFramesFromOnStart`** if that matters for huge jobs).
+Use this mode for small/generated sets where keeping the source list in memory is acceptable.
 
 ---
 
-## Example — generate frames with **`createCanvas`**
+## True `AsyncIterable` streaming
+
+Returning `AsyncIterable<GIFEncodedFrame>` is the memory-bounded Phase 7 path.
+
+The consumer sequence is intentionally:
+
+```text
+request one frame
+→ validate it
+→ resolve its source
+→ decode
+→ draw/overlay
+→ encode
+→ release per-frame references
+→ request the next frame
+```
+
+There is **no prefetch** from the generated async iterator and no conversion to an array. Backpressure therefore reaches the producer: Apexify does not ask it for frame `N + 1` until frame `N` has completed the per-frame encode path.
+
+Generated streams are still bounded. If the iterator produces more frames than the configured/declared limit, creation fails rather than continuing indefinitely. An iterator that yields zero frames is also rejected.
+
+### Streaming example
 
 ```typescript
-await painter.createGIF(undefined, {
+const gif = await painter.createGIF(undefined, {
   outputFormat: 'buffer',
   width: 320,
   height: 180,
   quality: 10,
   delay: 100,
-  onStart: async (_hint, p) => {
-    const frames: Array<{ buffer: Buffer; duration: number }> = [];
-    for (let i = 0; i < 12; i++) {
+  frameCount: 120,
+  onStart: async (_hint, p) => (async function* () {
+    for (let i = 0; i < 120; i++) {
       const { buffer } = await p.createCanvas({
         width: 320,
         height: 180,
-        colorBg: `hsl(${i * 30} 70% 45%)`,
+        colorBg: `hsl(${i * 3} 70% 45%)`,
       });
-      frames.push({ buffer, duration: 100 });
+      yield { buffer, duration: 100 };
     }
-    return frames;
-  },
+  })(),
 });
 ```
 
+For long animations, prefer yielding frames as they are produced instead of first building a separate `Buffer[]` and then yielding that array.
+
 ---
+
+## Cancellation and producer errors
+
+Pass `options.signal` to cancel generated work. Apexify checks cancellation between frame pulls and propagates the signal into remote media resolution. It stops requesting additional frames after cancellation/failure.
+
+Errors already represented by Apexify's structured error classes retain their type. Other failures thrown by the `onStart` callback or iterator are wrapped as GIF decode/generation errors with the original cause attached.

@@ -1,7 +1,5 @@
 # Canvas size, encoder & output formats {#02-create-gif-options-output}
 
-
-
 ## Dimensions
 
 | Field | Default | Role |
@@ -9,7 +7,9 @@
 | **`width`** | **1200** | GIF encoder canvas width. |
 | **`height`** | **1200** | GIF encoder canvas height. |
 
-Every resolved frame is drawn into this canvas (**clear → draw**). Smaller/larger rasters are scaled unless **`skipResizeWhenDimensionsMatch`** applies — see **[Callbacks](/docs#06-create-gif-onend-results)**.
+`width` and `height` must be supplied together when either is provided. The dimensions are checked against the central GIF dimension/resource-cost limits before encoding work proceeds.
+
+Every resolved frame is cleared into and drawn onto this output canvas. Sources with different dimensions are stretched to the configured output dimensions. Exact-size sources can skip redundant scaling when `skipResizeWhenDimensionsMatch` is omitted or `true`.
 
 ---
 
@@ -17,34 +17,48 @@ Every resolved frame is drawn into this canvas (**clear → draw**). Smaller/lar
 
 | Field | Default | Role |
 |-------|---------|------|
-| **`repeat`** | **0** | **`encoder.setRepeat`** — loop count (**`0`** = infinite in gifencoder semantics). |
-| **`quality`** | **10** | **`encoder.setQuality`** — **`1…20`** validated when provided (semantics follow **`gifencoder`**; tweak empirically). |
+| **`repeat`** | **0** | Repeat mode: `-1` = play once, `0` = loop indefinitely, positive values = finite repeat count. |
+| **`quality`** | **10** | Quantizer sample interval **1…30**. Lower values improve color mapping at higher CPU cost. |
+| **`delay`** | **100 ms fallback** | Used when a frame omits its own `duration`. |
+
+A provided delay must be finite and within the encoder-supported range. GIF timing is represented in 10 ms units internally.
+
+`frameCount` and `duration` can provide bounds/hints for generated-frame mode. They do not permit a producer to exceed central `maxGifFrames` or aggregate GIF resource limits.
 
 ---
 
-## Timing defaults
-
-| Field | Role |
-|-------|------|
-| **`delay`** | Fallback ms when a **`GIFEncodedFrame`** omits **`duration`** (**then `100`** ms). **`GIFInputFrame`** always supplies **`duration`** on each frame. |
-
----
-
-## **`outputFormat`** (required)
+## `outputFormat` (required)
 
 | Value | Behaviour |
 |-------|-----------|
-| **`file`** | Streams encoded GIF to **`outputFile`** (**required**). Resolves **`undefined`** unless **`onEnd`** changes return shape — see **[Callbacks](/docs#06-create-gif-onend-results)**. |
-| **`buffer`** | Collects stream into **`Buffer`**. |
-| **`base64`** | Same buffer → **`toString('base64')`**. |
-| **`attachment`** | Returns **`[{ attachment: encoder.createReadStream(), name: 'gif.js' }]`** immediately (**filename is fixed** in source — override in your mailer if needed). |
+| **`file`** | Streams encoded bytes to **`outputFile`** (required), waits for the file stream to finish, validates the GIF signature, then resolves `undefined` unless `onEnd` returns a static image. Partial files are removed on failure. |
+| **`buffer`** | Fully drains the encoder stream and returns a GIF **`Buffer`** after signature validation. |
+| **`base64`** | Fully drains the encoder stream, validates it, then returns `buffer.toString('base64')`. No data-URL prefix is added. |
+| **`attachment`** | Fully drains and validates the encoder stream, then returns **`GIFAttachment[]`** containing Buffer-backed GIF bytes, a `.gif` filename, and `contentType: 'image/gif'`. |
 
-Unsupported **`outputFormat`** throws.
+Unsupported output strings are rejected by validation.
+
+### Attachment naming
+
+`attachmentName` is optional and must be a filename, not a path. Default: **`image.gif`**. If the supplied name does not already end in `.gif`, Apexify appends the extension.
+
+```typescript
+const attachments = await painter.createGIF(frames, {
+  outputFormat: 'attachment',
+  attachmentName: 'status-animation',
+  width: 640,
+  height: 360,
+});
+
+// [{ attachment: Buffer, name: 'status-animation.gif', contentType: 'image/gif' }]
+```
 
 ---
 
+## File example
+
 ```typescript
-await painter.createGIF(undefined, {
+await painter.createGIF(frames, {
   outputFormat: 'file',
   outputFile: './out/animation.gif',
   width: 640,
@@ -52,8 +66,7 @@ await painter.createGIF(undefined, {
   repeat: 0,
   quality: 8,
   delay: 80,
-  // ...
 });
 ```
 
----
+The method resolves only after the file output has finished and passed the GIF signature check.

@@ -1,61 +1,107 @@
-# Watermark & simple text overlay {#04-create-gif-watermark-overlay}
+# Watermark & text overlay {#04-create-gif-watermark-overlay}
 
-
-Applied **after** each frame is drawn onto the encoder canvas, **before** **`encoder.addFrame`**.
-
----
-
-## Global watermark — `options.watermark`
-
-```typescript
-watermark?: {
-  enable: boolean;
-  url: string;       // path or http(s) — same loader as frames
-  x?: number;        // default 10
-  y?: number;        // default canvasHeight - imageHeight - 10 (bottom band)
-};
-```
-
-When **`enable`** is truthy and **`url`** set, the image is composited every frame **unless** a frame overrides (below).
+Overlays are applied after the frame raster is drawn onto the GIF output canvas and before `encoder.addFrame`.
 
 ---
 
-## Per-frame watermark — `GIFWatermarkSpec`
+## Watermarks
+
+Global and per-frame watermarks use the same `GIFWatermarkSpec`:
 
 ```typescript
-watermark?: {
-  enable?: boolean;  // false → skip watermark this frame (even if global on)
-  url: string;
+interface GIFWatermarkSpec {
+  enable?: boolean;
+  url: string | Buffer | Uint8Array | URL;
   x?: number;
   y?: number;
-};
+  opacity?: number; // 0..1
+  width?: number;
+  height?: number;
+  scale?: number;
+  margin?: number;
+  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
+}
 ```
 
-**`drawWatermarkOverlay`** logic:
+`url` is a `GIFFrameSource`, despite the historical field name. It can therefore be local bytes, a path/data image, or a permitted remote URL. Remote watermark sources use Apexify's central network policy and byte limits.
 
-1. If **`frame.watermark?.enable === false`** → **skip**.
-2. Else if **`frame.watermark?.url`** → load & draw at **`fw.x ?? global.x ?? 10`**, **`fw.y ?? global.y ?? bottom-default`**.
-3. Else if **global** watermark **`enable` + `url`** → draw global image.
-
----
-
-## `textOverlay` — **not** rich text
+### Global watermark
 
 ```typescript
-textOverlay?: {
-  text: string;
-  fontName?: string;   // ⚠ not applied by GIFCreator today
-  fontPath?: string;   // ⚠ not applied
-  fontSize?: number;   // default 20
-  fontColor?: string;  // default white
-  x?: number;          // default 10
-  y?: number;          // default 30
-};
+const gif = await painter.createGIF(frames, {
+  outputFormat: 'buffer',
+  width: 640,
+  height: 360,
+  watermark: {
+    url: './brand/logo.png',
+    position: 'bottom-right',
+    margin: 16,
+    opacity: 0.8,
+    scale: 0.6,
+  },
+});
 ```
 
-Implementation **`GIFCreator`** sets:
+The global image is resolved once for the operation and reused through a bounded cache rather than being decoded independently for every frame.
 
-**`ctx.font = `${fontSize}px Arial`** — **`fontName`** / **`fontPath`** on the type are **unused** in this path. For branded typography, bake text into each frame with **`createText`** first, or extend **`GIFCreator`**.
+### Per-frame watermark
+
+A frame-level `watermark` replaces the global watermark specification for that frame. `enable: false` suppresses watermarking for the frame even when a global watermark exists.
+
+```typescript
+const frames = [
+  { buffer: frameA },
+  {
+    buffer: frameB,
+    watermark: {
+      url: './brand/alternate.png',
+      position: 'top-left',
+      opacity: 0.5,
+    },
+  },
+  { buffer: frameC, watermark: { enable: false, url: './brand/logo.png' } },
+];
+```
+
+### Sizing and placement
+
+- `scale` scales both native dimensions and cannot be combined with explicit `width`/`height`.
+- `width` only preserves native aspect ratio while deriving height.
+- `height` only preserves native aspect ratio while deriving width.
+- both `width` and `height` use the explicit dimensions.
+- `position` defaults to `bottom-left`.
+- `margin` defaults to `10` pixels for position-based placement.
+- explicit `x` / `y` override the derived position coordinate independently.
+- `opacity` defaults to `1`.
 
 ---
 
+## `textOverlay` uses the main text renderer
+
+Phase 7 no longer uses a hard-coded `${fontSize}px Arial` `fillText` shortcut. `GIFOptions.textOverlay` is based on the normal **`TextProperties`** model and is rendered through **`EnhancedTextRenderer`**.
+
+That means GIF text overlays support the same core styling model used by `createText`, including nested font/fill/layout/placement/effects/decorations, custom font paths, gradients, strokes, shadows/glow, wrapping, rotation, and curved text where the underlying `TextProperties` feature supports it.
+
+`x` and `y` are optional only for the GIF overlay convenience API and default to **10** and **30**. `fontColor` remains a compatibility alias for the text color.
+
+```typescript
+await painter.createGIF(frames, {
+  outputFormat: 'file',
+  outputFile: './out/branded.gif',
+  width: 640,
+  height: 360,
+  textOverlay: {
+    text: 'Apexify.js',
+    x: 24,
+    y: 48,
+    font: { family: 'Arial', size: 28 },
+    decorations: { bold: true },
+    fill: { color: '#ffffff' },
+    effects: {
+      shadow: { color: '#000000', blur: 4, offsetX: 2, offsetY: 2, opacity: 0.7 },
+    },
+  },
+});
+```
+
+Text-overlay validation uses the same authoritative text-property validation path as other Apexify rendering surfaces.

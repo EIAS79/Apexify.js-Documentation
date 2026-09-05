@@ -1,46 +1,99 @@
-# `onEnd`, return values & performance flags {#06-create-gif-onend-results}
-
-
+# `onEnd`, return values & cancellation {#06-create-gif-onend-results}
 
 ## `onEnd`
 
 ```typescript
 onEnd?: (
   finalFrameBuffer: Buffer,
-  painter: ApexPainter
+  painter: unknown
 ) => Promise<Buffer | undefined>;
 ```
 
-**`finalFrameBuffer`** — PNG bytes of the **last composite** after resize, watermark, and **`textOverlay`** (the encoder canvas snapshot).
+The runtime passes the active `ApexPainter` instance as the second argument.
 
-Use it to ship a **still preview**, upload a poster frame, etc.
+`finalFrameBuffer` is a PNG snapshot of the **last fully composited encoder canvas** after frame sizing, watermarking, and `textOverlay` rendering. Use it for a poster/still preview or another derived static result.
 
-### Pairing with **`gif`**
+`onEnd` runs only after GIF encoding has finished and the selected primary output has been drained/validated.
 
-- When **`outputFormat`** is **`buffer`** or **`base64`** **and** **`onEnd`** returns a **`Buffer`**, **`createGIF`** resolves **`{ gif, static }`**.
-- When **`outputFormat`** is **`file`**, **`gifResult`** is **`undefined`** (GIF already written). If **`onEnd`** returns a buffer, the method returns **only** that **`static`** **`Buffer`** — **not** an object with paths — the GIF lives on disk at **`outputFile`**.
-- When **`outputFormat`** is **`attachment`**, the method **returns early** with the stream tuple — **`onEnd` is never called** in the current implementation.
+---
+
+## Return values
+
+Without a static `onEnd` result:
+
+| `outputFormat` | Primary result |
+|----------------|----------------|
+| `buffer` | GIF `Buffer` |
+| `base64` | base64 string containing GIF bytes |
+| `attachment` | `GIFAttachment[]` with Buffer-backed `.gif` data and `image/gif` MIME |
+| `file` | `undefined`; file already written to `outputFile` |
+
+If `onEnd` returns a `Buffer`:
+
+- **`buffer`** → `{ gif: Buffer, static: Buffer }`
+- **`base64`** → `{ gif: string, static: Buffer }`
+- **`attachment`** → `{ gif: GIFAttachment[], static: Buffer }`
+- **`file`** → the returned static `Buffer` only; the GIF remains at `outputFile`
+
+Unlike the old attachment shortcut, Phase 7 **does invoke `onEnd` for attachment output**. Attachment creation drains and validates the encoder output first.
+
+```typescript
+const result = await painter.createGIF(frames, {
+  outputFormat: 'attachment',
+  attachmentName: 'preview',
+  width: 640,
+  height: 360,
+  onEnd: async (lastFramePng) => lastFramePng,
+});
+
+// result.gif[0].name === 'preview.gif'
+// result.gif[0].contentType === 'image/gif'
+// result.static is the final composited PNG Buffer
+```
 
 ---
 
 ## `skipResizeWhenDimensionsMatch`
 
+Public sizing is always deterministic **stretch-to-output**.
+
 | Value | Behaviour |
 |-------|-----------|
-| **`true`** or **omitted** | If **`loadImage`** dimensions equal **`options.width` × `height`**, **`drawImage`** **without** intermediate resize canvas (**faster**). |
-| **`false`** | Always **`resizeImage`** path (**consistent scaling**). |
+| `true` or omitted | If decoded source dimensions already match output dimensions, draw directly without redundant sized scaling. |
+| `false` | Use the explicit sized draw path even when dimensions match. |
+
+This is an optimization switch, not a fit/crop mode. Sources whose size differs from the GIF canvas are stretched to `options.width × options.height` in either case.
+
+---
+
+## Cancellation (`signal`)
+
+`GIFOptions.signal` accepts an `AbortSignal`.
+
+A cancellation is checked before generated-frame startup and between frame pulls/processing steps, and is forwarded into remote media resolution. On failure/cancellation:
+
+- no additional generated frames are requested;
+- encoder/output streams are destroyed where applicable;
+- pending output completion is observed to avoid unhandled stream failures;
+- a partially written `outputFile` is removed.
+
+A signal that is already aborted prevents `onStart` from running.
 
 ---
 
 ## Validation recap
 
-| Rule | Error |
-|------|--------|
-| No **`onStart`** and empty **`gifFrames`** | Frames required |
-| **`outputFormat === 'file'`** without **`outputFile`** | **`outputFile` required** |
-| **`repeat < 0`** | Invalid |
-| **`quality`** outside **`1…20`** | Invalid |
-| **`duration`** negative on input frame | Invalid |
+Important Phase 7 rules include:
 
----
+- `outputFormat` must be `file`, `buffer`, `base64`, or `attachment`.
+- `file` requires a non-empty `outputFile`.
+- `attachmentName`, when present, must be a filename rather than a path.
+- `width` and `height` must be supplied together and fit GIF resource limits.
+- `repeat` allows `-1`, `0`, or a finite positive repeat count within the encoder range.
+- `quality` is an integer from `1` through `30`.
+- frame/default delays must be finite and within the GIF delay range; zero delay is allowed.
+- static frame lists must be non-empty and each frame must provide exactly one source.
+- generated arrays/streams cannot exceed configured generated-frame/GIF limits.
+- passing both a non-empty static list and `onStart` is invalid.
 
+Structured Apexify input/resource/network/decode/process errors are used for these failure classes rather than leaking arbitrary backend errors as the public contract.
