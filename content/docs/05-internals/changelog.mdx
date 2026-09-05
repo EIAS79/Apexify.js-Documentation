@@ -9,6 +9,32 @@ Version history is mirrored here for the docs site. For the **canonical** file (
 
 <!-- changelog-versions -->
 
+## [6.0.0] - Unreleased
+
+### ⚠️ Breaking / runtime contract
+
+- **Node.js 22.x, 24.x, and 26.x** are the supported runtime matrix for Apexify.js 6.
+- Scene validation is **mandatory** before raster allocation. The legacy `SceneRenderOptions.validate` field is retained only for source compatibility and no longer disables validation; use `maxSurfaceDepth` only to make the configured scene-depth ceiling stricter for a render.
+- **`await painter.use(plugin)`** is the supported plugin lifecycle. Installation may be asynchronous and is not considered complete until the returned promise resolves.
+
+### 🧩 Phase 6 — composition architecture
+
+- **Scenes / `SceneBuilder`** — deterministic bottom-to-top ordering, insertion/move/removal/replacement, copied ingress and isolated render snapshots, nested surfaces, aggregate scene budgets, and repeated-render determinism. Nested surfaces remain canvases until direct parent compositing rather than performing an unnecessary PNG encode/decode round trip.
+- **Named assets** — explicit duplicate rejection and `replace*` APIs; images/fonts/palettes plus JSON-like `loadValue`; dotted object/array lookup; whole-field `Buffer`/structured references; scalar embedded references; `$$` escaping; cycle and unsafe-key rejection; failed replacement does not mutate the registry.
+- **Templates** — immutable definition/data snapshots, dotted placeholders, nullish-only defaults, visibility before placeholder resolution, deep id-based overrides, deterministic insertions, `$asset` resolution, flex/grid expansion, and normal scene validation on the resolved output. Explicit `0`, `false`, and `""` are preserved as values; they do not silently trigger defaults.
+- **Components** — `badge`, `progressBar`, `avatar`, `card`, and `watermark` all emit renderable `SceneLayer[]` with runtime validation for sizing/geometry and invalid inputs.
+- **Plugins** — duplicate/pending-name rejection, serialized asynchronous installs, transactional `PluginHost` registration rollback on throw/rejection, retry after failed install, installed-state inspection, and preservation of unrelated application registry writes during an async plugin failure.
+- **Composition safety** — shared cloning/resolution rejects cyclic graphs and prototype-pollution keys while preserving opaque runtime objects only where the generic composition pipeline intentionally treats them as opaque.
+
+### ✅ Verification
+
+- Added a dedicated **Phase 6 self-challenge**, runtime/regression suites, golden rendering checks, and composition benchmarks.
+- Phase 6 is part of the mandatory package `npm test` gate alongside prior security, Phase 3, Phase 4, and Phase 5 regressions.
+- Package/release CI verifies Node 22/24/26, native ESM + CommonJS output, dual declaration modes, clean tarball consumer installs, clean prepack rebuilds, package contents, and production dependency audit.
+- Documentation build CI runs on Node 22/24/26 and the composition/scene guides were synchronized with the hardened 6.0 behavior.
+
+---
+
 ## [5.4.5] - 2026-05-13
 
 ### ✨ Added
