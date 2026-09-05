@@ -1,57 +1,98 @@
 # Input frames (`GIFInputFrame`) {#01-create-gif-input-frames}
 
-
-Used when **not** using **`options.onStart`**. **`GIFCreator.validateGIFOptions`** requires at least one frame and valid raster sources.
-
----
-
-## Required per frame
-
-| Field | Rule |
-|-------|------|
-| **`duration`** | Non-negative **number** (milliseconds → **`encoder.setDelay`**). |
-| **Pixels** | At least one of **`buffer`** or **`background`** (path, URL, or **`Buffer`**). |
+Use **`GIFInputFrame[]`** when **not** using `options.onStart`. The list must be non-empty, must stay within the configured GIF frame/resource limits, and each frame must select exactly one raster source.
 
 ---
 
-## Resolution order (`resolveFrameToBuffer`)
+## Frame shape
 
-Implementation picks the first available:
+```typescript
+type GIFFrameSource = string | Buffer | Uint8Array | URL;
 
-1. **`frame.buffer`** (**`Buffer`**) — used as-is.
-2. **`frame.background`** as **`Buffer`**.
-3. **`frame.background`** as **`string`**:
-   - **`http`/`https`** → **`axios`** GET → **`Buffer`**
-   - otherwise **`fs.readFileSync(background)`** (filesystem path; **not** cwd-normalised in this helper — pass absolute or correct relative paths from process cwd).
+interface GIFInputFrame {
+  duration?: number;
+  buffer?: GIFFrameSource;
+  background?: GIFFrameSource;
+  dispose?: 0 | 1 | 2 | 3;
+  transparentColor?: number | string | null;
+  watermark?: GIFWatermarkSpec;
+}
+```
+
+### Required source rule
+
+Each frame must provide **exactly one** of:
+
+- **`buffer`**
+- **`background`**
+
+Providing neither is invalid. Providing both is also invalid. The two names are retained for API compatibility; both feed the same Phase 7 source-resolution pipeline.
+
+### Duration
+
+`duration` is optional. Resolution is:
+
+**`frame.duration ?? options.delay ?? 100`** milliseconds.
+
+A provided duration must be finite and within the GIF delay range. GIF timing is encoded in hundredths of a second, so the encoder rounds millisecond values to 10 ms units.
 
 ---
 
-## Optional per-frame overrides
+## Supported source forms
+
+`buffer` / `background` accept:
+
+- **`Buffer`** or **`Uint8Array`** raster bytes
+- filesystem path strings
+- supported base64 `data:image/...` URLs
+- `http:` / `https:` URLs allowed by the configured network policy
+- `URL` objects, including supported file/remote URLs
+
+Remote data is resolved through Apexify's shared media layer. Protocol/host restrictions, SSRF protections, redirect handling, timeouts, remote-byte limits, and global remote concurrency policy therefore apply automatically.
+
+For ordinary frame arrays, Apexify may resolve several frames ahead, but the queue is bounded by the central batch/network concurrency limits and preserves input order. It does **not** launch an unconstrained `Promise.all` over the whole animation.
+
+Per-frame remote payloads use the central transport without retaining every one-use frame in the shared media cache.
+
+---
+
+## Per-frame overrides
 
 | Field | Purpose |
 |-------|---------|
-| **`dispose`** | **`GIFDisposalMethod`** for this frame — overrides global **`defaultDispose`** when set. |
-| **`transparentColor`** | Chroma key for this frame (`#RRGGBB`, **`0xRRGGBB`**, etc.). **`null`** forces **no** transparency for this frame. |
-| **`watermark`** | **`GIFWatermarkSpec`** — see **[Watermark](/docs#04-create-gif-watermark-overlay)**. |
+| **`dispose`** | GIF disposal method for this frame; overrides `options.defaultDispose`. |
+| **`transparentColor`** | Per-frame chroma key. `null` explicitly disables transparency for this frame. |
+| **`watermark`** | Per-frame watermark. `enable: false` suppresses even a configured global watermark for that frame. |
+
+Frame-local transparency/disposal state is reset deterministically before every `addFrame`, so one frame's override does not leak into the next frame.
+
+---
+
+## Sizing
+
+All frames are composited onto the configured GIF output canvas (`width` × `height`, default 1200 × 1200). A source whose dimensions differ from the output is stretched to the output dimensions.
+
+When `skipResizeWhenDimensionsMatch` is omitted or `true`, an exact-size source is drawn directly. `false` forces the explicit sized draw path even when dimensions already match; it does not change the public stretch-to-output sizing rule.
 
 ---
 
 ## Example
 
 ```typescript
-await painter.createGIF(
+const gif = await painter.createGIF(
   [
-    { duration: 120, buffer: frame1Png },
-    { duration: 120, background: './frames/step2.png' },
-    { duration: 200, background: 'https://example.com/frame3.png' },
+    { buffer: frame1Png, duration: 120 },
+    { background: './frames/step2.png' }, // falls back to options.delay
+    { background: new URL('https://cdn.example.com/frame3.png'), duration: 200 },
   ],
   {
     outputFormat: 'buffer',
     width: 480,
     height: 270,
     quality: 12,
+    delay: 100,
   }
 );
 ```
 
----
+For remote examples, the host/protocol must be permitted by your Apexify runtime network configuration.
