@@ -37,6 +37,8 @@ Hidden layers are removed before their other placeholders/assets are resolved, s
 - A placeholder that occupies the **entire string field** preserves the native value. `0`, `false`, and `""` are not treated as missing.
 - An embedded placeholder inside a longer string is stringified.
 
+Preserving an explicit empty string does **not** bypass the final scene contract. If `""` resolves into a field that requires a non-empty string, such as a text layer's `text`, `toRenderInput()` / `render()` rejects the final scene during validation. Apexify.js does not silently substitute the placeholder default or drop the layer; use **`visible`** when an empty value should intentionally suppress content.
+
 ```typescript
 const data = {
   position: { x: 0 },
