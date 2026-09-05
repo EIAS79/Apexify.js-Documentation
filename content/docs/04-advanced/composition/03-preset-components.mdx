@@ -1,9 +1,10 @@
 # Preset scene components (`painter.components`) {#03-preset-components}
 
+**`painter.components`** exposes small factories. Every **`toLayers(options)`** returns ordinary **`SceneLayer[]`** that you can spread into **`renderScene`**, **`SceneBuilder.addLayers`**, or template insertions.
 
-**`painter.components`** returns **small factories** — each **`toLayers(options)`** expands to **`SceneLayer[]`** you can **spread** into **`renderScene`**, **`SceneBuilder#addLayers`**, or merge with template output.
+They are static rendering helpers, not DOM widgets. They do not carry accessibility semantics such as alt text, ARIA labels, or reading order. If the generated image is shown in HTML or another accessible UI, provide the appropriate accessible name/description in that surrounding UI.
 
-They are **not** magic widgets on a DOM: they emit **static scene data** ( rects, text, optional image clips ) that **`SceneCreator`** paints like any other layers.
+All built-ins validate finite/positive geometry and relevant resource limits before returning layers.
 
 ---
 
@@ -44,56 +45,59 @@ const layers = [
 const png = await painter.renderScene({
   width: 420,
   height: 140,
-  colorBg: "#020617",
+  background: { colorBg: "#020617" },
   layers,
 });
 ```
 
-**Order:** Earlier entries in the **`layers`** array paint **below** later ones (same as **[scene paint order](/docs#09-scene-paint-order-performance)**).
+Earlier entries paint below later entries.
 
 ---
 
 ## `badge.toLayers`
 
-**`BadgeToLayersOptions`**: **`text`**, **`x`**, **`y`**, optional **`paddingX`**, **`paddingY`**, **`radius`**, **`background`**, **`color`**, **`fontSize`**.
+**`BadgeToLayersOptions`**: required **`text`**, **`x`**, **`y`**; optional **`paddingX`**, **`paddingY`**, **`radius`**, **`background`**, **`color`**, **`fontSize`**.
 
-Rounded pill label suitable for “NEW”, tier names, environment tags.
+The component estimates pill width from text length/font size, enforces non-negative padding/radius and positive font size, and clamps the corner radius to the produced box.
 
 ---
 
 ## `progressBar.toLayers`
 
-**`ProgressBarToLayersOptions`**: **`x`**, **`y`**, **`width`**, **`height`**, **`value`**, optional **`max`** (defaults to **100**), track **`background`**, **`fill`**, **`radius`**, **`showLabel`**, **`labelColor`**.
+**`ProgressBarToLayersOptions`**: **`x`**, **`y`**, **`width`**, **`height`**, **`value`**; optional **`max`** (default 100), track **`background`**, **`fill`**, **`radius`**, **`showLabel`**, **`labelColor`**.
 
-**`value`** is clamped against **`max`** during layout.
+- Width/height and `max` must be positive.
+- `value` is clamped into `[0, max]`.
+- The fill never exceeds the declared progress-bar width.
+- Zero progress emits no fill layer.
 
 ---
 
 ## `avatar.toLayers`
 
-**`AvatarToLayersOptions`**: **`source`** (**path, URL, or `Buffer`**), **`x`**, **`y`**, **`size`**, optional **`borderColor`**, **`borderWidth`** for a circular ring.
+**`AvatarToLayersOptions`**: **`source`** (non-empty path/URL string or `Buffer`), **`x`**, **`y`**, **`size`**, optional **`borderColor`**, **`borderWidth`**.
 
-Circular clip; place before/after other layers depending on whether the ring should sit above artwork.
+The image uses circular clipping. A positive `borderWidth` with `borderColor` emits a ring layer behind the clipped image. Invalid/empty sources and border widths larger than the avatar size are rejected.
 
 ---
 
 ## `card.toLayers`
 
-**`CardToLayersOptions`**: **`x`**, **`y`**, **`width`**, **`height`**, **`radius`**, **`background`**, border **`borderColor`** / **`borderWidth`**, **`title`**, **`body`**, font sizing **(`titleFontSize`**, **`bodyFontSize`**) and colors, **`padding`**.
+**`CardToLayersOptions`**: **`x`**, **`y`**, **`width`**, **`height`**, optional **`radius`**, **`background`**, **`borderColor`** / **`borderWidth`**, **`title`**, **`body`**, title/body font sizes and colors, **`padding`**.
 
-Emits a rounded panel with optional **title** and **body** text blocks.
+The component emits a rounded panel followed by optional text layers. Padding and border width are validated so a positive content area remains. Text uses the available card width as its wrap bound.
 
 ---
 
 ## `watermark.toLayers`
 
-**`WatermarkToLayersOptions`**: **`text`**, **`canvasWidth`**, **`canvasHeight`** (required for corner math), **`position`** (**`bottom-right`**, **`bottom-left`**, **`top-right`**, **`top-left`**, **`center`**), **`fontSize`**, **`color`** (semi-transparent hex recommended, e.g. **`#f8fafc40`**), **`margin`**.
+**`WatermarkToLayersOptions`**: **`text`**, **`canvasWidth`**, **`canvasHeight`**, optional **`position`** (`bottom-right`, `bottom-left`, `top-right`, `top-left`, `center`), **`fontSize`**, **`color`**, **`margin`**.
 
-Typical last layer in **`layers`** so it paints on top.
+The watermark is canvas-aware: invalid position values are rejected, text must fit the supplied canvas dimensions, and corner margins may not push the estimated watermark outside the canvas. Use it late in the layer array when it should paint on top.
 
 ---
 
-## Mixing with arbitrary `SceneLayer` rows
+## Mixing with arbitrary scene layers
 
 ```typescript
 const ui = [
@@ -122,9 +126,14 @@ const ui = [
   }),
 ];
 
-await painter.renderScene({ width: 480, height: 280, colorBg: "#020617", layers: ui });
+await painter.renderScene({
+  width: 480,
+  height: 280,
+  background: { colorBg: "#020617" },
+  layers: ui,
+});
 ```
 
-Types for every options object ship as **`BadgeToLayersOptions`**, … from **`apexify.js`** / **`apexify.js/types`**.
+The option types are exported from `apexify.js` and the type-only `apexify.js/types` subpath.
 
 ---

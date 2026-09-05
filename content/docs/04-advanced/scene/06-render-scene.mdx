@@ -1,17 +1,16 @@
 # `renderScene` {#06-render-scene}
 
+**`renderScene(input: SceneRenderInput, options?: SceneRenderOptions): Promise<Buffer>`** validates and renders a scene to PNG bytes.
 
-**`renderScene(input: SceneRenderInput, options?: SceneRenderOptions): Promise<Buffer>`** — async because chart/image loads are async. Returns **PNG** bytes.
-
-**`SceneCreator.render`** (used internally) accepts the same **`options`**: by default it runs **`validateSceneRenderInput`** (dimensions, **`layers`** array, nested **`surface`** depth). Pass **`{ validate: false }`** only for trusted hot paths; use **`{ maxSurfaceDepth: n }`** to cap nesting (default **64**).
+Validation is mandatory. The deprecated `validate` option may still appear in older TypeScript code for source compatibility, but it is ignored and cannot disable safety checks. Use **`maxSurfaceDepth`** only to impose a stricter nesting cap than the configured runtime limit.
 
 ---
 
-## Variant: plain object (config / CMS JSON)
+## Plain object
 
 ```typescript
 import { ApexPainter } from "apexify.js";
-import fs from "fs";
+import fs from "node:fs";
 
 const painter = new ApexPainter();
 
@@ -35,40 +34,49 @@ await fs.promises.writeFile("card.png", png);
 
 ---
 
-## Variant: validate before work (untrusted JSON)
+## Explicit preflight for untrusted input
+
+Use the painter method when you want to reject a payload before entering a larger workflow. Rendering performs the same validation again at its boundary.
 
 ```typescript
-import { ApexPainter, validateSceneRenderInput } from "apexify.js";
+import { ApexPainter } from "apexify.js";
 import type { SceneRenderInput } from "apexify.js";
 
 const painter = new ApexPainter();
 
 function parseScene(json: unknown): SceneRenderInput {
   const input = json as SceneRenderInput;
-  validateSceneRenderInput(input, { maxSurfaceDepth: 16 });
+  painter.validateSceneRenderInput(input, { maxSurfaceDepth: 16 });
   return input;
 }
-
-// or: painter.validateSceneRenderInput(input, { maxSurfaceDepth: 16 });
 ```
+
+There is no public trusted-input bypass.
 
 ---
 
-## Variant: skip validation (trusted pipeline)
+## Named assets (`$name`, `$palette.key`)
+
+`renderScene` resolves string asset references through `painter.assets` by default. Pass **`{ resolveAssetRefs: false }`** only when the scene is already resolved or `$` must remain literal data.
 
 ```typescript
-await painter.renderScene(trustedInput, { validate: false });
+painter.assets.loadPalette("brand", { bg: "#020617", text: "#f8fafc" });
+
+await painter.renderScene({
+  width: 640,
+  height: 360,
+  background: { colorBg: "$brand.bg" },
+  layers: [
+    { type: "text", texts: { text: "Resolved", x: 40, y: 80, fontSize: 36, color: "$brand.text" } },
+  ],
+});
 ```
 
----
-
-## Named assets (`$name`, **`$palette.key`**)
-
-Strings in **`SceneRenderInput`** normally resolve **`$`** references via **`painter.assets`** (**on** unless **`resolveAssetRefs: false`**). See **[Composition hub](/docs#00-composition-hub)** and **[Imperative & batch resolution](/docs#05-imperative-batch-chain-assets)** for **`prepareForRender`**, imperative APIs, and **`batch`** / **`chain`**.
+See [Named assets](/docs#01-named-assets) for `$$` escaping, dotted paths, Buffers, values, and explicit replacement.
 
 ---
 
-## Variant: `SceneBuilder` then `render` (`addLayers` + options)
+## `SceneBuilder.render`
 
 ```typescript
 const png = await painter
@@ -85,15 +93,17 @@ const png = await painter
     },
     {
       type: "text",
-      texts: [{ text: "Builder", x: 48, y: 160, fontSize: 48, color: "#f1f5f9" }],
+      texts: { text: "Builder", x: 48, y: 160, fontSize: 48, color: "#f1f5f9" },
     },
   ])
-  .render({ maxSurfaceDepth: 32 });
+  .render({ maxSurfaceDepth: 16 });
 ```
+
+Builder asset resolution is off by default. Use **`.render({ resolveAssetRefs: true })`** for builders created by `painter.createScene()` when the snapshot contains `$` references.
 
 ---
 
-## Variant: reuse `SceneRenderInput` for PNG + GIF + video
+## Reuse one scene for PNG, GIF, and video
 
 ```typescript
 import type { SceneRenderInput } from "apexify.js";
@@ -102,19 +112,19 @@ const baseScene = {
   width: 1080,
   height: 1080,
   background: { colorBg: "#111827" },
-  layers: [
-    /* shared layers */
-  ],
+  layers: [],
 } satisfies SceneRenderInput;
 
 const png = await painter.renderScene(baseScene);
-// await painter.renderSceneToGIF(baseScene, { options: { … }, sceneRender: { maxSurfaceDepth: 32 } });
-// await painter.renderSceneToVideoFrames(baseScene, { options: { … }, sceneRender: { validate: false } });
+// await painter.renderSceneToGIF(baseScene, { options: { ... }, sceneRender: { maxSurfaceDepth: 16 } });
+// await painter.renderSceneToVideoFrames(baseScene, { options: { ... }, sceneRender: { maxSurfaceDepth: 16 } });
 ```
+
+Scene→video performs cheap structural frame validation before spending work on the composed scene raster.
 
 ---
 
-## Variant: dynamic layers from a function
+## Dynamic scenes
 
 ```typescript
 function buildScene(theme: "light" | "dark") {
@@ -124,7 +134,9 @@ function buildScene(theme: "light" | "dark") {
     width: 400,
     height: 200,
     background: { colorBg: bg },
-    layers: [{ type: "text" as const, texts: [{ text: theme, x: 24, y: 80, fontSize: 32, color: fg }] }],
+    layers: [
+      { type: "text" as const, texts: { text: theme, x: 24, y: 80, fontSize: 32, color: fg } },
+    ],
   };
 }
 
@@ -136,6 +148,8 @@ const lightPng = await painter.renderScene(buildScene("light"));
 
 ## Error handling
 
-Failures wrap as **`SceneCreator.render failed: …`**. **`validateSceneRenderInput`** throws earlier with **`Scene: …`** messages for bad dimensions or excessive **`surface`** nesting. Validate **`customLines`** and file paths **before** render in production when validation alone is not enough.
+Scene validation/resource failures retain their structured Apexify error types such as **`ApexifyInputError`** and **`ApexifyResourceLimitError`**. Unexpected rendering/decode failures become **`ApexifyDecodeError`** with the original cause preserved.
+
+Validation covers scene budgets and known domain inputs, but application-level policy still belongs to your application—for example, whether a particular local file path should be permitted.
 
 ---

@@ -1,16 +1,15 @@
 # Plugins (`painter.plugins`, `painter.use`) {#04-plugins}
 
+Apexify.js exposes two related extension mechanisms:
 
-Two related mechanisms:
+1. **`painter.plugins`** (`PluginHost`) — a name → API-object registry.
+2. **`await painter.use(plugin)`** — transactional plugin installation with one installation per plugin name.
 
-1. **`PluginHost`** — **`painter.plugins`** — a **name → object** registry for **opaque** helper APIs (QR, barcode, custom exporters, …).
-2. **`ApexifyPlugin`** — **`painter.use(plugin)`** — runs an **`install`** function **once per plugin name** so you can register facades or patch behavior without editing core sources.
-
-**`ApexPainter.use`** is **synchronous** — if **`install`** returns a **`Promise`**, the core **does not await** it; keep **`install`** sync for predictable startup.
+**`ApexPainter.use` is asynchronous. Always `await` it.** The method resolves to the painter instance only after `plugin.install(host)` has completed.
 
 ---
 
-## `painter.plugins.use` / `get` / `has` / `remove`
+## `painter.plugins` registry
 
 ```typescript
 import { ApexPainter } from "apexify.js";
@@ -23,24 +22,32 @@ const myToolkit = painter.plugins.use("analytics", {
   },
 });
 
-// elsewhere
 const tk = painter.plugins.get<typeof myToolkit>("analytics");
 tk?.track("render_ok");
 ```
 
-- **`use(name, api)`** throws if **`name`** is already registered.
-- **`remove(name)`** deletes the entry (**`true`** if existed).
+Registry contract:
+
+- **`use(name, api)`** validates the name and rejects duplicate API names with **`ApexifyPluginError`**.
+- **`get<T>(name)`**, **`has(name)`**, **`list()`** inspect registered APIs.
+- **`remove(name)`** deletes an API entry.
+- **`isInstalled(name)`**, **`listInstalled()`** inspect completed `ApexifyPlugin` installations.
+
+API names and plugin names must be non-empty identifier-like strings.
 
 ---
 
-## `painter.use` — install hook
+## `await painter.use(plugin)`
 
 ```typescript
 import { ApexPainter, type ApexifyPlugin, type SceneLayer } from "apexify.js";
 
 const watermarkHelper: ApexifyPlugin<ApexPainter> = {
   name: "watermark-kit",
-  install(p) {
+  async install(p) {
+    // Async setup is supported and awaited.
+    await Promise.resolve();
+
     p.plugins.use("watermark-kit", {
       cornerLabel(text: string): SceneLayer[] {
         return p.components.watermark.toLayers({
@@ -58,24 +65,70 @@ const watermarkHelper: ApexifyPlugin<ApexPainter> = {
 };
 
 const painter = new ApexPainter({ type: "buffer" });
-painter.use(watermarkHelper);
+await painter.use(watermarkHelper);
 
 const kit = painter.plugins.get<{ cornerLabel: (text: string) => SceneLayer[] }>("watermark-kit");
 const layers = kit?.cornerLabel("staging") ?? [];
 
-await painter.renderScene({ width: 640, height: 360, colorBg: "#020617", layers });
+await painter.renderScene({
+  width: 640,
+  height: 360,
+  background: { colorBg: "#020617" },
+  layers,
+});
 ```
 
-- Calling **`painter.use`** twice with the **same **`plugin.name`** throws.
-- **`install`** receives the **`ApexPainter`** instance (the **`host`** parameter).
+---
+
+## Lifecycle and duplicate semantics
+
+- Calling **`painter.use()`** twice with the same **`plugin.name`** is rejected.
+- A second same-name call is also rejected while the first installation is still pending.
+- Different plugin installations are serialized so plugin transactions do not overlap.
+- A failed plugin name is released after cleanup, so the application may retry that plugin later.
+- The current lifecycle is **install-only**. Apexify.js does not provide plugin uninstall/teardown hooks.
+
+---
+
+## Failure rollback
+
+PluginHost uses an async-context transaction around `plugin.install(host)`. If `install()` throws or rejects:
+
+- API registrations made through **`host.plugins.use(...)`** inside that plugin installation are removed.
+- Pre-existing PluginHost APIs removed by the failing plugin are restored.
+- Unrelated application registry writes that happen concurrently while the plugin is awaiting are preserved.
+- The plugin is not marked installed.
+- The caller receives **`ApexifyPluginError`** with the original error as its cause.
+
+Rollback is intentionally limited to **PluginHost registry mutations performed in the plugin installation context**. Apexify.js cannot automatically undo arbitrary external side effects performed by plugin code (files, network calls, timers, mutations to unrelated application state). Plugins should perform irreversible side effects only after their own prerequisites are known to have succeeded, or provide their own compensation logic.
+
+---
+
+## Type safety
+
+```typescript
+import type { ApexifyPlugin, ApexPainter } from "apexify.js";
+
+const plugin: ApexifyPlugin<ApexPainter> = {
+  name: "typed-plugin",
+  async install(host) {
+    host.plugins.use("typed-api", {
+      renderCount: 0,
+    });
+  },
+};
+```
+
+`ApexifyPlugin<T>` types the installation host. `PluginHost.get<T>()` lets consumers recover the registered API type at the lookup site.
 
 ---
 
 ## When to use which
 
 | Goal | Tool |
-|------|------|
-| Attach a **plain object** collaborators can fetch by string id | **`plugins.use`** |
-| Run **setup** once (register multiple facades, subscribe, seed defaults) | **`painter.use`** + optional internal **`plugins.use`** calls |
+|---|---|
+| Attach a plain named helper object | **`painter.plugins.use(name, api)`** |
+| Run one-time synchronous or asynchronous setup | **`await painter.use(plugin)`** |
+| Need automatic uninstall/teardown | Not provided; manage that lifecycle in your application/plugin |
 
 ---

@@ -1,49 +1,87 @@
 # Scene — paint order & performance {#09-scene-paint-order-performance}
 
+## Paint order
 
+1. Root background is composed from the scene `background` configuration using the authoritative root `width` / `height`.
+2. `layers[0]` through `layers[n - 1]` paint in stable array order on the root 2D context.
+3. A `surface` creates a child canvas at its placement dimensions, paints its child background/layers, then composites that canvas onto the parent with placement opacity/composite mode/rotation/scale.
 
-## Paint order (root)
-
-1. **`composeCanvasForScene`** — **`background`** (clip, zoom, primary fill **`colorBg`/`gradientBg`/`customBg`/`videoBg`**, **`bgLayers`**, **`patternBg`**, **`noiseBg`**, then shadow/stroke per **`CanvasCreator`**).
-2. **`layers[0]` … `layers[n-1]`** — each **`SceneLayer`** in order on the **same** 2D context.
-3. **`surface`** — for each surface layer: **child** background + **child** layers → bitmap → **`drawSurfaceOntoParent`** (opacity, rotation, scale, blend).
-
-Nested **`surface`** repeats: **deepest** child is rasterised first, then parent surfaces bottom-up within their own **`layers`** arrays.
+Earlier layers are lower; later layers paint over them. Nested surfaces preserve the same rule recursively.
 
 ---
 
 ## Z-order cheatsheet
 
 | Need | Pattern |
-|------|---------|
-| Background image with text on top | `image` (full bleed) then `text` **after** in **`layers`**. |
-| Watermark last | Push **`image`** / **`imageBuffer`** **last**. |
-| Chart behind panel | `chart` **before** **`surface`** card that covers part of it, or put chart **inside** surface. |
+|---|---|
+| Full-bleed image with text on top | Put the `image` first and the `text` later. |
+| Watermark on top | Put watermark component/layers near the end of the array. |
+| Chart behind a panel | Put `chart` before the panel/surface, or render the chart inside that surface. |
+| Editor reorder | Use `SceneBuilder.moveLayer`, `insertBefore`, `insertAfter`, and `replaceLayer`. |
 
 ---
 
-## Performance
+## Performance characteristics
 
-| Cost | Mitigation |
-|------|------------|
-| **Each `chart` layer** | Full chart render + decode; **cache** with **`createChart`** → **`imageBuffer`**. |
-| **Large `surface` trees** | Each node = extra full-size **`toBuffer('png')`** for child; flatten when possible. |
-| **Huge `customLines` batches** | Same as **`path2d.custom`** — many segments = more CPU. |
-| **Default scene validation** | **`renderScene`** / **`SceneBuilder.render`** run **`validateSceneRenderInput`** unless **`{ validate: false }`**. Tiny cost vs canvas work; turn off only for trusted batches. |
+| Cost | Phase 6 behavior / mitigation |
+|---|---|
+| **Nested surfaces** | Child surfaces remain **Canvas objects** until direct parent compositing. There is no per-surface PNG encode/decode round-trip. Flatten only when the composition itself does not need surface clipping/transforms. |
+| **Repeated image/Buffer assets** | The bounded decoded-image cache and in-flight deduplication reuse identical sources. Repeated Buffer-backed assets use content-derived cache keys rather than forcing a decode every layer. |
+| **Chart layers** | Chart creator APIs currently produce raster Buffers that scene composition decodes. If the same chart is reused repeatedly, render it once and reuse an `imageBuffer` or named image value where appropriate. |
+| **Many ordinary layers** | Layer traversal is deterministic and sequential. Batch layer construction with `addLayers` when convenient; do not assume that it changes paint semantics. |
+| **Large custom-line batches** | Segment count still translates to drawing work. Keep line sets bounded and benchmark representative inputs. |
+| **Scene validation** | Validation is mandatory and occurs before root allocation/rendering. It enforces aggregate scene budgets so hostile/accidental composition size cannot grow without bounds. |
+| **Scene→video invalid configuration** | Cheap frame-structure validation runs before composing the scene raster, avoiding wasted raster work on invalid video requests. |
+
+Phase 6 deliberately does **not** introduce a compiled-scene/cache abstraction just for architectural novelty. Current benchmarks cover 10/50-layer scenes, nested surfaces, repeated Buffer assets, repeated template resolution/rendering, component-heavy scenes, and plugin-enabled rendering. More complex caching/batching should be added only when measurements justify it.
+
+---
+
+## Determinism
+
+For identical composition data and identical local/runtime assets, scene array order and layout resolution are deterministic. Phase 6 regression/golden coverage explicitly checks repeated scene and template renders.
+
+External inputs can still change output when they themselves change—for example a remote asset URL, font file, or application-generated timestamp.
+
+---
+
+## Resource limits
+
+Scene validation applies configured limits including:
+
+- root and nested canvas dimensions
+- root canvas pixel budget plus aggregate scene pixel budget
+- total layer count
+- nested surface count/depth
+- image count
+- text-layer and aggregate text-content limits
+- chart count
+- remote asset count
+
+`SceneRenderOptions.maxSurfaceDepth` can make one render stricter, but cannot raise the configured runtime maximum.
 
 ---
 
 ## Pitfalls
 
-- **`renderSceneToGIF` + `onStart`:** **throws by design** — use **`createGIF`** for **`onStart`** workflows.  
-- **`videoBg` without `setExtractVideoFrame`:** may not paint or size; use **`customBg`** with a still.  
-- **`chartComparison` / `chartCombo` `options`:** typed **`unknown`** — bad options surface as runtime errors inside **`ChartCreator`**.  
-- **Scene does not auto-trim** transparent margins — size **`width`/`height`** explicitly.
+- **`renderSceneToGIF` + `onStart`:** rejected by design. Use `createGIF` for `onStart` frame-generation workflows.
+- **`videoBg`:** video background behavior depends on the configured video-frame extraction support; use a still/image background when video-frame extraction is unavailable.
+- **`chartComparison` / `chartCombo` options:** these scene layer option payloads remain broadly typed; invalid chart options can fail in chart-domain validation/rendering.
+- **Transparent margins:** scenes do not auto-trim the root canvas; choose explicit `width` / `height`.
+- **Deprecated `validate`:** setting `validate: false` does not disable validation.
 
 ---
 
-## Testing tip
+## Testing
 
-Snapshot **`renderScene`** PNGs in CI (golden files) for layout regressions; keep **`width`/`height`** fixed.
+Use fixed scene dimensions/data for visual regression tests. Apexify.js Phase 6 itself combines:
+
+- contract/runtime tests,
+- golden pixel/raster assertions,
+- deterministic repeated renders,
+- security/self-challenge scans,
+- performance sanity benchmarks.
+
+For your own application, snapshot only outputs whose fonts/assets are controlled enough to be stable in CI.
 
 ---
