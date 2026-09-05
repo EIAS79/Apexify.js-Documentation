@@ -1,17 +1,21 @@
 # GIF & animation — overview {#00-create-gif-overview}
 
-**`await painter.createGIF(gifFrames, options[, painterOpts])`** encodes animated GIFs with **`gifencoder`**, compositing raster frames (buffers, filesystem paths, **`http`** URLs), optional watermarks, chroma transparency, disposal codes, and programmatic **`onStart`** / **`onEnd`** hooks.
+**`await painter.createGIF(gifFrames, options[, painterOpts])`** encodes animated GIFs with **`@skyra/gifenc`**. It supports local and remote raster sources, bounded frame processing, true incremental **`AsyncIterable`** generation, watermarks, rich text overlays, chroma transparency, disposal codes, cancellation, and file/Buffer/base64/attachment outputs.
 
-**`await painter.animate(frames, defaultDuration, defaultWidth?, defaultHeight?, options?, painterOpts?)`** builds **each** frame on a fresh canvas from declarative **`Frame`** definitions — PNG **`Buffer[]`** **or** an optional GIF file (**see [Animate](/docs#08-animate-api)**).
+**`await painter.animate(frames, defaultDuration, defaultWidth?, defaultHeight?, options?, painterOpts?)`** builds each frame on a fresh canvas from declarative **`Frame`** definitions and returns PNG **`Buffer[]`** or writes an optional GIF file. Use **`createGIF`** when you need the full GIF-specific pipeline.
 
-Implementation: **`lib-next/gif/gif-creator.ts`**, **`animate-frames.ts`**, **`types/gif.ts`**. **`GIFCreator.setPainter`** wires **`onStart`/`onEnd`** second argument to the **`ApexPainter`** instance (**`main.ts`**).
+Implementation: **`lib-next/gif/gif-creator.ts`**, **`gif-validation.ts`**, **`animate-frames.ts`**, and **`types/gif.ts`**. **`GIFCreator.setPainter`** wires the **`onStart`/`onEnd`** callback painter argument to the active **`ApexPainter`** instance.
 
 ---
 
 ## Signatures
 
 ```typescript
-await painter.createGIF(gifFrames: GIFInputFrame[] | undefined, options: GIFOptions, painterOpts?);
+await painter.createGIF(
+  gifFrames: GIFInputFrame[] | undefined,
+  options: GIFOptions,
+  painterOpts?
+);
 
 await painter.animate(
   frames: Frame[],
@@ -23,22 +27,50 @@ await painter.animate(
 );
 ```
 
-Optional **`painterOpts`** (**`resolveAssetRefs`**, **`prepareForRender`**) resolves **`$…`** placeholders via **`resolveAssetRefsDeep`**. **`createGIF`** runs **`maybeResolveRefs`** on **`gifFrames`** (when provided) **and** **`GIFOptions`** when **`resolveAssetRefs: true`**. **`animate`** resolves **`frames`** the same way; **`AnimateOptions`** is wrapped with **`prepareForRender`** **only** when **`resolveAssetRefs: true`** **and** **`options`** is passed (**no-op** if you omit **`options`** — call **`prepareForRender`** yourself **first** when you need refs inside **`AnimateOptions`**).
+Optional **`painterOpts.resolveAssetRefs`** resolves supported **`$…`** asset references before the domain API runs. `renderSceneToGIF` also delegates to the same GIF creator, so the encoder/output/resource semantics documented in this section apply there as well.
 
 ---
 
 ## Modes (`createGIF`)
 
-| Mode | **`gifFrames`** | **`options`** |
-|------|-----------------|---------------|
-| **Static list** | Non-empty **`GIFInputFrame[]`** | Omit **`onStart`**. |
-| **Programmatic** | **`undefined`** (ignored if **`onStart`** present) | **`onStart`** yields **`GIFEncodedFrame[]`** or **`AsyncIterable<GIFEncodedFrame>`**. |
+| Mode | `gifFrames` | `options` |
+|------|-------------|-----------|
+| **Static list** | Non-empty **`GIFInputFrame[]`** | Omit **`onStart`**. Regular arrays are resolved with bounded ordered concurrency. |
+| **Generated array** | **`undefined`** | **`onStart`** returns **`GIFEncodedFrame[]`**. The array is validated and bounded before encoding. |
+| **Generated stream** | **`undefined`** | **`onStart`** returns **`AsyncIterable<GIFEncodedFrame>`**. Each yielded frame is resolved, decoded, drawn, encoded, then released before the next frame is requested. |
+
+Passing both a non-empty **`gifFrames`** array and **`options.onStart`** is rejected. The input modes are intentionally exclusive.
 
 ---
 
-## Return shape (`createGIF`)
+## Source and network policy
 
-Depends on **`outputFormat`** **and** **`onEnd`** — full tables in **[Options & output](/docs#02-create-gif-options-output)** and **[onEnd](/docs#06-create-gif-onend-results)**.
+`GIFFrameSource` is **`string | Buffer | Uint8Array | URL`**. String/URL sources may be filesystem paths, supported data-image URLs, or permitted remote URLs.
+
+Remote frames and watermarks use Apexify's central media/network layer. That means the normal protocol/host trust policy, SSRF protections, redirects/timeouts, remote-byte limits, and central remote concurrency limits apply. GIF code does not use a separate Axios/direct-HTTP path.
+
+Per-frame remote bytes are not retained in the shared media cache, which prevents long animations from filling it with one-use frame payloads. Reusable static watermark data may use bounded caching.
+
+---
+
+## Output model
+
+`GIFOptions.outputFormat` is one of:
+
+- **`"file"`** — writes a validated GIF to `outputFile`; primary return is `undefined`.
+- **`"buffer"`** — returns encoded GIF bytes as `Buffer`.
+- **`"base64"`** — returns raw GIF bytes encoded with `Buffer.toString("base64")`.
+- **`"attachment"`** — returns `GIFAttachment[]`; each attachment contains a **Buffer**, a `.gif` filename, and `contentType: "image/gif"`.
+
+If **`onEnd`** returns a still-image `Buffer`, non-file outputs become **`{ gif, static }`**; file output returns the static `Buffer` because the GIF itself already lives at `outputFile`.
+
+---
+
+## Important limits
+
+GIF creation participates in the central runtime limits, including maximum GIF dimensions, maximum frame count, aggregate GIF resource cost, decoded-image limits, remote image bytes, and bounded remote/batch concurrency. Generated streams are checked as frames arrive, so an unbounded producer cannot bypass the configured maximum.
+
+`GIFOptions.signal` accepts an `AbortSignal`. Cancellation stops further frame pulls/resolution and tears down output work as far as the encoder/Node streams permit; partially written file output is removed on failure.
 
 ---
 
@@ -46,14 +78,15 @@ Depends on **`outputFormat`** **and** **`onEnd`** — full tables in **[Options 
 
 | Type | Role |
 |------|------|
-| **`GIFInputFrame`** | Static encoder input (**`duration`** + **`buffer`** / **`background`**). |
-| **`GIFEncodedFrame`** | **`onStart`** emission shape (**`buffer`** required). |
-| **`GIFOptions`** | Encoder canvas, **`repeat`**, **`quality`**, outputs, overlays, **`onStart`/`onEnd`**. |
-| **`GIFResults`** | Structured **`buffer`** / **`base64`** / **`attachment`** (partial — **`createGIF`** may return plain **`Buffer`**). |
-| **`Frame`** | **`animate`** declarative scene (**background**, **`source`**, transforms, **`onDrawCustom`**). |
-| **`GIFDisposalMethod`** | **`0 \| 1 \| 2 \| 3`** disposal codes. |
+| **`GIFFrameSource`** | `string | Buffer | Uint8Array | URL`. |
+| **`GIFInputFrame`** | Static input: exactly one of `buffer`/`background`, optional duration and per-frame overrides. |
+| **`GIFEncodedFrame`** | `onStart` emission shape; `buffer` is required and accepts `GIFFrameSource`. |
+| **`GIFOptions`** | Encoder dimensions/timing/output, overlays, generation callbacks, cancellation. |
+| **`GIFAttachment`** | Buffer-backed attachment with `.gif` name and `image/gif` MIME type. |
+| **`GIFDisposalMethod`** | `0 | 1 | 2 | 3`. |
+| **`Frame`** | Declarative input for the separate `animate` helper. |
 
-**`GIFOptions.basDir`** exists on the type but is **unused** by **`GIFCreator`** today.
+**`GIFOptions.basDir`** remains in the type for source compatibility only; the Phase 7 GIF creator ignores it.
 
 ---
 
@@ -62,20 +95,16 @@ Depends on **`outputFormat`** **and** **`onEnd`** — full tables in **[Options 
 | # | Topic |
 |---|--------|
 | 01 | [Input frames (`GIFInputFrame`)](/docs#01-create-gif-input-frames) |
-| 02 | [Canvas size, encoder & **`outputFormat`**](/docs#02-create-gif-options-output) |
+| 02 | [Canvas size, encoder & `outputFormat`](/docs#02-create-gif-options-output) |
 | 03 | [Transparency & disposal](/docs#03-create-gif-transparency-disposal) |
-| 04 | [Watermark & **`textOverlay`**](/docs#04-create-gif-watermark-overlay) |
-| 05 | [Programmatic **`onStart`**](/docs#05-create-gif-onstart) |
-| 06 | [`onEnd`, returns & resize flag](/docs#06-create-gif-onend-results) |
+| 04 | [Watermark & `textOverlay`](/docs#04-create-gif-watermark-overlay) |
+| 05 | [Programmatic `onStart`](/docs#05-create-gif-onstart) |
+| 06 | [`onEnd`, results & cancellation](/docs#06-create-gif-onend-results) |
 | 07 | [Encode pipeline (reference)](/docs#07-create-gif-encode-pipeline) |
 | 08 | [`animate` API](/docs#08-animate-api) |
-
-*(Anchors **`#06-create-gif-onend-results`** match file **`06-create-gif-onend-results.mdx`**.)*
 
 ---
 
 ## Scenes
 
-**`SceneBuilder`** / **`renderSceneToGIF`** delegates to **`GIFCreator.createGIF`** — follow the same **`GIFOptions`** rules (**`scene-create.ts`** validates **`onStart`** exclusivity vs composed scenes).
-
----
+**`SceneBuilder`** / **`renderSceneToGIF`** delegates to **`GIFCreator.createGIF`**. Scene composition has its own validation, but final GIF output still follows the same output, encoder, frame-limit, network-policy, and callback contracts described here.
