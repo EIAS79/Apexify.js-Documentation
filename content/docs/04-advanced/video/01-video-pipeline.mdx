@@ -1,8 +1,8 @@
 # Video pipeline (`videoPipeline`) {#01-video-pipeline}
 
-**`painter.videoPipeline(source?)`** is the **recommended** API when you combine **several** video steps (trim, splice B-roll, captions, music, procedural SFX). It uses a **layer stack** — similar in spirit to **`SceneBuilder`** and **composition templates** — instead of chaining many **`createVideo`** calls that each write a new file and re-encode.
+**`painter.videoPipeline(source?)`** is the recommended API when several edits belong to one project: trim, deterministic segment replacement, captions, file audio, and procedural SFX. It uses a validated layer stack and isolated internal workspaces rather than asking application code to manage a chain of temporary output files.
 
-**Also on:** **`painter.video.videoPipeline()`** (same **`VideoStack`** entry).
+**Also on:** **`painter.video.videoPipeline()`** (same `VideoStack` entry).
 
 **Basics (single ops):** [Video overview](/docs#00-video-overview) · [Timeline](/docs#04-timeline-edits) · [Text overlays](/docs#08-text-overlays) · [Video audio](/docs#06-audio-deep-dive) · [`createAudio`](/docs#01-create-audio)
 
@@ -12,33 +12,63 @@
 
 | Situation | API |
 |-----------|-----|
-| Building a **video editor**, server render farm, or **saved edit JSON** | **`videoPipeline()`** |
-| **One** FFmpeg job (probe, trim only, single `mixAudio`, …) | **`createVideo({ … })`** |
-| **Generated** motion (gameplay, `animate`, scenes) | **`animate`** / **`renderSceneToVideoFrames`** → then pipeline or **`mixAudio`** |
+| Building a video editor, server render project, or saved edit JSON | **`videoPipeline()`** |
+| Exactly one FFmpeg job (probe, trim only, one audio mix, …) | **`createVideo({ … })`** |
+| Generated motion (gameplay, `animate`, scenes) | **`animate`** / **`renderSceneToVideoFrames`** → then pipeline |
 | Rich captions matching **`createText`** | **`addTextOverlay`** or **`pipeline.text()`** |
-| Procedural SFX (no sound files) | **`painter.createAudio`** + **`pipeline.audio()`** or **`mixAudio`** |
+| Procedural SFX | **`painter.createAudio`** + **`pipeline.audio()`** or **`mixAudio`** |
 
-**Requirements:** Same as **`createVideo`** — **`ffmpeg`** and **`ffprobe`** on **`PATH`**.
+Requirements and source policy are the same as `createVideo`: FFmpeg/ffprobe plus the centralized Buffer/local/HTTP(S) resolver described in [Video overview](/docs#00-video-overview).
 
 ---
 
 ## Layer stack model
 
-Each call on the pipeline **adds or updates** a layer:
+Each builder call adds or updates a validated layer:
 
 | Layer kind | Builder method | Purpose |
 |------------|----------------|---------|
-| **`source`** | `.source(path \| Buffer, id?)` | Input video (required once). |
-| **`trim`** | `.trim(start, end, id?)` | Keep only **`[startTime, endTime]`** on the timeline. |
-| **`splice`** | `.splice({ targetStartTime, targetEndTime, replacementVideo, … }, id?)` | Replace a range with another clip or frame sequence. |
-| **`text`** | `.text(overlay \| overlays[], id?)` | Timed captions — **same types as `createText`**. |
-| **`audio`** | `.audio(tracks[], { keepOriginalAudio, … }, id?)` | File music/SFX **and** procedural **`createAudio`** tracks. |
+| **`source`** | `.source(path \| Buffer, id?)` | Input video (exactly one render source). |
+| **`trim`** | `.trim(start, end, id?)` | Keep `[startTime, endTime]` before later layers. |
+| **`splice`** | `.splice({ targetStartTime, targetEndTime, replacementVideo/replacementFrames, … }, id?)` | Replace a timeline range. |
+| **`text`** | `.text(overlay \| overlays[], id?)` | Timed `createText`-style overlays. |
+| **`audio`** | `.audio(tracks, options?, id?)` | File/Buffer/WAV plus procedural preset/synth/sequence tracks. |
 
-### Layer `id` — avoid duplicates
+### Stable layer IDs
 
-- **Same `id`** on a **trim** / **splice** / **source** layer → **replaces** the previous layer with that id (good for editor undo/redo).
-- **Same `id`** on **`text`** or **`audio`** → **merges** overlays or tracks into one layer (append).
-- Pass **`{ replace: true }`** on **`pushLayer`** if you need to overwrite instead of merge (advanced).
+- Same `id` on **source / trim / splice** replaces the previous layer with that id.
+- Same `id` on **text / audio** merges overlays or tracks.
+- `pushLayer(layer, { replace: true })` explicitly replaces instead of merging.
+- Invalid mutations are transactional: a rejected edit does not leave the stack partially changed.
+
+This makes IDs suitable for editor timeline rows and deterministic project updates.
+
+---
+
+## Execution order and splice determinism
+
+Rendering is normalized to this order:
+
+1. source resolution;
+2. trim;
+3. splices, sorted by `targetStartTime` and then `id`;
+4. text overlays;
+5. audio mix;
+6. optional `preview` encode.
+
+Overlapping splice ranges are rejected. Multiple `durationPolicy: 'preserve'` splices are rejected because changing total timeline length would make later source coordinates ambiguous.
+
+The render result exposes the plan that actually ran:
+
+```typescript
+const result = await pipeline.render({ outputPath: './out.mp4' });
+
+console.log(result.passes);
+console.log(result.executionPlan);
+// e.g. ['trim', 'splice:broll', 'text', 'audio']
+```
+
+`passes` is the actual internal FFmpeg stage count, not an estimate.
 
 ---
 
@@ -49,7 +79,7 @@ import { ApexPainter } from 'apexify.js';
 
 const painter = new ApexPainter({ type: 'buffer' });
 
-const result = await painter
+const pipeline = painter
   .videoPipeline('./uploads/user-clip.mp4')
   .trim(0, 60, 'trim')
   .splice(
@@ -59,6 +89,7 @@ const result = await painter
       replacementVideo: './uploads/b-roll.mp4',
       replacementStartTime: 0,
       replacementDuration: 5,
+      durationPolicy: 'fit',
     },
     'broll'
   )
@@ -73,9 +104,7 @@ const result = await painter
         font: { size: 42, family: 'Arial' },
         decorations: { bold: true },
         fill: { color: '#ffffff' },
-        effects: {
-          shadow: { color: 'rgba(0,0,0,0.5)', offsetY: 3, blur: 8 },
-        },
+        effects: { shadow: { color: 'rgba(0,0,0,0.5)', offsetY: 3, blur: 8 } },
         transitionIn: { type: 'fade', duration: 0.3 },
       },
       {
@@ -96,76 +125,107 @@ const result = await painter
       { type: 'file', source: './music.mp3', startTime: 0, volume: 0.35 },
       { type: 'preset', preset: 'whoosh', startTime: 9.8, gain: 1.1 },
     ],
-    { keepOriginalAudio: true, originalVolume: 0.85 },
+    { keepOriginalAudio: true, originalVolume: 0.85, durationPolicy: 'video' },
     'sound'
-  )
-  .render({ outputPath: './out/final.mp4' });
+  );
 
-console.log('Done:', result.outputPath, 'passes:', result.passes);
+const result = await pipeline.render({
+  outputPath: './out/final.mp4',
+  overwrite: true,
+  onProgress: ({ percent, speed }) => console.log(percent, speed),
+});
+
+console.log('Done:', result.outputPath);
+console.log('Passes:', result.passes);
+console.log('Plan:', result.executionPlan);
 ```
-
-**`result.passes`** reports how many internal FFmpeg stages ran. The pipeline **reduces** round-trips vs manually chaining **`createVideo`**; a future compiler may lower this further with a single filter graph.
 
 ---
 
 ## Text layers — `createText` parity
 
-**`.text()`** accepts **`VideoTextOverlayClip`**: every **`TextProperties`** field (**`font`**, **`fill`**, **`effects`**, **`layout`**, **`placement`**, **`stroke`**, curved text, …) plus:
+`.text()` accepts `VideoTextOverlayClip`: the `TextProperties` styling surface plus timed video fields.
 
 | Field | Meaning |
 |-------|---------|
-| **`startTime`**, **`endTime`** | Visible window (seconds) on the **current** timeline. |
-| **`transitionIn`**, **`transitionOut`** | **`fade`**, **`slideLeft`**, **`zoomIn`**, … or **`custom`** FFmpeg expressions. |
-| **`overlayOpacity`** | Master 0–1 multiplier (separate from glyph **`fill.opacity`**). |
+| **`startTime`**, **`endTime`** | Visible window on the current timeline. |
+| **`transitionIn`**, **`transitionOut`** | Fade/slide/zoom/bounce presets or validated custom expressions. |
+| **`overlayOpacity`** | Master 0–1 overlay multiplier, separate from glyph fill opacity. |
 
-**Multiple overlays** may share the **same time range** at different **`x`** / **`y`**. Later items in the array paint **on top**.
+Unicode, quotes, newlines, multiple overlays, timed visibility, and transitions are handled without shell command interpolation. Later overlays in the same text layer are applied after earlier ones.
 
-**Single-op equivalent:** [Text overlays](/docs#08-text-overlays) (**`addTextOverlay`** on **`createVideo`**).
+**Single-op equivalent:** [Text overlays](/docs#08-text-overlays).
 
 ---
 
-## Audio layers — files + `createAudio`
+## Audio layers — files + procedural audio
 
-**`.audio(tracks, options?, id?)`** merges:
+`.audio(tracks, options?, id?)` accepts:
 
 | Track `type` | Purpose |
 |--------------|---------|
-| **`file`** | Path, URL, or **Buffer** (same as **`mixAudio` overlays**). |
-| **`preset`** | **`createAudio`** preset name at **`startTime`**. |
-| **`synth`** | Custom **`SynthSoundOptions`** at **`startTime`**. |
-| **`sequence`** | Event timeline; placed at **`startTime`** on the video. |
-| **`wav`** | Pre-built **Buffer** (e.g. from **`painter.createAudio.preset()`**). |
+| **`file`** | Local path, URL, or Buffer. Supports placement plus volume/pan/fades. |
+| **`preset`** | `createAudio` preset at `startTime`. |
+| **`synth`** | `SynthSoundOptions` at `startTime`. |
+| **`sequence`** | Procedural event timeline placed on the video. |
+| **`wav`** | Pre-built WAV Buffer. |
 
-Top-level audio options mirror **`mixAudio`**: **`keepOriginalAudio`**, **`originalVolume`**, **`originalSpeed`**, **`originalPitchSemitones`**.
+Audio-layer options include original-audio retention/volume/speed/pitch and `durationPolicy: 'video' | 'shortest' | 'longest'`.
 
 ```typescript
 pipeline.audio(
   [
-    { type: 'file', source: './bed.mp3', startTime: 0, volume: 0.3 },
+    { type: 'file', source: './bed.mp3', startTime: 0, volume: 0.3, pan: -0.2, fadeIn: 0.5 },
     { type: 'preset', preset: 'coin', startTime: 2.5, gain: 0.9 },
     { type: 'sequence', startTime: 0, events: [{ at: 0, preset: 'laser' }, { at: 0.2, preset: 'explosionSmall' }] },
   ],
-  { keepOriginalAudio: false },
+  { keepOriginalAudio: false, durationPolicy: 'video' },
   'sfx'
 );
 ```
 
-Use **`painter.createAudio`** when you only need WAV output ([full guide](/docs#01-create-audio)); mux with **`pipeline.audio()`** or **`createVideo({ mixAudio })`** ([FFmpeg audio](/docs#06-audio-deep-dive)).
+---
+
+## Undo / redo
+
+The builder keeps bounded project history for editor-style mutations:
+
+```typescript
+pipeline.text(caption, 'caption');
+
+if (pipeline.canUndo()) pipeline.undo();
+if (pipeline.canRedo()) pipeline.redo();
+```
+
+`undo()` and `redo()` return `false` when no corresponding history entry exists. A new successful mutation clears redo history.
 
 ---
 
-## Saved projects (editors)
+## Versioned saved projects
+
+`toJSON()` emits a versioned snapshot:
 
 ```typescript
 const snapshot = pipeline.toJSON();
-// Persist snapshot.layers in your DB (JSON column)
+console.log(snapshot.version); // 1
 
-// Later on server:
+await db.projects.save(JSON.stringify(snapshot));
+```
+
+For path/URL-backed projects, restore the persisted layer array through the public painter entry:
+
+```typescript
+const snapshot = JSON.parse(await db.projects.load());
+
+if (snapshot.version !== 1) {
+  throw new Error(`Unsupported video pipeline snapshot version: ${snapshot.version}`);
+}
+
 const restored = painter.videoPipeline(undefined, snapshot.layers);
 await restored.render({ outputPath: './export.mp4' });
 ```
 
-**`id`** fields on layers map cleanly to timeline UI rows (replace vs merge rules still apply).
+For durable editor projects, prefer stable path/URL/object-storage references rather than embedding large media Buffers in database JSON.
 
 ---
 
@@ -174,23 +234,30 @@ await restored.render({ outputPath: './export.mp4' });
 ```typescript
 await pipeline.render({
   outputPath: './out/final.mp4',
-  preset: 'export', // reserved — 'preview' for future proxy renders
+  preset: 'export', // 'preview' performs a real final proxy encode
+  signal: controller.signal,
+  timeoutMs: 120_000,
+  overwrite: false,
   onProgress: (p) => console.log(p.percent, p.speed),
 });
 ```
 
+- **`preset: 'export'`** keeps the full export path.
+- **`preset: 'preview'`** adds a real low-quality proxy encode, constrained to a maximum 960-pixel dimension while preserving aspect ratio.
+- **`signal`**, **`timeoutMs`**, **`overwrite`**, and **`onProgress`** use the same shared execution controls as `createVideo`.
+
 ---
 
-## vs chained `createVideo`
+## Pipeline vs chained `createVideo`
 
 | Chained `createVideo` | `videoPipeline` |
 |----------------------|-----------------|
-| You manage temp paths | Pipeline manages internal temps |
-| Easy to accidentally **re-encode** every step | Fewer internal **passes** |
-| One operation per call | Declarative **stack** |
-| Fine for scripts | Better for **editor backends** |
+| Application manages intermediate paths | Pipeline owns and cleans isolated workspaces |
+| Easy to accidentally re-encode every step | Deterministic normalized pass plan |
+| Exactly one operation per call | Declarative multi-layer project |
+| Fine for scripts | Better for editor/server project state |
 
-You can still call **`createVideo`** for ops not on the pipeline yet (LUT, stabilize, **`batch`**, …) — export pipeline output, then run a final **`createVideo`** pass.
+Operations that are not pipeline layer kinds (for example LUT, stabilization, or batch orchestration) remain single `createVideo` operations and can run before or after a pipeline export.
 
 ---
 
@@ -198,8 +265,8 @@ You can still call **`createVideo`** for ops not on the pipeline yet (LUT, stabi
 
 Typical product flow:
 
-1. **`renderSceneToVideoFrames`** or **`animate`** for branded/generated segments.  
-2. **`videoPipeline`** to trim user uploads, splice segments, burn captions, mix **`createAudio`** SFX.
+1. `renderSceneToVideoFrames` or `animate` for branded/generated segments.
+2. `videoPipeline` to trim uploads, splice generated segments, burn captions, and mix file/procedural audio.
 
 See [Render scene to video](/docs#08-render-scene-to-video).
 

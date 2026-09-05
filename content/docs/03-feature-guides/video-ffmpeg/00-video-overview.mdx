@@ -4,9 +4,9 @@
 
 **Multi-step editor workflows** (trim → splice → captions → audio in one stack) live under **[Advanced → Video pipeline](/docs#01-video-pipeline)** — not in this feature guide.
 
-**Requirements:** **`ffmpeg`** and **`ffprobe`** on **`PATH`**, or configure **`APEXIFY_FFMPEG_PATH`** and **`APEXIFY_FFPROBE_PATH`**. **`Buffer`** and **`http(s)`** sources are staged in isolated temporary workspaces when required. See **[Video security & runtime configuration](/docs#09-video-security-runtime-configuration)** and [Imperative helpers](/docs#08-imperative-video-helpers).
+**Requirements:** **`ffmpeg`** and **`ffprobe`** on **`PATH`**, or configure custom binary paths through the Apexify runtime configuration. **`Buffer`**, local-path, and **`http(s)`** video sources all enter the same source-resolution policy. Remote video is streamed into an isolated temporary workspace under the configured byte, host, redirect, timeout, retry, and concurrency limits; it is not first accumulated as one full in-memory Buffer. See **[Video security & runtime configuration](/docs#09-video-security-runtime-configuration)**.
 
-**Low-level stack:** **`painter.video`** — **`getVideoInfo`**, frame extract helpers, and **`videoPipeline()`** ([advanced](/docs#00-video-advanced-hub)).
+**Low-level stack:** **`painter.video`** — typed **`getVideoInfo`**, frame extract helpers, and **`videoPipeline()`** ([advanced](/docs#01-video-pipeline)).
 
 ---
 
@@ -16,15 +16,57 @@
 await painter.createVideo(options: VideoCreationOptions, painterOpts?: PainterAssetRefsOptions);
 ```
 
-When **`painterOpts.resolveAssetRefs`** is **`true`**, **`options`** is passed through **`maybeResolveRefs`** (**`$…`** placeholders, same pattern as **`createImage`** and **`createGIF`** on **`ApexPainter`**, **`lib-next/apex-painter/main.ts`**). To resolve refs yourself with the flag off, use **`prepareForRender`**.
+When **`painterOpts.resolveAssetRefs`** is **`true`**, **`options`** is passed through **`maybeResolveRefs`** (**`$…`** placeholders, same pattern as **`createImage`** and **`createGIF`** on **`ApexPainter`**). To resolve refs yourself with the flag off, use **`prepareForRender`**.
 
 ---
 
-## One operation per call (router)
+## Exactly one operation per call
 
-Design for **exactly one** operation key in **`options`** besides **`source`** (and **`onProgress`** when used). **`VideoCreator.createVideo`** is a linear **`if`** chain: **the first truthy branch wins**; later keys are ignored. For example **`getInfo`** is checked **before** **`extractFrame`**, **`convert`**, **`trim`**, **`merge`**, **`createFromFrames`**, **`detectFormat`**, **`exportPreset`**, **`addTextOverlay`**, and so on—**`detectFormat`** is **late** in the chain, **after** **`createFromFrames`**. The **[options reference card](/docs#07-video-creation-options-matrix)** maps each key to its deep-dive page.
+`createVideo` now validates the whole request **before** resolving media, probing files, creating workspaces, or starting FFmpeg. A call must contain **exactly one** video operation key in addition to **`source`** and the optional execution controls.
 
-Some operations ignore top-level **`source`** (they use their own paths or **`videos`** arrays)—the type still requires **`source`**; tutorials call that out (**`merge`**, **`splitScreen`**, **`batch`**, …).
+```typescript
+await painter.createVideo({
+  source: './input.mp4',
+  trim: { startTime: 5, endTime: 12, outputPath: './clip.mp4' },
+  // convert: { ... } // ❌ a second operation is rejected; it is not silently ignored
+});
+```
+
+Use **`videoPipeline()`** when several edits belong to one project. The **[options reference card](/docs#07-video-creation-options-matrix)** maps every `createVideo` operation to its guide.
+
+Some operations use their own media lists (for example **`merge`**, **`splitScreen`**, and **`batch`**), but the public `VideoCreationOptions` contract still includes top-level **`source`**.
+
+---
+
+## Shared execution controls
+
+All FFmpeg-backed operations share the same controls:
+
+```typescript
+await painter.createVideo({
+  source: './input.mp4',
+  convert: { outputPath: './out.mp4', format: 'mp4' },
+  signal: abortController.signal,
+  timeoutMs: 120_000,
+  overwrite: false,
+  onProgress: ({ percent, time, speed }) => {
+    console.log(percent, time, speed);
+  },
+});
+```
+
+- **`signal`** aborts remote resolution and active FFmpeg/ffprobe work where applicable.
+- **`timeoutMs`** bounds the active FFmpeg operation.
+- **`overwrite`** defaults to `true`; `false` rejects an existing destination before FFmpeg starts and also uses FFmpeg's no-overwrite mode as a race-condition backstop.
+- **`onProgress`** uses FFmpeg's machine-readable progress channel for FFmpeg-backed jobs. Metadata-only operations do not synthesize progress events.
+
+---
+
+## Source and process safety model
+
+Phase 8 removes shell-command construction from the video subsystem. FFmpeg and ffprobe are spawned with an executable plus an argv array and `shell: false`; media paths, filter values, and output paths are validated before execution.
+
+Remote video uses the same centralized network policy as other media. Buffer and remote inputs are materialized only inside isolated temporary workspaces, and workspaces are removed after success, rejection, timeout, or abort unless temporary-file retention is explicitly enabled in runtime configuration.
 
 ---
 
@@ -36,11 +78,11 @@ Some operations ignore top-level **`source`** (they use their own paths or **`vi
 | [Transcode, trim & geometry](/docs#02-transcode-trim-transform) | **`convert`**, **`compress`**, **`trim`**, **`rotate`**, **`crop`**, **`changeSpeed`**, … |
 | [Audio tracks](/docs#03-audio) | **`extractAudio`**, **`removeAudio`**, **`mute`**, **`mixAudio`**, **`adjustVolume`** (**`normalizeAudio`**: [Video audio](/docs#06-audio-deep-dive)) |
 | [Effects, colour & overlays](/docs#04-effects-overlays) | **`applyEffects`**, **`colorCorrect`**, **`applyLUT`**, **`addWatermark`**, **`addFade`** |
-| [Compose, PiP & frame builds](/docs#05-compose-and-build) | **`merge`**, **`splitScreen`**, **`pictureInPicture`**, **`createFromFrames`**, **`createLoop`** |
+| [Compose, PiP & frame builds](/docs#05-compose-and-build) | **`merge`** (sequential, side-by-side, real grid), **`splitScreen`**, **`pictureInPicture`**, **`createFromFrames`**, **`createLoop`** |
 | [Presets, transitions, stabilize & batch](/docs#06-advanced-presets-transitions) | **`exportPreset`**, **`stabilize`**, **`addTransition`**, **`batch`**, **`onProgress`** examples |
 | [Options reference card](/docs#07-video-creation-options-matrix) | Compact key → **`options/`** guide index |
 | [Imperative helpers (`painter.*`)](/docs#08-imperative-video-helpers) | **`getVideoInfo`**, **`extractFrameAtTime`**, **`extractFrameByNumber`**, **`extractMultipleFrames`**, **`extractFrames`**, **`extractAllFrames`** |
-| [Security & runtime configuration](/docs#09-video-security-runtime-configuration) | Safe FFmpeg execution model, custom binary paths, temp workspace root, hostile filenames and operational guidance |
+| [Security & runtime configuration](/docs#09-video-security-runtime-configuration) | Safe argv execution model, custom binary paths, temp workspace root, hostile filenames and operational guidance |
 
 ---
 
@@ -54,7 +96,7 @@ For **every `createVideo` flag**, start at the **[Video options hub](/docs#00-vi
 
 ## Scenes → video
 
-**`painter.renderSceneToVideoFrames(scene, video)`** renders the scene to PNG, merges optional frame slots, and delegates to **`createVideo`**. **`video.options.createFromFrames`** is **required** (**`lib-next/scene/render-scene-to-video.ts`**). **`video.sceneRender.resolveAssetRefs`** defaults **`true`** — **`scene`** asset refs use **`resolveSceneRenderInputAssets`** unless you opt out (**`main.ts`**).
+**`painter.renderSceneToVideoFrames(scene, video)`** renders the scene to PNG, merges optional frame slots, and delegates to **`createVideo`**. **`video.options.createFromFrames`** is **required**. **`video.sceneRender.resolveAssetRefs`** defaults **`true`** — scene asset refs use the shared scene resolver unless you opt out.
 
 ---
 
@@ -62,9 +104,9 @@ For **every `createVideo` flag**, start at the **[Video options hub](/docs#00-vi
 
 | Area | Types |
 |------|--------|
-| **`createVideo`** | **`VideoCreationOptions`**, **`MixAudioOperation`**, **`MixAudioOverlayClip`** |
+| **`createVideo`** | **`VideoCreationOptions`**, **`VideoOperationControls`**, **`MixAudioOperation`**, **`MixAudioOverlayClip`** |
 | **`addTextOverlay`** | **`VideoTextOverlayClip`**, **`VideoTextOverlayOperation`**, **`VideoTextTransition`** |
-| **`videoPipeline`** | **`VideoPipelineLayer`**, **`VideoPipelineAudioTrack`**, **`VideoPipelineSnapshot`** |
+| **`videoPipeline`** | **`VideoPipelineLayer`**, **`VideoPipelineAudioTrack`**, **`VideoPipelineSnapshot`**, **`VideoPipelineRenderResult`** |
 | **`createAudio`** | **`SynthPresetName`**, **`SynthSoundOptions`**, … — [Advanced](/docs#01-create-audio) |
 
 Import from **`apexify.js`** or **`apexify.js/types`**.
