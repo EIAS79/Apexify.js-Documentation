@@ -1,6 +1,6 @@
-# Constructor output type, `outPut` & `painter.output` {#03-output-format-and-encoding}
+# Constructor output type, `toOutput`, legacy `outPut` & `painter.output` {#03-output-format-and-encoding}
 
-Rendering does **not** depend on constructor `type`. Canvas, image, chart, scene, batch, and chain paths build raster data the same way and expose `Buffer` values (or structures containing `.buffer`). The constructor `OutputFormat.type` is only consumed by `await painter.outPut(buffer)` through `bufferToPainterOutput`.
+Rendering does **not** depend on constructor `type`. Canvas, image, chart, scene, batch, and chain paths build raster data the same way and expose `Buffer` values (or structures containing `.buffer`). The constructor `OutputFormat.type` is consumed by `await painter.toOutput(buffer)` through `bufferToPainterOutput`. The older `await painter.outPut(buffer)` spelling remains as a deprecated compatibility alias and delegates to `toOutput`.
 
 Most applications should keep `new ApexPainter()` with the default `buffer` output and use explicit `painter.output.*` helpers when another representation is needed.
 
@@ -18,7 +18,7 @@ Default: `buffer`.
 
 ---
 
-## `await painter.outPut(results)`
+## `await painter.toOutput(results)`
 
 Input must be a non-empty `Buffer`, normally PNG bytes produced by Apexify.
 
@@ -34,6 +34,10 @@ Input must be a non-empty `Buffer`, normally PNG bytes produced by Apexify.
 Unsupported constructor output types reject with the allowed values.
 
 `save` / `saveMultiple` are separate disk-output APIs and do not use constructor `type`.
+
+### Legacy `outPut` alias
+
+`await painter.outPut(results)` is retained for existing Apexify.js applications and returns the same result as `toOutput`. New code should use `toOutput`; `outPut` is deprecated rather than removed so the naming cleanup does not break established callers.
 
 ---
 
@@ -61,6 +65,7 @@ const { buffer } = await painter.createCanvas({
   colorBg: '#111827',
 });
 
+const converted = await painter.toOutput(buffer);
 const dataUrl = painter.output.dataURL(buffer);
 const b64 = painter.output.base64(buffer);
 const bytes = painter.output.arrayBuffer(buffer);
@@ -102,7 +107,8 @@ If required credentials are absent, the call rejects **before** an upload reques
 |------|----------|
 | Keep buffers everywhere | `new ApexPainter()` and use returned buffers. |
 | Encode ad hoc | `painter.output.*`. |
-| One global encoding for `outPut` only | `new ApexPainter({ type: '…' })`, then `await painter.outPut(buf)`. |
+| One global encoding for `toOutput` | `new ApexPainter({ type: '…' })`, then `await painter.toOutput(buf)`. |
+| Maintain older callers | `painter.outPut(buf)` remains a deprecated compatibility alias. |
 | Save to disk safely | `save` / `saveMultiple` with explicit `SaveOptions`. |
 
 ---
