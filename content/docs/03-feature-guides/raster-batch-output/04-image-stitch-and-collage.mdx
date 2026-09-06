@@ -1,28 +1,29 @@
 # Stitch & collage {#04-image-stitch-and-collage}
 
-**`await painter.image.stitchImages(images, options?)`** concatenates images **horizontally**, **vertically**, or on a **square grid**. **`await painter.image.createCollage(images, layout)`** lays out **sized** cells with backgrounds and optional **rounded clips**.
+**`await painter.image.stitchImages(images, options?)`** concatenates images horizontally, vertically, or on a square-ish grid. **`await painter.image.createCollage(images, layout)`** lays out sized cells as a grid, shortest-column masonry, or carousel with backgrounds and optional rounded clips.
 
-Implementation:** **`lib-next/output/stitch.ts`** (**PNG** output **`/`** **`canvas.toBuffer('image/png')`**).
+Implementation: `lib-next/output/stitch.ts` (PNG output through `canvas.toBuffer('image/png')`). Image sources use the shared Apexify image loading/preflight path and may be a local/remote string source or `Buffer`.
 
-**Sources:** **`string`** (**`http`** **`/`** **`https`** URL **or** path relative **`/`** joined with **`process.cwd()``**) **`/`** **`Buffer`**.
+Both helpers bound source loading by the central batch-concurrency limit and validate final canvas dimensions before allocation.
 
 ---
 
 ## `stitchImages(images, options?)`
 
-### `StitchOptions` (**`lib-next/types/batch.ts`**)
+### `StitchOptions` (`lib-next/types/batch.ts`)
 
 | Field | Default | Behaviour |
 |-------|---------|-----------|
-| **`direction`** | **`horizontal`** | **`horizontal`** **`|`** **`vertical`** **`|`** **`grid`**. |
-| **`overlap`** | **`0`** | Pixels subtracted between neighbours (**horizontal **`/`** vertical**). |
-| **`spacing`** | **`0`** | Extra gap (**pixels**) inserted between tiles. |
-| **`blend`** | **`false`** | When **`true`** **`overlap > 0`**, redraws overlap zone with **`multiply`** **`/`** **`globalAlpha 0.5`** (**approximate** blend). |
+| **`direction`** | `horizontal` | `horizontal` \| `vertical` \| `grid`. |
+| **`overlap`** | `0` | Pixels subtracted between neighbours for horizontal/vertical stitching. Grid rejects non-zero overlap. |
+| **`spacing`** | `0` | Extra pixels inserted between tiles. |
+| **`blend`** | `false` | With a real overlap, the overlap region is redrawn with `multiply` and `globalAlpha = 0.5`; non-overlap pixels are not darkened. |
 
 ### Layout rules
 
-- **Horizontal **`/`** vertical:** canvas spans **sum of sides** minus overlaps **plus** spacing; orthogonal extent is **max** edge among images.
-- **Grid:** **`cols = ceil(sqrt(n))`**, **`rows = ceil(n / cols)`**; each cell **`maxWidth`** **`×`** **`maxHeight`** of inputs (**images keep intrinsic size**, top-left anchored per cell).
+- **Horizontal / vertical:** canvas spans the sum of tile extents minus overlap plus spacing; the orthogonal extent is the maximum input edge.
+- **Grid:** `cols = ceil(sqrt(n))`, `rows = ceil(n / cols)`; every cell uses the maximum input width/height. Inputs keep their intrinsic dimensions and are anchored to the top-left of each cell.
+- A combination of overlap/spacing that would produce a non-positive output dimension is rejected before canvas allocation.
 
 ```typescript
 const strip = await painter.image.stitchImages(['./a.png', './b.png'], {
@@ -43,26 +44,25 @@ const sheet = await painter.image.stitchImages(urls, { direction: 'grid' });
 Array<{ source: string | Buffer; width?: number; height?: number }>;
 ```
 
-Optional **`width`** **`/`** **`height`** scale draws (**defaults:** raster dimensions).
+Optional `width` / `height` control the draw size and default to the decoded raster dimensions. Positive integer dimensions are required when supplied.
 
 ### `CollageLayout`
 
 | Field | Default | Notes |
 |-------|---------|------|
-| **`type`** | **`grid`** | **`grid`** **`|`** **`masonry`** **`|`** **`carousel`** **`|`** **`custom`**. |
-| **`columns`** **`/`** **`rows`** | **`3`** **`/`** **`3`** | **`grid`** tile counts. |
-| **`spacing`** | **`10`** | Gap (**pixels**) between cells **`/`** strips. |
-| **`background`** | **`#ffffff`** | Filled before drawing. |
-| **`borderRadius`** | **`0`** | Uses **`ctx.roundRect`** + **`clip`** per tile when **`> 0`**. |
+| **`type`** | required by the public type | `grid` \| `masonry` \| `carousel`. The old misleading `custom` value is no longer accepted because it never had a real placement algorithm. |
+| **`columns`** / **`rows`** | `3` / `3` | Grid uses `columns`; declared `rows` is a minimum and automatically expands so inputs are never silently dropped. Masonry uses `columns`. |
+| **`spacing`** | `10` | Gap in pixels between cells/tiles. |
+| **`background`** | `#ffffff` | Filled before drawing. |
+| **`borderRadius`** | `0` | Uses `ctx.roundRect` + `clip` for each tile, clamped to half the tile width/height. |
 
 ### Layout behaviour
 
-| **`type`** | Algorithm (summary) |
-|------------|---------------------|
-| **`grid`** | Uniform cell **`max(width)` **`×`** **`max(height)`** across **all** images; tiles indexed row-major. |
-| **`masonry`** | Column stripping (**shortest column** receives next image **`/`** heights accumulate). |
-| **`carousel`** | Single horizontal strip with vertical centering (**full widths summed **+** spacing). |
-| **`custom`** | Canvas defaults **`800×600`** — **warning:** placement logic does **not** position **`custom`** tiles beyond **`grid`** **`/`** **`masonry`** **`/`** **`carousel`** branches; prefer **`grid`** **`/`** **`carousel`** unless you extend upstream. |
+| `type` | Algorithm |
+|--------|-----------|
+| **`grid`** | Uniform cell `max(width) × max(height)`, row-major. If `rows` is too small for all inputs, Apexify expands the row count. |
+| **`masonry`** | Each next image is placed in the currently shortest column; column heights include configured spacing. |
+| **`carousel`** | One horizontal strip with vertical centering; widths are summed with spacing. |
 
 ```typescript
 const board = await painter.image.createCollage(
@@ -70,7 +70,14 @@ const board = await painter.image.createCollage(
     { source: './photo-a.jpg', width: 320, height: 240 },
     { source: './photo-b.jpg' },
   ],
-  { type: 'grid', columns: 2, rows: 2, spacing: 12, background: '#0f172a', borderRadius: 8 }
+  {
+    type: 'grid',
+    columns: 2,
+    rows: 2,
+    spacing: 12,
+    background: '#0f172a',
+    borderRadius: 8,
+  }
 );
 ```
 
