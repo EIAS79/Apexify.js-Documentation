@@ -48,10 +48,11 @@ The defaults are intended to be usable for normal server workloads while placing
 | `maxGifResourceCost` | 268,435,456 | Width × height × effective frame-count budget |
 | `maxAudioDurationSeconds` | 600 | Procedural/combined audio duration |
 | `maxAudioSampleRate` | 192,000 | Audio sample rate |
+| `maxAudioChannels` | 2 | Audio channel count; implementation supports mono/stereo only |
 | `maxAudioEvents` | 20,000 | Audio sequence/timeline events |
 | `maxAudioLayers` | 1,024 | Audio synthesis/composition layers |
 | `maxAudioPartials` | 4,096 | Harmonic partial budget |
-| `maxAudioBytes` | 256 MiB | Estimated decoded/generated audio sample memory |
+| `maxAudioBytes` | 256 MiB | Peak governed audio working-memory estimate |
 | `maxVideoDurationSeconds` | 14,400 | Video duration |
 | `maxVideoFps` | 240 | Video frame rate |
 | `maxVideoBitrateKbps` | 200,000 | Video bitrate |
@@ -60,7 +61,21 @@ The defaults are intended to be usable for normal server workloads while placing
 | `maxBatchConcurrency` | 4 | Concurrent batch workers |
 | `maxConcurrentRemoteFetches` | 8 | Concurrent remote media requests |
 
-All limit values must be finite positive integers. `maxSceneDepth` cannot exceed `maxNestedSurfaces`, and `maxBatchConcurrency` cannot exceed `maxBatchOperations`.
+Most limits must be finite positive integers. Continuous duration/FPS limits such as `maxAudioDurationSeconds`, `maxVideoDurationSeconds`, and `maxVideoFps` must be finite and positive. `maxAudioChannels` cannot exceed the implementation's mono/stereo ceiling of 2. `maxSceneDepth` cannot exceed `maxNestedSurfaces`, and `maxBatchConcurrency` cannot exceed `maxBatchOperations`.
+
+## Audio peak-memory accounting
+
+Phase 9 treats `maxAudioBytes` as a **peak-allocation guard**, not merely a final output-size check. The preflight budget includes buffers that can coexist during the operation, including:
+
+- the final Float32 render/mix buffer;
+- decoded Float32 WAV source storage where applicable;
+- resampled or speed-adjusted working buffers;
+- one transient sequence event or composition clip under the bounded renderer;
+- the final PCM16 WAV allocation while Float32 PCM is still live.
+
+This matters because a 10 MiB WAV does not imply only 10 MiB of peak memory. Audio processing normally uses Float32 working samples and may temporarily hold source, transformed, output, and encoded buffers at the same time.
+
+The authoritative synthesis/sequence/compose/mix entry points reject over-budget work before their large allocations. The public `createAudio` façade also validates at its boundary as defense-in-depth.
 
 ## Override limits deliberately
 
@@ -81,6 +96,7 @@ configureApexifyRuntime({
     maxDecodedImagePixels: 32_000_000,
     maxBatchOperations: 100,
     maxBatchConcurrency: 2,
+    maxAudioDurationSeconds: 120,
     maxAudioBytes: 128 * 1024 * 1024,
   },
 });
@@ -103,11 +119,11 @@ The runtime policy is enforced across the public high-cost surface, including:
 - text arrays, total text length, coordinates, typography metrics, gradients, strokes, shadows, curves, and opacity;
 - scene dimensions, total/nested layers, surfaces, depth, remote references, image/chart/text counts, aggregate text, transforms, filters/effects, and child-surface budgets;
 - GIF dimensions, frames, generated frames, delays, repeat/quality/disposal, overlays, and final frame-resource cost;
-- procedural audio duration, sample rate, channels, layers/events/partials, frequency/gain/pan/filter/ADSR values, timeline offsets, and estimated sample memory before large `Float32Array` allocation;
+- procedural audio duration, sample rate, channels, layers/events/partials, frequency/gain/pan/filter/ADSR values, timeline offsets, WAV decode metadata, and peak working-memory estimates before large audio allocation;
 - video operation combinations, time ranges, speed, FPS, dimensions, bitrate, overlays, audio tracks and declarative pipeline layers before FFmpeg work where practical;
 - charts, pixels, Path2D/custom paths, hit-detection collections, batch/chain work, output encoding/upload, and save/save-multiple validation.
 
-Apexify.js also inspects decoded image metadata so an input can be rejected by decoded-pixel/canvas budgets before a full native canvas decode where practical.
+Apexify.js also inspects decoded image metadata so an input can be rejected by decoded-pixel/canvas budgets before a full native canvas decode where practical. PCM16 WAV metadata is likewise inspected before allocating decoded Float32 audio storage.
 
 ## Early rejection and error handling
 
@@ -125,7 +141,7 @@ try {
 
 Do not blindly retry the same request. Reduce the requested work or deliberately change the server policy after confirming the deployment has sufficient capacity.
 
-Validation is intentionally placed before dangerous boundaries when possible: native canvas allocation, full image decode, generated GIF work, large audio sample allocation, FFmpeg execution, filesystem writes for invalid save requests, and unbounded batch fan-out.
+Validation is intentionally placed before dangerous boundaries when possible: native canvas allocation, full image decode, generated GIF work, large audio sample allocation, PCM16 encode/decode working sets, FFmpeg execution, filesystem writes for invalid save requests, and unbounded batch fan-out.
 
 ## Concurrency behavior
 
@@ -133,12 +149,15 @@ Validation is intentionally placed before dangerous boundaries when possible: na
 
 These controls are independent. A deployment can, for example, allow 100 batch operations while processing only two concurrently.
 
+Procedural audio uses operation-local DSP, filter, and seeded-RNG state. Seeded concurrent renders are therefore reentrant and do not depend on shared mutable synthesis state.
+
 ## Operational guidance
 
 - Keep `trustedNetworkAccess` disabled unless an explicit allowlist is required and understood.
 - Keep decoded-image and total-pixel limits aligned with the process memory available to native raster libraries.
 - Remember that GIF resource cost multiplies pixels by frame count.
-- Remember that audio memory scales approximately with duration × sample rate × channels × 4 bytes for `Float32Array` samples, before additional working buffers.
+- Remember that baseline Float32 audio storage scales approximately with duration × sample rate × channels × 4 bytes, and `maxAudioBytes` additionally accounts for relevant coexisting working/encoded buffers.
+- `createAudio` returns a complete WAV `Buffer`; use stricter duration/byte limits when complete-buffer synthesis is inappropriate for your service memory budget.
 - Prefer lower concurrency for memory-heavy image/video workloads even when CPU capacity is available.
 - Log structured error `code` and limit metadata, but do not expose internal paths, credentials, or sensitive request details to untrusted clients.
 
