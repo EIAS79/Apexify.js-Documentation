@@ -1,59 +1,97 @@
 # `onProgress` callback {#11-on-progress}
 
-
+`onProgress` is one of the shared Phase 8 video execution controls. FFmpeg-backed operations use FFmpeg's machine-readable **`-progress pipe:2`** output rather than scraping human-formatted status lines.
 
 ## Type
 
 ```typescript
 onProgress?: (progress: {
-  percent: number; // ~0–100 from stderr time/duration parse
-  time: number;   // seconds FFmpeg reports as encoded position
-  speed: number; // e.g. 2.3 meaning ~2.3× realtime
+  percent: number;
+  time: number;   // encoded position, seconds
+  speed: number;  // e.g. 2.3 means ~2.3× realtime
 }) => void;
 ```
 
 ---
 
-## When it runs
+## Where it applies
 
-Forwarded only on operations that call **`executeFFmpegWithProgress`**:
-
-| Operation |
-|-----------|
-| **`freezeFrame`** (concat phase) |
-| **`exportPreset`** |
-| **`normalizeAudio`** |
-| **`applyLUT`** |
-| **`addTransition`** |
-| **`addAnimatedText`** |
-| **`addTextOverlay`** |
-| **`videoPipeline().render({ onProgress })`** |
-
-Other **`createVideo`** branches **do not** invoke **`onProgress`** even if you pass it. **`mixAudio`** and **`trim`** do not report progress today.
-
----
-
-## Behaviour & limits
-
-**How it works:** Parses FFmpeg **stderr** for **`time=`** vs **`Duration:`** and **`speed=`**. Rough ETA — **not** frame-sample accurate.
-
-**Edge cases:** Very short jobs may never emit parseable lines; **`percent`** may jump or stick at **100** early.
-
-### Example
+Pass `onProgress` at the top level of **`VideoCreationOptions`**:
 
 ```typescript
 await painter.createVideo({
-  source: './long.mp4',
-  normalizeAudio: {
-    method: 'lufs',
-    targetLevel: -23,
-    outputPath: './norm.mp4',
+  source: './input.mp4',
+  trim: {
+    startTime: 10,
+    endTime: 40,
+    outputPath: './clip.mp4',
+    mode: 'accurate',
   },
-  onProgress: ({ percent, speed }) => {
-    process.stdout.write(`\r${percent.toFixed(1)}% @ ${speed.toFixed(2)}x`);
+  onProgress: ({ percent, time, speed }) => {
+    process.stdout.write(`\r${percent.toFixed(1)}%  ${time.toFixed(2)}s  ${speed.toFixed(2)}x`);
   },
 });
 ```
 
+The same callback is forwarded by FFmpeg-backed conversion, trim, compositing, audio, overlay, frame-output, transition, and other render operations that execute through the shared video runtime.
+
+Metadata-only work such as `getInfo`/ffprobe does **not** manufacture FFmpeg encode progress. Very short FFmpeg jobs may also finish before many progress records are emitted.
+
 ---
 
+## Pipeline progress
+
+`videoPipeline().render()` accepts the same control:
+
+```typescript
+const result = await painter
+  .videoPipeline('./input.mp4')
+  .trim(0, 15)
+  .text({
+    text: 'Apexify',
+    x: 32,
+    y: 32,
+    startTime: 0,
+    endTime: 4,
+    font: { size: 36, family: 'Arial' },
+    fill: { color: '#ffffff' },
+  })
+  .render({
+    outputPath: './out.mp4',
+    onProgress: ({ percent }) => console.log(percent),
+  });
+
+console.log(result.passes, result.executionPlan);
+```
+
+A pipeline can contain several FFmpeg passes. The callback reports the active pass's FFmpeg progress; use `result.executionPlan` and `result.passes` after rendering to inspect the deterministic pass plan that actually ran.
+
+---
+
+## Related controls
+
+```typescript
+await painter.createVideo({
+  source: './input.mp4',
+  convert: { outputPath: './out.mp4' },
+  signal: controller.signal,
+  timeoutMs: 120_000,
+  overwrite: false,
+  onProgress: handleProgress,
+});
+```
+
+- **`signal`** aborts active work where applicable.
+- **`timeoutMs`** bounds the FFmpeg process.
+- **`overwrite: false`** rejects an existing output rather than replacing it.
+- **`onProgress`** observes the active FFmpeg process without changing output semantics.
+
+---
+
+## Behaviour and limits
+
+`percent` is derived from FFmpeg's reported encoded time against the operation's expected duration when that duration is known. It is operational progress, not a promise of frame/sample-level completion accuracy. Filters, muxer flushes, multi-pass pipeline stages, and very short clips can make updates uneven.
+
+The callback should stay lightweight. If your application needs persistence, queue or throttle writes instead of performing expensive synchronous work on every progress record.
+
+---
