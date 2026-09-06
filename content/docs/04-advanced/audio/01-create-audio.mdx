@@ -2,7 +2,9 @@
 
 **`painter.createAudio`** synthesizes **16-bit PCM WAV `Buffer`s** — presets, custom multi-layer sounds, timelines, and mixes. Output is ready for **`mixAudio`**, **`videoPipeline().audio()`**, disk via **`save`**, or any API that accepts a WAV buffer.
 
-**Hub:** [Audio (advanced)](/docs#00-audio-advanced-hub) · **Mux on video:** [Video audio operations](/docs#06-audio-deep-dive) · **Pipeline tracks:** [Video pipeline](/docs#01-video-pipeline)
+Phase 9 hardens this surface with **pre-allocation resource checks**, **operation-local seeded randomness**, stricter DSP validation, and RIFF-safe PCM16 handling. `createAudio` remains a complete-buffer API: it returns a finished WAV `Buffer`, not a streaming audio object.
+
+**Hub:** [Audio (advanced)](/docs#00-audio-advanced-hub) · **Runtime limits:** [Runtime validation & resource governance](/docs#01-runtime-resource-governance) · **Mux on video:** [Video audio operations](/docs#06-audio-deep-dive) · **Pipeline tracks:** [Video pipeline](/docs#01-video-pipeline)
 
 ---
 
@@ -23,6 +25,34 @@ Types export from **`apexify.js/types`**: **`SynthPresetName`**, **`SynthSoundOp
 
 ---
 
+## Deterministic seeded audio
+
+Noise-based synthesis is nondeterministic by default. Supply **`seed`** when you need byte-stable procedural output for tests, cache keys, reproducible renders, or parallel jobs.
+
+`seed` accepts a **safe integer** or a **1–256 character string** on sound, sequence, compose, clip, and mix options where the type exposes it.
+
+```typescript
+const a = painter.createAudio.synth({
+  seed: 'ui-impact-v1',
+  layers: [
+    { waveform: 'pink', duration: 0.18, gain: 0.35 },
+  ],
+});
+
+const b = painter.createAudio.synth({
+  seed: 'ui-impact-v1',
+  layers: [
+    { waveform: 'pink', duration: 0.18, gain: 0.35 },
+  ],
+});
+
+// a and b are byte-identical WAV buffers.
+```
+
+Seeded layers/events/clips derive independent random streams. Concurrent seeded renders do not share RNG or filter state. Omitting `seed` intentionally keeps stochastic sounds nondeterministic.
+
+---
+
 ## Presets
 
 **39** built-in names (game/UI oriented): **`laser`**, **`explosion`**, **`coin`**, **`jump`**, **`whoosh`**, **`menuSelect`**, **`footstep`**, **`thunder`**, …
@@ -35,7 +65,7 @@ for (const info of painter.createAudio.listPresets()) {
 }
 ```
 
-**`SynthPresetOverrides`:** **`volume`**, **`transpose`**, plus any **`SynthSoundOptions`** field layered on the preset definition.
+**`SynthPresetOverrides`:** **`volume`**, **`transpose`**, plus any **`SynthSoundOptions`** field layered on the preset definition. Preset definitions are cloned before use, so caller mutation does not alter the shared catalog.
 
 ---
 
@@ -45,17 +75,18 @@ Each **`SynthLayer`** can use waveforms **`sine`**, **`square`**, **`sawtooth`**
 
 | Field | Role |
 |-------|------|
-| **`frequency`** / **`frequencyEnd`** | Start Hz and optional sweep |
+| **`frequency`** / **`frequencyEnd`** | Start Hz and optional sweep for tonal waveforms |
 | **`duration`** | Layer length (seconds) |
 | **`delay`** | Offset before layer starts |
 | **`gain`**, **`detune`**, **`pan`** | Level, cents, stereo pan |
 | **`adsr`** | Attack / decay / sustain / release |
 | **`vibrato`**, **`tremolo`** | LFO depth + rate |
-| **`filter`** | **`lowpass`** / **`highpass`** + cutoff |
-| **`noiseMix`**, **`partials`** | Noise blend, harmonic ratios |
+| **`filter`** | **`lowpass`** / **`highpass`** + cutoff + optional Q |
+| **`noiseMix`**, **`partials`** | Noise blend and harmonic ratios on tonal layers |
 
 ```typescript
 const uiTick = painter.createAudio.synth({
+  seed: 'ui-tick',
   layers: [
     {
       waveform: 'square',
@@ -73,14 +104,17 @@ const uiTick = painter.createAudio.synth({
 
 **`sampleRate`** (default **44100**), **`channels`** (**`1`** or **`2`**), **`limiter`** (default **`true`**) apply at the sound level.
 
+Noise/pink layers reject tonal-only controls such as frequency sweeps, detune, vibrato, and harmonic partials instead of silently ignoring them. Filter cutoff must be below the selected sample rate's Nyquist frequency.
+
 ---
 
 ## Timelines — `sequence`
 
-Events fire at **`at`** (seconds). Each event uses **`preset`** and/or **`options`** (**`SynthSoundOptions`**), plus optional **`gain`**.
+Events fire at **`at`** (seconds). Each event uses exactly one of **`preset`** or **`options`** (**`SynthSoundOptions`**), plus optional **`gain`**.
 
 ```typescript
 const combo = painter.createAudio.sequence({
+  seed: 'combo-v1',
   events: [
     { at: 0, preset: 'hit' },
     { at: 0.08, preset: 'coin', gain: 0.85 },
@@ -91,7 +125,7 @@ const combo = painter.createAudio.sequence({
 });
 ```
 
-**`tail`** pads silence after the last event ends. Overlapping events **sum** in the same buffer (limiter applied).
+**`tail`** pads silence after the last event ends. Overlapping events **sum** in the same buffer (limiter applied). The renderer keeps the final output plus one event working buffer instead of retaining every rendered event in memory.
 
 ---
 
@@ -102,16 +136,18 @@ const combo = painter.createAudio.sequence({
 | **`SynthComposeClip`** field | Effect |
 |------------------------------|--------|
 | **`at`**, **`duration`**, **`sourceStart`** | Placement and trim |
-| **`preset`** / **`sound`** / **`wav`** | Source (one required) |
-| **`gain`**, **`volume`**, **`transpose`**, **`detune`**, **`pitch`**, **`speed`** | Level and pitch |
+| **`preset`** / **`sound`** / **`wav`** | Source (exactly one required) |
+| **`gain`**, **`volume`**, **`transpose`**, **`detune`**, **`pitch`**, **`speed`** | Level and pitch/playback-rate controls |
 | **`pan`**, **`fadeIn`**, **`fadeOut`** | Stereo and edges |
 | **`noise`**, **`filter`**, **`quality`** | Post-tone on the clip |
 | **`overrides`** | Preset tweaks |
+| **`seed`** | Deterministic clip-local stochastic processing |
 
-Top-level **`SynthComposeOptions`**: **`duration`**, **`tail`**, **`masterGain`**, **`postHighpassHz`** (rumble cleanup), **`noiseGateThreshold`** (quiet overlap hiss).
+Top-level **`SynthComposeOptions`**: **`duration`**, **`tail`**, **`masterGain`**, **`postHighpassHz`** (rumble cleanup), **`noiseGateThreshold`** (quiet overlap hiss), and optional **`seed`**.
 
 ```typescript
 const bossIntro = painter.createAudio.compose({
+  seed: 'boss-intro-v3',
   clips: [
     { at: 0, preset: 'rumble', duration: 1.2, gain: 0.5 },
     { at: 0.4, preset: 'alarm', gain: 0.4, fadeIn: 0.1 },
@@ -122,6 +158,10 @@ const bossIntro = painter.createAudio.compose({
 });
 ```
 
+For synthesized preset/custom sources, **`transpose`**, **`detune`**, and **`pitch`** modify oscillator pitch. Existing WAV clips do not accept those procedural pitch controls; use **`speed`** instead. `speed` is playback-rate resampling: it changes **duration and pitch together** and is not pitch-preserving time stretch.
+
+The composer keeps the final output plus one processed clip working buffer rather than retaining every clip at once.
+
 ---
 
 ## `mix`
@@ -131,11 +171,48 @@ Combine one or more **`Buffer`s** (or inline preset/sound definitions where supp
 ```typescript
 const layered = painter.createAudio.mix(
   [painter.createAudio.preset('beep'), painter.createAudio.preset('whoosh', { volume: 0.5 })],
-  { masterGain: 0.9 }
+  { masterGain: 0.9, seed: 'layered-v1' }
 );
 ```
 
-Use when you already have WAV buffers and need a single file without a full **`compose`** timeline.
+Use when you already have WAV buffers and need a single file without a full **`compose`** timeline. If any input uses timeline/clip controls, `mix` routes through the validated composition path.
+
+---
+
+## Resource limits and allocation behavior
+
+Audio requests are validated **before large sample allocations**. Defaults are controlled by the shared Apexify runtime configuration:
+
+| Limit | Default |
+|---|---:|
+| `maxAudioDurationSeconds` | 600 seconds |
+| `maxAudioSampleRate` | 192,000 Hz |
+| `maxAudioChannels` | 2 |
+| `maxAudioEvents` | 20,000 |
+| `maxAudioLayers` | 1,024 |
+| `maxAudioPartials` | 4,096 |
+| `maxAudioBytes` | 256 MiB |
+
+`maxAudioBytes` is a **peak working-memory guard**, not just a final WAV-size limit. Apexify.js accounts for the Float32 render buffer, decoded/resampled sources where applicable, transient event/clip buffers, and the final PCM16 WAV allocation when those buffers coexist.
+
+```typescript
+configureApexifyRuntime({
+  limits: {
+    maxAudioDurationSeconds: 120,
+    maxAudioBytes: 96 * 1024 * 1024,
+  },
+});
+```
+
+Lower limits for multi-tenant or memory-constrained services. Do not raise them merely to suppress `ApexifyResourceLimitError`.
+
+Because the API returns a complete WAV `Buffer`, Phase 9 deliberately enforces bounded complete-buffer rendering rather than claiming streaming synthesis.
+
+---
+
+## WAV behavior
+
+Generated output is mono/stereo **PCM16 RIFF/WAVE**. Internally, WAV inspection/decoding validates chunk boundaries and does not assume `fmt ` and `data` occur at fixed offsets. Unsupported formats, bit depths, malformed chunk sizes, incomplete frames, inconsistent byte-rate/block-alignment metadata, and oversized decoded audio are rejected before unsafe allocation.
 
 ---
 
@@ -181,6 +258,7 @@ See [Video pipeline — Audio layers](/docs#01-video-pipeline).
 ```typescript
 await painter.createAudio.save(
   painter.createAudio.sequence({
+    seed: 'menu-select',
     events: [{ at: 0, preset: 'menuSelect' }],
   }),
   './ui/select.wav'
@@ -202,9 +280,11 @@ await painter.createAudio.save(
 
 ## Tips
 
+- Add **`seed`** when output must be reproducible across repeated or concurrent renders.
 - **`listPresets()`** before hard-coding names in editor UIs.
 - Prefer **`sequence`** for linear SFX chains; **`compose`** when clips **overlap** with independent pitch/fades.
 - For long gameplay videos, generate SFX once, then **`mixAudio`** or pipeline **`type: 'wav'`** — avoid re-synthesizing on every export pass.
+- Keep deployment-specific audio limits below what the Node process can safely hold at peak.
 - Pair with **[GIF / `animate`](/docs#08-animate-api)** by muxing SFX after frame encode.
 
 ---
