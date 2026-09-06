@@ -1,66 +1,86 @@
 # Batch & chain {#01-batch-and-chain}
 
-**`painter.batch`** runs **independent** canvas **`/`** image **`/`** text jobs **in parallel** (`Promise.all`). **`painter.chain`** runs **named painter methods sequentially**, passing the **previous step’s `Buffer`** into the next when you use the placeholder **`'current'`** or **`{ __isCurrentBuffer: true }`**.
+**`painter.batch`** runs independent canvas / image / text jobs with **bounded concurrency** and preserves input order in the returned `Buffer[]`. **`painter.chain`** runs named painter methods sequentially, passing the previous step’s `Buffer` into the next when you use the placeholder **`'current'`** or **`{ __isCurrentBuffer: true }`**.
 
-Types: **`BatchOperation`**, **`ChainOperation`**, **`BatchChainAssetOpts`** (**`lib-next/types/batch.ts`**, **`lib-next/batch/batch-operations.ts`**).
+Types: **`BatchOperation`**, **`ChainOperation`**, **`BatchChainAssetOpts`** (`lib-next/types/batch.ts`, `lib-next/batch/batch-operations.ts`).
 
 ---
 
 ## `batch(operations, opts?)`
 
 ```typescript
-await painter.batch(operations: BatchOperation[], opts?: BatchChainAssetOpts): Promise<Buffer[]>;
+await painter.batch(
+  operations: BatchOperation[],
+  opts?: BatchChainAssetOpts
+): Promise<Buffer[]>;
 ```
 
 | Field | Meaning |
 |-------|---------|
-| **`operations`** | Non-empty array of **`{ type, config }`**. |
-| **`opts.resolveAssetRefs`** | When **`true`**, each **`config`** is **`resolveAssetRefsDeep`** — **`opts.resolve`** **must** be set unless you rely on **`ApexPainter`** wiring (**defaults** **`painter.assets.resolve`**). |
+| **`operations`** | Non-empty array of `{ type, config }`, bounded by the configured batch-operation resource limit. |
+| **`opts.resolveAssetRefs`** | When `true`, operation configs are resolved through the shared asset-reference engine. `opts.resolve` must be available; `ApexPainter` normally wires its asset resolver for you. |
+| **`opts.concurrency`** | Optional positive integer. The effective value may not exceed the runtime `maxBatchConcurrency` limit. When omitted, Apexify uses that configured limit. |
+| **`opts.signal`** | Optional `AbortSignal`. A pre-aborted signal rejects immediately; aborting during a batch stops scheduling additional work and rejects the batch. |
 
 ### Operation types
 
-| **`type`** | Behaviour |
-|------------|-----------|
-| **`canvas`** | **`await painter.createCanvas(config)`** → returns **`canvasResult.buffer`**. |
-| **`image`** | Builds a temporary **`800×600`** canvas, then **`createImage(config, baseCanvas)`**. |
-| **`text`** | Same temporary canvas pattern with **`createText(config, baseCanvas)`**. |
+| `type` | Behaviour |
+|--------|-----------|
+| **`canvas`** | `await painter.createCanvas(config)` → returns `canvasResult.buffer`. |
+| **`image`** | Builds a temporary `800×600` canvas, then calls `createImage(config, baseCanvas)`. |
+| **`text`** | Uses the same temporary-canvas pattern with `createText(config, baseCanvas)`. |
 
 ```typescript
+const controller = new AbortController();
+
 const [badge, label] = await painter.batch(
   [
     { type: 'canvas', config: { width: 120, height: 40, color: '#0f172a' } },
     {
       type: 'text',
-      config: [{ text: 'Hi', x: 12, y: 26, font: { size: 18, family: 'Arial', color: '#fff' } }],
+      config: [{ text: 'Hi', x: 12, y: 26, font: { size: 18, family: 'Arial' } }],
     },
   ],
-  { resolveAssetRefs: true }
+  {
+    resolveAssetRefs: true,
+    concurrency: 2,
+    signal: controller.signal,
+  }
 );
 ```
+
+### Failure semantics
+
+`batch` is **fail-fast at the Promise boundary**: if an operation fails, the returned Promise rejects with the failing operation index/type. Results are not returned as a partial array. Work that already started may finish, but the scheduler stops taking new work after failure or cancellation is observed.
 
 ---
 
 ## `chain(operations, opts?)`
 
 ```typescript
-await painter.chain(operations: ChainOperation[], opts?: BatchChainAssetOpts): Promise<Buffer>;
+await painter.chain(
+  operations: ChainOperation[],
+  opts?: BatchChainAssetOpts
+): Promise<Buffer>;
 ```
 
-Each step **`{ method: string; args: unknown[] }`**:
+Each step is `{ method: string; args: unknown[] }`.
 
-| **`method`** | Resolution |
-|--------------|------------|
-| Top-level name | **`painter[method]`** (must be a **`function`**). |
-| Dotted path (**e.g.** **`path2d.draw`**) | Walks **`painter`** properties (**facet methods** supported). |
+| `method` | Resolution |
+|----------|------------|
+| Top-level name | `painter[method]` and it must be a function. |
+| Dotted path, e.g. `path2d.draw` | Walks painter properties, so facet methods are supported. |
 
-### Args & **`resolveAssetRefs`**
+### Args, asset resolution, and cancellation
 
-- Placeholders **`'current'`** or **`{ __isCurrentBuffer: true }`** → replaced by **`currentBuffer`** from the previous successful step (**first step:** **`undefined`** unless you pass real buffers).
-- Other arguments: when **`resolveAssetRefs`** is **`true`**, deep **`$…`** resolution runs (**requires **`resolve`****, same rule as **`batch`**).
+- `'current'` or `{ __isCurrentBuffer: true }` is replaced by the `currentBuffer` from the previous successful step. On the first step it is `undefined` unless you pass a real buffer yourself.
+- With `resolveAssetRefs: true`, other arguments are resolved deeply through the shared asset resolver.
+- `signal` is checked before the chain starts and between operations. Cancellation rejects rather than returning a partial result.
+- `concurrency` is accepted by the shared option type for consistency but has no parallelizing effect on `chain`; chain execution is deliberately sequential.
 
 ### Return shape contract
 
-Each step must resolve to **`Buffer`** **or** **`{ buffer: Buffer }`** (**e.g.** **`createCanvas`** returns **`CanvasResults`**). Anything else throws (**`chain: Operation … did not return a buffer`**).
+Each step must resolve to a **`Buffer`** or **`{ buffer: Buffer }`** such as `CanvasResults`. Anything else rejects the chain.
 
 ```typescript
 const ribbon = await painter.chain([
@@ -83,7 +103,9 @@ const ribbon = await painter.chain([
 
 ## Design notes
 
-- **`batch`** **`/`** **`chain`** only cover **`createCanvas`** **`/`** **`createImage`** **`/`** **`createText`** **syntactic sugar** for **`batch`** — not arbitrary methods. **`chain`** is the escape hatch for **`path2d`**, **`pixels`**, **`createImage`** on a prior buffer, etc.
-- Errors wrap the failing op: **`batch: Failed to process …`**, **`chain: Failed to execute "…"`**.
+- `batch` supports the explicit canvas / image / text operation union. It is not an arbitrary-method dispatcher.
+- `chain` is the sequential escape hatch for methods such as `path2d.draw`, pixel operations, and image operations that consume a previous buffer.
+- Both surfaces use the central operation-count limits; batch concurrency is bounded by the central runtime configuration.
+- Errors preserve the failing operation index and operation type/method through structured Apexify input errors.
 
 ---
