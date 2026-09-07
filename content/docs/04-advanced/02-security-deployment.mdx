@@ -1,0 +1,131 @@
+# Security deployment guide {#02-security-deployment}
+
+Apexify.js can process attacker-controlled dimensions, text, image/media sources, URLs, GIF/video options, and batch inputs. Deploy it as a bounded media engine, not as an implicit trust boundary.
+
+## 1. Remote-network policy and SSRF
+
+All Apexify-managed remote media uses the shared network policy.
+
+Default behavior:
+
+- protocols are limited to `http:` and `https:`;
+- credentials embedded in URLs are rejected;
+- `localhost` and `.localhost` names are blocked unless explicitly trusted;
+- DNS is resolved before connection;
+- every resolved address is checked, not just the first;
+- non-public IPv4/IPv6 classes are blocked by default, including loopback, RFC1918/private, link-local, multicast, reserved/documentation, carrier-grade/shared, IPv4-mapped private, NAT64/local translation, 6to4, unique-local and related protocol-assignment ranges;
+- redirects are revalidated through the same target policy;
+- URL userinfo/query/hash are removed from exposed request URLs/diagnostic text;
+- retries, redirects, timeout, byte ceilings, abort, and global remote-fetch concurrency are bounded.
+
+### Private-network opt-in
+
+`trustedNetworkAccess` defaults to `false`. It cannot be enabled alone: at least one explicit `allowedHosts` entry is required.
+
+```ts
+configureApexifyRuntime({
+  network: {
+    trustedNetworkAccess: true,
+    allowedHosts: ["media.internal.example"],
+  },
+});
+```
+
+Allowlist entries may be exact hosts or documented wildcard forms such as `*.example.internal`. Do not use trusted-network access for arbitrary user-supplied hosts.
+
+## 2. Remote byte and resource ceilings
+
+Relevant built-in defaults include:
+
+- `maxRemoteImageBytes`: 32 MiB
+- `maxRemoteVideoBytes`: 512 MiB
+- `maxImageSourceBytes`: 64 MiB
+- `maxDecodedImagePixels`: 67,108,864
+- `maxDecodedImageFrames`: 128
+- `maxRemoteAssets`: 128
+- `maxConcurrentRemoteFetches`: 8
+
+A small compressed upload can decode to a large raster. Enforce both transfer/input bytes **and decoded-pixel/frame limits**.
+
+## 3. Untrusted upload/API endpoints
+
+Apexify runtime validation is necessary but not sufficient for a public service. At the HTTP/application layer also enforce:
+
+- authentication/authorization where the endpoint is not intentionally public;
+- request body and multipart limits before buffering uploads;
+- accepted MIME/content types and file signatures appropriate to your product;
+- rate limits, per-user quotas, queue limits, and request deadlines;
+- output-size/destination policy;
+- application-controlled filesystem paths rather than caller-selected arbitrary paths;
+- application logging/redaction policy;
+- deployment-specific Apexify `RenderLimits` lower than machine exhaustion thresholds.
+
+Do not let an untrusted caller directly configure `trustedNetworkAccess`, host allowlists, FFmpeg paths, temp roots, retain-temp settings, or global resource limits.
+
+## 4. FFmpeg/ffprobe execution
+
+FFmpeg/ffprobe are external system binaries. Apexify invokes them through a centralized argv-based process runner with `shell: false`; media paths/options are arguments rather than concatenated shell command strings.
+
+Built-in process policy bounds:
+
+- FFmpeg process timeout: 300,000 ms;
+- ffprobe timeout: 5,000 ms;
+- stdout: 10 MiB;
+- stderr: 30 MiB.
+
+Configure trusted executable paths through runtime/session options or `APEXIFY_FFMPEG_PATH` / `APEXIFY_FFPROBE_PATH`. Never map those settings directly from an untrusted request.
+
+Keep FFmpeg patched through your OS/container image lifecycle. Apexify does not vendor or sandbox the FFmpeg binary.
+
+## 5. Temporary files
+
+Media operations that need filesystem staging use isolated `fs.mkdtemp()` workspaces. Parent-directory precedence is:
+
+1. explicit operation/session option;
+2. runtime `temp.rootDirectory`;
+3. `APEXIFY_TEMP_DIR`;
+4. OS temp directory.
+
+Workspaces are deleted by default. `APEXIFY_RETAIN_TEMP_FILES=true`, runtime `temp.retainFiles`, or equivalent session options are diagnostic/debug behavior and should remain disabled in production.
+
+For multi-tenant services, use a private writable temp parent with appropriate OS/container permissions and disk quota/monitoring.
+
+## 6. Cancellation and timeouts
+
+Where supported, `AbortSignal` is propagated into remote fetches, GIF generation, FFmpeg/video operations, and other long-running workflows. Cancellation should be treated as a normal lifecycle event: managed child processes, queue slots, streams, partial files, and temporary workspaces are released/cleaned by the owning subsystem.
+
+Application-level request cancellation should still stop accepting/writing downstream output when the client disconnects.
+
+## 7. Credentials and external services
+
+Apexify.js contains **no built-in Imgur credentials**. `painter.output.url()` requires explicit credentials or the documented `IMGUR_CLIENT_ID`, `IMGUR_CLIENT_SECRET`, `IMGUR_ACCESS_TOKEN`, and `IMGUR_REFRESH_TOKEN` environment values.
+
+`painter.image.removeBackground(imageURL, apiKey)` requires a caller-supplied external-service key.
+
+Never embed service credentials in source, documentation snippets, URLs, logs, rendered metadata, or user-visible structured errors. Rotate any credential that has ever been committed publicly.
+
+## 8. Plugins
+
+Plugins are executable application code and are therefore trusted. Apexify transactionally rolls back PluginHost registry mutations from a failed installation, but it does **not** sandbox plugin code or reverse arbitrary side effects such as files, network requests, timers, or mutations outside `PluginHost`.
+
+Do not install user-submitted plugins in an untrusted rendering service.
+
+## 9. Error handling
+
+Use structured error class/code/metadata for server decisions, but do not return raw `cause`, process stderr, filesystem paths, environment values, or arbitrary `details` to untrusted clients.
+
+`ApexifyResourceLimitError` should normally map to a rejected/too-large request rather than automatic retry. `ApexifyRemoteFetchError` can represent policy rejection as well as transport/HTTP failures.
+
+## 10. Production checklist
+
+Before accepting untrusted jobs:
+
+- configure tighter `RenderLimits` from measured host capacity;
+- keep private networking disabled unless explicitly required;
+- bound HTTP request size and rate independently of Apexify;
+- install and patch FFmpeg only if video features are enabled;
+- keep temp retention disabled and monitor temp disk;
+- provide external credentials through secret management;
+- propagate cancellation/deadlines;
+- log stable error codes and safe metadata, not raw backend output;
+- run package/security tests for the exact release artifact you deploy.
