@@ -1,0 +1,44 @@
+# GIF & frame animation APIs {#api-create-gif}
+
+## `createGIF()`
+
+```ts
+await painter.createGIF(gifFrames, options, painterOpts?);
+```
+
+- `gifFrames`: `GIFInputFrame[] | undefined`.
+- `options`: `GIFOptions`.
+- `painterOpts?.resolveAssetRefs`: off by default for this imperative method.
+- Returns the current `GIFCreator.createGIF()` result type.
+
+Important behavior:
+
+- `maxGifFrames`, `maxGifDimension`, and `maxGifResourceCost` are enforced.
+- static frame source resolution uses bounded ordered concurrency;
+- generated `onStart` may return an `AsyncIterable<GIFEncodedFrame>`; generated frames are pulled incrementally so producer backpressure is preserved;
+- remote frame/watermark sources use the shared SSRF/redirect/timeout/retry/byte/concurrency policy;
+- `AbortSignal` is propagated where supported;
+- file output cleans partial files on failure/cancellation where the implementation owns them.
+
+## `animate()`
+
+```ts
+await painter.animate(
+  frames,
+  defaultDuration,
+  defaultWidth = 800,
+  defaultHeight = 600,
+  options?,
+  painterOpts?,
+);
+```
+
+Returns `Promise<Buffer[] | undefined>`. `frames` and optional animation settings are runtime validated; imperative `$asset` resolution is opt-in.
+
+`animate()` is the current server-side frame helper. It is **not** the future browser/native animation system described in later roadmap material.
+
+## Scene integration
+
+`renderSceneToGIF(scene, gif)` renders the scene through the normal mandatory scene validation path and then feeds the GIF workflow. Scene `$asset` resolution is on by default unless `gif.sceneRender.resolveAssetRefs` is false.
+
+For option fields, generated-frame examples, transparency/disposal, watermarking, file/base64/attachment outputs, and cancellation examples, use the [GIF & Animation feature guide](/docs#00-gif-animation-overview).
