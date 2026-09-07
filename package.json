@@ -15,7 +15,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "verify:content": "node scripts/verify-phase13-content.mjs",
-    "verify:docs": "npm run verify:content && node scripts/verify-phase13-docs.mjs",
+    "verify:links": "node scripts/verify-phase13-links.mjs",
+    "verify:docs": "npm run verify:content && npm run verify:links && node scripts/verify-phase13-docs.mjs",
     "verify": "npm run verify:docs && npm run typecheck && npm run build",
     "gallery:build": "tsx scripts/gallery-build.ts",
     "gallery:verify": "tsx scripts/verify-gallery-outputs.ts"
