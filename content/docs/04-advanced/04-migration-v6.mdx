@@ -4,7 +4,7 @@ This guide covers migration from older 5.x-era usage to the **current 6.0.0 pack
 
 ## Compatibility-window summary
 
-Phase 13 requires changed behavior to state its compatibility status explicitly rather than leaving callers to infer it.
+Phase 13 requires changed behavior to state its compatibility status explicitly rather than leaving callers to infer it. Phase 14 independently re-audited those contracts and tightened remaining resource/error paths without adding a second compatibility mode.
 
 | Change | 6.0 compatibility status |
 |---|---|
@@ -13,6 +13,8 @@ Phase 13 requires changed behavior to state its compatibility status explicitly 
 | permissive private-network fetching → explicit trusted-network policy | There is **no legacy permissive compatibility mode**. Private/local access requires `trustedNetworkAccess: true` plus an explicit host allowlist. |
 | Node 18/20-or-older execution → Node 22/24/26 | Older Node majors are outside the 6.0.0 supported runtime window. Upgrade the application runtime before adopting staged 6.0.0. |
 | deep/source imports → package exports | Internal `lib-next/*`, `dist/*`, and other source/deep paths have no compatibility guarantee. Use only documented package exports. |
+| historically unbounded registries/fan-out → finite admission limits | There is **no unbounded compatibility mode**. Assets, plugins, fonts, unique in-flight image decodes, and template layout collections/fan-out are governed by the central runtime limits. |
+| generic runtime errors → structured `ApexifyError` subclasses | Do not branch on historical generic `Error.message` text. Use concrete Apexify error classes/codes and documented metadata. |
 
 The sections below show the previous and current forms, why each change exists, and what action callers should take.
 
@@ -73,11 +75,13 @@ await painter.use(plugin);
 
 If older code called `painter.use(plugin)` without awaiting it, fix that ordering. Code that immediately consumes APIs registered by the plugin can otherwise race installation.
 
+Plugin state is also resource-governed in the final 6.0.0 release candidate: API registrations, installed/pending names, and the transactional rollback journal have finite admission bounds. A plugin that attempts unbounded unique registrations can therefore receive `ApexifyResourceLimitError` rather than growing process state indefinitely.
+
 ## 5. Account for runtime validation and limits
 
-Apexify.js 6 enforces bounded runtime policy across canvas, image, scene, GIF, audio, video, batch, network, and related high-cost APIs.
+Apexify.js 6 enforces bounded runtime policy across canvas, image, scene, templates, assets, plugins, fonts, GIF, audio, video, batch, network, and related high-cost APIs.
 
-Handle `ApexifyResourceLimitError` as a deliberate rejected workload rather than assuming every historically accepted dimension/frame count will still execute.
+Handle `ApexifyResourceLimitError` as a deliberate rejected workload rather than assuming every historically accepted dimension/frame/collection count will still execute.
 
 ```ts
 import { ApexifyResourceLimitError } from "apexify.js";
@@ -93,7 +97,15 @@ try {
 
 Use `configureApexifyRuntime()` only to set limits your deployment can actually sustain.
 
-## 6. Remote URLs are deny-by-default for private networks
+Final Phase 14 hardening applies `maxCollectionItems` to caller-controlled persistent/transient admission state, including asset/plugin/font registries, unique in-flight decoded-image work, and template layout child collections. Template flex/grid measurement also uses a worker pool capped by `maxBatchConcurrency` instead of launching one active measurement promise per child.
+
+## 6. Use structured runtime errors
+
+Apexify.js 6 runtime/public failure contracts use the `ApexifyError` hierarchy. Common classes include `ApexifyInputError`, `ApexifyConfigError`, `ApexifyResourceLimitError`, `ApexifyRemoteFetchError`, `ApexifyDecodeError`, `ApexifyProcessError`, `ApexifyExternalServiceError`, `ApexifyAssetError`, and `ApexifyPluginError`.
+
+Do not migrate code by matching exact historical generic error-message strings. Prefer `instanceof`, the stable error `code`, and documented fields such as resource-limit metadata. Preserve `cause` for internal diagnostics but do not expose raw causes/process stderr/paths to untrusted clients.
+
+## 7. Remote URLs are deny-by-default for private networks
 
 Remote media now goes through a shared SSRF/network policy. Public HTTP(S) resources remain supported, but loopback/private/link-local/reserved/non-public targets are blocked by default and redirects are revalidated.
 
@@ -110,7 +122,7 @@ configureApexifyRuntime({
 
 Do not enable trusted network access globally just to restore old permissive behavior.
 
-## 7. FFmpeg and temp configuration
+## 8. FFmpeg and temp configuration
 
 Video features still require FFmpeg/ffprobe. Custom binary paths should use runtime/session configuration or:
 
@@ -121,7 +133,7 @@ APEXIFY_FFPROBE_PATH
 
 Temporary media root uses `APEXIFY_TEMP_DIR` as a compatibility configuration path after explicit/runtime settings. Temp retention is off by default; `APEXIFY_RETAIN_TEMP_FILES=true` is debug-only.
 
-## 8. Credentials are explicit
+## 9. Credentials are explicit
 
 Apexify.js contains no fallback Imgur credentials. Configure the required `IMGUR_*` environment values or pass credentials explicitly to `painter.output.url()`.
 
@@ -129,7 +141,7 @@ External remove-background integration likewise requires an explicit API key.
 
 If an old deployment relied on credentials committed in source or historical fallbacks, rotate those credentials before migration.
 
-## 9. Asset-resolution behavior
+## 10. Asset-resolution behavior
 
 Do not assume `$asset` references resolve everywhere automatically.
 
@@ -147,7 +159,7 @@ For explicit imperative preprocessing:
 const resolved = painter.prepareForRender(config);
 ```
 
-## 10. Scenes/templates are validated composition contracts
+## 11. Scenes/templates are validated composition contracts
 
 Scene rendering always validates. A historical `SceneRenderOptions.validate` compatibility field does not disable mandatory validation.
 
@@ -155,9 +167,9 @@ Templates preserve native whole-placeholder values such as `0`, `false`, and `""
 
 Review code that previously depended on mutation of input objects: scene/template/asset paths use copy/snapshot semantics in current 6.0 behavior.
 
-## 11. Test ESM/CJS/TypeScript from the actual artifact
+## 12. Test ESM/CJS/TypeScript from the actual artifact
 
-The package CI now verifies documentation examples against the packed `.tgz`, not only source-tree imports. For an application migration, do the same basic release check in a clean install/CI environment:
+The package CI verifies documentation examples against the packed `.tgz`, not only source-tree imports. For an application migration, do the same basic release check in a clean install/CI environment:
 
 ```bash
 npm ci
@@ -166,7 +178,7 @@ npm test
 
 If you publish an internal wrapper around Apexify.js, test both the module format and types your consumers actually use.
 
-## 12. What you should *not* migrate to yet
+## 13. What you should *not* migrate to yet
 
 The current package does **not** ship the later roadmap's scoped `@apexify/*` runtime family, browser realtime renderer, React/Next adapters, Render IR/ARS, native animation engine, AI assistant, or distributed renderer.
 
