@@ -1,0 +1,90 @@
+name: Phase 14 Final Package Identity Pin
+
+on:
+  push:
+    branches:
+      - phase14/final-package-identity-lock
+    paths:
+      - .github/workflows/phase14-package-pin.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pin:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: phase14/final-package-identity-lock
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Use HTTPS for public GitHub git dependencies
+        run: |
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+          git config --global --add url."https://github.com/".insteadOf "git@github.com:"
+      - name: Pin docs to final package completion SHA
+        env:
+          PACKAGE_SHA: dbed9743353593eafae9a7b1c25312d7170a233b
+          OLD_SHA: c2b8eb01b071c0ddff18f3cd0fef0431e5150981
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const sha = process.env.PACKAGE_SHA;
+          const old = process.env.OLD_SHA;
+          if (pkg.dependencies?.['apexify.js'] !== `github:EIAS79/Apexify.js#${old}`) {
+            throw new Error(`Unexpected current Apexify pin: ${pkg.dependencies?.['apexify.js']}`);
+          }
+          pkg.dependencies['apexify.js'] = `github:EIAS79/Apexify.js#${sha}`;
+          fs.writeFileSync('package.json', `${JSON.stringify(pkg, null, 2)}\n`);
+
+          const heroPath = 'components/home/HeroShowcase.tsx';
+          let hero = fs.readFileSync(heroPath, 'utf8');
+          if (!hero.includes(old)) throw new Error('Expected previous package SHA not found in HeroShowcase.');
+          hero = hero.split(old).join(sha);
+          hero = hero.replace('#c2b8eb01…', '#dbed9743…');
+          fs.writeFileSync(heroPath, hero);
+          NODE
+      - name: Regenerate exact lockfile
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Verify package, lockfile, public install command, and version
+        env:
+          PACKAGE_SHA: dbed9743353593eafae9a7b1c25312d7170a233b
+          OLD_SHA: c2b8eb01b071c0ddff18f3cd0fef0431e5150981
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const assert = require('node:assert/strict');
+          const sha = process.env.PACKAGE_SHA;
+          const old = process.env.OLD_SHA;
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const lock = fs.readFileSync('package-lock.json', 'utf8');
+          const hero = fs.readFileSync('components/home/HeroShowcase.tsx', 'utf8');
+          assert.equal(pkg.dependencies?.['apexify.js'], `github:EIAS79/Apexify.js#${sha}`);
+          assert.equal(pkg.devDependencies?.['@types/react'], '^18.2.0');
+          assert.ok(lock.includes(`github:EIAS79/Apexify.js#${sha}`));
+          assert.ok(lock.includes(`#${sha}`));
+          assert.ok(hero.includes(`github:EIAS79/Apexify.js#${sha}`));
+          assert.ok(!lock.includes(`#${old}`));
+          assert.ok(!hero.includes(old));
+          NODE
+          npm ci --ignore-scripts
+          node -e "const p=require('./node_modules/apexify.js/package.json'); if(p.version!=='6.0.0') throw new Error('Expected apexify.js 6.0.0, got '+p.version); console.log('apexify.js',p.version)"
+      - name: Commit exact final identity pin
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add package.json package-lock.json components/home/HeroShowcase.tsx
+          if git diff --cached --quiet; then
+            echo 'No identity pin changes to commit.'
+            exit 0
+          fi
+          git commit -m 'Phase 14 docs: pin final package completion SHA'
+          git push origin HEAD:phase14/final-package-identity-lock
