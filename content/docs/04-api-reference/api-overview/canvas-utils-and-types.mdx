@@ -1,0 +1,56 @@
+# Public type domains & common contracts {#canvas-utils-and-types}
+
+Public declarations are exported from `apexify.js`; `apexify.js/types` is available for type-only imports. The exact declaration files emitted in the packed artifact are the authority.
+
+## Core type families
+
+| Area | Representative public types |
+|---|---|
+| Common/output | `OutputFormat`, source/output option types, save/output contracts |
+| Canvas/backgrounds | `CanvasConfig`, `CanvasResults`, gradient/background/pattern/filter options |
+| Image | `ImageProperties`, `CreateImageOptions`, filters, mask/blend options |
+| Text | `TextProperties`, `TextMetrics`, font/fill/stroke/placement options |
+| Charts | chart data/option families for pie/bar/horizontalBar/line/scatter/radar/polarArea, comparison, combo |
+| Scene | `SceneRenderInput`, `SceneLayer`, `SceneRenderOptions`, scene GIF/video frame contracts |
+| Templates | `TemplateSceneDefinition`, `TemplateOptions`, override/insertion/layout types |
+| Assets | `AssetValue`, `AssetKind`, asset-reference options |
+| Plugins | `ApexifyPlugin<T>` and public plugin registry contracts |
+| GIF | `GIFOptions`, `GIFInputFrame`, encoded/generated frame types |
+| Video | `VideoCreationOptions`, pipeline-layer and frame-extraction option types |
+| Audio | synthesis/preset/sequence/compose/mix types |
+| Batch/chain | `BatchOperation`, `ChainOperation`, `BatchChainAssetOpts` |
+| Runtime | `ApexifyRuntimeConfig`, `ApexifyRuntimeConfigInput`, `NetworkRuntimeConfig`, `CacheRuntimeConfig`, `DiagnosticsRuntimeConfig`, `RenderLimits` |
+| Facets | `PainterImageUtils`, `PainterHitDetect`, `PainterPath2D`, `PainterPixels`, `PainterOutput`, `PainterCreateAudio` |
+
+## `CanvasResults`
+
+`createCanvas()` resolves to `CanvasResults`, not a bare `Buffer`:
+
+```ts
+interface CanvasResults {
+  buffer: Buffer;
+  canvas: CanvasConfig;
+}
+```
+
+APIs that draw onto an existing raster commonly accept either `CanvasResults` or `Buffer` where declared.
+
+## Binary/source model
+
+The Node package intentionally uses Node `Buffer` in many public rendering/media contracts. Depending on the domain, sources may additionally accept local paths, HTTP(S) URLs under the shared network policy, `Uint8Array`/`PathLike`, or structured frame/scene inputs. Do not generalize source forms across methods: use the specific declaration/feature guide for the method being called.
+
+## Output type
+
+The `ApexPainter` constructor accepts an `OutputFormat` whose `type` is one of:
+
+```text
+buffer | url | dataURL | blob | base64 | arraybuffer
+```
+
+That choice is consumed by `toOutput()`. It does not turn every rendering method into that representation automatically.
+
+## TypeScript is not runtime validation
+
+Apexify validates high-cost public inputs at runtime. JavaScript callers, JSON/config-driven callers, and values crossing trust boundaries still receive the same finite-number, enum, collection, decoded-resource, network, and `RenderLimits` checks.
+
+For server endpoints, treat TypeScript declarations as developer ergonomics, not as a security boundary.
