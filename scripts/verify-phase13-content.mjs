@@ -3,6 +3,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const packageJson = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+const packagePin = packageJson.dependencies?.['apexify.js'] ?? '';
+const pinMatch = /^github:EIAS79\/Apexify\.js#([0-9a-f]{40})$/.exec(packagePin);
+if (!pinMatch) {
+  console.error(`Phase 13 stale-content audit cannot resolve the exact Apexify package pin: ${packagePin}`);
+  process.exit(1);
+}
+const pinnedSha = pinMatch[1];
 
 function collect(dir, predicate, out = []) {
   if (!fs.existsSync(dir)) return out;
@@ -48,6 +56,17 @@ for (const file of files) {
       findings.push({ file: path.relative(root, file), line, label, excerpt: lines[line - 1]?.trim().slice(0, 180) ?? '' });
     }
   }
+
+  for (const match of text.matchAll(/github:EIAS79\/Apexify\.js#([0-9a-f]{40})/g)) {
+    if (match[1] === pinnedSha) continue;
+    const line = text.slice(0, match.index).split(/\r?\n/).length;
+    findings.push({
+      file: path.relative(root, file),
+      line,
+      label: 'stale staged Apexify Git SHA',
+      excerpt: `${match[1]} (expected ${pinnedSha})`,
+    });
+  }
 }
 
 if (findings.length) {
@@ -56,4 +75,4 @@ if (findings.length) {
   process.exit(1);
 }
 
-console.log(`verify-phase13-content: ${files.length} active documentation/site files scanned — PASS`);
+console.log(`verify-phase13-content: ${files.length} active documentation/site files scanned against staged pin ${pinnedSha.slice(0, 12)}… — PASS`);
