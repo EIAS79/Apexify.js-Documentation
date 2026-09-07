@@ -1,6 +1,6 @@
 # Runtime validation & resource governance {#01-runtime-resource-governance}
 
-Apexify.js 6 treats runtime validation and bounded resource usage as part of the public contract. TypeScript is not a security boundary: JavaScript/JSON callers, non-finite numbers, oversized images/scenes/media, excessive frame counts, and invalid runtime configuration are rejected at runtime.
+Apexify.js 6 treats runtime validation and bounded resource usage as part of the public contract. TypeScript is not a security boundary: JavaScript/JSON callers, non-finite numbers, oversized images/scenes/media, excessive frame counts, invalid runtime configuration, and unbounded persistent/transient registries are rejected at runtime.
 
 ```ts
 import {
@@ -22,7 +22,7 @@ These values are the current 6.0.0 defaults from `DEFAULT_APEXIFY_RUNTIME_CONFIG
 |---|---:|---|
 | `maxCanvasDimension` | 16,384 | Maximum width/height of a canvas/surface |
 | `maxTotalPixels` | 67,108,864 | Maximum pixels in one canvas/surface |
-| `maxCollectionItems` | 2,048 | Generic bounded high-cost collections |
+| `maxCollectionItems` | 2,048 | Generic bounded high-cost collections and Phase 14 persistent/transient admission state |
 | `maxBackgroundLayers` | 128 | Canvas background layers |
 | `maxFiltersPerOperation` | 64 | Filter list length |
 | `maxSceneLayers` | 2,000 | Total scene layer count/work |
@@ -59,7 +59,7 @@ These values are the current 6.0.0 defaults from `DEFAULT_APEXIFY_RUNTIME_CONFIG
 | `maxVideoAudioTracks` | 64 | Video audio tracks |
 | `maxVideoPipelineLayers` | 256 | Declarative video pipeline layers |
 | `maxBatchOperations` | 256 | Batch/chain operation count |
-| `maxBatchConcurrency` | 4 | Concurrent batch workers |
+| `maxBatchConcurrency` | 4 | Concurrent batch/layout workers |
 | `maxConcurrentRemoteFetches` | 8 | Global concurrent remote media requests |
 
 Most limits must be finite positive integers. `maxAudioDurationSeconds`, `maxVideoDurationSeconds`, and `maxVideoFps` are finite positive continuous limits. Additional configuration invariants include:
@@ -69,6 +69,20 @@ Most limits must be finite positive integers. `maxAudioDurationSeconds`, `maxVid
 - `maxSceneTotalPixels >= maxTotalPixels`;
 - `maxBatchConcurrency <= maxBatchOperations`;
 - `maxRemoteImageBytes <= maxImageSourceBytes`.
+
+## Phase 14 admission-bound clarification
+
+`maxCollectionItems` is not only an array-length limit. Final Phase 14 hardening also uses it as the finite admission ceiling for process/instance state that can otherwise grow from caller-controlled unique keys:
+
+- `painter.assets` registry entries, nested values and palette entries;
+- plugin API registrations, installed/pending plugin names, and a plugin installation rollback journal;
+- process-wide registered/pending native font keys;
+- unique in-flight decoded-image promises;
+- template flex/grid child collections.
+
+Template flex/grid child measurement is also executed through a worker pool capped by `maxBatchConcurrency`; it does not create one active measurement promise per user-provided child.
+
+These checks mean a workload can fail with `ApexifyResourceLimitError` before a registry mutation, decode launch, layout fan-out, or native font admission. Treat that as intentional backpressure/resource policy.
 
 ## Network policy defaults
 
@@ -99,7 +113,7 @@ Most limits must be finite positive integers. `maxAudioDurationSeconds`, `maxVid
 }
 ```
 
-The decoded resource cache is bounded by both entry count and bytes and expires entries by TTL. Disable/reduce it when process memory is more constrained; do not wrap it with an unbounded global cache.
+The decoded resource cache is bounded by both entry count and bytes and expires entries by TTL. Unique in-flight decodes are separately bounded and are removed from the in-flight map in `finally`. Disable/reduce caching when process memory is more constrained; do not wrap Apexify with an unbounded global cache.
 
 ## FFmpeg policy defaults
 
@@ -154,7 +168,7 @@ resetApexifyRuntimeConfig();
 
 `configureApexifyRuntime()` merges supplied sections into the current process-wide config and validates the resulting whole configuration. `resolveApexifyRuntimeConfig()` validates/normalizes without changing the process-wide default.
 
-Do not raise a limit merely to silence `ApexifyResourceLimitError`. A higher canvas/decoded-image/GIF/audio/video/concurrency budget increases worst-case memory, CPU, I/O, or process pressure.
+Do not raise a limit merely to silence `ApexifyResourceLimitError`. A higher canvas/decoded-image/GIF/audio/video/concurrency/registry budget increases worst-case memory, CPU, I/O, native-state, or process pressure.
 
 ## Validation coverage
 
@@ -162,8 +176,10 @@ Resource/validation policy is enforced across the high-cost public surface, incl
 
 - canvases, backgrounds, gradients, patterns and filters;
 - image placement/decode, crop/mask/distortion/mesh/filter utilities, collage/stitch/blend/palette;
-- text arrays/content/coordinates/typography effects;
+- text arrays/content/coordinates/typography effects and native-font registration admission;
 - scene roots, nested surfaces, layer/domain counts, aggregate pixels/text/remote assets and transforms;
+- templates, including bounded flex/grid child collections and measurement fan-out;
+- assets and plugin registries/installation journals;
 - GIF dimensions/frames/generated frames/resource cost/overlays;
 - audio duration/sample rate/channels/events/layers/partials and peak working-memory estimates;
 - video time/FPS/dimensions/bitrate/overlays/merge inputs/frame extraction/audio tracks/pipeline layers;
@@ -187,12 +203,14 @@ try {
 
 Resource-limit errors are policy failures. Do not automatically retry the unchanged request. Reduce the work or deliberately adjust deployment policy after measuring available capacity.
 
+Apexify 6 runtime code uses the structured `ApexifyError` hierarchy for runtime/public failure contracts. Do not depend on generic `Error` messages for branching logic; use the concrete error class/code and documented metadata.
+
 ## Audio memory accounting
 
 `maxAudioBytes` is a peak-allocation guard. It accounts for relevant coexisting Float32 render/mix/source/transformed buffers and final PCM16 WAV allocation rather than checking only final output bytes.
 
 ## Concurrency
 
-`batch()` is bounded by `maxBatchOperations` and `maxBatchConcurrency`. Remote media acquisition is separately bounded by `maxConcurrentRemoteFetches`. A deployment may therefore accept a large batch while allowing only a small number of active heavy operations and remote requests.
+`batch()` is bounded by `maxBatchOperations` and `maxBatchConcurrency`. Template flex/grid measurement uses the same bounded worker concept. Remote media acquisition is separately bounded by `maxConcurrentRemoteFetches`, while unique in-flight image decodes additionally have a finite collection admission limit. A deployment may therefore accept a large high-level job while allowing only a small number of active heavy operations and remote requests.
 
 Use [Performance & memory](/docs#03-performance-memory) for tuning and [Security deployment](/docs#02-security-deployment) for untrusted services.
