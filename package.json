@@ -28,7 +28,7 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@uiw/react-codemirror": "^4.25.9",
     "@vercel/speed-insights": "^2.0.0",
-    "apexify.js": "github:EIAS79/Apexify.js#d19ccd31ec9f9ccabc4ebd5eaa51ff038f0343a5",
+    "apexify.js": "github:EIAS79/Apexify.js#4aca4b4c98a50020a1c41b02983d341791a3ddba",
     "dejavu-fonts-ttf": "^2.37.3",
     "framer-motion": "^12.38.0",
     "next": "^14.2.0",
