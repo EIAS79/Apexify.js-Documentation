@@ -16,8 +16,7 @@ function wrapFlatCanvasSnippet(snippet: string, relOut: string): string {
   const body = snippet
     .replace(/^import \{ ApexPainter \} from 'apexify\.js';\s*\n\s*\n/, '')
     .replace(/^const painter = new ApexPainter\(\);\s*\n/, '')
-    .trimEnd()
-    .replace(/\s*return canvas\.buffer;\s*$/, '');
+    .trimEnd();
   const indented = body
     .split('\n')
     .map((line) => (line.length ? `  ${line}` : line))
@@ -30,9 +29,10 @@ import path from 'path';
 (async () => {
   const painter = new ApexPainter();
 ${indented}
+  const rendered = await main();
   const dest = path.join(process.cwd(), 'public', 'gallery-outputs', '${safeRel}');
   fs.mkdirSync(path.dirname(dest), { recursive: true });
-  fs.writeFileSync(dest, canvas.buffer);
+  fs.writeFileSync(dest, Buffer.isBuffer(rendered) ? rendered : Buffer.from(rendered as Uint8Array));
 })().catch((e) => {
   console.error(e);
   process.exit(1);
@@ -64,7 +64,7 @@ function runTsxSource(label: string, fileBase: string, source: string): void {
   mkdirSync(TEMP_DIR, { recursive: true });
   const fp = join(TEMP_DIR, `${fileBase}.ts`);
   writeFileSync(fp, source, 'utf8');
-  console.log(`ÔåÆ ${label}`);
+  console.log(`▶ ${label}`);
   execSync(`npx tsx "${fp}"`, { stdio: 'inherit', cwd: process.cwd(), env: process.env });
 }
 
