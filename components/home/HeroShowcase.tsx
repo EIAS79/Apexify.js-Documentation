@@ -40,26 +40,32 @@ const SHOWCASES: Showcase[] = [
     label: 'line-rich',
     category: 'Chart',
     tint: '#FF3DAA',
-    snippet: `await painter.createChart({
-  kind: 'line',
-  series: [revenue, target],
-  area: true, smooth: true,
-  palette: 'sunset',
-  legend: { position: 'top' },
-});`,
+    snippet: `await painter.createChart(
+  'line',
+  [{
+    label: 'Revenue',
+    data: [{ x: 1, y: 12 }, { x: 2, y: 18 }],
+    color: '#FF3DAA',
+  }],
+  { dimensions: { width: 960, height: 540 } },
+);`,
   },
   {
     src: '/gallery-outputs/images/presentation-slide.png',
     label: 'presentation-slide',
     category: 'Composition',
     tint: '#FFB347',
-    snippet: `await painter.createCanvas({ ... });
-await painter.createText({
-  text: 'Q3 Performance',
-  font: { size: 64, weight: 800 },
-  gradient: emberGradient,
+    snippet: `const canvas = await painter.createCanvas({
+  width: 960, height: 540, colorBg: '#0f172a',
 });
-await painter.createChart({ ... });`,
+await painter.createText(
+  {
+    text: 'Q3 Performance', x: 48, y: 80,
+    font: { size: 64, family: 'Arial' },
+    fill: { color: '#ffffff' },
+  },
+  canvas,
+);`,
   },
   {
     src: '/gallery-outputs/backgrounds/bg-molten-core.png',
@@ -80,12 +86,17 @@ await painter.createChart({ ... });`,
     label: 'shape-collage-prism',
     category: 'Shapes',
     tint: '#5DEAB8',
-    snippet: `await painter.createImage({
-  shapes: prismGeometry,
-  filters: [{ type: 'glow',
-    color: '#FF3DAA', radius: 24 }],
-  paintOrder: 'shape-then-glow',
-});`,
+    snippet: `const canvas = await painter.createCanvas({
+  width: 960, height: 540, colorBg: '#0f172a',
+});
+await painter.createImage(
+  {
+    source: 'rectangle', x: 120, y: 100,
+    width: 420, height: 260,
+    shape: { fill: true, color: '#FF3DAA' },
+  },
+  canvas,
+);`,
   },
 ];
 
@@ -140,7 +151,7 @@ export default function HeroShowcase() {
             transition={{ delay: 0.1, duration: 0.6 }}
           >
             <SparklesIcon className="h-3.5 w-3.5" />
-            <span className="tracking-wide">v5.4.5 · charts · GIFs · video · 22+ filters</span>
+            <span className="tracking-wide">v6.0 staged · Node 22/24/26 · charts · GIF · video</span>
           </motion.div>
 
           {/* Title */}
@@ -164,8 +175,8 @@ export default function HeroShowcase() {
             style={{ color: 'var(--text-secondary)' }}
           >
             <strong style={{ color: 'var(--text-primary)' }}>Apexify.js</strong> is a programmatic visual library
-            for Node.js — render charts, images, GIFs, slides and video on the server with one TypeScript
-            API, powered by Rust under the hood.
+            for Node.js — render images, charts, GIFs, procedural audio, and FFmpeg-backed video on the server
+            from one TypeScript API. These docs track the staged 6.0 package surface.
           </p>
 
           {/* CTAs */}
@@ -183,11 +194,11 @@ export default function HeroShowcase() {
               type="button"
               className="btn btn-ghost !py-3.5 !px-4 !text-sm font-mono"
               onClick={() => {
-                navigator.clipboard.writeText('npm install apexify.js');
+                navigator.clipboard.writeText('npm install github:EIAS79/Apexify.js#d19ccd31ec9f9ccabc4ebd5eaa51ff038f0343a5');
               }}
-              title="Copy install command"
+              title="Copy staged Apexify.js 6 GitHub install command"
             >
-              <span className="opacity-70">$</span> npm i apexify.js
+              <span className="opacity-70">$</span> npm i github:EIAS79/Apexify.js#d19ccd31…
               <ClipboardIcon className="h-4 w-4 opacity-60" />
             </button>
           </div>

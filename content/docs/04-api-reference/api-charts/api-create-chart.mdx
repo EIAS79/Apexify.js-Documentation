@@ -1,0 +1,39 @@
+# Chart APIs {#api-create-chart}
+
+## `createChart()`
+
+```ts
+await painter.createChart(type, data, options?, painterOpts?);
+```
+
+Stable chart types in 6.0.0:
+
+```text
+pie | bar | horizontalBar | line | scatter | radar | polarArea
+```
+
+The generic signature maps each chart type to its corresponding data/options type and returns `Promise<Buffer>`.
+
+`painterOpts?.resolveAssetRefs` is off by default for this imperative API. Use `{ resolveAssetRefs: true }` or preprocess with `prepareForRender()` when chart inputs intentionally contain `$asset` references.
+
+## `createComparisonChart()`
+
+```ts
+await painter.createComparisonChart(options, painterOpts?);
+```
+
+Returns `Promise<Buffer>` and uses the current `ComparisonChartOptions` declaration.
+
+## `createComboChart()`
+
+```ts
+await painter.createComboChart(options, painterOpts?);
+```
+
+Returns `Promise<Buffer>` and uses the current `ComboChartOptions` declaration.
+
+## Validation and limits
+
+Chart dimensions, finite numeric values, dataset/collection sizes, labels/text, nested scene use, and canvas/resource budgets are validated at runtime. Invalid caller values use structured Apexify errors; over-budget work uses `ApexifyResourceLimitError`.
+
+For chart-specific option defaults, axes, legends, labels, geometry, and examples, use the [Charts feature guide](/docs#00-charts-overview). This API page deliberately describes the stable public entrypoints rather than duplicating every chart-specific option table.

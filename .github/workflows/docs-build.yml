@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - reengineering/phase-2-runtime-docs
+      - reengineering/phase-13-authoritative-docs
   pull_request:
     branches:
       - main
@@ -14,8 +14,8 @@ permissions:
   contents: read
 
 jobs:
-  build:
-    name: Node ${{ matrix.node }} / docs build
+  verify:
+    name: Node ${{ matrix.node }} / Phase 13 docs gate
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -31,35 +31,14 @@ jobs:
         run: npm install --global npm@11.19.1
       - name: Install locked documentation graph
         run: npm ci
-      - name: Verify Apexify runtime used by docs tooling
-        run: |
-          node --input-type=module <<'NODE'
-          import {
-            ApexPainter,
-            ApexifyResourceLimitError,
-            configureApexifyRuntime,
-            getDefaultApexifyRuntimeConfig,
-            resetApexifyRuntimeConfig,
-          } from 'apexify.js';
-
-          if (typeof ApexPainter !== 'function') throw new Error('ApexPainter export missing');
-          if (typeof configureApexifyRuntime !== 'function') throw new Error('configureApexifyRuntime export missing');
-          if (typeof getDefaultApexifyRuntimeConfig !== 'function') throw new Error('getDefaultApexifyRuntimeConfig export missing');
-          if (typeof resetApexifyRuntimeConfig !== 'function') throw new Error('resetApexifyRuntimeConfig export missing');
-
-          const defaults = getDefaultApexifyRuntimeConfig();
-          if (defaults.limits.maxCanvasDimension !== 16_384) throw new Error('documented maxCanvasDimension default drifted');
-          if (defaults.limits.maxBatchConcurrency !== 4) throw new Error('documented maxBatchConcurrency default drifted');
-
-          configureApexifyRuntime({ limits: { maxBatchConcurrency: 2 } });
-          if (getDefaultApexifyRuntimeConfig().limits.maxBatchConcurrency !== 2) throw new Error('runtime limit override failed');
-          resetApexifyRuntimeConfig();
-
-          const sample = new ApexifyResourceLimitError('maxBatchOperations', 256, 257);
-          if (sample.code !== 'APEXIFY_RESOURCE_LIMIT' || sample.limit !== 'maxBatchOperations') {
-            throw new Error('documented resource-limit error contract drifted');
-          }
-          console.log('docs Apexify Phase 4 runtime governance API ok');
-          NODE
+      - name: Verify documentation/runtime contract and drift guards
+        run: npm run verify:docs
+      - name: Typecheck documentation application
+        run: npm run typecheck
+      - name: Execute snippet-backed gallery examples
+        if: matrix.node == 24
+        env:
+          GALLERY_SKIP_VIDEO: '1'
+        run: npm run gallery:build
       - name: Build documentation site
         run: npm run build

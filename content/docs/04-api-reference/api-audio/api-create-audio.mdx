@@ -1,0 +1,33 @@
+# `painter.createAudio` — procedural WAV APIs {#api-create-audio}
+
+`painter.createAudio` implements `PainterCreateAudio` and returns complete WAV `Buffer`s for synthesis/composition operations.
+
+| Member | Return | Contract |
+|---|---|---|
+| `presetNames` | `readonly SynthPresetName[]` | Supported preset identifiers |
+| `listPresets()` | `SynthPresetInfo[]` | Preset metadata |
+| `synth(options)` | `Buffer` | Synthesize configured layers |
+| `custom(options)` | `Buffer` | Alias-style custom synthesis entrypoint using `SynthSoundOptions` |
+| `preset(name, overrides?)` | `Buffer` | Render one built-in preset |
+| `sequence(options)` | `Buffer` | Place preset/synth events on a timeline |
+| `compose(options)` | `Buffer` | Compose multiple clips on a timeline; overlaps allowed |
+| `mix(inputs, options?)` | `Buffer` | Simultaneous/timeline mix |
+| `save(wav, filePath)` | `Promise<void>` | Persist WAV bytes |
+
+## Current resource defaults
+
+- `maxAudioDurationSeconds`: 600
+- `maxAudioSampleRate`: 192,000
+- `maxAudioChannels`: 2 (mono/stereo implementation ceiling)
+- `maxAudioEvents`: 20,000
+- `maxAudioLayers`: 1,024
+- `maxAudioPartials`: 4,096
+- `maxAudioBytes`: 256 MiB peak governed working-memory estimate
+
+`maxAudioBytes` is a **peak-allocation guard**, not only a final WAV-size check. Preflight accounts for relevant coexisting Float32 working buffers, decoded/resampled inputs, transient clip/event work, and final PCM16 output where applicable.
+
+Seeded concurrent synthesis uses operation-local DSP/filter/RNG state so deterministic jobs do not depend on shared mutable synthesis state.
+
+The internal implementation has audio-specific structured failures, but `ApexifyAudioError` is not a package-root runtime export in 6.0.0. Import only documented package-root error classes.
+
+See [Create audio](/docs#01-create-audio) for presets, oscillator/filter/ADSR options, sequence/compose examples, WAV details, and video integration.

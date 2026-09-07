@@ -1,0 +1,72 @@
+# Video & FFmpeg APIs {#api-create-video}
+
+Video features are Node/server operations and require **FFmpeg + ffprobe** unless a specific metadata/test option documents otherwise.
+
+## `createVideo()`
+
+```ts
+await painter.createVideo(options, painterOpts?);
+```
+
+`options` is `VideoCreationOptions`; the result is `Promise<SceneToVideoResult>`. This is the one-shot public video entrypoint for supported operations such as conversion/trim, frame-based creation, overlays/transitions, and audio mixing.
+
+Imperative `$asset` resolution is off by default; opt in through the trailing painter option.
+
+## `videoPipeline()`
+
+```ts
+const pipeline = painter.videoPipeline(source?, initialLayers?);
+```
+
+Creates the declarative video edit pipeline. Layer ids upsert rather than creating duplicate operations with the same id. Rendering compiles supported trim/splice/text/audio/synth operations into bounded FFmpeg passes.
+
+`painter.video.videoPipeline()` exposes the same pipeline from the advanced video stack.
+
+## Metadata and frame extraction
+
+| Method | Important defaults/contract |
+|---|---|
+| `getVideoInfo(source, skipFfmpegCheck?)` | ffprobe-backed typed metadata |
+| `extractFrames(source, options)` | bounded extraction using `ExtractFramesOptions` |
+| `extractAllFrames(source, options?)` | bounded by `maxVideoExtractedFrames` |
+| `extractFrameAtTime(source, timeSeconds, outputFormat = "jpg", quality = 2)` | one timestamp |
+| `extractFrameByNumber(source, frameNumber, outputFormat = "jpg", quality = 2)` | one frame index |
+| `extractMultipleFrames(source, times, outputFormat = "jpg", quality = 2)` | multiple timestamps |
+| `renderSceneToVideoFrames(scene, video)` | compose validated scene frames into video workflow |
+
+## Runtime limits
+
+Current defaults include:
+
+- `maxRemoteVideoBytes`: 512 MiB
+- `maxVideoDurationSeconds`: 14,400
+- `maxVideoFps`: 240
+- `maxVideoBitrateKbps`: 200,000
+- `maxVideoOverlays`: 256
+- `maxVideoMergeInputs`: 32
+- `maxVideoExtractedFrames`: 2,000
+- `maxVideoAudioTracks`: 64
+- `maxVideoPipelineLayers`: 256
+
+Related image/frame inputs are also governed by the normal decoded-image and canvas limits.
+
+## Process safety
+
+FFmpeg/ffprobe execution is centralized and argv-based with `shell: false`. Runtime policy bounds:
+
+- process timeout (default 300,000 ms);
+- probe timeout (default 5,000 ms);
+- stdout bytes (10 MiB);
+- stderr bytes (30 MiB).
+
+Custom executable precedence is explicit session option → runtime config → `APEXIFY_FFMPEG_PATH` / `APEXIFY_FFPROBE_PATH` → command on `PATH`.
+
+Cancellation/timeout kills managed child processes and cleanup runs in `finally` paths where Apexify owns temporary state.
+
+## Remote and temporary media
+
+Remote video is streamed to an isolated temporary workspace rather than first collected into one large in-memory Buffer. It uses the same DNS/SSRF, redirect revalidation, host allowlist, retry, timeout, byte-limit, abort, redaction, and global-concurrency policy as other remote media.
+
+Temporary workspace precedence is explicit option → runtime `temp.rootDirectory` → `APEXIFY_TEMP_DIR` → OS temp. Workspaces are removed by default; retained temp files are debug-only.
+
+See [Video & FFmpeg](/docs#00-video-overview), [Video pipeline](/docs#01-video-pipeline), and [Security deployment](/docs#02-security-deployment).

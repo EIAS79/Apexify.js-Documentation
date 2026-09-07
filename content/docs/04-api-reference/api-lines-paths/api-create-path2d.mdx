@@ -1,0 +1,34 @@
+# `painter.path2d`, `painter.pixels` & `painter.detect` {#api-create-path2d}
+
+## `painter.path2d`
+
+| Method | Return | Contract |
+|---|---|---|
+| `create(commands)` | `Path2D` | Build a native path from validated `PathCommand[]` |
+| `draw(canvasBuffer, path, options?)` | `Promise<Buffer>` | Draw a `Path2D` or command list onto `CanvasResults | Buffer` |
+| `custom(options, buffer)` | `Promise<Buffer>` | Draw one/many bounded custom line/connector definitions |
+
+Path/custom-line input is runtime validated for finite coordinates, command/collection limits, widths, colors/options, and relevant scene/path budgets.
+
+## `painter.pixels`
+
+| Method | Return |
+|---|---|
+| `getData(canvasBuffer, options?)` | `Promise<PixelData>` |
+| `setData(canvasBuffer, pixelData, options?)` | `Promise<Buffer>` |
+| `manipulate(canvasBuffer, options)` | `Promise<Buffer>` |
+| `getColor(canvasBuffer, x, y)` | `Promise<{ r, g, b, a }>` |
+| `setColor(canvasBuffer, x, y, color)` | `Promise<Buffer>` |
+
+Pixel regions must fit the underlying canvas and configured resource limits. Coordinates/dimensions must be finite and valid.
+
+## `painter.detect`
+
+| Method | Return | Contract |
+|---|---|---|
+| `path(path, x, y, options?)` | `Promise<HitDetectionResult>` | Hit-test `Path2D` or commands |
+| `region(region, x, y, options?)` | `Promise<HitDetectionResult>` | Hit-test one declared region |
+| `anyRegion(regions, x, y, options?)` | `Promise<HitDetectionResult>` | Test bounded region collection |
+| `distance(region, x, y)` | `Promise<number>` | Distance from point to region semantics |
+
+These APIs are server-side raster/geometry utilities. They are not browser DOM pointer-event APIs.

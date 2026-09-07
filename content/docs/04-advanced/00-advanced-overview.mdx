@@ -1,110 +1,108 @@
 # Advanced topics {#00-advanced-overview}
 
+**Advanced** covers cross-cutting behavior and production concerns: composition, resource governance, security, performance, migration, video, and audio. Full per-feature option matrices remain in [Feature guides](/docs#feature-guides-hub); exact public names/signatures belong in the [API reference](/docs#api-reference).
 
-**Advanced** here means **cross-cutting behaviour**: how pieces combine, performance intuition, and pointers — **not** repeating full option matrices (those live in each linked **feature guide** from the **[Feature guides hub](/docs#feature-guides-hub)**).
+---
 
-For **what to ship** (social covers, Discord cards, chart PNGs, GIFs, …) organized by feature, see **[What you can build](/docs#01-what-you-can-build)**.
+## Production/runtime guides
+
+| Guide | Use it for |
+|---|---|
+| [Runtime validation & resource governance](/docs#01-runtime-resource-governance) | Complete current `RenderLimits`, network/cache/FFmpeg/temp defaults, validation behavior |
+| [Security deployment](/docs#02-security-deployment) | SSRF/private network policy, untrusted uploads, credentials, FFmpeg/temp/plugin safety, cancellation |
+| [Performance & memory](/docs#03-performance-memory) | Cache/reuse, raster memory, batch/concurrency, GIF/video/audio tuning, benchmark discipline |
+| [Migration to Apexify.js 6](/docs#04-migration-v6) | Node/modules/output/plugin/network/limit migration from older releases |
 
 ---
 
 ## Composition model
 
-Most flows are:
+Simple imperative flows are typically:
 
-1. **`createCanvas`** → base bitmap (+ backgrounds).  
-2. **`createImage`** / **`createText`** / **`path2d.custom`** / **`path2d.draw`** → layers on that buffer.  
-3. **`save`** / **`outPut`** → files or encoded strings — see [Raster, batch & output](/docs#00-raster-batch-output-overview).
+1. `createCanvas()` → `CanvasResults` base raster.
+2. `createImage()` / `createText()` / `path2d.custom()` / `path2d.draw()` → new PNG buffers.
+3. `save()` for files, or `toOutput()` for explicit constructor-selected encoded output.
 
-For **declarative** multi-layer stacks (charts, nested surfaces, one-shot PNG/GIF/video), use **[Scene overview](/docs#00-scene-composition)** (**`createScene`**, **`renderScene`**, **`renderSceneToGIF`**, **`renderSceneToVideoFrames`**).
+`outPut()` remains only as a deprecated compatibility alias for `toOutput()`.
 
-**5.4+** adds reusable **templates** (**`{{placeholders}}`**, flex/grid **layout**), **`painter.assets`** for **`$name`** / **`$palette.key`**, **`painter.components`** (badge, progress bar, avatar, card, watermark → **`SceneLayer[]`**), **`painter.plugins`** / **`painter.use`**, and **opt-in **`$`** resolution** on imperative paints and **batch / chain**. Those topics are written up in the **composition** chapter set (first file is the hub below).
+For declarative multi-layer stacks (charts, nested surfaces, one-shot PNG/GIF/video), use [Scene overview](/docs#00-scene-composition) with `createScene`, `renderScene`, `renderSceneToGIF`, and `renderSceneToVideoFrames`.
 
-Charts and GIF/video helpers either return buffers or orchestrate their own pipelines; each topic guide explains ordering.
+For reusable composition, use [Composition hub](/docs#00-composition-hub): templates, named assets, built-in scene-layer components, plugins, and explicit `$asset` resolution rules.
 
 ---
 
-## Composition · templates · assets · components (5.4+) {#10-templates-assets-components}
-
-**Start here:** **[Composition hub](/docs#00-composition-hub)** — reading order and mental model (**`$`** defaults on **`renderScene`** vs imperative APIs).
+## Composition · templates · assets · components {#10-templates-assets-components}
 
 | Chapter | Anchor |
-|---------|--------|
-| Named assets (`painter.assets`, **`prepareForRender`**) | [01 — Named assets](/docs#01-named-assets) |
-| Templates (`createTemplate`, **`toRenderInput`**) | [02 — Templates](/docs#02-templates) |
-| Preset UI fragments (`painter.components`) | [03 — Preset components](/docs#03-preset-components) |
-| Plugins (`painter.plugins`, **`painter.use`**) | [04 — Plugins](/docs#04-plugins) |
-| Imperative / **`SceneBuilder.render`** / **batch** / **chain** + **`$`** | [05 — Imperative & batch](/docs#05-imperative-batch-chain-assets) |
+|---|---|
+| Named assets (`painter.assets`, `prepareForRender`) | [Named assets](/docs#01-named-assets) |
+| Templates (`createTemplate`, `toRenderInput`) | [Templates](/docs#02-templates) |
+| Preset layer factories (`painter.components`) | [Preset components](/docs#03-preset-components) |
+| Plugins (`painter.plugins`, `await painter.use`) | [Plugins](/docs#04-plugins) |
+| Imperative / `SceneBuilder.render` / batch / chain + `$` | [Imperative & batch](/docs#05-imperative-batch-chain-assets) |
 
-**With Scene:** layers from templates or **`toLayers`** are normal **`SceneLayer[]`** — see [Scene overview](/docs#00-scene-composition) · [Render scene](/docs#06-render-scene).
+Template/component output is ordinary `SceneLayer[]`; final scene rendering remains subject to mandatory validation and resource limits.
 
 ---
 
 ## Engines you touch indirectly
 
 | Engine | Role |
-|--------|------|
-| **`@napi-rs/canvas`** | Raster canvas, paths, text rendering |
-| **Sharp** | Image filters, compression, palette extraction, many URL/path loads |
-| **FFmpeg / ffprobe** | Optional; video discovery, transcode, compose — [Video](/docs#00-video-overview) |
+|---|---|
+| `@napi-rs/canvas` | Node raster canvas, paths, text rendering |
+| Sharp | Image decode/processing/compression/palette and related raster work |
+| FFmpeg / ffprobe | Optional system dependency for video/media probing/transcoding |
 
----
-
-## Runtime safety & resource budgets
-
-Apexify.js 6 applies runtime validation and configurable resource ceilings before high-cost work such as native canvas allocation, full image decode, GIF generation, large audio sample allocation, FFmpeg execution, and invalid save requests.
-
-See **[Runtime validation & resource governance](/docs#01-runtime-resource-governance)** for the complete default `RenderLimits`, override examples, structured errors, decoded-image budgets, and batch/remote concurrency policy.
+These are current Node implementation dependencies. They do not imply the future Phase 15+ package architecture is already shipped.
 
 ---
 
 ## Performance intuition
 
-- **`createImage`** filters often use **Sharp** (good for full-frame work).  
-- **`pixels.getData`** / **`pixels.manipulate`** (or legacy names in older docs) are **CPU loops** — best for small regions or custom logic ([Pixel data](/docs#08-pixel-data)).  
-- **`batch`** processes independent jobs with bounded concurrency controlled by **`maxBatchConcurrency`**; **`chain`** runs **sequentially** and pipes buffers — [Batch & chain](/docs#01-batch-and-chain).
+- `createImage()` filters and transforms can be native/raster intensive; dimensions dominate memory/cost.
+- `pixels.getData()` / `pixels.manipulate()` are appropriate for explicit pixel work but scale with touched pixels.
+- `batch()` runs independent jobs with bounded concurrency; `chain()` runs sequentially and feeds output forward.
+- scenes/templates can avoid awkward repeated imperative composition; nested surfaces composite directly rather than requiring a PNG encode/decode boundary at each nesting level.
+- generated GIF `AsyncIterable` frames preserve producer backpressure rather than collecting all generated frames first.
+- remote video is staged by streaming into isolated temporary files.
+
+Use [Performance & memory](/docs#03-performance-memory) before increasing concurrency or resource ceilings.
 
 ---
 
-## Video — editor pipelines (5.4+) {#11-video-advanced}
+## Video — editor pipelines {#11-video-advanced}
 
-**Start here:** **[Video (advanced) hub](/docs#00-video-advanced-hub)** — when to use **`videoPipeline()`** vs **`createVideo`** vs Scene export.
+Start with [Video (advanced) hub](/docs#00-video-advanced-hub) to choose `videoPipeline()` vs `createVideo()` vs Scene export.
 
 | Chapter | Topic |
-|---------|--------|
-| [Video pipeline](/docs#01-video-pipeline) | Layer stack: trim, splice, **`createText`** captions, file + synth audio tracks |
-| [Render scene to video](/docs#08-render-scene-to-video) | **`renderSceneToVideoFrames`** |
-| Single FFmpeg operations | [Video feature guide](/docs#00-video-overview) |
+|---|---|
+| [Video pipeline](/docs#01-video-pipeline) | Declarative trim/splice/text/audio/synth layer stack |
+| [Render scene to video](/docs#08-render-scene-to-video) | `renderSceneToVideoFrames()` |
+| [Video feature guide](/docs#00-video-overview) | One-shot video/FFmpeg operations |
+
+FFmpeg/ffprobe are required only for video/FFmpeg functionality and run under the central process/network/temp/resource policy.
 
 ---
 
-## Audio — procedural SFX (5.4+) {#12-audio-advanced}
+## Audio — procedural SFX {#12-audio-advanced}
 
-**Start here:** **[Audio (advanced) hub](/docs#00-audio-advanced-hub)** — **`createAudio`** vs FFmpeg **`mixAudio`** on video.
+Start with [Audio (advanced) hub](/docs#00-audio-advanced-hub).
 
 | Chapter | Topic |
-|---------|--------|
-| [`createAudio`](/docs#01-create-audio) | Presets, **`synth`**, **`sequence`**, **`compose`**, **`mix`**, **`save`** |
-| Mux / normalize on video | [Video audio operations](/docs#06-audio-deep-dive) (feature guide) |
-| Editor audio layers | [Video pipeline](/docs#01-video-pipeline) |
+|---|---|
+| [`createAudio`](/docs#01-create-audio) | Presets, `synth`, `sequence`, `compose`, `mix`, `save` |
+| [Video audio operations](/docs#06-audio-deep-dive) | Mux/mix/normalize audio in FFmpeg video workflows |
+| [Video pipeline](/docs#01-video-pipeline) | Declarative audio/synth layers |
+
+Procedural audio is bounded by duration/sample-rate/channel/event/layer/partial and peak working-memory limits; see [Runtime governance](/docs#01-runtime-resource-governance).
 
 ---
 
-## Where to go deeper
+## Source-of-truth rule
 
-| Topic | Link |
-|-------|------|
-| **Runtime validation & resource governance** | [Runtime safety](/docs#01-runtime-resource-governance) |
-| **Composition** (templates, **`$`**, components, plugins, batch) | [Composition hub](/docs#00-composition-hub) |
-| **Scene** — layer graph, GIF/video export | [Scene overview](/docs#00-scene-composition) |
-| **Video** — **`videoPipeline`**, Scene → MP4 | [Video (advanced) hub](/docs#00-video-advanced-hub) |
-| **Audio** — **`createAudio`**, SFX timelines | [Audio (advanced) hub](/docs#00-audio-advanced-hub) |
-| Paint order & layering | Feature guides for canvas / image / text |
-| **`createVideo`** options (one op per call) | [Video overview](/docs#00-video-overview) |
-| FFmpeg audio on video | [Video audio operations](/docs#06-audio-deep-dive) |
-| **Repo layout** | [Internals hub](/docs#00-internals-overview) | Maintainer / contributor pointers only |
+Historical pages and old examples are not allowed to override current 6.0 runtime/export behavior. For the current contract use:
 
----
-
-Add topic pages under **Advanced** as needed (migration notes, engine deep dives) and link them from this hub.
-
----
+1. current package runtime/exports/declarations and packed consumer tests;
+2. [API reference](/docs#api-reference);
+3. current feature/advanced guides;
+4. internals/changelog only as historical context.

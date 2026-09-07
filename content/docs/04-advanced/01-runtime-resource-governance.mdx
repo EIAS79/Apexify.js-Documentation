@@ -1,13 +1,12 @@
 # Runtime validation & resource governance {#01-runtime-resource-governance}
 
-Apexify.js 6 validates resource-intensive public operations at runtime. TypeScript types are not treated as a security boundary: malformed JavaScript values, JSON-driven configuration, `NaN`, infinities, negative dimensions, oversized collections, and configurations that would exceed server resource budgets are rejected before expensive work whenever the relevant value is knowable in advance.
-
-Use the runtime policy exports from the package root:
+Apexify.js 6 treats runtime validation and bounded resource usage as part of the public contract. TypeScript is not a security boundary: JavaScript/JSON callers, non-finite numbers, oversized images/scenes/media, excessive frame counts, and invalid runtime configuration are rejected at runtime.
 
 ```ts
 import {
   configureApexifyRuntime,
   getDefaultApexifyRuntimeConfig,
+  resolveApexifyRuntimeConfig,
   resetApexifyRuntimeConfig,
   ApexifyInputError,
   ApexifyConfigError,
@@ -15,119 +14,166 @@ import {
 } from "apexify.js";
 ```
 
-## Why this exists
+## Complete default `RenderLimits`
 
-Rendering and media APIs can allocate native canvases, decoded image memory, GIF frames, audio sample arrays, temporary files, and FFmpeg processes. Apexify.js therefore applies two layers of protection:
-
-1. **Input validation** rejects invalid types, non-finite numbers, invalid enums, impossible ranges, and inconsistent option combinations.
-2. **Resource governance** rejects otherwise valid work that exceeds configured `RenderLimits`.
-
-Resource-limit failures use `ApexifyResourceLimitError`. Invalid caller data generally uses `ApexifyInputError`; invalid runtime-policy configuration uses `ApexifyConfigError`.
-
-## Default `RenderLimits`
-
-The defaults are intended to be usable for normal server workloads while placing explicit ceilings on pathological requests. They are global defaults and are overrideable through `configureApexifyRuntime`.
+These values are the current 6.0.0 defaults from `DEFAULT_APEXIFY_RUNTIME_CONFIG`.
 
 | Limit | Default | Governs |
 |---|---:|---|
-| `maxCanvasDimension` | 16,384 | Maximum canvas/surface width or height |
-| `maxTotalPixels` | 67,108,864 | Maximum pixels in a canvas/surface |
-| `maxCollectionItems` | 2,048 | Generic bounded arrays/collections used by high-cost APIs |
+| `maxCanvasDimension` | 16,384 | Maximum width/height of a canvas/surface |
+| `maxTotalPixels` | 67,108,864 | Maximum pixels in one canvas/surface |
+| `maxCollectionItems` | 2,048 | Generic bounded high-cost collections |
 | `maxBackgroundLayers` | 128 | Canvas background layers |
-| `maxFiltersPerOperation` | 64 | Filter lists on one operation |
-| `maxSceneLayers` | 2,000 | Total scene layer work |
-| `maxNestedSurfaces` | 64 | Nested scene surfaces |
-| `maxSceneDepth` | 32 | Scene nesting depth |
-| `maxTextLength` | 1,000,000 | Aggregate/pathological text content budget |
-| `maxRemoteAssets` | 128 | Remote asset references in governed compositions |
-| `maxRemoteImageBytes` | 32 MiB | Remote image transfer bytes |
-| `maxRemoteVideoBytes` | 512 MiB | Remote video transfer bytes |
-| `maxDecodedImagePixels` | 67,108,864 | Decoded raster pixels before full image decode/render |
-| `maxGifFrames` | 1,000 | GIF input/generated frame count |
-| `maxGifDimension` | 4,096 | GIF width or height |
-| `maxGifResourceCost` | 268,435,456 | Width × height × effective frame-count budget |
-| `maxAudioDurationSeconds` | 600 | Procedural/combined audio duration |
+| `maxFiltersPerOperation` | 64 | Filter list length |
+| `maxSceneLayers` | 2,000 | Total scene layer count/work |
+| `maxSceneTotalPixels` | 268,435,456 | Aggregate root + nested scene surface pixels |
+| `maxNestedSurfaces` | 64 | Total nested surfaces |
+| `maxSceneDepth` | 32 | Scene/surface nesting depth |
+| `maxSceneImages` | 2,000 | Scene image layer count |
+| `maxSceneTextLayers` | 1,000 | Scene text layer count |
+| `maxSceneCharts` | 256 | Scene chart layer count |
+| `maxTextLength` | 1,000,000 | Governed aggregate/pathological text content |
+| `maxRemoteAssets` | 128 | Remote assets referenced by governed compositions |
+| `maxRemoteImageBytes` | 32 MiB | Remote image transfer ceiling |
+| `maxRemoteVideoBytes` | 512 MiB | Remote video transfer ceiling |
+| `maxImageSourceBytes` | 64 MiB | Image source-byte ceiling |
+| `maxDecodedImagePixels` | 67,108,864 | Decoded raster pixel ceiling |
+| `maxDecodedImageFrames` | 128 | Decoded multi-frame image frame ceiling |
+| `maxSvgElements` | 10,000 | SVG element complexity ceiling |
+| `maxGifFrames` | 1,000 | GIF input/generated frames |
+| `maxGifDimension` | 4,096 | GIF width/height |
+| `maxGifResourceCost` | 268,435,456 | Width × height × effective frame count budget |
+| `maxAudioDurationSeconds` | 600 | Audio duration |
 | `maxAudioSampleRate` | 192,000 | Audio sample rate |
-| `maxAudioChannels` | 2 | Audio channel count; implementation supports mono/stereo only |
-| `maxAudioEvents` | 20,000 | Audio sequence/timeline events |
-| `maxAudioLayers` | 1,024 | Audio synthesis/composition layers |
+| `maxAudioChannels` | 2 | Mono/stereo channel count |
+| `maxAudioEvents` | 20,000 | Sequence/timeline events |
+| `maxAudioLayers` | 1,024 | Synthesis/composition layers |
 | `maxAudioPartials` | 4,096 | Harmonic partial budget |
-| `maxAudioBytes` | 256 MiB | Peak governed audio working-memory estimate |
+| `maxAudioBytes` | 256 MiB | Governed peak audio working-memory estimate |
 | `maxVideoDurationSeconds` | 14,400 | Video duration |
 | `maxVideoFps` | 240 | Video frame rate |
 | `maxVideoBitrateKbps` | 200,000 | Video bitrate |
-| `maxVideoOverlays` | 256 | Video overlays/layers |
-| `maxBatchOperations` | 256 | Batch operation count |
+| `maxVideoOverlays` | 256 | Video overlays |
+| `maxVideoMergeInputs` | 32 | Video merge/splice inputs |
+| `maxVideoExtractedFrames` | 2,000 | Extracted video frames |
+| `maxVideoAudioTracks` | 64 | Video audio tracks |
+| `maxVideoPipelineLayers` | 256 | Declarative video pipeline layers |
+| `maxBatchOperations` | 256 | Batch/chain operation count |
 | `maxBatchConcurrency` | 4 | Concurrent batch workers |
-| `maxConcurrentRemoteFetches` | 8 | Concurrent remote media requests |
+| `maxConcurrentRemoteFetches` | 8 | Global concurrent remote media requests |
 
-Most limits must be finite positive integers. Continuous duration/FPS limits such as `maxAudioDurationSeconds`, `maxVideoDurationSeconds`, and `maxVideoFps` must be finite and positive. `maxAudioChannels` cannot exceed the implementation's mono/stereo ceiling of 2. `maxSceneDepth` cannot exceed `maxNestedSurfaces`, and `maxBatchConcurrency` cannot exceed `maxBatchOperations`.
+Most limits must be finite positive integers. `maxAudioDurationSeconds`, `maxVideoDurationSeconds`, and `maxVideoFps` are finite positive continuous limits. Additional configuration invariants include:
 
-## Audio peak-memory accounting
+- `maxAudioChannels <= 2`;
+- `maxSceneDepth <= maxNestedSurfaces`;
+- `maxSceneTotalPixels >= maxTotalPixels`;
+- `maxBatchConcurrency <= maxBatchOperations`;
+- `maxRemoteImageBytes <= maxImageSourceBytes`.
 
-Phase 9 treats `maxAudioBytes` as a **peak-allocation guard**, not merely a final output-size check. The preflight budget includes buffers that can coexist during the operation, including:
+## Network policy defaults
 
-- the final Float32 render/mix buffer;
-- decoded Float32 WAV source storage where applicable;
-- resampled or speed-adjusted working buffers;
-- one transient sequence event or composition clip under the bounded renderer;
-- the final PCM16 WAV allocation while Float32 PCM is still live.
+| Field | Default |
+|---|---:|
+| `allowedProtocols` | `http:`, `https:` |
+| `timeoutMs` | 15,000 |
+| `maxRedirects` | 5 |
+| `retryAttempts` | 3 |
+| `retryBaseDelayMs` | 200 |
+| `retryMaxDelayMs` | 3,000 |
+| `retryJitterRatio` | 0.2 |
+| `honorRetryAfter` | `true` |
+| `trustedNetworkAccess` | `false` |
+| `allowedHosts` | empty |
+| `userAgent` | `Apexify.js/6` |
 
-This matters because a 10 MiB WAV does not imply only 10 MiB of peak memory. Audio processing normally uses Float32 working samples and may temporarily hold source, transformed, output, and encoded buffers at the same time.
+`trustedNetworkAccess: true` is invalid without at least one explicit `allowedHosts` entry. See [Security deployment](/docs#02-security-deployment) for DNS/SSRF/redirect behavior.
 
-The authoritative synthesis/sequence/compose/mix entry points reject over-budget work before their large allocations. The public `createAudio` façade also validates at its boundary as defense-in-depth.
+## Cache policy defaults
 
-## Override limits deliberately
+```ts
+{
+  enabled: true,
+  ttlMs: 5 * 60_000,
+  maxEntries: 128,
+  maxBytes: 128 * 1024 * 1024,
+}
+```
 
-Read the current effective policy before changing it:
+The decoded resource cache is bounded by both entry count and bytes and expires entries by TTL. Disable/reduce it when process memory is more constrained; do not wrap it with an unbounded global cache.
+
+## FFmpeg policy defaults
+
+```ts
+{
+  processTimeoutMs: 5 * 60_000,
+  probeTimeoutMs: 5_000,
+  maxStdoutBytes: 10 * 1024 * 1024,
+  maxStderrBytes: 30 * 1024 * 1024,
+}
+```
+
+`ffmpegPath` / `ffprobePath` are optional. The session layer can also use `APEXIFY_FFMPEG_PATH` / `APEXIFY_FFPROBE_PATH` before falling back to commands on `PATH`.
+
+## Temp policy defaults
+
+```ts
+{
+  rootDirectory: undefined,
+  retainFiles: false,
+}
+```
+
+Temporary workspace parent precedence is explicit operation/session option → runtime config → `APEXIFY_TEMP_DIR` → OS temp. `APEXIFY_RETAIN_TEMP_FILES=true` is a compatibility/debug override and should remain false in production.
+
+## Diagnostics
+
+`diagnostics.handler` is optional and receives structured `{ level, code, message, details? }` events. The configuration validator rejects a non-function handler.
+
+## Read and override policy
 
 ```ts
 const current = getDefaultApexifyRuntimeConfig();
 console.log(current.limits.maxTotalPixels);
-```
 
-Override only the limits your deployment can safely support:
-
-```ts
 configureApexifyRuntime({
   limits: {
     maxCanvasDimension: 8192,
     maxTotalPixels: 32_000_000,
     maxDecodedImagePixels: 32_000_000,
-    maxBatchOperations: 100,
     maxBatchConcurrency: 2,
     maxAudioDurationSeconds: 120,
     maxAudioBytes: 128 * 1024 * 1024,
   },
+  network: {
+    timeoutMs: 10_000,
+  },
 });
-```
 
-`configureApexifyRuntime` merges partial sections into the current policy and validates the resulting configuration. To restore built-in defaults:
-
-```ts
 resetApexifyRuntimeConfig();
 ```
 
-Do not raise a limit just to silence `ApexifyResourceLimitError`. Raising canvas, decoded-image, GIF, audio, or concurrency budgets directly increases worst-case CPU and/or memory exposure. Set deployment-specific values from the memory and concurrency available to the Node.js process.
+`configureApexifyRuntime()` merges supplied sections into the current process-wide config and validates the resulting whole configuration. `resolveApexifyRuntimeConfig()` validates/normalizes without changing the process-wide default.
 
-## Where validation happens
+Do not raise a limit merely to silence `ApexifyResourceLimitError`. A higher canvas/decoded-image/GIF/audio/video/concurrency budget increases worst-case memory, CPU, I/O, or process pressure.
 
-The runtime policy is enforced across the public high-cost surface, including:
+## Validation coverage
 
-- canvas dimensions, inherited backgrounds, gradients, patterns, filters, and background-layer counts;
-- image placement, dimensions, crop/mask/distortion/mesh/filter options, decoded input images, collage/stitch/blend/crop/masking and other image utilities;
-- text arrays, total text length, coordinates, typography metrics, gradients, strokes, shadows, curves, and opacity;
-- scene dimensions, total/nested layers, surfaces, depth, remote references, image/chart/text counts, aggregate text, transforms, filters/effects, and child-surface budgets;
-- GIF dimensions, frames, generated frames, delays, repeat/quality/disposal, overlays, and final frame-resource cost;
-- procedural audio duration, sample rate, channels, layers/events/partials, frequency/gain/pan/filter/ADSR values, timeline offsets, WAV decode metadata, and peak working-memory estimates before large audio allocation;
-- video operation combinations, time ranges, speed, FPS, dimensions, bitrate, overlays, audio tracks and declarative pipeline layers before FFmpeg work where practical;
-- charts, pixels, Path2D/custom paths, hit-detection collections, batch/chain work, output encoding/upload, and save/save-multiple validation.
+Resource/validation policy is enforced across the high-cost public surface, including:
 
-Apexify.js also inspects decoded image metadata so an input can be rejected by decoded-pixel/canvas budgets before a full native canvas decode where practical. PCM16 WAV metadata is likewise inspected before allocating decoded Float32 audio storage.
+- canvases, backgrounds, gradients, patterns and filters;
+- image placement/decode, crop/mask/distortion/mesh/filter utilities, collage/stitch/blend/palette;
+- text arrays/content/coordinates/typography effects;
+- scene roots, nested surfaces, layer/domain counts, aggregate pixels/text/remote assets and transforms;
+- GIF dimensions/frames/generated frames/resource cost/overlays;
+- audio duration/sample rate/channels/events/layers/partials and peak working-memory estimates;
+- video time/FPS/dimensions/bitrate/overlays/merge inputs/frame extraction/audio tracks/pipeline layers;
+- paths/pixels/hit-detection collections;
+- batch/chain work;
+- output/upload/save validation.
 
-## Early rejection and error handling
+Apexify also inspects image metadata so oversized decoded images can be rejected before full decode where practical, and validates audio/video structures before the largest allocation/process work where practical.
 
-Treat resource-limit errors as request-policy failures, not transient renderer failures:
+## Error handling
 
 ```ts
 try {
@@ -139,26 +185,14 @@ try {
 }
 ```
 
-Do not blindly retry the same request. Reduce the requested work or deliberately change the server policy after confirming the deployment has sufficient capacity.
+Resource-limit errors are policy failures. Do not automatically retry the unchanged request. Reduce the work or deliberately adjust deployment policy after measuring available capacity.
 
-Validation is intentionally placed before dangerous boundaries when possible: native canvas allocation, full image decode, generated GIF work, large audio sample allocation, PCM16 encode/decode working sets, FFmpeg execution, filesystem writes for invalid save requests, and unbounded batch fan-out.
+## Audio memory accounting
 
-## Concurrency behavior
+`maxAudioBytes` is a peak-allocation guard. It accounts for relevant coexisting Float32 render/mix/source/transformed buffers and final PCM16 WAV allocation rather than checking only final output bytes.
 
-`batch()` is bounded by `maxBatchOperations` and `maxBatchConcurrency`; it no longer fans every operation out through an unbounded `Promise.all(operations.map(...))`. Remote media acquisition is separately governed by `maxConcurrentRemoteFetches`.
+## Concurrency
 
-These controls are independent. A deployment can, for example, allow 100 batch operations while processing only two concurrently.
+`batch()` is bounded by `maxBatchOperations` and `maxBatchConcurrency`. Remote media acquisition is separately bounded by `maxConcurrentRemoteFetches`. A deployment may therefore accept a large batch while allowing only a small number of active heavy operations and remote requests.
 
-Procedural audio uses operation-local DSP, filter, and seeded-RNG state. Seeded concurrent renders are therefore reentrant and do not depend on shared mutable synthesis state.
-
-## Operational guidance
-
-- Keep `trustedNetworkAccess` disabled unless an explicit allowlist is required and understood.
-- Keep decoded-image and total-pixel limits aligned with the process memory available to native raster libraries.
-- Remember that GIF resource cost multiplies pixels by frame count.
-- Remember that baseline Float32 audio storage scales approximately with duration × sample rate × channels × 4 bytes, and `maxAudioBytes` additionally accounts for relevant coexisting working/encoded buffers.
-- `createAudio` returns a complete WAV `Buffer`; use stricter duration/byte limits when complete-buffer synthesis is inappropriate for your service memory budget.
-- Prefer lower concurrency for memory-heavy image/video workloads even when CPU capacity is available.
-- Log structured error `code` and limit metadata, but do not expose internal paths, credentials, or sensitive request details to untrusted clients.
-
-The default policy is a baseline, not a promise that every server should use the maximum values simultaneously. For multi-tenant or hostile-input services, use stricter deployment-specific limits.
+Use [Performance & memory](/docs#03-performance-memory) for tuning and [Security deployment](/docs#02-security-deployment) for untrusted services.

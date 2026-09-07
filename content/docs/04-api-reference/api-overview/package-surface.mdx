@@ -1,0 +1,114 @@
+# Package surface, runtime configuration & errors {#package-surface}
+
+## Package metadata
+
+| Item | Current contract |
+|---|---|
+| Package | `apexify.js` |
+| Version | `6.0.0` |
+| Node | `22.x || 24.x || 26.x` |
+| npm | `>=10` |
+| Module formats | ESM + CommonJS |
+| Type declarations | ESM + CommonJS declarations |
+| Public subpaths | `.`, `./types` (types only), `./package.json` |
+
+### ESM
+
+```js
+import { ApexPainter } from "apexify.js";
+```
+
+### CommonJS
+
+```js
+const { ApexPainter } = require("apexify.js");
+```
+
+### Types
+
+```ts
+import type { CanvasConfig, RenderLimits, SceneRenderInput } from "apexify.js";
+// Equivalent type-only subpath:
+import type { VideoPipelineLayer } from "apexify.js/types";
+```
+
+`apexify.js/types` deliberately has no runtime JavaScript target.
+
+## Runtime configuration exports
+
+| Export | Contract |
+|---|---|
+| `DEFAULT_APEXIFY_RUNTIME_CONFIG` | Frozen built-in defaults |
+| `getDefaultApexifyRuntimeConfig()` | Read current process-wide effective config |
+| `resolveApexifyRuntimeConfig(input?)` | Validate/normalize an input without changing global state |
+| `configureApexifyRuntime(input)` | Merge partial sections into current process-wide defaults, then validate |
+| `resetApexifyRuntimeConfig()` | Restore built-in defaults |
+
+`ApexifyRuntimeConfig` contains `network`, `limits`, `cache`, `ffmpeg`, `temp`, and `diagnostics` sections.
+
+### Network defaults
+
+| Field | Default |
+|---|---:|
+| `allowedProtocols` | `http:`, `https:` |
+| `timeoutMs` | 15,000 |
+| `maxRedirects` | 5 |
+| `retryAttempts` | 3 |
+| `retryBaseDelayMs` | 200 |
+| `retryMaxDelayMs` | 3,000 |
+| `retryJitterRatio` | 0.2 |
+| `honorRetryAfter` | `true` |
+| `trustedNetworkAccess` | `false` |
+| `allowedHosts` | `[]` |
+| `userAgent` | `Apexify.js/6` |
+
+`trustedNetworkAccess: true` is invalid unless at least one explicit `allowedHosts` entry is supplied.
+
+### Cache defaults
+
+`{ enabled: true, ttlMs: 300000, maxEntries: 128, maxBytes: 134217728 }`.
+
+### FFmpeg defaults
+
+- `processTimeoutMs`: 300,000 ms
+- `probeTimeoutMs`: 5,000 ms
+- `maxStdoutBytes`: 10 MiB
+- `maxStderrBytes`: 30 MiB
+- `ffmpegPath` / `ffprobePath`: unset; resolved from explicit config/session option, `APEXIFY_FFMPEG_PATH` / `APEXIFY_FFPROBE_PATH`, or `PATH`.
+
+### Temp defaults
+
+- `rootDirectory`: unset; operation/session option, runtime config, `APEXIFY_TEMP_DIR`, then OS temp are used in precedence order.
+- `retainFiles`: `false`.
+
+## Package-root error classes
+
+| Class | `code` | Extra public metadata |
+|---|---|---|
+| `ApexifyError` | supplied by concrete error | `details?`, standard `cause` |
+| `ApexifyInputError` | `APEXIFY_INPUT` | — |
+| `ApexifyConfigError` | `APEXIFY_CONFIG` | — |
+| `ApexifyResourceLimitError` | `APEXIFY_RESOURCE_LIMIT` | `limit`, `maximum`, `actual` |
+| `ApexifyRemoteFetchError` | `APEXIFY_REMOTE_FETCH` | `status?`, redacted `requestUrl?` |
+| `ApexifyDecodeError` | `APEXIFY_DECODE` | — |
+| `ApexifyProcessError` | `APEXIFY_PROCESS` | — |
+| `ApexifyExternalServiceError` | `APEXIFY_EXTERNAL_SERVICE` | — |
+| `ApexifyAssetError` | `APEXIFY_ASSET` | — |
+| `ApexifyPluginError` | `APEXIFY_PLUGIN` | — |
+
+An internal `ApexifyAudioError` exists in the implementation but is **not a package-root runtime export** in 6.0.0; do not import it from `apexify.js`.
+
+## Diagnostics
+
+`diagnostics.handler`, when supplied, receives:
+
+```ts
+type DiagnosticsEvent = {
+  level: "debug" | "info" | "warn" | "error";
+  code: string;
+  message: string;
+  details?: Readonly<Record<string, unknown>>;
+};
+```
+
+Do not assume diagnostic `details` are safe to return verbatim to untrusted clients; application logging/redaction policy still applies.

@@ -1,0 +1,89 @@
+# API reference {#api-reference}
+
+This reference describes the **current `apexify.js` 6.0.0 package**, not planned future engine work. The runtime source, package export map, declarations, packed-package tests, and CI fixtures are the authority when a historical guide disagrees.
+
+## Package-root runtime exports
+
+```ts
+import {
+  ApexPainter,
+  configureApexifyRuntime,
+  resetApexifyRuntimeConfig,
+  getDefaultApexifyRuntimeConfig,
+  resolveApexifyRuntimeConfig,
+  DEFAULT_APEXIFY_RUNTIME_CONFIG,
+  ApexifyError,
+  ApexifyInputError,
+  ApexifyConfigError,
+  ApexifyResourceLimitError,
+  ApexifyRemoteFetchError,
+  ApexifyDecodeError,
+  ApexifyProcessError,
+  ApexifyExternalServiceError,
+  ApexifyAssetError,
+  ApexifyPluginError,
+} from "apexify.js";
+```
+
+Those are the package-root runtime names. Public TypeScript types are re-exported from the root and are also available through the **type-only** `apexify.js/types` export.
+
+Do not use internal `lib-next/*`, `dist/*`, or undeclared deep imports.
+
+## Main façade
+
+`ApexPainter` owns the current user-facing rendering/media domains:
+
+| Domain | Surface |
+|---|---|
+| Canvas | `createCanvas()` |
+| Image/text | `createImage()`, `createText()`, `measureText()` |
+| Charts | `createChart()`, `createComparisonChart()`, `createComboChart()` |
+| Scenes/templates | `createScene()`, `renderScene()`, `validateSceneRenderInput()`, `createTemplate()` |
+| Scene media | `renderSceneToGIF()`, `renderSceneToVideoFrames()` |
+| GIF/animation | `createGIF()`, `animate()` |
+| Video | `createVideo()`, `videoPipeline()`, metadata/frame extraction helpers, `video` |
+| Audio | `createAudio` |
+| Assets | `assets`, `prepareForRender()` |
+| Plugins/components | `plugins`, `await use()`, `components` |
+| Raster utilities | `image`, `path2d`, `pixels`, `detect` |
+| Output | `output`, `save()`, `saveMultiple()`, `toOutput()`, deprecated `outPut()` |
+| Work orchestration | `batch()`, `chain()` |
+
+## Output model
+
+Most raster rendering methods return a PNG `Buffer`. `createCanvas()` returns `CanvasResults`, which contains `buffer` plus canvas metadata. `toOutput()` converts a finished buffer according to the `ApexPainter` constructor's `type`.
+
+Supported constructor/output types are `buffer`, `url`, `dataURL`, `blob`, `base64`, and `arraybuffer`.
+
+## Asset-resolution defaults
+
+| Surface | `$asset` resolution |
+|---|---|
+| `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames` | On by default; `resolveAssetRefs: false` disables it |
+| `TemplateHandle.render()` | Performed as part of template resolution |
+| `SceneBuilder.render()` | Off by default; opt in with `{ resolveAssetRefs: true }` |
+| Imperative create/chart/GIF/video helpers | Off by default; use trailing painter option or `prepareForRender()` |
+| `batch()` / `chain()` | Off by default; opt in with `{ resolveAssetRefs: true }` |
+
+## Runtime policy
+
+Runtime configuration is process-wide and validated before it becomes the default:
+
+```ts
+configureApexifyRuntime({
+  limits: { maxBatchConcurrency: 2 },
+  network: { timeoutMs: 10_000 },
+});
+```
+
+Use [Runtime validation & resource governance](/docs#01-runtime-resource-governance) for every current `RenderLimits` field and the network/cache/FFmpeg/temp policy.
+
+## Error contract
+
+All package-root Apexify errors extend `ApexifyError` and carry a stable `code`. Resource-limit errors additionally expose `limit`, `maximum`, and `actual`; remote-fetch errors may expose a redacted `requestUrl` and HTTP `status`.
+
+See [Package surface, configuration & errors](/docs#package-surface) for the exact public list.
+
+## Current runtime boundary
+
+Apexify.js 6 is a **Node/server package**. It does not currently export `@apexify/core`, `@apexify/node`, `@apexify/web`, `@apexify/react`, `@apexify/next`, Render IR/ARS, a browser realtime renderer, a native animation engine, an AI assistant, or a distributed renderer. Those concepts must not be treated as shipped 6.0 APIs.

@@ -1,0 +1,30 @@
+# `painter.image` — raster utilities {#api-image-utilities}
+
+`painter.image` implements `PainterImageUtils`.
+
+| Method | Return | Notes |
+|---|---|---|
+| `stitchImages(images, options?)` | `Promise<Buffer>` | Horizontal/vertical/grid-style stitching per `StitchOptions` |
+| `createCollage(images, layout)` | `Promise<Buffer>` | Grid/masonry/carousel collage layouts |
+| `compress(image, options?)` | `Promise<Buffer>` | Sharp-backed image compression/transcode |
+| `extractPalette(image, options?)` | `Promise<Array<{ color, percentage }>>` | Dominant palette analysis |
+| `resize(resizeOptions)` | `Promise<Buffer>` | Resize under runtime image/pixel limits |
+| `imgConverter(source, newExtension)` | `Promise<Buffer>` | Convert supported raster format |
+| `effects(source, filters)` | `Promise<Buffer>` | Apply bounded image-filter list |
+| `colorsFilter(source, filterColor, opacity?)` | `Promise<Buffer>` | Color/gradient overlay/filter |
+| `colorAnalysis(source)` | `Promise<Array<{ color, frequency }>>` | Color-frequency analysis |
+| `colorsRemover(source, rgb)` | `Promise<Buffer>` | Remove selected RGB color; failures throw structured errors |
+| `removeBackground(imageURL, apiKey)` | `Promise<Buffer>` | External service call; caller supplies API key; failures use `ApexifyExternalServiceError` |
+| `blend(layers, baseImageBuffer, defaultBlendMode?)` | `Promise<Buffer>` | Bounded multi-layer compositing |
+| `cropImage(options)` | `Promise<Buffer>` | Crop by declared crop geometry |
+| `masking(source, maskSource, options?)` | `Promise<Buffer>` | Mask source image |
+| `gradientBlend(source, options)` | `Promise<Buffer>` | Blend generated gradient |
+| `validHex(hexColor)` | `boolean` | Hex color validation helper |
+
+## Resource/network behavior
+
+String sources may represent local paths or remote URLs where the specific helper supports them. Remote media is always subject to the shared network policy; decoded raster inputs are subject to source-byte, decoded-pixel/frame, canvas, filter, and collection limits.
+
+Do not assume all `painter.image` methods accept the same source forms: the TypeScript declaration for each method is authoritative.
+
+For detailed semantics and option fields, use the [Raster, batch & output](/docs#00-raster-batch-output-overview) and [Images & Shapes] feature guides.

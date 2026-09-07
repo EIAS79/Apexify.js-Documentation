@@ -116,9 +116,11 @@ const RECIPES_ORDER = [
 const API_REFERENCE_SUBFOLDER_ORDER = [
   'api-overview',
   'api-scene',
+  'api-image',
   'api-lines-paths',
   'api-charts',
   'api-gif',
+  'api-audio',
   'api-video',
   'api-batch-save',
 ];
@@ -126,9 +128,11 @@ const API_REFERENCE_SUBFOLDER_ORDER = [
 const API_REFERENCE_SUBFOLDER_LABELS: Record<string, string> = {
   'api-overview': 'Overview & types',
   'api-scene': 'Canvas & layers',
+  'api-image': 'Images & utilities',
   'api-lines-paths': 'Lines & paths',
   'api-charts': 'Charts',
   'api-gif': 'GIF & animation',
+  'api-audio': 'Audio',
   'api-video': 'Video',
   'api-batch-save': 'Batch & save',
 };
@@ -143,15 +147,17 @@ const API_REFERENCE_FILES_ORDER_BY_SUBFOLDER: Record<string, string[]> = {
     'api-create-text',
     'api-measure-text',
   ],
+  'api-image': ['api-image-utilities'],
   'api-lines-paths': ['api-create-custom', 'api-create-path2d', 'api-draw-path'],
   'api-charts': ['api-create-chart', 'api-create-comparison-chart', 'api-create-combo-chart'],
   'api-gif': ['api-create-gif', 'api-animate'],
+  'api-audio': ['api-create-audio'],
   'api-video': ['api-create-video'],
   'api-batch-save': ['api-batch', 'api-chain', 'api-save', 'api-save-multiple', 'api-output', 'api-valid-hex'],
 };
 
 /** Loose `.mdx` files directly under `04-advanced` / `05-advanced`. */
-const ADVANCED_ORDER = ['00-advanced-overview'];
+const ADVANCED_ORDER = ['00-advanced-overview', '01-runtime-resource-governance', '02-security-deployment', '03-performance-memory', '04-migration-v6'];
 
 /** Nested topic folders under Advanced (`04-advanced`, `05-advanced`) — sidebar order. */
 const ADVANCED_SUBFOLDER_ORDER = ['composition', 'scene', 'video', 'audio'];
