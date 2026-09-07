@@ -1,0 +1,159 @@
+# Migration to Apexify.js 6 {#04-migration-v6}
+
+This guide covers migration from older 5.x-era usage to the **current 6.0.0 package**. It does not describe the separate future Phase 15+ engine roadmap.
+
+## 1. Upgrade the runtime first
+
+Apexify.js 6 supports:
+
+```text
+Node 22.x | 24.x | 26.x
+npm >= 10
+```
+
+If the application is still on Node 18/20 or older, upgrade and run your test suite before adopting Apexify.js 6.
+
+## 2. Use public package exports only
+
+Supported imports:
+
+```ts
+import { ApexPainter } from "apexify.js";
+import type { CanvasConfig, SceneRenderInput } from "apexify.js";
+import type { VideoPipelineLayer } from "apexify.js/types";
+```
+
+CommonJS remains supported:
+
+```js
+const { ApexPainter } = require("apexify.js");
+```
+
+Do not migrate old deep/source imports by guessing new `dist` paths. `lib-next/*`, `dist/*`, and internal modules are not public API.
+
+## 3. Prefer `toOutput()`
+
+Older code may use:
+
+```ts
+await painter.outPut(buffer);
+```
+
+It still works as a deprecated compatibility alias, but new code should use:
+
+```ts
+await painter.toOutput(buffer);
+```
+
+The painter constructor `type` controls this conversion; normal raster creation/render methods continue to produce Buffer-based results (with `createCanvas()` returning `CanvasResults`).
+
+## 4. Await plugin installation
+
+Current contract:
+
+```ts
+await painter.use(plugin);
+```
+
+`plugin.install(host)` may be asynchronous. Installations are serialized, same-name installed/pending duplicates reject, and `ApexPainter.use()` resolves only after installation completes.
+
+If older code called `painter.use(plugin)` without awaiting it, fix that ordering. Code that immediately consumes APIs registered by the plugin can otherwise race installation.
+
+## 5. Account for runtime validation and limits
+
+Apexify.js 6 enforces bounded runtime policy across canvas, image, scene, GIF, audio, video, batch, network, and related high-cost APIs.
+
+Handle `ApexifyResourceLimitError` as a deliberate rejected workload rather than assuming every historically accepted dimension/frame count will still execute.
+
+```ts
+import { ApexifyResourceLimitError } from "apexify.js";
+
+try {
+  await renderJob();
+} catch (error) {
+  if (error instanceof ApexifyResourceLimitError) {
+    console.error(error.limit, error.maximum, error.actual);
+  }
+}
+```
+
+Use `configureApexifyRuntime()` only to set limits your deployment can actually sustain.
+
+## 6. Remote URLs are deny-by-default for private networks
+
+Remote media now goes through a shared SSRF/network policy. Public HTTP(S) resources remain supported, but loopback/private/link-local/reserved/non-public targets are blocked by default and redirects are revalidated.
+
+If your application intentionally fetches a private host, configure both:
+
+```ts
+configureApexifyRuntime({
+  network: {
+    trustedNetworkAccess: true,
+    allowedHosts: ["media.internal.example"],
+  },
+});
+```
+
+Do not enable trusted network access globally just to restore old permissive behavior.
+
+## 7. FFmpeg and temp configuration
+
+Video features still require FFmpeg/ffprobe. Custom binary paths should use runtime/session configuration or:
+
+```text
+APEXIFY_FFMPEG_PATH
+APEXIFY_FFPROBE_PATH
+```
+
+Temporary media root uses `APEXIFY_TEMP_DIR` as a compatibility configuration path after explicit/runtime settings. Temp retention is off by default; `APEXIFY_RETAIN_TEMP_FILES=true` is debug-only.
+
+## 8. Credentials are explicit
+
+Apexify.js contains no fallback Imgur credentials. Configure the required `IMGUR_*` environment values or pass credentials explicitly to `painter.output.url()`.
+
+External remove-background integration likewise requires an explicit API key.
+
+If an old deployment relied on credentials committed in source or historical fallbacks, rotate those credentials before migration.
+
+## 9. Asset-resolution behavior
+
+Do not assume `$asset` references resolve everywhere automatically.
+
+| Surface | Current default |
+|---|---|
+| `renderScene`, `renderSceneToGIF`, `renderSceneToVideoFrames` | resolve |
+| templates | resolve during template render |
+| `SceneBuilder.render()` | do not resolve unless enabled |
+| imperative create/chart/GIF/video helpers | do not resolve unless enabled |
+| `batch()` / `chain()` | do not resolve unless enabled |
+
+For explicit imperative preprocessing:
+
+```ts
+const resolved = painter.prepareForRender(config);
+```
+
+## 10. Scenes/templates are validated composition contracts
+
+Scene rendering always validates. A historical `SceneRenderOptions.validate` compatibility field does not disable mandatory validation.
+
+Templates preserve native whole-placeholder values such as `0`, `false`, and `""`; defaults are nullish-oriented. Visibility/insertions/overrides/assets/layout are resolved deterministically before final scene validation.
+
+Review code that previously depended on mutation of input objects: scene/template/asset paths use copy/snapshot semantics in current 6.0 behavior.
+
+## 11. Test ESM/CJS/TypeScript from the actual artifact
+
+The package CI now verifies documentation examples against the packed `.tgz`, not only source-tree imports. For an application migration, do the same basic release check in a clean install/CI environment:
+
+```bash
+npm ci
+npm test
+```
+
+If you publish an internal wrapper around Apexify.js, test both the module format and types your consumers actually use.
+
+## 12. What you should *not* migrate to yet
+
+The current package does **not** ship the later roadmap's scoped `@apexify/*` runtime family, browser realtime renderer, React/Next adapters, Render IR/ARS, native animation engine, AI assistant, or distributed renderer.
+
+Do not rewrite working Apexify.js 6 code around those future APIs before they exist in a released package.
