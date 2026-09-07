@@ -171,7 +171,7 @@ const BENTO = [
     Icon: PencilSquareIcon,
   },
   {
-    title: 'Programmatic slides',
+    title: 'Presentation graphics',
     blurb: 'Compose chart + image + text on a canvas, export to PNG.',
     span: 'lg:col-span-2',
     src: '/gallery-outputs/images/presentation-slide.png',
@@ -273,25 +273,22 @@ export function BentoGrid() {
    3. Live snippet section — code → output
    ===================================================================== */
 
-const SAMPLE_CODE = `import { ApexPainter } from 'apexify.js';
+const SAMPLE_CODE = `import { writeFile } from 'node:fs/promises';
+import { ApexPainter } from 'apexify.js';
 
-const painter = new ApexPainter();
+const painter = new ApexPainter({ type: 'buffer' });
 
-const { buffer } = await painter.createChart({
-  kind: 'line',
-  width: 960,
-  height: 540,
-  series: [
-    { name: 'Revenue', data: revenue, fill: 'gradient' },
-    { name: 'Target',  data: target,  dashed: true   },
-  ],
-  smooth: true,
-  palette: 'sunset',
-  legend: { position: 'top' },
-  background: { gradient: aurora },
-});
+const buffer = await painter.createChart(
+  'line',
+  [{
+    label: 'Revenue',
+    data: [{ x: 1, y: 12 }, { x: 2, y: 18 }, { x: 3, y: 15 }],
+    color: '#FF3DAA',
+  }],
+  { dimensions: { width: 960, height: 540 } },
+);
 
-await fs.promises.writeFile('chart.png', buffer);`;
+await writeFile('chart.png', buffer);`;
 
 /**
  * Lightweight TS token highlighter for the demo (no extra deps).
@@ -364,7 +361,7 @@ export function LiveSnippetSection() {
               <span className="text-grad-iris">A finished PNG.</span>
             </>
           }
-          subtitle="Same TypeScript surface, whether you're rendering a chart, a slide, a banner, or a 60-frame GIF."
+          subtitle="Same TypeScript surface, whether you're rendering a chart, a presentation graphic, a banner, or a GIF."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -468,10 +465,10 @@ export function LiveSnippetSection() {
    ===================================================================== */
 
 const BENCH = [
-  { label: 'Apexify · @napi-rs/canvas', value: 100, color: 'var(--gradient-sunset)', winner: true },
-  { label: 'sharp', value: 78, color: 'var(--accent-iris)' },
-  { label: 'node-canvas', value: 64, color: 'var(--accent-iris-soft)' },
-  { label: 'jimp (pure JS)', value: 22, color: 'var(--text-muted)' },
+  { label: 'Node 22 full release gate', value: 100, color: 'var(--gradient-sunset)', winner: true },
+  { label: 'Node 24 full release gate', value: 100, color: 'var(--accent-iris)' },
+  { label: 'Node 26 full release gate', value: 100, color: 'var(--accent-iris-soft)' },
+  { label: 'Packed ESM / CJS / types', value: 100, color: 'var(--text-muted)' },
 ];
 
 export function PerformanceSection() {
@@ -485,11 +482,11 @@ export function PerformanceSection() {
               eyebrow="Performance"
               title={
                 <>
-                  TypeScript on the surface.{' '}
-                  <span className="text-grad-ember">Rust underneath.</span>
+                  Measured, bounded, and{' '}
+                  <span className="text-grad-ember">regression-gated.</span>
                 </>
               }
-              subtitle="Built on @napi-rs/canvas — a Rust-native binding that ships memory-efficient pipelines, smart caching, and parallel-safe batch & chain operations for big workloads."
+              subtitle="Apexify.js combines native raster primitives with bounded caches, runtime resource limits, controlled concurrency, and benchmark gates. Measure performance on the workload you actually deploy."
             />
             <div className="flex flex-wrap gap-3">
               <span className="chip">
@@ -498,7 +495,7 @@ export function PerformanceSection() {
               </span>
               <span className="chip">
                 <BoltIcon className="h-3.5 w-3.5" />
-                Rust SIMD
+                Regression benchmarks
               </span>
               <span className="chip">
                 <Square3Stack3DIcon className="h-3.5 w-3.5" />
@@ -515,13 +512,13 @@ export function PerformanceSection() {
             >
               <div className="flex items-baseline justify-between mb-6">
                 <h3 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>
-                  Relative throughput
+                  Release/runtime verification
                 </h3>
                 <span
                   className="text-[11px] font-mono uppercase tracking-wider"
                   style={{ color: 'var(--text-tertiary)' }}
                 >
-                  higher is better
+                  all gates required
                 </span>
               </div>
               <div className="space-y-4">
@@ -577,9 +574,10 @@ export function PerformanceSection() {
                 className="mt-6 text-[11px] leading-relaxed"
                 style={{ color: 'var(--text-muted)' }}
               >
-                Numbers are illustrative — measure on your own workload. Apexify gets the lead by composing
-                Rust-backed canvas + image filters + chart layout on a single buffer instead of round-tripping
-                through multiple libraries.
+                These bars are pass-state indicators, not cross-library speed claims. The release gate runs on
+                Node 22, 24, and 26 and verifies the packed ESM/CommonJS/type surface. Separate repository
+                benchmarks record representative medians and reject material regressions; deployment speed still
+                depends on dimensions, codecs, filters, fonts, concurrency, and host resources.
               </p>
             </div>
           </div>
@@ -1135,8 +1133,8 @@ export function SiteFooter() {
               <span className="text-2xl font-black text-grad-aurora">Apexify.js</span>
             </Link>
             <p className="text-sm leading-relaxed max-w-md mb-6" style={{ color: 'var(--text-secondary)' }}>
-              Programmatic visual library for Node.js — charts, images, GIFs, and video, all in one TypeScript
-              surface. Powered by Rust under the hood.
+              Programmatic visual library for Node.js — images, charts, GIFs, procedural audio, and FFmpeg-backed
+              video through one TypeScript surface.
             </p>
             <div className="flex gap-2">
               <a
