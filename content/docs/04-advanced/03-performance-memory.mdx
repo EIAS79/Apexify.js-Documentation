@@ -1,0 +1,139 @@
+# Performance & memory guide {#03-performance-memory}
+
+Apexify performance is dominated by raster dimensions, decoded image size, layer/filter complexity, chart/text work, GIF frame count, video codecs/processes, audio sample counts, and concurrency. Optimize those costs before micro-optimizing JavaScript around the library.
+
+## Reuse the painter and reusable composition objects
+
+For repeated work in one process, prefer reusing an `ApexPainter` and long-lived reusable assets/templates where application semantics permit it.
+
+```ts
+const painter = new ApexPainter({ type: "buffer" });
+const card = painter.createTemplate(definition);
+
+for (const row of rows) {
+  await card.render(row);
+}
+```
+
+This avoids unnecessary setup and gives bounded decoded-source caching a chance to reuse work. Do not create an unbounded number of painters/templates merely to parallelize jobs.
+
+## Cache behavior
+
+The decoded image cache is bounded. Built-in defaults:
+
+```text
+enabled     true
+TTL         5 minutes
+maxEntries  128
+maxBytes    128 MiB
+```
+
+Cache entries are not a substitute for application-level source lifecycle design. Reuse stable asset/source identities, and reduce the cache size or disable it if your process has stricter memory constraints.
+
+Do not implement another unbounded global image cache around Apexify.
+
+## Canvas and decoded images
+
+Raster memory scales with pixel count, not encoded file size. A 10,000 × 10,000 RGBA surface is roughly 400 MB before additional native/temporary allocations.
+
+Practical rules:
+
+- render at the final dimensions you actually need;
+- resize oversized input images before repeatedly applying expensive filters/composition when the larger pixels are unnecessary;
+- avoid repeatedly decoding the same source under different equivalent identities;
+- keep nested surfaces only where isolation/composition semantics require them;
+- use `maxDecodedImagePixels`, `maxTotalPixels`, and `maxSceneTotalPixels` as operational budgets, not merely validation defaults.
+
+## Scenes vs imperative chains
+
+Use **scenes** when the task is naturally a layered composition: stable paint order, nested surfaces, charts/images/text/path layers, and one final render/validation pass.
+
+Use **templates** when the layer graph repeats with different data.
+
+Use imperative `createCanvas` → `createImage` / `createText` when the workflow is genuinely incremental/simple.
+
+Avoid serial encode/decode cycles purely to move data between Apexify operations. Pass `Buffer`/`CanvasResults` directly where the next API accepts them.
+
+Nested scene surfaces composite directly into parent canvases; they are not required to PNG-encode/decode at every nesting boundary.
+
+## `batch()` vs `chain()`
+
+- `batch()` is for independent operations and uses bounded parallelism.
+- `chain()` is for dependent operations whose output feeds the next step.
+
+Defaults are `maxBatchOperations = 256` and `maxBatchConcurrency = 4`.
+
+Higher concurrency can increase native raster/decode/process memory faster than it reduces wall time. Measure peak RSS/native pressure for your actual image sizes and filters before increasing concurrency.
+
+Remote acquisition has its own global ceiling (`maxConcurrentRemoteFetches = 8` by default), independent of batch concurrency.
+
+## GIF workloads
+
+GIF cost roughly scales with:
+
+```text
+width × height × effective frame count
+```
+
+Apexify enforces `maxGifDimension`, `maxGifFrames`, and `maxGifResourceCost`.
+
+For generated animations, prefer `onStart` returning an `AsyncIterable<GIFEncodedFrame>`. Apexify pulls and completes one generated frame through resolve/decode/overlay/encode before asking for the next, which preserves producer backpressure instead of collecting the whole sequence first.
+
+Keep frame dimensions, FPS-equivalent cadence, overlays, and frame count no larger than the final product requires.
+
+## Video workloads
+
+Video is FFmpeg-backed. The dominant costs are codec choice, resolution, FPS, duration, filters/overlays, number of passes, and process startup.
+
+- avoid needless re-encodes between sequential video operations;
+- use `videoPipeline()` when its declarative layers can express a multi-step edit coherently;
+- remote video is streamed to an isolated temp file rather than first fully buffered in JS memory;
+- set explicit output dimensions/FPS/bitrate appropriate to the delivery target;
+- keep `maxVideo*` limits aligned to tenant/request classes;
+- avoid launching more concurrent FFmpeg work than memory/I/O/CPU can sustain.
+
+Apexify does not promise that hardware acceleration is used. Treat FFmpeg codec/backend tuning as deployment-specific and verify output correctness when changing FFmpeg options outside the documented Apexify surface.
+
+## Audio workloads
+
+Procedural audio uses complete in-memory WAV/working buffers. Approximate baseline Float32 sample storage as:
+
+```text
+duration × sampleRate × channels × 4 bytes
+```
+
+Peak working memory can be higher because source, transformed, mixed, and encoded buffers may coexist. `maxAudioBytes` is intentionally a peak-budget preflight.
+
+Reduce duration/sample rate/channels/layer count before raising `maxAudioBytes`.
+
+## Text, charts, filters, and pixels
+
+- reuse fonts/assets rather than repeatedly resolving equivalent sources;
+- avoid huge text strings/char-metric requests when not needed;
+- keep chart data only as dense as the exported raster can visually resolve;
+- filters and per-pixel operations scale with affected pixels and filter count;
+- crop/resize early when subsequent operations only need a smaller region;
+- prefer vector/path primitives to manual whole-image pixel loops when they express the same operation.
+
+## Measure the right thing
+
+Benchmark with the same Node major, native dependencies, fonts, image codecs, FFmpeg version, CPU architecture, and representative input sizes used in production.
+
+Record at least:
+
+- median/p95 wall time;
+- peak RSS when feasible;
+- output correctness/size;
+- concurrency level;
+- remote/temp bytes for media workloads.
+
+The package's Phase 12 benchmark gate uses five-run medians and a versioned baseline with a 10% regression tolerance after noise allowance. Those repository baselines are regression controls, not universal throughput promises for every server.
+
+## Recommended tuning order
+
+1. reduce unnecessary dimensions/frame counts/durations;
+2. eliminate repeated decode/encode/fetch work;
+3. reuse assets/templates/painter state appropriately;
+4. choose scene/template vs imperative/batch architecture correctly;
+5. tune concurrency under measured peak memory;
+6. then tune codec/filter-specific options.
