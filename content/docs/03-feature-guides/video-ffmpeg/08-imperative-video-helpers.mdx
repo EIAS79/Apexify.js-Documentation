@@ -1,196 +1,166 @@
 # Imperative video helpers (`painter.*`) {#08-imperative-video-helpers}
 
+Besides `createVideo({ ... })`, `ApexPainter` exposes direct probe and frame-extraction methods. These methods use the same central FFmpeg session, validation, runtime limits, remote-network policy, abort/process handling, and isolated temporary workspaces as the rest of the video stack.
 
-Besides **`createVideo({ … })`**, **`ApexPainter`** exposes **low-level** FFmpeg helpers you can call **directly**. Use them when you already have **`ApexPainter`** and want **buffers** or **file paths** without building a **`VideoCreationOptions`** router payload.
+**Requirements:** FFmpeg and ffprobe must be available on `PATH`, configured through `configureApexifyRuntime({ ffmpeg: ... })`, or supplied through the documented `APEXIFY_FFMPEG_PATH` / `APEXIFY_FFPROBE_PATH` environment variables.
 
-**Requirements:** **FFmpeg** + **ffprobe** on **`PATH`** (same as **`createVideo`**). **`Buffer`** and **HTTP** sources are written to **`.temp-frames`** temp files for the duration of the operation.
+## Method map
 
----
+| Method | Result |
+|---|---|
+| `getVideoInfo(source, skipFfmpegCheck?)` | Probed video metadata |
+| `extractFrameAtTime(source, seconds, format?, quality?)` | One JPEG/PNG `Buffer` |
+| `extractFrameByNumber(source, frameNumber, format?, quality?)` | One JPEG/PNG `Buffer`; frame numbers are 1-based |
+| `extractMultipleFrames(source, times, format?, quality?)` | Ordered `Buffer[]` |
+| `extractFrames(source, options)` | Extracted frame file descriptors `{ source, isRemote }[]` |
+| `extractAllFrames(source, options?)` | `{ source, frameNumber, time }[]` |
 
-## Mental map
-
-| Method | Typical output |
-|--------|----------------|
-| **`getVideoInfo`** | Metadata object (**duration**, **resolution**, **fps**, …) |
-| **`extractFrameAtTime`** | Single frame **`Buffer`** (**JPEG** or **PNG** bytes from FFmpeg) |
-| **`extractFrameByNumber`** | Same — seeks using **probe FPS** (**1-based** frame index) |
-| **`extractMultipleFrames`** | **`Buffer[]`** — one **`extractFrameAtTime`** per timestamp |
-| **`extractFrames`** | **`{ source, isRemote }[]`** — **filesystem paths** under **`.temp-frames/frames-<id>/`** |
-| **`extractAllFrames`** | Rich list **`{ source, frameNumber, time }[]`** — many files on disk (**heavy**) |
-
-**`createVideo`** branches often **wrap** these internally; behaviour aligns with **[Frame extraction suite](/docs#02-frame-extraction)** conceptually, but **signatures differ**.
+The same helpers are available through the grouped `painter.video` stack where documented by its public type surface.
 
 ---
 
-## `getVideoInfo(videoSource, skipFFmpegCheck?)`
+## `getVideoInfo(source, skipFfmpegCheck?)`
 
-```typescript
-await painter.getVideoInfo(videoSource: string | Buffer, skipFFmpegCheck?: boolean)
+```ts
+const info = await painter.getVideoInfo('./clip.mp4');
+console.log(info.width, info.height, info.fps, info.duration);
 ```
 
-| Param | Role |
-|-------|------|
-| **`videoSource`** | Local path (resolved vs **`process.cwd()`**), **`http(s)`** URL, or **`Buffer`** (**written** to a temp **`.mp4`**). |
-| **`skipFFmpegCheck`** | Default **`false`**. Pass **`true`** only when FFmpeg was already verified (**internal** **`#extractVideoFrame`** uses this after a prior check). |
+`source` may be a local path, an HTTP(S) URL permitted by the central network policy, or a `Buffer`. Remote/buffer inputs are staged inside the operation's isolated temporary workspace. Do not depend on any internal temporary pathname.
 
-**Returns** **`null`** on failure inside probe path, else:
+`skipFfmpegCheck` defaults to `false`. It exists for already-validated internal/delegated flows; normal application code should leave it omitted.
 
-| Field | Meaning |
-|-------|---------|
-| **`duration`** | Seconds (**float**) |
-| **`width`**, **`height`** | Primary video stream |
-| **`fps`** | From **`r_frame_rate`** (**defaults `30`** if missing) |
-| **`bitrate`** | Stream or container hint |
-| **`format`** | **`format_name`** string |
-
-```typescript
-const painter = new ApexPainter();
-const meta = await painter.getVideoInfo('./clip.mp4');
-if (meta) console.log(`${meta.width}x${meta.height} @ ${meta.fps}fps, ${meta.duration}s`);
-```
+Probe failures use the structured Apexify process/input error paths rather than a documented `null` sentinel contract.
 
 ---
 
-## `extractFrameAtTime(videoSource, timeSeconds, outputFormat?, quality?)`
+## `extractFrameAtTime`
 
-```typescript
-await painter.extractFrameAtTime(
+```ts
+const jpeg = await painter.extractFrameAtTime(
+  './film.mp4',
+  42.5,
+  'jpg',
+  3,
+);
+```
+
+Signature:
+
+```ts
+extractFrameAtTime(
   videoSource: string | Buffer,
   timeSeconds: number,
-  outputFormat: 'jpg' | 'png' = 'jpg',
-  quality: number = 2
-): Promise<Buffer | null>;
+  outputFormat?: 'jpg' | 'png',
+  quality?: number,
+): Promise<Buffer>
 ```
 
-Seeks to **`timeSeconds`**, decodes **one** frame.
-
-| Param | Notes |
-|-------|------|
-| **`outputFormat`** | **`jpg`** uses **`-q:v ${quality}`** (FFmpeg scale: **lower = higher quality** for this flag). **`png`** uses **`-pix_fmt rgba`**. |
-| **`quality`** | JPEG **`-q:v`** only; PNG path ignores it in practice. |
-
-Returns **`null`** only if the **private** extractor yields nothing; failures usually **throw**.
-
-```typescript
-const thumb = await painter.extractFrameAtTime('./film.mp4', 42.5, 'jpg', 3);
-if (thumb) require('fs').writeFileSync('thumb.jpg', thumb);
-```
+Defaults are `outputFormat = 'jpg'` and `quality = 2`. `quality` must be an integer from 1 through 31. The timestamp must be finite, non-negative, inside the governed video duration, and inside the actual source duration.
 
 ---
 
-## `extractFrameByNumber(videoSource, frameNumber, outputFormat?, quality?)`
+## `extractFrameByNumber`
 
-```typescript
-await painter.extractFrameByNumber(
-  videoSource: string | Buffer,
-  frameNumber: number, // 1-based: 1 = first frame
-  outputFormat: 'jpg' | 'png' = 'jpg',
-  quality: number = 2
-): Promise<Buffer | null>;
+```ts
+const png = await painter.extractFrameByNumber('./take.mp4', 48, 'png');
 ```
 
-1. Calls **`getVideoInfo(..., true)`** for **FPS**.
-2. Converts **1-based** **`frameNumber`** → **`timeSeconds = (frameNumber - 1) / fps`**.
-3. Delegates **`#extractVideoFrame`** with that time.
-
-Throws if FPS cannot be resolved (**≤ 0**).
-
-```typescript
-// Exact 24p film — frame 48 ≈ 2s
-const buf = await painter.extractFrameByNumber('./take.mp4', 48, 'png');
-```
+`frameNumber` is **1-based**. The implementation probes FPS and converts the requested frame to `(frameNumber - 1) / fps`. The frame number must be a positive integer; format and quality use the same validation as `extractFrameAtTime`.
 
 ---
 
-## `extractMultipleFrames(videoSource, times[], outputFormat?, quality?)`
+## `extractMultipleFrames`
 
-```typescript
-await painter.extractMultipleFrames(
-  videoSource: string | Buffer,
-  times: number[],
-  outputFormat: 'jpg' | 'png' = 'jpg',
-  quality: number = 2
-): Promise<Buffer[]>;
+```ts
+const shots = await painter.extractMultipleFrames(
+  './interview.mp4',
+  [0, 1.25, 3.8, 10],
+  'jpg',
+  3,
+);
 ```
 
-Sequential **`extractFrameAtTime`** loop — **order preserved**; skips **`null`** returns (does not push).
-
-```typescript
-const stamps = [0, 1.25, 3.8, 10];
-const shots = await painter.extractMultipleFrames('./interview.mp4', stamps, 'jpg', 3);
-shots.forEach((b, i) => require('fs').writeFileSync(`grab-${i}.jpg`, b));
-```
+This returns an ordered `Buffer[]`. The timestamp array must be non-empty, each timestamp must be finite and non-negative, and the request is bounded by both collection and `maxVideoExtractedFrames` limits. Extraction is performed through the shared frame operation/runtime rather than an unbounded `Promise.all` fan-out.
 
 ---
 
-## `extractFrames(videoSource, options: ExtractFramesOptions)`
+## `extractFrames(source, options)`
 
-```typescript
-await painter.extractFrames(videoSource: string | Buffer, options: ExtractFramesOptions)
-```
-
-**Requires **`options.interval`** — positive **milliseconds** between samples.** Derives **`fps = 1000 / interval`**, probes duration, selects **[`startFrame`, `endFrame`]** from **`frameSelection`**, runs FFmpeg **`-vf fps=${fps}`** into **`process.cwd()/.temp-frames/frames-<timestamp>/frame-%03d.ext`**.
-
-### **`ExtractFramesOptions`**
-
-| Field | Required | Notes |
-|-------|----------|------|
-| **`interval`** | ✅ | **Ms** between frames → **`fps`**. |
-| **`outputFormat`** | — | **`jpg`** (default) or **`png`**. |
-| **`frameSelection.start`**, **`end`** | — | **Indices** inside the synthetic sequence (**clamped**). |
-| **`outputDirectory`** | — | Present on **type** — **not** used by this **`ApexPainter`** implementation (files stay under **`.temp-frames/...`**). |
-| **`watermark`** | — | Present on **type** — **not applied** in **`extractFrames`** today. |
-
-Returns **`{ source: string; isRemote: boolean }[]`** — **`source`** is a **local path** you should **read or move** before relying on long-term cleanup.
-
-```typescript
+```ts
 const frames = await painter.extractFrames('./motion.mp4', {
-  interval: 500, // ~2 fps sampling
+  interval: 500,
   outputFormat: 'jpg',
+  quality: 3,
+  outputDirectory: './sampled-frames',
   frameSelection: { start: 0, end: 19 },
 });
-frames.forEach((f) => console.log(f.source));
 ```
+
+`interval` is required and is expressed in milliseconds; sampling FPS is derived as `1000 / interval`. `frameSelection.start` and `.end` are zero-based indexes into the generated sampling sequence and must form an increasing range inside that sequence.
+
+Current options include:
+
+| Field | Behavior |
+|---|---|
+| `interval` | Required positive sampling interval in milliseconds |
+| `outputFormat` | `jpg` by default; `png` supported |
+| `quality` | JPEG quality value, integer 1–31; default 2 |
+| `frameSelection` | Optional bounded start/end generated-frame indexes |
+| `outputDirectory` | Destination directory; defaults to `./extracted-frames` |
+
+The method writes the selected frames to the output directory and returns local descriptors `{ source, isRemote: false }[]`. The operation's **temporary input workspace** is isolated and cleaned separately; output files intentionally persist because they are caller-visible results.
+
+The number of extracted files is bounded by `maxVideoExtractedFrames`.
 
 ---
 
-## `extractAllFrames(videoSource, options?)`
+## `extractAllFrames(source, options?)`
 
-Dumps **every** decoded frame between **`startTime`** and **`endTime`** (seconds) into **`outputDirectory`** (**default `./extracted-frames`** — resolved vs cwd in implementation).
-
-| Option | Default | Role |
-|--------|---------|------|
-| **`outputFormat`** | **`png`** | **`jpg`** \| **`png`** |
-| **`outputDirectory`** | **`./extracted-frames`** | Output folder (**created**). |
-| **`quality`** | **`2`** | JPEG **`-q:v`**. |
-| **`prefix`** | **`frame`** | **`prefix-%06d.ext`**. |
-| **`startTime`**, **`endTime`** | **0 … duration** | Time window. |
-
-Returns **`{ source, frameNumber, time }[]`** — **`time`** stepped approximately by **1/fps**.
-
-```typescript
-const list = await painter.extractAllFrames('./short.mp4', {
+```ts
+const frames = await painter.extractAllFrames('./short.mp4', {
   outputDirectory: './cells',
   outputFormat: 'png',
   startTime: 0,
   endTime: 1,
+  prefix: 'frame',
 });
-console.log(list.length, 'files');
 ```
 
-**Warning:** Long clips × full FPS → **huge** disk use.
+Defaults:
+
+| Option | Default |
+|---|---|
+| `outputFormat` | `png` |
+| `outputDirectory` | `./extracted-frames` |
+| `quality` | `2` |
+| `prefix` | `frame` |
+| `startTime` | `0` |
+| `endTime` | source duration |
+
+The prefix must be a simple filename prefix, the time range must be inside the source duration, and the estimated frame count is checked against `maxVideoExtractedFrames` before FFmpeg runs. Results are `{ source, frameNumber, time }[]` with zero-based `frameNumber` metadata.
+
+**Disk warning:** extracting every frame from a long/high-FPS source can produce substantial persistent output. Use an explicit output directory with sufficient quota and prefer interval/timestamp extraction when full-frame dumping is unnecessary.
 
 ---
 
-## Choosing **`createVideo`** vs imperative calls
+## Security, cleanup, and cancellation
 
-| Prefer **`createVideo`** | Prefer **`painter.extract*`** |
-|--------------------------|-------------------------------|
-| Single router payload, **`buffer`** wrapper types from **`VideoCreator`** | Script-style **probe** / **grab** without composing **`source` + branch** |
-| **`extractFrame`** returning **`{ buffer, canvas }`** composites | Raw FFmpeg **`Buffer`** for thumbnails |
+All direct helpers inherit the Phase 8/13 video runtime controls:
+
+- remote HTTP(S) inputs pass through DNS/SSRF validation, redirect revalidation, transfer-byte limits, and remote concurrency bounds;
+- FFmpeg/ffprobe use argv execution with `shell: false`;
+- temporary operation state lives in isolated `fs.mkdtemp()` workspaces and is cleaned by default;
+- custom temp roots come from explicit/session settings, runtime `temp.rootDirectory`, `APEXIFY_TEMP_DIR`, then the OS temp directory;
+- process timeouts and `AbortSignal` controls are handled through the shared FFmpeg session where the enclosing API exposes controls;
+- caller-visible `outputDirectory` files from `extractFrames` / `extractAllFrames` are outputs, not temporary workspace files, and are not automatically deleted.
+
+See [Security & deployment](/docs#02-security-deployment) and [Runtime validation & resource governance](/docs#01-runtime-resource-governance) for the complete policy.
 
 ---
 
-See also: **[Frame extraction suite](/docs#02-frame-extraction)** · **[Metadata & frames](/docs#01-metadata-and-frames)** · **[Video pipeline (advanced)](/docs#01-video-pipeline)** for multi-step edits.
+## Choosing the surface
 
----
+Use `createVideo()` for the typed one-operation router, `videoPipeline()` for multi-step declarative editing, and these direct helpers when the task is specifically probing or extracting frames.
+
+See also: [Frame extraction suite](/docs#02-frame-extraction) · [Metadata & frames](/docs#01-metadata-and-frames) · [Video pipeline](/docs#01-video-pipeline).
