@@ -1,0 +1,114 @@
+# `ApexPainter` — constructor, direct methods & composition managers {#api-new-apex-painter}
+
+```ts
+import { ApexPainter } from "apexify.js";
+
+const painter = new ApexPainter({ type: "buffer" });
+```
+
+The constructor accepts `OutputFormat`; `type` defaults to `buffer` when omitted/falsy. The configured type is used by `toOutput()`.
+
+## Direct methods
+
+| Method | Return | Contract |
+|---|---|---|
+| `prepareForRender<T>(value)` | `T` | Deep-resolve `$name` / `$path.to.value` through `painter.assets`; `$$` escapes a literal `$` |
+| `createCanvas(canvas, painterOpts?)` | `Promise<CanvasResults>` | Create validated base raster; imperative asset refs opt in with `resolveAssetRefs` |
+| `createImage(images, canvasBuffer, options?, painterOpts?)` | `Promise<Buffer>` | Draw one/many image/shape descriptors |
+| `createText(text, canvasBuffer, painterOpts?)` | `Promise<Buffer>` | Draw one/many text descriptors |
+| `measureText(textProps, painterOpts?)` | `Promise<TextMetrics>` | Measure text without final image composition |
+| `createScene(config)` / `createScene(width, height)` | `SceneBuilder` | Create copy-on-ingress scene builder |
+| `createTemplate(definition, options?)` | `TemplateHandle` | Immutable reusable scene/template definition |
+| `use(plugin)` | `Promise<this>` | Serialized transactional plugin install; **always await it** |
+| `renderScene(input, options?)` | `Promise<Buffer>` | Validate and render scene; asset resolution defaults on |
+| `validateSceneRenderInput(input, options?)` | `void` | Explicit scene preflight; validation is mandatory during render regardless |
+| `renderSceneToGIF(scene, gif)` | `Promise<...>` | Compose scene with GIF workflow; scene asset resolution defaults on |
+| `renderSceneToVideoFrames(scene, video)` | `Promise<SceneToVideoResult>` | Compose scene frame workflow before video encode |
+| `createVideo(options, painterOpts?)` | `Promise<SceneToVideoResult>` | One-shot video/FFmpeg operation |
+| `videoPipeline(source?, initialLayers?)` | pipeline builder | Declarative trim/splice/text/audio/synth video edit pipeline |
+| `getVideoInfo(source, skipFfmpegCheck?)` | video metadata promise | ffprobe-backed metadata |
+| `extractFrames(source, options)` | frame result promise | Extract configured frame sequence |
+| `extractAllFrames(source, options?)` | frame result promise | Extract all frames within limits |
+| `extractFrameAtTime(source, seconds, format = "jpg", quality = 2)` | frame promise | Extract one time-positioned frame |
+| `extractFrameByNumber(source, frameNumber, format = "jpg", quality = 2)` | frame promise | Extract one numbered frame |
+| `extractMultipleFrames(source, times, format = "jpg", quality = 2)` | frame result promise | Extract multiple timestamps |
+| `createChart(type, data, options?, painterOpts?)` | `Promise<Buffer>` | `pie`, `bar`, `horizontalBar`, `line`, `scatter`, `radar`, `polarArea` |
+| `createComparisonChart(options, painterOpts?)` | `Promise<Buffer>` | Comparison chart |
+| `createComboChart(options, painterOpts?)` | `Promise<Buffer>` | Combo chart |
+| `createGIF(frames, options, painterOpts?)` | GIF result promise | Bounded GIF/static/generated frame workflow |
+| `animate(frames, defaultDuration, defaultWidth = 800, defaultHeight = 600, options?, painterOpts?)` | `Promise<Buffer[] | undefined>` | Frame animation helper |
+| `batch(operations, opts?)` | `Promise<Buffer[]>` | Bounded parallel operations |
+| `chain(operations, opts?)` | `Promise<Buffer>` | Sequential operations feeding output forward |
+| `toOutput(buffer)` | `Promise<Buffer | string | Blob | ArrayBuffer>` | Convert using painter `outputFormat.type` |
+| `outPut(buffer)` | same as `toOutput()` | **Deprecated compatibility alias** |
+| `save(buffer, options?)` | `Promise<SaveResult>` | Save/transcode one image |
+| `saveMultiple(buffers, options?)` | `Promise<SaveResult[]>` | Save/transcode multiple images |
+
+## Properties / grouped APIs
+
+| Property | Contract |
+|---|---|
+| `outputFormat` | Constructor-selected `OutputFormat` |
+| `assets` | `AssetManager` named composition registry |
+| `plugins` | `PluginHost` named extension registry/lifecycle state |
+| `components` | Built-in layer factories |
+| `image` | `PainterImageUtils` raster utilities |
+| `detect` | `PainterHitDetect` |
+| `path2d` | `PainterPath2D` |
+| `pixels` | `PainterPixels` |
+| `output` | `PainterOutput` encodings/Imgur upload |
+| `createAudio` | `PainterCreateAudio` procedural WAV APIs |
+| `video` | Advanced `VideoStack` / FFmpeg session surface |
+
+The `detect`, `path2d`, `pixels`, and `output` facets are lazily created; callers should treat that as an implementation detail.
+
+## `AssetManager`
+
+| Method | Behavior |
+|---|---|
+| `loadImage(id, source)` | Register string/Buffer image source; duplicate root names reject |
+| `replaceImage(id, source)` | Replace an existing image registration; unknown name rejects |
+| `loadFont(id, fontPath)` / `replaceFont(...)` | Register/replace font path |
+| `loadPalette(name, colors)` / `replacePalette(...)` | Register/replace string palette record |
+| `loadValue(name, value)` / `replaceValue(...)` | Register/replace JSON-like value/Buffer; cyclic/unsafe objects reject |
+| `unregisterImage(id)` / `unregisterFont(id)` / `unregisterPalette(name)` | Remove matching-kind entry if present |
+| `has(name)` | Root-name existence |
+| `delete(name)` | Delete any root entry; returns boolean |
+| `clear()` | Remove all registrations; returns manager |
+| `list()` | Array of `{ name, kind }` records |
+| `resolve(refPath)` | Resolve root or dotted own-property/array-index path and return a cloned value |
+
+Asset names are identifier-like and unsafe prototype keys are rejected. Whole values are cloned on registration/resolution so caller mutation does not silently mutate registry storage.
+
+## `PluginHost`
+
+| Method | Behavior |
+|---|---|
+| `use(name, api)` | Register a named API object; duplicates reject |
+| `get<T>(name)` | Return typed API or `undefined` |
+| `has(name)` | Registry membership |
+| `remove(name)` | Remove API; returns boolean |
+| `list()` | Registered API names |
+| `isInstalled(name)` | Completed `ApexifyPlugin` state |
+| `listInstalled()` | Installed plugin names |
+| `install(plugin, host)` | Public class method used by `ApexPainter.use`; serialized async transaction |
+
+A failed plugin installation rolls back `PluginHost` registry mutations performed in that plugin's async installation context. It cannot undo arbitrary filesystem/network/application side effects.
+
+## Built-in components
+
+Each component exposes `toLayers(options)` and returns normal `SceneLayer[]`:
+
+- `painter.components.badge.toLayers()`
+- `painter.components.progressBar.toLayers()`
+- `painter.components.avatar.toLayers()`
+- `painter.components.card.toLayers()`
+- `painter.components.watermark.toLayers()`
+
+They are server-rendering layer factories, not DOM components. Add accessibility semantics in the UI that presents the generated raster.
+
+## Errors and limits
+
+Direct methods validate finite values/options and resource budgets before expensive native/process work where practical. Common failures are `ApexifyInputError`, `ApexifyResourceLimitError`, `ApexifyDecodeError`, `ApexifyRemoteFetchError`, `ApexifyProcessError`, `ApexifyAssetError`, and `ApexifyPluginError` depending on the domain.
+
+Use [Runtime validation & resource governance](/docs#01-runtime-resource-governance) for exact global limits and [Security deployment](/docs#02-security-deployment) for untrusted-input guidance.
