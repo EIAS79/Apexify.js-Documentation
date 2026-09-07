@@ -1,0 +1,62 @@
+name: Phase 13 final package pin synchronization
+
+on:
+  push:
+    branches:
+      - reengineering/phase-13-authoritative-docs
+
+permissions:
+  contents: write
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: reengineering/phase-13-authoritative-docs
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Synchronize exact Apexify merge SHA and lock
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import json
+
+          old = 'ce300541b344e9938db5943b30808171bc707d5b'
+          new = 'd19ccd31ec9f9ccabc4ebd5eaa51ff038f0343a5'
+          pkg_path = Path('package.json')
+          pkg = json.loads(pkg_path.read_text())
+          pkg['dependencies']['apexify.js'] = f'github:EIAS79/Apexify.js#{new}'
+          pkg_path.write_text(json.dumps(pkg, indent=2) + '\n')
+
+          for root in [Path('content'), Path('app'), Path('components'), Path('scripts')]:
+              if not root.exists():
+                  continue
+              for file in root.rglob('*'):
+                  if not file.is_file() or file.suffix not in {'.mdx', '.tsx', '.ts', '.mjs', '.js', '.json'}:
+                      continue
+                  text = file.read_text(errors='ignore')
+                  changed = text.replace(old, new).replace('ce300541…', 'd19ccd31…')
+                  if changed != text:
+                      file.write_text(changed)
+          PY
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Commit final pin
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "Final package pin already synchronized"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json content app components scripts
+          git commit -m "Phase 13: pin docs to final staged Apexify.js merge"
+          git push origin HEAD:reengineering/phase-13-authoritative-docs
