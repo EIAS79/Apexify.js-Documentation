@@ -31,8 +31,8 @@ jobs:
           git config --global --add url."https://github.com/".insteadOf "git@github.com:"
       - name: Pin docs to final Phase 14 package SHA
         env:
-          PACKAGE_SHA: 4aca4b4c98a50020a1c41b02983d341791a3ddba
-          OLD_SHA: d19ccd31ec9f9ccabc4ebd5eaa51ff038f0343a5
+          PACKAGE_SHA: c2b8eb01b071c0ddff18f3cd0fef0431e5150981
+          OLD_SHA: 4aca4b4c98a50020a1c41b02983d341791a3ddba
         run: |
           node <<'NODE'
           const fs = require('node:fs');
@@ -44,17 +44,17 @@ jobs:
 
           const heroPath = 'components/home/HeroShowcase.tsx';
           let hero = fs.readFileSync(heroPath, 'utf8');
-          if (!hero.includes(old)) throw new Error('Expected Phase 13 package SHA not found in HeroShowcase.');
+          if (!hero.includes(old)) throw new Error('Expected previous package SHA not found in HeroShowcase.');
           hero = hero.split(old).join(sha);
-          hero = hero.replace('#d19ccd31…', '#4aca4b4c…');
+          hero = hero.replace('#4aca4b4c…', '#c2b8eb01…');
           fs.writeFileSync(heroPath, hero);
           NODE
       - name: Regenerate lockfile for exact package commit
         run: npm install --package-lock-only --ignore-scripts
       - name: Verify exact package lock
         env:
-          PACKAGE_SHA: 4aca4b4c98a50020a1c41b02983d341791a3ddba
-          OLD_SHA: d19ccd31ec9f9ccabc4ebd5eaa51ff038f0343a5
+          PACKAGE_SHA: c2b8eb01b071c0ddff18f3cd0fef0431e5150981
+          OLD_SHA: 4aca4b4c98a50020a1c41b02983d341791a3ddba
         run: |
           node <<'NODE'
           const fs = require('node:fs');
@@ -68,7 +68,7 @@ jobs:
           assert.ok(lock.includes(sha), 'package-lock.json does not contain final package SHA');
           assert.ok(hero.includes(sha), 'HeroShowcase does not contain final package SHA');
           for (const [name, text] of [['package.json', pkg], ['package-lock.json', lock], ['HeroShowcase.tsx', hero]]) {
-            assert.ok(!text.includes(old), `${name} still contains Phase 13 SHA`);
+            assert.ok(!text.includes(old), `${name} still contains previous package SHA`);
           }
           NODE
       - name: Verify locked install and docs package version
