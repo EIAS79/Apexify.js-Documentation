@@ -2,6 +2,20 @@
 
 This guide covers migration from older 5.x-era usage to the **current 6.0.0 package**. It does not describe the separate future Phase 15+ engine roadmap.
 
+## Compatibility-window summary
+
+Phase 13 requires changed behavior to state its compatibility status explicitly rather than leaving callers to infer it.
+
+| Change | 6.0 compatibility status |
+|---|---|
+| `outPut(buffer)` → `toOutput(buffer)` | `outPut()` remains available in 6.0.0 as a deprecated compatibility alias. No removal release is committed here; migrate new and maintained code to `toOutput()` now. Any future removal requires an explicit release/migration notice. |
+| non-awaited `painter.use(plugin)` → `await painter.use(plugin)` | There is **no synchronous compatibility guarantee** in 6.0.0. The method is asynchronous because plugin installation may be asynchronous; callers that depend on installed APIs must await it. |
+| permissive private-network fetching → explicit trusted-network policy | There is **no legacy permissive compatibility mode**. Private/local access requires `trustedNetworkAccess: true` plus an explicit host allowlist. |
+| Node 18/20-or-older execution → Node 22/24/26 | Older Node majors are outside the 6.0.0 supported runtime window. Upgrade the application runtime before adopting staged 6.0.0. |
+| deep/source imports → package exports | Internal `lib-next/*`, `dist/*`, and other source/deep paths have no compatibility guarantee. Use only documented package exports. |
+
+The sections below show the previous and current forms, why each change exists, and what action callers should take.
+
 ## 1. Upgrade the runtime first
 
 Apexify.js 6 supports:
