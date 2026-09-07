@@ -1,44 +1,63 @@
 # Apexify.js documentation {#readme}
 
-This directory is the **human-readable docs** for **Apexify.js**: tutorials, feature guides, contributor notes, and goal-first recipes.
+This site documents the staged **Apexify.js 6.0.0** Node/server package artifact and is tested against an exact repository commit. npm `latest` remains 5.4.5 until 6.0.0 is explicitly published.
+
+The documentation hierarchy is intentionally split between learning material and contract/reference material:
+
+- tutorials/recipes explain workflows;
+- feature guides explain domain behavior and options;
+- API Reference inventories the current public package surface;
+- Advanced contains runtime policy, security, performance, migration, and composition/media depth;
+- Internals/changelog pages are historical/developer context and must not override current runtime/export truth.
 
 ---
 
 ## Where to begin
 
-1. **[Start here](/docs#00-start-here)** — what the library is, install, **`ApexPainter`**, minimal example (**`00-start-here/00-start-here.mdx`**).
-2. **[Feature tracks](/docs#01-feature-tracks)** — every major topic with a **short summary** and **links** into the right overview (**`00-start-here/01-feature-tracks.mdx`**).
-3. **[Beginner guide](/docs#00-beginner-guide)** — first real images and buffers (**`01-beginner-guide/00-beginner-guide.mdx`**).
-4. **[What you can build](/docs#01-what-you-can-build)** — idea catalog (products → APIs); **[Why ApexPainter](/docs#02-philosophy-goals-and-when-to-use)** — goals **`/`** stack; **[Recipes hub](/docs#00-recipes-overview)** — **`recipe-*.mdx`** walkthroughs.
-
-Learning flow lives in **`docs/00-start-here/`** and **`docs/01-beginner-guide/`**. Inspiration and philosophy live under **`docs/02-recipes/`**.
+1. **[Start here](/docs#00-start-here)** — scope, release status, runtime requirements, minimal example.
+2. **[Install & setup](/docs#01-install-and-setup)** — Node/npm/module/FFmpeg requirements.
+3. **[Beginner guide](/docs#00-beginner-guide)** — first real images and buffers.
+4. **[Feature guides](/docs#feature-guides-hub)** — canvas, images, text, charts, GIF, video, raster/output.
+5. **[API reference](/docs#api-reference)** — current exports, `ApexPainter`, facets, configuration, errors, public type domains.
+6. **[Advanced](/docs#00-advanced-overview)** — scenes/templates/assets/plugins/audio/video plus operational guides.
 
 ---
 
 ## Folder map
 
-Numbered folders follow a rough learning path. Each row links to a **hub page** (anchor) when present:
-
 | Folder | Hub | Role |
-|--------|-----|------|
-| **`00-start-here`** | [Start here](/docs#00-start-here), [Feature tracks](/docs#01-feature-tracks) | Orientation + navigation |
-| **`01-beginner-guide`** | [Beginner hub](/docs#00-beginner-guide) | Lessons **`01-`…`05-`** — anchors match **`basename`** |
-| **`02-recipes`** | [Recipes](/docs#00-recipes-overview) · [Philosophy](/docs#02-philosophy-goals-and-when-to-use) · [What you can build](/docs#01-what-you-can-build) | Goals, idea catalog, **`recipe-*.mdx`** |
-| **`03-feature-guides`** | [Feature guides hub](/docs#feature-guides-hub) | Full feature narratives (**includes** [raster, batch, output & **`painter.image**](/docs#00-raster-batch-output-overview)) |
-| **`04-advanced`** | [Advanced hub](/docs#00-advanced-overview) | Scene, composition, [Video (advanced)](/docs#00-video-advanced-hub), [Audio (advanced)](/docs#00-audio-advanced-hub) |
-| **`05-internals`** | [Internals hub](/docs#00-internals-overview) · [Changelog](/docs#changelog) | Code layout, release notes |
+|---|---|---|
+| `00-start-here` | [Start here](/docs#00-start-here) | Orientation/current release status |
+| `01-beginner-guide` | [Beginner hub](/docs#00-beginner-guide) | Installation and first rendering workflows |
+| `02-recipes` | [Recipes](/docs#00-recipes-overview) | Goal-oriented examples |
+| `03-feature-guides` | [Feature guides hub](/docs#feature-guides-hub) | Detailed domain behavior/options |
+| `04-api-reference` | [API reference](/docs#api-reference) | Current public API/package contract |
+| `04-advanced` | [Advanced hub](/docs#00-advanced-overview) | Composition/media depth + runtime/security/performance/migration |
+| `05-internals` | [Internals hub](/docs#00-internals-overview) · [Changelog](/docs#changelog) | Historical/developer notes |
 
 ---
 
-## TypeScript signatures & types
+## Source of truth
 
-There is **no separate generated API micro-site** in this repo: behaviour is documented in **`03-feature-guides/`**, and **signatures** live in **`lib-next/`** (published as **`apexify.js`** and **`apexify.js/types`**).
+For current behavior, use this precedence:
 
-| Looking for | Where |
-|-------------|--------|
-| **`ApexPainter`** methods | **`lib-next/apex-painter/main.ts`** |
-| Exported surface and re-exports | **`lib-next/index.ts`** |
-| Public types | **`lib-next/types/`** (package export **`apexify.js/types`**) |
-| Domain internals | **`lib-next/canvas/`**, **`gif/`**, **`video/`**, **`chart/`**, … |
+1. current merged package source/runtime implementation;
+2. current package exports and generated declarations;
+3. packed-package consumer fixtures/tests;
+4. this API Reference and current guides;
+5. historical internals/changelog material.
+
+If a historical page contradicts a current API-reference page, the historical page is not the runtime contract.
+
+The current public package exposes only declared package exports (`apexify.js`, type-only `apexify.js/types`, and `apexify.js/package.json`). Do not teach or depend on internal `lib-next/*` / `dist/*` paths.
 
 ---
+
+## Operational docs
+
+- [Runtime validation & resource governance](/docs#01-runtime-resource-governance)
+- [Security deployment](/docs#02-security-deployment)
+- [Performance & memory](/docs#03-performance-memory)
+- [Migration to Apexify.js 6](/docs#04-migration-v6)
+
+These are part of the public contract for production/server use, not optional contributor notes.
