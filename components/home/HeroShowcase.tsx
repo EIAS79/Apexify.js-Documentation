@@ -194,11 +194,11 @@ export default function HeroShowcase() {
               type="button"
               className="btn btn-ghost !py-3.5 !px-4 !text-sm font-mono"
               onClick={() => {
-                navigator.clipboard.writeText('npm install github:EIAS79/Apexify.js#ce300541b344e9938db5943b30808171bc707d5b');
+                navigator.clipboard.writeText('npm install github:EIAS79/Apexify.js#d19ccd31ec9f9ccabc4ebd5eaa51ff038f0343a5');
               }}
               title="Copy staged Apexify.js 6 GitHub install command"
             >
-              <span className="opacity-70">$</span> npm i github:EIAS79/Apexify.js#ce300541…
+              <span className="opacity-70">$</span> npm i github:EIAS79/Apexify.js#d19ccd31…
               <ClipboardIcon className="h-4 w-4 opacity-60" />
             </button>
           </div>
