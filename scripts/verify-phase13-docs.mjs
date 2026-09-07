@@ -38,6 +38,20 @@ function sameSet(actual, expected, label) {
   assert(JSON.stringify(a) === JSON.stringify(e), `${label} drifted.\nExpected: ${e.join(', ')}\nActual: ${a.join(', ')}`);
 }
 
+function memberNames(value) {
+  const names = new Set();
+  if (value === null || value === undefined) return names;
+  for (const name of Object.keys(Object(value))) names.add(name);
+  let proto = Object.getPrototypeOf(value);
+  while (proto && proto !== Object.prototype && proto !== Function.prototype) {
+    for (const name of Object.getOwnPropertyNames(proto)) {
+      if (name !== 'constructor') names.add(name);
+    }
+    proto = Object.getPrototypeOf(proto);
+  }
+  return names;
+}
+
 const expectedRuntimeExports = [
   'ApexPainter',
   'ApexifyAssetError',
@@ -152,8 +166,12 @@ const docsDir = path.join(root, 'content', 'docs');
 const mdxFiles = collectFiles(docsDir, (file) => file.endsWith('.mdx'));
 const apiFiles = mdxFiles.filter((file) => file.includes(`${path.sep}04-api-reference${path.sep}`));
 const activeFiles = mdxFiles.filter((file) => !file.includes(`${path.sep}05-internals${path.sep}`));
-const legacyGettingStarted = path.join(root, 'app', 'docs', 'getting-started', 'page.tsx');
-const activeCorpus = [...activeFiles, legacyGettingStarted].map(read).join('\n');
+const userFacingTsx = [
+  ...collectFiles(path.join(root, 'app', 'docs'), (file) => file.endsWith('.tsx')),
+  ...collectFiles(path.join(root, 'components', 'home'), (file) => file.endsWith('.tsx')),
+];
+const activePageFiles = [...activeFiles, ...userFacingTsx];
+const activeCorpus = activePageFiles.map(read).join('\n');
 const apiCorpus = apiFiles.map(read).join('\n');
 
 const requiredDocs = [
@@ -191,6 +209,36 @@ for (const facetMethod of [
   assert(apiCorpus.includes(facetMethod), `API reference does not mention grouped/public method ${facetMethod}`);
 }
 
+// Phase 13.7: audit every active documentation page against the actual installed painter surface.
+const painterMembers = memberNames(painter);
+const groupedSurfaces = {
+  assets: painter.assets,
+  plugins: painter.plugins,
+  components: painter.components,
+  image: painter.image,
+  detect: painter.detect,
+  path2d: painter.path2d,
+  pixels: painter.pixels,
+  output: painter.output,
+  createAudio: painter.createAudio,
+  video: painter.video,
+};
+const groupedMembers = Object.fromEntries(Object.entries(groupedSurfaces).map(([name, value]) => [name, memberNames(value)]));
+
+for (const file of activePageFiles) {
+  const text = read(file);
+  const relative = path.relative(root, file);
+  for (const match of text.matchAll(/\bpainter\.([A-Za-z_$][\w$]*)/g)) {
+    assert(painterMembers.has(match[1]), `${relative} references nonexistent painter.${match[1]}`);
+  }
+  for (const [group, members] of Object.entries(groupedMembers)) {
+    const pattern = new RegExp(`\\bpainter\\.${group}\\.([A-Za-z_$][\\w$]*)`, 'g');
+    for (const match of text.matchAll(pattern)) {
+      assert(members.has(match[1]), `${relative} references nonexistent painter.${group}.${match[1]}`);
+    }
+  }
+}
+
 assert(!/from\s+["']@apexify\//.test(activeCorpus), 'active docs import an unshipped @apexify/* package');
 assert(!/from\s+["']apexify\.js\/(?!types(?:["']|$)|package\.json(?:["']|$))/.test(activeCorpus), 'active docs use an unsupported apexify.js deep import');
 assert(!/Node\.js\s+16\.0\.0\s+or\s+higher/i.test(activeCorpus), 'active docs still claim Node.js 16+');
@@ -198,6 +246,10 @@ assert(!/Node(?:\.js)?\s+20\.x\s+(?:or\s+higher|required|supported)/i.test(activ
 assert(!/(^|[^A-Z_])FFMPEG_PATH\b/m.test(activeCorpus), 'active docs still use bare FFMPEG_PATH instead of APEXIFY_FFMPEG_PATH');
 assert(!/(^|[^A-Z_])FFPROBE_PATH\b/m.test(activeCorpus), 'active docs still use bare FFPROBE_PATH instead of APEXIFY_FFPROBE_PATH');
 assert(!/createCanvas\([^\n]*\)[\s\S]{0,120}(?:is|returns?)\s+(?:a\s+)?(?:base64|string|data URL)/i.test(activeCorpus), 'active docs still imply constructor output type changes createCanvas() return value');
+assert(!/painter\.createChart\s*\(\s*\{/.test(activeCorpus), 'active docs still use the obsolete object-first createChart({ ... }) signature');
+assert(!/v5\.4\.5\s*·\s*charts/i.test(activeCorpus), 'website hero still presents v5.4.5 as the documentation version');
+assert(!/powered by Rust under the hood/i.test(activeCorpus), 'website makes an overbroad Rust implementation claim');
+assert(!/render charts, images, GIFs, slides and video/i.test(activeCorpus), 'website still presents slides as a first-class renderer output');
 
 const docsPackage = JSON.parse(read(path.join(root, 'package.json')));
 const pin = docsPackage.dependencies?.['apexify.js'];
@@ -207,6 +259,7 @@ const pinnedSha = pinMatch[1];
 const lockText = read(path.join(root, 'package-lock.json'));
 assert(lockText.includes(`github:EIAS79/Apexify.js#${pinnedSha}`), 'package-lock root spec does not match the exact Apexify pin');
 assert(lockText.includes(`#${pinnedSha}`), 'package-lock resolved Apexify dependency does not match the exact pin');
+assert(!fs.existsSync(path.join(root, '.github', 'workflows', 'phase13-lock-sync.yml')), 'temporary Phase 13 lock-sync workflow must not ship');
 
 const anchors = new Set();
 for (const file of mdxFiles) {
@@ -221,4 +274,4 @@ for (const file of mdxFiles) {
   }
 }
 
-console.log(`verify-phase13-docs: ${apiFiles.length} API-reference pages, ${mdxFiles.length} MDX pages, package ${packageJson.version}, pin ${pinnedSha.slice(0, 12)}… — PASS`);
+console.log(`verify-phase13-docs: ${apiFiles.length} API-reference pages, ${mdxFiles.length} MDX pages, ${userFacingTsx.length} user-facing TSX pages, package ${packageJson.version}, pin ${pinnedSha.slice(0, 12)}… — PASS`);
