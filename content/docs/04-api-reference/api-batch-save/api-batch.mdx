@@ -1,0 +1,62 @@
+# Batch, chain, save & output APIs {#api-batch}
+
+## `batch()`
+
+```ts
+await painter.batch(operations, opts?);
+```
+
+Returns `Promise<Buffer[]>`. Operation count is bounded by `maxBatchOperations` and active work by `maxBatchConcurrency` (defaults: 256 operations / 4 concurrent). `$asset` resolution is off by default and can be enabled through `BatchChainAssetOpts`.
+
+## `chain()`
+
+```ts
+await painter.chain(operations, opts?);
+```
+
+Returns `Promise<Buffer>`. Operations execute sequentially so the previous result can feed the next operation. The operation collection is still bounded by runtime limits.
+
+## `save()` / `saveMultiple()`
+
+```ts
+await painter.save(buffer, options?);
+await painter.saveMultiple(buffers, options?);
+```
+
+`save()` returns `Promise<SaveResult>`; `saveMultiple()` returns `Promise<SaveResult[]>`. Image output may be persisted/transcoded according to `SaveOptions`. Paths/options are runtime validated before writes where possible.
+
+## `toOutput()`
+
+```ts
+const value = await painter.toOutput(buffer);
+```
+
+Converts a finished `Buffer` using the `ApexPainter` constructor's `outputFormat.type`. Return type is `Promise<Buffer | string | Blob | ArrayBuffer>`.
+
+`painter.outPut(buffer)` is retained only as a **deprecated compatibility alias**. New code should call `toOutput()`.
+
+## `painter.output`
+
+`PainterOutput` exposes direct conversions:
+
+| Method | Return | Notes |
+|---|---|---|
+| `dataURL(buffer)` | `string` | `data:image/png;base64,...` |
+| `base64(buffer)` | `string` | raw base64 without prefix |
+| `blob(buffer)` | `Blob` | Blob containing bytes |
+| `arrayBuffer(buffer)` | `ArrayBuffer` | ArrayBuffer view/copy per implementation contract |
+| `url(buffer, credentials?)` | `Promise<string>` | Upload PNG to Imgur and return public link |
+
+Imgur credentials must be provided explicitly or through the four documented `IMGUR_*` environment variables. Apexify.js contains no default credentials. External-service failures use `ApexifyExternalServiceError`.
+
+## `validHex`
+
+The current hex-color helper is available as `painter.image.validHex(hexColor): boolean`.
+
+## Performance guidance
+
+Use `batch()` for **independent** work only. Higher concurrency can increase native raster/decode memory faster than it improves throughput. Keep `maxBatchConcurrency` based on measured peak memory and latency for the actual workload.
+
+Use `chain()` when work is semantically dependent; do not use it to emulate parallel batching.
+
+See [Raster, batch & output](/docs#00-raster-batch-output-overview) for save naming, formats, output conversion, compression, collage, palette, mask/blend, and Imgur details.
