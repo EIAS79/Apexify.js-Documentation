@@ -1,0 +1,38 @@
+name: Phase 13 lock sync
+
+on:
+  push:
+    branches:
+      - reengineering/phase-13-authoritative-docs
+
+permissions:
+  contents: write
+
+jobs:
+  sync-lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: reengineering/phase-13-authoritative-docs
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Use repository npm version
+        run: npm install --global npm@11.19.1
+      - name: Regenerate lockfile from exact package pin
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Commit lockfile if changed
+        shell: bash
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "package-lock.json already synchronized"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "Phase 13: sync docs package lock to final Apexify SHA"
+          git push origin HEAD:reengineering/phase-13-authoritative-docs
