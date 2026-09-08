@@ -13,6 +13,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: doc0-baseline-audit
+  cancel-in-progress: true
+
 env:
   DOC0_DOCS_BASE_SHA: a52b79e87c3cfa4407d2607c15c6aecacbb2083f
   DOC0_PACKAGE_MAIN_SHA: dbed9743353593eafae9a7b1c25312d7170a233b
