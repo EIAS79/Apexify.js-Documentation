@@ -20,7 +20,15 @@
     "verify:docs": "npm run verify:content && npm run verify:links && node scripts/verify-phase13-docs.mjs && npm run verify:pin",
     "verify": "npm run verify:docs && npm run typecheck && npm run build",
     "gallery:build": "tsx scripts/gallery-build.ts",
-    "gallery:verify": "tsx scripts/verify-gallery-outputs.ts"
+    "gallery:verify": "tsx scripts/verify-gallery-outputs.ts",
+    "docs:audit:baseline": "node scripts/doc0-audit.mjs",
+    "docs:audit:build": "node scripts/doc0-build-baseline.mjs",
+    "docs:audit:links": "node scripts/doc0-link-audit.mjs",
+    "docs:audit:browser": "node scripts/doc0-browser-audit.mjs",
+    "docs:audit:lighthouse": "node scripts/doc0-lighthouse-summary.mjs",
+    "docs:audit:finalize": "node scripts/doc0-finalize-index.mjs",
+    "docs:test:baseline": "node --test scripts/doc0-baseline.test.mjs",
+    "docs:verify:baseline": "node scripts/doc0-validate.mjs"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
