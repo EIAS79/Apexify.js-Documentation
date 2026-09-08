@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 1,
+  "methodology": "Pinned Lighthouse CLI JSON; default mobile and desktop preset. Raw reports are not committed; unstable timestamps are stripped.",
+  "runCount": 7,
+  "records": [
+    {
+      "surface": "docs",
+      "mode": "desktop",
+      "run": 1,
+      "url": "http://127.0.0.1:3000/docs#00-start-here",
+      "lighthouseVersion": "12.8.2",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "scores": {
+        "performance": 0.65,
+        "accessibility": 0.96,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "fcpMs": 261.2615,
+        "lcpMs": 1503.8922499999999,
+        "cls": 0.5400274836606479,
+        "tbtMs": 230.0000000000001,
+        "speedIndexMs": 570.2023629347509,
+        "interactiveMs": 1503.89225,
+        "inpMs": null
+      }
+    },
+    {
+      "surface": "docs",
+      "mode": "desktop",
+      "run": 2,
+      "url": "http://127.0.0.1:3000/docs#00-start-here",
+      "lighthouseVersion": "12.8.2",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "scores": {
+        "performance": 0.68,
+        "accessibility": 0.96,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "fcpMs": 259.909,
+        "lcpMs": 1527.8635000000002,
+        "cls": 0.3531888894003876,
+        "tbtMs": 250.9999999999999,
+        "speedIndexMs": 587.9758195464302,
+        "interactiveMs": 1527.8635000000004,
+        "inpMs": null
+      }
+    },
+    {
+      "surface": "docs",
+      "mode": "mobile",
+      "run": 1,
+      "url": "http://127.0.0.1:3000/docs#00-start-here",
+      "lighthouseVersion": "12.8.2",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "scores": {
+        "performance": 0.53,
+        "accessibility": 0.96,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "fcpMs": 924.3739,
+        "lcpMs": 6194.7478,
+        "cls": 0.030287511879005836,
+        "tbtMs": 1304,
+        "speedIndexMs": 1549.5284542430627,
+        "interactiveMs": 6194.747800000001,
+        "inpMs": null
+      }
+    },
+    {
+      "surface": "docs",
+      "mode": "mobile",
+      "run": 2,
+      "url": "http://127.0.0.1:3000/docs#00-start-here",
+      "lighthouseVersion": "12.8.2",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "scores": {
+        "performance": 0.54,
+        "accessibility": 0.96,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "fcpMs": 919.0207,
+        "lcpMs": 6184.0414,
+        "cls": 0.009852231879197338,
+        "tbtMs": 1231,
+        "speedIndexMs": 1502.0105525341155,
+        "interactiveMs": 6184.0414,
+        "inpMs": null
+      }
+    },
+    {
+      "surface": "gallery",
+      "mode": "mobile",
+      "run": 1,
+      "url": "http://127.0.0.1:3000/gallery",
+      "lighthouseVersion": "12.8.2",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "scores": {
+        "performance": 0.55,
+        "accessibility": 0.89,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "fcpMs": 1075.5961,
+        "lcpMs": 14220.091225,
+        "cls": 0,
+        "tbtMs": 876.5,
+        "speedIndexMs": 1838.8266002892233,
+        "interactiveMs": 14963.201322500001,
+        "inpMs": null
+      }
+    },
+    {
+      "surface": "home",
+      "mode": "mobile",
+      "run": 1,
+      "url": "http://127.0.0.1:3000/",
+      "lighthouseVersion": "12.8.2",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "scores": {
+        "performance": 0.49,
+        "accessibility": 0.92,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "fcpMs": 1075.9415,
+        "lcpMs": 7543.883,
+        "cls": 0,
+        "tbtMs": 1531.02925,
+        "speedIndexMs": 3275.135072453145,
+        "interactiveMs": 7558.883,
+        "inpMs": null
+      }
+    },
+    {
+      "surface": "studio",
+      "mode": "mobile",
+      "run": 1,
+      "url": "http://127.0.0.1:3000/studio",
+      "lighthouseVersion": "12.8.2",
+      "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+      "scores": {
+        "performance": 0.8,
+        "accessibility": 0.87,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "metrics": {
+        "fcpMs": 914.8449,
+        "lcpMs": 4501.5347,
+        "cls": 0.044649950843416164,
+        "tbtMs": 213,
+        "speedIndexMs": 2082.579189137812,
+        "interactiveMs": 4507.5347,
+        "inpMs": null
+      }
+    }
+  ],
+  "summary": {
+    "docs:desktop": {
+      "runs": 2,
+      "medianScores": {
+        "performance": 0.665,
+        "accessibility": 0.96,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "medianMetrics": {
+        "fcpMs": 260.58525,
+        "lcpMs": 1515.8778750000001,
+        "cls": 0.44660818653051776,
+        "tbtMs": 240.5,
+        "speedIndexMs": 579.0890912405905,
+        "interactiveMs": 1515.8778750000001,
+        "inpMs": null
+      }
+    },
+    "docs:mobile": {
+      "runs": 2,
+      "medianScores": {
+        "performance": 0.535,
+        "accessibility": 0.96,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "medianMetrics": {
+        "fcpMs": 921.6973,
+        "lcpMs": 6189.3946,
+        "cls": 0.020069871879101586,
+        "tbtMs": 1267.5,
+        "speedIndexMs": 1525.769503388589,
+        "interactiveMs": 6189.3946000000005,
+        "inpMs": null
+      }
+    },
+    "gallery:mobile": {
+      "runs": 1,
+      "medianScores": {
+        "performance": 0.55,
+        "accessibility": 0.89,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "medianMetrics": {
+        "fcpMs": 1075.5961,
+        "lcpMs": 14220.091225,
+        "cls": 0,
+        "tbtMs": 876.5,
+        "speedIndexMs": 1838.8266002892233,
+        "interactiveMs": 14963.201322500001,
+        "inpMs": null
+      }
+    },
+    "home:mobile": {
+      "runs": 1,
+      "medianScores": {
+        "performance": 0.49,
+        "accessibility": 0.92,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "medianMetrics": {
+        "fcpMs": 1075.9415,
+        "lcpMs": 7543.883,
+        "cls": 0,
+        "tbtMs": 1531.02925,
+        "speedIndexMs": 3275.135072453145,
+        "interactiveMs": 7558.883,
+        "inpMs": null
+      }
+    },
+    "studio:mobile": {
+      "runs": 1,
+      "medianScores": {
+        "performance": 0.8,
+        "accessibility": 0.87,
+        "bestPractices": 0.96,
+        "seo": 1
+      },
+      "medianMetrics": {
+        "fcpMs": 914.8449,
+        "lcpMs": 4501.5347,
+        "cls": 0.044649950843416164,
+        "tbtMs": 213,
+        "speedIndexMs": 2082.579189137812,
+        "interactiveMs": 4507.5347,
+        "inpMs": null
+      }
+    }
+  }
+}

@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v24.20.0",
+    "npm": "11.19.1",
+    "osRelease": "6.17.0-1022-azure",
+    "cpuModel": "AMD EPYC 7763 64-Core Processor",
+    "cpuCount": 4,
+    "totalMemoryBytes": 16766406656
+  },
+  "methodology": {
+    "cleanBeforeEachSample": true,
+    "samples": 2,
+    "command": "npm run build",
+    "telemetryDisabled": true,
+    "timing": "monotonic wall-clock process time"
+  },
+  "status": "PASS",
+  "samples": [
+    {
+      "sample": 1,
+      "elapsedMs": 37778.994,
+      "exitCode": 0,
+      "signal": null,
+      "warningLines": [],
+      "routeTableLines": [
+        "⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache",
+        "Route (app)                              Size     First Load JS",
+        "┌ ○ /                                    18.6 kB         164 kB",
+        "├ ○ /_not-found                          150 B          87.5 kB",
+        "├ ƒ /api/docs                            0 B                0 B",
+        "├ ƒ /api/docs/search                     0 B                0 B",
+        "├ ƒ /api/gallery/run                     0 B                0 B",
+        "├ ○ /apple-icon                          0 B                0 B",
+        "├ ○ /docs                                81.3 kB         462 kB",
+        "├ ○ /docs/api                            150 B          87.5 kB",
+        "├ ○ /docs/getting-started                549 B          90.9 kB",
+        "├ ○ /gallery                             18.6 kB         617 kB",
+        "└ ○ /studio                              23.6 kB         336 kB",
+        "+ First Load JS shared by all            87.3 kB",
+        "ƒ Middleware                             26.5 kB",
+        "○  (Static)   prerendered as static content",
+        "ƒ  (Dynamic)  server-rendered on demand"
+      ]
+    },
+    {
+      "sample": 2,
+      "elapsedMs": 37310.249,
+      "exitCode": 0,
+      "signal": null,
+      "warningLines": [],
+      "routeTableLines": [
+        "⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache",
+        "Route (app)                              Size     First Load JS",
+        "┌ ○ /                                    18.6 kB         164 kB",
+        "├ ○ /_not-found                          150 B          87.5 kB",
+        "├ ƒ /api/docs                            0 B                0 B",
+        "├ ƒ /api/docs/search                     0 B                0 B",
+        "├ ƒ /api/gallery/run                     0 B                0 B",
+        "├ ○ /apple-icon                          0 B                0 B",
+        "├ ○ /docs                                81.3 kB         462 kB",
+        "├ ○ /docs/api                            150 B          87.5 kB",
+        "├ ○ /docs/getting-started                549 B          90.9 kB",
+        "├ ○ /gallery                             18.6 kB         617 kB",
+        "└ ○ /studio                              23.6 kB         336 kB",
+        "+ First Load JS shared by all            87.3 kB",
+        "ƒ Middleware                             26.5 kB",
+        "○  (Static)   prerendered as static content",
+        "ƒ  (Dynamic)  server-rendered on demand"
+      ]
+    }
+  ],
+  "summary": {
+    "medianMs": 37544.622,
+    "minMs": 37310.249,
+    "maxMs": 37778.994,
+    "p95Ms": 37778.994
+  },
+  "builtRoutes": [
+    {
+      "key": "/_not-found/page",
+      "route": "/_not-found",
+      "type": "page",
+      "rendering": "dynamic/non-prerendered"
+    },
+    {
+      "key": "/page",
+      "route": "/",
+      "type": "page",
+      "rendering": "static/prerendered"
+    },
+    {
+      "key": "/api/docs/route",
+      "route": "/api/docs",
+      "type": "api/route-handler",
+      "rendering": "server"
+    },
+    {
+      "key": "/api/docs/search/route",
+      "route": "/api/docs/search",
+      "type": "api/route-handler",
+      "rendering": "server"
+    },
+    {
+      "key": "/api/gallery/run/route",
+      "route": "/api/gallery/run",
+      "type": "api/route-handler",
+      "rendering": "server"
+    },
+    {
+      "key": "/apple-icon/route",
+      "route": "/apple-icon",
+      "type": "api/route-handler",
+      "rendering": "server"
+    },
+    {
+      "key": "/docs/page",
+      "route": "/docs",
+      "type": "page",
+      "rendering": "static/prerendered"
+    },
+    {
+      "key": "/docs/api/page",
+      "route": "/docs/api",
+      "type": "page",
+      "rendering": "static/prerendered"
+    },
+    {
+      "key": "/docs/getting-started/page",
+      "route": "/docs/getting-started",
+      "type": "page",
+      "rendering": "static/prerendered"
+    },
+    {
+      "key": "/gallery/page",
+      "route": "/gallery",
+      "type": "page",
+      "rendering": "static/prerendered"
+    },
+    {
+      "key": "/studio/page",
+      "route": "/studio",
+      "type": "page",
+      "rendering": "static/prerendered"
+    }
+  ],
+  "builtRouteCounts": {
+    "total": 11,
+    "pages": 7,
+    "apiRoutes": 4,
+    "staticPages": 6,
+    "dynamicPages": 1
+  }
+}

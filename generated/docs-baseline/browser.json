@@ -1,0 +1,631 @@
+{
+  "schemaVersion": 1,
+  "environment": {
+    "chromePath": "/usr/bin/google-chrome",
+    "browserVersion": "Chrome/152.0.7977.64",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "baseUrl": "http://127.0.0.1:3000",
+    "puppeteerVersion": "24.16.0",
+    "axeVersion": "4.10.3"
+  },
+  "methodology": "Headless Chromium production-server audit; cache disabled; JS bytes from Resource Timing.",
+  "routes": [
+    {
+      "key": "docs:desktop",
+      "surface": "docs",
+      "viewport": "desktop",
+      "url": "/docs#00-start-here",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 23,
+        "transferBytes": 766174,
+        "encodedBytes": 759274,
+        "decodedBytes": 2451943,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+          "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+          "<BASE>/_next/static/chunks/app/gallery/page-9553d07a08cbcace.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 33,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "docs:mobile",
+      "surface": "docs",
+      "viewport": "mobile",
+      "url": "/docs#00-start-here",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 18,
+        "transferBytes": 551290,
+        "encodedBytes": 545890,
+        "decodedBytes": 1769532,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+          "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 26,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "docs:tablet",
+      "surface": "docs",
+      "viewport": "tablet",
+      "url": "/docs#00-start-here",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 23,
+        "transferBytes": 766174,
+        "encodedBytes": 759274,
+        "decodedBytes": 2451943,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+          "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+          "<BASE>/_next/static/chunks/app/gallery/page-9553d07a08cbcace.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 33,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "gallery:desktop",
+      "surface": "gallery",
+      "viewport": "desktop",
+      "url": "/gallery",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 23,
+        "transferBytes": 766174,
+        "encodedBytes": 759274,
+        "decodedBytes": 2451943,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+          "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+          "<BASE>/_next/static/chunks/app/gallery/page-9553d07a08cbcace.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 41,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "gallery:mobile",
+      "surface": "gallery",
+      "viewport": "mobile",
+      "url": "/gallery",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 17,
+        "transferBytes": 647368,
+        "encodedBytes": 642268,
+        "decodedBytes": 2041599,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/gallery/page-9553d07a08cbcace.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 27,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "gallery:tablet",
+      "surface": "gallery",
+      "viewport": "tablet",
+      "url": "/gallery",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 23,
+        "transferBytes": 766174,
+        "encodedBytes": 759274,
+        "decodedBytes": 2451943,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+          "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+          "<BASE>/_next/static/chunks/app/gallery/page-9553d07a08cbcace.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 37,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "home:desktop",
+      "surface": "home",
+      "viewport": "desktop",
+      "url": "/",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 23,
+        "transferBytes": 766174,
+        "encodedBytes": 759274,
+        "decodedBytes": 2451943,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+          "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+          "<BASE>/_next/static/chunks/app/gallery/page-9553d07a08cbcace.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 37,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "home:mobile",
+      "surface": "home",
+      "viewport": "mobile",
+      "url": "/",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 22,
+        "transferBytes": 747242,
+        "encodedBytes": 740642,
+        "decodedBytes": 2374923,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+          "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 30,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "home:tablet",
+      "surface": "home",
+      "viewport": "tablet",
+      "url": "/",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 23,
+        "transferBytes": 766174,
+        "encodedBytes": 759274,
+        "decodedBytes": 2451943,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+          "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+          "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+          "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+          "<BASE>/_next/static/chunks/app/gallery/page-9553d07a08cbcace.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 35,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "studio:desktop",
+      "surface": "studio",
+      "viewport": "desktop",
+      "url": "/studio",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 16,
+        "transferBytes": 369603,
+        "encodedBytes": 364803,
+        "decodedBytes": 1176714,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 23,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "studio:mobile",
+      "surface": "studio",
+      "viewport": "mobile",
+      "url": "/studio",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 16,
+        "transferBytes": 369603,
+        "encodedBytes": 364803,
+        "decodedBytes": 1176714,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 23,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    },
+    {
+      "key": "studio:tablet",
+      "surface": "studio",
+      "viewport": "tablet",
+      "url": "/studio",
+      "status": 200,
+      "ok": true,
+      "js": {
+        "count": 16,
+        "transferBytes": 369603,
+        "encodedBytes": 364803,
+        "decodedBytes": 1176714,
+        "urls": [
+          "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+          "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+          "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+          "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+          "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+          "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+          "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+          "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+          "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+          "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+          "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+          "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+          "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+          "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+          "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+          "<BASE>/_vercel/speed-insights/script.js"
+        ]
+      },
+      "resourceCount": 23,
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      ],
+      "pageErrors": [],
+      "requestFailures": [
+        {
+          "url": "<BASE>/_vercel/speed-insights/script.js",
+          "error": "net::ERR_ABORTED"
+        }
+      ]
+    }
+  ],
+  "search": {
+    "surface": "docs-sidebar-search",
+    "query": "canvas",
+    "resultCount": 20,
+    "endpointDurationsMs": [
+      12.9,
+      9.1,
+      10.8
+    ],
+    "endpointMedianMs": 10.8,
+    "initialDocsJs": {
+      "count": 23,
+      "transferBytes": 766174,
+      "encodedBytes": 759274,
+      "decodedBytes": 2451943,
+      "urls": [
+        "<BASE>/_next/static/chunks/117-a627bfaad15e34a1.js",
+        "<BASE>/_next/static/chunks/232-05f578251d4a7764.js",
+        "<BASE>/_next/static/chunks/363642f4-a8ca11fa1d0cc6b6.js",
+        "<BASE>/_next/static/chunks/478-057c471d99efd3f0.js",
+        "<BASE>/_next/static/chunks/679-1d6b8706d43d502a.js",
+        "<BASE>/_next/static/chunks/707-e28efdfb978f9613.js",
+        "<BASE>/_next/static/chunks/776-b7f2869424a7ccf0.js",
+        "<BASE>/_next/static/chunks/787-02efce08846c97ee.js",
+        "<BASE>/_next/static/chunks/806-4434b935255014b2.js",
+        "<BASE>/_next/static/chunks/835-2e888597b67d0860.js",
+        "<BASE>/_next/static/chunks/849-7b0ab1fbafb6be31.js",
+        "<BASE>/_next/static/chunks/972-a5fcc930e50a4ee8.js",
+        "<BASE>/_next/static/chunks/app/docs/layout-01bf1fa0b0066af4.js",
+        "<BASE>/_next/static/chunks/app/docs/page-8261806efc186ca8.js",
+        "<BASE>/_next/static/chunks/app/gallery/page-9553d07a08cbcace.js",
+        "<BASE>/_next/static/chunks/app/layout-14c7d39cdf9fde1c.js",
+        "<BASE>/_next/static/chunks/app/not-found-5235c1969e871825.js",
+        "<BASE>/_next/static/chunks/app/page-4ebc0c3b5c24964b.js",
+        "<BASE>/_next/static/chunks/app/studio/page-60e1da6ea7cf5a0e.js",
+        "<BASE>/_next/static/chunks/fd9d1056-0615e1e217504726.js",
+        "<BASE>/_next/static/chunks/main-app-ba549686b79b189e.js",
+        "<BASE>/_next/static/chunks/webpack-51d49af0b60d1bb9.js",
+        "<BASE>/_vercel/speed-insights/script.js"
+      ]
+    },
+    "incrementalJsAfterSearch": {
+      "count": 0,
+      "transferBytes": 0,
+      "encodedBytes": 0,
+      "decodedBytes": 0,
+      "urls": []
+    },
+    "note": "Zero incremental JS means search is already in the initial docs client graph."
+  }
+}

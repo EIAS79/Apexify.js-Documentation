@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "baselineIdentity": {
+    "repository": "EIAS79/Apexify.js-Documentation",
+    "docsBaseSha": "a52b79e87c3cfa4407d2607c15c6aecacbb2083f",
+    "packageMainSha": "dbed9743353593eafae9a7b1c25312d7170a233b",
+    "phase14pFrozenSha": "5d9b71f185140d6c3477286b8fb111f293e52b48",
+    "phase14pBranch": "phase14p-baseline",
+    "packageVersion": "6.0.0",
+    "auditBranchSha": "6f651c926824d96f1d953be435cfc77ebec7e5bc",
+    "baselineSchemaVersion": 1
+  },
+  "environment": {
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v24.20.0",
+    "npm": "11.19.1",
+    "osRelease": "6.17.0-1022-azure",
+    "cpuModel": "AMD EPYC 7763 64-Core Processor",
+    "cpuCount": 4,
+    "totalMemoryBytes": 16766406656
+  },
+  "methods": {
+    "staticInventory": "filesystem/import-regex; stable sorting; generated/.next excluded",
+    "bundle": "Next app-build-manifest JS byte sum",
+    "build": "scripts/doc0-build-baseline.mjs",
+    "browser": "headless Chromium + axe-core",
+    "lighthouse": "pinned CLI JSON summarized"
+  },
+  "normalizationWarning": "Performance values are valid only for the recorded environment."
+}

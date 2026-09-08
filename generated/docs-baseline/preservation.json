@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "requirements": [
+    {
+      "id": "PRES-001",
+      "item": "Existing docs corpus",
+      "requirement": "No deletion without DOC-9 coverage decision."
+    },
+    {
+      "id": "PRES-002",
+      "item": "Legacy /docs# hashes",
+      "requirement": "Map every current hash and alias before retirement."
+    },
+    {
+      "id": "PRES-003",
+      "item": "Deep heading links",
+      "requirement": "Preserve heading IDs/?h semantics or aliases."
+    },
+    {
+      "id": "PRES-004",
+      "item": "Docs navigation",
+      "requirement": "Preserve sidebar/breadcrumbs/pager/progress/TOC/mobile access."
+    },
+    {
+      "id": "PRES-005",
+      "item": "Search",
+      "requirement": "Preserve keyboard search and result navigation before replacement."
+    },
+    {
+      "id": "PRES-006",
+      "item": "Examples",
+      "requirement": "Preserve code/copy/switcher/preview/Studio affordances."
+    },
+    {
+      "id": "PRES-007",
+      "item": "Gallery",
+      "requirement": "Preserve sources/snippets/outputs/filters/detail/generation."
+    },
+    {
+      "id": "PRES-008",
+      "item": "Studio",
+      "requirement": "Preserve editor/execution/preview/session/error behavior."
+    },
+    {
+      "id": "PRES-009",
+      "item": "Theme",
+      "requirement": "Preserve light/dark/system and contrast."
+    },
+    {
+      "id": "PRES-010",
+      "item": "Responsive",
+      "requirement": "Do not regress desktop/tablet/mobile/overflow behavior."
+    },
+    {
+      "id": "PRES-011",
+      "item": "Accessibility",
+      "requirement": "Preserve existing semantics/focus/labels/reduced-motion support."
+    },
+    {
+      "id": "PRES-012",
+      "item": "SEO/public links",
+      "requirement": "Preserve inbound links; avoid duplicate indexable old/new pages."
+    },
+    {
+      "id": "PRES-013",
+      "item": "Verified package claims",
+      "requirement": "No speculative Phase15+ stable APIs."
+    },
+    {
+      "id": "PRES-014",
+      "item": "Package/docs sync",
+      "requirement": "Retain or supersede exact pin/drift guards."
+    }
+  ],
+  "legacyLinkCount": 155,
+  "contentCount": 148
+}

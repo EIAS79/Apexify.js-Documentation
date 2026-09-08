@@ -1,0 +1,3621 @@
+{
+  "schemaVersion": 1,
+  "aliases": [
+    {
+      "alias": "api-index",
+      "target": "api-reference",
+      "from": "/docs#api-index",
+      "to": "/docs#api-reference"
+    },
+    {
+      "alias": "Change-Log",
+      "target": "changelog",
+      "from": "/docs#Change-Log",
+      "to": "/docs#changelog"
+    },
+    {
+      "alias": "create-charts",
+      "target": "charts",
+      "from": "/docs#create-charts",
+      "to": "/docs#charts"
+    },
+    {
+      "alias": "create-gifs",
+      "target": "gif-and-animation",
+      "from": "/docs#create-gifs",
+      "to": "/docs#gif-and-animation"
+    },
+    {
+      "alias": "create-videos",
+      "target": "video-ffmpeg",
+      "from": "/docs#create-videos",
+      "to": "/docs#video-ffmpeg"
+    },
+    {
+      "alias": "Getting-Started",
+      "target": "00-start-here",
+      "from": "/docs#Getting-Started",
+      "to": "/docs#00-start-here"
+    },
+    {
+      "alias": "start-here",
+      "target": "00-start-here",
+      "from": "/docs#start-here",
+      "to": "/docs#00-start-here"
+    }
+  ],
+  "hardCodedDocHashes": [
+    {
+      "file": "content/docs/00-start-here/00-start-here.mdx",
+      "hash": "00-advanced-overview",
+      "url": "/docs#00-advanced-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-advanced-overview",
+      "url": "/docs#00-advanced-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "00-advanced-overview",
+      "url": "/docs#00-advanced-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-advanced-overview",
+      "url": "/docs#00-advanced-overview"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "00-advanced-overview",
+      "url": "/docs#00-advanced-overview"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "00-advanced-overview",
+      "url": "/docs#00-advanced-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-audio-advanced-hub",
+      "url": "/docs#00-audio-advanced-hub"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-audio-advanced-hub",
+      "url": "/docs#00-audio-advanced-hub"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/06-audio-deep-dive.mdx",
+      "hash": "00-audio-advanced-hub",
+      "url": "/docs#00-audio-advanced-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "00-audio-advanced-hub",
+      "url": "/docs#00-audio-advanced-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "hash": "00-audio-advanced-hub",
+      "url": "/docs#00-audio-advanced-hub"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "00-audio-advanced-hub",
+      "url": "/docs#00-audio-advanced-hub"
+    },
+    {
+      "file": "content/docs/03-feature-guides/batch-save-output/03-imgur-output-security.mdx",
+      "hash": "00-batch-save-output-overview",
+      "url": "/docs#00-batch-save-output-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-batch-save-output-overview",
+      "url": "/docs#00-batch-save-output-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/00-start-here.mdx",
+      "hash": "00-beginner-guide",
+      "url": "/docs#00-beginner-guide"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-beginner-guide",
+      "url": "/docs#00-beginner-guide"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "00-beginner-guide",
+      "url": "/docs#00-beginner-guide"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "00-beginner-guide",
+      "url": "/docs#00-beginner-guide"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "00-beginner-guide",
+      "url": "/docs#00-beginner-guide"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-charts-overview",
+      "url": "/docs#00-charts-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-charts-overview",
+      "url": "/docs#00-charts-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-charts-overview",
+      "url": "/docs#00-charts-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-charts-overview",
+      "url": "/docs#00-charts-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/03-scene-layers-charts.mdx",
+      "hash": "00-charts-overview",
+      "url": "/docs#00-charts-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/03-scene-layers-charts.mdx",
+      "hash": "00-charts-overview",
+      "url": "/docs#00-charts-overview"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-charts/api-create-chart.mdx",
+      "hash": "00-charts-overview",
+      "url": "/docs#00-charts-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-composition-hub",
+      "url": "/docs#00-composition-hub"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-composition-hub",
+      "url": "/docs#00-composition-hub"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-composition-hub",
+      "url": "/docs#00-composition-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "00-composition-hub",
+      "url": "/docs#00-composition-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/05-imperative-batch-chain-assets.mdx",
+      "hash": "00-composition-hub",
+      "url": "/docs#00-composition-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "00-composition-hub",
+      "url": "/docs#00-composition-hub"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "00-composition-hub",
+      "url": "/docs#00-composition-hub"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/05-common-mistakes.mdx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/recipe-share-card.mdx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-create-canvas-overview",
+      "url": "/docs#00-create-canvas-overview"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-create-gif-overview",
+      "url": "/docs#00-create-gif-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-create-gif-overview",
+      "url": "/docs#00-create-gif-overview"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "00-create-gif-overview",
+      "url": "/docs#00-create-gif-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-create-gif-overview",
+      "url": "/docs#00-create-gif-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-create-gif-overview",
+      "url": "/docs#00-create-gif-overview"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-gif/api-create-gif.mdx",
+      "hash": "00-create-gif-overview",
+      "url": "/docs#00-create-gif-overview"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-create-image-overview",
+      "url": "/docs#00-create-image-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-create-image-overview",
+      "url": "/docs#00-create-image-overview"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "00-create-image-overview",
+      "url": "/docs#00-create-image-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-create-image-overview",
+      "url": "/docs#00-create-image-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/recipe-share-card.mdx",
+      "hash": "00-create-image-overview",
+      "url": "/docs#00-create-image-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "00-create-image-overview",
+      "url": "/docs#00-create-image-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-create-image-overview",
+      "url": "/docs#00-create-image-overview"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-create-text-overview",
+      "url": "/docs#00-create-text-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-create-text-overview",
+      "url": "/docs#00-create-text-overview"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "00-create-text-overview",
+      "url": "/docs#00-create-text-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-create-text-overview",
+      "url": "/docs#00-create-text-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "00-create-text-overview",
+      "url": "/docs#00-create-text-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-create-text-overview",
+      "url": "/docs#00-create-text-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-custom-lines-overview",
+      "url": "/docs#00-custom-lines-overview"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "00-custom-lines-overview",
+      "url": "/docs#00-custom-lines-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-custom-lines-overview",
+      "url": "/docs#00-custom-lines-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-custom-lines-overview",
+      "url": "/docs#00-custom-lines-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/05-hit-testing-paths.mdx",
+      "hash": "00-custom-lines-overview",
+      "url": "/docs#00-custom-lines-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/09-path2d-draw-and-custom-lines.mdx",
+      "hash": "00-custom-lines-overview",
+      "url": "/docs#00-custom-lines-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/10-hit-detection.mdx",
+      "hash": "00-custom-lines-overview",
+      "url": "/docs#00-custom-lines-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-internals-overview",
+      "url": "/docs#00-internals-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-internals-overview",
+      "url": "/docs#00-internals-overview"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "00-internals-overview",
+      "url": "/docs#00-internals-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/04-save-and-export.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/batch-save-output/00-batch-save-output-overview.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-batch-save/api-batch.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-image/api-image-utilities.mdx",
+      "hash": "00-raster-batch-output-overview",
+      "url": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-recipes-overview",
+      "url": "/docs#00-recipes-overview"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-recipes-overview",
+      "url": "/docs#00-recipes-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-recipes-overview",
+      "url": "/docs#00-recipes-overview"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "00-recipes-overview",
+      "url": "/docs#00-recipes-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-recipes-overview",
+      "url": "/docs#00-recipes-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/02-philosophy-goals-and-when-to-use.mdx",
+      "hash": "00-recipes-overview",
+      "url": "/docs#00-recipes-overview"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "00-recipes-overview",
+      "url": "/docs#00-recipes-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-hub.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "00-scene-composition",
+      "url": "/docs#00-scene-composition"
+    },
+    {
+      "file": ".github/workflows/doc0-baseline.yml",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": ".github/workflows/doc0-baseline.yml",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": ".github/workflows/doc0-baseline.yml",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": ".github/workflows/doc0-baseline.yml",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "app/gallery/components/GalleryClient.tsx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "components/DocHeader.tsx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "components/docs/DocBreadcrumbs.tsx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "components/home/HeroShowcase.tsx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "components/Navbar.tsx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "scripts/doc0-browser-audit.mjs",
+      "hash": "00-start-here",
+      "url": "/docs#00-start-here"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-video-advanced-hub",
+      "url": "/docs#00-video-advanced-hub"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-video-advanced-hub",
+      "url": "/docs#00-video-advanced-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "00-video-advanced-hub",
+      "url": "/docs#00-video-advanced-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/08-render-scene-to-video.mdx",
+      "hash": "00-video-advanced-hub",
+      "url": "/docs#00-video-advanced-hub"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "00-video-advanced-hub",
+      "url": "/docs#00-video-advanced-hub"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-video-options-hub",
+      "url": "/docs#00-video-options-hub"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-video-options-hub",
+      "url": "/docs#00-video-options-hub"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-video-options-hub",
+      "url": "/docs#00-video-options-hub"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "00-video-options-hub",
+      "url": "/docs#00-video-options-hub"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "00-video-options-hub",
+      "url": "/docs#00-video-options-hub"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "00-video-options-hub",
+      "url": "/docs#00-video-options-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "00-video-options-hub",
+      "url": "/docs#00-video-options-hub"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/06-advanced-presets-transitions.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/09-security-runtime-configuration.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/08-render-scene-to-video.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-video/api-create-video.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "00-video-overview",
+      "url": "/docs#00-video-overview"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "01-batch-and-chain",
+      "url": "/docs#01-batch-and-chain"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "01-batch-and-chain",
+      "url": "/docs#01-batch-and-chain"
+    },
+    {
+      "file": "content/docs/03-feature-guides/batch-save-output/00-batch-save-output-overview.mdx",
+      "hash": "01-batch-and-chain",
+      "url": "/docs#01-batch-and-chain"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "01-batch-and-chain",
+      "url": "/docs#01-batch-and-chain"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "01-canvas-size-and-coordinates",
+      "url": "/docs#01-canvas-size-and-coordinates"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "01-charts-shared-appearance",
+      "url": "/docs#01-charts-shared-appearance"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/02-chart-pie-and-donut.mdx",
+      "hash": "01-charts-shared-appearance",
+      "url": "/docs#01-charts-shared-appearance"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/03-chart-bar-vertical.mdx",
+      "hash": "01-charts-shared-appearance",
+      "url": "/docs#01-charts-shared-appearance"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/09-chart-combo.mdx",
+      "hash": "01-charts-shared-appearance",
+      "url": "/docs#01-charts-shared-appearance"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/03-audio.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/06-audio-deep-dive.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/08-render-scene-to-video.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-audio/api-create-audio.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "01-create-audio",
+      "url": "/docs#01-create-audio"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/00-custom-lines-overview.mdx",
+      "hash": "01-create-custom-api",
+      "url": "/docs#01-create-custom-api"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/02-custom-line-style-path.mdx",
+      "hash": "01-create-custom-api",
+      "url": "/docs#01-create-custom-api"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/04-scene-layers-custom-lines-surface.mdx",
+      "hash": "01-create-custom-api",
+      "url": "/docs#01-create-custom-api"
+    },
+    {
+      "file": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "hash": "01-create-gif-input-frames",
+      "url": "/docs#01-create-gif-input-frames"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "01-create-image-basics",
+      "url": "/docs#01-create-image-basics"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/02-scene-layers-raster-text-path.mdx",
+      "hash": "01-create-image-basics",
+      "url": "/docs#01-create-image-basics"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "01-create-text-font-and-position",
+      "url": "/docs#01-create-text-font-and-position"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/01-metadata-and-frames.mdx",
+      "hash": "01-discovery-metadata",
+      "url": "/docs#01-discovery-metadata"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "01-discovery-metadata",
+      "url": "/docs#01-discovery-metadata"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "01-discovery-metadata",
+      "url": "/docs#01-discovery-metadata"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "01-feature-tracks",
+      "url": "/docs#01-feature-tracks"
+    },
+    {
+      "file": "content/docs/05-internals/00-internals-overview.mdx",
+      "hash": "01-feature-tracks",
+      "url": "/docs#01-feature-tracks"
+    },
+    {
+      "file": "content/docs/00-start-here/00-start-here.mdx",
+      "hash": "01-install-and-setup",
+      "url": "/docs#01-install-and-setup"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "01-install-and-setup",
+      "url": "/docs#01-install-and-setup"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "01-install-and-setup",
+      "url": "/docs#01-install-and-setup"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "01-install-and-setup",
+      "url": "/docs#01-install-and-setup"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "01-install-and-setup",
+      "url": "/docs#01-install-and-setup"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "01-metadata-and-frames",
+      "url": "/docs#01-metadata-and-frames"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "01-metadata-and-frames",
+      "url": "/docs#01-metadata-and-frames"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/08-imperative-video-helpers.mdx",
+      "hash": "01-metadata-and-frames",
+      "url": "/docs#01-metadata-and-frames"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "01-named-assets",
+      "url": "/docs#01-named-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "01-named-assets",
+      "url": "/docs#01-named-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "01-named-assets",
+      "url": "/docs#01-named-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "01-named-assets",
+      "url": "/docs#01-named-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/06-render-scene.mdx",
+      "hash": "01-named-assets",
+      "url": "/docs#01-named-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "01-named-assets",
+      "url": "/docs#01-named-assets"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/01-install-and-setup.mdx",
+      "hash": "01-runtime-resource-governance",
+      "url": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/08-imperative-video-helpers.mdx",
+      "hash": "01-runtime-resource-governance",
+      "url": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "01-runtime-resource-governance",
+      "url": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "01-runtime-resource-governance",
+      "url": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "hash": "01-runtime-resource-governance",
+      "url": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-overview/api-reference.mdx",
+      "hash": "01-runtime-resource-governance",
+      "url": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-scene/api-new-apex-painter.mdx",
+      "hash": "01-runtime-resource-governance",
+      "url": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "01-runtime-resource-governance",
+      "url": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "01-scene-types-builder",
+      "url": "/docs#01-scene-types-builder"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/03-audio.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/08-imperative-video-helpers.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/04-timeline-edits.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/06-audio-deep-dive.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/08-text-overlays.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/08-render-scene-to-video.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-video/api-create-video.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "01-video-pipeline",
+      "url": "/docs#01-video-pipeline"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "01-what-you-can-build",
+      "url": "/docs#01-what-you-can-build"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "01-what-you-can-build",
+      "url": "/docs#01-what-you-can-build"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "01-what-you-can-build",
+      "url": "/docs#01-what-you-can-build"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "01-what-you-can-build",
+      "url": "/docs#01-what-you-can-build"
+    },
+    {
+      "file": "content/docs/02-recipes/02-philosophy-goals-and-when-to-use.mdx",
+      "hash": "01-what-you-can-build",
+      "url": "/docs#01-what-you-can-build"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "01-what-you-can-build",
+      "url": "/docs#01-what-you-can-build"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/05-common-mistakes.mdx",
+      "hash": "02-backgrounds-primary",
+      "url": "/docs#02-backgrounds-primary"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "02-backgrounds-primary",
+      "url": "/docs#02-backgrounds-primary"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "02-backgrounds-primary",
+      "url": "/docs#02-backgrounds-primary"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/05-scene-backgrounds.mdx",
+      "hash": "02-backgrounds-primary",
+      "url": "/docs#02-backgrounds-primary"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "02-chart-pie-and-donut",
+      "url": "/docs#02-chart-pie-and-donut"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "02-chart-pie-and-donut",
+      "url": "/docs#02-chart-pie-and-donut"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/01-charts-shared-appearance.mdx",
+      "hash": "02-chart-pie-and-donut",
+      "url": "/docs#02-chart-pie-and-donut"
+    },
+    {
+      "file": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "hash": "02-create-gif-options-output",
+      "url": "/docs#02-create-gif-options-output"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "02-create-text-wrapping-spacing",
+      "url": "/docs#02-create-text-wrapping-spacing"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/00-custom-lines-overview.mdx",
+      "hash": "02-custom-line-style-path",
+      "url": "/docs#02-custom-line-style-path"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/01-create-custom-api.mdx",
+      "hash": "02-custom-line-style-path",
+      "url": "/docs#02-custom-line-style-path"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "02-frame-extraction",
+      "url": "/docs#02-frame-extraction"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/01-metadata-and-frames.mdx",
+      "hash": "02-frame-extraction",
+      "url": "/docs#02-frame-extraction"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "02-frame-extraction",
+      "url": "/docs#02-frame-extraction"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/08-imperative-video-helpers.mdx",
+      "hash": "02-frame-extraction",
+      "url": "/docs#02-frame-extraction"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "02-frame-extraction",
+      "url": "/docs#02-frame-extraction"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "02-philosophy-goals-and-when-to-use",
+      "url": "/docs#02-philosophy-goals-and-when-to-use"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "02-philosophy-goals-and-when-to-use",
+      "url": "/docs#02-philosophy-goals-and-when-to-use"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "02-philosophy-goals-and-when-to-use",
+      "url": "/docs#02-philosophy-goals-and-when-to-use"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "02-philosophy-goals-and-when-to-use",
+      "url": "/docs#02-philosophy-goals-and-when-to-use"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "02-recipes",
+      "url": "/docs#02-recipes"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/04-save-and-export.mdx",
+      "hash": "02-save-disk",
+      "url": "/docs#02-save-disk"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "02-save-disk",
+      "url": "/docs#02-save-disk"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "02-save-disk",
+      "url": "/docs#02-save-disk"
+    },
+    {
+      "file": "content/docs/03-feature-guides/batch-save-output/00-batch-save-output-overview.mdx",
+      "hash": "02-save-disk",
+      "url": "/docs#02-save-disk"
+    },
+    {
+      "file": "content/docs/03-feature-guides/batch-save-output/01-save-disk-and-multiple.mdx",
+      "hash": "02-save-disk",
+      "url": "/docs#02-save-disk"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "02-save-disk",
+      "url": "/docs#02-save-disk"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "02-save-disk",
+      "url": "/docs#02-save-disk"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "02-scene-layers-raster-text-path",
+      "url": "/docs#02-scene-layers-raster-text-path"
+    },
+    {
+      "file": "content/docs/00-start-here/00-start-here.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/01-install-and-setup.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/08-imperative-video-helpers.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/04-advanced/01-runtime-resource-governance.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/04-advanced/01-runtime-resource-governance.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-scene/api-new-apex-painter.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-video/api-create-video.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "02-security-deployment",
+      "url": "/docs#02-security-deployment"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "02-shapes-reference",
+      "url": "/docs#02-shapes-reference"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "02-shapes-reference",
+      "url": "/docs#02-shapes-reference"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/01-create-image-basics.mdx",
+      "hash": "02-shapes-reference",
+      "url": "/docs#02-shapes-reference"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "02-templates",
+      "url": "/docs#02-templates"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "02-templates",
+      "url": "/docs#02-templates"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "02-templates",
+      "url": "/docs#02-templates"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "02-templates",
+      "url": "/docs#02-templates"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "02-transcode-trim-transform",
+      "url": "/docs#02-transcode-trim-transform"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "02-your-first-image",
+      "url": "/docs#02-your-first-image"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "02-your-first-image",
+      "url": "/docs#02-your-first-image"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "03-audio",
+      "url": "/docs#03-audio"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "03-backgrounds-transparent-base",
+      "url": "/docs#03-backgrounds-transparent-base"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/02-backgrounds-primary.mdx",
+      "hash": "03-backgrounds-transparent-base",
+      "url": "/docs#03-backgrounds-transparent-base"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/05-backgrounds-pattern-noise.mdx",
+      "hash": "03-backgrounds-transparent-base",
+      "url": "/docs#03-backgrounds-transparent-base"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/05-scene-backgrounds.mdx",
+      "hash": "03-backgrounds-transparent-base",
+      "url": "/docs#03-backgrounds-transparent-base"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/05-scene-backgrounds.mdx",
+      "hash": "03-backgrounds-transparent-base",
+      "url": "/docs#03-backgrounds-transparent-base"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "03-chart-bar-vertical",
+      "url": "/docs#03-chart-bar-vertical"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/05-chart-line.mdx",
+      "hash": "03-chart-bar-vertical",
+      "url": "/docs#03-chart-bar-vertical"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/03-scene-layers-charts.mdx",
+      "hash": "03-chart-bar-vertical",
+      "url": "/docs#03-chart-bar-vertical"
+    },
+    {
+      "file": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "hash": "03-create-gif-transparency-disposal",
+      "url": "/docs#03-create-gif-transparency-disposal"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "03-create-image-styling-clip",
+      "url": "/docs#03-create-image-styling-clip"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/04-create-image-shadow-stroke.mdx",
+      "hash": "03-create-image-styling-clip",
+      "url": "/docs#03-create-image-styling-clip"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "03-create-text-color-gradients",
+      "url": "/docs#03-create-text-color-gradients"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "03-create-text-color-gradients",
+      "url": "/docs#03-create-text-color-gradients"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/05-scene-backgrounds.mdx",
+      "hash": "03-create-text-color-gradients",
+      "url": "/docs#03-create-text-color-gradients"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/00-custom-lines-overview.mdx",
+      "hash": "03-custom-lines-arrows-markers-textures",
+      "url": "/docs#03-custom-lines-arrows-markers-textures"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/02-custom-line-style-path.mdx",
+      "hash": "03-custom-lines-arrows-markers-textures",
+      "url": "/docs#03-custom-lines-arrows-markers-textures"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/04-scene-layers-custom-lines-surface.mdx",
+      "hash": "03-custom-lines-arrows-markers-textures",
+      "url": "/docs#03-custom-lines-arrows-markers-textures"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "03-how-buffers-work",
+      "url": "/docs#03-how-buffers-work"
+    },
+    {
+      "file": "content/docs/03-feature-guides/batch-save-output/00-batch-save-output-overview.mdx",
+      "hash": "03-imgur-output-security",
+      "url": "/docs#03-imgur-output-security"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "03-output-format-and-encoding",
+      "url": "/docs#03-output-format-and-encoding"
+    },
+    {
+      "file": "content/docs/02-recipes/recipe-share-card.mdx",
+      "hash": "03-output-format-and-encoding",
+      "url": "/docs#03-output-format-and-encoding"
+    },
+    {
+      "file": "content/docs/03-feature-guides/batch-save-output/00-batch-save-output-overview.mdx",
+      "hash": "03-output-format-and-encoding",
+      "url": "/docs#03-output-format-and-encoding"
+    },
+    {
+      "file": "content/docs/03-feature-guides/batch-save-output/02-output-format-and-outPut.mdx",
+      "hash": "03-output-format-and-encoding",
+      "url": "/docs#03-output-format-and-encoding"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "03-output-format-and-encoding",
+      "url": "/docs#03-output-format-and-encoding"
+    },
+    {
+      "file": "content/docs/00-start-here/00-start-here.mdx",
+      "hash": "03-performance-memory",
+      "url": "/docs#03-performance-memory"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "03-performance-memory",
+      "url": "/docs#03-performance-memory"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "03-performance-memory",
+      "url": "/docs#03-performance-memory"
+    },
+    {
+      "file": "content/docs/04-advanced/01-runtime-resource-governance.mdx",
+      "hash": "03-performance-memory",
+      "url": "/docs#03-performance-memory"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "03-performance-memory",
+      "url": "/docs#03-performance-memory"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "03-preset-components",
+      "url": "/docs#03-preset-components"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "03-preset-components",
+      "url": "/docs#03-preset-components"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "03-preset-components",
+      "url": "/docs#03-preset-components"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "03-scene-layers-charts",
+      "url": "/docs#03-scene-layers-charts"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/02-transcode-trim-transform.mdx",
+      "hash": "03-transcode-export",
+      "url": "/docs#03-transcode-export"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/06-advanced-presets-transitions.mdx",
+      "hash": "03-transcode-export",
+      "url": "/docs#03-transcode-export"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "03-transcode-export",
+      "url": "/docs#03-transcode-export"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "03-transcode-export",
+      "url": "/docs#03-transcode-export"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "04-backgrounds-bg-layers",
+      "url": "/docs#04-backgrounds-bg-layers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "04-backgrounds-bg-layers",
+      "url": "/docs#04-backgrounds-bg-layers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/02-backgrounds-primary.mdx",
+      "hash": "04-backgrounds-bg-layers",
+      "url": "/docs#04-backgrounds-bg-layers"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/05-scene-backgrounds.mdx",
+      "hash": "04-backgrounds-bg-layers",
+      "url": "/docs#04-backgrounds-bg-layers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "04-chart-horizontal-bar",
+      "url": "/docs#04-chart-horizontal-bar"
+    },
+    {
+      "file": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "hash": "04-create-gif-watermark-overlay",
+      "url": "/docs#04-create-gif-watermark-overlay"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "04-create-image-shadow-stroke",
+      "url": "/docs#04-create-image-shadow-stroke"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "04-create-text-glow-shadow-stroke",
+      "url": "/docs#04-create-text-glow-shadow-stroke"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "04-create-text-glow-shadow-stroke",
+      "url": "/docs#04-create-text-glow-shadow-stroke"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "04-effects-overlays",
+      "url": "/docs#04-effects-overlays"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "04-image-stitch-and-collage",
+      "url": "/docs#04-image-stitch-and-collage"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "04-image-stitch-and-collage",
+      "url": "/docs#04-image-stitch-and-collage"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "04-image-stitch-and-collage",
+      "url": "/docs#04-image-stitch-and-collage"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "04-image-stitch-and-collage",
+      "url": "/docs#04-image-stitch-and-collage"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/01-install-and-setup.mdx",
+      "hash": "04-migration-v6",
+      "url": "/docs#04-migration-v6"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "04-migration-v6",
+      "url": "/docs#04-migration-v6"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "04-migration-v6",
+      "url": "/docs#04-migration-v6"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "04-path2d-draw-path",
+      "url": "/docs#04-path2d-draw-path"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/00-custom-lines-overview.mdx",
+      "hash": "04-path2d-draw-path",
+      "url": "/docs#04-path2d-draw-path"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/02-custom-line-style-path.mdx",
+      "hash": "04-path2d-draw-path",
+      "url": "/docs#04-path2d-draw-path"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "04-plugins",
+      "url": "/docs#04-plugins"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "04-plugins",
+      "url": "/docs#04-plugins"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "04-plugins",
+      "url": "/docs#04-plugins"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "04-save-and-export",
+      "url": "/docs#04-save-and-export"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "04-scene-layers-custom-lines-surface",
+      "url": "/docs#04-scene-layers-custom-lines-surface"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/02-transcode-trim-transform.mdx",
+      "hash": "04-timeline-edits",
+      "url": "/docs#04-timeline-edits"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "04-timeline-edits",
+      "url": "/docs#04-timeline-edits"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "04-timeline-edits",
+      "url": "/docs#04-timeline-edits"
+    },
+    {
+      "file": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "hash": "04-timeline-edits",
+      "url": "/docs#04-timeline-edits"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "05-backgrounds-pattern-noise",
+      "url": "/docs#05-backgrounds-pattern-noise"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/04-backgrounds-bg-layers.mdx",
+      "hash": "05-backgrounds-pattern-noise",
+      "url": "/docs#05-backgrounds-pattern-noise"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "05-chart-line",
+      "url": "/docs#05-chart-line"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/03-scene-layers-charts.mdx",
+      "hash": "05-chart-line",
+      "url": "/docs#05-chart-line"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "hash": "05-common-mistakes",
+      "url": "/docs#05-common-mistakes"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "05-compose-and-build",
+      "url": "/docs#05-compose-and-build"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "05-create-gif-onstart",
+      "url": "/docs#05-create-gif-onstart"
+    },
+    {
+      "file": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "hash": "05-create-gif-onstart",
+      "url": "/docs#05-create-gif-onstart"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "05-create-image-filters",
+      "url": "/docs#05-create-image-filters"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "05-create-image-filters",
+      "url": "/docs#05-create-image-filters"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "05-create-text-decorations-highlight",
+      "url": "/docs#05-create-text-decorations-highlight"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/02-transcode-trim-transform.mdx",
+      "hash": "05-geometry",
+      "url": "/docs#05-geometry"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "05-geometry",
+      "url": "/docs#05-geometry"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "05-geometry",
+      "url": "/docs#05-geometry"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/00-custom-lines-overview.mdx",
+      "hash": "05-hit-testing-paths",
+      "url": "/docs#05-hit-testing-paths"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "05-image-compress-and-palette",
+      "url": "/docs#05-image-compress-and-palette"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "05-image-compress-and-palette",
+      "url": "/docs#05-image-compress-and-palette"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "05-imperative-batch-chain-assets",
+      "url": "/docs#05-imperative-batch-chain-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "05-imperative-batch-chain-assets",
+      "url": "/docs#05-imperative-batch-chain-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "hash": "05-imperative-batch-chain-assets",
+      "url": "/docs#05-imperative-batch-chain-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/composition/01-named-assets.mdx",
+      "hash": "05-imperative-batch-chain-assets",
+      "url": "/docs#05-imperative-batch-chain-assets"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "05-scene-backgrounds",
+      "url": "/docs#05-scene-backgrounds"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "06-advanced-presets-transitions",
+      "url": "/docs#06-advanced-presets-transitions"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/10-advanced-ops.mdx",
+      "hash": "06-advanced-presets-transitions",
+      "url": "/docs#06-advanced-presets-transitions"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/03-audio.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/03-audio.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "06-audio-deep-dive",
+      "url": "/docs#06-audio-deep-dive"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "06-canvas-border-shadow-zoom",
+      "url": "/docs#06-canvas-border-shadow-zoom"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "06-chart-scatter",
+      "url": "/docs#06-chart-scatter"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "06-create-gif-onend-results",
+      "url": "/docs#06-create-gif-onend-results"
+    },
+    {
+      "file": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "hash": "06-create-gif-onend-results",
+      "url": "/docs#06-create-gif-onend-results"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "06-create-image-mask-distortion",
+      "url": "/docs#06-create-image-mask-distortion"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "06-create-image-mask-distortion",
+      "url": "/docs#06-create-image-mask-distortion"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "06-create-text-curved",
+      "url": "/docs#06-create-text-curved"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "06-create-text-curved",
+      "url": "/docs#06-create-text-curved"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/09-create-text-properties-matrix.mdx",
+      "hash": "06-create-text-curved",
+      "url": "/docs#06-create-text-curved"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "06-image-resize-convert-effects",
+      "url": "/docs#06-image-resize-convert-effects"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "06-image-resize-convert-effects",
+      "url": "/docs#06-image-resize-convert-effects"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "06-image-resize-convert-effects",
+      "url": "/docs#06-image-resize-convert-effects"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "06-image-resize-convert-effects",
+      "url": "/docs#06-image-resize-convert-effects"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "06-image-resize-convert-effects",
+      "url": "/docs#06-image-resize-convert-effects"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "06-image-resize-convert-effects",
+      "url": "/docs#06-image-resize-convert-effects"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "06-render-scene",
+      "url": "/docs#06-render-scene"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "07-canvas-shadow-options",
+      "url": "/docs#07-canvas-shadow-options"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "hash": "07-canvas-shadow-options",
+      "url": "/docs#07-canvas-shadow-options"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "hash": "07-canvas-shadow-options",
+      "url": "/docs#07-canvas-shadow-options"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "hash": "07-canvas-shadow-options",
+      "url": "/docs#07-canvas-shadow-options"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "07-chart-radar",
+      "url": "/docs#07-chart-radar"
+    },
+    {
+      "file": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "hash": "07-create-gif-encode-pipeline",
+      "url": "/docs#07-create-gif-encode-pipeline"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "07-create-image-effects",
+      "url": "/docs#07-create-image-effects"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "07-create-image-effects",
+      "url": "/docs#07-create-image-effects"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "07-image-blend-mask-crop-gradient",
+      "url": "/docs#07-image-blend-mask-crop-gradient"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "07-image-blend-mask-crop-gradient",
+      "url": "/docs#07-image-blend-mask-crop-gradient"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "07-image-blend-mask-crop-gradient",
+      "url": "/docs#07-image-blend-mask-crop-gradient"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "07-image-blend-mask-crop-gradient",
+      "url": "/docs#07-image-blend-mask-crop-gradient"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "07-measure-text",
+      "url": "/docs#07-measure-text"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "07-measure-text",
+      "url": "/docs#07-measure-text"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "07-render-scene-to-gif",
+      "url": "/docs#07-render-scene-to-gif"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "07-video-creation-options-matrix",
+      "url": "/docs#07-video-creation-options-matrix"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "07-video-creation-options-matrix",
+      "url": "/docs#07-video-creation-options-matrix"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "07-video-creation-options-matrix",
+      "url": "/docs#07-video-creation-options-matrix"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/04-effects-overlays.mdx",
+      "hash": "07-visual-filters",
+      "url": "/docs#07-visual-filters"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "07-visual-filters",
+      "url": "/docs#07-visual-filters"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "07-visual-filters",
+      "url": "/docs#07-visual-filters"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "08-animate-api",
+      "url": "/docs#08-animate-api"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "08-animate-api",
+      "url": "/docs#08-animate-api"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "08-animate-api",
+      "url": "/docs#08-animate-api"
+    },
+    {
+      "file": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "hash": "08-animate-api",
+      "url": "/docs#08-animate-api"
+    },
+    {
+      "file": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "hash": "08-animate-api",
+      "url": "/docs#08-animate-api"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "08-canvas-stroke-options",
+      "url": "/docs#08-canvas-stroke-options"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "hash": "08-canvas-stroke-options",
+      "url": "/docs#08-canvas-stroke-options"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "hash": "08-canvas-stroke-options",
+      "url": "/docs#08-canvas-stroke-options"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "hash": "08-canvas-stroke-options",
+      "url": "/docs#08-canvas-stroke-options"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "08-chart-polar-area",
+      "url": "/docs#08-chart-polar-area"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "08-create-image-groups",
+      "url": "/docs#08-create-image-groups"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "08-create-image-groups",
+      "url": "/docs#08-create-image-groups"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/09-create-image-paint-order.mdx",
+      "hash": "08-create-image-groups",
+      "url": "/docs#08-create-image-groups"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "08-create-text-paint-order",
+      "url": "/docs#08-create-text-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/04-create-text-glow-shadow-stroke.mdx",
+      "hash": "08-create-text-paint-order",
+      "url": "/docs#08-create-text-paint-order"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "08-imperative-video-helpers",
+      "url": "/docs#08-imperative-video-helpers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "08-imperative-video-helpers",
+      "url": "/docs#08-imperative-video-helpers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/01-metadata-and-frames.mdx",
+      "hash": "08-imperative-video-helpers",
+      "url": "/docs#08-imperative-video-helpers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "08-imperative-video-helpers",
+      "url": "/docs#08-imperative-video-helpers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/09-security-runtime-configuration.mdx",
+      "hash": "08-imperative-video-helpers",
+      "url": "/docs#08-imperative-video-helpers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "08-imperative-video-helpers",
+      "url": "/docs#08-imperative-video-helpers"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/02-frame-extraction.mdx",
+      "hash": "08-imperative-video-helpers",
+      "url": "/docs#08-imperative-video-helpers"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "08-pixel-data",
+      "url": "/docs#08-pixel-data"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "08-pixel-data",
+      "url": "/docs#08-pixel-data"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "08-pixel-data",
+      "url": "/docs#08-pixel-data"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "08-render-scene-to-video",
+      "url": "/docs#08-render-scene-to-video"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "08-render-scene-to-video",
+      "url": "/docs#08-render-scene-to-video"
+    },
+    {
+      "file": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "hash": "08-render-scene-to-video",
+      "url": "/docs#08-render-scene-to-video"
+    },
+    {
+      "file": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "hash": "08-render-scene-to-video",
+      "url": "/docs#08-render-scene-to-video"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "08-text-overlays",
+      "url": "/docs#08-text-overlays"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/04-effects-overlays.mdx",
+      "hash": "08-text-overlays",
+      "url": "/docs#08-text-overlays"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "08-text-overlays",
+      "url": "/docs#08-text-overlays"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "08-text-overlays",
+      "url": "/docs#08-text-overlays"
+    },
+    {
+      "file": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "hash": "08-text-overlays",
+      "url": "/docs#08-text-overlays"
+    },
+    {
+      "file": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "hash": "08-text-overlays",
+      "url": "/docs#08-text-overlays"
+    },
+    {
+      "file": "content/docs/05-internals/changelog.mdx",
+      "hash": "08-text-overlays",
+      "url": "/docs#08-text-overlays"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "09-canvas-paint-order",
+      "url": "/docs#09-canvas-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "hash": "09-canvas-paint-order",
+      "url": "/docs#09-canvas-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/05-backgrounds-pattern-noise.mdx",
+      "hash": "09-canvas-paint-order",
+      "url": "/docs#09-canvas-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "hash": "09-canvas-paint-order",
+      "url": "/docs#09-canvas-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/canvas/07-canvas-shadow-options.mdx",
+      "hash": "09-canvas-paint-order",
+      "url": "/docs#09-canvas-paint-order"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "09-chart-combo",
+      "url": "/docs#09-chart-combo"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "09-chart-combo",
+      "url": "/docs#09-chart-combo"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/05-compose-and-build.mdx",
+      "hash": "09-compositing",
+      "url": "/docs#09-compositing"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "09-compositing",
+      "url": "/docs#09-compositing"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "09-compositing",
+      "url": "/docs#09-compositing"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/10-advanced-ops.mdx",
+      "hash": "09-compositing",
+      "url": "/docs#09-compositing"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "hash": "09-create-image-paint-order",
+      "url": "/docs#09-create-image-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/02-shapes-reference.mdx",
+      "hash": "09-create-image-paint-order",
+      "url": "/docs#09-create-image-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/04-create-image-shadow-stroke.mdx",
+      "hash": "09-create-image-paint-order",
+      "url": "/docs#09-create-image-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/04-create-image-shadow-stroke.mdx",
+      "hash": "09-create-image-paint-order",
+      "url": "/docs#09-create-image-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/05-create-image-filters.mdx",
+      "hash": "09-create-image-paint-order",
+      "url": "/docs#09-create-image-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/06-create-image-mask-distortion.mdx",
+      "hash": "09-create-image-paint-order",
+      "url": "/docs#09-create-image-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/images-shapes/08-create-image-groups.mdx",
+      "hash": "09-create-image-paint-order",
+      "url": "/docs#09-create-image-paint-order"
+    },
+    {
+      "file": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "hash": "09-create-text-properties-matrix",
+      "url": "/docs#09-create-text-properties-matrix"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "09-path2d-draw-and-custom-lines",
+      "url": "/docs#09-path2d-draw-and-custom-lines"
+    },
+    {
+      "file": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "hash": "09-scene-paint-order-performance",
+      "url": "/docs#09-scene-paint-order-performance"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "09-video-security-runtime-configuration",
+      "url": "/docs#09-video-security-runtime-configuration"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "hash": "09-video-security-runtime-configuration",
+      "url": "/docs#09-video-security-runtime-configuration"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/06-advanced-presets-transitions.mdx",
+      "hash": "10-advanced-ops",
+      "url": "/docs#10-advanced-ops"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "10-advanced-ops",
+      "url": "/docs#10-advanced-ops"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "10-advanced-ops",
+      "url": "/docs#10-advanced-ops"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "10-chart-comparison",
+      "url": "/docs#10-chart-comparison"
+    },
+    {
+      "file": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "hash": "10-chart-comparison",
+      "url": "/docs#10-chart-comparison"
+    },
+    {
+      "file": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "hash": "10-hit-detection",
+      "url": "/docs#10-hit-detection"
+    },
+    {
+      "file": "content/docs/03-feature-guides/lines-connectors/05-hit-testing-paths.mdx",
+      "hash": "10-hit-detection",
+      "url": "/docs#10-hit-detection"
+    },
+    {
+      "file": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "hash": "10-hit-detection",
+      "url": "/docs#10-hit-detection"
+    },
+    {
+      "file": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "hash": "10-remote-image-reliability",
+      "url": "/docs#10-remote-image-reliability"
+    },
+    {
+      "file": "content/docs/05-internals/01-5.4.5-remote-image-hotfix.mdx",
+      "hash": "10-remote-image-reliability",
+      "url": "/docs#10-remote-image-reliability"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/06-advanced-presets-transitions.mdx",
+      "hash": "11-on-progress",
+      "url": "/docs#11-on-progress"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "hash": "11-on-progress",
+      "url": "/docs#11-on-progress"
+    },
+    {
+      "file": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "hash": "11-on-progress",
+      "url": "/docs#11-on-progress"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "animated-gif",
+      "url": "/docs#animated-gif"
+    },
+    {
+      "file": "app/docs/api/page.tsx",
+      "hash": "api-reference",
+      "url": "/docs#api-reference"
+    },
+    {
+      "file": "content/docs/00-start-here/00-start-here.mdx",
+      "hash": "api-reference",
+      "url": "/docs#api-reference"
+    },
+    {
+      "file": "content/docs/01-beginner-guide/01-install-and-setup.mdx",
+      "hash": "api-reference",
+      "url": "/docs#api-reference"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "api-reference",
+      "url": "/docs#api-reference"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "api-reference",
+      "url": "/docs#api-reference"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "api-reference",
+      "url": "/docs#api-reference"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "api-reference",
+      "url": "/docs#api-reference"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "changelog",
+      "url": "/docs#changelog"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "changelog",
+      "url": "/docs#changelog"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "changelog",
+      "url": "/docs#changelog"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "chart-image",
+      "url": "/docs#chart-image"
+    },
+    {
+      "file": "features-forDocs.md",
+      "hash": "documentation-map",
+      "url": "/docs#documentation-map"
+    },
+    {
+      "file": "content/docs/00-start-here/00-start-here.mdx",
+      "hash": "feature-guides-hub",
+      "url": "/docs#feature-guides-hub"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "feature-guides-hub",
+      "url": "/docs#feature-guides-hub"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "feature-guides-hub",
+      "url": "/docs#feature-guides-hub"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "feature-guides-hub",
+      "url": "/docs#feature-guides-hub"
+    },
+    {
+      "file": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "hash": "feature-guides-hub",
+      "url": "/docs#feature-guides-hub"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "feature-guides-hub",
+      "url": "/docs#feature-guides-hub"
+    },
+    {
+      "file": "content/docs/README.mdx",
+      "hash": "feature-guides-hub",
+      "url": "/docs#feature-guides-hub"
+    },
+    {
+      "file": "scripts/doc0-audit.mjs",
+      "hash": "hash",
+      "url": "/docs#hash"
+    },
+    {
+      "file": "scripts/doc0-audit.mjs",
+      "hash": "hash",
+      "url": "/docs#hash"
+    },
+    {
+      "file": "content/docs/04-api-reference/api-overview/api-reference.mdx",
+      "hash": "package-surface",
+      "url": "/docs#package-surface"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "product-card",
+      "url": "/docs#product-card"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "quote-image",
+      "url": "/docs#quote-image"
+    },
+    {
+      "file": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "hash": "readme",
+      "url": "/docs#readme"
+    },
+    {
+      "file": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "hash": "recipe-share-card",
+      "url": "/docs#recipe-share-card"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "social-media-banner",
+      "url": "/docs#social-media-banner"
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "hash": "video-from-frames",
+      "url": "/docs#video-from-frames"
+    }
+  ],
+  "links": [
+    {
+      "from": "/docs#00-advanced-overview",
+      "to": "/docs#00-advanced-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/00-advanced-overview.mdx"
+    },
+    {
+      "from": "/docs#00-audio-advanced-hub",
+      "to": "/docs#00-audio-advanced-hub",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx"
+    },
+    {
+      "from": "/docs#00-batch-save-output-overview",
+      "to": "/docs#00-batch-save-output-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/batch-save-output/00-batch-save-output-overview.mdx"
+    },
+    {
+      "from": "/docs#00-beginner-guide",
+      "to": "/docs#00-beginner-guide",
+      "type": "canonical-current-hash",
+      "source": "content/docs/01-beginner-guide/00-beginner-guide.mdx"
+    },
+    {
+      "from": "/docs#00-charts-overview",
+      "to": "/docs#00-charts-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/00-charts-overview.mdx"
+    },
+    {
+      "from": "/docs#00-composition-hub",
+      "to": "/docs#00-composition-hub",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/composition/00-composition-hub.mdx"
+    },
+    {
+      "from": "/docs#00-create-canvas-overview",
+      "to": "/docs#00-create-canvas-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx"
+    },
+    {
+      "from": "/docs#00-create-gif-overview",
+      "to": "/docs#00-create-gif-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx"
+    },
+    {
+      "from": "/docs#00-create-image-overview",
+      "to": "/docs#00-create-image-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx"
+    },
+    {
+      "from": "/docs#00-create-text-overview",
+      "to": "/docs#00-create-text-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx"
+    },
+    {
+      "from": "/docs#00-custom-lines-overview",
+      "to": "/docs#00-custom-lines-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/lines-connectors/00-custom-lines-overview.mdx"
+    },
+    {
+      "from": "/docs#00-internals-overview",
+      "to": "/docs#00-internals-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/05-internals/00-internals-overview.mdx"
+    },
+    {
+      "from": "/docs#00-raster-batch-output-overview",
+      "to": "/docs#00-raster-batch-output-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx"
+    },
+    {
+      "from": "/docs#00-recipes-overview",
+      "to": "/docs#00-recipes-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/02-recipes/00-recipes-overview.mdx"
+    },
+    {
+      "from": "/docs#00-scene-composition",
+      "to": "/docs#00-scene-composition",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/00-scene-composition.mdx"
+    },
+    {
+      "from": "/docs#00-scene-hub",
+      "to": "/docs#00-scene-hub",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/00-scene-hub.mdx"
+    },
+    {
+      "from": "/docs#00-start-here",
+      "to": "/docs#00-start-here",
+      "type": "canonical-current-hash",
+      "source": "content/docs/00-start-here/00-start-here.mdx"
+    },
+    {
+      "from": "/docs#00-video-advanced-hub",
+      "to": "/docs#00-video-advanced-hub",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/video/00-video-advanced-hub.mdx"
+    },
+    {
+      "from": "/docs#00-video-options-hub",
+      "to": "/docs#00-video-options-hub",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx"
+    },
+    {
+      "from": "/docs#00-video-overview",
+      "to": "/docs#00-video-overview",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx"
+    },
+    {
+      "from": "/docs#01-5.4.5-remote-image-hotfix",
+      "to": "/docs#01-5.4.5-remote-image-hotfix",
+      "type": "canonical-current-hash",
+      "source": "content/docs/05-internals/01-5.4.5-remote-image-hotfix.mdx"
+    },
+    {
+      "from": "/docs#01-batch-and-chain",
+      "to": "/docs#01-batch-and-chain",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/01-batch-and-chain.mdx"
+    },
+    {
+      "from": "/docs#01-canvas-size-and-coordinates",
+      "to": "/docs#01-canvas-size-and-coordinates",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/01-canvas-size-and-coordinates.mdx"
+    },
+    {
+      "from": "/docs#01-charts-shared-appearance",
+      "to": "/docs#01-charts-shared-appearance",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/01-charts-shared-appearance.mdx"
+    },
+    {
+      "from": "/docs#01-create-audio",
+      "to": "/docs#01-create-audio",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/audio/01-create-audio.mdx"
+    },
+    {
+      "from": "/docs#01-create-custom-api",
+      "to": "/docs#01-create-custom-api",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/lines-connectors/01-create-custom-api.mdx"
+    },
+    {
+      "from": "/docs#01-create-gif-input-frames",
+      "to": "/docs#01-create-gif-input-frames",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/01-create-gif-input-frames.mdx"
+    },
+    {
+      "from": "/docs#01-create-image-basics",
+      "to": "/docs#01-create-image-basics",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/01-create-image-basics.mdx"
+    },
+    {
+      "from": "/docs#01-create-text-font-and-position",
+      "to": "/docs#01-create-text-font-and-position",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/01-create-text-font-and-position.mdx"
+    },
+    {
+      "from": "/docs#01-discovery-metadata",
+      "to": "/docs#01-discovery-metadata",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/01-discovery-metadata.mdx"
+    },
+    {
+      "from": "/docs#01-feature-tracks",
+      "to": "/docs#01-feature-tracks",
+      "type": "canonical-current-hash",
+      "source": "content/docs/00-start-here/01-feature-tracks.mdx"
+    },
+    {
+      "from": "/docs#01-install-and-setup",
+      "to": "/docs#01-install-and-setup",
+      "type": "canonical-current-hash",
+      "source": "content/docs/01-beginner-guide/01-install-and-setup.mdx"
+    },
+    {
+      "from": "/docs#01-metadata-and-frames",
+      "to": "/docs#01-metadata-and-frames",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/01-metadata-and-frames.mdx"
+    },
+    {
+      "from": "/docs#01-named-assets",
+      "to": "/docs#01-named-assets",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/composition/01-named-assets.mdx"
+    },
+    {
+      "from": "/docs#01-runtime-resource-governance",
+      "to": "/docs#01-runtime-resource-governance",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/01-runtime-resource-governance.mdx"
+    },
+    {
+      "from": "/docs#01-save-disk-and-multiple",
+      "to": "/docs#01-save-disk-and-multiple",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/batch-save-output/01-save-disk-and-multiple.mdx"
+    },
+    {
+      "from": "/docs#01-scene-types-builder",
+      "to": "/docs#01-scene-types-builder",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/01-scene-types-builder.mdx"
+    },
+    {
+      "from": "/docs#01-video-pipeline",
+      "to": "/docs#01-video-pipeline",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/video/01-video-pipeline.mdx"
+    },
+    {
+      "from": "/docs#01-what-you-can-build",
+      "to": "/docs#01-what-you-can-build",
+      "type": "canonical-current-hash",
+      "source": "content/docs/02-recipes/01-what-you-can-build.mdx"
+    },
+    {
+      "from": "/docs#02-backgrounds-primary",
+      "to": "/docs#02-backgrounds-primary",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/02-backgrounds-primary.mdx"
+    },
+    {
+      "from": "/docs#02-chart-pie-and-donut",
+      "to": "/docs#02-chart-pie-and-donut",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/02-chart-pie-and-donut.mdx"
+    },
+    {
+      "from": "/docs#02-create-gif-options-output",
+      "to": "/docs#02-create-gif-options-output",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/02-create-gif-options-output.mdx"
+    },
+    {
+      "from": "/docs#02-create-text-wrapping-spacing",
+      "to": "/docs#02-create-text-wrapping-spacing",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/02-create-text-wrapping-spacing.mdx"
+    },
+    {
+      "from": "/docs#02-custom-line-style-path",
+      "to": "/docs#02-custom-line-style-path",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/lines-connectors/02-custom-line-style-path.mdx"
+    },
+    {
+      "from": "/docs#02-frame-extraction",
+      "to": "/docs#02-frame-extraction",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/02-frame-extraction.mdx"
+    },
+    {
+      "from": "/docs#02-output-format-and-outPut",
+      "to": "/docs#02-output-format-and-outPut",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/batch-save-output/02-output-format-and-outPut.mdx"
+    },
+    {
+      "from": "/docs#02-philosophy-goals-and-when-to-use",
+      "to": "/docs#02-philosophy-goals-and-when-to-use",
+      "type": "canonical-current-hash",
+      "source": "content/docs/02-recipes/02-philosophy-goals-and-when-to-use.mdx"
+    },
+    {
+      "from": "/docs#02-save-disk",
+      "to": "/docs#02-save-disk",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/02-save-disk.mdx"
+    },
+    {
+      "from": "/docs#02-scene-layers-raster-text-path",
+      "to": "/docs#02-scene-layers-raster-text-path",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/02-scene-layers-raster-text-path.mdx"
+    },
+    {
+      "from": "/docs#02-security-deployment",
+      "to": "/docs#02-security-deployment",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/02-security-deployment.mdx"
+    },
+    {
+      "from": "/docs#02-shapes-reference",
+      "to": "/docs#02-shapes-reference",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/02-shapes-reference.mdx"
+    },
+    {
+      "from": "/docs#02-templates",
+      "to": "/docs#02-templates",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/composition/02-templates.mdx"
+    },
+    {
+      "from": "/docs#02-transcode-trim-transform",
+      "to": "/docs#02-transcode-trim-transform",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/02-transcode-trim-transform.mdx"
+    },
+    {
+      "from": "/docs#02-your-first-image",
+      "to": "/docs#02-your-first-image",
+      "type": "canonical-current-hash",
+      "source": "content/docs/01-beginner-guide/02-your-first-image.mdx"
+    },
+    {
+      "from": "/docs#03-audio",
+      "to": "/docs#03-audio",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/03-audio.mdx"
+    },
+    {
+      "from": "/docs#03-backgrounds-transparent-base",
+      "to": "/docs#03-backgrounds-transparent-base",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/03-backgrounds-transparent-base.mdx"
+    },
+    {
+      "from": "/docs#03-chart-bar-vertical",
+      "to": "/docs#03-chart-bar-vertical",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/03-chart-bar-vertical.mdx"
+    },
+    {
+      "from": "/docs#03-create-gif-transparency-disposal",
+      "to": "/docs#03-create-gif-transparency-disposal",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/03-create-gif-transparency-disposal.mdx"
+    },
+    {
+      "from": "/docs#03-create-image-styling-clip",
+      "to": "/docs#03-create-image-styling-clip",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/03-create-image-styling-clip.mdx"
+    },
+    {
+      "from": "/docs#03-create-text-color-gradients",
+      "to": "/docs#03-create-text-color-gradients",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/03-create-text-color-gradients.mdx"
+    },
+    {
+      "from": "/docs#03-custom-lines-arrows-markers-textures",
+      "to": "/docs#03-custom-lines-arrows-markers-textures",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/lines-connectors/03-custom-lines-arrows-markers-textures.mdx"
+    },
+    {
+      "from": "/docs#03-how-buffers-work",
+      "to": "/docs#03-how-buffers-work",
+      "type": "canonical-current-hash",
+      "source": "content/docs/01-beginner-guide/03-how-buffers-work.mdx"
+    },
+    {
+      "from": "/docs#03-imgur-output-security",
+      "to": "/docs#03-imgur-output-security",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/batch-save-output/03-imgur-output-security.mdx"
+    },
+    {
+      "from": "/docs#03-output-format-and-encoding",
+      "to": "/docs#03-output-format-and-encoding",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/03-output-format-and-encoding.mdx"
+    },
+    {
+      "from": "/docs#03-performance-memory",
+      "to": "/docs#03-performance-memory",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/03-performance-memory.mdx"
+    },
+    {
+      "from": "/docs#03-preset-components",
+      "to": "/docs#03-preset-components",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/composition/03-preset-components.mdx"
+    },
+    {
+      "from": "/docs#03-scene-layers-charts",
+      "to": "/docs#03-scene-layers-charts",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/03-scene-layers-charts.mdx"
+    },
+    {
+      "from": "/docs#03-transcode-export",
+      "to": "/docs#03-transcode-export",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/03-transcode-export.mdx"
+    },
+    {
+      "from": "/docs#04-backgrounds-bg-layers",
+      "to": "/docs#04-backgrounds-bg-layers",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/04-backgrounds-bg-layers.mdx"
+    },
+    {
+      "from": "/docs#04-chart-horizontal-bar",
+      "to": "/docs#04-chart-horizontal-bar",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/04-chart-horizontal-bar.mdx"
+    },
+    {
+      "from": "/docs#04-create-gif-watermark-overlay",
+      "to": "/docs#04-create-gif-watermark-overlay",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/04-create-gif-watermark-overlay.mdx"
+    },
+    {
+      "from": "/docs#04-create-image-shadow-stroke",
+      "to": "/docs#04-create-image-shadow-stroke",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/04-create-image-shadow-stroke.mdx"
+    },
+    {
+      "from": "/docs#04-create-text-glow-shadow-stroke",
+      "to": "/docs#04-create-text-glow-shadow-stroke",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/04-create-text-glow-shadow-stroke.mdx"
+    },
+    {
+      "from": "/docs#04-effects-overlays",
+      "to": "/docs#04-effects-overlays",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/04-effects-overlays.mdx"
+    },
+    {
+      "from": "/docs#04-image-stitch-and-collage",
+      "to": "/docs#04-image-stitch-and-collage",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/04-image-stitch-and-collage.mdx"
+    },
+    {
+      "from": "/docs#04-migration-v6",
+      "to": "/docs#04-migration-v6",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/04-migration-v6.mdx"
+    },
+    {
+      "from": "/docs#04-path2d-draw-path",
+      "to": "/docs#04-path2d-draw-path",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/lines-connectors/04-path2d-draw-path.mdx"
+    },
+    {
+      "from": "/docs#04-plugins",
+      "to": "/docs#04-plugins",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/composition/04-plugins.mdx"
+    },
+    {
+      "from": "/docs#04-save-and-export",
+      "to": "/docs#04-save-and-export",
+      "type": "canonical-current-hash",
+      "source": "content/docs/01-beginner-guide/04-save-and-export.mdx"
+    },
+    {
+      "from": "/docs#04-scene-layers-custom-lines-surface",
+      "to": "/docs#04-scene-layers-custom-lines-surface",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/04-scene-layers-custom-lines-surface.mdx"
+    },
+    {
+      "from": "/docs#04-timeline-edits",
+      "to": "/docs#04-timeline-edits",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/04-timeline-edits.mdx"
+    },
+    {
+      "from": "/docs#05-backgrounds-pattern-noise",
+      "to": "/docs#05-backgrounds-pattern-noise",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/05-backgrounds-pattern-noise.mdx"
+    },
+    {
+      "from": "/docs#05-chart-line",
+      "to": "/docs#05-chart-line",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/05-chart-line.mdx"
+    },
+    {
+      "from": "/docs#05-common-mistakes",
+      "to": "/docs#05-common-mistakes",
+      "type": "canonical-current-hash",
+      "source": "content/docs/01-beginner-guide/05-common-mistakes.mdx"
+    },
+    {
+      "from": "/docs#05-compose-and-build",
+      "to": "/docs#05-compose-and-build",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/05-compose-and-build.mdx"
+    },
+    {
+      "from": "/docs#05-create-gif-onstart",
+      "to": "/docs#05-create-gif-onstart",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/05-create-gif-onstart.mdx"
+    },
+    {
+      "from": "/docs#05-create-image-filters",
+      "to": "/docs#05-create-image-filters",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/05-create-image-filters.mdx"
+    },
+    {
+      "from": "/docs#05-create-text-decorations-highlight",
+      "to": "/docs#05-create-text-decorations-highlight",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/05-create-text-decorations-highlight.mdx"
+    },
+    {
+      "from": "/docs#05-geometry",
+      "to": "/docs#05-geometry",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/05-geometry.mdx"
+    },
+    {
+      "from": "/docs#05-hit-testing-paths",
+      "to": "/docs#05-hit-testing-paths",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/lines-connectors/05-hit-testing-paths.mdx"
+    },
+    {
+      "from": "/docs#05-image-compress-and-palette",
+      "to": "/docs#05-image-compress-and-palette",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/05-image-compress-and-palette.mdx"
+    },
+    {
+      "from": "/docs#05-imperative-batch-chain-assets",
+      "to": "/docs#05-imperative-batch-chain-assets",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/composition/05-imperative-batch-chain-assets.mdx"
+    },
+    {
+      "from": "/docs#05-scene-backgrounds",
+      "to": "/docs#05-scene-backgrounds",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/05-scene-backgrounds.mdx"
+    },
+    {
+      "from": "/docs#06-advanced-presets-transitions",
+      "to": "/docs#06-advanced-presets-transitions",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/06-advanced-presets-transitions.mdx"
+    },
+    {
+      "from": "/docs#06-audio-deep-dive",
+      "to": "/docs#06-audio-deep-dive",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/06-audio-deep-dive.mdx"
+    },
+    {
+      "from": "/docs#06-canvas-border-shadow-zoom",
+      "to": "/docs#06-canvas-border-shadow-zoom",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx"
+    },
+    {
+      "from": "/docs#06-chart-scatter",
+      "to": "/docs#06-chart-scatter",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/06-chart-scatter.mdx"
+    },
+    {
+      "from": "/docs#06-create-gif-onend-results",
+      "to": "/docs#06-create-gif-onend-results",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/06-create-gif-onend-results.mdx"
+    },
+    {
+      "from": "/docs#06-create-image-mask-distortion",
+      "to": "/docs#06-create-image-mask-distortion",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/06-create-image-mask-distortion.mdx"
+    },
+    {
+      "from": "/docs#06-create-text-curved",
+      "to": "/docs#06-create-text-curved",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/06-create-text-curved.mdx"
+    },
+    {
+      "from": "/docs#06-image-resize-convert-effects",
+      "to": "/docs#06-image-resize-convert-effects",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/06-image-resize-convert-effects.mdx"
+    },
+    {
+      "from": "/docs#06-render-scene",
+      "to": "/docs#06-render-scene",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/06-render-scene.mdx"
+    },
+    {
+      "from": "/docs#07-canvas-shadow-options",
+      "to": "/docs#07-canvas-shadow-options",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/07-canvas-shadow-options.mdx"
+    },
+    {
+      "from": "/docs#07-chart-radar",
+      "to": "/docs#07-chart-radar",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/07-chart-radar.mdx"
+    },
+    {
+      "from": "/docs#07-create-gif-encode-pipeline",
+      "to": "/docs#07-create-gif-encode-pipeline",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/07-create-gif-encode-pipeline.mdx"
+    },
+    {
+      "from": "/docs#07-create-image-effects",
+      "to": "/docs#07-create-image-effects",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/07-create-image-effects.mdx"
+    },
+    {
+      "from": "/docs#07-image-blend-mask-crop-gradient",
+      "to": "/docs#07-image-blend-mask-crop-gradient",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/07-image-blend-mask-crop-gradient.mdx"
+    },
+    {
+      "from": "/docs#07-measure-text",
+      "to": "/docs#07-measure-text",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/07-measure-text.mdx"
+    },
+    {
+      "from": "/docs#07-render-scene-to-gif",
+      "to": "/docs#07-render-scene-to-gif",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/07-render-scene-to-gif.mdx"
+    },
+    {
+      "from": "/docs#07-video-creation-options-matrix",
+      "to": "/docs#07-video-creation-options-matrix",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx"
+    },
+    {
+      "from": "/docs#07-visual-filters",
+      "to": "/docs#07-visual-filters",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/07-visual-filters.mdx"
+    },
+    {
+      "from": "/docs#08-animate-api",
+      "to": "/docs#08-animate-api",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/gif-animation/08-animate-api.mdx"
+    },
+    {
+      "from": "/docs#08-canvas-stroke-options",
+      "to": "/docs#08-canvas-stroke-options",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/08-canvas-stroke-options.mdx"
+    },
+    {
+      "from": "/docs#08-chart-polar-area",
+      "to": "/docs#08-chart-polar-area",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/08-chart-polar-area.mdx"
+    },
+    {
+      "from": "/docs#08-create-image-groups",
+      "to": "/docs#08-create-image-groups",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/08-create-image-groups.mdx"
+    },
+    {
+      "from": "/docs#08-create-text-paint-order",
+      "to": "/docs#08-create-text-paint-order",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/08-create-text-paint-order.mdx"
+    },
+    {
+      "from": "/docs#08-imperative-video-helpers",
+      "to": "/docs#08-imperative-video-helpers",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/08-imperative-video-helpers.mdx"
+    },
+    {
+      "from": "/docs#08-pixel-data",
+      "to": "/docs#08-pixel-data",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/08-pixel-data.mdx"
+    },
+    {
+      "from": "/docs#08-render-scene-to-video",
+      "to": "/docs#08-render-scene-to-video",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/08-render-scene-to-video.mdx"
+    },
+    {
+      "from": "/docs#08-text-overlays",
+      "to": "/docs#08-text-overlays",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/08-text-overlays.mdx"
+    },
+    {
+      "from": "/docs#09-canvas-paint-order",
+      "to": "/docs#09-canvas-paint-order",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/canvas/09-canvas-paint-order.mdx"
+    },
+    {
+      "from": "/docs#09-chart-combo",
+      "to": "/docs#09-chart-combo",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/09-chart-combo.mdx"
+    },
+    {
+      "from": "/docs#09-compositing",
+      "to": "/docs#09-compositing",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/09-compositing.mdx"
+    },
+    {
+      "from": "/docs#09-create-image-paint-order",
+      "to": "/docs#09-create-image-paint-order",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/09-create-image-paint-order.mdx"
+    },
+    {
+      "from": "/docs#09-create-text-properties-matrix",
+      "to": "/docs#09-create-text-properties-matrix",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/text-rendering/09-create-text-properties-matrix.mdx"
+    },
+    {
+      "from": "/docs#09-path2d-draw-and-custom-lines",
+      "to": "/docs#09-path2d-draw-and-custom-lines",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/09-path2d-draw-and-custom-lines.mdx"
+    },
+    {
+      "from": "/docs#09-scene-paint-order-performance",
+      "to": "/docs#09-scene-paint-order-performance",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-advanced/scene/09-scene-paint-order-performance.mdx"
+    },
+    {
+      "from": "/docs#09-security-runtime-configuration",
+      "to": "/docs#09-security-runtime-configuration",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/09-security-runtime-configuration.mdx"
+    },
+    {
+      "from": "/docs#10-advanced-ops",
+      "to": "/docs#10-advanced-ops",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/10-advanced-ops.mdx"
+    },
+    {
+      "from": "/docs#10-chart-comparison",
+      "to": "/docs#10-chart-comparison",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/charts/10-chart-comparison.mdx"
+    },
+    {
+      "from": "/docs#10-hit-detection",
+      "to": "/docs#10-hit-detection",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/raster-batch-output/10-hit-detection.mdx"
+    },
+    {
+      "from": "/docs#10-remote-image-reliability",
+      "to": "/docs#10-remote-image-reliability",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/images-shapes/10-remote-image-reliability.mdx"
+    },
+    {
+      "from": "/docs#11-on-progress",
+      "to": "/docs#11-on-progress",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/video-ffmpeg/options/11-on-progress.mdx"
+    },
+    {
+      "from": "/docs#api-batch",
+      "to": "/docs#api-batch",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-batch-save/api-batch.mdx"
+    },
+    {
+      "from": "/docs#api-create-audio",
+      "to": "/docs#api-create-audio",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-audio/api-create-audio.mdx"
+    },
+    {
+      "from": "/docs#api-create-chart",
+      "to": "/docs#api-create-chart",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-charts/api-create-chart.mdx"
+    },
+    {
+      "from": "/docs#api-create-gif",
+      "to": "/docs#api-create-gif",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-gif/api-create-gif.mdx"
+    },
+    {
+      "from": "/docs#api-create-path2d",
+      "to": "/docs#api-create-path2d",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-lines-paths/api-create-path2d.mdx"
+    },
+    {
+      "from": "/docs#api-create-video",
+      "to": "/docs#api-create-video",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-video/api-create-video.mdx"
+    },
+    {
+      "from": "/docs#api-image-utilities",
+      "to": "/docs#api-image-utilities",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-image/api-image-utilities.mdx"
+    },
+    {
+      "from": "/docs#api-index",
+      "to": "/docs#api-reference",
+      "type": "explicit-alias",
+      "source": "lib/doc-filename-aliases.ts"
+    },
+    {
+      "from": "/docs#api-new-apex-painter",
+      "to": "/docs#api-new-apex-painter",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-scene/api-new-apex-painter.mdx"
+    },
+    {
+      "from": "/docs#api-reference",
+      "to": "/docs#api-reference",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-overview/api-reference.mdx"
+    },
+    {
+      "from": "/docs#canvas-utils-and-types",
+      "to": "/docs#canvas-utils-and-types",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-overview/canvas-utils-and-types.mdx"
+    },
+    {
+      "from": "/docs#Change-Log",
+      "to": "/docs#changelog",
+      "type": "explicit-alias",
+      "source": "lib/doc-filename-aliases.ts"
+    },
+    {
+      "from": "/docs#changelog",
+      "to": "/docs#changelog",
+      "type": "canonical-current-hash",
+      "source": "content/docs/05-internals/changelog.mdx"
+    },
+    {
+      "from": "/docs#create-charts",
+      "to": "/docs#charts",
+      "type": "explicit-alias",
+      "source": "lib/doc-filename-aliases.ts"
+    },
+    {
+      "from": "/docs#create-gifs",
+      "to": "/docs#gif-and-animation",
+      "type": "explicit-alias",
+      "source": "lib/doc-filename-aliases.ts"
+    },
+    {
+      "from": "/docs#create-videos",
+      "to": "/docs#video-ffmpeg",
+      "type": "explicit-alias",
+      "source": "lib/doc-filename-aliases.ts"
+    },
+    {
+      "from": "/docs#feature-guides-hub",
+      "to": "/docs#feature-guides-hub",
+      "type": "canonical-current-hash",
+      "source": "content/docs/03-feature-guides/feature-guides-hub.mdx"
+    },
+    {
+      "from": "/docs#Getting-Started",
+      "to": "/docs#00-start-here",
+      "type": "explicit-alias",
+      "source": "lib/doc-filename-aliases.ts"
+    },
+    {
+      "from": "/docs#package-surface",
+      "to": "/docs#package-surface",
+      "type": "canonical-current-hash",
+      "source": "content/docs/04-api-reference/api-overview/package-surface.mdx"
+    },
+    {
+      "from": "/docs#README",
+      "to": "/docs#README",
+      "type": "canonical-current-hash",
+      "source": "content/docs/README.mdx"
+    },
+    {
+      "from": "/docs#recipe-share-card",
+      "to": "/docs#recipe-share-card",
+      "type": "canonical-current-hash",
+      "source": "content/docs/02-recipes/recipe-share-card.mdx"
+    },
+    {
+      "from": "/docs#start-here",
+      "to": "/docs#00-start-here",
+      "type": "explicit-alias",
+      "source": "lib/doc-filename-aliases.ts"
+    }
+  ]
+}

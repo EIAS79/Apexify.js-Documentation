@@ -1,0 +1,521 @@
+{
+  "schemaVersion": 1,
+  "environment": {
+    "chromePath": "/usr/bin/google-chrome",
+    "browserVersion": "Chrome/152.0.7977.64",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "baseUrl": "http://127.0.0.1:3000",
+    "puppeteerVersion": "24.16.0",
+    "axeVersion": "4.10.3"
+  },
+  "methodology": "Desktop/tablet/mobile viewport checks for overflow and visible interactive target sizing.",
+  "results": [
+    {
+      "key": "docs:desktop",
+      "surface": "docs",
+      "viewport": "desktop",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 188,
+      "sub24pxTargetCount": 5,
+      "sub24pxTargets": [
+        {
+          "tag": "input",
+          "label": "Search documentation",
+          "width": 273,
+          "height": 20
+        },
+        {
+          "tag": "a",
+          "label": "Install & setup",
+          "width": 94,
+          "height": 18
+        },
+        {
+          "tag": "a",
+          "label": "Feature guides",
+          "width": 99,
+          "height": 18
+        },
+        {
+          "tag": "a",
+          "label": "API reference",
+          "width": 91,
+          "height": 18
+        },
+        {
+          "tag": "a",
+          "label": "Advanced",
+          "width": 68,
+          "height": 18
+        }
+      ],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "docs:mobile",
+      "surface": "docs",
+      "viewport": "mobile",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 29,
+      "sub24pxTargetCount": 1,
+      "sub24pxTargets": [
+        {
+          "tag": "a",
+          "label": "Advanced",
+          "width": 58,
+          "height": 16
+        }
+      ],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "docs:tablet",
+      "surface": "docs",
+      "viewport": "tablet",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 32,
+      "sub24pxTargetCount": 4,
+      "sub24pxTargets": [
+        {
+          "tag": "a",
+          "label": "Install & setup",
+          "width": 94,
+          "height": 18
+        },
+        {
+          "tag": "a",
+          "label": "Feature guides",
+          "width": 99,
+          "height": 18
+        },
+        {
+          "tag": "a",
+          "label": "API reference",
+          "width": 91,
+          "height": 18
+        },
+        {
+          "tag": "a",
+          "label": "Advanced",
+          "width": 68,
+          "height": 18
+        }
+      ],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "gallery:desktop",
+      "surface": "gallery",
+      "viewport": "desktop",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 50,
+      "sub24pxTargetCount": 0,
+      "sub24pxTargets": [],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "gallery:mobile",
+      "surface": "gallery",
+      "viewport": "mobile",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 50,
+      "sub24pxTargetCount": 0,
+      "sub24pxTargets": [],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "gallery:tablet",
+      "surface": "gallery",
+      "viewport": "tablet",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 50,
+      "sub24pxTargetCount": 0,
+      "sub24pxTargets": [],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "home:desktop",
+      "surface": "home",
+      "viewport": "desktop",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 85,
+      "sub24pxTargetCount": 15,
+      "sub24pxTargets": [
+        {
+          "tag": "button",
+          "label": "Copy",
+          "width": 60,
+          "height": 22
+        },
+        {
+          "tag": "button",
+          "label": "Show bg-aurora-grid",
+          "width": 32,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show line-rich",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show presentation-slide",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show bg-molten-core",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show shape-collage-prism",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "a",
+          "label": "Edit live",
+          "width": 73,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Gallery",
+          "width": 47,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Studio",
+          "width": 42,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Docs",
+          "width": 34,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Recipes",
+          "width": 52,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "GitHub",
+          "width": 46,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "npm",
+          "width": 29,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Report issue",
+          "width": 83,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Changelog",
+          "width": 72,
+          "height": 17
+        }
+      ],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "home:mobile",
+      "surface": "home",
+      "viewport": "mobile",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 83,
+      "sub24pxTargetCount": 15,
+      "sub24pxTargets": [
+        {
+          "tag": "button",
+          "label": "Copy",
+          "width": 60,
+          "height": 22
+        },
+        {
+          "tag": "button",
+          "label": "Show bg-aurora-grid",
+          "width": 32,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show line-rich",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show presentation-slide",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show bg-molten-core",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show shape-collage-prism",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "a",
+          "label": "Edit live",
+          "width": 73,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Gallery",
+          "width": 47,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Studio",
+          "width": 42,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Docs",
+          "width": 34,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Recipes",
+          "width": 52,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "GitHub",
+          "width": 46,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "npm",
+          "width": 29,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Report issue",
+          "width": 83,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Changelog",
+          "width": 72,
+          "height": 17
+        }
+      ],
+      "codeOverflowContainers": 2
+    },
+    {
+      "key": "home:tablet",
+      "surface": "home",
+      "viewport": "tablet",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 85,
+      "sub24pxTargetCount": 15,
+      "sub24pxTargets": [
+        {
+          "tag": "button",
+          "label": "Copy",
+          "width": 60,
+          "height": 22
+        },
+        {
+          "tag": "button",
+          "label": "Show bg-aurora-grid",
+          "width": 32,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show line-rich",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show presentation-slide",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show bg-molten-core",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "button",
+          "label": "Show shape-collage-prism",
+          "width": 8,
+          "height": 6
+        },
+        {
+          "tag": "a",
+          "label": "Edit live",
+          "width": 73,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Gallery",
+          "width": 47,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Studio",
+          "width": 42,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Docs",
+          "width": 34,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Recipes",
+          "width": 52,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "GitHub",
+          "width": 46,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "npm",
+          "width": 29,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Report issue",
+          "width": 83,
+          "height": 17
+        },
+        {
+          "tag": "a",
+          "label": "Changelog",
+          "width": 72,
+          "height": 17
+        }
+      ],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "studio:desktop",
+      "surface": "studio",
+      "viewport": "desktop",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 30,
+      "sub24pxTargetCount": 3,
+      "sub24pxTargets": [
+        {
+          "tag": "div",
+          "label": "Resize editor and preview",
+          "width": 6,
+          "height": 771
+        },
+        {
+          "tag": "button",
+          "label": "Toggle TypeScript / JavaScript",
+          "width": 75,
+          "height": 22
+        },
+        {
+          "tag": "button",
+          "label": "Toggle auto-run on edit",
+          "width": 88,
+          "height": 21
+        }
+      ],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "studio:mobile",
+      "surface": "studio",
+      "viewport": "mobile",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 28,
+      "sub24pxTargetCount": 2,
+      "sub24pxTargets": [
+        {
+          "tag": "button",
+          "label": "Toggle TypeScript / JavaScript",
+          "width": 32,
+          "height": 22
+        },
+        {
+          "tag": "button",
+          "label": "Toggle auto-run on edit",
+          "width": 82,
+          "height": 19
+        }
+      ],
+      "codeOverflowContainers": 0
+    },
+    {
+      "key": "studio:tablet",
+      "surface": "studio",
+      "viewport": "tablet",
+      "horizontalOverflowPx": 0,
+      "interactiveCount": 30,
+      "sub24pxTargetCount": 3,
+      "sub24pxTargets": [
+        {
+          "tag": "div",
+          "label": "Resize editor and preview",
+          "width": 6,
+          "height": 828
+        },
+        {
+          "tag": "button",
+          "label": "Toggle TypeScript / JavaScript",
+          "width": 75,
+          "height": 22
+        },
+        {
+          "tag": "button",
+          "label": "Toggle auto-run on edit",
+          "width": 88,
+          "height": 21
+        }
+      ],
+      "codeOverflowContainers": 0
+    }
+  ]
+}

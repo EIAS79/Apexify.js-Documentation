@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "sourceFlow": [
+    "app/api/docs/route.ts: DOC_STRUCTURE + filesystem loader",
+    "app/docs/page.tsx: fetch /api/docs and current hash selection",
+    "components/DocSidebar.tsx: fetch /api/docs, expansion state, hash navigation",
+    "lib/docs-nav-utils.ts: navigation types/utilities",
+    "lib/doc-filename-aliases.ts: canonical legacy identifiers"
+  ],
+  "ownership": {
+    "globalHeader": "components/DocHeader.tsx",
+    "docsSidebar": "components/DocSidebar.tsx",
+    "docsSidebarSearch": "components/docs/DocsSidebarSearch.tsx",
+    "breadcrumbs": "components/docs/DocBreadcrumbs.tsx",
+    "pager": "components/docs/DocPager.tsx",
+    "onThisPage": "components/OnThisPage.tsx",
+    "readingProgress": "components/docs/DocReadingProgress.tsx"
+  },
+  "currentModel": "Server API returns a curated folder tree; client docs shell and sidebar fetch it independently; document selection/navigation is hash-based.",
+  "duplicationRisk": "The docs page and sidebar each fetch /api/docs independently; navigation labels/order are curated in server route code rather than content metadata."
+}

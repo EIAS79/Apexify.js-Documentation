@@ -1,0 +1,1194 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "component": "MDXContentRenderer",
+      "path": "app/docs/MDXContentRenderer.tsx",
+      "domain": "docs",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 2,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 540,
+      "bytes": 16552,
+      "status": "OVERLAPPING / REVIEW"
+    },
+    {
+      "component": "GalleryClient",
+      "path": "app/gallery/components/GalleryClient.tsx",
+      "domain": "gallery",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 267,
+      "bytes": 9329,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "GalleryFilterBar",
+      "path": "app/gallery/components/GalleryFilterBar.tsx",
+      "domain": "gallery",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryClient.tsx"
+      ],
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 20,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 502,
+      "bytes": 20550,
+      "status": "POSSIBLE SPLIT"
+    },
+    {
+      "component": "GalleryGrid",
+      "path": "app/gallery/components/GalleryGrid.tsx",
+      "domain": "gallery",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryClient.tsx"
+      ],
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 3,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 548,
+      "bytes": 19167,
+      "status": "POSSIBLE SPLIT"
+    },
+    {
+      "component": "GalleryHero",
+      "path": "app/gallery/components/GalleryHero.tsx",
+      "domain": "gallery",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryClient.tsx"
+      ],
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 157,
+      "bytes": 5361,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "GalleryModal",
+      "path": "app/gallery/components/GalleryModal.tsx",
+      "domain": "gallery",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryClient.tsx"
+      ],
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 19,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 927,
+      "bytes": 34219,
+      "status": "POSSIBLE SPLIT"
+    },
+    {
+      "component": "GallerySnippetEditor",
+      "path": "app/gallery/components/GallerySnippetEditor.tsx",
+      "domain": "gallery",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryModal.tsx",
+        "components/studio/CodeStudio.tsx"
+      ],
+      "affectedRoutes": [
+        "/gallery",
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes"
+      ],
+      "lines": 72,
+      "bytes": 2062,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "GallerySpotlight",
+      "path": "app/gallery/components/GallerySpotlight.tsx",
+      "domain": "gallery",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryFilterBar.tsx"
+      ],
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 9,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 527,
+      "bytes": 18966,
+      "status": "POSSIBLE SPLIT"
+    },
+    {
+      "component": "GalleryZoomablePreview",
+      "path": "app/gallery/components/GalleryZoomablePreview.tsx",
+      "domain": "gallery",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryModal.tsx"
+      ],
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 5,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 279,
+      "bytes": 9851,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "Brand",
+      "path": "components/Brand.tsx",
+      "domain": "shared",
+      "boundary": "client",
+      "usedBy": [
+        "components/DocHeader.tsx",
+        "components/home/HomeSections.tsx",
+        "components/Navbar.tsx",
+        "components/studio/StudioTopBar.tsx"
+      ],
+      "affectedRoutes": [
+        "/",
+        "/gallery",
+        "/studio"
+      ],
+      "propsTypeSignals": 2,
+      "interactive": false,
+      "accessibilitySignals": 10,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 114,
+      "bytes": 3416,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "ChangelogRenderer",
+      "path": "components/ChangelogRenderer.tsx",
+      "domain": "shared",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/MDXContentRenderer.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 7,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 723,
+      "bytes": 28958,
+      "status": "POSSIBLE SPLIT"
+    },
+    {
+      "component": "CustomCursor",
+      "path": "components/CustomCursor.tsx",
+      "domain": "shared",
+      "boundary": "client",
+      "usedBy": [
+        "app/layout.tsx"
+      ],
+      "affectedRoutes": [],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 8,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 312,
+      "bytes": 10855,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "DocHeader",
+      "path": "components/DocHeader.tsx",
+      "domain": "navigation",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/layout.tsx"
+      ],
+      "affectedRoutes": [],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 20,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 309,
+      "bytes": 12201,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "DocLayout",
+      "path": "components/DocLayout.tsx",
+      "domain": "shared",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/getting-started/page.tsx",
+        "app/docs/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs",
+        "/docs/getting-started"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes"
+      ],
+      "lines": 79,
+      "bytes": 2886,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "DocBreadcrumbs",
+      "path": "components/docs/DocBreadcrumbs.tsx",
+      "domain": "docs",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 6,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 61,
+      "bytes": 2282,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "DocHeadingAnchor",
+      "path": "components/docs/DocHeadingAnchor.tsx",
+      "domain": "docs",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/MDXContentRenderer.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 3,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 53,
+      "bytes": 1716,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "DocPager",
+      "path": "components/docs/DocPager.tsx",
+      "domain": "docs",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 7,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 116,
+      "bytes": 3590,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "DocReadingProgress",
+      "path": "components/docs/DocReadingProgress.tsx",
+      "domain": "docs",
+      "boundary": "client",
+      "usedBy": [
+        "components/DocLayout.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs",
+        "/docs/getting-started"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 1,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 56,
+      "bytes": 1707,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "DocsSidebarSearch",
+      "path": "components/docs/DocsSidebarSearch.tsx",
+      "domain": "docs",
+      "boundary": "client",
+      "usedBy": [
+        "components/DocSidebar.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 9,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 266,
+      "bytes": 9920,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "SectionAccentIcon",
+      "path": "components/docs/SectionAccentIcon.tsx",
+      "domain": "docs",
+      "boundary": "client",
+      "usedBy": [
+        "components/docs/DocBreadcrumbs.tsx",
+        "components/DocSidebar.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 1,
+      "styling": [
+        "classes"
+      ],
+      "lines": 41,
+      "bytes": 1055,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "DocSidebar",
+      "path": "components/DocSidebar.tsx",
+      "domain": "navigation",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 11,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 527,
+      "bytes": 19320,
+      "status": "POSSIBLE SPLIT"
+    },
+    {
+      "component": "DocsSearchPalette",
+      "path": "components/DocsSearchPalette.tsx",
+      "domain": "shared",
+      "boundary": "client",
+      "usedBy": [
+        "components/DocHeader.tsx"
+      ],
+      "affectedRoutes": [],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 12,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 339,
+      "bytes": 12961,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "AmbientBackground",
+      "path": "components/home/AmbientBackground.tsx",
+      "domain": "home",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryClient.tsx",
+        "app/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/",
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 1,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 121,
+      "bytes": 4662,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "HeroShowcase",
+      "path": "components/home/HeroShowcase.tsx",
+      "domain": "home",
+      "boundary": "client",
+      "usedBy": [
+        "app/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 4,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 374,
+      "bytes": 13519,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "HomeMotion",
+      "path": "components/home/HomeMotion.tsx",
+      "domain": "home",
+      "boundary": "client",
+      "usedBy": [],
+      "affectedRoutes": [],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 2,
+      "styling": [
+        "classes"
+      ],
+      "lines": 191,
+      "bytes": 4591,
+      "status": "DEAD / VERIFY"
+    },
+    {
+      "component": "HomeSections",
+      "path": "components/home/HomeSections.tsx",
+      "domain": "home",
+      "boundary": "client",
+      "usedBy": [
+        "app/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 13,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 1209,
+      "bytes": 48819,
+      "status": "POSSIBLE SPLIT"
+    },
+    {
+      "component": "ShowcaseWall",
+      "path": "components/home/ShowcaseWall.tsx",
+      "domain": "home",
+      "boundary": "client",
+      "usedBy": [
+        "app/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 3,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 267,
+      "bytes": 12668,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "Alert",
+      "path": "components/mdx/Alert.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/index.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": false,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes"
+      ],
+      "lines": 83,
+      "bytes": 3159,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "CodeBlock",
+      "path": "components/mdx/CodeBlock.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/CodeSwitcher.tsx",
+        "components/mdx/CodeWithImage.tsx",
+        "components/mdx/index.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 2,
+      "styling": [
+        "classes"
+      ],
+      "lines": 198,
+      "bytes": 7916,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "CodeSwitcher",
+      "path": "components/mdx/CodeSwitcher.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/index.tsx",
+        "components/mdx/PreviewWithCode.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes"
+      ],
+      "lines": 89,
+      "bytes": 3022,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "CodeWithImage",
+      "path": "components/mdx/CodeWithImage.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/index.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": false,
+      "accessibilitySignals": 1,
+      "styling": [
+        "classes"
+      ],
+      "lines": 52,
+      "bytes": 1039,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "Dropdown",
+      "path": "components/mdx/Dropdown.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/index.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes"
+      ],
+      "lines": 38,
+      "bytes": 1062,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "GalleryExample",
+      "path": "components/mdx/GalleryExample.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/index.tsx",
+        "components/mdx/RelatedGallery.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 2,
+      "styling": [
+        "classes"
+      ],
+      "lines": 41,
+      "bytes": 1652,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "GalleryPreview",
+      "path": "components/mdx/GalleryPreview.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/GalleryExample.tsx",
+        "components/mdx/index.tsx",
+        "components/mdx/PreviewWithCode.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 1,
+      "styling": [
+        "classes"
+      ],
+      "lines": 43,
+      "bytes": 1002,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "index",
+      "path": "components/mdx/index.tsx",
+      "domain": "mdx",
+      "boundary": "server/static-capable",
+      "usedBy": [
+        "app/docs/MDXContentRenderer.tsx",
+        "components/mdx/MDXRenderer.tsx",
+        "mdx-components.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 0,
+      "styling": [],
+      "lines": 13,
+      "bytes": 506,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "MDXRenderer",
+      "path": "components/mdx/MDXRenderer.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [],
+      "affectedRoutes": [],
+      "propsTypeSignals": 1,
+      "interactive": false,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes"
+      ],
+      "lines": 131,
+      "bytes": 5126,
+      "status": "OVERLAPPING / REVIEW"
+    },
+    {
+      "component": "PreviewWithCode",
+      "path": "components/mdx/PreviewWithCode.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/index.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 4,
+      "styling": [
+        "classes"
+      ],
+      "lines": 92,
+      "bytes": 3513,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "RelatedGallery",
+      "path": "components/mdx/RelatedGallery.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/index.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes"
+      ],
+      "lines": 25,
+      "bytes": 571,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "Table",
+      "path": "components/mdx/Table.tsx",
+      "domain": "mdx",
+      "boundary": "client",
+      "usedBy": [
+        "components/mdx/index.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": false,
+      "accessibilitySignals": 0,
+      "styling": [
+        "classes"
+      ],
+      "lines": 58,
+      "bytes": 1419,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "Navbar",
+      "path": "components/Navbar.tsx",
+      "domain": "navigation",
+      "boundary": "client",
+      "usedBy": [
+        "app/gallery/components/GalleryClient.tsx",
+        "app/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/",
+        "/gallery"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 8,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 233,
+      "bytes": 10429,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "OnThisPage",
+      "path": "components/OnThisPage.tsx",
+      "domain": "shared",
+      "boundary": "client",
+      "usedBy": [
+        "components/DocLayout.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs",
+        "/docs/getting-started"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 17,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 274,
+      "bytes": 10073,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "CodeStudio",
+      "path": "components/studio/CodeStudio.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "app/studio/page.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 4,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 883,
+      "bytes": 28759,
+      "status": "POSSIBLE SPLIT"
+    },
+    {
+      "component": "StudioCommandPalette",
+      "path": "components/studio/StudioCommandPalette.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/CodeStudio.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 9,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 265,
+      "bytes": 9621,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "StudioFileTabs",
+      "path": "components/studio/StudioFileTabs.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/CodeStudio.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 11,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 168,
+      "bytes": 5681,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "StudioOutputPanel",
+      "path": "components/studio/StudioOutputPanel.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/CodeStudio.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 16,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 392,
+      "bytes": 13464,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "StudioPreviewZoom",
+      "path": "components/studio/StudioPreviewZoom.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/StudioOutputPanel.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 6,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 330,
+      "bytes": 11831,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "StudioResizableSplit",
+      "path": "components/studio/StudioResizableSplit.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/CodeStudio.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 8,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 144,
+      "bytes": 4466,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "StudioRunnerTerminal",
+      "path": "components/studio/StudioRunnerTerminal.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/StudioOutputPanel.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": false,
+      "accessibilitySignals": 4,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 114,
+      "bytes": 4027,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "StudioShortcutOverlay",
+      "path": "components/studio/StudioShortcutOverlay.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/CodeStudio.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 4,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 152,
+      "bytes": 5697,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "StudioStatusBar",
+      "path": "components/studio/StudioStatusBar.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/CodeStudio.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 7,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 131,
+      "bytes": 4065,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "StudioTopBar",
+      "path": "components/studio/StudioTopBar.tsx",
+      "domain": "studio",
+      "boundary": "client",
+      "usedBy": [
+        "components/studio/CodeStudio.tsx"
+      ],
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "propsTypeSignals": 1,
+      "interactive": true,
+      "accessibilitySignals": 25,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 423,
+      "bytes": 14477,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "ThemeProvider",
+      "path": "components/ThemeProvider.tsx",
+      "domain": "theme",
+      "boundary": "client",
+      "usedBy": [
+        "app/layout.tsx",
+        "components/Brand.tsx",
+        "components/home/AmbientBackground.tsx",
+        "components/mdx/Alert.tsx",
+        "components/ThemeToggle.tsx"
+      ],
+      "affectedRoutes": [
+        "/",
+        "/docs",
+        "/gallery",
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 0,
+      "styling": [],
+      "lines": 103,
+      "bytes": 2993,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "ThemeToggle",
+      "path": "components/ThemeToggle.tsx",
+      "domain": "theme",
+      "boundary": "client",
+      "usedBy": [
+        "components/DocHeader.tsx",
+        "components/Navbar.tsx",
+        "components/studio/StudioTopBar.tsx"
+      ],
+      "affectedRoutes": [
+        "/",
+        "/gallery",
+        "/studio"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 5,
+      "styling": [
+        "classes",
+        "inline-style"
+      ],
+      "lines": 55,
+      "bytes": 1727,
+      "status": "KEEP / ENHANCE LATER"
+    },
+    {
+      "component": "SidebarContext",
+      "path": "contexts/SidebarContext.tsx",
+      "domain": "navigation",
+      "boundary": "client",
+      "usedBy": [
+        "app/docs/page.tsx",
+        "app/layout.tsx",
+        "components/DocHeader.tsx",
+        "components/DocLayout.tsx"
+      ],
+      "affectedRoutes": [
+        "/docs",
+        "/docs/getting-started"
+      ],
+      "propsTypeSignals": 0,
+      "interactive": true,
+      "accessibilitySignals": 0,
+      "styling": [],
+      "lines": 56,
+      "bytes": 1443,
+      "status": "KEEP / ENHANCE LATER"
+    }
+  ]
+}

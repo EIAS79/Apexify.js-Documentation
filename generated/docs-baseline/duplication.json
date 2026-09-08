@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "duplicateComponentNames": [],
+  "rendererOverlaps": [
+    {
+      "files": [
+        "app/docs/MDXContentRenderer.tsx",
+        "components/mdx/MDXRenderer.tsx"
+      ],
+      "classification": "RENDERER OVERLAP — REVIEW IN DOC-3"
+    }
+  ]
+}

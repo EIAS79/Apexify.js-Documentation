@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "topLevel": [
+    ".github",
+    ".gitignore",
+    ".nvmrc",
+    ".vscode",
+    "app",
+    "components",
+    "content",
+    "contexts",
+    "features-forDocs.md",
+    "lib",
+    "mdx-components.tsx",
+    "middleware.ts",
+    "next-env.d.ts",
+    "next.config.js",
+    "package-lock.json",
+    "package.json",
+    "postcss.config.js",
+    "public",
+    "scripts",
+    "tailwind.config.ts",
+    "tsconfig.json",
+    "tsconfig.tsbuildinfo",
+    "vercel.json"
+  ],
+  "sourceFileCount": 277,
+  "routeCount": 9,
+  "layoutCount": 4,
+  "componentCount": 54,
+  "docsContentCount": 148,
+  "apiRouteCount": 3,
+  "clientBoundaryCount": 56,
+  "flowSummary": {
+    "docs": [
+      "content/docs MDX",
+      "/api/docs fs loader",
+      "/docs client hash controller",
+      "MDXContentRenderer",
+      "docs shell"
+    ],
+    "search": [
+      "content/docs",
+      "/api/docs/search runtime scan",
+      "sidebar/palette",
+      "/docs#hash"
+    ],
+    "gallery": [
+      "lib/gallery + public/gallery",
+      "gallery UI",
+      "/api/gallery/run"
+    ],
+    "studio": [
+      "Studio editor/state",
+      "/api/gallery/run",
+      "preview/output"
+    ]
+  }
+}

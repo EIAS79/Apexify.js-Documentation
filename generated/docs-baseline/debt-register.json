@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "findings": [
+    {
+      "id": "DOC0-COMPLEX-008",
+      "domain": "shared",
+      "severity": "low",
+      "description": "Large source (5467 lines/191612 bytes) requires decomposition review.",
+      "evidence": "package-lock.json",
+      "recommendedOwner": "DOC-2/DOC-3",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-009",
+      "domain": "home",
+      "severity": "low",
+      "description": "Large source (1209 lines/48819 bytes) requires decomposition review.",
+      "evidence": "components/home/HomeSections.tsx",
+      "recommendedOwner": "DOC-2/DOC-3",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-010",
+      "domain": "gallery",
+      "severity": "low",
+      "description": "Large source (927 lines/34219 bytes) requires decomposition review.",
+      "evidence": "app/gallery/components/GalleryModal.tsx",
+      "recommendedOwner": "DOC-7",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-011",
+      "domain": "gallery",
+      "severity": "low",
+      "description": "Large source (993 lines/29117 bytes) requires decomposition review.",
+      "evidence": "lib/gallery/charts/chartsShowcaseGalleryItems.ts",
+      "recommendedOwner": "DOC-7",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-012",
+      "domain": "shared",
+      "severity": "low",
+      "description": "Large source (723 lines/28958 bytes) requires decomposition review.",
+      "evidence": "components/ChangelogRenderer.tsx",
+      "recommendedOwner": "DOC-2/DOC-3",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-013",
+      "domain": "studio",
+      "severity": "low",
+      "description": "Large source (883 lines/28759 bytes) requires decomposition review.",
+      "evidence": "components/studio/CodeStudio.tsx",
+      "recommendedOwner": "DOC-8",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-014",
+      "domain": "shared",
+      "severity": "low",
+      "description": "Large source (753 lines/24878 bytes) requires decomposition review.",
+      "evidence": "app/globals.css",
+      "recommendedOwner": "DOC-2/DOC-3",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-015",
+      "domain": "shared",
+      "severity": "low",
+      "description": "Large source (46 lines/22914 bytes) requires decomposition review.",
+      "evidence": "scripts/doc0-audit.mjs",
+      "recommendedOwner": "DOC-2/DOC-3",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-016",
+      "domain": "gallery",
+      "severity": "low",
+      "description": "Large source (827 lines/21792 bytes) requires decomposition review.",
+      "evidence": "lib/gallery/background/backgroundSnippets.ts",
+      "recommendedOwner": "DOC-7",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-017",
+      "domain": "docs",
+      "severity": "low",
+      "description": "Large source (659 lines/21472 bytes) requires decomposition review.",
+      "evidence": "app/api/docs/route.ts",
+      "recommendedOwner": "DOC-2/DOC-3",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-018",
+      "domain": "gallery",
+      "severity": "low",
+      "description": "Large source (502 lines/20550 bytes) requires decomposition review.",
+      "evidence": "app/gallery/components/GalleryFilterBar.tsx",
+      "recommendedOwner": "DOC-7",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-COMPLEX-019",
+      "domain": "gallery",
+      "severity": "low",
+      "description": "Large source (717 lines/20071 bytes) requires decomposition review.",
+      "evidence": "lib/gallery/core/writeGalleryStaticOutputs.ts",
+      "recommendedOwner": "DOC-7",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-DEBT-001",
+      "domain": "routing",
+      "severity": "high",
+      "description": "/docs multiplexes corpus via hashes",
+      "evidence": "app/docs/page.tsx",
+      "recommendedOwner": "DOC-1",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-DEBT-002",
+      "domain": "server-client",
+      "severity": "high",
+      "description": "docs page and layout are client components",
+      "evidence": "app/docs/page.tsx + app/docs/layout.tsx",
+      "recommendedOwner": "DOC-1/DOC-2",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-DEBT-003",
+      "domain": "search",
+      "severity": "medium",
+      "description": "request-time synchronous recursive MDX scan",
+      "evidence": "app/api/docs/search/route.ts",
+      "recommendedOwner": "DOC-6",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-DEBT-004",
+      "domain": "mdx",
+      "severity": "medium",
+      "description": "two MDX renderer concepts overlap",
+      "evidence": "MDXContentRenderer + MDXRenderer",
+      "recommendedOwner": "DOC-3",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-DEBT-005",
+      "domain": "seo",
+      "severity": "medium",
+      "description": "generic root metadata; canonical/OG need baseline review",
+      "evidence": "app/layout.tsx",
+      "recommendedOwner": "DOC-11",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-DEBT-006",
+      "domain": "performance",
+      "severity": "medium",
+      "description": "global CustomCursor/SpeedInsights cost needs review",
+      "evidence": "app/layout.tsx",
+      "recommendedOwner": "DOC-2/DOC-11",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-DEBT-007",
+      "domain": "package-sync",
+      "severity": "high",
+      "description": "docs pin tracks package main, not frozen Phase14-P control point",
+      "evidence": "package.json",
+      "recommendedOwner": "DOC-0/DOC-12",
+      "blockingDoc0": false
+    },
+    {
+      "id": "DOC0-SEC-001",
+      "domain": "gallery/studio",
+      "severity": "critical",
+      "description": "Gallery/Studio code runner isolation is not a security sandbox",
+      "evidence": "app/api/gallery/run/route.ts + lib/gallery/core/wrapSnippetForRunner.ts + next.config.js",
+      "recommendedOwner": "DOC-7 / DOC-8 with release-security review before public untrusted execution",
+      "blockingDoc0": false
+    }
+  ]
+}

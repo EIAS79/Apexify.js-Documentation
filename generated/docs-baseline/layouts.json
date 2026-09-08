@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "layouts": [
+    {
+      "file": "app/docs/layout.tsx",
+      "routeScope": "/docs",
+      "boundary": "client",
+      "responsibilities": [
+        "navigation/header",
+        "interactive-effect"
+      ],
+      "imports": [
+        "react",
+        "@/components/DocHeader"
+      ],
+      "lines": 68,
+      "bytes": 2363
+    },
+    {
+      "file": "app/gallery/layout.tsx",
+      "routeScope": "/gallery",
+      "boundary": "server/static-capable",
+      "responsibilities": [
+        "metadata"
+      ],
+      "imports": [
+        "next"
+      ],
+      "lines": 12,
+      "bytes": 354
+    },
+    {
+      "file": "app/layout.tsx",
+      "routeScope": "/",
+      "boundary": "server/static-capable",
+      "responsibilities": [
+        "theme/provider",
+        "sidebar/provider",
+        "metadata"
+      ],
+      "imports": [
+        "next",
+        "next/font/google",
+        "@vercel/speed-insights/next",
+        "@/components/ThemeProvider",
+        "@/contexts/SidebarContext",
+        "@/components/CustomCursor",
+        "./globals.css"
+      ],
+      "lines": 55,
+      "bytes": 1713
+    },
+    {
+      "file": "app/studio/layout.tsx",
+      "routeScope": "/studio",
+      "boundary": "server/static-capable",
+      "responsibilities": [
+        "metadata"
+      ],
+      "imports": [
+        "next",
+        "react"
+      ],
+      "lines": 13,
+      "bytes": 383
+    }
+  ]
+}

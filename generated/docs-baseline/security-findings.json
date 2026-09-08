@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "findings": [
+    {
+      "id": "DOC0-SEC-001",
+      "domain": "gallery/studio",
+      "severity": "critical",
+      "title": "Gallery/Studio code runner isolation is not a security sandbox",
+      "evidenceFiles": [
+        "app/api/gallery/run/route.ts",
+        "lib/gallery/core/wrapSnippetForRunner.ts",
+        "next.config.js"
+      ],
+      "observedFacts": {
+        "enabledByDefault": true,
+        "optionalSecret": true,
+        "inheritsParentEnvironment": true,
+        "spawnsUserDerivedSnippet": true,
+        "sourceTextBlocklist": true,
+        "hoistsUserImports": true
+      },
+      "risk": "Remote snippets execute as a child Node process with the application working directory and inherited environment. The source-text blocklist is not an isolation boundary; optional authentication and default-enabled execution materially increase exposure.",
+      "doc0Action": "Record only. Do not redesign Gallery/Studio execution during baseline phase.",
+      "recommendedOwner": "DOC-7 / DOC-8 with release-security review before public untrusted execution",
+      "preservationConstraint": "Any hardening must preserve verified Gallery/Studio authoring workflows while changing the execution trust boundary deliberately."
+    }
+  ]
+}
