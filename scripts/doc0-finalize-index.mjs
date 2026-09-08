@@ -1,0 +1,4 @@
+import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';
+const R=process.cwd(),O=path.join(R,'generated/docs-baseline');if(!fs.existsSync(O))throw new Error('generated/docs-baseline does not exist');
+const sha=f=>crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex'),names=fs.readdirSync(O).filter(n=>n.endsWith('.json')&&n!=='index.json').sort(),arch=path.join(O,'architecture.json'),identity=fs.existsSync(arch)?JSON.parse(fs.readFileSync(arch,'utf8')).identity||null:null;
+fs.writeFileSync(path.join(O,'index.json'),JSON.stringify({schemaVersion:1,baselineIdentity:identity,artifactCount:names.length,artifacts:names.map(name=>({name,sha256:sha(path.join(O,name))}))},null,2)+'\n');console.log(`DOC-0 index finalized: ${names.length} JSON artifacts`);
