@@ -21,7 +21,7 @@
     "verify": "npm run verify:docs && npm run typecheck && npm run build",
     "gallery:build": "tsx scripts/gallery-build.ts",
     "gallery:verify": "tsx scripts/verify-gallery-outputs.ts",
-    "docs:audit:baseline": "node scripts/doc0-audit.mjs && node scripts/doc0-manual-findings.mjs",
+    "docs:audit:baseline": "node scripts/doc0-audit.mjs && node scripts/doc0-manual-findings.mjs && node scripts/doc0-controls-audit.mjs",
     "docs:audit:build": "node scripts/doc0-build-baseline.mjs",
     "docs:audit:links": "node scripts/doc0-link-audit.mjs",
     "docs:audit:browser": "node scripts/doc0-browser-audit.mjs",
