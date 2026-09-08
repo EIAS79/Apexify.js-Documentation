@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "appSpecialFiles": [
+    {
+      "file": "app/not-found.tsx",
+      "type": "not-found"
+    }
+  ],
+  "nextConfig": "next.config.js",
+  "redirectsDefined": false,
+  "rewritesDefined": false,
+  "headersDefined": false,
+  "legacyRouting": {
+    "primaryDocsRoute": "/docs",
+    "documentIdentity": "URL hash",
+    "headingIdentity": "?h=<heading-id> inside docs hash",
+    "aliasSource": "lib/doc-filename-aliases.ts"
+  },
+  "notFoundHandling": [
+    {
+      "file": "app/not-found.tsx",
+      "type": "not-found"
+    }
+  ]
+}

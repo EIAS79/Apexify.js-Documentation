@@ -1,0 +1,517 @@
+{
+  "schemaVersion": 1,
+  "dependencies": [
+    {
+      "name": "@codemirror/lang-javascript",
+      "version": "^6.2.5",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/gallery/components/GallerySnippetEditor.tsx"
+      ],
+      "domains": [
+        "gallery"
+      ],
+      "status": "USED",
+      "riskNotes": [
+        "client-heavy: bundle containment"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "@heroicons/react",
+      "version": "^2.2.0",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/docs/page.tsx",
+        "app/gallery/components/GalleryClient.tsx",
+        "app/gallery/components/galleryConfig.ts",
+        "app/gallery/components/GalleryFilterBar.tsx",
+        "app/gallery/components/GalleryGrid.tsx",
+        "app/gallery/components/GalleryHero.tsx",
+        "app/gallery/components/GalleryModal.tsx",
+        "app/gallery/components/GallerySpotlight.tsx",
+        "app/gallery/components/GalleryZoomablePreview.tsx",
+        "app/page.tsx",
+        "components/ChangelogRenderer.tsx",
+        "components/DocHeader.tsx",
+        "components/docs/DocBreadcrumbs.tsx",
+        "components/docs/DocHeadingAnchor.tsx",
+        "components/docs/DocPager.tsx",
+        "components/docs/DocsSidebarSearch.tsx",
+        "components/docs/SectionAccentIcon.tsx",
+        "components/DocSidebar.tsx",
+        "components/DocsSearchPalette.tsx",
+        "components/home/HeroShowcase.tsx",
+        "components/home/HomeSections.tsx",
+        "components/home/ShowcaseWall.tsx",
+        "components/mdx/Alert.tsx",
+        "components/mdx/CodeBlock.tsx",
+        "components/mdx/Dropdown.tsx",
+        "components/mdx/GalleryExample.tsx",
+        "components/mdx/PreviewWithCode.tsx",
+        "components/Navbar.tsx",
+        "components/OnThisPage.tsx",
+        "components/studio/CodeStudio.tsx",
+        "components/studio/StudioCommandPalette.tsx",
+        "components/studio/StudioFileTabs.tsx",
+        "components/studio/StudioOutputPanel.tsx",
+        "components/studio/StudioPreviewZoom.tsx",
+        "components/studio/StudioShortcutOverlay.tsx",
+        "components/studio/StudioTopBar.tsx",
+        "components/ThemeToggle.tsx"
+      ],
+      "domains": [
+        "docs",
+        "gallery",
+        "home",
+        "mdx",
+        "navigation",
+        "shared",
+        "studio",
+        "theme"
+      ],
+      "status": "USED",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "@napi-rs/canvas",
+      "version": "^0.1.80",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "lib/gallery/core/wrapSnippetForRunner.ts"
+      ],
+      "domains": [
+        "gallery"
+      ],
+      "status": "USED",
+      "riskNotes": [
+        "native/server-heavy: browser exclusion"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "@types/node",
+      "version": "^22.20.1",
+      "dependencyClass": "dev",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "@types/react",
+      "version": "^18.2.0",
+      "dependencyClass": "dev",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "@types/react-syntax-highlighter",
+      "version": "^15.5.13",
+      "dependencyClass": "runtime",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [
+        "client-heavy: bundle containment"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "@uiw/react-codemirror",
+      "version": "^4.25.9",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/gallery/components/GallerySnippetEditor.tsx"
+      ],
+      "domains": [
+        "gallery"
+      ],
+      "status": "USED",
+      "riskNotes": [
+        "client-heavy: bundle containment"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "@vercel/speed-insights",
+      "version": "^2.0.0",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/layout.tsx"
+      ],
+      "domains": [
+        "shared"
+      ],
+      "status": "USED",
+      "riskNotes": [
+        "telemetry/privacy + global client cost"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "apexify.js",
+      "version": "github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/api/gallery/run/route.ts",
+        "app/docs/getting-started/page.tsx",
+        "components/home/HomeSections.tsx",
+        "content/docs/00-start-here/00-start-here.mdx",
+        "content/docs/01-beginner-guide/01-install-and-setup.mdx",
+        "content/docs/01-beginner-guide/02-your-first-image.mdx",
+        "content/docs/02-recipes/recipe-share-card.mdx",
+        "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+        "content/docs/03-feature-guides/canvas/05-backgrounds-pattern-noise.mdx",
+        "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+        "content/docs/03-feature-guides/canvas/07-canvas-shadow-options.mdx",
+        "content/docs/03-feature-guides/canvas/08-canvas-stroke-options.mdx",
+        "content/docs/03-feature-guides/raster-batch-output/03-output-format-and-encoding.mdx",
+        "content/docs/03-feature-guides/raster-batch-output/06-image-resize-convert-effects.mdx",
+        "content/docs/03-feature-guides/raster-batch-output/07-image-blend-mask-crop-gradient.mdx",
+        "content/docs/03-feature-guides/raster-batch-output/09-path2d-draw-and-custom-lines.mdx",
+        "content/docs/04-advanced/01-runtime-resource-governance.mdx",
+        "content/docs/04-advanced/04-migration-v6.mdx",
+        "content/docs/04-advanced/composition/01-named-assets.mdx",
+        "content/docs/04-advanced/composition/02-templates.mdx",
+        "content/docs/04-advanced/composition/03-preset-components.mdx",
+        "content/docs/04-advanced/composition/04-plugins.mdx",
+        "content/docs/04-advanced/composition/05-imperative-batch-chain-assets.mdx",
+        "content/docs/04-advanced/scene/00-scene-composition.mdx",
+        "content/docs/04-advanced/scene/01-scene-types-builder.mdx",
+        "content/docs/04-advanced/scene/06-render-scene.mdx",
+        "content/docs/04-advanced/scene/07-render-scene-to-gif.mdx",
+        "content/docs/04-advanced/scene/08-render-scene-to-video.mdx",
+        "content/docs/04-advanced/video/01-video-pipeline.mdx",
+        "content/docs/04-api-reference/api-overview/api-reference.mdx",
+        "content/docs/04-api-reference/api-overview/package-surface.mdx",
+        "content/docs/04-api-reference/api-scene/api-new-apex-painter.mdx",
+        "content/docs/05-internals/changelog.mdx",
+        "lib/gallery/advance/advanceSnippets.ts",
+        "lib/gallery/advance/extraAdvanceSnippets.ts",
+        "lib/gallery/background/backgroundSnippets.ts",
+        "lib/gallery/background/canvasBackgroundGallerySnippets.ts",
+        "lib/gallery/background/canvasBackgroundShowcasePicks.ts",
+        "lib/gallery/charts/chartsShowcaseGalleryItems.ts",
+        "lib/gallery/charts/chartsShowcaseMoreRenders.ts",
+        "lib/gallery/charts/chartsShowcasePicks.ts",
+        "lib/gallery/core/galleryAssetRunner.ts",
+        "lib/gallery/core/wrapSnippetForRunner.ts",
+        "lib/gallery/core/writeGalleryStaticOutputs.ts",
+        "lib/gallery/motion/motionSnippets.ts",
+        "lib/gallery/spin-wheel/spinWheelSnippets.ts",
+        "lib/studio/studioConfig.ts",
+        "next.config.js",
+        "scripts/verify-phase13-docs.mjs"
+      ],
+      "domains": [
+        "docs",
+        "gallery",
+        "home",
+        "shared",
+        "studio"
+      ],
+      "status": "USED",
+      "riskNotes": [
+        "native/server-heavy: browser exclusion"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "autoprefixer",
+      "version": "^10.4.17",
+      "dependencyClass": "dev",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "dejavu-fonts-ttf",
+      "version": "^2.37.3",
+      "dependencyClass": "runtime",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "framer-motion",
+      "version": "^12.38.0",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/gallery/components/GalleryClient.tsx",
+        "app/gallery/components/GalleryGrid.tsx",
+        "app/gallery/components/GalleryHero.tsx",
+        "app/page.tsx",
+        "components/DocsSearchPalette.tsx",
+        "components/home/HeroShowcase.tsx",
+        "components/home/HomeMotion.tsx",
+        "components/home/HomeSections.tsx",
+        "components/home/ShowcaseWall.tsx",
+        "components/studio/CodeStudio.tsx",
+        "components/studio/StudioCommandPalette.tsx",
+        "components/studio/StudioShortcutOverlay.tsx"
+      ],
+      "domains": [
+        "gallery",
+        "home",
+        "shared",
+        "studio"
+      ],
+      "status": "USED",
+      "riskNotes": [
+        "client-heavy: bundle containment"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "next",
+      "version": "^14.2.0",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/api/docs/route.ts",
+        "app/api/docs/search/route.ts",
+        "app/api/gallery/run/route.ts",
+        "app/apple-icon.tsx",
+        "app/docs/api/page.tsx",
+        "app/docs/page.tsx",
+        "app/gallery/components/GalleryClient.tsx",
+        "app/gallery/components/GalleryModal.tsx",
+        "app/gallery/layout.tsx",
+        "app/layout.tsx",
+        "app/not-found.tsx",
+        "app/studio/layout.tsx",
+        "components/Brand.tsx",
+        "components/CustomCursor.tsx",
+        "components/DocHeader.tsx",
+        "components/docs/DocBreadcrumbs.tsx",
+        "components/docs/DocsSidebarSearch.tsx",
+        "components/DocSidebar.tsx",
+        "components/DocsSearchPalette.tsx",
+        "components/home/HeroShowcase.tsx",
+        "components/home/HomeSections.tsx",
+        "components/home/ShowcaseWall.tsx",
+        "components/mdx/CodeBlock.tsx",
+        "components/mdx/GalleryExample.tsx",
+        "components/mdx/PreviewWithCode.tsx",
+        "components/Navbar.tsx",
+        "components/studio/StudioTopBar.tsx",
+        "middleware.ts",
+        "next.config.js"
+      ],
+      "domains": [
+        "docs",
+        "gallery",
+        "home",
+        "mdx",
+        "navigation",
+        "shared",
+        "studio"
+      ],
+      "status": "USED",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "postcss",
+      "version": "^8.4.33",
+      "dependencyClass": "dev",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "react",
+      "version": "^18.3.0",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/docs/layout.tsx",
+        "app/docs/MDXContentRenderer.tsx",
+        "app/docs/page.tsx",
+        "app/gallery/components/GalleryClient.tsx",
+        "app/gallery/components/GalleryFilterBar.tsx",
+        "app/gallery/components/GalleryGrid.tsx",
+        "app/gallery/components/GalleryModal.tsx",
+        "app/gallery/components/GallerySnippetEditor.tsx",
+        "app/gallery/components/GallerySpotlight.tsx",
+        "app/gallery/components/GalleryZoomablePreview.tsx",
+        "app/page.tsx",
+        "app/studio/layout.tsx",
+        "components/ChangelogRenderer.tsx",
+        "components/CustomCursor.tsx",
+        "components/DocHeader.tsx",
+        "components/DocLayout.tsx",
+        "components/docs/DocHeadingAnchor.tsx",
+        "components/docs/DocPager.tsx",
+        "components/docs/DocReadingProgress.tsx",
+        "components/docs/DocsSidebarSearch.tsx",
+        "components/docs/SectionAccentIcon.tsx",
+        "components/DocSidebar.tsx",
+        "components/DocsSearchPalette.tsx",
+        "components/home/AmbientBackground.tsx",
+        "components/home/HeroShowcase.tsx",
+        "components/home/HomeMotion.tsx",
+        "components/home/HomeSections.tsx",
+        "components/home/ShowcaseWall.tsx",
+        "components/mdx/CodeBlock.tsx",
+        "components/mdx/CodeSwitcher.tsx",
+        "components/mdx/Dropdown.tsx",
+        "components/mdx/PreviewWithCode.tsx",
+        "components/Navbar.tsx",
+        "components/OnThisPage.tsx",
+        "components/studio/CodeStudio.tsx",
+        "components/studio/StudioCommandPalette.tsx",
+        "components/studio/StudioFileTabs.tsx",
+        "components/studio/StudioPreviewZoom.tsx",
+        "components/studio/StudioResizableSplit.tsx",
+        "components/studio/StudioTopBar.tsx",
+        "components/ThemeProvider.tsx",
+        "contexts/SidebarContext.tsx",
+        "mdx-components.tsx"
+      ],
+      "domains": [
+        "docs",
+        "gallery",
+        "home",
+        "mdx",
+        "navigation",
+        "shared",
+        "studio",
+        "theme"
+      ],
+      "status": "USED",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "react-dom",
+      "version": "^18.3.0",
+      "dependencyClass": "runtime",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "react-markdown",
+      "version": "^10.1.0",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/docs/MDXContentRenderer.tsx",
+        "app/gallery/components/GalleryModal.tsx",
+        "components/ChangelogRenderer.tsx",
+        "components/mdx/MDXRenderer.tsx"
+      ],
+      "domains": [
+        "docs",
+        "gallery",
+        "mdx",
+        "shared"
+      ],
+      "status": "USED",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "react-syntax-highlighter",
+      "version": "^16.1.0",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/gallery/components/GalleryModal.tsx",
+        "components/mdx/CodeBlock.tsx"
+      ],
+      "domains": [
+        "gallery",
+        "mdx"
+      ],
+      "status": "USED",
+      "riskNotes": [
+        "client-heavy: bundle containment"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "rehype-raw",
+      "version": "^7.0.0",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/docs/MDXContentRenderer.tsx",
+        "components/ChangelogRenderer.tsx"
+      ],
+      "domains": [
+        "docs",
+        "shared"
+      ],
+      "status": "USED",
+      "riskNotes": [
+        "raw HTML trust surface"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "remark-gfm",
+      "version": "^4.0.1",
+      "dependencyClass": "runtime",
+      "importSites": [
+        "app/docs/MDXContentRenderer.tsx",
+        "components/ChangelogRenderer.tsx",
+        "components/mdx/MDXRenderer.tsx"
+      ],
+      "domains": [
+        "docs",
+        "mdx",
+        "shared"
+      ],
+      "status": "USED",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "tailwindcss",
+      "version": "^3.4.1",
+      "dependencyClass": "dev",
+      "importSites": [
+        "tailwind.config.ts"
+      ],
+      "domains": [
+        "shared"
+      ],
+      "status": "USED",
+      "riskNotes": [],
+      "packageLockResolved": true
+    },
+    {
+      "name": "tsx",
+      "version": "^4.19.2",
+      "dependencyClass": "runtime",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [
+        "code execution/toolchain: trusted server path only"
+      ],
+      "packageLockResolved": true
+    },
+    {
+      "name": "typescript",
+      "version": "^5.3.3",
+      "dependencyClass": "dev",
+      "importSites": [],
+      "domains": [],
+      "status": "LIKELY UNUSED — VERIFY",
+      "riskNotes": [],
+      "packageLockResolved": true
+    }
+  ]
+}

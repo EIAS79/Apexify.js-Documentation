@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "cssFiles": [
+    {
+      "file": "app/globals.css",
+      "bytes": 24878,
+      "lines": 753,
+      "cssVariableDeclarations": 86,
+      "mediaQueries": 2,
+      "reducedMotionQueries": 1
+    }
+  ],
+  "globalStylesheets": [
+    {
+      "file": "app/globals.css",
+      "bytes": 24878,
+      "lines": 753,
+      "cssVariableDeclarations": 86,
+      "mediaQueries": 2,
+      "reducedMotionQueries": 1
+    }
+  ],
+  "cssModules": [],
+  "tailwindConfig": "tailwind.config.ts",
+  "jsxClassNameOccurrences": 1239,
+  "jsxInlineStyleOccurrences": 589
+}

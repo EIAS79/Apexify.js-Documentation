@@ -1,0 +1,331 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "route": "/api/gallery/run",
+      "sourceFile": "app/api/gallery/run/route.ts",
+      "routeType": "route-handler",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "gallery/Studio execution API"
+    },
+    {
+      "route": "/gallery",
+      "sourceFile": "app/gallery/page.tsx",
+      "routeType": "page",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx",
+        "app/gallery/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "gallery"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/gallery/components/GalleryClient.tsx",
+      "bytes": 9329
+    },
+    {
+      "path": "app/gallery/components/galleryConfig.ts",
+      "bytes": 2966
+    },
+    {
+      "path": "app/gallery/components/GalleryFilterBar.tsx",
+      "bytes": 20550
+    },
+    {
+      "path": "app/gallery/components/GalleryGrid.tsx",
+      "bytes": 19167
+    },
+    {
+      "path": "app/gallery/components/galleryHelpers.ts",
+      "bytes": 4596
+    },
+    {
+      "path": "app/gallery/components/GalleryHero.tsx",
+      "bytes": 5361
+    },
+    {
+      "path": "app/gallery/components/GalleryModal.tsx",
+      "bytes": 34219
+    },
+    {
+      "path": "app/gallery/components/GallerySnippetEditor.tsx",
+      "bytes": 2062
+    },
+    {
+      "path": "app/gallery/components/GallerySpotlight.tsx",
+      "bytes": 18966
+    },
+    {
+      "path": "app/gallery/components/GalleryZoomablePreview.tsx",
+      "bytes": 9851
+    },
+    {
+      "path": "app/gallery/layout.tsx",
+      "bytes": 354
+    },
+    {
+      "path": "app/gallery/page.tsx",
+      "bytes": 331
+    },
+    {
+      "path": "lib/gallery/advance/advanceSnippets.ts",
+      "bytes": 13460
+    },
+    {
+      "path": "lib/gallery/advance/extraAdvanceSnippets.ts",
+      "bytes": 10036
+    },
+    {
+      "path": "lib/gallery/background/backgroundSnippets.ts",
+      "bytes": 21792
+    },
+    {
+      "path": "lib/gallery/background/canvasBackgroundGallerySnippets.ts",
+      "bytes": 7781
+    },
+    {
+      "path": "lib/gallery/background/canvasBackgroundShowcasePicks.ts",
+      "bytes": 4651
+    },
+    {
+      "path": "lib/gallery/charts/chartsShowcaseGalleryItems.ts",
+      "bytes": 29117
+    },
+    {
+      "path": "lib/gallery/charts/chartsShowcaseMoreRenders.ts",
+      "bytes": 7604
+    },
+    {
+      "path": "lib/gallery/charts/chartsShowcasePicks.ts",
+      "bytes": 13700
+    },
+    {
+      "path": "lib/gallery/core/galleryAssetRunner.ts",
+      "bytes": 3775
+    },
+    {
+      "path": "lib/gallery/core/galleryDocLink.ts",
+      "bytes": 1436
+    },
+    {
+      "path": "lib/gallery/core/galleryTypes.ts",
+      "bytes": 844
+    },
+    {
+      "path": "lib/gallery/core/runnerNodePath.ts",
+      "bytes": 652
+    },
+    {
+      "path": "lib/gallery/core/wrapSnippetForRunner.ts",
+      "bytes": 6481
+    },
+    {
+      "path": "lib/gallery/core/writeGalleryStaticOutputs.ts",
+      "bytes": 20071
+    },
+    {
+      "path": "lib/gallery/docs/galleryRegistry.ts",
+      "bytes": 1479
+    },
+    {
+      "path": "lib/gallery/motion/motionSnippets.ts",
+      "bytes": 6222
+    },
+    {
+      "path": "lib/gallery/presentation/presentationSlideSnippet.ts",
+      "bytes": 15607
+    },
+    {
+      "path": "lib/gallery/spin-wheel/spinWheelSnippets.ts",
+      "bytes": 15556
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-aurora-grid.png",
+      "bytes": 575792
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-chromatic-depth.png",
+      "bytes": 532558
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-crossweave-noir.png",
+      "bytes": 568615
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-crt-ghost.png",
+      "bytes": 691663
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-crystal-fog.png",
+      "bytes": 799993
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-hex-stage.png",
+      "bytes": 657349
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-molten-core.png",
+      "bytes": 830638
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-pipeline-color-stripes.png",
+      "bytes": 420529
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-pipeline-framed-chrome.png",
+      "bytes": 569436
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-pipeline-gradient-grid-crosses.png",
+      "bytes": 435561
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-pipeline-layer-dots-multiply.png",
+      "bytes": 465386
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-pipeline-transparent-gradient.png",
+      "bytes": 27868
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-solstice-silk.png",
+      "bytes": 744917
+    },
+    {
+      "path": "public/gallery-outputs/backgrounds/bg-tideglass.png",
+      "bytes": 558154
+    },
+    {
+      "path": "public/gallery-outputs/gifs/conic-drift.gif",
+      "bytes": 3977066
+    },
+    {
+      "path": "public/gallery-outputs/gifs/spin-wheel.gif",
+      "bytes": 677436
+    },
+    {
+      "path": "public/gallery-outputs/images/advance-text-glow-plaque.png",
+      "bytes": 368749
+    },
+    {
+      "path": "public/gallery-outputs/images/chart-bar-quarterly.png",
+      "bytes": 233111
+    },
+    {
+      "path": "public/gallery-outputs/images/chart-donut-luminous.png",
+      "bytes": 634275
+    },
+    {
+      "path": "public/gallery-outputs/images/chart-hbar-routes.png",
+      "bytes": 25936
+    },
+    {
+      "path": "public/gallery-outputs/images/chart-line-dual-target.png",
+      "bytes": 345564
+    },
+    {
+      "path": "public/gallery-outputs/images/comparison-donut-line.png",
+      "bytes": 2576681
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-bar-grouped.png",
+      "bytes": 511371
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-bar-lollipop.png",
+      "bytes": 521049
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-bar-waterfall.png",
+      "bytes": 513000
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-combo-grouped-lines.png",
+      "bytes": 584520
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-comparison-pie-bar.png",
+      "bytes": 863016
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-hbar-stacked.png",
+      "bytes": 373517
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-line-all-styles.png",
+      "bytes": 708756
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-line-rich.png",
+      "bytes": 600121
+    },
+    {
+      "path": "public/gallery-outputs/images/gallery-chartshowcase-pie-connected.png",
+      "bytes": 469395
+    },
+    {
+      "path": "public/gallery-outputs/images/presentation-slide.png",
+      "bytes": 1400784
+    },
+    {
+      "path": "public/gallery-outputs/images/shape-collage-prism.png",
+      "bytes": 578399
+    },
+    {
+      "path": "public/gallery-outputs/README.md",
+      "bytes": 1322
+    },
+    {
+      "path": "public/gallery-outputs/videos/pulse-bloom.mp4",
+      "bytes": 15262
+    },
+    {
+      "path": "public/gallery-outputs/videos/spin-wheel.mp4",
+      "bytes": 69638
+    },
+    {
+      "path": "scripts/gallery-build.ts",
+      "bytes": 645
+    },
+    {
+      "path": "scripts/verify-gallery-outputs.ts",
+      "bytes": 2028
+    }
+  ],
+  "components": [
+    "app/gallery/components/GalleryClient.tsx",
+    "app/gallery/components/GalleryFilterBar.tsx",
+    "app/gallery/components/GalleryGrid.tsx",
+    "app/gallery/components/GalleryHero.tsx",
+    "app/gallery/components/GalleryModal.tsx",
+    "app/gallery/components/GallerySnippetEditor.tsx",
+    "app/gallery/components/GallerySpotlight.tsx",
+    "app/gallery/components/GalleryZoomablePreview.tsx"
+  ],
+  "apiRelationship": [
+    "/api/gallery/run"
+  ],
+  "buildScripts": [
+    {
+      "name": "gallery:build",
+      "command": "tsx scripts/gallery-build.ts"
+    },
+    {
+      "name": "gallery:verify",
+      "command": "tsx scripts/verify-gallery-outputs.ts"
+    }
+  ]
+}

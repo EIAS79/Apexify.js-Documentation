@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "strengths": [
+    "App Router + existing production build gate",
+    "Reusable MDX/code/table/gallery components",
+    "Sidebar/search/breadcrumb/pager/progress/TOC concepts",
+    "Legacy hash alias helper exists",
+    "Gallery generation/verification tooling",
+    "Dedicated Studio source domain",
+    "Theme provider behavior",
+    "Package/docs drift guards from Phase13/14"
+  ]
+}

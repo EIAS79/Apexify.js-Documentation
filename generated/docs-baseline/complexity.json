@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "file": "package-lock.json",
+      "domain": "shared",
+      "lines": 5467,
+      "bytes": 191612
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "domain": "home",
+      "lines": 1209,
+      "bytes": 48819
+    },
+    {
+      "file": "app/gallery/components/GalleryModal.tsx",
+      "domain": "gallery",
+      "lines": 927,
+      "bytes": 34219
+    },
+    {
+      "file": "lib/gallery/charts/chartsShowcaseGalleryItems.ts",
+      "domain": "gallery",
+      "lines": 993,
+      "bytes": 29117
+    },
+    {
+      "file": "components/ChangelogRenderer.tsx",
+      "domain": "shared",
+      "lines": 723,
+      "bytes": 28958
+    },
+    {
+      "file": "components/studio/CodeStudio.tsx",
+      "domain": "studio",
+      "lines": 883,
+      "bytes": 28759
+    },
+    {
+      "file": "app/globals.css",
+      "domain": "shared",
+      "lines": 753,
+      "bytes": 24878
+    },
+    {
+      "file": "scripts/doc0-audit.mjs",
+      "domain": "shared",
+      "lines": 46,
+      "bytes": 22914
+    },
+    {
+      "file": "lib/gallery/background/backgroundSnippets.ts",
+      "domain": "gallery",
+      "lines": 827,
+      "bytes": 21792
+    },
+    {
+      "file": "app/api/docs/route.ts",
+      "domain": "docs",
+      "lines": 659,
+      "bytes": 21472
+    },
+    {
+      "file": "app/gallery/components/GalleryFilterBar.tsx",
+      "domain": "gallery",
+      "lines": 502,
+      "bytes": 20550
+    },
+    {
+      "file": "lib/gallery/core/writeGalleryStaticOutputs.ts",
+      "domain": "gallery",
+      "lines": 717,
+      "bytes": 20071
+    },
+    {
+      "file": "components/DocSidebar.tsx",
+      "domain": "navigation",
+      "lines": 527,
+      "bytes": 19320
+    },
+    {
+      "file": "app/gallery/components/GalleryGrid.tsx",
+      "domain": "gallery",
+      "lines": 548,
+      "bytes": 19167
+    },
+    {
+      "file": "app/gallery/components/GallerySpotlight.tsx",
+      "domain": "gallery",
+      "lines": 527,
+      "bytes": 18966
+    },
+    {
+      "file": "app/docs/MDXContentRenderer.tsx",
+      "domain": "docs",
+      "lines": 540,
+      "bytes": 16552
+    },
+    {
+      "file": "lib/gallery/spin-wheel/spinWheelSnippets.ts",
+      "domain": "gallery",
+      "lines": 678,
+      "bytes": 15556
+    },
+    {
+      "file": "components/studio/StudioTopBar.tsx",
+      "domain": "studio",
+      "lines": 423,
+      "bytes": 14477
+    },
+    {
+      "file": "lib/gallery/charts/chartsShowcasePicks.ts",
+      "domain": "gallery",
+      "lines": 430,
+      "bytes": 13700
+    },
+    {
+      "file": "lib/gallery/advance/advanceSnippets.ts",
+      "domain": "gallery",
+      "lines": 469,
+      "bytes": 13460
+    },
+    {
+      "file": "lib/studio/studioConfig.ts",
+      "domain": "studio",
+      "lines": 438,
+      "bytes": 12815
+    }
+  ]
+}

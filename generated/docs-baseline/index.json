@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "baselineIdentity": {
+    "repository": "EIAS79/Apexify.js-Documentation",
+    "docsBaseSha": "a52b79e87c3cfa4407d2607c15c6aecacbb2083f",
+    "packageMainSha": "dbed9743353593eafae9a7b1c25312d7170a233b",
+    "phase14pFrozenSha": "5d9b71f185140d6c3477286b8fb111f293e52b48",
+    "phase14pBranch": "phase14p-baseline",
+    "packageVersion": "6.0.0",
+    "auditBranchSha": "6f651c926824d96f1d953be435cfc77ebec7e5bc",
+    "baselineSchemaVersion": 1
+  },
+  "artifactCount": 37,
+  "artifacts": [
+    {
+      "name": "accessibility.json",
+      "sha256": "28966e9db407a0e43a55f363ec22c07da6ca0ae42ef7a319b3123d46c7788903"
+    },
+    {
+      "name": "api-routes.json",
+      "sha256": "4efc10fef0247f8c36b216b4735aa106101b9dbe9d0c2566e02a1993f5b0c3d4"
+    },
+    {
+      "name": "architecture.json",
+      "sha256": "80c048cf822279648a80550a811ddd3a972fa19f43ced6743a09f2632bd75a70"
+    },
+    {
+      "name": "browser.json",
+      "sha256": "41ea8567a91690a8e3809f33d62d660a8a757dd9b7946aaf585419e29f6bfdfe"
+    },
+    {
+      "name": "build.json",
+      "sha256": "836c5f88a3ab22c2630bfc50890076296b66948af619a921c3e7c41174067fdd"
+    },
+    {
+      "name": "bundles.json",
+      "sha256": "f850eca1b672410fa9435ee3f8ac4c6eca485ddcf6ac9796d509d5d8e71b0c45"
+    },
+    {
+      "name": "client-boundaries.json",
+      "sha256": "01408c6fad1edb84de7946122fe24d349f99e5ddf00b0afadede978fa8cf8167"
+    },
+    {
+      "name": "complexity.json",
+      "sha256": "914b3fda6f950668901e20c30bd3af3a62e4305046248ce1ff40e32ab992958b"
+    },
+    {
+      "name": "components.json",
+      "sha256": "bb76b87463eb4f032f317a6da51bc63e785a974e81a9c65280456f3b74f34a8f"
+    },
+    {
+      "name": "content.json",
+      "sha256": "d03c415051907861f528a7fb2160bcc4ae32b98213efc7efec13e709329ff574"
+    },
+    {
+      "name": "counts.json",
+      "sha256": "712bed2d8c280e1ca776b6163e853434e1f211f21c6c5c072d287b4c218cfbe7"
+    },
+    {
+      "name": "debt-register.json",
+      "sha256": "73c8f043d121135fd03cf0474188a4ce173fd86c44fe4e177ca7187a00c6ebe7"
+    },
+    {
+      "name": "dependencies.json",
+      "sha256": "2cb59998c0488bed81cde54bdd81af1cb5c5a19ebefdb7989af7771b021e8285"
+    },
+    {
+      "name": "duplication.json",
+      "sha256": "5b6f83cc27f93ece333476ccd8ca3327d7469c27b1eb286c61161bf6327e2ab8"
+    },
+    {
+      "name": "gallery.json",
+      "sha256": "ed75cf44bc84634329bd27173f4307ddd4d53ac6e43dd0f19d0a216a67e6f16b"
+    },
+    {
+      "name": "layouts.json",
+      "sha256": "a63dfd0492de0eadcbfe29721c7a043a88acceff620c6ef429c5bbefbfc1c139"
+    },
+    {
+      "name": "legacy-links.json",
+      "sha256": "992f8942ba58f0596cd7e4ca01859dede829ce8d188feef073958a5856c0c096"
+    },
+    {
+      "name": "lighthouse.json",
+      "sha256": "cf8d9671e7fa137d020f06d381d0d520f73d6079490c94b4b1aa4a1a92af1ac7"
+    },
+    {
+      "name": "links-browser.json",
+      "sha256": "faf5c3f2884e3e23552f2bc2c9fbb7a37603c6eb7e9b20432067f1856f2a3fd2"
+    },
+    {
+      "name": "links.json",
+      "sha256": "21fef0e772c2beabaa48946729d0847b7303678b8a73642921be24f1f67881ee"
+    },
+    {
+      "name": "mdx-components.json",
+      "sha256": "1e9f4f925c9ac2dec1120f3d32599e905a00eb3c08df08926cfc8bc1dba69db4"
+    },
+    {
+      "name": "methodology.json",
+      "sha256": "312bc8b5578fec17de708071be19f6afc170bd74a567cd6b8f7d423b2c2ba374"
+    },
+    {
+      "name": "mobile.json",
+      "sha256": "c23107be7e4f4d34095b2035a6fd3292cfcc9c8068d5377c2d7c8ac50625f61f"
+    },
+    {
+      "name": "navigation.json",
+      "sha256": "78292c5d3613a815928fb32bcf743871f4cbb39eab0790023097b4543da2328a"
+    },
+    {
+      "name": "preservation.json",
+      "sha256": "c29aa17dc20260afbb9a5aeccd8d424ec3318c94ea46973339778196c0c75b7c"
+    },
+    {
+      "name": "reduced-motion.json",
+      "sha256": "28d958679bacb0846d50a66b0e64e0271d8c5494c91133a1ff1bef771c9a8160"
+    },
+    {
+      "name": "repo-map.json",
+      "sha256": "71767e587c83215c94b7575d0af1ee295b5fede8ac9b2a072c4fd042ed206151"
+    },
+    {
+      "name": "repository-controls.json",
+      "sha256": "f107eb308a6b19a9af12182263eb8c3b239212d507fe10f37820cbbeb205e09a"
+    },
+    {
+      "name": "routes.json",
+      "sha256": "5567ddaf388ab968183fdb8ad2d25823eede227515518a10be7bb25c18b44432"
+    },
+    {
+      "name": "routing-controls.json",
+      "sha256": "ed8ba8be878a43a17a246ebbb2be1120be6468c1b97d0395554d80b7857ae618"
+    },
+    {
+      "name": "search.json",
+      "sha256": "425ab22a417ff9e5ca1ab858f5a66d0d9dfadb6fe706dfacb1bf9292a3879596"
+    },
+    {
+      "name": "security-findings.json",
+      "sha256": "5c9cbc1c64471d512b9e03470b52af71c6930d611e4ba61ca5d5dedfcdde7522"
+    },
+    {
+      "name": "seo.json",
+      "sha256": "7de3753b10fe11b54095309b1ffe320cf4ce9c3eb8aed1a09c463ee7dbfed6d6"
+    },
+    {
+      "name": "strengths.json",
+      "sha256": "169f44e05184190d49c87b2bf3ec73e3fd46cff773a2430e5d43a6a669f93ac2"
+    },
+    {
+      "name": "studio.json",
+      "sha256": "5562341cb27b77219d407c6cd1b2753b47a401a9c55a55f03ffcdb441d740b2d"
+    },
+    {
+      "name": "styles.json",
+      "sha256": "5fb530c936161f6b1daf743d17716eecb1033ae55bba25a38f0b27223f16b0f1"
+    },
+    {
+      "name": "todo-stubs.json",
+      "sha256": "e93d63a9e2c2e73599c7763399fb0f1ee86a172e93d330cbaba1d0e20b36703c"
+    }
+  ]
+}

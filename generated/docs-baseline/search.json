@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    "components/DocsSearchPalette.tsx",
+    "components/docs/DocsSidebarSearch.tsx"
+  ],
+  "apiRoute": "/api/docs/search",
+  "dataSource": "content/docs filesystem scanned at request time",
+  "indexModel": "runtime/no persistent index",
+  "ranking": [
+    "filename",
+    "folder",
+    "content"
+  ],
+  "maxResults": 20,
+  "resultNavigation": "/docs#hash",
+  "measurement": "browser.json"
+}

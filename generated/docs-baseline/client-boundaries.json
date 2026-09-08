@@ -1,0 +1,821 @@
+{
+  "schemaVersion": 1,
+  "boundaries": [
+    {
+      "file": "app/docs/layout.tsx",
+      "domain": "docs",
+      "affectedRoutes": [],
+      "stateHooks": 0,
+      "effectHooks": 2,
+      "browserApiSignals": 2,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 68,
+      "bytes": 2363
+    },
+    {
+      "file": "app/docs/MDXContentRenderer.tsx",
+      "domain": "docs",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 540,
+      "bytes": 16552
+    },
+    {
+      "file": "app/docs/page.tsx",
+      "domain": "docs",
+      "affectedRoutes": [],
+      "stateHooks": 7,
+      "effectHooks": 3,
+      "browserApiSignals": 15,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 265,
+      "bytes": 9445
+    },
+    {
+      "file": "app/gallery/components/GalleryClient.tsx",
+      "domain": "gallery",
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "stateHooks": 6,
+      "effectHooks": 3,
+      "browserApiSignals": 11,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 267,
+      "bytes": 9329
+    },
+    {
+      "file": "app/gallery/components/GalleryFilterBar.tsx",
+      "domain": "gallery",
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "stateHooks": 4,
+      "effectHooks": 3,
+      "browserApiSignals": 6,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 502,
+      "bytes": 20550
+    },
+    {
+      "file": "app/gallery/components/GalleryGrid.tsx",
+      "domain": "gallery",
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "stateHooks": 4,
+      "effectHooks": 4,
+      "browserApiSignals": 0,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 548,
+      "bytes": 19167
+    },
+    {
+      "file": "app/gallery/components/GalleryHero.tsx",
+      "domain": "gallery",
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 157,
+      "bytes": 5361
+    },
+    {
+      "file": "app/gallery/components/GalleryModal.tsx",
+      "domain": "gallery",
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "stateHooks": 12,
+      "effectHooks": 6,
+      "browserApiSignals": 14,
+      "heavyImports": [
+        "react-syntax-highlighter",
+        "react-syntax-highlighter/dist/esm/styles/prism"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 927,
+      "bytes": 34219
+    },
+    {
+      "file": "app/gallery/components/GallerySnippetEditor.tsx",
+      "domain": "gallery",
+      "affectedRoutes": [
+        "/gallery",
+        "/studio"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [
+        "@uiw/react-codemirror",
+        "@codemirror/lang-javascript",
+        "@codemirror/view"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 72,
+      "bytes": 2062
+    },
+    {
+      "file": "app/gallery/components/GallerySpotlight.tsx",
+      "domain": "gallery",
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "stateHooks": 4,
+      "effectHooks": 6,
+      "browserApiSignals": 11,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 527,
+      "bytes": 18966
+    },
+    {
+      "file": "app/gallery/components/GalleryZoomablePreview.tsx",
+      "domain": "gallery",
+      "affectedRoutes": [
+        "/gallery"
+      ],
+      "stateHooks": 4,
+      "effectHooks": 3,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 279,
+      "bytes": 9851
+    },
+    {
+      "file": "app/page.tsx",
+      "domain": "shared",
+      "affectedRoutes": [],
+      "stateHooks": 2,
+      "effectHooks": 2,
+      "browserApiSignals": 4,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "REVIEW",
+      "lines": 78,
+      "bytes": 2409
+    },
+    {
+      "file": "components/Brand.tsx",
+      "domain": "shared",
+      "affectedRoutes": [
+        "/",
+        "/gallery",
+        "/studio"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 114,
+      "bytes": 3416
+    },
+    {
+      "file": "components/ChangelogRenderer.tsx",
+      "domain": "shared",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 723,
+      "bytes": 28958
+    },
+    {
+      "file": "components/CustomCursor.tsx",
+      "domain": "shared",
+      "affectedRoutes": [],
+      "stateHooks": 0,
+      "effectHooks": 2,
+      "browserApiSignals": 22,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 312,
+      "bytes": 10855
+    },
+    {
+      "file": "components/DocHeader.tsx",
+      "domain": "navigation",
+      "affectedRoutes": [],
+      "stateHooks": 4,
+      "effectHooks": 4,
+      "browserApiSignals": 6,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 309,
+      "bytes": 12201
+    },
+    {
+      "file": "components/DocLayout.tsx",
+      "domain": "shared",
+      "affectedRoutes": [
+        "/docs",
+        "/docs/getting-started"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 2,
+      "browserApiSignals": 3,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 79,
+      "bytes": 2886
+    },
+    {
+      "file": "components/docs/DocBreadcrumbs.tsx",
+      "domain": "docs",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 61,
+      "bytes": 2282
+    },
+    {
+      "file": "components/docs/DocHeadingAnchor.tsx",
+      "domain": "docs",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 0,
+      "browserApiSignals": 6,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 53,
+      "bytes": 1716
+    },
+    {
+      "file": "components/docs/DocPager.tsx",
+      "domain": "docs",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 2,
+      "browserApiSignals": 7,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 116,
+      "bytes": 3590
+    },
+    {
+      "file": "components/docs/DocReadingProgress.tsx",
+      "domain": "docs",
+      "affectedRoutes": [
+        "/docs",
+        "/docs/getting-started"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 2,
+      "browserApiSignals": 9,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 56,
+      "bytes": 1707
+    },
+    {
+      "file": "components/docs/DocsSidebarSearch.tsx",
+      "domain": "docs",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 5,
+      "effectHooks": 4,
+      "browserApiSignals": 12,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 266,
+      "bytes": 9920
+    },
+    {
+      "file": "components/docs/SectionAccentIcon.tsx",
+      "domain": "docs",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 41,
+      "bytes": 1055
+    },
+    {
+      "file": "components/DocSidebar.tsx",
+      "domain": "navigation",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 8,
+      "effectHooks": 6,
+      "browserApiSignals": 22,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 527,
+      "bytes": 19320
+    },
+    {
+      "file": "components/DocsSearchPalette.tsx",
+      "domain": "shared",
+      "affectedRoutes": [],
+      "stateHooks": 5,
+      "effectHooks": 5,
+      "browserApiSignals": 11,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 339,
+      "bytes": 12961
+    },
+    {
+      "file": "components/home/AmbientBackground.tsx",
+      "domain": "home",
+      "affectedRoutes": [
+        "/",
+        "/gallery"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 2,
+      "browserApiSignals": 2,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 121,
+      "bytes": 4662
+    },
+    {
+      "file": "components/home/HeroShowcase.tsx",
+      "domain": "home",
+      "affectedRoutes": [
+        "/"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 2,
+      "browserApiSignals": 2,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "REVIEW",
+      "lines": 374,
+      "bytes": 13519
+    },
+    {
+      "file": "components/home/HomeMotion.tsx",
+      "domain": "home",
+      "affectedRoutes": [],
+      "stateHooks": 3,
+      "effectHooks": 2,
+      "browserApiSignals": 3,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "REVIEW",
+      "lines": 191,
+      "bytes": 4591
+    },
+    {
+      "file": "components/home/HomeSections.tsx",
+      "domain": "home",
+      "affectedRoutes": [
+        "/"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 2,
+      "browserApiSignals": 3,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "REVIEW",
+      "lines": 1209,
+      "bytes": 48819
+    },
+    {
+      "file": "components/home/ShowcaseWall.tsx",
+      "domain": "home",
+      "affectedRoutes": [
+        "/"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 2,
+      "browserApiSignals": 4,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "REVIEW",
+      "lines": 267,
+      "bytes": 12668
+    },
+    {
+      "file": "components/mdx/Alert.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 83,
+      "bytes": 3159
+    },
+    {
+      "file": "components/mdx/CodeBlock.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 0,
+      "browserApiSignals": 4,
+      "heavyImports": [
+        "react-syntax-highlighter",
+        "react-syntax-highlighter/dist/esm/styles/prism"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 198,
+      "bytes": 7916
+    },
+    {
+      "file": "components/mdx/CodeSwitcher.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 89,
+      "bytes": 3022
+    },
+    {
+      "file": "components/mdx/CodeWithImage.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 52,
+      "bytes": 1039
+    },
+    {
+      "file": "components/mdx/Dropdown.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 38,
+      "bytes": 1062
+    },
+    {
+      "file": "components/mdx/GalleryExample.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 41,
+      "bytes": 1652
+    },
+    {
+      "file": "components/mdx/GalleryPreview.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 43,
+      "bytes": 1002
+    },
+    {
+      "file": "components/mdx/MDXRenderer.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 131,
+      "bytes": 5126
+    },
+    {
+      "file": "components/mdx/PreviewWithCode.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 92,
+      "bytes": 3513
+    },
+    {
+      "file": "components/mdx/RelatedGallery.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 25,
+      "bytes": 571
+    },
+    {
+      "file": "components/mdx/Table.tsx",
+      "domain": "mdx",
+      "affectedRoutes": [
+        "/docs"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 58,
+      "bytes": 1419
+    },
+    {
+      "file": "components/Navbar.tsx",
+      "domain": "navigation",
+      "affectedRoutes": [
+        "/",
+        "/gallery"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 4,
+      "browserApiSignals": 5,
+      "heavyImports": [],
+      "classification": "REVIEW",
+      "lines": 233,
+      "bytes": 10429
+    },
+    {
+      "file": "components/OnThisPage.tsx",
+      "domain": "shared",
+      "affectedRoutes": [
+        "/docs",
+        "/docs/getting-started"
+      ],
+      "stateHooks": 4,
+      "effectHooks": 3,
+      "browserApiSignals": 11,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 274,
+      "bytes": 10073
+    },
+    {
+      "file": "components/studio/CodeStudio.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 21,
+      "effectHooks": 8,
+      "browserApiSignals": 20,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 883,
+      "bytes": 28759
+    },
+    {
+      "file": "components/studio/StudioCommandPalette.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 5,
+      "browserApiSignals": 2,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 265,
+      "bytes": 9621
+    },
+    {
+      "file": "components/studio/StudioFileTabs.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 2,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 168,
+      "bytes": 5681
+    },
+    {
+      "file": "components/studio/StudioOutputPanel.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 392,
+      "bytes": 13464
+    },
+    {
+      "file": "components/studio/StudioPreviewZoom.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 4,
+      "effectHooks": 4,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 330,
+      "bytes": 11831
+    },
+    {
+      "file": "components/studio/StudioResizableSplit.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 2,
+      "browserApiSignals": 10,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 144,
+      "bytes": 4466
+    },
+    {
+      "file": "components/studio/StudioRunnerTerminal.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 114,
+      "bytes": 4027
+    },
+    {
+      "file": "components/studio/StudioShortcutOverlay.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [
+        "framer-motion"
+      ],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 152,
+      "bytes": 5697
+    },
+    {
+      "file": "components/studio/StudioStatusBar.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 131,
+      "bytes": 4065
+    },
+    {
+      "file": "components/studio/StudioTopBar.tsx",
+      "domain": "studio",
+      "affectedRoutes": [
+        "/studio"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 2,
+      "browserApiSignals": 4,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 423,
+      "bytes": 14477
+    },
+    {
+      "file": "components/ThemeProvider.tsx",
+      "domain": "theme",
+      "affectedRoutes": [
+        "/",
+        "/docs",
+        "/gallery",
+        "/studio"
+      ],
+      "stateHooks": 3,
+      "effectHooks": 3,
+      "browserApiSignals": 13,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 103,
+      "bytes": 2993
+    },
+    {
+      "file": "components/ThemeToggle.tsx",
+      "domain": "theme",
+      "affectedRoutes": [
+        "/",
+        "/gallery",
+        "/studio"
+      ],
+      "stateHooks": 0,
+      "effectHooks": 0,
+      "browserApiSignals": 0,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 55,
+      "bytes": 1727
+    },
+    {
+      "file": "contexts/SidebarContext.tsx",
+      "domain": "navigation",
+      "affectedRoutes": [
+        "/docs",
+        "/docs/getting-started"
+      ],
+      "stateHooks": 2,
+      "effectHooks": 2,
+      "browserApiSignals": 4,
+      "heavyImports": [],
+      "classification": "LIKELY JUSTIFIED",
+      "lines": 56,
+      "bytes": 1443
+    }
+  ]
+}

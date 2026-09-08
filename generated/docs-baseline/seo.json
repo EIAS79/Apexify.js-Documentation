@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "environment": {
+    "chromePath": "/usr/bin/google-chrome",
+    "browserVersion": "Chrome/152.0.7977.64",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "baseUrl": "http://127.0.0.1:3000",
+    "puppeteerVersion": "24.16.0",
+    "axeVersion": "4.10.3"
+  },
+  "methodology": "Rendered production DOM metadata inspection.",
+  "results": [
+    {
+      "key": "docs:desktop",
+      "surface": "docs",
+      "viewport": "desktop",
+      "title": "Apexify.js - Advanced Canvas Rendering Library",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Professional-grade TypeScript canvas library for Node.js. Create stunning visuals with image processing, shapes, text effects, patterns, filters, and charts.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "docs:mobile",
+      "surface": "docs",
+      "viewport": "mobile",
+      "title": "Apexify.js - Advanced Canvas Rendering Library",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Professional-grade TypeScript canvas library for Node.js. Create stunning visuals with image processing, shapes, text effects, patterns, filters, and charts.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "docs:tablet",
+      "surface": "docs",
+      "viewport": "tablet",
+      "title": "Apexify.js - Advanced Canvas Rendering Library",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Professional-grade TypeScript canvas library for Node.js. Create stunning visuals with image processing, shapes, text effects, patterns, filters, and charts.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "gallery:desktop",
+      "surface": "gallery",
+      "viewport": "desktop",
+      "title": "Gallery | Apexify.js",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Interactive Apexify.js canvas examples — layered backgrounds, gradients, noise, blend modes, and pattern fills.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "gallery:mobile",
+      "surface": "gallery",
+      "viewport": "mobile",
+      "title": "Gallery | Apexify.js",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Interactive Apexify.js canvas examples — layered backgrounds, gradients, noise, blend modes, and pattern fills.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "gallery:tablet",
+      "surface": "gallery",
+      "viewport": "tablet",
+      "title": "Gallery | Apexify.js",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Interactive Apexify.js canvas examples — layered backgrounds, gradients, noise, blend modes, and pattern fills.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "home:desktop",
+      "surface": "home",
+      "viewport": "desktop",
+      "title": "Apexify.js - Advanced Canvas Rendering Library",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Professional-grade TypeScript canvas library for Node.js. Create stunning visuals with image processing, shapes, text effects, patterns, filters, and charts.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "home:mobile",
+      "surface": "home",
+      "viewport": "mobile",
+      "title": "Apexify.js - Advanced Canvas Rendering Library",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Professional-grade TypeScript canvas library for Node.js. Create stunning visuals with image processing, shapes, text effects, patterns, filters, and charts.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "home:tablet",
+      "surface": "home",
+      "viewport": "tablet",
+      "title": "Apexify.js - Advanced Canvas Rendering Library",
+      "lang": "en",
+      "h1Count": 1,
+      "meta": {
+        "description": "Professional-grade TypeScript canvas library for Node.js. Create stunning visuals with image processing, shapes, text effects, patterns, filters, and charts.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "studio:desktop",
+      "surface": "studio",
+      "viewport": "desktop",
+      "title": "Code studio | Apexify.js",
+      "lang": "en",
+      "h1Count": 0,
+      "meta": {
+        "description": "Try Apexify.js in the browser with a live editor and server-side preview — same sandbox as the gallery.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "studio:mobile",
+      "surface": "studio",
+      "viewport": "mobile",
+      "title": "Code studio | Apexify.js",
+      "lang": "en",
+      "h1Count": 0,
+      "meta": {
+        "description": "Try Apexify.js in the browser with a live editor and server-side preview — same sandbox as the gallery.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    },
+    {
+      "key": "studio:tablet",
+      "surface": "studio",
+      "viewport": "tablet",
+      "title": "Code studio | Apexify.js",
+      "lang": "en",
+      "h1Count": 0,
+      "meta": {
+        "description": "Try Apexify.js in the browser with a live editor and server-side preview — same sandbox as the gallery.",
+        "canonical": null,
+        "robots": null,
+        "ogTitle": null,
+        "ogDescription": null,
+        "ogImage": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "route": "/studio",
+      "sourceFile": "app/studio/page.tsx",
+      "routeType": "page",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx",
+        "app/studio/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "Studio"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/studio/layout.tsx",
+      "bytes": 383
+    },
+    {
+      "path": "app/studio/page.tsx",
+      "bytes": 124
+    },
+    {
+      "path": "components/studio/CodeStudio.tsx",
+      "bytes": 28759
+    },
+    {
+      "path": "components/studio/StudioCommandPalette.tsx",
+      "bytes": 9621
+    },
+    {
+      "path": "components/studio/StudioFileTabs.tsx",
+      "bytes": 5681
+    },
+    {
+      "path": "components/studio/StudioOutputPanel.tsx",
+      "bytes": 13464
+    },
+    {
+      "path": "components/studio/StudioPreviewZoom.tsx",
+      "bytes": 11831
+    },
+    {
+      "path": "components/studio/StudioResizableSplit.tsx",
+      "bytes": 4466
+    },
+    {
+      "path": "components/studio/StudioRunnerTerminal.tsx",
+      "bytes": 4027
+    },
+    {
+      "path": "components/studio/StudioShortcutOverlay.tsx",
+      "bytes": 5697
+    },
+    {
+      "path": "components/studio/StudioStatusBar.tsx",
+      "bytes": 4065
+    },
+    {
+      "path": "components/studio/StudioTopBar.tsx",
+      "bytes": 14477
+    },
+    {
+      "path": "lib/studio/starterSnippets.ts",
+      "bytes": 289
+    },
+    {
+      "path": "lib/studio/studioConfig.ts",
+      "bytes": 12815
+    },
+    {
+      "path": "lib/studio/studioRunnerTerminal.ts",
+      "bytes": 3455
+    },
+    {
+      "path": "lib/studio/studioStorage.ts",
+      "bytes": 8851
+    }
+  ],
+  "components": [
+    "components/studio/CodeStudio.tsx",
+    "components/studio/StudioCommandPalette.tsx",
+    "components/studio/StudioFileTabs.tsx",
+    "components/studio/StudioOutputPanel.tsx",
+    "components/studio/StudioPreviewZoom.tsx",
+    "components/studio/StudioResizableSplit.tsx",
+    "components/studio/StudioRunnerTerminal.tsx",
+    "components/studio/StudioShortcutOverlay.tsx",
+    "components/studio/StudioStatusBar.tsx",
+    "components/studio/StudioTopBar.tsx"
+  ],
+  "editorDependencies": [
+    "@codemirror/lang-javascript",
+    "@types/react-syntax-highlighter",
+    "@uiw/react-codemirror",
+    "react-syntax-highlighter"
+  ],
+  "executionApi": "/api/gallery/run"
+}

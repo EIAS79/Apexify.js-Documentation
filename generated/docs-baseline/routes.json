@@ -1,0 +1,139 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "route": "/",
+      "sourceFile": "app/page.tsx",
+      "routeType": "page",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "client",
+      "layoutChain": [
+        "app/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "marketing/home"
+    },
+    {
+      "route": "/api/docs",
+      "sourceFile": "app/api/docs/route.ts",
+      "routeType": "route-handler",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "docs content API"
+    },
+    {
+      "route": "/api/docs/search",
+      "sourceFile": "app/api/docs/search/route.ts",
+      "routeType": "route-handler",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "docs search API"
+    },
+    {
+      "route": "/api/gallery/run",
+      "sourceFile": "app/api/gallery/run/route.ts",
+      "routeType": "route-handler",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "gallery/Studio execution API"
+    },
+    {
+      "route": "/docs",
+      "sourceFile": "app/docs/page.tsx",
+      "routeType": "page",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "client",
+      "layoutChain": [
+        "app/layout.tsx",
+        "app/docs/layout.tsx"
+      ],
+      "dataSources": [
+        "/api/docs",
+        "content/docs"
+      ],
+      "metadataSource": "local",
+      "primaryPurpose": "documentation hash viewer"
+    },
+    {
+      "route": "/docs/api",
+      "sourceFile": "app/docs/api/page.tsx",
+      "routeType": "page",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx",
+        "app/docs/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "supporting route"
+    },
+    {
+      "route": "/docs/getting-started",
+      "sourceFile": "app/docs/getting-started/page.tsx",
+      "routeType": "page",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx",
+        "app/docs/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "supporting route"
+    },
+    {
+      "route": "/gallery",
+      "sourceFile": "app/gallery/page.tsx",
+      "routeType": "page",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx",
+        "app/gallery/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "gallery"
+    },
+    {
+      "route": "/studio",
+      "sourceFile": "app/studio/page.tsx",
+      "routeType": "page",
+      "dynamicSegments": false,
+      "rendering": "build-determined",
+      "boundary": "server/static-capable",
+      "layoutChain": [
+        "app/layout.tsx",
+        "app/studio/layout.tsx"
+      ],
+      "dataSources": [],
+      "metadataSource": "layout/inherited",
+      "primaryPurpose": "Studio"
+    }
+  ]
+}

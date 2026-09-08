@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "hits": [
+    {
+      "file": "app/gallery/components/GallerySpotlight.tsx",
+      "line": 237,
+      "text": "placeholder=\"Find a gallery piece by name, id, or vibe…\""
+    },
+    {
+      "file": "components/docs/DocsSidebarSearch.tsx",
+      "line": 151,
+      "text": "placeholder=\"Search docs…\""
+    },
+    {
+      "file": "components/DocsSearchPalette.tsx",
+      "line": 193,
+      "text": "placeholder=\"Search docs by title, section, or content…\""
+    },
+    {
+      "file": "components/studio/StudioCommandPalette.tsx",
+      "line": 156,
+      "text": "placeholder=\"Run a command, jump to a template…\""
+    },
+    {
+      "file": "lib/gallery/core/galleryAssetRunner.ts",
+      "line": 13,
+      "text": "const TEMP_DIR = join(process.cwd(), '.gallery-build-temp');"
+    },
+    {
+      "file": "lib/gallery/core/runnerNodePath.ts",
+      "line": 4,
+      "text": "* Snippets execute from a temp directory (`os.tmpdir()/…`). Node resolves packages by walking"
+    },
+    {
+      "file": "lib/studio/studioRunnerTerminal.ts",
+      "line": 2,
+      "text": "* Normalize temp sandbox paths in runner stderr/stacks so users see `(sandbox)/snippet.ts`"
+    },
+    {
+      "file": "lib/studio/studioRunnerTerminal.ts",
+      "line": 3,
+      "text": "* instead of long OS temp paths."
+    },
+    {
+      "file": "scripts/doc0-audit.mjs",
+      "line": 33,
+      "text": "const todo=[];for(const[f,t]of txt)if(!/\\.mdx?$/.test(f))t.split(/\\r?\\n/).forEach((l,i)=>{/\\b(TODO|FIXME|HACK|TEMP|XXX|not implemented|stub|placeholder)\\b/i.test(l)&&todo.push({file:f,line:i+1,text:l.trim().slice(0,220)}"
+    },
+    {
+      "file": "scripts/doc0-audit.mjs",
+      "line": 44,
+      "text": "const outputs={'architecture.json':architecture,'repo-map.json':{schemaVersion:S,topLevel:sort([...new Set(files.map(f=>f.path.split('/')[0]))]),sourceFileCount:src.length,routeCount:routes.length,layoutCount:layouts.len"
+    },
+    {
+      "file": "scripts/doc0-baseline.test.mjs",
+      "line": 2,
+      "text": "const R=process.cwd(),O=path.join(R,'generated/docs-baseline'),names=['architecture.json','repo-map.json','routes.json','layouts.json','components.json','mdx-components.json','content.json','api-routes.json','search.json"
+    },
+    {
+      "file": "scripts/doc0-validate.mjs",
+      "line": 3,
+      "text": "const staticNames=['architecture.json','repo-map.json','routes.json','layouts.json','components.json','mdx-components.json','content.json','api-routes.json','search.json','gallery.json','studio.json','dependencies.json',"
+    }
+  ]
+}

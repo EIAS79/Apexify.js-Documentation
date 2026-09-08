@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "routes": [
+    {
+      "route": "/api/docs",
+      "sourceFile": "app/api/docs/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "purpose": "docs content API",
+      "inputSignals": [
+        "filename"
+      ],
+      "output": "JSON",
+      "authSignals": false,
+      "networkSignals": false,
+      "runtime": "Node/server",
+      "resourceRisk": "elevated/inspect"
+    },
+    {
+      "route": "/api/docs/search",
+      "sourceFile": "app/api/docs/search/route.ts",
+      "methods": [
+        "GET"
+      ],
+      "purpose": "docs search API",
+      "inputSignals": [
+        "q"
+      ],
+      "output": "JSON",
+      "authSignals": false,
+      "networkSignals": false,
+      "runtime": "Node/server",
+      "resourceRisk": "elevated/inspect"
+    },
+    {
+      "route": "/api/gallery/run",
+      "sourceFile": "app/api/gallery/run/route.ts",
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "purpose": "gallery/Studio execution API",
+      "inputSignals": [],
+      "output": "JSON",
+      "authSignals": true,
+      "networkSignals": false,
+      "runtime": "Node/server",
+      "resourceRisk": "elevated/inspect"
+    }
+  ]
+}

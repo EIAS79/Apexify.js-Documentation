@@ -1,0 +1,2024 @@
+{
+  "schemaVersion": 1,
+  "environment": {
+    "chromePath": "/usr/bin/google-chrome",
+    "browserVersion": "Chrome/152.0.7977.64",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36",
+    "baseUrl": "http://127.0.0.1:3000",
+    "puppeteerVersion": "24.16.0",
+    "axeVersion": "4.10.3"
+  },
+  "methodology": "axe-core WCAG A/AA automation plus captured headings/landmarks/skip-link source review; not a claim of full manual conformance.",
+  "results": [
+    {
+      "key": "docs:desktop",
+      "surface": "docs",
+      "viewport": "desktop",
+      "violationCount": 2,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 24,
+          "targets": [
+            [
+              ".mb-3.overflow-hidden.rounded-xl > p"
+            ],
+            [
+              ".inline-flex.py-1.px-1\\.5:nth-child(5)"
+            ],
+            [
+              "blockquote > .text-base.sm\\:text-lg > .font-mono.text-sm:nth-child(3)"
+            ],
+            [
+              "blockquote > .text-base.sm\\:text-lg > .font-mono.text-sm:nth-child(5)"
+            ],
+            [
+              ".font-mono.text-sm:nth-child(6)"
+            ],
+            [
+              ".text-base.sm\\:text-lg:nth-child(15) > .font-mono.text-sm:nth-child(1)"
+            ],
+            [
+              ".text-base.sm\\:text-lg:nth-child(15) > .font-mono.text-sm:nth-child(3)"
+            ],
+            [
+              ".text-base.sm\\:text-lg:nth-child(19) > .font-mono.text-sm:nth-child(1)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodeCount": 1,
+          "targets": [
+            [
+              "pre:nth-child(18) > .my-4.sm\\:my-6 > .bg-slate-900.border-2.shadow-2xl > .bg-slate-950.max-h-\\[min\\(65vh\\,28rem\\)\\].max-w-full"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 18
+        }
+      ],
+      "passRuleCount": 31,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Start here",
+            "id": "00-start-here"
+          },
+          {
+            "level": 2,
+            "text": "#Requirements for staged 6.0.0",
+            "id": "requirements-for-staged-6-0-0"
+          },
+          {
+            "level": 2,
+            "text": "#Published npm install",
+            "id": "published-npm-install"
+          },
+          {
+            "level": 2,
+            "text": "#ESM and CommonJS",
+            "id": "esm-and-commonjs"
+          },
+          {
+            "level": 2,
+            "text": "#Smallest staged-6 example",
+            "id": "smallest-staged-6-example"
+          },
+          {
+            "level": 2,
+            "text": "#Read in this order",
+            "id": "read-in-this-order"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 5,
+          "header": 1,
+          "footer": 0
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "docs:mobile",
+      "surface": "docs",
+      "viewport": "mobile",
+      "violationCount": 2,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 21,
+          "targets": [
+            [
+              ".px-1\\.5.inline-flex.gap-1\\.5"
+            ],
+            [
+              "blockquote > p > .font-mono.text-sm:nth-child(3)"
+            ],
+            [
+              ".font-mono.text-sm:nth-child(6)"
+            ],
+            [
+              "p:nth-child(15) > .font-mono.text-sm:nth-child(1)"
+            ],
+            [
+              "p:nth-child(15) > .font-mono.text-sm:nth-child(3)"
+            ],
+            [
+              "p:nth-child(19) > .font-mono.text-sm:nth-child(1)"
+            ],
+            [
+              ".font-mono.text-sm:nth-child(2)"
+            ],
+            [
+              "p:nth-child(19) > .font-mono.text-sm:nth-child(3)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodeCount": 2,
+          "targets": [
+            [
+              "pre:nth-child(14) > .my-4.sm\\:my-6.group > .bg-slate-900.border-2.shadow-2xl > .bg-slate-950.max-h-\\[min\\(65vh\\,28rem\\)\\].max-w-full > .p-3.sm\\:p-4.min-w-0 > div"
+            ],
+            [
+              "pre:nth-child(18) > .my-4.sm\\:my-6.group > .bg-slate-900.border-2.shadow-2xl > .bg-slate-950.max-h-\\[min\\(65vh\\,28rem\\)\\].max-w-full > .p-3.sm\\:p-4.min-w-0 > div"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 14
+        }
+      ],
+      "passRuleCount": 28,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Start here",
+            "id": "00-start-here"
+          },
+          {
+            "level": 2,
+            "text": "#Requirements for staged 6.0.0",
+            "id": "requirements-for-staged-6-0-0"
+          },
+          {
+            "level": 2,
+            "text": "#Published npm install",
+            "id": "published-npm-install"
+          },
+          {
+            "level": 2,
+            "text": "#ESM and CommonJS",
+            "id": "esm-and-commonjs"
+          },
+          {
+            "level": 2,
+            "text": "#Smallest staged-6 example",
+            "id": "smallest-staged-6-example"
+          },
+          {
+            "level": 2,
+            "text": "#Read in this order",
+            "id": "read-in-this-order"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 4,
+          "header": 1,
+          "footer": 0
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "docs:tablet",
+      "surface": "docs",
+      "viewport": "tablet",
+      "violationCount": 2,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 22,
+          "targets": [
+            [
+              ".px-1\\.5.inline-flex.gap-1\\.5"
+            ],
+            [
+              "blockquote > p > .font-mono.text-sm:nth-child(3)"
+            ],
+            [
+              "blockquote > p > .font-mono.text-sm:nth-child(5)"
+            ],
+            [
+              ".font-mono.text-sm:nth-child(6)"
+            ],
+            [
+              "p:nth-child(15) > .font-mono.text-sm:nth-child(1)"
+            ],
+            [
+              "p:nth-child(15) > .font-mono.text-sm:nth-child(3)"
+            ],
+            [
+              "p:nth-child(19) > .font-mono.text-sm:nth-child(1)"
+            ],
+            [
+              ".font-mono.text-sm:nth-child(2)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodeCount": 1,
+          "targets": [
+            [
+              "pre:nth-child(18) > .my-4.sm\\:my-6.group > .bg-slate-900.border-2.shadow-2xl > .bg-slate-950.max-h-\\[min\\(65vh\\,28rem\\)\\].max-w-full"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 13
+        }
+      ],
+      "passRuleCount": 27,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Start here",
+            "id": "00-start-here"
+          },
+          {
+            "level": 2,
+            "text": "#Requirements for staged 6.0.0",
+            "id": "requirements-for-staged-6-0-0"
+          },
+          {
+            "level": 2,
+            "text": "#Published npm install",
+            "id": "published-npm-install"
+          },
+          {
+            "level": 2,
+            "text": "#ESM and CommonJS",
+            "id": "esm-and-commonjs"
+          },
+          {
+            "level": 2,
+            "text": "#Smallest staged-6 example",
+            "id": "smallest-staged-6-example"
+          },
+          {
+            "level": 2,
+            "text": "#Read in this order",
+            "id": "read-in-this-order"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 4,
+          "header": 1,
+          "footer": 0
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "gallery:desktop",
+      "surface": "gallery",
+      "viewport": "desktop",
+      "violationCount": 1,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 4,
+          "targets": [
+            [
+              ".font-mono"
+            ],
+            [
+              ".block.text-left.lift:nth-child(2) > .aspect-\\[5\\/3\\].relative > .gap-1\\.5.top-3.left-3 > .py-1.px-2.tracking-widest:nth-child(1)"
+            ],
+            [
+              ".block.text-left.lift:nth-child(3) > .aspect-\\[5\\/3\\].relative > .gap-1\\.5.top-3.left-3 > .py-1.px-2.tracking-widest:nth-child(1)"
+            ],
+            [
+              ".sm\\:mb-8 > .tracking-\\[0\\.22em\\].text-\\[10px\\].font-bold"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 27
+        },
+        {
+          "id": "video-caption",
+          "impact": "critical",
+          "nodeCount": 2
+        }
+      ],
+      "passRuleCount": 23,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Recipes you can lift.Code you can run.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Worth opening first",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Aurora lattice — grid over dual radials",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar chart · quarterly index",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Combo · grouped bars + lines",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Comparison · pie + bar",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Comparison canvas · donut vs line",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Conic drift — streaming GIF encoder",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "CRT Ghost — phosphor haze",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Depth Field — stacked light",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Donut chart · patterned chart canvas",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Executive deck slide (chart + layout)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Hex Stage — lattice + neon rim",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line · all styles & markers",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line · areas, markers, regression",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line chart · dual series & markers",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pie · connected legend",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · framed slab (crosses + stroke + shadow)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · gradientBg + preset grid + crosses",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · transparentBase + gradient layer",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pulse bloom — PNG frames → MP4",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Spin wheel — animated GIF",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Spin wheel — MP4 video",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · grouped + axis legend",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · lollipop",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · waterfall",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Crossweave noir · crosses pattern",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Crystal fog — waves + heavy grain",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Horizontal bar · route throughput",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Horizontal bar · stacked",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Molten core — conic ember field",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · colorBg + stripes preset",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · presetPattern dots (multiply)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Solstice Silk — conic over sunset",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Tideglass — waves on teal",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Typography plaque · gradient logotype",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Vector collage · stars & gradients",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Found one you like? Make it yours.",
+            "id": null
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 0,
+          "footer": 0
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "gallery:mobile",
+      "surface": "gallery",
+      "viewport": "mobile",
+      "violationCount": 2,
+      "violations": [
+        {
+          "id": "button-name",
+          "impact": "critical",
+          "help": "Buttons must have discernible text",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".relative:nth-child(5) > .h-10.sm\\:px-3\\.5[aria-haspopup=\"menu\"]"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 5,
+          "targets": [
+            [
+              ".font-mono"
+            ],
+            [
+              ".tracking-\\[0\\.22em\\].mb-1\\.5"
+            ],
+            [
+              ".block.text-left.lift:nth-child(2) > .aspect-\\[5\\/3\\].relative > .gap-1\\.5.top-3.left-3 > .py-1.px-2.tracking-widest:nth-child(1)"
+            ],
+            [
+              ".block.text-left.lift:nth-child(3) > .aspect-\\[5\\/3\\].relative > .gap-1\\.5.top-3.left-3 > .py-1.px-2.tracking-widest:nth-child(1)"
+            ],
+            [
+              ".sm\\:mb-8 > .tracking-\\[0\\.22em\\].text-\\[10px\\].font-bold"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 22
+        },
+        {
+          "id": "video-caption",
+          "impact": "critical",
+          "nodeCount": 2
+        }
+      ],
+      "passRuleCount": 23,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Recipes you can lift.Code you can run.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Worth opening first",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Aurora lattice — grid over dual radials",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar chart · quarterly index",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Combo · grouped bars + lines",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Comparison · pie + bar",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Comparison canvas · donut vs line",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Conic drift — streaming GIF encoder",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "CRT Ghost — phosphor haze",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Depth Field — stacked light",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Donut chart · patterned chart canvas",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Executive deck slide (chart + layout)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Hex Stage — lattice + neon rim",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line · all styles & markers",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line · areas, markers, regression",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line chart · dual series & markers",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pie · connected legend",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · framed slab (crosses + stroke + shadow)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · gradientBg + preset grid + crosses",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · transparentBase + gradient layer",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pulse bloom — PNG frames → MP4",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Spin wheel — animated GIF",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Spin wheel — MP4 video",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · grouped + axis legend",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · lollipop",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · waterfall",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Crossweave noir · crosses pattern",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Crystal fog — waves + heavy grain",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Horizontal bar · route throughput",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Horizontal bar · stacked",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Molten core — conic ember field",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · colorBg + stripes preset",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · presetPattern dots (multiply)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Solstice Silk — conic over sunset",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Tideglass — waves on teal",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Typography plaque · gradient logotype",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Vector collage · stars & gradients",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Found one you like? Make it yours.",
+            "id": null
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 0,
+          "footer": 0
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "gallery:tablet",
+      "surface": "gallery",
+      "viewport": "tablet",
+      "violationCount": 1,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 4,
+          "targets": [
+            [
+              ".font-mono"
+            ],
+            [
+              ".block.text-left.lift:nth-child(2) > .aspect-\\[5\\/3\\].relative > .gap-1\\.5.top-3.left-3 > .py-1.px-2.tracking-widest:nth-child(1)"
+            ],
+            [
+              ".block.text-left.lift:nth-child(3) > .aspect-\\[5\\/3\\].relative > .gap-1\\.5.top-3.left-3 > .py-1.px-2.tracking-widest:nth-child(1)"
+            ],
+            [
+              ".sm\\:mb-8 > .tracking-\\[0\\.22em\\].text-\\[10px\\].font-bold"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 31
+        },
+        {
+          "id": "video-caption",
+          "impact": "critical",
+          "nodeCount": 2
+        }
+      ],
+      "passRuleCount": 23,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Recipes you can lift.Code you can run.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Worth opening first",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Aurora lattice — grid over dual radials",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar chart · quarterly index",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Combo · grouped bars + lines",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Comparison · pie + bar",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Comparison canvas · donut vs line",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Conic drift — streaming GIF encoder",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "CRT Ghost — phosphor haze",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Depth Field — stacked light",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Donut chart · patterned chart canvas",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Executive deck slide (chart + layout)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Hex Stage — lattice + neon rim",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line · all styles & markers",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line · areas, markers, regression",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Line chart · dual series & markers",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pie · connected legend",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · framed slab (crosses + stroke + shadow)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · gradientBg + preset grid + crosses",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · transparentBase + gradient layer",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pulse bloom — PNG frames → MP4",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Spin wheel — animated GIF",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Spin wheel — MP4 video",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · grouped + axis legend",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · lollipop",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Bar · waterfall",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Crossweave noir · crosses pattern",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Crystal fog — waves + heavy grain",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Horizontal bar · route throughput",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Horizontal bar · stacked",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Molten core — conic ember field",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · colorBg + stripes preset",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Pipeline · presetPattern dots (multiply)",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Solstice Silk — conic over sunset",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Tideglass — waves on teal",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Typography plaque · gradient logotype",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Vector collage · stars & gradients",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Found one you like? Make it yours.",
+            "id": null
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 0,
+          "footer": 0
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "home:desktop",
+      "surface": "home",
+      "viewport": "desktop",
+      "violationCount": 2,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 11,
+          "targets": [
+            [
+              ".px-2.text-\\[10px\\].py-0\\.5"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(3) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(4) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".lg\\:col-span-5 > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              "div:nth-child(1) > .mb-1\\.5.justify-between.flex > .font-mono.text-xs.font-bold"
+            ],
+            [
+              ".mt-6"
+            ],
+            [
+              ".sm\\:items-end > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(7) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ]
+          ]
+        },
+        {
+          "id": "target-size",
+          "impact": "serious",
+          "help": "All touch targets must be 24px large, or leave sufficient space",
+          "nodeCount": 4,
+          "targets": [
+            [
+              "button[aria-label=\"Show line-rich\"]"
+            ],
+            [
+              "button[aria-label=\"Show presentation-slide\"]"
+            ],
+            [
+              "button[aria-label=\"Show bg-molten-core\"]"
+            ],
+            [
+              "button[aria-label=\"Show shape-collage-prism\"]"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 107
+        },
+        {
+          "id": "link-in-text-block",
+          "impact": "serious",
+          "nodeCount": 1
+        }
+      ],
+      "passRuleCount": 28,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Draw anything.From a script.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "One library, a whole studio of outputs.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Charts that look designed",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Cinematic backgrounds",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "GIFs from frames",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Type with attitude",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Presentation graphics",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Shapes & masks",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "A handful of lines. A finished PNG.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Measured, bounded, and regression-gated.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Release/runtime verification",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Copy-paste starting points.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Animated GIF",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Quote image",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Product card",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Social banner",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Chart image",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Video from frames",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "What other libraries don't ship in the box.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Every image below was rendered with this library.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Stop hand-designing every asset.Render them.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Product",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Resources",
+            "id": null
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 0,
+          "footer": 1
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "home:mobile",
+      "surface": "home",
+      "viewport": "mobile",
+      "violationCount": 3,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 11,
+          "targets": [
+            [
+              ".px-2.text-\\[10px\\].py-0\\.5"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(3) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(4) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".lg\\:col-span-5 > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              "div:nth-child(1) > .mb-1\\.5.justify-between.flex > .font-mono.text-xs.font-bold"
+            ],
+            [
+              ".mt-6"
+            ],
+            [
+              ".sm\\:items-end > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(7) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodeCount": 3,
+          "targets": [
+            [
+              ".whitespace-pre"
+            ],
+            [
+              ".text-\\[13px\\]"
+            ],
+            [
+              ".max-w-7xl.mx-auto > .rounded-2xl.surface-elevated.overflow-hidden > .overflow-x-auto"
+            ]
+          ]
+        },
+        {
+          "id": "target-size",
+          "impact": "serious",
+          "help": "All touch targets must be 24px large, or leave sufficient space",
+          "nodeCount": 4,
+          "targets": [
+            [
+              "button[aria-label=\"Show line-rich\"]"
+            ],
+            [
+              "button[aria-label=\"Show presentation-slide\"]"
+            ],
+            [
+              "button[aria-label=\"Show bg-molten-core\"]"
+            ],
+            [
+              "button[aria-label=\"Show shape-collage-prism\"]"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 95
+        },
+        {
+          "id": "link-in-text-block",
+          "impact": "serious",
+          "nodeCount": 1
+        }
+      ],
+      "passRuleCount": 28,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Draw anything.From a script.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "One library, a whole studio of outputs.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Charts that look designed",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Cinematic backgrounds",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "GIFs from frames",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Type with attitude",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Presentation graphics",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Shapes & masks",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "A handful of lines. A finished PNG.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Measured, bounded, and regression-gated.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Release/runtime verification",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Copy-paste starting points.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Animated GIF",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Quote image",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Product card",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Social banner",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Chart image",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Video from frames",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "What other libraries don't ship in the box.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Every image below was rendered with this library.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Stop hand-designing every asset.Render them.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Product",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Resources",
+            "id": null
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 0,
+          "footer": 1
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "home:tablet",
+      "surface": "home",
+      "viewport": "tablet",
+      "violationCount": 2,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 11,
+          "targets": [
+            [
+              ".px-2.text-\\[10px\\].py-0\\.5"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(3) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(4) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".lg\\:col-span-5 > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              "div:nth-child(1) > .mb-1\\.5.justify-between.flex > .font-mono.text-xs.font-bold"
+            ],
+            [
+              ".mt-6"
+            ],
+            [
+              ".sm\\:items-end > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ],
+            [
+              ".py-20.sm\\:py-28:nth-child(7) > .max-w-7xl.mx-auto > .sm\\:mb-14.max-w-3xl.mb-10 > .tracking-\\[0\\.22em\\].mb-3.text-\\[11px\\]"
+            ]
+          ]
+        },
+        {
+          "id": "target-size",
+          "impact": "serious",
+          "help": "All touch targets must be 24px large, or leave sufficient space",
+          "nodeCount": 4,
+          "targets": [
+            [
+              "button[aria-label=\"Show line-rich\"]"
+            ],
+            [
+              "button[aria-label=\"Show presentation-slide\"]"
+            ],
+            [
+              "button[aria-label=\"Show bg-molten-core\"]"
+            ],
+            [
+              "button[aria-label=\"Show shape-collage-prism\"]"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 99
+        },
+        {
+          "id": "link-in-text-block",
+          "impact": "serious",
+          "nodeCount": 1
+        }
+      ],
+      "passRuleCount": 28,
+      "sourceReview": {
+        "headings": [
+          {
+            "level": 1,
+            "text": "Draw anything.From a script.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "One library, a whole studio of outputs.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Charts that look designed",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Cinematic backgrounds",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "GIFs from frames",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Type with attitude",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Presentation graphics",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Shapes & masks",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "A handful of lines. A finished PNG.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Measured, bounded, and regression-gated.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Release/runtime verification",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Copy-paste starting points.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Animated GIF",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Quote image",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Product card",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Social banner",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Chart image",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Video from frames",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "What other libraries don't ship in the box.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Every image below was rendered with this library.",
+            "id": null
+          },
+          {
+            "level": 2,
+            "text": "Stop hand-designing every asset.Render them.",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Product",
+            "id": null
+          },
+          {
+            "level": 3,
+            "text": "Resources",
+            "id": null
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 0,
+          "footer": 1
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "search:desktop",
+      "surface": "search",
+      "viewport": "desktop",
+      "violationCount": 2,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 32,
+          "targets": [
+            [
+              "div[role=\"presentation\"]:nth-child(1) > .sticky.z-10.border-b"
+            ],
+            [
+              "button[data-idx=\"0\"] > .rounded.px-1.text-\\[8px\\]"
+            ],
+            [
+              "button[data-idx=\"1\"] > .rounded.px-1.text-\\[8px\\]"
+            ],
+            [
+              "button[data-idx=\"2\"] > .rounded.px-1.text-\\[8px\\]"
+            ],
+            [
+              "button[data-idx=\"3\"] > .rounded.px-1.text-\\[8px\\]"
+            ],
+            [
+              "button[data-idx=\"4\"] > .rounded.px-1.text-\\[8px\\]"
+            ],
+            [
+              "button[data-idx=\"5\"] > .rounded.px-1.text-\\[8px\\]"
+            ],
+            [
+              "button[data-idx=\"6\"] > .rounded.px-1.text-\\[8px\\]"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodeCount": 1,
+          "targets": [
+            [
+              "pre:nth-child(18) > .my-4.sm\\:my-6 > .bg-slate-900.border-2.shadow-2xl > .bg-slate-950.max-h-\\[min\\(65vh\\,28rem\\)\\].max-w-full"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [],
+      "passRuleCount": null,
+      "sourceReview": {
+        "keyboardEntry": "Ctrl/Cmd+K focuses docs sidebar search; direct input tested",
+        "resultCount": 20
+      }
+    },
+    {
+      "key": "studio:desktop",
+      "surface": "studio",
+      "viewport": "desktop",
+      "violationCount": 5,
+      "violations": [
+        {
+          "id": "aria-input-field-name",
+          "impact": "serious",
+          "help": "ARIA input fields must have an accessible name",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".cm-content"
+            ]
+          ]
+        },
+        {
+          "id": "aria-required-children",
+          "impact": "critical",
+          "help": "Certain ARIA roles must contain particular children",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".items-end"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 38,
+          "targets": [
+            [
+              ".cm-gutterElement:nth-child(11)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(12)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(13)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(14)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(15)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(16)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(17)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(18)"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "help": "Interactive controls must not be nested",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".group"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".min-h-\\[160px\\]"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 21
+        }
+      ],
+      "passRuleCount": 25,
+      "sourceReview": {
+        "headings": [],
+        "landmarks": {
+          "main": 1,
+          "nav": 0,
+          "header": 1,
+          "footer": 1
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "studio:mobile",
+      "surface": "studio",
+      "viewport": "mobile",
+      "violationCount": 4,
+      "violations": [
+        {
+          "id": "aria-input-field-name",
+          "impact": "serious",
+          "help": "ARIA input fields must have an accessible name",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".cm-content"
+            ]
+          ]
+        },
+        {
+          "id": "aria-required-children",
+          "impact": "critical",
+          "help": "Certain ARIA roles must contain particular children",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".items-end"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 18,
+          "targets": [
+            [
+              ".cm-gutterElement:nth-child(11)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(12)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(13)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(14)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(15)"
+            ],
+            [
+              ".cm-activeLine > .ͼp:nth-child(1)"
+            ],
+            [
+              ".ͼp:nth-child(3)"
+            ],
+            [
+              ".ͼq:nth-child(5)"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".cm-scroller"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 15
+        }
+      ],
+      "passRuleCount": 25,
+      "sourceReview": {
+        "headings": [],
+        "landmarks": {
+          "main": 1,
+          "nav": 0,
+          "header": 1,
+          "footer": 1
+        },
+        "skipLinks": 0
+      }
+    },
+    {
+      "key": "studio:tablet",
+      "surface": "studio",
+      "viewport": "tablet",
+      "violationCount": 5,
+      "violations": [
+        {
+          "id": "aria-input-field-name",
+          "impact": "serious",
+          "help": "ARIA input fields must have an accessible name",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".cm-content"
+            ]
+          ]
+        },
+        {
+          "id": "aria-required-children",
+          "impact": "critical",
+          "help": "Certain ARIA roles must contain particular children",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".items-end"
+            ]
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "nodeCount": 38,
+          "targets": [
+            [
+              ".cm-gutterElement:nth-child(11)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(12)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(13)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(14)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(15)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(16)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(17)"
+            ],
+            [
+              ".cm-gutterElement:nth-child(18)"
+            ]
+          ]
+        },
+        {
+          "id": "nested-interactive",
+          "impact": "serious",
+          "help": "Interactive controls must not be nested",
+          "nodeCount": 1,
+          "targets": [
+            [
+              ".group"
+            ]
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "help": "Scrollable region must have keyboard access",
+          "nodeCount": 2,
+          "targets": [
+            [
+              ".cm-scroller"
+            ],
+            [
+              ".min-h-\\[160px\\]"
+            ]
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodeCount": 21
+        }
+      ],
+      "passRuleCount": 25,
+      "sourceReview": {
+        "headings": [],
+        "landmarks": {
+          "main": 1,
+          "nav": 0,
+          "header": 1,
+          "footer": 1
+        },
+        "skipLinks": 0
+      }
+    }
+  ]
+}

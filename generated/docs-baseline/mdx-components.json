@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "name": "Alert",
+      "implementation": "components/mdx/Alert.tsx",
+      "boundary": "client",
+      "interactive": false,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 0
+    },
+    {
+      "name": "CodeBlock",
+      "implementation": "components/mdx/CodeBlock.tsx",
+      "boundary": "client",
+      "interactive": true,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 2
+    },
+    {
+      "name": "CodeSwitcher",
+      "implementation": "components/mdx/CodeSwitcher.tsx",
+      "boundary": "client",
+      "interactive": true,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 0
+    },
+    {
+      "name": "CodeWithImage",
+      "implementation": "components/mdx/CodeWithImage.tsx",
+      "boundary": "client",
+      "interactive": false,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 1
+    },
+    {
+      "name": "Dropdown",
+      "implementation": "components/mdx/Dropdown.tsx",
+      "boundary": "client",
+      "interactive": true,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 0
+    },
+    {
+      "name": "GalleryExample",
+      "implementation": "components/mdx/GalleryExample.tsx",
+      "boundary": "client",
+      "interactive": false,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 2
+    },
+    {
+      "name": "GalleryPreview",
+      "implementation": "components/mdx/GalleryPreview.tsx",
+      "boundary": "client",
+      "interactive": false,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 1
+    },
+    {
+      "name": "MDXRenderer",
+      "implementation": "components/mdx/MDXRenderer.tsx",
+      "boundary": "client",
+      "interactive": false,
+      "exposedByRegistry": false,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 0
+    },
+    {
+      "name": "PreviewWithCode",
+      "implementation": "components/mdx/PreviewWithCode.tsx",
+      "boundary": "client",
+      "interactive": true,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 4
+    },
+    {
+      "name": "RelatedGallery",
+      "implementation": "components/mdx/RelatedGallery.tsx",
+      "boundary": "client",
+      "interactive": false,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 0
+    },
+    {
+      "name": "Table",
+      "implementation": "components/mdx/Table.tsx",
+      "boundary": "client",
+      "interactive": false,
+      "exposedByRegistry": true,
+      "usageCount": 0,
+      "contentFiles": [],
+      "accessibilitySignals": 0
+    }
+  ]
+}

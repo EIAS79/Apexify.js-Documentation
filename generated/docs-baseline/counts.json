@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "countingRules": {
+    "routes": "App Router page.* + route.*",
+    "docs": "content/docs/**/*.mdx",
+    "components": "relevant TSX/JSX excluding App special files",
+    "routeBackedDocs": "own canonical App route; current hash docs=0"
+  },
+  "routes": 9,
+  "pageRoutes": 6,
+  "apiRoutes": 3,
+  "docsContentItems": 148,
+  "mdxCount": 148,
+  "otherAuthoredDocsContentCount": 0,
+  "docsCategoryCounts": {
+    "00-start-here": 2,
+    "01-beginner-guide": 6,
+    "02-recipes": 4,
+    "03-feature-guides": 95,
+    "04-advanced": 26,
+    "04-api-reference": 11,
+    "05-internals": 3,
+    "README.mdx": 1
+  },
+  "legacyHashLinkedDocumentCount": 148,
+  "routeBackedDocumentCount": 0,
+  "components": 54,
+  "componentDomains": {
+    "docs": 7,
+    "mdx": 12,
+    "home": 5,
+    "gallery": 8,
+    "studio": 10,
+    "navigation": 4,
+    "theme": 2,
+    "shared": 6
+  },
+  "mdxComponents": 11,
+  "clientComponents": 56,
+  "serverOrStaticComponents": 1,
+  "cssFiles": 1
+}

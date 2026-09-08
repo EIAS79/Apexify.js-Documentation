@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "configFiles": [
+    "package.json",
+    "package-lock.json",
+    "next.config.js",
+    "tsconfig.json",
+    "tailwind.config.ts",
+    "postcss.config.js",
+    "vercel.json"
+  ],
+  "ciWorkflows": [
+    {
+      "file": ".github/workflows/doc0-baseline.yml"
+    },
+    {
+      "file": ".github/workflows/docs-build.yml"
+    }
+  ],
+  "deployment": {
+    "vercelConfig": "vercel.json",
+    "nextConfig": "next.config.js",
+    "platformSignals": [
+      "Vercel Speed Insights",
+      "Next output-file tracing for serverless"
+    ]
+  },
+  "mdxConfiguration": {
+    "dedicatedNextMdxPlugin": false,
+    "contentExtension": ".mdx",
+    "renderers": [
+      "app/docs/MDXContentRenderer.tsx",
+      "components/mdx/MDXRenderer.tsx"
+    ],
+    "remarkRehypeDependencies": [
+      "react-markdown",
+      "remark-gfm",
+      "rehype-raw"
+    ]
+  },
+  "contentSchema": {
+    "frontmatterRequired": false,
+    "currentIdentity": "filename/path + curated DOC_STRUCTURE metadata",
+    "typedCentralSchemaDetected": false,
+    "routeMetadataDerivedFromContent": false
+  }
+}
