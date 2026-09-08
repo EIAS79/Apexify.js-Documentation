@@ -1,0 +1,121 @@
+name: DOC-0 Documentation Baseline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - doc0-baseline-audit
+    paths:
+      - 'scripts/doc0-*'
+      - 'package.json'
+      - '.github/workflows/doc0-baseline.yml'
+
+permissions:
+  contents: write
+
+env:
+  DOC0_DOCS_BASE_SHA: a52b79e87c3cfa4407d2607c15c6aecacbb2083f
+  DOC0_PACKAGE_MAIN_SHA: dbed9743353593eafae9a7b1c25312d7170a233b
+  DOC0_PHASE14P_SHA: 5d9b71f185140d6c3477286b8fb111f293e52b48
+  DOC0_PHASE14P_BRANCH: phase14p-baseline
+  DOC0_PACKAGE_VERSION: 6.0.0
+  DOC0_BASE_URL: http://127.0.0.1:3000
+  NEXT_TELEMETRY_DISABLED: '1'
+
+jobs:
+  baseline:
+    name: Reproduce DOC-0 baseline
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Deterministic install
+        run: npm ci
+      - name: Existing documentation integrity gates
+        run: |
+          npm run verify:docs
+          npm run typecheck
+      - name: Verify gallery executable examples
+        env:
+          GALLERY_SKIP_VIDEO: '1'
+        run: npm run gallery:build
+      - name: Generate static architecture and preservation evidence
+        run: |
+          npm run docs:audit:baseline
+          npm run docs:audit:links
+          npm run docs:audit:finalize
+          npm run docs:verify:baseline
+          npm run docs:test:baseline
+      - name: Capture repeated clean production-build baseline
+        run: npm run docs:audit:build
+      - name: Refresh bundle evidence from production build
+        run: npm run docs:audit:baseline
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3 lighthouse@12.8.2
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc0-next.log 2>&1 &
+          echo $! > /tmp/doc0-next.pid
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc0-next.log
+          exit 1
+      - name: Browser, accessibility, mobile, reduced-motion, SEO and search baseline
+        run: npm run docs:audit:browser
+      - name: Lighthouse controlled samples
+        shell: bash
+        run: |
+          mkdir -p .doc0-lighthouse
+          LH=./node_modules/.bin/lighthouse
+          FLAGS="--headless=new --no-sandbox --disable-dev-shm-usage"
+          "$LH" http://127.0.0.1:3000/ --quiet --output=json --output-path=.doc0-lighthouse/home--mobile--1.json --chrome-flags="$FLAGS"
+          "$LH" 'http://127.0.0.1:3000/docs#00-start-here' --quiet --output=json --output-path=.doc0-lighthouse/docs--mobile--1.json --chrome-flags="$FLAGS"
+          "$LH" 'http://127.0.0.1:3000/docs#00-start-here' --quiet --output=json --output-path=.doc0-lighthouse/docs--mobile--2.json --chrome-flags="$FLAGS"
+          "$LH" 'http://127.0.0.1:3000/docs#00-start-here' --preset=desktop --quiet --output=json --output-path=.doc0-lighthouse/docs--desktop--1.json --chrome-flags="$FLAGS"
+          "$LH" 'http://127.0.0.1:3000/docs#00-start-here' --preset=desktop --quiet --output=json --output-path=.doc0-lighthouse/docs--desktop--2.json --chrome-flags="$FLAGS"
+          "$LH" http://127.0.0.1:3000/studio --quiet --output=json --output-path=.doc0-lighthouse/studio--mobile--1.json --chrome-flags="$FLAGS"
+          "$LH" http://127.0.0.1:3000/gallery --quiet --output=json --output-path=.doc0-lighthouse/gallery--mobile--1.json --chrome-flags="$FLAGS"
+      - name: Summarize Lighthouse and validate complete baseline
+        run: |
+          npm run docs:audit:lighthouse
+          npm run docs:audit:finalize
+          DOC0_REQUIRE_MEASURED=1 npm run docs:verify:baseline
+      - name: Upload full control evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc0-baseline-evidence
+          path: |
+            generated/docs-baseline
+            .doc0-lighthouse
+            /tmp/doc0-next.log
+          if-no-files-found: error
+      - name: Commit versioned baseline evidence
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add generated/docs-baseline
+          if git diff --cached --quiet; then
+            echo 'No baseline changes to commit.'
+            exit 0
+          fi
+          git commit -m 'DOC-0: capture measured documentation baseline'
+          git push origin HEAD:doc0-baseline-audit
