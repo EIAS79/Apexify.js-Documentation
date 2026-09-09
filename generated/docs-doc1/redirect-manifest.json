@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "canonicalEntry": "/docs/getting-started",
+  "deepHeadingConvention": "/docs#legacy-document?h=heading-id -> /docs/canonical#heading-id",
+  "routes": [
+    {
+      "slug": "getting-started",
+      "canonicalPath": "/docs/getting-started",
+      "legacyHashes": ["00-start-here"],
+      "aliases": ["start-here", "Getting-Started"]
+    },
+    {
+      "slug": "node/canvas",
+      "canonicalPath": "/docs/node/canvas",
+      "legacyHashes": ["00-create-canvas-overview"],
+      "aliases": []
+    },
+    {
+      "slug": "node/canvas/size-and-coordinates",
+      "canonicalPath": "/docs/node/canvas/size-and-coordinates",
+      "legacyHashes": ["01-canvas-size-and-coordinates"],
+      "aliases": []
+    }
+  ],
+  "legacyDocuments": [],
+  "legacyAliases": [],
+  "defaultLegacyIdentity": "00-start-here"
+}

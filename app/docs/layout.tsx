@@ -2,6 +2,10 @@
 
 import { useEffect } from 'react';
 import DocHeader from '@/components/DocHeader';
+import {
+  DEFAULT_DOCUMENTATION_PATH,
+  resolveLegacyDocumentationFragment,
+} from '@/lib/docs/legacy-routing';
 
 export default function DocsLayout({
   children,
@@ -13,12 +17,28 @@ export default function DocsLayout({
     return () => document.documentElement.classList.remove('docs-scrollbar-theme');
   }, []);
 
+  useEffect(() => {
+    if (window.location.pathname !== '/docs') return;
+
+    const canonicalizeLegacyLocation = () => {
+      if (window.location.pathname !== '/docs') return;
+      const rawFragment = window.location.hash.slice(1);
+      const target = rawFragment
+        ? resolveLegacyDocumentationFragment(rawFragment)
+        : DEFAULT_DOCUMENTATION_PATH;
+      if (target) window.location.replace(target);
+    };
+
+    canonicalizeLegacyLocation();
+    window.addEventListener('hashchange', canonicalizeLegacyLocation);
+    return () => window.removeEventListener('hashchange', canonicalizeLegacyLocation);
+  }, []);
+
   return (
     <div
       className="relative min-h-screen overflow-hidden transition-colors duration-300"
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
-      {/* Twilight backdrop — matches home / studio */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
         <div
           className="absolute inset-0"
@@ -41,7 +61,7 @@ export default function DocsLayout({
           }}
         />
         <div
-          className="absolute left-[10%] bottom-[-10%] h-[40vh] w-[45vw] rounded-full blur-3xl"
+          className="absolute bottom-[-10%] left-[10%] h-[40vh] w-[45vw] rounded-full blur-3xl"
           style={{
             background:
               'radial-gradient(closest-side, color-mix(in srgb, var(--accent-amber) 18%, transparent), transparent 70%)',
