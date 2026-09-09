@@ -9,9 +9,9 @@ const requireFile = (file: string) => {
   if (!fs.existsSync(target)) throw new Error(`[doc2-verify] missing required file: ${file}`);
   return fs.readFileSync(target, 'utf8');
 };
-const assert = (condition: unknown, message: string): asserts condition => {
+function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`[doc2-verify] ${message}`);
-};
+}
 
 const tokenCss = requireFile('styles/docs-tokens.css');
 const shellCss = requireFile('styles/docs-shell.css');
