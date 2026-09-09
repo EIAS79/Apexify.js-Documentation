@@ -4,26 +4,30 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarProvider } from "@/contexts/SidebarContext";
-import CustomCursor from "@/components/CustomCursor";
+import { CustomCursorGate } from "@/components/docs/shell/CustomCursorGate";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-/** Works with notched phones + `/studio` full-viewport layout (`viewport-fit=cover`). */
+const THEME_BOOTSTRAP = `(() => {
+  try {
+    const stored = localStorage.getItem('apexify-theme') || localStorage.getItem('theme') || 'system';
+    const mode = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'system';
+    const resolved = mode === 'system'
+      ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : mode;
+    const root = document.documentElement;
+    root.classList.toggle('dark', resolved === 'dark');
+    root.classList.toggle('light', resolved === 'light');
+    root.style.colorScheme = resolved;
+  } catch {}
+})();`;
+
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
 };
 
-/**
- * Site-wide metadata.
- *
- * Favicon: set explicitly via `metadata.icons` pointing at `public/brand/icon.svg`.
- * (Relying only on `app/icon.svg` can produce `<link rel="icon" … sizes="…">` that
- * Chromium ignores for SVG, so the tab shows a generic document icon.)
- *
- * Apple touch icon: `app/apple-icon.tsx` (PNG via `ImageResponse`).
- */
 export const metadata: Metadata = {
   title: "Apexify.js - Advanced Canvas Rendering Library",
   description:
@@ -33,19 +37,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
+      </head>
+      <body className={`${inter.className} ${inter.variable}`}>
         <ThemeProvider>
-          <SidebarProvider>
-          {children}
-          </SidebarProvider>
-          <CustomCursor />
+          <SidebarProvider>{children}</SidebarProvider>
+          <CustomCursorGate />
         </ThemeProvider>
         <SpeedInsights />
       </body>

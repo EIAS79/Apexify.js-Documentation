@@ -1,58 +1,30 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import {
-  getDocumentationPageBySlug,
-  loadDocumentationPages,
-} from '@/lib/docs/content';
-import {
-  buildDocumentationNavigation,
-  getDocumentationBreadcrumbs,
-  getDocumentationPager,
-} from '@/lib/docs/navigation';
-import { RouteDocsFrame } from '@/components/docs/route/RouteDocsFrame';
+import { getDocumentationPageBySlug, loadDocumentationPages } from '@/lib/docs/content';
+import { buildDocumentationNavigation, getDocumentationBreadcrumbs, getDocumentationPager } from '@/lib/docs/navigation';
+import { DocsShell } from '@/components/docs/shell/DocsShell';
+import { DocsBreadcrumbsV2, DocsPagerV2 } from '@/components/docs/navigation/DocsNavigationChrome';
+import { DocsPageHero } from '@/components/docs/content/DocsPageHero';
 import { RouteDocsMarkdown } from '@/components/docs/route/RouteDocsMarkdown';
-import {
-  RouteDocBreadcrumbs,
-  RouteDocPager,
-} from '@/components/docs/route/RouteDocChrome';
 
 const SITE_ORIGIN = 'https://apexifyjs.vercel.app';
-
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return loadDocumentationPages().map((page) => ({
-    slug: page.slug.split('/'),
-  }));
+  return loadDocumentationPages().map((page) => ({ slug: page.slug.split('/') }));
 }
 
-export function generateMetadata({
-  params,
-}: {
-  params: { slug: string[] };
-}): Metadata {
+export function generateMetadata({ params }: { params: { slug: string[] } }): Metadata {
   const page = getDocumentationPageBySlug(params.slug);
-  if (!page) {
-    return {
-      title: 'Documentation not found | Apexify.js',
-      robots: { index: false, follow: false },
-    };
-  }
-
+  if (!page) return { title: 'Documentation not found | Apexify.js', robots: { index: false, follow: false } };
   const canonical = `${SITE_ORIGIN}${page.canonicalPath}`;
   const indexable = !['ROADMAP', 'REMOVED'].includes(page.stability);
-
   return {
     title: `${page.title} | Apexify.js Docs`,
     description: page.description,
     keywords: page.keywords,
-    alternates: {
-      canonical,
-    },
-    robots: {
-      index: indexable,
-      follow: true,
-    },
+    alternates: { canonical },
+    robots: { index: indexable, follow: true },
     openGraph: {
       type: 'article',
       title: page.title,
@@ -63,11 +35,11 @@ export function generateMetadata({
   };
 }
 
-export default function DocumentationRoutePage({
-  params,
-}: {
-  params: { slug: string[] };
-}) {
+function withoutLeadingTitle(body: string): string {
+  return body.replace(/^\s*#\s+[^\r\n]+(?:\r?\n)+/, '');
+}
+
+export default function DocumentationRoutePage({ params }: { params: { slug: string[] } }) {
   const page = getDocumentationPageBySlug(params.slug);
   if (!page) notFound();
 
@@ -75,61 +47,21 @@ export default function DocumentationRoutePage({
   const breadcrumbs = getDocumentationBreadcrumbs(navigation, page);
   const pager = getDocumentationPager(navigation, page.canonicalPath);
   const headings = page.toc ? page.headings : [];
+  const leadingHeading = headings[0]?.level === 1 ? headings[0] : undefined;
 
   return (
-    <RouteDocsFrame groups={navigation} headings={headings}>
-      <RouteDocBreadcrumbs breadcrumbs={breadcrumbs} />
-
-      <div
-        className="not-prose mb-5 flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.16em]"
-        data-doc1-metadata
-      >
-        <span
-          className="rounded-full px-2 py-1"
-          style={{
-            backgroundColor: 'color-mix(in srgb, var(--accent-iris) 12%, transparent)',
-            color: 'var(--accent-iris)',
-            border: '1px solid color-mix(in srgb, var(--accent-iris) 28%, transparent)',
-          }}
-        >
-          {page.package}
-        </span>
-        {page.runtime.map((runtime) => (
-          <span
-            key={runtime}
-            className="rounded-full px-2 py-1"
-            style={{
-              backgroundColor: 'var(--bg-sunken)',
-              color: 'var(--text-secondary)',
-              border: '1px solid var(--border-default)',
-            }}
-          >
-            {runtime}
-          </span>
-        ))}
-        <span
-          className="rounded-full px-2 py-1"
-          style={{
-            backgroundColor: 'color-mix(in srgb, var(--accent-magenta) 10%, transparent)',
-            color: 'var(--accent-magenta)',
-            border: '1px solid color-mix(in srgb, var(--accent-magenta) 26%, transparent)',
-          }}
-        >
-          {page.stability}
-        </span>
-        <span style={{ color: 'var(--text-muted)' }}>{page.kind}</span>
-      </div>
-
+    <DocsShell groups={navigation} headings={headings} activePath={page.canonicalPath}>
+      <DocsBreadcrumbsV2 breadcrumbs={breadcrumbs} />
       <article
-        className="prose prose-xl max-w-none"
+        className="apx-doc-prose"
         data-doc-article
         data-doc-slug={page.slug}
         data-doc-source={page.sourcePath}
       >
-        <RouteDocsMarkdown content={page.body} />
+        <DocsPageHero page={page} headingId={leadingHeading?.id} />
+        <RouteDocsMarkdown content={withoutLeadingTitle(page.body)} />
       </article>
-
-      <RouteDocPager pager={pager} />
-    </RouteDocsFrame>
+      <DocsPagerV2 pager={pager} />
+    </DocsShell>
   );
 }

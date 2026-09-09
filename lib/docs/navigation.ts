@@ -1,18 +1,8 @@
 import type { DocumentationPage } from './schema';
 
 export const DOCUMENTATION_NAVIGATION_MANIFEST = [
-  {
-    id: 'start',
-    label: 'Start',
-    order: 10,
-    pages: ['getting-started'],
-  },
-  {
-    id: 'node',
-    label: 'Node',
-    order: 20,
-    pages: ['node/canvas', 'node/canvas/size-and-coordinates'],
-  },
+  { id: 'start', label: 'Start', order: 10, pages: ['getting-started'] },
+  { id: 'node', label: 'Node', order: 20, pages: ['node/canvas', 'node/canvas/size-and-coordinates'] },
 ] as const;
 
 export interface DocumentationNavigationItem {
@@ -25,6 +15,7 @@ export interface DocumentationNavigationItem {
   stability: DocumentationPage['stability'];
   runtime: DocumentationPage['runtime'];
   package: DocumentationPage['package'];
+  children?: DocumentationNavigationItem[];
 }
 
 export interface DocumentationNavigationGroup {
@@ -34,36 +25,21 @@ export interface DocumentationNavigationGroup {
   items: DocumentationNavigationItem[];
 }
 
-export interface DocumentationPager {
-  previous: DocumentationNavigationItem | null;
-  next: DocumentationNavigationItem | null;
-}
+export interface DocumentationPager { previous: DocumentationNavigationItem | null; next: DocumentationNavigationItem | null; }
+export interface DocumentationBreadcrumb { label: string; href?: string; }
+export interface DocumentationNavigationFilter { runtime?: DocumentationPage['runtime'][number]; package?: DocumentationPage['package']; }
 
-export interface DocumentationBreadcrumb {
-  label: string;
-  href?: string;
-}
-
-export function buildDocumentationNavigation(
-  pages: DocumentationPage[],
-): DocumentationNavigationGroup[] {
+export function buildDocumentationNavigation(pages: DocumentationPage[]): DocumentationNavigationGroup[] {
   const bySlug = new Map(pages.map((page) => [page.slug, page]));
   const seen = new Set<string>();
-
   const groups = DOCUMENTATION_NAVIGATION_MANIFEST.map((group) => ({
     id: group.id,
     label: group.label,
     order: group.order,
     items: group.pages.map((slug) => {
       const page = bySlug.get(slug);
-      if (!page) {
-        throw new Error(
-          `[docs-navigation] manifest references missing routed page "${slug}"`,
-        );
-      }
-      if (seen.has(slug)) {
-        throw new Error(`[docs-navigation] routed page "${slug}" appears more than once`);
-      }
+      if (!page) throw new Error(`[docs-navigation] manifest references missing routed page "${slug}"`);
+      if (seen.has(slug)) throw new Error(`[docs-navigation] routed page "${slug}" appears more than once`);
       seen.add(slug);
       return {
         id: page.id,
@@ -78,50 +54,43 @@ export function buildDocumentationNavigation(
       };
     }),
   })).sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
-
   const missing = pages.filter((page) => !seen.has(page.slug));
-  if (missing.length > 0) {
-    throw new Error(
-      `[docs-navigation] routed pages missing from navigation manifest: ${missing
-        .map((page) => page.slug)
-        .join(', ')}`,
-    );
-  }
-
+  if (missing.length) throw new Error(`[docs-navigation] routed pages missing from navigation manifest: ${missing.map((page) => page.slug).join(', ')}`);
   return groups;
 }
 
-export function flattenDocumentationNavigation(
-  groups: DocumentationNavigationGroup[],
-): DocumentationNavigationItem[] {
-  return groups.flatMap((group) => group.items);
+function flattenItems(items: DocumentationNavigationItem[]): DocumentationNavigationItem[] {
+  return items.flatMap((item) => [item, ...flattenItems(item.children ?? [])]);
 }
 
-export function getDocumentationPager(
-  groups: DocumentationNavigationGroup[],
-  canonicalPath: string,
-): DocumentationPager {
+export function flattenDocumentationNavigation(groups: DocumentationNavigationGroup[]): DocumentationNavigationItem[] {
+  return groups.flatMap((group) => flattenItems(group.items));
+}
+
+function filterItems(items: DocumentationNavigationItem[], filter: DocumentationNavigationFilter): DocumentationNavigationItem[] {
+  return items.flatMap((item) => {
+    const children = filterItems(item.children ?? [], filter);
+    const matchesRuntime = !filter.runtime || item.runtime.includes(filter.runtime);
+    const matchesPackage = !filter.package || item.package === filter.package;
+    if (matchesRuntime && matchesPackage) return [{ ...item, children }];
+    return children.length ? [{ ...item, children }] : [];
+  });
+}
+
+export function filterDocumentationNavigation(groups: DocumentationNavigationGroup[], filter: DocumentationNavigationFilter): DocumentationNavigationGroup[] {
+  return groups.map((group) => ({ ...group, items: filterItems(group.items, filter) })).filter((group) => group.items.length > 0);
+}
+
+export function getDocumentationPager(groups: DocumentationNavigationGroup[], canonicalPath: string): DocumentationPager {
   const items = flattenDocumentationNavigation(groups);
   const index = items.findIndex((item) => item.href === canonicalPath);
   if (index < 0) return { previous: null, next: null };
-  return {
-    previous: index > 0 ? items[index - 1] : null,
-    next: index < items.length - 1 ? items[index + 1] : null,
-  };
+  return { previous: index > 0 ? items[index - 1] : null, next: index < items.length - 1 ? items[index + 1] : null };
 }
 
-export function getDocumentationBreadcrumbs(
-  groups: DocumentationNavigationGroup[],
-  page: DocumentationPage,
-): DocumentationBreadcrumb[] {
-  const group = groups.find((candidate) =>
-    candidate.items.some((item) => item.href === page.canonicalPath),
-  );
-  if (!group) {
-    throw new Error(
-      `[docs-navigation] cannot build breadcrumbs for unmanifested page "${page.slug}"`,
-    );
-  }
+export function getDocumentationBreadcrumbs(groups: DocumentationNavigationGroup[], page: DocumentationPage): DocumentationBreadcrumb[] {
+  const group = groups.find((candidate) => flattenItems(candidate.items).some((item) => item.href === page.canonicalPath));
+  if (!group) throw new Error(`[docs-navigation] cannot build breadcrumbs for unmanifested page "${page.slug}"`);
   return [
     { label: 'Apexify', href: '/' },
     { label: 'Docs', href: '/docs/getting-started' },
