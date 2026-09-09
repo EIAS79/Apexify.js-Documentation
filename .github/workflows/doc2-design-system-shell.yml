@@ -9,15 +9,26 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: doc2-shell-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
-  contents: read
+  contents: write
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC2_BASE_URL: http://127.0.0.1:3000
 
 jobs:
   verify:
-    name: Verify DOC-2 shell
+    name: Verify DOC-2 complete shell gate
     runs-on: ubuntu-24.04
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -26,11 +37,82 @@ jobs:
         run: npm install --global npm@11.19.1
       - name: Deterministic install
         run: npm ci
+      - name: Generate deterministic DOC-2 evidence
+        run: npm run docs:generate:doc2
+      - name: DOC-2 deterministic tests and DOC-1 regression
+        run: npm run docs:verify:doc2
       - name: Existing documentation integrity
         run: npm run verify:docs
-      - name: DOC-1 route regression
-        run: npm run docs:verify:doc1
       - name: TypeScript typecheck
         run: npm run typecheck
-      - name: Production build
-        run: npm run build
+      - name: Clean production build and DOC-2 bundle/CSS measurement
+        run: npm run docs:measure:doc2
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc2-next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/docs/node/canvas >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc2-next.log
+          exit 1
+      - name: Desktop/tablet/mobile theme keyboard reduced-motion and axe verification
+        run: npm run docs:browser:doc2
+      - name: Lighthouse desktop
+        shell: bash
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:3000/docs/node/canvas \
+            --preset=desktop \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --output=json \
+            --output-path=.doc2-runtime-evidence/lighthouse-desktop.json \
+            --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+      - name: Lighthouse mobile
+        shell: bash
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:3000/docs/node/canvas \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --output=json \
+            --output-path=.doc2-runtime-evidence/lighthouse-mobile.json \
+            --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+      - name: Finalize DOC-2 runtime comparisons and regression gates
+        run: npm run docs:finalize:doc2
+      - name: Print DOC-2 runtime summaries
+        shell: bash
+        run: |
+          cat .doc2-runtime-evidence/build-bundle.json
+          cat .doc2-runtime-evidence/performance-comparison.json
+          cat .doc2-runtime-evidence/accessibility-runtime.json
+      - name: Upload DOC-2 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc2-design-system-shell-evidence
+          path: |
+            generated/docs-doc2
+            .doc2-runtime-evidence
+            /tmp/doc2-next.log
+          include-hidden-files: true
+          if-no-files-found: error
+      - name: Commit generated static evidence on DOC-2 branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/doc2-design-system-shell'
+        shell: bash
+        run: |
+          git add generated/docs-doc2
+          if git diff --cached --quiet; then
+            echo "DOC-2 generated evidence already current"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "DOC-2: refresh deterministic shell evidence"
+          git push

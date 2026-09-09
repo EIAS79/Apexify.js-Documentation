@@ -34,7 +34,14 @@
     "docs:test:doc1": "tsx --test scripts/docs/doc1.test.ts",
     "docs:verify:doc1": "tsx scripts/docs/doc1-generate.ts --check && tsx --test scripts/docs/doc1.test.ts && tsx scripts/docs/doc1-verify.ts",
     "docs:measure:doc1": "node scripts/docs/doc1-build-measure.mjs",
-    "docs:browser:doc1": "node scripts/docs/doc1-browser-verify.mjs"
+    "docs:browser:doc1": "node scripts/docs/doc1-browser-verify.mjs",
+    "docs:generate:doc2": "tsx scripts/docs/doc2-generate.ts",
+    "docs:test:doc2": "tsx --test scripts/docs/doc2.test.ts",
+    "docs:verify:doc2": "tsx scripts/docs/doc2-generate.ts --check && tsx --test scripts/docs/doc2.test.ts && tsx scripts/docs/doc2-verify.ts && npm run docs:verify:doc1",
+    "docs:measure:doc2": "node scripts/docs/doc2-build-measure.mjs",
+    "docs:browser:doc2": "node scripts/docs/doc2-browser-verify.mjs",
+    "docs:finalize:doc2": "node scripts/docs/doc2-finalize.mjs",
+    "docs:audit:doc2": "npm run docs:verify:doc2"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
