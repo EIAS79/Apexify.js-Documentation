@@ -28,7 +28,7 @@ function TocItems({ nodes, activeId }: { nodes: TocNode[]; activeId: string }) {
             href={`#${node.heading.id}`}
             aria-current={activeId === node.heading.id ? 'location' : undefined}
             onClick={() => {
-              setTimeout(() => window.dispatchEvent(new Event('apx-close-docs-toc')), 0);
+              window.setTimeout(() => window.dispatchEvent(new Event('apx-close-docs-toc')), 0);
             }}
           >
             {node.heading.text}
@@ -40,7 +40,7 @@ function TocItems({ nodes, activeId }: { nodes: TocNode[]; activeId: string }) {
   );
 }
 
-export function OnThisPageV2({ headings }: { headings: DocumentationHeading[] }) {
+export function OnThisPageV2({ headings, id = 'docs-toc-rail' }: { headings: DocumentationHeading[]; id?: string }) {
   const tree = useMemo(() => buildTree(headings), [headings]);
   const [activeId, setActiveId] = useState(headings[0]?.id ?? '');
 
@@ -69,7 +69,7 @@ export function OnThisPageV2({ headings }: { headings: DocumentationHeading[] })
 
   if (!headings.length) return null;
   return (
-    <nav aria-label="On this page" id="docs-toc-rail" data-doc2-toc>
+    <nav aria-label="On this page" id={id} data-doc2-toc>
       <p className="apx-toc-title">On this page</p>
       <TocItems nodes={tree} activeId={activeId} />
     </nav>
