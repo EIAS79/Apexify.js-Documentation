@@ -15,6 +15,19 @@ function assert(condition, message) {
   if (!condition) throw new Error(`[doc1-browser] ${message}`);
 }
 
+function isIgnoredTelemetryUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    return (
+      url.pathname.startsWith('/_vercel/insights/') ||
+      url.pathname.startsWith('/_vercel/speed-insights/') ||
+      url.pathname.startsWith('/_vercel/analytics/')
+    );
+  } catch {
+    return false;
+  }
+}
+
 const browser = await puppeteer.launch({
   executablePath: CHROME_PATH,
   headless: 'new',
@@ -22,6 +35,7 @@ const browser = await puppeteer.launch({
 });
 
 const errors = [];
+const networkErrors = [];
 const browserChecks = [];
 
 try {
@@ -52,12 +66,27 @@ try {
 
   const page = await browser.newPage();
   page.on('console', (message) => {
-    if (message.type() === 'error') {
-      const text = message.text();
-      if (!text.includes('speed-insights')) errors.push(`console: ${text}`);
-    }
+    if (message.type() !== 'error') return;
+    const text = message.text();
+    if (text.includes('speed-insights')) return;
+    // Chromium's generic resource-load console message omits the failed URL.
+    // Network listeners below are authoritative and retain the exact request.
+    if (text.startsWith('Failed to load resource:')) return;
+    errors.push(`console: ${text}`);
   });
   page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
+  page.on('response', (response) => {
+    if (response.status() < 400) return;
+    const url = response.url();
+    if (isIgnoredTelemetryUrl(url)) return;
+    networkErrors.push(`response ${response.status()}: ${url}`);
+  });
+  page.on('requestfailed', (request) => {
+    const url = request.url();
+    if (isIgnoredTelemetryUrl(url)) return;
+    const failure = request.failure();
+    networkErrors.push(`request failed: ${url}${failure?.errorText ? ` (${failure.errorText})` : ''}`);
+  });
 
   await page.setViewport({ width: 1440, height: 1000, deviceScaleFactor: 1 });
   await page.goto(`${BASE_URL}/docs/getting-started`, { waitUntil: 'domcontentloaded' });
@@ -160,6 +189,10 @@ try {
     errors.length === 0,
     `serious browser console/page errors: ${errors.join(' | ')}`,
   );
+  assert(
+    networkErrors.length === 0,
+    `unexpected browser network failures: ${networkErrors.join(' | ')}`,
+  );
 
   const evidence = {
     schemaVersion: 1,
@@ -184,6 +217,7 @@ try {
       tocControl: true,
     },
     seriousConsoleErrors: errors,
+    unexpectedNetworkFailures: networkErrors,
     status: 'PASS',
   };
 
@@ -195,6 +229,7 @@ try {
     status: evidence.status,
     routeChecks: evidence.routeChecks.length,
     seriousConsoleErrors: errors.length,
+    unexpectedNetworkFailures: networkErrors.length,
   }));
 } finally {
   await browser.close();
