@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "strategy": "representative vertical slice only; broad migration is deferred to DOC-9",
+  "pages": [
+    {
+      "sourcePath": "content/docs/00-start-here/00-start-here.mdx",
+      "legacyHashes": [
+        "00-start-here"
+      ],
+      "canonicalPath": "/docs/getting-started",
+      "kind": "guide"
+    },
+    {
+      "sourcePath": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "legacyHashes": [
+        "00-create-canvas-overview"
+      ],
+      "canonicalPath": "/docs/node/canvas",
+      "kind": "guide"
+    },
+    {
+      "sourcePath": "content/docs/03-feature-guides/canvas/01-canvas-size-and-coordinates.mdx",
+      "legacyHashes": [
+        "01-canvas-size-and-coordinates"
+      ],
+      "canonicalPath": "/docs/node/canvas/size-and-coordinates",
+      "kind": "reference"
+    }
+  ]
+}

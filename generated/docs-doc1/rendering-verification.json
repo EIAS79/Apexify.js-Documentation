@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "serverStaticRoute": "app/docs/[...slug]/page.tsx",
+  "serverContentLoader": "lib/docs/content.ts",
+  "serverMarkdownRenderer": "components/docs/route/RouteDocsMarkdown.tsx",
+  "clientIslands": [
+    "app/docs/layout.tsx (legacy fragment compatibility + existing shell)",
+    "components/docs/route/RouteDocsFrame.tsx (sidebar state)",
+    "components/docs/route/RouteDocSidebar.tsx (mobile navigation/search)",
+    "components/DocLayout.tsx (existing reading progress/TOC shell)",
+    "components/mdx/CodeBlock.tsx (copy/Studio affordance)"
+  ],
+  "forbiddenPattern": "routed pages do not fetch raw documentation content after hydration and do not identify documents from location.hash"
+}

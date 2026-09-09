@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "siteOrigin": "https://apexifyjs.vercel.app",
+  "pages": [
+    {
+      "canonicalPath": "/docs/getting-started",
+      "canonicalUrl": "https://apexifyjs.vercel.app/docs/getting-started",
+      "title": "Getting Started | Apexify.js Docs",
+      "description": "Install the staged Apexify.js 6.0.0 package, understand its Node/server requirements, and render a first image.",
+      "openGraphUrl": "https://apexifyjs.vercel.app/docs/getting-started",
+      "indexable": true
+    },
+    {
+      "canonicalPath": "/docs/node/canvas",
+      "canonicalUrl": "https://apexifyjs.vercel.app/docs/node/canvas",
+      "title": "Canvas and createCanvas | Apexify.js Docs",
+      "description": "Understand createCanvas, CanvasConfig, CanvasResults, validation, backgrounds, rendering order, and the core Node canvas workflow.",
+      "openGraphUrl": "https://apexifyjs.vercel.app/docs/node/canvas",
+      "indexable": true
+    },
+    {
+      "canonicalPath": "/docs/node/canvas/size-and-coordinates",
+      "canonicalUrl": "https://apexifyjs.vercel.app/docs/node/canvas/size-and-coordinates",
+      "title": "Canvas size and coordinates | Apexify.js Docs",
+      "description": "Reference the width, height, x, and y sizing and coordinate behavior used by Apexify.js createCanvas.",
+      "openGraphUrl": "https://apexifyjs.vercel.app/docs/node/canvas/size-and-coordinates",
+      "indexable": true
+    }
+  ]
+}

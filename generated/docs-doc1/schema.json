@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "pageKinds": [
+    "landing",
+    "concept",
+    "tutorial",
+    "guide",
+    "recipe",
+    "reference",
+    "configuration",
+    "architecture",
+    "migration",
+    "capability",
+    "troubleshooting",
+    "example"
+  ],
+  "stabilities": [
+    "CURRENT",
+    "PREVIEW",
+    "EXPERIMENTAL",
+    "ROADMAP",
+    "DEPRECATED",
+    "REMOVED"
+  ],
+  "runtimes": [
+    "node",
+    "web",
+    "worker",
+    "react",
+    "next-server",
+    "next-client",
+    "distributed"
+  ],
+  "packages": [
+    "apexify.js",
+    "@apexify/core",
+    "@apexify/node",
+    "@apexify/web",
+    "@apexify/react",
+    "@apexify/next",
+    "@apexify/plugin-sdk",
+    "@apexify/assistant",
+    "@apexify/devtools",
+    "@apexify/server",
+    "@apexify/native"
+  ],
+  "requiredFields": [
+    "title",
+    "description",
+    "slug",
+    "kind",
+    "category",
+    "order",
+    "package",
+    "runtime",
+    "stability",
+    "canonical"
+  ],
+  "optionalFields": [
+    "frameworks",
+    "since",
+    "deprecatedSince",
+    "removedIn",
+    "replacedBy",
+    "feature",
+    "apiSymbols",
+    "keywords",
+    "prerequisites",
+    "related",
+    "examples",
+    "toc",
+    "search",
+    "aliases",
+    "legacyHashes"
+  ],
+  "frontmatterParser": "first-party deterministic key:value subset with JSON-compatible scalar/array values"
+}

@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "managedPageCount": 3,
+  "legacyFallbackPageCount": 145,
+  "pages": [
+    {
+      "id": "00-start-here",
+      "sourcePath": "content/docs/00-start-here/00-start-here.mdx",
+      "slug": "getting-started",
+      "canonicalPath": "/docs/getting-started",
+      "title": "Getting Started",
+      "description": "Install the staged Apexify.js 6.0.0 package, understand its Node/server requirements, and render a first image.",
+      "kind": "guide",
+      "category": "Start",
+      "order": 10,
+      "package": "apexify.js",
+      "runtime": [
+        "node"
+      ],
+      "frameworks": [],
+      "stability": "CURRENT",
+      "since": "6.0.0",
+      "feature": null,
+      "apiSymbols": [],
+      "keywords": [
+        "getting started",
+        "installation",
+        "ApexPainter",
+        "Node.js"
+      ],
+      "related": [
+        "node/canvas"
+      ],
+      "toc": true,
+      "search": true,
+      "aliases": [
+        "start-here",
+        "Getting-Started"
+      ],
+      "legacyHashes": [
+        "00-start-here"
+      ],
+      "headings": [
+        {
+          "level": 1,
+          "id": "00-start-here",
+          "text": "Start here"
+        },
+        {
+          "level": 2,
+          "id": "requirements-for-staged-6-0-0",
+          "text": "Requirements for staged 6.0.0"
+        },
+        {
+          "level": 2,
+          "id": "published-npm-install",
+          "text": "Published npm install"
+        },
+        {
+          "level": 2,
+          "id": "esm-and-commonjs",
+          "text": "ESM and CommonJS"
+        },
+        {
+          "level": 2,
+          "id": "smallest-staged-6-example",
+          "text": "Smallest staged-6 example"
+        },
+        {
+          "level": 2,
+          "id": "read-in-this-order",
+          "text": "Read in this order"
+        }
+      ]
+    },
+    {
+      "id": "00-create-canvas-overview",
+      "sourcePath": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "slug": "node/canvas",
+      "canonicalPath": "/docs/node/canvas",
+      "title": "Canvas and createCanvas",
+      "description": "Understand createCanvas, CanvasConfig, CanvasResults, validation, backgrounds, rendering order, and the core Node canvas workflow.",
+      "kind": "guide",
+      "category": "Node / Canvas",
+      "order": 20,
+      "package": "apexify.js",
+      "runtime": [
+        "node"
+      ],
+      "frameworks": [],
+      "stability": "CURRENT",
+      "since": "6.0.0",
+      "feature": "canvas",
+      "apiSymbols": [
+        "ApexPainter.createCanvas",
+        "CanvasConfig",
+        "CanvasResults"
+      ],
+      "keywords": [
+        "canvas",
+        "createCanvas",
+        "CanvasConfig",
+        "CanvasResults"
+      ],
+      "related": [
+        "getting-started",
+        "node/canvas/size-and-coordinates"
+      ],
+      "toc": true,
+      "search": true,
+      "aliases": [],
+      "legacyHashes": [
+        "00-create-canvas-overview"
+      ],
+      "headings": [
+        {
+          "level": 1,
+          "id": "00-create-canvas-overview",
+          "text": "Canvas & `createCanvas` — overview"
+        },
+        {
+          "level": 2,
+          "id": "signature-types",
+          "text": "Signature & types"
+        },
+        {
+          "level": 2,
+          "id": "return-value-canvasresults",
+          "text": "Return value (**`CanvasResults`**)"
+        },
+        {
+          "level": 2,
+          "id": "defaults-validation-quick-rules",
+          "text": "Defaults & validation (quick rules)"
+        },
+        {
+          "level": 2,
+          "id": "minimal-example",
+          "text": "Minimal example"
+        },
+        {
+          "level": 2,
+          "id": "topics-read-in-order",
+          "text": "Topics (read in order)"
+        },
+        {
+          "level": 2,
+          "id": "next-surfaces",
+          "text": "Next surfaces"
+        },
+        {
+          "level": 2,
+          "id": "implementation-lib-next",
+          "text": "Implementation (`lib-next`)"
+        }
+      ]
+    },
+    {
+      "id": "01-canvas-size-and-coordinates",
+      "sourcePath": "content/docs/03-feature-guides/canvas/01-canvas-size-and-coordinates.mdx",
+      "slug": "node/canvas/size-and-coordinates",
+      "canonicalPath": "/docs/node/canvas/size-and-coordinates",
+      "title": "Canvas size and coordinates",
+      "description": "Reference the width, height, x, and y sizing and coordinate behavior used by Apexify.js createCanvas.",
+      "kind": "reference",
+      "category": "Node / Canvas",
+      "order": 30,
+      "package": "apexify.js",
+      "runtime": [
+        "node"
+      ],
+      "frameworks": [],
+      "stability": "CURRENT",
+      "since": "6.0.0",
+      "feature": "canvas",
+      "apiSymbols": [
+        "ApexPainter.createCanvas",
+        "CanvasConfig"
+      ],
+      "keywords": [
+        "canvas",
+        "width",
+        "height",
+        "coordinates"
+      ],
+      "related": [
+        "node/canvas"
+      ],
+      "toc": true,
+      "search": true,
+      "aliases": [],
+      "legacyHashes": [
+        "01-canvas-size-and-coordinates"
+      ],
+      "headings": [
+        {
+          "level": 1,
+          "id": "01-canvas-size-and-coordinates",
+          "text": "Canvas size & coordinates"
+        },
+        {
+          "level": 2,
+          "id": "width-and-height",
+          "text": "`width` and `height`"
+        },
+        {
+          "level": 2,
+          "id": "x-and-y",
+          "text": "`x` and `y`"
+        },
+        {
+          "level": 2,
+          "id": "minimum-valid-example",
+          "text": "Minimum valid example"
+        }
+      ]
+    }
+  ]
+}

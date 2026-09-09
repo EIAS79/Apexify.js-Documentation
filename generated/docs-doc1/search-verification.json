@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "scope": "DOC-1 route-awareness only; DOC-6 owns the future build-time search replacement",
+  "endpoint": "/api/docs/search",
+  "migratedResults": "canonical route href",
+  "unmigratedResults": "legacy /docs#document-id href",
+  "searchImplementationRetained": "request-time filesystem scan"
+}
