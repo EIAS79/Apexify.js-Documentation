@@ -120,6 +120,7 @@ jobs:
             .doc1-runtime-evidence
             /tmp/doc1-next.log
           if-no-files-found: error
+          include-hidden-files: true
 
       - name: Commit generated static evidence on DOC-1 branch
         if: github.event_name == 'push' && github.ref == 'refs/heads/doc1-information-architecture'
