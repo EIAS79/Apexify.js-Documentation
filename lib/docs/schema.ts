@@ -88,7 +88,35 @@ export interface DocumentationHeading {
   level: number;
 }
 
-export interface DocumentationPage extends DocumentationFrontmatter {
+type NormalizedDocumentationFields =
+  | 'frameworks'
+  | 'apiSymbols'
+  | 'keywords'
+  | 'prerequisites'
+  | 'related'
+  | 'examples'
+  | 'toc'
+  | 'search'
+  | 'aliases'
+  | 'legacyHashes';
+
+/**
+ * Server/build consumers use this normalized record, not raw frontmatter.
+ * Optional authoring fields that have deterministic defaults are required
+ * here so routing/navigation/search cannot accidentally branch on undefined.
+ */
+export interface DocumentationPage
+  extends Omit<DocumentationFrontmatter, NormalizedDocumentationFields> {
+  frameworks: string[];
+  apiSymbols: string[];
+  keywords: string[];
+  prerequisites: string[];
+  related: string[];
+  examples: string[];
+  toc: boolean;
+  search: boolean;
+  aliases: string[];
+  legacyHashes: string[];
   id: string;
   sourcePath: string;
   canonicalPath: string;

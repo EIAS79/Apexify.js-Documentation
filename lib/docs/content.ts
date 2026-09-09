@@ -72,11 +72,30 @@ export function loadDocumentationPages(): DocumentationPage[] {
     if (!parsed.data) continue;
 
     const metadata = validateDocumentationFrontmatter(parsed.data, sourceFile.sourcePath);
+    const frameworks = metadata.frameworks ?? [];
+    const apiSymbols = metadata.apiSymbols ?? [];
+    const keywords = metadata.keywords ?? [];
+    const prerequisites = metadata.prerequisites ?? [];
+    const related = metadata.related ?? [];
+    const examples = metadata.examples ?? [];
+    const aliases = metadata.aliases ?? [];
     const legacyHashes = metadata.legacyHashes ?? [];
+    const toc = metadata.toc ?? true;
+    const search = metadata.search ?? true;
     const id = legacyHashes[0] ?? metadata.slug;
 
     pages.push({
       ...metadata,
+      frameworks,
+      apiSymbols,
+      keywords,
+      prerequisites,
+      related,
+      examples,
+      toc,
+      search,
+      aliases,
+      legacyHashes,
       id,
       sourcePath: sourceFile.sourcePath,
       canonicalPath: metadata.canonical,
