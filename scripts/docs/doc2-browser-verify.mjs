@@ -178,9 +178,9 @@ async function interactionAudit() {
     results.tocDrawerAxe = await axe(page);
     const tocLink = '#docs-toc-drawer a[href^="#"]';
     const firstTocHref = await page.$eval(tocLink, (element) => element.getAttribute('href'));
-    await page.$eval(tocLink, (element) => element.scrollIntoView({ block: 'center', inline: 'nearest' }));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    await page.click(tocLink);
+    await page.focus(tocLink);
+    results.tocLinkKeyboardFocus = await page.evaluate((selector) => document.activeElement?.matches(selector) ?? false, tocLink);
+    await page.keyboard.press('Enter');
     await page.waitForSelector('[role="dialog"][aria-label="On this page"]', { hidden: true });
     results.tocDeepLink = await page.evaluate((expected) => location.hash === expected, firstTocHref);
 
@@ -241,7 +241,7 @@ try {
   }
   const reduced = states.find((state) => state.name === 'desktop-reduced');
   if (!reduced || reduced.motionElements !== 0) failures.push(`desktop-reduced: expected zero motion-bearing elements, got ${reduced?.motionElements ?? 'missing'}`);
-  for (const key of ['skipFirstFocus','skipMovesToMain','searchShortcutFocus','searchCanonicalNavigation','pagerCanonicalNavigation','navDrawerFocusEntry','navDrawerFocusReturn','tocDrawerFocusEntry','tocDeepLink','siteDrawerFocusReturn','legacyHashRedirect']) {
+  for (const key of ['skipFirstFocus','skipMovesToMain','searchShortcutFocus','searchCanonicalNavigation','pagerCanonicalNavigation','navDrawerFocusEntry','navDrawerFocusReturn','tocDrawerFocusEntry','tocLinkKeyboardFocus','tocDeepLink','siteDrawerFocusReturn','legacyHashRedirect']) {
     if (!interactions[key]) failures.push(`interaction failed: ${key}`);
   }
   for (const key of ['navDrawerAxe','tocDrawerAxe','siteDrawerAxe']) {
