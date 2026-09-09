@@ -176,8 +176,11 @@ async function interactionAudit() {
     await page.waitForSelector('[role="dialog"][aria-label="On this page"]');
     results.tocDrawerFocusEntry = await page.evaluate(() => Boolean(document.activeElement?.closest('[role="dialog"][aria-label="On this page"]')));
     results.tocDrawerAxe = await axe(page);
-    const firstTocHref = await page.$eval('#docs-toc-drawer a[href^="#"]', (element) => element.getAttribute('href'));
-    await page.click('#docs-toc-drawer a[href^="#"]');
+    const tocLink = '#docs-toc-drawer a[href^="#"]';
+    const firstTocHref = await page.$eval(tocLink, (element) => element.getAttribute('href'));
+    await page.$eval(tocLink, (element) => element.scrollIntoView({ block: 'center', inline: 'nearest' }));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await page.click(tocLink);
     await page.waitForSelector('[role="dialog"][aria-label="On this page"]', { hidden: true });
     results.tocDeepLink = await page.evaluate((expected) => location.hash === expected, firstTocHref);
 
