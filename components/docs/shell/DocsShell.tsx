@@ -15,7 +15,7 @@ export function DocsShell({ groups, headings, activePath, children }: {
   return (
     <div className="apx-doc-shell" data-doc2-shell>
       <aside className="apx-doc-sidebar" aria-label="Documentation sidebar">
-        <DocsSidebarV2 groups={groups} activePath={activePath} />
+        <DocsSidebarV2 groups={groups} activePath={activePath} searchInputId="docs-sidebar-search-input" />
       </aside>
       <main id="docs-content" tabIndex={-1} className="apx-doc-main">
         <div className="apx-doc-mobile-bar" aria-label="Mobile documentation controls">
@@ -26,7 +26,7 @@ export function DocsShell({ groups, headings, activePath, children }: {
             eventName="apx-open-docs-nav"
             trigger={<><Bars3Icon className="h-5 w-5" aria-hidden /><span>Navigation</span></>}
           >
-            <DocsSidebarV2 groups={groups} activePath={activePath} />
+            <DocsSidebarV2 groups={groups} activePath={activePath} searchInputId="docs-drawer-search-input" />
           </AccessibleDrawer>
           {headings.length ? (
             <AccessibleDrawer
@@ -36,14 +36,14 @@ export function DocsShell({ groups, headings, activePath, children }: {
               closeEventName="apx-close-docs-toc"
               trigger={<><ListBulletIcon className="h-5 w-5" aria-hidden /><span>On this page</span></>}
             >
-              <OnThisPageV2 headings={headings} />
+              <OnThisPageV2 headings={headings} id="docs-toc-drawer" />
             </AccessibleDrawer>
           ) : <span aria-hidden />}
         </div>
         <div className="apx-doc-content">{children}</div>
       </main>
       <aside className="apx-doc-toc-rail" aria-label="On this page rail">
-        <OnThisPageV2 headings={headings} />
+        <OnThisPageV2 headings={headings} id="docs-toc-rail" />
       </aside>
     </div>
   );
