@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "routeImplementation": "app/docs/[...slug]/page.tsx",
+  "staticParams": [
+    [
+      "getting-started"
+    ],
+    [
+      "node",
+      "canvas"
+    ],
+    [
+      "node",
+      "canvas",
+      "size-and-coordinates"
+    ]
+  ],
+  "canonicalRoutes": [
+    "/docs/getting-started",
+    "/docs/node/canvas",
+    "/docs/node/canvas/size-and-coordinates"
+  ],
+  "dynamicParams": false,
+  "unknownRoutePolicy": "404",
+  "rootDocsPolicy": "/docs remains the compatibility entry because URL fragments are client-only; no-hash and migrated hashes replace to canonical routes"
+}

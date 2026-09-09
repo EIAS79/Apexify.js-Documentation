@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-1",
+  "files": [
+    {
+      "name": "docs-manifest.json",
+      "bytes": 5643,
+      "sha256": "9c7fd49681cc4021954e3c27784769ecc1dc9ae17d3410a4cb16c627a99f3d94"
+    },
+    {
+      "name": "identity.json",
+      "bytes": 410,
+      "sha256": "5af24f5118ac2b0f152b1c96ffd13afd8007f3659c91d2c73cd834004fb74bf2"
+    },
+    {
+      "name": "link-verification.json",
+      "bytes": 4964,
+      "sha256": "366e75306eb1503f3e4c6da7dc3ec6a3dc0a0ebd8502c26b0e7adad16f761746"
+    },
+    {
+      "name": "metadata-verification.json",
+      "bytes": 1427,
+      "sha256": "34dac7c66f59137457c65c8987009cbf534954429084bd3be2d4abc8f6fba207"
+    },
+    {
+      "name": "migrated-pages.json",
+      "bytes": 853,
+      "sha256": "0e36db6b0fa9daa79b9262d74700a37466d48af9c650e5d70a26328b3787041e"
+    },
+    {
+      "name": "navigation-manifest.json",
+      "bytes": 1790,
+      "sha256": "e7ff759ee344cb6dd47e2be4f30ac2e48b920ce4bb72c650d6563aa4745ab68b"
+    },
+    {
+      "name": "redirect-manifest.json",
+      "bytes": 35734,
+      "sha256": "0c299d2e0bfba19307df342eac7dbd12e1407af17c7559ff90e43e7bdcb04f5f"
+    },
+    {
+      "name": "redirect-verification.json",
+      "bytes": 625,
+      "sha256": "f020c18cd4818ec9ae406c942958918677b9b0d7fe5c3b15da17dbe06ba2599a"
+    },
+    {
+      "name": "rendering-verification.json",
+      "bytes": 716,
+      "sha256": "431c39b0c9e2a55f2af66e4679d86ac02b6b7883931c898e5044d02390945a69"
+    },
+    {
+      "name": "route-verification.json",
+      "bytes": 596,
+      "sha256": "769dcc65d81731374b6c005e525b9af32755b4c62a8a8f827088b24ae29f6d8a"
+    },
+    {
+      "name": "schema.json",
+      "bytes": 1326,
+      "sha256": "231789206e1f6eba957b7e1bdb49d8b94b6dd58ada4b2362397050c89d053b32"
+    },
+    {
+      "name": "search-verification.json",
+      "bytes": 320,
+      "sha256": "68890d26862bc5709e5d9f7c02a6e10b563b122aa0142553ff3a1b6874116aed"
+    }
+  ]
+}

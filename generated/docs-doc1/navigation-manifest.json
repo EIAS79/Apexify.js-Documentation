@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "groups": [
+    {
+      "id": "start",
+      "label": "Start",
+      "order": 10,
+      "items": [
+        {
+          "id": "00-start-here",
+          "title": "Getting Started",
+          "description": "Install the staged Apexify.js 6.0.0 package, understand its Node/server requirements, and render a first image.",
+          "slug": "getting-started",
+          "href": "/docs/getting-started",
+          "kind": "guide",
+          "stability": "CURRENT",
+          "runtime": [
+            "node"
+          ],
+          "package": "apexify.js"
+        }
+      ]
+    },
+    {
+      "id": "node",
+      "label": "Node",
+      "order": 20,
+      "items": [
+        {
+          "id": "00-create-canvas-overview",
+          "title": "Canvas and createCanvas",
+          "description": "Understand createCanvas, CanvasConfig, CanvasResults, validation, backgrounds, rendering order, and the core Node canvas workflow.",
+          "slug": "node/canvas",
+          "href": "/docs/node/canvas",
+          "kind": "guide",
+          "stability": "CURRENT",
+          "runtime": [
+            "node"
+          ],
+          "package": "apexify.js"
+        },
+        {
+          "id": "01-canvas-size-and-coordinates",
+          "title": "Canvas size and coordinates",
+          "description": "Reference the width, height, x, and y sizing and coordinate behavior used by Apexify.js createCanvas.",
+          "slug": "node/canvas/size-and-coordinates",
+          "href": "/docs/node/canvas/size-and-coordinates",
+          "kind": "reference",
+          "stability": "CURRENT",
+          "runtime": [
+            "node"
+          ],
+          "package": "apexify.js"
+        }
+      ]
+    }
+  ],
+  "source": "lib/docs/navigation.ts::DOCUMENTATION_NAVIGATION_MANIFEST"
+}

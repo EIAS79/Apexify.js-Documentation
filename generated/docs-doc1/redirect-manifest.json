@@ -1,0 +1,969 @@
+{
+  "schemaVersion": 1,
+  "canonicalEntry": "/docs/getting-started",
+  "deepHeadingConvention": "/docs#legacy-document?h=heading-id -> /docs/canonical#heading-id",
+  "routes": [
+    {
+      "slug": "getting-started",
+      "canonicalPath": "/docs/getting-started",
+      "legacyHashes": [
+        "00-start-here"
+      ],
+      "aliases": [
+        "start-here",
+        "Getting-Started"
+      ]
+    },
+    {
+      "slug": "node/canvas",
+      "canonicalPath": "/docs/node/canvas",
+      "legacyHashes": [
+        "00-create-canvas-overview"
+      ],
+      "aliases": []
+    },
+    {
+      "slug": "node/canvas/size-and-coordinates",
+      "canonicalPath": "/docs/node/canvas/size-and-coordinates",
+      "legacyHashes": [
+        "01-canvas-size-and-coordinates"
+      ],
+      "aliases": []
+    }
+  ],
+  "legacyDocuments": [
+    {
+      "identity": "00-start-here",
+      "sourcePath": "content/docs/00-start-here/00-start-here.mdx",
+      "state": "MIGRATED",
+      "target": "/docs/getting-started"
+    },
+    {
+      "identity": "01-feature-tracks",
+      "sourcePath": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-feature-tracks"
+    },
+    {
+      "identity": "00-beginner-guide",
+      "sourcePath": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-beginner-guide"
+    },
+    {
+      "identity": "01-install-and-setup",
+      "sourcePath": "content/docs/01-beginner-guide/01-install-and-setup.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-install-and-setup"
+    },
+    {
+      "identity": "02-your-first-image",
+      "sourcePath": "content/docs/01-beginner-guide/02-your-first-image.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-your-first-image"
+    },
+    {
+      "identity": "03-how-buffers-work",
+      "sourcePath": "content/docs/01-beginner-guide/03-how-buffers-work.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-how-buffers-work"
+    },
+    {
+      "identity": "04-save-and-export",
+      "sourcePath": "content/docs/01-beginner-guide/04-save-and-export.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-save-and-export"
+    },
+    {
+      "identity": "05-common-mistakes",
+      "sourcePath": "content/docs/01-beginner-guide/05-common-mistakes.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-common-mistakes"
+    },
+    {
+      "identity": "00-recipes-overview",
+      "sourcePath": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-recipes-overview"
+    },
+    {
+      "identity": "01-what-you-can-build",
+      "sourcePath": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-what-you-can-build"
+    },
+    {
+      "identity": "02-philosophy-goals-and-when-to-use",
+      "sourcePath": "content/docs/02-recipes/02-philosophy-goals-and-when-to-use.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-philosophy-goals-and-when-to-use"
+    },
+    {
+      "identity": "recipe-share-card",
+      "sourcePath": "content/docs/02-recipes/recipe-share-card.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#recipe-share-card"
+    },
+    {
+      "identity": "00-batch-save-output-overview",
+      "sourcePath": "content/docs/03-feature-guides/batch-save-output/00-batch-save-output-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-batch-save-output-overview"
+    },
+    {
+      "identity": "01-save-disk-and-multiple",
+      "sourcePath": "content/docs/03-feature-guides/batch-save-output/01-save-disk-and-multiple.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-save-disk-and-multiple"
+    },
+    {
+      "identity": "02-output-format-and-outPut",
+      "sourcePath": "content/docs/03-feature-guides/batch-save-output/02-output-format-and-outPut.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-output-format-and-outPut"
+    },
+    {
+      "identity": "03-imgur-output-security",
+      "sourcePath": "content/docs/03-feature-guides/batch-save-output/03-imgur-output-security.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-imgur-output-security"
+    },
+    {
+      "identity": "00-create-canvas-overview",
+      "sourcePath": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "state": "MIGRATED",
+      "target": "/docs/node/canvas"
+    },
+    {
+      "identity": "01-canvas-size-and-coordinates",
+      "sourcePath": "content/docs/03-feature-guides/canvas/01-canvas-size-and-coordinates.mdx",
+      "state": "MIGRATED",
+      "target": "/docs/node/canvas/size-and-coordinates"
+    },
+    {
+      "identity": "02-backgrounds-primary",
+      "sourcePath": "content/docs/03-feature-guides/canvas/02-backgrounds-primary.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-backgrounds-primary"
+    },
+    {
+      "identity": "03-backgrounds-transparent-base",
+      "sourcePath": "content/docs/03-feature-guides/canvas/03-backgrounds-transparent-base.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-backgrounds-transparent-base"
+    },
+    {
+      "identity": "04-backgrounds-bg-layers",
+      "sourcePath": "content/docs/03-feature-guides/canvas/04-backgrounds-bg-layers.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-backgrounds-bg-layers"
+    },
+    {
+      "identity": "05-backgrounds-pattern-noise",
+      "sourcePath": "content/docs/03-feature-guides/canvas/05-backgrounds-pattern-noise.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-backgrounds-pattern-noise"
+    },
+    {
+      "identity": "06-canvas-border-shadow-zoom",
+      "sourcePath": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-canvas-border-shadow-zoom"
+    },
+    {
+      "identity": "07-canvas-shadow-options",
+      "sourcePath": "content/docs/03-feature-guides/canvas/07-canvas-shadow-options.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-canvas-shadow-options"
+    },
+    {
+      "identity": "08-canvas-stroke-options",
+      "sourcePath": "content/docs/03-feature-guides/canvas/08-canvas-stroke-options.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-canvas-stroke-options"
+    },
+    {
+      "identity": "09-canvas-paint-order",
+      "sourcePath": "content/docs/03-feature-guides/canvas/09-canvas-paint-order.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#09-canvas-paint-order"
+    },
+    {
+      "identity": "00-charts-overview",
+      "sourcePath": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-charts-overview"
+    },
+    {
+      "identity": "01-charts-shared-appearance",
+      "sourcePath": "content/docs/03-feature-guides/charts/01-charts-shared-appearance.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-charts-shared-appearance"
+    },
+    {
+      "identity": "02-chart-pie-and-donut",
+      "sourcePath": "content/docs/03-feature-guides/charts/02-chart-pie-and-donut.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-chart-pie-and-donut"
+    },
+    {
+      "identity": "03-chart-bar-vertical",
+      "sourcePath": "content/docs/03-feature-guides/charts/03-chart-bar-vertical.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-chart-bar-vertical"
+    },
+    {
+      "identity": "04-chart-horizontal-bar",
+      "sourcePath": "content/docs/03-feature-guides/charts/04-chart-horizontal-bar.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-chart-horizontal-bar"
+    },
+    {
+      "identity": "05-chart-line",
+      "sourcePath": "content/docs/03-feature-guides/charts/05-chart-line.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-chart-line"
+    },
+    {
+      "identity": "06-chart-scatter",
+      "sourcePath": "content/docs/03-feature-guides/charts/06-chart-scatter.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-chart-scatter"
+    },
+    {
+      "identity": "07-chart-radar",
+      "sourcePath": "content/docs/03-feature-guides/charts/07-chart-radar.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-chart-radar"
+    },
+    {
+      "identity": "08-chart-polar-area",
+      "sourcePath": "content/docs/03-feature-guides/charts/08-chart-polar-area.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-chart-polar-area"
+    },
+    {
+      "identity": "09-chart-combo",
+      "sourcePath": "content/docs/03-feature-guides/charts/09-chart-combo.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#09-chart-combo"
+    },
+    {
+      "identity": "10-chart-comparison",
+      "sourcePath": "content/docs/03-feature-guides/charts/10-chart-comparison.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#10-chart-comparison"
+    },
+    {
+      "identity": "feature-guides-hub",
+      "sourcePath": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#feature-guides-hub"
+    },
+    {
+      "identity": "00-create-gif-overview",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-create-gif-overview"
+    },
+    {
+      "identity": "01-create-gif-input-frames",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/01-create-gif-input-frames.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-create-gif-input-frames"
+    },
+    {
+      "identity": "02-create-gif-options-output",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/02-create-gif-options-output.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-create-gif-options-output"
+    },
+    {
+      "identity": "03-create-gif-transparency-disposal",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/03-create-gif-transparency-disposal.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-create-gif-transparency-disposal"
+    },
+    {
+      "identity": "04-create-gif-watermark-overlay",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/04-create-gif-watermark-overlay.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-create-gif-watermark-overlay"
+    },
+    {
+      "identity": "05-create-gif-onstart",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/05-create-gif-onstart.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-create-gif-onstart"
+    },
+    {
+      "identity": "06-create-gif-onend-results",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/06-create-gif-onend-results.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-create-gif-onend-results"
+    },
+    {
+      "identity": "07-create-gif-encode-pipeline",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/07-create-gif-encode-pipeline.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-create-gif-encode-pipeline"
+    },
+    {
+      "identity": "08-animate-api",
+      "sourcePath": "content/docs/03-feature-guides/gif-animation/08-animate-api.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-animate-api"
+    },
+    {
+      "identity": "00-create-image-overview",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-create-image-overview"
+    },
+    {
+      "identity": "01-create-image-basics",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/01-create-image-basics.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-create-image-basics"
+    },
+    {
+      "identity": "02-shapes-reference",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/02-shapes-reference.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-shapes-reference"
+    },
+    {
+      "identity": "03-create-image-styling-clip",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/03-create-image-styling-clip.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-create-image-styling-clip"
+    },
+    {
+      "identity": "04-create-image-shadow-stroke",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/04-create-image-shadow-stroke.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-create-image-shadow-stroke"
+    },
+    {
+      "identity": "05-create-image-filters",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/05-create-image-filters.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-create-image-filters"
+    },
+    {
+      "identity": "06-create-image-mask-distortion",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/06-create-image-mask-distortion.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-create-image-mask-distortion"
+    },
+    {
+      "identity": "07-create-image-effects",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/07-create-image-effects.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-create-image-effects"
+    },
+    {
+      "identity": "08-create-image-groups",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/08-create-image-groups.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-create-image-groups"
+    },
+    {
+      "identity": "09-create-image-paint-order",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/09-create-image-paint-order.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#09-create-image-paint-order"
+    },
+    {
+      "identity": "10-remote-image-reliability",
+      "sourcePath": "content/docs/03-feature-guides/images-shapes/10-remote-image-reliability.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#10-remote-image-reliability"
+    },
+    {
+      "identity": "00-custom-lines-overview",
+      "sourcePath": "content/docs/03-feature-guides/lines-connectors/00-custom-lines-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-custom-lines-overview"
+    },
+    {
+      "identity": "01-create-custom-api",
+      "sourcePath": "content/docs/03-feature-guides/lines-connectors/01-create-custom-api.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-create-custom-api"
+    },
+    {
+      "identity": "02-custom-line-style-path",
+      "sourcePath": "content/docs/03-feature-guides/lines-connectors/02-custom-line-style-path.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-custom-line-style-path"
+    },
+    {
+      "identity": "03-custom-lines-arrows-markers-textures",
+      "sourcePath": "content/docs/03-feature-guides/lines-connectors/03-custom-lines-arrows-markers-textures.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-custom-lines-arrows-markers-textures"
+    },
+    {
+      "identity": "04-path2d-draw-path",
+      "sourcePath": "content/docs/03-feature-guides/lines-connectors/04-path2d-draw-path.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-path2d-draw-path"
+    },
+    {
+      "identity": "05-hit-testing-paths",
+      "sourcePath": "content/docs/03-feature-guides/lines-connectors/05-hit-testing-paths.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-hit-testing-paths"
+    },
+    {
+      "identity": "00-raster-batch-output-overview",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-raster-batch-output-overview"
+    },
+    {
+      "identity": "01-batch-and-chain",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/01-batch-and-chain.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-batch-and-chain"
+    },
+    {
+      "identity": "02-save-disk",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/02-save-disk.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-save-disk"
+    },
+    {
+      "identity": "03-output-format-and-encoding",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/03-output-format-and-encoding.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-output-format-and-encoding"
+    },
+    {
+      "identity": "04-image-stitch-and-collage",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/04-image-stitch-and-collage.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-image-stitch-and-collage"
+    },
+    {
+      "identity": "05-image-compress-and-palette",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/05-image-compress-and-palette.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-image-compress-and-palette"
+    },
+    {
+      "identity": "06-image-resize-convert-effects",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/06-image-resize-convert-effects.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-image-resize-convert-effects"
+    },
+    {
+      "identity": "07-image-blend-mask-crop-gradient",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/07-image-blend-mask-crop-gradient.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-image-blend-mask-crop-gradient"
+    },
+    {
+      "identity": "08-pixel-data",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/08-pixel-data.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-pixel-data"
+    },
+    {
+      "identity": "09-path2d-draw-and-custom-lines",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/09-path2d-draw-and-custom-lines.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#09-path2d-draw-and-custom-lines"
+    },
+    {
+      "identity": "10-hit-detection",
+      "sourcePath": "content/docs/03-feature-guides/raster-batch-output/10-hit-detection.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#10-hit-detection"
+    },
+    {
+      "identity": "00-create-text-overview",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-create-text-overview"
+    },
+    {
+      "identity": "01-create-text-font-and-position",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/01-create-text-font-and-position.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-create-text-font-and-position"
+    },
+    {
+      "identity": "02-create-text-wrapping-spacing",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/02-create-text-wrapping-spacing.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-create-text-wrapping-spacing"
+    },
+    {
+      "identity": "03-create-text-color-gradients",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/03-create-text-color-gradients.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-create-text-color-gradients"
+    },
+    {
+      "identity": "04-create-text-glow-shadow-stroke",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/04-create-text-glow-shadow-stroke.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-create-text-glow-shadow-stroke"
+    },
+    {
+      "identity": "05-create-text-decorations-highlight",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/05-create-text-decorations-highlight.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-create-text-decorations-highlight"
+    },
+    {
+      "identity": "06-create-text-curved",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/06-create-text-curved.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-create-text-curved"
+    },
+    {
+      "identity": "07-measure-text",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/07-measure-text.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-measure-text"
+    },
+    {
+      "identity": "08-create-text-paint-order",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/08-create-text-paint-order.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-create-text-paint-order"
+    },
+    {
+      "identity": "09-create-text-properties-matrix",
+      "sourcePath": "content/docs/03-feature-guides/text-rendering/09-create-text-properties-matrix.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#09-create-text-properties-matrix"
+    },
+    {
+      "identity": "00-video-overview",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-video-overview"
+    },
+    {
+      "identity": "01-metadata-and-frames",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/01-metadata-and-frames.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-metadata-and-frames"
+    },
+    {
+      "identity": "02-transcode-trim-transform",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/02-transcode-trim-transform.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-transcode-trim-transform"
+    },
+    {
+      "identity": "03-audio",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/03-audio.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-audio"
+    },
+    {
+      "identity": "04-effects-overlays",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/04-effects-overlays.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-effects-overlays"
+    },
+    {
+      "identity": "05-compose-and-build",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/05-compose-and-build.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-compose-and-build"
+    },
+    {
+      "identity": "06-advanced-presets-transitions",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/06-advanced-presets-transitions.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-advanced-presets-transitions"
+    },
+    {
+      "identity": "07-video-creation-options-matrix",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-video-creation-options-matrix"
+    },
+    {
+      "identity": "08-imperative-video-helpers",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/08-imperative-video-helpers.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-imperative-video-helpers"
+    },
+    {
+      "identity": "09-security-runtime-configuration",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/09-security-runtime-configuration.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#09-security-runtime-configuration"
+    },
+    {
+      "identity": "00-video-options-hub",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-video-options-hub"
+    },
+    {
+      "identity": "01-discovery-metadata",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/01-discovery-metadata.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-discovery-metadata"
+    },
+    {
+      "identity": "02-frame-extraction",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/02-frame-extraction.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-frame-extraction"
+    },
+    {
+      "identity": "03-transcode-export",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/03-transcode-export.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-transcode-export"
+    },
+    {
+      "identity": "04-timeline-edits",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/04-timeline-edits.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-timeline-edits"
+    },
+    {
+      "identity": "05-geometry",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/05-geometry.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-geometry"
+    },
+    {
+      "identity": "06-audio-deep-dive",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/06-audio-deep-dive.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-audio-deep-dive"
+    },
+    {
+      "identity": "07-visual-filters",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/07-visual-filters.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-visual-filters"
+    },
+    {
+      "identity": "08-text-overlays",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/08-text-overlays.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-text-overlays"
+    },
+    {
+      "identity": "09-compositing",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/09-compositing.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#09-compositing"
+    },
+    {
+      "identity": "10-advanced-ops",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/10-advanced-ops.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#10-advanced-ops"
+    },
+    {
+      "identity": "11-on-progress",
+      "sourcePath": "content/docs/03-feature-guides/video-ffmpeg/options/11-on-progress.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#11-on-progress"
+    },
+    {
+      "identity": "00-advanced-overview",
+      "sourcePath": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-advanced-overview"
+    },
+    {
+      "identity": "01-runtime-resource-governance",
+      "sourcePath": "content/docs/04-advanced/01-runtime-resource-governance.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-runtime-resource-governance"
+    },
+    {
+      "identity": "02-security-deployment",
+      "sourcePath": "content/docs/04-advanced/02-security-deployment.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-security-deployment"
+    },
+    {
+      "identity": "03-performance-memory",
+      "sourcePath": "content/docs/04-advanced/03-performance-memory.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-performance-memory"
+    },
+    {
+      "identity": "04-migration-v6",
+      "sourcePath": "content/docs/04-advanced/04-migration-v6.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-migration-v6"
+    },
+    {
+      "identity": "00-audio-advanced-hub",
+      "sourcePath": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-audio-advanced-hub"
+    },
+    {
+      "identity": "01-create-audio",
+      "sourcePath": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-create-audio"
+    },
+    {
+      "identity": "00-composition-hub",
+      "sourcePath": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-composition-hub"
+    },
+    {
+      "identity": "01-named-assets",
+      "sourcePath": "content/docs/04-advanced/composition/01-named-assets.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-named-assets"
+    },
+    {
+      "identity": "02-templates",
+      "sourcePath": "content/docs/04-advanced/composition/02-templates.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-templates"
+    },
+    {
+      "identity": "03-preset-components",
+      "sourcePath": "content/docs/04-advanced/composition/03-preset-components.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-preset-components"
+    },
+    {
+      "identity": "04-plugins",
+      "sourcePath": "content/docs/04-advanced/composition/04-plugins.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-plugins"
+    },
+    {
+      "identity": "05-imperative-batch-chain-assets",
+      "sourcePath": "content/docs/04-advanced/composition/05-imperative-batch-chain-assets.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-imperative-batch-chain-assets"
+    },
+    {
+      "identity": "00-scene-composition",
+      "sourcePath": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-scene-composition"
+    },
+    {
+      "identity": "00-scene-hub",
+      "sourcePath": "content/docs/04-advanced/scene/00-scene-hub.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-scene-hub"
+    },
+    {
+      "identity": "01-scene-types-builder",
+      "sourcePath": "content/docs/04-advanced/scene/01-scene-types-builder.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-scene-types-builder"
+    },
+    {
+      "identity": "02-scene-layers-raster-text-path",
+      "sourcePath": "content/docs/04-advanced/scene/02-scene-layers-raster-text-path.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#02-scene-layers-raster-text-path"
+    },
+    {
+      "identity": "03-scene-layers-charts",
+      "sourcePath": "content/docs/04-advanced/scene/03-scene-layers-charts.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#03-scene-layers-charts"
+    },
+    {
+      "identity": "04-scene-layers-custom-lines-surface",
+      "sourcePath": "content/docs/04-advanced/scene/04-scene-layers-custom-lines-surface.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#04-scene-layers-custom-lines-surface"
+    },
+    {
+      "identity": "05-scene-backgrounds",
+      "sourcePath": "content/docs/04-advanced/scene/05-scene-backgrounds.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#05-scene-backgrounds"
+    },
+    {
+      "identity": "06-render-scene",
+      "sourcePath": "content/docs/04-advanced/scene/06-render-scene.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#06-render-scene"
+    },
+    {
+      "identity": "07-render-scene-to-gif",
+      "sourcePath": "content/docs/04-advanced/scene/07-render-scene-to-gif.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#07-render-scene-to-gif"
+    },
+    {
+      "identity": "08-render-scene-to-video",
+      "sourcePath": "content/docs/04-advanced/scene/08-render-scene-to-video.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#08-render-scene-to-video"
+    },
+    {
+      "identity": "09-scene-paint-order-performance",
+      "sourcePath": "content/docs/04-advanced/scene/09-scene-paint-order-performance.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#09-scene-paint-order-performance"
+    },
+    {
+      "identity": "00-video-advanced-hub",
+      "sourcePath": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-video-advanced-hub"
+    },
+    {
+      "identity": "01-video-pipeline",
+      "sourcePath": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-video-pipeline"
+    },
+    {
+      "identity": "api-create-audio",
+      "sourcePath": "content/docs/04-api-reference/api-audio/api-create-audio.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-create-audio"
+    },
+    {
+      "identity": "api-batch",
+      "sourcePath": "content/docs/04-api-reference/api-batch-save/api-batch.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-batch"
+    },
+    {
+      "identity": "api-create-chart",
+      "sourcePath": "content/docs/04-api-reference/api-charts/api-create-chart.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-create-chart"
+    },
+    {
+      "identity": "api-create-gif",
+      "sourcePath": "content/docs/04-api-reference/api-gif/api-create-gif.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-create-gif"
+    },
+    {
+      "identity": "api-image-utilities",
+      "sourcePath": "content/docs/04-api-reference/api-image/api-image-utilities.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-image-utilities"
+    },
+    {
+      "identity": "api-create-path2d",
+      "sourcePath": "content/docs/04-api-reference/api-lines-paths/api-create-path2d.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-create-path2d"
+    },
+    {
+      "identity": "api-reference",
+      "sourcePath": "content/docs/04-api-reference/api-overview/api-reference.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-reference"
+    },
+    {
+      "identity": "canvas-utils-and-types",
+      "sourcePath": "content/docs/04-api-reference/api-overview/canvas-utils-and-types.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#canvas-utils-and-types"
+    },
+    {
+      "identity": "package-surface",
+      "sourcePath": "content/docs/04-api-reference/api-overview/package-surface.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#package-surface"
+    },
+    {
+      "identity": "api-new-apex-painter",
+      "sourcePath": "content/docs/04-api-reference/api-scene/api-new-apex-painter.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-new-apex-painter"
+    },
+    {
+      "identity": "api-create-video",
+      "sourcePath": "content/docs/04-api-reference/api-video/api-create-video.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-create-video"
+    },
+    {
+      "identity": "00-internals-overview",
+      "sourcePath": "content/docs/05-internals/00-internals-overview.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#00-internals-overview"
+    },
+    {
+      "identity": "01-5.4.5-remote-image-hotfix",
+      "sourcePath": "content/docs/05-internals/01-5.4.5-remote-image-hotfix.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#01-5.4.5-remote-image-hotfix"
+    },
+    {
+      "identity": "changelog",
+      "sourcePath": "content/docs/05-internals/changelog.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#changelog"
+    },
+    {
+      "identity": "README",
+      "sourcePath": "content/docs/README.mdx",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#README"
+    }
+  ],
+  "legacyAliases": [
+    {
+      "alias": "api-index",
+      "targetIdentity": "api-reference",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#api-reference"
+    },
+    {
+      "alias": "Change-Log",
+      "targetIdentity": "changelog",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#changelog"
+    },
+    {
+      "alias": "create-charts",
+      "targetIdentity": "charts",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#charts"
+    },
+    {
+      "alias": "create-gifs",
+      "targetIdentity": "gif-and-animation",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#gif-and-animation"
+    },
+    {
+      "alias": "create-videos",
+      "targetIdentity": "video-ffmpeg",
+      "state": "LEGACY_FALLBACK",
+      "target": "/docs#video-ffmpeg"
+    },
+    {
+      "alias": "Getting-Started",
+      "targetIdentity": "00-start-here",
+      "state": "MIGRATED",
+      "target": "/docs/getting-started"
+    },
+    {
+      "alias": "start-here",
+      "targetIdentity": "00-start-here",
+      "state": "MIGRATED",
+      "target": "/docs/getting-started"
+    }
+  ],
+  "defaultLegacyIdentity": "00-start-here"
+}

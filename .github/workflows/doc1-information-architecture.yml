@@ -1,0 +1,137 @@
+name: DOC-1 Information Architecture
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - doc1-information-architecture
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'content/docs/**'
+      - 'lib/**'
+      - 'scripts/docs/**'
+      - 'package.json'
+      - 'DOC1_INFORMATION_ARCHITECTURE_REPORT.md'
+      - '.github/workflows/doc1-information-architecture.yml'
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'content/docs/**'
+      - 'lib/**'
+      - 'scripts/docs/**'
+      - 'package.json'
+      - 'DOC1_INFORMATION_ARCHITECTURE_REPORT.md'
+      - '.github/workflows/doc1-information-architecture.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: doc1-information-architecture-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC1_BASE_URL: http://127.0.0.1:3000
+
+jobs:
+  doc1:
+    name: Verify DOC-1 vertical slice
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+
+      - name: Deterministic install
+        run: npm ci
+
+      - name: Generate DOC-1 static evidence
+        run: npm run docs:generate:doc1
+
+      - name: DOC-1 schema, routing and manifest verification
+        run: npm run docs:verify:doc1
+
+      - name: Existing documentation integrity
+        run: |
+          npm run verify:docs
+          npm run typecheck
+
+      - name: Clean production build and bundle measurement
+        run: npm run docs:measure:doc1
+
+      - name: Install ephemeral browser audit tool
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0
+
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc1-next.log 2>&1 &
+          echo $! > /tmp/doc1-next.pid
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/docs/getting-started >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/doc1-next.log
+          exit 1
+
+      - name: Desktop/mobile route and legacy-link browser smoke
+        run: npm run docs:browser:doc1
+
+      - name: Print runtime evidence
+        shell: bash
+        run: |
+          echo '--- build/bundle evidence ---'
+          cat .doc1-runtime-evidence/build-bundle.json
+          echo '--- browser evidence ---'
+          cat .doc1-runtime-evidence/browser.json
+
+      - name: Finalize static evidence index
+        run: npm run docs:finalize:doc1
+
+      - name: Upload DOC-1 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc1-information-architecture-evidence
+          path: |
+            generated/docs-doc1
+            .doc1-runtime-evidence
+            /tmp/doc1-next.log
+          if-no-files-found: error
+          include-hidden-files: true
+
+      - name: Commit generated static evidence on DOC-1 branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/doc1-information-architecture'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add generated/docs-doc1
+          if git diff --cached --quiet; then
+            echo 'Generated DOC-1 static evidence is already current.'
+            exit 0
+          fi
+          git commit -m 'DOC-1: capture generated architecture evidence'
+          git push origin HEAD:doc1-information-architecture

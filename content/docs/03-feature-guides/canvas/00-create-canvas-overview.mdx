@@ -1,3 +1,26 @@
+---
+title: "Canvas and createCanvas"
+description: "Understand createCanvas, CanvasConfig, CanvasResults, validation, backgrounds, rendering order, and the core Node canvas workflow."
+slug: "node/canvas"
+kind: "guide"
+category: "Node / Canvas"
+order: 20
+package: "apexify.js"
+runtime: ["node"]
+frameworks: []
+stability: "CURRENT"
+since: "6.0.0"
+feature: "canvas"
+apiSymbols: ["ApexPainter.createCanvas", "CanvasConfig", "CanvasResults"]
+keywords: ["canvas", "createCanvas", "CanvasConfig", "CanvasResults"]
+related: ["getting-started", "node/canvas/size-and-coordinates"]
+toc: true
+search: true
+canonical: "/docs/node/canvas"
+aliases: []
+legacyHashes: ["00-create-canvas-overview"]
+---
+
 # Canvas & `createCanvas` — overview {#00-create-canvas-overview}
 
 **`await painter.createCanvas(config[, painterOpts])`** allocates a **`@napi-rs/canvas`** surface, paints backgrounds (layers, gradients, images, patterns, noise), applies clip, zoom, rotation, blur, optional shadow and stroke, and returns PNG bytes. Most Apexify pipelines start here — **`createImage`**, **`createText`**, and charts composite on top of **`CanvasResults.buffer`** (or a plain **`Buffer`** from elsewhere).
