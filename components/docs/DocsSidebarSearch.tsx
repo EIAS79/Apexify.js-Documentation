@@ -39,7 +39,7 @@ function prettyFolder(folder: string): string {
     .join(' › ');
 }
 
-export function DocsSidebarSearch() {
+export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { inputId?: string }) {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -48,6 +48,7 @@ export function DocsSidebarSearch() {
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<number>(0);
+  const listboxId = `${inputId}-results`;
 
   useEffect(() => {
     window.clearTimeout(debounceRef.current);
@@ -94,6 +95,11 @@ export function DocsSidebarSearch() {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (document.activeElement !== inputRef.current) return;
+      if (event.key === 'Escape') {
+        setQuery('');
+        setResults([]);
+        return;
+      }
       if (query.trim().length < 2 || flat.length === 0) return;
 
       if (event.key === 'ArrowDown') {
@@ -128,7 +134,7 @@ export function DocsSidebarSearch() {
       }}
     >
       <div
-        className="flex items-center gap-2 px-2.5 py-2"
+        className="flex min-h-11 items-center gap-2 px-2.5 py-2"
         style={{
           borderBottom:
             results.length > 0 || query.trim().length >= 2
@@ -138,20 +144,26 @@ export function DocsSidebarSearch() {
       >
         <MagnifyingGlassIcon
           className="h-4 w-4 shrink-0"
-          style={{ color: 'var(--text-tertiary)' }}
+          style={{ color: 'var(--text-secondary)' }}
           aria-hidden
         />
         <input
-          id="docs-sidebar-search-input"
+          id={inputId}
+          data-docs-search-input
           ref={inputRef}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Search docs…"
-          className="min-w-0 flex-1 bg-transparent text-[13px] outline-none"
+          className="min-h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"
           style={{ color: 'var(--text-primary)' }}
           autoComplete="off"
           spellCheck={false}
+          role="combobox"
           aria-label="Search documentation"
+          aria-autocomplete="list"
+          aria-controls={query.trim().length >= 2 ? listboxId : undefined}
+          aria-expanded={query.trim().length >= 2}
+          aria-activedescendant={flat[active] ? `${inputId}-option-${active}` : undefined}
         />
         {searching && (
           <span
@@ -171,16 +183,18 @@ export function DocsSidebarSearch() {
           style={{ borderTopColor: 'var(--border-subtle)' }}
         >
           <div
+            id={listboxId}
             ref={listRef}
             className="apex-scroll max-h-[min(38vh,16rem)] overflow-y-auto overflow-x-hidden overscroll-y-contain py-1.5 pl-1 pr-1"
             style={{ scrollbarGutter: 'stable' }}
             role="listbox"
+            tabIndex={0}
             aria-label="Search results"
           >
             {!searching && results.length === 0 && (
               <div
-                className="px-3 py-4 text-center text-[12px]"
-                style={{ color: 'var(--text-tertiary)' }}
+                className="px-3 py-4 text-center text-sm"
+                style={{ color: 'var(--text-secondary)' }}
               >
                 No matches for “{query}”.
               </div>
@@ -191,15 +205,13 @@ export function DocsSidebarSearch() {
               return (
                 <div key={groupName} className="min-w-0" role="presentation">
                   <p
-                    className="sticky top-0 z-10 mb-1 border-b px-2.5 py-1 pt-2 text-[9px] font-bold uppercase tracking-[0.18em]"
+                    className="sticky top-0 z-10 mb-1 border-b px-2.5 py-1.5 pt-2 text-[11px] font-bold uppercase tracking-[0.14em]"
                     style={{
-                      color: 'var(--accent-magenta)',
+                      color: 'var(--text-secondary)',
                       backgroundColor:
-                        'color-mix(in srgb, var(--bg-raised) 94%, transparent)',
+                        'color-mix(in srgb, var(--bg-raised) 96%, transparent)',
                       borderBottomColor:
                         'color-mix(in srgb, var(--border-default) 80%, transparent)',
-                      backdropFilter: 'blur(10px)',
-                      WebkitBackdropFilter: 'blur(10px)',
                     }}
                   >
                     {groupName}
@@ -210,6 +222,7 @@ export function DocsSidebarSearch() {
                       const isActive = flatIndex === active;
                       return (
                         <button
+                          id={`${inputId}-option-${flatIndex}`}
                           key={`${result.href}-${flatIndex}`}
                           type="button"
                           data-idx={flatIndex}
@@ -218,7 +231,7 @@ export function DocsSidebarSearch() {
                           aria-selected={isActive}
                           onMouseEnter={() => setActive(flatIndex)}
                           onClick={() => goTo(result)}
-                          className="flex w-full min-w-0 cursor-pointer items-start gap-2 rounded-lg px-2 py-2 text-left transition-colors"
+                          className="flex min-h-11 w-full min-w-0 cursor-pointer items-start gap-2 rounded-lg px-2 py-2.5 text-left transition-colors"
                           style={{
                             backgroundColor: isActive
                               ? 'color-mix(in srgb, var(--accent-iris) 16%, transparent)'
@@ -226,11 +239,11 @@ export function DocsSidebarSearch() {
                           }}
                         >
                           <span
-                            className="mt-0.5 inline-flex h-4 shrink-0 items-center rounded px-1 text-[8px] font-bold uppercase tracking-wider"
+                            className="mt-0.5 inline-flex min-h-5 shrink-0 items-center rounded px-1.5 text-[10px] font-bold uppercase tracking-wide"
                             style={{
-                              background: `color-mix(in srgb, ${MATCH_COLOR[result.matchType]} 18%, transparent)`,
-                              color: MATCH_COLOR[result.matchType],
-                              border: `1px solid color-mix(in srgb, ${MATCH_COLOR[result.matchType]} 42%, transparent)`,
+                              background: `color-mix(in srgb, ${MATCH_COLOR[result.matchType]} 14%, transparent)`,
+                              color: 'var(--text-primary)',
+                              border: `1px solid color-mix(in srgb, ${MATCH_COLOR[result.matchType]} 32%, var(--border-default))`,
                             }}
                             aria-hidden
                           >
@@ -238,15 +251,15 @@ export function DocsSidebarSearch() {
                           </span>
                           <span className="min-w-0 flex-1">
                             <span
-                              className="block break-words text-[12px] font-semibold leading-snug line-clamp-2"
+                              className="block break-words text-[13px] font-semibold leading-snug line-clamp-2"
                               style={{ color: 'var(--text-primary)' }}
                             >
                               {result.name}
                             </span>
                             {result.snippet && (
                               <span
-                                className="mt-0.5 line-clamp-2 break-words text-[10px] leading-snug"
-                                style={{ color: 'var(--text-tertiary)' }}
+                                className="mt-1 line-clamp-2 break-words text-[12px] leading-snug"
+                                style={{ color: 'var(--text-secondary)' }}
                               >
                                 …{result.snippet}…
                               </span>
@@ -263,9 +276,9 @@ export function DocsSidebarSearch() {
         </div>
       )}
 
-      <p className="px-2.5 py-2 text-[10px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-        <kbd className="kbd text-[9px]">⌘</kbd>{' '}
-        <kbd className="kbd text-[9px]">K</kbd> focuses this search · min. 2 characters
+      <p className="px-2.5 py-2 text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+        <kbd className="kbd text-[11px]">⌘</kbd>{' '}
+        <kbd className="kbd text-[11px]">K</kbd> focuses search · minimum 2 characters
       </p>
     </div>
   );
