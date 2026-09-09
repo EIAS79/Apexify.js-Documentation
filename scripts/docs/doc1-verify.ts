@@ -73,7 +73,8 @@ if (fs.existsSync(path.join(ROOT, 'app/docs/getting-started/page.tsx'))) {
 }
 
 const layout = requireFile('app/docs/layout.tsx');
-if (!layout.includes('resolveLegacyDocumentationFragment')) {
+const legacyIsland = requireFile('components/docs/shell/LegacyDocsRedirectIsland.tsx');
+if (!layout.includes('LegacyDocsRedirectIsland') || !legacyIsland.includes('resolveLegacyDocumentationFragment')) {
   throw new Error('[doc1-verify] /docs compatibility layer does not canonicalize migrated hash links');
 }
 
@@ -87,7 +88,9 @@ if (!sidebarSearch.includes('router.push(result.href)')) {
   throw new Error('[doc1-verify] sidebar search does not navigate using result canonical href');
 }
 
-const routedSidebar = requireFile('components/docs/route/RouteDocSidebar.tsx');
+const routedSidebar = fs.existsSync(path.join(ROOT, 'components/docs/navigation/DocsSidebarV2.tsx'))
+  ? requireFile('components/docs/navigation/DocsSidebarV2.tsx')
+  : requireFile('components/docs/route/RouteDocSidebar.tsx');
 if (!routedSidebar.includes('DocumentationNavigationGroup')) {
   throw new Error('[doc1-verify] routed sidebar is not driven by the navigation manifest');
 }
