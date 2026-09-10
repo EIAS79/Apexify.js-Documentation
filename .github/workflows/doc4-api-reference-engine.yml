@@ -1,0 +1,128 @@
+name: DOC-4 API Reference Engine
+
+on:
+  push:
+    branches: [doc4-api-reference-engine, main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: doc4-api-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC4_BASE_URL: http://127.0.0.1:3000
+  APEXIFY_PACKAGE_COMMIT: dbed9743353593eafae9a7b1c25312d7170a233b
+  DOC4_BASE_SHA: eece2c982c82f013b415cc6b5a822a6b88d27a05
+
+jobs:
+  verify:
+    name: Verify DOC-4 API reference and option engine
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+
+      - name: Deterministic install
+        run: npm ci
+
+      - name: Inspect consumer packed Apexify.js artifact
+        shell: bash
+        run: |
+          rm -rf /tmp/doc4-pack
+          mkdir -p /tmp/doc4-pack .doc4-runtime-evidence
+          npm pack ./node_modules/apexify.js --ignore-scripts --pack-destination /tmp/doc4-pack >/tmp/doc4-pack-name.txt
+          TGZ="$(find /tmp/doc4-pack -maxdepth 1 -name '*.tgz' -print -quit)"
+          test -n "$TGZ"
+          tar -tzf "$TGZ" | sort > .doc4-runtime-evidence/packed-files.txt
+          grep -q 'package/dist/declarations/index.d.ts' .doc4-runtime-evidence/packed-files.txt
+          grep -q 'package/dist/declarations-cjs/index.d.cts' .doc4-runtime-evidence/packed-files.txt
+          SHA="$(sha256sum "$TGZ" | awk '{print $1}')"
+          SIZE="$(stat -c %s "$TGZ")"
+          printf '{"schemaVersion":1,"package":"apexify.js","version":"6.0.0","sha256":"%s","bytes":%s}\n' "$SHA" "$SIZE" > .doc4-runtime-evidence/packed-artifact.json
+          cat .doc4-runtime-evidence/packed-artifact.json
+
+      - name: Generate DOC-4 API manifest and coverage
+        run: npm run docs:generate:doc4
+
+      - name: Prove deterministic generation
+        shell: bash
+        run: |
+          rm -rf /tmp/doc4-first
+          cp -R generated/docs-doc4 /tmp/doc4-first
+          npm run docs:generate:doc4
+          diff -ru /tmp/doc4-first generated/docs-doc4
+
+      - name: DOC-4 extraction, coverage, component and prior-phase verification
+        run: npm run docs:verify:doc4
+
+      - name: Existing documentation integrity
+        run: npm run verify:docs
+
+      - name: TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Clean production build and DOC-4 bundle/extraction measurement
+        run: npm run docs:measure:doc4
+
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc4-next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/api-reference/apexify.js/ApexPainter/createImage >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc4-next.log
+          exit 1
+
+      - name: Browser, keyboard, responsive, theme and axe verification
+        run: npm run docs:browser:doc4
+
+      - name: Quantitative DOC-4 finalizer
+        run: npm run docs:finalize:doc4
+
+      - name: Upload DOC-4 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc4-api-reference-engine-evidence
+          path: |
+            generated/docs-doc4
+            .doc4-runtime-evidence
+            /tmp/doc4-next.log
+          include-hidden-files: true
+          if-no-files-found: error
+
+      - name: Commit deterministic DOC-4 evidence on execution branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/doc4-api-reference-engine'
+        shell: bash
+        run: |
+          git add generated/docs-doc4
+          if git diff --cached --quiet; then echo "DOC-4 generated evidence already current"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "DOC-4: refresh generated API reference evidence"
+          git push
