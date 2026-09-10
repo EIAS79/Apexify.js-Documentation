@@ -17,8 +17,8 @@
 /* SyntaxHighlighter emits inline token colors. The routed code surface is deliberately
    dark in both themes, so force a WCAG-readable neutral token foreground in light mode.
    Dark mode keeps the accessible Prism palette. */
-html:not(.dark) .apx-doc-prose [role="region"][aria-label$="code example"] code,
-html:not(.dark) .apx-doc-prose [role="region"][aria-label$="code example"] code span {
+html:not(.dark) .apx-doc-prose [role="group"][aria-label$="code example"] code,
+html:not(.dark) .apx-doc-prose [role="group"][aria-label$="code example"] code span {
   color: #f5f0ff !important;
 }
 .apx-doc-prose table { width:100%; display:block; overflow-x:auto; border-spacing:0; border-collapse:separate; border:1px solid var(--apx-border-default); border-radius:var(--apx-radius-lg); background:var(--apx-surface-raised); font-size:.9rem; }
