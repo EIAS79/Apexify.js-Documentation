@@ -122,7 +122,7 @@ export function CodeBlock({
           className="relative transition-colors duration-200 overflow-x-auto overflow-y-auto max-h-[min(65vh,28rem)] max-w-full"
           style={{ backgroundColor: CODE_SURFACE }}
           tabIndex={0}
-          role="region"
+          role="group"
           aria-label={codeRegionLabel}
         >
           <div className="p-3 sm:p-4 min-w-0">
