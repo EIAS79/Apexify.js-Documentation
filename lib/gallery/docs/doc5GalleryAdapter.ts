@@ -17,7 +17,7 @@ export const doc5GalleryItems: Doc5GalleryCard[] = getGalleryExamples().map((exa
   return {
     id: example.id,
     title: example.title,
-    description: `${example.summary}\n\nVerified by DOC-5 against packed ${example.verifiedPackageVersion ?? 'apexify.js'}.`,
+    description: `${example.summary}\n\nVerified by DOC-5 against packed ${example.verifiedPackageVersion ?? 'apexify.js'}. [Open the canonical verified example](${example.canonicalRoute}).`,
     thumbnail: preview.publicPath,
     thumbnailMedia: preview.kind === 'gif' ? 'gif' : 'image',
     featured: example.gallery.featured,
