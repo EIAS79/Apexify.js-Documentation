@@ -70,3 +70,9 @@ DOC-4 links existing guides/examples; it does not execute them. DOC-5 owns the e
 - `unknown-related`: bind to a current stable API ID.
 
 The high-level integrity command is `npm run docs:verify:doc4`.
+
+## Evidence and exact-tree validation lifecycle
+
+DOC-4 intentionally keeps the very large runtime API manifest out of Git while versioning compact deterministic coverage, identity, inventory, representative-API, signature, source-link, and type-graph evidence under `generated/docs-doc4/`. A clean install regenerates the runtime manifest from the pinned packed package before the documentation build consumes it.
+
+The DOC-4 branch workflow may commit refreshed compact evidence after a successful push run. That generated evidence commit must not be treated as sufficient merge proof by itself: the evidence-complete tree is followed by a human-authored validation commit so the complete pull-request workflow matrix runs against the exact tree proposed for merge.
