@@ -13,7 +13,7 @@ const states=[
 const results=[];
 try{
  for(const state of states){
-  const page=await browser.newPage();await page.setViewport(state.viewport);
+  const page=await browser.newPage();await page.setCacheEnabled(false);await page.setViewport(state.viewport);
   await page.evaluateOnNewDocument(theme=>localStorage.setItem('apexify-theme',theme),state.theme);
   await page.evaluateOnNewDocument(()=>{
     Object.defineProperty(navigator,'clipboard',{configurable:true,value:{
@@ -62,9 +62,9 @@ try{
   results.push({...state,status:response.status(),canonical,components,axeViolations:axe,horizontalOverflow:overflow,nestedSearchHref:`${REP}#option-images-mask-mode`,optionSearchResultCount:visiblePaths.length,transferredJsBytes:js,reducedMotionOk,expectedResourceMisses:httpErrors.filter(isExpectedLocalResourceMiss)});
   await page.close();
  }
- const overload=await browser.newPage();await overload.setViewport({width:1200,height:900});const r=await overload.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/createScene`,{waitUntil:'networkidle2'});if(!r||r.status()!==200)throw new Error('createScene overload route missing');
+ const overload=await browser.newPage();await overload.setCacheEnabled(false);await overload.setViewport({width:1200,height:900});const r=await overload.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/createScene`,{waitUntil:'networkidle2'});if(!r||r.status()!==200)throw new Error('createScene overload route missing');
  const tabs=await overload.$$('[role="tab"]');if(tabs.length<2)throw new Error('createScene overload tabs missing');await tabs[0].focus();await overload.keyboard.press('ArrowRight');const selected=await overload.$eval('[role="tab"][aria-selected="true"]',e=>e.textContent?.trim());if(!selected)throw new Error('overload keyboard switching failed');await overload.close();
- const unknown=await browser.newPage();const bad=await unknown.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/__missing__`,{waitUntil:'networkidle2'});if(!bad||bad.status()!==404)throw new Error(`unknown member expected 404 got ${bad?.status()}`);await unknown.close();
+ const unknown=await browser.newPage();await unknown.setCacheEnabled(false);const bad=await unknown.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/__missing__`,{waitUntil:'networkidle2'});if(!bad||bad.status()!==404)throw new Error(`unknown member expected 404 got ${bad?.status()}`);await unknown.close();
 }finally{await browser.close();}
 const evidence={schemaVersion:1,phase:'DOC-4',representative:REP,states:results,overloadRoute:'/api-reference/apexify.js/ApexPainter/createScene',unknownMember404:true,failures:0};
 fs.writeFileSync(path.join(OUT,'browser.json'),`${JSON.stringify(evidence,null,2)}\n`);console.log('[doc4-browser] PASS '+JSON.stringify(results.map(r=>({name:r.name,js:r.transferredJsBytes,optionMatches:r.optionSearchResultCount,expectedResourceMisses:r.expectedResourceMisses}))));
