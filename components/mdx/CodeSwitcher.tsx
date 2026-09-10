@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { CodeBlock } from './CodeBlock';
+import { Tabs } from './DocsTabs';
 
 interface CodeSwitcherProps {
   ts?: string;
@@ -9,80 +8,14 @@ interface CodeSwitcherProps {
   tsLabel?: string;
   jsLabel?: string;
   children?: React.ReactNode;
-  /** Outer spacing (default `my-4`; use `my-0` when nested inside cards). */
   className?: string;
-  /** When true (documentation), show “Open in Studio” on TS/JS panes when runnable. */
   docsStudio?: boolean;
 }
 
-export function CodeSwitcher({ 
-  ts, 
-  js, 
-  tsLabel = 'TypeScript', 
-  jsLabel = 'JavaScript',
-  children,
-  className = 'my-4',
-  docsStudio = false,
-}: CodeSwitcherProps) {
-  let tsCode = ts;
-  let jsCode = js;
-
-  if (children && !ts && !js) {
-    const childrenStr = typeof children === 'string' ? children : String(children);
-    const tsMatch = childrenStr.match(/<ts>([\s\S]*?)<\/ts>/);
-    const jsMatch = childrenStr.match(/<js>([\s\S]*?)<\/js>/);
-    tsCode = tsMatch ? tsMatch[1].trim() : undefined;
-    jsCode = jsMatch ? jsMatch[1].trim() : undefined;
-  }
-
-  const defaultActive = tsCode ? 'ts' : (jsCode ? 'js' : 'ts');
-  const [active, setActive] = useState<'ts' | 'js'>(defaultActive);
-
-  return (
-    <div className={className}>
-      {/* Language switcher tabs */}
-      <div className="flex gap-0 mb-0 bg-gray-800 dark:bg-gray-800 border border-gray-700 dark:border-gray-700 border-b-0 rounded-t-lg p-1 transition-colors duration-300">
-        <button
-          onClick={() => setActive('ts')}
-          disabled={!tsCode}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-            active === 'ts'
-              ? 'bg-gray-700 dark:bg-gray-700 text-green-400 shadow-sm'
-              : tsCode
-              ? 'text-gray-400 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-700/50 dark:hover:bg-gray-700/50'
-              : 'text-gray-600 dark:text-gray-600 cursor-not-allowed'
-          }`}
-        >
-          {tsLabel}
-        </button>
-        <button
-          onClick={() => setActive('js')}
-          disabled={!jsCode}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-            active === 'js'
-              ? 'bg-gray-700 dark:bg-gray-700 text-green-400 shadow-sm'
-              : jsCode
-              ? 'text-gray-400 dark:text-gray-400 hover:text-white dark:hover:text-white hover:bg-gray-700/50 dark:hover:bg-gray-700/50'
-              : 'text-gray-600 dark:text-gray-600 cursor-not-allowed'
-          }`}
-        >
-          {jsLabel}
-        </button>
-      </div>
-      
-      {/* Code block - hide header since we have tabs */}
-      <div className="mt-0">
-        {active === 'ts' && tsCode && (
-          <CodeBlock lang="typescript" hideHeader docsStudio={docsStudio}>
-            {tsCode}
-          </CodeBlock>
-        )}
-        {active === 'js' && jsCode && (
-          <CodeBlock lang="javascript" hideHeader docsStudio={docsStudio}>
-            {jsCode}
-          </CodeBlock>
-        )}
-      </div>
-    </div>
-  );
+export function CodeSwitcher({ ts, js, tsLabel = 'TypeScript', jsLabel = 'JavaScript', className = 'my-4' }: CodeSwitcherProps) {
+  const items = [
+    ts ? { label: tsLabel, content: ts, language: 'typescript' } : null,
+    js ? { label: jsLabel, content: js, language: 'javascript' } : null,
+  ].filter((item): item is { label: string; content: string; language: string } => item !== null);
+  return <div className={className} data-doc3-compatibility="CodeSwitcher"><Tabs items={items} ariaLabel="Language" /></div>;
 }

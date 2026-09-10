@@ -1,0 +1,84 @@
+name: DOC-3 MDX Component Library
+
+on:
+  push:
+    branches: [doc3-mdx-component-library, main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: doc3-mdx-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: write
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC3_BASE_URL: http://127.0.0.1:3000
+jobs:
+  verify:
+    name: Verify DOC-3 complete component-library gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Deterministic install
+        run: npm ci
+      - name: Generate deterministic DOC-3 evidence
+        run: npm run docs:generate:doc3
+      - name: DOC-3 tests, structural verification, DOC-2 and DOC-1 regression
+        run: npm run docs:verify:doc3
+      - name: Existing documentation integrity
+        run: npm run verify:docs
+      - name: TypeScript typecheck
+        run: npm run typecheck
+      - name: Clean production build and routed bundle measurement
+        run: npm run docs:measure:doc3
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc3-next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/docs/node/canvas >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc3-next.log
+          exit 1
+      - name: Desktop/mobile component, keyboard and axe verification
+        run: npm run docs:browser:doc3
+      - name: Quantitative DOC-3 finalizer
+        run: npm run docs:finalize:doc3
+      - name: Upload DOC-3 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc3-mdx-component-library-evidence
+          path: |
+            generated/docs-doc3
+            .doc3-runtime-evidence
+            /tmp/doc3-next.log
+          include-hidden-files: true
+          if-no-files-found: error
+      - name: Commit deterministic evidence on DOC-3 branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/doc3-mdx-component-library'
+        shell: bash
+        run: |
+          git add generated/docs-doc3
+          if git diff --cached --quiet; then echo "DOC-3 generated evidence already current"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "DOC-3: refresh deterministic component evidence"
+          git push

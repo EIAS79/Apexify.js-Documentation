@@ -8,5 +8,5 @@ export { GalleryPreview } from './GalleryPreview';
 export { GalleryExample } from './GalleryExample';
 export { RelatedGallery } from './RelatedGallery';
 export { PreviewWithCode } from './PreviewWithCode';
-
-
+export * from './RichDocsComponents';
+export { DOC3_REQUIRED_COMPONENTS, DOC3_REGISTERED_COMPONENTS } from './doc3-contract';

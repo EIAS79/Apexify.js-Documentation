@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { parseRichMdxAttributes, parseRichMdxSegments } from '../../components/mdx/rich-parser';
+import { DOC3_REQUIRED_COMPONENTS } from '../../components/mdx/doc3-contract';
+
+test('DOC-3 registry contains the full required roadmap surface',()=>{const required=['Callout','Steps','Tabs','Details','CodeBlockV2','CodeGroup','InstallCommand','CodeDiff','ComparisonTable','FeatureMatrix','AvailabilityMatrix','DecisionGuide','ArchitectureDiagram','BeforeAfter','OutputPreview','ExampleCard','ExampleSteps','NextSteps','Prerequisites','CapabilityBadge','ImageResult','VideoResult','AudioResult','SvgResult'];assert.deepEqual([...DOC3_REQUIRED_COMPONENTS],required);});
+test('rich parser segments registered paired and self-closing components',()=>{const segments=parseRichMdxSegments('before\n<Callout tone="tip">hello</Callout>\n<Tabs items={[{"label":"JS","content":"x"}]} />\nafter');assert.equal(segments.filter((segment)=>segment.kind==='component').length,2);const callout=segments.find((segment)=>segment.kind==='component'&&segment.name==='Callout');assert.ok(callout&&callout.kind==='component');assert.equal(callout.props.tone,'tip');assert.equal(callout.body,'hello');});
+test('JSON props support nested arrays and objects without JavaScript evaluation',()=>{const props=parseRichMdxAttributes('items={[{"label":"TS","content":"const x = 1"}]} open={true} count={2}');assert.deepEqual(props.items,[{label:'TS',content:'const x = 1'}]);assert.equal(props.open,true);assert.equal(props.count,2);});
+test('non-JSON brace expressions are rejected',()=>{assert.throws(()=>parseRichMdxAttributes('items={process.env.SECRET}'),/must be valid JSON/);assert.throws(()=>parseRichMdxAttributes('value={() => 1}'),/must be valid JSON|invalid component attribute/);});
+test('unregistered JSX-like tags remain markdown text',()=>{assert.deepEqual(parseRichMdxSegments('<Dangerous value={1} />'),[{kind:'markdown',content:'<Dangerous value={1} />'}]);});
