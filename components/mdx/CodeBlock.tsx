@@ -18,6 +18,8 @@ interface CodeBlockProps {
   docsStudio?: boolean;
 }
 
+const CODE_SURFACE = '#050314';
+
 export function CodeBlock({
   children,
   className,
@@ -117,7 +119,8 @@ export function CodeBlock({
         )}
 
         <div
-          className="relative bg-slate-950 transition-colors duration-200 overflow-x-auto overflow-y-auto max-h-[min(65vh,28rem)] max-w-full"
+          className="relative transition-colors duration-200 overflow-x-auto overflow-y-auto max-h-[min(65vh,28rem)] max-w-full"
+          style={{ backgroundColor: CODE_SURFACE }}
           tabIndex={0}
           role="region"
           aria-label={codeRegionLabel}
@@ -129,7 +132,8 @@ export function CodeBlock({
               customStyle={{
                 margin: 0,
                 padding: 0,
-                background: 'transparent',
+                background: CODE_SURFACE,
+                backgroundColor: CODE_SURFACE,
                 fontSize: 'clamp(0.7rem, 2vw, 0.875rem)',
                 lineHeight: '1.6',
                 overflowX: 'visible',
@@ -145,7 +149,8 @@ export function CodeBlock({
               codeTagProps={{
                 style: {
                   fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-                  background: 'transparent',
+                  background: CODE_SURFACE,
+                  backgroundColor: CODE_SURFACE,
                 }
               }}
               PreTag="div"
