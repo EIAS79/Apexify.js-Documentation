@@ -23,7 +23,7 @@
   --apx-text-faint: var(--text-muted);
   --apx-text-inverse: var(--text-inverse);
 
-  --apx-status-current-fg: #0b6b53;
+  --apx-status-current-fg: #064a36;
   --apx-status-current-bg: color-mix(in srgb, var(--success) 12%, transparent);
   --apx-status-preview-fg: #3527c9;
   --apx-status-preview-bg: color-mix(in srgb, var(--info) 11%, transparent);
