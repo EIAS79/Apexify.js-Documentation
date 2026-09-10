@@ -12,7 +12,12 @@ export function CustomCursorGate() {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => {
-      setEnabled(!pathname?.startsWith('/docs') && finePointer.matches && !reducedMotion.matches);
+      setEnabled(
+        !pathname?.startsWith('/docs') &&
+          !pathname?.startsWith('/api-reference') &&
+          finePointer.matches &&
+          !reducedMotion.matches,
+      );
     };
     sync();
     finePointer.addEventListener('change', sync);
