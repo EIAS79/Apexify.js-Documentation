@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - doc2-design-system-shell
+      - main
   pull_request:
     branches:
       - main
