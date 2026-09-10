@@ -12,5 +12,16 @@ export function getVerifiedExamples(): GeneratedExampleRecord[] {
 }
 
 export function getGalleryExamples(): GeneratedExampleRecord[] {
-  return exampleManifest.examples.filter((example) => example.gallery.enabled);
+  return getVerifiedExamples().filter((example) => example.gallery.enabled);
+}
+
+export function getExamplesForApiId(apiId: string): GeneratedExampleRecord[] {
+  return getVerifiedExamples().filter((example) => example.apiSymbols.includes(apiId));
+}
+
+export function apiHrefFromStableId(apiId: string): string {
+  const [packageName, target] = apiId.split('::');
+  if (!packageName || !target) return '/api-reference';
+  const [owner, member] = target.split('#');
+  return `/api-reference/${encodeURIComponent(packageName)}/${encodeURIComponent(owner)}${member ? `/${encodeURIComponent(member)}` : ''}`;
 }
