@@ -19,7 +19,7 @@ function runOrThrow(command: string, args: string[], cwd: string, env: NodeJS.Pr
   return result.stdout;
 }
 function minimalInstallEnv(): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = {};
+  const env = { NODE_ENV: process.env.NODE_ENV ?? 'test' } as NodeJS.ProcessEnv;
   for (const key of ['PATH','Path','HOME','SystemRoot','TMPDIR','TMP','TEMP','HTTP_PROXY','HTTPS_PROXY','NO_PROXY','http_proxy','https_proxy','no_proxy','npm_config_cache','npm_config_registry']) if (process.env[key]) env[key]=process.env[key];
   return env;
 }
