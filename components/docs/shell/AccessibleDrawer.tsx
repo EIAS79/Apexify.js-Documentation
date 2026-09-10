@@ -31,8 +31,11 @@ export function AccessibleDrawer({
   const previousPath = useRef(pathname);
 
   const close = (restore = true) => {
+    // Restore focus synchronously before the dialog unmounts. Scheduling this
+    // with requestAnimationFrame creates a race where assistive technology or
+    // automation can observe the closed dialog before focus has returned.
+    if (restore) triggerRef.current?.focus();
     setOpen(false);
-    if (restore) requestAnimationFrame(() => triggerRef.current?.focus());
   };
 
   useEffect(() => {
