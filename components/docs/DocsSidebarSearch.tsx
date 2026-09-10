@@ -9,17 +9,19 @@ type SearchResult = {
   name: string;
   folder: string;
   href: string;
-  matchType: 'filename' | 'folder' | 'content';
+  matchType: 'filename' | 'folder' | 'content' | 'api';
   snippet?: string;
 };
 
 const MATCH_LABEL: Record<SearchResult['matchType'], string> = {
+  api: 'API',
   filename: 'Title',
   folder: 'Section',
   content: 'Content',
 };
 
 const MATCH_COLOR: Record<SearchResult['matchType'], string> = {
+  api: 'var(--accent-iris)',
   filename: 'var(--accent-magenta)',
   folder: 'var(--accent-iris)',
   content: 'var(--accent-amber)',
@@ -101,7 +103,6 @@ export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { i
         return;
       }
       if (query.trim().length < 2 || flat.length === 0) return;
-
       if (event.key === 'ArrowDown') {
         event.preventDefault();
         setActive((index) => Math.min(flat.length - 1, index + 1));
@@ -114,7 +115,6 @@ export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { i
         if (target) goTo(target);
       }
     };
-
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [query, flat, active]);
@@ -137,35 +137,29 @@ export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { i
         className="flex min-h-11 items-center gap-2 px-2.5 py-2"
         style={{
           borderBottom:
-            results.length > 0 || query.trim().length >= 2
-              ? '1px solid var(--border-subtle)'
-              : undefined,
+            results.length > 0 || query.trim().length >= 2 ? '1px solid var(--border-subtle)' : undefined,
         }}
       >
-        <MagnifyingGlassIcon
-          className="h-4 w-4 shrink-0"
-          style={{ color: 'var(--text-secondary)' }}
-          aria-hidden
-        />
+        <MagnifyingGlassIcon className="h-4 w-4 shrink-0" style={{ color: 'var(--text-secondary)' }} aria-hidden />
         <input
           id={inputId}
           data-docs-search-input
           ref={inputRef}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search docs…"
+          placeholder="Search docs and API…"
           className="min-h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"
           style={{ color: 'var(--text-primary)' }}
           autoComplete="off"
           spellCheck={false}
           role="combobox"
-          aria-label="Search documentation"
+          aria-label="Search documentation and API reference"
           aria-autocomplete="list"
           aria-controls={query.trim().length >= 2 ? listboxId : undefined}
           aria-expanded={query.trim().length >= 2}
           aria-activedescendant={flat[active] ? `${inputId}-option-${active}` : undefined}
         />
-        {searching && (
+        {searching ? (
           <span
             aria-hidden
             className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full"
@@ -174,14 +168,11 @@ export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { i
               borderTopColor: 'var(--accent-iris)',
             }}
           />
-        )}
+        ) : null}
       </div>
 
-      {query.trim().length >= 2 && (
-        <div
-          className="min-w-0 border-t overflow-x-hidden"
-          style={{ borderTopColor: 'var(--border-subtle)' }}
-        >
+      {query.trim().length >= 2 ? (
+        <div className="min-w-0 border-t overflow-x-hidden" style={{ borderTopColor: 'var(--border-subtle)' }}>
           <div
             id={listboxId}
             ref={listRef}
@@ -191,14 +182,11 @@ export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { i
             tabIndex={0}
             aria-label="Search results"
           >
-            {!searching && results.length === 0 && (
-              <div
-                className="px-3 py-4 text-center text-sm"
-                style={{ color: 'var(--text-secondary)' }}
-              >
+            {!searching && results.length === 0 ? (
+              <div className="px-3 py-4 text-center text-sm" style={{ color: 'var(--text-secondary)' }}>
                 No matches for “{query}”.
               </div>
-            )}
+            ) : null}
 
             {grouped.map(([groupName, items]) => {
               const startIndex = flat.findIndex((result) => result === items[0]);
@@ -208,10 +196,8 @@ export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { i
                     className="sticky top-0 z-10 mb-1 border-b px-2.5 py-1.5 pt-2 text-[11px] font-bold uppercase tracking-[0.14em]"
                     style={{
                       color: 'var(--text-secondary)',
-                      backgroundColor:
-                        'color-mix(in srgb, var(--bg-raised) 96%, transparent)',
-                      borderBottomColor:
-                        'color-mix(in srgb, var(--border-default) 80%, transparent)',
+                      backgroundColor: 'color-mix(in srgb, var(--bg-raised) 96%, transparent)',
+                      borderBottomColor: 'color-mix(in srgb, var(--border-default) 80%, transparent)',
                     }}
                   >
                     {groupName}
@@ -250,20 +236,14 @@ export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { i
                             {MATCH_LABEL[result.matchType]}
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span
-                              className="block break-words text-[13px] font-semibold leading-snug line-clamp-2"
-                              style={{ color: 'var(--text-primary)' }}
-                            >
+                            <span className="block break-words text-[13px] font-semibold leading-snug line-clamp-2" style={{ color: 'var(--text-primary)' }}>
                               {result.name}
                             </span>
-                            {result.snippet && (
-                              <span
-                                className="mt-1 line-clamp-2 break-words text-[12px] leading-snug"
-                                style={{ color: 'var(--text-secondary)' }}
-                              >
+                            {result.snippet ? (
+                              <span className="mt-1 line-clamp-2 break-words text-[12px] leading-snug" style={{ color: 'var(--text-secondary)' }}>
                                 …{result.snippet}…
                               </span>
-                            )}
+                            ) : null}
                           </span>
                         </button>
                       );
@@ -274,7 +254,7 @@ export function DocsSidebarSearch({ inputId = 'docs-sidebar-search-input' }: { i
             })}
           </div>
         </div>
-      )}
+      ) : null}
 
       <p className="px-2.5 py-2 text-[12px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
         <kbd className="kbd text-[11px]">⌘</kbd>{' '}
