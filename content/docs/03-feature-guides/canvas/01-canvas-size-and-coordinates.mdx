@@ -23,35 +23,32 @@ legacyHashes: ["01-canvas-size-and-coordinates"]
 
 # Canvas size & coordinates {#01-canvas-size-and-coordinates}
 
+<Callout tone="info" title="Reference contract">
+`width` and `height` define output pixel dimensions when supplied. `x` and `y` are coordinate offsets used by rotation/layout math and normally remain zero for simple banners.
+</Callout>
 
+<AvailabilityMatrix rows={[{"surface":"width","available":true,"notes":"Explicit output width in pixels"},{"surface":"height","available":true,"notes":"Explicit output height in pixels"},{"surface":"x","available":true,"notes":"Coordinate offset; normally zero"},{"surface":"y","available":true,"notes":"Coordinate offset; normally zero"},{"surface":"customBg.inherit","available":true,"notes":"May derive missing dimensions from the loaded image"},{"surface":"videoBg sizing","available":true,"notes":"May derive missing dimensions from an extracted frame"}]} />
 
-## `width` and `height`
+## Width and height
+<BeforeAfter before="Omit dimensions and rely on the 500 × 500 fallback." after="Set explicit dimensions when output size is part of the contract." beforeLabel="Implicit sizing" afterLabel="Production sizing" />
+<CodeBlockV2 language="typescript" code="await painter.createCanvas({ width: 1920, height: 1080, colorBg: '#000000' });" studio={true} />
 
-Pixels of the output PNG.
+If both dimensions remain unset after inherited image/video sizing opportunities, the creator defaults to **500 × 500**.
 
-```typescript
-await painter.createCanvas({
-  width: 1920,
-  height: 1080,
-  colorBg: '#000000',
-});
-```
+<Details summary="When can another source determine size?" open={false}>
+- `customBg.inherit: true` can take width and height from the loaded image.
+- `videoBg` can supply missing dimensions after a successful frame extraction.
+</Details>
 
-If you omit both, the creator defaults to **500×500** unless something else sets size first:
+## Coordinates
+<ComparisonTable leftLabel="Default" rightLabel="Purpose" rows={[{"feature":"x","left":"0","right":"Horizontal offset used by rotation/layout math"},{"feature":"y","left":"0","right":"Vertical offset used by rotation/layout math"}]} />
+<CodeDiff language="typescript" before="await painter.createCanvas({ colorBg: '#18181b' });" after="await painter.createCanvas({ width: 640, height: 360, colorBg: '#18181b' });" />
 
-- **`customBg.inherit: true`** → size taken from the **image** after load.
-- **`videoBg`** (with successful frame extract) → may set size from the frame when **`width`/`height`** omitted.
+## Installation reference
+<InstallCommand packageName="apexify.js" managers={["npm","pnpm","yarn"]} />
 
----
-
-## `x` and `y`
-
-Offset used with **rotation** and layout math (default **0**). Most banners keep **`0`**.
-
----
-
-## Minimum valid example
-
+## Minimal valid example
+<ExampleCard title="Explicit 640 × 360 output">
 ```typescript
 await painter.createCanvas({
   width: 640,
@@ -59,5 +56,12 @@ await painter.createCanvas({
   colorBg: '#18181b',
 });
 ```
+</ExampleCard>
 
----
+<OutputPreview label="Expected sizing result">
+The resulting PNG surface is 640 pixels wide and 360 pixels high unless a different documented configuration path intentionally changes the effective size.
+</OutputPreview>
+
+<NextSteps>
+Return to the [Canvas and createCanvas overview](/docs/node/canvas) for validation, return-value, background, and paint-pipeline context.
+</NextSteps>

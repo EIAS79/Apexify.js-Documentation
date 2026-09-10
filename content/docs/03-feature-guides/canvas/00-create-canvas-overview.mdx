@@ -23,9 +23,9 @@ legacyHashes: ["00-create-canvas-overview"]
 
 # Canvas & `createCanvas` — overview {#00-create-canvas-overview}
 
-**`await painter.createCanvas(config[, painterOpts])`** allocates a **`@napi-rs/canvas`** surface, paints backgrounds (layers, gradients, images, patterns, noise), applies clip, zoom, rotation, blur, optional shadow and stroke, and returns PNG bytes. Most Apexify pipelines start here — **`createImage`**, **`createText`**, and charts composite on top of **`CanvasResults.buffer`** (or a plain **`Buffer`** from elsewhere).
-
----
+<Callout tone="info" title="Core Node canvas entry point">
+`await painter.createCanvas(config[, painterOpts])` allocates an `@napi-rs/canvas` surface, paints configured backgrounds and effects, and returns PNG bytes plus the effective canvas configuration.
+</Callout>
 
 ## Signature & types
 
@@ -36,87 +36,74 @@ await painter.createCanvas(
 ): Promise<CanvasResults>;
 ```
 
-**`CanvasConfig`**, **`BackgroundLayer`**, **`CanvasResults`** — **`apexify.js`** (**`lib-next/types/canvas.ts`**). With **`resolveAssetRefs: true`**, **`$…`** placeholders in **`config`** resolve via **`painter.assets`** (**same **`maybeResolveRefs`** path as **`main.ts`**).
+`CanvasConfig` and `CanvasResults` are the primary configuration and result contracts for the Node canvas workflow. The `signature-types` heading remains canonical so legacy deep links continue to resolve after the DOC-3 component migration.
 
----
+<Prerequisites>
+- Apexify.js 6.0.0 installed in a Node runtime.
+- An `ApexPainter` instance configured for buffer output.
+- Explicit width and height for predictable production output unless an inherited image/video source determines them.
+</Prerequisites>
 
-## Return value (**`CanvasResults`**)
+## Minimal workflow
 
-```typescript
-const { buffer, canvas } = await painter.createCanvas({
-  width: 800,
-  height: 450,
-  colorBg: '#0f172a',
-});
-```
+<Steps title="Create a canvas">
+1. Import `ApexPainter` from `apexify.js`.
+2. Create a painter with buffer output.
+3. Call `createCanvas` with explicit dimensions and one primary fill.
+4. Use `buffer` as the PNG output or composite additional image/text/chart content.
+</Steps>
 
-| Field | Meaning |
-|-------|---------|
-| **`buffer`** | **`image/png`** **`Buffer`** — save, **`outPut`**, or pass to **`createImage`** **`/`** **`createText`**. |
-| **`canvas`** | The **`CanvasConfig`** reference you passed (**may be mutated**: **`customBg.inherit`** sets **`width`** **`/`** **`height`** from the image; **`videoBg`** can fill missing dimensions). Useful for inspecting the effective size after those steps. |
+<CodeGroup items={[{"label":"TypeScript","language":"typescript","content":"const painter = new ApexPainter({ type: 'buffer' });\nconst { buffer } = await painter.createCanvas({ width: 640, height: 360, colorBg: '#020617' });"},{"label":"JavaScript","language":"javascript","content":"const painter = new ApexPainter({ type: 'buffer' });\nconst result = await painter.createCanvas({ width: 640, height: 360, colorBg: '#020617' });"}]} />
 
----
+<CapabilityBadge label="Node canvas" status="available" />
 
-## Defaults & validation (quick rules)
+## Return value (`CanvasResults`)
 
-| Topic | Behaviour |
-|-------|-----------|
-| **Size** | If **`width`** **`/`** **`height`** stay unset after **`inherit`** **`/`** **`videoBg`** sizing, they default to **`500`** each — prefer explicit dimensions in production. |
-| **Primary fill mutex** | At most **one** of **`colorBg`**, **`gradientBg`**, **`customBg`** — supplying more than one throws (**see [Primary backgrounds](/docs#02-backgrounds-primary)**). |
-| **`opacity`** | Canvas global alpha must be **`0`** **`–`** **`1`**. |
-| **`zoom.scale`** | Must be **`> 0`** when set. |
-| **`bgLayers`** | Each layer **`type`** is **`color`**, **`gradient`**, **`image`**, **`pattern`**, **`presetPattern`**, or **`noise`** (**per-entry validation**). |
+<ComparisonTable leftLabel="Field" rightLabel="Meaning" rows={[{"feature":"buffer","left":"Buffer","right":"PNG bytes for saving, output, or later composition"},{"feature":"canvas","left":"CanvasConfig","right":"Effective configuration reference after inherited sizing or other mutations"}]} />
 
-**`videoBg`**, **`patternBg`**, **`noiseBg`**, **`transparentBase`**, and **`bgLayers`** interact with primary fills as documented in **[Paint order](/docs#09-canvas-paint-order)**.
+<Callout tone="warning" title="Configuration mutation">
+The returned `canvas` value is the configuration reference used by the creator. Features such as inherited background sizing can update effective width or height.
+</Callout>
 
----
+## Defaults and validation
 
-## Minimal example
+<FeatureMatrix rows={[{"feature":"width / height","status":"Defaults to 500 × 500","note":"Prefer explicit production dimensions unless another configured source determines size"},{"feature":"primary fill","status":"Mutually exclusive","note":"Use at most one of colorBg, gradientBg, or customBg"},{"feature":"opacity","status":"0 through 1","note":"Values outside the range are invalid"},{"feature":"zoom.scale","status":"Greater than 0","note":"Required when zoom is configured"},{"feature":"bgLayers","status":"Validated per entry","note":"Supports configured color, gradient, image, pattern, preset-pattern, and noise layers"}]} />
 
+<DecisionGuide items={[{"when":"you need a predictable banner or card size","use":"explicit width and height","because":"the output dimensions remain independent of source-asset dimensions"},{"when":"the background image should determine canvas size","use":"customBg.inherit","because":"the loaded image can supply effective dimensions"},{"when":"you need layered composition","use":"bgLayers","because":"layers make paint order explicit instead of overloading the primary fill"}]} />
+
+## Paint architecture
+
+<ArchitectureDiagram diagram="CanvasConfig → validation → surface allocation → backgrounds/layers → clip and transforms → shadow/stroke → PNG buffer" caption="High-level createCanvas pipeline" />
+
+<Details summary="Primary fill rule">
+Use only one primary fill among `colorBg`, `gradientBg`, and `customBg`. Additional layering concerns belong in the dedicated background-layer options.
+</Details>
+
+## Runnable example
+
+<ExampleCard title="640 × 360 dark canvas" description="A minimal deterministic canvas suitable for subsequent composition.">
 ```typescript
 import { ApexPainter } from 'apexify.js';
-
 const painter = new ApexPainter({ type: 'buffer' });
-
 const { buffer } = await painter.createCanvas({
   width: 640,
   height: 360,
   colorBg: '#020617',
 });
-
-// buffer → save, createImage, createText, charts…
 ```
+</ExampleCard>
 
----
+<ExampleSteps title="What happens next">
+1. `createCanvas` validates the configuration.
+2. The canvas surface is allocated.
+3. Configured background and effect stages are applied.
+4. The result exposes PNG `buffer` output for saving or composition.
+</ExampleSteps>
 
-## Topics (read in order)
+## Implementation path
+`CanvasCreator.createCanvas` (`canvas/canvas-creator.ts`) delegates through the canvas composition/paint helpers and supporting background, pattern, shadow, stroke, and clip-path modules.
 
-| # | Page | Covers |
-|---|------|--------|
-| 1 | [Size & coordinates](/docs#01-canvas-size-and-coordinates) | **`width`**, **`height`**, **`x`**, **`y`**, **`customBg.inherit`**, **`videoBg`** sizing |
-| 2 | [Primary backgrounds (pick one)](/docs#02-backgrounds-primary) | **`colorBg`**, **`gradientBg`**, **`customBg`**, **`videoBg`** vs **`patternBg`** **`/`** **`noiseBg`** |
-| 3 | [Transparent base](/docs#03-backgrounds-transparent-base) | **`transparentBase`** |
-| 4 | [Background layers (`bgLayers`)](/docs#04-backgrounds-bg-layers) | Stacked colour, gradient, image, pattern, procedural, noise |
-| 5 | [Patterns & film noise](/docs#05-backgrounds-pattern-noise) | **`patternBg`**, **`presetPattern`**, **`noiseBg`** |
-| 6 | [Border clip, zoom, rotation & canvas blur](/docs#06-canvas-border-shadow-zoom) | **`borderRadius`**, **`zoom`**, **`rotation`**, **`opacity`**, **`blendMode`**, **`blur`** |
-| 7 | [Shadow (`ShadowOptions`)](/docs#07-canvas-shadow-options) | **`shadow`** |
-| 8 | [Stroke (`StrokeOptions`)](/docs#08-canvas-stroke-options) | **`stroke`** |
-| 9 | [Paint order (reference)](/docs#09-canvas-paint-order) | **`CanvasCreator`** pipeline |
-
----
-
-## Next surfaces
-
-| Step | Docs |
-|------|------|
-| Photos / shapes | [Images overview](/docs#00-create-image-overview) |
-| Typography | [Text overview](/docs#00-create-text-overview) |
-| Save / encode / batch | [Raster, batch & output](/docs#00-raster-batch-output-overview) |
-
----
-
-## Implementation (`lib-next`)
-
-**`CanvasCreator.createCanvas`** (**`canvas/canvas-creator.ts`**) **`→`** **`composeCanvasForScene`** **`/`** **`paintConfiguredCanvasSurface`**. Helpers:** **`canvas/background-renderer.ts`**, **`canvas/pattern-renderer.ts`**, **`render/shadow-renderer.ts`**, **`render/stroke-renderer.ts`**, **`render/clip-path.ts`**.
-
----
+<NextSteps>
+- Continue to [Canvas size and coordinates](/docs/node/canvas/size-and-coordinates).
+- Use the legacy feature-guide links for deeper background/effect topics until DOC-9 migrates the remaining corpus to canonical routes.
+</NextSteps>

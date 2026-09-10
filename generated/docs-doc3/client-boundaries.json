@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-3",
+  "staticComponents": [
+    "Callout",
+    "Steps",
+    "Details",
+    "ComparisonTable",
+    "FeatureMatrix",
+    "AvailabilityMatrix",
+    "DecisionGuide",
+    "BeforeAfter",
+    "OutputPreview",
+    "ExampleCard",
+    "ExampleSteps",
+    "NextSteps",
+    "Prerequisites",
+    "CapabilityBadge",
+    "ImageResult",
+    "VideoResult",
+    "AudioResult",
+    "SvgResult"
+  ],
+  "interactiveIslands": {
+    "Tabs": "DocsTabs.tsx",
+    "codeControls": "CodeBlock.tsx"
+  },
+  "compatibility": {
+    "Alert": "server wrapper over Callout",
+    "Dropdown": "server wrapper over native Details",
+    "CodeSwitcher": "client compatibility wrapper over Tabs",
+    "CodeBlock": "existing code-control island reused by CodeBlockV2"
+  }
+}

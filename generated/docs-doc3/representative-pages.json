@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-3",
+  "pages": [
+    {
+      "sourcePath": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "usedComponents": [
+        "Callout",
+        "Steps",
+        "Details",
+        "CodeGroup",
+        "ComparisonTable",
+        "FeatureMatrix",
+        "DecisionGuide",
+        "ArchitectureDiagram",
+        "ExampleCard",
+        "ExampleSteps",
+        "NextSteps",
+        "Prerequisites",
+        "CapabilityBadge"
+      ]
+    },
+    {
+      "sourcePath": "content/docs/03-feature-guides/canvas/01-canvas-size-and-coordinates.mdx",
+      "usedComponents": [
+        "Callout",
+        "Details",
+        "CodeBlockV2",
+        "InstallCommand",
+        "CodeDiff",
+        "ComparisonTable",
+        "AvailabilityMatrix",
+        "BeforeAfter",
+        "OutputPreview",
+        "ExampleCard",
+        "NextSteps"
+      ]
+    }
+  ]
+}
