@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "routePageServer": true,
+  "docsLayoutServer": true,
+  "docsShellServer": true,
+  "docsHeaderServer": true,
+  "clientIslands": [
+    "components/docs/DocsSidebarSearch.tsx",
+    "components/docs/navigation/OnThisPageV2.tsx",
+    "components/docs/shell/AccessibleDrawer.tsx",
+    "components/docs/shell/DocsSearchTrigger.tsx",
+    "components/docs/shell/LegacyDocsRedirectIsland.tsx",
+    "components/docs/shell/LegacyDocsSidebarToggle.tsx",
+    "components/ThemeToggle.tsx"
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-2",
+  "startingSha": "c3d0799b8fb67fd7c86d48aceaa8c88e5e3d649f",
+  "provenance": {
+    "browserWorkflowRun": 34329043163,
+    "artifactId": 10095034582,
+    "artifactDigest": "sha256:f46e90ccf3dd90779ff7cc324395c4f15713b6309b49d48109c16a04d9672278"
+  },
+  "build": {
+    "wallMs": 37079.165,
+    "routedManifestJsBytes": 1010958,
+    "sourceCssBytes": 24878
+  },
+  "lighthouse": {
+    "desktop": {
+      "performance": 67,
+      "accessibility": 92,
+      "bestPractices": 96,
+      "seo": 100,
+      "lcpMs": 1067.17015,
+      "cls": 0.8891731202128843,
+      "tbtMs": 213.60995
+    },
+    "mobile": {
+      "performance": 62,
+      "accessibility": 96,
+      "bestPractices": 96,
+      "seo": 100,
+      "lcpMs": 4824.8772,
+      "cls": 0,
+      "tbtMs": 891
+    }
+  },
+  "browser": {
+    "desktopLight": {
+      "skipLinks": 0,
+      "smallTargets": 51,
+      "motionElements": 95,
+      "seriousAxe": 2,
+      "criticalAxe": 0,
+      "cls": 0.19893223892023534
+    },
+    "desktopDark": {
+      "skipLinks": 0,
+      "smallTargets": 51,
+      "motionElements": 95,
+      "seriousAxe": 2,
+      "criticalAxe": 0,
+      "cls": 0.21028247221016588
+    },
+    "mobileLight": {
+      "skipLinks": 0,
+      "smallTargets": 31,
+      "motionElements": 90,
+      "seriousAxe": 2,
+      "criticalAxe": 0,
+      "cls": 0
+    },
+    "reducedMotion": {
+      "motionElements": 95,
+      "seriousAxe": 2,
+      "criticalAxe": 0,
+      "cls": 0.197543342496142
+    }
+  }
+}

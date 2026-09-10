@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "sourceChecks": {
+    "semanticMain": true,
+    "skipLink": true,
+    "modalDrawer": true,
+    "namedDrawer": true,
+    "sidebarNavigation": true,
+    "tocNavigation": true,
+    "focusSystem": true
+  },
+  "runtimeAudit": "captured by DOC-2 CI artifact; serious/critical violations are gating"
+}

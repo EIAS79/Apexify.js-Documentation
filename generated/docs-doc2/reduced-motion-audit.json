@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "mediaQuery": true,
+  "disablesSmoothScroll": true,
+  "removesTransitions": true,
+  "removesAnimations": true,
+  "cursorDisabled": true
+}

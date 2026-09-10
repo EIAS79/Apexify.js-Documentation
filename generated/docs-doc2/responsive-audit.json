@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "breakpoints": {
+    "tablet": true,
+    "desktop": true,
+    "narrowMobile": true
+  },
+  "safeViewport": true,
+  "safeArea": true,
+  "horizontalContainment": true,
+  "desktopThreeColumnGrid": true
+}
