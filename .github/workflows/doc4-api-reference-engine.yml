@@ -116,13 +116,20 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
 
-      - name: Commit deterministic DOC-4 evidence on execution branch
+      - name: Commit compact deterministic DOC-4 evidence on execution branch
         if: github.event_name == 'push' && github.ref == 'refs/heads/doc4-api-reference-engine'
         shell: bash
         run: |
-          git add generated/docs-doc4
-          if git diff --cached --quiet; then echo "DOC-4 generated evidence already current"; exit 0; fi
+          git add \
+            generated/docs-doc4/identity.json \
+            generated/docs-doc4/api-coverage.json \
+            generated/docs-doc4/option-coverage.json \
+            generated/docs-doc4/signature-verification.json \
+            generated/docs-doc4/source-link-verification.json \
+            generated/docs-doc4/representative-api.json \
+            generated/docs-doc4/index.json
+          if git diff --cached --quiet; then echo "DOC-4 compact evidence already current"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "DOC-4: refresh generated API reference evidence"
+          git commit -m "DOC-4: refresh compact API reference evidence"
           git push
