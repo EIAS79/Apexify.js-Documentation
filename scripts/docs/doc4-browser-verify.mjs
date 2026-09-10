@@ -3,7 +3,6 @@ const require=createRequire(import.meta.url);const axeSource=fs.readFileSync(req
 const baseUrl=process.env.DOC4_BASE_URL||'http://127.0.0.1:3000';const executablePath=process.env.CHROME_PATH;if(!executablePath)throw new Error('[doc4-browser] CHROME_PATH required');
 const OUT=path.join(process.cwd(),'.doc4-runtime-evidence');fs.mkdirSync(OUT,{recursive:true});
 const REP='/api-reference/apexify.js/ApexPainter/createImage';const browser=await puppeteer.launch({executablePath,headless:'new',args:['--no-sandbox','--disable-dev-shm-usage']});
-await browser.defaultBrowserContext().overridePermissions(baseUrl,['clipboard-read','clipboard-write']);
 const states=[
  {name:'desktop-light',viewport:{width:1440,height:1000},theme:'light'},
  {name:'tablet-dark',viewport:{width:900,height:1000},theme:'dark'},
@@ -16,6 +15,12 @@ try{
  for(const state of states){
   const page=await browser.newPage();await page.setViewport(state.viewport);
   await page.evaluateOnNewDocument(theme=>localStorage.setItem('apexify-theme',theme),state.theme);
+  await page.evaluateOnNewDocument(()=>{
+    Object.defineProperty(navigator,'clipboard',{configurable:true,value:{
+      writeText:async text=>{window.__doc4Clipboard=String(text);},
+      readText:async()=>window.__doc4Clipboard||'',
+    }});
+  });
   if(state.reduced)await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
   const consoleErrors=[];page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
   const response=await page.goto(`${baseUrl}${REP}`,{waitUntil:'networkidle2'});if(!response||response.status()!==200)throw new Error(`${state.name} status ${response?.status()}`);
@@ -39,7 +44,7 @@ try{
   if(!signatureText.includes('Promise<Buffer>'))throw new Error(`${state.name} canonical signature marker missing`);
   await page.click('[data-doc4-component="ApiSignature"] button[aria-label="Copy API signature"]');
   await page.waitForFunction(()=>document.querySelector('[data-doc4-component="ApiSignature"] button[aria-label="Copy API signature"]')?.getAttribute('data-copy-state')==='copied');
-  const copied=await page.evaluate(()=>navigator.clipboard.readText());if(copied!==signatureText)throw new Error(`${state.name} signature copy failed`);
+  const copied=await page.evaluate(()=>window.__doc4Clipboard||'');if(copied!==signatureText)throw new Error(`${state.name} signature copy failed`);
   const sourceHref=await page.$eval('[data-doc4-component="SourceLink"]',e=>e.getAttribute('href')||'');if(!sourceHref.includes('dbed9743353593eafae9a7b1c25312d7170a233b'))throw new Error(`${state.name} source link is not commit-pinned`);
   const searchResult=await page.evaluate(async()=>{const r=await fetch('/api/docs/search?q=images.mask.mode');return r.json();});
   if(!searchResult.results?.some(r=>r.href===`${REP}#option-images-mask-mode`))throw new Error(`${state.name} nested option search deep-link missing`);
