@@ -1,0 +1,11 @@
+{
+  "defaultsCovered": 3220,
+  "descriptionsCovered": 17233,
+  "documented": 17233,
+  "missing": [],
+  "nestedPaths": 16891,
+  "runtimeMetadataCovered": 17233,
+  "schemaVersion": 1,
+  "total": 17233,
+  "typesCovered": 17233
+}
