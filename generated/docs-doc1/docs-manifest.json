@@ -120,38 +120,33 @@
         },
         {
           "level": 2,
-          "id": "signature-types",
-          "text": "Signature & types"
+          "id": "minimal-workflow",
+          "text": "Minimal workflow"
         },
         {
           "level": 2,
           "id": "return-value-canvasresults",
-          "text": "Return value (**`CanvasResults`**)"
+          "text": "Return value (`CanvasResults`)"
         },
         {
           "level": 2,
-          "id": "defaults-validation-quick-rules",
-          "text": "Defaults & validation (quick rules)"
+          "id": "defaults-and-validation",
+          "text": "Defaults and validation"
         },
         {
           "level": 2,
-          "id": "minimal-example",
-          "text": "Minimal example"
+          "id": "paint-architecture",
+          "text": "Paint architecture"
         },
         {
           "level": 2,
-          "id": "topics-read-in-order",
-          "text": "Topics (read in order)"
+          "id": "runnable-example",
+          "text": "Runnable example"
         },
         {
           "level": 2,
-          "id": "next-surfaces",
-          "text": "Next surfaces"
-        },
-        {
-          "level": 2,
-          "id": "implementation-lib-next",
-          "text": "Implementation (`lib-next`)"
+          "id": "implementation-path",
+          "text": "Implementation path"
         }
       ]
     },
@@ -201,17 +196,22 @@
         {
           "level": 2,
           "id": "width-and-height",
-          "text": "`width` and `height`"
+          "text": "Width and height"
         },
         {
           "level": 2,
-          "id": "x-and-y",
-          "text": "`x` and `y`"
+          "id": "coordinates",
+          "text": "Coordinates"
         },
         {
           "level": 2,
-          "id": "minimum-valid-example",
-          "text": "Minimum valid example"
+          "id": "installation-reference",
+          "text": "Installation reference"
+        },
+        {
+          "level": 2,
+          "id": "minimal-valid-example",
+          "text": "Minimal valid example"
         }
       ]
     }
