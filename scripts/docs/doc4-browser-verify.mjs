@@ -51,13 +51,15 @@ try{
   const sourceHref=await page.$eval('[data-doc4-component="SourceLink"]',e=>e.getAttribute('href')||'');if(!sourceHref.includes('dbed9743353593eafae9a7b1c25312d7170a233b'))throw new Error(`${state.name} source link is not commit-pinned`);
   const searchResult=await page.evaluate(async()=>{const r=await fetch('/api/docs/search?q=images.mask.mode');return r.json();});
   if(!searchResult.results?.some(r=>r.href===`${REP}#option-images-mask-mode`))throw new Error(`${state.name} nested option search deep-link missing`);
-  const unexpectedHttp=httpErrors.filter(r=>!(r.status===404&&new URL(r.url).pathname==='/favicon.ico'));
-  const onlyExpectedFavicon404=httpErrors.length>0&&unexpectedHttp.length===0&&httpErrors.every(r=>r.status===404&&new URL(r.url).pathname==='/favicon.ico');
-  const unexpectedConsole=consoleErrors.filter(message=>!(onlyExpectedFavicon404&&message.includes('404')));
+  const localOrigin=new URL(baseUrl).origin;
+  const isExpectedLocalResourceMiss=r=>{const u=new URL(r.url);return r.status===404&&u.origin===localOrigin&&(u.pathname==='/favicon.ico'||u.pathname==='/_vercel/speed-insights/script.js');};
+  const unexpectedHttp=httpErrors.filter(r=>!isExpectedLocalResourceMiss(r));
+  const onlyExpectedLocal404s=httpErrors.length>0&&unexpectedHttp.length===0&&httpErrors.every(isExpectedLocalResourceMiss);
+  const unexpectedConsole=consoleErrors.filter(message=>!(onlyExpectedLocal404s&&message.includes('404')));
   if(unexpectedHttp.length||unexpectedConsole.length||pageErrors.length)throw new Error(`${state.name} browser errors ${JSON.stringify({unexpectedHttp,consoleErrors:unexpectedConsole,pageErrors})}`);
   const js=await page.evaluate(()=>performance.getEntriesByType('resource').filter(r=>r.name.includes('/_next/static/')&&r.name.endsWith('.js')).reduce((n,r)=>n+(r.transferSize||0),0));
   let reducedMotionOk=true;if(state.reduced){reducedMotionOk=await page.evaluate(()=>[...document.querySelectorAll('.apx-api-root *')].every(e=>{const s=getComputedStyle(e);const ds=s.transitionDuration.split(',').map(x=>parseFloat(x)||0);const as=s.animationDuration.split(',').map(x=>parseFloat(x)||0);return Math.max(...ds,0)<=0.01&&Math.max(...as,0)<=0.01;}));if(!reducedMotionOk)throw new Error(`${state.name} reduced motion not applied`);}
-  results.push({...state,status:response.status(),canonical,components,axeViolations:axe,horizontalOverflow:overflow,nestedSearchHref:`${REP}#option-images-mask-mode`,optionSearchResultCount:visiblePaths.length,transferredJsBytes:js,reducedMotionOk,expectedResourceMisses:httpErrors.filter(r=>!unexpectedHttp.includes(r))});
+  results.push({...state,status:response.status(),canonical,components,axeViolations:axe,horizontalOverflow:overflow,nestedSearchHref:`${REP}#option-images-mask-mode`,optionSearchResultCount:visiblePaths.length,transferredJsBytes:js,reducedMotionOk,expectedResourceMisses:httpErrors.filter(isExpectedLocalResourceMiss)});
   await page.close();
  }
  const overload=await browser.newPage();await overload.setViewport({width:1200,height:900});const r=await overload.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/createScene`,{waitUntil:'networkidle2'});if(!r||r.status()!==200)throw new Error('createScene overload route missing');
