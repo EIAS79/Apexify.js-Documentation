@@ -1,0 +1,109 @@
+name: DOC-5 Executable Example Platform
+
+on:
+  push:
+    branches: [doc5-executable-example-platform, main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: doc5-examples-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC5_BASE_URL: http://127.0.0.1:3000
+  APEXIFY_PACKAGE_COMMIT: dbed9743353593eafae9a7b1c25312d7170a233b
+  DOC5_BASE_SHA: b7dfca98c2c227619f6b5360898248845846d83a
+
+jobs:
+  verify:
+    name: Verify DOC-5 executable example platform
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Deterministic install
+        run: npm ci
+      - name: Pack, typecheck, execute and verify representative examples
+        run: npm run docs:examples:verify
+      - name: Prove deterministic manifest generation
+        run: npm run docs:examples:validate
+      - name: DOC-5 manifest, runner, linkage and prior-phase verification
+        run: npm run docs:verify:doc5
+      - name: Existing documentation integrity
+        run: npm run verify:docs
+      - name: TypeScript typecheck
+        run: npm run typecheck
+      - name: Clean production build and DOC-5 measurement
+        run: npm run docs:measure:doc5
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc5-next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/examples/node.canvas.basic >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc5-next.log
+          exit 1
+      - name: Browser, responsive, theme, keyboard and axe verification
+        run: npm run docs:browser:doc5
+      - name: Quantitative DOC-5 finalizer
+        run: npm run docs:finalize:doc5
+      - name: Upload DOC-5 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc5-executable-example-platform-evidence
+          path: |
+            generated/docs-doc5
+            public/example-outputs
+            /tmp/doc5-next.log
+          include-hidden-files: true
+          if-no-files-found: error
+      - name: Commit deterministic DOC-5 evidence and verified outputs on execution branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/doc5-executable-example-platform'
+        shell: bash
+        run: |
+          git add generated/docs-doc5/*.json public/example-outputs
+          if git diff --cached --quiet; then echo "DOC-5 deterministic evidence already current"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "DOC-5: refresh verified example evidence and outputs"
+          git push
+
+  supported-node-examples:
+    name: Packed examples / Node ${{ matrix.node }}
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 26]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: ${{ matrix.node }}, cache: npm }
+      - run: npm install --global npm@11.19.1
+      - run: npm ci
+      - name: Execute packed-package examples on supported Node
+        run: npx tsx scripts/docs/doc5-runner.ts --runtime-only
