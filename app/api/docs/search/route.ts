@@ -48,7 +48,9 @@ export async function GET(request:NextRequest){
       if(!haystack.includes(searchTerm))continue;
       results.push({filename:record.id,name:record.title,folder:'API Reference',href:record.href,matchType:'api',snippet:`${record.kind} · ${record.runtime.join(', ')}`});
     }
-    const rank:Record<SearchResult['matchType'],number>={api:0,filename:1,folder:2,content:3};
+    // Preserve the established documentation-title search contract while integrating DOC-4 API records.
+    // Exact/broad documentation title matches must not be crowded out by a large API option surface.
+    const rank:Record<SearchResult['matchType'],number>={filename:0,api:1,folder:2,content:3};
     results.sort((a,b)=>rank[a.matchType]-rank[b.matchType]||a.name.localeCompare(b.name)||a.href.localeCompare(b.href));
     const unique=[...new Map(results.map(r=>[`${r.name}|${r.href}`,r])).values()];
     return NextResponse.json({results:unique.slice(0,30)});
