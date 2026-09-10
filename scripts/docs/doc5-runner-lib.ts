@@ -7,7 +7,7 @@ export const MAX_OUTPUT_FILES = 8;
 export const MAX_TOTAL_OUTPUT_BYTES = 20 * 1024 * 1024;
 
 export function sanitizedExecutionEnv(outputDir: string): NodeJS.ProcessEnv {
-  const env: NodeJS.ProcessEnv = { APEXIFY_EXAMPLE_OUTPUT_DIR: outputDir };
+  const env = { NODE_ENV: 'test', APEXIFY_EXAMPLE_OUTPUT_DIR: outputDir } as NodeJS.ProcessEnv;
   for (const key of ['PATH','Path','SystemRoot','TMPDIR','TMP','TEMP']) if (process.env[key]) env[key] = process.env[key];
   return env;
 }
