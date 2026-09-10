@@ -22,7 +22,10 @@ try{
     }});
   });
   if(state.reduced)await page.emulateMediaFeatures([{name:'prefers-reduced-motion',value:'reduce'}]);
-  const consoleErrors=[];page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
+  const consoleErrors=[];const pageErrors=[];const httpErrors=[];
+  page.on('console',m=>{if(m.type()==='error')consoleErrors.push(m.text());});
+  page.on('pageerror',e=>pageErrors.push(e.message));
+  page.on('response',r=>{if(r.status()>=400)httpErrors.push({status:r.status(),url:r.url()});});
   const response=await page.goto(`${baseUrl}${REP}`,{waitUntil:'networkidle2'});if(!response||response.status()!==200)throw new Error(`${state.name} status ${response?.status()}`);
   await page.addScriptTag({content:axeSource});
   const canonical=await page.$eval('link[rel="canonical"]',e=>e.href);if(canonical!==`https://apexifyjs.vercel.app${REP}`)throw new Error(`${state.name} canonical ${canonical}`);
@@ -48,10 +51,13 @@ try{
   const sourceHref=await page.$eval('[data-doc4-component="SourceLink"]',e=>e.getAttribute('href')||'');if(!sourceHref.includes('dbed9743353593eafae9a7b1c25312d7170a233b'))throw new Error(`${state.name} source link is not commit-pinned`);
   const searchResult=await page.evaluate(async()=>{const r=await fetch('/api/docs/search?q=images.mask.mode');return r.json();});
   if(!searchResult.results?.some(r=>r.href===`${REP}#option-images-mask-mode`))throw new Error(`${state.name} nested option search deep-link missing`);
-  if(consoleErrors.length||pageErrors.length)throw new Error(`${state.name} browser errors ${JSON.stringify({consoleErrors,pageErrors})}`);
+  const unexpectedHttp=httpErrors.filter(r=>!(r.status===404&&new URL(r.url).pathname==='/favicon.ico'));
+  const onlyExpectedFavicon404=httpErrors.length>0&&unexpectedHttp.length===0&&httpErrors.every(r=>r.status===404&&new URL(r.url).pathname==='/favicon.ico');
+  const unexpectedConsole=consoleErrors.filter(message=>!(onlyExpectedFavicon404&&message.includes('404')));
+  if(unexpectedHttp.length||unexpectedConsole.length||pageErrors.length)throw new Error(`${state.name} browser errors ${JSON.stringify({unexpectedHttp,consoleErrors:unexpectedConsole,pageErrors})}`);
   const js=await page.evaluate(()=>performance.getEntriesByType('resource').filter(r=>r.name.includes('/_next/static/')&&r.name.endsWith('.js')).reduce((n,r)=>n+(r.transferSize||0),0));
   let reducedMotionOk=true;if(state.reduced){reducedMotionOk=await page.evaluate(()=>[...document.querySelectorAll('.apx-api-root *')].every(e=>{const s=getComputedStyle(e);const ds=s.transitionDuration.split(',').map(x=>parseFloat(x)||0);const as=s.animationDuration.split(',').map(x=>parseFloat(x)||0);return Math.max(...ds,0)<=0.01&&Math.max(...as,0)<=0.01;}));if(!reducedMotionOk)throw new Error(`${state.name} reduced motion not applied`);}
-  results.push({...state,status:response.status(),canonical,components,axeViolations:axe,horizontalOverflow:overflow,nestedSearchHref:`${REP}#option-images-mask-mode`,optionSearchResultCount:visiblePaths.length,transferredJsBytes:js,reducedMotionOk});
+  results.push({...state,status:response.status(),canonical,components,axeViolations:axe,horizontalOverflow:overflow,nestedSearchHref:`${REP}#option-images-mask-mode`,optionSearchResultCount:visiblePaths.length,transferredJsBytes:js,reducedMotionOk,expectedResourceMisses:httpErrors.filter(r=>!unexpectedHttp.includes(r))});
   await page.close();
  }
  const overload=await browser.newPage();await overload.setViewport({width:1200,height:900});const r=await overload.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/createScene`,{waitUntil:'networkidle2'});if(!r||r.status()!==200)throw new Error('createScene overload route missing');
@@ -59,4 +65,4 @@ try{
  const unknown=await browser.newPage();const bad=await unknown.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/__missing__`,{waitUntil:'networkidle2'});if(!bad||bad.status()!==404)throw new Error(`unknown member expected 404 got ${bad?.status()}`);await unknown.close();
 }finally{await browser.close();}
 const evidence={schemaVersion:1,phase:'DOC-4',representative:REP,states:results,overloadRoute:'/api-reference/apexify.js/ApexPainter/createScene',unknownMember404:true,failures:0};
-fs.writeFileSync(path.join(OUT,'browser.json'),`${JSON.stringify(evidence,null,2)}\n`);console.log('[doc4-browser] PASS '+JSON.stringify(results.map(r=>({name:r.name,js:r.transferredJsBytes,optionMatches:r.optionSearchResultCount}))));
+fs.writeFileSync(path.join(OUT,'browser.json'),`${JSON.stringify(evidence,null,2)}\n`);console.log('[doc4-browser] PASS '+JSON.stringify(results.map(r=>({name:r.name,js:r.transferredJsBytes,optionMatches:r.optionSearchResultCount,expectedResourceMisses:r.expectedResourceMisses}))));
