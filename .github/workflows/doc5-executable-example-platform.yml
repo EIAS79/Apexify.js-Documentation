@@ -83,7 +83,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/doc5-executable-example-platform'
         shell: bash
         run: |
-          git add generated/docs-doc5/*.json public/example-outputs
+          git add generated/docs-doc1 generated/docs-doc3 generated/docs-doc5/*.json public/example-outputs
           if git diff --cached --quiet; then echo "DOC-5 deterministic evidence already current"; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
