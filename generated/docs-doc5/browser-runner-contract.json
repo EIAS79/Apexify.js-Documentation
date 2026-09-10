@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "available": false,
+  "reason": "DOC-5 defines the contract only. @apexify/web is not a shipped current runtime and no browser execution adapter is activated.",
+  "contract": "BrowserExampleRunner",
+  "activation": "deferred until a real shipped @apexify/web runtime exists"
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "id": "node.canvas.basic",
+    "enabled": true,
+    "preview": "canvas-basic.png"
+  },
+  {
+    "id": "node.chart.bar",
+    "enabled": true,
+    "preview": "chart-bar.png"
+  },
+  {
+    "id": "node.gif.basic",
+    "enabled": true,
+    "preview": "poster.png"
+  },
+  {
+    "id": "node.integration.report",
+    "enabled": true,
+    "preview": "report.png"
+  }
+]

@@ -1,0 +1,451 @@
+{
+  "schemaVersion": 1,
+  "package": {
+    "name": "apexify.js",
+    "version": "6.0.0",
+    "commit": "dbed9743353593eafae9a7b1c25312d7170a233b"
+  },
+  "examples": [
+    {
+      "id": "node.canvas.basic",
+      "title": "Create a deterministic canvas",
+      "summary": "Render a fixed 320×180 server-side PNG using the public ApexPainter canvas API.",
+      "runtime": "node",
+      "difficulty": "minimal",
+      "packages": [
+        "apexify.js"
+      ],
+      "features": [
+        "canvas",
+        "output"
+      ],
+      "apiSymbols": [
+        "apexify.js::ApexPainter",
+        "apexify.js::ApexPainter#createCanvas"
+      ],
+      "sourceFiles": [
+        "examples/node/canvas-basic/index.ts"
+      ],
+      "entrypoint": "examples/node/canvas-basic/index.ts",
+      "outputType": "image",
+      "expectedOutput": [
+        {
+          "path": "canvas-basic.png",
+          "kind": "png",
+          "public": true,
+          "verificationMode": "metadata",
+          "width": 320,
+          "height": 180,
+          "minBytes": 100,
+          "maxBytes": 2000000
+        }
+      ],
+      "verification": {
+        "typecheck": true,
+        "executable": true,
+        "timeoutMs": 20000,
+        "stderrPolicy": "fail-on-error-pattern"
+      },
+      "relatedDocs": [
+        "/docs/node/canvas"
+      ],
+      "relatedExamples": [
+        "node.integration.report"
+      ],
+      "gallery": {
+        "enabled": true,
+        "featured": true,
+        "previewOutput": "canvas-basic.png"
+      },
+      "explanation": {
+        "goal": "Create the smallest useful server-rendered image with explicit dimensions and background color.",
+        "prerequisites": [
+          "Node.js 22, 24, or 26",
+          "apexify.js 6.0.0"
+        ],
+        "importantOptions": [
+          "width",
+          "height",
+          "colorBg"
+        ],
+        "whyOptions": [
+          "Explicit dimensions make output verification deterministic.",
+          "A local color background avoids remote assets and font dependencies."
+        ],
+        "variants": [
+          "Replace colorBg with a gradient or layered background after the basic pipeline is understood."
+        ],
+        "performanceNote": "The example uses one small canvas and performs no remote I/O.",
+        "errorNote": "Invalid dimensions are rejected by Apexify.js runtime validation before rendering.",
+        "nextStep": "Use node.chart.bar for a generated chart or node.integration.report for a multi-file workflow."
+      },
+      "schemaVersion": 1,
+      "canonicalRoute": "/examples/node.canvas.basic",
+      "sourceHash": "d1603f74395a1b3c07efbf96be39ca6d867413977a29ea556c0bfc1e712649e4",
+      "sources": [
+        {
+          "path": "examples/node/canvas-basic/index.ts",
+          "language": "typescript",
+          "sha256": "0c6a0b8413590f8c2cb05887a5cf9352652f4b184a268a91935c4fa887857c60",
+          "content": "import { mkdir, writeFile } from 'node:fs/promises';\nimport { join } from 'node:path';\nimport { ApexPainter } from 'apexify.js';\n\nconst outputDir = process.env.APEXIFY_EXAMPLE_OUTPUT_DIR;\nif (!outputDir) throw new Error('APEXIFY_EXAMPLE_OUTPUT_DIR is required.');\n\nconst painter = new ApexPainter({ type: 'buffer' });\nconst canvas = await painter.createCanvas({ width: 320, height: 180, colorBg: '#0f172a' });\nif (!Buffer.isBuffer(canvas.buffer)) throw new Error('Expected createCanvas() to expose a PNG Buffer.');\n\nawait mkdir(outputDir, { recursive: true });\nawait writeFile(join(outputDir, 'canvas-basic.png'), canvas.buffer);\nconsole.log(JSON.stringify({ example: 'node.canvas.basic', format: 'png', width: 320, height: 180, bytes: canvas.buffer.length }));\n"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "canvas-basic.png",
+          "kind": "png",
+          "publicPath": "/example-outputs/node.canvas.basic/canvas-basic.png",
+          "verificationMode": "metadata",
+          "width": 320,
+          "height": 180
+        }
+      ],
+      "verificationStatus": "verified",
+      "verifiedPackageVersion": "6.0.0",
+      "verifiedPackageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
+    },
+    {
+      "id": "node.chart.bar",
+      "title": "Render a bar chart",
+      "summary": "Render a practical bar chart as a verified 480×320 PNG through ApexPainter.createChart().",
+      "runtime": "node",
+      "difficulty": "practical",
+      "packages": [
+        "apexify.js"
+      ],
+      "features": [
+        "charts",
+        "canvas",
+        "output"
+      ],
+      "apiSymbols": [
+        "apexify.js::ApexPainter",
+        "apexify.js::ApexPainter#createChart"
+      ],
+      "sourceFiles": [
+        "examples/node/chart-bar/index.ts"
+      ],
+      "entrypoint": "examples/node/chart-bar/index.ts",
+      "outputType": "image",
+      "expectedOutput": [
+        {
+          "path": "chart-bar.png",
+          "kind": "png",
+          "public": true,
+          "verificationMode": "metadata",
+          "width": 480,
+          "height": 320,
+          "minBytes": 500,
+          "maxBytes": 4000000
+        }
+      ],
+      "verification": {
+        "typecheck": true,
+        "executable": true,
+        "timeoutMs": 25000,
+        "stderrPolicy": "fail-on-error-pattern"
+      },
+      "relatedDocs": [
+        "/docs/getting-started"
+      ],
+      "relatedExamples": [
+        "node.integration.report"
+      ],
+      "gallery": {
+        "enabled": true,
+        "previewOutput": "chart-bar.png"
+      },
+      "explanation": {
+        "goal": "Turn structured bar data into a server-generated chart image.",
+        "prerequisites": [
+          "Node.js 22, 24, or 26",
+          "apexify.js 6.0.0"
+        ],
+        "importantOptions": [
+          "chart type: bar",
+          "dimensions.width",
+          "dimensions.height"
+        ],
+        "whyOptions": [
+          "A fixed chart type keeps the example focused.",
+          "Explicit dimensions allow PNG metadata verification without pixel-fragile golden tests."
+        ],
+        "variants": [
+          "Use the same createChart API with pie, line, scatter, radar, horizontalBar, or polarArea data shapes."
+        ],
+        "performanceNote": "Chart rendering is CPU-bound and local; this example intentionally uses three bars.",
+        "errorNote": "Malformed chart data or non-finite numeric input is rejected by Apexify.js validation.",
+        "nextStep": "Combine rendered output with application metadata as shown in node.integration.report."
+      },
+      "schemaVersion": 1,
+      "canonicalRoute": "/examples/node.chart.bar",
+      "sourceHash": "cd7a888b8b826223996d9aa4d2a7769e6eed61bc8753315d90bd594d838c8baa",
+      "sources": [
+        {
+          "path": "examples/node/chart-bar/index.ts",
+          "language": "typescript",
+          "sha256": "e85b99e996341066b72a03b1399d4ec44d199ff9d8ff8b7b2581a37953f49ce9",
+          "content": "import { mkdir, writeFile } from 'node:fs/promises';\nimport { join } from 'node:path';\nimport { ApexPainter } from 'apexify.js';\n\nconst outputDir = process.env.APEXIFY_EXAMPLE_OUTPUT_DIR;\nif (!outputDir) throw new Error('APEXIFY_EXAMPLE_OUTPUT_DIR is required.');\n\nconst painter = new ApexPainter({ type: 'buffer' });\nconst data = [\n  { label: 'Docs', value: 72, xStart: 0, xEnd: 1, color: '#6366f1' },\n  { label: 'API', value: 58, xStart: 1, xEnd: 2, color: '#8b5cf6' },\n  { label: 'Gallery', value: 50, xStart: 2, xEnd: 3, color: '#ec4899' },\n];\nconst png = await painter.createChart('bar', data, { dimensions: { width: 480, height: 320 } });\nif (!Buffer.isBuffer(png)) throw new Error('Expected createChart() to return a PNG Buffer.');\n\nawait mkdir(outputDir, { recursive: true });\nawait writeFile(join(outputDir, 'chart-bar.png'), png);\nconsole.log(JSON.stringify({ example: 'node.chart.bar', format: 'png', width: 480, height: 320, bytes: png.length }));\n"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "chart-bar.png",
+          "kind": "png",
+          "publicPath": "/example-outputs/node.chart.bar/chart-bar.png",
+          "verificationMode": "metadata",
+          "width": 480,
+          "height": 320
+        }
+      ],
+      "verificationStatus": "verified",
+      "verifiedPackageVersion": "6.0.0",
+      "verifiedPackageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
+    },
+    {
+      "id": "node.gif.basic",
+      "title": "Generate a two-frame GIF",
+      "summary": "Generate a tiny server-side GIF from two Apexify canvas frames and verify its GIF structure.",
+      "runtime": "node",
+      "difficulty": "advanced",
+      "packages": [
+        "apexify.js"
+      ],
+      "features": [
+        "gif",
+        "canvas",
+        "media",
+        "output"
+      ],
+      "apiSymbols": [
+        "apexify.js::ApexPainter",
+        "apexify.js::ApexPainter#createCanvas",
+        "apexify.js::ApexPainter#createGIF"
+      ],
+      "sourceFiles": [
+        "examples/node/gif-basic/index.ts"
+      ],
+      "entrypoint": "examples/node/gif-basic/index.ts",
+      "outputType": "gif",
+      "expectedOutput": [
+        {
+          "path": "animation.gif",
+          "kind": "gif",
+          "public": true,
+          "verificationMode": "structural",
+          "width": 96,
+          "height": 64,
+          "minBytes": 100,
+          "maxBytes": 4000000
+        },
+        {
+          "path": "poster.png",
+          "kind": "png",
+          "public": true,
+          "verificationMode": "metadata",
+          "width": 96,
+          "height": 64,
+          "minBytes": 100,
+          "maxBytes": 2000000
+        }
+      ],
+      "verification": {
+        "typecheck": true,
+        "executable": true,
+        "timeoutMs": 30000,
+        "stderrPolicy": "fail-on-error-pattern"
+      },
+      "relatedDocs": [
+        "/docs/getting-started"
+      ],
+      "gallery": {
+        "enabled": true,
+        "previewOutput": "poster.png"
+      },
+      "explanation": {
+        "goal": "Prove the current server-side GIF encoder using small deterministic local frames.",
+        "prerequisites": [
+          "Node.js 22, 24, or 26",
+          "apexify.js 6.0.0"
+        ],
+        "importantOptions": [
+          "outputFormat",
+          "width",
+          "height",
+          "repeat",
+          "quality"
+        ],
+        "whyOptions": [
+          "Buffer output keeps verification inside the fixture.",
+          "Small dimensions and two frames keep CI cost bounded.",
+          "The Gallery uses the verified poster by default so reduced-motion users are not forced to watch animation."
+        ],
+        "variants": [
+          "Increase frame count or use generated-frame mode for real animation workflows."
+        ],
+        "performanceNote": "GIF encoding is heavier than a single PNG, so the completion example is intentionally tiny.",
+        "errorNote": "Missing frame data, invalid dimensions, or frame-limit violations fail the run.",
+        "nextStep": "Use production-sized inputs only after measuring frame count, dimensions, and encoding quality."
+      },
+      "schemaVersion": 1,
+      "canonicalRoute": "/examples/node.gif.basic",
+      "sourceHash": "609a9b8654f7cb2e819f8d81bc4801369625e8bdf3f522346bc281602cdcd7a8",
+      "sources": [
+        {
+          "path": "examples/node/gif-basic/index.ts",
+          "language": "typescript",
+          "sha256": "bd359463db522fdf2c3cf41f9fe4008f8de83f81ef4d44378ca7b41ee67b5136",
+          "content": "import { mkdir, writeFile } from 'node:fs/promises';\nimport { join } from 'node:path';\nimport { ApexPainter } from 'apexify.js';\n\nconst outputDir = process.env.APEXIFY_EXAMPLE_OUTPUT_DIR;\nif (!outputDir) throw new Error('APEXIFY_EXAMPLE_OUTPUT_DIR is required.');\n\nconst painter = new ApexPainter({ type: 'buffer' });\nconst first = await painter.createCanvas({ width: 96, height: 64, colorBg: '#312e81' });\nconst second = await painter.createCanvas({ width: 96, height: 64, colorBg: '#be185d' });\nconst gif = await painter.createGIF(\n  [\n    { buffer: first.buffer, duration: 120 },\n    { buffer: second.buffer, duration: 120 },\n  ],\n  { outputFormat: 'buffer', width: 96, height: 64, repeat: -1, quality: 20, skipResizeWhenDimensionsMatch: true },\n);\nif (!Buffer.isBuffer(gif)) throw new Error('Expected createGIF({ outputFormat: buffer }) to return a GIF Buffer.');\n\nawait mkdir(outputDir, { recursive: true });\nawait writeFile(join(outputDir, 'animation.gif'), gif);\nawait writeFile(join(outputDir, 'poster.png'), first.buffer);\nconsole.log(JSON.stringify({ example: 'node.gif.basic', format: 'gif', width: 96, height: 64, bytes: gif.length, frames: 2 }));\n"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "animation.gif",
+          "kind": "gif",
+          "publicPath": "/example-outputs/node.gif.basic/animation.gif",
+          "verificationMode": "structural",
+          "width": 96,
+          "height": 64
+        },
+        {
+          "path": "poster.png",
+          "kind": "png",
+          "publicPath": "/example-outputs/node.gif.basic/poster.png",
+          "verificationMode": "metadata",
+          "width": 96,
+          "height": 64
+        }
+      ],
+      "verificationStatus": "verified",
+      "verifiedPackageVersion": "6.0.0",
+      "verifiedPackageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
+    },
+    {
+      "id": "node.integration.report",
+      "title": "Build a multi-file chart report",
+      "summary": "Use a typed data module plus ApexPainter to generate both a report chart and exact JSON summary.",
+      "runtime": "node",
+      "difficulty": "integration",
+      "packages": [
+        "apexify.js"
+      ],
+      "features": [
+        "charts",
+        "output",
+        "batch"
+      ],
+      "apiSymbols": [
+        "apexify.js::ApexPainter",
+        "apexify.js::ApexPainter#createChart"
+      ],
+      "sourceFiles": [
+        "examples/node/integration-report/index.ts",
+        "examples/node/integration-report/report-data.ts"
+      ],
+      "entrypoint": "examples/node/integration-report/index.ts",
+      "outputType": "multi",
+      "expectedOutput": [
+        {
+          "path": "report.png",
+          "kind": "png",
+          "public": true,
+          "verificationMode": "metadata",
+          "width": 640,
+          "height": 360,
+          "minBytes": 500,
+          "maxBytes": 5000000
+        },
+        {
+          "path": "summary.json",
+          "kind": "json",
+          "public": false,
+          "verificationMode": "semantic",
+          "jsonEquals": {
+            "total": 180,
+            "highest": "Docs",
+            "entries": 3
+          }
+        }
+      ],
+      "verification": {
+        "typecheck": true,
+        "executable": true,
+        "timeoutMs": 30000,
+        "stderrPolicy": "fail-on-error-pattern"
+      },
+      "relatedDocs": [
+        "/docs/getting-started",
+        "/docs/node/canvas"
+      ],
+      "relatedExamples": [
+        "node.chart.bar"
+      ],
+      "gallery": {
+        "enabled": true,
+        "featured": true,
+        "previewOutput": "report.png"
+      },
+      "explanation": {
+        "goal": "Prove a realistic multi-file example that produces more than one independently validated output.",
+        "prerequisites": [
+          "Node.js 22, 24, or 26",
+          "apexify.js 6.0.0"
+        ],
+        "importantOptions": [
+          "bar chart data",
+          "dimensions"
+        ],
+        "whyOptions": [
+          "Data lives in a separate typed module to prove multi-file fixture copying.",
+          "The PNG uses metadata verification while the JSON summary uses exact semantic verification."
+        ],
+        "variants": [
+          "Replace the report data module with application data while retaining the same rendering boundary."
+        ],
+        "performanceNote": "The fixture creates one 640×360 chart and one tiny JSON file; no remote resources are loaded.",
+        "errorNote": "Type errors in the imported data module fail before execution; output contract mismatches fail after execution.",
+        "nextStep": "Link the same stable example identity from feature guides and API reference metadata."
+      },
+      "schemaVersion": 1,
+      "canonicalRoute": "/examples/node.integration.report",
+      "sourceHash": "e319c93d86cacdf025a04d5601b3c523e710962d96d83e8eac564f8b8c97e52b",
+      "sources": [
+        {
+          "path": "examples/node/integration-report/index.ts",
+          "language": "typescript",
+          "sha256": "d8a40df77741530f2d5e44ca2cc4e97aab7c887eedf32b161c3d8080de71b921",
+          "content": "import { mkdir, writeFile } from 'node:fs/promises';\nimport { join } from 'node:path';\nimport { ApexPainter } from 'apexify.js';\nimport { reportEntries } from './report-data.js';\n\nconst outputDir = process.env.APEXIFY_EXAMPLE_OUTPUT_DIR;\nif (!outputDir) throw new Error('APEXIFY_EXAMPLE_OUTPUT_DIR is required.');\n\nconst painter = new ApexPainter({ type: 'buffer' });\nconst chartData = reportEntries.map((entry, index) => ({\n  label: entry.label,\n  value: entry.value,\n  xStart: index,\n  xEnd: index + 1,\n  color: entry.color,\n}));\nconst png = await painter.createChart('bar', chartData, { dimensions: { width: 640, height: 360 } });\nconst highest = [...reportEntries].sort((a, b) => b.value - a.value)[0]?.label ?? '';\nconst summary = { total: reportEntries.reduce((sum, entry) => sum + entry.value, 0), highest, entries: reportEntries.length };\n\nawait mkdir(outputDir, { recursive: true });\nawait writeFile(join(outputDir, 'report.png'), png);\nawait writeFile(join(outputDir, 'summary.json'), `${JSON.stringify(summary, null, 2)}\\n`);\nconsole.log(JSON.stringify({ example: 'node.integration.report', outputs: ['report.png', 'summary.json'], summary }));\n"
+        },
+        {
+          "path": "examples/node/integration-report/report-data.ts",
+          "language": "typescript",
+          "sha256": "5c0580406c5a67de728d38ceddea702e3252464ef43ed06eefa9f95ed5d69e81",
+          "content": "export interface ReportEntry {\n  label: string;\n  value: number;\n  color: string;\n}\n\nexport const reportEntries: ReportEntry[] = [\n  { label: 'Docs', value: 80, color: '#6366f1' },\n  { label: 'API', value: 60, color: '#8b5cf6' },\n  { label: 'Gallery', value: 40, color: '#ec4899' },\n];\n"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "report.png",
+          "kind": "png",
+          "publicPath": "/example-outputs/node.integration.report/report.png",
+          "verificationMode": "metadata",
+          "width": 640,
+          "height": 360
+        },
+        {
+          "path": "summary.json",
+          "kind": "json",
+          "publicPath": null,
+          "verificationMode": "semantic"
+        }
+      ],
+      "verificationStatus": "verified",
+      "verifiedPackageVersion": "6.0.0",
+      "verifiedPackageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
+    }
+  ]
+}

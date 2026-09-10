@@ -1,0 +1,58 @@
+[
+  {
+    "id": "node.canvas.basic",
+    "title": "Create a deterministic canvas",
+    "runtime": "node",
+    "difficulty": "minimal",
+    "features": [
+      "canvas",
+      "output"
+    ],
+    "canonicalRoute": "/examples/node.canvas.basic",
+    "verificationStatus": "verified",
+    "sourceHash": "d1603f74395a1b3c07efbf96be39ca6d867413977a29ea556c0bfc1e712649e4"
+  },
+  {
+    "id": "node.chart.bar",
+    "title": "Render a bar chart",
+    "runtime": "node",
+    "difficulty": "practical",
+    "features": [
+      "charts",
+      "canvas",
+      "output"
+    ],
+    "canonicalRoute": "/examples/node.chart.bar",
+    "verificationStatus": "verified",
+    "sourceHash": "cd7a888b8b826223996d9aa4d2a7769e6eed61bc8753315d90bd594d838c8baa"
+  },
+  {
+    "id": "node.gif.basic",
+    "title": "Generate a two-frame GIF",
+    "runtime": "node",
+    "difficulty": "advanced",
+    "features": [
+      "gif",
+      "canvas",
+      "media",
+      "output"
+    ],
+    "canonicalRoute": "/examples/node.gif.basic",
+    "verificationStatus": "verified",
+    "sourceHash": "609a9b8654f7cb2e819f8d81bc4801369625e8bdf3f522346bc281602cdcd7a8"
+  },
+  {
+    "id": "node.integration.report",
+    "title": "Build a multi-file chart report",
+    "runtime": "node",
+    "difficulty": "integration",
+    "features": [
+      "charts",
+      "output",
+      "batch"
+    ],
+    "canonicalRoute": "/examples/node.integration.report",
+    "verificationStatus": "verified",
+    "sourceHash": "e319c93d86cacdf025a04d5601b3c523e710962d96d83e8eac564f8b8c97e52b"
+  }
+]

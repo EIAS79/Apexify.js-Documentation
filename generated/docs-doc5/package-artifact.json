@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "packageName": "apexify.js",
+  "packageVersion": "6.0.0",
+  "packageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+  "artifactFilename": "apexify.js-6.0.0.tgz",
+  "artifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118",
+  "installedLocation": "isolated-consumer/node_modules/apexify.js",
+  "localSourceShortcut": false
+}

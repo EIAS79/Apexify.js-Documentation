@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "examples": [
+    {
+      "id": "node.canvas.basic",
+      "status": "verified",
+      "typecheck": true,
+      "executed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdoutSha256": "1c31099b8046b117522765a3e5787130d08e37a77f881954f508e3003187bdae",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputs": [
+        {
+          "path": "canvas-basic.png",
+          "sha256": "363a0799e5cfd1f1adaa6bfdcc30709640c89baeab5649dd97fbcd33484629d3",
+          "verificationMode": "metadata"
+        }
+      ]
+    },
+    {
+      "id": "node.chart.bar",
+      "status": "verified",
+      "typecheck": true,
+      "executed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdoutSha256": "dda7dd1cbd86dd58a326a7c2c011a9380b5321b283aeb4c51b5d5f9c56b2992d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputs": [
+        {
+          "path": "chart-bar.png",
+          "sha256": "ba1967af820c753a58ddfc46f6c99ea5c357441f8e49b5aa38acc303f698abcb",
+          "verificationMode": "metadata"
+        }
+      ]
+    },
+    {
+      "id": "node.gif.basic",
+      "status": "verified",
+      "typecheck": true,
+      "executed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdoutSha256": "d39ae1556f7b852365f6f86b576bdc72f9053d786e9065840cbdcdae3e3746fe",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputs": [
+        {
+          "path": "animation.gif",
+          "sha256": "e1fef8d9ca8920887e8792a8fcc4c99f9eaaaefdf13a35c77cd457f3345a51fb",
+          "verificationMode": "structural"
+        },
+        {
+          "path": "poster.png",
+          "sha256": "400d0cd48b5273aca153e8d340973dc94e1b810847ce1677df5de0f5aa1f18a1",
+          "verificationMode": "metadata"
+        }
+      ]
+    },
+    {
+      "id": "node.integration.report",
+      "status": "verified",
+      "typecheck": true,
+      "executed": true,
+      "exitCode": 0,
+      "timedOut": false,
+      "stdoutSha256": "666eb5c0e28340d1d099831b262e9fb8e545d9855fce4bdef37a0f82c4c8229d",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "outputs": [
+        {
+          "path": "report.png",
+          "sha256": "b3827602fe4f2325311efb9bc5855fc96c16c4e7b84b87c88fb4450104699e44",
+          "verificationMode": "metadata"
+        },
+        {
+          "path": "summary.json",
+          "sha256": "b273c62043238656416b1b39272ddd0577b7d1a2283c3da43aeafa75542dd8e4",
+          "verificationMode": "semantic"
+        }
+      ]
+    }
+  ]
+}
