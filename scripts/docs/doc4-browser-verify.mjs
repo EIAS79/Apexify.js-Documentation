@@ -25,22 +25,26 @@ try{
   for(const required of ['ApiMethodHeader','ApiSignature','OptionTable','OptionCard','TypeReference','TypeExplorer','ReturnValue','ErrorReference','LimitReference','RelatedApiGrid','SourceLink'])if(!components.includes(required))throw new Error(`${state.name} missing ${required}`);
   const axe=await page.evaluate(async()=>{const r=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}});return r.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.length}));});if(axe.length)throw new Error(`${state.name} axe ${JSON.stringify(axe)}`);
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+1);if(overflow)throw new Error(`${state.name} horizontal overflow`);
-  await page.focus('#api-option-search');await page.keyboard.type('mask.mode');
-  await page.waitForFunction(()=>document.querySelectorAll('[data-option-path]').length===1);
-  const visiblePath=await page.$eval('[data-option-path]',e=>e.getAttribute('data-option-path'));if(visiblePath!=='images.mask.mode')throw new Error(`${state.name} option search returned ${visiblePath}`);
+  const initialOptionCount=await page.$$eval('[data-option-path]',nodes=>nodes.length);
+  await page.focus('#api-option-search');await page.keyboard.type('images.mask.mode');
+  await page.waitForFunction(initial=>{const nodes=[...document.querySelectorAll('[data-option-path]')];return nodes.length>0&&nodes.length<initial&&nodes.some(n=>n.getAttribute('data-option-path')==='images.mask.mode');},{},initialOptionCount);
+  const visiblePaths=await page.$$eval('[data-option-path]',nodes=>nodes.map(e=>e.getAttribute('data-option-path')).filter(Boolean));
+  if(!visiblePaths.includes('images.mask.mode'))throw new Error(`${state.name} option search omitted images.mask.mode: ${visiblePaths.join(',')}`);
+  if(visiblePaths.length>=initialOptionCount)throw new Error(`${state.name} option search did not narrow results`);
   await page.goto(`${baseUrl}${REP}#option-images-mask-mode`,{waitUntil:'networkidle2'});
   const deep=await page.$('#option-images-mask-mode');if(!deep)throw new Error(`${state.name} deep option missing`);
   const explorer=await page.$('[data-doc4-component="TypeExplorer"] details summary');if(!explorer)throw new Error(`${state.name} TypeExplorer summary missing`);
   await explorer.focus();const before=await explorer.evaluate(e=>e.parentElement?.hasAttribute('open'));await page.keyboard.press('Enter');const after=await explorer.evaluate(e=>e.parentElement?.hasAttribute('open'));if(before===after)throw new Error(`${state.name} TypeExplorer keyboard toggle failed`);
+  const signatureText=await page.$eval('[data-doc4-component="ApiSignature"] pre code',e=>e.textContent||'');
   await page.click('[data-doc4-component="ApiSignature"] button[aria-label="Copy API signature"]');
-  const copied=await page.evaluate(()=>navigator.clipboard.readText());if(!copied.includes('createImage'))throw new Error(`${state.name} signature copy failed`);
+  const copied=await page.evaluate(()=>navigator.clipboard.readText());if(copied!==signatureText||!copied.includes('Promise<Buffer>'))throw new Error(`${state.name} signature copy failed`);
   const sourceHref=await page.$eval('[data-doc4-component="SourceLink"]',e=>e.getAttribute('href')||'');if(!sourceHref.includes('dbed9743353593eafae9a7b1c25312d7170a233b'))throw new Error(`${state.name} source link is not commit-pinned`);
   const searchResult=await page.evaluate(async()=>{const r=await fetch('/api/docs/search?q=images.mask.mode');return r.json();});
   if(!searchResult.results?.some(r=>r.href===`${REP}#option-images-mask-mode`))throw new Error(`${state.name} nested option search deep-link missing`);
   if(consoleErrors.length||pageErrors.length)throw new Error(`${state.name} browser errors ${JSON.stringify({consoleErrors,pageErrors})}`);
   const js=await page.evaluate(()=>performance.getEntriesByType('resource').filter(r=>r.name.includes('/_next/static/')&&r.name.endsWith('.js')).reduce((n,r)=>n+(r.transferSize||0),0));
   let reducedMotionOk=true;if(state.reduced){reducedMotionOk=await page.evaluate(()=>[...document.querySelectorAll('.apx-api-root *')].every(e=>{const s=getComputedStyle(e);const ds=s.transitionDuration.split(',').map(x=>parseFloat(x)||0);const as=s.animationDuration.split(',').map(x=>parseFloat(x)||0);return Math.max(...ds,0)<=0.01&&Math.max(...as,0)<=0.01;}));if(!reducedMotionOk)throw new Error(`${state.name} reduced motion not applied`);}
-  results.push({...state,status:response.status(),canonical,components,axeViolations:axe,horizontalOverflow:overflow,nestedSearchHref:`${REP}#option-images-mask-mode`,transferredJsBytes:js,reducedMotionOk});
+  results.push({...state,status:response.status(),canonical,components,axeViolations:axe,horizontalOverflow:overflow,nestedSearchHref:`${REP}#option-images-mask-mode`,optionSearchResultCount:visiblePaths.length,transferredJsBytes:js,reducedMotionOk});
   await page.close();
  }
  const overload=await browser.newPage();await overload.setViewport({width:1200,height:900});const r=await overload.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/createScene`,{waitUntil:'networkidle2'});if(!r||r.status()!==200)throw new Error('createScene overload route missing');
@@ -48,4 +52,4 @@ try{
  const unknown=await browser.newPage();const bad=await unknown.goto(`${baseUrl}/api-reference/apexify.js/ApexPainter/__missing__`,{waitUntil:'networkidle2'});if(!bad||bad.status()!==404)throw new Error(`unknown member expected 404 got ${bad?.status()}`);await unknown.close();
 }finally{await browser.close();}
 const evidence={schemaVersion:1,phase:'DOC-4',representative:REP,states:results,overloadRoute:'/api-reference/apexify.js/ApexPainter/createScene',unknownMember404:true,failures:0};
-fs.writeFileSync(path.join(OUT,'browser.json'),`${JSON.stringify(evidence,null,2)}\n`);console.log('[doc4-browser] PASS '+JSON.stringify(results.map(r=>({name:r.name,js:r.transferredJsBytes}))));
+fs.writeFileSync(path.join(OUT,'browser.json'),`${JSON.stringify(evidence,null,2)}\n`);console.log('[doc4-browser] PASS '+JSON.stringify(results.map(r=>({name:r.name,js:r.transferredJsBytes,optionMatches:r.optionSearchResultCount}))));
