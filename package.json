@@ -63,7 +63,7 @@
     "docs:examples:verify": "tsx scripts/docs/doc5-runner.ts && npm run docs:examples:manifest",
     "docs:examples:coverage": "npm run docs:examples:validate",
     "docs:test:examples": "tsx --test scripts/docs/doc5.test.ts scripts/docs/doc5-runner.test.ts",
-    "docs:verify:doc5": "npm run docs:examples:validate && npm run docs:test:examples && tsx scripts/docs/doc5-verify.ts && npm run docs:verify:doc4",
+    "docs:verify:doc5": "npm run docs:examples:validate && npm run docs:test:examples && tsx scripts/docs/doc5-verify.ts && npm run docs:generate:doc3 && npm run docs:verify:doc4",
     "docs:measure:doc5": "node scripts/docs/doc5-build-measure.mjs",
     "docs:browser:doc5": "node scripts/docs/doc5-browser-verify.mjs",
     "docs:finalize:doc5": "node scripts/docs/doc5-finalize.mjs",
