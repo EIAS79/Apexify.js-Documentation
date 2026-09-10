@@ -87,22 +87,40 @@ export function SignatureControls({
   permalink: string;
 }) {
   const [active, setActive] = useState(0);
+  const [copied, setCopied] = useState(false);
   const current = overloads[Math.min(active, overloads.length - 1)];
 
   async function copy() {
     if (!current) return;
     await navigator.clipboard.writeText(current.text);
+    setCopied(true);
   }
 
   if (!current) return null;
   return (
-    <div className="apx-api-signature" data-doc4-component="ApiSignature">
-      <OverloadTabs overloads={overloads} active={active} onChange={setActive} />
+    <div
+      className="apx-api-signature"
+      data-doc4-component="ApiSignature"
+      data-signature-text={current.text}
+    >
+      <OverloadTabs
+        overloads={overloads}
+        active={active}
+        onChange={(index) => {
+          setActive(index);
+          setCopied(false);
+        }}
+      />
       <div className="apx-api-signature__bar">
         <span>TypeScript</span>
         <div>
-          <button type="button" onClick={copy} aria-label="Copy API signature">
-            Copy
+          <button
+            type="button"
+            onClick={copy}
+            aria-label="Copy API signature"
+            data-copy-state={copied ? 'copied' : 'idle'}
+          >
+            {copied ? 'Copied' : 'Copy'}
           </button>
           <a href={permalink} aria-label="Permalink to API signature">
             Permalink
