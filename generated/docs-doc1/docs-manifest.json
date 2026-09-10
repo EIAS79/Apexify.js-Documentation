@@ -120,6 +120,11 @@
         },
         {
           "level": 2,
+          "id": "signature-types",
+          "text": "Signature & types"
+        },
+        {
+          "level": 2,
           "id": "minimal-workflow",
           "text": "Minimal workflow"
         },
