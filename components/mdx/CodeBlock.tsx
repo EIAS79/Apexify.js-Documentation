@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ClipboardIcon, CheckIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { composeStudioSnippetFromDocs, STUDIO_INCOMING_SNIPPET_KEY } from '@/lib/studio/studioConfig';
 
 interface CodeBlockProps {
@@ -125,7 +125,7 @@ export function CodeBlock({
           <div className="p-3 sm:p-4 min-w-0">
             <SyntaxHighlighter
               language={normalizedLanguage}
-              style={vscDarkPlus}
+              style={a11yDark}
               customStyle={{
                 margin: 0,
                 padding: 0,
@@ -137,7 +137,7 @@ export function CodeBlock({
               }}
               showLineNumbers={true}
               lineNumberStyle={{
-                color: '#9ca3af',
+                color: '#b8c0cc',
                 paddingRight: '1rem',
                 minWidth: '2.5em',
                 userSelect: 'none',
