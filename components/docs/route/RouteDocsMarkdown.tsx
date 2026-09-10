@@ -199,7 +199,7 @@ const markdownComponents: Components = {
         className="my-6 overflow-x-auto rounded-xl"
         style={{ border: '1px solid var(--border-default)' }}
         tabIndex={0}
-        role="region"
+        role="group"
         aria-label="Documentation table"
       >
         <table {...props} className="w-full border-collapse text-left text-sm">
