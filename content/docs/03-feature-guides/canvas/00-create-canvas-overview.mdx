@@ -27,6 +27,17 @@ legacyHashes: ["00-create-canvas-overview"]
 `await painter.createCanvas(config[, painterOpts])` allocates an `@napi-rs/canvas` surface, paints configured backgrounds and effects, and returns PNG bytes plus the effective canvas configuration.
 </Callout>
 
+## Signature & types
+
+```typescript
+await painter.createCanvas(
+  config: CanvasConfig,
+  painterOpts?: { resolveAssetRefs?: boolean }
+): Promise<CanvasResults>;
+```
+
+`CanvasConfig` and `CanvasResults` are the primary configuration and result contracts for the Node canvas workflow. The `signature-types` heading remains canonical so legacy deep links continue to resolve after the DOC-3 component migration.
+
 <Prerequisites>
 - Apexify.js 6.0.0 installed in a Node runtime.
 - An `ApexPainter` instance configured for buffer output.
