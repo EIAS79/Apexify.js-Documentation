@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "modes": [
+    "light",
+    "dark",
+    "system"
+  ],
+  "semanticTokenSource": "styles/docs-tokens.css",
+  "darkOverridePresent": true,
+  "prePaintBootstrap": true,
+  "systemMatchMedia": true,
+  "hydrationSuppressionScopedToHtml": true
+}

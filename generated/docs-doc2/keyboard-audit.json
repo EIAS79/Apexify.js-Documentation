@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "skipToContent": true,
+  "drawerEscape": true,
+  "drawerTabTrap": true,
+  "focusReturn": true,
+  "searchShortcut": true,
+  "canonicalLinks": true
+}

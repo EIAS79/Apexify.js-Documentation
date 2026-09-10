@@ -85,8 +85,8 @@ const markdownComponents: Components = {
         className="rounded-md px-2 py-1 font-mono text-sm"
         style={{
           backgroundColor: 'var(--bg-sunken)',
-          color: 'var(--accent-magenta)',
-          border: '1px solid var(--border-subtle)',
+          color: 'var(--text-primary)',
+          border: '1px solid var(--border-default)',
           overflowWrap: 'anywhere',
           wordBreak: 'break-word',
         }}
@@ -144,7 +144,7 @@ const markdownComponents: Components = {
   },
   em({ node: _node, children, ...props }) {
     return (
-      <em {...props} className="italic" style={{ color: 'var(--accent-iris)' }}>
+      <em {...props} className="italic" style={{ color: 'var(--text-primary)' }}>
         {children}
       </em>
     );
@@ -153,8 +153,8 @@ const markdownComponents: Components = {
     const targetHref = canonicalizeLegacyDocumentationHref(href);
     const className = 'font-medium underline transition-colors';
     const style = {
-      color: 'var(--accent-iris)',
-      textDecorationColor: 'color-mix(in srgb, var(--accent-iris) 50%, transparent)',
+      color: 'var(--text-primary)',
+      textDecorationColor: 'var(--accent-iris)',
     };
     if (targetHref.startsWith('/')) {
       return (
@@ -195,7 +195,13 @@ const markdownComponents: Components = {
   },
   table({ node: _node, children, ...props }) {
     return (
-      <div className="my-6 overflow-x-auto rounded-xl" style={{ border: '1px solid var(--border-default)' }}>
+      <div
+        className="my-6 overflow-x-auto rounded-xl"
+        style={{ border: '1px solid var(--border-default)' }}
+        tabIndex={0}
+        role="group"
+        aria-label="Documentation table"
+      >
         <table {...props} className="w-full border-collapse text-left text-sm">
           {children}
         </table>

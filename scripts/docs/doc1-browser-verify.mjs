@@ -102,12 +102,12 @@ try {
   );
 
   const routedNavHrefs = await page.$$eval(
-    '[data-doc1-route-sidebar] a[href^="/docs/"]',
+    'nav[aria-label="Documentation"] a[href^="/docs/"]',
     (links) => links.map((link) => link.getAttribute('href')),
   );
   assert(
     routedNavHrefs.includes('/docs/node/canvas'),
-    'route sidebar does not expose canonical Canvas navigation',
+    'documentation navigation does not expose canonical Canvas navigation',
   );
 
   await page.waitForSelector('#docs-toc-rail a[href^="#"]');
@@ -172,13 +172,13 @@ try {
   await page.goto(`${BASE_URL}/docs/node/canvas`, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('[data-doc-article] h1');
 
-  const tocButton = await page.$('button[aria-label="On this page"]');
+  const tocButton = await page.$('button[aria-label="Open on this page navigation"]');
   assert(Boolean(tocButton), 'mobile On this page control is missing');
 
-  await page.click('button[aria-label="Toggle docs navigation"]');
-  await page.waitForSelector('[data-doc1-route-sidebar] #docs-sidebar-search-input');
+  await page.click('button[aria-label="Open documentation navigation"]');
+  await page.waitForSelector('[role="dialog"][aria-label="Documentation navigation"] #docs-drawer-search-input');
   const mobileNavHref = await page.$eval(
-    '[data-doc1-route-sidebar] a[href="/docs/getting-started"]',
+    '[role="dialog"][aria-label="Documentation navigation"] nav[aria-label="Documentation"] a[href="/docs/getting-started"]',
     (element) => element.getAttribute('href'),
   );
   assert(mobileNavHref === '/docs/getting-started', 'mobile sidebar canonical link missing');

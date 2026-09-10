@@ -1,0 +1,86 @@
+name: DOC-2 Starting Baseline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - doc2-design-system-shell
+    paths:
+      - 'scripts/docs/doc2-baseline-browser.mjs'
+      - '.github/workflows/doc2-baseline.yml'
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC2_BASE_URL: http://127.0.0.1:3000
+  DOC2_STARTING_SHA: c3d0799b8fb67fd7c86d48aceaa8c88e5e3d649f
+
+jobs:
+  baseline:
+    name: Measure untouched DOC-2 base
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Deterministic install
+        run: npm ci
+      - name: Clean build and DOC-1 bundle measurement
+        run: npm run docs:measure:doc1
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc2-base-next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/docs/node/canvas >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc2-base-next.log
+          exit 1
+      - name: Browser/accessibility/responsive baseline
+        run: node scripts/docs/doc2-baseline-browser.mjs
+      - name: Lighthouse desktop baseline
+        shell: bash
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:3000/docs/node/canvas \
+            --preset=desktop \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --output=json \
+            --output-path=.doc2-baseline-evidence/lighthouse-desktop.json \
+            --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+      - name: Lighthouse mobile baseline
+        shell: bash
+        run: |
+          npx --yes lighthouse@12.8.2 http://127.0.0.1:3000/docs/node/canvas \
+            --only-categories=performance,accessibility,best-practices,seo \
+            --output=json \
+            --output-path=.doc2-baseline-evidence/lighthouse-mobile.json \
+            --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+      - name: Print baseline
+        run: cat .doc2-baseline-evidence/baseline.json
+      - name: Upload baseline evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc2-starting-baseline
+          path: |
+            .doc2-baseline-evidence
+            .doc1-runtime-evidence/build-bundle.json
+            /tmp/doc2-base-next.log
+          include-hidden-files: true
+          if-no-files-found: error

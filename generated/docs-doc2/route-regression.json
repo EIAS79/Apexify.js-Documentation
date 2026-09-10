@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "routedPages": [
+    {
+      "slug": "getting-started",
+      "canonicalPath": "/docs/getting-started"
+    },
+    {
+      "slug": "node/canvas",
+      "canonicalPath": "/docs/node/canvas"
+    },
+    {
+      "slug": "node/canvas/size-and-coordinates",
+      "canonicalPath": "/docs/node/canvas/size-and-coordinates"
+    }
+  ],
+  "routedCount": 3,
+  "legacyFallbackCount": 145,
+  "navigationOrder": [
+    "/docs/getting-started",
+    "/docs/node/canvas",
+    "/docs/node/canvas/size-and-coordinates"
+  ],
+  "catchAllServer": true,
+  "staticParams": true,
+  "canonicalMetadata": true,
+  "unknownRoute404": true
+}

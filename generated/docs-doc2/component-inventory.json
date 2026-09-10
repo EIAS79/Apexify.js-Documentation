@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "components": [
+    {
+      "file": "app/docs/[...slug]/page.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "app/docs/layout.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "components/docs/content/DocsPageHero.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "components/docs/DocsSidebarSearch.tsx",
+      "boundary": "client"
+    },
+    {
+      "file": "components/docs/navigation/DocsNavigationChrome.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "components/docs/navigation/DocsSidebarV2.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "components/docs/navigation/OnThisPageV2.tsx",
+      "boundary": "client"
+    },
+    {
+      "file": "components/docs/route/RouteDocsMarkdown.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "components/docs/shell/AccessibleDrawer.tsx",
+      "boundary": "client"
+    },
+    {
+      "file": "components/docs/shell/DocsHeader.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "components/docs/shell/DocsSearchTrigger.tsx",
+      "boundary": "client"
+    },
+    {
+      "file": "components/docs/shell/DocsShell.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "components/docs/shell/LegacyDocsRedirectIsland.tsx",
+      "boundary": "client"
+    },
+    {
+      "file": "components/docs/shell/LegacyDocsSidebarToggle.tsx",
+      "boundary": "client"
+    },
+    {
+      "file": "components/docs/status/DocsBadges.tsx",
+      "boundary": "server"
+    },
+    {
+      "file": "components/ThemeToggle.tsx",
+      "boundary": "client"
+    }
+  ]
+}

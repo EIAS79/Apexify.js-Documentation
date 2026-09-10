@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-2",
+  "files": [
+    {
+      "name": "accessibility-audit.json",
+      "sha256": "1986673df3005949de592b0f1066bfe727200d03c6aaa94f7ee7cc3c59eb1161"
+    },
+    {
+      "name": "baseline.json",
+      "sha256": "6cd1ecfbbd440abb60d8291a200235ab93d1b8c824ddbe4a197db92facab07e0"
+    },
+    {
+      "name": "client-boundaries.json",
+      "sha256": "6c6fbe3c0a8843921bc5a683236b33be24294accaae48e5e65d84f9f673277f7"
+    },
+    {
+      "name": "component-inventory.json",
+      "sha256": "6ea6d9b63432e225e45a43644859570811604fb34f2ba796c7ea15366f6967e9"
+    },
+    {
+      "name": "dependency-audit.json",
+      "sha256": "32e96656664b73ffc4a36ce6b5990213e226c368a9f9dc7102243a9fd81b1b9d"
+    },
+    {
+      "name": "focus-audit.json",
+      "sha256": "561fb5805ba10d656781a8b79263d58674f2def1fec2db01fcd75beca1fd6425"
+    },
+    {
+      "name": "identity.json",
+      "sha256": "4455212b98127592bf71f692ff9d7587f8c105f020c4f13b8b9e0ec52e94e795"
+    },
+    {
+      "name": "keyboard-audit.json",
+      "sha256": "721da247bd78ef81e64f7680e8d58cc6c1309c0163a75258f9845a7d676969b4"
+    },
+    {
+      "name": "reduced-motion-audit.json",
+      "sha256": "4426805781ed6cf6dd8aad55b8b3717a916e2e5b63ecefe3446643b2ef596b02"
+    },
+    {
+      "name": "responsive-audit.json",
+      "sha256": "549a7ecc576527acd61878268271076282a2a02bbd6f1358fbc4e7a888292a2c"
+    },
+    {
+      "name": "route-regression.json",
+      "sha256": "92182fa43ea76cb3312b85d12062c6057ba09f6bf1e9ea2570cb957a0f95f27d"
+    },
+    {
+      "name": "theme-audit.json",
+      "sha256": "0df28225752b82ae46a0e40b4c55c7e5781600b6a39b80903b680a631fb2a18a"
+    },
+    {
+      "name": "token-audit.json",
+      "sha256": "e574042602a3b1138b3081bf1f7d2b4911d16ca37b5fbb5247316135535bd4db"
+    }
+  ]
+}
