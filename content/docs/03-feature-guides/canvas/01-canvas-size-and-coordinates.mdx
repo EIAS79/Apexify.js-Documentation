@@ -33,6 +33,10 @@ legacyHashes: ["01-canvas-size-and-coordinates"]
 <BeforeAfter before="Omit dimensions and rely on the 500 × 500 fallback." after="Set explicit dimensions when output size is part of the contract." beforeLabel="Implicit sizing" afterLabel="Production sizing" />
 <CodeBlockV2 language="typescript" code="await painter.createCanvas({ width: 1920, height: 1080, colorBg: '#000000' });" studio={true} />
 
+<CodeGroup ariaLabel="Canvas sizing configuration fragments" items={[{"label":"Explicit dimensions","language":"typescript","content":"{ width: 1920, height: 1080 }"},{"label":"Inherited image sizing","language":"typescript","content":"{ customBg: { source: imageSource, inherit: true } }"}]} />
+
+The grouped fragments above compare sizing policy only; they are not separate executable examples. The canonical runnable source remains the stable DOC-5 example linked from the canvas overview.
+
 If both dimensions remain unset after inherited image/video sizing opportunities, the creator defaults to **500 × 500**.
 
 <Details summary="When can another source determine size?" open={false}>
