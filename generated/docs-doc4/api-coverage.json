@@ -1,0 +1,29 @@
+{
+  "documentedMembers": 93,
+  "documentedOptionPaths": 17233,
+  "documentedPublicExports": 217,
+  "errorsDocumented": 3,
+  "exampleLinkCoverage": 1,
+  "limitsDocumented": 6,
+  "missingIdentifiers": {
+    "exports": [],
+    "options": [],
+    "signatures": [],
+    "types": []
+  },
+  "missingOptionPaths": [],
+  "missingPublicExports": [],
+  "optionPathsTotal": 17233,
+  "publicExportsTotal": 217,
+  "publicMembersTotal": 93,
+  "runtimeMetadataCoverage": 1,
+  "schemaVersion": 1,
+  "signatureMismatches": [],
+  "signaturesVerified": 41,
+  "sourceLinkCoverage": 1,
+  "stablePublicExports": 216,
+  "staleDocumentedExports": [],
+  "staleOptionPaths": [],
+  "typesResolved": 239,
+  "unresolvedPublicTypes": []
+}

@@ -1,0 +1,3806 @@
+{
+  "allowedValues": [
+    {
+      "path": "images.align",
+      "values": [
+        "center",
+        "top",
+        "bottom",
+        "left",
+        "right",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right"
+      ]
+    },
+    {
+      "path": "images.blendMode",
+      "values": [
+        "color",
+        "color-burn",
+        "color-dodge",
+        "copy",
+        "darken",
+        "destination-atop",
+        "destination-in",
+        "destination-out",
+        "destination-over",
+        "difference",
+        "exclusion",
+        "hard-light",
+        "hue",
+        "lighten",
+        "lighter",
+        "luminosity",
+        "multiply",
+        "overlay",
+        "saturation",
+        "screen",
+        "soft-light",
+        "source-atop",
+        "source-in",
+        "source-out",
+        "source-over",
+        "xor"
+      ]
+    },
+    {
+      "path": "images.boxBackground.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "images.boxBackground.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "images.distortion.type",
+      "values": [
+        "perspective",
+        "warp",
+        "bulge",
+        "pinch"
+      ]
+    },
+    {
+      "path": "images.filterOrder",
+      "values": [
+        "pre",
+        "post"
+      ]
+    },
+    {
+      "path": "images.filters.type",
+      "values": [
+        "saturation",
+        "gaussianBlur",
+        "motionBlur",
+        "radialBlur",
+        "sharpen",
+        "noise",
+        "grain",
+        "edgeDetection",
+        "emboss",
+        "invert",
+        "grayscale",
+        "sepia",
+        "pixelate",
+        "brightness",
+        "contrast",
+        "hueShift",
+        "posterize"
+      ]
+    },
+    {
+      "path": "images.fit",
+      "values": [
+        "fill",
+        "contain",
+        "cover"
+      ]
+    },
+    {
+      "path": "images.inherit",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "path": "images.mask.mode",
+      "values": [
+        "alpha",
+        "luminance",
+        "inverse"
+      ]
+    },
+    {
+      "path": "images.shadow.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "images.shadow.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "images.shape.fill",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "path": "images.shape.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "images.shape.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "images.stroke.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "images.stroke.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "images.stroke.style",
+      "values": [
+        "solid",
+        "dashed",
+        "dotted",
+        "groove",
+        "ridge",
+        "double"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.blendMode",
+      "values": [
+        "color",
+        "color-burn",
+        "color-dodge",
+        "copy",
+        "darken",
+        "destination-atop",
+        "destination-in",
+        "destination-out",
+        "destination-over",
+        "difference",
+        "exclusion",
+        "hard-light",
+        "hue",
+        "lighten",
+        "lighter",
+        "luminosity",
+        "multiply",
+        "overlay",
+        "saturation",
+        "screen",
+        "soft-light",
+        "source-atop",
+        "source-in",
+        "source-out",
+        "source-over",
+        "xor"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.type",
+      "values": [
+        "color"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.align",
+      "values": [
+        "center",
+        "top",
+        "bottom",
+        "left",
+        "right",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.fit",
+      "values": [
+        "fill",
+        "contain",
+        "cover"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.repeat",
+      "values": [
+        "repeat",
+        "no-repeat",
+        "repeat-x",
+        "repeat-y"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.pattern.blendMode",
+      "values": [
+        "color",
+        "color-burn",
+        "color-dodge",
+        "copy",
+        "darken",
+        "destination-atop",
+        "destination-in",
+        "destination-out",
+        "destination-over",
+        "difference",
+        "exclusion",
+        "hard-light",
+        "hue",
+        "lighten",
+        "lighter",
+        "luminosity",
+        "multiply",
+        "overlay",
+        "saturation",
+        "screen",
+        "soft-light",
+        "source-atop",
+        "source-in",
+        "source-out",
+        "source-over",
+        "xor"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.pattern.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.pattern.gradient.type",
+      "values": [
+        "linear",
+        "radial",
+        "conic"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.pattern.repeat",
+      "values": [
+        "repeat",
+        "no-repeat",
+        "repeat-x",
+        "repeat-y"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.bgLayers.pattern.type",
+      "values": [
+        "grid",
+        "dots",
+        "diagonal",
+        "stripes",
+        "waves",
+        "crosses",
+        "hexagons",
+        "checkerboard",
+        "diamonds",
+        "triangles",
+        "stars",
+        "polka",
+        "custom"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.blendMode",
+      "values": [
+        "color",
+        "color-burn",
+        "color-dodge",
+        "copy",
+        "darken",
+        "destination-atop",
+        "destination-in",
+        "destination-out",
+        "destination-over",
+        "difference",
+        "exclusion",
+        "hard-light",
+        "hue",
+        "lighten",
+        "lighter",
+        "luminosity",
+        "multiply",
+        "overlay",
+        "saturation",
+        "screen",
+        "soft-light",
+        "source-atop",
+        "source-in",
+        "source-out",
+        "source-over",
+        "xor"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.customBg.align",
+      "values": [
+        "center",
+        "top",
+        "bottom",
+        "left",
+        "right",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.customBg.filters.type",
+      "values": [
+        "saturation",
+        "gaussianBlur",
+        "motionBlur",
+        "radialBlur",
+        "sharpen",
+        "noise",
+        "grain",
+        "edgeDetection",
+        "emboss",
+        "invert",
+        "grayscale",
+        "sepia",
+        "pixelate",
+        "brightness",
+        "contrast",
+        "hueShift",
+        "posterize"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.customBg.fit",
+      "values": [
+        "fill",
+        "contain",
+        "cover"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.customBg.inherit",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.gradientBg.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.gradientBg.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.patternBg.blendMode",
+      "values": [
+        "color",
+        "color-burn",
+        "color-dodge",
+        "copy",
+        "darken",
+        "destination-atop",
+        "destination-in",
+        "destination-out",
+        "destination-over",
+        "difference",
+        "exclusion",
+        "hard-light",
+        "hue",
+        "lighten",
+        "lighter",
+        "luminosity",
+        "multiply",
+        "overlay",
+        "saturation",
+        "screen",
+        "soft-light",
+        "source-atop",
+        "source-in",
+        "source-out",
+        "source-over",
+        "xor"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.patternBg.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.patternBg.gradient.type",
+      "values": [
+        "linear",
+        "radial",
+        "conic"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.patternBg.repeat",
+      "values": [
+        "repeat",
+        "no-repeat",
+        "repeat-x",
+        "repeat-y"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.patternBg.type",
+      "values": [
+        "grid",
+        "dots",
+        "diagonal",
+        "stripes",
+        "waves",
+        "crosses",
+        "hexagons",
+        "checkerboard",
+        "diamonds",
+        "triangles",
+        "stars",
+        "polka",
+        "custom"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.shadow.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.shadow.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.stroke.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.stroke.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.stroke.style",
+      "values": [
+        "solid",
+        "dashed",
+        "dotted",
+        "groove",
+        "ridge",
+        "double"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.transparentBase",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.videoBg.autoplay",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.videoBg.format",
+      "values": [
+        "jpg",
+        "png"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.videoBg.loop",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "path": "options.groupTransform.blendMode",
+      "values": [
+        "color",
+        "color-burn",
+        "color-dodge",
+        "copy",
+        "darken",
+        "destination-atop",
+        "destination-in",
+        "destination-out",
+        "destination-over",
+        "difference",
+        "exclusion",
+        "hard-light",
+        "hue",
+        "lighten",
+        "lighter",
+        "luminosity",
+        "multiply",
+        "overlay",
+        "saturation",
+        "screen",
+        "soft-light",
+        "source-atop",
+        "source-in",
+        "source-out",
+        "source-over",
+        "xor"
+      ]
+    },
+    {
+      "path": "options.groupTransform.boxBackground.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "options.groupTransform.boxBackground.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "options.groupTransform.distortion.type",
+      "values": [
+        "perspective",
+        "warp",
+        "bulge",
+        "pinch"
+      ]
+    },
+    {
+      "path": "options.groupTransform.filterOrder",
+      "values": [
+        "pre",
+        "post"
+      ]
+    },
+    {
+      "path": "options.groupTransform.filters.type",
+      "values": [
+        "saturation",
+        "gaussianBlur",
+        "motionBlur",
+        "radialBlur",
+        "sharpen",
+        "noise",
+        "grain",
+        "edgeDetection",
+        "emboss",
+        "invert",
+        "grayscale",
+        "sepia",
+        "pixelate",
+        "brightness",
+        "contrast",
+        "hueShift",
+        "posterize"
+      ]
+    },
+    {
+      "path": "options.groupTransform.mask.mode",
+      "values": [
+        "alpha",
+        "luminance",
+        "inverse"
+      ]
+    },
+    {
+      "path": "options.groupTransform.shadow.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "options.groupTransform.shadow.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "options.groupTransform.stroke.gradient.repeat",
+      "values": [
+        "repeat",
+        "reflect",
+        "no-repeat"
+      ]
+    },
+    {
+      "path": "options.groupTransform.stroke.gradient.type",
+      "values": [
+        "linear"
+      ]
+    },
+    {
+      "path": "options.groupTransform.stroke.style",
+      "values": [
+        "solid",
+        "dashed",
+        "dotted",
+        "groove",
+        "ridge",
+        "double"
+      ]
+    },
+    {
+      "path": "options.isGrouped",
+      "values": [
+        false,
+        true
+      ]
+    },
+    {
+      "path": "painterOpts.resolveAssetRefs",
+      "values": [
+        false,
+        true
+      ]
+    }
+  ],
+  "canonicalRoute": "/api-reference/apexify.js/ApexPainter/createImage",
+  "completion": {
+    "allowedValues": true,
+    "canonicalRoute": true,
+    "defaults": true,
+    "errors": true,
+    "everyNestedPublicOption": true,
+    "everyOption": true,
+    "everyOverload": true,
+    "everyParameter": true,
+    "examples": true,
+    "limits": true,
+    "nestedTypeStructure": true,
+    "optionDeepLinks": true,
+    "optionTypes": true,
+    "owner": true,
+    "packageExportPath": true,
+    "publicSymbolIdentity": true,
+    "referencedTypes": true,
+    "relatedApis": true,
+    "requiredState": true,
+    "returnValue": true,
+    "runtimeConstraints": true,
+    "searchRecord": true,
+    "signature": true,
+    "sourceLink": true,
+    "stabilityDeprecation": true
+  },
+  "defaults": [
+    {
+      "path": "images.align",
+      "value": "center"
+    },
+    {
+      "path": "images.fit",
+      "value": "fill"
+    },
+    {
+      "path": "images.mask.mode",
+      "value": "alpha"
+    },
+    {
+      "path": "painterOpts.resolveAssetRefs",
+      "value": false
+    }
+  ],
+  "errors": [
+    {
+      "className": "ApexifyInputError",
+      "condition": "Required source/x/y data is absent, the image list is empty, or validated image options are invalid.",
+      "recoverability": "Correct input and retry.",
+      "resolution": "Provide the required fields and values accepted by the published declaration/validators."
+    },
+    {
+      "className": "ApexifyDecodeError",
+      "condition": "A supplied image source cannot be decoded as supported image data.",
+      "recoverability": "Replace/fix source and retry.",
+      "resolution": "Use a supported, decodable image source within configured limits."
+    },
+    {
+      "className": "ApexifyResourceLimitError",
+      "condition": "Image dimensions, source bytes, decoded pixels/frames, filters, or collection work exceed active RenderLimits.",
+      "recoverability": "Reduce input or adjust policy, then retry.",
+      "resolution": "Reduce the workload or explicitly configure safe process-wide RenderLimits."
+    }
+  ],
+  "examples": [
+    {
+      "href": "/docs/node/images-shapes",
+      "id": "image-basic",
+      "label": "Images & Shapes guide"
+    }
+  ],
+  "exportPath": ".",
+  "id": "apexify.js::ApexPainter#createImage",
+  "limits": [
+    {
+      "context": "Bounds configured image width/height and decoded image dimensions.",
+      "name": "maxCanvasDimension",
+      "sourcePath": "lib-next/runtime/config.ts",
+      "unit": "px",
+      "value": 16384
+    },
+    {
+      "context": "Bounds image/shape collection work.",
+      "name": "maxCollectionItems",
+      "sourcePath": "lib-next/runtime/config.ts",
+      "unit": "items",
+      "value": 2048
+    },
+    {
+      "context": "Bounds filters applied in one image operation.",
+      "name": "maxFiltersPerOperation",
+      "sourcePath": "lib-next/runtime/config.ts",
+      "unit": "filters",
+      "value": 64
+    },
+    {
+      "context": "Bounds accepted image source bytes.",
+      "name": "maxImageSourceBytes",
+      "sourcePath": "lib-next/runtime/config.ts",
+      "unit": "bytes",
+      "value": 67108864
+    },
+    {
+      "context": "Bounds decoded image pixel count.",
+      "name": "maxDecodedImagePixels",
+      "sourcePath": "lib-next/runtime/config.ts",
+      "unit": "pixels",
+      "value": 67108864
+    },
+    {
+      "context": "Bounds decoded image frame count.",
+      "name": "maxDecodedImageFrames",
+      "sourcePath": "lib-next/runtime/config.ts",
+      "unit": "frames",
+      "value": 128
+    }
+  ],
+  "optionCount": 483,
+  "optionPaths": [
+    "canvasBuffer.buffer",
+    "canvasBuffer.canvas",
+    "canvasBuffer.canvas.bgLayers",
+    "canvasBuffer.canvas.bgLayers.align",
+    "canvasBuffer.canvas.bgLayers.blendMode",
+    "canvasBuffer.canvas.bgLayers.fit",
+    "canvasBuffer.canvas.bgLayers.intensity",
+    "canvasBuffer.canvas.bgLayers.opacity",
+    "canvasBuffer.canvas.bgLayers.pattern",
+    "canvasBuffer.canvas.bgLayers.pattern.blendMode",
+    "canvasBuffer.canvas.bgLayers.pattern.color",
+    "canvasBuffer.canvas.bgLayers.pattern.customPatternImage",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.angle",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.centerX",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.centerY",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.colors",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.colors.color",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.colors.stop",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.endRadius",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.endX",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.endY",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.repeat",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.startAngle",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.startRadius",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.startX",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.startY",
+    "canvasBuffer.canvas.bgLayers.pattern.gradient.type",
+    "canvasBuffer.canvas.bgLayers.pattern.offsetX",
+    "canvasBuffer.canvas.bgLayers.pattern.offsetY",
+    "canvasBuffer.canvas.bgLayers.pattern.opacity",
+    "canvasBuffer.canvas.bgLayers.pattern.repeat",
+    "canvasBuffer.canvas.bgLayers.pattern.rotation",
+    "canvasBuffer.canvas.bgLayers.pattern.scale",
+    "canvasBuffer.canvas.bgLayers.pattern.secondaryColor",
+    "canvasBuffer.canvas.bgLayers.pattern.size",
+    "canvasBuffer.canvas.bgLayers.pattern.spacing",
+    "canvasBuffer.canvas.bgLayers.pattern.type",
+    "canvasBuffer.canvas.bgLayers.repeat",
+    "canvasBuffer.canvas.bgLayers.source",
+    "canvasBuffer.canvas.bgLayers.type",
+    "canvasBuffer.canvas.bgLayers.value",
+    "canvasBuffer.canvas.blendMode",
+    "canvasBuffer.canvas.blur",
+    "canvasBuffer.canvas.borderPosition",
+    "canvasBuffer.canvas.borderRadius",
+    "canvasBuffer.canvas.colorBg",
+    "canvasBuffer.canvas.customBg",
+    "canvasBuffer.canvas.customBg.align",
+    "canvasBuffer.canvas.customBg.filters",
+    "canvasBuffer.canvas.customBg.filters.angle",
+    "canvasBuffer.canvas.customBg.filters.centerX",
+    "canvasBuffer.canvas.customBg.filters.centerY",
+    "canvasBuffer.canvas.customBg.filters.intensity",
+    "canvasBuffer.canvas.customBg.filters.levels",
+    "canvasBuffer.canvas.customBg.filters.radius",
+    "canvasBuffer.canvas.customBg.filters.size",
+    "canvasBuffer.canvas.customBg.filters.type",
+    "canvasBuffer.canvas.customBg.filters.value",
+    "canvasBuffer.canvas.customBg.fit",
+    "canvasBuffer.canvas.customBg.inherit",
+    "canvasBuffer.canvas.customBg.opacity",
+    "canvasBuffer.canvas.customBg.source",
+    "canvasBuffer.canvas.gradientBg",
+    "canvasBuffer.canvas.gradientBg.centerX",
+    "canvasBuffer.canvas.gradientBg.centerY",
+    "canvasBuffer.canvas.gradientBg.colors",
+    "canvasBuffer.canvas.gradientBg.colors.color",
+    "canvasBuffer.canvas.gradientBg.colors.stop",
+    "canvasBuffer.canvas.gradientBg.endRadius",
+    "canvasBuffer.canvas.gradientBg.endX",
+    "canvasBuffer.canvas.gradientBg.endY",
+    "canvasBuffer.canvas.gradientBg.pivotX",
+    "canvasBuffer.canvas.gradientBg.pivotY",
+    "canvasBuffer.canvas.gradientBg.repeat",
+    "canvasBuffer.canvas.gradientBg.rotate",
+    "canvasBuffer.canvas.gradientBg.startAngle",
+    "canvasBuffer.canvas.gradientBg.startRadius",
+    "canvasBuffer.canvas.gradientBg.startX",
+    "canvasBuffer.canvas.gradientBg.startY",
+    "canvasBuffer.canvas.gradientBg.type",
+    "canvasBuffer.canvas.height",
+    "canvasBuffer.canvas.noiseBg",
+    "canvasBuffer.canvas.noiseBg.intensity",
+    "canvasBuffer.canvas.opacity",
+    "canvasBuffer.canvas.patternBg",
+    "canvasBuffer.canvas.patternBg.blendMode",
+    "canvasBuffer.canvas.patternBg.color",
+    "canvasBuffer.canvas.patternBg.customPatternImage",
+    "canvasBuffer.canvas.patternBg.gradient",
+    "canvasBuffer.canvas.patternBg.gradient.angle",
+    "canvasBuffer.canvas.patternBg.gradient.centerX",
+    "canvasBuffer.canvas.patternBg.gradient.centerY",
+    "canvasBuffer.canvas.patternBg.gradient.colors",
+    "canvasBuffer.canvas.patternBg.gradient.colors.color",
+    "canvasBuffer.canvas.patternBg.gradient.colors.stop",
+    "canvasBuffer.canvas.patternBg.gradient.endRadius",
+    "canvasBuffer.canvas.patternBg.gradient.endX",
+    "canvasBuffer.canvas.patternBg.gradient.endY",
+    "canvasBuffer.canvas.patternBg.gradient.repeat",
+    "canvasBuffer.canvas.patternBg.gradient.startAngle",
+    "canvasBuffer.canvas.patternBg.gradient.startRadius",
+    "canvasBuffer.canvas.patternBg.gradient.startX",
+    "canvasBuffer.canvas.patternBg.gradient.startY",
+    "canvasBuffer.canvas.patternBg.gradient.type",
+    "canvasBuffer.canvas.patternBg.offsetX",
+    "canvasBuffer.canvas.patternBg.offsetY",
+    "canvasBuffer.canvas.patternBg.opacity",
+    "canvasBuffer.canvas.patternBg.repeat",
+    "canvasBuffer.canvas.patternBg.rotation",
+    "canvasBuffer.canvas.patternBg.scale",
+    "canvasBuffer.canvas.patternBg.secondaryColor",
+    "canvasBuffer.canvas.patternBg.size",
+    "canvasBuffer.canvas.patternBg.spacing",
+    "canvasBuffer.canvas.patternBg.type",
+    "canvasBuffer.canvas.rotation",
+    "canvasBuffer.canvas.shadow",
+    "canvasBuffer.canvas.shadow.blur",
+    "canvasBuffer.canvas.shadow.borderPosition",
+    "canvasBuffer.canvas.shadow.borderRadius",
+    "canvasBuffer.canvas.shadow.color",
+    "canvasBuffer.canvas.shadow.gradient",
+    "canvasBuffer.canvas.shadow.gradient.centerX",
+    "canvasBuffer.canvas.shadow.gradient.centerY",
+    "canvasBuffer.canvas.shadow.gradient.colors",
+    "canvasBuffer.canvas.shadow.gradient.colors.color",
+    "canvasBuffer.canvas.shadow.gradient.colors.stop",
+    "canvasBuffer.canvas.shadow.gradient.endRadius",
+    "canvasBuffer.canvas.shadow.gradient.endX",
+    "canvasBuffer.canvas.shadow.gradient.endY",
+    "canvasBuffer.canvas.shadow.gradient.pivotX",
+    "canvasBuffer.canvas.shadow.gradient.pivotY",
+    "canvasBuffer.canvas.shadow.gradient.repeat",
+    "canvasBuffer.canvas.shadow.gradient.rotate",
+    "canvasBuffer.canvas.shadow.gradient.startAngle",
+    "canvasBuffer.canvas.shadow.gradient.startRadius",
+    "canvasBuffer.canvas.shadow.gradient.startX",
+    "canvasBuffer.canvas.shadow.gradient.startY",
+    "canvasBuffer.canvas.shadow.gradient.type",
+    "canvasBuffer.canvas.shadow.offsetX",
+    "canvasBuffer.canvas.shadow.offsetY",
+    "canvasBuffer.canvas.shadow.opacity",
+    "canvasBuffer.canvas.shadow.roundedCorners",
+    "canvasBuffer.canvas.stroke",
+    "canvasBuffer.canvas.stroke.blur",
+    "canvasBuffer.canvas.stroke.borderPosition",
+    "canvasBuffer.canvas.stroke.borderRadius",
+    "canvasBuffer.canvas.stroke.color",
+    "canvasBuffer.canvas.stroke.gradient",
+    "canvasBuffer.canvas.stroke.gradient.centerX",
+    "canvasBuffer.canvas.stroke.gradient.centerY",
+    "canvasBuffer.canvas.stroke.gradient.colors",
+    "canvasBuffer.canvas.stroke.gradient.colors.color",
+    "canvasBuffer.canvas.stroke.gradient.colors.stop",
+    "canvasBuffer.canvas.stroke.gradient.endRadius",
+    "canvasBuffer.canvas.stroke.gradient.endX",
+    "canvasBuffer.canvas.stroke.gradient.endY",
+    "canvasBuffer.canvas.stroke.gradient.pivotX",
+    "canvasBuffer.canvas.stroke.gradient.pivotY",
+    "canvasBuffer.canvas.stroke.gradient.repeat",
+    "canvasBuffer.canvas.stroke.gradient.rotate",
+    "canvasBuffer.canvas.stroke.gradient.startAngle",
+    "canvasBuffer.canvas.stroke.gradient.startRadius",
+    "canvasBuffer.canvas.stroke.gradient.startX",
+    "canvasBuffer.canvas.stroke.gradient.startY",
+    "canvasBuffer.canvas.stroke.gradient.type",
+    "canvasBuffer.canvas.stroke.opacity",
+    "canvasBuffer.canvas.stroke.position",
+    "canvasBuffer.canvas.stroke.roundedCorners",
+    "canvasBuffer.canvas.stroke.style",
+    "canvasBuffer.canvas.stroke.width",
+    "canvasBuffer.canvas.transparentBase",
+    "canvasBuffer.canvas.videoBg",
+    "canvasBuffer.canvas.videoBg.autoplay",
+    "canvasBuffer.canvas.videoBg.format",
+    "canvasBuffer.canvas.videoBg.frame",
+    "canvasBuffer.canvas.videoBg.loop",
+    "canvasBuffer.canvas.videoBg.opacity",
+    "canvasBuffer.canvas.videoBg.quality",
+    "canvasBuffer.canvas.videoBg.source",
+    "canvasBuffer.canvas.videoBg.time",
+    "canvasBuffer.canvas.width",
+    "canvasBuffer.canvas.x",
+    "canvasBuffer.canvas.y",
+    "canvasBuffer.canvas.zoom",
+    "canvasBuffer.canvas.zoom.centerX",
+    "canvasBuffer.canvas.zoom.centerY",
+    "canvasBuffer.canvas.zoom.scale",
+    "images.align",
+    "images.blendMode",
+    "images.blur",
+    "images.borderPosition",
+    "images.borderRadius",
+    "images.boxBackground",
+    "images.boxBackground.color",
+    "images.boxBackground.gradient",
+    "images.boxBackground.gradient.centerX",
+    "images.boxBackground.gradient.centerY",
+    "images.boxBackground.gradient.colors",
+    "images.boxBackground.gradient.colors.color",
+    "images.boxBackground.gradient.colors.stop",
+    "images.boxBackground.gradient.endRadius",
+    "images.boxBackground.gradient.endX",
+    "images.boxBackground.gradient.endY",
+    "images.boxBackground.gradient.pivotX",
+    "images.boxBackground.gradient.pivotY",
+    "images.boxBackground.gradient.repeat",
+    "images.boxBackground.gradient.rotate",
+    "images.boxBackground.gradient.startAngle",
+    "images.boxBackground.gradient.startRadius",
+    "images.boxBackground.gradient.startX",
+    "images.boxBackground.gradient.startY",
+    "images.boxBackground.gradient.type",
+    "images.clipPath",
+    "images.clipPath.x",
+    "images.clipPath.y",
+    "images.distortion",
+    "images.distortion.intensity",
+    "images.distortion.points",
+    "images.distortion.points.x",
+    "images.distortion.points.y",
+    "images.distortion.type",
+    "images.effects",
+    "images.effects.chromaticAberration",
+    "images.effects.chromaticAberration.intensity",
+    "images.effects.filmGrain",
+    "images.effects.filmGrain.intensity",
+    "images.effects.lensFlare",
+    "images.effects.lensFlare.intensity",
+    "images.effects.lensFlare.x",
+    "images.effects.lensFlare.y",
+    "images.effects.vignette",
+    "images.effects.vignette.intensity",
+    "images.effects.vignette.size",
+    "images.filterIntensity",
+    "images.filterOrder",
+    "images.filters",
+    "images.filters.angle",
+    "images.filters.centerX",
+    "images.filters.centerY",
+    "images.filters.intensity",
+    "images.filters.levels",
+    "images.filters.radius",
+    "images.filters.size",
+    "images.filters.type",
+    "images.filters.value",
+    "images.fit",
+    "images.height",
+    "images.inherit",
+    "images.mask",
+    "images.mask.mode",
+    "images.mask.source",
+    "images.meshWarp",
+    "images.meshWarp.controlPoints",
+    "images.meshWarp.controlPoints.x",
+    "images.meshWarp.controlPoints.y",
+    "images.meshWarp.gridX",
+    "images.meshWarp.gridY",
+    "images.opacity",
+    "images.rotation",
+    "images.shadow",
+    "images.shadow.blur",
+    "images.shadow.borderPosition",
+    "images.shadow.borderRadius",
+    "images.shadow.color",
+    "images.shadow.gradient",
+    "images.shadow.gradient.centerX",
+    "images.shadow.gradient.centerY",
+    "images.shadow.gradient.colors",
+    "images.shadow.gradient.colors.color",
+    "images.shadow.gradient.colors.stop",
+    "images.shadow.gradient.endRadius",
+    "images.shadow.gradient.endX",
+    "images.shadow.gradient.endY",
+    "images.shadow.gradient.pivotX",
+    "images.shadow.gradient.pivotY",
+    "images.shadow.gradient.repeat",
+    "images.shadow.gradient.rotate",
+    "images.shadow.gradient.startAngle",
+    "images.shadow.gradient.startRadius",
+    "images.shadow.gradient.startX",
+    "images.shadow.gradient.startY",
+    "images.shadow.gradient.type",
+    "images.shadow.offsetX",
+    "images.shadow.offsetY",
+    "images.shadow.opacity",
+    "images.shadow.roundedCorners",
+    "images.shape",
+    "images.shape.centerX",
+    "images.shape.centerY",
+    "images.shape.color",
+    "images.shape.endAngle",
+    "images.shape.fill",
+    "images.shape.gradient",
+    "images.shape.gradient.centerX",
+    "images.shape.gradient.centerY",
+    "images.shape.gradient.colors",
+    "images.shape.gradient.colors.color",
+    "images.shape.gradient.colors.stop",
+    "images.shape.gradient.endRadius",
+    "images.shape.gradient.endX",
+    "images.shape.gradient.endY",
+    "images.shape.gradient.pivotX",
+    "images.shape.gradient.pivotY",
+    "images.shape.gradient.repeat",
+    "images.shape.gradient.rotate",
+    "images.shape.gradient.startAngle",
+    "images.shape.gradient.startRadius",
+    "images.shape.gradient.startX",
+    "images.shape.gradient.startY",
+    "images.shape.gradient.type",
+    "images.shape.innerRadius",
+    "images.shape.outerRadius",
+    "images.shape.points",
+    "images.shape.points.x",
+    "images.shape.points.y",
+    "images.shape.radius",
+    "images.shape.sides",
+    "images.shape.startAngle",
+    "images.source",
+    "images.stroke",
+    "images.stroke.blur",
+    "images.stroke.borderPosition",
+    "images.stroke.borderRadius",
+    "images.stroke.color",
+    "images.stroke.gradient",
+    "images.stroke.gradient.centerX",
+    "images.stroke.gradient.centerY",
+    "images.stroke.gradient.colors",
+    "images.stroke.gradient.colors.color",
+    "images.stroke.gradient.colors.stop",
+    "images.stroke.gradient.endRadius",
+    "images.stroke.gradient.endX",
+    "images.stroke.gradient.endY",
+    "images.stroke.gradient.pivotX",
+    "images.stroke.gradient.pivotY",
+    "images.stroke.gradient.repeat",
+    "images.stroke.gradient.rotate",
+    "images.stroke.gradient.startAngle",
+    "images.stroke.gradient.startRadius",
+    "images.stroke.gradient.startX",
+    "images.stroke.gradient.startY",
+    "images.stroke.gradient.type",
+    "images.stroke.opacity",
+    "images.stroke.position",
+    "images.stroke.roundedCorners",
+    "images.stroke.style",
+    "images.stroke.width",
+    "images.width",
+    "images.x",
+    "images.y",
+    "options.groupTransform",
+    "options.groupTransform.blendMode",
+    "options.groupTransform.blur",
+    "options.groupTransform.borderPosition",
+    "options.groupTransform.borderRadius",
+    "options.groupTransform.boxBackground",
+    "options.groupTransform.boxBackground.color",
+    "options.groupTransform.boxBackground.gradient",
+    "options.groupTransform.boxBackground.gradient.centerX",
+    "options.groupTransform.boxBackground.gradient.centerY",
+    "options.groupTransform.boxBackground.gradient.colors",
+    "options.groupTransform.boxBackground.gradient.colors.color",
+    "options.groupTransform.boxBackground.gradient.colors.stop",
+    "options.groupTransform.boxBackground.gradient.endRadius",
+    "options.groupTransform.boxBackground.gradient.endX",
+    "options.groupTransform.boxBackground.gradient.endY",
+    "options.groupTransform.boxBackground.gradient.pivotX",
+    "options.groupTransform.boxBackground.gradient.pivotY",
+    "options.groupTransform.boxBackground.gradient.repeat",
+    "options.groupTransform.boxBackground.gradient.rotate",
+    "options.groupTransform.boxBackground.gradient.startAngle",
+    "options.groupTransform.boxBackground.gradient.startRadius",
+    "options.groupTransform.boxBackground.gradient.startX",
+    "options.groupTransform.boxBackground.gradient.startY",
+    "options.groupTransform.boxBackground.gradient.type",
+    "options.groupTransform.clipPath",
+    "options.groupTransform.clipPath.x",
+    "options.groupTransform.clipPath.y",
+    "options.groupTransform.distortion",
+    "options.groupTransform.distortion.intensity",
+    "options.groupTransform.distortion.points",
+    "options.groupTransform.distortion.points.x",
+    "options.groupTransform.distortion.points.y",
+    "options.groupTransform.distortion.type",
+    "options.groupTransform.effects",
+    "options.groupTransform.effects.chromaticAberration",
+    "options.groupTransform.effects.chromaticAberration.intensity",
+    "options.groupTransform.effects.filmGrain",
+    "options.groupTransform.effects.filmGrain.intensity",
+    "options.groupTransform.effects.lensFlare",
+    "options.groupTransform.effects.lensFlare.intensity",
+    "options.groupTransform.effects.lensFlare.x",
+    "options.groupTransform.effects.lensFlare.y",
+    "options.groupTransform.effects.vignette",
+    "options.groupTransform.effects.vignette.intensity",
+    "options.groupTransform.effects.vignette.size",
+    "options.groupTransform.filterIntensity",
+    "options.groupTransform.filterOrder",
+    "options.groupTransform.filters",
+    "options.groupTransform.filters.angle",
+    "options.groupTransform.filters.centerX",
+    "options.groupTransform.filters.centerY",
+    "options.groupTransform.filters.intensity",
+    "options.groupTransform.filters.levels",
+    "options.groupTransform.filters.radius",
+    "options.groupTransform.filters.size",
+    "options.groupTransform.filters.type",
+    "options.groupTransform.filters.value",
+    "options.groupTransform.mask",
+    "options.groupTransform.mask.mode",
+    "options.groupTransform.mask.source",
+    "options.groupTransform.meshWarp",
+    "options.groupTransform.meshWarp.controlPoints",
+    "options.groupTransform.meshWarp.controlPoints.x",
+    "options.groupTransform.meshWarp.controlPoints.y",
+    "options.groupTransform.meshWarp.gridX",
+    "options.groupTransform.meshWarp.gridY",
+    "options.groupTransform.opacity",
+    "options.groupTransform.pivotX",
+    "options.groupTransform.pivotY",
+    "options.groupTransform.rotation",
+    "options.groupTransform.scaleX",
+    "options.groupTransform.scaleY",
+    "options.groupTransform.shadow",
+    "options.groupTransform.shadow.blur",
+    "options.groupTransform.shadow.borderPosition",
+    "options.groupTransform.shadow.borderRadius",
+    "options.groupTransform.shadow.color",
+    "options.groupTransform.shadow.gradient",
+    "options.groupTransform.shadow.gradient.centerX",
+    "options.groupTransform.shadow.gradient.centerY",
+    "options.groupTransform.shadow.gradient.colors",
+    "options.groupTransform.shadow.gradient.colors.color",
+    "options.groupTransform.shadow.gradient.colors.stop",
+    "options.groupTransform.shadow.gradient.endRadius",
+    "options.groupTransform.shadow.gradient.endX",
+    "options.groupTransform.shadow.gradient.endY",
+    "options.groupTransform.shadow.gradient.pivotX",
+    "options.groupTransform.shadow.gradient.pivotY",
+    "options.groupTransform.shadow.gradient.repeat",
+    "options.groupTransform.shadow.gradient.rotate",
+    "options.groupTransform.shadow.gradient.startAngle",
+    "options.groupTransform.shadow.gradient.startRadius",
+    "options.groupTransform.shadow.gradient.startX",
+    "options.groupTransform.shadow.gradient.startY",
+    "options.groupTransform.shadow.gradient.type",
+    "options.groupTransform.shadow.offsetX",
+    "options.groupTransform.shadow.offsetY",
+    "options.groupTransform.shadow.opacity",
+    "options.groupTransform.shadow.roundedCorners",
+    "options.groupTransform.stroke",
+    "options.groupTransform.stroke.blur",
+    "options.groupTransform.stroke.borderPosition",
+    "options.groupTransform.stroke.borderRadius",
+    "options.groupTransform.stroke.color",
+    "options.groupTransform.stroke.gradient",
+    "options.groupTransform.stroke.gradient.centerX",
+    "options.groupTransform.stroke.gradient.centerY",
+    "options.groupTransform.stroke.gradient.colors",
+    "options.groupTransform.stroke.gradient.colors.color",
+    "options.groupTransform.stroke.gradient.colors.stop",
+    "options.groupTransform.stroke.gradient.endRadius",
+    "options.groupTransform.stroke.gradient.endX",
+    "options.groupTransform.stroke.gradient.endY",
+    "options.groupTransform.stroke.gradient.pivotX",
+    "options.groupTransform.stroke.gradient.pivotY",
+    "options.groupTransform.stroke.gradient.repeat",
+    "options.groupTransform.stroke.gradient.rotate",
+    "options.groupTransform.stroke.gradient.startAngle",
+    "options.groupTransform.stroke.gradient.startRadius",
+    "options.groupTransform.stroke.gradient.startX",
+    "options.groupTransform.stroke.gradient.startY",
+    "options.groupTransform.stroke.gradient.type",
+    "options.groupTransform.stroke.opacity",
+    "options.groupTransform.stroke.position",
+    "options.groupTransform.stroke.roundedCorners",
+    "options.groupTransform.stroke.style",
+    "options.groupTransform.stroke.width",
+    "options.groupTransform.translateX",
+    "options.groupTransform.translateY",
+    "options.isGrouped",
+    "painterOpts.resolveAssetRefs"
+  ],
+  "overloads": 1,
+  "owner": "ApexPainter",
+  "package": "apexify.js",
+  "parameters": [
+    {
+      "name": "images",
+      "optional": false,
+      "type": "ImageProperties | ImageProperties[]"
+    },
+    {
+      "name": "canvasBuffer",
+      "optional": false,
+      "type": "Buffer<ArrayBufferLike> | CanvasResults"
+    },
+    {
+      "name": "options",
+      "optional": true,
+      "type": "CreateImageOptions"
+    },
+    {
+      "name": "painterOpts",
+      "optional": true,
+      "type": "PainterAssetRefsOptions"
+    }
+  ],
+  "related": [
+    "apexify.js::ApexPainter#createCanvas",
+    "apexify.js::ApexPainter#createText",
+    "apexify.js::ApexPainter#prepareForRender"
+  ],
+  "returnType": {
+    "elements": [
+      {
+        "kind": "reference",
+        "name": "Buffer",
+        "text": "Buffer<ArrayBufferLike>"
+      }
+    ],
+    "kind": "promise",
+    "name": "Promise",
+    "text": "Promise<Buffer<ArrayBufferLike>>"
+  },
+  "runtimeTargets": [
+    "node22",
+    "node24",
+    "node26"
+  ],
+  "schemaVersion": 1,
+  "searchRecords": [
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage",
+      "id": "search:apexify.js::ApexPainter#createImage",
+      "kind": "api-member"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-align",
+      "id": "search:apexify.js::ApexPainter#createImage::images.align",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-blendmode",
+      "id": "search:apexify.js::ApexPainter#createImage::images.blendMode",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::images.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::images.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-color",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-boxbackground-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-clippath",
+      "id": "search:apexify.js::ApexPainter#createImage::images.clipPath",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-clippath-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.clipPath.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-clippath-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.clipPath.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-points",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.points",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-points-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.points.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-points-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.points.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-type",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-chromaticaberration",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.chromaticAberration",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-chromaticaberration-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.chromaticAberration.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-filmgrain",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.filmGrain",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-filmgrain-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.filmGrain.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-lensflare",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.lensFlare",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-lensflare-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.lensFlare.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-lensflare-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.lensFlare.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-lensflare-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.lensFlare.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-vignette",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.vignette",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-vignette-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.vignette.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-effects-vignette-size",
+      "id": "search:apexify.js::ApexPainter#createImage::images.effects.vignette.size",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filterintensity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filterIntensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filterorder",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filterOrder",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-angle",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.angle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-levels",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.levels",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.radius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-size",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.size",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-type",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-value",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.value",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-fit",
+      "id": "search:apexify.js::ApexPainter#createImage::images.fit",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-height",
+      "id": "search:apexify.js::ApexPainter#createImage::images.height",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-inherit",
+      "id": "search:apexify.js::ApexPainter#createImage::images.inherit",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-mask",
+      "id": "search:apexify.js::ApexPainter#createImage::images.mask",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-mask-mode",
+      "id": "search:apexify.js::ApexPainter#createImage::images.mask.mode",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-mask-source",
+      "id": "search:apexify.js::ApexPainter#createImage::images.mask.source",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp",
+      "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-controlpoints",
+      "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-controlpoints-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-controlpoints-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-gridx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.gridX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-gridy",
+      "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.gridY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-rotation",
+      "id": "search:apexify.js::ApexPainter#createImage::images.rotation",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-color",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-offsetx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.offsetX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-offsety",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.offsetY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shadow-roundedcorners",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shadow.roundedCorners",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-color",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-endangle",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.endAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-fill",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.fill",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-innerradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.innerRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-outerradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.outerRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-points",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.points",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-points-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.points.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-points-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.points.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.radius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-sides",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.sides",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-shape-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::images.shape.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-source",
+      "id": "search:apexify.js::ApexPainter#createImage::images.source",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-color",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-position",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.position",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-roundedcorners",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.roundedCorners",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-style",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.style",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-stroke-width",
+      "id": "search:apexify.js::ApexPainter#createImage::images.stroke.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-width",
+      "id": "search:apexify.js::ApexPainter#createImage::images.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-buffer",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.buffer",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-blendmode",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.blendMode",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-value",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.value",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-align",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.align",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-fit",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.fit",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-source",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.source",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-blendmode",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.blendMode",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-custompatternimage",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.customPatternImage",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-angle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.angle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-offsetx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.offsetX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-offsety",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.offsetY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-rotation",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.rotation",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-scale",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.scale",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-secondarycolor",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.secondaryColor",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-size",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.size",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-spacing",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.spacing",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-pattern-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.pattern.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-bglayers-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.bgLayers.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-blendmode",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.blendMode",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-colorbg",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.colorBg",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-align",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.align",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-angle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.angle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-levels",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.levels",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.radius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-size",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.size",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-value",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.value",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-fit",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.fit",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-inherit",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.inherit",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-source",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.source",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-gradientbg-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.gradientBg.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-height",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.height",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-noisebg",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.noiseBg",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-noisebg-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.noiseBg.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-blendmode",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.blendMode",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-custompatternimage",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.customPatternImage",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-angle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.angle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-offsetx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.offsetX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-offsety",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.offsetY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-rotation",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.rotation",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-scale",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.scale",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-secondarycolor",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.secondaryColor",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-size",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.size",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-spacing",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.spacing",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-patternbg-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.patternBg.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-rotation",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.rotation",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-offsetx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.offsetX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-offsety",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.offsetY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-shadow-roundedcorners",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.shadow.roundedCorners",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-position",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.position",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-roundedcorners",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.roundedCorners",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-style",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.style",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-stroke-width",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.stroke.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-transparentbase",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.transparentBase",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-autoplay",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.autoplay",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-format",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.format",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-frame",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.frame",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-loop",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.loop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-quality",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.quality",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-source",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.source",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-time",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.time",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-width",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-x",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-y",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-zoom",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.zoom",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-zoom-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.zoom.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-zoom-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.zoom.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-zoom-scale",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.zoom.scale",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-blendmode",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.blendMode",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-color",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-boxbackground-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-clippath",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.clipPath",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-clippath-x",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.clipPath.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-clippath-y",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.clipPath.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-points",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.points",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-points-x",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.points.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-points-y",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.points.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-type",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-chromaticaberration",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.chromaticAberration",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-chromaticaberration-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.chromaticAberration.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-filmgrain",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.filmGrain",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-filmgrain-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.filmGrain.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-lensflare",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.lensFlare",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-lensflare-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.lensFlare.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-lensflare-x",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.lensFlare.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-lensflare-y",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.lensFlare.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-vignette",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.vignette",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-vignette-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.vignette.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-effects-vignette-size",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.effects.vignette.size",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filterintensity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filterIntensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filterorder",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filterOrder",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-angle",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.angle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-levels",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.levels",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.radius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-size",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.size",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-type",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-value",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.value",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-mask",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.mask",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-mask-mode",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.mask.mode",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-mask-source",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.mask.source",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-controlpoints",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.controlPoints",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-controlpoints-x",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.controlPoints.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-controlpoints-y",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.controlPoints.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-gridx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.gridX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-gridy",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.gridY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-rotation",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.rotation",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-scalex",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.scaleX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-scaley",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.scaleY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-color",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-offsetx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.offsetX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-offsety",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.offsetY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-shadow-roundedcorners",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.shadow.roundedCorners",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-blur",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.blur",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-borderposition",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.borderPosition",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-borderradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.borderRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-color",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-colors",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.colors",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-colors-color",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.colors.color",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-colors-stop",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.colors.stop",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-endx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.endX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-endy",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.endY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-pivotx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.pivotX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-pivoty",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.pivotY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-repeat",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.repeat",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-rotate",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.rotate",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-startx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.startX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-starty",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.startY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-type",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-endradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.endRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-startradius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.startRadius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-gradient-startangle",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.startAngle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-opacity",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.opacity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-position",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.position",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-roundedcorners",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.roundedCorners",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-style",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.style",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-stroke-width",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.stroke.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-translatex",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.translateX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-translatey",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.translateY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-isgrouped",
+      "id": "search:apexify.js::ApexPainter#createImage::options.isGrouped",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-painteropts-resolveassetrefs",
+      "id": "search:apexify.js::ApexPainter#createImage::painterOpts.resolveAssetRefs",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#errors",
+      "id": "search:apexify.js::ApexPainter#createImage::error:ApexifyInputError:1",
+      "kind": "api-error"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#errors",
+      "id": "search:apexify.js::ApexPainter#createImage::error:ApexifyDecodeError:2",
+      "kind": "api-error"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#errors",
+      "id": "search:apexify.js::ApexPainter#createImage::error:ApexifyResourceLimitError:3",
+      "kind": "api-error"
+    }
+  ],
+  "signature": "(images: ImageProperties | ImageProperties[], canvasBuffer: CanvasResults | Buffer, options?: CreateImageOptions, painterOpts?: PainterAssetRefsOptions) => Promise<Buffer>",
+  "source": {
+    "declarationPath": "dist/declarations/apex-painter/main.d.ts",
+    "href": "https://github.com/EIAS79/Apexify.js/blob/dbed9743353593eafae9a7b1c25312d7170a233b/lib-next/apex-painter/main.ts",
+    "sourcePath": "lib-next/apex-painter/main.ts"
+  },
+  "sourceLink": "https://github.com/EIAS79/Apexify.js/blob/dbed9743353593eafae9a7b1c25312d7170a233b/lib-next/apex-painter/main.ts",
+  "stability": "CURRENT",
+  "symbol": "createImage"
+}

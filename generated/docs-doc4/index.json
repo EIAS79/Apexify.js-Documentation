@@ -1,0 +1,50 @@
+{
+  "artifacts": [
+    {
+      "file": "api-coverage.json",
+      "sha256": "968fcf3482ed14dfe0b0f345891eb53b04294ab4ba153b2c61660259b47f4891"
+    },
+    {
+      "file": "api-manifest.json",
+      "sha256": "8880d430e5105d7a5bc70c27c318d78a8404abba12786a18dd5becc92f23a471"
+    },
+    {
+      "file": "api-search-index.json",
+      "sha256": "faf1b1a9af9a22aef0718ca9a83da3caea88ce5cd5966b7990bb6fbf91410bf6"
+    },
+    {
+      "file": "export-inventory.json",
+      "sha256": "15198772c766f73c4269ad7c3fe228f22ea8bab391f58315538368ca06ac8cf7"
+    },
+    {
+      "file": "identity.json",
+      "sha256": "e7fb4cf4f916b47c7080b848cd3502e6fa060adb30665152dcc7a242d1bcadc2"
+    },
+    {
+      "file": "option-coverage.json",
+      "sha256": "6be2c26fb989a2855112ddaec80be8d424f8779a0c15a684369a2fedd7314d26"
+    },
+    {
+      "file": "option-inventory.json",
+      "sha256": "bac69c04bdded6301cc7ff0ddba7d577a6d50a5ea21170631e8afc1b87a97a05"
+    },
+    {
+      "file": "representative-api.json",
+      "sha256": "e220742ac0e6633b4532e750c9694cb16d74a1c0f1ca90f7b180938c7d961773"
+    },
+    {
+      "file": "signature-verification.json",
+      "sha256": "e7fa938b0af1b2d13bf1127b1c009d60192bd11a34d8612f9b3e60195607b81d"
+    },
+    {
+      "file": "source-link-verification.json",
+      "sha256": "71232a471137b177c2978c74be8f455aced39a43dff2ab83d4460ba28a1f04f6"
+    },
+    {
+      "file": "type-graph.json",
+      "sha256": "9af3f59534ec93a453c4585b61fddf13e639ec710eb102faadb0479566e21f2b"
+    }
+  ],
+  "phase": "DOC-4",
+  "schemaVersion": 1
+}
