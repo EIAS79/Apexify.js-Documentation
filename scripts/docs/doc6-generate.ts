@@ -61,7 +61,8 @@ for(const e of examples.examples??[]){exampleIds.add(e.id);add({id:`example:${e.
 for(const g of allGalleryItemsForDocs as any[]){if(exampleIds.has(g.id))continue;const href=galleryDeepLink(g);add({id:`gallery:${g.id}`,kind:'gallery',title:g.title,description:plainGalleryDescription(g.description??''),href,canonicalHref:href,breadcrumb:['Gallery',String(g.category??'Examples'),g.title],runtime:['node'],packages:[api.package.name],stability:'CURRENT',version:api.package.version,domain:String(g.category??'gallery'),keywords:expandSearchAliases(uniq([g.title,g.category,plainGalleryDescription(g.description??'',300)])),aliases:[],goals:uniq([plainGalleryDescription(g.description??'',180)]),sourceId:g.id});}
 records.sort((a,b)=>a.id.localeCompare(b.id));
 
-const tokens:Record<string,string[]>={},prefixes:Record<string,string[]>={};
+const tokens=Object.create(null) as Record<string,string[]>;
+const prefixes=Object.create(null) as Record<string,string[]>;
 for(const r of records){const values=[r.title,r.description,r.excerpt,r.symbol,r.optionPath,r.typeName,r.errorCode,...r.keywords,...r.aliases,...r.goals,...r.runtime,...r.packages].filter(Boolean).join(' ');for(const t of tokenizeSearchText(values)){(tokens[t]??=[]).push(r.id);const p=t.slice(0,Math.min(6,t.length));(prefixes[p]??=[]).push(r.id);}}
 for(const map of [tokens,prefixes])for(const k of Object.keys(map))map[k]=[...new Set(map[k])].sort();
 const index:SearchIndexArtifact={schemaVersion:SEARCH_SCHEMA_VERSION,sourceChecksum,recordCount:records.length,tokens,prefixes};
