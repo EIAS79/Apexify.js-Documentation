@@ -4,11 +4,11 @@
   "artifacts": [
     {
       "file": "component-manifest.json",
-      "sha256": "7a83fee8279b0138ebb8cbd0ff2665f8b046371fb1f354122d819f35c372899a"
+      "sha256": "f19e2e9876f0ed8a32a7074411b915a73dfc69c27a00a750b6914c583a141417"
     },
     {
       "file": "representative-pages.json",
-      "sha256": "04565e280cd85d1831e96bb26dd35809784e66fa26d2ab2fae74bb5646d1d2de"
+      "sha256": "28652c329b4b8e17676d6a5b26e8b7f2890743ccfafcb97dfc1dbc11e0aea93c"
     },
     {
       "file": "client-boundaries.json",

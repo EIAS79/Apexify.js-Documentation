@@ -52,6 +52,8 @@
     "VideoResult",
     "AudioResult",
     "SvgResult",
+    "ExecutableExample",
+    "CodePreview",
     "Alert",
     "Dropdown",
     "CodeSwitcher",

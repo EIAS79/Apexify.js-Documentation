@@ -13,6 +13,8 @@ import {
   BeforeAfter, OutputPreview, ExampleCard, ExampleSteps, NextSteps, Prerequisites,
   CapabilityBadge, ImageResult, VideoResult, AudioResult, SvgResult,
 } from '@/components/mdx/RichDocsComponents';
+import { ExecutableExample } from '@/components/examples/ExecutableExample';
+import { CodePreview } from '@/components/examples/CodePreview';
 import type { DocsTabItem } from '@/components/mdx/DocsTabs';
 import type { ComparisonRow, FeatureRow, AvailabilityRow, DecisionItem } from '@/components/mdx/RichDocsComponents';
 import { Alert } from '@/components/mdx/Alert';
@@ -97,6 +99,8 @@ function RichComponent({ name, props, body }: { name: string; props: UnknownProp
     case 'VideoResult': return <VideoResult src={stringProp(props, 'src')} caption={stringProp(props, 'caption') || undefined} />;
     case 'AudioResult': return <AudioResult src={stringProp(props, 'src')} caption={stringProp(props, 'caption') || undefined} />;
     case 'SvgResult': return <SvgResult src={stringProp(props, 'src')} alt={stringProp(props, 'alt', 'SVG result')} caption={stringProp(props, 'caption') || undefined} />;
+    case 'ExecutableExample': return <ExecutableExample id={stringProp(props, 'id')} compact={boolProp(props, 'compact')} />;
+    case 'CodePreview': return <CodePreview id={stringProp(props, 'id')} />;
     case 'Alert': return <Alert type={(stringProp(props, 'type', 'info') as 'warning' | 'info' | 'error' | 'success' | 'tip')} title={stringProp(props, 'title') || undefined}>{children}</Alert>;
     case 'Dropdown': return <Dropdown title={stringProp(props, 'title', 'Details')} defaultOpen={boolProp(props, 'defaultOpen')}>{children}</Dropdown>;
     case 'CodeSwitcher': return <CodeSwitcher ts={stringProp(props, 'ts') || undefined} js={stringProp(props, 'js') || undefined} tsLabel={stringProp(props, 'tsLabel', 'TypeScript')} jsLabel={stringProp(props, 'jsLabel', 'JavaScript')} docsStudio />;

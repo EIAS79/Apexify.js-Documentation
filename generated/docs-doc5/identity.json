@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-5",
+  "docsBaseSha": "b7dfca98c2c227619f6b5360898248845846d83a",
+  "package": {
+    "name": "apexify.js",
+    "version": "6.0.0",
+    "commit": "dbed9743353593eafae9a7b1c25312d7170a233b"
+  },
+  "phase14pFrozenSha": "5d9b71f185140d6c3477286b8fb111f293e52b48",
+  "stableIdPattern": "^node\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+}

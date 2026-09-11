@@ -14,6 +14,7 @@ feature: "canvas"
 apiSymbols: ["ApexPainter.createCanvas", "CanvasConfig", "CanvasResults"]
 keywords: ["canvas", "createCanvas", "CanvasConfig", "CanvasResults"]
 related: ["getting-started", "node/canvas/size-and-coordinates"]
+examples: ["node.canvas.basic"]
 toc: true
 search: true
 canonical: "/docs/node/canvas"
@@ -53,8 +54,6 @@ await painter.createCanvas(
 4. Use `buffer` as the PNG output or composite additional image/text/chart content.
 </Steps>
 
-<CodeGroup items={[{"label":"TypeScript","language":"typescript","content":"const painter = new ApexPainter({ type: 'buffer' });\nconst { buffer } = await painter.createCanvas({ width: 640, height: 360, colorBg: '#020617' });"},{"label":"JavaScript","language":"javascript","content":"const painter = new ApexPainter({ type: 'buffer' });\nconst result = await painter.createCanvas({ width: 640, height: 360, colorBg: '#020617' });"}]} />
-
 <CapabilityBadge label="Node canvas" status="available" />
 
 ## Return value (`CanvasResults`)
@@ -79,25 +78,15 @@ The returned `canvas` value is the configuration reference used by the creator. 
 Use only one primary fill among `colorBg`, `gradientBg`, and `customBg`. Additional layering concerns belong in the dedicated background-layer options.
 </Details>
 
-## Runnable example
+## Verified executable example
 
-<ExampleCard title="640 × 360 dark canvas" description="A minimal deterministic canvas suitable for subsequent composition.">
-```typescript
-import { ApexPainter } from 'apexify.js';
-const painter = new ApexPainter({ type: 'buffer' });
-const { buffer } = await painter.createCanvas({
-  width: 640,
-  height: 360,
-  colorBg: '#020617',
-});
-```
-</ExampleCard>
+<ExecutableExample id="node.canvas.basic" />
 
 <ExampleSteps title="What happens next">
-1. `createCanvas` validates the configuration.
-2. The canvas surface is allocated.
-3. Configured background and effect stages are applied.
-4. The result exposes PNG `buffer` output for saving or composition.
+1. The source above is read from the authoritative example file, not copied into this MDX page.
+2. DOC-5 installs the packed Apexify.js artifact into an isolated consumer fixture.
+3. The source typechecks, executes, and produces the preview shown above.
+4. Gallery consumes the same stable example identity and generated source/output record.
 </ExampleSteps>
 
 ## Implementation path
@@ -105,5 +94,6 @@ const { buffer } = await painter.createCanvas({
 
 <NextSteps>
 - Continue to [Canvas size and coordinates](/docs/node/canvas/size-and-coordinates).
+- Open the canonical executable example page for source, verification state, output, and API relationships.
 - Use the legacy feature-guide links for deeper background/effect topics until DOC-9 migrates the remaining corpus to canonical routes.
 </NextSteps>

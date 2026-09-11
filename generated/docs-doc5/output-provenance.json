@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "examples": [
+    {
+      "id": "node.canvas.basic",
+      "packageVersion": "6.0.0",
+      "packageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "artifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118",
+      "sourceHash": "d1603f74395a1b3c07efbf96be39ca6d867413977a29ea556c0bfc1e712649e4",
+      "outputs": [
+        {
+          "path": "canvas-basic.png",
+          "sha256": "363a0799e5cfd1f1adaa6bfdcc30709640c89baeab5649dd97fbcd33484629d3",
+          "bytes": 705,
+          "verificationMode": "metadata"
+        }
+      ]
+    },
+    {
+      "id": "node.chart.bar",
+      "packageVersion": "6.0.0",
+      "packageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "artifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118",
+      "sourceHash": "cd7a888b8b826223996d9aa4d2a7769e6eed61bc8753315d90bd594d838c8baa",
+      "outputs": [
+        {
+          "path": "chart-bar.png",
+          "sha256": "ba1967af820c753a58ddfc46f6c99ea5c357441f8e49b5aa38acc303f698abcb",
+          "bytes": 10001,
+          "verificationMode": "metadata"
+        }
+      ]
+    },
+    {
+      "id": "node.gif.basic",
+      "packageVersion": "6.0.0",
+      "packageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "artifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118",
+      "sourceHash": "609a9b8654f7cb2e819f8d81bc4801369625e8bdf3f522346bc281602cdcd7a8",
+      "outputs": [
+        {
+          "path": "animation.gif",
+          "sha256": "e1fef8d9ca8920887e8792a8fcc4c99f9eaaaefdf13a35c77cd457f3345a51fb",
+          "bytes": 1848,
+          "verificationMode": "structural"
+        },
+        {
+          "path": "poster.png",
+          "sha256": "400d0cd48b5273aca153e8d340973dc94e1b810847ce1677df5de0f5aa1f18a1",
+          "bytes": 255,
+          "verificationMode": "metadata"
+        }
+      ]
+    },
+    {
+      "id": "node.integration.report",
+      "packageVersion": "6.0.0",
+      "packageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "artifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118",
+      "sourceHash": "e319c93d86cacdf025a04d5601b3c523e710962d96d83e8eac564f8b8c97e52b",
+      "outputs": [
+        {
+          "path": "report.png",
+          "sha256": "b3827602fe4f2325311efb9bc5855fc96c16c4e7b84b87c88fb4450104699e44",
+          "bytes": 10720,
+          "verificationMode": "metadata"
+        },
+        {
+          "path": "summary.json",
+          "sha256": "b273c62043238656416b1b39272ddd0577b7d1a2283c3da43aeafa75542dd8e4",
+          "bytes": 56,
+          "verificationMode": "semantic"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-5",
+  "files": [
+    {
+      "name": "identity.json"
+    },
+    {
+      "name": "example-manifest.json"
+    },
+    {
+      "name": "example-inventory.json"
+    },
+    {
+      "name": "source-hashes.json"
+    },
+    {
+      "name": "example-coverage.json"
+    },
+    {
+      "name": "example-drift.json"
+    },
+    {
+      "name": "docs-linkage.json"
+    },
+    {
+      "name": "api-linkage.json"
+    },
+    {
+      "name": "gallery-linkage.json"
+    },
+    {
+      "name": "browser-runner-contract.json"
+    },
+    {
+      "name": "security-boundary.json"
+    },
+    {
+      "name": "dependency-audit.json"
+    }
+  ]
+}

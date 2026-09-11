@@ -1,0 +1,6 @@
+{
+  "schemaVersion": 1,
+  "productionDependenciesAdded": [],
+  "ciDependenciesAdded": [],
+  "decision": "DOC-5 uses Node core plus existing TypeScript/tsx tooling; no heavy production dependency added."
+}

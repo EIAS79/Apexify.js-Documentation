@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { runControlled, safeOutputPath, sanitizedExecutionEnv, verifyOutputBuffer } from './doc5-runner-lib';
+
+test('execution environment does not inherit common secret names',()=>{process.env.GITHUB_TOKEN='secret';process.env.TEST_PRIVATE_SECRET='secret';const env=sanitizedExecutionEnv('/tmp/out');assert.equal(env.GITHUB_TOKEN,undefined);assert.equal(env.TEST_PRIVATE_SECRET,undefined);assert.equal(env.APEXIFY_EXAMPLE_OUTPUT_DIR,'/tmp/out');});
+test('controlled process captures success and runtime failure',()=>{const ok=runControlled(process.execPath,['-e','console.log("ok")'],{cwd:process.cwd(),timeoutMs:2000});assert.equal(ok.status,0);assert.match(ok.stdout,/ok/);const bad=runControlled(process.execPath,['-e','process.exit(7)'],{cwd:process.cwd(),timeoutMs:2000});assert.equal(bad.status,7);});
+test('controlled process times out',()=>{const out=runControlled(process.execPath,['-e','setTimeout(()=>{},5000)'],{cwd:process.cwd(),timeoutMs:50});assert.equal(out.timedOut,true);});
+test('output path traversal is rejected',()=>assert.throws(()=>safeOutputPath('/tmp/doc5','../escape'),/escapes controlled directory/));
+test('PNG and GIF metadata verification reject wrong output and accept valid headers',()=>{const png=Buffer.alloc(24);Buffer.from([0x89,0x50,0x4e,0x47]).copy(png,0);png.writeUInt32BE(10,16);png.writeUInt32BE(20,20);assert.doesNotThrow(()=>verifyOutputBuffer(png,{path:'x.png',kind:'png',public:false,verificationMode:'metadata',width:10,height:20}));assert.throws(()=>verifyOutputBuffer(Buffer.from('no'),{path:'x.png',kind:'png',public:false,verificationMode:'metadata'}));const gif=Buffer.alloc(10);gif.write('GIF89a',0,'ascii');gif.writeUInt16LE(8,6);gif.writeUInt16LE(6,8);assert.doesNotThrow(()=>verifyOutputBuffer(gif,{path:'x.gif',kind:'gif',public:false,verificationMode:'structural',width:8,height:6}));});
+test('JSON semantic verifier catches output mismatch and multiple files can stay isolated',()=>{assert.doesNotThrow(()=>verifyOutputBuffer(Buffer.from('{"a":1}'),{path:'x.json',kind:'json',public:false,verificationMode:'semantic',jsonEquals:{a:1}}));assert.throws(()=>verifyOutputBuffer(Buffer.from('{"a":2}'),{path:'x.json',kind:'json',public:false,verificationMode:'semantic',jsonEquals:{a:1}}));const dir=fs.mkdtempSync(path.join(os.tmpdir(),'doc5-test-'));try{fs.writeFileSync(path.join(dir,'a'),'a');fs.writeFileSync(path.join(dir,'b'),'b');assert.deepEqual(fs.readdirSync(dir).sort(),['a','b']);}finally{fs.rmSync(dir,{recursive:true,force:true});}});

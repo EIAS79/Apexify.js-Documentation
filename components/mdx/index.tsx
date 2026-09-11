@@ -9,4 +9,6 @@ export { GalleryExample } from './GalleryExample';
 export { RelatedGallery } from './RelatedGallery';
 export { PreviewWithCode } from './PreviewWithCode';
 export * from './RichDocsComponents';
-export { DOC3_REQUIRED_COMPONENTS, DOC3_REGISTERED_COMPONENTS } from './doc3-contract';
+export { ExecutableExample } from '@/components/examples/ExecutableExample';
+export { CodePreview } from '@/components/examples/CodePreview';
+export { DOC3_REQUIRED_COMPONENTS, DOC3_REGISTERED_COMPONENTS, DOC5_REGISTERED_COMPONENTS } from './doc3-contract';

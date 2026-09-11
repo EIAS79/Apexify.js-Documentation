@@ -1,0 +1,46 @@
+[
+  {
+    "id": "node.canvas.basic",
+    "sourceHash": "d1603f74395a1b3c07efbf96be39ca6d867413977a29ea556c0bfc1e712649e4",
+    "files": [
+      {
+        "path": "examples/node/canvas-basic/index.ts",
+        "sha256": "0c6a0b8413590f8c2cb05887a5cf9352652f4b184a268a91935c4fa887857c60"
+      }
+    ]
+  },
+  {
+    "id": "node.chart.bar",
+    "sourceHash": "cd7a888b8b826223996d9aa4d2a7769e6eed61bc8753315d90bd594d838c8baa",
+    "files": [
+      {
+        "path": "examples/node/chart-bar/index.ts",
+        "sha256": "e85b99e996341066b72a03b1399d4ec44d199ff9d8ff8b7b2581a37953f49ce9"
+      }
+    ]
+  },
+  {
+    "id": "node.gif.basic",
+    "sourceHash": "609a9b8654f7cb2e819f8d81bc4801369625e8bdf3f522346bc281602cdcd7a8",
+    "files": [
+      {
+        "path": "examples/node/gif-basic/index.ts",
+        "sha256": "bd359463db522fdf2c3cf41f9fe4008f8de83f81ef4d44378ca7b41ee67b5136"
+      }
+    ]
+  },
+  {
+    "id": "node.integration.report",
+    "sourceHash": "e319c93d86cacdf025a04d5601b3c523e710962d96d83e8eac564f8b8c97e52b",
+    "files": [
+      {
+        "path": "examples/node/integration-report/index.ts",
+        "sha256": "d8a40df77741530f2d5e44ca2cc4e97aab7c887eedf32b161c3d8080de71b921"
+      },
+      {
+        "path": "examples/node/integration-report/report-data.ts",
+        "sha256": "5c0580406c5a67de728d38ceddea702e3252464ef43ed06eefa9f95ed5d69e81"
+      }
+    ]
+  }
+]

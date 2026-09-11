@@ -1,0 +1,27 @@
+[
+  {
+    "id": "node.canvas.basic",
+    "links": [
+      "/docs/node/canvas"
+    ]
+  },
+  {
+    "id": "node.chart.bar",
+    "links": [
+      "/docs/getting-started"
+    ]
+  },
+  {
+    "id": "node.gif.basic",
+    "links": [
+      "/docs/getting-started"
+    ]
+  },
+  {
+    "id": "node.integration.report",
+    "links": [
+      "/docs/getting-started",
+      "/docs/node/canvas"
+    ]
+  }
+]

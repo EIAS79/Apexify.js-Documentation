@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "total": 4,
+  "verified": [
+    "node.canvas.basic",
+    "node.chart.bar",
+    "node.gif.basic",
+    "node.integration.report"
+  ],
+  "failed": [],
+  "stale": [],
+  "unverified": [],
+  "node": [
+    "node.canvas.basic",
+    "node.chart.bar",
+    "node.gif.basic",
+    "node.integration.report"
+  ],
+  "difficulty": {
+    "minimal": [
+      "node.canvas.basic"
+    ],
+    "practical": [
+      "node.chart.bar"
+    ],
+    "advanced": [
+      "node.gif.basic"
+    ],
+    "integration": [
+      "node.integration.report"
+    ]
+  },
+  "docsLinked": [
+    "node.canvas.basic",
+    "node.chart.bar",
+    "node.gif.basic",
+    "node.integration.report"
+  ],
+  "apiLinked": [
+    "node.canvas.basic",
+    "node.chart.bar",
+    "node.gif.basic",
+    "node.integration.report"
+  ],
+  "galleryLinked": [
+    "node.canvas.basic",
+    "node.chart.bar",
+    "node.gif.basic",
+    "node.integration.report"
+  ],
+  "withVerifiedOutput": [
+    "node.canvas.basic",
+    "node.chart.bar",
+    "node.gif.basic",
+    "node.integration.report"
+  ],
+  "missingExplanation": []
+}

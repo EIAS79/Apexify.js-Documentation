@@ -3,15 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "author": "zenith-79",
-  "engines": {
-    "node": "22.x || 24.x || 26.x",
-    "npm": ">=10"
-  },
+  "engines": { "node": "22.x || 24.x || 26.x", "npm": ">=10" },
   "packageManager": "npm@11.19.1",
   "scripts": {
-    "postinstall": "npm run docs:generate:doc4",
-    "dev": "npm run docs:generate:doc4 && next dev",
-    "build": "node scripts/docs/doc4-ensure-generated.mjs && next build",
+    "postinstall": "npm run docs:generate:doc4 && npm run docs:examples:manifest",
+    "dev": "npm run docs:generate:doc4 && npm run docs:examples:manifest && next dev",
+    "build": "node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
@@ -60,7 +57,17 @@
     "docs:measure:doc4": "node scripts/docs/doc4-build-measure.mjs",
     "docs:browser:doc4": "node scripts/docs/doc4-browser-verify.mjs",
     "docs:finalize:doc4": "node scripts/docs/doc4-finalize.mjs",
-    "docs:audit:doc4": "npm run docs:verify:doc4"
+    "docs:audit:doc4": "npm run docs:verify:doc4",
+    "docs:examples:manifest": "tsx scripts/docs/doc5-generate.ts",
+    "docs:examples:validate": "tsx scripts/docs/doc5-generate.ts --check",
+    "docs:examples:verify": "tsx scripts/docs/doc5-runner.ts && npm run docs:examples:manifest",
+    "docs:examples:coverage": "npm run docs:examples:validate",
+    "docs:test:examples": "tsx --test scripts/docs/doc5.test.ts scripts/docs/doc5-runner.test.ts",
+    "docs:verify:doc5": "npm run docs:examples:validate && npm run docs:test:examples && tsx scripts/docs/doc5-verify.ts && npm run docs:generate:doc3 && npm run docs:verify:doc4",
+    "docs:measure:doc5": "node scripts/docs/doc5-build-measure.mjs",
+    "docs:browser:doc5": "node scripts/docs/doc5-browser-verify.mjs",
+    "docs:finalize:doc5": "node scripts/docs/doc5-finalize.mjs",
+    "docs:audit:doc5": "npm run docs:verify:doc5"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",

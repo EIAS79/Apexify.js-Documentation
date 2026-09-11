@@ -1,4 +1,4 @@
-/** Shared gallery card shape — previews are static files under `/public/gallery-outputs/`. */
+/** Shared gallery card shape — previews are static files under `/public/gallery-outputs/` or verified DOC-5 output paths. */
 
 export type GalleryMediaKind = 'image' | 'gif' | 'video';
 
@@ -11,7 +11,7 @@ export interface GalleryCardBase {
   id: string;
   title: string;
   description: string;
-  /** Grid + modal hero — URL under `public/` e.g. `/gallery-outputs/...` */
+  /** Grid + modal hero — URL under `public/`. */
   thumbnail: string;
   /** How to render `thumbnail` (inferred from extension when omitted). */
   thumbnailMedia?: GalleryMediaKind;
@@ -23,5 +23,5 @@ export interface GalleryCardBase {
 /** Deck-style demos: charts, comparisons, multi-pass compose (`advance` filter in the gallery UI). */
 export type AdvanceGalleryCard = GalleryCardBase & {
   category: 'advance';
-  code: { ts: string; js: string };
+  code: { ts: string; js?: string };
 };

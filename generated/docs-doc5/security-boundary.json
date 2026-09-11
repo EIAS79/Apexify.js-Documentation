@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "executes": "repository-controlled DOC-5 example sources only",
+  "arbitraryPublicCode": false,
+  "sandboxClaim": false,
+  "isolation": [
+    "temporary consumer fixture",
+    "per-example working/output directory",
+    "packed artifact install",
+    "sanitized execution environment",
+    "timeout",
+    "stdio cap",
+    "output count/byte limits",
+    "cleanup"
+  ],
+  "network": "No example requires network I/O; operating-system network access is not claimed to be denied.",
+  "inheritedSecretEnvironment": false
+}

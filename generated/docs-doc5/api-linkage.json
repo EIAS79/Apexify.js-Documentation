@@ -1,0 +1,31 @@
+[
+  {
+    "id": "node.canvas.basic",
+    "links": [
+      "apexify.js::ApexPainter",
+      "apexify.js::ApexPainter#createCanvas"
+    ]
+  },
+  {
+    "id": "node.chart.bar",
+    "links": [
+      "apexify.js::ApexPainter",
+      "apexify.js::ApexPainter#createChart"
+    ]
+  },
+  {
+    "id": "node.gif.basic",
+    "links": [
+      "apexify.js::ApexPainter",
+      "apexify.js::ApexPainter#createCanvas",
+      "apexify.js::ApexPainter#createGIF"
+    ]
+  },
+  {
+    "id": "node.integration.report",
+    "links": [
+      "apexify.js::ApexPainter",
+      "apexify.js::ApexPainter#createChart"
+    ]
+  }
+]

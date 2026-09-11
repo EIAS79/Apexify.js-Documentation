@@ -8,16 +8,15 @@
         "Callout",
         "Steps",
         "Details",
-        "CodeGroup",
         "ComparisonTable",
         "FeatureMatrix",
         "DecisionGuide",
         "ArchitectureDiagram",
-        "ExampleCard",
         "ExampleSteps",
         "NextSteps",
         "Prerequisites",
-        "CapabilityBadge"
+        "CapabilityBadge",
+        "ExecutableExample"
       ]
     },
     {
@@ -26,6 +25,7 @@
         "Callout",
         "Details",
         "CodeBlockV2",
+        "CodeGroup",
         "InstallCommand",
         "CodeDiff",
         "ComparisonTable",
