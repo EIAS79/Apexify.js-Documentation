@@ -124,7 +124,11 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
     return result.violations.map((violation) => ({
       id: violation.id,
       impact: violation.impact,
-      nodes: violation.nodes.length,
+      nodes: violation.nodes.map((node) => ({
+        target: node.target,
+        html: node.html,
+        failureSummary: node.failureSummary,
+      })),
     }));
   });
   if (axeViolations.length) throw new Error(`${name}: axe ${JSON.stringify(axeViolations)}`);
