@@ -6,7 +6,7 @@ import { SEARCH_SCHEMA_VERSION, type SearchResponse, type SearchResult, type Ran
 export const runtime = 'nodejs';
 
 // Generated DOC-6 artifacts are fixed files loaded and cached by the server-data module.
-// The request hot path never traverses content/docs or reparses MDX sources.
+// The request hot path never traverses source documentation or reparses MDX sources.
 const { recordsArtifact, indexArtifact } = getSearchArtifacts();
 const availableFilters = getSearchFilterOptions(recordsArtifact.records);
 
