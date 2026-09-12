@@ -97,10 +97,15 @@ test("coverage is complete for authoritative DOC-1/DOC-4/DOC-5 sources", () => {
   assert.equal(value.examples.indexed, value.examples.total);
 });
 
-test("normal production search route contains no request-time filesystem traversal", () => {
+test("normal production search route contains no request-time source traversal", () => {
   const route = fs.readFileSync(path.join(process.cwd(), "app/api/docs/search/route.ts"), "utf8");
   assert.doesNotMatch(route, /node:fs|readdirSync|readFileSync|getAllMdxFiles|content\/docs/);
-  assert.match(route, /generated\/docs-doc6/);
+  assert.match(route, /lib\/search\/server-data/);
+  const serverData = fs.readFileSync(path.join(process.cwd(), "lib/search/server-data.ts"), "utf8");
+  assert.doesNotMatch(serverData, /readdirSync|getAllMdxFiles|content\/docs/);
+  assert.match(serverData, /generated["',)]?,?\s*["']?docs-doc6|docs-doc6/);
+  assert.match(serverData, /search-records\.json/);
+  assert.match(serverData, /search-index-manifest\.json/);
 });
 
 test("generated related content is consumed by routed docs, API, and example surfaces", () => {
