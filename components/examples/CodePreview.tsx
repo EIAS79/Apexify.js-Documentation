@@ -35,7 +35,7 @@ export function CodePreview({ example: provided, id }: { example?: GeneratedExam
         <VerifiedExamplePlayground
           title={example.title}
           initialSource={example.sources[0].content}
-          previewUrl={verifiedPreview?.publicPath}
+          previewUrl={verifiedPreview?.publicPath ?? undefined}
           previewAlt={`${example.title} verified output`}
           sourceHash={example.sourceHash}
         />
