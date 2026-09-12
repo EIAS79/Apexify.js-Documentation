@@ -38,6 +38,10 @@ const json = <T>(relative: string): T => JSON.parse(read(relative)) as T;
 const fail = (message: string): never => {
   throw new Error(`[doc7-verify] ${message}`);
 };
+const required = <T>(value: T | null | undefined, message: string): T => {
+  if (value == null) fail(message);
+  return value;
+};
 
 const api = json<ApiManifest>('generated/docs-doc4/api-manifest.json');
 const examples = json<ExampleManifest>('generated/docs-doc5/example-manifest.json');
@@ -57,12 +61,16 @@ if (!pin.endsWith(`#${api.package.commit}`)) {
   fail(`documentation dependency pin does not match ${api.package.commit}`);
 }
 
-const apexPainter = api.symbols.find((symbol) => symbol.symbol === 'ApexPainter');
-if (!apexPainter) fail('ApexPainter missing from DOC-4 manifest');
+const apexPainter = required(
+  api.symbols.find((symbol) => symbol.symbol === 'ApexPainter'),
+  'ApexPainter missing from DOC-4 manifest',
+);
 
 const currentCapabilities = CURRENT_CAPABILITIES.map((capability) => {
-  const member = apexPainter.members.find((candidate) => candidate.name === capability.apiMember);
-  if (!member) fail(`ApexPainter#${capability.apiMember} missing from DOC-4 manifest`);
+  const member = required(
+    apexPainter.members.find((candidate) => candidate.name === capability.apiMember),
+    `ApexPainter#${capability.apiMember} missing from DOC-4 manifest`,
+  );
   if (member.stability !== 'CURRENT') {
     fail(`ApexPainter#${capability.apiMember} is ${member.stability}, but DOC-7 labels it CURRENT`);
   }
@@ -88,8 +96,11 @@ for (const roadmap of ROADMAP_CAPABILITIES) {
   }
 }
 
-const hero = examples.examples.find((example) => example.id === HERO_EXAMPLE_ID);
-if (!hero || hero.verificationStatus !== 'verified') fail(`${HERO_EXAMPLE_ID} is not verified`);
+const hero = required(
+  examples.examples.find((example) => example.id === HERO_EXAMPLE_ID),
+  `${HERO_EXAMPLE_ID} is missing`,
+);
+if (hero.verificationStatus !== 'verified') fail(`${HERO_EXAMPLE_ID} is not verified`);
 if (hero.verifiedPackageCommit !== api.package.commit || hero.verifiedPackageVersion !== api.package.version) {
   fail(`${HERO_EXAMPLE_ID} verification identity does not match active package`);
 }
