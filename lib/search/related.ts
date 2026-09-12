@@ -61,24 +61,26 @@ export function getRelatedContent(
   const entry = relatedBySourceId.get(sourceRecordId);
   if (!entry) return [];
   const limit = Math.max(1, Math.min(12, options.limit ?? 4));
-  return entry.targets
-    .map((target) => {
-      const record = recordById.get(target.id);
-      if (!record) return null;
-      return {
-        id: record.id,
-        kind: record.kind,
-        title: record.title,
-        description: record.description ?? record.excerpt,
-        canonicalHref: record.canonicalHref,
-        breadcrumb: record.breadcrumb,
-        runtime: record.runtime,
-        packages: record.packages,
-        stability: record.stability,
-        score: target.score,
-        reasons: target.reasons,
-      } satisfies RelatedContentItem;
-    })
-    .filter((item): item is RelatedContentItem => Boolean(item))
-    .slice(0, limit);
+  const items: RelatedContentItem[] = [];
+  for (const target of entry.targets) {
+    const record = recordById.get(target.id);
+    if (!record) continue;
+    const item: RelatedContentItem = {
+      id: record.id,
+      kind: record.kind,
+      title: record.title,
+      canonicalHref: record.canonicalHref,
+      breadcrumb: record.breadcrumb,
+      runtime: record.runtime,
+      packages: record.packages,
+      score: target.score,
+      reasons: target.reasons,
+    };
+    const description = record.description ?? record.excerpt;
+    if (description) item.description = description;
+    if (record.stability) item.stability = record.stability;
+    items.push(item);
+    if (items.length >= limit) break;
+  }
+  return items;
 }
