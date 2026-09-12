@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-8",
+  "endpoint": "/api/gallery/run",
+  "publicArbitraryExecution": false,
+  "productionMode": "unavailable",
+  "developmentMode": "trusted-local-opt-in",
+  "developmentOptIn": "ENABLE_LOCAL_APEXIFY_CODE_RUN=true",
+  "sandboxClaim": false,
+  "environmentPolicy": "allowlist",
+  "cwdPolicy": "per-run-temporary-directory",
+  "cleanup": "recursive-finally",
+  "networkIsolation": false,
+  "packageInstallation": false,
+  "remoteScriptExecution": false,
+  "resourceLimits": {
+    "executionMs": 55000,
+    "sourceChars": 280000,
+    "outputBytes": 26214400,
+    "processBufferBytes": 20971520,
+    "shareStateBytes": 65536,
+    "maxOutputs": 1
+  }
+}
