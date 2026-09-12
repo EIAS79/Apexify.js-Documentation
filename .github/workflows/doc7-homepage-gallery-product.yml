@@ -16,32 +16,43 @@ permissions:
 
 env:
   NEXT_TELEMETRY_DISABLED: '1'
+  DOC7_BASE_SHA: 46b7eb1712fcb1456c23eca9b2077d6f4e51f25d
   DOC7_BASE_URL: http://127.0.0.1:3000
+  DOC7_BASELINE_URL: http://127.0.0.1:3001
 
 jobs:
   verify:
     name: Verify DOC-7 product experience
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 1 }
+        with: { fetch-depth: 0 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: npm }
       - name: Pin npm toolchain
         run: npm install --global npm@11.19.1
       - name: Deterministic install
         run: npm ci
-      - name: DOC-7 truth, architecture and claim verification
-        run: npx tsx scripts/docs/doc7-verify.ts
+      - name: DOC-7 truth, claim, architecture and Gallery data verification
+        run: |
+          npx tsx scripts/docs/doc7-verify.ts
+          npx tsx --test scripts/docs/doc7.test.ts
       - name: DOC-1 through DOC-6 regression verification
         run: npm run docs:verify:doc6
       - name: Existing documentation integrity
         run: npm run verify:docs
       - name: TypeScript typecheck
         run: npm run typecheck
-      - name: Clean production build
-        run: npm run build
+      - name: Measure clean current production build
+        run: node scripts/docs/doc7-build-subject.mjs --root . --label current --out generated/docs-doc7/runtime/current-build.json
+      - name: Measure clean DOC-7 base production build on same runner
+        shell: bash
+        run: |
+          rm -rf /tmp/doc7-base
+          git worktree add --detach /tmp/doc7-base "$DOC7_BASE_SHA"
+          ln -s "$GITHUB_WORKSPACE/node_modules" /tmp/doc7-base/node_modules
+          node scripts/docs/doc7-build-subject.mjs --root /tmp/doc7-base --label baseline --out "$GITHUB_WORKSPACE/generated/docs-doc7/runtime/baseline-build.json"
       - name: Install ephemeral browser audit tools
         run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
       - name: Resolve system Chrome
@@ -51,23 +62,29 @@ jobs:
           test -n "$CHROME"
           echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
           "$CHROME" --version
-      - name: Start production server
+      - name: Start current and baseline production servers
         shell: bash
         run: |
-          npm start -- -p 3000 > /tmp/doc7-next.log 2>&1 &
+          npm start -- -p 3000 > /tmp/doc7-current-next.log 2>&1 &
+          (cd /tmp/doc7-base && npm start -- -p 3001 > /tmp/doc7-baseline-next.log 2>&1 &)
           for i in $(seq 1 60); do
-            if curl --fail --silent http://127.0.0.1:3000/ >/dev/null; then exit 0; fi
+            if curl --fail --silent http://127.0.0.1:3000/ >/dev/null && curl --fail --silent http://127.0.0.1:3001/ >/dev/null; then exit 0; fi
             sleep 1
           done
-          cat /tmp/doc7-next.log
+          cat /tmp/doc7-current-next.log || true
+          cat /tmp/doc7-baseline-next.log || true
           exit 1
-      - name: Homepage and Gallery browser, responsive, theme, reduced-motion, keyboard and axe verification
+      - name: Homepage and Gallery browser, responsive, theme, reduced-motion, keyboard, screenshots and axe verification
         run: node scripts/docs/doc7-browser-verify.mjs
+      - name: Base-vs-final production performance comparison
+        run: node scripts/docs/doc7-performance-browser.mjs
       - name: Upload DOC-7 evidence
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: doc7-homepage-gallery-product-evidence
           path: |
             generated/docs-doc7/runtime
-            /tmp/doc7-next.log
+            /tmp/doc7-current-next.log
+            /tmp/doc7-baseline-next.log
           if-no-files-found: error

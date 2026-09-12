@@ -24,9 +24,16 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden" style={{ color: 'var(--text-primary)' }}>
+      <a
+        href="#main-content"
+        className="sr-only fixed left-4 top-4 z-[100] rounded-lg px-4 py-2 font-semibold focus:not-sr-only"
+        style={{ backgroundColor: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-strong)' }}
+      >
+        Skip to content
+      </a>
       <AmbientBackground />
       <Navbar />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <ProductHero model={model} />
         <CapabilitySection model={model} />
         <FeatureTracks model={model} />
