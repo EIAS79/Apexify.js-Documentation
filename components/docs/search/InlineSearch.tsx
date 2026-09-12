@@ -22,7 +22,7 @@ export function InlineSearch({
       }}
     >
       <GlobalDocsSearch inputId={inputId} compact ariaLabel={ariaLabel} fixedFilters={scope} />
-      <p className="px-1 pt-1 text-[11px]" style={{ color: "var(--text-muted)" }}>
+      <p className="px-1 pt-1 text-[11px]" style={{ color: "var(--text-secondary)" }}>
         Uses the same build-time search index and ranking as global search.
       </p>
     </div>
