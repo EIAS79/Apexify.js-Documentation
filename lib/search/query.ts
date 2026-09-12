@@ -79,8 +79,15 @@ type PreparedRecord = {
   haystackTokens: string[];
 };
 
+type QueryContext = { normalized: string; compact: string; tokens: string[] };
+type ScoredRef = { record: SearchRecord; score: number; reason: string };
+type CachedUnfilteredQuery = { results: RankedSearchRecord[]; unfilteredTotal: number };
+
 const preparedCache = new WeakMap<SearchRecord, PreparedRecord>();
 const recordMapCache = new WeakMap<SearchRecord[], Map<string, SearchRecord>>();
+const queryResultCache = new WeakMap<SearchRecord[], Map<string, CachedUnfilteredQuery>>();
+const MAX_CACHED_QUERIES = 64;
+const MAX_RESULT_LIMIT = 100;
 
 function prepare(record: SearchRecord): PreparedRecord {
   const cached = preparedCache.get(record);
@@ -134,9 +141,6 @@ function prepare(record: SearchRecord): PreparedRecord {
   preparedCache.set(record, prepared);
   return prepared;
 }
-
-type QueryContext = { normalized: string; compact: string; tokens: string[] };
-type ScoredRef = { record: SearchRecord; score: number; reason: string };
 
 function scoreRecord(record: SearchRecord, query: QueryContext): { score: number; reason: string } | null {
   const prepared = prepare(record);
@@ -205,6 +209,10 @@ function passesFilters(record: SearchRecord, filters: SearchFilters): boolean {
   return true;
 }
 
+function hasActiveFilters(filters: SearchFilters): boolean {
+  return Boolean(filters.runtime || filters.package || filters.kind || filters.stability || filters.version || filters.domain);
+}
+
 function intersectPostings(postings: string[][]): string[] {
   if (!postings.length) return [];
   const sorted = [...postings].sort((a, b) => a.length - b.length);
@@ -261,6 +269,30 @@ function insertTop(top: ScoredRef[], candidate: ScoredRef, limit: number): void 
   if (top.length > limit) top.pop();
 }
 
+function getCachedQuery(records: SearchRecord[], key: string): CachedUnfilteredQuery | undefined {
+  const cache = queryResultCache.get(records);
+  const value = cache?.get(key);
+  if (!cache || !value) return value;
+  cache.delete(key);
+  cache.set(key, value);
+  return value;
+}
+
+function setCachedQuery(records: SearchRecord[], key: string, value: CachedUnfilteredQuery): void {
+  let cache = queryResultCache.get(records);
+  if (!cache) {
+    cache = new Map();
+    queryResultCache.set(records, cache);
+  }
+  cache.delete(key);
+  while (cache.size >= MAX_CACHED_QUERIES) {
+    const oldest = cache.keys().next().value as string | undefined;
+    if (oldest === undefined) break;
+    cache.delete(oldest);
+  }
+  cache.set(key, value);
+}
+
 export function getSearchFilterOptions(records: SearchRecord[]): SearchFilterOptions {
   const collect = (values: string[]) => [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b));
   return {
@@ -282,16 +314,29 @@ export function searchRecords(
 ): { results: RankedSearchRecord[]; unfilteredTotal: number; filteredOut: boolean } {
   const normalized = normalizeSearchText(rawQuery);
   if (!normalized) return { results: [], unfilteredTotal: 0, filteredOut: false };
+  const boundedLimit = Math.max(1, Math.min(MAX_RESULT_LIMIT, limit));
+  const cacheable = !hasActiveFilters(filters);
+  if (cacheable) {
+    const cached = getCachedQuery(records, normalized);
+    if (cached) {
+      return {
+        results: cached.results.slice(0, boundedLimit),
+        unfilteredTotal: cached.unfilteredTotal,
+        filteredOut: false,
+      };
+    }
+  }
+
   const query: QueryContext = {
     normalized,
     compact: compact(rawQuery),
     tokens: [...new Set(normalized.split(' ').filter(Boolean))],
   };
-  const boundedLimit = Math.max(1, Math.min(100, limit));
   const byId = recordsById(records);
   const top: ScoredRef[] = [];
   let unfilteredTotal = 0;
   let filteredMatches = 0;
+  const rankingLimit = cacheable ? MAX_RESULT_LIMIT : boundedLimit;
 
   for (const id of candidateIds(index, records, query.tokens)) {
     const record = byId.get(id);
@@ -301,11 +346,14 @@ export function searchRecords(
     unfilteredTotal += 1;
     if (!passesFilters(record, filters)) continue;
     filteredMatches += 1;
-    insertTop(top, { record, score: scored.score, reason: scored.reason }, boundedLimit);
+    insertTop(top, { record, score: scored.score, reason: scored.reason }, rankingLimit);
   }
 
+  const rankedResults = top.map(({ record, score, reason }) => ({ ...record, score, matchReason: reason }));
+  if (cacheable) setCachedQuery(records, normalized, { results: rankedResults, unfilteredTotal });
+
   return {
-    results: top.map(({ record, score, reason }) => ({ ...record, score, matchReason: reason })),
+    results: rankedResults.slice(0, boundedLimit),
     unfilteredTotal,
     filteredOut: unfilteredTotal > 0 && filteredMatches === 0,
   };
