@@ -96,20 +96,20 @@ export default function GalleryModal({
   const hasJs = Boolean(item.code?.js?.trim());
   const hasCode = hasTs || hasJs;
   const modalMediaKind = inferMediaKind(item.thumbnail, item.thumbnailMedia);
-  const sandboxEligible = hasCode && modalMediaKind !== 'video';
+  const executionEligible = hasCode && modalMediaKind !== 'video';
 
   const [layoutMode, setLayoutMode] = useState<ModalLayoutMode>(hasCode ? 'split' : 'media');
   const [codeLang, setCodeLang] = useState<'ts' | 'js'>(hasTs ? 'ts' : 'js');
   const [editedCode, setEditedCode] = useState('');
-  const [sandboxDataUrl, setSandboxDataUrl] = useState<string | null>(null);
-  const [sandboxError, setSandboxError] = useState<string | null>(null);
+  const [executionDataUrl, setSandboxDataUrl] = useState<string | null>(null);
+  const [executionError, setSandboxError] = useState<string | null>(null);
   const [drawMs, setDrawMs] = useState<number | null>(null);
   const [runProgress, setRunProgress] = useState(0);
-  const [sandboxRunning, setSandboxRunning] = useState(false);
-  const [runnerEnabled, setRunnerEnabled] = useState(true);
+  const [executionRunning, setSandboxRunning] = useState(false);
+  const [runnerEnabled, setRunnerEnabled] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
-  const sandboxProgressRafRef = useRef(0);
+  const executionProgressRafRef = useRef(0);
 
   const codeText = codeLang === 'ts' ? item.code?.ts ?? '' : item.code?.js ?? '';
 
@@ -136,7 +136,7 @@ export default function GalleryModal({
         if (!cancelled) setRunnerEnabled(Boolean(d.enabled));
       })
       .catch(() => {
-        if (!cancelled) setRunnerEnabled(true);
+        if (!cancelled) setRunnerEnabled(false);
       });
     return () => {
       cancelled = true;
@@ -146,9 +146,9 @@ export default function GalleryModal({
   // Cancel raf on unmount
   useEffect(() => {
     return () => {
-      if (sandboxProgressRafRef.current) {
-        cancelAnimationFrame(sandboxProgressRafRef.current);
-        sandboxProgressRafRef.current = 0;
+      if (executionProgressRafRef.current) {
+        cancelAnimationFrame(executionProgressRafRef.current);
+        executionProgressRafRef.current = 0;
       }
     };
   }, []);
@@ -169,20 +169,20 @@ export default function GalleryModal({
   }, [onClose, onPrev, onNext, total]);
 
   const stopProgressLoop = () => {
-    if (sandboxProgressRafRef.current) {
-      cancelAnimationFrame(sandboxProgressRafRef.current);
-      sandboxProgressRafRef.current = 0;
+    if (executionProgressRafRef.current) {
+      cancelAnimationFrame(executionProgressRafRef.current);
+      executionProgressRafRef.current = 0;
     }
   };
   const startProgressLoop = () => {
     const loop = () => {
       setRunProgress((p) => (p >= 92 ? p : Math.min(p + (92 - p) * 0.06 + 0.35, 92)));
-      sandboxProgressRafRef.current = requestAnimationFrame(loop);
+      executionProgressRafRef.current = requestAnimationFrame(loop);
     };
-    sandboxProgressRafRef.current = requestAnimationFrame(loop);
+    executionProgressRafRef.current = requestAnimationFrame(loop);
   };
 
-  const resetSandbox = () => {
+  const resetExecution = () => {
     stopProgressLoop();
     setEditedCode(codeText);
     setSandboxDataUrl(null);
@@ -191,8 +191,8 @@ export default function GalleryModal({
     setRunProgress(0);
   };
 
-  const runSandbox = async () => {
-    if (!sandboxEligible || !editedCode.trim() || sandboxRunning) return;
+  const runExecution = async () => {
+    if (!executionEligible || !editedCode.trim() || executionRunning) return;
     const tClick = performance.now();
     stopProgressLoop();
     setSandboxRunning(true);
@@ -286,7 +286,7 @@ export default function GalleryModal({
 
   const showCode = hasCode && layoutMode !== 'media';
   const showMedia = layoutMode !== 'code';
-  const previewSrc = sandboxEligible && sandboxDataUrl ? sandboxDataUrl : item.thumbnail;
+  const previewSrc = executionEligible && executionDataUrl ? executionDataUrl : item.thumbnail;
 
   return (
     <>
@@ -535,16 +535,16 @@ export default function GalleryModal({
                     <CodeWindow
                       code={editedCode}
                       onCodeChange={setEditedCode}
-                      editable={sandboxEligible}
+                      editable={executionEligible}
                       codeLang={codeLang}
                       hasTs={hasTs}
                       hasJs={hasJs}
                       onLangChange={setCodeLang}
-                      sandboxEligible={sandboxEligible}
+                      executionEligible={executionEligible}
                       runnerEnabled={runnerEnabled}
-                      onRunSandbox={runSandbox}
-                      onResetSandbox={resetSandbox}
-                      sandboxRunning={sandboxRunning}
+                      onRunExecution={runExecution}
+                      onResetExecution={resetExecution}
+                      executionRunning={executionRunning}
                       runProgress={runProgress}
                       drawMs={drawMs}
                       onCopyCode={copyCode}
@@ -594,7 +594,7 @@ export default function GalleryModal({
                   </div>
                 ) : (
                   <>
-                    {sandboxEligible && sandboxDataUrl && (
+                    {executionEligible && executionDataUrl && (
                       <p
                         className="mb-3 shrink-0 rounded-lg px-3 py-2 text-[11px] font-medium leading-snug border"
                         style={{
@@ -603,18 +603,18 @@ export default function GalleryModal({
                           color: 'var(--success)',
                         }}
                       >
-                        Preview shows your last sandbox run (PNG/GIF buffer). Reset code clears this overlay.
+                        Preview shows your last trusted-local execution result (PNG/GIF buffer). Reset code clears this overlay.
                       </p>
                     )}
                     <GalleryZoomablePreview
                       src={previewSrc}
                       alt={
-                        sandboxEligible && sandboxDataUrl
-                          ? `${item.title} — sandbox output`
+                        executionEligible && executionDataUrl
+                          ? `${item.title} — trusted-local execution output`
                           : item.title
                       }
                     />
-                    {sandboxError && sandboxEligible && (
+                    {executionError && executionEligible && (
                       <div
                         role="alert"
                         className="mt-3 shrink-0 rounded-lg px-3 py-2.5 text-[12px] leading-relaxed border whitespace-pre-wrap"
@@ -624,7 +624,7 @@ export default function GalleryModal({
                           color: 'var(--danger)',
                         }}
                       >
-                        {sandboxError}
+                        {executionError}
                       </div>
                     )}
                   </>
@@ -707,11 +707,11 @@ function CodeWindow({
   hasTs,
   hasJs,
   onLangChange,
-  sandboxEligible,
+  executionEligible,
   runnerEnabled,
-  onRunSandbox,
-  onResetSandbox,
-  sandboxRunning,
+  onRunExecution,
+  onResetExecution,
+  executionRunning,
   runProgress,
   drawMs,
   onCopyCode,
@@ -724,11 +724,11 @@ function CodeWindow({
   hasTs: boolean;
   hasJs: boolean;
   onLangChange: (lang: 'ts' | 'js') => void;
-  sandboxEligible: boolean;
+  executionEligible: boolean;
   runnerEnabled: boolean;
-  onRunSandbox: () => void;
-  onResetSandbox: () => void;
-  sandboxRunning: boolean;
+  onRunExecution: () => void;
+  onResetExecution: () => void;
+  executionRunning: boolean;
   runProgress: number;
   drawMs: number | null;
   onCopyCode: () => void;
@@ -736,7 +736,7 @@ function CodeWindow({
 }) {
   const prismLang = codeLang === 'ts' ? 'typescript' : 'javascript';
   const fileLabel = codeLang === 'ts' ? 'snippet.ts' : 'snippet.js';
-  const showSandboxBar = editable && sandboxEligible;
+  const showExecutionBar = editable && executionEligible;
 
   return (
     <div
@@ -817,8 +817,8 @@ function CodeWindow({
         </button>
       </div>
 
-      {/* Sandbox toolbar */}
-      {showSandboxBar && (
+      {/* Execution toolbar */}
+      {showExecutionBar && (
         <div
           className="flex-shrink-0 flex flex-wrap items-center gap-2 px-3 py-2 border-b"
           style={{
@@ -828,21 +828,21 @@ function CodeWindow({
         >
           <button
             type="button"
-            onClick={onRunSandbox}
-            disabled={!runnerEnabled || sandboxRunning || !code.trim()}
+            onClick={onRunExecution}
+            disabled={!runnerEnabled || executionRunning || !code.trim()}
             className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-45 transition-shadow"
             style={{
               backgroundImage: 'var(--gradient-sunset)',
-              boxShadow: !runnerEnabled || sandboxRunning ? 'none' : 'var(--glow-magenta)',
+              boxShadow: !runnerEnabled || executionRunning ? 'none' : 'var(--glow-magenta)',
             }}
           >
             <PlayIcon className="h-3.5 w-3.5" />
-            {sandboxRunning ? 'Running…' : 'Run'}
+            {executionRunning ? 'Running…' : 'Run'}
           </button>
           <button
             type="button"
-            onClick={onResetSandbox}
-            disabled={sandboxRunning}
+            onClick={onResetExecution}
+            disabled={executionRunning}
             className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-medium border transition-colors disabled:opacity-45"
             style={{
               backgroundColor: '#0d1117',
@@ -860,11 +860,11 @@ function CodeWindow({
           )}
           {!runnerEnabled && (
             <span className="text-[11px]" style={{ color: 'var(--accent-amber)' }}>
-              Sandbox runner disabled.
+              Execution unavailable on this deployment.
             </span>
           )}
           <span className="flex-1 min-w-[2rem]" />
-          {(sandboxRunning || runProgress > 0) && (
+          {(executionRunning || runProgress > 0) && (
             <div
               className="h-1 w-full sm:w-32 rounded-full overflow-hidden shrink-0"
               style={{ backgroundColor: '#0d1117' }}
