@@ -1,22 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import recordsJson from "@/generated/docs-doc6/search-records.json";
-import indexJson from "@/generated/docs-doc6/search-index-manifest.json";
+import { getSearchArtifacts } from "@/lib/search/server-data";
 import { getSearchFilterOptions, searchRecords } from "@/lib/search/query";
-import { SEARCH_SCHEMA_VERSION, type SearchIndexArtifact, type SearchRecord, type SearchResponse, type SearchResult, type RankedSearchRecord } from "@/lib/search/schema";
+import { SEARCH_SCHEMA_VERSION, type SearchResponse, type SearchResult, type RankedSearchRecord } from "@/lib/search/schema";
 
-const recordsArtifact = recordsJson as { schemaVersion: number; sourceChecksum: string; records: SearchRecord[] };
-const indexArtifact = indexJson as SearchIndexArtifact;
+export const runtime = 'nodejs';
 
-if (recordsArtifact.schemaVersion !== SEARCH_SCHEMA_VERSION || indexArtifact.schemaVersion !== SEARCH_SCHEMA_VERSION) {
-  throw new Error("[doc6-search] generated search schema mismatch; rebuild DOC-6 artifacts");
-}
-if (recordsArtifact.sourceChecksum !== indexArtifact.sourceChecksum) {
-  throw new Error("[doc6-search] generated search artifacts are stale/inconsistent");
-}
-if (recordsArtifact.records.length !== indexArtifact.recordCount) {
-  throw new Error("[doc6-search] generated record/index count mismatch");
-}
-
+// Generated DOC-6 artifacts are fixed files loaded and cached by the server-data module.
+// The request hot path never traverses content/docs or reparses MDX sources.
+const { recordsArtifact, indexArtifact } = getSearchArtifacts();
 const availableFilters = getSearchFilterOptions(recordsArtifact.records);
 
 export async function GET(request: NextRequest) {
@@ -68,7 +59,6 @@ export async function GET(request: NextRequest) {
     errorCode: result.errorCode,
     score: result.score,
     matchReason: result.matchReason,
-    // Temporary compatibility fields for any pre-DOC-6 consumer not yet migrated.
     filename: result.sourceId,
     name: result.title,
     folder: result.breadcrumb.join(" / "),
