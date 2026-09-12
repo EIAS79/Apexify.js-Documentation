@@ -71,6 +71,22 @@ body:has(#gallery-main) .surface-elevated .text-grad-aurora {
   color: transparent;
 }
 
+/* Production axe diagnostics identified four Gallery microcopy/badge pairs
+   that were below AA in light mode. These overrides are intentionally scoped
+   to Gallery and preserve the existing decorative background accents. */
+body:has(#gallery-main) [style*="color:var(--text-muted)"] {
+  color: var(--text-secondary) !important;
+}
+
+body:has(#gallery-main) .text-white[style*="background-color:var(--accent-amber)"],
+body:has(#gallery-main) .text-white[style*="background-color:var(--success)"] {
+  color: #080312 !important;
+}
+
+.light body:has(#gallery-main) [style*="color:var(--accent-magenta)"] {
+  color: #a81464 !important;
+}
+
 /* Primary CTAs need a deterministic foreground/background contrast pair.
    The general sunset gradient is decorative and is not itself a text-color
    contract. These scoped variants preserve the sunset character while making
