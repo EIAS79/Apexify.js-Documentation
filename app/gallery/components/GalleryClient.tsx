@@ -238,7 +238,10 @@ function CallToAction() {
           viewport={{ once: true, amount: 0.3 }}
           transition={reduce ? { duration: 0 } : { duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="relative overflow-hidden rounded-3xl p-8 sm:p-12 lg:p-14"
-          style={{ background: 'var(--gradient-aurora)', boxShadow: 'var(--shadow-xl)' }}
+          style={{
+            background: 'linear-gradient(135deg, #3527c7 0%, #a81464 50%, #7a3e00 100%)',
+            boxShadow: 'var(--shadow-xl)',
+          }}
         >
           <div className="relative z-10 grid grid-cols-1 items-center gap-6 lg:grid-cols-3">
             <div className="text-white lg:col-span-2">
