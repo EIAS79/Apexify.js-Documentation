@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "records": 19071,
+  "recordsRawBytes": 30680773,
+  "indexRawBytes": 75734932,
+  "combinedRawBytes": 106415705,
+  "delivery": "server-side generated index; clients fetch only bounded result JSON on interaction",
+  "eagerFullIndexOnOrdinaryDocsRoutes": false
+}

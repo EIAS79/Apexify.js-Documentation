@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "categories": [
+    {
+      "category": "symbol",
+      "query": "AdsrEnvelope",
+      "applicable": true,
+      "expectedId": "api-symbol:apexify.js::AdsrEnvelope",
+      "actualTopIds": [
+        "api-symbol:apexify.js::AdsrEnvelope",
+        "api-symbol:apexify.js::SynthLayer",
+        "api-symbol:apexify.js::SynthLayerOverride",
+        "api-option:apexify.js::ApexPainter#videoPipeline::initialLayers.tracks.events.options.layers.adsr",
+        "api-option:apexify.js::ApexPainter#videoPipeline::initialLayers.tracks.sound.layers.adsr"
+      ],
+      "pass": true
+    },
+    {
+      "category": "option",
+      "query": "frames.backgroundColor",
+      "applicable": true,
+      "expectedId": "api-option:apexify.js::ApexPainter#animate::frames.backgroundColor",
+      "actualTopIds": [
+        "api-option:apexify.js::ApexPainter#animate::frames.backgroundColor",
+        "api-symbol:apexify.js::VideoCreationOptions",
+        "doc:08-animate-api",
+        "doc:03-create-gif-transparency-disposal",
+        "doc:01-create-gif-input-frames"
+      ],
+      "pass": true
+    },
+    {
+      "category": "concept",
+      "query": "canvas",
+      "applicable": true,
+      "expectedAny": true,
+      "actualTopIds": [
+        "api-option:apexify.js::ApexPainter#createImage::canvasBuffer.canvas",
+        "api-option:apexify.js::ApexPainter#createText::canvasBuffer.canvas",
+        "api-symbol:apexify.js::CanvasConfig",
+        "api-symbol:apexify.js::CanvasResults",
+        "api-option:apexify.js::ApexPainter#createCanvas::canvas.bgLayers"
+      ],
+      "pass": true
+    },
+    {
+      "category": "goal",
+      "query": "create canvas",
+      "applicable": true,
+      "expectedAny": true,
+      "actualTopIds": [
+        "api-type:apexify.js::createCanvas",
+        "api-member:apexify.js::ApexPainter#createCanvas",
+        "heading:00-create-canvas-overview:00-create-canvas-overview",
+        "heading:03-how-buffers-work:what-createcanvas-returns",
+        "api-symbol:apexify.js::CanvasResults"
+      ],
+      "pass": true
+    },
+    {
+      "category": "runtime",
+      "query": "node",
+      "applicable": true,
+      "expectedAny": true,
+      "actualTopIds": [
+        "api-symbol:apexify.js::AdsrEnvelope",
+        "api-symbol:apexify.js::AlignMode",
+        "api-symbol:apexify.js::ApexifyAssetError",
+        "api-symbol:apexify.js::ApexifyConfigError",
+        "api-symbol:apexify.js::ApexifyDecodeError"
+      ],
+      "pass": true
+    },
+    {
+      "category": "package",
+      "query": "apexify.js",
+      "applicable": true,
+      "expectedAny": true,
+      "actualTopIds": [
+        "api-symbol:apexify.js::AdsrEnvelope",
+        "api-symbol:apexify.js::AlignMode",
+        "api-symbol:apexify.js::ApexifyAssetError",
+        "api-symbol:apexify.js::ApexifyConfigError",
+        "api-symbol:apexify.js::ApexifyDecodeError"
+      ],
+      "pass": true
+    },
+    {
+      "category": "error-code",
+      "query": null,
+      "applicable": false,
+      "reason": "No public current error code",
+      "pass": null
+    }
+  ],
+  "passedApplicable": true,
+  "errorCodeApplicable": false
+}

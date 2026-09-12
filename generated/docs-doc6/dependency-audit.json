@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "addedRuntimeDependencies": [],
+  "addedDevDependencies": [],
+  "externalSearchServices": [],
+  "aiDependencies": [],
+  "indexRuntime": "first-party deterministic TypeScript"
+}

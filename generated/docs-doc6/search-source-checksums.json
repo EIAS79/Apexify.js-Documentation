@@ -1,0 +1,787 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    {
+      "path": "content/docs/00-start-here/00-start-here.mdx",
+      "sha256": "c4e1c2a00ef060e295da0daeef575f171b5dda9afb4e152aae6a46afbf471ced",
+      "bytes": 3628
+    },
+    {
+      "path": "content/docs/00-start-here/01-feature-tracks.mdx",
+      "sha256": "5604650215440e07f70dfd6184f8e74f5a82c76f2bbcf973fe4bdd4a6cb60145",
+      "bytes": 4693
+    },
+    {
+      "path": "content/docs/01-beginner-guide/00-beginner-guide.mdx",
+      "sha256": "a393f442ac793be2c91c8ad1fd6f18b58dd1afa6c294276a7969b990e0d109b2",
+      "bytes": 2398
+    },
+    {
+      "path": "content/docs/01-beginner-guide/01-install-and-setup.mdx",
+      "sha256": "e4eb9274a8633fa4270036a1c3aa86468adf4c9703a16ef81d57047c909a21b5",
+      "bytes": 3397
+    },
+    {
+      "path": "content/docs/01-beginner-guide/02-your-first-image.mdx",
+      "sha256": "84f9de89eddec8fa4e945b8f883c91c633728e3e516703847c1d16112fe4e7bd",
+      "bytes": 1223
+    },
+    {
+      "path": "content/docs/01-beginner-guide/03-how-buffers-work.mdx",
+      "sha256": "673d5c4504903deae9048093aa26499f90ad3a7120e2b2d2bfec7619ac542093",
+      "bytes": 1461
+    },
+    {
+      "path": "content/docs/01-beginner-guide/04-save-and-export.mdx",
+      "sha256": "9585b26212059e3a368e65340b9c7867f39df3bfd16206fec00a350efe5c2ebd",
+      "bytes": 1260
+    },
+    {
+      "path": "content/docs/01-beginner-guide/05-common-mistakes.mdx",
+      "sha256": "f2eac5f1e12f1589a2cfd1827ffbcce3c1eb7ad1b5bb2ea73cf669c6f95ead10",
+      "bytes": 1399
+    },
+    {
+      "path": "content/docs/02-recipes/00-recipes-overview.mdx",
+      "sha256": "bbb6b585faaf33a6ed63d08c86d67f46cf6c338bc823de419f78a7c989a816b6",
+      "bytes": 2126
+    },
+    {
+      "path": "content/docs/02-recipes/01-what-you-can-build.mdx",
+      "sha256": "b3ea4feadd4886d2b1e345ae7d4d932702c5efe14653dfcfda5730dc7406587d",
+      "bytes": 8130
+    },
+    {
+      "path": "content/docs/02-recipes/02-philosophy-goals-and-when-to-use.mdx",
+      "sha256": "6f3b1c947d360f579a5c37d40e1c178a07c5d288b35fe425bdb45b9313b36d4d",
+      "bytes": 3743
+    },
+    {
+      "path": "content/docs/02-recipes/recipe-share-card.mdx",
+      "sha256": "5a06a3504c5765d0610254e735bcd0c150a833799cec1106ad55c34e967318b2",
+      "bytes": 2019
+    },
+    {
+      "path": "content/docs/03-feature-guides/batch-save-output/00-batch-save-output-overview.mdx",
+      "sha256": "0f7c47c2f4eaff0f0f11d1e6740b76e290de7099b1ecc1b0727270ffd49e0f80",
+      "bytes": 672
+    },
+    {
+      "path": "content/docs/03-feature-guides/batch-save-output/01-save-disk-and-multiple.mdx",
+      "sha256": "b523f338fc96649eb16f725c8492950d32f6a35595e271989bb0a9b2c99ddc26",
+      "bytes": 142
+    },
+    {
+      "path": "content/docs/03-feature-guides/batch-save-output/02-output-format-and-outPut.mdx",
+      "sha256": "907f64bf4eac8f5b0efc56cfcaac5dba8de79e1c4b6462b9650c1838794226ab",
+      "bytes": 242
+    },
+    {
+      "path": "content/docs/03-feature-guides/batch-save-output/03-imgur-output-security.mdx",
+      "sha256": "de0a363ca716a4d137ca96d33c44c77b905ea6f3407bbe7ab500542eeade6c8d",
+      "bytes": 1903
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/00-create-canvas-overview.mdx",
+      "sha256": "1455875123c10b37410d14aeecb72103f9c7e8c4f35a9a6fc19556e1a61e7e76",
+      "bytes": 5277
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/01-canvas-size-and-coordinates.mdx",
+      "sha256": "c77255f8c9f2c1da4a16897164b12392c35ef1c141c02af5153e82529af30d1c",
+      "bytes": 3846
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/02-backgrounds-primary.mdx",
+      "sha256": "7adccb85a6077d72809204f8d32f4cd6eda7691ce5a803af8808e47a5190e09c",
+      "bytes": 2524
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/03-backgrounds-transparent-base.mdx",
+      "sha256": "a81b13723d4d67e03adedf1cf4eabf61232d3274dabdfa6cdd250317dfb52226",
+      "bytes": 937
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/04-backgrounds-bg-layers.mdx",
+      "sha256": "8660a67156a259257e0947a4b4ba15fd38d3ffa0a87dc712f4c6a2bddf55a78f",
+      "bytes": 1833
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/05-backgrounds-pattern-noise.mdx",
+      "sha256": "ece13247414e0920e8df20a97bbca699aa6e9810cfa7af8a5a3e35a1640e0c44",
+      "bytes": 7383
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/06-canvas-border-shadow-zoom.mdx",
+      "sha256": "57d793f99a895a074dc73e08fd7867358529c68954bfbc28bc2f0ce320909c4e",
+      "bytes": 3960
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/07-canvas-shadow-options.mdx",
+      "sha256": "2584545d77b2abe9c09b5a6e8e3705668c43666eab0da58856f96603b26aaa66",
+      "bytes": 2983
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/08-canvas-stroke-options.mdx",
+      "sha256": "84fad7d2908cae93ae10849473b081251abe170af8626c3bbfecf3f3e90b2719",
+      "bytes": 4214
+    },
+    {
+      "path": "content/docs/03-feature-guides/canvas/09-canvas-paint-order.mdx",
+      "sha256": "371a07cc4aebfba21a79865f050f3cc34e35a499d0c3c4b10390929fab68bee9",
+      "bytes": 1523
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/00-charts-overview.mdx",
+      "sha256": "a3c37efad65e9d2c57b6544d9da70f921dc9eeb19c5fd41ae33a0da282112c7f",
+      "bytes": 3176
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/01-charts-shared-appearance.mdx",
+      "sha256": "19a34bd3136e1ef71634e3fba7584233b6ab6a13cbb78323891c98f73af119fe",
+      "bytes": 3675
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/02-chart-pie-and-donut.mdx",
+      "sha256": "22d96dd856ae6071b7e3d69d2e1b67739a87dcfdc446e97c82d053922a8f8600",
+      "bytes": 2996
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/03-chart-bar-vertical.mdx",
+      "sha256": "d6a04f8b23948b1bf156473639205a1e9d30b7562d87e6b0b81b3e014f331cb8",
+      "bytes": 3883
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/04-chart-horizontal-bar.mdx",
+      "sha256": "eac7fa0769a0d4f0cfb00c262f914f3e4ac0665f4a489d90d6db05422d213e8c",
+      "bytes": 2233
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/05-chart-line.mdx",
+      "sha256": "4352446a8bffa800fab6f85dd460f980df423238c84c9b5e8682bfbf23ff7479",
+      "bytes": 7140
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/06-chart-scatter.mdx",
+      "sha256": "19d53a3deb8372b913527d74cbaae475e5a1077996d8d1ae206423d70a7e18df",
+      "bytes": 2548
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/07-chart-radar.mdx",
+      "sha256": "8031539a8132eabceceb94ba4064514081df14f398a694479061635911a1f395",
+      "bytes": 4627
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/08-chart-polar-area.mdx",
+      "sha256": "a6e2258ffa01fd6cff5ebf2476c584442267305ddd597b61c39f94eaee6d67e9",
+      "bytes": 4330
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/09-chart-combo.mdx",
+      "sha256": "8b9fbdbc471dd786a35f3d478e9a1e7e909e46cc1758e08287705bde6640f61a",
+      "bytes": 5712
+    },
+    {
+      "path": "content/docs/03-feature-guides/charts/10-chart-comparison.mdx",
+      "sha256": "781dfc0c76d03812a15b06f564d7a71f1716b8790b8e32dde29fe652c9033c21",
+      "bytes": 6716
+    },
+    {
+      "path": "content/docs/03-feature-guides/feature-guides-hub.mdx",
+      "sha256": "037e5b26f48df3cf2263ba7d8908a1982a648890c2a1d5a03b47e95087aad7d4",
+      "bytes": 1869
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/00-create-gif-overview.mdx",
+      "sha256": "f4d5efa0648b46c7624231b2eda4ccb70bef2a8061c9b7018e6a1723bcacfc20",
+      "bytes": 5892
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/01-create-gif-input-frames.mdx",
+      "sha256": "58038148e02f925f5a12916990626f5b729cc7e720d0f9909b0c69fc11941caa",
+      "bytes": 3523
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/02-create-gif-options-output.mdx",
+      "sha256": "d49136e02dff7e857932b6558ae42e2b578a3a395f838c18e8f81b4e08e84afe",
+      "bytes": 2992
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/03-create-gif-transparency-disposal.mdx",
+      "sha256": "f6be45add2b7681273544c4d62d7453d1648a43ffba91f07ffacb9e3fbda5ee5",
+      "bytes": 2262
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/04-create-gif-watermark-overlay.mdx",
+      "sha256": "ac800a72d70d48627abed52c21a0847100c9583f3c44150e3d1d6ed3c2416942",
+      "bytes": 3499
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/05-create-gif-onstart.mdx",
+      "sha256": "08b7cd7192c52fe8ff18a60d72d9ac32c8b1226f8090d66f190543cfe0a3c68e",
+      "bytes": 3661
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/06-create-gif-onend-results.mdx",
+      "sha256": "ddeaa324902ffb8c58530f32dba15e19fae96dd13c9607f93b0f126da0d4d674",
+      "bytes": 3782
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/07-create-gif-encode-pipeline.mdx",
+      "sha256": "6b3d3e7ebcf7d33b7904f072f7702c8ee27e937dffc3da4a4119647113e12d53",
+      "bytes": 4337
+    },
+    {
+      "path": "content/docs/03-feature-guides/gif-animation/08-animate-api.mdx",
+      "sha256": "1d6d98f517f5ea9c295c4eefacdf08dc23626e6b3750768319c2d70e0a64be41",
+      "bytes": 6380
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/00-create-image-overview.mdx",
+      "sha256": "59307ba5e1bf16118f3d1c770afde9d6bd2e91267a7bfe3477dd866768499b1c",
+      "bytes": 3027
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/01-create-image-basics.mdx",
+      "sha256": "5c45abe8427780a4991bfe26a1bf6b4ba48868569fd6814fb24c661207e7be8b",
+      "bytes": 1961
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/02-shapes-reference.mdx",
+      "sha256": "fe151b293b09fd8f7332c7ff163660f3405bfa34fd1795a6e9c3f177cd3d06c3",
+      "bytes": 4704
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/03-create-image-styling-clip.mdx",
+      "sha256": "c6bde648576138432764a39e94304da33a35d91ee1591c96b40a70adb8524c69",
+      "bytes": 4514
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/04-create-image-shadow-stroke.mdx",
+      "sha256": "0d7275fbf1b3607baefecd05b28343e3a77ca6788b9f06df18fa8c1d4719b3fe",
+      "bytes": 3881
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/05-create-image-filters.mdx",
+      "sha256": "8a0c7207e6f088669fe2a17db3449984b7db16ea7f9653d38e46c0b800719e93",
+      "bytes": 3687
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/06-create-image-mask-distortion.mdx",
+      "sha256": "dd6d9b2332d5809fc68f9929e3ec8ed791e41b032d6c2443e5b44ee8e9f608a8",
+      "bytes": 3240
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/07-create-image-effects.mdx",
+      "sha256": "13311c7977b36457026989bd99fbeca23386e79f2a7ee1664623cdd8b14fec90",
+      "bytes": 2382
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/08-create-image-groups.mdx",
+      "sha256": "8bf352fa85fbc9e56b224b0e9e475e910fc2a38f352f60743a34fb1ab0ed48c3",
+      "bytes": 2994
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/09-create-image-paint-order.mdx",
+      "sha256": "b2873ccbc58108daa8fb7e29f3e77fce2c7b04d91899333ae4904444c86b45e6",
+      "bytes": 3684
+    },
+    {
+      "path": "content/docs/03-feature-guides/images-shapes/10-remote-image-reliability.mdx",
+      "sha256": "72c62aa4a948ebeb036238c4f5a2857001f9b667cd62457978b9bfc44a5aa1aa",
+      "bytes": 3669
+    },
+    {
+      "path": "content/docs/03-feature-guides/lines-connectors/00-custom-lines-overview.mdx",
+      "sha256": "013de5feb6923925f5e14e372b178a7ce89c60dc458a4a17007bd0afe4ebc034",
+      "bytes": 3174
+    },
+    {
+      "path": "content/docs/03-feature-guides/lines-connectors/01-create-custom-api.mdx",
+      "sha256": "2c7f8ed7e4d9c7ad275a24e00a69f674fba01cde2b405087833b24f5b6670469",
+      "bytes": 3187
+    },
+    {
+      "path": "content/docs/03-feature-guides/lines-connectors/02-custom-line-style-path.mdx",
+      "sha256": "487b6c58a94db2541270cb9c1bb2d6488c0309be64d4d54ddb619cb3af2dbb85",
+      "bytes": 3461
+    },
+    {
+      "path": "content/docs/03-feature-guides/lines-connectors/03-custom-lines-arrows-markers-textures.mdx",
+      "sha256": "de393d3c49bb2926abac6d9111225a4ce7aa94e3970ef936c08ba3af882a1fde",
+      "bytes": 2992
+    },
+    {
+      "path": "content/docs/03-feature-guides/lines-connectors/04-path2d-draw-path.mdx",
+      "sha256": "6e4303d6882df9b601d7fa6f63eb1a182a870ea5c054a54207a2b48c8b117dc4",
+      "bytes": 4338
+    },
+    {
+      "path": "content/docs/03-feature-guides/lines-connectors/05-hit-testing-paths.mdx",
+      "sha256": "60f2d1e2ebb6369dfcf4cad727cc555a27e7e9564e3590159d3166d93096e5c6",
+      "bytes": 488
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/00-raster-batch-output-overview.mdx",
+      "sha256": "9b8b2d46033ac812fab45fc10bd866dcad93540605fb9562d0cc8e22878fd32c",
+      "bytes": 2404
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/01-batch-and-chain.mdx",
+      "sha256": "bb83f1e378c8f2a04c710483875179ca2fa419231fe68e93c065d377f28d1160",
+      "bytes": 4603
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/02-save-disk.mdx",
+      "sha256": "ccd8063afb98d92b1d5e4ee58fee7b28fe86dea16aec8f478ed0660c3639963c",
+      "bytes": 3110
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/03-output-format-and-encoding.mdx",
+      "sha256": "c9a825ccca66750390f628630e756f7069cf4a0e56a6d162f64809a11a30c843",
+      "bytes": 4228
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/04-image-stitch-and-collage.mdx",
+      "sha256": "6c4819ea6ff220cde3d19906205abf6353df5d341a55e524962a9b522611bf2e",
+      "bytes": 3684
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/05-image-compress-and-palette.mdx",
+      "sha256": "aa651a5b611e0aa5ffed5e3652db402b711a9ca50e3686e10782d5466411deb6",
+      "bytes": 2157
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/06-image-resize-convert-effects.mdx",
+      "sha256": "b9ecdbc0e20275a7c5df8d57185981c1ea1a95c0f7d44c34dbeb0ddc07a7c086",
+      "bytes": 6655
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/07-image-blend-mask-crop-gradient.mdx",
+      "sha256": "7e0405eff949f6880768e0e00cadae1f234d613093b511594062ca760dfa44fe",
+      "bytes": 5048
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/08-pixel-data.mdx",
+      "sha256": "c4c764fbe4108baf346d0ccabacffad0e82bb42a9f88471b5c25a730bcc3227d",
+      "bytes": 1936
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/09-path2d-draw-and-custom-lines.mdx",
+      "sha256": "7762f63af8292098eb6c12d886f4709bbfe2680e947fb457f26add43c38d8a0e",
+      "bytes": 4289
+    },
+    {
+      "path": "content/docs/03-feature-guides/raster-batch-output/10-hit-detection.mdx",
+      "sha256": "1080410d01bcb7d359cb086128ab0693b79e3db32fe7c42db255acba0c32eab3",
+      "bytes": 4679
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/00-create-text-overview.mdx",
+      "sha256": "c6cf25102aad17dc9e01ef0af3e395974e360560c2ce65e87e0336bda4a53d4b",
+      "bytes": 3799
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/01-create-text-font-and-position.mdx",
+      "sha256": "94973455c3b8fe1f7322c379bfd2297cfa87d0c408c290bfb5c55619704439d8",
+      "bytes": 3254
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/02-create-text-wrapping-spacing.mdx",
+      "sha256": "77ff6ee3362c780f6d6789059dfa6a73d5dc873e5aaafdacef6259ac373d94d1",
+      "bytes": 2509
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/03-create-text-color-gradients.mdx",
+      "sha256": "56ad4200788d6a762034ba66915db85dff9c38719ef34c31421acb5e2cb91818",
+      "bytes": 2415
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/04-create-text-glow-shadow-stroke.mdx",
+      "sha256": "75eb3137667c151a7a5701208962e9d941f9a313bf199de400ff073b15e131f1",
+      "bytes": 2712
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/05-create-text-decorations-highlight.mdx",
+      "sha256": "f08925f889f8b14c04f6c5b7b380cb4ddbb5d9344fb17b04186b4dbd51576a30",
+      "bytes": 2101
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/06-create-text-curved.mdx",
+      "sha256": "a55a02824a704caeac69b829f1931a0e4aba3f499c27d5736eb880a7abd94448",
+      "bytes": 2960
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/07-measure-text.mdx",
+      "sha256": "f084712b8a13a5a77d8f0a7a5f29564adf0c13b04b9c1c4f7e5a94dccd87d8e3",
+      "bytes": 2688
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/08-create-text-paint-order.mdx",
+      "sha256": "2ad4aa35d644670a780ab4e64f7e8c79e4cf07ef89894f7ccb4aefd0ea19d2cb",
+      "bytes": 2584
+    },
+    {
+      "path": "content/docs/03-feature-guides/text-rendering/09-create-text-properties-matrix.mdx",
+      "sha256": "f688928618055dcd7d45fe39f060bf397b779261199df8a8341cf89f2b9c31a2",
+      "bytes": 3983
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/00-video-overview.mdx",
+      "sha256": "7c96424347e49ef94b3076c152643e72e2e7b8988f32075e34ab92e834108803",
+      "bytes": 7143
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/01-metadata-and-frames.mdx",
+      "sha256": "b60d3b931bf599974641463502f92a3701a8240c9aada6e7e624a52029211192",
+      "bytes": 6782
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/02-transcode-trim-transform.mdx",
+      "sha256": "a945417d7259902e090b87fd851dc1b017d9bb4ec711d08d3d1e352fb415117f",
+      "bytes": 5554
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/03-audio.mdx",
+      "sha256": "999d8f0ca2b294c3bea2fb98b6a18449a92162d4e8f156fc39cf6ac28958a069",
+      "bytes": 5194
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/04-effects-overlays.mdx",
+      "sha256": "e5919d3c1dae1acbb8fddf210f56025c5777ec53deab7e294d687c8e1d8025bb",
+      "bytes": 5923
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/05-compose-and-build.mdx",
+      "sha256": "531c9532ae053d3766bc61c117333a1434a6732e8ef8e229532296af2f6ca812",
+      "bytes": 4863
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/06-advanced-presets-transitions.mdx",
+      "sha256": "4d7c41e2e709b7cf21fae73928402c6e60f6ac489fa6ca4721a2ee5b46e8d727",
+      "bytes": 4386
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/07-video-creation-options-matrix.mdx",
+      "sha256": "81bffc5a6032421b91163f41c6f2bf5b10fd11b1b9b521f5dfb136feb3846863",
+      "bytes": 2516
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/08-imperative-video-helpers.mdx",
+      "sha256": "405e4f0428055d04f3255d9d6882e0fc605deaf8a19bc1962618b8b9c5b36ff8",
+      "bytes": 6942
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/09-security-runtime-configuration.mdx",
+      "sha256": "db654bdacfdc13d486493de0d898cffac84e20feabe9bb8a586c0cb0d8cf0408",
+      "bytes": 2778
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/00-video-options-hub.mdx",
+      "sha256": "0229999cb427a140536c2fa7a018a0b1a81f7a64f9a8e2e034d3f2df106e5b6f",
+      "bytes": 2425
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/01-discovery-metadata.mdx",
+      "sha256": "f600a473cdf2be8cd44077da7c5e41fd139ac722d46b7c8ece7579683cfc6e77",
+      "bytes": 1785
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/02-frame-extraction.mdx",
+      "sha256": "2f0ac05fd410b53c6db773f3d09334de9b518ce3218ffadc7ceb2d93c6e37e51",
+      "bytes": 5702
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/03-transcode-export.mdx",
+      "sha256": "c5c90dfb51770655af31aab562ff9ea92865718e281307f95318ec75f252b9db",
+      "bytes": 3690
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/04-timeline-edits.mdx",
+      "sha256": "437bf377f37854d729a2b764460045bc8269efc1a3b7c25a598d3af4ccc30cfc",
+      "bytes": 3829
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/05-geometry.mdx",
+      "sha256": "c24e30eba5b57223638ca06e0d0b4a3c98742fe6bcc1fb174291378838114559",
+      "bytes": 1695
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/06-audio-deep-dive.mdx",
+      "sha256": "ab00f9002c41e1f7b067744a500b8945d4c77118b73dda09c178cd30669c0775",
+      "bytes": 7118
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/07-visual-filters.mdx",
+      "sha256": "5087f272fe68e838626736e99a0ba63df54890e0d14dface792b51e6e0f91945",
+      "bytes": 4122
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/08-text-overlays.mdx",
+      "sha256": "350bfc6f7ee81f28eec88a0d843a3b311ef2ac6658c80d841dec75b63e166983",
+      "bytes": 6005
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/09-compositing.mdx",
+      "sha256": "bea84ddc0c7d01c0a6e7e09d06f5f72c58c02b77ae577474046cba87f08bbbd5",
+      "bytes": 3682
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/10-advanced-ops.mdx",
+      "sha256": "617fe8590329a2ea1e3f3c7bac7246e0c6dd65c6d3636951aa76cdc8130a0444",
+      "bytes": 1839
+    },
+    {
+      "path": "content/docs/03-feature-guides/video-ffmpeg/options/11-on-progress.mdx",
+      "sha256": "186460c53b324907314732c9f23b5b0a33b59e20916f0a695892a3dfdb753bda",
+      "bytes": 2975
+    },
+    {
+      "path": "content/docs/04-advanced/00-advanced-overview.mdx",
+      "sha256": "f61fb1194fb543feca912e333af07715b0b309bc02bf7b4115a513a2fc892f0e",
+      "bytes": 5466
+    },
+    {
+      "path": "content/docs/04-advanced/01-runtime-resource-governance.mdx",
+      "sha256": "800f3e4f7fe002c9ec4ecf89143ed4202b8d276581ba5425a0a95ff129f1f979",
+      "bytes": 10274
+    },
+    {
+      "path": "content/docs/04-advanced/02-security-deployment.mdx",
+      "sha256": "64db0f237be0a70b424fffb5978a874b1976711f1cfc1ee1dd7d619556040053",
+      "bytes": 6672
+    },
+    {
+      "path": "content/docs/04-advanced/03-performance-memory.mdx",
+      "sha256": "25c44f938d2a28cd5c9d8baaa87a61a517aea3dad682804e274564d5fea94e12",
+      "bytes": 6612
+    },
+    {
+      "path": "content/docs/04-advanced/04-migration-v6.mdx",
+      "sha256": "0e7c662e8be8add08074e5ef5555d4565399d8322ae86559d00beb64949085e9",
+      "bytes": 9179
+    },
+    {
+      "path": "content/docs/04-advanced/audio/00-audio-advanced-hub.mdx",
+      "sha256": "d97960f5acc958531a7edf03c5b8fe76d108ff3efc9267c4b1909165896b06c6",
+      "bytes": 2135
+    },
+    {
+      "path": "content/docs/04-advanced/audio/01-create-audio.mdx",
+      "sha256": "fa4339dcb5ee1e23f2dcef4d06196e226e37e6ce1676ef403d54102bb18ee0a5",
+      "bytes": 11599
+    },
+    {
+      "path": "content/docs/04-advanced/composition/00-composition-hub.mdx",
+      "sha256": "ff53de4dcd5b9b0b7eaf5c68e60ce22858f69f8d7d056189cfeddf03aac549e7",
+      "bytes": 3448
+    },
+    {
+      "path": "content/docs/04-advanced/composition/01-named-assets.mdx",
+      "sha256": "e0fd588ca3e0393b80f85a5e7b7d9d5bdaf4c0c555082d42f404c49cde7b2014",
+      "bytes": 5530
+    },
+    {
+      "path": "content/docs/04-advanced/composition/02-templates.mdx",
+      "sha256": "424fca4e4902a27f20972597bf726ddec31f9b9cdeacdd6c0a163bd9153e71f9",
+      "bytes": 7795
+    },
+    {
+      "path": "content/docs/04-advanced/composition/03-preset-components.mdx",
+      "sha256": "a252160aba65881ae5f8318436c0997315efd6425d37709be217a566887646a5",
+      "bytes": 4393
+    },
+    {
+      "path": "content/docs/04-advanced/composition/04-plugins.mdx",
+      "sha256": "6d320c4673ec07c6d0ef127d556d50db4382ffa2ab817e81d220c4fcdddaae28",
+      "bytes": 4494
+    },
+    {
+      "path": "content/docs/04-advanced/composition/05-imperative-batch-chain-assets.mdx",
+      "sha256": "fdd8333ace9f00d17550ffea5f4c529ed48526d4129096b0efd44eeec65913fe",
+      "bytes": 4258
+    },
+    {
+      "path": "content/docs/04-advanced/scene/00-scene-composition.mdx",
+      "sha256": "d69117e16b26247b76eee3ec84b5737452f11ab50b1555e97ffba7b4db47b2ee",
+      "bytes": 6472
+    },
+    {
+      "path": "content/docs/04-advanced/scene/00-scene-hub.mdx",
+      "sha256": "ba4e25891341c1d3b7c253ccd8c7d9832103343fdd8602b59f1c9d45301ec02b",
+      "bytes": 187
+    },
+    {
+      "path": "content/docs/04-advanced/scene/01-scene-types-builder.mdx",
+      "sha256": "21988b793adca2a78b05e4cd625c26c8d89d71362180fe5fcedf94da9152fb4d",
+      "bytes": 6009
+    },
+    {
+      "path": "content/docs/04-advanced/scene/02-scene-layers-raster-text-path.mdx",
+      "sha256": "5bad0c25084a0043038ee4d6c1d879055b1d1323621deab756b97e43f8570e56",
+      "bytes": 4765
+    },
+    {
+      "path": "content/docs/04-advanced/scene/03-scene-layers-charts.mdx",
+      "sha256": "61128068d22fe3103ca8ff42cc84b55ba55c6b9239e884b1213e4daffaa097b9",
+      "bytes": 3956
+    },
+    {
+      "path": "content/docs/04-advanced/scene/04-scene-layers-custom-lines-surface.mdx",
+      "sha256": "b462e0be53ec87b9ea34eed306cd5b8dc03ff0419d7fa9fe5612e356b5a34aff",
+      "bytes": 4818
+    },
+    {
+      "path": "content/docs/04-advanced/scene/05-scene-backgrounds.mdx",
+      "sha256": "c7602a815a7664195cb3b4e9bf22ce611039bb4f07bca67d89a67af91a614808",
+      "bytes": 3536
+    },
+    {
+      "path": "content/docs/04-advanced/scene/06-render-scene.mdx",
+      "sha256": "27234cc533e516f2179bc622c8450a890a940ec392634c7325ea71e131e1d278",
+      "bytes": 4576
+    },
+    {
+      "path": "content/docs/04-advanced/scene/07-render-scene-to-gif.mdx",
+      "sha256": "d2115a5d21de55f57a088c5d044bcb9e6313638048de7a3536783ffce17b2e09",
+      "bytes": 4888
+    },
+    {
+      "path": "content/docs/04-advanced/scene/08-render-scene-to-video.mdx",
+      "sha256": "079b7c0dda5c3e55e54ab5067af0d2ee3e410ad3feb78ba4381a9b7a71549925",
+      "bytes": 4757
+    },
+    {
+      "path": "content/docs/04-advanced/scene/09-scene-paint-order-performance.mdx",
+      "sha256": "ea181fe65a1864699b08b449a642c0f3f980cb97addfe3eaeac96f8e501cefb5",
+      "bytes": 4793
+    },
+    {
+      "path": "content/docs/04-advanced/video/00-video-advanced-hub.mdx",
+      "sha256": "154ae583ceba434b1254656f60f4ac3bd0df9bcc9ee8b512b92f98681ece7b67",
+      "bytes": 1532
+    },
+    {
+      "path": "content/docs/04-advanced/video/01-video-pipeline.mdx",
+      "sha256": "1deeb69eaf00b2045c42bc35555045b66c34e0fa768d58e3c9aba4a661aa2a2d",
+      "bytes": 9436
+    },
+    {
+      "path": "content/docs/04-api-reference/api-audio/api-create-audio.mdx",
+      "sha256": "06592ae3a4873aad9f2127b466dedd1b85b0b7eb6374545a5958c861571ddc66",
+      "bytes": 1947
+    },
+    {
+      "path": "content/docs/04-api-reference/api-batch-save/api-batch.mdx",
+      "sha256": "ec5c7691fd4e4cc7fe2d4dd65a635eb4da6f2a63de92aeaf6078869501b5c9b1",
+      "bytes": 2634
+    },
+    {
+      "path": "content/docs/04-api-reference/api-charts/api-create-chart.mdx",
+      "sha256": "3cdc520a747fab3bb0b29cd535d85e97c061b09311de56ee4f7b2274966b4531",
+      "bytes": 1467
+    },
+    {
+      "path": "content/docs/04-api-reference/api-gif/api-create-gif.mdx",
+      "sha256": "0a68986df3392a628a2683fefe8155ff4cc27524ca86f32106a3b8be3eb3d23d",
+      "bytes": 1821
+    },
+    {
+      "path": "content/docs/04-api-reference/api-image/api-image-utilities.mdx",
+      "sha256": "d0d30a6b125947e23c7fb98066fe778e37e84478cab6d0c53eb7566b3ec07792",
+      "bytes": 2319
+    },
+    {
+      "path": "content/docs/04-api-reference/api-lines-paths/api-create-path2d.mdx",
+      "sha256": "4bfbf3aa05d8f8add1a00031b3e3790e64414f3a767a190be4b4135fc6cea602",
+      "bytes": 1672
+    },
+    {
+      "path": "content/docs/04-api-reference/api-overview/api-reference.mdx",
+      "sha256": "7c2c51b4f5475f4405df6af65bfc004b8ad7568bf0f49b0af58017c8330bdbd3",
+      "bytes": 3940
+    },
+    {
+      "path": "content/docs/04-api-reference/api-overview/canvas-utils-and-types.mdx",
+      "sha256": "aec16960bc39ef776fbb8274e3c7c8464b36a724d42c6eb3ec3b1b582ac0164d",
+      "bytes": 3054
+    },
+    {
+      "path": "content/docs/04-api-reference/api-overview/package-surface.mdx",
+      "sha256": "c4ec0ae7ed866aadcf8cebf08afb26809d25e5e618622bbb05de7b11ea9eb24f",
+      "bytes": 3663
+    },
+    {
+      "path": "content/docs/04-api-reference/api-scene/api-new-apex-painter.mdx",
+      "sha256": "b87e5e90675956190c5ddd9fe1869d913acce1e67965a02cf4961c2e4b9167ba",
+      "bytes": 7502
+    },
+    {
+      "path": "content/docs/04-api-reference/api-video/api-create-video.mdx",
+      "sha256": "7c2937641f1d6ec76b6dcd3eb203cfdc4944d75bcc3f3be5e86a690514ad781c",
+      "bytes": 3317
+    },
+    {
+      "path": "content/docs/05-internals/00-internals-overview.mdx",
+      "sha256": "f89deb56119e5339027ed820724eaa6579b57fbadcbd20f17b91f9171e942fa6",
+      "bytes": 292
+    },
+    {
+      "path": "content/docs/05-internals/01-5.4.5-remote-image-hotfix.mdx",
+      "sha256": "47c94737fad86478bd3a0756d47012451ea294ba63b0c41bac79dec87175edb1",
+      "bytes": 1468
+    },
+    {
+      "path": "content/docs/05-internals/changelog.mdx",
+      "sha256": "c0e56309fa75f49c031baa5b29092b645b89a407c0c33d6f83c57d23d1cbb99f",
+      "bytes": 15480
+    },
+    {
+      "path": "content/docs/README.mdx",
+      "sha256": "1a2d04aebda5e35b99065861a553cc92d9f1161af1579e3885e3a5eeb42840b3",
+      "bytes": 3197
+    },
+    {
+      "path": "generated/docs-doc1/docs-manifest.json",
+      "sha256": "ae18ca69701b9ba11f4318b4ff784cea0b29cecdb7ae81bcbf25b6a722cfb20b",
+      "bytes": 5759
+    },
+    {
+      "path": "generated/docs-doc1/navigation-manifest.json",
+      "sha256": "e7ff759ee344cb6dd47e2be4f30ac2e48b920ce4bb72c650d6563aa4745ab68b",
+      "bytes": 1790
+    },
+    {
+      "path": "generated/docs-doc1/redirect-manifest.json",
+      "sha256": "0c299d2e0bfba19307df342eac7dbd12e1407af17c7559ff90e43e7bdcb04f5f",
+      "bytes": 35734
+    },
+    {
+      "path": "generated/docs-doc4/api-manifest.json",
+      "sha256": "8880d430e5105d7a5bc70c27c318d78a8404abba12786a18dd5becc92f23a471",
+      "bytes": 113351826
+    },
+    {
+      "path": "generated/docs-doc5/example-manifest.json",
+      "sha256": "929ee33cfd7e80268b5cb9a5fb28cb0d1dc72d9fdb8b44bab2647e4e051beb1f",
+      "bytes": 19261
+    },
+    {
+      "path": "lib/gallery/core/galleryDocLink.ts",
+      "sha256": "7a5d06262bb9ef9ab8df32df53438c7f23b45f90484399f5c99b772ef634f627",
+      "bytes": 1436
+    },
+    {
+      "path": "lib/gallery/docs/doc5GalleryAdapter.ts",
+      "sha256": "a33b902e0ddd3fb94a07c4fe27501eb29fd5faf0564813978553d867d2c121ef",
+      "bytes": 1459
+    },
+    {
+      "path": "lib/gallery/docs/galleryRegistry.ts",
+      "sha256": "e6201b00dffe5ddbc26098a7cf01faf4fcf15ba91d47cea48d8160d32a51be47",
+      "bytes": 1599
+    }
+  ],
+  "galleryDataSha256": "261a66af6919b629262e19835fa13938cb3b2cece62949258c2cf5f3a9f4e4df",
+  "combinedSha256": "acced5f9121388e460b6f0143434255609962552525189e436c8a351427e0f01"
+}

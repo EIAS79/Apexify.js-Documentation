@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-6",
+  "files": [
+    "identity.json",
+    "source-manifests.json",
+    "search-records.json",
+    "search-index-manifest.json",
+    "search-coverage.json",
+    "ranking-rules.json",
+    "ranking-verification.json",
+    "completion-query-matrix.json",
+    "filter-verification.json",
+    "canonical-link-verification.json",
+    "related-content.json",
+    "related-content-coverage.json",
+    "diagnostic-contract.json",
+    "index-size.json",
+    "dependency-audit.json",
+    "search-source-checksums.json"
+  ]
+}
