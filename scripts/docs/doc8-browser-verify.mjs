@@ -77,9 +77,9 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
     const diagnosticText = await page.$eval('[data-doc8-primitive="diagnostics"]', (element) => element.textContent || '');
     if (!diagnosticText.includes('DOC-5 verified output')) throw new Error(`${name}: provenance diagnostic missing`);
 
-    const copyButton = await page.$x("//button[contains(normalize-space(.), 'Copy local state')]");
-    if (!copyButton.length) throw new Error(`${name}: local share-state control missing`);
-    await copyButton[0].focus();
+    const copyButton = await page.$('[data-doc8-action="copy-share-state"]');
+    if (!copyButton) throw new Error(`${name}: local share-state control missing`);
+    await copyButton.focus();
     await page.keyboard.press('Enter');
     await page.waitForFunction(() => (window.__doc8Clipboard || '').includes('"schemaVersion":1'));
 
