@@ -124,6 +124,7 @@ export function CapabilitySection({ model }: { model: ProductExperienceModel }) 
     <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8" aria-labelledby="current-capabilities">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
+          id="current-capabilities"
           eyebrow="Current package"
           title="What Apexify.js 6 actually ships"
           description="Every card below is resolved against the generated DOC-4 API manifest at build time. Missing or non-current APIs fail the DOC-7 gate."
@@ -165,6 +166,7 @@ export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
     <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8" aria-labelledby="feature-tracks">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
+          id="feature-tracks"
           eyebrow="Build paths"
           title="Follow a capability, not a marketing claim"
           description="Each track connects the current API surface to verified examples where DOC-5 evidence exists."
@@ -197,6 +199,7 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
     <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8" aria-labelledby="verified-examples">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
+          id="verified-examples"
           eyebrow="Executable proof"
           title="Generated from repository-controlled examples"
           description={`These previews come from DOC-5 examples verified against ${model.package.name} ${model.package.version}; they are not hand-written marketing mockups.`}
@@ -305,14 +308,14 @@ function FooterGroup({ title, links }: { title: string; links: Array<[string, st
   );
 }
 
-function SectionHeading({ eyebrow, title, description }: { eyebrow: string; title: string; description: string }) {
+function SectionHeading({ id, eyebrow, title, description }: { id: string; eyebrow: string; title: string; description: string }) {
   return (
     <div className="mb-8 max-w-3xl sm:mb-10">
       <div className="mb-3 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: 'var(--accent-magenta)' }}>
         <BoltIcon className="h-4 w-4" />
         {eyebrow}
       </div>
-      <h2 className="mb-3 text-balance text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl" style={{ color: 'var(--text-primary)' }}>{title}</h2>
+      <h2 id={id} className="mb-3 text-balance text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl" style={{ color: 'var(--text-primary)' }}>{title}</h2>
       <p className="text-pretty text-sm leading-relaxed sm:text-base" style={{ color: 'var(--text-secondary)' }}>{description}</p>
     </div>
   );
