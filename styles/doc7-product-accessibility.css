@@ -26,6 +26,51 @@ body:has([data-doc7-verified-hero]) .text-grad-sunset {
   color: transparent;
 }
 
+/* Gallery summary numbers are semantic text, not decoration. Their four
+   display gradients fall below AA contrast on the light sunken-card surface,
+   so light mode uses equivalent accessible foregrounds. Dark mode keeps the
+   original gradients. The selector is intentionally limited to the Gallery
+   hero's elevated summary card so other decorative gradients are untouched. */
+body:has(#gallery-main) .surface-elevated .text-grad-sunset {
+  background-image: none;
+  color: #a81464;
+}
+
+body:has(#gallery-main) .surface-elevated .text-grad-ember {
+  background-image: none;
+  color: #8a3d00;
+}
+
+body:has(#gallery-main) .surface-elevated .text-grad-iris {
+  background-image: none;
+  color: #4635e8;
+}
+
+body:has(#gallery-main) .surface-elevated .text-grad-aurora {
+  background-image: none;
+  color: #00624f;
+}
+
+.dark body:has(#gallery-main) .surface-elevated .text-grad-sunset {
+  background-image: var(--gradient-sunset);
+  color: transparent;
+}
+
+.dark body:has(#gallery-main) .surface-elevated .text-grad-ember {
+  background-image: var(--gradient-ember);
+  color: transparent;
+}
+
+.dark body:has(#gallery-main) .surface-elevated .text-grad-iris {
+  background-image: var(--gradient-iris);
+  color: transparent;
+}
+
+.dark body:has(#gallery-main) .surface-elevated .text-grad-aurora {
+  background-image: var(--gradient-aurora);
+  color: transparent;
+}
+
 /* Primary CTAs need a deterministic foreground/background contrast pair.
    The general sunset gradient is decorative and is not itself a text-color
    contract. These scoped variants preserve the sunset character while making
