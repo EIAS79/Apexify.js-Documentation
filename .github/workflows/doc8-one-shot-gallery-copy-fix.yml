@@ -1,0 +1,32 @@
+name: DOC-8 One-shot Gallery Execution Copy Fix
+
+on:
+  push:
+    branches: [doc8-studio-interactive-foundation]
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: ${{ !contains(github.event.head_commit.message, '[doc8-gallery-copy-fixed]') }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Apply deterministic GalleryModal migration
+        run: node scripts/docs/doc8-fix-gallery-execution-copy.mjs
+      - name: Commit migration if needed
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No migration changes required."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/gallery/components/GalleryModal.tsx
+          git commit -m "DOC-8: correct Gallery execution boundary copy [doc8-gallery-copy-fixed]"
+          git push origin HEAD:doc8-studio-interactive-foundation
