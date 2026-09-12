@@ -1,0 +1,121 @@
+/* DOC-7 public product surfaces: foreground colors are deliberately separated
+   from decorative accent tokens so light-mode text meets WCAG contrast. */
+
+body:has([data-doc7-verified-hero]) {
+  --success: #064a36;
+  --accent-magenta: #a81464;
+  --accent-iris: #4635e8;
+}
+
+.dark body:has([data-doc7-verified-hero]),
+.dark body:has(#gallery-main) {
+  --text-tertiary: #9e93c7;
+  --accent-iris: #a99cff;
+}
+
+.dark body:has([data-doc7-verified-hero]) {
+  --success: #5deab8;
+  --accent-magenta: #ff3daa;
+}
+
+/* The light sunset display gradient contains amber values that are too light
+   to use as clipped foreground text on the cream canvas. Keep the gradient in
+   dark mode and use the accessible brand-magenta foreground in light mode. */
+body:has([data-doc7-verified-hero]) .text-grad-sunset {
+  background-image: none;
+  color: #a81464;
+}
+
+.dark body:has([data-doc7-verified-hero]) .text-grad-sunset {
+  background-image: var(--gradient-sunset);
+  color: transparent;
+}
+
+/* Gallery summary numbers are semantic text, not decoration. Their four
+   display gradients fall below AA contrast on the light sunken-card surface,
+   so light mode uses equivalent accessible foregrounds. Dark mode keeps the
+   original gradients. The selector is intentionally limited to the Gallery
+   hero's elevated summary card so other decorative gradients are untouched. */
+body:has(#gallery-main) .surface-elevated .text-grad-sunset {
+  background-image: none;
+  color: #a81464;
+}
+
+body:has(#gallery-main) .surface-elevated .text-grad-ember {
+  background-image: none;
+  color: #8a3d00;
+}
+
+body:has(#gallery-main) .surface-elevated .text-grad-iris {
+  background-image: none;
+  color: #4635e8;
+}
+
+body:has(#gallery-main) .surface-elevated .text-grad-aurora {
+  background-image: none;
+  color: #00624f;
+}
+
+.dark body:has(#gallery-main) .surface-elevated .text-grad-sunset {
+  background-image: var(--gradient-sunset);
+  color: transparent;
+}
+
+.dark body:has(#gallery-main) .surface-elevated .text-grad-ember {
+  background-image: var(--gradient-ember);
+  color: transparent;
+}
+
+.dark body:has(#gallery-main) .surface-elevated .text-grad-iris {
+  background-image: var(--gradient-iris);
+  color: transparent;
+}
+
+.dark body:has(#gallery-main) .surface-elevated .text-grad-aurora {
+  background-image: var(--gradient-aurora);
+  color: transparent;
+}
+
+/* Production axe diagnostics identified Gallery microcopy/badge pairs that
+   were below AA. These overrides are intentionally scoped to Gallery and
+   preserve the existing decorative background accents. */
+body:has(#gallery-main) [style*="color:var(--text-muted)"] {
+  color: var(--text-secondary) !important;
+}
+
+body:has(#gallery-main) .text-white[style*="background-color:var(--accent-amber)"],
+body:has(#gallery-main) .text-white[style*="background-color:var(--success)"] {
+  color: #080312 !important;
+}
+
+.dark body:has(#gallery-main) .text-white[style*="background-color:var(--accent-iris)"] {
+  color: #080312 !important;
+}
+
+.light body:has(#gallery-main) [style*="color:var(--accent-magenta)"] {
+  color: #a81464 !important;
+}
+
+/* Primary CTAs need a deterministic foreground/background contrast pair.
+   The general sunset gradient is decorative and is not itself a text-color
+   contract. These scoped variants preserve the sunset character while making
+   the text legible in each theme. */
+body:has([data-doc7-verified-hero]) .btn-primary,
+body:has(#gallery-main) .btn-primary {
+  background-image: linear-gradient(135deg, #a81464 0%, #7a3e00 100%);
+  color: #ffffff;
+}
+
+.dark body:has([data-doc7-verified-hero]) .btn-primary,
+.dark body:has(#gallery-main) .btn-primary {
+  background-image: var(--gradient-sunset);
+  color: #1a0f3d;
+}
+
+/* The homepage source proof is short enough to render without an inner
+   scroll region. Removing the nested scrollbar keeps the code keyboard-safe
+   without adding a non-semantic focus stop. */
+body:has([data-doc7-verified-hero]) pre.max-h-64 {
+  max-height: none;
+  overflow: visible;
+}

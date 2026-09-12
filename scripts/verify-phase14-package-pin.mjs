@@ -55,11 +55,31 @@ for (const relative of publicFiles) {
   }
 }
 
-if (fullPinCount === 0) fail('no user-facing exact Apexify GitHub install pin was found');
+const productCatalogPath = 'lib/product/catalog.ts';
+let manifestDerivedInstall = false;
+if (fs.existsSync(path.join(root, productCatalogPath))) {
+  const productCatalog = read(productCatalogPath);
+  manifestDerivedInstall =
+    productCatalog.includes('apiManifest.package.commit') &&
+    productCatalog.includes('npm install github:EIAS79/Apexify.js#${apiManifest.package.commit}');
+  if (manifestDerivedInstall) {
+    const apiManifest = JSON.parse(read('generated/docs-doc4/api-manifest.json'));
+    if (apiManifest.package?.commit !== pinnedSha) {
+      fail(`DOC-4 API manifest advertises ${apiManifest.package?.commit}; expected ${pinnedSha}`);
+    }
+  }
+}
 
-const hero = read('components/home/HeroShowcase.tsx');
-if (!hero.includes(`github:EIAS79/Apexify.js#${pinnedSha}`)) {
-  fail('HeroShowcase copy-install command does not use the exact package.json Apexify SHA');
+if (fullPinCount === 0 && !manifestDerivedInstall) {
+  fail('no user-facing exact Apexify GitHub install pin or verified manifest-derived install command was found');
+}
+
+if (!manifestDerivedInstall) {
+  const legacyHero = path.join(root, 'components', 'home', 'HeroShowcase.tsx');
+  if (!fs.existsSync(legacyHero)) fail('neither the DOC-7 manifest-derived install command nor the legacy HeroShowcase exists');
+  if (!read('components/home/HeroShowcase.tsx').includes(`github:EIAS79/Apexify.js#${pinnedSha}`)) {
+    fail('HeroShowcase copy-install command does not use the exact package.json Apexify SHA');
+  }
 }
 
 for (const temporaryWorkflow of [
@@ -69,4 +89,4 @@ for (const temporaryWorkflow of [
   if (fs.existsSync(path.join(root, temporaryWorkflow))) fail(`temporary workflow must not ship: ${temporaryWorkflow}`);
 }
 
-console.log(`verify-phase14-package-pin: package, lockfile and public install pins agree on ${pinnedSha}.`);
+console.log(`verify-phase14-package-pin: package, lockfile and ${manifestDerivedInstall ? 'manifest-derived public install command' : 'public install pins'} agree on ${pinnedSha}.`);

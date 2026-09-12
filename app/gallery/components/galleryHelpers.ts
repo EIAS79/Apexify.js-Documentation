@@ -8,6 +8,8 @@ import type { AdvanceGalleryCard } from '@/lib/gallery/core/galleryTypes';
 import type { FilterCategory } from './galleryConfig';
 
 export type GalleryItem = BackgroundGalleryCard | SpinWheelGalleryCard | AdvanceGalleryCard | Doc5GalleryCard;
+export type GalleryRuntimeFilter = 'all' | 'node';
+export type GalleryEvidenceFilter = 'all' | 'verified' | 'legacy';
 
 export const galleryItems: GalleryItem[] = [
   ...backgroundGalleryItems,
@@ -18,10 +20,26 @@ export const galleryItems: GalleryItem[] = [
   ...doc5GalleryItems,
 ];
 
+export function isVerifiedGalleryItem(item: GalleryItem): item is Doc5GalleryCard {
+  return 'doc5' in item && item.doc5 === true;
+}
+
+export function galleryRuntime(item: GalleryItem): 'node' {
+  return isVerifiedGalleryItem(item) ? item.runtime : 'node';
+}
+
+export function galleryEvidence(item: GalleryItem): Exclude<GalleryEvidenceFilter, 'all'> {
+  return isVerifiedGalleryItem(item) ? 'verified' : 'legacy';
+}
+
+export function galleryPackageVersion(): string | null {
+  return doc5GalleryItems[0]?.verifiedPackageVersion ?? null;
+}
+
 /** Each item exposes one or more category lenses. DOC-5 items derive feature lenses from the authoritative manifest. */
 export function discoverCategories(item: GalleryItem): Exclude<FilterCategory, 'all'>[] {
   const tags = new Set<Exclude<FilterCategory, 'all'>>();
-  if ('doc5' in item && item.doc5) {
+  if (isVerifiedGalleryItem(item)) {
     tags.add('advance');
     if (item.doc5Features.includes('charts')) tags.add('charts');
     if (item.doc5Features.includes('gif')) { tags.add('gifs'); tags.add('extras'); }
@@ -44,15 +62,44 @@ export function discoverCategories(item: GalleryItem): Exclude<FilterCategory, '
   return [...tags];
 }
 
-export function itemMatchesFilter(item: GalleryItem, filter: FilterCategory): boolean { return filter === 'all' || discoverCategories(item).includes(filter); }
+export function itemMatchesFilter(item: GalleryItem, filter: FilterCategory): boolean {
+  return filter === 'all' || discoverCategories(item).includes(filter);
+}
+
+export function itemMatchesRuntime(item: GalleryItem, filter: GalleryRuntimeFilter): boolean {
+  return filter === 'all' || galleryRuntime(item) === filter;
+}
+
+export function itemMatchesEvidence(item: GalleryItem, filter: GalleryEvidenceFilter): boolean {
+  return filter === 'all' || galleryEvidence(item) === filter;
+}
+
 export function itemMatchesQuery(item: GalleryItem, query: string): boolean {
   if (!query.trim()) return true;
-  const q=query.trim().toLowerCase();
-  return item.title.toLowerCase().includes(q) || item.id.toLowerCase().includes(q) || plainGallerySummary(item.description).toLowerCase().includes(q);
+  const q = query.trim().toLowerCase();
+  const features = isVerifiedGalleryItem(item) ? item.doc5Features.join(' ') : '';
+  return [
+    item.title,
+    item.id,
+    plainGallerySummary(item.description),
+    discoverCategories(item).join(' '),
+    galleryRuntime(item),
+    galleryEvidence(item),
+    features,
+  ].some((value) => value.toLowerCase().includes(q));
 }
-export function plainGallerySummary(text: string): string { return text.replace(/\r?\n+/g,' ').replace(/\*\*([^*]+)\*\*/g,'$1').replace(/`([^`]+)`/g,'$1').replace(/\s+/g,' ').trim(); }
+
+export function plainGallerySummary(text: string): string {
+  return text.replace(/\r?\n+/g,' ').replace(/\*\*([^*]+)\*\*/g,'$1').replace(/`([^`]+)`/g,'$1').replace(/\s+/g,' ').trim();
+}
+
 export function primaryBadgeCategory(item: GalleryItem): Exclude<FilterCategory,'all'> {
-  if ('doc5' in item && item.doc5) { if(item.doc5Features.includes('charts'))return 'charts'; if(item.doc5Features.includes('gif'))return 'gifs'; if(item.doc5Features.includes('canvas'))return 'images'; return 'advance'; }
+  if (isVerifiedGalleryItem(item)) {
+    if(item.doc5Features.includes('charts'))return 'charts';
+    if(item.doc5Features.includes('gif'))return 'gifs';
+    if(item.doc5Features.includes('canvas'))return 'images';
+    return 'advance';
+  }
   if (item.category === 'background') return 'background';
   if (item.category === 'gifs') return 'gifs';
   if (item.category === 'videos') return 'videos';
@@ -62,7 +109,16 @@ export function primaryBadgeCategory(item: GalleryItem): Exclude<FilterCategory,
   if(item.id==='advance-shape-collage')return 'images';
   return 'advance';
 }
+
 export function parseGalleryHash(rawHash:string):{id:string;type:string|null}|null{
-  const hash=rawHash.replace(/^#/,'').trim();if(!hash)return null;let decoded=hash;try{decoded=decodeURIComponent(hash);}catch{decoded=hash;}
-  const plusIdx=decoded.lastIndexOf('+');if(plusIdx<=0)return{id:decoded,type:null};const id=decoded.slice(0,plusIdx).trim();const type=decoded.slice(plusIdx+1).trim().toLowerCase();if(!id)return null;return{id,type:type||null};
+  const hash=rawHash.replace(/^#/,'').trim();
+  if(!hash)return null;
+  let decoded=hash;
+  try{decoded=decodeURIComponent(hash);}catch{decoded=hash;}
+  const plusIdx=decoded.lastIndexOf('+');
+  if(plusIdx<=0)return{id:decoded,type:null};
+  const id=decoded.slice(0,plusIdx).trim();
+  const type=decoded.slice(plusIdx+1).trim().toLowerCase();
+  if(!id)return null;
+  return{id,type:type||null};
 }

@@ -2,20 +2,26 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { ArrowRightIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRightIcon, BookOpenIcon, RocketLaunchIcon } from '@heroicons/react/24/outline';
 import Navbar from '@/components/Navbar';
 import AmbientBackground from '@/components/home/AmbientBackground';
 import {
+  galleryEvidence,
   galleryItems,
+  galleryPackageVersion,
+  isVerifiedGalleryItem,
+  itemMatchesEvidence,
   itemMatchesFilter,
   itemMatchesQuery,
+  itemMatchesRuntime,
   primaryBadgeCategory,
   parseGalleryHash,
+  type GalleryEvidenceFilter,
   type GalleryItem,
+  type GalleryRuntimeFilter,
 } from './galleryHelpers';
 import {
-  CATEGORY_CONFIG,
   HASH_TYPE_TO_FILTER,
   type FilterCategory,
   type SortMode,
@@ -24,6 +30,7 @@ import { discoverCategories } from './galleryHelpers';
 import { buildGalleryHash } from '@/lib/gallery/core/galleryDocLink';
 import GalleryHero from './GalleryHero';
 import GalleryFilterBar from './GalleryFilterBar';
+import GalleryScopeBar from './GalleryScopeBar';
 import GalleryGrid from './GalleryGrid';
 import GalleryModal from './GalleryModal';
 
@@ -38,13 +45,13 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default function GalleryClient() {
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
+  const [runtime, setRuntime] = useState<GalleryRuntimeFilter>('all');
+  const [evidence, setEvidence] = useState<GalleryEvidenceFilter>('all');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortMode>('curated');
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
-  /** Bumped each filter change so 'shuffle' resorts. */
   const [shuffleSeed, setShuffleSeed] = useState(0);
 
-  /* Per-category counts (post-discovery, pre-search) */
   const filterCounts = useMemo(() => {
     const counts: Record<Exclude<FilterCategory, 'all'>, number> = {
       background: 0,
@@ -58,52 +65,53 @@ export default function GalleryClient() {
       advance: 0,
     };
     for (const item of galleryItems) {
-      for (const c of discoverCategories(item)) {
-        counts[c] += 1;
-      }
+      for (const category of discoverCategories(item)) counts[category] += 1;
     }
     return counts;
   }, []);
 
-  const totalCount = galleryItems.length;
+  const evidenceCounts = useMemo(
+    () => ({
+      verified: galleryItems.filter((item) => galleryEvidence(item) === 'verified').length,
+      legacy: galleryItems.filter((item) => galleryEvidence(item) === 'legacy').length,
+    }),
+    [],
+  );
 
-  /* Filtered + searched + sorted */
   const visibleItems = useMemo(() => {
     const filtered = galleryItems
       .filter((item) => itemMatchesFilter(item, selectedCategory))
+      .filter((item) => itemMatchesRuntime(item, runtime))
+      .filter((item) => itemMatchesEvidence(item, evidence))
       .filter((item) => itemMatchesQuery(item, query));
 
     switch (sort) {
       case 'shuffle':
-        // shuffleSeed used so React re-runs this memo when reshuffle is requested
         void shuffleSeed;
         return shuffle(filtered);
       case 'alpha':
-        return [...filtered].sort((a, b) =>
-          a.title.localeCompare(b.title, undefined, { sensitivity: 'base' })
-        );
+        return [...filtered].sort((a, b) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' }));
       case 'curated':
       default:
         return [...filtered].sort((a, b) => {
+          const verifiedDelta = Number(isVerifiedGalleryItem(b)) - Number(isVerifiedGalleryItem(a));
+          if (verifiedDelta !== 0) return verifiedDelta;
           const featuredDelta = Number(!!b.featured) - Number(!!a.featured);
           if (featuredDelta !== 0) return featuredDelta;
           if (selectedCategory !== 'all') {
-            const primaryBoost = (item: GalleryItem) =>
-              Number(primaryBadgeCategory(item) === selectedCategory);
+            const primaryBoost = (item: GalleryItem) => Number(primaryBadgeCategory(item) === selectedCategory);
             const primaryDelta = primaryBoost(b) - primaryBoost(a);
             if (primaryDelta !== 0) return primaryDelta;
           }
           return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
         });
     }
-  }, [selectedCategory, query, sort, shuffleSeed]);
+  }, [selectedCategory, runtime, evidence, query, sort, shuffleSeed]);
 
-  /* Reshuffle when filter/search changes if in shuffle mode */
   useEffect(() => {
     if (sort === 'shuffle') setShuffleSeed((n) => n + 1);
-  }, [selectedCategory, query, sort]);
+  }, [selectedCategory, runtime, evidence, query, sort]);
 
-  /* Hash routing — sync URL hash with selectedItem */
   useEffect(() => {
     const apply = () => {
       const parsed = parseGalleryHash(window.location.hash);
@@ -111,11 +119,11 @@ export default function GalleryClient() {
         setSelectedItem(null);
         return;
       }
-      const item = galleryItems.find((c) => c.id === parsed.id);
+      const item = galleryItems.find((candidate) => candidate.id === parsed.id);
       if (!item) return;
       if (parsed.type) {
-        const t = HASH_TYPE_TO_FILTER[parsed.type];
-        if (t) setSelectedCategory(t);
+        const nextCategory = HASH_TYPE_TO_FILTER[parsed.type];
+        if (nextCategory) setSelectedCategory(nextCategory);
       }
       setSelectedItem(item);
     };
@@ -139,42 +147,54 @@ export default function GalleryClient() {
   };
 
   const moveBy = (delta: number) => {
-    if (!selectedItem) return;
-    if (visibleItems.length === 0) return;
-    const idx = visibleItems.findIndex((i) => i.id === selectedItem.id);
-    if (idx < 0) return;
-    const nextIdx = (idx + delta + visibleItems.length) % visibleItems.length;
-    openItem(visibleItems[nextIdx]);
+    if (!selectedItem || visibleItems.length === 0) return;
+    const index = visibleItems.findIndex((item) => item.id === selectedItem.id);
+    if (index < 0) return;
+    openItem(visibleItems[(index + delta + visibleItems.length) % visibleItems.length]);
   };
 
   const heroCounts = useMemo(
     () => ({
-      total: totalCount,
-      featured: galleryItems.filter((i) => i.featured).length,
+      total: galleryItems.length,
+      featured: galleryItems.filter((item) => item.featured).length,
       videos: filterCounts.videos,
       gifs: filterCounts.gifs,
+      verified: evidenceCounts.verified,
     }),
-    [totalCount, filterCounts]
+    [filterCounts, evidenceCounts],
   );
 
-  const selectedIndex = selectedItem
-    ? Math.max(0, visibleItems.findIndex((i) => i.id === selectedItem.id))
-    : -1;
+  const selectedIndex = selectedItem ? Math.max(0, visibleItems.findIndex((item) => item.id === selectedItem.id)) : -1;
 
   return (
     <div className="relative min-h-screen overflow-x-hidden" style={{ color: 'var(--text-primary)' }}>
+      <a
+        href="#gallery-main"
+        className="sr-only fixed left-4 top-4 z-[100] rounded-lg px-4 py-2 font-semibold focus:not-sr-only"
+        style={{ backgroundColor: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-strong)' }}
+      >
+        Skip to Gallery content
+      </a>
       <AmbientBackground />
       <Navbar />
 
-      <main>
-        <GalleryHero counts={heroCounts} />
+      <main id="gallery-main" tabIndex={-1}>
+        <GalleryHero counts={heroCounts} version={galleryPackageVersion()} />
 
-        <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <GalleryScopeBar
+            runtime={runtime}
+            evidence={evidence}
+            verifiedCount={evidenceCounts.verified}
+            legacyCount={evidenceCounts.legacy}
+            onRuntimeChange={setRuntime}
+            onEvidenceChange={setEvidence}
+          />
           <GalleryFilterBar
             selected={selectedCategory}
             onSelect={setSelectedCategory}
             counts={filterCounts}
-            totalCount={totalCount}
+            totalCount={galleryItems.length}
             filteredCount={visibleItems.length}
             query={query}
             onQueryChange={setQuery}
@@ -184,13 +204,9 @@ export default function GalleryClient() {
           />
         </div>
 
-        <section className="py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <GalleryGrid
-              items={visibleItems}
-              selectedFilter={selectedCategory}
-              onOpen={openItem}
-            />
+        <section className="px-4 py-10 sm:px-6 sm:py-14 lg:px-8" aria-label="Gallery results">
+          <div className="mx-auto max-w-7xl">
+            <GalleryGrid items={visibleItems} selectedFilter={selectedCategory} onOpen={openItem} />
           </div>
         </section>
 
@@ -212,50 +228,42 @@ export default function GalleryClient() {
 }
 
 function CallToAction() {
+  const reduce = useReducedMotion();
   return (
-    <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
+    <section className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <div className="mx-auto max-w-5xl">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={reduce ? false : { opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={reduce ? { duration: 0 } : { duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="relative overflow-hidden rounded-3xl p-8 sm:p-12 lg:p-14"
           style={{
-            background: 'var(--gradient-aurora)',
-            backgroundSize: '200% 200%',
-            animation: 'gradient-pan 8s ease infinite',
+            background: 'linear-gradient(135deg, #3527c7 0%, #a81464 50%, #7a3e00 100%)',
             boxShadow: 'var(--shadow-xl)',
           }}
         >
-          <div className="absolute -top-12 -right-12 h-56 w-56 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 h-72 w-72 rounded-full bg-white/15 blur-3xl pointer-events-none" />
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-            <div className="lg:col-span-2 text-white">
-              <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-black leading-[1.05] tracking-tight mb-4 text-balance">
-                Found one you like?{' '}
-                <span className="italic font-medium">Make it yours.</span>
+          <div className="relative z-10 grid grid-cols-1 items-center gap-6 lg:grid-cols-3">
+            <div className="text-white lg:col-span-2">
+              <h2 className="mb-4 text-balance text-3xl font-black leading-[1.05] sm:text-4xl lg:text-[2.75rem]">
+                Use verified examples when you need proof.
               </h2>
-              <p className="text-base sm:text-lg text-white/95 max-w-xl leading-relaxed">
-                Open any tile, hit <strong>Open in Studio</strong>, and the same recipe lands in a live editor — tweak the inputs, regenerate, save the snippet, ship it.
+              <p className="max-w-xl text-base leading-relaxed text-white/95 sm:text-lg">
+                DOC-5 examples expose canonical repository-controlled source and verified outputs. Studio remains an interactive authoring surface; it is not used as evidence that every legacy Gallery card has been execution-verified.
               </p>
             </div>
             <div className="flex flex-col gap-3">
-              <Link
-                href="/studio"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white font-bold text-base shadow-[var(--shadow-md)] transition-transform hover:-translate-y-0.5 group"
-                style={{ color: '#1a0f3d' }}
-              >
-                <RocketLaunchIcon className="h-5 w-5" />
-                Open the Studio
-                <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="/docs#00-start-here"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-white font-bold text-base border-2 border-white/40 hover:bg-white/10 transition-colors"
-              >
-                Read the docs
+              <Link href="/examples/node.canvas.basic" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-bold shadow-[var(--shadow-md)]" style={{ color: '#1a0f3d' }}>
+                <BookOpenIcon className="h-5 w-5" />
+                Open verified examples
                 <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+              <Link href="/studio" className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/40 px-6 py-3.5 text-base font-bold text-white hover:bg-white/10">
+                <RocketLaunchIcon className="h-5 w-5" />
+                Open Studio
+              </Link>
+              <Link href="/docs/getting-started" className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2 text-sm font-bold text-white/90 hover:text-white">
+                Read the docs <ArrowRightIcon className="h-4 w-4" />
               </Link>
             </div>
           </div>

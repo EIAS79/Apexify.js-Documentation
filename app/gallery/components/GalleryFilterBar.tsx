@@ -156,7 +156,7 @@ export default function GalleryFilterBar({
                     className="tabular-nums text-[10.5px] font-bold px-1 py-0.5 rounded"
                     style={{
                       backgroundColor: activeIsAll ? 'color-mix(in srgb, var(--text-primary) 8%, transparent)' : 'rgba(0,0,0,0.25)',
-                      color: activeIsAll ? 'var(--text-tertiary)' : 'white',
+                      color: activeIsAll ? 'var(--text-secondary)' : 'white',
                     }}
                   >
                     {filteredCount}
@@ -255,6 +255,7 @@ export default function GalleryFilterBar({
                 onClick={() => { setSortOpen((o) => !o); setFilterOpen(false); }}
                 aria-haspopup="menu"
                 aria-expanded={sortOpen}
+                aria-label={`Sort gallery: ${sortMeta.label}`}
                 className="h-10 inline-flex items-center gap-1.5 px-3 sm:px-3.5 rounded-full text-[12.5px] font-semibold transition-colors"
                 style={{
                   backgroundColor: sortOpen

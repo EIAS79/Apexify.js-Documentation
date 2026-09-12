@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import "@/styles/docs-examples.css";
+import "@/styles/doc7-product-accessibility.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { CustomCursorGate } from "@/components/docs/shell/CustomCursorGate";
