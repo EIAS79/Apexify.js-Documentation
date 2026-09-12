@@ -1,38 +1,39 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-
-function visibleSearchInput(): HTMLInputElement | null {
-  return Array.from(document.querySelectorAll<HTMLInputElement>('[data-docs-search-input]'))
-    .find((input) => input.offsetParent !== null) ?? null;
-}
+import { SearchCommandPalette } from '@/components/docs/search/SearchCommandPalette';
 
 export function DocsSearchTrigger() {
-  const focusSearch = () => {
-    const input = visibleSearchInput();
-    if (input) {
-      input.focus();
-      return;
-    }
-    window.dispatchEvent(new Event('apx-open-docs-nav'));
-    window.setTimeout(() => visibleSearchInput()?.focus(), 100);
-  };
+  const [open, setOpen] = useState(false);
+  const openSearch = useCallback(() => setOpen(true), []);
+  const closeSearch = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        focusSearch();
+        openSearch();
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, []);
+  }, [openSearch]);
 
   return (
-    <button type="button" className="apx-icon-button" aria-label="Search documentation" title="Search documentation (Ctrl/⌘ K)" onClick={focusSearch}>
-      <MagnifyingGlassIcon className="h-5 w-5" aria-hidden />
-    </button>
+    <>
+      <button
+        type="button"
+        className="apx-icon-button"
+        aria-label="Search documentation"
+        title="Search documentation (Ctrl/⌘ K)"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={openSearch}
+      >
+        <MagnifyingGlassIcon className="h-5 w-5" aria-hidden />
+      </button>
+      <SearchCommandPalette open={open} onClose={closeSearch} />
+    </>
   );
 }
