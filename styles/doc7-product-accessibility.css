@@ -7,10 +7,15 @@ body:has([data-doc7-verified-hero]) {
   --accent-iris: #4635e8;
 }
 
+.dark body:has([data-doc7-verified-hero]),
+.dark body:has(#gallery-main) {
+  --text-tertiary: #9e93c7;
+  --accent-iris: #a99cff;
+}
+
 .dark body:has([data-doc7-verified-hero]) {
   --success: #5deab8;
   --accent-magenta: #ff3daa;
-  --accent-iris: #7b6cff;
 }
 
 /* The light sunset display gradient contains amber values that are too light
