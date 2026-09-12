@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { GlobalDocsSearch } from "./GlobalDocsSearch";
 
@@ -67,7 +67,12 @@ export function SearchCommandPalette({
         aria-modal="true"
         aria-label="Search Apexify documentation"
         className="w-full max-w-3xl overflow-hidden rounded-2xl p-3 sm:p-4"
-        style={{ background: "var(--bg-raised)", border: "1px solid var(--border-default)", boxShadow: "var(--shadow-xl)" }}
+        style={{
+          background: "var(--bg-raised)",
+          border: "1px solid var(--border-default)",
+          boxShadow: "var(--shadow-xl)",
+          "--text-muted": "var(--text-secondary)",
+        } as CSSProperties}
       >
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
