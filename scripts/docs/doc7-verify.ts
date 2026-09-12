@@ -39,8 +39,8 @@ const fail = (message: string): never => {
   throw new Error(`[doc7-verify] ${message}`);
 };
 const required = <T>(value: T | null | undefined, message: string): T => {
-  if (value == null) fail(message);
-  return value;
+  if (value === null || value === undefined) fail(message);
+  return value as T;
 };
 
 const api = json<ApiManifest>('generated/docs-doc4/api-manifest.json');
