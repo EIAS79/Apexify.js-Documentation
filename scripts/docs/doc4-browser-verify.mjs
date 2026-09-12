@@ -50,7 +50,7 @@ try{
   const copied=await page.evaluate(()=>window.__doc4Clipboard||'');if(copied!==signatureText)throw new Error(`${state.name} signature copy failed`);
   const sourceHref=await page.$eval('[data-doc4-component="SourceLink"]',e=>e.getAttribute('href')||'');if(!sourceHref.includes('dbed9743353593eafae9a7b1c25312d7170a233b'))throw new Error(`${state.name} source link is not commit-pinned`);
   const searchResult=await page.evaluate(async()=>{const r=await fetch('/api/docs/search?q=images.mask.mode');return r.json();});
-  if(!searchResult.results?.some(r=>r.href===`${REP}#option-images-mask-mode`))throw new Error(`${state.name} nested option search deep-link missing`);
+  if(!searchResult.results?.some(r=>(r.canonicalHref??r.href)===`${REP}#option-images-mask-mode`))throw new Error(`${state.name} nested option search deep-link missing`);
   const localOrigin=new URL(baseUrl).origin;
   const isExpectedLocalResourceMiss=r=>{const u=new URL(r.url);return r.status===404&&u.origin===localOrigin&&(u.pathname==='/favicon.ico'||u.pathname==='/_vercel/speed-insights/script.js');};
   const unexpectedHttp=httpErrors.filter(r=>!isExpectedLocalResourceMiss(r));
