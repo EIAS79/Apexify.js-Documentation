@@ -4,9 +4,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { SearchCommandPalette } from '@/components/docs/search/SearchCommandPalette';
 
+function visibleSearchInput(): HTMLInputElement | null {
+  return Array.from(document.querySelectorAll<HTMLInputElement>('[data-docs-search-input]'))
+    .find((input) => input.offsetParent !== null) ?? null;
+}
+
 export function DocsSearchTrigger() {
   const [open, setOpen] = useState(false);
-  const openSearch = useCallback(() => setOpen(true), []);
+  const openSearch = useCallback(() => {
+    visibleSearchInput()?.focus();
+    setOpen(true);
+  }, []);
   const closeSearch = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
