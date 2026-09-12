@@ -37,6 +37,13 @@ async function makePage(state) {
   await page.evaluateOnNewDocument((theme) => {
     if (theme === 'system') localStorage.removeItem('apexify-theme');
     else localStorage.setItem('apexify-theme', theme);
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (text) => { window.__doc7Clipboard = String(text); },
+        readText: async () => window.__doc7Clipboard || '',
+      },
+    });
   }, state.theme);
   const features = [];
   if (state.theme === 'system') features.push({ name: 'prefers-color-scheme', value: 'dark' });
@@ -102,8 +109,11 @@ try {
     if ((await homePage.$$('[aria-labelledby="verified-examples"] a[href^="/examples/"]')).length < 4) throw new Error(`${state.name} verified-example strip incomplete`);
     const copyButton = await homePage.$('button[aria-label="Copy Apexify.js install command"]');
     if (!copyButton) throw new Error(`${state.name} copy-install control missing`);
-    await copyButton.click();
+    await copyButton.focus();
+    await homePage.keyboard.press('Enter');
     await homePage.waitForFunction(() => document.body.textContent?.includes('Copied'), { timeout: 3000 });
+    const copiedCommand = await homePage.evaluate(() => window.__doc7Clipboard || '');
+    if (!copiedCommand.includes('github:EIAS79/Apexify.js#')) throw new Error(`${state.name} copy-install did not copy the authoritative package pin`);
     const staleHome = await homePage.evaluate(() => document.body.textContent?.includes('v5.4.5') ?? false);
     if (staleHome) throw new Error(`${state.name} stale homepage version copy`);
     await homePage.screenshot({ path: path.join(screenshots, `${state.name}-home.png`), fullPage: true });
@@ -165,7 +175,7 @@ const evidence = {
   schemaVersion: 1,
   phase: 'DOC-7',
   states: results,
-  keyboard: { runtimeAndEvidenceCombined: true, searchDialog: true, canonicalExampleLinkage: true },
+  keyboard: { installCopy: true, runtimeAndEvidenceCombined: true, searchDialog: true, canonicalExampleLinkage: true },
   screenshots: states.flatMap((state) => [`${state.name}-home.png`, `${state.name}-gallery.png`]),
   galleryCanonicalExampleLinkage: true,
 };
