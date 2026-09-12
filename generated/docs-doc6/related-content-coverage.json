@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "sourceRecords": 462,
+  "withGeneratedTargets": 461,
+  "withoutGeneratedTargets": [
+    "api-symbol:apexify.js::DEFAULT_APEXIFY_RUNTIME_CONFIG"
+  ],
+  "selfLinks": 0,
+  "duplicateTargets": 0
+}

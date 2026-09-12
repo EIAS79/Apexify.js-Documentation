@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "recordKind": "error | diagnostic",
+  "fields": [
+    "id",
+    "title",
+    "description",
+    "href",
+    "canonicalHref",
+    "runtime",
+    "packages",
+    "stability",
+    "errorCode",
+    "keywords",
+    "sourceId"
+  ],
+  "lookupKeys": [
+    "errorCode",
+    "title",
+    "related API symbol",
+    "runtime",
+    "package"
+  ],
+  "publicCurrentCodes": [],
+  "fabricatedCodes": [],
+  "futureCompatible": true
+}

@@ -6,6 +6,7 @@ import { DocsShell } from '@/components/docs/shell/DocsShell';
 import { DocsBreadcrumbsV2, DocsPagerV2 } from '@/components/docs/navigation/DocsNavigationChrome';
 import { DocsPageHero } from '@/components/docs/content/DocsPageHero';
 import { RouteDocsMarkdown } from '@/components/docs/route/RouteDocsMarkdown';
+import { RelatedContent } from '@/components/docs/search/RelatedContent';
 
 const SITE_ORIGIN = 'https://apexifyjs.vercel.app';
 export const dynamicParams = false;
@@ -60,6 +61,7 @@ export default function DocumentationRoutePage({ params }: { params: { slug: str
       >
         <DocsPageHero page={page} headingId={leadingHeading?.id} />
         <RouteDocsMarkdown content={withoutLeadingTitle(page.body)} />
+        <RelatedContent sourceId={page.id} preferredKinds={['doc', 'changelog']} title="Related guides and reference" />
       </article>
       <DocsPagerV2 pager={pager} />
     </DocsShell>

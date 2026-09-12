@@ -79,13 +79,37 @@ if (!layout.includes('LegacyDocsRedirectIsland') || !legacyIsland.includes('reso
 }
 
 const searchRoute = requireFile('app/api/docs/search/route.ts');
-if (!searchRoute.includes('canonicalPath') || !searchRoute.includes('href')) {
-  throw new Error('[doc1-verify] search results are not route-aware');
-}
-
-const sidebarSearch = requireFile('components/docs/DocsSidebarSearch.tsx');
-if (!sidebarSearch.includes('router.push(result.href)')) {
-  throw new Error('[doc1-verify] sidebar search does not navigate using result canonical href');
+const doc6RecordsPath = path.join(ROOT, 'generated/docs-doc6/search-records.json');
+if (fs.existsSync(doc6RecordsPath)) {
+  const usesGeneratedSearchData = searchRoute.includes('generated/docs-doc6/search-records.json') || searchRoute.includes('lib/search/server-data');
+  if (!searchRoute.includes('canonicalHref') || !usesGeneratedSearchData) {
+    throw new Error('[doc1-verify] DOC-6 search endpoint does not return generated canonical route hrefs');
+  }
+  const artifact = JSON.parse(fs.readFileSync(doc6RecordsPath, 'utf8')) as {
+    records?: Array<{ kind?: string; canonicalHref?: string }>;
+  };
+  const canonicalDocHrefs = new Set(
+    (artifact.records ?? [])
+      .filter((record) => record.kind === 'doc' && typeof record.canonicalHref === 'string')
+      .map((record) => record.canonicalHref as string),
+  );
+  for (const page of pages) {
+    if (!canonicalDocHrefs.has(page.canonicalPath)) {
+      throw new Error(`[doc1-verify] DOC-6 search index is missing canonical DOC-1 route: ${page.canonicalPath}`);
+    }
+  }
+  const globalSearch = requireFile('components/docs/search/GlobalDocsSearch.tsx');
+  if (!globalSearch.includes('router.push(result.canonicalHref)')) {
+    throw new Error('[doc1-verify] shared DOC-6 search UI does not navigate using canonical result href');
+  }
+} else {
+  if (!searchRoute.includes('canonicalPath') || !searchRoute.includes('href')) {
+    throw new Error('[doc1-verify] search results are not route-aware');
+  }
+  const sidebarSearch = requireFile('components/docs/DocsSidebarSearch.tsx');
+  if (!sidebarSearch.includes('router.push(result.href)')) {
+    throw new Error('[doc1-verify] sidebar search does not navigate using result canonical href');
+  }
 }
 
 const routedSidebar = fs.existsSync(path.join(ROOT, 'components/docs/navigation/DocsSidebarV2.tsx'))

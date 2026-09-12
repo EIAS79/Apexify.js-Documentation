@@ -35,7 +35,7 @@ export function DocsHeader() {
           ))}
         </nav>
         <div className="apx-doc-header__actions">
-          <span className="apx-version-badge" aria-label={`Apexify.js version ${version}`}>{version}</span>
+          <span className="apx-version-badge"><span className="sr-only">Apexify.js version </span>{version}</span>
           <DocsSearchTrigger />
           <ThemeToggle />
           <div className="md:hidden">

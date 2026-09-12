@@ -17,6 +17,7 @@
 .gallery-build-temp/
 .doc5-runtime-evidence/
 /generated/docs-doc5/runtime/
+/generated/docs-doc6/runtime/
 
 # production
 /build

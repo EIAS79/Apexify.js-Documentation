@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "docs": {
+    "total": 148,
+    "indexed": 148
+  },
+  "apiSymbols": {
+    "total": 217,
+    "indexed": 217
+  },
+  "apiOptions": {
+    "total": 17233,
+    "indexed": 17233
+  },
+  "apiTypes": {
+    "total": 239,
+    "indexed": 239
+  },
+  "examples": {
+    "total": 4,
+    "indexed": 4
+  },
+  "galleryMetadata": {
+    "total": 39,
+    "accounted": 39
+  },
+  "headings": 1099,
+  "errors": 3,
+  "records": 19071
+}

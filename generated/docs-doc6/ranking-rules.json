@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "priority": [
+    "exact symbol",
+    "exact error code",
+    "exact title",
+    "exact option",
+    "exact type",
+    "exact alias",
+    "package",
+    "runtime",
+    "title prefix",
+    "option/type",
+    "heading",
+    "goal",
+    "keyword",
+    "title/description",
+    "body",
+    "token",
+    "fuzzy"
+  ],
+  "stabilityPenalties": {
+    "REMOVED": -35,
+    "ROADMAP": -30,
+    "DEPRECATED": -18,
+    "EXPERIMENTAL": -6,
+    "PREVIEW": -3,
+    "CURRENT": 0
+  },
+  "deterministicTieBreak": [
+    "score desc",
+    "title asc",
+    "canonicalHref asc",
+    "id asc"
+  ],
+  "fuzzyMayOutrankExact": false
+}

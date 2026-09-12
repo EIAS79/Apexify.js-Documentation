@@ -1,0 +1,90 @@
+name: DOC-6 Search Discovery
+
+on:
+  push:
+    branches: [doc6-search-discovery, main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: doc6-search-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC6_BASE_URL: http://127.0.0.1:3000
+  APEXIFY_PACKAGE_COMMIT: dbed9743353593eafae9a7b1c25312d7170a233b
+  DOC6_BASE_SHA: 61f690695be11de1928e0ee028c65fd0496be76c
+
+jobs:
+  verify:
+    name: Verify DOC-6 search, discovery and cross-linking
+    runs-on: ubuntu-24.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Deterministic install and generated source preparation
+        run: npm ci
+      - name: DOC-6 deterministic index, ranking, coverage, filters, links and related-content verification
+        run: npm run docs:verify:doc6
+      - name: Attest inherited DOC-1 through DOC-5 gates from DOC-6 verification chain
+        run: echo "DOC6_PRIOR_PHASE_VERIFIED=1" >> "$GITHUB_ENV"
+      - name: Existing documentation integrity
+        run: npm run verify:docs
+      - name: Attest existing documentation integrity
+        run: echo "DOC6_BASE_DOCS_VERIFIED=1" >> "$GITHUB_ENV"
+      - name: TypeScript typecheck
+        run: npm run typecheck
+      - name: Clean production build, search performance and bundle isolation
+        run: npm run docs:measure:doc6
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc6-next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl --fail --silent "http://127.0.0.1:3000/api/docs/search?q=canvas" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc6-next.log
+          exit 1
+      - name: Browser, responsive, theme, reduced-motion, keyboard and axe verification
+        run: npm run docs:browser:doc6
+      - name: Quantitative DOC-6 finalizer
+        run: npm run docs:finalize:doc6
+      - name: Upload DOC-6 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc6-search-discovery-evidence
+          path: |
+            generated/docs-doc6
+            /tmp/doc6-next.log
+          include-hidden-files: true
+          if-no-files-found: error
+      - name: Commit deterministic DOC-6 evidence on execution branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/doc6-search-discovery'
+        shell: bash
+        run: |
+          git add generated/docs-doc6/*.json
+          if git diff --cached --quiet; then echo "DOC-6 deterministic evidence already current"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "DOC-6: refresh deterministic search evidence [skip ci]"
+          git push

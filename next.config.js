@@ -27,6 +27,12 @@ const galleryRunNativeIncludes = [
   './node_modules/@img/sharp-libvips-linuxmusl-arm64/**/*',
 ]
 
+const doc6SearchIncludes = [
+  './generated/docs-doc6/search-records.json',
+  './generated/docs-doc6/search-index-manifest.json',
+  './generated/docs-doc6/related-content.json',
+]
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -40,6 +46,7 @@ const nextConfig = {
     /** Gallery + `/studio` (`POST /api/gallery/run`). On Vercel: keep runner enabled (omit `DISABLE_GALLERY_CODE_RUN`). */
     outputFileTracingIncludes: {
       '/app/api/gallery/run': galleryRunNativeIncludes,
+      '/app/api/docs/search': doc6SearchIncludes,
     },
   },
   webpack: (config, { dev, isServer }) => {
@@ -51,7 +58,7 @@ const nextConfig = {
         ...config.optimization,
         splitChunks: false,
         runtimeChunk: false,
-      };
+      }
       // Fewer parallel builds → less chance of torn writes on Windows watchers (marginal; safe to remove if slow).
       if (process.platform === 'win32') {
         config.parallelism = Math.min(config.parallelism ?? 100, 4);

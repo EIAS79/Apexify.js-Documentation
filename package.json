@@ -6,9 +6,9 @@
   "engines": { "node": "22.x || 24.x || 26.x", "npm": ">=10" },
   "packageManager": "npm@11.19.1",
   "scripts": {
-    "postinstall": "npm run docs:generate:doc4 && npm run docs:examples:manifest",
-    "dev": "npm run docs:generate:doc4 && npm run docs:examples:manifest && next dev",
-    "build": "node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && next build",
+    "postinstall": "npm run docs:generate:doc4 && npm run docs:examples:manifest && npm run docs:search:build",
+    "dev": "npm run docs:generate:doc4 && npm run docs:examples:manifest && npm run docs:search:build && next dev",
+    "build": "node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && node scripts/docs/doc6-ensure-generated.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
@@ -67,7 +67,18 @@
     "docs:measure:doc5": "node scripts/docs/doc5-build-measure.mjs",
     "docs:browser:doc5": "node scripts/docs/doc5-browser-verify.mjs",
     "docs:finalize:doc5": "node scripts/docs/doc5-finalize.mjs",
-    "docs:audit:doc5": "npm run docs:verify:doc5"
+    "docs:audit:doc5": "npm run docs:verify:doc5",
+    "docs:search:build": "tsx scripts/docs/doc6-generate.ts && tsx scripts/docs/doc6-resolve-related.ts",
+    "docs:search:verify": "tsx scripts/docs/doc6-generate.ts --check && tsx scripts/docs/doc6-resolve-related.ts --check && tsx scripts/docs/doc6-verify.ts",
+    "docs:search:coverage": "tsx scripts/docs/doc6-verify.ts",
+    "docs:search:relevance": "tsx --test scripts/docs/doc6.test.ts",
+    "docs:search:related": "tsx scripts/docs/doc6-resolve-related.ts --check && tsx scripts/docs/doc6-verify.ts",
+    "docs:test:search": "tsx --test scripts/docs/doc6.test.ts",
+    "docs:verify:doc6": "tsx scripts/docs/doc6-generate.ts --check && tsx scripts/docs/doc6-resolve-related.ts --check && tsx --test scripts/docs/doc6.test.ts && tsx scripts/docs/doc6-verify.ts && npm run docs:verify:doc5",
+    "docs:measure:doc6": "tsx scripts/docs/doc6-measure.ts",
+    "docs:browser:doc6": "node scripts/docs/doc6-browser-verify.mjs",
+    "docs:finalize:doc6": "node scripts/docs/doc6-finalize.mjs",
+    "docs:audit:doc6": "npm run docs:verify:doc6"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
