@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-8",
+  "heavyEditorModule": "components/docs/playground/CodeMirrorEditor.tsx",
+  "lazyBoundary": "components/docs/playground/InteractiveCodeEditor.tsx",
+  "lazy": true,
+  "ordinaryDocsMustNotMountEditor": true,
+  "homepageMustNotMountEditor": true,
+  "galleryClosedStateMustNotMountEditor": true,
+  "interactiveRoutes": [
+    "/studio",
+    "/docs/node/canvas"
+  ]
+}
