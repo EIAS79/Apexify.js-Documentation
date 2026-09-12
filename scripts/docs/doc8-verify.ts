@@ -17,7 +17,9 @@ const options = read('components/docs/playground/OptionFields.tsx');
 const playground = read('components/docs/playground/VerifiedExamplePlayground.tsx');
 const contracts = read('lib/docs/playground/contracts.ts');
 const session = read('lib/docs/playground/session.ts');
+const executionAdapter = read('lib/docs/playground/serverClientAdapter.ts');
 const galleryEditor = read('app/gallery/components/GallerySnippetEditor.tsx');
+const studio = read('components/studio/CodeStudio.tsx');
 const studioSplit = read('components/studio/StudioResizableSplit.tsx');
 const studioOutput = read('components/studio/StudioOutputPanel.tsx');
 const studioStorage = read('lib/studio/studioStorage.ts');
@@ -49,6 +51,10 @@ requireCheck(studioSplit.includes("@/components/docs/playground/InteractiveWorks
 requireCheck(studioOutput.includes("@/components/docs/playground/InteractivePreview"), 'Studio output must use InteractivePreview.');
 requireCheck(studioOutput.includes("@/components/docs/playground/DiagnosticsPanel"), 'Studio output must use DiagnosticsPanel.');
 requireCheck(studioStorage.includes("@/lib/docs/playground/session"), 'Studio share state must use shared DOC-8 session utilities.');
+requireCheck(studio.includes("@/lib/docs/playground/serverClientAdapter"), 'Studio execution must use the shared server-backed ExecutionAdapter.');
+requireCheck(studio.includes('currentNodeServerExecutionAdapter.run'), 'Studio must dispatch execution through ExecutionAdapter.run().');
+requireCheck(!studio.includes("fetch('/api/gallery/run'"), 'Studio UI must not know the concrete gallery runner endpoint.');
+requireCheck(studio.includes('useState(false)'), 'Studio runner must start disabled until availability is proven.');
 requireCheck(codePreview.includes("example.id === 'node.canvas.basic'"), 'DOC-8 representative interactive example must be explicitly bounded to node.canvas.basic.');
 requireCheck(codePreview.includes('<CodeGroup'), 'DOC-5 CodeGroup compatibility must remain intact.');
 
@@ -56,6 +62,8 @@ requireCheck(contracts.includes("mode: 'verified-static' | 'server-backed' | 'fu
 requireCheck(contracts.includes('interface WebRuntimeAdapter'), 'Future WebRuntimeAdapter contract missing.');
 requireCheck(!contracts.includes("from '@apexify/web'"), 'DOC-8 must not import nonexistent @apexify/web runtime.');
 requireCheck(session.includes('shareStateBytes'), 'Share serializer must enforce the shared size limit.');
+requireCheck(executionAdapter.includes("const ENDPOINT = '/api/gallery/run'"), 'Server-backed endpoint ownership must remain inside the execution adapter.');
+requireCheck(executionAdapter.includes("mode: 'server-backed'"), 'Server-backed adapter mode missing.');
 
 requireCheck(runner.includes("process.env.NODE_ENV !== 'production'"), 'Public/deployed arbitrary execution must be disabled.');
 requireCheck(runner.includes("ENABLE_LOCAL_APEXIFY_CODE_RUN === 'true'"), 'Trusted-local execution must require explicit opt-in.');
@@ -97,7 +105,7 @@ if (failures.length) {
 }
 
 console.log('[doc8-verify] PASS', JSON.stringify({
-  sharedPrimitives: ['editor', 'preview', 'diagnostics', 'workspace', 'options', 'session'],
+  sharedPrimitives: ['editor', 'preview', 'diagnostics', 'workspace', 'options', 'session', 'execution'],
   representativeExample: 'node.canvas.basic',
   heavyEditorImportOwner: heavyImports[0],
   publicArbitraryExecution: false,
