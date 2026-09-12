@@ -81,7 +81,8 @@ if (!layout.includes('LegacyDocsRedirectIsland') || !legacyIsland.includes('reso
 const searchRoute = requireFile('app/api/docs/search/route.ts');
 const doc6RecordsPath = path.join(ROOT, 'generated/docs-doc6/search-records.json');
 if (fs.existsSync(doc6RecordsPath)) {
-  if (!searchRoute.includes('canonicalHref') || !searchRoute.includes('generated/docs-doc6/search-records.json')) {
+  const usesGeneratedSearchData = searchRoute.includes('generated/docs-doc6/search-records.json') || searchRoute.includes('lib/search/server-data');
+  if (!searchRoute.includes('canonicalHref') || !usesGeneratedSearchData) {
     throw new Error('[doc1-verify] DOC-6 search endpoint does not return generated canonical route hrefs');
   }
   const artifact = JSON.parse(fs.readFileSync(doc6RecordsPath, 'utf8')) as {
