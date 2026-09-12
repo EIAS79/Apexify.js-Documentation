@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import type { CodeMirrorEditorProps } from './CodeMirrorEditor';
+import { InteractiveErrorBoundary } from './InteractiveErrorBoundary';
 
 const LazyCodeMirrorEditor = dynamic(() => import('./CodeMirrorEditor'), {
   ssr: false,
@@ -22,8 +23,13 @@ export type InteractiveCodeEditorProps = CodeMirrorEditorProps;
 /** Shared DOC-8 editor boundary. Heavy CodeMirror modules are loaded only for explicit interactive surfaces. */
 export function InteractiveCodeEditor(props: InteractiveCodeEditorProps) {
   return (
-    <div data-doc8-primitive="editor" className={props.fillParent ? 'flex min-h-0 flex-1 flex-col' : 'flex flex-col'}>
-      <LazyCodeMirrorEditor {...props} />
+    <div
+      data-doc8-primitive="editor"
+      className={props.fillParent ? 'flex min-h-0 flex-1 flex-col' : 'flex flex-col'}
+    >
+      <InteractiveErrorBoundary label="Code editor">
+        <LazyCodeMirrorEditor {...props} />
+      </InteractiveErrorBoundary>
     </div>
   );
 }
