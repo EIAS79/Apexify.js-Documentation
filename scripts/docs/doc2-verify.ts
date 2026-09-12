@@ -29,6 +29,7 @@ const cursorGate = requireFile('components/docs/shell/CustomCursorGate.tsx');
 const rootLayout = requireFile('app/layout.tsx');
 const searchTrigger = requireFile('components/docs/shell/DocsSearchTrigger.tsx');
 const search = requireFile('components/docs/DocsSidebarSearch.tsx');
+const globalSearch = requireFile('components/docs/search/GlobalDocsSearch.tsx');
 
 const requiredTokens = [
   '--apx-color-accent', '--apx-surface-page', '--apx-surface-raised', '--apx-surface-code',
@@ -77,7 +78,8 @@ assert(shellCss.includes('@media (prefers-reduced-motion: reduce)'), 'reduced-mo
 assert(shellCss.includes('transition-duration:0s !important') && shellCss.includes('animation-duration:0s !important'), 'reduced-motion does not eliminate nonessential shell motion');
 assert(cursorGate.includes("!pathname?.startsWith('/docs')") && cursorGate.includes('prefers-reduced-motion: reduce'), 'custom cursor is not disabled for docs/reduced motion');
 
-assert(search.includes('data-docs-search-input') && search.includes('inputId'), 'search instances cannot be uniquely identified in desktop/mobile shells');
+assert(search.includes('inputId') && (search.includes('GlobalDocsSearch') || search.includes('InlineSearch')), 'sidebar search no longer delegates unique input identity');
+assert(globalSearch.includes('data-docs-search-input') && globalSearch.includes('id={inputId}'), 'search instances cannot be uniquely identified in desktop/mobile shells');
 assert(searchTrigger.includes('querySelectorAll<HTMLInputElement>') && searchTrigger.includes("event.key.toLowerCase() === 'k'"), 'search trigger does not resolve visible search / keyboard shortcut');
 
 assert(routePage.includes('generateStaticParams') && routePage.includes('dynamicParams = false') && routePage.includes('notFound()'), 'DOC-1 route/static 404 contract regressed');
