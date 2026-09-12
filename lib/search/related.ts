@@ -1,4 +1,4 @@
-import { getRelatedContentArtifact, getSearchRecordsArtifact } from './server-data';
+import { getResolvedRelatedContentArtifact, type ResolvedRelatedEntryArtifact } from './server-data';
 import type { SearchRecord } from './schema';
 
 export interface RelatedContentItem {
@@ -15,60 +15,51 @@ export interface RelatedContentItem {
   reasons: string[];
 }
 
-const records = getSearchRecordsArtifact().records;
-const related = getRelatedContentArtifact().records;
-const recordById = new Map(records.map((record) => [record.id, record]));
-const recordIdsBySourceId = new Map<string, string[]>();
-for (const record of records) {
-  const ids = recordIdsBySourceId.get(record.sourceId) ?? [];
-  ids.push(record.id);
-  recordIdsBySourceId.set(record.sourceId, ids);
+const related = getResolvedRelatedContentArtifact().records;
+const relatedByRecordId = new Map(related.map((entry) => [entry.sourceRecordId, entry]));
+const relatedByAuthoritativeSourceId = new Map<string, ResolvedRelatedEntryArtifact[]>();
+for (const entry of related) {
+  const entries = relatedByAuthoritativeSourceId.get(entry.authoritativeSourceId) ?? [];
+  entries.push(entry);
+  relatedByAuthoritativeSourceId.set(entry.authoritativeSourceId, entries);
 }
-const relatedBySourceId = new Map(related.map((entry) => [entry.sourceId, entry]));
 
-function resolveSourceRecordId(authoritativeId: string, preferredKinds?: readonly SearchRecord['kind'][]): string | null {
-  if (relatedBySourceId.has(authoritativeId)) return authoritativeId;
-  const ids = recordIdsBySourceId.get(authoritativeId) ?? [];
-  if (!ids.length) return null;
+function resolveSourceEntry(
+  authoritativeId: string,
+  preferredKinds?: readonly SearchRecord['kind'][],
+): ResolvedRelatedEntryArtifact | null {
+  const direct = relatedByRecordId.get(authoritativeId);
+  if (direct) return direct;
+  const entries = relatedByAuthoritativeSourceId.get(authoritativeId) ?? [];
+  if (!entries.length) return null;
   if (preferredKinds?.length) {
-    const preferred = ids.find((id) => {
-      const record = recordById.get(id);
-      return record ? preferredKinds.includes(record.kind) : false;
-    });
+    const preferred = entries.find((entry) => preferredKinds.includes(entry.sourceKind));
     if (preferred) return preferred;
   }
-  return ids.find((id) => relatedBySourceId.has(id)) ?? null;
+  return entries[0] ?? null;
 }
 
 export function getRelatedContent(
   authoritativeId: string,
   options: { limit?: number; preferredKinds?: readonly SearchRecord['kind'][] } = {},
 ): RelatedContentItem[] {
-  const sourceRecordId = resolveSourceRecordId(authoritativeId, options.preferredKinds);
-  if (!sourceRecordId) return [];
-  const entry = relatedBySourceId.get(sourceRecordId);
+  const entry = resolveSourceEntry(authoritativeId, options.preferredKinds);
   if (!entry) return [];
   const limit = Math.max(1, Math.min(12, options.limit ?? 4));
-  const items: RelatedContentItem[] = [];
-  for (const target of entry.targets) {
-    const record = recordById.get(target.id);
-    if (!record) continue;
+  return entry.targets.slice(0, limit).map((target) => {
     const item: RelatedContentItem = {
-      id: record.id,
-      kind: record.kind,
-      title: record.title,
-      canonicalHref: record.canonicalHref,
-      breadcrumb: record.breadcrumb,
-      runtime: record.runtime,
-      packages: record.packages,
+      id: target.id,
+      kind: target.kind,
+      title: target.title,
+      canonicalHref: target.canonicalHref,
+      breadcrumb: target.breadcrumb,
+      runtime: target.runtime,
+      packages: target.packages,
       score: target.score,
       reasons: target.reasons,
     };
-    const description = record.description ?? record.excerpt;
-    if (description) item.description = description;
-    if (record.stability) item.stability = record.stability;
-    items.push(item);
-    if (items.length >= limit) break;
-  }
-  return items;
+    if (target.description) item.description = target.description;
+    if (target.stability) item.stability = target.stability;
+    return item;
+  });
 }
