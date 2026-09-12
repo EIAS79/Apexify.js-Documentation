@@ -1,14 +1,17 @@
 /**
- * Normalize temp sandbox paths in runner stderr/stacks so users see `(sandbox)/snippet.ts`
- * instead of long OS temp paths.
+ * Normalize trusted-local temporary runner paths so users see `(run-temp)/snippet.ts`
+ * instead of long OS temp paths. This is path redaction only, not an isolation claim.
  */
 export function normalizeSandboxPaths(text: string): string {
   let s = text.replace(/\r\n/g, '\n');
-  // Windows: drive letter path ending in apexify-gallery-<uuid>\
-  s = s.replace(/(?:[A-Za-z]:)?[^:*?"<>|\n]*?apexify-gallery-[a-f0-9-]+\\/gi, '(sandbox)\\');
-  // Unix: /tmp/apexify-gallery-<uuid>/
-  s = s.replace(/(?:\/var\/folders\/[^/\s]+\/[^/\s]+\/)?T\/apexify-gallery-[a-f0-9-]+\//gi, '(sandbox)/');
-  s = s.replace(/\/tmp\/apexify-gallery-[a-f0-9-]+\//gi, '(sandbox)/');
+  // Historical temp-path form kept for backward-compatible diagnostic normalization.
+  s = s.replace(/(?:[A-Za-z]:)?[^:*?"<>|\n]*?apexify-gallery-[a-f0-9-]+\\/gi, '(run-temp)\\');
+  s = s.replace(/(?:[A-Za-z]:)?[^:*?"<>|\n]*?apexify-local-run-[a-f0-9-]+\\/gi, '(run-temp)\\');
+  // Unix/macOS temp paths.
+  s = s.replace(/(?:\/var\/folders\/[^/\s]+\/[^/\s]+\/)?T\/apexify-gallery-[a-f0-9-]+\//gi, '(run-temp)/');
+  s = s.replace(/(?:\/var\/folders\/[^/\s]+\/[^/\s]+\/)?T\/apexify-local-run-[a-f0-9-]+\//gi, '(run-temp)/');
+  s = s.replace(/\/tmp\/apexify-gallery-[a-f0-9-]+\//gi, '(run-temp)/');
+  s = s.replace(/\/tmp\/apexify-local-run-[a-f0-9-]+\//gi, '(run-temp)/');
   return s;
 }
 
@@ -81,7 +84,7 @@ export function parseStudioRunnerOutput(raw: string): ParsedRunnerOutput {
 
   if (hints.length === 0) {
     hints.push('Read the message and stack below — the first Error line usually states what broke.');
-    hints.push('Paths shown as `(sandbox)/snippet.ts` are your submitted code in the runner.');
+    hints.push('Paths shown as `(run-temp)/snippet.ts` are your submitted code in trusted-local execution.');
   }
 
   return { headline, hints: hints.slice(0, 5), terminalBody };
