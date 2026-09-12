@@ -67,7 +67,16 @@ async function auditRoute(page, route, state, routeName) {
     const result = await window.axe.run(document, {
       runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] },
     });
-    return result.violations.map((violation) => ({ id: violation.id, impact: violation.impact, nodes: violation.nodes.length }));
+    return result.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      nodes: violation.nodes.length,
+      targets: violation.nodes.map((node) => ({
+        target: node.target,
+        html: node.html,
+        failureSummary: node.failureSummary,
+      })),
+    }));
   });
   const serious = axe.filter((violation) => violation.impact === 'serious' || violation.impact === 'critical');
   if (serious.length) throw new Error(`${state.name} ${routeName} serious axe ${JSON.stringify(serious)}`);
