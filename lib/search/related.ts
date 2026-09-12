@@ -1,17 +1,5 @@
-import recordsJson from '@/generated/docs-doc6/search-records.json';
-import relatedJson from '@/generated/docs-doc6/related-content.json';
+import { getRelatedContentArtifact, getSearchRecordsArtifact } from './server-data';
 import type { SearchRecord } from './schema';
-
-interface RelatedTargetArtifact {
-  id: string;
-  score: number;
-  reasons: string[];
-}
-
-interface RelatedEntryArtifact {
-  sourceId: string;
-  targets: RelatedTargetArtifact[];
-}
 
 export interface RelatedContentItem {
   id: string;
@@ -27,8 +15,8 @@ export interface RelatedContentItem {
   reasons: string[];
 }
 
-const records = (recordsJson as { records: SearchRecord[] }).records;
-const related = (relatedJson as { records: RelatedEntryArtifact[] }).records;
+const records = getSearchRecordsArtifact().records;
+const related = getRelatedContentArtifact().records;
 const recordById = new Map(records.map((record) => [record.id, record]));
 const recordIdsBySourceId = new Map<string, string[]>();
 for (const record of records) {
