@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import type { SearchFilterOptions, SearchFilters, SearchResponse, SearchResult } from "@/lib/search/schema";
 
 const EMPTY_FILTERS: SearchFilterOptions = { runtimes: [], packages: [], kinds: [], stabilities: [], versions: [], domains: [] };
-const GROUP_ORDER = ["api-symbol", "api-member", "api-option", "api-type", "doc", "heading", "example", "gallery", "changelog", "error", "diagnostic"];
 const GROUP_LABEL: Record<string, string> = {
   "api-symbol": "API",
   "api-member": "API members",
@@ -148,10 +147,9 @@ export function GlobalDocsSearch({
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(result);
     }
-    return [...map.entries()].sort(([a], [b]) => {
-      const ai = GROUP_ORDER.indexOf(a), bi = GROUP_ORDER.indexOf(b);
-      return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi) || a.localeCompare(b);
-    });
+    // Map insertion order follows the server's global relevance ranking, so the
+    // highest-ranked result remains the first visible/keyboard-selectable item.
+    return [...map.entries()];
   }, [results]);
   const flat = useMemo(() => grouped.flatMap(([, items]) => items), [grouped]);
   const hasFilters = Boolean(runtime || packageName || kind || stability || version || domain || fixedFilters.runtime || fixedFilters.package || fixedFilters.kind || fixedFilters.stability || fixedFilters.version || fixedFilters.domain);
