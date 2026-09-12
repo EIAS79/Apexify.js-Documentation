@@ -85,7 +85,7 @@ export function SearchCommandPalette({
           onEscape={onClose}
           onNavigate={onClose}
         />
-        <p className="mt-3 text-[11px]" style={{ color: "var(--text-muted)" }}>
+        <p className="mt-3 text-[11px]" style={{ color: "var(--text-tertiary)" }}>
           ↑/↓ select · Enter open canonical result · Esc clear/close · Tab stays inside palette · recent searches stay in this browser only
         </p>
       </div>
