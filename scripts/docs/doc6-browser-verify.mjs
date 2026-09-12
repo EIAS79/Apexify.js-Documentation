@@ -25,9 +25,15 @@ const modKey = process.platform === 'darwin' ? 'Meta' : 'Control';
 
 const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
 const consoleErrors = [];
+const pageErrors = [];
+const httpErrors = [];
 const checks = [];
 const accessibilityRuns = [];
 
+function expectedLocalMiss(row) {
+  const url = new URL(row.url);
+  return row.status === 404 && url.origin === new URL(BASE).origin && (url.pathname === '/favicon.ico' || url.pathname === '/_vercel/speed-insights/script.js');
+}
 async function openPalette(page) {
   await page.keyboard.down(modKey);
   await page.keyboard.press('k');
@@ -72,7 +78,8 @@ async function newPage(viewport) {
   const page = await browser.newPage();
   await page.setViewport(viewport);
   page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
-  page.on('pageerror', (error) => consoleErrors.push(error.message));
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('response', (response) => { if (response.status() >= 400) httpErrors.push({ status: response.status(), url: response.url() }); });
   return page;
 }
 
@@ -177,15 +184,30 @@ try {
   await runAxe(mobile, 'mobile-reduced-motion');
   await mobile.close();
 
-  const status = consoleErrors.length ? 'FAIL' : 'PASS';
-  const browserEvidence = { schemaVersion: 1, phase: 'DOC-6', status, checks, consoleErrors };
+  const unexpectedHttp = httpErrors.filter((row) => !expectedLocalMiss(row));
+  const onlyExpectedLocal404s = httpErrors.length > 0 && unexpectedHttp.length === 0 && httpErrors.every(expectedLocalMiss);
+  const unexpectedConsole = consoleErrors.filter((message) => !(onlyExpectedLocal404s && message.includes('404')));
+  const status = unexpectedHttp.length || unexpectedConsole.length || pageErrors.length ? 'FAIL' : 'PASS';
+  const browserEvidence = {
+    schemaVersion: 1,
+    phase: 'DOC-6',
+    status,
+    checks,
+    consoleErrors: unexpectedConsole,
+    pageErrors,
+    unexpectedHttp,
+    expectedResourceMisses: httpErrors.filter(expectedLocalMiss),
+  };
   const accessibilityEvidence = { schemaVersion: 1, phase: 'DOC-6', status: accessibilityRuns.every((run) => run.severe.length === 0) ? 'PASS' : 'FAIL', runs: accessibilityRuns };
   const keyboardEvidence = { schemaVersion: 1, phase: 'DOC-6', status: checks.some((item) => item.name === 'enter-canonical-navigation') && checks.some((item) => item.name === 'escape-close') ? 'PASS' : 'FAIL', verified: ['Ctrl/Cmd+K open', 'autofocus', 'Arrow/Enter selection path', 'Escape clear/close', 'focus trap implementation', 'focus restoration implementation'] };
   fs.writeFileSync(path.join(OUT, 'browser.json'), `${JSON.stringify(browserEvidence, null, 2)}\n`);
   fs.writeFileSync(path.join(OUT, 'accessibility.json'), `${JSON.stringify(accessibilityEvidence, null, 2)}\n`);
   fs.writeFileSync(path.join(OUT, 'keyboard.json'), `${JSON.stringify(keyboardEvidence, null, 2)}\n`);
-  if (status !== 'PASS' || accessibilityEvidence.status !== 'PASS' || keyboardEvidence.status !== 'PASS') throw new Error('DOC-6 browser verification failed');
-  console.log('[doc6-browser]', JSON.stringify({ status, checks: checks.length, accessibilityRuns: accessibilityRuns.length }));
+  if (status !== 'PASS' || accessibilityEvidence.status !== 'PASS' || keyboardEvidence.status !== 'PASS') {
+    console.error('[doc6-browser-errors]', JSON.stringify({ unexpectedHttp, unexpectedConsole, pageErrors }));
+    throw new Error('DOC-6 browser verification failed');
+  }
+  console.log('[doc6-browser]', JSON.stringify({ status, checks: checks.length, accessibilityRuns: accessibilityRuns.length, expectedResourceMisses: browserEvidence.expectedResourceMisses.length }));
 } finally {
   await browser.close();
 }
