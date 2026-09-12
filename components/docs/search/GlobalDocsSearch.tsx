@@ -237,7 +237,7 @@ export function GlobalDocsSearch({
       </div>
 
       {!compact && (
-        <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Search filters">
+        <div role="group" className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Search filters">
           <select aria-label="Runtime filter" value={runtime} onChange={(event) => setRuntime(event.target.value)} className="min-h-10 rounded-lg bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
             <option value="">All runtimes</option>
             {filters.runtimes.map((value) => <option key={value} value={value}>{value}</option>)}
