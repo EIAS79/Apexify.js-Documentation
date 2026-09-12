@@ -301,11 +301,12 @@ export function GlobalDocsSearch({
         <div id={listboxId} ref={listRef} role="listbox" aria-label="Search results" className={`apex-scroll mt-2 overflow-y-auto ${compact ? "max-h-[16rem]" : "max-h-[min(60vh,34rem)]"}`}>
           {grouped.map(([group, items]) => {
             const start = flat.indexOf(items[0]);
+            const groupLabel = GROUP_LABEL[group] ?? group;
             return (
-              <section key={group} role="presentation" className="mb-2">
-                <h3 className="sticky top-0 z-10 px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]" style={{ background: "var(--bg-raised)", color: "var(--text-tertiary)" }}>
-                  {GROUP_LABEL[group] ?? group}
-                </h3>
+              <div key={group} role="group" aria-label={groupLabel} className="mb-2">
+                <div aria-hidden="true" className="sticky top-0 z-10 px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]" style={{ background: "var(--bg-raised)", color: "var(--text-secondary)" }}>
+                  {groupLabel}
+                </div>
                 {items.map((result, offset) => {
                   const index = start + offset;
                   const selected = index === active;
@@ -326,7 +327,7 @@ export function GlobalDocsSearch({
                       <span className="flex min-w-0 items-start justify-between gap-3">
                         <span className="min-w-0">
                           <span className="block truncate text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{result.title}</span>
-                          <span className="mt-0.5 block truncate text-[11px]" style={{ color: "var(--text-tertiary)" }}>{result.breadcrumb.join(" › ")}</span>
+                          <span className="mt-0.5 block truncate text-[11px]" style={{ color: "var(--text-secondary)" }}>{result.breadcrumb.join(" › ")}</span>
                         </span>
                         <span className="shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
                           {result.stability ?? result.kind}
@@ -337,11 +338,11 @@ export function GlobalDocsSearch({
                           {result.excerpt || result.description}
                         </span>
                       )}
-                      <span className="mt-1 block text-[10px]" style={{ color: "var(--text-muted)" }}>{resultMeta(result)}</span>
+                      <span className="mt-1 block text-[10px]" style={{ color: "var(--text-secondary)" }}>{resultMeta(result)}</span>
                     </button>
                   );
                 })}
-              </section>
+              </div>
             );
           })}
         </div>
