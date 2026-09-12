@@ -24,14 +24,43 @@ export interface RelatedContentArtifact {
   records: RelatedEntryArtifact[];
 }
 
+export interface ResolvedRelatedTargetArtifact {
+  id: string;
+  kind: SearchRecord['kind'];
+  title: string;
+  description?: string;
+  canonicalHref: string;
+  breadcrumb: string[];
+  runtime: string[];
+  packages: string[];
+  stability?: string;
+  score: number;
+  reasons: string[];
+}
+
+export interface ResolvedRelatedEntryArtifact {
+  sourceRecordId: string;
+  authoritativeSourceId: string;
+  sourceKind: SearchRecord['kind'];
+  targets: ResolvedRelatedTargetArtifact[];
+}
+
+export interface ResolvedRelatedContentArtifact {
+  schemaVersion: number;
+  sourceChecksum: string;
+  records: ResolvedRelatedEntryArtifact[];
+}
+
 const GENERATED_DIR = path.join(process.cwd(), 'generated', 'docs-doc6');
 const RECORDS_PATH = path.join(GENERATED_DIR, 'search-records.json');
 const INDEX_PATH = path.join(GENERATED_DIR, 'search-index-manifest.json');
 const RELATED_PATH = path.join(GENERATED_DIR, 'related-content.json');
+const RESOLVED_RELATED_PATH = path.join(GENERATED_DIR, 'related-content-resolved.json');
 
 let recordsCache: SearchRecordsArtifact | undefined;
 let indexCache: SearchIndexArtifact | undefined;
 let relatedCache: RelatedContentArtifact | undefined;
+let resolvedRelatedCache: ResolvedRelatedContentArtifact | undefined;
 
 function readJson<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, 'utf8')) as T;
@@ -72,4 +101,14 @@ export function getSearchArtifacts(): { recordsArtifact: SearchRecordsArtifact; 
 export function getRelatedContentArtifact(): RelatedContentArtifact {
   if (!relatedCache) relatedCache = readJson<RelatedContentArtifact>(RELATED_PATH);
   return relatedCache;
+}
+
+export function getResolvedRelatedContentArtifact(): ResolvedRelatedContentArtifact {
+  if (!resolvedRelatedCache) {
+    resolvedRelatedCache = readJson<ResolvedRelatedContentArtifact>(RESOLVED_RELATED_PATH);
+    if (resolvedRelatedCache.schemaVersion !== SEARCH_SCHEMA_VERSION) {
+      throw new Error('[doc6-search] resolved related-content schema mismatch; rebuild DOC-6 artifacts');
+    }
+  }
+  return resolvedRelatedCache;
 }
