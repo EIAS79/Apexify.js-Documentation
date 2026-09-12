@@ -136,6 +136,7 @@ function prepare(record: SearchRecord): PreparedRecord {
 }
 
 type QueryContext = { normalized: string; compact: string; tokens: string[] };
+type ScoredRef = { record: SearchRecord; score: number; reason: string };
 
 function scoreRecord(record: SearchRecord, query: QueryContext): { score: number; reason: string } | null {
   const prepared = prepare(record);
@@ -204,32 +205,32 @@ function passesFilters(record: SearchRecord, filters: SearchFilters): boolean {
   return true;
 }
 
-function intersectPostings(postings: string[][]): Set<string> {
-  if (!postings.length) return new Set();
+function intersectPostings(postings: string[][]): string[] {
+  if (!postings.length) return [];
   const sorted = [...postings].sort((a, b) => a.length - b.length);
   let current = new Set(sorted[0]);
   for (let i = 1; i < sorted.length && current.size; i += 1) {
     const next = new Set(sorted[i]);
-    current = new Set([...current].filter((id) => next.has(id)));
+    for (const id of current) if (!next.has(id)) current.delete(id);
   }
-  return current;
+  return [...current];
 }
 
-function candidateIds(index: SearchIndexArtifact, records: SearchRecord[], queryTokens: string[]): Set<string> {
-  if (!queryTokens.length) return new Set(records.map((record) => record.id));
+function candidateIds(index: SearchIndexArtifact, records: SearchRecord[], queryTokens: string[]): string[] {
+  if (!queryTokens.length) return records.map((record) => record.id);
   const postings = queryTokens.map((token) => {
     const exact = index.tokens[token] ?? [];
     if (exact.length) return exact;
     return index.prefixes[token.slice(0, Math.min(6, token.length))] ?? [];
   });
+  if (postings.length === 1 && postings[0].length) return postings[0];
   if (postings.every((list) => list.length > 0)) {
     const intersection = intersectPostings(postings);
-    if (intersection.size) return intersection;
+    if (intersection.length) return intersection;
   }
   const union = new Set<string>();
   for (const list of postings) for (const id of list) union.add(id);
-  // Only an absent posting set needs full-corpus fuzzy fallback.
-  return union.size ? union : new Set(records.map((record) => record.id));
+  return union.size ? [...union] : records.map((record) => record.id);
 }
 
 function recordsById(records: SearchRecord[]): Map<string, SearchRecord> {
@@ -238,6 +239,26 @@ function recordsById(records: SearchRecord[]): Map<string, SearchRecord> {
   const map = new Map(records.map((record) => [record.id, record]));
   recordMapCache.set(records, map);
   return map;
+}
+
+function compareScored(a: ScoredRef, b: ScoredRef): number {
+  return b.score - a.score ||
+    a.record.title.localeCompare(b.record.title, undefined, { numeric: true }) ||
+    a.record.canonicalHref.localeCompare(b.record.canonicalHref) ||
+    a.record.id.localeCompare(b.record.id);
+}
+
+function insertTop(top: ScoredRef[], candidate: ScoredRef, limit: number): void {
+  if (top.length === limit && compareScored(candidate, top[top.length - 1]) >= 0) return;
+  let low = 0;
+  let high = top.length;
+  while (low < high) {
+    const mid = (low + high) >>> 1;
+    if (compareScored(candidate, top[mid]) < 0) high = mid;
+    else low = mid + 1;
+  }
+  top.splice(low, 0, candidate);
+  if (top.length > limit) top.pop();
 }
 
 export function getSearchFilterOptions(records: SearchRecord[]): SearchFilterOptions {
@@ -266,26 +287,26 @@ export function searchRecords(
     compact: compact(rawQuery),
     tokens: [...new Set(normalized.split(' ').filter(Boolean))],
   };
+  const boundedLimit = Math.max(1, Math.min(100, limit));
   const byId = recordsById(records);
-  const candidates = [...candidateIds(index, records, query.tokens)]
-    .map((id) => byId.get(id))
-    .filter((record): record is SearchRecord => Boolean(record));
-  const scored = candidates
-    .map((record) => {
-      const scoredRecord = scoreRecord(record, query);
-      return scoredRecord ? { ...record, score: scoredRecord.score, matchReason: scoredRecord.reason } : null;
-    })
-    .filter((record): record is RankedSearchRecord => Boolean(record))
-    .sort((a, b) =>
-      b.score - a.score ||
-      a.title.localeCompare(b.title, undefined, { numeric: true }) ||
-      a.canonicalHref.localeCompare(b.canonicalHref) ||
-      a.id.localeCompare(b.id));
+  const top: ScoredRef[] = [];
+  let unfilteredTotal = 0;
+  let filteredMatches = 0;
 
-  const filtered = scored.filter((record) => passesFilters(record, filters));
+  for (const id of candidateIds(index, records, query.tokens)) {
+    const record = byId.get(id);
+    if (!record) continue;
+    const scored = scoreRecord(record, query);
+    if (!scored) continue;
+    unfilteredTotal += 1;
+    if (!passesFilters(record, filters)) continue;
+    filteredMatches += 1;
+    insertTop(top, { record, score: scored.score, reason: scored.reason }, boundedLimit);
+  }
+
   return {
-    results: filtered.slice(0, Math.max(1, Math.min(100, limit))),
-    unfilteredTotal: scored.length,
-    filteredOut: scored.length > 0 && filtered.length === 0,
+    results: top.map(({ record, score, reason }) => ({ ...record, score, matchReason: reason })),
+    unfilteredTotal,
+    filteredOut: unfilteredTotal > 0 && filteredMatches === 0,
   };
 }
