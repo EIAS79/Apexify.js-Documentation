@@ -1,0 +1,115 @@
+name: DOC-8 Studio Interactive Foundation
+
+on:
+  push:
+    branches: [doc8-studio-interactive-foundation, main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: doc8-interactive-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC8_BASE_SHA: 8424834aa0334044b5603bf88406f0a1fa10a396
+  DOC8_BASE_URL: http://127.0.0.1:3000
+  DOC8_BASELINE_URL: http://127.0.0.1:3001
+
+jobs:
+  verify:
+    name: Verify DOC-8 shared interactive foundation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: npm }
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Deterministic install
+        run: npm ci
+
+      - name: DOC-8 deterministic evidence, unit and structural security verification
+        run: |
+          npx tsx scripts/docs/doc8-generate.ts --check
+          npx tsx --test scripts/docs/doc8.test.ts
+          npx tsx scripts/docs/doc8-verify.ts
+
+      - name: DOC-1 through DOC-6 regression verification
+        run: npm run docs:verify:doc6
+
+      - name: DOC-7 product regression verification
+        run: |
+          npx tsx scripts/docs/doc7-verify.ts
+          npx tsx --test scripts/docs/doc7.test.ts
+
+      - name: Existing documentation integrity and package pin
+        run: npm run verify:docs
+
+      - name: TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Build current DOC-8 candidate
+        run: npm run build
+
+      - name: Build DOC-8 baseline on same runner
+        shell: bash
+        run: |
+          rm -rf /tmp/doc8-base
+          git worktree add --detach /tmp/doc8-base "$DOC8_BASE_SHA"
+          ln -s "$GITHUB_WORKSPACE/node_modules" /tmp/doc8-base/node_modules
+          (cd /tmp/doc8-base && npm run build)
+
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+
+      - name: Start current and baseline production servers
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc8-current-next.log 2>&1 &
+          (cd /tmp/doc8-base && npm start -- -p 3001 > /tmp/doc8-baseline-next.log 2>&1 &)
+          for i in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:3000/docs/node/canvas >/dev/null && curl --fail --silent http://127.0.0.1:3001/docs/node/canvas >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc8-current-next.log || true
+          cat /tmp/doc8-baseline-next.log || true
+          exit 1
+
+      - name: DOC-8 browser, accessibility, responsive, keyboard, execution-boundary and bundle verification
+        run: node scripts/docs/doc8-browser-verify.mjs
+
+      - name: DOC-5 executable example browser regression
+        env:
+          DOC5_BASE_URL: http://127.0.0.1:3000
+        run: node scripts/docs/doc5-browser-verify.mjs
+
+      - name: DOC-7 homepage and Gallery browser regression
+        env:
+          DOC7_BASE_URL: http://127.0.0.1:3000
+        run: node scripts/docs/doc7-browser-verify.mjs
+
+      - name: Upload DOC-8 evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: doc8-studio-interactive-foundation-evidence
+          path: |
+            generated/docs-doc8
+            /tmp/doc8-current-next.log
+            /tmp/doc8-baseline-next.log
+          if-no-files-found: error
