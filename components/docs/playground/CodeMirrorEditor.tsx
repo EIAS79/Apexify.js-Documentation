@@ -23,9 +23,12 @@ const interactiveTheme = EditorView.theme(
       borderRight: '1px solid rgba(240,246,252,0.14)',
       color: '#8b949e',
     },
+    '.cm-gutterElement': {
+      color: '#aeb8c8 !important',
+    },
     '.cm-activeLineGutter': {
       backgroundColor: '#161b22',
-      color: '#c9d1d9',
+      color: '#c9d1d9 !important',
     },
     '.cm-activeLine': { backgroundColor: '#161b22' },
     '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
