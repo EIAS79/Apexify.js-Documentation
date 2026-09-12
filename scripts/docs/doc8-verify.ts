@@ -19,29 +19,37 @@ const contracts = read('lib/docs/playground/contracts.ts');
 const session = read('lib/docs/playground/session.ts');
 const executionAdapter = read('lib/docs/playground/serverClientAdapter.ts');
 const galleryEditor = read('app/gallery/components/GallerySnippetEditor.tsx');
+const galleryModal = read('app/gallery/components/GalleryModal.tsx');
+const studioLayout = read('app/studio/layout.tsx');
 const studio = read('components/studio/CodeStudio.tsx');
+const studioStatus = read('components/studio/StudioStatusBar.tsx');
 const studioSplit = read('components/studio/StudioResizableSplit.tsx');
 const studioOutput = read('components/studio/StudioOutputPanel.tsx');
 const studioStorage = read('lib/studio/studioStorage.ts');
+const studioTerminal = read('lib/studio/studioRunnerTerminal.ts');
+const runnerWrapper = read('lib/gallery/core/wrapSnippetForRunner.ts');
 const codePreview = read('components/examples/CodePreview.tsx');
 const runner = read('app/api/gallery/run/route.ts');
 const packageJson = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
 
 requireCheck(editor.includes("dynamic(() => import('./CodeMirrorEditor')"), 'InteractiveCodeEditor must lazy-load CodeMirrorEditor.');
+requireCheck(editor.includes('<InteractiveErrorBoundary'), 'Shared editor must isolate lazy/editor failures.');
 requireCheck(codeMirror.includes("from '@uiw/react-codemirror'"), 'CodeMirrorEditor must own the existing CodeMirror integration.');
 requireCheck(codeMirror.includes("from '@codemirror/lang-javascript'"), 'CodeMirrorEditor must own syntax-language loading.');
 requireCheck(diagnostics.includes('data-doc8-primitive="diagnostics"'), 'DiagnosticsPanel marker missing.');
 requireCheck(preview.includes('data-doc8-primitive="preview"'), 'InteractivePreview marker missing.');
+requireCheck(preview.includes('<InteractiveErrorBoundary'), 'Shared preview must isolate preview failures.');
 requireCheck(workspace.includes('data-doc8-primitive="workspace"'), 'InteractiveWorkspace marker missing.');
 requireCheck(workspace.includes('role="separator"'), 'Shared workspace must expose an accessible separator.');
+requireCheck(workspace.includes('internalRatio'), 'Shared workspace must support standalone docs keyboard resizing.');
 requireCheck(options.includes('data-doc8-primitive="options"'), 'Shared option primitive marker missing.');
 
 for (const dependency of [
-  "./InteractiveCodeEditor",
-  "./InteractivePreview",
-  "./DiagnosticsPanel",
-  "./InteractiveWorkspace",
-  "@/lib/docs/playground/session",
+  './InteractiveCodeEditor',
+  './InteractivePreview',
+  './DiagnosticsPanel',
+  './InteractiveWorkspace',
+  '@/lib/docs/playground/session',
 ]) {
   requireCheck(playground.includes(dependency), `Representative docs playground must use ${dependency}.`);
 }
@@ -72,6 +80,18 @@ requireCheck(runner.includes('DOC8_RESOURCE_LIMITS.executionMs'), 'Runner timeou
 requireCheck(runner.includes('DOC8_RESOURCE_LIMITS.outputBytes'), 'Runner output limit must use centralized DOC-8 limits.');
 requireCheck(runner.includes('cwd: dir'), 'Trusted-local execution must run from the controlled temporary directory.');
 requireCheck(runner.includes('rmSync(dir, { recursive: true, force: true })'), 'Runner must clean its temporary directory.');
+
+// A blocklist + child process is not a security sandbox. Keep all current product copy truthful.
+requireCheck(!studioLayout.toLowerCase().includes('sandbox'), 'Studio metadata must not describe current execution as a sandbox.');
+requireCheck(!studioStatus.includes('Sandbox ·'), 'Studio status UI must not describe current execution as a sandbox.');
+requireCheck(!galleryModal.includes('Sandbox runner'), 'Gallery must not expose the legacy Sandbox runner label.');
+requireCheck(!galleryModal.includes('sandbox run'), 'Gallery preview copy must not call trusted-local execution a sandbox run.');
+requireCheck(!galleryModal.includes('sandbox output'), 'Gallery alt text must not call trusted-local output sandbox output.');
+requireCheck(galleryModal.includes('useState(false)'), 'Gallery execution availability must fail closed.');
+requireCheck(galleryModal.includes('setRunnerEnabled(false)'), 'Gallery availability probe failures must keep execution disabled.');
+requireCheck(!studioTerminal.includes('(sandbox)'), 'Studio diagnostics must not label temporary paths as a sandbox.');
+requireCheck(!runnerWrapper.includes('server sandbox'), 'Runner diagnostics must not claim server sandboxing.');
+requireCheck(runnerWrapper.includes('not a security sandbox'), 'Trusted-local video diagnostic must explicitly reject sandbox overclaiming.');
 
 const sourceRoots = ['app', 'components', 'contexts', 'lib'];
 const heavyImports: string[] = [];
@@ -110,5 +130,6 @@ console.log('[doc8-verify] PASS', JSON.stringify({
   heavyEditorImportOwner: heavyImports[0],
   publicArbitraryExecution: false,
   localExecutionMode: 'trusted-local-opt-in',
+  sandboxClaim: false,
   packagePin: packageJson.dependencies?.['apexify.js'],
 }));
