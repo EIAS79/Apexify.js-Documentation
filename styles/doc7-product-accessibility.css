@@ -76,15 +76,19 @@ body:has(#gallery-main) .surface-elevated .text-grad-aurora {
   color: transparent;
 }
 
-/* Production axe diagnostics identified four Gallery microcopy/badge pairs
-   that were below AA in light mode. These overrides are intentionally scoped
-   to Gallery and preserve the existing decorative background accents. */
+/* Production axe diagnostics identified Gallery microcopy/badge pairs that
+   were below AA. These overrides are intentionally scoped to Gallery and
+   preserve the existing decorative background accents. */
 body:has(#gallery-main) [style*="color:var(--text-muted)"] {
   color: var(--text-secondary) !important;
 }
 
 body:has(#gallery-main) .text-white[style*="background-color:var(--accent-amber)"],
 body:has(#gallery-main) .text-white[style*="background-color:var(--success)"] {
+  color: #080312 !important;
+}
+
+.dark body:has(#gallery-main) .text-white[style*="background-color:var(--accent-iris)"] {
   color: #080312 !important;
 }
 
