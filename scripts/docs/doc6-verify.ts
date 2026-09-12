@@ -39,10 +39,16 @@ for (const source of sources.sources) {
 }
 
 const routeSource = fs.readFileSync(path.join(root, "app/api/docs/search/route.ts"), "utf8");
-assert.doesNotMatch(routeSource, /node:fs|readdirSync|readFileSync|getAllMdxFiles/, "request-time filesystem search returned");
+assert.doesNotMatch(routeSource, /node:fs|readdirSync|readFileSync|getAllMdxFiles/, "request-time source traversal returned");
+assert.match(routeSource, /lib\/search\/server-data/);
+const serverData = fs.readFileSync(path.join(root, "lib/search/server-data.ts"), "utf8");
+assert.doesNotMatch(serverData, /readdirSync|getAllMdxFiles|content\/docs/);
+for (const file of ["search-records.json", "search-index-manifest.json", "related-content.json"]) {
+  assert.ok(serverData.includes(file), `server data loader does not bind fixed artifact ${file}`);
+}
 const relatedAdapter = fs.readFileSync(path.join(root, "lib/search/related.ts"), "utf8");
 const relatedComponent = fs.readFileSync(path.join(root, "components/docs/search/RelatedContent.tsx"), "utf8");
-assert.match(relatedAdapter, /related-content\.json/);
+assert.match(relatedAdapter, /getRelatedContentArtifact/);
 assert.match(relatedComponent, /NextSteps/);
 for (const relative of ["app/docs/[...slug]/page.tsx","app/api-reference/[package]/[...symbol]/page.tsx","app/examples/[id]/page.tsx"]) {
   const source = fs.readFileSync(path.join(root, relative), "utf8");
@@ -50,7 +56,8 @@ for (const relative of ["app/docs/[...slug]/page.tsx","app/api-reference/[packag
 }
 const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")) as { scripts?: Record<string, string> };
 assert.match(packageJson.scripts?.postinstall ?? "", /docs:search:build/);
-assert.match(packageJson.scripts?.build ?? "", /doc6-generate\.ts --check/);
+assert.match(packageJson.scripts?.build ?? "", /doc6-ensure-generated\.mjs/);
+assert.ok(fs.existsSync(path.join(root, 'scripts/docs/doc6-ensure-generated.mjs')));
 const palette = fs.readFileSync(path.join(root, "components/docs/search/SearchCommandPalette.tsx"), "utf8");
 assert.match(palette, /role="dialog"/);
 assert.match(palette, /aria-modal="true"/);
