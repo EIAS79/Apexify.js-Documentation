@@ -28,8 +28,8 @@ const STUDIO_VIDEO_CHECKS: Array<{ re: RegExp; label: string }> = [
 ];
 
 /**
- * Studio sandbox only accepts PNG/GIF buffers — video APIs need local FFmpeg.
- * Returns detected API names when the snippet should not run in Studio.
+ * Trusted-local Studio execution accepts PNG/GIF buffers; video APIs require local FFmpeg.
+ * Returns detected API names when the snippet should not run through the current adapter.
  */
 export function detectStudioVideoUsage(code: string): string[] | null {
   const scanned = stripCommentsForScan(code);
@@ -46,7 +46,8 @@ export function studioVideoBlockedMessage(detected: string[]): string {
     'Video encoding is not available in Studio.',
     '',
     'Why:',
-    '  Studio runs your snippet in a server sandbox. main() must return a PNG or GIF Buffer.',
+    '  Trusted-local Studio execution requires main() to return a PNG or GIF Buffer.',
+    '  This mode is developer tooling, not a security sandbox.',
     '  Apexify video APIs rely on FFmpeg/ffprobe on the host — that',
     '  toolchain is not installed in the Studio runner (and is unreliable on serverless).',
     '',
@@ -110,8 +111,6 @@ export function wrapSnippetForRunner(
   const { hoisted, rest: inner } = hoistLeadingImports(body);
   const hoistedBlock = hoisted ? `${hoisted}\n\n` : '';
 
-  // Named import avoids clashing with user `import fs from 'fs'`. No top-level await: run inside an async IIFE.
-  // Register DejaVu under common sans-serif names so charts/text render on Linux serverless (no Arial/Segoe).
   return `import { writeFileSync as __galleryWrite } from 'fs';
 import * as __galleryPath from 'node:path';
 import { GlobalFonts as __galleryGlobalFonts } from '@napi-rs/canvas';
