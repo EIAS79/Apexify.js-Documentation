@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSearchArtifacts } from "@/lib/search/server-data";
-import { getSearchFilterOptions, searchRecords } from "@/lib/search/query";
+import { getSearchFilterOptions, normalizeSearchText, searchRecords } from "@/lib/search/query";
 import { SEARCH_SCHEMA_VERSION, type SearchResponse, type SearchResult, type RankedSearchRecord } from "@/lib/search/schema";
 
 export const runtime = 'nodejs';
@@ -39,13 +39,37 @@ export async function GET(request: NextRequest) {
   }
 
   const outcome = searchRecords(indexArtifact, recordsArtifact.records, query, filters, limit);
-  type CompatibleResult = SearchResult & { filename: string; name: string; folder: string; matchType: string };
-  const results: CompatibleResult[] = outcome.results.map((result: RankedSearchRecord) => ({
+  let rankedResults = outcome.results;
+
+  // Preserve DOC-1/DOC-2 canonical-document discovery after DOC-6 expanded the
+  // index with thousands of API/heading records. A direct document-title match
+  // must remain visible in the bounded global result set; this supplements the
+  // ranking without displacing its highest-ranked result or weakening filters.
+  if (!filters.kind) {
+    const normalizedQuery = normalizeSearchText(query);
+    const directDoc = searchRecords(
+      indexArtifact,
+      recordsArtifact.records,
+      query,
+      { ...filters, kind: 'doc' },
+      100,
+    ).results.find((result) => normalizeSearchText(result.title).includes(normalizedQuery));
+
+    if (directDoc && !rankedResults.some((result) => result.id === directDoc.id)) {
+      rankedResults = rankedResults.length >= limit
+        ? [...rankedResults.slice(0, Math.max(0, limit - 1)), directDoc]
+        : [...rankedResults, directDoc];
+    }
+  }
+
+  type CompatibleResult = SearchResult & { href: string; filename: string; name: string; folder: string; matchType: string };
+  const results: CompatibleResult[] = rankedResults.map((result: RankedSearchRecord) => ({
     id: result.id,
     kind: result.kind,
     title: result.title,
     description: result.description,
     excerpt: result.excerpt,
+    href: result.canonicalHref,
     canonicalHref: result.canonicalHref,
     breadcrumb: result.breadcrumb,
     runtime: result.runtime,
@@ -68,7 +92,7 @@ export async function GET(request: NextRequest) {
     schemaVersion: SEARCH_SCHEMA_VERSION,
     query,
     results,
-    total: outcome.results.length,
+    total: results.length,
     unfilteredTotal: outcome.unfilteredTotal,
     filteredOut: outcome.filteredOut,
     filters: availableFilters,
