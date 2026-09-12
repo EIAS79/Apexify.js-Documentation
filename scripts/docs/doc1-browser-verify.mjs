@@ -28,6 +28,18 @@ function isIgnoredTelemetryUrl(rawUrl) {
   }
 }
 
+function isExpectedSearchAbort(request) {
+  const failure = request.failure();
+  if (failure?.errorText !== 'net::ERR_ABORTED') return false;
+  try {
+    const requestUrl = new URL(request.url());
+    const baseUrl = new URL(BASE_URL);
+    return requestUrl.origin === baseUrl.origin && requestUrl.pathname === '/api/docs/search';
+  } catch {
+    return false;
+  }
+}
+
 const browser = await puppeteer.launch({
   executablePath: CHROME_PATH,
   headless: 'new',
@@ -83,7 +95,7 @@ try {
   });
   page.on('requestfailed', (request) => {
     const url = request.url();
-    if (isIgnoredTelemetryUrl(url)) return;
+    if (isIgnoredTelemetryUrl(url) || isExpectedSearchAbort(request)) return;
     const failure = request.failure();
     networkErrors.push(`request failed: ${url}${failure?.errorText ? ` (${failure.errorText})` : ''}`);
   });
