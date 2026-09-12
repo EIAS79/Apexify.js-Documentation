@@ -224,21 +224,36 @@ function intersectPostings(postings: string[][]): string[] {
   return [...current];
 }
 
+function fuzzyTokenPostings(index: SearchIndexArtifact, token: string): string[] {
+  if (token.length < 4) return [];
+  const maxDistance = token.length <= 5 ? 1 : 2;
+  const ids = new Set<string>();
+  for (const [candidate, postings] of Object.entries(index.tokens)) {
+    if (candidate.length < 4 || Math.abs(candidate.length - token.length) > maxDistance) continue;
+    if (boundedLevenshtein(token, candidate, maxDistance) > maxDistance) continue;
+    for (const id of postings) ids.add(id);
+  }
+  return [...ids];
+}
+
+function tokenPostings(index: SearchIndexArtifact, token: string): string[] {
+  const exact = index.tokens[token] ?? [];
+  if (exact.length) return exact;
+  const prefix = index.prefixes[token.slice(0, Math.min(6, token.length))] ?? [];
+  if (prefix.length) return prefix;
+  return fuzzyTokenPostings(index, token);
+}
+
 function candidateIds(index: SearchIndexArtifact, records: SearchRecord[], queryTokens: string[]): string[] {
   if (!queryTokens.length) return records.map((record) => record.id);
-  const postings = queryTokens.map((token) => {
-    const exact = index.tokens[token] ?? [];
-    if (exact.length) return exact;
-    return index.prefixes[token.slice(0, Math.min(6, token.length))] ?? [];
-  });
-  if (postings.length === 1 && postings[0].length) return postings[0];
-  if (postings.every((list) => list.length > 0)) {
-    const intersection = intersectPostings(postings);
-    if (intersection.length) return intersection;
-  }
+  const postings = queryTokens.map((token) => tokenPostings(index, token));
+  if (postings.some((list) => list.length === 0)) return [];
+  if (postings.length === 1) return postings[0];
+  const intersection = intersectPostings(postings);
+  if (intersection.length) return intersection;
   const union = new Set<string>();
   for (const list of postings) for (const id of list) union.add(id);
-  return union.size ? [...union] : records.map((record) => record.id);
+  return [...union];
 }
 
 function recordsById(records: SearchRecord[]): Map<string, SearchRecord> {
