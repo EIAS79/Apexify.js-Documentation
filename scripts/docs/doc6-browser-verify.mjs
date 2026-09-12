@@ -51,8 +51,22 @@ async function runAxe(page, label) {
   await page.addScriptTag({ content: axeSource });
   const result = await page.evaluate(async () => await globalThis.axe.run(document, { resultTypes: ['violations'], rules: { 'color-contrast': { enabled: true } } }));
   const severe = result.violations.filter((item) => item.impact === 'critical' || item.impact === 'serious');
-  accessibilityRuns.push({ label, violations: result.violations.length, severe: severe.map((item) => ({ id: item.id, impact: item.impact, nodes: item.nodes.length })) });
-  if (severe.length) throw new Error(`${label}: ${severe.length} serious/critical axe violations`);
+  const severeDetails = severe.map((item) => ({
+    id: item.id,
+    impact: item.impact,
+    help: item.help,
+    helpUrl: item.helpUrl,
+    nodes: item.nodes.map((node) => ({
+      target: node.target,
+      html: node.html,
+      failureSummary: node.failureSummary,
+    })),
+  }));
+  accessibilityRuns.push({ label, violations: result.violations.length, severe: severeDetails });
+  if (severeDetails.length) {
+    console.error('[doc6-axe]', JSON.stringify({ label, severe: severeDetails }));
+    throw new Error(`${label}: ${severeDetails.map((item) => item.id).join(', ')}`);
+  }
 }
 async function newPage(viewport) {
   const page = await browser.newPage();
