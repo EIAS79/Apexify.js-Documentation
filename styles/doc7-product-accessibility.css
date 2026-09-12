@@ -1,0 +1,49 @@
+/* DOC-7 public product surfaces: foreground colors are deliberately separated
+   from decorative accent tokens so light-mode text meets WCAG contrast. */
+
+body:has([data-doc7-verified-hero]) {
+  --success: #064a36;
+  --accent-magenta: #a81464;
+}
+
+.dark body:has([data-doc7-verified-hero]) {
+  --success: #5deab8;
+  --accent-magenta: #ff3daa;
+}
+
+/* The light sunset display gradient contains amber values that are too light
+   to use as clipped foreground text on the cream canvas. Keep the gradient in
+   dark mode and use the accessible brand-magenta foreground in light mode. */
+body:has([data-doc7-verified-hero]) .text-grad-sunset {
+  background-image: none;
+  color: #a81464;
+}
+
+.dark body:has([data-doc7-verified-hero]) .text-grad-sunset {
+  background-image: var(--gradient-sunset);
+  color: transparent;
+}
+
+/* Primary CTAs need a deterministic foreground/background contrast pair.
+   The general sunset gradient is decorative and is not itself a text-color
+   contract. These scoped variants preserve the sunset character while making
+   the text legible in each theme. */
+body:has([data-doc7-verified-hero]) .btn-primary,
+body:has(#gallery-main) .btn-primary {
+  background-image: linear-gradient(135deg, #a81464 0%, #7a3e00 100%);
+  color: #ffffff;
+}
+
+.dark body:has([data-doc7-verified-hero]) .btn-primary,
+.dark body:has(#gallery-main) .btn-primary {
+  background-image: var(--gradient-sunset);
+  color: #1a0f3d;
+}
+
+/* The homepage source proof is short enough to render without an inner
+   scroll region. Removing the nested scrollbar keeps the code keyboard-safe
+   without adding a non-semantic focus stop. */
+body:has([data-doc7-verified-hero]) pre.max-h-64 {
+  max-height: none;
+  overflow: visible;
+}
