@@ -15,6 +15,11 @@ import { StudioResizableSplit } from '@/components/studio/StudioResizableSplit';
 import { StudioShortcutOverlay } from '@/components/studio/StudioShortcutOverlay';
 import { StudioStatusBar } from '@/components/studio/StudioStatusBar';
 import { StudioTopBar } from '@/components/studio/StudioTopBar';
+import { createInteractiveSession } from '@/lib/docs/playground/session';
+import {
+  currentNodeServerExecutionAdapter,
+  getServerExecutionAvailability,
+} from '@/lib/docs/playground/serverClientAdapter';
 import {
   LayoutMode,
   RunHistoryEntry,
@@ -48,7 +53,7 @@ export default function CodeStudio() {
   const [autoRun, setAutoRun] = useState(false);
   const [splitRatio, setSplitRatio] = useState(0.5);
 
-  const [runnerEnabled, setRunnerEnabled] = useState(true);
+  const [runnerEnabled, setRunnerEnabled] = useState(false);
   const [running, setRunning] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewMime, setPreviewMime] = useState<string | null>(null);
@@ -124,21 +129,15 @@ export default function CodeStudio() {
     });
   }, [hydrated, buffers, activeBufferId, lang, layout, autoRun, splitRatio]);
 
-  /* ---------- runner availability probe ---------- */
+  /* ---------- execution-adapter availability probe ---------- */
 
   useEffect(() => {
-    let cancelled = false;
-    fetch('/api/gallery/run')
-      .then((r) => r.json())
-      .then((d: { enabled?: boolean }) => {
-        if (!cancelled) setRunnerEnabled(Boolean(d.enabled));
-      })
-      .catch(() => {
-        if (!cancelled) setRunnerEnabled(true);
-      });
-    return () => {
-      cancelled = true;
-    };
+    const controller = new AbortController();
+    void getServerExecutionAvailability(controller.signal).then(
+      (availability) => setRunnerEnabled(availability.enabled),
+      () => setRunnerEnabled(false),
+    );
+    return () => controller.abort();
   }, []);
 
   /* ---------- helpers ---------- */
@@ -184,7 +183,7 @@ export default function CodeStudio() {
     }
   }, []);
 
-  /* ---------- run pipeline ---------- */
+  /* ---------- run pipeline through shared ExecutionAdapter ---------- */
 
   const runCode = useCallback(async () => {
     if (!activeBuffer) return;
@@ -194,67 +193,51 @@ export default function CodeStudio() {
     setRunning(true);
     setError(null);
     setErrorExitCode(null);
-    const t0 = performance.now();
 
     try {
-      const res = await fetch('/api/gallery/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, lang, context: 'studio' }),
+      const result = await currentNodeServerExecutionAdapter.run({
+        session: createInteractiveSession({
+          source: code,
+          language: lang,
+          runtime: 'node',
+          options: {},
+          layout: { activePanel: 'editor' },
+        }),
       });
 
-      let data: {
-        ok?: boolean;
-        mime?: string;
-        base64?: string;
-        error?: string;
-        stderr?: string;
-        exitCode?: number;
-        elapsedMs?: number;
-      };
-      try {
-        data = (await res.json()) as typeof data;
-      } catch {
-        const message = `Run failed (HTTP ${res.status}) — response was not JSON.`;
+      if (result.status !== 'ready' || !result.output?.base64) {
+        revokePreview();
         setPreviewUrl(null);
+        const primary = result.diagnostics[0];
+        const message = primary?.message ?? 'Execution is unavailable.';
+        const exitCode = primary?.code?.startsWith('EXIT_')
+          ? Number(primary.code.slice('EXIT_'.length))
+          : null;
         setError(message);
-        setErrorExitCode(null);
-        setElapsedMs(null);
+        setErrorExitCode(Number.isFinite(exitCode) ? exitCode : null);
+        setElapsedMs(result.elapsedMs ?? null);
         setOutputTab('terminal');
         setHistory((cur) =>
           pushRunHistory(
-            historyEntry(activeBuffer, lang, false, null, null, message, null, null, code),
-            cur
-          )
+            historyEntry(
+              activeBuffer,
+              lang,
+              false,
+              result.elapsedMs ?? null,
+              Number.isFinite(exitCode) ? exitCode : null,
+              message,
+              null,
+              null,
+              code,
+            ),
+            cur,
+          ),
         );
         return;
       }
 
-      if (!res.ok || !data.ok) {
-        setPreviewUrl(null);
-        const stderr = typeof data.stderr === 'string' ? data.stderr.trim() : '';
-        let message = typeof data.error === 'string' ? data.error.trim() : '';
-        if (stderr && message && !message.includes(stderr.slice(0, Math.min(100, stderr.length)))) {
-          message = `${message}\n\n━━ stderr ━━\n${stderr}`;
-        } else if (stderr && !message) {
-          message = stderr;
-        }
-        const exitCode = typeof data.exitCode === 'number' ? data.exitCode : 1;
-        setError(message || `Run failed (HTTP ${res.status})`);
-        setErrorExitCode(exitCode);
-        setElapsedMs(typeof data.elapsedMs === 'number' ? data.elapsedMs : null);
-        setOutputTab('terminal');
-        setHistory((cur) =>
-          pushRunHistory(
-            historyEntry(activeBuffer, lang, false, typeof data.elapsedMs === 'number' ? data.elapsedMs : null, exitCode, message || `Run failed (HTTP ${res.status})`, null, null, code),
-            cur
-          )
-        );
-        return;
-      }
-
-      const mime = data.mime ?? 'image/png';
-      const base64 = data.base64 ?? '';
+      const mime = result.output.mime;
+      const base64 = result.output.base64;
       const bin = atob(base64);
       const bytes = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
@@ -265,7 +248,7 @@ export default function CodeStudio() {
       setPreviewUrl(url);
       setPreviewMime(mime);
       setErrorExitCode(null);
-      const elapsed = typeof data.elapsedMs === 'number' ? data.elapsedMs : Math.round(performance.now() - t0);
+      const elapsed = result.elapsedMs ?? null;
       setElapsedMs(elapsed);
       setOutputTab('preview');
 
@@ -273,8 +256,8 @@ export default function CodeStudio() {
       setHistory((cur) =>
         pushRunHistory(
           historyEntry(activeBuffer, lang, true, elapsed, null, null, thumb, mime, code),
-          cur
-        )
+          cur,
+        ),
       );
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Network error';
@@ -286,8 +269,8 @@ export default function CodeStudio() {
       setHistory((cur) =>
         pushRunHistory(
           historyEntry(activeBuffer, lang, false, null, null, message, null, null, code),
-          cur
-        )
+          cur,
+        ),
       );
     } finally {
       setRunning(false);
@@ -303,7 +286,7 @@ export default function CodeStudio() {
     autoRunTimerRef.current = window.setTimeout(() => void runCodeRef.current(), 1300);
   }, [autoRun, runnerEnabled]);
 
-  /** Initial run after hydrate + sandbox probe — same UX as old studio. */
+  /** Initial run occurs only after the explicit execution-adapter probe enables trusted-local mode. */
   useEffect(() => {
     if (!hydrated || !runnerEnabled || !activeBuffer) return;
     let cancelled = false;
@@ -389,7 +372,6 @@ export default function CodeStudio() {
     setActiveBufferId(buf.id);
     setOutputTab('preview');
     flashToast('success', `Loaded template · ${template.name}`);
-    /** Auto-run the freshly loaded template after one frame. */
     requestAnimationFrame(() => requestAnimationFrame(() => void runCodeRef.current()));
   }, [flashToast]);
 
@@ -677,7 +659,6 @@ export default function CodeStudio() {
       className="relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden overscroll-none"
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
-      {/* Backdrop — twilight gradient + soft aurora glows + grid */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div
           className="absolute inset-0"
@@ -744,9 +725,9 @@ export default function CodeStudio() {
         >
           <ExclamationTriangleIcon className="h-4 w-4 shrink-0" style={{ color: 'var(--warning)' }} aria-hidden />
           <span>
-            Code execution is disabled on this deployment (
-            <code style={{ color: 'var(--warning)' }}>DISABLE_GALLERY_CODE_RUN</code>
-            ). Remove it to enable Studio runs.
+            Public arbitrary code execution is unavailable. Studio editing, reset, local state sharing,
+            and verified documentation outputs remain available. Execution can be enabled only in an
+            explicitly opted-in trusted local development process; it is not a security sandbox.
           </span>
         </div>
       )}
@@ -849,10 +830,6 @@ export default function CodeStudio() {
     </div>
   );
 }
-
-/* ----------------------------------------------------------------- *
- *  small helpers
- * ----------------------------------------------------------------- */
 
 function historyEntry(
   buffer: StudioBuffer,
