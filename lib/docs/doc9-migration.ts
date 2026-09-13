@@ -75,6 +75,13 @@ export function doc9FeatureFromSource(sourcePath: string): string | null {
   const parts = relativeParts(sourcePath);
   const id = doc9LegacyId(sourcePath);
   const joined = `${parts.join('/')} ${id}`.toLowerCase();
+
+  // Stable DOC-5 workflow identities need a primary canonical guide, not only
+  // a secondary migration alias. These pages already describe the shipped
+  // behavior represented by the verified examples.
+  if (/raster-batch-output\/00-raster-batch-output-overview/.test(joined)) return 'batch';
+  if (/gif-animation\/07-create-gif-encode-pipeline/.test(joined)) return 'media';
+
   if (/canvas/.test(joined)) return 'canvas';
   if (/chart/.test(joined)) return 'charts';
   if (/gif|animate/.test(joined)) return 'gif';
