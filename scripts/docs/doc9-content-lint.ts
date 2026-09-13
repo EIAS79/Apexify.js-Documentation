@@ -4,7 +4,7 @@ import { DOC3_REGISTERED_COMPONENTS } from '../../components/mdx/doc3-contract';
 import { loadDocumentationPages } from '../../lib/docs/content';
 
 const ROOT = process.cwd();
-const OUT = path.join(ROOT, 'generated', 'docs-doc9', 'content-lint-full.json');
+const OUT = path.join(ROOT, 'generated', 'docs-doc9', 'runtime', 'content-lint-full.json');
 const pages = loadDocumentationPages();
 const pageByRoute = new Map(pages.map((page) => [page.canonicalPath, page]));
 const registered = new Set<string>(DOC3_REGISTERED_COMPONENTS);
