@@ -3,6 +3,8 @@ import { DocsSidebarSearch } from '@/components/docs/DocsSidebarSearch';
 import { StabilityBadge } from '@/components/docs/status/DocsBadges';
 import type { DocumentationNavigationGroup, DocumentationNavigationItem } from '@/lib/docs/navigation';
 
+const INTERACTIVE_CANVAS_PATH = '/docs/node/canvas';
+
 function containsPath(items: DocumentationNavigationItem[], activePath: string): boolean {
   return items.some((item) => item.href === activePath || containsPath(item.children ?? [], activePath));
 }
@@ -16,6 +18,7 @@ function NavigationItems({ items, activePath, depth = 0 }: { items: Documentatio
           <li key={item.href}>
             <Link
               href={item.href}
+              prefetch={item.href === INTERACTIVE_CANVAS_PATH ? false : undefined}
               className="apx-sidebar-link"
               aria-current={active ? 'page' : undefined}
               data-runtime={item.runtime.join(',')}
