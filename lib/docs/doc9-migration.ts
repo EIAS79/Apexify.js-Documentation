@@ -4,6 +4,13 @@ import type { DocumentationFrontmatter, DocumentationPageKind } from './schema';
 export type Doc9Classification = 'keep' | 'rewrite' | 'split' | 'merge' | 'move' | 'archive' | 'delete';
 export type Doc9MigrationStatus = 'pending' | 'migrated' | 'verified';
 
+export interface Doc9ExistingPageIdentity {
+  canonicalPath: string;
+  title: string;
+  category: string;
+  feature?: string;
+}
+
 export interface Doc9MigrationRecord {
   legacyId: string;
   legacyPath: string;
@@ -54,7 +61,7 @@ export function doc9LegacyId(sourcePath: string): string {
 
 function firstHeading(source: string): string | null {
   const match = source.match(/^#\s+(.+)$/m);
-  return match?.[1]?.replace(/[`*_]/g, '').trim() || null;
+  return match?.[1]?.replace(/[`*_]/g, '').replace(/\s*\{#[^}]+\}\s*$/, '').trim() || null;
 }
 
 function titleFromId(id: string): string {
@@ -64,17 +71,19 @@ function titleFromId(id: string): string {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function featureFromParts(parts: string[], id: string): string | null {
+export function doc9FeatureFromSource(sourcePath: string): string | null {
+  const parts = relativeParts(sourcePath);
+  const id = doc9LegacyId(sourcePath);
   const joined = `${parts.join('/')} ${id}`.toLowerCase();
   if (/canvas/.test(joined)) return 'canvas';
   if (/chart/.test(joined)) return 'charts';
   if (/gif|animate/.test(joined)) return 'gif';
   if (/text-rendering|create-text|measure-text/.test(joined)) return 'text';
-  if (/images-shapes|create-image|image-/.test(joined)) return 'image';
+  if (/images-shapes|create-image|image-/.test(joined)) return 'images';
   if (/lines-connectors|path2d|custom-line|hit-testing|hit-detection/.test(joined)) return 'paths';
   if (/video/.test(joined)) return 'video';
   if (/audio/.test(joined)) return 'audio';
-  if (/scene/.test(joined)) return 'scene';
+  if (/scene/.test(joined)) return 'scenes';
   if (/template/.test(joined)) return 'templates';
   if (/asset/.test(joined)) return 'assets';
   if (/plugin/.test(joined)) return 'plugins';
@@ -129,22 +138,27 @@ function canonicalSlug(parts: string[]): string {
   return ['node', ...parts.map(slugPart)].join('/');
 }
 
-export function doc9Disposition(sourcePath: string, hasFrontmatter: boolean, source = ''): Doc9MigrationRecord {
+export function doc9Disposition(
+  sourcePath: string,
+  hasFrontmatter: boolean,
+  source = '',
+  existingPage?: Doc9ExistingPageIdentity,
+): Doc9MigrationRecord {
   const parts = relativeParts(sourcePath);
   const id = doc9LegacyId(sourcePath);
-  const title = firstHeading(source) ?? titleFromId(id);
-  const feature = featureFromParts(parts, id);
+  const inferredTitle = firstHeading(source) ?? titleFromId(id);
+  const inferredFeature = doc9FeatureFromSource(sourcePath);
 
   if (parts[0] === '04-api-reference') {
     return {
       legacyId: id,
       legacyPath: normalize(sourcePath),
       legacyHash: `/docs#${id}`,
-      title,
+      title: inferredTitle,
       category: 'API Reference',
       classification: 'merge',
       targetRoutes: ['/api-reference'],
-      featureIds: feature ? [feature] : [],
+      featureIds: inferredFeature ? [inferredFeature] : [],
       redirectRequired: true,
       contentPreserved: true,
       rationale: 'Handwritten API prose is superseded by the DOC-4 generated reference. Preserve the source for migration audit while canonical API truth remains generated.',
@@ -158,11 +172,11 @@ export function doc9Disposition(sourcePath: string, hasFrontmatter: boolean, sou
       legacyId: id,
       legacyPath: normalize(sourcePath),
       legacyHash: `/docs#${id}`,
-      title,
+      title: inferredTitle,
       category: 'Archive',
       classification: 'archive',
       targetRoutes: ['/docs/migration/changelog'],
-      featureIds: ['image'],
+      featureIds: ['images'],
       redirectRequired: true,
       contentPreserved: true,
       rationale: 'Version 5.4.5 hotfix detail is historical release-era material and must not masquerade as current package behavior.',
@@ -171,20 +185,38 @@ export function doc9Disposition(sourcePath: string, hasFrontmatter: boolean, sou
     };
   }
 
+  if (hasFrontmatter && existingPage) {
+    return {
+      legacyId: id,
+      legacyPath: normalize(sourcePath),
+      legacyHash: `/docs#${id}`,
+      title: existingPage.title,
+      category: existingPage.category,
+      classification: 'keep',
+      targetRoutes: [existingPage.canonicalPath],
+      featureIds: existingPage.feature ? [existingPage.feature] : inferredFeature ? [inferredFeature] : [],
+      redirectRequired: true,
+      contentPreserved: true,
+      rationale: 'Already uses the DOC-1 validated metadata contract; retain its authored canonical route and migrate links/discovery around it.',
+      status: 'verified',
+      search: true,
+    };
+  }
+
   const slug = canonicalSlug(parts);
   return {
     legacyId: id,
     legacyPath: normalize(sourcePath),
     legacyHash: `/docs#${id}`,
-    title,
+    title: inferredTitle,
     category: categoryFor(parts),
     classification: hasFrontmatter ? 'keep' : 'move',
     targetRoutes: [`/docs/${slug}`],
-    featureIds: feature ? [feature] : [],
+    featureIds: inferredFeature ? [inferredFeature] : [],
     redirectRequired: true,
     contentPreserved: true,
     rationale: hasFrontmatter
-      ? 'Already uses the DOC-1 validated metadata contract; retain the canonical route and migrate links/discovery around it.'
+      ? 'Uses validated metadata; preserve the page while retaining its canonical documentation role.'
       : 'Preserve current technical prose while promoting it from legacy hash-only delivery into the canonical DOC-1 route/content architecture.',
     status: 'verified',
     search: true,
@@ -224,7 +256,3 @@ export function synthesizeDoc9Frontmatter(sourcePath: string, source: string): D
     legacyHashes: [id],
   };
 }
-
-export const DOC9_ACTIVE_FEATURES = [
-  'canvas', 'text', 'image', 'charts', 'paths', 'gif', 'video', 'audio', 'output', 'scene', 'templates', 'assets', 'plugins', 'components',
-] as const;
