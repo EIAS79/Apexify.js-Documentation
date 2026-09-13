@@ -28,17 +28,26 @@ on:
 permissions:
   contents: read
 
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC6_BASE_URL: http://127.0.0.1:3000
+
 jobs:
   verify-doc9:
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
-      - run: npm ci
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Deterministic install
+        run: npm ci
 
       - name: Full DOC-9 migration and prior-phase verification
         run: npm run docs:verify:doc9
@@ -56,13 +65,38 @@ jobs:
       - name: Production build
         run: npm run build
 
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc9-next.log 2>&1 &
+          for i in $(seq 1 90); do
+            if curl --fail --silent "http://127.0.0.1:3000/api/docs/search?q=canvas" >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/doc9-next.log || true
+          exit 1
+
       - name: Browser and search smoke
         run: npm run docs:browser:doc6
 
-      - name: Archive deterministic DOC-9 evidence
+      - name: Archive DOC-9 evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: docs-doc9-evidence
-          path: generated/docs-doc9
+          path: |
+            generated/docs-doc9
+            /tmp/doc9-next.log
           if-no-files-found: error
           retention-days: 30
