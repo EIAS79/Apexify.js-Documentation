@@ -42,7 +42,7 @@
     "docs:audit:doc2": "npm run docs:verify:doc2",
     "docs:generate:doc3": "tsx scripts/docs/doc3-generate.ts",
     "docs:test:doc3": "tsx --test scripts/docs/doc3.test.ts",
-    "docs:verify:doc3": "tsx scripts/docs/doc3-generate.ts --check && tsx --test scripts/docs/doc3.test.ts && tsx scripts/docs/doc3-verify.ts && tsx scripts/docs/doc1-generate.ts && npm run docs:verify:doc2",
+    "docs:verify:doc3": "tsx scripts/docs/doc3-generate.ts --check && tsx --test scripts/docs/doc3.test.ts && tsx scripts/docs/doc3-verify.ts && tsx scripts/docs/doc1-generate.ts && npm run docs:generate:doc2 && npm run docs:verify:doc2",
     "docs:measure:doc3": "node scripts/docs/doc3-build-measure.mjs",
     "docs:browser:doc3": "node scripts/docs/doc3-browser-verify.mjs",
     "docs:finalize:doc3": "node scripts/docs/doc3-finalize.mjs",
