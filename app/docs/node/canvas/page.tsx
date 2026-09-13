@@ -7,18 +7,14 @@ import { DocsBreadcrumbsV2, DocsPagerV2 } from '@/components/docs/navigation/Doc
 import { DocsPageHero } from '@/components/docs/content/DocsPageHero';
 import { RouteDocsMarkdown } from '@/components/docs/route/RouteDocsMarkdown';
 import { RelatedContent } from '@/components/docs/search/RelatedContent';
+import { CanvasPlaygroundLoader } from '@/components/docs/playground/CanvasPlaygroundLoader';
+import { getExampleById } from '@/lib/examples/manifest';
 
 const SITE_ORIGIN = 'https://apexifyjs.vercel.app';
-export const dynamicParams = false;
+const CANVAS_SLUG = 'node/canvas';
 
-export function generateStaticParams() {
-  return loadDocumentationPages()
-    .filter((page) => page.canonicalPath !== '/docs/node/canvas')
-    .map((page) => ({ slug: page.slug.split('/') }));
-}
-
-export function generateMetadata({ params }: { params: { slug: string[] } }): Metadata {
-  const page = getDocumentationPageBySlug(params.slug);
+export function generateMetadata(): Metadata {
+  const page = getDocumentationPageBySlug(CANVAS_SLUG);
   if (!page) return { title: 'Documentation not found | Apexify.js', robots: { index: false, follow: false } };
   const canonical = `${SITE_ORIGIN}${page.canonicalPath}`;
   const indexable = !['ROADMAP', 'REMOVED'].includes(page.stability);
@@ -42,8 +38,26 @@ function withoutLeadingTitle(body: string): string {
   return body.replace(/^\s*#\s+[^\r\n]+(?:\r?\n)+/, '');
 }
 
-export default function DocumentationRoutePage({ params }: { params: { slug: string[] } }) {
-  const page = getDocumentationPageBySlug(params.slug);
+function CanvasInteractiveExample() {
+  const example = getExampleById('node.canvas.basic');
+  if (!example || example.sources.length !== 1) return null;
+  const verifiedPreview =
+    example.outputs.find((output) => output.path === example.gallery.previewOutput) ??
+    example.outputs.find((output) => output.publicPath);
+
+  return (
+    <CanvasPlaygroundLoader
+      title={example.title}
+      initialSource={example.sources[0].content}
+      previewUrl={verifiedPreview?.publicPath ?? undefined}
+      previewAlt={`${example.title} verified output`}
+      sourceHash={example.sourceHash}
+    />
+  );
+}
+
+export default function CanvasDocumentationPage() {
+  const page = getDocumentationPageBySlug(CANVAS_SLUG);
   if (!page) notFound();
 
   const navigation = buildDocumentationNavigation(loadDocumentationPages());
@@ -63,6 +77,7 @@ export default function DocumentationRoutePage({ params }: { params: { slug: str
       >
         <DocsPageHero page={page} headingId={leadingHeading?.id} />
         <RouteDocsMarkdown content={withoutLeadingTitle(page.body)} />
+        <CanvasInteractiveExample />
         <RelatedContent sourceId={page.id} preferredKinds={['doc', 'changelog']} title="Related guides and reference" />
       </article>
       <DocsPagerV2 pager={pager} />

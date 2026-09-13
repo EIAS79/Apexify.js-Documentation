@@ -85,6 +85,7 @@ export function CodeBlock({
               {studioPayload && (
                 <Link
                   href="/studio"
+                  prefetch={false}
                   onClick={(e) => {
                     e.preventDefault();
                     openInStudio();
@@ -164,6 +165,7 @@ export function CodeBlock({
               {studioPayload && (
                 <Link
                   href="/studio"
+                  prefetch={false}
                   onClick={(e) => {
                     e.preventDefault();
                     openInStudio();

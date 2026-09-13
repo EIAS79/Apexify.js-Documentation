@@ -51,7 +51,6 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-6xl mx-auto">
-        {/* Outer shell — gradient rim that appears on scroll */}
         <div
           className="relative rounded-2xl p-[1px] transition-all duration-500"
           style={{
@@ -65,7 +64,6 @@ export default function Navbar() {
               : '0 8px 28px -14px rgba(0, 0, 0, 0.25)',
           }}
         >
-          {/* Inner pill */}
           <div
             className="rounded-[15px] backdrop-blur-2xl"
             style={{
@@ -74,9 +72,9 @@ export default function Navbar() {
             }}
           >
             <div className="flex items-center justify-between gap-2 px-3 sm:px-4 md:px-5 py-2 min-h-[3.25rem] sm:min-h-[3.5rem]">
-              {/* Logo */}
               <Link
                 href="/"
+                prefetch={false}
                 className="group/logo flex items-center gap-2 flex-shrink-0 min-w-0"
                 aria-label="Apexify.js — home"
               >
@@ -97,7 +95,6 @@ export default function Navbar() {
                 </span>
               </Link>
 
-              {/* Center nav (desktop) */}
               <div className="hidden md:flex items-center gap-0.5 lg:gap-1 flex-1 justify-center">
                 {NAV_LINKS.map((link) => {
                   const active = isActive(link.href);
@@ -105,6 +102,7 @@ export default function Navbar() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      prefetch={false}
                       className="relative px-3 lg:px-4 py-2 rounded-xl font-semibold text-sm transition-all"
                       style={{
                         color: active ? 'var(--text-primary)' : 'var(--text-tertiary)',
@@ -132,7 +130,6 @@ export default function Navbar() {
                 })}
               </div>
 
-              {/* Right cluster */}
               <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 <ThemeToggle className="hidden sm:inline-flex" />
 
@@ -183,7 +180,6 @@ export default function Navbar() {
               </div>
             </div>
 
-            {/* Mobile drawer */}
             <div
               id="mobile-nav-menu"
               className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-out border-t ${
@@ -198,6 +194,7 @@ export default function Navbar() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      prefetch={false}
                       className="flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-[15px]"
                       style={{
                         color: active ? 'var(--text-primary)' : 'var(--text-secondary)',

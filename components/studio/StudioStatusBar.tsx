@@ -39,14 +39,14 @@ export function StudioStatusBar(props: Props) {
     hasOutput,
   } = props;
 
-  const sandboxLabel = !runnerEnabled
-    ? 'Sandbox · disabled'
+  const executionLabel = !runnerEnabled
+    ? 'Execution · unavailable'
     : running
-      ? 'Sandbox · running'
+      ? 'Trusted-local · running'
       : lastError
-        ? 'Sandbox · error'
-        : 'Sandbox · ready';
-  const sandboxColor = !runnerEnabled
+        ? 'Trusted-local · error'
+        : 'Trusted-local · ready';
+  const executionColor = !runnerEnabled
     ? 'var(--warning)'
     : running
       ? 'var(--info)'
@@ -66,10 +66,10 @@ export function StudioStatusBar(props: Props) {
       <span className="inline-flex items-center gap-1.5">
         <span
           className="inline-block h-2 w-2 rounded-full"
-          style={{ backgroundColor: sandboxColor }}
+          style={{ backgroundColor: executionColor }}
           aria-hidden
         />
-        <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{sandboxLabel}</span>
+        <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>{executionLabel}</span>
       </span>
 
       <span aria-hidden style={{ color: 'var(--border-strong)' }}>·</span>
@@ -83,7 +83,7 @@ export function StudioStatusBar(props: Props) {
       >
         <span
           className="rounded-sm px-1 py-0.5 text-[9px] font-bold tracking-wide"
-          style={{ backgroundColor: 'var(--accent-iris)', color: 'white' }}
+          style={{ backgroundColor: 'var(--accent-iris)', color: 'var(--text-inverse)' }}
         >
           {lang.toUpperCase()}
         </span>

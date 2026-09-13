@@ -1,6 +1,12 @@
 import Link from 'next/link';
 import type { DocumentationBreadcrumb, DocumentationPager } from '@/lib/docs/navigation';
 
+const INTERACTIVE_CANVAS_PATH = '/docs/node/canvas';
+
+function docsPrefetch(href: string | undefined): false | undefined {
+  return href === INTERACTIVE_CANVAS_PATH ? false : undefined;
+}
+
 export function DocsBreadcrumbsV2({ breadcrumbs }: { breadcrumbs: DocumentationBreadcrumb[] }) {
   return (
     <nav className="apx-breadcrumbs" aria-label="Breadcrumb" data-doc2-breadcrumbs>
@@ -10,7 +16,7 @@ export function DocsBreadcrumbsV2({ breadcrumbs }: { breadcrumbs: DocumentationB
           return (
             <li key={`${breadcrumb.label}-${index}`}>
               {breadcrumb.href && !current ? (
-                <Link href={breadcrumb.href}>{breadcrumb.label}</Link>
+                <Link href={breadcrumb.href} prefetch={docsPrefetch(breadcrumb.href)}>{breadcrumb.label}</Link>
               ) : (
                 <span aria-current={current ? 'page' : undefined}>{breadcrumb.label}</span>
               )}
@@ -24,7 +30,13 @@ export function DocsBreadcrumbsV2({ breadcrumbs }: { breadcrumbs: DocumentationB
 
 function PagerLink({ direction, item }: { direction: 'previous' | 'next'; item: NonNullable<DocumentationPager['previous']> }) {
   return (
-    <Link className="apx-pager-link" data-direction={direction} href={item.href} rel={direction === 'previous' ? 'prev' : 'next'}>
+    <Link
+      className="apx-pager-link"
+      data-direction={direction}
+      href={item.href}
+      prefetch={docsPrefetch(item.href)}
+      rel={direction === 'previous' ? 'prev' : 'next'}
+    >
       <span className="apx-pager-label">{direction === 'previous' ? 'Previous' : 'Next'}</span>
       <span className="apx-pager-title">{item.title}</span>
       <span className="apx-pager-context">{item.package} · {item.kind}</span>

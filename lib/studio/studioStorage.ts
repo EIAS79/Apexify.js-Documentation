@@ -17,6 +17,11 @@ import {
   createDefaultBuffer,
   makeId,
 } from './studioConfig';
+import {
+  createInteractiveSession,
+  parseInteractiveSession,
+  serializeInteractiveSession,
+} from '@/lib/docs/playground/session';
 
 const HISTORY_LIMIT = 8;
 
@@ -139,7 +144,7 @@ export function consumeIncomingSnippet(): IncomingSnippet | null {
 }
 
 /* ----------------------------------------------------------------- *
- *  Share-link encoding (URL-safe base64 of the active buffer)
+ *  Share-link encoding (URL-safe base64 of the shared DOC-8 session)
  * ----------------------------------------------------------------- */
 
 function utf8ToBase64Url(input: string): string {
@@ -167,13 +172,54 @@ export type ShareLinkPayload = {
   lang: StudioLang;
 };
 
+type StudioShareOptions = {
+  studio?: {
+    name?: string;
+    ts?: string;
+    js?: string;
+  };
+};
+
 export function encodeShareLink(payload: ShareLinkPayload): string {
-  return utf8ToBase64Url(JSON.stringify(payload));
+  const session = createInteractiveSession({
+    source: payload.lang === 'js' ? payload.js : payload.ts,
+    language: payload.lang,
+    runtime: 'node',
+    options: {
+      studio: {
+        name: payload.name,
+        ts: payload.ts,
+        js: payload.js,
+      },
+    },
+    layout: { activePanel: 'editor' },
+  });
+  return utf8ToBase64Url(serializeInteractiveSession(session));
 }
 
-export function decodeShareLink(encoded: string): ShareLinkPayload | null {
+function decodeSharedSession(raw: string): ShareLinkPayload | null {
   try {
-    const parsed = JSON.parse(base64UrlToUtf8(encoded)) as ShareLinkPayload;
+    const session = parseInteractiveSession(raw);
+    const options = session.options as StudioShareOptions;
+    const studio = options.studio;
+    const ts = typeof studio?.ts === 'string' ? studio.ts : session.language === 'ts' ? session.source : '';
+    const js = typeof studio?.js === 'string' ? studio.js : session.language === 'js' ? session.source : '';
+    if (!ts && !js) return null;
+    return {
+      name: typeof studio?.name === 'string' ? studio.name : undefined,
+      ts,
+      js,
+      lang: session.language,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** Legacy decoder keeps already-issued pre-DOC-8 share links valid. */
+function decodeLegacySharePayload(raw: string): ShareLinkPayload | null {
+  try {
+    const parsed = JSON.parse(raw) as ShareLinkPayload;
     if (typeof parsed.ts !== 'string' && typeof parsed.js !== 'string') return null;
     return {
       name: typeof parsed.name === 'string' ? parsed.name : undefined,
@@ -181,6 +227,15 @@ export function decodeShareLink(encoded: string): ShareLinkPayload | null {
       js: typeof parsed.js === 'string' ? parsed.js : '',
       lang: parsed.lang === 'js' ? 'js' : 'ts',
     };
+  } catch {
+    return null;
+  }
+}
+
+export function decodeShareLink(encoded: string): ShareLinkPayload | null {
+  try {
+    const raw = base64UrlToUtf8(encoded);
+    return decodeSharedSession(raw) ?? decodeLegacySharePayload(raw);
   } catch {
     return null;
   }

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 export const metadata: Metadata = {
   title: 'Code studio | Apexify.js',
   description:
-    'Try Apexify.js in the browser with a live editor and server-side preview — same sandbox as the gallery.',
+    'Edit Apexify.js snippets in the browser, inspect verified outputs, and use explicitly enabled trusted-local execution during development.',
 };
 
 export default function StudioLayout({ children }: { children: ReactNode }) {

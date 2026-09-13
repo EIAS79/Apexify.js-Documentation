@@ -101,7 +101,7 @@ function LangPills({
         onClick={() => onChange(id)}
         className="rounded-md px-2.5 py-1.5 text-[11px] font-bold tracking-wide transition-colors active:scale-[0.98] sm:text-xs"
         style={{
-          color: active ? 'white' : 'var(--text-secondary)',
+          color: active ? 'var(--text-inverse)' : 'var(--text-secondary)',
           background: active ? 'var(--accent-iris)' : 'transparent',
         }}
       >

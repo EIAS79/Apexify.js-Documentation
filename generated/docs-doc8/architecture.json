@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "phase": "DOC-8",
+  "baseDocumentationSha": "8424834aa0334044b5603bf88406f0a1fa10a396",
+  "packagePin": "github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b",
+  "representativeInteractiveSurface": {
+    "exampleId": "node.canvas.basic",
+    "documentationRoute": "/docs/node/canvas",
+    "previewMode": "verified-static"
+  },
+  "sharedPrimitives": [
+    {
+      "name": "editor",
+      "path": "components/docs/playground/InteractiveCodeEditor.tsx"
+    },
+    {
+      "name": "preview",
+      "path": "components/docs/playground/InteractivePreview.tsx"
+    },
+    {
+      "name": "diagnostics",
+      "path": "components/docs/playground/DiagnosticsPanel.tsx"
+    },
+    {
+      "name": "options",
+      "path": "components/docs/playground/OptionFields.tsx"
+    },
+    {
+      "name": "workspace",
+      "path": "components/docs/playground/InteractiveWorkspace.tsx"
+    },
+    {
+      "name": "session",
+      "path": "lib/docs/playground/session.ts"
+    },
+    {
+      "name": "execution",
+      "path": "lib/docs/playground/serverClientAdapter.ts"
+    }
+  ],
+  "consumers": {
+    "studio": [
+      "components/studio/CodeStudio.tsx",
+      "components/studio/StudioOutputPanel.tsx",
+      "components/studio/StudioResizableSplit.tsx",
+      "lib/studio/studioStorage.ts"
+    ],
+    "documentation": [
+      "components/docs/playground/VerifiedExamplePlayground.tsx",
+      "components/examples/CodePreview.tsx"
+    ]
+  }
+}

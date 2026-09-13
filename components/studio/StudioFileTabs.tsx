@@ -48,7 +48,7 @@ export function StudioFileTabs({
         backgroundColor: 'color-mix(in srgb, var(--bg-sunken) 65%, transparent)',
         borderBottom: '1px solid var(--border-subtle)',
       }}
-      role="tablist"
+      role="group"
       aria-label="Open snippets"
     >
       {buffers.map((b) => {
@@ -57,12 +57,7 @@ export function StudioFileTabs({
         return (
           <div
             key={b.id}
-            role="tab"
-            aria-selected={isActive}
-            tabIndex={isActive ? 0 : -1}
-            onClick={() => onSelect(b.id)}
-            onDoubleClick={() => startRename(b)}
-            className="group relative flex min-w-[8.5rem] max-w-[14rem] shrink-0 cursor-pointer items-center gap-1.5 rounded-t-lg pl-3 pr-1.5 py-2 text-[12px] font-medium transition-colors"
+            className="group relative flex min-w-[8.5rem] max-w-[14rem] shrink-0 items-center gap-1 rounded-t-lg pl-1.5 pr-1 py-1 text-[12px] font-medium transition-colors"
             style={{
               color: isActive ? 'var(--text-primary)' : 'var(--text-tertiary)',
               backgroundColor: isActive ? 'var(--bg-raised)' : 'transparent',
@@ -73,7 +68,6 @@ export function StudioFileTabs({
               borderBottom: isActive ? '1px solid var(--bg-raised)' : '1px solid var(--border-subtle)',
               marginBottom: isActive ? '-1px' : '0',
             }}
-            title={b.name + (isEditing ? '' : ' — double-click to rename')}
           >
             {isActive && (
               <span
@@ -83,60 +77,73 @@ export function StudioFileTabs({
               />
             )}
 
-            <span
-              className="grid h-2 w-2 place-items-center rounded-full shrink-0"
-              style={{ backgroundColor: isActive ? 'var(--accent-magenta)' : 'var(--border-strong)' }}
-              aria-hidden
-            />
-
             {isEditing ? (
-              <input
-                ref={inputRef}
-                value={draftName}
-                onChange={(e) => setDraftName(e.target.value)}
-                onBlur={commitRename}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    commitRename();
-                  } else if (e.key === 'Escape') {
-                    e.preventDefault();
-                    setEditingId(null);
-                  }
-                }}
-                className="min-w-0 flex-1 bg-transparent text-[12px] outline-none"
-                style={{ color: 'var(--text-primary)' }}
-                autoComplete="off"
-              />
+              <div className="flex min-w-0 flex-1 items-center gap-1.5 px-1.5 py-1">
+                <span
+                  className="grid h-2 w-2 shrink-0 place-items-center rounded-full"
+                  style={{ backgroundColor: isActive ? 'var(--accent-magenta)' : 'var(--border-strong)' }}
+                  aria-hidden
+                />
+                <input
+                  ref={inputRef}
+                  value={draftName}
+                  onChange={(e) => setDraftName(e.target.value)}
+                  onBlur={commitRename}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      commitRename();
+                    } else if (e.key === 'Escape') {
+                      e.preventDefault();
+                      setEditingId(null);
+                    }
+                  }}
+                  aria-label={`Rename ${b.name}`}
+                  className="min-w-0 flex-1 bg-transparent text-[12px] outline-none"
+                  style={{ color: 'var(--text-primary)' }}
+                  autoComplete="off"
+                />
+              </div>
             ) : (
-              <span className="min-w-0 flex-1 truncate">{b.name}</span>
-            )}
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                startRename(b);
-              }}
-              aria-label={`Rename ${b.name}`}
-              className="hidden h-6 w-6 shrink-0 place-items-center rounded-md opacity-0 transition group-hover:opacity-100 sm:grid"
-              style={{ color: 'var(--text-tertiary)' }}
-              title="Rename"
-            >
-              <PencilSquareIcon className="h-3.5 w-3.5" />
-            </button>
-
-            {buffers.length > 1 && (
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose(b.id);
-                }}
-                aria-label={`Close ${b.name}`}
-                className="grid h-6 w-6 shrink-0 place-items-center rounded-md transition hover:bg-[var(--bg-sunken)]"
+                onClick={() => onSelect(b.id)}
+                onDoubleClick={() => startRename(b)}
+                aria-current={isActive ? 'page' : undefined}
+                aria-label={`${isActive ? 'Current' : 'Open'} snippet ${b.name}`}
+                className="flex min-w-0 flex-1 cursor-pointer items-center gap-1.5 rounded-md px-1.5 py-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                title={`${b.name} — double-click to rename`}
+              >
+                <span
+                  className="grid h-2 w-2 shrink-0 place-items-center rounded-full"
+                  style={{ backgroundColor: isActive ? 'var(--accent-magenta)' : 'var(--border-strong)' }}
+                  aria-hidden
+                />
+                <span className="min-w-0 flex-1 truncate">{b.name}</span>
+              </button>
+            )}
+
+            {!isEditing && (
+              <button
+                type="button"
+                onClick={() => startRename(b)}
+                aria-label={`Rename ${b.name}`}
+                className="hidden h-6 w-6 shrink-0 place-items-center rounded-md opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100 sm:grid"
                 style={{ color: 'var(--text-tertiary)' }}
-                title="Close tab"
+                title="Rename"
+              >
+                <PencilSquareIcon className="h-3.5 w-3.5" />
+              </button>
+            )}
+
+            {buffers.length > 1 && !isEditing && (
+              <button
+                type="button"
+                onClick={() => onClose(b.id)}
+                aria-label={`Close ${b.name}`}
+                className="grid h-6 w-6 shrink-0 place-items-center rounded-md transition hover:bg-[var(--bg-sunken)] focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+                style={{ color: 'var(--text-tertiary)' }}
+                title="Close snippet"
               >
                 <XMarkIcon className="h-3.5 w-3.5" />
               </button>
@@ -148,14 +155,14 @@ export function StudioFileTabs({
       <button
         type="button"
         onClick={onNew}
-        aria-label="New tab"
-        className="ml-1 inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-colors"
+        aria-label="New snippet"
+        className="ml-1 inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
         style={{
           color: 'var(--text-tertiary)',
           border: '1px dashed var(--border-default)',
           backgroundColor: 'transparent',
         }}
-        title="New blank tab"
+        title="New blank snippet"
       >
         <PlusIcon className="h-3.5 w-3.5" />
         <span className="hidden sm:inline">New</span>
