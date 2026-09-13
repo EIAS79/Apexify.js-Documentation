@@ -175,6 +175,10 @@ async function jsTransfer(origin, route) {
     return {
       jsTransferBytes: scripts.reduce((sum, entry) => sum + (entry.transferSize || entry.encodedBodySize || 0), 0),
       scriptCount: scripts.length,
+      scripts: scripts.map((entry) => ({
+        path: new URL(entry.name).pathname,
+        bytes: entry.transferSize || entry.encodedBodySize || 0,
+      })).sort((a, b) => b.bytes - a.bytes),
     };
   });
   await page.close();
