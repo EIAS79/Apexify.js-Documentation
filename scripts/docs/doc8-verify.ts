@@ -31,6 +31,7 @@ const studioTerminal = read('lib/studio/studioRunnerTerminal.ts');
 const runnerWrapper = read('lib/gallery/core/wrapSnippetForRunner.ts');
 const codePreview = read('components/examples/CodePreview.tsx');
 const docsRoute = read('app/docs/[...slug]/page.tsx');
+const canvasRoute = read('app/docs/node/canvas/page.tsx');
 const runner = read('app/api/gallery/run/route.ts');
 const packageJson = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
 
@@ -67,10 +68,13 @@ requireCheck(!studio.includes("fetch('/api/gallery/run'"), 'Studio UI must not k
 requireCheck(studio.includes('useState(false)'), 'Studio runner must start disabled until availability is proven.');
 requireCheck(codePreview.includes('<CodeGroup'), 'DOC-5 CodeGroup compatibility must remain intact.');
 requireCheck(!codePreview.includes('VerifiedExamplePlayground'), 'Generic DOC-5 CodePreview must not eagerly pull the DOC-8 client playground into ordinary docs.');
-requireCheck(docsRoute.includes("page.canonicalPath === '/docs/node/canvas'"), 'DOC-8 representative interactive example must be route-bounded to /docs/node/canvas.');
-requireCheck(docsRoute.includes("getExampleById('node.canvas.basic')"), 'DOC-8 representative route must use the authoritative node.canvas.basic example.');
-requireCheck(docsRoute.includes('CanvasPlaygroundLoader'), 'Canvas guide must mount the route-local activation loader.');
-requireCheck(!docsRoute.includes('VerifiedExamplePlayground'), 'Catch-all docs route must not directly reference the heavy DOC-8 playground client module.');
+
+requireCheck(docsRoute.includes("page.canonicalPath !== '/docs/node/canvas'"), 'Catch-all docs route must exclude the interactive Canvas route from static params.');
+requireCheck(!docsRoute.includes('CanvasPlaygroundLoader'), 'Ordinary catch-all docs route must not reference the DOC-8 playground loader.');
+requireCheck(!docsRoute.includes('VerifiedExamplePlayground'), 'Ordinary catch-all docs route must not reference the heavy DOC-8 playground module.');
+requireCheck(canvasRoute.includes("getExampleById('node.canvas.basic')"), 'DOC-8 Canvas route must use the authoritative node.canvas.basic example.');
+requireCheck(canvasRoute.includes('CanvasPlaygroundLoader'), 'DOC-8 Canvas route must mount the route-local activation loader.');
+requireCheck(canvasRoute.includes("const CANVAS_SLUG = 'node/canvas'"), 'DOC-8 Canvas route must remain bound to node/canvas.');
 requireCheck(canvasLoader.includes("import('./VerifiedExamplePlayground')"), 'Canvas activation loader must own the native playground import.');
 requireCheck(canvasLoader.includes('useEffect'), 'Canvas activation loader must defer the heavy import until the Canvas client island mounts.');
 requireCheck(!canvasLoader.includes('next/dynamic'), 'Canvas activation loader must not register catch-all route preload metadata with next/dynamic.');
@@ -136,6 +140,7 @@ if (failures.length) {
 console.log('[doc8-verify] PASS', JSON.stringify({
   sharedPrimitives: ['editor', 'preview', 'diagnostics', 'workspace', 'options', 'session', 'execution'],
   representativeExample: 'node.canvas.basic',
+  interactiveRoute: 'app/docs/node/canvas/page.tsx',
   routeActivationBoundary: 'components/docs/playground/CanvasPlaygroundLoader.tsx',
   heavyEditorImportOwner: heavyImports[0],
   publicArbitraryExecution: false,
