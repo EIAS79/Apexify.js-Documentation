@@ -19,7 +19,7 @@ const RASTER_BATCH = new Set(['00-raster-batch-output-overview','01-batch-and-ch
  * scripts/docs/doc9-generate.ts verifies every migration record against it.
  */
 export function resolveDoc9LegacyIdentity(identity: string): string | null {
-  if (identity === 'README') return '/docs/overview';
+  if (identity === 'README' || identity === 'readme') return '/docs/overview';
   if (identity === '00-start-here' || identity === 'start-here' || identity === 'Getting-Started') return '/docs/getting-started';
   if (identity === '00-create-canvas-overview') return '/docs/node/canvas';
   if (identity === '01-canvas-size-and-coordinates') return '/docs/node/canvas/size-and-coordinates';
@@ -29,6 +29,7 @@ export function resolveDoc9LegacyIdentity(identity: string): string | null {
   if (identity === 'create-charts') return '/docs/node/charts/charts-overview';
   if (identity === 'create-gifs') return '/docs/node/gif-animation/create-gif-overview';
   if (identity === 'create-videos') return '/docs/node/video-ffmpeg/video-overview';
+  if (identity === '09-video-security-runtime-configuration') return '/docs/node/video-ffmpeg/security-runtime-configuration';
   if (identity === 'api-index' || identity.startsWith('api-') || identity === 'canvas-utils-and-types' || identity === 'package-surface') return '/api-reference';
   if (START.has(identity)) return `/docs/start/${slug(identity)}`;
   if (RECIPES.has(identity)) return `/docs/recipes/${slug(identity)}`;
