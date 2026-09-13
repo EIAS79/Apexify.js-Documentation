@@ -15,8 +15,8 @@ export interface CanvasPlaygroundProps {
  *
  * The catch-all docs route may reference this tiny client module, but the
  * heavyweight interactive workspace is imported only after this component
- * actually mounts on /docs/node/canvas. Native import() is intentional here:
- * next/dynamic would register preload metadata for the whole catch-all route.
+ * actually mounts on /docs/node/canvas. Native import() is intentional here
+ * so the catch-all route does not register eager preload metadata.
  */
 export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
   const [Playground, setPlayground] = useState<ComponentType<CanvasPlaygroundProps> | null>(null);
