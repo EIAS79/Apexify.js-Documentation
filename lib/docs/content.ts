@@ -77,7 +77,13 @@ export function loadDocumentationPages(): DocumentationPage[] {
     const rawMetadata = parsed.data ?? synthesizeDoc9Frontmatter(sourceFile.sourcePath, source);
     if (!rawMetadata) continue;
 
-    const metadata = validateDocumentationFrontmatter(rawMetadata, sourceFile.sourcePath);
+    // Synthesized metadata is strongly typed, while parsed frontmatter is a generic
+    // record. Both still pass through the same runtime validator; this cast only
+    // unifies their TypeScript input shape and does not bypass schema checks.
+    const metadata = validateDocumentationFrontmatter(
+      rawMetadata as unknown as Record<string, unknown>,
+      sourceFile.sourcePath,
+    );
     const frameworks = metadata.frameworks ?? [];
     const apiSymbols = metadata.apiSymbols ?? [];
     const keywords = metadata.keywords ?? [];
