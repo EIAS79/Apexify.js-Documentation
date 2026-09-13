@@ -88,7 +88,12 @@ assert(routePage.includes('alternates: { canonical }'), 'DOC-1 canonical metadat
 const pages = loadDocumentationPages();
 const navigation = buildDocumentationNavigation(pages);
 const flat = flattenDocumentationNavigation(navigation);
-assert(flat.map((item) => item.href).join('|') === '/docs/getting-started|/docs/node/canvas|/docs/node/canvas/size-and-coordinates', 'navigation/pager order regressed');
+const hrefs = flat.map((item) => item.href);
+assert(flat.length === pages.length, `navigation coverage regressed: ${flat.length}/${pages.length}`);
+assert(new Set(hrefs).size === pages.length, 'navigation contains duplicate canonical routes');
+for (const required of ['/docs/getting-started', '/docs/node/canvas', '/docs/node/canvas/size-and-coordinates', '/docs/migration/changelog']) {
+  assert(hrefs.includes(required), `required canonical navigation route missing: ${required}`);
+}
 const nodeFiltered = filterDocumentationNavigation(navigation, { runtime: 'node', package: 'apexify.js' });
 assert(flattenDocumentationNavigation(nodeFiltered).length === flat.length, 'current node/package filter architecture drops valid current pages');
 
