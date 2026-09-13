@@ -1,0 +1,50 @@
+name: DOC-9 full content migration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'content/docs/**'
+      - 'lib/docs/**'
+      - 'scripts/docs/doc9-*'
+      - 'generated/docs-doc9/**'
+      - '.github/workflows/doc9.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-doc9:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Generate DOC-9 evidence
+        run: npx tsx scripts/docs/doc9-generate.ts
+      - name: Refresh DOC-1 manifests for the fully migrated corpus
+        run: npm run docs:generate:doc1
+      - name: Verify source classification and zero legacy-only active features
+        run: |
+          node -e "const x=require('./generated/docs-doc9/classification-summary.json'); if(x.unclassified!==0) process.exit(1)"
+          node -e "const x=require('./generated/docs-doc9/legacy-only-features.json'); if(x.active_feature_legacy_only_count!==0) process.exit(1)"
+          node -e "const x=require('./generated/docs-doc9/orphan-content-audit.json'); if(x.status!=='PASS') process.exit(1)"
+      - name: Prior documentation phase regression chain
+        run: npm run docs:verify:doc6
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
+      - name: Browser/search smoke
+        run: npm run docs:browser:doc6
+      - name: Archive deterministic DOC-9 evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-doc9-evidence
+          path: generated/docs-doc9
+          if-no-files-found: error
