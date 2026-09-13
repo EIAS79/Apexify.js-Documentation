@@ -14,10 +14,11 @@ const failures = [];
 const routedPageCount = Number(docsManifest.managedPageCount ?? docsManifest.pages?.length ?? 0);
 const baselineRoutedPageCount = 3;
 const intentionalRouteExpansion = routedPageCount > baselineRoutedPageCount;
-const baselineBuildPerRoute = build.before.buildWallMs / baselineRoutedPageCount;
+const baselineBuildPerRoute = build.baseline.buildWallMs / baselineRoutedPageCount;
 const currentBuildPerRoute = build.after.buildWallMs / Math.max(routedPageCount, 1);
 const normalizedBuildPercent = Number((((currentBuildPerRoute / baselineBuildPerRoute) - 1) * 100).toFixed(2));
 
+if (!Number.isFinite(normalizedBuildPercent)) failures.push('route-normalized build metric is not finite');
 if (coverage.verified.length !== coverage.total) failures.push('not all examples verified');
 if (coverage.failed.length || coverage.stale.length || coverage.unverified.length) failures.push('coverage contains failed/stale/unverified examples');
 if (!intentionalRouteExpansion && build.delta.buildPercent > 35) failures.push(`build wall regression ${build.delta.buildPercent}% exceeds 35%`);
