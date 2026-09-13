@@ -32,6 +32,8 @@ const runnerWrapper = read('lib/gallery/core/wrapSnippetForRunner.ts');
 const codePreview = read('components/examples/CodePreview.tsx');
 const docsRoute = read('app/docs/[...slug]/page.tsx');
 const canvasRoute = read('app/docs/node/canvas/page.tsx');
+const docsSidebar = read('components/docs/navigation/DocsSidebarV2.tsx');
+const docsNavigationChrome = read('components/docs/navigation/DocsNavigationChrome.tsx');
 const runner = read('app/api/gallery/run/route.ts');
 const packageJson = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
 
@@ -78,6 +80,10 @@ requireCheck(canvasRoute.includes("const CANVAS_SLUG = 'node/canvas'"), 'DOC-8 C
 requireCheck(canvasLoader.includes("import('./VerifiedExamplePlayground')"), 'Canvas activation loader must own the native playground import.');
 requireCheck(canvasLoader.includes('useEffect'), 'Canvas activation loader must defer the heavy import until the Canvas client island mounts.');
 requireCheck(!canvasLoader.includes('next/dynamic'), 'Canvas activation loader must not register catch-all route preload metadata with next/dynamic.');
+requireCheck(docsSidebar.includes("const INTERACTIVE_CANVAS_PATH = '/docs/node/canvas'"), 'Docs sidebar must identify the interactive Canvas route for prefetch isolation.');
+requireCheck(docsSidebar.includes('prefetch={item.href === INTERACTIVE_CANVAS_PATH ? false : undefined}'), 'Ordinary docs sidebar must not prefetch the interactive Canvas route.');
+requireCheck(docsNavigationChrome.includes("const INTERACTIVE_CANVAS_PATH = '/docs/node/canvas'"), 'Docs pager/breadcrumb chrome must identify the interactive Canvas route for prefetch isolation.');
+requireCheck(docsNavigationChrome.includes('prefetch={docsPrefetch(item.href)}'), 'Docs pager must not prefetch the interactive Canvas route.');
 
 requireCheck(contracts.includes("mode: 'verified-static' | 'server-backed' | 'future-browser'"), 'Execution modes must remain explicit.');
 requireCheck(contracts.includes('interface WebRuntimeAdapter'), 'Future WebRuntimeAdapter contract missing.');
@@ -142,6 +148,7 @@ console.log('[doc8-verify] PASS', JSON.stringify({
   representativeExample: 'node.canvas.basic',
   interactiveRoute: 'app/docs/node/canvas/page.tsx',
   routeActivationBoundary: 'components/docs/playground/CanvasPlaygroundLoader.tsx',
+  navigationPrefetchIsolation: true,
   heavyEditorImportOwner: heavyImports[0],
   publicArbitraryExecution: false,
   localExecutionMode: 'trusted-local-opt-in',
