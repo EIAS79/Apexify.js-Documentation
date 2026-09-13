@@ -35,6 +35,43 @@ export function parseHeadingTitleAndId(rest: string): { label: string; id: strin
   return { label: trimmed, id: slugifyHeading(trimmed) };
 }
 
+/**
+ * Makes duplicate heading IDs deterministic without changing visible heading text.
+ * The first occurrence keeps its historical ID; later collisions receive `-2`,
+ * `-3`, and so on. Fenced code is untouched. Existing unique explicit IDs are
+ * preserved exactly after normalization.
+ */
+export function ensureUniqueHeadingIdsInMarkdown(content: string): string {
+  const lines = content.split(/\r?\n/);
+  const counts = new Map<string, number>();
+  let inFence = false;
+  const headingLine = /^(\s*)(#{1,6})\s+(.+)$/;
+
+  return lines
+    .map((line) => {
+      const fenceTrim = line.trimStart();
+      if (fenceTrim.startsWith('```') || fenceTrim.startsWith('~~~')) {
+        inFence = !inFence;
+        return line;
+      }
+      if (inFence) return line;
+
+      const match = headingLine.exec(line);
+      if (!match) return line;
+
+      const parsed = parseHeadingTitleAndId(match[3]);
+      if (!parsed.id) return line;
+
+      const seen = counts.get(parsed.id) ?? 0;
+      counts.set(parsed.id, seen + 1);
+      if (seen === 0) return line;
+
+      const uniqueId = `${parsed.id}-${seen + 1}`;
+      return `${match[1]}${match[2]} ${parsed.label} {#${uniqueId}}`;
+    })
+    .join('\n');
+}
+
 /** TOC / scroll-spy headings from raw MDX/Markdown (h1–h3 only). Skips ATX-looking lines inside fenced code (```` ``` ````). */
 export function extractHeadingsFromMdxRaw(content: string): DocHeading[] {
   const lines = content.split(/\r?\n/);
