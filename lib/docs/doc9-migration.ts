@@ -1,5 +1,6 @@
 import path from 'node:path';
 import type { DocumentationFrontmatter, DocumentationPageKind } from './schema';
+import { resolveDoc9LegacyIdentity } from './doc9-legacy-client';
 
 export type Doc9Classification = 'keep' | 'rewrite' | 'split' | 'merge' | 'move' | 'archive' | 'delete';
 export type Doc9MigrationStatus = 'pending' | 'migrated' | 'verified';
@@ -35,15 +36,6 @@ function normalize(value: string): string {
 
 function withoutNumericPrefix(value: string): string {
   return value.replace(/^\d+-/, '');
-}
-
-function slugPart(value: string): string {
-  return withoutNumericPrefix(value)
-    .replace(/\.mdx$/i, '')
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/[^A-Za-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .toLowerCase();
 }
 
 function relativeParts(sourcePath: string): string[] {
@@ -146,20 +138,12 @@ function kindFor(parts: string[], id: string): DocumentationPageKind {
   return 'guide';
 }
 
-function canonicalSlug(parts: string[]): string {
-  if (parts.length === 1 && parts[0] === 'README.mdx') return 'overview';
-  const root = parts[0];
-  const rest = parts.slice(1).map(slugPart).filter(Boolean);
-  if (root === '00-start-here') return ['start', ...rest].join('/');
-  if (root === '01-beginner-guide') return ['start', ...rest].join('/');
-  if (root === '02-recipes') return ['recipes', ...rest].join('/');
-  if (root === '03-feature-guides') return ['node', ...rest].join('/');
-  if (root === '04-advanced') return ['advanced', ...rest].join('/');
-  if (root === '05-internals') {
-    if (parts.at(-1) === 'changelog.mdx') return 'migration/changelog';
-    return ['architecture', ...rest].join('/');
+function requiredLegacyTarget(id: string, sourcePath: string): string {
+  const target = resolveDoc9LegacyIdentity(id);
+  if (!target) {
+    throw new Error(`[doc9-migration] no canonical target rule for ${sourcePath} (${id})`);
   }
-  return ['node', ...parts.map(slugPart)].join('/');
+  return target;
 }
 
 export function doc9Disposition(
@@ -182,7 +166,7 @@ export function doc9Disposition(
       title: inferredTitle,
       category: 'API Reference',
       classification: 'merge',
-      targetRoutes: ['/api-reference'],
+      targetRoutes: [requiredLegacyTarget(id, sourcePath)],
       featureIds: inferredFeatureIds,
       redirectRequired: true,
       contentPreserved: true,
@@ -200,7 +184,7 @@ export function doc9Disposition(
       title: inferredTitle,
       category: 'Archive',
       classification: 'archive',
-      targetRoutes: ['/docs/migration/changelog'],
+      targetRoutes: [requiredLegacyTarget(id, sourcePath)],
       featureIds: ['images', 'media'],
       redirectRequired: true,
       contentPreserved: true,
@@ -212,6 +196,10 @@ export function doc9Disposition(
 
   if (hasFrontmatter && existingPage) {
     const authoredFeatureIds = featureIdsForSource(sourcePath, existingPage.feature ?? inferredFeature);
+    const compatibilityTarget = requiredLegacyTarget(id, sourcePath);
+    if (compatibilityTarget !== existingPage.canonicalPath) {
+      throw new Error(`[doc9-migration] authored canonical route disagrees with compatibility authority for ${sourcePath}: ${existingPage.canonicalPath} != ${compatibilityTarget}`);
+    }
     return {
       legacyId: id,
       legacyPath: normalize(sourcePath),
@@ -229,7 +217,7 @@ export function doc9Disposition(
     };
   }
 
-  const slug = canonicalSlug(parts);
+  const canonical = requiredLegacyTarget(id, sourcePath);
   return {
     legacyId: id,
     legacyPath: normalize(sourcePath),
@@ -237,7 +225,7 @@ export function doc9Disposition(
     title: inferredTitle,
     category: categoryFor(parts),
     classification: hasFrontmatter ? 'keep' : 'move',
-    targetRoutes: [`/docs/${slug}`],
+    targetRoutes: [canonical],
     featureIds: inferredFeatureIds,
     redirectRequired: true,
     contentPreserved: true,
