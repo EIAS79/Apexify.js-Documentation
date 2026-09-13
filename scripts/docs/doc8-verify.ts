@@ -15,6 +15,7 @@ const preview = read('components/docs/playground/InteractivePreview.tsx');
 const workspace = read('components/docs/playground/InteractiveWorkspace.tsx');
 const options = read('components/docs/playground/OptionFields.tsx');
 const playground = read('components/docs/playground/VerifiedExamplePlayground.tsx');
+const canvasLoader = read('components/docs/playground/CanvasPlaygroundLoader.tsx');
 const contracts = read('lib/docs/playground/contracts.ts');
 const session = read('lib/docs/playground/session.ts');
 const executionAdapter = read('lib/docs/playground/serverClientAdapter.ts');
@@ -68,7 +69,11 @@ requireCheck(codePreview.includes('<CodeGroup'), 'DOC-5 CodeGroup compatibility 
 requireCheck(!codePreview.includes('VerifiedExamplePlayground'), 'Generic DOC-5 CodePreview must not eagerly pull the DOC-8 client playground into ordinary docs.');
 requireCheck(docsRoute.includes("page.canonicalPath === '/docs/node/canvas'"), 'DOC-8 representative interactive example must be route-bounded to /docs/node/canvas.');
 requireCheck(docsRoute.includes("getExampleById('node.canvas.basic')"), 'DOC-8 representative route must use the authoritative node.canvas.basic example.');
-requireCheck(docsRoute.includes("await import('@/components/docs/playground/VerifiedExamplePlayground')"), 'Representative playground must be dynamically imported only for the Canvas guide.');
+requireCheck(docsRoute.includes('CanvasPlaygroundLoader'), 'Canvas guide must mount the route-local activation loader.');
+requireCheck(!docsRoute.includes('VerifiedExamplePlayground'), 'Catch-all docs route must not directly reference the heavy DOC-8 playground client module.');
+requireCheck(canvasLoader.includes("import('./VerifiedExamplePlayground')"), 'Canvas activation loader must own the native playground import.');
+requireCheck(canvasLoader.includes('useEffect'), 'Canvas activation loader must defer the heavy import until the Canvas client island mounts.');
+requireCheck(!canvasLoader.includes('next/dynamic'), 'Canvas activation loader must not register catch-all route preload metadata with next/dynamic.');
 
 requireCheck(contracts.includes("mode: 'verified-static' | 'server-backed' | 'future-browser'"), 'Execution modes must remain explicit.');
 requireCheck(contracts.includes('interface WebRuntimeAdapter'), 'Future WebRuntimeAdapter contract missing.');
@@ -131,6 +136,7 @@ if (failures.length) {
 console.log('[doc8-verify] PASS', JSON.stringify({
   sharedPrimitives: ['editor', 'preview', 'diagnostics', 'workspace', 'options', 'session', 'execution'],
   representativeExample: 'node.canvas.basic',
+  routeActivationBoundary: 'components/docs/playground/CanvasPlaygroundLoader.tsx',
   heavyEditorImportOwner: heavyImports[0],
   publicArbitraryExecution: false,
   localExecutionMode: 'trusted-local-opt-in',
