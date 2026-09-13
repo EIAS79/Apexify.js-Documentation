@@ -32,7 +32,10 @@ function safeDecode(value: string): string {
   try { return decodeURIComponent(value); } catch { return value; }
 }
 function stripCode(body: string): string {
-  return body.replace(/```[\s\S]*?```/g, '');
+  return body
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/~~~[\s\S]*?~~~/g, '')
+    .replace(/`[^`\n]*`/g, '');
 }
 
 for (const page of pages) {
@@ -75,7 +78,7 @@ for (const page of pages) {
     }
   }
 
-  const fenceLines = body.split('\n').filter((line) => line.startsWith('```'));
+  const fenceLines = body.split('\n').filter((line) => line.startsWith('```') || line.startsWith('~~~'));
   if (fenceLines.length % 2 !== 0) addError(page.sourcePath, 'code-fence', 'unbalanced fenced code block');
   for (const line of fenceLines.filter((_line, index) => index % 2 === 0)) {
     const metadata = line.slice(3).trim();
