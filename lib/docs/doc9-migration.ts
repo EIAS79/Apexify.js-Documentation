@@ -92,6 +92,23 @@ export function doc9FeatureFromSource(sourcePath: string): string | null {
   return null;
 }
 
+function featureIdsForSource(sourcePath: string, primary: string | null): string[] {
+  const normalized = normalize(sourcePath).toLowerCase();
+  const ids = primary ? [primary] : [];
+
+  // DOC-5 uses `batch` as a workflow feature identity for multi-output work.
+  // The existing batch/raster guide corpus is its canonical conceptual surface.
+  if (/\/batch-save-output\/|\/raster-batch-output\//.test(normalized)) ids.push('batch');
+
+  // DOC-5 uses `media` for the GIF/media pipeline example. Current GIF, video,
+  // audio, image and raster guides are the shipped Node media documentation.
+  if (/\/gif-animation\/|\/video-ffmpeg\/|\/images-shapes\/|\/raster-batch-output\/|\/advanced\/audio\/|\/advanced\/video\//.test(normalized)) {
+    ids.push('media');
+  }
+
+  return [...new Set(ids)].sort();
+}
+
 function categoryFor(parts: string[]): string {
   const root = parts[0];
   if (root === '00-start-here' || root === '01-beginner-guide') return 'Start';
@@ -148,6 +165,7 @@ export function doc9Disposition(
   const id = doc9LegacyId(sourcePath);
   const inferredTitle = firstHeading(source) ?? titleFromId(id);
   const inferredFeature = doc9FeatureFromSource(sourcePath);
+  const inferredFeatureIds = featureIdsForSource(sourcePath, inferredFeature);
 
   if (parts[0] === '04-api-reference') {
     return {
@@ -158,7 +176,7 @@ export function doc9Disposition(
       category: 'API Reference',
       classification: 'merge',
       targetRoutes: ['/api-reference'],
-      featureIds: inferredFeature ? [inferredFeature] : [],
+      featureIds: inferredFeatureIds,
       redirectRequired: true,
       contentPreserved: true,
       rationale: 'Handwritten API prose is superseded by the DOC-4 generated reference. Preserve the source for migration audit while canonical API truth remains generated.',
@@ -176,7 +194,7 @@ export function doc9Disposition(
       category: 'Archive',
       classification: 'archive',
       targetRoutes: ['/docs/migration/changelog'],
-      featureIds: ['images'],
+      featureIds: ['images', 'media'],
       redirectRequired: true,
       contentPreserved: true,
       rationale: 'Version 5.4.5 hotfix detail is historical release-era material and must not masquerade as current package behavior.',
@@ -186,6 +204,7 @@ export function doc9Disposition(
   }
 
   if (hasFrontmatter && existingPage) {
+    const authoredFeatureIds = featureIdsForSource(sourcePath, existingPage.feature ?? inferredFeature);
     return {
       legacyId: id,
       legacyPath: normalize(sourcePath),
@@ -194,7 +213,7 @@ export function doc9Disposition(
       category: existingPage.category,
       classification: 'keep',
       targetRoutes: [existingPage.canonicalPath],
-      featureIds: existingPage.feature ? [existingPage.feature] : inferredFeature ? [inferredFeature] : [],
+      featureIds: authoredFeatureIds,
       redirectRequired: true,
       contentPreserved: true,
       rationale: 'Already uses the DOC-1 validated metadata contract; retain its authored canonical route and migrate links/discovery around it.',
@@ -212,7 +231,7 @@ export function doc9Disposition(
     category: categoryFor(parts),
     classification: hasFrontmatter ? 'keep' : 'move',
     targetRoutes: [`/docs/${slug}`],
-    featureIds: inferredFeature ? [inferredFeature] : [],
+    featureIds: inferredFeatureIds,
     redirectRequired: true,
     contentPreserved: true,
     rationale: hasFrontmatter
@@ -230,7 +249,7 @@ export function synthesizeDoc9Frontmatter(sourcePath: string, source: string): D
   const id = record.legacyId;
   const canonical = record.targetRoutes[0];
   const slug = canonical.replace(/^\/docs\//, '');
-  const feature = record.featureIds[0];
+  const feature = doc9FeatureFromSource(sourcePath) ?? record.featureIds[0];
   return {
     title: record.title,
     description: `Current Apexify.js 6.0.0 documentation for ${record.title}.`,
@@ -245,7 +264,7 @@ export function synthesizeDoc9Frontmatter(sourcePath: string, source: string): D
     since: '6.0.0',
     feature,
     apiSymbols: [],
-    keywords: [...new Set([feature, ...slug.split('/')].filter((value): value is string => Boolean(value)))],
+    keywords: [...new Set([feature, ...record.featureIds, ...slug.split('/')].filter((value): value is string => Boolean(value)))],
     prerequisites: [],
     related: [],
     examples: [],
