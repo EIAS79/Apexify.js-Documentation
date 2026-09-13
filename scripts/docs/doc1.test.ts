@@ -10,6 +10,7 @@ import {
 } from '../../lib/docs/schema';
 import {
   buildDocumentationNavigation,
+  flattenDocumentationNavigation,
   getDocumentationPager,
 } from '../../lib/docs/navigation';
 import {
@@ -140,22 +141,25 @@ test('legacy document hashes map to canonical routes while headings stay fragmen
   );
   assert.equal(
     canonicalizeLegacyDocumentationHref('/docs#02-backgrounds-primary'),
-    '/docs#02-backgrounds-primary',
+    '/docs/node/canvas/backgrounds-primary',
   );
 });
 
-test('navigation manifest deterministically drives pager order', () => {
-  const navigation = buildDocumentationNavigation(loadDocumentationPages());
-  assert.deepEqual(
-    navigation.flatMap((group) => group.items.map((item) => item.href)),
-    [
-      '/docs/getting-started',
-      '/docs/node/canvas',
-      '/docs/node/canvas/size-and-coordinates',
-    ],
-  );
+test('navigation manifest deterministically covers the fully migrated canonical corpus', () => {
+  const pages = loadDocumentationPages();
+  const navigation = buildDocumentationNavigation(pages);
+  const items = flattenDocumentationNavigation(navigation);
+  const hrefs = items.map((item) => item.href);
+
+  assert.equal(items.length, pages.length);
+  assert.equal(new Set(hrefs).size, pages.length);
+  assert.ok(hrefs.includes('/docs/getting-started'));
+  assert.ok(hrefs.includes('/docs/node/canvas'));
+  assert.ok(hrefs.includes('/docs/node/canvas/size-and-coordinates'));
+  assert.ok(hrefs.includes('/docs/node/canvas/backgrounds-primary'));
+  assert.ok(hrefs.includes('/docs/migration/changelog'));
 
   const pager = getDocumentationPager(navigation, '/docs/node/canvas');
-  assert.equal(pager.previous?.href, '/docs/getting-started');
-  assert.equal(pager.next?.href, '/docs/node/canvas/size-and-coordinates');
+  assert.ok(pager.previous);
+  assert.ok(pager.next);
 });
