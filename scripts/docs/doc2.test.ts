@@ -20,31 +20,44 @@ test('DOC-2 token and status primitives are complete for both themes', () => {
   assert.ok(css.includes('.dark'));
 });
 
-test('DOC-2 navigation remains manifest-driven and filter-capable without speculative pages', () => {
+test('DOC-2 navigation remains manifest-driven and filter-capable across the fully migrated corpus', () => {
   const pages = loadDocumentationPages();
   const navigation = buildDocumentationNavigation(pages);
   const flat = flattenDocumentationNavigation(navigation);
-  assert.deepEqual(flat.map((item) => item.href), [
+  const hrefs = flat.map((item) => item.href);
+
+  assert.equal(flat.length, pages.length);
+  assert.equal(new Set(hrefs).size, pages.length);
+  for (const required of [
     '/docs/getting-started',
     '/docs/node/canvas',
     '/docs/node/canvas/size-and-coordinates',
-  ]);
+    '/docs/node/canvas/backgrounds-primary',
+    '/docs/migration/changelog',
+  ]) {
+    assert.ok(hrefs.includes(required), `missing migrated navigation route ${required}`);
+  }
+
   const filtered = filterDocumentationNavigation(navigation, { runtime: 'node', package: 'apexify.js' });
-  assert.deepEqual(flattenDocumentationNavigation(filtered).map((item) => item.href), flat.map((item) => item.href));
+  assert.deepEqual(flattenDocumentationNavigation(filtered).map((item) => item.href), hrefs);
   assert.equal(flat.some((item) => item.href.includes('@apexify/web')), false);
 });
 
-test('DOC-2 breadcrumbs and pager preserve canonical DOC-1 ordering', () => {
+test('DOC-2 breadcrumbs and pager preserve canonical manifest ordering', () => {
   const pages = loadDocumentationPages();
   const navigation = buildDocumentationNavigation(pages);
+  const flat = flattenDocumentationNavigation(navigation);
   const canvas = pages.find((page) => page.slug === 'node/canvas');
   assert.ok(canvas);
   const breadcrumbs = getDocumentationBreadcrumbs(navigation, canvas);
   assert.equal(breadcrumbs[1].href, '/docs/getting-started');
   assert.equal(breadcrumbs.at(-1)?.label, canvas.title);
+
+  const index = flat.findIndex((item) => item.href === canvas.canonicalPath);
+  assert.ok(index >= 0);
   const pager = getDocumentationPager(navigation, canvas.canonicalPath);
-  assert.equal(pager.previous?.href, '/docs/getting-started');
-  assert.equal(pager.next?.href, '/docs/node/canvas/size-and-coordinates');
+  assert.equal(pager.previous?.href ?? null, index > 0 ? flat[index - 1].href : null);
+  assert.equal(pager.next?.href ?? null, index < flat.length - 1 ? flat[index + 1].href : null);
 });
 
 test('DOC-2 shell keeps server boundaries and accessible drawer behavior', () => {
