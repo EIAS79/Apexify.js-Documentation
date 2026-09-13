@@ -83,7 +83,7 @@ export function StudioStatusBar(props: Props) {
       >
         <span
           className="rounded-sm px-1 py-0.5 text-[9px] font-bold tracking-wide"
-          style={{ backgroundColor: 'var(--accent-iris)', color: 'white' }}
+          style={{ backgroundColor: 'var(--accent-iris)', color: 'var(--text-inverse)' }}
         >
           {lang.toUpperCase()}
         </span>
