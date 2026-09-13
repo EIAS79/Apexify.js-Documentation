@@ -45,7 +45,7 @@ export function resolveDoc9LegacyIdentity(identity: string): string | null {
   if (/chart/.test(identity)) return `/docs/node/charts/${slug(identity)}`;
   if (/gif|animate-api/.test(identity)) return `/docs/node/gif-animation/${slug(identity)}`;
   if (/create-image|shapes-reference|remote-image/.test(identity)) return `/docs/node/images-shapes/${slug(identity)}`;
-  if (/custom-line|path2d|hit-testing-paths/.test(identity)) return `/docs/node/lines-connectors/${slug(identity)}`;
+  if (/custom-line|create-custom-api|path2d|hit-testing-paths/.test(identity)) return `/docs/node/lines-connectors/${slug(identity)}`;
   if (/create-text|measure-text/.test(identity)) return `/docs/node/text-rendering/${slug(identity)}`;
   return null;
 }
