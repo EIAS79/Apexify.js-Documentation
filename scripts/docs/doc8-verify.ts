@@ -29,6 +29,7 @@ const studioStorage = read('lib/studio/studioStorage.ts');
 const studioTerminal = read('lib/studio/studioRunnerTerminal.ts');
 const runnerWrapper = read('lib/gallery/core/wrapSnippetForRunner.ts');
 const codePreview = read('components/examples/CodePreview.tsx');
+const docsRoute = read('app/docs/[...slug]/page.tsx');
 const runner = read('app/api/gallery/run/route.ts');
 const packageJson = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
 
@@ -63,8 +64,11 @@ requireCheck(studio.includes("@/lib/docs/playground/serverClientAdapter"), 'Stud
 requireCheck(studio.includes('currentNodeServerExecutionAdapter.run'), 'Studio must dispatch execution through ExecutionAdapter.run().');
 requireCheck(!studio.includes("fetch('/api/gallery/run'"), 'Studio UI must not know the concrete gallery runner endpoint.');
 requireCheck(studio.includes('useState(false)'), 'Studio runner must start disabled until availability is proven.');
-requireCheck(codePreview.includes("example.id === 'node.canvas.basic'"), 'DOC-8 representative interactive example must be explicitly bounded to node.canvas.basic.');
 requireCheck(codePreview.includes('<CodeGroup'), 'DOC-5 CodeGroup compatibility must remain intact.');
+requireCheck(!codePreview.includes('VerifiedExamplePlayground'), 'Generic DOC-5 CodePreview must not eagerly pull the DOC-8 client playground into ordinary docs.');
+requireCheck(docsRoute.includes("page.canonicalPath === '/docs/node/canvas'"), 'DOC-8 representative interactive example must be route-bounded to /docs/node/canvas.');
+requireCheck(docsRoute.includes("getExampleById('node.canvas.basic')"), 'DOC-8 representative route must use the authoritative node.canvas.basic example.');
+requireCheck(docsRoute.includes("await import('@/components/docs/playground/VerifiedExamplePlayground')"), 'Representative playground must be dynamically imported only for the Canvas guide.');
 
 requireCheck(contracts.includes("mode: 'verified-static' | 'server-backed' | 'future-browser'"), 'Execution modes must remain explicit.');
 requireCheck(contracts.includes('interface WebRuntimeAdapter'), 'Future WebRuntimeAdapter contract missing.');
