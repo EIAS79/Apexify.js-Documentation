@@ -7,14 +7,14 @@ import { DocsBreadcrumbsV2, DocsPagerV2 } from '@/components/docs/navigation/Doc
 import { DocsPageHero } from '@/components/docs/content/DocsPageHero';
 import { RouteDocsMarkdown } from '@/components/docs/route/RouteDocsMarkdown';
 import { RelatedContent } from '@/components/docs/search/RelatedContent';
-import { CanvasPlaygroundLoader } from '@/components/docs/playground/CanvasPlaygroundLoader';
-import { getExampleById } from '@/lib/examples/manifest';
 
 const SITE_ORIGIN = 'https://apexifyjs.vercel.app';
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return loadDocumentationPages().map((page) => ({ slug: page.slug.split('/') }));
+  return loadDocumentationPages()
+    .filter((page) => page.canonicalPath !== '/docs/node/canvas')
+    .map((page) => ({ slug: page.slug.split('/') }));
 }
 
 export function generateMetadata({ params }: { params: { slug: string[] } }): Metadata {
@@ -42,24 +42,6 @@ function withoutLeadingTitle(body: string): string {
   return body.replace(/^\s*#\s+[^\r\n]+(?:\r?\n)+/, '');
 }
 
-function CanvasInteractiveExample() {
-  const example = getExampleById('node.canvas.basic');
-  if (!example || example.sources.length !== 1) return null;
-  const verifiedPreview =
-    example.outputs.find((output) => output.path === example.gallery.previewOutput) ??
-    example.outputs.find((output) => output.publicPath);
-
-  return (
-    <CanvasPlaygroundLoader
-      title={example.title}
-      initialSource={example.sources[0].content}
-      previewUrl={verifiedPreview?.publicPath ?? undefined}
-      previewAlt={`${example.title} verified output`}
-      sourceHash={example.sourceHash}
-    />
-  );
-}
-
 export default function DocumentationRoutePage({ params }: { params: { slug: string[] } }) {
   const page = getDocumentationPageBySlug(params.slug);
   if (!page) notFound();
@@ -81,7 +63,6 @@ export default function DocumentationRoutePage({ params }: { params: { slug: str
       >
         <DocsPageHero page={page} headingId={leadingHeading?.id} />
         <RouteDocsMarkdown content={withoutLeadingTitle(page.body)} />
-        {page.canonicalPath === '/docs/node/canvas' ? <CanvasInteractiveExample /> : null}
         <RelatedContent sourceId={page.id} preferredKinds={['doc', 'changelog']} title="Related guides and reference" />
       </article>
       <DocsPagerV2 pager={pager} />
