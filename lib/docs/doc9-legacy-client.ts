@@ -11,15 +11,25 @@ const ADVANCED_ROOT = new Set(['00-advanced-overview','01-runtime-resource-gover
 const ADVANCED_AUDIO = new Set(['00-audio-advanced-hub','01-create-audio']);
 const ADVANCED_COMPOSITION = new Set(['00-composition-hub','01-named-assets','02-templates','03-preset-components','04-plugins','05-imperative-batch-chain-assets']);
 const ADVANCED_VIDEO = new Set(['00-video-advanced-hub','01-video-pipeline']);
+const RASTER_BATCH = new Set(['00-raster-batch-output-overview','01-batch-and-chain','02-save-disk','03-output-format-and-encoding','04-image-stitch-and-collage','05-image-compress-and-palette','06-image-resize-convert-effects','07-image-blend-mask-crop-gradient','08-pixel-data','09-path2d-draw-and-custom-lines','10-hit-detection']);
 
+/**
+ * Client-safe canonical map for the legacy hash corpus. Keep this implementation
+ * free of fs/server imports because LegacyDocsRedirectIsland consumes it.
+ * scripts/docs/doc9-generate.ts verifies every migration record against it.
+ */
 export function resolveDoc9LegacyIdentity(identity: string): string | null {
   if (identity === 'README') return '/docs/overview';
-  if (identity === '00-start-here') return '/docs/getting-started';
+  if (identity === '00-start-here' || identity === 'start-here' || identity === 'Getting-Started') return '/docs/getting-started';
   if (identity === '00-create-canvas-overview') return '/docs/node/canvas';
   if (identity === '01-canvas-size-and-coordinates') return '/docs/node/canvas/size-and-coordinates';
-  if (identity === 'changelog' || identity === '01-5.4.5-remote-image-hotfix') return '/docs/migration/changelog';
+  if (identity === 'changelog' || identity === 'Change-Log' || identity === '01-5.4.5-remote-image-hotfix') return '/docs/migration/changelog';
   if (identity === '00-internals-overview') return '/docs/architecture/internals-overview';
-  if (identity.startsWith('api-') || identity === 'canvas-utils-and-types' || identity === 'package-surface') return '/api-reference';
+  if (identity === 'feature-guides-hub') return '/docs/node/feature-guides-hub';
+  if (identity === 'create-charts') return '/docs/node/charts/charts-overview';
+  if (identity === 'create-gifs') return '/docs/node/gif-animation/create-gif-overview';
+  if (identity === 'create-videos') return '/docs/node/video-ffmpeg/video-overview';
+  if (identity === 'api-index' || identity.startsWith('api-') || identity === 'canvas-utils-and-types' || identity === 'package-surface') return '/api-reference';
   if (START.has(identity)) return `/docs/start/${slug(identity)}`;
   if (RECIPES.has(identity)) return `/docs/recipes/${slug(identity)}`;
   if (BATCH_SAVE.has(identity)) return `/docs/node/batch-save-output/${slug(identity)}`;
@@ -30,12 +40,12 @@ export function resolveDoc9LegacyIdentity(identity: string): string | null {
   if (ADVANCED_COMPOSITION.has(identity)) return `/docs/advanced/composition/${slug(identity)}`;
   if (ADVANCED_VIDEO.has(identity)) return `/docs/advanced/video/${slug(identity)}`;
   if (/scene/.test(identity)) return `/docs/advanced/scene/${slug(identity)}`;
+  if (RASTER_BATCH.has(identity)) return `/docs/node/raster-batch-output/${slug(identity)}`;
   if (/canvas|background|stroke-options|shadow-options|paint-order/.test(identity) && !/text|image/.test(identity)) return `/docs/node/canvas/${slug(identity)}`;
   if (/chart/.test(identity)) return `/docs/node/charts/${slug(identity)}`;
   if (/gif|animate-api/.test(identity)) return `/docs/node/gif-animation/${slug(identity)}`;
   if (/create-image|shapes-reference|remote-image/.test(identity)) return `/docs/node/images-shapes/${slug(identity)}`;
   if (/custom-line|path2d|hit-testing-paths/.test(identity)) return `/docs/node/lines-connectors/${slug(identity)}`;
   if (/create-text|measure-text/.test(identity)) return `/docs/node/text-rendering/${slug(identity)}`;
-  if (/raster-batch-output|batch-and-chain|save-disk|output-format-and-encoding|image-stitch|image-compress|image-resize|image-blend|pixel-data|hit-detection/.test(identity)) return `/docs/node/raster-batch-output/${slug(identity)}`;
   return null;
 }
