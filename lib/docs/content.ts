@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { extractHeadingsFromMdxRaw } from '../docs-heading-utils';
 import { parseDocumentationSource, stripDocumentationFrontmatter } from './frontmatter';
+import { synthesizeDoc9Frontmatter } from './doc9-migration';
 import {
   type DocumentationPage,
   validateDocumentationFrontmatter,
@@ -66,12 +67,12 @@ export function loadDocumentationPages(): DocumentationPage[] {
 
   const pages: DocumentationPage[] = [];
   for (const sourceFile of discoverDocumentationSources()) {
-    if (!sourceFile.hasFrontmatter) continue;
     const source = fs.readFileSync(sourceFile.absolutePath, 'utf8');
     const parsed = parseDocumentationSource(source, sourceFile.sourcePath);
-    if (!parsed.data) continue;
+    const rawMetadata = parsed.data ?? synthesizeDoc9Frontmatter(sourceFile.sourcePath, source);
+    if (!rawMetadata) continue;
 
-    const metadata = validateDocumentationFrontmatter(parsed.data, sourceFile.sourcePath);
+    const metadata = validateDocumentationFrontmatter(rawMetadata, sourceFile.sourcePath);
     const frameworks = metadata.frameworks ?? [];
     const apiSymbols = metadata.apiSymbols ?? [];
     const keywords = metadata.keywords ?? [];
