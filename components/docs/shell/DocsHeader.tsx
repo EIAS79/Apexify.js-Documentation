@@ -14,13 +14,17 @@ const NAV_LINKS = [
   { href: '/studio', label: 'Studio' },
 ] as const;
 
+function docsHeaderPrefetch(href: string): false | undefined {
+  return href.startsWith('/docs') ? undefined : false;
+}
+
 export function DocsHeader() {
   const version = apexifyVersionLabel();
   return (
     <header className="apx-doc-header" data-doc2-header>
       <div className="apx-doc-header__inner">
         <LegacyDocsSidebarToggle />
-        <Link href="/" className="apx-doc-brand" aria-label="Apexify.js home">
+        <Link href="/" prefetch={false} className="apx-doc-brand" aria-label="Apexify.js home">
           <span className="apx-doc-brand__icon" aria-hidden><BrandIcon /></span>
           <span className="apx-doc-brand__text">
             <span className="apx-doc-brand__eyebrow">Apexify.js</span>
@@ -29,7 +33,12 @@ export function DocsHeader() {
         </Link>
         <nav className="apx-doc-primary-nav" aria-label="Primary">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} aria-current={link.label === 'Docs' ? 'page' : undefined}>
+            <Link
+              key={link.href}
+              href={link.href}
+              prefetch={docsHeaderPrefetch(link.href)}
+              aria-current={link.label === 'Docs' ? 'page' : undefined}
+            >
               {link.label}
             </Link>
           ))}
@@ -45,6 +54,7 @@ export function DocsHeader() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    prefetch={docsHeaderPrefetch(link.href)}
                     aria-current={link.label === 'Docs' ? 'page' : undefined}
                     className="min-h-11 rounded-lg px-3 py-3 font-semibold"
                   >
