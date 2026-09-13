@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { extractHeadingsFromMdxRaw } from '../docs-heading-utils';
 import { parseDocumentationSource, stripDocumentationFrontmatter } from './frontmatter';
+import { canonicalizeDoc9BodyLinks } from './doc9-links';
 import { synthesizeDoc9Frontmatter } from './doc9-migration';
 import {
   type DocumentationPage,
@@ -84,6 +85,7 @@ export function loadDocumentationPages(): DocumentationPage[] {
     const toc = metadata.toc ?? true;
     const search = metadata.search ?? true;
     const id = legacyHashes[0] ?? metadata.slug;
+    const body = canonicalizeDoc9BodyLinks(parsed.body);
 
     pages.push({
       ...metadata,
@@ -100,7 +102,7 @@ export function loadDocumentationPages(): DocumentationPage[] {
       id,
       sourcePath: sourceFile.sourcePath,
       canonicalPath: metadata.canonical,
-      body: parsed.body,
+      body,
       headings: extractHeadingsFromMdxRaw(parsed.body),
     });
   }
@@ -152,7 +154,7 @@ export function createLegacyIdentityMap(): Map<string, DocumentationPage> {
 
 export function readDocumentationBody(sourcePath: string): string {
   const absolutePath = path.join(process.cwd(), sourcePath);
-  return stripDocumentationFrontmatter(fs.readFileSync(absolutePath, 'utf8'), sourcePath);
+  return canonicalizeDoc9BodyLinks(stripDocumentationFrontmatter(fs.readFileSync(absolutePath, 'utf8'), sourcePath));
 }
 
 export function resetDocumentationContentCacheForTests(): void {
