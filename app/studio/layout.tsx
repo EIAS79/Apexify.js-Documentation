@@ -8,5 +8,15 @@ export const metadata: Metadata = {
 };
 
 export default function StudioLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <>
+      <style>{`
+        [aria-label="Language"] > button[aria-pressed="true"],
+        footer button[title="Toggle TypeScript / JavaScript"] > span.rounded-sm {
+          color: var(--text-inverse) !important;
+        }
+      `}</style>
+      {children}
+    </>
+  );
 }
