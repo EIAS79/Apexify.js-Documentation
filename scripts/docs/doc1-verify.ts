@@ -87,7 +87,11 @@ if (fs.existsSync(doc6RecordsPath)) {
   };
   const canonicalDocHrefs = new Set(
     (artifact.records ?? [])
-      .filter((record) => record.kind === 'doc' && typeof record.canonicalHref === 'string')
+      .filter(
+        (record) =>
+          (record.kind === 'doc' || record.kind === 'changelog') &&
+          typeof record.canonicalHref === 'string',
+      )
       .map((record) => record.canonicalHref as string),
   );
   for (const page of pages) {
