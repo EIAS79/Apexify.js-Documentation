@@ -6,8 +6,22 @@ on:
     paths:
       - 'content/docs/**'
       - 'lib/docs/**'
-      - 'scripts/docs/doc9-*'
+      - 'lib/product/catalog-data.ts'
+      - 'scripts/docs/**'
       - 'generated/docs-doc9/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/doc9.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'content/docs/**'
+      - 'lib/docs/**'
+      - 'lib/product/catalog-data.ts'
+      - 'scripts/docs/**'
+      - 'generated/docs-doc9/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/doc9.yml'
   workflow_dispatch:
 
@@ -17,7 +31,7 @@ permissions:
 jobs:
   verify-doc9:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,26 +39,30 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Generate DOC-9 evidence
-        run: npx tsx scripts/docs/doc9-generate.ts
-      - name: Refresh DOC-1 manifests for the fully migrated corpus
-        run: npm run docs:generate:doc1
-      - name: Verify source classification and zero legacy-only active features
+
+      - name: Full DOC-9 migration and prior-phase verification
+        run: npm run docs:verify:doc9
+
+      - name: Verify hard completion gates
         run: |
-          node -e "const x=require('./generated/docs-doc9/classification-summary.json'); if(x.unclassified!==0) process.exit(1)"
+          node -e "const x=require('./generated/docs-doc9/classification-summary.json'); if(x.unclassified!==0 || x.blocked!==0) process.exit(1)"
           node -e "const x=require('./generated/docs-doc9/legacy-only-features.json'); if(x.active_feature_legacy_only_count!==0) process.exit(1)"
           node -e "const x=require('./generated/docs-doc9/orphan-content-audit.json'); if(x.status!=='PASS') process.exit(1)"
-      - name: Prior documentation phase regression chain
-        run: npm run docs:verify:doc6
-      - name: Typecheck
-        run: npm run typecheck
+          node -e "const x=require('./generated/docs-doc9/duplicate-content-audit.json'); if(x.status!=='PASS') process.exit(1)"
+          node -e "const x=require('./generated/docs-doc9/heading-links.json'); if(x.status!=='PASS') process.exit(1)"
+          node -e "const x=require('./generated/docs-doc9/redirect-verification.json'); if(x.status!=='PASS') process.exit(1)"
+          node -e "const x=require('./generated/docs-doc9/navigation-coverage.json'); if(x.status!=='PASS') process.exit(1)"
+
       - name: Production build
         run: npm run build
-      - name: Browser/search smoke
+
+      - name: Browser and search smoke
         run: npm run docs:browser:doc6
+
       - name: Archive deterministic DOC-9 evidence
         uses: actions/upload-artifact@v4
         with:
           name: docs-doc9-evidence
           path: generated/docs-doc9
           if-no-files-found: error
+          retention-days: 30
