@@ -61,12 +61,12 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
             GIF/video workflows and procedural audio. This page separates what ships now from the future engine roadmap.
           </p>
           <div className="mb-6 flex flex-wrap gap-3">
-            <Link href="/docs/getting-started" className="btn btn-primary !px-5 !py-3">
+            <Link href="/docs/getting-started" prefetch={false} className="btn btn-primary !px-5 !py-3">
               <BookOpenIcon className="h-5 w-5" />
               Start with the docs
               <ArrowRightIcon className="h-4 w-4" />
             </Link>
-            <Link href={example.href} className="btn btn-secondary !px-5 !py-3">
+            <Link href={example.href} prefetch={false} className="btn btn-secondary !px-5 !py-3">
               <CheckBadgeIcon className="h-5 w-5" />
               Open verified example
             </Link>
@@ -104,7 +104,7 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
             <div className="border-t" style={{ borderColor: 'var(--border-subtle)', backgroundColor: 'var(--bg-canvas)' }}>
               <div className="flex items-center justify-between gap-3 border-b px-4 py-2" style={{ borderColor: 'var(--border-subtle)' }}>
                 <span className="font-mono text-[11px]" style={{ color: 'var(--text-tertiary)' }}>authoritative source</span>
-                <Link href={example.href} className="text-xs font-bold" style={{ color: 'var(--accent-iris)' }}>
+                <Link href={example.href} prefetch={false} className="text-xs font-bold" style={{ color: 'var(--accent-iris)' }}>
                   source + verification →
                 </Link>
               </div>
@@ -142,12 +142,12 @@ export function CapabilitySection({ model }: { model: ProductExperienceModel }) 
               <p className="mb-4 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{capability.summary}</p>
               {capability.note ? <p className="mb-4 text-xs leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>{capability.note}</p> : null}
               <div className="flex flex-wrap gap-2">
-                <Link href={capability.apiHref} className="chip">
+                <Link href={capability.apiHref} prefetch={false} className="chip">
                   <CodeBracketIcon className="h-3.5 w-3.5" />
                   {capability.apiMember}()
                 </Link>
                 {capability.example ? (
-                  <Link href={capability.example.href} className="chip">
+                  <Link href={capability.example.href} prefetch={false} className="chip">
                     <CheckBadgeIcon className="h-3.5 w-3.5" />
                     verified example
                   </Link>
@@ -183,8 +183,8 @@ export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
               </div>
               <p className="mb-5 text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{track.summary}</p>
               <div className="flex flex-wrap gap-2">
-                {track.api.map((api) => <Link key={api.name} href={api.href} className="chip">{api.name}()</Link>)}
-                {track.example ? <Link href={track.example.href} className="chip">verified example →</Link> : null}
+                {track.api.map((api) => <Link key={api.name} href={api.href} prefetch={false} className="chip">{api.name}()</Link>)}
+                {track.example ? <Link href={track.example.href} prefetch={false} className="chip">verified example →</Link> : null}
               </div>
             </article>
           ))}
@@ -206,7 +206,7 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
         />
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
           {model.galleryExamples.map((example) => (
-            <Link key={example.id} href={example.href} className="group overflow-hidden rounded-2xl border surface-elevated lift" style={{ borderColor: 'var(--border-default)' }}>
+            <Link key={example.id} href={example.href} prefetch={false} className="group overflow-hidden rounded-2xl border surface-elevated lift" style={{ borderColor: 'var(--border-default)' }}>
               <div className="relative aspect-[4/3]" style={{ backgroundColor: 'var(--bg-sunken)' }}>
                 <Image
                   src={example.preview}
@@ -229,7 +229,7 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
           ))}
         </div>
         <div className="mt-7">
-          <Link href="/gallery" className="btn btn-secondary">
+          <Link href="/gallery" prefetch={false} className="btn btn-secondary">
             Explore the full Gallery <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>
@@ -301,7 +301,7 @@ function FooterGroup({ title, links }: { title: string; links: Array<[string, st
       <h2 className="mb-3 text-xs font-black uppercase tracking-[0.18em]" style={{ color: 'var(--text-tertiary)' }}>{title}</h2>
       <ul className="space-y-2">
         {links.map(([label, href]) => (
-          <li key={href}><Link href={href} className="text-sm hover:underline" style={{ color: 'var(--text-secondary)' }}>{label}</Link></li>
+          <li key={href}><Link href={href} prefetch={href.startsWith('/') ? false : undefined} className="text-sm hover:underline" style={{ color: 'var(--text-secondary)' }}>{label}</Link></li>
         ))}
       </ul>
     </nav>
