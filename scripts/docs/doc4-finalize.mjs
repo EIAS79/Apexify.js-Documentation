@@ -26,8 +26,8 @@ if (intentionalRouteExpansion && normalizedBuildPercent > 35) {
   failures.push(`route-normalized build regression ${normalizedBuildPercent}% > 35%`);
 }
 if (build.after.complexApiRouteJsBytes > 1_400_000) failures.push(`API routed JS ${build.after.complexApiRouteJsBytes} > 1.4MB budget`);
-if (build.after.optionSearchIslandJsBytes > 250_000) failures.push(`OptionTable island ${build.after.optionSearchIslandJsBytes} > 250KB`);
-if (build.after.typeExplorerIslandJsBytes > 250_000) failures.push(`TypeExplorer island ${build.after.typeExplorerIslandJsBytes} > 250KB`);
+if (build.after.optionSearchIslandJsBytes > 250_000) failures.push(`OptionTable incremental island JS ${build.after.optionSearchIslandJsBytes} > 250KB`);
+if (build.after.typeExplorerIslandJsBytes > 250_000) failures.push(`TypeExplorer incremental island JS ${build.after.typeExplorerIslandJsBytes} > 250KB`);
 if (build.after.extractionMs > 30_000) failures.push(`extraction ${build.after.extractionMs}ms > 30s`);
 if (coverage.missingPublicExports.length || coverage.staleDocumentedExports.length || coverage.signatureMismatches.length) failures.push('API coverage drift');
 if (options.missing.length || options.total !== options.documented) failures.push('option coverage drift');
@@ -45,6 +45,16 @@ const evidence = {
     intentionalRouteExpansion,
     normalizedBuildPercent,
   },
+  bundleAttribution: {
+    methodology: build.methodology,
+    sharedIslandJsBytes: build.after.sharedIslandJsBytes,
+    signatureDirectJsBytes: build.after.signatureIslandDirectJsBytes,
+    optionDirectJsBytes: build.after.optionSearchIslandDirectJsBytes,
+    typeExplorerDirectJsBytes: build.after.typeExplorerIslandDirectJsBytes,
+    signatureIncrementalJsBytes: build.after.signatureIslandJsBytes,
+    optionIncrementalJsBytes: build.after.optionSearchIslandJsBytes,
+    typeExplorerIncrementalJsBytes: build.after.typeExplorerIslandJsBytes,
+  },
   metrics: {
     build: build.after,
     delta: build.delta,
@@ -59,4 +69,4 @@ const evidence = {
 };
 fs.writeFileSync(path.join(OUT, 'final.json'), `${JSON.stringify(evidence, null, 2)}\n`);
 if (failures.length) throw new Error(`[doc4-finalize] ${failures.join('; ')}`);
-console.log('[doc4-finalize] PASS ' + JSON.stringify(evidence.metrics));
+console.log('[doc4-finalize] PASS ' + JSON.stringify({ metrics: evidence.metrics, bundleAttribution: evidence.bundleAttribution }));
