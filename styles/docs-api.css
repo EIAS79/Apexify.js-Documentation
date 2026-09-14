@@ -24,7 +24,10 @@
 
 .apx-api-signature pre { overflow-x:auto; max-width:100%; }
 .apx-api-token-comment { color:var(--text-tertiary); font-style:italic; }
-.apx-api-token-string { color:var(--success); }
-.apx-api-token-number,.apx-api-token-literal { color:var(--accent-amber); }
-.apx-api-token-keyword { color:var(--accent-iris); font-weight:650; }
+.apx-api-token-string { color:#064a36; }
+.apx-api-token-number,.apx-api-token-literal { color:#7a4800; }
+.apx-api-token-keyword { color:#3527c9; font-weight:650; }
+.dark .apx-api-token-string { color:var(--success); }
+.dark .apx-api-token-number,.dark .apx-api-token-literal { color:var(--accent-amber); }
+.dark .apx-api-token-keyword { color:var(--accent-iris); }
 .apx-api-enum-inline { display:inline-flex; flex-wrap:wrap; gap:.25rem; }
