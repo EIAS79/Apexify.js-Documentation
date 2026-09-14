@@ -65,7 +65,11 @@ async function visit(route, { width = 1365, height = 900, theme = 'light', reduc
     for (const token of fixtureTokens) if (text.includes(token)) throw new Error(`${route}: fixture token leaked into production UI: ${token}`);
   }
   await page.addScriptTag({ content: axeSource });
-  const violations = await page.evaluate(async () => (await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] } })).violations.map((item) => ({ id: item.id, impact: item.impact, nodes: item.nodes.length })));
+  const violations = await page.evaluate(async () => (await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] } })).violations.map((item) => ({
+    id: item.id,
+    impact: item.impact,
+    nodes: item.nodes.map((node) => ({ target: node.target, html: node.html, failureSummary: node.failureSummary })),
+  })));
   if (violations.length) throw new Error(`${route}: axe ${JSON.stringify(violations)}`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
   if (overflow) throw new Error(`${route}: horizontal overflow`);
