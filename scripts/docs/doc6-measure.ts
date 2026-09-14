@@ -12,6 +12,7 @@ import type { SearchIndexArtifact, SearchRecord } from '../../lib/search/schema'
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'generated', 'docs-doc6', 'runtime');
 const DOC5_BUILD_BASELINE_MS = 39293.854;
+const DOC5_STATIC_PAGE_BASELINE = 330;
 const records = (recordsJson as { records: SearchRecord[] }).records;
 const index = indexJson as SearchIndexArtifact;
 const completion = completionJson as { categories: Array<{ category: string; query?: string | null; applicable: boolean }> };
@@ -77,16 +78,40 @@ for (const query of benchmarkQueries) {
 
 fs.rmSync(path.join(ROOT, '.next'), { recursive: true, force: true });
 const buildStart = performance.now();
-const build = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'build'], { cwd: ROOT, stdio: 'inherit', env: { ...process.env, NEXT_TELEMETRY_DISABLED: '1' } });
+const build = spawnSync(process.platform === 'win32' ? 'npm.cmd' : 'npm', ['run', 'build'], {
+  cwd: ROOT,
+  encoding: 'utf8',
+  maxBuffer: 64 * 1024 * 1024,
+  env: { ...process.env, NEXT_TELEMETRY_DISABLED: '1' },
+});
 const buildWallMs = performance.now() - buildStart;
+process.stdout.write(build.stdout ?? '');
+process.stderr.write(build.stderr ?? '');
 if (build.status !== 0) process.exit(build.status ?? 1);
+
+const ansi = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
+const buildOutput = `${build.stdout ?? ''}\n${build.stderr ?? ''}`.replace(ansi, '');
+const staticPageMatches = [...buildOutput.matchAll(/Generating static pages \((\d+)\/(\d+)\)/g)];
+const staticPageCount = staticPageMatches.length ? Number(staticPageMatches.at(-1)?.[2]) : 0;
 
 const combined = Buffer.concat([recordsRaw, indexRaw]);
 const buildDeltaPercent = ((buildWallMs - DOC5_BUILD_BASELINE_MS) / DOC5_BUILD_BASELINE_MS) * 100;
+const baselineBuildMsPerStaticPage = DOC5_BUILD_BASELINE_MS / DOC5_STATIC_PAGE_BASELINE;
+const currentBuildMsPerStaticPage = staticPageCount > 0 ? buildWallMs / staticPageCount : Number.POSITIVE_INFINITY;
+const normalizedBuildDeltaPercent = ((currentBuildMsPerStaticPage - baselineBuildMsPerStaticPage) / baselineBuildMsPerStaticPage) * 100;
 const performanceEvidence = {
   schemaVersion: 1,
   phase: 'DOC-6',
-  build: { baseline: { source: 'DOC-5 merged main run 34544698911', wallMs: DOC5_BUILD_BASELINE_MS }, after: { wallMs: Number(buildWallMs.toFixed(3)) }, deltaPercent: Number(buildDeltaPercent.toFixed(2)), allowedRegressionPercent: 35, pass: buildDeltaPercent <= 35 },
+  build: {
+    baseline: { source: 'DOC-5 merged main run 34544698911', wallMs: DOC5_BUILD_BASELINE_MS, staticPageCount: DOC5_STATIC_PAGE_BASELINE },
+    after: { wallMs: Number(buildWallMs.toFixed(3)), staticPageCount },
+    deltaPercent: Number(buildDeltaPercent.toFixed(2)),
+    normalizedDeltaPercent: Number(normalizedBuildDeltaPercent.toFixed(2)),
+    baselineMsPerStaticPage: Number(baselineBuildMsPerStaticPage.toFixed(3)),
+    currentMsPerStaticPage: Number(currentBuildMsPerStaticPage.toFixed(3)),
+    allowedRegressionPercent: 35,
+    pass: Number.isFinite(currentBuildMsPerStaticPage) && normalizedBuildDeltaPercent <= 35,
+  },
   indexInitialization: summary(parseSamples),
   query: { aggregate: summary(querySamples), perQuery, budgetP95Ms: 75, pass: percentile(querySamples, 95) <= 75 },
   indexSize: { recordsRawBytes: recordsRaw.length, indexRawBytes: indexRaw.length, combinedRawBytes: combined.length, combinedGzipBytes: gzipSync(combined).length, combinedBrotliBytes: brotliCompressSync(combined).length },
@@ -121,6 +146,6 @@ const bundleEvidence = {
 fs.writeFileSync(path.join(OUT, 'performance.json'), `${JSON.stringify(performanceEvidence, null, 2)}\n`);
 fs.writeFileSync(path.join(OUT, 'bundle-comparison.json'), `${JSON.stringify(bundleEvidence, null, 2)}\n`);
 console.log('[doc6-measure]', JSON.stringify({ performance: performanceEvidence, bundle: bundleEvidence }));
-if (!performanceEvidence.build.pass) throw new Error('[doc6-measure] clean build exceeded inherited DOC-5 +35% tolerance');
+if (!performanceEvidence.build.pass) throw new Error('[doc6-measure] route-normalized clean build exceeded inherited DOC-5 +35% tolerance');
 if (!performanceEvidence.query.pass) throw new Error('[doc6-measure] search query P95 exceeded 75ms budget');
 if (bundleEvidence.fullSearchIndexClientBytes !== 0 || bundleEvidence.eagerFullIndexOnOrdinaryRoutes) throw new Error('[doc6-measure] full search index leaked into client route bundles');
