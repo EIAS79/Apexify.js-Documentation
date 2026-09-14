@@ -15,7 +15,7 @@ export function ApiMethodHeader({ symbol, member }: { symbol:ApiSymbol; member?:
     <h1>{member?<><span>{member.owner}.</span>{member.name}</>:symbol.symbol}</h1>
     <p>{item.summary}</p>
     <div className="apx-api-badges">
-      <PackageBadge value="apexify.js" />
+      <PackageBadge value={symbol.package} />
       <span className="apx-badge" data-status={item.stability.toLowerCase()}>{item.stability}</span>
       {item.runtimeTargets.map(r=><span key={r} className="apx-badge" data-kind="runtime">{r}</span>)}
       {item.since?<span className="apx-badge" data-kind="since">Since {item.since}</span>:null}
