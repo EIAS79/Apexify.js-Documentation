@@ -41,11 +41,39 @@ function sortValue(value: unknown): unknown {
 function json(value: unknown): string { return `${JSON.stringify(sortValue(value), null, 2)}\n`; }
 function digest(value: unknown): string { return createHash('sha256').update(json(value)).digest('hex'); }
 function readText(relative: string): string { return fs.readFileSync(path.join(ROOT, relative), 'utf8'); }
-function readJson<T>(relative: string): T { return JSON.parse(readText(relative)) as T; }
 function flattenOptions(options = FUTURE_NESTED_OPTIONS): typeof FUTURE_NESTED_OPTIONS { return options.flatMap((item) => [item, ...flattenOptions(item.children)]); }
+function optionFragment(pathValue: string): string { return `option-${pathValue.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase()}`; }
+
+const fixtureOptionSearchRecords: SearchRecord[] = flattenOptions().map((item) => {
+  const webOnly = item.runtimeTargets.length > 0 && item.runtimeTargets.every((runtime) => runtime === 'web' || runtime === 'worker');
+  const packageName = webOnly ? '@apexify/web' : '@apexify/core';
+  const symbolName = webOnly ? 'WebPainterFixture' : 'CoreSharedFixture';
+  const href = `${buildFixtureApiHref(packageName, symbolName)}#${optionFragment(item.path)}`;
+  return {
+    id: `doc10:option:${item.id}`,
+    kind: 'api-option',
+    title: item.path,
+    description: item.description,
+    href,
+    canonicalHref: href,
+    breadcrumb: ['FIXTURE', packageName, symbolName, item.path],
+    runtime: item.runtimeTargets,
+    packages: [packageName],
+    stability: item.stability,
+    version: '0.0.0-fixture',
+    domain: 'future-option-fixture',
+    symbol: symbolName,
+    optionPath: item.path,
+    keywords: ['fixture', item.name, ...(item.capabilityIds ?? []), ...(item.allowedValues ?? []).map(String)],
+    aliases: [item.name],
+    goals: ['DOC-10 future option search readiness'],
+    sourceId: item.id,
+  };
+});
 
 const fixtureSearchRecords: SearchRecord[] = [
   ...FUTURE_API_FIXTURES.flatMap((manifest) => manifest.symbols.map((symbol) => ({ id: `doc10:${symbol.id}`, kind: 'api-symbol' as const, title: symbol.symbol, description: symbol.summary, href: symbol.href, canonicalHref: symbol.href, breadcrumb: ['FIXTURE', manifest.package.name, symbol.symbol], runtime: symbol.runtimeTargets, packages: [manifest.package.name], stability: 'ROADMAP', version: '0.0.0-fixture', domain: 'future-api-fixture', symbol: symbol.symbol, keywords: ['fixture', ...symbol.runtimeTargets], aliases: [], goals: ['DOC-10 future API route readiness'], sourceId: symbol.id }))),
+  ...fixtureOptionSearchRecords,
   ...FUTURE_CAPABILITIES.map((item) => ({ id: `doc10:capability:${item.id}`, kind: 'doc' as const, title: item.name, description: 'DOC-10 fixture capability metadata.', href: `/docs/capabilities/${item.id}`, canonicalHref: `/docs/capabilities/${item.id}`, breadcrumb: ['FIXTURE', 'Capabilities', item.name], runtime: item.runtime, packages: item.packages, stability: 'ROADMAP', version: '0.0.0-fixture', domain: 'capability', keywords: [item.id, item.name, 'fixture'], aliases: [], goals: ['capability fixture'], sourceId: `fixture-capability:${item.id}` })),
   ...FUTURE_DIAGNOSTICS.map((item) => ({ id: `doc10:diagnostic:${item.code}`, kind: 'diagnostic' as const, title: item.code, description: item.meaning, href: `/docs/errors/${item.code.toLowerCase()}`, canonicalHref: `/docs/errors/${item.code.toLowerCase()}`, breadcrumb: ['FIXTURE', 'Diagnostics', item.code], runtime: item.runtime, packages: [], stability: 'ROADMAP', version: '0.0.0-fixture', domain: 'diagnostic', errorCode: item.code, keywords: ['fixture', item.class, ...item.evidenceFields], aliases: [], goals: [item.recommendedFix], sourceId: `fixture-diagnostic:${item.code}` })),
 ];
@@ -54,7 +82,7 @@ function fixtureSearchIndex(records: SearchRecord[]): SearchIndexArtifact {
   const tokens: Record<string, string[]> = {};
   const prefixes: Record<string, string[]> = {};
   for (const record of records) {
-    const terms = [record.title, record.description ?? '', record.symbol ?? '', record.errorCode ?? '', ...record.keywords, ...record.packages, ...record.runtime];
+    const terms = [record.title, record.description ?? '', record.symbol ?? '', record.optionPath ?? '', record.errorCode ?? '', ...record.keywords, ...record.packages, ...record.runtime];
     for (const token of [...new Set(terms.flatMap(tokenizeSearchText))]) {
       tokens[token] ??= [];
       tokens[token].push(record.id);
@@ -137,7 +165,7 @@ const artifacts: Record<string, unknown> = {
   'package-navigator.json': { schemaVersion, status: 'PASS', cases: packageNavigator },
   'version-readiness.json': { schemaVersion, status: 'PASS', productionSelectorEnabled: false, fixtures: FUTURE_VERSION_FIXTURES },
   'support-matrix.json': { schemaVersion, status: 'PASS', ...FUTURE_SUPPORT_MATRIX },
-  'option-table-readiness.json': { schemaVersion, status: 'PASS', flattenedPaths: flattenOptions().map((item) => ({ path: item.path, runtime: item.runtimeTargets, capabilities: item.capabilityIds ?? [], defaultState: item.defaultState, stability: item.stability, deepLink: `#option-${item.path.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase()}` })) },
+  'option-table-readiness.json': { schemaVersion, status: 'PASS', flattenedPaths: flattenOptions().map((item) => ({ path: item.path, runtime: item.runtimeTargets, capabilities: item.capabilityIds ?? [], defaultState: item.defaultState, stability: item.stability, deepLink: `#${optionFragment(item.path)}` })) },
   'api-package-routes.json': { schemaVersion, status: 'PASS WITH ADAPTER', scopedEncoding: 'percent-encoded package route segment', routes: apiRoutes, unknownPackageResolves: false, unknownSymbolResolves: false },
   'browser-playground-shell.json': { schemaVersion, status: 'PASS WITH ADAPTER', fixture: true, rendererImplemented: false, reuses: ['InteractiveWorkspace', 'DiagnosticsPanel', 'OptionTable'], states: ['no-adapter', 'adapter-contract', 'unsupported-capability', 'runtime-error', 'diagnostic-result', 'reset', 'mobile', 'reduced-motion'] },
   'animation-playground-shell.json': { schemaVersion, status: 'PASS WITH ADAPTER', fixture: true, engineImplemented: false, reuses: ['InteractiveWorkspace', 'DiagnosticsPanel'], controls: ['duration', 'delay', 'easing', 'repeat', 'playback-rate', 'property', 'pause', 'seek', 'replay', 'reduced-motion'] },
