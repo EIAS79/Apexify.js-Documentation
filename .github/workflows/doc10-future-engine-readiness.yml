@@ -145,7 +145,17 @@ jobs:
         shell: bash
         run: |
           ! curl --fail --silent http://127.0.0.1:3000/sitemap.xml | grep -q '__docs-fixtures'
-          node -e "fetch('http://127.0.0.1:3000/api/docs/search?q=WebPainterFixture').then(r=>r.json()).then(x=>{if(x.total!==0)process.exit(1)})"
+          node - <<'NODE'
+          const markers=['0.0.0-fixture','FIXTURE-APX-','WebPainterFixture','ReactCanvasFixture','NextBoundaryFixture','@apexify/core','@apexify/node','@apexify/web','@apexify/react','@apexify/next','/__docs-fixtures/'];
+          const queries=['WebPainterFixture','FIXTURE-APX-WEB-001'];
+          Promise.all(queries.map(async query=>{
+            const response=await fetch(`http://127.0.0.1:3000/api/docs/search?q=${encodeURIComponent(query)}`);
+            if(!response.ok) throw new Error(`search HTTP ${response.status}`);
+            const payload=await response.json();
+            const leaks=(payload.results||[]).filter(result=>markers.some(marker=>JSON.stringify(result).includes(marker)));
+            if(leaks.length) throw new Error(`fixture search leak for ${query}: ${JSON.stringify(leaks.slice(0,3))}`);
+          })).catch(error=>{console.error(error);process.exit(1)});
+          NODE
 
       - name: Archive DOC-10 evidence
         if: always()
