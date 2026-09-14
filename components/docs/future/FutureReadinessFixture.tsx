@@ -20,7 +20,7 @@ import {
 const diagnostic = FUTURE_DIAGNOSTICS[0];
 
 function PlaceholderEditor({ label }: { label: string }) {
-  return <section aria-label={`${label} editor slot`} className="h-full overflow-auto rounded-lg p-4" style={{ background: 'var(--bg-sunken)', border: '1px solid var(--border-default)' }}><h3>{label} editor slot</h3><pre><code>{'// TEST-ONLY fixture\n// No future Apexify package is imported or executed.'}</code></pre></section>;
+  return <section tabIndex={0} aria-label={`${label} editor slot`} className="h-full overflow-auto rounded-lg p-4" style={{ background: 'var(--bg-sunken)', border: '1px solid var(--border-default)' }}><h3>{label} editor slot</h3><pre><code>{'// TEST-ONLY fixture\n// No future Apexify package is imported or executed.'}</code></pre></section>;
 }
 
 function PlaceholderPreview({ kind, reducedMotion }: { kind: string; reducedMotion?: boolean }) {
