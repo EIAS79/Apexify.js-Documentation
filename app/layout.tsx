@@ -33,4 +33,4 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
   },
 };
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} /></head><body className={`${inter.className} ${inter.variable}`}><ThemeProvider><SidebarProvider>{children}</SidebarProvider><CustomCursorGate /></ThemeProvider><SpeedInsights /></body></html>; }
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} /></head><body className={`${inter.className} ${inter.variable}`}><ThemeProvider><SidebarProvider>{children}</SidebarProvider><CustomCursorGate /></ThemeProvider>{process.env.VERCEL ? <SpeedInsights /> : null}</body></html>; }
