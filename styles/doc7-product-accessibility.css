@@ -119,3 +119,17 @@ body:has([data-doc7-verified-hero]) pre.max-h-64 {
   max-height: none;
   overflow: visible;
 }
+
+/* DOC-11 reduced-motion contract: a user preference for reduced motion must
+   win over every decorative animation, including component-local animation
+   shorthands and any future utility classes. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
