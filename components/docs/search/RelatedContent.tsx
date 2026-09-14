@@ -1,4 +1,3 @@
-import { NextSteps } from '@/components/mdx/RichDocsComponents';
 import { getRelatedContent } from '@/lib/search/related';
 import type { SearchRecordKind } from '@/lib/search/schema';
 
@@ -32,7 +31,8 @@ export function RelatedContent({
   return (
     <section data-doc6-related-content aria-labelledby={`doc6-related-${sourceId.replace(/[^a-zA-Z0-9_-]+/g, '-')}`}>
       <h2 id={`doc6-related-${sourceId.replace(/[^a-zA-Z0-9_-]+/g, '-')}`}>{title}</h2>
-      <NextSteps>
+      <section className="apx-doc3-card" data-doc3-component="NextSteps" aria-label="Next steps">
+        <h3>Next steps</h3>
         <div className="apx-api-related-grid">
           {items.map((item) => (
             <a className="apx-api-reference-card" key={item.id} href={item.canonicalHref}>
@@ -46,7 +46,7 @@ export function RelatedContent({
             </a>
           ))}
         </div>
-      </NextSteps>
+      </section>
     </section>
   );
 }
