@@ -86,6 +86,7 @@ export function loadDocumentationPages(): DocumentationPage[] {
     );
     const frameworks = metadata.frameworks ?? [];
     const apiSymbols = metadata.apiSymbols ?? [];
+    const capabilities = metadata.capabilities ?? [];
     const keywords = metadata.keywords ?? [];
     const prerequisites = metadata.prerequisites ?? [];
     const related = metadata.related ?? [];
@@ -101,6 +102,7 @@ export function loadDocumentationPages(): DocumentationPage[] {
       ...metadata,
       frameworks,
       apiSymbols,
+      capabilities,
       keywords,
       prerequisites,
       related,
