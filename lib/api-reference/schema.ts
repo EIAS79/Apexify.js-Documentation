@@ -1,5 +1,5 @@
 export type ApiStability = 'CURRENT' | 'PREVIEW' | 'EXPERIMENTAL' | 'ROADMAP' | 'DEPRECATED' | 'REMOVED';
-export type RuntimeTarget = 'node22' | 'node24' | 'node26';
+export type RuntimeTarget = 'node22' | 'node24' | 'node26' | 'web' | 'worker' | 'react' | 'next-server' | 'next-client' | 'shared';
 
 export interface ApiSourceRef {
   declarationPath: string;
@@ -28,6 +28,8 @@ export interface ApiOption {
   allowedValues?: Array<string | number | boolean | null>;
   description: string;
   runtimeTargets: RuntimeTarget[];
+  capabilityIds?: string[];
+  limitIds?: string[];
   animatable?: boolean;
   stability: ApiStability;
   deprecated?: { since?: string; replacement?: string; note?: string };
