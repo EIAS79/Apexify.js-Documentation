@@ -189,4 +189,5 @@ jobs:
             /tmp/doc11-server.log
             /tmp/doc11-base-server.log
           if-no-files-found: warn
+          include-hidden-files: true
           retention-days: 30
