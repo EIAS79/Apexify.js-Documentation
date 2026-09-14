@@ -85,6 +85,39 @@ jobs:
           echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
           "$CHROME" --version
 
+      - name: Build and start bundle-regression baseline
+        shell: bash
+        env:
+          DOC11_COMPARE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+        run: |
+          BASE_SHA="$DOC11_COMPARE_SHA"
+          ZERO_SHA="0000000000000000000000000000000000000000"
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "$ZERO_SHA" ]; then
+            BASE_SHA="$(git rev-parse HEAD^)"
+          fi
+          git cat-file -e "${BASE_SHA}^{commit}"
+          BASE_DIR="$RUNNER_TEMP/doc11-base"
+          rm -rf "$BASE_DIR"
+          git worktree add --detach "$BASE_DIR" "$BASE_SHA"
+          pushd "$BASE_DIR"
+          npm ci
+          npm run build
+          npm start -- -p 3001 > /tmp/doc11-base-server.log 2>&1 &
+          echo $! > /tmp/doc11-base-server.pid
+          popd
+          ok=0
+          for i in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:3001/docs/getting-started >/dev/null; then ok=1; break; fi
+            sleep 1
+          done
+          if [ "$ok" -ne 1 ]; then
+            cat /tmp/doc11-base-server.log || true
+            exit 1
+          fi
+          echo "DOC11_BUNDLE_BASE_URL=http://127.0.0.1:3001" >> "$GITHUB_ENV"
+          echo "DOC11_BUNDLE_BASE_SHA=$BASE_SHA" >> "$GITHUB_ENV"
+          echo "DOC-11 bundle baseline: $BASE_SHA"
+
       - name: Start production server
         shell: bash
         run: |
@@ -154,5 +187,6 @@ jobs:
             generated/verification/doc-11
             .doc11-lighthouse
             /tmp/doc11-server.log
+            /tmp/doc11-base-server.log
           if-no-files-found: warn
           retention-days: 30
