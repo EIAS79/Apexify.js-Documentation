@@ -67,14 +67,18 @@ test('nested options retain runtime, capability, default and deprecation metadat
 });
 
 test('DOC-5 validator accepts isolated future fixture roots without weakening production defaults', () => {
-  validateExampleDefinitions(FUTURE_EXAMPLE_FIXTURES, {
+  const fixtureContext = {
     docs: new Set(['/docs/getting-started']),
     apiIds: new Set(FUTURE_API_FIXTURES.flatMap((manifest) => manifest.symbols.map((symbol) => symbol.id))),
     files: new Set(FUTURE_EXAMPLE_FIXTURES.flatMap((item) => item.sourceFiles)),
+  };
+  validateExampleDefinitions(FUTURE_EXAMPLE_FIXTURES, {
+    ...fixtureContext,
     requiredPackages: [],
     sourceRoots: { node: ['fixtures/docs-future/examples/'], web: ['fixtures/docs-future/examples/'], react: ['fixtures/docs-future/examples/'], 'next-server': ['fixtures/docs-future/examples/'], 'next-client': ['fixtures/docs-future/examples/'], shared: ['fixtures/docs-future/examples/'] },
   });
-  assert.throws(() => validateExampleDefinitions([FUTURE_EXAMPLE_FIXTURES[1]], { docs: new Set(['/docs/getting-started']), apiIds: new Set(FUTURE_API_FIXTURES.flatMap((manifest) => manifest.symbols.map((symbol) => symbol.id))), files: new Set(FUTURE_EXAMPLE_FIXTURES[1].sourceFiles) }), /no authoritative source root configured for runtime web/);
+  assert.throws(() => validateExampleDefinitions([FUTURE_EXAMPLE_FIXTURES[1]], { ...fixtureContext, files: new Set(FUTURE_EXAMPLE_FIXTURES[1].sourceFiles) }), /required package is missing: apexify\.js/);
+  assert.throws(() => validateExampleDefinitions([FUTURE_EXAMPLE_FIXTURES[1]], { ...fixtureContext, files: new Set(FUTURE_EXAMPLE_FIXTURES[1].sourceFiles), requiredPackages: [] }), /no authoritative source root configured for runtime web/);
 });
 
 test('runtime and package switchers preserve topic context and never fabricate missing routes', () => {
