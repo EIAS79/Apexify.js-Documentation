@@ -33,6 +33,7 @@ export const DOCUMENTATION_RUNTIMES = [
   'react',
   'next-server',
   'next-client',
+  'shared',
   'distributed',
 ] as const;
 
@@ -71,6 +72,7 @@ export interface DocumentationFrontmatter {
   replacedBy?: string;
   feature?: string;
   apiSymbols?: string[];
+  capabilities?: string[];
   keywords?: string[];
   prerequisites?: string[];
   related?: string[];
@@ -91,6 +93,7 @@ export interface DocumentationHeading {
 type NormalizedDocumentationFields =
   | 'frameworks'
   | 'apiSymbols'
+  | 'capabilities'
   | 'keywords'
   | 'prerequisites'
   | 'related'
@@ -109,6 +112,7 @@ export interface DocumentationPage
   extends Omit<DocumentationFrontmatter, NormalizedDocumentationFields> {
   frameworks: string[];
   apiSymbols: string[];
+  capabilities: string[];
   keywords: string[];
   prerequisites: string[];
   related: string[];
@@ -245,6 +249,7 @@ export function validateDocumentationFrontmatter(
     replacedBy: optionalString(raw.replacedBy, sourcePath, 'replacedBy'),
     feature: optionalString(raw.feature, sourcePath, 'feature'),
     apiSymbols: stringArray(raw.apiSymbols, sourcePath, 'apiSymbols') ?? [],
+    capabilities: stringArray(raw.capabilities, sourcePath, 'capabilities') ?? [],
     keywords: stringArray(raw.keywords, sourcePath, 'keywords') ?? [],
     prerequisites: stringArray(raw.prerequisites, sourcePath, 'prerequisites') ?? [],
     related: stringArray(raw.related, sourcePath, 'related') ?? [],
