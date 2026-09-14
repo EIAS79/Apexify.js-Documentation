@@ -98,7 +98,12 @@
     "docs:test:doc10": "tsx --test scripts/docs/doc10.test.ts",
     "docs:audit:doc10": "npm run docs:generate:doc10 && tsx scripts/docs/doc10-generate.ts --check && npm run docs:test:doc10 && npm run docs:verify:fixture-isolation",
     "docs:browser:doc10": "node scripts/docs/doc10-browser-verify.mjs",
-    "docs:verify:doc10": "npm run docs:audit:doc10 && npm run docs:verify:doc9 && npm run verify:docs && npm run typecheck"
+    "docs:verify:doc10": "npm run docs:audit:doc10 && npm run docs:verify:doc9 && npm run verify:docs && npm run typecheck",
+    "docs:audit:doc11": "node scripts/docs/doc11-static-audit.mjs",
+    "docs:browser:doc11": "node scripts/docs/doc11-browser-verify.mjs",
+    "docs:lighthouse:doc11": "node scripts/docs/doc11-lighthouse-summary.mjs",
+    "docs:verify:evidence:doc11": "node scripts/docs/doc11-evidence-verify.mjs",
+    "docs:verify:doc11": "npm run docs:verify:doc10 && npm run docs:audit:doc11 && npm run typecheck && npm run build && npm run docs:verify:evidence:doc11"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
