@@ -16,6 +16,7 @@ const apiManifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'generat
 const representativeSymbol = apiManifest.symbols.find((item) => item.id === apiManifest.representativeApiId) ?? apiManifest.symbols[0];
 const apiRoute = representativeSymbol?.href ?? '/api-reference';
 const fixtureTokens = ['0.0.0-fixture', 'FIXTURE-APX-', 'WebPainterFixture', 'ReactCanvasFixture', 'NextBoundaryFixture'];
+const fixtureSearchMarkers = [...fixtureTokens, '@apexify/core', '@apexify/node', '@apexify/web', '@apexify/react', '@apexify/next', '/__docs-fixtures/'];
 const baseOrigin = new URL(base).origin;
 
 const browser = await puppeteer.launch({ executablePath: chrome, headless: 'new', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
@@ -31,6 +32,22 @@ function expectedLocalMiss(row) {
   return row.status === 404 && url.origin === baseOrigin && (
     url.pathname === '/favicon.ico' || url.pathname === '/_vercel/speed-insights/script.js'
   );
+}
+
+function fixtureLeaksFromSearch(payload) {
+  return (payload.results ?? []).filter((result) => {
+    const serialized = JSON.stringify(result);
+    return fixtureSearchMarkers.some((marker) => serialized.includes(marker));
+  });
+}
+
+async function assertNoFixtureSearchLeak(query, label) {
+  const response = await fetch(`${base}/api/docs/search?q=${encodeURIComponent(query)}`);
+  if (!response.ok) throw new Error(`${label} search request failed: HTTP ${response.status}`);
+  const payload = await response.json();
+  const leaks = fixtureLeaksFromSearch(payload);
+  if (leaks.length) throw new Error(`${label} leaked into production search: ${JSON.stringify(leaks.slice(0, 3))}`);
+  return { query, totalReturned: payload.total ?? (payload.results ?? []).length, fixtureLeaks: 0 };
 }
 
 async function visit(route, { width = 1365, height = 900, theme = 'light', reduced = false, fixture = false } = {}) {
@@ -118,12 +135,14 @@ try {
   await visit('/__docs-fixtures/future-readiness', { fixture: true, width: 768, height: 1024, theme: 'light', reduced: true });
   for (const route of ['/', '/docs/getting-started', '/gallery', '/api-reference']) await visit(route);
 
-  const searchResponse = await fetch(`${base}/api/docs/search?q=WebPainterFixture`).then((response) => response.json());
-  if (searchResponse.total !== 0) throw new Error(`fixture API leaked into production search: ${JSON.stringify(searchResponse.results?.slice?.(0, 3))}`);
-  const diagnosticSearch = await fetch(`${base}/api/docs/search?q=FIXTURE-APX-WEB-001`).then((response) => response.json());
-  if (diagnosticSearch.total !== 0) throw new Error('fixture diagnostic leaked into production search');
+  const searchChecks = [
+    await assertNoFixtureSearchLeak('WebPainterFixture', 'fixture API'),
+    await assertNoFixtureSearchLeak('FIXTURE-APX-WEB-001', 'fixture diagnostic'),
+  ];
+  evidence.push({ kind: 'production-search-isolation', checks: searchChecks });
+
   const sitemap = await fetch(`${base}/sitemap.xml`).then((response) => response.text());
-  if (sitemap.includes('/__docs-fixtures/') || fixtureTokens.some((token) => sitemap.includes(token))) throw new Error('fixture route/data leaked into production sitemap');
+  if (sitemap.includes('/__docs-fixtures/') || fixtureSearchMarkers.some((token) => sitemap.includes(token))) throw new Error('fixture route/data leaked into production sitemap');
 
   for (const route of ['/docs/getting-started', apiRoute, '/studio']) {
     const [before, after] = await Promise.all([transfer(baseline, route), transfer(base, route)]);
@@ -141,4 +160,4 @@ try {
 
 fs.writeFileSync(path.join(outDir, 'browser-verification.json'), `${JSON.stringify({ schemaVersion: 1, status: 'PASS', routes: evidence, productionFixtureLeaks: 0 }, null, 2)}\n`);
 fs.writeFileSync(path.join(outDir, 'bundle-comparison.json'), `${JSON.stringify({ schemaVersion: 1, status: 'PASS', productionBudget: { maxDeltaBytes: 81920, maxDeltaPctWhenByteThresholdExceeded: 10 }, routes: bundle, productionRuntimeDependenciesAdded: 0 }, null, 2)}\n`);
-console.log(`[DOC-10 browser] PASS routes=${evidence.length} production bundle comparisons=3 fixture leaks=0`);
+console.log(`[DOC-10 browser] PASS routes=${evidence.filter((row) => row.route).length} production bundle comparisons=3 fixture leaks=0`);
