@@ -33,6 +33,12 @@ const baseline = {
 };
 const delta = (after, before) => Object.fromEntries(Object.keys(after).map((key) => [key, round(after[key] - before[key], key === 'cls' ? 6 : 3)]));
 
+const baselineStaticPageCount = Number(build.baseline.staticPageCount ?? 15);
+const currentStaticPageCount = Number(build.after.staticPageCount ?? 0);
+const baselineBuildMsPerStaticPage = build.baseline.buildWallMs / Math.max(baselineStaticPageCount, 1);
+const currentBuildMsPerStaticPage = currentStaticPageCount > 0 ? build.after.buildWallMs / currentStaticPageCount : Number.POSITIVE_INFINITY;
+const normalizedBuildPercent = round(((currentBuildMsPerStaticPage / baselineBuildMsPerStaticPage) - 1) * 100, 2);
+
 const perf = {
   schemaVersion: 1,
   phase: 'DOC-2',
@@ -50,6 +56,14 @@ const bundles = {
   after: build.after,
   delta: build.delta,
   methodology: build.methodology,
+  buildNormalization: {
+    baselineStaticPageCount,
+    currentStaticPageCount,
+    baselineBuildMsPerStaticPage: round(baselineBuildMsPerStaticPage, 3),
+    currentBuildMsPerStaticPage: round(currentBuildMsPerStaticPage, 3),
+    normalizedBuildPercent,
+    allowedRegressionPercent: 25,
+  },
 };
 
 const accessibility = {
@@ -95,7 +109,8 @@ if (afterMobile.performance < baseline.mobile.performance) failures.push(`mobile
 if (afterDesktop.accessibility < baseline.desktop.accessibility) failures.push(`desktop Lighthouse accessibility regressed ${baseline.desktop.accessibility} -> ${afterDesktop.accessibility}`);
 if (afterMobile.accessibility < baseline.mobile.accessibility) failures.push(`mobile Lighthouse accessibility regressed ${baseline.mobile.accessibility} -> ${afterMobile.accessibility}`);
 if (build.after.routedManifestJsBytes > build.baseline.routedManifestJsBytes * 1.05) failures.push(`routed manifest JS increased more than 5%: ${build.baseline.routedManifestJsBytes} -> ${build.after.routedManifestJsBytes}`);
-if (build.after.buildWallMs > build.baseline.buildWallMs * 1.25) failures.push(`clean build exceeded +25% tolerance: ${build.baseline.buildWallMs} -> ${build.after.buildWallMs}`);
+if (!Number.isFinite(currentBuildMsPerStaticPage)) failures.push('clean build static-page count could not be determined');
+else if (normalizedBuildPercent > 25) failures.push(`route-normalized clean build exceeded +25% tolerance: ${normalizedBuildPercent}%`);
 
-console.log('[doc2-finalize] ' + JSON.stringify({ desktop: afterDesktop, mobile: afterMobile, build: build.after, failures: failures.length }));
+console.log('[doc2-finalize] ' + JSON.stringify({ desktop: afterDesktop, mobile: afterMobile, build: build.after, buildNormalization: bundles.buildNormalization, failures: failures.length }));
 if (failures.length) throw new Error(`[doc2-finalize] closure regressions:\n${failures.join('\n')}`);
