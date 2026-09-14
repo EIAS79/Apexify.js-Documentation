@@ -87,8 +87,8 @@ export function ExampleCard({ title, description, children }: { title: string; d
 export function ExampleSteps({ title = 'Example walkthrough', children }: { title?: string; children?: ReactNode }) {
   return <section className="apx-doc3-card" data-doc3-component="ExampleSteps" aria-label={title}><h4>{title}</h4>{children}</section>;
 }
-export function Prerequisites({ children }: { children?: ReactNode }) { return <section className="apx-doc3-card" data-doc3-component="Prerequisites" aria-label="Prerequisites"><h4>Prerequisites</h4>{children}</section>; }
-export function NextSteps({ children }: { children?: ReactNode }) { return <section className="apx-doc3-card" data-doc3-component="NextSteps" aria-label="Next steps"><h4>Next steps</h4>{children}</section>; }
+export function Prerequisites({ children }: { children?: ReactNode }) { return <section className="apx-doc3-card" data-doc3-component="Prerequisites" aria-label="Prerequisites"><h3>Prerequisites</h3>{children}</section>; }
+export function NextSteps({ children }: { children?: ReactNode }) { return <section className="apx-doc3-card" data-doc3-component="NextSteps" aria-label="Next steps"><h3>Next steps</h3>{children}</section>; }
 export function CapabilityBadge({ label, status = 'available' }: { label: string; status?: 'available' | 'preview' | 'experimental' | 'unavailable' }) { return <span className="apx-badge" data-kind="capability" data-capability-status={status} data-doc3-component="CapabilityBadge">{label}: {status}</span>; }
 export function ImageResult({ src, alt, caption }: { src: string; alt: string; caption?: string }) { return <figure className="apx-doc3-media" data-doc3-component="ImageResult"><img src={src} alt={alt} />{caption ? <figcaption>{caption}</figcaption> : null}</figure>; }
 export function VideoResult({ src, caption }: { src: string; caption?: string }) { return <figure className="apx-doc3-media" data-doc3-component="VideoResult"><video controls preload="metadata" src={src}>Your browser does not support video playback.</video>{caption ? <figcaption>{caption}</figcaption> : null}</figure>; }
