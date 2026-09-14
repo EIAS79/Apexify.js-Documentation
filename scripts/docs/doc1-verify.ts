@@ -22,17 +22,10 @@ const pages = loadDocumentationPages();
 const sources = discoverDocumentationSources();
 
 if (pages.length < 3) {
-  throw new Error('[doc1-verify] representative migration must contain at least three routed pages');
+  throw new Error('[doc1-verify] canonical documentation architecture must contain at least the original three routed pages');
 }
-if (pages.length > 5) {
-  throw new Error(
-    '[doc1-verify] DOC-1 migration exceeded the representative slice; broad migration belongs to DOC-9',
-  );
-}
-if (sources.length - pages.length < 100) {
-  throw new Error(
-    '[doc1-verify] legacy corpus fallback unexpectedly disappeared; broad migration is out of scope',
-  );
+if (pages.length > sources.length) {
+  throw new Error('[doc1-verify] routed page count cannot exceed discovered documentation sources');
 }
 
 for (const slug of [
@@ -54,7 +47,11 @@ if (canvas?.canonicalPath !== '/docs/node/canvas') {
   throw new Error('[doc1-verify] Canvas legacy identity is not canonicalized');
 }
 
-buildDocumentationNavigation(pages);
+const navigation = buildDocumentationNavigation(pages);
+const navigationCount = navigation.reduce((count, group) => count + group.items.length, 0);
+if (navigationCount !== pages.length) {
+  throw new Error(`[doc1-verify] navigation must cover every routed page exactly once: ${navigationCount}/${pages.length}`);
+}
 
 const catchAll = requireFile('app/docs/[...slug]/page.tsx');
 for (const token of ['generateStaticParams', 'generateMetadata', 'dynamicParams = false', 'notFound()']) {
@@ -90,11 +87,15 @@ if (fs.existsSync(doc6RecordsPath)) {
   };
   const canonicalDocHrefs = new Set(
     (artifact.records ?? [])
-      .filter((record) => record.kind === 'doc' && typeof record.canonicalHref === 'string')
+      .filter(
+        (record) =>
+          (record.kind === 'doc' || record.kind === 'changelog') &&
+          typeof record.canonicalHref === 'string',
+      )
       .map((record) => record.canonicalHref as string),
   );
   for (const page of pages) {
-    if (!canonicalDocHrefs.has(page.canonicalPath)) {
+    if (page.search && !canonicalDocHrefs.has(page.canonicalPath)) {
       throw new Error(`[doc1-verify] DOC-6 search index is missing canonical DOC-1 route: ${page.canonicalPath}`);
     }
   }
@@ -143,5 +144,5 @@ for (const name of generatedRequired) {
 }
 
 console.log(
-  `[doc1-verify] PASS: ${pages.length} routed pages, ${sources.length - pages.length} legacy fallbacks, normalized navigation/search/metadata/redirect controls present.`,
+  `[doc1-verify] PASS: ${pages.length} routed pages, ${sources.length - pages.length} intentional non-routed/legacy sources, normalized navigation/search/metadata/redirect controls present.`,
 );

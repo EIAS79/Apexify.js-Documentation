@@ -1,4 +1,5 @@
 import redirectManifest from '../../generated/docs-doc1/redirect-manifest.json';
+import { resolveDoc9LegacyIdentity } from './doc9-legacy-client';
 
 type RedirectRoute = {
   canonicalPath: string;
@@ -24,10 +25,8 @@ function safeDecode(value: string): string {
 }
 
 /**
- * Legacy document fragments use `/docs#document-id?h=heading-id`.
- * A fragment is never sent to the server, so the `/docs` compatibility
- * client uses this deterministic map to replace migrated identities with
- * canonical route URLs.
+ * URL fragments are browser-only. The compatibility client therefore maps
+ * both DOC-1 aliases and the complete DOC-9 legacy corpus to canonical routes.
  */
 export function resolveLegacyDocumentationFragment(fragment: string): string | null {
   const normalized = fragment.replace(/^#/, '');
@@ -36,7 +35,7 @@ export function resolveLegacyDocumentationFragment(fragment: string): string | n
   const queryIndex = normalized.indexOf('?');
   const rawIdentity = queryIndex >= 0 ? normalized.slice(0, queryIndex) : normalized;
   const identity = safeDecode(rawIdentity);
-  const canonicalPath = byIdentity.get(identity);
+  const canonicalPath = byIdentity.get(identity) ?? resolveDoc9LegacyIdentity(identity);
   if (!canonicalPath) return null;
 
   if (queryIndex < 0) return canonicalPath;

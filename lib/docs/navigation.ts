@@ -1,8 +1,12 @@
 import type { DocumentationPage } from './schema';
 
+/** DOC-9 navigation is intent/taxonomy driven rather than a hand-copied legacy filesystem list. */
 export const DOCUMENTATION_NAVIGATION_MANIFEST = [
-  { id: 'start', label: 'Start', order: 10, pages: ['getting-started'] },
-  { id: 'node', label: 'Node', order: 20, pages: ['node/canvas', 'node/canvas/size-and-coordinates'] },
+  { id: 'start', label: 'Start', order: 10 },
+  { id: 'recipes', label: 'Recipes', order: 20 },
+  { id: 'node', label: 'Node guides', order: 30 },
+  { id: 'advanced', label: 'Advanced', order: 40 },
+  { id: 'architecture', label: 'Architecture & migration', order: 50 },
 ] as const;
 
 export interface DocumentationNavigationItem {
@@ -29,33 +33,44 @@ export interface DocumentationPager { previous: DocumentationNavigationItem | nu
 export interface DocumentationBreadcrumb { label: string; href?: string; }
 export interface DocumentationNavigationFilter { runtime?: DocumentationPage['runtime'][number]; package?: DocumentationPage['package']; }
 
+function groupIdFor(page: DocumentationPage): (typeof DOCUMENTATION_NAVIGATION_MANIFEST)[number]['id'] {
+  if (page.slug === 'overview' || page.slug === 'getting-started' || page.slug.startsWith('start/')) return 'start';
+  if (page.slug.startsWith('recipes/')) return 'recipes';
+  if (page.slug.startsWith('advanced/')) return 'advanced';
+  if (page.slug.startsWith('architecture/') || page.slug.startsWith('migration/')) return 'architecture';
+  return 'node';
+}
+
+function toItem(page: DocumentationPage): DocumentationNavigationItem {
+  return {
+    id: page.id,
+    title: page.title,
+    description: page.description,
+    slug: page.slug,
+    href: page.canonicalPath,
+    kind: page.kind,
+    stability: page.stability,
+    runtime: page.runtime,
+    package: page.package,
+  };
+}
+
 export function buildDocumentationNavigation(pages: DocumentationPage[]): DocumentationNavigationGroup[] {
-  const bySlug = new Map(pages.map((page) => [page.slug, page]));
   const seen = new Set<string>();
-  const groups = DOCUMENTATION_NAVIGATION_MANIFEST.map((group) => ({
-    id: group.id,
-    label: group.label,
-    order: group.order,
-    items: group.pages.map((slug) => {
-      const page = bySlug.get(slug);
-      if (!page) throw new Error(`[docs-navigation] manifest references missing routed page "${slug}"`);
-      if (seen.has(slug)) throw new Error(`[docs-navigation] routed page "${slug}" appears more than once`);
-      seen.add(slug);
-      return {
-        id: page.id,
-        title: page.title,
-        description: page.description,
-        slug: page.slug,
-        href: page.canonicalPath,
-        kind: page.kind,
-        stability: page.stability,
-        runtime: page.runtime,
-        package: page.package,
-      };
-    }),
-  })).sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+  const groups = DOCUMENTATION_NAVIGATION_MANIFEST.map((definition) => ({
+    ...definition,
+    items: pages
+      .filter((page) => groupIdFor(page) === definition.id)
+      .sort((a, b) => a.order - b.order || a.canonicalPath.localeCompare(b.canonicalPath, undefined, { numeric: true }))
+      .map((page) => {
+        if (seen.has(page.slug)) throw new Error(`[docs-navigation] routed page "${page.slug}" appears more than once`);
+        seen.add(page.slug);
+        return toItem(page);
+      }),
+  })).filter((group) => group.items.length > 0);
+
   const missing = pages.filter((page) => !seen.has(page.slug));
-  if (missing.length) throw new Error(`[docs-navigation] routed pages missing from navigation manifest: ${missing.map((page) => page.slug).join(', ')}`);
+  if (missing.length) throw new Error(`[docs-navigation] routed pages missing from navigation taxonomy: ${missing.map((page) => page.slug).join(', ')}`);
   return groups;
 }
 

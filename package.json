@@ -6,8 +6,8 @@
   "engines": { "node": "22.x || 24.x || 26.x", "npm": ">=10" },
   "packageManager": "npm@11.19.1",
   "scripts": {
-    "postinstall": "npm run docs:generate:doc4 && npm run docs:examples:manifest && npm run docs:search:build",
-    "dev": "npm run docs:generate:doc4 && npm run docs:examples:manifest && npm run docs:search:build && next dev",
+    "postinstall": "npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:generate:doc4 && npm run docs:examples:manifest && npm run docs:search:build",
+    "dev": "npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:generate:doc4 && npm run docs:examples:manifest && npm run docs:search:build && next dev",
     "build": "node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && node scripts/docs/doc6-ensure-generated.mjs && next build",
     "start": "next start",
     "lint": "next lint",
@@ -42,7 +42,7 @@
     "docs:audit:doc2": "npm run docs:verify:doc2",
     "docs:generate:doc3": "tsx scripts/docs/doc3-generate.ts",
     "docs:test:doc3": "tsx --test scripts/docs/doc3.test.ts",
-    "docs:verify:doc3": "tsx scripts/docs/doc3-generate.ts --check && tsx --test scripts/docs/doc3.test.ts && tsx scripts/docs/doc3-verify.ts && tsx scripts/docs/doc1-generate.ts && npm run docs:verify:doc2",
+    "docs:verify:doc3": "tsx scripts/docs/doc3-generate.ts --check && tsx --test scripts/docs/doc3.test.ts && tsx scripts/docs/doc3-verify.ts && tsx scripts/docs/doc1-generate.ts && npm run docs:generate:doc2 && npm run docs:verify:doc2",
     "docs:measure:doc3": "node scripts/docs/doc3-build-measure.mjs",
     "docs:browser:doc3": "node scripts/docs/doc3-browser-verify.mjs",
     "docs:finalize:doc3": "node scripts/docs/doc3-finalize.mjs",
@@ -78,7 +78,16 @@
     "docs:measure:doc6": "tsx scripts/docs/doc6-measure.ts",
     "docs:browser:doc6": "node scripts/docs/doc6-browser-verify.mjs",
     "docs:finalize:doc6": "node scripts/docs/doc6-finalize.mjs",
-    "docs:audit:doc6": "npm run docs:verify:doc6"
+    "docs:audit:doc6": "npm run docs:verify:doc6",
+    "docs:generate:doc9": "tsx scripts/docs/doc9-generate.ts",
+    "docs:migration:inventory": "npm run docs:generate:doc9",
+    "docs:migration:verify": "tsx scripts/docs/doc9-generate.ts --check",
+    "docs:lint:doc9": "tsx scripts/docs/doc9-content-lint.ts",
+    "docs:verify:legacy-links": "tsx --test scripts/docs/doc9.test.ts",
+    "docs:verify:feature-completeness": "tsx scripts/docs/doc9-generate.ts --check",
+    "docs:test:doc9": "tsx --test scripts/docs/doc9.test.ts",
+    "docs:audit:doc9": "npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:search:build && npm run docs:generate:doc9 && npm run docs:lint:doc9 && npm run docs:test:doc9",
+    "docs:verify:doc9": "npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:search:build && npm run docs:generate:doc9 && npm run docs:lint:doc9 && npm run docs:migration:verify && npm run docs:test:doc9 && npm run docs:verify:doc6 && npx tsx scripts/docs/doc7-verify.ts && npx tsx --test scripts/docs/doc7.test.ts && npx tsx scripts/docs/doc8-generate.ts --check && npx tsx --test scripts/docs/doc8.test.ts && npx tsx scripts/docs/doc8-verify.ts && npm run verify:docs && npm run typecheck"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
