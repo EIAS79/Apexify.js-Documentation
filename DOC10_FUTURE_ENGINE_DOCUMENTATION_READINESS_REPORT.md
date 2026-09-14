@@ -2,369 +2,228 @@
 
 ## Status
 
-`PARTIAL — BLOCKED`
+`VERIFIED — READY TO MERGE`
 
-Implementation is present on `doc10-future-engine-readiness`. The architecture has been changed only where the DOC-10 fixtures exposed generic deficiencies. PR CI, same-runner baseline comparison, merge, and post-merge verification are still required before this report may state `COMPLETE`.
+DOC-10 implementation is complete on `doc10-future-engine-readiness`. The implementation head `b03e95ff3207f1cb9358cc5624c331ceb5c07ace` passed the full DOC-10 gate and every DOC-1 through DOC-9 regression workflow associated with the PR. This revision replaces the provisional report with measured CI evidence. Merge and post-merge verification are the only remaining closure actions.
 
-## Source authority
+## Scope and authority
 
-Primary authority: `APEXIFY_DOCUMENTATION_ARCHITECTURE_PRE_PHASE_ROADMAP.md` and the DOC-10 master execution prompt. DOC-10 is an architecture simulation/readiness phase only. It does not ship future engine functionality.
+Primary authority is `APEXIFY_DOCUMENTATION_ARCHITECTURE_PRE_PHASE_ROADMAP.md` plus the DOC-10 master execution prompt. DOC-10 is an architecture-readiness simulation only. It does not ship Phase 15 runtime functionality and does not claim that future packages or runtimes exist.
 
 ## Repository identities
 
-- Phase 14-P frozen SHA: `5d9b71f185140d6c3477286b8fb111f293e52b48`
+- Phase 14-P frozen package SHA: `5d9b71f185140d6c3477286b8fb111f293e52b48`
 - package main SHA at DOC-10 start: `2b64087a04411982067cc624031b3de6f663c530`
 - package version: `6.0.0`
-- DOC-0 merge SHA: `573b592942327d451661cd55d50fd237630eb5cf`
-- DOC-1 merge SHA: `c3d0799b8fb67fd7c86d48aceaa8c88e5e3d649f`
-- DOC-2 merge SHA: `6ae3234b3de0e303c0a762f5394ea568c9be2c44`
-- DOC-3 merge SHA: `b5ab2bcf96f68f2bc574c64b512228734c8ccbe6`
-- DOC-4 implementation merge SHA: `9a6911fba5594e771437be1154646d196482c686`
-- DOC-5 implementation merge SHA: `698f7ec860f8e9cfd0fa99c6b620a1a3ce5b4240`
-- DOC-6 merge SHA: `96c4c9ef418fc3ea30a391c89037cc9744d7fdc0`
-- DOC-7 implementation merge SHA: `1e013019a3768f10d1fd9bfc6de5d7879d5e63e7`
-- DOC-8 implementation merge SHA: `4d8d5fef2064211ddd1788b4b7373730a71d1d8b`
 - DOC-9 implementation merge SHA: `ae2eb52e3b69f416fb5a3362d17b6b57ce952b89`
 - DOC-9 completion-record merge / DOC-10 base SHA: `8a8702aaa110e0a5b633ab91d78fa2e8e51b1e12`
 - DOC-10 branch: `doc10-future-engine-readiness`
-- DOC-10 branch SHA at this revision: `4a973a3312ebddfbdfe00eff39ceeb9d206dce3c`
-- DOC-10 merge SHA: pending
-- final docs main SHA: pending
+- verified implementation head: `b03e95ff3207f1cb9358cc5624c331ceb5c07ace`
+- implementation PR: `#34`
+- DOC-10 merge SHA: pending merge
+- final docs main SHA: pending post-merge verification
 
-No Phase 15 branch or implementation PR was found at DOC-10 start.
+No Phase 15 implementation was introduced by DOC-10.
 
-## Starting readiness architecture
+## Architecture delivered
 
-The DOC-0→DOC-9 platform already provided validated page metadata, intent-driven routes/navigation, generated DOC-4 API reference, DOC-5 examples, DOC-6 search/filtering, DOC-8 shared interactive primitives, and DOC-9 full current-content migration. Several future-facing enum values and a Web runtime contract already existed, but simulation exposed narrow generic gaps described below.
+DOC-10 stress-tested the DOC-1 through DOC-9 documentation platform with isolated future-shaped fixtures and fixed only generic architecture gaps exposed by those fixtures. The delivered readiness architecture includes:
 
-## Fixture policy
+- isolated TEST-ONLY / ROADMAP fixtures for future package, runtime, capability and diagnostic shapes;
+- normalized `shared` runtime and page capability metadata in the existing DOC-1 schema;
+- package-agnostic DOC-4 API manifest routing while production still supplies the real `apexify.js` manifest;
+- nested option metadata carrying runtime, capability, limit and deprecation information through the existing OptionTable;
+- generalized DOC-5 example metadata/validation with current strict Node defaults preserved;
+- future navigation taxonomy slots that remain absent until real pages exist;
+- runtime/package/version readiness controls without fake public choices;
+- semantic support matrices and capability badges;
+- browser and animation fixture shells reusing DOC-8 `InteractiveWorkspace` and `DiagnosticsPanel`;
+- Web/animation adapter contracts only, with no fake renderer or engine implementation;
+- isolated fixture search using DOC-6 search structures while production search remains fixture-free;
+- deterministic readiness matrix, gap report, adapter inventory, leak checks and browser evidence;
+- contributor integration playbook for later engine phases.
 
-All future-readiness data lives under `fixtures/docs-future/` or generated DOC-10 evidence. Every future record is explicitly fixture-only, non-publishable, and ROADMAP/TEST-ONLY. Fixture package versions use `0.0.0-fixture`; fixture diagnostics use the unmistakable `FIXTURE-APX-*` prefix.
+## Fixture policy and truth boundary
 
-No nonexistent package is installed or imported.
+Future-shaped records remain under fixture-only architecture and generated DOC-10 evidence. They use explicit ROADMAP/TEST-ONLY identities such as `0.0.0-fixture` versions and `FIXTURE-APX-*` diagnostics. No nonexistent package is installed or imported. No fixture package, API, example, diagnostic, capability, route, install command or version is represented as current product truth.
 
-## Fixture isolation
+The internal `/__docs-fixtures/future-readiness` route remains non-production documentation infrastructure: it is excluded from current navigation, search and sitemap and is browser-tested for isolation.
 
-Production DOC-1, DOC-4, DOC-5 and DOC-6 generated data plus homepage catalog data are scanned for fixture-only identifiers. The internal route `/__docs-fixtures/future-readiness` is `noindex`, is not added to current navigation/search, and is separately checked against production sitemap/search in browser CI.
+## Architecture gaps discovered and resolved
 
-## Simulated package matrix
+1. **Schema gap** — shared runtime and structured page capabilities were not normalized. Resolved in the existing DOC-1 schema.
+2. **API manifest gap** — runtime targets and package routing assumed the first shipped package shape. Resolved with generic runtime metadata and manifest-agnostic routing helpers.
+3. **Example manifest gap** — example schema/validation was Node-only. Resolved with generic runtime metadata and configurable authoritative roots while preserving current defaults.
+4. **Navigation gap** — future scopes would collapse into Node-oriented fallback. Resolved with empty taxonomy slots that materialize only for actual pages.
+5. **Interactive adapter gap** — DOC-8 had a Web execution boundary but no animation playback contract. Resolved with `AnimationRuntimeAdapter` only; no engine code added.
 
-The isolated fixtures cover:
+Generated evidence reports `discovered = 5`, `resolved = 5`, and `required_unresolved_gaps = 0`.
 
-- `@apexify/core`
-- `@apexify/node`
-- `@apexify/web`
-- `@apexify/react`
-- `@apexify/next`
+## Readiness matrix
 
-All are ROADMAP test identities only. They are not install instructions or package-availability claims.
+`generated/docs-doc10/future-readiness-matrix.json` covers the required architecture domains and required columns for metadata, routing, navigation, search, API reference, options, examples, support semantics, interactive shell, diagnostics, switching and adapters. The generator rejects any required `GAP` cell.
 
-## Simulated runtime matrix
+CI hard-gate result: **PASS** with `required_unresolved_gaps = 0`.
 
-The fixture architecture covers Node, Web, React, Next Server, Next Client and Shared runtime identities. DOC-1 gains a generic `shared` runtime value so shared-specification content can be represented without abusing Node or Web identities.
+## Fixture isolation verification
 
-## Versioning readiness
+Static and browser verification cover production docs manifests, API manifests, example manifests, search data, homepage/Gallery data and sitemap behavior.
 
-Fixture version-shaped records cover stable/preview/historical concepts internally. The `VersionSelector` readiness surface remains deliberately disabled. No public fake version choices are activated.
+Final evidence:
 
-## RuntimeNavigator readiness
+- `fixture-leak-check.json`: `PASS`
+- unintended fixture leaks: `0`
+- fixture route indexed: `false`
+- production browser search query `WebPainterFixture`: 30 ordinary fuzzy results returned, **0 fixture leaks**
+- production browser search query `FIXTURE-APX-WEB-001`: `0` results, **0 fixture leaks**
+- production sitemap fixture leakage: none
 
-Equivalent topic records can switch among Node/Web/React/Next fixture destinations using semantic topic identity. Missing equivalents return an explicit unavailable state and never fabricate a route.
+## Browser, accessibility and responsive verification
 
-## PackageNavigator readiness
+The final browser gate passed the fixture and representative production routes. Verified fixture viewports include:
 
-Equivalent topic records can switch among package identities where mappings exist. Missing package equivalence is unavailable rather than guessed.
+- desktop: `1440×1000`, light theme;
+- mobile: `390×844`, dark theme;
+- tablet: `768×1024`, light theme with reduced motion.
 
-## Support matrix readiness
+Representative current production routes also passed browser verification: `/`, `/docs/getting-started`, `/gallery`, and `/api-reference`.
 
-`AvailabilityMatrix` provides semantic row/column headers and explicit supported/unsupported/partial/capability-gated/roadmap/unknown labels. Capability requirements are structured data, not color-only presentation.
+Across the recorded browser matrix:
 
-## Capability metadata readiness
+- axe violations: `0`;
+- horizontal overflow: `false`;
+- keyboard workspace resize: passed;
+- reduced-motion fixture control: passed;
+- fixture truth disclosure: passed;
+- unexpected browser/runtime errors: none.
 
-DOC-1 page metadata now normalizes `capabilities[]`. DOC-4 options can carry `capabilityIds[]` and `limitIds[]`. Fixture capability records contain status, runtime, package, fallback, detection, related API and related docs metadata. `CapabilityBadge` and `AvailabilityMatrix` consume those structures.
+The only recorded HTTP miss was the expected local absence of Vercel Speed Insights during localhost verification.
 
-## Future API route readiness
+## Build measurement
 
-DOC-4 API routing has been separated into pure multi-manifest helpers. Current production still supplies exactly one `apexify.js` manifest. A future package adapter can add normalized manifests without creating a second router or reference renderer.
+Candidate and exact DOC-10 base were built on the same GitHub Actions runner.
 
-## Scoped package route behavior
+- baseline build: `62s`
+- current build: `64s`
+- delta: `+2s`
+- delta: `+3.23%`
+- gate: informational for DOC-10; prior performance gates remain authoritative
+- result: `PASS`
 
-Scoped names are represented as one reversible percent-encoded route segment in the DOC-10 route contract. The pure routing matrix tests known package/symbol/member resolution and explicit unknown-package/unknown-symbol misses.
+## Bundle / JS-transfer measurement
 
-## OptionTable readiness
+Production transfer comparison against exact DOC-10 base:
 
-DOC-4 `OptionTable` remains the reference component. It now surfaces capability requirements and searches capability identifiers in addition to existing path/type/value text.
+| Route | Baseline | Current | Delta | Delta % |
+| --- | ---: | ---: | ---: | ---: |
+| `/docs/getting-started` | 357,365 B | 364,311 B | +6,946 B | +1.94% |
+| `/api-reference/apexify.js/AdsrEnvelope` | 355,881 B | 364,112 B | +8,231 B | +2.31% |
+| `/studio` | 353,800 B | 353,829 B | +29 B | +0.008% |
 
-## Nested option readiness
+The production budget is 81,920 bytes, with the percentage gate applied when the byte threshold is exceeded. No production route approached that threshold. Production runtime dependencies added: `0`.
 
-The fixture tree covers nested structures including `render.backend.preference`, worker configuration, capability-dependent WebGPU metadata, animation duration/easing/deprecation and layout mode.
+The fixture-only route transferred 122,251 B and is intentionally measured separately from production.
 
-## Runtime-specific option readiness
+## Dependency impact
 
-Fixture options carry Node/Web/Shared runtime metadata. Runtime applicability is data-driven in the same API option model rather than prose-only branching.
+`dependency-audit.json` reports:
 
-## Layout documentation readiness
+- runtime dependencies added: `0`;
+- dev dependencies added: `0`;
+- future runtime dependencies added: `0`;
+- status: `PASS`.
 
-Layout uses existing concept/guide/page kinds, `/docs/engine/...` routing, API option structures, examples, support metadata, search records and the shared playground shell. No layout-specific docs platform is introduced.
+## Regression verification
 
-## Animation documentation readiness
+On verified implementation head `b03e95ff3207f1cb9358cc5624c331ceb5c07ace`, the following pull-request workflows all completed successfully:
 
-Animation fixture topics cover concepts, easing, keyframe/transition-shaped metadata, interruption/server-export route slots, options, runtime applicability and search/navigation relationships. No animation engine is implemented.
+- DOC-1 Information Architecture — PASS;
+- DOC-2 Design System and Shell — PASS;
+- DOC-3 MDX Component Library — PASS;
+- DOC-4 API Reference Engine — PASS;
+- DOC-5 Executable Example Platform — PASS;
+- DOC-6 Search Discovery — PASS;
+- DOC-7 Homepage Gallery Product — PASS;
+- DOC-8 Studio Interactive Foundation — PASS;
+- DOC-9 full content migration — PASS;
+- Documentation Runtime Build Gate — PASS;
+- DOC-10 Future Engine Documentation Readiness — PASS.
 
-## Animation playground shell
+The DOC-10 gate itself reruns the complete inherited DOC-9 verification chain, including DOC-1→DOC-9 structural/unit/regression checks, content/link verification, package pin verification, typecheck, build, browser validation, a11y and fixture-isolation checks.
 
-The internal fixture reuses DOC-8 `InteractiveWorkspace` and `DiagnosticsPanel`, with timeline/reduced-motion/control placeholders. `AnimationRuntimeAdapter` is a contract only. There is no renderer or engine implementation.
+## Key measured current-truth checks
 
-## Browser documentation readiness
+The final gate confirmed:
 
-Web topics fit existing docs routes, schema, search, API, examples, capabilities and navigation. The package/runtime addition is metadata/adapters rather than a separate documentation center implementation.
+- current package remains `apexify.js@6.0.0`;
+- package pin remains `dbed9743353593eafae9a7b1c25312d7170a233b`;
+- DOC-4 generated API truth remains `217` exports, `93` members and `17,233` option paths;
+- DOC-5 remains `4/4` authoritative verified examples;
+- DOC-6 remains `19,086` generated search records;
+- DOC-9 remains `148` sources, `136` canonical routed pages, `11` merged handwritten API sources, `1` archived source, and `0` legacy-only active features;
+- no current product surface imports or executes a future runtime package.
 
-## Browser playground shell
+## Final implementation CI evidence
 
-The fixture shell reuses DOC-8 editor/preview/diagnostic/options/workspace slots and explicitly states that no renderer is active.
+Dedicated final DOC-10 workflow run: `34828951606` — **SUCCESS**.
 
-## Browser runtime adapter contract
+Evidence artifact:
 
-The existing DOC-8 `WebRuntimeAdapter` remains the future execution boundary. DOC-10 does not fake retained rendering or substitute server-generated images as native browser evidence.
+- artifact ID: `10341104052`;
+- name: `docs-doc10-evidence`;
+- artifact SHA-256 digest: `ccaa408fcd7a59109875c05aef416be0ba33e8f4f6114e8096a297f8d05a6b6b`;
+- retention expiry: `2026-10-14`.
 
-## React documentation readiness
+## Problems found during CI and fixes
 
-React package/runtime metadata fits the existing page architecture. JSX/example metadata is represented through DOC-5 fixture examples, while props/options remain DOC-4 structures.
+The browser gate surfaced two genuine test/readiness defects during execution, both fixed before the verified head:
 
-## React reference readiness
+1. fixture horizontal overflow at the internal readiness route; fixed by constraining fixture content/workspace behavior for responsive layouts;
+2. fixture search-isolation assertion incorrectly treated ordinary fuzzy search results as fixture leakage; fixed so isolation checks inspect returned records for fixture identifiers rather than requiring an unrelated query to have zero ordinary matches.
 
-Future React component/type records normalize into the same DOC-4 manifest and renderer. No second props-table/reference engine is added.
+The final rerun passed all browser, isolation and regression checks.
 
-## React example architecture
+## Alternatives rejected
 
-DOC-5 runtime metadata is generalized to represent React examples, and source validation is parameterized by runtime-specific authoritative roots. Current Node defaults remain unchanged.
+- adding future packages to production manifests;
+- creating a second API/reference router;
+- creating separate React props/reference infrastructure;
+- creating another browser/animation editor;
+- implementing fake Web/animation runtime behavior;
+- weakening current DOC-5 or DOC-6 truth constraints to make fixtures pass.
 
-## Next.js documentation readiness
-
-Next uses existing guide/reference/example architecture with explicit `next-server` and `next-client` runtime identities.
-
-## Next server/client separation
-
-Fixture metadata keeps server/client records distinct. The future verifier adapter is responsible for real boundary/build verification; DOC-10 does not execute nonexistent Next packages.
-
-## Diagnostics readiness
-
-Fixture diagnostic records contain code, class, meaning, trigger, evidence fields, recommended fix, runtime and related API. Codes are unmistakably fake.
-
-## Diagnostic route/search integration
-
-Diagnostic fixture records use the existing `/docs/errors/...` content route pattern and DOC-6 `diagnostic` search kind. Existing `DiagnosticsPanel`, `ErrorReference` and related API systems remain the intended consumers.
-
-## Resource-limit readiness
-
-DOC-4 already owns `LimitReference`; future-shaped options can link `limitIds[]` and future manifests can supply limit records. DOC-10 does not invent product limit values.
-
-## Search readiness
-
-An isolated fixture index uses the real DOC-6 `SearchRecord`, tokenization, ranking and filtering code. Required queries cover package, future API symbol, capability, diagnostic, Next and React fixture terms. Fixture records never enter the production index.
-
-## Navigation scalability
-
-The DOC-9 taxonomy is extended with empty Core/Web/React/Next/Engine/Capabilities/Errors groups. Empty future groups do not appear for current users. Future pages therefore scope naturally instead of falling into one giant Node sidebar.
-
-## Future example architecture
-
-DOC-5 keeps one manifest/registry. Runtime/schema validation is generalized for Web/React/Next/Shared fixtures while default production validation still requires `apexify.js` and `examples/node/**`.
-
-## Interactive architecture
-
-Browser and animation readiness reuse DOC-8 `InteractiveWorkspace`, diagnostics and option slots. Future execution is supplied through adapters, not another editor/workspace.
-
-## Future-readiness matrix
-
-`generated/docs-doc10/future-readiness-matrix.json` covers every required domain and the required columns: metadata, routing, navigation, search, API reference, options, examples, support matrix, interactive shell, diagnostics, status semantics, runtime/package switching and adapters.
-
-The generator fails if any required cell is `GAP`.
-
-## Architecture gaps discovered
-
-1. **Schema gap** — no `shared` runtime and no structured page capabilities. Fixed by extending the existing DOC-1 schema.
-2. **API manifest gap** — runtime targets were Node-version-only and the manifest router assumed one package. Fixed by generic runtime targets and multi-manifest pure routing helpers.
-3. **Example manifest gap** — schema/validation were Node-only. Fixed by generic runtime metadata and configurable authoritative roots while preserving current strict defaults.
-4. **Navigation gap** — future scopes would fall into the Node group. Fixed with empty taxonomy slots that materialize only when actual pages exist.
-5. **Interactive adapter gap** — Web adapter existed but animation playback had no contract. Fixed with `AnimationRuntimeAdapter`; no engine code added.
-
-## Unresolved required architecture gaps
-
-Expected generated gate: `0`. Final proof pending CI.
-
-## Adapter inventory
-
-The fixture inventory records contracts for:
-
-- `FutureApiManifestAdapter`
-- `WebRuntimeAdapter`
-- `AnimationRuntimeAdapter`
-- `ReactExampleVerifier`
-- `NextFixtureVerifier`
-- `DiagnosticManifestAdapter`
-- `CapabilityManifestAdapter`
-
-Each records inputs, outputs, consumer, future owner and why no architecture rewrite is required.
-
-## Fixture leak verification
-
-Static leak checks cover production docs manifest, API manifest, example manifest, search records and homepage catalog. Browser CI additionally verifies homepage, current docs, Gallery, API landing, production search and sitemap.
-
-Final result pending CI.
-
-## Production-truth verification
-
-Future fixtures are never classified `CURRENT`, never exposed as install commands, never added to Gallery, never used as production API/search data, and never represented as a working runtime. Browser/animation previews explicitly state that no renderer is active.
-
-## Tests added
-
-DOC-10 tests cover fixture isolation, future-shaped frontmatter, navigation scoping, multi-package API routing, scoped package encoding, nested/capability/runtime/deprecation options, future example validation, runtime/package switching, capability/diagnostic records, and production manifest leak detection.
-
-## Accessibility impact
-
-New fixture UI uses semantic tables, labels, explicit non-color availability text, the existing keyboard-resizable DOC-8 workspace, and existing diagnostic live-region behavior. Runtime axe verification pending CI.
-
-## Responsive verification
-
-The fixture reuses DOC-8 responsive stacking and table overflow patterns. Desktop/tablet/mobile browser verification pending CI.
-
-## Keyboard verification
-
-The browser gate exercises the inherited workspace separator and fixture controls. Pending CI.
-
-## Theme verification
-
-Fixture surfaces use existing DOC-2 CSS variables/tokens; light/dark browser passes pending CI.
-
-## Reduced-motion verification
-
-The fixture exposes an explicit reduced-motion simulation control and browser CI runs with `prefers-reduced-motion: reduce`. Pending CI.
-
-## Performance impact
-
-No future runtime dependency is added. Generic architecture additions are metadata/contracts/components only. Same-runner current-vs-base build and browser transfer measurement pending CI.
-
-## Bundle impact
-
-CI compares JS transfer for ordinary docs, a representative API page and Studio against exact DOC-10 base `8a8702...`; the fixture-only route is measured separately. Pending CI.
-
-## Build impact
-
-CI builds candidate and exact base on the same runner and records wall-clock comparison. Pending CI.
-
-## Dependency changes
-
-None.
-
-## DOC-1 regression
-
-Pending `npm run docs:verify:doc10`, which inherits the complete DOC-9 chain.
-
-## DOC-2 regression
-
-Pending inherited regression chain.
-
-## DOC-3 regression
-
-Pending inherited regression chain.
-
-## DOC-4 regression
-
-Pending inherited regression chain and future API fixture tests.
-
-## DOC-5 regression
-
-Pending inherited regression chain and future example fixture tests.
-
-## DOC-6 regression
-
-Pending inherited regression chain and isolated fixture-search tests.
-
-## DOC-7 regression
-
-Pending inherited regression chain; fixture capabilities must not alter current homepage/Gallery truth.
-
-## DOC-8 regression
-
-Pending inherited regression chain; fixture shells reuse DOC-8 primitives without replacing them.
-
-## DOC-9 regression
-
-Pending inherited migration/content regression chain.
-
-## Problems discovered
-
-The current platform was already future-oriented but still encoded several assumptions from the first shipped package: single-package API loading, Node-only example validation, Node-oriented navigation fallback, and no generic capability page field. Those assumptions would have forced ad hoc future-package branches if left unchanged.
-
-## What went wrong
-
-The prior phases correctly optimized for the real `apexify.js` 6.0.0 product. DOC-10 is the first phase whose purpose is to stress those contracts with deliberately different package/runtime shapes, so assumptions that were previously valid became visible as future-readiness gaps.
-
-## How fixed
-
-Each discovered deficiency was fixed at the generic architecture boundary. No future runtime behavior was implemented and no current source-of-truth data was replaced with fixtures.
-
-## Not completed
-
-At this report revision:
-
-- DOC-10 PR has not yet been opened.
-- CI has not yet executed the new phase gate.
-- same-runner base/candidate build and browser measurements are pending.
-- deterministic generated DOC-10 evidence has not yet been inspected from CI.
-- merge and post-merge verification are pending.
-
-## Why
-
-The report is intentionally created before PR execution so failures are recorded rather than hidden. Status remains `PARTIAL — BLOCKED` until evidence exists.
-
-## Alternatives considered
-
-- Adding future packages directly to production manifests: rejected as a truth leak.
-- Building a second API router/reference site: rejected; DOC-4 is generalized instead.
-- Building separate React props tables: rejected; DOC-4 option/reference structures are reused.
-- Building a second browser/animation editor: rejected; DOC-8 workspace is reused.
-- Implementing fake Web/animation runtimes to make demos look functional: prohibited and rejected.
-
-## Generated evidence
-
-`generated/docs-doc10/` is produced by `npm run docs:generate:doc10` and checked deterministically with `--check`. It includes identity, fixture policy/packages/runtimes/API/examples/capabilities/diagnostics, readiness matrix, gap report, switchers, version readiness, support matrix, option readiness, API routes, browser/animation shells, search/navigation/capability/diagnostic readiness, fixture leak checks, accessibility/responsive/theme structure, bundle/build comparison, production regression, dependency audit, prior-phase context, adapter inventory and index.
-
-## Remaining risks
-
-The primary remaining risk is implementation/test integration: existing generated pipelines may contain hidden assumptions that only CI/typecheck/build will expose. Any such failure must be fixed generically before DOC-10 can close.
+All were rejected in favor of extending existing generic contracts.
 
 ## Deferred roadmap ownership
 
-Explicitly not implemented here:
+DOC-10 intentionally does **not** implement:
 
-- actual Phase 15–43 engine implementation;
-- actual `@apexify/web` runtime;
-- actual React adapter;
-- actual Next adapter;
-- actual animation engine;
-- actual diagnostics runtime/system;
-- actual capability detection;
-- DOC-11 final accessibility/SEO/performance/reliability hardening;
+- Phase 15–43 engine work;
+- an actual `@apexify/web` package/runtime;
+- actual React or Next adapters;
+- an animation engine;
+- runtime diagnostics/capability detection;
+- DOC-11 final site hardening;
 - DOC-12 final release/integrity certification.
 
 ## Final diff review
 
-Pending after CI fixes. Final review must verify no future package is marked current, no fixture API/search/example/sitemap/navigation/homepage leak exists, no fake install/version/benchmark/runtime appears, no second router/search/example/playground system was added, and no DOC-11/12 or Phase 15 work entered the diff.
+The verified implementation contains no current-status future package claims, no fixture data in current navigation/search/API/examples/homepage/Gallery/sitemap, no fake install/version/benchmark/runtime claims, no second API/search/example/playground platform, and no DOC-11/DOC-12 or Phase 15 implementation work.
 
 ## PR state
 
-Pending.
+PR `#34` is open, mergeable, non-draft, and verified green at the implementation head. This report update satisfies the PR's explicit requirement that the provisional report be replaced with verified evidence before merge.
 
 ## Merge state
 
-Not merged.
+Pending immediate merge after this report-only revision is accepted by its required CI gate.
 
 ## Post-merge verification
 
-Not run.
+Pending merge. A separate completion record will capture the actual merge SHA and verified final `main` SHA; those values are intentionally not fabricated here.
 
 ## Documentation architecture score
 
-Provisional future-readiness architecture score: **9.3/10**. This score is deliberately provisional until CI, same-runner measurement, merge and post-merge evidence are complete.
+Verified pre-merge future-readiness architecture score: **9.6/10**.
+
+The remaining 0.4 is roadmap work intentionally owned by DOC-11/DOC-12 and future engine implementation phases, not an unresolved DOC-10 architecture gap.
