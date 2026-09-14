@@ -8,8 +8,12 @@ export function RuntimeBadge({ value }: { value: DocumentationPage['runtime'][nu
   return <span className="apx-badge" data-kind="runtime">Runtime: {value}</span>;
 }
 
-export function PackageBadge({ value }: { value: DocumentationPage['package'] }) {
+export function PackageBadge({ value }: { value: string }) {
   return <span className="apx-badge" data-kind="package">{value}</span>;
+}
+
+export function CapabilityBadge({ value, state }: { value: string; state?: string }) {
+  return <span className="apx-badge" data-kind="capability" data-state={state}>{value}{state ? `: ${state}` : ''}</span>;
 }
 
 export function SinceBadge({ value }: { value: string }) {

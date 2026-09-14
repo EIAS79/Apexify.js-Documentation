@@ -1,6 +1,6 @@
 export const EXAMPLE_SCHEMA_VERSION = 1 as const;
 
-export const EXAMPLE_RUNTIMES = ['node'] as const;
+export const EXAMPLE_RUNTIMES = ['node', 'web', 'react', 'next-server', 'next-client', 'shared'] as const;
 export type ExampleRuntime = (typeof EXAMPLE_RUNTIMES)[number];
 
 export const EXAMPLE_DIFFICULTIES = ['minimal', 'practical', 'advanced', 'integration'] as const;
@@ -9,7 +9,7 @@ export type ExampleDifficulty = (typeof EXAMPLE_DIFFICULTIES)[number];
 export const EXAMPLE_OUTPUT_TYPES = ['image', 'gif', 'json', 'text', 'multi'] as const;
 export type ExampleOutputType = (typeof EXAMPLE_OUTPUT_TYPES)[number];
 
-export const EXAMPLE_VERIFICATION_MODES = ['exact-hash', 'golden-file', 'semantic', 'metadata', 'structural'] as const;
+export const EXAMPLE_VERIFICATION_MODES = ['exact-hash', 'golden-file', 'semantic', 'metadata', 'structural', 'browser-semantic', 'framework-build', 'adapter-contract'] as const;
 export type ExampleVerificationMode = (typeof EXAMPLE_VERIFICATION_MODES)[number];
 
 export type ExampleVerificationStatus = 'verified' | 'failed' | 'stale' | 'not-run' | 'unsupported';
@@ -70,7 +70,7 @@ export interface ExampleDefinition {
 
 export interface GeneratedExampleSource {
   path: string;
-  language: 'typescript';
+  language: 'typescript' | 'tsx' | 'javascript' | 'jsx';
   sha256: string;
   content: string;
 }
@@ -98,8 +98,8 @@ export interface GeneratedExampleRecord extends Omit<ExampleDefinition, 'sourceF
 
 export interface ExampleManifest {
   schemaVersion: typeof EXAMPLE_SCHEMA_VERSION;
-  package: { name: 'apexify.js'; version: string; commit: string };
+  package: { name: string; version: string; commit: string };
   examples: GeneratedExampleRecord[];
 }
 
-export const EXAMPLE_ID_PATTERN = /^node\.[a-z0-9]+(?:[.-][a-z0-9]+)*$/;
+export const EXAMPLE_ID_PATTERN = /^(node|web|react|next-server|next-client|shared)\.[a-z0-9]+(?:[.-][a-z0-9]+)*$/;

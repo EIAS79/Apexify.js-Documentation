@@ -1,11 +1,18 @@
 import type { DocumentationPage } from './schema';
 
-/** DOC-9 navigation is intent/taxonomy driven rather than a hand-copied legacy filesystem list. */
+/** DOC-9/10 navigation is intent/taxonomy driven and remains empty for future scopes until real pages exist. */
 export const DOCUMENTATION_NAVIGATION_MANIFEST = [
   { id: 'start', label: 'Start', order: 10 },
   { id: 'recipes', label: 'Recipes', order: 20 },
+  { id: 'core', label: 'Core', order: 25 },
   { id: 'node', label: 'Node guides', order: 30 },
+  { id: 'web', label: 'Web', order: 32 },
+  { id: 'react', label: 'React', order: 34 },
+  { id: 'next', label: 'Next.js', order: 36 },
+  { id: 'engine', label: 'Engine', order: 38 },
   { id: 'advanced', label: 'Advanced', order: 40 },
+  { id: 'capabilities', label: 'Capabilities', order: 45 },
+  { id: 'errors', label: 'Errors & diagnostics', order: 47 },
   { id: 'architecture', label: 'Architecture & migration', order: 50 },
 ] as const;
 
@@ -36,7 +43,14 @@ export interface DocumentationNavigationFilter { runtime?: DocumentationPage['ru
 function groupIdFor(page: DocumentationPage): (typeof DOCUMENTATION_NAVIGATION_MANIFEST)[number]['id'] {
   if (page.slug === 'overview' || page.slug === 'getting-started' || page.slug.startsWith('start/')) return 'start';
   if (page.slug.startsWith('recipes/')) return 'recipes';
+  if (page.slug.startsWith('core/')) return 'core';
+  if (page.slug.startsWith('web/')) return 'web';
+  if (page.slug.startsWith('react/')) return 'react';
+  if (page.slug.startsWith('next/')) return 'next';
+  if (page.slug.startsWith('engine/')) return 'engine';
   if (page.slug.startsWith('advanced/')) return 'advanced';
+  if (page.slug.startsWith('capabilities/')) return 'capabilities';
+  if (page.slug.startsWith('errors/')) return 'errors';
   if (page.slug.startsWith('architecture/') || page.slug.startsWith('migration/')) return 'architecture';
   return 'node';
 }

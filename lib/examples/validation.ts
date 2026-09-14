@@ -5,13 +5,18 @@ import {
   EXAMPLE_RUNTIMES,
   EXAMPLE_VERIFICATION_MODES,
   type ExampleDefinition,
+  type ExampleRuntime,
 } from './schema';
 
 export interface ExampleValidationContext {
   docs: Set<string>;
   apiIds: Set<string>;
   files: Set<string>;
+  sourceRoots?: Partial<Record<ExampleRuntime, string[]>>;
+  requiredPackages?: string[];
 }
+
+const DEFAULT_SOURCE_ROOTS: Partial<Record<ExampleRuntime, string[]>> = { node: ['examples/node/'] };
 
 function assertAllowed<T extends string>(value: string, allowed: readonly T[], label: string, id: string): asserts value is T {
   if (!(allowed as readonly string[]).includes(value)) throw new Error(`[DOC-5 ${id}] unknown ${label}: ${value}`);
@@ -19,6 +24,8 @@ function assertAllowed<T extends string>(value: string, allowed: readonly T[], l
 
 export function validateExampleDefinitions(definitions: readonly ExampleDefinition[], context: ExampleValidationContext): void {
   const ids = new Set<string>();
+  const sourceRoots = context.sourceRoots ?? DEFAULT_SOURCE_ROOTS;
+  const requiredPackages = context.requiredPackages ?? ['apexify.js'];
   for (const example of definitions) {
     if (!EXAMPLE_ID_PATTERN.test(example.id)) throw new Error(`[DOC-5 ${example.id}] invalid stable example ID`);
     if (ids.has(example.id)) throw new Error(`[DOC-5 ${example.id}] duplicate example ID`);
@@ -28,11 +35,15 @@ export function validateExampleDefinitions(definitions: readonly ExampleDefiniti
     assertAllowed(example.runtime, EXAMPLE_RUNTIMES, 'runtime', example.id);
     assertAllowed(example.difficulty, EXAMPLE_DIFFICULTIES, 'difficulty', example.id);
     assertAllowed(example.outputType, EXAMPLE_OUTPUT_TYPES, 'output type', example.id);
-    if (!example.packages.includes('apexify.js')) throw new Error(`[DOC-5 ${example.id}] apexify.js package requirement is missing`);
+    for (const packageName of requiredPackages) {
+      if (!example.packages.includes(packageName)) throw new Error(`[DOC-5 ${example.id}] required package is missing: ${packageName}`);
+    }
     if (!example.sourceFiles.length) throw new Error(`[DOC-5 ${example.id}] sourceFiles is empty`);
     if (!example.sourceFiles.includes(example.entrypoint)) throw new Error(`[DOC-5 ${example.id}] entrypoint must be declared in sourceFiles`);
+    const roots = sourceRoots[example.runtime] ?? [];
+    if (!roots.length) throw new Error(`[DOC-5 ${example.id}] no authoritative source root configured for runtime ${example.runtime}`);
     for (const file of example.sourceFiles) {
-      if (!file.startsWith('examples/node/') || file.includes('..')) throw new Error(`[DOC-5 ${example.id}] source path escapes authoritative example boundary: ${file}`);
+      if (file.includes('..') || !roots.some((root) => file.startsWith(root))) throw new Error(`[DOC-5 ${example.id}] source path escapes authoritative example boundary: ${file}`);
       if (!context.files.has(file)) throw new Error(`[DOC-5 ${example.id}] missing source file: ${file}`);
     }
     if (!example.expectedOutput.length) throw new Error(`[DOC-5 ${example.id}] expected output is empty`);

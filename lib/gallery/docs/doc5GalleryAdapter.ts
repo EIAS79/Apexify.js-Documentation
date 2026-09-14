@@ -17,6 +17,9 @@ export const doc5GalleryItems: Doc5GalleryCard[] = getGalleryExamples().map((exa
   if (!entry || !preview?.publicPath || !example.verifiedPackageVersion) {
     throw new Error(`[DOC-5 ${example.id}] Gallery adapter requires authoritative source, public preview, and verified package identity.`);
   }
+  if (example.runtime !== 'node') {
+    throw new Error(`[DOC-5 ${example.id}] Current Gallery only accepts verified Node examples; received runtime ${example.runtime}.`);
+  }
   return {
     id: example.id,
     title: example.title,
@@ -28,7 +31,7 @@ export const doc5GalleryItems: Doc5GalleryCard[] = getGalleryExamples().map((exa
     code: { ts: entry.content },
     doc5: true,
     exampleRoute: example.canonicalRoute,
-    runtime: example.runtime,
+    runtime: 'node',
     difficulty: example.difficulty,
     doc5Features: example.features,
     verificationStatus: 'verified',
