@@ -1,0 +1,160 @@
+name: DOC-10 Future Engine Documentation Readiness
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/__docs-fixtures/**'
+      - 'components/api-reference/**'
+      - 'components/docs/**'
+      - 'fixtures/docs-future/**'
+      - 'lib/api-reference/**'
+      - 'lib/docs/**'
+      - 'lib/examples/**'
+      - 'scripts/docs/**'
+      - 'generated/docs-doc10/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/doc10-future-engine-readiness.yml'
+      - 'DOC10_*'
+  push:
+    branches: [main]
+    paths:
+      - 'app/__docs-fixtures/**'
+      - 'components/api-reference/**'
+      - 'components/docs/**'
+      - 'fixtures/docs-future/**'
+      - 'lib/api-reference/**'
+      - 'lib/docs/**'
+      - 'lib/examples/**'
+      - 'scripts/docs/**'
+      - 'generated/docs-doc10/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/doc10-future-engine-readiness.yml'
+      - 'DOC10_*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC10_BASE_SHA: 8a8702aaa110e0a5b633ab91d78fa2e8e51b1e12
+  DOC10_BASE_URL: http://127.0.0.1:3000
+  DOC10_BASELINE_URL: http://127.0.0.1:3001
+
+jobs:
+  verify-doc10:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+
+      - name: Deterministic install
+        run: npm ci
+
+      - name: DOC-10 architecture and DOC-1 through DOC-9 regression gate
+        run: npm run docs:verify:doc10
+
+      - name: Verify hard readiness gates
+        run: |
+          node -e "const x=require('./generated/docs-doc10/future-readiness-matrix.json'); if(x.required_unresolved_gaps!==0 || x.rows.some(r=>Object.values(r.cells).includes('GAP'))) process.exit(1)"
+          node -e "const x=require('./generated/docs-doc10/architecture-gap-report.json'); if(x.required_unresolved_gaps!==0) process.exit(1)"
+          node -e "const x=require('./generated/docs-doc10/fixture-leak-check.json'); if(x.status!=='PASS' || x.unintendedLeaks!==0) process.exit(1)"
+          node -e "const x=require('./generated/docs-doc10/search-readiness.json'); if(x.status!=='PASS' || x.productionIndexChangedByFixtures) process.exit(1)"
+          node -e "const x=require('./generated/docs-doc10/dependency-audit.json'); if(x.futureRuntimeDependenciesAdded.length!==0) process.exit(1)"
+
+      - name: Build current candidate and measure wall clock
+        shell: bash
+        run: |
+          rm -rf .next
+          START="$(date +%s)"
+          npm run build
+          END="$(date +%s)"
+          echo "DOC10_CURRENT_BUILD_SECONDS=$((END-START))" >> "$GITHUB_ENV"
+
+      - name: Build exact DOC-10 base on same runner
+        shell: bash
+        run: |
+          git worktree add --detach /tmp/doc10-base "$DOC10_BASE_SHA"
+          cd /tmp/doc10-base
+          npm ci
+          rm -rf .next
+          START="$(date +%s)"
+          npm run build
+          END="$(date +%s)"
+          echo "DOC10_BASE_BUILD_SECONDS=$((END-START))" >> "$GITHUB_ENV"
+
+      - name: Record build comparison
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const file='generated/docs-doc10/build-comparison.json';
+          const baseline=Number(process.env.DOC10_BASE_BUILD_SECONDS);
+          const current=Number(process.env.DOC10_CURRENT_BUILD_SECONDS);
+          const delta=current-baseline;
+          const pct=baseline?delta/baseline*100:null;
+          fs.writeFileSync(file, JSON.stringify({schemaVersion:1,status:'PASS',measurement:'same-runner-wall-clock',baselineSeconds:baseline,currentSeconds:current,deltaSeconds:delta,deltaPct:pct,gate:'informational in DOC-10; prior phase performance gates remain authoritative'},null,2)+'\n');
+          NODE
+
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+
+      - name: Start current and baseline production servers
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc10-current.log 2>&1 &
+          (cd /tmp/doc10-base && npm start -- -p 3001 > /tmp/doc10-base.log 2>&1) &
+          for port in 3000 3001; do
+            ok=0
+            for i in $(seq 1 120); do
+              if curl --fail --silent "http://127.0.0.1:${port}/docs/getting-started" >/dev/null; then ok=1; break; fi
+              sleep 1
+            done
+            if [ "$ok" -ne 1 ]; then
+              cat /tmp/doc10-current.log || true
+              cat /tmp/doc10-base.log || true
+              exit 1
+            fi
+          done
+
+      - name: Fixture browser, accessibility, isolation and JS-transfer verification
+        run: npm run docs:browser:doc10
+
+      - name: Verify fixture route is absent from sitemap and current search
+        shell: bash
+        run: |
+          ! curl --fail --silent http://127.0.0.1:3000/sitemap.xml | grep -q '__docs-fixtures'
+          node -e "fetch('http://127.0.0.1:3000/api/docs/search?q=WebPainterFixture').then(r=>r.json()).then(x=>{if(x.total!==0)process.exit(1)})"
+
+      - name: Archive DOC-10 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-doc10-evidence
+          path: |
+            generated/docs-doc10
+            /tmp/doc10-current.log
+            /tmp/doc10-base.log
+          if-no-files-found: error
+          retention-days: 30
