@@ -8,7 +8,11 @@ const axeSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'generated', 'verification', 'doc-11');
 const BASE = process.env.DOC11_BASE_URL || 'http://127.0.0.1:3000';
+const BUNDLE_BASE = process.env.DOC11_BUNDLE_BASE_URL || '';
+const BUNDLE_BASE_SHA = process.env.DOC11_BUNDLE_BASE_SHA || null;
 const CHROME = process.env.CHROME_PATH;
+const BUNDLE_RELATIVE_THRESHOLD = 0.10;
+const BUNDLE_ABSOLUTE_FLOOR_BYTES = 20 * 1024;
 if (!CHROME) throw new Error('[DOC-11 browser] CHROME_PATH is required');
 fs.mkdirSync(OUT, { recursive: true });
 
@@ -53,6 +57,15 @@ const ROUTE_MATRIX = [
   { kind: 'changelog', route: changelog, canonical: changelog },
   { kind: '404', route: '/__doc11-not-found-probe__', expectedStatus: 404, state: '404' },
   { kind: 'legacy redirect', route: `/docs#${encodeURIComponent(legacyHash)}`, canonical: legacyTarget, state: 'legacy' },
+];
+
+const BUNDLE_MATRIX = [
+  { kind: 'homepage', route: '/' },
+  { kind: 'docs-textual', route: '/docs/getting-started' },
+  { kind: 'api-reference', route: '/api-reference' },
+  { kind: 'search-opened', route: '/docs/getting-started', openSearch: true },
+  { kind: 'interactive-example', route: '/docs/node/canvas' },
+  { kind: 'Studio', route: '/studio' },
 ];
 
 const MAJOR_SOCIAL = new Set(['homepage', 'docs landing', 'API landing', 'Gallery', 'Studio']);
@@ -298,17 +311,25 @@ async function auditReducedMotion(route, kind) {
   }
 }
 
-async function measureJs(route, kind, budgetBytes = null) {
+async function collectJsMetrics(origin, route, { openSearch = false, recordCache = false } = {}) {
   const page = await setupPage({ cache: false });
   const staticHeaders = [];
-  page.on('response', async (response) => {
-    if (response.url().includes('/_next/static/') && response.request().resourceType() === 'script') {
+  page.on('response', (response) => {
+    if (recordCache && response.url().includes('/_next/static/') && response.request().resourceType() === 'script') {
       staticHeaders.push({ url: response.url(), cacheControl: response.headers()['cache-control'] ?? '' });
     }
   });
   try {
-    const response = await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle2' });
+    const response = await page.goto(`${origin}${route}`, { waitUntil: 'networkidle2' });
     if (!response || response.status() !== 200) throw new Error(`HTTP ${response?.status()}`);
+    if (openSearch) {
+      const mod = process.platform === 'darwin' ? 'Meta' : 'Control';
+      await page.keyboard.down(mod);
+      await page.keyboard.press('k');
+      await page.keyboard.up(mod);
+      await page.waitForSelector('[role="dialog"][aria-label="Search Apexify documentation"]', { visible: true, timeout: 5000 });
+      await page.waitForNetworkIdle({ idleTime: 300, timeout: 5000 }).catch(() => {});
+    }
     const metrics = await page.evaluate(() => {
       const scripts = performance.getEntriesByType('resource').filter((entry) => entry.initiatorType === 'script');
       return {
@@ -317,14 +338,42 @@ async function measureJs(route, kind, budgetBytes = null) {
         scriptCount: scripts.length,
       };
     });
-    const pass = budgetBytes == null || metrics.jsTransferBytes <= budgetBytes;
-    if (!pass) fail(`bundle ${kind}: ${metrics.jsTransferBytes} bytes exceeds ${budgetBytes}`);
-    bundleEvidence.push({ kind, route, budgetBytes, status: pass ? 'PASS' : 'FAIL', ...metrics });
-    cacheEvidence.push({ kind, route, staticHeaders });
-  } catch (error) {
-    fail(`bundle ${kind}: ${error instanceof Error ? error.message : String(error)}`);
+    return { ...metrics, staticHeaders };
   } finally {
     await page.close();
+  }
+}
+
+async function measureBundleRegression({ route, kind, openSearch = false }) {
+  if (!BUNDLE_BASE) {
+    fail(`bundle ${kind}: DOC11_BUNDLE_BASE_URL is required for base-vs-head regression measurement`);
+    bundleEvidence.push({ kind, route, status: 'FAIL', reason: 'baseline URL missing' });
+    return;
+  }
+  try {
+    const baseline = await collectJsMetrics(BUNDLE_BASE, route, { openSearch });
+    const head = await collectJsMetrics(BASE, route, { openSearch, recordCache: true });
+    const deltaBytes = head.jsTransferBytes - baseline.jsTransferBytes;
+    const deltaPercent = baseline.jsTransferBytes > 0 ? deltaBytes / baseline.jsTransferBytes : null;
+    const allowedIncreaseBytes = Math.max(BUNDLE_ABSOLUTE_FLOOR_BYTES, Math.ceil(baseline.jsTransferBytes * BUNDLE_RELATIVE_THRESHOLD));
+    const pass = deltaBytes <= allowedIncreaseBytes;
+    if (!pass) {
+      fail(`bundle ${kind}: head ${head.jsTransferBytes} bytes vs base ${baseline.jsTransferBytes} bytes, increase ${deltaBytes} exceeds material-regression threshold ${allowedIncreaseBytes}`);
+    }
+    bundleEvidence.push({
+      kind,
+      route,
+      status: pass ? 'PASS' : 'FAIL',
+      baseline: { jsTransferBytes: baseline.jsTransferBytes, jsDecodedBytes: baseline.jsDecodedBytes, scriptCount: baseline.scriptCount },
+      head: { jsTransferBytes: head.jsTransferBytes, jsDecodedBytes: head.jsDecodedBytes, scriptCount: head.scriptCount },
+      deltaBytes,
+      deltaPercent,
+      allowedIncreaseBytes,
+    });
+    cacheEvidence.push({ kind, route, staticHeaders: head.staticHeaders });
+  } catch (error) {
+    fail(`bundle ${kind}: ${error instanceof Error ? error.message : String(error)}`);
+    bundleEvidence.push({ kind, route, status: 'FAIL', error: error instanceof Error ? error.message : String(error) });
   }
 }
 
@@ -358,7 +407,8 @@ async function auditHttpInfrastructure() {
   if (staticHeaderRows.length && immutableStaticCount !== staticHeaderRows.length) fail('cache: one or more Next static scripts lack immutable caching');
   cacheEvidence.push({ kind: 'page-cache', route: '/docs/getting-started', coldMs, warmMs, cacheControl: pageCacheControl, staticAssetSamples: staticHeaderRows.length, immutableStaticCount });
 
-  fs.writeFileSync(path.join(OUT, 'seo-infrastructure.json'), `${JSON.stringify({ schemaVersion: 1, sitemap: { status: sitemapResponse.status, bytes: Buffer.byteLength(sitemapText), representativeMissing: missing }, robots: { status: robotsResponse.status, text: robotsText } }, null, 2)}\n`);
+  const seoStatus = sitemapResponse.ok && robotsResponse.ok && missing.length === 0 && !sitemapText.includes('/__docs-fixtures/') && !sitemapText.includes('/docs#') ? 'PASS' : 'FAIL';
+  fs.writeFileSync(path.join(OUT, 'seo-infrastructure.json'), `${JSON.stringify({ schemaVersion: 2, status: seoStatus, sitemap: { status: sitemapResponse.status, bytes: Buffer.byteLength(sitemapText), representativeMissing: missing }, robots: { status: robotsResponse.status, text: robotsText } }, null, 2)}\n`);
 }
 
 try {
@@ -394,14 +444,7 @@ try {
     await auditReducedMotion(route, kind);
   }
 
-  await measureJs('/', 'homepage', 220 * 1024);
-  await measureJs('/docs/getting-started', 'docs-textual', 180 * 1024);
-  await measureJs('/api-reference', 'api-reference');
-  await measureJs('/gallery', 'Gallery');
-  await measureJs('/studio', 'Studio');
-  await measureJs('/docs/node/canvas', 'playground');
-  await measureJs(exampleRoute, 'example-detail');
-
+  for (const entry of BUNDLE_MATRIX) await measureBundleRegression(entry);
   await auditHttpInfrastructure();
 } finally {
   await browser.close();
@@ -409,18 +452,25 @@ try {
 
 const status = failures.length ? 'FAIL' : 'PASS';
 const write = (name, value) => fs.writeFileSync(path.join(OUT, name), `${JSON.stringify(value, null, 2)}\n`);
-write('route-matrix.json', { schemaVersion: 1, status, requiredKinds: ROUTE_MATRIX.length, routes: routeEvidence });
-write('accessibility.json', { schemaVersion: 1, status: accessibilityEvidence.every((row) => row.criticalOrSerious === 0) ? 'PASS' : 'FAIL', routes: accessibilityEvidence });
-write('keyboard.json', { schemaVersion: 1, status: failures.some((message) => message.startsWith('keyboard') || message.startsWith('search')) ? 'FAIL' : 'PASS', routes: keyboardEvidence });
-write('mobile.json', { schemaVersion: 1, status: mobileEvidence.every((row) => row.status === 'PASS') ? 'PASS' : 'FAIL', widths: [320, 375, 393, 768, 1024], routes: mobileEvidence });
-write('reduced-motion.json', { schemaVersion: 1, status: reducedMotionEvidence.every((row) => row.status === 'PASS') ? 'PASS' : 'FAIL', routes: reducedMotionEvidence });
-write('metadata-seo.json', { schemaVersion: 1, status: failures.some((message) => message.startsWith('metadata') || message.includes('canonical') || message.includes('Open Graph') || message.includes('missing title') || message.includes('meta description')) ? 'FAIL' : 'PASS', routes: metadataEvidence });
-write('bundle.json', { schemaVersion: 1, status: bundleEvidence.every((row) => row.status === 'PASS') ? 'PASS' : 'FAIL', budgets: { docsTextualGzipTransferBytes: 180 * 1024, homepageGzipTransferBytes: 220 * 1024 }, routes: bundleEvidence });
-write('cache-reliability.json', { schemaVersion: 1, status: failures.some((message) => message.startsWith('cache:') || message.startsWith('404:') || message.includes('browser errors')) ? 'FAIL' : 'PASS', records: cacheEvidence });
-write('browser-summary.json', { schemaVersion: 1, phase: 'DOC-11', status, failures, matrixKinds: ROUTE_MATRIX.map((row) => row.kind) });
+write('route-matrix.json', { schemaVersion: 2, status, requiredKinds: ROUTE_MATRIX.length, routes: routeEvidence });
+write('accessibility.json', { schemaVersion: 2, status: accessibilityEvidence.every((row) => row.criticalOrSerious === 0) ? 'PASS' : 'FAIL', routes: accessibilityEvidence });
+write('keyboard.json', { schemaVersion: 2, status: failures.some((message) => message.startsWith('keyboard') || message.startsWith('search')) ? 'FAIL' : 'PASS', routes: keyboardEvidence });
+write('mobile.json', { schemaVersion: 2, status: mobileEvidence.every((row) => row.status === 'PASS') ? 'PASS' : 'FAIL', widths: [320, 375, 393, 768, 1024], routes: mobileEvidence });
+write('reduced-motion.json', { schemaVersion: 2, status: reducedMotionEvidence.every((row) => row.status === 'PASS') ? 'PASS' : 'FAIL', routes: reducedMotionEvidence });
+write('metadata-seo.json', { schemaVersion: 2, status: failures.some((message) => message.startsWith('metadata') || message.includes('canonical') || message.includes('Open Graph') || message.includes('missing title') || message.includes('meta description')) ? 'FAIL' : 'PASS', routes: metadataEvidence });
+write('bundle.json', {
+  schemaVersion: 2,
+  status: bundleEvidence.length === BUNDLE_MATRIX.length && bundleEvidence.every((row) => row.status === 'PASS') ? 'PASS' : 'FAIL',
+  methodology: 'Base and head are measured in the same CI job, on the same Chrome/runner, with cache disabled. The roadmap requires measured representative surfaces and material-regression review rather than absolute byte caps. DOC-11 operationally defines material as an increase greater than both 10% of the base transfer and 20 KiB; the effective threshold is max(10% of base, 20 KiB).',
+  base: { url: BUNDLE_BASE || null, sha: BUNDLE_BASE_SHA },
+  policy: { relativeIncrease: BUNDLE_RELATIVE_THRESHOLD, absoluteFloorBytes: BUNDLE_ABSOLUTE_FLOOR_BYTES },
+  routes: bundleEvidence,
+});
+write('cache-reliability.json', { schemaVersion: 2, status: failures.some((message) => message.startsWith('cache:') || message.startsWith('404:') || message.includes('browser errors')) ? 'FAIL' : 'PASS', records: cacheEvidence });
+write('browser-summary.json', { schemaVersion: 2, phase: 'DOC-11', status, failures, matrixKinds: ROUTE_MATRIX.map((row) => row.kind), bundleKinds: BUNDLE_MATRIX.map((row) => row.kind) });
 
 if (failures.length) {
   console.error(`[DOC-11 browser] FAIL count=${failures.length}`);
   process.exit(1);
 }
-console.log(`[DOC-11 browser] PASS matrix=${ROUTE_MATRIX.length} mobile=${mobileEvidence.length} reduced=${reducedMotionEvidence.length}`);
+console.log(`[DOC-11 browser] PASS matrix=${ROUTE_MATRIX.length} mobile=${mobileEvidence.length} reduced=${reducedMotionEvidence.length} bundles=${bundleEvidence.length}`);
