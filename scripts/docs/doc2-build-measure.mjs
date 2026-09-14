@@ -11,6 +11,7 @@ fs.rmSync(path.join(ROOT, '.next'), { recursive: true, force: true });
 const BASELINE = {
   startingSha: 'c3d0799b8fb67fd7c86d48aceaa8c88e5e3d649f',
   buildWallMs: 37079.165,
+  staticPageCount: 15,
   routedManifestJsBytes: 1010958,
   sourceCssBytes: 24878,
 };
@@ -64,6 +65,8 @@ const compiledCssBytes = compiledCss.reduce((sum, file) => sum + file.bytes, 0);
 const ansi = /\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])/g;
 const output = `${build.stdout ?? ''}\n${build.stderr ?? ''}`.replace(ansi, '');
 const routeLine = output.split(/\r?\n/).find((line) => line.includes('/docs/[...slug]')) ?? null;
+const staticPageMatches = [...output.matchAll(/Generating static pages \((\d+)\/(\d+)\)/g)];
+const staticPageCount = staticPageMatches.length ? Number(staticPageMatches.at(-1)[2]) : null;
 function sizeToBytes(value) {
   const match = value?.trim().match(/^([\d.]+)\s*(B|kB|MB)$/i);
   if (!match) return null;
@@ -80,10 +83,11 @@ if (routeLine) {
 const evidence = {
   schemaVersion: 1,
   phase: 'DOC-2',
-  methodology: 'one clean Next.js production build; route JS measured from app-build-manifest; source and compiled CSS measured by file bytes',
+  methodology: 'one clean Next.js production build; build throughput normalized by generated static-page count; route JS measured from app-build-manifest; source and compiled CSS measured by file bytes',
   baseline: BASELINE,
   after: {
     buildWallMs: Number(wallMs.toFixed(3)),
+    staticPageCount,
     routedManifestJsBytes,
     firstLoadJsBytes,
     sourceCssBytes,
