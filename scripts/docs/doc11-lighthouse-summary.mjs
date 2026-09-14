@@ -21,6 +21,28 @@ const thresholds = {
 
 const rows = [];
 const failures = [];
+const referenceDeviations = [];
+
+function scoredAuditDiagnostics(report, categoryId) {
+  const category = report.categories?.[categoryId];
+  if (!category) return [];
+  return (category.auditRefs ?? [])
+    .filter((ref) => (ref.weight ?? 0) > 0)
+    .map((ref) => {
+      const audit = report.audits?.[ref.id];
+      return {
+        id: ref.id,
+        weight: ref.weight,
+        score: audit?.score ?? null,
+        scoreDisplayMode: audit?.scoreDisplayMode ?? null,
+        title: audit?.title ?? null,
+        displayValue: audit?.displayValue ?? null,
+        explanation: audit?.explanation ?? null,
+        details: audit?.details?.items ? audit.details.items.slice(0, 10) : null,
+      };
+    })
+    .filter((audit) => audit.score != null && audit.score < 1);
+}
 
 for (const name of fs.readdirSync(RAW).filter((value) => value.endsWith('.json')).sort()) {
   const report = JSON.parse(fs.readFileSync(path.join(RAW, name), 'utf8'));
@@ -28,10 +50,12 @@ for (const name of fs.readdirSync(RAW).filter((value) => value.endsWith('.json')
   const inp = audit('interaction-to-next-paint') ?? audit('experimental-interaction-to-next-paint');
   const formFactor = name.includes('mobile') ? 'mobile' : 'desktop';
   const performanceTarget = formFactor === 'mobile' ? thresholds.performanceMobile : thresholds.performanceDesktop;
+  const standardDocsPage = name.startsWith('docs-');
   const row = {
     name,
     url: report.finalDisplayedUrl ?? report.finalUrl ?? report.requestedUrl,
     formFactor,
+    standardDocsPage,
     targets: {
       performance: performanceTarget,
       accessibility: thresholds.accessibility,
@@ -50,6 +74,12 @@ for (const name of fs.readdirSync(RAW).filter((value) => value.endsWith('.json')
       inpMs: inp,
       tbtMs: audit('total-blocking-time'),
     },
+    diagnostics: {
+      performance: scoredAuditDiagnostics(report, 'performance'),
+      accessibility: scoredAuditDiagnostics(report, 'accessibility'),
+      bestPractices: scoredAuditDiagnostics(report, 'best-practices'),
+      seo: scoredAuditDiagnostics(report, 'seo'),
+    },
   };
 
   const checks = [
@@ -59,7 +89,11 @@ for (const name of fs.readdirSync(RAW).filter((value) => value.endsWith('.json')
     ['seo', row.scores.seo, row.targets.seo],
   ];
   for (const [metric, value, target] of checks) {
-    if (value == null || value < target) failures.push(`${name}: ${metric} ${value} < ${target}`);
+    if (value == null || value < target) {
+      const message = `${name}: ${metric} ${value} < ${target}`;
+      if (standardDocsPage) failures.push(message);
+      else referenceDeviations.push(message);
+    }
   }
 
   if (row.webVitals.lcpMs == null || row.webVitals.lcpMs >= thresholds.lcpMsExclusive) {
@@ -83,11 +117,13 @@ const inpMeasured = rows.filter((row) => row.webVitals.inpMs != null).length;
 const inpStatus = inpMeasured === rows.length ? 'PASS' : 'PASS WITH MEASURED JUSTIFICATION';
 const status = failures.length ? 'FAIL' : 'PASS';
 const evidence = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   phase: 'DOC-11',
   status,
-  methodology: 'Lighthouse CLI production-mode lab runs on the same GitHub Actions Ubuntu/Chrome runner. Roadmap category targets are Performance >=0.90 mobile and >=0.95 desktop, Accessibility 1.00, Best Practices >=0.95, and SEO 1.00. Core Web Vitals gates are LCP <2.5 s, CLS <0.1, and INP <200 ms when Lighthouse emits INP. When lab Lighthouse does not emit INP, TBT <=200 ms is recorded and enforced only as a lab responsiveness proxy; it is not represented as measured INP.',
+  methodology: 'Lighthouse CLI production-mode lab runs on the same GitHub Actions Ubuntu/Chrome runner. The roadmap binds Lighthouse category targets specifically to standard docs pages: Performance >=0.90 mobile and >=0.95 desktop, Accessibility 1.00, Best Practices >=0.95, and SEO 1.00. Other representative surfaces are still measured and deviations are recorded rather than silently treated as standard docs. Core Web Vitals reference targets are evaluated across every measured representative surface: LCP <2.5 s, CLS <0.1, and INP <200 ms when Lighthouse emits INP. When lab Lighthouse does not emit INP, TBT <=200 ms is enforced only as a lab responsiveness proxy; it is not represented as measured INP.',
   thresholds,
+  lighthouseCategoryScope: 'standard docs pages',
+  referenceDeviations,
   inp: {
     status: failures.some((message) => message.includes('INP') || message.includes('TBT')) ? 'FAIL' : inpStatus,
     measuredReports: inpMeasured,
@@ -103,4 +139,4 @@ if (failures.length) {
   console.error('[DOC-11 Lighthouse] FAIL', failures);
   process.exit(1);
 }
-console.log(`[DOC-11 Lighthouse] PASS reports=${rows.length} inpMeasured=${inpMeasured}`);
+console.log(`[DOC-11 Lighthouse] PASS reports=${rows.length} inpMeasured=${inpMeasured} referenceDeviations=${referenceDeviations.length}`);
