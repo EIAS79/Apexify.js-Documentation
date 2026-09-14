@@ -3,6 +3,7 @@ import React, { type ReactNode } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { CodeBlock } from '@/components/mdx/CodeBlock';
+import { StaticCodeBlock } from '@/components/mdx/StaticCodeBlock';
 import { DocHeadingAnchor } from '@/components/docs/DocHeadingAnchor';
 import { canonicalizeLegacyDocumentationHref } from '@/lib/docs/legacy-routing';
 import { parseHeadingTitleAndId, slugifyHeading } from '@/lib/docs-heading-utils';
@@ -51,7 +52,7 @@ const markdownComponents: Components = {
   pre({ children }) { return <>{children}</>; },
   code({ className, children, ...props }) {
     const languageMatch = /language-([\w-]+)/.exec(className ?? '');
-    if (languageMatch) return <CodeBlock lang={languageMatch[1]} docsStudio>{String(children).replace(/\n$/, '')}</CodeBlock>;
+    if (languageMatch) return <StaticCodeBlock lang={languageMatch[1]} docsStudio>{String(children).replace(/\n$/, '')}</StaticCodeBlock>;
     return <code {...props} className="rounded-md px-2 py-1 font-mono text-sm" style={{ backgroundColor: 'var(--bg-sunken)', color: 'var(--text-primary)', border: '1px solid var(--border-default)', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{children}</code>;
   },
   table({ children, ...props }) { return <div className="my-6 overflow-x-auto rounded-xl" style={{ border: '1px solid var(--border-default)' }} tabIndex={0} role="group" aria-label="Documentation table"><table {...props} className="w-full border-collapse text-left text-sm">{children}</table></div>; },
