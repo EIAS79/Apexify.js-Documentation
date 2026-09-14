@@ -17,7 +17,7 @@ export function PackageNavigator(props: { entries: NavigatorEntry[]; current?: s
   return <Navigator label="Package navigator" {...props} />;
 }
 
-/** Readiness surface only: callers decide when real versions exist. */
-export function VersionSelector({ entries, current, enabled = false }: { entries: NavigatorEntry[]; current?: string; enabled?: boolean }) {
-  return <div data-doc10-version-selector data-enabled={enabled}><label htmlFor="doc-version-selector">Version</label><select id="doc-version-selector" value={current ?? entries[0]?.id ?? ''} disabled={!enabled} readOnly>{entries.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}{entry.status ? ` · ${entry.status}` : ''}</option>)}</select>{!enabled ? <p>Version switching remains inactive until multiple real versions exist.</p> : null}</div>;
+/** Readiness surface only: this remains deliberately disabled until multiple real versions exist. */
+export function VersionSelector({ entries, current }: { entries: NavigatorEntry[]; current?: string; enabled?: false }) {
+  return <div data-doc10-version-selector data-enabled="false"><label htmlFor="doc-version-selector">Version</label><select id="doc-version-selector" defaultValue={current ?? entries[0]?.id ?? ''} disabled>{entries.map((entry) => <option key={entry.id} value={entry.id}>{entry.label}{entry.status ? ` · ${entry.status}` : ''}</option>)}</select><p>Version switching remains inactive until multiple real versions exist.</p></div>;
 }
