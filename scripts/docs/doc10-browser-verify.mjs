@@ -16,6 +16,7 @@ const apiManifest = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'generat
 const representativeSymbol = apiManifest.symbols.find((item) => item.id === apiManifest.representativeApiId) ?? apiManifest.symbols[0];
 const apiRoute = representativeSymbol?.href ?? '/api-reference';
 const fixtureTokens = ['0.0.0-fixture', 'FIXTURE-APX-', 'WebPainterFixture', 'ReactCanvasFixture', 'NextBoundaryFixture'];
+const baseOrigin = new URL(base).origin;
 
 const browser = await puppeteer.launch({ executablePath: chrome, headless: 'new', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
 const evidence = [];
@@ -23,6 +24,13 @@ const bundle = [];
 
 async function stableState(page, theme = 'light') {
   await page.evaluateOnNewDocument((value) => { localStorage.clear(); localStorage.setItem('apexify-theme', value); }, theme);
+}
+
+function expectedLocalMiss(row) {
+  const url = new URL(row.url);
+  return row.status === 404 && url.origin === baseOrigin && (
+    url.pathname === '/favicon.ico' || url.pathname === '/_vercel/speed-insights/script.js'
+  );
 }
 
 async function visit(route, { width = 1365, height = 900, theme = 'light', reduced = false, fixture = false } = {}) {
@@ -33,8 +41,12 @@ async function visit(route, { width = 1365, height = 900, theme = 'light', reduc
   if (reduced) await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
   const consoleErrors = [];
   const pageErrors = [];
+  const httpErrors = [];
   page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
   page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('response', (response) => {
+    if (response.status() >= 400) httpErrors.push({ status: response.status(), url: response.url() });
+  });
   const response = await page.goto(`${base}${route}`, { waitUntil: 'networkidle2' });
   if (!response || response.status() !== 200) throw new Error(`${route}: HTTP ${response?.status()}`);
   const text = await page.evaluate(() => document.body.textContent || '');
@@ -73,8 +85,15 @@ async function visit(route, { width = 1365, height = 900, theme = 'light', reduc
   if (violations.length) throw new Error(`${route}: axe ${JSON.stringify(violations)}`);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
   if (overflow) throw new Error(`${route}: horizontal overflow`);
-  if (consoleErrors.length || pageErrors.length) throw new Error(`${route}: browser errors ${JSON.stringify({ consoleErrors, pageErrors })}`);
-  evidence.push({ route, width, height, theme, reduced, fixture, axeViolations: violations.length, overflow });
+
+  const unexpectedHttp = httpErrors.filter((row) => !expectedLocalMiss(row));
+  const onlyExpected404s = httpErrors.length > 0 && unexpectedHttp.length === 0;
+  const unexpectedConsole = consoleErrors.filter((message) => !(onlyExpected404s && message.includes('404')));
+  if (unexpectedHttp.length || unexpectedConsole.length || pageErrors.length) {
+    throw new Error(`${route}: browser errors ${JSON.stringify({ unexpectedHttp, unexpectedConsole, pageErrors })}`);
+  }
+
+  evidence.push({ route, width, height, theme, reduced, fixture, axeViolations: violations.length, overflow, expectedLocalMisses: httpErrors.filter(expectedLocalMiss) });
   await page.close();
 }
 
