@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'app/__docs-fixtures/**'
+      - 'app/%5F_docs-fixtures/**'
       - 'components/api-reference/**'
       - 'components/docs/**'
       - 'fixtures/docs-future/**'
@@ -20,7 +20,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'app/__docs-fixtures/**'
+      - 'app/%5F_docs-fixtures/**'
       - 'components/api-reference/**'
       - 'components/docs/**'
       - 'fixtures/docs-future/**'
