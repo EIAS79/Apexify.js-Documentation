@@ -15,5 +15,10 @@ export const metadata: Metadata = {
 };
 
 export default function StudioPage() {
-  return <CodeStudio />;
+  return (
+    <>
+      <h1 className="sr-only">Apexify.js Studio</h1>
+      <CodeStudio />
+    </>
+  );
 }
