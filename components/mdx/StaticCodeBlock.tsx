@@ -1,6 +1,4 @@
 import type { ReactNode } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { CodeBlockActions } from './CodeBlockActions';
 import { composeStudioSnippetFromDocs, STUDIO_INCOMING_SNIPPET_KEY } from '@/lib/studio/studioConfig';
 
@@ -40,6 +38,7 @@ export function StaticCodeBlock({
   const normalizedLanguage = normalizeLanguage(language);
   const studioPayload = docsStudio ? composeStudioSnippetFromDocs(code, language) : null;
   const codeRegionLabel = filename ? `${filename} code example` : `${normalizedLanguage} code example`;
+  const lines = code.split('\n');
 
   return (
     <div className="relative my-4 group sm:my-6" data-doc11-static-code>
@@ -65,39 +64,24 @@ export function StaticCodeBlock({
           role="group"
           aria-label={codeRegionLabel}
         >
-          <div className="min-w-0 p-3 sm:p-4">
-            <SyntaxHighlighter
-              language={normalizedLanguage}
-              style={a11yDark}
-              customStyle={{
-                margin: 0,
-                padding: 0,
-                background: CODE_SURFACE,
-                backgroundColor: CODE_SURFACE,
-                fontSize: 'clamp(0.7rem, 2vw, 0.875rem)',
-                lineHeight: '1.6',
-                overflowX: 'visible',
-                overflowY: 'visible',
-              }}
-              showLineNumbers
-              lineNumberStyle={{
-                color: '#b8c0cc',
-                paddingRight: '1rem',
-                minWidth: '2.5em',
-                userSelect: 'none',
-              }}
-              codeTagProps={{
-                style: {
-                  fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
-                  background: CODE_SURFACE,
-                  backgroundColor: CODE_SURFACE,
-                },
-              }}
-              PreTag="div"
-            >
-              {code}
-            </SyntaxHighlighter>
-          </div>
+          <pre
+            className="m-0 min-w-max p-3 font-mono text-[clamp(0.7rem,2vw,0.875rem)] leading-[1.6] text-slate-100 sm:p-4"
+            style={{ backgroundColor: CODE_SURFACE }}
+          >
+            <code>
+              {lines.map((line, index) => (
+                <span key={index} className="block min-h-[1.6em]">
+                  <span
+                    aria-hidden="true"
+                    className="mr-4 inline-block min-w-[2.5em] select-none text-right text-slate-400"
+                  >
+                    {index + 1}
+                  </span>
+                  <span>{line || ' '}</span>
+                </span>
+              ))}
+            </code>
+          </pre>
         </div>
       </div>
     </div>
