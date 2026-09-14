@@ -18,6 +18,10 @@ const interactiveTheme = EditorView.theme(
     '.cm-content': {
       caretColor: '#f0f6fc',
     },
+    '.cm-content:focus-visible': {
+      outline: '3px solid #a99cff',
+      outlineOffset: '-3px',
+    },
     '.cm-gutters': {
       backgroundColor: '#0d1117',
       borderRight: '1px solid rgba(240,246,252,0.14)',
