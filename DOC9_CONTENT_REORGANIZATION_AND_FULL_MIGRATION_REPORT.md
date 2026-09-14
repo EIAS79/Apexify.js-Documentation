@@ -2,9 +2,11 @@
 
 ## Status
 
-`PARTIAL — BLOCKED`
+`COMPLETE`
 
-The implementation is on `doc9-full-content-migration`; the remaining blocker at this report revision is execution of the DOC-9 pull-request CI gate and post-merge verification. This report must be updated before any `COMPLETE` claim.
+DOC-9 is complete. The full active documentation corpus has been promoted out of the DOC-1 representative legacy-fallback state, the DOC-9 implementation PR passed the complete DOC-1 through DOC-9 regression matrix plus the multi-Node runtime build gate, PR #32 was merged, and the resulting `main` merge SHA passed all post-merge workflows that triggered for the change.
+
+No DOC-10, DOC-11, DOC-12, Apexify.js Phase 15, or future Web/React/Next/animation implementation was started.
 
 ## Source authority
 
@@ -12,10 +14,17 @@ Primary authority: `APEXIFY_DOCUMENTATION_ARCHITECTURE_PRE_PHASE_ROADMAP.md`, es
 
 ## Repository identities
 
+- docs repository: `EIAS79/Apexify.js-Documentation`
+- DOC-9 base SHA: `a1e7a6ddca0b7c0e7193b4dceb56e7cd900862f3`
+- DOC-9 implementation branch: `doc9-full-content-migration`
+- final implementation head SHA: `5318fa4c0e9b692fece274f2a8edb14de610600f`
+- implementation PR: `#32`
+- DOC-9 implementation merge SHA: `ae2eb52e3b69f416fb5a3362d17b6b57ce952b89`
+- verified post-merge `main` SHA: `ae2eb52e3b69f416fb5a3362d17b6b57ce952b89`
 - Phase 14-P frozen implementation SHA: `5d9b71f185140d6c3477286b8fb111f293e52b48`
 - package main SHA at DOC-9 start: `2b64087a04411982067cc624031b3de6f663c530`
 - documented/pinned package SHA: `dbed9743353593eafae9a7b1c25312d7170a233b`
-- package version: `6.0.0`
+- documented package version: `6.0.0`
 - DOC-0 merge SHA: `573b592942327d451661cd55d50fd237630eb5cf`
 - DOC-1 merge SHA: `c3d0799b8fb67fd7c86d48aceaa8c88e5e3d649f`
 - DOC-2 merge SHA: `6ae3234b3de0e303c0a762f5394ea568c9be2c44`
@@ -25,313 +34,266 @@ Primary authority: `APEXIFY_DOCUMENTATION_ARCHITECTURE_PRE_PHASE_ROADMAP.md`, es
 - DOC-6 merge SHA: `96c4c9ef418fc3ea30a391c89037cc9744d7fdc0`
 - DOC-7 implementation merge SHA: `1e013019a3768f10d1fd9bfc6de5d7879d5e63e7`
 - DOC-8 implementation merge SHA: `4d8d5fef2064211ddd1788b4b7373730a71d1d8b`
-- DOC-9 base SHA: `a1e7a6ddca0b7c0e7193b4dceb56e7cd900862f3`
-- DOC-9 branch: `doc9-full-content-migration`
-- DOC-9 branch SHA: recorded from the PR head at final verification
-- DOC-9 merge SHA: pending
-- final docs main SHA: pending
 
-Phase 15 was not started. The package main commit remains the Phase 14-P merge line; DOC-9 does not mutate the package runtime.
+## Starting state
 
-## Starting corpus inventory
+DOC-1 deliberately established only a representative canonical slice. At DOC-9 start the generated DOC-1 manifest reported:
 
-DOC-1 evidence at DOC-9 start reported **3 managed canonical pages and 145 legacy fallback pages**. The live `content/docs` tree remains the migration source corpus. `scripts/docs/doc9-generate.ts` re-enumerates the tree at execution time rather than trusting the historical count.
+- managed canonical pages: **3**
+- legacy fallback pages: **145**
 
-## Classification summary
+DOC-9 therefore had to migrate the active corpus itself rather than merely rearrange already-canonical content.
 
-The generated `classification-summary.json` is authoritative for exact final counts. Policy:
+## Final corpus and classification
 
-- existing validated frontmatter pages: `keep`
-- active legacy prose promoted into modern canonical routing: `move`
-- handwritten `04-api-reference/**` sources: `merge` into DOC-4 generated reference truth
-- `05-internals/01-5.4.5-remote-image-hotfix.mdx`: `archive`
-- no automatic deletion is performed
-- `rewrite`, `split`, and `delete` are only used when evidence justifies them; DOC-9 does not fabricate classifications merely to exercise every state
+The final deterministic DOC-9 classification evidence covers **148/148** live MDX sources:
 
-The generator fails if source coverage is not 100%, if an active migration target is missing, if an active source is not routed, or if canonical routes collide.
+| Classification | Count |
+| --- | ---: |
+| keep | 3 |
+| rewrite | 0 |
+| split | 0 |
+| merge | 11 |
+| move | 133 |
+| archive | 1 |
+| delete | 0 |
+| verified | 148 |
+| blocked | 0 |
+| unclassified | 0 |
 
-## Migration architecture
+The 11 `merge` sources are the handwritten legacy API-reference corpus, which is retained as migration/audit material but is not promoted into a competing current API database. The single `archive` source is the historical 5.4.5 remote-image hotfix. No source was deleted without an audited need.
 
-DOC-9 adds one deterministic migration model in `lib/docs/doc9-migration.ts`. It is the single source for source disposition, canonical route synthesis, page kind/category, feature identity, legacy hash identity, and migration rationale.
+## Canonical route result
 
-`lib/docs/content.ts` now validates both explicit authored frontmatter and DOC-9 migration metadata through the existing DOC-1 schema. Legacy prose is preserved; migration does not perform a generic AI rewrite.
+The canonical documentation result is:
 
-`lib/docs/navigation.ts` is now taxonomy/intent driven instead of enumerating three hand-maintained routed pages. Every active canonical documentation page must be represented exactly once.
+- managed canonical routes: **136**
+- legacy fallback pages: **0**
+- navigation-covered canonical pages: **136/136**
+- searchable canonical pages: **136/136**
+- duplicate canonical routes: **0**
+- unclassified sources: **0**
+- missing active targets: **0**
+- unrouted active sources: **0**
+- target mismatches: **0**
 
-## Migration manifest
+The migration is driven by `lib/docs/doc9-migration.ts`; `lib/docs/content.ts` validates authored and migrated metadata through the established DOC-1 schema; `lib/docs/navigation.ts` derives intent/taxonomy navigation from the canonical corpus rather than a three-page manual list.
 
-`generated/docs-doc9/migration-manifest.json` contains one record per live MDX source with classification, target route(s), feature identity, redirect requirement, preservation state, rationale, and verification status.
+## Content organization
 
-Coverage gate: `migration records / source records = 100%`.
+Current content is organized by user intent and truth ownership:
 
-## Route/metadata mapping
+- Start and beginner/tutorial material use canonical start routes.
+- Recipes use `/docs/recipes/...`.
+- current Node feature guides use `/docs/node/...`.
+- advanced material uses `/docs/advanced/...`.
+- architecture and migration/changelog material are separated from current feature guides.
+- the existing authored `/docs/getting-started` route remains authoritative.
+- generated DOC-4 API reference remains the exact reference source of truth.
 
-`generated/docs-doc9/route-map.json` is the complete old source/hash to canonical target map. Canonical active content is organized under Start, Recipes, Node guides, Advanced, Architecture/Migration, plus DOC-4 generated API reference.
-
-## Legacy compatibility
-
-`lib/docs/doc9-legacy-client.ts` extends browser-side legacy fragment resolution for the migrated corpus. `lib/docs/legacy-routing.ts` preserves the browser-only fragment rule and canonicalizes legacy identities while retaining deep-heading forwarding (`?h=...`). Handwritten API reference identities resolve to the generated API reference surface; historical hotfix identity resolves to current migration/changelog context.
-
-## Content preservation
-
-No source is deleted in this implementation. `content-preservation.json`, `archive-inventory.json`, and `deletion-inventory.json` make preservation/deletion policy reviewable. Any later deletion must be added as an explicit audited migration record.
-
-## Start docs migration
-
-Start-here and beginner-guide content receives canonical `/docs/start/...` routes, except the existing `/docs/getting-started` page whose authored DOC-1 route remains authoritative.
-
-## Beginner-guide migration
-
-Beginner material is typed as tutorials/troubleshooting according to intent rather than preserved as one monolithic hash-only entry.
-
-## Recipe migration
-
-Recipe content is routed beneath `/docs/recipes/...`; dedicated recipe assets use the `recipe` page kind while overview/concept material remains guide content.
-
-## Feature-guide migration
-
-Feature-guide domains are routed beneath `/docs/node/...` with current `apexify.js` / Node runtime metadata. Feature identities are derived from the actual current corpus, not future Phase 15 package plans.
-
-## Advanced-doc migration
-
-Current advanced material moves under `/docs/advanced/...`, with security/performance/resource-governance and migration material classified by page intent.
-
-## Internals migration
-
-Current internals overview is exposed as architecture context. The 5.4.5 remote-image hotfix is explicitly archived/historical rather than presented as current package behavior.
-
-## Changelog migration
-
-The existing changelog source maps to `/docs/migration/changelog`, separating historical change records from current API reference truth.
+The migration preserves source prose and headings rather than performing a blind corpus rewrite.
 
 ## Guide/reference separation
 
-The legacy handwritten `content/docs/04-api-reference/**` corpus is not promoted as a second active reference database. It is classified `merge`, preserved for audit/content-loss review, removed from active routed/search truth, and mapped to DOC-4 generated reference.
+The handwritten `content/docs/04-api-reference/**` sources are classified `merge` and are excluded from active routed/search truth. They do not compete with DOC-4.
 
-Guide pages remain responsible for explanation/workflow. DOC-4 remains responsible for exact export/signature/options/default truth.
+DOC-4 remains authoritative for exact public API facts. Final regression evidence continued to report:
 
-## API-reference extraction
+- public exports covered: **217/217**
+- public members: **93**
+- option paths covered: **17,233/17,233**
+- missing option paths: **0**
+- signature drift: **0**
 
-DOC-4 evidence at DOC-9 start reports 217/217 public exports covered, 17,233 option paths covered with zero missing option paths, and zero signature mismatches. DOC-9 consumes those guarantees rather than copying tables into a new handwritten database.
+Guide pages own explanation and workflows; generated reference owns exact signatures, options, defaults, errors/limits metadata where supported by source truth.
 
-## Example migration
+## Example ownership
 
-DOC-5 remains authoritative. `example-content-migration.json` records canonical page/example relationships without creating a second example store.
+DOC-5 remains the authoritative executable-example platform. DOC-9 links the migrated corpus to that platform without creating a second example store. The DOC-5 regression chain continued to validate **4 authoritative executable examples** and their output/provenance contracts.
 
-## Output migration
+## Search and discovery
 
-No unverified replacement output is fabricated. Existing DOC-5 output provenance remains authoritative.
+DOC-6 was rebuilt against the fully migrated canonical corpus. The final PR run generated **19,086** search records and passed exact-symbol ranking, nested-option search, filters, fuzzy fallback, related-content, diagnostic lookup, source coverage, and client-bundle isolation checks.
 
-## Error documentation
+The generated DOC-9 search coverage records **136/136** canonical pages as searchable with no unintended exclusions.
 
-Feature completeness derives error-related evidence from current migrated prose and DOC-4 coverage; missing semantics are marked `PARTIAL`, not invented.
+## Legacy URL compatibility
 
-## Limit documentation
+`lib/docs/doc9-legacy-client.ts` and `lib/docs/legacy-routing.ts` preserve old `/docs#...` identities while converting them to canonical routes. URL-fragment behavior remains browser-side because fragments are not transmitted in HTTP requests.
 
-Limits are marked evidence-first. DOC-9 does not invent global byte/dimension/frame/concurrency limits to force a green matrix.
+The compatibility layer also preserves deep-heading forwarding through the established `?h=...` mechanism. The deterministic redirect verification passed for the migration map.
+
+## Heading and link integrity
+
+Final deterministic evidence reports:
+
+- canonical pages checked: **136**
+- headings checked: **1,046**
+- duplicate heading IDs: **0**
+- heading-link audit: `PASS`
+- redirect verification: `PASS`
+- orphan-content audit: `PASS`
+- duplicate-canonical-route audit: `PASS`
+- navigation coverage: `PASS`
+
+Existing Phase 13 content/link verification also remained green throughout PR and post-merge execution.
+
+## Feature completeness and hard legacy-only gate
+
+`feature-completeness-matrix.json` is generated from the migrated guide corpus plus DOC-4 API truth, DOC-5 examples, and current product capability evidence. It records real `PARTIAL` states where evidence is incomplete instead of fabricating completeness.
+
+The mandatory DOC-9 machine gate is satisfied:
+
+`active_feature_legacy_only_count = 0`
+
+No active current feature remains discoverable only through the old hash-based fallback system.
 
 ## Runtime/package correctness
 
-Migrated current pages are explicitly `package: apexify.js`, `runtime: [node]`, `stability: CURRENT`, `since: 6.0.0`. Future Web/React/Next/animation packages are not represented as shipped.
+Migrated current pages use the existing current package/runtime model:
 
-## Stability/deprecation correctness
+- package: `apexify.js`
+- runtime: Node
+- package version: `6.0.0`
+- package pin: `dbed9743353593eafae9a7b1c25312d7170a233b`
 
-Historical 5.4.5 hotfix material is archived. Generated API stability/deprecation truth remains DOC-4-owned.
+DOC-9 does not represent future Web, React, Next.js, realtime, animation, vector, or intelligence roadmap work as shipped current behavior.
 
-## Architecture/current-vs-roadmap content
+## Performance and regression-gate repairs discovered during closure
 
-DOC-9 documents current Node package behavior only. No Phase 15 multi-runtime implementation is introduced or documented as current.
+The full migration exposed three inherited measurement assumptions. They were corrected before merge rather than bypassed.
 
-## Feature completeness matrix
+### DOC-2 build measurement
 
-`feature-completeness-matrix.json` is generated from current feature-linked canonical pages plus DOC-4/DOC-5 evidence. Columns include package, runtime, guide, API reference, options, examples, errors, limits, performance, security, animation, migration, verified version, and status.
+The original DOC-2 baseline was measured when the production build generated **15 static pages**. DOC-9 produces **463** static pages across the application. A raw wall-clock comparison therefore treated intentional route expansion as a regression.
 
-`PARTIAL` is retained where evidence is incomplete; the generator never converts missing evidence into a fictional `COMPLETE` state.
+The DOC-2 gate now compares clean-build throughput per generated static page while preserving its original **25% regression tolerance**. Browser, Lighthouse, accessibility, routed-JS, and other DOC-2 checks remain unchanged.
 
-## Legacy-only active features
+### DOC-4 client-island bundle measurement
 
-Hard gate: `active_feature_legacy_only_count == 0`.
+The old DOC-4 measurement used a text-window heuristic over Next.js client-reference manifests and charged the same shared route/layout chunks to `SignatureControls`, `OptionTable`, and `TypeExplorer`. This produced identical false per-island sizes.
 
-`legacy-only-features.json` is machine generated and the CI job exits non-zero if the count is not zero.
+The measurement now parses the exact RSC `clientModules` records, identifies chunks common to all measured islands as shared route cost, and applies the unchanged **250 KB** island budget to incremental island-owned chunks. The existing **1.4 MB** complex API-route budget remains in force, so shared cost is still bounded globally.
 
-## Orphan-content audit
+### DOC-6 build measurement
 
-The generator fails on unclassified sources, missing active targets, active sources without canonical routed pages, or duplicate canonical routes.
+The inherited DOC-6 baseline came from a build producing **330 static pages**; DOC-9 produces **463**. DOC-6 now evaluates the existing **35%** build tolerance using clean-build throughput per generated static page. Search p95 and zero-client-index-leakage gates remain unchanged.
 
-## Duplicate-content audit
+These changes fixed obsolete/incorrect measurements; they did not relax the substantive accessibility, search, bundle, runtime, or correctness requirements.
 
-Canonical-route duplication fails generation. Semantic text similarity is not used to auto-delete material; candidate review remains manual.
+## Pull-request verification
 
-## Archive inventory
+Implementation PR #32 was tested at head SHA `5318fa4c0e9b692fece274f2a8edb14de610600f`.
 
-Historical 5.4.5 hotfix content is retained with explicit archive rationale and a current-context destination.
+All PR workflows completed successfully:
 
-## Delete inventory
+- DOC-1 Information Architecture — run `34793098589` — `SUCCESS`
+- DOC-2 Design System and Shell — run `34793098568` — `SUCCESS`
+- DOC-3 MDX Component Library — run `34793098597` — `SUCCESS`
+- DOC-4 API Reference Engine — run `34793098558` — `SUCCESS`
+- DOC-5 Executable Example Platform — run `34793098563` — `SUCCESS`
+- DOC-6 Search Discovery — run `34793098586` — `SUCCESS`
+- DOC-7 Homepage Gallery Product — run `34793098561` — `SUCCESS`
+- DOC-8 Studio Interactive Foundation — run `34793098590` — `SUCCESS`
+- DOC-9 full content migration — run `34793098559` — `SUCCESS`
+- Documentation Runtime Build Gate — run `34793098595` — `SUCCESS`
 
-No content is deleted in this implementation. The deletion inventory therefore starts empty rather than inventing deletion rationale.
+The runtime gate passed its Node 22, Node 24, and Node 26 jobs.
 
-## Navigation impact
+## DOC-9 evidence artifact
 
-Navigation changes from a 3-page manual manifest to intent-driven groups covering the full canonical active corpus. Breadcrumbs and pager continue consuming the shared navigation model.
+The successful PR DOC-9 workflow archived `docs-doc9-evidence` with:
 
-## Search impact
+- workflow run: `34793098559`
+- artifact id: `10328639700`
+- artifact size: **43,308 bytes**
+- artifact digest: `sha256:5060bd4dd1259253822bf74327dd248702040860b61799c4de5cf64aad0a4d19`
+- retention expiry: `2026-10-14T00:38:23Z`
 
-All canonical active migrated pages default to search enabled. Manual legacy API and archive sources are excluded from active page loading/search so they do not compete with generated current truth.
+The artifact contains the generated classification, migration manifest, route/alias maps, content-preservation inventory, canonical routes, active-feature inventory, feature-completeness matrix, zero-legacy-only report, API/example/changelog migration evidence, archive/deletion inventories, orphan/duplicate audits, navigation/search/redirect/heading evidence, content lint, and the DOC-9 runtime log.
 
-## Internal-link impact
+## Merge
 
-Legacy fragments continue through compatibility canonicalization. Existing canonical routed content remains server/static by default.
+PR #32 was merged only after the full PR matrix was green.
 
-## Redirect impact
-
-Legacy browser fragments are mapped client-side because URL fragments are never sent in HTTP requests. DOC-9 extends that mapping without attempting impossible server-side fragment redirects.
-
-## Heading/anchor impact
-
-Existing MDX bodies and headings are preserved during route promotion. Legacy `?h=heading-id` forwarding remains supported by the compatibility resolver.
-
-## Components used/enhanced
-
-DOC-9 reuses DOC-1 content/schema/navigation, DOC-3 rendering/components, DOC-4 API reference, DOC-5 examples, DOC-6 discovery, and DOC-8 interaction foundation. No parallel component or interactive-editor system is added.
-
-## Routes added/migrated
-
-Exact final route count is generated in `canonical-routes.json`. The starting managed-route baseline is 3; DOC-9 promotes the active non-API/non-archive corpus from hash-only fallback to canonical `/docs/...` routes.
-
-## Content migrated
-
-The generator records domain counts from the live corpus. Migration covers start, beginner/tutorial, recipes, feature guides, advanced, internals, changelog/migration and legacy API disposition.
-
-## Tests added
-
-The DOC-9 CI gate performs generation integrity checks, zero-legacy-only-feature verification, orphan checks, the existing DOC-1→DOC-6 regression chain, TypeScript checking, production build, browser/search smoke, and evidence upload.
-
-## Accessibility impact
-
-No new content renderer is introduced. Existing heading extraction and DOC-2/DOC-3 semantics remain in use. Representative migration smoke remains a CI/post-merge gate before final status can change.
-
-## Responsive impact
-
-No DOC-2 shell redesign is performed. Full-corpus navigation exercises the existing responsive shell; CI/browser smoke is required before closure.
-
-## Performance impact
-
-Migration is metadata/routing driven and does not globally import interactive components. Build/bundle impact is recorded separately; DOC-11 final performance hardening is not pulled into DOC-9.
-
-## Build impact
-
-`build-comparison.json` records route-count change from the 3 managed / 145 fallback baseline to the generated final canonical route count. Production build result is pending PR CI at this revision.
-
-## Bundle impact
-
-No heavy component is introduced globally by DOC-9. Final bundle verification remains pending PR CI at this revision.
-
-## SEO/link impact
-
-Active content gains canonical route identities. Handwritten API duplicates do not become equally current/indexable reference pages.
-
-## Dependency changes
-
-None.
-
-## DOC-1 regression
-
-Pending DOC-9 CI. The workflow refreshes DOC-1 generated manifests against the fully migrated corpus before running the existing regression chain.
-
-## DOC-2 regression
-
-Pending DOC-9 CI through the established chained verification/build contracts.
-
-## DOC-3 regression
-
-Pending DOC-9 CI through the established chained verification/build contracts.
-
-## DOC-4 regression
-
-Pending DOC-9 CI; public export/options/signature coverage remains authoritative.
-
-## DOC-5 regression
-
-Pending DOC-9 CI; authoritative example verification remains unchanged.
-
-## DOC-6 regression
-
-Pending DOC-9 CI; search generation/verification is rerun against the expanded canonical corpus.
-
-## DOC-7 regression
-
-No DOC-7 product-surface implementation is replaced. Production build and link/search relationships are the DOC-9 regression surface; final outcome pending CI.
-
-## DOC-8 regression
-
-No standalone editor/viewer is introduced. Existing shared interactive primitives remain untouched; final build outcome pending CI.
-
-## Problems discovered
-
-The key live discrepancy was architectural: DOC-1 intentionally migrated only a representative 3-page slice, leaving 145 pages as legacy fallback. DOC-9 therefore had to convert the fallback state itself rather than merely move a few files.
-
-The legacy `04-api-reference` directory also represented a duplicate handwritten reference risk after DOC-4. Promoting it directly would violate the one-source-of-truth rule.
-
-## What went wrong
-
-Historical navigation and content loading treated frontmatter presence as the boundary between canonical and legacy content. That was appropriate for DOC-1 but would permanently strand most current documentation if retained through DOC-9.
-
-## How fixed
-
-A deterministic migration layer now supplies validated metadata for unmigrated active prose, excludes superseded manual API truth from active routing, archives historical hotfix detail, generates auditable disposition/evidence for every source, and expands navigation/search inputs from the canonical page set.
-
-## Not completed
-
-At this report revision:
-
-- DOC-9 PR CI has not yet completed.
-- final generated CI evidence has not yet been inspected.
-- PR has not yet merged.
-- post-merge main CI/evidence verification has not yet run.
-
-## Why
-
-Those operations occur after the implementation branch/report is present and the pull request is opened.
-
-## Alternatives considered
-
-1. Add literal frontmatter to ~145 files in one blind codemod. Rejected because it creates mass noisy edits and higher technical-content loss risk.
-2. Keep legacy fallback and add a separate route database. Rejected because it creates a second source of truth.
-3. Promote handwritten API pages as canonical `/docs` references. Rejected because DOC-4 is already the authoritative generated API system.
-
-## Generated evidence
-
-`generated/docs-doc9/` is produced by `npx tsx scripts/docs/doc9-generate.ts` and archived by `.github/workflows/doc9.yml`. It includes identity, inventory, migration manifest, classification summary, route/alias maps, preservation, canonical routes, active feature inventory, completeness matrix, legacy-only report, API/example/changelog migration, archive/delete inventories, duplicate/orphan audits, navigation/search coverage, redirect verification, content lint handoff, accessibility/responsive/build/bundle placeholders updated by CI context, prior-phase regression context, and index.
-
-## Remaining risks
-
-- Existing prose that contains exact contract fragments still requires ongoing DOC-4 drift discipline; DOC-9 avoids promoting the dedicated handwritten API tree but does not destructively rewrite every explanatory code fragment.
-- Very large navigation coverage can expose shell ergonomics issues; DOC-2 behavior must be observed in CI/browser smoke and later DOC-11 owns final global hardening.
-- Package main and docs pinned package SHA are distinct identities under the established synchronization policy; technical claims remain pinned to the documented 6.0.0 package artifact rather than silently following package main.
-
-## Deferred roadmap ownership
-
-- DOC-10: future-engine documentation readiness simulation — **not started**.
-- DOC-11: final accessibility/SEO/performance/reliability hardening — **not started**.
-- DOC-12: final release/integrity certification — **not started**.
-- Phase 15+: **not started**.
-
-## Final diff review
-
-Required before merge: inspect all DOC-9 branch changes for unclassified sources, broken canonical routes, accidental `/docs#` additions, handwritten API duplication, copied authoritative examples, fake defaults/errors/limits, future APIs represented as current, duplicate canonical pages, invalid metadata, clientification and dependency changes.
-
-## PR state
-
-Pending creation at this report revision.
-
-## Merge state
-
-Not merged.
+- merge SHA: `ae2eb52e3b69f416fb5a3362d17b6b57ce952b89`
+- merge title: `Merge DOC-9 full content migration`
+- merge result: `SUCCESS`
 
 ## Post-merge verification
 
-Not run.
+The resulting `main` SHA `ae2eb52e3b69f416fb5a3362d17b6b57ce952b89` triggered **9** push workflows.
 
-## Documentation architecture score
+Final observed post-merge state:
 
-Provisional DOC-9 architecture score: **9.2/10** for the implemented migration architecture, reduced from a higher score because CI/post-merge proof is not yet available. This is not the future DOC-12 final product score.
+- successful workflows: **9**
+- failed workflows: **0**
+- queued workflows: **0**
+- in-progress workflows: **0**
+
+The post-merge DOC-9 workflow run `34793500421` completed successfully. The post-merge Documentation Runtime Build Gate run `34793500462` also completed successfully. No post-merge failure remained.
+
+## Accessibility and responsive impact
+
+DOC-9 did not introduce a second renderer or redesign the DOC-2 shell. The full-corpus migration was exercised through inherited browser, keyboard, responsive, reduced-motion and axe regressions. DOC-8's full shared-interaction browser gate passed both before merge and on the verified main state.
+
+## Build and bundle impact
+
+The migration increases canonical routed content from 3 managed documentation routes to 136, so total application static-generation work necessarily increases. The corrected build gates normalize build throughput to route/static-page growth while keeping route JS, client-island, search-index isolation, accessibility, and browser budgets active.
+
+No DOC-9 dependency was added solely to perform the migration.
+
+## Content preservation and deletion policy
+
+No documentation source was automatically deleted in DOC-9. Historical/superseded material is explicitly classified and preserved for auditability. Any later destructive cleanup must satisfy its own target/content/link/redirect/search/navigation verification before deletion.
+
+## Problems discovered and resolved
+
+1. **145-page fallback architecture** — DOC-1 intentionally left most content in legacy delivery. DOC-9 replaced that state with canonical validated routing.
+2. **duplicate handwritten API truth risk** — legacy API prose was merged into DOC-4 ownership instead of promoted as a competing reference system.
+3. **legacy hash identities** — canonical routes were introduced without breaking old browser-fragment entry points.
+4. **stale build-time baselines** — DOC-2 and DOC-6 raw wall-clock gates were corrected to account for intentional static-route growth.
+5. **DOC-4 bundle attribution bug** — exact RSC client-module attribution replaced the shared-chunk overcounting heuristic.
+
+All five were resolved before the implementation PR was merged.
+
+## Final completion gates
+
+| Gate | Result |
+| --- | --- |
+| source inventory/classification coverage | PASS |
+| canonical-route coverage | PASS |
+| active legacy-only feature count | **0** |
+| orphan-content audit | PASS |
+| duplicate-route audit | PASS |
+| navigation coverage | **136/136** |
+| search coverage | **136/136** |
+| heading/anchor audit | PASS |
+| legacy redirect verification | PASS |
+| DOC-4 API truth regression | PASS |
+| DOC-5 executable examples regression | PASS |
+| DOC-6 search/discovery regression | PASS |
+| DOC-7 product regression | PASS |
+| DOC-8 interaction/a11y/responsive regression | PASS |
+| TypeScript/build verification | PASS |
+| Node 22/24/26 runtime build gate | PASS |
+| PR CI matrix | PASS |
+| merge | PASS |
+| post-merge main verification | PASS |
+
+## Deferred roadmap ownership
+
+The following remain intentionally untouched:
+
+- DOC-10 — future-engine documentation readiness simulation
+- DOC-11 — final accessibility/SEO/performance/reliability hardening
+- DOC-12 — final release/integrity certification
+- Apexify.js Phase 15+
+
+These are not hidden DOC-9 blockers; they are later roadmap work.
+
+## Final result
+
+DOC-9's required migration state is complete: the active corpus is canonical, current technical truth remains tied to DOC-4/DOC-5 and the pinned Apexify.js 6.0.0 artifact, discovery covers the migrated corpus, legacy inbound identities remain compatible, no current feature is stranded only in legacy docs, the full prior-phase matrix is green, the implementation is merged, and the merge result is verified on `main`.
+
+**DOC-9 status: COMPLETE.**
