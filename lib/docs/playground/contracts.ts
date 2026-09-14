@@ -1,5 +1,5 @@
 export type InteractiveLanguage = 'ts' | 'js';
-export type InteractiveRuntime = 'node' | 'web';
+export type InteractiveRuntime = 'node' | 'web' | 'react' | 'next-server' | 'next-client' | 'shared';
 export type DiagnosticSeverity = 'info' | 'warning' | 'error';
 export type PreviewStatus = 'idle' | 'loading' | 'ready' | 'error' | 'unsupported' | 'stale' | 'resetting';
 
@@ -69,16 +69,41 @@ export interface ExecutionResult {
 export interface ExecutionAdapter {
   readonly id: string;
   readonly runtime: InteractiveRuntime;
-  readonly mode: 'verified-static' | 'server-backed' | 'future-browser';
+  readonly mode: 'verified-static' | 'server-backed' | 'future-browser' | 'fixture';
   run(input: ExecutionInput): Promise<ExecutionResult>;
   reset?(): Promise<void>;
   dispose?(): Promise<void>;
 }
 
-/** Contract only. DOC-8 does not import or implement @apexify/web. */
+/** Contract only. DOC-8/DOC-10 do not import or implement @apexify/web. */
 export interface WebRuntimeAdapter {
   mount(target: HTMLElement, session: InteractiveSession): Promise<void>;
   update(session: InteractiveSession): Promise<void>;
+  diagnostics(): InteractiveDiagnostic[];
+  reset(): Promise<void>;
+  dispose(): Promise<void>;
+  capabilities(): Readonly<Record<string, boolean | string | number>>;
+}
+
+export interface AnimationPlaybackState {
+  durationMs: number;
+  delayMs: number;
+  easing: string;
+  repeat: number;
+  playbackRate: number;
+  property: string;
+  paused: boolean;
+  positionMs: number;
+  reducedMotion: boolean;
+}
+
+/** Adapter boundary only. The actual animation engine remains Phase 15+ work. */
+export interface AnimationRuntimeAdapter {
+  mount(target: HTMLElement, session: InteractiveSession): Promise<void>;
+  update(session: InteractiveSession, playback: AnimationPlaybackState): Promise<void>;
+  play(): Promise<void>;
+  pause(): Promise<void>;
+  seek(positionMs: number): Promise<void>;
   diagnostics(): InteractiveDiagnostic[];
   reset(): Promise<void>;
   dispose(): Promise<void>;
