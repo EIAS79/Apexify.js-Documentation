@@ -87,7 +87,18 @@
     "docs:verify:feature-completeness": "tsx scripts/docs/doc9-generate.ts --check",
     "docs:test:doc9": "tsx --test scripts/docs/doc9.test.ts",
     "docs:audit:doc9": "npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:search:build && npm run docs:generate:doc9 && npm run docs:lint:doc9 && npm run docs:test:doc9",
-    "docs:verify:doc9": "npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:search:build && npm run docs:generate:doc9 && npm run docs:lint:doc9 && npm run docs:migration:verify && npm run docs:test:doc9 && npm run docs:verify:doc6 && npx tsx scripts/docs/doc7-verify.ts && npx tsx --test scripts/docs/doc7.test.ts && npx tsx scripts/docs/doc8-generate.ts --check && npx tsx --test scripts/docs/doc8.test.ts && npx tsx scripts/docs/doc8-verify.ts && npm run verify:docs && npm run typecheck"
+    "docs:verify:doc9": "npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:search:build && npm run docs:generate:doc9 && npm run docs:lint:doc9 && npm run docs:migration:verify && npm run docs:test:doc9 && npm run docs:verify:doc6 && npx tsx scripts/docs/doc7-verify.ts && npx tsx --test scripts/docs/doc7.test.ts && npx tsx scripts/docs/doc8-generate.ts --check && npx tsx --test scripts/docs/doc8.test.ts && npx tsx scripts/docs/doc8-verify.ts && npm run verify:docs && npm run typecheck",
+    "docs:fixtures:future": "tsx scripts/docs/doc10-generate.ts",
+    "docs:test:future-routes": "tsx --test scripts/docs/doc10.test.ts",
+    "docs:test:future-navigation": "tsx --test scripts/docs/doc10.test.ts",
+    "docs:test:future-api": "tsx --test scripts/docs/doc10.test.ts",
+    "docs:test:future-playgrounds": "tsx --test scripts/docs/doc10.test.ts",
+    "docs:verify:fixture-isolation": "tsx scripts/docs/doc10-verify.ts",
+    "docs:generate:doc10": "tsx scripts/docs/doc10-generate.ts",
+    "docs:test:doc10": "tsx --test scripts/docs/doc10.test.ts",
+    "docs:audit:doc10": "npm run docs:generate:doc10 && tsx scripts/docs/doc10-generate.ts --check && npm run docs:test:doc10 && npm run docs:verify:fixture-isolation",
+    "docs:browser:doc10": "node scripts/docs/doc10-browser-verify.mjs",
+    "docs:verify:doc10": "npm run docs:audit:doc10 && npm run docs:verify:doc9 && npm run verify:docs && npm run typecheck"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
