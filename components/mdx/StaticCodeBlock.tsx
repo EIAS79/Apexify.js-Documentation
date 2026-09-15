@@ -3,6 +3,8 @@ import { CodeBlockActions } from './CodeBlockActions';
 import { composeStudioSnippetFromDocs, STUDIO_INCOMING_SNIPPET_KEY } from '@/lib/studio/studioConfig';
 
 const CODE_SURFACE = '#050314';
+const CODE_TEXT = '#f5f0ff';
+const CODE_LINE_NUMBER = '#cbd5e1';
 
 function normalizeLanguage(lang: string) {
   const langMap: Record<string, string> = {
@@ -59,25 +61,30 @@ export function StaticCodeBlock({
         </div>
         <div
           className="relative max-h-[min(65vh,28rem)] max-w-full overflow-x-auto overflow-y-auto"
-          style={{ backgroundColor: CODE_SURFACE }}
+          style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}
           tabIndex={0}
           role="group"
           aria-label={codeRegionLabel}
         >
           <pre
-            className="m-0 min-w-max p-3 font-mono text-[clamp(0.7rem,2vw,0.875rem)] leading-[1.6] text-slate-100 sm:p-4"
-            style={{ backgroundColor: CODE_SURFACE }}
+            className="m-0 min-w-max p-3 font-mono text-[clamp(0.7rem,2vw,0.875rem)] leading-[1.6] sm:p-4"
+            style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}
           >
-            <code>
+            <code style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}>
               {lines.map((line, index) => (
-                <span key={index} className="block min-h-[1.6em]">
+                <span
+                  key={index}
+                  className="block min-h-[1.6em]"
+                  style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}
+                >
                   <span
                     aria-hidden="true"
-                    className="mr-4 inline-block min-w-[2.5em] select-none text-right text-slate-400"
+                    className="mr-4 inline-block min-w-[2.5em] select-none text-right"
+                    style={{ backgroundColor: CODE_SURFACE, color: CODE_LINE_NUMBER }}
                   >
                     {index + 1}
                   </span>
-                  <span>{line || ' '}</span>
+                  <span style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}>{line || ' '}</span>
                 </span>
               ))}
             </code>
