@@ -14,12 +14,20 @@
 .apx-doc-prose :not(pre) > code { font-family:var(--apx-font-code); border:1px solid var(--apx-border-subtle); border-radius:.35rem; padding:.12rem .34rem; background:var(--apx-surface-sunken); color:var(--apx-text-primary); font-size:.88em; }
 .apx-doc-prose pre { max-width:100%; overflow:auto; overscroll-behavior-x:contain; border:1px solid var(--apx-border-default); border-radius:var(--apx-radius-lg); background:var(--apx-surface-code); color:var(--apx-text-primary); box-shadow:var(--apx-shadow-sm); scrollbar-gutter:stable; }
 .apx-doc-prose pre code { font-family:var(--apx-font-code); font-size:.875rem; line-height:1.65; }
-/* SyntaxHighlighter emits inline token colors. The routed code surface is deliberately
-   dark in both themes, so force a WCAG-readable neutral token foreground in light mode.
-   Dark mode keeps the accessible Prism palette. */
+/* Routed code-example surfaces are deliberately dark in both themes. Rich Prism blocks
+   emit inline token colors; the lightweight DOC-11 static renderer emits plain spans.
+   Keep both surfaces on the same opaque dark background so the forced light-mode token
+   foreground is evaluated against the actual code surface rather than the page canvas. */
 html:not(.dark) .apx-doc-prose [role="group"][aria-label$="code example"] code,
 html:not(.dark) .apx-doc-prose [role="group"][aria-label$="code example"] code span {
   color: #f5f0ff !important;
+}
+.apx-doc-prose [data-doc11-static-code] [role="group"][aria-label$="code example"],
+.apx-doc-prose [data-doc11-static-code] [role="group"][aria-label$="code example"] pre,
+.apx-doc-prose [data-doc11-static-code] [role="group"][aria-label$="code example"] code,
+.apx-doc-prose [data-doc11-static-code] [role="group"][aria-label$="code example"] code span {
+  background: #050314 !important;
+  background-color: #050314 !important;
 }
 .apx-doc-prose table { width:100%; display:block; overflow-x:auto; border-spacing:0; border-collapse:separate; border:1px solid var(--apx-border-default); border-radius:var(--apx-radius-lg); background:var(--apx-surface-raised); font-size:.9rem; }
 .apx-doc-prose th, .apx-doc-prose td { min-width:8rem; padding:.7rem .8rem; border-bottom:1px solid var(--apx-border-subtle); text-align:left; vertical-align:top; }
