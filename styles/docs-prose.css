@@ -22,12 +22,22 @@ html:not(.dark) .apx-doc-prose [role="group"][aria-label$="code example"] code,
 html:not(.dark) .apx-doc-prose [role="group"][aria-label$="code example"] code span {
   color: #f5f0ff !important;
 }
-.apx-doc-prose [data-doc11-static-code] [role="group"][aria-label$="code example"],
-.apx-doc-prose [data-doc11-static-code] [role="group"][aria-label$="code example"] pre,
-.apx-doc-prose [data-doc11-static-code] [role="group"][aria-label$="code example"] code,
-.apx-doc-prose [data-doc11-static-code] [role="group"][aria-label$="code example"] code span {
+/* Static code is reused by docs, example-detail, and interactive routes. Do not scope
+   its contrast lock to .apx-doc-prose: legacy .prose rules otherwise repaint the code
+   ancestor to the light sunken surface on example-detail pages, causing axe to evaluate
+   the intentionally light code text against #f1e8d6. */
+[data-doc11-static-code] [role="group"][aria-label$="code example"],
+[data-doc11-static-code] [role="group"][aria-label$="code example"] pre,
+[data-doc11-static-code] [role="group"][aria-label$="code example"] code,
+[data-doc11-static-code] [role="group"][aria-label$="code example"] code span {
   background: #050314 !important;
   background-color: #050314 !important;
+}
+[data-doc11-static-code] [role="group"][aria-label$="code example"] code > span > span[aria-hidden="true"] {
+  color: #cbd5e1 !important;
+}
+[data-doc11-static-code] [role="group"][aria-label$="code example"] code > span > span:not([aria-hidden="true"]) {
+  color: #f5f0ff !important;
 }
 .apx-doc-prose table { width:100%; display:block; overflow-x:auto; border-spacing:0; border-collapse:separate; border:1px solid var(--apx-border-default); border-radius:var(--apx-radius-lg); background:var(--apx-surface-raised); font-size:.9rem; }
 .apx-doc-prose th, .apx-doc-prose td { min-width:8rem; padding:.7rem .8rem; border-bottom:1px solid var(--apx-border-subtle); text-align:left; vertical-align:top; }
