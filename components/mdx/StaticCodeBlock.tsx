@@ -67,24 +67,32 @@ export function StaticCodeBlock({
           aria-label={codeRegionLabel}
         >
           <pre
-            className="m-0 min-w-max p-3 font-mono text-[clamp(0.7rem,2vw,0.875rem)] leading-[1.6] sm:p-4"
+            className="m-0 min-w-max !bg-[#050314] p-3 font-mono text-[clamp(0.7rem,2vw,0.875rem)] !text-[#f5f0ff] leading-[1.6] sm:p-4"
             style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}
           >
-            <code style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}>
+            <code
+              className="!bg-[#050314] !text-[#f5f0ff]"
+              style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}
+            >
               {lines.map((line, index) => (
                 <span
                   key={index}
-                  className="block min-h-[1.6em]"
+                  className="block min-h-[1.6em] !bg-[#050314] !text-[#f5f0ff]"
                   style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}
                 >
                   <span
                     aria-hidden="true"
-                    className="mr-4 inline-block min-w-[2.5em] select-none text-right"
+                    className="mr-4 inline-block min-w-[2.5em] select-none text-right !bg-[#050314] !text-[#cbd5e1]"
                     style={{ backgroundColor: CODE_SURFACE, color: CODE_LINE_NUMBER }}
                   >
                     {index + 1}
                   </span>
-                  <span style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}>{line || ' '}</span>
+                  <span
+                    className="!bg-[#050314] !text-[#f5f0ff]"
+                    style={{ backgroundColor: CODE_SURFACE, color: CODE_TEXT }}
+                  >
+                    {line || ' '}
+                  </span>
                 </span>
               ))}
             </code>
