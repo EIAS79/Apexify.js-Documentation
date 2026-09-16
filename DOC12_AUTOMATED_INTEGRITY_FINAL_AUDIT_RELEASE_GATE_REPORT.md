@@ -159,9 +159,11 @@ After this report was first committed at `11432ea4308006532b221d2a2e74946a218072
 
 All DOC-5 package execution, manifest, documentation integrity, TypeScript, production build, and other DOC-8 browser/accessibility checks passed. Reproduction in the independent DOC-8 workflow established that this was not a one-off runner fluctuation.
 
-The single undersized target was the example-detail `Gallery` breadcrumb link rendered under `.apx-api-breadcrumbs`. Existing code-copy, Studio, tab, disclosure, and example-footer controls already met the 44px interaction contract.
+The candidate undersized target was the example-detail `Gallery` breadcrumb link rendered under `.apx-api-breadcrumbs`; existing code-copy, Studio, tab, disclosure, and example-footer controls already meet the 44px interaction contract.
 
-**Correction:** `.apx-api-breadcrumbs a` now uses an inline-flex target with a minimum 44px height and explicit padding. The axe rule and WCAG 2.2 tag set were **not** disabled, filtered, or weakened. This correction must pass the new final-head CI before merge.
+An initial correction added a 44px breadcrumb target rule to `docs-api.css`. Fresh DOC-5 CI still failed because `/examples/[id]` does not load that API-reference stylesheet. Import tracing confirmed that the root route graph loads `app/site.css`, which includes `docs-examples.css`, while `docs-api.css` is owned by the API-reference route.
+
+**Final correction:** the example-detail breadcrumb contract is now defined in the stylesheet that the route actually loads: `.apx-doc5-page > .apx-api-breadcrumbs a` in `styles/docs-examples.css` uses an inline-flex target with a minimum 44px height and explicit padding. The API breadcrumb rule is retained for API-reference routes. The axe rule and WCAG 2.2 tag set were **not** disabled, filtered, or weakened. This routed correction must pass the new final-head CI before merge.
 
 ## DOC-11 inherited external verification boundary
 
