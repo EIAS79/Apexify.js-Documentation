@@ -121,7 +121,8 @@ if (!routedSidebar.includes('DocumentationNavigationGroup')) {
 }
 
 const routeRenderer = requireFile('components/docs/route/RouteDocsMarkdown.tsx');
-if (!routeRenderer.includes('canonicalizeLegacyDocumentationHref')) {
+const markdownRenderer = requireFile('components/docs/route/DocumentationMarkdownFragment.tsx');
+if (!routeRenderer.includes('DocumentationMarkdownFragment') || !markdownRenderer.includes('canonicalizeLegacyDocumentationHref')) {
   throw new Error('[doc1-verify] routed content does not canonicalize migrated internal doc links');
 }
 

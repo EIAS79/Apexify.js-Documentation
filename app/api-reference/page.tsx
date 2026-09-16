@@ -4,11 +4,13 @@ import { DocsShell } from '@/components/docs/shell/DocsShell';
 import { buildDocumentationNavigation } from '@/lib/docs/navigation';
 import { loadDocumentationPages } from '@/lib/docs/content';
 import { getApiManifest } from '@/lib/api-reference/manifest';
+import { absoluteSiteUrl } from '@/lib/site';
 
 export const metadata:Metadata={
   title:'API Reference | Apexify.js',
   description:'Generated API reference for the current packed Apexify.js package.',
-  alternates:{canonical:'https://apexifyjs.vercel.app/api-reference'},
+  alternates:{canonical:absoluteSiteUrl('/api-reference')},
+  openGraph:{type:'website',title:'Apexify.js API Reference',description:'Generated API reference for the current packed Apexify.js package.',url:absoluteSiteUrl('/api-reference'),siteName:'Apexify.js Documentation'},
 };
 export default function ApiReferenceIndex(){
   const manifest=getApiManifest();const groups=buildDocumentationNavigation(loadDocumentationPages());

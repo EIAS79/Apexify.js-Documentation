@@ -1,0 +1,193 @@
+name: DOC-11 Production Hardening
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'contexts/**'
+      - 'lib/**'
+      - 'styles/**'
+      - 'scripts/docs/**'
+      - 'content/**'
+      - 'public/**'
+      - 'generated/docs-doc*/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/doc11-production-hardening.yml'
+      - 'DOC11_*'
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'components/**'
+      - 'contexts/**'
+      - 'lib/**'
+      - 'styles/**'
+      - 'scripts/docs/**'
+      - 'content/**'
+      - 'public/**'
+      - 'generated/docs-doc*/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/doc11-production-hardening.yml'
+      - 'DOC11_*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  DOC11_BASE_URL: http://127.0.0.1:3000
+
+jobs:
+  harden-and-measure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+
+      - name: Deterministic install
+        run: npm ci
+
+      - name: DOC-0 through DOC-10 regression gate
+        run: npm run docs:verify:doc10
+
+      - name: DOC-11 static contracts and media audit
+        run: node scripts/docs/doc11-static-audit.mjs
+
+      - name: TypeScript gate
+        run: npm run typecheck
+
+      - name: Production build
+        run: npm run build
+
+      - name: Install ephemeral production audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3 lighthouse@12.8.2
+
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+
+      - name: Build and start bundle-regression baseline
+        shell: bash
+        env:
+          DOC11_COMPARE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+        run: |
+          BASE_SHA="$DOC11_COMPARE_SHA"
+          ZERO_SHA="0000000000000000000000000000000000000000"
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "$ZERO_SHA" ]; then
+            BASE_SHA="$(git rev-parse HEAD^)"
+          fi
+          git cat-file -e "${BASE_SHA}^{commit}"
+          BASE_DIR="$RUNNER_TEMP/doc11-base"
+          rm -rf "$BASE_DIR"
+          git worktree add --detach "$BASE_DIR" "$BASE_SHA"
+          pushd "$BASE_DIR"
+          npm ci
+          npm run build
+          npm start -- -p 3001 > /tmp/doc11-base-server.log 2>&1 &
+          echo $! > /tmp/doc11-base-server.pid
+          popd
+          ok=0
+          for i in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:3001/docs/getting-started >/dev/null; then ok=1; break; fi
+            sleep 1
+          done
+          if [ "$ok" -ne 1 ]; then
+            cat /tmp/doc11-base-server.log || true
+            exit 1
+          fi
+          echo "DOC11_BUNDLE_BASE_URL=http://127.0.0.1:3001" >> "$GITHUB_ENV"
+          echo "DOC11_BUNDLE_BASE_SHA=$BASE_SHA" >> "$GITHUB_ENV"
+          echo "DOC-11 bundle baseline: $BASE_SHA"
+
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/doc11-server.log 2>&1 &
+          ok=0
+          for i in $(seq 1 120); do
+            if curl --fail --silent http://127.0.0.1:3000/docs/getting-started >/dev/null; then ok=1; break; fi
+            sleep 1
+          done
+          if [ "$ok" -ne 1 ]; then
+            cat /tmp/doc11-server.log || true
+            exit 1
+          fi
+
+      - name: Route matrix, accessibility, keyboard, mobile, SEO, bundle and reliability audit
+        run: node scripts/docs/doc11-browser-verify.mjs
+
+      - name: Lighthouse desktop and mobile route matrix
+        shell: bash
+        run: |
+          rm -rf .doc11-lighthouse
+          mkdir -p .doc11-lighthouse
+          routes=(
+            "home|/"
+            "docs|/docs/getting-started"
+            "api|/api-reference"
+            "gallery|/gallery"
+            "studio|/studio"
+            "playground|/docs/node/canvas"
+          )
+          for entry in "${routes[@]}"; do
+            name="${entry%%|*}"
+            route="${entry#*|}"
+            url="http://127.0.0.1:3000${route}"
+            npx lighthouse "$url" --output=json --output-path=".doc11-lighthouse/${name}-mobile.json" --only-categories=performance,accessibility,best-practices,seo --quiet --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+            npx lighthouse "$url" --preset=desktop --output=json --output-path=".doc11-lighthouse/${name}-desktop.json" --only-categories=performance,accessibility,best-practices,seo --quiet --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage"
+          done
+
+      - name: Enforce Lighthouse and Core Web Vitals targets
+        run: node scripts/docs/doc11-lighthouse-summary.mjs
+
+      - name: Verify complete DOC-11 evidence set
+        shell: bash
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const path=require('path');
+          const dir=path.join('generated','verification','doc-11');
+          const required=['static-contracts.json','media.json','route-matrix.json','accessibility.json','keyboard.json','mobile.json','reduced-motion.json','metadata-seo.json','bundle.json','cache-reliability.json','seo-infrastructure.json','browser-summary.json','lighthouse-cwv.json'];
+          const missing=required.filter(name=>!fs.existsSync(path.join(dir,name)));
+          if(missing.length) throw new Error(`missing DOC-11 evidence: ${missing.join(', ')}`);
+          const failed=[];
+          for(const name of required){
+            const data=JSON.parse(fs.readFileSync(path.join(dir,name),'utf8'));
+            if(data.status==='FAIL') failed.push(name);
+          }
+          if(failed.length) throw new Error(`failed DOC-11 evidence: ${failed.join(', ')}`);
+          console.log('DOC-11 evidence PASS', required.length);
+          NODE
+
+      - name: Archive DOC-11 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-doc11-evidence
+          path: |
+            generated/verification/doc-11
+            .doc11-lighthouse
+            /tmp/doc11-server.log
+            /tmp/doc11-base-server.log
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 30
