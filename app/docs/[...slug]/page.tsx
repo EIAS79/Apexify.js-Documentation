@@ -17,8 +17,9 @@ export function generateStaticParams() {
     .map((page) => ({ slug: page.slug.split('/') }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string[] } }): Metadata {
-  const page = getDocumentationPageBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string[] }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const page = getDocumentationPageBySlug(slug);
   if (!page) return { title: 'Documentation not found | Apexify.js', robots: { index: false, follow: false } };
   const canonical = `${SITE_ORIGIN}${page.canonicalPath}`;
   const indexable = !['ROADMAP', 'REMOVED'].includes(page.stability);
@@ -42,8 +43,9 @@ function withoutLeadingTitle(body: string): string {
   return body.replace(/^\s*#\s+[^\r\n]+(?:\r?\n)+/, '');
 }
 
-export default function DocumentationRoutePage({ params }: { params: { slug: string[] } }) {
-  const page = getDocumentationPageBySlug(params.slug);
+export default async function DocumentationRoutePage({ params }: { params: Promise<{ slug: string[] }> }) {
+  const { slug } = await params;
+  const page = getDocumentationPageBySlug(slug);
   if (!page) notFound();
 
   const navigation = buildDocumentationNavigation(loadDocumentationPages());

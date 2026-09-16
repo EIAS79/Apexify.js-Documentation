@@ -69,19 +69,37 @@ function toItem(page: DocumentationPage): DocumentationNavigationItem {
   };
 }
 
+function nestNavigationItems(items: DocumentationNavigationItem[]): DocumentationNavigationItem[] {
+  const bySlug = new Map(items.map((item) => [item.slug, item]));
+  const roots: DocumentationNavigationItem[] = [];
+
+  for (const item of items) {
+    const segments = item.slug.split('/');
+    const parentSlug = segments.length > 1 ? segments.slice(0, -1).join('/') : null;
+    const parent = parentSlug ? bySlug.get(parentSlug) : undefined;
+    if (parent) {
+      parent.children = [...(parent.children ?? []), item];
+    } else {
+      roots.push(item);
+    }
+  }
+
+  return roots;
+}
+
 export function buildDocumentationNavigation(pages: DocumentationPage[]): DocumentationNavigationGroup[] {
   const seen = new Set<string>();
-  const groups = DOCUMENTATION_NAVIGATION_MANIFEST.map((definition) => ({
-    ...definition,
-    items: pages
+  const groups = DOCUMENTATION_NAVIGATION_MANIFEST.map((definition) => {
+    const items = pages
       .filter((page) => groupIdFor(page) === definition.id)
       .sort((a, b) => a.order - b.order || a.canonicalPath.localeCompare(b.canonicalPath, undefined, { numeric: true }))
       .map((page) => {
         if (seen.has(page.slug)) throw new Error(`[docs-navigation] routed page "${page.slug}" appears more than once`);
         seen.add(page.slug);
         return toItem(page);
-      }),
-  })).filter((group) => group.items.length > 0);
+      });
+    return { ...definition, items: nestNavigationItems(items) };
+  }).filter((group) => group.items.length > 0);
 
   const missing = pages.filter((page) => !seen.has(page.slug));
   if (missing.length) throw new Error(`[docs-navigation] routed pages missing from navigation taxonomy: ${missing.map((page) => page.slug).join(', ')}`);
