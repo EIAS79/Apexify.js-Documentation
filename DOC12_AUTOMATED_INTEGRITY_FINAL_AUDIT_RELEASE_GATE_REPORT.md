@@ -79,7 +79,7 @@ The candidate verifier passed export and declaration identity checks and execute
 | Privacy/secrets | **PASS** | Secret-pattern findings `0` |
 | Internal links/headings | **PASS** | Required internal link and heading integrity checks passed |
 | External links | **PASS** | 14 inventoried; 5 controlled live checks; 9 syntax-only; hard failures `0`; transient `0` |
-| Accessibility/mobile/reliability | **PASS** | DOC-11 browser matrix and inherited evidence rerun successfully |
+| Accessibility/mobile/reliability | **PASS** | DOC-11 browser matrix and inherited evidence rerun successfully; final-head DOC-5 WCAG 2.2 target-size defect documented and corrected below before merge |
 | Lighthouse | **PASS** | DOC-11 reference matrix plus repeated DOC-12 standard-doc gate passed |
 | Evidence integrity | **PASS** | 40 final artifacts, current source SHA, checksummed index, release verifier PASS |
 | Future-phase documentation contract | **PASS** | Public behavior changes must update and verify docs in the same implementation phase |
@@ -150,6 +150,18 @@ Before the corrections above, the release workflow reached the final `Authoritat
 - `[DOC-11 evidence] PASS files=13`
 - `[DOC-12 audit] PASS ... evidence=40 warnings=0`
 - `[DOC-12 release verify] PASS ... artifacts=40`
+
+### 6. Fresh final-head CI exposed an inherited WCAG 2.2 target-size defect
+
+After this report was first committed at `11432ea4308006532b221d2a2e74946a2180726a`, the required fresh final-head CI exposed a reproducible accessibility failure in the inherited DOC-5 example browser regression. Both the DOC-5 workflow and DOC-8's DOC-5 regression step reported:
+
+`desktop-light axe [{"id":"target-size","impact":"serious","nodes":1}]`
+
+All DOC-5 package execution, manifest, documentation integrity, TypeScript, production build, and other DOC-8 browser/accessibility checks passed. Reproduction in the independent DOC-8 workflow established that this was not a one-off runner fluctuation.
+
+The single undersized target was the example-detail `Gallery` breadcrumb link rendered under `.apx-api-breadcrumbs`. Existing code-copy, Studio, tab, disclosure, and example-footer controls already met the 44px interaction contract.
+
+**Correction:** `.apx-api-breadcrumbs a` now uses an inline-flex target with a minimum 44px height and explicit padding. The axe rule and WCAG 2.2 tag set were **not** disabled, filtered, or weakened. This correction must pass the new final-head CI before merge.
 
 ## DOC-11 inherited external verification boundary
 
