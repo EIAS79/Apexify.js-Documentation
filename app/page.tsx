@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import '@/styles/doc7-product-accessibility.css';
 import Navbar from '@/components/Navbar';
 import AmbientBackground from '@/components/home/AmbientBackground';
 import ScrollTopButton from '@/components/home/ScrollTopButton';

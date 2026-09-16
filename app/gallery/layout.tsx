@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import '@/styles/doc7-product-accessibility.css';
 
 export const metadata: Metadata = {
   title: 'Gallery | Apexify.js',

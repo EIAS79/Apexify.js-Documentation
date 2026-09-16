@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import '@/styles/docs-examples.css';
 import { notFound } from 'next/navigation';
 import { getDocumentationPageBySlug, loadDocumentationPages } from '@/lib/docs/content';
 import { buildDocumentationNavigation, getDocumentationBreadcrumbs, getDocumentationPager } from '@/lib/docs/navigation';

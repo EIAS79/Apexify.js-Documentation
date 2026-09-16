@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import '@/styles/docs-examples.css';
 import { notFound } from 'next/navigation';
 import { DocsShell } from '@/components/docs/shell/DocsShell';
 import { buildDocumentationNavigation } from '@/lib/docs/navigation';

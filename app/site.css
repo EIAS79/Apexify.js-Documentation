@@ -1,0 +1,4 @@
+/* Root stylesheet entrypoint. Keep owned source modules separate while emitting a single root CSS dependency graph. */
+@import './globals.css';
+@import '../styles/doc7-product-accessibility.css';
+@import '../styles/docs-examples.css';
