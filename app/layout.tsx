@@ -7,6 +7,7 @@ import "@/styles/doc7-product-accessibility.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { CustomCursorGate } from "@/components/docs/shell/CustomCursorGate";
+import { SiteTelemetry } from "@/components/analytics/SiteTelemetry";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_ORIGIN } from "@/lib/site";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "optional" });
@@ -33,4 +34,4 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
   },
 };
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} /></head><body className={`${inter.className} ${inter.variable}`}><ThemeProvider><SidebarProvider>{children}</SidebarProvider><CustomCursorGate /></ThemeProvider>{process.env.VERCEL ? <SpeedInsights /> : null}</body></html>; }
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} /></head><body className={`${inter.className} ${inter.variable}`}><ThemeProvider><SidebarProvider>{children}</SidebarProvider><CustomCursorGate /></ThemeProvider><SiteTelemetry />{process.env.VERCEL ? <SpeedInsights /> : null}</body></html>; }
