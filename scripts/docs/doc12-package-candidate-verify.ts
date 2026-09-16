@@ -3,8 +3,8 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync, execFileSync } from 'node:child_process';
-import { exampleDefinitions } from '../../lib/examples/definitions.ts';
-import { MAX_OUTPUT_FILES, MAX_TOTAL_OUTPUT_BYTES, runControlled, safeOutputPath, sanitizedExecutionEnv, verifyOutputBuffer } from './doc5-runner-lib.ts';
+import { exampleDefinitions } from '../../lib/examples/definitions';
+import { MAX_OUTPUT_FILES, MAX_TOTAL_OUTPUT_BYTES, runControlled, safeOutputPath, sanitizedExecutionEnv, verifyOutputBuffer } from './doc5-runner-lib';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'generated', 'docs-doc12');
