@@ -153,17 +153,29 @@ Before the corrections above, the release workflow reached the final `Authoritat
 
 ### 6. Fresh final-head CI exposed an inherited WCAG 2.2 target-size defect
 
-After this report was first committed at `11432ea4308006532b221d2a2e74946a2180726a`, the required fresh final-head CI exposed a reproducible accessibility failure in the inherited DOC-5 example browser regression. Both the DOC-5 workflow and DOC-8's DOC-5 regression step reported:
+After this report was first committed at `11432ea4308006532b221d2a2e74946a2180726a`, the required fresh final-head CI exposed a reproducible accessibility failure in the inherited DOC-5 example browser regression. Both the DOC-5 workflow and DOC-8's DOC-5 regression step initially reported:
 
 `desktop-light axe [{"id":"target-size","impact":"serious","nodes":1}]`
 
 All DOC-5 package execution, manifest, documentation integrity, TypeScript, production build, and other DOC-8 browser/accessibility checks passed. Reproduction in the independent DOC-8 workflow established that this was not a one-off runner fluctuation.
 
-The candidate undersized target was the example-detail `Gallery` breadcrumb link rendered under `.apx-api-breadcrumbs`; existing code-copy, Studio, tab, disclosure, and example-footer controls already meet the 44px interaction contract.
+The candidate undersized target was the example-detail `Gallery` breadcrumb link rendered under `.apx-api-breadcrumbs`; existing code-copy, Studio, disclosure, and example-footer controls already meet the 44px interaction contract.
 
-An initial correction added a 44px breadcrumb target rule to `docs-api.css`. Fresh DOC-5 CI still failed because `/examples/[id]` does not load that API-reference stylesheet. Import tracing confirmed that the root route graph loads `app/site.css`, which includes `docs-examples.css`, while `docs-api.css` is owned by the API-reference route.
+An initial correction added a 44px breadcrumb target rule to `docs-api.css`. Fresh DOC-5 CI still failed because `/examples/[id]` does not load that API-reference stylesheet. Import tracing confirmed that the root route graph loads `app/site.css`, which includes `docs-examples.css`, while `docs-api.css` is owned by the API-reference route. The breadcrumb rule was then moved into `styles/docs-examples.css`, which corrected the desktop target geometry.
 
-**Final correction:** the example-detail breadcrumb contract is now defined in the stylesheet that the route actually loads: `.apx-doc5-page > .apx-api-breadcrumbs a` in `styles/docs-examples.css` uses an inline-flex target with a minimum 44px height and explicit padding. The API breadcrumb rule is retained for API-reference routes. The axe rule and WCAG 2.2 tag set were **not** disabled, filtered, or weakened. This routed correction must pass the new final-head CI before merge.
+To remove ambiguity from any later accessibility failure, `scripts/docs/doc5-browser-verify.mjs` was also strengthened so axe failures retain each offending node's selector, HTML and failure summary instead of collapsing evidence to a node count.
+
+That diagnostic exposed the remaining failure precisely on `mobile-light`:
+
+- selector: `a[href$="gallery"]`
+- element: `<a href="/gallery">Gallery</a>`
+- usable visible space: `62.5px × 13px`
+- safe clickable-space diameter: `22px` instead of at least `24px`
+- axe classification: the target was **partially obscured**, not merely intrinsically too small.
+
+The root cause was the `/examples` route shell contract. `DocsShell`'s mobile control bar is sticky at `top: var(--apx-header-height)`. Canonical `/docs` and `/api-reference` surfaces provide a real `DocsHeader` occupying that reserved height; `/examples` had no route layout/header. Once the missing shell/component styles were loaded, the sticky mobile bar shifted down by the reserved header offset while retaining its original flow position and overlapped the first content row, partially covering the `Gallery` breadcrumb.
+
+**Final correction:** `app/examples/layout.tsx` now owns the same documentation shell prerequisites as the API-reference surface: `docs.css`, reusable component/API styles, the `.apx-doc-root` wrapper, skip link, background layer, and `DocsHeader`. This makes the sticky mobile offset correspond to a real header instead of overlapping content. The route-style dependency gap and the obscured mobile target are fixed at their architectural boundary. The axe rule, WCAG 2.2 tag set, target-size threshold, and browser states were **not** disabled, filtered, or weakened. This correction must pass the new final-head CI before merge.
 
 ## DOC-11 inherited external verification boundary
 
