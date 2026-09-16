@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import { Bars3Icon, ListBulletIcon } from '@heroicons/react/24/outline';
+import { ListBulletIcon } from '@heroicons/react/24/outline';
 import type { DocumentationHeading } from '@/lib/docs/schema';
 import type { DocumentationNavigationGroup } from '@/lib/docs/navigation';
 import { AccessibleDrawer } from './AccessibleDrawer';
+import { MobileDocsNavigationDrawer } from './MobileDocsNavigationDrawer';
 import { DocsSidebarV2 } from '@/components/docs/navigation/DocsSidebarV2';
 import { OnThisPageV2 } from '@/components/docs/navigation/OnThisPageV2';
 
@@ -16,15 +17,7 @@ export function DocsShell({ groups, headings, activePath, children }: {
     <div className="apx-doc-shell" data-doc2-shell>
       <main id="docs-content" tabIndex={-1} className="apx-doc-main lg:col-start-2 lg:row-start-1">
         <div className="apx-doc-mobile-bar" aria-label="Mobile documentation controls">
-          <AccessibleDrawer
-            label="Documentation navigation"
-            triggerLabel="Open documentation navigation"
-            side="left"
-            eventName="apx-open-docs-nav"
-            trigger={<><Bars3Icon className="h-5 w-5" aria-hidden /><span>Navigation</span></>}
-          >
-            <DocsSidebarV2 groups={groups} activePath={activePath} searchInputId="docs-drawer-search-input" />
-          </AccessibleDrawer>
+          <MobileDocsNavigationDrawer groups={groups} activePath={activePath} />
           {headings.length ? (
             <AccessibleDrawer
               label="On this page"
