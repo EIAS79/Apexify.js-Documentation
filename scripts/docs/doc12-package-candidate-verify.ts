@@ -28,14 +28,70 @@ const minimalInstallEnv = (): NodeJS.ProcessEnv => {
   for (const key of ['PATH','Path','HOME','SystemRoot','TMPDIR','TMP','TEMP','HTTP_PROXY','HTTPS_PROXY','NO_PROXY','http_proxy','https_proxy','no_proxy','npm_config_cache','npm_config_registry']) if (process.env[key]) env[key] = process.env[key];
   return env;
 };
-function declarationDigest(root: string) {
-  const dir = path.join(root, 'dist');
-  const files: string[] = [];
-  const walk = (d: string) => { if (!fs.existsSync(d)) return; for (const e of fs.readdirSync(d, { withFileTypes: true }).sort((a,b)=>a.name.localeCompare(b.name))) { const f=path.join(d,e.name); if(e.isDirectory()) walk(f); else if(e.isFile() && /\.d\.(?:ts|cts)$/.test(e.name)) files.push(f); } };
-  walk(dir);
+
+function publicTypeEntrypoints(pkg: any): string[] {
+  const entries = new Set<string>();
+  if (typeof pkg.types === 'string') entries.add(pkg.types);
+  const visit = (value: any): void => {
+    if (!value || typeof value !== 'object') return;
+    if (typeof value.types === 'string') entries.add(value.types);
+    for (const child of Object.values(value)) visit(child);
+  };
+  visit(pkg.exports);
+  return [...entries].sort();
+}
+
+function resolveDeclarationSpecifier(fromFile: string, specifier: string): string | null {
+  if (!specifier.startsWith('.')) return null;
+  const base = path.resolve(path.dirname(fromFile), specifier);
+  const candidates = [base];
+  if (/\.js$/i.test(base)) candidates.unshift(base.replace(/\.js$/i, '.d.ts'));
+  if (/\.cjs$/i.test(base)) candidates.unshift(base.replace(/\.cjs$/i, '.d.cts'));
+  if (/\.mjs$/i.test(base)) candidates.unshift(base.replace(/\.mjs$/i, '.d.mts'));
+  if (!/\.d\.(?:ts|cts|mts)$/i.test(base)) {
+    candidates.push(`${base}.d.ts`, `${base}.d.cts`, `${base}.d.mts`);
+    candidates.push(path.join(base, 'index.d.ts'), path.join(base, 'index.d.cts'), path.join(base, 'index.d.mts'));
+  }
+  return candidates.find((candidate) => fs.existsSync(candidate) && fs.statSync(candidate).isFile()) ?? null;
+}
+
+function declarationDigest(root: string, pkg: any) {
+  const entrypoints = publicTypeEntrypoints(pkg);
+  if (!entrypoints.length) throw new Error('package has no exported declaration entrypoints');
+  const rootResolved = path.resolve(root);
+  const queue = entrypoints.map((entry) => path.resolve(root, entry));
+  const files = new Set<string>();
+  const sourceByFile = new Map<string, string>();
+  while (queue.length) {
+    const file = queue.shift()!;
+    const normalizedFile = path.resolve(file);
+    if (files.has(normalizedFile)) continue;
+    if (normalizedFile !== rootResolved && !normalizedFile.startsWith(`${rootResolved}${path.sep}`)) throw new Error(`declaration escaped package root: ${normalizedFile}`);
+    if (!fs.existsSync(normalizedFile)) throw new Error(`missing exported declaration: ${path.relative(root, normalizedFile)}`);
+    const source = fs.readFileSync(normalizedFile, 'utf8').replace(/\r\n/g, '\n');
+    files.add(normalizedFile);
+    sourceByFile.set(normalizedFile, source);
+    const specs = new Set<string>();
+    for (const match of source.matchAll(/(?:from\s+|import\s*\(\s*|require\s*\(\s*)['"]([^'"]+)['"]/g)) specs.add(match[1]);
+    for (const match of source.matchAll(/\/\/\/\s*<reference\s+path=['"]([^'"]+)['"]/g)) specs.add(match[1]);
+    for (const specifier of specs) {
+      if (!specifier.startsWith('.')) continue;
+      const resolved = resolveDeclarationSpecifier(normalizedFile, specifier);
+      if (!resolved) throw new Error(`unresolved relative declaration import ${specifier} from ${path.relative(root, normalizedFile)}`);
+      queue.push(resolved);
+    }
+  }
+  const ordered = [...files].sort((a, b) => path.relative(root, a).localeCompare(path.relative(root, b)));
   const h = crypto.createHash('sha256');
-  for (const file of files) { const rel=path.relative(root,file).split(path.sep).join('/'); h.update(rel); h.update('\0'); h.update(fs.readFileSync(file,'utf8').replace(/\r\n/g,'\n')); h.update('\0'); }
-  return { sha256:h.digest('hex'), files:files.map((f)=>path.relative(root,f).split(path.sep).join('/')) };
+  for (const file of ordered) {
+    const rel = path.relative(root, file).split(path.sep).join('/');
+    h.update(rel); h.update('\0'); h.update(sourceByFile.get(file)!); h.update('\0');
+  }
+  return {
+    sha256: h.digest('hex'),
+    entrypoints: entrypoints.map((entry) => entry.replace(/^\.\//, '')),
+    files: ordered.map((file) => path.relative(root, file).split(path.sep).join('/')),
+  };
 }
 
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'apexify-doc12-candidate-'));
@@ -51,11 +107,11 @@ try {
   const pinnedRoot = path.join(ROOT, 'node_modules', 'apexify.js');
   if (!fs.existsSync(path.join(pinnedRoot, 'package.json'))) throw new Error('docs pinned apexify.js dependency is not installed');
   const pinnedPkg = JSON.parse(fs.readFileSync(path.join(pinnedRoot, 'package.json'), 'utf8'));
-  const candidateDecl = declarationDigest(candidateRoot);
-  const pinnedDecl = declarationDigest(pinnedRoot);
+  const candidateDecl = declarationDigest(candidateRoot, candidatePkg);
+  const pinnedDecl = declarationDigest(pinnedRoot, pinnedPkg);
   const exportsMatch = JSON.stringify(stable(candidatePkg.exports ?? {})) === JSON.stringify(stable(pinnedPkg.exports ?? {}));
   const declarationsMatch = candidateDecl.sha256 === pinnedDecl.sha256;
-  if (!exportsMatch || !declarationsMatch) throw new Error(`current package public surface differs from documented artifact: exportsMatch=${exportsMatch} declarationsMatch=${declarationsMatch}`);
+  if (!exportsMatch || !declarationsMatch) throw new Error(`current package public surface differs from documented artifact: exportsMatch=${exportsMatch} declarationsMatch=${declarationsMatch} candidateReachableDeclarations=${candidateDecl.files.length} documentedReachableDeclarations=${pinnedDecl.files.length}`);
 
   const results: any[] = [];
   for (const example of exampleDefinitions) {
@@ -87,12 +143,12 @@ try {
     generatedAt:new Date().toISOString(),
     status:'PASS',
     package:{name:candidatePkg.name,version:candidatePkg.version,commit:packageSha,artifactFilename:path.basename(tarball),artifactSha256:hash(fs.readFileSync(tarball))},
-    documentedArtifact:{version:pinnedPkg.version,exportsMatch,declarationsMatch,declarationSha256:pinnedDecl.sha256},
-    candidatePublicSurface:{exportsMatch,declarationsMatch,declarationSha256:candidateDecl.sha256,declarationFiles:candidateDecl.files.length},
+    documentedArtifact:{version:pinnedPkg.version,exportsMatch,declarationsMatch,declarationSha256:pinnedDecl.sha256,declarationEntrypoints:pinnedDecl.entrypoints,declarationFiles:pinnedDecl.files.length},
+    candidatePublicSurface:{exportsMatch,declarationsMatch,declarationSha256:candidateDecl.sha256,declarationEntrypoints:candidateDecl.entrypoints,declarationFiles:candidateDecl.files.length},
     examples:{total:results.length,passed:results.length,results},
   };
   fs.writeFileSync(path.join(OUT,'package-candidate.json'), `${JSON.stringify(payload,null,2)}\n`);
-  console.log(`[DOC-12 package candidate] PASS ${candidatePkg.version} ${packageSha.slice(0,12)}… artifact=${payload.package.artifactSha256.slice(0,12)}… examples=${results.length}`);
+  console.log(`[DOC-12 package candidate] PASS ${candidatePkg.version} ${packageSha.slice(0,12)}… artifact=${payload.package.artifactSha256.slice(0,12)}… publicDeclarations=${candidateDecl.files.length} examples=${results.length}`);
 } finally {
   fs.rmSync(temp,{recursive:true,force:true});
 }
