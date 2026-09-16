@@ -1,12 +1,22 @@
-import { parseRichMdxSegments } from '@/components/mdx/rich-parser';
+import { parseRichMdxSegments, type RichMdxSegment } from '@/components/mdx/rich-parser';
 import { DocumentationMarkdownFragment } from './DocumentationMarkdownFragment';
 
-export async function RouteDocsMarkdown({ content }: { content: string }) {
+type RichComponentSegment = Extract<RichMdxSegment, { kind: 'component' }>;
+
+async function LazyRichDocsSegment({ segment, index }: { segment: RichComponentSegment; index: number }) {
+  const { RichDocsSegment } = await import('./RichDocsSegment');
+  return (
+    <RichDocsSegment
+      key={`${segment.name}-${index}`}
+      name={segment.name}
+      props={segment.props}
+      body={segment.body}
+    />
+  );
+}
+
+export function RouteDocsMarkdown({ content }: { content: string }) {
   const segments = parseRichMdxSegments(content);
-  const hasRichSegments = segments.some((segment) => segment.kind === 'component');
-  const RichDocsSegment = hasRichSegments
-    ? (await import('./RichDocsSegment')).RichDocsSegment
-    : null;
 
   return (
     <>
@@ -14,8 +24,7 @@ export async function RouteDocsMarkdown({ content }: { content: string }) {
         if (segment.kind === 'markdown') {
           return <DocumentationMarkdownFragment key={`markdown-${index}`} content={segment.content} />;
         }
-        if (!RichDocsSegment) return null;
-        return <RichDocsSegment key={`${segment.name}-${index}`} name={segment.name} props={segment.props} body={segment.body} />;
+        return <LazyRichDocsSegment key={`${segment.name}-${index}`} segment={segment} index={index} />;
       })}
     </>
   );
