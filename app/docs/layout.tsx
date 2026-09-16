@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import '@/styles/docs-tokens.css';
 import '@/styles/docs-shell.css';
 import '@/styles/docs-prose.css';
-import '@/styles/docs-components.css';
 import { DocsHeader } from '@/components/docs/shell/DocsHeader';
 import { LegacyDocsRedirectIsland } from '@/components/docs/shell/LegacyDocsRedirectIsland';
 import { absoluteSiteUrl } from '@/lib/site';
