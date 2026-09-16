@@ -74,6 +74,9 @@ jobs:
           echo "DOC12_PACKAGE_MAIN_ARTIFACT_SHA256=$PACKAGE_ARTIFACT_SHA256" >> "$GITHUB_ENV"
           echo "Package candidate: $PACKAGE_SHA $PACKAGE_VERSION $PACKAGE_ARTIFACT_SHA256"
 
+      - name: Fail fast on package public-surface drift
+        run: npm run docs:verify:package-candidate
+
       - name: Regenerate and verify DOC-1 through DOC-10 prerequisites
         run: npm run docs:verify:doc10
 
