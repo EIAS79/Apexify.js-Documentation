@@ -1,3 +1,4 @@
+import '@/styles/docs-components.css';
 import { CodeBlock } from '@/components/mdx/CodeBlock';
 import {
   Callout, Steps, Tabs, Details, CodeBlockV2, CodeGroup, InstallCommand, CodeDiff,
