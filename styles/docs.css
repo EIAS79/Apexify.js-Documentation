@@ -1,0 +1,7 @@
+/* DOC-12: single documentation-style entrypoint.
+ * Keep the source modules separate for ownership/tests while letting Next/Webpack
+ * build one route-level CSS dependency graph instead of three independent layout imports.
+ */
+@import './docs-tokens.css';
+@import './docs-shell.css';
+@import './docs-prose.css';
