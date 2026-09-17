@@ -46,7 +46,7 @@ export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
       >
         <div className="grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(220px,.8fr)] sm:p-5">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'var(--accent-magenta)' }}>Interactive example</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'color-mix(in srgb,var(--accent-magenta) 75%,var(--text-primary))' }}>Interactive example</p>
             <h3 className="mt-1 text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{props.title}</h3>
             <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>Open the verified source and output side by side. The editor is deferred until requested; this documentation surface does not pretend to run Node code in the browser.</p>
             <button type="button" onClick={() => setActivated(true)} className="mt-4 min-h-11 rounded-lg px-4 text-sm font-bold" style={{ background:'var(--gradient-sunset)', color:'white', boxShadow:'var(--shadow-sm)' }}>Show code &amp; preview</button>
