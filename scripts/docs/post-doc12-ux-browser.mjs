@@ -41,7 +41,8 @@ async function open({ name, route, width = 1440, height = 1100, theme = 'light',
   ]);
   await page.evaluateOnNewDocument((mode) => localStorage.setItem('apexify-theme', mode), theme);
   const response = await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle2' });
-  if (!response?.ok()) throw new Error(`${name}: ${route} returned ${response?.status()}`);
+  const status = response?.status() ?? 0;
+  if (status < 200 || status >= 400) throw new Error(`${name}: ${route} returned ${status || 'no response'}`);
   await page.addScriptTag({ content: axeSource });
   const violations = await axe(page);
   const metrics = await page.evaluate(() => ({
@@ -53,7 +54,7 @@ async function open({ name, route, width = 1440, height = 1100, theme = 'light',
     jsResources: performance.getEntriesByType('resource').filter((entry) => /\.js($|\?)/.test(entry.name)).length,
   }));
   if (shot) await page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: true });
-  const record = { name, route, width, height, theme, systemDark, reduced, violations, seriousViolations: serious(violations), consoleErrors, pageErrors, metrics };
+  const record = { name, route, status, width, height, theme, systemDark, reduced, violations, seriousViolations: serious(violations), consoleErrors, pageErrors, metrics };
   results.push(record);
   if (record.seriousViolations.length) fail.push(`${name}: ${record.seriousViolations.length} serious/critical axe violations`);
   if (metrics.overflowPx > 1) fail.push(`${name}: horizontal overflow ${metrics.overflowPx}px`);
@@ -129,34 +130,41 @@ try {
   if (activated && afterWorkbench.resources <= beforeWorkbench.resources) fail.push('workbench: editor/workspace bundle was not deferred until activation');
 
   let keyboardWorkbenchTab = false;
-  let bothTab = null;
-  const tabs = await docs.page.$$('[role="tab"]');
-  for (const tab of tabs) {
-    const label = await tab.evaluate((node) => node.textContent?.trim());
-    if (label === 'Preview') {
-      await tab.focus();
-      await docs.page.keyboard.press('Enter');
-      keyboardWorkbenchTab = (await tab.evaluate((node) => node.getAttribute('aria-selected'))) === 'true';
+  const previewTab = await docs.page.$('[role="tab"]');
+  if (previewTab) {
+    const tabs = await docs.page.$$('[role="tab"]');
+    for (const tab of tabs) {
+      const label = await tab.evaluate((node) => node.textContent?.trim());
+      if (label === 'Preview') {
+        await tab.focus();
+        await docs.page.keyboard.press('Enter');
+        keyboardWorkbenchTab = (await tab.evaluate((node) => node.getAttribute('aria-selected'))) === 'true';
+        break;
+      }
     }
-    if (label === 'Both') bothTab = tab;
   }
   if (!keyboardWorkbenchTab) fail.push('workbench: keyboard tab activation failed');
-  if (bothTab) {
-    await bothTab.focus();
-    await docs.page.keyboard.press('Enter');
-  }
 
   let keyboardResize = false;
+  const bothTabs = await docs.page.$$('[role="tab"]');
+  for (const tab of bothTabs) {
+    const label = await tab.evaluate((node) => node.textContent?.trim());
+    if (label === 'Both') {
+      await tab.click();
+      break;
+    }
+  }
   const separator = await docs.page.$('[role="separator"][aria-label="Resize editor and preview"]');
   if (separator) {
     await separator.focus();
     const before = Number(await separator.evaluate((node) => node.getAttribute('aria-valuenow')));
     await docs.page.keyboard.press('ArrowRight');
     const after = Number(await separator.evaluate((node) => node.getAttribute('aria-valuenow')));
-    keyboardResize = after > before;
     await docs.page.keyboard.press('0');
+    const reset = Number(await separator.evaluate((node) => node.getAttribute('aria-valuenow')));
+    keyboardResize = after > before && reset === 50;
   }
-  if (!keyboardResize) fail.push('workbench: keyboard resize separator failed');
+  if (!keyboardResize) fail.push('workbench: keyboard resize/reset failed');
 
   const expandedViolations = await axe(docs.page);
   if (serious(expandedViolations).length) fail.push(`workbench: ${serious(expandedViolations).length} serious/critical axe violations after expansion`);
@@ -214,13 +222,13 @@ try {
   await studio.page.close();
 
   write('accessibility.json', { status: fail.some((item) => item.includes('axe')) ? 'FAIL' : 'PASS', pages: results.map((item) => ({ name: item.name, seriousViolations: item.seriousViolations })), expandedWorkbenchSeriousViolations: serious(expandedViolations) });
-  write('keyboard.json', { status: keyboardDisclosure && keyboardWorkbenchTab && keyboardResize ? 'PASS' : 'FAIL', disclosureEnterToggle: keyboardDisclosure, workbenchTabEnterActivation: keyboardWorkbenchTab, workbenchResizeArrowKey: keyboardResize, studioHandoff });
+  write('keyboard.json', { status: keyboardDisclosure && keyboardWorkbenchTab && keyboardResize ? 'PASS' : 'FAIL', disclosureEnterToggle: keyboardDisclosure, workbenchTabEnterActivation: keyboardWorkbenchTab, workbenchSeparatorKeyboardResize: keyboardResize, studioHandoff });
   write('responsive.json', { status: results.every((item) => item.metrics.overflowPx <= 1) ? 'PASS' : 'FAIL', viewports: results.map((item) => ({ name: item.name, width: item.width, overflowPx: item.metrics.overflowPx })) });
   write('theme.json', { status: 'PASS', states: results.map((item) => ({ name: item.name, requested: item.theme, systemDark: item.systemDark, resolved: item.metrics.theme })) });
   write('reduced-motion.json', { status: reducedMetrics === '0s' ? 'PASS' : 'FAIL', disclosureTransitionDuration: reducedMetrics });
   write('bundle-comparison.json', { collapsedResourceCount: beforeWorkbench.resources, expandedResourceCount: afterWorkbench.resources, deferredWorkbenchResources: Math.max(0, afterWorkbench.resources - beforeWorkbench.resources) });
   write('performance-comparison.json', { status: 'INFORMATIONAL', routeResourceCounts: results.map((item) => ({ name: item.name, total: item.metrics.resources, js: item.metrics.jsResources })) });
-  write('browser-regression.json', { status: fail.length ? 'FAIL' : 'PASS', failures: fail, navigation: navState, table: tableMetrics, workbench: { before: beforeWorkbench, after: afterWorkbench, mobileCollapsed: mobileWorkbenchCollapsed }, studioHandoff, screenshots: fs.readdirSync(SHOTS).sort() });
+  write('browser-regression.json', { status: fail.length ? 'FAIL' : 'PASS', failures: fail, navigation: navState, table: tableMetrics, workbench: { before: beforeWorkbench, after: afterWorkbench, mobileCollapsed: mobileWorkbenchCollapsed, keyboardResize }, studioHandoff, screenshots: fs.readdirSync(SHOTS).sort() });
 
   if (fail.length) throw new Error(`[post-doc12-browser] ${fail.length} failure(s):\n- ${fail.join('\n- ')}`);
   console.log(`[post-doc12-browser] PASS states=${results.length} screenshots=${fs.readdirSync(SHOTS).length}`);
