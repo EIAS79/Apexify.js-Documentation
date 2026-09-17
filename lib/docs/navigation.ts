@@ -66,8 +66,8 @@ const FEATURE_LABELS: Record<string, string> = {
   'batch-save-output': 'Batch & output',
   canvas: 'Canvas',
   charts: 'Charts',
-  'gif-animation': 'GIF & animation',
-  'images-shapes': 'Images & shapes',
+  'gif-animation': 'GIF',
+  'images-shapes': 'Images',
   'lines-connectors': 'Lines & connectors',
   'raster-batch-output': 'Raster & encoded output',
   'text-rendering': 'Text',
@@ -111,7 +111,7 @@ function virtualItem(
 function sourceBucket(page: DocumentationPage): string {
   const source = page.sourcePath.replace(/\\/g, '/');
   if (source.includes('/00-start-here/') || source.endsWith('/README.mdx')) return 'start';
-  if (source.includes('/01-beginner-guide/')) return 'guides';
+  if (source.includes('/01-beginner-guide/')) return 'getting-started';
   if (source.includes('/02-recipes/')) return 'recipes';
   if (source.includes('/03-feature-guides/')) return 'features';
   if (source.includes('/04-advanced/')) return 'advanced';
@@ -200,7 +200,16 @@ function groupedFolderTree(pages: DocumentationPage[], marker: string, tag: Docu
   return items;
 }
 
-function nodeEngineTree(pages: DocumentationPage[]): DocumentationNavigationItem[] {
+type EngineTreeOptions = {
+  id: string;
+  title: string;
+  pages: DocumentationPage[];
+  runtime: DocumentationPage['runtime'];
+  packageName: DocumentationPage['package'];
+  stability: DocumentationPage['stability'];
+};
+
+function buildEngineTree({ id, title, pages, runtime, packageName, stability }: EngineTreeOptions): DocumentationNavigationItem[] {
   const buckets = new Map<string, DocumentationPage[]>();
   for (const page of pages) {
     const bucket = sourceBucket(page);
@@ -208,12 +217,13 @@ function nodeEngineTree(pages: DocumentationPage[]): DocumentationNavigationItem
   }
 
   const sections: DocumentationNavigationItem[] = [];
-  const add = (bucket: string, title: string, tag: DocumentationNavigationTag, children?: DocumentationNavigationItem[]) => {
+  const add = (bucket: string, sectionTitle: string, tag: DocumentationNavigationTag, children?: DocumentationNavigationItem[]) => {
     const sourcePages = buckets.get(bucket) ?? [];
     const resolved = children ?? sortPages(sourcePages).map(pageItem);
-    if (resolved.length) sections.push(virtualItem(`node:${bucket}`, title, resolved, { type: 'section', tag }));
+    if (resolved.length) sections.push(virtualItem(`${id}:${bucket}`, sectionTitle, resolved, { type: 'section', tag }));
   };
 
+  add('getting-started', 'Getting Started', 'GUIDE');
   add('guides', 'Guides', 'GUIDE');
   add('recipes', 'Recipes', 'RECIPE', groupedFolderTree(buckets.get('recipes') ?? [], '02-recipes', 'RECIPE'));
   add('features', 'Features', 'FEATURE', featureTree(buckets.get('features') ?? []));
@@ -224,11 +234,11 @@ function nodeEngineTree(pages: DocumentationPage[]): DocumentationNavigationItem
   add('api', 'API Reference', 'API');
 
   return [
-    virtualItem('engine:node', 'Node', sections, {
+    virtualItem(`engine:${id}`, title, sections, {
       type: 'engine',
-      stability: 'CURRENT',
-      runtime: ['node'],
-      package: 'apexify.js',
+      stability,
+      runtime,
+      package: packageName,
     }),
   ];
 }
@@ -267,12 +277,20 @@ export function buildDocumentationNavigation(pages: DocumentationPage[]): Docume
 
   const groups: DocumentationNavigationGroup[] = [];
   if (startPages.length) groups.push({ id: 'start', label: 'Start', order: 10, items: sortPages(startPages).map(pageItem) });
-  if (nodePages.length) groups.push({ id: 'engines', label: 'Engines', order: 20, items: nodeEngineTree(nodePages) });
+  if (nodePages.length) {
+    groups.push({
+      id: 'engines',
+      label: 'Engines',
+      order: 20,
+      items: buildEngineTree({ id: 'node', title: 'Node', pages: nodePages, runtime: ['node'], packageName: 'apexify.js', stability: 'CURRENT' }),
+    });
+  }
   if (architecturePages.length) groups.push({ id: 'architecture', label: 'Architecture', order: 80, items: sortPages(architecturePages).map(pageItem) });
   if (migrationPages.length) groups.push({ id: 'migration', label: 'Migration', order: 90, items: sortPages(migrationPages).map(pageItem) });
 
   // DOC-10 future-readiness fixtures deliberately keep their established runtime
-  // group IDs, while real ROADMAP pages remain visibly labelled if ever published.
+  // group IDs, while the generic engine-tree builder above is reusable once those
+  // runtimes have real current content to publish.
   for (const definition of DOCUMENTATION_NAVIGATION_MANIFEST) {
     if (!['core', 'web', 'react', 'next', 'engine', 'capabilities', 'errors'].includes(definition.id)) continue;
     const matching = futurePages.filter((page) => futureGroupId(page) === definition.id);
