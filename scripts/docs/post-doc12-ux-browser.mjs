@@ -187,7 +187,7 @@ try {
   if (!studioHandoff || studioHandoff.pathname !== '/studio' || !studioHandoff.hashPrefix.startsWith('#snippet=')) fail.push('workbench: Studio handoff did not preserve encoded snippet transport');
   await docs.page.close();
 
-  const table = await open({ name: 'table-heavy-desktop', route: '/docs/node/canvas/backgrounds-primary', width: 1024, height: 900, theme: 'light' });
+  const table = await open({ name: 'table-heavy-desktop', route: '/docs/node/video-ffmpeg/metadata-and-frames', width: 1024, height: 900, theme: 'light' });
   const tableMetrics = await table.page.evaluate(() => {
     const wrap = document.querySelector('.apx-doc-table-wrap');
     const table = wrap?.querySelector('table');
