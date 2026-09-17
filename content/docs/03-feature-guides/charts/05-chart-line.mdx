@@ -26,8 +26,8 @@ await painter.createChart('line', series, options);
 | **`marker`** | **`type`**: **`circle` \| `square` \| `triangle` \| `diamond` \| `cross` \| `none`** — **`size`**, **`color`**, **`show`**, **`filled`**. |
 | **`area`** | **`AreaConfig`** — fill under/over/between — see below. |
 | **`correlation`** | Regression overlay (**`linear`**, **`polynomial`**, **`exponential`**, **`logarithmic`**, **`none`**) — **`degree`** for polynomial. |
-| **`errorBar`** | Series-level defaults for caps (**point **`errorBar`** overrides). |
-| **`opacity`** | **0…1** for line + markers + area + correlation (**overrides **`options.lines.opacity`**). |
+| **`errorBar`** | Series-level defaults for caps (point **`errorBar`** overrides). |
+| **`opacity`** | **0…1** for line + markers + area + correlation (overrides **`options.lines.opacity`**). |
 
 ---
 
@@ -38,7 +38,7 @@ await painter.createChart('line', series, options);
 | **`none`** | No fill |
 | **`below`** | To baseline |
 | **`above`** | Above baseline |
-| **`between`** | Between series and **`secondLine`** (**another **`LineSeries`**) |
+| **`between`** | Between series and **`secondLine`** (another **`LineSeries`**) |
 | **`around`** | Band-style (uses **`upperBound`**/**`lowerBound`** arrays when wired) |
 
 Also **`color`**, **`opacity`**, **`show`**, **`toValue`**, **`showAreaSize`**, **`areaSizeColor`**.
@@ -61,7 +61,7 @@ Beyond **[bar Axis](/docs#03-chart-bar-vertical)** subset:
 
 ## `LineChartOptions`
 
-**`dimensions`**, **`appearance`**, **`axes.{x,y}`**, **`labels.title`**, **`labels.pointLabelDefaults`** (**`position`**: **`top`…`), **`legend`** (**`fit`**, **`minWidth`**, **`width`**), **`grid`**, **`lines.opacity`** (series default).
+**`dimensions`**, **`appearance`**, **`axes.{x,y}`**, **`labels.title`**, **`labels.pointLabelDefaults`** (**`position`**: **`top`**…), **`legend`** (**`fit`**, **`minWidth`**, **`width`**), **`grid`**, **`lines.opacity`** (series default).
 
 ---
 
