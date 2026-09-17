@@ -273,10 +273,10 @@ writeOrCheck('rendering-verification.json', {
   serverContentLoader: 'lib/docs/content.ts',
   serverMarkdownRenderer: 'components/docs/route/RouteDocsMarkdown.tsx',
   clientIslands: [
-    'app/docs/layout.tsx (legacy fragment compatibility + existing shell)',
-    'components/docs/route/RouteDocsFrame.tsx (sidebar state)',
-    'components/docs/route/RouteDocSidebar.tsx (mobile navigation/search)',
-    'components/DocLayout.tsx (existing reading progress/TOC shell)',
+    'app/docs/layout.tsx (legacy fragment compatibility + server-first shell)',
+    'components/docs/navigation/DocsSidebarV2.tsx (hierarchical disclosure state)',
+    'components/docs/shell/MobileDocsNavigationDrawer.tsx (mobile navigation drawer)',
+    'components/docs/search/GlobalDocsSearch.tsx (DOC-6 search interaction)',
     'components/mdx/CodeBlock.tsx (copy/Studio affordance)',
   ],
   forbiddenPattern:
@@ -285,11 +285,11 @@ writeOrCheck('rendering-verification.json', {
 
 writeOrCheck('search-verification.json', {
   schemaVersion: 1,
-  scope: 'DOC-1 route-awareness only; DOC-6 owns the future build-time search replacement',
+  scope: 'DOC-1 route-awareness only; DOC-6 owns the build-time search system',
   endpoint: '/api/docs/search',
   migratedResults: 'canonical route href',
   unmigratedResults: 'legacy /docs#document-id href',
-  searchImplementationRetained: 'request-time filesystem scan',
+  searchImplementationRetained: 'DOC-6 generated build-time search records',
 });
 
 writeOrCheck('link-verification.json', {
