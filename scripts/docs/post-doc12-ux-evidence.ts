@@ -48,6 +48,21 @@ for (const node of allNodes) if (node.tag) invariant(validTags.has(node.tag), `i
 const currentFutureGroups = navigation.filter((group) => ['core', 'web', 'react', 'next', 'engine', 'capabilities', 'errors'].includes(group.id));
 invariant(currentFutureGroups.length === 0, `unshipped runtime groups visible as normal current navigation: ${currentFutureGroups.map((group) => group.id).join(', ')}`);
 
+const nodeEngine = allNodes.find((node) => node.id === 'engine:node');
+invariant(nodeEngine?.type === 'engine', 'Node engine root missing');
+invariant(nodeEngine.package === 'apexify.js', 'Node engine root has incorrect package ownership');
+invariant(nodeEngine.runtime?.length === 1 && nodeEngine.runtime[0] === 'node', 'Node engine root has incorrect runtime ownership');
+invariant(nodeEngine.stability === 'CURRENT', 'Node engine root must be CURRENT');
+const nodeSections = new Set((nodeEngine.children ?? []).map((node) => node.title));
+for (const section of ['Getting Started', 'Recipes', 'Features', 'Advanced', 'API Reference']) {
+  invariant(nodeSections.has(section), `Node intent branch missing: ${section}`);
+}
+const featureSection = nodeEngine.children?.find((node) => node.title === 'Features');
+const featureFamilies = new Set((featureSection?.children ?? []).map((node) => node.title));
+for (const family of ['Canvas', 'Images', 'Text', 'Charts', 'GIF', 'Video']) {
+  invariant(featureFamilies.has(family), `Node feature family missing: ${family}`);
+}
+
 for (const page of pages) {
   const crumbs = getDocumentationBreadcrumbs(navigation, page);
   invariant(crumbs.at(-1)?.label === page.title, `terminal breadcrumb is not canonical title for ${page.slug}`);
@@ -72,10 +87,9 @@ for (const text of ['aria-expanded', 'sessionStorage', 'activeKeys', 'Navigation
   invariant(sidebarSource.includes(text), `sidebar recovery marker missing: ${text}`);
 }
 invariant(!sidebarSource.includes('apx-sidebar-link__meta'), 'repetitive per-link metadata block returned');
-invariant(navSource.includes("virtualItem('engine:node', 'Node'"), 'Node engine root missing');
-for (const text of ["add('guides'", "add('recipes'", "add('features'", "add('advanced'", "add('api'"]) {
-  invariant(navSource.includes(text), `Node intent branch missing: ${text}`);
-}
+invariant(navSource.includes('function buildEngineTree'), 'generic engine tree builder missing');
+invariant(navSource.includes("id: 'node', title: 'Node'"), 'Node engine configuration missing');
+invariant(navSource.includes("add('getting-started', 'Getting Started'"), 'Node Getting Started branch missing');
 
 for (const mapping of ['table: Table', 'thead: TableHead', 'tbody: TableBody', 'tr: TableRow', 'th: TableHeader', 'td: TableCell']) {
   invariant(mdxComponents.includes(mapping), `native markdown table mapping missing: ${mapping}`);
@@ -160,9 +174,9 @@ write('homepage-comparison.json', {
   ],
 });
 write('navigation-tree.json', treeForEvidence(navigation));
-write('navigation-coverage.json', { pages: pages.length, linkedNavigationPages: flat.length, uniqueRoutes: new Set(flat.map((item) => item.href)).size, duplicateNodeIds: 0, terminalBreadcrumbMismatches: 0 });
+write('navigation-coverage.json', { pages: pages.length, linkedNavigationPages: flat.length, uniqueRoutes: new Set(flat.map((item) => item.href)).size, duplicateNodeIds: 0, terminalBreadcrumbMismatches: 0, nodeRoot: { package: nodeEngine.package, runtime: nodeEngine.runtime, stability: nodeEngine.stability }, nodeSections: [...nodeSections], featureFamilies: [...featureFamilies] });
 write('navigation-tags.json', { allowed: [...validTags].sort(), used: [...new Set(allNodes.flatMap((node) => node.tag ? [node.tag] : []))].sort() });
-write('future-engine-visibility.json', { currentVisibleFutureGroups: currentFutureGroups.map((group) => group.id), policy: 'future package/runtime groups remain absent from normal current navigation until real pages exist' });
+write('future-engine-visibility.json', { currentVisibleFutureGroups: currentFutureGroups.map((group) => group.id), policy: 'future package/runtime groups remain absent from normal current navigation until real pages exist', genericEngineTreeBuilder: true });
 write('table-audit.json', { nativeMarkdownMapped: true, semanticTableElements: true, explicitScrollableRegion: true, stickyHeaderAndFirstColumnStyled: true });
 write('mdx-formatting-audit.json', { pagesScanned: pages.length, issues: contentIssues, existingDoc9ContentLintRetained: true });
 write('mdx-repairs.json', { structuralRendererRepairs: ['GFM tables routed through DOC-3 Table component'], destructiveContentRewrites: 0 });
