@@ -65,6 +65,7 @@ function PagerCard({
   direction: 'previous' | 'next';
   item: NonNullable<DocumentationPager['previous']>;
 }) {
+  if (!item.href) return null;
   const previous = direction === 'previous';
   return (
     <Link
