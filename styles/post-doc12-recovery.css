@@ -4,6 +4,7 @@
  */
 
 .apx-sidebar-search { margin-bottom: .75rem; }
+.apx-inline-search--compact > .min-w-0:has([data-docs-search-input][aria-expanded="false"]) > [aria-live] + div { display:none; }
 .apx-sidebar-group { margin:.35rem 0 0; padding:.35rem 0 0; border-top:1px solid var(--apx-border-subtle); }
 .apx-sidebar-group__button { width:100%; min-height:2.5rem; display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:.35rem .5rem; border:0; border-radius:var(--apx-radius-md); background:transparent; color:var(--apx-text-secondary); font-size:.72rem; font-weight:850; letter-spacing:.105em; text-transform:uppercase; text-align:left; }
 .apx-sidebar-group__button:hover { color:var(--apx-text-primary); background:color-mix(in srgb,var(--apx-color-accent) 6%,transparent); }
