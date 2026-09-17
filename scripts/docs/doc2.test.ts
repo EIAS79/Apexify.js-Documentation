@@ -68,17 +68,17 @@ test('DOC-2 shell keeps server boundaries and accessible drawer behavior', () =>
   assert.ok(drawer.includes('role="dialog"'));
   assert.ok(drawer.includes('aria-modal="true"'));
   assert.ok(drawer.includes("event.key === 'Escape'"));
-  assert.ok(drawer.includes('previousFocusRef.current?.focus()'));
+  assert.ok(drawer.includes('triggerRef.current?.focus()'));
 });
 
 test('DOC-2 shell applies semantic main target, skip link, and route-complete mobile/desktop sidebars', () => {
   const shell = read('components/docs/shell/DocsShell.tsx');
-  const header = read('components/docs/shell/DocsHeader.tsx');
+  const layout = read('app/docs/layout.tsx');
   assert.ok(shell.includes('id="docs-content"'));
-  assert.ok(header.includes('href="#docs-content"'));
+  assert.ok(layout.includes('href="#docs-content"'));
   assert.ok(shell.includes('DocsSidebarV2'));
   assert.ok(shell.includes('AccessibleDrawer'));
-  assert.ok(shell.includes('DocsTocRail'));
+  assert.ok(shell.includes('OnThisPageV2'));
 });
 
 test('DOC-2 visual and accessibility styles avoid prohibited effects', () => {
@@ -88,6 +88,6 @@ test('DOC-2 visual and accessibility styles avoid prohibited effects', () => {
     assert.doesNotMatch(css, /cursor\s*:\s*none/i);
     assert.doesNotMatch(css, /filter\s*:\s*drop-shadow\([^)]{0,80}(#|rgb|hsl)/i);
   }
-  assert.ok(shellCss.includes('@media(prefers-reduced-motion:reduce)'));
-  assert.ok(proseCss.includes('@media (prefers-reduced-motion: reduce)'));
+  assert.match(shellCss, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+  assert.match(proseCss, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
 });
