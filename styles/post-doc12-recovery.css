@@ -31,13 +31,6 @@
 .apx-doc-hero__description { margin-top:.75rem; line-height:1.62; }
 .apx-doc-hero__meta { margin-top:.85rem; gap:.35rem; }
 
-/* Gradient H1 text is not reliably contrast-auditable on the light docs canvas. */
-:root:not(.dark) .apx-doc-prose h1.text-grad-aurora {
-  background-image:none;
-  color:var(--apx-text-primary);
-  -webkit-text-fill-color:var(--apx-text-primary);
-}
-
 /* DOC-3 table recovery: native table semantics inside an explicit scroll region. */
 .apx-doc-table-wrap { width:100%; max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-gutter:stable; border:1px solid var(--apx-border-default); border-radius:var(--apx-radius-lg); background:var(--apx-surface-raised); box-shadow:var(--apx-shadow-sm); }
 .apx-doc-prose .apx-doc-table { display:table; width:max-content; min-width:100%; max-width:none; margin:0; border:0; border-radius:0; overflow:visible; border-collapse:separate; border-spacing:0; background:transparent; font-size:.9rem; }
