@@ -18,16 +18,16 @@ const write = (name: string, value: unknown) => {
   fs.mkdirSync(OUT, { recursive: true });
   fs.writeFileSync(path.join(OUT, name), `${JSON.stringify(value, null, 2)}\n`);
 };
-const assert = (condition: unknown, message: string): asserts condition => {
+function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`[post-doc12] ${message}`);
-};
+}
 
 const pages = loadDocumentationPages();
 const navigation = buildDocumentationNavigation(pages);
 const flat = flattenDocumentationNavigation(navigation);
 
-assert(flat.length === pages.length, `navigation coverage ${flat.length}/${pages.length}`);
-assert(new Set(flat.map((item) => item.href)).size === pages.length, 'duplicate canonical routes in navigation');
+invariant(flat.length === pages.length, `navigation coverage ${flat.length}/${pages.length}`);
+invariant(new Set(flat.map((item) => item.href)).size === pages.length, 'duplicate canonical routes in navigation');
 
 const allNodes: DocumentationNavigationItem[] = [];
 function walk(items: DocumentationNavigationItem[]) {
@@ -37,20 +37,20 @@ function walk(items: DocumentationNavigationItem[]) {
   }
 }
 for (const group of navigation) walk(group.items);
-assert(new Set(allNodes.map((node) => node.id)).size === allNodes.length, 'duplicate navigation node IDs');
+invariant(new Set(allNodes.map((node) => node.id)).size === allNodes.length, 'duplicate navigation node IDs');
 
 const validTags = new Set<DocumentationNavigationTag>([
   'FEATURE', 'GUIDE', 'RECIPE', 'API', 'ADVANCED', 'PERF', 'SECURITY', 'HELP',
   'PREVIEW', 'EXPERIMENTAL', 'ROADMAP', 'DEPRECATED',
 ]);
-for (const node of allNodes) if (node.tag) assert(validTags.has(node.tag), `invalid navigation tag ${node.tag}`);
+for (const node of allNodes) if (node.tag) invariant(validTags.has(node.tag), `invalid navigation tag ${node.tag}`);
 
 const currentFutureGroups = navigation.filter((group) => ['core', 'web', 'react', 'next', 'engine', 'capabilities', 'errors'].includes(group.id));
-assert(currentFutureGroups.length === 0, `unshipped runtime groups visible as normal current navigation: ${currentFutureGroups.map((group) => group.id).join(', ')}`);
+invariant(currentFutureGroups.length === 0, `unshipped runtime groups visible as normal current navigation: ${currentFutureGroups.map((group) => group.id).join(', ')}`);
 
 for (const page of pages) {
   const crumbs = getDocumentationBreadcrumbs(navigation, page);
-  assert(crumbs.at(-1)?.label === page.title, `terminal breadcrumb is not canonical title for ${page.slug}`);
+  invariant(crumbs.at(-1)?.label === page.title, `terminal breadcrumb is not canonical title for ${page.slug}`);
 }
 
 const navSource = read('lib/docs/navigation.ts');
@@ -63,47 +63,51 @@ const loaderSource = read('components/docs/playground/CanvasPlaygroundLoader.tsx
 const studioSource = read('lib/studio/studioStorage.ts');
 
 for (const text of ['Draw ', 'From a ', 'ProductExperienceModel', 'model.heroExample', 'DOC-5']) {
-  assert(homeSource.includes(text), `homepage recovery marker missing: ${text}`);
+  invariant(homeSource.includes(text), `homepage recovery marker missing: ${text}`);
 }
-assert(!homeSource.includes("'use client'"), 'homepage recovery clientified the server component');
+invariant(!homeSource.includes("'use client'"), 'homepage recovery clientified the server component');
 
 for (const text of ['aria-expanded', 'sessionStorage', 'activeKeys', 'NavigationItems', 'apx-sidebar-tag']) {
-  assert(sidebarSource.includes(text), `sidebar recovery marker missing: ${text}`);
+  invariant(sidebarSource.includes(text), `sidebar recovery marker missing: ${text}`);
 }
-assert(!sidebarSource.includes('apx-sidebar-link__meta'), 'repetitive per-link metadata block returned');
-assert(navSource.includes("virtualItem('engine:node', 'Node'"), 'Node engine root missing');
+invariant(!sidebarSource.includes('apx-sidebar-link__meta'), 'repetitive per-link metadata block returned');
+invariant(navSource.includes("virtualItem('engine:node', 'Node'"), 'Node engine root missing');
 for (const text of ["add('guides'", "add('recipes'", "add('features'", "add('advanced'", "add('api'"]) {
-  assert(navSource.includes(text), `Node intent branch missing: ${text}`);
+  invariant(navSource.includes(text), `Node intent branch missing: ${text}`);
 }
 
 for (const mapping of ['table: Table', 'thead: TableHead', 'tbody: TableBody', 'tr: TableRow', 'th: TableHeader', 'td: TableCell']) {
-  assert(mdxComponents.includes(mapping), `native markdown table mapping missing: ${mapping}`);
+  invariant(mdxComponents.includes(mapping), `native markdown table mapping missing: ${mapping}`);
 }
 for (const text of ['apx-doc-table-wrap', 'overflow', 'tabIndex={0}', 'aria-label="Scrollable documentation table"']) {
-  assert(tableSource.includes(text), `table recovery marker missing: ${text}`);
+  invariant(tableSource.includes(text), `table recovery marker missing: ${text}`);
 }
 
 for (const text of ['ExampleWorkbench', "'ts' | 'preview' | 'both'", 'Copy code', 'Reset', 'Open in Studio', 'encodeShareLink', 'DOC-5 verified output']) {
-  assert(workbenchSource.includes(text), `workbench marker missing: ${text}`);
+  invariant(workbenchSource.includes(text), `workbench marker missing: ${text}`);
 }
-assert(!/\bRun\b/.test(workbenchSource), 'workbench falsely exposes browser Run behavior');
-assert(loaderSource.includes('if (!activated)'), 'collapsed workbench activation gate missing');
-assert(loaderSource.includes("import('./VerifiedExamplePlayground')"), 'deferred workbench import missing');
-assert(studioSource.includes('deserializeInteractiveSession') && studioSource.includes('#snippet='), 'existing Studio/session transport is not available');
+invariant(!/\bRun\b/.test(workbenchSource), 'workbench falsely exposes browser Run behavior');
+invariant(loaderSource.includes('if (!activated)'), 'collapsed workbench activation gate missing');
+invariant(loaderSource.includes("import('./VerifiedExamplePlayground')"), 'deferred workbench import missing');
+invariant(studioSource.includes('deserializeInteractiveSession') && studioSource.includes('#snippet='), 'existing Studio/session transport is not available');
 
 const example = getExampleById('node.canvas.basic');
-assert(example, 'authoritative DOC-5 example node.canvas.basic is missing');
-assert(example.sources.length === 1, 'workbench source identity is ambiguous');
-assert(example.outputs.some((output) => output.publicPath), 'workbench authoritative example has no public verified output');
+invariant(example, 'authoritative DOC-5 example node.canvas.basic is missing');
+invariant(example.sources.length === 1, 'workbench source identity is ambiguous');
+invariant(example.outputs.some((output) => output.publicPath), 'workbench authoritative example has no public verified output');
 
 const contentIssues: Array<{ slug: string; problem: string }> = [];
 for (const page of pages) {
-  const prose = page.body.replace(/```[\s\S]*?```/g, '');
-  if (/\\n/.test(prose)) contentIssues.push({ slug: page.slug, problem: 'literal escaped newline outside fenced code' });
-  const fenceCount = (page.body.match(/```/g) ?? []).length;
-  if (fenceCount % 2 !== 0) contentIssues.push({ slug: page.slug, problem: 'unbalanced fenced code block' });
+  const prose = page.body
+    .replace(/```[\s\S]*?```/g, '')
+    .replace(/~~~[\s\S]*?~~~/g, '')
+    .replace(/`[^`\n]*`/g, '');
+  if (/\\n/.test(prose)) contentIssues.push({ slug: page.slug, problem: 'literal escaped newline outside fenced/inline code' });
+  const backtickFenceCount = (page.body.match(/```/g) ?? []).length;
+  const tildeFenceCount = (page.body.match(/~~~/g) ?? []).length;
+  if (backtickFenceCount % 2 !== 0 || tildeFenceCount % 2 !== 0) contentIssues.push({ slug: page.slug, problem: 'unbalanced fenced code block' });
 }
-assert(contentIssues.length === 0, `MDX formatting issues detected: ${JSON.stringify(contentIssues.slice(0, 5))}`);
+invariant(contentIssues.length === 0, `MDX formatting issues detected: ${JSON.stringify(contentIssues.slice(0, 5))}`);
 
 const treeForEvidence = (groups: DocumentationNavigationGroup[]) => groups.map((group) => ({
   id: group.id,
