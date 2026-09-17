@@ -48,6 +48,8 @@ export interface DocumentationNavigationItem {
   package?: DocumentationPage['package'];
   type?: DocumentationNavigationNodeType;
   tag?: DocumentationNavigationTag;
+  /** Links such as the DOC-4 API root belong in navigation but not the DOC page pager/coverage sequence. */
+  navigationOnly?: boolean;
   children?: DocumentationNavigationItem[];
 }
 
@@ -103,7 +105,7 @@ function virtualItem(
   id: string,
   title: string,
   children: DocumentationNavigationItem[],
-  options: Pick<DocumentationNavigationItem, 'type' | 'tag' | 'stability' | 'runtime' | 'package'> = {},
+  options: Pick<DocumentationNavigationItem, 'type' | 'tag' | 'stability' | 'runtime' | 'package' | 'href' | 'navigationOnly'> = {},
 ): DocumentationNavigationItem {
   return { id, title, children, ...options };
 }
@@ -232,6 +234,17 @@ function buildEngineTree({ id, title, pages, runtime, packageName, stability }: 
   add('security', 'Security', 'SECURITY');
   add('help', 'Troubleshooting', 'HELP');
   add('api', 'API Reference', 'API');
+  if (!(buckets.get('api')?.length)) {
+    sections.push(virtualItem(`${id}:api`, 'API Reference', [], {
+      type: 'section',
+      tag: 'API',
+      href: '/api-reference',
+      navigationOnly: true,
+      runtime,
+      package: packageName,
+      stability,
+    }));
+  }
 
   return [
     virtualItem(`engine:${id}`, title, sections, {
@@ -304,7 +317,7 @@ export function buildDocumentationNavigation(pages: DocumentationPage[]): Docume
 
 function flattenItems(items: DocumentationNavigationItem[], linkedOnly = false): DocumentationNavigationItem[] {
   return items.flatMap((item) => [
-    ...(!linkedOnly || item.href ? [item] : []),
+    ...(!linkedOnly || (item.href && !item.navigationOnly) ? [item] : []),
     ...flattenItems(item.children ?? [], linkedOnly),
   ]);
 }
