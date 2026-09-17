@@ -73,6 +73,7 @@ const sidebarSource = read('components/docs/navigation/DocsSidebarV2.tsx');
 const homeSource = read('components/home/ProductHome.tsx');
 const mdxComponents = read('mdx-components.tsx');
 const tableSource = read('components/mdx/Table.tsx');
+const routedMarkdownSource = read('components/docs/route/DocumentationMarkdownFragment.tsx');
 const recoveryCss = read('styles/post-doc12-recovery.css');
 const workbenchSource = read('components/docs/playground/VerifiedExamplePlayground.tsx');
 const loaderSource = read('components/docs/playground/CanvasPlaygroundLoader.tsx');
@@ -99,6 +100,9 @@ for (const text of ['apx-doc-table-wrap', 'tabIndex={0}', 'aria-label="Scrollabl
 }
 for (const text of ['.apx-doc-table-wrap', 'overflow-x:auto', 'position:sticky', 'left:0']) {
   invariant(recoveryCss.includes(text), `table CSS recovery marker missing: ${text}`);
+}
+for (const mapping of ['<Table ', '<TableHead ', '<TableBody ', '<TableRow ', '<TableHeader ', '<TableCell ']) {
+  invariant(routedMarkdownSource.includes(mapping), `migrated routed Markdown does not reuse shared table primitive: ${mapping}`);
 }
 
 for (const text of ['ExampleWorkbench', "'ts' | 'preview' | 'both'", 'Copy code', 'Reset', 'Open in Studio', 'encodeShareLink', 'DOC-5 verified output']) {
@@ -177,7 +181,7 @@ write('navigation-tree.json', treeForEvidence(navigation));
 write('navigation-coverage.json', { pages: pages.length, linkedNavigationPages: flat.length, uniqueRoutes: new Set(flat.map((item) => item.href)).size, duplicateNodeIds: 0, terminalBreadcrumbMismatches: 0, nodeRoot: { package: nodeEngine.package, runtime: nodeEngine.runtime, stability: nodeEngine.stability }, nodeSections: [...nodeSections], featureFamilies: [...featureFamilies] });
 write('navigation-tags.json', { allowed: [...validTags].sort(), used: [...new Set(allNodes.flatMap((node) => node.tag ? [node.tag] : []))].sort() });
 write('future-engine-visibility.json', { currentVisibleFutureGroups: currentFutureGroups.map((group) => group.id), policy: 'future package/runtime groups remain absent from normal current navigation until real pages exist', genericEngineTreeBuilder: true });
-write('table-audit.json', { nativeMarkdownMapped: true, semanticTableElements: true, explicitScrollableRegion: true, stickyHeaderAndFirstColumnStyled: true });
+write('table-audit.json', { nativeMarkdownMapped: true, migratedRoutedMarkdownUsesSharedTablePrimitive: true, semanticTableElements: true, explicitScrollableRegion: true, stickyHeaderAndFirstColumnStyled: true });
 write('mdx-formatting-audit.json', { pagesScanned: pages.length, issues: contentIssues, existingDoc9ContentLintRetained: true });
 write('mdx-repairs.json', { structuralRendererRepairs: ['GFM tables routed through DOC-3 Table component'], destructiveContentRewrites: 0 });
 write('workbench-inventory.json', { examples: [{ route: '/docs/node/canvas', exampleId: example.id, modes: ['ts', 'preview', 'both'], collapsedByDefault: true, deferredEditorBundle: true }] });
