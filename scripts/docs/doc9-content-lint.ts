@@ -111,19 +111,20 @@ for (const page of pages) {
     }
     if (activeFence) return;
 
-    if (/\\n/.test(line)) {
+    // Remove balanced inline code before checking prose corruption. This permits
+    // intentional documentation such as `\\n` while still catching unmatched
+    // backticks and literal escaped newlines that leaked into normal prose.
+    const proseLine = line.replace(/`[^`\n]*`/g, '');
+    if (/\\n/.test(proseLine)) {
       addError(page.sourcePath, 'literal-escaped-newline', `line ${lineNumber}: literal \\n found in prose; use a real line break or inline code if intentional`);
     }
-
-    // Odd inline-code delimiters on one prose line are almost always migration
-    // corruption. Multiline code belongs in fenced blocks in this corpus.
-    if (unescapedCount(line, '`') % 2 !== 0) {
+    if (unescapedCount(proseLine, '`') % 2 !== 0) {
       addError(page.sourcePath, 'inline-code-delimiter', `line ${lineNumber}: unmatched inline backtick delimiter`);
     }
 
     // Strong-emphasis mismatches can legally span lines, so flag them for exact
     // review without making legitimate authored Markdown fail the build.
-    const strongCount = unescapedCount(line.replace(/\*\*\*/g, ''), '**');
+    const strongCount = unescapedCount(proseLine.replace(/\*\*\*/g, ''), '**');
     if (strongCount % 2 !== 0) {
       addWarning(page.sourcePath, 'emphasis-review', `line ${lineNumber}: odd strong-emphasis delimiter count`);
     }
