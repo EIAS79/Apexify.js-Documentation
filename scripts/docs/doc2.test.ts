@@ -89,5 +89,6 @@ test('DOC-2 visual and accessibility styles avoid prohibited effects', () => {
     assert.doesNotMatch(css, /filter\s*:\s*drop-shadow\([^)]{0,80}(#|rgb|hsl)/i);
   }
   assert.match(shellCss, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
-  assert.match(proseCss, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+  assert.match(shellCss, /\.apx-doc-root \*, \.apx-doc-root \*::before, \.apx-doc-root \*::after/);
+  assert.match(shellCss, /transition-duration\s*:\s*0s\s*!important/);
 });
