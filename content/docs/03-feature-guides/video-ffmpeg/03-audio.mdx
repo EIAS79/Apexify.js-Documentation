@@ -45,8 +45,8 @@ await painter.createVideo({
 
 | Mode | Behaviour |
 |------|-----------|
-| **No **`ranges`**** | Same strip as **`removeAudio`** (**`-an`**). |
-| **`ranges: [{ start, end }]`** | **`volume=enable='between(t,...)'`:volume=0`** segments on audio (**`-c:v copy`**). |
+| No **`ranges`** | Same strip as **`removeAudio`** (**`-an`**). |
+| **`ranges: [{ start, end }]`** | **`volume=enable='between(t,...)':volume=0`** segments on audio (**`-c:v copy`**). |
 
 ```typescript
 await painter.createVideo({
@@ -137,7 +137,7 @@ await painter.createVideo({
 
 ## `adjustVolume`
 
-### Global mode (**no **`ranges`****)
+### Global mode (no **`ranges`**)
 
 **`volume`** is **percentage** of unity (**100 = unchanged**) → **`volume={volume/100}`**.
 
@@ -196,4 +196,3 @@ await painter.createVideo({
 ```
 
 ---
-
