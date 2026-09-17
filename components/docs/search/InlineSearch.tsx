@@ -13,7 +13,7 @@ export function InlineSearch({
   scope?: SearchFilters;
 }) {
   return (
-    <div className="not-prose min-w-0">
+    <div className="apx-inline-search--compact not-prose min-w-0">
       <GlobalDocsSearch inputId={inputId} compact ariaLabel={ariaLabel} fixedFilters={scope} />
       <div className="px-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--text-tertiary)" }} aria-hidden>
         Symbols · options · guides
