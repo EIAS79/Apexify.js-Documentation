@@ -18,6 +18,13 @@ const results = [];
 const fail = [];
 const write = (name, value) => fs.writeFileSync(path.join(OUT, name), `${JSON.stringify(value, null, 2)}\n`);
 
+async function axe(page) {
+  return page.evaluate(async () => {
+    const scan = await window.axe.run(document, { resultTypes: ['violations'] });
+    return scan.violations.map((violation) => ({ id: violation.id, impact: violation.impact, nodes: violation.nodes.length, targets: violation.nodes.slice(0, 5).map((node) => node.target) })).sort((a, b) => a.id.localeCompare(b.id));
+  });
+}
+
 async function open({ name, route, width = 1440, height = 1100, theme = 'light', systemDark = false, reduced = false, shot = true }) {
   const page = await browser.newPage();
   const consoleErrors = [];
@@ -36,10 +43,7 @@ async function open({ name, route, width = 1440, height = 1100, theme = 'light',
   const response = await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle2' });
   if (!response?.ok()) throw new Error(`${name}: ${route} returned ${response?.status()}`);
   await page.addScriptTag({ content: axeSource });
-  const violations = await page.evaluate(async () => {
-    const scan = await window.axe.run(document, { resultTypes: ['violations'] });
-    return scan.violations.map((violation) => ({ id: violation.id, impact: violation.impact, nodes: violation.nodes.length, targets: violation.nodes.slice(0, 5).map((node) => node.target) })).sort((a, b) => a.id.localeCompare(b.id));
-  });
+  const violations = await axe(page);
   const metrics = await page.evaluate(() => ({
     pathname: location.pathname,
     theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
@@ -68,6 +72,7 @@ try {
   await homeDark.page.close();
 
   const homeMobile = await open({ name: 'homepage-mobile', route: '/', width: 390, height: 844, theme: 'system', systemDark: false });
+  if (homeMobile.record.metrics.theme !== 'light') fail.push('homepage system theme did not follow light OS preference');
   await homeMobile.page.close();
 
   const docs = await open({ name: 'docs-tree-active', route: '/docs/node/canvas', theme: 'light' });
@@ -82,13 +87,13 @@ try {
   if (navState.expanded.length < 2) fail.push('docs: active ancestors did not auto-expand');
   if (navState.repeatedMeta) fail.push('docs: repetitive per-link metadata remains');
 
-  const firstDisclosure = await docs.page.$('.apx-sidebar-disclosure');
+  const toggleDisclosure = await docs.page.$('.apx-sidebar-disclosure[aria-expanded="false"]');
   let keyboardDisclosure = false;
-  if (firstDisclosure) {
-    await firstDisclosure.focus();
-    const before = await firstDisclosure.evaluate((node) => node.getAttribute('aria-expanded'));
+  if (toggleDisclosure) {
+    await toggleDisclosure.focus();
+    const before = await toggleDisclosure.evaluate((node) => node.getAttribute('aria-expanded'));
     await docs.page.keyboard.press('Enter');
-    const after = await firstDisclosure.evaluate((node) => node.getAttribute('aria-expanded'));
+    const after = await toggleDisclosure.evaluate((node) => node.getAttribute('aria-expanded'));
     keyboardDisclosure = before !== after;
   }
   if (!keyboardDisclosure) fail.push('docs: keyboard disclosure toggle failed');
@@ -123,6 +128,25 @@ try {
   if (afterWorkbench.run) fail.push('workbench: fake Run button present');
   if (activated && afterWorkbench.resources <= beforeWorkbench.resources) fail.push('workbench: editor/workspace bundle was not deferred until activation');
 
+  let keyboardWorkbenchTab = false;
+  const previewTab = await docs.page.$('[role="tab"]');
+  if (previewTab) {
+    const tabs = await docs.page.$$('[role="tab"]');
+    for (const tab of tabs) {
+      const label = await tab.evaluate((node) => node.textContent?.trim());
+      if (label === 'Preview') {
+        await tab.focus();
+        await docs.page.keyboard.press('Enter');
+        keyboardWorkbenchTab = (await tab.evaluate((node) => node.getAttribute('aria-selected'))) === 'true';
+        break;
+      }
+    }
+  }
+  if (!keyboardWorkbenchTab) fail.push('workbench: keyboard tab activation failed');
+
+  const expandedViolations = await axe(docs.page);
+  if (serious(expandedViolations).length) fail.push(`workbench: ${serious(expandedViolations).length} serious/critical axe violations after expansion`);
+
   let studioHandoff = null;
   if (afterWorkbench.studio) {
     const buttons = await docs.page.$$('button');
@@ -150,10 +174,16 @@ try {
   if (!tableMetrics.wrapper || !tableMetrics.nativeTable || tableMetrics.tabIndex !== '0') fail.push('table: semantic scroll wrapper missing');
   await table.page.close();
 
+  const tabletDocs = await open({ name: 'docs-tablet', route: '/docs/node/canvas', width: 768, height: 1024, theme: 'system', systemDark: true });
+  if (tabletDocs.record.metrics.theme !== 'dark') fail.push('docs tablet system theme did not follow dark OS preference');
+  await tabletDocs.page.close();
+
   const api = await open({ name: 'api-reference', route: '/api-reference/apexify.js/ApexPainter/createImage', width: 1440, height: 1000, theme: 'dark' });
   await api.page.close();
 
   const mobileDocs = await open({ name: 'docs-mobile', route: '/docs/node/canvas', width: 360, height: 800, theme: 'dark' });
+  const mobileWorkbenchCollapsed = await mobileDocs.page.evaluate(() => Boolean(document.querySelector('[data-post-doc12-workbench="collapsed"]')));
+  if (!mobileWorkbenchCollapsed) fail.push('workbench: mobile collapsed surface missing');
   await mobileDocs.page.close();
 
   const reduced = await open({ name: 'docs-reduced-motion', route: '/docs/node/canvas', width: 1024, height: 800, theme: 'light', reduced: true, shot: false });
@@ -169,14 +199,14 @@ try {
   const studio = await open({ name: 'studio', route: '/studio', width: 1440, height: 1000, theme: 'dark' });
   await studio.page.close();
 
-  write('accessibility.json', { status: fail.some((item) => item.includes('axe')) ? 'FAIL' : 'PASS', pages: results.map((item) => ({ name: item.name, seriousViolations: item.seriousViolations })) });
-  write('keyboard.json', { status: keyboardDisclosure ? 'PASS' : 'FAIL', disclosureEnterToggle: keyboardDisclosure, studioHandoff });
+  write('accessibility.json', { status: fail.some((item) => item.includes('axe')) ? 'FAIL' : 'PASS', pages: results.map((item) => ({ name: item.name, seriousViolations: item.seriousViolations })), expandedWorkbenchSeriousViolations: serious(expandedViolations) });
+  write('keyboard.json', { status: keyboardDisclosure && keyboardWorkbenchTab ? 'PASS' : 'FAIL', disclosureEnterToggle: keyboardDisclosure, workbenchTabEnterActivation: keyboardWorkbenchTab, studioHandoff });
   write('responsive.json', { status: results.every((item) => item.metrics.overflowPx <= 1) ? 'PASS' : 'FAIL', viewports: results.map((item) => ({ name: item.name, width: item.width, overflowPx: item.metrics.overflowPx })) });
-  write('theme.json', { status: 'PASS', states: results.map((item) => ({ name: item.name, requested: item.theme, resolved: item.metrics.theme })) });
+  write('theme.json', { status: 'PASS', states: results.map((item) => ({ name: item.name, requested: item.theme, systemDark: item.systemDark, resolved: item.metrics.theme })) });
   write('reduced-motion.json', { status: reducedMetrics === '0s' ? 'PASS' : 'FAIL', disclosureTransitionDuration: reducedMetrics });
   write('bundle-comparison.json', { collapsedResourceCount: beforeWorkbench.resources, expandedResourceCount: afterWorkbench.resources, deferredWorkbenchResources: Math.max(0, afterWorkbench.resources - beforeWorkbench.resources) });
   write('performance-comparison.json', { status: 'INFORMATIONAL', routeResourceCounts: results.map((item) => ({ name: item.name, total: item.metrics.resources, js: item.metrics.jsResources })) });
-  write('browser-regression.json', { status: fail.length ? 'FAIL' : 'PASS', failures: fail, navigation: navState, table: tableMetrics, workbench: { before: beforeWorkbench, after: afterWorkbench }, studioHandoff, screenshots: fs.readdirSync(SHOTS).sort() });
+  write('browser-regression.json', { status: fail.length ? 'FAIL' : 'PASS', failures: fail, navigation: navState, table: tableMetrics, workbench: { before: beforeWorkbench, after: afterWorkbench, mobileCollapsed: mobileWorkbenchCollapsed }, studioHandoff, screenshots: fs.readdirSync(SHOTS).sort() });
 
   if (fail.length) throw new Error(`[post-doc12-browser] ${fail.length} failure(s):\n- ${fail.join('\n- ')}`);
   console.log(`[post-doc12-browser] PASS states=${results.length} screenshots=${fs.readdirSync(SHOTS).length}`);
