@@ -58,6 +58,7 @@ const sidebarSource = read('components/docs/navigation/DocsSidebarV2.tsx');
 const homeSource = read('components/home/ProductHome.tsx');
 const mdxComponents = read('mdx-components.tsx');
 const tableSource = read('components/mdx/Table.tsx');
+const recoveryCss = read('styles/post-doc12-recovery.css');
 const workbenchSource = read('components/docs/playground/VerifiedExamplePlayground.tsx');
 const loaderSource = read('components/docs/playground/CanvasPlaygroundLoader.tsx');
 const studioSource = read('lib/studio/studioStorage.ts');
@@ -79,8 +80,11 @@ for (const text of ["add('guides'", "add('recipes'", "add('features'", "add('adv
 for (const mapping of ['table: Table', 'thead: TableHead', 'tbody: TableBody', 'tr: TableRow', 'th: TableHeader', 'td: TableCell']) {
   invariant(mdxComponents.includes(mapping), `native markdown table mapping missing: ${mapping}`);
 }
-for (const text of ['apx-doc-table-wrap', 'overflow', 'tabIndex={0}', 'aria-label="Scrollable documentation table"']) {
-  invariant(tableSource.includes(text), `table recovery marker missing: ${text}`);
+for (const text of ['apx-doc-table-wrap', 'tabIndex={0}', 'aria-label="Scrollable documentation table"']) {
+  invariant(tableSource.includes(text), `table component recovery marker missing: ${text}`);
+}
+for (const text of ['.apx-doc-table-wrap', 'overflow-x:auto', 'position:sticky', 'left:0']) {
+  invariant(recoveryCss.includes(text), `table CSS recovery marker missing: ${text}`);
 }
 
 for (const text of ['ExampleWorkbench', "'ts' | 'preview' | 'both'", 'Copy code', 'Reset', 'Open in Studio', 'encodeShareLink', 'DOC-5 verified output']) {
