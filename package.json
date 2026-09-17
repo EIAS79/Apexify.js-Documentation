@@ -103,7 +103,12 @@
     "docs:browser:doc11": "node scripts/docs/doc11-browser-verify.mjs",
     "docs:lighthouse:doc11": "node scripts/docs/doc11-lighthouse-summary.mjs",
     "docs:verify:evidence:doc11": "node scripts/docs/doc11-evidence-verify.mjs",
-    "docs:verify:doc11": "npm run docs:verify:doc10 && npm run docs:audit:doc11 && npm run typecheck && npm run build && npm run docs:verify:evidence:doc11"
+    "docs:verify:doc11": "npm run docs:verify:doc10 && npm run docs:audit:doc11 && npm run typecheck && npm run build && npm run docs:verify:evidence:doc11",
+    "docs:verify:package-candidate": "tsx scripts/docs/doc12-package-candidate-verify.ts",
+    "docs:verify:external-links": "node scripts/docs/doc12-external-links.mjs",
+    "docs:audit:doc12": "node scripts/docs/doc12-static-audit.mjs",
+    "docs:verify:doc12": "npm run docs:verify:doc10 && npm run typecheck && npm run build && npm run docs:audit:doc11 && npm run docs:verify:package-candidate && npm run docs:verify:external-links && npm run docs:verify:evidence:doc11 && npm run docs:audit:doc12 && node scripts/docs/doc12-release-verify.mjs",
+    "docs:verify:release": "npm run docs:verify:doc12"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",

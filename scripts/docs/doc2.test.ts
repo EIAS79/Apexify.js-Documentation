@@ -85,10 +85,12 @@ test('DOC-2 focus, reduced-motion and custom-cursor policies are explicit', () =
 
 test('DOC-2 desktop/mobile search and TOC instances use unique identities', () => {
   const shell = read('components/docs/shell/DocsShell.tsx');
+  const mobileNavigation = read('components/docs/shell/MobileDocsNavigationDrawer.tsx');
   const sidebarSearch = read('components/docs/DocsSidebarSearch.tsx');
   const globalSearch = read('components/docs/search/GlobalDocsSearch.tsx');
   assert.ok(shell.includes('docs-sidebar-search-input'));
-  assert.ok(shell.includes('docs-drawer-search-input'));
+  assert.ok(shell.includes('MobileDocsNavigationDrawer'));
+  assert.ok(mobileNavigation.includes('docs-drawer-search-input'));
   assert.ok(shell.includes('docs-toc-rail'));
   assert.ok(shell.includes('docs-toc-drawer'));
   assert.ok(sidebarSearch.includes('inputId'));

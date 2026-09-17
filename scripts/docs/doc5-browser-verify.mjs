@@ -52,7 +52,14 @@ try{
     if(!(await page.$('[data-doc5-component="CodePreview"]')))throw new Error(`${s.name} CodePreview missing`);
     if(!(await page.$('img[src*="example-outputs/node.canvas.basic"]')))throw new Error(`${s.name} verified output missing`);
     await page.addScriptTag({content:axeSource});
-    const axe=await page.evaluate(async()=>{const result=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}});return result.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.length}));});
+    const axe=await page.evaluate(async()=>{
+      const result=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}});
+      return result.violations.map(v=>({
+        id:v.id,
+        impact:v.impact,
+        nodes:v.nodes.map(node=>({target:node.target,html:node.html,failureSummary:node.failureSummary})),
+      }));
+    });
     if(axe.length)throw new Error(`${s.name} axe ${JSON.stringify(axe)}`);
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth+1);
     if(overflow)throw new Error(`${s.name} horizontal overflow`);

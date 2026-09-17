@@ -5,6 +5,7 @@
 .apx-api-badges{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
 .apx-api-source-link{display:inline-flex;align-items:center;gap:.35rem;overflow-wrap:anywhere}
 .apx-api-breadcrumbs{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin-bottom:1rem;font-size:.9rem}
+.apx-api-breadcrumbs a{min-height:44px;display:inline-flex;align-items:center;padding:.45rem .35rem}
 .apx-api-signature{border:1px solid var(--docs-border,var(--border-default));border-radius:.9rem;overflow:hidden;background:var(--docs-code-surface,#0c0826);color:#f5f0ff}
 .apx-api-signature__bar{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:.65rem .8rem;border-bottom:1px solid rgba(255,255,255,.12);font-size:.8rem}
 .apx-api-signature__bar div{display:flex;gap:.5rem}.apx-api-signature button,.apx-api-signature a{border:1px solid rgba(255,255,255,.25);border-radius:.45rem;padding:.35rem .55rem;color:inherit;background:transparent}
