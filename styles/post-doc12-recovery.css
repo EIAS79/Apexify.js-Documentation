@@ -26,9 +26,6 @@
 .apx-sidebar-tag[data-tag="FEATURE"]{color:var(--apx-color-accent)}.apx-sidebar-tag[data-tag="RECIPE"]{color:var(--apx-status-current-fg)}.apx-sidebar-tag[data-tag="API"]{color:var(--info)}.apx-sidebar-tag[data-tag="SECURITY"]{color:var(--danger)}.apx-sidebar-tag[data-tag="PERF"]{color:var(--warning)}.apx-sidebar-tag[data-tag="ROADMAP"],.apx-sidebar-tag[data-tag="PREVIEW"],.apx-sidebar-tag[data-tag="EXPERIMENTAL"]{color:var(--apx-status-roadmap-fg)}
 .apx-sidebar-link .apx-badge { min-height:1.2rem; padding:.08rem .32rem; font-size:.58rem; }
 
-/* Keep the workbench accent visibly magenta while meeting AA against the light canvas. */
-:root:not(.dark) .apx-example-workbench [style*="color:var(--accent-magenta)"] { color:#a81464 !important; }
-
 /* Keep page-level metadata useful without letting the page header dominate. */
 .apx-doc-hero { margin-bottom:var(--apx-space-8); padding-bottom:var(--apx-space-6); }
 .apx-doc-hero__description { margin-top:.75rem; line-height:1.62; }
