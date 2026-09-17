@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { discoverDocumentationSources, loadDocumentationPages } from '../../lib/docs/content';
-import { buildDocumentationNavigation } from '../../lib/docs/navigation';
+import { buildDocumentationNavigation, flattenDocumentationNavigation } from '../../lib/docs/navigation';
 import { doc9Disposition } from '../../lib/docs/doc9-migration';
 import { resolveDoc9LegacyIdentity } from '../../lib/docs/doc9-legacy-client';
 import { CURRENT_CAPABILITIES } from '../../lib/product/catalog-data';
@@ -212,7 +212,7 @@ const canonicalPages = pages.map((page) => ({
   search: page.search,
   headingCount: page.headings.length,
 }));
-const navRoutes = new Set(navigation.flatMap((group) => group.items.map((item) => item.href)));
+const navRoutes = new Set(flattenDocumentationNavigation(navigation).map((item) => item.href));
 const navigationMissing = pages.filter((page) => !navRoutes.has(page.canonicalPath));
 const duplicateHeadingIds = pages.flatMap((page) => {
   const ids = page.headings.map((heading) => heading.id);
