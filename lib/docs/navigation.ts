@@ -234,6 +234,11 @@ function nodeEngineTree(pages: DocumentationPage[]): DocumentationNavigationItem
 }
 
 function futureGroupId(page: DocumentationPage): string | null {
+  const source = page.sourcePath.replace(/\\/g, '/');
+  const futureRuntime = page.runtime.some((runtime) => ['web', 'react', 'next-client', 'next-server'].includes(runtime));
+  const futureSurface = source.startsWith('fixture/') || page.package !== 'apexify.js' || futureRuntime;
+  if (!futureSurface) return null;
+
   if (page.slug.startsWith('core/')) return 'core';
   if (page.slug.startsWith('web/')) return 'web';
   if (page.slug.startsWith('react/')) return 'react';
@@ -330,7 +335,9 @@ export function getDocumentationBreadcrumbs(groups: DocumentationNavigationGroup
       { label: 'Docs', href: '/docs/getting-started' },
       { label: group.label },
       ...path.map((item, index) => ({
-        label: item.title,
+        // Sidebar family labels are deliberately compact; the terminal breadcrumb
+        // must retain the canonical page title for clarity and DOC-2 compatibility.
+        label: index === path.length - 1 ? page.title : item.title,
         href: index < path.length - 1 ? item.href : undefined,
       })),
     ];
