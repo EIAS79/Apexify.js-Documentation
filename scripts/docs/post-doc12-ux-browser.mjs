@@ -171,7 +171,8 @@ try {
 
   let studioHandoff = null;
   if (afterWorkbench.studio) {
-    const buttons = await docs.page.$$('button');
+    const sourceBeforeStudio = await docs.page.$eval('[data-doc8-primitive="editor"] .cm-content', (node) => (node.textContent ?? '').replace(/\\s+/g, ' ').trim()).catch(() => '');
+    const buttons = await docs.page.$('button');
     for (const button of buttons) {
       const text = await button.evaluate((node) => node.textContent?.trim());
       if (text === 'Open in Studio') {
@@ -179,12 +180,32 @@ try {
           docs.page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 15000 }).catch(() => null),
           button.click(),
         ]);
-        studioHandoff = await docs.page.evaluate(() => ({ pathname: location.pathname, hashPrefix: location.hash.slice(0, 9), hashLength: location.hash.length }));
+        await docs.page.waitForSelector('[data-doc8-primitive="editor"] .cm-content', { timeout: 15000 });
+        await docs.page.waitForFunction(
+          (expected) => {
+            const editor = document.querySelector('[data-doc8-primitive="editor"] .cm-content');
+            const actual = (editor?.textContent ?? '').replace(/\\s+/g, ' ').trim();
+            return Boolean(expected) && actual.includes(expected.slice(0, Math.min(96, expected.length)));
+          },
+          { timeout: 15000 },
+          sourceBeforeStudio,
+        ).catch(() => null);
+        studioHandoff = await docs.page.evaluate((expected) => {
+          const editor = document.querySelector('[data-doc8-primitive="editor"] .cm-content');
+          const actual = (editor?.textContent ?? '').replace(/\\s+/g, ' ').trim();
+          const body = document.body.textContent ?? '';
+          return {
+            pathname: location.pathname,
+            hashConsumed: location.hash === '',
+            sharedSourceLoaded: Boolean(expected) && actual.includes(expected.slice(0, Math.min(96, expected.length))),
+            shareToastObserved: body.includes('Loaded snippet from share link'),
+          };
+        }, sourceBeforeStudio);
         break;
       }
     }
   }
-  if (!studioHandoff || studioHandoff.pathname !== '/studio' || !studioHandoff.hashPrefix.startsWith('#snippet=')) fail.push('workbench: Studio handoff did not preserve encoded snippet transport');
+  if (!studioHandoff || studioHandoff.pathname !== '/studio' || !studioHandoff.sharedSourceLoaded) fail.push('workbench: Studio handoff did not load the encoded workbench source');
   await docs.page.close();
 
   const table = await open({ name: 'table-heavy-desktop', route: '/docs/node/video-ffmpeg/metadata-and-frames', width: 1024, height: 900, theme: 'light' });
