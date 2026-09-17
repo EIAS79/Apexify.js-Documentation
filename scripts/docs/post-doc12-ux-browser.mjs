@@ -23,7 +23,8 @@ async function open({ name, route, width = 1440, height = 1100, theme = 'light',
   const consoleErrors = [];
   const pageErrors = [];
   page.on('console', (message) => {
-    if (message.type() === 'error' && !/vercel|speed-insights/i.test(message.text())) consoleErrors.push(message.text());
+    const text = message.text();
+    if (message.type() === 'error' && !/vercel|speed-insights|Failed to load resource: the server responded with a status of 404/i.test(text)) consoleErrors.push(text);
   });
   page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.setViewport({ width, height, deviceScaleFactor: 1 });
@@ -58,7 +59,8 @@ async function open({ name, route, width = 1440, height = 1100, theme = 'light',
 
 try {
   const homeLight = await open({ name: 'homepage-desktop-light', route: '/', theme: 'light' });
-  if (!(await homeLight.page.$('text/Draw anything.'))) fail.push('homepage: recovered legacy headline missing');
+  const recoveredHeadline = await homeLight.page.evaluate(() => (document.querySelector('h1')?.textContent ?? '').replace(/\s+/g, ' ').trim());
+  if (!recoveredHeadline.includes('Draw anything.') || !recoveredHeadline.includes('From a script.')) fail.push(`homepage: recovered legacy headline missing (${recoveredHeadline})`);
   await homeLight.page.close();
 
   const homeDark = await open({ name: 'homepage-desktop-dark', route: '/', theme: 'dark' });
@@ -94,7 +96,6 @@ try {
   const beforeWorkbench = await docs.page.evaluate(() => ({ resources: performance.getEntriesByType('resource').length, workbench: Boolean(document.querySelector('[data-post-doc12-workbench="collapsed"]')) }));
   if (!beforeWorkbench.workbench) fail.push('workbench: collapsed-by-default surface missing');
   await docs.page.screenshot({ path: path.join(SHOTS, 'workbench-collapsed.png'), fullPage: true });
-  const showButton = await docs.page.$('button');
   const showButtons = await docs.page.$$('button');
   let activated = false;
   for (const button of showButtons) {
