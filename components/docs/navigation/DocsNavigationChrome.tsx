@@ -29,6 +29,7 @@ export function DocsBreadcrumbsV2({ breadcrumbs }: { breadcrumbs: DocumentationB
 }
 
 function PagerLink({ direction, item }: { direction: 'previous' | 'next'; item: NonNullable<DocumentationPager['previous']> }) {
+  if (!item.href) return null;
   return (
     <Link
       className="apx-pager-link"
