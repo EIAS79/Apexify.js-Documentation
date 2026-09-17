@@ -27,7 +27,7 @@
 .apx-sidebar-link .apx-badge { min-height:1.2rem; padding:.08rem .32rem; font-size:.58rem; }
 
 /* Keep the workbench accent visibly magenta while meeting AA against the light canvas. */
-.light .apx-example-workbench [style*="color:var(--accent-magenta)"] { color:#a81464 !important; }
+:root:not(.dark) .apx-example-workbench [style*="color:var(--accent-magenta)"] { color:#a81464 !important; }
 
 /* Keep page-level metadata useful without letting the page header dominate. */
 .apx-doc-hero { margin-bottom:var(--apx-space-8); padding-bottom:var(--apx-space-6); }
