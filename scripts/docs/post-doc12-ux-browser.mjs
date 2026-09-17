@@ -129,20 +129,34 @@ try {
   if (activated && afterWorkbench.resources <= beforeWorkbench.resources) fail.push('workbench: editor/workspace bundle was not deferred until activation');
 
   let keyboardWorkbenchTab = false;
-  const previewTab = await docs.page.$('[role="tab"]');
-  if (previewTab) {
-    const tabs = await docs.page.$$('[role="tab"]');
-    for (const tab of tabs) {
-      const label = await tab.evaluate((node) => node.textContent?.trim());
-      if (label === 'Preview') {
-        await tab.focus();
-        await docs.page.keyboard.press('Enter');
-        keyboardWorkbenchTab = (await tab.evaluate((node) => node.getAttribute('aria-selected'))) === 'true';
-        break;
-      }
+  let bothTab = null;
+  const tabs = await docs.page.$$('[role="tab"]');
+  for (const tab of tabs) {
+    const label = await tab.evaluate((node) => node.textContent?.trim());
+    if (label === 'Preview') {
+      await tab.focus();
+      await docs.page.keyboard.press('Enter');
+      keyboardWorkbenchTab = (await tab.evaluate((node) => node.getAttribute('aria-selected'))) === 'true';
     }
+    if (label === 'Both') bothTab = tab;
   }
   if (!keyboardWorkbenchTab) fail.push('workbench: keyboard tab activation failed');
+  if (bothTab) {
+    await bothTab.focus();
+    await docs.page.keyboard.press('Enter');
+  }
+
+  let keyboardResize = false;
+  const separator = await docs.page.$('[role="separator"][aria-label="Resize editor and preview"]');
+  if (separator) {
+    await separator.focus();
+    const before = Number(await separator.evaluate((node) => node.getAttribute('aria-valuenow')));
+    await docs.page.keyboard.press('ArrowRight');
+    const after = Number(await separator.evaluate((node) => node.getAttribute('aria-valuenow')));
+    keyboardResize = after > before;
+    await docs.page.keyboard.press('0');
+  }
+  if (!keyboardResize) fail.push('workbench: keyboard resize separator failed');
 
   const expandedViolations = await axe(docs.page);
   if (serious(expandedViolations).length) fail.push(`workbench: ${serious(expandedViolations).length} serious/critical axe violations after expansion`);
@@ -200,7 +214,7 @@ try {
   await studio.page.close();
 
   write('accessibility.json', { status: fail.some((item) => item.includes('axe')) ? 'FAIL' : 'PASS', pages: results.map((item) => ({ name: item.name, seriousViolations: item.seriousViolations })), expandedWorkbenchSeriousViolations: serious(expandedViolations) });
-  write('keyboard.json', { status: keyboardDisclosure && keyboardWorkbenchTab ? 'PASS' : 'FAIL', disclosureEnterToggle: keyboardDisclosure, workbenchTabEnterActivation: keyboardWorkbenchTab, studioHandoff });
+  write('keyboard.json', { status: keyboardDisclosure && keyboardWorkbenchTab && keyboardResize ? 'PASS' : 'FAIL', disclosureEnterToggle: keyboardDisclosure, workbenchTabEnterActivation: keyboardWorkbenchTab, workbenchResizeArrowKey: keyboardResize, studioHandoff });
   write('responsive.json', { status: results.every((item) => item.metrics.overflowPx <= 1) ? 'PASS' : 'FAIL', viewports: results.map((item) => ({ name: item.name, width: item.width, overflowPx: item.metrics.overflowPx })) });
   write('theme.json', { status: 'PASS', states: results.map((item) => ({ name: item.name, requested: item.theme, systemDark: item.systemDark, resolved: item.metrics.theme })) });
   write('reduced-motion.json', { status: reducedMetrics === '0s' ? 'PASS' : 'FAIL', disclosureTransitionDuration: reducedMetrics });
