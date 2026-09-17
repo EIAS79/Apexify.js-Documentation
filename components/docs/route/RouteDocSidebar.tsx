@@ -97,11 +97,13 @@ export function RouteDocSidebar({
                     </div>
                     <div className="space-y-0.5">
                       {group.items.map((item) => {
-                        const active = pathname === item.href;
+                        if (!item.href) return null;
+                        const href = item.href;
+                        const active = pathname === href;
                         return (
                           <Link
-                            key={item.href}
-                            href={item.href}
+                            key={item.id}
+                            href={href}
                             aria-current={active ? 'page' : undefined}
                             onClick={() => {
                               if (window.innerWidth < 1024) onClose();
