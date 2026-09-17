@@ -179,6 +179,23 @@
   .apx-version-badge { display:inline-flex; }
 }
 
+/* Mobile performance: avoid expensive backdrop/filter compositing on the critical
+   docs paint path. The mobile shell keeps the same surfaces/borders without blur. */
+@media (max-width: 47.99rem) {
+  .apx-doc-header,
+  .apx-doc-mobile-bar {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--apx-surface-page);
+  }
+  .apx-doc-background {
+    background: var(--apx-surface-page);
+  }
+  .apx-doc-background::after {
+    display: none;
+  }
+}
+
 @media (max-width: 22rem) {
   .apx-doc-header__inner { gap:.35rem; padding-inline:.5rem; }
   .apx-doc-brand__text { display:none; }
