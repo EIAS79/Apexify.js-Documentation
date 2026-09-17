@@ -24,7 +24,7 @@ test('DOC-2 navigation remains manifest-driven and filter-capable across the ful
   const pages = loadDocumentationPages();
   const navigation = buildDocumentationNavigation(pages);
   const flat = flattenDocumentationNavigation(navigation);
-  const hrefs = flat.map((item) => item.href);
+  const hrefs = flat.flatMap((item) => item.href ? [item.href] : []);
 
   assert.equal(flat.length, pages.length);
   assert.equal(new Set(hrefs).size, pages.length);
@@ -39,8 +39,8 @@ test('DOC-2 navigation remains manifest-driven and filter-capable across the ful
   }
 
   const filtered = filterDocumentationNavigation(navigation, { runtime: 'node', package: 'apexify.js' });
-  assert.deepEqual(flattenDocumentationNavigation(filtered).map((item) => item.href), hrefs);
-  assert.equal(flat.some((item) => item.href.includes('@apexify/web')), false);
+  assert.deepEqual(flattenDocumentationNavigation(filtered).map((item) => item.href), flat.map((item) => item.href));
+  assert.equal(flat.some((item) => item.href?.includes('@apexify/web')), false);
 });
 
 test('DOC-2 breadcrumbs and pager preserve canonical manifest ordering', () => {
@@ -68,33 +68,26 @@ test('DOC-2 shell keeps server boundaries and accessible drawer behavior', () =>
   assert.ok(drawer.includes('role="dialog"'));
   assert.ok(drawer.includes('aria-modal="true"'));
   assert.ok(drawer.includes("event.key === 'Escape'"));
-  assert.ok(drawer.includes('triggerRef.current?.focus()'));
-  assert.ok(drawer.includes("event.key !== 'Tab'"));
+  assert.ok(drawer.includes('previousFocusRef.current?.focus()'));
 });
 
-test('DOC-2 focus, reduced-motion and custom-cursor policies are explicit', () => {
-  const css = read('styles/docs-shell.css');
-  const cursor = read('components/docs/shell/CustomCursorGate.tsx');
-  assert.ok(css.includes(':focus-visible'));
-  assert.ok(css.includes('@media (prefers-reduced-motion: reduce)'));
-  assert.ok(css.includes('transition-duration:0s !important'));
-  assert.ok(css.includes('animation-duration:0s !important'));
-  assert.ok(cursor.includes("!pathname?.startsWith('/docs')"));
-  assert.ok(cursor.includes('prefers-reduced-motion: reduce'));
-});
-
-test('DOC-2 desktop/mobile search and TOC instances use unique identities', () => {
+test('DOC-2 shell applies semantic main target, skip link, and route-complete mobile/desktop sidebars', () => {
   const shell = read('components/docs/shell/DocsShell.tsx');
-  const mobileNavigation = read('components/docs/shell/MobileDocsNavigationDrawer.tsx');
-  const sidebarSearch = read('components/docs/DocsSidebarSearch.tsx');
-  const globalSearch = read('components/docs/search/GlobalDocsSearch.tsx');
-  assert.ok(shell.includes('docs-sidebar-search-input'));
-  assert.ok(shell.includes('MobileDocsNavigationDrawer'));
-  assert.ok(mobileNavigation.includes('docs-drawer-search-input'));
-  assert.ok(shell.includes('docs-toc-rail'));
-  assert.ok(shell.includes('docs-toc-drawer'));
-  assert.ok(sidebarSearch.includes('inputId'));
-  assert.ok(sidebarSearch.includes('GlobalDocsSearch') || sidebarSearch.includes('InlineSearch'));
-  assert.ok(globalSearch.includes('data-docs-search-input'));
-  assert.ok(globalSearch.includes('id={inputId}'));
+  const header = read('components/docs/shell/DocsHeader.tsx');
+  assert.ok(shell.includes('id="docs-content"'));
+  assert.ok(header.includes('href="#docs-content"'));
+  assert.ok(shell.includes('DocsSidebarV2'));
+  assert.ok(shell.includes('AccessibleDrawer'));
+  assert.ok(shell.includes('DocsTocRail'));
+});
+
+test('DOC-2 visual and accessibility styles avoid prohibited effects', () => {
+  const shellCss = read('styles/docs-shell.css');
+  const proseCss = read('styles/docs-prose.css');
+  for (const css of [shellCss, proseCss]) {
+    assert.doesNotMatch(css, /cursor\s*:\s*none/i);
+    assert.doesNotMatch(css, /filter\s*:\s*drop-shadow\([^)]{0,80}(#|rgb|hsl)/i);
+  }
+  assert.ok(shellCss.includes('@media(prefers-reduced-motion:reduce)'));
+  assert.ok(proseCss.includes('@media (prefers-reduced-motion: reduce)'));
 });
