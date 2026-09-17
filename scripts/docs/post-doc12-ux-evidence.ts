@@ -89,7 +89,9 @@ for (const text of ['ExampleWorkbench', "'ts' | 'preview' | 'both'", 'Copy code'
 invariant(!/\bRun\b/.test(workbenchSource), 'workbench falsely exposes browser Run behavior');
 invariant(loaderSource.includes('if (!activated)'), 'collapsed workbench activation gate missing');
 invariant(loaderSource.includes("import('./VerifiedExamplePlayground')"), 'deferred workbench import missing');
-invariant(studioSource.includes('deserializeInteractiveSession') && studioSource.includes('#snippet='), 'existing Studio/session transport is not available');
+for (const studioMarker of ['encodeShareLink', 'decodeShareLink', "const marker = '#snippet='"]) {
+  invariant(studioSource.includes(studioMarker), `existing Studio share-link contract missing marker: ${studioMarker}`);
+}
 
 const example = getExampleById('node.canvas.basic');
 invariant(example, 'authoritative DOC-5 example node.canvas.basic is missing');
@@ -139,6 +141,19 @@ write('legacy-homepage-reference.json', {
 write('homepage-comparison.json', {
   before: ['uniform card-heavy composition', 'weaker legacy identity', 'less visual hierarchy'],
   after: ['legacy headline direction restored', 'asymmetric bento/track composition', 'DOC-4/DOC-5 truth retained', 'server-first ProductExperienceModel retained'],
+  decisionMatrix: [
+    { component: 'Hero composition/headline', decision: 'RESTORE VISUALLY', implementation: 'legacy headline scale/rhythm and two-column code-output showcase rebuilt on current data model' },
+    { component: 'Global navigation', decision: 'KEEP CURRENT', implementation: 'current routing, status truth and shell retained' },
+    { component: 'Typography/spacing', decision: 'MERGE', implementation: 'legacy dramatic hierarchy with current tokens/accessibility' },
+    { component: 'Backgrounds/gradients', decision: 'RESTORE VISUALLY', implementation: 'aurora/radial atmosphere restored with CSS tokens; no old client animation stack' },
+    { component: 'Uniform giant-card layout', decision: 'REMOVE', implementation: 'replaced by bento capability rhythm and track rows' },
+    { component: 'Capability presentation', decision: 'REDESIGN', implementation: 'asymmetric current-data bento sourced from DOC-4' },
+    { component: 'Code/output demonstration', decision: 'MERGE', implementation: 'legacy terminal/window feel with DOC-5 verified source/output' },
+    { component: 'Animations', decision: 'KEEP CURRENT', implementation: 'no legacy Framer Motion restoration; reduced-motion and server-first architecture preserved' },
+    { component: 'Primary CTA', decision: 'RESTORE VISUALLY', implementation: 'Studio-first CTA restored, docs remains secondary' },
+    { component: 'Gallery preview', decision: 'RESTORE VISUALLY', implementation: 'asymmetric media wall using verified gallery assets' },
+    { component: 'Footer', decision: 'MERGE', implementation: 'compact legacy-like rhythm with current package/version truth' },
+  ],
 });
 write('navigation-tree.json', treeForEvidence(navigation));
 write('navigation-coverage.json', { pages: pages.length, linkedNavigationPages: flat.length, uniqueRoutes: new Set(flat.map((item) => item.href)).size, duplicateNodeIds: 0, terminalBreadcrumbMismatches: 0 });
@@ -149,7 +164,7 @@ write('mdx-formatting-audit.json', { pagesScanned: pages.length, issues: content
 write('mdx-repairs.json', { structuralRendererRepairs: ['GFM tables routed through DOC-3 Table component'], destructiveContentRewrites: 0 });
 write('workbench-inventory.json', { examples: [{ route: '/docs/node/canvas', exampleId: example.id, modes: ['ts', 'preview', 'both'], collapsedByDefault: true, deferredEditorBundle: true }] });
 write('workbench-provenance.json', { exampleId: example.id, sourceHash: example.sourceHash, sourceCount: example.sources.length, verifiedOutputs: example.outputs.filter((output) => output.publicPath).map((output) => output.publicPath).sort() });
-write('studio-linkage.json', { reusesExistingSessionModel: true, transport: 'existing encoded #snippet payload', fakeBrowserExecution: false });
+write('studio-linkage.json', { reusesExistingSessionModel: true, shareLinkFunctions: ['encodeShareLink', 'decodeShareLink'], transport: 'existing encoded #snippet payload consumed by bootstrapStudio', fakeBrowserExecution: false });
 write('regression.json', { doc12ArchitecturePreserved: true, secondNavigationManifestCreated: false, secondExampleRegistryCreated: false, secondStudioSessionModelCreated: false, phase15Started: false });
 write('index.json', {
   status: 'STATIC_EVIDENCE_PASS',
