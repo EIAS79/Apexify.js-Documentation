@@ -152,7 +152,11 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
                 <span>source / {example.id}</span>
                 <span>{model.package.name}</span>
               </div>
-              <pre className="!m-0 max-h-72 overflow-auto !rounded-none !border-0 !bg-transparent px-4 py-4 text-[11px] leading-5 sm:text-xs">
+              <pre
+                tabIndex={0}
+                aria-label={`${example.title} verified source code`}
+                className="!m-0 max-h-72 overflow-auto !rounded-none !border-0 !bg-transparent px-4 py-4 text-[11px] leading-5 outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] sm:text-xs"
+              >
                 <code>{example.source}</code>
               </pre>
             </div>
