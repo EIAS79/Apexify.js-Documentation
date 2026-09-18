@@ -21,7 +21,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { GallerySnippetEditor } from './GallerySnippetEditor';
 import { CATEGORY_CONFIG } from './galleryConfig';
-import { type GalleryItem, primaryBadgeCategory } from './galleryHelpers';
+import { galleryTrustLabel, type GalleryItem, primaryBadgeCategory } from './galleryHelpers';
 import { inferMediaKind, buildGalleryHash } from '@/lib/gallery/core/galleryDocLink';
 import { STUDIO_INCOMING_SNIPPET_KEY } from '@/lib/studio/studioConfig';
 import GalleryZoomablePreview from './GalleryZoomablePreview';
@@ -306,7 +306,7 @@ export default function GalleryModal({
         aria-describedby="gallery-modal-about"
       >
         <div
-          className="pointer-events-auto flex flex-col flex-1 min-h-0 max-h-[100dvh] sm:max-h-[calc(100dvh-1.5rem)] md:max-h-[calc(100dvh-3rem)] w-full max-w-7xl mx-auto rounded-none sm:rounded-2xl lg:rounded-3xl overflow-hidden surface-elevated"
+          className="apx-gallery-inspector pointer-events-auto flex flex-col flex-1 min-h-0 max-h-[100dvh] sm:max-h-[calc(100dvh-1.5rem)] md:max-h-[calc(100dvh-3rem)] w-full max-w-7xl mx-auto rounded-none sm:rounded-2xl lg:rounded-3xl overflow-hidden surface-elevated"
           style={{
             backgroundColor: 'var(--bg-canvas)',
             borderColor: 'var(--border-default)',
@@ -315,7 +315,7 @@ export default function GalleryModal({
         >
           {/* HEADER */}
           <div
-            className="flex-shrink-0 px-4 sm:px-6 py-4 border-b"
+            className="apx-gallery-inspector__header flex-shrink-0 px-4 sm:px-6 py-4 border-b"
             style={{
               borderColor: 'var(--border-subtle)',
               backgroundColor: 'var(--bg-raised)',
@@ -425,7 +425,7 @@ export default function GalleryModal({
                     color: shareCopied ? 'var(--success)' : 'var(--text-primary)',
                   }}
                   onMouseEnter={(e) => {
-                    if (!shareCopied) e.currentTarget.style.borderColor = 'var(--accent-magenta)';
+                    if (!shareCopied) e.currentTarget.style.borderColor = 'var(--accent-iris)';
                   }}
                   onMouseLeave={(e) => {
                     if (!shareCopied) e.currentTarget.style.borderColor = 'var(--border-default)';
@@ -443,11 +443,12 @@ export default function GalleryModal({
               <div
                 className="shrink-0 inline-flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl"
                 style={{
-                  backgroundColor: cfg.accent,
-                  boxShadow: `0 0 26px -6px ${cfg.accent}`,
+                  backgroundColor: cfg.accentSoft,
+                  border: `1px solid ${cfg.accent}`,
+                  boxShadow: 'none',
                 }}
               >
-                <Icon className="h-5 w-5 text-white" />
+                <Icon className="h-5 w-5" style={{ color: cfg.accent }} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 mb-1.5">
@@ -461,7 +462,7 @@ export default function GalleryModal({
                     className="text-[10px] font-mono"
                     style={{ color: 'var(--text-muted)' }}
                   >
-                    · {item.id}
+                    · {galleryTrustLabel(item)} · {item.id}
                   </span>
                 </div>
                 <h2
@@ -490,7 +491,7 @@ export default function GalleryModal({
                 className="text-[10px] font-bold uppercase tracking-[0.22em] mb-1.5"
                 style={{ color: 'var(--text-tertiary)' }}
               >
-                About this example
+                Piece notes
               </p>
               <div className="text-[13.5px] leading-relaxed">
                 <ReactMarkdown components={MARKDOWN_COMPONENTS}>{item.description}</ReactMarkdown>

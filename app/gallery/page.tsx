@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
+import '@/styles/gallery-calm.css';
 import GalleryClient from './components/GalleryClient';
 import { absoluteSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Gallery | Apexify.js',
-  description: 'Browse verified Apexify.js rendering examples and inspect the source behind representative outputs.',
+  description: 'Browse Apexify.js visual output across composition, image, typography, data, motion, surface, and advanced rendering studies.',
   alternates: { canonical: absoluteSiteUrl('/gallery') },
   openGraph: {
     type: 'website',
     title: 'Apexify.js Gallery',
-    description: 'Verified Apexify.js rendering examples with source and output previews.',
+    description: 'A curated Apexify.js output library with visual lenses, source trust, code, and previews.',
     url: absoluteSiteUrl('/gallery'),
   },
 };
