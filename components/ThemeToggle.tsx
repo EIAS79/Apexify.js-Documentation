@@ -16,11 +16,8 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
     <div
       role="radiogroup"
       aria-label="Color theme"
-      className={`relative inline-flex items-center gap-0.5 rounded-full border p-0.5 ${className}`}
-      style={{
-        backgroundColor: 'var(--bg-sunken)',
-        borderColor: 'var(--border-default)',
-      }}
+      className={`inline-flex items-center gap-0.5 rounded-lg border p-0.5 ${className}`}
+      style={{ backgroundColor: 'var(--surface-2)', borderColor: 'var(--border)' }}
     >
       {OPTIONS.map((opt) => {
         const active = mode === opt.id;
@@ -34,16 +31,11 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
             aria-label={`${opt.label} theme`}
             title={`${opt.label} theme`}
             onClick={() => setMode(opt.id)}
-            className="relative h-7 w-7 inline-flex items-center justify-center rounded-full transition-all"
-            style={
-              active
-                ? {
-                    backgroundImage: 'var(--gradient-sunset)',
-                    color: 'white',
-                    boxShadow: 'var(--glow-magenta)',
-                  }
-                : { color: 'var(--text-tertiary)' }
-            }
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md transition-colors"
+            style={{
+              backgroundColor: active ? 'var(--accent)' : 'transparent',
+              color: active ? 'var(--on-accent)' : 'var(--text-secondary)',
+            }}
           >
             <Icon className="h-3.5 w-3.5" />
           </button>
