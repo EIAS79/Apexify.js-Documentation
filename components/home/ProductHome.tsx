@@ -3,9 +3,6 @@ import Link from 'next/link';
 import {
   ArrowRightIcon,
   CheckIcon,
-  CodeBracketIcon,
-  CommandLineIcon,
-  PhotoIcon,
 } from '@heroicons/react/24/outline';
 import type { ProductExperienceModel } from '@/lib/product/catalog';
 import type { ProductStatus } from '@/lib/product/catalog-data';
