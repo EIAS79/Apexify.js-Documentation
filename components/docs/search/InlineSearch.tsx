@@ -13,18 +13,11 @@ export function InlineSearch({
   scope?: SearchFilters;
 }) {
   return (
-    <div
-      className="not-prose mb-3 min-w-0 overflow-hidden rounded-xl p-2"
-      style={{
-        background: "color-mix(in srgb, var(--bg-sunken) 55%, transparent)",
-        border: "1px solid var(--border-default)",
-        boxShadow: "var(--shadow-sm)",
-      }}
-    >
+    <div className="apx-inline-search--compact not-prose min-w-0">
       <GlobalDocsSearch inputId={inputId} compact ariaLabel={ariaLabel} fixedFilters={scope} />
-      <p className="px-1 pt-1 text-[11px]" style={{ color: "var(--text-secondary)" }}>
-        Uses the same build-time search index and ranking as global search.
-      </p>
+      <div className="px-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: "var(--text-tertiary)" }} aria-hidden>
+        Symbols · options · guides
+      </div>
     </div>
   );
 }

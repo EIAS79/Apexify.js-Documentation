@@ -6,7 +6,7 @@ import {
   getDocumentationPageBySlug,
   loadDocumentationPages,
 } from '../../lib/docs/content';
-import { buildDocumentationNavigation } from '../../lib/docs/navigation';
+import { buildDocumentationNavigation, flattenDocumentationNavigation } from '../../lib/docs/navigation';
 
 const ROOT = process.cwd();
 
@@ -48,9 +48,16 @@ if (canvas?.canonicalPath !== '/docs/node/canvas') {
 }
 
 const navigation = buildDocumentationNavigation(pages);
-const navigationCount = navigation.reduce((count, group) => count + group.items.length, 0);
-if (navigationCount !== pages.length) {
-  throw new Error(`[doc1-verify] navigation must cover every routed page exactly once: ${navigationCount}/${pages.length}`);
+const navigationItems = flattenDocumentationNavigation(navigation);
+const navigationCount = navigationItems.length;
+const navigationRoutes = new Set(navigationItems.map((item) => item.href));
+if (navigationCount !== pages.length || navigationRoutes.size !== pages.length) {
+  throw new Error(`[doc1-verify] navigation must cover every routed page exactly once: ${navigationCount}/${pages.length} items, ${navigationRoutes.size}/${pages.length} unique routes`);
+}
+for (const page of pages) {
+  if (!navigationRoutes.has(page.canonicalPath)) {
+    throw new Error(`[doc1-verify] navigation is missing canonical routed page: ${page.canonicalPath}`);
+  }
 }
 
 const catchAll = requireFile('app/docs/[...slug]/page.tsx');

@@ -37,6 +37,17 @@ function stripCode(body: string): string {
     .replace(/~~~[\s\S]*?~~~/g, '')
     .replace(/`[^`\n]*`/g, '');
 }
+function unescapedCount(line: string, token: string): number {
+  let count = 0;
+  for (let index = 0; index <= line.length - token.length; index += 1) {
+    if (line.slice(index, index + token.length) !== token) continue;
+    let slashes = 0;
+    for (let cursor = index - 1; cursor >= 0 && line[cursor] === '\\'; cursor -= 1) slashes += 1;
+    if (slashes % 2 === 0) count += 1;
+    index += token.length - 1;
+  }
+  return count;
+}
 
 for (const page of pages) {
   const body = page.body;
@@ -87,6 +98,38 @@ for (const page of pages) {
     }
   }
 
+  // POST-DOC-12 corruption recovery: scan prose line-by-line so failures identify
+  // the exact source line rather than reporting an opaque "MDX invalid" error.
+  let activeFence: '```' | '~~~' | null = null;
+  body.split('\n').forEach((line, zeroBasedLine) => {
+    const lineNumber = zeroBasedLine + 1;
+    const trimmed = line.trimStart();
+    const fence = trimmed.startsWith('```') ? '```' : trimmed.startsWith('~~~') ? '~~~' : null;
+    if (fence) {
+      activeFence = activeFence === fence ? null : activeFence ?? fence;
+      return;
+    }
+    if (activeFence) return;
+
+    // Remove balanced inline code before checking prose corruption. This permits
+    // intentional documentation such as `\\n` while still catching unmatched
+    // backticks and literal escaped newlines that leaked into normal prose.
+    const proseLine = line.replace(/`[^`\n]*`/g, '');
+    if (/\\n/.test(proseLine)) {
+      addError(page.sourcePath, 'literal-escaped-newline', `line ${lineNumber}: literal \\n found in prose; use a real line break or inline code if intentional`);
+    }
+    if (unescapedCount(proseLine, '`') % 2 !== 0) {
+      addError(page.sourcePath, 'inline-code-delimiter', `line ${lineNumber}: unmatched inline backtick delimiter`);
+    }
+
+    // Strong-emphasis mismatches can legally span lines, so flag them for exact
+    // review without making legitimate authored Markdown fail the build.
+    const strongCount = unescapedCount(proseLine.replace(/\*\*\*/g, ''), '**');
+    if (strongCount % 2 !== 0) {
+      addWarning(page.sourcePath, 'emphasis-review', `line ${lineNumber}: odd strong-emphasis delimiter count`);
+    }
+  });
+
   const hrefs = [
     ...[...prose.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)].map((match) => match[1]),
     ...[...prose.matchAll(/href=(['"])([^'"]+)\1/g)].map((match) => match[2]),
@@ -126,8 +169,8 @@ for (const page of pages) {
 errors.sort((a, b) => `${a.source}:${a.rule}:${a.detail}`.localeCompare(`${b.source}:${b.rule}:${b.detail}`));
 warnings.sort((a, b) => `${a.source}:${a.rule}:${a.detail}`.localeCompare(`${b.source}:${b.rule}:${b.detail}`));
 const artifact = {
-  schemaVersion: 1,
-  phase: 'DOC-9',
+  schemaVersion: 2,
+  phase: 'DOC-9+POST-DOC-12',
   pageCount: pages.length,
   rules: [
     'heading-root',
@@ -138,6 +181,9 @@ const artifact = {
     'unsafe-raw-html',
     'code-fence',
     'code-metadata',
+    'literal-escaped-newline',
+    'inline-code-delimiter',
+    'emphasis-review',
     'legacy-link',
     'broken-internal-link',
     'broken-anchor',

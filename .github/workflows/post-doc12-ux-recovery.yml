@@ -1,0 +1,80 @@
+name: POST-DOC-12 UX Recovery
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [post-doc12-ux-recovery, main]
+  workflow_dispatch:
+
+concurrency:
+  group: post-doc12-ux-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: '1'
+  POST_DOC12_BASE_URL: http://127.0.0.1:3000
+
+jobs:
+  verify:
+    name: Verify recovery architecture, content and browser UX
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Pin npm toolchain
+        run: npm install --global npm@11.19.1
+      - name: Deterministic install
+        run: npm ci
+      - name: Generate and verify recovery static evidence
+        run: npx tsx scripts/docs/post-doc12-ux-evidence.ts
+      - name: Full migrated-content lint
+        run: npm run docs:lint:doc9
+      - name: TypeScript typecheck
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
+      - name: Install ephemeral browser audit tools
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+          "$CHROME" --version
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/post-doc12-next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/docs/node/canvas >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/post-doc12-next.log
+          exit 1
+      - name: Browser, accessibility, keyboard, responsive and visual evidence
+        run: node scripts/docs/post-doc12-ux-browser.mjs
+      - name: Collect production server log
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p generated/post-doc12-ux-recovery
+          if test -f /tmp/post-doc12-next.log; then cp /tmp/post-doc12-next.log generated/post-doc12-ux-recovery/server.log; fi
+      - name: Upload recovery evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-doc12-ux-recovery-evidence
+          path: generated/post-doc12-ux-recovery
+          include-hidden-files: true
+          if-no-files-found: warn

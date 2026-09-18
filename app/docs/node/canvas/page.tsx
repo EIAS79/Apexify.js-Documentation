@@ -24,13 +24,7 @@ export function generateMetadata(): Metadata {
     keywords: page.keywords,
     alternates: { canonical },
     robots: { index: indexable, follow: true },
-    openGraph: {
-      type: 'article',
-      title: page.title,
-      description: page.description,
-      url: canonical,
-      siteName: 'Apexify.js Documentation',
-    },
+    openGraph: { type: 'article', title: page.title, description: page.description, url: canonical, siteName: 'Apexify.js Documentation' },
   };
 }
 
@@ -41,12 +35,11 @@ function withoutLeadingTitle(body: string): string {
 function CanvasInteractiveExample() {
   const example = getExampleById('node.canvas.basic');
   if (!example || example.sources.length !== 1) return null;
-  const verifiedPreview =
-    example.outputs.find((output) => output.path === example.gallery.previewOutput) ??
-    example.outputs.find((output) => output.publicPath);
+  const verifiedPreview = example.outputs.find((output) => output.path === example.gallery.previewOutput) ?? example.outputs.find((output) => output.publicPath);
 
   return (
     <CanvasPlaygroundLoader
+      exampleId={example.id}
       title={example.title}
       initialSource={example.sources[0].content}
       previewUrl={verifiedPreview?.publicPath ?? undefined}
@@ -59,7 +52,6 @@ function CanvasInteractiveExample() {
 export default function CanvasDocumentationPage() {
   const page = getDocumentationPageBySlug(CANVAS_SLUG);
   if (!page) notFound();
-
   const navigation = buildDocumentationNavigation(loadDocumentationPages());
   const breadcrumbs = getDocumentationBreadcrumbs(navigation, page);
   const pager = getDocumentationPager(navigation, page.canonicalPath);
@@ -69,12 +61,7 @@ export default function CanvasDocumentationPage() {
   return (
     <DocsShell groups={navigation} headings={headings} activePath={page.canonicalPath}>
       <DocsBreadcrumbsV2 breadcrumbs={breadcrumbs} />
-      <article
-        className="apx-doc-prose"
-        data-doc-article
-        data-doc-slug={page.slug}
-        data-doc-source={page.sourcePath}
-      >
+      <article className="apx-doc-prose" data-doc-article data-doc-slug={page.slug} data-doc-source={page.sourcePath}>
         <DocsPageHero page={page} headingId={leadingHeading?.id} />
         <RouteDocsMarkdown content={withoutLeadingTitle(page.body)} />
         <CanvasInteractiveExample />

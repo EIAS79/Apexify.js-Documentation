@@ -66,7 +66,21 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
   }
 
   if (kind === 'docs-playground') {
-    await page.waitForSelector('[data-doc8-representative-playground="verified-example"]');
+    const collapsed = await page.waitForSelector('[data-post-doc12-workbench="collapsed"]');
+    if (!collapsed) throw new Error(`${name}: deferred workbench collapsed state missing`);
+    if (await page.$('[data-doc8-primitive="editor"]')) {
+      throw new Error(`${name}: editor primitive mounted before workbench activation`);
+    }
+
+    const activated = await page.evaluate(() => {
+      const button = [...document.querySelectorAll('button')].find((node) => node.textContent?.trim() === 'Show code & preview');
+      if (!(button instanceof HTMLButtonElement)) return false;
+      button.click();
+      return true;
+    });
+    if (!activated) throw new Error(`${name}: Show code & preview activation control missing`);
+    await page.waitForSelector('[data-post-doc12-workbench]:not([data-post-doc12-workbench="collapsed"])', { timeout: 30000 });
+
     for (const primitive of ['editor', 'preview', 'diagnostics', 'workspace']) {
       if (!(await page.$(`[data-doc8-primitive="${primitive}"]`))) {
         throw new Error(`${name}: shared ${primitive} primitive missing`);
@@ -77,11 +91,18 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
     const diagnosticText = await page.$eval('[data-doc8-primitive="diagnostics"]', (element) => element.textContent || '');
     if (!diagnosticText.includes('DOC-5 verified output')) throw new Error(`${name}: provenance diagnostic missing`);
 
-    const copyButton = await page.$('[data-doc8-action="copy-share-state"]');
-    if (!copyButton) throw new Error(`${name}: local share-state control missing`);
-    await copyButton.focus();
-    await page.keyboard.press('Enter');
-    await page.waitForFunction(() => (window.__doc8Clipboard || '').includes('"schemaVersion":1'));
+    const workbenchControls = await page.evaluate(() => [...document.querySelectorAll('[data-post-doc12-workbench] button')].map((node) => node.textContent?.trim()));
+    for (const required of ['Copy code', 'Reset', 'Open in Studio']) {
+      if (!workbenchControls.includes(required)) throw new Error(`${name}: ${required} workbench control missing`);
+    }
+    const copied = await page.evaluate(() => {
+      const button = [...document.querySelectorAll('[data-post-doc12-workbench] button')].find((node) => node.textContent?.trim() === 'Copy code');
+      if (!(button instanceof HTMLButtonElement)) return false;
+      button.click();
+      return true;
+    });
+    if (!copied) throw new Error(`${name}: Copy code control could not be activated`);
+    await page.waitForFunction(() => typeof window.__doc8Clipboard === 'string' && window.__doc8Clipboard.length > 0);
 
     if (width >= 768) {
       const separator = await page.$('[data-doc8-primitive="workspace"] [role="separator"]');
@@ -108,8 +129,8 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
   }
 
   if (kind === 'ordinary') {
-    if (await page.$('[data-doc8-representative-playground]')) {
-      throw new Error(`${name}: ordinary route unexpectedly mounted DOC-8 playground`);
+    if (await page.$('[data-doc8-representative-playground], [data-post-doc12-workbench]')) {
+      throw new Error(`${name}: ordinary route unexpectedly mounted DOC-8 playground/workbench`);
     }
     if (await page.$('[data-doc8-primitive="editor"]')) {
       throw new Error(`${name}: ordinary route unexpectedly mounted editor primitive`);
@@ -139,7 +160,7 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
   let reducedMotionOk = true;
   if (reduced) {
     reducedMotionOk = await page.evaluate(() => {
-      const nodes = [...document.querySelectorAll('[data-doc8-primitive], [data-doc8-representative-playground] *')];
+      const nodes = [...document.querySelectorAll('[data-doc8-primitive], [data-doc8-representative-playground] *, [data-post-doc12-workbench] *')];
       return nodes.every((element) => {
         const style = getComputedStyle(element);
         const transitions = style.transitionDuration.split(',').map((value) => Number.parseFloat(value) || 0);
