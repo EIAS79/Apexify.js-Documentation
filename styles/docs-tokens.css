@@ -21,7 +21,7 @@
   --apx-text-secondary: var(--text-secondary);
   --apx-text-muted: var(--text-muted);
   --apx-text-faint: color-mix(in srgb, var(--text-secondary) 92%, transparent);
-  --apx-text-inverse: var(--on-accent);
+  --apx-text-inverse: var(--text-inverse);
 
   --apx-status-current-fg: #166348;
   --apx-status-current-bg: color-mix(in srgb, var(--success) 9%, transparent);
