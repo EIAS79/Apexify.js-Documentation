@@ -204,8 +204,8 @@ export function GlobalDocsSearch({
   return (
     <div className="min-w-0">
       <div
-        className="flex min-h-11 items-center gap-2 rounded-xl px-3"
-        style={{ background: "var(--bg-sunken)", border: "1px solid var(--border-default)" }}
+        className="flex min-h-11 items-center gap-2 rounded-md px-3"
+        style={{ background: "var(--surface-1)", border: "1px solid var(--border-default)" }}
       >
         <MagnifyingGlassIcon className="h-4 w-4 shrink-0" aria-hidden style={{ color: "var(--text-secondary)" }} />
         <input
@@ -230,7 +230,7 @@ export function GlobalDocsSearch({
         {searching ? (
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-label="Searching" />
         ) : query ? (
-          <button type="button" onClick={() => setQuery("")} className="grid h-8 w-8 place-items-center rounded-lg" aria-label="Clear search">
+          <button type="button" onClick={() => setQuery("")} className="grid h-8 w-8 place-items-center rounded-md" aria-label="Clear search">
             <XMarkIcon className="h-4 w-4" aria-hidden />
           </button>
         ) : null}
@@ -238,30 +238,30 @@ export function GlobalDocsSearch({
 
       {!compact && (
         <div role="group" className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Search filters">
-          <select aria-label="Runtime filter" value={runtime} onChange={(event) => setRuntime(event.target.value)} className="min-h-10 rounded-lg bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
+          <select aria-label="Runtime filter" value={runtime} onChange={(event) => setRuntime(event.target.value)} className="min-h-10 rounded-md bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
             <option value="">All runtimes</option>
             {filters.runtimes.map((value) => <option key={value} value={value}>{value}</option>)}
           </select>
-          <select aria-label="Package filter" value={packageName} onChange={(event) => setPackageName(event.target.value)} className="min-h-10 rounded-lg bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
+          <select aria-label="Package filter" value={packageName} onChange={(event) => setPackageName(event.target.value)} className="min-h-10 rounded-md bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
             <option value="">All packages</option>
             {filters.packages.map((value) => <option key={value} value={value}>{value}</option>)}
           </select>
-          <select aria-label="Content type filter" value={kind} onChange={(event) => setKind(event.target.value)} className="min-h-10 rounded-lg bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
+          <select aria-label="Content type filter" value={kind} onChange={(event) => setKind(event.target.value)} className="min-h-10 rounded-md bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
             <option value="">All content</option>
             {filters.kinds.map((value) => <option key={value} value={value}>{GROUP_LABEL[value] ?? value}</option>)}
           </select>
-          <select aria-label="Stability filter" value={stability} onChange={(event) => setStability(event.target.value)} className="min-h-10 rounded-lg bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
+          <select aria-label="Stability filter" value={stability} onChange={(event) => setStability(event.target.value)} className="min-h-10 rounded-md bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
             <option value="">All stability</option>
             {filters.stabilities.map((value) => <option key={value} value={value}>{value}</option>)}
           </select>
           {filters.domains.length > 1 && (
-            <select aria-label="Domain filter" value={domain} onChange={(event) => setDomain(event.target.value)} className="min-h-10 rounded-lg bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
+            <select aria-label="Domain filter" value={domain} onChange={(event) => setDomain(event.target.value)} className="min-h-10 rounded-md bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
               <option value="">All domains</option>
               {filters.domains.map((value) => <option key={value} value={value}>{value}</option>)}
             </select>
           )}
           {filters.versions.length > 1 && (
-            <select aria-label="Version filter" value={version} onChange={(event) => setVersion(event.target.value)} className="min-h-10 rounded-lg bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
+            <select aria-label="Version filter" value={version} onChange={(event) => setVersion(event.target.value)} className="min-h-10 rounded-md bg-transparent px-2 text-xs" style={{ border: "1px solid var(--border-default)", color: "var(--text-secondary)" }}>
               <option value="">All versions</option>
               {filters.versions.map((value) => <option key={value} value={value}>{value}</option>)}
             </select>
@@ -280,7 +280,7 @@ export function GlobalDocsSearch({
               <p className="mb-2 text-xs font-semibold uppercase tracking-wide">Recent searches</p>
               <div className="flex flex-wrap gap-2">
                 {recent.map((value) => (
-                  <button key={value} type="button" onClick={() => setQuery(value)} className="rounded-lg px-2.5 py-1.5 text-xs" style={{ border: "1px solid var(--border-default)" }}>
+                  <button key={value} type="button" onClick={() => setQuery(value)} className="rounded-md px-2.5 py-1.5 text-xs" style={{ border: "1px solid var(--border-default)" }}>
                     {value}
                   </button>
                 ))}
@@ -304,7 +304,7 @@ export function GlobalDocsSearch({
             const groupLabel = GROUP_LABEL[group] ?? group;
             return (
               <div key={group} role="group" aria-label={groupLabel} className="mb-2">
-                <div aria-hidden="true" className="sticky top-0 z-10 px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]" style={{ background: "var(--bg-raised)", color: "var(--text-secondary)" }}>
+                <div aria-hidden="true" className="sticky top-0 z-10 px-2 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em]" style={{ background: "var(--surface-1)", color: "var(--text-secondary)" }}>
                   {groupLabel}
                 </div>
                 {items.map((result, offset) => {
@@ -321,8 +321,8 @@ export function GlobalDocsSearch({
                       data-search-href={result.canonicalHref}
                       onMouseEnter={() => setActive(index)}
                       onClick={() => navigate(result)}
-                      className="block min-h-11 w-full rounded-lg px-3 py-2.5 text-left"
-                      style={{ background: selected ? "color-mix(in srgb, var(--accent-iris) 14%, transparent)" : "transparent" }}
+                      className="block min-h-11 w-full rounded-md px-3 py-2.5 text-left"
+                      style={{ background: selected ? "var(--accent-subtle)" : "transparent" }}
                     >
                       <span className="flex min-w-0 items-start justify-between gap-3">
                         <span className="min-w-0">
