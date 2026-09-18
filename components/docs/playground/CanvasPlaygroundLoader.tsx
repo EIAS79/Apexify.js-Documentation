@@ -46,10 +46,10 @@ export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
       >
         <div className="grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(220px,.8fr)] sm:p-5">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--accent)' }}>Interactive example</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--accent-hover)' }}>Interactive example</p>
             <h3 className="mt-1 text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{props.title}</h3>
             <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>Open the verified source and output side by side. The editor is deferred until requested; this documentation surface does not pretend to run Node code in the browser.</p>
-            <button type="button" onClick={() => setActivated(true)} className="mt-4 min-h-11 rounded-md px-4 text-sm font-semibold" style={{ background:'var(--accent)', color:'var(--on-accent)', boxShadow:'none' }}>Show code &amp; preview</button>
+            <button type="button" onClick={() => setActivated(true)} className="mt-4 min-h-11 rounded-md px-4 text-sm font-semibold" style={{ background:'var(--accent)', color:'var(--text-inverse)', boxShadow:'none' }}>Show code &amp; preview</button>
           </div>
           {props.previewUrl ? (
             <div className="grid min-h-[150px] place-items-center rounded-md border p-3" style={{ borderColor:'var(--border-subtle)', background:'var(--bg-sunken)' }}>
