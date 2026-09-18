@@ -2,96 +2,164 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRightIcon,
-  BeakerIcon,
   BookOpenIcon,
-  CheckBadgeIcon,
+  CheckCircleIcon,
   CodeBracketIcon,
-  CubeTransparentIcon,
-  PlayIcon,
-  ServerStackIcon,
-  SparklesIcon,
+  CommandLineIcon,
+  CubeIcon,
+  PhotoIcon,
 } from '@heroicons/react/24/outline';
 import type { ProductExperienceModel } from '@/lib/product/catalog';
 import type { ProductStatus } from '@/lib/product/catalog-data';
 import CopyInstallButton from './CopyInstallButton';
 
-function StatusPill({ status }: { status: ProductStatus }) {
+function StatusLabel({ status }: { status: ProductStatus }) {
+  const current = status === 'CURRENT';
   return (
     <span
-      className="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.16em]"
       data-product-status={status}
+      className="inline-flex items-center gap-1.5 rounded-md border px-2 py-1 font-mono text-[10px] font-semibold tracking-[0.08em]"
       style={{
-        color: status === 'CURRENT' ? 'var(--success)' : 'var(--accent-iris)',
-        borderColor: status === 'CURRENT'
-          ? 'color-mix(in srgb, var(--success) 35%, var(--border-default))'
-          : 'color-mix(in srgb, var(--accent-iris) 35%, var(--border-default))',
-        backgroundColor: status === 'CURRENT'
-          ? 'color-mix(in srgb, var(--success) 8%, transparent)'
-          : 'color-mix(in srgb, var(--accent-iris) 8%, transparent)',
+        color: current ? 'var(--success)' : 'var(--text-secondary)',
+        borderColor: current
+          ? 'color-mix(in srgb,var(--success) 34%,var(--border))'
+          : 'var(--border)',
+        background: current
+          ? 'color-mix(in srgb,var(--success) 7%,var(--surface-1))'
+          : 'var(--surface-1)',
       }}
     >
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: current ? 'var(--success)' : 'var(--text-muted)' }} />
       {status}
     </span>
   );
 }
 
-function SectionHeading({ id, eyebrow, title, description }: { id: string; eyebrow: string; title: string; description: string }) {
+function SectionHeading({
+  id,
+  eyebrow,
+  title,
+  description,
+}: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
   return (
-    <div className="mb-8 grid gap-3 sm:mb-10 lg:grid-cols-12 lg:items-end lg:gap-8">
+    <div className="mb-10 grid gap-5 border-t pt-6 lg:grid-cols-12 lg:gap-8" style={{ borderColor: 'var(--border)' }}>
       <div className="lg:col-span-7">
-        <p className="mb-2 text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: 'var(--accent-magenta)' }}>{eyebrow}</p>
-        <h2 id={id} className="text-balance text-3xl font-black tracking-[-0.035em] sm:text-4xl lg:text-5xl" style={{ color: 'var(--text-primary)' }}>{title}</h2>
+        <p className="apx-home-eyebrow">{eyebrow}</p>
+        <h2 id={id} className="apx-home-heading">{title}</h2>
       </div>
-      <p className="max-w-2xl text-sm leading-7 lg:col-span-5 lg:justify-self-end" style={{ color: 'var(--text-secondary)' }}>{description}</p>
+      <p className="apx-home-copy self-end text-sm lg:col-span-5">{description}</p>
     </div>
   );
 }
 
 export function ProductHero({ model }: { model: ProductExperienceModel }) {
   const example = model.heroExample;
+
   return (
-    <section className="relative px-4 pb-20 pt-28 sm:px-6 sm:pb-24 sm:pt-36 lg:px-8 lg:pb-28 lg:pt-40">
-      <div className="pointer-events-none absolute inset-x-0 top-20 -z-10 mx-auto h-[34rem] max-w-6xl rounded-[999px] opacity-60 blur-3xl" aria-hidden style={{ background: 'radial-gradient(circle at 28% 40%, color-mix(in srgb, var(--accent-iris) 26%, transparent), transparent 44%), radial-gradient(circle at 72% 45%, color-mix(in srgb, var(--accent-magenta) 24%, transparent), transparent 42%)' }} />
-      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-14">
-        <div className="lg:col-span-7">
-          <div className="mb-7 inline-flex flex-wrap items-center gap-2 rounded-full border px-3 py-1.5" style={{ borderColor: 'var(--border-default)', backgroundColor: 'color-mix(in srgb, var(--bg-raised) 76%, transparent)' }}>
-            <SparklesIcon className="h-4 w-4" style={{ color: 'var(--accent-magenta)' }} />
-            <StatusPill status="CURRENT" />
-            <span className="font-mono text-[11px] sm:text-xs" style={{ color: 'var(--text-tertiary)' }}>{model.package.name} {model.package.version} · Node/server</span>
+    <section className="px-4 pb-20 pt-28 sm:px-6 sm:pb-24 sm:pt-32 lg:px-8 lg:pb-28 lg:pt-36">
+      <div className="mx-auto grid max-w-[88rem] gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
+        <div className="lg:col-span-6">
+          <div className="mb-7 flex flex-wrap items-center gap-2">
+            <span className="apx-home-eyebrow">PROGRAMMABLE GRAPHICS / NODE RUNTIME</span>
+            <StatusLabel status="CURRENT" />
+            <span className="apx-home-version">{model.package.name} {model.package.version}</span>
           </div>
-          <h1 className="mb-6 text-balance text-[clamp(3.2rem,8vw,6.8rem)] font-black leading-[0.9] tracking-[-0.055em]" style={{ color: 'var(--text-primary)' }}>
-            Draw <span className="text-grad-aurora">anything</span>.<br />From a <span className="italic text-grad-ember">script</span>.
+
+          <h1 className="max-w-[11ch] text-balance text-[clamp(3.6rem,8vw,7.4rem)] font-semibold leading-[0.88] tracking-[-0.065em]" style={{ color: 'var(--text)' }}>
+            Render visuals with JavaScript.
           </h1>
-          <p className="mb-8 max-w-2xl text-pretty text-base leading-8 sm:text-lg lg:text-xl" style={{ color: 'var(--text-secondary)' }}>
-            A TypeScript-first Node rendering and media toolkit for images, charts, scenes, templates, GIF/video workflows and procedural audio — presented with repository-verified package output.
+
+          <p className="mt-7 max-w-2xl text-pretty text-base leading-8 sm:text-lg" style={{ color: 'var(--text-secondary)' }}>
+            Apexify.js is a TypeScript-first rendering and media toolkit for images, text, charts, scenes,
+            templates, GIF/video workflows, audio, and programmatic output on Node/server runtimes.
           </p>
-          <div className="mb-5 flex flex-wrap gap-3">
-            <Link href="/studio" prefetch={false} className="btn btn-primary !px-5 !py-3.5"><PlayIcon className="h-5 w-5" />Open Studio<ArrowRightIcon className="h-4 w-4" /></Link>
-            <Link href="/docs/getting-started" prefetch={false} className="btn btn-secondary !px-5 !py-3.5"><BookOpenIcon className="h-5 w-5" />Read the docs</Link>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/docs/getting-started" prefetch={false} className="btn btn-primary">
+              <BookOpenIcon className="h-4 w-4" />
+              Start with the docs
+            </Link>
+            <Link href="/gallery" prefetch={false} className="btn btn-secondary">
+              <PhotoIcon className="h-4 w-4" />
+              Inspect outputs
+            </Link>
           </div>
-          <CopyInstallButton command={model.package.installCommand} />
-          <div className="mt-8 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {[[''+model.capabilities.length,'verified domains'],[''+model.galleryExamples.length,'gallery proofs'],['DOC-4','API truth'],['DOC-5','output proof']].map(([value,label]) => (
-              <div key={label} className="surface-glass rounded-xl border px-4 py-3" style={{ borderColor: 'var(--border-subtle)' }}><strong className="block text-2xl font-black text-grad-sunset">{value}</strong><span className="text-[11px] font-bold uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>{label}</span></div>
-            ))}
+
+          <div className="mt-5 max-w-lg">
+            <CopyInstallButton command={model.package.installCommand} />
+          </div>
+
+          <div className="mt-10 max-w-2xl border-y" style={{ borderColor: 'var(--border)' }}>
+            <div className="grid grid-cols-2 sm:grid-cols-4">
+              {[
+                [String(model.capabilities.length), 'documented domains'],
+                [String(model.galleryExamples.length), 'output examples'],
+                ['TypeScript', 'first authoring'],
+                ['Node', 'current runtime'],
+              ].map(([value, label], index) => (
+                <div
+                  key={label}
+                  className="px-3 py-4 first:pl-0 sm:border-l sm:first:border-l-0"
+                  style={{ borderColor: 'var(--border-subtle)' }}
+                >
+                  <strong className="block font-mono text-sm font-semibold" style={{ color: index < 2 ? 'var(--accent)' : 'var(--text)' }}>
+                    {value}
+                  </strong>
+                  <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="relative lg:col-span-5" data-doc7-verified-hero={example.id}>
-          <div className="pointer-events-none absolute -inset-10 -z-10 rounded-[3rem] opacity-60 blur-3xl" style={{ background: 'radial-gradient(closest-side, color-mix(in srgb, var(--accent-magenta) 38%, transparent), transparent 72%)' }} aria-hidden />
-          <div className="overflow-hidden rounded-2xl border surface-elevated" style={{ borderColor: 'var(--border-default)', boxShadow: 'var(--shadow-xl)' }}>
-            <div className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: 'var(--border-subtle)', backgroundColor: 'var(--bg-sunken)' }}>
-              <div className="flex items-center gap-1.5" aria-hidden><span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" /></div>
-              <span className="truncate font-mono text-[11px]" style={{ color: 'var(--text-tertiary)' }}>verified / {example.id}</span>
-              <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: 'var(--success)' }}>DOC-5</span>
+        <div className="lg:col-span-6" data-doc7-verified-hero={example.id}>
+          <div className="apx-engine-panel overflow-hidden">
+            <div className="flex items-center justify-between gap-4 border-b px-4 py-3" style={{ borderColor: 'var(--border)' }}>
+              <div>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--text-muted)' }}>
+                  Repository-verified output
+                </p>
+                <p className="mt-0.5 text-sm font-semibold" style={{ color: 'var(--text)' }}>{example.title}</p>
+              </div>
+              <Link href={example.href} prefetch={false} className="font-mono text-[11px] font-semibold" style={{ color: 'var(--accent)' }}>
+                proof ↗
+              </Link>
             </div>
-            <div className="relative aspect-[16/10]" style={{ backgroundColor: 'var(--bg-sunken)' }}>
-              <Image src={example.output} alt={`Verified output from ${example.title}`} fill priority sizes="(min-width: 1024px) 40vw, 100vw" className="object-contain p-5" />
-              <div className="absolute bottom-3 right-3 rounded-md border border-white/10 bg-black/55 px-2 py-1 text-[10px] font-bold text-white backdrop-blur">rendered with apexify.js</div>
+
+            <div className="relative aspect-[16/10]" style={{ background: 'var(--surface-2)' }}>
+              <div className="absolute inset-0 opacity-40" aria-hidden style={{
+                backgroundImage: 'linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px)',
+                backgroundSize: '32px 32px',
+              }} />
+              <Image
+                src={example.output}
+                alt={`Verified output from ${example.title}`}
+                fill
+                priority
+                sizes="(min-width: 1024px) 48vw, 100vw"
+                className="relative object-contain p-6 sm:p-8"
+              />
             </div>
-            <div className="border-t" style={{ borderColor: 'var(--border-subtle)', backgroundColor: 'var(--bg-canvas)' }}>
-              <div className="flex items-center justify-between border-b px-4 py-2" style={{ borderColor: 'var(--border-subtle)' }}><span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>authoritative source</span><Link href={example.href} prefetch={false} className="text-xs font-bold" style={{ color: 'var(--accent-iris)' }}>proof →</Link></div>
-              <pre className="max-h-64 overflow-auto px-4 py-4 text-[11px] leading-5 sm:text-xs" style={{ color: 'var(--text-secondary)' }}><code>{example.source}</code></pre>
+
+            <div className="apx-engine-panel--dark">
+              <div className="apx-code-header">
+                <span>source / {example.id}</span>
+                <span>{model.package.name}</span>
+              </div>
+              <pre
+                tabIndex={0}
+                aria-label={`${example.title} verified source code`}
+                className="!m-0 max-h-72 overflow-auto !rounded-none !border-0 !bg-transparent px-4 py-4 text-[11px] leading-5 outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] sm:text-xs"
+              >
+                <code>{example.source}</code>
+              </pre>
             </div>
           </div>
         </div>
@@ -102,17 +170,42 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
 
 export function CapabilitySection({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8" aria-labelledby="current-capabilities">
-      <div className="mx-auto max-w-7xl">
-        <SectionHeading id="current-capabilities" eyebrow="Current package" title="One toolkit, multiple visual systems" description="Every capability resolves against the DOC-4 API manifest. The presentation is varied again without sacrificing current package truth." />
-        <div className="grid auto-rows-[minmax(14rem,auto)] grid-cols-1 gap-4 md:grid-cols-6">
-          {model.capabilities.map((capability, index) => (
-            <article key={capability.id} className={`relative overflow-hidden rounded-2xl border p-5 sm:p-6 ${index === 0 ? 'md:col-span-4 md:row-span-2' : index % 3 === 0 ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ borderColor: 'var(--border-default)', background: index === 0 ? 'linear-gradient(145deg, color-mix(in srgb, var(--accent-iris) 11%, var(--bg-elevated)), color-mix(in srgb, var(--accent-magenta) 7%, var(--bg-raised)))' : 'var(--bg-elevated)', boxShadow: 'var(--shadow-md)' }}>
-              <div className="mb-5 flex items-center justify-between gap-3"><div className="grid h-10 w-10 place-items-center rounded-xl" style={{ backgroundColor: 'color-mix(in srgb, var(--accent-iris) 12%, transparent)' }}><CubeTransparentIcon className="h-5 w-5" style={{ color: 'var(--accent-iris)' }} /></div>{index === 0 ? <StatusPill status={capability.status} /> : null}</div>
-              <h3 className={`${index === 0 ? 'text-3xl sm:text-4xl' : 'text-xl'} mb-2 font-black tracking-tight`} style={{ color: 'var(--text-primary)' }}>{capability.title}</h3>
-              <p className="mb-5 max-w-xl text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>{capability.summary}</p>
-              {capability.note ? <p className="mb-4 text-xs leading-6" style={{ color: 'var(--text-tertiary)' }}>{capability.note}</p> : null}
-              <div className="flex flex-wrap gap-2"><Link href={capability.apiHref} prefetch={false} className="chip"><CodeBracketIcon className="h-3.5 w-3.5" />{capability.apiMember}()</Link>{capability.example ? <Link href={capability.example.href} prefetch={false} className="chip"><CheckBadgeIcon className="h-3.5 w-3.5" />example</Link> : null}</div>
+    <section className="apx-home-section" aria-labelledby="current-capabilities">
+      <div className="apx-home-shell">
+        <SectionHeading
+          id="current-capabilities"
+          eyebrow="ENGINE SURFACE"
+          title="Graphics primitives, composition, and media output."
+          description="The current package stays centered on concrete rendering work: build a canvas, draw and transform visual data, compose reusable structures, then emit an artifact."
+        />
+
+        <div className="grid border-y md:grid-cols-2 xl:grid-cols-3" style={{ borderColor: 'var(--border)' }}>
+          {model.capabilities.map((capability) => (
+            <article
+              key={capability.id}
+              className="border-b px-0 py-6 md:px-6 md:first:pl-0 xl:border-r xl:last:border-r-0"
+              style={{ borderColor: 'var(--border-subtle)' }}
+            >
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <span className="grid h-8 w-8 place-items-center rounded-md border" style={{ borderColor: 'var(--border)', background: 'var(--surface-1)' }}>
+                  <CubeIcon className="h-4 w-4" style={{ color: 'var(--accent)' }} />
+                </span>
+                <StatusLabel status={capability.status} />
+              </div>
+              <h3 className="text-xl font-semibold tracking-[-0.025em]" style={{ color: 'var(--text)' }}>{capability.title}</h3>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>{capability.summary}</p>
+              {capability.note ? <p className="mt-3 text-xs leading-5" style={{ color: 'var(--text-muted)' }}>{capability.note}</p> : null}
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Link href={capability.apiHref} prefetch={false} className="chip">
+                  <CodeBracketIcon className="h-3.5 w-3.5" />
+                  {capability.apiMember}()
+                </Link>
+                {capability.example ? (
+                  <Link href={capability.example.href} prefetch={false} className="chip">
+                    output →
+                  </Link>
+                ) : null}
+              </div>
             </article>
           ))}
         </div>
@@ -123,33 +216,145 @@ export function CapabilitySection({ model }: { model: ProductExperienceModel }) 
 
 export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8" aria-labelledby="feature-tracks"><div className="mx-auto max-w-7xl">
-      <SectionHeading id="feature-tracks" eyebrow="Build paths" title="Follow the work, not a wall of cards" description="Task-oriented tracks connect directly to actual ApexPainter APIs and verified examples." />
-      <div className="overflow-hidden rounded-3xl border" style={{ borderColor: 'var(--border-default)', backgroundColor: 'color-mix(in srgb, var(--bg-elevated) 80%, transparent)' }}>
-        {model.featureTracks.map((track,index) => <article key={track.id} className="grid gap-4 border-b p-5 last:border-b-0 sm:p-7 lg:grid-cols-[5rem_minmax(0,1fr)_auto] lg:items-center" style={{ borderColor: 'var(--border-subtle)' }}><span className="font-mono text-3xl font-black text-grad-iris">{String(index+1).padStart(2,'0')}</span><div><p className="mb-1 text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--accent-magenta)' }}>{track.eyebrow}</p><h3 className="text-2xl font-black" style={{ color: 'var(--text-primary)' }}>{track.title}</h3><p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>{track.summary}</p></div><div className="flex flex-wrap gap-2 lg:max-w-xs lg:justify-end">{track.api.map(api => <Link key={api.name} href={api.href} prefetch={false} className="chip">{api.name}()</Link>)}{track.example ? <Link href={track.example.href} prefetch={false} className="chip">proof →</Link> : null}</div></article>)}
+    <section className="apx-home-section" aria-labelledby="feature-tracks">
+      <div className="apx-home-shell">
+        <SectionHeading
+          id="feature-tracks"
+          eyebrow="RENDER PIPELINE"
+          title="Move from input to output without losing the model."
+          description="Apexify keeps ordinary work approachable while still providing scenes, templates, batch/media workflows, and deeper composition tools where the job requires them."
+        />
+
+        <div className="apx-pipeline">
+          {model.featureTracks.slice(0, 4).map((track, index) => (
+            <article key={track.id}>
+              <div className="apx-pipeline__index">{String(index + 1).padStart(2, '0')}</div>
+              <div>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>{track.eyebrow}</p>
+                <h3 className="mt-1">{track.title}</h3>
+                <p>{track.summary}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {track.api.slice(0, 2).map((api) => (
+                    <Link key={api.name} href={api.href} prefetch={false} className="font-mono text-[11px] font-semibold" style={{ color: 'var(--accent)' }}>
+                      {api.name}()
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
-    </div></section>
+    </section>
   );
 }
 
 export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8" aria-labelledby="verified-examples"><div className="mx-auto max-w-7xl">
-      <SectionHeading id="verified-examples" eyebrow="Executable proof" title="A wall of actual output" description={`Repository-controlled examples verified against ${model.package.name} ${model.package.version}; no copied marketing screenshots.`} />
-      <div className="grid grid-cols-1 gap-4 md:auto-rows-[15rem] md:grid-cols-4">{model.galleryExamples.slice(0,8).map((example,index) => <Link key={example.id} href={example.href} prefetch={false} className={`group relative overflow-hidden rounded-2xl border ${index===0?'md:col-span-2 md:row-span-2':index===3?'md:col-span-2':'md:col-span-1'}`} style={{ borderColor:'var(--border-default)', backgroundColor:'var(--bg-sunken)', boxShadow:'var(--shadow-md)' }}><Image src={example.preview} alt={example.title} fill loading={index<2?'eager':'lazy'} sizes="(min-width: 768px) 50vw, 100vw" className="object-contain p-4 transition-transform duration-300 group-hover:scale-[1.025]"/><div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent p-4 pt-12 text-white"><p className="text-[10px] font-black uppercase tracking-[0.16em] text-white/70">{example.runtime} · verified</p><h3 className="mt-1 font-bold">{example.title}</h3></div></Link>)}</div>
-      <div className="mt-7"><Link href="/gallery" prefetch={false} className="btn btn-secondary">Explore Gallery <ArrowRightIcon className="h-4 w-4" /></Link></div>
-    </div></section>
+    <section className="apx-home-section" aria-labelledby="verified-examples">
+      <div className="apx-home-shell">
+        <SectionHeading
+          id="verified-examples"
+          eyebrow="OUTPUT / EVIDENCE"
+          title="Inspect what the engine actually renders."
+          description={`These examples are repository-controlled outputs associated with ${model.package.name} ${model.package.version}. The output stays primary; source and evidence remain one click away.`}
+        />
+
+        <div className="grid gap-px overflow-hidden rounded-[var(--radius-lg)] border sm:grid-cols-2 lg:grid-cols-4" style={{ borderColor: 'var(--border)', background: 'var(--border)' }}>
+          {model.galleryExamples.slice(0, 8).map((example) => (
+            <Link
+              key={example.id}
+              href={example.href}
+              prefetch={false}
+              className="group block min-w-0"
+              style={{ background: 'var(--surface-1)' }}
+            >
+              <div className="relative aspect-[4/3] overflow-hidden" style={{ background: 'var(--surface-2)' }}>
+                <Image
+                  src={example.preview}
+                  alt={example.title}
+                  fill
+                  sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-contain p-4 transition-transform duration-200 group-hover:scale-[1.015]"
+                />
+              </div>
+              <div className="border-t px-4 py-3" style={{ borderColor: 'var(--border-subtle)' }}>
+                <p className="font-mono text-[10px] uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>{example.runtime} / verified</p>
+                <h3 className="mt-1 truncate text-sm font-semibold" style={{ color: 'var(--text)' }}>{example.title}</h3>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-6 flex items-center gap-4">
+          <Link href="/gallery" prefetch={false} className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--accent)' }}>
+            Browse the complete gallery <ArrowRightIcon className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
 
 export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8" aria-labelledby="roadmap-direction"><div className="mx-auto max-w-7xl rounded-3xl border p-6 sm:p-8 lg:p-10" style={{ borderColor:'var(--border-default)', background:'linear-gradient(145deg, color-mix(in srgb,var(--bg-elevated) 92%,transparent), color-mix(in srgb,var(--accent-iris) 5%,var(--bg-raised)))' }}><div className="mb-8 grid gap-5 lg:grid-cols-12"><div className="lg:col-span-7"><div className="mb-3 inline-flex items-center gap-2"><BeakerIcon className="h-5 w-5" style={{ color:'var(--accent-iris)' }}/><StatusPill status="ROADMAP"/></div><h2 id="roadmap-direction" className="text-balance text-3xl font-black tracking-tight sm:text-4xl" style={{ color:'var(--text-primary)' }}>Future engine work stays visible without pretending it ships today.</h2></div><p className="text-sm leading-7 lg:col-span-5 lg:self-end" style={{ color:'var(--text-secondary)' }}>Browser rendering, React/Next adapters, retained realtime updates, animation, vector work and intelligence remain roadmap work until their owning phases actually ship.</p></div><div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">{model.roadmap.map(item => <article key={item.id} className="rounded-2xl border p-5" style={{ borderColor:'var(--border-subtle)', backgroundColor:'var(--bg-sunken)' }}><div className="mb-3 flex items-center justify-between gap-3"><h3 className="font-bold" style={{ color:'var(--text-primary)' }}>{item.title}</h3><StatusPill status={item.status}/></div><p className="text-sm leading-6" style={{ color:'var(--text-secondary)' }}>{item.summary}</p><p className="mt-3 font-mono text-[11px]" style={{ color:'var(--text-tertiary)' }}>{item.target}</p></article>)}</div></div></section>
+    <section className="apx-home-section" aria-labelledby="roadmap-direction">
+      <div className="apx-home-shell">
+        <SectionHeading
+          id="roadmap-direction"
+          eyebrow="ENGINE DIRECTION"
+          title="One rendering model, more runtimes over time."
+          description="Future runtime and tooling work stays visibly separate from current package capability. Roadmap items are labelled as roadmap until the implementation, tests, packaging, and documentation actually ship."
+        />
+
+        <div className="apx-roadmap-map">
+          {model.roadmap.map((item) => (
+            <article key={item.id}>
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <CommandLineIcon className="h-4 w-4" style={{ color: 'var(--accent)' }} />
+                <StatusLabel status={item.status} />
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+              <p className="font-mono !text-[10px] uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>{item.target}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
 export function EcosystemFooter({ model }: { model: ProductExperienceModel }) {
   return (
-    <footer className="border-t px-4 py-12 sm:px-6 lg:px-8" style={{ borderColor:'var(--border-subtle)' }}><div className="mx-auto grid max-w-7xl gap-8 md:grid-cols-4"><div className="md:col-span-2"><div className="mb-3 inline-flex items-center gap-2"><ServerStackIcon className="h-5 w-5" style={{ color:'var(--accent-magenta)' }}/><strong style={{ color:'var(--text-primary)' }}>Apexify.js</strong></div><p className="max-w-xl text-sm leading-7" style={{ color:'var(--text-secondary)' }}>Current package truth: {model.package.name} {model.package.version}. Public examples and API links are resolved from generated documentation evidence.</p></div><div><p className="mb-3 text-xs font-black uppercase tracking-wider" style={{ color:'var(--text-tertiary)' }}>Build</p><div className="grid gap-2 text-sm"><Link href="/docs/getting-started">Documentation</Link><Link href="/api-reference">API Reference</Link><Link href="/studio">Studio</Link></div></div><div><p className="mb-3 text-xs font-black uppercase tracking-wider" style={{ color:'var(--text-tertiary)' }}>Explore</p><div className="grid gap-2 text-sm"><Link href="/gallery">Gallery</Link><Link href={model.heroExample.href}>Verified example</Link><span className="font-mono text-xs" style={{ color:'var(--text-tertiary)' }}>{model.package.version}</span></div></div></div></footer>
+    <footer className="border-t px-4 py-12 sm:px-6 lg:px-8" style={{ borderColor: 'var(--border)' }}>
+      <div className="mx-auto grid max-w-[88rem] gap-10 md:grid-cols-12">
+        <div className="md:col-span-6">
+          <div className="flex items-center gap-2">
+            <CheckCircleIcon className="h-4 w-4" style={{ color: 'var(--success)' }} />
+            <strong className="text-sm" style={{ color: 'var(--text)' }}>Apexify.js {model.package.version}</strong>
+          </div>
+          <p className="mt-3 max-w-xl text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>
+            Programmatic rendering and media tooling with generated API evidence, executable examples, and explicitly labelled future work.
+          </p>
+        </div>
+        <div className="md:col-span-3">
+          <p className="apx-home-eyebrow">BUILD</p>
+          <div className="mt-3 grid gap-2 text-sm">
+            <Link href="/docs/getting-started">Documentation</Link>
+            <Link href="/api-reference">API Reference</Link>
+            <Link href="/studio">Studio</Link>
+          </div>
+        </div>
+        <div className="md:col-span-3">
+          <p className="apx-home-eyebrow">EXPLORE</p>
+          <div className="mt-3 grid gap-2 text-sm">
+            <Link href="/gallery">Gallery</Link>
+            <Link href={model.heroExample.href}>Verified output</Link>
+            <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>{model.package.name}</span>
+          </div>
+        </div>
+      </div>
+    </footer>
   );
 }
