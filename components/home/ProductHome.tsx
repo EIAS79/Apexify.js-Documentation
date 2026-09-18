@@ -1,12 +1,16 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRightIcon,
   CheckIcon,
+  MinusIcon,
 } from '@heroicons/react/24/outline';
-import type { ProductExperienceModel } from '@/lib/product/catalog';
+import type { ProductExperienceModel, ResolvedCapability } from '@/lib/product/catalog';
 import type { ProductStatus } from '@/lib/product/catalog-data';
 import CopyInstallButton from './CopyInstallButton';
+
+function getCapability(model: ProductExperienceModel, id: string): ResolvedCapability {
+  return model.capabilities.find((item) => item.id === id) ?? model.capabilities[0];
+}
 
 function StatusBadge({ status }: { status: ProductStatus }) {
   return (
@@ -29,88 +33,203 @@ function SectionIntro({
   body: string;
 }) {
   return (
-    <header className="apx-editorial-intro">
-      <div className="apx-editorial-intro__index">{index}</div>
-      <div className="apx-editorial-intro__main">
+    <header className="apx-section-intro">
+      <div className="apx-section-intro__index">{index}</div>
+      <div className="apx-section-intro__main">
         <p className="apx-kicker">{eyebrow}</p>
         <h2>{title}</h2>
       </div>
-      <p className="apx-editorial-intro__body">{body}</p>
+      <p className="apx-section-intro__body">{body}</p>
     </header>
   );
 }
 
-function OutputCard({
-  example,
-  className = '',
-  priority = false,
-  label,
-}: {
-  example: ProductExperienceModel['galleryExamples'][number];
-  className?: string;
-  priority?: boolean;
-  label?: string;
-}) {
+function PosterArtwork() {
   return (
-    <Link
-      href={example.href}
-      prefetch={false}
-      className={`apx-output-card ${className}`}
-      aria-label={`Open verified example: ${example.title}`}
-    >
-      <div className="apx-output-card__media">
-        <Image
-          src={example.preview}
-          alt={example.title}
-          fill
-          priority={priority}
-          sizes="(min-width: 1200px) 38vw, (min-width: 768px) 52vw, 92vw"
-          className="object-contain"
-        />
+    <div className="apx-art apx-art--poster" aria-hidden>
+      <div className="apx-art-poster__top">
+        <span>APX / 06</span>
+        <span>VISUAL SYSTEM</span>
       </div>
-      <div className="apx-output-card__meta">
-        <span>{label ?? example.runtime}</span>
-        <strong>{example.title}</strong>
-        <span aria-hidden>↗</span>
+      <div className="apx-art-poster__orbit" />
+      <div className="apx-art-poster__type">
+        <strong>FORM</strong>
+        <strong>MEETS</strong>
+        <em>logic.</em>
       </div>
-    </Link>
+      <div className="apx-art-poster__footer">
+        <span>TYPE</span><span>LAYOUT</span><span>OUTPUT</span>
+      </div>
+    </div>
+  );
+}
+
+function TemplateArtwork() {
+  return (
+    <div className="apx-art apx-art--template" aria-hidden>
+      <div className="apx-art-template__rail">
+        <span>01</span><span>02</span><span>03</span><span>04</span>
+      </div>
+      <div className="apx-art-template__page">
+        <div className="apx-art-template__head">
+          <span>QUARTERLY / SIGNAL</span>
+          <b>24</b>
+        </div>
+        <div className="apx-art-template__headline">A reusable layout system.</div>
+        <div className="apx-art-template__rule" />
+        <div className="apx-art-template__stats">
+          <div><strong>42</strong><span>assets</span></div>
+          <div><strong>08</strong><span>variants</span></div>
+          <div><strong>1</strong><span>template</span></div>
+        </div>
+        <div className="apx-art-template__blocks">
+          <i /><i /><i /><i />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SceneArtwork() {
+  return (
+    <div className="apx-art apx-art--scene" aria-hidden>
+      <div className="apx-scene__frame apx-scene__frame--one" />
+      <div className="apx-scene__frame apx-scene__frame--two" />
+      <div className="apx-scene__frame apx-scene__frame--three" />
+      <div className="apx-scene__label">
+        <span>SCENE 04</span>
+        <strong>layers</strong>
+        <em>ordered.</em>
+      </div>
+      <div className="apx-scene__cursor">+</div>
+    </div>
+  );
+}
+
+function MotionArtwork() {
+  return (
+    <div className="apx-art apx-art--motion" aria-hidden>
+      <div className="apx-motion__header"><span>FRAME SEQUENCE</span><span>00:02.40</span></div>
+      <div className="apx-motion__frames">
+        <i data-frame="1" /><i data-frame="2" /><i data-frame="3" /><i data-frame="4" />
+      </div>
+      <div className="apx-motion__timeline">
+        <span />
+        <b />
+      </div>
+      <div className="apx-motion__caption">motion / media / output</div>
+    </div>
+  );
+}
+
+function ImageArtwork() {
+  return (
+    <div className="apx-art apx-art--image" aria-hidden>
+      <div className="apx-image__crop" />
+      <div className="apx-image__disc" />
+      <div className="apx-image__mesh" />
+      <div className="apx-image__type">
+        <span>IMAGE / SHAPE</span>
+        <strong>Compose.</strong>
+      </div>
+    </div>
+  );
+}
+
+function AudioArtwork() {
+  return (
+    <div className="apx-art apx-art--audio" aria-hidden>
+      <div className="apx-audio__head"><span>PROCEDURAL AUDIO</span><span>WAV</span></div>
+      <div className="apx-audio__wave">
+        {[18,42,28,61,34,74,48,86,62,39,71,55,26,48,80,63,35,57,43,22,36,65,31,52].map((height, index) => (
+          <i key={index} style={{ height: `${height}%` }} />
+        ))}
+      </div>
+      <div className="apx-audio__sequencer">
+        <span className="is-on" /><span /><span className="is-on" /><span />
+        <span /><span className="is-on" /><span /><span className="is-on" />
+      </div>
+    </div>
+  );
+}
+
+function SyntaxCode() {
+  return (
+    <pre className="apx-syntax" tabIndex={0} aria-label="TypeScript Apexify.js example">
+      <code>
+        <span className="apx-syntax__line"><span className="apx-syntax__kw">import</span> {'{ '}<span className="apx-syntax__fn">writeFile</span>{' } '}<span className="apx-syntax__kw">from</span> <span className="apx-syntax__str">&apos;node:fs/promises&apos;</span>;</span>
+        <span className="apx-syntax__line"><span className="apx-syntax__kw">import</span> {'{ '}<span className="apx-syntax__type">ApexPainter</span>{' } '}<span className="apx-syntax__kw">from</span> <span className="apx-syntax__str">&apos;apexify.js&apos;</span>;</span>
+        <span className="apx-syntax__line">&nbsp;</span>
+        <span className="apx-syntax__line"><span className="apx-syntax__kw">const</span> painter = <span className="apx-syntax__kw">new</span> <span className="apx-syntax__type">ApexPainter</span>({'{'} type: <span className="apx-syntax__str">&apos;buffer&apos;</span> {'}'});</span>
+        <span className="apx-syntax__line"><span className="apx-syntax__kw">const</span> canvas = <span className="apx-syntax__kw">await</span> painter.<span className="apx-syntax__fn">createCanvas</span>({'{'}</span>
+        <span className="apx-syntax__line apx-syntax__indent">width: <span className="apx-syntax__num">1200</span>, height: <span className="apx-syntax__num">630</span>,</span>
+        <span className="apx-syntax__line apx-syntax__indent">colorBg: <span className="apx-syntax__str">&apos;#101622&apos;</span>,</span>
+        <span className="apx-syntax__line">{'}'});</span>
+        <span className="apx-syntax__line">&nbsp;</span>
+        <span className="apx-syntax__line"><span className="apx-syntax__kw">const</span> png = <span className="apx-syntax__kw">await</span> painter.<span className="apx-syntax__fn">createText</span>({'{'}</span>
+        <span className="apx-syntax__line apx-syntax__indent">text: <span className="apx-syntax__str">&apos;Visual systems, from code.&apos;</span>,</span>
+        <span className="apx-syntax__line apx-syntax__indent">x: <span className="apx-syntax__num">92</span>, y: <span className="apx-syntax__num">120</span>,</span>
+        <span className="apx-syntax__line apx-syntax__indent">font: {'{'} size: <span className="apx-syntax__num">72</span>, family: <span className="apx-syntax__str">&apos;Arial&apos;</span> {'}'},</span>
+        <span className="apx-syntax__line apx-syntax__indent">fill: {'{'} color: <span className="apx-syntax__str">&apos;#F6F7F9&apos;</span> {'}'},</span>
+        <span className="apx-syntax__line">{'}'}, canvas);</span>
+        <span className="apx-syntax__line">&nbsp;</span>
+        <span className="apx-syntax__line"><span className="apx-syntax__kw">await</span> <span className="apx-syntax__fn">writeFile</span>(<span className="apx-syntax__str">&apos;launch-card.png&apos;</span>, png);</span>
+      </code>
+    </pre>
+  );
+}
+
+function CompositionPreview() {
+  return (
+    <div className="apx-composition-preview" aria-label="Illustrative composition preview">
+      <div className="apx-composition-preview__meta"><span>1200 × 630</span><span>PNG</span></div>
+      <div className="apx-composition-preview__orb" />
+      <div className="apx-composition-preview__copy">
+        <span>APEXIFY.JS</span>
+        <strong>Visual systems,<br />from code.</strong>
+        <em>Type · image · scene · media</em>
+      </div>
+      <div className="apx-composition-preview__grid" />
+    </div>
+  );
+}
+
+function ApproachCell({ tone, children }: { tone: 'strong' | 'mid' | 'soft'; children: React.ReactNode }) {
+  return (
+    <div className="apx-compare-cell" data-tone={tone}>
+      {tone === 'strong' ? <CheckIcon className="h-3.5 w-3.5" /> : <MinusIcon className="h-3.5 w-3.5" />}
+      <span>{children}</span>
+    </div>
   );
 }
 
 export function ProductHero({ model }: { model: ProductExperienceModel }) {
-  const gallery = model.galleryExamples;
-  const lead = gallery.find((item) => item.id === 'node.integration.report') ?? gallery[0];
-  const secondary = gallery.find((item) => item.id === 'node.canvas.basic') ?? gallery[1] ?? lead;
-  const tertiary = gallery.find((item) => item.id === 'node.gif.basic') ?? gallery[2] ?? secondary;
-
   return (
     <section className="apx-hero">
       <div className="apx-hero__shell">
         <div className="apx-hero__copy">
           <div className="apx-hero__meta">
-            <span className="apx-kicker">CREATIVE RENDERING ENGINE / NODE</span>
+            <span className="apx-kicker">PROGRAMMABLE VISUAL ENGINE / NODE</span>
             <StatusBadge status="CURRENT" />
             <span className="apx-hero__version">{model.package.name} {model.package.version}</span>
           </div>
 
           <h1>
-            <span>Code the visual.</span>
-            <span className="apx-hero__serif">Control the output.</span>
+            <span>Build visual systems</span>
+            <span className="apx-hero__serif">from code.</span>
           </h1>
 
           <p className="apx-hero__lede">
-            Apexify.js turns JavaScript into designed output: images, type, charts, scenes,
-            templates, GIF/video workflows, and procedural media — composed on the server with
-            explicit APIs and inspectable results.
+            One TypeScript-first surface for images, typography, scenes, templates, charts,
+            GIF/video workflows, and procedural audio — designed for deterministic server output.
           </p>
 
           <div className="apx-hero__actions">
-            <Link href="/gallery" prefetch={false} className="apx-cta apx-cta--primary">
-              Explore the output
-              <ArrowRightIcon className="h-4 w-4" />
+            <Link href="/docs/getting-started" prefetch={false} className="apx-cta apx-cta--primary">
+              Start building <ArrowRightIcon className="h-4 w-4" />
             </Link>
-            <Link href="/docs/getting-started" prefetch={false} className="apx-cta apx-cta--ghost">
-              Read the docs
+            <Link href="/gallery" prefetch={false} className="apx-cta apx-cta--ghost">
+              Explore verified examples
             </Link>
           </div>
 
@@ -119,47 +238,34 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
           </div>
 
           <div className="apx-hero__proof">
-            <div>
-              <strong>{model.capabilities.length}</strong>
-              <span>current domains</span>
-            </div>
-            <div>
-              <strong>{model.galleryExamples.length}</strong>
-              <span>verified outputs</span>
-            </div>
-            <div>
-              <strong>TS</strong>
-              <span>first authoring</span>
-            </div>
-            <div>
-              <strong>Node</strong>
-              <span>current runtime</span>
-            </div>
+            <div><strong>{model.capabilities.length}</strong><span>current domains</span></div>
+            <div><strong>TS</strong><span>first authoring</span></div>
+            <div><strong>Node</strong><span>current runtime</span></div>
           </div>
         </div>
 
-        <div className="apx-hero-stage" aria-label="Verified Apexify.js output composition">
-          <div className="apx-hero-stage__poster">
-            <span>APX / OUTPUT</span>
-            <span>06.00</span>
+        <div className="apx-hero-gallery" aria-label="Apexify.js capability compositions">
+          <div className="apx-hero-gallery__main">
+            <PosterArtwork />
+            <div className="apx-hero-gallery__caption"><span>01 / TYPOGRAPHY</span><strong>Editorial composition</strong></div>
           </div>
-          <OutputCard example={lead} className="apx-output-card--hero" priority label="composition" />
-          <OutputCard example={secondary} className="apx-output-card--float-a" label="canvas" />
-          <OutputCard example={tertiary} className="apx-output-card--float-b" label="media" />
-          <div className="apx-hero-stage__stamp">
-            <span>PROGRAMMABLE</span>
-            <strong>VISUAL</strong>
-            <span>SYSTEMS</span>
+          <div className="apx-hero-gallery__side apx-hero-gallery__side--top">
+            <TemplateArtwork />
+            <div className="apx-hero-gallery__caption"><span>02 / TEMPLATE</span><strong>Reusable systems</strong></div>
+          </div>
+          <div className="apx-hero-gallery__side apx-hero-gallery__side--bottom">
+            <MotionArtwork />
+            <div className="apx-hero-gallery__caption"><span>03 / MEDIA</span><strong>Frame workflows</strong></div>
           </div>
         </div>
       </div>
 
-      <div className="apx-capability-marquee" aria-label="Current capabilities">
-        <div className="apx-capability-marquee__track">
+      <div className="apx-capability-queue" aria-label="Current capabilities">
+        <div className="apx-capability-queue__track">
           {[...model.capabilities, ...model.capabilities].map((capability, index) => (
             <span key={`${capability.id}-${index}`}>
               {capability.title}
-              <i aria-hidden>✦</i>
+              <i aria-hidden>·</i>
             </span>
           ))}
         </div>
@@ -169,72 +275,38 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
 }
 
 export function CapabilitySection({ model }: { model: ProductExperienceModel }) {
-  const canvas = model.galleryExamples.find((item) => item.id === 'node.canvas.basic') ?? model.galleryExamples[0];
-  const chart = model.galleryExamples.find((item) => item.id === 'node.chart.bar') ?? model.galleryExamples[1] ?? canvas;
-  const report = model.galleryExamples.find((item) => item.id === 'node.integration.report') ?? model.galleryExamples[2] ?? chart;
+  const cards = [
+    { id: 'images', label: 'IMAGE COMPOSITION', title: 'Image, shape, crop, blend.', body: 'Build raster compositions from imagery and primitives instead of treating screenshots as your rendering layer.', Art: ImageArtwork },
+    { id: 'templates', label: 'TEMPLATES', title: 'Reusable layouts, not one-offs.', body: 'Move repeated visual work into reusable definitions with data binding and layout support.', Art: TemplateArtwork },
+    { id: 'scenes', label: 'SCENES', title: 'Ordered composition with structure.', body: 'Layer content through validated scene composition when a single drawing call is not enough.', Art: SceneArtwork },
+    { id: 'video', label: 'MEDIA', title: 'Frames, GIF, video and audio.', body: 'Extend the same programmatic workflow into bounded animation and FFmpeg-backed media operations.', Art: MotionArtwork },
+  ];
 
   return (
-    <section className="apx-editorial-section apx-editorial-section--systems" aria-labelledby="visual-systems">
+    <section className="apx-section apx-section--build" aria-labelledby="what-you-can-build">
       <div className="apx-home-shell">
         <SectionIntro
           index="01"
-          eyebrow="VISUAL SYSTEMS"
-          title="Not a canvas demo. A programmable design surface."
-          body="Apexify’s current Node runtime spans primitive drawing, typography, structured charts, reusable composition, templates, and media workflows. The interface stays explicit while the output can be highly visual."
+          eyebrow="WHAT YOU CAN BUILD"
+          title="One engine. Different visual jobs."
+          body="The homepage now separates visual categories instead of repeating the same chart demo. Each composition below represents a different current capability area."
         />
 
-        <div className="apx-feature-story">
-          <article className="apx-feature-story__hero">
-            <div className="apx-feature-story__copy">
-              <span className="apx-feature-story__number">A</span>
-              <p className="apx-kicker">COMPOSE</p>
-              <h3>Build from pixels to reusable scenes.</h3>
-              <p>
-                Start with a canvas, layer imagery and text, then move into ordered scenes and
-                reusable templates without changing the mental model.
-              </p>
-              <div className="apx-feature-story__links">
-                {model.capabilities.slice(0, 3).map((capability) => (
-                  <Link key={capability.id} href={capability.apiHref} prefetch={false}>
-                    {capability.apiMember}()
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div className="apx-feature-story__visual apx-feature-story__visual--ink">
-              <Image src={report.preview} alt={report.title} fill sizes="(min-width: 1024px) 50vw, 90vw" className="object-contain" />
-            </div>
-          </article>
-
-          <article className="apx-feature-story__split">
-            <div className="apx-feature-story__visual apx-feature-story__visual--acid">
-              <Image src={canvas.preview} alt={canvas.title} fill sizes="(min-width: 1024px) 35vw, 90vw" className="object-contain" />
-            </div>
-            <div className="apx-feature-story__copy">
-              <span className="apx-feature-story__number">B</span>
-              <p className="apx-kicker">DRAW + TYPE</p>
-              <h3>Make layout part of the program.</h3>
-              <p>
-                Images, shapes, text, measurements, and explicit canvas state give you the pieces
-                for repeatable server-side graphics instead of screenshot automation.
-              </p>
-            </div>
-          </article>
-
-          <article className="apx-feature-story__split apx-feature-story__split--reverse">
-            <div className="apx-feature-story__copy">
-              <span className="apx-feature-story__number">C</span>
-              <p className="apx-kicker">DATA → IMAGE</p>
-              <h3>Turn structured data into visual artifacts.</h3>
-              <p>
-                Render charts and report-like compositions as deterministic image output, then move
-                the same workflow into templates, GIFs, video, or generated media.
-              </p>
-            </div>
-            <div className="apx-feature-story__visual apx-feature-story__visual--coral">
-              <Image src={chart.preview} alt={chart.title} fill sizes="(min-width: 1024px) 35vw, 90vw" className="object-contain" />
-            </div>
-          </article>
+        <div className="apx-build-grid">
+          {cards.map(({ id, label, title, body, Art }, index) => {
+            const capability = getCapability(model, id);
+            return (
+              <article key={id} className="apx-build-card" data-card={index + 1}>
+                <div className="apx-build-card__visual"><Art /></div>
+                <div className="apx-build-card__copy">
+                  <div><span>{String(index + 1).padStart(2, '0')}</span><span>{label}</span></div>
+                  <h3>{title}</h3>
+                  <p>{body}</p>
+                  <Link href={capability.apiHref} prefetch={false}>{capability.apiMember}() <ArrowRightIcon className="h-3.5 w-3.5" /></Link>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -243,32 +315,26 @@ export function CapabilitySection({ model }: { model: ProductExperienceModel }) 
 
 export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="apx-editorial-section apx-editorial-section--workflow" aria-labelledby="render-workflow">
+    <section className="apx-section apx-section--workflow" aria-labelledby="render-workflow">
       <div className="apx-home-shell">
         <SectionIntro
           index="02"
-          eyebrow="ENGINE GRAMMAR"
-          title="A rendering workflow you can reason about."
-          body="The homepage should show how the engine thinks. Each step maps to current APIs and current runtime capability instead of hiding the system behind decorative UI."
+          eyebrow="THE WORKFLOW"
+          title="A predictable path from input to artifact."
+          body="Apexify keeps the mental model explicit: create the surface, compose the content, structure reusable work, then emit or transform the result."
         />
 
-        <div className="apx-workflow-map" role="list">
+        <div className="apx-workflow">
           {model.featureTracks.map((track, index) => (
-            <article key={track.id} className="apx-workflow-node" role="listitem">
-              <div className="apx-workflow-node__top">
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <span>{track.eyebrow}</span>
-              </div>
+            <article key={track.id} className="apx-workflow__item">
+              <div className="apx-workflow__number">{String(index + 1).padStart(2, '0')}</div>
+              <div className="apx-workflow__line" aria-hidden />
+              <p>{track.eyebrow}</p>
               <h3>{track.title}</h3>
-              <p>{track.summary}</p>
-              <div className="apx-workflow-node__apis">
-                {track.api.map((api) => (
-                  <Link key={api.name} href={api.href} prefetch={false}>
-                    {api.name}()
-                  </Link>
-                ))}
+              <span>{track.summary}</span>
+              <div className="apx-workflow__apis">
+                {track.api.map((api) => <Link key={api.name} href={api.href}>{api.name}()</Link>)}
               </div>
-              <div className="apx-workflow-node__connector" aria-hidden />
             </article>
           ))}
         </div>
@@ -278,72 +344,62 @@ export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
 }
 
 export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
-  const hero = model.heroExample;
-  const wall = model.galleryExamples.slice(0, 6);
-
+  const verified = model.heroExample;
   return (
     <>
-      <section className="apx-code-proof" aria-labelledby="source-to-output">
-        <div className="apx-code-proof__shell">
-          <div className="apx-code-proof__intro">
-            <span className="apx-code-proof__index">03</span>
-            <p className="apx-kicker">SOURCE / OUTPUT</p>
-            <h2 id="source-to-output">The code is the system. The image is the proof.</h2>
+      <section className="apx-code-section" aria-labelledby="code-to-output" data-doc7-verified-hero={verified.id}>
+        <div className="apx-code-section__shell">
+          <div className="apx-code-section__intro">
+            <p className="apx-kicker">TYPE-SAFE AUTHORING</p>
+            <h2 id="code-to-output">Readable code. Designed output.</h2>
             <p>
-              Every featured output here is tied back to repository-controlled source. No fake
-              mockup, no decorative placeholder presented as engine capability.
+              This example uses the current <code>createCanvas()</code> and <code>createText()</code> API shape documented by Apexify.js. Syntax color is intentional, not a monochrome terminal dump.
             </p>
-            <Link href={hero.href} prefetch={false} className="apx-text-link">
-              Open verified example <ArrowRightIcon className="h-4 w-4" />
+            <Link href={getCapability(model, 'text').apiHref} className="apx-inline-link">
+              Explore the text API <ArrowRightIcon className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="apx-code-proof__workbench" data-doc7-verified-hero={hero.id}>
-            <div className="apx-code-proof__code">
-              <div className="apx-code-proof__bar">
-                <span>{hero.id}</span>
-                <span>{model.package.name}</span>
-              </div>
-              <pre tabIndex={0} aria-label={`${hero.title} verified source code`}>
-                <code>{hero.source}</code>
-              </pre>
+          <div className="apx-code-section__workbench">
+            <div className="apx-code-panel">
+              <div className="apx-code-panel__bar"><span>launch-card.ts</span><span>TypeScript</span></div>
+              <SyntaxCode />
             </div>
-            <div className="apx-code-proof__output">
-              <div className="apx-code-proof__label">
-                <span>VERIFIED OUTPUT</span>
-                <span>{hero.runtime}</span>
-              </div>
-              <div className="apx-code-proof__media">
-                <Image src={hero.output} alt={`Verified output from ${hero.title}`} fill sizes="(min-width: 1024px) 50vw, 95vw" className="object-contain" />
-              </div>
+            <div className="apx-preview-panel">
+              <div className="apx-preview-panel__bar"><span>Composition preview</span><span>1200 × 630</span></div>
+              <CompositionPreview />
             </div>
+          </div>
+
+          <div className="apx-code-section__proof-note">
+            <span>Repository verification remains separate from homepage art direction.</span>
+            <Link href={verified.href}>Open a verified executable example <ArrowRightIcon className="h-3.5 w-3.5" /></Link>
           </div>
         </div>
       </section>
 
-      <section className="apx-editorial-section apx-editorial-section--gallery" aria-labelledby="output-gallery">
+      <section className="apx-section apx-section--showcase" aria-labelledby="capability-showcase">
         <div className="apx-home-shell">
           <SectionIntro
-            index="04"
-            eyebrow="OUTPUT WALL"
-            title="Let the renders do the selling."
-            body={`A selection of repository-verified output from ${model.package.name} ${model.package.version}. Different jobs, one programmatic surface.`}
+            index="03"
+            eyebrow="CAPABILITY SHOWCASE"
+            title="Different outputs should look different."
+            body="Six visual studies map to distinct Apexify domains. No repeated bar charts, no duplicated demo frames, and no single aesthetic forced onto every capability."
           />
 
-          <div className="apx-output-wall">
-            {wall.map((example, index) => (
-              <OutputCard
-                key={example.id}
-                example={example}
-                className={`apx-output-wall__item apx-output-wall__item--${index + 1}`}
-              />
-            ))}
+          <div className="apx-showcase">
+            <article className="apx-showcase__item apx-showcase__item--poster"><PosterArtwork /><span>TYPE / LAYOUT</span></article>
+            <article className="apx-showcase__item apx-showcase__item--image"><ImageArtwork /><span>IMAGE / SHAPE</span></article>
+            <article className="apx-showcase__item apx-showcase__item--template"><TemplateArtwork /><span>TEMPLATE</span></article>
+            <article className="apx-showcase__item apx-showcase__item--scene"><SceneArtwork /><span>SCENE</span></article>
+            <article className="apx-showcase__item apx-showcase__item--motion"><MotionArtwork /><span>GIF / VIDEO</span></article>
+            <article className="apx-showcase__item apx-showcase__item--audio"><AudioArtwork /><span>AUDIO</span></article>
           </div>
 
-          <Link href="/gallery" prefetch={false} className="apx-gallery-cta">
-            <span>See the full output library</span>
-            <ArrowRightIcon className="h-5 w-5" />
-          </Link>
+          <div className="apx-showcase__footer">
+            <p>Minimal repository-verified examples stay available for execution proof.</p>
+            <Link href="/gallery">Browse Gallery <ArrowRightIcon className="h-4 w-4" /></Link>
+          </div>
         </div>
       </section>
     </>
@@ -351,47 +407,65 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
 }
 
 export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
+  const current = ['Server-side raster output','Text + image composition','Charts','Scenes + templates','GIF / video / audio'];
   return (
-    <section className="apx-editorial-section apx-editorial-section--index" aria-labelledby="engine-index">
-      <div className="apx-home-shell">
-        <SectionIntro
-          index="05"
-          eyebrow="ENGINE INDEX"
-          title="What ships now. What stays clearly future."
-          body="Current package capability and future direction are intentionally separated. That keeps the page ambitious without pretending roadmap work already exists."
-        />
+    <>
+      <section className="apx-section apx-section--compare" aria-labelledby="compare-approaches">
+        <div className="apx-home-shell">
+          <SectionIntro
+            index="04"
+            eyebrow="COMPARE APPROACHES"
+            title="Apexify.js vs common rendering setups."
+            body="This compares typical workflow focus, not every library implementation. The point is where each approach usually puts the composition burden."
+          />
 
-        <div className="apx-engine-index">
-          <div className="apx-engine-index__current">
-            <div className="apx-engine-index__heading">
-              <span>NOW</span>
-              <strong>{model.capabilities.length} current domains</strong>
+          <div className="apx-compare">
+            <div className="apx-compare__head">
+              <span>Capability</span>
+              <strong>Apexify.js</strong>
+              <span>Screenshot automation</span>
+              <span>Chart-focused library</span>
+              <span>Raw canvas scripting</span>
             </div>
-            <div className="apx-engine-index__list">
-              {model.capabilities.map((capability, index) => (
-                <Link key={capability.id} href={capability.apiHref} prefetch={false}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
+            {current.map((row, index) => (
+              <div className="apx-compare__row" key={row}>
+                <strong>{row}</strong>
+                <ApproachCell tone="strong">{['Built in','Built in','Built in','Built in','Built in'][index]}</ApproachCell>
+                <ApproachCell tone={index < 2 ? 'mid' : 'soft'}>{['Indirect via DOM','Indirect via DOM','External','External','External'][index]}</ApproachCell>
+                <ApproachCell tone={index === 2 ? 'strong' : 'soft'}>{['Not primary','Not primary','Primary focus','Not primary','Not primary'][index]}</ApproachCell>
+                <ApproachCell tone={index < 2 ? 'mid' : 'soft'}>{['Manual','Manual','Manual / external','Manual architecture','External tooling'][index]}</ApproachCell>
+              </div>
+            ))}
+          </div>
+          <p className="apx-compare__note">“Typical” describes common usage patterns; individual tools can differ substantially.</p>
+        </div>
+      </section>
+
+      <section className="apx-section apx-section--roadmap" aria-labelledby="engine-roadmap">
+        <div className="apx-home-shell">
+          <SectionIntro
+            index="05"
+            eyebrow="CURRENT + NEXT"
+            title="Ambitious direction, clearly labeled."
+            body="The shipped Node surface stays visually separate from roadmap work. Future runtimes and advanced engine features remain future until they actually ship."
+          />
+
+          <div className="apx-roadmap-grid">
+            <div className="apx-roadmap-grid__current">
+              <div className="apx-roadmap-grid__title"><span>NOW</span><strong>{model.capabilities.length} current domains</strong></div>
+              {model.capabilities.map((capability) => (
+                <Link key={capability.id} href={capability.apiHref}>
                   <strong>{capability.title}</strong>
                   <code>{capability.apiMember}()</code>
                   <CheckIcon className="h-4 w-4" />
                 </Link>
               ))}
             </div>
-          </div>
-
-          <div className="apx-engine-index__future">
-            <div className="apx-engine-index__heading">
-              <span>NEXT</span>
-              <strong>explicit roadmap</strong>
-            </div>
-            <div className="apx-engine-index__roadmap">
-              {model.roadmap.map((item, index) => (
+            <div className="apx-roadmap-grid__future">
+              <div className="apx-roadmap-grid__title"><span>NEXT</span><strong>explicit roadmap</strong></div>
+              {model.roadmap.slice(0, 5).map((item) => (
                 <article key={item.id}>
-                  <div>
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                    <StatusBadge status={item.status} />
-                  </div>
-                  <h3>{item.title}</h3>
+                  <div><h3>{item.title}</h3><StatusBadge status={item.status} /></div>
                   <p>{item.summary}</p>
                   <code>{item.target}</code>
                 </article>
@@ -399,42 +473,35 @@ export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
 export function EcosystemFooter({ model }: { model: ProductExperienceModel }) {
   return (
-    <footer className="apx-home-footer">
-      <div className="apx-home-footer__statement">
-        <span className="apx-kicker">APEXIFY.JS / {model.package.version}</span>
-        <h2>
-          Build visual systems
-          <span className="apx-home-footer__serif">with code.</span>
-        </h2>
-        <div className="apx-home-footer__actions">
-          <Link href="/docs/getting-started" className="apx-cta apx-cta--light">
-            Start with the docs <ArrowRightIcon className="h-4 w-4" />
-          </Link>
-          <Link href="/studio" className="apx-cta apx-cta--line">
-            Open Studio
-          </Link>
+    <footer className="apx-footer">
+      <div className="apx-footer__top">
+        <div className="apx-footer__statement">
+          <p className="apx-kicker">APEXIFY.JS / {model.package.version}</p>
+          <h2>Make the rendering layer <em>yours.</em></h2>
+          <p>Start with a canvas. Grow into scenes, templates, media, and repeatable visual systems.</p>
+          <div>
+            <Link href="/docs/getting-started" className="apx-cta apx-cta--footer">Read the docs <ArrowRightIcon className="h-4 w-4" /></Link>
+            <Link href="/studio" className="apx-footer__studio">Open Studio</Link>
+          </div>
+        </div>
+
+        <div className="apx-footer__nav">
+          <div><span>BUILD</span><Link href="/docs/getting-started">Getting started</Link><Link href="/api-reference">API reference</Link><Link href="/studio">Studio</Link></div>
+          <div><span>EXPLORE</span><Link href="/gallery">Gallery</Link><Link href={model.heroExample.href}>Verified example</Link><a href="https://github.com/EIAS79/Apexify.js" target="_blank" rel="noreferrer">GitHub</a></div>
+          <div><span>PACKAGE</span><a href="https://www.npmjs.com/package/apexify.js" target="_blank" rel="noreferrer">npm</a><span className="apx-footer__meta">v{model.package.version}</span><span className="apx-footer__meta">{model.package.commit.slice(0, 8)}</span></div>
         </div>
       </div>
 
-      <div className="apx-home-footer__bottom">
-        <div>
-          <strong>Apexify.js</strong>
-          <span>Programmatic rendering + media tooling for JavaScript.</span>
-        </div>
-        <nav aria-label="Footer">
-          <Link href="/docs/getting-started">Docs</Link>
-          <Link href="/api-reference">API</Link>
-          <Link href="/gallery">Gallery</Link>
-          <Link href="/studio">Studio</Link>
-        </nav>
-        <span className="apx-home-footer__commit">{model.package.commit.slice(0, 8)}</span>
+      <div className="apx-footer__bottom">
+        <strong>Apexify.js</strong>
+        <span>TypeScript-first rendering and media tooling for Node/server runtimes.</span>
       </div>
     </footer>
   );
