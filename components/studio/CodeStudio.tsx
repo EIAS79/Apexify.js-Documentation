@@ -656,40 +656,21 @@ export default function CodeStudio() {
 
   return (
     <div
-      className="relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden overscroll-none"
+      className="relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden overscroll-none" data-studio-root
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'var(--gradient-twilight)',
-          }}
-        />
-        <div
-          className="absolute -left-[20%] -top-[20%] h-[55vh] w-[55vw] rounded-full blur-3xl"
-          style={{
-            background:
-              'radial-gradient(closest-side, color-mix(in srgb, var(--accent-iris) 38%, transparent), transparent 70%)',
-            opacity: 0.7,
-          }}
-        />
-        <div
-          className="absolute -right-[18%] top-[35%] h-[48vh] w-[48vw] rounded-full blur-3xl"
-          style={{
-            background:
-              'radial-gradient(closest-side, color-mix(in srgb, var(--accent-magenta) 32%, transparent), transparent 70%)',
-            opacity: 0.6,
-          }}
-        />
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+        style={{ background: 'var(--surface-1)' }}
+        aria-hidden
+      >
         <div
           className="absolute inset-0"
           style={{
             backgroundImage:
-              'linear-gradient(color-mix(in srgb, var(--border-subtle) 100%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border-subtle) 100%, transparent) 1px, transparent 1px)',
-            backgroundSize: '64px 64px',
-            opacity: 0.55,
-            maskImage: 'radial-gradient(ellipse at center, black 30%, transparent 75%)',
+              'linear-gradient(color-mix(in srgb, var(--border) 32%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--border) 32%, transparent) 1px, transparent 1px)',
+            backgroundSize: '32px 32px',
+            opacity: 0.35,
           }}
         />
       </div>
@@ -737,12 +718,10 @@ export default function CodeStudio() {
         tabIndex={-1}
       >
         <div
-          className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl shadow-[var(--shadow-md)] sm:rounded-2xl"
+          className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg"
           style={{
-            backgroundColor: 'color-mix(in srgb, var(--bg-raised) 92%, transparent)',
-            backdropFilter: 'blur(18px) saturate(140%)',
-            WebkitBackdropFilter: 'blur(18px) saturate(140%)',
-            border: '1px solid var(--border-default)',
+            backgroundColor: 'var(--canvas)',
+            border: '1px solid var(--border)',
           }}
         >
           {showCode && showPreview ? (
@@ -793,7 +772,7 @@ export default function CodeStudio() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 14, scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-            className="pointer-events-auto fixed bottom-12 left-1/2 z-[90] flex -translate-x-1/2 items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold shadow-[var(--shadow-lg)]"
+            className="pointer-events-auto fixed bottom-12 left-1/2 z-[90] flex -translate-x-1/2 items-center gap-2 rounded-md px-4 py-2 text-xs font-semibold shadow-[var(--shadow-md)]"
             style={{
               backgroundColor: 'var(--bg-raised)',
               border: '1px solid var(--border-default)',
@@ -808,7 +787,7 @@ export default function CodeStudio() {
                     ? 'var(--success)'
                     : toast.kind === 'warning'
                       ? 'var(--warning)'
-                      : 'var(--gradient-iris)',
+                      : 'var(--accent)',
                 color: 'white',
               }}
               aria-hidden
