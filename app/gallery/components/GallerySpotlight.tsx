@@ -8,9 +8,11 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import {
+  discoverCategories,
   galleryItems,
   itemMatchesQuery,
   plainGallerySummary,
+  primaryBadgeCategory,
   type GalleryItem,
 } from './galleryHelpers';
 import { CATEGORY_CONFIG, type FilterCategory } from './galleryConfig';
@@ -32,11 +34,12 @@ import { CATEGORY_CONFIG, type FilterCategory } from './galleryConfig';
 
 const QUICK_PILLS: { id: FilterCategory; label: string }[] = [
   { id: 'all', label: 'Everything' },
-  { id: 'background', label: 'Backgrounds' },
-  { id: 'charts', label: 'Charts' },
-  { id: 'videos', label: 'Videos' },
-  { id: 'gifs', label: 'GIFs' },
-  { id: 'advance', label: 'Advanced' },
+  { id: 'composition', label: 'Composition' },
+  { id: 'image', label: 'Image' },
+  { id: 'data', label: 'Data' },
+  { id: 'motion', label: 'Motion' },
+  { id: 'surface', label: 'Surface' },
+  { id: 'advanced', label: 'Advanced' },
 ];
 
 const RECENT_KEY = 'apx.gallery.recent';
@@ -207,7 +210,7 @@ export function GallerySpotlight({
           backgroundColor: 'color-mix(in srgb, var(--bg-elevated) 96%, transparent)',
           border: '1px solid color-mix(in srgb, var(--accent-iris) 22%, transparent)',
           boxShadow:
-            '0 32px 96px -16px color-mix(in srgb, var(--accent-magenta) 22%, transparent), 0 0 0 1px color-mix(in srgb, white 4%, transparent), 0 24px 64px -12px rgba(0,0,0,0.55)',
+            '0 32px 96px -16px color-mix(in srgb, var(--accent-iris) 22%, transparent), 0 0 0 1px color-mix(in srgb, white 4%, transparent), 0 24px 64px -12px rgba(0,0,0,0.55)',
         }}
       >
         {/* Top gradient strip — pure decoration */}
@@ -478,26 +481,11 @@ function Hint({ keys, children }: { keys: string[]; children: React.ReactNode })
 /* ---- helpers ---- */
 
 function itemMatchesScope(item: GalleryItem, scope: FilterCategory): boolean {
-  if (scope === 'all') return true;
-  if (item.category === 'background' && scope === 'background') return true;
-  if (item.category === 'gifs' && (scope === 'gifs' || scope === 'extras' || scope === 'mix')) return true;
-  if (item.category === 'videos' && (scope === 'videos' || scope === 'extras' || scope === 'mix')) return true;
-  if (item.category === 'advance' && scope === 'advance') return true;
-  if (item.category === 'advance' && scope === 'images') return true;
-  if (item.category === 'advance' && scope === 'charts') {
-    return item.id.startsWith('advance-chartshowcase-') ||
-      ['advance-chart-donut-glow', 'advance-comparison-donut-line', 'presentation-deck-slide',
-       'advance-chart-bar-quarterly', 'advance-chart-hbar-routes', 'advance-chart-line-dual-target']
-        .includes(item.id);
-  }
-  return false;
+  return scope === 'all' || discoverCategories(item).includes(scope);
 }
 
 function primaryCategoryFor(item: GalleryItem): Exclude<FilterCategory, 'all'> {
-  if (item.category === 'background') return 'background';
-  if (item.category === 'gifs') return 'gifs';
-  if (item.category === 'videos') return 'videos';
-  return 'advance';
+  return primaryBadgeCategory(item);
 }
 
 function highlight(text: string, q: string): React.ReactNode {
