@@ -65,7 +65,7 @@ async function open({ name, route, width = 1440, height = 1100, theme = 'light',
 try {
   const homeLight = await open({ name: 'homepage-desktop-light', route: '/', theme: 'light' });
   const recoveredHeadline = await homeLight.page.evaluate(() => (document.querySelector('h1')?.textContent ?? '').replace(/\s+/g, ' ').trim());
-  if (!recoveredHeadline.includes('Draw anything.') || !recoveredHeadline.includes('From a script.')) fail.push(`homepage: recovered legacy headline missing (${recoveredHeadline})`);
+  if (!recoveredHeadline.includes('Render visuals with JavaScript.')) fail.push(`homepage: precision-engine headline missing (${recoveredHeadline})`);
   await homeLight.page.close();
 
   const homeDark = await open({ name: 'homepage-desktop-dark', route: '/', theme: 'dark' });

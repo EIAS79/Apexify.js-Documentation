@@ -43,7 +43,7 @@ export function ExampleWorkbench({
     () => [{
       id: 'doc5-provenance',
       severity: 'info' as const,
-      message: 'Preview is DOC-5 verified output. Editing source here does not execute code or alter verification evidence.',
+      message: 'Preview is repository-verified output. Editing source here does not execute code or alter verification evidence.',
       source: sourceHash,
       help: 'Open the current session in Studio when trusted-local execution is intentionally enabled.',
     }],
@@ -89,15 +89,15 @@ export function ExampleWorkbench({
   );
 
   return (
-    <section className="apx-example-workbench my-6 overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--border-default)', background: 'var(--bg-raised)', boxShadow: 'var(--shadow-md)' }} data-post-doc12-workbench data-example-id={exampleId ?? undefined}>
+    <section className="apx-example-workbench my-6 overflow-hidden rounded-lg border" style={{ borderColor: 'var(--border-default)', background: 'var(--bg-raised)', boxShadow: 'var(--shadow-md)' }} data-post-doc12-workbench data-example-id={exampleId ?? undefined}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 sm:px-5" style={{ borderColor: 'var(--border-subtle)', background: 'var(--bg-sunken)' }}>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'color-mix(in srgb,var(--accent-magenta) 75%,var(--text-primary))' }}>Verified example workbench</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--accent-hover)' }}>Verified example workbench</p>
           <h3 className="mt-1 text-base font-bold" style={{ color: 'var(--text-primary)' }}>{title}</h3>
         </div>
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Workbench view">
           {([['ts','TypeScript'],['preview','Preview'],['both','Both']] as const).map(([value,label]) => (
-            <button key={value} type="button" role="tab" aria-selected={mode===value} onClick={() => setMode(value)} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor: mode===value?'var(--accent-iris)':'var(--border-default)', background: mode===value?'color-mix(in srgb,var(--accent-iris) 10%,var(--bg-raised))':'var(--bg-raised)', color: 'var(--text-primary)' }}>{label}</button>
+            <button key={value} type="button" role="tab" aria-selected={mode===value} onClick={() => setMode(value)} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor: mode===value?'var(--accent)':'var(--border-default)', background: mode===value?'var(--accent-subtle)':'var(--bg-raised)', color: 'var(--text-primary)' }}>{label}</button>
           ))}
         </div>
       </div>
@@ -105,7 +105,7 @@ export function ExampleWorkbench({
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-2.5 sm:px-5" style={{ borderColor: 'var(--border-subtle)' }}>
         <button type="button" onClick={() => void copySource()} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--border-default)', background:'var(--bg-raised)' }}>{copied?'Copied':'Copy code'}</button>
         <button type="button" onClick={reset} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--border-default)', background:'var(--bg-raised)' }}>Reset</button>
-        <button type="button" data-post-doc12-action="open-in-studio" onClick={openInStudio} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--accent-iris)', background:'color-mix(in srgb,var(--accent-iris) 10%,var(--bg-raised))', color:'var(--text-primary)' }}>Open in Studio</button>
+        <button type="button" data-post-doc12-action="open-in-studio" onClick={openInStudio} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--accent)', background:'var(--accent-subtle)', color:'var(--text-primary)' }}>Open in Studio</button>
         <span className="ml-auto text-[10px] font-semibold" style={{ color:'var(--text-tertiary)' }}>Verified preview · local edits are not executed</span>
       </div>
 
@@ -122,7 +122,7 @@ export function ExampleWorkbench({
       </InteractiveErrorBoundary>
 
       <div className="border-t px-4 py-2.5 text-[10px] leading-5 sm:px-5" style={{ borderColor:'var(--border-subtle)', color:'var(--text-tertiary)' }}>
-        Provenance: <code>{exampleId ?? 'verified-example'}</code> · source <code>{sourceHash.slice(0, 12)}</code> · preview from DOC-5 verification artifacts.
+        Provenance: <code>{exampleId ?? 'verified-example'}</code> · source <code>{sourceHash.slice(0, 12)}</code> · preview from repository verification artifacts.
       </div>
     </section>
   );

@@ -229,43 +229,40 @@ export default function GalleryClient() {
 
 function CallToAction() {
   const reduce = useReducedMotion();
+
   return (
-    <section className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+    <section className="px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <div className="mx-auto max-w-[88rem] border-t pt-10" style={{ borderColor: 'var(--border)' }}>
         <motion.div
-          initial={reduce ? false : { opacity: 0, y: 18 }}
+          initial={reduce ? false : { opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={reduce ? { duration: 0 } : { duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="relative overflow-hidden rounded-3xl p-8 sm:p-12 lg:p-14"
-          style={{
-            background: 'linear-gradient(135deg, #3527c7 0%, #a81464 50%, #7a3e00 100%)',
-            boxShadow: 'var(--shadow-xl)',
-          }}
+          transition={reduce ? { duration: 0 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="grid gap-8 rounded-[var(--radius-lg)] border p-6 sm:p-8 lg:grid-cols-12 lg:items-center"
+          style={{ background: 'var(--surface-1)', borderColor: 'var(--border)' }}
         >
-          <div className="relative z-10 grid grid-cols-1 items-center gap-6 lg:grid-cols-3">
-            <div className="text-white lg:col-span-2">
-              <h2 className="mb-4 text-balance text-3xl font-black leading-[1.05] sm:text-4xl lg:text-[2.75rem]">
-                Use verified examples when you need proof.
-              </h2>
-              <p className="max-w-xl text-base leading-relaxed text-white/95 sm:text-lg">
-                DOC-5 examples expose canonical repository-controlled source and verified outputs. Studio remains an interactive authoring surface; it is not used as evidence that every legacy Gallery card has been execution-verified.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Link href="/examples/node.canvas.basic" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-bold shadow-[var(--shadow-md)]" style={{ color: '#1a0f3d' }}>
-                <BookOpenIcon className="h-5 w-5" />
-                Open verified examples
-                <ArrowRightIcon className="h-4 w-4" />
-              </Link>
-              <Link href="/studio" className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/40 px-6 py-3.5 text-base font-bold text-white hover:bg-white/10">
-                <RocketLaunchIcon className="h-5 w-5" />
-                Open Studio
-              </Link>
-              <Link href="/docs/getting-started" className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2 text-sm font-bold text-white/90 hover:text-white">
-                Read the docs <ArrowRightIcon className="h-4 w-4" />
-              </Link>
-            </div>
+          <div className="lg:col-span-8">
+            <p className="apx-home-eyebrow">SOURCE / OUTPUT / PROVENANCE</p>
+            <h2 className="mt-2 max-w-xl text-balance text-3xl font-semibold leading-[1.05] tracking-[-0.04em] sm:text-4xl" style={{ color: 'var(--text)' }}>
+              Use verified examples when you need proof.
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-7 sm:text-base" style={{ color: 'var(--text-secondary)' }}>
+              Verified examples expose canonical repository-controlled source and output. Studio remains an authoring surface; retained legacy Gallery cards are not presented as execution-verified evidence.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 lg:col-span-4 lg:items-stretch">
+            <Link href="/examples/node.canvas.basic" className="btn btn-primary">
+              <BookOpenIcon className="h-4 w-4" />
+              Open verified examples
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+            <Link href="/studio" className="btn btn-secondary">
+              <RocketLaunchIcon className="h-4 w-4" />
+              Open Studio
+            </Link>
+            <Link href="/docs/getting-started" className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-semibold" style={{ color: 'var(--accent)' }}>
+              Read the docs <ArrowRightIcon className="h-4 w-4" />
+            </Link>
           </div>
         </motion.div>
       </div>

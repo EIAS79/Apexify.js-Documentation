@@ -195,35 +195,33 @@ export function GallerySpotlight({
         className="absolute inset-0 cursor-default"
         style={{
           backgroundColor: 'color-mix(in srgb, var(--bg-base) 70%, transparent)',
-          backdropFilter: 'blur(20px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+          
         }}
       />
 
       {/* Floating panel */}
       <div
-        className="relative w-full max-w-[640px] rounded-2xl overflow-hidden animate-in zoom-in-95 slide-in-from-top-4 duration-200"
+        className="relative w-full max-w-[640px] rounded-lg overflow-hidden animate-in fade-in duration-150"
         style={{
-          backgroundColor: 'color-mix(in srgb, var(--bg-elevated) 96%, transparent)',
-          border: '1px solid color-mix(in srgb, var(--accent-iris) 22%, transparent)',
-          boxShadow:
-            '0 32px 96px -16px color-mix(in srgb, var(--accent-magenta) 22%, transparent), 0 0 0 1px color-mix(in srgb, white 4%, transparent), 0 24px 64px -12px rgba(0,0,0,0.55)',
+          backgroundColor: 'var(--surface-1)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-2)',
         }}
       >
         {/* Top gradient strip — pure decoration */}
         <div
           aria-hidden
           className="absolute top-0 inset-x-0 h-[2px] opacity-70"
-          style={{ background: 'var(--gradient-aurora)' }}
+          style={{ background: 'var(--accent)' }}
         />
 
         {/* Header — input row */}
         <div className="flex items-center gap-3 px-4 sm:px-5 pt-4 pb-3">
           <div
-            className="grid place-items-center h-9 w-9 rounded-xl shrink-0"
+            className="grid place-items-center h-9 w-9 rounded-md shrink-0"
             style={{
-              background: 'var(--gradient-sunset)',
-              boxShadow: '0 4px 18px -4px color-mix(in srgb, var(--accent-magenta) 70%, transparent)',
+              background: 'var(--accent)',
+              boxShadow: 'none',
             }}
           >
             <MagnifyingGlassIcon className="h-4 w-4 text-white" strokeWidth={2.5} />
@@ -397,7 +395,7 @@ export function GallerySpotlight({
                           <span
                             className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded tracking-wider shrink-0"
                             style={{
-                              background: 'var(--gradient-sunset)',
+                              background: 'var(--accent)',
                               color: 'white',
                             }}
                           >

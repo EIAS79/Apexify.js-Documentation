@@ -1,18 +1,23 @@
 import Link from 'next/link';
+import { BrandIcon } from '@/components/Brand';
 
-/** Minimal server-only UI — avoids heavy shared chunks during error rendering on Windows dev. */
 export default function NotFound() {
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 px-6 py-16 text-center">
-      <p className="text-sm font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-300">404</p>
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Page not found</h1>
-      <p className="max-w-md text-sm text-slate-700 dark:text-slate-300">The page you requested does not exist or was moved.</p>
-      <Link
-        href="/"
-        className="mt-2 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-800 dark:bg-blue-500 dark:text-slate-950 dark:hover:bg-blue-400"
-      >
-        Back to home
-      </Link>
-    </div>
+    <main className="grid min-h-screen place-items-center px-6 py-16" id="main-content">
+      <section className="w-full max-w-xl border-y py-10" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-8 w-8"><BrandIcon /></span>
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--accent)' }}>HTTP / 404</p>
+        </div>
+        <h1 className="mt-6 text-4xl font-semibold tracking-[-0.045em]" style={{ color: 'var(--text)' }}>Page not found.</h1>
+        <p className="mt-3 max-w-md text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
+          The requested route does not exist or has moved. Use the current documentation entry point or return home.
+        </p>
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Link href="/docs/getting-started" className="btn btn-primary">Open docs</Link>
+          <Link href="/" className="btn btn-secondary">Back home</Link>
+        </div>
+      </section>
+    </main>
   );
 }

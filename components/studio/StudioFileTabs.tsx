@@ -73,7 +73,7 @@ export function StudioFileTabs({
               <span
                 aria-hidden
                 className="absolute left-2 right-2 top-0 h-[2px] rounded-full"
-                style={{ background: 'var(--gradient-sunset)' }}
+                style={{ background: 'var(--accent)' }}
               />
             )}
 
@@ -81,7 +81,7 @@ export function StudioFileTabs({
               <div className="flex min-w-0 flex-1 items-center gap-1.5 px-1.5 py-1">
                 <span
                   className="grid h-2 w-2 shrink-0 place-items-center rounded-full"
-                  style={{ backgroundColor: isActive ? 'var(--accent-magenta)' : 'var(--border-strong)' }}
+                  style={{ backgroundColor: isActive ? 'var(--accent)' : 'var(--border-strong)' }}
                   aria-hidden
                 />
                 <input
@@ -116,7 +116,7 @@ export function StudioFileTabs({
               >
                 <span
                   className="grid h-2 w-2 shrink-0 place-items-center rounded-full"
-                  style={{ backgroundColor: isActive ? 'var(--accent-magenta)' : 'var(--border-strong)' }}
+                  style={{ backgroundColor: isActive ? 'var(--accent)' : 'var(--border-strong)' }}
                   aria-hidden
                 />
                 <span className="min-w-0 flex-1 truncate">{b.name}</span>

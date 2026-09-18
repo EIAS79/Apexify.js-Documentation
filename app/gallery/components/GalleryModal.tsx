@@ -306,7 +306,7 @@ export default function GalleryModal({
         aria-describedby="gallery-modal-about"
       >
         <div
-          className="pointer-events-auto flex flex-col flex-1 min-h-0 max-h-[100dvh] sm:max-h-[calc(100dvh-1.5rem)] md:max-h-[calc(100dvh-3rem)] w-full max-w-7xl mx-auto rounded-none sm:rounded-2xl lg:rounded-3xl overflow-hidden surface-elevated"
+          className="pointer-events-auto flex flex-col flex-1 min-h-0 max-h-[100dvh] sm:max-h-[calc(100dvh-1.5rem)] md:max-h-[calc(100dvh-3rem)] w-full max-w-7xl mx-auto rounded-none sm:rounded-lg lg:rounded-lg overflow-hidden surface-elevated"
           style={{
             backgroundColor: 'var(--bg-canvas)',
             borderColor: 'var(--border-default)',
@@ -677,7 +677,7 @@ function ModalLayoutToolbar({
             style={
               active
                 ? {
-                    backgroundImage: 'var(--gradient-sunset)',
+                    backgroundColor: 'var(--accent)',
                     color: 'white',
                   }
                 : { color: 'var(--text-secondary)' }
@@ -789,7 +789,7 @@ function CodeWindow({
                   style={
                     active
                       ? {
-                          backgroundImage: 'var(--gradient-sunset)',
+                          backgroundColor: 'var(--accent)',
                           color: 'white',
                         }
                       : { color: '#8b949e' }
@@ -832,8 +832,8 @@ function CodeWindow({
             disabled={!runnerEnabled || executionRunning || !code.trim()}
             className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] font-bold text-white disabled:cursor-not-allowed disabled:opacity-45 transition-shadow"
             style={{
-              backgroundImage: 'var(--gradient-sunset)',
-              boxShadow: !runnerEnabled || executionRunning ? 'none' : 'var(--glow-magenta)',
+              backgroundColor: 'var(--accent)',
+              boxShadow: 'none',
             }}
           >
             <PlayIcon className="h-3.5 w-3.5" />
@@ -873,7 +873,7 @@ function CodeWindow({
                 className="h-full rounded-full transition-[width] duration-150 ease-out"
                 style={{
                   width: `${Math.min(100, runProgress)}%`,
-                  backgroundImage: 'var(--gradient-sunset)',
+                  backgroundColor: 'var(--accent)',
                 }}
               />
             </div>

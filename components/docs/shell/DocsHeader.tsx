@@ -8,18 +8,20 @@ import { DocsSearchTrigger } from './DocsSearchTrigger';
 import { LegacyDocsSidebarToggle } from './LegacyDocsSidebarToggle';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/docs/getting-started', label: 'Docs' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/studio', label: 'Studio' },
+  { href: '/', label: 'Home', key: 'home' },
+  { href: '/docs/getting-started', label: 'Docs', key: 'docs' },
+  { href: '/api-reference', label: 'API', key: 'api' },
+  { href: '/gallery', label: 'Gallery', key: 'gallery' },
+  { href: '/studio', label: 'Studio', key: 'studio' },
 ] as const;
 
 function docsHeaderPrefetch(href: string): false | undefined {
   return href.startsWith('/docs') ? undefined : false;
 }
 
-export function DocsHeader() {
+export function DocsHeader({ active = 'docs' }: { active?: (typeof NAV_LINKS)[number]['key'] }) {
   const version = apexifyVersionLabel();
+
   return (
     <header className="apx-doc-header" data-doc2-header>
       <div className="apx-doc-header__inner">
@@ -28,35 +30,42 @@ export function DocsHeader() {
           <span className="apx-doc-brand__icon" aria-hidden><BrandIcon /></span>
           <span className="apx-doc-brand__text">
             <span className="apx-doc-brand__eyebrow">Apexify.js</span>
-            <span className="apx-doc-brand__title">Documentation</span>
+            <span className="apx-doc-brand__title">{active === 'api' ? 'API Reference' : 'Documentation'}</span>
           </span>
         </Link>
+
         <nav className="apx-doc-primary-nav" aria-label="Primary">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               prefetch={docsHeaderPrefetch(link.href)}
-              aria-current={link.label === 'Docs' ? 'page' : undefined}
+              aria-current={link.key === active ? 'page' : undefined}
             >
               {link.label}
             </Link>
           ))}
         </nav>
+
         <div className="apx-doc-header__actions">
           <span className="apx-version-badge"><span className="sr-only">Apexify.js version </span>{version}</span>
           <DocsSearchTrigger />
           <ThemeToggle />
           <div className="md:hidden">
-            <AccessibleDrawer label="Site navigation" triggerLabel="Open site navigation" side="right" trigger={<Bars3Icon className="h-5 w-5" aria-hidden />}>
+            <AccessibleDrawer
+              label="Site navigation"
+              triggerLabel="Open site navigation"
+              side="right"
+              trigger={<Bars3Icon className="h-5 w-5" aria-hidden />}
+            >
               <nav aria-label="Mobile primary" className="grid gap-1">
                 {NAV_LINKS.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     prefetch={docsHeaderPrefetch(link.href)}
-                    aria-current={link.label === 'Docs' ? 'page' : undefined}
-                    className="min-h-11 rounded-lg px-3 py-3 font-semibold"
+                    aria-current={link.key === active ? 'page' : undefined}
+                    className="min-h-11 rounded-md px-3 py-3 font-semibold"
                   >
                     {link.label}
                   </Link>

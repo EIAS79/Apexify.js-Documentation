@@ -114,14 +114,11 @@ export default function GalleryFilterBar({
         {/* Floating command island — single pill, content-width, centered */}
         <div className="flex justify-center">
           <div
-            className="relative inline-flex items-stretch p-1 rounded-full"
+            className="relative inline-flex items-stretch p-1 rounded-md"
             style={{
-              backgroundColor: 'color-mix(in srgb, var(--bg-elevated) 88%, transparent)',
-              border: '1px solid color-mix(in srgb, white 6%, transparent)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              boxShadow:
-                '0 18px 48px -16px rgba(0,0,0,0.55), 0 0 0 1px color-mix(in srgb, var(--accent-iris) 10%, transparent), inset 0 1px 0 color-mix(in srgb, white 7%, transparent)',
+              backgroundColor: 'var(--surface-1)',
+              border: '1px solid var(--border)',
+              boxShadow: 'var(--shadow-1)',
             }}
           >
             {/* ── Filter chip + popover ── */}
@@ -131,7 +128,7 @@ export default function GalleryFilterBar({
                 onClick={() => { setFilterOpen((o) => !o); setSortOpen(false); }}
                 aria-haspopup="menu"
                 aria-expanded={filterOpen}
-                className="h-10 inline-flex items-center gap-2 px-3 sm:px-3.5 rounded-full text-[12.5px] font-semibold transition-colors"
+                className="h-10 inline-flex items-center gap-2 px-3 sm:px-3.5 rounded-md text-[12.5px] font-semibold transition-colors"
                 style={{
                   backgroundColor: filterOpen
                     ? 'color-mix(in srgb, var(--accent-iris) 18%, transparent)'
@@ -145,7 +142,7 @@ export default function GalleryFilterBar({
                   style={{
                     background: activeIsAll
                       ? 'color-mix(in srgb, var(--text-primary) 5%, transparent)'
-                      : `linear-gradient(135deg, color-mix(in srgb, ${activeAccent} 28%, transparent), color-mix(in srgb, ${activeAccent} 12%, transparent))`,
+                      : `color-mix(in srgb, ${activeAccent} 11%, var(--surface-1))`,
                     color: activeIsAll ? 'var(--text-secondary)' : 'white',
                     border: `1px solid color-mix(in srgb, ${activeAccent} ${activeIsAll ? 0 : 35}%, transparent)`,
                   }}
@@ -168,7 +165,7 @@ export default function GalleryFilterBar({
                     tabIndex={-1}
                     onClick={(e) => { e.stopPropagation(); onSelect('all'); }}
                     aria-label="Clear filter"
-                    className="h-4 w-4 -ml-0.5 inline-flex items-center justify-center rounded-full transition-colors"
+                    className="h-4 w-4 -ml-0.5 inline-flex items-center justify-center rounded-md transition-colors"
                     style={{ color: 'var(--text-tertiary)' }}
                     onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent-magenta)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; }}
@@ -199,7 +196,7 @@ export default function GalleryFilterBar({
             <button
               type="button"
               onClick={() => setSpotlightOpen(true)}
-              className="group h-10 inline-flex items-center gap-1.5 px-3 sm:px-3.5 rounded-full text-[12.5px] font-semibold transition-all active:scale-[0.97]"
+              className="group h-10 inline-flex items-center gap-1.5 px-3 sm:px-3.5 rounded-md text-[12.5px] font-semibold transition-all active:scale-[0.97]"
               style={{
                 color: hasQuery ? 'var(--accent-magenta)' : 'var(--text-secondary)',
                 backgroundColor: hasQuery
@@ -219,7 +216,7 @@ export default function GalleryFilterBar({
                     tabIndex={-1}
                     onClick={(e) => { e.stopPropagation(); onQueryChange(''); }}
                     aria-label="Clear search"
-                    className="h-4 w-4 inline-flex items-center justify-center rounded-full"
+                    className="h-4 w-4 inline-flex items-center justify-center rounded-md"
                     style={{ color: 'var(--accent-magenta)' }}
                   >
                     <XMarkIcon className="h-3 w-3" strokeWidth={3} />
@@ -256,7 +253,7 @@ export default function GalleryFilterBar({
                 aria-haspopup="menu"
                 aria-expanded={sortOpen}
                 aria-label={`Sort gallery: ${sortMeta.label}`}
-                className="h-10 inline-flex items-center gap-1.5 px-3 sm:px-3.5 rounded-full text-[12.5px] font-semibold transition-colors"
+                className="h-10 inline-flex items-center gap-1.5 px-3 sm:px-3.5 rounded-md text-[12.5px] font-semibold transition-colors"
                 style={{
                   backgroundColor: sortOpen
                     ? 'color-mix(in srgb, var(--accent-iris) 18%, transparent)'
@@ -273,7 +270,7 @@ export default function GalleryFilterBar({
               {sortOpen && (
                 <div
                   role="menu"
-                  className="absolute right-0 top-12 w-48 rounded-2xl p-1 z-40 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150"
+                  className="absolute right-0 top-12 w-48 rounded-lg p-1 z-40 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150"
                   style={{
                     backgroundColor: 'var(--bg-elevated)',
                     border: '1px solid color-mix(in srgb, var(--accent-iris) 18%, transparent)',
@@ -354,7 +351,7 @@ function FilterMenu({
   return (
     <div
       role="menu"
-      className="absolute left-0 top-12 w-[min(86vw,420px)] rounded-2xl p-3 z-40 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150"
+      className="absolute left-0 top-12 w-[min(86vw,420px)] rounded-lg p-3 z-40 animate-in fade-in zoom-in-95 slide-in-from-top-1 duration-150"
       style={{
         backgroundColor: 'var(--bg-elevated)',
         border: '1px solid color-mix(in srgb, var(--accent-iris) 18%, transparent)',
@@ -451,7 +448,7 @@ function FilterCard({
             className="grid place-items-center h-9 w-9 rounded-lg shrink-0"
             style={{
               background: active
-                ? `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 60%, var(--accent-iris)))`
+                ? `color-mix(in srgb, ${accent} 12%, var(--surface-1))`
                 : `color-mix(in srgb, ${accent} 14%, transparent)`,
               boxShadow: active ? `0 6px 20px -6px color-mix(in srgb, ${accent} 70%, transparent)` : 'none',
             }}
@@ -475,7 +472,7 @@ function FilterCard({
               className="grid place-items-center h-7 w-7 rounded-lg"
               style={{
                 background: active
-                  ? `linear-gradient(135deg, ${accent}, color-mix(in srgb, ${accent} 60%, var(--accent-iris)))`
+                  ? `color-mix(in srgb, ${accent} 12%, var(--surface-1))`
                   : 'color-mix(in srgb, var(--text-primary) 6%, transparent)',
                 boxShadow: active ? `0 4px 14px -4px color-mix(in srgb, ${accent} 70%, transparent)` : 'none',
               }}

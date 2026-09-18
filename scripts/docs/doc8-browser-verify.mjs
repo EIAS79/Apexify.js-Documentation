@@ -89,7 +89,7 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
     const truth = await page.$eval('[data-doc8-primitive="preview"]', (element) => element.textContent || '');
     if (!truth.includes('Verified output')) throw new Error(`${name}: verified preview truth label missing`);
     const diagnosticText = await page.$eval('[data-doc8-primitive="diagnostics"]', (element) => element.textContent || '');
-    if (!diagnosticText.includes('DOC-5 verified output')) throw new Error(`${name}: provenance diagnostic missing`);
+    if (!diagnosticText.includes('repository-verified output')) throw new Error(`${name}: provenance diagnostic missing`);
 
     const workbenchControls = await page.evaluate(() => [...document.querySelectorAll('[data-post-doc12-workbench] button')].map((node) => node.textContent?.trim()));
     for (const required of ['Copy code', 'Reset', 'Open in Studio']) {
