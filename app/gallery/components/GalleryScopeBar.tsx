@@ -79,8 +79,8 @@ function ScopeButton({
       onClick={onClick}
       className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition-colors"
       style={{
-        borderColor: active ? 'var(--accent)' : 'var(--border)',
-        color: active ? 'var(--accent)' : 'var(--text-secondary)',
+        borderColor: active ? 'var(--accent-hover)' : 'var(--border)',
+        color: active ? 'var(--accent-hover)' : 'var(--text-secondary)',
         backgroundColor: active ? 'var(--accent-subtle)' : 'var(--surface-1)',
       }}
     >
