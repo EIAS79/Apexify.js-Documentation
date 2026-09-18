@@ -1,12 +1,11 @@
 export default function HomeAmbientBackground() {
   return (
-    <div aria-hidden className="apx-art-bg">
-      <div className="apx-art-bg__grain" />
-      <div className="apx-art-bg__orb apx-art-bg__orb--orange" />
-      <div className="apx-art-bg__orb apx-art-bg__orb--violet" />
-      <div className="apx-art-bg__cross apx-art-bg__cross--a" />
-      <div className="apx-art-bg__cross apx-art-bg__cross--b" />
-      <div className="apx-art-bg__word">APX</div>
+    <div aria-hidden className="apx-ambient">
+      <div className="apx-ambient__mesh" />
+      <div className="apx-ambient__glow apx-ambient__glow--blue" />
+      <div className="apx-ambient__glow apx-ambient__glow--mint" />
+      <div className="apx-ambient__line apx-ambient__line--a" />
+      <div className="apx-ambient__line apx-ambient__line--b" />
     </div>
   );
 }
