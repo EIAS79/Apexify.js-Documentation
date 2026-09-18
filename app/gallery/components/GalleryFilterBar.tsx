@@ -116,12 +116,9 @@ export default function GalleryFilterBar({
           <div
             className="relative inline-flex items-stretch p-1 rounded-md"
             style={{
-              backgroundColor: 'color-mix(in srgb, var(--bg-elevated) 88%, transparent)',
-              border: '1px solid color-mix(in srgb, white 6%, transparent)',
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-              boxShadow:
-                '0 18px 48px -16px rgba(0,0,0,0.55), 0 0 0 1px color-mix(in srgb, var(--accent-iris) 10%, transparent), inset 0 1px 0 color-mix(in srgb, white 7%, transparent)',
+              backgroundColor: 'var(--surface-1)',
+              border: '1px solid var(--border)',
+              boxShadow: 'var(--shadow-1)',
             }}
           >
             {/* ── Filter chip + popover ── */}
