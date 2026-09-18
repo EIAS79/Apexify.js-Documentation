@@ -95,11 +95,11 @@ export default function GalleryClient() {
       case 'curated':
       default:
         return [...filtered].sort((a, b) => {
-          const verifiedDelta = Number(isVerifiedGalleryItem(b)) - Number(isVerifiedGalleryItem(a));
-          if (verifiedDelta !== 0) return verifiedDelta;
-
           const featuredDelta = Number(Boolean(b.featured)) - Number(Boolean(a.featured));
           if (featuredDelta !== 0) return featuredDelta;
+
+          const verifiedDelta = Number(isVerifiedGalleryItem(b)) - Number(isVerifiedGalleryItem(a));
+          if (verifiedDelta !== 0) return verifiedDelta;
 
           if (selectedCategory !== 'all') {
             const primaryBoost = (item: GalleryItem) => Number(primaryBadgeCategory(item) === selectedCategory);
