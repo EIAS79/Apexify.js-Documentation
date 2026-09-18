@@ -10,7 +10,6 @@ import {
 import { CATEGORY_CONFIG, type FilterCategory } from './galleryConfig';
 import {
   type GalleryItem,
-  discoverCategories,
   primaryBadgeCategory,
   plainGallerySummary,
 } from './galleryHelpers';
@@ -31,7 +30,7 @@ export default function GalleryGrid({
   if (items.length === 0) {
     return (
       <div
-        className="text-center py-20 rounded-2xl border-2 border-dashed mx-auto max-w-2xl"
+        className="text-center py-20 rounded-lg border-2 border-dashed mx-auto max-w-2xl"
         style={{
           borderColor: 'var(--border-default)',
           backgroundColor: 'var(--bg-sunken)',
@@ -168,7 +167,7 @@ function FeaturedSpotlight({
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative block w-full text-left rounded-3xl overflow-hidden mb-12 sm:mb-16 lift surface-elevated"
+      className="group relative block w-full text-left rounded-lg overflow-hidden mb-12 sm:mb-16 lift surface-elevated"
       style={{
         borderColor: 'var(--border-default)',
         boxShadow: 'var(--shadow-lg)',
@@ -210,7 +209,7 @@ function FeaturedSpotlight({
         {/* Top-left badges */}
         <div className="absolute top-5 left-5 flex flex-wrap items-center gap-2">
           <span
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest text-white"
             style={{
               backgroundColor: cfg.accent,
               boxShadow: `0 0 24px -4px ${cfg.accent}`,
@@ -220,10 +219,10 @@ function FeaturedSpotlight({
             {cfg.label}
           </span>
           <span
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest text-white"
             style={{
-              backgroundImage: 'var(--gradient-sunset)',
-              boxShadow: 'var(--glow-magenta)',
+              backgroundColor: 'rgba(0,0,0,0.62)',
+              boxShadow: 'none',
             }}
           >
             ★ Featured
@@ -287,7 +286,7 @@ function FeaturedTile({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: featuredIndex * 0.06, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative block text-left rounded-2xl overflow-hidden surface-elevated lift"
+      className="group relative block text-left rounded-lg overflow-hidden surface-elevated lift"
       style={{ borderColor: 'var(--border-default)' }}
     >
       <div className="relative aspect-[5/3]" style={{ backgroundColor: 'var(--bg-sunken)' }}>
@@ -319,15 +318,15 @@ function FeaturedTile({
         />
         <div className="absolute top-3 left-3 flex items-center gap-1.5">
           <span
-            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-white"
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest text-white"
             style={{ backgroundColor: cfg.accent }}
           >
             <Icon className="h-3 w-3" />
             {cfg.label}
           </span>
           <span
-            className="inline-flex items-center px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest text-white"
-            style={{ backgroundImage: 'var(--gradient-sunset)' }}
+            className="inline-flex items-center px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest text-white"
+            style={{ backgroundColor: 'rgba(0,0,0,0.62)' }}
           >
             ★ Featured
           </span>
@@ -379,7 +378,6 @@ function GalleryCard({
   const cfg = CATEGORY_CONFIG[primaryBadgeCategory(item)];
   const Icon = cfg.icon;
   const mediaKind = inferMediaKind(item.thumbnail, item.thumbnailMedia);
-  const extraTags = discoverCategories(item).filter((c) => c !== primaryBadgeCategory(item)).slice(0, 3);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const hasCode = Boolean(item.code?.ts || item.code?.js);
@@ -406,7 +404,7 @@ function GalleryCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1 }}
       transition={{ duration: 0.5, delay: Math.min(index, 12) * 0.04, ease: [0.16, 1, 0.3, 1] }}
-      className="break-inside-avoid mb-5 lg:mb-6 w-full block text-left group relative overflow-hidden rounded-2xl surface-elevated lift"
+      className="break-inside-avoid mb-5 lg:mb-6 w-full block text-left group relative overflow-hidden rounded-lg surface-elevated lift"
       style={{ borderColor: 'var(--border-default)' }}
     >
       <div className="relative aspect-[4/3]" style={{ backgroundColor: 'var(--bg-sunken)' }}>
@@ -440,7 +438,7 @@ function GalleryCard({
         {/* Top badges */}
         <div className="absolute top-3 left-3 right-3 flex items-start justify-between gap-2">
           <span
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-widest text-white"
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest text-white"
             style={{ backgroundColor: cfg.accent }}
           >
             <Icon className="h-3 w-3" />
@@ -462,7 +460,7 @@ function GalleryCard({
             )}
             {item.featured && (
               <span
-                className="px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-widest text-white"
+                className="px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest text-white"
                 style={{
                   backgroundColor: 'rgba(0,0,0,0.45)',
                   backdropFilter: 'blur(8px)',
@@ -497,23 +495,6 @@ function GalleryCard({
         className="p-4 sm:p-5 border-t"
         style={{ borderColor: 'var(--border-subtle)' }}
       >
-        {extraTags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-2">
-            {extraTags.map((tag) => (
-              <span
-                key={tag}
-                className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded"
-                style={{
-                  backgroundColor: 'var(--bg-sunken)',
-                  color: 'var(--text-tertiary)',
-                  border: '1px solid var(--border-subtle)',
-                }}
-              >
-                +{CATEGORY_CONFIG[tag].label}
-              </span>
-            ))}
-          </div>
-        )}
         <h3
           className="text-base font-bold leading-snug mb-1.5 line-clamp-2"
           style={{ color: 'var(--text-primary)' }}
