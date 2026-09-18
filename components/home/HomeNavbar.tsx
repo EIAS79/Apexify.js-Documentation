@@ -12,12 +12,14 @@ import {
 import { useTheme, type ThemeMode } from '@/components/ThemeProvider';
 
 const NAV_LINKS = [
-  { href: '/', label: 'Home' },
-  { href: '/docs/getting-started', label: 'Docs' },
-  { href: '/api-reference', label: 'API' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/studio', label: 'Studio' },
+  { href: '/', label: 'Home', key: 'home' },
+  { href: '/docs/getting-started', label: 'Docs', key: 'docs' },
+  { href: '/api-reference', label: 'API', key: 'api' },
+  { href: '/gallery', label: 'Gallery', key: 'gallery' },
+  { href: '/studio', label: 'Studio', key: 'studio' },
 ] as const;
+
+export type HomeNavSection = (typeof NAV_LINKS)[number]['key'];
 
 const THEMES: { id: ThemeMode; label: string; Icon: typeof SunIcon }[] = [
   { id: 'light', label: 'Light', Icon: SunIcon },
@@ -64,7 +66,7 @@ function ThemeControl() {
   );
 }
 
-export default function HomeNavbar() {
+export default function HomeNavbar({ active = 'home' }: { active?: HomeNavSection }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function HomeNavbar() {
 
         <nav className="apx-home-nav__links" aria-label="Primary">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} aria-current={link.href === '/' ? 'page' : undefined}>
+            <Link key={link.href} href={link.href} aria-current={link.key === active ? 'page' : undefined}>
               {link.label}
             </Link>
           ))}
@@ -133,7 +135,7 @@ export default function HomeNavbar() {
       <div id="home-mobile-nav" className="apx-home-nav__mobile md:hidden" data-open={open || undefined}>
         <nav aria-label="Mobile primary">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setOpen(false)} aria-current={link.href === '/' ? 'page' : undefined}>
+            <Link key={link.href} href={link.href} onClick={() => setOpen(false)} aria-current={link.key === active ? 'page' : undefined}>
               {link.label}
             </Link>
           ))}
