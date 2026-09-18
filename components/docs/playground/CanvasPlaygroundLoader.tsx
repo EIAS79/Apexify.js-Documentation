@@ -40,19 +40,19 @@ export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
   if (!activated) {
     return (
       <section
-        className="my-6 overflow-hidden rounded-2xl border"
+        className="my-6 overflow-hidden rounded-lg border"
         style={{ borderColor: 'var(--border-default)', background: 'var(--bg-raised)', boxShadow: 'var(--shadow-sm)' }}
         data-post-doc12-workbench="collapsed"
       >
         <div className="grid gap-4 p-4 sm:grid-cols-[minmax(0,1fr)_minmax(220px,.8fr)] sm:p-5">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'color-mix(in srgb,var(--accent-magenta) 75%,var(--text-primary))' }}>Interactive example</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--accent)' }}>Interactive example</p>
             <h3 className="mt-1 text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{props.title}</h3>
             <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>Open the verified source and output side by side. The editor is deferred until requested; this documentation surface does not pretend to run Node code in the browser.</p>
-            <button type="button" onClick={() => setActivated(true)} className="mt-4 min-h-11 rounded-lg px-4 text-sm font-bold" style={{ background:'var(--gradient-sunset)', color:'white', boxShadow:'var(--shadow-sm)' }}>Show code &amp; preview</button>
+            <button type="button" onClick={() => setActivated(true)} className="mt-4 min-h-11 rounded-md px-4 text-sm font-semibold" style={{ background:'var(--accent)', color:'var(--on-accent)', boxShadow:'none' }}>Show code &amp; preview</button>
           </div>
           {props.previewUrl ? (
-            <div className="grid min-h-[150px] place-items-center rounded-xl border p-3" style={{ borderColor:'var(--border-subtle)', background:'var(--bg-sunken)' }}>
+            <div className="grid min-h-[150px] place-items-center rounded-md border p-3" style={{ borderColor:'var(--border-subtle)', background:'var(--bg-sunken)' }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={props.previewUrl} alt={props.previewAlt} className="max-h-48 max-w-full rounded-lg object-contain" loading="lazy" />
             </div>
@@ -64,7 +64,7 @@ export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
 
   if (failed) {
     return (
-      <section className="my-5 rounded-xl p-4 text-sm" style={{ border:'1px solid var(--border-default)', background:'var(--bg-raised)' }} data-doc8-playground-loader="error" role="status">
+      <section className="my-5 rounded-md p-4 text-sm" style={{ border:'1px solid var(--border-default)', background:'var(--bg-raised)' }} data-doc8-playground-loader="error" role="status">
         The interactive workbench could not be loaded. The verified documentation content remains available above.
       </section>
     );
@@ -72,7 +72,7 @@ export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
 
   if (!Playground) {
     return (
-      <section className="my-5 min-h-24 rounded-xl p-4 text-sm" style={{ border:'1px solid var(--border-default)', background:'var(--bg-raised)' }} data-doc8-playground-loader="loading" aria-busy="true">
+      <section className="my-5 min-h-24 rounded-md p-4 text-sm" style={{ border:'1px solid var(--border-default)', background:'var(--bg-raised)' }} data-doc8-playground-loader="loading" aria-busy="true">
         Loading example workbench…
       </section>
     );
