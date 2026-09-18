@@ -1,30 +1,25 @@
 'use client';
 
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
 /**
- * Feather Icons “mouse-pointer” polygon geometry (same classic silhouette adopted by Lucide;
- * ISC — https://feathericons.com ). We only draw the arrow outline; hotspot matches the pixel
- * tip at `(3,3)` in their 24×24 view box.
+ * Custom pointer for the public product surfaces.
  *
- *   • Idle: gradient-outlined arrow + neon glow pass.
- *   • Dot  — precise centre when hovering text / magnetic targets.
- *   • Wrap — morphing ring (magnet / text underline).
+ * Visual language:
+ * - idle: compact precision arrow with cobalt edge + mint detail
+ * - interactive: circular focus ring + centre point at the mouse position
+ * - text: slim caret marker
  *
- * Driven with direct DOM + RAF (no React state per frame).
+ * Motion uses direct DOM + RAF so pointer tracking does not trigger React renders.
  */
 const POINTER_VIEWBOX = 24;
-const POINTER_DISPLAY_PX = 28;
-/** Click point at the arrow tip in user space `(3,3)` → raster coordinates for our ~28px render. */
-const POINTER_HOTSPOT_X = (3 / POINTER_VIEWBOX) * POINTER_DISPLAY_PX;
+const POINTER_DISPLAY_PX = 24;
+const POINTER_HOTSPOT_X = (4 / POINTER_VIEWBOX) * POINTER_DISPLAY_PX;
 const POINTER_HOTSPOT_Y = (3 / POINTER_VIEWBOX) * POINTER_DISPLAY_PX;
-/** Feather ISC: closed arrow pointer silhouette (absolute coords). */
-const POINTER_PATH_D = 'M3 3 L10.07 19.97 L12.58 12.58 L19.97 10.07 Z';
+const POINTER_PATH_D = 'M4 3 L18.4 11.3 L12.1 13.1 L15.2 19.1 L11.9 20.8 L8.7 14.7 L4 18.6 Z';
 
 export default function CustomCursor() {
-  const cursorUid = useId().replace(/:/g, '');
-  const gradientId = `apex-cursor-grad-${cursorUid}`;
   const pointerRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -54,7 +49,7 @@ export default function CustomCursor() {
     const target = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
     /* ---- wrap geometry: current (lerped) + target ---- */
-    const DEFAULT_SIZE = 28;
+    const DEFAULT_SIZE = 24;
     const cur = { x: target.x, y: target.y, w: DEFAULT_SIZE, h: DEFAULT_SIZE, r: 9999 };
     const tgt = { x: target.x, y: target.y, w: DEFAULT_SIZE, h: DEFAULT_SIZE, r: 9999 };
 
@@ -66,20 +61,13 @@ export default function CustomCursor() {
     /* ---- helpers ---- */
 
     const updateMagnetTarget = () => {
-      if (!magnetEl) return;
-      const rect = (magnetEl as HTMLElement).getBoundingClientRect();
-      // 6px padding so the wrap sits *around* the element, not flush.
-      const pad = 6;
-      tgt.w = rect.width + pad * 2;
-      tgt.h = rect.height + pad * 2;
-      tgt.x = rect.left + rect.width / 2;
-      tgt.y = rect.top + rect.height / 2;
-      const cs = window.getComputedStyle(magnetEl as HTMLElement);
-      const radius = parseFloat(cs.borderRadius || '0');
-      // Match element radius + the padding we added; clamp to a pill if very rounded.
-      tgt.r = Number.isFinite(radius) && radius > 0
-        ? Math.min(radius + pad, Math.min(tgt.w, tgt.h) / 2)
-        : 12;
+      // Interactive state follows the actual pointer instead of stretching
+      // around the whole target element.
+      tgt.w = 38;
+      tgt.h = 38;
+      tgt.x = target.x;
+      tgt.y = target.y;
+      tgt.r = 9999;
     };
 
     const setDefaultTarget = () => {
@@ -91,11 +79,11 @@ export default function CustomCursor() {
     };
 
     const setTextTarget = () => {
-      // Tiny pill underline that hugs the cursor.
-      tgt.x = target.x;
-      tgt.y = target.y + 10;
-      tgt.w = 16;
-      tgt.h = 2;
+      // Compact vertical marker for selectable text.
+      tgt.x = target.x + 8;
+      tgt.y = target.y;
+      tgt.w = 2;
+      tgt.h = 18;
       tgt.r = 2;
     };
 
@@ -140,9 +128,13 @@ export default function CustomCursor() {
         pointer.style.opacity = '1';
         dot.style.opacity = '0';
         wrap.style.opacity = '0';
-      } else {
+      } else if (mode === 'magnet') {
         pointer.style.opacity = '0';
         dot.style.opacity = '1';
+        wrap.style.opacity = '1';
+      } else {
+        pointer.style.opacity = '0';
+        dot.style.opacity = '0';
         wrap.style.opacity = '1';
       }
     };
@@ -264,32 +256,26 @@ export default function CustomCursor() {
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden
         >
-          <defs>
-            <linearGradient id={gradientId} x1="2" y1="3" x2="22" y2="21" gradientUnits="userSpaceOnUse">
-              <stop stopColor="var(--accent-iris)" />
-              <stop offset="0.5" stopColor="var(--accent-magenta)" />
-              <stop offset="1" stopColor="var(--accent-amber)" />
-            </linearGradient>
-          </defs>
-          {/* Glow pass beneath the crisp stroke (neon halo without adding a runtime dependency). */}
-          <path
-            aria-hidden
-            d={POINTER_PATH_D}
-            fill="none"
-            stroke={`url(#${gradientId})`}
-            strokeWidth="3.2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            opacity={0.22}
-          />
           <path
             className="custom-cursor-pointer__shape"
             d={POINTER_PATH_D}
-            stroke={`url(#${gradientId})`}
-            strokeWidth="1.25"
+            stroke="currentColor"
+            strokeWidth="1.35"
             strokeLinejoin="round"
             strokeLinecap="round"
-            paintOrder="stroke fill"
+          />
+          <path
+            className="custom-cursor-pointer__detail"
+            d="M6.7 6.1 L11.8 12.2"
+            fill="none"
+            strokeWidth="1.25"
+            strokeLinecap="round"
+          />
+          <circle
+            className="custom-cursor-pointer__node"
+            cx="6.3"
+            cy="5.8"
+            r="1.15"
           />
         </svg>
       </div>
