@@ -209,71 +209,95 @@ body {
   z-index: 99999;
 }
 
-/* Idle “normal” cursor: arrow outline matches sunset palette */
+/* Custom cursor — calm precision language */
 .custom-cursor-pointer {
-  transition: opacity 0.18s ease;
+  color: #5269dc;
+  transition: opacity 0.12s ease;
+}
+
+.dark .custom-cursor-pointer {
+  color: #8ea2ff;
 }
 
 .custom-cursor-pointer__svg {
   display: block;
   overflow: visible;
-  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent-magenta) 22%, transparent))
-    drop-shadow(0 2px 6px color-mix(in srgb, var(--accent-iris) 16%, transparent));
-  transform-origin: 12.5% 12.5%;
-  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: 16% 14%;
+  transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .custom-cursor-pointer__shape {
-  fill: color-mix(in srgb, var(--bg-raised) 86%, transparent);
+  fill: rgba(244, 247, 250, 0.96);
+  filter: drop-shadow(0 2px 5px rgba(18, 29, 48, 0.18));
 }
 
 .dark .custom-cursor-pointer__shape {
-  fill: color-mix(in srgb, var(--bg-elevated) 42%, transparent);
-  opacity: 0.97;
+  fill: rgba(15, 21, 30, 0.96);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.28));
+}
+
+.custom-cursor-pointer__detail {
+  stroke: #7db8b0;
+}
+
+.custom-cursor-pointer__node {
+  fill: #7db8b0;
 }
 
 .custom-cursor-pointer[data-pressed="true"] .custom-cursor-pointer__svg {
-  transform: scale(0.92);
+  transform: scale(0.88);
 }
 
 .custom-cursor-dot {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 9999px;
-  background: var(--accent-magenta);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--accent-magenta) 60%, transparent);
-  mix-blend-mode: difference;
-  transition: opacity 0.18s ease, transform 0s;
+  background: #7db8b0;
+  box-shadow: 0 0 0 3px rgba(125, 184, 176, 0.12);
+  transition: opacity 0.12s ease;
 }
 
 .custom-cursor-wrap {
   background: transparent;
-  border: 1.5px solid color-mix(in srgb, var(--accent-iris) 65%, transparent);
-  box-shadow: 0 0 12px -2px color-mix(in srgb, var(--accent-iris) 35%, transparent);
-  /* opacity, border-color, border-width transition; geometry is driven by JS */
-  transition: opacity 0.2s ease, border-color 0.25s ease, background-color 0.25s ease, border-width 0.15s ease, box-shadow 0.25s ease;
+  border: 1.25px solid rgba(82, 105, 220, 0.72);
+  box-shadow: none;
+  transition:
+    opacity 0.14s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    transform 0.08s linear;
 }
 
-/* Magnet — wraps a hovered button/link */
+.dark .custom-cursor-wrap {
+  border-color: rgba(142, 162, 255, 0.78);
+}
+
+/* Interactive elements: compact focus ring centered on the pointer. */
 .custom-cursor-wrap[data-mode="magnet"] {
-  border-color: color-mix(in srgb, var(--accent-magenta) 80%, transparent);
-  background: color-mix(in srgb, var(--accent-magenta) 6%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--accent-magenta) 18%, transparent),
-    0 0 22px -4px color-mix(in srgb, var(--accent-magenta) 45%, transparent);
+  border-width: 1.25px;
+  border-color: rgba(82, 105, 220, 0.82);
+  background:
+    radial-gradient(circle at center, rgba(125, 184, 176, 0.10) 0 34%, transparent 36%);
 }
 
-/* Text — minimal underline accent near pointer */
+.dark .custom-cursor-wrap[data-mode="magnet"] {
+  border-color: rgba(142, 162, 255, 0.86);
+  background:
+    radial-gradient(circle at center, rgba(125, 184, 176, 0.11) 0 34%, transparent 36%);
+}
+
+/* Selectable text: a quiet vertical marker instead of a neon underline. */
 .custom-cursor-wrap[data-mode="text"] {
-  border: none;
-  background: var(--gradient-sunset);
-  box-shadow: 0 0 8px -1px color-mix(in srgb, var(--accent-magenta) 50%, transparent);
+  border: 0;
+  background: #7db8b0;
+  box-shadow: none;
 }
 
-/* Pressed — flash deeper */
+/* Pressed interactive state: subtle compression / fill. */
 .custom-cursor-wrap[data-pressed="true"][data-mode="magnet"] {
-  background: color-mix(in srgb, var(--accent-magenta) 16%, transparent);
-  border-color: var(--accent-magenta);
+  border-color: #7db8b0;
+  background: rgba(125, 184, 176, 0.16);
+  transform: scale(0.92);
 }
 
 /* ============================================================
