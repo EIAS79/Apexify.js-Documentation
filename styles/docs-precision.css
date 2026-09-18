@@ -237,7 +237,7 @@
 .apx-doc-brand__eyebrow,
 .apx-doc5-kicker,
 .apx-doc5-proof-note,
-.apx-doc3-output > figcaption,
-.apx-doc3-media > figcaption {
+.apx-doc3-output figcaption,
+.apx-doc3-media figcaption {
   color:var(--apx-text-secondary);
 }
