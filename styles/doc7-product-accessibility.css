@@ -10,12 +10,6 @@ body:has(#gallery-main) [style*="color:var(--text-muted)"] {
   color: var(--text-secondary) !important;
 }
 
-/* Amber and green category surfaces are not guaranteed to support white text. */
-body:has(#gallery-main) .text-white[style*="background-color:var(--accent-amber)"],
-body:has(#gallery-main) .text-white[style*="background-color:var(--success)"] {
-  color: #07100d !important;
-}
-
 .dark body:has(#gallery-main) .text-white[style*="background-color:var(--accent)"] {
   color: #ffffff !important;
 }
