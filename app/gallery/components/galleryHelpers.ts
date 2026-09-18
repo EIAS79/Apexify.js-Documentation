@@ -32,33 +32,76 @@ export function galleryEvidence(item: GalleryItem): Exclude<GalleryEvidenceFilte
   return isVerifiedGalleryItem(item) ? 'verified' : 'legacy';
 }
 
+export function galleryTrustLabel(item: GalleryItem): 'Verified source' | 'Curated demo' {
+  return isVerifiedGalleryItem(item) ? 'Verified source' : 'Curated demo';
+}
+
 export function galleryPackageVersion(): string | null {
   return doc5GalleryItems[0]?.verifiedPackageVersion ?? null;
 }
 
-/** Each item exposes one or more category lenses. DOC-5 items derive feature lenses from the authoritative manifest. */
+const DATA_IDS = new Set([
+  'advance-chart-donut-glow',
+  'advance-comparison-donut-line',
+  'presentation-deck-slide',
+  'advance-chart-bar-quarterly',
+  'advance-chart-hbar-routes',
+  'advance-chart-line-dual-target',
+]);
+
+const TYPOGRAPHY_IDS = new Set([
+  'advance-text-glow-plaque',
+  'presentation-deck-slide',
+]);
+
+const IMAGE_IDS = new Set([
+  'advance-shape-collage',
+]);
+
+const COMPOSITION_IDS = new Set([
+  'advance-comparison-donut-line',
+  'presentation-deck-slide',
+  'advance-shape-collage',
+]);
+
+/** Visual lenses used by the Gallery UI. One item may appear under more than one lens. */
 export function discoverCategories(item: GalleryItem): Exclude<FilterCategory, 'all'>[] {
   const tags = new Set<Exclude<FilterCategory, 'all'>>();
+
   if (isVerifiedGalleryItem(item)) {
-    tags.add('advance');
-    if (item.doc5Features.includes('charts')) tags.add('charts');
-    if (item.doc5Features.includes('gif')) { tags.add('gifs'); tags.add('extras'); }
-    if (item.doc5Features.includes('canvas')) tags.add('images');
-    if (item.doc5Features.includes('batch')) tags.add('mix');
+    if (item.doc5Features.includes('charts')) tags.add('data');
+    if (item.doc5Features.includes('gif')) tags.add('motion');
+    if (item.doc5Features.includes('canvas')) tags.add('image');
+    if (item.doc5Features.includes('batch')) tags.add('composition');
+    if (tags.size === 0) tags.add('advanced');
     return [...tags];
   }
-  if (item.category === 'background') { tags.add('background'); tags.add('mix'); return [...tags]; }
-  if (item.category === 'gifs') { tags.add('gifs'); tags.add('extras'); tags.add('mix'); return [...tags]; }
-  if (item.category === 'videos') { tags.add('videos'); tags.add('extras'); tags.add('mix'); return [...tags]; }
+
+  if (item.category === 'background') {
+    tags.add('surface');
+    tags.add('composition');
+    return [...tags];
+  }
+
+  if (item.category === 'gifs' || item.category === 'videos') {
+    tags.add('motion');
+    tags.add('composition');
+    return [...tags];
+  }
+
   if (item.category === 'advance') {
-    tags.add('advance'); tags.add('images');
-    const advanceChartIds = ['advance-chart-donut-glow','advance-comparison-donut-line','presentation-deck-slide','advance-chart-bar-quarterly','advance-chart-hbar-routes','advance-chart-line-dual-target'];
-    if (advanceChartIds.includes(item.id) || item.id.startsWith('advance-chartshowcase-')) tags.add('charts');
-    if (item.id === 'advance-chartshowcase-comparison-pie-bar') tags.add('mix');
-    if (['presentation-deck-slide','advance-shape-collage','advance-text-glow-plaque'].includes(item.id)) tags.add('text');
-    if (['advance-comparison-donut-line','presentation-deck-slide','advance-shape-collage'].includes(item.id)) tags.add('mix');
+    if (DATA_IDS.has(item.id) || item.id.startsWith('advance-chartshowcase-')) tags.add('data');
+    if (TYPOGRAPHY_IDS.has(item.id)) tags.add('typography');
+    if (IMAGE_IDS.has(item.id)) tags.add('image');
+    if (COMPOSITION_IDS.has(item.id) || item.id === 'advance-chartshowcase-comparison-pie-bar') tags.add('composition');
+
+    if (tags.size === 0) tags.add('advanced');
+    else if (tags.size > 1) tags.add('advanced');
+
     return [...tags];
   }
+
+  tags.add('composition');
   return [...tags];
 }
 
@@ -85,40 +128,50 @@ export function itemMatchesQuery(item: GalleryItem, query: string): boolean {
     discoverCategories(item).join(' '),
     galleryRuntime(item),
     galleryEvidence(item),
+    galleryTrustLabel(item),
     features,
   ].some((value) => value.toLowerCase().includes(q));
 }
 
 export function plainGallerySummary(text: string): string {
-  return text.replace(/\r?\n+/g,' ').replace(/\*\*([^*]+)\*\*/g,'$1').replace(/`([^`]+)`/g,'$1').replace(/\s+/g,' ').trim();
+  return text
+    .replace(/\r?\n+/g, ' ')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\`([^\`]+)\`/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-export function primaryBadgeCategory(item: GalleryItem): Exclude<FilterCategory,'all'> {
-  if (isVerifiedGalleryItem(item)) {
-    if(item.doc5Features.includes('charts'))return 'charts';
-    if(item.doc5Features.includes('gif'))return 'gifs';
-    if(item.doc5Features.includes('canvas'))return 'images';
-    return 'advance';
+export function primaryBadgeCategory(item: GalleryItem): Exclude<FilterCategory, 'all'> {
+  const categories = discoverCategories(item);
+  const priority: Exclude<FilterCategory, 'all'>[] = [
+    'composition',
+    'image',
+    'typography',
+    'data',
+    'motion',
+    'surface',
+    'advanced',
+  ];
+  return priority.find((category) => categories.includes(category)) ?? 'advanced';
+}
+
+export function parseGalleryHash(rawHash: string): { id: string; type: string | null } | null {
+  const hash = rawHash.replace(/^#/, '').trim();
+  if (!hash) return null;
+
+  let decoded = hash;
+  try {
+    decoded = decodeURIComponent(hash);
+  } catch {
+    decoded = hash;
   }
-  if (item.category === 'background') return 'background';
-  if (item.category === 'gifs') return 'gifs';
-  if (item.category === 'videos') return 'videos';
-  const ids=['advance-chart-donut-glow','advance-comparison-donut-line','presentation-deck-slide','advance-chart-bar-quarterly','advance-chart-hbar-routes','advance-chart-line-dual-target'];
-  if(item.id.startsWith('advance-chartshowcase-')||ids.includes(item.id))return 'charts';
-  if(item.id==='advance-text-glow-plaque')return 'text';
-  if(item.id==='advance-shape-collage')return 'images';
-  return 'advance';
-}
 
-export function parseGalleryHash(rawHash:string):{id:string;type:string|null}|null{
-  const hash=rawHash.replace(/^#/,'').trim();
-  if(!hash)return null;
-  let decoded=hash;
-  try{decoded=decodeURIComponent(hash);}catch{decoded=hash;}
-  const plusIdx=decoded.lastIndexOf('+');
-  if(plusIdx<=0)return{id:decoded,type:null};
-  const id=decoded.slice(0,plusIdx).trim();
-  const type=decoded.slice(plusIdx+1).trim().toLowerCase();
-  if(!id)return null;
-  return{id,type:type||null};
+  const plusIdx = decoded.lastIndexOf('+');
+  if (plusIdx <= 0) return { id: decoded, type: null };
+
+  const id = decoded.slice(0, plusIdx).trim();
+  const type = decoded.slice(plusIdx + 1).trim().toLowerCase();
+  if (!id) return null;
+  return { id, type: type || null };
 }
