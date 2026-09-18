@@ -125,7 +125,7 @@ export function StudioCommandPalette({
           transition={{ duration: 0.15 }}
           onClick={onClose}
           className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[12vh]"
-          style={{ backgroundColor: 'color-mix(in srgb, var(--bg-base) 70%, black)', backdropFilter: 'blur(10px)' }}
+          style={{ backgroundColor: 'rgba(0,0,0,0.58)' }}
         >
           <motion.div
             key="panel"
@@ -137,11 +137,11 @@ export function StudioCommandPalette({
             role="dialog"
             aria-modal="true"
             aria-label="Studio command palette"
-            className="w-full max-w-xl overflow-hidden rounded-2xl"
+            className="w-full max-w-xl overflow-hidden rounded-lg"
             style={{
-              backgroundColor: 'var(--bg-raised)',
+              backgroundColor: 'var(--surface-1)',
               border: '1px solid var(--border-default)',
-              boxShadow: 'var(--shadow-xl)',
+              boxShadow: 'var(--shadow-2)',
             }}
           >
             <div
@@ -205,7 +205,7 @@ export function StudioCommandPalette({
                     <span
                       className="grid h-7 w-7 shrink-0 place-items-center rounded-md text-[10px] font-bold uppercase tracking-wider"
                       style={{
-                        background: meta.badge === 'TPL' ? 'var(--gradient-iris)' : 'var(--gradient-sunset)',
+                        background: 'var(--accent)',
                         color: 'white',
                       }}
                       aria-hidden
