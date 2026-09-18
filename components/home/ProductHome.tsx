@@ -17,6 +17,7 @@ function StatusLabel({ status }: { status: ProductStatus }) {
   const current = status === 'CURRENT';
   return (
     <span
+      data-product-status={status}
       className="inline-flex items-center gap-1.5 rounded-md border px-2 py-1 font-mono text-[10px] font-semibold tracking-[0.08em]"
       style={{
         color: current ? 'var(--success)' : 'var(--text-secondary)',
