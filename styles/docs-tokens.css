@@ -1,40 +1,40 @@
-/* DOC-2 documentation design tokens. Existing site palette remains the lower-level color source. */
+/* Documentation semantic tokens — Precision Graphics Engine. */
 :root {
-  --apx-color-accent: var(--accent-iris);
-  --apx-color-accent-strong: var(--accent-magenta);
-  --apx-color-accent-warm: var(--accent-amber);
+  --apx-color-accent: var(--accent);
+  --apx-color-accent-strong: var(--cyan);
+  --apx-color-accent-warm: var(--warning);
 
-  --apx-surface-page: var(--bg-base);
-  --apx-surface-content: var(--bg-canvas);
-  --apx-surface-raised: var(--bg-raised);
-  --apx-surface-elevated: var(--bg-elevated);
-  --apx-surface-sunken: var(--bg-sunken);
-  --apx-surface-overlay: var(--bg-overlay);
-  --apx-surface-code: color-mix(in srgb, var(--bg-sunken) 88%, var(--bg-raised));
+  --apx-surface-page: var(--canvas);
+  --apx-surface-content: var(--canvas);
+  --apx-surface-raised: var(--surface-1);
+  --apx-surface-elevated: var(--surface-2);
+  --apx-surface-sunken: var(--surface-2);
+  --apx-surface-overlay: var(--overlay);
+  --apx-surface-code: var(--code-bg);
 
   --apx-border-subtle: var(--border-subtle);
-  --apx-border-default: var(--border-default);
+  --apx-border-default: var(--border);
   --apx-border-strong: var(--border-strong);
-  --apx-border-accent: var(--border-accent);
+  --apx-border-accent: color-mix(in srgb, var(--accent) 40%, var(--border));
 
-  --apx-text-primary: var(--text-primary);
+  --apx-text-primary: var(--text);
   --apx-text-secondary: var(--text-secondary);
-  --apx-text-muted: var(--text-tertiary);
-  --apx-text-faint: var(--text-muted);
-  --apx-text-inverse: var(--text-inverse);
+  --apx-text-muted: var(--text-muted);
+  --apx-text-faint: color-mix(in srgb, var(--text-muted) 72%, transparent);
+  --apx-text-inverse: var(--on-accent);
 
-  --apx-status-current-fg: #064a36;
-  --apx-status-current-bg: color-mix(in srgb, var(--success) 12%, transparent);
-  --apx-status-preview-fg: #3527c9;
-  --apx-status-preview-bg: color-mix(in srgb, var(--info) 11%, transparent);
-  --apx-status-experimental-fg: #7a4800;
-  --apx-status-experimental-bg: color-mix(in srgb, var(--warning) 13%, transparent);
-  --apx-status-roadmap-fg: #4436d6;
-  --apx-status-roadmap-bg: color-mix(in srgb, var(--accent-iris) 11%, transparent);
-  --apx-status-deprecated-fg: #a1162b;
-  --apx-status-deprecated-bg: color-mix(in srgb, var(--danger) 10%, transparent);
-  --apx-status-removed-fg: #4a3f6b;
-  --apx-status-removed-bg: color-mix(in srgb, var(--text-secondary) 9%, transparent);
+  --apx-status-current-fg: #166348;
+  --apx-status-current-bg: color-mix(in srgb, var(--success) 9%, transparent);
+  --apx-status-preview-fg: #2053b9;
+  --apx-status-preview-bg: color-mix(in srgb, var(--info) 8%, transparent);
+  --apx-status-experimental-fg: #805000;
+  --apx-status-experimental-bg: color-mix(in srgb, var(--warning) 9%, transparent);
+  --apx-status-roadmap-fg: #53606e;
+  --apx-status-roadmap-bg: color-mix(in srgb, var(--text-muted) 8%, transparent);
+  --apx-status-deprecated-fg: #a32c3b;
+  --apx-status-deprecated-bg: color-mix(in srgb, var(--danger) 8%, transparent);
+  --apx-status-removed-fg: #606b78;
+  --apx-status-removed-bg: color-mix(in srgb, var(--text-muted) 8%, transparent);
 
   --apx-space-1: 0.25rem;
   --apx-space-2: 0.5rem;
@@ -47,19 +47,19 @@
   --apx-space-12: 3rem;
   --apx-space-16: 4rem;
 
-  --apx-radius-sm: 0.375rem;
-  --apx-radius-md: 0.625rem;
-  --apx-radius-lg: 0.875rem;
-  --apx-radius-xl: 1.125rem;
+  --apx-radius-sm: 0.3rem;
+  --apx-radius-md: 0.5rem;
+  --apx-radius-lg: 0.7rem;
+  --apx-radius-xl: 0.875rem;
   --apx-radius-pill: 999px;
 
-  --apx-shadow-sm: var(--shadow-sm);
-  --apx-shadow-md: var(--shadow-md);
+  --apx-shadow-sm: var(--shadow-1);
+  --apx-shadow-md: var(--shadow-2);
   --apx-shadow-lg: var(--shadow-lg);
 
   --apx-motion-fast: 120ms;
   --apx-motion-standard: 180ms;
-  --apx-motion-slow: 260ms;
+  --apx-motion-slow: 240ms;
   --apx-motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   --apx-z-base: 0;
@@ -69,26 +69,25 @@
   --apx-z-drawer: 80;
   --apx-z-skip: 100;
 
-  --apx-content-width: 52rem;
+  --apx-content-width: 54rem;
   --apx-sidebar-width: 19rem;
-  --apx-toc-width: 16rem;
-  --apx-header-height: 4rem;
+  --apx-toc-width: 15rem;
+  --apx-header-height: 3.75rem;
   --apx-shell-max-width: 112rem;
 
-  --apx-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --apx-font-body: Inter, Geist, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --apx-font-code: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, ui-monospace, monospace;
 
-  --apx-focus-color: #4f3fff;
-  --apx-focus-ring: 0 0 0 3px color-mix(in srgb, var(--apx-focus-color) 30%, transparent);
+  --apx-focus-color: var(--accent);
+  --apx-focus-ring: 0 0 0 3px var(--focus-ring);
 }
 
 .dark {
-  --apx-surface-code: color-mix(in srgb, var(--bg-sunken) 82%, #000 18%);
-  --apx-status-current-fg: #7df3c5;
-  --apx-status-preview-fg: #b3aaff;
-  --apx-status-experimental-fg: #ffd08a;
-  --apx-status-roadmap-fg: #c0b8ff;
-  --apx-status-deprecated-fg: #ff9aaa;
-  --apx-status-removed-fg: #b8aed6;
-  --apx-focus-color: #a99cff;
+  --apx-status-current-fg: #6fd8b0;
+  --apx-status-preview-fg: #8ab2ff;
+  --apx-status-experimental-fg: #e1b15e;
+  --apx-status-roadmap-fg: #9da8b7;
+  --apx-status-deprecated-fg: #ff8794;
+  --apx-status-removed-fg: #9aa4b1;
+  --apx-focus-color: var(--accent);
 }
