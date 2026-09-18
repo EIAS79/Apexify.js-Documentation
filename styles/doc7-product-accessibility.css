@@ -11,7 +11,7 @@ body:has(#gallery-main) [style*="color:var(--text-muted)"] {
 }
 
 .dark body:has(#gallery-main) .text-white[style*="background-color:var(--accent)"] {
-  color: #ffffff !important;
+  color: #08101f !important;
 }
 
 /* DOC-11 reduced-motion contract: user preference wins over decorative motion. */
