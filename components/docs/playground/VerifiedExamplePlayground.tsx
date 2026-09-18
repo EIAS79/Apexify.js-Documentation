@@ -92,7 +92,7 @@ export function ExampleWorkbench({
     <section className="apx-example-workbench my-6 overflow-hidden rounded-lg border" style={{ borderColor: 'var(--border-default)', background: 'var(--bg-raised)', boxShadow: 'var(--shadow-md)' }} data-post-doc12-workbench data-example-id={exampleId ?? undefined}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 sm:px-5" style={{ borderColor: 'var(--border-subtle)', background: 'var(--bg-sunken)' }}>
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--accent)' }}>Verified example workbench</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--accent-hover)' }}>Verified example workbench</p>
           <h3 className="mt-1 text-base font-bold" style={{ color: 'var(--text-primary)' }}>{title}</h3>
         </div>
         <div className="flex flex-wrap gap-2" role="tablist" aria-label="Workbench view">
