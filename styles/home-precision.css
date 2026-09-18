@@ -389,3 +389,9 @@
   .apx-capability-queue__track{animation:none}
   .apx-home-root *, .apx-home-root *::before, .apx-home-root *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
+
+/* Hero artwork cards reserve caption space explicitly. */
+.apx-hero-gallery__main,
+.apx-hero-gallery__side{display:grid;grid-template-rows:minmax(0,1fr) auto}
+.apx-hero-gallery__main>.apx-art,
+.apx-hero-gallery__side>.apx-art{min-height:0}
