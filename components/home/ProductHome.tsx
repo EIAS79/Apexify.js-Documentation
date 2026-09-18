@@ -2,166 +2,166 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRightIcon,
-  BookOpenIcon,
-  CheckCircleIcon,
-  CodeBracketIcon,
-  CommandLineIcon,
-  CubeIcon,
-  PhotoIcon,
+  CheckIcon,
 } from '@heroicons/react/24/outline';
 import type { ProductExperienceModel } from '@/lib/product/catalog';
 import type { ProductStatus } from '@/lib/product/catalog-data';
 import CopyInstallButton from './CopyInstallButton';
 
-function StatusLabel({ status }: { status: ProductStatus }) {
-  const current = status === 'CURRENT';
+function StatusBadge({ status }: { status: ProductStatus }) {
   return (
-    <span
-      data-product-status={status}
-      className="inline-flex items-center gap-1.5 rounded-md border px-2 py-1 font-mono text-[10px] font-semibold tracking-[0.08em]"
-      style={{
-        color: current ? 'var(--success)' : 'var(--text-secondary)',
-        borderColor: current
-          ? 'color-mix(in srgb,var(--success) 34%,var(--border))'
-          : 'var(--border)',
-        background: current
-          ? 'color-mix(in srgb,var(--success) 7%,var(--surface-1))'
-          : 'var(--surface-1)',
-      }}
-    >
-      <span className="h-1.5 w-1.5 rounded-full" style={{ background: current ? 'var(--success)' : 'var(--text-muted)' }} />
+    <span className="apx-status-badge" data-status={status} data-product-status={status}>
+      <span className="apx-status-badge__dot" />
       {status}
     </span>
   );
 }
 
-function SectionHeading({
-  id,
+function SectionIntro({
+  index,
   eyebrow,
   title,
-  description,
+  body,
 }: {
-  id: string;
+  index: string;
   eyebrow: string;
   title: string;
-  description: string;
+  body: string;
 }) {
   return (
-    <div className="mb-10 grid gap-5 border-t pt-6 lg:grid-cols-12 lg:gap-8" style={{ borderColor: 'var(--border)' }}>
-      <div className="lg:col-span-7">
-        <p className="apx-home-eyebrow">{eyebrow}</p>
-        <h2 id={id} className="apx-home-heading">{title}</h2>
+    <header className="apx-editorial-intro">
+      <div className="apx-editorial-intro__index">{index}</div>
+      <div className="apx-editorial-intro__main">
+        <p className="apx-kicker">{eyebrow}</p>
+        <h2>{title}</h2>
       </div>
-      <p className="apx-home-copy self-end text-sm lg:col-span-5">{description}</p>
-    </div>
+      <p className="apx-editorial-intro__body">{body}</p>
+    </header>
+  );
+}
+
+function OutputCard({
+  example,
+  className = '',
+  priority = false,
+  label,
+}: {
+  example: ProductExperienceModel['galleryExamples'][number];
+  className?: string;
+  priority?: boolean;
+  label?: string;
+}) {
+  return (
+    <Link
+      href={example.href}
+      prefetch={false}
+      className={`apx-output-card ${className}`}
+      aria-label={`Open verified example: ${example.title}`}
+    >
+      <div className="apx-output-card__media">
+        <Image
+          src={example.preview}
+          alt={example.title}
+          fill
+          priority={priority}
+          sizes="(min-width: 1200px) 38vw, (min-width: 768px) 52vw, 92vw"
+          className="object-contain"
+        />
+      </div>
+      <div className="apx-output-card__meta">
+        <span>{label ?? example.runtime}</span>
+        <strong>{example.title}</strong>
+        <span aria-hidden>↗</span>
+      </div>
+    </Link>
   );
 }
 
 export function ProductHero({ model }: { model: ProductExperienceModel }) {
-  const example = model.heroExample;
+  const gallery = model.galleryExamples;
+  const lead = gallery.find((item) => item.id === 'node.integration.report') ?? gallery[0];
+  const secondary = gallery.find((item) => item.id === 'node.canvas.basic') ?? gallery[1] ?? lead;
+  const tertiary = gallery.find((item) => item.id === 'node.gif.basic') ?? gallery[2] ?? secondary;
 
   return (
-    <section className="px-4 pb-20 pt-28 sm:px-6 sm:pb-24 sm:pt-32 lg:px-8 lg:pb-28 lg:pt-36">
-      <div className="mx-auto grid max-w-[88rem] gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
-        <div className="lg:col-span-6">
-          <div className="mb-7 flex flex-wrap items-center gap-2">
-            <span className="apx-home-eyebrow">PROGRAMMABLE GRAPHICS / NODE RUNTIME</span>
-            <StatusLabel status="CURRENT" />
-            <span className="apx-home-version">{model.package.name} {model.package.version}</span>
+    <section className="apx-hero">
+      <div className="apx-hero__shell">
+        <div className="apx-hero__copy">
+          <div className="apx-hero__meta">
+            <span className="apx-kicker">CREATIVE RENDERING ENGINE / NODE</span>
+            <StatusBadge status="CURRENT" />
+            <span className="apx-hero__version">{model.package.name} {model.package.version}</span>
           </div>
 
-          <h1 className="max-w-[11ch] text-balance text-[clamp(3.6rem,8vw,7.4rem)] font-semibold leading-[0.88] tracking-[-0.065em]" style={{ color: 'var(--text)' }}>
-            Render visuals with JavaScript.
+          <h1>
+            <span>Code the visual.</span>
+            <span className="apx-hero__serif">Control the output.</span>
           </h1>
 
-          <p className="mt-7 max-w-2xl text-pretty text-base leading-8 sm:text-lg" style={{ color: 'var(--text-secondary)' }}>
-            Apexify.js is a TypeScript-first rendering and media toolkit for images, text, charts, scenes,
-            templates, GIF/video workflows, audio, and programmatic output on Node/server runtimes.
+          <p className="apx-hero__lede">
+            Apexify.js turns JavaScript into designed output: images, type, charts, scenes,
+            templates, GIF/video workflows, and procedural media — composed on the server with
+            explicit APIs and inspectable results.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/docs/getting-started" prefetch={false} className="btn btn-primary">
-              <BookOpenIcon className="h-4 w-4" />
-              Start with the docs
+          <div className="apx-hero__actions">
+            <Link href="/gallery" prefetch={false} className="apx-cta apx-cta--primary">
+              Explore the output
+              <ArrowRightIcon className="h-4 w-4" />
             </Link>
-            <Link href="/gallery" prefetch={false} className="btn btn-secondary">
-              <PhotoIcon className="h-4 w-4" />
-              Inspect outputs
+            <Link href="/docs/getting-started" prefetch={false} className="apx-cta apx-cta--ghost">
+              Read the docs
             </Link>
           </div>
 
-          <div className="mt-5 max-w-lg">
+          <div className="apx-hero__install">
             <CopyInstallButton command={model.package.installCommand} />
           </div>
 
-          <div className="mt-10 max-w-2xl border-y" style={{ borderColor: 'var(--border)' }}>
-            <div className="grid grid-cols-2 sm:grid-cols-4">
-              {[
-                [String(model.capabilities.length), 'documented domains'],
-                [String(model.galleryExamples.length), 'output examples'],
-                ['TypeScript', 'first authoring'],
-                ['Node', 'current runtime'],
-              ].map(([value, label], index) => (
-                <div
-                  key={label}
-                  className="px-3 py-4 first:pl-0 sm:border-l sm:first:border-l-0"
-                  style={{ borderColor: 'var(--border-subtle)' }}
-                >
-                  <strong className="block font-mono text-sm font-semibold" style={{ color: index < 2 ? 'var(--accent)' : 'var(--text)' }}>
-                    {value}
-                  </strong>
-                  <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>
-                    {label}
-                  </span>
-                </div>
-              ))}
+          <div className="apx-hero__proof">
+            <div>
+              <strong>{model.capabilities.length}</strong>
+              <span>current domains</span>
+            </div>
+            <div>
+              <strong>{model.galleryExamples.length}</strong>
+              <span>verified outputs</span>
+            </div>
+            <div>
+              <strong>TS</strong>
+              <span>first authoring</span>
+            </div>
+            <div>
+              <strong>Node</strong>
+              <span>current runtime</span>
             </div>
           </div>
         </div>
 
-        <div className="lg:col-span-6" data-doc7-verified-hero={example.id}>
-          <div className="apx-engine-panel overflow-hidden">
-            <div className="flex items-center justify-between gap-4 border-b px-4 py-3" style={{ borderColor: 'var(--border)' }}>
-              <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--text-muted)' }}>
-                  Repository-verified output
-                </p>
-                <p className="mt-0.5 text-sm font-semibold" style={{ color: 'var(--text)' }}>{example.title}</p>
-              </div>
-              <Link href={example.href} prefetch={false} className="font-mono text-[11px] font-semibold" style={{ color: 'var(--accent)' }}>
-                proof ↗
-              </Link>
-            </div>
-
-            <div className="relative aspect-[16/10]" style={{ background: 'var(--surface-2)' }}>
-              <div className="absolute inset-0 opacity-40" aria-hidden style={{
-                backgroundImage: 'linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px)',
-                backgroundSize: '32px 32px',
-              }} />
-              <Image
-                src={example.output}
-                alt={`Verified output from ${example.title}`}
-                fill
-                priority
-                sizes="(min-width: 1024px) 48vw, 100vw"
-                className="relative object-contain p-6 sm:p-8"
-              />
-            </div>
-
-            <div className="apx-engine-panel--dark">
-              <div className="apx-code-header">
-                <span>source / {example.id}</span>
-                <span>{model.package.name}</span>
-              </div>
-              <pre
-                tabIndex={0}
-                aria-label={`${example.title} verified source code`}
-                className="!m-0 max-h-72 overflow-auto !rounded-none !border-0 !bg-transparent px-4 py-4 text-[11px] leading-5 outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] sm:text-xs"
-              >
-                <code>{example.source}</code>
-              </pre>
-            </div>
+        <div className="apx-hero-stage" aria-label="Verified Apexify.js output composition">
+          <div className="apx-hero-stage__poster">
+            <span>APX / OUTPUT</span>
+            <span>06.00</span>
           </div>
+          <OutputCard example={lead} className="apx-output-card--hero" priority label="composition" />
+          <OutputCard example={secondary} className="apx-output-card--float-a" label="canvas" />
+          <OutputCard example={tertiary} className="apx-output-card--float-b" label="media" />
+          <div className="apx-hero-stage__stamp">
+            <span>PROGRAMMABLE</span>
+            <strong>VISUAL</strong>
+            <span>SYSTEMS</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="apx-capability-marquee" aria-label="Current capabilities">
+        <div className="apx-capability-marquee__track">
+          {[...model.capabilities, ...model.capabilities].map((capability, index) => (
+            <span key={`${capability.id}-${index}`}>
+              {capability.title}
+              <i aria-hidden>✦</i>
+            </span>
+          ))}
         </div>
       </div>
     </section>
@@ -169,45 +169,72 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
 }
 
 export function CapabilitySection({ model }: { model: ProductExperienceModel }) {
+  const canvas = model.galleryExamples.find((item) => item.id === 'node.canvas.basic') ?? model.galleryExamples[0];
+  const chart = model.galleryExamples.find((item) => item.id === 'node.chart.bar') ?? model.galleryExamples[1] ?? canvas;
+  const report = model.galleryExamples.find((item) => item.id === 'node.integration.report') ?? model.galleryExamples[2] ?? chart;
+
   return (
-    <section className="apx-home-section" aria-labelledby="current-capabilities">
+    <section className="apx-editorial-section apx-editorial-section--systems" aria-labelledby="visual-systems">
       <div className="apx-home-shell">
-        <SectionHeading
-          id="current-capabilities"
-          eyebrow="ENGINE SURFACE"
-          title="Graphics primitives, composition, and media output."
-          description="The current package stays centered on concrete rendering work: build a canvas, draw and transform visual data, compose reusable structures, then emit an artifact."
+        <SectionIntro
+          index="01"
+          eyebrow="VISUAL SYSTEMS"
+          title="Not a canvas demo. A programmable design surface."
+          body="Apexify’s current Node runtime spans primitive drawing, typography, structured charts, reusable composition, templates, and media workflows. The interface stays explicit while the output can be highly visual."
         />
 
-        <div className="grid border-y md:grid-cols-2 xl:grid-cols-3" style={{ borderColor: 'var(--border)' }}>
-          {model.capabilities.map((capability) => (
-            <article
-              key={capability.id}
-              className="border-b px-0 py-6 md:px-6 md:first:pl-0 xl:border-r xl:last:border-r-0"
-              style={{ borderColor: 'var(--border-subtle)' }}
-            >
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <span className="grid h-8 w-8 place-items-center rounded-md border" style={{ borderColor: 'var(--border)', background: 'var(--surface-1)' }}>
-                  <CubeIcon className="h-4 w-4" style={{ color: 'var(--accent)' }} />
-                </span>
-                <StatusLabel status={capability.status} />
-              </div>
-              <h3 className="text-xl font-semibold tracking-[-0.025em]" style={{ color: 'var(--text)' }}>{capability.title}</h3>
-              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>{capability.summary}</p>
-              {capability.note ? <p className="mt-3 text-xs leading-5" style={{ color: 'var(--text-muted)' }}>{capability.note}</p> : null}
-              <div className="mt-5 flex flex-wrap gap-2">
-                <Link href={capability.apiHref} prefetch={false} className="chip">
-                  <CodeBracketIcon className="h-3.5 w-3.5" />
-                  {capability.apiMember}()
-                </Link>
-                {capability.example ? (
-                  <Link href={capability.example.href} prefetch={false} className="chip">
-                    output →
+        <div className="apx-feature-story">
+          <article className="apx-feature-story__hero">
+            <div className="apx-feature-story__copy">
+              <span className="apx-feature-story__number">A</span>
+              <p className="apx-kicker">COMPOSE</p>
+              <h3>Build from pixels to reusable scenes.</h3>
+              <p>
+                Start with a canvas, layer imagery and text, then move into ordered scenes and
+                reusable templates without changing the mental model.
+              </p>
+              <div className="apx-feature-story__links">
+                {model.capabilities.slice(0, 3).map((capability) => (
+                  <Link key={capability.id} href={capability.apiHref} prefetch={false}>
+                    {capability.apiMember}()
                   </Link>
-                ) : null}
+                ))}
               </div>
-            </article>
-          ))}
+            </div>
+            <div className="apx-feature-story__visual apx-feature-story__visual--ink">
+              <Image src={report.preview} alt={report.title} fill sizes="(min-width: 1024px) 50vw, 90vw" className="object-contain" />
+            </div>
+          </article>
+
+          <article className="apx-feature-story__split">
+            <div className="apx-feature-story__visual apx-feature-story__visual--acid">
+              <Image src={canvas.preview} alt={canvas.title} fill sizes="(min-width: 1024px) 35vw, 90vw" className="object-contain" />
+            </div>
+            <div className="apx-feature-story__copy">
+              <span className="apx-feature-story__number">B</span>
+              <p className="apx-kicker">DRAW + TYPE</p>
+              <h3>Make layout part of the program.</h3>
+              <p>
+                Images, shapes, text, measurements, and explicit canvas state give you the pieces
+                for repeatable server-side graphics instead of screenshot automation.
+              </p>
+            </div>
+          </article>
+
+          <article className="apx-feature-story__split apx-feature-story__split--reverse">
+            <div className="apx-feature-story__copy">
+              <span className="apx-feature-story__number">C</span>
+              <p className="apx-kicker">DATA → IMAGE</p>
+              <h3>Turn structured data into visual artifacts.</h3>
+              <p>
+                Render charts and report-like compositions as deterministic image output, then move
+                the same workflow into templates, GIFs, video, or generated media.
+              </p>
+            </div>
+            <div className="apx-feature-story__visual apx-feature-story__visual--coral">
+              <Image src={chart.preview} alt={chart.title} fill sizes="(min-width: 1024px) 35vw, 90vw" className="object-contain" />
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -216,31 +243,32 @@ export function CapabilitySection({ model }: { model: ProductExperienceModel }) 
 
 export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="apx-home-section" aria-labelledby="feature-tracks">
+    <section className="apx-editorial-section apx-editorial-section--workflow" aria-labelledby="render-workflow">
       <div className="apx-home-shell">
-        <SectionHeading
-          id="feature-tracks"
-          eyebrow="RENDER PIPELINE"
-          title="Move from input to output without losing the model."
-          description="Apexify keeps ordinary work approachable while still providing scenes, templates, batch/media workflows, and deeper composition tools where the job requires them."
+        <SectionIntro
+          index="02"
+          eyebrow="ENGINE GRAMMAR"
+          title="A rendering workflow you can reason about."
+          body="The homepage should show how the engine thinks. Each step maps to current APIs and current runtime capability instead of hiding the system behind decorative UI."
         />
 
-        <div className="apx-pipeline">
-          {model.featureTracks.slice(0, 4).map((track, index) => (
-            <article key={track.id}>
-              <div className="apx-pipeline__index">{String(index + 1).padStart(2, '0')}</div>
-              <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>{track.eyebrow}</p>
-                <h3 className="mt-1">{track.title}</h3>
-                <p>{track.summary}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {track.api.slice(0, 2).map((api) => (
-                    <Link key={api.name} href={api.href} prefetch={false} className="font-mono text-[11px] font-semibold" style={{ color: 'var(--accent)' }}>
-                      {api.name}()
-                    </Link>
-                  ))}
-                </div>
+        <div className="apx-workflow-map" role="list">
+          {model.featureTracks.map((track, index) => (
+            <article key={track.id} className="apx-workflow-node" role="listitem">
+              <div className="apx-workflow-node__top">
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <span>{track.eyebrow}</span>
               </div>
+              <h3>{track.title}</h3>
+              <p>{track.summary}</p>
+              <div className="apx-workflow-node__apis">
+                {track.api.map((api) => (
+                  <Link key={api.name} href={api.href} prefetch={false}>
+                    {api.name}()
+                  </Link>
+                ))}
+              </div>
+              <div className="apx-workflow-node__connector" aria-hidden />
             </article>
           ))}
         </div>
@@ -250,75 +278,126 @@ export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
 }
 
 export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
+  const hero = model.heroExample;
+  const wall = model.galleryExamples.slice(0, 6);
+
   return (
-    <section className="apx-home-section" aria-labelledby="verified-examples">
-      <div className="apx-home-shell">
-        <SectionHeading
-          id="verified-examples"
-          eyebrow="OUTPUT / EVIDENCE"
-          title="Inspect what the engine actually renders."
-          description={`These examples are repository-controlled outputs associated with ${model.package.name} ${model.package.version}. The output stays primary; source and evidence remain one click away.`}
-        />
-
-        <div className="grid gap-px overflow-hidden rounded-[var(--radius-lg)] border sm:grid-cols-2 lg:grid-cols-4" style={{ borderColor: 'var(--border)', background: 'var(--border)' }}>
-          {model.galleryExamples.slice(0, 8).map((example) => (
-            <Link
-              key={example.id}
-              href={example.href}
-              prefetch={false}
-              className="group block min-w-0"
-              style={{ background: 'var(--surface-1)' }}
-            >
-              <div className="relative aspect-[4/3] overflow-hidden" style={{ background: 'var(--surface-2)' }}>
-                <Image
-                  src={example.preview}
-                  alt={example.title}
-                  fill
-                  sizes="(min-width: 1024px) 24vw, (min-width: 640px) 50vw, 100vw"
-                  className="object-contain p-4 transition-transform duration-200 group-hover:scale-[1.015]"
-                />
-              </div>
-              <div className="border-t px-4 py-3" style={{ borderColor: 'var(--border-subtle)' }}>
-                <p className="font-mono text-[10px] uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>{example.runtime} / verified</p>
-                <h3 className="mt-1 truncate text-sm font-semibold" style={{ color: 'var(--text)' }}>{example.title}</h3>
-              </div>
+    <>
+      <section className="apx-code-proof" aria-labelledby="source-to-output">
+        <div className="apx-code-proof__shell">
+          <div className="apx-code-proof__intro">
+            <span className="apx-code-proof__index">03</span>
+            <p className="apx-kicker">SOURCE / OUTPUT</p>
+            <h2 id="source-to-output">The code is the system. The image is the proof.</h2>
+            <p>
+              Every featured output here is tied back to repository-controlled source. No fake
+              mockup, no decorative placeholder presented as engine capability.
+            </p>
+            <Link href={hero.href} prefetch={false} className="apx-text-link">
+              Open verified example <ArrowRightIcon className="h-4 w-4" />
             </Link>
-          ))}
-        </div>
+          </div>
 
-        <div className="mt-6 flex items-center gap-4">
-          <Link href="/gallery" prefetch={false} className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--accent)' }}>
-            Browse the complete gallery <ArrowRightIcon className="h-4 w-4" />
+          <div className="apx-code-proof__workbench" data-doc7-verified-hero={hero.id}>
+            <div className="apx-code-proof__code">
+              <div className="apx-code-proof__bar">
+                <span>{hero.id}</span>
+                <span>{model.package.name}</span>
+              </div>
+              <pre tabIndex={0} aria-label={`${hero.title} verified source code`}>
+                <code>{hero.source}</code>
+              </pre>
+            </div>
+            <div className="apx-code-proof__output">
+              <div className="apx-code-proof__label">
+                <span>VERIFIED OUTPUT</span>
+                <span>{hero.runtime}</span>
+              </div>
+              <div className="apx-code-proof__media">
+                <Image src={hero.output} alt={`Verified output from ${hero.title}`} fill sizes="(min-width: 1024px) 50vw, 95vw" className="object-contain" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="apx-editorial-section apx-editorial-section--gallery" aria-labelledby="output-gallery">
+        <div className="apx-home-shell">
+          <SectionIntro
+            index="04"
+            eyebrow="OUTPUT WALL"
+            title="Let the renders do the selling."
+            body={`A selection of repository-verified output from ${model.package.name} ${model.package.version}. Different jobs, one programmatic surface.`}
+          />
+
+          <div className="apx-output-wall">
+            {wall.map((example, index) => (
+              <OutputCard
+                key={example.id}
+                example={example}
+                className={`apx-output-wall__item apx-output-wall__item--${index + 1}`}
+              />
+            ))}
+          </div>
+
+          <Link href="/gallery" prefetch={false} className="apx-gallery-cta">
+            <span>See the full output library</span>
+            <ArrowRightIcon className="h-5 w-5" />
           </Link>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
 export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="apx-home-section" aria-labelledby="roadmap-direction">
+    <section className="apx-editorial-section apx-editorial-section--index" aria-labelledby="engine-index">
       <div className="apx-home-shell">
-        <SectionHeading
-          id="roadmap-direction"
-          eyebrow="ENGINE DIRECTION"
-          title="One rendering model, more runtimes over time."
-          description="Future runtime and tooling work stays visibly separate from current package capability. Roadmap items are labelled as roadmap until the implementation, tests, packaging, and documentation actually ship."
+        <SectionIntro
+          index="05"
+          eyebrow="ENGINE INDEX"
+          title="What ships now. What stays clearly future."
+          body="Current package capability and future direction are intentionally separated. That keeps the page ambitious without pretending roadmap work already exists."
         />
 
-        <div className="apx-roadmap-map">
-          {model.roadmap.map((item) => (
-            <article key={item.id}>
-              <div className="mb-4 flex items-start justify-between gap-3">
-                <CommandLineIcon className="h-4 w-4" style={{ color: 'var(--accent)' }} />
-                <StatusLabel status={item.status} />
-              </div>
-              <h3>{item.title}</h3>
-              <p>{item.summary}</p>
-              <p className="font-mono !text-[10px] uppercase tracking-[0.08em]" style={{ color: 'var(--text-muted)' }}>{item.target}</p>
-            </article>
-          ))}
+        <div className="apx-engine-index">
+          <div className="apx-engine-index__current">
+            <div className="apx-engine-index__heading">
+              <span>NOW</span>
+              <strong>{model.capabilities.length} current domains</strong>
+            </div>
+            <div className="apx-engine-index__list">
+              {model.capabilities.map((capability, index) => (
+                <Link key={capability.id} href={capability.apiHref} prefetch={false}>
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <strong>{capability.title}</strong>
+                  <code>{capability.apiMember}()</code>
+                  <CheckIcon className="h-4 w-4" />
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="apx-engine-index__future">
+            <div className="apx-engine-index__heading">
+              <span>NEXT</span>
+              <strong>explicit roadmap</strong>
+            </div>
+            <div className="apx-engine-index__roadmap">
+              {model.roadmap.map((item, index) => (
+                <article key={item.id}>
+                  <div>
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <StatusBadge status={item.status} />
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.summary}</p>
+                  <code>{item.target}</code>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -327,33 +406,35 @@ export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
 
 export function EcosystemFooter({ model }: { model: ProductExperienceModel }) {
   return (
-    <footer className="border-t px-4 py-12 sm:px-6 lg:px-8" style={{ borderColor: 'var(--border)' }}>
-      <div className="mx-auto grid max-w-[88rem] gap-10 md:grid-cols-12">
-        <div className="md:col-span-6">
-          <div className="flex items-center gap-2">
-            <CheckCircleIcon className="h-4 w-4" style={{ color: 'var(--success)' }} />
-            <strong className="text-sm" style={{ color: 'var(--text)' }}>Apexify.js {model.package.version}</strong>
-          </div>
-          <p className="mt-3 max-w-xl text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>
-            Programmatic rendering and media tooling with generated API evidence, executable examples, and explicitly labelled future work.
-          </p>
+    <footer className="apx-home-footer">
+      <div className="apx-home-footer__statement">
+        <span className="apx-kicker">APEXIFY.JS / {model.package.version}</span>
+        <h2>
+          Build visual systems
+          <span className="apx-home-footer__serif">with code.</span>
+        </h2>
+        <div className="apx-home-footer__actions">
+          <Link href="/docs/getting-started" className="apx-cta apx-cta--light">
+            Start with the docs <ArrowRightIcon className="h-4 w-4" />
+          </Link>
+          <Link href="/studio" className="apx-cta apx-cta--line">
+            Open Studio
+          </Link>
         </div>
-        <div className="md:col-span-3">
-          <p className="apx-home-eyebrow">BUILD</p>
-          <div className="mt-3 grid gap-2 text-sm">
-            <Link href="/docs/getting-started">Documentation</Link>
-            <Link href="/api-reference">API Reference</Link>
-            <Link href="/studio">Studio</Link>
-          </div>
+      </div>
+
+      <div className="apx-home-footer__bottom">
+        <div>
+          <strong>Apexify.js</strong>
+          <span>Programmatic rendering + media tooling for JavaScript.</span>
         </div>
-        <div className="md:col-span-3">
-          <p className="apx-home-eyebrow">EXPLORE</p>
-          <div className="mt-3 grid gap-2 text-sm">
-            <Link href="/gallery">Gallery</Link>
-            <Link href={model.heroExample.href}>Verified output</Link>
-            <span className="font-mono text-xs" style={{ color: 'var(--text-muted)' }}>{model.package.name}</span>
-          </div>
-        </div>
+        <nav aria-label="Footer">
+          <Link href="/docs/getting-started">Docs</Link>
+          <Link href="/api-reference">API</Link>
+          <Link href="/gallery">Gallery</Link>
+          <Link href="/studio">Studio</Link>
+        </nav>
+        <span className="apx-home-footer__commit">{model.package.commit.slice(0, 8)}</span>
       </div>
     </footer>
   );
