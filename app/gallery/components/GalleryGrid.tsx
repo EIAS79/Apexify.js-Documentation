@@ -336,7 +336,6 @@ function FeaturedTile({
             className="absolute top-3 right-3 inline-flex items-center justify-center h-7 w-7 rounded-full text-white"
             style={{
               backgroundColor: 'rgba(0,0,0,0.5)',
-              backdropFilter: 'blur(8px)',
               border: '1px solid rgba(255,255,255,0.2)',
             }}
           >
@@ -450,8 +449,7 @@ function GalleryCard({
                 className="h-6 w-6 inline-flex items-center justify-center rounded-full text-white"
                 style={{
                   backgroundColor: 'rgba(0,0,0,0.45)',
-                  backdropFilter: 'blur(8px)',
-                  border: '1px solid rgba(255,255,255,0.2)',
+                      border: '1px solid rgba(255,255,255,0.2)',
                 }}
                 title="Has source"
               >
@@ -463,8 +461,7 @@ function GalleryCard({
                 className="px-1.5 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-widest text-white"
                 style={{
                   backgroundColor: 'rgba(0,0,0,0.45)',
-                  backdropFilter: 'blur(8px)',
-                  border: '1px solid color-mix(in srgb, var(--accent-amber) 50%, transparent)',
+                      border: '1px solid color-mix(in srgb, var(--accent-amber) 50%, transparent)',
                   color: 'var(--accent-amber-soft)',
                 }}
               >
@@ -482,7 +479,6 @@ function GalleryCard({
               className="inline-flex h-12 w-12 items-center justify-center rounded-full text-white"
               style={{
                 backgroundColor: 'rgba(0,0,0,0.55)',
-                backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255,255,255,0.25)',
               }}
             >
