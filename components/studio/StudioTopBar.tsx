@@ -60,8 +60,8 @@ function LayoutPills({
         className="touch-manipulation inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
         style={{
           color: active ? 'white' : 'var(--text-secondary)',
-          background: active ? 'var(--gradient-sunset)' : 'transparent',
-          boxShadow: active ? 'var(--glow-magenta)' : 'none',
+          background: active ? 'var(--accent)' : 'transparent',
+          boxShadow: 'none',
         }}
         title={label}
       >
@@ -205,7 +205,7 @@ function TemplatesMenu({ onLoad }: { onLoad: (t: StudioTemplate) => void }) {
                       >
                         <span
                           className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-md text-[10px] font-bold uppercase tracking-wider"
-                          style={{ background: 'var(--gradient-iris)', color: 'white' }}
+                          style={{ background: 'var(--accent)', color: 'white' }}
                           aria-hidden
                         >
                           TPL
@@ -256,11 +256,9 @@ export function StudioTopBar(props: TopBarProps) {
     <header
       className="relative z-40 flex shrink-0 flex-col gap-2 px-3 py-2 sm:px-4 md:flex-row md:items-center md:gap-3"
       style={{
-        backgroundColor: 'color-mix(in srgb, var(--bg-raised) 92%, transparent)',
-        backdropFilter: 'blur(16px) saturate(140%)',
-        WebkitBackdropFilter: 'blur(16px) saturate(140%)',
-        borderBottom: '1px solid var(--border-default)',
-        boxShadow: 'var(--shadow-sm)',
+        backgroundColor: 'var(--surface-1)',
+        borderBottom: '1px solid var(--border)',
+        boxShadow: 'none',
       }}
     >
       {/* Left — Logo + view controls */}
@@ -273,8 +271,8 @@ export function StudioTopBar(props: TopBarProps) {
         >
           <span
             aria-hidden
-            className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover/logo:scale-105 sm:h-9 sm:w-9"
-            style={{ boxShadow: 'var(--glow-magenta)' }}
+            className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-md sm:h-9 sm:w-9"
+            style={{ boxShadow: 'none' }}
           >
             <BrandIcon />
           </span>
@@ -285,7 +283,7 @@ export function StudioTopBar(props: TopBarProps) {
             >
               Apexify
             </span>
-            <span className="text-sm font-bold text-grad-aurora">Studio</span>
+            <span className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Studio</span>
           </span>
         </Link>
 
@@ -315,9 +313,9 @@ export function StudioTopBar(props: TopBarProps) {
           disabled={running || !runnerEnabled}
           className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[12px] sm:text-[13px] font-bold transition-all active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
           style={{
-            background: 'var(--gradient-sunset)',
+            background: 'var(--accent)',
             color: 'white',
-            boxShadow: running ? 'none' : '0 2px 12px -3px rgba(236, 72, 153, 0.5)',
+            boxShadow: 'none',
           }}
           title="Run snippet (⌘↵)"
         >
@@ -330,11 +328,9 @@ export function StudioTopBar(props: TopBarProps) {
           onClick={() => onAutoRunChange(!autoRun)}
           className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
           style={{
-            background: autoRun
-              ? 'linear-gradient(135deg, var(--accent-iris), var(--accent-magenta))'
-              : 'transparent',
-            color: autoRun ? 'white' : 'var(--text-secondary)',
-            boxShadow: autoRun ? '0 2px 10px -3px var(--accent-iris)' : 'none',
+            background: autoRun ? 'var(--accent-subtle)' : 'transparent',
+            color: autoRun ? 'var(--accent)' : 'var(--text-secondary)',
+            boxShadow: 'none',
           }}
           title={autoRun ? 'Auto-run active — click to disable' : 'Enable auto-run on typing'}
         >
@@ -343,7 +339,7 @@ export function StudioTopBar(props: TopBarProps) {
           {autoRun && (
             <span
               className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
+              style={{ backgroundColor: 'currentColor' }}
             />
           )}
         </button>
