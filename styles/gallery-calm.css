@@ -682,55 +682,29 @@
 .apx-gallery-root [role="dialog"] button{
   box-shadow:none!important;
 }
-/* Responsive specimen rhythm */
-@media(min-width:640px){
-  .apx-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .apx-gallery-card[data-featured="true"]{grid-column:span 2}
-  .apx-gallery-card[data-featured="true"] .apx-gallery-card__visual{min-height:25rem}
-}
+/* Shared responsive shell */
 @media(min-width:768px){
-  .apx-gallery-tools__top{grid-template-columns:minmax(18rem,1fr) auto auto;align-items:center}
-  .apx-gallery-scope{grid-template-columns:1fr auto;align-items:end}
   .apx-gallery-closing__inner{grid-template-columns:1.35fr .65fr}
 }
 @media(min-width:1024px){
-  .apx-gallery-hero .apx-gallery-shell{grid-template-columns:minmax(0,1.18fr) minmax(24rem,.82fr);align-items:end}
-  .apx-gallery-grid{grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-flow:dense}
-  .apx-gallery-card{grid-column:span 4}
-  .apx-gallery-card[data-index="1"],
-  .apx-gallery-card[data-index="6"]{grid-column:span 7}
-  .apx-gallery-card[data-index="2"],
-  .apx-gallery-card[data-index="5"]{grid-column:span 5}
-  .apx-gallery-card[data-index="3"],
-  .apx-gallery-card[data-index="4"],
-  .apx-gallery-card[data-index="7"],
-  .apx-gallery-card[data-index="8"]{grid-column:span 4}
-  .apx-gallery-card[data-featured="true"]{grid-column:span 7}
-  .apx-gallery-card[data-index="1"] .apx-gallery-card__visual,
-  .apx-gallery-card[data-index="6"] .apx-gallery-card__visual,
-  .apx-gallery-card[data-featured="true"] .apx-gallery-card__visual{min-height:27rem}
-  .apx-gallery-card[data-index="2"] .apx-gallery-card__visual,
-  .apx-gallery-card[data-index="5"] .apx-gallery-card__visual{min-height:21rem}
+  .apx-gallery-hero .apx-gallery-shell{
+    grid-template-columns:minmax(0,1.18fr) minmax(24rem,.82fr);
+    align-items:end;
+  }
 }
 @media(max-width:767px){
   .apx-gallery-hero{padding-top:8rem}
   .apx-gallery-hero__copy h1{font-size:clamp(3.7rem,18vw,6.2rem)}
-  .apx-gallery-tools{top:4.45rem}
-  .apx-gallery-scope__groups{display:grid}
   .apx-gallery-closing{padding-block:4rem}
 }
 @media(max-width:480px){
   .apx-gallery-shell,
   .apx-home-nav__inner{width:min(100% - 1.25rem,88rem)}
-  .apx-gallery-tools{margin-inline:-.1rem;padding:.6rem}
   .apx-gallery-sort{overflow-x:auto}
-  .apx-gallery-result-count{justify-content:flex-start}
-  .apx-gallery-card__visual{min-height:14rem}
 }
-
 @media(prefers-reduced-motion:reduce){
   .apx-gallery-card,
-  .apx-gallery-tools{transition:none!important}
+  .apx-gallery-toolbar{transition:none!important}
 }
 
 .apx-gallery-inspector{
