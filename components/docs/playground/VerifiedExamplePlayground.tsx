@@ -105,7 +105,7 @@ export function ExampleWorkbench({
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-2.5 sm:px-5" style={{ borderColor: 'var(--border-subtle)' }}>
         <button type="button" onClick={() => void copySource()} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--border-default)', background:'var(--bg-raised)' }}>{copied?'Copied':'Copy code'}</button>
         <button type="button" onClick={reset} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--border-default)', background:'var(--bg-raised)' }}>Reset</button>
-        <button type="button" onClick={openInStudio} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--accent-iris)', background:'color-mix(in srgb,var(--accent-iris) 10%,var(--bg-raised))', color:'var(--text-primary)' }}>Open in Studio</button>
+        <button type="button" data-post-doc12-action="open-in-studio" onClick={openInStudio} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--accent-iris)', background:'color-mix(in srgb,var(--accent-iris) 10%,var(--bg-raised))', color:'var(--text-primary)' }}>Open in Studio</button>
         <span className="ml-auto text-[10px] font-semibold" style={{ color:'var(--text-tertiary)' }}>Verified preview · local edits are not executed</span>
       </div>
 
