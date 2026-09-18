@@ -4,7 +4,7 @@
 
 **Program:** POST-DOC-12 — Documentation UX, Navigation & Interactive Example Recovery  
 **Scope:** corrective documentation work after DOC-12; this is not DOC-13 and does not start Apexify.js Phase 15.  
-**Status:** **PRE-MERGE CLOSURE** — implementation and source-controlled recovery work are complete; final CI, PR merge, merge SHA recording, and post-merge `main` verification remain to be recorded before this report may say COMPLETE.
+**Status:** **COMPLETE** — implementation, final candidate CI, PR integration, merge-SHA recording, visual/diff review, and post-merge `main` verification are complete. No Apexify.js Phase 15 work was started.
 
 ## Repository identities
 
@@ -16,7 +16,8 @@
 - Apexify.js package repository: `EIAS79/Apexify.js`
 - Verified package commit: `2b64087a04411982067cc624031b3de6f663c530`
 - Verified package version: `apexify.js@6.0.0`
-- Recovery candidate immediately before this report commit: `7b06d80ad4e32152103937bb414d82d71ded4b6e`
+- Final pre-merge recovery head: `e7d1621daf7617b6d6e111386d013fe3fcb24d99`
+- Merged `main` recovery commit: `32d2971659c0a8c7400673562c6c39ca19c5f993`
 
 ## Legacy visual source
 
@@ -490,16 +491,18 @@ Generated evidence also includes:
 - Studio linkage;
 - regression invariants.
 
-## Not completed at this pre-merge checkpoint
+## Completion status
 
-The following items are intentionally not marked complete until they actually happen:
+All recovery closure items are complete:
 
-1. final candidate CI after this report commit;
-2. PR #39 transition from draft to ready;
-3. merge of PR #39;
-4. recording the real merge SHA;
-5. post-merge `main` verification;
-6. final update of this report from PRE-MERGE CLOSURE to COMPLETE.
+1. final pre-merge candidate CI on `e7d1621daf7617b6d6e111386d013fe3fcb24d99`: **PASS** across all 14 workflows;
+2. PR #39 transitioned from draft to ready: **DONE**;
+3. PR #39 merged to `main`: **DONE**;
+4. merge SHA recorded: `32d2971659c0a8c7400673562c6c39ca19c5f993`;
+5. post-merge `main` verification on the merge SHA: **PASS** across all 13 push-triggered workflows;
+6. recovery report status updated from PRE-MERGE CLOSURE to **COMPLETE**.
+
+No source-controlled recovery item remains open.
 
 ## Remaining risks
 
@@ -515,9 +518,16 @@ Residual operational risks are the normal ones covered by CI and production moni
 ## Final PR / merge / post-merge verification
 
 - PR: #39 — https://github.com/EIAS79/Apexify.js-Documentation/pull/39
-- PR state at report creation: draft/open
-- Merge SHA: **PENDING**
-- Post-merge `main` verification: **PENDING**
+- Final pre-merge head: `e7d1621daf7617b6d6e111386d013fe3fcb24d99`
+- Final pre-merge workflow matrix: **14/14 PASS**
+- PR state: **MERGED**
+- Merge SHA: `32d2971659c0a8c7400673562c6c39ca19c5f993`
+- `main` pointed to that exact merge SHA during post-merge certification: **YES**
+- Post-merge `main` workflow matrix: **13/13 PASS**
+- POST-DOC-12 UX Recovery on `main`: **PASS** (run #99)
+- DOC-11 Production Hardening on `main`: **PASS** (run #115)
+- DOC-12 Final Documentation Release Gate on `main`: **PASS** (run #76)
+- Documentation Runtime Build Gate on `main`: **PASS** (run #304)
 - Phase 15 started by this recovery: **NO**
 
-This section must be updated with the actual GitHub merge SHA and final `main` verification results before this report is marked COMPLETE.
+The POST-DOC-12 documentation UX, navigation, content, interactive-example, performance, and integration recovery is **COMPLETE**.
