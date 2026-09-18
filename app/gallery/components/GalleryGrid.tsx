@@ -8,7 +8,7 @@ import {
   FilmIcon,
 } from '@heroicons/react/24/outline';
 import { inferMediaKind } from '@/lib/gallery/core/galleryDocLink';
-import { CATEGORY_CONFIG, type FilterCategory } from './galleryConfig';
+import { CATEGORY_CONFIG } from './galleryConfig';
 import {
   galleryRuntime,
   galleryTrustLabel,
@@ -20,27 +20,27 @@ import {
 
 export default function GalleryGrid({
   items,
-  selectedFilter,
   onOpen,
+  variant = 'catalog',
 }: {
   items: GalleryItem[];
-  selectedFilter: FilterCategory;
   onOpen: (item: GalleryItem) => void;
+  variant?: 'catalog' | 'featured';
 }) {
   if (items.length === 0) {
     return (
       <div className="apx-gallery-empty">
         <span>NO MATCHES</span>
-        <h2>Nothing in this lens yet.</h2>
-        <p>Try another visual category, clear the search, or broaden source trust.</p>
+        <h2>Nothing in this view yet.</h2>
+        <p>Try another category, clear search, or broaden source trust.</p>
       </div>
     );
   }
 
   return (
-    <div className="apx-gallery-grid" data-filter={selectedFilter}>
-      {items.map((item, index) => (
-        <GalleryCard key={item.id} item={item} index={index} onOpen={onOpen} />
+    <div className="apx-gallery-grid" data-variant={variant}>
+      {items.map((item) => (
+        <GalleryCard key={item.id} item={item} onOpen={onOpen} featured={variant === 'featured'} />
       ))}
     </div>
   );
@@ -48,12 +48,12 @@ export default function GalleryGrid({
 
 function GalleryCard({
   item,
-  index,
   onOpen,
+  featured,
 }: {
   item: GalleryItem;
-  index: number;
   onOpen: (item: GalleryItem) => void;
+  featured: boolean;
 }) {
   const category = primaryBadgeCategory(item);
   const cfg = CATEGORY_CONFIG[category];
@@ -66,9 +66,8 @@ function GalleryCard({
     <article
       className="apx-gallery-card"
       data-category={category}
-      data-featured={item.featured || undefined}
+      data-featured={featured || undefined}
       data-media={mediaKind}
-      data-index={(index % 8) + 1}
     >
       <button type="button" className="apx-gallery-card__button" onClick={() => onOpen(item)}>
         <div className="apx-gallery-card__visual">
@@ -76,20 +75,21 @@ function GalleryCard({
             <video
               src={item.thumbnail}
               muted
-              loop
-              autoPlay
               playsInline
               preload="metadata"
               aria-label={item.title}
             />
           ) : (
-            // Gallery assets are local generated outputs; native img keeps GIF animation intact.
+            // Local generated outputs; native img preserves animated GIF playback.
             // eslint-disable-next-line @next/next/no-img-element
             <img src={item.thumbnail} alt="" loading="lazy" />
           )}
 
           <div className="apx-gallery-card__visual-top">
-            <span className="apx-gallery-card__category" style={{ '--card-accent': cfg.accent } as CSSProperties}>
+            <span
+              className="apx-gallery-card__category"
+              style={{ '--card-accent': cfg.accent } as CSSProperties}
+            >
               {cfg.short}
             </span>
             <span className="apx-gallery-card__trust" data-verified={verified || undefined}>
