@@ -10,7 +10,10 @@ body:has(#gallery-main) [style*="color:var(--text-muted)"] {
   color: var(--text-secondary) !important;
 }
 
-.dark body:has(#gallery-main) .text-white[style*="background-color:var(--accent)"] {
+.dark body:has(#gallery-main) .text-white[style*="background-color:var(--accent)"],
+.dark body:has(#gallery-main) .text-white[style*="background-color:var(--accent-iris)"],
+.dark body:has(#gallery-main) .text-white[style*="background-color:var(--accent-amber)"],
+.dark body:has(#gallery-main) .text-white[style*="background-color:var(--success)"] {
   color: #08101f !important;
 }
 
