@@ -204,3 +204,31 @@
   .apx-doc-background::before{display:none}
   .apx-doc-content{padding-top:1.25rem}
 }
+
+/* Verified example surfaces use the same inspector language as API/docs. */
+.apx-doc5-example{
+  border:1px solid var(--apx-border-default);
+  border-radius:.6rem;
+  background:var(--apx-surface-content);
+  box-shadow:none;
+  overflow:hidden;
+}
+.apx-doc5-example__header{
+  border-bottom:1px solid var(--apx-border-default);
+  background:var(--apx-surface-raised);
+}
+.apx-doc5-kicker,.apx-doc5-proof-note{
+  font-family:var(--apx-font-code);
+  letter-spacing:.045em;
+}
+.apx-doc5-code-preview,.apx-doc5-notes{
+  border-radius:.5rem;
+}
+.apx-doc5-example__footer{
+  border-top:1px solid var(--apx-border-default);
+  background:var(--apx-surface-raised);
+}
+.apx-example-workbench{
+  border-radius:.6rem !important;
+  box-shadow:none !important;
+}
