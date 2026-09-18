@@ -15,7 +15,7 @@ export function CodePreview({ example: provided, id }: { example?: GeneratedExam
     <section className="apx-doc5-code-preview" data-doc5-component="CodePreview" aria-labelledby={`source-${example.id}`}>
       <div className="apx-doc5-section-heading"><h3 id={`source-${example.id}`}>Authoritative source</h3></div>
       <CodeGroup items={items} ariaLabel={`${example.title} source files`} />
-      <p className="apx-doc5-proof-note">Source hash: <code>{example.sourceHash}</code>. The displayed payload is generated from the files executed by DOC-5 verification.</p>
+      <p className="apx-doc5-proof-note">Source hash: <code>{example.sourceHash}</code>. The displayed payload is generated from the exact repository-controlled files used by the verification pipeline.</p>
     </section>
   );
 }
