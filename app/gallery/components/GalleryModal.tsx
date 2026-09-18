@@ -306,7 +306,7 @@ export default function GalleryModal({
         aria-describedby="gallery-modal-about"
       >
         <div
-          className="pointer-events-auto flex flex-col flex-1 min-h-0 max-h-[100dvh] sm:max-h-[calc(100dvh-1.5rem)] md:max-h-[calc(100dvh-3rem)] w-full max-w-7xl mx-auto rounded-none sm:rounded-2xl lg:rounded-3xl overflow-hidden surface-elevated"
+          className="apx-gallery-inspector pointer-events-auto flex flex-col flex-1 min-h-0 max-h-[100dvh] sm:max-h-[calc(100dvh-1.5rem)] md:max-h-[calc(100dvh-3rem)] w-full max-w-7xl mx-auto rounded-none sm:rounded-2xl lg:rounded-3xl overflow-hidden surface-elevated"
           style={{
             backgroundColor: 'var(--bg-canvas)',
             borderColor: 'var(--border-default)',
@@ -315,7 +315,7 @@ export default function GalleryModal({
         >
           {/* HEADER */}
           <div
-            className="flex-shrink-0 px-4 sm:px-6 py-4 border-b"
+            className="apx-gallery-inspector__header flex-shrink-0 px-4 sm:px-6 py-4 border-b"
             style={{
               borderColor: 'var(--border-subtle)',
               backgroundColor: 'var(--bg-raised)',
