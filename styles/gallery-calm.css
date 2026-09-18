@@ -69,7 +69,7 @@
   --success:var(--gallery-success);
   --danger:var(--gallery-danger);
   --warning:#c5ad74;
-  --gradient-sunset:linear-gradient(135deg,var(--gallery-blue),var(--gallery-mint));
+  --gradient-sunset:linear-gradient(135deg,#4058cc,#655e99);
   --gradient-iris:linear-gradient(135deg,var(--gallery-blue),var(--gallery-lavender));
   --glow-magenta:none;
   --glow-iris:none;
@@ -681,10 +681,6 @@
 .apx-gallery-root [role="dialog"] button{
   box-shadow:none!important;
 }
-.apx-gallery-root [role="dialog"] .text-white{
-  color:var(--text-inverse);
-}
-
 /* Responsive specimen rhythm */
 @media(min-width:640px){
   .apx-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -734,4 +730,13 @@
 @media(prefers-reduced-motion:reduce){
   .apx-gallery-card,
   .apx-gallery-tools{transition:none!important}
+}
+
+.apx-gallery-inspector{
+  background:var(--gallery-bg)!important;
+  border:1px solid var(--gallery-line)!important;
+}
+.apx-gallery-inspector__header{
+  background:var(--gallery-panel)!important;
+  border-color:var(--gallery-line)!important;
 }
