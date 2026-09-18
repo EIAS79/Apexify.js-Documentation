@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -194,7 +195,7 @@ function CompositionPreview() {
   );
 }
 
-function ApproachCell({ tone, children }: { tone: 'strong' | 'mid' | 'soft'; children: React.ReactNode }) {
+function ApproachCell({ tone, children }: { tone: 'strong' | 'mid' | 'soft'; children: ReactNode }) {
   return (
     <div className="apx-compare-cell" data-tone={tone}>
       {tone === 'strong' ? <CheckIcon className="h-3.5 w-3.5" /> : <MinusIcon className="h-3.5 w-3.5" />}
