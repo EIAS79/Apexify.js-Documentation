@@ -77,6 +77,7 @@ function GalleryCard({
               src={item.thumbnail}
               muted
               loop
+              autoPlay
               playsInline
               preload="metadata"
               aria-label={item.title}
