@@ -24,38 +24,31 @@ export default function GalleryScopeBar({
   onEvidenceChange: (value: GalleryEvidenceFilter) => void;
 }) {
   return (
-    <section className="apx-gallery-scope" aria-label="Source trust and runtime">
-      <div className="apx-gallery-scope__copy">
-        <span className="apx-gallery-label">SOURCE TRUST</span>
-        <p>
-          <strong>Verified source</strong> points to repository-controlled executable evidence.
-          <strong> Curated demo</strong> means the piece is preserved product showcase material,
-          not execution proof.
-        </p>
-      </div>
+    <section className="apx-gallery-scope" aria-label="Gallery source trust and runtime">
+      <ScopeGroup label="Source trust">
+        <ScopeButton active={evidence === 'all'} onClick={() => onEvidenceChange('all')}>
+          <CircleStackIcon /> All <small>{verifiedCount + legacyCount}</small>
+        </ScopeButton>
+        <ScopeButton active={evidence === 'verified'} onClick={() => onEvidenceChange('verified')}>
+          <CheckBadgeIcon /> Verified <small>{verifiedCount}</small>
+        </ScopeButton>
+        <ScopeButton active={evidence === 'legacy'} onClick={() => onEvidenceChange('legacy')}>
+          <CircleStackIcon /> Curated <small>{legacyCount}</small>
+        </ScopeButton>
+      </ScopeGroup>
 
-      <div className="apx-gallery-scope__groups">
-        <ScopeGroup label="Trust">
-          <ScopeButton active={evidence === 'all'} onClick={() => onEvidenceChange('all')}>
-            <CircleStackIcon /> All
-          </ScopeButton>
-          <ScopeButton active={evidence === 'verified'} onClick={() => onEvidenceChange('verified')}>
-            <CheckBadgeIcon /> Verified {verifiedCount}
-          </ScopeButton>
-          <ScopeButton active={evidence === 'legacy'} onClick={() => onEvidenceChange('legacy')}>
-            <CircleStackIcon /> Curated {legacyCount}
-          </ScopeButton>
-        </ScopeGroup>
+      <ScopeGroup label="Runtime">
+        <ScopeButton active={runtime === 'all'} onClick={() => onRuntimeChange('all')}>
+          <CircleStackIcon /> All
+        </ScopeButton>
+        <ScopeButton active={runtime === 'node'} onClick={() => onRuntimeChange('node')}>
+          <ServerStackIcon /> Node
+        </ScopeButton>
+      </ScopeGroup>
 
-        <ScopeGroup label="Runtime">
-          <ScopeButton active={runtime === 'all'} onClick={() => onRuntimeChange('all')}>
-            <CircleStackIcon /> All
-          </ScopeButton>
-          <ScopeButton active={runtime === 'node'} onClick={() => onRuntimeChange('node')}>
-            <ServerStackIcon /> Node
-          </ScopeButton>
-        </ScopeGroup>
-      </div>
+      <p className="apx-gallery-scope__note">
+        Verified = repository-controlled executable source. Curated = showcase material.
+      </p>
     </section>
   );
 }
