@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import {
   ArrowUpRightIcon,
   CheckBadgeIcon,
@@ -87,7 +88,7 @@ function GalleryCard({
           )}
 
           <div className="apx-gallery-card__visual-top">
-            <span className="apx-gallery-card__category" style={{ '--card-accent': cfg.accent } as React.CSSProperties}>
+            <span className="apx-gallery-card__category" style={{ '--card-accent': cfg.accent } as CSSProperties}>
               {cfg.short}
             </span>
             <span className="apx-gallery-card__trust" data-verified={verified || undefined}>
