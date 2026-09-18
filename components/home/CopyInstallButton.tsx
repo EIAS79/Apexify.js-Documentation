@@ -20,10 +20,10 @@ export default function CopyInstallButton({ command }: { command: string }) {
     <button
       type="button"
       onClick={copy}
-      className="inline-flex max-w-full items-center gap-2 rounded-xl border px-3.5 py-2.5 text-left font-mono text-xs sm:text-sm"
+      className="apx-home-copy-install inline-flex max-w-full items-center gap-2 border px-3.5 py-2.5 text-left font-mono text-xs sm:text-sm"
       style={{
-        borderColor: 'var(--border-default)',
-        backgroundColor: 'var(--bg-sunken)',
+        borderColor: 'var(--border)',
+        backgroundColor: 'var(--surface-1)',
         color: 'var(--text-secondary)',
       }}
       aria-label="Copy Apexify.js install command"
