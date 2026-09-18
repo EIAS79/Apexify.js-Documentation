@@ -59,7 +59,7 @@ function LayoutPills({
         onClick={() => onChange(m)}
         className="touch-manipulation inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
         style={{
-          color: active ? 'white' : 'var(--text-secondary)',
+          color: active ? 'var(--text-inverse)' : 'var(--text-secondary)',
           background: active ? 'var(--accent)' : 'transparent',
           boxShadow: 'none',
         }}
