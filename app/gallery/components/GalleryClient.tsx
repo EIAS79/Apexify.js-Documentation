@@ -26,6 +26,7 @@ import {
   type GalleryRuntimeFilter,
 } from './galleryHelpers';
 import {
+  CATEGORY_CONFIG,
   HASH_TYPE_TO_FILTER,
   type FilterCategory,
   type SortMode,
@@ -34,8 +35,12 @@ import { buildGalleryHash } from '@/lib/gallery/core/galleryDocLink';
 import GalleryHero from './GalleryHero';
 import GalleryFilterBar from './GalleryFilterBar';
 import GalleryScopeBar from './GalleryScopeBar';
+import GalleryToolbar from './GalleryToolbar';
 import GalleryGrid from './GalleryGrid';
 import GalleryModal from './GalleryModal';
+
+const PAGE_SIZE = 24;
+const FEATURED_LIMIT = 4;
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -54,6 +59,7 @@ export default function GalleryClient() {
   const [sort, setSort] = useState<SortMode>('curated');
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
   const [shuffleSeed, setShuffleSeed] = useState(0);
+  const [visibleLimit, setVisibleLimit] = useState(PAGE_SIZE);
 
   const filterCounts = useMemo(() => {
     const counts: Record<Exclude<FilterCategory, 'all'>, number> = {
@@ -112,8 +118,36 @@ export default function GalleryClient() {
     }
   }, [selectedCategory, runtime, evidence, query, sort, shuffleSeed]);
 
+  const showFeatured =
+    selectedCategory === 'all' &&
+    runtime === 'all' &&
+    evidence === 'all' &&
+    query.trim() === '' &&
+    sort === 'curated';
+
+  const featuredItems = useMemo(
+    () => (showFeatured ? visibleItems.filter((item) => item.featured).slice(0, FEATURED_LIMIT) : []),
+    [showFeatured, visibleItems],
+  );
+
+  const featuredIds = useMemo(() => new Set(featuredItems.map((item) => item.id)), [featuredItems]);
+
+  const catalogItems = useMemo(
+    () => (showFeatured ? visibleItems.filter((item) => !featuredIds.has(item.id)) : visibleItems),
+    [showFeatured, visibleItems, featuredIds],
+  );
+
+  const displayedCatalogItems = catalogItems.slice(0, visibleLimit);
+  const hasMore = displayedCatalogItems.length < catalogItems.length;
+  const activeLabel =
+    selectedCategory === 'all' ? 'All outputs' : CATEGORY_CONFIG[selectedCategory].label;
+
   useEffect(() => {
     if (sort === 'shuffle') setShuffleSeed((value) => value + 1);
+  }, [selectedCategory, runtime, evidence, query, sort]);
+
+  useEffect(() => {
+    setVisibleLimit(PAGE_SIZE);
   }, [selectedCategory, runtime, evidence, query, sort]);
 
   useEffect(() => {
@@ -195,41 +229,84 @@ export default function GalleryClient() {
       <main id="gallery-main" tabIndex={-1}>
         <GalleryHero counts={heroCounts} version={galleryPackageVersion()} />
 
-        <div className="apx-gallery-shell apx-gallery-control-stack">
-          <GalleryScopeBar
-            runtime={runtime}
-            evidence={evidence}
-            verifiedCount={evidenceCounts.verified}
-            legacyCount={evidenceCounts.legacy}
-            onRuntimeChange={setRuntime}
-            onEvidenceChange={setEvidence}
-          />
+        <section className="apx-gallery-library" aria-label="Gallery library">
+          <div className="apx-gallery-shell apx-gallery-library__layout">
+            <aside className="apx-gallery-sidebar">
+              <div className="apx-gallery-sidebar__sticky">
+                <GalleryFilterBar
+                  selected={selectedCategory}
+                  onSelect={setSelectedCategory}
+                  counts={filterCounts}
+                  totalCount={galleryItems.length}
+                />
 
-          <GalleryFilterBar
-            selected={selectedCategory}
-            onSelect={setSelectedCategory}
-            counts={filterCounts}
-            totalCount={galleryItems.length}
-            filteredCount={visibleItems.length}
-            query={query}
-            onQueryChange={setQuery}
-            sort={sort}
-            onSortChange={setSort}
-          />
-        </div>
-
-        <section className="apx-gallery-results" aria-label="Gallery results">
-          <div className="apx-gallery-shell">
-            <div className="apx-gallery-results__heading">
-              <div>
-                <span>LIBRARY / {selectedCategory.toUpperCase()}</span>
-                <h2>{query ? `Results for “${query}”` : 'Selected output studies'}</h2>
+                <GalleryScopeBar
+                  runtime={runtime}
+                  evidence={evidence}
+                  verifiedCount={evidenceCounts.verified}
+                  legacyCount={evidenceCounts.legacy}
+                  onRuntimeChange={setRuntime}
+                  onEvidenceChange={setEvidence}
+                />
               </div>
-              <p>
-                {visibleItems.length} {visibleItems.length === 1 ? 'piece' : 'pieces'} · {sort === 'curated' ? 'verified and featured first' : sort}
-              </p>
+            </aside>
+
+            <div className="apx-gallery-catalog">
+              <GalleryToolbar
+                query={query}
+                onQueryChange={setQuery}
+                sort={sort}
+                onSortChange={setSort}
+                filteredCount={visibleItems.length}
+                totalCount={galleryItems.length}
+              />
+
+              {featuredItems.length > 0 ? (
+                <section className="apx-gallery-featured" aria-labelledby="gallery-featured-title">
+                  <div className="apx-gallery-section-heading">
+                    <div>
+                      <span>FEATURED</span>
+                      <h2 id="gallery-featured-title">Selected work</h2>
+                    </div>
+                    <p>{featuredItems.length} curated highlights</p>
+                  </div>
+                  <GalleryGrid items={featuredItems} onOpen={openItem} variant="featured" />
+                </section>
+              ) : null}
+
+              <section className="apx-gallery-catalog-list" aria-labelledby="gallery-catalog-title">
+                <div className="apx-gallery-section-heading">
+                  <div>
+                    <span>LIBRARY / {selectedCategory.toUpperCase()}</span>
+                    <h2 id="gallery-catalog-title">
+                      {query ? `Results for “${query}”` : activeLabel}
+                    </h2>
+                  </div>
+                  <p>
+                    Showing {displayedCatalogItems.length} of {catalogItems.length}
+                  </p>
+                </div>
+
+                <GalleryGrid items={displayedCatalogItems} onOpen={openItem} />
+
+                {hasMore ? (
+                  <div className="apx-gallery-load-more">
+                    <button
+                      type="button"
+                      onClick={() => setVisibleLimit((value) => value + PAGE_SIZE)}
+                    >
+                      <span>Load 24 more</span>
+                      <small>{catalogItems.length - displayedCatalogItems.length} remaining</small>
+                    </button>
+                  </div>
+                ) : catalogItems.length > 0 ? (
+                  <div className="apx-gallery-catalog-end">
+                    <span>END OF CURRENT SET</span>
+                    <small>{catalogItems.length} pieces in this view</small>
+                  </div>
+                ) : null}
+              </section>
             </div>
-            <GalleryGrid items={visibleItems} selectedFilter={selectedCategory} onOpen={openItem} />
           </div>
         </section>
 
