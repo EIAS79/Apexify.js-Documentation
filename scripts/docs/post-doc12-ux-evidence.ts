@@ -79,7 +79,7 @@ const workbenchSource = read('components/docs/playground/VerifiedExamplePlaygrou
 const loaderSource = read('components/docs/playground/CanvasPlaygroundLoader.tsx');
 const studioSource = read('lib/studio/studioStorage.ts');
 
-for (const text of ['Draw ', 'From a ', 'ProductExperienceModel', 'model.heroExample', 'DOC-5']) {
+for (const text of ['Render visuals with JavaScript.', 'PROGRAMMABLE GRAPHICS / NODE RUNTIME', 'ProductExperienceModel', 'model.heroExample', 'data-doc7-verified-hero', 'data-product-status']) {
   invariant(homeSource.includes(text), `homepage recovery marker missing: ${text}`);
 }
 invariant(!homeSource.includes("'use client'"), 'homepage recovery clientified the server component');
@@ -156,7 +156,7 @@ write('identity.json', {
 });
 write('legacy-homepage-reference.json', {
   commit: '46b7eb1712fcb1456c23eca9b2077d6f4e51f25d',
-  role: 'visual/UX reference only',
+  role: 'historical visual/UX reference only; superseded by precision graphics redesign',
   restoredArchitecture: false,
   recoveredSignals: ['legacy hero composition', 'aurora atmosphere', 'Studio-first CTA', 'verified code/output showcase', 'asymmetric gallery rhythm'],
 });
@@ -167,13 +167,13 @@ write('homepage-comparison.json', {
     { component: 'Hero composition/headline', decision: 'RESTORE VISUALLY', implementation: 'legacy headline scale/rhythm and two-column code-output showcase rebuilt on current data model' },
     { component: 'Global navigation', decision: 'KEEP CURRENT', implementation: 'current routing, status truth and shell retained' },
     { component: 'Typography/spacing', decision: 'MERGE', implementation: 'legacy dramatic hierarchy with current tokens/accessibility' },
-    { component: 'Backgrounds/gradients', decision: 'RESTORE VISUALLY', implementation: 'aurora/radial atmosphere restored with CSS tokens; no old client animation stack' },
+    { component: 'Backgrounds/gradients', decision: 'REPLACE', implementation: 'precision canvas/grid motifs replace aurora and decorative gradients' },
     { component: 'Uniform giant-card layout', decision: 'REMOVE', implementation: 'replaced by bento capability rhythm and track rows' },
     { component: 'Capability presentation', decision: 'REDESIGN', implementation: 'asymmetric current-data bento sourced from DOC-4' },
     { component: 'Code/output demonstration', decision: 'MERGE', implementation: 'legacy terminal/window feel with DOC-5 verified source/output' },
     { component: 'Animations', decision: 'KEEP CURRENT', implementation: 'no legacy Framer Motion restoration; reduced-motion and server-first architecture preserved' },
-    { component: 'Primary CTA', decision: 'RESTORE VISUALLY', implementation: 'Studio-first CTA restored, docs remains secondary' },
-    { component: 'Gallery preview', decision: 'RESTORE VISUALLY', implementation: 'asymmetric media wall using verified gallery assets' },
+    { component: 'Primary CTA', decision: 'REDESIGN', implementation: 'documentation-first entry with Gallery output inspection as secondary' },
+    { component: 'Gallery preview', decision: 'REDESIGN', implementation: 'output-first evidence library using verified gallery assets' },
     { component: 'Footer', decision: 'MERGE', implementation: 'compact legacy-like rhythm with current package/version truth' },
   ],
 });
