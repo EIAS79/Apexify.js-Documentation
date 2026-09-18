@@ -241,3 +241,31 @@
 .apx-doc3-media figcaption {
   color:var(--apx-text-secondary);
 }
+
+/* Active navigation must beat legacy recovery specificity while preserving
+   a theme-aware foreground: white on the darker light-theme blue, dark ink
+   on the brighter dark-theme blue. */
+.apx-sidebar-node[data-active="true"] > .apx-sidebar-node__row .apx-sidebar-link,
+.apx-sidebar-link[aria-current="page"] {
+  background:var(--apx-color-accent);
+  color:var(--apx-text-inverse);
+}
+.apx-sidebar-node[data-active="true"] > .apx-sidebar-node__row .apx-sidebar-link .apx-sidebar-link__title,
+.apx-sidebar-node[data-active="true"] > .apx-sidebar-node__row .apx-sidebar-link .apx-sidebar-tag,
+.apx-sidebar-link[aria-current="page"] .apx-sidebar-link__title,
+.apx-sidebar-link[aria-current="page"] .apx-sidebar-tag {
+  color:var(--apx-text-inverse) !important;
+}
+.apx-sidebar-node[data-active="true"] > .apx-sidebar-node__row .apx-sidebar-link .apx-sidebar-tag,
+.apx-sidebar-link[aria-current="page"] .apx-sidebar-tag {
+  background:transparent;
+  border-color:color-mix(in srgb,var(--apx-text-inverse) 44%,transparent);
+}
+
+/* Prose inline-code styling must not paint a light box inside the dark API
+   signature inspector. */
+.apx-api-signature > code,
+.apx-api-signature pre code {
+  background:transparent !important;
+  color:inherit !important;
+}
