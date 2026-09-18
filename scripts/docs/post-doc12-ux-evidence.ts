@@ -105,7 +105,7 @@ for (const mapping of ['<Table ', '<TableHead ', '<TableBody ', '<TableRow ', '<
   invariant(routedMarkdownSource.includes(mapping), `migrated routed Markdown does not reuse shared table primitive: ${mapping}`);
 }
 
-for (const text of ['ExampleWorkbench', "'ts' | 'preview' | 'both'", 'Copy code', 'Reset', 'Open in Studio', 'encodeShareLink', 'DOC-5 verified output']) {
+for (const text of ['ExampleWorkbench', "'ts' | 'preview' | 'both'", 'Copy code', 'Reset', 'Open in Studio', 'encodeShareLink', 'repository-verified output']) {
   invariant(workbenchSource.includes(text), `workbench marker missing: ${text}`);
 }
 invariant(!/\bRun\b/.test(workbenchSource), 'workbench falsely exposes browser Run behavior');
