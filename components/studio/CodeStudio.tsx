@@ -3,7 +3,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  ExclamationTriangleIcon,
   InformationCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
