@@ -26,6 +26,11 @@ const galleryRunNativeIncludes = [
   './node_modules/@img/sharp-libvips-linuxmusl-x64/**/*',
   './node_modules/@img/sharp-libvips-linuxmusl-arm64/**/*',
   './vendor/studio-deno/**/*',
+  './vendor/studio-ffmpeg/**/*',
+  './scripts/studio/ffmpeg-proxy',
+  './scripts/studio/ffprobe-proxy',
+  './scripts/studio/media-process-proxy.mjs',
+  './scripts/studio/media-process-proxy-cli.mjs',
 ]
 
 const doc6SearchIncludes = [

@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+for NODE_BIN in /usr/bin/node /usr/local/bin/node /nodejs/bin/node; do
+  if [ -x "$NODE_BIN" ]; then
+    exec "$NODE_BIN" "$SCRIPT_DIR/media-process-proxy-cli.mjs" ffmpeg "$@"
+  fi
+done
+
+echo "Studio media proxy: Node runtime not found." >&2
+exit 127

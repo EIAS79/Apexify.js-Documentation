@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -5,7 +6,7 @@ import { join, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { InteractiveArtifact } from '@/lib/docs/playground/contracts';
 import { DOC8_RESOURCE_LIMITS } from '@/lib/docs/playground/contracts';
-import { detectStudioMedia } from './media';
+import { deriveStudioMediaMetadata, detectStudioMedia } from './media';
 import type { StudioVirtualAsset } from './assets';
 import { STUDIO_ASSET_LIMITS } from './assets';
 import { wrapStudioSnippetForRunner } from './wrapStudioSnippetForRunner';
@@ -46,6 +47,16 @@ export type IsolatedStudioRunResult = {
 };
 
 const APEXIFY_PIN = 'github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b';
+const MEDIA_CAPABILITY_DIR = join(tmpdir(), 'apexify-studio-media-caps');
+
+type StudioMediaCapability = {
+  id: string;
+  file: string;
+  ffmpegProxy: string;
+  ffprobeProxy: string;
+  ffmpeg: string;
+  ffprobe: string;
+};
 
 const EXECUTION_LIMITS = Object.freeze({
   processOutputBytes: Math.min(DOC8_RESOURCE_LIMITS.processBufferBytes, 2 * 1024 * 1024),
@@ -72,8 +83,99 @@ function nativeCanvasRoot(): string {
   return join(projectRoot(), 'node_modules', '@napi-rs');
 }
 
+function nativeCanvasEntry(): string {
+  return join(projectRoot(), 'node_modules', '@napi-rs', 'canvas', 'index.js');
+}
+
+function defaultStudioFontPath(): string {
+  return join(
+    projectRoot(),
+    'node_modules',
+    'dejavu-fonts-ttf',
+    'ttf',
+    'DejaVuSans.ttf',
+  );
+}
+
+function mediaProxyPaths(): { ffmpegProxy: string; ffprobeProxy: string } {
+  return {
+    ffmpegProxy: join(projectRoot(), 'scripts', 'studio', 'ffmpeg-proxy'),
+    ffprobeProxy: join(projectRoot(), 'scripts', 'studio', 'ffprobe-proxy'),
+  };
+}
+
+function mediaBinaryPair(): { ffmpeg: string; ffprobe: string } | null {
+  const root = projectRoot();
+  const candidates = [
+    {
+      ffmpeg: join(root, 'vendor', 'studio-ffmpeg', process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg'),
+      ffprobe: join(root, 'vendor', 'studio-ffmpeg', process.platform === 'win32' ? 'ffprobe.exe' : 'ffprobe'),
+    },
+    { ffmpeg: '/usr/bin/ffmpeg', ffprobe: '/usr/bin/ffprobe' },
+    { ffmpeg: '/usr/local/bin/ffmpeg', ffprobe: '/usr/local/bin/ffprobe' },
+    { ffmpeg: '/opt/homebrew/bin/ffmpeg', ffprobe: '/opt/homebrew/bin/ffprobe' },
+  ];
+
+  for (const pair of candidates) {
+    if (existsSync(pair.ffmpeg) && existsSync(pair.ffprobe)) {
+      return { ffmpeg: realpathSync(pair.ffmpeg), ffprobe: realpathSync(pair.ffprobe) };
+    }
+  }
+  return null;
+}
+
+function createMediaCapability(runDir: string): StudioMediaCapability | null {
+  const binaries = mediaBinaryPair();
+  const proxies = mediaProxyPaths();
+  if (!binaries || !existsSync(proxies.ffmpegProxy) || !existsSync(proxies.ffprobeProxy)) {
+    return null;
+  }
+
+  mkdirSync(MEDIA_CAPABILITY_DIR, { recursive: true, mode: 0o700 });
+  const id = randomUUID();
+  const file = join(MEDIA_CAPABILITY_DIR, `${id}.json`);
+  writeFileSync(
+    file,
+    JSON.stringify(
+      {
+        version: 1,
+        runRoot: resolve(runDir),
+        ffmpeg: binaries.ffmpeg,
+        ffprobe: binaries.ffprobe,
+      },
+      null,
+      2,
+    ),
+    { mode: 0o600 },
+  );
+
+  return {
+    id,
+    file,
+    ffmpegProxy: realpathSync(proxies.ffmpegProxy),
+    ffprobeProxy: realpathSync(proxies.ffprobeProxy),
+    ...binaries,
+  };
+}
+
 export function sameOriginStudioIsolationAvailable(): boolean {
-  return existsSync(denoBinary()) && existsSync(apexifyEntry()) && existsSync(nativeCanvasRoot());
+  return (
+    existsSync(denoBinary()) &&
+    existsSync(apexifyEntry()) &&
+    existsSync(nativeCanvasRoot()) &&
+    existsSync(nativeCanvasEntry()) &&
+    existsSync(defaultStudioFontPath())
+  );
+}
+
+export function sameOriginStudioVideoAvailable(): boolean {
+  const proxies = mediaProxyPaths();
+  return Boolean(
+    sameOriginStudioIsolationAvailable() &&
+      mediaBinaryPair() &&
+      existsSync(proxies.ffmpegProxy) &&
+      existsSync(proxies.ffprobeProxy),
+  );
 }
 
 function safeAssetName(value: string): string {
@@ -183,6 +285,7 @@ function artifactFromEntry(
   }
 
   const detected = detectStudioMedia(bytes, name);
+  const derived = deriveStudioMediaMetadata(bytes, detected);
   return {
     artifact: {
       id,
@@ -190,14 +293,22 @@ function artifactFromEntry(
       kind: entry.kind ?? detected.kind,
       mime: entry.mime ?? detected.mime,
       base64: bytes.toString('base64'),
-      metadata: entry.metadata,
+      metadata: { ...derived, ...(entry.metadata ?? {}) },
     },
     bytes: bytes.length,
   };
 }
 
-function safeEnvironment(runDir: string, artifactDir: string, manifestPath: string, assetManifest: string, errPath: string) {
-  return {
+function safeEnvironment(
+  runDir: string,
+  artifactDir: string,
+  manifestPath: string,
+  assetManifest: string,
+  errPath: string,
+  media: StudioMediaCapability | null,
+): NodeJS.ProcessEnv {
+  const env: NodeJS.ProcessEnv = {
+    NODE_ENV: 'production',
     GALLERY_ERR: errPath,
     STUDIO_ARTIFACT_DIR: artifactDir,
     STUDIO_MANIFEST: manifestPath,
@@ -207,9 +318,21 @@ function safeEnvironment(runDir: string, artifactDir: string, manifestPath: stri
     DENO_NO_UPDATE_CHECK: '1',
     NO_COLOR: '1',
   };
+
+  if (media) {
+    env.APEXIFY_FFMPEG_PATH = media.ffmpegProxy;
+    env.APEXIFY_FFPROBE_PATH = media.ffprobeProxy;
+    env.STUDIO_MEDIA_CAP_ID = media.id;
+  }
+
+  return env;
 }
 
-function denoArguments(runDir: string, entry: string): string[] {
+function denoArguments(
+  runDir: string,
+  entry: string,
+  media: StudioMediaCapability | null,
+): string[] {
   const root = projectRoot();
   const readPaths = [
     runDir,
@@ -219,17 +342,19 @@ function denoArguments(runDir: string, entry: string): string[] {
   ].filter((path) => existsSync(path));
 
   const envNames = [
+    'NODE_ENV',
     'GALLERY_ERR',
     'STUDIO_ARTIFACT_DIR',
     'STUDIO_MANIFEST',
     'STUDIO_ASSET_MANIFEST',
     'APEXIFY_TEMP_DIR',
+    ...(media ? ['APEXIFY_FFMPEG_PATH', 'APEXIFY_FFPROBE_PATH', 'STUDIO_MEDIA_CAP_ID'] : []),
     'DENO_DIR',
     'DENO_NO_UPDATE_CHECK',
     'NO_COLOR',
   ];
 
-  return [
+  const args = [
     'run',
     '--quiet',
     '--no-prompt',
@@ -240,8 +365,14 @@ function denoArguments(runDir: string, entry: string): string[] {
     `--allow-env=${envNames.join(',')}`,
     `--allow-ffi=${nativeCanvasRoot()}`,
     `--v8-flags=--max-old-space-size=${EXECUTION_LIMITS.v8HeapMb}`,
-    entry,
   ];
+
+  if (media) {
+    args.push(`--allow-run=${media.ffmpegProxy},${media.ffprobeProxy}`);
+  }
+
+  args.push(entry);
+  return args;
 }
 
 function executeDeno(
@@ -251,10 +382,11 @@ function executeDeno(
   manifestPath: string,
   assetManifest: string,
   errPath: string,
+  media: StudioMediaCapability | null,
 ): Promise<{ exitCode: number | null; stderr: string; timedOut: boolean }> {
   return new Promise((resolveRun, rejectRun) => {
     const deno = denoBinary();
-    const args = denoArguments(runDir, entry);
+    const args = denoArguments(runDir, entry, media);
 
     const prlimit = '/usr/bin/prlimit';
     const command = process.platform === 'linux' && existsSync(prlimit) ? prlimit : deno;
@@ -273,7 +405,7 @@ function executeDeno(
 
     const child = spawn(command, commandArgs, {
       cwd: runDir,
-      env: safeEnvironment(runDir, artifactDir, manifestPath, assetManifest, errPath),
+      env: safeEnvironment(runDir, artifactDir, manifestPath, assetManifest, errPath, media),
       stdio: ['ignore', 'pipe', 'pipe'],
       windowsHide: true,
     });
@@ -368,6 +500,7 @@ export async function runSameOriginIsolatedStudio(
   mkdirSync(artifactDir, { recursive: true });
   mkdirSync(join(runDir, 'apexify-tmp'), { recursive: true });
   mkdirSync(join(runDir, 'deno-cache'), { recursive: true });
+  const media = createMediaCapability(runDir);
 
   try {
     const materialized = materializeAssets(runDir, assets);
@@ -382,6 +515,8 @@ export async function runSameOriginIsolatedStudio(
       entry,
       wrapStudioSnippetForRunner(executable, {
         apexifyImportHref: pathToFileURL(apexifyEntry()).href,
+        canvasImportHref: pathToFileURL(nativeCanvasEntry()).href,
+        defaultFontPath: defaultStudioFontPath(),
       }),
       { mode: 0o600 },
     );
@@ -394,6 +529,7 @@ export async function runSameOriginIsolatedStudio(
       manifestPath,
       assetManifestPath,
       errPath,
+      media,
     );
     const elapsedMs = Date.now() - started;
 
@@ -480,6 +616,13 @@ export async function runSameOriginIsolatedStudio(
     };
   } finally {
     activeRuns = Math.max(0, activeRuns - 1);
+    if (media) {
+      try {
+        rmSync(media.file, { force: true });
+      } catch {
+        // best-effort media capability cleanup
+      }
+    }
     try {
       rmSync(runDir, { recursive: true, force: true });
     } catch {

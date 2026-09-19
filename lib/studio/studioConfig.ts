@@ -748,6 +748,320 @@ const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'gro
   });`,
   },
   {
+    id: 'animate-frame-sequence',
+    name: 'Animate · frame sequence',
+    blurb: 'Render Apexify animation frames and inspect the returned frame collection directly in Studio.',
+    group: 'Media',
+    body: `  return painter.animate([
+    { backgroundColor: '#0b1020', duration: 120, width: 640, height: 360 },
+    {
+      gradient: {
+        type: 'linear',
+        startX: 0, startY: 0,
+        endX: 640, endY: 360,
+        colors: [
+          { stop: 0, color: '#172554' },
+          { stop: 1, color: '#7c3aed' },
+        ],
+      },
+      duration: 120,
+      width: 640,
+      height: 360,
+    },
+    { backgroundColor: '#0f766e', duration: 120, width: 640, height: 360 },
+    { backgroundColor: '#b45309', duration: 120, width: 640, height: 360 },
+  ], 120, 640, 360);`,
+  },
+  {
+    id: 'scene-to-gif',
+    name: 'Scene · GIF',
+    blurb: 'Compose a scene and encode it through renderSceneToGIF().',
+    group: 'Media',
+    body: `  const scene = {
+    width: 640,
+    height: 360,
+    background: {
+      gradientBg: {
+        type: 'linear',
+        startX: 0, startY: 0,
+        endX: 640, endY: 360,
+        colors: [
+          { stop: 0, color: '#07111f' },
+          { stop: 1, color: '#4c1d95' },
+        ],
+      },
+    },
+    layers: [
+      {
+        type: 'image',
+        images: {
+          source: 'circle',
+          x: 220, y: 80, width: 200, height: 200,
+          shape: { fill: true, color: '#60a5fa', radius: 100 },
+        },
+      },
+      {
+        type: 'text',
+        texts: {
+          text: 'SCENE → GIF',
+          x: 320, y: 310,
+          font: { family: 'Arial', size: 28 },
+          bold: true,
+          fill: { color: '#f8fafc' },
+          textAlign: 'center',
+        },
+      },
+    ],
+  };
+
+  return painter.renderSceneToGIF(scene, {
+    options: {
+      outputFormat: 'buffer',
+      width: 640,
+      height: 360,
+      delay: 260,
+      repeat: 0,
+      quality: 10,
+    },
+    composedFrameDuration: 260,
+    composedFrameRepeat: 4,
+  });`,
+  },
+  {
+    id: 'audio-synth-custom',
+    name: 'Audio · synth / custom',
+    blurb: 'Build procedural WAV output with oscillators, envelopes, filters, pan, modulation, and noise.',
+    group: 'Media',
+    body: `  const synth = painter.createAudio.synth({
+    channels: 2,
+    sampleRate: 44100,
+    duration: 1.25,
+    masterGain: 0.82,
+    seed: 'studio-synth',
+    layers: [
+      {
+        waveform: 'sawtooth',
+        frequency: 220,
+        frequencyEnd: 660,
+        duration: 1.1,
+        gain: 0.42,
+        pan: -0.35,
+        adsr: { attack: 0.02, decay: 0.12, sustain: 0.62, release: 0.28 },
+        vibrato: { depth: 8, rate: 6 },
+        filter: { type: 'lowpass', cutoff: 3200, q: 0.8 },
+      },
+      {
+        waveform: 'triangle',
+        frequency: 330,
+        frequencyEnd: 110,
+        duration: 1.0,
+        delay: 0.08,
+        gain: 0.34,
+        pan: 0.35,
+        tremolo: { depth: 0.3, rate: 8 },
+        noiseMix: 0.04,
+      },
+    ],
+  });
+
+  const custom = painter.createAudio.custom({
+    channels: 2,
+    duration: 0.7,
+    layers: [
+      { waveform: 'sine', frequency: 880, frequencyEnd: 440, duration: 0.7, gain: 0.3 },
+    ],
+  });
+
+  return [synth, custom];`,
+  },
+  {
+    id: 'audio-sequence-compose-mix',
+    name: 'Audio · sequence / compose / mix',
+    blurb: 'Exercise the full procedural-audio timeline: sequencing, clip composition, and simultaneous mixing.',
+    group: 'Media',
+    body: `  const sequence = painter.createAudio.sequence({
+    channels: 2,
+    tail: 0.25,
+    seed: 'studio-sequence',
+    events: [
+      { at: 0.00, preset: 'click', gain: 0.7 },
+      { at: 0.24, preset: 'coin', gain: 0.7 },
+      { at: 0.52, preset: 'powerup', gain: 0.58 },
+      { at: 0.92, preset: 'success', gain: 0.66 },
+    ],
+  });
+
+  const composed = painter.createAudio.compose({
+    channels: 2,
+    tail: 0.2,
+    masterGain: 0.85,
+    clips: [
+      { at: 0.00, preset: 'whoosh', volume: 0.45, pan: -0.5, fadeOut: 0.15 },
+      { at: 0.32, preset: 'sparkle', volume: 0.56, pan: 0.5 },
+      { at: 0.78, preset: 'hitSoft', volume: 0.5 },
+    ],
+  });
+
+  const mixed = painter.createAudio.mix([
+    sequence,
+    { preset: 'engineIdle', gain: 0.10 },
+    {
+      layers: [
+        {
+          waveform: 'sine',
+          frequency: 110,
+          duration: 1.5,
+          gain: 0.12,
+          adsr: { attack: 0.08, decay: 0.12, sustain: 0.7, release: 0.3 },
+        },
+      ],
+      channels: 2,
+      duration: 1.5,
+    },
+  ], {
+    channels: 2,
+    masterGain: 0.78,
+    seed: 'studio-mix',
+  });
+
+  return [sequence, composed, mixed];`,
+  },
+  {
+    id: 'video-pipeline-roundtrip',
+    name: 'Video · pipeline / metadata / frames',
+    blurb: 'Create MP4, run the Apexify video pipeline, inspect metadata, and browse extracted frames.',
+    group: 'Media',
+    body: `  const frameBase = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    gradientBg: {
+      type: 'linear',
+      startX: 0, startY: 0,
+      endX: 640, endY: 360,
+      colors: [
+        { stop: 0, color: '#0b1020' },
+        { stop: 1, color: '#2563eb' },
+      ],
+    },
+  });
+
+  const frames = [];
+  for (let index = 0; index < 6; index += 1) {
+    const frame = await painter.createText({
+      text: `FRAME ${String(index + 1).padStart(2, '0')}`,
+      x: 320, y: 180,
+      font: { family: 'Arial', size: 46 },
+      bold: true,
+      fill: { color: index % 2 ? '#67e8f9' : '#f8fafc' },
+      textAlign: 'center',
+      textBaseline: 'middle',
+    }, frameBase);
+    frames.push(frame);
+  }
+
+  const created = await painter.createVideo({
+    source: frames[0],
+    createFromFrames: {
+      frames,
+      outputPath: 'studio-source.mp4',
+      fps: 3,
+      format: 'mp4',
+      quality: 'medium',
+    },
+  });
+
+  const pipeline = painter.videoPipeline(created.outputPath)
+    .text({
+      startTime: 0,
+      endTime: 2,
+      text: 'APEXIFY STUDIO',
+      x: 320, y: 318,
+      font: { family: 'Arial', size: 20 },
+      bold: true,
+      fill: { color: '#f8fafc' },
+      textAlign: 'center',
+    }, 'title')
+    .audio({
+      type: 'preset',
+      preset: 'success',
+      startTime: 0.25,
+      gain: 0.28,
+    }, { keepOriginalAudio: false }, 'sfx');
+
+  const rendered = await pipeline.render({
+    outputPath: 'studio-pipeline.mp4',
+    preset: 'preview',
+  });
+
+  const info = await painter.getVideoInfo(rendered.outputPath);
+  const extracted = await painter.extractMultipleFrames(
+    rendered.outputPath,
+    [0.2, 0.8, 1.4],
+    'png',
+  );
+
+  return [rendered, info, extracted];`,
+  },
+  {
+    id: 'scene-to-video',
+    name: 'Scene · video frames',
+    blurb: 'Render a scene and pass it through renderSceneToVideoFrames() into MP4.',
+    group: 'Media',
+    body: `  const scene = {
+    width: 640,
+    height: 360,
+    background: {
+      gradientBg: {
+        type: 'linear',
+        startX: 0, startY: 0,
+        endX: 640, endY: 360,
+        colors: [
+          { stop: 0, color: '#082f49' },
+          { stop: 1, color: '#4c1d95' },
+        ],
+      },
+    },
+    layers: [
+      {
+        type: 'image',
+        images: {
+          source: 'star',
+          x: 240, y: 70, width: 160, height: 160,
+          shape: { fill: true, color: '#fde047', innerRadius: 34, outerRadius: 76 },
+          stroke: { width: 3, color: '#713f12' },
+        },
+      },
+      {
+        type: 'text',
+        texts: {
+          text: 'SCENE → VIDEO',
+          x: 320, y: 292,
+          font: { family: 'Arial', size: 30 },
+          bold: true,
+          fill: { color: '#f8fafc' },
+          textAlign: 'center',
+        },
+      },
+    ],
+  };
+
+  const rendered = await painter.renderScene(scene);
+
+  return painter.renderSceneToVideoFrames(scene, {
+    options: {
+      source: rendered,
+      createFromFrames: {
+        frames: [rendered, rendered, rendered],
+        outputPath: 'scene-video.mp4',
+        fps: 2,
+        format: 'mp4',
+        quality: 'medium',
+      },
+    },
+    prependComposedToFrames: true,
+  });`,
+  },
+  {
     id: 'video-from-frames',
     name: 'Video · frames to MP4',
     blurb: 'Create two rendered frames and encode them into MP4 through the full Apexify video runtime.',

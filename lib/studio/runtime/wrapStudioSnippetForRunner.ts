@@ -13,7 +13,15 @@ function hoistLeadingImports(src: string): { hoisted: string; rest: string } {
 
 export function wrapStudioSnippetForRunner(
   code: string,
-  { apexifyImportHref }: { apexifyImportHref: string },
+  {
+    apexifyImportHref,
+    canvasImportHref = '@napi-rs/canvas',
+    defaultFontPath,
+  }: {
+    apexifyImportHref: string;
+    canvasImportHref?: string;
+    defaultFontPath?: string;
+  },
 ): string {
   let body = code
     .replace(/^import\s*\{\s*ApexPainter\s*\}\s*from\s*['"]apexify\.js['"]\s*;?\s*\r?\n/m, '')
@@ -25,12 +33,22 @@ export function wrapStudioSnippetForRunner(
 
   const { hoisted, rest: inner } = hoistLeadingImports(body);
   const hoistedBlock = hoisted ? hoisted + '\n\n' : '';
+  const frameArrayHint = /\b(?:animate|extractMultipleFrames)\s*\(/.test(body);
 
   return `import { copyFileSync as __studioCopy, existsSync as __studioExists, mkdirSync as __studioMkdir, readFileSync as __studioRead, readdirSync as __studioReadDir, statSync as __studioStat, writeFileSync as __studioWrite } from 'node:fs';
 import * as __studioPath from 'node:path';
-import { GlobalFonts as __studioGlobalFonts } from '@napi-rs/canvas';
+import * as __studioCanvas from ${JSON.stringify(canvasImportHref)};
 
 ${hoistedBlock}
+type __StudioFontRegistry = {
+  registerFromPath(path: string, family: string): boolean;
+};
+const __studioGlobalFonts =
+  (__studioCanvas as unknown as { GlobalFonts?: __StudioFontRegistry }).GlobalFonts ??
+  ((__studioCanvas as unknown as { default?: { GlobalFonts?: __StudioFontRegistry } }).default?.GlobalFonts);
+const __studioDefaultFontPath = ${JSON.stringify(defaultFontPath ?? '')};
+const __studioFrameArrayHint = ${JSON.stringify(frameArrayHint)};
+
 function __studioFontFamily(name: string): string {
   const base = name.replace(/\.[^.]+$/, '').trim();
   const normalized = base.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
@@ -39,9 +57,11 @@ function __studioFontFamily(name: string): string {
 
 function __studioRegisterFonts(): void {
   try {
-    const ttf = __studioPath.join(process.cwd(), 'node_modules', 'dejavu-fonts-ttf', 'ttf', 'DejaVuSans.ttf');
+    const ttf =
+      __studioDefaultFontPath ||
+      __studioPath.join(process.cwd(), 'node_modules', 'dejavu-fonts-ttf', 'ttf', 'DejaVuSans.ttf');
     for (const family of ['DejaVu Sans', 'Arial', 'Helvetica', 'sans-serif', 'Segoe UI', 'system-ui', 'Verdana', 'Tahoma']) {
-      try { __studioGlobalFonts.registerFromPath(ttf, family); } catch {}
+      try { __studioGlobalFonts?.registerFromPath(ttf, family); } catch {}
     }
   } catch {}
 
@@ -66,7 +86,7 @@ function __studioRegisterFonts(): void {
         /\.(?:ttf|otf|woff2?|woff)$/i.test(asset.name);
       if (!fontLike) continue;
       try {
-        __studioGlobalFonts.registerFromPath(asset.path, __studioFontFamily(asset.name));
+        __studioGlobalFonts?.registerFromPath(asset.path, __studioFontFamily(asset.name));
       } catch {}
     }
   } catch {}
@@ -183,7 +203,11 @@ ${inner}
     const id = 'artifact-' + String(++__index);
     const resolvedMime = mime || __studioDetectBufferMime(buf);
     const extension = __studioExtensionForMime(resolvedMime);
-    const name = __studioSafeName(label || id) + extension;
+    const safeLabel = __studioSafeName(label || id);
+    const name =
+      extension && safeLabel.toLowerCase().endsWith(extension)
+        ? safeLabel
+        : safeLabel + extension;
     const out = __studioPath.join(__artifactDir, id + extension);
     __studioWrite(out, buf);
     __entries.push({ id, name, path: out, metadata, mime: resolvedMime });
@@ -235,6 +259,19 @@ ${inner}
     }
   }
 
+  function __decodeLooseBase64Media(value: string): { bytes: Buffer; mime: string } | null {
+    const compact = value.trim();
+    if (compact.length < 24 || compact.length % 4 !== 0) return null;
+    if (!/^[A-Za-z0-9+/]+={0,2}$/.test(compact)) return null;
+    try {
+      const bytes = Buffer.from(compact, 'base64');
+      const mime = __studioDetectBufferMime(bytes);
+      return mime ? { bytes, mime } : null;
+    } catch {
+      return null;
+    }
+  }
+
   async function __collect(value: unknown, label = 'result'): Promise<void> {
     if (value == null) return;
 
@@ -270,6 +307,12 @@ ${inner}
         return;
       }
 
+      const looseMedia = __decodeLooseBase64Media(value);
+      if (looseMedia) {
+        __pushBuffer(looseMedia.bytes, label, undefined, looseMedia.mime);
+        return;
+      }
+
       const resolved = __studioPath.resolve(value);
       if (!__pushFile(resolved, label)) __pushText(value, label);
       return;
@@ -281,6 +324,76 @@ ${inner}
     }
 
     if (Array.isArray(value)) {
+      const frameSequence =
+        value.length > 0 &&
+        value.every((item) => {
+          if (Buffer.isBuffer(item) || item instanceof ArrayBuffer || ArrayBuffer.isView(item)) {
+            return __studioFrameArrayHint && Boolean(__studioDetectBufferMime(Buffer.isBuffer(item)
+              ? item
+              : ArrayBuffer.isView(item)
+                ? Buffer.from(item.buffer, item.byteOffset, item.byteLength)
+                : Buffer.from(new Uint8Array(item as ArrayBuffer)))?.startsWith('image/'));
+          }
+          if (!item || typeof item !== 'object') return false;
+          const record = item as Record<string, unknown>;
+          return (
+            typeof record.source === 'string' &&
+            (typeof record.frameNumber === 'number' || typeof record.time === 'number')
+          );
+        });
+
+      if (frameSequence) {
+        const collectionId = 'frames-' + String(__index + 1);
+        for (let index = 0; index < value.length; index += 1) {
+          const item = value[index];
+          const metadata: Record<string, unknown> = {
+            collection: 'frame-sequence',
+            collectionId,
+            sequenceIndex: index,
+            sequenceCount: value.length,
+          };
+
+          if (Buffer.isBuffer(item)) {
+            __pushBuffer(item, label + '-frame-' + String(index + 1), metadata);
+            continue;
+          }
+          if (ArrayBuffer.isView(item)) {
+            __pushBuffer(
+              Buffer.from(item.buffer, item.byteOffset, item.byteLength),
+              label + '-frame-' + String(index + 1),
+              { ...metadata, viewType: item.constructor?.name || 'TypedArray' },
+            );
+            continue;
+          }
+          if (item instanceof ArrayBuffer) {
+            __pushBuffer(
+              Buffer.from(new Uint8Array(item)),
+              label + '-frame-' + String(index + 1),
+              metadata,
+            );
+            continue;
+          }
+
+          const record = item as Record<string, unknown>;
+          const source = typeof record.source === 'string' ? record.source : '';
+          const frameMetadata = {
+            ...metadata,
+            ...__metadataFromRecord(record, new Set(['source'])),
+          };
+          if (
+            source &&
+            __pushFile(
+              __studioPath.resolve(source),
+              label + '-frame-' + String(index + 1),
+              frameMetadata,
+            )
+          ) {
+            continue;
+          }
+        }
+        return;
+      }
+
       const artifactLike = value.some((item) => {
         if (Buffer.isBuffer(item) || item instanceof ArrayBuffer || ArrayBuffer.isView(item)) return true;
         if (typeof Blob !== 'undefined' && item instanceof Blob) return true;
@@ -292,6 +405,9 @@ ${inner}
         const record = item as Record<string, unknown>;
         return (
           Buffer.isBuffer(record.buffer) ||
+          Buffer.isBuffer(record.attachment) ||
+          Buffer.isBuffer(record.gif) ||
+          Buffer.isBuffer(record.static) ||
           typeof record.output === 'string' ||
           typeof record.outputPath === 'string' ||
           typeof record.path === 'string' ||
@@ -343,8 +459,43 @@ ${inner}
 
       const metadata = __metadataFromRecord(
         obj,
-        new Set(['source', 'output', 'outputPath', 'path', 'file', 'files', 'frames', 'buffers', 'result']),
+        new Set([
+          'source',
+          'output',
+          'outputPath',
+          'path',
+          'file',
+          'files',
+          'frames',
+          'buffers',
+          'result',
+          'attachment',
+          'gif',
+          'static',
+        ]),
       );
+
+      if (Buffer.isBuffer(obj.attachment)) {
+        __pushBuffer(
+          obj.attachment,
+          typeof obj.name === 'string' ? obj.name : label + '-attachment',
+          metadata,
+          typeof obj.contentType === 'string' ? obj.contentType : undefined,
+        );
+        return;
+      }
+
+      for (const key of ['output', 'outputPath', 'path', 'file'] as const) {
+        const candidate = obj[key];
+        if (typeof candidate !== 'string') continue;
+        if (__pushFile(__studioPath.resolve(candidate), label, metadata)) {
+          const remainingKeys = ['files', 'frames', 'buffers', 'result', 'gif', 'static'] as const;
+          for (const nestedKey of remainingKeys) {
+            if (nestedKey in obj) await __collect(obj[nestedKey], label + '-' + nestedKey);
+          }
+          return;
+        }
+      }
 
       // Video frame APIs return records such as { source, frameNumber, time }.
       // Prefer the actual generated file while retaining the frame metadata.
@@ -359,6 +510,9 @@ ${inner}
         'outputPath',
         'path',
         'file',
+        'attachment',
+        'gif',
+        'static',
         'files',
         'frames',
         'buffers',
@@ -381,14 +535,42 @@ ${inner}
   const __result = await main();
   await __collect(__result);
 
-  // File-producing operations such as createVideo() may write a relative output
-  // and return metadata. Pick up new files in the run workspace as a fallback.
+  // File-producing GIF/video APIs may return void/metadata while writing a
+  // temporary Studio artifact. Discover only caller-visible files and never
+  // internal inputs/caches.
   if (__entries.length === 0) {
-    for (const name of __studioReadDir(process.cwd())) {
-      if (name === 'snippet.ts' || name === 'err.txt' || name === 'artifacts' || name === 'studio-manifest.json') continue;
-      const candidate = __studioPath.join(process.cwd(), name);
-      try { __pushFile(candidate, name); } catch {}
-    }
+    const __ignoredDiscoveryNames = new Set([
+      'snippet.ts',
+      'err.txt',
+      'artifacts',
+      'studio-manifest.json',
+      'studio-assets.json',
+      'studio-inputs',
+      'apexify-tmp',
+      'deno-cache',
+      'ffmpeg-tmp',
+    ]);
+
+    const __discoverGeneratedFiles = (dir: string, depth: number): void => {
+      if (depth > 4 || __entries.length >= 24) return;
+      let names: string[] = [];
+      try { names = __studioReadDir(dir); } catch { return; }
+
+      for (const name of names) {
+        if (__entries.length >= 24 || __ignoredDiscoveryNames.has(name)) continue;
+        const candidate = __studioPath.join(dir, name);
+        try {
+          const stat = __studioStat(candidate);
+          if (stat.isDirectory()) {
+            __discoverGeneratedFiles(candidate, depth + 1);
+          } else if (stat.isFile()) {
+            __pushFile(candidate, name);
+          }
+        } catch {}
+      }
+    };
+
+    __discoverGeneratedFiles(process.cwd(), 0);
   }
 
   __studioWrite(__manifestPath, JSON.stringify({ schemaVersion: 1, artifacts: __entries }, null, 2));

@@ -10,8 +10,8 @@
 > - [x] STUDIO-4 same-origin isolated runtime complete: no external executor URL/token, no browser credential, one disposable restricted Deno subprocess per full-runtime run, pinned Apexify runtime, bounded resources, no arbitrary network/subprocess permission, and direct same-origin orchestration from /api/gallery/run.
 > - [x] STUDIO-5 virtual assets complete: image/audio/video/font uploads, persistent IndexedDB asset storage, metadata/thumbnail UX, stable `studio://asset/<id>` references, cursor insertion, automatic browser/full-runtime font registration, browser bitmap resolution, and isolated-runtime materialization
 > - [x] STUDIO-6 raster/chart/scene parity implementation complete: all Phase-6 families have an execution route, buffer identity is preserved through the real runtime, structured/non-raster results are collected safely, and representative Studio templates cover scenes/components/assets/templates, image utilities, path/pixels/detect, batch/chain, plus chart-buffer reuse. Isolated production execution proof is intentionally deferred to the final validation pass and STUDIO-4 deployment.
-> - [~] STUDIO-7 GIF/animation/audio in progress: media-aware artifact collection and playable GIF/audio templates are implemented; isolated-runtime execution proofs remain
-> - [~] STUDIO-8 video in progress: video/frame artifact discovery and an MP4 Studio template are implemented; production FFmpeg execution still depends on STUDIO-4
+> - [x] STUDIO-7 GIF/animation/audio implementation complete: GIF result variants, animation frame collections, WAV metadata, full procedural-audio families, scene-to-GIF, media previews, and representative templates all use the real full-runtime path. Final execution proofs are deferred to the end-of-program validation pass.
+> - [x] STUDIO-8 video implementation complete: pinned FFmpeg/ffprobe, narrowly mediated same-origin media subprocesses, createVideo/videoPipeline/probing/extraction/scene-video routing, video metadata/player UI, ordered frame collections, and representative templates are implemented. Final deployment/runtime proofs are deferred to the end-of-program validation pass.
 > - [ ] STUDIO-9 real `@apexify/web` migration when that package/runtime ships
 > - [~] STUDIO-10 completeness matrix now covers top-level ApexPainter methods plus audio/image/detect/path/pixels/output/assets/plugins/video facet members and component factories; per-capability execution proofs remain
 >
@@ -44,7 +44,7 @@ capability analyzer
           - real apexify.js package
           - native canvas/image stack
           - bounded temporary workspace
-          - video subprocess work remains owned by STUDIO-8
+          - media-only FFmpeg/ffprobe proxy boundary for video
    |
    v
 unified artifact protocol
@@ -81,7 +81,7 @@ The full runtime path therefore has two modes:
 1. **trusted-local development** — current explicitly enabled local runner;
 2. **same-origin isolated execution** — production Studio requests stay on the documentation origin and are handed to a fresh restricted Deno subprocess.
 
-No executor URL, API token, or browser credential is part of the Studio product architecture. The outer application route validates/orchestrates the run but does not evaluate Studio source. The isolated subprocess receives bounded filesystem/environment/FFI permissions, no arbitrary network permission, no subprocess permission, a disposable workspace, and bounded CPU/memory/time/output.
+No executor URL, API token, or browser credential is part of the Studio product architecture. The outer application route validates/orchestrates the run but does not evaluate Studio source. The isolated subprocess receives bounded filesystem/environment/FFI permissions, no arbitrary network permission, no general subprocess permission, a disposable workspace, and bounded CPU/memory/time/output. Video may execute only two immutable Studio-owned FFmpeg/ffprobe proxies.
 
 ## 5. Unified artifact protocol
 
@@ -211,7 +211,7 @@ Delivered:
 - write access is restricted to the disposable workspace;
 - environment access is restricted to non-secret Studio runtime paths;
 - FFI access is restricted to the installed `@napi-rs` native addon directory;
-- arbitrary outbound network and arbitrary subprocess execution are not granted;
+- arbitrary outbound network and arbitrary subprocess execution are not granted; video receives only the two fixed Studio media proxies;
 - full-runtime external media uses uploaded `studio://asset/<id>` files instead of general server egress;
 - source, assets, stdout/stderr, output count, per-output bytes, aggregate output bytes, wall time, concurrency, and V8 heap are bounded;
 - Linux `prlimit` CPU/address-space/file/process bounds are used when the host exposes them;
@@ -219,7 +219,7 @@ Delivered:
 - runtime/package identity remains traceable;
 - host persistence APIs remain outside the Studio contract.
 
-Video/FFmpeg execution is intentionally not exposed through this general-purpose server sandbox. That media path remains owned by STUDIO-8 so video can be implemented without giving arbitrary Studio code a server subprocess capability.
+STUDIO-8 extends this boundary with a media-specific capability: Deno may execute only immutable Studio FFmpeg/ffprobe proxies, which constrain paths/protocols before forwarding to pinned binaries.
 
 ### STUDIO-5 — Virtual Studio assets
 
@@ -269,7 +269,7 @@ Delivered:
   - batch + chain;
   - chart-buffer reuse inside `createImage()`.
 
-Phase-6 implementation no longer has an open coding item. Per the project execution policy, isolated-production execution proofs are deferred to the **final validation pass** rather than being run repeatedly during implementation. Those proofs also depend on STUDIO-4's isolated executor being deployed.
+Phase-6 implementation no longer has an open coding item. Per the project execution policy, isolated-production execution proofs are deferred to the **final validation pass** rather than being run repeatedly during implementation. Those proofs remain deferred to the final end-to-end Studio validation pass.
 
 Deliverables:
 
@@ -281,57 +281,48 @@ Deliverables:
 
 ### STUDIO-7 — GIF, animation, and audio
 
-Status: **in progress**.
+Status: **implementation complete**.
 
 Delivered:
 
-- full-runtime artifact collection accepts Buffer, Uint8Array, ArrayBuffer, Blob, data URLs, arrays and nested result objects;
-- GIF buffers are MIME-detected and use the animated image preview;
-- WAV/audio buffers are MIME-detected and use the Studio audio player;
-- frame arrays are emitted as multiple artifacts rather than flattened into one image;
-- Studio includes real `createGIF()` and procedural `createAudio.preset()` templates.
+- GIF magic/MIME detection and animated-image playback;
+- GIF metadata extraction for dimensions, frame count, byte size and aggregate frame delay;
+- artifact collection for public `createGIF()` result shapes including Buffer, data URL/base64 media, attachment objects, `{ gif, static }` composites and temporary file output;
+- `animate()` frame Buffer arrays are classified as ordered frame collections;
+- extracted frame records carry collection id, sequence index/count and available frame/time metadata;
+- Studio preview includes a selectable frame rail;
+- `renderSceneToGIF()` routes through the real Apexify runtime;
+- WAV output receives sample-rate, channel-count, bit-depth, duration and byte metadata;
+- audio artifacts use the native browser audio player plus runtime metadata;
+- the complete procedural audio surface routes through the real runtime: `presetNames`, `listPresets()`, `preset()`, `synth()`, `custom()`, `sequence()`, `compose()`, and `mix()`;
+- `createAudio.save()` remains excluded as host persistence;
+- representative Studio templates cover GIF creation, animation frames, scene-to-GIF, preset audio, synth/custom audio, and sequence/compose/mix audio.
 
-Remaining:
-
-- production execution proof through the isolated executor;
-- representative `animate()`, audio `synth/custom/sequence/compose/mix`, and scene-to-GIF proofs;
-- close any output metadata/diagnostic gaps found by those runs.
-
-Deliverables:
-
-- GIF playback;
-- frame-sequence inspection;
-- procedural audio playback;
-- audio composition/mix output;
-- deterministic diagnostics and limits.
+There is no remaining STUDIO-7 implementation item. Runtime proof/quality verification is deferred to the final validation pass.
 
 ### STUDIO-8 — Video
 
-Status: **in progress, blocked on production isolation for final execution**.
+Status: **implementation complete**.
 
 Delivered:
 
 - video artifacts are MIME-detected and use the native Studio video player;
-- file-producing results with `outputPath` are collected automatically;
-- frame extraction records with `source`, frame number and time now resolve to real frame artifacts while preserving metadata;
-- duplicate file discovery is suppressed;
-- Studio includes a real `createVideo({ createFromFrames })` MP4 template;
-- JSON-returning video inspection APIs already land in the structured text/JSON preview path.
+- browser video metadata supplies dimensions/duration in the output inspector;
+- pinned Linux FFmpeg/ffprobe binaries are installed at build time under `vendor/studio-ffmpeg/`;
+- the server trace includes the media binaries and immutable proxy programs;
+- Apexify video calls receive `APEXIFY_FFMPEG_PATH` / `APEXIFY_FFPROBE_PATH` values pointing only to Studio-owned media proxies;
+- Deno receives no general subprocess permission: its `--allow-run` list contains only those two proxies;
+- each run gets a trusted outer-process media capability outside Deno's readable/writable workspace;
+- proxies constrain paths to the disposable run workspace, reject traversal/external protocols/policy overrides/filter-script injection, validate concat lists, inject a `file,pipe` protocol whitelist, use `shell:false`, and launch pinned media binaries with a minimal environment;
+- full-runtime external video input uses uploaded `studio://asset/<id>` media rather than unrestricted server egress;
+- file-producing video result objects preserve scalar metadata while generated media becomes the preview artifact;
+- frame extraction results are collected as ordered frame sequences with frame number/time metadata;
+- frame Buffer arrays are grouped only for frame-producing APIs rather than blindly grouping arbitrary Buffer collections;
+- the planner routes top-level video methods and the `painter.video` facade to the real runtime;
+- representative Studio templates cover `createVideo({ createFromFrames })`, `videoPipeline()` with text/procedural audio, `getVideoInfo()`, `extractMultipleFrames()`, and `renderSceneToVideoFrames()`;
+- MP4/WebM preview, structured metadata inspection and frame browsing use the unified artifact system.
 
-Remaining:
-
-- implement the production video engine without granting the general-purpose same-origin sandbox arbitrary subprocess permission;
-- execute `createVideo`, `videoPipeline`, metadata/probing, extraction, and scene-to-video representative cases through that media-specific path;
-- verify MP4/WebM playback and bounded multi-frame output in production.
-
-Deliverables:
-
-- production video operations through the dedicated STUDIO-8 media path;
-- MP4/WebM preview;
-- frame extraction previews;
-- metadata inspector;
-- video pipeline support;
-- scene-to-video workflows.
+There is no remaining STUDIO-8 implementation item. Media-binary/runtime execution proof and representative operation verification are deferred to the final validation pass.
 
 ### STUDIO-9 — @apexify/web migration
 

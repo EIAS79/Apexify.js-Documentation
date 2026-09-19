@@ -39,6 +39,8 @@ const docsNavigationChrome = read('components/docs/navigation/DocsNavigationChro
 const runner = read('app/api/gallery/run/route.ts');
 const isolatedRunner = read('lib/studio/runtime/isolatedNodeExecutor.ts');
 const denoInstaller = read('scripts/studio/install-deno.mjs');
+const ffmpegInstaller = read('scripts/studio/install-ffmpeg.mjs');
+const mediaProxy = read('scripts/studio/media-process-proxy.mjs');
 const packageJson = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
 
 requireCheck(editor.includes("dynamic(() => import('./CodeMirrorEditor')"), 'InteractiveCodeEditor must lazy-load CodeMirrorEditor.');
@@ -107,10 +109,19 @@ requireCheck(isolatedRunner.includes('DOC8_RESOURCE_LIMITS.executionMs'), 'Isola
 requireCheck(isolatedRunner.includes('DOC8_RESOURCE_LIMITS.outputBytes'), 'Isolated runner output limit must use centralized DOC-8 limits.');
 requireCheck(isolatedRunner.includes("'--no-prompt'"), 'Isolated runner must deny interactive permission escalation.');
 requireCheck(!isolatedRunner.includes("'--allow-net'"), 'Same-origin isolated execution must not grant arbitrary network access.');
-requireCheck(!isolatedRunner.includes("'--allow-run'"), 'Same-origin isolated execution must not grant arbitrary subprocess access.');
+requireCheck(
+  isolatedRunner.includes('--allow-run=') &&
+    isolatedRunner.includes('media.ffmpegProxy') &&
+    isolatedRunner.includes('media.ffprobeProxy'),
+  'Same-origin video execution must grant subprocess access only through fixed media proxies.',
+);
+requireCheck(!isolatedRunner.includes('--allow-run-all'), 'Same-origin execution must not grant unrestricted subprocess access.');
 requireCheck(isolatedRunner.includes("'--allow-ffi="), 'Isolated runner must scope native FFI for the canvas backend.');
 requireCheck(isolatedRunner.includes("rmSync(runDir, { recursive: true, force: true })"), 'Isolated runner must clean its disposable workspace.');
 requireCheck(denoInstaller.includes('vendor') && denoInstaller.includes('studio-deno'), 'Build must install the same-origin Deno isolation runtime.');
+requireCheck(ffmpegInstaller.includes('studio-ffmpeg') && ffmpegInstaller.includes('ffprobe'), 'Build must install the pinned Studio media runtime.');
+requireCheck(mediaProxy.includes("'file,pipe'"), 'Studio media proxy must force local-only FFmpeg input protocols.');
+requireCheck(mediaProxy.includes('validateConcatList'), 'Studio media proxy must validate concat-demuxer references.');
 requireCheck(runner.includes('cwd: dir'), 'Trusted-local execution must run from the controlled temporary directory.');
 requireCheck(runner.includes('rmSync(dir, { recursive: true, force: true })'), 'Trusted-local runner must clean its temporary directory.');
 

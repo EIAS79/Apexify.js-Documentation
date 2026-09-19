@@ -1,6 +1,6 @@
 # Apexify Studio Same-Origin Runtime
 
-> Status: ACTIVE IMPLEMENTATION
+> Status: COMPLETE IMPLEMENTATION — final validation deferred
 
 Studio full-runtime execution is an internal same-origin backend concern. The browser never receives an executor URL, API token, or server credential.
 
@@ -13,9 +13,16 @@ Studio browser
       v
 /api/gallery/run
       |
-      | direct in-process orchestration only
+      | direct orchestration
       v
 fresh restricted Deno subprocess
+      |
+      +--> raster / GIF / audio / scene work
+      |
+      +--> two fixed media proxy executables
+               |
+               v
+          pinned FFmpeg / ffprobe
       |
       v
 real pinned apexify.js
@@ -39,81 +46,57 @@ The isolated process receives:
 - write access only to the disposable run workspace;
 - environment access only to non-secret Studio runtime paths;
 - FFI access only to the installed `@napi-rs` native addon directory;
-- no network permission;
-- no subprocess permission;
+- no general network permission;
+- no general subprocess permission;
 - no prompt escalation.
 
 The outer route does not evaluate Studio source.
 
-## Why network is disabled in the full runtime
+## Video subprocess mediation
 
-Browser-direct Studio already handles normal HTTP(S) image sources for the APIs it can execute.
+Apexify's Node video engine legitimately needs FFmpeg and ffprobe. Studio does not grant user code unrestricted process execution.
 
-The same-origin full runtime deliberately has no arbitrary outbound network permission because user code must not be able to access deployment-private services or metadata endpoints.
+At build time Studio installs a pinned FFmpeg/ffprobe pair under `vendor/studio-ffmpeg/`.
 
-For full-runtime operations that need an external image/audio/video/font:
+For a video-capable run the trusted outer backend creates a short-lived capability file outside the Deno-readable workspace. Deno may execute only:
 
-1. upload it through Studio Assets;
-2. use its stable `studio://asset/<id>` reference.
+- `scripts/studio/ffmpeg-proxy`
+- `scripts/studio/ffprobe-proxy`
 
-This keeps media available without giving arbitrary executed code network access.
+Those proxies:
+
+- resolve only the trusted per-run capability;
+- forward only to the pinned FFmpeg/ffprobe pair;
+- use `shell:false`;
+- force cwd to the disposable run workspace;
+- reject NULs, traversal, external absolute paths, protocol-policy overrides, filter-script files, and external/network protocols;
+- validate concat-demuxer lists;
+- inject a `file,pipe` protocol whitelist for inputs;
+- launch the media binaries with a minimal environment;
+- forward termination signals.
+
+User code therefore gets video support without a general host process bridge.
+
+## Network policy
+
+Browser-direct Studio may fetch normal HTTP(S) images for APIs supported by Live Canvas.
+
+The same-origin full runtime has no arbitrary outbound network permission. Full-runtime external image/audio/video/font input uses uploaded Studio Assets and `studio://asset/<id>`.
 
 ## Resource bounds
 
-The runtime applies:
+The runtime applies bounded source length, uploaded asset limits, one active full-runtime execution per server instance, a hard wall-clock timeout, a V8 heap limit, Linux `prlimit` CPU/address-space/file/process limits when available, bounded stdout/stderr, bounded artifact count and bytes, and unconditional workspace/capability cleanup.
 
-- bounded source length;
-- bounded uploaded asset count, per-file bytes, and aggregate bytes;
-- one active full-runtime execution per server instance;
-- hard wall-clock timeout;
-- V8 heap limit;
-- Linux `prlimit` CPU/address-space/file/process limits when the host exposes `/usr/bin/prlimit`;
-- bounded stdout/stderr;
-- bounded artifact count, per-artifact bytes, and aggregate output bytes;
-- unconditional workspace cleanup.
+## Package and media identity
 
-Apexify's own renderer/resource limits remain active inside the sandbox.
-
-## Package identity
-
-The full runtime is pinned to:
+Apexify.js is pinned to:
 
 ```text
 github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b
 ```
 
-The Deno isolation binary is installed at build time under:
-
-```text
-vendor/studio-deno/
-```
-
-and is included in the server trace for `/api/gallery/run`.
-
-## Studio assets
-
-Uploaded assets are:
-
-- stored client-side in IndexedDB;
-- sent only with an execution that needs the full runtime;
-- materialized only inside that execution's temporary workspace;
-- rewritten from `studio://asset/<id>` to the temporary local path;
-- deleted with the workspace after the run.
-
-Uploaded font files are registered before user code executes.
+The Deno runtime is installed under `vendor/studio-deno/`. The pinned media binaries are installed under `vendor/studio-ffmpeg/`. Required runtime/proxy files are included in the server trace for `/api/gallery/run`.
 
 ## Host persistence
 
-Host persistence remains outside the Studio product contract:
-
-- `save()`
-- `saveMultiple()`
-- equivalent caller-selected host paths
-
-Studio returns artifacts to the browser instead.
-
-## Video
-
-The same-origin Deno sandbox intentionally has no child-process permission. That means production FFmpeg execution is **not** smuggled through STUDIO-4.
-
-Video execution belongs to STUDIO-8's media implementation, where the browser/WebCodecs/WASM path can be completed without opening a general-purpose server subprocess capability to user code.
+Host persistence remains outside the Studio contract: `save()`, `saveMultiple()`, `createAudio.save()`, and caller-selected host paths. GIF/video APIs may use files inside the disposable workspace; Studio returns them as artifacts and deletes the workspace.

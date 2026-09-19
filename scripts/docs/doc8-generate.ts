@@ -56,6 +56,7 @@ const artifacts: Record<string, unknown> = {
     cleanup: 'recursive-finally',
     networkIsolation: true,
     subprocessIsolation: true,
+    mediaSubprocessPolicy: 'fixed-ffmpeg-proxy-only',
     externalExecutorApi: false,
     externalExecutorToken: false,
     packageInstallation: false,

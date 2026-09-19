@@ -204,7 +204,13 @@ export function StudioOutputPanel({
               label="Studio output preview"
               provenance={activeArtifact ? previewProvenance : undefined}
             >
-              {activeArtifact && !error ? <StudioArtifactPreview artifact={activeArtifact} /> : null}
+              {activeArtifact && !error ? (
+                <StudioArtifactPreview
+                  artifact={activeArtifact}
+                  artifacts={previewArtifacts}
+                  onArtifactSelect={onArtifactSelect}
+                />
+              ) : null}
             </InteractivePreview>
           </>
         ) : null}

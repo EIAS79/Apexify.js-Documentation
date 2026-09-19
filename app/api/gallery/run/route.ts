@@ -23,7 +23,7 @@ import {
   DOC8_RESOURCE_LIMITS,
   type InteractiveArtifact,
 } from '@/lib/docs/playground/contracts';
-import { detectStudioMedia } from '@/lib/studio/runtime/media';
+import { deriveStudioMediaMetadata, detectStudioMedia } from '@/lib/studio/runtime/media';
 import {
   STUDIO_ASSET_LIMITS,
   type StudioVirtualAsset,
@@ -32,7 +32,9 @@ import { wrapStudioSnippetForRunner } from '@/lib/studio/runtime/wrapStudioSnipp
 import {
   runSameOriginIsolatedStudio,
   sameOriginStudioIsolationAvailable,
+  sameOriginStudioVideoAvailable,
 } from '@/lib/studio/runtime/isolatedNodeExecutor';
+import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -248,6 +250,7 @@ function artifactFromEntry(
   }
 
   const detected = detectStudioMedia(buf, name);
+  const derived = deriveStudioMediaMetadata(buf, detected);
   return {
     artifact: {
       id,
@@ -255,7 +258,7 @@ function artifactFromEntry(
       kind: entry.kind ?? detected.kind,
       mime: entry.mime ?? detected.mime,
       base64: buf.toString('base64'),
-      metadata: entry.metadata,
+      metadata: { ...derived, ...(entry.metadata ?? {}) },
     },
     bytes: buf.length,
   };
@@ -588,6 +591,18 @@ export async function POST(req: NextRequest) {
   const local = isLocalRunnerEnabled();
 
   if (context === 'studio' && !local) {
+    const plan = planStudioExecution(code);
+    if (plan.families.includes('video') && !sameOriginStudioVideoAvailable()) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            'Studio video requires the built-in FFmpeg/ffprobe media runtime, but those binaries are unavailable on this deployment.',
+        },
+        { status: 503 },
+      );
+    }
+
     const isolated = await runSameOriginIsolatedStudio(code, studioAssets);
     return NextResponse.json(isolated.body, { status: isolated.status });
   }
