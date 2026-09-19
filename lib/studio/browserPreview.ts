@@ -473,19 +473,55 @@ function drawRoundedRect(
   ctx.closePath();
 }
 
-function applyBackground(
+async function applyBackground(
   ctx: CanvasRenderingContext2D,
   config: RecordValue,
   width: number,
   height: number,
+  studioAssetsById: ReadonlyMap<string, StudioVirtualAsset>,
+  warnings: string[],
 ) {
-  if (!boolOf(config.transparentBase, false)) {
-    ctx.fillStyle = stringOf(config.colorBg, '#ffffff');
-    ctx.fillRect(0, 0, width, height);
-  }
+  const customBg = isRecord(config.customBg) ? config.customBg : null;
+  const hasGradient = isRecord(config.gradientBg);
+  const transparent = boolOf(config.transparentBase, false);
 
-  if (isRecord(config.gradientBg)) {
-    ctx.fillStyle = createGradient(ctx, config.gradientBg, width, height);
+  // Apexify's primary background is one of customBg / gradientBg / colorBg.
+  // Do not paint a fallback color underneath a custom background because that
+  // changes contain/opacity behavior compared with the real renderer.
+  if (customBg) {
+    const source = stringOf(customBg.source, '');
+    if (source) {
+      const bitmap = await previewBitmapFromSource(
+        source,
+        studioAssetsById,
+        warnings,
+        'customBg',
+      );
+      if (bitmap) {
+        try {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(customBg.opacity, 1)));
+          const blur = Math.max(0, numberOf(config.blur, 0));
+          if (blur > 0) ctx.filter = `blur(${blur}px)`;
+          drawBitmapFitted(
+            ctx,
+            bitmap,
+            width,
+            height,
+            stringOf(customBg.fit, 'fill'),
+            stringOf(customBg.align, 'center'),
+          );
+          ctx.restore();
+        } finally {
+          bitmap.close();
+        }
+      }
+    }
+  } else if (hasGradient) {
+    ctx.fillStyle = createGradient(ctx, config.gradientBg as RecordValue, width, height);
+    ctx.fillRect(0, 0, width, height);
+  } else if (!transparent) {
+    ctx.fillStyle = stringOf(config.colorBg, '#000000');
     ctx.fillRect(0, 0, width, height);
   }
 
@@ -503,9 +539,52 @@ function applyBackground(
     }
 
     const type = stringOf(layer.type, '');
-    if (type === 'gradient' && isRecord(layer.value)) {
+    if (type === 'color') {
+      ctx.fillStyle = stringOf(layer.value, 'transparent');
+      ctx.fillRect(0, 0, width, height);
+    } else if (type === 'gradient' && isRecord(layer.value)) {
       ctx.fillStyle = createGradient(ctx, layer.value, width, height);
       ctx.fillRect(0, 0, width, height);
+    } else if (type === 'image') {
+      const source = stringOf(layer.source, '');
+      const bitmap = source
+        ? await previewBitmapFromSource(source, studioAssetsById, warnings, 'bgLayers image')
+        : null;
+      if (bitmap) {
+        try {
+          drawBitmapFitted(
+            ctx,
+            bitmap,
+            width,
+            height,
+            stringOf(layer.fit, 'fill'),
+            stringOf(layer.align, 'center'),
+          );
+        } finally {
+          bitmap.close();
+        }
+      }
+    } else if (type === 'pattern') {
+      const source = stringOf(layer.source, '');
+      const bitmap = source
+        ? await previewBitmapFromSource(source, studioAssetsById, warnings, 'bgLayers pattern')
+        : null;
+      if (bitmap) {
+        try {
+          const repeat = stringOf(layer.repeat, 'repeat') as
+            | 'repeat'
+            | 'repeat-x'
+            | 'repeat-y'
+            | 'no-repeat';
+          const pattern = ctx.createPattern(bitmap, repeat);
+          if (pattern) {
+            ctx.fillStyle = pattern;
+            ctx.fillRect(0, 0, width, height);
+          }
+        } finally {
+          bitmap.close();
+        }
+      }
     } else if (type === 'presetPattern' && isRecord(layer.pattern)) {
       drawPattern(ctx, layer.pattern, width, height);
     } else if (type === 'noise') {
@@ -1070,6 +1149,77 @@ async function fetchRemoteImageBitmap(source:string):Promise<ImageBitmap>{
     return bitmap;
   } finally { window.clearTimeout(timeout); }
 }
+function drawBitmapFitted(
+  ctx: CanvasRenderingContext2D,
+  bitmap: ImageBitmap,
+  width: number,
+  height: number,
+  fit: string,
+  align: string,
+) {
+  if (fit === 'contain' || fit === 'cover') {
+    const scale =
+      fit === 'cover'
+        ? Math.max(width / bitmap.width, height / bitmap.height)
+        : Math.min(width / bitmap.width, height / bitmap.height);
+    const drawWidth = bitmap.width * scale;
+    const drawHeight = bitmap.height * scale;
+    const offset = alignedImageOffset(align, width, height, drawWidth, drawHeight);
+    ctx.drawImage(bitmap, offset.x, offset.y, drawWidth, drawHeight);
+    return;
+  }
+  ctx.drawImage(bitmap, 0, 0, width, height);
+}
+
+async function previewBitmapFromSource(
+  source: string,
+  studioAssetsById: ReadonlyMap<string, StudioVirtualAsset>,
+  warnings: string[],
+  context: string,
+): Promise<ImageBitmap | null> {
+  const studioAssetId = studioAssetIdFromReference(source);
+  if (studioAssetId) {
+    const asset = studioAssetsById.get(studioAssetId);
+    if (!asset) {
+      warnings.push(`${context}: Studio asset ${source} is not loaded in this session.`);
+      return null;
+    }
+    if (!asset.mime.startsWith('image/')) {
+      warnings.push(`${context}: Studio asset ${asset.name} is ${asset.mime}, not an image.`);
+      return null;
+    }
+    try {
+      const bitmap = await studioAssetBitmap(asset);
+      if (bitmap.width * bitmap.height > MAX_REMOTE_IMAGE_PIXELS) {
+        bitmap.close();
+        throw new Error('decoded image exceeds the 12 million pixel Live Canvas limit');
+      }
+      return bitmap;
+    } catch (error) {
+      warnings.push(
+        `${context}: Studio image asset ${asset.name} could not be decoded: ${error instanceof Error ? error.message : 'unknown image error'}.`,
+      );
+      return null;
+    }
+  }
+
+  if (remoteImageSource(source)) {
+    try {
+      return await fetchRemoteImageBitmap(source);
+    } catch (error) {
+      warnings.push(
+        `${context}: remote image from ${remoteImageHost(source)} could not be rendered: ${error instanceof Error ? error.message : 'request failed'}.`,
+      );
+      return null;
+    }
+  }
+
+  warnings.push(
+    `${context}: local filesystem image paths are not available to Live Canvas. Upload the image as a Studio asset or use an HTTP(S) URL.`,
+  );
+  return null;
+}
+
 function studioAssetBitmap(asset: StudioVirtualAsset): Promise<ImageBitmap> {
   const binary = atob(asset.base64);
   const bytes = new Uint8Array(binary.length);
@@ -1972,7 +2122,14 @@ export async function renderStudioBrowserPreview(
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) throw new Error('Canvas 2D is unavailable in this browser.');
 
-    applyBackground(ctx, canvasConfig, width, height);
+    await applyBackground(
+      ctx,
+      canvasConfig,
+      width,
+      height,
+      studioAssetsById,
+      warnings,
+    );
 
 
     for (const call of calls) {

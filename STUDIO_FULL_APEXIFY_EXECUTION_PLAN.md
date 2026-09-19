@@ -217,7 +217,7 @@ Delivered:
 - session-scoped upload shelf for image/audio/video/font assets;
 - stable `studio://asset/<id>` references copied directly from the Studio UI;
 - bounded asset count, per-file bytes, and aggregate bytes;
-- browser-direct `createImage()` can decode uploaded image assets without a network hop;
+- browser-direct `createImage()`, `createCanvas().customBg`, and bitmap `bgLayers` can decode uploaded image assets without a network hop;
 - full-runtime requests carry the same asset payloads and trusted-local execution materializes them only inside the disposable run workspace;
 - the isolated-remote executor protocol receives the same asset list, so production execution does not depend on caller filesystem paths;
 - asset bytes are deliberately not serialized into share links or localStorage.
