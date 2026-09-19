@@ -429,6 +429,166 @@ return await main();
 
 const COLLAGE_JS = COLLAGE_TS.replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
 
+const REMOTE_IMAGE_POSTER_TS = `import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+async function main() {
+  const W = 960;
+  const H = 540;
+
+  const { buffer } = await painter.createCanvas({
+    width: W,
+    height: H,
+    gradientBg: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: W,
+      endY: H,
+      colors: [
+        { stop: 0, color: '#07111f' },
+        { stop: 0.48, color: '#13233d' },
+        { stop: 1, color: '#1e3a5f' },
+      ],
+    },
+    bgLayers: [
+      {
+        type: 'gradient',
+        blendMode: 'screen',
+        opacity: 0.42,
+        value: {
+          type: 'radial',
+          startX: 760,
+          startY: 100,
+          startRadius: 0,
+          endX: 760,
+          endY: 100,
+          endRadius: 330,
+          colors: [
+            { stop: 0, color: 'rgba(125, 211, 252, 0.32)' },
+            { stop: 1, color: 'transparent' },
+          ],
+        },
+      },
+      {
+        type: 'gradient',
+        blendMode: 'screen',
+        opacity: 0.24,
+        value: {
+          type: 'radial',
+          startX: 120,
+          startY: 470,
+          startRadius: 0,
+          endX: 120,
+          endY: 470,
+          endRadius: 280,
+          colors: [
+            { stop: 0, color: 'rgba(244, 114, 182, 0.28)' },
+            { stop: 1, color: 'transparent' },
+          ],
+        },
+      },
+    ],
+    patternBg: {
+      type: 'dots',
+      color: 'rgba(226, 232, 240, 0.12)',
+      size: 3,
+      spacing: 24,
+      opacity: 0.34,
+    },
+    noiseBg: { intensity: 0.025 },
+  });
+
+  const remoteImages = [
+    {
+      source: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=85',
+      x: 54,
+      y: 112,
+      width: 520,
+      height: 354,
+      fit: 'cover',
+      align: 'center',
+      borderRadius: 28,
+      rotation: -2.2,
+      opacity: 0.98,
+      stroke: { width: 2, color: 'rgba(255,255,255,0.42)', opacity: 1 },
+      shadow: { color: 'rgba(0,0,0,0.55)', offsetY: 24, blur: 42, opacity: 1 },
+    },
+    {
+      source: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=85',
+      x: 610,
+      y: 118,
+      width: 286,
+      height: 184,
+      fit: 'cover',
+      align: 'center',
+      borderRadius: 22,
+      rotation: 3.2,
+      stroke: { width: 2, color: 'rgba(255,255,255,0.35)', opacity: 1 },
+      shadow: { color: 'rgba(0,0,0,0.45)', offsetY: 18, blur: 34, opacity: 1 },
+    },
+    {
+      source: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=85',
+      x: 628,
+      y: 326,
+      width: 268,
+      height: 150,
+      fit: 'cover',
+      align: 'center',
+      borderRadius: 22,
+      rotation: -2.4,
+      stroke: { width: 2, color: 'rgba(255,255,255,0.32)', opacity: 1 },
+      shadow: { color: 'rgba(0,0,0,0.42)', offsetY: 16, blur: 30, opacity: 1 },
+    },
+  ];
+
+  let buf = await painter.createImage(remoteImages, buffer);
+
+  buf = await painter.createText(
+    [
+      {
+        text: 'REMOTE IMAGE ATLAS',
+        x: 54,
+        y: 46,
+        font: { family: 'Arial', size: 16, weight: 700 },
+        color: 'rgba(186, 230, 253, 0.9)',
+        textBaseline: 'middle',
+      },
+      {
+        text: 'Three URLs. One canvas.',
+        x: 54,
+        y: 78,
+        font: { family: 'Arial', size: 30 },
+        bold: true,
+        color: '#f8fafc',
+        textBaseline: 'middle',
+        shadow: { color: 'rgba(0,0,0,0.5)', offsetY: 6, blur: 14, opacity: 1 },
+      },
+      {
+        text: 'createCanvas → createImage(HTTP sources) → createText',
+        x: W - 54,
+        y: H - 28,
+        font: { family: 'Arial', size: 14 },
+        color: 'rgba(226, 232, 240, 0.78)',
+        textAlign: 'right',
+        textBaseline: 'middle',
+      },
+    ],
+    buf
+  );
+
+  return buf;
+}
+
+return await main();
+`;
+
+const REMOTE_IMAGE_POSTER_JS = REMOTE_IMAGE_POSTER_TS.replace(
+  /^import \\{ ApexPainter \\} from 'apexify\\.js';\\n\\n/,
+  ''
+);
+
 const coreAdvanceGalleryItems: AdvanceGalleryCard[] = [
   {
     id: 'advance-chart-donut-glow',
@@ -458,6 +618,16 @@ const coreAdvanceGalleryItems: AdvanceGalleryCard[] = [
       '**Vector collage from pure drawing APIs.** Starts with **`createCanvas`** and **`patternBg.hexagons`**, then **`createImage`** stacks **`rectangle`** (gradient fill), **`circle`**, **`triangle`**, and **`star`** geometry with explicit inner/outer radius.\n\n**Takeaway:** Finishes with **`createText`** using gradient fills and stroke for poster-style lettering—useful when you need crisp PNG output without design tools.',
     thumbnail: '/gallery-outputs/images/shape-collage-prism.png',
     code: { ts: COLLAGE_TS, js: COLLAGE_JS },
+  },
+  {
+    id: 'advance-remote-image-atlas',
+    title: 'Remote image atlas · URL-only sources',
+    category: 'advance',
+    description:
+      '**A complete remote-image composition.** Every `createImage` layer uses a public HTTPS image URL—no local bitmap source—over a layered `createCanvas` gradient, dot pattern, and noise texture.\n\n**Takeaway:** Demonstrates `fit: \'cover\'`, alignment, rotation, rounded corners, strokes, shadows, and text finishing in one composition. Public Studio previews fetch these assets directly in the browser, so normal CORS rules still apply.',
+    thumbnail: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+    featured: true,
+    code: { ts: REMOTE_IMAGE_POSTER_TS, js: REMOTE_IMAGE_POSTER_JS },
   },
 ];
 
