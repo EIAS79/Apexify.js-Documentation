@@ -10,6 +10,7 @@ import {
   resetInteractiveSession,
   serializeInteractiveSession,
 } from '../../lib/docs/playground/session';
+import { planStudioExecution } from '../../lib/studio/runtime/capabilities';
 
 function sampleSession(): InteractiveSession {
   return createInteractiveSession({
@@ -66,4 +67,64 @@ test('resource limits preserve bounded current runner ceilings', () => {
   assert.equal(DOC8_RESOURCE_LIMITS.processBufferBytes, 20 * 1024 * 1024);
   assert.equal(DOC8_RESOURCE_LIMITS.maxOutputs, 24);
   assert.ok(DOC8_RESOURCE_LIMITS.shareStateBytes < DOC8_RESOURCE_LIMITS.sourceChars);
+});
+
+test('Studio planner keeps https URLs intact while detecting later full-runtime APIs', () => {
+  const source = [
+    "import { ApexPainter } from 'apexify.js';",
+    'async function main() {',
+    '  const p = new ApexPainter();',
+    "  const image = 'https://example.com/photo.png';",
+    '  const base = await p.createCanvas({ width: 100, height: 100 });',
+    '  await p.createImage({ source: image }, base);',
+    "  return p.createVideo({ output: 'out.mp4', width: 100, height: 100, fps: 24 });",
+    '}',
+  ].join('\n');
+  const plan = planStudioExecution(source);
+  assert.equal(plan.backend, 'full-runtime');
+  assert.ok(plan.families.includes('video'));
+});
+
+test('Studio planner detects ApexPainter facets regardless of local instance name', () => {
+  const plan = planStudioExecution([
+    'const renderer = new ApexPainter();',
+    'const result = await renderer.image.resize(source, { width: 320 });',
+    'return result;',
+  ].join('\n'));
+  assert.equal(plan.backend, 'full-runtime');
+  assert.ok(plan.families.includes('image-utils'));
+});
+
+test('Studio planner blocks host persistence for aliased ApexPainter instances', () => {
+  const plan = planStudioExecution([
+    'const renderer = new ApexPainter();',
+    'const canvas = await renderer.createCanvas({ width: 64, height: 64 });',
+    "await renderer.save(canvas.buffer, { filename: 'host.png' });",
+    'return canvas.buffer;',
+  ].join('\n'));
+  assert.deepEqual(plan.hostPersistenceOnly, ['save()']);
+  assert.ok(plan.families.includes('host-persistence'));
+});
+
+test('Studio planner routes generated raster buffers reused as sources to full runtime', () => {
+  const plan = planStudioExecution([
+    'const painter = new ApexPainter();',
+    'const base = await painter.createCanvas({ width: 320, height: 180 });',
+    "const badge = await painter.createImage({ source: 'circle', width: 40, height: 40 }, base);",
+    'return painter.createImage({ source: badge, x: 20, y: 20 }, base);',
+  ].join('\n'));
+  assert.equal(plan.backend, 'full-runtime');
+  assert.match(plan.reasons.join('\n'), /preserve buffer identity/);
+});
+
+test('Studio planner keeps generated chart-buffer reuse browser-direct', () => {
+  const plan = planStudioExecution([
+    'const painter = new ApexPainter();',
+    'const base = await painter.createCanvas({ width: 640, height: 360 });',
+    "const chartBuf = await painter.createChart('bar', [{ label: 'A', value: 4, xStart: 0, xEnd: 1 }]);",
+    'return painter.createImage({ source: chartBuf, x: 20, y: 20, width: 320, height: 180 }, base);',
+  ].join('\n'));
+  assert.equal(plan.backend, 'browser');
+  assert.ok(plan.families.includes('chart'));
+  assert.ok(plan.families.includes('image'));
 });

@@ -9,7 +9,7 @@
 > - [x] STUDIO-3 trusted-local full-runtime artifact runner foundation; intentional video block removed
 > - [~] STUDIO-4 production isolated executor integration boundary (`STUDIO_EXECUTOR_URL`) is implemented; an isolated executor deployment/snapshot is still required before production full-runtime execution is enabled
 > - [x] STUDIO-5 session virtual assets foundation: image/audio/video/font uploads, stable `studio://asset/<id>` references, browser image preview resolution, and full-runtime materialization
-> - [ ] STUDIO-6 full raster/chart/scene parity
+> - [~] STUDIO-6 raster/chart/scene parity in progress: alias-safe full-runtime routing, generated raster-buffer identity routing, and chart-buffer browser reuse are implemented; full isolated end-to-end family validation remains
 > - [ ] STUDIO-7 GIF/animation/audio completion
 > - [ ] STUDIO-8 video completion
 > - [ ] STUDIO-9 real `@apexify/web` migration when that package/runtime ships
@@ -225,6 +225,22 @@ Delivered:
 Remaining refinements are UX/persistence improvements (for example IndexedDB persistence between page reloads), not a change to the execution reference model.
 
 ### STUDIO-6 — Complete raster/chart/scene parity
+
+Status: **in progress**.
+
+Delivered in the current parity pass:
+
+- full-runtime facet detection no longer depends on the local variable being named `painter`;
+- planner comment scanning preserves quoted `https://` media URLs instead of truncating the source at `//`;
+- host-persistence rejection follows aliased `new ApexPainter()` instances;
+- generated canvas/image/text buffers reused later as media sources route to the real full runtime so buffer identity is preserved;
+- generated chart buffers remain browser-direct where Live Canvas has explicit identity mapping;
+- planner regression coverage is part of the DOC-8 deterministic test gate.
+
+Still required before STUDIO-6 is complete:
+
+- execute and record representative full-runtime proofs for image utilities, path/pixels/detect, all chart families, scenes, templates, components, named assets, batch and chain inside the isolated executor;
+- close any artifact-shape gaps found by those executions.
 
 Deliverables:
 
