@@ -180,7 +180,393 @@
   },
   "excludedFromStudioManipulation": [
     "save",
-    "saveMultiple"
+    "saveMultiple",
+    "createAudio.save"
   ],
-  "complete": true
+  "complete": true,
+  "facetMembers": {
+    "createAudio": {
+      "declaration": "PainterCreateAudio",
+      "methods": [
+        {
+          "name": "compose",
+          "route": "full-runtime"
+        },
+        {
+          "name": "custom",
+          "route": "full-runtime"
+        },
+        {
+          "name": "listPresets",
+          "route": "full-runtime"
+        },
+        {
+          "name": "mix",
+          "route": "full-runtime"
+        },
+        {
+          "name": "preset",
+          "route": "full-runtime"
+        },
+        {
+          "name": "save",
+          "route": "host-persistence"
+        },
+        {
+          "name": "sequence",
+          "route": "full-runtime"
+        },
+        {
+          "name": "synth",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [
+        "presetNames"
+      ],
+      "missing": []
+    },
+    "image": {
+      "declaration": "PainterImageUtils",
+      "methods": [
+        {
+          "name": "blend",
+          "route": "full-runtime"
+        },
+        {
+          "name": "colorAnalysis",
+          "route": "full-runtime"
+        },
+        {
+          "name": "colorsFilter",
+          "route": "full-runtime"
+        },
+        {
+          "name": "colorsRemover",
+          "route": "full-runtime"
+        },
+        {
+          "name": "compress",
+          "route": "full-runtime"
+        },
+        {
+          "name": "createCollage",
+          "route": "full-runtime"
+        },
+        {
+          "name": "cropImage",
+          "route": "full-runtime"
+        },
+        {
+          "name": "effects",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractPalette",
+          "route": "full-runtime"
+        },
+        {
+          "name": "gradientBlend",
+          "route": "full-runtime"
+        },
+        {
+          "name": "imgConverter",
+          "route": "full-runtime"
+        },
+        {
+          "name": "masking",
+          "route": "full-runtime"
+        },
+        {
+          "name": "removeBackground",
+          "route": "full-runtime"
+        },
+        {
+          "name": "resize",
+          "route": "full-runtime"
+        },
+        {
+          "name": "stitchImages",
+          "route": "full-runtime"
+        },
+        {
+          "name": "validHex",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [],
+      "missing": []
+    },
+    "detect": {
+      "declaration": "PainterHitDetect",
+      "methods": [
+        {
+          "name": "anyRegion",
+          "route": "full-runtime"
+        },
+        {
+          "name": "distance",
+          "route": "full-runtime"
+        },
+        {
+          "name": "path",
+          "route": "full-runtime"
+        },
+        {
+          "name": "region",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [],
+      "missing": []
+    },
+    "path2d": {
+      "declaration": "PainterPath2D",
+      "methods": [
+        {
+          "name": "create",
+          "route": "full-runtime"
+        },
+        {
+          "name": "custom",
+          "route": "full-runtime"
+        },
+        {
+          "name": "draw",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [],
+      "missing": []
+    },
+    "pixels": {
+      "declaration": "PainterPixels",
+      "methods": [
+        {
+          "name": "getColor",
+          "route": "full-runtime"
+        },
+        {
+          "name": "getData",
+          "route": "full-runtime"
+        },
+        {
+          "name": "manipulate",
+          "route": "full-runtime"
+        },
+        {
+          "name": "setColor",
+          "route": "full-runtime"
+        },
+        {
+          "name": "setData",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [],
+      "missing": []
+    },
+    "output": {
+      "declaration": "PainterOutput",
+      "methods": [
+        {
+          "name": "arrayBuffer",
+          "route": "full-runtime"
+        },
+        {
+          "name": "base64",
+          "route": "full-runtime"
+        },
+        {
+          "name": "blob",
+          "route": "full-runtime"
+        },
+        {
+          "name": "dataURL",
+          "route": "full-runtime"
+        },
+        {
+          "name": "url",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [],
+      "missing": []
+    },
+    "assets": {
+      "declaration": "AssetManager",
+      "methods": [
+        {
+          "name": "clear",
+          "route": "full-runtime"
+        },
+        {
+          "name": "delete",
+          "route": "full-runtime"
+        },
+        {
+          "name": "has",
+          "route": "full-runtime"
+        },
+        {
+          "name": "list",
+          "route": "full-runtime"
+        },
+        {
+          "name": "loadFont",
+          "route": "full-runtime"
+        },
+        {
+          "name": "loadImage",
+          "route": "full-runtime"
+        },
+        {
+          "name": "loadPalette",
+          "route": "full-runtime"
+        },
+        {
+          "name": "loadValue",
+          "route": "full-runtime"
+        },
+        {
+          "name": "replaceFont",
+          "route": "full-runtime"
+        },
+        {
+          "name": "replaceImage",
+          "route": "full-runtime"
+        },
+        {
+          "name": "replacePalette",
+          "route": "full-runtime"
+        },
+        {
+          "name": "replaceValue",
+          "route": "full-runtime"
+        },
+        {
+          "name": "resolve",
+          "route": "full-runtime"
+        },
+        {
+          "name": "unregisterFont",
+          "route": "full-runtime"
+        },
+        {
+          "name": "unregisterImage",
+          "route": "full-runtime"
+        },
+        {
+          "name": "unregisterPalette",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [],
+      "missing": []
+    },
+    "plugins": {
+      "declaration": "PluginHost",
+      "methods": [
+        {
+          "name": "get",
+          "route": "full-runtime"
+        },
+        {
+          "name": "has",
+          "route": "full-runtime"
+        },
+        {
+          "name": "install",
+          "route": "full-runtime"
+        },
+        {
+          "name": "isInstalled",
+          "route": "full-runtime"
+        },
+        {
+          "name": "list",
+          "route": "full-runtime"
+        },
+        {
+          "name": "listInstalled",
+          "route": "full-runtime"
+        },
+        {
+          "name": "remove",
+          "route": "full-runtime"
+        },
+        {
+          "name": "use",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [],
+      "missing": []
+    },
+    "video": {
+      "declaration": "VideoStack",
+      "methods": [
+        {
+          "name": "extractAllFrames",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractFrameAtTime",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractFrameByNumber",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractFrames",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractMultipleFrames",
+          "route": "full-runtime"
+        },
+        {
+          "name": "getVideoInfo",
+          "route": "full-runtime"
+        },
+        {
+          "name": "videoPipeline",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [
+        "creator",
+        "operations"
+      ],
+      "missing": []
+    }
+  },
+  "componentMembers": [
+    {
+      "name": "avatar",
+      "method": "toLayers",
+      "route": "full-runtime"
+    },
+    {
+      "name": "badge",
+      "method": "toLayers",
+      "route": "full-runtime"
+    },
+    {
+      "name": "card",
+      "method": "toLayers",
+      "route": "full-runtime"
+    },
+    {
+      "name": "progressBar",
+      "method": "toLayers",
+      "route": "full-runtime"
+    },
+    {
+      "name": "watermark",
+      "method": "toLayers",
+      "route": "full-runtime"
+    }
+  ]
 }

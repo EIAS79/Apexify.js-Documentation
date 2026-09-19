@@ -139,6 +139,133 @@ const facetRows = surface.facets.map((name) => ({
 const missingMethods = methodRows.filter((row) => row.route === 'missing').map((row) => row.name);
 const missingFacets = facetRows.filter((row) => row.route === 'missing').map((row) => row.name);
 
+
+type FacetSpec = {
+  declaration: string;
+  kind: 'interface' | 'class';
+  excluded?: ReadonlySet<string>;
+};
+
+const FACET_SPECS: Record<string, FacetSpec> = {
+  createAudio: {
+    declaration: 'PainterCreateAudio',
+    kind: 'interface',
+    excluded: new Set(['save']),
+  },
+  image: { declaration: 'PainterImageUtils', kind: 'interface' },
+  detect: { declaration: 'PainterHitDetect', kind: 'interface' },
+  path2d: { declaration: 'PainterPath2D', kind: 'interface' },
+  pixels: { declaration: 'PainterPixels', kind: 'interface' },
+  output: { declaration: 'PainterOutput', kind: 'interface' },
+  assets: { declaration: 'AssetManager', kind: 'class' },
+  plugins: { declaration: 'PluginHost', kind: 'class' },
+  video: { declaration: 'VideoStack', kind: 'class' },
+};
+
+const declarationFiles = walk(path.join(root, 'node_modules', 'apexify.js', 'dist'))
+  .filter((file) => /\.d\.(?:ts|cts)$/.test(file));
+
+function declarationBody(name: string, kind: 'interface' | 'class'): string {
+  const pattern = new RegExp('(?:export\\s+)?(?:declare\\s+)?' + kind + '\\s+' + name + '\\b[^\\{]*\\{');
+  for (const file of declarationFiles) {
+    const source = fs.readFileSync(file, 'utf8');
+    const match = pattern.exec(source);
+    if (!match) continue;
+    const open = match.index + match[0].lastIndexOf('{');
+    let depth = 0;
+    let quote: "'" | '"' | '`' | null = null;
+    let escaped = false;
+
+    for (let index = open; index < source.length; index += 1) {
+      const ch = source[index]!;
+      if (quote) {
+        if (escaped) escaped = false;
+        else if (ch === '\\') escaped = true;
+        else if (ch === quote) quote = null;
+        continue;
+      }
+      if (ch === "'" || ch === '"' || ch === '`') {
+        quote = ch;
+        continue;
+      }
+      if (ch === '{') depth += 1;
+      else if (ch === '}') {
+        depth -= 1;
+        if (depth === 0) return source.slice(open + 1, index);
+      }
+    }
+  }
+  throw new Error('Could not locate declaration ' + kind + ' ' + name + ' in apexify.js.');
+}
+
+function declarationMethods(body: string): string[] {
+  const methods: string[] = [];
+  const re = /^\s*(?:public\s+)?(?:readonly\s+)?([A-Za-z_$][\w$]*)\s*(?:<[^\n(]+>)?\s*\(/gm;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(body))) {
+    if (match[1] !== 'constructor') methods.push(match[1]!);
+  }
+  return uniqueSorted(methods);
+}
+
+function declarationProperties(body: string): string[] {
+  const properties: string[] = [];
+  const re = /^\s*(?:public\s+)?readonly\s+([A-Za-z_$][\w$]*)\s*:/gm;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(body))) properties.push(match[1]!);
+  return uniqueSorted(properties);
+}
+
+function componentFactories(): string[] {
+  const pattern = /(?:export\s+)?(?:declare\s+)?function\s+createPainterComponents\s*\([^)]*\)\s*:\s*\{/;
+  for (const file of declarationFiles) {
+    const source = fs.readFileSync(file, 'utf8');
+    const match = pattern.exec(source);
+    if (!match) continue;
+    const open = match.index + match[0].lastIndexOf('{');
+    let depth = 0;
+    for (let index = open; index < source.length; index += 1) {
+      const ch = source[index]!;
+      if (ch === '{') depth += 1;
+      else if (ch === '}') {
+        depth -= 1;
+        if (depth === 0) {
+          const body = source.slice(open + 1, index);
+          return uniqueSorted(
+            [...body.matchAll(/^\s*([A-Za-z_$][\w$]*)\s*:\s*\{/gm)].map((entry) => entry[1]!),
+          );
+        }
+      }
+    }
+  }
+  return [];
+}
+
+const facetMembers = Object.fromEntries(
+  Object.entries(FACET_SPECS).map(([facet, spec]) => {
+    const body = declarationBody(spec.declaration, spec.kind);
+    const methods = declarationMethods(body).map((name) => ({
+      name,
+      route: spec.excluded?.has(name) ? 'host-persistence' : 'full-runtime',
+    }));
+    return [
+      facet,
+      {
+        declaration: spec.declaration,
+        methods,
+        properties: declarationProperties(body),
+        missing: methods.filter((row) => row.route === 'missing').map((row) => row.name),
+      },
+    ];
+  }),
+);
+
+const componentMembers = componentFactories().map((name) => ({
+  name,
+  method: 'toLayers',
+  route: 'full-runtime',
+}));
+
 const artifact = {
   schemaVersion: 1,
   packagePin: packageJson.dependencies?.['apexify.js'] ?? null,
@@ -149,14 +276,29 @@ const artifact = {
     missingMethods,
     missingFacets,
   },
-  excludedFromStudioManipulation: ['save', 'saveMultiple'],
-  complete: missingMethods.length === 0 && missingFacets.length === 0,
+  facetMembers,
+  componentMembers,
+  excludedFromStudioManipulation: [
+    'save',
+    'saveMultiple',
+    'createAudio.save',
+  ],
+  complete:
+    missingMethods.length === 0 &&
+    missingFacets.length === 0 &&
+    Object.values(facetMembers).every(
+      (facet) => (facet as { missing: string[] }).missing.length === 0,
+    ),
 };
 
 if (!artifact.complete) {
   console.error('[studio-completeness] UNROUTED APEXIFY SURFACE');
   if (missingMethods.length) console.error('methods:', missingMethods.join(', '));
   if (missingFacets.length) console.error('facets:', missingFacets.join(', '));
+  for (const [facet, detail] of Object.entries(facetMembers)) {
+    const missing = (detail as { missing: string[] }).missing;
+    if (missing.length) console.error('facet ' + facet + ':', missing.join(', '));
+  }
   process.exitCode = 1;
 }
 

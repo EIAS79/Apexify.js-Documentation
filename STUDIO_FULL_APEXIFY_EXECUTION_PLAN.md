@@ -13,7 +13,7 @@
 > - [~] STUDIO-7 GIF/animation/audio in progress: media-aware artifact collection and playable GIF/audio templates are implemented; isolated-runtime execution proofs remain
 > - [~] STUDIO-8 video in progress: video/frame artifact discovery and an MP4 Studio template are implemented; production FFmpeg execution still depends on STUDIO-4
 > - [ ] STUDIO-9 real `@apexify/web` migration when that package/runtime ships
-> - [~] STUDIO-10 completeness matrix foundation implemented from the installed Apexify.js declaration surface; deeper facet-member coverage remains
+> - [~] STUDIO-10 completeness matrix now covers top-level ApexPainter methods plus audio/image/detect/path/pixels/output/assets/plugins/video facet members and component factories; per-capability execution proofs remain
 >
 > Goal: make Studio an online Apexify.js coding and media-manipulation environment. A user writes normal Apexify.js code, presses **Run**, and Studio executes the required Apexify feature with the correct runtime and previews the result. Host-side persistence APIs such as `save()` / `saveMultiple()` are not part of the Studio execution target.
 
@@ -325,10 +325,16 @@ Current implementation:
 - `npm run studio:completeness` regenerates it and `npm run studio:completeness:check` verifies it on demand;
 - this is intentionally not wired into the legacy documentation CI chain yet.
 
+Additional coverage now implemented:
+
+- member-level inventory for `createAudio`, image utilities, hit detection, Path2D, pixels, output conversion, named assets, plugins, and the video stack;
+- component factory inventory for badge/progressBar/avatar/card/watermark `toLayers` surfaces;
+- `createAudio.save()` is explicitly classified as a host-persistence exclusion.
+
 Remaining:
 
-- recurse into facet member APIs (audio, image utilities, pixels, path, detect, output, video stack, components/assets/plugins) rather than only checking the top-level facet exists;
-- attach execution-proof status per capability family after the isolated executor is deployed.
+- attach execution-proof status per capability and representative option family after the isolated executor is deployed;
+- expand the generated matrix further if Apexify.js exposes new nested public classes beneath existing facets.
 
 A release is incomplete when a new render/manipulation API is public in Apexify.js but absent from Studio capability routing, execution, or output handling.
 
