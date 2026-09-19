@@ -89,7 +89,7 @@ const artifacts: Record<string, unknown> = {
     phase: 'DOC-2',
     packageRepository: 'EIAS79/Apexify.js',
     documentationRepository: 'EIAS79/Apexify.js-Documentation',
-    packageMainSha: 'dbed9743353593eafae9a7b1c25312d7170a233b',
+    packageMainSha: '1f767143271f6c17c2be8cd3a09f10a27b04b606',
     packageVersion: '6.0.0',
     phase14pFrozenSha: '5d9b71f185140d6c3477286b8fb111f293e52b48',
     doc0MergeSha: '573b592942327d451661cd55d50fd237630eb5cf',

@@ -69,7 +69,8 @@ const index:SearchIndexArtifact={schemaVersion:SEARCH_SCHEMA_VERSION,sourceCheck
 
 const count=(kind:SearchRecordKind)=>records.filter(r=>r.kind===kind).length;
 const optionTotal=(api.symbols??[]).flatMap((s:any)=>s.members??[]).reduce((n:number,m:any)=>{const seen=new Set<string>();const visit=(o:any)=>{seen.add(o.id);for(const c of o.children??[])visit(c)};for(const ov of m.overloads??[])for(const p of ov.parameters??[])for(const o of p.options??[])visit(o);return n+seen.size;},0);
-const galleryAccounted=(examples.examples??[]).filter((e:any)=>e.gallery?.enabled).length+records.filter(r=>r.kind==='gallery').length;
+const registeredGalleryIds=new Set((allGalleryItemsForDocs as any[]).map((item:any)=>item.id));
+const galleryAccounted=(examples.examples??[]).filter((e:any)=>e.gallery?.enabled&&registeredGalleryIds.has(e.id)).length+records.filter(r=>r.kind==='gallery').length;
 const coverage={schemaVersion:1,docs:{total:(redirects.legacyDocuments??[]).length,indexed:count('doc')+count('changelog')},apiSymbols:{total:(api.symbols??[]).length,indexed:count('api-symbol')},apiOptions:{total:optionTotal,indexed:count('api-option')},apiTypes:{total:(api.types??[]).length,indexed:count('api-type')},examples:{total:(examples.examples??[]).length,indexed:count('example')},galleryMetadata:{total:allGalleryItemsForDocs.length,accounted:galleryAccounted},headings:count('heading'),errors:count('error')+count('diagnostic'),records:records.length};
 for(const k of ['docs','apiSymbols','apiOptions','apiTypes','examples'] as const)if(coverage[k].total!==coverage[k].indexed)throw new Error(`[doc6] coverage mismatch ${k}`);
 if(coverage.galleryMetadata.total!==coverage.galleryMetadata.accounted)throw new Error('[doc6] Gallery coverage mismatch');

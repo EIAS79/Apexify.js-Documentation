@@ -1,6 +1,6 @@
 ---
 title: "Getting Started"
-description: "Install the staged Apexify.js 6.0.0 package, understand its Node/server requirements, and render a first image."
+description: "Install Apexify.js 6.0.0, understand its Node/server requirements, and render a first image."
 slug: "getting-started"
 kind: "guide"
 category: "Start"
@@ -23,11 +23,11 @@ legacyHashes: ["00-start-here"]
 
 Welcome to **Apexify.js** — a Node/server library for programmatic PNG/image composition, text, charts, GIFs, FFmpeg-backed video, procedural audio, scenes, templates, and batch/output workflows.
 
-> **Release status:** these docs describe the staged **Apexify.js 6.0.0** package artifact produced from the current repository. npm `latest` is still **5.4.5**, so `npm install apexify.js` currently installs 5.4.5. Do not use the 6.0 API reference against npm `latest` until 6.0.0 is explicitly published.
+> **Release target:** these docs describe **Apexify.js 6.0.0** and are verified against an exact package commit. During the npm release cutover, confirm the registry resolves to `6.0.0` before relying on v6-specific behavior: `npm view apexify.js version`.
 
 ---
 
-## Requirements for staged 6.0.0
+## Requirements for 6.0.0
 
 - **Node.js 22.x, 24.x, or 26.x**
 - **npm 10+**
@@ -44,7 +44,7 @@ Apexify.js 6 is a **Node/server package**. Browser-native, React/Next, Render-IR
 npm install apexify.js
 ```
 
-That currently installs the published 5.4.5 release. The 6.0 documentation site itself is validated against an exact staged package commit rather than pretending npm already contains 6.0.0.
+These docs target 6.0.0. During the release cutover, verify the resolved version with `npm view apexify.js version` or `npm ls apexify.js` before deployment.
 
 ---
 
@@ -62,7 +62,7 @@ const { ApexPainter } = require("apexify.js");
 
 ---
 
-## Smallest staged-6 example
+## Smallest v6 example
 
 ```ts
 import { writeFile } from "node:fs/promises";
