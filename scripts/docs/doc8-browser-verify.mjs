@@ -120,11 +120,11 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
     await page.waitForSelector('[data-doc8-primitive="workspace"]');
     await page.waitForSelector('[data-doc8-primitive="preview"]');
     const bodyText = await page.evaluate(() => document.body.textContent || '');
-    if (!bodyText.includes('Public arbitrary code execution is unavailable')) {
-      throw new Error(`${name}: Studio execution boundary disclosure missing`);
+    if (!bodyText.includes('Live Canvas is active')) {
+      throw new Error(`${name}: Studio Live Canvas capability disclosure missing`);
     }
-    if (!bodyText.includes('not a security sandbox')) {
-      throw new Error(`${name}: Studio must explicitly avoid sandbox overclaiming`);
+    if (!bodyText.includes('trusted local runtime')) {
+      throw new Error(`${name}: Studio Node execution boundary disclosure missing`);
     }
   }
 
