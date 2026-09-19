@@ -25,6 +25,7 @@ type FunctionDef = {
   params: string[];
   body: string;
   start: number;
+  bodyStart: number;
   end: number;
 };
 
@@ -36,6 +37,7 @@ type Runtime = {
 
 export type SafePreviewResolver = {
   resolve(expression: string): PreviewJsonish;
+  resolveAt(expression: string, sourceIndex: number): PreviewJsonish;
   unresolved(): string[];
 };
 
@@ -318,6 +320,7 @@ function collectFunctions(source: string): Map<string, FunctionDef> {
       params: splitTopLevel(source.slice(open + 1, close)).map(paramName).filter(Boolean),
       body: source.slice(bodyOpen + 1, bodyClose),
       start: match.index,
+      bodyStart: bodyOpen + 1,
       end: bodyClose + 1,
     });
     re.lastIndex = bodyClose + 1;
@@ -935,6 +938,32 @@ function execute(body: string, env: Map<string, SafeValue>, runtime: Runtime, de
   return { returned: false, value: null };
 }
 
+function enclosingFunction(sourceIndex: number, runtime: Runtime): FunctionDef | null {
+  let best: FunctionDef | null = null;
+
+  for (const fn of runtime.functions.values()) {
+    if (sourceIndex <= fn.bodyStart || sourceIndex >= fn.end) continue;
+    if (!best || fn.end - fn.start < best.end - best.start) best = fn;
+  }
+
+  return best;
+}
+
+function environmentAt(sourceIndex: number, runtime: Runtime): Map<string, SafeValue> {
+  const env = new Map(runtime.globals);
+  const fn = enclosingFunction(sourceIndex, runtime);
+  if (!fn) return env;
+
+  for (const param of fn.params) {
+    if (!env.has(param)) env.set(param, unknown(param));
+  }
+
+  const localLength = Math.max(0, Math.min(fn.body.length, sourceIndex - fn.bodyStart));
+  const prefix = fn.body.slice(0, localLength);
+  execute(prefix, env, runtime, 0);
+  return env;
+}
+
 function collectGlobals(source: string, runtime: Runtime) {
   const declarations: Array<{ index: number; name: string; expression: string }> = [];
   const re = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/g;
@@ -971,6 +1000,10 @@ export function createSafePreviewResolver(source: string): SafePreviewResolver {
   return {
     resolve(expression: string) {
       return toJsonish(new Parser(expression, runtime.globals, runtime, 0).parse(), unresolved);
+    },
+    resolveAt(expression: string, sourceIndex: number) {
+      const env = environmentAt(sourceIndex, runtime);
+      return toJsonish(new Parser(expression, env, runtime, 0).parse(), unresolved);
     },
     unresolved() {
       return [...unresolved];
