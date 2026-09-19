@@ -209,10 +209,10 @@ body {
   z-index: 99999;
 }
 
-/* Custom cursor — calm precision language */
+/* Custom cursor — container morph + proper pointer states */
 .custom-cursor-pointer {
   color: #5269dc;
-  transition: opacity 0.12s ease;
+  transition: opacity 0.1s ease;
 }
 
 .dark .custom-cursor-pointer {
@@ -222,82 +222,87 @@ body {
 .custom-cursor-pointer__svg {
   display: block;
   overflow: visible;
-  transform-origin: 16% 14%;
-  transition: transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: 20% 16%;
+  transition:
+    transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.08s ease;
+}
+
+.custom-cursor-pointer__svg--hand {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.custom-cursor-pointer[data-mode="magnet"] .custom-cursor-pointer__svg--arrow {
+  opacity: 0;
+}
+
+.custom-cursor-pointer[data-mode="magnet"] .custom-cursor-pointer__svg--hand {
+  opacity: 1;
 }
 
 .custom-cursor-pointer__shape {
-  fill: rgba(244, 247, 250, 0.96);
-  filter: drop-shadow(0 2px 5px rgba(18, 29, 48, 0.18));
+  fill: rgba(246, 248, 251, 0.98);
+  filter: drop-shadow(0 1.5px 4px rgba(18, 29, 48, 0.2));
 }
 
 .dark .custom-cursor-pointer__shape {
-  fill: rgba(15, 21, 30, 0.96);
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.28));
+  fill: rgba(13, 18, 26, 0.98);
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
 }
 
-.custom-cursor-pointer__detail {
-  stroke: #7db8b0;
+.custom-cursor-pointer__hand-shape {
+  fill: rgba(246, 248, 251, 0.98);
+  filter: drop-shadow(0 1.5px 4px rgba(18, 29, 48, 0.2));
 }
 
-.custom-cursor-pointer__node {
-  fill: #7db8b0;
+.dark .custom-cursor-pointer__hand-shape {
+  fill: rgba(13, 18, 26, 0.98);
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
 }
 
 .custom-cursor-pointer[data-pressed="true"] .custom-cursor-pointer__svg {
-  transform: scale(0.88);
-}
-
-.custom-cursor-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 9999px;
-  background: #7db8b0;
-  box-shadow: 0 0 0 3px rgba(125, 184, 176, 0.12);
-  transition: opacity 0.12s ease;
+  transform: scale(0.9);
 }
 
 .custom-cursor-wrap {
   background: transparent;
-  border: 1.25px solid rgba(82, 105, 220, 0.72);
+  border: 1.2px solid rgba(82, 105, 220, 0.8);
   box-shadow: none;
   transition:
-    opacity 0.14s ease,
-    border-color 0.16s ease,
-    background-color 0.16s ease,
-    transform 0.08s linear;
+    opacity 0.1s ease,
+    border-color 0.12s ease,
+    background-color 0.12s ease;
 }
 
 .dark .custom-cursor-wrap {
-  border-color: rgba(142, 162, 255, 0.78);
+  border-color: rgba(142, 162, 255, 0.84);
 }
 
-/* Interactive elements: compact focus ring centered on the pointer. */
+/* Interactive elements: outline the actual hovered control geometry. */
 .custom-cursor-wrap[data-mode="magnet"] {
-  border-width: 1.25px;
-  border-color: rgba(82, 105, 220, 0.82);
-  background:
-    radial-gradient(circle at center, rgba(125, 184, 176, 0.10) 0 34%, transparent 36%);
+  border-width: 1.2px;
+  border-color: rgba(82, 105, 220, 0.86);
+  background: rgba(82, 105, 220, 0.045);
 }
 
 .dark .custom-cursor-wrap[data-mode="magnet"] {
-  border-color: rgba(142, 162, 255, 0.86);
-  background:
-    radial-gradient(circle at center, rgba(125, 184, 176, 0.11) 0 34%, transparent 36%);
+  border-color: rgba(142, 162, 255, 0.9);
+  background: rgba(142, 162, 255, 0.055);
 }
 
-/* Selectable text: a quiet vertical marker instead of a neon underline. */
+/* Selectable text: slim caret marker. */
 .custom-cursor-wrap[data-mode="text"] {
   border: 0;
   background: #7db8b0;
   box-shadow: none;
 }
 
-/* Pressed interactive state: subtle compression / fill. */
+/* Pressed interactive state: restrained feedback without breaking geometry. */
 .custom-cursor-wrap[data-pressed="true"][data-mode="magnet"] {
   border-color: #7db8b0;
-  background: rgba(125, 184, 176, 0.16);
-  transform: scale(0.92);
+  background: rgba(125, 184, 176, 0.1);
 }
 
 /* ============================================================
