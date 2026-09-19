@@ -799,10 +799,11 @@ export default function CodeStudio() {
         >
           <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            <strong>Live Canvas is active.</strong> Public Studio safely previews supported
-            <code> createCanvas()</code>, <code>createText()</code>, and shape-based
-            <code> createImage()</code> calls in your browser. Full Node execution remains available
-            only in explicitly trusted local development.
+            <strong>Live Canvas is active.</strong> Public Studio previews
+            <code> createCanvas()</code>, <code>createChart()</code>, <code>createText()</code>,
+            shape-based <code>createImage()</code>, browser-fetchable HTTP(S) image layers,
+            generated chart layers, and procedural canvas patterns directly in your browser.
+            Local-file and Node-only media workflows still require an explicitly trusted local runtime.
           </span>
         </div>
       )}

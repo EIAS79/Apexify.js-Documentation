@@ -79,7 +79,7 @@ const workbenchSource = read('components/docs/playground/VerifiedExamplePlaygrou
 const loaderSource = read('components/docs/playground/CanvasPlaygroundLoader.tsx');
 const studioSource = read('lib/studio/studioStorage.ts');
 
-for (const text of ['Draw ', 'From a ', 'ProductExperienceModel', 'model.heroExample', 'DOC-5']) {
+for (const text of ['Build visual systems', 'from code.', 'ProductExperienceModel', 'model.heroExample', 'data-doc7-verified-hero']) {
   invariant(homeSource.includes(text), `homepage recovery marker missing: ${text}`);
 }
 invariant(!homeSource.includes("'use client'"), 'homepage recovery clientified the server component');

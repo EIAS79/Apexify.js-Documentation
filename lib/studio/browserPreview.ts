@@ -1,6 +1,6 @@
 'use client';
 
-import { createSafePreviewResolver, isUnresolvedPreviewValue } from './safePreviewExpression';
+import { createSafePreviewResolver, isUnresolvedPreviewValue, UNRESOLVED_PREVIEW_PREFIX } from './safePreviewExpression';
 
 type Jsonish = null | boolean | number | string | Jsonish[] | { [key: string]: Jsonish };
 type RecordValue = { [key: string]: Jsonish };
@@ -40,7 +40,6 @@ const MAX_REMOTE_IMAGE_COUNT = 8;
 const REMOTE_IMAGE_TIMEOUT_MS = 8_000;
 
 const UNSUPPORTED_APIS = [
-  'createChart',
   'createComparisonChart',
   'createComboChart',
   'createScene',
@@ -390,6 +389,12 @@ function createGradient(
       numberOf(config.endY, height / 2),
       Math.max(1, numberOf(config.endRadius, Math.max(width, height) / 2)),
     );
+  } else if (type === 'conic' && typeof ctx.createConicGradient === 'function') {
+    gradient = ctx.createConicGradient(
+      (numberOf(config.startAngle, 0) * Math.PI) / 180,
+      numberOf(config.centerX, width / 2),
+      numberOf(config.centerY, height / 2),
+    );
   } else {
     const angle = numberOf(config.rotate, Number.NaN);
     if (Number.isFinite(angle)) {
@@ -481,14 +486,23 @@ function applyBackground(
       ctx.fillRect(0, 0, width, height);
     } else if (type === 'presetPattern' && isRecord(layer.pattern)) {
       drawPattern(ctx, layer.pattern, width, height);
+    } else if (type === 'noise') {
+      const intensity = Math.min(0.12, Math.max(0, numberOf(layer.intensity, 0.03)));
+      if (intensity > 0) drawNoise(ctx, width, height, intensity);
     }
     ctx.restore();
   }
 
   if (isRecord(config.patternBg)) {
     ctx.save();
-    applyBlendMode(ctx, config.patternBg.blendMode);
-    drawPattern(ctx, config.patternBg, width, height);
+    const pattern = config.patternBg;
+    const blend = stringOf(pattern.blendMode, 'source-over');
+    try {
+      ctx.globalCompositeOperation = blend as GlobalCompositeOperation;
+    } catch {
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    drawPattern(ctx, pattern, width, height);
     ctx.restore();
   }
 
@@ -497,16 +511,25 @@ function applyBackground(
     if (intensity > 0) drawNoise(ctx, width, height, intensity);
   }
 
-  if (isRecord(config.canvasStroke)) {
-    const stroke = config.canvasStroke;
-    const lineWidth = Math.max(1, numberOf(stroke.width, 1));
-    ctx.save();
-    ctx.strokeStyle = stringOf(stroke.color, '#ffffff');
-    ctx.lineWidth = lineWidth;
-    const radius = numberOf(config.borderRadius, 0);
-    drawRoundedRect(ctx, lineWidth / 2, lineWidth / 2, width - lineWidth, height - lineWidth, radius);
-    ctx.stroke();
-    ctx.restore();
+  const stroke = isRecord(config.canvasStroke)
+    ? config.canvasStroke
+    : isRecord(config.stroke)
+      ? config.stroke
+      : null;
+  if (stroke) {
+    const lineWidth = Math.max(0, numberOf(stroke.width, 1));
+    if (lineWidth > 0) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(stroke.opacity, 1)));
+      ctx.lineWidth = lineWidth;
+      ctx.strokeStyle = isRecord(stroke.gradient)
+        ? createGradient(ctx, stroke.gradient, width, height)
+        : stringOf(stroke.color, '#ffffff');
+      const radius = numberOf(stroke.borderRadius, numberOf(config.borderRadius, 0));
+      drawRoundedRect(ctx, lineWidth / 2, lineWidth / 2, width - lineWidth, height - lineWidth, radius);
+      ctx.stroke();
+      ctx.restore();
+    }
   }
 }
 
@@ -519,63 +542,168 @@ function drawPattern(
   const type = stringOf(pattern.type, 'grid');
   const color = stringOf(pattern.color, 'rgba(255,255,255,.16)');
   const secondary = stringOf(pattern.secondaryColor, color);
-  const spacing = Math.max(4, numberOf(pattern.spacing, 24));
-  const size = Math.max(1, numberOf(pattern.size, 2));
+  const spacing = Math.max(2, numberOf(pattern.spacing, 24));
+  const size = Math.max(1, numberOf(pattern.size, 6));
+  const lineWidth = Math.max(0.5, Math.min(4, size * 0.16));
+  const rotation = (numberOf(pattern.rotation, 0) * Math.PI) / 180;
+  const margin = Math.ceil(Math.hypot(width, height) * 0.55);
+  const left = -margin;
+  const top = -margin;
+  const right = width + margin;
+  const bottom = height + margin;
+  const spanWidth = Math.max(1, right - left);
+  const spanHeight = Math.max(1, bottom - top);
+  const MAX_PATTERN_MARKS = 24000;
+  const densityFloor = Math.sqrt((spanWidth * spanHeight) / MAX_PATTERN_MARKS);
+  const bounded2dStep = (step: number) => Math.max(step, densityFloor);
+
+  const strokePolygon = (points: Array<[number, number]>, strokeColor = color) => {
+    if (!points.length) return;
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    for (let i = 1; i < points.length; i += 1) ctx.lineTo(points[i][0], points[i][1]);
+    ctx.closePath();
+    ctx.strokeStyle = strokeColor;
+    ctx.stroke();
+  };
+
+  const starPath = (cx: number, cy: number, outer: number, inner: number) => {
+    ctx.beginPath();
+    for (let i = 0; i < 10; i += 1) {
+      const radius = i % 2 === 0 ? outer : inner;
+      const angle = (i * Math.PI) / 5 - Math.PI / 2;
+      const x = cx + Math.cos(angle) * radius;
+      const y = cy + Math.sin(angle) * radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  };
 
   ctx.save();
   ctx.globalAlpha *= Math.min(1, Math.max(0, numberOf(pattern.opacity, 1)));
-  const rotation = (numberOf(pattern.rotation, 0) * Math.PI) / 180;
+  ctx.lineWidth = lineWidth;
   if (rotation) {
     ctx.translate(width / 2, height / 2);
     ctx.rotate(rotation);
     ctx.translate(-width / 2, -height / 2);
   }
 
-  if (type === 'dots') {
+  if (type === 'dots' || type === 'polka') {
     ctx.fillStyle = color;
-    for (let y = spacing / 2; y < height; y += spacing) {
-      for (let x = spacing / 2; x < width; x += spacing) {
+    const step = bounded2dStep(Math.max(size + spacing, size * 1.6));
+    for (let y = top; y <= bottom; y += step) {
+      for (let x = left; x <= right; x += step) {
+        const offset = type === 'polka' && Math.round((y - top) / step) % 2 ? step / 2 : 0;
         ctx.beginPath();
-        ctx.arc(x, y, size / 2, 0, Math.PI * 2);
+        ctx.arc(x + offset, y, Math.max(1, size / 2), 0, Math.PI * 2);
         ctx.fill();
+      }
+    }
+  } else if (type === 'stripes' || type === 'diagonal') {
+    ctx.strokeStyle = color;
+    const step = Math.max(5, size + spacing);
+    const diagonal = type === 'diagonal' ? height + margin * 2 : 0;
+    for (let x = left - diagonal; x <= right + diagonal; x += step) {
+      ctx.beginPath();
+      ctx.moveTo(x, top);
+      ctx.lineTo(x + diagonal, bottom);
+      ctx.stroke();
+    }
+  } else if (type === 'waves') {
+    const stepY = bounded2dStep(Math.max(10, size + spacing));
+    const amplitude = Math.max(2, size * 0.35);
+    const wavelength = Math.max(24, size * 2.4 + spacing * 2);
+    const rowCount = Math.max(1, Math.ceil(spanHeight / stepY));
+    const waveSampleStep = Math.max(4, Math.ceil((spanWidth * rowCount) / MAX_PATTERN_MARKS));
+    for (let y = top; y <= bottom; y += stepY) {
+      ctx.beginPath();
+      for (let x = left; x <= right; x += waveSampleStep) {
+        const waveY = y + Math.sin(((x - left) / wavelength) * Math.PI * 2) * amplitude;
+        if (x === left) ctx.moveTo(x, waveY);
+        else ctx.lineTo(x, waveY);
+      }
+      ctx.strokeStyle = Math.round((y - top) / stepY) % 2 ? secondary : color;
+      ctx.stroke();
+    }
+  } else if (type === 'crosses') {
+    const step = bounded2dStep(Math.max(8, size + spacing));
+    const arm = Math.max(2, size / 2);
+    for (let y = top; y <= bottom; y += step) {
+      for (let x = left; x <= right; x += step) {
+        ctx.strokeStyle = Math.round((x + y) / step) % 2 ? secondary : color;
+        ctx.beginPath();
+        ctx.moveTo(x - arm, y);
+        ctx.lineTo(x + arm, y);
+        ctx.moveTo(x, y - arm);
+        ctx.lineTo(x, y + arm);
+        ctx.stroke();
       }
     }
   } else if (type === 'hexagons') {
     const radius = Math.max(3, size);
-    const stepX = Math.max(radius * 1.5 + spacing, 6);
-    const stepY = Math.max(Math.sqrt(3) * radius + spacing, 6);
-    ctx.lineWidth = Math.max(0.5, radius / 7);
-    let row = 0;
-    for (let y = -stepY; y <= height + stepY; y += stepY, row += 1) {
-      for (let x = -stepX; x <= width + stepX; x += stepX) {
-        const cx = x + (row % 2 ? stepX / 2 : 0);
-        ctx.strokeStyle = row % 2 ? secondary : color;
-        ctx.beginPath();
+    const hexH = Math.sqrt(3) * radius;
+    const stepX = Math.max(radius * 1.5 + spacing, densityFloor);
+    const stepY = Math.max(hexH + spacing, densityFloor);
+    let col = 0;
+    for (let x = left; x <= right + radius; x += stepX, col += 1) {
+      let row = 0;
+      for (let y = top + (col % 2 ? stepY / 2 : 0); y <= bottom + hexH; y += stepY, row += 1) {
+        const points: Array<[number, number]> = [];
         for (let i = 0; i < 6; i += 1) {
-          const angle = Math.PI / 3 * i;
-          const px = cx + Math.cos(angle) * radius;
-          const py = y + Math.sin(angle) * radius;
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
+          const angle = (Math.PI / 3) * i;
+          points.push([x + Math.cos(angle) * radius, y + Math.sin(angle) * radius]);
         }
-        ctx.closePath();
+        strokePolygon(points, (col + row) % 2 ? secondary : color);
+      }
+    }
+  } else if (type === 'checkerboard') {
+    const cell = bounded2dStep(Math.max(4, size + spacing));
+    for (let y = top, row = 0; y <= bottom; y += cell, row += 1) {
+      for (let x = left, col = 0; x <= right; x += cell, col += 1) {
+        ctx.fillStyle = (row + col) % 2 ? secondary : color;
+        ctx.fillRect(x, y, cell, cell);
+      }
+    }
+  } else if (type === 'diamonds') {
+    const step = bounded2dStep(Math.max(8, size * 2 + spacing));
+    const half = Math.max(3, size);
+    for (let y = top; y <= bottom; y += step) {
+      for (let x = left; x <= right; x += step) {
+        strokePolygon([[x, y - half], [x + half, y], [x, y + half], [x - half, y]]);
+      }
+    }
+  } else if (type === 'triangles') {
+    const step = bounded2dStep(Math.max(8, size * 2 + spacing));
+    const triH = Math.max(4, size * 1.5);
+    for (let y = top; y <= bottom; y += step) {
+      for (let x = left; x <= right; x += step) {
+        strokePolygon([[x, y - triH / 2], [x + size, y + triH / 2], [x - size, y + triH / 2]]);
+      }
+    }
+  } else if (type === 'stars') {
+    const step = bounded2dStep(Math.max(12, size * 2 + spacing));
+    for (let y = top; y <= bottom; y += step) {
+      for (let x = left; x <= right; x += step) {
+        starPath(x, y, size, size * 0.45);
+        ctx.strokeStyle = color;
         ctx.stroke();
       }
     }
   } else {
-    ctx.lineWidth = Math.max(0.5, size / 3);
-    for (let x = 0; x <= width; x += spacing) {
+    const step = Math.max(6, size + spacing);
+    for (let x = left; x <= right; x += step) {
       ctx.strokeStyle = color;
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
+      ctx.moveTo(x, top);
+      ctx.lineTo(x, bottom);
       ctx.stroke();
     }
-    for (let y = 0; y <= height; y += spacing) {
+    for (let y = top; y <= bottom; y += step) {
       ctx.strokeStyle = secondary;
       ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
+      ctx.moveTo(left, y);
+      ctx.lineTo(right, y);
       ctx.stroke();
     }
   }
@@ -644,29 +772,16 @@ function applyText(ctx: CanvasRenderingContext2D, value: Jsonish) {
     ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(item.opacity, 1)));
     applyBlendMode(ctx, item.blendMode);
     applyShadow(ctx, item.shadow);
-
-    if (isRecord(item.gradient)) {
-      ctx.fillStyle = createGradient(
-        ctx,
-        item.gradient,
-        Math.max(1, numberOf(item.maxWidth, size * 12)),
-        size * 2,
-      );
-    } else {
-      ctx.fillStyle = stringOf(fill.color, stringOf(item.color, '#ffffff'));
-    }
-
     ctx.translate(x, y);
     if (rotation) ctx.rotate(rotation);
     ctx.font = `${style} ${weight} ${size}px ${family}`;
-    ctx.textAlign = stringOf(
-      item.textAlign,
-      stringOf(placement.textAlign, 'left'),
-    ) as CanvasTextAlign;
-    ctx.textBaseline = stringOf(
-      item.textBaseline,
-      stringOf(placement.textBaseline, 'alphabetic'),
-    ) as CanvasTextBaseline;
+    ctx.textAlign = stringOf(item.textAlign, stringOf(placement.textAlign, 'left')) as CanvasTextAlign;
+    ctx.textBaseline = stringOf(item.textBaseline, stringOf(placement.textBaseline, 'alphabetic')) as CanvasTextBaseline;
+    if (isRecord(item.gradient)) {
+      ctx.fillStyle = createGradient(ctx, item.gradient, Math.max(1, numberOf(item.maxWidth, size * 12)), size * 2);
+    } else {
+      ctx.fillStyle = stringOf(fill.color, stringOf(item.color, '#ffffff'));
+    }
 
     const text = stringOf(item.text, '');
     const maxWidth = numberOf(item.maxWidth, 0);
@@ -709,13 +824,67 @@ function applyText(ctx: CanvasRenderingContext2D, value: Jsonish) {
   }
 }
 
-function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
+function drawGeneratedCanvasLayer(
+  ctx: CanvasRenderingContext2D,
+  item: RecordValue,
+  sourceCanvas: HTMLCanvasElement,
+) {
+  const x = numberOf(item.x, 0);
+  const y = numberOf(item.y, 0);
+  const width = Math.max(1, numberOf(item.width, sourceCanvas.width));
+  const height = Math.max(1, numberOf(item.height, sourceCanvas.height));
+  const radius = Math.max(0, numberOf(item.borderRadius, 0));
+  const shadow = isRecord(item.shadow) ? item.shadow : null;
+
+  if (shadow) {
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(shadow.opacity, 1)));
+    ctx.shadowColor = stringOf(shadow.color, 'rgba(0,0,0,.35)');
+    ctx.shadowBlur = Math.max(0, numberOf(shadow.blur, 0));
+    ctx.shadowOffsetX = numberOf(shadow.offsetX, 0);
+    ctx.shadowOffsetY = numberOf(shadow.offsetY, 0);
+    ctx.fillStyle = 'rgba(0,0,0,0.01)';
+    drawRoundedRect(ctx, x, y, width, height, radius);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(item.opacity, 1)));
+  if (radius > 0) {
+    drawRoundedRect(ctx, x, y, width, height, radius);
+    ctx.clip();
+  }
+  ctx.drawImage(sourceCanvas, x, y, width, height);
+  ctx.restore();
+}
+
+function unresolvedPreviewLabel(value: Jsonish): string | null {
+  if (!isUnresolvedPreviewValue(value)) return null;
+  return value.slice(UNRESOLVED_PREVIEW_PREFIX.length) || null;
+}
+
+function applyImageShapes(
+  ctx: CanvasRenderingContext2D,
+  value: Jsonish,
+  generatedChartsBySource: Map<string, HTMLCanvasElement>,
+): Set<string> {
   const list = Array.isArray(value) ? value : [value];
+  const usedGeneratedSources = new Set<string>();
 
   for (const item of list) {
     if (!isRecord(item)) continue;
-    const source = stringOf(item.source, '');
-    if (!SHAPES.has(source)) continue;
+    const rawSource = item.source;
+    const source = stringOf(rawSource, '');
+    if (!SHAPES.has(source)) {
+      const unresolvedLabel = unresolvedPreviewLabel(rawSource);
+      const generatedChart = unresolvedLabel ? generatedChartsBySource.get(unresolvedLabel) : undefined;
+      if (unresolvedLabel && generatedChart) {
+        drawGeneratedCanvasLayer(ctx, item, generatedChart);
+        usedGeneratedSources.add(unresolvedLabel);
+      }
+      continue;
+    }
 
     const shape = isRecord(item.shape) ? item.shape : {};
     const stroke = isRecord(item.stroke) ? item.stroke : {};
@@ -820,7 +989,7 @@ function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
         ctx.closePath();
       }
     } else {
-      const strokeRadius = isRecord(stroke) ? stroke.borderRadius : undefined;
+      const strokeRadius = stroke.borderRadius;
       const radius =
         item.borderRadius === 'circular' || strokeRadius === 'circular'
           ? Math.min(width, height) / 2
@@ -846,210 +1015,673 @@ function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
 
     ctx.restore();
   }
+
+  return usedGeneratedSources;
 }
+
 
 function remoteImageSource(source: string): boolean {
   return /^https?:\/\//i.test(source);
 }
-
 function remoteImageHost(source: string): string {
-  try {
-    return new URL(source).hostname || 'remote host';
-  } catch {
-    return 'remote host';
-  }
+  try { return new URL(source).hostname || 'remote host'; } catch { return 'remote host'; }
 }
-
-function alignedImageOffset(
-  align: string,
-  outerWidth: number,
-  outerHeight: number,
-  drawWidth: number,
-  drawHeight: number,
-) {
-  let x = (outerWidth - drawWidth) / 2;
-  let y = (outerHeight - drawHeight) / 2;
-
-  if (align.includes('left')) x = 0;
-  else if (align.includes('right')) x = outerWidth - drawWidth;
-
-  if (align.includes('top')) y = 0;
-  else if (align.includes('bottom')) y = outerHeight - drawHeight;
-
-  return { x, y };
+function alignedImageOffset(align:string, outerWidth:number, outerHeight:number, drawWidth:number, drawHeight:number) {
+  let x=(outerWidth-drawWidth)/2, y=(outerHeight-drawHeight)/2;
+  if (align.includes('left')) x=0; else if (align.includes('right')) x=outerWidth-drawWidth;
+  if (align.includes('top')) y=0; else if (align.includes('bottom')) y=outerHeight-drawHeight;
+  return {x,y};
 }
-
-async function fetchRemoteImageBitmap(source: string): Promise<ImageBitmap> {
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), REMOTE_IMAGE_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(source, {
-      signal: controller.signal,
-      mode: 'cors',
-      credentials: 'omit',
-      redirect: 'follow',
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const announcedBytes = Number(response.headers.get('content-length') || 0);
-    if (Number.isFinite(announcedBytes) && announcedBytes > MAX_REMOTE_IMAGE_BYTES) {
-      throw new Error('image exceeds the 8 MiB Live Canvas limit');
-    }
-
-    const blob = await response.blob();
-    if (blob.size > MAX_REMOTE_IMAGE_BYTES) {
-      throw new Error('image exceeds the 8 MiB Live Canvas limit');
-    }
-    if (blob.type && !blob.type.toLowerCase().startsWith('image/')) {
-      throw new Error(`expected image content, received ${blob.type}`);
-    }
-
-    const bitmap = await createImageBitmap(blob);
-    if (bitmap.width * bitmap.height > MAX_REMOTE_IMAGE_PIXELS) {
-      bitmap.close();
-      throw new Error('decoded image exceeds the 12 million pixel Live Canvas limit');
-    }
+async function fetchRemoteImageBitmap(source:string):Promise<ImageBitmap>{
+  const controller=new AbortController();
+  const timeout=window.setTimeout(()=>controller.abort(),REMOTE_IMAGE_TIMEOUT_MS);
+  try{
+    const response=await fetch(source,{signal:controller.signal,mode:'cors',credentials:'omit',redirect:'follow'});
+    if(!response.ok) throw new Error(`HTTP ${response.status}`);
+    const announcedBytes=Number(response.headers.get('content-length')||0);
+    if(Number.isFinite(announcedBytes)&&announcedBytes>MAX_REMOTE_IMAGE_BYTES) throw new Error('image exceeds the 8 MiB Live Canvas limit');
+    const blob=await response.blob();
+    if(blob.size>MAX_REMOTE_IMAGE_BYTES) throw new Error('image exceeds the 8 MiB Live Canvas limit');
+    if(blob.type&&!blob.type.toLowerCase().startsWith('image/')) throw new Error(`expected image content, received ${blob.type}`);
+    const bitmap=await createImageBitmap(blob);
+    if(bitmap.width*bitmap.height>MAX_REMOTE_IMAGE_PIXELS){bitmap.close();throw new Error('decoded image exceeds the 12 million pixel Live Canvas limit');}
     return bitmap;
-  } finally {
-    window.clearTimeout(timeout);
+  } finally { window.clearTimeout(timeout); }
+}
+async function drawRemoteImageLayer(ctx:CanvasRenderingContext2D,item:RecordValue,warnings:string[]){
+  const source=stringOf(item.source,''); let bitmap:ImageBitmap|null=null;
+  try{
+    bitmap=await fetchRemoteImageBitmap(source);
+    const intrinsicWidth=Math.max(1,bitmap.width), intrinsicHeight=Math.max(1,bitmap.height);
+    const width=Math.max(1,numberOf(item.width,intrinsicWidth)), height=Math.max(1,numberOf(item.height,intrinsicHeight));
+    const x=numberOf(item.x,0), y=numberOf(item.y,0), rotation=(numberOf(item.rotation,0)*Math.PI)/180;
+    const fit=stringOf(item.fit,'fill'), align=stringOf(item.align,'center'), stroke=isRecord(item.stroke)?item.stroke:{};
+    const rawRadius=item.borderRadius;
+    const radius=rawRadius==='circular'?Math.min(width,height)/2:Math.max(0,numberOf(rawRadius,numberOf(stroke.borderRadius,0)));
+    ctx.save();
+    ctx.globalAlpha=Math.min(1,Math.max(0,numberOf(item.opacity,1)));
+    applyBlendMode(ctx,item.blendMode);
+    ctx.translate(x+width/2,y+height/2); if(rotation)ctx.rotate(rotation); ctx.translate(-width/2,-height/2);
+    if(isRecord(item.shadow)){
+      applyShadow(ctx,item.shadow); drawRoundedRect(ctx,0,0,width,height,radius);
+      ctx.fillStyle='rgba(0,0,0,0.01)'; ctx.fill();
+      ctx.shadowColor='rgba(0,0,0,0)'; ctx.shadowBlur=0; ctx.shadowOffsetX=0; ctx.shadowOffsetY=0;
+    }
+    if(radius>0){drawRoundedRect(ctx,0,0,width,height,radius);ctx.clip();}
+    if(fit==='contain'||fit==='cover'){
+      const scale=fit==='cover'?Math.max(width/intrinsicWidth,height/intrinsicHeight):Math.min(width/intrinsicWidth,height/intrinsicHeight);
+      const drawWidth=intrinsicWidth*scale, drawHeight=intrinsicHeight*scale;
+      const offset=alignedImageOffset(align,width,height,drawWidth,drawHeight);
+      ctx.drawImage(bitmap,offset.x,offset.y,drawWidth,drawHeight);
+    }else ctx.drawImage(bitmap,0,0,width,height);
+    const strokeWidth=numberOf(stroke.width,0);
+    if(strokeWidth>0){ctx.lineWidth=strokeWidth;ctx.strokeStyle=stringOf(stroke.color,'#ffffff');drawRoundedRect(ctx,strokeWidth/2,strokeWidth/2,width-strokeWidth,height-strokeWidth,radius);ctx.stroke();}
+    ctx.restore();
+  }catch(error){
+    warnings.push(`Remote image could not be loaded in Live Canvas (${remoteImageHost(source)}): ${error instanceof Error?error.message:'unknown browser image error'}.`);
+  }finally{bitmap?.close();}
+}
+async function applyImageLayersInOrder(ctx:CanvasRenderingContext2D,value:Jsonish,generatedChartsBySource:Map<string,HTMLCanvasElement>,warnings:string[]):Promise<Set<string>>{
+  const list=Array.isArray(value)?value:[value]; const usedGeneratedSources=new Set<string>(); let remoteCount=0;
+  for(const item of list){
+    if(!isRecord(item))continue;
+    const source=stringOf(item.source,'');
+    if(SHAPES.has(source)||isUnresolvedPreviewValue(item.source)){
+      const used=applyImageShapes(ctx,item,generatedChartsBySource); for(const label of used)usedGeneratedSources.add(label); continue;
+    }
+    if(remoteImageSource(source)){remoteCount+=1;if(remoteCount<=MAX_REMOTE_IMAGE_COUNT)await drawRemoteImageLayer(ctx,item,warnings);}
+  }
+  if(remoteCount>MAX_REMOTE_IMAGE_COUNT)warnings.push(`Live Canvas renders at most ${MAX_REMOTE_IMAGE_COUNT} remote image layers per createImage() call; extra remote layers were skipped.`);
+  return usedGeneratedSources;
+}
+
+function readInitializerExpression(source: string, start: number, end: number): string {
+  let paren = 0;
+  let brace = 0;
+  let bracket = 0;
+  let quote: string | null = null;
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+
+  for (let i = start; i < end; i += 1) {
+    const ch = source[i];
+    const next = source[i + 1];
+
+    if (lineComment) {
+      if (ch === '\n') lineComment = false;
+      continue;
+    }
+    if (blockComment) {
+      if (ch === '*' && next === '/') {
+        blockComment = false;
+        i += 1;
+      }
+      continue;
+    }
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '/' && next === '/') {
+      lineComment = true;
+      i += 1;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      blockComment = true;
+      i += 1;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      quote = ch;
+      continue;
+    }
+    if (ch === '(') paren += 1;
+    else if (ch === ')') paren -= 1;
+    else if (ch === '{') brace += 1;
+    else if (ch === '}') brace -= 1;
+    else if (ch === '[') bracket += 1;
+    else if (ch === ']') bracket -= 1;
+    else if (ch === ';' && paren === 0 && brace === 0 && bracket === 0) {
+      return source.slice(start, i).trim();
+    }
+  }
+
+  return source.slice(start, end).trim();
+}
+
+function findInitializerBefore(source: string, name: string, beforeIndex: number): string | null {
+  const prefix = source.slice(0, Math.max(0, beforeIndex));
+  const escapedName = name.split('$').join('\\$');
+  const re = new RegExp('\\b(?:const|let|var)\\s+' + escapedName + '\\s*=', 'g');
+  let match: RegExpExecArray | null;
+  let last: RegExpExecArray | null = null;
+  while ((match = re.exec(prefix))) last = match;
+  if (!last) return null;
+  const expressionStart = last.index + last[0].length;
+  return readInitializerExpression(source, expressionStart, beforeIndex) || null;
+}
+function resolveCallArgument(
+  source: string,
+  call: Call,
+  expression: string | undefined,
+  resolve: (expression: string, sourceIndex: number) => Jsonish,
+): Jsonish {
+  if (!expression) return null;
+  let direct: Jsonish;
+  try {
+    direct = resolve(expression, call.index);
+  } catch {
+    direct = parseLiteral(expression);
+  }
+
+  if (!hasUnresolved(direct)) return direct;
+  const identifier = expression.trim().match(/^[A-Za-z_$][\w$]*$/)?.[0];
+  if (!identifier) return direct;
+  const initializer = findInitializerBefore(source, identifier, call.index);
+  if (!initializer) return direct;
+  try {
+    return resolve(initializer, call.index);
+  } catch {
+    return parseLiteral(initializer);
   }
 }
 
-async function applyRemoteImages(
-  ctx: CanvasRenderingContext2D,
-  value: Jsonish,
-  warnings: string[],
-) {
-  const list = Array.isArray(value) ? value : [value];
-  const remoteItems = list.filter(
-    (item): item is RecordValue =>
-      isRecord(item) && typeof item.source === 'string' && remoteImageSource(item.source),
-  );
+function chartPadding(options: RecordValue) {
+  const dimensions = isRecord(options.dimensions) ? options.dimensions : {};
+  const padding = isRecord(dimensions.padding) ? dimensions.padding : {};
+  return {
+    top: Math.max(18, numberOf(padding.top, 46)),
+    right: Math.max(18, numberOf(padding.right, 36)),
+    bottom: Math.max(24, numberOf(padding.bottom, 52)),
+    left: Math.max(28, numberOf(padding.left, 62)),
+  };
+}
 
-  if (remoteItems.length > MAX_REMOTE_IMAGE_COUNT) {
-    warnings.push(
-      `Live Canvas renders at most ${MAX_REMOTE_IMAGE_COUNT} remote image layers; extra remote layers were skipped.`,
-    );
+function createChartCanvas(chartType: string, rawData: Jsonish, optionsValue: Jsonish): HTMLCanvasElement | null {
+  const options = isRecord(optionsValue) ? optionsValue : {};
+  const dimensions = isRecord(options.dimensions) ? options.dimensions : {};
+  const width = Math.round(Math.min(4096, Math.max(120, numberOf(dimensions.width, 800))));
+  const height = Math.round(Math.min(4096, Math.max(120, numberOf(dimensions.height, 520))));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { alpha: true });
+  if (!ctx) return null;
+
+  const appearance = isRecord(options.appearance) ? options.appearance : {};
+  const backgroundGradient = isRecord(appearance.backgroundGradient) ? appearance.backgroundGradient : null;
+  ctx.fillStyle = backgroundGradient
+    ? createGradient(ctx, backgroundGradient, width, height)
+    : stringOf(appearance.backgroundColor, '#0f172a');
+  ctx.fillRect(0, 0, width, height);
+
+  const appearanceLayers = Array.isArray(appearance.bgLayers) ? appearance.bgLayers : [];
+  for (const layer of appearanceLayers) {
+    if (!isRecord(layer)) continue;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(layer.opacity, 1)));
+    const blend = stringOf(layer.blendMode, 'source-over');
+    try {
+      ctx.globalCompositeOperation = blend as GlobalCompositeOperation;
+    } catch {
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    if (stringOf(layer.type, '') === 'gradient' && isRecord(layer.value)) {
+      ctx.fillStyle = createGradient(ctx, layer.value, width, height);
+      ctx.fillRect(0, 0, width, height);
+    } else if (stringOf(layer.type, '') === 'presetPattern' && isRecord(layer.pattern)) {
+      drawPattern(ctx, layer.pattern, width, height);
+    }
+    ctx.restore();
   }
 
-  for (const item of remoteItems.slice(0, MAX_REMOTE_IMAGE_COUNT)) {
-    const source = stringOf(item.source, '');
-    let bitmap: ImageBitmap | null = null;
-
+  if (isRecord(appearance.patternBg)) {
+    ctx.save();
+    const blend = stringOf(appearance.patternBg.blendMode, 'source-over');
     try {
-      bitmap = await fetchRemoteImageBitmap(source);
-      const intrinsicWidth = Math.max(1, bitmap.width);
-      const intrinsicHeight = Math.max(1, bitmap.height);
-      const width = Math.max(1, numberOf(item.width, intrinsicWidth));
-      const height = Math.max(1, numberOf(item.height, intrinsicHeight));
-      const x = numberOf(item.x, 0);
-      const y = numberOf(item.y, 0);
-      const rotation = (numberOf(item.rotation, 0) * Math.PI) / 180;
-      const fit = stringOf(item.fit, 'fill');
-      const align = stringOf(item.align, 'center');
-      const stroke = isRecord(item.stroke) ? item.stroke : {};
-      const rawRadius = item.borderRadius;
-      const radius =
-        rawRadius === 'circular'
-          ? Math.min(width, height) / 2
-          : Math.max(0, numberOf(rawRadius, 0));
+      ctx.globalCompositeOperation = blend as GlobalCompositeOperation;
+    } catch {
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    drawPattern(ctx, appearance.patternBg, width, height);
+    ctx.restore();
+  }
 
+  if (isRecord(appearance.noiseBg)) {
+    drawNoise(ctx, width, height, Math.min(0.08, Math.max(0, numberOf(appearance.noiseBg.intensity, 0))));
+  }
+
+  const padding = chartPadding(options);
+  const labels = isRecord(options.labels) ? options.labels : {};
+  const title = isRecord(labels.title) ? labels.title : {};
+  const titleText = stringOf(title.text, '');
+  const titleSize = Math.max(12, numberOf(title.fontSize, 20));
+  const titleColor = stringOf(title.color, '#f8fafc');
+  if (titleText) {
+    ctx.save();
+    ctx.fillStyle = titleColor;
+    ctx.font = `700 ${titleSize}px Arial`;
+    ctx.textBaseline = 'top';
+    ctx.fillText(titleText, padding.left, Math.max(10, padding.top * 0.35));
+    ctx.restore();
+    padding.top = Math.max(padding.top, titleSize + 30);
+  }
+
+  const plot = {
+    x: padding.left,
+    y: padding.top,
+    w: Math.max(20, width - padding.left - padding.right),
+    h: Math.max(20, height - padding.top - padding.bottom),
+  };
+
+  const axes = isRecord(options.axes) ? options.axes : {};
+  const xAxis = isRecord(axes.x) ? axes.x : {};
+  const yAxis = isRecord(axes.y) ? axes.y : {};
+  const axisColor = stringOf(yAxis.color, stringOf(xAxis.color, stringOf(appearance.axisColor, '#cbd5e1')));
+  const grid = isRecord(options.grid) ? options.grid : {};
+  const data = Array.isArray(rawData) ? rawData.filter(isRecord) : [];
+
+  const axisRange = (axis: RecordValue, values: number[], fallbackMin = 0) => {
+    const range = isRecord(axis.range) ? axis.range : {};
+    const finite = values.filter(Number.isFinite);
+    const min = typeof range.min === 'number'
+      ? range.min
+      : finite.length
+        ? Math.min(fallbackMin, ...finite)
+        : fallbackMin;
+    const maxRaw = typeof range.max === 'number'
+      ? range.max
+      : finite.length
+        ? Math.max(...finite)
+        : min + 1;
+    const max = maxRaw === min ? min + 1 : maxRaw;
+    return { min, max };
+  };
+
+  const drawCartesianFrame = (xRange: { min: number; max: number }, yRange: { min: number; max: number }) => {
+    ctx.save();
+    if (boolOf(grid.show, true)) {
+      ctx.strokeStyle = stringOf(grid.color, 'rgba(148,163,184,.16)');
+      ctx.lineWidth = Math.max(0.5, numberOf(grid.width, 1));
+      for (let i = 0; i <= 5; i += 1) {
+        const yy = plot.y + (plot.h * i) / 5;
+        ctx.beginPath();
+        ctx.moveTo(plot.x, yy);
+        ctx.lineTo(plot.x + plot.w, yy);
+        ctx.stroke();
+      }
+    }
+
+    ctx.strokeStyle = axisColor;
+    ctx.lineWidth = Math.max(1, numberOf(appearance.axisWidth, 1.5));
+    ctx.beginPath();
+    ctx.moveTo(plot.x, plot.y);
+    ctx.lineTo(plot.x, plot.y + plot.h);
+    ctx.lineTo(plot.x + plot.w, plot.y + plot.h);
+    ctx.stroke();
+
+    ctx.fillStyle = stringOf(yAxis.tickColor, stringOf(yAxis.labelColor, axisColor));
+    ctx.font = `${Math.max(9, numberOf(yAxis.tickFontSize, 11))}px Arial`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i <= 5; i += 1) {
+      const value = yRange.max - ((yRange.max - yRange.min) * i) / 5;
+      const yy = plot.y + (plot.h * i) / 5;
+      ctx.fillText(Number.isInteger(value) ? String(value) : value.toFixed(1), plot.x - 8, yy);
+    }
+
+    const xLabel = stringOf(xAxis.label, '');
+    const yLabel = stringOf(yAxis.label, '');
+    if (xLabel) {
+      ctx.fillStyle = stringOf(xAxis.labelColor, axisColor);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.font = `600 ${Math.max(10, numberOf(xAxis.tickFontSize, 11))}px Arial`;
+      ctx.fillText(xLabel, plot.x + plot.w / 2, height - 8);
+    }
+    if (yLabel) {
       ctx.save();
-      ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(item.opacity, 1)));
-      applyBlendMode(ctx, item.blendMode);
-      ctx.translate(x + width / 2, y + height / 2);
-      if (rotation) ctx.rotate(rotation);
-      ctx.translate(-width / 2, -height / 2);
+      ctx.fillStyle = stringOf(yAxis.labelColor, axisColor);
+      ctx.translate(14, plot.y + plot.h / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.font = `600 ${Math.max(10, numberOf(yAxis.tickFontSize, 11))}px Arial`;
+      ctx.fillText(yLabel, 0, 0);
+      ctx.restore();
+    }
+    ctx.restore();
+  };
 
-      if (isRecord(item.shadow)) {
-        applyShadow(ctx, item.shadow);
-        drawRoundedRect(ctx, 0, 0, width, height, radius);
-        ctx.fillStyle = '#000000';
-        ctx.fill();
-        ctx.shadowColor = 'rgba(0,0,0,0)';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 0;
-      }
-
-      if (radius > 0) {
-        drawRoundedRect(ctx, 0, 0, width, height, radius);
-        ctx.clip();
-      }
-
-      if (fit === 'contain' || fit === 'cover') {
-        const scale =
-          fit === 'cover'
-            ? Math.max(width / intrinsicWidth, height / intrinsicHeight)
-            : Math.min(width / intrinsicWidth, height / intrinsicHeight);
-        const drawWidth = intrinsicWidth * scale;
-        const drawHeight = intrinsicHeight * scale;
-        const offset = alignedImageOffset(align, width, height, drawWidth, drawHeight);
-        ctx.drawImage(bitmap, offset.x, offset.y, drawWidth, drawHeight);
+  if (chartType === 'pie' || chartType === 'doughnut' || chartType === 'donut') {
+    const values = data.map((item) => Math.max(0, numberOf(item.value, 0)));
+    const total = values.reduce((sum, value) => sum + value, 0) || 1;
+    const cx = plot.x + plot.w / 2;
+    const cy = plot.y + plot.h / 2;
+    const outer = Math.max(10, Math.min(plot.w, plot.h) * 0.42);
+    const inner = chartType === 'pie' && stringOf(options.type, 'pie') !== 'donut' ? 0 : outer * 0.55;
+    let angle = -Math.PI / 2;
+    data.forEach((item, index) => {
+      const next = angle + (values[index] / total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
+      ctx.arc(cx, cy, outer, angle, next);
+      if (inner > 0) {
+        ctx.lineTo(cx + Math.cos(next) * inner, cy + Math.sin(next) * inner);
+        ctx.arc(cx, cy, inner, next, angle, true);
       } else {
-        ctx.drawImage(bitmap, 0, 0, width, height);
+        ctx.lineTo(cx, cy);
+      }
+      ctx.closePath();
+      ctx.fillStyle = stringOf(item.color, ['#38bdf8','#a78bfa','#fb7185','#34d399','#fbbf24','#60a5fa'][index % 6]);
+      ctx.fill();
+      angle = next;
+    });
+  } else if (chartType === 'polarArea') {
+    const values = data.map((item) => Math.max(0, numberOf(item.value, 0)));
+    const maxValue = Math.max(1, ...values);
+    const polar = isRecord(options.polar) ? options.polar : {};
+    const cx = plot.x + plot.w / 2;
+    const cy = plot.y + plot.h / 2;
+    const outer = Math.max(10, Math.min(plot.w, plot.h) * 0.43);
+    const inner = outer * Math.min(0.9, Math.max(0, numberOf(polar.innerRadiusRatio, 0)));
+    const start = (numberOf(polar.startAngleDeg, -90) * Math.PI) / 180;
+    const sliceAngle = (Math.PI * 2) / Math.max(1, data.length);
+    const areaScale = stringOf(options.scale, 'radius') === 'area';
+
+    data.forEach((item, index) => {
+      const ratio = Math.max(0, values[index] / maxValue);
+      const radius = inner + (outer - inner) * (areaScale ? Math.sqrt(ratio) : ratio);
+      const a0 = start + index * sliceAngle;
+      const a1 = a0 + sliceAngle;
+      ctx.save();
+      ctx.globalAlpha = Math.min(
+        1,
+        Math.max(0, numberOf(polar.opacity, 1) * numberOf(item.opacity, 1)),
+      );
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a0) * inner, cy + Math.sin(a0) * inner);
+      ctx.arc(cx, cy, radius, a0, a1);
+      if (inner > 0) {
+        ctx.lineTo(cx + Math.cos(a1) * inner, cy + Math.sin(a1) * inner);
+        ctx.arc(cx, cy, inner, a1, a0, true);
+      } else {
+        ctx.lineTo(cx, cy);
+      }
+      ctx.closePath();
+      ctx.fillStyle = stringOf(
+        item.color,
+        ['#38bdf8','#a78bfa','#fb7185','#34d399','#fbbf24','#60a5fa'][index % 6],
+      );
+      ctx.fill();
+      const strokeWidth = Math.max(0, numberOf(polar.sliceStrokeWidth, 1));
+      if (strokeWidth > 0) {
+        ctx.lineWidth = strokeWidth;
+        ctx.strokeStyle = stringOf(polar.sliceStrokeColor, 'rgba(255,255,255,.28)');
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+  } else if (chartType === 'radar') {
+    const radar = isRecord(options.radar) ? options.radar : {};
+    const categories = Array.isArray(radar.categories)
+      ? radar.categories.map((value) => stringOf(value, ''))
+      : [];
+    const series = data.filter((item) => Array.isArray(item.values));
+    const categoryCount = categories.length || Math.max(0, ...(series.map((item) => Array.isArray(item.values) ? item.values.length : 0)));
+    if (categoryCount < 3) return null;
+
+    const cx = plot.x + plot.w / 2;
+    const cy = plot.y + plot.h / 2;
+    const radius = Math.max(10, Math.min(plot.w, plot.h) * 0.38);
+    const allValues = series.flatMap((item) =>
+      Array.isArray(item.values) ? item.values.map((value) => numberOf(value, 0)) : [],
+    );
+    const maxValue = Math.max(1, numberOf(radar.maxValue, Math.max(1, ...allValues) * 1.05));
+    const levels = Math.max(3, Math.min(10, Math.round(numberOf(radar.gridLevels, 5))));
+    const gridColor = stringOf(radar.gridColor, 'rgba(148,163,184,.28)');
+    const gridWidth = Math.max(0.5, numberOf(radar.gridWidth, 1));
+
+    const pointAt = (index: number, valueRatio: number) => {
+      const angle = -Math.PI / 2 + (index / categoryCount) * Math.PI * 2;
+      return {
+        x: cx + Math.cos(angle) * radius * valueRatio,
+        y: cy + Math.sin(angle) * radius * valueRatio,
+      };
+    };
+
+    ctx.save();
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = gridWidth;
+    for (let level = 1; level <= levels; level += 1) {
+      ctx.beginPath();
+      for (let index = 0; index < categoryCount; index += 1) {
+        const point = pointAt(index, level / levels);
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+    for (let index = 0; index < categoryCount; index += 1) {
+      const point = pointAt(index, 1);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+    }
+
+    if (categories.length) {
+      ctx.fillStyle = stringOf(radar.axisLabelColor, axisColor);
+      ctx.font = `${Math.max(9, numberOf(radar.axisLabelFontSize, 11))}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      categories.forEach((label, index) => {
+        const point = pointAt(index, 1.12);
+        ctx.fillText(label, point.x, point.y);
+      });
+    }
+    ctx.restore();
+
+    series.forEach((seriesItem, seriesIndex) => {
+      const values = Array.isArray(seriesItem.values) ? seriesItem.values : [];
+      if (values.length < categoryCount) return;
+      const color = stringOf(
+        seriesItem.stroke,
+        stringOf(seriesItem.color, ['#38bdf8','#a78bfa','#f472b6','#34d399','#fbbf24'][seriesIndex % 5]),
+      );
+      ctx.save();
+      ctx.globalAlpha = Math.min(
+        1,
+        Math.max(0, numberOf(seriesItem.opacity, numberOf(radar.opacity, 1))),
+      );
+      ctx.beginPath();
+      values.slice(0, categoryCount).forEach((rawValue, index) => {
+        const point = pointAt(index, Math.max(0, numberOf(rawValue, 0)) / maxValue);
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.closePath();
+      if (boolOf(radar.fill, true)) {
+        ctx.save();
+        ctx.globalAlpha *= Math.min(1, Math.max(0, numberOf(seriesItem.fillOpacity, 0.24)));
+        ctx.fillStyle = stringOf(seriesItem.color, color);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(1, numberOf(seriesItem.lineWidth, 2));
+      ctx.stroke();
+
+      if (boolOf(radar.showPoints, false)) {
+        values.slice(0, categoryCount).forEach((rawValue, index) => {
+          const point = pointAt(index, Math.max(0, numberOf(rawValue, 0)) / maxValue);
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, Math.max(1, numberOf(radar.pointRadius, 4)), 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+        });
+      }
+      ctx.restore();
+    });
+  } else if (chartType === 'line' || chartType === 'scatter') {
+    const series = data.length && Array.isArray(data[0].data) ? data : [{ label: '', color: '#38bdf8', data: rawData }];
+    const points = series.flatMap((seriesItem) => Array.isArray(seriesItem.data) ? seriesItem.data.filter(isRecord) : []);
+    const xValues = points.map((point) => numberOf(point.x, 0));
+    const yValues = points.map((point) => numberOf(point.y, 0));
+    const xRange = axisRange(xAxis, xValues, xValues.length ? Math.min(...xValues) : 0);
+    const yRange = axisRange(yAxis, yValues, 0);
+    drawCartesianFrame(xRange, yRange);
+
+    const mapX = (value: number) => plot.x + ((value - xRange.min) / (xRange.max - xRange.min)) * plot.w;
+    const mapY = (value: number) => plot.y + plot.h - ((value - yRange.min) / (yRange.max - yRange.min)) * plot.h;
+
+    series.forEach((seriesItem, index) => {
+      const seriesPoints = Array.isArray(seriesItem.data) ? seriesItem.data.filter(isRecord) : [];
+      if (!seriesPoints.length) return;
+      const stroke = stringOf(seriesItem.color, ['#38bdf8','#a78bfa','#fb7185','#34d399'][index % 4]);
+      const lineWidth = Math.max(1, numberOf(seriesItem.lineWidth, 2.5));
+      const area = isRecord(seriesItem.area) ? seriesItem.area : null;
+
+      if (chartType === 'line' && area && boolOf(area.show, true)) {
+        ctx.beginPath();
+        seriesPoints.forEach((point, pointIndex) => {
+          const x = mapX(numberOf(point.x, pointIndex));
+          const y = mapY(numberOf(point.y, 0));
+          if (pointIndex === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        const last = seriesPoints[seriesPoints.length - 1];
+        const first = seriesPoints[0];
+        ctx.lineTo(mapX(numberOf(last.x, seriesPoints.length - 1)), plot.y + plot.h);
+        ctx.lineTo(mapX(numberOf(first.x, 0)), plot.y + plot.h);
+        ctx.closePath();
+        ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(area.opacity, 0.2)));
+        ctx.fillStyle = stringOf(area.color, stroke);
+        ctx.fill();
+        ctx.globalAlpha = 1;
       }
 
-      const strokeWidth = numberOf(stroke.width, 0);
-      if (strokeWidth > 0) {
-        ctx.shadowColor = 'rgba(0,0,0,0)';
-        ctx.shadowBlur = 0;
-        ctx.lineWidth = strokeWidth;
-        ctx.strokeStyle = stringOf(stroke.color, '#ffffff');
-        drawRoundedRect(ctx, strokeWidth / 2, strokeWidth / 2, width - strokeWidth, height - strokeWidth, radius);
+      if (chartType === 'line') {
+        ctx.beginPath();
+        seriesPoints.forEach((point, pointIndex) => {
+          const x = mapX(numberOf(point.x, pointIndex));
+          const y = mapY(numberOf(point.y, 0));
+          if (pointIndex === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        });
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = lineWidth;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
         ctx.stroke();
       }
 
-      ctx.restore();
-    } catch (error) {
-      warnings.push(
-        `Remote image could not be loaded in Live Canvas (${remoteImageHost(source)}): ${error instanceof Error ? error.message : 'unknown browser image error'}.`,
-      );
-    } finally {
-      bitmap?.close();
-    }
-  }
-}
-
-async function applyImageLayersInOrder(
-  ctx: CanvasRenderingContext2D,
-  value: Jsonish,
-  warnings: string[],
-) {
-  const list = Array.isArray(value) ? value : [value];
-  let remoteCount = 0;
-
-  for (const item of list) {
-    if (!isRecord(item)) continue;
-    const source = stringOf(item.source, '');
-
-    if (SHAPES.has(source)) {
-      applyImageShapes(ctx, item);
-      continue;
-    }
-
-    if (remoteImageSource(source)) {
-      remoteCount += 1;
-      if (remoteCount <= MAX_REMOTE_IMAGE_COUNT) {
-        await applyRemoteImages(ctx, item, warnings);
+      for (const point of seriesPoints) {
+        const x = mapX(numberOf(point.x, 0));
+        const y = mapY(numberOf(point.y, 0));
+        ctx.beginPath();
+        ctx.arc(x, y, chartType === 'scatter' ? 4.5 : 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = stroke;
+        ctx.fill();
       }
-    }
+    });
+  } else {
+    const horizontal = chartType === 'horizontalBar';
+    const grouped = data.some((item) => Array.isArray(item.values));
+    const allValues = data.flatMap((item) =>
+      Array.isArray(item.values)
+        ? item.values.filter(isRecord).map((entry) => numberOf(entry.value, 0))
+        : [numberOf(item.value, 0)],
+    );
+    const valueAxis = horizontal ? xAxis : yAxis;
+    const valueRange = axisRange(valueAxis, allValues, Math.min(0, ...allValues));
+    const explicitValueRange = isRecord(valueAxis.range) ? valueAxis.range : {};
+    if (typeof explicitValueRange.min !== 'number') valueRange.min = Math.min(0, valueRange.min);
+    if (typeof explicitValueRange.max !== 'number') valueRange.max = Math.max(0, valueRange.max);
+    if (valueRange.max === valueRange.min) valueRange.max = valueRange.min + 1;
+    const categoryRange = { min: 0, max: Math.max(1, data.length) };
+    drawCartesianFrame(
+      horizontal ? valueRange : categoryRange,
+      horizontal ? categoryRange : valueRange,
+    );
+
+    const categoryStep = (horizontal ? plot.h : plot.w) / Math.max(1, data.length);
+    data.forEach((item, categoryIndex) => {
+      const entries = Array.isArray(item.values) ? item.values.filter(isRecord) : [item];
+      const innerStep = categoryStep * 0.72 / Math.max(1, entries.length);
+      entries.forEach((entry, entryIndex) => {
+        const value = numberOf(entry.value, 0);
+        const color = stringOf(entry.color, stringOf(item.color, ['#38bdf8','#a78bfa','#fb7185','#34d399'][entryIndex % 4]));
+        const zeroRatio = (0 - valueRange.min) / (valueRange.max - valueRange.min);
+        const valueRatio = (value - valueRange.min) / (valueRange.max - valueRange.min);
+
+        if (horizontal) {
+          const y = plot.y + categoryIndex * categoryStep + categoryStep * 0.14 + entryIndex * innerStep;
+          const x0 = plot.x + zeroRatio * plot.w;
+          const x1 = plot.x + valueRatio * plot.w;
+          ctx.fillStyle = color;
+          ctx.fillRect(Math.min(x0, x1), y, Math.abs(x1 - x0), Math.max(3, innerStep - 3));
+        } else {
+          const x = plot.x + categoryIndex * categoryStep + categoryStep * 0.14 + entryIndex * innerStep;
+          const y0 = plot.y + plot.h - zeroRatio * plot.h;
+          const y1 = plot.y + plot.h - valueRatio * plot.h;
+          if (stringOf(options.type, '') === 'lollipop') {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = Math.max(1, numberOf(isRecord(options.bars) ? options.bars.lineWidth : undefined, 2));
+            ctx.beginPath();
+            ctx.moveTo(x + innerStep / 2, y0);
+            ctx.lineTo(x + innerStep / 2, y1);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x + innerStep / 2, y1, Math.max(4, numberOf(isRecord(options.bars) ? options.bars.dotSize : undefined, 8) / 2), 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+          } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, Math.min(y0, y1), Math.max(3, innerStep - 3), Math.abs(y1 - y0));
+          }
+        }
+      });
+
+      const label = stringOf(item.label, String(categoryIndex + 1));
+      ctx.save();
+      ctx.fillStyle = stringOf(horizontal ? yAxis.tickColor : xAxis.tickColor, axisColor);
+      ctx.font = `${Math.max(9, numberOf(horizontal ? yAxis.tickFontSize : xAxis.tickFontSize, 10))}px Arial`;
+      if (horizontal) {
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, plot.x - 8, plot.y + categoryIndex * categoryStep + categoryStep / 2);
+      } else {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(label, plot.x + categoryIndex * categoryStep + categoryStep / 2, plot.y + plot.h + 8);
+      }
+      ctx.restore();
+    });
+    void grouped;
   }
 
-  if (remoteCount > MAX_REMOTE_IMAGE_COUNT) {
-    warnings.push(
-      `Live Canvas renders at most ${MAX_REMOTE_IMAGE_COUNT} remote image layers per createImage() call; extra remote layers were skipped.`,
-    );
+  const borderWidth = Math.max(0, numberOf(appearance.borderWidth, 0));
+  if (borderWidth > 0) {
+    ctx.save();
+    ctx.strokeStyle = stringOf(appearance.borderColor, axisColor);
+    ctx.lineWidth = borderWidth;
+    drawRoundedRect(ctx, borderWidth / 2, borderWidth / 2, width - borderWidth, height - borderWidth, numberOf(appearance.borderRadius, 0));
+    ctx.stroke();
+    ctx.restore();
   }
+
+  return canvas;
 }
 
 export async function renderStudioBrowserPreview(source: string): Promise<BrowserStudioResult> {
   const started = performance.now();
-  const supportedApis = ['createCanvas', 'createText', 'createImage'];
+  const supportedApis = ['createCanvas', 'createText', 'createImage', 'createChart'];
   const warnings: string[] = [];
 
   if (
@@ -1076,20 +1708,69 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
         return parseLiteral(expression);
       }
     };
-    const canvasCall = calls.find((call) => call.method === 'createCanvas');
 
+    const chartCalls = calls.filter((call) => call.method === 'createChart' && call.args[0]);
+    const generatedCharts = chartCalls
+      .map((call) => {
+        const typeValue = resolveCallArgument(source, call, call.args[0], resolve);
+        const dataValue = resolveCallArgument(source, call, call.args[1], resolve);
+        const optionsValue = resolveCallArgument(source, call, call.args[2], resolve);
+        if (hasUnresolved(dataValue) || hasUnresolved(optionsValue)) return null;
+        return createChartCanvas(stringOf(typeValue, 'bar'), dataValue, optionsValue);
+      })
+      .filter((value): value is HTMLCanvasElement => Boolean(value));
+
+    const chartSourceLabels: string[] = [];
+    for (const call of calls) {
+      if (call.method !== 'createImage' || !call.args[0]) continue;
+      const parsed = resolveCallArgument(source, call, call.args[0], resolve);
+      const items = Array.isArray(parsed) ? parsed : [parsed];
+      for (const item of items) {
+        if (!isRecord(item)) continue;
+        const label = unresolvedPreviewLabel(item.source);
+        if (!label || !/(?:chart|graph|plot)/i.test(label) || chartSourceLabels.includes(label)) continue;
+        chartSourceLabels.push(label);
+      }
+    }
+    const generatedChartsBySource = new Map<string, HTMLCanvasElement>();
+    chartSourceLabels.forEach((label, index) => {
+      const chart = generatedCharts[index];
+      if (chart) generatedChartsBySource.set(label, chart);
+    });
+
+    const canvasCall = calls.find((call) => call.method === 'createCanvas');
     if (!canvasCall?.args[0]) {
+      const chartOnly = generatedCharts[generatedCharts.length - 1];
+      if (chartOnly) {
+        const unresolved = resolver.unresolved().filter((name) => name !== 'painter');
+        if (unresolved.length) {
+          warnings.push(
+            'Live Canvas rendered the chart and skipped unrelated runtime-only values: ' +
+              unresolved.slice(0, 4).join(', ') +
+              (unresolved.length > 4 ? '…' : ''),
+          );
+        }
+        return {
+          ok: true,
+          dataUrl: chartOnly.toDataURL('image/png'),
+          mime: 'image/png',
+          elapsedMs: Math.round(performance.now() - started),
+          supportedApis,
+          warnings: [...new Set(warnings)],
+        };
+      }
+
       return {
         ok: false,
         elapsedMs: Math.round(performance.now() - started),
-        error: 'Live Canvas needs a supported painter.createCanvas(...) call before it can render a preview.',
+        error: 'Live Canvas needs a supported painter.createCanvas(...) or painter.createChart(...) call before it can render a preview.',
         supportedApis,
       };
     }
 
-    const canvasConfig = resolve(canvasCall.args[0], canvasCall.index);
+    const canvasConfig = resolveCallArgument(source, canvasCall, canvasCall.args[0], resolve);
     if (!isRecord(canvasConfig)) {
-      throw new Error('createCanvas() options must be an object literal.');
+      throw new Error('createCanvas() options must resolve to an object.');
     }
 
     const width = Math.round(numberOf(canvasConfig.width, 640));
@@ -1107,23 +1788,26 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
 
     applyBackground(ctx, canvasConfig, width, height);
 
+
     for (const call of calls) {
       if (call.index <= canvasCall.index || !call.args[0]) continue;
 
       if (call.method === 'createText') {
-        const parsed = resolve(call.args[0], call.index);
+        const parsed = resolveCallArgument(source, call, call.args[0], resolve);
         if (hasUnresolved(parsed)) {
           warnings.push('Some createText() values depend on runtime-only expressions and were skipped or defaulted in Live Canvas.');
         }
         applyText(ctx, parsed);
       } else if (call.method === 'createImage') {
-        const parsed = resolve(call.args[0], call.index);
+        const parsed = resolveCallArgument(source, call, call.args[0], resolve);
         const items = Array.isArray(parsed) ? parsed : [parsed];
-        const unresolvedSource = items.some(
-          (item) => isRecord(item) && isUnresolvedPreviewValue(item.source),
-        );
+        const usedGeneratedSources = await applyImageLayersInOrder(ctx, parsed, generatedChartsBySource, warnings);
 
-        await applyImageLayersInOrder(ctx, parsed, warnings);
+        const unresolvedSource = items.some((item) => {
+          if (!isRecord(item)) return false;
+          const label = unresolvedPreviewLabel(item.source);
+          return Boolean(label && !usedGeneratedSources.has(label));
+        });
 
         const unsupportedImage = items.some(
           (item) =>
@@ -1138,14 +1822,20 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
           warnings.push('An image layer depends on a Node-only runtime value and was skipped; other browser-supported layers were still rendered.');
         }
         if (unsupportedImage) {
-          warnings.push('Local/Node-only bitmap sources were skipped; Live Canvas rendered supported shapes and browser-fetchable HTTP(S) images.');
+          warnings.push('Local/Node-only bitmap sources were skipped; Live Canvas rendered supported shapes, generated charts, and browser-fetchable HTTP(S) images.');
         }
+      } else if (call.method === 'createChart') {
+        // Charts are pre-rendered so their output can be used by later createImage() calls.
       } else if (UNSUPPORTED_APIS.includes(call.method)) {
         warnings.push(`${call.method}() requires the Node renderer and was not executed by Live Canvas.`);
       }
     }
 
-    const unresolved = resolver.unresolved();
+    const unresolved = resolver.unresolved().filter((name) => {
+      if (name === 'painter') return false;
+      if (generatedChartsBySource.has(name)) return false;
+      return true;
+    });
     if (unresolved.length) {
       warnings.push(
         'Live Canvas resolved the supported composition subset and skipped runtime-only values: ' +

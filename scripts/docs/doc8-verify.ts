@@ -28,6 +28,8 @@ const studioSplit = read('components/studio/StudioResizableSplit.tsx');
 const studioOutput = read('components/studio/StudioOutputPanel.tsx');
 const studioStorage = read('lib/studio/studioStorage.ts');
 const studioTerminal = read('lib/studio/studioRunnerTerminal.ts');
+const studioBrowserPreview = read('lib/studio/browserPreview.ts');
+const studioPreviewZoom = read('components/studio/StudioPreviewZoom.tsx');
 const runnerWrapper = read('lib/gallery/core/wrapSnippetForRunner.ts');
 const codePreview = read('components/examples/CodePreview.tsx');
 const docsRoute = read('app/docs/[...slug]/page.tsx');
@@ -109,6 +111,13 @@ requireCheck(!galleryModal.includes('sandbox output'), 'Gallery alt text must no
 requireCheck(galleryModal.includes('useState(false)'), 'Gallery execution availability must fail closed.');
 requireCheck(galleryModal.includes('setRunnerEnabled(false)'), 'Gallery availability probe failures must keep execution disabled.');
 requireCheck(!studioTerminal.includes('(sandbox)'), 'Studio diagnostics must not label temporary paths as a sandbox.');
+requireCheck(studioBrowserPreview.includes("'createChart'"), 'Live Canvas must expose createChart() as a supported browser preview API.');
+requireCheck(studioBrowserPreview.includes("type === 'hexagons'"), 'Live Canvas must keep the procedural hexagon pattern renderer.');
+requireCheck(studioBrowserPreview.includes('config.patternBg'), 'Live Canvas must render top-level canvas patternBg.');
+requireCheck(studioBrowserPreview.includes("chartType === 'radar'") && studioBrowserPreview.includes("chartType === 'polarArea'"), 'Live Canvas must cover all stable createChart() families.');
+requireCheck(studioPreviewZoom.includes('requestFullscreen()'), 'Studio preview must expose real fullscreen mode.');
+requireCheck(studioPreviewZoom.includes('cursor-grab') && studioPreviewZoom.includes('scrollLeft'), 'Studio preview must preserve drag-to-pan behavior.');
+requireCheck(studioPreviewZoom.includes('applyFitToView') && studioPreviewZoom.includes('resetView'), 'Studio preview must preserve fit and reset controls.');
 requireCheck(!runnerWrapper.includes('server sandbox'), 'Runner diagnostics must not claim server sandboxing.');
 requireCheck(runnerWrapper.includes('not a security sandbox'), 'Trusted-local video diagnostic must explicitly reject sandbox overclaiming.');
 
