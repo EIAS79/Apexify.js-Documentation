@@ -34,6 +34,10 @@ const SHAPES = new Set([
   'pieSlice',
 ]);
 
+const MAX_REMOTE_IMAGE_BYTES = 8 * 1024 * 1024;
+const MAX_REMOTE_IMAGE_COUNT = 8;
+const REMOTE_IMAGE_TIMEOUT_MS = 8_000;
+
 const UNSUPPORTED_APIS = [
   'createChart',
   'createComparisonChart',
@@ -480,6 +484,13 @@ function applyBackground(
     ctx.restore();
   }
 
+  if (isRecord(config.patternBg)) {
+    ctx.save();
+    applyBlendMode(ctx, config.patternBg.blendMode);
+    drawPattern(ctx, config.patternBg, width, height);
+    ctx.restore();
+  }
+
   if (isRecord(config.noiseBg)) {
     const intensity = Math.min(0.12, Math.max(0, numberOf(config.noiseBg.intensity, 0)));
     if (intensity > 0) drawNoise(ctx, width, height, intensity);
@@ -512,6 +523,12 @@ function drawPattern(
 
   ctx.save();
   ctx.globalAlpha *= Math.min(1, Math.max(0, numberOf(pattern.opacity, 1)));
+  const rotation = (numberOf(pattern.rotation, 0) * Math.PI) / 180;
+  if (rotation) {
+    ctx.translate(width / 2, height / 2);
+    ctx.rotate(rotation);
+    ctx.translate(-width / 2, -height / 2);
+  }
 
   if (type === 'dots') {
     ctx.fillStyle = color;
@@ -520,6 +537,28 @@ function drawPattern(
         ctx.beginPath();
         ctx.arc(x, y, size / 2, 0, Math.PI * 2);
         ctx.fill();
+      }
+    }
+  } else if (type === 'hexagons') {
+    const radius = Math.max(3, size);
+    const stepX = Math.max(radius * 1.5 + spacing, 6);
+    const stepY = Math.max(Math.sqrt(3) * radius + spacing, 6);
+    ctx.lineWidth = Math.max(0.5, radius / 7);
+    let row = 0;
+    for (let y = -stepY; y <= height + stepY; y += stepY, row += 1) {
+      for (let x = -stepX; x <= width + stepX; x += stepX) {
+        const cx = x + (row % 2 ? stepX / 2 : 0);
+        ctx.strokeStyle = row % 2 ? secondary : color;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i += 1) {
+          const angle = Math.PI / 3 * i;
+          const px = cx + Math.cos(angle) * radius;
+          const py = y + Math.sin(angle) * radius;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.stroke();
       }
     }
   } else {
@@ -560,6 +599,23 @@ function drawNoise(ctx: CanvasRenderingContext2D, width: number, height: number,
   ctx.restore();
 }
 
+function applyShadow(ctx: CanvasRenderingContext2D, value: Jsonish | undefined) {
+  if (!isRecord(value)) return;
+  ctx.shadowColor = stringOf(value.color, 'rgba(0,0,0,0)');
+  ctx.shadowBlur = Math.max(0, numberOf(value.blur, 0));
+  ctx.shadowOffsetX = numberOf(value.offsetX, 0);
+  ctx.shadowOffsetY = numberOf(value.offsetY, 0);
+}
+
+function applyBlendMode(ctx: CanvasRenderingContext2D, value: Jsonish | undefined) {
+  if (typeof value !== 'string' || !value) return;
+  try {
+    ctx.globalCompositeOperation = value as GlobalCompositeOperation;
+  } catch {
+    ctx.globalCompositeOperation = 'source-over';
+  }
+}
+
 function applyText(ctx: CanvasRenderingContext2D, value: Jsonish) {
   const list = Array.isArray(value) ? value : [value];
 
@@ -585,16 +641,31 @@ function applyText(ctx: CanvasRenderingContext2D, value: Jsonish) {
 
     ctx.save();
     ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(item.opacity, 1)));
-    ctx.translate(x, y);
-    if (rotation) ctx.rotate(rotation);
-    ctx.font = `${style} ${weight} ${size}px ${family}`;
-    ctx.textAlign = stringOf(placement.textAlign, 'left') as CanvasTextAlign;
-    ctx.textBaseline = stringOf(placement.textBaseline, 'alphabetic') as CanvasTextBaseline;
+    applyBlendMode(ctx, item.blendMode);
+    applyShadow(ctx, item.shadow);
+
     if (isRecord(item.gradient)) {
-      ctx.fillStyle = createGradient(ctx, item.gradient, Math.max(1, numberOf(item.maxWidth, size * 12)), size * 2);
+      ctx.fillStyle = createGradient(
+        ctx,
+        item.gradient,
+        Math.max(1, numberOf(item.maxWidth, size * 12)),
+        size * 2,
+      );
     } else {
       ctx.fillStyle = stringOf(fill.color, stringOf(item.color, '#ffffff'));
     }
+
+    ctx.translate(x, y);
+    if (rotation) ctx.rotate(rotation);
+    ctx.font = `${style} ${weight} ${size}px ${family}`;
+    ctx.textAlign = stringOf(
+      item.textAlign,
+      stringOf(placement.textAlign, 'left'),
+    ) as CanvasTextAlign;
+    ctx.textBaseline = stringOf(
+      item.textBaseline,
+      stringOf(placement.textBaseline, 'alphabetic'),
+    ) as CanvasTextBaseline;
 
     const text = stringOf(item.text, '');
     const maxWidth = numberOf(item.maxWidth, 0);
@@ -655,6 +726,8 @@ function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
 
     ctx.save();
     ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(item.opacity, 1)));
+    applyBlendMode(ctx, item.blendMode);
+    applyShadow(ctx, item.shadow);
     ctx.translate(x + width / 2, y + height / 2);
     if (rotation) ctx.rotate(rotation);
     ctx.translate(-width / 2, -height / 2);
@@ -746,7 +819,11 @@ function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
         ctx.closePath();
       }
     } else {
-      const radius = numberOf(item.borderRadius, 0);
+      const strokeRadius = isRecord(stroke) ? stroke.borderRadius : undefined;
+      const radius =
+        item.borderRadius === 'circular' || strokeRadius === 'circular'
+          ? Math.min(width, height) / 2
+          : numberOf(item.borderRadius, numberOf(strokeRadius, 0));
       const drawHeight = source === 'square' ? width : height;
       drawRoundedRect(ctx, 0, 0, width, drawHeight, radius);
     }
@@ -767,6 +844,150 @@ function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
     }
 
     ctx.restore();
+  }
+}
+
+function remoteImageSource(source: string): boolean {
+  return /^https?:\/\//i.test(source);
+}
+
+function alignedImageOffset(
+  align: string,
+  outerWidth: number,
+  outerHeight: number,
+  drawWidth: number,
+  drawHeight: number,
+) {
+  let x = (outerWidth - drawWidth) / 2;
+  let y = (outerHeight - drawHeight) / 2;
+
+  if (align.includes('left')) x = 0;
+  else if (align.includes('right')) x = outerWidth - drawWidth;
+
+  if (align.includes('top')) y = 0;
+  else if (align.includes('bottom')) y = outerHeight - drawHeight;
+
+  return { x, y };
+}
+
+async function fetchRemoteImageBitmap(source: string): Promise<ImageBitmap> {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), REMOTE_IMAGE_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(source, {
+      signal: controller.signal,
+      mode: 'cors',
+      credentials: 'omit',
+      redirect: 'follow',
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const announcedBytes = Number(response.headers.get('content-length') || 0);
+    if (Number.isFinite(announcedBytes) && announcedBytes > MAX_REMOTE_IMAGE_BYTES) {
+      throw new Error('image exceeds the 8 MiB Live Canvas limit');
+    }
+
+    const blob = await response.blob();
+    if (blob.size > MAX_REMOTE_IMAGE_BYTES) {
+      throw new Error('image exceeds the 8 MiB Live Canvas limit');
+    }
+    if (blob.type && !blob.type.toLowerCase().startsWith('image/')) {
+      throw new Error(`expected image content, received ${blob.type}`);
+    }
+
+    return await createImageBitmap(blob);
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+async function applyRemoteImages(
+  ctx: CanvasRenderingContext2D,
+  value: Jsonish,
+  warnings: string[],
+) {
+  const list = Array.isArray(value) ? value : [value];
+  const remoteItems = list.filter(
+    (item): item is RecordValue =>
+      isRecord(item) && typeof item.source === 'string' && remoteImageSource(item.source),
+  );
+
+  if (remoteItems.length > MAX_REMOTE_IMAGE_COUNT) {
+    warnings.push(
+      `Live Canvas renders at most ${MAX_REMOTE_IMAGE_COUNT} remote image layers; extra remote layers were skipped.`,
+    );
+  }
+
+  for (const item of remoteItems.slice(0, MAX_REMOTE_IMAGE_COUNT)) {
+    const source = stringOf(item.source, '');
+    let bitmap: ImageBitmap | null = null;
+
+    try {
+      bitmap = await fetchRemoteImageBitmap(source);
+      const intrinsicWidth = Math.max(1, bitmap.width);
+      const intrinsicHeight = Math.max(1, bitmap.height);
+      const width = Math.max(1, numberOf(item.width, intrinsicWidth));
+      const height = Math.max(1, numberOf(item.height, intrinsicHeight));
+      const x = numberOf(item.x, 0);
+      const y = numberOf(item.y, 0);
+      const rotation = (numberOf(item.rotation, 0) * Math.PI) / 180;
+      const fit = stringOf(item.fit, 'fill');
+      const align = stringOf(item.align, 'center');
+      const stroke = isRecord(item.stroke) ? item.stroke : {};
+      const rawRadius = item.borderRadius;
+      const radius =
+        rawRadius === 'circular'
+          ? Math.min(width, height) / 2
+          : Math.max(0, numberOf(rawRadius, 0));
+
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(item.opacity, 1)));
+      applyBlendMode(ctx, item.blendMode);
+      applyShadow(ctx, item.shadow);
+      ctx.translate(x + width / 2, y + height / 2);
+      if (rotation) ctx.rotate(rotation);
+      ctx.translate(-width / 2, -height / 2);
+
+      if (radius > 0) {
+        drawRoundedRect(ctx, 0, 0, width, height, radius);
+        ctx.clip();
+      }
+
+      if (fit === 'contain' || fit === 'cover') {
+        const scale =
+          fit === 'cover'
+            ? Math.max(width / intrinsicWidth, height / intrinsicHeight)
+            : Math.min(width / intrinsicWidth, height / intrinsicHeight);
+        const drawWidth = intrinsicWidth * scale;
+        const drawHeight = intrinsicHeight * scale;
+        const offset = alignedImageOffset(align, width, height, drawWidth, drawHeight);
+        ctx.drawImage(bitmap, offset.x, offset.y, drawWidth, drawHeight);
+      } else {
+        ctx.drawImage(bitmap, 0, 0, width, height);
+      }
+
+      const strokeWidth = numberOf(stroke.width, 0);
+      if (strokeWidth > 0) {
+        ctx.shadowColor = 'rgba(0,0,0,0)';
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = strokeWidth;
+        ctx.strokeStyle = stringOf(stroke.color, '#ffffff');
+        drawRoundedRect(ctx, strokeWidth / 2, strokeWidth / 2, width - strokeWidth, height - strokeWidth, radius);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    } catch (error) {
+      warnings.push(
+        `Remote image could not be loaded in Live Canvas (${new URL(source).hostname}): ${error instanceof Error ? error.message : 'unknown browser image error'}.`,
+      );
+    } finally {
+      bitmap?.close();
+    }
   }
 }
 
@@ -792,9 +1013,9 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
   try {
     const calls = extractCalls(source, [...supportedApis, ...UNSUPPORTED_APIS]);
     const resolver = createSafePreviewResolver(source);
-    const resolve = (expression: string): Jsonish => {
+    const resolve = (expression: string, sourceIndex: number): Jsonish => {
       try {
-        return resolver.resolve(expression);
+        return resolver.resolveAt(expression, sourceIndex);
       } catch {
         return parseLiteral(expression);
       }
@@ -810,7 +1031,7 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
       };
     }
 
-    const canvasConfig = resolve(canvasCall.args[0]);
+    const canvasConfig = resolve(canvasCall.args[0], canvasCall.index);
     if (!isRecord(canvasConfig)) {
       throw new Error('createCanvas() options must be an object literal.');
     }
@@ -834,32 +1055,35 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
       if (call.index <= canvasCall.index || !call.args[0]) continue;
 
       if (call.method === 'createText') {
-        const parsed = resolve(call.args[0]);
+        const parsed = resolve(call.args[0], call.index);
         if (hasUnresolved(parsed)) {
           warnings.push('Some createText() values depend on runtime-only expressions and were skipped or defaulted in Live Canvas.');
         }
         applyText(ctx, parsed);
       } else if (call.method === 'createImage') {
-        const parsed = resolve(call.args[0]);
+        const parsed = resolve(call.args[0], call.index);
         const items = Array.isArray(parsed) ? parsed : [parsed];
         const unresolvedSource = items.some(
           (item) => isRecord(item) && isUnresolvedPreviewValue(item.source),
         );
 
-        if (!unresolvedSource) applyImageShapes(ctx, parsed);
+        applyImageShapes(ctx, parsed);
+        await applyRemoteImages(ctx, parsed, warnings);
 
         const unsupportedImage = items.some(
           (item) =>
             isRecord(item) &&
             typeof item.source === 'string' &&
             !isUnresolvedPreviewValue(item.source) &&
-            !SHAPES.has(item.source),
+            !SHAPES.has(item.source) &&
+            !remoteImageSource(item.source),
         );
 
         if (unresolvedSource) {
           warnings.push('An image layer depends on a Node-only runtime value and was skipped; other browser-supported layers were still rendered.');
-        } else if (unsupportedImage) {
-          warnings.push('Bitmap/remote image sources require the Node renderer; Live Canvas rendered supported shape layers only.');
+        }
+        if (unsupportedImage) {
+          warnings.push('Local/Node-only bitmap sources were skipped; Live Canvas rendered supported shapes and browser-fetchable HTTP(S) images.');
         }
       } else if (UNSUPPORTED_APIS.includes(call.method)) {
         warnings.push(`${call.method}() requires the Node renderer and was not executed by Live Canvas.`);
