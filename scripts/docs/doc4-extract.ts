@@ -9,7 +9,7 @@ import { DOC4_METADATA, CURRENT_NODE_RUNTIME } from '../../lib/api-reference/met
 const require=createRequire(import.meta.url);
 const ROOT=process.cwd();
 const OUT=path.join(ROOT,'generated','docs-doc4');
-const COMMIT=process.env.APEXIFY_PACKAGE_COMMIT||'dbed9743353593eafae9a7b1c25312d7170a233b';
+const COMMIT=process.env.APEXIFY_PACKAGE_COMMIT||'1f767143271f6c17c2be8cd3a09f10a27b04b606';
 const BASE=process.env.DOC4_BASE_SHA||'eece2c982c82f013b415cc6b5a822a6b88d27a05';
 const REP='apexify.js::ApexPainter#createImage';
 const POLICY='Generated from packed package declarations/artifacts and explicit metadata. Do not edit directly.';
