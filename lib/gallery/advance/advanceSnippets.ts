@@ -625,7 +625,7 @@ const coreAdvanceGalleryItems: AdvanceGalleryCard[] = [
     category: 'advance',
     description:
       '**A complete remote-image composition.** Every `createImage` layer uses a public HTTPS raw-GitHub image URL—no local bitmap source—over a layered `createCanvas` gradient, dot pattern, and noise texture.\n\n**Takeaway:** Demonstrates `fit: \'cover\'`, alignment, rotation, rounded corners, strokes, shadows, and text finishing in one composition. Public Studio previews fetch these assets directly in the browser, so normal CORS rules still apply.',
-    thumbnail: 'https://raw.githubusercontent.com/EIAS79/Apexify.js-Documentation/main/public/gallery-outputs/images/shape-collage-prism.png',
+    thumbnail: '/gallery-outputs/images/shape-collage-prism.png',
     featured: true,
     code: { ts: REMOTE_IMAGE_POSTER_TS, js: REMOTE_IMAGE_POSTER_JS },
   },
