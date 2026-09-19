@@ -1,5 +1,6 @@
 'use client';
 
+import type { StudioVirtualAsset } from '@/lib/studio/runtime/assets';
 import {
   type ExecutionAdapter,
   type ExecutionResult,
@@ -69,6 +70,9 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
     }
 
     const started = performance.now();
+    const studioOptions = session.options as { studioAssets?: StudioVirtualAsset[] };
+    const studioAssets = Array.isArray(studioOptions.studioAssets) ? studioOptions.studioAssets : [];
+
     const response = await fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -76,6 +80,7 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
         code: session.source,
         lang: session.language,
         context: 'studio',
+        assets: studioAssets,
       }),
       signal,
     });

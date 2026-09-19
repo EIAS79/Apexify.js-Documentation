@@ -7,6 +7,7 @@ import {
   ArrowPathIcon,
   CodeBracketIcon,
   CommandLineIcon,
+  FolderOpenIcon,
   PhotoIcon,
   PlayIcon,
   QuestionMarkCircleIcon,
@@ -52,6 +53,9 @@ type TopBarProps = {
   shareCopied: boolean;
   onDownloadOutput: () => void;
   hasOutput: boolean;
+  assetCount: number;
+  assetsOpen: boolean;
+  onToggleAssets: () => void;
   onOpenPalette: () => void;
   onOpenShortcuts: () => void;
 };
@@ -262,6 +266,9 @@ export function StudioTopBar(props: TopBarProps) {
     shareCopied,
     onDownloadOutput,
     hasOutput,
+    assetCount,
+    assetsOpen,
+    onToggleAssets,
     onOpenPalette,
     onOpenShortcuts,
   } = props;
@@ -408,8 +415,34 @@ export function StudioTopBar(props: TopBarProps) {
 
       <span aria-hidden className="hidden flex-1 md:block" />
 
-      {/* Right — Templates + utils */}
+      {/* Right — Assets + templates + utils */}
       <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={onToggleAssets}
+          aria-pressed={assetsOpen}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
+          style={{
+            border: '1px solid var(--border-default)',
+            color: assetsOpen ? 'var(--studio-mint)' : 'var(--text-primary)',
+            background: assetsOpen
+              ? 'color-mix(in srgb, var(--studio-mint) 10%, var(--bg-raised))'
+              : 'var(--bg-raised)',
+          }}
+          title="Session media assets"
+        >
+          <FolderOpenIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          <span className="hidden min-[480px]:inline">Assets</span>
+          {assetCount > 0 ? (
+            <span
+              className="grid min-w-5 place-items-center rounded-full px-1 text-[10px]"
+              style={{ background: 'var(--bg-sunken)', color: 'var(--text-secondary)' }}
+            >
+              {assetCount}
+            </span>
+          ) : null}
+        </button>
+
         <TemplatesMenu onLoad={onLoadTemplate} />
 
         <div
@@ -443,7 +476,7 @@ export function StudioTopBar(props: TopBarProps) {
             disabled={!hasOutput}
             className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98] disabled:opacity-40"
             style={{ color: 'var(--text-secondary)' }}
-            title="Download last preview"
+            title="Download active output artifact"
           >
             <ArrowDownTrayIcon className="h-3.5 w-3.5" aria-hidden />
           </button>

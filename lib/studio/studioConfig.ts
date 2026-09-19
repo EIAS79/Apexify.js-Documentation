@@ -44,8 +44,9 @@ export type RunHistoryEntry = {
 };
 
 /* ----------------------------------------------------------------- *
- *  Starter templates — keep API conservative (createCanvas only) so
- *  every template runs cleanly inside the gallery sandbox.
+ *  Studio templates. Browser-direct templates intentionally exercise the
+ *  current Live Canvas contract; advanced media templates can route to the
+ *  full Apexify runtime automatically.
  * ----------------------------------------------------------------- */
 
 export type StudioTemplate = {
@@ -53,7 +54,7 @@ export type StudioTemplate = {
   name: string;
   blurb: string;
   /** Tag used for grouping in the templates menu. */
-  group: 'Starter' | 'Backgrounds' | 'Patterns' | 'Effects';
+  group: 'Starter' | 'Charts' | 'Backgrounds' | 'Patterns' | 'Effects' | 'Media';
   ts: string;
   js: string;
 };
@@ -183,6 +184,146 @@ const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'gro
       x: 82, y: 448,
       font: { size: 20, family: 'Arial' },
       fill: { color: '#b8c2cf' },
+    },
+  ], output);
+
+  return output;`,
+  },
+  {
+    id: 'integration-showcase',
+    name: 'Canvas · URL · chart · text',
+    blurb: 'Generated chart-buffer reuse, remote images, shapes, and fitted typography in one real Apexify composition.',
+    group: 'Charts',
+    body: `  const canvas = await painter.createCanvas({
+    width: 1200,
+    height: 720,
+    gradientBg: {
+      type: 'linear',
+      startX: 0, startY: 0,
+      endX: 1200, endY: 720,
+      colors: [
+        { stop: 0, color: '#07111f' },
+        { stop: 0.48, color: '#101b34' },
+        { stop: 1, color: '#1d335d' },
+      ],
+    },
+    patternBg: {
+      type: 'dots',
+      color: 'rgba(226,232,240,0.08)',
+      secondaryColor: 'rgba(96,165,250,0.08)',
+      size: 3,
+      spacing: 26,
+      opacity: 0.32,
+    },
+    noiseBg: { intensity: 0.025 },
+  });
+
+  const chartBuf = await painter.createChart('bar', [
+    { label: 'Canvas', value: 96, xStart: 0, xEnd: 1, color: '#60a5fa' },
+    { label: 'Images', value: 92, xStart: 1, xEnd: 2, color: '#818cf8' },
+    { label: 'Shapes', value: 94, xStart: 2, xEnd: 3, color: '#34d399' },
+    { label: 'Text', value: 98, xStart: 3, xEnd: 4, color: '#f59e0b' },
+  ], {
+    type: 'standard',
+    dimensions: { width: 390, height: 240, padding: { top: 36, right: 24, bottom: 44, left: 42 } },
+    appearance: { backgroundColor: '#0b1427' },
+    labels: { title: { text: 'Feature coverage', color: '#e2e8f0', fontSize: 18 } },
+  });
+
+  let output = await painter.createImage([
+    {
+      source: 'rectangle',
+      x: 54, y: 150, width: 560, height: 430,
+      borderRadius: 28,
+      shape: { fill: true, color: 'rgba(15,23,42,0.82)' },
+      stroke: { width: 2, color: 'rgba(255,255,255,0.16)', borderRadius: 28 },
+      shadow: { color: 'rgba(0,0,0,0.44)', offsetY: 20, blur: 38, opacity: 1, borderRadius: 28 },
+    },
+    {
+      source: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80',
+      x: 78, y: 174, width: 512, height: 292,
+      fit: 'cover',
+      align: 'center',
+      borderRadius: 22,
+      stroke: { width: 2, color: 'rgba(255,255,255,0.24)' },
+      shadow: { color: 'rgba(0,0,0,0.34)', offsetY: 14, blur: 24, opacity: 1 },
+    },
+    {
+      source: 'rectangle',
+      x: 660, y: 150, width: 486, height: 430,
+      borderRadius: 28,
+      shape: { fill: true, color: 'rgba(15,23,42,0.90)' },
+      stroke: { width: 2, color: 'rgba(255,255,255,0.14)', borderRadius: 28 },
+    },
+    {
+      source: chartBuf,
+      x: 708, y: 206, width: 390, height: 240,
+      borderRadius: 18,
+      shadow: { color: 'rgba(0,0,0,0.35)', offsetY: 12, blur: 24, opacity: 1 },
+    },
+    {
+      source: 'star',
+      x: 82, y: 82, width: 86, height: 86, rotation: -10,
+      shape: { fill: true, color: '#fde047', innerRadius: 17, outerRadius: 39 },
+      stroke: { width: 2, color: '#713f12' },
+    },
+    {
+      source: 'circle',
+      x: 1042, y: 82, width: 104, height: 104,
+      shape: { fill: true, color: '#14e5a4', radius: 52 },
+    },
+  ], canvas);
+
+  output = await painter.createText([
+    {
+      text: 'Apexify.js integration',
+      x: 194, y: 58,
+      font: { family: 'Arial', size: 34 },
+      bold: true,
+      fill: { color: '#f8fafc' },
+      textBaseline: 'middle',
+    },
+    {
+      text: 'Canvas · URL image · generated chart · shapes · text',
+      x: 194, y: 94,
+      font: { family: 'Arial', size: 16 },
+      fill: { color: '#a9b8cf' },
+      textBaseline: 'middle',
+    },
+    {
+      text: 'Remote image layer',
+      x: 82, y: 506,
+      font: { family: 'Arial', size: 20 },
+      bold: true,
+      fill: { color: '#f8fafc' },
+    },
+    {
+      text: 'Public HTTPS source with crop, radius, stroke, and shadow.',
+      x: 82, y: 538,
+      font: { family: 'Arial', size: 14 },
+      fill: { color: '#cbd5e1' },
+      maxWidth: 460,
+    },
+    {
+      text: 'Generated chart buffer',
+      x: 708, y: 490,
+      font: { family: 'Arial', size: 20 },
+      bold: true,
+      fill: { color: '#f8fafc' },
+    },
+    {
+      text: 'The chart output is reused by createImage() in the same program.',
+      x: 708, y: 522,
+      font: { family: 'Arial', size: 14 },
+      fill: { color: '#cbd5e1' },
+      maxWidth: 390,
+    },
+    {
+      text: 'One composition · real Apexify data flow',
+      x: 1146, y: 676,
+      font: { family: 'Arial', size: 14 },
+      fill: { color: '#94a3b8' },
+      textAlign: 'right',
     },
   ], output);
 
@@ -454,7 +595,7 @@ export const STUDIO_ACTIONS: StudioAction[] = [
 
   { id: 'copyCode', label: 'Copy active snippet', group: 'Share', shortcut: '⌘ C', keywords: 'clipboard' },
   { id: 'copyShareLink', label: 'Copy share link (encoded snippet)', group: 'Share', shortcut: '⌘ S', keywords: 'url permalink' },
-  { id: 'downloadOutput', label: 'Download last preview as PNG / GIF', group: 'Share', shortcut: '⌘ D' },
+  { id: 'downloadOutput', label: 'Download active output artifact', group: 'Share', shortcut: '⌘ D', keywords: 'image gif audio video media export' },
   { id: 'clearHistory', label: 'Clear run history', group: 'Share' },
 
   { id: 'openShortcuts', label: 'Show keyboard shortcuts', group: 'Navigate', shortcut: '?' },

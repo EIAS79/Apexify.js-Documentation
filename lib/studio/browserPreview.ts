@@ -1,6 +1,10 @@
 'use client';
 
 import { createSafePreviewResolver, isUnresolvedPreviewValue, UNRESOLVED_PREVIEW_PREFIX } from './safePreviewExpression';
+import {
+  studioAssetIdFromReference,
+  type StudioVirtualAsset,
+} from './runtime/assets';
 
 type Jsonish = null | boolean | number | string | Jsonish[] | { [key: string]: Jsonish };
 type RecordValue = { [key: string]: Jsonish };
@@ -281,6 +285,24 @@ function extractCalls(source: string, methods: string[]): Call[] {
   }
 
   return calls.sort((a, b) => a.index - b.index);
+}
+
+function assignedIdentifierForCall(source: string, call: Call): string | null {
+  const start = Math.max(
+    source.lastIndexOf(';', call.index - 1),
+    source.lastIndexOf('\n', call.index - 1),
+    source.lastIndexOf('{', call.index - 1),
+  ) + 1;
+  const prefix = source.slice(start, call.index);
+  const match = prefix.match(
+    /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:await\s+)?[A-Za-z_$][\w$]*\s*$/,
+  );
+  if (match?.[1]) return match[1];
+
+  const reassigned = prefix.match(
+    /([A-Za-z_$][\w$]*)\s*=\s*(?:await\s+)?[A-Za-z_$][\w$]*\s*$/,
+  );
+  return reassigned?.[1] ?? null;
 }
 
 function readCallArguments(source: string, openParen: number): { args: string[]; end: number } | null {
@@ -1048,6 +1070,110 @@ async function fetchRemoteImageBitmap(source:string):Promise<ImageBitmap>{
     return bitmap;
   } finally { window.clearTimeout(timeout); }
 }
+function studioAssetBitmap(asset: StudioVirtualAsset): Promise<ImageBitmap> {
+  const binary = atob(asset.base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index);
+  return createImageBitmap(new Blob([bytes], { type: asset.mime || 'application/octet-stream' }));
+}
+
+async function drawStudioAssetImageLayer(
+  ctx: CanvasRenderingContext2D,
+  item: RecordValue,
+  asset: StudioVirtualAsset,
+  warnings: string[],
+) {
+  if (!asset.mime.startsWith('image/')) {
+    warnings.push(
+      `Studio asset ${asset.name} is ${asset.mime}; createImage() browser preview accepts image assets only.`,
+    );
+    return;
+  }
+
+  let bitmap: ImageBitmap | null = null;
+  try {
+    bitmap = await studioAssetBitmap(asset);
+    if (bitmap.width * bitmap.height > MAX_REMOTE_IMAGE_PIXELS) {
+      throw new Error('decoded image exceeds the 12 million pixel Live Canvas limit');
+    }
+
+    const intrinsicWidth = Math.max(1, bitmap.width);
+    const intrinsicHeight = Math.max(1, bitmap.height);
+    const width = Math.max(1, numberOf(item.width, intrinsicWidth));
+    const height = Math.max(1, numberOf(item.height, intrinsicHeight));
+    const x = numberOf(item.x, 0);
+    const y = numberOf(item.y, 0);
+    const rotation = (numberOf(item.rotation, 0) * Math.PI) / 180;
+    const fit = stringOf(item.fit, 'fill');
+    const align = stringOf(item.align, 'center');
+    const stroke = isRecord(item.stroke) ? item.stroke : {};
+    const rawRadius = item.borderRadius;
+    const radius =
+      rawRadius === 'circular'
+        ? Math.min(width, height) / 2
+        : Math.max(0, numberOf(rawRadius, numberOf(stroke.borderRadius, 0)));
+
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(item.opacity, 1)));
+    applyBlendMode(ctx, item.blendMode);
+    ctx.translate(x + width / 2, y + height / 2);
+    if (rotation) ctx.rotate(rotation);
+    ctx.translate(-width / 2, -height / 2);
+
+    if (isRecord(item.shadow)) {
+      applyShadow(ctx, item.shadow);
+      drawRoundedRect(ctx, 0, 0, width, height, radius);
+      ctx.fillStyle = 'rgba(0,0,0,0.01)';
+      ctx.fill();
+      ctx.shadowColor = 'rgba(0,0,0,0)';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+    }
+
+    if (radius > 0) {
+      drawRoundedRect(ctx, 0, 0, width, height, radius);
+      ctx.clip();
+    }
+
+    if (fit === 'contain' || fit === 'cover') {
+      const scale =
+        fit === 'cover'
+          ? Math.max(width / intrinsicWidth, height / intrinsicHeight)
+          : Math.min(width / intrinsicWidth, height / intrinsicHeight);
+      const drawWidth = intrinsicWidth * scale;
+      const drawHeight = intrinsicHeight * scale;
+      const offset = alignedImageOffset(align, width, height, drawWidth, drawHeight);
+      ctx.drawImage(bitmap, offset.x, offset.y, drawWidth, drawHeight);
+    } else {
+      ctx.drawImage(bitmap, 0, 0, width, height);
+    }
+
+    const strokeWidth = numberOf(stroke.width, 0);
+    if (strokeWidth > 0) {
+      ctx.lineWidth = strokeWidth;
+      ctx.strokeStyle = stringOf(stroke.color, '#ffffff');
+      drawRoundedRect(
+        ctx,
+        strokeWidth / 2,
+        strokeWidth / 2,
+        width - strokeWidth,
+        height - strokeWidth,
+        radius,
+      );
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  } catch (error) {
+    warnings.push(
+      `Studio image asset ${asset.name} could not be rendered: ${error instanceof Error ? error.message : 'unknown image error'}.`,
+    );
+  } finally {
+    bitmap?.close();
+  }
+}
+
 async function drawRemoteImageLayer(ctx:CanvasRenderingContext2D,item:RecordValue,warnings:string[]){
   const source=stringOf(item.source,''); let bitmap:ImageBitmap|null=null;
   try{
@@ -1081,17 +1207,51 @@ async function drawRemoteImageLayer(ctx:CanvasRenderingContext2D,item:RecordValu
     warnings.push(`Remote image could not be loaded in Live Canvas (${remoteImageHost(source)}): ${error instanceof Error?error.message:'unknown browser image error'}.`);
   }finally{bitmap?.close();}
 }
-async function applyImageLayersInOrder(ctx:CanvasRenderingContext2D,value:Jsonish,generatedChartsBySource:Map<string,HTMLCanvasElement>,warnings:string[]):Promise<Set<string>>{
-  const list=Array.isArray(value)?value:[value]; const usedGeneratedSources=new Set<string>(); let remoteCount=0;
-  for(const item of list){
-    if(!isRecord(item))continue;
-    const source=stringOf(item.source,'');
-    if(SHAPES.has(source)||isUnresolvedPreviewValue(item.source)){
-      const used=applyImageShapes(ctx,item,generatedChartsBySource); for(const label of used)usedGeneratedSources.add(label); continue;
+async function applyImageLayersInOrder(
+  ctx: CanvasRenderingContext2D,
+  value: Jsonish,
+  generatedChartsBySource: Map<string, HTMLCanvasElement>,
+  studioAssetsById: ReadonlyMap<string, StudioVirtualAsset>,
+  warnings: string[],
+): Promise<Set<string>> {
+  const list = Array.isArray(value) ? value : [value];
+  const usedGeneratedSources = new Set<string>();
+  let remoteCount = 0;
+
+  for (const item of list) {
+    if (!isRecord(item)) continue;
+    const source = stringOf(item.source, '');
+
+    if (SHAPES.has(source) || isUnresolvedPreviewValue(item.source)) {
+      const used = applyImageShapes(ctx, item, generatedChartsBySource);
+      for (const label of used) usedGeneratedSources.add(label);
+      continue;
     }
-    if(remoteImageSource(source)){remoteCount+=1;if(remoteCount<=MAX_REMOTE_IMAGE_COUNT)await drawRemoteImageLayer(ctx,item,warnings);}
+
+    const studioAssetId = studioAssetIdFromReference(source);
+    if (studioAssetId) {
+      const asset = studioAssetsById.get(studioAssetId);
+      if (!asset) {
+        warnings.push(`Studio asset ${source} is not loaded in this session.`);
+      } else {
+        await drawStudioAssetImageLayer(ctx, item, asset, warnings);
+      }
+      continue;
+    }
+
+    if (remoteImageSource(source)) {
+      remoteCount += 1;
+      if (remoteCount <= MAX_REMOTE_IMAGE_COUNT) {
+        await drawRemoteImageLayer(ctx, item, warnings);
+      }
+    }
   }
-  if(remoteCount>MAX_REMOTE_IMAGE_COUNT)warnings.push(`Live Canvas renders at most ${MAX_REMOTE_IMAGE_COUNT} remote image layers per createImage() call; extra remote layers were skipped.`);
+
+  if (remoteCount > MAX_REMOTE_IMAGE_COUNT) {
+    warnings.push(
+      `Live Canvas renders at most ${MAX_REMOTE_IMAGE_COUNT} remote image layers per createImage() call; extra remote layers were skipped.`,
+    );
+  }
   return usedGeneratedSources;
 }
 
@@ -1679,8 +1839,12 @@ function createChartCanvas(chartType: string, rawData: Jsonish, optionsValue: Js
   return canvas;
 }
 
-export async function renderStudioBrowserPreview(source: string): Promise<BrowserStudioResult> {
+export async function renderStudioBrowserPreview(
+  source: string,
+  studioAssets: readonly StudioVirtualAsset[] = [],
+): Promise<BrowserStudioResult> {
   const started = performance.now();
+  const studioAssetsById = new Map(studioAssets.map((asset) => [asset.id, asset] as const));
   const supportedApis = ['createCanvas', 'createText', 'createImage', 'createChart'];
   const warnings: string[] = [];
 
@@ -1710,17 +1874,38 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
     };
 
     const chartCalls = calls.filter((call) => call.method === 'createChart' && call.args[0]);
-    const generatedCharts = chartCalls
-      .map((call) => {
-        const typeValue = resolveCallArgument(source, call, call.args[0], resolve);
-        const dataValue = resolveCallArgument(source, call, call.args[1], resolve);
-        const optionsValue = resolveCallArgument(source, call, call.args[2], resolve);
-        if (hasUnresolved(dataValue) || hasUnresolved(optionsValue)) return null;
-        return createChartCanvas(stringOf(typeValue, 'bar'), dataValue, optionsValue);
-      })
+    const chartRecords = chartCalls.map((call) => {
+      const typeValue = resolveCallArgument(source, call, call.args[0], resolve);
+      const dataValue = resolveCallArgument(source, call, call.args[1], resolve);
+      const optionsValue = resolveCallArgument(source, call, call.args[2], resolve);
+      const canvas =
+        hasUnresolved(dataValue) || hasUnresolved(optionsValue)
+          ? null
+          : createChartCanvas(stringOf(typeValue, 'bar'), dataValue, optionsValue);
+      return {
+        call,
+        canvas,
+        assignedIdentifier: assignedIdentifierForCall(source, call),
+      };
+    });
+
+    const generatedCharts = chartRecords
+      .map((record) => record.canvas)
       .filter((value): value is HTMLCanvasElement => Boolean(value));
 
-    const chartSourceLabels: string[] = [];
+    const generatedChartsBySource = new Map<string, HTMLCanvasElement>();
+    const assignedCanvases = new Set<HTMLCanvasElement>();
+
+    for (const record of chartRecords) {
+      if (!record.canvas || !record.assignedIdentifier) continue;
+      generatedChartsBySource.set(record.assignedIdentifier, record.canvas);
+      assignedCanvases.add(record.canvas);
+    }
+
+    // Fallback for unusual expressions where a generated chart is passed through
+    // another local identifier before createImage(). Direct assignment above is
+    // authoritative and avoids the old positional chartBuf/chart mapping bug.
+    const unresolvedChartLabels: string[] = [];
     for (const call of calls) {
       if (call.method !== 'createImage' || !call.args[0]) continue;
       const parsed = resolveCallArgument(source, call, call.args[0], resolve);
@@ -1728,13 +1913,14 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
       for (const item of items) {
         if (!isRecord(item)) continue;
         const label = unresolvedPreviewLabel(item.source);
-        if (!label || !/(?:chart|graph|plot)/i.test(label) || chartSourceLabels.includes(label)) continue;
-        chartSourceLabels.push(label);
+        if (!label || generatedChartsBySource.has(label) || unresolvedChartLabels.includes(label)) continue;
+        unresolvedChartLabels.push(label);
       }
     }
-    const generatedChartsBySource = new Map<string, HTMLCanvasElement>();
-    chartSourceLabels.forEach((label, index) => {
-      const chart = generatedCharts[index];
+
+    const fallbackCharts = generatedCharts.filter((chart) => !assignedCanvases.has(chart));
+    unresolvedChartLabels.forEach((label, index) => {
+      const chart = fallbackCharts[index];
       if (chart) generatedChartsBySource.set(label, chart);
     });
 
@@ -1801,7 +1987,13 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
       } else if (call.method === 'createImage') {
         const parsed = resolveCallArgument(source, call, call.args[0], resolve);
         const items = Array.isArray(parsed) ? parsed : [parsed];
-        const usedGeneratedSources = await applyImageLayersInOrder(ctx, parsed, generatedChartsBySource, warnings);
+        const usedGeneratedSources = await applyImageLayersInOrder(
+          ctx,
+          parsed,
+          generatedChartsBySource,
+          studioAssetsById,
+          warnings,
+        );
 
         const unresolvedSource = items.some((item) => {
           if (!isRecord(item)) return false;
@@ -1815,7 +2007,8 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
             typeof item.source === 'string' &&
             !isUnresolvedPreviewValue(item.source) &&
             !SHAPES.has(item.source) &&
-            !remoteImageSource(item.source),
+            !remoteImageSource(item.source) &&
+            !studioAssetIdFromReference(item.source),
         );
 
         if (unresolvedSource) {

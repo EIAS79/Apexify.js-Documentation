@@ -8,7 +8,7 @@
 > - [x] STUDIO-2 automatic runtime selection in the Studio UI
 > - [x] STUDIO-3 trusted-local full-runtime artifact runner foundation; intentional video block removed
 > - [~] STUDIO-4 production isolated executor integration boundary (`STUDIO_EXECUTOR_URL`) is implemented; an isolated executor deployment/snapshot is still required before production full-runtime execution is enabled
-> - [ ] STUDIO-5 virtual uploaded assets
+> - [x] STUDIO-5 session virtual assets foundation: image/audio/video/font uploads, stable `studio://asset/<id>` references, browser image preview resolution, and full-runtime materialization
 > - [ ] STUDIO-6 full raster/chart/scene parity
 > - [ ] STUDIO-7 GIF/animation/audio completion
 > - [ ] STUDIO-8 video completion
@@ -210,13 +210,19 @@ No production full-runtime claim before this phase is deployed.
 
 ### STUDIO-5 — Virtual Studio assets
 
-Deliverables:
+Status: **foundation implemented**.
 
-- upload image/audio/video/font assets into a per-session virtual workspace;
-- stable asset identifiers;
-- URL assets;
-- no dependency on caller filesystem paths;
-- previews and re-runs reuse bounded assets.
+Delivered:
+
+- session-scoped upload shelf for image/audio/video/font assets;
+- stable `studio://asset/<id>` references copied directly from the Studio UI;
+- bounded asset count, per-file bytes, and aggregate bytes;
+- browser-direct `createImage()` can decode uploaded image assets without a network hop;
+- full-runtime requests carry the same asset payloads and trusted-local execution materializes them only inside the disposable run workspace;
+- the isolated-remote executor protocol receives the same asset list, so production execution does not depend on caller filesystem paths;
+- asset bytes are deliberately not serialized into share links or localStorage.
+
+Remaining refinements are UX/persistence improvements (for example IndexedDB persistence between page reloads), not a change to the execution reference model.
 
 ### STUDIO-6 — Complete raster/chart/scene parity
 

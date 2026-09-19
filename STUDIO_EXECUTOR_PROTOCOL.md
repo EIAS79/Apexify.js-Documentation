@@ -23,7 +23,16 @@ The executor is not a public browser endpoint.
   "protocolVersion": 1,
   "context": "studio",
   "lang": "ts",
-  "code": "import { ApexPainter } from 'apexify.js'; ..."
+  "code": "import { ApexPainter } from 'apexify.js'; ...",
+  "assets": [
+    {
+      "id": "c9f7...",
+      "name": "photo.png",
+      "mime": "image/png",
+      "size": 124833,
+      "base64": "..."
+    }
+  ]
 }
 ```
 
@@ -32,7 +41,10 @@ Constraints:
 - `protocolVersion` must be `1`;
 - `context` must be `studio`;
 - `lang` is `ts` or `js`;
-- source size is bounded by the Studio resource contract.
+- source size is bounded by the Studio resource contract;
+- `assets` is optional and contains the bounded per-session virtual files referenced from code as `studio://asset/<id>`;
+- the executor must materialize asset bytes only inside the disposable run workspace and resolve those references before execution;
+- asset count, per-asset bytes, and aggregate asset bytes must be enforced again by the executor rather than trusting the gateway.
 
 ## Success response
 

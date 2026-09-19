@@ -7,6 +7,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { GallerySnippetEditor } from '@/app/gallery/components/GallerySnippetEditor';
+import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import { StudioCommandPalette } from '@/components/studio/StudioCommandPalette';
 import { StudioFileTabs } from '@/components/studio/StudioFileTabs';
 import { StudioOutputPanel, OutputTab } from '@/components/studio/StudioOutputPanel';
@@ -36,6 +37,7 @@ import {
 } from '@/lib/studio/studioConfig';
 import { renderStudioBrowserPreview } from '@/lib/studio/browserPreview';
 import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
+import type { StudioVirtualAsset } from '@/lib/studio/runtime/assets';
 import {
   bootstrapStudio,
   encodeShareLink,
@@ -55,6 +57,8 @@ export default function CodeStudio() {
   const [layout, setLayout] = useState<LayoutMode>('split');
   const [autoRun, setAutoRun] = useState(false);
   const [splitRatio, setSplitRatio] = useState(0.5);
+  const [assets, setAssets] = useState<StudioVirtualAsset[]>([]);
+  const [assetsOpen, setAssetsOpen] = useState(false);
 
   const [runnerEnabled, setRunnerEnabled] = useState(false);
   const [running, setRunning] = useState(false);
@@ -260,7 +264,7 @@ export default function CodeStudio() {
       }
 
       if (target === 'browser') {
-        const result = await renderStudioBrowserPreview(code);
+        const result = await renderStudioBrowserPreview(code, assets);
 
         if (!result.ok) {
           revokePreview();
@@ -328,7 +332,7 @@ export default function CodeStudio() {
           source: code,
           language: lang,
           runtime: 'node',
-          options: {},
+          options: { studioAssets: assets },
           layout: { activePanel: 'editor' },
         }),
       });
@@ -429,6 +433,7 @@ export default function CodeStudio() {
   }, [
     activeBuffer,
     lang,
+    assets,
     runnerEnabled,
     running,
     revokePreview,
@@ -897,9 +902,20 @@ export default function CodeStudio() {
         shareCopied={shareCopied}
         onDownloadOutput={downloadOutput}
         hasOutput={previewArtifacts.length > 0}
+        assetCount={assets.length}
+        assetsOpen={assetsOpen}
+        onToggleAssets={() => setAssetsOpen((open) => !open)}
         onOpenPalette={() => setPaletteOpen(true)}
         onOpenShortcuts={() => setShortcutsOpen(true)}
       />
+
+      {assetsOpen ? (
+        <StudioAssetShelf
+          assets={assets}
+          onChange={setAssets}
+          onNotice={flashToast}
+        />
+      ) : null}
 
       {!runnerEnabled && executionTarget === 'node' && (
         <div

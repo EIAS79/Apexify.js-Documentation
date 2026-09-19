@@ -11,7 +11,7 @@ const GROUPS: Array<{ title: string; rows: Array<{ keys: string[]; label: string
       { keys: ['⌘', 'L'], label: 'Toggle TS / JS' },
       { keys: ['⌘', 'C'], label: 'Copy active snippet' },
       { keys: ['⌘', 'S'], label: 'Copy share link' },
-      { keys: ['⌘', 'D'], label: 'Download last preview' },
+      { keys: ['⌘', 'D'], label: 'Download active artifact' },
     ],
   },
   {
