@@ -25,6 +25,7 @@ const galleryRunNativeIncludes = [
   './node_modules/@img/sharp-libvips-linux-arm64/**/*',
   './node_modules/@img/sharp-libvips-linuxmusl-x64/**/*',
   './node_modules/@img/sharp-libvips-linuxmusl-arm64/**/*',
+  './vendor/studio-deno/**/*',
 ]
 
 const doc6SearchIncludes = [

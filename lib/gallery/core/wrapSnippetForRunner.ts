@@ -1,5 +1,5 @@
 const BLOCKLIST =
-  /\bchild_process\b|\bnode:child_process\b|\bworker_threads\b|\bnode:vm\b|\beval\s*\(|\bnew\s+Function\s*\(/i;
+  /\bchild_process\b|\bnode:child_process\b|\bworker_threads\b|\bnode:vm\b|\beval\s*\(|\bnew\s+Function\s*\(|\bDeno\s*\.\s*(?:Command|run|dlopen|UnsafePointer|UnsafeFnPointer|UnsafeCallback)\b|\bprocess\s*\.\s*(?:binding|getBuiltinModule)\b/i;
 
 export function assertSnippetAllowed(code: string): string | null {
   if (BLOCKLIST.test(code)) {

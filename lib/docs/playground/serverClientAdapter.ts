@@ -12,7 +12,7 @@ const ENDPOINT = '/api/gallery/run';
 
 export type ServerExecutionAvailability = {
   enabled: boolean;
-  mode: 'trusted-local' | 'isolated-remote' | 'unavailable';
+  mode: 'trusted-local' | 'same-origin-isolated' | 'unavailable';
 };
 
 export async function getServerExecutionAvailability(signal?: AbortSignal): Promise<ServerExecutionAvailability> {
@@ -24,8 +24,8 @@ export async function getServerExecutionAvailability(signal?: AbortSignal): Prom
     mode:
       value.mode === 'trusted-local'
         ? 'trusted-local'
-        : value.mode === 'isolated-remote'
-          ? 'isolated-remote'
+        : value.mode === 'same-origin-isolated'
+          ? 'same-origin-isolated'
           : 'unavailable',
   };
 }
@@ -48,7 +48,7 @@ function diagnosticFromFailure(data: {
     message: message || `Execution failed (HTTP ${status}).`,
     code: typeof data.exitCode === 'number' ? `EXIT_${data.exitCode}` : `HTTP_${status}`,
     help: status === 503
-      ? 'This source requires the full Apexify runtime. Connect the isolated Studio executor in production or enable trusted-local execution during local development.'
+      ? 'This source requires the built-in full Apexify runtime, but the same-origin isolation runtime is unavailable on this deployment.'
       : 'Fix the source or return a previewable Apexify artifact from main() before retrying.',
   };
 }

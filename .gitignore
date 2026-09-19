@@ -42,6 +42,5 @@ node-v*-linux-x64/
 *.tsbuildinfo
 next-env.d.ts
 
-# isolated Studio executor runtime downloads
-/studio-executor/vendor/
-/studio-executor/.deno-cache/
+# same-origin Studio isolation runtime downloaded at build time
+/vendor/studio-deno/

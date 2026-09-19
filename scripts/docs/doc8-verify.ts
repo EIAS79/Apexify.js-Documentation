@@ -37,6 +37,8 @@ const canvasRoute = read('app/docs/node/canvas/page.tsx');
 const docsSidebar = read('components/docs/navigation/DocsSidebarV2.tsx');
 const docsNavigationChrome = read('components/docs/navigation/DocsNavigationChrome.tsx');
 const runner = read('app/api/gallery/run/route.ts');
+const isolatedRunner = read('lib/studio/runtime/isolatedNodeExecutor.ts');
+const denoInstaller = read('scripts/studio/install-deno.mjs');
 const packageJson = JSON.parse(read('package.json')) as { dependencies?: Record<string, string> };
 
 requireCheck(editor.includes("dynamic(() => import('./CodeMirrorEditor')"), 'InteractiveCodeEditor must lazy-load CodeMirrorEditor.');
@@ -96,13 +98,21 @@ requireCheck(executionAdapter.includes("mode: 'server-backed'"), 'Server-backed 
 
 requireCheck(runner.includes("process.env.NODE_ENV !== 'production'"), 'Unsandboxed local execution must remain disabled in production.');
 requireCheck(runner.includes("ENABLE_LOCAL_APEXIFY_CODE_RUN === 'true'"), 'Trusted-local execution must require explicit opt-in.');
-requireCheck(runner.includes('STUDIO_EXECUTOR_URL'), 'Production Studio must expose an isolated executor integration boundary.');
-requireCheck(runner.includes("mode: 'isolated-remote'"), 'Production Studio must identify the isolated remote executor mode truthfully.');
+requireCheck(!runner.includes('STUDIO_EXECUTOR_URL'), 'Studio must not require an external executor URL.');
+requireCheck(!runner.includes('STUDIO_EXECUTOR_TOKEN'), 'Studio must not require an external executor token.');
+requireCheck(runner.includes("mode: 'same-origin-isolated'"), 'Production Studio must identify the same-origin isolated mode truthfully.');
+requireCheck(runner.includes('runSameOriginIsolatedStudio'), 'Production Studio must dispatch full-runtime work to the same-origin isolation layer.');
 requireCheck(!runner.includes('...process.env'), 'Runner must not blindly inherit the deployment environment.');
-requireCheck(runner.includes('DOC8_RESOURCE_LIMITS.executionMs'), 'Runner timeout must use centralized DOC-8 limits.');
-requireCheck(runner.includes('DOC8_RESOURCE_LIMITS.outputBytes'), 'Runner output limit must use centralized DOC-8 limits.');
+requireCheck(isolatedRunner.includes('DOC8_RESOURCE_LIMITS.executionMs'), 'Isolated runner timeout must use centralized DOC-8 limits.');
+requireCheck(isolatedRunner.includes('DOC8_RESOURCE_LIMITS.outputBytes'), 'Isolated runner output limit must use centralized DOC-8 limits.');
+requireCheck(isolatedRunner.includes("'--no-prompt'"), 'Isolated runner must deny interactive permission escalation.');
+requireCheck(!isolatedRunner.includes("'--allow-net'"), 'Same-origin isolated execution must not grant arbitrary network access.');
+requireCheck(!isolatedRunner.includes("'--allow-run'"), 'Same-origin isolated execution must not grant arbitrary subprocess access.');
+requireCheck(isolatedRunner.includes("'--allow-ffi="), 'Isolated runner must scope native FFI for the canvas backend.');
+requireCheck(isolatedRunner.includes("rmSync(runDir, { recursive: true, force: true })"), 'Isolated runner must clean its disposable workspace.');
+requireCheck(denoInstaller.includes('vendor') && denoInstaller.includes('studio-deno'), 'Build must install the same-origin Deno isolation runtime.');
 requireCheck(runner.includes('cwd: dir'), 'Trusted-local execution must run from the controlled temporary directory.');
-requireCheck(runner.includes('rmSync(dir, { recursive: true, force: true })'), 'Runner must clean its temporary directory.');
+requireCheck(runner.includes('rmSync(dir, { recursive: true, force: true })'), 'Trusted-local runner must clean its temporary directory.');
 
 // A blocklist + child process is not a security sandbox. Keep all current product copy truthful.
 requireCheck(!studioLayout.toLowerCase().includes('sandbox'), 'Studio metadata must not describe current execution as a sandbox.');
@@ -163,7 +173,8 @@ console.log('[doc8-verify] PASS', JSON.stringify({
   heavyEditorImportOwner: heavyImports[0],
   unsandboxedProductionExecution: false,
   localExecutionMode: 'trusted-local-opt-in',
-  isolatedExecutorIntegration: true,
+  sameOriginIsolation: true,
+  externalExecutorApi: false,
   sandboxClaim: false,
   packagePin: packageJson.dependencies?.['apexify.js'],
 }));

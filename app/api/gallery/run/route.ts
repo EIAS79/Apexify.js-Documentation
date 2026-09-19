@@ -29,6 +29,10 @@ import {
   type StudioVirtualAsset,
 } from '@/lib/studio/runtime/assets';
 import { wrapStudioSnippetForRunner } from '@/lib/studio/runtime/wrapStudioSnippetForRunner';
+import {
+  runSameOriginIsolatedStudio,
+  sameOriginStudioIsolationAvailable,
+} from '@/lib/studio/runtime/isolatedNodeExecutor';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -59,89 +63,18 @@ function isLocalRunnerEnabled(): boolean {
   return process.env.NODE_ENV !== 'production' && process.env.ENABLE_LOCAL_APEXIFY_CODE_RUN === 'true';
 }
 
-function remoteExecutorConfig(): { url: string; token: string } | null {
-  const raw = process.env.STUDIO_EXECUTOR_URL?.trim();
-  const token = process.env.STUDIO_EXECUTOR_TOKEN?.trim();
-  if (!raw || !token) return null;
-
-  try {
-    const parsed = new URL(raw);
-    if (
-      parsed.protocol !== 'https:' &&
-      parsed.hostname !== '127.0.0.1' &&
-      parsed.hostname !== 'localhost'
-    ) {
-      return null;
-    }
-    return {
-      url: parsed.toString().replace(/\/$/, ''),
-      token,
-    };
-  } catch {
-    return null;
-  }
-}
 function availability() {
   if (isLocalRunnerEnabled()) {
     return { enabled: true, mode: 'trusted-local' as const };
   }
-  if (remoteExecutorConfig()) {
-    return { enabled: true, mode: 'isolated-remote' as const };
+  if (sameOriginStudioIsolationAvailable()) {
+    return { enabled: true, mode: 'same-origin-isolated' as const };
   }
   return { enabled: false, mode: 'unavailable' as const };
 }
 
 export async function GET() {
   return NextResponse.json(availability());
-}
-
-async function proxyToRemoteExecutor(body: RunBody, config: { url: string; token: string }) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), DOC8_RESOURCE_LIMITS.executionMs + 5_000);
-
-  try {
-    const response = await fetch(`${config.url}/v1/run`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.token}`,
-      },
-      body: JSON.stringify({
-        code: body.code,
-        lang: body.lang,
-        context: 'studio',
-        protocolVersion: 1,
-        assets: body.assets ?? [],
-      }),
-      cache: 'no-store',
-      signal: controller.signal,
-    });
-
-    let data: unknown;
-    try {
-      data = await response.json();
-    } catch {
-      return NextResponse.json(
-        { ok: false, error: 'Studio executor returned a non-JSON response.' },
-        { status: 502 },
-      );
-    }
-
-    return NextResponse.json(data, { status: response.status });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          error instanceof Error
-            ? `Studio executor request failed: ${error.message}`
-            : 'Studio executor request failed.',
-      },
-      { status: 502 },
-    );
-  } finally {
-    clearTimeout(timeout);
-  }
 }
 
 function runnerEnvironment(
@@ -653,10 +586,10 @@ export async function POST(req: NextRequest) {
   }
 
   const local = isLocalRunnerEnabled();
-  const remote = remoteExecutorConfig();
 
-  if (context === 'studio' && !local && remote) {
-    return proxyToRemoteExecutor(body, remote);
+  if (context === 'studio' && !local) {
+    const isolated = await runSameOriginIsolatedStudio(code, studioAssets);
+    return NextResponse.json(isolated.body, { status: isolated.status });
   }
 
   if (!local) {
@@ -664,9 +597,7 @@ export async function POST(req: NextRequest) {
       {
         ok: false,
         error:
-          context === 'studio'
-            ? 'The full Apexify Studio runtime is not connected on this deployment.'
-            : 'Interactive code execution is unavailable on this deployment. Current docs use verified output instead.',
+          'Interactive gallery code execution is unavailable on this deployment. Current docs use verified output instead.',
       },
       { status: 503 },
     );

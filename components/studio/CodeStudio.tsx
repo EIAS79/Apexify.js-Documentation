@@ -966,9 +966,9 @@ export default function CodeStudio() {
         >
           <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            <strong>This source needs the full Apexify runtime.</strong> Studio now chooses the
-            runtime automatically, but this deployment does not yet have the isolated full executor
-            connected. Browser-direct Canvas/Image/Text/Chart snippets continue to run in Live Canvas.
+            <strong>This source needs the full Apexify runtime.</strong> Studio now uses a
+            same-origin isolated backend automatically, but that built-in runtime is unavailable on
+            this deployment. Browser-direct Canvas/Image/Text/Chart snippets continue to run in Live Canvas.
           </span>
         </div>
       )}

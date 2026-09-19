@@ -7,7 +7,7 @@
 > - [x] STUDIO-1 artifact protocol and image/GIF/audio/video/text/JSON preview foundation
 > - [x] STUDIO-2 automatic runtime selection in the Studio UI
 > - [x] STUDIO-3 trusted-local full-runtime artifact runner foundation; intentional video block removed
-> - [x] STUDIO-4 isolated executor implementation complete: authenticated remote gateway, dedicated executor service, per-run Deno permission sandbox, bounded CPU/memory/time/output, pinned Apexify runtime, FFmpeg/ffprobe, explicit network allowlist, disposable workspace, and Render deployment blueprint. The documentation host still needs its executor URL/token environment values before public full-runtime execution becomes active.
+> - [x] STUDIO-4 same-origin isolated runtime complete: no external executor URL/token, no browser credential, one disposable restricted Deno subprocess per full-runtime run, pinned Apexify runtime, bounded resources, no arbitrary network/subprocess permission, and direct same-origin orchestration from /api/gallery/run.
 > - [x] STUDIO-5 virtual assets complete: image/audio/video/font uploads, persistent IndexedDB asset storage, metadata/thumbnail UX, stable `studio://asset/<id>` references, cursor insertion, automatic browser/full-runtime font registration, browser bitmap resolution, and isolated-runtime materialization
 > - [x] STUDIO-6 raster/chart/scene parity implementation complete: all Phase-6 families have an execution route, buffer identity is preserved through the real runtime, structured/non-raster results are collected safely, and representative Studio templates cover scenes/components/assets/templates, image utilities, path/pixels/detect, batch/chain, plus chart-buffer reuse. Isolated production execution proof is intentionally deferred to the final validation pass and STUDIO-4 deployment.
 > - [~] STUDIO-7 GIF/animation/audio in progress: media-aware artifact collection and playable GIF/audio templates are implemented; isolated-runtime execution proofs remain
@@ -40,11 +40,11 @@ capability analyzer
    |      - replaced by @apexify/web as the browser engine lands
    |
    +--> full Apexify runtime
-          - isolated executor
+          - same-origin isolated backend
           - real apexify.js package
           - native canvas/image stack
-          - FFmpeg/ffprobe when required
           - bounded temporary workspace
+          - video subprocess work remains owned by STUDIO-8
    |
    v
 unified artifact protocol
@@ -79,9 +79,9 @@ Public arbitrary JavaScript must never run in the documentation web process or a
 The full runtime path therefore has two modes:
 
 1. **trusted-local development** — current explicitly enabled local runner;
-2. **isolated-remote execution** — production executor configured by `STUDIO_EXECUTOR_URL`.
+2. **same-origin isolated execution** — production Studio requests stay on the documentation origin and are handed to a fresh restricted Deno subprocess.
 
-The production executor must provide real isolation, bounded CPU/memory/time/output, a temporary workspace, restricted environment, and explicit network policy. A normal Vercel/Next child process is not considered isolation.
+No executor URL, API token, or browser credential is part of the Studio product architecture. The outer application route validates/orchestrates the run but does not evaluate Studio source. The isolated subprocess receives bounded filesystem/environment/FFI permissions, no arbitrary network permission, no subprocess permission, a disposable workspace, and bounded CPU/memory/time/output.
 
 ## 5. Unified artifact protocol
 
@@ -195,28 +195,31 @@ Deliverables:
 - Studio runner no longer intentionally blocks video APIs;
 - still explicitly local/trusted only.
 
-### STUDIO-4 — Production isolated executor
+### STUDIO-4 — Same-origin isolated runtime
 
-Status: **implementation complete; deployment wiring available**.
+Status: **complete**.
 
 Delivered:
 
-- `STUDIO_EXECUTOR_URL` gateway with fail-closed requirement for both URL and bearer token;
-- dedicated `studio-executor/` service rather than arbitrary code in the documentation process;
-- one fresh restricted Deno subprocess per run;
-- no inherited documentation/application secrets;
-- read/write/env/run/FFI/network permissions explicitly scoped per run;
-- explicit outbound host allowlist through `STUDIO_EXECUTOR_ALLOWED_HOSTS`;
-- one disposable workspace per execution with unconditional cleanup;
-- Apexify package pinned to the documentation's authoritative package commit;
-- pinned FFmpeg/ffprobe binaries exposed only through the restricted run permission;
-- bounded source size, virtual assets, artifact count, per-artifact bytes, combined output bytes, stdout/stderr, wall time, concurrency, V8 heap, CPU time and address space;
-- Linux `prlimit` required by the executor for production CPU/address-space/file/process bounds;
-- compatible plugin imports restricted to the configured installed plugin allowlist;
-- package/runtime identity included in executor responses;
-- `render.yaml` plus `studio-executor/README.md` deployment contract.
+- Studio uses only the existing same-origin `/api/gallery/run` request path;
+- no `STUDIO_EXECUTOR_URL`, no `STUDIO_EXECUTOR_TOKEN`, no external executor API, and no browser-visible runtime credential;
+- production full-runtime runs are orchestrated directly by the documentation backend;
+- every full-runtime execution starts a fresh restricted Deno subprocess rather than evaluating user code in the Next.js process;
+- the Deno binary is installed at build time and included in the server trace;
+- Apexify is pinned to the documentation's authoritative package commit;
+- the subprocess receives read access only to the disposable workspace, installed dependencies, and system fonts;
+- write access is restricted to the disposable workspace;
+- environment access is restricted to non-secret Studio runtime paths;
+- FFI access is restricted to the installed `@napi-rs` native addon directory;
+- arbitrary outbound network and arbitrary subprocess execution are not granted;
+- full-runtime external media uses uploaded `studio://asset/<id>` files instead of general server egress;
+- source, assets, stdout/stderr, output count, per-output bytes, aggregate output bytes, wall time, concurrency, and V8 heap are bounded;
+- Linux `prlimit` CPU/address-space/file/process bounds are used when the host exposes them;
+- every run uses a disposable workspace and cleanup occurs in `finally`;
+- runtime/package identity remains traceable;
+- host persistence APIs remain outside the Studio contract.
 
-Production activation requires the documentation host to set `STUDIO_EXECUTOR_URL` and the matching `STUDIO_EXECUTOR_TOKEN`. This is host configuration, not an additional Studio execution implementation phase.
+Video/FFmpeg execution is intentionally not exposed through this general-purpose server sandbox. That media path remains owned by STUDIO-8 so video can be implemented without giving arbitrary Studio code a server subprocess capability.
 
 ### STUDIO-5 — Virtual Studio assets
 
@@ -234,9 +237,9 @@ Delivered:
 - browser-direct `createImage()`, `createCanvas().customBg`, bitmap `bgLayers`, and pattern layers resolve uploaded image assets without a network hop;
 - browser-direct text rendering automatically registers uploaded font assets under a deterministic family derived from the filename;
 - the asset shelf exposes/copies/inserts the exact font family developers should use in `font.family`;
-- trusted-local and isolated-remote full runtimes materialize assets only inside the disposable run workspace;
+- trusted-local and same-origin isolated full runtimes materialize assets only inside the disposable run workspace;
 - the full-runtime wrapper automatically registers uploaded font files before user code executes;
-- the isolated executor receives the same bounded asset protocol and never depends on caller filesystem paths;
+- the same-origin isolated runtime receives the same bounded asset protocol and never depends on caller filesystem paths;
 - asset bytes are deliberately excluded from Studio share links and ordinary localStorage state.
 
 The virtual-asset reference model is now complete. Future media-specific waveform/timeline UI belongs to STUDIO-7/8 rather than this phase.
@@ -317,13 +320,13 @@ Delivered:
 
 Remaining:
 
-- deploy the STUDIO-4 isolated executor with FFmpeg/ffprobe;
-- execute `createVideo`, `videoPipeline`, metadata/probing, extraction, and scene-to-video representative cases there;
+- implement the production video engine without granting the general-purpose same-origin sandbox arbitrary subprocess permission;
+- execute `createVideo`, `videoPipeline`, metadata/probing, extraction, and scene-to-video representative cases through that media-specific path;
 - verify MP4/WebM playback and bounded multi-frame output in production.
 
 Deliverables:
 
-- FFmpeg-backed video operations through isolated runtime;
+- production video operations through the dedicated STUDIO-8 media path;
 - MP4/WebM preview;
 - frame extraction previews;
 - metadata inspector;
