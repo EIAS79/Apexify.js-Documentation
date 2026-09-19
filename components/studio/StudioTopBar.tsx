@@ -29,7 +29,9 @@ type TopBarProps = {
   lang: StudioLang;
   onLangChange: (l: StudioLang) => void;
   running: boolean;
-  runnerEnabled: boolean;
+  nodeRunnerEnabled: boolean;
+  executionTarget: 'browser' | 'node';
+  onExecutionTargetChange: (target: 'browser' | 'node') => void;
   autoRun: boolean;
   onAutoRunChange: (next: boolean) => void;
   onRun: () => void;
@@ -205,7 +207,7 @@ function TemplatesMenu({ onLoad }: { onLoad: (t: StudioTemplate) => void }) {
                       >
                         <span
                           className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-md text-[10px] font-bold uppercase tracking-wider"
-                          style={{ background: 'var(--gradient-iris)', color: 'white' }}
+                          style={{ background: 'var(--studio-blue)', color: 'var(--studio-action-ink)' }}
                           aria-hidden
                         >
                           TPL
@@ -238,7 +240,9 @@ export function StudioTopBar(props: TopBarProps) {
     lang,
     onLangChange,
     running,
-    runnerEnabled,
+    nodeRunnerEnabled,
+    executionTarget,
+    onExecutionTargetChange,
     autoRun,
     onAutoRunChange,
     onRun,
@@ -274,7 +278,7 @@ export function StudioTopBar(props: TopBarProps) {
           <span
             aria-hidden
             className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover/logo:scale-105 sm:h-9 sm:w-9"
-            style={{ boxShadow: 'var(--glow-magenta)' }}
+            style={{ boxShadow: 'none' }}
           >
             <BrandIcon />
           </span>
@@ -285,7 +289,7 @@ export function StudioTopBar(props: TopBarProps) {
             >
               Apexify
             </span>
-            <span className="text-sm font-bold text-grad-aurora">Studio</span>
+            <span className="text-sm font-bold" style={{ color: 'var(--studio-blue-2)' }}>Studio</span>
           </span>
         </Link>
 
@@ -303,21 +307,44 @@ export function StudioTopBar(props: TopBarProps) {
 
       {/* Center — Execution controls */}
       <div
-        className="flex items-center gap-1 rounded-xl p-1"
+        className="studio-run-cluster flex items-center gap-1 rounded-xl p-1"
         style={{
           border: '1px solid var(--border-default)',
           backgroundColor: 'color-mix(in srgb, var(--bg-base) 60%, transparent)',
         }}
       >
+        <div className="studio-target-switch flex items-center gap-0.5 rounded-lg p-0.5" role="group" aria-label="Execution target">
+          <button
+            type="button"
+            aria-pressed={executionTarget === 'browser'}
+            onClick={() => onExecutionTargetChange('browser')}
+            className="studio-target-switch__button"
+            data-active={executionTarget === 'browser' || undefined}
+            title="Live Canvas — safe browser preview"
+          >
+            Live
+          </button>
+          <button
+            type="button"
+            aria-pressed={executionTarget === 'node'}
+            onClick={() => onExecutionTargetChange('node')}
+            disabled={!nodeRunnerEnabled}
+            className="studio-target-switch__button"
+            data-active={executionTarget === 'node' || undefined}
+            title={nodeRunnerEnabled ? 'Trusted-local Node runner' : 'Node runner unavailable on this deployment'}
+          >
+            Node
+          </button>
+        </div>
         <button
           type="button"
           onClick={onRun}
-          disabled={running || !runnerEnabled}
+          disabled={running}
           className="inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[12px] sm:text-[13px] font-bold transition-all active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-50"
           style={{
-            background: 'var(--gradient-sunset)',
-            color: 'white',
-            boxShadow: running ? 'none' : '0 2px 12px -3px rgba(236, 72, 153, 0.5)',
+            background: 'var(--studio-action)',
+            color: 'var(--studio-action-ink)',
+            boxShadow: running ? 'none' : '0 8px 24px -14px var(--studio-action)',
           }}
           title="Run snippet (⌘↵)"
         >
@@ -331,10 +358,10 @@ export function StudioTopBar(props: TopBarProps) {
           className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
           style={{
             background: autoRun
-              ? 'linear-gradient(135deg, var(--accent-iris), var(--accent-magenta))'
+              ? 'color-mix(in srgb, var(--studio-mint) 16%, var(--bg-raised))'
               : 'transparent',
-            color: autoRun ? 'white' : 'var(--text-secondary)',
-            boxShadow: autoRun ? '0 2px 10px -3px var(--accent-iris)' : 'none',
+            color: autoRun ? 'var(--studio-mint)' : 'var(--text-secondary)',
+            boxShadow: 'none',
           }}
           title={autoRun ? 'Auto-run active — click to disable' : 'Enable auto-run on typing'}
         >
