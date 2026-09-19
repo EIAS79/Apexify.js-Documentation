@@ -11,10 +11,12 @@ function visibleSearchInput(): HTMLInputElement | null {
 
 export function DocsSearchTrigger() {
   const [open, setOpen] = useState(false);
+
   const openSearch = useCallback(() => {
     visibleSearchInput()?.focus();
     setOpen(true);
   }, []);
+
   const closeSearch = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
@@ -32,14 +34,16 @@ export function DocsSearchTrigger() {
     <>
       <button
         type="button"
-        className="apx-icon-button"
+        className="apx-icon-button apx-doc-search-trigger"
         aria-label="Search documentation"
         title="Search documentation (Ctrl/⌘ K)"
         aria-haspopup="dialog"
         aria-expanded={open}
         onClick={openSearch}
       >
-        <MagnifyingGlassIcon className="h-5 w-5" aria-hidden />
+        <MagnifyingGlassIcon className="h-4 w-4" aria-hidden />
+        <span className="apx-doc-search-trigger__label">Search docs</span>
+        <kbd>⌘K</kbd>
       </button>
       <SearchCommandPalette open={open} onClose={closeSearch} />
     </>

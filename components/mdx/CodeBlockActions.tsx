@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { ArrowUpRightIcon, CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 
 export type StudioHandoffPayload = {
   name: string;
@@ -41,24 +42,29 @@ export function CodeBlockActions({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="apx-code-actions">
       {studioPayload ? (
         <Link
           href="/studio"
           prefetch={false}
           onClick={persistStudioHandoff}
-          className="flex min-h-11 items-center rounded-lg border border-violet-400/50 px-3 py-1.5 text-xs text-violet-200 transition-colors duration-150 hover:border-violet-300 hover:bg-slate-700 hover:text-white"
-          title="Open this snippet in Studio and run it"
+          className="apx-code-action apx-code-action--studio"
+          title="Open this snippet in Studio"
         >
           Studio
+          <ArrowUpRightIcon className="h-3.5 w-3.5" aria-hidden />
         </Link>
       ) : null}
+
       <button
         type="button"
         onClick={copy}
-        className="flex min-h-11 items-center rounded-lg border border-slate-600 px-3 py-1.5 text-xs text-gray-200 transition-colors duration-150 hover:border-blue-400 hover:bg-slate-700 hover:text-white"
+        className="apx-code-action"
         aria-label={copied ? 'Code copied' : 'Copy code'}
       >
+        {copied
+          ? <CheckIcon className="h-3.5 w-3.5" aria-hidden />
+          : <ClipboardDocumentIcon className="h-3.5 w-3.5" aria-hidden />}
         {copied ? 'Copied' : 'Copy'}
       </button>
     </div>

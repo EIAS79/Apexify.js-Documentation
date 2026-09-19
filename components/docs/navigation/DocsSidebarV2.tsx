@@ -225,6 +225,13 @@ export function DocsSidebarV2({
 
   return (
     <div className="apx-sidebar-panel" data-doc2-sidebar data-post-doc12-tree>
+      <div className="apx-sidebar-panel__head">
+        <div>
+          <span>DOCS INDEX</span>
+          <strong>Browse by engine</strong>
+        </div>
+        <small>runtime → section → feature</small>
+      </div>
       {includeSearch ? (
         <div className="apx-sidebar-search">
           <DocsSidebarSearch inputId={searchInputId} />

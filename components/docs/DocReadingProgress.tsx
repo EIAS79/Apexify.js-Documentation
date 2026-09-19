@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
-/** Thin sunset-gradient strip pinned under the header that tracks the active doc's scroll. */
 export function DocReadingProgress() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     let raf = 0;
+
     const update = () => {
       const article =
         (document.querySelector('[data-doc-article]') as HTMLElement | null) ??
@@ -28,6 +28,7 @@ export function DocReadingProgress() {
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     window.addEventListener('hashchange', onScroll);
+
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('scroll', onScroll);
@@ -39,17 +40,10 @@ export function DocReadingProgress() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed left-0 right-0 top-16 z-[55] h-[2px]"
-      style={{ backgroundColor: 'transparent' }}
+      className="apx-doc-reading-progress"
+      style={{ top: 'var(--apx-header-height)' }}
     >
-      <div
-        className="h-full transition-[width] duration-100 ease-out"
-        style={{
-          width: `${progress * 100}%`,
-          background: 'var(--gradient-aurora)',
-          boxShadow: '0 0 12px 0 var(--accent-magenta)',
-        }}
-      />
+      <div style={{ width: String(progress * 100) + '%' }} />
     </div>
   );
 }

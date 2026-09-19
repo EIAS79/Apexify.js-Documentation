@@ -10,42 +10,29 @@ interface CodeWithImageProps {
   codeFirst?: boolean;
 }
 
-export function CodeWithImage({ 
-  code, 
-  image, 
-  imageAlt = 'Code example result', 
+export function CodeWithImage({
+  code,
+  image,
+  imageAlt = 'Code example result',
   lang = 'typescript',
-  codeFirst = true 
+  codeFirst = true,
 }: CodeWithImageProps) {
   const imageBlock = (
-    <div className="bg-gray-800 rounded-lg border border-gray-700 p-4 flex items-center justify-center min-w-0">
-      <img 
-        src={image} 
-        alt={imageAlt}
-        className="max-w-full h-auto rounded"
-      />
-    </div>
+    <figure className="apx-code-with-image__media">
+      <img src={image} alt={imageAlt} />
+      <figcaption>Rendered output</figcaption>
+    </figure>
   );
 
   const codeBlock = (
-    <div className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden min-w-0">
-      <CodeBlock lang={lang}>{code}</CodeBlock>
+    <div className="apx-code-with-image__source">
+      <CodeBlock lang={lang} docsStudio>{code}</CodeBlock>
     </div>
   );
 
   return (
-    <div className="my-6 flex flex-col gap-4">
-      {codeFirst ? (
-        <>
-          {codeBlock}
-          {imageBlock}
-        </>
-      ) : (
-        <>
-          {imageBlock}
-          {codeBlock}
-        </>
-      )}
+    <div className="apx-code-with-image" data-doc3-component="CodeWithImage">
+      {codeFirst ? <>{codeBlock}{imageBlock}</> : <>{imageBlock}{codeBlock}</>}
     </div>
   );
 }
