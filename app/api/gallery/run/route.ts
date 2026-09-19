@@ -139,11 +139,14 @@ async function proxyToRemoteExecutor(body: RunBody, config: { url: string; token
   }
 }
 
-function runnerEnvironment(projectRoot: string, extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
+function runnerEnvironment(
+  projectRoot: string,
+  extra: Partial<NodeJS.ProcessEnv> = {},
+): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = {
+    ...extra,
     NODE_ENV: 'development',
     NODE_PATH: galleryRunnerNodePath(projectRoot),
-    ...extra,
   };
 
   if (process.env.PATH) env.PATH = process.env.PATH;
