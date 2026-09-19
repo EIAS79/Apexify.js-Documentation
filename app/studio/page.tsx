@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import '@/styles/studio-calm.css';
 import CodeStudio from '@/components/studio/CodeStudio';
 import { absoluteSiteUrl } from '@/lib/site';
 

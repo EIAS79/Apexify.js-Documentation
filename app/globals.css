@@ -234,11 +234,13 @@ body {
   opacity: 0;
 }
 
-.custom-cursor-pointer[data-mode="magnet"] .custom-cursor-pointer__svg--arrow {
+.custom-cursor-pointer[data-mode="magnet"] .custom-cursor-pointer__svg--arrow,
+.custom-cursor-pointer[data-mode="pointer"] .custom-cursor-pointer__svg--arrow {
   opacity: 0;
 }
 
-.custom-cursor-pointer[data-mode="magnet"] .custom-cursor-pointer__svg--hand {
+.custom-cursor-pointer[data-mode="magnet"] .custom-cursor-pointer__svg--hand,
+.custom-cursor-pointer[data-mode="pointer"] .custom-cursor-pointer__svg--hand {
   opacity: 1;
 }
 

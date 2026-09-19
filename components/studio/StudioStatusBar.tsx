@@ -10,7 +10,8 @@ type Props = {
   charCount: number;
   autoRun: boolean;
   onToggleAutoRun: () => void;
-  runnerEnabled: boolean;
+  nodeRunnerEnabled: boolean;
+  executionTarget: 'browser' | 'node';
   running: boolean;
   lastError: boolean;
   elapsedMs: number | null;
@@ -32,27 +33,34 @@ export function StudioStatusBar(props: Props) {
     charCount,
     autoRun,
     onToggleAutoRun,
-    runnerEnabled,
+    nodeRunnerEnabled,
+    executionTarget,
     running,
     lastError,
     elapsedMs,
     hasOutput,
   } = props;
 
-  const executionLabel = !runnerEnabled
-    ? 'Execution · unavailable'
-    : running
-      ? 'Trusted-local · running'
-      : lastError
-        ? 'Trusted-local · error'
-        : 'Trusted-local · ready';
-  const executionColor = !runnerEnabled
-    ? 'var(--warning)'
-    : running
-      ? 'var(--info)'
-      : lastError
-        ? 'var(--danger)'
-        : 'var(--success)';
+  const isBrowser = executionTarget === 'browser';
+  const executionLabel = running
+    ? isBrowser ? 'Live Canvas · rendering' : 'Node · running'
+    : lastError
+      ? isBrowser ? 'Live Canvas · error' : 'Node · error'
+      : isBrowser
+        ? 'Live Canvas · ready'
+        : nodeRunnerEnabled
+          ? 'Node · ready'
+          : 'Node · unavailable';
+
+  const executionColor = running
+    ? 'var(--studio-blue-2)'
+    : lastError
+      ? 'var(--danger)'
+      : isBrowser
+        ? 'var(--studio-mint)'
+        : nodeRunnerEnabled
+          ? 'var(--success)'
+          : 'var(--warning)';
 
   return (
     <footer
@@ -83,7 +91,7 @@ export function StudioStatusBar(props: Props) {
       >
         <span
           className="rounded-sm px-1 py-0.5 text-[9px] font-bold tracking-wide"
-          style={{ backgroundColor: 'var(--accent-iris)', color: 'var(--text-inverse)' }}
+          style={{ backgroundColor: 'var(--studio-blue)', color: 'var(--studio-action-ink)' }}
         >
           {lang.toUpperCase()}
         </span>
@@ -111,7 +119,7 @@ export function StudioStatusBar(props: Props) {
       >
         <span
           className="inline-block h-2 w-2 rounded-full"
-          style={{ backgroundColor: autoRun ? 'var(--accent-iris)' : 'var(--border-strong)' }}
+          style={{ backgroundColor: autoRun ? 'var(--studio-mint)' : 'var(--border-strong)' }}
           aria-hidden
         />
         <span style={{ color: 'var(--text-secondary)' }}>Auto-run {autoRun ? 'on' : 'off'}</span>

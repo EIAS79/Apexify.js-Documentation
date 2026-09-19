@@ -12,7 +12,7 @@ export function InteractivePreview({
 }: {
   status: PreviewStatus;
   label: string;
-  provenance?: 'verified' | 'server-generated' | 'static';
+  provenance?: 'verified' | 'server-generated' | 'browser-generated' | 'static';
   children?: ReactNode;
 }) {
   const truthLabel =
@@ -20,7 +20,9 @@ export function InteractivePreview({
       ? 'Verified output'
       : provenance === 'server-generated'
         ? 'Server-generated output'
-        : provenance === 'static'
+        : provenance === 'browser-generated'
+          ? 'Live Canvas output'
+          : provenance === 'static'
           ? 'Static preview'
           : null;
 
