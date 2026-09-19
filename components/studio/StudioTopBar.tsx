@@ -43,7 +43,6 @@ type TopBarProps = {
   running: boolean;
   nodeRunnerEnabled: boolean;
   executionTarget: 'browser' | 'node';
-  onExecutionTargetChange: (target: 'browser' | 'node') => void;
   autoRun: boolean;
   onAutoRunChange: (next: boolean) => void;
   onRun: () => void;
@@ -254,7 +253,6 @@ export function StudioTopBar(props: TopBarProps) {
     running,
     nodeRunnerEnabled,
     executionTarget,
-    onExecutionTargetChange,
     autoRun,
     onAutoRunChange,
     onRun,
@@ -325,28 +323,35 @@ export function StudioTopBar(props: TopBarProps) {
           backgroundColor: 'color-mix(in srgb, var(--bg-base) 60%, transparent)',
         }}
       >
-        <div className="studio-target-switch flex items-center gap-0.5 rounded-lg p-0.5" role="group" aria-label="Execution target">
-          <button
-            type="button"
-            aria-pressed={executionTarget === 'browser'}
-            onClick={() => onExecutionTargetChange('browser')}
-            className="studio-target-switch__button"
-            data-active={executionTarget === 'browser' || undefined}
-            title="Live Canvas — safe browser preview"
-          >
-            Live
-          </button>
-          <button
-            type="button"
-            aria-pressed={executionTarget === 'node'}
-            onClick={() => onExecutionTargetChange('node')}
-            disabled={!nodeRunnerEnabled}
-            className="studio-target-switch__button"
-            data-active={executionTarget === 'node' || undefined}
-            title={nodeRunnerEnabled ? 'Trusted-local Node runner' : 'Node runner unavailable on this deployment'}
-          >
-            Node
-          </button>
+        <div
+          className="studio-target-switch inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold sm:text-xs"
+          title={
+            executionTarget === 'browser'
+              ? 'Studio selected the browser-direct runtime for this source.'
+              : nodeRunnerEnabled
+                ? 'Studio selected the full Apexify runtime for this source.'
+                : 'This source requires the full Apexify runtime, but no full executor is connected.'
+          }
+          aria-label="Automatic execution runtime"
+        >
+          <span
+            aria-hidden
+            className="h-1.5 w-1.5 rounded-full"
+            style={{
+              backgroundColor:
+                executionTarget === 'browser'
+                  ? 'var(--studio-mint)'
+                  : nodeRunnerEnabled
+                    ? 'var(--success)'
+                    : 'var(--warning)',
+            }}
+          />
+          <span>
+            {executionTarget === 'browser' ? 'Live Canvas' : 'Full runtime'}
+          </span>
+          <span className="hidden text-[10px] font-medium sm:inline" style={{ color: 'var(--text-tertiary)' }}>
+            auto
+          </span>
         </div>
         <button
           type="button"

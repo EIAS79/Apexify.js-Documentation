@@ -10,11 +10,13 @@ import { GallerySnippetEditor } from '@/app/gallery/components/GallerySnippetEdi
 import { StudioCommandPalette } from '@/components/studio/StudioCommandPalette';
 import { StudioFileTabs } from '@/components/studio/StudioFileTabs';
 import { StudioOutputPanel, OutputTab } from '@/components/studio/StudioOutputPanel';
+import type { StudioPreviewArtifact } from '@/components/studio/StudioArtifactPreview';
 import { StudioResizableSplit } from '@/components/studio/StudioResizableSplit';
 import { StudioShortcutOverlay } from '@/components/studio/StudioShortcutOverlay';
 import { StudioStatusBar } from '@/components/studio/StudioStatusBar';
 import { StudioTopBar } from '@/components/studio/StudioTopBar';
 import { createInteractiveSession } from '@/lib/docs/playground/session';
+import type { InteractiveArtifact } from '@/lib/docs/playground/contracts';
 import {
   currentNodeServerExecutionAdapter,
   getServerExecutionAvailability,
@@ -33,6 +35,7 @@ import {
   makeId,
 } from '@/lib/studio/studioConfig';
 import { renderStudioBrowserPreview } from '@/lib/studio/browserPreview';
+import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
 import {
   bootstrapStudio,
   encodeShareLink,
@@ -54,10 +57,9 @@ export default function CodeStudio() {
   const [splitRatio, setSplitRatio] = useState(0.5);
 
   const [runnerEnabled, setRunnerEnabled] = useState(false);
-  const [executionTarget, setExecutionTarget] = useState<'browser' | 'node'>('browser');
   const [running, setRunning] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewMime, setPreviewMime] = useState<string | null>(null);
+  const [previewArtifacts, setPreviewArtifacts] = useState<StudioPreviewArtifact[]>([]);
+  const [activeArtifactId, setActiveArtifactId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorExitCode, setErrorExitCode] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
@@ -72,7 +74,7 @@ export default function CodeStudio() {
   const [toast, setToast] = useState<Toast>(null);
   const [shareCopied, setShareCopied] = useState(false);
 
-  const previewObjectUrlRef = useRef<string | null>(null);
+  const previewObjectUrlsRef = useRef<string[]>([]);
   const autoRunTimerRef = useRef<number>(0);
   const toastTimerRef = useRef<number>(0);
 
@@ -84,6 +86,9 @@ export default function CodeStudio() {
     () => (activeBuffer ? (lang === 'ts' ? activeBuffer.ts : activeBuffer.js) : ''),
     [activeBuffer, lang]
   );
+  const executionPlan = useMemo(() => planStudioExecution(activeCode), [activeCode]);
+  const executionTarget: 'browser' | 'node' =
+    executionPlan.backend === 'browser' ? 'browser' : 'node';
 
   /* ---------- bootstrap (storage + share-link + incoming) ---------- */
 
@@ -152,11 +157,50 @@ export default function CodeStudio() {
   }, []);
 
   const revokePreview = useCallback(() => {
-    if (previewObjectUrlRef.current) {
-      URL.revokeObjectURL(previewObjectUrlRef.current);
-      previewObjectUrlRef.current = null;
+    for (const url of previewObjectUrlsRef.current) {
+      URL.revokeObjectURL(url);
     }
+    previewObjectUrlsRef.current = [];
+    setPreviewArtifacts([]);
+    setActiveArtifactId(null);
   }, []);
+
+  const showServerArtifacts = useCallback(
+    (
+      rawArtifacts: InteractiveArtifact[],
+      provenance: 'server-generated' = 'server-generated',
+    ) => {
+      revokePreview();
+
+      const resolved: StudioPreviewArtifact[] = rawArtifacts.map((artifact) => {
+        let url: string | null = null;
+        if (artifact.base64) {
+          const bin = atob(artifact.base64);
+          const bytes = new Uint8Array(bin.length);
+          for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+          url = URL.createObjectURL(new Blob([bytes], { type: artifact.mime }));
+          previewObjectUrlsRef.current.push(url);
+        }
+        return { ...artifact, url };
+      });
+
+      setPreviewArtifacts(resolved);
+      const primary = resolved[0] ?? null;
+      setActiveArtifactId(primary?.id ?? null);
+      setPreviewProvenance(primary ? provenance : undefined);
+      return resolved;
+    },
+    [revokePreview],
+  );
+
+  const selectPreviewArtifact = useCallback(
+    (id: string) => {
+      const artifact = previewArtifacts.find((item) => item.id === id);
+      if (!artifact) return;
+      setActiveArtifactId(artifact.id);
+    },
+    [previewArtifacts],
+  );
 
   /** Render the response into a 256×144-ish thumbnail data URL for run history. */
   const makeThumbnail = useCallback(async (mime: string, base64: string): Promise<string | null> => {
@@ -186,12 +230,15 @@ export default function CodeStudio() {
     }
   }, []);
 
-  /* ---------- run pipeline: Live Canvas public preview + optional trusted-local Node ---------- */
+  /* ---------- run pipeline: automatic browser/full-runtime routing ---------- */
 
   const runCode = useCallback(async () => {
     if (!activeBuffer) return;
     const code = lang === 'ts' ? activeBuffer.ts : activeBuffer.js;
     if (!code.trim() || running) return;
+
+    const plan = planStudioExecution(code);
+    const target: 'browser' | 'node' = plan.backend === 'browser' ? 'browser' : 'node';
 
     setRunning(true);
     setError(null);
@@ -199,13 +246,24 @@ export default function CodeStudio() {
     setPreviewWarnings([]);
 
     try {
-      if (executionTarget === 'browser') {
+      if (plan.hostPersistenceOnly.length > 0) {
+        const message =
+          'Studio does not execute host persistence calls (' +
+          plan.hostPersistenceOnly.join(', ') +
+          '). Return the generated Apexify artifact from main() and use the Studio download action if you want a local copy.';
+        revokePreview();
+        setPreviewProvenance(undefined);
+        setError(message);
+        setElapsedMs(null);
+        setOutputTab('terminal');
+        return;
+      }
+
+      if (target === 'browser') {
         const result = await renderStudioBrowserPreview(code);
 
         if (!result.ok) {
           revokePreview();
-          setPreviewUrl(null);
-          setPreviewMime(null);
           setPreviewProvenance(undefined);
           setError(result.error);
           setElapsedMs(result.elapsedMs);
@@ -220,8 +278,15 @@ export default function CodeStudio() {
         }
 
         revokePreview();
-        setPreviewUrl(result.dataUrl);
-        setPreviewMime(result.mime);
+        const browserArtifact: StudioPreviewArtifact = {
+          id: 'browser-preview',
+          name: 'Live Canvas output.png',
+          kind: 'image',
+          mime: result.mime,
+          url: result.dataUrl,
+        };
+        setPreviewArtifacts([browserArtifact]);
+        setActiveArtifactId(browserArtifact.id);
         setPreviewProvenance('browser-generated');
         setPreviewWarnings(result.warnings);
         setElapsedMs(result.elapsedMs);
@@ -237,17 +302,22 @@ export default function CodeStudio() {
         );
 
         if (result.warnings.length > 0) {
-          flashToast('warning', `Live Canvas rendered with ${result.warnings.length} unsupported operation${result.warnings.length === 1 ? '' : 's'}`);
+          flashToast(
+            'warning',
+            `Live Canvas rendered with ${result.warnings.length} note${result.warnings.length === 1 ? '' : 's'}`,
+          );
         }
         return;
       }
 
       if (!runnerEnabled) {
-        const message = 'Trusted-local Node execution is unavailable on this deployment. Switch the run target to Live Canvas.';
-        setError(message);
-        setPreviewUrl(null);
-        setPreviewMime(null);
+        const details = plan.reasons.length ? ' ' + plan.reasons.join(' ') : '';
+        const message =
+          'This snippet requires the full Apexify runtime, but no isolated/full executor is connected on this deployment.' +
+          details;
+        revokePreview();
         setPreviewProvenance(undefined);
+        setError(message);
         setElapsedMs(null);
         setOutputTab('terminal');
         return;
@@ -263,9 +333,8 @@ export default function CodeStudio() {
         }),
       });
 
-      if (result.status !== 'ready' || !result.output?.base64) {
+      if (result.status !== 'ready' || !result.output) {
         revokePreview();
-        setPreviewUrl(null);
         setPreviewProvenance(undefined);
         const primary = result.diagnostics[0];
         const message = primary?.message ?? 'Execution is unavailable.';
@@ -295,36 +364,56 @@ export default function CodeStudio() {
         return;
       }
 
-      const mime = result.output.mime;
-      const base64 = result.output.base64;
-      const bin = atob(base64);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
-      revokePreview();
-      const blob = new Blob([bytes], { type: mime });
-      const url = URL.createObjectURL(blob);
-      previewObjectUrlRef.current = url;
-      setPreviewUrl(url);
-      setPreviewMime(mime);
-      setPreviewProvenance('server-generated');
+      const rawArtifacts =
+        result.output.artifacts && result.output.artifacts.length > 0
+          ? result.output.artifacts
+          : result.output.base64
+            ? [{
+                id: 'primary-output',
+                name: 'Apexify output',
+                kind:
+                  result.output.mime === 'image/gif'
+                    ? 'gif' as const
+                    : result.output.mime.startsWith('image/')
+                      ? 'image' as const
+                      : result.output.mime.startsWith('audio/')
+                        ? 'audio' as const
+                        : result.output.mime.startsWith('video/')
+                          ? 'video' as const
+                          : 'binary' as const,
+                mime: result.output.mime,
+                base64: result.output.base64,
+              }]
+            : [];
+
+      if (rawArtifacts.length === 0) {
+        throw new Error('The full Apexify runtime completed without a previewable artifact.');
+      }
+
+      showServerArtifacts(rawArtifacts);
       setErrorExitCode(null);
       const elapsed = result.elapsedMs ?? null;
       setElapsedMs(elapsed);
       setOutputTab('preview');
 
-      const thumb = await makeThumbnail(mime, base64);
+      const thumbSource = rawArtifacts.find(
+        (artifact) => artifact.base64 && artifact.mime.startsWith('image/'),
+      );
+      const thumb = thumbSource?.base64
+        ? await makeThumbnail(thumbSource.mime, thumbSource.base64)
+        : null;
+      const primary = rawArtifacts[0]!;
       setHistory((cur) =>
         pushRunHistory(
-          historyEntry(activeBuffer, lang, true, elapsed, null, null, thumb, mime, code),
+          historyEntry(activeBuffer, lang, true, elapsed, null, null, thumb, primary.mime, code),
           cur,
         ),
       );
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Preview failed';
+      revokePreview();
       setError(message);
       setErrorExitCode(null);
-      setPreviewUrl(null);
-      setPreviewMime(null);
       setPreviewProvenance(undefined);
       setElapsedMs(null);
       setOutputTab('terminal');
@@ -340,14 +429,13 @@ export default function CodeStudio() {
   }, [
     activeBuffer,
     lang,
-    executionTarget,
     runnerEnabled,
     running,
     revokePreview,
+    showServerArtifacts,
     makeThumbnail,
     flashToast,
   ]);
-
   const runCodeRef = useRef(runCode);
   runCodeRef.current = runCode;
 
@@ -357,7 +445,7 @@ export default function CodeStudio() {
     autoRunTimerRef.current = window.setTimeout(() => void runCodeRef.current(), 900);
   }, [autoRun]);
 
-  /** Initial Live Canvas preview is available publicly; Node remains opt-in trusted-local. */
+  /** Initial preview uses the same automatic runtime planner as manual Run. */
   useEffect(() => {
     if (!hydrated || !activeBuffer) return;
     let cancelled = false;
@@ -370,7 +458,7 @@ export default function CodeStudio() {
       cancelled = true;
       cancelAnimationFrame(id);
     };
-  }, [hydrated, activeBuffer?.id, executionTarget]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hydrated, activeBuffer?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => () => revokePreview(), [revokePreview]);
   useEffect(
@@ -506,16 +594,37 @@ export default function CodeStudio() {
   }, [activeBuffer, lang, flashToast]);
 
   const downloadOutput = useCallback(() => {
-    if (!previewUrl) return flashToast('warning', 'Run the snippet first to download output');
+    const artifact =
+      previewArtifacts.find((item) => item.id === activeArtifactId) ??
+      previewArtifacts[0];
+
+    if (!artifact) {
+      return flashToast('warning', 'Run the snippet first to download output');
+    }
+
+    let href = artifact.url;
+    let temporaryUrl: string | null = null;
+
+    if (!href && artifact.text !== undefined) {
+      temporaryUrl = URL.createObjectURL(new Blob([artifact.text], { type: artifact.mime }));
+      href = temporaryUrl;
+    }
+
+    if (!href) {
+      return flashToast('warning', 'This artifact has no downloadable payload');
+    }
+
     const a = document.createElement('a');
-    a.href = previewUrl;
-    const ext = previewMime?.includes('gif') ? 'gif' : previewMime?.includes('webp') ? 'webp' : 'png';
-    a.download = `${(activeBuffer?.name ?? 'apexify').replace(/[^a-z0-9-_]/gi, '-').toLowerCase()}.${ext}`;
+    a.href = href;
+    a.download =
+      artifact.name ||
+      `${(activeBuffer?.name ?? 'apexify').replace(/[^a-z0-9-_]/gi, '-').toLowerCase()}.bin`;
     document.body.appendChild(a);
     a.click();
     a.remove();
-    flashToast('success', `Saved ${a.download}`);
-  }, [previewUrl, previewMime, activeBuffer, flashToast]);
+    if (temporaryUrl) URL.revokeObjectURL(temporaryUrl);
+    flashToast('success', `Downloaded ${a.download}`);
+  }, [previewArtifacts, activeArtifactId, activeBuffer, flashToast]);
 
   const copyActiveCode = useCallback(() => {
     if (!activeCode) return;
@@ -715,7 +824,9 @@ export default function CodeStudio() {
       tab={outputTab}
       onTabChange={setOutputTab}
       running={running}
-      previewUrl={previewUrl}
+      previewArtifacts={previewArtifacts}
+      activeArtifactId={activeArtifactId}
+      onArtifactSelect={selectPreviewArtifact}
       previewProvenance={previewProvenance}
       notices={previewWarnings}
       error={error}
@@ -777,7 +888,6 @@ export default function CodeStudio() {
         running={running}
         nodeRunnerEnabled={runnerEnabled}
         executionTarget={executionTarget}
-        onExecutionTargetChange={setExecutionTarget}
         autoRun={autoRun}
         onAutoRunChange={setAutoRun}
         onRun={() => void runCode()}
@@ -786,12 +896,12 @@ export default function CodeStudio() {
         onCopyShareLink={copyShareLink}
         shareCopied={shareCopied}
         onDownloadOutput={downloadOutput}
-        hasOutput={!!previewUrl}
+        hasOutput={previewArtifacts.length > 0}
         onOpenPalette={() => setPaletteOpen(true)}
         onOpenShortcuts={() => setShortcutsOpen(true)}
       />
 
-      {!runnerEnabled && (
+      {!runnerEnabled && executionTarget === 'node' && (
         <div
           className="studio-runtime-note flex shrink-0 items-start gap-2 px-3 py-2 text-xs sm:px-4"
           role="status"
@@ -799,11 +909,9 @@ export default function CodeStudio() {
         >
           <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            <strong>Live Canvas is active.</strong> Public Studio previews
-            <code> createCanvas()</code>, <code>createChart()</code>, <code>createText()</code>,
-            shape-based <code>createImage()</code>, browser-fetchable HTTP(S) image layers,
-            generated chart layers, and procedural canvas patterns directly in your browser.
-            Local-file and Node-only media workflows still require an explicitly trusted local runtime.
+            <strong>This source needs the full Apexify runtime.</strong> Studio now chooses the
+            runtime automatically, but this deployment does not yet have the isolated full executor
+            connected. Browser-direct Canvas/Image/Text/Chart snippets continue to run in Live Canvas.
           </span>
         </div>
       )}
@@ -850,7 +958,7 @@ export default function CodeStudio() {
         running={running}
         lastError={!!error}
         elapsedMs={elapsedMs}
-        hasOutput={!!previewUrl}
+        hasOutput={previewArtifacts.length > 0}
       />
 
       <StudioCommandPalette

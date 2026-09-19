@@ -8,10 +8,13 @@ import {
   PlayIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-import { StudioPreviewZoom } from './StudioPreviewZoom';
 import { RunHistoryEntry } from '@/lib/studio/studioConfig';
 import { InteractivePreview } from '@/components/docs/playground/InteractivePreview';
 import { DiagnosticsPanel } from '@/components/docs/playground/DiagnosticsPanel';
+import {
+  StudioArtifactPreview,
+  type StudioPreviewArtifact,
+} from './StudioArtifactPreview';
 
 export type OutputTab = 'preview' | 'terminal' | 'history';
 
@@ -21,7 +24,9 @@ type Props = {
   tab: OutputTab;
   onTabChange: (next: OutputTab) => void;
   running: boolean;
-  previewUrl: string | null;
+  previewArtifacts: StudioPreviewArtifact[];
+  activeArtifactId: string | null;
+  onArtifactSelect: (id: string) => void;
   previewProvenance: PreviewProvenance;
   notices: string[];
   error: string | null;
@@ -76,11 +81,56 @@ function Tab({
   );
 }
 
+function ArtifactStrip({
+  artifacts,
+  activeId,
+  onSelect,
+}: {
+  artifacts: StudioPreviewArtifact[];
+  activeId: string | null;
+  onSelect: (id: string) => void;
+}) {
+  if (artifacts.length <= 1) return null;
+
+  return (
+    <div
+      className="flex shrink-0 gap-1.5 overflow-x-auto px-2 py-2"
+      style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-sunken)' }}
+      aria-label="Generated artifacts"
+    >
+      {artifacts.map((artifact, index) => {
+        const active = artifact.id === activeId;
+        return (
+          <button
+            key={artifact.id}
+            type="button"
+            onClick={() => onSelect(artifact.id)}
+            className="shrink-0 rounded-lg px-2.5 py-1.5 text-left"
+            style={{
+              border: active ? '1px solid var(--studio-blue-2)' : '1px solid var(--border-default)',
+              background: active ? 'var(--bg-raised)' : 'transparent',
+              color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+            }}
+            title={artifact.mime}
+          >
+            <span className="block text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>
+              {artifact.kind} {index + 1}
+            </span>
+            <span className="block max-w-40 truncate text-xs font-semibold">{artifact.name}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function StudioOutputPanel({
   tab,
   onTabChange,
   running,
-  previewUrl,
+  previewArtifacts,
+  activeArtifactId,
+  onArtifactSelect,
   previewProvenance,
   notices,
   error,
@@ -96,11 +146,15 @@ export function StudioOutputPanel({
         severity: 'error' as const,
         message: error,
         code: errorExitCode == null ? undefined : `EXIT_${errorExitCode}`,
-        help: 'Fix the supported source, switch execution target, or reset to a starter template and run again.',
+        help: 'Fix the source or return the generated Apexify artifact from main().',
       }]
     : [];
 
   const diagnosticStatus = error ? 'error' : notices.length ? 'warning' : 'idle';
+  const activeArtifact =
+    previewArtifacts.find((artifact) => artifact.id === activeArtifactId) ??
+    previewArtifacts[0] ??
+    null;
 
   return (
     <section className="studio-output-panel flex min-h-[200px] flex-col overflow-hidden md:min-h-0">
@@ -114,7 +168,8 @@ export function StudioOutputPanel({
           onClick={() => onTabChange('preview')}
           Icon={PhotoIcon}
           label="Preview"
-          status={error ? 'error' : previewUrl ? 'ok' : 'idle'}
+          badge={previewArtifacts.length > 1 ? previewArtifacts.length : undefined}
+          status={error ? 'error' : activeArtifact ? 'ok' : 'idle'}
         />
         <Tab
           active={tab === 'terminal'}
@@ -138,15 +193,20 @@ export function StudioOutputPanel({
 
       <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
         {tab === 'preview' ? (
-          <InteractivePreview
-            status={running ? 'loading' : error ? 'error' : previewUrl ? 'ready' : 'idle'}
-            label="Studio output preview"
-            provenance={previewUrl ? previewProvenance : undefined}
-          >
-            {previewUrl && !error ? (
-              <StudioPreviewZoom src={previewUrl} alt="Generated Studio output" />
-            ) : null}
-          </InteractivePreview>
+          <>
+            <ArtifactStrip
+              artifacts={previewArtifacts}
+              activeId={activeArtifact?.id ?? null}
+              onSelect={onArtifactSelect}
+            />
+            <InteractivePreview
+              status={running ? 'loading' : error ? 'error' : activeArtifact ? 'ready' : 'idle'}
+              label="Studio output preview"
+              provenance={activeArtifact ? previewProvenance : undefined}
+            >
+              {activeArtifact && !error ? <StudioArtifactPreview artifact={activeArtifact} /> : null}
+            </InteractivePreview>
+          </>
         ) : null}
 
         {tab === 'terminal' ? (
@@ -157,7 +217,7 @@ export function StudioOutputPanel({
               <div className="studio-diagnostics__notice mt-3">
                 <div>
                   <ExclamationTriangleIcon className="h-4 w-4" aria-hidden />
-                  <strong>Live Canvas notes</strong>
+                  <strong>Studio notes</strong>
                 </div>
                 <ul>
                   {notices.map((notice) => <li key={notice}>{notice}</li>)}

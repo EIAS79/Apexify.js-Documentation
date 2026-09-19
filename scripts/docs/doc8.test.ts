@@ -61,8 +61,9 @@ test('reset returns a fresh deterministic copy of initial structured state', () 
 test('resource limits preserve bounded current runner ceilings', () => {
   assert.equal(DOC8_RESOURCE_LIMITS.executionMs, 55_000);
   assert.equal(DOC8_RESOURCE_LIMITS.sourceChars, 280_000);
-  assert.equal(DOC8_RESOURCE_LIMITS.outputBytes, 25 * 1024 * 1024);
+  assert.equal(DOC8_RESOURCE_LIMITS.outputBytes, 32 * 1024 * 1024);
+  assert.equal(DOC8_RESOURCE_LIMITS.totalOutputBytes, 64 * 1024 * 1024);
   assert.equal(DOC8_RESOURCE_LIMITS.processBufferBytes, 20 * 1024 * 1024);
-  assert.equal(DOC8_RESOURCE_LIMITS.maxOutputs, 1);
+  assert.equal(DOC8_RESOURCE_LIMITS.maxOutputs, 24);
   assert.ok(DOC8_RESOURCE_LIMITS.shareStateBytes < DOC8_RESOURCE_LIMITS.sourceChars);
 });

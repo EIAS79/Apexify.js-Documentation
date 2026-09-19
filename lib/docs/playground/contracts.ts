@@ -28,6 +28,7 @@ export interface InteractiveResourceLimits {
   executionMs: number;
   sourceChars: number;
   outputBytes: number;
+  totalOutputBytes: number;
   processBufferBytes: number;
   shareStateBytes: number;
   maxOutputs: number;
@@ -41,10 +42,11 @@ export interface InteractiveResourceLimits {
 export const DOC8_RESOURCE_LIMITS: Readonly<InteractiveResourceLimits> = Object.freeze({
   executionMs: 55_000,
   sourceChars: 280_000,
-  outputBytes: 25 * 1024 * 1024,
+  outputBytes: 32 * 1024 * 1024,
+  totalOutputBytes: 64 * 1024 * 1024,
   processBufferBytes: 20 * 1024 * 1024,
   shareStateBytes: 64 * 1024,
-  maxOutputs: 1,
+  maxOutputs: 24,
 });
 
 export interface ExecutionInput {
@@ -52,11 +54,32 @@ export interface ExecutionInput {
   signal?: AbortSignal;
 }
 
+export type InteractiveArtifactKind =
+  | 'image'
+  | 'gif'
+  | 'audio'
+  | 'video'
+  | 'json'
+  | 'text'
+  | 'binary';
+
+export interface InteractiveArtifact {
+  id: string;
+  name: string;
+  kind: InteractiveArtifactKind;
+  mime: string;
+  base64?: string;
+  text?: string;
+  metadata?: Record<string, unknown>;
+}
+
 export interface ExecutionOutput {
   mime: string;
   base64?: string;
   url?: string;
   provenance?: string;
+  artifacts?: InteractiveArtifact[];
+  primaryArtifactId?: string;
 }
 
 export interface ExecutionResult {

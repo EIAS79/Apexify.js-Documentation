@@ -4,13 +4,14 @@ import {
   type ExecutionAdapter,
   type ExecutionResult,
   type InteractiveDiagnostic,
+  type InteractiveArtifact,
 } from './contracts';
 
 const ENDPOINT = '/api/gallery/run';
 
 export type ServerExecutionAvailability = {
   enabled: boolean;
-  mode: 'trusted-local' | 'unavailable';
+  mode: 'trusted-local' | 'isolated-remote' | 'unavailable';
 };
 
 export async function getServerExecutionAvailability(signal?: AbortSignal): Promise<ServerExecutionAvailability> {
@@ -19,7 +20,12 @@ export async function getServerExecutionAvailability(signal?: AbortSignal): Prom
   const value = (await response.json()) as { enabled?: boolean; mode?: string };
   return {
     enabled: Boolean(value.enabled),
-    mode: value.mode === 'trusted-local' ? 'trusted-local' : 'unavailable',
+    mode:
+      value.mode === 'trusted-local'
+        ? 'trusted-local'
+        : value.mode === 'isolated-remote'
+          ? 'isolated-remote'
+          : 'unavailable',
   };
 }
 
@@ -41,8 +47,8 @@ function diagnosticFromFailure(data: {
     message: message || `Execution failed (HTTP ${status}).`,
     code: typeof data.exitCode === 'number' ? `EXIT_${data.exitCode}` : `HTTP_${status}`,
     help: status === 503
-      ? 'Public arbitrary execution is intentionally unavailable. Use DOC-5 verified output or explicitly enabled trusted-local development execution.'
-      : 'Fix the source or reset to the authoritative example before retrying.',
+      ? 'This source requires the full Apexify runtime. Connect the isolated Studio executor in production or enable trusted-local execution during local development.'
+      : 'Fix the source or return a previewable Apexify artifact from main() before retrying.',
   };
 }
 
@@ -82,6 +88,8 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
       stderr?: string;
       exitCode?: number;
       elapsedMs?: number;
+      outputs?: InteractiveArtifact[];
+      primaryArtifactId?: string;
     };
     try {
       data = (await response.json()) as typeof data;
@@ -109,12 +117,19 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
       };
     }
 
+    const artifacts = Array.isArray(data.outputs) ? data.outputs : [];
+    const primary =
+      artifacts.find((artifact) => artifact.id === data.primaryArtifactId) ??
+      artifacts[0];
+
     return {
       status: 'ready',
       output: {
-        mime: data.mime ?? 'image/png',
-        base64: data.base64 ?? '',
+        mime: primary?.mime ?? data.mime ?? 'application/octet-stream',
+        base64: primary?.base64 ?? data.base64,
         provenance: 'server-generated',
+        artifacts,
+        primaryArtifactId: primary?.id ?? data.primaryArtifactId,
       },
       diagnostics: [],
       elapsedMs,

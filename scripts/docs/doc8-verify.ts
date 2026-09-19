@@ -94,8 +94,10 @@ requireCheck(session.includes('shareStateBytes'), 'Share serializer must enforce
 requireCheck(executionAdapter.includes("const ENDPOINT = '/api/gallery/run'"), 'Server-backed endpoint ownership must remain inside the execution adapter.');
 requireCheck(executionAdapter.includes("mode: 'server-backed'"), 'Server-backed adapter mode missing.');
 
-requireCheck(runner.includes("process.env.NODE_ENV !== 'production'"), 'Public/deployed arbitrary execution must be disabled.');
+requireCheck(runner.includes("process.env.NODE_ENV !== 'production'"), 'Unsandboxed local execution must remain disabled in production.');
 requireCheck(runner.includes("ENABLE_LOCAL_APEXIFY_CODE_RUN === 'true'"), 'Trusted-local execution must require explicit opt-in.');
+requireCheck(runner.includes('STUDIO_EXECUTOR_URL'), 'Production Studio must expose an isolated executor integration boundary.');
+requireCheck(runner.includes("mode: 'isolated-remote'"), 'Production Studio must identify the isolated remote executor mode truthfully.');
 requireCheck(!runner.includes('...process.env'), 'Runner must not blindly inherit the deployment environment.');
 requireCheck(runner.includes('DOC8_RESOURCE_LIMITS.executionMs'), 'Runner timeout must use centralized DOC-8 limits.');
 requireCheck(runner.includes('DOC8_RESOURCE_LIMITS.outputBytes'), 'Runner output limit must use centralized DOC-8 limits.');
@@ -159,8 +161,9 @@ console.log('[doc8-verify] PASS', JSON.stringify({
   routeActivationBoundary: 'components/docs/playground/CanvasPlaygroundLoader.tsx',
   navigationPrefetchIsolation: true,
   heavyEditorImportOwner: heavyImports[0],
-  publicArbitraryExecution: false,
+  unsandboxedProductionExecution: false,
   localExecutionMode: 'trusted-local-opt-in',
+  isolatedExecutorIntegration: true,
   sandboxClaim: false,
   packagePin: packageJson.dependencies?.['apexify.js'],
 }));

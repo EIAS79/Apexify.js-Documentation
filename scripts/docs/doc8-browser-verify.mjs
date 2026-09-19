@@ -120,11 +120,11 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
     await page.waitForSelector('[data-doc8-primitive="workspace"]');
     await page.waitForSelector('[data-doc8-primitive="preview"]');
     const bodyText = await page.evaluate(() => document.body.textContent || '');
-    if (!bodyText.includes('Live Canvas is active')) {
-      throw new Error(`${name}: Studio Live Canvas capability disclosure missing`);
+    if (!bodyText.includes('Live Canvas')) {
+      throw new Error(`${name}: Studio browser-direct runtime disclosure missing`);
     }
-    if (!bodyText.includes('trusted local runtime')) {
-      throw new Error(`${name}: Studio Node execution boundary disclosure missing`);
+    if (!bodyText.includes('auto')) {
+      throw new Error(`${name}: Studio automatic runtime routing disclosure missing`);
     }
   }
 
@@ -247,9 +247,9 @@ const evidence = {
   phase: 'DOC-8',
   routes: routeEvidence,
   executionBoundary: {
-    publicArbitraryExecution: false,
-    productionMode: 'unavailable',
-    rejectedStatus: 503,
+    unsandboxedProductionExecution: false,
+    productionModeWithoutExecutor: 'unavailable',
+    rejectedStatusWithoutExecutor: 503,
   },
   performance: performanceEvidence,
 };

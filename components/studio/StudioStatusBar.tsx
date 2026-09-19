@@ -43,14 +43,14 @@ export function StudioStatusBar(props: Props) {
 
   const isBrowser = executionTarget === 'browser';
   const executionLabel = running
-    ? isBrowser ? 'Live Canvas · rendering' : 'Node · running'
+    ? isBrowser ? 'Live Canvas · rendering' : 'Full runtime · running'
     : lastError
-      ? isBrowser ? 'Live Canvas · error' : 'Node · error'
+      ? isBrowser ? 'Live Canvas · error' : 'Full runtime · error'
       : isBrowser
         ? 'Live Canvas · ready'
         : nodeRunnerEnabled
-          ? 'Node · ready'
-          : 'Node · unavailable';
+          ? 'Full runtime · ready'
+          : 'Full runtime · unavailable';
 
   const executionColor = running
     ? 'var(--studio-blue-2)'
