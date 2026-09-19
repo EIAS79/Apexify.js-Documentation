@@ -1,6 +1,8 @@
 'use client';
 
 import { createSafePreviewResolver, isUnresolvedPreviewValue } from './safePreviewExpression';
+import { renderBrowserChart } from './browserChartPreview';
+import { drawBrowserCanvasAsset, paintBrowserCanvasBackground } from './browserCanvasPaint';
 
 type Jsonish = null | boolean | number | string | Jsonish[] | { [key: string]: Jsonish };
 type RecordValue = { [key: string]: Jsonish };
@@ -35,7 +37,6 @@ const SHAPES = new Set([
 ]);
 
 const UNSUPPORTED_APIS = [
-  'createChart',
   'createComparisonChart',
   'createComboChart',
   'createScene',
@@ -772,7 +773,7 @@ function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
 
 export async function renderStudioBrowserPreview(source: string): Promise<BrowserStudioResult> {
   const started = performance.now();
-  const supportedApis = ['createCanvas', 'createText', 'createImage'];
+  const supportedApis = ['createCanvas', 'createText', 'createImage', 'createChart'];
   const warnings: string[] = [];
 
   if (
@@ -799,13 +800,39 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
         return parseLiteral(expression);
       }
     };
+    const chartAssets = calls
+      .filter((call) => call.method === 'createChart' && call.args.length >= 2)
+      .map((call) => {
+        const chartType = resolve(call.args[0]);
+        const chartData = resolve(call.args[1]);
+        const chartOptions = call.args[2] ? resolve(call.args[2]) : {};
+        const canvas = renderBrowserChart(chartType, chartData, chartOptions);
+        return canvas ? { call, canvas } : null;
+      })
+      .filter((asset): asset is { call: Call; canvas: HTMLCanvasElement } => Boolean(asset));
+
     const canvasCall = calls.find((call) => call.method === 'createCanvas');
 
     if (!canvasCall?.args[0]) {
+      const standaloneChart = chartAssets[0]?.canvas;
+      if (standaloneChart) {
+        if (chartAssets.length > 1) {
+          warnings.push('This snippet creates multiple charts; Live Canvas is showing the first browser-renderable chart.');
+        }
+        return {
+          ok: true,
+          dataUrl: standaloneChart.toDataURL('image/png'),
+          mime: 'image/png',
+          elapsedMs: Math.round(performance.now() - started),
+          supportedApis,
+          warnings: [...new Set(warnings)],
+        };
+      }
+
       return {
         ok: false,
         elapsedMs: Math.round(performance.now() - started),
-        error: 'Live Canvas needs a supported painter.createCanvas(...) call before it can render a preview.',
+        error: 'Live Canvas needs a supported createCanvas() or createChart() call before it can render a preview.',
         supportedApis,
       };
     }
@@ -828,7 +855,7 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) throw new Error('Canvas 2D is unavailable in this browser.');
 
-    applyBackground(ctx, canvasConfig, width, height);
+    paintBrowserCanvasBackground(ctx, canvasConfig, width, height);
 
     for (const call of calls) {
       if (call.index <= canvasCall.index || !call.args[0]) continue;
@@ -842,31 +869,36 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
       } else if (call.method === 'createImage') {
         const parsed = resolve(call.args[0]);
         const items = Array.isArray(parsed) ? parsed : [parsed];
-        const unresolvedSource = items.some(
-          (item) => isRecord(item) && isUnresolvedPreviewValue(item.source),
-        );
 
-        if (!unresolvedSource) applyImageShapes(ctx, parsed);
+        for (const item of items) {
+          if (!isRecord(item)) continue;
+          const source = stringOf(item.source, '');
 
-        const unsupportedImage = items.some(
-          (item) =>
-            isRecord(item) &&
-            typeof item.source === 'string' &&
-            !isUnresolvedPreviewValue(item.source) &&
-            !SHAPES.has(item.source),
-        );
+          if (SHAPES.has(source)) {
+            applyImageShapes(ctx, item);
+            continue;
+          }
 
-        if (unresolvedSource) {
-          warnings.push('An image layer depends on a Node-only runtime value and was skipped; other browser-supported layers were still rendered.');
-        } else if (unsupportedImage) {
-          warnings.push('Bitmap/remote image sources require the Node renderer; Live Canvas rendered supported shape layers only.');
+          if (isUnresolvedPreviewValue(item.source) && chartAssets.length) {
+            drawBrowserCanvasAsset(ctx, item, chartAssets[0].canvas);
+            if (chartAssets.length > 1) {
+              warnings.push('A runtime image buffer was matched to the first browser-rendered chart because multiple chart outputs exist.');
+            }
+            continue;
+          }
+
+          if (source) {
+            warnings.push('Bitmap/remote image sources require the Node renderer; Live Canvas rendered supported vector and chart layers only.');
+          }
         }
+      } else if (call.method === 'createChart') {
+        // Chart output is rendered separately and embedded when createImage() references it.
       } else if (UNSUPPORTED_APIS.includes(call.method)) {
         warnings.push(`${call.method}() requires the Node renderer and was not executed by Live Canvas.`);
       }
     }
 
-    const unresolved = resolver.unresolved();
+    const unresolved = resolver.unresolved().filter((name) => !(chartAssets.length && /chart|plot|graph/i.test(name)));
     if (unresolved.length) {
       warnings.push(
         'Live Canvas resolved the supported composition subset and skipped runtime-only values: ' +

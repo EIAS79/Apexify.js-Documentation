@@ -799,10 +799,10 @@ export default function CodeStudio() {
         >
           <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            <strong>Live Canvas is active.</strong> Public Studio safely previews supported
-            <code> createCanvas()</code>, <code>createText()</code>, and shape-based
-            <code> createImage()</code> calls in your browser. Full Node execution remains available
-            only in explicitly trusted local development.
+            <strong>Live Canvas is active.</strong> Public Studio previews supported
+            <code> createCanvas()</code>, <code>createChart()</code>, <code>createText()</code>,
+            pattern backgrounds, and shape/chart <code>createImage()</code> composition in your browser.
+            Full Node-only media and filesystem execution remains available only in explicitly trusted local development.
           </span>
         </div>
       )}
