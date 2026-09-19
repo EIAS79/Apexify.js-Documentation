@@ -64,6 +64,19 @@ const fullMethods = new Map<string, StudioCapabilityFamily>([
   ['outPut', 'output'],
 ]);
 
+export const STUDIO_FULL_RUNTIME_FACETS = Object.freeze([
+  'createAudio',
+  'video',
+  'image',
+  'path2d',
+  'pixels',
+  'detect',
+  'assets',
+  'components',
+  'plugins',
+  'output',
+] as const);
+
 const facetPatterns: Array<[RegExp, StudioCapabilityFamily, string]> = [
   [/\.\s*createAudio\b/, 'audio', 'procedural audio'],
   [/\.\s*video\b/, 'video', 'advanced video stack'],

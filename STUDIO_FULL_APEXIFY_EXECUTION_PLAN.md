@@ -10,10 +10,10 @@
 > - [~] STUDIO-4 production isolated executor integration boundary (`STUDIO_EXECUTOR_URL`) is implemented; an isolated executor deployment/snapshot is still required before production full-runtime execution is enabled
 > - [x] STUDIO-5 session virtual assets foundation: image/audio/video/font uploads, stable `studio://asset/<id>` references, browser image preview resolution, and full-runtime materialization
 > - [~] STUDIO-6 raster/chart/scene parity in progress: alias-safe full-runtime routing, generated raster-buffer identity routing, and chart-buffer browser reuse are implemented; full isolated end-to-end family validation remains
-> - [ ] STUDIO-7 GIF/animation/audio completion
-> - [ ] STUDIO-8 video completion
+> - [~] STUDIO-7 GIF/animation/audio in progress: media-aware artifact collection and playable GIF/audio templates are implemented; isolated-runtime execution proofs remain
+> - [~] STUDIO-8 video in progress: video/frame artifact discovery and an MP4 Studio template are implemented; production FFmpeg execution still depends on STUDIO-4
 > - [ ] STUDIO-9 real `@apexify/web` migration when that package/runtime ships
-> - [ ] STUDIO-10 generated completeness gate
+> - [~] STUDIO-10 completeness matrix foundation implemented from the installed Apexify.js declaration surface; deeper facet-member coverage remains
 >
 > Goal: make Studio an online Apexify.js coding and media-manipulation environment. A user writes normal Apexify.js code, presses **Run**, and Studio executes the required Apexify feature with the correct runtime and previews the result. Host-side persistence APIs such as `save()` / `saveMultiple()` are not part of the Studio execution target.
 
@@ -251,6 +251,22 @@ Deliverables:
 
 ### STUDIO-7 — GIF, animation, and audio
 
+Status: **in progress**.
+
+Delivered:
+
+- full-runtime artifact collection accepts Buffer, Uint8Array, ArrayBuffer, Blob, data URLs, arrays and nested result objects;
+- GIF buffers are MIME-detected and use the animated image preview;
+- WAV/audio buffers are MIME-detected and use the Studio audio player;
+- frame arrays are emitted as multiple artifacts rather than flattened into one image;
+- Studio includes real `createGIF()` and procedural `createAudio.preset()` templates.
+
+Remaining:
+
+- production execution proof through the isolated executor;
+- representative `animate()`, audio `synth/custom/sequence/compose/mix`, and scene-to-GIF proofs;
+- close any output metadata/diagnostic gaps found by those runs.
+
 Deliverables:
 
 - GIF playback;
@@ -260,6 +276,23 @@ Deliverables:
 - deterministic diagnostics and limits.
 
 ### STUDIO-8 — Video
+
+Status: **in progress, blocked on production isolation for final execution**.
+
+Delivered:
+
+- video artifacts are MIME-detected and use the native Studio video player;
+- file-producing results with `outputPath` are collected automatically;
+- frame extraction records with `source`, frame number and time now resolve to real frame artifacts while preserving metadata;
+- duplicate file discovery is suppressed;
+- Studio includes a real `createVideo({ createFromFrames })` MP4 template;
+- JSON-returning video inspection APIs already land in the structured text/JSON preview path.
+
+Remaining:
+
+- deploy the STUDIO-4 isolated executor with FFmpeg/ffprobe;
+- execute `createVideo`, `videoPipeline`, metadata/probing, extraction, and scene-to-video representative cases there;
+- verify MP4/WebM playback and bounded multi-frame output in production.
 
 Deliverables:
 
@@ -280,7 +313,22 @@ As the browser-native renderer from the Apexify.js phases lands:
 
 ### STUDIO-10 — Completeness gate
 
-Generate a Studio support matrix from the authoritative Apexify.js public surface.
+Status: **foundation implemented**.
+
+Current implementation:
+
+- `scripts/studio/studio-completeness.ts` reads the installed, pinned Apexify.js declaration rather than a hand-copied API list;
+- it inventories public `ApexPainter` methods and top-level facets;
+- every public manipulation method must be classified as browser-direct or full-runtime;
+- `save()` / `saveMultiple()` are explicitly classified as host-persistence exclusions rather than silently omitted;
+- the generated evidence is `generated/studio/capability-matrix.json`;
+- `npm run studio:completeness` regenerates it and `npm run studio:completeness:check` verifies it on demand;
+- this is intentionally not wired into the legacy documentation CI chain yet.
+
+Remaining:
+
+- recurse into facet member APIs (audio, image utilities, pixels, path, detect, output, video stack, components/assets/plugins) rather than only checking the top-level facet exists;
+- attach execution-proof status per capability family after the isolated executor is deployed.
 
 A release is incomplete when a new render/manipulation API is public in Apexify.js but absent from Studio capability routing, execution, or output handling.
 

@@ -76,25 +76,59 @@ ${inner}
 
   const __entries: __StudioEntry[] = [];
   const __seen = new WeakSet<object>();
+  const __copiedFiles = new Set<string>();
   let __index = 0;
 
-  function __pushBuffer(buf: Buffer, label: string) {
+  function __metadataFromRecord(
+    obj: Record<string, unknown>,
+    excluded: ReadonlySet<string>,
+  ): Record<string, unknown> | undefined {
+    const metadata: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (excluded.has(key)) continue;
+      if (
+        value == null ||
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean'
+      ) {
+        metadata[key] = value;
+      }
+    }
+    return Object.keys(metadata).length ? metadata : undefined;
+  }
+
+  function __pushBuffer(
+    buf: Buffer,
+    label: string,
+    metadata?: Record<string, unknown>,
+    mime?: string,
+  ) {
     const id = 'artifact-' + String(++__index);
     const name = __studioSafeName(label || id) + '.bin';
     const out = __studioPath.join(__artifactDir, id + '.bin');
     __studioWrite(out, buf);
-    __entries.push({ id, name, path: out });
+    __entries.push({ id, name, path: out, metadata, mime });
   }
 
-  function __pushFile(file: string, label: string) {
+  function __pushFile(
+    file: string,
+    label: string,
+    metadata?: Record<string, unknown>,
+  ) {
     if (!__studioExists(file)) return false;
     const stat = __studioStat(file);
     if (!stat.isFile()) return false;
+
+    const canonical = __studioPath.resolve(file);
+    if (__copiedFiles.has(canonical)) return true;
+    __copiedFiles.add(canonical);
+
     const id = 'artifact-' + String(++__index);
     const base = __studioSafeName(__studioPath.basename(file) || label || id);
     const out = __studioPath.join(__artifactDir, id + '-' + base);
     __studioCopy(file, out);
-    __entries.push({ id, name: base, path: out });
+    __entries.push({ id, name: base, path: out, metadata });
     return true;
   }
 
@@ -109,7 +143,21 @@ ${inner}
     });
   }
 
-  function __collect(value: unknown, label = 'result'): void {
+  function __decodeDataUrl(value: string): { bytes: Buffer; mime: string } | null {
+    const match = /^data:([^;,]+)?(;base64)?,([\s\S]*)$/i.exec(value);
+    if (!match) return null;
+    const mime = match[1] || 'application/octet-stream';
+    try {
+      const bytes = match[2]
+        ? Buffer.from(match[3] || '', 'base64')
+        : Buffer.from(decodeURIComponent(match[3] || ''), 'utf8');
+      return { bytes, mime };
+    } catch {
+      return null;
+    }
+  }
+
+  async function __collect(value: unknown, label = 'result'): Promise<void> {
     if (value == null) return;
 
     if (Buffer.isBuffer(value)) {
@@ -117,7 +165,29 @@ ${inner}
       return;
     }
 
+    if (value instanceof Uint8Array) {
+      __pushBuffer(Buffer.from(value), label);
+      return;
+    }
+
+    if (value instanceof ArrayBuffer) {
+      __pushBuffer(Buffer.from(new Uint8Array(value)), label);
+      return;
+    }
+
+    if (typeof Blob !== 'undefined' && value instanceof Blob) {
+      const bytes = Buffer.from(new Uint8Array(await value.arrayBuffer()));
+      __pushBuffer(bytes, label, undefined, value.type || undefined);
+      return;
+    }
+
     if (typeof value === 'string') {
+      const dataUrl = __decodeDataUrl(value);
+      if (dataUrl) {
+        __pushBuffer(dataUrl.bytes, label, undefined, dataUrl.mime);
+        return;
+      }
+
       const resolved = __studioPath.resolve(value);
       if (!__pushFile(resolved, label)) __pushText(value, label);
       return;
@@ -130,7 +200,9 @@ ${inner}
 
     if (Array.isArray(value)) {
       const before = __entries.length;
-      value.forEach((item, index) => __collect(item, label + '-' + String(index + 1)));
+      for (let index = 0; index < value.length; index += 1) {
+        await __collect(value[index], label + '-' + String(index + 1));
+      }
       if (__entries.length === before) __pushText(__studioJson(value), label, 'json');
       return;
     }
@@ -141,14 +213,36 @@ ${inner}
       __seen.add(obj);
 
       if (Buffer.isBuffer(obj.buffer)) {
-        __pushBuffer(obj.buffer, label);
+        const metadata = __metadataFromRecord(obj, new Set(['buffer']));
+        __pushBuffer(obj.buffer, label, metadata);
         return;
       }
 
+      const metadata = __metadataFromRecord(
+        obj,
+        new Set(['source', 'output', 'outputPath', 'path', 'file', 'files', 'frames', 'buffers', 'result']),
+      );
+
+      // Video frame APIs return records such as { source, frameNumber, time }.
+      // Prefer the actual generated file while retaining the frame metadata.
+      if (typeof obj.source === 'string') {
+        const sourcePath = __studioPath.resolve(obj.source);
+        if (__pushFile(sourcePath, label + '-source', metadata)) return;
+      }
+
       const before = __entries.length;
-      const preferred = ['output', 'outputPath', 'path', 'file', 'files', 'frames', 'buffers', 'result'];
+      const preferred = [
+        'output',
+        'outputPath',
+        'path',
+        'file',
+        'files',
+        'frames',
+        'buffers',
+        'result',
+      ];
       for (const key of preferred) {
-        if (key in obj) __collect(obj[key], label + '-' + key);
+        if (key in obj) await __collect(obj[key], label + '-' + key);
       }
 
       if (__entries.length === before) {
@@ -162,7 +256,7 @@ ${inner}
   }
 
   const __result = await main();
-  __collect(__result);
+  await __collect(__result);
 
   // File-producing operations such as createVideo() may write a relative output
   // and return metadata. Pick up new files in the run workspace as a fallback.

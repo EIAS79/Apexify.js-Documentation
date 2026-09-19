@@ -60,7 +60,7 @@ export type StudioTemplate = {
 };
 
 const wrapTs = (body: string): string =>
-  `import { ApexPainter } from 'apexify.js';\n\nasync function main(): Promise<Buffer> {\n  const painter = new ApexPainter();\n${body}\n}\n`;
+  `import { ApexPainter } from 'apexify.js';\n\nasync function main(): Promise<unknown> {\n  const painter = new ApexPainter();\n${body}\n}\n`;
 
 const wrapJs = (body: string): string =>
   `import { ApexPainter } from 'apexify.js';\n\nasync function main() {\n  const painter = new ApexPainter();\n${body}\n}\n`;
@@ -328,6 +328,128 @@ const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'gro
   ], output);
 
   return output;`,
+  },
+  {
+    id: 'gif-motion-card',
+    name: 'GIF · motion card',
+    blurb: 'Two rendered Apexify frames encoded into a looping GIF and previewed directly in Studio.',
+    group: 'Media',
+    body: `  const first = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    gradientBg: {
+      type: 'linear',
+      startX: 0, startY: 0,
+      endX: 640, endY: 360,
+      colors: [
+        { stop: 0, color: '#0b1020' },
+        { stop: 1, color: '#2444a8' },
+      ],
+    },
+  });
+
+  const second = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    gradientBg: {
+      type: 'linear',
+      startX: 0, startY: 0,
+      endX: 640, endY: 360,
+      colors: [
+        { stop: 0, color: '#241238' },
+        { stop: 1, color: '#a12f88' },
+      ],
+    },
+  });
+
+  const frameA = await painter.createText({
+    text: 'APEXIFY / FRAME 01',
+    x: 320, y: 180,
+    font: { family: 'Arial', size: 34 },
+    bold: true,
+    fill: { color: '#f8fafc' },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  }, first);
+
+  const frameB = await painter.createText({
+    text: 'APEXIFY / FRAME 02',
+    x: 320, y: 180,
+    font: { family: 'Arial', size: 34 },
+    bold: true,
+    fill: { color: '#f8fafc' },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  }, second);
+
+  return painter.createGIF([
+    { buffer: frameA, duration: 420 },
+    { buffer: frameB, duration: 420 },
+  ], {
+    outputFormat: 'buffer',
+    width: 640,
+    height: 360,
+    repeat: 0,
+    quality: 10,
+    delay: 420,
+  });`,
+  },
+  {
+    id: 'audio-preset',
+    name: 'Audio · procedural preset',
+    blurb: 'Generate a WAV sound entirely from Apexify.js and play it in the Studio audio preview.',
+    group: 'Media',
+    body: `  return painter.createAudio.preset('laser', {
+    volume: 0.72,
+    transpose: -2,
+  });`,
+  },
+  {
+    id: 'video-from-frames',
+    name: 'Video · frames to MP4',
+    blurb: 'Create two rendered frames and encode them into MP4 through the full Apexify video runtime.',
+    group: 'Media',
+    body: `  const first = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    colorBg: '#0b1020',
+  });
+  const second = await painter.createCanvas({
+    width: 640,
+    height: 360,
+    colorBg: '#162b5f',
+  });
+
+  const frameA = await painter.createText({
+    text: 'FRAME 01',
+    x: 320, y: 180,
+    font: { family: 'Arial', size: 48 },
+    bold: true,
+    fill: { color: '#f8fafc' },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  }, first);
+
+  const frameB = await painter.createText({
+    text: 'FRAME 02',
+    x: 320, y: 180,
+    font: { family: 'Arial', size: 48 },
+    bold: true,
+    fill: { color: '#67e8f9' },
+    textAlign: 'center',
+    textBaseline: 'middle',
+  }, second);
+
+  return painter.createVideo({
+    source: frameA,
+    createFromFrames: {
+      frames: [frameA, frameB, frameA, frameB],
+      outputPath: 'studio-video.mp4',
+      fps: 2,
+      format: 'mp4',
+      quality: 'medium',
+    },
+  });`,
   },
   {
     id: 'aurora-iris',

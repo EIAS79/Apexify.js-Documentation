@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "packagePin": "github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b",
+  "declaration": "node_modules/apexify.js/dist/declarations/apex-painter/main.d.ts",
+  "topLevel": {
+    "methods": [
+      {
+        "name": "animate",
+        "route": "full-runtime"
+      },
+      {
+        "name": "batch",
+        "route": "full-runtime"
+      },
+      {
+        "name": "chain",
+        "route": "full-runtime"
+      },
+      {
+        "name": "createCanvas",
+        "route": "browser"
+      },
+      {
+        "name": "createChart",
+        "route": "browser"
+      },
+      {
+        "name": "createComboChart",
+        "route": "full-runtime"
+      },
+      {
+        "name": "createComparisonChart",
+        "route": "full-runtime"
+      },
+      {
+        "name": "createGIF",
+        "route": "full-runtime"
+      },
+      {
+        "name": "createImage",
+        "route": "browser"
+      },
+      {
+        "name": "createScene",
+        "route": "full-runtime"
+      },
+      {
+        "name": "createTemplate",
+        "route": "full-runtime"
+      },
+      {
+        "name": "createText",
+        "route": "browser"
+      },
+      {
+        "name": "createVideo",
+        "route": "full-runtime"
+      },
+      {
+        "name": "extractAllFrames",
+        "route": "full-runtime"
+      },
+      {
+        "name": "extractFrameAtTime",
+        "route": "full-runtime"
+      },
+      {
+        "name": "extractFrameByNumber",
+        "route": "full-runtime"
+      },
+      {
+        "name": "extractFrames",
+        "route": "full-runtime"
+      },
+      {
+        "name": "extractMultipleFrames",
+        "route": "full-runtime"
+      },
+      {
+        "name": "getVideoInfo",
+        "route": "full-runtime"
+      },
+      {
+        "name": "measureText",
+        "route": "full-runtime"
+      },
+      {
+        "name": "outPut",
+        "route": "full-runtime"
+      },
+      {
+        "name": "prepareForRender",
+        "route": "full-runtime"
+      },
+      {
+        "name": "renderScene",
+        "route": "full-runtime"
+      },
+      {
+        "name": "renderSceneToGIF",
+        "route": "full-runtime"
+      },
+      {
+        "name": "renderSceneToVideoFrames",
+        "route": "full-runtime"
+      },
+      {
+        "name": "save",
+        "route": "host-persistence"
+      },
+      {
+        "name": "saveMultiple",
+        "route": "host-persistence"
+      },
+      {
+        "name": "toOutput",
+        "route": "full-runtime"
+      },
+      {
+        "name": "use",
+        "route": "full-runtime"
+      },
+      {
+        "name": "validateSceneRenderInput",
+        "route": "full-runtime"
+      },
+      {
+        "name": "videoPipeline",
+        "route": "full-runtime"
+      }
+    ],
+    "facets": [
+      {
+        "name": "assets",
+        "route": "full-runtime"
+      },
+      {
+        "name": "components",
+        "route": "full-runtime"
+      },
+      {
+        "name": "createAudio",
+        "route": "full-runtime"
+      },
+      {
+        "name": "detect",
+        "route": "full-runtime"
+      },
+      {
+        "name": "image",
+        "route": "full-runtime"
+      },
+      {
+        "name": "output",
+        "route": "full-runtime"
+      },
+      {
+        "name": "outputFormat",
+        "route": "introspection"
+      },
+      {
+        "name": "path2d",
+        "route": "full-runtime"
+      },
+      {
+        "name": "pixels",
+        "route": "full-runtime"
+      },
+      {
+        "name": "plugins",
+        "route": "full-runtime"
+      },
+      {
+        "name": "video",
+        "route": "full-runtime"
+      }
+    ],
+    "missingMethods": [],
+    "missingFacets": []
+  },
+  "excludedFromStudioManipulation": [
+    "save",
+    "saveMultiple"
+  ],
+  "complete": true
+}
