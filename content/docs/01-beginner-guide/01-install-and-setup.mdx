@@ -2,17 +2,17 @@
 
 ## Release status
 
-These docs describe the staged **Apexify.js 6.0.0** package artifact built from the repository. The published npm `latest` release is still **5.4.5**.
+These docs target **Apexify.js 6.0.0** and are verified against an exact package commit.
 
 ```bash
 npm install apexify.js
 ```
 
-That command currently installs 5.4.5. The documentation website is pinned and tested against an exact staged 6.0 repository commit so its API reference can be validated before publication; do not assume npm already serves 6.0.0.
+During the release cutover, verify that npm resolves to 6.0.0 before deploying v6-specific behavior: `npm view apexify.js version`.
 
 ---
 
-## Requirements for staged 6.0.0
+## Requirements for 6.0.0
 
 - **Node.js 22.x, 24.x, or 26.x**
 - **npm 10+** (the repository/release toolchain is pinned to npm 11.19.1)
@@ -61,7 +61,7 @@ void scene;
 void layer;
 ```
 
-Use Node 22-compatible or newer Node type definitions for staged 6.0 development.
+Use Node 22-compatible or newer Node type definitions for Apexify.js 6 development.
 
 ---
 
