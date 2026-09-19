@@ -585,7 +585,7 @@ return await main();
 `;
 
 const REMOTE_IMAGE_POSTER_JS = REMOTE_IMAGE_POSTER_TS.replace(
-  /^import \\{ ApexPainter \\} from 'apexify\\.js';\\n\\n/,
+  /^import \{ ApexPainter \} from 'apexify\.js';\n\n/,
   ''
 );
 
