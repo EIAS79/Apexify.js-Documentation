@@ -975,7 +975,67 @@ function applyImageShapes(
   return usedGeneratedChart;
 }
 
+function readInitializerExpression(source: string, start: number, end: number): string {
+  let paren = 0;
+  let brace = 0;
+  let bracket = 0;
+  let quote: string | null = null;
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+
+  for (let i = start; i < end; i += 1) {
+    const ch = source[i];
+    const next = source[i + 1];
+
+    if (lineComment) {
+      if (ch === '\n') lineComment = false;
+      continue;
+    }
+    if (blockComment) {
+      if (ch === '*' && next === '/') {
+        blockComment = false;
+        i += 1;
+      }
+      continue;
+    }
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '/' && next === '/') {
+      lineComment = true;
+      i += 1;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      blockComment = true;
+      i += 1;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      quote = ch;
+      continue;
+    }
+    if (ch === '(') paren += 1;
+    else if (ch === ')') paren -= 1;
+    else if (ch === '{') brace += 1;
+    else if (ch === '}') brace -= 1;
+    else if (ch === '[') bracket += 1;
+    else if (ch === ']') bracket -= 1;
+    else if (ch === ';' && paren === 0 && brace === 0 && bracket === 0) {
+      return source.slice(start, i).trim();
+    }
+  }
+
+  return source.slice(start, end).trim();
+}
+
 function findInitializerBefore(source: string, name: string, beforeIndex: number): string | null {
+  const prefix = source.slice(0, Math.max(0, beforeIndex));
+  const re = new RegExp('\\b(?:const|let|var)\\s+' + name.replace(/[$]/g, '\\function findInitializerBefore(source: string, name: string, beforeIndex: number): string | null {
   const prefix = source.slice(0, Math.max(0, beforeIndex));
   const re = new RegExp('\\b(?:const|let|var)\\s+' + name.replace(/[$]/g, '\\$&') + '\\s*=', 'g');
   let match: RegExpExecArray | null;
@@ -984,6 +1044,13 @@ function findInitializerBefore(source: string, name: string, beforeIndex: number
   if (!last) return null;
   const start = last.index + last[0].length;
   return readUntil(source, start, new Set([';'])).text || null;
+}') + '\\s*=', 'g');
+  let match: RegExpExecArray | null;
+  let last: RegExpExecArray | null = null;
+  while ((match = re.exec(prefix))) last = match;
+  if (!last) return null;
+  const start = last.index + last[0].length;
+  return readInitializerExpression(source, start, beforeIndex) || null;
 }
 
 function resolveCallArgument(
