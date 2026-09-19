@@ -961,10 +961,20 @@ async function applyRemoteImages(
       ctx.save();
       ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(item.opacity, 1)));
       applyBlendMode(ctx, item.blendMode);
-      applyShadow(ctx, item.shadow);
       ctx.translate(x + width / 2, y + height / 2);
       if (rotation) ctx.rotate(rotation);
       ctx.translate(-width / 2, -height / 2);
+
+      if (isRecord(item.shadow)) {
+        applyShadow(ctx, item.shadow);
+        drawRoundedRect(ctx, 0, 0, width, height, radius);
+        ctx.fillStyle = '#000000';
+        ctx.fill();
+        ctx.shadowColor = 'rgba(0,0,0,0)';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+      }
 
       if (radius > 0) {
         drawRoundedRect(ctx, 0, 0, width, height, radius);
