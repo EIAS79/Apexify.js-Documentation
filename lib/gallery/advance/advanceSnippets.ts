@@ -502,7 +502,7 @@ async function main() {
 
   const remoteImages = [
     {
-      source: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=85',
+      source: 'https://raw.githubusercontent.com/EIAS79/Apexify.js-Documentation/main/public/gallery-outputs/images/shape-collage-prism.png',
       x: 54,
       y: 112,
       width: 520,
@@ -516,7 +516,7 @@ async function main() {
       shadow: { color: 'rgba(0,0,0,0.55)', offsetY: 24, blur: 42, opacity: 1 },
     },
     {
-      source: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=85',
+      source: 'https://raw.githubusercontent.com/EIAS79/Apexify.js-Documentation/main/public/gallery-outputs/images/chart-donut-luminous.png',
       x: 610,
       y: 118,
       width: 286,
@@ -529,7 +529,7 @@ async function main() {
       shadow: { color: 'rgba(0,0,0,0.45)', offsetY: 18, blur: 34, opacity: 1 },
     },
     {
-      source: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1000&q=85',
+      source: 'https://raw.githubusercontent.com/EIAS79/Apexify.js-Documentation/main/public/gallery-outputs/images/advance-text-glow-plaque.png',
       x: 628,
       y: 326,
       width: 268,
@@ -624,8 +624,8 @@ const coreAdvanceGalleryItems: AdvanceGalleryCard[] = [
     title: 'Remote image atlas · URL-only sources',
     category: 'advance',
     description:
-      '**A complete remote-image composition.** Every `createImage` layer uses a public HTTPS image URL—no local bitmap source—over a layered `createCanvas` gradient, dot pattern, and noise texture.\n\n**Takeaway:** Demonstrates `fit: \'cover\'`, alignment, rotation, rounded corners, strokes, shadows, and text finishing in one composition. Public Studio previews fetch these assets directly in the browser, so normal CORS rules still apply.',
-    thumbnail: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+      '**A complete remote-image composition.** Every `createImage` layer uses a public HTTPS raw-GitHub image URL—no local bitmap source—over a layered `createCanvas` gradient, dot pattern, and noise texture.\n\n**Takeaway:** Demonstrates `fit: \'cover\'`, alignment, rotation, rounded corners, strokes, shadows, and text finishing in one composition. Public Studio previews fetch these assets directly in the browser, so normal CORS rules still apply.',
+    thumbnail: 'https://raw.githubusercontent.com/EIAS79/Apexify.js-Documentation/main/public/gallery-outputs/images/shape-collage-prism.png',
     featured: true,
     code: { ts: REMOTE_IMAGE_POSTER_TS, js: REMOTE_IMAGE_POSTER_JS },
   },
