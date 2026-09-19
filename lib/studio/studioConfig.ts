@@ -399,7 +399,7 @@ export const STUDIO_TEMPLATES: StudioTemplate[] = TEMPLATE_BODIES.map((t) => ({
   js: wrapJs(t.body),
 }));
 
-export const STUDIO_STARTER_TEMPLATE_ID = 'gradient-sunset';
+export const STUDIO_STARTER_TEMPLATE_ID = 'editorial-card';
 export const STUDIO_STARTER_TEMPLATE = STUDIO_TEMPLATES.find((t) => t.id === STUDIO_STARTER_TEMPLATE_ID)!;
 export const STUDIO_STARTER_TS = STUDIO_STARTER_TEMPLATE.ts;
 export const STUDIO_STARTER_JS = STUDIO_STARTER_TEMPLATE.js;
