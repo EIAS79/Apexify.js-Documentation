@@ -116,7 +116,7 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
     const onFullscreenChange = () => {
       const isFullscreen = document.fullscreenElement === rootRef.current;
       setFullscreen(isFullscreen);
-      if (isFullscreen && natural) afterPaint(applyFitToView);
+      if (natural) afterPaint(applyFitToView);
     };
     document.addEventListener('fullscreenchange', onFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', onFullscreenChange);

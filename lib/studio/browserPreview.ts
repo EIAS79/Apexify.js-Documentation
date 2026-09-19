@@ -1,6 +1,6 @@
 'use client';
 
-import { createSafePreviewResolver, isUnresolvedPreviewValue } from './safePreviewExpression';
+import { createSafePreviewResolver, isUnresolvedPreviewValue, UNRESOLVED_PREVIEW_PREFIX } from './safePreviewExpression';
 
 type Jsonish = null | boolean | number | string | Jsonish[] | { [key: string]: Jsonish };
 type RecordValue = { [key: string]: Jsonish };
@@ -546,6 +546,11 @@ function drawPattern(
   const top = -margin;
   const right = width + margin;
   const bottom = height + margin;
+  const spanWidth = Math.max(1, right - left);
+  const spanHeight = Math.max(1, bottom - top);
+  const MAX_PATTERN_MARKS = 24000;
+  const densityFloor = Math.sqrt((spanWidth * spanHeight) / MAX_PATTERN_MARKS);
+  const bounded2dStep = (step: number) => Math.max(step, densityFloor);
 
   const strokePolygon = (points: Array<[number, number]>, strokeColor = color) => {
     if (!points.length) return;
@@ -581,7 +586,7 @@ function drawPattern(
 
   if (type === 'dots' || type === 'polka') {
     ctx.fillStyle = color;
-    const step = Math.max(size + spacing, size * 1.6);
+    const step = bounded2dStep(Math.max(size + spacing, size * 1.6));
     for (let y = top; y <= bottom; y += step) {
       for (let x = left; x <= right; x += step) {
         const offset = type === 'polka' && Math.round((y - top) / step) % 2 ? step / 2 : 0;
@@ -601,12 +606,14 @@ function drawPattern(
       ctx.stroke();
     }
   } else if (type === 'waves') {
-    const stepY = Math.max(10, size + spacing);
+    const stepY = bounded2dStep(Math.max(10, size + spacing));
     const amplitude = Math.max(2, size * 0.35);
     const wavelength = Math.max(24, size * 2.4 + spacing * 2);
+    const rowCount = Math.max(1, Math.ceil(spanHeight / stepY));
+    const waveSampleStep = Math.max(4, Math.ceil((spanWidth * rowCount) / MAX_PATTERN_MARKS));
     for (let y = top; y <= bottom; y += stepY) {
       ctx.beginPath();
-      for (let x = left; x <= right; x += 4) {
+      for (let x = left; x <= right; x += waveSampleStep) {
         const waveY = y + Math.sin(((x - left) / wavelength) * Math.PI * 2) * amplitude;
         if (x === left) ctx.moveTo(x, waveY);
         else ctx.lineTo(x, waveY);
@@ -615,7 +622,7 @@ function drawPattern(
       ctx.stroke();
     }
   } else if (type === 'crosses') {
-    const step = Math.max(8, size + spacing);
+    const step = bounded2dStep(Math.max(8, size + spacing));
     const arm = Math.max(2, size / 2);
     for (let y = top; y <= bottom; y += step) {
       for (let x = left; x <= right; x += step) {
@@ -631,8 +638,8 @@ function drawPattern(
   } else if (type === 'hexagons') {
     const radius = Math.max(3, size);
     const hexH = Math.sqrt(3) * radius;
-    const stepX = radius * 1.5 + spacing;
-    const stepY = hexH + spacing;
+    const stepX = Math.max(radius * 1.5 + spacing, densityFloor);
+    const stepY = Math.max(hexH + spacing, densityFloor);
     let col = 0;
     for (let x = left; x <= right + radius; x += stepX, col += 1) {
       let row = 0;
@@ -646,7 +653,7 @@ function drawPattern(
       }
     }
   } else if (type === 'checkerboard') {
-    const cell = Math.max(4, size + spacing);
+    const cell = bounded2dStep(Math.max(4, size + spacing));
     for (let y = top, row = 0; y <= bottom; y += cell, row += 1) {
       for (let x = left, col = 0; x <= right; x += cell, col += 1) {
         ctx.fillStyle = (row + col) % 2 ? secondary : color;
@@ -654,7 +661,7 @@ function drawPattern(
       }
     }
   } else if (type === 'diamonds') {
-    const step = Math.max(8, size * 2 + spacing);
+    const step = bounded2dStep(Math.max(8, size * 2 + spacing));
     const half = Math.max(3, size);
     for (let y = top; y <= bottom; y += step) {
       for (let x = left; x <= right; x += step) {
@@ -662,7 +669,7 @@ function drawPattern(
       }
     }
   } else if (type === 'triangles') {
-    const step = Math.max(8, size * 2 + spacing);
+    const step = bounded2dStep(Math.max(8, size * 2 + spacing));
     const triH = Math.max(4, size * 1.5);
     for (let y = top; y <= bottom; y += step) {
       for (let x = left; x <= right; x += step) {
@@ -670,7 +677,7 @@ function drawPattern(
       }
     }
   } else if (type === 'stars') {
-    const step = Math.max(12, size * 2 + spacing);
+    const step = bounded2dStep(Math.max(12, size * 2 + spacing));
     for (let y = top; y <= bottom; y += step) {
       for (let x = left; x <= right; x += step) {
         starPath(x, y, size, size * 0.45);
@@ -828,22 +835,29 @@ function drawGeneratedCanvasLayer(
   ctx.restore();
 }
 
+function unresolvedPreviewLabel(value: Jsonish): string | null {
+  if (!isUnresolvedPreviewValue(value)) return null;
+  return value.slice(UNRESOLVED_PREVIEW_PREFIX.length) || null;
+}
+
 function applyImageShapes(
   ctx: CanvasRenderingContext2D,
   value: Jsonish,
-  generatedChart?: HTMLCanvasElement,
-): boolean {
+  generatedChartsBySource: Map<string, HTMLCanvasElement>,
+): Set<string> {
   const list = Array.isArray(value) ? value : [value];
-  let usedGeneratedChart = false;
+  const usedGeneratedSources = new Set<string>();
 
   for (const item of list) {
     if (!isRecord(item)) continue;
     const rawSource = item.source;
     const source = stringOf(rawSource, '');
     if (!SHAPES.has(source)) {
-      if (isUnresolvedPreviewValue(rawSource) && generatedChart) {
+      const unresolvedLabel = unresolvedPreviewLabel(rawSource);
+      const generatedChart = unresolvedLabel ? generatedChartsBySource.get(unresolvedLabel) : undefined;
+      if (unresolvedLabel && generatedChart) {
         drawGeneratedCanvasLayer(ctx, item, generatedChart);
-        usedGeneratedChart = true;
+        usedGeneratedSources.add(unresolvedLabel);
       }
       continue;
     }
@@ -972,7 +986,7 @@ function applyImageShapes(
     ctx.restore();
   }
 
-  return usedGeneratedChart;
+  return usedGeneratedSources;
 }
 
 function readInitializerExpression(source: string, start: number, end: number): string {
@@ -1098,6 +1112,38 @@ function createChartCanvas(chartType: string, rawData: Jsonish, optionsValue: Js
     ? createGradient(ctx, backgroundGradient, width, height)
     : stringOf(appearance.backgroundColor, '#0f172a');
   ctx.fillRect(0, 0, width, height);
+
+  const appearanceLayers = Array.isArray(appearance.bgLayers) ? appearance.bgLayers : [];
+  for (const layer of appearanceLayers) {
+    if (!isRecord(layer)) continue;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, Math.max(0, numberOf(layer.opacity, 1)));
+    const blend = stringOf(layer.blendMode, 'source-over');
+    try {
+      ctx.globalCompositeOperation = blend as GlobalCompositeOperation;
+    } catch {
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    if (stringOf(layer.type, '') === 'gradient' && isRecord(layer.value)) {
+      ctx.fillStyle = createGradient(ctx, layer.value, width, height);
+      ctx.fillRect(0, 0, width, height);
+    } else if (stringOf(layer.type, '') === 'presetPattern' && isRecord(layer.pattern)) {
+      drawPattern(ctx, layer.pattern, width, height);
+    }
+    ctx.restore();
+  }
+
+  if (isRecord(appearance.patternBg)) {
+    ctx.save();
+    const blend = stringOf(appearance.patternBg.blendMode, 'source-over');
+    try {
+      ctx.globalCompositeOperation = blend as GlobalCompositeOperation;
+    } catch {
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    drawPattern(ctx, appearance.patternBg, width, height);
+    ctx.restore();
+  }
 
   if (isRecord(appearance.noiseBg)) {
     drawNoise(ctx, width, height, Math.min(0.08, Math.max(0, numberOf(appearance.noiseBg.intensity, 0))));
@@ -1229,6 +1275,153 @@ function createChartCanvas(chartType: string, rawData: Jsonish, optionsValue: Js
       ctx.fill();
       angle = next;
     });
+  } else if (chartType === 'polarArea') {
+    const values = data.map((item) => Math.max(0, numberOf(item.value, 0)));
+    const maxValue = Math.max(1, ...values);
+    const polar = isRecord(options.polar) ? options.polar : {};
+    const cx = plot.x + plot.w / 2;
+    const cy = plot.y + plot.h / 2;
+    const outer = Math.max(10, Math.min(plot.w, plot.h) * 0.43);
+    const inner = outer * Math.min(0.9, Math.max(0, numberOf(polar.innerRadiusRatio, 0)));
+    const start = (numberOf(polar.startAngleDeg, -90) * Math.PI) / 180;
+    const sliceAngle = (Math.PI * 2) / Math.max(1, data.length);
+    const areaScale = stringOf(options.scale, 'radius') === 'area';
+
+    data.forEach((item, index) => {
+      const ratio = Math.max(0, values[index] / maxValue);
+      const radius = inner + (outer - inner) * (areaScale ? Math.sqrt(ratio) : ratio);
+      const a0 = start + index * sliceAngle;
+      const a1 = a0 + sliceAngle;
+      ctx.save();
+      ctx.globalAlpha = Math.min(
+        1,
+        Math.max(0, numberOf(polar.opacity, 1) * numberOf(item.opacity, 1)),
+      );
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(a0) * inner, cy + Math.sin(a0) * inner);
+      ctx.arc(cx, cy, radius, a0, a1);
+      if (inner > 0) {
+        ctx.lineTo(cx + Math.cos(a1) * inner, cy + Math.sin(a1) * inner);
+        ctx.arc(cx, cy, inner, a1, a0, true);
+      } else {
+        ctx.lineTo(cx, cy);
+      }
+      ctx.closePath();
+      ctx.fillStyle = stringOf(
+        item.color,
+        ['#38bdf8','#a78bfa','#fb7185','#34d399','#fbbf24','#60a5fa'][index % 6],
+      );
+      ctx.fill();
+      const strokeWidth = Math.max(0, numberOf(polar.sliceStrokeWidth, 1));
+      if (strokeWidth > 0) {
+        ctx.lineWidth = strokeWidth;
+        ctx.strokeStyle = stringOf(polar.sliceStrokeColor, 'rgba(255,255,255,.28)');
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+  } else if (chartType === 'radar') {
+    const radar = isRecord(options.radar) ? options.radar : {};
+    const categories = Array.isArray(radar.categories)
+      ? radar.categories.map((value) => stringOf(value, ''))
+      : [];
+    const series = data.filter((item) => Array.isArray(item.values));
+    const categoryCount = categories.length || Math.max(0, ...(series.map((item) => Array.isArray(item.values) ? item.values.length : 0)));
+    if (categoryCount < 3) return null;
+
+    const cx = plot.x + plot.w / 2;
+    const cy = plot.y + plot.h / 2;
+    const radius = Math.max(10, Math.min(plot.w, plot.h) * 0.38);
+    const allValues = series.flatMap((item) =>
+      Array.isArray(item.values) ? item.values.map((value) => numberOf(value, 0)) : [],
+    );
+    const maxValue = Math.max(1, numberOf(radar.maxValue, Math.max(1, ...allValues) * 1.05));
+    const levels = Math.max(3, Math.min(10, Math.round(numberOf(radar.gridLevels, 5))));
+    const gridColor = stringOf(radar.gridColor, 'rgba(148,163,184,.28)');
+    const gridWidth = Math.max(0.5, numberOf(radar.gridWidth, 1));
+
+    const pointAt = (index: number, valueRatio: number) => {
+      const angle = -Math.PI / 2 + (index / categoryCount) * Math.PI * 2;
+      return {
+        x: cx + Math.cos(angle) * radius * valueRatio,
+        y: cy + Math.sin(angle) * radius * valueRatio,
+      };
+    };
+
+    ctx.save();
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = gridWidth;
+    for (let level = 1; level <= levels; level += 1) {
+      ctx.beginPath();
+      for (let index = 0; index < categoryCount; index += 1) {
+        const point = pointAt(index, level / levels);
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+    for (let index = 0; index < categoryCount; index += 1) {
+      const point = pointAt(index, 1);
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+    }
+
+    if (categories.length) {
+      ctx.fillStyle = stringOf(radar.axisLabelColor, axisColor);
+      ctx.font = `${Math.max(9, numberOf(radar.axisLabelFontSize, 11))}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      categories.forEach((label, index) => {
+        const point = pointAt(index, 1.12);
+        ctx.fillText(label, point.x, point.y);
+      });
+    }
+    ctx.restore();
+
+    series.forEach((seriesItem, seriesIndex) => {
+      const values = Array.isArray(seriesItem.values) ? seriesItem.values : [];
+      if (values.length < categoryCount) return;
+      const color = stringOf(
+        seriesItem.stroke,
+        stringOf(seriesItem.color, ['#38bdf8','#a78bfa','#f472b6','#34d399','#fbbf24'][seriesIndex % 5]),
+      );
+      ctx.save();
+      ctx.globalAlpha = Math.min(
+        1,
+        Math.max(0, numberOf(seriesItem.opacity, numberOf(radar.opacity, 1))),
+      );
+      ctx.beginPath();
+      values.slice(0, categoryCount).forEach((rawValue, index) => {
+        const point = pointAt(index, Math.max(0, numberOf(rawValue, 0)) / maxValue);
+        if (index === 0) ctx.moveTo(point.x, point.y);
+        else ctx.lineTo(point.x, point.y);
+      });
+      ctx.closePath();
+      if (boolOf(radar.fill, true)) {
+        ctx.save();
+        ctx.globalAlpha *= Math.min(1, Math.max(0, numberOf(seriesItem.fillOpacity, 0.24)));
+        ctx.fillStyle = stringOf(seriesItem.color, color);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(1, numberOf(seriesItem.lineWidth, 2));
+      ctx.stroke();
+
+      if (boolOf(radar.showPoints, false)) {
+        values.slice(0, categoryCount).forEach((rawValue, index) => {
+          const point = pointAt(index, Math.max(0, numberOf(rawValue, 0)) / maxValue);
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, Math.max(1, numberOf(radar.pointRadius, 4)), 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+        });
+      }
+      ctx.restore();
+    });
   } else if (chartType === 'line' || chartType === 'scatter') {
     const series = data.length && Array.isArray(data[0].data) ? data : [{ label: '', color: '#38bdf8', data: rawData }];
     const points = series.flatMap((seriesItem) => Array.isArray(seriesItem.data) ? seriesItem.data.filter(isRecord) : []);
@@ -1301,6 +1494,10 @@ function createChartCanvas(chartType: string, rawData: Jsonish, optionsValue: Js
     );
     const valueAxis = horizontal ? xAxis : yAxis;
     const valueRange = axisRange(valueAxis, allValues, Math.min(0, ...allValues));
+    const explicitValueRange = isRecord(valueAxis.range) ? valueAxis.range : {};
+    if (typeof explicitValueRange.min !== 'number') valueRange.min = Math.min(0, valueRange.min);
+    if (typeof explicitValueRange.max !== 'number') valueRange.max = Math.max(0, valueRange.max);
+    if (valueRange.max === valueRange.min) valueRange.max = valueRange.min + 1;
     const categoryRange = { min: 0, max: Math.max(1, data.length) };
     drawCartesianFrame(
       horizontal ? valueRange : categoryRange,
@@ -1417,6 +1614,24 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
       })
       .filter((value): value is HTMLCanvasElement => Boolean(value));
 
+    const chartSourceLabels: string[] = [];
+    for (const call of calls) {
+      if (call.method !== 'createImage' || !call.args[0]) continue;
+      const parsed = resolveCallArgument(source, call, call.args[0], resolve);
+      const items = Array.isArray(parsed) ? parsed : [parsed];
+      for (const item of items) {
+        if (!isRecord(item)) continue;
+        const label = unresolvedPreviewLabel(item.source);
+        if (!label || !/(?:chart|graph|plot)/i.test(label) || chartSourceLabels.includes(label)) continue;
+        chartSourceLabels.push(label);
+      }
+    }
+    const generatedChartsBySource = new Map<string, HTMLCanvasElement>();
+    chartSourceLabels.forEach((label, index) => {
+      const chart = generatedCharts[index];
+      if (chart) generatedChartsBySource.set(label, chart);
+    });
+
     const canvasCall = calls.find((call) => call.method === 'createCanvas');
     if (!canvasCall?.args[0]) {
       const chartOnly = generatedCharts[generatedCharts.length - 1];
@@ -1467,7 +1682,6 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
 
     applyBackground(ctx, canvasConfig, width, height);
 
-    let chartCursor = 0;
 
     for (const call of calls) {
       if (call.index <= canvasCall.index || !call.args[0]) continue;
@@ -1481,16 +1695,13 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
       } else if (call.method === 'createImage') {
         const parsed = resolveCallArgument(source, call, call.args[0], resolve);
         const items = Array.isArray(parsed) ? parsed : [parsed];
-        const availableChart = generatedCharts[Math.min(chartCursor, Math.max(0, generatedCharts.length - 1))];
-        const usedChart = applyImageShapes(ctx, parsed, availableChart);
-        if (usedChart) chartCursor += 1;
+        const usedGeneratedSources = applyImageShapes(ctx, parsed, generatedChartsBySource);
 
-        const unresolvedSource = items.some(
-          (item) =>
-            isRecord(item) &&
-            isUnresolvedPreviewValue(item.source) &&
-            !usedChart,
-        );
+        const unresolvedSource = items.some((item) => {
+          if (!isRecord(item)) return false;
+          const label = unresolvedPreviewLabel(item.source);
+          return Boolean(label && !usedGeneratedSources.has(label));
+        });
 
         const unsupportedImage = items.some(
           (item) =>
@@ -1514,7 +1725,7 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
 
     const unresolved = resolver.unresolved().filter((name) => {
       if (name === 'painter') return false;
-      if (generatedCharts.length && /^(?:chartBuf|chart|chartBuffer)$/i.test(name)) return false;
+      if (generatedChartsBySource.has(name)) return false;
       return true;
     });
     if (unresolved.length) {
