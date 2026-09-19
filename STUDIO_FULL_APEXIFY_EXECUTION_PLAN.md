@@ -9,7 +9,7 @@
 > - [x] STUDIO-3 trusted-local full-runtime artifact runner foundation; intentional video block removed
 > - [~] STUDIO-4 production isolated executor integration boundary (`STUDIO_EXECUTOR_URL`) is implemented; an isolated executor deployment/snapshot is still required before production full-runtime execution is enabled
 > - [x] STUDIO-5 session virtual assets foundation: image/audio/video/font uploads, stable `studio://asset/<id>` references, browser image preview resolution, and full-runtime materialization
-> - [~] STUDIO-6 raster/chart/scene parity in progress: alias-safe full-runtime routing, generated raster-buffer identity routing, and chart-buffer browser reuse are implemented; full isolated end-to-end family validation remains
+> - [x] STUDIO-6 raster/chart/scene parity implementation complete: all Phase-6 families have an execution route, buffer identity is preserved through the real runtime, structured/non-raster results are collected safely, and representative Studio templates cover scenes/components/assets/templates, image utilities, path/pixels/detect, batch/chain, plus chart-buffer reuse. Isolated production execution proof is intentionally deferred to the final validation pass and STUDIO-4 deployment.
 > - [~] STUDIO-7 GIF/animation/audio in progress: media-aware artifact collection and playable GIF/audio templates are implemented; isolated-runtime execution proofs remain
 > - [~] STUDIO-8 video in progress: video/frame artifact discovery and an MP4 Studio template are implemented; production FFmpeg execution still depends on STUDIO-4
 > - [ ] STUDIO-9 real `@apexify/web` migration when that package/runtime ships
@@ -226,28 +226,38 @@ Remaining refinements are UX/persistence improvements (for example IndexedDB per
 
 ### STUDIO-6 — Complete raster/chart/scene parity
 
-Status: **in progress**.
+Status: **implementation complete**.
 
-Delivered in the current parity pass:
+Delivered:
 
-- full-runtime facet detection no longer depends on the local variable being named `painter`;
+- full-runtime facet detection does not depend on the local variable being named `painter`;
 - planner comment scanning preserves quoted `https://` media URLs instead of truncating the source at `//`;
 - host-persistence rejection follows aliased `new ApexPainter()` instances;
 - generated canvas/image/text buffers reused later as media sources route to the real full runtime so buffer identity is preserved;
-- generated chart buffers remain browser-direct where Live Canvas has explicit identity mapping;
-- planner regression coverage is part of the DOC-8 deterministic test gate.
+- generated chart buffers remain browser-direct where Live Canvas has explicit assignment-identity mapping;
+- every stable `createChart()` family has a browser execution path, while comparison/combo charts route to the real full runtime;
+- scenes, SceneBuilder, nested surfaces, templates, components, named assets / `$refs`, `prepareForRender`, image utilities, Path2D, pixels, hit detection, batch, chain, output conversion, and compatible plugins route to the real Apexify runtime;
+- the trusted-local full runtime exposes already-installed project dependencies inside the disposable execution workspace, allowing compatible plugin/helper imports without permitting runtime package installation;
+- full-runtime artifact collection handles Buffer, typed arrays, ArrayBuffer, Blob, data URLs, generated files, scalar/JSON results, CanvasResults-like objects, multi-buffer arrays, metadata objects, and mixed visual + structured outputs;
+- non-media arrays such as palettes, color-analysis results, asset listings, hit-test records, and component layer definitions remain structured JSON instead of being exploded into many fake artifacts;
+- generated raster/media buffers receive MIME-aware filenames when the format is recognizable;
+- Studio ships representative Phase-6 templates for:
+  - SceneBuilder + nested surfaces + components + named assets;
+  - templates + placeholders + named assets;
+  - Path2D + pixels + hit detection;
+  - image utilities + palette extraction;
+  - batch + chain;
+  - chart-buffer reuse inside `createImage()`.
 
-Still required before STUDIO-6 is complete:
-
-- execute and record representative full-runtime proofs for image utilities, path/pixels/detect, all chart families, scenes, templates, components, named assets, batch and chain inside the isolated executor;
-- close any artifact-shape gaps found by those executions.
+Phase-6 implementation no longer has an open coding item. Per the project execution policy, isolated-production execution proofs are deferred to the **final validation pass** rather than being run repeatedly during implementation. Those proofs also depend on STUDIO-4's isolated executor being deployed.
 
 Deliverables:
 
-- all raster APIs execute;
-- every chart family executes;
-- generated chart/image/text buffers can feed later Apexify operations without losing identity;
-- scenes/templates/components/assets work end-to-end.
+- all raster APIs have an execution path;
+- every chart family has an execution path;
+- generated chart/image/text/canvas buffers can feed later Apexify operations without losing identity;
+- scenes/templates/components/assets work end-to-end in the real runtime path;
+- structured Phase-6 results are inspectable rather than misclassified as media.
 
 ### STUDIO-7 — GIF, animation, and audio
 

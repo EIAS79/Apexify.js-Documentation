@@ -54,7 +54,7 @@ export type StudioTemplate = {
   name: string;
   blurb: string;
   /** Tag used for grouping in the templates menu. */
-  group: 'Starter' | 'Charts' | 'Backgrounds' | 'Patterns' | 'Effects' | 'Media';
+  group: 'Starter' | 'Charts' | 'Parity' | 'Backgrounds' | 'Patterns' | 'Effects' | 'Media';
   ts: string;
   js: string;
 };
@@ -328,6 +328,349 @@ const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'gro
   ], output);
 
   return output;`,
+  },
+  {
+    id: 'scene-components-assets',
+    name: 'Scene · components · assets',
+    blurb: 'SceneBuilder, nested surfaces, reusable components, and named asset references in one render.',
+    group: 'Parity',
+    body: `  painter.assets.loadPalette('brand', {
+    bg: '#08111f',
+    panel: '#17213a',
+    accent: '#60a5fa',
+    mint: '#34d399',
+    text: '#f8fafc',
+    muted: '#94a3b8',
+  });
+
+  const scene = painter.createScene({ width: 960, height: 540 });
+  scene.setBackground({ colorBg: '$brand.bg' });
+
+  scene.addLayers([
+    ...painter.components.card.toLayers({
+      x: 52, y: 52, width: 480, height: 360,
+      radius: 28,
+      background: '$brand.panel',
+      borderColor: '$brand.accent',
+      borderWidth: 2,
+      title: 'Studio 6 parity',
+      titleColor: '$brand.text',
+      titleFontSize: 30,
+      body: 'SceneBuilder + components + named assets',
+      bodyColor: '$brand.muted',
+      bodyFontSize: 18,
+      padding: 28,
+    }),
+    ...painter.components.progressBar.toLayers({
+      x: 82, y: 330, width: 390, height: 18,
+      value: 86,
+      max: 100,
+      background: '#24324a',
+      fill: '$brand.mint',
+      radius: 9,
+      showLabel: true,
+      labelColor: '$brand.text',
+    }),
+    {
+      type: 'surface',
+      placement: {
+        x: 568, y: 82, width: 320, height: 320,
+        opacity: 0.98,
+        rotation: 3,
+      },
+      background: {
+        colorBg: '#0f172a',
+        borderRadius: 26,
+        canvasStroke: { color: '$brand.accent', width: 2 },
+      },
+      layers: [
+        {
+          type: 'image',
+          images: {
+            source: 'circle',
+            x: 78, y: 64, width: 164, height: 164,
+            shape: { fill: true, color: '$brand.accent', radius: 82 },
+            shadow: { color: 'rgba(0,0,0,0.35)', offsetY: 12, blur: 24, opacity: 1 },
+          },
+        },
+        {
+          type: 'text',
+          texts: {
+            text: 'NESTED',
+            x: 160, y: 266,
+            font: { family: 'Arial', size: 24 },
+            bold: true,
+            fill: { color: '$brand.text' },
+            textAlign: 'center',
+            textBaseline: 'middle',
+          },
+        },
+      ],
+    },
+    ...painter.components.watermark.toLayers({
+      text: 'APEXIFY.JS',
+      position: 'bottom-right',
+      fontSize: 15,
+      color: '#f8fafc66',
+      margin: 24,
+      canvasWidth: 960,
+      canvasHeight: 540,
+    }),
+  ]);
+
+  return scene.render({ resolveAssetRefs: true });`,
+  },
+  {
+    id: 'template-named-assets',
+    name: 'Template · named assets',
+    blurb: 'Reusable template placeholders resolved together with painter.assets palette references.',
+    group: 'Parity',
+    body: `  painter.assets.loadPalette('brand', {
+    bg: '#07111f',
+    panel: '#14213a',
+    accent: '#a78bfa',
+    text: '#f8fafc',
+    muted: '#a9b8cf',
+  });
+
+  const template = painter.createTemplate({
+    width: 960,
+    height: 540,
+    background: { colorBg: '$brand.bg' },
+    layers: [
+      {
+        id: 'panel',
+        type: 'image',
+        images: {
+          source: 'rectangle',
+          x: 64, y: 64, width: 832, height: 412,
+          borderRadius: 30,
+          shape: { fill: true, color: '$brand.panel' },
+          stroke: { width: 2, color: '$brand.accent', borderRadius: 30 },
+        },
+      },
+      {
+        id: 'eyebrow',
+        type: 'text',
+        texts: {
+          text: '{{eyebrow}}',
+          x: 104, y: 138,
+          font: { family: 'Arial', size: 18 },
+          bold: true,
+          fill: { color: '$brand.accent' },
+        },
+      },
+      {
+        id: 'headline',
+        type: 'text',
+        texts: {
+          text: '{{headline}}',
+          x: 104, y: 250,
+          font: { family: 'Arial', size: 54 },
+          bold: true,
+          fill: { color: '$brand.text' },
+        },
+      },
+      {
+        id: 'body',
+        type: 'text',
+        texts: {
+          text: '{{body}}',
+          x: 104, y: 332,
+          font: { family: 'Arial', size: 20 },
+          fill: { color: '$brand.muted' },
+          maxWidth: 700,
+        },
+      },
+    ],
+  });
+
+  return template.render({
+    eyebrow: 'TEMPLATE SYSTEM',
+    headline: 'Reusable visual language',
+    body: 'Data placeholders and named assets resolve before the scene is rendered.',
+  });`,
+  },
+  {
+    id: 'path-pixels-detect',
+    name: 'Path · pixels · hit detect',
+    blurb: 'Path2D drawing, pixel manipulation/readback, and hit detection with visual plus JSON outputs.',
+    group: 'Parity',
+    body: `  const canvas = await painter.createCanvas({
+    width: 720,
+    height: 420,
+    colorBg: '#08111f',
+  });
+
+  const path = painter.path2d.create([
+    { type: 'roundedRect', x: 90, y: 80, width: 540, height: 250, radius: 34 },
+    { type: 'circle', x: 360, y: 205, radius: 72 },
+  ]);
+
+  let output = await painter.path2d.draw(canvas, path, {
+    fill: {
+      color: '#1d4ed8',
+      opacity: 0.72,
+      rule: 'evenodd',
+    },
+    stroke: {
+      color: '#93c5fd',
+      width: 5,
+      lineJoin: 'round',
+    },
+    shadow: {
+      color: 'rgba(37,99,235,0.42)',
+      blur: 28,
+      offsetY: 14,
+    },
+  });
+
+  output = await painter.pixels.manipulate(output, {
+    filter: 'contrast',
+    intensity: 1.08,
+    region: { x: 70, y: 60, width: 580, height: 290 },
+  });
+
+  output = await painter.pixels.setColor(output, 110, 110, {
+    r: 52, g: 211, b: 153, a: 255,
+  });
+
+  const pixel = await painter.pixels.getColor(output, 110, 110);
+  const hit = await painter.detect.region(
+    { type: 'rect', x: 90, y: 80, width: 540, height: 250 },
+    360,
+    205,
+  );
+  const distance = await painter.detect.distance(
+    { type: 'circle', x: 360, y: 205, radius: 72 },
+    500,
+    205,
+  );
+
+  return [output, { pixel, hit, distance }];`,
+  },
+  {
+    id: 'image-utils-parity',
+    name: 'Image utilities · transform',
+    blurb: 'Real image utility calls with resize, gradient blend, palette extraction, and validation metadata.',
+    group: 'Parity',
+    body: `  const source = await painter.createCanvas({
+    width: 760,
+    height: 420,
+    gradientBg: {
+      type: 'linear',
+      startX: 0, startY: 0,
+      endX: 760, endY: 420,
+      colors: [
+        { stop: 0, color: '#0f172a' },
+        { stop: 0.55, color: '#2563eb' },
+        { stop: 1, color: '#c026d3' },
+      ],
+    },
+    noiseBg: { intensity: 0.025 },
+  });
+
+  const resized = await painter.image.resize({
+    imagePath: source.buffer,
+    size: { width: 620, height: 344 },
+    maintainAspectRatio: true,
+    quality: 92,
+    outputFormat: 'png',
+  });
+
+  const blended = await painter.image.gradientBlend(resized, {
+    type: 'linear',
+    angle: 28,
+    colors: [
+      { stop: 0, color: 'rgba(15,23,42,0.05)' },
+      { stop: 1, color: 'rgba(236,72,153,0.42)' },
+    ],
+    blendMode: 'screen',
+  });
+
+  const palette = await painter.image.extractPalette(blended, {
+    count: 5,
+    method: 'median-cut',
+    format: 'hex',
+  });
+
+  return [
+    blended,
+    {
+      palette,
+      validAccent: painter.image.validHex('#60a5fa'),
+    },
+  ];`,
+  },
+  {
+    id: 'batch-chain-parity',
+    name: 'Batch · chain',
+    blurb: 'Ordered multi-output batch rendering plus sequential current-buffer chaining.',
+    group: 'Parity',
+    body: `  const batchOutputs = await painter.batch([
+    {
+      type: 'canvas',
+      config: {
+        width: 420,
+        height: 260,
+        gradientBg: {
+          type: 'linear',
+          startX: 0, startY: 0, endX: 420, endY: 260,
+          colors: [
+            { stop: 0, color: '#07111f' },
+            { stop: 1, color: '#1d4ed8' },
+          ],
+        },
+      },
+    },
+    {
+      type: 'text',
+      config: {
+        text: 'BATCH OUTPUT',
+        x: 400, y: 300,
+        font: { family: 'Arial', size: 42 },
+        bold: true,
+        fill: { color: '#f8fafc' },
+        textAlign: 'center',
+        textBaseline: 'middle',
+      },
+    },
+  ], { concurrency: 2 });
+
+  const chained = await painter.chain([
+    {
+      method: 'createCanvas',
+      args: [{ width: 640, height: 360, colorBg: '#0b1020' }],
+    },
+    {
+      method: 'createImage',
+      args: [
+        {
+          source: 'circle',
+          x: 220, y: 78, width: 200, height: 200,
+          shape: { fill: true, color: '#818cf8', radius: 100 },
+          shadow: { color: 'rgba(0,0,0,0.4)', offsetY: 16, blur: 28, opacity: 1 },
+        },
+        'current',
+      ],
+    },
+    {
+      method: 'createText',
+      args: [
+        {
+          text: 'CHAIN',
+          x: 320, y: 310,
+          font: { family: 'Arial', size: 28 },
+          bold: true,
+          fill: { color: '#f8fafc' },
+          textAlign: 'center',
+        },
+        'current',
+      ],
+    },
+  ]);
+
+  return [...batchOutputs, chained];`,
   },
   {
     id: 'gif-motion-card',

@@ -55,10 +55,54 @@ function __studioSafeName(value: string): string {
   return cleaned || 'artifact';
 }
 
+function __studioExtensionForMime(mime: string | undefined): string {
+  const normalized = (mime || '').toLowerCase();
+  if (normalized === 'image/png') return '.png';
+  if (normalized === 'image/jpeg') return '.jpg';
+  if (normalized === 'image/webp') return '.webp';
+  if (normalized === 'image/gif') return '.gif';
+  if (normalized === 'audio/wav') return '.wav';
+  if (normalized === 'audio/mpeg') return '.mp3';
+  if (normalized === 'audio/ogg') return '.ogg';
+  if (normalized === 'video/mp4') return '.mp4';
+  if (normalized === 'video/webm') return '.webm';
+  return '.bin';
+}
+
+function __studioDetectBufferMime(buf: Buffer): string | undefined {
+  if (buf.length >= 8 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47) return 'image/png';
+  const sig6 = buf.subarray(0, 6).toString('ascii');
+  if (sig6 === 'GIF87a' || sig6 === 'GIF89a') return 'image/gif';
+  if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+  if (buf.length >= 12 && buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WEBP') return 'image/webp';
+  if (buf.length >= 12 && buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WAVE') return 'audio/wav';
+  if (buf.length >= 12 && buf.subarray(4, 8).toString('ascii') === 'ftyp') return 'video/mp4';
+  if (buf.length >= 4 && buf[0] === 0x1a && buf[1] === 0x45 && buf[2] === 0xdf && buf[3] === 0xa3) return 'video/webm';
+  return undefined;
+}
+
 function __studioJson(value: unknown): string {
   return JSON.stringify(value, (_key, item) => {
-    if (Buffer.isBuffer(item)) return { type: 'Buffer', bytes: item.length };
+    if (Buffer.isBuffer(item)) return { type: 'Buffer', bytes: item.length, mime: __studioDetectBufferMime(item) };
+    if (ArrayBuffer.isView(item)) {
+      return {
+        type: item.constructor?.name || 'TypedArray',
+        length: 'length' in item ? Number((item as { length?: unknown }).length ?? 0) : undefined,
+        bytes: item.byteLength,
+      };
+    }
+    if (item instanceof ArrayBuffer) return { type: 'ArrayBuffer', bytes: item.byteLength };
     if (typeof item === 'bigint') return item.toString();
+    if (
+      item &&
+      typeof item === 'object' &&
+      item.constructor &&
+      item.constructor !== Object &&
+      !Array.isArray(item)
+    ) {
+      const own = Object.keys(item);
+      if (own.length === 0) return { type: item.constructor.name || 'Object' };
+    }
     return item;
   }, 2);
 }
@@ -105,10 +149,12 @@ ${inner}
     mime?: string,
   ) {
     const id = 'artifact-' + String(++__index);
-    const name = __studioSafeName(label || id) + '.bin';
-    const out = __studioPath.join(__artifactDir, id + '.bin');
+    const resolvedMime = mime || __studioDetectBufferMime(buf);
+    const extension = __studioExtensionForMime(resolvedMime);
+    const name = __studioSafeName(label || id) + extension;
+    const out = __studioPath.join(__artifactDir, id + extension);
     __studioWrite(out, buf);
-    __entries.push({ id, name, path: out, metadata, mime });
+    __entries.push({ id, name, path: out, metadata, mime: resolvedMime });
   }
 
   function __pushFile(
@@ -165,13 +211,17 @@ ${inner}
       return;
     }
 
-    if (value instanceof Uint8Array) {
-      __pushBuffer(Buffer.from(value), label);
+    if (ArrayBuffer.isView(value)) {
+      const bytes = Buffer.from(value.buffer, value.byteOffset, value.byteLength);
+      __pushBuffer(bytes, label, {
+        viewType: value.constructor?.name || 'TypedArray',
+        byteLength: value.byteLength,
+      });
       return;
     }
 
     if (value instanceof ArrayBuffer) {
-      __pushBuffer(Buffer.from(new Uint8Array(value)), label);
+      __pushBuffer(Buffer.from(new Uint8Array(value)), label, { byteLength: value.byteLength });
       return;
     }
 
@@ -199,6 +249,31 @@ ${inner}
     }
 
     if (Array.isArray(value)) {
+      const artifactLike = value.some((item) => {
+        if (Buffer.isBuffer(item) || item instanceof ArrayBuffer || ArrayBuffer.isView(item)) return true;
+        if (typeof Blob !== 'undefined' && item instanceof Blob) return true;
+        if (typeof item === 'string') {
+          if (/^data:/i.test(item)) return true;
+          try { return __studioExists(__studioPath.resolve(item)); } catch { return false; }
+        }
+        if (!item || typeof item !== 'object') return false;
+        const record = item as Record<string, unknown>;
+        return (
+          Buffer.isBuffer(record.buffer) ||
+          typeof record.output === 'string' ||
+          typeof record.outputPath === 'string' ||
+          typeof record.path === 'string' ||
+          typeof record.file === 'string' ||
+          Array.isArray(record.frames) ||
+          Array.isArray(record.buffers)
+        );
+      });
+
+      if (!artifactLike) {
+        __pushText(__studioJson(value), label, 'json');
+        return;
+      }
+
       const before = __entries.length;
       for (let index = 0; index < value.length; index += 1) {
         await __collect(value[index], label + '-' + String(index + 1));
@@ -212,9 +287,25 @@ ${inner}
       if (__seen.has(obj)) return;
       __seen.add(obj);
 
-      if (Buffer.isBuffer(obj.buffer)) {
-        const metadata = __metadataFromRecord(obj, new Set(['buffer']));
-        __pushBuffer(obj.buffer, label, metadata);
+      if (Buffer.isBuffer(obj.buffer) || ArrayBuffer.isView(obj.buffer) || obj.buffer instanceof ArrayBuffer) {
+        let metadata = __metadataFromRecord(obj, new Set(['buffer']));
+        if (obj.canvas && typeof obj.canvas === 'object') {
+          const canvas = obj.canvas as { width?: unknown; height?: unknown };
+          if (typeof canvas.width === 'number') (metadata ??= {}).width = canvas.width;
+          if (typeof canvas.height === 'number') (metadata ??= {}).height = canvas.height;
+        }
+
+        if (Buffer.isBuffer(obj.buffer)) {
+          __pushBuffer(obj.buffer, label, metadata);
+        } else if (ArrayBuffer.isView(obj.buffer)) {
+          __pushBuffer(
+            Buffer.from(obj.buffer.buffer, obj.buffer.byteOffset, obj.buffer.byteLength),
+            label,
+            { ...(metadata ?? {}), viewType: obj.buffer.constructor?.name || 'TypedArray' },
+          );
+        } else {
+          __pushBuffer(Buffer.from(new Uint8Array(obj.buffer as ArrayBuffer)), label, metadata);
+        }
         return;
       }
 

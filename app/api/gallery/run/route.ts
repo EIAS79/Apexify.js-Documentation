@@ -5,6 +5,7 @@ import {
   mkdirSync,
   readFileSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from 'fs';
 import { tmpdir } from 'os';
@@ -335,6 +336,24 @@ async function runStudioLocal({
   const entry = join(dir, 'snippet.ts');
 
   mkdirSync(artifactDir, { recursive: true });
+
+  // The Studio snippet executes from a disposable directory. Link the app's
+  // already-installed dependencies into that workspace so compatible plugins
+  // and helper packages can be imported without allowing runtime installation.
+  const projectNodeModules = join(projectRoot, 'node_modules');
+  const runNodeModules = join(dir, 'node_modules');
+  if (existsSync(projectNodeModules) && !existsSync(runNodeModules)) {
+    try {
+      symlinkSync(
+        projectNodeModules,
+        runNodeModules,
+        process.platform === 'win32' ? 'junction' : 'dir',
+      );
+    } catch {
+      // NODE_PATH remains the compatibility fallback in runnerEnvironment().
+    }
+  }
+
   const assetRefs = materializeStudioAssets(dir, assets);
   const executableCode = rewriteStudioAssetReferences(code, assetRefs);
   writeFileSync(
