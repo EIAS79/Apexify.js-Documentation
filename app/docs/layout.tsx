@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import '@/styles/docs.css';
 import { DocsHeader } from '@/components/docs/shell/DocsHeader';
+import { DocReadingProgress } from '@/components/docs/DocReadingProgress';
 import { LegacyDocsRedirectIsland } from '@/components/docs/shell/LegacyDocsRedirectIsland';
 import { absoluteSiteUrl } from '@/lib/site';
 
@@ -23,6 +24,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <div className="apx-doc-background" aria-hidden />
       <LegacyDocsRedirectIsland />
       <DocsHeader />
+      <DocReadingProgress />
       {children}
     </div>
   );

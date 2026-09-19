@@ -466,3 +466,17 @@
     padding-inline:.65rem!important;
   }
 }
+
+
+/* File tabs scroll horizontally when needed, but never expose an internal Y scrollbar. */
+.apx-studio-root .studio-file-tabs{
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  scrollbar-width:none;
+  overscroll-behavior-x:contain;
+}
+.apx-studio-root .studio-file-tabs::-webkit-scrollbar{
+  display:none;
+  width:0;
+  height:0;
+}

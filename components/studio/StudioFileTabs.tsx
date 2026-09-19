@@ -43,7 +43,7 @@ export function StudioFileTabs({
 
   return (
     <div
-      className="flex shrink-0 items-end gap-1 overflow-x-auto px-2 pt-1.5 sm:px-3"
+      className="studio-file-tabs flex shrink-0 items-end gap-1 overflow-x-auto overflow-y-hidden px-2 pt-1.5 sm:px-3"
       style={{
         backgroundColor: 'color-mix(in srgb, var(--bg-sunken) 65%, transparent)',
         borderBottom: '1px solid var(--border-subtle)',

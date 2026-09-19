@@ -880,3 +880,39 @@
     font-size: .68rem !important;
   }
 }
+
+
+/* ==========================================================================
+   Home shell refinements — compact desktop hero start + correct nav breakpoint
+   ========================================================================== */
+@media(min-width:768px){
+  .apx-home-menu,
+  .apx-home-nav__mobile{
+    display:none!important;
+  }
+}
+@media(min-width:1024px){
+  .apx-hero__shell{
+    min-height:0;
+    padding-top:3.1rem;
+    padding-bottom:3.75rem;
+    align-items:start;
+  }
+}
+@media(min-width:1200px){
+  .apx-hero__shell{
+    min-height:0;
+    padding-top:3rem;
+  }
+  .apx-hero-gallery{
+    min-height:44rem;
+  }
+  .apx-hero-gallery__main{
+    inset:1.5rem 5.5rem 3.5rem .5rem;
+  }
+}
+@media(min-width:768px) and (max-width:1023px){
+  .apx-hero__shell{
+    padding-top:3.5rem;
+  }
+}
