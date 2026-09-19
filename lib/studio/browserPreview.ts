@@ -1035,24 +1035,15 @@ function readInitializerExpression(source: string, start: number, end: number): 
 
 function findInitializerBefore(source: string, name: string, beforeIndex: number): string | null {
   const prefix = source.slice(0, Math.max(0, beforeIndex));
-  const re = new RegExp('\\b(?:const|let|var)\\s+' + name.replace(/[$]/g, '\\function findInitializerBefore(source: string, name: string, beforeIndex: number): string | null {
-  const prefix = source.slice(0, Math.max(0, beforeIndex));
-  const re = new RegExp('\\b(?:const|let|var)\\s+' + name.replace(/[$]/g, '\\$&') + '\\s*=', 'g');
+  const escapedName = name.split('$').join('\\$');
+  const re = new RegExp('\\b(?:const|let|var)\\s+' + escapedName + '\\s*=', 'g');
   let match: RegExpExecArray | null;
   let last: RegExpExecArray | null = null;
   while ((match = re.exec(prefix))) last = match;
   if (!last) return null;
-  const start = last.index + last[0].length;
-  return readUntil(source, start, new Set([';'])).text || null;
-}') + '\\s*=', 'g');
-  let match: RegExpExecArray | null;
-  let last: RegExpExecArray | null = null;
-  while ((match = re.exec(prefix))) last = match;
-  if (!last) return null;
-  const start = last.index + last[0].length;
-  return readInitializerExpression(source, start, beforeIndex) || null;
+  const expressionStart = last.index + last[0].length;
+  return readInitializerExpression(source, expressionStart, beforeIndex) || null;
 }
-
 function resolveCallArgument(
   source: string,
   call: Call,
