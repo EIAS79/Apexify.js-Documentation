@@ -10,8 +10,8 @@ const ROOT = process.cwd();
 const OUTPUT = path.join(ROOT, 'generated', 'docs-doc9');
 const CHECK = process.argv.includes('--check');
 const PACKAGE_VERSION = '6.0.0';
-const PACKAGE_SHA = 'dbed9743353593eafae9a7b1c25312d7170a233b';
-const PACKAGE_MAIN_SHA = '2b64087a04411982067cc624031b3de6f663c530';
+const PACKAGE_SHA = '1f767143271f6c17c2be8cd3a09f10a27b04b606';
+const PACKAGE_MAIN_SHA = '1f767143271f6c17c2be8cd3a09f10a27b04b606';
 const PHASE14P_FROZEN_SHA = '5d9b71f185140d6c3477286b8fb111f293e52b48';
 const DOC9_BASE_SHA = 'a1e7a6ddca0b7c0e7193b4dceb56e7cd900862f3';
 
