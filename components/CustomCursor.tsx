@@ -50,7 +50,7 @@ export default function CustomCursor() {
     const cur = { x: target.x, y: target.y, w: DEFAULT_SIZE, h: DEFAULT_SIZE, r: 7 };
     const tgt = { x: target.x, y: target.y, w: DEFAULT_SIZE, h: DEFAULT_SIZE, r: 7 };
 
-    let mode: 'default' | 'magnet' | 'text' = 'default';
+    let mode: 'default' | 'pointer' | 'magnet' | 'text' = 'default';
     let magnetEl: HTMLElement | null = null;
     let visible = false;
     let raf = 0;
@@ -146,14 +146,23 @@ export default function CustomCursor() {
       tgt.r = 2;
     };
 
-    const findMagnetTarget = (el: Element | null): HTMLElement | null => {
+    const findInteractiveTarget = (
+      el: Element | null,
+    ): { element: HTMLElement; mode: 'pointer' | 'magnet' } | null => {
       if (!el) return null;
 
       const explicit = (el as HTMLElement).closest?.('[data-cursor]') as HTMLElement | null;
       if (explicit) {
         const value = explicit.dataset.cursor;
         if (value === 'none') return null;
-        if (value === 'link' || value === 'button' || value === 'magnet') return explicit;
+        if (value === 'pointer') return { element: explicit, mode: 'pointer' };
+        if (value === 'link' || value === 'button' || value === 'magnet') {
+          const rect = explicit.getBoundingClientRect();
+          return {
+            element: explicit,
+            mode: rect.width > 520 || rect.height > 160 ? 'pointer' : 'magnet',
+          };
+        }
       }
 
       const candidate = (el as HTMLElement).closest?.(
@@ -164,11 +173,12 @@ export default function CustomCursor() {
 
       const rect = candidate.getBoundingClientRect();
 
-      // Prevent giant page/card hit areas from swallowing the cursor.
-      // Normal controls, nav items and compact cards still receive the morph.
-      if (rect.width > 520 || rect.height > 160) return null;
-
-      return candidate;
+      // Large cards should still look interactive, but outlining the entire
+      // surface is visually noisy. Use the hand pointer without a morph box.
+      return {
+        element: candidate,
+        mode: rect.width > 520 || rect.height > 160 ? 'pointer' : 'magnet',
+      };
     };
 
     const isTextTarget = (el: Element | null): boolean => {
@@ -198,6 +208,12 @@ export default function CustomCursor() {
         return;
       }
 
+      if (mode === 'pointer') {
+        pointer.style.opacity = '1';
+        wrap.style.opacity = '0';
+        return;
+      }
+
       if (mode === 'magnet') {
         pointer.style.opacity = '1';
         wrap.style.opacity = '1';
@@ -209,10 +225,18 @@ export default function CustomCursor() {
     };
 
     const recompute = (el: Element | null) => {
-      const nextMagnet = findMagnetTarget(el);
+      const interactive = findInteractiveTarget(el);
 
-      if (nextMagnet) {
-        magnetEl = nextMagnet;
+      if (interactive) {
+        magnetEl = interactive.element;
+
+        if (interactive.mode === 'pointer') {
+          if (mode !== 'pointer') setMode('pointer');
+          setDefaultTarget();
+          applyVisibility();
+          return;
+        }
+
         if (mode !== 'magnet') setMode('magnet');
         updateMagnetTarget();
         applyVisibility();
@@ -234,8 +258,9 @@ export default function CustomCursor() {
     };
 
     const positionPointer = () => {
-      const hotspotX = mode === 'magnet' ? HAND_HOTSPOT_X : ARROW_HOTSPOT_X;
-      const hotspotY = mode === 'magnet' ? HAND_HOTSPOT_Y : ARROW_HOTSPOT_Y;
+      const interactivePointer = mode === 'magnet' || mode === 'pointer';
+      const hotspotX = interactivePointer ? HAND_HOTSPOT_X : ARROW_HOTSPOT_X;
+      const hotspotY = interactivePointer ? HAND_HOTSPOT_Y : ARROW_HOTSPOT_Y;
 
       pointer.style.transform =
         `translate3d(${target.x - hotspotX}px, ${target.y - hotspotY}px, 0)`;
