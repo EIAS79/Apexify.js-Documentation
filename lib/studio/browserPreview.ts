@@ -35,6 +35,7 @@ const SHAPES = new Set([
 ]);
 
 const MAX_REMOTE_IMAGE_BYTES = 8 * 1024 * 1024;
+const MAX_REMOTE_IMAGE_PIXELS = 12_000_000;
 const MAX_REMOTE_IMAGE_COUNT = 8;
 const REMOTE_IMAGE_TIMEOUT_MS = 8_000;
 
@@ -907,7 +908,12 @@ async function fetchRemoteImageBitmap(source: string): Promise<ImageBitmap> {
       throw new Error(`expected image content, received ${blob.type}`);
     }
 
-    return await createImageBitmap(blob);
+    const bitmap = await createImageBitmap(blob);
+    if (bitmap.width * bitmap.height > MAX_REMOTE_IMAGE_PIXELS) {
+      bitmap.close();
+      throw new Error('decoded image exceeds the 12 million pixel Live Canvas limit');
+    }
+    return bitmap;
   } finally {
     window.clearTimeout(timeout);
   }
