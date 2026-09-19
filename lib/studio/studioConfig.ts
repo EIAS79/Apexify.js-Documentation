@@ -105,8 +105,8 @@ export function composeStudioSnippetFromDocs(
 const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'group'> & { body: string }> = [
   {
     id: 'gradient-sunset',
-    name: 'Sunset gradient',
-    blurb: 'Linear sunset wash — the studio default.',
+    name: 'Slate / cobalt',
+    blurb: 'Calm Studio starter aligned with the current Apexify.js product surfaces.',
     group: 'Starter',
     body: `  const canvas = await painter.createCanvas({
     width: 960,
@@ -119,13 +119,74 @@ const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'gro
       endY: 540,
       rotate: 32,
       colors: [
-        { stop: 0, color: '#1a0f3d' },
-        { stop: 0.55, color: '#e91e8c' },
-        { stop: 1, color: '#e8941a' },
+        { stop: 0, color: '#0d1118' },
+        { stop: 0.58, color: '#17213a' },
+        { stop: 1, color: '#5269dc' },
       ],
     },
   });
   return canvas.buffer;`,
+  },
+  {
+    id: 'editorial-card',
+    name: 'Editorial system card',
+    blurb: 'Canvas + geometric shapes + typography in one composition.',
+    group: 'Starter',
+    body: `  const canvas = await painter.createCanvas({
+    width: 960,
+    height: 540,
+    colorBg: '#0d1118',
+  });
+
+  let output = await painter.createImage([
+    {
+      source: 'rectangle',
+      x: 56, y: 54, width: 848, height: 432,
+      borderRadius: 30,
+      shape: { fill: true, color: '#151c29' },
+      stroke: { color: '#2a3546', width: 2 },
+    },
+    {
+      source: 'circle',
+      x: 680, y: 84, width: 170, height: 170,
+      shape: { fill: true, color: '#6f86ff' },
+    },
+    {
+      source: 'rectangle',
+      x: 82, y: 398, width: 290, height: 12,
+      borderRadius: 6,
+      shape: { fill: true, color: '#7db8b0' },
+    },
+  ], canvas);
+
+  output = await painter.createText([
+    {
+      text: 'APEXIFY / LIVE',
+      x: 82, y: 112,
+      font: { size: 20, family: 'Arial' },
+      fill: { color: '#9dd2ca' },
+    },
+    {
+      text: 'Visual systems',
+      x: 82, y: 220,
+      font: { size: 72, family: 'Arial' },
+      fill: { color: '#eef2f6' },
+    },
+    {
+      text: 'from code.',
+      x: 82, y: 302,
+      font: { size: 64, family: 'Arial' },
+      fill: { color: '#8ea2ff' },
+    },
+    {
+      text: 'Canvas · shape · type',
+      x: 82, y: 448,
+      font: { size: 20, family: 'Arial' },
+      fill: { color: '#b8c2cf' },
+    },
+  ], output);
+
+  return output;`,
   },
   {
     id: 'aurora-iris',
@@ -203,8 +264,8 @@ const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'gro
       endX: 960,
       endY: 540,
       colors: [
-        { stop: 0, color: '#0c0826' },
-        { stop: 1, color: '#1d1750' },
+        { stop: 0, color: '#0d1118' },
+        { stop: 1, color: '#26344f' },
       ],
     },
     bgLayers: [
