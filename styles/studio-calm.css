@@ -1,0 +1,326 @@
+/* ==========================================================================
+   Apexify.js Studio — Calm Creative Workbench
+   Scoped to .apx-studio-root.
+   ========================================================================== */
+
+.apx-studio-root{
+  --studio-bg:#0d1118;
+  --studio-bg-2:#101722;
+  --studio-panel:#151c29;
+  --studio-panel-2:#1a2231;
+  --studio-panel-3:#202a3a;
+  --studio-line:#2a3546;
+  --studio-line-soft:#202a38;
+  --studio-text:#eef2f6;
+  --studio-text-2:#b8c2cf;
+  --studio-text-3:#7f8b9b;
+  --studio-blue:#6f86ff;
+  --studio-blue-2:#8ea2ff;
+  --studio-mint:#7db8b0;
+  --studio-mint-2:#9dd2ca;
+  --studio-lavender:#9b92cf;
+  --studio-action:#6f86ff;
+  --studio-action-ink:#0b0f15;
+
+  --bg-base:var(--studio-bg);
+  --bg-canvas:var(--studio-bg-2);
+  --bg-raised:var(--studio-panel);
+  --bg-elevated:var(--studio-panel-2);
+  --bg-sunken:var(--studio-panel-3);
+  --border-subtle:var(--studio-line-soft);
+  --border-default:var(--studio-line);
+  --border-strong:#3b485b;
+  --text-primary:var(--studio-text);
+  --text-secondary:var(--studio-text-2);
+  --text-tertiary:var(--studio-text-3);
+  --text-muted:#697586;
+  --text-inverse:#0b0f15;
+  --accent-iris:var(--studio-blue);
+  --accent-magenta:var(--studio-blue);
+  --accent-amber:var(--studio-mint);
+  --accent-coral:#7f92a8;
+  --accent-rose:var(--studio-lavender);
+  --success:#77c8a4;
+  --danger:#d67d86;
+  --warning:#cfb674;
+  --info:var(--studio-blue-2);
+  --ring:var(--studio-blue);
+  --gradient-sunset:linear-gradient(135deg,var(--studio-blue),#7899d9);
+  --gradient-iris:linear-gradient(135deg,var(--studio-blue),var(--studio-lavender));
+  --gradient-aurora:linear-gradient(135deg,var(--studio-blue),var(--studio-mint));
+  --gradient-twilight:linear-gradient(145deg,#0d1118 0%,#101722 56%,#151c29 100%);
+  --glow-magenta:none;
+  --glow-iris:none;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.18);
+  --shadow-md:0 12px 34px rgba(0,0,0,.22);
+  --shadow-lg:0 22px 60px rgba(0,0,0,.3);
+  --shadow-xl:0 30px 90px rgba(0,0,0,.4);
+
+  background:var(--studio-bg);
+  color:var(--studio-text);
+}
+
+.light .apx-studio-root{
+  --studio-bg:#eef1f4;
+  --studio-bg-2:#e8edf1;
+  --studio-panel:#f7f8fa;
+  --studio-panel-2:#ffffff;
+  --studio-panel-3:#e5eaf0;
+  --studio-line:#cbd4de;
+  --studio-line-soft:#dde3ea;
+  --studio-text:#141922;
+  --studio-text-2:#4e5a68;
+  --studio-text-3:#727f8f;
+  --studio-blue:#5269dc;
+  --studio-blue-2:#4058cc;
+  --studio-mint:#568c86;
+  --studio-mint-2:#43756f;
+  --studio-lavender:#7169a6;
+  --studio-action:#5269dc;
+  --studio-action-ink:#fff;
+  --text-inverse:#fff;
+  --gradient-twilight:linear-gradient(145deg,#eef1f4 0%,#e8edf1 55%,#f7f8fa 100%);
+  --shadow-md:0 12px 34px rgba(44,56,74,.12);
+  --shadow-lg:0 22px 60px rgba(44,56,74,.16);
+  --shadow-xl:0 30px 90px rgba(44,56,74,.2);
+}
+
+.apx-studio-root::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    linear-gradient(color-mix(in srgb,var(--studio-line) 22%,transparent) 1px,transparent 1px),
+    linear-gradient(90deg,color-mix(in srgb,var(--studio-line) 22%,transparent) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse at 50% 35%,black 10%,transparent 72%);
+  opacity:.45;
+}
+
+/* Top bar */
+.apx-studio-root > header{
+  min-height:4.4rem;
+  background:color-mix(in srgb,var(--studio-bg) 90%,transparent)!important;
+  border-bottom-color:var(--studio-line)!important;
+  box-shadow:none!important;
+}
+
+.apx-studio-root > header :where(button,a){
+  border-radius:.55rem;
+}
+
+.apx-studio-root .studio-run-cluster{
+  border-radius:.65rem!important;
+  background:var(--studio-panel)!important;
+}
+
+.studio-target-switch{
+  background:var(--studio-bg-2);
+  border:1px solid var(--studio-line-soft);
+}
+
+.studio-target-switch__button{
+  min-height:1.95rem;
+  padding:.35rem .6rem;
+  border-radius:.42rem;
+  color:var(--studio-text-3);
+  font:750 .62rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+  letter-spacing:.04em;
+  transition:background-color .14s ease,color .14s ease;
+}
+
+.studio-target-switch__button:hover:not(:disabled){
+  color:var(--studio-text);
+}
+
+.studio-target-switch__button[data-active]{
+  background:color-mix(in srgb,var(--studio-blue) 15%,var(--studio-panel));
+  color:var(--studio-blue-2);
+}
+
+.studio-target-switch__button:disabled{
+  opacity:.35;
+}
+
+/* Public execution note */
+.studio-runtime-note{
+  background:color-mix(in srgb,var(--studio-mint) 8%,var(--studio-bg-2));
+  border-bottom:1px solid color-mix(in srgb,var(--studio-mint) 28%,var(--studio-line));
+  color:var(--studio-text-2);
+  line-height:1.5;
+}
+
+.studio-runtime-note>svg{
+  color:var(--studio-mint);
+}
+
+.studio-runtime-note strong{
+  color:var(--studio-text);
+}
+
+.studio-runtime-note code{
+  color:var(--studio-mint-2);
+  font-size:.92em;
+}
+
+/* Main workbench */
+.apx-studio-root main>div{
+  border-radius:.75rem!important;
+  border-color:var(--studio-line)!important;
+  background:color-mix(in srgb,var(--studio-panel) 94%,transparent)!important;
+  box-shadow:var(--shadow-md)!important;
+  backdrop-filter:blur(12px)!important;
+}
+
+.apx-studio-root .gallery-snippet-editor-root{
+  background:#0d1118;
+}
+
+.apx-studio-root .gallery-snippet-editor-root .cm-editor{
+  border-radius:.45rem;
+  overflow:hidden;
+}
+
+.apx-studio-root .gallery-snippet-editor-root .cm-content{
+  padding-top:.65rem;
+}
+
+/* File tabs */
+.apx-studio-root [aria-label="Open snippets"]{
+  background:var(--studio-bg-2)!important;
+  border-color:var(--studio-line)!important;
+}
+
+.apx-studio-root [aria-label="Open snippets"]>div{
+  border-radius:.5rem .5rem 0 0!important;
+}
+
+/* Output panel */
+.studio-output-panel{
+  background:var(--studio-bg-2);
+}
+
+.studio-output-tabs{
+  background:color-mix(in srgb,var(--studio-panel) 80%,var(--studio-bg-2));
+  border-bottom:1px solid var(--studio-line);
+}
+
+.studio-output-tab{
+  color:var(--studio-text-3);
+  background:transparent;
+  box-shadow:none;
+}
+
+.studio-output-tab[data-active]{
+  color:var(--studio-text);
+  background:var(--studio-panel-2);
+  box-shadow:inset 0 0 0 1px var(--studio-line);
+}
+
+.studio-output-tab__badge{
+  padding:.15rem .4rem;
+  border-radius:999px;
+  background:var(--studio-line);
+  color:var(--studio-text-2);
+  font-size:.58rem;
+}
+
+.studio-diagnostics__notice{
+  padding:.8rem .9rem;
+  border:1px solid color-mix(in srgb,var(--warning) 35%,var(--studio-line));
+  border-radius:.55rem;
+  background:color-mix(in srgb,var(--warning) 7%,var(--studio-panel));
+  color:var(--studio-text-2);
+  font-size:.72rem;
+}
+
+.studio-diagnostics__notice>div{
+  display:flex;
+  align-items:center;
+  gap:.45rem;
+  color:var(--warning);
+}
+
+.studio-diagnostics__notice ul{
+  margin:.55rem 0 0 1rem;
+  list-style:disc;
+}
+
+.studio-diagnostics__notice li+li{
+  margin-top:.3rem;
+}
+
+.studio-history-card{
+  border:1px solid var(--studio-line);
+  background:var(--studio-panel);
+  color:var(--studio-text);
+  transition:border-color .15s ease,background-color .15s ease;
+}
+
+.studio-history-card:hover{
+  border-color:color-mix(in srgb,var(--studio-blue) 55%,var(--studio-line));
+  background:var(--studio-panel-2);
+}
+
+/* Preview checkerboard becomes cooler and quieter. */
+.apx-studio-root [aria-label="Studio output preview"]{
+  background:var(--studio-bg-2)!important;
+}
+
+/* Status bar */
+.apx-studio-root>footer{
+  min-height:2.2rem;
+  background:var(--studio-bg-2)!important;
+  border-top-color:var(--studio-line)!important;
+}
+
+/* Overlays and menus inherit the workbench palette. */
+.apx-studio-root [role="dialog"],
+.apx-studio-root [role="menu"]{
+  border-color:var(--studio-line)!important;
+}
+
+.apx-studio-root .kbd{
+  background:var(--studio-panel-3);
+  border-color:var(--studio-line);
+  color:var(--studio-text-2);
+}
+
+/* Narrow layouts */
+@media(max-width:1023px){
+  .apx-studio-root>header{
+    align-items:stretch;
+  }
+
+  .apx-studio-root .studio-run-cluster{
+    align-self:flex-start;
+  }
+}
+
+@media(max-width:767px){
+  .apx-studio-root>header{
+    max-height:12rem;
+    overflow-x:auto;
+  }
+
+  .apx-studio-root main{
+    padding:.5rem!important;
+  }
+
+  .studio-runtime-note{
+    font-size:.68rem;
+  }
+}
+
+@media(max-width:520px){
+  .studio-target-switch__button{
+    padding-inline:.45rem;
+  }
+
+  .apx-studio-root .studio-run-cluster{
+    width:100%;
+    overflow-x:auto;
+  }
+}
