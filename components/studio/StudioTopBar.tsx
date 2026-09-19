@@ -7,6 +7,7 @@ import {
   ArrowPathIcon,
   CodeBracketIcon,
   CommandLineIcon,
+  FolderOpenIcon,
   PhotoIcon,
   PlayIcon,
   QuestionMarkCircleIcon,
@@ -15,6 +16,7 @@ import {
   ViewColumnsIcon,
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
+import { BrandIcon } from '@/components/Brand';
 import {
   STUDIO_TEMPLATES,
   StudioLang,
@@ -22,18 +24,6 @@ import {
   LayoutMode,
 } from '@/lib/studio/studioConfig';
 
-
-function StudioMark() {
-  return (
-    <svg viewBox="0 0 64 64" aria-hidden className="h-full w-full">
-      <rect x="5" y="5" width="54" height="54" rx="9" fill="currentColor" opacity="0.05" />
-      <rect x="5.5" y="5.5" width="53" height="53" rx="8.5" fill="none" stroke="currentColor" opacity="0.28" />
-      <path d="M18 48 31 17h4l12 31h-6l-3-8H27l-3 8h-6Zm11-13h7l-3.4-9L29 35Z" fill="currentColor" />
-      <path d="M47 16H37v3h7v8h3V16ZM17 49h10v-3h-7v-8h-3v11Z" fill="var(--studio-blue)" />
-      <circle cx="48" cy="41" r="4" fill="var(--studio-mint)" />
-    </svg>
-  );
-}
 
 type TopBarProps = {
   layout: LayoutMode;
@@ -52,6 +42,8 @@ type TopBarProps = {
   shareCopied: boolean;
   onDownloadOutput: () => void;
   hasOutput: boolean;
+  assetCount: number;
+  onOpenAssets: () => void;
   onOpenPalette: () => void;
   onOpenShortcuts: () => void;
 };
@@ -262,6 +254,8 @@ export function StudioTopBar(props: TopBarProps) {
     shareCopied,
     onDownloadOutput,
     hasOutput,
+    assetCount,
+    onOpenAssets,
     onOpenPalette,
     onOpenShortcuts,
   } = props;
@@ -285,21 +279,14 @@ export function StudioTopBar(props: TopBarProps) {
           aria-label="Apexify.js — home"
           title="Back to home"
         >
-          <span
-            aria-hidden
-            className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover/logo:scale-105 sm:h-9 sm:w-9"
-            style={{ boxShadow: 'none' }}
-          >
-            <StudioMark />
+          <span className="inline-flex h-8 w-8 shrink-0 overflow-hidden rounded-lg sm:h-9 sm:w-9" aria-hidden>
+            <BrandIcon />
           </span>
-          <span className="hidden flex-col leading-tight sm:flex">
-            <span
-              className="text-[10px] font-semibold uppercase tracking-[0.28em]"
-              style={{ color: 'var(--text-tertiary)' }}
-            >
-              Apexify
+          <span className="hidden min-w-0 flex-col leading-tight sm:flex">
+            <span className="text-sm font-black tracking-tight">Apexify.js</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--studio-blue-2)' }}>
+              Studio
             </span>
-            <span className="text-sm font-bold" style={{ color: 'var(--studio-blue-2)' }}>Studio</span>
           </span>
         </Link>
 
@@ -410,6 +397,29 @@ export function StudioTopBar(props: TopBarProps) {
 
       {/* Right — Templates + utils */}
       <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={onOpenAssets}
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
+          style={{
+            border: '1px solid var(--border-default)',
+            color: assetCount ? 'var(--studio-mint)' : 'var(--text-primary)',
+            background: 'var(--bg-raised)',
+          }}
+          title="Manage temporary Studio assets"
+        >
+          <FolderOpenIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          <span>Assets</span>
+          {assetCount > 0 ? (
+            <span
+              className="grid min-w-5 place-items-center rounded-full px-1 text-[10px]"
+              style={{ background: 'var(--bg-sunken)', color: 'var(--studio-mint)' }}
+            >
+              {assetCount}
+            </span>
+          ) : null}
+        </button>
+
         <TemplatesMenu onLoad={onLoadTemplate} />
 
         <div
