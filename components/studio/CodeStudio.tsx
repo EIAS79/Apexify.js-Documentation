@@ -33,6 +33,7 @@ import {
   createBlankBuffer,
   makeId,
 } from '@/lib/studio/studioConfig';
+import { renderStudioBrowserPreview } from '@/lib/studio/browserPreview';
 import {
   bootstrapStudio,
   encodeShareLink,
@@ -54,12 +55,15 @@ export default function CodeStudio() {
   const [splitRatio, setSplitRatio] = useState(0.5);
 
   const [runnerEnabled, setRunnerEnabled] = useState(false);
+  const [executionTarget, setExecutionTarget] = useState<'browser' | 'node'>('browser');
   const [running, setRunning] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewMime, setPreviewMime] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [errorExitCode, setErrorExitCode] = useState<number | null>(null);
   const [elapsedMs, setElapsedMs] = useState<number | null>(null);
+  const [previewProvenance, setPreviewProvenance] = useState<'browser-generated' | 'server-generated' | undefined>(undefined);
+  const [previewWarnings, setPreviewWarnings] = useState<string[]>([]);
 
   const [outputTab, setOutputTab] = useState<OutputTab>('preview');
   const [history, setHistory] = useState<RunHistoryEntry[]>([]);
@@ -183,18 +187,73 @@ export default function CodeStudio() {
     }
   }, []);
 
-  /* ---------- run pipeline through shared ExecutionAdapter ---------- */
+  /* ---------- run pipeline: Live Canvas public preview + optional trusted-local Node ---------- */
 
   const runCode = useCallback(async () => {
     if (!activeBuffer) return;
     const code = lang === 'ts' ? activeBuffer.ts : activeBuffer.js;
-    if (!runnerEnabled || !code.trim() || running) return;
+    if (!code.trim() || running) return;
 
     setRunning(true);
     setError(null);
     setErrorExitCode(null);
+    setPreviewWarnings([]);
 
     try {
+      if (executionTarget === 'browser') {
+        const result = await renderStudioBrowserPreview(code);
+
+        if (!result.ok) {
+          revokePreview();
+          setPreviewUrl(null);
+          setPreviewMime(null);
+          setPreviewProvenance(undefined);
+          setError(result.error);
+          setElapsedMs(result.elapsedMs);
+          setOutputTab('terminal');
+          setHistory((cur) =>
+            pushRunHistory(
+              historyEntry(activeBuffer, lang, false, result.elapsedMs, null, result.error, null, null, code),
+              cur,
+            ),
+          );
+          return;
+        }
+
+        revokePreview();
+        setPreviewUrl(result.dataUrl);
+        setPreviewMime(result.mime);
+        setPreviewProvenance('browser-generated');
+        setPreviewWarnings(result.warnings);
+        setElapsedMs(result.elapsedMs);
+        setOutputTab('preview');
+
+        const base64 = result.dataUrl.split(',')[1] ?? '';
+        const thumb = base64 ? await makeThumbnail(result.mime, base64) : null;
+        setHistory((cur) =>
+          pushRunHistory(
+            historyEntry(activeBuffer, lang, true, result.elapsedMs, null, null, thumb, result.mime, code),
+            cur,
+          ),
+        );
+
+        if (result.warnings.length > 0) {
+          flashToast('warning', `Live Canvas rendered with ${result.warnings.length} unsupported operation${result.warnings.length === 1 ? '' : 's'}`);
+        }
+        return;
+      }
+
+      if (!runnerEnabled) {
+        const message = 'Trusted-local Node execution is unavailable on this deployment. Switch the run target to Live Canvas.';
+        setError(message);
+        setPreviewUrl(null);
+        setPreviewMime(null);
+        setPreviewProvenance(undefined);
+        setElapsedMs(null);
+        setOutputTab('terminal');
+        return;
+      }
+
       const result = await currentNodeServerExecutionAdapter.run({
         session: createInteractiveSession({
           source: code,
@@ -208,6 +267,7 @@ export default function CodeStudio() {
       if (result.status !== 'ready' || !result.output?.base64) {
         revokePreview();
         setPreviewUrl(null);
+        setPreviewProvenance(undefined);
         const primary = result.diagnostics[0];
         const message = primary?.message ?? 'Execution is unavailable.';
         const exitCode = primary?.code?.startsWith('EXIT_')
@@ -247,6 +307,7 @@ export default function CodeStudio() {
       previewObjectUrlRef.current = url;
       setPreviewUrl(url);
       setPreviewMime(mime);
+      setPreviewProvenance('server-generated');
       setErrorExitCode(null);
       const elapsed = result.elapsedMs ?? null;
       setElapsedMs(elapsed);
@@ -260,10 +321,12 @@ export default function CodeStudio() {
         ),
       );
     } catch (e) {
-      const message = e instanceof Error ? e.message : 'Network error';
+      const message = e instanceof Error ? e.message : 'Preview failed';
       setError(message);
       setErrorExitCode(null);
       setPreviewUrl(null);
+      setPreviewMime(null);
+      setPreviewProvenance(undefined);
       setElapsedMs(null);
       setOutputTab('terminal');
       setHistory((cur) =>
@@ -275,20 +338,29 @@ export default function CodeStudio() {
     } finally {
       setRunning(false);
     }
-  }, [activeBuffer, lang, runnerEnabled, running, revokePreview, makeThumbnail]);
+  }, [
+    activeBuffer,
+    lang,
+    executionTarget,
+    runnerEnabled,
+    running,
+    revokePreview,
+    makeThumbnail,
+    flashToast,
+  ]);
 
   const runCodeRef = useRef(runCode);
   runCodeRef.current = runCode;
 
   const scheduleAutoRun = useCallback(() => {
-    if (!autoRun || !runnerEnabled) return;
+    if (!autoRun) return;
     window.clearTimeout(autoRunTimerRef.current);
-    autoRunTimerRef.current = window.setTimeout(() => void runCodeRef.current(), 1300);
-  }, [autoRun, runnerEnabled]);
+    autoRunTimerRef.current = window.setTimeout(() => void runCodeRef.current(), 900);
+  }, [autoRun]);
 
-  /** Initial run occurs only after the explicit execution-adapter probe enables trusted-local mode. */
+  /** Initial Live Canvas preview is available publicly; Node remains opt-in trusted-local. */
   useEffect(() => {
-    if (!hydrated || !runnerEnabled || !activeBuffer) return;
+    if (!hydrated || !activeBuffer) return;
     let cancelled = false;
     const id = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -299,7 +371,7 @@ export default function CodeStudio() {
       cancelled = true;
       cancelAnimationFrame(id);
     };
-  }, [hydrated, runnerEnabled, activeBuffer?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [hydrated, activeBuffer?.id, executionTarget]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => () => revokePreview(), [revokePreview]);
   useEffect(
@@ -645,6 +717,8 @@ export default function CodeStudio() {
       onTabChange={setOutputTab}
       running={running}
       previewUrl={previewUrl}
+      previewProvenance={previewProvenance}
+      notices={previewWarnings}
       error={error}
       errorExitCode={errorExitCode}
       elapsedMs={elapsedMs}
@@ -656,7 +730,7 @@ export default function CodeStudio() {
 
   return (
     <div
-      className="relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden overscroll-none"
+      className="apx-studio-root relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden overscroll-none"
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
@@ -700,7 +774,9 @@ export default function CodeStudio() {
         lang={lang}
         onLangChange={setLang}
         running={running}
-        runnerEnabled={runnerEnabled}
+        nodeRunnerEnabled={runnerEnabled}
+        executionTarget={executionTarget}
+        onExecutionTargetChange={setExecutionTarget}
         autoRun={autoRun}
         onAutoRunChange={setAutoRun}
         onRun={() => void runCode()}
@@ -715,19 +791,13 @@ export default function CodeStudio() {
       />
 
       {!runnerEnabled && (
-        <div
-          className="flex shrink-0 items-center gap-2 px-3 py-2 text-xs sm:px-4"
-          style={{
-            backgroundColor: 'color-mix(in srgb, var(--warning) 14%, transparent)',
-            borderBottom: '1px solid color-mix(in srgb, var(--warning) 35%, transparent)',
-            color: 'var(--text-primary)',
-          }}
-        >
-          <ExclamationTriangleIcon className="h-4 w-4 shrink-0" style={{ color: 'var(--warning)' }} aria-hidden />
+        <div className="studio-runtime-note flex shrink-0 items-start gap-2 px-3 py-2 text-xs sm:px-4">
+          <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
-            Public arbitrary code execution is unavailable. Studio editing, reset, local state sharing,
-            and verified documentation outputs remain available. Execution can be enabled only in an
-            explicitly opted-in trusted local development process; it is not a security sandbox.
+            <strong>Live Canvas is active.</strong> Public Studio safely previews supported
+            <code> createCanvas()</code>, <code>createText()</code>, and shape-based
+            <code> createImage()</code> calls in your browser. Full Node execution remains available
+            only in explicitly trusted local development.
           </span>
         </div>
       )}
@@ -769,7 +839,8 @@ export default function CodeStudio() {
         charCount={charCount}
         autoRun={autoRun}
         onToggleAutoRun={() => setAutoRun((v) => !v)}
-        runnerEnabled={runnerEnabled}
+        nodeRunnerEnabled={runnerEnabled}
+        executionTarget={executionTarget}
         running={running}
         lastError={!!error}
         elapsedMs={elapsedMs}
