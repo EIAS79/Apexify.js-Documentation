@@ -269,6 +269,12 @@ const componentMembers = componentFactories().map((name) => ({
 const artifact = {
   schemaVersion: 1,
   packagePin: packageJson.dependencies?.['apexify.js'] ?? null,
+  browserRuntime: {
+    package: '@apexify/web',
+    sourceRepository: 'EIAS79/Apexify.js',
+    sourceCommit: '7f7c9bf1bc742ef851e143142f1fe7b60f2682b2',
+    installation: 'integrity-checked-build-snapshot',
+  },
   declaration: path.relative(root, declaration).replaceAll(path.sep, '/'),
   topLevel: {
     methods: methodRows,

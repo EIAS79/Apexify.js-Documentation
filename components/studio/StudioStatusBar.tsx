@@ -43,11 +43,11 @@ export function StudioStatusBar(props: Props) {
 
   const isBrowser = executionTarget === 'browser';
   const executionLabel = running
-    ? isBrowser ? 'Live Canvas · rendering' : 'Full runtime · running'
+    ? isBrowser ? '@apexify/web · rendering' : 'Full runtime · running'
     : lastError
-      ? isBrowser ? 'Live Canvas · error' : 'Full runtime · error'
+      ? isBrowser ? '@apexify/web · error' : 'Full runtime · error'
       : isBrowser
-        ? 'Live Canvas · ready'
+        ? '@apexify/web · ready'
         : nodeRunnerEnabled
           ? 'Full runtime · ready'
           : 'Full runtime · unavailable';

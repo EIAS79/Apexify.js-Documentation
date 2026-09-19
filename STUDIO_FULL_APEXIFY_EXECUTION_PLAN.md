@@ -12,7 +12,7 @@
 > - [x] STUDIO-6 raster/chart/scene parity implementation complete: all Phase-6 families have an execution route, buffer identity is preserved through the real runtime, structured/non-raster results are collected safely, and representative Studio templates cover scenes/components/assets/templates, image utilities, path/pixels/detect, batch/chain, plus chart-buffer reuse. Isolated production execution proof is intentionally deferred to the final validation pass and STUDIO-4 deployment.
 > - [x] STUDIO-7 GIF/animation/audio implementation complete: GIF result variants, animation frame collections, WAV metadata, full procedural-audio families, scene-to-GIF, media previews, and representative templates all use the real full-runtime path. Final execution proofs are deferred to the end-of-program validation pass.
 > - [x] STUDIO-8 video implementation complete: pinned FFmpeg/ffprobe, narrowly mediated same-origin media subprocesses, createVideo/videoPipeline/probing/extraction/scene-video routing, video metadata/player UI, ordered frame collections, and representative templates are implemented. Final deployment/runtime proofs are deferred to the end-of-program validation pass.
-> - [ ] STUDIO-9 real `@apexify/web` migration when that package/runtime ships
+> - [x] STUDIO-9 `@apexify/web` migration complete for Studio: the first-party browser runtime now lives in Apexify.js, Studio installs a commit-pinned integrity-checked source snapshot, browser runs call the package runtime/font manager directly, and the former local renderer is only a compatibility re-export. The broader Apexify.js Phase 20–25 retained/realtime program remains separate from this Studio migration.
 > - [~] STUDIO-10 completeness matrix now covers top-level ApexPainter methods plus audio/image/detect/path/pixels/output/assets/plugins/video facet members and component factories; per-capability execution proofs remain
 >
 > Goal: make Studio an online Apexify.js coding and media-manipulation environment. A user writes normal Apexify.js code, presses **Run**, and Studio executes the required Apexify feature with the correct runtime and previews the result. Host-side persistence APIs such as `save()` / `saveMultiple()` are not part of the Studio execution target.
@@ -36,8 +36,9 @@ editor source
 capability analyzer
    |
    +--> browser-direct runtime
-   |      - current Live Canvas compatibility renderer
-   |      - replaced by @apexify/web as the browser engine lands
+   |      - real @apexify/web package source
+   |      - browser Canvas2D/image/chart/font execution
+   |      - package capability inspection + lifecycle
    |
    +--> full Apexify runtime
           - same-origin isolated backend
@@ -57,7 +58,7 @@ unified artifact protocol
    +--> text / diagnostics
 ```
 
-The current `browserPreview.ts` is compatibility infrastructure only. It must not become a second implementation of the complete Apexify.js API.
+`lib/studio/browserPreview.ts` is now only a compatibility re-export. The browser renderer implementation is owned by `@apexify/web` in the Apexify.js repository and is installed into the documentation build as an integrity-checked commit-pinned source snapshot.
 
 ## 3. Non-goals
 
@@ -326,11 +327,26 @@ There is no remaining STUDIO-8 implementation item. Media-binary/runtime executi
 
 ### STUDIO-9 — @apexify/web migration
 
-As the browser-native renderer from the Apexify.js phases lands:
+Status: **complete for Studio**.
 
-- replace browser source interpretation with the real browser package;
-- use Canvas2D/OffscreenCanvas/ImageBitmap/FontFace/Web Audio/WebCodecs per the Browser Realtime Renderer specification;
-- keep the full isolated runtime only for features that truly require Node/native/FFmpeg semantics.
+Delivered:
+
+- a real first-party `@apexify/web` package source now exists under `packages/web` in the Apexify.js repository;
+- the package has zero runtime npm dependencies and does not import Node/native Apexify runtime code;
+- Studio pins the browser package to Apexify.js commit `7f7c9bf1bc742ef851e143142f1fe7b60f2682b2`;
+- `scripts/studio/install-apexify-web.mjs` downloads only the required package files and verifies their exact Git blob SHA-1 identities before installation;
+- the generated package snapshot lives under `vendor/apexify-web/` and is excluded from source control;
+- TypeScript and webpack resolve the package through the real `@apexify/web` package identity;
+- Studio's browser path creates an `ApexifyWebRuntime`, delegates browser font registration to the package, and executes browser previews through the package runtime;
+- the runtime exposes browser capability inspection for Canvas2D, OffscreenCanvas, ImageBitmap, FontFace, Web Audio, WebCodecs and DPR;
+- uploaded `studio://asset/<id>` image sources remain supported by the package browser renderer;
+- remote browser images continue to use browser-native fetch/CORS behavior and bounded preview limits rather than a hidden proxy;
+- stable browser chart families remain on the package browser path;
+- advanced scenes, GIF/audio/video, image utilities, plugins, host-sensitive work and other Node/native semantics continue to route automatically to the same-origin isolated full runtime;
+- `lib/studio/browserPreview.ts` no longer owns renderer logic and exists only as a backwards-compatible re-export;
+- Studio UI/status/provenance language identifies `@apexify/web` rather than the legacy “Live Canvas” implementation name.
+
+This completes the **Studio migration boundary**. It does not claim that the wider Apexify.js Phase 20–25 retained-mode/realtime renderer, React adapter, Next adapter, generalized browser animation system, worker architecture, or WebCodecs program is complete; those are engine-program phases outside STUDIO-9.
 
 ### STUDIO-10 — Completeness gate
 
@@ -363,7 +379,7 @@ A release is incomplete when a new render/manipulation API is public in Apexify.
 
 At the start of this program:
 
-- browser execution supports a useful subset through `browserPreview.ts`;
+- browser execution uses the pinned first-party `@apexify/web` package; the old `browserPreview.ts` implementation has been retired to a compatibility re-export;
 - trusted-local execution exists but historically only accepted PNG/GIF and intentionally blocked video;
 - production arbitrary execution is disabled;
 - output UI is image-centric.

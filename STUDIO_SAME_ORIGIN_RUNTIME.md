@@ -79,7 +79,7 @@ User code therefore gets video support without a general host process bridge.
 
 ## Network policy
 
-Browser-direct Studio may fetch normal HTTP(S) images for APIs supported by Live Canvas.
+Browser-direct Studio may fetch normal HTTP(S) images for APIs supported by @apexify/web.
 
 The same-origin full runtime has no arbitrary outbound network permission. Full-runtime external image/audio/video/font input uses uploaded Studio Assets and `studio://asset/<id>`.
 

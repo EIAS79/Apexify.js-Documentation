@@ -1,6 +1,12 @@
 {
   "schemaVersion": 1,
   "packagePin": "github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b",
+  "browserRuntime": {
+    "package": "@apexify/web",
+    "sourceRepository": "EIAS79/Apexify.js",
+    "sourceCommit": "7f7c9bf1bc742ef851e143142f1fe7b60f2682b2",
+    "installation": "integrity-checked-build-snapshot"
+  },
   "declaration": "node_modules/apexify.js/dist/declarations/apex-painter/main.d.ts",
   "topLevel": {
     "methods": [
@@ -178,12 +184,6 @@
     "missingMethods": [],
     "missingFacets": []
   },
-  "excludedFromStudioManipulation": [
-    "save",
-    "saveMultiple",
-    "createAudio.save"
-  ],
-  "complete": true,
   "facetMembers": {
     "createAudio": {
       "declaration": "PainterCreateAudio",
@@ -568,5 +568,11 @@
       "method": "toLayers",
       "route": "full-runtime"
     }
-  ]
+  ],
+  "excludedFromStudioManipulation": [
+    "save",
+    "saveMultiple",
+    "createAudio.save"
+  ],
+  "complete": true
 }

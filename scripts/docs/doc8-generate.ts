@@ -15,6 +15,12 @@ const artifacts: Record<string, unknown> = {
     phase: 'DOC-8',
     baseDocumentationSha: '8424834aa0334044b5603bf88406f0a1fa10a396',
     packagePin: packageJson.dependencies?.['apexify.js'],
+    studioBrowserRuntime: {
+      package: '@apexify/web',
+      sourceRepository: 'EIAS79/Apexify.js',
+      sourceCommit: '7f7c9bf1bc742ef851e143142f1fe7b60f2682b2',
+      integration: 'integrity-checked-build-snapshot',
+    },
     representativeInteractiveSurface: {
       exampleId: 'node.canvas.basic',
       documentationRoute: '/docs/node/canvas',

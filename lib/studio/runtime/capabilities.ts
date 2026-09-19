@@ -193,8 +193,9 @@ type BrowserGeneratedBinding = {
 };
 
 /**
- * Browser-direct rendering preserves createChart() buffer identity. Auxiliary
- * canvas/image/text buffers reused later as image sources need the real runtime.
+ * @apexify/web preserves the browser-direct createChart() identity path used by Studio. Auxiliary
+ * canvas/image/text buffers reused later as image sources still route to the full runtime until those
+ * buffer-identity semantics land in the browser package.
  */
 function browserGeneratedMediaReuse(source: string): BrowserGeneratedBinding[] {
   const bindings: BrowserGeneratedBinding[] = [];
@@ -251,14 +252,14 @@ export function planStudioExecution(source: string): StudioExecutionPlan {
     if (!re.test(scanned)) continue;
     addFamily(families, family);
     needsFullRuntime = true;
-    reasons.push(method + '() requires the full Apexify runtime in the current Studio implementation.');
+    reasons.push(method + '() requires the full Apexify runtime in the current @apexify/web/full-runtime split.');
   }
 
   for (const [pattern, family, reason] of facetPatterns) {
     if (!pattern.test(scanned)) continue;
     addFamily(families, family);
     needsFullRuntime = true;
-    reasons.push(reason + ' requires the full Apexify runtime in the current Studio implementation.');
+    reasons.push(reason + ' requires the full Apexify runtime in the current @apexify/web/full-runtime split.');
   }
 
   const generatedReuse = browserGeneratedMediaReuse(scanned);
@@ -274,12 +275,11 @@ export function planStudioExecution(source: string): StudioExecutionPlan {
     }
   }
 
-  // Imports beyond apexify.js are a full-runtime concern. The browser compatibility
-  // renderer intentionally does not execute arbitrary modules.
+  // Imports beyond apexify.js are a full-runtime concern. The @apexify/web Studio runtime intentionally does not execute arbitrary non-Apexify modules.
   const nonApexImport = /\b(?:import\s+(?:[^'"]+\s+from\s+)?|require\s*\()\s*['"](?!apexify\.js['"])[^'"]+['"]/;
   if (nonApexImport.test(scanned)) {
     needsFullRuntime = true;
-    reasons.push('The snippet imports a module that is not executed by the browser compatibility renderer.');
+    reasons.push('The snippet imports a module that is not executed by the @apexify/web Studio runtime.');
   }
 
   if (hostPersistenceOnly.length) {

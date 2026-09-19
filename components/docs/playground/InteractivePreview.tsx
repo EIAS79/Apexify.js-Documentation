@@ -21,7 +21,7 @@ export function InteractivePreview({
       : provenance === 'server-generated'
         ? 'Server-generated output'
         : provenance === 'browser-generated'
-          ? 'Live Canvas output'
+          ? '@apexify/web output'
           : provenance === 'static'
           ? 'Static preview'
           : null;

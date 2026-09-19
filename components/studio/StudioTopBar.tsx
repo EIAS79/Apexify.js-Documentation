@@ -354,7 +354,7 @@ export function StudioTopBar(props: TopBarProps) {
             }}
           />
           <span>
-            {executionTarget === 'browser' ? 'Live Canvas' : 'Full runtime'}
+            {executionTarget === 'browser' ? '@apexify/web' : 'Full runtime'}
           </span>
           <span className="hidden text-[10px] font-medium sm:inline" style={{ color: 'var(--text-tertiary)' }}>
             auto

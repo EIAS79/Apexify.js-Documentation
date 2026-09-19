@@ -46,3 +46,6 @@ next-env.d.ts
 /vendor/studio-deno/
 
 /vendor/studio-ffmpeg/
+
+# pinned @apexify/web source snapshot installed at build time
+/vendor/apexify-web/

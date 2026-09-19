@@ -98,7 +98,7 @@ export interface ExecutionAdapter {
   dispose?(): Promise<void>;
 }
 
-/** Contract only. DOC-8/DOC-10 do not import or implement @apexify/web. */
+/** Shared browser-runtime contract. Studio uses the pinned @apexify/web implementation; ordinary DOC-8 examples remain independently gated. */
 export interface WebRuntimeAdapter {
   mount(target: HTMLElement, session: InteractiveSession): Promise<void>;
   update(session: InteractiveSession): Promise<void>;

@@ -45,7 +45,7 @@ export type RunHistoryEntry = {
 
 /* ----------------------------------------------------------------- *
  *  Studio templates. Browser-direct templates intentionally exercise the
- *  current Live Canvas contract; advanced media templates can route to the
+ *  current @apexify/web browser contract; advanced media templates route to the
  *  full Apexify runtime automatically.
  * ----------------------------------------------------------------- */
 

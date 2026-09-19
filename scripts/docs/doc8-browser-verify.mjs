@@ -120,7 +120,7 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
     await page.waitForSelector('[data-doc8-primitive="workspace"]');
     await page.waitForSelector('[data-doc8-primitive="preview"]');
     const bodyText = await page.evaluate(() => document.body.textContent || '');
-    if (!bodyText.includes('Live Canvas')) {
+    if (!bodyText.includes('@apexify/web')) {
       throw new Error(`${name}: Studio browser-direct runtime disclosure missing`);
     }
     if (!bodyText.includes('auto')) {

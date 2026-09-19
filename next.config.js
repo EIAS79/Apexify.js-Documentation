@@ -1,3 +1,5 @@
+const path = require('node:path')
+
 /**
  * Native / sibling optional deps are never pulled in by static analysis alone.
  * Covers Vercel Linux **glibc + musl**, **x64 + arm64** (match lockfile package names).
@@ -56,6 +58,13 @@ const nextConfig = {
     },
   },
   webpack: (config, { dev, isServer }) => {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias['@apexify/web'] = path.resolve(
+      __dirname,
+      'vendor/apexify-web/src/index.ts'
+    );
+
     // Windows dev: HMR + antivirus can delete numbered chunk files while webpack-runtime still references them
     // (`Cannot find module './276.js'`). Disable chunk splitting in dev + avoid `next/dynamic` on /gallery for fewer async chunks.
     if (dev) {

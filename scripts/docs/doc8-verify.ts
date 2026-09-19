@@ -29,6 +29,10 @@ const studioOutput = read('components/studio/StudioOutputPanel.tsx');
 const studioStorage = read('lib/studio/studioStorage.ts');
 const studioTerminal = read('lib/studio/studioRunnerTerminal.ts');
 const studioBrowserPreview = read('lib/studio/browserPreview.ts');
+const apexifyWebPreview = read('vendor/apexify-web/src/studio-preview.ts');
+const apexifyWebIndex = read('vendor/apexify-web/src/index.ts');
+const apexifyWebSource = JSON.parse(read('vendor/apexify-web/SOURCE.json')) as { commit?: string };
+const apexifyWebInstaller = read('scripts/studio/install-apexify-web.mjs');
 const studioPreviewZoom = read('components/studio/StudioPreviewZoom.tsx');
 const runnerWrapper = read('lib/gallery/core/wrapSnippetForRunner.ts');
 const codePreview = read('components/examples/CodePreview.tsx');
@@ -93,7 +97,10 @@ requireCheck(docsNavigationChrome.includes('prefetch={docsPrefetch(item.href)}')
 
 requireCheck(contracts.includes("mode: 'verified-static' | 'server-backed' | 'future-browser'"), 'Execution modes must remain explicit.');
 requireCheck(contracts.includes('interface WebRuntimeAdapter'), 'Future WebRuntimeAdapter contract missing.');
-requireCheck(!contracts.includes("from '@apexify/web'"), 'DOC-8 must not import nonexistent @apexify/web runtime.');
+requireCheck(
+  !contracts.includes("from '@apexify/web'"),
+  'Shared contracts must stay package-neutral even though Studio now consumes @apexify/web.',
+);
 requireCheck(session.includes('shareStateBytes'), 'Share serializer must enforce the shared size limit.');
 requireCheck(executionAdapter.includes("const ENDPOINT = '/api/gallery/run'"), 'Server-backed endpoint ownership must remain inside the execution adapter.');
 requireCheck(executionAdapter.includes("mode: 'server-backed'"), 'Server-backed adapter mode missing.');
@@ -134,10 +141,17 @@ requireCheck(!galleryModal.includes('sandbox output'), 'Gallery alt text must no
 requireCheck(galleryModal.includes('useState(false)'), 'Gallery execution availability must fail closed.');
 requireCheck(galleryModal.includes('setRunnerEnabled(false)'), 'Gallery availability probe failures must keep execution disabled.');
 requireCheck(!studioTerminal.includes('(sandbox)'), 'Studio diagnostics must not label temporary paths as a sandbox.');
-requireCheck(studioBrowserPreview.includes("'createChart'"), 'Live Canvas must expose createChart() as a supported browser preview API.');
-requireCheck(studioBrowserPreview.includes("type === 'hexagons'"), 'Live Canvas must keep the procedural hexagon pattern renderer.');
-requireCheck(studioBrowserPreview.includes('config.patternBg'), 'Live Canvas must render top-level canvas patternBg.');
-requireCheck(studioBrowserPreview.includes("chartType === 'radar'") && studioBrowserPreview.includes("chartType === 'polarArea'"), 'Live Canvas must cover all stable createChart() families.');
+requireCheck(studio.includes("from '@apexify/web'"), 'Studio browser execution must import the real @apexify/web runtime.');
+requireCheck(studioBrowserPreview.includes("from '@apexify/web'"), 'Legacy browserPreview must be a thin @apexify/web compatibility bridge.');
+requireCheck(studioBrowserPreview.length < 1000, 'Legacy browserPreview must not retain a duplicate browser renderer implementation.');
+requireCheck(apexifyWebPreview.includes("'createChart'"), '@apexify/web must expose createChart() in the Studio browser renderer.');
+requireCheck(apexifyWebPreview.includes("type === 'hexagons'"), '@apexify/web must keep the procedural hexagon pattern renderer.');
+requireCheck(apexifyWebPreview.includes('config.patternBg'), '@apexify/web must render top-level canvas patternBg.');
+requireCheck(apexifyWebPreview.includes("chartType === 'radar'") && apexifyWebPreview.includes("chartType === 'polarArea'"), '@apexify/web must cover all stable createChart() families.');
+requireCheck(apexifyWebIndex.includes('class ApexifyWebRuntime'), '@apexify/web runtime lifecycle class missing.');
+requireCheck(apexifyWebIndex.includes('registerApexifyWebFonts'), '@apexify/web font manager missing.');
+requireCheck(apexifyWebSource.commit === '7f7c9bf1bc742ef851e143142f1fe7b60f2682b2', '@apexify/web source snapshot is not pinned to the approved engine commit.');
+requireCheck(apexifyWebInstaller.includes('Integrity mismatch for @apexify/web'), '@apexify/web installer must verify source integrity.');
 requireCheck(studioPreviewZoom.includes('requestFullscreen()'), 'Studio preview must expose real fullscreen mode.');
 requireCheck(studioPreviewZoom.includes('cursor-grab') && studioPreviewZoom.includes('scrollLeft'), 'Studio preview must preserve drag-to-pan behavior.');
 requireCheck(studioPreviewZoom.includes('applyFitToView') && studioPreviewZoom.includes('resetView'), 'Studio preview must preserve fit and reset controls.');

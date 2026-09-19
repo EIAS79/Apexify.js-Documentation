@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { createApexifyWebRuntime, type ApexifyWebRuntime } from '@apexify/web';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   InformationCircleIcon,
@@ -35,11 +36,9 @@ import {
   createBlankBuffer,
   makeId,
 } from '@/lib/studio/studioConfig';
-import { renderStudioBrowserPreview } from '@/lib/studio/browserPreview';
 import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
 import {
   loadPersistedStudioAssets,
-  registerStudioBrowserFonts,
   savePersistedStudioAssets,
   type StudioVirtualAsset,
 } from '@/lib/studio/runtime/assets';
@@ -86,6 +85,7 @@ export default function CodeStudio() {
   const [shareCopied, setShareCopied] = useState(false);
 
   const previewObjectUrlsRef = useRef<string[]>([]);
+  const webRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
   const autoRunTimerRef = useRef<number>(0);
   const toastTimerRef = useRef<number>(0);
 
@@ -171,6 +171,13 @@ export default function CodeStudio() {
       // IndexedDB persistence is best-effort; the in-memory Studio session remains usable.
     });
   }, [assetStorageReady, assets]);
+
+  useEffect(() => {
+    return () => {
+      webRuntimeRef.current?.dispose();
+      webRuntimeRef.current = null;
+    };
+  }, []);
 
   /* ---------- execution-adapter availability probe ---------- */
 
@@ -295,10 +302,12 @@ export default function CodeStudio() {
       }
 
       if (target === 'browser') {
-        const fontResults = await registerStudioBrowserFonts(assets);
+        const webRuntime =
+          webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
+        const fontResults = await webRuntime.registerFonts(assets);
         const failedFonts = fontResults.filter((font) => !font.ok);
 
-        const result = await renderStudioBrowserPreview(code, assets);
+        const result = await webRuntime.renderStudioSource(code, assets);
 
         if (!result.ok) {
           revokePreview();
@@ -318,7 +327,7 @@ export default function CodeStudio() {
         revokePreview();
         const browserArtifact: StudioPreviewArtifact = {
           id: 'browser-preview',
-          name: 'Live Canvas output.png',
+          name: '@apexify/web output.png',
           kind: 'image',
           mime: result.mime,
           url: result.dataUrl,
@@ -345,7 +354,7 @@ export default function CodeStudio() {
         if (result.warnings.length > 0) {
           flashToast(
             'warning',
-            `Live Canvas rendered with ${result.warnings.length} note${result.warnings.length === 1 ? '' : 's'}`,
+            `@apexify/web rendered with ${result.warnings.length} note${result.warnings.length === 1 ? '' : 's'}`,
           );
         }
         return;
@@ -354,7 +363,7 @@ export default function CodeStudio() {
       if (!runnerEnabled) {
         const details = plan.reasons.length ? ' ' + plan.reasons.join(' ') : '';
         const message =
-          'This snippet requires the full Apexify runtime, but no isolated/full executor is connected on this deployment.' +
+          'This snippet requires the full Apexify runtime, but the built-in same-origin isolated runtime is unavailable on this deployment.' +
           details;
         revokePreview();
         setPreviewProvenance(undefined);
