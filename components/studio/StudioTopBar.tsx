@@ -14,7 +14,6 @@ import {
   SparklesIcon,
   ViewColumnsIcon,
 } from '@heroicons/react/24/outline';
-import { BrandIcon } from '@/components/Brand';
 import ThemeToggle from '@/components/ThemeToggle';
 import {
   STUDIO_TEMPLATES,
@@ -22,6 +21,19 @@ import {
   StudioTemplate,
   LayoutMode,
 } from '@/lib/studio/studioConfig';
+
+
+function StudioMark() {
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden className="h-full w-full">
+      <rect x="5" y="5" width="54" height="54" rx="9" fill="currentColor" opacity="0.05" />
+      <rect x="5.5" y="5.5" width="53" height="53" rx="8.5" fill="none" stroke="currentColor" opacity="0.28" />
+      <path d="M18 48 31 17h4l12 31h-6l-3-8H27l-3 8h-6Zm11-13h7l-3.4-9L29 35Z" fill="currentColor" />
+      <path d="M47 16H37v3h7v8h3V16ZM17 49h10v-3h-7v-8h-3v11Z" fill="var(--studio-blue)" />
+      <circle cx="48" cy="41" r="4" fill="var(--studio-mint)" />
+    </svg>
+  );
+}
 
 type TopBarProps = {
   layout: LayoutMode;
@@ -189,7 +201,7 @@ function TemplatesMenu({ onLoad }: { onLoad: (t: StudioTemplate) => void }) {
               <li key={group} className="px-1.5">
                 <p
                   className="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider"
-                  style={{ color: 'var(--accent-magenta)' }}
+                  style={{ color: 'var(--studio-mint)' }}
                 >
                   {group}
                 </p>
@@ -280,7 +292,7 @@ export function StudioTopBar(props: TopBarProps) {
             className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl transition-transform duration-300 group-hover/logo:scale-105 sm:h-9 sm:w-9"
             style={{ boxShadow: 'none' }}
           >
-            <BrandIcon />
+            <StudioMark />
           </span>
           <span className="hidden flex-col leading-tight sm:flex">
             <span
