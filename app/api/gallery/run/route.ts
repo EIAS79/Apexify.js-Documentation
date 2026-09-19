@@ -59,24 +59,28 @@ function isLocalRunnerEnabled(): boolean {
   return process.env.NODE_ENV !== 'production' && process.env.ENABLE_LOCAL_APEXIFY_CODE_RUN === 'true';
 }
 
-function remoteExecutorConfig(): { url: string; token?: string } | null {
+function remoteExecutorConfig(): { url: string; token: string } | null {
   const raw = process.env.STUDIO_EXECUTOR_URL?.trim();
-  if (!raw) return null;
+  const token = process.env.STUDIO_EXECUTOR_TOKEN?.trim();
+  if (!raw || !token) return null;
 
   try {
     const parsed = new URL(raw);
-    if (parsed.protocol !== 'https:' && parsed.hostname !== '127.0.0.1' && parsed.hostname !== 'localhost') {
+    if (
+      parsed.protocol !== 'https:' &&
+      parsed.hostname !== '127.0.0.1' &&
+      parsed.hostname !== 'localhost'
+    ) {
       return null;
     }
     return {
       url: parsed.toString().replace(/\/$/, ''),
-      token: process.env.STUDIO_EXECUTOR_TOKEN?.trim() || undefined,
+      token,
     };
   } catch {
     return null;
   }
 }
-
 function availability() {
   if (isLocalRunnerEnabled()) {
     return { enabled: true, mode: 'trusted-local' as const };
@@ -91,7 +95,7 @@ export async function GET() {
   return NextResponse.json(availability());
 }
 
-async function proxyToRemoteExecutor(body: RunBody, config: { url: string; token?: string }) {
+async function proxyToRemoteExecutor(body: RunBody, config: { url: string; token: string }) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DOC8_RESOURCE_LIMITS.executionMs + 5_000);
 
@@ -100,7 +104,7 @@ async function proxyToRemoteExecutor(body: RunBody, config: { url: string; token
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(config.token ? { Authorization: `Bearer ${config.token}` } : {}),
+        Authorization: `Bearer ${config.token}`,
       },
       body: JSON.stringify({
         code: body.code,
@@ -218,6 +222,14 @@ function validateStudioAssets(value: unknown): StudioVirtualAsset[] {
       mime: entry.mime.slice(0, 160),
       size: bytes.length,
       base64: entry.base64,
+      metadata:
+        entry.metadata && typeof entry.metadata === 'object'
+          ? {
+              width: typeof entry.metadata.width === 'number' ? entry.metadata.width : undefined,
+              height: typeof entry.metadata.height === 'number' ? entry.metadata.height : undefined,
+              duration: typeof entry.metadata.duration === 'number' ? entry.metadata.duration : undefined,
+            }
+          : undefined,
     });
   }
 
@@ -332,6 +344,7 @@ async function runStudioLocal({
   const dir = join(tmpdir(), `apexify-studio-run-${randomUUID()}`);
   const artifactDir = join(dir, 'artifacts');
   const manifestPath = join(dir, 'studio-manifest.json');
+  const assetManifestPath = join(dir, 'studio-assets.json');
   const errPath = join(dir, 'err.txt');
   const entry = join(dir, 'snippet.ts');
 
@@ -355,6 +368,24 @@ async function runStudioLocal({
   }
 
   const assetRefs = materializeStudioAssets(dir, assets);
+  writeFileSync(
+    assetManifestPath,
+    JSON.stringify(
+      {
+        schemaVersion: 1,
+        assets: assets.map((asset) => ({
+          id: asset.id,
+          name: asset.name,
+          mime: asset.mime,
+          path: assetRefs.get(`studio://asset/${asset.id}`) ?? null,
+        })),
+      },
+      null,
+      2,
+    ),
+    'utf8',
+  );
+
   const executableCode = rewriteStudioAssetReferences(code, assetRefs);
   writeFileSync(
     entry,
@@ -374,6 +405,7 @@ async function runStudioLocal({
         GALLERY_ERR: errPath,
         STUDIO_ARTIFACT_DIR: artifactDir,
         STUDIO_MANIFEST: manifestPath,
+        STUDIO_ASSET_MANIFEST: assetManifestPath,
       }),
     });
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { InteractiveCodeEditor } from '@/components/docs/playground/InteractiveCodeEditor';
+import type { EditorInsertRequest } from '@/components/docs/playground/CodeMirrorEditor';
 
 /**
  * Compatibility wrapper retained because Gallery and Studio already import this name.
@@ -12,11 +13,13 @@ export function GallerySnippetEditor({
   codeLang,
   onChange,
   fillParent = false,
+  insertRequest = null,
 }: {
   value: string;
   codeLang: 'ts' | 'js';
   onChange: (next: string) => void;
   fillParent?: boolean;
+  insertRequest?: EditorInsertRequest | null;
 }) {
   return (
     <InteractiveCodeEditor
@@ -25,6 +28,7 @@ export function GallerySnippetEditor({
       onChange={onChange}
       fillParent={fillParent}
       ariaLabel="Apexify source editor"
+      insertRequest={insertRequest}
     />
   );
 }

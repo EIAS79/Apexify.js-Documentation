@@ -1,7 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
+  ArrowDownOnSquareIcon,
   ArrowUpTrayIcon,
   ClipboardDocumentIcon,
   DocumentIcon,
@@ -13,6 +14,9 @@ import {
 import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
+  isStudioFontAsset,
+  studioAssetDataUrl,
+  studioAssetFontFamily,
   studioAssetQuotedReference,
   totalStudioAssetBytes,
   type StudioVirtualAsset,
@@ -21,6 +25,7 @@ import {
 type Props = {
   assets: StudioVirtualAsset[];
   onChange: (next: StudioVirtualAsset[]) => void;
+  onInsertReference: (text: string) => void;
   onNotice: (kind: 'info' | 'success' | 'warning', text: string) => void;
 };
 
@@ -30,6 +35,24 @@ function formatBytes(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function formatDuration(value: number | undefined): string | null {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return null;
+  const minutes = Math.floor(value / 60);
+  const seconds = Math.floor(value % 60);
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
+
+function metadataLabel(asset: StudioVirtualAsset): string {
+  const bits = [asset.mime, formatBytes(asset.size)];
+  if (asset.metadata?.width && asset.metadata?.height) {
+    bits.push(`${asset.metadata.width}×${asset.metadata.height}`);
+  }
+  const duration = formatDuration(asset.metadata?.duration);
+  if (duration) bits.push(duration);
+  if (isStudioFontAsset(asset)) bits.push(`family: ${studioAssetFontFamily(asset)}`);
+  return bits.join(' · ');
+}
+
 function AssetIcon({ mime }: { mime: string }) {
   if (mime.startsWith('image/')) return <PhotoIcon className="h-4 w-4" aria-hidden />;
   if (mime.startsWith('audio/')) return <MusicalNoteIcon className="h-4 w-4" aria-hidden />;
@@ -37,8 +60,38 @@ function AssetIcon({ mime }: { mime: string }) {
   return <DocumentIcon className="h-4 w-4" aria-hidden />;
 }
 
-export function StudioAssetShelf({ assets, onChange, onNotice }: Props) {
+function AssetPreview({ asset }: { asset: StudioVirtualAsset }) {
+  const dataUrl = useMemo(() => studioAssetDataUrl(asset), [asset]);
+
+  if (asset.mime.startsWith('image/')) {
+    return (
+      <img
+        src={dataUrl}
+        alt=""
+        className="h-10 w-10 shrink-0 rounded-lg object-cover"
+        style={{ border: '1px solid var(--border-default)', background: 'var(--bg-sunken)' }}
+      />
+    );
+  }
+
+  return (
+    <span
+      className="grid h-10 w-10 shrink-0 place-items-center rounded-lg"
+      style={{ background: 'var(--bg-sunken)', color: 'var(--studio-blue-2)' }}
+    >
+      <AssetIcon mime={asset.mime} />
+    </span>
+  );
+}
+
+export function StudioAssetShelf({
+  assets,
+  onChange,
+  onInsertReference,
+  onNotice,
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const dragDepthRef = useRef(0);
   const [dragging, setDragging] = useState(false);
 
   const addFiles = async (files: FileList | File[]) => {
@@ -46,7 +99,10 @@ export function StudioAssetShelf({ assets, onChange, onNotice }: Props) {
     if (!incoming.length) return;
 
     if (assets.length + incoming.length > STUDIO_ASSET_LIMITS.maxCount) {
-      onNotice('warning', `Studio accepts at most ${STUDIO_ASSET_LIMITS.maxCount} virtual assets per session.`);
+      onNotice(
+        'warning',
+        `Studio accepts at most ${STUDIO_ASSET_LIMITS.maxCount} virtual assets per session.`,
+      );
       return;
     }
 
@@ -76,43 +132,80 @@ export function StudioAssetShelf({ assets, onChange, onNotice }: Props) {
   };
 
   const copyReference = (asset: StudioVirtualAsset) => {
-    const reference = studioAssetQuotedReference(asset);
-    void navigator.clipboard.writeText(reference).then(
-      () => onNotice('success', `Copied ${reference}`),
+    const value = isStudioFontAsset(asset)
+      ? JSON.stringify(studioAssetFontFamily(asset))
+      : studioAssetQuotedReference(asset);
+    void navigator.clipboard.writeText(value).then(
+      () => onNotice('success', `Copied ${value}`),
       () => onNotice('warning', 'Clipboard access was blocked.'),
+    );
+  };
+
+  const insertReference = (asset: StudioVirtualAsset) => {
+    const value = isStudioFontAsset(asset)
+      ? JSON.stringify(studioAssetFontFamily(asset))
+      : studioAssetQuotedReference(asset);
+    onInsertReference(value);
+    onNotice(
+      'success',
+      isStudioFontAsset(asset)
+        ? `Inserted font family ${studioAssetFontFamily(asset)}.`
+        : 'Inserted Studio asset reference at the cursor.',
     );
   };
 
   return (
     <section
-      className="studio-assets shrink-0 px-3 py-2 sm:px-4"
+      className="studio-assets relative shrink-0 px-3 py-2 sm:px-4"
       style={{
         borderBottom: '1px solid var(--border-subtle)',
-        background: 'color-mix(in srgb, var(--bg-sunken) 82%, transparent)',
+        background: dragging
+          ? 'color-mix(in srgb, var(--studio-mint) 8%, var(--bg-sunken))'
+          : 'color-mix(in srgb, var(--bg-sunken) 82%, transparent)',
       }}
       aria-label="Studio virtual assets"
+      onDragEnter={(event) => {
+        event.preventDefault();
+        dragDepthRef.current += 1;
+        setDragging(true);
+      }}
+      onDragOver={(event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+      }}
+      onDragLeave={(event) => {
+        event.preventDefault();
+        dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+        if (dragDepthRef.current === 0) setDragging(false);
+      }}
+      onDrop={(event) => {
+        event.preventDefault();
+        dragDepthRef.current = 0;
+        setDragging(false);
+        void addFiles(event.dataTransfer.files);
+      }}
     >
+      {dragging ? (
+        <div
+          className="pointer-events-none absolute inset-1 z-10 grid place-items-center rounded-xl text-sm font-bold"
+          style={{
+            border: '2px dashed var(--studio-mint)',
+            background: 'color-mix(in srgb, var(--bg-base) 82%, transparent)',
+            color: 'var(--studio-mint)',
+          }}
+        >
+          Drop media into Studio
+        </div>
+      ) : null}
+
       <div className="mx-auto flex max-w-[1800px] items-stretch gap-2 overflow-x-auto">
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          onDragEnter={(event) => {
-            event.preventDefault();
-            setDragging(true);
-          }}
-          onDragOver={(event) => event.preventDefault()}
-          onDragLeave={() => setDragging(false)}
-          onDrop={(event) => {
-            event.preventDefault();
-            setDragging(false);
-            void addFiles(event.dataTransfer.files);
-          }}
           className="flex min-w-[185px] shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-semibold"
           style={{
-            border: `1px ${dragging ? 'solid var(--studio-mint)' : 'dashed var(--border-strong)'}`,
-            background: dragging
-              ? 'color-mix(in srgb, var(--studio-mint) 10%, var(--bg-raised))'
-              : 'var(--bg-raised)',
+            border: '1px dashed var(--border-strong)',
+            background: 'var(--bg-raised)',
             color: 'var(--text-secondary)',
           }}
         >
@@ -137,43 +230,56 @@ export function StudioAssetShelf({ assets, onChange, onNotice }: Props) {
 
         {assets.length === 0 ? (
           <div
-            className="flex min-w-[260px] items-center rounded-xl px-3 py-2 text-xs"
+            className="flex min-w-[300px] items-center rounded-xl px-3 py-2 text-xs"
             style={{ border: '1px solid var(--border-default)', color: 'var(--text-tertiary)' }}
           >
-            Upload a file, copy its <code className="mx-1">studio://asset/…</code> reference, and use
-            that string anywhere Apexify accepts the matching media source.
+            Upload or drop media here. Assets persist in this browser and expose stable{' '}
+            <code className="mx-1">studio://asset/…</code> references. Uploaded fonts register
+            automatically under their filename family.
           </div>
         ) : (
           assets.map((asset) => (
             <article
               key={asset.id}
-              className="flex min-w-[230px] max-w-[310px] shrink-0 items-center gap-2 rounded-xl px-3 py-2"
+              className="flex min-w-[285px] max-w-[370px] shrink-0 items-center gap-2 rounded-xl px-3 py-2"
               style={{ border: '1px solid var(--border-default)', background: 'var(--bg-raised)' }}
             >
-              <span
-                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg"
-                style={{ background: 'var(--bg-sunken)', color: 'var(--studio-blue-2)' }}
-              >
-                <AssetIcon mime={asset.mime} />
-              </span>
+              <AssetPreview asset={asset} />
               <span className="min-w-0 flex-1">
                 <strong className="block truncate text-xs" title={asset.name}>
                   {asset.name}
                 </strong>
-                <span className="block truncate text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
-                  {asset.mime} · {formatBytes(asset.size)}
+                <span
+                  className="block truncate text-[10px]"
+                  title={metadataLabel(asset)}
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
+                  {metadataLabel(asset)}
                 </span>
               </span>
+
+              <button
+                type="button"
+                onClick={() => insertReference(asset)}
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-lg"
+                title={isStudioFontAsset(asset) ? 'Insert font family at cursor' : 'Insert asset reference at cursor'}
+                aria-label={`Insert ${asset.name} into editor`}
+                style={{ color: 'var(--studio-mint)', border: '1px solid var(--border-default)' }}
+              >
+                <ArrowDownOnSquareIcon className="h-4 w-4" aria-hidden />
+              </button>
+
               <button
                 type="button"
                 onClick={() => copyReference(asset)}
                 className="grid h-8 w-8 shrink-0 place-items-center rounded-lg"
-                title="Copy Studio asset reference"
+                title={isStudioFontAsset(asset) ? 'Copy font family' : 'Copy Studio asset reference'}
                 aria-label={`Copy reference for ${asset.name}`}
                 style={{ color: 'var(--text-secondary)', border: '1px solid var(--border-default)' }}
               >
                 <ClipboardDocumentIcon className="h-4 w-4" aria-hidden />
               </button>
+
               <button
                 type="button"
                 onClick={() => onChange(assets.filter((item) => item.id !== asset.id))}

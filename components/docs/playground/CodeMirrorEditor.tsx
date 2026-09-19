@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { EditorView } from '@codemirror/view';
@@ -47,6 +47,11 @@ const interactiveTheme = EditorView.theme(
   { dark: true }
 );
 
+export type EditorInsertRequest = {
+  id: number;
+  text: string;
+};
+
 export type CodeMirrorEditorProps = {
   value: string;
   language: InteractiveLanguage;
@@ -54,6 +59,7 @@ export type CodeMirrorEditorProps = {
   readOnly?: boolean;
   fillParent?: boolean;
   ariaLabel?: string;
+  insertRequest?: EditorInsertRequest | null;
 };
 
 export default function CodeMirrorEditor({
@@ -63,7 +69,11 @@ export default function CodeMirrorEditor({
   readOnly = false,
   fillParent = false,
   ariaLabel = 'Code editor',
+  insertRequest = null,
 }: CodeMirrorEditorProps) {
+  const viewRef = useRef<EditorView | null>(null);
+  const lastInsertIdRef = useRef<number | null>(null);
+
   const extensions = useMemo(
     () => [
       javascript({ typescript: language === 'ts' }),
@@ -72,6 +82,23 @@ export default function CodeMirrorEditor({
     ],
     [ariaLabel, language]
   );
+
+  useEffect(() => {
+    const view = viewRef.current;
+    if (!view || !insertRequest || lastInsertIdRef.current === insertRequest.id) return;
+    lastInsertIdRef.current = insertRequest.id;
+
+    const selection = view.state.selection.main;
+    const from = selection.from;
+    const to = selection.to;
+    view.dispatch({
+      changes: { from, to, insert: insertRequest.text },
+      selection: { anchor: from + insertRequest.text.length },
+      scrollIntoView: true,
+    });
+    view.focus();
+  }, [insertRequest]);
+
   const layoutClass = fillParent
     ? 'h-full min-h-0 max-h-full flex-1 overflow-hidden [&_.cm-editor]:flex [&_.cm-editor]:h-full [&_.cm-editor]:min-h-0 [&_.cm-editor]:max-h-full [&_.cm-editor]:flex-col [&_.cm-scroller]:min-h-0 [&_.cm-scroller]:flex-1 [&_.cm-scroller]:overflow-auto'
     : 'min-h-[220px] flex-1 [&_.cm-editor]:min-h-[220px] [&_.cm-scroller]:min-h-0';
@@ -85,6 +112,7 @@ export default function CodeMirrorEditor({
       extensions={extensions}
       onChange={onChange}
       onCreateEditor={(view) => {
+        viewRef.current = view;
         view.scrollDOM.tabIndex = 0;
         view.scrollDOM.setAttribute('aria-label', `${ariaLabel} scroll area`);
       }}

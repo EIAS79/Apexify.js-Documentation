@@ -37,7 +37,12 @@ import {
 } from '@/lib/studio/studioConfig';
 import { renderStudioBrowserPreview } from '@/lib/studio/browserPreview';
 import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
-import type { StudioVirtualAsset } from '@/lib/studio/runtime/assets';
+import {
+  loadPersistedStudioAssets,
+  registerStudioBrowserFonts,
+  savePersistedStudioAssets,
+  type StudioVirtualAsset,
+} from '@/lib/studio/runtime/assets';
 import {
   bootstrapStudio,
   encodeShareLink,
@@ -59,6 +64,8 @@ export default function CodeStudio() {
   const [splitRatio, setSplitRatio] = useState(0.5);
   const [assets, setAssets] = useState<StudioVirtualAsset[]>([]);
   const [assetsOpen, setAssetsOpen] = useState(false);
+  const [assetStorageReady, setAssetStorageReady] = useState(false);
+  const [editorInsertRequest, setEditorInsertRequest] = useState<{ id: number; text: string } | null>(null);
 
   const [runnerEnabled, setRunnerEnabled] = useState(false);
   const [running, setRunning] = useState(false);
@@ -140,6 +147,30 @@ export default function CodeStudio() {
       splitRatio,
     });
   }, [hydrated, buffers, activeBufferId, lang, layout, autoRun, splitRatio]);
+
+  useEffect(() => {
+    if (!hydrated || assetStorageReady) return;
+    let cancelled = false;
+    void loadPersistedStudioAssets()
+      .then((stored) => {
+        if (cancelled) return;
+        setAssets(stored);
+        setAssetStorageReady(true);
+      })
+      .catch(() => {
+        if (!cancelled) setAssetStorageReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, assetStorageReady]);
+
+  useEffect(() => {
+    if (!assetStorageReady) return;
+    void savePersistedStudioAssets(assets).catch(() => {
+      // IndexedDB persistence is best-effort; the in-memory Studio session remains usable.
+    });
+  }, [assetStorageReady, assets]);
 
   /* ---------- execution-adapter availability probe ---------- */
 
@@ -264,6 +295,9 @@ export default function CodeStudio() {
       }
 
       if (target === 'browser') {
+        const fontResults = await registerStudioBrowserFonts(assets);
+        const failedFonts = fontResults.filter((font) => !font.ok);
+
         const result = await renderStudioBrowserPreview(code, assets);
 
         if (!result.ok) {
@@ -292,7 +326,10 @@ export default function CodeStudio() {
         setPreviewArtifacts([browserArtifact]);
         setActiveArtifactId(browserArtifact.id);
         setPreviewProvenance('browser-generated');
-        setPreviewWarnings(result.warnings);
+        setPreviewWarnings([
+          ...failedFonts.map((font) => `Studio could not register uploaded font ${font.name} in this browser.`),
+          ...result.warnings,
+        ]);
         setElapsedMs(result.elapsedMs);
         setOutputTab('preview');
 
@@ -818,6 +855,7 @@ export default function CodeStudio() {
             value={activeCode}
             codeLang={lang}
             onChange={updateActiveCode}
+            insertRequest={editorInsertRequest}
           />
         </div>
       </div>
@@ -913,6 +951,9 @@ export default function CodeStudio() {
         <StudioAssetShelf
           assets={assets}
           onChange={setAssets}
+          onInsertReference={(text) =>
+            setEditorInsertRequest({ id: Date.now() + Math.random(), text })
+          }
           onNotice={flashToast}
         />
       ) : null}

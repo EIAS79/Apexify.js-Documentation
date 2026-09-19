@@ -31,11 +31,43 @@ import * as __studioPath from 'node:path';
 import { GlobalFonts as __studioGlobalFonts } from '@napi-rs/canvas';
 
 ${hoistedBlock}
+function __studioFontFamily(name: string): string {
+  const base = name.replace(/\.[^.]+$/, '').trim();
+  const normalized = base.replace(/[_-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return normalized || 'Studio Font';
+}
+
 function __studioRegisterFonts(): void {
   try {
     const ttf = __studioPath.join(process.cwd(), 'node_modules', 'dejavu-fonts-ttf', 'ttf', 'DejaVuSans.ttf');
     for (const family of ['DejaVu Sans', 'Arial', 'Helvetica', 'sans-serif', 'Segoe UI', 'system-ui', 'Verdana', 'Tahoma']) {
       try { __studioGlobalFonts.registerFromPath(ttf, family); } catch {}
+    }
+  } catch {}
+
+  const manifestPath = process.env.STUDIO_ASSET_MANIFEST;
+  if (!manifestPath || !__studioExists(manifestPath)) return;
+
+  try {
+    const manifest = JSON.parse(__studioRead(manifestPath, 'utf8')) as {
+      assets?: Array<{ name?: unknown; mime?: unknown; path?: unknown }>;
+    };
+    for (const asset of manifest.assets ?? []) {
+      if (
+        typeof asset.name !== 'string' ||
+        typeof asset.mime !== 'string' ||
+        typeof asset.path !== 'string' ||
+        !asset.path
+      ) {
+        continue;
+      }
+      const fontLike =
+        asset.mime.startsWith('font/') ||
+        /\.(?:ttf|otf|woff2?|woff)$/i.test(asset.name);
+      if (!fontLike) continue;
+      try {
+        __studioGlobalFonts.registerFromPath(asset.path, __studioFontFamily(asset.name));
+      } catch {}
     }
   } catch {}
 }

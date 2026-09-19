@@ -7,8 +7,8 @@
 > - [x] STUDIO-1 artifact protocol and image/GIF/audio/video/text/JSON preview foundation
 > - [x] STUDIO-2 automatic runtime selection in the Studio UI
 > - [x] STUDIO-3 trusted-local full-runtime artifact runner foundation; intentional video block removed
-> - [~] STUDIO-4 production isolated executor integration boundary (`STUDIO_EXECUTOR_URL`) is implemented; an isolated executor deployment/snapshot is still required before production full-runtime execution is enabled
-> - [x] STUDIO-5 session virtual assets foundation: image/audio/video/font uploads, stable `studio://asset/<id>` references, browser image preview resolution, and full-runtime materialization
+> - [x] STUDIO-4 isolated executor implementation complete: authenticated remote gateway, dedicated executor service, per-run Deno permission sandbox, bounded CPU/memory/time/output, pinned Apexify runtime, FFmpeg/ffprobe, explicit network allowlist, disposable workspace, and Render deployment blueprint. The documentation host still needs its executor URL/token environment values before public full-runtime execution becomes active.
+> - [x] STUDIO-5 virtual assets complete: image/audio/video/font uploads, persistent IndexedDB asset storage, metadata/thumbnail UX, stable `studio://asset/<id>` references, cursor insertion, automatic browser/full-runtime font registration, browser bitmap resolution, and isolated-runtime materialization
 > - [x] STUDIO-6 raster/chart/scene parity implementation complete: all Phase-6 families have an execution route, buffer identity is preserved through the real runtime, structured/non-raster results are collected safely, and representative Studio templates cover scenes/components/assets/templates, image utilities, path/pixels/detect, batch/chain, plus chart-buffer reuse. Isolated production execution proof is intentionally deferred to the final validation pass and STUDIO-4 deployment.
 > - [~] STUDIO-7 GIF/animation/audio in progress: media-aware artifact collection and playable GIF/audio templates are implemented; isolated-runtime execution proofs remain
 > - [~] STUDIO-8 video in progress: video/frame artifact discovery and an MP4 Studio template are implemented; production FFmpeg execution still depends on STUDIO-4
@@ -197,32 +197,49 @@ Deliverables:
 
 ### STUDIO-4 — Production isolated executor
 
-Deliverables:
-
-- `STUDIO_EXECUTOR_URL` gateway;
-- authenticated server-to-server calls;
-- disposable isolated execution environments;
-- Apexify package pinned to the documentation's authoritative package commit;
-- FFmpeg/ffprobe;
-- bounded workspace, CPU, memory, duration, network, and output.
-
-No production full-runtime claim before this phase is deployed.
-
-### STUDIO-5 — Virtual Studio assets
-
-Status: **foundation implemented**.
+Status: **implementation complete; deployment wiring available**.
 
 Delivered:
 
-- session-scoped upload shelf for image/audio/video/font assets;
-- stable `studio://asset/<id>` references copied directly from the Studio UI;
-- bounded asset count, per-file bytes, and aggregate bytes;
-- browser-direct `createImage()`, `createCanvas().customBg`, and bitmap `bgLayers` can decode uploaded image assets without a network hop;
-- full-runtime requests carry the same asset payloads and trusted-local execution materializes them only inside the disposable run workspace;
-- the isolated-remote executor protocol receives the same asset list, so production execution does not depend on caller filesystem paths;
-- asset bytes are deliberately not serialized into share links or localStorage.
+- `STUDIO_EXECUTOR_URL` gateway with fail-closed requirement for both URL and bearer token;
+- dedicated `studio-executor/` service rather than arbitrary code in the documentation process;
+- one fresh restricted Deno subprocess per run;
+- no inherited documentation/application secrets;
+- read/write/env/run/FFI/network permissions explicitly scoped per run;
+- explicit outbound host allowlist through `STUDIO_EXECUTOR_ALLOWED_HOSTS`;
+- one disposable workspace per execution with unconditional cleanup;
+- Apexify package pinned to the documentation's authoritative package commit;
+- pinned FFmpeg/ffprobe binaries exposed only through the restricted run permission;
+- bounded source size, virtual assets, artifact count, per-artifact bytes, combined output bytes, stdout/stderr, wall time, concurrency, V8 heap, CPU time and address space;
+- Linux `prlimit` required by the executor for production CPU/address-space/file/process bounds;
+- compatible plugin imports restricted to the configured installed plugin allowlist;
+- package/runtime identity included in executor responses;
+- `render.yaml` plus `studio-executor/README.md` deployment contract.
 
-Remaining refinements are UX/persistence improvements (for example IndexedDB persistence between page reloads), not a change to the execution reference model.
+Production activation requires the documentation host to set `STUDIO_EXECUTOR_URL` and the matching `STUDIO_EXECUTOR_TOKEN`. This is host configuration, not an additional Studio execution implementation phase.
+
+### STUDIO-5 — Virtual Studio assets
+
+Status: **complete**.
+
+Delivered:
+
+- image, audio, video, and font uploads in a session asset shelf;
+- full-shelf drag/drop handling;
+- bounded asset count, per-file bytes, and aggregate bytes;
+- stable `studio://asset/<id>` references;
+- one-click insertion of asset references directly at the editor cursor;
+- image thumbnails plus captured image/video dimensions and audio/video duration where the browser can read metadata;
+- IndexedDB persistence so uploaded assets survive normal page reloads without bloating localStorage/share links;
+- browser-direct `createImage()`, `createCanvas().customBg`, bitmap `bgLayers`, and pattern layers resolve uploaded image assets without a network hop;
+- browser-direct text rendering automatically registers uploaded font assets under a deterministic family derived from the filename;
+- the asset shelf exposes/copies/inserts the exact font family developers should use in `font.family`;
+- trusted-local and isolated-remote full runtimes materialize assets only inside the disposable run workspace;
+- the full-runtime wrapper automatically registers uploaded font files before user code executes;
+- the isolated executor receives the same bounded asset protocol and never depends on caller filesystem paths;
+- asset bytes are deliberately excluded from Studio share links and ordinary localStorage state.
+
+The virtual-asset reference model is now complete. Future media-specific waveform/timeline UI belongs to STUDIO-7/8 rather than this phase.
 
 ### STUDIO-6 — Complete raster/chart/scene parity
 

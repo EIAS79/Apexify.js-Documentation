@@ -1,0 +1,21 @@
+{
+  "name": "apexify-studio-executor",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "bootstrap": "node scripts/install-deno.mjs",
+    "start": "tsx server.ts"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.80",
+    "adm-zip": "^0.5.16",
+    "apexify.js": "github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b",
+    "dejavu-fonts-ttf": "^2.37.3",
+    "ffmpeg-static": "^5.2.0",
+    "ffprobe-static": "^3.1.0",
+    "tsx": "^4.19.2"
+  }
+}

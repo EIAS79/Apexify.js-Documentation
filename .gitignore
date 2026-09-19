@@ -41,3 +41,7 @@ node-v*-linux-x64/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# isolated Studio executor runtime downloads
+/studio-executor/vendor/
+/studio-executor/.deno-cache/

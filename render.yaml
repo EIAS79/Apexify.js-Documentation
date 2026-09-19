@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: apexify-studio-executor
+    runtime: node
+    repo: https://github.com/EIAS79/Apexify.js-Documentation
+    branch: main
+    buildCommand: cd studio-executor && npm install && npm run bootstrap
+    startCommand: cd studio-executor && npm start
+    healthCheckPath: /health
+    plan: free
+    region: frankfurt
+    autoDeploy: true
+    envVars:
+      - key: STUDIO_EXECUTOR_TOKEN
+        sync: false
+      - key: STUDIO_EXECUTOR_ALLOWED_HOSTS
+        value: raw.githubusercontent.com:443,images.unsplash.com:443,github.com:443,objects.githubusercontent.com:443
+      - key: STUDIO_EXECUTOR_CONCURRENCY
+        value: "1"
+      - key: STUDIO_EXECUTOR_ADDRESS_SPACE_BYTES
+        value: "2147483648"
+      - key: STUDIO_DENO_VERSION
+        value: "2.4.5"

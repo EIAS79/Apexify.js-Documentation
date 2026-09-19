@@ -1,6 +1,6 @@
 # Apexify Studio Isolated Executor Protocol
 
-> Status: ACTIVE CONTRACT — executor deployment not yet connected.
+> Status: ACTIVE CONTRACT — isolated executor implementation added; production activation requires the documentation deployment to provide the executor URL/token.
 
 This document defines the server-to-server boundary used by Studio when a snippet requires the full Apexify.js runtime.
 
@@ -8,13 +8,13 @@ This document defines the server-to-server boundary used by Studio when a snippe
 
 `POST /v1/run`
 
-The documentation application calls the executor through `STUDIO_EXECUTOR_URL`. If `STUDIO_EXECUTOR_TOKEN` is configured, the request includes:
+The documentation application calls the executor through `STUDIO_EXECUTOR_URL`. `STUDIO_EXECUTOR_TOKEN` is mandatory; the request includes:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-The executor is not a public browser endpoint.
+The executor is not a public browser endpoint. The documentation route fails closed and reports the full runtime unavailable unless **both** the executor URL and bearer token are configured.
 
 ## Request
 
@@ -107,50 +107,69 @@ Every execution requires:
 9. cleanup/termination even after failure or timeout;
 10. pinned Apexify.js runtime identity.
 
-## Recommended Vercel implementation
+## Implemented production executor
 
-Vercel Sandbox is the preferred implementation for the current Vercel-hosted documentation site because it provides isolated Sandbox sessions rather than executing user code inside the Next.js function.
+The repository contains a dedicated `studio-executor/` service. It does **not** evaluate Studio source in the documentation process.
 
-Recommended production flow:
+Production flow:
 
 ```text
-Next.js /api/gallery/run
+documentation /api/gallery/run
+        |
+        | Bearer-authenticated server request
+        v
+studio-executor
+        |
+        +-- validate request / assets / limits
+        +-- create one disposable run workspace
+        +-- start one fresh restricted Deno process
         |
         v
-isolated executor gateway
+real pinned apexify.js runtime
+        |
+        +-- @napi-rs/canvas
+        +-- registered bundled/uploaded fonts
+        +-- pinned FFmpeg + ffprobe binaries
+        +-- explicit filesystem/env/run/FFI/network permissions
         |
         v
-fresh Vercel Sandbox session
-        |
-        +-- Node 24
-        +-- apexify.js pinned runtime
-        +-- @napi-rs/canvas / fonts
-        +-- FFmpeg + ffprobe
-        +-- tsx
+artifact manifest -> bounded response
         |
         v
-run wrapper -> artifact manifest
-        |
-        v
-read bounded artifacts
-        |
-        v
-stop sandbox
+delete run workspace
 ```
 
-For latency and deterministic dependencies, build a reusable Sandbox snapshot containing the pinned Apexify runtime, FFmpeg/ffprobe, fonts, and runner dependencies. Each Studio request should start from that snapshot and still receive a fresh disposable session.
+The outer executor is a small Node service. The user program runs in a **fresh Deno subprocess** with an explicit permission set. Deno provides the per-run filesystem/environment/subprocess/network boundary while Apexify itself remains the real package implementation.
+
+The executor additionally applies:
+
+- a wall-clock timeout;
+- V8 heap bound;
+- Linux `prlimit` address-space / CPU / file-descriptor / process bounds when available;
+- one disposable workspace per run;
+- no inherited application environment;
+- bounded stdout/stderr;
+- bounded source, asset bytes, artifact count, per-artifact bytes, and aggregate output bytes;
+- pinned Apexify runtime identity in responses;
+- mandatory bearer authentication.
+
+The Render blueprint is `render.yaml`. The executor can also be hosted by another Node-capable service as long as the same process-level restrictions remain available.
 
 ## Network policy
 
-Apexify.js supports remote media URLs. The executor therefore needs outbound HTTPS, but it must not expose deployment-private networks or credentials.
+Remote media is **deny-by-default** at the execution boundary.
 
-Policy requirements:
+The isolated process only receives `--allow-net` entries from `STUDIO_EXECUTOR_ALLOWED_HOSTS`. Configure explicit HTTPS host/port pairs, for example:
 
-- no injection of documentation-site secrets into executed code;
-- block private/link-local/metadata targets;
-- honor Apexify's own trusted-network policy;
-- bound remote bytes, redirects, concurrency, and timeouts;
-- if a stricter Sandbox domain allowlist is used, document which remote asset hosts are permitted.
+```text
+raw.githubusercontent.com:443,images.unsplash.com:443
+```
+
+This is intentionally stricter than giving arbitrary Studio code unrestricted egress.
+
+Apexify's own remote-media network policy still runs inside that boundary and continues to reject private/link-local/metadata targets and enforce its byte/redirect/concurrency/timeout limits.
+
+For media on a host that is not in the executor allowlist, upload the file through Studio and use its `studio://asset/<id>` reference.
 
 ## Package identity
 
