@@ -851,6 +851,14 @@ function remoteImageSource(source: string): boolean {
   return /^https?:\/\//i.test(source);
 }
 
+function remoteImageHost(source: string): string {
+  try {
+    return new URL(source).hostname || 'remote host';
+  } catch {
+    return 'remote host';
+  }
+}
+
 function alignedImageOffset(
   align: string,
   outerWidth: number,
@@ -983,11 +991,43 @@ async function applyRemoteImages(
       ctx.restore();
     } catch (error) {
       warnings.push(
-        `Remote image could not be loaded in Live Canvas (${new URL(source).hostname}): ${error instanceof Error ? error.message : 'unknown browser image error'}.`,
+        `Remote image could not be loaded in Live Canvas (${remoteImageHost(source)}): ${error instanceof Error ? error.message : 'unknown browser image error'}.`,
       );
     } finally {
       bitmap?.close();
     }
+  }
+}
+
+async function applyImageLayersInOrder(
+  ctx: CanvasRenderingContext2D,
+  value: Jsonish,
+  warnings: string[],
+) {
+  const list = Array.isArray(value) ? value : [value];
+  let remoteCount = 0;
+
+  for (const item of list) {
+    if (!isRecord(item)) continue;
+    const source = stringOf(item.source, '');
+
+    if (SHAPES.has(source)) {
+      applyImageShapes(ctx, item);
+      continue;
+    }
+
+    if (remoteImageSource(source)) {
+      remoteCount += 1;
+      if (remoteCount <= MAX_REMOTE_IMAGE_COUNT) {
+        await applyRemoteImages(ctx, item, warnings);
+      }
+    }
+  }
+
+  if (remoteCount > MAX_REMOTE_IMAGE_COUNT) {
+    warnings.push(
+      `Live Canvas renders at most ${MAX_REMOTE_IMAGE_COUNT} remote image layers per createImage() call; extra remote layers were skipped.`,
+    );
   }
 }
 
@@ -1067,8 +1107,7 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
           (item) => isRecord(item) && isUnresolvedPreviewValue(item.source),
         );
 
-        applyImageShapes(ctx, parsed);
-        await applyRemoteImages(ctx, parsed, warnings);
+        await applyImageLayersInOrder(ctx, parsed, warnings);
 
         const unsupportedImage = items.some(
           (item) =>
