@@ -39,8 +39,8 @@ html:not(.dark) .apx-doc-prose [role="group"][aria-label$="code example"] code s
 [data-doc11-static-code] [role="group"][aria-label$="code example"] code > span > span:not([aria-hidden="true"]) {
   color: #f5f0ff !important;
 }
-.apx-doc-prose table { width:100%; display:block; overflow-x:auto; border-spacing:0; border-collapse:separate; border:1px solid var(--apx-border-default); border-radius:var(--apx-radius-lg); background:var(--apx-surface-raised); font-size:.9rem; }
-.apx-doc-prose th, .apx-doc-prose td { min-width:8rem; padding:.7rem .8rem; border-bottom:1px solid var(--apx-border-subtle); text-align:left; vertical-align:top; }
+.apx-doc-prose table { width:100%; display:block; overflow-x:auto; border-spacing:0; border-collapse:separate; border:1px solid var(--apx-border-default); border-radius:var(--apx-radius-lg); background:var(--apx-surface-raised); font-size:.84rem; line-height:1.45; }
+.apx-doc-prose th, .apx-doc-prose td { min-width:6.5rem; padding:.5rem .62rem; border-bottom:1px solid var(--apx-border-subtle); text-align:left; vertical-align:top; }
 .apx-doc-prose th { color:var(--apx-text-primary); background:var(--apx-surface-sunken); font-weight:750; }
 .apx-doc-prose blockquote { margin:1.4rem 0; border-left:3px solid var(--apx-color-accent); padding:.25rem 0 .25rem 1rem; color:var(--apx-text-secondary); }
 .apx-doc-prose :where(ul,ol) { padding-left:1.35rem; }
