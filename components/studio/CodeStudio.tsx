@@ -7,6 +7,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { GallerySnippetEditor } from '@/app/gallery/components/GallerySnippetEditor';
+import { StudioAssetsPanel } from '@/components/studio/StudioAssetsPanel';
 import { StudioCommandPalette } from '@/components/studio/StudioCommandPalette';
 import { StudioFileTabs } from '@/components/studio/StudioFileTabs';
 import { StudioOutputPanel, OutputTab } from '@/components/studio/StudioOutputPanel';
@@ -36,6 +37,12 @@ import {
 } from '@/lib/studio/studioConfig';
 import { renderStudioBrowserPreview } from '@/lib/studio/browserPreview';
 import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
+import {
+  fileToStudioAsset,
+  studioAssetPath,
+  validateStudioAssetSet,
+  type StudioAsset,
+} from '@/lib/studio/runtime/assets';
 import {
   bootstrapStudio,
   encodeShareLink,
@@ -73,6 +80,8 @@ export default function CodeStudio() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [toast, setToast] = useState<Toast>(null);
   const [shareCopied, setShareCopied] = useState(false);
+  const [assetsOpen, setAssetsOpen] = useState(false);
+  const [assets, setAssets] = useState<StudioAsset[]>([]);
 
   const previewObjectUrlsRef = useRef<string[]>([]);
   const autoRunTimerRef = useRef<number>(0);
@@ -86,7 +95,10 @@ export default function CodeStudio() {
     () => (activeBuffer ? (lang === 'ts' ? activeBuffer.ts : activeBuffer.js) : ''),
     [activeBuffer, lang]
   );
-  const executionPlan = useMemo(() => planStudioExecution(activeCode), [activeCode]);
+  const executionPlan = useMemo(
+    () => planStudioExecution(activeCode, { hasAssets: assets.length > 0 }),
+    [activeCode, assets.length],
+  );
   const executionTarget: 'browser' | 'node' =
     executionPlan.backend === 'browser' ? 'browser' : 'node';
 
@@ -202,6 +214,50 @@ export default function CodeStudio() {
     [previewArtifacts],
   );
 
+  const addAssetFiles = useCallback(
+    async (files: FileList) => {
+      try {
+        const incoming = await Promise.all(Array.from(files).map((file) => fileToStudioAsset(file)));
+        const byName = new Map(assets.map((asset) => [asset.name, asset]));
+        for (const asset of incoming) byName.set(asset.name, asset);
+        const next = [...byName.values()];
+        const issue = validateStudioAssetSet(next);
+        if (issue) {
+          flashToast('warning', issue);
+          return;
+        }
+        setAssets(next);
+        flashToast(
+          'success',
+          `${incoming.length} asset${incoming.length === 1 ? '' : 's'} ready in the virtual workspace`,
+        );
+      } catch (error) {
+        flashToast('warning', error instanceof Error ? error.message : 'Could not add Studio assets');
+      }
+    },
+    [assets, flashToast],
+  );
+
+  const removeAsset = useCallback((id: string) => {
+    setAssets((current) => current.filter((asset) => asset.id !== id));
+  }, []);
+
+  const clearAssets = useCallback(() => {
+    setAssets([]);
+    flashToast('info', 'Studio session assets cleared');
+  }, [flashToast]);
+
+  const copyAssetPath = useCallback(
+    (asset: StudioAsset) => {
+      const path = studioAssetPath(asset);
+      void navigator.clipboard.writeText(path).then(
+        () => flashToast('success', `Copied ${path}`),
+        () => flashToast('warning', 'Clipboard blocked'),
+      );
+    },
+    [flashToast],
+  );
+
   /** Render the response into a 256×144-ish thumbnail data URL for run history. */
   const makeThumbnail = useCallback(async (mime: string, base64: string): Promise<string | null> => {
     if (!mime.startsWith('image/')) return null;
@@ -237,7 +293,7 @@ export default function CodeStudio() {
     const code = lang === 'ts' ? activeBuffer.ts : activeBuffer.js;
     if (!code.trim() || running) return;
 
-    const plan = planStudioExecution(code);
+    const plan = planStudioExecution(code, { hasAssets: assets.length > 0 });
     const target: 'browser' | 'node' = plan.backend === 'browser' ? 'browser' : 'node';
 
     setRunning(true);
@@ -329,6 +385,7 @@ export default function CodeStudio() {
           language: lang,
           runtime: 'node',
           options: {},
+          assets,
           layout: { activePanel: 'editor' },
         }),
       });
@@ -431,6 +488,7 @@ export default function CodeStudio() {
     lang,
     runnerEnabled,
     running,
+    assets,
     revokePreview,
     showServerArtifacts,
     makeThumbnail,
@@ -897,6 +955,8 @@ export default function CodeStudio() {
         shareCopied={shareCopied}
         onDownloadOutput={downloadOutput}
         hasOutput={previewArtifacts.length > 0}
+        assetCount={assets.length}
+        onOpenAssets={() => setAssetsOpen(true)}
         onOpenPalette={() => setPaletteOpen(true)}
         onOpenShortcuts={() => setShortcutsOpen(true)}
       />
@@ -969,6 +1029,16 @@ export default function CodeStudio() {
       />
 
       <StudioShortcutOverlay open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
+
+      <StudioAssetsPanel
+        open={assetsOpen}
+        assets={assets}
+        onClose={() => setAssetsOpen(false)}
+        onFiles={addAssetFiles}
+        onRemove={removeAsset}
+        onClear={clearAssets}
+        onCopyPath={copyAssetPath}
+      />
 
       <AnimatePresence>
         {toast && (

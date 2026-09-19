@@ -93,12 +93,21 @@ function addFamily(target: Set<StudioCapabilityFamily>, family: StudioCapability
   target.add(family);
 }
 
-export function planStudioExecution(source: string): StudioExecutionPlan {
+export function planStudioExecution(
+  source: string,
+  { hasAssets = false }: { hasAssets?: boolean } = {},
+): StudioExecutionPlan {
   const scanned = stripComments(source);
   const families = new Set<StudioCapabilityFamily>();
   const reasons: string[] = [];
   const hostPersistenceOnly: string[] = [];
   let needsFullRuntime = false;
+
+  if (hasAssets) {
+    needsFullRuntime = true;
+    addFamily(families, 'assets');
+    reasons.push('Uploaded Studio assets are materialized by the full Apexify runtime.');
+  }
 
   for (const [pattern, label] of persistencePatterns) {
     if (pattern.test(scanned)) {

@@ -76,6 +76,7 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
         code: session.source,
         lang: session.language,
         context: 'studio',
+        assets: session.assets ?? [],
       }),
       signal,
     });

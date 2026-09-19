@@ -14,12 +14,22 @@ export interface InteractiveDiagnostic {
   help?: string;
 }
 
+export interface InteractiveInputAsset {
+  id: string;
+  name: string;
+  mime: string;
+  size: number;
+  base64: string;
+  virtualPath: string;
+}
+
 export interface InteractiveSession {
   schemaVersion: 1;
   source: string;
   language: InteractiveLanguage;
   runtime: InteractiveRuntime;
   options: Record<string, unknown>;
+  assets?: InteractiveInputAsset[];
   selectedFile?: string;
   layout?: { activePanel?: string };
 }
@@ -29,6 +39,9 @@ export interface InteractiveResourceLimits {
   sourceChars: number;
   outputBytes: number;
   totalOutputBytes: number;
+  inputAssetBytes: number;
+  totalInputAssetBytes: number;
+  maxInputAssets: number;
   processBufferBytes: number;
   shareStateBytes: number;
   maxOutputs: number;
@@ -44,6 +57,9 @@ export const DOC8_RESOURCE_LIMITS: Readonly<InteractiveResourceLimits> = Object.
   sourceChars: 280_000,
   outputBytes: 32 * 1024 * 1024,
   totalOutputBytes: 64 * 1024 * 1024,
+  inputAssetBytes: 12 * 1024 * 1024,
+  totalInputAssetBytes: 32 * 1024 * 1024,
+  maxInputAssets: 12,
   processBufferBytes: 20 * 1024 * 1024,
   shareStateBytes: 64 * 1024,
   maxOutputs: 24,

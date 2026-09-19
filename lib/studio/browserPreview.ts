@@ -283,6 +283,20 @@ function extractCalls(source: string, methods: string[]): Call[] {
   return calls.sort((a, b) => a.index - b.index);
 }
 
+function assignedVariableBeforeCall(source: string, call: Call): string | null {
+  const statementStart = Math.max(
+    source.lastIndexOf(';', call.index - 1),
+    source.lastIndexOf('\n', call.index - 1),
+    source.lastIndexOf('{', call.index - 1),
+    source.lastIndexOf('}', call.index - 1),
+  );
+  const prefix = source.slice(statementStart + 1, call.index);
+  const match = prefix.match(
+    /(?:(?:const|let|var)\s+)?([A-Za-z_$][\w$]*)\s*=\s*(?:await\s+)?[A-Za-z_$][\w$]*\s*$/,
+  );
+  return match?.[1] ?? null;
+}
+
 function readCallArguments(source: string, openParen: number): { args: string[]; end: number } | null {
   const args: string[] = [];
   let start = openParen + 1;
@@ -1710,33 +1724,58 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
     };
 
     const chartCalls = calls.filter((call) => call.method === 'createChart' && call.args[0]);
-    const generatedCharts = chartCalls
+    const generatedChartRecords = chartCalls
       .map((call) => {
         const typeValue = resolveCallArgument(source, call, call.args[0], resolve);
         const dataValue = resolveCallArgument(source, call, call.args[1], resolve);
         const optionsValue = resolveCallArgument(source, call, call.args[2], resolve);
-        if (hasUnresolved(dataValue) || hasUnresolved(optionsValue)) return null;
-        return createChartCanvas(stringOf(typeValue, 'bar'), dataValue, optionsValue);
+        if (hasUnresolved(typeValue) || hasUnresolved(dataValue) || hasUnresolved(optionsValue)) {
+          return null;
+        }
+        const canvas = createChartCanvas(stringOf(typeValue, 'bar'), dataValue, optionsValue);
+        if (!canvas) return null;
+        return {
+          call,
+          canvas,
+          variable: assignedVariableBeforeCall(source, call),
+        };
       })
-      .filter((value): value is HTMLCanvasElement => Boolean(value));
+      .filter(
+        (
+          value,
+        ): value is { call: Call; canvas: HTMLCanvasElement; variable: string | null } =>
+          Boolean(value),
+      );
 
-    const chartSourceLabels: string[] = [];
+    const generatedCharts = generatedChartRecords.map((record) => record.canvas);
+    const generatedChartsBySource = new Map<string, HTMLCanvasElement>();
+
+    for (const record of generatedChartRecords) {
+      if (record.variable) generatedChartsBySource.set(record.variable, record.canvas);
+    }
+
+    // Compatibility fallback for unusual expressions where the chart result is fed into
+    // createImage() without a directly recoverable assignment. Exact assignment names
+    // always win; this fallback preserves older snippets without relying on chart-like names.
+    const unboundCharts = generatedChartRecords.filter(
+      (record) => !record.variable || !generatedChartsBySource.has(record.variable),
+    );
+    let fallbackChartIndex = 0;
     for (const call of calls) {
       if (call.method !== 'createImage' || !call.args[0]) continue;
       const parsed = resolveCallArgument(source, call, call.args[0], resolve);
       const items = Array.isArray(parsed) ? parsed : [parsed];
+
       for (const item of items) {
         if (!isRecord(item)) continue;
         const label = unresolvedPreviewLabel(item.source);
-        if (!label || !/(?:chart|graph|plot)/i.test(label) || chartSourceLabels.includes(label)) continue;
-        chartSourceLabels.push(label);
+        if (!label || generatedChartsBySource.has(label)) continue;
+        const fallback = unboundCharts[fallbackChartIndex];
+        if (!fallback) continue;
+        generatedChartsBySource.set(label, fallback.canvas);
+        fallbackChartIndex += 1;
       }
     }
-    const generatedChartsBySource = new Map<string, HTMLCanvasElement>();
-    chartSourceLabels.forEach((label, index) => {
-      const chart = generatedCharts[index];
-      if (chart) generatedChartsBySource.set(label, chart);
-    });
 
     const canvasCall = calls.find((call) => call.method === 'createCanvas');
     if (!canvasCall?.args[0]) {

@@ -21,8 +21,10 @@ import {
 import {
   DOC8_RESOURCE_LIMITS,
   type InteractiveArtifact,
+  type InteractiveInputAsset,
 } from '@/lib/docs/playground/contracts';
 import { detectStudioMedia } from '@/lib/studio/runtime/media';
+import { normalizeStudioAssetName } from '@/lib/studio/runtime/assets';
 import { wrapStudioSnippetForRunner } from '@/lib/studio/runtime/wrapStudioSnippetForRunner';
 
 export const runtime = 'nodejs';
@@ -32,6 +34,7 @@ type RunBody = {
   code?: string;
   lang?: string;
   context?: string;
+  assets?: InteractiveInputAsset[];
 };
 
 type StudioManifestEntry = {
@@ -101,6 +104,7 @@ async function proxyToRemoteExecutor(body: RunBody, config: { url: string; token
         lang: body.lang,
         context: 'studio',
         protocolVersion: 1,
+        assets: Array.isArray(body.assets) ? body.assets : [],
       }),
       cache: 'no-store',
       signal: controller.signal,
@@ -148,6 +152,63 @@ function runnerEnvironment(projectRoot: string, extra: NodeJS.ProcessEnv = {}): 
   if (process.env.APEXIFY_FFPROBE_PATH) env.APEXIFY_FFPROBE_PATH = process.env.APEXIFY_FFPROBE_PATH;
 
   return env;
+}
+
+function materializeStudioAssets(
+  assets: InteractiveInputAsset[],
+  runDir: string,
+): string {
+  if (assets.length > DOC8_RESOURCE_LIMITS.maxInputAssets) {
+    throw new Error('Studio input asset count exceeds the configured limit.');
+  }
+
+  const assetDir = join(runDir, 'assets');
+  mkdirSync(assetDir, { recursive: true });
+
+  let totalBytes = 0;
+  const names = new Set<string>();
+
+  for (const asset of assets) {
+    if (
+      !asset ||
+      typeof asset.id !== 'string' ||
+      typeof asset.name !== 'string' ||
+      typeof asset.mime !== 'string' ||
+      typeof asset.base64 !== 'string' ||
+      typeof asset.size !== 'number'
+    ) {
+      throw new Error('Studio input asset metadata is invalid.');
+    }
+
+    const name = normalizeStudioAssetName(asset.name);
+    if (names.has(name)) {
+      throw new Error(`Studio input asset names collide after normalization: ${name}`);
+    }
+    names.add(name);
+
+    let bytes: Buffer;
+    try {
+      bytes = Buffer.from(asset.base64, 'base64');
+    } catch {
+      throw new Error(`Studio input asset ${name} has invalid base64 content.`);
+    }
+
+    if (bytes.length !== asset.size) {
+      throw new Error(`Studio input asset ${name} size does not match its payload.`);
+    }
+    if (bytes.length > DOC8_RESOURCE_LIMITS.inputAssetBytes) {
+      throw new Error(`Studio input asset ${name} exceeds the per-asset limit.`);
+    }
+
+    totalBytes += bytes.length;
+    if (totalBytes > DOC8_RESOURCE_LIMITS.totalInputAssetBytes) {
+      throw new Error('Studio input assets exceed the aggregate input limit.');
+    }
+
+    writeFileSync(join(assetDir, name), bytes);
+  }
+
+  return assetDir;
 }
 
 function parseStudioManifest(path: string): StudioManifest {
@@ -216,11 +277,13 @@ async function runStudioLocal({
   projectRoot,
   tsxCli,
   apexifyEsm,
+  assets,
 }: {
   code: string;
   projectRoot: string;
   tsxCli: string;
   apexifyEsm: string;
+  assets: InteractiveInputAsset[];
 }) {
   const dir = join(tmpdir(), `apexify-studio-run-${randomUUID()}`);
   const artifactDir = join(dir, 'artifacts');
@@ -229,6 +292,7 @@ async function runStudioLocal({
   const entry = join(dir, 'snippet.ts');
 
   mkdirSync(artifactDir, { recursive: true });
+  const inputAssetDir = materializeStudioAssets(assets, dir);
   writeFileSync(
     entry,
     wrapStudioSnippetForRunner(code, { apexifyImportHref: pathToFileURL(apexifyEsm).href }),
@@ -247,6 +311,7 @@ async function runStudioLocal({
         GALLERY_ERR: errPath,
         STUDIO_ARTIFACT_DIR: artifactDir,
         STUDIO_MANIFEST: manifestPath,
+        STUDIO_ASSET_DIR: inputAssetDir,
       }),
     });
 
@@ -481,6 +546,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: blocked }, { status: 400 });
   }
 
+  const assets =
+    context === 'studio' && Array.isArray(body.assets)
+      ? body.assets
+      : [];
+
+  if (context === 'studio' && body.assets !== undefined && !Array.isArray(body.assets)) {
+    return NextResponse.json({ ok: false, error: 'Studio assets must be an array.' }, { status: 400 });
+  }
+
   const local = isLocalRunnerEnabled();
   const remote = remoteExecutorConfig();
 
@@ -513,6 +587,6 @@ export async function POST(req: NextRequest) {
   }
 
   return context === 'studio'
-    ? runStudioLocal({ code, projectRoot, tsxCli, apexifyEsm })
+    ? runStudioLocal({ code, projectRoot, tsxCli, apexifyEsm, assets })
     : runGalleryLocal({ code, projectRoot, tsxCli, apexifyEsm });
 }
