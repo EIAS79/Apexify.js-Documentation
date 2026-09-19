@@ -253,6 +253,8 @@ export function StudioPreviewZoom({ src, alt }: { src: string; alt: string }) {
 
       <div
         ref={scrollRef}
+        data-cursor={natural ? 'pointer' : undefined}
+        title={natural ? 'Drag to pan preview' : undefined}
         className={`studio-preview-scroll min-h-[160px] flex-1 touch-pan-x touch-pan-y overflow-auto rounded-lg p-2 sm:min-h-[200px] sm:rounded-xl sm:p-4 md:p-5 ${natural ? (grabPan ? 'cursor-grabbing' : 'cursor-grab') : ''}`}
         style={{
           backgroundImage:

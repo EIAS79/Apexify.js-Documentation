@@ -47,7 +47,7 @@ export default function GalleryScopeBar({
       </ScopeGroup>
 
       <p className="apx-gallery-scope__note">
-        Verified = repository-controlled executable source. Curated = showcase material.
+        Verified examples = repository-controlled executable source. Curated = showcase material.
       </p>
     </section>
   );

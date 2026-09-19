@@ -36,7 +36,7 @@ test('runtime and evidence filters are data filters and reset to all items', () 
 
 test('combined feature/evidence filtering has a real empty state and reset path', () => {
   const impossible = galleryItems.filter(
-    (item) => itemMatchesEvidence(item, 'verified') && itemMatchesFilter(item, 'videos'),
+    (item) => itemMatchesEvidence(item, 'verified') && itemMatchesFilter(item, 'surface'),
   );
   assert.equal(impossible.length, 0);
   const reset = galleryItems.filter(
