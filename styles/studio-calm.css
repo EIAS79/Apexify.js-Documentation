@@ -58,6 +58,7 @@
 
   background:var(--studio-bg);
   color:var(--studio-text);
+  font-family:Inter,Geist,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
 .light .apx-studio-root{
@@ -322,5 +323,146 @@
   .apx-studio-root .studio-run-cluster{
     width:100%;
     overflow-x:auto;
+  }
+}
+
+
+/* Final workbench polish */
+.apx-studio-root button:focus-visible,
+.apx-studio-root a:focus-visible,
+.apx-studio-root [role="separator"]:focus-visible{
+  outline:2px solid var(--studio-blue-2);
+  outline-offset:2px;
+}
+
+.apx-studio-root [data-doc8-primitive="workspace"]{
+  gap:0!important;
+}
+
+.apx-studio-root [role="separator"][aria-label="Resize editor and preview"]{
+  background:var(--studio-line-soft)!important;
+  transition:background-color .14s ease;
+}
+
+.apx-studio-root [role="separator"][aria-label="Resize editor and preview"]:hover,
+.apx-studio-root [role="separator"][aria-label="Resize editor and preview"]:focus-visible{
+  background:color-mix(in srgb,var(--studio-blue) 24%,var(--studio-line-soft))!important;
+}
+
+.apx-studio-root [role="separator"][aria-label="Resize editor and preview"]>span{
+  background:var(--studio-line)!important;
+  transition:background-color .14s ease,height .14s ease;
+}
+
+.apx-studio-root [role="separator"][aria-label="Resize editor and preview"]:hover>span,
+.apx-studio-root [role="separator"][aria-label="Resize editor and preview"]:focus-visible>span{
+  height:3.25rem;
+  background:var(--studio-blue-2)!important;
+}
+
+.apx-studio-root .gallery-snippet-editor-root .cm-editor,
+.apx-studio-root .gallery-snippet-editor-root .cm-scroller,
+.apx-studio-root .gallery-snippet-editor-root .cm-gutters{
+  background:#0d1118!important;
+}
+
+.apx-studio-root .gallery-snippet-editor-root .cm-gutters{
+  border-right-color:#263244!important;
+}
+
+.apx-studio-root .gallery-snippet-editor-root .cm-activeLine,
+.apx-studio-root .gallery-snippet-editor-root .cm-activeLineGutter{
+  background:#151d29!important;
+}
+
+.apx-studio-root .gallery-snippet-editor-root .cm-cursor{
+  border-left-color:var(--studio-mint-2)!important;
+}
+
+.apx-studio-root .gallery-snippet-editor-root .cm-selectionBackground{
+  background:rgba(111,134,255,.24)!important;
+}
+
+.apx-studio-root [aria-label="Studio output preview"]>div:first-child{
+  color:var(--studio-mint)!important;
+}
+
+.apx-studio-root [aria-label="Studio output preview"] img{
+  border:1px solid color-mix(in srgb,var(--studio-line) 92%,transparent);
+  box-shadow:0 18px 55px rgba(0,0,0,.34)!important;
+}
+
+.apx-studio-root [role="menu"] button:hover,
+.apx-studio-root .studio-history-card:hover{
+  background:var(--studio-panel-2)!important;
+}
+
+.apx-studio-root ::-webkit-scrollbar{
+  width:7px;
+  height:7px;
+}
+
+.apx-studio-root ::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.apx-studio-root ::-webkit-scrollbar-thumb{
+  border:2px solid transparent;
+  border-radius:999px;
+  background:color-mix(in srgb,var(--studio-blue) 34%,transparent);
+  background-clip:padding-box;
+}
+
+.apx-studio-root ::-webkit-scrollbar-thumb:hover{
+  background:color-mix(in srgb,var(--studio-blue-2) 54%,transparent);
+  background-clip:padding-box;
+}
+
+@media(max-width:767px){
+  .apx-studio-root>header{
+    max-height:none;
+    overflow-x:visible;
+  }
+
+  .apx-studio-root>header>div{
+    min-width:0;
+  }
+
+  .apx-studio-root .studio-run-cluster{
+    width:100%;
+    max-width:100%;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+
+  .apx-studio-root .studio-run-cluster::-webkit-scrollbar{
+    display:none;
+  }
+
+  .studio-runtime-note{
+    line-height:1.45;
+  }
+
+  .apx-studio-root [data-doc8-primitive="workspace"]>div:first-child{
+    border-bottom:1px solid var(--studio-line);
+  }
+}
+
+@media(max-width:420px){
+  .apx-studio-root>header{
+    padding-inline:.5rem!important;
+  }
+
+  .apx-studio-root .studio-runtime-note{
+    padding-inline:.65rem!important;
+  }
+
+  .apx-studio-root .studio-runtime-note code{
+    white-space:nowrap;
+  }
+
+  .apx-studio-root>footer{
+    gap:.35rem .7rem!important;
+    padding-inline:.65rem!important;
   }
 }

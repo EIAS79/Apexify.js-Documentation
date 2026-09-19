@@ -730,6 +730,8 @@ export default function CodeStudio() {
   return (
     <div
       className="apx-studio-root relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden overscroll-none"
+      data-execution-target={executionTarget}
+      data-node-runner={runnerEnabled ? 'enabled' : 'disabled'}
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
     >
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
@@ -790,7 +792,11 @@ export default function CodeStudio() {
       />
 
       {!runnerEnabled && (
-        <div className="studio-runtime-note flex shrink-0 items-start gap-2 px-3 py-2 text-xs sm:px-4">
+        <div
+          className="studio-runtime-note flex shrink-0 items-start gap-2 px-3 py-2 text-xs sm:px-4"
+          role="status"
+          aria-live="polite"
+        >
           <InformationCircleIcon className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
           <span>
             <strong>Live Canvas is active.</strong> Public Studio safely previews supported

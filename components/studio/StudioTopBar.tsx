@@ -73,9 +73,9 @@ function LayoutPills({
         onClick={() => onChange(m)}
         className="touch-manipulation inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
         style={{
-          color: active ? 'white' : 'var(--text-secondary)',
-          background: active ? 'var(--gradient-sunset)' : 'transparent',
-          boxShadow: active ? 'var(--glow-magenta)' : 'none',
+          color: active ? 'var(--studio-action-ink)' : 'var(--text-secondary)',
+          background: active ? 'var(--studio-blue)' : 'transparent',
+          boxShadow: 'none',
         }}
         title={label}
       >
@@ -116,7 +116,7 @@ function LangPills({
         className="rounded-md px-2.5 py-1.5 text-[11px] font-bold tracking-wide transition-colors active:scale-[0.98] sm:text-xs"
         style={{
           color: active ? 'var(--text-inverse)' : 'var(--text-secondary)',
-          background: active ? 'var(--accent-iris)' : 'transparent',
+          background: active ? 'var(--studio-blue)' : 'transparent',
         }}
       >
         {label}
@@ -382,7 +382,7 @@ export function StudioTopBar(props: TopBarProps) {
           {autoRun && (
             <span
               className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: 'rgba(255,255,255,0.85)' }}
+              style={{ backgroundColor: 'var(--studio-mint)' }}
             />
           )}
         </button>

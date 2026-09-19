@@ -69,7 +69,12 @@ function GalleryCard({
       data-featured={featured || undefined}
       data-media={mediaKind}
     >
-      <button type="button" className="apx-gallery-card__button" onClick={() => onOpen(item)}>
+      <button
+        type="button"
+        className="apx-gallery-card__button"
+        data-cursor="pointer"
+        onClick={() => onOpen(item)}
+      >
         <div className="apx-gallery-card__visual">
           {mediaKind === 'video' ? (
             <video

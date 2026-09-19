@@ -24,6 +24,7 @@ const SHAPES = new Set([
   'square',
   'circle',
   'triangle',
+  'trapezium',
   'star',
   'heart',
   'polygon',
@@ -562,7 +563,10 @@ function applyText(ctx: CanvasRenderingContext2D, value: Jsonish) {
 
     const size = Math.max(1, numberOf(font.size, 32));
     const family = stringOf(font.family, 'Arial');
-    const weight = stringOf(font.weight, '400');
+    const weight =
+      typeof font.weight === 'number'
+        ? String(font.weight)
+        : stringOf(font.weight, '400');
     const style = stringOf(font.style, 'normal');
     const x = numberOf(item.x, 0);
     const y = numberOf(item.y, 0);
@@ -617,20 +621,30 @@ function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
     ctx.translate(-width / 2, -height / 2);
 
     ctx.beginPath();
+
     if (source === 'circle') {
-      ctx.ellipse(width / 2, height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
+      const radius = numberOf(shape.radius, Math.min(width, height) / 2);
+      ctx.arc(width / 2, height / 2, radius, 0, Math.PI * 2);
     } else if (source === 'triangle') {
       ctx.moveTo(width / 2, 0);
       ctx.lineTo(width, height);
       ctx.lineTo(0, height);
       ctx.closePath();
+    } else if (source === 'trapezium') {
+      const topWidth = width * 0.6;
+      const topOffset = (width - topWidth) / 2;
+      ctx.moveTo(topOffset, 0);
+      ctx.lineTo(topOffset + topWidth, 0);
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
     } else if (source === 'star') {
-      const outer = Math.min(width, height) / 2;
-      const inner = numberOf(shape.innerRadius, outer * 0.45);
-      const points = Math.max(3, Math.round(numberOf(shape.sides, 5)));
+      const outer = numberOf(shape.outerRadius, Math.min(width, height) / 2);
+      const inner = numberOf(shape.innerRadius, outer * 0.4);
+      const points = 5;
       for (let i = 0; i < points * 2; i += 1) {
         const radius = i % 2 === 0 ? outer : inner;
-        const angle = -Math.PI / 2 + (i * Math.PI) / points;
+        const angle = (i * Math.PI) / points - Math.PI / 2;
         const px = width / 2 + Math.cos(angle) * radius;
         const py = height / 2 + Math.sin(angle) * radius;
         if (i === 0) ctx.moveTo(px, py);
@@ -638,19 +652,71 @@ function applyImageShapes(ctx: CanvasRenderingContext2D, value: Jsonish) {
       }
       ctx.closePath();
     } else if (source === 'heart') {
-      ctx.moveTo(width / 2, height);
-      ctx.bezierCurveTo(-width * .1, height * .58, 0, height * .15, width * .25, height * .15);
-      ctx.bezierCurveTo(width * .42, height * .15, width / 2, height * .32, width / 2, height * .42);
-      ctx.bezierCurveTo(width / 2, height * .32, width * .58, height * .15, width * .75, height * .15);
-      ctx.bezierCurveTo(width, height * .15, width * 1.1, height * .58, width / 2, height);
+      ctx.moveTo(width / 2, height * 0.9);
+      ctx.bezierCurveTo(width * 0.35, height * 0.6, width * 0.1, height * 0.55, width * 0.1, height * 0.3333);
+      ctx.bezierCurveTo(width * 0.1, height * 0.1, width * 0.5, height * 0.05, width * 0.5, height * 0.3333);
+      ctx.bezierCurveTo(width * 0.5, height * 0.05, width * 0.9, height * 0.1, width * 0.9, height * 0.3333);
+      ctx.bezierCurveTo(width * 0.9, height * 0.55, width * 0.65, height * 0.6, width / 2, height * 0.9);
       ctx.closePath();
+    } else if (source === 'polygon') {
+      const rawPoints = Array.isArray(shape.points) ? shape.points : [];
+      const points = rawPoints.filter(isRecord);
+
+      if (points.length > 0) {
+        const first = points[0];
+        ctx.moveTo(numberOf(first.x, x) - x, numberOf(first.y, y) - y);
+        for (let i = 1; i < points.length; i += 1) {
+          ctx.lineTo(numberOf(points[i].x, x) - x, numberOf(points[i].y, y) - y);
+        }
+        ctx.closePath();
+      } else {
+        const sides = Math.max(3, Math.round(numberOf(shape.sides, 6)));
+        const radius = Math.min(width, height) / 2;
+        for (let i = 0; i < sides; i += 1) {
+          const angle = (i * Math.PI * 2) / sides - Math.PI / 2;
+          const px = width / 2 + Math.cos(angle) * radius;
+          const py = height / 2 + Math.sin(angle) * radius;
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+      }
+    } else if (source === 'arc' || source === 'pieSlice') {
+      const centerX = numberOf(shape.centerX, x + width / 2) - x;
+      const centerY = numberOf(shape.centerY, y + height / 2) - y;
+      const outerRadius = numberOf(
+        shape.radius,
+        numberOf(shape.outerRadius, Math.min(width, height) / 2),
+      );
+      const innerRadius = Math.max(0, numberOf(shape.innerRadius, 0));
+      const startAngle = numberOf(shape.startAngle, 0);
+      const endAngle = numberOf(shape.endAngle, Math.PI * 2);
+
+      if (innerRadius > 0) {
+        ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+        ctx.lineTo(
+          centerX + innerRadius * Math.cos(endAngle),
+          centerY + innerRadius * Math.sin(endAngle),
+        );
+        ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+        ctx.closePath();
+      } else {
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+        ctx.lineTo(centerX, centerY);
+        ctx.closePath();
+      }
     } else {
       const radius = numberOf(item.borderRadius, 0);
-      drawRoundedRect(ctx, 0, 0, width, source === 'square' ? width : height, radius);
+      const drawHeight = source === 'square' ? width : height;
+      drawRoundedRect(ctx, 0, 0, width, drawHeight, radius);
     }
 
-    if (isRecord(shape.gradient)) ctx.fillStyle = createGradient(ctx, shape.gradient, width, height);
-    else ctx.fillStyle = stringOf(shape.color, '#6f86ff');
+    if (isRecord(shape.gradient)) {
+      ctx.fillStyle = createGradient(ctx, shape.gradient, width, height);
+    } else {
+      ctx.fillStyle = stringOf(shape.color, '#6f86ff');
+    }
 
     if (boolOf(shape.fill, true)) ctx.fill();
 
@@ -669,6 +735,20 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
   const started = performance.now();
   const supportedApis = ['createCanvas', 'createText', 'createImage'];
   const warnings: string[] = [];
+
+  if (
+    /(?:node:fs|from\s+['"]fs['"]|require\(\s*['"](?:node:)?fs['"]\s*\)|\bfs\.)/.test(source)
+  ) {
+    warnings.push(
+      'Filesystem calls are Node-only and are ignored by Live Canvas. The visual Apexify calls are still previewed.',
+    );
+  }
+
+  if (/\bprocess\.(?:env|cwd|argv|platform)\b/.test(source)) {
+    warnings.push(
+      'Node process APIs are not executed by Live Canvas. Switch to the trusted-local Node target when available.',
+    );
+  }
 
   try {
     const calls = extractCalls(source, [...supportedApis, ...UNSUPPORTED_APIS]);
