@@ -16,9 +16,10 @@
   "resourceLimits": {
     "executionMs": 55000,
     "sourceChars": 280000,
-    "outputBytes": 26214400,
+    "outputBytes": 33554432,
+    "totalOutputBytes": 67108864,
     "processBufferBytes": 20971520,
     "shareStateBytes": 65536,
-    "maxOutputs": 1
+    "maxOutputs": 24
   }
 }
