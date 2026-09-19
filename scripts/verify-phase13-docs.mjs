@@ -124,7 +124,7 @@ sameSet(Object.keys(cjs), expectedRuntimeExports, 'CommonJS package-root runtime
 const packageJsonPath = require.resolve('apexify.js/package.json');
 const packageJson = JSON.parse(read(packageJsonPath));
 assert(packageJson.name === 'apexify.js', 'installed package name is not apexify.js');
-assert(packageJson.version === '6.0.0', `installed package version is ${packageJson.version}, expected staged 6.0.0`);
+assert(packageJson.version === '6.0.0', `installed package version is ${packageJson.version}, expected 6.0.0`);
 assert(packageJson.engines?.node === '22.x || 24.x || 26.x', `Node engine drifted: ${packageJson.engines?.node}`);
 sameSet(Object.keys(packageJson.exports ?? {}), ['.', './types', './package.json'], 'package export subpaths');
 const typesExport = packageJson.exports?.['./types'];
