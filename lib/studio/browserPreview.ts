@@ -1,5 +1,7 @@
 'use client';
 
+import { createSafePreviewResolver, isUnresolvedPreviewValue } from './safePreviewExpression';
+
 type Jsonish = null | boolean | number | string | Jsonish[] | { [key: string]: Jsonish };
 type RecordValue = { [key: string]: Jsonish };
 
@@ -81,7 +83,7 @@ class LiteralParser {
 
     throw new Error(
       id
-        ? `Live Canvas only accepts literal values inside supported Apexify calls; “${id}” is an expression.`
+        ? `Live Canvas could not resolve the expression “${id}” in this preview.`
         : 'Live Canvas could not parse this Apexify options object.',
     );
   }
@@ -358,6 +360,13 @@ function parseLiteral(source: string): Jsonish {
   return new LiteralParser(source).parse();
 }
 
+function hasUnresolved(value: Jsonish): boolean {
+  if (isUnresolvedPreviewValue(value)) return true;
+  if (Array.isArray(value)) return value.some(hasUnresolved);
+  if (isRecord(value)) return Object.values(value).some(hasUnresolved);
+  return false;
+}
+
 function createGradient(
   ctx: CanvasRenderingContext2D,
   config: RecordValue,
@@ -566,8 +575,10 @@ function applyText(ctx: CanvasRenderingContext2D, value: Jsonish) {
     const weight =
       typeof font.weight === 'number'
         ? String(font.weight)
-        : stringOf(font.weight, '400');
-    const style = stringOf(font.style, 'normal');
+        : boolOf(item.bold, false)
+          ? '700'
+          : stringOf(font.weight, '400');
+    const style = boolOf(item.italic, false) ? 'italic' : stringOf(font.style, 'normal');
     const x = numberOf(item.x, 0);
     const y = numberOf(item.y, 0);
     const rotation = (numberOf(item.rotation, 0) * Math.PI) / 180;
@@ -579,12 +590,40 @@ function applyText(ctx: CanvasRenderingContext2D, value: Jsonish) {
     ctx.font = `${style} ${weight} ${size}px ${family}`;
     ctx.textAlign = stringOf(placement.textAlign, 'left') as CanvasTextAlign;
     ctx.textBaseline = stringOf(placement.textBaseline, 'alphabetic') as CanvasTextBaseline;
-    ctx.fillStyle = stringOf(fill.color, '#ffffff');
+    if (isRecord(item.gradient)) {
+      ctx.fillStyle = createGradient(ctx, item.gradient, Math.max(1, numberOf(item.maxWidth, size * 12)), size * 2);
+    } else {
+      ctx.fillStyle = stringOf(fill.color, stringOf(item.color, '#ffffff'));
+    }
 
     const text = stringOf(item.text, '');
     const maxWidth = numberOf(item.maxWidth, 0);
-    if (maxWidth > 0) ctx.fillText(text, 0, 0, maxWidth);
-    else ctx.fillText(text, 0, 0);
+    const lineHeight = Math.max(0.8, numberOf(item.lineHeight, 1.2));
+    const explicitLines = text.split('\n');
+
+    if (maxWidth > 0) {
+      const rendered: string[] = [];
+      for (const explicitLine of explicitLines) {
+        const words = explicitLine.split(/\s+/).filter(Boolean);
+        if (!words.length) {
+          rendered.push('');
+          continue;
+        }
+        let line = words[0];
+        for (let wordIndex = 1; wordIndex < words.length; wordIndex += 1) {
+          const candidate = line + ' ' + words[wordIndex];
+          if (ctx.measureText(candidate).width <= maxWidth) line = candidate;
+          else {
+            rendered.push(line);
+            line = words[wordIndex];
+          }
+        }
+        rendered.push(line);
+      }
+      rendered.forEach((line, lineIndex) => ctx.fillText(line, 0, lineIndex * size * lineHeight));
+    } else {
+      explicitLines.forEach((line, lineIndex) => ctx.fillText(line, 0, lineIndex * size * lineHeight));
+    }
 
     const strokeWidth = numberOf(stroke.width, 0);
     if (strokeWidth > 0) {
@@ -752,18 +791,26 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
 
   try {
     const calls = extractCalls(source, [...supportedApis, ...UNSUPPORTED_APIS]);
+    const resolver = createSafePreviewResolver(source);
+    const resolve = (expression: string): Jsonish => {
+      try {
+        return resolver.resolve(expression);
+      } catch {
+        return parseLiteral(expression);
+      }
+    };
     const canvasCall = calls.find((call) => call.method === 'createCanvas');
 
     if (!canvasCall?.args[0]) {
       return {
         ok: false,
         elapsedMs: Math.round(performance.now() - started),
-        error: 'Live Canvas needs a literal painter.createCanvas({ ... }) call before it can render a preview.',
+        error: 'Live Canvas needs a supported painter.createCanvas(...) call before it can render a preview.',
         supportedApis,
       };
     }
 
-    const canvasConfig = parseLiteral(canvasCall.args[0]);
+    const canvasConfig = resolve(canvasCall.args[0]);
     if (!isRecord(canvasConfig)) {
       throw new Error('createCanvas() options must be an object literal.');
     }
@@ -787,21 +834,45 @@ export async function renderStudioBrowserPreview(source: string): Promise<Browse
       if (call.index <= canvasCall.index || !call.args[0]) continue;
 
       if (call.method === 'createText') {
-        applyText(ctx, parseLiteral(call.args[0]));
+        const parsed = resolve(call.args[0]);
+        if (hasUnresolved(parsed)) {
+          warnings.push('Some createText() values depend on runtime-only expressions and were skipped or defaulted in Live Canvas.');
+        }
+        applyText(ctx, parsed);
       } else if (call.method === 'createImage') {
-        const parsed = parseLiteral(call.args[0]);
-        applyImageShapes(ctx, parsed);
-
+        const parsed = resolve(call.args[0]);
         const items = Array.isArray(parsed) ? parsed : [parsed];
-        const unsupportedImage = items.some(
-          (item) => isRecord(item) && typeof item.source === 'string' && !SHAPES.has(item.source),
+        const unresolvedSource = items.some(
+          (item) => isRecord(item) && isUnresolvedPreviewValue(item.source),
         );
-        if (unsupportedImage) {
+
+        if (!unresolvedSource) applyImageShapes(ctx, parsed);
+
+        const unsupportedImage = items.some(
+          (item) =>
+            isRecord(item) &&
+            typeof item.source === 'string' &&
+            !isUnresolvedPreviewValue(item.source) &&
+            !SHAPES.has(item.source),
+        );
+
+        if (unresolvedSource) {
+          warnings.push('An image layer depends on a Node-only runtime value and was skipped; other browser-supported layers were still rendered.');
+        } else if (unsupportedImage) {
           warnings.push('Bitmap/remote image sources require the Node renderer; Live Canvas rendered supported shape layers only.');
         }
       } else if (UNSUPPORTED_APIS.includes(call.method)) {
         warnings.push(`${call.method}() requires the Node renderer and was not executed by Live Canvas.`);
       }
+    }
+
+    const unresolved = resolver.unresolved();
+    if (unresolved.length) {
+      warnings.push(
+        'Live Canvas resolved the supported composition subset and skipped runtime-only values: ' +
+          unresolved.slice(0, 4).join(', ') +
+          (unresolved.length > 4 ? '…' : ''),
+      );
     }
 
     const radius = numberOf(canvasConfig.borderRadius, 0);
