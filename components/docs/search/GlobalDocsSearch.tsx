@@ -204,7 +204,7 @@ export function GlobalDocsSearch({
   return (
     <div className="min-w-0">
       <div
-        className="flex min-h-11 items-center gap-2 rounded-xl px-3"
+        className="apx-global-search-control flex min-h-11 items-center gap-2 rounded-xl px-3"
         style={{ background: "var(--bg-sunken)", border: "1px solid var(--border-default)" }}
       >
         <MagnifyingGlassIcon className="h-4 w-4 shrink-0" aria-hidden style={{ color: "var(--text-secondary)" }} />
