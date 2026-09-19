@@ -521,3 +521,29 @@
   .apx-studio-root .studio-file-tabs{padding-inline:.35rem}
   .apx-studio-root .studio-file-tabs-actions{padding-inline:.35rem}
 }
+
+
+/* Preview viewport controls */
+.apx-studio-root .studio-preview-controls button{
+  color:inherit;
+  cursor:pointer;
+}
+.apx-studio-root .studio-preview-zoom:fullscreen{
+  width:100vw;
+  height:100vh;
+  padding:1rem;
+  background:var(--studio-bg);
+  color:var(--studio-text);
+}
+.apx-studio-root .studio-preview-zoom:fullscreen .studio-preview-scroll{
+  min-height:0;
+  border:1px solid var(--studio-line);
+  border-radius:.8rem;
+}
+.apx-studio-root .studio-preview-scroll{
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+.apx-studio-root .studio-preview-scroll:active{
+  cursor:grabbing;
+}
