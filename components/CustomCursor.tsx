@@ -75,18 +75,59 @@ export default function CustomCursor() {
       return values.length ? Math.max(...values) : 0;
     };
 
+    const hasVisibleContainer = (element: HTMLElement) => {
+      const style = window.getComputedStyle(element);
+      const background = style.backgroundColor;
+      const hasBackground =
+        background !== 'transparent' &&
+        background !== 'rgba(0, 0, 0, 0)' &&
+        background !== 'rgba(0,0,0,0)';
+
+      const borderWidth =
+        Number.parseFloat(style.borderTopWidth) +
+        Number.parseFloat(style.borderRightWidth) +
+        Number.parseFloat(style.borderBottomWidth) +
+        Number.parseFloat(style.borderLeftWidth);
+
+      return hasBackground || borderWidth > 0;
+    };
+
+    const readContentRect = (element: HTMLElement) => {
+      const elementRect = element.getBoundingClientRect();
+
+      // Plain text links often occupy a large flex hit-area (for example,
+      // full-height navbar anchors). The cursor should follow the visible
+      // label, not that invisible hit-area.
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      const rangeRect = range.getBoundingClientRect();
+
+      if (
+        rangeRect.width > 0 &&
+        rangeRect.height > 0 &&
+        rangeRect.width <= elementRect.width &&
+        rangeRect.height <= elementRect.height
+      ) {
+        return rangeRect;
+      }
+
+      return elementRect;
+    };
+
     const updateMagnetTarget = () => {
       if (!magnetEl) return;
 
-      const rect = magnetEl.getBoundingClientRect();
-      const padding = 5;
-      const radius = readRadius(magnetEl);
+      const boxed = hasVisibleContainer(magnetEl);
+      const rect = boxed ? magnetEl.getBoundingClientRect() : readContentRect(magnetEl);
+      const paddingX = boxed ? 4 : 9;
+      const paddingY = boxed ? 4 : 6;
+      const radius = boxed ? readRadius(magnetEl) : 7;
 
       tgt.x = rect.left + rect.width / 2;
       tgt.y = rect.top + rect.height / 2;
-      tgt.w = rect.width + padding * 2;
-      tgt.h = rect.height + padding * 2;
-      tgt.r = Math.max(6, radius + padding);
+      tgt.w = rect.width + paddingX * 2;
+      tgt.h = rect.height + paddingY * 2;
+      tgt.r = boxed ? Math.max(6, radius + Math.max(paddingX, paddingY)) : 8;
     };
 
     const setDefaultTarget = () => {
