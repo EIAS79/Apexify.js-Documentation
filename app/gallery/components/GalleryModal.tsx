@@ -92,20 +92,32 @@ export default function GalleryModal({
   const router = useRouter();
   const cfg = CATEGORY_CONFIG[primaryBadgeCategory(item)];
   const Icon = cfg.icon;
-  const hasTs = Boolean(item.code?.ts?.trim());
-  const hasJs = Boolean(item.code?.js?.trim());
+  const pagedCode = item.codePages?.length ? item.codePages : null;
+  const hasTs = Boolean(item.code?.ts?.trim()) || Boolean(pagedCode?.some((page) => page.language === 'ts'));
+  const hasJs = Boolean(item.code?.js?.trim()) || Boolean(pagedCode?.some((page) => page.language === 'js'));
   const hasCode = hasTs || hasJs;
-  const modalMediaKind = inferMediaKind(item.thumbnail, item.thumbnailMedia);
-  const gallerySource = `${item.code?.ts ?? ''}\n${item.code?.js ?? ''}`;
+  const outputAssets = item.outputs?.length
+    ? item.outputs
+    : [{ src: item.thumbnail, label: 'Primary output', media: item.thumbnailMedia }];
+  const gallerySource = [
+    item.code?.ts ?? '',
+    item.code?.js ?? '',
+    ...(pagedCode?.map((page) => page.code) ?? []),
+  ].join('\n');
   const requiresStudioExecution = /\b(?:createAudio|createVideo|videoPipeline)\b/.test(gallerySource);
   const effectiveExecutionMode =
     item.executionMode ?? (requiresStudioExecution ? 'studio' : 'gallery');
-  const executionEligible =
-    hasCode && modalMediaKind !== 'video' && effectiveExecutionMode === 'gallery';
   const studioEligible = hasCode && effectiveExecutionMode !== 'none';
 
   const [layoutMode, setLayoutMode] = useState<ModalLayoutMode>(hasCode ? 'split' : 'media');
   const [codeLang, setCodeLang] = useState<'ts' | 'js'>(hasTs ? 'ts' : 'js');
+  const [codePageIndex, setCodePageIndex] = useState(0);
+  const [outputIndex, setOutputIndex] = useState(0);
+  const activeCodePage = pagedCode?.[Math.min(codePageIndex, Math.max(0, pagedCode.length - 1))];
+  const activeOutput = outputAssets[Math.min(outputIndex, Math.max(0, outputAssets.length - 1))];
+  const modalMediaKind = inferMediaKind(activeOutput.src, activeOutput.media);
+  const executionEligible =
+    hasCode && !pagedCode && modalMediaKind !== 'video' && effectiveExecutionMode === 'gallery';
   const [editedCode, setEditedCode] = useState('');
   const [executionDataUrl, setSandboxDataUrl] = useState<string | null>(null);
   const [executionError, setSandboxError] = useState<string | null>(null);
@@ -117,13 +129,19 @@ export default function GalleryModal({
   const [codeCopied, setCodeCopied] = useState(false);
   const executionProgressRafRef = useRef(0);
 
-  const codeText = codeLang === 'ts' ? item.code?.ts ?? '' : item.code?.js ?? '';
+  const codeText = activeCodePage?.code ?? (codeLang === 'ts' ? item.code?.ts ?? '' : item.code?.js ?? '');
 
   // Reset transient state when item or language changes
   useEffect(() => {
     setLayoutMode(hasCode ? 'split' : 'media');
     setCodeLang(hasTs ? 'ts' : 'js');
+    setCodePageIndex(0);
+    setOutputIndex(0);
   }, [item.id, hasTs, hasCode]);
+
+  useEffect(() => {
+    if (activeCodePage) setCodeLang(activeCodePage.language);
+  }, [activeCodePage]);
 
   useEffect(() => {
     setEditedCode(codeText);
@@ -292,7 +310,7 @@ export default function GalleryModal({
 
   const showCode = hasCode && layoutMode !== 'media';
   const showMedia = layoutMode !== 'code';
-  const previewSrc = executionEligible && executionDataUrl ? executionDataUrl : item.thumbnail;
+  const previewSrc = executionEligible && executionDataUrl ? executionDataUrl : activeOutput.src;
 
   return (
     <>
@@ -551,6 +569,14 @@ export default function GalleryModal({
                         MP4 examples are encoded with FFmpeg. Use the preview above and copy the source below to run locally with Node + FFmpeg if needed.
                       </div>
                     )}
+                    {pagedCode && pagedCode.length > 1 ? (
+                      <GalleryPageStrip
+                        label="CODE PAGES"
+                        current={codePageIndex}
+                        items={pagedCode.map((page) => page.label)}
+                        onSelect={setCodePageIndex}
+                      />
+                    ) : null}
                     <CodeWindow
                       code={editedCode}
                       onCodeChange={setEditedCode}
@@ -559,6 +585,8 @@ export default function GalleryModal({
                       hasTs={hasTs}
                       hasJs={hasJs}
                       onLangChange={setCodeLang}
+                      fileLabel={activeCodePage?.label ?? (codeLang === 'ts' ? 'snippet.ts' : 'snippet.js')}
+                      hideLanguageTabs={Boolean(pagedCode)}
                       executionEligible={executionEligible}
                       runnerEnabled={runnerEnabled}
                       onRunExecution={runExecution}
@@ -600,10 +628,18 @@ export default function GalleryModal({
               style={{ backgroundColor: 'var(--bg-canvas)' }}
             >
               <div className="flex flex-1 min-h-0 min-w-0 flex-col p-3 sm:p-4 max-lg:min-h-[min(44vh,280px)]">
+                {outputAssets.length > 1 ? (
+                  <GalleryPageStrip
+                    label="OUTPUTS"
+                    current={outputIndex}
+                    items={outputAssets.map((output) => output.label)}
+                    onSelect={setOutputIndex}
+                  />
+                ) : null}
                 {modalMediaKind === 'video' ? (
                   <div className="flex flex-1 min-h-0 flex-col items-center justify-center">
                     <video
-                      src={item.thumbnail}
+                      src={activeOutput.src}
                       className="max-w-full max-h-[min(78vh,880px)] rounded-xl"
                       style={{ boxShadow: 'var(--shadow-lg)' }}
                       controls
@@ -630,7 +666,7 @@ export default function GalleryModal({
                       alt={
                         executionEligible && executionDataUrl
                           ? `${item.title} — trusted-local execution output`
-                          : item.title
+                          : `${item.title} — ${activeOutput.label}`
                       }
                     />
                     {executionError && executionEligible && (
@@ -654,6 +690,38 @@ export default function GalleryModal({
         </div>
       </div>
     </>
+  );
+}
+
+function GalleryPageStrip({
+  label,
+  current,
+  items,
+  onSelect,
+}: {
+  label: string;
+  current: number;
+  items: string[];
+  onSelect: (index: number) => void;
+}) {
+  return (
+    <div className="apx-gallery-page-strip" aria-label={label}>
+      <span>{label}</span>
+      <div>
+        {items.map((item, index) => (
+          <button
+            type="button"
+            key={`${item}-${index}`}
+            data-active={index === current || undefined}
+            onClick={() => onSelect(index)}
+            title={item}
+          >
+            <b>{index + 1}</b>
+            <em>{item}</em>
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -726,6 +794,8 @@ function CodeWindow({
   hasTs,
   hasJs,
   onLangChange,
+  fileLabel,
+  hideLanguageTabs,
   executionEligible,
   runnerEnabled,
   onRunExecution,
@@ -743,6 +813,8 @@ function CodeWindow({
   hasTs: boolean;
   hasJs: boolean;
   onLangChange: (lang: 'ts' | 'js') => void;
+  fileLabel?: string;
+  hideLanguageTabs?: boolean;
   executionEligible: boolean;
   runnerEnabled: boolean;
   onRunExecution: () => void;
@@ -754,7 +826,7 @@ function CodeWindow({
   codeCopied: boolean;
 }) {
   const prismLang = codeLang === 'ts' ? 'typescript' : 'javascript';
-  const fileLabel = codeLang === 'ts' ? 'snippet.ts' : 'snippet.js';
+  const resolvedFileLabel = fileLabel ?? (codeLang === 'ts' ? 'snippet.ts' : 'snippet.js');
   const showExecutionBar = editable && executionEligible;
 
   return (
@@ -776,7 +848,7 @@ function CodeWindow({
       >
         <CodeBracketIcon className="h-4 w-4 shrink-0" style={{ color: 'var(--accent-iris-soft)' }} aria-hidden />
         <span className="text-xs font-semibold truncate min-w-0" style={{ color: '#e6edf3' }}>
-          {fileLabel}
+          {resolvedFileLabel}
         </span>
         <span
           className="text-[10px] font-medium shrink-0 uppercase tracking-wide"
@@ -785,7 +857,7 @@ function CodeWindow({
           {codeLang.toUpperCase()}
         </span>
         <span className="flex-1 min-w-2" />
-        {hasTs && hasJs && (
+        {!hideLanguageTabs && hasTs && hasJs && (
           <div
             className="flex rounded-md p-0.5 shrink-0 border"
             style={{
