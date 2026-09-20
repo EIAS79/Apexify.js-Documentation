@@ -13,6 +13,13 @@ This repository powers the Apexify.js documentation website and developer portal
 - **Gallery:** https://apexifyjs.vercel.app/gallery
 - **Studio:** https://apexifyjs.vercel.app/studio
 
+
+## Documentation program status
+
+**DOC-0 through DOC-12 are complete as project phases.**
+
+See [DOC0_12_PROGRAM_COMPLETION_STATUS.md](./DOC0_12_PROGRAM_COMPLETION_STATUS.md) for the authoritative current program status. Historical phase reports and CI logs remain preserved as historical evidence.
+
 ## Brand assets
 
 The current brand assets live in `public/brand/`:
