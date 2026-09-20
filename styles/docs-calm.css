@@ -127,3 +127,22 @@
 /* Code chrome is intentionally dark in both themes; do not inherit light-theme accents. */
 .apx-codeblock__kind{color:#9dd2ca!important}
 .apx-code-action--studio{color:#a9b6ff!important}
+
+
+/* DOC-2 accessibility contract: shell navigation controls expose a minimum
+   44x44 CSS-pixel hit area at every audited viewport. */
+.apx-doc-root :is(
+  .apx-doc-header a,
+  .apx-doc-header button,
+  .apx-doc-header input,
+  .apx-doc-mobile-bar button,
+  .apx-doc-sidebar a,
+  .apx-doc-sidebar summary,
+  .apx-doc-sidebar input,
+  .apx-doc-toc-rail a,
+  .apx-breadcrumbs a,
+  .apx-pager a
+){
+  min-width:44px!important;
+  min-height:44px!important;
+}
