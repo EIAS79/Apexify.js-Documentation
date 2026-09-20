@@ -56,7 +56,7 @@
   --text-primary:var(--gallery-text);
   --text-secondary:var(--gallery-text-2);
   --text-tertiary:var(--gallery-text-3);
-  --text-muted:#697586;
+  --text-muted:var(--gallery-text-3);
   --text-inverse:#0b0f15;
   --accent-iris:var(--gallery-blue);
   --accent-iris-soft:var(--gallery-blue-2);
@@ -95,11 +95,11 @@
   --gallery-line-soft:#dde3ea;
   --gallery-text:#141922;
   --gallery-text-2:#4e5a68;
-  --gallery-text-3:#727f8f;
-  --gallery-blue:#5269dc;
-  --gallery-blue-2:#4058cc;
-  --gallery-mint:#568c86;
-  --gallery-cyan:#4f8490;
+  --gallery-text-3:#526171;
+  --gallery-blue:#4058cc;
+  --gallery-blue-2:#3048b8;
+  --gallery-mint:#365f5a;
+  --gallery-cyan:#365f69;
   --gallery-lavender:#7169a6;
   --gallery-violet:#655e99;
   --gallery-steel:#5d6f82;
@@ -1183,3 +1183,17 @@
     flex-direction:column;
   }
 }
+
+
+/* Peak Lab paged inspector */
+.apx-gallery-page-strip{flex:0 0 auto;margin:0 0 .65rem;display:grid;gap:.45rem}
+.apx-gallery-page-strip>span{color:var(--gallery-text-3);font:800 .52rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em}
+.apx-gallery-page-strip>div{display:flex;gap:.35rem;overflow-x:auto;padding-bottom:.15rem;scrollbar-width:thin}
+.apx-gallery-page-strip button{min-width:0;flex:0 0 auto;display:flex;align-items:center;gap:.42rem;max-width:14rem;padding:.4rem .5rem;border:1px solid var(--gallery-line);border-radius:.45rem;background:var(--gallery-panel);color:var(--gallery-text-2)}
+.apx-gallery-page-strip button b{display:grid;place-items:center;min-width:1.25rem;height:1.25rem;border-radius:.3rem;background:var(--gallery-bg-2);font:800 .55rem/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.apx-gallery-page-strip button em{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:650 .6rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;font-style:normal}
+.apx-gallery-page-strip button[data-active]{border-color:var(--gallery-blue);color:var(--gallery-text);background:color-mix(in srgb,var(--gallery-blue) 10%,var(--gallery-panel))}
+.apx-gallery-grid[data-variant="featured"]{grid-template-columns:1fr}
+.apx-gallery-grid[data-variant="featured"] .apx-gallery-card__visual{aspect-ratio:16/9}
+@media(min-width:720px){.apx-gallery-grid[data-variant="featured"]{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1024px){.apx-gallery-grid[data-variant="featured"]{grid-template-columns:repeat(2,minmax(0,1fr))}.apx-gallery-grid[data-variant="featured"] .apx-gallery-card__visual{aspect-ratio:16/9}}

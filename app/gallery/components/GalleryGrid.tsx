@@ -60,7 +60,7 @@ function GalleryCard({
   const mediaKind = inferMediaKind(item.thumbnail, item.thumbnailMedia);
   const verified = isVerifiedGalleryItem(item);
   const summary = plainGallerySummary(item.description);
-  const hasCode = Boolean(item.code?.ts?.trim() || item.code?.js?.trim());
+  const hasCode = Boolean(item.code?.ts?.trim() || item.code?.js?.trim() || item.codePages?.length);
 
   return (
     <article

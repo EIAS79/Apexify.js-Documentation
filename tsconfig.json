@@ -39,6 +39,7 @@
   ],
   "exclude": [
     "node_modules",
-    "_doc12-package-main"
+    "_doc12-package-main",
+    "scripts/gallery/Apexify-Peak-Lab.ts"
   ]
 }

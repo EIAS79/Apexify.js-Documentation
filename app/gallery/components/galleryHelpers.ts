@@ -1,5 +1,6 @@
 import type { GalleryCardBase, GalleryLens } from '@/lib/gallery/core/galleryTypes';
 import { doc5GalleryItems, type Doc5GalleryCard } from '@/lib/gallery/docs/doc5GalleryAdapter';
+import { peakLabGalleryItems } from '@/lib/gallery/generatedPeakLabCatalog';
 import type { FilterCategory } from './galleryConfig';
 
 export type CuratedGalleryCard = GalleryCardBase & {
@@ -12,14 +13,46 @@ export type GalleryItem = CuratedGalleryCard | Doc5GalleryCard;
 export type GalleryRuntimeFilter = 'all' | 'node';
 export type GalleryEvidenceFilter = 'all' | 'verified' | 'legacy';
 
+const peakShowcaseItems: CuratedGalleryCard[] = [
+  {
+    id: 'showcase-apexify-spectrum',
+    category: 'advance',
+    title: 'Apexify Spectrum',
+    description: 'Peak showcase film spanning composition, typography, image work, charts, templates, audio, motion, and video. Presented as finished Apexify work rather than a source tutorial.',
+    thumbnail: '/brand/Apexify-Spectrum.mp4',
+    thumbnailMedia: 'video',
+    featured: true,
+    lenses: ['composition', 'image', 'typography', 'data', 'motion', 'surface', 'advanced'],
+    primaryLens: 'motion',
+    executionMode: 'none',
+    sourceKind: 'showcase',
+  },
+  {
+    id: 'showcase-orbit-breaker',
+    category: 'advance',
+    title: 'Orbit Breaker',
+    description: 'A cinematic procedural motion study built to show the upper creative range of Apexify composition, effects, animation, and media output.',
+    thumbnail: '/brand/Orbit-Breaker.mp4',
+    thumbnailMedia: 'video',
+    featured: true,
+    lenses: ['composition', 'image', 'motion', 'advanced'],
+    primaryLens: 'motion',
+    executionMode: 'none',
+    sourceKind: 'showcase',
+  },
+];
+
 /**
  * Visible Gallery catalog.
  *
- * Intentionally empty. The Gallery page, theme, filters, modal, and Studio
- * hand-off infrastructure remain in place so a new output set can be added
- * cleanly without carrying forward the previous showcase content.
+ * The two cinematic showcases are hand-curated finished work. Peak Lab items
+ * are generated from the canonical Peak Lab source + real rendered artifacts
+ * by the repository publishing workflow.
  */
-export const galleryItems: GalleryItem[] = [];
+export const galleryItems: GalleryItem[] = [
+  ...peakShowcaseItems,
+  ...peakLabGalleryItems,
+];
 
 export function isVerifiedGalleryItem(item: GalleryItem): item is Doc5GalleryCard {
   return 'doc5' in item && item.doc5 === true;
@@ -30,11 +63,14 @@ export function galleryRuntime(item: GalleryItem): 'node' {
 }
 
 export function galleryEvidence(item: GalleryItem): Exclude<GalleryEvidenceFilter, 'all'> {
-  return isVerifiedGalleryItem(item) ? 'verified' : 'legacy';
+  return isVerifiedGalleryItem(item) || item.sourceKind === 'peak-lab' ? 'verified' : 'legacy';
 }
 
-export function galleryTrustLabel(item: GalleryItem): 'Verified source' | 'Curated demo' {
-  return isVerifiedGalleryItem(item) ? 'Verified source' : 'Curated demo';
+export function galleryTrustLabel(item: GalleryItem): 'Verified source' | 'Peak Lab' | 'Peak showcase' | 'Curated demo' {
+  if (isVerifiedGalleryItem(item)) return 'Verified source';
+  if (item.sourceKind === 'peak-lab') return 'Peak Lab';
+  if (item.sourceKind === 'showcase') return 'Peak showcase';
+  return 'Curated demo';
 }
 
 export function galleryPackageVersion(): string | null {
@@ -76,6 +112,8 @@ export function itemMatchesQuery(item: GalleryItem, query: string): boolean {
   if (!query.trim()) return true;
   const q = query.trim().toLowerCase();
   const features = isVerifiedGalleryItem(item) ? item.doc5Features.join(' ') : '';
+  const sourcePages = item.codePages?.map((page) => page.label).join(' ') ?? '';
+  const outputLabels = item.outputs?.map((output) => output.label).join(' ') ?? '';
   return [
     item.title,
     item.id,
@@ -85,6 +123,8 @@ export function itemMatchesQuery(item: GalleryItem, query: string): boolean {
     galleryEvidence(item),
     galleryTrustLabel(item),
     features,
+    sourcePages,
+    outputLabels,
   ].some((value) => value.toLowerCase().includes(q));
 }
 

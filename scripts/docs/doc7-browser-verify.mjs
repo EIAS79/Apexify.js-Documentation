@@ -113,9 +113,13 @@ try {
     if (!(await homePage.$('[data-doc7-verified-hero="node.chart.bar"]'))) throw new Error(`${state.name} verified homepage hero missing`);
     if (!(await homePage.$('[data-product-status="CURRENT"]'))) throw new Error(`${state.name} CURRENT status missing`);
     if (!(await homePage.$('[data-product-status="ROADMAP"]'))) throw new Error(`${state.name} ROADMAP status missing`);
-    if ((await homePage.$$('[aria-labelledby="current-capabilities"] a')).length < 9) throw new Error(`${state.name} capability API links incomplete`);
-    if ((await homePage.$$('[aria-labelledby="feature-tracks"] a')).length < 4) throw new Error(`${state.name} feature-track links incomplete`);
-    if ((await homePage.$$('[aria-labelledby="verified-examples"] a[href^="/examples/"]')).length < 4) throw new Error(`${state.name} verified-example strip incomplete`);
+    const curatedCapabilityLinks = (await homePage.$('[aria-labelledby="what-you-can-build"] a[href^="/api-reference/"]')).length;
+    if (curatedCapabilityLinks !== 4) throw new Error(`${state.name} curated capability API links ${curatedCapabilityLinks}, expected 4`);
+    const completeCapabilityLinks = (await homePage.$('.apx-roadmap-grid__current a[href^="/api-reference/"]')).length;
+    if (completeCapabilityLinks !== 9) throw new Error(`${state.name} complete current capability links ${completeCapabilityLinks}, expected 9`);
+    const workflowApiLinks = (await homePage.$('[aria-labelledby="render-workflow"] a[href^="/api-reference/"]')).length;
+    if (workflowApiLinks < 7) throw new Error(`${state.name} workflow API links incomplete: ${workflowApiLinks}`);
+    if (!(await homePage.$('[data-doc7-verified-hero] a[href^="/examples/"]'))) throw new Error(`${state.name} verified example canonical link missing`);
     const copyButton = await homePage.$('button[aria-label="Copy Apexify.js install command"]');
     if (!copyButton) throw new Error(`${state.name} copy-install control missing`);
     await copyButton.focus();
@@ -172,9 +176,8 @@ try {
   await keyboard.keyboard.press('Escape');
   await keyboard.waitForSelector('[role="dialog"][aria-label="Search gallery"]', { hidden: true });
 
-  await keyboard.goto(`${base}/gallery#${encodeURIComponent('node.canvas.basic+advance')}`, { waitUntil: 'networkidle2' });
-  await keyboard.waitForSelector('#gallery-modal-title');
-  if (!(await keyboard.$('#gallery-modal-about a[href="/examples/node.canvas.basic"]'))) throw new Error('Gallery canonical DOC-5 example linkage missing');
+  await keyboard.goto(`${base}/gallery`, { waitUntil: 'networkidle2' });
+  if (!(await keyboard.$('.apx-gallery-closing__actions a[href="/examples/node.canvas.basic"]'))) throw new Error('Gallery canonical DOC-5 example linkage missing');
   await keyboard.close();
 } finally {
   await browser.close();

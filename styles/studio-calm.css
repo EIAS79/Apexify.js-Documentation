@@ -33,7 +33,7 @@
   --text-primary:var(--studio-text);
   --text-secondary:var(--studio-text-2);
   --text-tertiary:var(--studio-text-3);
-  --text-muted:#697586;
+  --text-muted:var(--studio-text-3);
   --text-inverse:#0b0f15;
   --accent-iris:var(--studio-blue);
   --accent-magenta:var(--studio-blue);
@@ -71,13 +71,13 @@
   --studio-line-soft:#dde3ea;
   --studio-text:#141922;
   --studio-text-2:#4e5a68;
-  --studio-text-3:#727f8f;
-  --studio-blue:#5269dc;
-  --studio-blue-2:#4058cc;
-  --studio-mint:#568c86;
-  --studio-mint-2:#43756f;
+  --studio-text-3:#526171;
+  --studio-blue:#4058cc;
+  --studio-blue-2:#3048b8;
+  --studio-mint:#365f5a;
+  --studio-mint-2:#305b56;
   --studio-lavender:#7169a6;
-  --studio-action:#5269dc;
+  --studio-action:#4058cc;
   --studio-action-ink:#fff;
   --text-inverse:#fff;
   --gradient-twilight:linear-gradient(145deg,#eef1f4 0%,#e8edf1 55%,#f7f8fa 100%);

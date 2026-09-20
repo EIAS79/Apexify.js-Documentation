@@ -28,9 +28,9 @@ export default function GalleryHero({ counts, version }: { counts: Counts; versi
           </h1>
 
           <p>
-            A curated library of Apexify.js output across composition, imagery, typography,
-            data, motion, surfaces, and advanced rendering studies. Open any piece to inspect
-            the source, preview, and execution context behind it.
+            Real Apexify.js output across composition, imagery, typography, data, motion,
+            surfaces, and advanced rendering. Peak Lab pieces pair generated artifacts with
+            their exact recipe source; the two cinematic Peak Showcases are finished work.
           </p>
 
           <div className="apx-gallery-hero__signals">

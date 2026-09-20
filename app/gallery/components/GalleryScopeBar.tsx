@@ -49,7 +49,7 @@ export default function GalleryScopeBar({
       </ScopeGroup>
 
       <p className="apx-gallery-scope__note">
-        Curated = purpose-built Apexify.js showcase source. Verified examples remain available in the canonical Examples library.
+        Verified examples include source-backed Peak Lab renders. Curated contains finished showcase films where source is intentionally not displayed.
       </p>
     </section>
   );
