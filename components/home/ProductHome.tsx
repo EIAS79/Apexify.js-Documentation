@@ -449,7 +449,7 @@ export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
             body="This compares typical workflow focus, not every library implementation. The point is where each approach usually puts the composition burden."
           />
 
-          <div className="apx-compare">
+          <div className="apx-compare" tabIndex={0} role="region" aria-label="Apexify.js comparison table">
             <div className="apx-compare__head">
               <span>Capability</span>
               <strong>Apexify.js</strong>
