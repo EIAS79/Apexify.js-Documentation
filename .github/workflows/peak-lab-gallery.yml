@@ -1,0 +1,74 @@
+name: Publish Peak Lab Gallery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/gallery/Apexify-Peak-Lab.ts'
+      - 'scripts/gallery/publish-peak-lab.mjs'
+      - '.github/workflows/peak-lab-gallery.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: peak-lab-gallery
+  cancel-in-progress: true
+
+jobs:
+  render-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout documentation
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Checkout Apexify.js verification engine
+        uses: actions/checkout@v4
+        with:
+          repository: EIAS79/Apexify.js
+          ref: 6825a9e8413cd6dc711aca35bd7bca35fe42e5b4
+          path: .peak-engine
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: .peak-engine/package-lock.json
+
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Build Apexify.js
+        working-directory: .peak-engine
+        run: |
+          npm ci
+          npm run build
+
+      - name: Render all Peak Lab recipes
+        run: |
+          cp scripts/gallery/Apexify-Peak-Lab.ts .peak-engine/Apexify-Peak-Lab.ts
+          cd .peak-engine
+          npx tsx ./Apexify-Peak-Lab.ts --all
+
+      - name: Publish curated gallery assets and source pages
+        env:
+          PEAK_LAB_SOURCE: scripts/gallery/Apexify-Peak-Lab.ts
+          PEAK_LAB_OUTPUT: .peak-engine/apexify-peak-output/output
+        run: node scripts/gallery/publish-peak-lab.mjs
+
+      - name: Commit generated Peak Lab gallery
+        run: |
+          git config user.name "apexify-gallery-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/gallery/peak-lab lib/gallery/generatedPeakLabCatalog.ts
+          if git diff --cached --quiet; then
+            echo "Peak Lab gallery is already current."
+            exit 0
+          fi
+          git commit -m "chore(gallery): publish verified Peak Lab outputs [skip ci]"
+          git push
