@@ -86,6 +86,8 @@ function extractMeta(block) {
 
 function cleanDisplayTypeScript(code) {
   return code
+    .replace(/:\s*any\[\]/g, '')
+    .replace(/:\s*Promise<any>\b/g, '')
     .replace(/:\s*any\b/g, '')
     .replace(/\s+as\s+any\b/g, '')
     .replace(/\bC\./g, 'COLORS.')
@@ -120,7 +122,22 @@ function splitSharedHelpers(sharedCode) {
     .replace(/^export interface RecipeMeta[^\n]*\n/gm, '')
     .replace(/^export interface Recipe[^\n]*\n/gm, '')
     .replace(/const coverage:[\s\S]*?const p:[^\n]*\n/, '')
-    .replace(/const C:\s*any\s*=\s*Object\.freeze/, 'const COLORS = Object.freeze');
+    .replace(/const C:\s*any\s*=\s*Object\.freeze/, 'const COLORS = Object.freeze')
+    // The published Studio source must not depend on Peak Lab's CI-only
+    // output/assets tree or on an env key intentionally hidden by the sandbox.
+    .replace(
+      /const ROOT:[^\n]*\nconst OUT:[^\n]*\nconst ASSETS:[^\n]*\n/,
+      "const OUT = path.resolve('apexify-studio-output');\n",
+    )
+    .replace(
+      /const fontFile:[^\n]*\nconst font:[^\n]*\n/,
+      "const font = (size=24) => ({ size, family: 'DejaVu Sans' });\n",
+    )
+    // Return the real generated path so Studio can collect and preview it.
+    .replace(
+      /async function save\(name:[^\n]*\n?/,
+      "async function save(name, buffer) { await mkdir(OUT,{recursive:true}); const file=path.join(OUT,name); await writeFile(file,buffer); return file; }\n",
+    );
 
   return {
     core: cleanDisplayTypeScript(core),
