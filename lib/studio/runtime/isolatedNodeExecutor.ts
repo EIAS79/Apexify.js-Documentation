@@ -564,32 +564,6 @@ function denoArguments(
     '/etc/fonts',
   ].filter((path) => existsSync(path));
 
-  const envNames = [
-    'NODE_ENV',
-    'GALLERY_ERR',
-    'STUDIO_ARTIFACT_DIR',
-    'STUDIO_MANIFEST',
-    'STUDIO_ASSET_MANIFEST',
-    'APEXIFY_TEMP_DIR',
-    'NAPI_RS_NATIVE_LIBRARY_PATH',
-    'NAPI_RS_FORCE_WASI',
-    'DISABLE_SYSTEM_FONTS_LOAD',
-    'npm_package_config_libvips',
-    'npm_config_arch',
-    'npm_config_platform',
-    'npm_config_libc',
-    'CC',
-    'PKG_CONFIG_PATH',
-    'SHARP_IGNORE_GLOBAL_LIBVIPS',
-    'SHARP_FORCE_GLOBAL_LIBVIPS',
-    'MALLOC_ARENA_MAX',
-    'VIPS_CONCURRENCY',
-    ...(media ? ['APEXIFY_FFMPEG_PATH', 'APEXIFY_FFPROBE_PATH', 'STUDIO_MEDIA_CAP_ID'] : []),
-    'DENO_DIR',
-    'DENO_NO_UPDATE_CHECK',
-    'NO_COLOR',
-  ];
-
   const args = [
     'run',
     '--quiet',
@@ -598,7 +572,11 @@ function denoArguments(
     '--node-modules-dir=manual',
     `--allow-read=${readPaths.join(',')}`,
     `--allow-write=${runDir}`,
-    `--allow-env=${envNames.join(',')}`,
+    // executeDeno() replaces the child environment with safeEnvironment().
+    // No host/Vercel secrets are inherited, so allowing env reads here only
+    // permits libraries to inspect that sanitized environment or receive
+    // undefined for absent keys instead of Deno NotCapable exceptions.
+    '--allow-env',
     '--allow-ffi=' + [nativeCanvasRoot(), sharpNativeRoot()].join(','),
     // @napi-rs/canvas uses Node process.report while selecting its native binary.
     // Deno's process.report probes cpus + networkInterfaces + OS metadata.
