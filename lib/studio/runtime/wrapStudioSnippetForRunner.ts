@@ -36,7 +36,14 @@ export function wrapStudioSnippetForRunner(
     JSON.stringify(apexifyImportHref),
   );
 
-  body = body.replace(/\s*return\s+await\s+main\s*\(\)\s*;?\s*$/m, '').trim();
+  body = body
+    .replace(/\s*return\s+await\s+main\s*\(\)\s*;?\s*$/m, '')
+    .replace(
+      /\s*\(\s*async\s*\(\s*\)\s*=>\s*\{\s*await\s+main\s*\(\s*\)\s*;?\s*\}\s*\)\s*\(\s*\)\s*\.catch\s*\(\s*console\.error\s*\)\s*;?\s*$/m,
+      '',
+    )
+    .replace(/\s*main\s*\(\s*\)\s*\.catch\s*\(\s*console\.error\s*\)\s*;?\s*$/m, '')
+    .trim();
 
   const { hoisted, rest: inner } = hoistLeadingImports(body);
   const hoistedBlock = hoisted ? hoisted + '\n\n' : '';
