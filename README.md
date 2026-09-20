@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/brand/readme-banner.svg" alt="Apexify.js — Build visual systems from code" width="100%" />
+  <img src="./public/brand/apexify-banner.png" alt="Apexify.js — Build visual systems from code" width="100%" />
 </p>
 
 # Apexify.js Documentation
@@ -17,12 +17,11 @@ This repository powers the Apexify.js documentation website and developer portal
 
 The current brand assets live in `public/brand/`:
 
-- `icon.svg` — compact Apexify mark used for the browser favicon and small UI placements.
-- `banner-dark.svg` — full Apexify.js logo for dark surfaces.
-- `banner-light.svg` — full Apexify.js logo for light surfaces.
-- `readme-banner.svg` — repository/documentation banner.
+- `apexify-mark.png` — exact uploaded Apexify mark used for favicons and compact UI placements.
+- `apexify-lockup.png` — exact uploaded Apexify.js horizontal logo/wordmark.
+- `apexify-banner.png` — exact uploaded full repository/documentation banner.
 
-The code shown in the README banner uses the same current `ApexPainter` / `createCanvas()` API shape used by the verified documentation homepage example.
+The older SVG and AVIF files remain only as compatibility/fallback assets. The site and README use the original uploaded PNG artwork so the mark, wordmark geometry, and `.js` spacing stay exact.
 
 ## Development
 

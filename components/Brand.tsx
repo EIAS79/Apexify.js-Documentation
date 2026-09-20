@@ -4,22 +4,20 @@
  * Brand assets — single source of truth for the Apexify.js logo + wordmark.
  *
  * Two pieces:
- *   - <BrandIcon />   the square mark; used in the navbar and the footer.
- *   - <BrandBanner /> the horizontal logo + wordmark lockup; theme-aware,
- *                     swaps between /public/brand/banner-light.svg and
- *                     /public/brand/banner-dark.svg.
+ *   - <BrandIcon />   the exact uploaded square Apexify mark.
+ *   - <BrandBanner /> the exact uploaded horizontal Apexify.js lockup.
  *
- * The actual artwork lives at:
- *   - /public/brand/icon.svg          (favicon via `app/layout.tsx` → `metadata.icons`)
- *   - /public/brand/banner-light.svg
- *   - /public/brand/banner-dark.svg
- *   - /app/apple-icon.tsx             (iOS home-screen PNG via ImageResponse)
+ * Canonical source artwork:
+ *   - /public/brand/apexify-mark.png
+ *   - /public/brand/apexify-lockup.png
+ *   - /public/brand/apexify-banner.png
+ *   - /app/apple-icon.png
  *
- * Swap the SVGs in /public/brand to update the brand site-wide.
+ * These PNG files are the original uploaded assets; do not rebuild the
+ * wordmark from browser text or SVG primitives.
  */
 
 import Image from 'next/image';
-import { useTheme } from './ThemeProvider';
 
 interface BrandIconProps {
   /**
@@ -37,7 +35,7 @@ export function BrandIcon({ size, className, decorative = true }: BrandIconProps
   if (size != null) {
     return (
       <Image
-        src="/brand/icon.svg"
+        src="/brand/apexify-mark.png"
         alt={decorative ? '' : 'Apexify.js'}
         aria-hidden={decorative || undefined}
         width={size}
@@ -50,7 +48,7 @@ export function BrandIcon({ size, className, decorative = true }: BrandIconProps
   }
   return (
     <Image
-      src="/brand/icon.svg"
+      src="/brand/apexify-mark.png"
       alt={decorative ? '' : 'Apexify.js'}
       aria-hidden={decorative || undefined}
       width={64}
@@ -71,41 +69,28 @@ interface BrandBannerProps {
 }
 
 /**
- * Theme-aware logo + wordmark lockup. On first paint we render BOTH variants
- * stacked and toggle visibility with CSS (.dark / .light on <html>) so the
- * correct one is visible even before the theme context has hydrated. After
- * hydration we render only the resolved variant so unused bytes don't ship
- * to interactive paint.
+ * Exact logo + wordmark lockup from the uploaded source artwork.
+ *
+ * `variant` remains accepted for call-site compatibility, but the same
+ * canonical artwork is used in both themes so the logo geometry and .js
+ * spacing cannot drift between variants.
  */
-export function BrandBanner({ variant, className = '', maxWidth = 480 }: BrandBannerProps) {
-  const { theme } = useTheme();
-  const resolved = variant ?? theme;
-
+export function BrandBanner({ className = '', maxWidth = 480 }: BrandBannerProps) {
   return (
     <div
       className={`brand-banner relative ${className}`}
-      style={{ maxWidth, aspectRatio: '960 / 220' }}
+      style={{ maxWidth, width: '100%' }}
       aria-label="Apexify.js — Programmatic visual library for Node.js"
       role="img"
     >
       <Image
-        src="/brand/banner-light.svg"
+        src="/brand/apexify-lockup.png"
         alt=""
         aria-hidden
-        fill
+        width={2048}
+        height={682}
         sizes={`${maxWidth}px`}
-        className="brand-banner-light object-contain"
-        style={{ display: resolved === 'light' ? 'block' : 'none' }}
-        priority
-      />
-      <Image
-        src="/brand/banner-dark.svg"
-        alt=""
-        aria-hidden
-        fill
-        sizes={`${maxWidth}px`}
-        className="brand-banner-dark object-contain"
-        style={{ display: resolved === 'dark' ? 'block' : 'none' }}
+        className="block h-auto w-full object-contain"
         priority
       />
     </div>
