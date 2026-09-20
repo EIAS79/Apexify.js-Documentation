@@ -1,4 +1,4 @@
-/** Shared gallery card shape — previews are static files under `/public/gallery-outputs/` or verified DOC-5 output paths. */
+/** Shared Gallery card shape. The visual shell is retained even when the visible catalog is empty. */
 
 export type GalleryMediaKind = 'image' | 'gif' | 'video';
 
