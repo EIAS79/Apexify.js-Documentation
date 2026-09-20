@@ -44,9 +44,18 @@ export function wrapStudioSnippetForRunner(
   const apexPainterBinding = declaresApexPainter
     ? ''
     : '  const ApexPainter = __apexMod.ApexPainter ?? __apexMod.default?.ApexPainter ?? __apexMod.default;\n';
+  const declaresPath = /\b(?:const|let|var|class|function|import)\s+path\b/.test(inner);
+  const declaresFs = /\b(?:const|let|var|class|function|import)\s+fs\b/.test(inner);
+  const pathBinding = !declaresPath && /\bpath\s*\./.test(inner)
+    ? '  const path = __studioPath;\n'
+    : '';
+  const fsBinding = !declaresFs && /\bfs\s*\./.test(inner)
+    ? '  const fs = __studioFs;\n'
+    : '';
   const frameArrayHint = /\b(?:animate|extractMultipleFrames)\s*\(/.test(body);
 
-  return `import { copyFileSync as __studioCopy, existsSync as __studioExists, mkdirSync as __studioMkdir, readFileSync as __studioRead, readdirSync as __studioReadDir, statSync as __studioStat, writeFileSync as __studioWrite } from 'node:fs';
+  return `import * as __studioFs from 'node:fs';
+import { copyFileSync as __studioCopy, existsSync as __studioExists, mkdirSync as __studioMkdir, readFileSync as __studioRead, readdirSync as __studioReadDir, statSync as __studioStat, writeFileSync as __studioWrite } from 'node:fs';
 import * as __studioPath from 'node:path';
 import * as __studioCanvas from ${JSON.stringify(canvasImportHref)};
 
@@ -173,7 +182,7 @@ function __studioJson(value: unknown): string {
 void (async () => {
   __studioRegisterFonts();
   const __apexMod = await import(${JSON.stringify(apexifyImportHref)});
-${apexPainterBinding}
+${apexPainterBinding}${pathBinding}${fsBinding}
 ${inner}
 
   const __artifactDir = process.env.STUDIO_ARTIFACT_DIR!;
