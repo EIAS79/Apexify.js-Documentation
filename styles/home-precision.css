@@ -920,3 +920,10 @@
 .apx-peak-film__copy h3{margin:.75rem 0 0;font-size:clamp(1.5rem,3vw,2.35rem);line-height:.95;letter-spacing:-.045em}
 .apx-peak-film__copy p{max-width:44rem;margin:.75rem 0 0;color:var(--text-2);font-size:.82rem;line-height:1.6}
 @media(min-width:900px){.apx-peak-films{grid-template-columns:minmax(0,1.35fr) minmax(0,.65fr);align-items:start}.apx-peak-film--orbit .apx-peak-film__copy h3{font-size:1.7rem}}
+
+
+/* WCAG AA contrast locks for filled light-theme controls. */
+.light .apx-home-root .apx-home-install,
+.light .apx-home-root .apx-cta--primary {
+  color:#fff!important;
+}
