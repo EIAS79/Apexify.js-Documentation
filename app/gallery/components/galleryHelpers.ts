@@ -1,8 +1,9 @@
 import { peakGalleryItems, type PeakGalleryCard } from '@/lib/gallery/peak/peakGalleryItems';
+import { peakLabGalleryItems, type PeakLabGalleryCard } from '@/lib/gallery/peak/peakLabGalleryItems';
 import { doc5GalleryItems, type Doc5GalleryCard } from '@/lib/gallery/docs/doc5GalleryAdapter';
 import type { FilterCategory } from './galleryConfig';
 
-export type GalleryItem = PeakGalleryCard | Doc5GalleryCard;
+export type GalleryItem = PeakGalleryCard | PeakLabGalleryCard | Doc5GalleryCard;
 export type GalleryRuntimeFilter = 'all' | 'node';
 export type GalleryEvidenceFilter = 'all' | 'verified' | 'legacy';
 
@@ -10,11 +11,12 @@ export type GalleryEvidenceFilter = 'all' | 'verified' | 'legacy';
  * Visible Gallery catalog.
  *
  * The pre-reset curated catalog remains in source/history for compatibility,
- * but the Gallery UI now starts from this purpose-built peak showcase only.
+ * but the Gallery UI now starts from the purpose-built peak showcase plus
+ * the complete 26-recipe Peak Lab collection.
  * DOC-5 examples remain available at /examples and still provide package
  * provenance/version information below.
  */
-export const galleryItems: GalleryItem[] = [...peakGalleryItems];
+export const galleryItems: GalleryItem[] = [...peakGalleryItems, ...peakLabGalleryItems];
 
 export function isVerifiedGalleryItem(item: GalleryItem): item is Doc5GalleryCard {
   return 'doc5' in item && item.doc5 === true;
