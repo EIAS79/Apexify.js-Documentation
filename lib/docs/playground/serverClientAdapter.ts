@@ -1,6 +1,7 @@
 'use client';
 
 import type { StudioVirtualAsset } from '@/lib/studio/runtime/assets';
+import type { StudioWorkspaceFile } from '@/lib/studio/runtime/workspace';
 import {
   type ExecutionAdapter,
   type ExecutionResult,
@@ -70,8 +71,12 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
     }
 
     const started = performance.now();
-    const studioOptions = session.options as { studioAssets?: StudioVirtualAsset[] };
+    const studioOptions = session.options as {
+      studioAssets?: StudioVirtualAsset[];
+      studioFiles?: StudioWorkspaceFile[];
+    };
     const studioAssets = Array.isArray(studioOptions.studioAssets) ? studioOptions.studioAssets : [];
+    const studioFiles = Array.isArray(studioOptions.studioFiles) ? studioOptions.studioFiles : [];
 
     const response = await fetch(ENDPOINT, {
       method: 'POST',
@@ -81,6 +86,7 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
         lang: session.language,
         context: 'studio',
         assets: studioAssets,
+        files: studioFiles,
       }),
       signal,
     });
