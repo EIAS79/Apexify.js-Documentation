@@ -948,7 +948,7 @@ const TEMPLATE_BODIES: Array<Pick<StudioTemplate, 'id' | 'name' | 'blurb' | 'gro
   const frames = [];
   for (let index = 0; index < 6; index += 1) {
     const frame = await painter.createText({
-      text: `FRAME ${String(index + 1).padStart(2, '0')}`,
+      text: 'FRAME ' + String(index + 1).padStart(2, '0'),
       x: 320, y: 180,
       font: { family: 'Arial', size: 46 },
       bold: true,
