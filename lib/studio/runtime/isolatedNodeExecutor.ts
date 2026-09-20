@@ -321,11 +321,19 @@ function rewriteAssetReferences(source: string, refs: ReadonlyMap<string, string
   return output;
 }
 
+function rewriteWorkspacePackageImports(source: string): string {
+  const apexifyHref = pathToFileURL(apexifyEntry()).href;
+  return source.replace(
+    /(['"])apexify\.js\1/g,
+    (_match, quote: string) => quote + apexifyHref + quote,
+  );
+}
+
 function materializeWorkspaceFiles(runDir: string, files: readonly StudioWorkspaceFile[]): Set<string> {
   const names = new Set<string>();
   for (const file of files) {
     const target = join(runDir, file.name);
-    writeFileSync(target, file.source, { mode: 0o600 });
+    writeFileSync(target, rewriteWorkspacePackageImports(file.source), { mode: 0o600 });
     names.add(file.name);
   }
   return names;
