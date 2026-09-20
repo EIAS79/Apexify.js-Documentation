@@ -274,10 +274,10 @@ export default function GalleryClient() {
                 <section className="apx-gallery-featured" aria-labelledby="gallery-featured-title">
                   <div className="apx-gallery-section-heading">
                     <div>
-                      <span>FEATURED</span>
-                      <h2 id="gallery-featured-title">Selected work</h2>
+                      <span>PEAK SHOWCASE</span>
+                      <h2 id="gallery-featured-title">Apexify at full stretch</h2>
                     </div>
-                    <p>{featuredItems.length} curated highlights</p>
+                    <p>{featuredItems.length} finished films · output only</p>
                   </div>
                   <GalleryGrid items={featuredItems} onOpen={openItem} variant="featured" />
                 </section>
