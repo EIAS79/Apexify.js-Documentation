@@ -1,83 +1,124 @@
 # DOC-8 Execution and Security Boundary
 
-This document records the security model for DOC-8 interactive execution. It is intentionally conservative: the current Apexify.js package is Node/server-oriented, so DOC-8 does not fabricate browser-native execution or expose arbitrary public code execution.
+This document records the current execution boundary for Apexify Studio. The product now has two execution paths: browser-direct `@apexify/web` for supported lightweight operations, and a same-origin isolated server runtime for the full Apexify.js feature set.
 
 ## Public production behavior
 
-`/api/gallery/run` does **not** execute arbitrary submitted code in production. Production mode reports execution as unavailable and rejects execution requests with HTTP 503.
+User-authored Studio source **can execute in production**, but only inside the same-origin isolated runtime.
 
-Public arbitrary JavaScript execution: **disabled**.
+Production mode:
 
-Remote script execution: **disabled**.
+- runtime: pinned Deno permission-isolated child process;
+- Apexify package: pinned installed `apexify.js` runtime;
+- native canvas: explicitly scoped FFI access;
+- system information: only the CPU capability required by the native canvas loader;
+- network access: disabled;
+- subprocess access: disabled except the fixed FFmpeg/ffprobe media proxies;
+- filesystem writes: limited to the per-run temporary workspace;
+- package installation: disabled;
+- arbitrary host-file imports: disabled;
+- remote script execution: disabled.
 
-Arbitrary npm/package installation: **disabled**.
+This is deliberately described as an **isolated runtime**, not as unrestricted host execution.
 
 ## Trusted-local development mode
 
-Current server-backed execution is a development tool only. It requires both a non-production environment and explicit opt-in:
+Trusted local development remains available only when both conditions are true:
+
+`NODE_ENV !== 'production'`
+
+and:
 
 `ENABLE_LOCAL_APEXIFY_CODE_RUN=true`
 
-This mode is **not a security sandbox**. It is intended only for trusted local development input.
+Trusted-local mode is not the public isolation boundary and may have the ambient capabilities of the developer machine.
 
 ## Trust model
 
-- Repository-controlled verified examples are trusted inputs for deterministic documentation evidence.
-- User-edited source must be treated as untrusted for public deployment and therefore is not executed publicly.
-- Share-state data is user-controlled and must not contain secrets.
-- Browser/native future runtimes are not present in DOC-8; the `WebRuntimeAdapter` is a contract only.
+- Repository-controlled verified examples remain authoritative documentation evidence.
+- User-edited Studio source is untrusted input and is executed only through the production permission boundary.
+- Studio project files are materialized into the disposable run workspace and relative imports may only resolve to those bounded files.
+- Uploaded Studio assets are materialized into the same disposable workspace under explicit count/size limits.
+- Share-state data remains user-controlled and must not contain secrets.
 
 ## Environment
 
-The local child process receives a constructed allowlisted environment rather than inheriting `process.env`. The route supplies only the small set of values required for local execution, including development mode, package/module resolution, controlled output/error locations, and platform path values where necessary.
+The production child receives a constructed allowlisted environment. Application secrets and unrelated deployment variables are not inherited.
 
-Common application secrets and unrelated host environment values are not copied into the child environment.
+The runtime receives only the keys required for execution, controlled artifact paths, the Deno cache path, and—when media is used—the fixed FFmpeg/ffprobe proxy paths and capability id.
 
 ## Filesystem
 
-Each local run receives a per-run temporary working directory. Generated output is constrained to the controlled run location. Cleanup runs recursively in `finally`, including failure/timeout paths.
+Each isolated run receives a fresh temporary directory.
 
-The runner does not provide a persistent user filesystem and does not install packages dynamically.
+Allowed writes are restricted to that run directory. Generated artifacts are copied into the controlled artifact directory and returned through the Studio artifact manifest. Cleanup runs recursively in `finally`.
+
+The runtime does not expose a persistent user filesystem and does not dynamically install packages.
 
 ## Network
 
-Network isolation is **not implemented** for trusted-local execution. The child process may have the ambient network access of the local host/process environment.
+Production isolated execution has no Deno `--allow-net` permission. Arbitrary outbound networking from submitted Studio code is therefore denied by the runtime.
 
-For that reason this mode must not be called a sandbox and must not be enabled as a public arbitrary-code service.
+Trusted-local mode remains separate and may have ambient developer-host networking.
 
-## Child processes and timeout
+## Child processes and media
 
-The current runner uses a bounded child-process execution path with a central timeout. Public production execution is disabled; trusted-local use remains responsible for the limitations of host-level process isolation.
+Production code does not receive unrestricted `--allow-run`.
+
+Video operations are routed only through fixed same-origin FFmpeg/ffprobe proxy executables. The proxy validates the media capability, keeps paths inside the run workspace, and restricts FFmpeg protocol access.
+
+## Native canvas and system permissions
+
+The native canvas binding receives FFI access scoped to the installed `@napi-rs` canvas runtime.
+
+The Deno system capability is restricted to `cpus`, which is required by the native loader's platform detection. The Studio runtime does not receive unrestricted system access.
+
+## Multi-file projects and multi-output previews
+
+Studio supports bounded sibling project files. The active tab is the entry source; other open tabs are materialized as sibling files and can be imported with relative imports such as `./helpers.ts`.
+
+A single run may return multiple previewable artifacts. The server manifest and client preview strip support image, GIF, audio, video, JSON, text, frame collections, and binary artifacts.
 
 ## Central resource limits
 
-All DOC-8 execution/share ceilings are defined in `DOC8_RESOURCE_LIMITS` in `lib/docs/playground/contracts.ts`:
+All execution/share ceilings are defined in `DOC8_RESOURCE_LIMITS` in `lib/docs/playground/contracts.ts`:
 
 | Limit | Value | Purpose |
 | --- | ---: | --- |
-| Execution time | 55,000 ms | Bound local process duration |
-| Source characters | 280,000 | Reject oversized submitted source |
-| Output bytes | 26,214,400 (25 MiB) | Bound generated output |
-| Process buffer bytes | 20,971,520 (20 MiB) | Bound captured process output |
-| Share-state bytes | 65,536 (64 KiB) | Bound URL/share payloads |
-| Maximum outputs | 1 | Bound per-run output multiplicity |
+| Execution time | 55,000 ms | Bound one isolated run |
+| Source characters | 280,000 | Bound submitted entry source |
+| Per-artifact output | 32 MiB | Bound one returned artifact |
+| Total output | 64 MiB | Bound all artifacts from one run |
+| Process buffer | 20 MiB | Bound captured process output |
+| Share state | 64 KiB | Bound URL/share payloads |
+| Maximum outputs | 24 | Bound multi-preview multiplicity |
 
-The UI/session contracts and current Node runner reference this shared limit model instead of maintaining independent magic numbers.
+Workspace files and uploaded assets have their own additional limits.
 
 ## Cleanup and failure behavior
 
-Execution failures are adapted into structured shared diagnostics. Temporary working directories are removed recursively in `finally`. Unsupported/disabled execution is reported as such rather than falling back to unsafe execution.
+Execution failures are converted into structured Studio diagnostics. Temporary workspaces and media capability files are removed in `finally` on success, error, and timeout paths.
 
-The interactive editor and preview also use error boundaries so client rendering failures have a recovery path without changing the server execution trust boundary.
+The UI does not silently fall back from a full-runtime request to a weaker renderer. If the isolated runtime is unavailable, Studio reports that state explicitly.
 
-## Future browser adapter
+## Browser-direct runtime
 
-DOC-8 defines a future `WebRuntimeAdapter` interface so later work can integrate a real browser runtime without replacing the shared editor/preview/diagnostics/session architecture.
+Studio also uses the pinned `@apexify/web` runtime for browser-direct operations that do not require the full Node/native Apexify stack.
 
-The interface does **not** mean `@apexify/web` exists or ships today. DOC-8 contains no fake browser renderer, no shadow renderer, and no future runtime import.
+The execution planner chooses browser-direct or full-runtime execution automatically from the source capabilities. Scene, template, assets, components, GIF, audio, video, batch, plugins, image utilities, pixel/path/detection utilities, and other full-runtime families route to the isolated server runtime.
 
 ## Verification
 
-`scripts/docs/doc8-verify.ts`, `scripts/docs/doc8.test.ts`, and `scripts/docs/doc8-browser-verify.mjs` verify the static/runtime boundary. The production browser test confirms execution availability is false and that a POST is rejected with HTTP 503. Deterministic evidence is recorded in `generated/docs-doc8/security-boundary.json`.
+`scripts/docs/doc8-verify.ts`, `scripts/docs/doc8.test.ts`, and `scripts/docs/doc8-browser-verify.mjs` verify this boundary.
 
-Any future change that enables public arbitrary execution must introduce genuine isolation and a new security review; it cannot inherit the trusted-local DOC-8 mode and relabel it as a sandbox.
+The production browser gate now requires:
+
+- `/api/gallery/run` to report `same-origin-isolated` availability;
+- bounded multi-file project execution;
+- multiple returned artifacts;
+- Scene + components + named assets execution;
+- GIF generation;
+- MP4 generation through the fixed media runtime;
+- arbitrary network access from submitted code to be denied.
+
+Deterministic evidence is recorded in `generated/docs-doc8/security-boundary.json`.
