@@ -113,9 +113,8 @@ try{
   await interaction.goto(`${base}/docs/node/canvas`,{waitUntil:'networkidle2'});
   if(!(await interaction.$('[data-doc5-example="node.canvas.basic"]')))throw new Error('docs stable-ID executable example missing');
 
-  await interaction.goto(`${base}/gallery#${encodeURIComponent('node.canvas.basic+advance')}`,{waitUntil:'networkidle2'});
-  await interaction.waitForSelector('#gallery-modal-title');
-  if(!(await interaction.$('#gallery-modal-about a[href="/examples/node.canvas.basic"]')))throw new Error('Gallery return link to canonical example missing');
+  await interaction.goto(`${base}/gallery`,{waitUntil:'networkidle2'});
+  if(!(await interaction.$('.apx-gallery-closing__actions a[href="/examples/node.canvas.basic"]')))throw new Error('Gallery link to canonical verified example missing');
 
   await interaction.goto(`${base}/api-reference/apexify.js/ApexPainter/createCanvas`,{waitUntil:'networkidle2'});
   if(!(await interaction.$('[data-doc5-api-examples] a[href="/examples/node.canvas.basic"]')))throw new Error('API reverse example linkage missing');
