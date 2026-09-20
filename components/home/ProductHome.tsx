@@ -8,6 +8,7 @@ import {
 import type { ProductExperienceModel, ResolvedCapability } from '@/lib/product/catalog';
 import type { ProductStatus } from '@/lib/product/catalog-data';
 import CopyInstallButton from './CopyInstallButton';
+import { BrandBanner } from '@/components/Brand';
 
 function getCapability(model: ProductExperienceModel, id: string): ResolvedCapability {
   return model.capabilities.find((item) => item.id === id) ?? model.capabilities[0];
@@ -423,7 +424,7 @@ export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
           <div className="apx-compare">
             <div className="apx-compare__head">
               <span>Capability</span>
-              <strong>Apexify.js</strong>
+              <BrandBanner variant="dark" className="apx-footer__brand-logo" maxWidth={150} />
               <span>Screenshot automation</span>
               <span>Chart-focused library</span>
               <span>Raw canvas scripting</span>

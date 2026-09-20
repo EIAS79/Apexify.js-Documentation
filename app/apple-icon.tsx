@@ -1,10 +1,6 @@
 /**
- * iOS home-screen icon — rendered as a PNG via Next.js' Image Response API.
- *
- * Next.js 14 only accepts raster formats for `apple-icon` (no SVG), so we
- * synthesize one from the same brand mark used by the rest of the site.
- * iOS clips the corners itself, so this asset ships as a square fill with
- * no rounded radius.
+ * iOS home-screen icon — rendered from the same Apexify brand geometry as
+ * /public/brand/icon.svg so browser, docs and installed-app identity stay aligned.
  */
 import { ImageResponse } from 'next/og';
 
@@ -21,32 +17,34 @@ export default function AppleIcon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #FF3D7F 0%, #FF7A5A 55%, #FFB84F 100%)',
-          position: 'relative',
+          background: 'linear-gradient(145deg, #071326 0%, #0A1740 100%)',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(225deg, rgba(124, 92, 255, 0.55) 0%, rgba(124, 92, 255, 0) 55%)',
-          }}
-        />
-        <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 60 16 L 104 60 L 60 104 L 16 60 Z" fill="rgba(255,255,255,0.94)" />
-          <path
-            d="M 60 32 L 88 60 L 60 88 L 32 60 Z"
-            fill="url(#sun-fill)"
-          />
-          <circle cx="60" cy="60" r="11" fill="white" />
+        <svg width="152" height="152" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="sun-fill" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#FF3D7F" />
-              <stop offset="55%" stopColor="#FF7A5A" />
-              <stop offset="100%" stopColor="#FFB84F" />
+            <linearGradient id="apex" x1="110" y1="410" x2="398" y2="112" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#055CFF" />
+              <stop offset="38%" stopColor="#1B9DFF" />
+              <stop offset="66%" stopColor="#28DDE9" />
+              <stop offset="100%" stopColor="#8A27FF" />
+            </linearGradient>
+            <linearGradient id="inner" x1="250" y1="294" x2="340" y2="430" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="100%" stopColor="#DCE5FF" />
+            </linearGradient>
+            <linearGradient id="cyan" x1="48" y1="146" x2="124" y2="226" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#20F0DE" />
+              <stop offset="100%" stopColor="#00A9F5" />
+            </linearGradient>
+            <linearGradient id="violet" x1="391" y1="247" x2="478" y2="335" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#FF22E6" />
+              <stop offset="100%" stopColor="#7E21FF" />
             </linearGradient>
           </defs>
+          <rect x="38" y="142" width="88" height="88" rx="23" fill="url(#cyan)" />
+          <rect x="388" y="247" width="88" height="88" rx="23" fill="url(#violet)" />
+          <path d="M84 426 256 84 428 426" fill="none" stroke="url(#apex)" strokeWidth="82" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M257 294 332 426" fill="none" stroke="url(#inner)" strokeWidth="64" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
     ),

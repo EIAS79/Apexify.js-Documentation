@@ -1,32 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Apexify.js">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Apexify.js mark</title>
+  <desc id="desc">A geometric A-shaped apex mark with cyan, blue and violet gradients and two programmable pixel accents.</desc>
   <defs>
-    <linearGradient id="apx-sunset" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF3D7F"/>
-      <stop offset="55%" stop-color="#FF7A5A"/>
-      <stop offset="100%" stop-color="#FFB84F"/>
+    <linearGradient id="apex" x1="110" y1="410" x2="398" y2="112" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#055CFF"/>
+      <stop offset=".38" stop-color="#1B9DFF"/>
+      <stop offset=".66" stop-color="#28DDE9"/>
+      <stop offset="1" stop-color="#8A27FF"/>
     </linearGradient>
-    <linearGradient id="apx-iris-glow" x1="100%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#7C5CFF" stop-opacity="0.55"/>
-      <stop offset="55%" stop-color="#7C5CFF" stop-opacity="0"/>
+    <linearGradient id="inner" x1="250" y1="294" x2="340" y2="430" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DCE5FF"/>
     </linearGradient>
-    <linearGradient id="apx-diamond-shine" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
-      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.78"/>
+    <linearGradient id="cyan" x1="48" y1="146" x2="124" y2="226" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#20F0DE"/>
+      <stop offset="1" stop-color="#00A9F5"/>
     </linearGradient>
-    <radialGradient id="apx-dot-shine" cx="50%" cy="35%" r="65%">
-      <stop offset="0%" stop-color="#FFFFFF"/>
-      <stop offset="100%" stop-color="#FFE9D6"/>
-    </radialGradient>
+    <linearGradient id="violet" x1="391" y1="247" x2="478" y2="335" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF22E6"/>
+      <stop offset="1" stop-color="#7E21FF"/>
+    </linearGradient>
   </defs>
-
-  <rect width="256" height="256" rx="56" fill="url(#apx-sunset)"/>
-  <rect width="256" height="256" rx="56" fill="url(#apx-iris-glow)"/>
-
-  <path d="M 128 52 L 204 128 L 128 204 L 52 128 Z" fill="url(#apx-diamond-shine)"/>
-
-  <path d="M 128 80 L 176 128 L 128 176 L 80 128 Z" fill="url(#apx-sunset)"/>
-
-  <circle cx="128" cy="128" r="20" fill="url(#apx-dot-shine)"/>
-
-  <rect x="2" y="2" width="252" height="252" rx="55" fill="none" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="1.5"/>
+  <rect x="38" y="142" width="88" height="88" rx="23" fill="url(#cyan)"/>
+  <rect x="388" y="247" width="88" height="88" rx="23" fill="url(#violet)"/>
+  <path d="M84 426 256 84 428 426" fill="none" stroke="url(#apex)" stroke-width="82" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M257 294 332 426" fill="none" stroke="url(#inner)" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
