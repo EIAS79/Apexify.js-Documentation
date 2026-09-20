@@ -96,7 +96,9 @@ export default function GalleryModal({
   const hasJs = Boolean(item.code?.js?.trim());
   const hasCode = hasTs || hasJs;
   const modalMediaKind = inferMediaKind(item.thumbnail, item.thumbnailMedia);
-  const executionEligible = hasCode && modalMediaKind !== 'video';
+  const gallerySource = `${item.code?.ts ?? ''}\n${item.code?.js ?? ''}`;
+  const requiresStudioExecution = /\\b(?:createAudio|createVideo|videoPipeline)\\b/.test(gallerySource);
+  const executionEligible = hasCode && modalMediaKind !== 'video' && !requiresStudioExecution;
 
   const [layoutMode, setLayoutMode] = useState<ModalLayoutMode>(hasCode ? 'split' : 'media');
   const [codeLang, setCodeLang] = useState<'ts' | 'js'>(hasTs ? 'ts' : 'js');
