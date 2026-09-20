@@ -35,6 +35,7 @@ import {
   sameOriginStudioVideoAvailable,
 } from '@/lib/studio/runtime/isolatedNodeExecutor';
 import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
+import { validateStudioWorkspaceFiles, type StudioWorkspaceFile } from '@/lib/studio/runtime/workspace';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -44,6 +45,7 @@ type RunBody = {
   lang?: string;
   context?: string;
   assets?: StudioVirtualAsset[];
+  files?: StudioWorkspaceFile[];
 };
 
 type StudioManifestEntry = {
@@ -267,12 +269,14 @@ function artifactFromEntry(
 async function runStudioLocal({
   code,
   assets,
+  files,
   projectRoot,
   tsxCli,
   apexifyEsm,
 }: {
   code: string;
   assets: readonly StudioVirtualAsset[];
+  files: readonly StudioWorkspaceFile[];
   projectRoot: string;
   tsxCli: string;
   apexifyEsm: string;
@@ -321,6 +325,10 @@ async function runStudioLocal({
     ),
     'utf8',
   );
+
+  for (const file of files) {
+    writeFileSync(join(dir, file.name), file.source, 'utf8');
+  }
 
   const executableCode = rewriteStudioAssetReferences(code, assetRefs);
   writeFileSync(
@@ -564,12 +572,14 @@ export async function POST(req: NextRequest) {
   const context = body.context === 'studio' ? 'studio' : 'gallery';
 
   let studioAssets: StudioVirtualAsset[] = [];
+  let studioFiles: StudioWorkspaceFile[] = [];
   if (context === 'studio') {
     try {
       studioAssets = validateStudioAssets(body.assets);
+      studioFiles = validateStudioWorkspaceFiles(body.files);
     } catch (error) {
       return NextResponse.json(
-        { ok: false, error: error instanceof Error ? error.message : 'Invalid Studio assets.' },
+        { ok: false, error: error instanceof Error ? error.message : 'Invalid Studio project.' },
         { status: 400 },
       );
     }
@@ -618,7 +628,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const isolated = await runSameOriginIsolatedStudio(code, studioAssets);
+    const isolated = await runSameOriginIsolatedStudio(code, studioAssets, studioFiles);
     return NextResponse.json(isolated.body, { status: isolated.status });
   }
 
@@ -645,6 +655,6 @@ export async function POST(req: NextRequest) {
   }
 
   return context === 'studio'
-    ? runStudioLocal({ code, assets: studioAssets, projectRoot, tsxCli, apexifyEsm })
+    ? runStudioLocal({ code, assets: studioAssets, files: studioFiles, projectRoot, tsxCli, apexifyEsm })
     : runGalleryLocal({ code, projectRoot, tsxCli, apexifyEsm });
 }
