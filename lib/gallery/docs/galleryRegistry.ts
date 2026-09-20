@@ -1,4 +1,5 @@
 import { doc5GalleryItems } from './doc5GalleryAdapter';
+import { peakLabGalleryItems } from '../generatedPeakLabCatalog';
 import type { RegistryGalleryItem } from '../core/galleryDocLink';
 
 /**
@@ -11,6 +12,7 @@ import type { RegistryGalleryItem } from '../core/galleryDocLink';
  */
 export const allGalleryItemsForDocs: RegistryGalleryItem[] = [
   ...doc5GalleryItems,
+  ...peakLabGalleryItems,
 ];
 
 export function getGalleryItemById(id: string): RegistryGalleryItem | undefined {
