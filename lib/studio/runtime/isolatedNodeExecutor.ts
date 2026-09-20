@@ -403,6 +403,11 @@ function safeEnvironment(
     STUDIO_MANIFEST: manifestPath,
     STUDIO_ASSET_MANIFEST: assetManifest,
     APEXIFY_TEMP_DIR: join(runDir, 'apexify-tmp'),
+    // @napi-rs/canvas's generated native loader reads these variables even
+    // when they are unset. Deno requires per-key env permission for that
+    // read, so expose explicit empty values rather than widening env access.
+    NAPI_RS_NATIVE_LIBRARY_PATH: '',
+    NAPI_RS_FORCE_WASI: '',
     DENO_DIR: join(runDir, 'deno-cache'),
     DENO_NO_UPDATE_CHECK: '1',
     NO_COLOR: '1',
@@ -437,6 +442,8 @@ function denoArguments(
     'STUDIO_MANIFEST',
     'STUDIO_ASSET_MANIFEST',
     'APEXIFY_TEMP_DIR',
+    'NAPI_RS_NATIVE_LIBRARY_PATH',
+    'NAPI_RS_FORCE_WASI',
     ...(media ? ['APEXIFY_FFMPEG_PATH', 'APEXIFY_FFPROBE_PATH', 'STUDIO_MEDIA_CAP_ID'] : []),
     'DENO_DIR',
     'DENO_NO_UPDATE_CHECK',
