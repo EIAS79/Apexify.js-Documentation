@@ -51,6 +51,8 @@ export interface GalleryCardBase {
   sourceKind?: 'peak-lab' | 'showcase' | 'verified-example';
   /** Peak Lab recipe number when applicable. */
   recipeId?: string;
+  /** Canonical complete source when the inspector intentionally paginates/omits binary payloads. */
+  sourceHref?: string;
   /**
    * Controls execution affordances for source shown in Gallery.
    * - gallery: editable + runnable in the lightweight Gallery runner
