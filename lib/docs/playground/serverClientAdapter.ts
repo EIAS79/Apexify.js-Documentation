@@ -35,6 +35,7 @@ function diagnosticFromFailure(data: {
   error?: string;
   stderr?: string;
   exitCode?: number;
+  runtimeDebug?: unknown;
 }, status: number): InteractiveDiagnostic {
   const stderr = typeof data.stderr === 'string' ? data.stderr.trim() : '';
   let message = typeof data.error === 'string' ? data.error.trim() : '';
@@ -43,6 +44,19 @@ function diagnosticFromFailure(data: {
   } else if (stderr && !message) {
     message = stderr;
   }
+
+  if (data.runtimeDebug && typeof data.runtimeDebug === 'object') {
+    let debugText = '';
+    try {
+      debugText = JSON.stringify(data.runtimeDebug, null, 2);
+    } catch {
+      debugText = String(data.runtimeDebug);
+    }
+    if (debugText) {
+      message += `\n\n━━ runtime debug ━━\n${debugText}`;
+    }
+  }
+
   return {
     id: 'server-backed-execution',
     severity: 'error',
@@ -101,6 +115,7 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
       elapsedMs?: number;
       outputs?: InteractiveArtifact[];
       primaryArtifactId?: string;
+      runtimeDebug?: unknown;
     };
     try {
       data = (await response.json()) as typeof data;
