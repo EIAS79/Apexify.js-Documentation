@@ -12,6 +12,14 @@ export const STUDIO_WORKSPACE_LIMITS = Object.freeze({
   maxTotalChars: 280_000,
 });
 
+const RESERVED_STUDIO_WORKSPACE_NAMES = new Set([
+  'snippet.ts',
+  'snippet.js',
+  'studio-manifest.json',
+  'studio-assets.json',
+  'err.txt',
+]);
+
 export function studioWorkspaceFileName(name: string, language: StudioWorkspaceLanguage): string {
   const trimmed = String(name || '').trim();
   const base = trimmed
@@ -49,6 +57,9 @@ export function validateStudioWorkspaceFiles(value: unknown): StudioWorkspaceFil
       throw new Error('Combined Studio workspace source exceeds the configured limit.');
     }
     const name = studioWorkspaceFileName(typeof entry.name === 'string' ? entry.name : '', language);
+    if (RESERVED_STUDIO_WORKSPACE_NAMES.has(name.toLowerCase())) {
+      throw new Error(`Studio workspace filename is reserved by the runner: ${name}`);
+    }
     if (names.has(name)) throw new Error(`Duplicate Studio workspace filename: ${name}`);
     names.add(name);
     result.push({ name, source: entry.source, language });
