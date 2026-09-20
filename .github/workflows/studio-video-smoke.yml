@@ -1,5 +1,9 @@
 name: Studio Video Runtime Smoke
 
+concurrency:
+  group: studio-video-runtime-smoke
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
   push:
