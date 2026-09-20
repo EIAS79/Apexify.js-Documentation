@@ -1,52 +1,46 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  galleryEvidence,
   galleryItems,
-  isVerifiedGalleryItem,
   itemMatchesEvidence,
   itemMatchesFilter,
   itemMatchesQuery,
   itemMatchesRuntime,
+  type GalleryItem,
 } from '../../app/gallery/components/galleryHelpers';
 
-test('Gallery stable IDs are unique and DOC-5 cards retain canonical verified provenance', () => {
-  const ids = galleryItems.map((item) => item.id);
-  assert.equal(new Set(ids).size, ids.length);
-  const verified = galleryItems.filter(isVerifiedGalleryItem);
-  assert.ok(verified.length > 0);
-  for (const item of verified) {
-    assert.equal(item.verificationStatus, 'verified');
-    assert.match(item.exampleRoute, /^\/examples\//);
-    assert.ok(item.verifiedPackageVersion);
-  }
+test('Gallery catalog is intentionally empty after the output reset', () => {
+  assert.deepEqual(galleryItems, []);
 });
 
-test('runtime and evidence filters are data filters and reset to all items', () => {
+test('empty Gallery filters remain stable and reset cleanly', () => {
   const all = galleryItems.filter((item) => itemMatchesRuntime(item, 'all') && itemMatchesEvidence(item, 'all'));
   const node = galleryItems.filter((item) => itemMatchesRuntime(item, 'node'));
   const verified = galleryItems.filter((item) => itemMatchesEvidence(item, 'verified'));
   const legacy = galleryItems.filter((item) => itemMatchesEvidence(item, 'legacy'));
-  assert.equal(all.length, galleryItems.length);
-  assert.equal(node.length, galleryItems.length);
-  assert.equal(verified.length + legacy.length, galleryItems.length);
-  assert.ok(verified.every((item) => galleryEvidence(item) === 'verified'));
-  assert.ok(legacy.every((item) => galleryEvidence(item) === 'legacy'));
+
+  assert.equal(all.length, 0);
+  assert.equal(node.length, 0);
+  assert.equal(verified.length, 0);
+  assert.equal(legacy.length, 0);
 });
 
-test('combined feature/evidence filtering has a real empty state and reset path', () => {
-  const impossible = galleryItems.filter(
-    (item) => itemMatchesEvidence(item, 'verified') && itemMatchesFilter(item, 'typography'),
-  );
-  assert.equal(impossible.length, 0);
-  const reset = galleryItems.filter(
-    (item) => itemMatchesEvidence(item, 'all') && itemMatchesFilter(item, 'all') && itemMatchesQuery(item, ''),
-  );
-  assert.equal(reset.length, galleryItems.length);
-});
+test('Gallery matching helpers stay ready for the next curated output set', () => {
+  const sample: GalleryItem = {
+    id: 'future-sample',
+    title: 'Future chart sample',
+    description: 'Synthetic chart output for helper-contract coverage.',
+    category: 'advance',
+    primaryLens: 'data',
+    lenses: ['data', 'advanced'],
+    thumbnail: '/future-output.png',
+    code: { ts: 'return painter.createChart();' },
+  };
 
-test('Gallery search indexes title, id, provenance and DOC-5 feature metadata', () => {
-  assert.ok(galleryItems.some((item) => itemMatchesQuery(item, 'verified')));
-  assert.ok(galleryItems.some((item) => itemMatchesQuery(item, 'chart')));
-  assert.ok(galleryItems.some((item) => itemMatchesQuery(item, 'legacy')));
+  assert.equal(itemMatchesRuntime(sample, 'node'), true);
+  assert.equal(itemMatchesEvidence(sample, 'legacy'), true);
+  assert.equal(itemMatchesFilter(sample, 'data'), true);
+  assert.equal(itemMatchesFilter(sample, 'motion'), false);
+  assert.equal(itemMatchesQuery(sample, 'chart'), true);
+  assert.equal(itemMatchesQuery(sample, 'future-sample'), true);
 });
