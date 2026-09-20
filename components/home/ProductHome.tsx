@@ -379,27 +379,56 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
         </div>
       </section>
 
-      <section className="apx-section apx-section--showcase" aria-labelledby="capability-showcase">
+      <section className="apx-section apx-section--showcase apx-section--peak" aria-labelledby="capability-showcase">
         <div className="apx-home-shell">
           <SectionIntro
             index="03"
-            eyebrow="CAPABILITY SHOWCASE"
-            title="Different outputs should look different."
-            body="Six visual studies map to distinct Apexify domains. No repeated bar charts, no duplicated demo frames, and no single aesthetic forced onto every capability."
+            eyebrow="PEAK SHOWCASE"
+            title="What Apexify looks like at full stretch."
+            body="Two finished motion pieces sit above the recipe library: no mockups and no source tutorial attached here—just authored output showing the upper creative range of the engine."
           />
 
-          <div className="apx-showcase">
-            <article className="apx-showcase__item apx-showcase__item--poster"><PosterArtwork /><span>TYPE / LAYOUT</span></article>
-            <article className="apx-showcase__item apx-showcase__item--image"><ImageArtwork /><span>IMAGE / SHAPE</span></article>
-            <article className="apx-showcase__item apx-showcase__item--template"><TemplateArtwork /><span>TEMPLATE</span></article>
-            <article className="apx-showcase__item apx-showcase__item--scene"><SceneArtwork /><span>SCENE</span></article>
-            <article className="apx-showcase__item apx-showcase__item--motion"><MotionArtwork /><span>GIF / VIDEO</span></article>
-            <article className="apx-showcase__item apx-showcase__item--audio"><AudioArtwork /><span>AUDIO</span></article>
+          <div className="apx-peak-films">
+            <article className="apx-peak-film apx-peak-film--spectrum">
+              <div className="apx-peak-film__media">
+                <video
+                  src="/brand/Apexify-Spectrum.mp4"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  aria-label="Apexify Spectrum showcase film"
+                />
+                <span>FEATURED FILM / 01</span>
+              </div>
+              <div className="apx-peak-film__copy">
+                <div><span>48 SEC</span><span>1920 × 1080</span><span>H.264</span></div>
+                <h3>Apexify Spectrum</h3>
+                <p>Composition, typography, imagery, charts, templates, audio, animation and video gathered into one cinematic Apexify showcase.</p>
+              </div>
+            </article>
+
+            <article className="apx-peak-film apx-peak-film--orbit">
+              <div className="apx-peak-film__media">
+                <video
+                  src="/brand/Orbit-Breaker.mp4"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  aria-label="Orbit Breaker showcase film"
+                />
+                <span>FEATURED FILM / 02</span>
+              </div>
+              <div className="apx-peak-film__copy">
+                <div><span>36 SEC</span><span>1280 × 720</span><span>H.264</span></div>
+                <h3>Orbit Breaker</h3>
+                <p>A procedural cinematic motion study built from layered visual systems, effects, animation and FFmpeg-backed media output.</p>
+              </div>
+            </article>
           </div>
 
           <div className="apx-showcase__footer">
-            <p>Minimal repository-verified examples stay available for execution proof.</p>
-            <Link href="/gallery">Browse Gallery <ArrowRightIcon className="h-4 w-4" /></Link>
+            <p>Below these films, the Gallery exposes the Peak Lab recipe-by-recipe: real output beside the exact source that generated it.</p>
+            <Link href="/gallery">Open Peak Lab Gallery <ArrowRightIcon className="h-4 w-4" /></Link>
           </div>
         </div>
       </section>
