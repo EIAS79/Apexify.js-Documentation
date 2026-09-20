@@ -21,6 +21,7 @@
     "gallery:verify": "tsx scripts/verify-gallery-outputs.ts",
     "studio:completeness": "tsx scripts/studio/studio-completeness.ts",
     "studio:completeness:check": "tsx scripts/studio/studio-completeness.ts --check",
+    "studio:verify": "npm run studio:completeness:check",
     "docs:audit:baseline": "node scripts/doc0-audit.mjs && node scripts/doc0-manual-findings.mjs && node scripts/doc0-controls-audit.mjs",
     "docs:audit:build": "node scripts/doc0-build-baseline.mjs",
     "docs:audit:links": "node scripts/doc0-link-audit.mjs",

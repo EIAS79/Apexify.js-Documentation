@@ -288,11 +288,15 @@ export default function CodeStudio() {
     setPreviewWarnings([]);
 
     try {
-      if (plan.hostPersistenceOnly.length > 0) {
+      if (plan.excludedOperations.length > 0) {
+        const labels = plan.excludedOperations.map((operation) => operation.label).join(', ');
+        const reasons = [...new Set(plan.excludedOperations.map((operation) => operation.reason))].join(' ');
         const message =
-          'Studio does not execute host persistence calls (' +
-          plan.hostPersistenceOnly.join(', ') +
-          '). Return the generated Apexify artifact from main() and use the Studio download action if you want a local copy.';
+          'Studio does not execute contract-excluded operations (' +
+          labels +
+          '). ' +
+          reasons +
+          ' Return the generated local artifact from main() and use the Studio download action when you need a local copy.';
         revokePreview();
         setPreviewProvenance(undefined);
         setError(message);

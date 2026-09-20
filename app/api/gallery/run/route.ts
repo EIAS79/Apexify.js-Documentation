@@ -588,10 +588,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: blocked }, { status: 400 });
   }
 
+  const studioPlan = context === 'studio' ? planStudioExecution(code) : null;
+  if (studioPlan?.excludedOperations.length) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          'Studio contract excludes: ' +
+          studioPlan.excludedOperations.map((operation) => operation.label).join(', ') +
+          '. ' +
+          [...new Set(studioPlan.excludedOperations.map((operation) => operation.reason))].join(' '),
+      },
+      { status: 400 },
+    );
+  }
+
   const local = isLocalRunnerEnabled();
 
   if (context === 'studio' && !local) {
-    const plan = planStudioExecution(code);
+    const plan = studioPlan!;
     if (plan.families.includes('video') && !sameOriginStudioVideoAvailable()) {
       return NextResponse.json(
         {

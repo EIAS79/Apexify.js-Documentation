@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "packagePin": "github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b",
   "browserRuntime": {
     "package": "@apexify/web",
@@ -387,7 +387,7 @@
         },
         {
           "name": "url",
-          "route": "full-runtime"
+          "route": "external-service"
         }
       ],
       "properties": [],
@@ -569,10 +569,2352 @@
       "route": "full-runtime"
     }
   ],
-  "excludedFromStudioManipulation": [
-    "save",
-    "saveMultiple",
-    "createAudio.save"
+  "nestedSurfaces": {
+    "SceneBuilder": {
+      "declaration": "SceneBuilder",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "addLayer",
+          "route": "full-runtime"
+        },
+        {
+          "name": "addLayers",
+          "route": "full-runtime"
+        },
+        {
+          "name": "clearBackground",
+          "route": "full-runtime"
+        },
+        {
+          "name": "clearLayers",
+          "route": "full-runtime"
+        },
+        {
+          "name": "insertAfter",
+          "route": "full-runtime"
+        },
+        {
+          "name": "insertBefore",
+          "route": "full-runtime"
+        },
+        {
+          "name": "insertLayer",
+          "route": "full-runtime"
+        },
+        {
+          "name": "insertLayers",
+          "route": "full-runtime"
+        },
+        {
+          "name": "moveLayer",
+          "route": "full-runtime"
+        },
+        {
+          "name": "removeLayer",
+          "route": "full-runtime"
+        },
+        {
+          "name": "render",
+          "route": "full-runtime"
+        },
+        {
+          "name": "replaceLayer",
+          "route": "full-runtime"
+        },
+        {
+          "name": "replaceLayers",
+          "route": "full-runtime"
+        },
+        {
+          "name": "setBackground",
+          "route": "full-runtime"
+        },
+        {
+          "name": "toRenderInput",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [
+        "height",
+        "layerCount",
+        "width"
+      ]
+    },
+    "TemplateHandle": {
+      "declaration": "TemplateHandle",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "render",
+          "route": "full-runtime"
+        },
+        {
+          "name": "toRenderInput",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoPipeline": {
+      "declaration": "VideoPipeline",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "audio",
+          "route": "full-runtime"
+        },
+        {
+          "name": "canRedo",
+          "route": "full-runtime"
+        },
+        {
+          "name": "canUndo",
+          "route": "full-runtime"
+        },
+        {
+          "name": "clearLayers",
+          "route": "full-runtime"
+        },
+        {
+          "name": "getLayers",
+          "route": "full-runtime"
+        },
+        {
+          "name": "pushLayer",
+          "route": "full-runtime"
+        },
+        {
+          "name": "redo",
+          "route": "full-runtime"
+        },
+        {
+          "name": "removeLayer",
+          "route": "full-runtime"
+        },
+        {
+          "name": "render",
+          "route": "full-runtime"
+        },
+        {
+          "name": "source",
+          "route": "full-runtime"
+        },
+        {
+          "name": "splice",
+          "route": "full-runtime"
+        },
+        {
+          "name": "text",
+          "route": "full-runtime"
+        },
+        {
+          "name": "toJSON",
+          "route": "full-runtime"
+        },
+        {
+          "name": "trim",
+          "route": "full-runtime"
+        },
+        {
+          "name": "undo",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoCreator": {
+      "declaration": "VideoCreator",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "createVideo",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoOperations": {
+      "declaration": "VideoOperations",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "codec",
+          "route": "full-runtime"
+        },
+        {
+          "name": "create",
+          "route": "full-runtime"
+        },
+        {
+          "name": "describeOperation",
+          "route": "full-runtime"
+        },
+        {
+          "name": "getInfo",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": [
+        "advanced",
+        "audio",
+        "frames",
+        "merge",
+        "overlays",
+        "runtime",
+        "session",
+        "structure",
+        "transcode"
+      ]
+    },
+    "VideoOperations.transcode": {
+      "declaration": "TranscodeOperations",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "adjustVolume",
+          "route": "full-runtime"
+        },
+        {
+          "name": "colorCorrect",
+          "route": "full-runtime"
+        },
+        {
+          "name": "compress",
+          "route": "full-runtime"
+        },
+        {
+          "name": "convert",
+          "route": "full-runtime"
+        },
+        {
+          "name": "crop",
+          "route": "full-runtime"
+        },
+        {
+          "name": "effects",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractAudio",
+          "route": "full-runtime"
+        },
+        {
+          "name": "fade",
+          "route": "full-runtime"
+        },
+        {
+          "name": "mute",
+          "route": "full-runtime"
+        },
+        {
+          "name": "normalizeAudio",
+          "route": "full-runtime"
+        },
+        {
+          "name": "removeAudio",
+          "route": "full-runtime"
+        },
+        {
+          "name": "reverse",
+          "route": "full-runtime"
+        },
+        {
+          "name": "rotate",
+          "route": "full-runtime"
+        },
+        {
+          "name": "speed",
+          "route": "full-runtime"
+        },
+        {
+          "name": "trim",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoOperations.merge": {
+      "declaration": "MergeOperations",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "merge",
+          "route": "full-runtime"
+        },
+        {
+          "name": "splitScreen",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoOperations.overlays": {
+      "declaration": "OverlayOperations",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "deprecatedAnimatedText",
+          "route": "full-runtime"
+        },
+        {
+          "name": "deprecatedText",
+          "route": "full-runtime"
+        },
+        {
+          "name": "pictureInPicture",
+          "route": "full-runtime"
+        },
+        {
+          "name": "text",
+          "route": "full-runtime"
+        },
+        {
+          "name": "watermark",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoOperations.audio": {
+      "declaration": "AudioOperations",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "mix",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoOperations.frames": {
+      "declaration": "FrameOperations",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "createFromFrames",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractAll",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractInterval",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractOne",
+          "route": "full-runtime"
+        },
+        {
+          "name": "extractTimes",
+          "route": "full-runtime"
+        },
+        {
+          "name": "preview",
+          "route": "full-runtime"
+        },
+        {
+          "name": "thumbnail",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoOperations.structure": {
+      "declaration": "StructureOperations",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "replaceSegment",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    },
+    "VideoOperations.advanced": {
+      "declaration": "AdvancedVideoOperations",
+      "route": "full-runtime",
+      "methods": [
+        {
+          "name": "applyLUT",
+          "route": "full-runtime"
+        },
+        {
+          "name": "detectScenes",
+          "route": "full-runtime"
+        },
+        {
+          "name": "exportPreset",
+          "route": "full-runtime"
+        },
+        {
+          "name": "freezeFrame",
+          "route": "full-runtime"
+        },
+        {
+          "name": "loop",
+          "route": "full-runtime"
+        },
+        {
+          "name": "stabilize",
+          "route": "full-runtime"
+        },
+        {
+          "name": "transition",
+          "route": "full-runtime"
+        }
+      ],
+      "properties": []
+    }
+  },
+  "capabilityProofs": [
+    {
+      "capability": "ApexPainter.animate",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "animation"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.clear",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.delete",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.has",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.list",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.loadFont",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.loadImage",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.loadPalette",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.loadValue",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.replaceFont",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.replaceImage",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.replacePalette",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.replaceValue",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.resolve",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.unregisterFont",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.unregisterImage",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.assets.unregisterPalette",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.batch",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "batch-chain"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.chain",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "batch-chain"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.components.avatar.toLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.components.badge.toLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.components.card.toLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.components.progressBar.toLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.components.watermark.toLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createAudio.compose",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "audio"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createAudio.custom",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "audio"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createAudio.listPresets",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "audio"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createAudio.mix",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "audio"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createAudio.preset",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "audio"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createAudio.presetNames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "audio"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createAudio.save",
+      "route": "host-persistence",
+      "status": "excluded-by-contract",
+      "proofCaseIds": [
+        "host-persistence-exclusion"
+      ],
+      "finalValidation": "not-required"
+    },
+    {
+      "capability": "ApexPainter.createAudio.sequence",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "audio"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createAudio.synth",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "audio"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createCanvas",
+      "route": "browser",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "web-raster-core"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createChart",
+      "route": "browser",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "charts"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createComboChart",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "charts"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createComparisonChart",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "charts"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createGIF",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "gif"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createImage",
+      "route": "browser",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "web-raster-core"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createScene",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createTemplate",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "templates"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createText",
+      "route": "browser",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "web-raster-core"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.createVideo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.detect.anyRegion",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.detect.distance",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.detect.path",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.detect.region",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.extractAllFrames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.extractFrameAtTime",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.extractFrameByNumber",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.extractFrames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.extractMultipleFrames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.getVideoInfo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.blend",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.colorAnalysis",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.colorsFilter",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.colorsRemover",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.compress",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.createCollage",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.cropImage",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.effects",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.extractPalette",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.gradientBlend",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.imgConverter",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.masking",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.removeBackground",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.resize",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.stitchImages",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.image.validHex",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.measureText",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "measure-and-structured"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.outPut",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.output.arrayBuffer",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.output.base64",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.output.blob",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.output.dataURL",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.output.url",
+      "route": "external-service",
+      "status": "excluded-by-contract",
+      "proofCaseIds": [
+        "external-transfer-exclusion"
+      ],
+      "finalValidation": "not-required"
+    },
+    {
+      "capability": "ApexPainter.outputFormat",
+      "route": "introspection",
+      "status": "introspection-only",
+      "proofCaseIds": [],
+      "finalValidation": "not-required"
+    },
+    {
+      "capability": "ApexPainter.path2d.create",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.path2d.custom",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.path2d.draw",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.pixels.getColor",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.pixels.getData",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.pixels.manipulate",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.pixels.setColor",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.pixels.setData",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.plugins.get",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.plugins.has",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.plugins.install",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.plugins.isInstalled",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.plugins.list",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.plugins.listInstalled",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.plugins.remove",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.plugins.use",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.prepareForRender",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "measure-and-structured",
+        "assets"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.renderScene",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.renderSceneToGIF",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "gif"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.renderSceneToVideoFrames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.save",
+      "route": "host-persistence",
+      "status": "excluded-by-contract",
+      "proofCaseIds": [
+        "host-persistence-exclusion"
+      ],
+      "finalValidation": "not-required"
+    },
+    {
+      "capability": "ApexPainter.saveMultiple",
+      "route": "host-persistence",
+      "status": "excluded-by-contract",
+      "proofCaseIds": [
+        "host-persistence-exclusion"
+      ],
+      "finalValidation": "not-required"
+    },
+    {
+      "capability": "ApexPainter.toOutput",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.use",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.validateSceneRenderInput",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.video.creator",
+      "route": "introspection",
+      "status": "introspection-only",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "not-required"
+    },
+    {
+      "capability": "ApexPainter.video.extractAllFrames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.video.extractFrameAtTime",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.video.extractFrameByNumber",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.video.extractFrames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.video.extractMultipleFrames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.video.getVideoInfo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.video.operations",
+      "route": "introspection",
+      "status": "introspection-only",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "not-required"
+    },
+    {
+      "capability": "ApexPainter.video.videoPipeline",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "ApexPainter.videoPipeline",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.addLayer",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.addLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.clearBackground",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.clearLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.insertAfter",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.insertBefore",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.insertLayer",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.insertLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.moveLayer",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.removeLayer",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.render",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.replaceLayer",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.replaceLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.setBackground",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "SceneBuilder.toRenderInput",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "TemplateHandle.render",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "templates"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "TemplateHandle.toRenderInput",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "templates"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoCreator.createVideo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.advanced.applyLUT",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.advanced.detectScenes",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.advanced.exportPreset",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.advanced.freezeFrame",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.advanced.loop",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.advanced.stabilize",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.advanced.transition",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.audio.mix",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.codec",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.create",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.describeOperation",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.frames.createFromFrames",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.frames.extractAll",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.frames.extractInterval",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.frames.extractOne",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.frames.extractTimes",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.frames.preview",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.frames.thumbnail",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.getInfo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.merge.merge",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.merge.splitScreen",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.overlays.deprecatedAnimatedText",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.overlays.deprecatedText",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.overlays.pictureInPicture",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.overlays.text",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.overlays.watermark",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.structure.replaceSegment",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.adjustVolume",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.colorCorrect",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.compress",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.convert",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.crop",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.effects",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.extractAudio",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.fade",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.mute",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.normalizeAudio",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.removeAudio",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.reverse",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.rotate",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.speed",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoOperations.transcode.trim",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.audio",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.canRedo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.canUndo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.clearLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.getLayers",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.pushLayer",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.redo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.removeLayer",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.render",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.source",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.splice",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.text",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.toJSON",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.trim",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    },
+    {
+      "capability": "VideoPipeline.undo",
+      "route": "full-runtime",
+      "status": "implementation-ready",
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "finalValidation": "deferred-final-validation"
+    }
   ],
-  "complete": true
+  "optionFamilyProofs": [
+    {
+      "id": "canvas-backgrounds",
+      "capability": "ApexPainter.createCanvas",
+      "families": [
+        "color",
+        "linear/radial gradients",
+        "background layers",
+        "patterns",
+        "noise",
+        "stroke/shadow/radius",
+        "transparent base"
+      ],
+      "proofCaseIds": [
+        "web-raster-core"
+      ]
+    },
+    {
+      "id": "image-sources",
+      "capability": "ApexPainter.createImage",
+      "families": [
+        "built-in shapes",
+        "remote browser image",
+        "Studio asset image",
+        "generated chart buffer",
+        "fit/alignment/radius/stroke/shadow"
+      ],
+      "proofCaseIds": [
+        "web-raster-core",
+        "charts"
+      ]
+    },
+    {
+      "id": "text",
+      "capability": "ApexPainter.createText",
+      "families": [
+        "font family/size",
+        "bold",
+        "fill",
+        "alignment/baseline",
+        "max width",
+        "uploaded browser font"
+      ],
+      "proofCaseIds": [
+        "web-raster-core"
+      ]
+    },
+    {
+      "id": "charts",
+      "capability": "ApexPainter.createChart",
+      "families": [
+        "pie/doughnut",
+        "bar",
+        "horizontalBar",
+        "line",
+        "scatter",
+        "radar",
+        "polarArea",
+        "comparison",
+        "combo"
+      ],
+      "proofCaseIds": [
+        "charts"
+      ]
+    },
+    {
+      "id": "scene",
+      "capability": "ApexPainter.createScene",
+      "families": [
+        "background",
+        "image/text/path/chart",
+        "nested surface",
+        "component layers",
+        "asset refs",
+        "builder mutation"
+      ],
+      "proofCaseIds": [
+        "scene-builder"
+      ]
+    },
+    {
+      "id": "templates",
+      "capability": "ApexPainter.createTemplate",
+      "families": [
+        "placeholders/defaults",
+        "asset refs",
+        "overrides",
+        "insertions",
+        "render input",
+        "render"
+      ],
+      "proofCaseIds": [
+        "templates"
+      ]
+    },
+    {
+      "id": "image-utils",
+      "capability": "ApexPainter.image",
+      "families": [
+        "geometry",
+        "filters/effects",
+        "blend/mask",
+        "palette/color",
+        "conversion/compression",
+        "collage/stitch"
+      ],
+      "proofCaseIds": [
+        "image-utils"
+      ]
+    },
+    {
+      "id": "path-pixels-detect",
+      "capability": "ApexPainter.path2d/pixels/detect",
+      "families": [
+        "path commands",
+        "path drawing",
+        "pixel read/write",
+        "pixel transforms",
+        "hit regions",
+        "distance"
+      ],
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ]
+    },
+    {
+      "id": "audio",
+      "capability": "ApexPainter.createAudio",
+      "families": [
+        "preset",
+        "synth",
+        "custom",
+        "sequence",
+        "compose",
+        "mix",
+        "metadata/playback"
+      ],
+      "proofCaseIds": [
+        "audio"
+      ]
+    },
+    {
+      "id": "video",
+      "capability": "ApexPainter.video",
+      "families": [
+        "creation/transcode",
+        "pipeline",
+        "metadata",
+        "frames",
+        "overlays",
+        "audio",
+        "structure",
+        "advanced operations",
+        "scene video"
+      ],
+      "proofCaseIds": [
+        "video-top-level",
+        "video-pipeline",
+        "video-deep-operations"
+      ]
+    },
+    {
+      "id": "structured",
+      "capability": "structured/non-raster results",
+      "families": [
+        "scalar",
+        "JSON object/array",
+        "typed arrays",
+        "ArrayBuffer",
+        "Blob",
+        "data URL",
+        "multi-output"
+      ],
+      "proofCaseIds": [
+        "measure-and-structured",
+        "output-local",
+        "batch-chain"
+      ]
+    }
+  ],
+  "proofCoverage": {
+    "status": "complete",
+    "totalCapabilities": 187,
+    "implementationReady": 180,
+    "excludedByContract": 4,
+    "missingProofs": [],
+    "proofCaseIds": [
+      "web-raster-core",
+      "charts",
+      "scene-builder",
+      "templates",
+      "measure-and-structured",
+      "image-utils",
+      "geometry-pixels-detect",
+      "assets",
+      "plugins",
+      "batch-chain",
+      "output-local",
+      "gif",
+      "animation",
+      "audio",
+      "video-top-level",
+      "video-pipeline",
+      "video-deep-operations",
+      "host-persistence-exclusion",
+      "external-transfer-exclusion"
+    ],
+    "optionFamilyProofIds": [
+      "canvas-backgrounds",
+      "image-sources",
+      "text",
+      "charts",
+      "scene",
+      "templates",
+      "image-utils",
+      "path-pixels-detect",
+      "audio",
+      "video",
+      "structured"
+    ],
+    "invalidTemplateRefs": [],
+    "invalidOptionProofRefs": [],
+    "emptyOptionFamilies": [],
+    "requiredArtifactKinds": [
+      "audio",
+      "binary",
+      "gif",
+      "image",
+      "json",
+      "text",
+      "video"
+    ],
+    "missingArtifactContractKinds": [],
+    "missingArtifactPreviewKinds": [],
+    "finalRuntimeValidation": "deferred-final-validation",
+    "introspectionOnly": 3
+  },
+  "excludedFromStudioManipulation": [
+    {
+      "capability": "ApexPainter.save",
+      "category": "host-persistence",
+      "reason": "Writes to the host filesystem rather than returning a Studio artifact."
+    },
+    {
+      "capability": "ApexPainter.saveMultiple",
+      "category": "host-persistence",
+      "reason": "Writes to the host filesystem rather than returning Studio artifacts."
+    },
+    {
+      "capability": "ApexPainter.createAudio.save",
+      "category": "host-persistence",
+      "reason": "Writes WAV bytes to a host path rather than returning a Studio artifact."
+    },
+    {
+      "capability": "ApexPainter.output.url",
+      "category": "external-service",
+      "reason": "Uploads to Imgur and requires third-party credentials/network access; Studio returns local artifacts instead."
+    }
+  ],
+  "implementationComplete": true,
+  "finalRuntimeValidation": {
+    "status": "deferred",
+    "reason": "Per project execution policy, browser/full-runtime representative execution and deployment proofs run once in the final validation pass rather than during each implementation phase."
+  }
 }

@@ -103,7 +103,43 @@ test('Studio planner blocks host persistence for aliased ApexPainter instances',
     'return canvas.buffer;',
   ].join('\n'));
   assert.deepEqual(plan.hostPersistenceOnly, ['save()']);
+  assert.deepEqual(
+    plan.excludedOperations.map((operation) => [operation.label, operation.category]),
+    [['save()', 'host-persistence']],
+  );
   assert.ok(plan.families.includes('host-persistence'));
+});
+
+test('Studio planner rejects credentialed external transfer while preserving local output conversions', () => {
+  const excluded = planStudioExecution([
+    'const renderer = new ApexPainter();',
+    'const canvas = await renderer.createCanvas({ width: 64, height: 64 });',
+    'return renderer.output.url(canvas.buffer);',
+  ].join('\n'));
+  assert.ok(excluded.families.includes('external-service'));
+  assert.deepEqual(
+    excluded.excludedOperations.map((operation) => [operation.label, operation.category]),
+    [['output.url()', 'external-service']],
+  );
+
+  const aliased = planStudioExecution([
+    'const renderer = new ApexPainter();',
+    'const transfer = renderer.output;',
+    'const canvas = await renderer.createCanvas({ width: 64, height: 64 });',
+    'return transfer.url(canvas.buffer);',
+  ].join('\n'));
+  assert.deepEqual(
+    aliased.excludedOperations.map((operation) => [operation.label, operation.category]),
+    [['output.url()', 'external-service']],
+  );
+
+  const local = planStudioExecution([
+    'const renderer = new ApexPainter();',
+    'const canvas = await renderer.createCanvas({ width: 64, height: 64 });',
+    'return renderer.output.base64(canvas.buffer);',
+  ].join('\n'));
+  assert.equal(local.excludedOperations.length, 0);
+  assert.ok(local.families.includes('output'));
 });
 
 test('Studio planner routes generated raster buffers reused as sources to full runtime', () => {

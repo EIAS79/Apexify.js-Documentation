@@ -13,7 +13,7 @@
 > - [x] STUDIO-7 GIF/animation/audio implementation complete: GIF result variants, animation frame collections, WAV metadata, full procedural-audio families, scene-to-GIF, media previews, and representative templates all use the real full-runtime path. Final execution proofs are deferred to the end-of-program validation pass.
 > - [x] STUDIO-8 video implementation complete: pinned FFmpeg/ffprobe, narrowly mediated same-origin media subprocesses, createVideo/videoPipeline/probing/extraction/scene-video routing, video metadata/player UI, ordered frame collections, and representative templates are implemented. Final deployment/runtime proofs are deferred to the end-of-program validation pass.
 > - [x] STUDIO-9 `@apexify/web` migration complete for Studio: the first-party browser runtime now lives in Apexify.js, Studio installs a commit-pinned integrity-checked source snapshot, browser runs call the package runtime/font manager directly, and the former local renderer is only a compatibility re-export. The broader Apexify.js Phase 20–25 retained/realtime program remains separate from this Studio migration.
-> - [~] STUDIO-10 completeness matrix now covers top-level ApexPainter methods plus audio/image/detect/path/pixels/output/assets/plugins/video facet members and component factories; per-capability execution proofs remain
+> - [x] STUDIO-10 completeness gate implementation complete: declaration-driven routing coverage, nested public-handle inventory, per-capability proof status, representative option-family evidence, artifact-preview coverage, explicit contract exclusions, and a deterministic generated matrix are all implemented. Final browser/full-runtime execution/deployment validation remains intentionally deferred to the single end-of-program validation pass.
 >
 > Goal: make Studio an online Apexify.js coding and media-manipulation environment. A user writes normal Apexify.js code, presses **Run**, and Studio executes the required Apexify feature with the correct runtime and previews the result. Host-side persistence APIs such as `save()` / `saveMultiple()` are not part of the Studio execution target.
 
@@ -69,6 +69,7 @@ Excluded from the Studio feature-completeness target:
 - `save()` and `saveMultiple()` host persistence semantics;
 - arbitrary writes to user-selected server paths;
 - direct access to deployment secrets;
+- credentialed third-party transfer helpers such as `painter.output.url()` (Imgur upload); Studio returns/downloads local artifacts instead;
 - unrestricted host process / shell access.
 
 Download/export of a produced Studio artifact is UI behavior, not Apexify filesystem persistence.
@@ -350,30 +351,50 @@ This completes the **Studio migration boundary**. It does not claim that the wid
 
 ### STUDIO-10 — Completeness gate
 
-Status: **foundation implemented**.
+Status: **implementation complete**.
 
-Current implementation:
+Delivered:
 
-- `scripts/studio/studio-completeness.ts` reads the installed, pinned Apexify.js declaration rather than a hand-copied API list;
-- it inventories public `ApexPainter` methods and top-level facets;
-- every public manipulation method must be classified as browser-direct or full-runtime;
-- `save()` / `saveMultiple()` are explicitly classified as host-persistence exclusions rather than silently omitted;
-- the generated evidence is `generated/studio/capability-matrix.json`;
-- `npm run studio:completeness` regenerates it and `npm run studio:completeness:check` verifies it on demand;
-- this is intentionally not wired into the legacy documentation CI chain yet.
+- `scripts/studio/studio-completeness.ts` reads the installed pinned Apexify.js declaration instead of relying on a hand-copied top-level API list;
+- all public `ApexPainter` manipulation methods are classified as browser, full-runtime, host-persistence exclusion, external-service exclusion, or introspection;
+- member-level inventory covers `createAudio`, image utilities, hit detection, Path2D, pixels, output conversion, assets, plugins and the video facade;
+- component factories are inventoried for badge/progressBar/avatar/card/watermark `toLayers()`;
+- returned/reachable public handles are inventoried rather than stopping at the top-level facade:
+  - `SceneBuilder`;
+  - `TemplateHandle`;
+  - `VideoPipeline`;
+  - `VideoCreator`;
+  - `VideoOperations`;
+  - video transcode/merge/overlay/audio/frame/structure/advanced operation services;
+- every executable manipulation capability receives a deterministic proof status and one or more proof-case ids from `scripts/studio/studio-proof-registry.ts`;
+- representative option-family evidence covers canvas backgrounds, image sources, typography, every chart family, scenes/builders/components, templates, image utilities, path/pixels/hit testing, procedural audio, video, and structured/non-raster results;
+- proof cases reference existing Studio templates where useful and static runtime/collector evidence where a dedicated user-facing template would add noise;
+- required artifact kinds are cross-checked against both the unified artifact contract and Studio preview implementation;
+- invalid proof-template references, invalid proof-case references, empty option-family proofs, unrouted methods/facets, and capabilities without a proof mapping make the completeness result fail;
+- `generated/studio/capability-matrix.json` is schema v2 and records:
+  - package/runtime identity;
+  - top-level routes;
+  - facet members;
+  - component members;
+  - nested public surfaces;
+  - per-capability proof status;
+  - representative option-family proofs;
+  - proof coverage counts/gaps;
+  - explicit Studio exclusions;
+  - final-validation state;
+- host persistence remains explicitly excluded:
+  - `save()`;
+  - `saveMultiple()`;
+  - `createAudio.save()`;
+- `output.url()` is now explicitly excluded as a credentialed Imgur/network transfer API rather than being falsely counted as executable inside the no-secret/no-egress Studio runtime;
+- the execution planner reports contract-excluded operations before execution, so users receive a deterministic Studio message instead of a credential/network failure;
+- `npm run studio:completeness` regenerates the evidence;
+- `npm run studio:completeness:check` verifies the evidence is current;
+- `npm run studio:verify` is the dedicated Studio completeness gate.
 
-Additional coverage now implemented:
+Implementation completeness and runtime validation are deliberately separate. The matrix may report **implementation complete** while its `finalRuntimeValidation.status` remains `deferred`. Per the project execution policy, representative browser/full-runtime/media execution, deployment proof and end-to-end quality gates run once in the final validation pass rather than being repeatedly executed during phase implementation.
 
-- member-level inventory for `createAudio`, image utilities, hit detection, Path2D, pixels, output conversion, named assets, plugins, and the video stack;
-- component factory inventory for badge/progressBar/avatar/card/watermark `toLayers` surfaces;
-- `createAudio.save()` is explicitly classified as a host-persistence exclusion.
-
-Remaining:
-
-- attach execution-proof status per capability and representative option family after the isolated executor is deployed;
-- expand the generated matrix further if Apexify.js exposes new nested public classes beneath existing facets.
-
-A release is incomplete when a new render/manipulation API is public in Apexify.js but absent from Studio capability routing, execution, or output handling.
+A release is incomplete when a new public render/manipulation capability is absent from routing, proof mapping, artifact handling or an explicit product-contract exclusion.
 
 ## 8. Current implementation boundary
 

@@ -20,13 +20,21 @@ export type StudioCapabilityFamily =
   | 'batch'
   | 'plugins'
   | 'output'
-  | 'host-persistence';
+  | 'host-persistence'
+  | 'external-service';
+
+export type StudioExcludedOperation = {
+  label: string;
+  category: 'host-persistence' | 'external-service';
+  reason: string;
+};
 
 export type StudioExecutionPlan = {
   backend: StudioExecutionBackend;
   families: StudioCapabilityFamily[];
   reasons: string[];
   hostPersistenceOnly: string[];
+  excludedOperations: StudioExcludedOperation[];
 };
 
 const browserMethods = new Map<string, StudioCapabilityFamily>([
@@ -114,6 +122,27 @@ function apexPainterIdentifiers(source: string): string[] {
 
   if (/\bpainter\b/.test(source)) ids.add('painter');
   return [...ids];
+}
+
+function apexFacetAliases(
+  source: string,
+  painterIds: readonly string[],
+  facet: 'createAudio' | 'output',
+): string[] {
+  const aliases = new Set<string>();
+  for (const id of painterIds) {
+    const re = new RegExp(
+      '\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*=\\s*' +
+        escapeRegExp(id) +
+        '\\s*\\.\\s*' +
+        facet +
+        '\\b',
+      'g',
+    );
+    let match: RegExpExecArray | null;
+    while ((match = re.exec(source))) aliases.add(match[1]!);
+  }
+  return [...aliases];
 }
 
 /**
@@ -225,9 +254,11 @@ export function planStudioExecution(source: string): StudioExecutionPlan {
   const families = new Set<StudioCapabilityFamily>();
   const reasons: string[] = [];
   const hostPersistenceOnly: string[] = [];
+  const excludedOperations: StudioExcludedOperation[] = [];
   let needsFullRuntime = false;
+  const painterIds = apexPainterIdentifiers(scanned);
 
-  for (const id of apexPainterIdentifiers(scanned)) {
+  for (const id of painterIds) {
     const escaped = escapeRegExp(id);
     const checks: Array<[RegExp, string]> = [
       [new RegExp('\\b' + escaped + '\\s*\\.\\s*save\\s*\\('), persistenceMethodLabels.save],
@@ -237,8 +268,52 @@ export function planStudioExecution(source: string): StudioExecutionPlan {
     for (const [pattern, label] of checks) {
       if (pattern.test(scanned)) {
         hostPersistenceOnly.push(label);
+        excludedOperations.push({
+          label,
+          category: 'host-persistence',
+          reason: 'Host filesystem persistence is outside the Studio execution contract.',
+        });
         addFamily(families, 'host-persistence');
       }
+    }
+
+    const outputUrl = new RegExp(
+      '\\b' + escaped + '\\s*\\.\\s*output\\s*\\.\\s*url\\s*\\(',
+    );
+    if (outputUrl.test(scanned)) {
+      excludedOperations.push({
+        label: 'output.url()',
+        category: 'external-service',
+        reason:
+          'output.url() uploads to Imgur and requires third-party credentials/network access; Studio keeps credentialed external transfer outside its execution contract.',
+      });
+      addFamily(families, 'external-service');
+    }
+  }
+
+  for (const alias of apexFacetAliases(scanned, painterIds, 'createAudio')) {
+    const pattern = new RegExp('\\b' + escapeRegExp(alias) + '\\s*\\.\\s*save\\s*\\(');
+    if (pattern.test(scanned)) {
+      hostPersistenceOnly.push(persistenceMethodLabels.createAudioSave);
+      excludedOperations.push({
+        label: persistenceMethodLabels.createAudioSave,
+        category: 'host-persistence',
+        reason: 'Host filesystem persistence is outside the Studio execution contract.',
+      });
+      addFamily(families, 'host-persistence');
+    }
+  }
+
+  for (const alias of apexFacetAliases(scanned, painterIds, 'output')) {
+    const pattern = new RegExp('\\b' + escapeRegExp(alias) + '\\s*\\.\\s*url\\s*\\(');
+    if (pattern.test(scanned)) {
+      excludedOperations.push({
+        label: 'output.url()',
+        category: 'external-service',
+        reason:
+          'output.url() uploads to Imgur and requires third-party credentials/network access; Studio keeps credentialed external transfer outside its execution contract.',
+      });
+      addFamily(families, 'external-service');
     }
   }
 
@@ -287,12 +362,22 @@ export function planStudioExecution(source: string): StudioExecutionPlan {
       'Host persistence calls are outside the Studio product contract. Return the generated artifact instead of saving it to the host filesystem.',
     );
   }
+  if (excludedOperations.some((operation) => operation.category === 'external-service')) {
+    reasons.push(
+      'Credentialed third-party transfer APIs are outside the Studio product contract. Return the local artifact instead.',
+    );
+  }
+
+  const uniqueExcluded = [...new Map(
+    excludedOperations.map((operation) => [operation.category + ':' + operation.label, operation]),
+  ).values()];
 
   return {
     backend: needsFullRuntime ? 'full-runtime' : 'browser',
     families: [...families],
     reasons: [...new Set(reasons)],
     hostPersistenceOnly: [...new Set(hostPersistenceOnly)],
+    excludedOperations: uniqueExcluded,
   };
 }
 
