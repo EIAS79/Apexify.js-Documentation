@@ -16,6 +16,7 @@ export type GalleryEvidenceFilter = 'all' | 'verified' | 'legacy';
 const peakShowcaseItems: CuratedGalleryCard[] = [
   {
     id: 'showcase-apexify-spectrum',
+    category: 'advance',
     title: 'Apexify Spectrum',
     description: 'Peak showcase film spanning composition, typography, image work, charts, templates, audio, motion, and video. Presented as finished Apexify work rather than a source tutorial.',
     thumbnail: '/brand/Apexify-Spectrum.mp4',
@@ -28,6 +29,7 @@ const peakShowcaseItems: CuratedGalleryCard[] = [
   },
   {
     id: 'showcase-orbit-breaker',
+    category: 'advance',
     title: 'Orbit Breaker',
     description: 'A cinematic procedural motion study built to show the upper creative range of Apexify composition, effects, animation, and media output.',
     thumbnail: '/brand/Orbit-Breaker.mp4',
