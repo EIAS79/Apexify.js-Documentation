@@ -31,10 +31,17 @@ export interface GalleryCardBase {
   primaryLens?: GalleryLens;
   /** Read-only TypeScript / JavaScript samples */
   code?: GalleryCodeTabs;
+  /**
+   * Controls execution affordances for source shown in Gallery.
+   * - gallery: editable + runnable in the lightweight Gallery runner
+   * - studio: read-only in Gallery, but can be sent to Studio
+   * - none: display/copy source only (for multi-file/project recipes)
+   */
+  executionMode?: 'gallery' | 'studio' | 'none';
 }
 
 /** Deck-style demos: charts, comparisons, multi-pass compose (`advance` filter in the gallery UI). */
 export type AdvanceGalleryCard = GalleryCardBase & {
   category: 'advance';
-  code: { ts: string; js?: string };
+  code: GalleryCodeTabs;
 };
