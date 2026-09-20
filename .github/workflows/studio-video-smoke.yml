@@ -1,0 +1,36 @@
+name: Studio Video Runtime Smoke
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lib/studio/runtime/**'
+      - 'scripts/studio/studio-video-smoke.ts'
+      - 'scripts/studio/Dockerfile.video-smoke'
+      - 'scripts/studio/install-deno.mjs'
+      - 'scripts/studio/install-ffmpeg.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/studio-video-smoke.yml'
+
+jobs:
+  video-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Run exact Studio video smoke
+        run: npm run studio:smoke:video
+      - name: Upload rendered MP4
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-video-smoke
+          path: studio-smoke-output/pulse-bloom.mp4
+          if-no-files-found: error
