@@ -1,4 +1,5 @@
 name: Publish Peak Lab Gallery
+# Bootstrap note: touching this workflow intentionally triggers the first main-branch publish.
 
 on:
   pull_request:
