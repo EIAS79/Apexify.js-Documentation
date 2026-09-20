@@ -34,7 +34,7 @@ export default function GalleryHero({ counts, version }: { counts: Counts; versi
           </p>
 
           <div className="apx-gallery-hero__signals">
-            <span><CheckBadgeIcon /> {counts.verified} verified source</span>
+            <span><CheckBadgeIcon /> {counts.total - counts.verified} peak showcases</span>
             <span><RectangleGroupIcon /> {counts.total} total pieces</span>
             <span><ServerStackIcon /> Node runtime</span>
             <span><FilmIcon /> {counts.gifs + counts.videos} motion pieces</span>
@@ -48,7 +48,7 @@ export default function GalleryHero({ counts, version }: { counts: Counts; versi
           </div>
           <div className="apx-gallery-hero__index-grid">
             <div><strong>{counts.total}</strong><span>pieces</span></div>
-            <div><strong>{counts.verified}</strong><span>verified</span></div>
+            <div><strong>{counts.total - counts.verified}</strong><span>curated</span></div>
             <div><strong>{counts.featured}</strong><span>featured</span></div>
             <div><strong>{counts.gifs + counts.videos}</strong><span>motion</span></div>
           </div>

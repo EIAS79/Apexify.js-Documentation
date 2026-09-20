@@ -1,21 +1,15 @@
-import { backgroundGalleryItems } from '../background/backgroundSnippets';
-import { spinWheelGalleryItems } from '../spin-wheel/spinWheelSnippets';
-import { extraMotionGalleryItems } from '../motion/motionSnippets';
-import { presentationSlideGalleryItems } from '../presentation/presentationSlideSnippet';
-import { advanceGalleryItems } from '../advance/advanceSnippets';
+import { peakGalleryItems } from '../peak/peakGalleryItems';
 import { doc5GalleryItems } from './doc5GalleryAdapter';
 import type { RegistryGalleryItem } from '../core/galleryDocLink';
 
 /**
- * Compatibility registry for docs/Gallery consumers.
- * DOC-5 authoritative items are derived from the generated example manifest; pre-DOC-5 items remain legacy inputs until their later controlled migration.
+ * Gallery registry after the peak-showcase reset.
+ * The visible Gallery is the 21-piece curated catalog. DOC-5 examples stay
+ * addressable for canonical verified-example links, but are not mixed into
+ * the reset visual catalog.
  */
 export const allGalleryItemsForDocs: RegistryGalleryItem[] = [
-  ...backgroundGalleryItems,
-  ...spinWheelGalleryItems,
-  ...extraMotionGalleryItems,
-  ...presentationSlideGalleryItems,
-  ...advanceGalleryItems,
+  ...peakGalleryItems,
   ...doc5GalleryItems,
 ];
 

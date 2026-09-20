@@ -2,6 +2,15 @@
 
 export type GalleryMediaKind = 'image' | 'gif' | 'video';
 
+export type GalleryLens =
+  | 'composition'
+  | 'image'
+  | 'typography'
+  | 'data'
+  | 'motion'
+  | 'surface'
+  | 'advanced';
+
 export type GalleryCodeTabs = {
   ts?: string;
   js?: string;
@@ -16,6 +25,10 @@ export interface GalleryCardBase {
   /** How to render `thumbnail` (inferred from extension when omitted). */
   thumbnailMedia?: GalleryMediaKind;
   featured?: boolean;
+  /** Explicit visual-category routing for curated Gallery catalogs. */
+  lenses?: GalleryLens[];
+  /** Preferred badge/filter identity when an item belongs to multiple lenses. */
+  primaryLens?: GalleryLens;
   /** Read-only TypeScript / JavaScript samples */
   code?: GalleryCodeTabs;
 }

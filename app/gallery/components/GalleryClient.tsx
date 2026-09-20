@@ -209,8 +209,17 @@ export default function GalleryClient() {
     () => ({
       total: galleryItems.length,
       featured: galleryItems.filter((item) => item.featured).length,
-      videos: galleryItems.filter((item) => item.thumbnailMedia === 'video' || item.thumbnail.endsWith('.mp4')).length,
-      gifs: galleryItems.filter((item) => item.thumbnailMedia === 'gif' || item.thumbnail.endsWith('.gif')).length,
+      videos: galleryItems.filter(
+        (item) =>
+          discoverCategories(item).includes('motion') &&
+          (item.thumbnailMedia === 'video' || item.thumbnail.endsWith('.mp4')),
+      ).length,
+      gifs: galleryItems.filter(
+        (item) =>
+          discoverCategories(item).includes('motion') &&
+          item.thumbnailMedia !== 'video' &&
+          !item.thumbnail.endsWith('.mp4'),
+      ).length,
       verified: evidenceCounts.verified,
     }),
     [evidenceCounts],

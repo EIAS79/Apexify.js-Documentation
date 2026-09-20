@@ -1,9 +1,10 @@
-import type { BackgroundGalleryCard } from '../background/backgroundSnippets';
-import type { SpinWheelGalleryCard } from '../spin-wheel/spinWheelSnippets';
-import type { AdvanceGalleryCard, GalleryMediaKind } from './galleryTypes';
+import type { GalleryCardBase, GalleryLens, GalleryMediaKind } from './galleryTypes';
 
-/** Same union as `GalleryClient` uses for items. */
-export type RegistryGalleryItem = BackgroundGalleryCard | SpinWheelGalleryCard | AdvanceGalleryCard;
+/** Generic registry card accepted by Gallery/docs consumers. */
+export type RegistryGalleryItem = GalleryCardBase & {
+  category: 'background' | 'gifs' | 'videos' | 'advance';
+  primaryLens?: GalleryLens;
+};
 
 export function inferMediaKind(src: string, explicit?: GalleryMediaKind): GalleryMediaKind {
   if (explicit) return explicit;
@@ -14,13 +15,13 @@ export function inferMediaKind(src: string, explicit?: GalleryMediaKind): Galler
 
 /** Fragment suffix for `/gallery#id+suffix` deep links. */
 export function galleryHashSuffix(item: RegistryGalleryItem): string {
-  if (item.category === 'background') return 'background';
-  if (item.category === 'gifs') return 'gif';
-  if (item.category === 'videos') return 'video';
-  if (item.id.startsWith('advance-chartshowcase-') || item.id.includes('chart')) return 'chart';
-  if (item.id.includes('text')) return 'text';
+  if (item.primaryLens) return item.primaryLens;
+  if (item.category === 'background') return 'surface';
+  if (item.category === 'gifs' || item.category === 'videos') return 'motion';
+  if (item.id.includes('chart')) return 'data';
+  if (item.id.includes('text')) return 'typography';
   if (item.id.includes('shape') || item.id.includes('image')) return 'image';
-  return 'advance';
+  return 'advanced';
 }
 
 export function buildGalleryHash(item: RegistryGalleryItem): string {

@@ -1,24 +1,20 @@
-import { backgroundGalleryItems, type BackgroundGalleryCard } from '@/lib/gallery/background/backgroundSnippets';
-import { spinWheelGalleryItems, type SpinWheelGalleryCard } from '@/lib/gallery/spin-wheel/spinWheelSnippets';
-import { extraMotionGalleryItems } from '@/lib/gallery/motion/motionSnippets';
-import { presentationSlideGalleryItems } from '@/lib/gallery/presentation/presentationSlideSnippet';
-import { advanceGalleryItems } from '@/lib/gallery/advance/advanceSnippets';
+import { peakGalleryItems, type PeakGalleryCard } from '@/lib/gallery/peak/peakGalleryItems';
 import { doc5GalleryItems, type Doc5GalleryCard } from '@/lib/gallery/docs/doc5GalleryAdapter';
-import type { AdvanceGalleryCard } from '@/lib/gallery/core/galleryTypes';
 import type { FilterCategory } from './galleryConfig';
 
-export type GalleryItem = BackgroundGalleryCard | SpinWheelGalleryCard | AdvanceGalleryCard | Doc5GalleryCard;
+export type GalleryItem = PeakGalleryCard | Doc5GalleryCard;
 export type GalleryRuntimeFilter = 'all' | 'node';
 export type GalleryEvidenceFilter = 'all' | 'verified' | 'legacy';
 
-export const galleryItems: GalleryItem[] = [
-  ...backgroundGalleryItems,
-  ...spinWheelGalleryItems,
-  ...extraMotionGalleryItems,
-  ...presentationSlideGalleryItems,
-  ...advanceGalleryItems,
-  ...doc5GalleryItems,
-];
+/**
+ * Visible Gallery catalog.
+ *
+ * The pre-reset curated catalog remains in source/history for compatibility,
+ * but the Gallery UI now starts from this purpose-built peak showcase only.
+ * DOC-5 examples remain available at /examples and still provide package
+ * provenance/version information below.
+ */
+export const galleryItems: GalleryItem[] = [...peakGalleryItems];
 
 export function isVerifiedGalleryItem(item: GalleryItem): item is Doc5GalleryCard {
   return 'doc5' in item && item.doc5 === true;
@@ -40,35 +36,14 @@ export function galleryPackageVersion(): string | null {
   return doc5GalleryItems[0]?.verifiedPackageVersion ?? null;
 }
 
-const DATA_IDS = new Set([
-  'advance-chart-donut-glow',
-  'advance-comparison-donut-line',
-  'presentation-deck-slide',
-  'advance-chart-bar-quarterly',
-  'advance-chart-hbar-routes',
-  'advance-chart-line-dual-target',
-]);
-
-const TYPOGRAPHY_IDS = new Set([
-  'advance-text-glow-plaque',
-  'presentation-deck-slide',
-]);
-
-const IMAGE_IDS = new Set([
-  'advance-shape-collage',
-]);
-
-const COMPOSITION_IDS = new Set([
-  'advance-comparison-donut-line',
-  'presentation-deck-slide',
-  'advance-shape-collage',
-]);
-
 /** Visual lenses used by the Gallery UI. One item may appear under more than one lens. */
 export function discoverCategories(item: GalleryItem): Exclude<FilterCategory, 'all'>[] {
-  const tags = new Set<Exclude<FilterCategory, 'all'>>();
+  if ('lenses' in item && Array.isArray(item.lenses) && item.lenses.length > 0) {
+    return [...new Set(item.lenses)];
+  }
 
   if (isVerifiedGalleryItem(item)) {
+    const tags = new Set<Exclude<FilterCategory, 'all'>>();
     if (item.doc5Features.includes('charts')) tags.add('data');
     if (item.doc5Features.includes('gif')) tags.add('motion');
     if (item.doc5Features.includes('canvas')) tags.add('image');
@@ -77,32 +52,7 @@ export function discoverCategories(item: GalleryItem): Exclude<FilterCategory, '
     return [...tags];
   }
 
-  if (item.category === 'background') {
-    tags.add('surface');
-    tags.add('composition');
-    return [...tags];
-  }
-
-  if (item.category === 'gifs' || item.category === 'videos') {
-    tags.add('motion');
-    tags.add('composition');
-    return [...tags];
-  }
-
-  if (item.category === 'advance') {
-    if (DATA_IDS.has(item.id) || item.id.startsWith('advance-chartshowcase-')) tags.add('data');
-    if (TYPOGRAPHY_IDS.has(item.id)) tags.add('typography');
-    if (IMAGE_IDS.has(item.id)) tags.add('image');
-    if (COMPOSITION_IDS.has(item.id) || item.id === 'advance-chartshowcase-comparison-pie-bar') tags.add('composition');
-
-    if (tags.size === 0) tags.add('advanced');
-    else if (tags.size > 1) tags.add('advanced');
-
-    return [...tags];
-  }
-
-  tags.add('composition');
-  return [...tags];
+  return ['advanced'];
 }
 
 export function itemMatchesFilter(item: GalleryItem, filter: FilterCategory): boolean {
@@ -143,6 +93,8 @@ export function plainGallerySummary(text: string): string {
 }
 
 export function primaryBadgeCategory(item: GalleryItem): Exclude<FilterCategory, 'all'> {
+  if ('primaryLens' in item && item.primaryLens) return item.primaryLens;
+
   const categories = discoverCategories(item);
   const priority: Exclude<FilterCategory, 'all'>[] = [
     'composition',

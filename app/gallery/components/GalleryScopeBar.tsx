@@ -29,9 +29,11 @@ export default function GalleryScopeBar({
         <ScopeButton active={evidence === 'all'} onClick={() => onEvidenceChange('all')}>
           <CircleStackIcon /> All <small>{verifiedCount + legacyCount}</small>
         </ScopeButton>
-        <ScopeButton active={evidence === 'verified'} onClick={() => onEvidenceChange('verified')}>
-          <CheckBadgeIcon /> Verified <small>{verifiedCount}</small>
-        </ScopeButton>
+        {verifiedCount > 0 ? (
+          <ScopeButton active={evidence === 'verified'} onClick={() => onEvidenceChange('verified')}>
+            <CheckBadgeIcon /> Verified <small>{verifiedCount}</small>
+          </ScopeButton>
+        ) : null}
         <ScopeButton active={evidence === 'legacy'} onClick={() => onEvidenceChange('legacy')}>
           <CircleStackIcon /> Curated <small>{legacyCount}</small>
         </ScopeButton>
@@ -47,7 +49,7 @@ export default function GalleryScopeBar({
       </ScopeGroup>
 
       <p className="apx-gallery-scope__note">
-        Verified examples = repository-controlled executable source. Curated = showcase material.
+        Curated = purpose-built Apexify.js showcase source. Verified examples remain available in the canonical Examples library.
       </p>
     </section>
   );
