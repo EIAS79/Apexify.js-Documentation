@@ -206,6 +206,152 @@ async function jsTransfer(origin, route) {
   return result;
 }
 
+async function runStudioSmoke(name, code, {
+  files = [],
+  minOutputs = 1,
+  expectedMimes = [],
+} = {}) {
+  const response = await fetch(`${base}/api/gallery/run`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      code,
+      lang: 'ts',
+      context: 'studio',
+      files,
+    }),
+  });
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error(`${name}: Studio runner returned non-JSON HTTP ${response.status}`);
+  }
+
+  if (!response.ok || !data?.ok) {
+    throw new Error(`${name}: Studio execution failed HTTP ${response.status}: ${data?.error || 'unknown error'}`);
+  }
+  if (data.runtime !== 'same-origin-isolated') {
+    throw new Error(`${name}: expected same-origin-isolated runtime, got ${JSON.stringify(data.runtime)}`);
+  }
+
+  const outputs = Array.isArray(data.outputs) ? data.outputs : [];
+  if (outputs.length < minOutputs) {
+    throw new Error(`${name}: expected at least ${minOutputs} outputs, got ${outputs.length}`);
+  }
+
+  for (const mime of expectedMimes) {
+    if (!outputs.some((output) => output?.mime === mime)) {
+      throw new Error(`${name}: missing expected output mime ${mime}; got ${outputs.map((output) => output?.mime).join(', ')}`);
+    }
+  }
+
+  return {
+    name,
+    elapsedMs: data.elapsedMs ?? null,
+    outputCount: outputs.length,
+    mimes: outputs.map((output) => output?.mime).filter(Boolean),
+  };
+}
+
+const workspaceSmokeCode = `import { ApexPainter } from 'apexify.js';
+import { makeCanvasConfig } from './helper.ts';
+
+async function main() {
+  const painter = new ApexPainter({ type: 'buffer' });
+  const canvas = await painter.createCanvas(makeCanvasConfig());
+  return [canvas.buffer, { workspace: 'ok', files: 2 }];
+}
+
+return await main();`;
+
+const workspaceSmokeFiles = [{
+  name: 'helper.ts',
+  language: 'ts',
+  source: `export function makeCanvasConfig() {
+  return { width: 128, height: 72, colorBg: '#17315f' };
+}`,
+}];
+
+const sceneSmokeCode = `import { ApexPainter } from 'apexify.js';
+
+async function main() {
+  const painter = new ApexPainter({ type: 'buffer' });
+  painter.assets.loadPalette('brand', {
+    bg: '#08111f',
+    panel: '#17213a',
+    accent: '#60a5fa',
+    text: '#f8fafc',
+  });
+
+  const scene = painter.createScene({ width: 320, height: 180 });
+  scene.setBackground({ colorBg: '$brand.bg' });
+  scene.addLayers([
+    ...painter.components.card.toLayers({
+      x: 20, y: 20, width: 280, height: 138,
+      radius: 16,
+      background: '$brand.panel',
+      borderColor: '$brand.accent',
+      borderWidth: 2,
+      title: 'Studio full runtime',
+      titleColor: '$brand.text',
+      titleFontSize: 22,
+      body: 'Scene + components + named assets',
+      bodyColor: '$brand.text',
+      bodyFontSize: 14,
+      padding: 18,
+    }),
+  ]);
+
+  return scene.render({ resolveAssetRefs: true });
+}
+
+return await main();`;
+
+const gifSmokeCode = `import { ApexPainter } from 'apexify.js';
+
+async function main() {
+  const painter = new ApexPainter({ type: 'buffer' });
+  const first = await painter.createCanvas({ width: 128, height: 72, colorBg: '#0b1020' });
+  const second = await painter.createCanvas({ width: 128, height: 72, colorBg: '#5b21b6' });
+
+  return painter.createGIF([
+    { buffer: first.buffer, duration: 120 },
+    { buffer: second.buffer, duration: 120 },
+  ], {
+    outputFormat: 'buffer',
+    width: 128,
+    height: 72,
+    repeat: 0,
+    quality: 10,
+    delay: 120,
+  });
+}
+
+return await main();`;
+
+const videoSmokeCode = `import { ApexPainter } from 'apexify.js';
+
+async function main() {
+  const painter = new ApexPainter({ type: 'buffer' });
+  const first = await painter.createCanvas({ width: 128, height: 72, colorBg: '#0b1020' });
+  const second = await painter.createCanvas({ width: 128, height: 72, colorBg: '#2563eb' });
+
+  return painter.createVideo({
+    source: first.buffer,
+    createFromFrames: {
+      frames: [first.buffer, second.buffer, first.buffer],
+      outputPath: 'studio-smoke.mp4',
+      fps: 2,
+      format: 'mp4',
+      quality: 'medium',
+    },
+  });
+}
+
+return await main();`;
+
 try {
   await auditRoute({ route: '/docs/node/canvas', name: 'docs-desktop-light', width: 1440, height: 1000, kind: 'docs-playground' });
   await auditRoute({ route: '/docs/node/canvas', name: 'docs-mobile-dark', width: 390, height: 844, theme: 'dark', kind: 'docs-playground' });
@@ -217,15 +363,53 @@ try {
   await auditRoute({ route: '/gallery', name: 'gallery-closed', width: 1365, height: 900, kind: 'ordinary' });
 
   const availability = await fetch(`${base}/api/gallery/run`).then((response) => response.json());
-  if (availability.enabled !== false || availability.mode !== 'unavailable') {
-    throw new Error(`production execution boundary mismatch: ${JSON.stringify(availability)}`);
+  if (availability.enabled !== true || availability.mode !== 'same-origin-isolated') {
+    throw new Error(`production isolated execution boundary mismatch: ${JSON.stringify(availability)}`);
   }
-  const rejected = await fetch(`${base}/api/gallery/run`, {
+
+  const runtimeSmokes = [];
+  runtimeSmokes.push(await runStudioSmoke('workspace-multi-output', workspaceSmokeCode, {
+    files: workspaceSmokeFiles,
+    minOutputs: 2,
+    expectedMimes: ['image/png', 'application/json'],
+  }));
+  runtimeSmokes.push(await runStudioSmoke('scene-components-assets', sceneSmokeCode, {
+    expectedMimes: ['image/png'],
+  }));
+  runtimeSmokes.push(await runStudioSmoke('gif', gifSmokeCode, {
+    expectedMimes: ['image/gif'],
+  }));
+  runtimeSmokes.push(await runStudioSmoke('video', videoSmokeCode, {
+    expectedMimes: ['video/mp4'],
+  }));
+
+  const deniedNetwork = await fetch(`${base}/api/gallery/run`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ code: 'console.log(process.env)', lang: 'js', context: 'studio' }),
+    body: JSON.stringify({
+      context: 'studio',
+      lang: 'ts',
+      code: `async function main() {
+  await fetch('https://example.com/');
+  return 'network-should-be-denied';
+}
+return await main();`,
+    }),
   });
-  if (rejected.status !== 503) throw new Error(`public arbitrary execution should be rejected with 503, got ${rejected.status}`);
+  if (deniedNetwork.status !== 422) {
+    throw new Error(`isolated Studio network access should fail with 422, got ${deniedNetwork.status}`);
+  }
+
+  routeEvidence.push({
+    name: 'studio-runtime-smokes',
+    route: '/api/gallery/run',
+    width: 0,
+    height: 0,
+    theme: 'n/a',
+    reduced: false,
+    runtimeSmokes,
+    networkDeniedStatus: deniedNetwork.status,
+  });
 
   for (const route of ['/studio', '/docs/node/canvas', '/docs/getting-started', '/', '/gallery']) {
     const [before, after] = await Promise.all([jsTransfer(baseline, route), jsTransfer(base, route)]);
@@ -248,8 +432,10 @@ const evidence = {
   routes: routeEvidence,
   executionBoundary: {
     unsandboxedProductionExecution: false,
-    productionModeWithoutExecutor: 'unavailable',
-    rejectedStatusWithoutExecutor: 503,
+    productionMode: 'same-origin-isolated',
+    publicUserSourceExecution: true,
+    arbitraryNetworkAccess: false,
+    mediaSubprocessPolicy: 'fixed-ffmpeg-proxy-only',
   },
   performance: performanceEvidence,
 };
