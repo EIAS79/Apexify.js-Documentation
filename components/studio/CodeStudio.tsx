@@ -37,6 +37,7 @@ import {
   makeId,
 } from '@/lib/studio/studioConfig';
 import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
+import { studioWorkspaceFileName, type StudioWorkspaceFile } from '@/lib/studio/runtime/workspace';
 import {
   loadPersistedStudioAssets,
   savePersistedStudioAssets,
@@ -377,12 +378,21 @@ export default function CodeStudio() {
         return;
       }
 
+      const studioFiles: StudioWorkspaceFile[] = buffers
+        .filter((buffer) => buffer.id !== activeBuffer.id)
+        .map((buffer) => ({
+          name: studioWorkspaceFileName(buffer.name, lang),
+          source: lang === 'ts' ? buffer.ts : buffer.js,
+          language: lang,
+        }));
+
       const result = await currentNodeServerExecutionAdapter.run({
         session: createInteractiveSession({
           source: code,
           language: lang,
           runtime: 'node',
-          options: { studioAssets: assets },
+          options: { studioAssets: assets, studioFiles },
+          selectedFile: studioWorkspaceFileName(activeBuffer.name, lang),
           layout: { activePanel: 'editor' },
         }),
       });
@@ -482,6 +492,7 @@ export default function CodeStudio() {
     }
   }, [
     activeBuffer,
+    buffers,
     lang,
     assets,
     runnerEnabled,
@@ -539,11 +550,11 @@ export default function CodeStudio() {
   );
 
   const newBuffer = useCallback(() => {
-    const b = createBlankBuffer(`Untitled ${buffers.length + 1}`);
+    const b = createBlankBuffer(`untitled-${buffers.length + 1}.${lang}`);
     setBuffers((cur) => [...cur, b]);
     setActiveBufferId(b.id);
     setOutputTab('preview');
-  }, [buffers.length]);
+  }, [buffers.length, lang]);
 
   const closeBuffer = useCallback(
     (id: string) => {
