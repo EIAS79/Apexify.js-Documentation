@@ -1,6 +1,12 @@
 name: Publish Peak Lab Gallery
 
 on:
+  pull_request:
+    paths:
+      - 'scripts/gallery/Apexify-Peak-Lab.ts'
+      - 'scripts/gallery/publish-peak-lab.mjs'
+      - '.github/workflows/peak-lab-gallery.yml'
+      - 'lib/gallery/generatedPeakLabCatalog.ts'
   push:
     branches: [main]
     paths:
@@ -61,7 +67,16 @@ jobs:
           PEAK_LAB_OUTPUT: .peak-engine/apexify-peak-output/output
         run: node scripts/gallery/publish-peak-lab.mjs
 
+      - name: Validate generated Peak Lab catalog
+        run: |
+          test "$(grep -c 'id: "peak-' lib/gallery/generatedPeakLabCatalog.ts)" -eq 26
+          test -f public/gallery/peak-lab/01-canvas.png
+          test -f public/gallery/peak-lab/24-film.mp4
+          test -f public/gallery/peak-lab/25-video-workbench.png
+          test -f public/gallery/peak-lab/26-capstone.png
+
       - name: Commit generated Peak Lab gallery
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config user.name "apexify-gallery-bot"
           git config user.email "actions@users.noreply.github.com"
