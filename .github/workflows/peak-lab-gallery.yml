@@ -69,7 +69,7 @@ jobs:
 
       - name: Validate generated Peak Lab catalog
         run: |
-          test "$(grep -c 'id: "peak-' lib/gallery/generatedPeakLabCatalog.ts)" -eq 26
+          test "$(grep -c '"id": "peak-' lib/gallery/generatedPeakLabCatalog.ts)" -eq 26
           test -f public/gallery/peak-lab/01-canvas.png
           test -f public/gallery/peak-lab/24-film.mp4
           test -f public/gallery/peak-lab/25-video-workbench.png
