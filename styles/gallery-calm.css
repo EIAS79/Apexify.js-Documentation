@@ -56,7 +56,7 @@
   --text-primary:var(--gallery-text);
   --text-secondary:var(--gallery-text-2);
   --text-tertiary:var(--gallery-text-3);
-  --text-muted:#697586;
+  --text-muted:var(--gallery-text-3);
   --text-inverse:#0b0f15;
   --accent-iris:var(--gallery-blue);
   --accent-iris-soft:var(--gallery-blue-2);
