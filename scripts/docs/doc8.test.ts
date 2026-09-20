@@ -11,6 +11,10 @@ import {
   serializeInteractiveSession,
 } from '../../lib/docs/playground/session';
 import { planStudioExecution } from '../../lib/studio/runtime/capabilities';
+import {
+  studioWorkspaceFileName,
+  validateStudioWorkspaceFiles,
+} from '../../lib/studio/runtime/workspace';
 
 function sampleSession(): InteractiveSession {
   return createInteractiveSession({
@@ -151,6 +155,45 @@ test('Studio planner routes generated raster buffers reused as sources to full r
   ].join('\n'));
   assert.equal(plan.backend, 'full-runtime');
   assert.match(plan.reasons.join('\n'), /preserve buffer identity/);
+});
+
+
+test('Studio workspace normalizes sibling filenames and rejects unsafe collisions', () => {
+  assert.equal(studioWorkspaceFileName('helpers', 'ts'), 'helpers.ts');
+  assert.equal(studioWorkspaceFileName('My helper file', 'js'), 'My-helper-file.js');
+
+  const files = validateStudioWorkspaceFiles([
+    { name: 'helpers.ts', source: 'export const answer = 42;', language: 'ts' },
+    { name: 'palette', source: 'export const color = "#60a5fa";', language: 'ts' },
+  ]);
+  assert.deepEqual(files.map((file) => file.name), ['helpers.ts', 'palette.ts']);
+
+  assert.throws(
+    () => validateStudioWorkspaceFiles([
+      { name: 'same.ts', source: 'export {};', language: 'ts' },
+      { name: 'same.ts', source: 'export {};', language: 'ts' },
+    ]),
+    /Duplicate Studio workspace filename/,
+  );
+  assert.throws(
+    () => validateStudioWorkspaceFiles([
+      { name: 'snippet.ts', source: 'export {};', language: 'ts' },
+    ]),
+    /reserved by the runner/,
+  );
+});
+
+test('Studio planner routes relative project imports to the full runtime', () => {
+  const plan = planStudioExecution([
+    "import { makeScene } from './helpers.ts';",
+    "import { ApexPainter } from 'apexify.js';",
+    'async function main() {',
+    '  const painter = new ApexPainter();',
+    '  return makeScene(painter);',
+    '}',
+  ].join('\n'));
+  assert.equal(plan.backend, 'full-runtime');
+  assert.match(plan.reasons.join('\n'), /imports a module/);
 });
 
 test('Studio planner keeps generated chart-buffer reuse browser-direct', () => {
