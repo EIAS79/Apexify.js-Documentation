@@ -519,6 +519,16 @@ function safeEnvironment(
     // @napi-rs/canvas reads this key during module initialization.
     // Disable host/system font scanning; Studio registers its bundled font explicitly.
     DISABLE_SYSTEM_FONTS_LOAD: '1',
+    // Sharp 0.35.4 reads these during module initialisation/runtime platform detection.
+    // Keep them explicit so the Studio sandbox never needs unrestricted env access.
+    npm_package_config_libvips: '',
+    npm_config_arch: process.arch,
+    npm_config_platform: process.platform,
+    npm_config_libc: '',
+    CC: '',
+    PKG_CONFIG_PATH: '',
+    SHARP_IGNORE_GLOBAL_LIBVIPS: '1',
+    SHARP_FORCE_GLOBAL_LIBVIPS: '',
     DENO_DIR: join(runDir, 'deno-cache'),
     DENO_NO_UPDATE_CHECK: '1',
     NO_COLOR: '1',
@@ -556,6 +566,14 @@ function denoArguments(
     'NAPI_RS_NATIVE_LIBRARY_PATH',
     'NAPI_RS_FORCE_WASI',
     'DISABLE_SYSTEM_FONTS_LOAD',
+    'npm_package_config_libvips',
+    'npm_config_arch',
+    'npm_config_platform',
+    'npm_config_libc',
+    'CC',
+    'PKG_CONFIG_PATH',
+    'SHARP_IGNORE_GLOBAL_LIBVIPS',
+    'SHARP_FORCE_GLOBAL_LIBVIPS',
     ...(media ? ['APEXIFY_FFMPEG_PATH', 'APEXIFY_FFPROBE_PATH', 'STUDIO_MEDIA_CAP_ID'] : []),
     'DENO_DIR',
     'DENO_NO_UPDATE_CHECK',
