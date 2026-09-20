@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 220" role="img" aria-labelledby="title desc">
+  <title id="title">Apexify.js</title>
+  <desc id="desc">Apexify.js full horizontal logo.</desc>
+  <defs>
+    <linearGradient id="apex" x1="40" y1="190" x2="182" y2="34" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#055CFF"/>
+      <stop offset=".42" stop-color="#1B9DFF"/>
+      <stop offset=".68" stop-color="#28DDE9"/>
+      <stop offset="1" stop-color="#8A27FF"/>
+    </linearGradient>
+    <linearGradient id="inner" x1="108" y1="116" x2="151" y2="190" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DCE5FF"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="20" y1="62" x2="62" y2="104" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#20F0DE"/>
+      <stop offset="1" stop-color="#00A9F5"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="174" y1="106" x2="216" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF22E6"/>
+      <stop offset="1" stop-color="#7E21FF"/>
+    </linearGradient>
+    <linearGradient id="word" x1="238" y1="70" x2="710" y2="165" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A1830"/>
+      <stop offset="1" stop-color="#294A76"/>
+    </linearGradient>
+    <linearGradient id="js" x1="730" y1="62" x2="924" y2="164" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5A55FF"/>
+      <stop offset=".5" stop-color="#168FFF"/>
+      <stop offset="1" stop-color="#10DCE3"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <rect x="15" y="64" width="42" height="42" rx="11" fill="url(#cyan)"/>
+    <rect x="174" y="109" width="42" height="42" rx="11" fill="url(#violet)"/>
+    <path d="M37 188 117 31 197 188" fill="none" stroke="url(#apex)" stroke-width="39" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="m118 127 36 61" fill="none" stroke="url(#inner)" stroke-width="30" stroke-linecap="round"/>
+  </g>
+  <text x="238" y="157" fill="url(#word)" font-family="Inter, Geist, Segoe UI, Arial, sans-serif" font-size="112" font-weight="820" letter-spacing="-6">Apexify</text>
+  <text x="721" y="157" fill="url(#js)" font-family="Inter, Geist, Segoe UI, Arial, sans-serif" font-size="112" font-weight="820" letter-spacing="-5">.js</text>
+</svg>

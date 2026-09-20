@@ -10,6 +10,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { useTheme, type ThemeMode } from '@/components/ThemeProvider';
+import { BrandBanner } from '@/components/Brand';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home', key: 'home' },
@@ -26,18 +27,6 @@ const THEMES: { id: ThemeMode; label: string; Icon: typeof SunIcon }[] = [
   { id: 'system', label: 'System', Icon: ComputerDesktopIcon },
   { id: 'dark', label: 'Dark', Icon: MoonIcon },
 ];
-
-function ApexMark() {
-  return (
-    <svg viewBox="0 0 64 64" aria-hidden className="h-full w-full">
-      <rect x="5" y="5" width="54" height="54" rx="8" fill="currentColor" opacity="0.06" />
-      <rect x="5.5" y="5.5" width="53" height="53" rx="7.5" fill="none" stroke="currentColor" opacity="0.22" />
-      <path d="M18 48 31 17h4l12 31h-6l-3-8H27l-3 8h-6Zm11-13h7l-3.4-9L29 35Z" fill="currentColor" />
-      <path d="M47 16H37v3h7v8h3V16ZM17 49h10v-3h-7v-8h-3v11Z" fill="var(--accent)" />
-      <path d="M41 30h9v9h-3v-6h-6v-3Z" fill="var(--cyan)" />
-    </svg>
-  );
-}
 
 function ThemeControl() {
   const { mode, setMode } = useTheme();
@@ -82,8 +71,7 @@ export default function HomeNavbar({ active = 'home' }: { active?: HomeNavSectio
     <header className="apx-home-nav">
       <div className="apx-home-nav__inner">
         <Link href="/" className="apx-home-brand" aria-label="Apexify.js home">
-          <span className="apx-home-brand__mark"><ApexMark /></span>
-          <span className="apx-home-brand__word">Apexify<span>.js</span></span>
+          <BrandBanner className="apx-home-brand__lockup" maxWidth={150} />
         </Link>
 
         <nav className="apx-home-nav__links" aria-label="Primary">
