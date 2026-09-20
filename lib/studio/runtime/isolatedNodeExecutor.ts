@@ -490,7 +490,7 @@ function denoArguments(
     `--allow-write=${runDir}`,
     `--allow-env=${envNames.join(',')}`,
     `--allow-ffi=${nativeCanvasRoot()}`,
-    '--allow-sys',
+    '--allow-sys=cpus',
     `--v8-flags=--max-old-space-size=${EXECUTION_LIMITS.v8HeapMb}`,
   ];
 
