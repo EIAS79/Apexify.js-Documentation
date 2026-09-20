@@ -3,12 +3,11 @@ import { peakLabGalleryItems } from '../generatedPeakLabCatalog';
 import type { RegistryGalleryItem } from '../core/galleryDocLink';
 
 /**
- * Documentation/search registry after the Gallery output reset.
+ * Documentation/search registry.
  *
- * The visible Gallery catalog is intentionally empty. Verified DOC-5 examples
- * remain registered here because documentation search and canonical example
- * links still depend on their authoritative metadata; they are not injected
- * back into the visual Gallery catalog.
+ * Canonical DOC-5 examples remain indexed for documentation links, while the
+ * source-backed Peak Lab catalog is indexed here after its render/publish
+ * workflow generates the current artifacts and recipe pages.
  */
 export const allGalleryItemsForDocs: RegistryGalleryItem[] = [
   ...doc5GalleryItems,
