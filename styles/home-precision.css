@@ -71,11 +71,11 @@
   --line-soft:#dde3ea;
   --text:#141922;
   --text-2:#4e5a68;
-  --text-3:#727f8f;
-  --blue:#5269dc;
-  --blue-2:#4058cc;
-  --mint:#568c86;
-  --mint-2:#43756f;
+  --text-3:#526171;
+  --blue:#4058cc;
+  --blue-2:#3048b8;
+  --mint:#365f5a;
+  --mint-2:#305b56;
   --lav:#7169a6;
   --ice:#d7e3ec;
   --success:#3a7c61;
@@ -193,13 +193,13 @@
 
 .apx-art--template{min-height:11rem;background:#e9edf1;color:#19212c;display:grid;grid-template-columns:2.2rem 1fr}
 .dark .apx-art--template{background:#dfe5ea;color:#19212c}
-.apx-art-template__rail{display:flex;flex-direction:column;justify-content:space-around;align-items:center;border-right:1px solid #c5ced7;color:#6b7887;font:700 .45rem/1 ui-monospace,SFMono-Regular,Menlo,monospace}
+.apx-art-template__rail{display:flex;flex-direction:column;justify-content:space-around;align-items:center;border-right:1px solid #c5ced7;color:#53606e;font:700 .45rem/1 ui-monospace,SFMono-Regular,Menlo,monospace}
 .apx-art-template__page{padding:.85rem}
-.apx-art-template__head{display:flex;justify-content:space-between;color:#637080;font:700 .42rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.07em}
+.apx-art-template__head{display:flex;justify-content:space-between;color:#53606e;font:700 .42rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.07em}
 .apx-art-template__headline{max-width:9rem;margin-top:.65rem;font-size:1.25rem;line-height:.95;font-weight:800;letter-spacing:-.04em}
 .apx-art-template__rule{height:1px;background:#aab5c0;margin:.65rem 0}
 .apx-art-template__stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem}
-.apx-art-template__stats div{display:grid}.apx-art-template__stats strong{font-size:.72rem}.apx-art-template__stats span{font-size:.42rem;color:#66717d}
+.apx-art-template__stats div{display:grid}.apx-art-template__stats strong{font-size:.72rem}.apx-art-template__stats span{font-size:.42rem;color:#53606e}
 .apx-art-template__blocks{display:grid;grid-template-columns:1.4fr .8fr 1fr .6fr;gap:.25rem;margin-top:.65rem}
 .apx-art-template__blocks i{height:1.2rem;background:#8498ff}.apx-art-template__blocks i:nth-child(2){background:#81aaa4}.apx-art-template__blocks i:nth-child(3){background:#9b92cf}.apx-art-template__blocks i:nth-child(4){background:#6c7b8b}
 
