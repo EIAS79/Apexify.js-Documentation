@@ -122,3 +122,8 @@
 @media(max-width:47.99rem){.apx-doc-header{backdrop-filter:none;background:var(--docs-bg)}.apx-doc-header__inner{width:min(100% - 1rem,96rem)}.apx-doc-brand__section,.apx-version-badge,.apx-doc-github,.apx-doc-search-trigger__label,.apx-doc-search-trigger kbd{display:none!important}.apx-doc-search-trigger{width:2.35rem;padding:0;justify-content:center}.apx-doc-theme{display:none}.apx-doc-content{padding:2rem 1rem 4.5rem}.apx-doc-hero h1{font-size:clamp(2.45rem,12vw,3.6rem)}.apx-doc-hero__description{font-size:.95rem}.apx-doc3-decision article{grid-template-columns:1fr}.apx-codeblock__header{align-items:flex-start}.apx-codeblock__actions{width:100%;justify-content:space-between}.apx-code-line{grid-template-columns:2.4rem minmax(max-content,1fr)}}
 @media(max-width:24rem){.apx-doc-brand__word{font-size:.82rem}.apx-doc-header__actions{gap:.3rem}.apx-doc-content{padding-inline:.75rem}.apx-doc-hero h1{font-size:2.25rem}}
 @media(prefers-reduced-motion:reduce){.apx-doc-reading-progress>div{transition:none}}
+
+
+/* Code chrome is intentionally dark in both themes; do not inherit light-theme accents. */
+.apx-codeblock__kind{color:#9dd2ca!important}
+.apx-code-action--studio{color:#a9b6ff!important}
