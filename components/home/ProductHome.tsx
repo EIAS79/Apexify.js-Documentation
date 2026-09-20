@@ -424,7 +424,7 @@ export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
           <div className="apx-compare">
             <div className="apx-compare__head">
               <span>Capability</span>
-              <BrandBanner variant="dark" className="apx-footer__brand-logo" maxWidth={150} />
+              <strong>Apexify.js</strong>
               <span>Screenshot automation</span>
               <span>Chart-focused library</span>
               <span>Raw canvas scripting</span>
@@ -502,7 +502,7 @@ export function EcosystemFooter({ model }: { model: ProductExperienceModel }) {
       </div>
 
       <div className="apx-footer__bottom">
-        <strong>Apexify.js</strong>
+        <BrandBanner variant="dark" className="apx-footer__brand-logo" maxWidth={150} />
         <span>TypeScript-first rendering and media tooling for Node/server runtimes.</span>
       </div>
     </footer>
