@@ -329,12 +329,53 @@ function rewriteWorkspacePackageImports(source: string): string {
   );
 }
 
+function resolveWorkspaceSpecifier(
+  specifier: string,
+  workspaceFiles: ReadonlySet<string>,
+): string {
+  if (!specifier.startsWith('./')) return specifier;
+  const requested = specifier.slice(2);
+  const candidates = [
+    requested,
+    requested + '.ts',
+    requested + '.js',
+    requested + '.tsx',
+    requested + '.jsx',
+  ];
+  const resolved = candidates.find((name) => workspaceFiles.has(name));
+  return resolved ? './' + resolved : specifier;
+}
+
+function rewriteWorkspaceRelativeImports(
+  source: string,
+  workspaceFiles: ReadonlySet<string>,
+): string {
+  let output = source.replace(
+    /(\bfrom\s*)(['"])(\.\/[^'"]+)\2/g,
+    (_match, prefix: string, quote: string, specifier: string) =>
+      prefix + quote + resolveWorkspaceSpecifier(specifier, workspaceFiles) + quote,
+  );
+  output = output.replace(
+    /(\bimport\s*\(\s*)(['"])(\.\/[^'"]+)\2/g,
+    (_match, prefix: string, quote: string, specifier: string) =>
+      prefix + quote + resolveWorkspaceSpecifier(specifier, workspaceFiles) + quote,
+  );
+  output = output.replace(
+    /(\bimport\s*)(['"])(\.\/[^'"]+)\2/g,
+    (_match, prefix: string, quote: string, specifier: string) =>
+      prefix + quote + resolveWorkspaceSpecifier(specifier, workspaceFiles) + quote,
+  );
+  return output;
+}
+
 function materializeWorkspaceFiles(runDir: string, files: readonly StudioWorkspaceFile[]): Set<string> {
-  const names = new Set<string>();
+  const names = new Set(files.map((file) => file.name));
   for (const file of files) {
     const target = join(runDir, file.name);
-    writeFileSync(target, rewriteWorkspacePackageImports(file.source), { mode: 0o600 });
-    names.add(file.name);
+    const rewritten = rewriteWorkspacePackageImports(
+      rewriteWorkspaceRelativeImports(file.source, names),
+    );
+    writeFileSync(target, rewritten, { mode: 0o600 });
   }
   return names;
 }
@@ -642,14 +683,17 @@ export async function runSameOriginIsolatedStudio(
 
   try {
     const materialized = materializeAssets(runDir, assets);
-    materializeWorkspaceFiles(runDir, files);
+    const workspaceNames = materializeWorkspaceFiles(runDir, files);
     writeFileSync(
       assetManifestPath,
       JSON.stringify({ schemaVersion: 1, assets: materialized.manifest }, null, 2),
       { mode: 0o600 },
     );
 
-    const executable = rewriteAssetReferences(code, materialized.refs);
+    const executable = rewriteWorkspaceRelativeImports(
+      rewriteAssetReferences(code, materialized.refs),
+      workspaceNames,
+    );
     writeFileSync(
       entry,
       wrapStudioSnippetForRunner(executable, {
