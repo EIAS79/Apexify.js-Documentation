@@ -70,10 +70,12 @@ type StudioRuntimeDebug = {
   apexifyPin: string;
   sysPermissionArg: string | null;
   envPermissionArg: string | null;
+  ffiPermissionArg: string | null;
   denoRuntimeAvailable: boolean;
   denoBinaryExists: boolean;
   nativeCanvasEntryExists: boolean;
   nativeCanvasRootExists: boolean;
+  sharpNativeRootExists: boolean;
   mediaCapabilityCreated: boolean;
   ffmpegProxyExists: boolean;
   ffprobeProxyExists: boolean;
@@ -169,6 +171,10 @@ function apexifyEntry(): string {
 
 function nativeCanvasRoot(): string {
   return join(projectRoot(), 'node_modules', '@napi-rs');
+}
+
+function sharpNativeRoot(): string {
+  return join(projectRoot(), 'node_modules', '@img');
 }
 
 function nativeCanvasEntry(): string {
@@ -589,7 +595,7 @@ function denoArguments(
     `--allow-read=${readPaths.join(',')}`,
     `--allow-write=${runDir}`,
     `--allow-env=${envNames.join(',')}`,
-    '--allow-ffi=' + nativeCanvasRoot(),
+    '--allow-ffi=' + [nativeCanvasRoot(), sharpNativeRoot()].join(','),
     // @napi-rs/canvas uses Node process.report while selecting its native binary.
     // Deno's process.report probes cpus + networkInterfaces + OS metadata.
     // Grant system introspection only; read/write/env/run/net remain separately constrained.
@@ -705,10 +711,12 @@ function studioRuntimeDebugBase(
     apexifyPin: APEXIFY_PIN,
     sysPermissionArg: args.find((arg) => arg === '--allow-sys' || arg.startsWith('--allow-sys=')) ?? null,
     envPermissionArg: args.find((arg) => arg === '--allow-env' || arg.startsWith('--allow-env=')) ?? null,
+    ffiPermissionArg: args.find((arg) => arg === '--allow-ffi' || arg.startsWith('--allow-ffi=')) ?? null,
     denoRuntimeAvailable: denoRuntimeAvailable(),
     denoBinaryExists: existsSync(deno),
     nativeCanvasEntryExists: existsSync(nativeCanvasEntry()),
     nativeCanvasRootExists: existsSync(nativeCanvasRoot()),
+    sharpNativeRootExists: existsSync(sharpNativeRoot()),
     mediaCapabilityCreated: Boolean(media),
     ffmpegProxyExists: existsSync(proxies.ffmpegProxy),
     ffprobeProxyExists: existsSync(proxies.ffprobeProxy),
