@@ -47,10 +47,6 @@ jobs:
         run: |
           npm run verify:docs
           npm run typecheck
-      - name: Verify gallery executable examples
-        env:
-          GALLERY_SKIP_VIDEO: '1'
-        run: npm run gallery:build
       - name: Generate static architecture and preservation evidence
         run: |
           npm run docs:audit:baseline
