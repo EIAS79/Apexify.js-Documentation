@@ -295,10 +295,19 @@ export default function GalleryModal({
        * clears the slot.
        */
       const liveCode = editedCode || codeText;
+      const projectCode = pagedCode?.length
+        ? pagedCode
+            .filter((page) => page.language === codeLang)
+            .map((page, index) => {
+              const absoluteIndex = pagedCode.indexOf(page);
+              return absoluteIndex === codePageIndex ? liveCode : page.code;
+            })
+            .join('\n\n')
+        : liveCode;
       const payload = {
         name: item.title || 'Gallery snippet',
-        ts: codeLang === 'ts' ? liveCode : item.code?.ts ?? '',
-        js: codeLang === 'js' ? liveCode : item.code?.js ?? '',
+        ts: codeLang === 'ts' ? projectCode : item.code?.ts ?? '',
+        js: codeLang === 'js' ? projectCode : item.code?.js ?? '',
         lang: codeLang,
       };
       localStorage.setItem(STUDIO_INCOMING_SNIPPET_KEY, JSON.stringify(payload));
