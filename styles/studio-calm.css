@@ -33,7 +33,7 @@
   --text-primary:var(--studio-text);
   --text-secondary:var(--studio-text-2);
   --text-tertiary:var(--studio-text-3);
-  --text-muted:#697586;
+  --text-muted:var(--studio-text-3);
   --text-inverse:#0b0f15;
   --accent-iris:var(--studio-blue);
   --accent-magenta:var(--studio-blue);
