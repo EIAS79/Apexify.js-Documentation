@@ -96,7 +96,13 @@ export default function GalleryModal({
   const hasJs = Boolean(item.code?.js?.trim());
   const hasCode = hasTs || hasJs;
   const modalMediaKind = inferMediaKind(item.thumbnail, item.thumbnailMedia);
-  const executionEligible = hasCode && modalMediaKind !== 'video';
+  const gallerySource = `${item.code?.ts ?? ''}\n${item.code?.js ?? ''}`;
+  const requiresStudioExecution = /\b(?:createAudio|createVideo|videoPipeline)\b/.test(gallerySource);
+  const effectiveExecutionMode =
+    item.executionMode ?? (requiresStudioExecution ? 'studio' : 'gallery');
+  const executionEligible =
+    hasCode && modalMediaKind !== 'video' && effectiveExecutionMode === 'gallery';
+  const studioEligible = hasCode && effectiveExecutionMode !== 'none';
 
   const [layoutMode, setLayoutMode] = useState<ModalLayoutMode>(hasCode ? 'split' : 'media');
   const [codeLang, setCodeLang] = useState<'ts' | 'js'>(hasTs ? 'ts' : 'js');
@@ -393,7 +399,7 @@ export default function GalleryModal({
                 )}
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                {hasCode && (
+                {studioEligible && (
                   <button
                     type="button"
                     onClick={openInStudio}
@@ -521,6 +527,18 @@ export default function GalleryModal({
               <div className="flex flex-1 min-h-0 min-w-0 h-full flex-col p-3 sm:p-4">
                 {hasCode ? (
                   <>
+                    {effectiveExecutionMode === 'none' && (
+                      <div
+                        className="mb-3 rounded-lg px-3 py-2 text-[11px] leading-snug border"
+                        style={{
+                          backgroundColor: 'color-mix(in srgb, var(--accent-iris) 8%, transparent)',
+                          borderColor: 'color-mix(in srgb, var(--accent-iris) 28%, transparent)',
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        This is a project-level recipe with shared helpers/assets. The source is intentionally read-only here; copy it with the rest of its Peak Lab project files to run it.
+                      </div>
+                    )}
                     {modalMediaKind === 'video' && (
                       <div
                         className="mb-3 rounded-lg px-3 py-2 text-[11px] leading-snug border"
@@ -888,8 +906,13 @@ function CodeWindow({
         style={{ backgroundColor: '#0d1117' }}
       >
         {editable && onCodeChange ? (
-          <div className="flex-1 min-h-[220px] flex flex-col p-2 sm:p-3">
-            <GallerySnippetEditor value={code} codeLang={codeLang} onChange={onCodeChange} />
+          <div className="flex min-h-0 flex-1 flex-col p-2 sm:p-3">
+            <GallerySnippetEditor
+              fillParent
+              value={code}
+              codeLang={codeLang}
+              onChange={onCodeChange}
+            />
           </div>
         ) : (
           <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto [scrollbar-gutter:stable]">

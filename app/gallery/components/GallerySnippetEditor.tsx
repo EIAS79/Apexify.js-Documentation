@@ -22,13 +22,19 @@ export function GallerySnippetEditor({
   insertRequest?: EditorInsertRequest | null;
 }) {
   return (
-    <InteractiveCodeEditor
-      value={value}
-      language={codeLang}
-      onChange={onChange}
-      fillParent={fillParent}
-      ariaLabel="Apexify source editor"
-      insertRequest={insertRequest}
-    />
+    <div
+      className={`gallery-snippet-editor-root ${
+        fillParent ? 'flex min-h-0 flex-1 flex-col overflow-hidden' : 'flex flex-col'
+      }`}
+    >
+      <InteractiveCodeEditor
+        value={value}
+        language={codeLang}
+        onChange={onChange}
+        fillParent={fillParent}
+        ariaLabel="Apexify source editor"
+        insertRequest={insertRequest}
+      />
+    </div>
   );
 }
