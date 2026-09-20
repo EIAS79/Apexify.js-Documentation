@@ -3,6 +3,7 @@
   "phase": "DOC-8",
   "endpoint": "/api/gallery/run",
   "publicArbitraryExecution": false,
+  "publicUserSourceExecution": true,
   "productionMode": "same-origin-isolated",
   "developmentMode": "trusted-local-opt-in",
   "developmentOptIn": "ENABLE_LOCAL_APEXIFY_CODE_RUN=true",
@@ -12,6 +13,11 @@
   "cleanup": "recursive-finally",
   "networkIsolation": true,
   "subprocessIsolation": true,
+  "systemAccess": [
+    "cpus"
+  ],
+  "workspaceFiles": true,
+  "multiOutput": true,
   "mediaSubprocessPolicy": "fixed-ffmpeg-proxy-only",
   "externalExecutorApi": false,
   "externalExecutorToken": false,
