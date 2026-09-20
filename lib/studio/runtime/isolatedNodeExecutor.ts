@@ -21,6 +21,7 @@ import { deriveStudioMediaMetadata, detectStudioMedia } from './media';
 import type { StudioVirtualAsset } from './assets';
 import { STUDIO_ASSET_LIMITS } from './assets';
 import { wrapStudioSnippetForRunner } from './wrapStudioSnippetForRunner';
+import type { StudioWorkspaceFile } from './workspace';
 
 type ManifestEntry = {
   id?: string;
@@ -320,20 +321,49 @@ function rewriteAssetReferences(source: string, refs: ReadonlyMap<string, string
   return output;
 }
 
-function assertUserImportsAreSandboxCompatible(source: string) {
+function materializeWorkspaceFiles(runDir: string, files: readonly StudioWorkspaceFile[]): Set<string> {
+  const names = new Set<string>();
+  for (const file of files) {
+    const target = join(runDir, file.name);
+    writeFileSync(target, file.source, { mode: 0o600 });
+    names.add(file.name);
+  }
+  return names;
+}
+
+
+function assertUserImportsAreSandboxCompatible(
+  source: string,
+  workspaceFiles: ReadonlySet<string>,
+) {
   const staticImports = [...source.matchAll(/\bimport\s+(?:[^'"]+\s+from\s+)?['"]([^'"]+)['"]/g)];
   const dynamicImports = [...source.matchAll(/\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g)];
   const imports = [...staticImports, ...dynamicImports].map((match) => match[1]!).filter(Boolean);
 
   for (const specifier of imports) {
     if (specifier === 'apexify.js' || specifier.startsWith('node:')) continue;
-    if (specifier.startsWith('./') || specifier.startsWith('../') || specifier.startsWith('file:')) {
+
+    if (specifier.startsWith('./')) {
+      const requested = specifier.slice(2);
+      const candidates = [
+        requested,
+        requested + '.ts',
+        requested + '.js',
+        requested + '.tsx',
+        requested + '.jsx',
+      ];
+      if (candidates.some((name) => workspaceFiles.has(name))) continue;
       throw new Error(
-        `Studio does not expose arbitrary host files. Import "${specifier}" is not available; use Studio assets instead.`,
+        `Studio project import "${specifier}" does not match an open sibling tab. Rename a tab to that filename or update the import.`,
       );
     }
+
+    if (specifier.startsWith('../') || specifier.startsWith('file:') || specifier.startsWith('/')) {
+      throw new Error(`Studio project import "${specifier}" escapes the isolated workspace.`);
+    }
+
     throw new Error(
-      `Package import "${specifier}" is not part of the same-origin Studio runtime. Use Apexify.js or inline the compatible plugin code.`,
+      `Package import "${specifier}" is not part of the same-origin Studio runtime. Use Apexify.js, node: built-ins, or Studio project files.`,
     );
   }
 }
@@ -551,6 +581,7 @@ function executeDeno(
 export async function runSameOriginIsolatedStudio(
   code: string,
   assets: readonly StudioVirtualAsset[],
+  files: readonly StudioWorkspaceFile[] = [],
 ): Promise<IsolatedStudioRunResult> {
   if (!sameOriginStudioIsolationAvailable()) {
     return {
@@ -578,7 +609,9 @@ export async function runSameOriginIsolatedStudio(
 
   try {
     validateAssets(assets);
-    assertUserImportsAreSandboxCompatible(code);
+    const workspaceNames = new Set(files.map((file) => file.name));
+    assertUserImportsAreSandboxCompatible(code, workspaceNames);
+    for (const file of files) assertUserImportsAreSandboxCompatible(file.source, workspaceNames);
   } catch (error) {
     return {
       status: 400,
@@ -601,6 +634,7 @@ export async function runSameOriginIsolatedStudio(
 
   try {
     const materialized = materializeAssets(runDir, assets);
+    materializeWorkspaceFiles(runDir, files);
     writeFileSync(
       assetManifestPath,
       JSON.stringify({ schemaVersion: 1, assets: materialized.manifest }, null, 2),
