@@ -168,3 +168,79 @@
 .dark .apx-api-token-string{color:var(--success)}
 .dark .apx-api-token-number,.dark .apx-api-token-literal{color:var(--accent-amber)}
 .dark .apx-api-token-keyword{color:var(--accent-iris)}
+
+
+/* DOC-4 responsive containment: generated API names, source paths, signatures
+   and deeply nested type text must never widen the document viewport. */
+.apx-api-page,
+.apx-api-page > *,
+.apx-api-header,
+.apx-api-signature,
+.apx-api-option-search,
+.apx-api-option-cards,
+.apx-api-option-card,
+.apx-api-reference-card,
+.apx-api-type-explorer,
+.apx-api-related-grid,
+.apx-api-parameter-list{
+  min-width:0;
+  max-width:100%;
+}
+
+.apx-api-page{
+  overflow-wrap:anywhere;
+}
+
+.apx-api-header h1,
+.apx-api-header p,
+.apx-api-breadcrumbs,
+.apx-api-breadcrumbs > *,
+.apx-api-source-link,
+.apx-api-source-link code,
+.apx-api-option-card code,
+.apx-api-reference-card code,
+.apx-api-type-explorer code{
+  min-width:0;
+  max-width:100%;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+.apx-api-source-link{
+  display:flex;
+  flex-wrap:wrap;
+}
+
+.apx-api-signature__bar,
+.apx-api-signature__bar > *,
+.apx-api-signature__bar > div{
+  min-width:0;
+  max-width:100%;
+}
+
+.apx-api-signature__bar > div{
+  flex-wrap:wrap;
+}
+
+.apx-api-signature pre{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  box-sizing:border-box;
+}
+
+.apx-api-type-explorer :is(details,summary,ul,li){
+  min-width:0;
+  max-width:100%;
+}
+
+@media(max-width:480px){
+  .apx-api-breadcrumbs{
+    min-width:0;
+    max-width:100%;
+  }
+  .apx-api-breadcrumbs a,
+  .apx-api-source-link{
+    white-space:normal;
+  }
+}
