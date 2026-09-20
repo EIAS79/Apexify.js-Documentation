@@ -121,6 +121,9 @@ function splitSharedHelpers(sharedCode) {
     .replace(/^import[^\n]+\n/gm, '')
     .replace(/^export interface RecipeMeta[^\n]*\n/gm, '')
     .replace(/^export interface Recipe[^\n]*\n/gm, '')
+    .replace(/^const Apex:[^\n]*\n/gm, '')
+    .replace(/^const ApexPainter:[^\n]*\n/gm, '')
+    .replace(/^const ApexifyDecodeError:[^\n]*\n/gm, '')
     .replace(/const coverage:[\s\S]*?const p:[^\n]*\n/, '')
     .replace(/const C:\s*any\s*=\s*Object\.freeze/, 'const COLORS = Object.freeze')
     // The published Studio source must not depend on Peak Lab's CI-only
