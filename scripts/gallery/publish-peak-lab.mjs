@@ -178,7 +178,7 @@ export const peakLabSharedSetupPages = ${JSON.stringify(sharedChunks)};
 const setupPages = peakLabSharedSetupPages.map((code, index) => ({
   label: peakLabSharedSetupPages.length === 1
     ? 'Shared setup'
-    : `Shared setup · ${index + 1}/${peakLabSharedSetupPages.length}`,
+    : 'Shared setup · ' + (index + 1) + '/' + peakLabSharedSetupPages.length,
   language: 'ts' as const,
   code,
 }));
