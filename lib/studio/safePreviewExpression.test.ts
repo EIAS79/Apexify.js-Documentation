@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createSafePreviewResolver, isUnresolvedPreviewValue } from './safePreviewExpression';
-import { PRESENTATION_SLIDE_TS } from '../gallery/presentation/presentationSlideSnippet';
+import { PRESENTATION_SLIDE_TS } from './fixtures/presentationSlideSource';
 
 function asRecord(value: unknown): Record<string, unknown> {
   assert.ok(value && typeof value === 'object' && !Array.isArray(value));
