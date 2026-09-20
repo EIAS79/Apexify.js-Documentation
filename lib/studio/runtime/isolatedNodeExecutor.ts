@@ -69,6 +69,7 @@ type StudioRuntimeDebug = {
   nodeVersion: string;
   apexifyPin: string;
   sysPermissionArg: string | null;
+  envPermissionArg: string | null;
   denoRuntimeAvailable: boolean;
   denoBinaryExists: boolean;
   nativeCanvasEntryExists: boolean;
@@ -515,6 +516,9 @@ function safeEnvironment(
     // read, so expose explicit empty values rather than widening env access.
     NAPI_RS_NATIVE_LIBRARY_PATH: '',
     NAPI_RS_FORCE_WASI: '',
+    // @napi-rs/canvas reads this key during module initialization.
+    // Disable host/system font scanning; Studio registers its bundled font explicitly.
+    DISABLE_SYSTEM_FONTS_LOAD: '1',
     DENO_DIR: join(runDir, 'deno-cache'),
     DENO_NO_UPDATE_CHECK: '1',
     NO_COLOR: '1',
@@ -551,6 +555,7 @@ function denoArguments(
     'APEXIFY_TEMP_DIR',
     'NAPI_RS_NATIVE_LIBRARY_PATH',
     'NAPI_RS_FORCE_WASI',
+    'DISABLE_SYSTEM_FONTS_LOAD',
     ...(media ? ['APEXIFY_FFMPEG_PATH', 'APEXIFY_FFPROBE_PATH', 'STUDIO_MEDIA_CAP_ID'] : []),
     'DENO_DIR',
     'DENO_NO_UPDATE_CHECK',
@@ -681,6 +686,7 @@ function studioRuntimeDebugBase(
     nodeVersion: process.version,
     apexifyPin: APEXIFY_PIN,
     sysPermissionArg: args.find((arg) => arg === '--allow-sys' || arg.startsWith('--allow-sys=')) ?? null,
+    envPermissionArg: args.find((arg) => arg === '--allow-env' || arg.startsWith('--allow-env=')) ?? null,
     denoRuntimeAvailable: denoRuntimeAvailable(),
     denoBinaryExists: existsSync(deno),
     nativeCanvasEntryExists: existsSync(nativeCanvasEntry()),
