@@ -44,7 +44,14 @@ function walk(dir) {
     else if (entry.isFile() && mediaExt.test(entry.name)) {
       const rel = path.relative(ROOT, full).split(path.sep).join('/');
       const bytes = fs.statSync(full).size;
-      media.push({ path: rel, bytes, onDemandOutput: rel.startsWith('public/example-outputs/') || rel.startsWith('public/gallery-outputs/') });
+      media.push({
+        path: rel,
+        bytes,
+        onDemandOutput:
+          rel.startsWith('public/example-outputs/') ||
+          rel.startsWith('public/gallery-outputs/') ||
+          rel.startsWith('public/gallery/peak-lab/'),
+      });
     }
   }
 }
