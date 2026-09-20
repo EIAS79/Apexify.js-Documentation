@@ -250,20 +250,20 @@ Secrets and environment data are explicitly outside the contract.
 
 ## Current execution modes
 
-- **Production/public:** unavailable; arbitrary execution is rejected.
-- **Trusted local development:** server-backed execution only with explicit `ENABLE_LOCAL_APEXIFY_CODE_RUN=true` and non-production environment.
+- **Production/public:** browser-direct `@apexify/web` where supported, otherwise the same-origin isolated full Apexify runtime.
+- **Trusted local development:** server-backed execution with explicit `ENABLE_LOCAL_APEXIFY_CODE_RUN=true` and non-production environment.
 - **Documentation representative example:** verified-static output.
-- **Future browser:** contract only.
+- **Browser runtime:** pinned `@apexify/web` implementation for supported direct operations.
 
 ## Trust boundary
 
 Trusted repository examples and generated DOC-5 outputs are accepted as authoritative documentation evidence.
 
-User-edited source is **not trusted for public execution**. Production therefore rejects it rather than claiming isolation that is not present.
+User-edited source is **not trusted**. Production executes it only through the same-origin Deno permission boundary. The isolated runtime uses an allowlisted environment, a disposable per-run workspace, no arbitrary network permission, scoped native FFI, and fixed FFmpeg/ffprobe media proxies.
 
-Server/local execution uses an allowlisted environment and a per-run temporary filesystem location. Dynamic package installation and remote-script execution are disabled. The current trusted-local child process does **not** have network isolation; it may inherit ambient host networking. Consequently it is deliberately not described as a security sandbox.
+Trusted-local execution remains a separate opt-in developer path and may inherit ambient host capabilities.
 
-Child execution is bounded by timeout/process/output limits and cleanup runs recursively in `finally`.
+All execution paths remain bounded by timeout/source/process/output limits and cleanup runs recursively in `finally`.
 
 ## Resource limits
 
@@ -271,23 +271,25 @@ Child execution is bounded by timeout/process/output limits and cleanup runs rec
 | --- | ---: | --- |
 | Execution time | 55,000 ms | Preserve the bounded current local-runner ceiling and prevent unbounded runs |
 | Source size | 280,000 characters | Reject oversized submitted programs |
-| Output size | 25 MiB | Bound generated media payload |
-| Process buffer | 20 MiB | Bound captured stdout/stderr/process data |
+| Per-output size | 32 MiB | Bound one generated artifact |
+| Total output | 64 MiB | Bound all artifacts from one run |\n| Process buffer | 20 MiB | Bound captured stdout/stderr/process data |
 | Share state | 64 KiB | Keep URL/share payloads bounded and privacy-conscious |
-| Maximum outputs | 1 | Bound one interactive run to one output artifact |
+| Maximum outputs | 24 | Bound one run to a finite multi-preview set |
 
 The same `DOC8_RESOURCE_LIMITS` object is consumed by contracts/tests/current runner instead of scattered magic numbers.
 
 ## Security changes
 
-- Public production arbitrary execution disabled.
-- Explicit trusted-local opt-in introduced.
-- False sandbox language removed from user-visible Studio/Gallery/runner copy.
-- Child environment changed to an allowlist instead of spreading `process.env`.
-- Per-run temporary cwd and recursive cleanup enforced.
-- Output/source/process/time/share ceilings centralized.
+- Public production user-source execution is enabled only through the same-origin isolated runtime.
+- Explicit trusted-local opt-in remains separate from production isolation.
+- Child environment is allowlisted instead of spreading `process.env`.
+- Production network access is denied.
+- Native canvas FFI and system access are scoped.
+- FFmpeg/ffprobe subprocess access is limited to fixed media proxies.
+- Per-run temporary cwd and recursive cleanup are enforced.
+- Multi-file workspace and multi-output artifact limits are bounded.
 - Package installation and remote-script execution remain disabled.
-- Production browser verification confirms availability is false and POST receives 503.
+- Production browser verification executes real Scene, GIF, MP4, multi-file, and multi-output smoke tests.
 - Dedicated security documentation: `DOC8_EXECUTION_SECURITY.md`.
 
 ## Error boundaries
@@ -307,11 +309,9 @@ Deterministic client-boundary evidence records:
 
 The final browser transfer comparison proves the ordinary-route and homepage leakage discovered during development was removed.
 
-## Future `@apexify/web` adapter
+## `@apexify/web` browser adapter
 
-A `WebRuntimeAdapter` interface exists so a genuine future browser runtime can plug into the same foundation.
-
-**Actual future runtime not fabricated.** DOC-8 does not import or implement `@apexify/web` and does not present it as shipped.
+The `WebRuntimeAdapter` contract now has a pinned `@apexify/web` implementation used by Studio for browser-direct operations. Full-runtime capability families continue to route to the isolated server runtime.
 
 ## No-shadow-renderer verification
 
@@ -321,7 +321,7 @@ DOC-8 does not create an editor-only renderer or duplicate Apexify graphics impl
 
 Studio now uses the shared editor/session/execution/preview/diagnostics/workspace architecture while preserving Studio-specific features including multiple buffers, templates, history, replay, zoom, download, keyboard shortcuts, and reset/share behavior.
 
-Execution availability defaults false and becomes available only after the shared adapter reports trusted-local eligibility.
+Execution availability defaults false until probed, then production reports the same-origin isolated runtime when its pinned runtime assets are present.
 
 ## Representative interactive docs migration
 
