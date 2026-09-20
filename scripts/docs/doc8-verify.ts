@@ -42,6 +42,7 @@ const docsSidebar = read('components/docs/navigation/DocsSidebarV2.tsx');
 const docsNavigationChrome = read('components/docs/navigation/DocsNavigationChrome.tsx');
 const runner = read('app/api/gallery/run/route.ts');
 const isolatedRunner = read('lib/studio/runtime/isolatedNodeExecutor.ts');
+const studioWorkspaceRuntime = read('lib/studio/runtime/workspace.ts');
 const denoInstaller = read('scripts/studio/install-deno.mjs');
 const ffmpegInstaller = read('scripts/studio/install-ffmpeg.mjs');
 const mediaProxy = read('scripts/studio/media-process-proxy.mjs');
@@ -104,6 +105,11 @@ requireCheck(
 requireCheck(session.includes('shareStateBytes'), 'Share serializer must enforce the shared size limit.');
 requireCheck(executionAdapter.includes("const ENDPOINT = '/api/gallery/run'"), 'Server-backed endpoint ownership must remain inside the execution adapter.');
 requireCheck(executionAdapter.includes("mode: 'server-backed'"), 'Server-backed adapter mode missing.');
+requireCheck(executionAdapter.includes('studioFiles'), 'Server-backed adapter must send Studio sibling project files.');
+requireCheck(studio.includes('studioFiles'), 'Studio must package open sibling tabs for full-runtime execution.');
+requireCheck(studioOutput.includes('ArtifactStrip'), 'Studio output must preserve multi-artifact preview selection.');
+requireCheck(studioWorkspaceRuntime.includes('maxFiles: 24'), 'Studio workspace file count must remain bounded.');
+requireCheck(studioWorkspaceRuntime.includes('validateStudioWorkspaceFiles'), 'Studio workspace files must pass centralized validation.');
 
 requireCheck(runner.includes("process.env.NODE_ENV !== 'production'"), 'Unsandboxed local execution must remain disabled in production.');
 requireCheck(runner.includes("ENABLE_LOCAL_APEXIFY_CODE_RUN === 'true'"), 'Trusted-local execution must require explicit opt-in.');
@@ -124,6 +130,9 @@ requireCheck(
 );
 requireCheck(!isolatedRunner.includes('--allow-run-all'), 'Same-origin execution must not grant unrestricted subprocess access.');
 requireCheck(isolatedRunner.includes("'--allow-ffi="), 'Isolated runner must scope native FFI for the canvas backend.');
+requireCheck(isolatedRunner.includes("'--allow-sys=cpus'"), 'Isolated runner must restrict system access to the native canvas CPU probe.');
+requireCheck(isolatedRunner.includes('materializeWorkspaceFiles'), 'Isolated runner must materialize bounded sibling project files.');
+requireCheck(isolatedRunner.includes('rewriteWorkspacePackageImports'), 'Isolated project files must resolve Apexify through the pinned runtime path.');
 requireCheck(isolatedRunner.includes("rmSync(runDir, { recursive: true, force: true })"), 'Isolated runner must clean its disposable workspace.');
 requireCheck(denoInstaller.includes('vendor') && denoInstaller.includes('studio-deno'), 'Build must install the same-origin Deno isolation runtime.');
 requireCheck(ffmpegInstaller.includes('studio-ffmpeg') && ffmpegInstaller.includes('ffprobe'), 'Build must install the pinned Studio media runtime.');
