@@ -539,7 +539,7 @@ function denoArguments(
     `--allow-write=${runDir}`,
     `--allow-env=${envNames.join(',')}`,
     '--allow-ffi=' + nativeCanvasRoot(),
-    '--allow-sys=cpus',
+    // @napi-rs/canvas uses Node process.report while selecting its native binary.\n    // Deno's process.report probes cpus + networkInterfaces + OS metadata; this\n    // grants system *introspection only* while read/write/env/run/net remain separately constrained.\n    '--allow-sys',
     `--v8-flags=--max-old-space-size=${EXECUTION_LIMITS.v8HeapMb}`,
   ];
 
