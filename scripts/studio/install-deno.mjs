@@ -1,17 +1,28 @@
-import { chmodSync, existsSync, mkdirSync, rmSync } from 'node:fs';
+import {
+  chmodSync,
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  rmSync,
+} from 'node:fs';
 import { get } from 'node:https';
 import { arch, platform } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { createGzip } from 'node:zlib';
+import { pipeline } from 'node:stream/promises';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
 const vendor = join(root, 'vendor', 'studio-deno');
-const denoPath = join(vendor, platform() === 'win32' ? 'deno.exe' : 'deno');
+const executable = platform() === 'win32' ? 'deno.exe' : 'deno';
+const denoPath = join(vendor, executable);
+const compressedPath = join(vendor, executable + '.gz');
 const version = process.env.STUDIO_DENO_VERSION || '2.4.5';
 
-if (existsSync(denoPath)) {
+if (existsSync(compressedPath) || existsSync(denoPath)) {
   process.exit(0);
 }
 
@@ -94,6 +105,15 @@ function extractZip() {
   return result.status === 0;
 }
 
+async function compressRuntime() {
+  await pipeline(
+    createReadStream(denoPath),
+    createGzip({ level: 9 }),
+    createWriteStream(compressedPath, { mode: 0o600 }),
+  );
+  rmSync(denoPath, { force: true });
+}
+
 console.log(`[studio] installing Deno ${version} for same-origin Studio isolation`);
 
 try {
@@ -103,9 +123,12 @@ try {
   }
   rmSync(archive, { force: true });
   if (platform() !== 'win32') chmodSync(denoPath, 0o755);
-  console.log('[studio] installed isolated runtime:', denoPath);
+  await compressRuntime();
+  console.log('[studio] installed compressed isolated runtime:', compressedPath);
 } catch (error) {
   rmSync(archive, { force: true });
+  rmSync(denoPath, { force: true });
+  rmSync(compressedPath, { force: true });
   console.error(
     '[studio] failed to install the same-origin Deno isolation runtime:',
     error instanceof Error ? error.message : String(error),

@@ -95,7 +95,7 @@ Apexify.js is pinned to:
 github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b
 ```
 
-The Deno runtime is installed under `vendor/studio-deno/`. The pinned media binaries are installed under `vendor/studio-ffmpeg/`. Required runtime/proxy files are included in the server trace for `/api/gallery/run`.
+The Deno runtime is installed as a gzip-compressed deployment payload under `vendor/studio-deno/`. The pinned FFmpeg/ffprobe pair is likewise stored compressed under `vendor/studio-ffmpeg/`. The serverless route hydrates only the executable binaries it needs into writable `/tmp` storage on first use and reuses them for the lifetime of the warm instance. Required runtime/proxy files are included in the server trace for `/api/gallery/run`, while native optional packages are traced only for the deployment architecture.
 
 ## Host persistence
 

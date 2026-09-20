@@ -1,32 +1,41 @@
 const path = require('node:path')
 
 /**
- * Native / sibling optional deps are never pulled in by static analysis alone.
- * Covers Vercel Linux **glibc + musl**, **x64 + arm64** (match lockfile package names).
+ * Trace only the native packages for the build/runtime architecture.
+ *
+ * The previous list forced glibc + musl and x64 + arm64 copies of canvas/sharp
+ * into one serverless function. Together with Deno + FFmpeg that pushed
+ * /api/gallery/run above Vercel's 250 MB uncompressed function limit.
+ *
+ * Studio production execution no longer uses the trusted-local tsx runner, so
+ * tsx/esbuild do not need to be forced into the production function either.
  */
+function linuxNativeRuntimeIncludes() {
+  if (process.platform !== 'linux') return []
+
+  const arch = process.arch === 'arm64' ? 'arm64' : 'x64'
+  const report = typeof process.report?.getReport === 'function'
+    ? process.report.getReport()
+    : null
+  const glibc = Boolean(report?.header?.glibcVersionRuntime)
+  const libc = glibc ? 'gnu' : 'musl'
+  const sharpPlatform = glibc ? `linux-${arch}` : `linuxmusl-${arch}`
+
+  return [
+    `./node_modules/@napi-rs/canvas-linux-${arch}-${libc}/**/*`,
+    `./node_modules/@img/sharp-${sharpPlatform}/**/*`,
+    `./node_modules/@img/sharp-libvips-${sharpPlatform}/**/*`,
+  ]
+}
+
 const galleryRunNativeIncludes = [
-  './node_modules/tsx/**/*',
-  './node_modules/esbuild/**/*',
-  './node_modules/@esbuild/linux-x64/**/*',
-  './node_modules/@esbuild/linux-arm64/**/*',
-  './node_modules/get-tsconfig/**/*',
-  './node_modules/resolve-pkg-maps/**/*',
   './node_modules/dejavu-fonts-ttf/**/*',
   './node_modules/apexify.js/**/*',
   './node_modules/@napi-rs/canvas/**/*',
-  './node_modules/@napi-rs/canvas-linux-x64-gnu/**/*',
-  './node_modules/@napi-rs/canvas-linux-arm64-gnu/**/*',
-  './node_modules/@napi-rs/canvas-linux-x64-musl/**/*',
-  './node_modules/@napi-rs/canvas-linux-arm64-musl/**/*',
   './node_modules/sharp/**/*',
-  './node_modules/@img/sharp-linux-x64/**/*',
-  './node_modules/@img/sharp-linux-arm64/**/*',
-  './node_modules/@img/sharp-linuxmusl-x64/**/*',
-  './node_modules/@img/sharp-linuxmusl-arm64/**/*',
-  './node_modules/@img/sharp-libvips-linux-x64/**/*',
-  './node_modules/@img/sharp-libvips-linux-arm64/**/*',
-  './node_modules/@img/sharp-libvips-linuxmusl-x64/**/*',
-  './node_modules/@img/sharp-libvips-linuxmusl-arm64/**/*',
+  ...linuxNativeRuntimeIncludes(),
+  // Deployment payloads contain gzip-compressed executables. The route
+  // hydrates them lazily into /tmp on the first isolated/media run.
   './vendor/studio-deno/**/*',
   './vendor/studio-ffmpeg/**/*',
   './scripts/studio/ffmpeg-proxy',
@@ -48,10 +57,11 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['apexify.js', '@napi-rs/canvas'],
     /**
-     * Gallery `/api/gallery/run` spawns `tsx` + loads apexify by path. Include toolchain +
-     * native optional deps (see `galleryRunNativeIncludes`). Pure-JS deps follow `import 'apexify.js'` in the route.
+     * Gallery / Studio production execution uses the same-origin Deno runtime.
+     * Include the pinned Apexify runtime plus only the native packages for this
+     * build architecture (see `galleryRunNativeIncludes`).
      */
-    /** Gallery + `/studio` (`POST /api/gallery/run`). On Vercel: keep runner enabled (omit `DISABLE_GALLERY_CODE_RUN`). */
+    /** Gallery + `/studio` (`POST /api/gallery/run`). */
     outputFileTracingIncludes: {
       '/app/api/gallery/run': galleryRunNativeIncludes,
       '/app/api/docs/search': doc6SearchIncludes,

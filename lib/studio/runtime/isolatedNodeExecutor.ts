@@ -1,9 +1,20 @@
 import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  realpathSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { gunzipSync } from 'node:zlib';
 import type { InteractiveArtifact } from '@/lib/docs/playground/contracts';
 import { DOC8_RESOURCE_LIMITS } from '@/lib/docs/playground/contracts';
 import { deriveStudioMediaMetadata, detectStudioMedia } from './media';
@@ -70,9 +81,56 @@ function projectRoot(): string {
   return process.cwd();
 }
 
+function packagedBinaryPath(group: 'studio-deno' | 'studio-ffmpeg', name: string): string {
+  return join(projectRoot(), 'vendor', group, name);
+}
+
+function runtimeCacheRoot(): string {
+  return join(tmpdir(), 'apexify-studio-runtime-v1');
+}
+
+function hydrateCompressedBinary(source: string, destination: string): string {
+  if (existsSync(destination)) return realpathSync(destination);
+
+  mkdirSync(resolve(destination, '..'), { recursive: true, mode: 0o700 });
+  const temporary = destination + '.' + process.pid + '.tmp';
+
+  try {
+    const bytes = gunzipSync(readFileSync(source));
+    writeFileSync(temporary, bytes, { mode: 0o700 });
+    if (process.platform !== 'win32') chmodSync(temporary, 0o755);
+    renameSync(temporary, destination);
+  } finally {
+    try {
+      rmSync(temporary, { force: true });
+    } catch {
+      // best-effort temporary hydration cleanup
+    }
+  }
+
+  return realpathSync(destination);
+}
+
 function denoBinary(): string {
   const executable = process.platform === 'win32' ? 'deno.exe' : 'deno';
-  return join(projectRoot(), 'vendor', 'studio-deno', executable);
+  const raw = packagedBinaryPath('studio-deno', executable);
+  if (existsSync(raw)) return realpathSync(raw);
+
+  const compressed = raw + '.gz';
+  if (existsSync(compressed)) {
+    return hydrateCompressedBinary(
+      compressed,
+      join(runtimeCacheRoot(), 'deno-2.4.5-' + process.arch, executable),
+    );
+  }
+
+  return raw;
+}
+
+function denoRuntimeAvailable(): boolean {
+  const executable = process.platform === 'win32' ? 'deno.exe' : 'deno';
+  const raw = packagedBinaryPath('studio-deno', executable);
+  return existsSync(raw) || existsSync(raw + '.gz');
 }
 
 function apexifyEntry(): string {
@@ -104,13 +162,43 @@ function mediaProxyPaths(): { ffmpegProxy: string; ffprobeProxy: string } {
   };
 }
 
+function mediaBinaryPairAvailable(): boolean {
+  const suffix = process.platform === 'win32' ? '.exe' : '';
+  const rawFfmpeg = packagedBinaryPath('studio-ffmpeg', 'ffmpeg' + suffix);
+  const rawFfprobe = packagedBinaryPath('studio-ffmpeg', 'ffprobe' + suffix);
+
+  if (
+    (existsSync(rawFfmpeg) && existsSync(rawFfprobe)) ||
+    (existsSync(rawFfmpeg + '.gz') && existsSync(rawFfprobe + '.gz'))
+  ) {
+    return true;
+  }
+
+  return [
+    ['/usr/bin/ffmpeg', '/usr/bin/ffprobe'],
+    ['/usr/local/bin/ffmpeg', '/usr/local/bin/ffprobe'],
+    ['/opt/homebrew/bin/ffmpeg', '/opt/homebrew/bin/ffprobe'],
+  ].some(([ffmpeg, ffprobe]) => existsSync(ffmpeg) && existsSync(ffprobe));
+}
+
 function mediaBinaryPair(): { ffmpeg: string; ffprobe: string } | null {
-  const root = projectRoot();
+  const suffix = process.platform === 'win32' ? '.exe' : '';
+  const rawFfmpeg = packagedBinaryPath('studio-ffmpeg', 'ffmpeg' + suffix);
+  const rawFfprobe = packagedBinaryPath('studio-ffmpeg', 'ffprobe' + suffix);
+
+  if (existsSync(rawFfmpeg) && existsSync(rawFfprobe)) {
+    return { ffmpeg: realpathSync(rawFfmpeg), ffprobe: realpathSync(rawFfprobe) };
+  }
+
+  if (existsSync(rawFfmpeg + '.gz') && existsSync(rawFfprobe + '.gz')) {
+    const cache = join(runtimeCacheRoot(), 'ffmpeg-6.0.1-' + process.arch);
+    return {
+      ffmpeg: hydrateCompressedBinary(rawFfmpeg + '.gz', join(cache, 'ffmpeg' + suffix)),
+      ffprobe: hydrateCompressedBinary(rawFfprobe + '.gz', join(cache, 'ffprobe' + suffix)),
+    };
+  }
+
   const candidates = [
-    {
-      ffmpeg: join(root, 'vendor', 'studio-ffmpeg', process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg'),
-      ffprobe: join(root, 'vendor', 'studio-ffmpeg', process.platform === 'win32' ? 'ffprobe.exe' : 'ffprobe'),
-    },
     { ffmpeg: '/usr/bin/ffmpeg', ffprobe: '/usr/bin/ffprobe' },
     { ffmpeg: '/usr/local/bin/ffmpeg', ffprobe: '/usr/local/bin/ffprobe' },
     { ffmpeg: '/opt/homebrew/bin/ffmpeg', ffprobe: '/opt/homebrew/bin/ffprobe' },
@@ -121,6 +209,7 @@ function mediaBinaryPair(): { ffmpeg: string; ffprobe: string } | null {
       return { ffmpeg: realpathSync(pair.ffmpeg), ffprobe: realpathSync(pair.ffprobe) };
     }
   }
+
   return null;
 }
 
@@ -160,7 +249,7 @@ function createMediaCapability(runDir: string): StudioMediaCapability | null {
 
 export function sameOriginStudioIsolationAvailable(): boolean {
   return (
-    existsSync(denoBinary()) &&
+    denoRuntimeAvailable() &&
     existsSync(apexifyEntry()) &&
     existsSync(nativeCanvasRoot()) &&
     existsSync(nativeCanvasEntry()) &&
@@ -172,7 +261,7 @@ export function sameOriginStudioVideoAvailable(): boolean {
   const proxies = mediaProxyPaths();
   return Boolean(
     sameOriginStudioIsolationAvailable() &&
-      mediaBinaryPair() &&
+      mediaBinaryPairAvailable() &&
       existsSync(proxies.ffmpegProxy) &&
       existsSync(proxies.ffprobeProxy),
   );

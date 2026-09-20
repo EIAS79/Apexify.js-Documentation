@@ -1,17 +1,32 @@
-import { chmodSync, existsSync, mkdirSync, readdirSync, rmSync, renameSync } from 'node:fs';
+import {
+  createReadStream,
+  createWriteStream,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  rmSync,
+} from 'node:fs';
 import { get } from 'node:https';
 import { arch, platform } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { createGzip } from 'node:zlib';
+import { pipeline } from 'node:stream/promises';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
 const vendor = join(root, 'vendor', 'studio-ffmpeg');
-const ffmpeg = join(vendor, platform() === 'win32' ? 'ffmpeg.exe' : 'ffmpeg');
-const ffprobe = join(vendor, platform() === 'win32' ? 'ffprobe.exe' : 'ffprobe');
+const executableSuffix = platform() === 'win32' ? '.exe' : '';
+const ffmpeg = join(vendor, 'ffmpeg' + executableSuffix);
+const ffprobe = join(vendor, 'ffprobe' + executableSuffix);
+const ffmpegGzip = ffmpeg + '.gz';
+const ffprobeGzip = ffprobe + '.gz';
 
-if (existsSync(ffmpeg) && existsSync(ffprobe)) process.exit(0);
+if (
+  (existsSync(ffmpegGzip) && existsSync(ffprobeGzip)) ||
+  (existsSync(ffmpeg) && existsSync(ffprobe))
+) process.exit(0);
 
 if (platform() !== 'linux' || !['x64', 'arm64'].includes(arch())) {
   console.log('[studio] bundled FFmpeg is installed only for Linux x64/arm64 builds; system FFmpeg may still be used locally.');
@@ -70,6 +85,14 @@ function download(source, destination, redirects = 0) {
   });
 }
 
+async function compressBinary(source, destination) {
+  await pipeline(
+    createReadStream(source),
+    createGzip({ level: 9 }),
+    createWriteStream(destination, { mode: 0o600 }),
+  );
+}
+
 console.log(`[studio] installing pinned FFmpeg ${release} (${target}) for Studio video`);
 
 try {
@@ -92,16 +115,22 @@ try {
 
   rmSync(ffmpeg, { force: true });
   rmSync(ffprobe, { force: true });
-  renameSync(join(folder, 'ffmpeg'), ffmpeg);
-  renameSync(join(folder, 'ffprobe'), ffprobe);
-  chmodSync(ffmpeg, 0o755);
-  chmodSync(ffprobe, 0o755);
+  rmSync(ffmpegGzip, { force: true });
+  rmSync(ffprobeGzip, { force: true });
+
+  await compressBinary(join(folder, 'ffmpeg'), ffmpegGzip);
+  await compressBinary(join(folder, 'ffprobe'), ffprobeGzip);
+
   rmSync(archive, { force: true });
   rmSync(extractDir, { recursive: true, force: true });
-  console.log('[studio] installed Studio FFmpeg:', ffmpeg);
+  console.log('[studio] installed compressed Studio FFmpeg:', ffmpegGzip);
 } catch (error) {
   rmSync(archive, { force: true });
   rmSync(extractDir, { recursive: true, force: true });
+  rmSync(ffmpeg, { force: true });
+  rmSync(ffprobe, { force: true });
+  rmSync(ffmpegGzip, { force: true });
+  rmSync(ffprobeGzip, { force: true });
   console.error(
     '[studio] failed to install the Studio FFmpeg runtime:',
     error instanceof Error ? error.message : String(error),
