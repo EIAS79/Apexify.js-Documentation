@@ -15,8 +15,8 @@
  * Video recipes 24/25 additionally require FFmpeg and ffprobe on PATH.
  * Audited original source: EIAS79/Apexify.js, commit cba16669337ca6b6bc7d4d28f6dbd5dbabdb35f3.
  * Original verification used a build of that commit; npm 6.0.0 may differ.
- * Known limits: two filters use documented pixel fallbacks; applyLUT failed in the
- * original runtime. External services are opt-in and require your credentials.
+ * Known limits: two filters use documented pixel fallbacks. External services are
+ * opt-in and require your credentials. Video/LUT paths are verified on current main.
  * Browser-only preview and gallery/server maintenance scripts are not Node recipes.
  * Dynamic rendering payloads use explicit any; the recipe registry and CLI are typed.
  */
@@ -913,7 +913,11 @@ async function run(): Promise<any> {
   }
   const layers: any=heading('25 / MEDIA OPERATIONS','The complete video workbench','Each row records a real call. Failures stay visible in the accompanying report.');
   for(let i: any=0;i<report.length;i++){const item: any=report[i],x: any=64+i%3*450,y: any=247+Math.floor(i/3)*73;layers.push(images(rect(x,y,414,55,item.status==='passed'?'#e1eadf':'#f8d8cf',{borderRadius:8})),textLayer(txt(item.status==='passed'?'OK':'ERR',x+13,y+17,16,item.status==='passed'?'#178574':C.red,{font:font(16,'mono')}),txt(item.operation,x+67,y+17,16,C.ink,{font:font(16,'mono')})));}
-  files.unshift(await save('25-video-workbench.png',await scene(1440,280+Math.ceil(report.length/3)*73,layers)));files.push(await json('25-video-operations.json',report));return files;
+  files.unshift(await save('25-video-workbench.png',await scene(1440,280+Math.ceil(report.length/3)*73,layers)));
+  files.push(await json('25-video-operations.json',report));
+  const failed: any=report.filter((item: any): any =>item.status==='failed');
+  if(failed.length)throw new Error(`Video workbench failed ${failed.length} operation(s): ${failed.map((item: any): any =>item.operation).join(', ')}`);
+  return files;
 }
 
 return {meta,run};
