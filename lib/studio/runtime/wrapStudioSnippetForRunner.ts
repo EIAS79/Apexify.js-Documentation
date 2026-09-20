@@ -29,10 +29,21 @@ export function wrapStudioSnippetForRunner(
     .replace(/^const\s+ApexPainter\s*=\s*require\s*\(\s*['"]apexify\.js['"]\s*\)\s*\.(?:default|ApexPainter)\s*;?\s*\r?\n/m, '')
     .trim();
 
+  // Any Apexify import form that survives the legacy ApexPainter-only cleanup
+  // is rewritten to the exact package entry bundled with this deployment.
+  body = body.replace(
+    /(['"])apexify\.js\1/g,
+    JSON.stringify(apexifyImportHref),
+  );
+
   body = body.replace(/\s*return\s+await\s+main\s*\(\)\s*;?\s*$/m, '').trim();
 
   const { hoisted, rest: inner } = hoistLeadingImports(body);
   const hoistedBlock = hoisted ? hoisted + '\n\n' : '';
+  const declaresApexPainter = /\b(?:const|let|var|class|function)\s+ApexPainter\b/.test(inner);
+  const apexPainterBinding = declaresApexPainter
+    ? ''
+    : '  const ApexPainter = __apexMod.ApexPainter ?? __apexMod.default?.ApexPainter ?? __apexMod.default;\n';
   const frameArrayHint = /\b(?:animate|extractMultipleFrames)\s*\(/.test(body);
 
   return `import { copyFileSync as __studioCopy, existsSync as __studioExists, mkdirSync as __studioMkdir, readFileSync as __studioRead, readdirSync as __studioReadDir, statSync as __studioStat, writeFileSync as __studioWrite } from 'node:fs';
@@ -162,8 +173,7 @@ function __studioJson(value: unknown): string {
 void (async () => {
   __studioRegisterFonts();
   const __apexMod = await import(${JSON.stringify(apexifyImportHref)});
-  const ApexPainter = __apexMod.ApexPainter ?? __apexMod.default?.ApexPainter ?? __apexMod.default;
-
+${apexPainterBinding}
 ${inner}
 
   const __artifactDir = process.env.STUDIO_ARTIFACT_DIR!;
