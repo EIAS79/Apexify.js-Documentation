@@ -417,6 +417,23 @@ export default function GalleryModal({
                 )}
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
+                {item.sourceHref ? (
+                  <a
+                    href={item.sourceHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hidden sm:inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-[12px] font-semibold border transition-colors"
+                    style={{
+                      backgroundColor: 'var(--bg-sunken)',
+                      borderColor: 'var(--border-default)',
+                      color: 'var(--text-primary)',
+                    }}
+                    title="Open the complete canonical Peak Lab source"
+                  >
+                    <CodeBracketIcon className="h-3.5 w-3.5" />
+                    Full source
+                  </a>
+                ) : null}
                 {studioEligible && (
                   <button
                     type="button"
