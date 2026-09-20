@@ -24,7 +24,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "surface"
     ],
     "primaryLens": "surface",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -65,7 +65,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "composition"
     ],
     "primaryLens": "image",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -106,7 +106,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "composition"
     ],
     "primaryLens": "typography",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -147,7 +147,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "advanced",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -193,7 +193,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "image",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -234,7 +234,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "advanced",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -274,7 +274,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "image"
     ],
     "primaryLens": "image",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -315,7 +315,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "image",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -386,7 +386,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "composition"
     ],
     "primaryLens": "image",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -426,7 +426,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "data"
     ],
     "primaryLens": "data",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -501,7 +501,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "data"
     ],
     "primaryLens": "data",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -566,7 +566,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "data"
     ],
     "primaryLens": "data",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -621,7 +621,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "data"
     ],
     "primaryLens": "data",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -672,7 +672,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "composition",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -712,7 +712,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "composition"
     ],
     "primaryLens": "composition",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -773,7 +773,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "composition",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -813,7 +813,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "advanced",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -884,7 +884,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "composition",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -924,7 +924,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "advanced",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -964,7 +964,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "advanced",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -1010,7 +1010,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "motion",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -1060,7 +1060,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "motion"
     ],
     "primaryLens": "motion",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -1110,7 +1110,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "motion"
     ],
     "primaryLens": "motion",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -1181,7 +1181,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "composition"
     ],
     "primaryLens": "motion",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -1232,7 +1232,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "motion",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
@@ -1279,7 +1279,7 @@ export const peakLabGalleryItems: CuratedGalleryCard[] = [
       "advanced"
     ],
     "primaryLens": "composition",
-    "executionMode": "none",
+    "executionMode": "studio",
     "sourceKind": "peak-lab",
     "sourceHref": "https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts",
     "codePages": [
