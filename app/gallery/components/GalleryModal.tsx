@@ -395,7 +395,7 @@ export default function GalleryModal({
                 )}
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2">
-                {hasCode && (
+                {studioEligible && (
                   <button
                     type="button"
                     onClick={openInStudio}
@@ -523,6 +523,18 @@ export default function GalleryModal({
               <div className="flex flex-1 min-h-0 min-w-0 h-full flex-col p-3 sm:p-4">
                 {hasCode ? (
                   <>
+                    {effectiveExecutionMode === 'none' && (
+                      <div
+                        className="mb-3 rounded-lg px-3 py-2 text-[11px] leading-snug border"
+                        style={{
+                          backgroundColor: 'color-mix(in srgb, var(--accent-iris) 8%, transparent)',
+                          borderColor: 'color-mix(in srgb, var(--accent-iris) 28%, transparent)',
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        This is a project-level recipe with shared helpers/assets. The source is intentionally read-only here; copy it with the rest of its Peak Lab project files to run it.
+                      </div>
+                    )}
                     {modalMediaKind === 'video' && (
                       <div
                         className="mb-3 rounded-lg px-3 py-2 text-[11px] leading-snug border"
