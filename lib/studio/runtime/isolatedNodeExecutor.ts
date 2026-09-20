@@ -55,6 +55,34 @@ export type IsolatedStudioRunResult = {
     primaryArtifactId?: string | null;
     mime?: string;
     base64?: string;
+    runtimeDebug?: StudioRuntimeDebug;
+  };
+};
+
+type StudioRuntimeDebug = {
+  schemaVersion: 1;
+  backend: 'same-origin-deno';
+  deploymentCommit: string;
+  deploymentEnvironment: string;
+  platform: string;
+  arch: string;
+  nodeVersion: string;
+  apexifyPin: string;
+  sysPermissionArg: string | null;
+  denoRuntimeAvailable: boolean;
+  denoBinaryExists: boolean;
+  nativeCanvasEntryExists: boolean;
+  nativeCanvasRootExists: boolean;
+  mediaCapabilityCreated: boolean;
+  ffmpegProxyExists: boolean;
+  ffprobeProxyExists: boolean;
+  ffmpegBinaryAvailable: boolean;
+  preflight?: {
+    attempted: boolean;
+    exitCode: number | null;
+    timedOut: boolean;
+    stdout: string;
+    stderr: string;
   };
 };
 
@@ -559,7 +587,7 @@ function executeDeno(
   assetManifest: string,
   errPath: string,
   media: StudioMediaCapability | null,
-): Promise<{ exitCode: number | null; stderr: string; timedOut: boolean }> {
+): Promise<{ exitCode: number | null; stdout: string; stderr: string; timedOut: boolean }> {
   return new Promise((resolveRun, rejectRun) => {
     const deno = denoBinary();
     const args = denoArguments(runDir, entry, media);
@@ -586,6 +614,7 @@ function executeDeno(
       windowsHide: true,
     });
 
+    let stdout = '';
     let stderr = '';
     let stdoutBytes = 0;
     let stderrBytes = 0;
@@ -594,6 +623,7 @@ function executeDeno(
 
     child.stdout?.on('data', (chunk: Buffer) => {
       stdoutBytes += chunk.length;
+      if (stdoutBytes <= EXECUTION_LIMITS.processOutputBytes) stdout += chunk.toString('utf8');
       if (stdoutBytes > EXECUTION_LIMITS.processOutputBytes) {
         outputExceeded = true;
         child.kill('SIGKILL');
@@ -622,10 +652,95 @@ function executeDeno(
     child.once('close', (code) => {
       clearTimeout(timer);
       if (outputExceeded) stderr += '\nStudio terminated this run because process output exceeded the limit.';
-      resolveRun({ exitCode: code, stderr, timedOut });
+      resolveRun({ exitCode: code, stdout, stderr, timedOut });
     });
   });
 }
+
+function studioRuntimeDebugBase(
+  runDir: string,
+  media: StudioMediaCapability | null,
+): StudioRuntimeDebug {
+  const args = denoArguments(runDir, join(runDir, 'snippet.ts'), media);
+  const proxies = mediaProxyPaths();
+  const deno = denoBinary();
+  return {
+    schemaVersion: 1,
+    backend: 'same-origin-deno',
+    deploymentCommit:
+      process.env.VERCEL_GIT_COMMIT_SHA ||
+      process.env.VERCEL_GIT_COMMIT_REF ||
+      process.env.GITHUB_SHA ||
+      'unknown',
+    deploymentEnvironment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'unknown',
+    platform: process.platform,
+    arch: process.arch,
+    nodeVersion: process.version,
+    apexifyPin: APEXIFY_PIN,
+    sysPermissionArg: args.find((arg) => arg === '--allow-sys' || arg.startsWith('--allow-sys=')) ?? null,
+    denoRuntimeAvailable: denoRuntimeAvailable(),
+    denoBinaryExists: existsSync(deno),
+    nativeCanvasEntryExists: existsSync(nativeCanvasEntry()),
+    nativeCanvasRootExists: existsSync(nativeCanvasRoot()),
+    mediaCapabilityCreated: Boolean(media),
+    ffmpegProxyExists: existsSync(proxies.ffmpegProxy),
+    ffprobeProxyExists: existsSync(proxies.ffprobeProxy),
+    ffmpegBinaryAvailable: mediaBinaryPairAvailable(),
+  };
+}
+
+async function runStudioRuntimePreflight(
+  runDir: string,
+  artifactDir: string,
+  manifestPath: string,
+  assetManifest: string,
+  errPath: string,
+  media: StudioMediaCapability | null,
+): Promise<StudioRuntimeDebug['preflight']> {
+  const entry = join(runDir, 'studio-runtime-preflight.ts');
+  writeFileSync(
+    entry,
+    [
+      "import * as os from 'node:os';",
+      "const result = {",
+      "  cpus: (() => { try { return { ok: true, count: os.cpus().length }; } catch (error) { return { ok: false, error: String(error) }; } })(),",
+      "  networkInterfaces: (() => { try { return { ok: true, count: Object.keys(os.networkInterfaces()).length }; } catch (error) { return { ok: false, error: String(error) }; } })(),",
+      "};",
+      "console.log(JSON.stringify(result));",
+    ].join('\n'),
+    { mode: 0o600 },
+  );
+
+  try {
+    const result = await executeDeno(
+      runDir,
+      entry,
+      artifactDir,
+      manifestPath,
+      assetManifest,
+      errPath,
+      media,
+    );
+    return {
+      attempted: true,
+      exitCode: result.exitCode,
+      timedOut: result.timedOut,
+      stdout: result.stdout.trim().slice(0, 8_000),
+      stderr: result.stderr.trim().slice(0, 8_000),
+    };
+  } catch (error) {
+    return {
+      attempted: true,
+      exitCode: null,
+      timedOut: false,
+      stdout: '',
+      stderr: error instanceof Error ? error.message : String(error),
+    };
+  } finally {
+    try { rmSync(entry, { force: true }); } catch {}
+  }
+}
+
 
 export async function runSameOriginIsolatedStudio(
   code: string,
@@ -725,6 +840,15 @@ export async function runSameOriginIsolatedStudio(
 
     if (existsSync(errPath)) {
       const errorText = readFileSync(errPath, 'utf8').trim() || result.stderr.trim() || 'Studio execution failed.';
+      const runtimeDebug = studioRuntimeDebugBase(runDir, media);
+      runtimeDebug.preflight = await runStudioRuntimePreflight(
+        runDir,
+        artifactDir,
+        manifestPath,
+        assetManifestPath,
+        errPath,
+        media,
+      );
       return {
         status: 422,
         body: {
@@ -733,11 +857,21 @@ export async function runSameOriginIsolatedStudio(
           stderr: result.stderr.trim().slice(0, EXECUTION_LIMITS.processOutputBytes) || undefined,
           elapsedMs,
           exitCode: result.exitCode,
+          runtimeDebug,
         },
       };
     }
 
     if (!existsSync(manifestPath)) {
+      const runtimeDebug = studioRuntimeDebugBase(runDir, media);
+      runtimeDebug.preflight = await runStudioRuntimePreflight(
+        runDir,
+        artifactDir,
+        manifestPath,
+        assetManifestPath,
+        errPath,
+        media,
+      );
       return {
         status: 422,
         body: {
@@ -745,6 +879,7 @@ export async function runSameOriginIsolatedStudio(
           error: result.stderr.trim() || 'Studio execution produced no artifact manifest.',
           elapsedMs,
           exitCode: result.exitCode,
+          runtimeDebug,
         },
       };
     }
@@ -795,6 +930,7 @@ export async function runSameOriginIsolatedStudio(
       body: {
         ok: false,
         error: error instanceof Error ? error.message : 'Studio isolated execution failed.',
+        runtimeDebug: studioRuntimeDebugBase(runDir, media),
       },
     };
   } finally {
