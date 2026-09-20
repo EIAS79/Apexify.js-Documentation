@@ -888,8 +888,13 @@ function CodeWindow({
         style={{ backgroundColor: '#0d1117' }}
       >
         {editable && onCodeChange ? (
-          <div className="flex-1 min-h-[220px] flex flex-col p-2 sm:p-3">
-            <GallerySnippetEditor value={code} codeLang={codeLang} onChange={onCodeChange} />
+          <div className="flex min-h-0 flex-1 flex-col p-2 sm:p-3">
+            <GallerySnippetEditor
+              fillParent
+              value={code}
+              codeLang={codeLang}
+              onChange={onCodeChange}
+            />
           </div>
         ) : (
           <div className="flex-1 min-h-0 overflow-y-auto overflow-x-auto [scrollbar-gutter:stable]">
