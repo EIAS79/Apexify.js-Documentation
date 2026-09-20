@@ -8,7 +8,6 @@ import {
 import type { ProductExperienceModel, ResolvedCapability } from '@/lib/product/catalog';
 import type { ProductStatus } from '@/lib/product/catalog-data';
 import CopyInstallButton from './CopyInstallButton';
-import { BrandBanner } from '@/components/Brand';
 
 function getCapability(model: ProductExperienceModel, id: string): ResolvedCapability {
   return model.capabilities.find((item) => item.id === id) ?? model.capabilities[0];
@@ -502,7 +501,6 @@ export function EcosystemFooter({ model }: { model: ProductExperienceModel }) {
       </div>
 
       <div className="apx-footer__bottom">
-        <BrandBanner variant="dark" className="apx-footer__brand-logo" maxWidth={150} />
         <span>TypeScript-first rendering and media tooling for Node/server runtimes.</span>
       </div>
     </footer>
