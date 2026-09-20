@@ -9,38 +9,55 @@ import {
   type GalleryItem,
 } from '../../app/gallery/components/galleryHelpers';
 
-test('Gallery catalog is intentionally empty after the output reset', () => {
-  assert.deepEqual(galleryItems, []);
+test('Gallery starts with the two finished Peak Showcase films', () => {
+  const showcases = galleryItems.filter((item) => item.sourceKind === 'showcase');
+
+  assert.equal(showcases.length, 2);
+  assert.deepEqual(
+    showcases.map((item) => item.id).sort(),
+    ['showcase-apexify-spectrum', 'showcase-orbit-breaker'],
+  );
+  for (const item of showcases) {
+    assert.equal(item.featured, true);
+    assert.equal(item.thumbnailMedia, 'video');
+    assert.equal(item.executionMode, 'none');
+    assert.equal(Boolean(item.code?.ts || item.code?.js || item.codePages?.length), false);
+  }
 });
 
-test('empty Gallery filters remain stable and reset cleanly', () => {
+test('Gallery filters remain stable before and after Peak Lab publication', () => {
   const all = galleryItems.filter((item) => itemMatchesRuntime(item, 'all') && itemMatchesEvidence(item, 'all'));
   const node = galleryItems.filter((item) => itemMatchesRuntime(item, 'node'));
   const verified = galleryItems.filter((item) => itemMatchesEvidence(item, 'verified'));
   const legacy = galleryItems.filter((item) => itemMatchesEvidence(item, 'legacy'));
+  const peak = galleryItems.filter((item) => item.sourceKind === 'peak-lab');
 
-  assert.equal(all.length, 0);
-  assert.equal(node.length, 0);
-  assert.equal(verified.length, 0);
-  assert.equal(legacy.length, 0);
+  assert.equal(all.length, galleryItems.length);
+  assert.equal(node.length, galleryItems.length);
+  assert.equal(legacy.length, 2);
+  assert.equal(verified.length, peak.length);
+  assert.equal(verified.length + legacy.length, galleryItems.length);
 });
 
-test('Gallery matching helpers stay ready for the next curated output set', () => {
+test('Gallery matching helpers support source-backed Peak Lab catalog entries', () => {
   const sample: GalleryItem = {
-    id: 'future-sample',
-    title: 'Future chart sample',
+    id: 'peak-sample',
+    title: 'Peak chart sample',
     description: 'Synthetic chart output for helper-contract coverage.',
     category: 'advance',
     primaryLens: 'data',
     lenses: ['data', 'advanced'],
-    thumbnail: '/future-output.png',
-    code: { ts: 'return painter.createChart();' },
+    thumbnail: '/gallery/peak-lab/sample.png',
+    codePages: [{ label: 'Recipe', language: 'ts', code: 'return painter.createChart();' }],
+    sourceKind: 'peak-lab',
+    recipeId: '00',
+    executionMode: 'none',
   };
 
   assert.equal(itemMatchesRuntime(sample, 'node'), true);
-  assert.equal(itemMatchesEvidence(sample, 'legacy'), true);
+  assert.equal(itemMatchesEvidence(sample, 'verified'), true);
   assert.equal(itemMatchesFilter(sample, 'data'), true);
   assert.equal(itemMatchesFilter(sample, 'motion'), false);
   assert.equal(itemMatchesQuery(sample, 'chart'), true);
-  assert.equal(itemMatchesQuery(sample, 'future-sample'), true);
+  assert.equal(itemMatchesQuery(sample, 'peak-sample'), true);
 });
