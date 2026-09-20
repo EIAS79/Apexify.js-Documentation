@@ -250,7 +250,7 @@ for (let n = 1; n <= 26; n++) {
     })),
     lenses: LENSES[id] ?? ['advanced'],
     primaryLens: PRIMARY[id] ?? 'advanced',
-    executionMode: 'none',
+    executionMode: 'studio',
     sourceKind: 'peak-lab',
     sourceHref: 'https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts',
     codePages: [...recipePages, ...supportPages, runPage],
