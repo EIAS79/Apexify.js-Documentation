@@ -1,0 +1,3555 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "artifact": "generated/studio/capability-matrix.json",
+    "schemaVersion": 2,
+    "packagePin": "github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b",
+    "implementationComplete": true,
+    "totalCapabilities": 187
+  },
+  "classificationVocabulary": [
+    "visual-property",
+    "visual-object",
+    "visual-operation",
+    "timeline-operation",
+    "project-operation",
+    "export-only",
+    "hosted-runtime-exclusion",
+    "not-applicable"
+  ],
+  "rows": [
+    {
+      "capability": "ApexPainter.animate",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "animation",
+      "editorSection": "Timeline / Animation",
+      "controlSchemaId": "studio.visual.controls.animation",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.animate"
+      },
+      "proofCaseIds": [
+        "animation"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-11",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.clear",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.clear"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.delete",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.delete"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.has",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.has"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.list",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.list"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.loadFont",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.loadFont"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.loadImage",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.loadImage"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.loadPalette",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.loadPalette"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.loadValue",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.loadValue"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.replaceFont",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.replaceFont"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.replaceImage",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.replaceImage"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.replacePalette",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.replacePalette"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.replaceValue",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.replaceValue"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.resolve",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.resolve"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.unregisterFont",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.unregisterFont"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.unregisterImage",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.unregisterImage"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.assets.unregisterPalette",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "assets",
+      "editorSection": "Assets",
+      "controlSchemaId": "studio.visual.controls.assets",
+      "projectModelField": "assets",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.assets.unregisterPalette"
+      },
+      "proofCaseIds": [
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.batch",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "batch-chain",
+      "editorSection": "Advanced / Operations",
+      "controlSchemaId": "studio.visual.controls.batch-chain",
+      "projectModelField": "operations",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.batch"
+      },
+      "proofCaseIds": [
+        "batch-chain"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.chain",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "batch-chain",
+      "editorSection": "Advanced / Operations",
+      "controlSchemaId": "studio.visual.controls.batch-chain",
+      "projectModelField": "operations",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.chain"
+      },
+      "proofCaseIds": [
+        "batch-chain"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.components.avatar.toLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "components",
+      "editorSection": "Insert / Components",
+      "controlSchemaId": "studio.visual.controls.components",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.components.avatar.toLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.components.badge.toLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "components",
+      "editorSection": "Insert / Components",
+      "controlSchemaId": "studio.visual.controls.components",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.components.badge.toLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.components.card.toLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "components",
+      "editorSection": "Insert / Components",
+      "controlSchemaId": "studio.visual.controls.components",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.components.card.toLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.components.progressBar.toLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "components",
+      "editorSection": "Insert / Components",
+      "controlSchemaId": "studio.visual.controls.components",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.components.progressBar.toLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.components.watermark.toLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "components",
+      "editorSection": "Insert / Components",
+      "controlSchemaId": "studio.visual.controls.components",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.components.watermark.toLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createAudio.compose",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": "studio.visual.controls.audio",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createAudio.compose"
+      },
+      "proofCaseIds": [
+        "audio"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createAudio.custom",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": "studio.visual.controls.audio",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createAudio.custom"
+      },
+      "proofCaseIds": [
+        "audio"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createAudio.listPresets",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "audio"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.createAudio.mix",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": "studio.visual.controls.audio",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createAudio.mix"
+      },
+      "proofCaseIds": [
+        "audio"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createAudio.preset",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": "studio.visual.controls.audio",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createAudio.preset"
+      },
+      "proofCaseIds": [
+        "audio"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createAudio.presetNames",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "audio"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.createAudio.save",
+      "sourceRoute": "host-persistence",
+      "classification": "hosted-runtime-exclusion",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "host-persistence-exclusion"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "excluded"
+    },
+    {
+      "capability": "ApexPainter.createAudio.sequence",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": "studio.visual.controls.audio",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createAudio.sequence"
+      },
+      "proofCaseIds": [
+        "audio"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createAudio.synth",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "audio",
+      "editorSection": "Timeline / Audio",
+      "controlSchemaId": "studio.visual.controls.audio",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createAudio.synth"
+      },
+      "proofCaseIds": [
+        "audio"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-12",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createCanvas",
+      "sourceRoute": "browser",
+      "classification": "visual-object",
+      "domain": "canvas",
+      "editorSection": "Canvas",
+      "controlSchemaId": "studio.visual.controls.canvas",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "browser",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createCanvas"
+      },
+      "proofCaseIds": [
+        "web-raster-core"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-4",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createChart",
+      "sourceRoute": "browser",
+      "classification": "visual-object",
+      "domain": "chart",
+      "editorSection": "Charts",
+      "controlSchemaId": "studio.visual.controls.chart",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "browser",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createChart"
+      },
+      "proofCaseIds": [
+        "charts"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-8",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createComboChart",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "chart",
+      "editorSection": "Charts",
+      "controlSchemaId": "studio.visual.controls.chart",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createComboChart"
+      },
+      "proofCaseIds": [
+        "charts"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-8",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createComparisonChart",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "chart",
+      "editorSection": "Charts",
+      "controlSchemaId": "studio.visual.controls.chart",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createComparisonChart"
+      },
+      "proofCaseIds": [
+        "charts"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-8",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createGIF",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "gif",
+      "editorSection": "Timeline / GIF",
+      "controlSchemaId": "studio.visual.controls.gif",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createGIF"
+      },
+      "proofCaseIds": [
+        "gif"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-11",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createImage",
+      "sourceRoute": "browser",
+      "classification": "visual-object",
+      "domain": "image",
+      "editorSection": "Insert / Images",
+      "controlSchemaId": "studio.visual.controls.image",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "browser",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createImage"
+      },
+      "proofCaseIds": [
+        "web-raster-core"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-5",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createScene",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createScene"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createTemplate",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-object",
+      "domain": "template",
+      "editorSection": "Composition / Templates",
+      "controlSchemaId": "studio.visual.controls.template",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createTemplate"
+      },
+      "proofCaseIds": [
+        "templates"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createText",
+      "sourceRoute": "browser",
+      "classification": "visual-object",
+      "domain": "text",
+      "editorSection": "Text",
+      "controlSchemaId": "studio.visual.controls.text",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "browser",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createText"
+      },
+      "proofCaseIds": [
+        "web-raster-core"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-6",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.createVideo",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.createVideo"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.detect.anyRegion",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "detect",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.detect",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.detect.anyRegion"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.detect.distance",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "detect",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.detect",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.detect.distance"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.detect.path",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "detect",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.detect",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.detect.path"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.detect.region",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "detect",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.detect",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.detect.region"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.extractAllFrames",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.extractAllFrames"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.extractFrameAtTime",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.extractFrameAtTime"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.extractFrameByNumber",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.extractFrameByNumber"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.extractFrames",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.extractFrames"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.extractMultipleFrames",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.extractMultipleFrames"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.getVideoInfo",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.getVideoInfo"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.blend",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.blend"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.colorAnalysis",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.colorAnalysis"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.colorsFilter",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.colorsFilter"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.colorsRemover",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.colorsRemover"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.compress",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.compress"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.createCollage",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.createCollage"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.cropImage",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.cropImage"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.effects",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.effects"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.extractPalette",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.extractPalette"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.gradientBlend",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.gradientBlend"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.imgConverter",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.imgConverter"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.masking",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.masking"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.removeBackground",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.removeBackground"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.resize",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.resize"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.stitchImages",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": "studio.visual.controls.image-utils",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.image.stitchImages"
+      },
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.image.validHex",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "image-utils",
+      "editorSection": "Image Effects",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "image-utils"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-10",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.measureText",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "text",
+      "editorSection": "Text",
+      "controlSchemaId": "studio.visual.controls.text",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.measureText"
+      },
+      "proofCaseIds": [
+        "measure-and-structured"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-6",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.outPut",
+      "sourceRoute": "full-runtime",
+      "classification": "export-only",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": "studio.visual.controls.output",
+      "projectModelField": "outputs",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.outPut"
+      },
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.output.arrayBuffer",
+      "sourceRoute": "full-runtime",
+      "classification": "export-only",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": "studio.visual.controls.output",
+      "projectModelField": "outputs",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.output.arrayBuffer"
+      },
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.output.base64",
+      "sourceRoute": "full-runtime",
+      "classification": "export-only",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": "studio.visual.controls.output",
+      "projectModelField": "outputs",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.output.base64"
+      },
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.output.blob",
+      "sourceRoute": "full-runtime",
+      "classification": "export-only",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": "studio.visual.controls.output",
+      "projectModelField": "outputs",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.output.blob"
+      },
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.output.dataURL",
+      "sourceRoute": "full-runtime",
+      "classification": "export-only",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": "studio.visual.controls.output",
+      "projectModelField": "outputs",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.output.dataURL"
+      },
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.output.url",
+      "sourceRoute": "external-service",
+      "classification": "hosted-runtime-exclusion",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "external-transfer-exclusion"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "excluded"
+    },
+    {
+      "capability": "ApexPainter.outputFormat",
+      "sourceRoute": "introspection",
+      "classification": "not-applicable",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.path2d.create",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "path",
+      "editorSection": "Path / Doodle",
+      "controlSchemaId": "studio.visual.controls.path",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.path2d.create"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.path2d.custom",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "path",
+      "editorSection": "Path / Doodle",
+      "controlSchemaId": "studio.visual.controls.path",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.path2d.custom"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.path2d.draw",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "path",
+      "editorSection": "Path / Doodle",
+      "controlSchemaId": "studio.visual.controls.path",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.path2d.draw"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.pixels.getColor",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "pixels",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.pixels",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.pixels.getColor"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.pixels.getData",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "pixels",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.pixels",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.pixels.getData"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.pixels.manipulate",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "pixels",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.pixels",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.pixels.manipulate"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.pixels.setColor",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "pixels",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.pixels",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.pixels.setColor"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.pixels.setData",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "pixels",
+      "editorSection": "Pixels / Detection",
+      "controlSchemaId": "studio.visual.controls.pixels",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.pixels.setData"
+      },
+      "proofCaseIds": [
+        "geometry-pixels-detect"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-7",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.plugins.get",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.plugins.has",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.plugins.install",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": "studio.visual.controls.plugins",
+      "projectModelField": "operations",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.plugins.install"
+      },
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.plugins.isInstalled",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.plugins.list",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.plugins.listInstalled",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.plugins.remove",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": "studio.visual.controls.plugins",
+      "projectModelField": "operations",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.plugins.remove"
+      },
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.plugins.use",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": "studio.visual.controls.plugins",
+      "projectModelField": "operations",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.plugins.use"
+      },
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.prepareForRender",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "rendering",
+      "editorSection": "Advanced / Rendering",
+      "controlSchemaId": "studio.visual.controls.rendering",
+      "projectModelField": "operations",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.prepareForRender"
+      },
+      "proofCaseIds": [
+        "measure-and-structured",
+        "assets"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.renderScene",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.renderScene"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.renderSceneToGIF",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "gif",
+      "editorSection": "Timeline / GIF",
+      "controlSchemaId": "studio.visual.controls.gif",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.renderSceneToGIF"
+      },
+      "proofCaseIds": [
+        "gif"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-11",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.renderSceneToVideoFrames",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.renderSceneToVideoFrames"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.save",
+      "sourceRoute": "host-persistence",
+      "classification": "hosted-runtime-exclusion",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "host-persistence-exclusion"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "excluded"
+    },
+    {
+      "capability": "ApexPainter.saveMultiple",
+      "sourceRoute": "host-persistence",
+      "classification": "hosted-runtime-exclusion",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "host-persistence-exclusion"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "excluded"
+    },
+    {
+      "capability": "ApexPainter.toOutput",
+      "sourceRoute": "full-runtime",
+      "classification": "export-only",
+      "domain": "output",
+      "editorSection": "Export",
+      "controlSchemaId": "studio.visual.controls.output",
+      "projectModelField": "outputs",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.toOutput"
+      },
+      "proofCaseIds": [
+        "output-local"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.use",
+      "sourceRoute": "full-runtime",
+      "classification": "project-operation",
+      "domain": "plugins",
+      "editorSection": "Advanced / Plugins",
+      "controlSchemaId": "studio.visual.controls.plugins",
+      "projectModelField": "operations",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.use"
+      },
+      "proofCaseIds": [
+        "plugins"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-14",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.validateSceneRenderInput",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.validateSceneRenderInput"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.video.creator",
+      "sourceRoute": "introspection",
+      "classification": "not-applicable",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.video.extractAllFrames",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.video.extractAllFrames"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.video.extractFrameAtTime",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.video.extractFrameAtTime"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.video.extractFrameByNumber",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.video.extractFrameByNumber"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.video.extractFrames",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.video.extractFrames"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.video.extractMultipleFrames",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.video.extractMultipleFrames"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.video.getVideoInfo",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.video.getVideoInfo"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.video.operations",
+      "sourceRoute": "introspection",
+      "classification": "not-applicable",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "ApexPainter.video.videoPipeline",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.video.videoPipeline"
+      },
+      "proofCaseIds": [
+        "video-top-level"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "ApexPainter.videoPipeline",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "ApexPainter.videoPipeline"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.addLayer",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.addLayer"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.addLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.addLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.clearBackground",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.clearBackground"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.clearLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.clearLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.insertAfter",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.insertAfter"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.insertBefore",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.insertBefore"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.insertLayer",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.insertLayer"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.insertLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.insertLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.moveLayer",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.moveLayer"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.removeLayer",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.removeLayer"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.render",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.render"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.replaceLayer",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.replaceLayer"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.replaceLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.replaceLayers"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.setBackground",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.setBackground"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "SceneBuilder.toRenderInput",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "scene",
+      "editorSection": "Composition / Scenes",
+      "controlSchemaId": "studio.visual.controls.scene",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "SceneBuilder.toRenderInput"
+      },
+      "proofCaseIds": [
+        "scene-builder"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "TemplateHandle.render",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "template",
+      "editorSection": "Composition / Templates",
+      "controlSchemaId": "studio.visual.controls.template",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "TemplateHandle.render"
+      },
+      "proofCaseIds": [
+        "templates"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "TemplateHandle.toRenderInput",
+      "sourceRoute": "full-runtime",
+      "classification": "visual-operation",
+      "domain": "template",
+      "editorSection": "Composition / Templates",
+      "controlSchemaId": "studio.visual.controls.template",
+      "projectModelField": "document.nodes",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "TemplateHandle.toRenderInput"
+      },
+      "proofCaseIds": [
+        "templates"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-9",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoCreator.createVideo",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoCreator.createVideo"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.advanced.applyLUT",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.advanced.applyLUT"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.advanced.detectScenes",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.advanced.detectScenes"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.advanced.exportPreset",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.advanced.exportPreset"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.advanced.freezeFrame",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.advanced.freezeFrame"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.advanced.loop",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.advanced.loop"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.advanced.stabilize",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.advanced.stabilize"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.advanced.transition",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.advanced.transition"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.audio.mix",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.audio.mix"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.codec",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.codec"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.create",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.create"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.describeOperation",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "VideoOperations.frames.createFromFrames",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.frames.createFromFrames"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.frames.extractAll",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.frames.extractAll"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.frames.extractInterval",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.frames.extractInterval"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.frames.extractOne",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.frames.extractOne"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.frames.extractTimes",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.frames.extractTimes"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.frames.preview",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.frames.preview"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.frames.thumbnail",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.frames.thumbnail"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.getInfo",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.getInfo"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.merge.merge",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.merge.merge"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.merge.splitScreen",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.merge.splitScreen"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.overlays.deprecatedAnimatedText",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.overlays.deprecatedAnimatedText"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.overlays.deprecatedText",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.overlays.deprecatedText"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.overlays.pictureInPicture",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.overlays.pictureInPicture"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.overlays.text",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.overlays.text"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.overlays.watermark",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.overlays.watermark"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.structure.replaceSegment",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.structure.replaceSegment"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.adjustVolume",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.adjustVolume"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.colorCorrect",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.colorCorrect"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.compress",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.compress"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.convert",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.convert"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.crop",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.crop"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.effects",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.effects"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.extractAudio",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.extractAudio"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.fade",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.fade"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.mute",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.mute"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.normalizeAudio",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.normalizeAudio"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.removeAudio",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.removeAudio"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.reverse",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.reverse"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.rotate",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.rotate"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.speed",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.speed"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoOperations.transcode.trim",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoOperations.transcode.trim"
+      },
+      "proofCaseIds": [
+        "video-deep-operations"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.audio",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.audio"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.canRedo",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "VideoPipeline.canUndo",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "VideoPipeline.clearLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.clearLayers"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.getLayers",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "VideoPipeline.pushLayer",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.pushLayer"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.redo",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.redo"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.removeLayer",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.removeLayer"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.render",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.render"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.source",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.source"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.splice",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.splice"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.text",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.text"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.toJSON",
+      "sourceRoute": "full-runtime",
+      "classification": "not-applicable",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": null,
+      "projectModelField": null,
+      "previewRuntimeRoute": null,
+      "codegen": null,
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "not-applicable"
+    },
+    {
+      "capability": "VideoPipeline.trim",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.trim"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    },
+    {
+      "capability": "VideoPipeline.undo",
+      "sourceRoute": "full-runtime",
+      "classification": "timeline-operation",
+      "domain": "video",
+      "editorSection": "Timeline / Video",
+      "controlSchemaId": "studio.visual.controls.video",
+      "projectModelField": "timelines",
+      "previewRuntimeRoute": "full-runtime",
+      "codegen": {
+        "strategy": "direct-public-api",
+        "symbol": "VideoPipeline.undo"
+      },
+      "proofCaseIds": [
+        "video-pipeline"
+      ],
+      "phaseOwner": "STUDIO-VISUAL-13",
+      "implementationState": "planned"
+    }
+  ],
+  "summary": {
+    "totalCapabilities": 187,
+    "classifiedCapabilities": 187,
+    "unclassifiedCount": 0,
+    "unclassifiedCapabilities": [],
+    "duplicateCapabilities": [],
+    "byClassification": {
+      "visual-property": 0,
+      "visual-object": 13,
+      "visual-operation": 47,
+      "timeline-operation": 78,
+      "project-operation": 23,
+      "export-only": 6,
+      "hosted-runtime-exclusion": 4,
+      "not-applicable": 16
+    },
+    "byDomain": {
+      "animation": 1,
+      "assets": 16,
+      "audio": 9,
+      "batch-chain": 2,
+      "canvas": 1,
+      "chart": 3,
+      "components": 5,
+      "detect": 4,
+      "gif": 2,
+      "image": 1,
+      "image-utils": 16,
+      "output": 10,
+      "path": 3,
+      "pixels": 5,
+      "plugins": 9,
+      "rendering": 1,
+      "scene": 18,
+      "template": 3,
+      "text": 2,
+      "video": 76
+    },
+    "deterministic": true,
+    "complete": true
+  }
+}
