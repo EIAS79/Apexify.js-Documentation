@@ -117,7 +117,7 @@
     "docs:verify:release": "npm run docs:verify:doc12",
     "studio:visual:capabilities": "tsx scripts/studio/visual/generate-capability-matrix.ts",
     "studio:visual:capabilities:check": "tsx scripts/studio/visual/generate-capability-matrix.ts --check",
-    "studio:visual:test": "tsx --test scripts/studio/declaration-parser.test.ts scripts/studio/visual/visual-contract.test.ts scripts/studio/visual/phase1-shell.test.ts scripts/studio/visual/phase2-model-codegen.test.ts scripts/studio/visual/phase3-editor.test.ts scripts/studio/visual/pre4-shell.test.ts scripts/studio/visual/live-sync.test.ts scripts/studio/visual/phase4-canvas.test.ts scripts/studio/media-proxy-contract.test.ts",
+    "studio:visual:test": "tsx --test scripts/studio/declaration-parser.test.ts scripts/studio/visual/visual-contract.test.ts scripts/studio/visual/phase1-shell.test.ts scripts/studio/visual/phase2-model-codegen.test.ts scripts/studio/visual/phase3-editor.test.ts scripts/studio/visual/pre4-shell.test.ts scripts/studio/visual/live-sync.test.ts scripts/studio/visual/phase4-canvas.test.ts scripts/studio/visual/phase5-images-shapes.test.ts scripts/studio/media-proxy-contract.test.ts",
     "studio:visual:proof": "tsx scripts/studio/visual/codegen-smoke.ts",
     "studio:visual:verify": "npm run studio:completeness:check && npm run studio:visual:capabilities:check && npm run studio:visual:test && npm run studio:visual:proof"
   },
