@@ -516,7 +516,7 @@ export function StudioTopBar(props: TopBarProps) {
         <button
           type="button"
           onClick={() => onAutoRunChange(!autoRun)}
-          className="studio-icon-control inline-flex h-8 w-8 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
           style={{
             background: autoRun
               ? 'color-mix(in srgb, var(--studio-mint) 16%, var(--bg-raised))'
@@ -539,7 +539,7 @@ export function StudioTopBar(props: TopBarProps) {
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
+          className="studio-icon-control inline-flex h-8 w-8 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
           style={{
             color: 'var(--text-secondary)',
           }}
