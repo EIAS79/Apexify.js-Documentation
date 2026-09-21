@@ -854,12 +854,22 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               <button type="button" onClick={() => setZoom((value) => Math.min(140, value + 10))} aria-label="Zoom in">+</button>
             </div>
 
+            <div className="apx-vw-history-controls">
+              <button type="button" onClick={undo} disabled={!editor.canUndo} aria-label="Undo" title="Undo · Ctrl/Cmd+Z">
+                <ArrowUturnLeftIcon className="h-4 w-4" aria-hidden />
+              </button>
+              <button type="button" onClick={redo} disabled={!editor.canRedo} aria-label="Redo" title="Redo · Ctrl/Cmd+Shift+Z">
+                <ArrowUturnRightIcon className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+
             <div className="apx-vw-viewtools">
               <button
                 type="button"
                 data-active={viewportMode === 'pan' ? 'true' : undefined}
                 onClick={() => setViewportMode('pan')}
                 aria-label="Pan viewport"
+                title="Pan viewport"
               >
                 <HandRaisedIcon className="h-4 w-4" aria-hidden />
               </button>
@@ -868,11 +878,22 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
                 data-active={viewportMode === 'select' ? 'true' : undefined}
                 onClick={() => setViewportMode('select')}
                 aria-label="Select mode"
+                title="Select mode"
               >
                 <CursorArrowRaysIcon className="h-4 w-4" aria-hidden />
               </button>
-              <button type="button" aria-label="Fit viewport" onClick={resetViewport}>
+              <button type="button" aria-label="Fit viewport" title="Fit viewport" onClick={resetViewport}>
                 <MagnifyingGlassIcon className="h-4 w-4" aria-hidden />
+              </button>
+              <button
+                type="button"
+                data-active={snapping ? 'true' : undefined}
+                onClick={() => setSnapping((value) => !value)}
+                aria-label="Toggle snapping"
+                title={snapping ? 'Snapping on' : 'Snapping off'}
+                data-visual-snapping
+              >
+                <span className="apx-vw-snap-icon">⌁</span>
               </button>
               <button
                 type="button"
@@ -887,11 +908,13 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
           </div>
 
           <div
+            ref={viewportRef}
             className="apx-vw-viewport"
+            data-visual-viewport
             onPointerDown={(event) => {
               if (viewportMode !== 'pan') return;
               event.currentTarget.setPointerCapture(event.pointerId);
-              dragRef.current = {
+              panDragRef.current = {
                 startX: event.clientX,
                 startY: event.clientY,
                 originX: pan.x,
@@ -899,7 +922,7 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               };
             }}
             onPointerMove={(event) => {
-              const drag = dragRef.current;
+              const drag = panDragRef.current;
               if (!drag || viewportMode !== 'pan') return;
               setPan({
                 x: drag.originX + event.clientX - drag.startX,
@@ -907,10 +930,10 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               });
             }}
             onPointerUp={() => {
-              dragRef.current = null;
+              panDragRef.current = null;
             }}
             onPointerCancel={() => {
-              dragRef.current = null;
+              panDragRef.current = null;
             }}
             onWheel={(event) => {
               if (!event.ctrlKey && !event.metaKey) return;
@@ -919,24 +942,125 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
             }}
           >
             <div
+              ref={artboardRef}
               className="apx-vw-artboard"
               style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom / 100})` }}
               data-viewport-mode={viewportMode}
+              onPointerDown={(event) => {
+                if (viewportMode === 'select' && !(event.target as HTMLElement).closest('[data-visual-node]')) {
+                  editor.select([]);
+                }
+              }}
             >
               <div className="apx-vw-artboard-grid" />
-              <div className="apx-vw-empty-canvas">
-                <span className="apx-vw-empty-logo">A</span>
-                <span className="apx-vw-kicker">Apexify Studio</span>
-                <h2>Visual workspace ready</h2>
-                <p>
-                  Visual Project v1 is now the semantic source of truth. Authoring tools attach to this model in the next phases.
-                </p>
-                <div className="apx-vw-empty-pills">
-                  <span>{project.document.width} × {project.document.height}</span>
-                  <span>Real Apexify runtime</span>
-                  <span>Preview → Code</span>
+
+              {snapGuides.map((guide, index) => (
+                <div
+                  key={`${guide.axis}-${guide.value}-${index}`}
+                  className={`apx-vw-snap-guide apx-vw-snap-guide--${guide.axis}`}
+                  data-source={guide.source}
+                  style={
+                    guide.axis === 'x'
+                      ? { left: `${(guide.value / project.document.width) * 100}%` }
+                      : { top: `${(guide.value / project.document.height) * 100}%` }
+                  }
+                />
+              ))}
+
+              {project.document.rootNodeIds.map((nodeId) => {
+                const node = project.document.nodes[nodeId];
+                if (!node) return null;
+                const transform = resolvedTransform(node.transform);
+                if (!transform.visible) return null;
+                const selected = selection.includes(nodeId);
+                return (
+                  <div
+                    key={nodeId}
+                    className="apx-vw-editor-node"
+                    data-visual-node={nodeId}
+                    data-selected={selected ? 'true' : undefined}
+                    data-locked={transform.locked ? 'true' : undefined}
+                    style={{
+                      left: `${(transform.x / project.document.width) * 100}%`,
+                      top: `${(transform.y / project.document.height) * 100}%`,
+                      width: `${(transform.width / project.document.width) * 100}%`,
+                      height: `${(transform.height / project.document.height) * 100}%`,
+                      opacity: transform.opacity,
+                      zIndex: transform.zIndex + 2,
+                      transform: `rotate(${transform.rotation}deg)`,
+                    }}
+                    onPointerDown={(event) => beginNodeMove(event, nodeId)}
+                    onPointerMove={moveNodePointer}
+                    onPointerUp={finishNodeMove}
+                    onPointerCancel={() => {
+                      nodeDragRef.current = null;
+                      setSnapGuides([]);
+                      editor.cancelInteraction();
+                    }}
+                  >
+                    <div className="apx-vw-editor-node__content">
+                      <span>{node.name ?? node.kind}</span>
+                      <small>{Math.round(transform.width)} × {Math.round(transform.height)}</small>
+                      {transform.locked ? <LockClosedIcon className="h-4 w-4" aria-hidden /> : null}
+                    </div>
+
+                    {selected && selection.length === 1 && !transform.locked ? (
+                      <>
+                        {(['nw', 'ne', 'se', 'sw'] as const).map((handle) => (
+                          <button
+                            key={handle}
+                            type="button"
+                            className={`apx-vw-resize-handle apx-vw-resize-handle--${handle}`}
+                            aria-label={`Resize ${handle}`}
+                            onPointerDown={(event) => beginResize(event, nodeId, handle)}
+                            onPointerMove={resizePointer}
+                            onPointerUp={finishResize}
+                            onPointerCancel={() => {
+                              resizeRef.current = null;
+                              editor.cancelInteraction();
+                            }}
+                          />
+                        ))}
+                        <button
+                          type="button"
+                          className="apx-vw-rotate-handle"
+                          aria-label="Rotate layer"
+                          title="Rotate layer"
+                          onPointerDown={(event) => beginRotate(event, nodeId)}
+                          onPointerMove={rotatePointer}
+                          onPointerUp={finishRotate}
+                          onPointerCancel={() => {
+                            rotateRef.current = null;
+                            editor.cancelInteraction();
+                          }}
+                        >
+                          ↻
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
+                );
+              })}
+
+              {!project.document.rootNodeIds.length ? (
+                <div className="apx-vw-empty-canvas">
+                  <span className="apx-vw-empty-logo">A</span>
+                  <span className="apx-vw-kicker">Apexify Studio</span>
+                  <h2>Editor core ready</h2>
+                  <p>
+                    Add generic layers to exercise selection, drag, resize, rotation, snapping, history and keyboard editing before domain-specific tools arrive.
+                  </p>
+                  <button type="button" className="apx-vw-empty-add" onClick={addPlaceholder}>
+                    <PlusIcon className="h-4 w-4" aria-hidden />
+                    Add first layer
+                  </button>
+                  <div className="apx-vw-empty-pills">
+                    <span>{project.document.width} × {project.document.height}</span>
+                    <span>Undo / redo</span>
+                    <span>Grid + object snapping</span>
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </div>
         </main>
