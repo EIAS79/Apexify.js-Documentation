@@ -65,6 +65,15 @@ export type ImageReverseSyncPolicy =
   | 'stable-source'
   | 'generated-buffer';
 
+export type ImageRuntimePropertyKey =
+  | keyof Omit<VisualImageNodeProps, 'createOptions'>
+  | 'x'
+  | 'y'
+  | 'width'
+  | 'height'
+  | 'rotation'
+  | 'opacity';
+
 export const IMAGE_AUTHORING_CLASSIFICATION = {
   source: { surface: 'Data', reverse: 'stable-source' },
   x: { surface: 'Transform', reverse: 'canonical-literal' },
@@ -93,7 +102,7 @@ export const IMAGE_AUTHORING_CLASSIFICATION = {
   stroke: { surface: 'Style', reverse: 'canonical-literal' },
   boxBackground: { surface: 'Style', reverse: 'canonical-literal' },
 } as const satisfies Record<
-  keyof Omit<VisualImageNodeProps, 'createOptions'>,
+  ImageRuntimePropertyKey,
   { surface: ImageAuthoringSurface; reverse: ImageReverseSyncPolicy }
 >;
 
