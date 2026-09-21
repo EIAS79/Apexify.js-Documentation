@@ -46,10 +46,10 @@ export default function StudioShell() {
   return (
     <StudioSharedSessionProvider>
     <div
-      className="apx-studio-shell flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden"
+      className="apx-studio-shell apx-studio-night flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden"
       data-studio-shell
       data-studio-mode={mode}
-      style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}
+      style={{ background: '#0d1118', color: '#eef2f6' }}
     >
       <section
         className="min-h-0 flex-1"
