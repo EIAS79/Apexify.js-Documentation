@@ -54,7 +54,7 @@ import {
 
 type Toast = { kind: 'info' | 'success' | 'warning'; text: string } | null;
 
-export default function CodeStudio() {
+export default function CodeStudio({ embedded = false }: { embedded?: boolean }) {
   const [hydrated, setHydrated] = useState(false);
   const [buffers, setBuffers] = useState<StudioBuffer[]>([]);
   const [activeBufferId, setActiveBufferId] = useState<string>('');
@@ -907,7 +907,7 @@ export default function CodeStudio() {
 
   return (
     <div
-      className="apx-studio-root relative flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden overscroll-none"
+      className={`apx-studio-root relative flex min-h-0 flex-col overflow-hidden overscroll-none ${embedded ? 'h-full max-h-full' : 'h-dvh max-h-dvh'}`}
       data-execution-target={executionTarget}
       data-node-runner={runnerEnabled ? 'enabled' : 'disabled'}
       style={{ backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)' }}
