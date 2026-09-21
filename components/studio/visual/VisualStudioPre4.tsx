@@ -290,6 +290,7 @@ export default function VisualStudioPre4({
   const pinch = useRef<{ distance: number; zoom: number } | null>(null);
   const didInitialFit = useRef(false);
   const webRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
+  const artboardRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
   const codeSaveTimerRef = useRef<number>(0);
   const codeAppliedSignatureRef = useRef('');
   const codeHydratedRef = useRef(false);
@@ -445,8 +446,44 @@ export default function VisualStudioPre4({
       window.clearTimeout(codeSaveTimerRef.current);
       webRuntimeRef.current?.dispose();
       webRuntimeRef.current = null;
+      artboardRuntimeRef.current?.dispose();
+      artboardRuntimeRef.current = null;
+      window.clearTimeout(artboardPreviewTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    window.clearTimeout(artboardPreviewTimerRef.current);
+    if (!active || !generated.value) return;
+
+    let cancelled = false;
+    artboardPreviewTimerRef.current = window.setTimeout(() => {
+      void (async () => {
+        setArtboardPreviewBusy(true);
+        try {
+          const runtime =
+            artboardRuntimeRef.current ??
+            (artboardRuntimeRef.current = createApexifyWebRuntime());
+          await runtime.registerFonts(assets);
+          const result = await runtime.renderStudioSource(
+            generated.value!.source,
+            assets,
+          );
+          if (cancelled) return;
+          if (result.ok) setArtboardPreviewUrl(result.dataUrl);
+        } catch {
+          // Keep the last authoritative frame while the next valid frame is built.
+        } finally {
+          if (!cancelled) setArtboardPreviewBusy(false);
+        }
+      })();
+    }, 180);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(artboardPreviewTimerRef.current);
+    };
+  }, [active, assets, generated.value?.source]);
 
   const mutate = (
     label: string,
