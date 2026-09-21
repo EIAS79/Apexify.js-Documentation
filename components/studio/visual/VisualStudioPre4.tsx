@@ -1819,13 +1819,143 @@ export default function VisualStudioPre4({
   const mediaContextActive =
     activeTool === 'images' ||
     activeTool === 'shapes' ||
+    activeTool === 'text' ||
     activeTool === 'assets';
 
   const imageAssets = assets.filter((asset) =>
     asset.mime.startsWith('image/'),
   );
+  const fontAssets = assets.filter(isStudioFontAsset);
+  const systemFontFamilies = [
+    'Arial',
+    'Helvetica',
+    'Georgia',
+    'Times New Roman',
+    'Courier New',
+    'Verdana',
+    'Trebuchet MS',
+  ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'text') {
+      return (
+        <div className="apx-media-context" data-visual-text-context>
+          <div className="apx-media-context-copy">
+            <strong>Text</strong>
+            <span>Insert editable Apexify text, then style typography, wrapping, effects and curves from the Inspector.</span>
+          </div>
+
+          <button
+            type="button"
+            className="apx-media-open-assets"
+            data-text-insert
+            onClick={() => insertText('Text')}
+          >
+            <DocumentTextIcon />
+            Add text layer
+          </button>
+
+          <div className="apx-media-context-heading">
+            <strong>Font families</strong>
+            <button
+              type="button"
+              onClick={() => {
+                setAssetFilter('font');
+                setDockTab('assets');
+              }}
+            >
+              Fonts
+            </button>
+          </div>
+
+          <div className="apx-text-font-list">
+            {systemFontFamilies.map((family) => (
+              <button
+                type="button"
+                key={family}
+                onClick={() => {
+                  if (!primaryText) {
+                    insertText('Text');
+                    window.setTimeout(() => {
+                      setProject((current) => {
+                        const id = current.editor?.selectedNodeIds?.at(-1);
+                        const node = id ? current.document.nodes[id] : undefined;
+                        if (!node || node.kind !== 'text') return current;
+                        const next = structuredClone(current);
+                        next.document.nodes[node.id].props = textPropsRecord({
+                          ...visualTextProps(next.document.nodes[node.id]),
+                          font: {
+                            ...(visualTextProps(next.document.nodes[node.id]).font ?? {}),
+                            family,
+                            name: family,
+                          },
+                        });
+                        return next;
+                      });
+                    }, 0);
+                    return;
+                  }
+                  mutateText('Font family', (current) => ({
+                    ...current,
+                    font: {
+                      ...(current.font ?? {}),
+                      family,
+                      name: family,
+                      path: undefined,
+                    },
+                  }));
+                }}
+                data-text-font-family={family}
+              >
+                <strong style={{ fontFamily: family }}>{family}</strong>
+                <small>System font</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Uploaded fonts</strong>
+            <button
+              type="button"
+              onClick={() => {
+                setAssetFilter('font');
+                setDockTab('assets');
+              }}
+            >
+              Upload
+            </button>
+          </div>
+          <div className="apx-text-font-list">
+            {fontAssets.length ? fontAssets.map((asset) => {
+              const family = studioAssetFontFamily(asset);
+              return (
+                <button
+                  type="button"
+                  key={asset.id}
+                  onClick={() => applyFontAsset(asset)}
+                  data-font-asset-apply={asset.id}
+                >
+                  <strong style={{ fontFamily: family }}>{family}</strong>
+                  <small>{asset.name}</small>
+                </button>
+              );
+            }) : (
+              <div className="apx-media-context-empty">
+                <DocumentTextIcon />
+                <strong>No uploaded fonts yet</strong>
+                <span>Open Fonts in Assets to add TTF, OTF, WOFF or WOFF2 files.</span>
+              </div>
+            )}
+          </div>
+
+          <div className="apx-live-sync-note">
+            <strong>Direct editing</strong>
+            <span>Double-click a text layer on the canvas to edit its content in place.</span>
+          </div>
+        </div>
+      );
+    }
+
     if (activeTool === 'shapes') {
       return (
         <div className="apx-media-context" data-visual-shapes-context>
