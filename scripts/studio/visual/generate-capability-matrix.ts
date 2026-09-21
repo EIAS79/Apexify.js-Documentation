@@ -300,19 +300,6 @@ const unclassifiedOptions = classifiedOptions.filter(
   (option) => !VISUAL_CAPABILITY_CLASSIFICATIONS.includes(option.classification),
 );
 
-const optionClassificationDigest = sha256(
-  JSON.stringify(
-    classifiedOptions
-      .map((option) => ({
-        id: option.id,
-        classification: option.classification,
-        domain: option.domain,
-        phaseOwner: option.phaseOwner,
-      }))
-      .sort((a, b) => a.id.localeCompare(b.id)),
-  ),
-);
-
 const duplicateCapabilities = rows
   .map((row) => row.capability)
   .filter((value, index, all) => all.indexOf(value) !== index)
@@ -333,6 +320,21 @@ const domains = [...new Set(rows.map((row) => row.domain))].sort((a, b) => a.loc
 const byDomain = Object.fromEntries(
   domains.map((domain) => [domain, rows.filter((row) => row.domain === domain).length]),
 );
+
+const optionCoverage = {
+  sourceArtifact: 'generated/docs-doc4/option-inventory.json',
+  sourceSchemaVersion: optionInventory.schemaVersion,
+  sourceSha256: optionInventorySha256,
+  indexedSha256: indexedOptionInventory.sha256,
+  sourceInventoryCurrent: optionInventoryCurrent,
+  totalOptionPaths: optionInventory.options.length,
+  classifiedOptionPaths: classifiedOptions.length - unclassifiedOptions.length,
+  unclassifiedOptionPaths: unclassifiedOptions.length,
+  complete:
+    optionInventoryCurrent &&
+    optionInventory.total === optionInventory.options.length &&
+    unclassifiedOptions.length === 0,
+};
 
 const artifact = {
   schemaVersion: 1,
@@ -359,6 +361,7 @@ const artifact = {
       unclassifiedCapabilities.length === 0 &&
       duplicateCapabilities.length === 0,
   },
+  optionCoverage,
 };
 
 if (!artifact.summary.complete || !artifact.optionCoverage.complete) {
