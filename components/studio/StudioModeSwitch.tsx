@@ -28,9 +28,12 @@ export function StudioModeSwitch({
         aria-pressed={mode === 'code'}
         data-active={mode === 'code' ? 'true' : undefined}
         onClick={() => onChange('code')}
+        aria-label="Code mode"
+        title="Code"
+        data-tooltip="Code"
       >
         <CodeBracketIcon className="h-4 w-4" aria-hidden />
-        <span>Code</span>
+        <span className="sr-only">Code</span>
       </button>
       <button
         type="button"
@@ -38,9 +41,12 @@ export function StudioModeSwitch({
         aria-pressed={mode === 'visual'}
         data-active={mode === 'visual' ? 'true' : undefined}
         onClick={() => onChange('visual')}
+        aria-label="Visual mode"
+        title="Visual"
+        data-tooltip="Visual"
       >
         <PaintBrushIcon className="h-4 w-4" aria-hidden />
-        <span>Visual</span>
+        <span className="sr-only">Visual</span>
       </button>
     </div>
   );
