@@ -321,6 +321,10 @@ export default function VisualStudioPre4({
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
   const primaryText = primary?.kind === 'text' ? primary : undefined;
+  const textMetrics = useMemo(
+    () => (primaryText ? measureVisualTextInBrowser(visualTextProps(primaryText)) : null),
+    [primaryText?.props, assets],
+  );
   const layerIds = useMemo(() => flattenLayerIds(project), [project]);
   const drawableIds = useMemo(
     () =>
@@ -802,6 +806,146 @@ export default function VisualStudioPre4({
     );
     setImageConfigError(null);
   }, [primaryMedia?.id, primaryMedia?.props]);
+
+  const updateTextDraft = (
+    updater: (props: VisualTextNodeProps) => VisualTextNodeProps,
+  ) => {
+    if (!primaryText) return;
+    setProject((current) => {
+      const node = current.document.nodes[primaryText.id];
+      if (!node || node.kind !== 'text') return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryText.id];
+      nextNode.props = textPropsRecord(updater(visualTextProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const mutateText = (
+    label: string,
+    updater: (props: VisualTextNodeProps) => VisualTextNodeProps,
+  ) => {
+    if (!primaryText) return;
+    mutate(label, (current) => {
+      const node = current.document.nodes[primaryText.id];
+      if (!node || node.kind !== 'text') return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryText.id];
+      nextNode.props = textPropsRecord(updater(visualTextProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const insertText = (
+    value = 'Text',
+    point?: Point,
+    fontAsset?: StudioVirtualAsset,
+  ) => {
+    mutate('Add text', (current) => {
+      const next = structuredClone(current);
+      const props = defaultTextNodeProps(value);
+      if (fontAsset && isStudioFontAsset(fontAsset)) {
+        const family = studioAssetFontFamily(fontAsset);
+        props.font = {
+          ...(props.font ?? {}),
+          family,
+          name: family,
+          path: studioAssetReference(fontAsset),
+        };
+      }
+      const node = createVisualNode(
+        'text',
+        textPropsRecord(props),
+        { name: value.length > 24 ? value.slice(0, 24) + '…' : value },
+      );
+      const width = props.layout?.maxWidth ?? 360;
+      const fontSize = props.font?.size ?? 48;
+      const height = Math.max(64, fontSize * (props.layout?.lineHeight ?? 1.2) * 2);
+      node.transform = {
+        x: point?.x ?? Math.max(32, (next.document.width - width) / 2),
+        y: point?.y ?? Math.max(32, (next.document.height - height) / 2),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setActiveTool('text');
+    setInspectorTab('style');
+    setMessage('Text added');
+  };
+
+  const applyFontAsset = (asset: StudioVirtualAsset) => {
+    if (!isStudioFontAsset(asset)) {
+      setMessage(asset.name + ' is not a font asset');
+      return;
+    }
+    const family = studioAssetFontFamily(asset);
+    if (!primaryText) {
+      insertText('Text', undefined, asset);
+      return;
+    }
+    mutateText('Apply font asset', (current) => ({
+      ...current,
+      font: {
+        ...(current.font ?? {}),
+        family,
+        name: family,
+        path: studioAssetReference(asset),
+      },
+    }));
+    setAssetFilter('font');
+    setMessage('Applied font ' + family);
+  };
+
+  useEffect(() => {
+    if (!primaryText) {
+      setTextConfigDraft('{}');
+      setTextConfigError(null);
+      return;
+    }
+    setTextConfigDraft(
+      JSON.stringify(visualTextProps(primaryText), null, 2),
+    );
+    setTextConfigError(null);
+  }, [primaryText?.id, primaryText?.props]);
+
+  const beginInlineTextEdit = (node: VisualNode) => {
+    if (node.kind !== 'text') return;
+    propertyBefore.current = structuredClone(project);
+    setInlineTextEditId(node.id);
+  };
+
+  const updateInlineText = (id: string, value: string) => {
+    setProject((current) => {
+      const node = current.document.nodes[id];
+      if (!node || node.kind !== 'text') return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[id];
+      nextNode.props = textPropsRecord({
+        ...visualTextProps(nextNode),
+        text: value,
+      });
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const finishInlineTextEdit = () => {
+    if (!inlineTextEditId) return;
+    endPropertyEdit('Edit text');
+    setInlineTextEditId(null);
+  };
 
   const addPlaceholder = () =>
     mutate('Add placeholder', (current) => {
