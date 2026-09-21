@@ -3210,7 +3210,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | PRE-4 | Studio product shell rebuild | MAIN MERGED | `b530d0a8f18290ac3f9081744153c9aae58a9dfe` | Studio Visual push gate `35632663379` PASS; PR gate `35632667933` PASS; build/browser/screenshot proof PASS; production deployment deferred because Vercel quota is rate-limited |
 | 4 | Canvas | MAIN MERGED | `7c33de0eae60a6ed7a12fb41b942610eaf702498` | PR #83; exact-head Studio Visual gate `35654406532` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because Vercel quota is rate-limited |
 | 5 | Images / shapes / assets | MAIN MERGED | `b3aa8683345f48687cddc4e54077bdfd3f13226d` | PR #84; exact-head Studio Visual gate `35657277254` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because no exact merge deployment is available yet |
-| 6 | Text / fonts | MAIN MERGED | `123d0bea6a324acb1a715d45d0f2faa70a500b05` | PR #85; exact-head Studio Visual gate `35662040413` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; Apexify Web text renderer merged as `fb48f08ed8fc3d48628d8a93b15fe5d94b69bfbb`; production verification deferred while Vercel quota is unavailable |
+| 6 | Text / fonts | MAIN MERGED | `123d0bea6a324acb1a715d45d0f2faa70a500b05` | PR #85; exact-head Studio Visual gate `35662040413` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; Apexify Web text renderer merged as `fb48f08ed8fc3d48628d8a93b15fe5d94b69bfbb`; production verification deferred because no exact Phase-6 main production deployment is available; branch preview `dpl_9vzrordcDAz2wVM7a3no3R872SDq` was intentionally canceled by the Vercel ignored-build-step policy |
 | 7 | Paths / doodle / pixels / detect | NOT STARTED | — | NEXT — activate Paths and implement path/doodle/pixel/detection authoring against the permanent shell |
 | 8 | Charts | NOT STARTED | — | — |
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
@@ -3475,7 +3475,7 @@ canonical literal createCanvas() edit
 → Visual Canvas mutation
 ```
 
-Production verification remains deferred until Vercel usage is available again.
+Production verification remains deferred until an exact Phase-6 main production deployment is available.
 
 ---
 
@@ -3562,7 +3562,7 @@ Production verification remains deferred until an exact Phase 5 main deployment 
 >
 > **Apexify.js runtime integration:** PR #33 merged as `fb48f08ed8fc3d48628d8a93b15fe5d94b69bfbb`
 >
-> **Production deployment:** DEFERRED — Vercel production verification is intentionally not claimed while deployment quota is unavailable.
+> **Production deployment:** DEFERRED — no exact Phase-6 main production deployment is available. The latest Phase-6 branch deployment observed (`dpl_9vzrordcDAz2wVM7a3no3R872SDq`) was intentionally canceled by the Vercel ignored-build-step policy, so it is not production evidence.
 
 Completed Phase-6 scope:
 
