@@ -47,6 +47,9 @@ jobs:
       - name: Install dependencies without runtime-heavy postinstall
         run: npm ci --ignore-scripts
 
+      - name: Install pinned browser runtime snapshot
+        run: node scripts/studio/install-apexify-web.mjs
+
       - name: Generate DOC-4 option inventory
         run: npm run docs:generate:doc4
 
