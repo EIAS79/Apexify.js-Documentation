@@ -307,7 +307,15 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
   };
 
   const resetViewport = () => {
-    setZoom(78);
+    const viewport = viewportRef.current;
+    const artboard = artboardRef.current;
+    if (viewport && artboard) {
+      const horizontal = (viewport.clientWidth - 64) / Math.max(1, artboard.offsetWidth);
+      const vertical = (viewport.clientHeight - 64) / Math.max(1, artboard.offsetHeight);
+      setZoom(Math.round(Math.min(1.4, Math.max(0.4, Math.min(horizontal, vertical))) * 100));
+    } else {
+      setZoom(78);
+    }
     setPan({ x: 0, y: 0 });
   };
 
@@ -322,7 +330,7 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
         panY: pan.y,
       },
     };
-    setProject(next);
+    editor.replaceProject(next);
     setProjectError(null);
     downloadVisualProject(next);
   };
@@ -330,7 +338,7 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
   const loadProject = async (file: File) => {
     try {
       const loaded = await loadVisualProjectFile(file);
-      setProject(loaded);
+      editor.replaceProject(loaded, true);
       setZoom(Math.round((loaded.editor?.zoom ?? 0.78) * 100));
       setPan({
         x: loaded.editor?.panX ?? 0,
@@ -359,6 +367,250 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
     });
     onModeChange('code');
   };
+
+  const commitProject = (label: string, updater: (current: VisualProject) => VisualProject) => {
+    editor.commit(label, updater);
+    setProjectError(null);
+  };
+
+  const commitTransform = (nodeId: string, patch: Partial<VisualTransform>, label = 'Transform layer') => {
+    commitProject(label, (current) => updateNodeTransform(current, nodeId, patch));
+  };
+
+  const addPlaceholder = () => {
+    commitProject('Add layer', (current) => addEditorPlaceholder(current));
+    setTool('layers');
+    setInspectorTab('Transform');
+  };
+
+  const selectLayer = (nodeId: string, additive = false) => {
+    const current = selectedNodeIds(projectRef.current);
+    if (!additive) {
+      editor.select([nodeId]);
+      return;
+    }
+    editor.select(current.includes(nodeId) ? current.filter((id) => id !== nodeId) : [...current, nodeId]);
+  };
+
+  const undo = () => {
+    const label = editor.undo();
+    if (label) {
+      setSnapGuides([]);
+      setProjectError(null);
+    }
+  };
+
+  const redo = () => {
+    const label = editor.redo();
+    if (label) {
+      setSnapGuides([]);
+      setProjectError(null);
+    }
+  };
+
+  const pointerToDocumentDelta = (dx: number, dy: number) => {
+    const artboard = artboardRef.current;
+    if (!artboard) return { dx: 0, dy: 0 };
+    const rect = artboard.getBoundingClientRect();
+    return {
+      dx: dx * (projectRef.current.document.width / Math.max(1, rect.width)),
+      dy: dy * (projectRef.current.document.height / Math.max(1, rect.height)),
+    };
+  };
+
+  const beginNodeMove = (event: React.PointerEvent<HTMLElement>, nodeId: string) => {
+    if (viewportMode !== 'select') return;
+    event.stopPropagation();
+    const current = projectRef.current;
+    const node = current.document.nodes[nodeId];
+    if (!node || resolvedTransform(node.transform).locked) {
+      selectLayer(nodeId, event.metaKey || event.ctrlKey || event.shiftKey);
+      return;
+    }
+
+    const additive = event.metaKey || event.ctrlKey || event.shiftKey;
+    if (!selectedNodeIds(current).includes(nodeId)) selectLayer(nodeId, additive);
+    const before = editor.beginInteraction('Move layer');
+    nodeDragRef.current = {
+      nodeId,
+      startX: event.clientX,
+      startY: event.clientY,
+      before,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const moveNodePointer = (event: React.PointerEvent<HTMLElement>) => {
+    const drag = nodeDragRef.current;
+    if (!drag) return;
+    const delta = pointerToDocumentDelta(event.clientX - drag.startX, event.clientY - drag.startY);
+    const original = resolvedTransform(drag.before.document.nodes[drag.nodeId]?.transform);
+    const candidate = {
+      ...original,
+      x: original.x + delta.dx,
+      y: original.y + delta.dy,
+    };
+    const snapped = snapNodeTransform(drag.before, drag.nodeId, candidate, { enabled: snapping });
+    const snappedTransform = resolvedTransform(snapped.transform);
+    const next = moveSelectedNodes(
+      drag.before,
+      snappedTransform.x - original.x,
+      snappedTransform.y - original.y,
+    );
+    setSnapGuides(snapped.guides);
+    editor.updateInteraction(next);
+  };
+
+  const finishNodeMove = () => {
+    if (!nodeDragRef.current) return;
+    nodeDragRef.current = null;
+    setSnapGuides([]);
+    editor.finishInteraction();
+  };
+
+  const beginResize = (
+    event: React.PointerEvent<HTMLButtonElement>,
+    nodeId: string,
+    handle: 'nw' | 'ne' | 'se' | 'sw',
+  ) => {
+    event.stopPropagation();
+    const node = projectRef.current.document.nodes[nodeId];
+    if (!node || resolvedTransform(node.transform).locked) return;
+    resizeRef.current = {
+      nodeId,
+      handle,
+      startX: event.clientX,
+      startY: event.clientY,
+      before: editor.beginInteraction('Resize layer'),
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const resizePointer = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const drag = resizeRef.current;
+    if (!drag) return;
+    const delta = pointerToDocumentDelta(event.clientX - drag.startX, event.clientY - drag.startY);
+    const original = resolvedTransform(drag.before.document.nodes[drag.nodeId]?.transform);
+    let x = original.x;
+    let y = original.y;
+    let width = original.width;
+    let height = original.height;
+
+    if (drag.handle.includes('e')) width = Math.max(8, original.width + delta.dx);
+    if (drag.handle.includes('s')) height = Math.max(8, original.height + delta.dy);
+    if (drag.handle.includes('w')) {
+      width = Math.max(8, original.width - delta.dx);
+      x = original.x + (original.width - width);
+    }
+    if (drag.handle.includes('n')) {
+      height = Math.max(8, original.height - delta.dy);
+      y = original.y + (original.height - height);
+    }
+
+    const grid = snapping ? 8 : 1;
+    width = Math.round(width / grid) * grid;
+    height = Math.round(height / grid) * grid;
+    x = Math.round(x / grid) * grid;
+    y = Math.round(y / grid) * grid;
+
+    editor.updateInteraction(updateNodeTransform(drag.before, drag.nodeId, { x, y, width, height }));
+  };
+
+  const finishResize = () => {
+    if (!resizeRef.current) return;
+    resizeRef.current = null;
+    editor.finishInteraction();
+  };
+
+  const beginRotate = (event: React.PointerEvent<HTMLButtonElement>, nodeId: string) => {
+    event.stopPropagation();
+    const nodeElement = event.currentTarget.closest('[data-visual-node]') as HTMLElement | null;
+    const node = projectRef.current.document.nodes[nodeId];
+    if (!nodeElement || !node || resolvedTransform(node.transform).locked) return;
+    const rect = nodeElement.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const pointerAngle = Math.atan2(event.clientY - centerY, event.clientX - centerX) * 180 / Math.PI;
+    rotateRef.current = {
+      nodeId,
+      centerX,
+      centerY,
+      offset: resolvedTransform(node.transform).rotation - pointerAngle,
+      before: editor.beginInteraction('Rotate layer'),
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const rotatePointer = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const drag = rotateRef.current;
+    if (!drag) return;
+    const angle = Math.atan2(event.clientY - drag.centerY, event.clientX - drag.centerX) * 180 / Math.PI;
+    const rotation = snapRotation(angle + drag.offset, snapping);
+    editor.updateInteraction(updateNodeTransform(drag.before, drag.nodeId, { rotation }));
+  };
+
+  const finishRotate = () => {
+    if (!rotateRef.current) return;
+    rotateRef.current = null;
+    editor.finishInteraction();
+  };
+
+  useEffect(() => {
+    if (!active) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.tagName === 'SELECT' ||
+        target?.isContentEditable
+      ) return;
+
+      const command = event.metaKey || event.ctrlKey;
+      if (command && event.key.toLowerCase() === 'z') {
+        event.preventDefault();
+        if (event.shiftKey) redo();
+        else undo();
+        return;
+      }
+      if (command && event.key.toLowerCase() === 'y') {
+        event.preventDefault();
+        redo();
+        return;
+      }
+      if (command && event.key.toLowerCase() === 'd') {
+        event.preventDefault();
+        commitProject('Duplicate layer', duplicateSelectedNodes);
+        return;
+      }
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        if (!selectedNodeIds(projectRef.current).length) return;
+        event.preventDefault();
+        commitProject('Delete layer', deleteSelectedNodes);
+        return;
+      }
+      if (event.key === 'Escape') {
+        editor.select([]);
+        return;
+      }
+
+      const amount = event.shiftKey ? 10 : 1;
+      const movement: Record<string, [number, number]> = {
+        ArrowLeft: [-amount, 0],
+        ArrowRight: [amount, 0],
+        ArrowUp: [0, -amount],
+        ArrowDown: [0, amount],
+      };
+      const delta = movement[event.key];
+      if (delta && selectedNodeIds(projectRef.current).length) {
+        event.preventDefault();
+        commitProject('Nudge layer', (current) => moveSelectedNodes(current, delta[0], delta[1]));
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [active, editor, snapping]);
 
   return (
     <div
