@@ -613,7 +613,7 @@ function executeDeno(
         ? [
             '--cpu=55',
             '--nofile=128',
-            '--nproc=32',
+            // Deno/V8 plus native Canvas/Sharp/FFmpeg can create dozens of worker threads.\n            // Keep a hard process/thread ceiling without starving runtime startup.\n            '--nproc=256',
             '--as=2147483648',
             '--',
             deno,
