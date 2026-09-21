@@ -204,6 +204,7 @@ export type VisualShapeType =
 
 export type VisualImageSource =
   | string
+  | VisualReference
   | { $generated: string };
 
 export interface VisualShapeProperties {
