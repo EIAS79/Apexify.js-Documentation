@@ -29,10 +29,11 @@ test('phase 1 Visual Studio remains an empty workspace with shared shell surface
   assert.match(visual, /data-studio-visual-workspace/);
   assert.match(visual, /useStudioSharedSession/);
   assert.match(visual, /Shared Studio assets/);
-  assert.match(visual, /title="Output"/);
-  assert.match(visual, /title="Diagnostics"/);
-  assert.match(visual, /title="History"/);
-  assert.match(visual, /Drawing, selection and editing are intentionally not implemented/);
+  assert.match(visual, /Generated Code/);
+  assert.match(visual, /Diagnostics/);
+  assert.match(visual, /History/);
+  assert.match(visual, /No visual layers yet/);
+  assert.match(visual, /authoring controls activate in their owning phase/);
   assert.doesNotMatch(visual, /createCanvas\(|createImage\(|createText\(|createChart\(/);
 });
 
