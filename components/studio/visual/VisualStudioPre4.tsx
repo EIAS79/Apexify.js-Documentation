@@ -321,10 +321,29 @@ export default function VisualStudioPre4({
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
   const primaryText = primary?.kind === 'text' ? primary : undefined;
-  const textMetrics = useMemo(
-    () => (primaryText ? measureVisualTextInBrowser(visualTextProps(primaryText)) : null),
-    [primaryText?.props, assets],
-  );
+  const textMetrics = useMemo(() => {
+    if (!primaryText) return null;
+    const props = visualTextProps(primaryText);
+    return measureVisualTextInBrowser({
+      ...props,
+      layout: {
+        ...(props.layout ?? {}),
+        ...(primaryText.transform?.width !== undefined
+          ? { maxWidth: primaryText.transform.width * (primaryText.transform.scaleX ?? 1) }
+          : {}),
+        ...(primaryText.transform?.height !== undefined
+          ? { maxHeight: primaryText.transform.height * (primaryText.transform.scaleY ?? 1) }
+          : {}),
+      },
+    });
+  }, [
+    primaryText?.props,
+    primaryText?.transform?.width,
+    primaryText?.transform?.height,
+    primaryText?.transform?.scaleX,
+    primaryText?.transform?.scaleY,
+    assets,
+  ]);
   const layerIds = useMemo(() => flattenLayerIds(project), [project]);
   const drawableIds = useMemo(
     () =>
@@ -842,6 +861,7 @@ export default function VisualStudioPre4({
     value = 'Text',
     point?: Point,
     fontAsset?: StudioVirtualAsset,
+    fontFamily?: string,
   ) => {
     mutate('Add text', (current) => {
       const next = structuredClone(current);
@@ -853,6 +873,12 @@ export default function VisualStudioPre4({
           family,
           name: family,
           path: studioAssetReference(fontAsset),
+        };
+      } else if (fontFamily) {
+        props.font = {
+          ...(props.font ?? {}),
+          family: fontFamily,
+          name: fontFamily,
         };
       }
       const node = createVisualNode(
@@ -1875,24 +1901,7 @@ export default function VisualStudioPre4({
                 key={family}
                 onClick={() => {
                   if (!primaryText) {
-                    insertText('Text');
-                    window.setTimeout(() => {
-                      setProject((current) => {
-                        const id = current.editor?.selectedNodeIds?.at(-1);
-                        const node = id ? current.document.nodes[id] : undefined;
-                        if (!node || node.kind !== 'text') return current;
-                        const next = structuredClone(current);
-                        next.document.nodes[node.id].props = textPropsRecord({
-                          ...visualTextProps(next.document.nodes[node.id]),
-                          font: {
-                            ...(visualTextProps(next.document.nodes[node.id]).font ?? {}),
-                            family,
-                            name: family,
-                          },
-                        });
-                        return next;
-                      });
-                    }, 0);
+                    insertText('Text', undefined, undefined, family);
                     return;
                   }
                   mutateText('Font family', (current) => ({
