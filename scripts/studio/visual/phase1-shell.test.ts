@@ -14,17 +14,20 @@ test('phase 1 mounts a top-level dual-mode shell without replacing Code Studio',
   assert.match(page, /StudioShell/);
   assert.match(shell, /data-studio-mode-tab="code"/);
   assert.match(shell, /data-studio-mode-tab="visual"/);
+  assert.match(shell, /StudioSharedSessionProvider/);
   assert.match(shell, /<CodeStudio embedded/);
   assert.match(shell, /dynamic\(/);
   assert.match(code, /createApexifyWebRuntime/);
   assert.match(code, /planStudioExecution/);
   assert.match(code, /currentNodeServerExecutionAdapter/);
+  assert.match(code, /useStudioSharedSession/);
 });
 
 test('phase 1 Visual Studio remains an empty workspace with shared shell surfaces', () => {
   const visual = read('components/studio/visual/VisualStudio.tsx');
 
   assert.match(visual, /data-studio-visual-workspace/);
+  assert.match(visual, /useStudioSharedSession/);
   assert.match(visual, /Shared Studio assets/);
   assert.match(visual, /title="Output"/);
   assert.match(visual, /title="Diagnostics"/);
