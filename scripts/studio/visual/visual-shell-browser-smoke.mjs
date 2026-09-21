@@ -36,8 +36,12 @@ async function verify(width, height) {
   await page.waitForSelector('[data-studio-visual-workspace]');
 
   const visualText = await page.$eval('[data-studio-visual-workspace]', (node) => node.textContent || '');
-  for (const label of ['Assets', 'Output', 'Diagnostics', 'History', 'Visual workspace ready']) {
+  for (const label of ['Apexify Studio', 'Canvas', 'Layers', 'Style', 'Transform', 'Generated Code', 'Assets', 'Output', 'Diagnostics', 'History', 'Visual workspace ready']) {
     if (!visualText.includes(label)) throw new Error('Visual shell missing ' + label);
+  }
+
+  if (width === 1440) {
+    await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });
   }
 
   const overflow = await page.evaluate(
@@ -51,12 +55,12 @@ async function verify(width, height) {
   const restored = await page.$eval('.cm-content', (node) => node.textContent || '');
   if (restored !== original) throw new Error('Code Studio session changed after mode round trip');
 
-  // Phase 2: generated Visual code must fork into a new Code Studio buffer.
+  // Phase 2+: generated Visual code must fork into a new Code Studio buffer.
+  // PRE-4 exposes Generate Code as a permanent top-bar action at every supported width.
   await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="visual"]');
-  await page.click('.apx-vw-project-menu > summary');
-  await page.waitForSelector('[data-visual-open-generated-code]:not([disabled])', { visible: true });
-  await page.click('[data-visual-open-generated-code]');
+  await page.waitForSelector('[data-visual-generate-code]:not([disabled])', { visible: true });
+  await page.click('[data-visual-generate-code]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="code"]');
 
   await page.waitForFunction(() => {
