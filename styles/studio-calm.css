@@ -2928,6 +2928,12 @@
   cursor:grabbing;
 }
 
+.apx-pre4-artboard-frame{
+  position:relative;
+  flex:0 0 auto;
+  will-change:transform;
+}
+
 .apx-pre4-artboard{
   position:relative;
   flex:0 0 auto;
