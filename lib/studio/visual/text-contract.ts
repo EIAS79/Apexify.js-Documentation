@@ -82,7 +82,7 @@ export function defaultTextNodeProps(text = 'Text'): VisualTextNodeProps {
     },
     placement: {
       textAlign: 'left',
-      textBaseline: 'alphabetic',
+      textBaseline: 'top',
       rotation: 0,
     },
     fill: {
