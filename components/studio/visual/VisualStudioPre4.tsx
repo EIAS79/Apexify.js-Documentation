@@ -61,10 +61,23 @@ import {
   loadVisualProjectFile,
 } from '@/lib/studio/visual/persistence';
 import type {
+  VisualBackgroundLayer,
+  VisualCanvasConfig,
+  VisualGradient,
   VisualNode,
+  VisualPatternOptions,
   VisualProject,
   VisualTransform,
 } from '@/lib/studio/visual/model';
+import {
+  CANVAS_ALIGNMENTS,
+  CANVAS_BLEND_MODES,
+  CANVAS_FITS,
+  CANVAS_PATTERN_TYPES,
+  defaultBackgroundLayer,
+  defaultCanvasGradient,
+  defaultCanvasPattern,
+} from '@/lib/studio/visual/canvas-contract';
 import {
   VisualHistory,
   alignNodes,
@@ -152,6 +165,37 @@ function rectsIntersect(a: SelectionRect, b: SelectionRect) {
 
 function distance(a: { clientX: number; clientY: number }, b: { clientX: number; clientY: number }) {
   return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+}
+
+function canvasBaseMode(canvas: VisualCanvasConfig): 'default' | 'color' | 'gradient' | 'image' | 'transparent' {
+  if (canvas.customBg) return 'image';
+  if (canvas.gradientBg) return 'gradient';
+  if (canvas.colorBg !== undefined) return 'color';
+  if (canvas.transparentBase) return 'transparent';
+  return 'default';
+}
+
+function canvasArtboardBackground(canvas: VisualCanvasConfig): string {
+  if (canvas.transparentBase) return 'transparent';
+  if (canvas.colorBg !== undefined) return canvas.colorBg || '#000000';
+  const gradient = canvas.gradientBg;
+  if (gradient?.colors?.length) {
+    const stops = gradient.colors
+      .map((item) => item.color + ' ' + Math.round(item.stop * 100) + '%')
+      .join(', ');
+    if (gradient.type === 'conic') return 'conic-gradient(from ' + (gradient.startAngle ?? 0) + 'deg, ' + stops + ')';
+    if (gradient.type === 'radial') return 'radial-gradient(circle, ' + stops + ')';
+    return 'linear-gradient(' + (gradient.rotate ?? 90) + 'deg, ' + stops + ')';
+  }
+  return '#000000';
+}
+
+function parseFilterJson(value: string): VisualCanvasConfig['customBg'] extends infer T
+  ? T extends { filters?: infer F } ? F : never
+  : never {
+  const parsed = JSON.parse(value);
+  if (!Array.isArray(parsed)) throw new Error('Filters JSON must be an array.');
+  return parsed as never;
 }
 
 export default function VisualStudioPre4({
