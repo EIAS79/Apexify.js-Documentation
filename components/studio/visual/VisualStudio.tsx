@@ -3,6 +3,11 @@
 import {
   AdjustmentsHorizontalIcon,
   ArrowDownTrayIcon,
+  ArrowUpTrayIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ChevronUpIcon,
   ChartBarIcon,
   ClockIcon,
   CodeBracketIcon,
@@ -23,10 +28,16 @@ import {
   Squares2X2Icon,
   VideoCameraIcon,
 } from '@heroicons/react/24/outline';
-import { useMemo, useState, type ComponentType, type SVGProps } from 'react';
+import { useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioModeSwitch, type StudioMode } from '@/components/studio/StudioModeSwitch';
-import { studioAssetDataUrl } from '@/lib/studio/runtime/assets';
+import {
+  STUDIO_ASSET_LIMITS,
+  fileToStudioAsset,
+  isStudioFontAsset,
+  studioAssetDataUrl,
+  totalStudioAssetBytes,
+} from '@/lib/studio/runtime/assets';
 
 type Props = { active: boolean; mode: StudioMode; onModeChange: (mode: StudioMode) => void };
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -101,8 +112,10 @@ function ActionButton({
 export default function VisualStudio({ active, mode, onModeChange }: Props) {
   const {
     assets,
+    setAssets,
     previewArtifacts,
     activeArtifactId,
+    setActiveArtifactId,
     error,
     previewWarnings,
     elapsedMs,
@@ -114,19 +127,76 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
   const [dockTab, setDockTab] = useState<DockTab>('Generated Code');
   const [zoom, setZoom] = useState(78);
   const [viewportMode, setViewportMode] = useState<'select' | 'pan'>('select');
+  const [layersCollapsed, setLayersCollapsed] = useState(false);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
+  const [dockCollapsed, setDockCollapsed] = useState(false);
+  const [assetFilter, setAssetFilter] = useState<'all' | 'image' | 'audio' | 'video' | 'font'>('all');
+  const [assetQuery, setAssetQuery] = useState('');
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   const activeArtifact =
     previewArtifacts.find((artifact) => artifact.id === activeArtifactId) ??
     previewArtifacts[0] ??
     null;
 
-  const imageAssets = useMemo(() => assets.filter((asset) => asset.mime.startsWith('image/')), [assets]);
+  const filteredAssets = useMemo(() => {
+    const query = assetQuery.trim().toLowerCase();
+    return assets.filter((asset) => {
+      const typeMatches =
+        assetFilter === 'all' ||
+        (assetFilter === 'image' && asset.mime.startsWith('image/')) ||
+        (assetFilter === 'audio' && asset.mime.startsWith('audio/')) ||
+        (assetFilter === 'video' && asset.mime.startsWith('video/')) ||
+        (assetFilter === 'font' && isStudioFontAsset(asset));
+      return typeMatches && (!query || asset.name.toLowerCase().includes(query));
+    });
+  }, [assets, assetFilter, assetQuery]);
+
+  const addAssets = async (files: FileList | File[]) => {
+    const incoming = Array.from(files);
+    if (!incoming.length) return;
+    setUploadError(null);
+
+    if (assets.length + incoming.length > STUDIO_ASSET_LIMITS.maxCount) {
+      setUploadError(`Studio accepts at most ${STUDIO_ASSET_LIMITS.maxCount} assets.`);
+      return;
+    }
+
+    try {
+      const created = [];
+      let total = totalStudioAssetBytes(assets);
+      for (const file of incoming) {
+        const asset = await fileToStudioAsset(file);
+        total += asset.size;
+        if (total > STUDIO_ASSET_LIMITS.maxTotalBytes) {
+          throw new Error('Combined Studio assets exceed the 24 MiB session limit.');
+        }
+        created.push(asset);
+      }
+      setAssets((current) => [...current, ...created]);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Could not add Studio asset.');
+    } finally {
+      if (uploadRef.current) uploadRef.current.value = '';
+    }
+  };
+
+  const resetViewport = () => {
+    setZoom(78);
+    setPan({ x: 0, y: 0 });
+  };
 
   return (
     <div
       className="apx-visual-workspace"
       data-studio-visual-workspace
       data-active={active ? 'true' : 'false'}
+      data-layers-collapsed={layersCollapsed ? 'true' : 'false'}
+      data-inspector-collapsed={inspectorCollapsed ? 'true' : 'false'}
+      data-dock-collapsed={dockCollapsed ? 'true' : 'false'}
     >
       <header className="apx-vw-header">
         <div className="apx-vw-brand">
@@ -187,9 +257,20 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               <strong>Layers</strong>
               <small>{tool[0].toUpperCase() + tool.slice(1)} workspace</small>
             </div>
-            <button type="button" className="apx-vw-iconbutton" disabled title="Layer creation begins in the authoring phases.">
-              <PlusIcon className="h-4 w-4" aria-hidden />
-            </button>
+            <div className="apx-vw-heading-actions">
+              <button
+                type="button"
+                className="apx-vw-iconbutton"
+                onClick={() => setLayersCollapsed(true)}
+                title="Collapse layers"
+                aria-label="Collapse layers panel"
+              >
+                <ChevronLeftIcon className="h-4 w-4" aria-hidden />
+              </button>
+              <button type="button" className="apx-vw-iconbutton" disabled title="Layer creation begins in the authoring phases.">
+                <PlusIcon className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
           </div>
 
           <div className="apx-vw-layer-tree">
@@ -218,6 +299,17 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
 
         <main className="apx-vw-stage">
           <div className="apx-vw-stagebar">
+            {layersCollapsed ? (
+              <button
+                type="button"
+                className="apx-vw-panel-reveal"
+                onClick={() => setLayersCollapsed(false)}
+                title="Show layers"
+              >
+                <ChevronRightIcon className="h-4 w-4" aria-hidden />
+                <RectangleStackIcon className="h-4 w-4" aria-hidden />
+              </button>
+            ) : null}
             <div className="apx-vw-device">
               <RectangleGroupIcon className="h-4 w-4" aria-hidden />
               <span>Desktop (1440 × 900)</span>
@@ -246,16 +338,56 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               >
                 <CursorArrowRaysIcon className="h-4 w-4" aria-hidden />
               </button>
-              <button type="button" aria-label="Fit viewport" onClick={() => setZoom(78)}>
+              <button type="button" aria-label="Fit viewport" onClick={resetViewport}>
                 <MagnifyingGlassIcon className="h-4 w-4" aria-hidden />
+              </button>
+              <button
+                type="button"
+                data-active={!inspectorCollapsed ? 'true' : undefined}
+                onClick={() => setInspectorCollapsed((value) => !value)}
+                aria-label="Toggle inspector"
+                title="Toggle inspector"
+              >
+                <AdjustmentsHorizontalIcon className="h-4 w-4" aria-hidden />
               </button>
             </div>
           </div>
 
-          <div className="apx-vw-viewport">
+          <div
+            className="apx-vw-viewport"
+            onPointerDown={(event) => {
+              if (viewportMode !== 'pan') return;
+              event.currentTarget.setPointerCapture(event.pointerId);
+              dragRef.current = {
+                startX: event.clientX,
+                startY: event.clientY,
+                originX: pan.x,
+                originY: pan.y,
+              };
+            }}
+            onPointerMove={(event) => {
+              const drag = dragRef.current;
+              if (!drag || viewportMode !== 'pan') return;
+              setPan({
+                x: drag.originX + event.clientX - drag.startX,
+                y: drag.originY + event.clientY - drag.startY,
+              });
+            }}
+            onPointerUp={() => {
+              dragRef.current = null;
+            }}
+            onPointerCancel={() => {
+              dragRef.current = null;
+            }}
+            onWheel={(event) => {
+              if (!event.ctrlKey && !event.metaKey) return;
+              event.preventDefault();
+              setZoom((value) => Math.min(140, Math.max(40, value + (event.deltaY < 0 ? 5 : -5))));
+            }}
+          >
             <div
               className="apx-vw-artboard"
-              style={{ transform: `scale(${zoom / 100})` }}
+              style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom / 100})` }}
               data-viewport-mode={viewportMode}
             >
               <div className="apx-vw-artboard-grid" />
@@ -277,6 +409,18 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
         </main>
 
         <aside className="apx-vw-inspector" aria-label="Inspector">
+          <div className="apx-vw-inspector-top">
+            <span>Inspector</span>
+            <button
+              type="button"
+              className="apx-vw-iconbutton"
+              onClick={() => setInspectorCollapsed(true)}
+              title="Collapse inspector"
+              aria-label="Collapse inspector panel"
+            >
+              <ChevronRightIcon className="h-4 w-4" aria-hidden />
+            </button>
+          </div>
           <div className="apx-vw-inspector-tabs" role="tablist" aria-label="Inspector sections">
             {INSPECTOR_TABS.map((tab) => (
               <button
@@ -352,6 +496,19 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
                 ) : null}
               </button>
             ))}
+            <button
+              type="button"
+              className="apx-vw-dock-toggle"
+              onClick={() => setDockCollapsed((value) => !value)}
+              title={dockCollapsed ? 'Expand bottom dock' : 'Collapse bottom dock'}
+              aria-label={dockCollapsed ? 'Expand bottom dock' : 'Collapse bottom dock'}
+            >
+              {dockCollapsed ? (
+                <ChevronUpIcon className="h-4 w-4" aria-hidden />
+              ) : (
+                <ChevronDownIcon className="h-4 w-4" aria-hidden />
+              )}
+            </button>
           </div>
 
           <div className="apx-vw-dock-content">
@@ -367,10 +524,40 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               ) : null}
 
               {dockTab === 'Preview' ? (
-                <div className="apx-vw-dock-empty">
-                  <PlayIcon className="h-7 w-7" aria-hidden />
-                  <strong>{activeArtifact ? activeArtifact.name : 'Preview awaiting Visual Project'}</strong>
-                  <span>{previewArtifacts.length} shared session artifact{previewArtifacts.length === 1 ? '' : 's'} available.</span>
+                <div className="apx-vw-preview-browser">
+                  <div className="apx-vw-preview-main">
+                    {activeArtifact?.url && activeArtifact.mime.startsWith('image/') ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={activeArtifact.url} alt={activeArtifact.name} />
+                    ) : (
+                      <div className="apx-vw-dock-empty">
+                        <PlayIcon className="h-7 w-7" aria-hidden />
+                        <strong>{activeArtifact ? activeArtifact.name : 'Preview awaiting Visual Project'}</strong>
+                        <span>{previewArtifacts.length} shared session artifact{previewArtifacts.length === 1 ? '' : 's'} available.</span>
+                      </div>
+                    )}
+                  </div>
+                  {previewArtifacts.length > 1 ? (
+                    <div className="apx-vw-preview-strip">
+                      {previewArtifacts.map((artifact) => (
+                        <button
+                          type="button"
+                          key={artifact.id}
+                          data-active={artifact.id === activeArtifact?.id ? 'true' : undefined}
+                          onClick={() => setActiveArtifactId(artifact.id)}
+                          title={artifact.name}
+                        >
+                          {artifact.url && artifact.mime.startsWith('image/') ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={artifact.url} alt="" />
+                          ) : (
+                            <PhotoIcon className="h-5 w-5" aria-hidden />
+                          )}
+                          <span>{artifact.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 
@@ -409,11 +596,61 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
                   <strong>Assets</strong>
                   <span>{assets.length}</span>
                 </div>
-                <small>Shared Studio assets</small>
+                <button
+                  type="button"
+                  className="apx-vw-assets-upload"
+                  onClick={() => uploadRef.current?.click()}
+                >
+                  <ArrowUpTrayIcon className="h-4 w-4" aria-hidden />
+                  Upload
+                </button>
+                <input
+                  ref={uploadRef}
+                  type="file"
+                  multiple
+                  hidden
+                  accept="image/*,audio/*,video/*,.ttf,.otf,.woff,.woff2"
+                  onChange={(event) => {
+                    if (event.target.files) void addAssets(event.target.files);
+                  }}
+                />
               </div>
 
-              <div className="apx-vw-asset-grid">
-                {assets.length ? assets.slice(0, 8).map((asset) => (
+              <div className="apx-vw-assets-tools">
+                <input
+                  type="search"
+                  value={assetQuery}
+                  onChange={(event) => setAssetQuery(event.target.value)}
+                  placeholder="Filter assets…"
+                  aria-label="Filter assets"
+                />
+                <div className="apx-vw-assets-filters" role="group" aria-label="Asset type filter">
+                  {(['all', 'image', 'audio', 'video', 'font'] as const).map((filter) => (
+                    <button
+                      type="button"
+                      key={filter}
+                      data-active={assetFilter === filter ? 'true' : undefined}
+                      onClick={() => setAssetFilter(filter)}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+                {uploadError ? <p className="apx-vw-assets-error">{uploadError}</p> : null}
+              </div>
+
+              <div
+                className="apx-vw-asset-grid"
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = 'copy';
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  void addAssets(event.dataTransfer.files);
+                }}
+              >
+                {filteredAssets.length ? filteredAssets.slice(0, 12).map((asset) => (
                   <div className="apx-vw-asset-card" key={asset.id} title={asset.name}>
                     <div className="apx-vw-asset-thumb">
                       {asset.mime.startsWith('image/') ? (
@@ -433,10 +670,18 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
                 )) : (
                   <div className="apx-vw-assets-empty">
                     <FolderOpenIcon className="h-6 w-6" aria-hidden />
-                    <strong>No assets yet</strong>
-                    <span>Assets uploaded in Code mode appear here automatically.</span>
+                    <strong>{assets.length ? 'No matching assets' : 'Drop or upload assets'}</strong>
+                    <span>
+                      {assets.length
+                        ? 'Change the filter or search query.'
+                        : 'Images, audio, video and fonts are shared with Code Studio.'}
+                    </span>
                   </div>
                 )}
+              </div>
+              <div className="apx-vw-assets-foot">
+                <span>{assets.length}/{STUDIO_ASSET_LIMITS.maxCount}</span>
+                <span>{formatBytes(totalStudioAssetBytes(assets))}</span>
               </div>
             </aside>
           </div>
