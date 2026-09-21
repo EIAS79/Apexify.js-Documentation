@@ -3787,3 +3787,887 @@
     display:none;
   }
 }
+
+
+/* ==========================================================================
+   PRE-4 POLISH — calm, reference-aligned Studio chrome
+   Keeps the PRE-4 architecture and editor semantics; refines visual hierarchy.
+   ========================================================================== */
+
+.apx-pre4-workspace{
+  --pre4-bg:#060e18;
+  --pre4-bg-deep:#040a12;
+  --pre4-surface:#08131f;
+  --pre4-surface-2:#0a1725;
+  --pre4-surface-3:#0d1d2f;
+  --pre4-surface-4:#11243a;
+  --pre4-line:#17283c;
+  --pre4-line-soft:#102033;
+  --pre4-text:#f4f7fb;
+  --pre4-text-2:#aebdd0;
+  --pre4-text-3:#70849e;
+  --pre4-blue:#4f80ff;
+  --pre4-blue-bright:#67a7ff;
+  --pre4-violet:#7257f4;
+  --pre4-violet-2:#8e6dff;
+  background:
+    radial-gradient(circle at 12% -18%,rgba(65,92,184,.10),transparent 34%),
+    radial-gradient(circle at 78% -24%,rgba(100,73,190,.08),transparent 34%),
+    var(--pre4-bg);
+}
+
+/* Calm scrollbars — remove the inherited magenta/bright tracks seen in PRE-4. */
+.apx-pre4-workspace,
+.apx-pre4-workspace *{
+  scrollbar-width:thin;
+  scrollbar-color:#2a4059 transparent;
+}
+
+.apx-pre4-workspace *::-webkit-scrollbar{
+  width:7px;
+  height:7px;
+}
+
+.apx-pre4-workspace *::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+.apx-pre4-workspace *::-webkit-scrollbar-thumb{
+  border:2px solid transparent;
+  border-radius:999px;
+  background:#2a4059;
+  background-clip:padding-box;
+}
+
+.apx-pre4-workspace *::-webkit-scrollbar-thumb:hover{
+  background:#385571;
+  background-clip:padding-box;
+}
+
+/* --------------------------------------------------------------------------
+   1. Top application bar
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-topbar{
+  flex-basis:58px;
+  min-height:58px;
+  grid-template-columns:minmax(220px,1fr) auto minmax(420px,1fr);
+  gap:1.1rem;
+  padding:.42rem .95rem;
+  border-bottom-color:#17283b;
+  background:rgba(7,17,29,.96);
+  box-shadow:0 8px 26px rgba(0,0,0,.16);
+  backdrop-filter:blur(14px);
+}
+
+.apx-pre4-brand{
+  gap:.62rem;
+}
+
+.apx-pre4-logo{
+  width:38px;
+  height:38px;
+  filter:drop-shadow(0 7px 14px rgba(76,92,230,.18));
+}
+
+.apx-pre4-brand-copy{
+  gap:.08rem;
+}
+
+.apx-pre4-brand-copy strong{
+  font-size:.94rem;
+  font-weight:820;
+  letter-spacing:-.025em;
+}
+
+.apx-pre4-brand-copy small{
+  color:#7f92aa;
+  font-size:.61rem;
+}
+
+.studio-mode-switch--pre4{
+  gap:.16rem;
+  padding:.2rem;
+  border-color:#1b3048;
+  border-radius:9px;
+  background:#07121e;
+  box-shadow:none;
+}
+
+.studio-mode-switch--pre4 button{
+  min-width:82px;
+  height:32px;
+  min-height:32px;
+  border-radius:6px;
+  color:#92a4bb;
+  font-size:.67rem;
+}
+
+.studio-mode-switch--pre4 button[data-active="true"]{
+  color:#fff;
+  background:linear-gradient(135deg,#4579f4,#7054eb);
+  box-shadow:0 5px 16px rgba(75,76,220,.20);
+}
+
+.apx-pre4-top-actions{
+  justify-self:end;
+  justify-content:flex-end;
+  gap:.38rem;
+}
+
+.apx-pre4-top-button{
+  min-height:33px;
+  padding:.38rem .68rem;
+  border-color:#1b3149;
+  border-radius:7px;
+  color:#aab8ca;
+  background:#0a1724;
+  box-shadow:none;
+  font-size:.64rem;
+  font-weight:720;
+}
+
+.apx-pre4-top-button:hover:not(:disabled){
+  color:#edf4ff;
+  border-color:#294664;
+  background:#0d1c2c;
+  transform:none;
+}
+
+.apx-pre4-primary{
+  min-width:122px;
+  color:#fff;
+  border-color:rgba(112,90,246,.72);
+  background:linear-gradient(135deg,#4d80f7,#7357ef);
+  box-shadow:0 6px 18px rgba(72,73,217,.20);
+}
+
+.apx-pre4-primary:hover:not(:disabled){
+  border-color:#7e6df2;
+  background:linear-gradient(135deg,#5787f8,#7a60ef);
+}
+
+.apx-pre4-export .apx-vw-project-menu__panel{
+  border-color:#1c324b;
+  background:#081522;
+  box-shadow:0 18px 44px rgba(0,0,0,.34);
+}
+
+/* Top-right account/notification/undo cluster intentionally removed from markup. */
+.apx-pre4-top-utility,
+.apx-pre4-avatar,
+.apx-pre4-user,
+.apx-pre4-chevron{
+  display:none!important;
+}
+
+/* --------------------------------------------------------------------------
+   2. Permanent workbench geometry
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-layout{
+  grid-template-columns:136px 258px minmax(500px,1fr) 316px;
+  background:#060e18;
+}
+
+.apx-pre4-feature-rail,
+.apx-pre4-layers,
+.apx-pre4-inspector{
+  background:#07131f;
+}
+
+.apx-pre4-feature-rail{
+  border-right-color:#15273a;
+}
+
+.apx-pre4-layers{
+  border-right-color:#15273a;
+}
+
+.apx-pre4-inspector{
+  border-left-color:#15273a;
+}
+
+/* --------------------------------------------------------------------------
+   3. Left feature rail
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-feature-list{
+  gap:.14rem;
+  padding:.62rem .48rem;
+}
+
+.apx-pre4-feature-list>button{
+  min-height:38px;
+  grid-template-columns:22px minmax(0,1fr);
+  gap:.5rem;
+  padding:.35rem .62rem;
+  border:0;
+  border-radius:7px;
+  color:#9dadc0;
+  background:transparent;
+  font-size:.64rem;
+  font-weight:650;
+}
+
+.apx-pre4-feature-list>button:hover{
+  color:#edf4ff;
+  background:rgba(128,157,196,.055);
+}
+
+.apx-pre4-feature-list>button[data-active="true"]{
+  color:#f7faff;
+  border:0;
+  background:linear-gradient(90deg,rgba(67,113,216,.20),rgba(62,82,145,.08));
+  box-shadow:inset 2px 0 0 #5686f8;
+}
+
+.apx-pre4-feature-icon{
+  height:20px;
+  color:#c4d0df;
+  font-size:.76rem;
+}
+
+.apx-pre4-feature-card{
+  margin:auto .48rem .58rem;
+  gap:.52rem;
+  padding:.72rem .65rem;
+  border-color:#1d3651;
+  border-radius:8px;
+  color:#b7c7d9;
+  background:linear-gradient(155deg,rgba(23,50,83,.62),rgba(10,25,41,.74));
+  box-shadow:none;
+}
+
+.apx-pre4-feature-card strong{
+  font-size:.61rem;
+  line-height:1.42;
+}
+
+.apx-pre4-feature-card span{
+  color:#75a9f6;
+  font-size:.57rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. Layers / context panel
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-panel-head{
+  flex-basis:48px;
+  padding:.42rem .66rem;
+  border-bottom-color:#13263a;
+  background:#081522;
+}
+
+.apx-pre4-panel-head strong{
+  color:#edf3fb;
+  font-size:.72rem;
+}
+
+.apx-pre4-panel-head small{
+  color:#6d829c;
+  font-size:.50rem;
+}
+
+.apx-pre4-panel-head>button{
+  width:28px;
+  height:28px;
+  border-color:#213c58;
+  border-radius:6px;
+  color:#c6d5e7;
+  background:#0b1b2b;
+}
+
+.apx-pre4-panel-head>button:hover{
+  border-color:#31536f;
+  background:#0f2235;
+}
+
+.apx-pre4-layer-tree{
+  padding:.38rem .34rem .52rem;
+}
+
+.apx-pre4-root-row{
+  min-height:34px;
+  padding:.32rem .44rem;
+  color:#dfe8f4;
+  font-size:.61rem;
+}
+
+.apx-pre4-layers .apx-vw-layer-row{
+  min-height:32px;
+  gap:.14rem;
+  margin:.02rem 0;
+  border:0;
+  border-radius:6px;
+  color:#92a5bc;
+  font-size:.57rem;
+}
+
+.apx-pre4-layers .apx-vw-layer-row:hover{
+  color:#edf4ff;
+  background:#0b1a29;
+}
+
+.apx-pre4-layers .apx-vw-layer-row[data-active="true"]{
+  color:#fff;
+  border:0;
+  background:linear-gradient(90deg,rgba(59,104,194,.30),rgba(40,63,105,.18))!important;
+  box-shadow:inset 2px 0 0 #5b8cf8;
+}
+
+.apx-pre4-layers .apx-vw-layer-row>button{
+  width:20px;
+  height:20px;
+  border-radius:4px;
+  color:#71869f;
+  font-size:.50rem;
+}
+
+.apx-pre4-layers .apx-vw-layer-row>button:hover{
+  color:#dce7f4;
+  background:rgba(126,153,187,.08);
+}
+
+.apx-pre4-layer-actions{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:.22rem;
+  padding:.42rem;
+  border-top-color:#13263a;
+  background:#07131f;
+}
+
+.apx-pre4-layer-actions button{
+  min-height:26px;
+  padding:0 .25rem;
+  border-color:#182e45;
+  border-radius:5px;
+  color:#778da6;
+  background:#091725;
+  font-size:.48rem;
+}
+
+.apx-pre4-layer-actions button:hover:not(:disabled){
+  color:#e8f0fa;
+  border-color:#294965;
+  background:#0c1d2e;
+}
+
+.apx-pre4-empty{
+  border-color:#1c3957;
+  border-radius:8px;
+  color:#748aa4;
+  background:rgba(9,24,39,.68);
+  box-shadow:none;
+}
+
+.apx-pre4-empty strong{
+  color:#c7d3e1;
+}
+
+.apx-pre4-empty button{
+  border-color:#315d91;
+  background:#10305a;
+}
+
+/* --------------------------------------------------------------------------
+   5. Canvas / viewport
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-stage{
+  background:#050c14;
+}
+
+.apx-pre4-stagebar{
+  flex-basis:48px;
+  gap:.65rem;
+  padding:.4rem .62rem;
+  border-bottom-color:#15273a;
+  background:#081522;
+}
+
+.apx-pre4-device{
+  min-height:30px;
+  gap:.4rem;
+  padding:.32rem .58rem;
+  border-color:#1c354f;
+  border-radius:6px;
+  color:#c8d5e4;
+  background:#0a1928;
+  font-size:.58rem;
+  font-weight:700;
+}
+
+.apx-pre4-zoom{
+  grid-template-columns:28px 48px 28px;
+  border-color:#1c354f;
+  border-radius:7px;
+  background:#091827;
+}
+
+.apx-pre4-zoom button,
+.apx-pre4-zoom span{
+  height:28px;
+}
+
+.apx-pre4-zoom button{
+  color:#899db5;
+}
+
+.apx-pre4-zoom button:hover{
+  color:#eef5ff;
+  background:#0f2134;
+}
+
+.apx-pre4-zoom span{
+  color:#cbd7e5;
+  font-size:.57rem;
+}
+
+.apx-pre4-view-tools{
+  gap:.2rem;
+}
+
+.apx-pre4-view-tools button{
+  width:30px;
+  height:30px;
+  border-color:#1b344f;
+  border-radius:6px;
+  color:#788da6;
+  background:#091827;
+}
+
+.apx-pre4-view-tools button:hover,
+.apx-pre4-view-tools button[data-active="true"]{
+  color:#f5f8fd;
+  border-color:#315c8d;
+  background:#0d2238;
+}
+
+.apx-pre4-viewport{
+  background:
+    radial-gradient(circle at 50% 42%,rgba(31,59,94,.16),transparent 40%),
+    linear-gradient(rgba(48,71,98,.095) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(48,71,98,.095) 1px,transparent 1px),
+    #050c14;
+  background-size:auto,32px 32px,32px 32px,auto;
+}
+
+.apx-pre4-artboard{
+  border-color:#28527f;
+  background:linear-gradient(180deg,#071426,#061220);
+  box-shadow:
+    0 0 0 1px rgba(67,113,174,.08),
+    0 24px 60px rgba(0,0,0,.31);
+}
+
+.apx-pre4-artboard-grid{
+  opacity:.44;
+  background:
+    linear-gradient(rgba(52,91,132,.11) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(52,91,132,.11) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+
+/* --------------------------------------------------------------------------
+   6. Inspector
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-inspector-tabs{
+  flex-basis:48px;
+  border-bottom-color:#15273a;
+  background:#081522;
+}
+
+.apx-pre4-inspector-tabs button{
+  min-width:56px;
+  padding:0 .48rem;
+  border-bottom-width:2px;
+  color:#7589a2;
+  font-size:.52rem;
+  font-weight:700;
+}
+
+.apx-pre4-inspector-tabs button:hover{
+  color:#cbd7e5;
+}
+
+.apx-pre4-inspector-tabs button[data-active="true"]{
+  color:#f5f8fc;
+  border-bottom-color:#6289ef;
+  background:transparent;
+}
+
+.apx-pre4-inspector-body{
+  padding:.62rem .66rem .82rem;
+}
+
+.apx-pre4-inspector-title{
+  padding:.08rem 0 .62rem;
+}
+
+.apx-pre4-inspector-title strong{
+  font-size:.67rem;
+}
+
+.apx-pre4-inspector-title small,
+.apx-pre4-type-pill{
+  font-size:.48rem;
+}
+
+.apx-pre4-type-pill{
+  border-color:#1e354e;
+  background:#091827;
+}
+
+.apx-pre4-property,
+.apx-pre4-section{
+  gap:.36rem;
+  padding:.58rem 0;
+  border-top-color:#11243a;
+}
+
+.apx-pre4-property>label,
+.apx-pre4-property-grid label>span,
+.apx-pre4-section-title{
+  color:#788da6;
+  font-size:.48rem;
+  letter-spacing:.035em;
+}
+
+.apx-pre4-input{
+  height:32px;
+  border-color:#1b344f;
+  border-radius:6px;
+  color:#dbe5f0;
+  background:#091827;
+  font-size:.57rem;
+}
+
+.apx-pre4-input:focus{
+  border-color:#426ea5;
+  box-shadow:0 0 0 2px rgba(66,110,165,.12);
+}
+
+.apx-pre4-align-grid{
+  gap:.2rem;
+}
+
+.apx-pre4-align-grid button{
+  height:27px;
+  border-color:#182f48;
+  color:#7c91aa;
+  background:#091725;
+}
+
+.apx-pre4-future-row{
+  min-height:40px;
+  border-color:#172e46;
+  background:#081624;
+}
+
+.apx-pre4-future-row strong{
+  color:#8498b0;
+  font-size:.54rem;
+}
+
+.apx-pre4-future-row small{
+  color:#60758d;
+}
+
+.apx-pre4-disabled-grid{
+  gap:.24rem;
+}
+
+.apx-pre4-disabled-grid button{
+  min-height:29px;
+  border-color:#152a41;
+  color:#5f748b;
+  background:#081522;
+}
+
+/* --------------------------------------------------------------------------
+   7. Bottom dock + assets
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-dock{
+  grid-template-columns:minmax(0,1fr) 330px;
+  border-top-color:#16283b;
+  background:#060f19;
+}
+
+.apx-pre4-dock-main{
+  border-right-color:#16283b;
+}
+
+.apx-pre4-dock-tabs{
+  flex-basis:38px;
+  padding:0 .48rem;
+  border-bottom-color:#112237;
+  background:#071421;
+}
+
+.apx-pre4-dock-tabs button{
+  padding:0 .62rem;
+  border-bottom-color:transparent;
+  color:#7589a1;
+  font-size:.54rem;
+  font-weight:700;
+}
+
+.apx-pre4-dock-tabs button:hover{
+  color:#c9d5e4;
+}
+
+.apx-pre4-dock-tabs button[data-active="true"]{
+  color:#f4f7fc;
+  border-bottom-color:#6d65e8;
+}
+
+.apx-pre4-dock-collapse{
+  width:28px!important;
+  height:26px;
+  border-color:#1b344e!important;
+  color:#7f93aa!important;
+  background:#091827!important;
+}
+
+.apx-pre4-dock-content{
+  background:#050d16;
+}
+
+.apx-pre4-code-wrap{
+  background:#050d16;
+}
+
+.apx-pre4-code-meta{
+  flex-basis:31px;
+  padding:.25rem .62rem;
+  border-bottom-color:#102136;
+  color:#657b94;
+  background:#07131f;
+  font-size:.49rem;
+}
+
+.apx-pre4-code-meta button{
+  padding:.26rem .5rem;
+  border-color:#1f3c59;
+  border-radius:5px;
+  color:#aabbd0;
+  background:#0a1b2b;
+  font-size:.48rem;
+}
+
+.apx-pre4-code-meta button:hover{
+  color:#eef5ff;
+  border-color:#315875;
+}
+
+.apx-pre4-code{
+  padding:.62rem .78rem .8rem;
+  border:0!important;
+  color:#b9c7d8!important;
+  background:#050b13!important;
+  font:500 .54rem/1.58 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  text-shadow:none!important;
+  box-shadow:none!important;
+}
+
+.apx-pre4-code::selection{
+  background:#274d7a;
+  color:#fff;
+}
+
+.apx-pre4-assets-pane{
+  background:#07131f;
+}
+
+.apx-pre4-assets-head{
+  flex-basis:38px;
+  padding:0 .62rem;
+  border-bottom-color:#112237;
+}
+
+.apx-pre4-assets-head strong{
+  color:#dbe5ef;
+  font-size:.57rem;
+}
+
+.apx-pre4-assets-head span{
+  min-width:17px;
+  height:17px;
+  color:#7d93ac;
+  background:#0e2135;
+  font-size:.45rem;
+}
+
+.apx-pre4-assets-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:.38rem;
+  padding:.46rem;
+}
+
+.apx-pre4-assets-grid>button{
+  min-height:66px;
+  gap:.24rem;
+  padding:.26rem;
+  border-color:#172e45;
+  border-radius:6px;
+  color:#7589a1;
+  background:#081725;
+}
+
+.apx-pre4-assets-grid>button:hover{
+  border-color:#2a4b69;
+  background:#0b1c2c;
+}
+
+.apx-pre4-assets-grid img,
+.apx-pre4-assets-grid>button>span{
+  min-height:39px;
+  border-radius:4px;
+  background:#050d16;
+}
+
+.apx-pre4-assets-grid small{
+  color:#7c91aa;
+  font-size:.43rem;
+}
+
+.apx-pre4-dock-empty{
+  gap:.3rem;
+  color:#6c829b;
+}
+
+.apx-pre4-dock-empty strong{
+  color:#c3cfdd;
+  font-size:.64rem;
+}
+
+.apx-pre4-dock-empty span{
+  font-size:.51rem;
+}
+
+/* Shared asset shelf inside the dock should visually belong to this shell. */
+.apx-pre4-dock .studio-assets{
+  border:0!important;
+  background:#050d16!important;
+  box-shadow:none!important;
+}
+
+.apx-pre4-dock .studio-assets button,
+.apx-pre4-dock .studio-assets input,
+.apx-pre4-dock .studio-assets select{
+  border-color:#1a334c!important;
+  box-shadow:none!important;
+}
+
+/* --------------------------------------------------------------------------
+   8. Status/footer — intentionally quiet
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-statusbar{
+  flex-basis:22px;
+  min-height:22px;
+  gap:.58rem;
+  padding:0 .58rem;
+  border-top-color:#132438;
+  color:#5f748d;
+  background:#040b12;
+  font-size:.46rem;
+}
+
+.apx-pre4-status-product{
+  color:#7d91a8;
+}
+
+.apx-pre4-save-state{
+  color:#749784;
+}
+
+.apx-pre4-save-state i{
+  width:5px;
+  height:5px;
+  box-shadow:none;
+}
+
+.apx-pre4-status-message{
+  max-width:220px;
+  opacity:.54;
+}
+
+.apx-pre4-build-motto{
+  color:#687d95;
+  opacity:.78;
+}
+
+/* --------------------------------------------------------------------------
+   9. Focus, transitions and restrained motion
+   -------------------------------------------------------------------------- */
+
+.apx-pre4-workspace button,
+.apx-pre4-workspace input,
+.apx-pre4-workspace summary{
+  transition:
+    color .12s ease,
+    background-color .12s ease,
+    border-color .12s ease,
+    box-shadow .12s ease,
+    opacity .12s ease;
+}
+
+.apx-pre4-workspace button:focus-visible,
+.apx-pre4-workspace input:focus-visible,
+.apx-pre4-workspace summary:focus-visible{
+  outline:2px solid rgba(96,139,239,.68);
+  outline-offset:1px;
+}
+
+@media(max-width:1500px){
+  .apx-pre4-topbar{
+    grid-template-columns:minmax(190px,1fr) auto minmax(370px,1fr);
+  }
+
+  .apx-pre4-layout{
+    grid-template-columns:118px 236px minmax(430px,1fr) 292px;
+  }
+
+  .apx-pre4-dock{
+    grid-template-columns:minmax(0,1fr) 292px;
+  }
+}
+
+@media(max-width:1250px){
+  .apx-pre4-topbar{
+    grid-template-columns:auto auto minmax(0,1fr);
+  }
+
+  .apx-pre4-layout{
+    grid-template-columns:66px 214px minmax(390px,1fr) 270px;
+  }
+
+  .apx-pre4-dock{
+    grid-template-columns:minmax(0,1fr) 260px;
+  }
+}
+
+@media(max-width:1020px){
+  .apx-pre4-layout{
+    grid-template-columns:58px minmax(420px,1fr) 266px;
+  }
+
+  .apx-pre4-dock{
+    grid-template-columns:minmax(0,1fr);
+  }
+}
+
+@media(max-width:760px){
+  .apx-pre4-topbar{
+    grid-template-columns:auto auto minmax(0,1fr);
+  }
+
+  .apx-pre4-status-message{
+    display:none;
+  }
+}
