@@ -551,7 +551,203 @@ export default function VisualStudioPre4({
     setCanvasConfigError(null);
   }, [project.document.canvas]);
 
+  const primaryMedia =
+    primary && (primary.kind === 'image' || primary.kind === 'shape')
+      ? primary
+      : undefined;
 
+  const updateImageDraft = (
+    updater: (props: VisualImageNodeProps) => VisualImageNodeProps,
+  ) => {
+    if (!primaryMedia) return;
+    setProject((current) => {
+      const node = current.document.nodes[primaryMedia.id];
+      if (!node || (node.kind !== 'image' && node.kind !== 'shape')) return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryMedia.id];
+      nextNode.props = imagePropsRecord(updater(visualImageProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const mutateImage = (
+    label: string,
+    updater: (props: VisualImageNodeProps) => VisualImageNodeProps,
+  ) => {
+    if (!primaryMedia) return;
+    mutate(label, (current) => {
+      const node = current.document.nodes[primaryMedia.id];
+      if (!node || (node.kind !== 'image' && node.kind !== 'shape')) return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryMedia.id];
+      nextNode.props = imagePropsRecord(updater(visualImageProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const insertImageSource = (
+    source: string,
+    name = 'Image',
+    metadata?: { width?: number; height?: number },
+    point?: Point,
+  ) => {
+    if (!source.trim()) {
+      setMessage('Image source is required');
+      return;
+    }
+    mutate('Add image', (current) => {
+      const next = structuredClone(current);
+      const node = createVisualNode(
+        'image',
+        imagePropsRecord(defaultImageNodeProps(source.trim())),
+        { name },
+      );
+      const sourceWidth = Math.max(1, metadata?.width ?? 640);
+      const sourceHeight = Math.max(1, metadata?.height ?? 360);
+      const maxWidth = Math.min(360, next.document.width * 0.55);
+      const scale = Math.min(1, maxWidth / sourceWidth);
+      const width = Math.max(48, Math.round(sourceWidth * scale));
+      const height = Math.max(48, Math.round(sourceHeight * scale));
+      const x = point?.x ?? Math.max(0, (next.document.width - width) / 2);
+      const y = point?.y ?? Math.max(0, (next.document.height - height) / 2);
+      node.transform = {
+        x,
+        y,
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setActiveTool('images');
+    setInspectorTab('style');
+    setMessage('Image added');
+  };
+
+  const insertImageAsset = (
+    asset: StudioVirtualAsset,
+    point?: Point,
+  ) => {
+    if (!asset.mime.startsWith('image/')) {
+      setMessage(asset.name + ' is not an image asset');
+      return;
+    }
+    insertImageSource(
+      studioAssetReference(asset),
+      asset.name.replace(/\.[^.]+$/, '') || 'Image',
+      asset.metadata,
+      point,
+    );
+  };
+
+  const insertShape = (shape: VisualShapeType, point?: Point) => {
+    mutate('Add shape', (current) => {
+      const next = structuredClone(current);
+      const node = createVisualNode(
+        'shape',
+        imagePropsRecord(defaultShapeNodeProps(shape)),
+        { name: shape.charAt(0).toUpperCase() + shape.slice(1) },
+      );
+      const size = shape === 'square' || shape === 'circle' ? 160 : 190;
+      const width = size;
+      const height =
+        shape === 'square' || shape === 'circle' ? size : 140;
+      node.transform = {
+        x: point?.x ?? Math.max(0, (next.document.width - width) / 2),
+        y: point?.y ?? Math.max(0, (next.document.height - height) / 2),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setActiveTool('shapes');
+    setInspectorTab('style');
+    setMessage('Shape added');
+  };
+
+  const addImageFiles = async (
+    files: FileList | File[],
+    point?: Point,
+  ) => {
+    const incoming = Array.from(files).filter((file) =>
+      (file.type || '').startsWith('image/'),
+    );
+    if (!incoming.length) {
+      setMessage('Drop an image file onto the canvas');
+      return;
+    }
+    if (assets.length + incoming.length > STUDIO_ASSET_LIMITS.maxCount) {
+      setMessage('Studio asset count limit reached');
+      return;
+    }
+
+    try {
+      const created: StudioVirtualAsset[] = [];
+      let total = totalStudioAssetBytes(assets);
+      for (const file of incoming) {
+        const asset = await fileToStudioAsset(file);
+        if (!asset.mime.startsWith('image/')) continue;
+        total += asset.size;
+        if (total > STUDIO_ASSET_LIMITS.maxTotalBytes) {
+          throw new Error('Combined Studio assets exceed the 24 MiB session limit.');
+        }
+        created.push(asset);
+      }
+      if (!created.length) return;
+      setAssets([...assets, ...created]);
+      created.forEach((asset, index) =>
+        insertImageAsset(
+          asset,
+          point
+            ? { x: point.x + index * 18, y: point.y + index * 18 }
+            : undefined,
+        ),
+      );
+      setMessage(
+        'Added ' +
+          created.length +
+          ' image asset' +
+          (created.length === 1 ? '' : 's'),
+      );
+    } catch (uploadError) {
+      setMessage(
+        uploadError instanceof Error
+          ? uploadError.message
+          : 'Could not add image asset',
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (!primaryMedia) {
+      setImageConfigDraft('{}');
+      setImageConfigError(null);
+      return;
+    }
+    setImageConfigDraft(
+      JSON.stringify(visualImageProps(primaryMedia), null, 2),
+    );
+    setImageConfigError(null);
+  }, [primaryMedia?.id, primaryMedia?.props]);
 
   const addPlaceholder = () =>
     mutate('Add placeholder', (current) => {
