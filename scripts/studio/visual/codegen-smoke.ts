@@ -299,8 +299,9 @@ async function run() {
   );
   assert.ok(metrics.width > 0);
   assert.ok(metrics.height > 0);
-  assert.ok(metrics.lines.length >= 2);
-  assert.ok((metrics.chars?.length ?? 0) > 0);
+  assert.ok((metrics.lines?.length ?? 0) >= 2);
+  assert.ok((metrics.charWidths?.length ?? 0) > 0);
+  assert.ok((metrics.charPositions?.length ?? 0) > 0);
 
   console.log(
     '[studio-visual:phase6] equivalent text preview-codegen + metrics proof passed',
@@ -309,8 +310,8 @@ async function run() {
       sha256: digest(textPreview),
       width: metrics.width,
       height: metrics.height,
-      lines: metrics.lines.length,
-      chars: metrics.chars?.length ?? 0,
+      lines: metrics.lines?.length ?? 0,
+      chars: metrics.charWidths?.length ?? 0,
       generatedFile: textGenerated.fileName,
     }),
   );
