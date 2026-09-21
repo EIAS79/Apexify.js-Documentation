@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://apexifyjs.com/schemas/studio/visual-project.v1.schema.json",
+  "title": "Apexify Studio Visual Project v1",
+  "description": "Phase-0 persisted project contract for *.apexstudio.json. Domain-specific props are intentionally refined by later Studio Visual phases.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "schemaVersion",
+    "id",
+    "name",
+    "createdAt",
+    "updatedAt",
+    "document",
+    "assets",
+    "palettes",
+    "variables",
+    "timelines",
+    "outputs",
+    "operations",
+    "codegen"
+  ],
+  "properties": {
+    "format": {
+      "const": "apexify-studio-visual"
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "document": {
+      "$ref": "#/$defs/document"
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "palettes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "timelines": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "operations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "codegen": {
+      "$ref": "#/$defs/codegen"
+    },
+    "editor": {
+      "$ref": "#/$defs/editor"
+    }
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height",
+        "rootNodeIds",
+        "nodes"
+      ],
+      "properties": {
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pixelRatioPolicy": {
+          "enum": [
+            "auto",
+            "fixed",
+            "capped-auto"
+          ]
+        },
+        "background": {},
+        "rootNodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "nodes": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/node"
+          }
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "props"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "canvas",
+            "group",
+            "surface",
+            "image",
+            "shape",
+            "text",
+            "chart",
+            "path",
+            "freehand",
+            "pixel-operation",
+            "component",
+            "template-instance",
+            "scene",
+            "gif-composition",
+            "audio-composition",
+            "video-composition",
+            "generated-buffer"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "parentId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "childIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "transform": {
+          "$ref": "#/$defs/transform"
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "transform": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number",
+          "minimum": 0
+        },
+        "height": {
+          "type": "number",
+          "minimum": 0
+        },
+        "scaleX": {
+          "type": "number"
+        },
+        "scaleY": {
+          "type": "number"
+        },
+        "rotation": {
+          "type": "number"
+        },
+        "anchorX": {
+          "type": "number"
+        },
+        "anchorY": {
+          "type": "number"
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "locked": {
+          "type": "boolean"
+        },
+        "zIndex": {
+          "type": "number"
+        }
+      }
+    },
+    "codegen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "language",
+        "singleFile",
+        "assetBasePath"
+      ],
+      "properties": {
+        "language": {
+          "const": "typescript"
+        },
+        "singleFile": {
+          "type": "boolean",
+          "default": true
+        },
+        "assetBasePath": {
+          "const": "./assets/"
+        }
+      }
+    },
+    "editor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "selectedNodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "zoom": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "panX": {
+          "type": "number"
+        },
+        "panY": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

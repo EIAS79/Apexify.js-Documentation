@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://apexifyjs.com/schemas/studio/visual-capability-matrix.v1.schema.json",
+  "title": "Apexify Studio Visual Capability Matrix v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "source",
+    "classificationVocabulary",
+    "rows",
+    "summary",
+    "optionCoverage"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact",
+        "schemaVersion",
+        "packagePin",
+        "implementationComplete",
+        "totalCapabilities"
+      ],
+      "properties": {
+        "artifact": {
+          "const": "generated/studio/capability-matrix.json"
+        },
+        "schemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "packagePin": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "implementationComplete": {
+          "type": "boolean"
+        },
+        "totalCapabilities": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "classificationVocabulary": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "visual-property",
+          "visual-object",
+          "visual-operation",
+          "timeline-operation",
+          "project-operation",
+          "export-only",
+          "hosted-runtime-exclusion",
+          "not-applicable"
+        ]
+      }
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/capabilityRow"
+      }
+    },
+    "summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "optionCoverage": {
+      "$ref": "#/$defs/optionCoverage"
+    }
+  },
+  "$defs": {
+    "classification": {
+      "enum": [
+        "visual-property",
+        "visual-object",
+        "visual-operation",
+        "timeline-operation",
+        "project-operation",
+        "export-only",
+        "hosted-runtime-exclusion",
+        "not-applicable"
+      ]
+    },
+    "capabilityRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability",
+        "sourceRoute",
+        "classification",
+        "domain",
+        "editorSection",
+        "controlSchemaId",
+        "projectModelField",
+        "previewRuntimeRoute",
+        "codegen",
+        "proofCaseIds",
+        "phaseOwner",
+        "implementationState"
+      ],
+      "properties": {
+        "capability": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceRoute": {
+          "enum": [
+            "browser",
+            "full-runtime",
+            "host-persistence",
+            "external-service",
+            "introspection"
+          ]
+        },
+        "classification": {
+          "$ref": "#/$defs/classification"
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "editorSection": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "controlSchemaId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "projectModelField": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "previewRuntimeRoute": {
+          "enum": [
+            "browser",
+            "full-runtime",
+            null
+          ]
+        },
+        "codegen": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "strategy",
+                "symbol"
+              ],
+              "properties": {
+                "strategy": {
+                  "const": "direct-public-api"
+                },
+                "symbol": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        },
+        "proofCaseIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true
+        },
+        "phaseOwner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "implementationState": {
+          "enum": [
+            "planned",
+            "excluded",
+            "not-applicable"
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "totalCapabilities",
+        "classifiedCapabilities",
+        "unclassifiedCount",
+        "unclassifiedCapabilities",
+        "duplicateCapabilities",
+        "byClassification",
+        "byDomain",
+        "deterministic",
+        "complete"
+      ],
+      "properties": {
+        "totalCapabilities": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "classifiedCapabilities": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unclassifiedCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unclassifiedCapabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "duplicateCapabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "byClassification": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "byDomain": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "deterministic": {
+          "type": "boolean"
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      }
+    },
+    "optionCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceArtifact",
+        "sourceSchemaVersion",
+        "sourceSha256",
+        "indexedSha256",
+        "sourceInventoryCurrent",
+        "totalOptionPaths",
+        "classifiedOptionPaths",
+        "unclassifiedOptionPaths",
+        "complete"
+      ],
+      "properties": {
+        "sourceArtifact": {
+          "const": "generated/docs-doc4/option-inventory.json"
+        },
+        "sourceSchemaVersion": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sourceSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "indexedSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "sourceInventoryCurrent": {
+          "type": "boolean"
+        },
+        "totalOptionPaths": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "classifiedOptionPaths": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unclassifiedOptionPaths": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

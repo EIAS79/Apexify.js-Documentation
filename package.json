@@ -114,7 +114,11 @@
     "docs:verify:external-links": "node scripts/docs/doc12-external-links.mjs",
     "docs:audit:doc12": "node scripts/docs/doc12-static-audit.mjs",
     "docs:verify:doc12": "npm run docs:verify:doc10 && npm run typecheck && npm run build && npm run docs:audit:doc11 && npm run docs:verify:package-candidate && npm run docs:verify:external-links && npm run docs:verify:evidence:doc11 && npm run docs:audit:doc12 && node scripts/docs/doc12-release-verify.mjs",
-    "docs:verify:release": "npm run docs:verify:doc12"
+    "docs:verify:release": "npm run docs:verify:doc12",
+    "studio:visual:capabilities": "tsx scripts/studio/visual/generate-capability-matrix.ts",
+    "studio:visual:capabilities:check": "tsx scripts/studio/visual/generate-capability-matrix.ts --check",
+    "studio:visual:test": "tsx --test scripts/studio/declaration-parser.test.ts scripts/studio/visual/visual-contract.test.ts",
+    "studio:visual:verify": "npm run studio:completeness:check && npm run studio:visual:capabilities:check && npm run studio:visual:test"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",

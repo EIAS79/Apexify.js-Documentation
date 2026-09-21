@@ -1,0 +1,85 @@
+name: Studio Visual Phase Gate
+
+on:
+  push:
+    branches:
+      - 'studio-visual/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'APEXIFY_STUDIO_VISUAL_AUTHORING_MASTER_PLAN.md'
+      - 'STUDIO_VISUAL_CONTRACT.md'
+      - 'STUDIO_VISUAL_DECISIONS.md'
+      - 'schemas/studio/**'
+      - 'lib/studio/visual/**'
+      - 'scripts/studio/visual/**'
+      - 'generated/studio/visual-capability-matrix.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vercel.json'
+      - '.github/workflows/studio-visual-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studio-visual-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phase-gate:
+    name: Phase 0 contract and capability gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies without runtime-heavy postinstall
+        run: npm ci --ignore-scripts
+
+      - name: Install pinned browser runtime snapshot
+        run: node scripts/studio/install-apexify-web.mjs
+
+      - name: Generate DOC-4 option inventory
+        run: npm run docs:generate:doc4
+
+      - name: Regenerate base Studio capability evidence
+        run: npm run studio:completeness
+
+      - name: Upload regenerated base capability evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-base-capability-matrix
+          path: generated/studio/capability-matrix.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Verify committed base capability evidence
+        run: git diff --exit-code -- generated/studio/capability-matrix.json
+
+      - name: Verify Visual Studio contracts
+        run: npm run studio:visual:verify
+
+      - name: Typecheck
+        run: |
+          set -o pipefail
+          npm run typecheck 2>&1 | tee studio-visual-typecheck.log
+
+      - name: Upload typecheck diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-visual-typecheck-log
+          path: studio-visual-typecheck.log
+          if-no-files-found: ignore
+          retention-days: 1
