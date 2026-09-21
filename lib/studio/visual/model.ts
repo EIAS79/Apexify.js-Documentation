@@ -170,8 +170,8 @@ export interface VisualShadowOptions {
 }
 
 export type VisualBackgroundLayer =
-  | { type: 'color'; value: string; opacity?: number; blendMode?: string }
-  | { type: 'gradient'; value: VisualGradient; opacity?: number; blendMode?: string }
+  | { type: 'color'; value: string; opacity?: number; blendMode?: VisualBlendMode }
+  | { type: 'gradient'; value: VisualGradient; opacity?: number; blendMode?: VisualBlendMode }
   | {
       type: 'image';
       source: string;
@@ -187,37 +187,8 @@ export type VisualBackgroundLayer =
       opacity?: number;
       blendMode?: VisualBlendMode;
     }
-  | { type: 'presetPattern'; pattern: VisualPatternOptions; opacity?: number; blendMode?: string }
-  | { type: 'noise'; intensity?: number; blendMode?: string };
-
-export interface VisualImageFilter {
-  type:
-    | 'gaussianBlur'
-    | 'motionBlur'
-    | 'radialBlur'
-    | 'sharpen'
-    | 'noise'
-    | 'grain'
-    | 'edgeDetection'
-    | 'emboss'
-    | 'invert'
-    | 'grayscale'
-    | 'sepia'
-    | 'pixelate'
-    | 'brightness'
-    | 'contrast'
-    | 'saturation'
-    | 'hueShift'
-    | 'posterize';
-  intensity?: number;
-  radius?: number;
-  angle?: number;
-  centerX?: number;
-  centerY?: number;
-  value?: number;
-  levels?: number;
-  size?: number;
-}
+  | { type: 'presetPattern'; pattern: VisualPatternOptions; opacity?: number; blendMode?: VisualBlendMode }
+  | { type: 'noise'; intensity?: number; blendMode?: VisualBlendMode };
 
 export interface VisualCanvasConfig {
   x?: number;
