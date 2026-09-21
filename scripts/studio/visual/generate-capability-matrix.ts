@@ -186,8 +186,12 @@ function previewRouteFor(
 
 const base = JSON.parse(fs.readFileSync(sourceFile, 'utf8')) as BaseCapabilityMatrix;
 
-const rows = base.capabilityProofs
-  .map((proof): VisualCapabilityRow & { classification: VisualCapabilityClassification | null } => {
+type DraftVisualCapabilityRow = Omit<VisualCapabilityRow, 'classification'> & {
+  classification: VisualCapabilityClassification | null;
+};
+
+const rows: DraftVisualCapabilityRow[] = base.capabilityProofs
+  .map((proof): DraftVisualCapabilityRow => {
     const domain = domainFor(proof.capability);
     const classification = domain ? classificationFor(proof.capability, proof.route, domain) : null;
     return {
