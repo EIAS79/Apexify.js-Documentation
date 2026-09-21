@@ -86,3 +86,17 @@ test('PRE-4 future feature surfaces do not pretend to be authoring-complete', ()
   assert.match(shell, /Preview remains tied to real Apexify execution artifacts/);
   assert.match(shell, /disabled/);
 });
+
+
+test('PRE-4 polish keeps the shell calm and removes nonessential top-right chrome', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const css = read('styles/studio-calm.css');
+
+  assert.doesNotMatch(shell, /className="apx-pre4-top-utility"/);
+  assert.doesNotMatch(shell, /title="Notifications"/);
+  assert.match(css, /PRE-4 POLISH/);
+  assert.match(css, /scrollbar-color:#2a4059 transparent/);
+  assert.match(css, /grid-template-columns:minmax\(0,1fr\) 330px/);
+  assert.match(css, /background:#050b13!important/);
+  assert.match(css, /grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+});
