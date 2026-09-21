@@ -16,7 +16,7 @@ export type StudioPathCommand =
   | { type: 'ellipse'; x: number; y: number; radiusX: number; radiusY: number; rotation?: number; startAngle?: number; endAngle?: number; counterclockwise?: boolean }
   | { type: 'closePath' }
   | { type: 'circle'; x: number; y: number; radius: number }
-  | { type: 'roundedRect'; x: number; y: number; width: number; height: number; radius: number }
+  | { type: 'roundedRect'; x: number; y: number; width: number; height: number; radius: number | { tl?: number; tr?: number; br?: number; bl?: number } }
   | { type: 'polygon'; points: Array<{ x: number; y: number }> }
   | { type: 'star'; x: number; y: number; outerRadius: number; innerRadius: number; points: number }
   | { type: 'arrow'; x: number; y: number; length: number; angle: number; headLength?: number; headAngle?: number };
@@ -96,6 +96,15 @@ export type StudioPixelOperation =
       color: { r: number; g: number; b: number; a?: number };
     };
 
+export type StudioHitRegion =
+  | { type: 'rect'; x: number; y: number; width: number; height: number }
+  | { type: 'circle'; x: number; y: number; radius: number }
+  | { type: 'ellipse'; x: number; y: number; radiusX: number; radiusY: number; rotation?: number }
+  | { type: 'polygon'; points: Array<{ x: number; y: number }> }
+  | { type: 'path'; path: StudioPathCommand[]; fillRule?: 'nonzero' | 'evenodd' };
+
+export type StudioDistanceRegion = Exclude<StudioHitRegion, { type: 'path' }>;
+
 export type StudioDetectionOperation =
   | { type: 'pixelColor'; x: number; y: number; resultName?: string }
   | { type: 'pixelData'; region?: { x: number; y: number; width: number; height: number }; resultName?: string }
@@ -112,19 +121,29 @@ export type StudioDetectionOperation =
     }
   | {
       type: 'detectRegion';
-      region:
-        | { type: 'rect'; x: number; y: number; width: number; height: number }
-        | { type: 'circle'; x: number; y: number; radius: number };
+      region: StudioHitRegion;
       x: number;
       y: number;
+      includeStroke?: boolean;
+      strokeWidth?: number;
       tolerance?: number;
+      fillRule?: 'nonzero' | 'evenodd';
+      resultName?: string;
+    }
+  | {
+      type: 'detectAnyRegion';
+      regions: StudioHitRegion[];
+      x: number;
+      y: number;
+      includeStroke?: boolean;
+      strokeWidth?: number;
+      tolerance?: number;
+      fillRule?: 'nonzero' | 'evenodd';
       resultName?: string;
     }
   | {
       type: 'detectDistance';
-      region:
-        | { type: 'rect'; x: number; y: number; width: number; height: number }
-        | { type: 'circle'; x: number; y: number; radius: number };
+      region: StudioDistanceRegion;
       x: number;
       y: number;
       resultName?: string;
