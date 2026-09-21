@@ -2515,7 +2515,443 @@ export default function VisualStudioPre4({
     );
   };
 
+  const renderMediaHeader = () => {
+    if (!primaryMedia) return null;
+    return (
+      <div className="apx-pre4-inspector-title">
+        <div>
+          <strong>{primaryMedia.name ?? primaryMedia.kind}</strong>
+          <small>{primaryMedia.kind === 'shape' ? 'Apexify built-in shape' : 'Apexify image layer'} · Phase 5</small>
+        </div>
+        <span className="apx-pre4-type-pill">{primaryMedia.kind}</span>
+      </div>
+    );
+  };
+
+  const renderMediaStyle = () => {
+    if (!primaryMedia) return renderTransformFields();
+    const props = visualImageProps(primaryMedia);
+    const isShape = primaryMedia.kind === 'shape';
+    const shape = props.shape ?? {};
+    return (
+      <>
+        {renderMediaHeader()}
+        <div className="apx-pre4-property">
+          <label>Name</label>
+          <input
+            className="apx-pre4-input"
+            value={primaryMedia.name ?? primaryMedia.kind}
+            onFocus={beginPropertyEdit}
+            onChange={(event) => setProject((current) => renameNode(current, primaryMedia.id, event.target.value))}
+            onBlur={() => endPropertyEdit('Rename media')}
+          />
+        </div>
+
+        {isShape ? (
+          <div className="apx-pre4-section" data-image-section="shape">
+            <div className="apx-pre4-section-title">Shape</div>
+            <label className="apx-canvas-field">
+              <span>Built-in source</span>
+              <select
+                className="apx-pre4-input"
+                value={typeof props.source === 'string' ? props.source : 'rectangle'}
+                onChange={(event) => {
+                  const nextShape = event.target.value as VisualShapeType;
+                  mutateImage('Shape type', (current) => ({
+                    ...current,
+                    source: nextShape,
+                    shape: defaultShapeNodeProps(nextShape).shape,
+                  }));
+                }}
+              >
+                {IMAGE_SHAPE_TYPES.map((shapeType) => <option key={shapeType} value={shapeType}>{shapeType}</option>)}
+              </select>
+            </label>
+            <label className="apx-canvas-check">
+              <input
+                type="checkbox"
+                checked={shape.fill ?? true}
+                onChange={(event) => mutateImage('Shape fill', (current) => ({
+                  ...current,
+                  shape: { ...(current.shape ?? {}), fill: event.target.checked },
+                }))}
+              />
+              <span>Fill shape</span>
+            </label>
+            <div className="apx-canvas-color-row">
+              <input
+                type="color"
+                value={shape.color ?? '#6f86ff'}
+                onChange={(event) => updateImageDraft((current) => ({
+                  ...current,
+                  shape: { ...(current.shape ?? {}), color: event.target.value },
+                }))}
+              />
+              <input
+                className="apx-pre4-input"
+                value={shape.color ?? '#6f86ff'}
+                onFocus={beginPropertyEdit}
+                onChange={(event) => updateImageDraft((current) => ({
+                  ...current,
+                  shape: { ...(current.shape ?? {}), color: event.target.value },
+                }))}
+                onBlur={() => endPropertyEdit('Shape color')}
+              />
+            </div>
+            {typeof props.source === 'string' && ['star','polygon','arc','pieSlice'].includes(props.source) ? (
+              <div className="apx-pre4-property-grid">
+                {props.source === 'polygon' ? (
+                  <label><span>Sides</span><input className="apx-pre4-input" type="number" min={3} value={shape.sides ?? 6} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), sides: Number(event.target.value) } }))}/></label>
+                ) : null}
+                {props.source === 'star' || props.source === 'arc' || props.source === 'pieSlice' ? (
+                  <>
+                    <label><span>Inner R</span><input className="apx-pre4-input" type="number" min={0} value={shape.innerRadius ?? 0} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), innerRadius: Number(event.target.value) } }))}/></label>
+                    <label><span>Outer R</span><input className="apx-pre4-input" type="number" min={0} value={shape.outerRadius ?? shape.radius ?? 72} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), outerRadius: Number(event.target.value) } }))}/></label>
+                  </>
+                ) : null}
+                {props.source === 'arc' || props.source === 'pieSlice' ? (
+                  <>
+                    <label><span>Start</span><input className="apx-pre4-input" type="number" step={0.1} value={shape.startAngle ?? 0} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), startAngle: Number(event.target.value) } }))}/></label>
+                    <label><span>End</span><input className="apx-pre4-input" type="number" step={0.1} value={shape.endAngle ?? Math.PI * 2} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), endAngle: Number(event.target.value) } }))}/></label>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="apx-pre4-section" data-image-section="layout">
+            <div className="apx-pre4-section-title">Image layout</div>
+            <div className="apx-pre4-property-grid">
+              <label>
+                <span>Fit</span>
+                <select className="apx-pre4-input" value={props.fit ?? 'cover'} onChange={(event) => mutateImage('Image fit', (current) => ({ ...current, fit: event.target.value as VisualImageNodeProps['fit'] }))}>
+                  {IMAGE_FITS.map((value) => <option key={value}>{value}</option>)}
+                </select>
+              </label>
+              <label>
+                <span>Align</span>
+                <select className="apx-pre4-input" value={props.align ?? 'center'} onChange={(event) => mutateImage('Image align', (current) => ({ ...current, align: event.target.value as VisualImageNodeProps['align'] }))}>
+                  {IMAGE_ALIGNS.map((value) => <option key={value}>{value}</option>)}
+                </select>
+              </label>
+            </div>
+            <label className="apx-canvas-check">
+              <input type="checkbox" checked={props.inherit ?? false} onChange={(event) => mutateImage('Image inherit', (current) => ({ ...current, inherit: event.target.checked }))}/>
+              <span>Inherit source dimensions</span>
+            </label>
+          </div>
+        )}
+
+        <div className="apx-pre4-section" data-image-section="appearance">
+          <div className="apx-pre4-section-title">Appearance</div>
+          <div className="apx-pre4-property-grid">
+            <label>
+              <span>Radius</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={0}
+                disabled={props.borderRadius === 'circular'}
+                value={typeof props.borderRadius === 'number' ? props.borderRadius : 0}
+                onFocus={beginPropertyEdit}
+                onChange={(event) => updateImageDraft((current) => ({ ...current, borderRadius: Math.max(0, Number(event.target.value)) }))}
+                onBlur={() => endPropertyEdit('Media radius')}
+              />
+            </label>
+            <label className="apx-canvas-check">
+              <input type="checkbox" checked={props.borderRadius === 'circular'} onChange={(event) => mutateImage('Circular media', (current) => ({ ...current, borderRadius: event.target.checked ? 'circular' : 0 }))}/>
+              <span>Circular</span>
+            </label>
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="stroke">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Stroke</div>
+            <label className="apx-canvas-switch">
+              <input type="checkbox" checked={Boolean(props.stroke)} onChange={(event) => mutateImage('Media stroke', (current) => {
+                if (!event.target.checked) {
+                  const next = { ...current };
+                  delete next.stroke;
+                  return next;
+                }
+                return { ...current, stroke: { color: '#ffffff', width: 2, opacity: 1, style: 'solid' } };
+              })}/>
+              <span />
+            </label>
+          </div>
+          {props.stroke ? (
+            <>
+              <div className="apx-canvas-color-row">
+                <input type="color" value={props.stroke.color ?? '#ffffff'} onChange={(event) => updateImageDraft((current) => ({ ...current, stroke: { ...current.stroke, color: event.target.value } }))}/>
+                <input className="apx-pre4-input" value={props.stroke.color ?? '#ffffff'} onChange={(event) => updateImageDraft((current) => ({ ...current, stroke: { ...current.stroke, color: event.target.value } }))}/>
+              </div>
+              <div className="apx-pre4-property-grid">
+                <label><span>Width</span><input className="apx-pre4-input" type="number" min={0} value={props.stroke.width ?? 2} onChange={(event) => updateImageDraft((current) => ({ ...current, stroke: { ...current.stroke, width: Number(event.target.value) } }))}/></label>
+                <label><span>Style</span><select className="apx-pre4-input" value={props.stroke.style ?? 'solid'} onChange={(event) => mutateImage('Stroke style', (current) => ({ ...current, stroke: { ...current.stroke, style: event.target.value as NonNullable<VisualImageNodeProps['stroke']>['style'] } }))}>{['solid','dashed','dotted','groove','ridge','double'].map((value) => <option key={value}>{value}</option>)}</select></label>
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="box-background">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Box background</div>
+            <label className="apx-canvas-switch">
+              <input type="checkbox" checked={Boolean(props.boxBackground)} onChange={(event) => mutateImage('Box background', (current) => {
+                if (!event.target.checked) {
+                  const next = { ...current };
+                  delete next.boxBackground;
+                  return next;
+                }
+                return { ...current, boxBackground: { color: '#0b1730' } };
+              })}/>
+              <span />
+            </label>
+          </div>
+          {props.boxBackground ? (
+            <div className="apx-canvas-color-row">
+              <input type="color" value={props.boxBackground.color ?? '#0b1730'} onChange={(event) => updateImageDraft((current) => ({ ...current, boxBackground: { ...current.boxBackground, color: event.target.value } }))}/>
+              <input className="apx-pre4-input" value={props.boxBackground.color ?? '#0b1730'} onChange={(event) => updateImageDraft((current) => ({ ...current, boxBackground: { ...current.boxBackground, color: event.target.value } }))}/>
+            </div>
+          ) : null}
+        </div>
+      </>
+    );
+  };
+
+  const renderMediaEffects = () => {
+    if (!primaryMedia) return renderTransformFields();
+    const props = visualImageProps(primaryMedia);
+    return (
+      <>
+        {renderMediaHeader()}
+        <div className="apx-pre4-section" data-image-section="effects">
+          <div className="apx-pre4-section-title">Layer effects</div>
+          <div className="apx-pre4-property-grid">
+            <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={props.blur ?? 0} onChange={(event) => updateImageDraft((current) => ({ ...current, blur: Math.max(0, Number(event.target.value)) }))}/></label>
+            <label><span>Blend</span><select className="apx-pre4-input" value={props.blendMode ?? 'source-over'} onChange={(event) => mutateImage('Image blend', (current) => ({ ...current, blendMode: event.target.value as VisualBlendMode }))}>{IMAGE_BLEND_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="filters">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Filters</div>
+            <button className="apx-canvas-mini-button" type="button" onClick={() => mutateImage('Add image filter', (current) => ({ ...current, filters: [...(current.filters ?? []), { type: 'brightness', value: 1 }] }))}>＋ Filter</button>
+          </div>
+          <div className="apx-image-filter-stack">
+            {(props.filters ?? []).map((filter, index) => (
+              <div key={index} className="apx-image-filter-row">
+                <select className="apx-pre4-input" value={filter.type} onChange={(event) => updateImageDraft((current) => ({
+                  ...current,
+                  filters: (current.filters ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, type: event.target.value as VisualImageFilter['type'] } : item),
+                }))}>
+                  {IMAGE_FILTER_TYPES.map((type) => <option key={type}>{type}</option>)}
+                </select>
+                <input className="apx-pre4-input" type="number" step={0.1} value={filter.value ?? filter.intensity ?? 1} onChange={(event) => updateImageDraft((current) => ({
+                  ...current,
+                  filters: (current.filters ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, value: Number(event.target.value) } : item),
+                }))}/>
+                <button type="button" onClick={() => mutateImage('Remove image filter', (current) => ({ ...current, filters: (current.filters ?? []).filter((_, itemIndex) => itemIndex !== index) }))}>×</button>
+              </div>
+            ))}
+          </div>
+          <div className="apx-pre4-property-grid">
+            <label><span>Intensity</span><input className="apx-pre4-input" type="number" step={0.1} value={props.filterIntensity ?? 1} onChange={(event) => updateImageDraft((current) => ({ ...current, filterIntensity: Number(event.target.value) }))}/></label>
+            <label><span>Order</span><select className="apx-pre4-input" value={props.filterOrder ?? 'post'} onChange={(event) => mutateImage('Filter order', (current) => ({ ...current, filterOrder: event.target.value as 'pre' | 'post' }))}><option value="pre">pre</option><option value="post">post</option></select></label>
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="shadow">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Shadow</div>
+            <label className="apx-canvas-switch">
+              <input type="checkbox" checked={Boolean(props.shadow)} onChange={(event) => mutateImage('Image shadow', (current) => {
+                if (!event.target.checked) {
+                  const next = { ...current };
+                  delete next.shadow;
+                  return next;
+                }
+                return { ...current, shadow: { color: '#000000', offsetX: 0, offsetY: 10, blur: 24, opacity: 0.35 } };
+              })}/>
+              <span />
+            </label>
+          </div>
+          {props.shadow ? (
+            <>
+              <div className="apx-canvas-color-row">
+                <input type="color" value={props.shadow.color ?? '#000000'} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, color: event.target.value } }))}/>
+                <input className="apx-pre4-input" value={props.shadow.color ?? '#000000'} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, color: event.target.value } }))}/>
+              </div>
+              <div className="apx-pre4-property-grid">
+                <label><span>X</span><input className="apx-pre4-input" type="number" value={props.shadow.offsetX ?? 0} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, offsetX: Number(event.target.value) } }))}/></label>
+                <label><span>Y</span><input className="apx-pre4-input" type="number" value={props.shadow.offsetY ?? 10} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, offsetY: Number(event.target.value) } }))}/></label>
+                <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={props.shadow.blur ?? 24} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, blur: Number(event.target.value) } }))}/></label>
+                <label><span>Opacity</span><input className="apx-pre4-input" type="number" min={0} max={1} step={0.05} value={props.shadow.opacity ?? .35} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, opacity: Number(event.target.value) } }))}/></label>
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="mask">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Mask</div>
+            <label className="apx-canvas-switch">
+              <input type="checkbox" checked={Boolean(props.mask)} onChange={(event) => mutateImage('Image mask', (current) => {
+                if (!event.target.checked) {
+                  const next = { ...current };
+                  delete next.mask;
+                  return next;
+                }
+                return { ...current, mask: { source: '', mode: 'alpha' } };
+              })}/>
+              <span />
+            </label>
+          </div>
+          {props.mask ? (
+            <>
+              <input className="apx-pre4-input" placeholder="Mask source URL or studio://asset/…" value={typeof props.mask.source === 'string' ? props.mask.source : ''} onChange={(event) => updateImageDraft((current) => ({ ...current, mask: { ...current.mask!, source: event.target.value } }))}/>
+              <select className="apx-pre4-input" value={props.mask.mode ?? 'alpha'} onChange={(event) => mutateImage('Mask mode', (current) => ({ ...current, mask: { ...current.mask!, mode: event.target.value as NonNullable<VisualImageNodeProps['mask']>['mode'] } }))}><option value="alpha">alpha</option><option value="luminance">luminance</option><option value="inverse">inverse</option></select>
+            </>
+          ) : null}
+        </div>
+      </>
+    );
+  };
+
+  const renderMediaData = () => {
+    if (!primaryMedia) return renderTransformFields();
+    const props = visualImageProps(primaryMedia);
+    const source = props.source;
+    const sourceString = typeof source === 'string' ? source : '';
+    const sourceAssetId = typeof source === 'string' ? studioAssetIdFromReference(source) : null;
+    const generatedId = typeof source === 'object' && source ? source.$generated : '';
+    const availableGenerated = layerIds
+      .map((id) => project.document.nodes[id])
+      .filter((node) => node && (node.kind === 'image' || node.kind === 'shape') && node.id !== primaryMedia.id);
+    return (
+      <>
+        {renderMediaHeader()}
+        <div className="apx-pre4-section" data-image-section="source">
+          <div className="apx-pre4-section-title">Source</div>
+          <label className="apx-canvas-field">
+            <span>URL / path / shape source</span>
+            <input
+              className="apx-pre4-input"
+              disabled={primaryMedia.kind === 'shape'}
+              value={sourceString}
+              placeholder="https://… or studio://asset/…"
+              onFocus={beginPropertyEdit}
+              onChange={(event) => updateImageDraft((current) => ({ ...current, source: event.target.value }))}
+              onBlur={() => endPropertyEdit('Image source')}
+            />
+          </label>
+          {primaryMedia.kind === 'image' ? (
+            <>
+              <label className="apx-canvas-field">
+                <span>Replace with Studio asset</span>
+                <select
+                  className="apx-pre4-input"
+                  value={sourceAssetId ?? ''}
+                  onChange={(event) => {
+                    const asset = imageAssets.find((item) => item.id === event.target.value);
+                    if (asset) mutateImage('Replace image asset', (current) => ({ ...current, source: studioAssetReference(asset) }));
+                  }}
+                >
+                  <option value="">Choose image asset…</option>
+                  {imageAssets.map((asset) => <option key={asset.id} value={asset.id}>{asset.name}</option>)}
+                </select>
+              </label>
+              <label className="apx-canvas-field">
+                <span>Generated-buffer source</span>
+                <select
+                  className="apx-pre4-input"
+                  value={generatedId}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    if (value) mutateImage('Generated buffer source', (current) => ({ ...current, source: { $generated: value } }));
+                  }}
+                >
+                  <option value="">None</option>
+                  <option value="document_canvas">Canvas buffer</option>
+                  {availableGenerated.map((node) => <option key={node!.id} value={node!.id}>{node!.name ?? node!.kind}</option>)}
+                </select>
+              </label>
+            </>
+          ) : null}
+        </div>
+        <div className="apx-live-sync-note">
+          <strong>Stable source identity</strong>
+          <span>Studio assets generate as studio://asset/… strings. Generated buffers compile as real earlier output identifiers rather than editor-only placeholders.</span>
+        </div>
+      </>
+    );
+  };
+
+  const renderMediaAdvanced = () => {
+    if (!primaryMedia) return renderTransformFields();
+    return (
+      <>
+        {renderMediaHeader()}
+        <div className="apx-pre4-section" data-image-section="complete-config">
+          <div className="apx-pre4-section-title">Complete ImageProperties / CreateImageOptions</div>
+          <textarea
+            className="apx-canvas-json apx-canvas-json--config"
+            spellCheck={false}
+            value={imageConfigDraft}
+            onChange={(event) => {
+              setImageConfigDraft(event.target.value);
+              setImageConfigError(null);
+            }}
+          />
+          {imageConfigError ? <div className="apx-live-code-error">{imageConfigError}</div> : null}
+          <button
+            className="apx-canvas-apply"
+            type="button"
+            onClick={() => {
+              try {
+                const parsed = JSON.parse(imageConfigDraft);
+                if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Image properties JSON must be an object.');
+                const nextProject = structuredClone(project);
+                const node = nextProject.document.nodes[primaryMedia.id];
+                node.props = imagePropsRecord(parsed as VisualImageNodeProps);
+                nextProject.updatedAt = new Date().toISOString();
+                const validation = validateVisualProject(nextProject);
+                if (!validation.ok) throw new Error(validation.issues[0]?.message ?? 'Invalid image configuration.');
+                history.current.commit(project, nextProject, 'Advanced image config');
+                projectRef.current = nextProject;
+                setProject(nextProject);
+                setHistoryTick((value) => value + 1);
+                setImageConfigError(null);
+                setMessage('Complete image configuration applied');
+              } catch (configError) {
+                setImageConfigError(configError instanceof Error ? configError.message : 'Invalid image configuration JSON.');
+              }
+            }}
+          >
+            Apply complete image config
+          </button>
+          <small className="apx-canvas-hint">
+            Declaration-level escape hatch for gradient fills, clipPath, distortion, meshWarp, advanced effects, mask buffers, stroke/shadow gradients, boxBackground and CreateImageOptions/groupTransform.
+          </small>
+        </div>
+      </>
+    );
+  };
+
+  const renderMediaInspector = () => {
+    if (inspectorTab === 'transform') return renderTransformFields();
+    if (inspectorTab === 'style') return renderMediaStyle();
+    if (inspectorTab === 'effects') return renderMediaEffects();
+    if (inspectorTab === 'data') return renderMediaData();
+    return renderMediaAdvanced();
+  };
+
   const renderInspector = () => {
+    if (primaryMedia) {
+      return renderMediaInspector();
+    }
+
     if (!primary && activeTool === 'canvas') {
       return renderCanvasInspector();
     }
