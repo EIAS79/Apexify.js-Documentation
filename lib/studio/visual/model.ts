@@ -34,6 +34,163 @@ export type VisualValue =
   | VisualValue[]
   | { [key: string]: VisualValue };
 
+
+export type VisualGradientStop = { stop: number; color: string };
+
+export type VisualGradient =
+  | {
+      type: 'linear';
+      startX?: number;
+      startY?: number;
+      endX?: number;
+      endY?: number;
+      rotate?: number;
+      pivotX?: number;
+      pivotY?: number;
+      repeat?: 'repeat' | 'reflect' | 'no-repeat';
+      colors: VisualGradientStop[];
+    }
+  | {
+      type: 'radial';
+      startX?: number;
+      startY?: number;
+      startRadius?: number;
+      endX?: number;
+      endY?: number;
+      endRadius?: number;
+      rotate?: number;
+      pivotX?: number;
+      pivotY?: number;
+      repeat?: 'repeat' | 'reflect' | 'no-repeat';
+      colors: VisualGradientStop[];
+    }
+  | {
+      type: 'conic';
+      centerX?: number;
+      centerY?: number;
+      startAngle?: number;
+      rotate?: number;
+      pivotX?: number;
+      pivotY?: number;
+      colors: VisualGradientStop[];
+    };
+
+export type VisualPatternType =
+  | 'grid'
+  | 'dots'
+  | 'diagonal'
+  | 'stripes'
+  | 'waves'
+  | 'crosses'
+  | 'hexagons'
+  | 'checkerboard'
+  | 'diamonds'
+  | 'triangles'
+  | 'stars'
+  | 'polka'
+  | 'custom';
+
+export interface VisualPatternOptions {
+  type: VisualPatternType;
+  color?: string;
+  secondaryColor?: string;
+  opacity?: number;
+  size?: number;
+  spacing?: number;
+  rotation?: number;
+  customPatternImage?: string;
+  repeat?: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
+  scale?: number;
+  offsetX?: number;
+  offsetY?: number;
+  blendMode?: string;
+  gradient?: VisualGradient;
+}
+
+export interface VisualStrokeOptions {
+  color?: string;
+  gradient?: VisualGradient;
+  width?: number;
+  position?: number;
+  blur?: number;
+  opacity?: number;
+  borderRadius?: number | 'circular';
+  borderPosition?: string;
+  roundedCorners?: string;
+  style?: 'solid' | 'dashed' | 'dotted' | 'groove' | 'ridge' | 'double';
+}
+
+export interface VisualShadowOptions {
+  color?: string;
+  gradient?: VisualGradient;
+  offsetX?: number;
+  offsetY?: number;
+  blur?: number;
+  opacity?: number;
+  borderRadius?: number | 'circular';
+  roundedCorners?: string;
+  borderPosition?: string;
+}
+
+export type VisualBackgroundLayer =
+  | { type: 'color'; value: string; opacity?: number; blendMode?: string }
+  | { type: 'gradient'; value: VisualGradient; opacity?: number; blendMode?: string }
+  | {
+      type: 'image';
+      source: string;
+      opacity?: number;
+      fit?: 'fill' | 'contain' | 'cover';
+      align?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+      blendMode?: string;
+    }
+  | {
+      type: 'pattern';
+      source: string;
+      repeat?: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
+      opacity?: number;
+      blendMode?: string;
+    }
+  | { type: 'presetPattern'; pattern: VisualPatternOptions; opacity?: number; blendMode?: string }
+  | { type: 'noise'; intensity?: number; blendMode?: string };
+
+export interface VisualCanvasConfig {
+  x?: number;
+  y?: number;
+  customBg?: {
+    source: string;
+    inherit?: boolean;
+    fit?: 'fill' | 'contain' | 'cover';
+    align?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+    filters?: VisualValue[];
+    opacity?: number;
+  };
+  videoBg?: {
+    source: string;
+    frame?: number;
+    time?: number;
+    loop?: boolean;
+    autoplay?: boolean;
+    opacity?: number;
+    format?: 'jpg' | 'png';
+    quality?: number;
+  };
+  colorBg?: string;
+  gradientBg?: VisualGradient;
+  patternBg?: VisualPatternOptions;
+  noiseBg?: { intensity?: number };
+  transparentBase?: boolean;
+  bgLayers?: VisualBackgroundLayer[];
+  blendMode?: string;
+  opacity?: number;
+  blur?: number;
+  rotation?: number;
+  borderRadius?: number | 'circular';
+  borderPosition?: string;
+  zoom?: { scale?: number; centerX?: number; centerY?: number };
+  stroke?: VisualStrokeOptions;
+  shadow?: VisualShadowOptions;
+}
+
 export interface VisualTransform {
   x?: number;
   y?: number;
@@ -65,6 +222,7 @@ export interface VisualDocument {
   height: number;
   pixelRatioPolicy?: 'auto' | 'fixed' | 'capped-auto';
   background?: VisualValue;
+  canvas?: VisualCanvasConfig;
   rootNodeIds: string[];
   nodes: Record<string, VisualNode>;
 }
