@@ -2678,8 +2678,8 @@ feat(studio-visual): release visual authoring and preview-to-code
 
 | Phase | Name | Status | Main commit | Production proof |
 |---|---|---|---|---|
-| 0 | Contract / capability baseline | NOT STARTED | — | — |
-| 1 | Dual-mode shell | NOT STARTED | — | — |
+| 0 | Contract / capability baseline | PRODUCTION VERIFIED | `97d7741c8f35b06dd33bed5ba2ac9b247b344465` | Vercel deployment + `/`, `/studio`, `/docs/getting-started`, `/api-reference` smoke |
+| 1 | Dual-mode shell | CI GREEN | pending merge | Branch gate `35584036125` |
 | 2 | Project model / codegen core | NOT STARTED | — | — |
 | 3 | Viewport / layers / transforms / history | NOT STARTED | — | — |
 | 4 | Canvas | NOT STARTED | — | — |
@@ -2709,6 +2709,29 @@ MAIN MERGED
 PRODUCTION VERIFIED
 BLOCKED
 ```
+
+---
+
+## STUDIO-VISUAL-1 implementation record
+
+> **Status:** CI GREEN
+>
+> **Work branch:** `studio-visual/v01-shell`
+>
+> **Branch gate:** GitHub Actions run `35584036125` — PASS
+
+Delivered:
+
+- top-level Code / Visual mode switch;
+- shared session provider for assets, output artifacts, diagnostics, and history;
+- Code Studio kept mounted so mode switching does not destroy its working session;
+- lazy-loaded Visual Studio;
+- responsive empty Visual workspace;
+- accessible tab/panel relationships for the mode selector;
+- desktop and mobile browser regression proving Code → Visual → Code round-trip without source mutation;
+- existing Code Studio runtime planner/execution path retained.
+
+Phase 1 intentionally adds no drawing, selection, transform, or domain-specific visual authoring.
 
 ---
 
