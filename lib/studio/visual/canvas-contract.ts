@@ -185,7 +185,7 @@ export function validateVisualCanvasConfig(
 
   canvas.bgLayers?.forEach((layer, index) => {
     const path = p + `.bgLayers[${index}]`;
-    validateOpacity(issues, layer.opacity, path + '.opacity');
+    if ('opacity' in layer) validateOpacity(issues, layer.opacity, path + '.opacity');
     if (layer.type === 'gradient') validateGradient(issues, layer.value, path + '.value');
     if (layer.type === 'presetPattern') validatePattern(issues, layer.pattern, path + '.pattern');
     if ((layer.type === 'image' || layer.type === 'pattern') && !layer.source.trim()) {
