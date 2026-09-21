@@ -5357,3 +5357,246 @@
   font-size:.48rem;
   line-height:1.5;
 }
+
+
+/* ==========================================================================
+   STUDIO-VISUAL-4 — Canvas authoring
+   ========================================================================== */
+
+.apx-canvas-stack{
+  display:grid;
+  gap:.45rem;
+}
+
+.apx-canvas-field{
+  display:grid;
+  gap:.3rem;
+}
+
+.apx-canvas-field>span,
+.apx-canvas-hint{
+  color:#758aa4;
+  font-size:.47rem;
+  line-height:1.45;
+}
+
+.apx-canvas-color-row{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  gap:.42rem;
+  align-items:center;
+}
+
+.apx-canvas-color-row>input[type="color"]{
+  width:34px;
+  height:32px;
+  padding:2px;
+  border:1px solid #1b344f;
+  border-radius:6px;
+  background:#091827;
+  cursor:pointer;
+}
+
+.apx-canvas-gradient-stops{
+  display:grid;
+  gap:.32rem;
+}
+
+.apx-canvas-gradient-stops>div{
+  display:grid;
+  grid-template-columns:32px minmax(0,1fr) 28px;
+  gap:.32rem;
+}
+
+.apx-canvas-gradient-stops input[type="color"]{
+  width:32px;
+  height:32px;
+  padding:2px;
+  border:1px solid #1b344f;
+  border-radius:5px;
+  background:#091827;
+}
+
+.apx-canvas-gradient-stops button,
+.apx-canvas-mini-button,
+.apx-canvas-apply{
+  min-height:28px;
+  border:1px solid #1d3955;
+  border-radius:5px;
+  color:#90a5bd;
+  background:#091827;
+  font-size:.47rem;
+  font-weight:700;
+}
+
+.apx-canvas-gradient-stops>button{
+  padding:0 .55rem;
+  justify-self:start;
+}
+
+.apx-canvas-gradient-stops button:hover:not(:disabled),
+.apx-canvas-mini-button:hover,
+.apx-canvas-apply:hover{
+  color:#edf4ff;
+  border-color:#315875;
+  background:#0d2032;
+}
+
+.apx-canvas-check,
+.apx-canvas-check-row{
+  display:flex;
+  align-items:center;
+  gap:.42rem;
+}
+
+.apx-canvas-check{
+  color:#8094ab;
+  font-size:.49rem;
+}
+
+.apx-canvas-check input{
+  accent-color:#6384ef;
+}
+
+.apx-canvas-check-row{
+  gap:.9rem;
+}
+
+.apx-canvas-section-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+}
+
+.apx-canvas-switch{
+  position:relative;
+  width:30px;
+  height:17px;
+  flex:0 0 auto;
+}
+
+.apx-canvas-switch input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.apx-canvas-switch span{
+  position:absolute;
+  inset:0;
+  border:1px solid #243c57;
+  border-radius:999px;
+  background:#0a1826;
+  cursor:pointer;
+  transition:.12s ease;
+}
+
+.apx-canvas-switch span::after{
+  content:'';
+  position:absolute;
+  width:11px;
+  height:11px;
+  left:2px;
+  top:2px;
+  border-radius:50%;
+  background:#70849c;
+  transition:.12s ease;
+}
+
+.apx-canvas-switch input:checked + span{
+  border-color:#4e69cf;
+  background:#293d91;
+}
+
+.apx-canvas-switch input:checked + span::after{
+  transform:translateX(13px);
+  background:#dce5ff;
+}
+
+.apx-canvas-layer-stack{
+  display:grid;
+  gap:.4rem;
+}
+
+.apx-canvas-layer-card{
+  display:grid;
+  gap:.38rem;
+  padding:.48rem;
+  border:1px solid #172d45;
+  border-radius:7px;
+  background:#071522;
+}
+
+.apx-canvas-layer-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 28px;
+  gap:.35rem;
+}
+
+.apx-canvas-layer-head>button{
+  border:1px solid #24374c;
+  border-radius:5px;
+  color:#8ea0b5;
+  background:#0a1928;
+}
+
+.apx-canvas-layer-head>button:hover{
+  color:#ffd9df;
+  border-color:#5c3340;
+  background:#29151d;
+}
+
+.apx-canvas-json{
+  width:100%;
+  min-height:120px;
+  resize:vertical;
+  padding:.55rem;
+  border:1px solid #1a344f;
+  border-radius:6px;
+  outline:none;
+  color:#c8d5e5;
+  background:#050d16;
+  font:500 .5rem/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+
+.apx-canvas-json:focus{
+  border-color:#426da5;
+  box-shadow:0 0 0 2px rgba(66,109,165,.12);
+}
+
+.apx-canvas-apply{
+  justify-self:start;
+  padding:0 .55rem;
+}
+
+.apx-canvas-runtime-note{
+  display:grid;
+  gap:.2rem;
+  padding:.55rem .6rem;
+  border:1px solid #4c3d20;
+  border-radius:6px;
+  color:#9d8a67;
+  background:#1a160d;
+}
+
+.apx-canvas-runtime-note strong{
+  color:#c9ae76;
+  font-size:.49rem;
+}
+
+.apx-canvas-runtime-note span{
+  font-size:.45rem;
+  line-height:1.45;
+}
+
+.apx-pre4-artboard[style*="background: transparent"]{
+  background-color:transparent!important;
+  background-image:
+    linear-gradient(45deg,#0b1826 25%,transparent 25%),
+    linear-gradient(-45deg,#0b1826 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#0b1826 75%),
+    linear-gradient(-45deg,transparent 75%,#0b1826 75%)!important;
+  background-size:24px 24px!important;
+  background-position:0 0,0 12px,12px -12px,-12px 0!important;
+}
