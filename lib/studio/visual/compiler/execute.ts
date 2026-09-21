@@ -8,6 +8,11 @@ import type {
   StudioTargetReference,
   StudioTextProperties,
 } from './plan';
+import type {
+  StudioConnectorOptions,
+  StudioPathCommand,
+  StudioPathDrawOptions,
+} from '../path-pixel-contract';
 
 export interface StudioOperationRuntime {
   createCanvas(
@@ -22,6 +27,42 @@ export interface StudioOperationRuntime {
     properties: StudioTextProperties,
     canvasBuffer: Uint8Array,
   ): Promise<Uint8Array>;
+  drawPath?(
+    canvasBuffer: Uint8Array,
+    commands: StudioPathCommand[],
+    options?: StudioPathDrawOptions,
+  ): Promise<Uint8Array>;
+  customPath?(
+    options: StudioConnectorOptions | StudioConnectorOptions[],
+    canvasBuffer: Uint8Array,
+  ): Promise<Uint8Array>;
+  manipulatePixels?(
+    canvasBuffer: Uint8Array,
+    options: {
+      filter: 'grayscale' | 'invert' | 'sepia' | 'brightness' | 'contrast' | 'saturate';
+      intensity?: number;
+      region?: { x: number; y: number; width: number; height: number };
+    },
+  ): Promise<Uint8Array>;
+  setPixelColor?(
+    canvasBuffer: Uint8Array,
+    x: number,
+    y: number,
+    color: { r: number; g: number; b: number; a?: number },
+  ): Promise<Uint8Array>;
+  getPixelColor?(canvasBuffer: Uint8Array, x: number, y: number): Promise<unknown>;
+  getPixelData?(
+    canvasBuffer: Uint8Array,
+    region?: { x: number; y: number; width: number; height: number },
+  ): Promise<unknown>;
+  detectPath?(
+    commands: StudioPathCommand[],
+    x: number,
+    y: number,
+    options?: { includeStroke?: boolean; strokeWidth?: number; tolerance?: number; fillRule?: 'nonzero' | 'evenodd' },
+  ): Promise<unknown>;
+  detectRegion?(region: unknown, x: number, y: number, options?: { tolerance?: number }): Promise<unknown>;
+  detectDistance?(region: unknown, x: number, y: number): Promise<unknown>;
 }
 
 type RuntimeValue = { buffer: Uint8Array } | Uint8Array;
@@ -109,6 +150,57 @@ export async function executeStudioOperationPlan(
         }
         const value = await runtime.createText(operation.properties, base);
         values.set(operation.target, value);
+        break;
+      }
+      case 'path-draw': {
+        const base = targetValue(operation.base, values);
+        if (!runtime.drawPath) throw new Error('Studio runtime does not implement path2d.draw().');
+        values.set(operation.target, await runtime.drawPath(base, operation.commands, operation.options));
+        break;
+      }
+      case 'path-custom': {
+        const base = targetValue(operation.base, values);
+        if (!runtime.customPath) throw new Error('Studio runtime does not implement path2d.custom().');
+        values.set(operation.target, await runtime.customPath(operation.options, base));
+        break;
+      }
+      case 'pixels-manipulate': {
+        const base = targetValue(operation.base, values);
+        if (!runtime.manipulatePixels) throw new Error('Studio runtime does not implement pixels.manipulate().');
+        values.set(operation.target, await runtime.manipulatePixels(base, operation.options));
+        break;
+      }
+      case 'pixels-set-color': {
+        const base = targetValue(operation.base, values);
+        if (!runtime.setPixelColor) throw new Error('Studio runtime does not implement pixels.setColor().');
+        values.set(operation.target, await runtime.setPixelColor(base, operation.x, operation.y, operation.color));
+        break;
+      }
+      case 'pixels-get-color': {
+        const base = targetValue(operation.base, values);
+        if (!runtime.getPixelColor) throw new Error('Studio runtime does not implement pixels.getColor().');
+        await runtime.getPixelColor(base, operation.x, operation.y);
+        break;
+      }
+      case 'pixels-get-data': {
+        const base = targetValue(operation.base, values);
+        if (!runtime.getPixelData) throw new Error('Studio runtime does not implement pixels.getData().');
+        await runtime.getPixelData(base, operation.region);
+        break;
+      }
+      case 'detect-path': {
+        if (!runtime.detectPath) throw new Error('Studio runtime does not implement detect.path().');
+        await runtime.detectPath(operation.commands, operation.x, operation.y, operation.options);
+        break;
+      }
+      case 'detect-region': {
+        if (!runtime.detectRegion) throw new Error('Studio runtime does not implement detect.region().');
+        await runtime.detectRegion(operation.region, operation.x, operation.y, operation.options);
+        break;
+      }
+      case 'detect-distance': {
+        if (!runtime.detectDistance) throw new Error('Studio runtime does not implement detect.distance().');
+        await runtime.detectDistance(operation.region, operation.x, operation.y);
         break;
       }
       default:
