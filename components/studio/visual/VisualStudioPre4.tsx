@@ -2826,9 +2826,14 @@ export default function VisualStudioPre4({
     const sourceString = typeof source === 'string' ? source : '';
     const sourceAssetId = typeof source === 'string' ? studioAssetIdFromReference(source) : null;
     const generatedId = typeof source === 'object' && source ? source.$generated : '';
+    const primaryLayerIndex = layerIds.indexOf(primaryMedia.id);
     const availableGenerated = layerIds
+      .slice(0, Math.max(0, primaryLayerIndex))
       .map((id) => project.document.nodes[id])
-      .filter((node) => node && (node.kind === 'image' || node.kind === 'shape') && node.id !== primaryMedia.id);
+      .filter(
+        (node): node is VisualNode =>
+          Boolean(node && (node.kind === 'image' || node.kind === 'shape')),
+      );
     return (
       <>
         {renderMediaHeader()}
