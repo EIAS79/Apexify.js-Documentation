@@ -4332,7 +4332,16 @@ export default function VisualStudioPre4({
                     className="apx-pre4-node"
                     data-kind={node.kind}
                     data-selected={isSelected ? 'true' : undefined}
-                    onPointerDown={(event) => beginMove(event, id)}
+                    data-inline-editing={inlineTextEditId === id ? 'true' : undefined}
+                    onPointerDown={(event) => {
+                      if (inlineTextEditId === id) return;
+                      beginMove(event, id);
+                    }}
+                    onDoubleClick={(event) => {
+                      if (node.kind !== 'text' || node.transform?.locked) return;
+                      event.stopPropagation();
+                      beginInlineTextEdit(node);
+                    }}
                     style={{
                       left: rect.x,
                       top: rect.y,
@@ -4343,8 +4352,32 @@ export default function VisualStudioPre4({
                       zIndex: node.transform?.zIndex ?? 0,
                     }}
                   >
-                    <span>{node.name ?? node.kind}</span>
-                    {isSelected && !node.transform?.locked && handles.map((handle) => (
+                    {node.kind === 'text' && inlineTextEditId === id ? (
+                      <textarea
+                        autoFocus
+                        className="apx-inline-text-editor"
+                        data-inline-text-editor={id}
+                        value={visualTextProps(node).text}
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
+                        onDoubleClick={(event) => event.stopPropagation()}
+                        onChange={(event) => updateInlineText(id, event.target.value)}
+                        onBlur={finishInlineTextEdit}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Escape') {
+                            event.preventDefault();
+                            event.currentTarget.blur();
+                          }
+                          if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                            event.preventDefault();
+                            event.currentTarget.blur();
+                          }
+                        }}
+                      />
+                    ) : (
+                      <span>{node.name ?? node.kind}</span>
+                    )}
+                    {isSelected && inlineTextEditId !== id && !node.transform?.locked && handles.map((handle) => (
                       <button
                         key={handle}
                         aria-label={'Resize ' + handle}
@@ -4357,7 +4390,7 @@ export default function VisualStudioPre4({
                         }}
                       />
                     ))}
-                    {isSelected && !node.transform?.locked && (
+                    {isSelected && inlineTextEditId !== id && !node.transform?.locked && (
                       <button
                         aria-label="Rotate"
                         className="apx-pre4-rotate"
