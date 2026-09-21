@@ -207,6 +207,7 @@ export default function VisualStudioPre4({
   const [modalPreviewError, setModalPreviewError] = useState<string | null>(null);
 
   const history = useRef(new VisualHistory(100));
+  const projectRef = useRef(project);
   const gesture = useRef<Gesture | null>(null);
   const clipboard = useRef<VisualClipboard | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -274,7 +275,109 @@ export default function VisualStudioPre4({
 
   useEffect(() => {
     setDirty(semanticSignature(project) !== cleanSignature.current);
+    projectRef.current = project;
   }, [project]);
+
+  const persistLiveCode = (source: string, fileName: string) => {
+    try {
+      window.localStorage.setItem(
+        VISUAL_CODE_STORAGE_KEY,
+        JSON.stringify({ source, fileName, savedAt: Date.now() }),
+      );
+    } catch {}
+  };
+
+  const applyCodeToVisual = (source: string) => {
+    const current = projectRef.current;
+    const result = reconcileVisualProjectFromCode(current, source);
+    if (!result.ok) {
+      setCodeSyncState('error');
+      setCodeSyncError(result.error);
+      return false;
+    }
+
+    setCodeSyncError(null);
+    setCodeSyncState('synced');
+    if (!result.changed) return true;
+
+    history.current.commit(current, result.project, 'Code → Visual');
+    codeAppliedSignatureRef.current = semanticSignature(result.project);
+    projectRef.current = result.project;
+    setProject(result.project);
+    setHistoryTick((value) => value + 1);
+    setMessage('Code synced to canvas');
+    return true;
+  };
+
+  const saveLiveCode = (source = codeSource, fileName = codeFileName) => {
+    window.clearTimeout(codeSaveTimerRef.current);
+    persistLiveCode(source, fileName);
+    const ok = applyCodeToVisual(source);
+    if (ok) setMessage('Code autosaved · canvas synced');
+  };
+
+  const updateLiveCode = (next: string) => {
+    setCodeSource(next);
+    setCodeSyncState('saving');
+    setCodeSyncError(null);
+    window.clearTimeout(codeSaveTimerRef.current);
+    codeSaveTimerRef.current = window.setTimeout(() => {
+      persistLiveCode(next, codeFileName);
+      applyCodeToVisual(next);
+    }, 320);
+  };
+
+  useEffect(() => {
+    if (codeHydratedRef.current || !generated.value) return;
+    codeHydratedRef.current = true;
+
+    let source = generated.value.source;
+    let fileName = generated.value.fileName;
+    try {
+      const raw = window.localStorage.getItem(VISUAL_CODE_STORAGE_KEY);
+      if (raw) {
+        const stored = JSON.parse(raw) as { source?: string; fileName?: string };
+        if (stored.source) {
+          const reconciled = reconcileVisualProjectFromCode(projectRef.current, stored.source);
+          if (reconciled.ok) {
+            source = stored.source;
+            fileName = stored.fileName || fileName;
+            if (reconciled.changed) {
+              codeAppliedSignatureRef.current = semanticSignature(reconciled.project);
+              projectRef.current = reconciled.project;
+              setProject(reconciled.project);
+            }
+          }
+        }
+      }
+    } catch {}
+
+    setCodeSource(source);
+    setCodeFileName(fileName);
+    setCodeSyncState('synced');
+  }, [generated.value]);
+
+  useEffect(() => {
+    if (!codeHydratedRef.current || !generated.value) return;
+    const signature = semanticSignature(project);
+    if (codeAppliedSignatureRef.current === signature) {
+      codeAppliedSignatureRef.current = '';
+      return;
+    }
+    setCodeSource(generated.value.source);
+    if (!fileNameTouchedRef.current) setCodeFileName(generated.value.fileName);
+    setCodeSyncState('synced');
+    setCodeSyncError(null);
+    persistLiveCode(generated.value.source, fileNameTouchedRef.current ? codeFileName : generated.value.fileName);
+  }, [generated.value?.source, generated.value?.fileName, project]);
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(codeSaveTimerRef.current);
+      webRuntimeRef.current?.dispose();
+      webRuntimeRef.current = null;
+    };
+  }, []);
 
   const mutate = (
     label: string,
@@ -838,16 +941,86 @@ export default function VisualStudioPre4({
   };
 
   const handoff = () => {
-    if (!generated.value) {
+    const source = codeSource || generated.value?.source;
+    if (!source) {
       setMessage(generated.error ?? 'Code unavailable');
       return;
     }
     setCodeHandoff({
       id: createVisualId('handoff'),
       name: project.name + ' — Generated',
-      source: generated.value.source,
+      source,
     });
     onModeChange('code');
+  };
+
+  const renderVisualPreview = async (openModal = true) => {
+    const source = codeSource || generated.value?.source;
+    if (openModal) setPreviewModalOpen(true);
+    if (!source) {
+      setModalPreviewError(generated.error ?? 'Code unavailable');
+      return;
+    }
+
+    setModalPreviewLoading(true);
+    setModalPreviewError(null);
+    try {
+      const runtime =
+        webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
+      await runtime.registerFonts(assets);
+      const result = await runtime.renderStudioSource(source, assets);
+      if (!result.ok) {
+        setModalPreviewUrl(null);
+        setModalPreviewError(result.error);
+        setMessage('Preview failed');
+        return;
+      }
+      setModalPreviewUrl(result.dataUrl);
+      setModalPreviewMime(result.mime);
+      setMessage('Preview rendered');
+    } catch (error) {
+      setModalPreviewUrl(null);
+      setModalPreviewError(error instanceof Error ? error.message : 'Preview failed');
+    } finally {
+      setModalPreviewLoading(false);
+    }
+  };
+
+  const downloadTextFile = (source: string, fileName: string) => {
+    const blob = new Blob([source], { type: 'text/typescript;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName.endsWith('.ts') ? fileName : fileName + '.ts';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadCanvasPreview = () => {
+    if (!modalPreviewUrl) return;
+    const extension =
+      modalPreviewMime === 'image/jpeg' ? 'jpg' :
+      modalPreviewMime === 'image/webp' ? 'webp' :
+      modalPreviewMime === 'image/gif' ? 'gif' : 'png';
+    const link = document.createElement('a');
+    link.href = modalPreviewUrl;
+    link.download = safeVisualDownloadStem(project.name) + '.' + extension;
+    link.click();
+  };
+
+  const renameCanvas = (name: string) => {
+    const nextName = name || 'Untitled Canvas';
+    setProject((current) => {
+      const next = { ...current, name: nextName, updatedAt: new Date().toISOString() };
+      projectRef.current = next;
+      return next;
+    });
+  };
+
+  const updateCodeFileName = (name: string) => {
+    fileNameTouchedRef.current = true;
+    setCodeFileName(name);
+    persistLiveCode(codeSource, name);
   };
 
   const onWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
