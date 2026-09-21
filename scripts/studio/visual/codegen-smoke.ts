@@ -7,6 +7,10 @@ import {
   defaultShapeNodeProps,
   imagePropsRecord,
 } from '../../../lib/studio/visual/image-contract';
+import {
+  defaultTextNodeProps,
+  textPropsRecord,
+} from '../../../lib/studio/visual/text-contract';
 import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { executeStudioOperationPlan } from '../../../lib/studio/visual/compiler/execute';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
@@ -180,6 +184,134 @@ async function run() {
       bytes: imagePreview.byteLength,
       sha256: digest(imagePreview),
       generatedFile: imageGenerated.fileName,
+    }),
+  );
+
+
+  const textProject = createVisualProject({
+    id: 'project_phase6_runtime',
+    name: 'Phase 6 Runtime',
+    width: 640,
+    height: 360,
+    now: '2026-09-21T00:00:00.000Z',
+  });
+  textProject.document.canvas = {
+    colorBg: '#07172d',
+    borderRadius: 18,
+  };
+  const runtimeTextProps = {
+    ...defaultTextNodeProps('Apexify Studio\nText and fonts.'),
+    font: {
+      size: 48,
+      family: 'Arial',
+      name: 'Arial',
+    },
+    decorations: {
+      bold: true,
+      italic: false,
+      underline: { color: '#7dd3fc', width: 2 },
+    },
+    layout: {
+      lineHeight: 1.3,
+      letterSpacing: 1,
+      wordSpacing: 1,
+      maxWidth: 420,
+      maxHeight: 150,
+    },
+    placement: {
+      textAlign: 'left' as const,
+      textBaseline: 'top' as const,
+      rotation: -3,
+    },
+    fill: {
+      color: '#f8fafc',
+      opacity: .96,
+    },
+    effects: {
+      shadow: {
+        color: '#000000',
+        offsetX: 0,
+        offsetY: 6,
+        blur: 12,
+        opacity: .35,
+      },
+    },
+    stroke: {
+      color: '#0b1730',
+      width: 1,
+      opacity: .8,
+      style: 'solid' as const,
+    },
+    includeCharMetrics: true,
+    measurementCanvas: { width: 1000, height: 500 },
+  };
+  const runtimeText = createVisualNode(
+    'text',
+    textPropsRecord(runtimeTextProps),
+    { id: 'text_runtime_copy', name: 'Runtime Copy' },
+  );
+  runtimeText.transform = {
+    x: 100,
+    y: 95,
+    width: 420,
+    height: 150,
+    rotation: -3,
+    opacity: .96,
+    visible: true,
+    locked: false,
+  };
+  textProject.document.nodes[runtimeText.id] = runtimeText;
+  textProject.document.rootNodeIds = [runtimeText.id];
+
+  const textPlan = lowerVisualProject(textProject);
+  const textPreview = await executeStudioOperationPlan(textPlan, {
+    createCanvas: async (options) => {
+      const canvas = await painter.createCanvas(
+        options as Parameters<ApexPainter['createCanvas']>[0],
+      );
+      return { buffer: canvas.buffer };
+    },
+    createText: async (properties, base) => {
+      const buffer = await painter.createText(
+        properties as Parameters<ApexPainter['createText']>[0],
+        base as Parameters<ApexPainter['createText']>[1],
+      );
+      return buffer;
+    },
+  });
+
+  const textGenerated = generateVisualProjectCode(textProject);
+  const textBody = textGenerated.source.replace(
+    /^import \{ ApexPainter \} from 'apexify\.js';\n\n/,
+    '',
+  );
+  const executeTextGenerated = new AsyncFunction('ApexPainter', textBody);
+  const textGeneratedBuffer = await executeTextGenerated(ApexPainter);
+  assert.equal(digest(textGeneratedBuffer), digest(textPreview));
+  assert.ok(textPreview.byteLength > 0);
+
+  const metrics = await painter.measureText(
+    {
+      ...runtimeTextProps,
+      x: 100,
+      y: 95,
+    } as Parameters<ApexPainter['measureText']>[0],
+  );
+  assert.ok(metrics.width > 0);
+  assert.ok(metrics.height > 0);
+  assert.ok(metrics.lines.length >= 2);
+  assert.ok((metrics.chars?.length ?? 0) > 0);
+
+  console.log(
+    '[studio-visual:phase6] equivalent text preview-codegen + metrics proof passed',
+    JSON.stringify({
+      bytes: textPreview.byteLength,
+      sha256: digest(textPreview),
+      width: metrics.width,
+      height: metrics.height,
+      lines: metrics.lines.length,
+      chars: metrics.chars?.length ?? 0,
+      generatedFile: textGenerated.fileName,
     }),
   );
 }
