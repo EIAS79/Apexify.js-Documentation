@@ -6,6 +6,7 @@ import type {
   StudioImageProperties,
   StudioOperationPlan,
   StudioTargetReference,
+  StudioTextProperties,
 } from './plan';
 
 export interface StudioOperationRuntime {
@@ -16,6 +17,10 @@ export interface StudioOperationRuntime {
     properties: Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array },
     canvasBuffer: Uint8Array,
     options?: VisualCreateImageOptions,
+  ): Promise<Uint8Array>;
+  createText?(
+    properties: StudioTextProperties,
+    canvasBuffer: Uint8Array,
   ): Promise<Uint8Array>;
 }
 
@@ -94,6 +99,15 @@ export async function executeStudioOperationPlan(
           base,
           operation.options,
         );
+        values.set(operation.target, value);
+        break;
+      }
+      case 'create-text': {
+        const base = targetValue(operation.base, values);
+        if (!runtime.createText) {
+          throw new Error('Studio runtime does not implement createText().');
+        }
+        const value = await runtime.createText(operation.properties, base);
         values.set(operation.target, value);
         break;
       }
