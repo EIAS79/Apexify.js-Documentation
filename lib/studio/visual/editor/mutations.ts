@@ -105,6 +105,18 @@ export function updateSelectedTransforms(
   return next;
 }
 
+export function updateSelectedNodeState(
+  project: VisualProject,
+  patch: Partial<Pick<VisualTransform, 'visible' | 'locked'>>,
+): VisualProject {
+  let next = project;
+  for (const id of selectedNodeIds(project)) {
+    if (!next.document.nodes[id]) continue;
+    next = updateNodeTransform(next, id, patch);
+  }
+  return next;
+}
+
 function descendantIds(project: VisualProject, id: string, out = new Set<string>()): Set<string> {
   if (out.has(id)) return out;
   out.add(id);
@@ -201,7 +213,10 @@ export type DistributeMode = 'horizontal' | 'vertical';
 export function alignSelectedNodes(project: VisualProject, mode: AlignMode): VisualProject {
   const ids = selectedNodeIds(project);
   if (ids.length < 2) return project;
-  const rects = ids.map((id) => ({ id, rect: nodeRect(project.document.nodes[id]?.transform) }));
+  const rects = ids
+    .filter((id) => !resolvedTransform(project.document.nodes[id]?.transform).locked)
+    .map((id) => ({ id, rect: nodeRect(project.document.nodes[id]?.transform) }));
+  if (rects.length < 2) return project;
   const left = Math.min(...rects.map(({ rect }) => rect.x));
   const right = Math.max(...rects.map(({ rect }) => rect.x + rect.width));
   const top = Math.min(...rects.map(({ rect }) => rect.y));
@@ -227,7 +242,10 @@ export function distributeSelectedNodes(project: VisualProject, mode: Distribute
   const ids = selectedNodeIds(project);
   if (ids.length < 3) return project;
 
-  const items = ids.map((id) => ({ id, rect: nodeRect(project.document.nodes[id]?.transform) }));
+  const items = ids
+    .filter((id) => !resolvedTransform(project.document.nodes[id]?.transform).locked)
+    .map((id) => ({ id, rect: nodeRect(project.document.nodes[id]?.transform) }));
+  if (items.length < 3) return project;
   const sorted = [...items].sort((a, b) =>
     mode === 'horizontal' ? a.rect.x - b.rect.x : a.rect.y - b.rect.y,
   );
