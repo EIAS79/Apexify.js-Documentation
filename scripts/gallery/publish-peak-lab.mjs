@@ -438,7 +438,57 @@ function importsForStandalone(source) {
 
 function formatStandaloneModule(code, id) {
   try {
-    return esbuild.transformSync(co®-®éÜj×
+    return esbuild.transformSync(code, {
+      loader: 'ts',
+      format: 'esm',
+      target: 'es2022',
+      minify: false,
+      legalComments: 'none',
+    }).code.trim();
+  } catch (error) {
+    throw new Error(
+      'Recipe ' + id + ' standalone code could not be formatted: ' +
+      (error instanceof Error ? error.message : String(error)),
+    );
+  }
+}
+
+function makeStandaloneRecipeSource(block, id, helperIndex) {
+  const rawBody = extractRecipeRunBody(block, id);
+  const body = simplifyRecipeReturnSaves(rawBody);
+  const helpers = helpersForRecipe(body, helperIndex);
+  const supportAndBody = helpers + '\n\nasync function main() {\n' + body + '\n}';
+  const imports = importsForStandalone(supportAndBody);
+
+  const moduleCode =
+    imports +
+    '\n\nconst painter = new ApexPainter();\n\n' +
+    (helpers ? helpers + '\n\n' : '') +
+    'async function main() {\n' +
+    body +
+    '\n}\n';
+
+  return formatStandaloneModule(moduleCode, id) + '\n\nreturn await main();';
+}
+
+function standalonePagesForRecipe(id, code, maxLines = 220) {
+  const lines = code.trim().split(/\r?\n/);
+  if (lines.length <= maxLines) {
+    return [{ label: 'Recipe ' + id, language: 'ts', code }];
+  }
+
+  const chunks = [];
+  for (let i = 0; i < lines.length; i += maxLines) {
+    chunks.push(lines.slice(i, i + maxLines).join('\n'));
+  }
+
+  return chunks.map((chunk, index) => ({
+    label: 'Recipe ' + id + ' - ' + (index + 1) + '/' + chunks.length,
+    language: 'ts',
+    code: chunk,
+  }));
+}
+
 const source = await fs.readFile(sourcePath, 'utf8');
 const sharedMatch = source.match(/import \* as ApexRuntime[\s\S]*?(?=\/\/ ===== EXAMPLE 01-canvas =====)/);
 if (!sharedMatch) throw new Error('Peak Lab shared setup block not found');
