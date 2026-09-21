@@ -12,6 +12,7 @@ import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import { StudioCommandPalette } from '@/components/studio/StudioCommandPalette';
 import { StudioFileTabs } from '@/components/studio/StudioFileTabs';
 import { StudioOutputPanel } from '@/components/studio/StudioOutputPanel';
+import type { StudioPreviewArtifact } from '@/components/studio/StudioArtifactPreview';
 import { StudioResizableSplit } from '@/components/studio/StudioResizableSplit';
 import { StudioShortcutOverlay } from '@/components/studio/StudioShortcutOverlay';
 import { StudioStatusBar } from '@/components/studio/StudioStatusBar';
