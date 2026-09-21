@@ -5277,6 +5277,34 @@ export default function VisualStudioPre4({
               ) : null}
               <div className="apx-pre4-artboard-grid" />
 
+              {freehandDraft.length > 1 ? (
+                <svg
+                  width={project.document.width}
+                  height={project.document.height}
+                  viewBox={'0 0 ' + project.document.width + ' ' + project.document.height}
+                  aria-hidden
+                  data-freehand-draft
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    overflow: 'visible',
+                    pointerEvents: 'none',
+                    zIndex: 9999,
+                  }}
+                >
+                  <polyline
+                    points={freehandDraft.map((point) => point.x + ',' + point.y).join(' ')}
+                    fill="none"
+                    stroke="#7dd3fc"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : null}
+
               {guides.map((guide, index) => (
                 <div
                   key={index}
