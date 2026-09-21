@@ -65,6 +65,19 @@ async function verify(width, height) {
       return content.includes('width: 1024');
     });
 
+    // Phase 5: Shapes is a real authoring surface. Inserting a native shape
+    // must create a semantic layer, generate createImage(), and render through
+    // the authoritative Apexify Web artboard frame.
+    await page.click('[data-feature-tool="shapes"]');
+    await page.waitForSelector('[data-visual-shapes-context]', { visible: true });
+    await page.click('[data-shape-insert="rectangle"]');
+    await page.waitForSelector('[data-visual-node][data-kind="shape"][data-selected="true"]', { visible: true });
+    await page.waitForFunction(() => {
+      const content = document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('createImage') && content.includes('source: "rectangle"');
+    });
+    await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
+
     await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });
   }
 
@@ -88,7 +101,8 @@ async function verify(width, height) {
   await page.waitForSelector('[data-visual-code-modal]', { visible: true });
   await page.waitForFunction(() => {
     const content = document.querySelector('[data-visual-code-modal] .cm-content')?.textContent || '';
-    return content.includes('createCanvas') && content.includes('return canvas.buffer');
+    return content.includes('createCanvas') &&
+      (content.includes('createImage') || content.includes('return canvas.buffer'));
   });
   await page.click('[data-visual-code-modal-close]');
 
@@ -109,7 +123,8 @@ async function verify(width, height) {
       const panels = [...document.querySelectorAll('[data-studio-code-panel]:not([hidden]) .cm-content')];
       return panels.some((node) => {
         const content = node.textContent || '';
-        return content.includes('createCanvas') && content.includes('return canvas.buffer');
+        return content.includes('createCanvas') &&
+          (content.includes('createImage') || content.includes('return canvas.buffer'));
       });
     });
   }
