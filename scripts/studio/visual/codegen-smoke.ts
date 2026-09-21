@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { ApexPainter } from 'apexify.js';
 import { createPhase2ProofProject } from '../../../lib/studio/visual/sample';
-import { createVisualProject } from '../../../lib/studio/visual/project';
+import { createVisualNode, createVisualProject } from '../../../lib/studio/visual/project';
+import {
+  defaultShapeNodeProps,
+  imagePropsRecord,
+} from '../../../lib/studio/visual/image-contract';
 import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { executeStudioOperationPlan } from '../../../lib/studio/visual/compiler/execute';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
@@ -104,9 +108,83 @@ async function run() {
       generatedFile: canvasGenerated.fileName,
     }),
   );
+
+  const imageProject = createVisualProject({
+    id: 'project_phase5_runtime',
+    name: 'Phase 5 Runtime',
+    width: 420,
+    height: 280,
+    now: '2026-09-21T00:00:00.000Z',
+  });
+  imageProject.document.canvas = {
+    colorBg: '#07172d',
+    borderRadius: 16,
+  };
+  const star = createVisualNode(
+    'shape',
+    imagePropsRecord({
+      ...defaultShapeNodeProps('star'),
+      shape: {
+        ...defaultShapeNodeProps('star').shape,
+        color: '#6f86ff',
+        innerRadius: 34,
+        outerRadius: 72,
+      },
+      stroke: { color: '#dbe7ff', width: 2, opacity: .9 },
+      shadow: { color: '#000000', offsetX: 0, offsetY: 8, blur: 14, opacity: .3 },
+    }),
+    { id: 'shape_runtime_star', name: 'Runtime Star' },
+  );
+  star.transform = {
+    x: 120,
+    y: 54,
+    width: 180,
+    height: 180,
+    rotation: 8,
+    opacity: .95,
+    visible: true,
+    locked: false,
+  };
+  imageProject.document.nodes[star.id] = star;
+  imageProject.document.rootNodeIds = [star.id];
+
+  const imagePlan = lowerVisualProject(imageProject);
+  const imagePreview = await executeStudioOperationPlan(imagePlan, {
+    createCanvas: async (options) => {
+      const canvas = await painter.createCanvas(options as Parameters<ApexPainter['createCanvas']>[0]);
+      return { buffer: canvas.buffer };
+    },
+    createImage: async (properties, base, options) => {
+      const buffer = await painter.createImage(
+        properties as Parameters<ApexPainter['createImage']>[0],
+        base as Parameters<ApexPainter['createImage']>[1],
+        options as Parameters<ApexPainter['createImage']>[2],
+      );
+      return buffer;
+    },
+  });
+
+  const imageGenerated = generateVisualProjectCode(imageProject);
+  const imageBody = imageGenerated.source.replace(
+    /^import \{ ApexPainter \} from 'apexify\.js';\n\n/,
+    '',
+  );
+  const executeImageGenerated = new AsyncFunction('ApexPainter', imageBody);
+  const imageGeneratedBuffer = await executeImageGenerated(ApexPainter);
+  assert.equal(digest(imageGeneratedBuffer), digest(imagePreview));
+  assert.ok(imagePreview.byteLength > 0);
+
+  console.log(
+    '[studio-visual:phase5] equivalent image/shape preview-codegen proof passed',
+    JSON.stringify({
+      bytes: imagePreview.byteLength,
+      sha256: digest(imagePreview),
+      generatedFile: imageGenerated.fileName,
+    }),
+  );
 }
 
 run().catch((error) => {
-  console.error('[studio-visual:phase2] proof failed', error);
+  console.error('[studio-visual] proof failed', error);
   process.exitCode = 1;
 });
