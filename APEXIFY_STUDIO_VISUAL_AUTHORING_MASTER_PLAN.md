@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3210,8 +3210,8 @@ feat(studio-visual): release visual authoring and preview-to-code
 | PRE-4 | Studio product shell rebuild | MAIN MERGED | `b530d0a8f18290ac3f9081744153c9aae58a9dfe` | Studio Visual push gate `35632663379` PASS; PR gate `35632667933` PASS; build/browser/screenshot proof PASS; production deployment deferred because Vercel quota is rate-limited |
 | 4 | Canvas | MAIN MERGED | `7c33de0eae60a6ed7a12fb41b942610eaf702498` | PR #83; exact-head Studio Visual gate `35654406532` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because Vercel quota is rate-limited |
 | 5 | Images / shapes / assets | MAIN MERGED | `b3aa8683345f48687cddc4e54077bdfd3f13226d` | PR #84; exact-head Studio Visual gate `35657277254` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because no exact merge deployment is available yet |
-| 6 | Text / fonts | NOT STARTED | — | NEXT — activate Text/Fonts authoring and extend linked Code ↔ Visual reconciliation |
-| 7 | Paths / doodle / pixels / detect | NOT STARTED | — | — |
+| 6 | Text / fonts | MAIN MERGED | `123d0bea6a324acb1a715d45d0f2faa70a500b05` | PR #85; exact-head Studio Visual gate `35662040413` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; Apexify Web text renderer merged as `fb48f08ed8fc3d48628d8a93b15fe5d94b69bfbb`; production verification deferred while Vercel quota is unavailable |
+| 7 | Paths / doodle / pixels / detect | NOT STARTED | — | NEXT — activate Paths and implement path/doodle/pixel/detection authoring against the permanent shell |
 | 8 | Charts | NOT STARTED | — | — |
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
 | 10 | Image utilities | NOT STARTED | — | — |
@@ -3543,6 +3543,77 @@ Studio image asset
 ```
 
 Production verification remains deferred until an exact Phase 5 main deployment is available.
+
+---
+
+## Phase 6 implementation record — STUDIO-VISUAL-6
+
+> **Status:** MAIN MERGED — PRODUCTION VERIFICATION DEFERRED
+>
+> **Work branch:** `studio-visual/v06-text-fonts`
+>
+> **PR:** #85
+>
+> **Verified implementation head:** `426b86342f9a4da7ff1251a28815c240e53c9273`
+>
+> **Green Studio Visual gate:** GitHub Actions `35662040413`
+>
+> **Main integration:** `123d0bea6a324acb1a715d45d0f2faa70a500b05`
+>
+> **Apexify.js runtime integration:** PR #33 merged as `fb48f08ed8fc3d48628d8a93b15fe5d94b69bfbb`
+>
+> **Production deployment:** DEFERRED — Vercel production verification is intentionally not claimed while deployment quota is unavailable.
+
+Completed Phase-6 scope:
+
+- modeled the pinned Apexify `TextProperties` contract, including modern nested `font`, `decorations`, `effects`, `layout`, `placement`, `fill`, `stroke`, `textOnCurve`, measurement options and legacy aliases;
+- mechanically classified every pinned text property into its permanent Inspector surface and reverse-sync policy;
+- activated the permanent **Text** feature-rail entry and contextual text/font panel;
+- added semantic text insertion with stable Visual node identity;
+- added safe double-click inline canvas text editing with one history transaction per edit;
+- added typography controls for family, size, line height, letter/word spacing, bold, italic, alignment and baseline;
+- added wrapping/max-width/max-height controls linked to transform geometry;
+- added fill color/opacity, underline, overline, strikethrough and text stroke controls;
+- added shadow, glow, highlight and curved-text authoring;
+- added system-font selection and uploaded font assets through the existing shared Assets/Fonts surfaces;
+- preserved uploaded font identity with stable `studio://asset/<id>` references in Visual state and canonical generated source;
+- added contextual text metrics and measurement configuration;
+- added a validated complete `TextProperties` Advanced escape hatch;
+- extended the Studio operation plan with ordered `create-text` operations;
+- generated deterministic canonical `createText()` source and preserved mixed image/shape/text composition order;
+- extended safe Code → Visual reconciliation to canonical `createText()` calls without `eval` / `new Function`;
+- allowed earlier text output to remain a valid generated buffer source for later composition operations;
+- upgraded the authoritative `@apexify/web` Studio text renderer to consume modern nested TextProperties rather than relying on legacy flat aliases;
+- pinned the documentation Studio to the merged Apexify Web runtime snapshot from `fb48f08ed8fc3d48628d8a93b15fe5d94b69bfbb`;
+- proved real ApexPainter operation-plan execution and generated-code execution produce equivalent Phase-6 text artifacts;
+- proved `measureText()` returns real width/height/line and character-metric data for the Phase-6 representative project;
+- desktop browser proof inserts Text, generates live `createText()` code, edits text inline on the artboard and verifies the linked source changes automatically;
+- mobile/desktop shell, Preview/Generate Code modals, Code Studio round-trip and all prior Visual phase regressions remain green.
+
+### Phase 6 proof
+
+```text
+Text / Font authoring
+→ semantic Visual text node
+→ ordered Studio operation plan
+→ canonical createText() source
+→ real ApexPainter execution
+→ equivalent artifact
+
+Visual text edit
+→ linked createText() source update
+
+canonical literal createText() edit
+→ safe parser/reconciler
+→ Text Visual state update
+
+uploaded font asset
+→ stable studio://asset/<id> identity
+→ registered browser font family
+→ authoritative @apexify/web preview
+```
+
+Production verification remains deferred until Vercel usage is available again.
 
 ---
 
