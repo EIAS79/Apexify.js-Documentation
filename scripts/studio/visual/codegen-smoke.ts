@@ -14,7 +14,7 @@ async function run() {
 
   const previewBuffer = await executeStudioOperationPlan(plan, {
     createCanvas: async (options) => {
-      const canvas = await painter.createCanvas(options);
+      const canvas = await painter.createCanvas(options as Parameters<ApexPainter['createCanvas']>[0]);
       return { buffer: canvas.buffer };
     },
   });
