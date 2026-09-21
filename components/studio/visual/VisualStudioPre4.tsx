@@ -2392,6 +2392,12 @@ export default function VisualStudioPre4({
                 style={{
                   width: project.document.width,
                   height: project.document.height,
+                  background: canvasArtboardBackground(project.document.canvas ?? {}),
+                  borderRadius:
+                    project.document.canvas?.borderRadius === 'circular'
+                      ? '50%'
+                      : project.document.canvas?.borderRadius ?? 0,
+                  opacity: project.document.canvas?.opacity ?? 1,
                   transform: 'scale(' + zoom / 100 + ')',
                   transformOrigin: 'top left',
                 }}
