@@ -17,10 +17,8 @@ export async function executeStudioOperationPlan(
         values.set(operation.target, value);
         break;
       }
-      default: {
-        const neverOperation: never = operation;
-        throw new Error(`Unsupported Studio operation: ${JSON.stringify(neverOperation)}`);
-      }
+      default:
+        throw new Error(`Unsupported Studio operation: ${JSON.stringify(operation)}`);
     }
   }
 
