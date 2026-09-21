@@ -1172,6 +1172,10 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
+    if ((inspectorTab === 'style' || inspectorTab === 'transform') && !primary) {
+      return renderTransformFields();
+    }
+
     if (inspectorTab === 'style' || inspectorTab === 'transform') {
       return (
         <>
@@ -1246,17 +1250,25 @@ export default function VisualStudioPre4({
               <small>{activeArtifact ? activeArtifact.name : 'No preview yet'}</small>
             </div>
             <div className="apx-pre4-output-body">
-              {activeArtifact ? (
-                <StudioArtifactPreview
-                  artifact={activeArtifact}
-                  artifacts={previewArtifacts}
-                  onArtifactSelect={setActiveArtifactId}
+              {activeArtifact?.url && (activeArtifact.kind === 'image' || activeArtifact.kind === 'gif') ? (
+                <img
+                  className="apx-pre4-output-media"
+                  src={activeArtifact.url}
+                  alt={activeArtifact.name || 'Canvas output'}
+                />
+              ) : activeArtifact?.url && activeArtifact.kind === 'video' ? (
+                <video
+                  className="apx-pre4-output-media"
+                  src={activeArtifact.url}
+                  muted
+                  playsInline
+                  controls
                 />
               ) : (
                 <div className="apx-pre4-output-placeholder">
                   <span>◇</span>
-                  <strong>Preview output</strong>
-                  <small>Run or preview the project to populate this pane.</small>
+                  <strong>{activeArtifact ? activeArtifact.name : 'Preview output'}</strong>
+                  <small>{activeArtifact ? 'Open Preview for the full runtime viewer.' : 'Run or preview the project to populate this pane.'}</small>
                 </div>
               )}
             </div>
@@ -1452,12 +1464,14 @@ export default function VisualStudioPre4({
               </div>
             )}
           </div>
-          <div className="apx-pre4-layer-actions">
-            <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))} disabled={!selected.length}>Duplicate</button>
-            <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))} disabled={!selected.length}>Delete</button>
-            <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
-            <button type="button" onClick={ungroupSelection} disabled={!selected.length}>Ungroup</button>
-          </div>
+          {selected.length ? (
+            <div className="apx-pre4-layer-actions">
+              <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))}>Duplicate</button>
+              <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))}>Delete</button>
+              <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
+              <button type="button" onClick={ungroupSelection}>Ungroup</button>
+            </div>
+          ) : null}
         </aside>
 
         <main className="apx-pre4-stage">
