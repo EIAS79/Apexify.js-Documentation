@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 NEXT; STUDIO-VISUAL-4 GATED
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; ROADMAP RE-AUDIT NEXT; STUDIO-VISUAL-4 GATED
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2970,7 +2970,8 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 1 | Dual-mode shell | PRODUCTION VERIFIED | `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7` | Vercel production deployment completed on main (`4d28777edbf140c9afe65e4e874a4b9b38ca5803`); live `/studio` Code → Visual → Code smoke passed with shared Assets/Output/Diagnostics/History and source-session preservation |
 | 2 | Project model / codegen core | MAIN MERGED | `186b87bcabba5316639c5a103c0b12125822a35a` | Manual deployment intentionally not triggered; current project instruction is merge-to-main only |
 | 3 | Viewport / layers / transforms / history | PRODUCTION VERIFIED | `372d449e8e37c998faf56eef0f0db8704f648e9d` | Vercel production deployment `dpl_6TEqXQJ9NbH2MYT2fpC1mmgRgNbn` READY for exact merge SHA; live `/studio` Visual-mode smoke passed with Layers, Transform Inspector, History, zoom/fit/reset, Select/Pan, Project menu and viewport visible |
-| PRE-4 | Studio product shell rebuild | NOT STARTED | — | Required before Phase 4; approved reference-driven layout/theme rebuild + Phase-3 regression + production smoke |\n| 4 | Canvas | GATED | — | Starts only after PRE-4 production verification and roadmap re-audit |
+| PRE-4 | Studio product shell rebuild | MAIN MERGED | `b530d0a8f18290ac3f9081744153c9aae58a9dfe` | Studio Visual push gate `35632663379` PASS; PR gate `35632667933` PASS; build/browser/screenshot proof PASS; production deployment deferred because Vercel quota is rate-limited |
+| 4 | Canvas | GATED | — | Starts only after PRE-4 production verification and roadmap re-audit |
 | 5 | Images / shapes / assets | NOT STARTED | — | — |
 | 6 | Text / fonts | NOT STARTED | — | — |
 | 7 | Paths / doodle / pixels / detect | NOT STARTED | — | — |
@@ -3115,6 +3116,45 @@ Phase-3 proof evidence:
 - exact merge SHA deployed to Vercel production and reported READY;
 - live Visual Workspace smoke: PASS.
 
+
+## PRE-4 implementation record — STUDIO-VISUAL-PRE-4
+
+> **Status:** MAIN MERGED — PRODUCTION VERIFICATION DEFERRED
+>
+> **Work branch:** `studio-visual/pre4-shell-rebuild`
+>
+> **PR:** #80
+>
+> **Green Studio Visual push gate:** GitHub Actions `35632663379`
+>
+> **Green Studio Visual PR gate:** GitHub Actions `35632667933`
+>
+> **Main integration:** `b530d0a8f18290ac3f9081744153c9aae58a9dfe`
+>
+> **Production deployment:** DEFERRED — Vercel reported deployment rate limiting / exhausted usage. This is an infrastructure quota constraint, not a PRE-4 implementation failure.
+>
+> **Browser proof:** PASS — typecheck, production build, dual-mode browser regression, responsive 1440×900 evidence capture and Code ↔ Visual session preservation all passed on the PRE-4 head before merge.
+
+Completed PRE-4 scope:
+
+- reference-aligned Apexify Studio product shell;
+- Apexify Studio branding and permanent Code / Visual switch;
+- Run / Preview / Generate Code / Export top-bar architecture;
+- permanent feature rail for Canvas, Images, Text, Charts, Shapes, Paths, Layers, Components, Assets, GIF, Audio and Video;
+- polished Layers/context panel architecture;
+- centered scale-aware viewport and artboard;
+- compact device, zoom, select, pan, fit and reset controls;
+- permanent Style / Transform / Effects / Data / Advanced inspector architecture;
+- Preview / Generated Code / Diagnostics / Assets / History bottom dock;
+- real shared asset shelf reuse;
+- runtime preview surface reuse;
+- Phase-3 editor behavior preserved;
+- constrained-width responsive behavior;
+- PRE-4 contract tests and browser screenshot evidence.
+
+### Required next gate
+
+Before STUDIO-VISUAL-4 begins, perform the mandatory post-PRE-4 roadmap re-audit and remap Phases 4–18 to the permanent shell surfaces now established.
 
 Allowed phase statuses:
 
