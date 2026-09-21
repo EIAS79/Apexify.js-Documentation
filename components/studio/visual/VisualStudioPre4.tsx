@@ -3136,7 +3136,12 @@ export default function VisualStudioPre4({
       .map((id) => project.document.nodes[id])
       .filter(
         (node): node is VisualNode =>
-          Boolean(node && (node.kind === 'image' || node.kind === 'shape')),
+          Boolean(
+            node &&
+              (node.kind === 'image' ||
+                node.kind === 'shape' ||
+                node.kind === 'text'),
+          ),
       );
     return (
       <>
