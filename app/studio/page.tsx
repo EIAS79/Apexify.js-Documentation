@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import '@/styles/studio-calm.css';
-import CodeStudio from '@/components/studio/CodeStudio';
+import StudioShell from '@/components/studio/StudioShell';
 import { absoluteSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
@@ -19,7 +19,7 @@ export default function StudioPage() {
   return (
     <>
       <h1 className="sr-only">Apexify.js Studio</h1>
-      <CodeStudio />
+      <StudioShell />
     </>
   );
 }

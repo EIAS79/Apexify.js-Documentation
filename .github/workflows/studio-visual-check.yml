@@ -13,6 +13,8 @@ on:
       - 'STUDIO_VISUAL_DECISIONS.md'
       - 'schemas/studio/**'
       - 'lib/studio/visual/**'
+      - 'components/studio/**'
+      - 'app/studio/**'
       - 'scripts/studio/visual/**'
       - 'generated/studio/visual-capability-matrix.json'
       - 'package.json'
@@ -30,9 +32,9 @@ concurrency:
 
 jobs:
   phase-gate:
-    name: Phase 0 contract and capability gate
+    name: Visual Studio phase gate
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
 
     steps:
       - name: Checkout
@@ -81,5 +83,43 @@ jobs:
         with:
           name: studio-visual-typecheck-log
           path: studio-visual-typecheck.log
+          if-no-files-found: ignore
+          retention-days: 1
+
+      - name: Build Studio candidate
+        run: npm run build
+
+      - name: Install ephemeral browser audit tool
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0
+
+      - name: Resolve system Chrome
+        shell: bash
+        run: |
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          test -n "$CHROME"
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+
+      - name: Start production server
+        shell: bash
+        run: |
+          npm start -- -p 3000 > /tmp/studio-visual-next.log 2>&1 &
+          for i in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:3000/studio >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/studio-visual-next.log || true
+          exit 1
+
+      - name: Dual-mode shell browser regression
+        env:
+          STUDIO_VISUAL_BASE_URL: http://127.0.0.1:3000
+        run: node scripts/studio/visual/visual-shell-browser-smoke.mjs
+
+      - name: Upload server log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-visual-next-log
+          path: /tmp/studio-visual-next.log
           if-no-files-found: ignore
           retention-days: 1
