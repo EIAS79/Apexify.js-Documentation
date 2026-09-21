@@ -75,7 +75,7 @@ export function VisualPreviewModal({
     <div className="apx-vmodal-backdrop" role="presentation" onPointerDown={(event) => {
       if (event.target === event.currentTarget) onClose();
     }}>
-      <section className="apx-vmodal apx-vmodal--preview" role="dialog" aria-modal="true" aria-label="Canvas preview">
+      <section className="apx-vmodal apx-vmodal--preview" role="dialog" aria-modal="true" aria-label="Canvas preview" data-visual-preview-modal>
         <header className="apx-vmodal-head">
           <div className="apx-vmodal-title">
             <strong>Canvas Preview</strong>
@@ -93,7 +93,7 @@ export function VisualPreviewModal({
             <button className="apx-vmodal-primary" type="button" onClick={onDownload} disabled={!previewUrl}>
               <ArrowDownTrayIcon /> Download
             </button>
-            <button type="button" onClick={onClose} title="Close"><XMarkIcon /></button>
+            <button type="button" onClick={onClose} title="Close" data-visual-preview-modal-close><XMarkIcon /></button>
           </div>
         </header>
 
@@ -166,7 +166,7 @@ export function VisualCodeModal({
     <div className="apx-vmodal-backdrop" role="presentation" onPointerDown={(event) => {
       if (event.target === event.currentTarget) onClose();
     }}>
-      <section className="apx-vmodal apx-vmodal--code" role="dialog" aria-modal="true" aria-label="Generated code preview">
+      <section className="apx-vmodal apx-vmodal--code" role="dialog" aria-modal="true" aria-label="Generated code preview" data-visual-code-modal>
         <header className="apx-vmodal-head">
           <div className="apx-vmodal-title">
             <strong>Generated Code</strong>
@@ -177,7 +177,7 @@ export function VisualCodeModal({
             <button className="apx-vmodal-primary" type="button" onClick={onDownload}>
               <ArrowDownTrayIcon /> Download
             </button>
-            <button type="button" onClick={onClose} title="Close"><XMarkIcon /></button>
+            <button type="button" onClick={onClose} title="Close" data-visual-code-modal-close><XMarkIcon /></button>
           </div>
         </header>
 
