@@ -178,6 +178,8 @@ test('Phase 4 shell exposes Canvas controls in the permanent inspector architect
     'data-canvas-section="pattern"',
     'data-canvas-section="noise"',
     'data-canvas-section="background-layers"',
+    'data-canvas-section="complete-config"',
+    'Apply complete CanvasConfig',
     'Video background',
     'Background image filters',
     'Live Code Sync',
