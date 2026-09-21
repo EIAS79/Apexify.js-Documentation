@@ -40,7 +40,11 @@ async function verify(width, height) {
     if (!visualText.includes(label)) throw new Error('Visual shell missing ' + label);
   }
 
-  if (width === 1440) {\n    await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });\n  }\n\n  const overflow = await page.evaluate(
+  if (width === 1440) {
+    await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });
+  }
+
+  const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
   );
   if (overflow) throw new Error(width + 'x' + height + ' horizontal overflow');
