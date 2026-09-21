@@ -27,7 +27,7 @@ test('phase 1 mounts a top-level dual-mode shell without replacing Code Studio',
   assert.match(code, /useStudioSharedSession/);
 });
 
-test('phase 1 Visual Studio remains an empty workspace with shared shell surfaces', () => {
+test('phase 1 Visual Studio preserves shared shell surfaces as later phases extend the workspace', () => {
   const visual = read('components/studio/visual/VisualStudio.tsx');
 
   assert.match(visual, /data-studio-visual-workspace/);
@@ -37,8 +37,8 @@ test('phase 1 Visual Studio remains an empty workspace with shared shell surface
   assert.match(visual, /Generated Code/);
   assert.match(visual, /Diagnostics/);
   assert.match(visual, /History/);
-  assert.match(visual, /No visual layers yet/);
-  assert.match(visual, /authoring controls activate in their owning phase/);
+  assert.match(visual, /data-visual-layer-tree/);
+  assert.match(visual, /Domain-specific properties arrive in their owning phases/);
   assert.match(visual, /fileToStudioAsset/);
   assert.match(visual, /assetFilter/);
   assert.match(visual, /setLayersCollapsed/);
