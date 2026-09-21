@@ -52,6 +52,7 @@ import {
   createVisualProject,
 } from '@/lib/studio/visual/project';
 import { generateVisualProjectCode } from '@/lib/studio/visual/codegen/generator';
+import { validateVisualProject } from '@/lib/studio/visual/compiler/validate';
 import {
   reconcileVisualProjectFromCode,
   safeVisualDownloadStem,
@@ -246,6 +247,8 @@ export default function VisualStudioPre4({
   const [modalPreviewError, setModalPreviewError] = useState<string | null>(null);
   const [canvasFiltersDraft, setCanvasFiltersDraft] = useState('[]');
   const [canvasFiltersError, setCanvasFiltersError] = useState<string | null>(null);
+  const [canvasConfigDraft, setCanvasConfigDraft] = useState('{}');
+  const [canvasConfigError, setCanvasConfigError] = useState<string | null>(null);
 
   const history = useRef(new VisualHistory(100));
   const projectRef = useRef(project);
@@ -513,6 +516,12 @@ export default function VisualStudioPre4({
     );
     setCanvasFiltersError(null);
   }, [project.document.canvas?.customBg?.filters]);
+
+  useEffect(() => {
+    setCanvasConfigDraft(JSON.stringify(project.document.canvas ?? {}, null, 2));
+    setCanvasConfigError(null);
+  }, [project.document.canvas]);
+
 
 
   const addPlaceholder = () =>
@@ -1551,6 +1560,7 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-section-title">Base background</div>
           <select
             className="apx-pre4-input"
+            data-canvas-base-mode
             value={mode}
             onChange={(event) => setCanvasBaseMode(event.target.value as typeof mode)}
           >
@@ -1571,6 +1581,7 @@ export default function VisualStudioPre4({
               />
               <input
                 className="apx-pre4-input"
+                data-canvas-color-text
                 value={canvas.colorBg || '#000000'}
                 onFocus={beginPropertyEdit}
                 onChange={(event) => updateCanvasDraft((current) => ({ ...current, colorBg: event.target.value }))}
@@ -1877,6 +1888,7 @@ export default function VisualStudioPre4({
                   type="number"
                   min={1}
                   max={16384}
+                  data-canvas-dimension={key}
                   value={project.document[key]}
                   onFocus={beginPropertyEdit}
                   onChange={(event) => {
@@ -2003,6 +2015,54 @@ export default function VisualStudioPre4({
             <small className="apx-canvas-hint">Advanced ImageFilter[] stays literal and round-trippable in generated code.</small>
           </div>
         ) : null}
+
+        <div className="apx-pre4-section" data-canvas-section="complete-config">
+          <div className="apx-pre4-section-title">Complete CanvasConfig</div>
+          <textarea
+            className="apx-canvas-json apx-canvas-json--config"
+            spellCheck={false}
+            value={canvasConfigDraft}
+            onChange={(event) => {
+              setCanvasConfigDraft(event.target.value);
+              setCanvasConfigError(null);
+            }}
+          />
+          {canvasConfigError ? <div className="apx-live-code-error">{canvasConfigError}</div> : null}
+          <button
+            className="apx-canvas-apply"
+            type="button"
+            onClick={() => {
+              try {
+                const parsed = JSON.parse(canvasConfigDraft);
+                if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                  throw new Error('CanvasConfig JSON must be an object.');
+                }
+                const nextProject = structuredClone(project);
+                nextProject.document.canvas = parsed as VisualCanvasConfig;
+                nextProject.updatedAt = new Date().toISOString();
+                const validation = validateVisualProject(nextProject);
+                if (!validation.ok) {
+                  throw new Error(validation.issues[0]?.message ?? 'Invalid CanvasConfig.');
+                }
+                history.current.commit(project, nextProject, 'Advanced CanvasConfig');
+                projectRef.current = nextProject;
+                setProject(nextProject);
+                setHistoryTick((value) => value + 1);
+                setCanvasConfigError(null);
+                setMessage('Complete CanvasConfig applied');
+              } catch (error) {
+                setCanvasConfigError(error instanceof Error ? error.message : 'Invalid CanvasConfig JSON.');
+              }
+            }}
+          >
+            Apply complete CanvasConfig
+          </button>
+          <small className="apx-canvas-hint">
+            Exact declaration-level escape hatch for gradient geometry, stroke/shadow gradients,
+            pattern gradient/repeat/blend details, background-layer variants and future-compatible
+            literal CanvasConfig fields. Validated before it reaches the Visual Project.
+          </small>
+        </div>
 
         <div className="apx-pre4-section">
           <div className="apx-canvas-section-heading"><div className="apx-pre4-section-title">Video background</div><label className="apx-canvas-switch"><input type="checkbox" checked={Boolean(canvas.videoBg)} onChange={(event) => mutateCanvas('Video background', (current) => { if (!event.target.checked) { const next = { ...current }; delete next.videoBg; return next; } return { ...current, videoBg: { source: '', frame: 0, loop: false, autoplay: false, opacity: 1, format: 'jpg', quality: 90 } }; })}/><span /></label></div>
@@ -2491,6 +2551,7 @@ export default function VisualStudioPre4({
               <button
                 key={id}
                 type="button"
+                data-inspector-tab={id}
                 data-active={inspectorTab === id ? 'true' : undefined}
                 onClick={() => setInspectorTab(id)}
               >
