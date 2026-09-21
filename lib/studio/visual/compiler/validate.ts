@@ -1,3 +1,4 @@
+import { validateVisualCanvasConfig } from '../canvas-contract';
 import {
   VISUAL_PROJECT_FORMAT,
   VISUAL_PROJECT_SCHEMA_VERSION,
@@ -143,6 +144,7 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   if (project.document.background !== undefined) {
     visitReferences(project.document.background, 'document.background', known, issues);
   }
+  validateVisualCanvasConfig(project.document.canvas, issues);
 
   if (project.codegen.language !== 'typescript') push(issues, 'codegen-language', 'codegen.language', 'Only TypeScript code generation is supported in v1.');
   if (project.codegen.assetBasePath !== './assets/') push(issues, 'asset-base-path', 'codegen.assetBasePath', 'Visual Project v1 uses ./assets/.');
