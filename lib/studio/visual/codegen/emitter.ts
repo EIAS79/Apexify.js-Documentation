@@ -218,6 +218,15 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       continue;
     }
 
+    if (operation.kind === 'detect-any-region') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'regionHit');
+      body.push(
+        `  const ${targetName} = await ${painterName}.detect.anyRegion(${emitValue(operation.regions, 2, targetNames)}, ${operation.x}, ${operation.y}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
     if (operation.kind === 'detect-distance') {
       const targetName = names.allocate(operation.preferredName || operation.target, 'distance');
       body.push(
