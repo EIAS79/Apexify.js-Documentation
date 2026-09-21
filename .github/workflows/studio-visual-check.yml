@@ -115,6 +115,15 @@ jobs:
           STUDIO_VISUAL_BASE_URL: http://127.0.0.1:3000
         run: node scripts/studio/visual/visual-shell-browser-smoke.mjs
 
+      - name: Upload PRE-4 shell screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-visual-pre4-screenshot
+          path: /tmp/studio-visual-pre4.png
+          if-no-files-found: ignore
+          retention-days: 1
+
       - name: Upload server log on failure
         if: failure()
         uses: actions/upload-artifact@v4
