@@ -1656,6 +1656,144 @@ export default function VisualStudioPre4({
     ['video', VideoCameraIcon, 'Video'],
   ] as const;
 
+  const mediaContextActive =
+    activeTool === 'images' ||
+    activeTool === 'shapes' ||
+    activeTool === 'assets';
+
+  const imageAssets = assets.filter((asset) =>
+    asset.mime.startsWith('image/'),
+  );
+
+  const renderMediaContext = () => {
+    if (activeTool === 'shapes') {
+      return (
+        <div className="apx-media-context" data-visual-shapes-context>
+          <div className="apx-media-context-copy">
+            <strong>Built-in shapes</strong>
+            <span>Insert native Apexify shape sources. Every shape remains linked to createImage().</span>
+          </div>
+          <div className="apx-shape-picker">
+            {IMAGE_SHAPE_TYPES.map((shape) => (
+              <button
+                key={shape}
+                type="button"
+                onClick={() => insertShape(shape)}
+                data-shape-insert={shape}
+              >
+                <span className={'apx-shape-glyph apx-shape-glyph--' + shape} />
+                <small>{shape}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTool === 'images') {
+      return (
+        <div className="apx-media-context" data-visual-images-context>
+          <div className="apx-media-context-copy">
+            <strong>Images</strong>
+            <span>Use a Studio asset, an HTTP(S) URL, or drop an image directly on the canvas.</span>
+          </div>
+
+          <div className="apx-media-url">
+            <input
+              className="apx-pre4-input"
+              value={imageUrlDraft}
+              placeholder="https://example.com/image.png"
+              onChange={(event) => setImageUrlDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && imageUrlDraft.trim()) {
+                  insertImageSource(imageUrlDraft.trim(), 'Remote image');
+                  setImageUrlDraft('');
+                }
+              }}
+            />
+            <button
+              type="button"
+              disabled={!imageUrlDraft.trim()}
+              onClick={() => {
+                insertImageSource(imageUrlDraft.trim(), 'Remote image');
+                setImageUrlDraft('');
+              }}
+              data-image-url-insert
+            >
+              Add
+            </button>
+          </div>
+
+          <div className="apx-media-drop-hint">
+            <ArrowDownTrayIcon />
+            <span>Drop PNG, JPG, WebP, GIF or SVG directly onto the artboard.</span>
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Image assets</strong>
+            <button type="button" onClick={() => setDockTab('assets')}>Open Assets</button>
+          </div>
+          <div className="apx-media-asset-list">
+            {imageAssets.length ? imageAssets.map((asset) => (
+              <button
+                type="button"
+                key={asset.id}
+                title={'Insert ' + asset.name}
+                onClick={() => insertImageAsset(asset)}
+                data-image-asset-insert={asset.id}
+              >
+                <img src={studioAssetDataUrl(asset)} alt="" />
+                <span>
+                  <strong>{asset.name}</strong>
+                  <small>
+                    {asset.metadata?.width && asset.metadata?.height
+                      ? asset.metadata.width + '×' + asset.metadata.height
+                      : asset.mime}
+                  </small>
+                </span>
+              </button>
+            )) : (
+              <div className="apx-media-context-empty">
+                <PhotoIcon />
+                <strong>No image assets yet</strong>
+                <span>Open Assets below to upload an image, or drop one on the artboard.</span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="apx-media-context" data-visual-assets-context>
+        <div className="apx-media-context-copy">
+          <strong>Assets</strong>
+          <span>Shared Studio assets keep stable studio://asset/… identities across Visual and Code modes.</span>
+        </div>
+        <button
+          className="apx-media-open-assets"
+          type="button"
+          onClick={() => setDockTab('assets')}
+        >
+          <CircleStackIcon />
+          Manage all assets
+        </button>
+        <div className="apx-media-asset-list">
+          {imageAssets.map((asset) => (
+            <button
+              type="button"
+              key={asset.id}
+              onClick={() => insertImageAsset(asset)}
+            >
+              <img src={studioAssetDataUrl(asset)} alt="" />
+              <span><strong>{asset.name}</strong><small>Insert image</small></span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const inspectorTabs = [
     ['style', 'Style'],
     ['transform', 'Transform'],
