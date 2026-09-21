@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import ts from 'typescript';
 
 const root = process.cwd();
 const sourcePath = path.resolve(root, process.env.PEAK_LAB_SOURCE ?? 'scripts/gallery/Apexify-Peak-Lab.ts');
@@ -150,41 +151,213 @@ function splitSharedHelpers(sharedCode) {
   };
 }
 
-function makeRecipeDisplaySource(block, id) {
-  const body = extractRecipeRunBody(block, id);
-  return `import * as ApexRuntime from 'apexify.js';
-import { mkdir, writeFile, readFile, access } from 'node:fs/promises';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import path from 'node:path';
-import assert from 'node:assert/strict';
 
-const Apex = ApexRuntime;
-const ApexPainter = ApexRuntime.ApexPainter;
-const ApexifyDecodeError = ApexRuntime.ApexifyDecodeError;
-const painter = new ApexPainter({ type: 'buffer' });
+const tsPrinter = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
 
-// This is the actual Peak Lab recipe.
-// Supporting drawing/chart/audio helpers used by this recipe are on the next code pages.
-async function main() {
-${body.split('\n').map((line) => `  ${line}`).join('\n')}
-}`;
+function parseDisplaySource(code, fileName = 'peak-gallery.ts') {
+  const file = ts.createSourceFile(fileName, code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  if (file.parseDiagnostics.length) {
+    const message = file.parseDiagnostics
+      .map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'))
+      .join('; ');
+    throw new Error('Peak Gallery display source is invalid TypeScript: ' + message);
+  }
+  return file;
 }
 
-function pagesForSection(label, code, maxLines = 58) {
-  const chunks = chunkCode(code, maxLines);
+function formatTypeScript(code) {
+  return tsPrinter.printFile(parseDisplaySource(code)).trim();
+}
+
+function simplifyRecipeReturnSaves(body) {
+  const wrapped = 'async function __recipe() {\n' + body + '\n}';
+  const file = parseDisplaySource(wrapped, 'recipe-body.ts');
+  const fn = file.statements.find(ts.isFunctionDeclaration);
+  if (!fn || !fn.body) return body;
+
+  const transformer = (context) => {
+    const stripSave = (node) => {
+      if (
+        ts.isAwaitExpression(node) &&
+        ts.isCallExpression(node.expression) &&
+        ts.isIdentifier(node.expression.expression) &&
+        node.expression.expression.text === 'save' &&
+        node.expression.arguments.length >= 2
+      ) {
+        return ts.visitNode(node.expression.arguments[1], stripSave);
+      }
+      return ts.visitEachChild(node, stripSave, context);
+    };
+
+    const visit = (node) => {
+      if (ts.isReturnStatement(node) && node.expression) {
+        return ts.factory.updateReturnStatement(node, ts.visitNode(node.expression, stripSave));
+      }
+      return ts.visitEachChild(node, visit, context);
+    };
+
+    return (node) => ts.visitNode(node, visit);
+  };
+
+  const transformed = ts.transform(fn.body, [transformer]);
+  const block = transformed.transformed[0];
+  const result = block.statements
+    .map((statement) => tsPrinter.printNode(ts.EmitHint.Unspecified, statement, file))
+    .join('\n');
+  transformed.dispose();
+  return result;
+}
+
+function declarationNames(statement) {
+  if (
+    (ts.isFunctionDeclaration(statement) ||
+      ts.isClassDeclaration(statement) ||
+      ts.isInterfaceDeclaration(statement) ||
+      ts.isTypeAliasDeclaration(statement) ||
+      ts.isEnumDeclaration(statement)) &&
+    statement.name
+  ) {
+    return [statement.name.text];
+  }
+
+  if (ts.isVariableStatement(statement)) {
+    return statement.declarationList.declarations
+      .map((declaration) => ts.isIdentifier(declaration.name) ? declaration.name.text : null)
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function collectIdentifiers(node, accepted) {
+  const found = new Set();
+  const visit = (current) => {
+    if (ts.isIdentifier(current) && accepted.has(current.text)) found.add(current.text);
+    ts.forEachChild(current, visit);
+  };
+  visit(node);
+  return found;
+}
+
+function buildHelperIndex(helperSections) {
+  const source = [
+    helperSections.core,
+    helperSections.charts,
+    helperSections.wav,
+    helperSections.motion,
+  ].join('\n\n');
+  const file = parseDisplaySource(source, 'peak-helpers.ts');
+  const entries = [];
+  const byName = new Map();
+
+  for (const statement of file.statements) {
+    const names = declarationNames(statement);
+    if (!names.length) continue;
+
+    const entry = {
+      names,
+      statement,
+      pos: statement.pos,
+      code: tsPrinter.printNode(ts.EmitHint.Unspecified, statement, file),
+      deps: new Set(),
+    };
+    entries.push(entry);
+    for (const name of names) byName.set(name, entry);
+  }
+
+  const accepted = new Set(byName.keys());
+  for (const entry of entries) {
+    for (const dependency of collectIdentifiers(entry.statement, accepted)) {
+      if (!entry.names.includes(dependency)) entry.deps.add(dependency);
+    }
+  }
+
+  return { entries, byName, accepted };
+}
+
+function helpersForRecipe(body, helperIndex) {
+  const bodyFile = parseDisplaySource(
+    'async function __recipe() {\n' + body + '\n}',
+    'recipe-deps.ts',
+  );
+  const queue = [...collectIdentifiers(bodyFile, helperIndex.accepted)];
+  const selected = new Set();
+
+  while (queue.length) {
+    const name = queue.shift();
+    const entry = helperIndex.byName.get(name);
+    if (!entry || selected.has(entry)) continue;
+    selected.add(entry);
+    for (const dependency of entry.deps) queue.push(dependency);
+  }
+
+  return [...selected]
+    .sort((a, b) => a.pos - b.pos)
+    .map((entry) => entry.code)
+    .join('\n\n');
+}
+
+function importsForStandalone(source) {
+  const imports = [];
+  const apexNamed = ['ApexPainter'];
+  if (/\bApexifyDecodeError\b/.test(source)) apexNamed.push('ApexifyDecodeError');
+
+  if (/\bApex\./.test(source)) imports.push("import * as Apex from 'apexify.js';");
+  imports.push("import { " + apexNamed.join(', ') + " } from 'apexify.js';");
+
+  const fsPromises = ['mkdir', 'writeFile', 'readFile', 'access']
+    .filter((name) => new RegExp('\\b' + name + '\\b').test(source));
+  if (fsPromises.length) {
+    imports.push("import { " + fsPromises.join(', ') + " } from 'node:fs/promises';");
+  }
+
+  if (/\bfs\./.test(source)) imports.push("import * as fs from 'node:fs';");
+  if (/\bpath\./.test(source)) imports.push("import path from 'node:path';");
+
+  const urlImports = ['fileURLToPath', 'pathToFileURL']
+    .filter((name) => new RegExp('\\b' + name + '\\b').test(source));
+  if (urlImports.length) {
+    imports.push("import { " + urlImports.join(', ') + " } from 'node:url';");
+  }
+
+  if (/\bassert\./.test(source)) imports.push("import assert from 'node:assert/strict';");
+
+  return imports.join('\n');
+}
+
+function makeStandaloneRecipeSource(block, id, helperIndex) {
+  const rawBody = extractRecipeRunBody(block, id);
+  const body = simplifyRecipeReturnSaves(rawBody);
+  const helpers = helpersForRecipe(body, helperIndex);
+  const supportAndBody = helpers + '\n\nasync function main() {\n' + body + '\n}';
+  const imports = importsForStandalone(supportAndBody);
+
+  const code =
+    imports +
+    '\n\nconst painter = new ApexPainter();\n\n' +
+    (helpers ? helpers + '\n\n' : '') +
+    'async function main() {\n' +
+    body +
+    '\n}\n\nreturn await main();\n';
+
+  return formatTypeScript(code);
+}
+
+function standalonePagesForRecipe(id, code, maxLines = 180) {
+  const lines = code.trim().split(/\r?\n/);
+  if (lines.length <= maxLines) {
+    return [{ label: 'Recipe ' + id, language: 'ts', code }];
+  }
+
+  const chunks = [];
+  for (let i = 0; i < lines.length; i += maxLines) {
+    chunks.push(lines.slice(i, i + maxLines).join('\n'));
+  }
   return chunks.map((chunk, index) => ({
-    label: chunks.length === 1 ? label : `${label} · ${index + 1}/${chunks.length}`,
+    label: 'Recipe ' + id + ' · ' + (index + 1) + '/' + chunks.length,
     language: 'ts',
     code: chunk,
   }));
-}
-
-function helperPagesForRecipe(body, helperSections) {
-  const pages = [...pagesForSection('Helpers · Core', helperSections.core)];
-  if (/\b(chartOptions|series)\b/.test(body)) pages.push(...pagesForSection('Helpers · Charts', helperSections.charts));
-  if (/\b(parseWav|waveform)\b/.test(body)) pages.push(...pagesForSection('Helpers · Audio', helperSections.wav));
-  if (/\b(motionScene|renderMotion)\b/.test(body)) pages.push(...pagesForSection('Helpers · Motion', helperSections.motion));
-  return pages;
 }
 
 await fs.rm(publicDir, { recursive: true, force: true });
@@ -195,6 +368,7 @@ const sharedMatch = source.match(/import \* as ApexRuntime[\s\S]*?(?=\/\/ ===== 
 if (!sharedMatch) throw new Error('Peak Lab shared setup block not found');
 const sharedCode = sharedMatch[0].trim();
 const helperSections = splitSharedHelpers(sharedCode);
+const helperIndex = buildHelperIndex(helperSections);
 
 // Recipe 25 records per-operation failures so its report remains visible.
 // Gallery publishing is stricter: never publish a source-backed run with
@@ -245,22 +419,15 @@ for (let n = 1; n <= 26; n++) {
     throw new Error(`Recipe ${id} produced none of its curated gallery outputs`);
   }
 
-  const recipeSource = makeRecipeDisplaySource(block, id);
-  const recipeBody = extractRecipeRunBody(block, id);
-  const recipePages = pagesForSection(`Recipe ${id}`, recipeSource);
-  const supportPages = helperPagesForRecipe(recipeBody, helperSections);
-  const runPage = {
-    label: 'Run',
-    language: 'ts',
-    code: 'return await main();',
-  };
+  const recipeSource = makeStandaloneRecipeSource(block, id, helperIndex);
+  const recipePages = standalonePagesForRecipe(id, recipeSource);
 
   items.push({
     id: `peak-${id}`,
     category: 'advance',
     recipeId: id,
     title: meta.title,
-    description: `${meta.description} Generated by Apexify Peak Lab recipe ${id}. The code viewer opens on the readable recipe first; only the supporting helpers required by the recipe follow on later pages.`,
+    description: `${meta.description} Generated by Apexify Peak Lab recipe ${id}. The Gallery shows a standalone, readable recipe with only the helpers this piece actually uses.`,
     thumbnail: `/gallery/peak-lab/${copied[0]}`,
     thumbnailMedia: mediaKind(copied[0]),
     outputs: copied.map((file) => ({
@@ -273,7 +440,7 @@ for (let n = 1; n <= 26; n++) {
     executionMode: 'studio',
     sourceKind: 'peak-lab',
     sourceHref: 'https://github.com/EIAS79/Apexify.js-Documentation/blob/main/scripts/gallery/Apexify-Peak-Lab.ts',
-    codePages: [...recipePages, ...supportPages, runPage],
+    codePages: recipePages,
   });
 }
 
