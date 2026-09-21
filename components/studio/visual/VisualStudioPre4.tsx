@@ -43,6 +43,15 @@ import {
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
+  STUDIO_ASSET_LIMITS,
+  fileToStudioAsset,
+  studioAssetDataUrl,
+  studioAssetIdFromReference,
+  studioAssetReference,
+  totalStudioAssetBytes,
+  type StudioVirtualAsset,
+} from '@/lib/studio/runtime/assets';
+import {
   StudioModeSwitch,
   type StudioMode,
 } from '@/components/studio/StudioModeSwitch';
@@ -67,9 +76,11 @@ import type {
   VisualCanvasConfig,
   VisualGradient,
   VisualImageFilter,
+  VisualImageNodeProps,
   VisualNode,
   VisualPatternOptions,
   VisualProject,
+  VisualShapeType,
   VisualTransform,
 } from '@/lib/studio/visual/model';
 import {
@@ -81,6 +92,17 @@ import {
   defaultCanvasGradient,
   defaultCanvasPattern,
 } from '@/lib/studio/visual/canvas-contract';
+import {
+  IMAGE_ALIGNS,
+  IMAGE_BLEND_MODES,
+  IMAGE_FILTER_TYPES,
+  IMAGE_FITS,
+  IMAGE_SHAPE_TYPES,
+  defaultImageNodeProps,
+  defaultShapeNodeProps,
+  imagePropsRecord,
+  visualImageProps,
+} from '@/lib/studio/visual/image-contract';
 import {
   VisualHistory,
   alignNodes,
@@ -250,6 +272,11 @@ export default function VisualStudioPre4({
   const [canvasFiltersError, setCanvasFiltersError] = useState<string | null>(null);
   const [canvasConfigDraft, setCanvasConfigDraft] = useState('{}');
   const [canvasConfigError, setCanvasConfigError] = useState<string | null>(null);
+  const [imageUrlDraft, setImageUrlDraft] = useState('');
+  const [imageConfigDraft, setImageConfigDraft] = useState('{}');
+  const [imageConfigError, setImageConfigError] = useState<string | null>(null);
+  const [artboardPreviewUrl, setArtboardPreviewUrl] = useState<string | null>(null);
+  const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
 
   const history = useRef(new VisualHistory(100));
   const projectRef = useRef(project);
@@ -267,6 +294,7 @@ export default function VisualStudioPre4({
   const codeAppliedSignatureRef = useRef('');
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
+  const artboardPreviewTimerRef = useRef<number>(0);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
 
