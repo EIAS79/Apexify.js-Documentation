@@ -190,6 +190,121 @@ export type VisualBackgroundLayer =
   | { type: 'presetPattern'; pattern: VisualPatternOptions; opacity?: number; blendMode?: VisualBlendMode }
   | { type: 'noise'; intensity?: number; blendMode?: VisualBlendMode };
 
+export type VisualShapeType =
+  | 'rectangle'
+  | 'square'
+  | 'circle'
+  | 'triangle'
+  | 'trapezium'
+  | 'star'
+  | 'heart'
+  | 'polygon'
+  | 'arc'
+  | 'pieSlice';
+
+export type VisualImageSource =
+  | string
+  | { $generated: string };
+
+export interface VisualShapeProperties {
+  fill?: boolean;
+  color?: string;
+  gradient?: VisualGradient;
+  points?: Array<{ x: number; y: number }>;
+  radius?: number;
+  sides?: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  startAngle?: number;
+  endAngle?: number;
+  centerX?: number;
+  centerY?: number;
+}
+
+export interface VisualImageMask {
+  source: VisualImageSource;
+  mode?: 'alpha' | 'luminance' | 'inverse';
+}
+
+export interface VisualImageDistortion {
+  type: 'perspective' | 'warp' | 'bulge' | 'pinch';
+  points?: Array<{ x: number; y: number }>;
+  intensity?: number;
+}
+
+export interface VisualImageMeshWarp {
+  gridX?: number;
+  gridY?: number;
+  controlPoints?: Array<Array<{ x: number; y: number }>>;
+}
+
+export interface VisualImageEffects {
+  vignette?: { intensity: number; size: number };
+  lensFlare?: { x: number; y: number; intensity: number };
+  chromaticAberration?: { intensity: number };
+  filmGrain?: { intensity: number };
+}
+
+export interface VisualBoxBackground {
+  color?: string;
+  gradient?: VisualGradient;
+}
+
+export interface VisualImageGroupTransform {
+  rotation?: number;
+  translateX?: number;
+  translateY?: number;
+  scaleX?: number;
+  scaleY?: number;
+  pivotX?: number;
+  pivotY?: number;
+  opacity?: number;
+  blur?: number;
+  blendMode?: VisualBlendMode;
+  borderRadius?: number | 'circular';
+  borderPosition?: string;
+  filters?: VisualImageFilter[];
+  filterIntensity?: number;
+  filterOrder?: 'pre' | 'post';
+  mask?: VisualImageMask;
+  clipPath?: Array<{ x: number; y: number }>;
+  distortion?: VisualImageDistortion;
+  meshWarp?: VisualImageMeshWarp;
+  effects?: VisualImageEffects;
+  shadow?: VisualShadowOptions;
+  stroke?: VisualStrokeOptions;
+  boxBackground?: VisualBoxBackground;
+}
+
+export interface VisualCreateImageOptions {
+  isGrouped?: boolean;
+  groupTransform?: VisualImageGroupTransform;
+}
+
+export interface VisualImageNodeProps {
+  source: VisualImageSource;
+  inherit?: boolean;
+  fit?: 'fill' | 'contain' | 'cover';
+  align?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  blur?: number;
+  blendMode?: VisualBlendMode;
+  borderRadius?: number | 'circular';
+  borderPosition?: string;
+  filters?: VisualImageFilter[];
+  filterIntensity?: number;
+  filterOrder?: 'pre' | 'post';
+  mask?: VisualImageMask;
+  clipPath?: Array<{ x: number; y: number }>;
+  distortion?: VisualImageDistortion;
+  meshWarp?: VisualImageMeshWarp;
+  effects?: VisualImageEffects;
+  shape?: VisualShapeProperties;
+  shadow?: VisualShadowOptions;
+  stroke?: VisualStrokeOptions;
+  boxBackground?: VisualBoxBackground;
+  createOptions?: VisualCreateImageOptions;
+}
+
 export interface VisualCanvasConfig {
   x?: number;
   y?: number;
