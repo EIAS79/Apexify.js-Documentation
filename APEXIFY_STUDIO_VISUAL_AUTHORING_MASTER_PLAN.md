@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 COMPLETE; STUDIO-VISUAL-1 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 CI GREEN
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2697,6 +2697,32 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 16 | Feature completeness gate | NOT STARTED | — | — |
 | 17 | Hardening | NOT STARTED | — | — |
 | 18 | Final release | NOT STARTED | — | — |
+
+## Phase 1 implementation record — STUDIO-VISUAL-1
+
+> **Status:** CI GREEN
+>
+> **Work branch:** `studio-visual/v01-shell`
+>
+> **Base main commit:** `97d7741c8f35b06dd33bed5ba2ac9b247b344465`
+>
+> **Green phase-gate run:** GitHub Actions `35584036125`
+
+Completed Phase-1 scope:
+
+- top-level Code / Visual authoring-mode switch;
+- shared Studio shell and shared session state;
+- shared assets, output artifacts, diagnostics/notices and history surfaces;
+- Visual mode lazy-loaded on first use;
+- responsive empty Visual workspace with no drawing/editing implementation;
+- existing Code Studio runtime/execution path preserved;
+- accessible tab / tabpanel relationships;
+- desktop and mobile browser regression;
+- Code → Visual → Code session-preservation proof;
+- TypeScript typecheck and production Next.js build green;
+- existing capability/completeness gates remain green.
+
+The Phase-1 browser smoke verifies the Studio route at desktop and mobile widths, switches into Visual mode, confirms the empty/shared surfaces, checks for horizontal overflow, switches back to Code mode and proves that the Code Studio source session was not mutated.
 
 Allowed phase statuses:
 
