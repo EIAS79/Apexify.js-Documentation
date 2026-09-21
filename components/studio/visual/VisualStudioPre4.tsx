@@ -11,6 +11,28 @@ import {
   type ReactNode,
   type CSSProperties,
 } from 'react';
+import {
+  ArrowDownTrayIcon,
+  ArrowPathIcon,
+  ArrowsPointingOutIcon,
+  ChartBarIcon,
+  CircleStackIcon,
+  CodeBracketIcon,
+  ComputerDesktopIcon,
+  CubeIcon,
+  CursorArrowRaysIcon,
+  DocumentTextIcon,
+  FilmIcon,
+  HandRaisedIcon,
+  MagnifyingGlassIcon,
+  MusicalNoteIcon,
+  PencilSquareIcon,
+  PhotoIcon,
+  PlayIcon,
+  RectangleStackIcon,
+  Squares2X2Icon,
+  VideoCameraIcon,
+} from '@heroicons/react/24/outline';
 import { BrandIcon } from '@/components/Brand';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioArtifactPreview } from '@/components/studio/StudioArtifactPreview';
@@ -160,6 +182,7 @@ export default function VisualStudioPre4({
     'preview' | 'generated' | 'diagnostics' | 'assets' | 'history'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
+  const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
 
   const history = useRef(new VisualHistory(100));
   const gesture = useRef<Gesture | null>(null);
@@ -196,6 +219,19 @@ export default function VisualStudioPre4({
     previewArtifacts.find((artifact) => artifact.id === activeArtifactId) ??
     previewArtifacts[0] ??
     null;
+
+  const assetKind = (mime: string) =>
+    mime.startsWith('image/')
+      ? 'image'
+      : mime.startsWith('audio/')
+        ? 'audio'
+        : mime.startsWith('video/')
+          ? 'video'
+          : mime.startsWith('font/') || /woff|ttf|otf/i.test(mime)
+            ? 'font'
+            : 'image';
+
+  const filteredAssets = assets.filter((asset) => assetKind(asset.mime) === assetFilter);
 
   const generated = useMemo(() => {
     try {
@@ -1000,18 +1036,18 @@ export default function VisualStudioPre4({
     );
 
   const featureTools = [
-    ['canvas', '▣', 'Canvas'],
-    ['images', '▧', 'Images'],
-    ['text', 'T', 'Text'],
-    ['charts', '▥', 'Charts'],
-    ['shapes', '◯', 'Shapes'],
-    ['paths', '⌁', 'Paths'],
-    ['layers', '◇', 'Layers'],
-    ['components', '⊞', 'Components'],
-    ['assets', '▤', 'Assets'],
-    ['gif', '◆', 'GIF'],
-    ['audio', '♪', 'Audio'],
-    ['video', '▷', 'Video'],
+    ['canvas', ComputerDesktopIcon, 'Canvas'],
+    ['images', PhotoIcon, 'Images'],
+    ['text', DocumentTextIcon, 'Text'],
+    ['charts', ChartBarIcon, 'Charts'],
+    ['shapes', Squares2X2Icon, 'Shapes'],
+    ['paths', PencilSquareIcon, 'Paths'],
+    ['layers', RectangleStackIcon, 'Layers'],
+    ['components', CubeIcon, 'Components'],
+    ['assets', CircleStackIcon, 'Assets'],
+    ['gif', FilmIcon, 'GIF'],
+    ['audio', MusicalNoteIcon, 'Audio'],
+    ['video', VideoCameraIcon, 'Video'],
   ] as const;
 
   const inspectorTabs = [
@@ -1158,6 +1194,10 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
+    if ((inspectorTab === 'style' || inspectorTab === 'transform') && !primary) {
+      return renderTransformFields();
+    }
+
     if (inspectorTab === 'style' || inspectorTab === 'transform') {
       return (
         <>
@@ -1211,14 +1251,50 @@ export default function VisualStudioPre4({
 
     if (dockTab === 'generated') {
       return generated.value ? (
-        <div className="apx-pre4-code-wrap">
-          <div className="apx-pre4-code-meta">
-            <span>Apexify.js generated source</span>
-            <button type="button" onClick={() => void navigator.clipboard.writeText(generated.value!.source)}>
-              Copy Code
-            </button>
+        <div className="apx-pre4-generated-grid">
+          <div className="apx-pre4-code-wrap">
+            <div className="apx-pre4-code-meta">
+              <span>Generated Apexify.js</span>
+              <button type="button" onClick={() => void navigator.clipboard.writeText(generated.value!.source)}>
+                Copy Code
+              </button>
+            </div>
+            <div className="apx-pre4-code-lines">
+              <ol aria-hidden="true">
+                {generated.value.source.split('\n').map((_, index) => <li key={index}>{index + 1}</li>)}
+              </ol>
+              <pre className="apx-pre4-code">{generated.value.source}</pre>
+            </div>
           </div>
-          <pre className="apx-pre4-code">{generated.value.source}</pre>
+          <div className="apx-pre4-output-pane">
+            <div className="apx-pre4-output-head">
+              <span>Canvas Output</span>
+              <small>{activeArtifact ? activeArtifact.name : 'No preview yet'}</small>
+            </div>
+            <div className="apx-pre4-output-body">
+              {activeArtifact?.url && (activeArtifact.kind === 'image' || activeArtifact.kind === 'gif') ? (
+                <img
+                  className="apx-pre4-output-media"
+                  src={activeArtifact.url}
+                  alt={activeArtifact.name || 'Canvas output'}
+                />
+              ) : activeArtifact?.url && activeArtifact.kind === 'video' ? (
+                <video
+                  className="apx-pre4-output-media"
+                  src={activeArtifact.url}
+                  muted
+                  playsInline
+                  controls
+                />
+              ) : (
+                <div className="apx-pre4-output-placeholder">
+                  <span>◇</span>
+                  <strong>{activeArtifact ? activeArtifact.name : 'Preview output'}</strong>
+                  <small>{activeArtifact ? 'Open Preview for the full runtime viewer.' : 'Run or preview the project to populate this pane.'}</small>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="apx-pre4-dock-empty">
@@ -1313,14 +1389,14 @@ export default function VisualStudioPre4({
             onClick={() => setDockTab('preview')}
             title={generated.value ? 'Open runtime preview' : 'Preview becomes available when the current project can execute'}
           >
-            <span>▷</span> Run
+            <PlayIcon className="apx-pre4-control-icon" aria-hidden /> Run
           </button>
           <button
             className="apx-pre4-top-button"
             type="button"
             onClick={() => setDockTab('preview')}
           >
-            <span>⌕</span> Preview
+            <MagnifyingGlassIcon className="apx-pre4-control-icon" aria-hidden /> Preview
           </button>
           <button
             className="apx-pre4-top-button apx-pre4-primary"
@@ -1329,12 +1405,12 @@ export default function VisualStudioPre4({
             onClick={handoff}
             disabled={!generated.value}
           >
-            <span>&lt;/&gt;</span> Generate Code
+            <CodeBracketIcon className="apx-pre4-control-icon" aria-hidden /> Generate Code
           </button>
 
           <details className="apx-vw-project-menu apx-pre4-export">
             <summary className="apx-pre4-top-button">
-              <span>⇩</span> Export <span>⌄</span>
+              <ArrowDownTrayIcon className="apx-pre4-control-icon" aria-hidden /> Export <span>⌄</span>
             </summary>
             <div className="apx-vw-project-menu__panel">
               <button data-visual-project-save onClick={save}>Save project</button>
@@ -1361,20 +1437,12 @@ export default function VisualStudioPre4({
           />
         </div>
 
-        <div className="apx-pre4-top-utility">
-          <button type="button" title="Undo" onClick={undo} disabled={!history.current.canUndo}>↶</button>
-          <button type="button" title="Redo" onClick={redo} disabled={!history.current.canRedo}>↷</button>
-          <button type="button" title="Notifications">●</button>
-          <span className="apx-pre4-avatar">A</span>
-          <span className="apx-pre4-user">Apexify</span>
-          <span className="apx-pre4-chevron">⌄</span>
-        </div>
       </header>
 
-      <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '42px' : '238px' } as CSSProperties}>
+      <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '38px' : '204px' } as CSSProperties}>
         <nav className="apx-pre4-feature-rail" aria-label="Visual Studio features">
           <div className="apx-pre4-feature-list">
-            {featureTools.map(([id, icon, label]) => (
+            {featureTools.map(([id, Icon, label]) => (
               <button
                 key={id}
                 type="button"
@@ -1385,7 +1453,7 @@ export default function VisualStudioPre4({
                   if (id === 'layers') setMessage('Layers panel active');
                 }}
               >
-                <span className="apx-pre4-feature-icon">{icon}</span>
+                <span className="apx-pre4-feature-icon"><Icon aria-hidden /></span>
                 <span>{label}</span>
               </button>
             ))}
@@ -1400,7 +1468,7 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-panel-head">
             <div>
               <strong>Layers</strong>
-              <small>{layerIds.length} layers · {selected.length} selected</small>
+              <small>{layerIds.length ? layerIds.length + ' layers' : 'Layer structure'}{selected.length ? ' · ' + selected.length + ' selected' : ''}</small>
             </div>
             <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
           </div>
@@ -1413,23 +1481,25 @@ export default function VisualStudioPre4({
             {!project.document.rootNodeIds.length && (
               <div className="apx-pre4-empty apx-pre4-empty-layers">
                 <strong>No layers yet</strong>
-                <span>Add a generic node to exercise the editor shell.</span>
+                <span>Add a layer to begin composing on the canvas.</span>
                 <button type="button" onClick={addPlaceholder}>Add layer</button>
               </div>
             )}
           </div>
-          <div className="apx-pre4-layer-actions">
-            <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))} disabled={!selected.length}>Duplicate</button>
-            <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))} disabled={!selected.length}>Delete</button>
-            <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
-            <button type="button" onClick={ungroupSelection} disabled={!selected.length}>Ungroup</button>
-          </div>
+          {selected.length ? (
+            <div className="apx-pre4-layer-actions">
+              <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))}>Duplicate</button>
+              <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))}>Delete</button>
+              <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
+              <button type="button" onClick={ungroupSelection}>Ungroup</button>
+            </div>
+          ) : null}
         </aside>
 
         <main className="apx-pre4-stage">
           <div className="apx-pre4-stagebar">
             <button className="apx-pre4-device" type="button">
-              <span>▣</span>
+              <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
               Desktop ({project.document.width} × {project.document.height})
               <span>⌄</span>
             </button>
@@ -1447,7 +1517,7 @@ export default function VisualStudioPre4({
                 onClick={() => setViewportMode('pan')}
                 title="Pan"
               >
-                ✋
+                <HandRaisedIcon className="apx-pre4-toolbar-icon" aria-hidden />
               </button>
               <button
                 type="button"
@@ -1455,11 +1525,11 @@ export default function VisualStudioPre4({
                 onClick={() => setViewportMode('select')}
                 title="Select"
               >
-                ↖
+                <CursorArrowRaysIcon className="apx-pre4-toolbar-icon" aria-hidden />
               </button>
-              <button type="button" onClick={() => setZoom(100)} title="100%">⊞</button>
-              <button type="button" onClick={fit} title="Fit">⌗</button>
-              <button type="button" onClick={resetView} title="Reset view">↺</button>
+              <button className="apx-pre4-100" type="button" onClick={() => setZoom(100)} title="100%">100</button>
+              <button type="button" onClick={fit} title="Fit"><ArrowsPointingOutIcon className="apx-pre4-toolbar-icon" aria-hidden /></button>
+              <button type="button" onClick={resetView} title="Reset view"><ArrowPathIcon className="apx-pre4-toolbar-icon" aria-hidden /></button>
             </div>
           </div>
 
@@ -1635,23 +1705,46 @@ export default function VisualStudioPre4({
           {!dockCollapsed && (
             <aside className="apx-pre4-assets-pane">
               <div className="apx-pre4-assets-head">
-                <strong>Assets</strong>
-                <span>{assets.length}</span>
+                <div>
+                  <strong>Assets</strong>
+                  <span>{assets.length}</span>
+                </div>
+                <button type="button" onClick={() => setDockTab('assets')}>＋ Upload</button>
+              </div>
+              <div className="apx-pre4-asset-tabs" role="tablist" aria-label="Asset categories">
+                {([
+                  ['image', 'Images'],
+                  ['font', 'Fonts'],
+                  ['audio', 'Audio'],
+                  ['video', 'Video'],
+                ] as const).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={assetFilter === id}
+                    data-active={assetFilter === id ? 'true' : undefined}
+                    onClick={() => setAssetFilter(id)}
+                  >
+                    {label}
+                    <span>{assets.filter((asset) => assetKind(asset.mime) === id).length}</span>
+                  </button>
+                ))}
               </div>
               <div className="apx-pre4-assets-grid">
-                {assets.length ? assets.slice(0, 8).map((asset) => (
+                {filteredAssets.length ? filteredAssets.slice(0, 9).map((asset) => (
                   <button key={asset.id} type="button" title={asset.name} onClick={() => setDockTab('assets')}>
                     {asset.mime.startsWith('image/') ? (
                       <img src={'data:' + asset.mime + ';base64,' + asset.base64} alt="" />
                     ) : (
-                      <span>{asset.mime.startsWith('video/') ? '▷' : asset.mime.startsWith('audio/') ? '♪' : '◆'}</span>
+                      <span>{asset.mime.startsWith('video/') ? '▷' : asset.mime.startsWith('audio/') ? '♪' : assetKind(asset.mime) === 'font' ? 'Aa' : '◆'}</span>
                     )}
                     <small>{asset.name}</small>
                   </button>
                 )) : (
                   <button type="button" onClick={() => setDockTab('assets')} className="apx-pre4-assets-empty">
                     <span>＋</span>
-                    <small>Upload Assets</small>
+                    <small>No {assetFilter} assets</small>
                   </button>
                 )}
               </div>
@@ -1661,11 +1754,11 @@ export default function VisualStudioPre4({
       </div>
 
       <footer className="apx-pre4-statusbar">
-        <span>Apexify Studio</span>
+        <span className="apx-pre4-status-product">Apexify Studio</span>
         <span className="apx-pre4-save-state" data-dirty={dirty ? 'true' : undefined}>
           <i /> {dirty ? 'Unsaved changes' : 'All changes saved'}
         </span>
-        <span className="apx-pre4-status-message">{message}</span>
+        <span className="apx-pre4-status-message" title={message}>{message}</span>
         <span className="apx-pre4-build-motto">Build something extraordinary. ✦</span>
         <span className="sr-only">Visual workspace ready · Assets · Output · Diagnostics · History</span>
       </footer>
