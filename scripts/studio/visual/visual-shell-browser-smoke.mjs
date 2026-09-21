@@ -36,7 +36,7 @@ async function verify(width, height) {
   await page.waitForSelector('[data-studio-visual-workspace]');
 
   const visualText = await page.$eval('[data-studio-visual-workspace]', (node) => node.textContent || '');
-  for (const label of ['Apexify Studio', 'Canvas', 'Layers', 'Style', 'Transform', 'Generated Code', 'Assets', 'Output', 'Diagnostics', 'History', 'Visual workspace ready']) {
+  for (const label of ['Apexify Studio', 'Canvas', 'Layers', 'Style', 'Transform', 'Code', 'Assets', 'Diagnostics', 'History', 'Visual workspace ready']) {
     if (!visualText.includes(label)) throw new Error('Visual shell missing ' + label);
   }
 
@@ -55,21 +55,39 @@ async function verify(width, height) {
   const restored = await page.$eval('.cm-content', (node) => node.textContent || '');
   if (restored !== original) throw new Error('Code Studio session changed after mode round trip');
 
-  // Phase 2+: generated Visual code must fork into a new Code Studio buffer.
-  // PRE-4 exposes Generate Code as a permanent top-bar action at every supported width.
+  // Generate Code now opens an in-place code modal instead of switching modes.
   await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="visual"]');
+  await page.waitForSelector('[data-visual-live-code]');
   await page.waitForSelector('[data-visual-generate-code]:not([disabled])', { visible: true });
   await page.click('[data-visual-generate-code]');
-  await page.waitForSelector('[data-studio-shell][data-studio-mode="code"]');
-
+  await page.waitForSelector('[data-visual-code-modal]', { visible: true });
   await page.waitForFunction(() => {
-    const content = document.querySelector('.cm-content')?.textContent || '';
+    const content = document.querySelector('[data-visual-code-modal] .cm-content')?.textContent || '';
     return content.includes('createCanvas') && content.includes('return canvas.buffer');
   });
-  const generated = await page.$eval('.cm-content', (node) => node.textContent || '');
-  if (!generated.includes("import { ApexPainter } from 'apexify.js'")) {
-    throw new Error('Visual → Code handoff did not open generated Apexify source');
+  await page.click('[data-visual-code-modal-close]');
+
+  // Top Preview opens a closable canvas modal.
+  await page.waitForSelector('[data-visual-preview-modal-trigger]:not([disabled])', { visible: true });
+  await page.click('[data-visual-preview-modal-trigger]');
+  await page.waitForSelector('[data-visual-preview-modal]', { visible: true });
+  await page.click('[data-visual-preview-modal-close]');
+
+  // Desktop Export still preserves the explicit Visual → Code Studio handoff path.
+  if (width >= 1000) {
+    await page.click('.apx-vw-project-menu > summary');
+    await page.waitForSelector('[data-visual-open-generated-code]:not([disabled])', { visible: true });
+    await page.click('[data-visual-open-generated-code]');
+    await page.waitForSelector('[data-studio-shell][data-studio-mode="code"]');
+
+    await page.waitForFunction(() => {
+      const panels = [...document.querySelectorAll('[data-studio-code-panel]:not([hidden]) .cm-content')];
+      return panels.some((node) => {
+        const content = node.textContent || '';
+        return content.includes('createCanvas') && content.includes('return canvas.buffer');
+      });
+    });
   }
 
   if (errors.length) throw new Error('page errors: ' + JSON.stringify(errors));

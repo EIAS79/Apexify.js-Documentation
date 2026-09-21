@@ -33,9 +33,14 @@ import {
   Squares2X2Icon,
   VideoCameraIcon,
 } from '@heroicons/react/24/outline';
+import { createApexifyWebRuntime, type ApexifyWebRuntime } from '@apexify/web';
 import { BrandIcon } from '@/components/Brand';
+import { InteractiveCodeEditor } from '@/components/docs/playground/InteractiveCodeEditor';
+import {
+  VisualCodeModal,
+  VisualPreviewModal,
+} from '@/components/studio/visual/VisualStudioModals';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
-import { StudioArtifactPreview } from '@/components/studio/StudioArtifactPreview';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
   StudioModeSwitch,
@@ -47,6 +52,10 @@ import {
   createVisualProject,
 } from '@/lib/studio/visual/project';
 import { generateVisualProjectCode } from '@/lib/studio/visual/codegen/generator';
+import {
+  reconcileVisualProjectFromCode,
+  safeVisualDownloadStem,
+} from '@/lib/studio/visual/codegen/reconcile';
 import {
   downloadVisualProject,
   loadVisualProjectFile,
@@ -106,6 +115,8 @@ type Gesture = {
   center?: Point;
 };
 
+const VISUAL_CODE_STORAGE_KEY = 'apexify-visual-live-code-v1';
+
 const handles: ResizeHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
 const handlePos: Record<
   ResizeHandle,
@@ -152,9 +163,6 @@ export default function VisualStudioPre4({
     setCodeHandoff,
     assets,
     setAssets,
-    previewArtifacts,
-    activeArtifactId,
-    setActiveArtifactId,
     error,
     previewWarnings,
     history: runHistory,
@@ -179,12 +187,23 @@ export default function VisualStudioPre4({
     'style' | 'transform' | 'effects' | 'data' | 'advanced'
   >('style');
   const [dockTab, setDockTab] = useState<
-    'preview' | 'generated' | 'diagnostics' | 'assets' | 'history'
+    'generated' | 'diagnostics' | 'assets' | 'history'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
   const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
+  const [codeSource, setCodeSource] = useState('');
+  const [codeFileName, setCodeFileName] = useState('landing-page.ts');
+  const [codeSyncState, setCodeSyncState] = useState<'synced' | 'saving' | 'error'>('synced');
+  const [codeSyncError, setCodeSyncError] = useState<string | null>(null);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [codeModalOpen, setCodeModalOpen] = useState(false);
+  const [modalPreviewUrl, setModalPreviewUrl] = useState<string | null>(null);
+  const [modalPreviewMime, setModalPreviewMime] = useState('image/png');
+  const [modalPreviewLoading, setModalPreviewLoading] = useState(false);
+  const [modalPreviewError, setModalPreviewError] = useState<string | null>(null);
 
   const history = useRef(new VisualHistory(100));
+  const projectRef = useRef(project);
   const gesture = useRef<Gesture | null>(null);
   const clipboard = useRef<VisualClipboard | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -194,9 +213,15 @@ export default function VisualStudioPre4({
   const propertyBefore = useRef<VisualProject | null>(null);
   const pinch = useRef<{ distance: number; zoom: number } | null>(null);
   const didInitialFit = useRef(false);
+  const webRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
+  const codeSaveTimerRef = useRef<number>(0);
+  const codeAppliedSignatureRef = useRef('');
+  const codeHydratedRef = useRef(false);
+  const fileNameTouchedRef = useRef(false);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
 
+  const projectSemanticSignature = useMemo(() => semanticSignature(project), [project]);
   const selected = project.editor?.selectedNodeIds ?? [];
   const primary = selected.length
     ? project.document.nodes[selected[selected.length - 1]]
@@ -214,11 +239,6 @@ export default function VisualStudioPre4({
       }),
     [layerIds, project],
   );
-
-  const activeArtifact =
-    previewArtifacts.find((artifact) => artifact.id === activeArtifactId) ??
-    previewArtifacts[0] ??
-    null;
 
   const assetKind = (mime: string) =>
     mime.startsWith('image/')
@@ -246,8 +266,110 @@ export default function VisualStudioPre4({
   }, [project]);
 
   useEffect(() => {
-    setDirty(semanticSignature(project) !== cleanSignature.current);
-  }, [project]);
+    setDirty(projectSemanticSignature !== cleanSignature.current);
+    projectRef.current = project;
+  }, [project, projectSemanticSignature]);
+
+  const persistLiveCode = (source: string, fileName: string) => {
+    try {
+      window.localStorage.setItem(
+        VISUAL_CODE_STORAGE_KEY,
+        JSON.stringify({ source, fileName, savedAt: Date.now() }),
+      );
+    } catch {}
+  };
+
+  const applyCodeToVisual = (source: string) => {
+    const current = projectRef.current;
+    const result = reconcileVisualProjectFromCode(current, source);
+    if (!result.ok) {
+      setCodeSyncState('error');
+      setCodeSyncError(result.error);
+      return false;
+    }
+
+    setCodeSyncError(null);
+    setCodeSyncState('synced');
+    if (!result.changed) return true;
+
+    history.current.commit(current, result.project, 'Code → Visual');
+    codeAppliedSignatureRef.current = semanticSignature(result.project);
+    projectRef.current = result.project;
+    setProject(result.project);
+    setHistoryTick((value) => value + 1);
+    setMessage('Code synced to canvas');
+    return true;
+  };
+
+  const saveLiveCode = (source = codeSource, fileName = codeFileName) => {
+    window.clearTimeout(codeSaveTimerRef.current);
+    persistLiveCode(source, fileName);
+    const ok = applyCodeToVisual(source);
+    if (ok) setMessage('Code autosaved · canvas synced');
+  };
+
+  const updateLiveCode = (next: string) => {
+    setCodeSource(next);
+    setCodeSyncState('saving');
+    setCodeSyncError(null);
+    window.clearTimeout(codeSaveTimerRef.current);
+    codeSaveTimerRef.current = window.setTimeout(() => {
+      persistLiveCode(next, codeFileName);
+      applyCodeToVisual(next);
+    }, 320);
+  };
+
+  useEffect(() => {
+    if (codeHydratedRef.current || !generated.value) return;
+    codeHydratedRef.current = true;
+
+    let source = generated.value.source;
+    let fileName = generated.value.fileName;
+    try {
+      const raw = window.localStorage.getItem(VISUAL_CODE_STORAGE_KEY);
+      if (raw) {
+        const stored = JSON.parse(raw) as { source?: string; fileName?: string };
+        if (stored.source) {
+          const reconciled = reconcileVisualProjectFromCode(projectRef.current, stored.source);
+          if (reconciled.ok) {
+            source = stored.source;
+            fileName = stored.fileName || fileName;
+            if (reconciled.changed) {
+              codeAppliedSignatureRef.current = semanticSignature(reconciled.project);
+              projectRef.current = reconciled.project;
+              setProject(reconciled.project);
+            }
+          }
+        }
+      }
+    } catch {}
+
+    setCodeSource(source);
+    setCodeFileName(fileName);
+    setCodeSyncState('synced');
+  }, [generated.value]);
+
+  useEffect(() => {
+    if (!codeHydratedRef.current || !generated.value) return;
+    const signature = semanticSignature(project);
+    if (codeAppliedSignatureRef.current === signature) {
+      codeAppliedSignatureRef.current = '';
+      return;
+    }
+    setCodeSource(generated.value.source);
+    if (!fileNameTouchedRef.current) setCodeFileName(generated.value.fileName);
+    setCodeSyncState('synced');
+    setCodeSyncError(null);
+    persistLiveCode(generated.value.source, fileNameTouchedRef.current ? codeFileName : generated.value.fileName);
+  }, [generated.value?.source, generated.value?.fileName, projectSemanticSignature]);
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(codeSaveTimerRef.current);
+      webRuntimeRef.current?.dispose();
+      webRuntimeRef.current = null;
+    };
+  }, []);
 
   const mutate = (
     label: string,
@@ -811,16 +933,86 @@ export default function VisualStudioPre4({
   };
 
   const handoff = () => {
-    if (!generated.value) {
+    const source = codeSource || generated.value?.source;
+    if (!source) {
       setMessage(generated.error ?? 'Code unavailable');
       return;
     }
     setCodeHandoff({
       id: createVisualId('handoff'),
       name: project.name + ' — Generated',
-      source: generated.value.source,
+      source,
     });
     onModeChange('code');
+  };
+
+  const renderVisualPreview = async (openModal = true) => {
+    const source = codeSource || generated.value?.source;
+    if (openModal) setPreviewModalOpen(true);
+    if (!source) {
+      setModalPreviewError(generated.error ?? 'Code unavailable');
+      return;
+    }
+
+    setModalPreviewLoading(true);
+    setModalPreviewError(null);
+    try {
+      const runtime =
+        webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
+      await runtime.registerFonts(assets);
+      const result = await runtime.renderStudioSource(source, assets);
+      if (!result.ok) {
+        setModalPreviewUrl(null);
+        setModalPreviewError(result.error);
+        setMessage('Preview failed');
+        return;
+      }
+      setModalPreviewUrl(result.dataUrl);
+      setModalPreviewMime(result.mime);
+      setMessage('Preview rendered');
+    } catch (error) {
+      setModalPreviewUrl(null);
+      setModalPreviewError(error instanceof Error ? error.message : 'Preview failed');
+    } finally {
+      setModalPreviewLoading(false);
+    }
+  };
+
+  const downloadTextFile = (source: string, fileName: string) => {
+    const blob = new Blob([source], { type: 'text/typescript;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName.endsWith('.ts') ? fileName : fileName + '.ts';
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadCanvasPreview = () => {
+    if (!modalPreviewUrl) return;
+    const extension =
+      modalPreviewMime === 'image/jpeg' ? 'jpg' :
+      modalPreviewMime === 'image/webp' ? 'webp' :
+      modalPreviewMime === 'image/gif' ? 'gif' : 'png';
+    const link = document.createElement('a');
+    link.href = modalPreviewUrl;
+    link.download = safeVisualDownloadStem(project.name) + '.' + extension;
+    link.click();
+  };
+
+  const renameCanvas = (name: string) => {
+    const nextName = name || 'Untitled Canvas';
+    setProject((current) => {
+      const next = { ...current, name: nextName, updatedAt: new Date().toISOString() };
+      projectRef.current = next;
+      return next;
+    });
+  };
+
+  const updateCodeFileName = (name: string) => {
+    fileNameTouchedRef.current = true;
+    setCodeFileName(name);
+    persistLiveCode(codeSource, name);
   };
 
   const onWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
@@ -1059,8 +1251,7 @@ export default function VisualStudioPre4({
   ] as const;
 
   const dockTabs = [
-    ['preview', 'Preview'],
-    ['generated', 'Generated Code'],
+    ['generated', 'Code'],
     ['diagnostics', 'Diagnostics'],
     ['assets', 'Assets'],
     ['history', 'History'],
@@ -1193,7 +1384,64 @@ export default function VisualStudioPre4({
     );
   };
 
+  const renderCanvasInspector = () => (
+    <>
+      <div className="apx-pre4-inspector-title">
+        <div>
+          <strong>{project.name}</strong>
+          <small>Canvas document</small>
+        </div>
+        <span className="apx-pre4-type-pill">canvas</span>
+      </div>
+
+      <div className="apx-pre4-property">
+        <label>Canvas name</label>
+        <input
+          className="apx-pre4-input"
+          value={project.name}
+          onFocus={beginPropertyEdit}
+          onChange={(event) => renameCanvas(event.target.value)}
+          onBlur={() => endPropertyEdit('Rename canvas')}
+        />
+      </div>
+
+      <div className="apx-pre4-property-grid">
+        {(['width', 'height'] as const).map((key) => (
+          <label key={key}>
+            <span>{key === 'width' ? 'W' : 'H'}</span>
+            <input
+              className="apx-pre4-input"
+              type="number"
+              min={1}
+              max={16384}
+              value={project.document[key]}
+              onFocus={beginPropertyEdit}
+              onChange={(event) => {
+                const value = Math.max(1, Math.min(16384, Number(event.target.value) || 1));
+                setProject((current) => ({
+                  ...current,
+                  updatedAt: new Date().toISOString(),
+                  document: { ...current.document, [key]: value },
+                }));
+              }}
+              onBlur={() => endPropertyEdit('Resize canvas')}
+            />
+          </label>
+        ))}
+      </div>
+
+      <div className="apx-live-sync-note">
+        <strong>Live Code Sync</strong>
+        <span>Canvas size changes update the code below automatically. Numeric createCanvas edits sync back here.</span>
+      </div>
+    </>
+  );
+
   const renderInspector = () => {
+    if ((inspectorTab === 'style' || inspectorTab === 'transform') && !primary && activeTool === 'canvas') {
+      return renderCanvasInspector();
+    }
+
     if ((inspectorTab === 'style' || inspectorTab === 'transform') && !primary) {
       return renderTransformFields();
     }
@@ -1234,78 +1482,48 @@ export default function VisualStudioPre4({
   };
 
   const renderDock = () => {
-    if (dockTab === 'preview') {
-      return activeArtifact ? (
-        <StudioArtifactPreview
-          artifact={activeArtifact}
-          artifacts={previewArtifacts}
-          onArtifactSelect={setActiveArtifactId}
-        />
-      ) : (
-        <div className="apx-pre4-dock-empty">
-          <strong>No runtime preview yet</strong>
-          <span>Preview remains tied to real Apexify execution artifacts.</span>
-        </div>
-      );
-    }
-
     if (dockTab === 'generated') {
-      return generated.value ? (
-        <div className="apx-pre4-generated-grid">
-          <div className="apx-pre4-code-wrap">
-            <div className="apx-pre4-code-meta">
-              <span>Generated Apexify.js</span>
-              <button type="button" onClick={() => void navigator.clipboard.writeText(generated.value!.source)}>
-                Copy Code
-              </button>
+      return (
+        <div className="apx-live-code-panel" data-visual-live-code>
+          <div className="apx-live-code-toolbar">
+            <div>
+              <strong>Live Apexify Code</strong>
+              <span
+                className="apx-live-sync-state"
+                data-state={codeSyncState}
+                title={codeSyncError ?? undefined}
+              >
+                {codeSyncState === 'saving'
+                  ? 'Autosaving…'
+                  : codeSyncState === 'error'
+                    ? 'Code not synced'
+                    : 'Autosaved · canvas synced'}
+              </span>
             </div>
-            <div className="apx-pre4-code-lines">
-              <ol aria-hidden="true">
-                {generated.value.source.split('\n').map((_, index) => <li key={index}>{index + 1}</li>)}
-              </ol>
-              <pre className="apx-pre4-code">{generated.value.source}</pre>
-            </div>
-          </div>
-          <div className="apx-pre4-output-pane">
-            <div className="apx-pre4-output-head">
-              <span>Canvas Output</span>
-              <small>{activeArtifact ? activeArtifact.name : 'No preview yet'}</small>
-            </div>
-            <div className="apx-pre4-output-body">
-              {activeArtifact?.url && (activeArtifact.kind === 'image' || activeArtifact.kind === 'gif') ? (
-                <img
-                  className="apx-pre4-output-media"
-                  src={activeArtifact.url}
-                  alt={activeArtifact.name || 'Canvas output'}
-                />
-              ) : activeArtifact?.url && activeArtifact.kind === 'video' ? (
-                <video
-                  className="apx-pre4-output-media"
-                  src={activeArtifact.url}
-                  muted
-                  playsInline
-                  controls
-                />
-              ) : (
-                <div className="apx-pre4-output-placeholder">
-                  <span>◇</span>
-                  <strong>{activeArtifact ? activeArtifact.name : 'Preview output'}</strong>
-                  <small>{activeArtifact ? 'Open Preview for the full runtime viewer.' : 'Run or preview the project to populate this pane.'}</small>
-                </div>
-              )}
+            <div className="apx-live-code-actions">
+              <button type="button" onClick={() => saveLiveCode()}>Save</button>
+              <button type="button" onClick={() => setCodeModalOpen(true)}>Open Code</button>
             </div>
           </div>
-        </div>
-      ) : (
-        <div className="apx-pre4-dock-empty">
-          <strong>Generated code unavailable</strong>
-          <span>{generated.error ?? 'The current visual nodes do not yet have an owning compiler phase.'}</span>
+          {codeSyncError ? (
+            <div className="apx-live-code-error">{codeSyncError}</div>
+          ) : null}
+          <div className="apx-live-code-editor">
+            <InteractiveCodeEditor
+              value={codeSource}
+              language="ts"
+              onChange={updateLiveCode}
+              fillParent
+              ariaLabel="Live Apexify Visual code"
+            />
+          </div>
         </div>
       );
     }
 
     if (dockTab === 'diagnostics') {
       const diagnostics = [
+        ...(codeSyncError ? [codeSyncError] : []),
         ...(error ? [error] : []),
         ...previewWarnings,
       ];
@@ -1316,7 +1534,7 @@ export default function VisualStudioPre4({
       ) : (
         <div className="apx-pre4-dock-empty">
           <strong>No diagnostics</strong>
-          <span>The current Visual Studio session has no runtime errors or warnings.</span>
+          <span>The Visual source, project model and runtime currently agree.</span>
         </div>
       );
     }
@@ -1385,16 +1603,18 @@ export default function VisualStudioPre4({
           <button
             className="apx-pre4-top-button"
             type="button"
-            disabled={!generated.value}
-            onClick={() => setDockTab('preview')}
-            title={generated.value ? 'Open runtime preview' : 'Preview becomes available when the current project can execute'}
+            disabled={!codeSource && !generated.value}
+            onClick={() => void renderVisualPreview(false)}
+            title="Render the current live Visual source"
           >
             <PlayIcon className="apx-pre4-control-icon" aria-hidden /> Run
           </button>
           <button
             className="apx-pre4-top-button"
             type="button"
-            onClick={() => setDockTab('preview')}
+            disabled={!codeSource && !generated.value}
+            onClick={() => void renderVisualPreview(true)}
+            data-visual-preview-modal-trigger
           >
             <MagnifyingGlassIcon className="apx-pre4-control-icon" aria-hidden /> Preview
           </button>
@@ -1402,8 +1622,8 @@ export default function VisualStudioPre4({
             className="apx-pre4-top-button apx-pre4-primary"
             type="button"
             data-visual-generate-code
-            onClick={handoff}
-            disabled={!generated.value}
+            onClick={() => setCodeModalOpen(true)}
+            disabled={!codeSource && !generated.value}
           >
             <CodeBracketIcon className="apx-pre4-control-icon" aria-hidden /> Generate Code
           </button>
@@ -1418,9 +1638,9 @@ export default function VisualStudioPre4({
               <button
                 data-visual-open-generated-code
                 onClick={handoff}
-                disabled={!generated.value}
+                disabled={!codeSource && !generated.value}
               >
-                Open generated code
+                Open in Code Studio
               </button>
             </div>
           </details>
@@ -1753,6 +1973,27 @@ export default function VisualStudioPre4({
         </section>
       </div>
 
+      <VisualPreviewModal
+        open={previewModalOpen}
+        onClose={() => setPreviewModalOpen(false)}
+        name={project.name}
+        onNameChange={renameCanvas}
+        previewUrl={modalPreviewUrl}
+        loading={modalPreviewLoading}
+        error={modalPreviewError}
+        onDownload={downloadCanvasPreview}
+      />
+
+      <VisualCodeModal
+        open={codeModalOpen}
+        onClose={() => setCodeModalOpen(false)}
+        source={codeSource || generated.value?.source || ''}
+        fileName={codeFileName}
+        onFileNameChange={updateCodeFileName}
+        onCopy={() => void navigator.clipboard.writeText(codeSource || generated.value?.source || '')}
+        onDownload={() => downloadTextFile(codeSource || generated.value?.source || '', codeFileName)}
+      />
+
       <footer className="apx-pre4-statusbar">
         <span className="apx-pre4-status-product">Apexify Studio</span>
         <span className="apx-pre4-save-state" data-dirty={dirty ? 'true' : undefined}>
@@ -1760,7 +2001,7 @@ export default function VisualStudioPre4({
         </span>
         <span className="apx-pre4-status-message" title={message}>{message}</span>
         <span className="apx-pre4-build-motto">Build something extraordinary. ✦</span>
-        <span className="sr-only">Visual workspace ready · Assets · Output · Diagnostics · History</span>
+        <span className="sr-only">Visual workspace ready · Code · Assets · Diagnostics · History</span>
       </footer>
     </div>
   );
