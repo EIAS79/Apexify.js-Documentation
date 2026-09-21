@@ -117,6 +117,16 @@ import {
   visualTextProps,
 } from '@/lib/studio/visual/text-contract';
 import {
+  defaultPathNodeProps,
+  detectionOperation,
+  operationRecord,
+  pathPropsRecord,
+  visualPathProps,
+  type StudioDetectionOperation,
+  type StudioPixelOperation,
+  type VisualPathNodeProps,
+} from '@/lib/studio/visual/path-pixel-contract';
+import {
   VisualHistory,
   alignNodes,
   copyNodes,
@@ -152,7 +162,7 @@ type Props = {
 type Point = { x: number; y: number };
 type SelectionRect = { x: number; y: number; width: number; height: number };
 type Gesture = {
-  kind: 'move' | 'resize' | 'rotate' | 'pan' | 'marquee';
+  kind: 'move' | 'resize' | 'rotate' | 'pan' | 'marquee' | 'freehand';
   id?: string;
   ids?: string[];
   handle?: ResizeHandle;
@@ -267,7 +277,7 @@ export default function VisualStudioPre4({
     'style' | 'transform' | 'effects' | 'data' | 'advanced'
   >('style');
   const [dockTab, setDockTab] = useState<
-    'generated' | 'diagnostics' | 'assets' | 'history'
+    'generated' | 'results' | 'diagnostics' | 'assets' | 'history'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
   const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
@@ -290,9 +300,17 @@ export default function VisualStudioPre4({
   const [imageConfigError, setImageConfigError] = useState<string | null>(null);
   const [textConfigDraft, setTextConfigDraft] = useState('{}');
   const [textConfigError, setTextConfigError] = useState<string | null>(null);
+  const [pathConfigDraft, setPathConfigDraft] = useState('{}');
+  const [pathConfigError, setPathConfigError] = useState<string | null>(null);
   const [inlineTextEditId, setInlineTextEditId] = useState<string | null>(null);
   const [artboardPreviewUrl, setArtboardPreviewUrl] = useState<string | null>(null);
   const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
+  const [phase7Results, setPhase7Results] = useState<Record<string, unknown>>({});
+  const [phase7Action, setPhase7Action] = useState<
+    'freehand' | 'pixel-probe' | 'pixel-data' | 'pixel-set' | 'path-detect' | 'region-detect' | 'region-distance' | 'any-region' | null
+  >(null);
+  const [pixelColorDraft, setPixelColorDraft] = useState('#ffffff');
+  const [freehandDraft, setFreehandDraft] = useState<Point[]>([]);
 
   const history = useRef(new VisualHistory(100));
   const projectRef = useRef(project);
@@ -312,6 +330,7 @@ export default function VisualStudioPre4({
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
   const artboardPreviewTimerRef = useRef<number>(0);
+  const freehandDraftRef = useRef<Point[]>([]);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
 
@@ -321,6 +340,10 @@ export default function VisualStudioPre4({
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
   const primaryText = primary?.kind === 'text' ? primary : undefined;
+  const primaryPath =
+    primary && (primary.kind === 'path' || primary.kind === 'freehand')
+      ? primary
+      : undefined;
   const textMetrics = useMemo(() => {
     if (!primaryText) return null;
     const props = visualTextProps(primaryText);
@@ -510,7 +533,12 @@ export default function VisualStudioPre4({
             assets,
           );
           if (cancelled) return;
-          if (result.ok) setArtboardPreviewUrl(result.dataUrl);
+          if (result.ok) {
+            setArtboardPreviewUrl(result.dataUrl);
+            setPhase7Results(
+              ((result as typeof result & { results?: Record<string, unknown> }).results ?? {}),
+            );
+          }
         } catch {
           // Keep the last authoritative frame while the next valid frame is built.
         } finally {
