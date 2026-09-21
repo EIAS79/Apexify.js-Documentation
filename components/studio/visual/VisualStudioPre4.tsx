@@ -11,6 +11,7 @@ import {
   type ReactNode,
   type CSSProperties,
 } from 'react';
+import { BrandIcon } from '@/components/Brand';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioArtifactPreview } from '@/components/studio/StudioArtifactPreview';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
@@ -136,11 +137,11 @@ export default function VisualStudioPre4({
     previewWarnings,
     history: runHistory,
   } = useStudioSharedSession();
-  const [project, setProject] = useState(() => createVisualProject());
+  const [project, setProject] = useState(() => createVisualProject({ name: 'Landing Page' }));
   const [zoom, setZoom] = useState(78);
   const [pan, setPan] = useState<Point>({ x: 0, y: 0 });
   const [viewportMode, setViewportMode] = useState<'select' | 'pan'>('select');
-  const [message, setMessage] = useState('Phase 3 editor ready');
+  const [message, setMessage] = useState('Ready');
   const [historyTick, setHistoryTick] = useState(0);
   const [guides, setGuides] = useState<
     Array<{ axis: 'x' | 'y'; value: number }>
@@ -169,6 +170,7 @@ export default function VisualStudioPre4({
   const cleanSignature = useRef('');
   const propertyBefore = useRef<VisualProject | null>(null);
   const pinch = useRef<{ distance: number; zoom: number } | null>(null);
+  const didInitialFit = useRef(false);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
 
@@ -276,6 +278,20 @@ export default function VisualStudioPre4({
     setZoom(100);
     setPan({ x: 0, y: 0 });
   };
+
+  useEffect(() => {
+    if (!active || didInitialFit.current) return;
+    const frame = window.requestAnimationFrame(() => {
+      const viewport = viewportRef.current?.getBoundingClientRect();
+      if (!viewport) return;
+      const widthScale = (viewport.width - 64) / project.document.width;
+      const heightScale = (viewport.height - 64) / project.document.height;
+      setZoom(clampZoom(Math.min(widthScale, heightScale, 1) * 100));
+      setPan({ x: 0, y: 0 });
+      didInitialFit.current = true;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [active, project.document.height, project.document.width]);
 
   const documentPoint = (clientX: number, clientY: number): Point | null => {
     const rect = artboardRef.current?.getBoundingClientRect();
@@ -993,7 +1009,7 @@ export default function VisualStudioPre4({
     ['layers', '◇', 'Layers'],
     ['components', '⊞', 'Components'],
     ['assets', '▤', 'Assets'],
-    ['gif', 'GIF', 'GIF'],
+    ['gif', '◆', 'GIF'],
     ['audio', '♪', 'Audio'],
     ['video', '▷', 'Video'],
   ] as const;
@@ -1276,7 +1292,7 @@ export default function VisualStudioPre4({
     >
       <header className="apx-pre4-topbar">
         <div className="apx-pre4-brand">
-          <span className="apx-pre4-logo">A</span>
+          <span className="apx-pre4-logo"><BrandIcon size={36} /></span>
           <span className="apx-pre4-brand-copy">
             <strong>Apexify Studio</strong>
             <small>Design. Visualize. Generate.</small>
@@ -1309,6 +1325,7 @@ export default function VisualStudioPre4({
           <button
             className="apx-pre4-top-button apx-pre4-primary"
             type="button"
+            data-visual-generate-code
             onClick={handoff}
             disabled={!generated.value}
           >
@@ -1635,12 +1652,13 @@ export default function VisualStudioPre4({
       </div>
 
       <footer className="apx-pre4-statusbar">
-        <span>Apexify Studio · PRE-4 shell</span>
+        <span>Apexify Studio</span>
         <span className="apx-pre4-save-state" data-dirty={dirty ? 'true' : undefined}>
           <i /> {dirty ? 'Unsaved changes' : 'All changes saved'}
         </span>
         <span className="apx-pre4-status-message">{message}</span>
-        <span>Visual workspace ready · Assets · Output · Diagnostics · History</span>
+        <span className="apx-pre4-build-motto">Build something extraordinary. ✦</span>
+        <span className="sr-only">Visual workspace ready · Assets · Output · Diagnostics · History</span>
       </footer>
     </div>
   );
