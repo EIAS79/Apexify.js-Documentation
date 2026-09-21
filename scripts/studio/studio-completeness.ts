@@ -11,6 +11,7 @@ import {
   STUDIO_OPTION_FAMILY_PROOFS,
   proofCasesForCapability,
 } from './studio-proof-registry';
+import { balancedDeclarationBody, namedDeclarationBody } from './declaration-parser';
 
 const root = process.cwd();
 const check = process.argv.includes('--check');
@@ -73,37 +74,8 @@ function findDeclaration(): string {
   return found;
 }
 
-function balancedBody(source: string, open: number): string {
-  let depth = 0;
-  let quote: "'" | '"' | '`' | null = null;
-  let escaped = false;
-
-  for (let index = open; index < source.length; index += 1) {
-    const ch = source[index]!;
-    if (quote) {
-      if (escaped) escaped = false;
-      else if (ch === '\\') escaped = true;
-      else if (ch === quote) quote = null;
-      continue;
-    }
-    if (ch === "'" || ch === '"' || ch === '`') {
-      quote = ch;
-      continue;
-    }
-    if (ch === '{') depth += 1;
-    else if (ch === '}') {
-      depth -= 1;
-      if (depth === 0) return source.slice(open + 1, index);
-    }
-  }
-  throw new Error('Declaration body is unbalanced.');
-}
-
 function classBody(source: string): string {
-  const match = /\bclass\s+ApexPainter\b[^\{]*\{/.exec(source);
-  if (!match) throw new Error('ApexPainter declaration was not found.');
-  const open = match.index + match[0].lastIndexOf('{');
-  return balancedBody(source, open);
+  return namedDeclarationBody(source, 'ApexPainter', 'class');
 }
 
 function uniqueSorted(values: Iterable<string>): string[] {
@@ -149,7 +121,7 @@ function declarationBody(name: string, kind: 'interface' | 'class'): string {
     const match = pattern.exec(declarationSource);
     if (!match) continue;
     const open = match.index + match[0].lastIndexOf('{');
-    return balancedBody(declarationSource, open);
+    return balancedDeclarationBody(declarationSource, open);
   }
   throw new Error('Could not locate declaration ' + kind + ' ' + name + ' in apexify.js.');
 }
@@ -183,7 +155,7 @@ function componentFactories(): string[] {
     const match = pattern.exec(declarationSource);
     if (!match) continue;
     const open = match.index + match[0].lastIndexOf('{');
-    const body = balancedBody(declarationSource, open);
+    const body = balancedDeclarationBody(declarationSource, open);
     return uniqueSorted(
       [...body.matchAll(/^\s*([A-Za-z_$][\w$]*)\s*:\s*\{/gm)].map((entry) => entry[1]!),
     );
