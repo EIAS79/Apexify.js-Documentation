@@ -81,10 +81,11 @@ async function main() {
 })().catch(console.error);
 `;
 
-const result = await runSameOriginIsolatedStudio(source, [], []);
-const body = result.body;
+async function runSmoke() {
+  const result = await runSameOriginIsolatedStudio(source, [], []);
+  const body = result.body;
 
-if (result.status !== 200 || !body.ok) {
+  if (result.status !== 200 || !body.ok) {
   console.error('\n[studio:smoke:video] FAILED');
   console.error(body.error ?? 'Unknown Studio runtime failure');
   if (body.stderr) console.error('\n--- stderr ---\n' + body.stderr);
@@ -107,15 +108,22 @@ const outPath = path.join(outDir, 'pulse-bloom.mp4');
 writeFileSync(outPath, Buffer.from(video.base64, 'base64'));
 
 console.log('\n[studio:smoke:video] PASS');
-console.log(JSON.stringify({
-  status: result.status,
-  runtime: body.runtime,
-  runtimeIdentity: body.runtimeIdentity,
-  output: {
-    name: video.name,
-    kind: video.kind,
-    mime: video.mime,
-    bytes: Buffer.byteLength(video.base64, 'base64'),
-    path: outPath,
-  },
-}, null, 2));
+  console.log(JSON.stringify({
+    status: result.status,
+    runtime: body.runtime,
+    runtimeIdentity: body.runtimeIdentity,
+    output: {
+      name: video.name,
+      kind: video.kind,
+      mime: video.mime,
+      bytes: Buffer.byteLength(video.base64, 'base64'),
+      path: outPath,
+    },
+  }, null, 2));
+}
+
+runSmoke().catch((error) => {
+  console.error('[studio:smoke:video] harness error');
+  console.error(error instanceof Error ? error.stack || error.message : String(error));
+  process.exit(1);
+});
