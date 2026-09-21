@@ -299,15 +299,20 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               <span>Project</span>
             </summary>
             <div className="apx-vw-project-menu__panel">
-              <button type="button" onClick={() => projectFileRef.current?.click()}>
+              <button type="button" data-visual-project-load onClick={() => projectFileRef.current?.click()}>
                 <FolderOpenIcon className="h-4 w-4" aria-hidden />
                 <span>Load .apexstudio.json</span>
               </button>
-              <button type="button" onClick={saveProject}>
+              <button type="button" data-visual-project-save onClick={saveProject}>
                 <ArrowDownTrayIcon className="h-4 w-4" aria-hidden />
                 <span>Save project</span>
               </button>
-              <button type="button" onClick={handoffToCode} disabled={!generated.value}>
+              <button
+                type="button"
+                data-visual-open-generated-code
+                onClick={handoffToCode}
+                disabled={!generated.value}
+              >
                 <CodeBracketIcon className="h-4 w-4" aria-hidden />
                 <span>Open generated code</span>
               </button>
