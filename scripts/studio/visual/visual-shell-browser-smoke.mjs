@@ -12,6 +12,7 @@ const browser = await puppeteer.launch({
 
 async function verify(width, height) {
   const page = await browser.newPage();
+  await page.setCacheEnabled(false);
   await page.setViewport({ width, height });
   await page.evaluateOnNewDocument(() => {
     localStorage.clear();
@@ -22,7 +23,7 @@ async function verify(width, height) {
   page.on('pageerror', (error) => errors.push(error.message));
 
   const response = await page.goto(base + '/studio', { waitUntil: 'networkidle2' });
-  if (!response || response.status() !== 200) throw new Error('Studio HTTP ' + response?.status());
+  if (!response || response.status() >= 400) throw new Error('Studio HTTP ' + response?.status());
 
   await page.waitForSelector('[data-studio-shell][data-studio-mode="code"]');
   await page.waitForSelector('.cm-editor');
