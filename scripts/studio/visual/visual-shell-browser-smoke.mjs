@@ -50,6 +50,25 @@ async function verify(width, height) {
 
   const restored = await page.$eval('.cm-content', (node) => node.textContent || '');
   if (restored !== original) throw new Error('Code Studio session changed after mode round trip');
+
+  // Phase 2: generated Visual code must fork into a new Code Studio buffer.
+  await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
+  await page.waitForSelector('[data-studio-shell][data-studio-mode="visual"]');
+  await page.click('.apx-vw-project-menu > summary');
+  const projectActions = await page.$('.apx-vw-project-menu__panel button');
+  if (projectActions.length < 3) throw new Error('Phase 2 project actions missing');
+  await projectActions[2].click();
+  await page.waitForSelector('[data-studio-shell][data-studio-mode="code"]');
+
+  await page.waitForFunction(() => {
+    const content = document.querySelector('.cm-content')?.textContent || '';
+    return content.includes('createCanvas') && content.includes('return canvas.buffer');
+  });
+  const generated = await page.$eval('.cm-content', (node) => node.textContent || '');
+  if (!generated.includes("import { ApexPainter } from 'apexify.js'")) {
+    throw new Error('Visual → Code handoff did not open generated Apexify source');
+  }
+
   if (errors.length) throw new Error('page errors: ' + JSON.stringify(errors));
 
   await page.close();
