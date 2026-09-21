@@ -16,6 +16,7 @@ import {
   ViewColumnsIcon,
 } from '@heroicons/react/24/outline';
 import ThemeToggle from '@/components/ThemeToggle';
+import { StudioModeSwitch, type StudioMode } from '@/components/studio/StudioModeSwitch';
 import {
   STUDIO_TEMPLATES,
   StudioLang,
@@ -37,6 +38,8 @@ function StudioMark() {
 }
 
 type TopBarProps = {
+  mode: StudioMode;
+  onModeChange?: (mode: StudioMode) => void;
   layout: LayoutMode;
   onLayoutChange: (m: LayoutMode) => void;
   lang: StudioLang;
@@ -250,6 +253,8 @@ function TemplatesMenu({ onLoad }: { onLoad: (t: StudioTemplate) => void }) {
 
 export function StudioTopBar(props: TopBarProps) {
   const {
+    mode,
+    onModeChange,
     layout,
     onLayoutChange,
     lang,
@@ -315,6 +320,10 @@ export function StudioTopBar(props: TopBarProps) {
           className="hidden h-6 w-px shrink-0 md:block"
           style={{ backgroundColor: 'var(--border-default)' }}
         />
+
+        {onModeChange ? (
+          <StudioModeSwitch mode={mode} onChange={onModeChange} className="studio-mode-switch--codebar" />
+        ) : null}
 
         <LangPills lang={lang} onChange={onLangChange} />
         <LayoutPills mode={layout} onChange={onLayoutChange} />

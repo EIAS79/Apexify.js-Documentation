@@ -1624,3 +1624,101 @@
     display:none;
   }
 }
+
+
+/* Inline Code / Visual mode switch.
+   Lives inside each mode's own toolbar; the outer duplicate Studio header is removed. */
+.studio-mode-switch{
+  display:inline-flex;
+  align-items:center;
+  gap:.2rem;
+  flex:0 0 auto;
+  padding:.2rem;
+  border-radius:.7rem;
+}
+
+.studio-mode-switch button{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.4rem;
+  min-height:2rem;
+  padding:.38rem .7rem;
+  border:0;
+  border-radius:.52rem;
+  background:transparent;
+  font-size:.68rem;
+  font-weight:800;
+  line-height:1;
+  cursor:pointer;
+  transition:background-color .14s ease,color .14s ease,box-shadow .14s ease,transform .14s ease;
+}
+
+.studio-mode-switch button:active{
+  transform:scale(.98);
+}
+
+.apx-studio-root .studio-mode-switch{
+  border:1px solid var(--studio-line);
+  background:var(--studio-bg-2);
+}
+
+.apx-studio-root .studio-mode-switch button{
+  color:var(--studio-text-3);
+}
+
+.apx-studio-root .studio-mode-switch button:hover{
+  color:var(--studio-text);
+  background:var(--studio-panel);
+}
+
+.apx-studio-root .studio-mode-switch button[data-active="true"]{
+  color:var(--studio-action-ink);
+  background:var(--studio-blue);
+  box-shadow:0 7px 18px rgba(74,98,220,.22);
+}
+
+.apx-visual-workspace .studio-mode-switch{
+  margin-left:.7rem;
+  border:1px solid var(--vw-border);
+  background:#081523;
+}
+
+.apx-visual-workspace .studio-mode-switch button{
+  color:var(--vw-text-3);
+}
+
+.apx-visual-workspace .studio-mode-switch button:hover{
+  color:white;
+  background:var(--vw-panel-2);
+}
+
+.apx-visual-workspace .studio-mode-switch button[data-active="true"]{
+  color:white;
+  background:linear-gradient(135deg,#4f78ff,#7454f4);
+  box-shadow:0 8px 20px rgba(78,91,255,.24);
+}
+
+@media(max-width:900px){
+  .studio-mode-switch button{
+    padding-inline:.55rem;
+  }
+
+  .studio-mode-switch button span{
+    display:none;
+  }
+
+  .apx-visual-workspace .studio-mode-switch{
+    margin-left:auto;
+  }
+}
+
+@media(max-width:640px){
+  .apx-studio-root .studio-mode-switch{
+    order:2;
+  }
+
+  .apx-visual-workspace .studio-mode-switch{
+    margin-left:auto;
+  }
+}

@@ -31,7 +31,7 @@ async function verify(width, height) {
   const original = await page.$eval('.cm-content', (node) => node.textContent || '');
   if (!original.includes('ApexPainter')) throw new Error('Code Studio starter source missing');
 
-  await page.click('[data-studio-mode-tab="visual"]');
+  await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="visual"]');
   await page.waitForSelector('[data-studio-visual-workspace]');
 
@@ -45,7 +45,7 @@ async function verify(width, height) {
   );
   if (overflow) throw new Error(width + 'x' + height + ' horizontal overflow');
 
-  await page.click('[data-studio-mode-tab="code"]');
+  await page.click('[data-studio-visual-panel]:not([hidden]) [data-studio-mode-tab="code"]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="code"]');
 
   const restored = await page.$eval('.cm-content', (node) => node.textContent || '');

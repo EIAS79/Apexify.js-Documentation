@@ -10,10 +10,14 @@ test('phase 1 mounts a top-level dual-mode shell without replacing Code Studio',
   const page = read('app/studio/page.tsx');
   const shell = read('components/studio/StudioShell.tsx');
   const code = read('components/studio/CodeStudio.tsx');
+  const topBar = read('components/studio/StudioTopBar.tsx');
+  const modeSwitch = read('components/studio/StudioModeSwitch.tsx');
 
   assert.match(page, /StudioShell/);
-  assert.match(shell, /data-studio-mode-tab="code"/);
-  assert.match(shell, /data-studio-mode-tab="visual"/);
+  assert.doesNotMatch(shell, /Apexify\.js[\s\S]*Studio authoring mode/);
+  assert.match(modeSwitch, /data-studio-mode-tab="code"/);
+  assert.match(modeSwitch, /data-studio-mode-tab="visual"/);
+  assert.match(topBar, /StudioModeSwitch/);
   assert.match(shell, /StudioSharedSessionProvider/);
   assert.match(shell, /<CodeStudio embedded/);
   assert.match(shell, /dynamic\(/);
@@ -28,6 +32,7 @@ test('phase 1 Visual Studio remains an empty workspace with shared shell surface
 
   assert.match(visual, /data-studio-visual-workspace/);
   assert.match(visual, /useStudioSharedSession/);
+  assert.match(visual, /StudioModeSwitch/);
   assert.match(visual, /Shared Studio assets/);
   assert.match(visual, /Generated Code/);
   assert.match(visual, /Diagnostics/);

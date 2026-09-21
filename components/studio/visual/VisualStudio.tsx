@@ -25,9 +25,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { useMemo, useState, type ComponentType, type SVGProps } from 'react';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
+import { StudioModeSwitch, type StudioMode } from '@/components/studio/StudioModeSwitch';
 import { studioAssetDataUrl } from '@/lib/studio/runtime/assets';
 
-type Props = { active: boolean };
+type Props = { active: boolean; mode: StudioMode; onModeChange: (mode: StudioMode) => void };
 type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 type ToolId =
   | 'canvas'
@@ -97,7 +98,7 @@ function ActionButton({
   );
 }
 
-export default function VisualStudio({ active }: Props) {
+export default function VisualStudio({ active, mode, onModeChange }: Props) {
   const {
     assets,
     previewArtifacts,
@@ -135,6 +136,8 @@ export default function VisualStudio({ active }: Props) {
             <small>Design · Visualize · Generate</small>
           </span>
         </div>
+
+        <StudioModeSwitch mode={mode} onChange={onModeChange} className="studio-mode-switch--visualbar" />
 
         <div className="apx-vw-header-actions">
           <ActionButton icon={EyeIcon} active={dockTab === 'Preview'} onClick={() => setDockTab('Preview')}>

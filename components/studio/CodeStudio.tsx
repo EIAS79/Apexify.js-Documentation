@@ -17,6 +17,7 @@ import { StudioResizableSplit } from '@/components/studio/StudioResizableSplit';
 import { StudioShortcutOverlay } from '@/components/studio/StudioShortcutOverlay';
 import { StudioStatusBar } from '@/components/studio/StudioStatusBar';
 import { StudioTopBar } from '@/components/studio/StudioTopBar';
+import type { StudioMode } from '@/components/studio/StudioModeSwitch';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { createInteractiveSession } from '@/lib/docs/playground/session';
 import type { InteractiveArtifact } from '@/lib/docs/playground/contracts';
@@ -54,7 +55,7 @@ import {
 
 type Toast = { kind: 'info' | 'success' | 'warning'; text: string } | null;
 
-export default function CodeStudio({ embedded = false }: { embedded?: boolean }) {
+export default function CodeStudio({ embedded = false, mode = 'code', onModeChange }: { embedded?: boolean; mode?: StudioMode; onModeChange?: (mode: StudioMode) => void }) {
   const [hydrated, setHydrated] = useState(false);
   const [buffers, setBuffers] = useState<StudioBuffer[]>([]);
   const [activeBufferId, setActiveBufferId] = useState<string>('');
@@ -960,6 +961,8 @@ export default function CodeStudio({ embedded = false }: { embedded?: boolean })
       </div>
 
       <StudioTopBar
+        mode={mode}
+        onModeChange={onModeChange}
         layout={layout}
         onLayoutChange={setLayout}
         lang={lang}
