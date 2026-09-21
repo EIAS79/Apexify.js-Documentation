@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 IN PROGRESS
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 COMPLETE; STUDIO-VISUAL-1 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2830,7 +2830,7 @@ That gives every later phase a measurable definition of “complete” and preve
 
 # 49. STUDIO-VISUAL-0 implementation record
 
-> **Status:** IN PROGRESS
+> **Status:** COMPLETE
 >
 > **Work branch:** `studio-visual/v00-contract`
 >
@@ -2847,3 +2847,26 @@ generated/studio/visual-capability-matrix.json
 ```
 
 Phase 0 is not complete until the Visual capability generator is deterministic, zero current public Studio capabilities remain unclassified, the schema/decision/CI contracts are committed, and the branch gate passes.
+
+
+## 49.1 Phase 0 completion evidence
+
+- [x] master plan committed as source of truth;
+- [x] Visual Studio terminology fixed;
+- [x] Code/Visual mode contract fixed;
+- [x] declaration-driven Visual Capability Matrix generator implemented;
+- [x] all 187 current Studio-relevant public capabilities classified;
+- [x] DOC-4 public option inventory coverage enforced with 17,233 option paths and zero unclassified paths at the Phase-0 gate;
+- [x] `.apexstudio.json` / `VisualProject` v1 schema committed;
+- [x] Studio Operation Plan / preview / code-generation contracts defined;
+- [x] all ten Phase-0 architecture questions resolved in `STUDIO_VISUAL_DECISIONS.md`;
+- [x] `studio-visual/*` Vercel ignore behavior implemented and regression-tested;
+- [x] dedicated `studio-visual-check.yml` CI gate implemented;
+- [x] declaration parser hardened against JSDoc braces/quotes and compiler indentation changes without changing the committed 187-capability evidence;
+- [x] base Studio capability regeneration is deterministic;
+- [x] Visual capability generation/check is deterministic;
+- [x] Visual contract tests pass;
+- [x] TypeScript typecheck passes;
+- [x] GitHub Actions **Studio Visual Phase Gate** run `35580198765` passed.
+
+Phase 0 is therefore complete. The next implementation phase is **STUDIO-VISUAL-1 — Dual-mode Studio shell**.
