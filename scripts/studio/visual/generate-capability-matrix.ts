@@ -398,6 +398,7 @@ if (!artifact.summary.complete || !artifact.optionCoverage.complete) {
 const expected = JSON.stringify(artifact, null, 2) + '\n';
 
 if (check) {
+  console.log('[studio-visual] option coverage ' + JSON.stringify(artifact.optionCoverage));
   if (!fs.existsSync(outFile)) {
     console.error('[studio-visual] missing generated/studio/visual-capability-matrix.json');
     process.exit(1);
