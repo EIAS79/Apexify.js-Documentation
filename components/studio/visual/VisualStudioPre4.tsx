@@ -3508,9 +3508,11 @@ export default function VisualStudioPre4({
                   ? 'Images'
                   : activeTool === 'shapes'
                     ? 'Shapes'
-                    : activeTool === 'assets'
-                      ? 'Assets'
-                      : 'Layers'}
+                    : activeTool === 'text'
+                      ? 'Text'
+                      : activeTool === 'assets'
+                        ? 'Assets'
+                        : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -3518,7 +3520,9 @@ export default function VisualStudioPre4({
                     ? imageAssets.length + ' image assets'
                     : activeTool === 'shapes'
                       ? IMAGE_SHAPE_TYPES.length + ' built-in shapes'
-                      : assets.length + ' shared assets'
+                      : activeTool === 'text'
+                        ? fontAssets.length + ' uploaded fonts'
+                        : assets.length + ' shared assets'
                   : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
@@ -3527,6 +3531,8 @@ export default function VisualStudioPre4({
               <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
             ) : activeTool === 'images' ? (
               <button type="button" onClick={() => setDockTab('assets')} title="Open Assets">＋</button>
+            ) : activeTool === 'text' ? (
+              <button type="button" onClick={() => insertText('Text')} title="Add text">＋</button>
             ) : null}
           </div>
 
