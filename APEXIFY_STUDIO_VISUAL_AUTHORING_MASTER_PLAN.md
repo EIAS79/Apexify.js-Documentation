@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; PHASES 4–18 RE-AUDITED; STUDIO-VISUAL-4 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3208,8 +3208,8 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 2 | Project model / codegen core | MAIN MERGED | `186b87bcabba5316639c5a103c0b12125822a35a` | Manual deployment intentionally not triggered; current project instruction is merge-to-main only |
 | 3 | Viewport / layers / transforms / history | PRODUCTION VERIFIED | `372d449e8e37c998faf56eef0f0db8704f648e9d` | Vercel production deployment `dpl_6TEqXQJ9NbH2MYT2fpC1mmgRgNbn` READY for exact merge SHA; live `/studio` Visual-mode smoke passed with Layers, Transform Inspector, History, zoom/fit/reset, Select/Pan, Project menu and viewport visible |
 | PRE-4 | Studio product shell rebuild | MAIN MERGED | `b530d0a8f18290ac3f9081744153c9aae58a9dfe` | Studio Visual push gate `35632663379` PASS; PR gate `35632667933` PASS; build/browser/screenshot proof PASS; production deployment deferred because Vercel quota is rate-limited |
-| 4 | Canvas | NOT STARTED | — | NEXT — post-PRE-4 roadmap re-audit complete; implement in permanent Canvas/Inspector/live-code architecture |
-| 5 | Images / shapes / assets | NOT STARTED | — | — |
+| 4 | Canvas | MAIN MERGED | `7c33de0eae60a6ed7a12fb41b942610eaf702498` | PR #83; exact-head Studio Visual gate `35654406532` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because Vercel quota is rate-limited |
+| 5 | Images / shapes / assets | NOT STARTED | — | NEXT — extend permanent Images/Shapes/Assets surfaces and linked Code ↔ Visual reconciliation |
 | 6 | Text / fonts | NOT STARTED | — | — |
 | 7 | Paths / doodle / pixels / detect | NOT STARTED | — | — |
 | 8 | Charts | NOT STARTED | — | — |
@@ -3421,6 +3421,63 @@ The linked-code architecture is intentionally capability-bounded. Each future fe
 ### Required next gate
 
 Before STUDIO-VISUAL-4 begins, perform the mandatory post-PRE-4 roadmap re-audit and remap Phases 4–18 to the permanent shell surfaces now established.
+
+## Phase 4 implementation record — STUDIO-VISUAL-4
+
+> **Status:** MAIN MERGED — PRODUCTION VERIFICATION DEFERRED
+>
+> **Work branch:** `studio-visual/v04-canvas-authoring`
+>
+> **PR:** #83
+>
+> **Verified PR head:** `85b4a622d6880509cc1755be72ae60a4f3f92648`
+>
+> **Green Studio Visual gate:** GitHub Actions `35654406532`
+>
+> **Main integration:** `7c33de0eae60a6ed7a12fb41b942610eaf702498`
+>
+> **Production deployment:** DEFERRED — Vercel usage is currently rate-limited. This is an infrastructure quota constraint, not a Phase 4 implementation failure.
+
+Completed Phase-4 scope:
+
+- modeled the pinned Apexify `CanvasConfig` contract in Visual Project state;
+- deterministic normalization, validation and lowering of Canvas configuration;
+- canonical `createCanvas()` generation for dimensions and declaration-backed Canvas options;
+- safe literal `createCanvas({...})` reverse reconciliation without `eval` / `new Function`;
+- **Style** Inspector authoring for canvas name, primary background, gradients/stops, custom image background, opacity, radius, stroke and shadow;
+- **Transform** Inspector authoring for width/height, x/y, rotation and internal zoom;
+- **Effects** Inspector authoring for blur, blend mode, procedural pattern, noise and ordered background layers;
+- **Advanced** Inspector authoring for custom background filters, validated complete `CanvasConfig` JSON, video-background declaration options and advanced border geometry;
+- complete declaration-level escape hatch so deep supported fields remain authorable without bloating the primary Inspector;
+- browser artboard reflects basic color/gradient/transparent/radius/opacity changes immediately;
+- browser Preview does not pretend to support Node-only video-frame extraction; generated code remains exact and the limitation is surfaced explicitly;
+- Visual Inspector edits update the linked CodeMirror code automatically;
+- canonical literal Canvas code edits reconcile back into Visual canvas state;
+- runtime equivalence proof compares operation-plan output and generated-code output using the real pinned ApexPainter runtime;
+- browser proof changes background color and width through the Inspector and verifies the live linked code updates;
+- Phase-3 / PRE-4 shell and linked-code regression contracts remain green.
+
+### Phase 4 proof
+
+```text
+Visual Canvas state
+→ deterministic Studio operation plan
+→ canonical createCanvas() source
+→ real ApexPainter execution
+→ equivalent artifact
+
+Inspector edit
+→ Visual Project mutation
+→ live generated code update
+
+canonical literal createCanvas() edit
+→ safe parser/reconciler
+→ Visual Canvas mutation
+```
+
+Production verification remains deferred until Vercel usage is available again.
+
+---
 
 Allowed phase statuses:
 
