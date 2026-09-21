@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { CodeBracketIcon, PaintBrushIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
 import CodeStudio from '@/components/studio/CodeStudio';
+import { StudioSharedSessionProvider } from '@/components/studio/StudioSharedSession';
 
 export type StudioMode = 'code' | 'visual';
 
@@ -45,6 +46,7 @@ export default function StudioShell() {
   };
 
   return (
+    <StudioSharedSessionProvider>
     <div
       className="apx-studio-shell flex h-dvh max-h-dvh min-h-0 flex-col overflow-hidden"
       data-studio-shell
@@ -128,5 +130,6 @@ export default function StudioShell() {
         </section>
       ) : null}
     </div>
+    </StudioSharedSessionProvider>
   );
 }
