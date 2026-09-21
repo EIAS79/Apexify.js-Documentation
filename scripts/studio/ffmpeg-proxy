@@ -2,6 +2,11 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+if [ -n "${STUDIO_MEDIA_NODE_PATH:-}" ] && [ -x "$STUDIO_MEDIA_NODE_PATH" ]; then
+  exec "$STUDIO_MEDIA_NODE_PATH" "$SCRIPT_DIR/media-process-proxy-cli.mjs" ffmpeg "$@"
+fi
+
 for NODE_BIN in /usr/bin/node /usr/local/bin/node /nodejs/bin/node; do
   if [ -x "$NODE_BIN" ]; then
     exec "$NODE_BIN" "$SCRIPT_DIR/media-process-proxy-cli.mjs" ffmpeg "$@"
