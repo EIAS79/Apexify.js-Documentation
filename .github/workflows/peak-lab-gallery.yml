@@ -59,6 +59,12 @@ jobs:
           npm ci
           npm run build
 
+      - name: Validate standalone Gallery code generation
+        env:
+          PEAK_LAB_VALIDATE_CODE: '1'
+          PEAK_LAB_SOURCE: scripts/gallery/Apexify-Peak-Lab.ts
+        run: node scripts/gallery/publish-peak-lab.mjs
+
       - name: Render all Peak Lab recipes
         run: |
           cp scripts/gallery/Apexify-Peak-Lab.ts .peak-engine/Apexify-Peak-Lab.ts
