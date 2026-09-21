@@ -186,6 +186,7 @@ function NumericField({
         step={step}
         min={min}
         max={max}
+        data-visual-number-field={label}
         onChange={(event) => setDraft(event.target.value)}
         onBlur={commit}
         onKeyDown={(event) => {
@@ -812,6 +813,7 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               <button
                 type="button"
                 disabled={!selection.length}
+                data-visual-duplicate-layer
                 onClick={() => commitProject('Duplicate layer', duplicateSelectedNodes)}
                 title="Duplicate selected layer(s)"
               >
@@ -820,6 +822,7 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               <button
                 type="button"
                 disabled={!selection.length}
+                data-visual-delete-layer
                 onClick={() => commitProject('Delete layer', deleteSelectedNodes)}
                 title="Delete selected layer(s)"
               >
@@ -855,10 +858,10 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
             </div>
 
             <div className="apx-vw-history-controls">
-              <button type="button" onClick={undo} disabled={!editor.canUndo} aria-label="Undo" title="Undo · Ctrl/Cmd+Z">
+              <button type="button" data-visual-undo onClick={undo} disabled={!editor.canUndo} aria-label="Undo" title="Undo · Ctrl/Cmd+Z">
                 <ArrowUturnLeftIcon className="h-4 w-4" aria-hidden />
               </button>
-              <button type="button" onClick={redo} disabled={!editor.canRedo} aria-label="Redo" title="Redo · Ctrl/Cmd+Shift+Z">
+              <button type="button" data-visual-redo onClick={redo} disabled={!editor.canRedo} aria-label="Redo" title="Redo · Ctrl/Cmd+Shift+Z">
                 <ArrowUturnRightIcon className="h-4 w-4" aria-hidden />
               </button>
             </div>
