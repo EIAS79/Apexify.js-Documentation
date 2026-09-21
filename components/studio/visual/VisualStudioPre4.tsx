@@ -1361,17 +1361,9 @@ export default function VisualStudioPre4({
           />
         </div>
 
-        <div className="apx-pre4-top-utility">
-          <button type="button" title="Undo" onClick={undo} disabled={!history.current.canUndo}>↶</button>
-          <button type="button" title="Redo" onClick={redo} disabled={!history.current.canRedo}>↷</button>
-          <button type="button" title="Notifications">●</button>
-          <span className="apx-pre4-avatar">A</span>
-          <span className="apx-pre4-user">Apexify</span>
-          <span className="apx-pre4-chevron">⌄</span>
-        </div>
       </header>
 
-      <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '42px' : '238px' } as CSSProperties}>
+      <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '38px' : '204px' } as CSSProperties}>
         <nav className="apx-pre4-feature-rail" aria-label="Visual Studio features">
           <div className="apx-pre4-feature-list">
             {featureTools.map(([id, icon, label]) => (
@@ -1400,7 +1392,7 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-panel-head">
             <div>
               <strong>Layers</strong>
-              <small>{layerIds.length} layers · {selected.length} selected</small>
+              <small>{layerIds.length ? layerIds.length + ' layers' : 'Layer structure'}{selected.length ? ' · ' + selected.length + ' selected' : ''}</small>
             </div>
             <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
           </div>
@@ -1413,7 +1405,7 @@ export default function VisualStudioPre4({
             {!project.document.rootNodeIds.length && (
               <div className="apx-pre4-empty apx-pre4-empty-layers">
                 <strong>No layers yet</strong>
-                <span>Add a generic node to exercise the editor shell.</span>
+                <span>Add a layer to begin composing on the canvas.</span>
                 <button type="button" onClick={addPlaceholder}>Add layer</button>
               </div>
             )}
@@ -1661,11 +1653,11 @@ export default function VisualStudioPre4({
       </div>
 
       <footer className="apx-pre4-statusbar">
-        <span>Apexify Studio</span>
+        <span className="apx-pre4-status-product">Apexify Studio</span>
         <span className="apx-pre4-save-state" data-dirty={dirty ? 'true' : undefined}>
           <i /> {dirty ? 'Unsaved changes' : 'All changes saved'}
         </span>
-        <span className="apx-pre4-status-message">{message}</span>
+        <span className="apx-pre4-status-message" title={message}>{message}</span>
         <span className="apx-pre4-build-motto">Build something extraordinary. ✦</span>
         <span className="sr-only">Visual workspace ready · Assets · Output · Diagnostics · History</span>
       </footer>
