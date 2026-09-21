@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 MAIN MERGED
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2679,7 +2679,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | Phase | Name | Status | Main commit | Production proof |
 |---|---|---|---|---|
 | 0 | Contract / capability baseline | PRODUCTION VERIFIED | `97d7741c8f35b06dd33bed5ba2ac9b247b344465` | Vercel deployment + `/`, `/studio`, `/docs/getting-started`, `/api-reference` smoke |
-| 1 | Dual-mode shell | MAIN MERGED | `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7` | Production deployment blocked by Vercel build-rate limit; branch production-build + browser gate green |
+| 1 | Dual-mode shell | PRODUCTION VERIFIED | `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7` | Vercel production deployment completed on main (`4d28777edbf140c9afe65e4e874a4b9b38ca5803`); live `/studio` Code → Visual → Code smoke passed with shared Assets/Output/Diagnostics/History and source-session preservation |
 | 2 | Project model / codegen core | NOT STARTED | — | — |
 | 3 | Viewport / layers / transforms / history | NOT STARTED | — | — |
 | 4 | Canvas | NOT STARTED | — | — |
@@ -2700,7 +2700,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 
 ## Phase 1 implementation record — STUDIO-VISUAL-1
 
-> **Status:** MAIN MERGED
+> **Status:** PRODUCTION VERIFIED
 >
 > **Work branch:** `studio-visual/v01-shell`
 >
@@ -2710,7 +2710,9 @@ feat(studio-visual): release visual authoring and preview-to-code
 >
 > **Main integration:** `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7`
 >
-> **Production deployment:** BLOCKED externally — Vercel reported `Deployment rate limited — retry in 24 hours.`
+> **Production deployment:** VERIFIED — Vercel completed deployment for main commit `4d28777edbf140c9afe65e4e874a4b9b38ca5803` on 2026-09-21.
+>
+> **Production smoke:** PASS — live `/studio` verified Code mode, Visual mode, Visual workspace/shared surfaces, and Code-session preservation after switching back.
 
 Completed Phase-1 scope:
 
@@ -2725,7 +2727,9 @@ Completed Phase-1 scope:
 - Code → Visual → Code session-preservation proof;
 - TypeScript typecheck and production Next.js build green;
 - existing capability/completeness gates remain green;
-- Phase-1 PR #70 squash-merged into `main`.
+- Phase-1 PR #70 squash-merged into `main`;
+- production Vercel deployment completed successfully;
+- live `/studio` smoke passed for Code → Visual → Code with the original Code Studio source preserved.
 
 The Phase-1 browser smoke verifies the Studio route at desktop and mobile widths, switches into Visual mode, confirms the empty/shared surfaces, checks for horizontal overflow, switches back to Code mode and proves that the Code Studio source session was not mutated.
 
