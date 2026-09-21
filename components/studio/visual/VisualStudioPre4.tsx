@@ -2702,6 +2702,12 @@ export default function VisualStudioPre4({
             onPointerUp={pointerUp}
             onPointerCancel={pointerUp}
             onWheel={onWheel}
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = 'copy';
+            }}
+            onDrop={dropImagesOnCanvas}
+            data-image-drop-target
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={() => { pinch.current = null; }}
@@ -2733,6 +2739,16 @@ export default function VisualStudioPre4({
                   transformOrigin: 'top left',
                 }}
               >
+              {artboardPreviewUrl ? (
+                <img
+                  className="apx-pre4-authoritative-frame"
+                  src={artboardPreviewUrl}
+                  alt=""
+                  draggable={false}
+                  data-authoritative-apexify-frame
+                  data-rendering={artboardPreviewBusy ? 'true' : undefined}
+                />
+              ) : null}
               <div className="apx-pre4-artboard-grid" />
 
               {guides.map((guide, index) => (
@@ -2756,6 +2772,7 @@ export default function VisualStudioPre4({
                     key={id}
                     data-visual-node={id}
                     className="apx-pre4-node"
+                    data-kind={node.kind}
                     data-selected={isSelected ? 'true' : undefined}
                     onPointerDown={(event) => beginMove(event, id)}
                     style={{
