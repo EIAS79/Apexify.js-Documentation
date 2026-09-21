@@ -113,7 +113,7 @@ function rectsIntersect(a: SelectionRect, b: SelectionRect) {
   );
 }
 
-function distance(a: Touch, b: Touch) {
+function distance(a: { clientX: number; clientY: number }, b: { clientX: number; clientY: number }) {
   return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
 }
 
