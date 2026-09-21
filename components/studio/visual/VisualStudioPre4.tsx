@@ -2825,7 +2825,12 @@ export default function VisualStudioPre4({
     const source = props.source;
     const sourceString = typeof source === 'string' ? source : '';
     const sourceAssetId = typeof source === 'string' ? studioAssetIdFromReference(source) : null;
-    const generatedId = typeof source === 'object' && source ? source.$generated : '';
+    const generatedId =
+      typeof source === 'object' &&
+      source &&
+      '$generated' in source
+        ? source.$generated
+        : '';
     const primaryLayerIndex = layerIds.indexOf(primaryMedia.id);
     const availableGenerated = layerIds
       .slice(0, Math.max(0, primaryLayerIndex))
