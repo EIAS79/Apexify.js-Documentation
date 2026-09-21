@@ -11,6 +11,28 @@ import {
   type ReactNode,
   type CSSProperties,
 } from 'react';
+import {
+  ArrowDownTrayIcon,
+  ArrowPathIcon,
+  ArrowsPointingOutIcon,
+  ChartBarIcon,
+  CircleStackIcon,
+  CodeBracketIcon,
+  ComputerDesktopIcon,
+  CubeIcon,
+  CursorArrowRaysIcon,
+  DocumentTextIcon,
+  FilmIcon,
+  HandRaisedIcon,
+  MagnifyingGlassIcon,
+  MusicalNoteIcon,
+  PencilSquareIcon,
+  PhotoIcon,
+  PlayIcon,
+  RectangleStackIcon,
+  Squares2X2Icon,
+  VideoCameraIcon,
+} from '@heroicons/react/24/outline';
 import { BrandIcon } from '@/components/Brand';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioArtifactPreview } from '@/components/studio/StudioArtifactPreview';
@@ -1014,18 +1036,18 @@ export default function VisualStudioPre4({
     );
 
   const featureTools = [
-    ['canvas', '▣', 'Canvas'],
-    ['images', '▧', 'Images'],
-    ['text', 'T', 'Text'],
-    ['charts', '▥', 'Charts'],
-    ['shapes', '◯', 'Shapes'],
-    ['paths', '⌁', 'Paths'],
-    ['layers', '◇', 'Layers'],
-    ['components', '⊞', 'Components'],
-    ['assets', '▤', 'Assets'],
-    ['gif', '◆', 'GIF'],
-    ['audio', '♪', 'Audio'],
-    ['video', '▷', 'Video'],
+    ['canvas', ComputerDesktopIcon, 'Canvas'],
+    ['images', PhotoIcon, 'Images'],
+    ['text', DocumentTextIcon, 'Text'],
+    ['charts', ChartBarIcon, 'Charts'],
+    ['shapes', Squares2X2Icon, 'Shapes'],
+    ['paths', PencilSquareIcon, 'Paths'],
+    ['layers', RectangleStackIcon, 'Layers'],
+    ['components', CubeIcon, 'Components'],
+    ['assets', CircleStackIcon, 'Assets'],
+    ['gif', FilmIcon, 'GIF'],
+    ['audio', MusicalNoteIcon, 'Audio'],
+    ['video', VideoCameraIcon, 'Video'],
   ] as const;
 
   const inspectorTabs = [
@@ -1367,14 +1389,14 @@ export default function VisualStudioPre4({
             onClick={() => setDockTab('preview')}
             title={generated.value ? 'Open runtime preview' : 'Preview becomes available when the current project can execute'}
           >
-            <span>▷</span> Run
+            <PlayIcon className="apx-pre4-control-icon" aria-hidden /> Run
           </button>
           <button
             className="apx-pre4-top-button"
             type="button"
             onClick={() => setDockTab('preview')}
           >
-            <span>⌕</span> Preview
+            <MagnifyingGlassIcon className="apx-pre4-control-icon" aria-hidden /> Preview
           </button>
           <button
             className="apx-pre4-top-button apx-pre4-primary"
@@ -1383,12 +1405,12 @@ export default function VisualStudioPre4({
             onClick={handoff}
             disabled={!generated.value}
           >
-            <span>&lt;/&gt;</span> Generate Code
+            <CodeBracketIcon className="apx-pre4-control-icon" aria-hidden /> Generate Code
           </button>
 
           <details className="apx-vw-project-menu apx-pre4-export">
             <summary className="apx-pre4-top-button">
-              <span>⇩</span> Export <span>⌄</span>
+              <ArrowDownTrayIcon className="apx-pre4-control-icon" aria-hidden /> Export <span>⌄</span>
             </summary>
             <div className="apx-vw-project-menu__panel">
               <button data-visual-project-save onClick={save}>Save project</button>
@@ -1420,7 +1442,7 @@ export default function VisualStudioPre4({
       <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '38px' : '204px' } as CSSProperties}>
         <nav className="apx-pre4-feature-rail" aria-label="Visual Studio features">
           <div className="apx-pre4-feature-list">
-            {featureTools.map(([id, icon, label]) => (
+            {featureTools.map(([id, Icon, label]) => (
               <button
                 key={id}
                 type="button"
@@ -1431,7 +1453,7 @@ export default function VisualStudioPre4({
                   if (id === 'layers') setMessage('Layers panel active');
                 }}
               >
-                <span className="apx-pre4-feature-icon">{icon}</span>
+                <span className="apx-pre4-feature-icon"><Icon aria-hidden /></span>
                 <span>{label}</span>
               </button>
             ))}
@@ -1477,7 +1499,7 @@ export default function VisualStudioPre4({
         <main className="apx-pre4-stage">
           <div className="apx-pre4-stagebar">
             <button className="apx-pre4-device" type="button">
-              <span>▣</span>
+              <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
               Desktop ({project.document.width} × {project.document.height})
               <span>⌄</span>
             </button>
@@ -1495,7 +1517,7 @@ export default function VisualStudioPre4({
                 onClick={() => setViewportMode('pan')}
                 title="Pan"
               >
-                ✋
+                <HandRaisedIcon className="apx-pre4-toolbar-icon" aria-hidden />
               </button>
               <button
                 type="button"
@@ -1503,11 +1525,11 @@ export default function VisualStudioPre4({
                 onClick={() => setViewportMode('select')}
                 title="Select"
               >
-                ↖
+                <CursorArrowRaysIcon className="apx-pre4-toolbar-icon" aria-hidden />
               </button>
-              <button type="button" onClick={() => setZoom(100)} title="100%">⊞</button>
-              <button type="button" onClick={fit} title="Fit">⌗</button>
-              <button type="button" onClick={resetView} title="Reset view">↺</button>
+              <button className="apx-pre4-100" type="button" onClick={() => setZoom(100)} title="100%">100</button>
+              <button type="button" onClick={fit} title="Fit"><ArrowsPointingOutIcon className="apx-pre4-toolbar-icon" aria-hidden /></button>
+              <button type="button" onClick={resetView} title="Reset view"><ArrowPathIcon className="apx-pre4-toolbar-icon" aria-hidden /></button>
             </div>
           </div>
 
