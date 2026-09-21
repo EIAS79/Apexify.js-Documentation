@@ -3145,12 +3145,41 @@ Completed PRE-4 scope:
 - centered scale-aware viewport and artboard;
 - compact device, zoom, select, pan, fit and reset controls;
 - permanent Style / Transform / Effects / Data / Advanced inspector architecture;
-- Preview / Generated Code / Diagnostics / Assets / History bottom dock;
+- editable Code / Diagnostics / Assets / History bottom dock;
 - real shared asset shelf reuse;
 - runtime preview surface reuse;
 - Phase-3 editor behavior preserved;
 - constrained-width responsive behavior;
 - PRE-4 contract tests and browser screenshot evidence.
+
+### PRE-4 linked-code follow-up
+
+> **Status:** MAIN MERGED
+>
+> **PR:** #82
+>
+> **Main integration:** `fa46e0affb139ad962a17af2338f5bbf24661f40`
+>
+> **Green Studio Visual gate:** GitHub Actions `35644690224`
+>
+> **Production deployment:** still deferred because Vercel usage is rate-limited.
+
+Follow-up behavior now established:
+
+- bottom Preview tab removed;
+- bottom Canvas Output pane removed;
+- bottom Code surface is editable through the shared lazy CodeMirror editor;
+- code autosaves locally;
+- Visual changes regenerate linked code automatically;
+- safe Code → Visual reconciliation is active for the compiler contract currently owned by Studio: document `createCanvas({ width, height })`;
+- unsupported/dynamic reverse-sync edits surface an explicit sync error instead of silently diverging;
+- top Preview opens a closable clean output modal with pan, zoom, reset, canvas rename and artifact download;
+- top Generate Code opens a closable syntax-highlighted code modal with copy, filename editing and source download;
+- Export retains the explicit Open in Code Studio handoff;
+- Canvas inspector exposes name, width and height as the first proven two-way linked visual properties;
+- reverse reconciliation does not use `eval` or `new Function`.
+
+The linked-code architecture is intentionally capability-bounded. Each future feature phase extends the reverse reconciler only when that feature owns deterministic lowering and parsing semantics.
 
 ### Required next gate
 
@@ -3192,11 +3221,11 @@ This section is updated whenever a nontrivial architecture decision changes.
 
 **Reason:** generated code must be understandable and usable.
 
-## D-004 — Arbitrary code-to-visual is not promised in this program
+## D-004 — Linked code-to-visual is compiler-contract bounded
 
-**Decision:** Code Studio remains arbitrary-code capable; Visual Studio guarantees Visual → Code and generated-project round trip.
+**Decision:** Code Studio remains arbitrary-code capable. Visual Studio keeps its generated source linked bidirectionally only for semantics owned by the current Visual compiler/reconciler. Unsupported or non-deterministic code edits must report a sync error rather than silently mutating or forking the scene.
 
-**Reason:** arbitrary imperative programs cannot reliably be inverted into a visual scene graph.
+**Reason:** deterministic generated contracts can be round-tripped safely, while arbitrary imperative programs still cannot be reliably inverted into a visual scene graph.
 
 ## D-005 — Vercel is release verification, not development test infrastructure
 
@@ -3217,7 +3246,7 @@ These questions must be answered before their dependent phase begins:
 5. Export asset path convention.
 6. Vercel branch ignored-build rule for `studio-visual/*`.
 7. Exact threshold/policy for optional project code splitting.
-8. Whether a user can manually edit generated code while remaining linked to Visual mode, or editing automatically forks into Code mode.
+8. RESOLVED — generated Visual code remains linked while edits stay within deterministic reconciler-owned semantics; unsupported edits remain in the editor but report a sync error until corrected or explicitly opened in Code Studio.
 9. Which future animation controls remain hidden until the corresponding package API becomes current/stable.
 10. Plugin-provided Visual Studio control-extension API.
 
