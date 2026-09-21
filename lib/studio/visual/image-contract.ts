@@ -154,8 +154,11 @@ function validateSource(
     return;
   }
   const object = record(source);
+  if (object && typeof object.$ref === 'string') {
+    return;
+  }
   if (!object || typeof object.$generated !== 'string' || !object.$generated.trim()) {
-    issue(issues, 'image-source', path, 'Image source must be a string or generated-buffer reference.');
+    issue(issues, 'image-source', path, 'Image source must be a string, asset reference, or generated-buffer reference.');
     return;
   }
   if (object.$generated !== 'document_canvas' && !project.document.nodes[object.$generated]) {
