@@ -12,7 +12,7 @@ export interface StudioOperationRuntime {
   createCanvas(
     options: { width: number; height: number } & VisualCanvasConfig,
   ): Promise<{ buffer: Uint8Array }>;
-  createImage(
+  createImage?(
     properties: Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array },
     canvasBuffer: Uint8Array,
     options?: VisualCreateImageOptions,
@@ -86,6 +86,9 @@ export async function executeStudioOperationPlan(
           source: string | Uint8Array;
         };
         const base = targetValue(operation.base, values);
+        if (!runtime.createImage) {
+          throw new Error('Studio runtime does not implement createImage().');
+        }
         const value = await runtime.createImage(
           properties,
           base,
