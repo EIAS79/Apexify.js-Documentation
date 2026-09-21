@@ -4,8 +4,10 @@ import type {
   VisualImageNodeProps,
   VisualNode,
   VisualProject,
+  VisualTextNodeProps,
 } from '../model';
 import { isGeneratedImageSource, visualImageProps } from '../image-contract';
+import { visualTextProps } from '../text-contract';
 import { normalizeVisualProject } from './normalize';
 import { assertValidVisualProject } from './validate';
 
@@ -52,9 +54,25 @@ export type StudioCreateImageOperation = {
   options?: VisualCreateImageOptions;
 };
 
+export type StudioTextProperties = VisualTextNodeProps & {
+  x: number;
+  y: number;
+};
+
+export type StudioCreateTextOperation = {
+  id: string;
+  kind: 'create-text';
+  sourceNodeId: string;
+  target: string;
+  preferredName?: string;
+  base: StudioTargetReference;
+  properties: StudioTextProperties;
+};
+
 export type StudioOperation =
   | StudioCreateCanvasOperation
-  | StudioCreateImageOperation;
+  | StudioCreateImageOperation
+  | StudioCreateTextOperation;
 
 export interface StudioOperationPlan {
   version: typeof STUDIO_OPERATION_PLAN_VERSION;
@@ -79,13 +97,13 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
       return;
     }
 
-    if (node.kind === 'image' || node.kind === 'shape') {
+    if (node.kind === 'image' || node.kind === 'shape' || node.kind === 'text') {
       out.push(node);
       return;
     }
 
     throw new Error(
-      `STUDIO-VISUAL-5 cannot lower node kind "${node.kind}" yet. It belongs to a later authoring phase.`,
+      `STUDIO-VISUAL-6 cannot lower node kind "${node.kind}" yet. It belongs to a later authoring phase.`,
     );
   };
 
@@ -156,6 +174,41 @@ function imageOperationProperties(
   };
 }
 
+function textOperationProperties(node: VisualNode): StudioTextProperties {
+  const props = visualTextProps(node);
+  const transform = node.transform ?? {};
+  const layout = {
+    ...(props.layout ?? {}),
+    ...(transform.width !== undefined
+      ? { maxWidth: transform.width * (transform.scaleX ?? 1) }
+      : {}),
+    ...(transform.height !== undefined
+      ? { maxHeight: transform.height * (transform.scaleY ?? 1) }
+      : {}),
+  };
+  const placement = {
+    ...(props.placement ?? {}),
+    ...(transform.rotation !== undefined
+      ? { rotation: transform.rotation }
+      : {}),
+  };
+  const fill = {
+    ...(props.fill ?? {}),
+    ...(transform.opacity !== undefined
+      ? { opacity: transform.opacity }
+      : {}),
+  };
+
+  return {
+    ...props,
+    x: transform.x ?? 0,
+    y: transform.y ?? 0,
+    ...(Object.keys(layout).length ? { layout } : {}),
+    ...(Object.keys(placement).length ? { placement } : {}),
+    ...(Object.keys(fill).length ? { fill } : {}),
+  };
+}
+
 export function lowerVisualProject(project: VisualProject): StudioOperationPlan {
   const normalized = normalizeVisualProject(project);
   assertValidVisualProject(normalized);
@@ -184,17 +237,30 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
 
   for (const node of orderedAuthoringNodes(normalized)) {
     const target = node.id;
-    const props = visualImageProps(node);
-    operations.push({
-      id: 'image_' + node.id,
-      kind: 'create-image',
-      sourceNodeId: node.id,
-      target,
-      preferredName: node.name || (node.kind === 'shape' ? 'shape' : 'image'),
-      base,
-      properties: imageOperationProperties(normalized, node, produced),
-      ...(props.createOptions ? { options: props.createOptions } : {}),
-    });
+
+    if (node.kind === 'text') {
+      operations.push({
+        id: 'text_' + node.id,
+        kind: 'create-text',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || 'text',
+        base,
+        properties: textOperationProperties(node),
+      });
+    } else {
+      const props = visualImageProps(node);
+      operations.push({
+        id: 'image_' + node.id,
+        kind: 'create-image',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || (node.kind === 'shape' ? 'shape' : 'image'),
+        base,
+        properties: imageOperationProperties(normalized, node, produced),
+        ...(props.createOptions ? { options: props.createOptions } : {}),
+      });
+    }
 
     produced.set(node.id, { target, member: null });
     base = { $studioTarget: target };

@@ -1,3 +1,4 @@
+import { validateVisualTextNode } from '../text-contract';
 import { validateVisualImageNode } from '../image-contract';
 import { validateVisualCanvasConfig } from '../canvas-contract';
 import {
@@ -142,6 +143,7 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   for (const [id, node] of Object.entries(project.document.nodes)) {
     visitReferences(node.props as VisualValue, `document.nodes.${id}.props`, known, issues);
     validateVisualImageNode(project, node, issues);
+    validateVisualTextNode(node, issues);
   }
   if (project.document.background !== undefined) {
     visitReferences(project.document.background, 'document.background', known, issues);

@@ -46,7 +46,9 @@ import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
+  isStudioFontAsset,
   studioAssetDataUrl,
+  studioAssetFontFamily,
   studioAssetIdFromReference,
   studioAssetReference,
   totalStudioAssetBytes,
@@ -82,6 +84,7 @@ import type {
   VisualPatternOptions,
   VisualProject,
   VisualShapeType,
+  VisualTextNodeProps,
   VisualTransform,
 } from '@/lib/studio/visual/model';
 import {
@@ -104,6 +107,15 @@ import {
   imagePropsRecord,
   visualImageProps,
 } from '@/lib/studio/visual/image-contract';
+import {
+  TEXT_ALIGNMENTS,
+  TEXT_BASELINES,
+  TEXT_CURVE_MODES,
+  defaultTextNodeProps,
+  measureVisualTextInBrowser,
+  textPropsRecord,
+  visualTextProps,
+} from '@/lib/studio/visual/text-contract';
 import {
   VisualHistory,
   alignNodes,
@@ -276,6 +288,9 @@ export default function VisualStudioPre4({
   const [imageUrlDraft, setImageUrlDraft] = useState('');
   const [imageConfigDraft, setImageConfigDraft] = useState('{}');
   const [imageConfigError, setImageConfigError] = useState<string | null>(null);
+  const [textConfigDraft, setTextConfigDraft] = useState('{}');
+  const [textConfigError, setTextConfigError] = useState<string | null>(null);
+  const [inlineTextEditId, setInlineTextEditId] = useState<string | null>(null);
   const [artboardPreviewUrl, setArtboardPreviewUrl] = useState<string | null>(null);
   const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
 
@@ -305,6 +320,30 @@ export default function VisualStudioPre4({
   const primary = selected.length
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
+  const primaryText = primary?.kind === 'text' ? primary : undefined;
+  const textMetrics = useMemo(() => {
+    if (!primaryText) return null;
+    const props = visualTextProps(primaryText);
+    return measureVisualTextInBrowser({
+      ...props,
+      layout: {
+        ...(props.layout ?? {}),
+        ...(primaryText.transform?.width !== undefined
+          ? { maxWidth: primaryText.transform.width * (primaryText.transform.scaleX ?? 1) }
+          : {}),
+        ...(primaryText.transform?.height !== undefined
+          ? { maxHeight: primaryText.transform.height * (primaryText.transform.scaleY ?? 1) }
+          : {}),
+      },
+    });
+  }, [
+    primaryText?.props,
+    primaryText?.transform?.width,
+    primaryText?.transform?.height,
+    primaryText?.transform?.scaleX,
+    primaryText?.transform?.scaleY,
+    assets,
+  ]);
   const layerIds = useMemo(() => flattenLayerIds(project), [project]);
   const drawableIds = useMemo(
     () =>
@@ -786,6 +825,153 @@ export default function VisualStudioPre4({
     );
     setImageConfigError(null);
   }, [primaryMedia?.id, primaryMedia?.props]);
+
+  const updateTextDraft = (
+    updater: (props: VisualTextNodeProps) => VisualTextNodeProps,
+  ) => {
+    if (!primaryText) return;
+    setProject((current) => {
+      const node = current.document.nodes[primaryText.id];
+      if (!node || node.kind !== 'text') return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryText.id];
+      nextNode.props = textPropsRecord(updater(visualTextProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const mutateText = (
+    label: string,
+    updater: (props: VisualTextNodeProps) => VisualTextNodeProps,
+  ) => {
+    if (!primaryText) return;
+    mutate(label, (current) => {
+      const node = current.document.nodes[primaryText.id];
+      if (!node || node.kind !== 'text') return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryText.id];
+      nextNode.props = textPropsRecord(updater(visualTextProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const insertText = (
+    value = 'Text',
+    point?: Point,
+    fontAsset?: StudioVirtualAsset,
+    fontFamily?: string,
+  ) => {
+    mutate('Add text', (current) => {
+      const next = structuredClone(current);
+      const props = defaultTextNodeProps(value);
+      if (fontAsset && isStudioFontAsset(fontAsset)) {
+        const family = studioAssetFontFamily(fontAsset);
+        props.font = {
+          ...(props.font ?? {}),
+          family,
+          name: family,
+          path: studioAssetReference(fontAsset),
+        };
+      } else if (fontFamily) {
+        props.font = {
+          ...(props.font ?? {}),
+          family: fontFamily,
+          name: fontFamily,
+        };
+      }
+      const node = createVisualNode(
+        'text',
+        textPropsRecord(props),
+        { name: value.length > 24 ? value.slice(0, 24) + '…' : value },
+      );
+      const width = props.layout?.maxWidth ?? 360;
+      const fontSize = props.font?.size ?? 48;
+      const height = Math.max(64, fontSize * (props.layout?.lineHeight ?? 1.2) * 2);
+      node.transform = {
+        x: point?.x ?? Math.max(32, (next.document.width - width) / 2),
+        y: point?.y ?? Math.max(32, (next.document.height - height) / 2),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setActiveTool('text');
+    setInspectorTab('style');
+    setMessage('Text added');
+  };
+
+  const applyFontAsset = (asset: StudioVirtualAsset) => {
+    if (!isStudioFontAsset(asset)) {
+      setMessage(asset.name + ' is not a font asset');
+      return;
+    }
+    const family = studioAssetFontFamily(asset);
+    if (!primaryText) {
+      insertText('Text', undefined, asset);
+      return;
+    }
+    mutateText('Apply font asset', (current) => ({
+      ...current,
+      font: {
+        ...(current.font ?? {}),
+        family,
+        name: family,
+        path: studioAssetReference(asset),
+      },
+    }));
+    setAssetFilter('font');
+    setMessage('Applied font ' + family);
+  };
+
+  useEffect(() => {
+    if (!primaryText) {
+      setTextConfigDraft('{}');
+      setTextConfigError(null);
+      return;
+    }
+    setTextConfigDraft(
+      JSON.stringify(visualTextProps(primaryText), null, 2),
+    );
+    setTextConfigError(null);
+  }, [primaryText?.id, primaryText?.props]);
+
+  const beginInlineTextEdit = (node: VisualNode) => {
+    if (node.kind !== 'text') return;
+    propertyBefore.current = structuredClone(project);
+    setInlineTextEditId(node.id);
+  };
+
+  const updateInlineText = (id: string, value: string) => {
+    setProject((current) => {
+      const node = current.document.nodes[id];
+      if (!node || node.kind !== 'text') return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[id];
+      nextNode.props = textPropsRecord({
+        ...visualTextProps(nextNode),
+        text: value,
+      });
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const finishInlineTextEdit = () => {
+    if (!inlineTextEditId) return;
+    endPropertyEdit('Edit text');
+    setInlineTextEditId(null);
+  };
 
   const addPlaceholder = () =>
     mutate('Add placeholder', (current) => {
@@ -1659,13 +1845,126 @@ export default function VisualStudioPre4({
   const mediaContextActive =
     activeTool === 'images' ||
     activeTool === 'shapes' ||
+    activeTool === 'text' ||
     activeTool === 'assets';
 
   const imageAssets = assets.filter((asset) =>
     asset.mime.startsWith('image/'),
   );
+  const fontAssets = assets.filter(isStudioFontAsset);
+  const systemFontFamilies = [
+    'Arial',
+    'Helvetica',
+    'Georgia',
+    'Times New Roman',
+    'Courier New',
+    'Verdana',
+    'Trebuchet MS',
+  ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'text') {
+      return (
+        <div className="apx-media-context" data-visual-text-context>
+          <div className="apx-media-context-copy">
+            <strong>Text</strong>
+            <span>Insert editable Apexify text, then style typography, wrapping, effects and curves from the Inspector.</span>
+          </div>
+
+          <button
+            type="button"
+            className="apx-media-open-assets"
+            data-text-insert
+            onClick={() => insertText('Text')}
+          >
+            <DocumentTextIcon />
+            Add text layer
+          </button>
+
+          <div className="apx-media-context-heading">
+            <strong>Font families</strong>
+            <button
+              type="button"
+              onClick={() => {
+                setAssetFilter('font');
+                setDockTab('assets');
+              }}
+            >
+              Fonts
+            </button>
+          </div>
+
+          <div className="apx-text-font-list">
+            {systemFontFamilies.map((family) => (
+              <button
+                type="button"
+                key={family}
+                onClick={() => {
+                  if (!primaryText) {
+                    insertText('Text', undefined, undefined, family);
+                    return;
+                  }
+                  mutateText('Font family', (current) => ({
+                    ...current,
+                    font: {
+                      ...(current.font ?? {}),
+                      family,
+                      name: family,
+                      path: undefined,
+                    },
+                  }));
+                }}
+                data-text-font-family={family}
+              >
+                <strong style={{ fontFamily: family }}>{family}</strong>
+                <small>System font</small>
+              </button>
+            ))}
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Uploaded fonts</strong>
+            <button
+              type="button"
+              onClick={() => {
+                setAssetFilter('font');
+                setDockTab('assets');
+              }}
+            >
+              Upload
+            </button>
+          </div>
+          <div className="apx-text-font-list">
+            {fontAssets.length ? fontAssets.map((asset) => {
+              const family = studioAssetFontFamily(asset);
+              return (
+                <button
+                  type="button"
+                  key={asset.id}
+                  onClick={() => applyFontAsset(asset)}
+                  data-font-asset-apply={asset.id}
+                >
+                  <strong style={{ fontFamily: family }}>{family}</strong>
+                  <small>{asset.name}</small>
+                </button>
+              );
+            }) : (
+              <div className="apx-media-context-empty">
+                <DocumentTextIcon />
+                <strong>No uploaded fonts yet</strong>
+                <span>Open Fonts in Assets to add TTF, OTF, WOFF or WOFF2 files.</span>
+              </div>
+            )}
+          </div>
+
+          <div className="apx-live-sync-note">
+            <strong>Direct editing</strong>
+            <span>Double-click a text layer on the canvas to edit its content in place.</span>
+          </div>
+        </div>
+      );
+    }
+
     if (activeTool === 'shapes') {
       return (
         <div className="apx-media-context" data-visual-shapes-context>
@@ -2837,7 +3136,12 @@ export default function VisualStudioPre4({
       .map((id) => project.document.nodes[id])
       .filter(
         (node): node is VisualNode =>
-          Boolean(node && (node.kind === 'image' || node.kind === 'shape')),
+          Boolean(
+            node &&
+              (node.kind === 'image' ||
+                node.kind === 'shape' ||
+                node.kind === 'text'),
+          ),
       );
     return (
       <>
@@ -2957,7 +3261,646 @@ export default function VisualStudioPre4({
     return renderMediaAdvanced();
   };
 
+  const renderTextHeader = () => {
+    if (!primaryText) return null;
+    return (
+      <div className="apx-pre4-inspector-title">
+        <div>
+          <strong>{primaryText.name ?? 'Text'}</strong>
+          <small>Apexify text layer · Phase 6</small>
+        </div>
+        <span className="apx-pre4-type-pill">text</span>
+      </div>
+    );
+  };
+
+  const renderTextStyle = () => {
+    if (!primaryText) return renderTransformFields();
+    const props = visualTextProps(primaryText);
+    const font = props.font ?? {};
+    const decorations = props.decorations ?? {};
+    const fill = props.fill ?? {};
+    const layout = props.layout ?? {};
+    const placement = props.placement ?? {};
+    const fontAssetId = font.path ? studioAssetIdFromReference(font.path) : null;
+
+    return (
+      <>
+        {renderTextHeader()}
+        <div className="apx-pre4-section" data-text-section="content">
+          <div className="apx-pre4-section-title">Content</div>
+          <textarea
+            className="apx-text-content"
+            value={props.text}
+            onFocus={beginPropertyEdit}
+            onChange={(event) => updateTextDraft((current) => ({ ...current, text: event.target.value }))}
+            onBlur={() => endPropertyEdit('Edit text')}
+            data-text-content-editor
+          />
+        </div>
+
+        <div className="apx-pre4-section" data-text-section="typography">
+          <div className="apx-pre4-section-title">Typography</div>
+          <label className="apx-canvas-field">
+            <span>Font family</span>
+            <select
+              className="apx-pre4-input"
+              value={fontAssetId ? 'asset:' + fontAssetId : (font.name ?? font.family ?? 'Arial')}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (value.startsWith('asset:')) {
+                  const asset = fontAssets.find((item) => item.id === value.slice(6));
+                  if (asset) applyFontAsset(asset);
+                  return;
+                }
+                mutateText('Font family', (current) => ({
+                  ...current,
+                  font: {
+                    ...(current.font ?? {}),
+                    family: value,
+                    name: value,
+                    path: undefined,
+                  },
+                }));
+              }}
+              data-text-font-select
+            >
+              {systemFontFamilies.map((family) => (
+                <option key={family} value={family}>{family}</option>
+              ))}
+              {fontAssets.map((asset) => (
+                <option key={asset.id} value={'asset:' + asset.id}>
+                  {studioAssetFontFamily(asset)} · uploaded
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="apx-pre4-property-grid">
+            <label>
+              <span>Size</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={1}
+                value={font.size ?? props.fontSize ?? 16}
+                onFocus={beginPropertyEdit}
+                onChange={(event) => updateTextDraft((current) => ({
+                  ...current,
+                  font: { ...(current.font ?? {}), size: Math.max(1, Number(event.target.value)) },
+                }))}
+                onBlur={() => endPropertyEdit('Font size')}
+              />
+            </label>
+            <label>
+              <span>Line height</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={0.1}
+                step={0.1}
+                value={layout.lineHeight ?? props.lineHeight ?? 1.4}
+                onFocus={beginPropertyEdit}
+                onChange={(event) => updateTextDraft((current) => ({
+                  ...current,
+                  layout: { ...(current.layout ?? {}), lineHeight: Number(event.target.value) },
+                }))}
+                onBlur={() => endPropertyEdit('Line height')}
+              />
+            </label>
+          </div>
+
+          <div className="apx-text-toggle-row">
+            <label className="apx-canvas-check">
+              <input
+                type="checkbox"
+                checked={decorations.bold ?? props.bold ?? false}
+                onChange={(event) => mutateText('Bold', (current) => ({
+                  ...current,
+                  decorations: { ...(current.decorations ?? {}), bold: event.target.checked },
+                }))}
+              />
+              <span>Bold</span>
+            </label>
+            <label className="apx-canvas-check">
+              <input
+                type="checkbox"
+                checked={decorations.italic ?? props.italic ?? false}
+                onChange={(event) => mutateText('Italic', (current) => ({
+                  ...current,
+                  decorations: { ...(current.decorations ?? {}), italic: event.target.checked },
+                }))}
+              />
+              <span>Italic</span>
+            </label>
+          </div>
+
+          <div className="apx-pre4-property-grid">
+            <label>
+              <span>Letter</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                step={0.25}
+                value={layout.letterSpacing ?? props.letterSpacing ?? 0}
+                onChange={(event) => updateTextDraft((current) => ({
+                  ...current,
+                  layout: { ...(current.layout ?? {}), letterSpacing: Number(event.target.value) },
+                }))}
+              />
+            </label>
+            <label>
+              <span>Word</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                step={0.25}
+                value={layout.wordSpacing ?? props.wordSpacing ?? 0}
+                onChange={(event) => updateTextDraft((current) => ({
+                  ...current,
+                  layout: { ...(current.layout ?? {}), wordSpacing: Number(event.target.value) },
+                }))}
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-text-section="fill">
+          <div className="apx-pre4-section-title">Fill & placement</div>
+          <div className="apx-canvas-color-row">
+            <input
+              type="color"
+              value={fill.color ?? props.color ?? '#f4f7fb'}
+              onChange={(event) => updateTextDraft((current) => ({
+                ...current,
+                fill: { ...(current.fill ?? {}), color: event.target.value },
+              }))}
+            />
+            <input
+              className="apx-pre4-input"
+              value={fill.color ?? props.color ?? '#f4f7fb'}
+              onChange={(event) => updateTextDraft((current) => ({
+                ...current,
+                fill: { ...(current.fill ?? {}), color: event.target.value },
+              }))}
+            />
+          </div>
+          <div className="apx-pre4-property-grid">
+            <label>
+              <span>Align</span>
+              <select
+                className="apx-pre4-input"
+                value={placement.textAlign ?? props.textAlign ?? 'left'}
+                onChange={(event) => mutateText('Text align', (current) => ({
+                  ...current,
+                  placement: {
+                    ...(current.placement ?? {}),
+                    textAlign: event.target.value as NonNullable<VisualTextNodeProps['placement']>['textAlign'],
+                  },
+                }))}
+              >
+                {TEXT_ALIGNMENTS.map((value) => <option key={value}>{value}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Baseline</span>
+              <select
+                className="apx-pre4-input"
+                value={placement.textBaseline ?? props.textBaseline ?? 'top'}
+                onChange={(event) => mutateText('Text baseline', (current) => ({
+                  ...current,
+                  placement: {
+                    ...(current.placement ?? {}),
+                    textBaseline: event.target.value as NonNullable<VisualTextNodeProps['placement']>['textBaseline'],
+                  },
+                }))}
+              >
+                {TEXT_BASELINES.map((value) => <option key={value}>{value}</option>)}
+              </select>
+            </label>
+          </div>
+          <label className="apx-canvas-field">
+            <span>Opacity · {Math.round((primaryText.transform?.opacity ?? fill.opacity ?? props.opacity ?? 1) * 100)}%</span>
+            <input
+              className="apx-pre4-range"
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={primaryText.transform?.opacity ?? fill.opacity ?? props.opacity ?? 1}
+              onChange={(event) => updateTransformDraft('opacity', Number(event.target.value))}
+            />
+          </label>
+        </div>
+
+        <div className="apx-pre4-section" data-text-section="wrapping">
+          <div className="apx-pre4-section-title">Wrapping & layout</div>
+          <div className="apx-pre4-property-grid">
+            <label>
+              <span>Max width</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={1}
+                value={primaryText.transform?.width ?? layout.maxWidth ?? props.maxWidth ?? 360}
+                onFocus={beginPropertyEdit}
+                onChange={(event) => updateTransformDraft('width', Number(event.target.value))}
+                onBlur={() => endPropertyEdit('Text max width')}
+              />
+            </label>
+            <label>
+              <span>Max height</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={1}
+                value={primaryText.transform?.height ?? layout.maxHeight ?? props.maxHeight ?? 120}
+                onFocus={beginPropertyEdit}
+                onChange={(event) => updateTransformDraft('height', Number(event.target.value))}
+                onBlur={() => endPropertyEdit('Text max height')}
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-text-section="decorations">
+          <div className="apx-pre4-section-title">Decorations</div>
+          <div className="apx-text-toggle-row apx-text-toggle-row--wrap">
+            {(['underline','overline','strikethrough'] as const).map((key) => (
+              <label className="apx-canvas-check" key={key}>
+                <input
+                  type="checkbox"
+                  checked={Boolean(decorations[key] ?? props[key])}
+                  onChange={(event) => mutateText('Text decoration', (current) => ({
+                    ...current,
+                    decorations: {
+                      ...(current.decorations ?? {}),
+                      [key]: event.target.checked,
+                    },
+                  }))}
+                />
+                <span>{key}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-text-section="stroke">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Stroke</div>
+            <label className="apx-canvas-switch">
+              <input
+                type="checkbox"
+                checked={Boolean(props.stroke)}
+                onChange={(event) => mutateText('Text stroke', (current) => {
+                  if (!event.target.checked) {
+                    const next = { ...current };
+                    delete next.stroke;
+                    return next;
+                  }
+                  return {
+                    ...current,
+                    stroke: { color: '#ffffff', width: 1, opacity: 1, style: 'solid' },
+                  };
+                })}
+              />
+              <span />
+            </label>
+          </div>
+          {props.stroke ? (
+            <>
+              <div className="apx-canvas-color-row">
+                <input
+                  type="color"
+                  value={props.stroke.color ?? '#ffffff'}
+                  onChange={(event) => updateTextDraft((current) => ({
+                    ...current,
+                    stroke: { ...(current.stroke ?? {}), color: event.target.value },
+                  }))}
+                />
+                <input
+                  className="apx-pre4-input"
+                  value={props.stroke.color ?? '#ffffff'}
+                  onChange={(event) => updateTextDraft((current) => ({
+                    ...current,
+                    stroke: { ...(current.stroke ?? {}), color: event.target.value },
+                  }))}
+                />
+              </div>
+              <div className="apx-pre4-property-grid">
+                <label>
+                  <span>Width</span>
+                  <input
+                    className="apx-pre4-input"
+                    type="number"
+                    min={0}
+                    value={props.stroke.width ?? 1}
+                    onChange={(event) => updateTextDraft((current) => ({
+                      ...current,
+                      stroke: { ...(current.stroke ?? {}), width: Number(event.target.value) },
+                    }))}
+                  />
+                </label>
+                <label>
+                  <span>Style</span>
+                  <select
+                    className="apx-pre4-input"
+                    value={props.stroke.style ?? 'solid'}
+                    onChange={(event) => mutateText('Text stroke style', (current) => ({
+                      ...current,
+                      stroke: {
+                        ...(current.stroke ?? {}),
+                        style: event.target.value as NonNullable<VisualTextNodeProps['stroke']>['style'],
+                      },
+                    }))}
+                  >
+                    {['solid','dashed','dotted','groove','ridge','double'].map((value) => <option key={value}>{value}</option>)}
+                  </select>
+                </label>
+              </div>
+            </>
+          ) : null}
+        </div>
+      </>
+    );
+  };
+
+  const renderTextEffects = () => {
+    if (!primaryText) return renderTransformFields();
+    const props = visualTextProps(primaryText);
+    const effects = props.effects ?? {};
+    const curve = props.textOnCurve;
+    return (
+      <>
+        {renderTextHeader()}
+        {(['shadow','glow','highlight'] as const).map((kind) => {
+          const current = effects[kind];
+          return (
+            <div className="apx-pre4-section" data-text-effect={kind} key={kind}>
+              <div className="apx-canvas-section-heading">
+                <div className="apx-pre4-section-title">{kind}</div>
+                <label className="apx-canvas-switch">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(current)}
+                    onChange={(event) => mutateText('Text ' + kind, (value) => {
+                      const nextEffects = { ...(value.effects ?? {}) };
+                      if (!event.target.checked) {
+                        delete nextEffects[kind];
+                      } else if (kind === 'shadow') {
+                        nextEffects.shadow = { color: '#000000', offsetX: 0, offsetY: 8, blur: 18, opacity: .4 };
+                      } else if (kind === 'glow') {
+                        nextEffects.glow = { color: '#6f86ff', intensity: 12, opacity: .75 };
+                      } else {
+                        nextEffects.highlight = { color: '#1d4ed8', opacity: .35 };
+                      }
+                      return { ...value, effects: nextEffects };
+                    })}
+                  />
+                  <span />
+                </label>
+              </div>
+              {current ? (
+                <>
+                  <div className="apx-canvas-color-row">
+                    <input
+                      type="color"
+                      value={current.color ?? (kind === 'shadow' ? '#000000' : '#6f86ff')}
+                      onChange={(event) => updateTextDraft((value) => ({
+                        ...value,
+                        effects: {
+                          ...(value.effects ?? {}),
+                          [kind]: { ...(value.effects?.[kind] ?? {}), color: event.target.value },
+                        },
+                      }))}
+                    />
+                    <input
+                      className="apx-pre4-input"
+                      value={current.color ?? (kind === 'shadow' ? '#000000' : '#6f86ff')}
+                      onChange={(event) => updateTextDraft((value) => ({
+                        ...value,
+                        effects: {
+                          ...(value.effects ?? {}),
+                          [kind]: { ...(value.effects?.[kind] ?? {}), color: event.target.value },
+                        },
+                      }))}
+                    />
+                  </div>
+                  {kind === 'shadow' ? (
+                    <div className="apx-pre4-property-grid">
+                      <label><span>X</span><input className="apx-pre4-input" type="number" value={effects.shadow?.offsetX ?? 0} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), shadow: { ...(value.effects?.shadow ?? {}), offsetX: Number(event.target.value) } } }))}/></label>
+                      <label><span>Y</span><input className="apx-pre4-input" type="number" value={effects.shadow?.offsetY ?? 8} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), shadow: { ...(value.effects?.shadow ?? {}), offsetY: Number(event.target.value) } } }))}/></label>
+                      <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={effects.shadow?.blur ?? 18} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), shadow: { ...(value.effects?.shadow ?? {}), blur: Number(event.target.value) } } }))}/></label>
+                      <label><span>Opacity</span><input className="apx-pre4-input" type="number" min={0} max={1} step={.05} value={effects.shadow?.opacity ?? .4} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), shadow: { ...(value.effects?.shadow ?? {}), opacity: Number(event.target.value) } } }))}/></label>
+                    </div>
+                  ) : kind === 'glow' ? (
+                    <div className="apx-pre4-property-grid">
+                      <label><span>Intensity</span><input className="apx-pre4-input" type="number" min={0} value={effects.glow?.intensity ?? 12} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), glow: { ...(value.effects?.glow ?? {}), intensity: Number(event.target.value) } } }))}/></label>
+                      <label><span>Opacity</span><input className="apx-pre4-input" type="number" min={0} max={1} step={.05} value={effects.glow?.opacity ?? .75} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), glow: { ...(value.effects?.glow ?? {}), opacity: Number(event.target.value) } } }))}/></label>
+                    </div>
+                  ) : (
+                    <label className="apx-canvas-field"><span>Opacity</span><input className="apx-pre4-range" type="range" min={0} max={1} step={.01} value={effects.highlight?.opacity ?? .35} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), highlight: { ...(value.effects?.highlight ?? {}), opacity: Number(event.target.value) } } }))}/></label>
+                  )}
+                </>
+              ) : null}
+            </div>
+          );
+        })}
+
+        <div className="apx-pre4-section" data-text-section="curve">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Text on curve</div>
+            <label className="apx-canvas-switch">
+              <input
+                type="checkbox"
+                checked={Boolean(curve)}
+                onChange={(event) => mutateText('Text on curve', (current) => {
+                  if (!event.target.checked) {
+                    const next = { ...current };
+                    delete next.textOnCurve;
+                    return next;
+                  }
+                  return {
+                    ...current,
+                    textOnCurve: {
+                      sweepAngle: 180,
+                      radius: 180,
+                      up: true,
+                      layoutMode: 'clamp',
+                      baselineOffset: 0,
+                      startAngleDeg: 0,
+                    },
+                  };
+                })}
+              />
+              <span />
+            </label>
+          </div>
+          {curve ? (
+            <>
+              <div className="apx-pre4-property-grid">
+                <label><span>Sweep</span><input className="apx-pre4-input" type="number" min={1} max={360} value={curve.sweepAngle} onChange={(event) => updateTextDraft((current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, sweepAngle: Number(event.target.value) } }))}/></label>
+                <label><span>Radius</span><input className="apx-pre4-input" type="number" min={1} value={curve.radius ?? 180} onChange={(event) => updateTextDraft((current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, radius: Number(event.target.value) } }))}/></label>
+                <label><span>Offset</span><input className="apx-pre4-input" type="number" value={curve.baselineOffset ?? 0} onChange={(event) => updateTextDraft((current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, baselineOffset: Number(event.target.value) } }))}/></label>
+                <label><span>Start °</span><input className="apx-pre4-input" type="number" value={curve.startAngleDeg ?? 0} onChange={(event) => updateTextDraft((current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, startAngleDeg: Number(event.target.value) } }))}/></label>
+              </div>
+              <div className="apx-pre4-property-grid">
+                <label><span>Mode</span><select className="apx-pre4-input" value={curve.layoutMode ?? 'clamp'} onChange={(event) => mutateText('Curve layout', (current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, layoutMode: event.target.value as NonNullable<VisualTextNodeProps['textOnCurve']>['layoutMode'] } }))}>{TEXT_CURVE_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
+                <label className="apx-canvas-check"><input type="checkbox" checked={curve.up ?? true} onChange={(event) => mutateText('Curve direction', (current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, up: event.target.checked } }))}/><span>Curve up</span></label>
+              </div>
+            </>
+          ) : null}
+        </div>
+      </>
+    );
+  };
+
+  const renderTextData = () => {
+    if (!primaryText) return renderTransformFields();
+    const props = visualTextProps(primaryText);
+    const font = props.font ?? {};
+    const fontAssetId = font.path ? studioAssetIdFromReference(font.path) : null;
+    return (
+      <>
+        {renderTextHeader()}
+        <div className="apx-pre4-section" data-text-section="font-registry">
+          <div className="apx-pre4-section-title">Font registry</div>
+          <label className="apx-canvas-field">
+            <span>Registered family</span>
+            <input className="apx-pre4-input" value={font.name ?? font.family ?? 'Arial'} onChange={(event) => updateTextDraft((current) => ({ ...current, font: { ...(current.font ?? {}), name: event.target.value, family: event.target.value } }))}/>
+          </label>
+          <label className="apx-canvas-field">
+            <span>Uploaded font asset</span>
+            <select
+              className="apx-pre4-input"
+              value={fontAssetId ?? ''}
+              onChange={(event) => {
+                const asset = fontAssets.find((item) => item.id === event.target.value);
+                if (asset) applyFontAsset(asset);
+                else mutateText('Detach font asset', (current) => ({
+                  ...current,
+                  font: { ...(current.font ?? {}), path: undefined },
+                }));
+              }}
+              data-text-font-asset-select
+            >
+              <option value="">None / system font</option>
+              {fontAssets.map((asset) => (
+                <option key={asset.id} value={asset.id}>{asset.name}</option>
+              ))}
+            </select>
+          </label>
+          <label className="apx-canvas-field">
+            <span>Font path</span>
+            <input className="apx-pre4-input" value={font.path ?? ''} placeholder="./assets/font.ttf" onChange={(event) => updateTextDraft((current) => ({ ...current, font: { ...(current.font ?? {}), path: event.target.value || undefined } }))}/>
+          </label>
+          <small className="apx-canvas-hint">
+            Uploaded fonts use stable studio://asset/… identity in Studio. Phase 15 owns exported asset-path rewriting.
+          </small>
+        </div>
+
+        <div className="apx-pre4-section" data-text-section="metrics">
+          <div className="apx-pre4-section-title">Text metrics</div>
+          {textMetrics ? (
+            <div className="apx-text-metrics-grid">
+              <div><span>Width</span><strong>{textMetrics.width.toFixed(1)} px</strong></div>
+              <div><span>Height</span><strong>{textMetrics.height.toFixed(1)} px</strong></div>
+              <div><span>Lines</span><strong>{textMetrics.lineCount}</strong></div>
+              <div><span>Baseline</span><strong>{textMetrics.baseline.toFixed(1)} px</strong></div>
+              <div><span>Line height</span><strong>{textMetrics.lineHeight.toFixed(1)} px</strong></div>
+            </div>
+          ) : (
+            <div className="apx-pre4-empty"><strong>Metrics unavailable</strong><span>The browser canvas measurement context is unavailable.</span></div>
+          )}
+          <label className="apx-canvas-check">
+            <input
+              type="checkbox"
+              checked={props.includeCharMetrics ?? false}
+              onChange={(event) => mutateText('Character metrics', (current) => ({ ...current, includeCharMetrics: event.target.checked }))}
+            />
+            <span>Include per-character metrics in Apexify measurement</span>
+          </label>
+          <div className="apx-pre4-property-grid">
+            <label><span>Measure W</span><input className="apx-pre4-input" type="number" min={1} value={props.measurementCanvas?.width ?? 1200} onChange={(event) => updateTextDraft((current) => ({ ...current, measurementCanvas: { ...(current.measurementCanvas ?? {}), width: Number(event.target.value) } }))}/></label>
+            <label><span>Measure H</span><input className="apx-pre4-input" type="number" min={1} value={props.measurementCanvas?.height ?? 600} onChange={(event) => updateTextDraft((current) => ({ ...current, measurementCanvas: { ...(current.measurementCanvas ?? {}), height: Number(event.target.value) } }))}/></label>
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const renderTextAdvanced = () => {
+    if (!primaryText) return renderTransformFields();
+    return (
+      <>
+        {renderTextHeader()}
+        <div className="apx-pre4-section" data-text-section="complete-config">
+          <div className="apx-pre4-section-title">Complete TextProperties</div>
+          <textarea
+            className="apx-canvas-json apx-canvas-json--config"
+            spellCheck={false}
+            value={textConfigDraft}
+            onChange={(event) => {
+              setTextConfigDraft(event.target.value);
+              setTextConfigError(null);
+            }}
+          />
+          {textConfigError ? <div className="apx-live-code-error">{textConfigError}</div> : null}
+          <button
+            className="apx-canvas-apply"
+            type="button"
+            onClick={() => {
+              try {
+                const parsed = JSON.parse(textConfigDraft);
+                if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                  throw new Error('Text properties JSON must be an object.');
+                }
+                const nextProject = structuredClone(project);
+                nextProject.document.nodes[primaryText.id].props =
+                  textPropsRecord(parsed as VisualTextNodeProps);
+                nextProject.updatedAt = new Date().toISOString();
+                const validation = validateVisualProject(nextProject);
+                if (!validation.ok) {
+                  throw new Error(validation.issues[0]?.message ?? 'Invalid text configuration.');
+                }
+                history.current.commit(project, nextProject, 'Advanced text config');
+                projectRef.current = nextProject;
+                setProject(nextProject);
+                setHistoryTick((value) => value + 1);
+                setTextConfigError(null);
+                setMessage('Complete text configuration applied');
+              } catch (configError) {
+                setTextConfigError(
+                  configError instanceof Error
+                    ? configError.message
+                    : 'Invalid text configuration JSON.',
+                );
+              }
+            }}
+          >
+            Apply complete text config
+          </button>
+          <small className="apx-canvas-hint">
+            Covers declaration-level gradients, styled line decorations, legacy aliases and every pinned TextProperties field while the normal Inspector stays calm.
+          </small>
+        </div>
+      </>
+    );
+  };
+
+  const renderTextInspector = () => {
+    if (inspectorTab === 'transform') return renderTransformFields();
+    if (inspectorTab === 'style') return renderTextStyle();
+    if (inspectorTab === 'effects') return renderTextEffects();
+    if (inspectorTab === 'data') return renderTextData();
+    return renderTextAdvanced();
+  };
+
   const renderInspector = () => {
+    if (primaryText) {
+      return renderTextInspector();
+    }
+
     if (primaryMedia) {
       return renderMediaInspector();
     }
@@ -3070,6 +4013,7 @@ export default function VisualStudioPre4({
           onChange={setAssets}
           onInsertReference={(value) => setMessage('Asset reference: ' + value)}
           onInsertAsset={insertImageAsset}
+          onInsertFontAsset={applyFontAsset}
           onNotice={(_kind, text) => setMessage(text)}
         />
       );
@@ -3218,9 +4162,11 @@ export default function VisualStudioPre4({
                   ? 'Images'
                   : activeTool === 'shapes'
                     ? 'Shapes'
-                    : activeTool === 'assets'
-                      ? 'Assets'
-                      : 'Layers'}
+                    : activeTool === 'text'
+                      ? 'Text'
+                      : activeTool === 'assets'
+                        ? 'Assets'
+                        : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -3228,7 +4174,9 @@ export default function VisualStudioPre4({
                     ? imageAssets.length + ' image assets'
                     : activeTool === 'shapes'
                       ? IMAGE_SHAPE_TYPES.length + ' built-in shapes'
-                      : assets.length + ' shared assets'
+                      : activeTool === 'text'
+                        ? fontAssets.length + ' uploaded fonts'
+                        : assets.length + ' shared assets'
                   : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
@@ -3237,6 +4185,8 @@ export default function VisualStudioPre4({
               <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
             ) : activeTool === 'images' ? (
               <button type="button" onClick={() => setDockTab('assets')} title="Open Assets">＋</button>
+            ) : activeTool === 'text' ? (
+              <button type="button" onClick={() => insertText('Text')} title="Add text">＋</button>
             ) : null}
           </div>
 
@@ -3387,7 +4337,16 @@ export default function VisualStudioPre4({
                     className="apx-pre4-node"
                     data-kind={node.kind}
                     data-selected={isSelected ? 'true' : undefined}
-                    onPointerDown={(event) => beginMove(event, id)}
+                    data-inline-editing={inlineTextEditId === id ? 'true' : undefined}
+                    onPointerDown={(event) => {
+                      if (inlineTextEditId === id) return;
+                      beginMove(event, id);
+                    }}
+                    onDoubleClick={(event) => {
+                      if (node.kind !== 'text' || node.transform?.locked) return;
+                      event.stopPropagation();
+                      beginInlineTextEdit(node);
+                    }}
                     style={{
                       left: rect.x,
                       top: rect.y,
@@ -3398,8 +4357,32 @@ export default function VisualStudioPre4({
                       zIndex: node.transform?.zIndex ?? 0,
                     }}
                   >
-                    <span>{node.name ?? node.kind}</span>
-                    {isSelected && !node.transform?.locked && handles.map((handle) => (
+                    {node.kind === 'text' && inlineTextEditId === id ? (
+                      <textarea
+                        autoFocus
+                        className="apx-inline-text-editor"
+                        data-inline-text-editor={id}
+                        value={visualTextProps(node).text}
+                        onPointerDown={(event) => event.stopPropagation()}
+                        onClick={(event) => event.stopPropagation()}
+                        onDoubleClick={(event) => event.stopPropagation()}
+                        onChange={(event) => updateInlineText(id, event.target.value)}
+                        onBlur={finishInlineTextEdit}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Escape') {
+                            event.preventDefault();
+                            event.currentTarget.blur();
+                          }
+                          if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                            event.preventDefault();
+                            event.currentTarget.blur();
+                          }
+                        }}
+                      />
+                    ) : (
+                      <span>{node.name ?? node.kind}</span>
+                    )}
+                    {isSelected && inlineTextEditId !== id && !node.transform?.locked && handles.map((handle) => (
                       <button
                         key={handle}
                         aria-label={'Resize ' + handle}
@@ -3412,7 +4395,7 @@ export default function VisualStudioPre4({
                         }}
                       />
                     ))}
-                    {isSelected && !node.transform?.locked && (
+                    {isSelected && inlineTextEditId !== id && !node.transform?.locked && (
                       <button
                         aria-label="Rotate"
                         className="apx-pre4-rotate"
@@ -3533,8 +4516,24 @@ export default function VisualStudioPre4({
                   <button
                     key={asset.id}
                     type="button"
-                    title={asset.mime.startsWith('image/') ? 'Insert ' + asset.name : asset.name}
-                    onClick={() => asset.mime.startsWith('image/') ? insertImageAsset(asset) : setDockTab('assets')}
+                    title={
+                      asset.mime.startsWith('image/')
+                        ? 'Insert ' + asset.name
+                        : isStudioFontAsset(asset)
+                          ? 'Apply ' + studioAssetFontFamily(asset)
+                          : asset.name
+                    }
+                    onClick={() => {
+                      if (asset.mime.startsWith('image/')) {
+                        insertImageAsset(asset);
+                        return;
+                      }
+                      if (isStudioFontAsset(asset)) {
+                        applyFontAsset(asset);
+                        return;
+                      }
+                      setDockTab('assets');
+                    }}
                   >
                     {asset.mime.startsWith('image/') ? (
                       <img src={'data:' + asset.mime + ';base64,' + asset.base64} alt="" />

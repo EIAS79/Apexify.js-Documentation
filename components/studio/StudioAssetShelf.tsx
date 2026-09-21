@@ -27,6 +27,7 @@ type Props = {
   onChange: (next: StudioVirtualAsset[]) => void;
   onInsertReference: (text: string) => void;
   onInsertAsset?: (asset: StudioVirtualAsset) => void;
+  onInsertFontAsset?: (asset: StudioVirtualAsset) => void;
   onNotice: (kind: 'info' | 'success' | 'warning', text: string) => void;
 };
 
@@ -90,6 +91,7 @@ export function StudioAssetShelf({
   onChange,
   onInsertReference,
   onInsertAsset,
+  onInsertFontAsset,
   onNotice,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -144,6 +146,11 @@ export function StudioAssetShelf({
   };
 
   const insertReference = (asset: StudioVirtualAsset) => {
+    if (onInsertFontAsset && isStudioFontAsset(asset)) {
+      onInsertFontAsset(asset);
+      onNotice('success', `Applied font family ${studioAssetFontFamily(asset)}.`);
+      return;
+    }
     if (onInsertAsset && asset.mime.startsWith('image/')) {
       onInsertAsset(asset);
       onNotice('success', `Inserted ${asset.name} into the Visual canvas.`);
