@@ -1524,7 +1524,33 @@ export default function VisualStudioPre4({
     return () => window.removeEventListener('keydown', onKey);
   });
 
+  const beginPhase7CanvasAction = (event: ReactPointerEvent) => {
+    if (!phase7Action) return false;
+    const point = documentPoint(event.clientX, event.clientY);
+    if (!point) return false;
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (phase7Action === 'freehand') {
+      freehandDraftRef.current = [point];
+      setFreehandDraft([point]);
+      gesture.current = {
+        kind: 'freehand',
+        startX: event.clientX,
+        startY: event.clientY,
+        before: project,
+        startDocument: point,
+      };
+      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+      return true;
+    }
+
+    runPhase7PointAction(point);
+    return true;
+  };
+
   const beginMove = (event: ReactPointerEvent, id: string) => {
+    if (beginPhase7CanvasAction(event)) return;
     if (viewportMode !== 'select') return;
     event.stopPropagation();
 
@@ -1592,6 +1618,8 @@ export default function VisualStudioPre4({
   };
 
   const beginViewportGesture = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (beginPhase7CanvasAction(event)) return;
+
     if (viewportMode === 'pan') {
       gesture.current = {
         kind: 'pan',
@@ -1629,6 +1657,19 @@ export default function VisualStudioPre4({
   const pointerMove = (event: ReactPointerEvent) => {
     const currentGesture = gesture.current;
     if (!currentGesture) return;
+
+    if (currentGesture.kind === 'freehand') {
+      const point = documentPoint(event.clientX, event.clientY);
+      if (!point) return;
+      const points = freehandDraftRef.current;
+      const previous = points[points.length - 1];
+      if (!previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 1.5) {
+        const next = [...points, point];
+        freehandDraftRef.current = next;
+        setFreehandDraft(next);
+      }
+      return;
+    }
 
     if (currentGesture.kind === 'pan' && currentGesture.originPan) {
       setPan({
@@ -1728,6 +1769,15 @@ export default function VisualStudioPre4({
   const pointerUp = () => {
     const currentGesture = gesture.current;
     if (!currentGesture) return;
+
+    if (currentGesture.kind === 'freehand') {
+      const points = freehandDraftRef.current;
+      freehandDraftRef.current = [];
+      setFreehandDraft([]);
+      gesture.current = null;
+      if (points.length > 1) finishFreehand(points);
+      return;
+    }
 
     if (
       currentGesture.kind !== 'pan' &&
