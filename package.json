@@ -117,7 +117,7 @@
     "docs:verify:release": "npm run docs:verify:doc12",
     "studio:visual:capabilities": "tsx scripts/studio/visual/generate-capability-matrix.ts",
     "studio:visual:capabilities:check": "tsx scripts/studio/visual/generate-capability-matrix.ts --check",
-    "studio:visual:test": "tsx --test scripts/studio/declaration-parser.test.ts scripts/studio/visual/visual-contract.test.ts",
+    "studio:visual:test": "tsx --test scripts/studio/declaration-parser.test.ts scripts/studio/visual/visual-contract.test.ts scripts/studio/visual/phase1-shell.test.ts",
     "studio:visual:verify": "npm run studio:completeness:check && npm run studio:visual:capabilities:check && npm run studio:visual:test"
   },
   "dependencies": {
