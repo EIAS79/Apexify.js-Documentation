@@ -329,6 +329,7 @@ export default function VisualStudio({ active }: Props) {
 
         <section className="apx-vw-dock" aria-label="Visual Studio bottom dock">
           <div className="apx-vw-dock-tabs" role="tablist" aria-label="Visual workspace output">
+            <span className="apx-vw-dock-label">Output</span>
             {DOCK_TABS.map((tab) => (
               <button
                 key={tab}
