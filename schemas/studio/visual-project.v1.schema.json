@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://apexifyjs.com/schemas/studio/visual-project.v1.schema.json",
   "title": "Apexify Studio Visual Project v1",
-  "description": "Phase-0 persisted project contract for *.apexstudio.json. Domain-specific props are intentionally refined by later Studio Visual phases.",
+  "description": "Persisted Apexify Studio Visual Project v1 contract. Phase 2 establishes this project as the semantic source of truth; domain-specific props are refined by later authoring phases.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -30,7 +30,8 @@
     },
     "id": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
     },
     "name": {
       "type": "string",
@@ -101,7 +102,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
         },
         "kind": {
           "type": "string",
@@ -146,7 +148,8 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
           },
           "uniqueItems": true
         },
@@ -169,7 +172,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
         },
         "kind": {
           "enum": [
@@ -199,13 +203,15 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
         },
         "childIds": {
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
           },
           "uniqueItems": true
         },
