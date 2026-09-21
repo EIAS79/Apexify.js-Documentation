@@ -1198,6 +1198,19 @@
   background:#0b1726;
 }
 
+.apx-vw-dock-label{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  padding:0 .75rem;
+  border-right:1px solid var(--vw-border);
+  color:#8fa4bf;
+  font-size:.56rem;
+  font-weight:850;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
 .apx-vw-dock-tabs button{
   position:relative;
   display:inline-flex;
