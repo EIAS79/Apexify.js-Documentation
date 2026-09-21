@@ -3561,7 +3561,6 @@
     "totalOptionPaths": 17233,
     "classifiedOptionPaths": 17233,
     "unclassifiedOptionPaths": 0,
-    "classificationSha256": "PENDING_CI_DIGEST",
     "complete": true
   }
 }
