@@ -33,7 +33,13 @@ import {
   Squares2X2Icon,
   VideoCameraIcon,
 } from '@heroicons/react/24/outline';
+import { createApexifyWebRuntime, type ApexifyWebRuntime } from '@apexify/web';
 import { BrandIcon } from '@/components/Brand';
+import { InteractiveCodeEditor } from '@/components/docs/playground/InteractiveCodeEditor';
+import {
+  VisualCodeModal,
+  VisualPreviewModal,
+} from '@/components/studio/visual/VisualStudioModals';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioArtifactPreview } from '@/components/studio/StudioArtifactPreview';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
@@ -47,6 +53,10 @@ import {
   createVisualProject,
 } from '@/lib/studio/visual/project';
 import { generateVisualProjectCode } from '@/lib/studio/visual/codegen/generator';
+import {
+  reconcileVisualProjectFromCode,
+  safeVisualDownloadStem,
+} from '@/lib/studio/visual/codegen/reconcile';
 import {
   downloadVisualProject,
   loadVisualProjectFile,
@@ -105,6 +115,8 @@ type Gesture = {
   baseSelection?: string[];
   center?: Point;
 };
+
+const VISUAL_CODE_STORAGE_KEY = 'apexify-visual-live-code-v1';
 
 const handles: ResizeHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
 const handlePos: Record<
@@ -179,10 +191,20 @@ export default function VisualStudioPre4({
     'style' | 'transform' | 'effects' | 'data' | 'advanced'
   >('style');
   const [dockTab, setDockTab] = useState<
-    'preview' | 'generated' | 'diagnostics' | 'assets' | 'history'
+    'generated' | 'diagnostics' | 'assets' | 'history'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
   const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
+  const [codeSource, setCodeSource] = useState('');
+  const [codeFileName, setCodeFileName] = useState('landing-page.ts');
+  const [codeSyncState, setCodeSyncState] = useState<'synced' | 'saving' | 'error'>('synced');
+  const [codeSyncError, setCodeSyncError] = useState<string | null>(null);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [codeModalOpen, setCodeModalOpen] = useState(false);
+  const [modalPreviewUrl, setModalPreviewUrl] = useState<string | null>(null);
+  const [modalPreviewMime, setModalPreviewMime] = useState('image/png');
+  const [modalPreviewLoading, setModalPreviewLoading] = useState(false);
+  const [modalPreviewError, setModalPreviewError] = useState<string | null>(null);
 
   const history = useRef(new VisualHistory(100));
   const gesture = useRef<Gesture | null>(null);
@@ -194,6 +216,11 @@ export default function VisualStudioPre4({
   const propertyBefore = useRef<VisualProject | null>(null);
   const pinch = useRef<{ distance: number; zoom: number } | null>(null);
   const didInitialFit = useRef(false);
+  const webRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
+  const codeSaveTimerRef = useRef<number>(0);
+  const codeAppliedSignatureRef = useRef('');
+  const codeHydratedRef = useRef(false);
+  const fileNameTouchedRef = useRef(false);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
 
