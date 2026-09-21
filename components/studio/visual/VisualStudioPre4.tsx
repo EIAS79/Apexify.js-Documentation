@@ -245,6 +245,8 @@ export default function VisualStudioPre4({
   const [modalPreviewMime, setModalPreviewMime] = useState('image/png');
   const [modalPreviewLoading, setModalPreviewLoading] = useState(false);
   const [modalPreviewError, setModalPreviewError] = useState<string | null>(null);
+  const [canvasFiltersDraft, setCanvasFiltersDraft] = useState('[]');
+  const [canvasFiltersError, setCanvasFiltersError] = useState<string | null>(null);
 
   const history = useRef(new VisualHistory(100));
   const projectRef = useRef(project);
@@ -425,6 +427,94 @@ export default function VisualStudioPre4({
       setHistoryTick((value) => value + 1);
       return next;
     });
+
+  const updateCanvasDraft = (
+    updater: (canvas: VisualCanvasConfig) => VisualCanvasConfig,
+  ) => {
+    setProject((current) => ({
+      ...current,
+      updatedAt: new Date().toISOString(),
+      document: {
+        ...current.document,
+        canvas: updater(current.document.canvas ?? {}),
+      },
+    }));
+  };
+
+  const mutateCanvas = (
+    label: string,
+    updater: (canvas: VisualCanvasConfig) => VisualCanvasConfig,
+  ) =>
+    mutate(label, (current) => ({
+      ...current,
+      updatedAt: new Date().toISOString(),
+      document: {
+        ...current.document,
+        canvas: updater(current.document.canvas ?? {}),
+      },
+    }));
+
+  const setCanvasBaseMode = (
+    mode: 'default' | 'color' | 'gradient' | 'image' | 'transparent',
+  ) =>
+    mutateCanvas('Canvas background', (current) => {
+      const next = { ...current };
+      delete next.colorBg;
+      delete next.gradientBg;
+      delete next.customBg;
+      next.transparentBase = mode === 'transparent';
+      if (mode === 'color') next.colorBg = '#0b1730';
+      if (mode === 'gradient') next.gradientBg = defaultCanvasGradient();
+      if (mode === 'image') {
+        next.customBg = {
+          source: '',
+          fit: 'cover',
+          align: 'center',
+          opacity: 1,
+          filters: [],
+        };
+      }
+      if (mode === 'default') delete next.transparentBase;
+      return next;
+    });
+
+  const setGradientStop = (
+    index: number,
+    patch: Partial<VisualGradient['colors'][number]>,
+  ) => {
+    updateCanvasDraft((current) => {
+      const gradient = current.gradientBg ?? defaultCanvasGradient();
+      const colors = gradient.colors.map((stop, stopIndex) =>
+        stopIndex === index ? { ...stop, ...patch } : stop,
+      );
+      return { ...current, gradientBg: { ...gradient, colors } as VisualGradient };
+    });
+  };
+
+  const updatePattern = (patch: Partial<VisualPatternOptions>) =>
+    updateCanvasDraft((current) => ({
+      ...current,
+      patternBg: { ...(current.patternBg ?? defaultCanvasPattern()), ...patch },
+    }));
+
+  const updateBackgroundLayer = (
+    index: number,
+    updater: (layer: VisualBackgroundLayer) => VisualBackgroundLayer,
+  ) =>
+    updateCanvasDraft((current) => ({
+      ...current,
+      bgLayers: (current.bgLayers ?? []).map((layer, layerIndex) =>
+        layerIndex === index ? updater(layer) : layer,
+      ),
+    }));
+
+  useEffect(() => {
+    setCanvasFiltersDraft(
+      JSON.stringify(project.document.canvas?.customBg?.filters ?? [], null, 2),
+    );
+    setCanvasFiltersError(null);
+  }, [project.document.canvas?.customBg?.filters]);
+
 
   const addPlaceholder = () =>
     mutate('Add placeholder', (current) => {
