@@ -3186,6 +3186,7 @@ export default function VisualStudioPre4({
               <button
                 key={id}
                 type="button"
+                data-feature-tool={id}
                 data-active={activeTool === id ? 'true' : undefined}
                 onClick={() => {
                   setActiveTool(id);
