@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 CI GREEN
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 MAIN MERGED
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2679,7 +2679,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | Phase | Name | Status | Main commit | Production proof |
 |---|---|---|---|---|
 | 0 | Contract / capability baseline | PRODUCTION VERIFIED | `97d7741c8f35b06dd33bed5ba2ac9b247b344465` | Vercel deployment + `/`, `/studio`, `/docs/getting-started`, `/api-reference` smoke |
-| 1 | Dual-mode shell | CI GREEN | pending merge | Branch gate `35584036125` |
+| 1 | Dual-mode shell | MAIN MERGED | `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7` | Production deployment blocked by Vercel build-rate limit; branch production-build + browser gate green |
 | 2 | Project model / codegen core | NOT STARTED | — | — |
 | 3 | Viewport / layers / transforms / history | NOT STARTED | — | — |
 | 4 | Canvas | NOT STARTED | — | — |
@@ -2700,13 +2700,17 @@ feat(studio-visual): release visual authoring and preview-to-code
 
 ## Phase 1 implementation record — STUDIO-VISUAL-1
 
-> **Status:** CI GREEN
+> **Status:** MAIN MERGED
 >
 > **Work branch:** `studio-visual/v01-shell`
 >
 > **Base main commit:** `97d7741c8f35b06dd33bed5ba2ac9b247b344465`
 >
-> **Green phase-gate run:** GitHub Actions `35584036125`
+> **Green phase-gate run:** GitHub Actions `35584341599`
+>
+> **Main integration:** `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7`
+>
+> **Production deployment:** BLOCKED externally — Vercel reported `Deployment rate limited — retry in 24 hours.`
 
 Completed Phase-1 scope:
 
@@ -2720,7 +2724,8 @@ Completed Phase-1 scope:
 - desktop and mobile browser regression;
 - Code → Visual → Code session-preservation proof;
 - TypeScript typecheck and production Next.js build green;
-- existing capability/completeness gates remain green.
+- existing capability/completeness gates remain green;
+- Phase-1 PR #70 squash-merged into `main`.
 
 The Phase-1 browser smoke verifies the Studio route at desktop and mobile widths, switches into Visual mode, confirms the empty/shared surfaces, checks for horizontal overflow, switches back to Code mode and proves that the Code Studio source session was not mutated.
 
@@ -2735,29 +2740,6 @@ MAIN MERGED
 PRODUCTION VERIFIED
 BLOCKED
 ```
-
----
-
-## STUDIO-VISUAL-1 implementation record
-
-> **Status:** CI GREEN
->
-> **Work branch:** `studio-visual/v01-shell`
->
-> **Branch gate:** GitHub Actions run `35584036125` — PASS
-
-Delivered:
-
-- top-level Code / Visual mode switch;
-- shared session provider for assets, output artifacts, diagnostics, and history;
-- Code Studio kept mounted so mode switching does not destroy its working session;
-- lazy-loaded Visual Studio;
-- responsive empty Visual workspace;
-- accessible tab/panel relationships for the mode selector;
-- desktop and mobile browser regression proving Code → Visual → Code round-trip without source mutation;
-- existing Code Studio runtime planner/execution path retained.
-
-Phase 1 intentionally adds no drawing, selection, transform, or domain-specific visual authoring.
 
 ---
 
