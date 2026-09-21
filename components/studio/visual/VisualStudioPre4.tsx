@@ -9,6 +9,7 @@ import {
   type TouchEvent as ReactTouchEvent,
   type WheelEvent as ReactWheelEvent,
   type ReactNode,
+  type CSSProperties,
 } from 'react';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioArtifactPreview } from '@/components/studio/StudioArtifactPreview';
@@ -1252,7 +1253,7 @@ export default function VisualStudioPre4({
           <div key={'run-' + index}>
             <span>▶</span>
             <strong>{'Run ' + (index + 1)}</strong>
-            <small>{String(entry.status ?? '')}</small>
+            <small>{entry.ok ? 'success' : 'failed'}</small>
           </div>
         ))}
       </div>
@@ -1353,7 +1354,7 @@ export default function VisualStudioPre4({
         </div>
       </header>
 
-      <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '42px' : '238px' } as React.CSSProperties}>
+      <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '42px' : '238px' } as CSSProperties}>
         <nav className="apx-pre4-feature-rail" aria-label="Visual Studio features">
           <div className="apx-pre4-feature-list">
             {featureTools.map(([id, icon, label]) => (
