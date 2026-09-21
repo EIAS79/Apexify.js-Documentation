@@ -55,9 +55,8 @@ async function verify(width, height) {
   await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="visual"]');
   await page.click('.apx-vw-project-menu > summary');
-  const projectActions = await page.$('.apx-vw-project-menu__panel button');
-  if (projectActions.length < 3) throw new Error('Phase 2 project actions missing');
-  await projectActions[2].click();
+  await page.waitForSelector('[data-visual-open-generated-code]:not([disabled])', { visible: true });
+  await page.click('[data-visual-open-generated-code]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="code"]');
 
   await page.waitForFunction(() => {
