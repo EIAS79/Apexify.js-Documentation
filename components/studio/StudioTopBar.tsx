@@ -7,6 +7,7 @@ import {
   ArrowPathIcon,
   CodeBracketIcon,
   CommandLineIcon,
+  EllipsisHorizontalIcon,
   FolderOpenIcon,
   PhotoIcon,
   PlayIcon,
@@ -15,7 +16,6 @@ import {
   SparklesIcon,
   ViewColumnsIcon,
 } from '@heroicons/react/24/outline';
-import ThemeToggle from '@/components/ThemeToggle';
 import { StudioModeSwitch, type StudioMode } from '@/components/studio/StudioModeSwitch';
 import {
   STUDIO_TEMPLATES,
@@ -175,16 +175,17 @@ function TemplatesMenu({ onLoad }: { onLoad: (t: StudioTemplate) => void }) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
+        className="studio-icon-control inline-flex h-9 w-9 items-center justify-center rounded-lg text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
         style={{
           border: '1px solid var(--border-default)',
           color: 'var(--text-primary)',
           background: 'var(--bg-raised)',
         }}
-        title="Load template"
+        title="Templates"
+        aria-label="Templates"
+        data-tooltip="Templates"
       >
-        <SparklesIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-        <span className="studio-code-toolbar-label hidden min-[420px]:inline">Templates</span>
+        <SparklesIcon className="h-4 w-4 shrink-0" aria-hidden />
       </button>
       {open && (
         <div
@@ -247,6 +248,133 @@ function TemplatesMenu({ onLoad }: { onLoad: (t: StudioTemplate) => void }) {
           </ul>
         </div>
       )}
+    </div>
+  );
+}
+
+
+function SecondaryToolsMenu({
+  onOpenPalette,
+  onCopyShareLink,
+  shareCopied,
+  onDownloadOutput,
+  hasOutput,
+  onOpenShortcuts,
+}: {
+  onOpenPalette: () => void;
+  onCopyShareLink: () => void;
+  shareCopied: boolean;
+  onDownloadOutput: () => void;
+  hasOutput: boolean;
+  onOpenShortcuts: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (event: MouseEvent) => {
+      if (!ref.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('mousedown', onDoc);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('mousedown', onDoc);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const itemClass =
+    'flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-xs font-semibold transition-colors hover:bg-[var(--bg-sunken)]';
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        className="studio-icon-control inline-flex h-9 w-9 items-center justify-center rounded-lg"
+        style={{
+          border: '1px solid var(--border-default)',
+          color: 'var(--text-secondary)',
+          background: 'var(--bg-raised)',
+        }}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="More Studio tools"
+        title="More tools"
+        data-tooltip="More"
+        onClick={() => setOpen((value) => !value)}
+      >
+        <EllipsisHorizontalIcon className="h-4 w-4" aria-hidden />
+      </button>
+
+      {open ? (
+        <div
+          role="menu"
+          className="absolute right-0 z-50 mt-2 w-56 rounded-xl p-1.5"
+          style={{
+            background: 'var(--bg-raised)',
+            border: '1px solid var(--border-default)',
+            boxShadow: 'var(--shadow-lg)',
+          }}
+        >
+          <button
+            type="button"
+            role="menuitem"
+            className={itemClass}
+            style={{ color: 'var(--text-primary)' }}
+            onClick={() => {
+              onOpenPalette();
+              setOpen(false);
+            }}
+          >
+            <CommandLineIcon className="h-4 w-4" aria-hidden />
+            Command palette
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={itemClass}
+            style={{ color: shareCopied ? 'var(--success)' : 'var(--text-primary)' }}
+            onClick={() => {
+              onCopyShareLink();
+              setOpen(false);
+            }}
+          >
+            <ShareIcon className="h-4 w-4" aria-hidden />
+            {shareCopied ? 'Share link copied' : 'Copy share link'}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            disabled={!hasOutput}
+            className={itemClass + ' disabled:cursor-not-allowed disabled:opacity-40'}
+            style={{ color: 'var(--text-primary)' }}
+            onClick={() => {
+              onDownloadOutput();
+              setOpen(false);
+            }}
+          >
+            <ArrowDownTrayIcon className="h-4 w-4" aria-hidden />
+            Download output
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={itemClass}
+            style={{ color: 'var(--text-primary)' }}
+            onClick={() => {
+              onOpenShortcuts();
+              setOpen(false);
+            }}
+          >
+            <QuestionMarkCircleIcon className="h-4 w-4" aria-hidden />
+            Keyboard shortcuts
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -388,7 +516,7 @@ export function StudioTopBar(props: TopBarProps) {
         <button
           type="button"
           onClick={() => onAutoRunChange(!autoRun)}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
+          className="studio-icon-control inline-flex h-8 w-8 items-center justify-center rounded-lg text-[11px] sm:text-[12px] font-semibold transition-all active:scale-[0.97]"
           style={{
             background: autoRun
               ? 'color-mix(in srgb, var(--studio-mint) 16%, var(--bg-raised))'
@@ -415,94 +543,49 @@ export function StudioTopBar(props: TopBarProps) {
           style={{
             color: 'var(--text-secondary)',
           }}
-          title="Reset to starter snippet"
+          title="Reset"
+          aria-label="Reset to starter snippet"
+          data-tooltip="Reset"
         >
-          <ArrowPathIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          <span className="studio-code-toolbar-label hidden min-[420px]:inline">Reset</span>
+          <ArrowPathIcon className="h-4 w-4 shrink-0" aria-hidden />
         </button>
       </div>
 
-      {/* Utilities — project resources, commands, appearance */}
+      {/* Utilities — keep primary resources visible; collapse secondary tools. */}
       <div className="studio-code-topbar__utilities">
         <div className="studio-code-topbar__resources">
-        <button
-          type="button"
-          onClick={onToggleAssets}
-          aria-pressed={assetsOpen}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-semibold transition-colors active:scale-[0.98] sm:text-xs"
-          style={{
-            border: '1px solid var(--border-default)',
-            color: assetsOpen ? 'var(--studio-mint)' : 'var(--text-primary)',
-            background: assetsOpen
-              ? 'color-mix(in srgb, var(--studio-mint) 10%, var(--bg-raised))'
-              : 'var(--bg-raised)',
-          }}
-          title="Session media assets"
-        >
-          <FolderOpenIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          <span className="studio-code-toolbar-label hidden min-[480px]:inline">Assets</span>
-          {assetCount > 0 ? (
-            <span
-              className="grid min-w-5 place-items-center rounded-full px-1 text-[10px]"
-              style={{ background: 'var(--bg-sunken)', color: 'var(--text-secondary)' }}
-            >
-              {assetCount}
-            </span>
-          ) : null}
-        </button>
-
-        <TemplatesMenu onLoad={onLoadTemplate} />
-        </div>
-
-        <div className="studio-code-topbar__utility-cluster">
-        <div
-          className="studio-code-topbar__quick-actions flex items-center gap-0.5 rounded-lg p-0.5"
-          style={{ border: '1px solid var(--border-default)', backgroundColor: 'var(--bg-raised)' }}
-        >
           <button
             type="button"
-            onClick={onOpenPalette}
-            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98]"
-            style={{ color: 'var(--text-secondary)' }}
-            title="Open command palette (⌘K)"
+            onClick={onToggleAssets}
+            aria-pressed={assetsOpen}
+            className="studio-icon-control relative inline-flex h-9 w-9 items-center justify-center rounded-lg transition-colors active:scale-[0.98]"
+            style={{
+              border: '1px solid var(--border-default)',
+              color: assetsOpen ? 'var(--studio-mint)' : 'var(--text-primary)',
+              background: assetsOpen
+                ? 'color-mix(in srgb, var(--studio-mint) 10%, var(--bg-raised))'
+                : 'var(--bg-raised)',
+            }}
+            title="Assets"
+            aria-label="Session media assets"
+            data-tooltip="Assets"
           >
-            <CommandLineIcon className="h-3.5 w-3.5" aria-hidden />
-            <span className="studio-code-toolbar-label hidden min-[480px]:inline">Cmd</span>
+            <FolderOpenIcon className="h-4 w-4" aria-hidden />
+            {assetCount > 0 ? (
+              <span className="studio-icon-badge">{assetCount}</span>
+            ) : null}
           </button>
 
-          <button
-            type="button"
-            onClick={onCopyShareLink}
-            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98]"
-            style={{ color: shareCopied ? 'var(--success)' : 'var(--text-secondary)' }}
-            title="Copy share link"
-          >
-            <ShareIcon className="h-3.5 w-3.5" aria-hidden />
-          </button>
+          <TemplatesMenu onLoad={onLoadTemplate} />
 
-          <button
-            type="button"
-            onClick={onDownloadOutput}
-            disabled={!hasOutput}
-            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98] disabled:opacity-40"
-            style={{ color: 'var(--text-secondary)' }}
-            title="Download active output artifact"
-          >
-            <ArrowDownTrayIcon className="h-3.5 w-3.5" aria-hidden />
-          </button>
-
-          <button
-            type="button"
-            onClick={onOpenShortcuts}
-            className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors active:scale-[0.98]"
-            style={{ color: 'var(--text-secondary)' }}
-            title="Show keyboard shortcuts (?)"
-          >
-            <QuestionMarkCircleIcon className="h-3.5 w-3.5" aria-hidden />
-          </button>
-        </div>
-
-        <ThemeToggle />
+          <SecondaryToolsMenu
+            onOpenPalette={onOpenPalette}
+            onCopyShareLink={onCopyShareLink}
+            shareCopied={shareCopied}
+            onDownloadOutput={onDownloadOutput}
+            hasOutput={hasOutput}
+            onOpenShortcuts={onOpenShortcuts}
+          />
         </div>
       </div>
     </header>
