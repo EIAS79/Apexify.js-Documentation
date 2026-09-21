@@ -11,6 +11,7 @@ import {
   STUDIO_OPTION_FAMILY_PROOFS,
   proofCasesForCapability,
 } from './studio-proof-registry';
+import { balancedDeclarationBody, namedDeclarationBody, topLevelDeclarationLines } from './declaration-parser';
 
 const root = process.cwd();
 const check = process.argv.includes('--check');
@@ -73,37 +74,8 @@ function findDeclaration(): string {
   return found;
 }
 
-function balancedBody(source: string, open: number): string {
-  let depth = 0;
-  let quote: "'" | '"' | '`' | null = null;
-  let escaped = false;
-
-  for (let index = open; index < source.length; index += 1) {
-    const ch = source[index]!;
-    if (quote) {
-      if (escaped) escaped = false;
-      else if (ch === '\\') escaped = true;
-      else if (ch === quote) quote = null;
-      continue;
-    }
-    if (ch === "'" || ch === '"' || ch === '`') {
-      quote = ch;
-      continue;
-    }
-    if (ch === '{') depth += 1;
-    else if (ch === '}') {
-      depth -= 1;
-      if (depth === 0) return source.slice(open + 1, index);
-    }
-  }
-  throw new Error('Declaration body is unbalanced.');
-}
-
 function classBody(source: string): string {
-  const match = /\bclass\s+ApexPainter\b[^\{]*\{/.exec(source);
-  if (!match) throw new Error('ApexPainter declaration was not found.');
-  const open = match.index + match[0].lastIndexOf('{');
-  return balancedBody(source, open);
+  return namedDeclarationBody(source, 'ApexPainter', 'class');
 }
 
 function uniqueSorted(values: Iterable<string>): string[] {
@@ -113,21 +85,22 @@ function uniqueSorted(values: Iterable<string>): string[] {
 function extractSurface(body: string) {
   const methods: string[] = [];
   const facets: string[] = [];
+  const topLevel = topLevelDeclarationLines(body).join('\n');
 
-  const methodRe = /^\s{2}([A-Za-z_$][\w$]*)\s*(?:<[^\n(]+>)?\s*\(/gm;
+  const methodRe = /^([A-Za-z_$][\w$]*)\s*(?:<[^\n(]+>)?\s*\(/gm;
   let methodMatch: RegExpExecArray | null;
-  while ((methodMatch = methodRe.exec(body))) {
+  while ((methodMatch = methodRe.exec(topLevel))) {
     const name = methodMatch[1]!;
     if (name !== 'constructor') methods.push(name);
   }
 
-  const readonlyRe = /^\s{2}readonly\s+([A-Za-z_$][\w$]*)\s*:/gm;
+  const readonlyRe = /^readonly\s+([A-Za-z_$][\w$]*)\s*:/gm;
   let fieldMatch: RegExpExecArray | null;
-  while ((fieldMatch = readonlyRe.exec(body))) facets.push(fieldMatch[1]!);
+  while ((fieldMatch = readonlyRe.exec(topLevel))) facets.push(fieldMatch[1]!);
 
-  const getterRe = /^\s{2}get\s+([A-Za-z_$][\w$]*)\s*\(\)\s*:/gm;
+  const getterRe = /^get\s+([A-Za-z_$][\w$]*)\s*\(\)\s*:/gm;
   let getterMatch: RegExpExecArray | null;
-  while ((getterMatch = getterRe.exec(body))) facets.push(getterMatch[1]!);
+  while ((getterMatch = getterRe.exec(topLevel))) facets.push(getterMatch[1]!);
 
   return {
     methods: uniqueSorted(methods),
@@ -149,16 +122,17 @@ function declarationBody(name: string, kind: 'interface' | 'class'): string {
     const match = pattern.exec(declarationSource);
     if (!match) continue;
     const open = match.index + match[0].lastIndexOf('{');
-    return balancedBody(declarationSource, open);
+    return balancedDeclarationBody(declarationSource, open);
   }
   throw new Error('Could not locate declaration ' + kind + ' ' + name + ' in apexify.js.');
 }
 
 function declarationMethods(body: string): string[] {
   const methods: string[] = [];
-  const re = /^\s*(?:public\s+)?(?:readonly\s+)?([A-Za-z_$][\w$]*)\s*(?:<[^\n(]+>)?\s*\(/gm;
+  const topLevel = topLevelDeclarationLines(body).join('\n');
+  const re = /^(?:public\s+)?(?:readonly\s+)?([A-Za-z_$][\w$]*)\s*(?:<[^\n(]+>)?\s*\(/gm;
   let match: RegExpExecArray | null;
-  while ((match = re.exec(body))) {
+  while ((match = re.exec(topLevel))) {
     if (match[1] !== 'constructor') methods.push(match[1]!);
   }
   return uniqueSorted(methods);
@@ -166,12 +140,13 @@ function declarationMethods(body: string): string[] {
 
 function declarationProperties(body: string): string[] {
   const properties: string[] = [];
-  const readonlyRe = /^\s*(?:public\s+)?readonly\s+([A-Za-z_$][\w$]*)\s*:/gm;
+  const topLevel = topLevelDeclarationLines(body).join('\n');
+  const readonlyRe = /^(?:public\s+)?readonly\s+([A-Za-z_$][\w$]*)\s*:/gm;
   let match: RegExpExecArray | null;
-  while ((match = readonlyRe.exec(body))) properties.push(match[1]!);
+  while ((match = readonlyRe.exec(topLevel))) properties.push(match[1]!);
 
-  const getterRe = /^\s*(?:public\s+)?get\s+([A-Za-z_$][\w$]*)\s*\(\)\s*:/gm;
-  while ((match = getterRe.exec(body))) properties.push(match[1]!);
+  const getterRe = /^(?:public\s+)?get\s+([A-Za-z_$][\w$]*)\s*\(\)\s*:/gm;
+  while ((match = getterRe.exec(topLevel))) properties.push(match[1]!);
 
   return uniqueSorted(properties);
 }
@@ -183,9 +158,10 @@ function componentFactories(): string[] {
     const match = pattern.exec(declarationSource);
     if (!match) continue;
     const open = match.index + match[0].lastIndexOf('{');
-    const body = balancedBody(declarationSource, open);
+    const body = balancedDeclarationBody(declarationSource, open);
+    const topLevel = topLevelDeclarationLines(body).join('\n');
     return uniqueSorted(
-      [...body.matchAll(/^\s*([A-Za-z_$][\w$]*)\s*:\s*\{/gm)].map((entry) => entry[1]!),
+      [...topLevel.matchAll(/^([A-Za-z_$][\w$]*)\s*:\s*\{/gm)].map((entry) => entry[1]!),
     );
   }
   return [];
