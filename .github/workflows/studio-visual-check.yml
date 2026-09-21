@@ -47,6 +47,20 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Regenerate base Studio capability evidence
+        run: npm run studio:completeness
+
+      - name: Upload regenerated base capability evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-base-capability-matrix
+          path: generated/studio/capability-matrix.json
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Verify committed base capability evidence
+        run: git diff --exit-code -- generated/studio/capability-matrix.json
+
       - name: Verify Visual Studio contracts
         run: npm run studio:visual:verify
 
