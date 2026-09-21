@@ -4,6 +4,7 @@ import type {
   VisualImageNodeProps,
   VisualImageSource,
   VisualProject,
+  VisualTextNodeProps,
   VisualValue,
 } from '../model';
 import {
@@ -12,6 +13,7 @@ import {
   visualImageProps,
 } from '../image-contract';
 import { createVisualId } from '../ids';
+import { textPropsRecord } from '../text-contract';
 import { validateVisualProject } from '../compiler/validate';
 
 export type VisualCodeSyncResult =
@@ -285,7 +287,7 @@ function assignedIdentifierBefore(
 
 function extractMethodCalls(
   source: string,
-  method: 'createCanvas' | 'createImage',
+  method: 'createCanvas' | 'createImage' | 'createText',
 ): MethodCall[] {
   const calls: MethodCall[] = [];
   const re = new RegExp('\\.' + method + '\\s*\\(', 'g');
@@ -416,7 +418,7 @@ function serializeCanvasConfig(value: RecordValue): VisualCanvasConfig {
   return canvas as unknown as VisualCanvasConfig;
 }
 
-function orderedImageNodes(project: VisualProject) {
+function orderedRenderableNodes(project: VisualProject) {
   const out = [] as Array<VisualProject['document']['nodes'][string]>;
   const visit = (id: string) => {
     const node = project.document.nodes[id];
@@ -425,7 +427,13 @@ function orderedImageNodes(project: VisualProject) {
       for (const childId of node.childIds ?? []) visit(childId);
       return;
     }
-    if (node.kind === 'image' || node.kind === 'shape') out.push(node);
+    if (
+      node.kind === 'image' ||
+      node.kind === 'shape' ||
+      node.kind === 'text'
+    ) {
+      out.push(node);
+    }
   };
   for (const rootId of project.document.rootNodeIds) visit(rootId);
   return out;
@@ -474,7 +482,7 @@ function imageSourceFromParsed(
       'Generated image source “' +
         value.__identifier +
         (value.member ? '.' + value.member : '') +
-        '” is not an earlier canonical image buffer.',
+        '” is not an earlier canonical output.',
     );
   }
   return { $generated: nodeId };
@@ -484,105 +492,279 @@ function asOptionalNumber(value: Jsonish | undefined): number | undefined {
   return typeof value === 'number' ? value : undefined;
 }
 
-function reconcileImageCalls(
+function assertCanonicalBase(
+  raw: string | undefined,
+  identifiers: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
+) {
+  if (!raw) throw new Error('Composition call requires a base canvas/output argument.');
+  const parsed = new LiteralParser(raw, true).parse();
+  if (!isIdentifierLiteral(parsed)) {
+    throw new Error('Composition base must be an earlier canonical output identifier.');
+  }
+  if (
+    canvasIdentifier &&
+    parsed.__identifier === canvasIdentifier &&
+    parsed.member === 'buffer'
+  ) {
+    return;
+  }
+  if (parsed.member) {
+    throw new Error('Generated composition outputs must be referenced directly.');
+  }
+  if (!identifiers.has(parsed.__identifier)) {
+    throw new Error(
+      'Composition base “' + parsed.__identifier + '” is not an earlier canonical output.',
+    );
+  }
+}
+
+function reconcileImageCall(
+  project: VisualProject,
+  call: MethodCall,
+  index: number,
+  matched: VisualProject['document']['nodes'][string] | undefined,
+  identifierToNodeId: Map<string, string>,
+  canvasIdentifier: string | null,
+) {
+  if (!call.args[0]) throw new Error('createImage() requires image properties.');
+  assertCanonicalBase(call.args[1], identifierToNodeId, canvasIdentifier);
+
+  const parsed = new LiteralParser(call.args[0], true).parse();
+  if (!isRecord(parsed)) {
+    throw new Error('createImage() properties must be an object literal.');
+  }
+  if (parsed.source === undefined) {
+    throw new Error('createImage() properties require source.');
+  }
+
+  const sourceValue = imageSourceFromParsed(
+    parsed.source,
+    identifierToNodeId,
+    canvasIdentifier,
+  );
+  const shape =
+    typeof sourceValue === 'string' &&
+    IMAGE_SHAPE_TYPES.includes(sourceValue as never);
+  const kind = shape ? 'shape' : 'image';
+
+  const id =
+    matched && matched.kind === kind
+      ? matched.id
+      : createVisualId(kind);
+  const oldNode = project.document.nodes[id];
+
+  const {
+    source: _source,
+    x,
+    y,
+    width,
+    height,
+    rotation,
+    opacity,
+    ...rest
+  } = parsed;
+
+  const props: VisualImageNodeProps = {
+    ...(rest as unknown as Omit<
+      VisualImageNodeProps,
+      'source' | 'createOptions'
+    >),
+    source: sourceValue,
+  };
+
+  if (call.args[2]) {
+    const options = new LiteralParser(call.args[2]).parse();
+    if (!isRecord(options)) {
+      throw new Error('createImage() options must be an object literal.');
+    }
+    props.createOptions =
+      options as unknown as VisualCreateImageOptions;
+  }
+
+  const node = {
+    id,
+    kind,
+    name:
+      oldNode?.name ??
+      (shape
+        ? 'Shape ' + String(index + 1)
+        : 'Image ' + String(index + 1)),
+    parentId: oldNode?.parentId ?? null,
+    childIds: oldNode?.childIds,
+    transform: {
+      ...(oldNode?.transform ?? {}),
+      x: asOptionalNumber(x) ?? 0,
+      y: asOptionalNumber(y) ?? 0,
+      ...(typeof width === 'number' ? { width } : {}),
+      ...(typeof height === 'number' ? { height } : {}),
+      rotation: asOptionalNumber(rotation) ?? 0,
+      opacity: asOptionalNumber(opacity) ?? 1,
+      visible: oldNode?.transform?.visible ?? true,
+      locked: oldNode?.transform?.locked ?? false,
+      zIndex: oldNode?.transform?.zIndex ?? index,
+    },
+    props: imagePropsRecord(props),
+  } satisfies VisualProject['document']['nodes'][string];
+
+  return node;
+}
+
+function reconcileTextCall(
+  project: VisualProject,
+  call: MethodCall,
+  index: number,
+  matched: VisualProject['document']['nodes'][string] | undefined,
+  identifiers: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
+) {
+  if (!call.args[0]) throw new Error('createText() requires text properties.');
+  assertCanonicalBase(call.args[1], identifiers, canvasIdentifier);
+  const parsed = new LiteralParser(call.args[0]).parse();
+  if (!isRecord(parsed)) {
+    throw new Error('createText() properties must be an object literal.');
+  }
+  if (typeof parsed.text !== 'string' || !parsed.text.length) {
+    throw new Error('createText() properties require non-empty text.');
+  }
+  if (typeof parsed.x !== 'number' || typeof parsed.y !== 'number') {
+    throw new Error('createText() x and y must be numeric literals.');
+  }
+
+  const {
+    x,
+    y,
+    layout,
+    placement,
+    fill,
+    maxWidth,
+    maxHeight,
+    rotation,
+    opacity,
+    ...rest
+  } = parsed;
+
+  const layoutRecord = isRecord(layout) ? layout : {};
+  const placementRecord = isRecord(placement) ? placement : {};
+  const fillRecord = isRecord(fill) ? fill : {};
+
+  const props: VisualTextNodeProps = {
+    ...(rest as unknown as VisualTextNodeProps),
+    ...(Object.keys(layoutRecord).length
+      ? { layout: layoutRecord as unknown as VisualTextNodeProps['layout'] }
+      : {}),
+    ...(Object.keys(placementRecord).length
+      ? { placement: placementRecord as unknown as VisualTextNodeProps['placement'] }
+      : {}),
+    ...(Object.keys(fillRecord).length
+      ? { fill: fillRecord as unknown as VisualTextNodeProps['fill'] }
+      : {}),
+    ...(typeof maxWidth === 'number' ? { maxWidth } : {}),
+    ...(typeof maxHeight === 'number' ? { maxHeight } : {}),
+    ...(typeof rotation === 'number' ? { rotation } : {}),
+    ...(typeof opacity === 'number' ? { opacity } : {}),
+  };
+
+  const width =
+    typeof layoutRecord.maxWidth === 'number'
+      ? layoutRecord.maxWidth
+      : typeof maxWidth === 'number'
+        ? maxWidth
+        : undefined;
+  const height =
+    typeof layoutRecord.maxHeight === 'number'
+      ? layoutRecord.maxHeight
+      : typeof maxHeight === 'number'
+        ? maxHeight
+        : undefined;
+  const resolvedRotation =
+    typeof placementRecord.rotation === 'number'
+      ? placementRecord.rotation
+      : typeof rotation === 'number'
+        ? rotation
+        : 0;
+  const resolvedOpacity =
+    typeof fillRecord.opacity === 'number'
+      ? fillRecord.opacity
+      : typeof opacity === 'number'
+        ? opacity
+        : 1;
+
+  const id =
+    matched?.kind === 'text'
+      ? matched.id
+      : createVisualId('text');
+  const oldNode = project.document.nodes[id];
+
+  return {
+    id,
+    kind: 'text',
+    name: oldNode?.name ?? 'Text ' + String(index + 1),
+    parentId: oldNode?.parentId ?? null,
+    childIds: oldNode?.childIds,
+    transform: {
+      ...(oldNode?.transform ?? {}),
+      x,
+      y,
+      ...(width !== undefined ? { width } : {}),
+      ...(height !== undefined ? { height } : {}),
+      rotation: resolvedRotation,
+      opacity: resolvedOpacity,
+      visible: oldNode?.transform?.visible ?? true,
+      locked: oldNode?.transform?.locked ?? false,
+      zIndex: oldNode?.transform?.zIndex ?? index,
+    },
+    props: textPropsRecord(props),
+  } satisfies VisualProject['document']['nodes'][string];
+}
+
+function reconcileRenderableCalls(
   project: VisualProject,
   source: string,
   canvasIdentifier: string | null,
 ) {
-  const calls = extractMethodCalls(source, 'createImage');
-  const existing = orderedImageNodes(project);
+  const calls = [
+    ...extractMethodCalls(source, 'createImage').map((call) => ({
+      ...call,
+      method: 'createImage' as const,
+    })),
+    ...extractMethodCalls(source, 'createText').map((call) => ({
+      ...call,
+      method: 'createText' as const,
+    })),
+  ].sort((a, b) => a.index - b.index);
+
+  const existing = orderedRenderableNodes(project);
   const identifierToNodeId = new Map<string, string>();
   const touched = new Set<string>();
 
   calls.forEach((call, index) => {
-    if (!call.args[0]) {
-      throw new Error('createImage() requires image properties.');
-    }
-    const parsed = new LiteralParser(call.args[0], true).parse();
-    if (!isRecord(parsed)) {
-      throw new Error('createImage() properties must be an object literal.');
-    }
-    if (parsed.source === undefined) {
-      throw new Error('createImage() properties require source.');
-    }
-
-    const sourceValue = imageSourceFromParsed(
-      parsed.source,
-      identifierToNodeId,
-      canvasIdentifier,
-    );
-    const shape =
-      typeof sourceValue === 'string' &&
-      IMAGE_SHAPE_TYPES.includes(sourceValue as never);
-    const kind = shape ? 'shape' : 'image';
-
     const matched = existing[index];
-    const id =
-      matched && matched.kind === kind
-        ? matched.id
-        : createVisualId(kind);
-    const oldNode = project.document.nodes[id];
+    const node =
+      call.method === 'createImage'
+        ? reconcileImageCall(
+            project,
+            call,
+            index,
+            matched,
+            identifierToNodeId,
+            canvasIdentifier,
+          )
+        : reconcileTextCall(
+            project,
+            call,
+            index,
+            matched,
+            identifierToNodeId,
+            canvasIdentifier,
+          );
 
-    const {
-      source: _source,
-      x,
-      y,
-      width,
-      height,
-      rotation,
-      opacity,
-      ...rest
-    } = parsed;
-
-    const props: VisualImageNodeProps = {
-      ...(rest as unknown as Omit<
-        VisualImageNodeProps,
-        'source' | 'createOptions'
-      >),
-      source: sourceValue,
-    };
-
-    if (call.args[2]) {
-      const options = new LiteralParser(call.args[2]).parse();
-      if (!isRecord(options)) {
-        throw new Error('createImage() options must be an object literal.');
-      }
-      props.createOptions =
-        options as unknown as VisualCreateImageOptions;
-    }
-
-    const node = {
-      id,
-      kind,
-      name:
-        oldNode?.name ??
-        (shape
-          ? 'Shape ' + String(index + 1)
-          : 'Image ' + String(index + 1)),
-      parentId: oldNode?.parentId ?? null,
-      childIds: oldNode?.childIds,
-      transform: {
-        ...(oldNode?.transform ?? {}),
-        x: asOptionalNumber(x) ?? 0,
-        y: asOptionalNumber(y) ?? 0,
-        ...(typeof width === 'number' ? { width } : {}),
-        ...(typeof height === 'number' ? { height } : {}),
-        rotation: asOptionalNumber(rotation) ?? 0,
-        opacity: asOptionalNumber(opacity) ?? 1,
-        visible: oldNode?.transform?.visible ?? true,
-        locked: oldNode?.transform?.locked ?? false,
-        zIndex: oldNode?.transform?.zIndex ?? index,
-      },
-      props: imagePropsRecord(props),
-    } satisfies VisualProject['document']['nodes'][string];
-
-    if (!oldNode) {
-      project.document.rootNodeIds.push(id);
-    }
-    project.document.nodes[id] = node;
-    touched.add(id);
+    const oldNode = project.document.nodes[node.id];
+    if (!oldNode) project.document.rootNodeIds.push(node.id);
+    project.document.nodes[node.id] = node;
+    touched.add(node.id);
     if (call.assignedIdentifier) {
-      identifierToNodeId.set(call.assignedIdentifier, id);
+      identifierToNodeId.set(call.assignedIdentifier, node.id);
     }
   });
 
@@ -641,7 +823,7 @@ export function reconcileVisualProjectFromCode(
     next.document.canvas =
       Object.keys(canvas).length ? canvas : undefined;
 
-    reconcileImageCalls(next, source, canvasCall.identifier);
+    reconcileRenderableCalls(next, source, canvasCall.identifier);
     next.updatedAt = new Date().toISOString();
 
     const validation = validateVisualProject(next);
