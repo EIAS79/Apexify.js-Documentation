@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-4 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2681,7 +2681,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 0 | Contract / capability baseline | PRODUCTION VERIFIED | `97d7741c8f35b06dd33bed5ba2ac9b247b344465` | Vercel deployment + `/`, `/studio`, `/docs/getting-started`, `/api-reference` smoke |
 | 1 | Dual-mode shell | PRODUCTION VERIFIED | `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7` | Vercel production deployment completed on main (`4d28777edbf140c9afe65e4e874a4b9b38ca5803`); live `/studio` Code → Visual → Code smoke passed with shared Assets/Output/Diagnostics/History and source-session preservation |
 | 2 | Project model / codegen core | MAIN MERGED | `186b87bcabba5316639c5a103c0b12125822a35a` | Manual deployment intentionally not triggered; current project instruction is merge-to-main only |
-| 3 | Viewport / layers / transforms / history | NOT STARTED | — | — |
+| 3 | Viewport / layers / transforms / history | PRODUCTION VERIFIED | `372d449e8e37c998faf56eef0f0db8704f648e9d` | Vercel production deployment `dpl_6TEqXQJ9NbH2MYT2fpC1mmgRgNbn` READY for exact merge SHA; live `/studio` Visual-mode smoke passed with Layers, Transform Inspector, History, zoom/fit/reset, Select/Pan, Project menu and viewport visible |
 | 4 | Canvas | NOT STARTED | — | — |
 | 5 | Images / shapes / assets | NOT STARTED | — | — |
 | 6 | Text / fonts | NOT STARTED | — | — |
@@ -2779,6 +2779,54 @@ Phase-2 proof evidence:
 - PR #78 squash-merged into `main` as `186b87bcabba5316639c5a103c0b12125822a35a`.
 
 The broader DOC-* failures observed on PR #78 are baseline documentation-workflow failures rather than Phase-2 regressions: the same workflow families were already failing repeatedly on `main` before the Phase-2 branch, including the Phase-2 base/current-main history. The dedicated Studio Visual Phase Gate and Documentation Runtime Build Gate both passed for the Phase-2 head.
+
+## Phase 3 implementation record — STUDIO-VISUAL-3
+
+> **Status:** PRODUCTION VERIFIED
+>
+> **Work branch:** `studio-visual/v03-editor`
+>
+> **Base main commit:** `ed09d0b74053d50388d641a574bf5e52e159ff9c`
+>
+> **Green phase-gate run:** GitHub Actions `35623534882`
+>
+> **PR:** #79
+>
+> **Main integration:** `372d449e8e37c998faf56eef0f0db8704f648e9d`
+>
+> **Production deployment:** Vercel `dpl_6TEqXQJ9NbH2MYT2fpC1mmgRgNbn` — READY, target `production`, exact merge SHA `372d449e8e37c998faf56eef0f0db8704f648e9d`.
+>
+> **Production smoke:** PASS — live `/studio` switched Code → Visual and rendered the Phase-3 Visual Workspace with Layers, Transform Inspector, History, zoom/reset/fit controls, Select/Pan tools, Project menu and viewport.
+
+Completed Phase-3 scope:
+
+- viewport zoom in/out, 100%, reset and fit-to-viewport;
+- mouse pan, wheel/trackpad pan, modifier-wheel zoom and two-touch pinch zoom;
+- click, shift-additive, marquee, keyboard traversal and Alt overlap-cycle selection;
+- drag, eight-handle resize, aspect-ratio modifier and rotation with 15° modifier snapping;
+- numeric transform inspector with grouped history commits;
+- snapping to canvas, object and grid candidates with ephemeral editor-only guides;
+- semantic nested layer tree with collapse/expand;
+- visibility and editor-only lock state;
+- inline/inspector rename;
+- sibling drag reorder plus forward/backward/front/back stacking operations;
+- duplicate/delete;
+- internal copy/cut/paste clipboard;
+- semantic group/ungroup with hierarchy preservation;
+- multi-select align/distribute;
+- bounded undo/redo command history with one command per drag/resize/rotate/property edit;
+- dirty/clean save-state detection;
+- keyboard shortcuts for undo/redo, clipboard, duplicate, delete, group/ungroup, nudge and selection traversal;
+- validation of persisted transforms and editor selection references;
+- generic placeholder proof with no runtime-specific Phase-3 editor infrastructure leakage.
+
+Phase-3 proof evidence:
+
+- dedicated Studio Visual Phase Gate `35623534882`: PASS;
+- PR #79 merged to `main` as `372d449e8e37c998faf56eef0f0db8704f648e9d`;
+- exact merge SHA deployed to Vercel production and reported READY;
+- live Visual Workspace smoke: PASS.
+
 
 Allowed phase statuses:
 
