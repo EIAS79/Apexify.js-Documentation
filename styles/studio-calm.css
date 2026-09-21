@@ -2006,3 +2006,158 @@
     display:none;
   }
 }
+
+
+/* ==========================================================================
+   Code Studio top bar organization
+   Three deliberate zones: workspace / execution / utilities.
+   Keeps desktop controls on one row and collapses labels before wrapping.
+   ========================================================================== */
+
+.studio-code-topbar{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:center;
+  gap:.7rem;
+}
+
+.studio-code-topbar__workspace,
+.studio-code-topbar__workspace-pills,
+.studio-code-topbar__resources,
+.studio-code-topbar__utility-cluster,
+.studio-code-topbar__utilities{
+  display:flex;
+  align-items:center;
+}
+
+.studio-code-topbar__workspace{
+  min-width:0;
+  gap:.65rem;
+  justify-self:start;
+}
+
+.studio-code-topbar__workspace-pills{
+  min-width:0;
+  gap:.45rem;
+}
+
+.studio-code-topbar__execution{
+  justify-self:center;
+  flex-wrap:nowrap;
+  white-space:nowrap;
+}
+
+.studio-code-topbar__utilities{
+  min-width:0;
+  gap:.55rem;
+  justify-self:end;
+  flex-wrap:nowrap;
+}
+
+.studio-code-topbar__resources{
+  gap:.45rem;
+  flex-wrap:nowrap;
+}
+
+.studio-code-topbar__utility-cluster{
+  gap:.45rem;
+  flex-wrap:nowrap;
+}
+
+.studio-code-topbar__quick-actions{
+  flex-wrap:nowrap;
+}
+
+@media(max-width:1640px){
+  .studio-code-topbar{
+    gap:.5rem;
+  }
+
+  .studio-code-topbar__workspace{
+    gap:.45rem;
+  }
+
+  .studio-code-brand-copy{
+    display:none!important;
+  }
+
+  .studio-code-topbar__utilities{
+    gap:.4rem;
+  }
+}
+
+@media(max-width:1480px){
+  .studio-code-topbar{
+    grid-template-columns:minmax(0,auto) auto minmax(0,1fr);
+  }
+
+  .studio-code-topbar .studio-code-toolbar-label{
+    display:none!important;
+  }
+
+  .studio-code-topbar .studio-mode-switch button span{
+    display:none;
+  }
+
+  .studio-code-topbar__workspace-pills{
+    gap:.3rem;
+  }
+
+  .studio-code-topbar__resources{
+    gap:.3rem;
+  }
+}
+
+@media(max-width:1180px){
+  .studio-code-topbar{
+    grid-template-columns:1fr auto;
+    grid-template-areas:
+      "workspace utilities"
+      "execution execution";
+    gap:.45rem .6rem;
+  }
+
+  .studio-code-topbar__workspace{
+    grid-area:workspace;
+  }
+
+  .studio-code-topbar__execution{
+    grid-area:execution;
+    justify-self:center;
+  }
+
+  .studio-code-topbar__utilities{
+    grid-area:utilities;
+  }
+}
+
+@media(max-width:760px){
+  .studio-code-topbar{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-areas:
+      "workspace"
+      "execution"
+      "utilities";
+  }
+
+  .studio-code-topbar__workspace,
+  .studio-code-topbar__execution,
+  .studio-code-topbar__utilities{
+    width:100%;
+    justify-self:stretch;
+  }
+
+  .studio-code-topbar__workspace{
+    overflow-x:auto;
+    padding-bottom:.1rem;
+  }
+
+  .studio-code-topbar__execution{
+    overflow-x:auto;
+  }
+
+  .studio-code-topbar__utilities{
+    justify-content:space-between;
+    overflow-x:auto;
+  }
+}
