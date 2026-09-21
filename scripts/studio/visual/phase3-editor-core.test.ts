@@ -103,6 +103,41 @@ test('alignment and distribution operate on generic transforms', () => {
   assert.equal(gap1, gap2);
 });
 
+test('transform normalization is canonical and validation rejects malformed geometry', async () => {
+  const project = makeProject();
+  project.document.nodes.layer_a.transform = {
+    locked: false,
+    y: 10,
+    x: 20,
+    width: 120,
+    height: 80,
+    opacity: 1,
+    rotation: 0,
+  };
+  const { normalizeVisualProject } = await import('../../../lib/studio/visual/compiler/normalize');
+  const { validateVisualProject } = await import('../../../lib/studio/visual/compiler/validate');
+  const normalized = normalizeVisualProject(project);
+  assert.deepEqual(Object.keys(normalized.document.nodes.layer_a.transform ?? {}), [
+    'x',
+    'y',
+    'width',
+    'height',
+    'rotation',
+    'opacity',
+    'locked',
+  ]);
+
+  normalized.document.nodes.layer_a.transform = {
+    ...normalized.document.nodes.layer_a.transform,
+    width: 0,
+    opacity: 2,
+  };
+  const result = validateVisualProject(normalized);
+  assert.equal(result.ok, false);
+  assert.ok(result.issues.some((issue) => issue.code === 'invalid-transform-size'));
+  assert.ok(result.issues.some((issue) => issue.code === 'invalid-transform-opacity'));
+});
+
 test('snapping supports grid, document, sibling and rotation guides', () => {
   const project = makeProject();
   const snapped = snapNodeTransform(project, 'layer_a', {
