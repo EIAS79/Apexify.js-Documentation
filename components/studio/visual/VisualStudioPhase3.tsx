@@ -7,6 +7,8 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
   type TouchEvent as ReactTouchEvent,
+  type WheelEvent as ReactWheelEvent,
+  type ReactNode,
 } from 'react';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import {
@@ -743,7 +745,7 @@ export default function VisualStudioPhase3({
     onModeChange('code');
   };
 
-  const onWheel = (event: React.WheelEvent<HTMLDivElement>) => {
+  const onWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
     event.preventDefault();
     if (event.ctrlKey || event.metaKey) {
       setZoom((value) =>
@@ -785,7 +787,7 @@ export default function VisualStudioPhase3({
     mutate('Rename', (current) => renameNode(current, id, value));
   };
 
-  const renderLayerRows = (ids: string[], depth = 0): React.ReactNode =>
+  const renderLayerRows = (ids: string[], depth = 0): ReactNode =>
     ids.map((id, index) => {
       const node = project.document.nodes[id];
       if (!node) return null;
