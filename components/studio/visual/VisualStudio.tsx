@@ -37,6 +37,7 @@ import {
   isStudioFontAsset,
   studioAssetDataUrl,
   totalStudioAssetBytes,
+  type StudioVirtualAsset,
 } from '@/lib/studio/runtime/assets';
 
 type Props = { active: boolean; mode: StudioMode; onModeChange: (mode: StudioMode) => void };
@@ -166,7 +167,7 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
     }
 
     try {
-      const created = [];
+      const created: StudioVirtualAsset[] = [];
       let total = totalStudioAssetBytes(assets);
       for (const file of incoming) {
         const asset = await fileToStudioAsset(file);
