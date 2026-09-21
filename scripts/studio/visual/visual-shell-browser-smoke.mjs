@@ -78,6 +78,34 @@ async function verify(width, height) {
     });
     await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
 
+    // Phase 6: Text is a real authoring surface. Insert a text layer, prove
+    // canonical createText() live code, then edit its content directly on the
+    // artboard and verify the linked source changes automatically.
+    await page.click('[data-feature-tool="text"]');
+    await page.waitForSelector('[data-visual-text-context]', { visible: true });
+    await page.click('[data-text-insert]');
+    const selectedTextSelector = '[data-visual-node][data-kind="text"][data-selected="true"]';
+    await page.waitForSelector(selectedTextSelector, { visible: true });
+    await page.waitForFunction(() => {
+      const content = document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('createText') && content.includes('text: "Text"');
+    });
+    await page.click(selectedTextSelector, { clickCount: 2 });
+    await page.waitForSelector('[data-inline-text-editor]', { visible: true });
+    await page.click('[data-inline-text-editor]');
+    await page.keyboard.down('Control');
+    await page.keyboard.press('A');
+    await page.keyboard.up('Control');
+    await page.keyboard.type('Edited in Visual');
+    await page.keyboard.down('Control');
+    await page.keyboard.press('Enter');
+    await page.keyboard.up('Control');
+    await page.waitForFunction(() => {
+      const content = document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('createText') && content.includes('text: "Edited in Visual"');
+    });
+    await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
+
     await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });
   }
 
