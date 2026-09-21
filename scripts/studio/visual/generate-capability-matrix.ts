@@ -55,7 +55,7 @@ function domainFor(capability: string): string | null {
   if (capability.startsWith('ApexPainter.assets.')) return 'assets';
   if (capability.startsWith('ApexPainter.components.')) return 'components';
   if (capability.startsWith('ApexPainter.createAudio.')) return 'audio';
-  if (/^ApexPainter\\.create(?:Combo|Comparison)?Chart$/.test(capability)) return 'chart';
+  if (/^ApexPainter\.create(?:Combo|Comparison)?Chart$/.test(capability)) return 'chart';
   if (capability === 'ApexPainter.createCanvas') return 'canvas';
   if (capability === 'ApexPainter.createGIF' || capability === 'ApexPainter.renderSceneToGIF') return 'gif';
   if (capability === 'ApexPainter.createImage') return 'image';
@@ -123,7 +123,7 @@ function classificationFor(
     capability === 'ApexPainter.createCanvas' ||
     capability === 'ApexPainter.createImage' ||
     capability === 'ApexPainter.createText' ||
-    /^ApexPainter\\.create(?:Combo|Comparison)?Chart$/.test(capability) ||
+    /^ApexPainter\.create(?:Combo|Comparison)?Chart$/.test(capability) ||
     capability === 'ApexPainter.createScene' ||
     capability === 'ApexPainter.createTemplate' ||
     capability.startsWith('ApexPainter.components.')
@@ -269,7 +269,7 @@ const classifiedOptions = optionInventory.options.map((option) => {
   const separator = option.id.lastIndexOf('::');
   const memberId = separator >= 0 ? option.id.slice(0, separator) : '';
   const capability = memberId
-    .replace(/^apexify\\.js::/, '')
+    .replace(/^apexify\.js::/, '')
     .replace('#', '.');
   const parent = rowByCapability.get(capability);
 
