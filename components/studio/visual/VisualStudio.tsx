@@ -11,13 +11,17 @@ import {
   ChartBarIcon,
   ClockIcon,
   CodeBracketIcon,
+  DocumentDuplicateIcon,
   CubeIcon,
   CursorArrowRaysIcon,
   DocumentTextIcon,
   EyeIcon,
+  EyeSlashIcon,
   FolderIcon,
   FolderOpenIcon,
   HandRaisedIcon,
+  LockClosedIcon,
+  LockOpenIcon,
   MagnifyingGlassIcon,
   MusicalNoteIcon,
   PhotoIcon,
@@ -26,9 +30,12 @@ import {
   RectangleGroupIcon,
   RectangleStackIcon,
   Squares2X2Icon,
+  TrashIcon,
   VideoCameraIcon,
+  ArrowUturnLeftIcon,
+  ArrowUturnRightIcon,
 } from '@heroicons/react/24/outline';
-import { useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react';
+import { useEffect, useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioModeSwitch, type StudioMode } from '@/components/studio/StudioModeSwitch';
 import { createVisualId } from '@/lib/studio/visual/ids';
@@ -38,6 +45,27 @@ import {
   downloadVisualProject,
   loadVisualProjectFile,
 } from '@/lib/studio/visual/persistence';
+import { useVisualEditor } from '@/components/studio/visual/useVisualEditor';
+import {
+  addEditorPlaceholder,
+  alignSelectedNodes,
+  deleteSelectedNodes,
+  distributeSelectedNodes,
+  duplicateSelectedNodes,
+  moveSelectedNodes,
+  reorderRootNode,
+  selectedNodeIds,
+  setVisualSelection,
+  updateNodeTransform,
+  updateSelectedTransforms,
+} from '@/lib/studio/visual/editor/mutations';
+import {
+  resolvedTransform,
+  snapNodeTransform,
+  snapRotation,
+  type SnapGuide,
+} from '@/lib/studio/visual/editor/geometry';
+import type { VisualProject, VisualTransform } from '@/lib/studio/visual/model';
 import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
@@ -117,6 +145,62 @@ function ActionButton({
   );
 }
 
+function NumericField({
+  label,
+  value,
+  onCommit,
+  step = 1,
+  min,
+  max,
+}: {
+  label: string;
+  value: number;
+  onCommit: (value: number) => void;
+  step?: number;
+  min?: number;
+  max?: number;
+}) {
+  const [draft, setDraft] = useState(String(Math.round(value * 1000) / 1000));
+
+  useEffect(() => {
+    setDraft(String(Math.round(value * 1000) / 1000));
+  }, [value]);
+
+  const commit = () => {
+    const parsed = Number(draft);
+    if (!Number.isFinite(parsed)) {
+      setDraft(String(value));
+      return;
+    }
+    const next = Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, parsed));
+    onCommit(next);
+    setDraft(String(next));
+  };
+
+  return (
+    <div className="apx-vw-number-field">
+      <label>{label}</label>
+      <input
+        type="number"
+        value={draft}
+        step={step}
+        min={min}
+        max={max}
+        onChange={(event) => setDraft(event.target.value)}
+        onBlur={commit}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.currentTarget.blur();
+          } else if (event.key === 'Escape') {
+            setDraft(String(value));
+            event.currentTarget.blur();
+          }
+        }}
+      />
+    </div>
+  );
+}
+
 export default function VisualStudio({ active, mode, onModeChange }: Props) {
   const {
     assets,
@@ -131,10 +215,11 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
     setCodeHandoff,
   } = useStudioSharedSession();
 
-  const [project, setProject] = useState(() => createVisualProject());
+  const editor = useVisualEditor(createVisualProject());
+  const { project, projectRef } = editor;
   const [projectError, setProjectError] = useState<string | null>(null);
   const [tool, setTool] = useState<ToolId>('canvas');
-  const [inspectorTab, setInspectorTab] = useState<InspectorTab>('Style');
+  const [inspectorTab, setInspectorTab] = useState<InspectorTab>('Transform');
   const [dockTab, setDockTab] = useState<DockTab>('Generated Code');
   const [zoom, setZoom] = useState(78);
   const [viewportMode, setViewportMode] = useState<'select' | 'pan'>('select');
@@ -145,7 +230,14 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
   const [assetQuery, setAssetQuery] = useState('');
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [pan, setPan] = useState({ x: 0, y: 0 });
-  const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
+  const [snapping, setSnapping] = useState(true);
+  const [snapGuides, setSnapGuides] = useState<SnapGuide[]>([]);
+  const panDragRef = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
+  const nodeDragRef = useRef<{ nodeId: string; startX: number; startY: number; before: VisualProject } | null>(null);
+  const resizeRef = useRef<{ nodeId: string; handle: 'nw' | 'ne' | 'se' | 'sw'; startX: number; startY: number; before: VisualProject } | null>(null);
+  const rotateRef = useRef<{ nodeId: string; centerX: number; centerY: number; offset: number; before: VisualProject } | null>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const artboardRef = useRef<HTMLDivElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
   const projectFileRef = useRef<HTMLInputElement>(null);
 
@@ -164,6 +256,13 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
     previewArtifacts.find((artifact) => artifact.id === activeArtifactId) ??
     previewArtifacts[0] ??
     null;
+
+  const selection = selectedNodeIds(project);
+  const selectedNodes = selection
+    .map((id) => project.document.nodes[id])
+    .filter(Boolean);
+  const primaryNode = selectedNodes.length === 1 ? selectedNodes[0] : null;
+  const primaryTransform = primaryNode ? resolvedTransform(primaryNode.transform) : null;
 
   const filteredAssets = useMemo(() => {
     const query = assetQuery.trim().toLowerCase();
