@@ -1,0 +1,54 @@
+name: Studio Visual Phase Gate
+
+on:
+  push:
+    branches:
+      - 'studio-visual/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'APEXIFY_STUDIO_VISUAL_AUTHORING_MASTER_PLAN.md'
+      - 'STUDIO_VISUAL_CONTRACT.md'
+      - 'STUDIO_VISUAL_DECISIONS.md'
+      - 'schemas/studio/**'
+      - 'lib/studio/visual/**'
+      - 'scripts/studio/visual/**'
+      - 'generated/studio/visual-capability-matrix.json'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vercel.json'
+      - '.github/workflows/studio-visual-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: studio-visual-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  phase-gate:
+    name: Phase 0 contract and capability gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify Visual Studio contracts
+        run: npm run studio:visual:verify
+
+      - name: Typecheck
+        run: npm run typecheck
