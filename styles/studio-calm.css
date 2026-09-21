@@ -2823,3 +2823,10 @@
     display:none;
   }
 }
+
+
+.apx-vw-number-field input:disabled{
+  cursor:not-allowed;
+  opacity:.48;
+  background:#08121e;
+}
