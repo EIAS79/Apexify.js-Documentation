@@ -2623,6 +2623,7 @@ export default function VisualStudioPre4({
 
   const dockTabs = [
     ['generated', 'Code'],
+    ['results', 'Results'],
     ['diagnostics', 'Diagnostics'],
     ['assets', 'Assets'],
     ['history', 'History'],
@@ -4416,7 +4417,426 @@ export default function VisualStudioPre4({
     return renderTextAdvanced();
   };
 
+
+  const renderPathInspector = () => {
+    if (!primaryPath) return null;
+    const props = visualPathProps(primaryPath);
+    const connector = props.connector
+      ? Array.isArray(props.connector)
+        ? props.connector[0]
+        : props.connector
+      : undefined;
+
+    const patchConnector = (
+      label: string,
+      updater: (value: NonNullable<typeof connector>) => NonNullable<typeof connector>,
+    ) => {
+      if (!connector) return;
+      mutatePath(label, (current) => {
+        const currentValue = Array.isArray(current.connector)
+          ? current.connector[0]
+          : current.connector;
+        if (!currentValue) return current;
+        const updated = updater(currentValue);
+        return {
+          ...current,
+          connector: Array.isArray(current.connector)
+            ? [updated, ...current.connector.slice(1)]
+            : updated,
+        };
+      });
+    };
+
+    if (inspectorTab === 'transform') return renderTransformFields();
+
+    if (inspectorTab === 'style') {
+      return (
+        <>
+          <div className="apx-pre4-inspector-title">
+            <div>
+              <strong>{primaryPath.name ?? 'Path'}</strong>
+              <small>{props.tool} · Apexify Path2D</small>
+            </div>
+            <span className="apx-pre4-type-pill">{primaryPath.kind}</span>
+          </div>
+
+          {props.tool === 'connector' && connector ? (
+            <>
+              <div className="apx-pre4-section" data-connector-style>
+                <div className="apx-pre4-section-title">Connector stroke</div>
+                <label className="apx-pre4-field">
+                  <span>Color</span>
+                  <input
+                    type="color"
+                    value={connector.lineStyle?.color ?? '#7dd3fc'}
+                    onChange={(event) =>
+                      patchConnector('Connector color', (value) => ({
+                        ...value,
+                        lineStyle: {
+                          ...(value.lineStyle ?? {}),
+                          color: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Width</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={connector.lineStyle?.width ?? 4}
+                    onChange={(event) =>
+                      patchConnector('Connector width', (value) => ({
+                        ...value,
+                        lineStyle: {
+                          ...(value.lineStyle ?? {}),
+                          width: Math.max(0, Number(event.target.value) || 0),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Dash</span>
+                  <select
+                    value={
+                      connector.lineStyle?.lineDash?.dashArray?.length
+                        ? connector.lineStyle.lineDash.dashArray.join(',') === '2,5'
+                          ? 'dotted'
+                          : 'dashed'
+                        : 'solid'
+                    }
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      patchConnector('Connector dash', (current) => ({
+                        ...current,
+                        lineStyle: {
+                          ...(current.lineStyle ?? {}),
+                          lineDash: {
+                            dashArray:
+                              value === 'dashed'
+                                ? [10, 6]
+                                : value === 'dotted'
+                                  ? [2, 5]
+                                  : [],
+                            offset: current.lineStyle?.lineDash?.offset ?? 0,
+                          },
+                        },
+                      }));
+                    }}
+                  >
+                    <option value="solid">Solid</option>
+                    <option value="dashed">Dashed</option>
+                    <option value="dotted">Dotted</option>
+                  </select>
+                </label>
+              </div>
+              <div className="apx-pre4-section" data-connector-arrows>
+                <div className="apx-pre4-section-title">Arrows & marker</div>
+                <label className="apx-pre4-check">
+                  <input
+                    type="checkbox"
+                    checked={connector.arrow?.start ?? false}
+                    onChange={(event) =>
+                      patchConnector('Start arrow', (value) => ({
+                        ...value,
+                        arrow: { ...(value.arrow ?? {}), start: event.target.checked },
+                      }))
+                    }
+                  />
+                  <span>Start arrow</span>
+                </label>
+                <label className="apx-pre4-check">
+                  <input
+                    type="checkbox"
+                    checked={connector.arrow?.end ?? false}
+                    onChange={(event) =>
+                      patchConnector('End arrow', (value) => ({
+                        ...value,
+                        arrow: { ...(value.arrow ?? {}), end: event.target.checked },
+                      }))
+                    }
+                  />
+                  <span>End arrow</span>
+                </label>
+                <label className="apx-pre4-check">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(connector.markers?.length)}
+                    onChange={(event) =>
+                      patchConnector('Connector marker', (value) => ({
+                        ...value,
+                        markers: event.target.checked
+                          ? [{ position: 0.5, shape: 'diamond', size: 8, color: '#f8fafc' }]
+                          : [],
+                      }))
+                    }
+                  />
+                  <span>Midpoint marker</span>
+                </label>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="apx-pre4-section" data-path-stroke>
+                <div className="apx-pre4-section-title">Stroke</div>
+                <label className="apx-pre4-field">
+                  <span>Color</span>
+                  <input
+                    type="color"
+                    value={props.draw?.stroke?.color ?? '#7dd3fc'}
+                    onChange={(event) =>
+                      mutatePath('Path stroke color', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          stroke: {
+                            ...(current.draw?.stroke ?? {}),
+                            color: event.target.value,
+                          },
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Width</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={props.draw?.stroke?.width ?? 4}
+                    onChange={(event) =>
+                      mutatePath('Path stroke width', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          stroke: {
+                            ...(current.draw?.stroke ?? {}),
+                            width: Math.max(0, Number(event.target.value) || 0),
+                          },
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Dash</span>
+                  <select
+                    value={props.draw?.stroke?.style ?? 'solid'}
+                    onChange={(event) =>
+                      mutatePath('Path dash style', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          stroke: {
+                            ...(current.draw?.stroke ?? {}),
+                            style: event.target.value as 'solid' | 'dashed' | 'dotted',
+                            dashArray: undefined,
+                          },
+                        },
+                      }))
+                    }
+                  >
+                    <option value="solid">Solid</option>
+                    <option value="dashed">Dashed</option>
+                    <option value="dotted">Dotted</option>
+                  </select>
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Line cap</span>
+                  <select
+                    value={props.draw?.stroke?.lineCap ?? 'round'}
+                    onChange={(event) =>
+                      mutatePath('Path line cap', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          stroke: {
+                            ...(current.draw?.stroke ?? {}),
+                            lineCap: event.target.value as 'butt' | 'round' | 'square',
+                          },
+                        },
+                      }))
+                    }
+                  >
+                    <option value="butt">Butt</option>
+                    <option value="round">Round</option>
+                    <option value="square">Square</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="apx-pre4-section" data-path-fill>
+                <div className="apx-pre4-section-title">Fill</div>
+                <label className="apx-pre4-field">
+                  <span>Color</span>
+                  <input
+                    type="color"
+                    value={props.draw?.fill?.color ?? '#2563eb'}
+                    onChange={(event) =>
+                      mutatePath('Path fill color', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          fill: {
+                            ...(current.draw?.fill ?? { opacity: 0.18, rule: 'nonzero' }),
+                            color: event.target.value,
+                          },
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Fill rule</span>
+                  <select
+                    value={props.draw?.fill?.rule ?? 'nonzero'}
+                    onChange={(event) =>
+                      mutatePath('Path fill rule', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          fill: {
+                            ...(current.draw?.fill ?? { color: '#2563eb', opacity: 0.18 }),
+                            rule: event.target.value as 'nonzero' | 'evenodd',
+                          },
+                        },
+                      }))
+                    }
+                    data-path-fill-rule
+                  >
+                    <option value="nonzero">Nonzero</option>
+                    <option value="evenodd">Even-odd</option>
+                  </select>
+                </label>
+              </div>
+            </>
+          )}
+        </>
+      );
+    }
+
+    if (inspectorTab === 'effects') {
+      if (props.tool === 'connector') {
+        return (
+          <div className="apx-pre4-empty">
+            <strong>Connector effects</strong>
+            <span>Arrow, marker and dash styling are available in Style. Advanced connector semantics remain editable in Data.</span>
+          </div>
+        );
+      }
+      return (
+        <div className="apx-pre4-section" data-path-effects>
+          <div className="apx-pre4-section-title">Shadow</div>
+          <label className="apx-pre4-field">
+            <span>Color</span>
+            <input
+              type="text"
+              value={props.draw?.shadow?.color ?? 'rgba(0,0,0,.45)'}
+              onChange={(event) =>
+                mutatePath('Path shadow color', (current) => ({
+                  ...current,
+                  draw: {
+                    ...(current.draw ?? {}),
+                    shadow: {
+                      ...(current.draw?.shadow ?? {}),
+                      color: event.target.value,
+                    },
+                  },
+                }))
+              }
+            />
+          </label>
+          <label className="apx-pre4-field">
+            <span>Blur</span>
+            <input
+              type="number"
+              min="0"
+              value={props.draw?.shadow?.blur ?? 0}
+              onChange={(event) =>
+                mutatePath('Path shadow blur', (current) => ({
+                  ...current,
+                  draw: {
+                    ...(current.draw ?? {}),
+                    shadow: {
+                      ...(current.draw?.shadow ?? {}),
+                      blur: Math.max(0, Number(event.target.value) || 0),
+                    },
+                  },
+                }))
+              }
+            />
+          </label>
+        </div>
+      );
+    }
+
+    return (
+      <div className="apx-pre4-section" data-path-data>
+        <div className="apx-pre4-section-title">
+          {inspectorTab === 'data' ? 'Path data' : 'Complete Path2D configuration'}
+        </div>
+        <textarea
+          className="apx-canvas-json apx-canvas-json--config"
+          spellCheck={false}
+          value={pathConfigDraft}
+          onChange={(event) => {
+            setPathConfigDraft(event.target.value);
+            setPathConfigError(null);
+          }}
+          data-path-config
+        />
+        {pathConfigError ? <div className="apx-live-code-error">{pathConfigError}</div> : null}
+        <button
+          className="apx-canvas-apply"
+          type="button"
+          data-path-config-apply
+          onClick={() => {
+            try {
+              const parsed = JSON.parse(pathConfigDraft);
+              if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                throw new Error('Path configuration must be an object.');
+              }
+              const nextProject = structuredClone(project);
+              nextProject.document.nodes[primaryPath.id].props =
+                pathPropsRecord(parsed as VisualPathNodeProps);
+              nextProject.updatedAt = new Date().toISOString();
+              const validation = validateVisualProject(nextProject);
+              if (!validation.ok) {
+                throw new Error(validation.issues[0]?.message ?? 'Invalid path configuration.');
+              }
+              history.current.commit(project, nextProject, 'Advanced path config');
+              projectRef.current = nextProject;
+              setProject(nextProject);
+              setHistoryTick((value) => value + 1);
+              setPathConfigError(null);
+              setMessage('Path configuration applied');
+            } catch (configError) {
+              setPathConfigError(
+                configError instanceof Error
+                  ? configError.message
+                  : 'Invalid path configuration JSON.',
+              );
+            }
+          }}
+        >
+          Apply path config
+        </button>
+        <small className="apx-canvas-hint">
+          This is the complete serializable Phase 7 path contract: commands, connector geometry, arrows, markers, dash, fill rule and draw effects.
+        </small>
+      </div>
+    );
+  };
+
   const renderInspector = () => {
+    if (primaryPath) {
+      return renderPathInspector();
+    }
+
     if (primaryText) {
       return renderTextInspector();
     }
@@ -4504,6 +4924,25 @@ export default function VisualStudioPre4({
               ariaLabel="Live Apexify Visual code"
             />
           </div>
+        </div>
+      );
+    }
+
+    if (dockTab === 'results') {
+      const entries = Object.entries(phase7Results);
+      return entries.length ? (
+        <div className="apx-pre4-diagnostics" data-phase7-results>
+          {entries.map(([name, value]) => (
+            <div key={name} data-phase7-result={name}>
+              <strong>{name}</strong>
+              <pre>{JSON.stringify(value, null, 2)}</pre>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="apx-pre4-dock-empty" data-phase7-results-empty>
+          <strong>No structured results yet</strong>
+          <span>Use Pixel color, Pixel data, Path hit, Region hit, Distance or Any region from Paths & pixels.</span>
         </div>
       );
     }
