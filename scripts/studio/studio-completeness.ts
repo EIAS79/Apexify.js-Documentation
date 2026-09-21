@@ -407,7 +407,6 @@ const proofCoverage = {
   totalCapabilities: capabilityProofs.length,
   implementationReady: capabilityProofs.filter((proof) => proof.status === 'implementation-ready').length,
   excludedByContract: capabilityProofs.filter((proof) => proof.status === 'excluded-by-contract').length,
-  introspectionOnly: capabilityProofs.filter((proof) => proof.status === 'introspection-only').length,
   missingProofs,
   proofCaseIds: [...proofCaseIds],
   optionFamilyProofIds: STUDIO_OPTION_FAMILY_PROOFS.map((proof) => proof.id),
@@ -418,6 +417,7 @@ const proofCoverage = {
   missingArtifactContractKinds,
   missingArtifactPreviewKinds,
   finalRuntimeValidation: 'deferred-final-validation' as const,
+  introspectionOnly: capabilityProofs.filter((proof) => proof.status === 'introspection-only').length,
 };
 
 const artifact = {
