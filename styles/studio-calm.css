@@ -5333,3 +5333,27 @@
     height:15px;
   }
 }
+
+
+.apx-live-sync-note{
+  display:grid;
+  gap:.22rem;
+  margin-top:.7rem;
+  padding:.62rem .66rem;
+  border:1px solid #19344d;
+  border-radius:7px;
+  color:#70869f;
+  background:#081725;
+}
+
+.apx-live-sync-note strong{
+  color:#9fb4ca;
+  font-size:.5rem;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+}
+
+.apx-live-sync-note span{
+  font-size:.48rem;
+  line-height:1.5;
+}
