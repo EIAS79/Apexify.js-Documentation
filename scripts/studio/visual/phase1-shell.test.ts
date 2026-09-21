@@ -39,6 +39,13 @@ test('phase 1 Visual Studio remains an empty workspace with shared shell surface
   assert.match(visual, /History/);
   assert.match(visual, /No visual layers yet/);
   assert.match(visual, /authoring controls activate in their owning phase/);
+  assert.match(visual, /fileToStudioAsset/);
+  assert.match(visual, /assetFilter/);
+  assert.match(visual, /setLayersCollapsed/);
+  assert.match(visual, /setInspectorCollapsed/);
+  assert.match(visual, /setDockCollapsed/);
+  assert.match(visual, /setPan/);
+  assert.match(visual, /setActiveArtifactId/);
   assert.doesNotMatch(visual, /createCanvas\(|createImage\(|createText\(|createChart\(/);
 });
 
