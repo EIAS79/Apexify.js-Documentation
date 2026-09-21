@@ -31,6 +31,13 @@ import {
 import { useMemo, useRef, useState, type ComponentType, type SVGProps } from 'react';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioModeSwitch, type StudioMode } from '@/components/studio/StudioModeSwitch';
+import { createVisualId } from '@/lib/studio/visual/ids';
+import { createVisualProject } from '@/lib/studio/visual/project';
+import { generateVisualProjectCode } from '@/lib/studio/visual/codegen/generator';
+import {
+  downloadVisualProject,
+  loadVisualProjectFile,
+} from '@/lib/studio/visual/persistence';
 import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
@@ -121,8 +128,11 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
     previewWarnings,
     elapsedMs,
     history,
+    setCodeHandoff,
   } = useStudioSharedSession();
 
+  const [project, setProject] = useState(() => createVisualProject());
+  const [projectError, setProjectError] = useState<string | null>(null);
   const [tool, setTool] = useState<ToolId>('canvas');
   const [inspectorTab, setInspectorTab] = useState<InspectorTab>('Style');
   const [dockTab, setDockTab] = useState<DockTab>('Generated Code');
@@ -137,6 +147,18 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
+  const projectFileRef = useRef<HTMLInputElement>(null);
+
+  const generated = useMemo(() => {
+    try {
+      return { value: generateVisualProjectCode(project), error: null as string | null };
+    } catch (err) {
+      return {
+        value: null,
+        error: err instanceof Error ? err.message : 'Visual Project code generation failed.',
+      };
+    }
+  }, [project]);
 
   const activeArtifact =
     previewArtifacts.find((artifact) => artifact.id === activeArtifactId) ??
@@ -190,6 +212,55 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
     setPan({ x: 0, y: 0 });
   };
 
+  const saveProject = () => {
+    const next = {
+      ...project,
+      updatedAt: new Date().toISOString(),
+      editor: {
+        ...project.editor,
+        zoom: zoom / 100,
+        panX: pan.x,
+        panY: pan.y,
+      },
+    };
+    setProject(next);
+    setProjectError(null);
+    downloadVisualProject(next);
+  };
+
+  const loadProject = async (file: File) => {
+    try {
+      const loaded = await loadVisualProjectFile(file);
+      setProject(loaded);
+      setZoom(Math.round((loaded.editor?.zoom ?? 0.78) * 100));
+      setPan({
+        x: loaded.editor?.panX ?? 0,
+        y: loaded.editor?.panY ?? 0,
+      });
+      setProjectError(null);
+      setDockTab('Generated Code');
+    } catch (err) {
+      setProjectError(err instanceof Error ? err.message : 'Could not load Visual Project.');
+      setDockTab('Diagnostics');
+    } finally {
+      if (projectFileRef.current) projectFileRef.current.value = '';
+    }
+  };
+
+  const handoffToCode = () => {
+    if (!generated.value) {
+      setProjectError(generated.error ?? 'Generated code is unavailable.');
+      setDockTab('Diagnostics');
+      return;
+    }
+    setCodeHandoff({
+      id: createVisualId('handoff'),
+      name: `${project.name} — Generated`,
+      source: generated.value.source,
+    });
+    onModeChange('code');
+  };
+
   return (
     <div
       className="apx-visual-workspace"
@@ -221,13 +292,38 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
           >
             Generated Code
           </ActionButton>
-          <ActionButton
-            icon={ArrowDownTrayIcon}
-            disabled
-            title="Project export becomes available with the Visual Project compiler."
-          >
-            Export
-          </ActionButton>
+
+          <details className="apx-vw-project-menu">
+            <summary className="apx-vw-action">
+              <FolderOpenIcon className="h-4 w-4" aria-hidden />
+              <span>Project</span>
+            </summary>
+            <div className="apx-vw-project-menu__panel">
+              <button type="button" onClick={() => projectFileRef.current?.click()}>
+                <FolderOpenIcon className="h-4 w-4" aria-hidden />
+                <span>Load .apexstudio.json</span>
+              </button>
+              <button type="button" onClick={saveProject}>
+                <ArrowDownTrayIcon className="h-4 w-4" aria-hidden />
+                <span>Save project</span>
+              </button>
+              <button type="button" onClick={handoffToCode} disabled={!generated.value}>
+                <CodeBracketIcon className="h-4 w-4" aria-hidden />
+                <span>Open generated code</span>
+              </button>
+              <small>{generated.value?.fileName ?? 'Code generation unavailable'}</small>
+            </div>
+            <input
+              ref={projectFileRef}
+              type="file"
+              hidden
+              accept=".apexstudio.json,application/json"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) void loadProject(file);
+              }}
+            />
+          </details>
         </div>
       </header>
 
@@ -313,7 +409,7 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
             ) : null}
             <div className="apx-vw-device">
               <RectangleGroupIcon className="h-4 w-4" aria-hidden />
-              <span>Desktop (1440 × 900)</span>
+              <span>Desktop ({project.document.width} × {project.document.height})</span>
             </div>
 
             <div className="apx-vw-zoom">
@@ -397,10 +493,10 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
                 <span className="apx-vw-kicker">Apexify Studio</span>
                 <h2>Visual workspace ready</h2>
                 <p>
-                  The professional workbench shell is in place. Your project model, generated code and real Apexify preview attach here in Phase 2.
+                  Visual Project v1 is now the semantic source of truth. Authoring tools attach to this model in the next phases.
                 </p>
                 <div className="apx-vw-empty-pills">
-                  <span>1440 × 900</span>
+                  <span>{project.document.width} × {project.document.height}</span>
                   <span>Real Apexify runtime</span>
                   <span>Preview → Code</span>
                 </div>
@@ -461,11 +557,11 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               </div>
               <div>
                 <label>W</label>
-                <div className="apx-vw-field apx-vw-field--disabled">1440</div>
+                <div className="apx-vw-field apx-vw-field--disabled">{project.document.width}</div>
               </div>
               <div>
                 <label>H</label>
-                <div className="apx-vw-field apx-vw-field--disabled">900</div>
+                <div className="apx-vw-field apx-vw-field--disabled">{project.document.height}</div>
               </div>
             </div>
 
@@ -515,13 +611,22 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
           <div className="apx-vw-dock-content">
             <div className="apx-vw-dock-primary">
               {dockTab === 'Generated Code' ? (
-                <div className="apx-vw-code-preview">
-                  <div><span>1</span><code>// Generated by Apexify Studio</code></div>
-                  <div><span>2</span><code>// Visual Project compiler connects in Phase 2.</code></div>
-                  <div><span>3</span><code>import &#123; ApexPainter &#125; from &apos;apexify.js&apos;;</code></div>
-                  <div><span>4</span><code /></div>
-                  <div><span>5</span><code>// No generated operations yet.</code></div>
-                </div>
+                generated.value ? (
+                  <div className="apx-vw-code-preview" data-visual-generated-code>
+                    {generated.value.source.split('\n').map((line, index) => (
+                      <div key={index}>
+                        <span>{index + 1}</span>
+                        <code>{line}</code>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="apx-vw-dock-empty">
+                    <CodeBracketIcon className="h-7 w-7" aria-hidden />
+                    <strong>Code generation blocked</strong>
+                    <span>{generated.error}</span>
+                  </div>
+                )
               ) : null}
 
               {dockTab === 'Preview' ? (
@@ -565,9 +670,9 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               {dockTab === 'Diagnostics' ? (
                 <div className="apx-vw-dock-empty">
                   <AdjustmentsHorizontalIcon className="h-7 w-7" aria-hidden />
-                  <strong>{error ? 'Shared runtime error' : 'Diagnostics clear'}</strong>
+                  <strong>{projectError || generated.error || error ? 'Visual diagnostics' : 'Diagnostics clear'}</strong>
                   <span>
-                    {error ?? (previewWarnings.length ? previewWarnings.join(' · ') : elapsedMs != null ? 'Last run ' + elapsedMs + ' ms' : 'No Visual diagnostics yet.')}
+                    {projectError ?? generated.error ?? error ?? (previewWarnings.length ? previewWarnings.join(' · ') : elapsedMs != null ? 'Last run ' + elapsedMs + ' ms' : 'Visual Project v1 validates and code generation is ready.')}
                   </span>
                 </div>
               ) : null}
@@ -692,8 +797,8 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
 
       <footer className="apx-vw-statusbar">
         <span>Apexify Studio Visual</span>
-        <span className="apx-vw-status-ok">● Shell ready</span>
-        <span className="ml-auto">Phase 2: Visual Project + codegen core</span>
+        <span className="apx-vw-status-ok">● Project v1 · codegen ready</span>
+        <span className="ml-auto">{project.name} · schema v{project.schemaVersion}</span>
       </footer>
     </div>
   );
