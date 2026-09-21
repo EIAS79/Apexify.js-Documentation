@@ -80,6 +80,15 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   for (const [key, node] of Object.entries(project.document.nodes)) {
     if (node.id !== key) push(issues, 'node-key-mismatch', `document.nodes.${key}.id`, 'Node id must match its nodes-map key.');
     if (!isStableVisualId(node.id)) push(issues, 'invalid-id', `document.nodes.${key}.id`, 'Node id is invalid.');
+    if (node.transform) {
+      for (const field of ['x','y','width','height','scaleX','scaleY','rotation','anchorX','anchorY','opacity','zIndex'] as const) {
+        const value = node.transform[field];
+        if (value !== undefined && !Number.isFinite(value)) push(issues, 'invalid-transform', `document.nodes.${key}.transform.${field}`, 'Transform values must be finite numbers.');
+      }
+      if (node.transform.width !== undefined && node.transform.width <= 0) push(issues, 'invalid-transform', `document.nodes.${key}.transform.width`, 'Width must be positive.');
+      if (node.transform.height !== undefined && node.transform.height <= 0) push(issues, 'invalid-transform', `document.nodes.${key}.transform.height`, 'Height must be positive.');
+      if (node.transform.opacity !== undefined && (node.transform.opacity < 0 || node.transform.opacity > 1)) push(issues, 'invalid-transform', `document.nodes.${key}.transform.opacity`, 'Opacity must be between 0 and 1.');
+    }
     if (node.parentId && !nodeIds.has(node.parentId)) push(issues, 'missing-parent', `document.nodes.${key}.parentId`, `Unknown parent node "${node.parentId}".`);
     const seenChildren = new Set<string>();
     for (const childId of node.childIds ?? []) {
@@ -98,6 +107,10 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
     rootSeen.add(rootId);
     const root = project.document.nodes[rootId];
     if (root?.parentId) push(issues, 'root-has-parent', `document.nodes.${rootId}.parentId`, 'Root nodes cannot have a parent.');
+  }
+
+  for (const selectedId of project.editor?.selectedNodeIds ?? []) {
+    if (!nodeIds.has(selectedId)) push(issues, 'missing-selection', 'editor.selectedNodeIds', `Unknown selected node "${selectedId}".`);
   }
 
   const visitState = new Map<string, 0 | 1 | 2>();

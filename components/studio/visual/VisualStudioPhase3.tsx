@@ -1,0 +1,1562 @@
+'use client';
+
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type TouchEvent as ReactTouchEvent,
+  type WheelEvent as ReactWheelEvent,
+  type ReactNode,
+} from 'react';
+import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
+import {
+  StudioModeSwitch,
+  type StudioMode,
+} from '@/components/studio/StudioModeSwitch';
+import { createVisualId } from '@/lib/studio/visual/ids';
+import {
+  createVisualNode,
+  createVisualProject,
+} from '@/lib/studio/visual/project';
+import { generateVisualProjectCode } from '@/lib/studio/visual/codegen/generator';
+import {
+  downloadVisualProject,
+  loadVisualProjectFile,
+} from '@/lib/studio/visual/persistence';
+import type {
+  VisualNode,
+  VisualProject,
+  VisualTransform,
+} from '@/lib/studio/visual/model';
+import {
+  VisualHistory,
+  alignNodes,
+  copyNodes,
+  deleteNodes,
+  duplicateNodes,
+  flattenLayerIds,
+  groupNodes,
+  moveNodeInStack,
+  moveNodes,
+  nodeRect,
+  pasteNodes,
+  patchNodeTransform,
+  renameNode,
+  reorderNode,
+  resizeNode,
+  rotateNode,
+  setNodeLocked,
+  setNodeVisibility,
+  setSelection,
+  snapPosition,
+  toggleSelection,
+  ungroupNodes,
+  type ResizeHandle,
+  type VisualClipboard,
+} from '@/lib/studio/visual/editor';
+
+type Props = {
+  active: boolean;
+  mode: StudioMode;
+  onModeChange: (mode: StudioMode) => void;
+};
+
+type Point = { x: number; y: number };
+type SelectionRect = { x: number; y: number; width: number; height: number };
+type Gesture = {
+  kind: 'move' | 'resize' | 'rotate' | 'pan' | 'marquee';
+  id?: string;
+  ids?: string[];
+  handle?: ResizeHandle;
+  startX: number;
+  startY: number;
+  before: VisualProject;
+  originPan?: Point;
+  origin?: Point;
+  startDocument?: Point;
+  baseSelection?: string[];
+  center?: Point;
+};
+
+const handles: ResizeHandle[] = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+const handlePos: Record<
+  ResizeHandle,
+  { left: string; top: string; cursor: string }
+> = {
+  nw: { left: '0%', top: '0%', cursor: 'nwse-resize' },
+  n: { left: '50%', top: '0%', cursor: 'ns-resize' },
+  ne: { left: '100%', top: '0%', cursor: 'nesw-resize' },
+  e: { left: '100%', top: '50%', cursor: 'ew-resize' },
+  se: { left: '100%', top: '100%', cursor: 'nwse-resize' },
+  s: { left: '50%', top: '100%', cursor: 'ns-resize' },
+  sw: { left: '0%', top: '100%', cursor: 'nesw-resize' },
+  w: { left: '0%', top: '50%', cursor: 'ew-resize' },
+};
+
+function clampZoom(value: number) {
+  return Math.max(20, Math.min(200, Math.round(value)));
+}
+
+function semanticSignature(project: VisualProject) {
+  const { editor: _editor, updatedAt: _updatedAt, ...semantic } = project;
+  return JSON.stringify(semantic);
+}
+
+function rectsIntersect(a: SelectionRect, b: SelectionRect) {
+  return (
+    a.x <= b.x + b.width &&
+    a.x + a.width >= b.x &&
+    a.y <= b.y + b.height &&
+    a.y + a.height >= b.y
+  );
+}
+
+function distance(a: { clientX: number; clientY: number }, b: { clientX: number; clientY: number }) {
+  return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+}
+
+export default function VisualStudioPhase3({
+  active,
+  mode,
+  onModeChange,
+}: Props) {
+  const { setCodeHandoff } = useStudioSharedSession();
+  const [project, setProject] = useState(() => createVisualProject());
+  const [zoom, setZoom] = useState(78);
+  const [pan, setPan] = useState<Point>({ x: 0, y: 0 });
+  const [viewportMode, setViewportMode] = useState<'select' | 'pan'>('select');
+  const [message, setMessage] = useState('Phase 3 editor ready');
+  const [historyTick, setHistoryTick] = useState(0);
+  const [guides, setGuides] = useState<
+    Array<{ axis: 'x' | 'y'; value: number }>
+  >([]);
+  const [marquee, setMarquee] = useState<SelectionRect | null>(null);
+  const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const [draggedLayer, setDraggedLayer] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameDraft, setRenameDraft] = useState('');
+  const [dirty, setDirty] = useState(false);
+
+  const history = useRef(new VisualHistory(100));
+  const gesture = useRef<Gesture | null>(null);
+  const clipboard = useRef<VisualClipboard | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const artboardRef = useRef<HTMLDivElement>(null);
+  const cleanSignature = useRef('');
+  const propertyBefore = useRef<VisualProject | null>(null);
+  const pinch = useRef<{ distance: number; zoom: number } | null>(null);
+
+  if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
+
+  const selected = project.editor?.selectedNodeIds ?? [];
+  const primary = selected.length
+    ? project.document.nodes[selected[selected.length - 1]]
+    : undefined;
+  const layerIds = useMemo(() => flattenLayerIds(project), [project]);
+  const drawableIds = useMemo(
+    () =>
+      layerIds.filter((id) => {
+        const node = project.document.nodes[id];
+        return Boolean(
+          node &&
+            node.transform?.visible !== false &&
+            !(node.kind === 'group' && (node.childIds?.length ?? 0) > 0),
+        );
+      }),
+    [layerIds, project],
+  );
+
+  const generated = useMemo(() => {
+    try {
+      return { value: generateVisualProjectCode(project), error: null };
+    } catch (error) {
+      return {
+        value: null,
+        error:
+          error instanceof Error ? error.message : 'Code generation unavailable',
+      };
+    }
+  }, [project]);
+
+  useEffect(() => {
+    setDirty(semanticSignature(project) !== cleanSignature.current);
+  }, [project]);
+
+  const mutate = (
+    label: string,
+    mutation: (current: VisualProject) => VisualProject,
+  ) =>
+    setProject((current) => {
+      const next = mutation(current);
+      history.current.commit(current, next, label);
+      setHistoryTick((value) => value + 1);
+      return next;
+    });
+
+  const addPlaceholder = () =>
+    mutate('Add placeholder', (current) => {
+      const next = structuredClone(current);
+      const node = createVisualNode('group', {}, { name: 'Placeholder' });
+      node.transform = {
+        x: 80 + next.document.rootNodeIds.length * 24,
+        y: 80 + next.document.rootNodeIds.length * 24,
+        width: 180,
+        height: 110,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      return next;
+    });
+
+  const undo = () => {
+    const result = history.current.undo(project);
+    if (!result) return;
+    setProject(result.project);
+    setMessage('Undo: ' + result.label);
+    setHistoryTick((value) => value + 1);
+  };
+
+  const redo = () => {
+    const result = history.current.redo(project);
+    if (!result) return;
+    setProject(result.project);
+    setMessage('Redo: ' + result.label);
+    setHistoryTick((value) => value + 1);
+  };
+
+  const fit = () => {
+    const viewport = viewportRef.current?.getBoundingClientRect();
+    if (!viewport) {
+      setZoom(78);
+      setPan({ x: 0, y: 0 });
+      return;
+    }
+    const widthScale = (viewport.width - 80) / project.document.width;
+    const heightScale = (viewport.height - 80) / project.document.height;
+    setZoom(clampZoom(Math.min(widthScale, heightScale, 1) * 100));
+    setPan({ x: 0, y: 0 });
+  };
+
+  const resetView = () => {
+    setZoom(100);
+    setPan({ x: 0, y: 0 });
+  };
+
+  const documentPoint = (clientX: number, clientY: number): Point | null => {
+    const rect = artboardRef.current?.getBoundingClientRect();
+    if (!rect) return null;
+    const scale = zoom / 100;
+    return {
+      x: (clientX - rect.left) / scale,
+      y: (clientY - rect.top) / scale,
+    };
+  };
+
+  const copySelection = () => {
+    if (!selected.length) return;
+    clipboard.current = copyNodes(project, selected);
+    setMessage(
+      'Copied ' + clipboard.current.roots.length + ' layer' +
+        (clipboard.current.roots.length === 1 ? '' : 's'),
+    );
+  };
+
+  const cutSelection = () => {
+    if (!selected.length) return;
+    clipboard.current = copyNodes(project, selected);
+    mutate('Cut', (current) => deleteNodes(current, selected));
+    setMessage('Cut selection');
+  };
+
+  const pasteSelection = () => {
+    if (!clipboard.current) return;
+    mutate('Paste', (current) =>
+      pasteNodes(current, clipboard.current!, () => createVisualId('node')),
+    );
+    setMessage('Pasted selection');
+  };
+
+  const groupSelection = () => {
+    if (selected.length < 2) return;
+    mutate('Group', (current) =>
+      groupNodes(current, selected, createVisualId('group')),
+    );
+    setMessage('Grouped selection');
+  };
+
+  const ungroupSelection = () => {
+    if (!selected.length) return;
+    mutate('Ungroup', (current) => ungroupNodes(current, selected));
+    setMessage('Ungrouped selection');
+  };
+
+  const movePrimaryInStack = (
+    stackMode: 'forward' | 'backward' | 'front' | 'back',
+  ) => {
+    if (!primary) return;
+    mutate('Layer ' + stackMode, (current) =>
+      moveNodeInStack(current, primary.id, stackMode),
+    );
+  };
+
+  const cycleSelectionAtPoint = (point: Point) => {
+    const hits = [...drawableIds]
+      .reverse()
+      .filter((id) => {
+        const node = project.document.nodes[id];
+        const rect = nodeRect(node);
+        return (
+          point.x >= rect.x &&
+          point.x <= rect.x + rect.width &&
+          point.y >= rect.y &&
+          point.y <= rect.y + rect.height
+        );
+      });
+    if (!hits.length) return false;
+    const currentIndex = primary ? hits.indexOf(primary.id) : -1;
+    const nextId = hits[(currentIndex + 1 + hits.length) % hits.length];
+    setProject((current) => setSelection(current, [nextId]));
+    setMessage('Cycled overlapping selection');
+    return true;
+  };
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.matches('input,textarea,[contenteditable=true]')) return;
+
+      const mod = event.ctrlKey || event.metaKey;
+      const key = event.key.toLowerCase();
+
+      if (mod && key === 'z') {
+        event.preventDefault();
+        event.shiftKey ? redo() : undo();
+        return;
+      }
+      if (mod && key === 'y') {
+        event.preventDefault();
+        redo();
+        return;
+      }
+      if (mod && key === 'c') {
+        event.preventDefault();
+        copySelection();
+        return;
+      }
+      if (mod && key === 'x') {
+        event.preventDefault();
+        cutSelection();
+        return;
+      }
+      if (mod && key === 'v') {
+        event.preventDefault();
+        pasteSelection();
+        return;
+      }
+      if (mod && key === 'd') {
+        event.preventDefault();
+        mutate('Duplicate', (current) =>
+          duplicateNodes(current, selected, () => createVisualId('node')),
+        );
+        return;
+      }
+      if (mod && key === 'g') {
+        event.preventDefault();
+        event.shiftKey ? ungroupSelection() : groupSelection();
+        return;
+      }
+      if (event.key === 'Tab' && layerIds.length) {
+        event.preventDefault();
+        const currentIndex = primary ? layerIds.indexOf(primary.id) : -1;
+        const direction = event.shiftKey ? -1 : 1;
+        const nextIndex =
+          (currentIndex + direction + layerIds.length) % layerIds.length;
+        setProject((current) => setSelection(current, [layerIds[nextIndex]]));
+        return;
+      }
+      if (
+        (event.key === 'Delete' || event.key === 'Backspace') &&
+        selected.length
+      ) {
+        event.preventDefault();
+        mutate('Delete', (current) => deleteNodes(current, selected));
+        return;
+      }
+      if (event.key === 'Escape') {
+        setProject((current) => setSelection(current, []));
+        setMarquee(null);
+        return;
+      }
+      if (
+        selected.length &&
+        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)
+      ) {
+        event.preventDefault();
+        const step = event.shiftKey ? 10 : 1;
+        mutate('Nudge', (current) =>
+          moveNodes(
+            current,
+            selected,
+            event.key === 'ArrowLeft'
+              ? -step
+              : event.key === 'ArrowRight'
+                ? step
+                : 0,
+            event.key === 'ArrowUp'
+              ? -step
+              : event.key === 'ArrowDown'
+                ? step
+                : 0,
+          ),
+        );
+      }
+    };
+
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  });
+
+  const beginMove = (event: ReactPointerEvent, id: string) => {
+    if (viewportMode !== 'select') return;
+    event.stopPropagation();
+
+    const node = project.document.nodes[id];
+    if (!node || node.transform?.locked) return;
+
+    const point = documentPoint(event.clientX, event.clientY);
+    if (event.altKey && point && cycleSelectionAtPoint(point)) return;
+
+    const next = event.shiftKey
+      ? toggleSelection(project, id)
+      : selected.includes(id)
+        ? project
+        : setSelection(project, [id]);
+    if (next !== project) setProject(next);
+
+    const movingIds = (next.editor?.selectedNodeIds ?? []).includes(id)
+      ? next.editor?.selectedNodeIds ?? [id]
+      : [id];
+    const rect = nodeRect(node);
+    gesture.current = {
+      kind: 'move',
+      id,
+      ids: movingIds,
+      startX: event.clientX,
+      startY: event.clientY,
+      before: next,
+      origin: { x: rect.x, y: rect.y },
+    };
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  };
+
+  const beginResize = (
+    event: ReactPointerEvent,
+    id: string,
+    handle: ResizeHandle,
+  ) => {
+    event.stopPropagation();
+    gesture.current = {
+      kind: 'resize',
+      id,
+      handle,
+      startX: event.clientX,
+      startY: event.clientY,
+      before: project,
+    };
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  };
+
+  const beginRotate = (event: ReactPointerEvent, id: string) => {
+    event.stopPropagation();
+    const rect = (event.currentTarget.parentElement as HTMLElement).getBoundingClientRect();
+    gesture.current = {
+      kind: 'rotate',
+      id,
+      startX: event.clientX,
+      startY: event.clientY,
+      before: project,
+      center: {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      },
+    };
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+  };
+
+  const beginViewportGesture = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (viewportMode === 'pan') {
+      gesture.current = {
+        kind: 'pan',
+        startX: event.clientX,
+        startY: event.clientY,
+        before: project,
+        originPan: pan,
+      };
+      event.currentTarget.setPointerCapture(event.pointerId);
+      return;
+    }
+
+    const target = event.target as HTMLElement;
+    if (target.closest('[data-visual-node]')) return;
+
+    const point = documentPoint(event.clientX, event.clientY);
+    if (!point) {
+      setProject((current) => setSelection(current, []));
+      return;
+    }
+
+    gesture.current = {
+      kind: 'marquee',
+      startX: event.clientX,
+      startY: event.clientY,
+      before: project,
+      startDocument: point,
+      baseSelection: event.shiftKey ? selected : [],
+    };
+    setMarquee({ x: point.x, y: point.y, width: 0, height: 0 });
+    if (!event.shiftKey) setProject((current) => setSelection(current, []));
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const pointerMove = (event: ReactPointerEvent) => {
+    const currentGesture = gesture.current;
+    if (!currentGesture) return;
+
+    if (currentGesture.kind === 'pan' && currentGesture.originPan) {
+      setPan({
+        x:
+          currentGesture.originPan.x +
+          event.clientX -
+          currentGesture.startX,
+        y:
+          currentGesture.originPan.y +
+          event.clientY -
+          currentGesture.startY,
+      });
+      return;
+    }
+
+    if (
+      currentGesture.kind === 'marquee' &&
+      currentGesture.startDocument
+    ) {
+      const point = documentPoint(event.clientX, event.clientY);
+      if (!point) return;
+      const selectionRect = {
+        x: Math.min(currentGesture.startDocument.x, point.x),
+        y: Math.min(currentGesture.startDocument.y, point.y),
+        width: Math.abs(point.x - currentGesture.startDocument.x),
+        height: Math.abs(point.y - currentGesture.startDocument.y),
+      };
+      setMarquee(selectionRect);
+      const hits = drawableIds.filter((id) =>
+        rectsIntersect(selectionRect, nodeRect(project.document.nodes[id])),
+      );
+      const ids = [
+        ...new Set([...(currentGesture.baseSelection ?? []), ...hits]),
+      ];
+      setProject((current) => setSelection(current, ids));
+      return;
+    }
+
+    if (!currentGesture.id) return;
+
+    const scale = zoom / 100;
+    const dx = (event.clientX - currentGesture.startX) / scale;
+    const dy = (event.clientY - currentGesture.startY) / scale;
+
+    if (currentGesture.kind === 'move' && currentGesture.origin) {
+      const snap = snapPosition(
+        currentGesture.before,
+        currentGesture.id,
+        currentGesture.origin.x + dx,
+        currentGesture.origin.y + dy,
+      );
+      setGuides(snap.guides);
+      const snappedDx = snap.x - currentGesture.origin.x;
+      const snappedDy = snap.y - currentGesture.origin.y;
+      setProject(
+        moveNodes(
+          currentGesture.before,
+          currentGesture.ids ?? [currentGesture.id],
+          snappedDx,
+          snappedDy,
+        ),
+      );
+    }
+
+    if (currentGesture.kind === 'resize' && currentGesture.handle) {
+      setProject(
+        resizeNode(
+          currentGesture.before,
+          currentGesture.id,
+          currentGesture.handle,
+          dx,
+          dy,
+          event.shiftKey,
+        ),
+      );
+    }
+
+    if (currentGesture.kind === 'rotate' && currentGesture.center) {
+      const angle =
+        (Math.atan2(
+          event.clientY - currentGesture.center.y,
+          event.clientX - currentGesture.center.x,
+        ) *
+          180) /
+          Math.PI +
+        90;
+      setProject(
+        rotateNode(
+          currentGesture.before,
+          currentGesture.id,
+          event.shiftKey ? Math.round(angle / 15) * 15 : angle,
+        ),
+      );
+    }
+  };
+
+  const pointerUp = () => {
+    const currentGesture = gesture.current;
+    if (!currentGesture) return;
+
+    if (
+      currentGesture.kind !== 'pan' &&
+      currentGesture.kind !== 'marquee'
+    ) {
+      const label =
+        currentGesture.kind === 'move'
+          ? 'Move'
+          : currentGesture.kind === 'resize'
+            ? 'Resize'
+            : 'Rotate';
+      setProject((current) => {
+        history.current.commit(currentGesture.before, current, label);
+        return current;
+      });
+      setHistoryTick((value) => value + 1);
+    }
+
+    gesture.current = null;
+    setGuides([]);
+    setMarquee(null);
+  };
+
+  const beginPropertyEdit = () => {
+    propertyBefore.current = project;
+  };
+
+  const endPropertyEdit = (label: string) => {
+    const before = propertyBefore.current;
+    propertyBefore.current = null;
+    if (!before) return;
+    setProject((current) => {
+      history.current.commit(before, current, label);
+      return current;
+    });
+    setHistoryTick((value) => value + 1);
+  };
+
+  const updateTransformDraft = (
+    key: keyof VisualTransform,
+    rawValue: number,
+  ) => {
+    if (!primary || !Number.isFinite(rawValue)) return;
+    let value = rawValue;
+    if (key === 'opacity') value = Math.max(0, Math.min(1, rawValue));
+    if (key === 'width' || key === 'height') value = Math.max(1, rawValue);
+
+    setProject((current) => {
+      const currentNode = current.document.nodes[primary.id];
+      if (!currentNode) return current;
+      if (
+        currentNode.kind === 'group' &&
+        (currentNode.childIds?.length ?? 0) > 0 &&
+        (key === 'x' || key === 'y')
+      ) {
+        const rect = nodeRect(currentNode);
+        return moveNodes(
+          current,
+          [currentNode.id],
+          key === 'x' ? value - rect.x : 0,
+          key === 'y' ? value - rect.y : 0,
+        );
+      }
+      return patchNodeTransform(current, primary.id, { [key]: value });
+    });
+  };
+
+  const load = async (file: File) => {
+    try {
+      const loaded = await loadVisualProjectFile(file);
+      setProject(loaded);
+      setZoom(clampZoom((loaded.editor?.zoom ?? 0.78) * 100));
+      setPan({
+        x: loaded.editor?.panX ?? 0,
+        y: loaded.editor?.panY ?? 0,
+      });
+      history.current = new VisualHistory(100);
+      cleanSignature.current = semanticSignature(loaded);
+      setDirty(false);
+      setMessage('Project loaded');
+      setHistoryTick((value) => value + 1);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Load failed');
+    }
+  };
+
+  const save = () => {
+    const saved = {
+      ...project,
+      updatedAt: new Date().toISOString(),
+      editor: {
+        ...project.editor,
+        zoom: zoom / 100,
+        panX: pan.x,
+        panY: pan.y,
+      },
+    };
+    downloadVisualProject(saved);
+    cleanSignature.current = semanticSignature(project);
+    setDirty(false);
+    setMessage('Project saved');
+  };
+
+  const handoff = () => {
+    if (!generated.value) {
+      setMessage(generated.error ?? 'Code unavailable');
+      return;
+    }
+    setCodeHandoff({
+      id: createVisualId('handoff'),
+      name: project.name + ' — Generated',
+      source: generated.value.source,
+    });
+    onModeChange('code');
+  };
+
+  const onWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (event.ctrlKey || event.metaKey) {
+      setZoom((value) =>
+        clampZoom(value + (event.deltaY < 0 ? 5 : -5)),
+      );
+      return;
+    }
+    setPan((current) => ({
+      x: current.x - event.deltaX,
+      y: current.y - event.deltaY,
+    }));
+  };
+
+  const onTouchStart = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if (event.touches.length !== 2) {
+      pinch.current = null;
+      return;
+    }
+    pinch.current = {
+      distance: distance(event.touches[0], event.touches[1]),
+      zoom,
+    };
+  };
+
+  const onTouchMove = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if (event.touches.length !== 2 || !pinch.current) return;
+    event.preventDefault();
+    const nextDistance = distance(event.touches[0], event.touches[1]);
+    setZoom(
+      clampZoom(
+        pinch.current.zoom * (nextDistance / pinch.current.distance),
+      ),
+    );
+  };
+
+  const finishRename = (id: string) => {
+    const value = renameDraft;
+    setRenamingId(null);
+    mutate('Rename', (current) => renameNode(current, id, value));
+  };
+
+  const renderLayerRows = (ids: string[], depth = 0): ReactNode =>
+    ids.map((id, index) => {
+      const node = project.document.nodes[id];
+      if (!node) return null;
+      const isSelected = selected.includes(id);
+      const hasChildren = (node.childIds?.length ?? 0) > 0;
+      const isCollapsed = collapsed.has(id);
+      const siblingIds = node.parentId
+        ? project.document.nodes[node.parentId]?.childIds ?? []
+        : project.document.rootNodeIds;
+
+      return (
+        <div key={id}>
+          <div
+            className="apx-vw-layer-row"
+            data-active={isSelected ? 'true' : undefined}
+            draggable
+            onDragStart={(event) => {
+              setDraggedLayer(id);
+              event.dataTransfer.effectAllowed = 'move';
+              event.dataTransfer.setData('text/plain', id);
+            }}
+            onDragEnd={() => setDraggedLayer(null)}
+            onDragOver={(event) => {
+              if (draggedLayer) event.preventDefault();
+            }}
+            onDrop={(event) => {
+              event.preventDefault();
+              if (!draggedLayer || draggedLayer === id) return;
+              const source = project.document.nodes[draggedLayer];
+              if (
+                !source ||
+                (source.parentId ?? null) !== (node.parentId ?? null)
+              ) {
+                setMessage('Drag reorder is limited to sibling layers');
+                return;
+              }
+              mutate('Drag reorder', (current) =>
+                reorderNode(current, draggedLayer, index),
+              );
+              setDraggedLayer(null);
+            }}
+            onClick={(event) =>
+              setProject((current) =>
+                event.shiftKey
+                  ? toggleSelection(current, id)
+                  : setSelection(current, [id]),
+              )
+            }
+            style={{
+              paddingLeft: 6 + depth * 14,
+              background: isSelected ? '#17345a' : undefined,
+            }}
+          >
+            <button
+              title={hasChildren ? 'Collapse / expand' : 'Leaf layer'}
+              disabled={!hasChildren}
+              onClick={(event) => {
+                event.stopPropagation();
+                setCollapsed((current) => {
+                  const next = new Set(current);
+                  next.has(id) ? next.delete(id) : next.add(id);
+                  return next;
+                });
+              }}
+            >
+              {hasChildren ? (isCollapsed ? '▸' : '▾') : '·'}
+            </button>
+            <button
+              title="Visibility"
+              onClick={(event) => {
+                event.stopPropagation();
+                mutate('Visibility', (current) =>
+                  setNodeVisibility(
+                    current,
+                    id,
+                    node.transform?.visible === false,
+                  ),
+                );
+              }}
+            >
+              {node.transform?.visible === false ? '○' : '◉'}
+            </button>
+            <button
+              title="Lock"
+              onClick={(event) => {
+                event.stopPropagation();
+                mutate('Lock', (current) =>
+                  setNodeLocked(current, id, !node.transform?.locked),
+                );
+              }}
+            >
+              {node.transform?.locked ? '🔒' : '◇'}
+            </button>
+            {renamingId === id ? (
+              <input
+                autoFocus
+                className="apx-vw-field"
+                value={renameDraft}
+                onClick={(event) => event.stopPropagation()}
+                onChange={(event) => setRenameDraft(event.target.value)}
+                onBlur={() => finishRename(id)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    event.currentTarget.blur();
+                  }
+                  if (event.key === 'Escape') {
+                    event.preventDefault();
+                    setRenamingId(null);
+                  }
+                }}
+                style={{ flex: 1, minWidth: 0, height: 24 }}
+              />
+            ) : (
+              <span
+                title="Double-click to rename"
+                onDoubleClick={(event) => {
+                  event.stopPropagation();
+                  setRenamingId(id);
+                  setRenameDraft(node.name ?? node.kind);
+                }}
+                style={{
+                  flex: 1,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {node.name ?? node.kind}
+              </span>
+            )}
+            <button
+              title="Move backward"
+              disabled={index === 0}
+              onClick={(event) => {
+                event.stopPropagation();
+                mutate('Reorder', (current) =>
+                  reorderNode(current, id, index - 1),
+                );
+              }}
+            >
+              ↑
+            </button>
+            <button
+              title="Move forward"
+              disabled={index === siblingIds.length - 1}
+              onClick={(event) => {
+                event.stopPropagation();
+                mutate('Reorder', (current) =>
+                  reorderNode(current, id, index + 1),
+                );
+              }}
+            >
+              ↓
+            </button>
+          </div>
+          {hasChildren &&
+            !isCollapsed &&
+            renderLayerRows(node.childIds ?? [], depth + 1)}
+        </div>
+      );
+    });
+
+  const selectedGroups = selected
+    .map((id) => project.document.nodes[id])
+    .filter(
+      (node): node is VisualNode =>
+        Boolean(node && node.kind === 'group' && (node.childIds?.length ?? 0) > 0),
+    );
+
+  void historyTick;
+
+  return (
+    <div
+      className="apx-visual-workspace"
+      data-studio-visual-workspace
+      data-active={active ? 'true' : 'false'}
+    >
+      <header className="apx-vw-header">
+        <div className="apx-vw-brand">
+          <span className="apx-vw-brandmark">A</span>
+          <span>
+            <strong>Visual Workspace</strong>
+            <small>
+              Viewport · Layers · Transforms · History · {dirty ? 'Unsaved' : 'Saved'}
+            </small>
+          </span>
+        </div>
+        <StudioModeSwitch
+          mode={mode}
+          onChange={onModeChange}
+          className="studio-mode-switch--visualbar"
+        />
+        <div className="apx-vw-header-actions">
+          <button
+            className="apx-vw-action"
+            onClick={undo}
+            disabled={!history.current.canUndo}
+          >
+            Undo
+          </button>
+          <button
+            className="apx-vw-action"
+            onClick={redo}
+            disabled={!history.current.canRedo}
+          >
+            Redo
+          </button>
+          <details className="apx-vw-project-menu">
+            <summary className="apx-vw-action">Project</summary>
+            <div className="apx-vw-project-menu__panel">
+              <button data-visual-project-save onClick={save}>
+                Save project
+              </button>
+              <button
+                data-visual-project-load
+                onClick={() => fileRef.current?.click()}
+              >
+                Load project
+              </button>
+              <button
+                data-visual-open-generated-code
+                onClick={handoff}
+                disabled={!generated.value}
+              >
+                Open generated code
+              </button>
+            </div>
+          </details>
+          <input
+            ref={fileRef}
+            hidden
+            type="file"
+            accept=".apexstudio.json,application/json"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void load(file);
+            }}
+          />
+        </div>
+      </header>
+
+      <div className="apx-vw-layout">
+        <nav className="apx-vw-toolrail">
+          <button
+            className="apx-vw-tool"
+            data-active={viewportMode === 'select' ? 'true' : undefined}
+            onClick={() => setViewportMode('select')}
+          >
+            ↖<span>Select</span>
+          </button>
+          <button
+            className="apx-vw-tool"
+            data-active={viewportMode === 'pan' ? 'true' : undefined}
+            onClick={() => setViewportMode('pan')}
+          >
+            ✋<span>Pan</span>
+          </button>
+          <button className="apx-vw-tool" onClick={addPlaceholder}>
+            ＋<span>Node</span>
+          </button>
+        </nav>
+
+        <aside className="apx-vw-layers">
+          <div className="apx-vw-panel-heading">
+            <div>
+              <strong>Layers</strong>
+              <small>
+                {layerIds.length} nodes · {selected.length} selected
+              </small>
+            </div>
+            <button className="apx-vw-iconbutton" onClick={addPlaceholder}>
+              ＋
+            </button>
+          </div>
+
+          <div className="apx-vw-layer-tree">
+            <div className="apx-vw-layer-row apx-vw-layer-row--root">
+              <span>▾</span>
+              <span>Visual Project</span>
+            </div>
+            {renderLayerRows(project.document.rootNodeIds)}
+            {!project.document.rootNodeIds.length && (
+              <div className="apx-vw-empty-list">
+                <strong>No layers</strong>
+                <span>
+                  Add a generic placeholder to exercise Phase 3 editing
+                  infrastructure.
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="apx-vw-mini-card">
+            <strong>Layer actions</strong>
+            <span>
+              Shift-click multi-select · Alt-click overlap cycle · drag reorder ·
+              double-click rename
+            </span>
+            <span>
+              Ctrl/Cmd+C/X/V clipboard · Ctrl/Cmd+G group · Shift+Ctrl/Cmd+G
+              ungroup
+            </span>
+            {selected.length > 0 && (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2,1fr)',
+                  gap: 4,
+                  marginTop: 6,
+                }}
+              >
+                <button
+                  onClick={() =>
+                    mutate('Duplicate', (current) =>
+                      duplicateNodes(current, selected, () =>
+                        createVisualId('node'),
+                      ),
+                    )
+                  }
+                >
+                  Duplicate
+                </button>
+                <button
+                  onClick={() =>
+                    mutate('Delete', (current) =>
+                      deleteNodes(current, selected),
+                    )
+                  }
+                >
+                  Delete
+                </button>
+                <button onClick={copySelection}>Copy</button>
+                <button onClick={pasteSelection} disabled={!clipboard.current}>
+                  Paste
+                </button>
+                <button onClick={groupSelection} disabled={selected.length < 2}>
+                  Group
+                </button>
+                <button onClick={ungroupSelection}>Ungroup</button>
+                <button onClick={() => movePrimaryInStack('front')}>
+                  To front
+                </button>
+                <button onClick={() => movePrimaryInStack('back')}>
+                  To back
+                </button>
+              </div>
+            )}
+          </div>
+        </aside>
+
+        <main className="apx-vw-stage">
+          <div className="apx-vw-stagebar">
+            <div className="apx-vw-device">
+              Desktop ({project.document.width} × {project.document.height})
+            </div>
+            <div className="apx-vw-zoom">
+              <button
+                onClick={() =>
+                  setZoom((value) => clampZoom(value - 10))
+                }
+              >
+                −
+              </button>
+              <span>{zoom}%</span>
+              <button
+                onClick={() =>
+                  setZoom((value) => clampZoom(value + 10))
+                }
+              >
+                +
+              </button>
+            </div>
+            <div className="apx-vw-viewtools">
+              <button onClick={() => setZoom(100)}>100%</button>
+              <button onClick={resetView}>Reset</button>
+              <button onClick={fit}>Fit</button>
+            </div>
+          </div>
+
+          <div
+            ref={viewportRef}
+            className="apx-vw-viewport"
+            onPointerDown={beginViewportGesture}
+            onPointerMove={pointerMove}
+            onPointerUp={pointerUp}
+            onPointerCancel={pointerUp}
+            onWheel={onWheel}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={() => {
+              pinch.current = null;
+            }}
+            style={{ touchAction: 'none' }}
+          >
+            <div
+              ref={artboardRef}
+              className="apx-vw-artboard"
+              data-artboard-surface
+              style={{
+                width: project.document.width,
+                height: project.document.height,
+                transform:
+                  'translate(' +
+                  pan.x +
+                  'px,' +
+                  pan.y +
+                  'px) scale(' +
+                  zoom / 100 +
+                  ')',
+                transformOrigin: 'center',
+              }}
+            >
+              <div className="apx-vw-artboard-grid" />
+
+              {guides.map((guide, index) => (
+                <div
+                  key={index}
+                  style={{
+                    position: 'absolute',
+                    zIndex: 70,
+                    pointerEvents: 'none',
+                    background: '#5aa7ff',
+                    ...(guide.axis === 'x'
+                      ? {
+                          left: guide.value,
+                          top: 0,
+                          bottom: 0,
+                          width: 1,
+                        }
+                      : {
+                          top: guide.value,
+                          left: 0,
+                          right: 0,
+                          height: 1,
+                        }),
+                  }}
+                />
+              ))}
+
+              {drawableIds.map((id) => {
+                const node = project.document.nodes[id];
+                const rect = nodeRect(node);
+                const isSelected = selected.includes(id);
+                return (
+                  <div
+                    key={id}
+                    data-visual-node={id}
+                    onPointerDown={(event) => beginMove(event, id)}
+                    style={{
+                      position: 'absolute',
+                      left: rect.x,
+                      top: rect.y,
+                      width: rect.width,
+                      height: rect.height,
+                      transform:
+                        'rotate(' + (node.transform?.rotation ?? 0) + 'deg)',
+                      transformOrigin: 'center',
+                      border: isSelected
+                        ? '2px solid #5aa7ff'
+                        : '1px solid #31557e',
+                      background:
+                        'linear-gradient(135deg,rgba(62,120,255,.16),rgba(122,82,242,.12))',
+                      boxSizing: 'border-box',
+                      userSelect: 'none',
+                      opacity: node.transform?.opacity ?? 1,
+                      zIndex: node.transform?.zIndex ?? 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        display: 'grid',
+                        placeItems: 'center',
+                        fontSize: 18,
+                        color: '#a9bfd7',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      {node.name ?? node.kind}
+                    </span>
+
+                    {isSelected &&
+                      !node.transform?.locked &&
+                      handles.map((handle) => (
+                        <button
+                          key={handle}
+                          aria-label={'Resize ' + handle}
+                          onPointerDown={(event) =>
+                            beginResize(event, id, handle)
+                          }
+                          style={{
+                            position: 'absolute',
+                            left: handlePos[handle].left,
+                            top: handlePos[handle].top,
+                            width: 10,
+                            height: 10,
+                            borderRadius: 2,
+                            border: '1px solid white',
+                            background: '#5aa7ff',
+                            transform: 'translate(-50%,-50%)',
+                            cursor: handlePos[handle].cursor,
+                            zIndex: 5,
+                          }}
+                        />
+                      ))}
+
+                    {isSelected && !node.transform?.locked && (
+                      <button
+                        aria-label="Rotate"
+                        onPointerDown={(event) => beginRotate(event, id)}
+                        style={{
+                          position: 'absolute',
+                          left: '50%',
+                          top: -28,
+                          width: 12,
+                          height: 12,
+                          borderRadius: 99,
+                          border: '1px solid white',
+                          background: '#9b7cff',
+                          transform: 'translateX(-50%)',
+                          cursor: 'grab',
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+
+              {selectedGroups.map((node) => {
+                const rect = nodeRect(node);
+                return (
+                  <div
+                    key={'group-overlay-' + node.id}
+                    style={{
+                      position: 'absolute',
+                      left: rect.x,
+                      top: rect.y,
+                      width: rect.width,
+                      height: rect.height,
+                      border: '1px dashed #9b7cff',
+                      boxSizing: 'border-box',
+                      pointerEvents: 'none',
+                      zIndex: 65,
+                    }}
+                  >
+                    <span
+                      style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: -20,
+                        fontSize: 11,
+                        color: '#c7b9ff',
+                      }}
+                    >
+                      {node.name ?? 'Group'}
+                    </span>
+                  </div>
+                );
+              })}
+
+              {marquee && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    left: marquee.x,
+                    top: marquee.y,
+                    width: marquee.width,
+                    height: marquee.height,
+                    border: '1px solid #5aa7ff',
+                    background: 'rgba(90,167,255,.12)',
+                    pointerEvents: 'none',
+                    zIndex: 80,
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </main>
+
+        <aside className="apx-vw-inspector">
+          <div className="apx-vw-inspector-top">
+            <span>Inspector</span>
+          </div>
+          <div className="apx-vw-inspector-tabs">
+            <button data-active="true">Transform</button>
+          </div>
+          <div className="apx-vw-inspector-body">
+            {primary ? (
+              <>
+                <div className="apx-vw-inspector-title">
+                  <div>
+                    <strong>{primary.name ?? primary.kind}</strong>
+                    <small>
+                      {selected.length > 1
+                        ? selected.length + ' selected'
+                        : primary.id}
+                    </small>
+                  </div>
+                </div>
+
+                <div className="apx-vw-fieldgroup">
+                  <label>Name</label>
+                  <input
+                    className="apx-vw-field"
+                    value={primary.name ?? primary.kind}
+                    onChange={(event) =>
+                      setProject((current) =>
+                        renameNode(current, primary.id, event.target.value),
+                      )
+                    }
+                    onFocus={beginPropertyEdit}
+                    onBlur={() => endPropertyEdit('Rename')}
+                  />
+                </div>
+
+                <div className="apx-vw-fieldgrid">
+                  {(
+                    [
+                      'x',
+                      'y',
+                      'width',
+                      'height',
+                      'rotation',
+                      'opacity',
+                    ] as const
+                  ).map((key) => (
+                    <div key={key}>
+                      <label>{key}</label>
+                      <input
+                        className="apx-vw-field"
+                        type="number"
+                        step={key === 'opacity' ? 0.05 : 1}
+                        min={
+                          key === 'opacity'
+                            ? 0
+                            : key === 'width' || key === 'height'
+                              ? 1
+                              : undefined
+                        }
+                        max={key === 'opacity' ? 1 : undefined}
+                        value={
+                          key === 'opacity'
+                            ? primary.transform?.opacity ?? 1
+                            : primary.transform?.[key] ??
+                              (key === 'width'
+                                ? 160
+                                : key === 'height'
+                                  ? 100
+                                  : 0)
+                        }
+                        onFocus={beginPropertyEdit}
+                        onChange={(event) =>
+                          updateTransformDraft(
+                            key,
+                            Number(event.target.value),
+                          )
+                        }
+                        onBlur={() =>
+                          endPropertyEdit('Transform ' + String(key))
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="apx-vw-inspector-note">
+                  Resize with handles. Shift preserves aspect ratio / 15°
+                  rotation. Locked nodes cannot transform.
+                </div>
+                <div className="apx-vw-inspector-note">
+                  Source feature: <strong>{primary.kind}</strong> · z-order:{' '}
+                  {primary.transform?.zIndex ?? 0}
+                </div>
+
+                {selected.length > 1 && (
+                  <div
+                    className="apx-vw-fieldgroup"
+                    style={{ marginTop: 12 }}
+                  >
+                    <label>Align / distribute</label>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(3,1fr)',
+                        gap: 4,
+                      }}
+                    >
+                      {(
+                        [
+                          'left',
+                          'center',
+                          'right',
+                          'top',
+                          'middle',
+                          'bottom',
+                          'distribute-horizontal',
+                          'distribute-vertical',
+                        ] as const
+                      ).map((alignment) => (
+                        <button
+                          key={alignment}
+                          onClick={() =>
+                            mutate('Align ' + alignment, (current) =>
+                              alignNodes(current, selected, alignment),
+                            )
+                          }
+                        >
+                          {alignment.replace('distribute-', 'dist ')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="apx-vw-empty-list">
+                <strong>No selection</strong>
+                <span>
+                  Select a layer or object to edit numeric transforms.
+                </span>
+              </div>
+            )}
+          </div>
+        </aside>
+
+        <section className="apx-vw-dock">
+          <div className="apx-vw-dock-tabs">
+            <span className="apx-vw-dock-label">History</span>
+          </div>
+          <div
+            className="apx-vw-dock-content"
+            style={{ gridTemplateColumns: '1fr' }}
+          >
+            <div className="apx-vw-dock-primary">
+              <div className="apx-vw-history-list">
+                {history.current.entries.length ? (
+                  history.current.entries.slice(0, 12).map((label, index) => (
+                    <div className="apx-vw-history-row" key={index}>
+                      <span>↶</span>
+                      <strong>{label}</strong>
+                      <span>{index === 0 ? 'latest' : ''}</span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="apx-vw-dock-empty">
+                    <strong>No editor history yet</strong>
+                    <span>
+                      Semantic edits are grouped into undoable commands.
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <footer
+        style={{
+          padding: '6px 12px',
+          fontSize: 11,
+          opacity: 0.72,
+          borderTop: '1px solid rgba(255,255,255,.08)',
+        }}
+      >
+        Visual workspace ready · Assets · Output · Diagnostics · History ·{' '}
+        {message}
+      </footer>
+    </div>
+  );
+}

@@ -27,25 +27,22 @@ test('phase 1 mounts a top-level dual-mode shell without replacing Code Studio',
   assert.match(code, /useStudioSharedSession/);
 });
 
-test('phase 1 Visual Studio remains an empty workspace with shared shell surfaces', () => {
-  const visual = read('components/studio/visual/VisualStudio.tsx');
+test('phase 1 Visual Studio shell contracts remain present as the editor evolves', () => {
+  const entry = read('components/studio/visual/VisualStudio.tsx');
+  const visual = entry + read('components/studio/visual/VisualStudioPhase3.tsx');
 
   assert.match(visual, /data-studio-visual-workspace/);
   assert.match(visual, /useStudioSharedSession/);
   assert.match(visual, /StudioModeSwitch/);
-  assert.match(visual, /Shared Studio assets/);
-  assert.match(visual, /Generated Code/);
+  assert.match(visual, /Assets/);
+  assert.match(visual, /Output/);
   assert.match(visual, /Diagnostics/);
   assert.match(visual, /History/);
-  assert.match(visual, /No visual layers yet/);
-  assert.match(visual, /authoring controls activate in their owning phase/);
-  assert.match(visual, /fileToStudioAsset/);
-  assert.match(visual, /assetFilter/);
-  assert.match(visual, /setLayersCollapsed/);
-  assert.match(visual, /setInspectorCollapsed/);
-  assert.match(visual, /setDockCollapsed/);
+  assert.match(visual, /Visual workspace ready/);
+  assert.match(visual, /data-visual-project-save/);
+  assert.match(visual, /data-visual-project-load/);
+  assert.match(visual, /data-visual-open-generated-code/);
   assert.match(visual, /setPan/);
-  assert.match(visual, /setActiveArtifactId/);
   assert.doesNotMatch(visual, /createCanvas\(|createImage\(|createText\(|createChart\(/);
 });
 
