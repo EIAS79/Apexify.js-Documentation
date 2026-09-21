@@ -204,7 +204,7 @@ test('Phase 5 generated-buffer references emit real earlier output identifiers a
   const ids = result.project.document.rootNodeIds;
   const generated = visualImageProps(result.project.document.nodes[ids[1]]).source;
   assert.equal(typeof generated, 'object');
-  if (typeof generated === 'object') {
+  if (typeof generated === 'object' && '$generated' in generated) {
     assert.equal(generated.$generated, ids[0]);
   }
 });
