@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type DragEvent as ReactDragEvent,
   type PointerEvent as ReactPointerEvent,
   type TouchEvent as ReactTouchEvent,
   type WheelEvent as ReactWheelEvent,
@@ -863,6 +864,15 @@ export default function VisualStudioPre4({
       x: (clientX - rect.left) / scale,
       y: (clientY - rect.top) / scale,
     };
+  };
+
+  const dropImagesOnCanvas = (event: ReactDragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const point = documentPoint(event.clientX, event.clientY) ?? undefined;
+    if (event.dataTransfer.files.length) {
+      void addImageFiles(event.dataTransfer.files, point);
+    }
   };
 
   const copySelection = () => {
