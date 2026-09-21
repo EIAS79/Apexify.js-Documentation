@@ -595,6 +595,7 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
                 <div>
                   <strong>Assets</strong>
                   <span>{assets.length}</span>
+                  <small>Shared Studio assets</small>
                 </div>
                 <button
                   type="button"
