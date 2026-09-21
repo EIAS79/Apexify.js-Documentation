@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 CI GREEN
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2680,7 +2680,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 |---|---|---|---|---|
 | 0 | Contract / capability baseline | PRODUCTION VERIFIED | `97d7741c8f35b06dd33bed5ba2ac9b247b344465` | Vercel deployment + `/`, `/studio`, `/docs/getting-started`, `/api-reference` smoke |
 | 1 | Dual-mode shell | PRODUCTION VERIFIED | `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7` | Vercel production deployment completed on main (`4d28777edbf140c9afe65e4e874a4b9b38ca5803`); live `/studio` Code → Visual → Code smoke passed with shared Assets/Output/Diagnostics/History and source-session preservation |
-| 2 | Project model / codegen core | CI GREEN | — | Manual deployment intentionally not triggered; current project instruction is merge-to-main only |
+| 2 | Project model / codegen core | MAIN MERGED | `186b87bcabba5316639c5a103c0b12125822a35a` | Manual deployment intentionally not triggered; current project instruction is merge-to-main only |
 | 3 | Viewport / layers / transforms / history | NOT STARTED | — | — |
 | 4 | Canvas | NOT STARTED | — | — |
 | 5 | Images / shapes / assets | NOT STARTED | — | — |
@@ -2735,7 +2735,7 @@ The Phase-1 browser smoke verifies the Studio route at desktop and mobile widths
 
 ## Phase 2 implementation record — STUDIO-VISUAL-2
 
-> **Status:** CI GREEN
+> **Status:** MAIN MERGED
 >
 > **Work branch:** `studio-visual/v02-model-codegen`
 >
@@ -2745,7 +2745,7 @@ The Phase-1 browser smoke verifies the Studio route at desktop and mobile widths
 >
 > **PR:** #78
 >
-> **Main integration:** pending squash merge after final tracking update
+> **Main integration:** `186b87bcabba5316639c5a103c0b12125822a35a`
 >
 > **Deployment policy:** no manual Vercel deployment; current project instruction is merge-to-main only.
 
@@ -2775,7 +2775,8 @@ Phase-2 proof evidence:
 - authoritative operation-plan preview and generated Apexify code produced the same artifact;
 - artifact size: 399 bytes;
 - SHA-256: `76d3fb9bc8c219f823912f35265a5182c9c366517e4d1226056ecad302b0a4f3`;
-- dedicated Studio Visual Phase Gate `35611056198`: PASS.
+- dedicated Studio Visual Phase Gate `35611056198`: PASS;
+- PR #78 squash-merged into `main` as `186b87bcabba5316639c5a103c0b12125822a35a`.
 
 The broader DOC-* failures observed on PR #78 are baseline documentation-workflow failures rather than Phase-2 regressions: the same workflow families were already failing repeatedly on `main` before the Phase-2 branch, including the Phase-2 base/current-main history. The dedicated Studio Visual Phase Gate and Documentation Runtime Build Gate both passed for the Phase-2 head.
 
