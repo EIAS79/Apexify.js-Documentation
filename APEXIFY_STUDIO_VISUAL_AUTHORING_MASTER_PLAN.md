@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 CI GREEN
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2680,7 +2680,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 |---|---|---|---|---|
 | 0 | Contract / capability baseline | PRODUCTION VERIFIED | `97d7741c8f35b06dd33bed5ba2ac9b247b344465` | Vercel deployment + `/`, `/studio`, `/docs/getting-started`, `/api-reference` smoke |
 | 1 | Dual-mode shell | PRODUCTION VERIFIED | `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7` | Vercel production deployment completed on main (`4d28777edbf140c9afe65e4e874a4b9b38ca5803`); live `/studio` Code → Visual → Code smoke passed with shared Assets/Output/Diagnostics/History and source-session preservation |
-| 2 | Project model / codegen core | NOT STARTED | — | — |
+| 2 | Project model / codegen core | CI GREEN | — | Manual deployment intentionally not triggered; current project instruction is merge-to-main only |
 | 3 | Viewport / layers / transforms / history | NOT STARTED | — | — |
 | 4 | Canvas | NOT STARTED | — | — |
 | 5 | Images / shapes / assets | NOT STARTED | — | — |
@@ -2732,6 +2732,52 @@ Completed Phase-1 scope:
 - live `/studio` smoke passed for Code → Visual → Code with the original Code Studio source preserved.
 
 The Phase-1 browser smoke verifies the Studio route at desktop and mobile widths, switches into Visual mode, confirms the empty/shared surfaces, checks for horizontal overflow, switches back to Code mode and proves that the Code Studio source session was not mutated.
+
+## Phase 2 implementation record — STUDIO-VISUAL-2
+
+> **Status:** CI GREEN
+>
+> **Work branch:** `studio-visual/v02-model-codegen`
+>
+> **Base main commit:** `be884aa507e8703d8a25118abb4b8167d3f84a76`
+>
+> **Green phase-gate run:** GitHub Actions `35611056198`
+>
+> **PR:** #78
+>
+> **Main integration:** pending squash merge after final tracking update
+>
+> **Deployment policy:** no manual Vercel deployment; current project instruction is merge-to-main only.
+
+Completed Phase-2 scope:
+
+- versioned `VisualProject` v1 semantic model;
+- stable project and node IDs;
+- typed asset / variable / palette references;
+- deterministic normalization;
+- structural/reference validation;
+- private Studio Operation Plan;
+- real Apexify operation-plan executor;
+- deterministic TypeScript code-generation framework;
+- minimal import registry;
+- stable identifier naming;
+- default single-file emitter;
+- `.apexstudio.json` save/load;
+- generated-code surface backed by the actual Visual Project;
+- explicit Visual → Code fork into a new Code Studio buffer;
+- Phase-2 unit tests;
+- desktop/mobile browser regression including Visual → Code handoff;
+- programmatic Visual Project proof using the real Apexify runtime;
+- generated-code/runtime equivalence proof.
+
+Phase-2 proof evidence:
+
+- authoritative operation-plan preview and generated Apexify code produced the same artifact;
+- artifact size: 399 bytes;
+- SHA-256: `76d3fb9bc8c219f823912f35265a5182c9c366517e4d1226056ecad302b0a4f3`;
+- dedicated Studio Visual Phase Gate `35611056198`: PASS.
+
+The broader DOC-* failures observed on PR #78 are baseline documentation-workflow failures rather than Phase-2 regressions: the same workflow families were already failing repeatedly on `main` before the Phase-2 branch, including the Phase-2 base/current-main history. The dedicated Studio Visual Phase Gate and Documentation Runtime Build Gate both passed for the Phase-2 head.
 
 Allowed phase statuses:
 

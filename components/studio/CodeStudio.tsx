@@ -86,6 +86,8 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
     setOutputTab,
     history,
     setHistory,
+    codeHandoff,
+    setCodeHandoff,
   } = useStudioSharedSession();
   const [assetsOpen, setAssetsOpen] = useState(false);
   const [editorInsertRequest, setEditorInsertRequest] = useState<{ id: number; text: string } | null>(null);
@@ -211,6 +213,22 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
     window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToast(null), 2400);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated || !codeHandoff) return;
+    const generatedBuffer: StudioBuffer = {
+      id: makeId('visual'),
+      name: codeHandoff.name,
+      ts: codeHandoff.source,
+      js: codeHandoff.source,
+    };
+    setBuffers((current) => [...current, generatedBuffer]);
+    setActiveBufferId(generatedBuffer.id);
+    setLang('ts');
+    setLayout('split');
+    setCodeHandoff(null);
+    flashToast('success', 'Generated Visual code opened in a new Code Studio buffer');
+  }, [codeHandoff, hydrated, flashToast, setCodeHandoff]);
 
   const revokePreview = useCallback(() => {
     for (const url of previewObjectUrlsRef.current) {
