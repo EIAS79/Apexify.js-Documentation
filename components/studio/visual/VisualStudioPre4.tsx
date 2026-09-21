@@ -1478,17 +1478,25 @@ export default function VisualStudioPre4({
             style={{ touchAction: 'none' }}
           >
             <div
-              ref={artboardRef}
-              className="apx-pre4-artboard"
-              data-artboard-surface
-              data-viewport-mode={viewportMode}
+              className="apx-pre4-artboard-frame"
               style={{
-                width: project.document.width,
-                height: project.document.height,
-                transform: 'translate(' + pan.x + 'px,' + pan.y + 'px) scale(' + zoom / 100 + ')',
-                transformOrigin: 'center',
+                width: project.document.width * (zoom / 100),
+                height: project.document.height * (zoom / 100),
+                transform: 'translate(' + pan.x + 'px,' + pan.y + 'px)',
               }}
             >
+              <div
+                ref={artboardRef}
+                className="apx-pre4-artboard"
+                data-artboard-surface
+                data-viewport-mode={viewportMode}
+                style={{
+                  width: project.document.width,
+                  height: project.document.height,
+                  transform: 'scale(' + zoom / 100 + ')',
+                  transformOrigin: 'top left',
+                }}
+              >
               <div className="apx-pre4-artboard-grid" />
 
               {guides.map((guide, index) => (
@@ -1568,6 +1576,7 @@ export default function VisualStudioPre4({
                   style={{ left: marquee.x, top: marquee.y, width: marquee.width, height: marquee.height }}
                 />
               )}
+              </div>
             </div>
           </div>
         </main>
