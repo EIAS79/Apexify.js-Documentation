@@ -720,33 +720,113 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
               >
                 <ChevronLeftIcon className="h-4 w-4" aria-hidden />
               </button>
-              <button type="button" className="apx-vw-iconbutton" disabled title="Layer creation begins in the authoring phases.">
+              <button type="button" className="apx-vw-iconbutton" onClick={addPlaceholder} title="Add generic layer" aria-label="Add generic layer">
                 <PlusIcon className="h-4 w-4" aria-hidden />
               </button>
             </div>
           </div>
 
-          <div className="apx-vw-layer-tree">
+          <div className="apx-vw-layer-tree" data-visual-layer-tree>
             <div className="apx-vw-layer-row apx-vw-layer-row--root">
               <FolderIcon className="h-4 w-4" aria-hidden />
               <span>Visual Project</span>
-              <EyeIcon className="ml-auto h-4 w-4" aria-hidden />
+              <span className="ml-auto apx-vw-layer-count">{project.document.rootNodeIds.length}</span>
             </div>
             <div className="apx-vw-layer-row">
               <RectangleGroupIcon className="h-4 w-4" aria-hidden />
               <span>Canvas</span>
             </div>
-            <div className="apx-vw-empty-list">
-              <RectangleStackIcon className="h-6 w-6" aria-hidden />
-              <strong>No visual layers yet</strong>
-              <span>Phase 2 connects this shell to the versioned Visual Project model.</span>
-            </div>
+
+            {project.document.rootNodeIds.length ? (
+              [...project.document.rootNodeIds].reverse().map((nodeId) => {
+                const node = project.document.nodes[nodeId];
+                if (!node) return null;
+                const transform = resolvedTransform(node.transform);
+                const selected = selection.includes(nodeId);
+                return (
+                  <div
+                    key={nodeId}
+                    className="apx-vw-layer-row apx-vw-layer-row--editable"
+                    data-selected={selected ? 'true' : undefined}
+                    data-visual-layer-id={nodeId}
+                    onClick={(event) => selectLayer(nodeId, event.metaKey || event.ctrlKey || event.shiftKey)}
+                  >
+                    <RectangleStackIcon className="h-4 w-4 shrink-0" aria-hidden />
+                    <span className="apx-vw-layer-name">{node.name ?? node.kind}</span>
+                    <div className="apx-vw-layer-actions" onClick={(event) => event.stopPropagation()}>
+                      <button
+                        type="button"
+                        title={transform.visible ? 'Hide layer' : 'Show layer'}
+                        aria-label={transform.visible ? 'Hide layer' : 'Show layer'}
+                        onClick={() =>
+                          commitTransform(nodeId, { visible: !transform.visible }, transform.visible ? 'Hide layer' : 'Show layer')
+                        }
+                      >
+                        {transform.visible ? <EyeIcon className="h-3.5 w-3.5" aria-hidden /> : <EyeSlashIcon className="h-3.5 w-3.5" aria-hidden />}
+                      </button>
+                      <button
+                        type="button"
+                        title={transform.locked ? 'Unlock layer' : 'Lock layer'}
+                        aria-label={transform.locked ? 'Unlock layer' : 'Lock layer'}
+                        onClick={() =>
+                          commitTransform(nodeId, { locked: !transform.locked }, transform.locked ? 'Unlock layer' : 'Lock layer')
+                        }
+                      >
+                        {transform.locked ? <LockClosedIcon className="h-3.5 w-3.5" aria-hidden /> : <LockOpenIcon className="h-3.5 w-3.5" aria-hidden />}
+                      </button>
+                      <button
+                        type="button"
+                        title="Move layer forward"
+                        aria-label="Move layer forward"
+                        onClick={() => commitProject('Reorder layer', (current) => reorderRootNode(current, nodeId, 'forward'))}
+                      >
+                        <ChevronUpIcon className="h-3.5 w-3.5" aria-hidden />
+                      </button>
+                      <button
+                        type="button"
+                        title="Move layer backward"
+                        aria-label="Move layer backward"
+                        onClick={() => commitProject('Reorder layer', (current) => reorderRootNode(current, nodeId, 'backward'))}
+                      >
+                        <ChevronDownIcon className="h-3.5 w-3.5" aria-hidden />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="apx-vw-empty-list">
+                <RectangleStackIcon className="h-6 w-6" aria-hidden />
+                <strong>No layers yet</strong>
+                <span>Add generic layers to exercise selection, transforms, history and snapping.</span>
+              </div>
+            )}
           </div>
 
-          <div className="apx-vw-mini-card">
-            <span className="apx-vw-mini-card__eyebrow">Selected tool</span>
-            <strong>{tool[0].toUpperCase() + tool.slice(1)}</strong>
-            <span>Interface shell only — authoring controls activate in their owning phase.</span>
+          <div className="apx-vw-mini-card apx-vw-layer-toolbar">
+            <div className="apx-vw-layer-toolbar__row">
+              <button type="button" onClick={addPlaceholder} data-visual-add-layer>
+                <PlusIcon className="h-4 w-4" aria-hidden />
+                Add layer
+              </button>
+              <button
+                type="button"
+                disabled={!selection.length}
+                onClick={() => commitProject('Duplicate layer', duplicateSelectedNodes)}
+                title="Duplicate selected layer(s)"
+              >
+                <DocumentDuplicateIcon className="h-4 w-4" aria-hidden />
+              </button>
+              <button
+                type="button"
+                disabled={!selection.length}
+                onClick={() => commitProject('Delete layer', deleteSelectedNodes)}
+                title="Delete selected layer(s)"
+              >
+                <TrashIcon className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+            <span>{selection.length ? `${selection.length} selected` : 'Select a layer to edit'}</span>
           </div>
         </aside>
 
