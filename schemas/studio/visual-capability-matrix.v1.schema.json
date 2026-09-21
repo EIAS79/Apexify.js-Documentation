@@ -272,7 +272,6 @@
         "totalOptionPaths",
         "classifiedOptionPaths",
         "unclassifiedOptionPaths",
-        "classificationSha256",
         "complete"
       ],
       "properties": {
@@ -305,10 +304,6 @@
         "unclassifiedOptionPaths": {
           "type": "integer",
           "minimum": 0
-        },
-        "classificationSha256": {
-          "type": "string",
-          "pattern": "^[a-f0-9]{64}$"
         },
         "complete": {
           "type": "boolean"
