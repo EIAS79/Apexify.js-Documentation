@@ -34,6 +34,30 @@ function validateRecordIds(
   return ids;
 }
 
+function validateTransform(
+  issues: VisualProjectIssue[],
+  transform: VisualProject['document']['nodes'][string]['transform'],
+  path: string,
+): void {
+  if (!transform) return;
+  const finiteFields = ['x', 'y', 'width', 'height', 'scaleX', 'scaleY', 'rotation', 'anchorX', 'anchorY', 'opacity', 'zIndex'] as const;
+  for (const field of finiteFields) {
+    const value = transform[field];
+    if (value !== undefined && !Number.isFinite(value)) {
+      push(issues, 'invalid-transform', `${path}.${field}`, `Transform ${field} must be finite.`);
+    }
+  }
+  if (transform.width !== undefined && transform.width <= 0) {
+    push(issues, 'invalid-transform-size', `${path}.width`, 'Transform width must be positive.');
+  }
+  if (transform.height !== undefined && transform.height <= 0) {
+    push(issues, 'invalid-transform-size', `${path}.height`, 'Transform height must be positive.');
+  }
+  if (transform.opacity !== undefined && (transform.opacity < 0 || transform.opacity > 1)) {
+    push(issues, 'invalid-transform-opacity', `${path}.opacity`, 'Transform opacity must be between 0 and 1.');
+  }
+}
+
 function visitReferences(
   value: VisualValue,
   path: string,
@@ -80,6 +104,7 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   for (const [key, node] of Object.entries(project.document.nodes)) {
     if (node.id !== key) push(issues, 'node-key-mismatch', `document.nodes.${key}.id`, 'Node id must match its nodes-map key.');
     if (!isStableVisualId(node.id)) push(issues, 'invalid-id', `document.nodes.${key}.id`, 'Node id is invalid.');
+    validateTransform(issues, node.transform, `document.nodes.${key}.transform`);
     if (node.parentId && !nodeIds.has(node.parentId)) push(issues, 'missing-parent', `document.nodes.${key}.parentId`, `Unknown parent node "${node.parentId}".`);
     const seenChildren = new Set<string>();
     for (const childId of node.childIds ?? []) {
