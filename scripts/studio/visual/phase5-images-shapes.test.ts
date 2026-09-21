@@ -7,6 +7,10 @@ import {
 } from '../../../lib/studio/visual/project';
 import {
   defaultImageNodeProps,
+  CREATE_IMAGE_OPTIONS_CLASSIFICATION,
+  GROUP_TRANSFORM_CLASSIFICATION,
+  IMAGE_AUTHORING_CLASSIFICATION,
+  SHAPE_PROPERTIES_CLASSIFICATION,
   defaultShapeNodeProps,
   imagePropsRecord,
   visualImageProps,
@@ -250,5 +254,33 @@ test('Phase 5 permanent shell exposes image shape asset workflows and authoritat
     'Replace with Studio asset',
   ]) {
     assert.ok(shell.includes(contract), 'missing Phase 5 UI contract: ' + contract);
+  }
+});
+
+
+test('Phase 5 classifies every pinned image, shape and createImage option into the permanent UI', () => {
+  assert.deepEqual(Object.keys(IMAGE_AUTHORING_CLASSIFICATION).sort(), [
+    'align','blendMode','blur','borderPosition','borderRadius','boxBackground',
+    'clipPath','distortion','effects','filterIntensity','filterOrder','filters',
+    'fit','height','inherit','mask','meshWarp','opacity','rotation','shadow',
+    'shape','source','stroke','width','x','y',
+  ].sort());
+  assert.deepEqual(Object.keys(CREATE_IMAGE_OPTIONS_CLASSIFICATION).sort(), [
+    'groupTransform','isGrouped',
+  ]);
+  assert.deepEqual(Object.keys(GROUP_TRANSFORM_CLASSIFICATION).sort(), [
+    'blendMode','blur','borderPosition','borderRadius','boxBackground',
+    'clipPath','distortion','effects','filterIntensity','filterOrder','filters',
+    'mask','meshWarp','opacity','pivotX','pivotY','rotation','scaleX','scaleY',
+    'shadow','stroke','translateX','translateY',
+  ].sort());
+  assert.deepEqual(Object.keys(SHAPE_PROPERTIES_CLASSIFICATION).sort(), [
+    'centerX','centerY','color','endAngle','fill','gradient','innerRadius',
+    'outerRadius','points','radius','sides','startAngle',
+  ].sort());
+
+  for (const entry of Object.values(IMAGE_AUTHORING_CLASSIFICATION)) {
+    assert.ok(['Transform','Style','Effects','Data','Advanced'].includes(entry.surface));
+    assert.ok(['canonical-literal','stable-source','generated-buffer'].includes(entry.reverse));
   }
 });
