@@ -4671,3 +4671,225 @@
     display:none;
   }
 }
+
+
+/* PRE-4 polish: generated-code + canvas-output split, reference-style asset drawer. */
+.apx-pre4-generated-grid{
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(0,1.55fr) minmax(250px,.85fr);
+  background:#050d16;
+}
+
+.apx-pre4-code-wrap{
+  min-width:0;
+  border-right:1px solid #12243a;
+}
+
+.apx-pre4-code-lines{
+  min-height:0;
+  flex:1 1 auto;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  overflow:hidden;
+  background:#050b13;
+}
+
+.apx-pre4-code-lines>ol{
+  margin:0;
+  padding:.62rem 7px .8rem 0;
+  overflow:hidden;
+  list-style:none;
+  border-right:1px solid #102136;
+  color:#42556d;
+  background:#050b13;
+  text-align:right;
+  font:500 .51rem/1.58 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  user-select:none;
+}
+
+.apx-pre4-code-lines>ol li{
+  height:calc(.51rem * 1.58);
+}
+
+.apx-pre4-code-lines .apx-pre4-code{
+  min-width:0;
+  height:100%;
+}
+
+.apx-pre4-output-pane{
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  background:#06101a;
+}
+
+.apx-pre4-output-head{
+  flex:0 0 31px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.6rem;
+  padding:0 .6rem;
+  border-bottom:1px solid #102136;
+  color:#8da0b6;
+  background:#07131f;
+  font-size:.49rem;
+}
+
+.apx-pre4-output-head>span{
+  color:#b6c4d5;
+  font-weight:720;
+}
+
+.apx-pre4-output-head small{
+  min-width:0;
+  overflow:hidden;
+  color:#60758e;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.apx-pre4-output-body{
+  min-height:0;
+  flex:1 1 auto;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(43,70,104,.12),transparent 45%),
+    #050c15;
+}
+
+.apx-pre4-output-body>div{
+  min-height:0!important;
+  height:100%;
+}
+
+.apx-pre4-output-placeholder{
+  height:100%;
+  display:grid;
+  place-content:center;
+  justify-items:center;
+  gap:.26rem;
+  padding:.75rem;
+  color:#667c94;
+  text-align:center;
+}
+
+.apx-pre4-output-placeholder>span{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border:1px solid #1c3651;
+  border-radius:8px;
+  color:#8196ad;
+  background:#091725;
+}
+
+.apx-pre4-output-placeholder strong{
+  color:#aebdce;
+  font-size:.56rem;
+}
+
+.apx-pre4-output-placeholder small{
+  max-width:180px;
+  color:#60758d;
+  font-size:.46rem;
+  line-height:1.4;
+}
+
+.apx-pre4-assets-head{
+  justify-content:space-between;
+}
+
+.apx-pre4-assets-head>div{
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+  min-width:0;
+}
+
+.apx-pre4-assets-head>button{
+  height:25px;
+  padding:0 .48rem;
+  border:1px solid #1d3854;
+  border-radius:5px;
+  color:#8fa3ba;
+  background:#091827;
+  font-size:.45rem;
+  font-weight:700;
+}
+
+.apx-pre4-assets-head>button:hover{
+  color:#eef5ff;
+  border-color:#30536f;
+  background:#0c1e30;
+}
+
+.apx-pre4-asset-tabs{
+  flex:0 0 31px;
+  display:flex;
+  align-items:stretch;
+  gap:.05rem;
+  padding:0 .42rem;
+  overflow-x:auto;
+  border-bottom:1px solid #102136;
+  background:#06111c;
+}
+
+.apx-pre4-asset-tabs>button{
+  min-width:max-content;
+  display:flex;
+  align-items:center;
+  gap:.28rem;
+  padding:0 .42rem;
+  border:0;
+  border-bottom:2px solid transparent;
+  color:#667b94;
+  background:transparent;
+  font-size:.44rem;
+  font-weight:700;
+}
+
+.apx-pre4-asset-tabs>button:hover{
+  color:#aebed0;
+}
+
+.apx-pre4-asset-tabs>button[data-active="true"]{
+  color:#e9f1fb;
+  border-bottom-color:#6a70eb;
+}
+
+.apx-pre4-asset-tabs>button span{
+  min-width:15px;
+  height:15px;
+  display:grid;
+  place-items:center;
+  border-radius:999px;
+  color:#70859d;
+  background:#0d2135;
+  font-size:.39rem;
+}
+
+.apx-pre4-asset-tabs>button[data-active="true"] span{
+  color:#a9b9cc;
+  background:#152a43;
+}
+
+@media(max-width:1250px){
+  .apx-pre4-generated-grid{
+    grid-template-columns:minmax(0,1fr) 240px;
+  }
+}
+
+@media(max-width:1020px){
+  .apx-pre4-generated-grid{
+    grid-template-columns:minmax(0,1fr);
+  }
+
+  .apx-pre4-output-pane{
+    display:none;
+  }
+}
