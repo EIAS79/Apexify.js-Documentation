@@ -61,7 +61,18 @@ export interface StudioOperationRuntime {
     y: number,
     options?: { includeStroke?: boolean; strokeWidth?: number; tolerance?: number; fillRule?: 'nonzero' | 'evenodd' },
   ): Promise<unknown>;
-  detectRegion?(region: unknown, x: number, y: number, options?: { tolerance?: number }): Promise<unknown>;
+  detectRegion?(
+    region: unknown,
+    x: number,
+    y: number,
+    options?: { includeStroke?: boolean; strokeWidth?: number; tolerance?: number; fillRule?: 'nonzero' | 'evenodd' },
+  ): Promise<unknown>;
+  detectAnyRegion?(
+    regions: unknown[],
+    x: number,
+    y: number,
+    options?: { includeStroke?: boolean; strokeWidth?: number; tolerance?: number; fillRule?: 'nonzero' | 'evenodd' },
+  ): Promise<unknown>;
   detectDistance?(region: unknown, x: number, y: number): Promise<unknown>;
 }
 
@@ -196,6 +207,11 @@ export async function executeStudioOperationPlan(
       case 'detect-region': {
         if (!runtime.detectRegion) throw new Error('Studio runtime does not implement detect.region().');
         await runtime.detectRegion(operation.region, operation.x, operation.y, operation.options);
+        break;
+      }
+      case 'detect-any-region': {
+        if (!runtime.detectAnyRegion) throw new Error('Studio runtime does not implement detect.anyRegion().');
+        await runtime.detectAnyRegion(operation.regions, operation.x, operation.y, operation.options);
         break;
       }
       case 'detect-distance': {
