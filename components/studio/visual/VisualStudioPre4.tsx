@@ -3059,6 +3059,7 @@ export default function VisualStudioPre4({
           assets={assets}
           onChange={setAssets}
           onInsertReference={(value) => setMessage('Asset reference: ' + value)}
+          onInsertAsset={insertImageAsset}
           onNotice={(_kind, text) => setMessage(text)}
         />
       );
@@ -3518,7 +3519,12 @@ export default function VisualStudioPre4({
               </div>
               <div className="apx-pre4-assets-grid">
                 {filteredAssets.length ? filteredAssets.slice(0, 9).map((asset) => (
-                  <button key={asset.id} type="button" title={asset.name} onClick={() => setDockTab('assets')}>
+                  <button
+                    key={asset.id}
+                    type="button"
+                    title={asset.mime.startsWith('image/') ? 'Insert ' + asset.name : asset.name}
+                    onClick={() => asset.mime.startsWith('image/') ? insertImageAsset(asset) : setDockTab('assets')}
+                  >
                     {asset.mime.startsWith('image/') ? (
                       <img src={'data:' + asset.mime + ';base64,' + asset.base64} alt="" />
                     ) : (
