@@ -61,30 +61,7 @@
   font-family:Inter,Geist,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
-.light .apx-studio-root{
-  --studio-bg:#eef1f4;
-  --studio-bg-2:#e8edf1;
-  --studio-panel:#f7f8fa;
-  --studio-panel-2:#ffffff;
-  --studio-panel-3:#e5eaf0;
-  --studio-line:#cbd4de;
-  --studio-line-soft:#dde3ea;
-  --studio-text:#141922;
-  --studio-text-2:#4e5a68;
-  --studio-text-3:#526171;
-  --studio-blue:#4058cc;
-  --studio-blue-2:#3048b8;
-  --studio-mint:#365f5a;
-  --studio-mint-2:#305b56;
-  --studio-lavender:#7169a6;
-  --studio-action:#4058cc;
-  --studio-action-ink:#fff;
-  --text-inverse:#fff;
-  --gradient-twilight:linear-gradient(145deg,#eef1f4 0%,#e8edf1 55%,#f7f8fa 100%);
-  --shadow-md:0 12px 34px rgba(44,56,74,.12);
-  --shadow-lg:0 22px 60px rgba(44,56,74,.16);
-  --shadow-xl:0 30px 90px rgba(44,56,74,.2);
-}
+/* Studio intentionally remains dark regardless of the documentation-site theme. */
 
 .apx-studio-root::before{
   content:"";
@@ -2159,5 +2136,117 @@
   .studio-code-topbar__utilities{
     justify-content:space-between;
     overflow-x:auto;
+  }
+}
+
+
+/* ==========================================================================
+   Compact permanent-dark Studio chrome
+   ========================================================================== */
+
+.apx-studio-shell,
+.light .apx-studio-shell{
+  --bg-base:#0d1118;
+  --bg-canvas:#101722;
+  --bg-raised:#151c29;
+  --bg-elevated:#1a2231;
+  --bg-sunken:#202a3a;
+  --border-subtle:#202a38;
+  --border-default:#2a3546;
+  --border-strong:#3b485b;
+  --text-primary:#eef2f6;
+  --text-secondary:#b8c2cf;
+  --text-tertiary:#7f8b9b;
+  --text-muted:#7f8b9b;
+  color-scheme:dark;
+}
+
+.studio-mode-switch{
+  gap:.22rem;
+  padding:.2rem;
+}
+
+.studio-mode-switch button{
+  position:relative;
+  width:2rem;
+  height:2rem;
+  min-height:2rem;
+  padding:0;
+}
+
+.studio-icon-control{
+  position:relative;
+}
+
+.studio-icon-control[data-tooltip]::after,
+.studio-mode-switch button[data-tooltip]::after{
+  content:attr(data-tooltip);
+  position:absolute;
+  left:50%;
+  top:calc(100% + .48rem);
+  z-index:120;
+  transform:translate(-50%,-3px);
+  padding:.3rem .48rem;
+  border:1px solid #33445c;
+  border-radius:.42rem;
+  background:#0a111d;
+  color:#f4f7fb;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  font-size:.57rem;
+  font-weight:750;
+  line-height:1;
+  letter-spacing:.01em;
+  white-space:nowrap;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .12s ease,transform .12s ease;
+}
+
+.studio-icon-control[data-tooltip]:hover::after,
+.studio-icon-control[data-tooltip]:focus-visible::after,
+.studio-mode-switch button[data-tooltip]:hover::after,
+.studio-mode-switch button[data-tooltip]:focus-visible::after{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+.studio-icon-badge{
+  position:absolute;
+  right:-.28rem;
+  top:-.28rem;
+  min-width:1rem;
+  height:1rem;
+  display:grid;
+  place-items:center;
+  padding:0 .22rem;
+  border:2px solid var(--studio-bg);
+  border-radius:999px;
+  background:var(--studio-blue);
+  color:#fff;
+  font-size:.48rem;
+  font-weight:850;
+  line-height:1;
+}
+
+.studio-code-topbar__resources{
+  padding:.18rem;
+  border:1px solid var(--studio-line-soft);
+  border-radius:.72rem;
+  background:color-mix(in srgb,var(--studio-bg-2) 82%,transparent);
+}
+
+.studio-code-topbar__utilities{
+  gap:.35rem;
+}
+
+@media(max-width:1480px){
+  .studio-code-topbar .studio-mode-switch button span{
+    display:initial;
+  }
+}
+
+@media(max-width:1180px){
+  .studio-code-topbar__resources{
+    padding:.14rem;
   }
 }
