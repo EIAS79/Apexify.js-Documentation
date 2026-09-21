@@ -4511,8 +4511,24 @@ export default function VisualStudioPre4({
                   <button
                     key={asset.id}
                     type="button"
-                    title={asset.mime.startsWith('image/') ? 'Insert ' + asset.name : asset.name}
-                    onClick={() => asset.mime.startsWith('image/') ? insertImageAsset(asset) : setDockTab('assets')}
+                    title={
+                      asset.mime.startsWith('image/')
+                        ? 'Insert ' + asset.name
+                        : isStudioFontAsset(asset)
+                          ? 'Apply ' + studioAssetFontFamily(asset)
+                          : asset.name
+                    }
+                    onClick={() => {
+                      if (asset.mime.startsWith('image/')) {
+                        insertImageAsset(asset);
+                        return;
+                      }
+                      if (isStudioFontAsset(asset)) {
+                        applyFontAsset(asset);
+                        return;
+                      }
+                      setDockTab('assets');
+                    }}
                   >
                     {asset.mime.startsWith('image/') ? (
                       <img src={'data:' + asset.mime + ';base64,' + asset.base64} alt="" />
