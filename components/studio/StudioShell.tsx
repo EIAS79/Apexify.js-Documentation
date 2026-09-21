@@ -78,6 +78,8 @@ export default function StudioShell() {
           <button
             type="button"
             role="tab"
+            id="studio-mode-code-tab"
+            aria-controls="studio-code-panel"
             aria-selected={mode === 'code'}
             data-studio-mode-tab="code"
             onClick={() => chooseMode('code')}
@@ -93,6 +95,8 @@ export default function StudioShell() {
           <button
             type="button"
             role="tab"
+            id="studio-mode-visual-tab"
+            aria-controls="studio-visual-panel"
             aria-selected={mode === 'visual'}
             data-studio-mode-tab="visual"
             onClick={() => chooseMode('visual')}
@@ -110,7 +114,9 @@ export default function StudioShell() {
 
       <section
         className="min-h-0 flex-1"
+        id="studio-code-panel"
         role="tabpanel"
+        aria-labelledby="studio-mode-code-tab"
         aria-label="Code Studio"
         hidden={mode !== 'code'}
         data-studio-code-panel
@@ -121,7 +127,9 @@ export default function StudioShell() {
       {visualVisited ? (
         <section
           className="min-h-0 flex-1"
+          id="studio-visual-panel"
           role="tabpanel"
+          aria-labelledby="studio-mode-visual-tab"
           aria-label="Visual Studio"
           hidden={mode !== 'visual'}
           data-studio-visual-panel
