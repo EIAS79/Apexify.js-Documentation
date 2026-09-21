@@ -4907,3 +4907,31 @@
 .apx-pre4-output-body video.apx-pre4-output-media{
   background:#03070c;
 }
+
+
+.apx-pre4-control-icon{
+  width:14px;
+  height:14px;
+  flex:0 0 auto;
+  stroke-width:1.8;
+}
+
+.apx-pre4-toolbar-icon{
+  width:15px;
+  height:15px;
+  stroke-width:1.8;
+}
+
+.apx-pre4-feature-icon svg{
+  width:15px;
+  height:15px;
+  display:block;
+  stroke-width:1.7;
+}
+
+.apx-pre4-100{
+  width:34px!important;
+  font-size:.43rem!important;
+  font-weight:800!important;
+  letter-spacing:-.02em;
+}
