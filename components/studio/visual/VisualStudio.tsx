@@ -152,6 +152,7 @@ function NumericField({
   step = 1,
   min,
   max,
+  disabled = false,
 }: {
   label: string;
   value: number;
@@ -159,6 +160,7 @@ function NumericField({
   step?: number;
   min?: number;
   max?: number;
+  disabled?: boolean;
 }) {
   const [draft, setDraft] = useState(String(Math.round(value * 1000) / 1000));
 
@@ -183,6 +185,7 @@ function NumericField({
       <input
         type="number"
         value={draft}
+        disabled={disabled}
         step={step}
         min={min}
         max={max}
@@ -1143,33 +1146,39 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
                     <div className="apx-vw-number-grid">
                       <NumericField
                         label="X"
+                        disabled={primaryTransform.locked}
                         value={primaryTransform.x}
                         onCommit={(value) => commitTransform(primaryNode.id, { x: value })}
                       />
                       <NumericField
                         label="Y"
+                        disabled={primaryTransform.locked}
                         value={primaryTransform.y}
                         onCommit={(value) => commitTransform(primaryNode.id, { y: value })}
                       />
                       <NumericField
                         label="W"
+                        disabled={primaryTransform.locked}
                         value={primaryTransform.width}
                         min={8}
                         onCommit={(value) => commitTransform(primaryNode.id, { width: value })}
                       />
                       <NumericField
                         label="H"
+                        disabled={primaryTransform.locked}
                         value={primaryTransform.height}
                         min={8}
                         onCommit={(value) => commitTransform(primaryNode.id, { height: value })}
                       />
                       <NumericField
                         label="Rotation"
+                        disabled={primaryTransform.locked}
                         value={primaryTransform.rotation}
                         onCommit={(value) => commitTransform(primaryNode.id, { rotation: value })}
                       />
                       <NumericField
                         label="Opacity"
+                        disabled={primaryTransform.locked}
                         value={Math.round(primaryTransform.opacity * 100)}
                         min={0}
                         max={100}
