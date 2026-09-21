@@ -101,6 +101,20 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       targetNames.set(operation.target, targetName);
       continue;
     }
+
+    if (operation.kind === 'create-text') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'text',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      const properties = emitValue(operation.properties, 2, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.createText(${properties}, ${base});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
   }
 
   const resultName = targetNames.get(plan.result.target);
