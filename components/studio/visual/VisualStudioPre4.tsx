@@ -1384,7 +1384,64 @@ export default function VisualStudioPre4({
     );
   };
 
+  const renderCanvasInspector = () => (
+    <>
+      <div className="apx-pre4-inspector-title">
+        <div>
+          <strong>{project.name}</strong>
+          <small>Canvas document</small>
+        </div>
+        <span className="apx-pre4-type-pill">canvas</span>
+      </div>
+
+      <div className="apx-pre4-property">
+        <label>Canvas name</label>
+        <input
+          className="apx-pre4-input"
+          value={project.name}
+          onFocus={beginPropertyEdit}
+          onChange={(event) => renameCanvas(event.target.value)}
+          onBlur={() => endPropertyEdit('Rename canvas')}
+        />
+      </div>
+
+      <div className="apx-pre4-property-grid">
+        {(['width', 'height'] as const).map((key) => (
+          <label key={key}>
+            <span>{key === 'width' ? 'W' : 'H'}</span>
+            <input
+              className="apx-pre4-input"
+              type="number"
+              min={1}
+              max={16384}
+              value={project.document[key]}
+              onFocus={beginPropertyEdit}
+              onChange={(event) => {
+                const value = Math.max(1, Math.min(16384, Number(event.target.value) || 1));
+                setProject((current) => ({
+                  ...current,
+                  updatedAt: new Date().toISOString(),
+                  document: { ...current.document, [key]: value },
+                }));
+              }}
+              onBlur={() => endPropertyEdit('Resize canvas')}
+            />
+          </label>
+        ))}
+      </div>
+
+      <div className="apx-live-sync-note">
+        <strong>Live Code Sync</strong>
+        <span>Canvas size changes update the code below automatically. Numeric createCanvas edits sync back here.</span>
+      </div>
+    </>
+  );
+
   const renderInspector = () => {
+    if ((inspectorTab === 'style' || inspectorTab === 'transform') && !primary && activeTool === 'canvas') {
+      return renderCanvasInspector();
+    }
+
     if ((inspectorTab === 'style' || inspectorTab === 'transform') && !primary) {
       return renderTransformFields();
     }
