@@ -30,6 +30,8 @@ jobs:
       - name: Install
         run: npm ci
       - name: Run exact Studio video smoke
+        env:
+          STUDIO_DISABLE_PRLIMIT: '1'
         run: npm run studio:smoke:video
       - name: Upload rendered MP4
         if: success()
