@@ -1,7 +1,8 @@
+import type { VisualCanvasConfig } from '../model';
 import type { StudioOperationPlan } from './plan';
 
 export interface StudioOperationRuntime {
-  createCanvas(options: { width: number; height: number }): Promise<{ buffer: Uint8Array }>;
+  createCanvas(options: { width: number; height: number } & VisualCanvasConfig): Promise<{ buffer: Uint8Array }>;
 }
 
 export async function executeStudioOperationPlan(
