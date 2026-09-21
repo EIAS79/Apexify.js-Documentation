@@ -125,7 +125,7 @@ function splitSharedHelpers(sharedCode) {
     .replace(/^const Apex:[^\n]*\n/gm, '')
     .replace(/^const ApexPainter:[^\n]*\n/gm, '')
     .replace(/^const ApexifyDecodeError:[^\n]*\n/gm, '')
-    .replace(/const coverage:[\s\S]*?const p:[^\n]*\n/, '')
+    .replace(/const coverage:[\s\S]*?const p:[^\n]*\n/, "const makePainter = (options = undefined) => new ApexPainter(options);\n")
     .replace(/const C:\s*any\s*=\s*Object\.freeze/, 'const COLORS = Object.freeze')
     // The published Studio source must not depend on Peak Lab's CI-only
     // output/assets tree or on an env key intentionally hidden by the sandbox.
@@ -135,7 +135,12 @@ function splitSharedHelpers(sharedCode) {
     )
     .replace(
       /const fontFile:[^\n]*\nconst font:[^\n]*\n/,
-      "const font = (size=24) => ({ size, family: 'DejaVu Sans' });\n",
+      [
+        "const FONT_FILES = { sans: 'DejaVuSans.ttf', bold: 'DejaVuSans-Bold.ttf', serif: 'DejaVuSerif.ttf', mono: 'DejaVuSansMono.ttf' };",
+        "const fontFile = (style = 'sans') => path.join(process.cwd(), 'node_modules', 'dejavu-fonts-ttf', 'ttf', FONT_FILES[style]);",
+        "const font = (size = 24, style = 'sans') => ({ size, path: fontFile(style), name: 'Peak-' + style, family: 'Peak-' + style });",
+        "",
+      ].join('\n'),
     )
     // Return the real generated path so Studio can collect and preview it.
     .replace(
