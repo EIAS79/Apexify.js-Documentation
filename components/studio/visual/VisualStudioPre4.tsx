@@ -160,6 +160,7 @@ export default function VisualStudioPre4({
     'preview' | 'generated' | 'diagnostics' | 'assets' | 'history'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
+  const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
 
   const history = useRef(new VisualHistory(100));
   const gesture = useRef<Gesture | null>(null);
@@ -196,6 +197,19 @@ export default function VisualStudioPre4({
     previewArtifacts.find((artifact) => artifact.id === activeArtifactId) ??
     previewArtifacts[0] ??
     null;
+
+  const assetKind = (mime: string) =>
+    mime.startsWith('image/')
+      ? 'image'
+      : mime.startsWith('audio/')
+        ? 'audio'
+        : mime.startsWith('video/')
+          ? 'video'
+          : mime.startsWith('font/') || /woff|ttf|otf/i.test(mime)
+            ? 'font'
+            : 'image';
+
+  const filteredAssets = assets.filter((asset) => assetKind(asset.mime) === assetFilter);
 
   const generated = useMemo(() => {
     try {
@@ -1211,14 +1225,42 @@ export default function VisualStudioPre4({
 
     if (dockTab === 'generated') {
       return generated.value ? (
-        <div className="apx-pre4-code-wrap">
-          <div className="apx-pre4-code-meta">
-            <span>Apexify.js generated source</span>
-            <button type="button" onClick={() => void navigator.clipboard.writeText(generated.value!.source)}>
-              Copy Code
-            </button>
+        <div className="apx-pre4-generated-grid">
+          <div className="apx-pre4-code-wrap">
+            <div className="apx-pre4-code-meta">
+              <span>Generated Apexify.js</span>
+              <button type="button" onClick={() => void navigator.clipboard.writeText(generated.value!.source)}>
+                Copy Code
+              </button>
+            </div>
+            <div className="apx-pre4-code-lines">
+              <ol aria-hidden="true">
+                {generated.value.source.split('\n').map((_, index) => <li key={index}>{index + 1}</li>)}
+              </ol>
+              <pre className="apx-pre4-code">{generated.value.source}</pre>
+            </div>
           </div>
-          <pre className="apx-pre4-code">{generated.value.source}</pre>
+          <div className="apx-pre4-output-pane">
+            <div className="apx-pre4-output-head">
+              <span>Canvas Output</span>
+              <small>{activeArtifact ? activeArtifact.name : 'No preview yet'}</small>
+            </div>
+            <div className="apx-pre4-output-body">
+              {activeArtifact ? (
+                <StudioArtifactPreview
+                  artifact={activeArtifact}
+                  artifacts={previewArtifacts}
+                  onArtifactSelect={setActiveArtifactId}
+                />
+              ) : (
+                <div className="apx-pre4-output-placeholder">
+                  <span>◇</span>
+                  <strong>Preview output</strong>
+                  <small>Run or preview the project to populate this pane.</small>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       ) : (
         <div className="apx-pre4-dock-empty">
@@ -1627,23 +1669,46 @@ export default function VisualStudioPre4({
           {!dockCollapsed && (
             <aside className="apx-pre4-assets-pane">
               <div className="apx-pre4-assets-head">
-                <strong>Assets</strong>
-                <span>{assets.length}</span>
+                <div>
+                  <strong>Assets</strong>
+                  <span>{assets.length}</span>
+                </div>
+                <button type="button" onClick={() => setDockTab('assets')}>＋ Upload</button>
+              </div>
+              <div className="apx-pre4-asset-tabs" role="tablist" aria-label="Asset categories">
+                {([
+                  ['image', 'Images'],
+                  ['font', 'Fonts'],
+                  ['audio', 'Audio'],
+                  ['video', 'Video'],
+                ] as const).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={assetFilter === id}
+                    data-active={assetFilter === id ? 'true' : undefined}
+                    onClick={() => setAssetFilter(id)}
+                  >
+                    {label}
+                    <span>{assets.filter((asset) => assetKind(asset.mime) === id).length}</span>
+                  </button>
+                ))}
               </div>
               <div className="apx-pre4-assets-grid">
-                {assets.length ? assets.slice(0, 8).map((asset) => (
+                {filteredAssets.length ? filteredAssets.slice(0, 9).map((asset) => (
                   <button key={asset.id} type="button" title={asset.name} onClick={() => setDockTab('assets')}>
                     {asset.mime.startsWith('image/') ? (
                       <img src={'data:' + asset.mime + ';base64,' + asset.base64} alt="" />
                     ) : (
-                      <span>{asset.mime.startsWith('video/') ? '▷' : asset.mime.startsWith('audio/') ? '♪' : '◆'}</span>
+                      <span>{asset.mime.startsWith('video/') ? '▷' : asset.mime.startsWith('audio/') ? '♪' : assetKind(asset.mime) === 'font' ? 'Aa' : '◆'}</span>
                     )}
                     <small>{asset.name}</small>
                   </button>
                 )) : (
                   <button type="button" onClick={() => setDockTab('assets')} className="apx-pre4-assets-empty">
                     <span>＋</span>
-                    <small>Upload Assets</small>
+                    <small>No {assetFilter} assets</small>
                   </button>
                 )}
               </div>
