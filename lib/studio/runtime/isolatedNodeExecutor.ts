@@ -607,13 +607,19 @@ function executeDeno(
     const args = denoArguments(runDir, entry, media);
 
     const prlimit = '/usr/bin/prlimit';
-    const command = process.platform === 'linux' && existsSync(prlimit) ? prlimit : deno;
+    const usePrlimit =
+      process.platform === 'linux' &&
+      existsSync(prlimit) &&
+      process.env.STUDIO_DISABLE_PRLIMIT !== '1';
+    const command = usePrlimit ? prlimit : deno;
     const commandArgs =
-      command === prlimit
+      usePrlimit
         ? [
             '--cpu=55',
             '--nofile=128',
-            // Deno/V8 plus native Canvas/Sharp/FFmpeg can create dozens of worker threads.\n            // Keep a hard process/thread ceiling without starving runtime startup.\n            '--nproc=256',
+            // Deno/V8 plus native Canvas/Sharp/FFmpeg can create dozens of worker threads.
+            // Keep a hard process/thread ceiling without starving runtime startup.
+            '--nproc=256',
             '--as=2147483648',
             '--',
             deno,
