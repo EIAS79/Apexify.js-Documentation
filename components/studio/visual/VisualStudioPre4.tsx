@@ -2762,38 +2762,65 @@ export default function VisualStudioPre4({
           </div>
         </nav>
 
-        <aside className="apx-pre4-layers">
+        <aside className="apx-pre4-layers" data-context-mode={mediaContextActive ? activeTool : 'layers'}>
           <div className="apx-pre4-panel-head">
             <div>
-              <strong>Layers</strong>
-              <small>{layerIds.length ? layerIds.length + ' layers' : 'Layer structure'}{selected.length ? ' · ' + selected.length + ' selected' : ''}</small>
+              <strong>
+                {activeTool === 'images'
+                  ? 'Images'
+                  : activeTool === 'shapes'
+                    ? 'Shapes'
+                    : activeTool === 'assets'
+                      ? 'Assets'
+                      : 'Layers'}
+              </strong>
+              <small>
+                {mediaContextActive
+                  ? activeTool === 'images'
+                    ? imageAssets.length + ' image assets'
+                    : activeTool === 'shapes'
+                      ? IMAGE_SHAPE_TYPES.length + ' built-in shapes'
+                      : assets.length + ' shared assets'
+                  : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
+                    (selected.length ? ' · ' + selected.length + ' selected' : '')}
+              </small>
             </div>
-            <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
+            {!mediaContextActive ? (
+              <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
+            ) : activeTool === 'images' ? (
+              <button type="button" onClick={() => setDockTab('assets')} title="Open Assets">＋</button>
+            ) : null}
           </div>
-          <div className="apx-pre4-layer-tree">
-            <div className="apx-pre4-root-row">
-              <span>▾</span>
-              <strong>{project.name || 'Landing Page'}</strong>
-            </div>
-            {renderLayerRows(project.document.rootNodeIds)}
-            {!project.document.rootNodeIds.length && (
-              <div className="apx-pre4-empty apx-pre4-empty-layers">
-                <strong>No layers yet</strong>
-                <span>Add a layer to begin composing on the canvas.</span>
-                <button type="button" onClick={addPlaceholder}>Add layer</button>
-              </div>
-            )}
-          </div>
-          {selected.length ? (
-            <div className="apx-pre4-layer-actions">
-              <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))}>Duplicate</button>
-              <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))}>Delete</button>
-              <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
-              <button type="button" onClick={ungroupSelection}>Ungroup</button>
-            </div>
-          ) : null}
-        </aside>
 
+          {mediaContextActive ? (
+            renderMediaContext()
+          ) : (
+            <>
+              <div className="apx-pre4-layer-tree">
+                <div className="apx-pre4-root-row">
+                  <span>▾</span>
+                  <strong>{project.name || 'Landing Page'}</strong>
+                </div>
+                {renderLayerRows(project.document.rootNodeIds)}
+                {!project.document.rootNodeIds.length && (
+                  <div className="apx-pre4-empty apx-pre4-empty-layers">
+                    <strong>No layers yet</strong>
+                    <span>Add a layer to begin composing on the canvas.</span>
+                    <button type="button" onClick={addPlaceholder}>Add layer</button>
+                  </div>
+                )}
+              </div>
+              {selected.length ? (
+                <div className="apx-pre4-layer-actions">
+                  <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))}>Duplicate</button>
+                  <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))}>Delete</button>
+                  <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
+                  <button type="button" onClick={ungroupSelection}>Ungroup</button>
+                </div>
+              ) : null}
+            </>
+          )}
+        </aside>
         <main className="apx-pre4-stage">
           <div className="apx-pre4-stagebar">
             <button className="apx-pre4-device" type="button">
