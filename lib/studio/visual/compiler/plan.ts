@@ -94,9 +94,25 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
 }
 
 function resolveImageSource(
+  project: VisualProject,
   props: VisualImageNodeProps,
   produced: Map<string, { target: string; member: 'buffer' | null }>,
 ): string | StudioTargetReference {
+  if (
+    typeof props.source === 'object' &&
+    props.source &&
+    '$ref' in props.source
+  ) {
+    const match = String(props.source.$ref).match(/^asset:(.+)$/);
+    const asset = match
+      ? project.assets.find((item) => item.id === match[1])
+      : undefined;
+    const uri = asset?.value?.uri;
+    if (typeof uri !== 'string' || !uri.trim()) {
+      throw new Error('Image asset reference must resolve to a string uri.');
+    }
+    return uri;
+  }
   if (!isGeneratedImageSource(props.source)) return props.source;
 
   const generated = produced.get(props.source.$generated);
@@ -112,6 +128,7 @@ function resolveImageSource(
 }
 
 function imageOperationProperties(
+  project: VisualProject,
   node: VisualNode,
   produced: Map<string, { target: string; member: 'buffer' | null }>,
 ): StudioImageProperties {
@@ -129,7 +146,7 @@ function imageOperationProperties(
 
   return {
     ...rest,
-    source: resolveImageSource(props, produced),
+    source: resolveImageSource(project, props, produced),
     x: transform.x ?? 0,
     y: transform.y ?? 0,
     ...(width !== undefined ? { width } : {}),
@@ -149,7 +166,6 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
       kind: 'create-canvas',
       source: 'document',
       target: 'canvas',
-      preferredName: 'canvas',
       options: {
         width: normalized.document.width,
         height: normalized.document.height,
@@ -176,7 +192,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
       target,
       preferredName: node.name || (node.kind === 'shape' ? 'shape' : 'image'),
       base,
-      properties: imageOperationProperties(node, produced),
+      properties: imageOperationProperties(normalized, node, produced),
       ...(props.createOptions ? { options: props.createOptions } : {}),
     });
 
