@@ -288,6 +288,9 @@ export default function VisualStudioPre4({
   const [imageUrlDraft, setImageUrlDraft] = useState('');
   const [imageConfigDraft, setImageConfigDraft] = useState('{}');
   const [imageConfigError, setImageConfigError] = useState<string | null>(null);
+  const [textConfigDraft, setTextConfigDraft] = useState('{}');
+  const [textConfigError, setTextConfigError] = useState<string | null>(null);
+  const [inlineTextEditId, setInlineTextEditId] = useState<string | null>(null);
   const [artboardPreviewUrl, setArtboardPreviewUrl] = useState<string | null>(null);
   const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
 
@@ -317,6 +320,7 @@ export default function VisualStudioPre4({
   const primary = selected.length
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
+  const primaryText = primary?.kind === 'text' ? primary : undefined;
   const layerIds = useMemo(() => flattenLayerIds(project), [project]);
   const drawableIds = useMemo(
     () =>
