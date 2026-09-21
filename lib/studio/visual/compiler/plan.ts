@@ -1,4 +1,4 @@
-import type { VisualProject } from '../model';
+import type { VisualCanvasConfig, VisualProject } from '../model';
 import { normalizeVisualProject } from './normalize';
 import { assertValidVisualProject } from './validate';
 
@@ -12,7 +12,7 @@ export type StudioCreateCanvasOperation = {
   options: {
     width: number;
     height: number;
-  };
+  } & VisualCanvasConfig;
 };
 
 export type StudioOperation = StudioCreateCanvasOperation;
@@ -51,6 +51,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         options: {
           width: normalized.document.width,
           height: normalized.document.height,
+          ...(normalized.document.canvas ?? {}),
         },
       },
     ],

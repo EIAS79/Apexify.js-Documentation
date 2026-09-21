@@ -80,7 +80,8 @@ test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
   assert.match(shell, /InteractiveCodeEditor/);
   assert.match(shell, /reconcileVisualProjectFromCode/);
   assert.match(shell, /data-visual-preview-modal-trigger/);
-  assert.doesNotMatch(shell, /createCanvas\(|createImage\(|createText\(|createChart\(/);
+  assert.doesNotMatch(shell, /new\s+ApexPainter\s*\(/);
+  assert.doesNotMatch(shell, /painter\.create(?:Canvas|Image|Text|Chart)\s*\(/);
 });
 
 test('PRE-4 future feature surfaces do not pretend to be authoring-complete', () => {

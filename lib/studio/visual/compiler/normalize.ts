@@ -1,4 +1,5 @@
 import type {
+  VisualCanvasConfig,
   VisualNode,
   VisualProject,
   VisualProjectRecord,
@@ -62,6 +63,13 @@ export function normalizeVisualProject(project: VisualProject): VisualProject {
         : {}),
       ...(project.document.background !== undefined
         ? { background: stableValue(project.document.background) }
+        : {}),
+      ...(project.document.canvas !== undefined
+        ? {
+            canvas: stableValue(
+              project.document.canvas as unknown as VisualValue,
+            ) as unknown as VisualCanvasConfig,
+          }
         : {}),
       rootNodeIds: [...project.document.rootNodeIds],
       nodes: Object.fromEntries(nodeEntries),

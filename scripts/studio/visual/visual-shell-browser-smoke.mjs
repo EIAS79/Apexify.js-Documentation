@@ -41,6 +41,30 @@ async function verify(width, height) {
   }
 
   if (width === 1440) {
+    // Phase 4: real Canvas Inspector edits must propagate into the live linked code.
+    await page.select('[data-canvas-base-mode]', 'color');
+    await page.click('[data-canvas-color-text]');
+    await page.keyboard.down('Control');
+    await page.keyboard.press('A');
+    await page.keyboard.up('Control');
+    await page.keyboard.type('#123456');
+    await page.waitForFunction(() => {
+      const content = document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('colorBg: "#123456"');
+    });
+
+    await page.click('[data-inspector-tab="transform"]');
+    await page.click('[data-canvas-dimension="width"]');
+    await page.keyboard.down('Control');
+    await page.keyboard.press('A');
+    await page.keyboard.up('Control');
+    await page.keyboard.type('1024');
+    await page.keyboard.press('Tab');
+    await page.waitForFunction(() => {
+      const content = document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('width: 1024');
+    });
+
     await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });
   }
 
