@@ -5317,3 +5317,19 @@
     gap:.18rem;
   }
 }
+
+
+@media(max-width:760px){
+  .apx-pre4-top-actions [data-visual-preview-modal-trigger]{
+    display:inline-flex!important;
+    width:36px;
+    min-width:36px;
+    padding-inline:.45rem;
+    font-size:0;
+  }
+
+  .apx-pre4-top-actions [data-visual-preview-modal-trigger] .apx-pre4-control-icon{
+    width:15px;
+    height:15px;
+  }
+}
