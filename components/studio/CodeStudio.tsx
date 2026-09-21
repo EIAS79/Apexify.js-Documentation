@@ -11,12 +11,12 @@ import { GallerySnippetEditor } from '@/app/gallery/components/GallerySnippetEdi
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import { StudioCommandPalette } from '@/components/studio/StudioCommandPalette';
 import { StudioFileTabs } from '@/components/studio/StudioFileTabs';
-import { StudioOutputPanel, OutputTab } from '@/components/studio/StudioOutputPanel';
-import type { StudioPreviewArtifact } from '@/components/studio/StudioArtifactPreview';
+import { StudioOutputPanel } from '@/components/studio/StudioOutputPanel';
 import { StudioResizableSplit } from '@/components/studio/StudioResizableSplit';
 import { StudioShortcutOverlay } from '@/components/studio/StudioShortcutOverlay';
 import { StudioStatusBar } from '@/components/studio/StudioStatusBar';
 import { StudioTopBar } from '@/components/studio/StudioTopBar';
+import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { createInteractiveSession } from '@/lib/docs/playground/session';
 import type { InteractiveArtifact } from '@/lib/docs/playground/contracts';
 import {
@@ -41,7 +41,6 @@ import { studioWorkspaceFileName, type StudioWorkspaceFile } from '@/lib/studio/
 import {
   loadPersistedStudioAssets,
   savePersistedStudioAssets,
-  type StudioVirtualAsset,
 } from '@/lib/studio/runtime/assets';
 import {
   bootstrapStudio,
@@ -62,23 +61,35 @@ export default function CodeStudio({ embedded = false }: { embedded?: boolean })
   const [layout, setLayout] = useState<LayoutMode>('split');
   const [autoRun, setAutoRun] = useState(false);
   const [splitRatio, setSplitRatio] = useState(0.5);
-  const [assets, setAssets] = useState<StudioVirtualAsset[]>([]);
+  const {
+    assets,
+    setAssets,
+    assetStorageReady,
+    setAssetStorageReady,
+    previewArtifacts,
+    setPreviewArtifacts,
+    activeArtifactId,
+    setActiveArtifactId,
+    error,
+    setError,
+    errorExitCode,
+    setErrorExitCode,
+    elapsedMs,
+    setElapsedMs,
+    previewProvenance,
+    setPreviewProvenance,
+    previewWarnings,
+    setPreviewWarnings,
+    outputTab,
+    setOutputTab,
+    history,
+    setHistory,
+  } = useStudioSharedSession();
   const [assetsOpen, setAssetsOpen] = useState(false);
-  const [assetStorageReady, setAssetStorageReady] = useState(false);
   const [editorInsertRequest, setEditorInsertRequest] = useState<{ id: number; text: string } | null>(null);
 
   const [runnerEnabled, setRunnerEnabled] = useState(false);
   const [running, setRunning] = useState(false);
-  const [previewArtifacts, setPreviewArtifacts] = useState<StudioPreviewArtifact[]>([]);
-  const [activeArtifactId, setActiveArtifactId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [errorExitCode, setErrorExitCode] = useState<number | null>(null);
-  const [elapsedMs, setElapsedMs] = useState<number | null>(null);
-  const [previewProvenance, setPreviewProvenance] = useState<'browser-generated' | 'server-generated' | undefined>(undefined);
-  const [previewWarnings, setPreviewWarnings] = useState<string[]>([]);
-
-  const [outputTab, setOutputTab] = useState<OutputTab>('preview');
-  const [history, setHistory] = useState<RunHistoryEntry[]>([]);
 
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
