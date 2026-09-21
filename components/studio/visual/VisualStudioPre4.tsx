@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type DragEvent as ReactDragEvent,
   type PointerEvent as ReactPointerEvent,
   type TouchEvent as ReactTouchEvent,
   type WheelEvent as ReactWheelEvent,
@@ -43,6 +44,15 @@ import {
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
+  STUDIO_ASSET_LIMITS,
+  fileToStudioAsset,
+  studioAssetDataUrl,
+  studioAssetIdFromReference,
+  studioAssetReference,
+  totalStudioAssetBytes,
+  type StudioVirtualAsset,
+} from '@/lib/studio/runtime/assets';
+import {
   StudioModeSwitch,
   type StudioMode,
 } from '@/components/studio/StudioModeSwitch';
@@ -67,9 +77,11 @@ import type {
   VisualCanvasConfig,
   VisualGradient,
   VisualImageFilter,
+  VisualImageNodeProps,
   VisualNode,
   VisualPatternOptions,
   VisualProject,
+  VisualShapeType,
   VisualTransform,
 } from '@/lib/studio/visual/model';
 import {
@@ -81,6 +93,17 @@ import {
   defaultCanvasGradient,
   defaultCanvasPattern,
 } from '@/lib/studio/visual/canvas-contract';
+import {
+  IMAGE_ALIGNS,
+  IMAGE_BLEND_MODES,
+  IMAGE_FILTER_TYPES,
+  IMAGE_FITS,
+  IMAGE_SHAPE_TYPES,
+  defaultImageNodeProps,
+  defaultShapeNodeProps,
+  imagePropsRecord,
+  visualImageProps,
+} from '@/lib/studio/visual/image-contract';
 import {
   VisualHistory,
   alignNodes,
@@ -250,6 +273,11 @@ export default function VisualStudioPre4({
   const [canvasFiltersError, setCanvasFiltersError] = useState<string | null>(null);
   const [canvasConfigDraft, setCanvasConfigDraft] = useState('{}');
   const [canvasConfigError, setCanvasConfigError] = useState<string | null>(null);
+  const [imageUrlDraft, setImageUrlDraft] = useState('');
+  const [imageConfigDraft, setImageConfigDraft] = useState('{}');
+  const [imageConfigError, setImageConfigError] = useState<string | null>(null);
+  const [artboardPreviewUrl, setArtboardPreviewUrl] = useState<string | null>(null);
+  const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
 
   const history = useRef(new VisualHistory(100));
   const projectRef = useRef(project);
@@ -263,10 +291,12 @@ export default function VisualStudioPre4({
   const pinch = useRef<{ distance: number; zoom: number } | null>(null);
   const didInitialFit = useRef(false);
   const webRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
+  const artboardRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
   const codeSaveTimerRef = useRef<number>(0);
   const codeAppliedSignatureRef = useRef('');
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
+  const artboardPreviewTimerRef = useRef<number>(0);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
 
@@ -417,8 +447,44 @@ export default function VisualStudioPre4({
       window.clearTimeout(codeSaveTimerRef.current);
       webRuntimeRef.current?.dispose();
       webRuntimeRef.current = null;
+      artboardRuntimeRef.current?.dispose();
+      artboardRuntimeRef.current = null;
+      window.clearTimeout(artboardPreviewTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    window.clearTimeout(artboardPreviewTimerRef.current);
+    if (!active || !generated.value) return;
+
+    let cancelled = false;
+    artboardPreviewTimerRef.current = window.setTimeout(() => {
+      void (async () => {
+        setArtboardPreviewBusy(true);
+        try {
+          const runtime =
+            artboardRuntimeRef.current ??
+            (artboardRuntimeRef.current = createApexifyWebRuntime());
+          await runtime.registerFonts(assets);
+          const result = await runtime.renderStudioSource(
+            generated.value!.source,
+            assets,
+          );
+          if (cancelled) return;
+          if (result.ok) setArtboardPreviewUrl(result.dataUrl);
+        } catch {
+          // Keep the last authoritative frame while the next valid frame is built.
+        } finally {
+          if (!cancelled) setArtboardPreviewBusy(false);
+        }
+      })();
+    }, 180);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(artboardPreviewTimerRef.current);
+    };
+  }, [active, assets, generated.value?.source]);
 
   const mutate = (
     label: string,
@@ -523,7 +589,203 @@ export default function VisualStudioPre4({
     setCanvasConfigError(null);
   }, [project.document.canvas]);
 
+  const primaryMedia =
+    primary && (primary.kind === 'image' || primary.kind === 'shape')
+      ? primary
+      : undefined;
 
+  const updateImageDraft = (
+    updater: (props: VisualImageNodeProps) => VisualImageNodeProps,
+  ) => {
+    if (!primaryMedia) return;
+    setProject((current) => {
+      const node = current.document.nodes[primaryMedia.id];
+      if (!node || (node.kind !== 'image' && node.kind !== 'shape')) return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryMedia.id];
+      nextNode.props = imagePropsRecord(updater(visualImageProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const mutateImage = (
+    label: string,
+    updater: (props: VisualImageNodeProps) => VisualImageNodeProps,
+  ) => {
+    if (!primaryMedia) return;
+    mutate(label, (current) => {
+      const node = current.document.nodes[primaryMedia.id];
+      if (!node || (node.kind !== 'image' && node.kind !== 'shape')) return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryMedia.id];
+      nextNode.props = imagePropsRecord(updater(visualImageProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const insertImageSource = (
+    source: string,
+    name = 'Image',
+    metadata?: { width?: number; height?: number },
+    point?: Point,
+  ) => {
+    if (!source.trim()) {
+      setMessage('Image source is required');
+      return;
+    }
+    mutate('Add image', (current) => {
+      const next = structuredClone(current);
+      const node = createVisualNode(
+        'image',
+        imagePropsRecord(defaultImageNodeProps(source.trim())),
+        { name },
+      );
+      const sourceWidth = Math.max(1, metadata?.width ?? 640);
+      const sourceHeight = Math.max(1, metadata?.height ?? 360);
+      const maxWidth = Math.min(360, next.document.width * 0.55);
+      const scale = Math.min(1, maxWidth / sourceWidth);
+      const width = Math.max(48, Math.round(sourceWidth * scale));
+      const height = Math.max(48, Math.round(sourceHeight * scale));
+      const x = point?.x ?? Math.max(0, (next.document.width - width) / 2);
+      const y = point?.y ?? Math.max(0, (next.document.height - height) / 2);
+      node.transform = {
+        x,
+        y,
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setActiveTool('images');
+    setInspectorTab('style');
+    setMessage('Image added');
+  };
+
+  const insertImageAsset = (
+    asset: StudioVirtualAsset,
+    point?: Point,
+  ) => {
+    if (!asset.mime.startsWith('image/')) {
+      setMessage(asset.name + ' is not an image asset');
+      return;
+    }
+    insertImageSource(
+      studioAssetReference(asset),
+      asset.name.replace(/\.[^.]+$/, '') || 'Image',
+      asset.metadata,
+      point,
+    );
+  };
+
+  const insertShape = (shape: VisualShapeType, point?: Point) => {
+    mutate('Add shape', (current) => {
+      const next = structuredClone(current);
+      const node = createVisualNode(
+        'shape',
+        imagePropsRecord(defaultShapeNodeProps(shape)),
+        { name: shape.charAt(0).toUpperCase() + shape.slice(1) },
+      );
+      const size = shape === 'square' || shape === 'circle' ? 160 : 190;
+      const width = size;
+      const height =
+        shape === 'square' || shape === 'circle' ? size : 140;
+      node.transform = {
+        x: point?.x ?? Math.max(0, (next.document.width - width) / 2),
+        y: point?.y ?? Math.max(0, (next.document.height - height) / 2),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setActiveTool('shapes');
+    setInspectorTab('style');
+    setMessage('Shape added');
+  };
+
+  const addImageFiles = async (
+    files: FileList | File[],
+    point?: Point,
+  ) => {
+    const incoming = Array.from(files).filter((file) =>
+      (file.type || '').startsWith('image/'),
+    );
+    if (!incoming.length) {
+      setMessage('Drop an image file onto the canvas');
+      return;
+    }
+    if (assets.length + incoming.length > STUDIO_ASSET_LIMITS.maxCount) {
+      setMessage('Studio asset count limit reached');
+      return;
+    }
+
+    try {
+      const created: StudioVirtualAsset[] = [];
+      let total = totalStudioAssetBytes(assets);
+      for (const file of incoming) {
+        const asset = await fileToStudioAsset(file);
+        if (!asset.mime.startsWith('image/')) continue;
+        total += asset.size;
+        if (total > STUDIO_ASSET_LIMITS.maxTotalBytes) {
+          throw new Error('Combined Studio assets exceed the 24 MiB session limit.');
+        }
+        created.push(asset);
+      }
+      if (!created.length) return;
+      setAssets([...assets, ...created]);
+      created.forEach((asset, index) =>
+        insertImageAsset(
+          asset,
+          point
+            ? { x: point.x + index * 18, y: point.y + index * 18 }
+            : undefined,
+        ),
+      );
+      setMessage(
+        'Added ' +
+          created.length +
+          ' image asset' +
+          (created.length === 1 ? '' : 's'),
+      );
+    } catch (uploadError) {
+      setMessage(
+        uploadError instanceof Error
+          ? uploadError.message
+          : 'Could not add image asset',
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (!primaryMedia) {
+      setImageConfigDraft('{}');
+      setImageConfigError(null);
+      return;
+    }
+    setImageConfigDraft(
+      JSON.stringify(visualImageProps(primaryMedia), null, 2),
+    );
+    setImageConfigError(null);
+  }, [primaryMedia?.id, primaryMedia?.props]);
 
   const addPlaceholder = () =>
     mutate('Add placeholder', (current) => {
@@ -602,6 +864,15 @@ export default function VisualStudioPre4({
       x: (clientX - rect.left) / scale,
       y: (clientY - rect.top) / scale,
     };
+  };
+
+  const dropImagesOnCanvas = (event: ReactDragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const point = documentPoint(event.clientX, event.clientY) ?? undefined;
+    if (event.dataTransfer.files.length) {
+      void addImageFiles(event.dataTransfer.files, point);
+    }
   };
 
   const copySelection = () => {
@@ -1385,6 +1656,144 @@ export default function VisualStudioPre4({
     ['video', VideoCameraIcon, 'Video'],
   ] as const;
 
+  const mediaContextActive =
+    activeTool === 'images' ||
+    activeTool === 'shapes' ||
+    activeTool === 'assets';
+
+  const imageAssets = assets.filter((asset) =>
+    asset.mime.startsWith('image/'),
+  );
+
+  const renderMediaContext = () => {
+    if (activeTool === 'shapes') {
+      return (
+        <div className="apx-media-context" data-visual-shapes-context>
+          <div className="apx-media-context-copy">
+            <strong>Built-in shapes</strong>
+            <span>Insert native Apexify shape sources. Every shape remains linked to createImage().</span>
+          </div>
+          <div className="apx-shape-picker">
+            {IMAGE_SHAPE_TYPES.map((shape) => (
+              <button
+                key={shape}
+                type="button"
+                onClick={() => insertShape(shape)}
+                data-shape-insert={shape}
+              >
+                <span className={'apx-shape-glyph apx-shape-glyph--' + shape} />
+                <small>{shape}</small>
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    if (activeTool === 'images') {
+      return (
+        <div className="apx-media-context" data-visual-images-context>
+          <div className="apx-media-context-copy">
+            <strong>Images</strong>
+            <span>Use a Studio asset, an HTTP(S) URL, or drop an image directly on the canvas.</span>
+          </div>
+
+          <div className="apx-media-url">
+            <input
+              className="apx-pre4-input"
+              value={imageUrlDraft}
+              placeholder="https://example.com/image.png"
+              onChange={(event) => setImageUrlDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && imageUrlDraft.trim()) {
+                  insertImageSource(imageUrlDraft.trim(), 'Remote image');
+                  setImageUrlDraft('');
+                }
+              }}
+            />
+            <button
+              type="button"
+              disabled={!imageUrlDraft.trim()}
+              onClick={() => {
+                insertImageSource(imageUrlDraft.trim(), 'Remote image');
+                setImageUrlDraft('');
+              }}
+              data-image-url-insert
+            >
+              Add
+            </button>
+          </div>
+
+          <div className="apx-media-drop-hint">
+            <ArrowDownTrayIcon />
+            <span>Drop PNG, JPG, WebP, GIF or SVG directly onto the artboard.</span>
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Image assets</strong>
+            <button type="button" onClick={() => setDockTab('assets')}>Open Assets</button>
+          </div>
+          <div className="apx-media-asset-list">
+            {imageAssets.length ? imageAssets.map((asset) => (
+              <button
+                type="button"
+                key={asset.id}
+                title={'Insert ' + asset.name}
+                onClick={() => insertImageAsset(asset)}
+                data-image-asset-insert={asset.id}
+              >
+                <img src={studioAssetDataUrl(asset)} alt="" />
+                <span>
+                  <strong>{asset.name}</strong>
+                  <small>
+                    {asset.metadata?.width && asset.metadata?.height
+                      ? asset.metadata.width + '×' + asset.metadata.height
+                      : asset.mime}
+                  </small>
+                </span>
+              </button>
+            )) : (
+              <div className="apx-media-context-empty">
+                <PhotoIcon />
+                <strong>No image assets yet</strong>
+                <span>Open Assets below to upload an image, or drop one on the artboard.</span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="apx-media-context" data-visual-assets-context>
+        <div className="apx-media-context-copy">
+          <strong>Assets</strong>
+          <span>Shared Studio assets keep stable studio://asset/… identities across Visual and Code modes.</span>
+        </div>
+        <button
+          className="apx-media-open-assets"
+          type="button"
+          onClick={() => setDockTab('assets')}
+        >
+          <CircleStackIcon />
+          Manage all assets
+        </button>
+        <div className="apx-media-asset-list">
+          {imageAssets.map((asset) => (
+            <button
+              type="button"
+              key={asset.id}
+              onClick={() => insertImageAsset(asset)}
+            >
+              <img src={studioAssetDataUrl(asset)} alt="" />
+              <span><strong>{asset.name}</strong><small>Insert image</small></span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   const inspectorTabs = [
     ['style', 'Style'],
     ['transform', 'Transform'],
@@ -2106,7 +2515,453 @@ export default function VisualStudioPre4({
     );
   };
 
+  const renderMediaHeader = () => {
+    if (!primaryMedia) return null;
+    return (
+      <div className="apx-pre4-inspector-title">
+        <div>
+          <strong>{primaryMedia.name ?? primaryMedia.kind}</strong>
+          <small>{primaryMedia.kind === 'shape' ? 'Apexify built-in shape' : 'Apexify image layer'} · Phase 5</small>
+        </div>
+        <span className="apx-pre4-type-pill">{primaryMedia.kind}</span>
+      </div>
+    );
+  };
+
+  const renderMediaStyle = () => {
+    if (!primaryMedia) return renderTransformFields();
+    const props = visualImageProps(primaryMedia);
+    const isShape = primaryMedia.kind === 'shape';
+    const shape = props.shape ?? {};
+    return (
+      <>
+        {renderMediaHeader()}
+        <div className="apx-pre4-property">
+          <label>Name</label>
+          <input
+            className="apx-pre4-input"
+            value={primaryMedia.name ?? primaryMedia.kind}
+            onFocus={beginPropertyEdit}
+            onChange={(event) => setProject((current) => renameNode(current, primaryMedia.id, event.target.value))}
+            onBlur={() => endPropertyEdit('Rename media')}
+          />
+        </div>
+
+        {isShape ? (
+          <div className="apx-pre4-section" data-image-section="shape">
+            <div className="apx-pre4-section-title">Shape</div>
+            <label className="apx-canvas-field">
+              <span>Built-in source</span>
+              <select
+                className="apx-pre4-input"
+                value={typeof props.source === 'string' ? props.source : 'rectangle'}
+                onChange={(event) => {
+                  const nextShape = event.target.value as VisualShapeType;
+                  mutateImage('Shape type', (current) => ({
+                    ...current,
+                    source: nextShape,
+                    shape: defaultShapeNodeProps(nextShape).shape,
+                  }));
+                }}
+              >
+                {IMAGE_SHAPE_TYPES.map((shapeType) => <option key={shapeType} value={shapeType}>{shapeType}</option>)}
+              </select>
+            </label>
+            <label className="apx-canvas-check">
+              <input
+                type="checkbox"
+                checked={shape.fill ?? true}
+                onChange={(event) => mutateImage('Shape fill', (current) => ({
+                  ...current,
+                  shape: { ...(current.shape ?? {}), fill: event.target.checked },
+                }))}
+              />
+              <span>Fill shape</span>
+            </label>
+            <div className="apx-canvas-color-row">
+              <input
+                type="color"
+                value={shape.color ?? '#6f86ff'}
+                onChange={(event) => updateImageDraft((current) => ({
+                  ...current,
+                  shape: { ...(current.shape ?? {}), color: event.target.value },
+                }))}
+              />
+              <input
+                className="apx-pre4-input"
+                value={shape.color ?? '#6f86ff'}
+                onFocus={beginPropertyEdit}
+                onChange={(event) => updateImageDraft((current) => ({
+                  ...current,
+                  shape: { ...(current.shape ?? {}), color: event.target.value },
+                }))}
+                onBlur={() => endPropertyEdit('Shape color')}
+              />
+            </div>
+            {typeof props.source === 'string' && ['star','polygon','arc','pieSlice'].includes(props.source) ? (
+              <div className="apx-pre4-property-grid">
+                {props.source === 'polygon' ? (
+                  <label><span>Sides</span><input className="apx-pre4-input" type="number" min={3} value={shape.sides ?? 6} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), sides: Number(event.target.value) } }))}/></label>
+                ) : null}
+                {props.source === 'star' || props.source === 'arc' || props.source === 'pieSlice' ? (
+                  <>
+                    <label><span>Inner R</span><input className="apx-pre4-input" type="number" min={0} value={shape.innerRadius ?? 0} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), innerRadius: Number(event.target.value) } }))}/></label>
+                    <label><span>Outer R</span><input className="apx-pre4-input" type="number" min={0} value={shape.outerRadius ?? shape.radius ?? 72} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), outerRadius: Number(event.target.value) } }))}/></label>
+                  </>
+                ) : null}
+                {props.source === 'arc' || props.source === 'pieSlice' ? (
+                  <>
+                    <label><span>Start</span><input className="apx-pre4-input" type="number" step={0.1} value={shape.startAngle ?? 0} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), startAngle: Number(event.target.value) } }))}/></label>
+                    <label><span>End</span><input className="apx-pre4-input" type="number" step={0.1} value={shape.endAngle ?? Math.PI * 2} onChange={(event) => updateImageDraft((current) => ({ ...current, shape: { ...(current.shape ?? {}), endAngle: Number(event.target.value) } }))}/></label>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <div className="apx-pre4-section" data-image-section="layout">
+            <div className="apx-pre4-section-title">Image layout</div>
+            <div className="apx-pre4-property-grid">
+              <label>
+                <span>Fit</span>
+                <select className="apx-pre4-input" value={props.fit ?? 'cover'} onChange={(event) => mutateImage('Image fit', (current) => ({ ...current, fit: event.target.value as VisualImageNodeProps['fit'] }))}>
+                  {IMAGE_FITS.map((value) => <option key={value}>{value}</option>)}
+                </select>
+              </label>
+              <label>
+                <span>Align</span>
+                <select className="apx-pre4-input" value={props.align ?? 'center'} onChange={(event) => mutateImage('Image align', (current) => ({ ...current, align: event.target.value as VisualImageNodeProps['align'] }))}>
+                  {IMAGE_ALIGNS.map((value) => <option key={value}>{value}</option>)}
+                </select>
+              </label>
+            </div>
+            <label className="apx-canvas-check">
+              <input type="checkbox" checked={props.inherit ?? false} onChange={(event) => mutateImage('Image inherit', (current) => ({ ...current, inherit: event.target.checked }))}/>
+              <span>Inherit source dimensions</span>
+            </label>
+          </div>
+        )}
+
+        <div className="apx-pre4-section" data-image-section="appearance">
+          <div className="apx-pre4-section-title">Appearance</div>
+          <div className="apx-pre4-property-grid">
+            <label>
+              <span>Radius</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={0}
+                disabled={props.borderRadius === 'circular'}
+                value={typeof props.borderRadius === 'number' ? props.borderRadius : 0}
+                onFocus={beginPropertyEdit}
+                onChange={(event) => updateImageDraft((current) => ({ ...current, borderRadius: Math.max(0, Number(event.target.value)) }))}
+                onBlur={() => endPropertyEdit('Media radius')}
+              />
+            </label>
+            <label className="apx-canvas-check">
+              <input type="checkbox" checked={props.borderRadius === 'circular'} onChange={(event) => mutateImage('Circular media', (current) => ({ ...current, borderRadius: event.target.checked ? 'circular' : 0 }))}/>
+              <span>Circular</span>
+            </label>
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="stroke">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Stroke</div>
+            <label className="apx-canvas-switch">
+              <input type="checkbox" checked={Boolean(props.stroke)} onChange={(event) => mutateImage('Media stroke', (current) => {
+                if (!event.target.checked) {
+                  const next = { ...current };
+                  delete next.stroke;
+                  return next;
+                }
+                return { ...current, stroke: { color: '#ffffff', width: 2, opacity: 1, style: 'solid' } };
+              })}/>
+              <span />
+            </label>
+          </div>
+          {props.stroke ? (
+            <>
+              <div className="apx-canvas-color-row">
+                <input type="color" value={props.stroke.color ?? '#ffffff'} onChange={(event) => updateImageDraft((current) => ({ ...current, stroke: { ...current.stroke, color: event.target.value } }))}/>
+                <input className="apx-pre4-input" value={props.stroke.color ?? '#ffffff'} onChange={(event) => updateImageDraft((current) => ({ ...current, stroke: { ...current.stroke, color: event.target.value } }))}/>
+              </div>
+              <div className="apx-pre4-property-grid">
+                <label><span>Width</span><input className="apx-pre4-input" type="number" min={0} value={props.stroke.width ?? 2} onChange={(event) => updateImageDraft((current) => ({ ...current, stroke: { ...current.stroke, width: Number(event.target.value) } }))}/></label>
+                <label><span>Style</span><select className="apx-pre4-input" value={props.stroke.style ?? 'solid'} onChange={(event) => mutateImage('Stroke style', (current) => ({ ...current, stroke: { ...current.stroke, style: event.target.value as NonNullable<VisualImageNodeProps['stroke']>['style'] } }))}>{['solid','dashed','dotted','groove','ridge','double'].map((value) => <option key={value}>{value}</option>)}</select></label>
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="box-background">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Box background</div>
+            <label className="apx-canvas-switch">
+              <input type="checkbox" checked={Boolean(props.boxBackground)} onChange={(event) => mutateImage('Box background', (current) => {
+                if (!event.target.checked) {
+                  const next = { ...current };
+                  delete next.boxBackground;
+                  return next;
+                }
+                return { ...current, boxBackground: { color: '#0b1730' } };
+              })}/>
+              <span />
+            </label>
+          </div>
+          {props.boxBackground ? (
+            <div className="apx-canvas-color-row">
+              <input type="color" value={props.boxBackground.color ?? '#0b1730'} onChange={(event) => updateImageDraft((current) => ({ ...current, boxBackground: { ...current.boxBackground, color: event.target.value } }))}/>
+              <input className="apx-pre4-input" value={props.boxBackground.color ?? '#0b1730'} onChange={(event) => updateImageDraft((current) => ({ ...current, boxBackground: { ...current.boxBackground, color: event.target.value } }))}/>
+            </div>
+          ) : null}
+        </div>
+      </>
+    );
+  };
+
+  const renderMediaEffects = () => {
+    if (!primaryMedia) return renderTransformFields();
+    const props = visualImageProps(primaryMedia);
+    return (
+      <>
+        {renderMediaHeader()}
+        <div className="apx-pre4-section" data-image-section="effects">
+          <div className="apx-pre4-section-title">Layer effects</div>
+          <div className="apx-pre4-property-grid">
+            <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={props.blur ?? 0} onChange={(event) => updateImageDraft((current) => ({ ...current, blur: Math.max(0, Number(event.target.value)) }))}/></label>
+            <label><span>Blend</span><select className="apx-pre4-input" value={props.blendMode ?? 'source-over'} onChange={(event) => mutateImage('Image blend', (current) => ({ ...current, blendMode: event.target.value as VisualBlendMode }))}>{IMAGE_BLEND_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="filters">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Filters</div>
+            <button className="apx-canvas-mini-button" type="button" onClick={() => mutateImage('Add image filter', (current) => ({ ...current, filters: [...(current.filters ?? []), { type: 'brightness', value: 1 }] }))}>＋ Filter</button>
+          </div>
+          <div className="apx-image-filter-stack">
+            {(props.filters ?? []).map((filter, index) => (
+              <div key={index} className="apx-image-filter-row">
+                <select className="apx-pre4-input" value={filter.type} onChange={(event) => updateImageDraft((current) => ({
+                  ...current,
+                  filters: (current.filters ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, type: event.target.value as VisualImageFilter['type'] } : item),
+                }))}>
+                  {IMAGE_FILTER_TYPES.map((type) => <option key={type}>{type}</option>)}
+                </select>
+                <input className="apx-pre4-input" type="number" step={0.1} value={filter.value ?? filter.intensity ?? 1} onChange={(event) => updateImageDraft((current) => ({
+                  ...current,
+                  filters: (current.filters ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, value: Number(event.target.value) } : item),
+                }))}/>
+                <button type="button" onClick={() => mutateImage('Remove image filter', (current) => ({ ...current, filters: (current.filters ?? []).filter((_, itemIndex) => itemIndex !== index) }))}>×</button>
+              </div>
+            ))}
+          </div>
+          <div className="apx-pre4-property-grid">
+            <label><span>Intensity</span><input className="apx-pre4-input" type="number" step={0.1} value={props.filterIntensity ?? 1} onChange={(event) => updateImageDraft((current) => ({ ...current, filterIntensity: Number(event.target.value) }))}/></label>
+            <label><span>Order</span><select className="apx-pre4-input" value={props.filterOrder ?? 'post'} onChange={(event) => mutateImage('Filter order', (current) => ({ ...current, filterOrder: event.target.value as 'pre' | 'post' }))}><option value="pre">pre</option><option value="post">post</option></select></label>
+          </div>
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="shadow">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Shadow</div>
+            <label className="apx-canvas-switch">
+              <input type="checkbox" checked={Boolean(props.shadow)} onChange={(event) => mutateImage('Image shadow', (current) => {
+                if (!event.target.checked) {
+                  const next = { ...current };
+                  delete next.shadow;
+                  return next;
+                }
+                return { ...current, shadow: { color: '#000000', offsetX: 0, offsetY: 10, blur: 24, opacity: 0.35 } };
+              })}/>
+              <span />
+            </label>
+          </div>
+          {props.shadow ? (
+            <>
+              <div className="apx-canvas-color-row">
+                <input type="color" value={props.shadow.color ?? '#000000'} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, color: event.target.value } }))}/>
+                <input className="apx-pre4-input" value={props.shadow.color ?? '#000000'} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, color: event.target.value } }))}/>
+              </div>
+              <div className="apx-pre4-property-grid">
+                <label><span>X</span><input className="apx-pre4-input" type="number" value={props.shadow.offsetX ?? 0} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, offsetX: Number(event.target.value) } }))}/></label>
+                <label><span>Y</span><input className="apx-pre4-input" type="number" value={props.shadow.offsetY ?? 10} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, offsetY: Number(event.target.value) } }))}/></label>
+                <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={props.shadow.blur ?? 24} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, blur: Number(event.target.value) } }))}/></label>
+                <label><span>Opacity</span><input className="apx-pre4-input" type="number" min={0} max={1} step={0.05} value={props.shadow.opacity ?? .35} onChange={(event) => updateImageDraft((current) => ({ ...current, shadow: { ...current.shadow, opacity: Number(event.target.value) } }))}/></label>
+              </div>
+            </>
+          ) : null}
+        </div>
+
+        <div className="apx-pre4-section" data-image-section="mask">
+          <div className="apx-canvas-section-heading">
+            <div className="apx-pre4-section-title">Mask</div>
+            <label className="apx-canvas-switch">
+              <input type="checkbox" checked={Boolean(props.mask)} onChange={(event) => mutateImage('Image mask', (current) => {
+                if (!event.target.checked) {
+                  const next = { ...current };
+                  delete next.mask;
+                  return next;
+                }
+                return { ...current, mask: { source: '', mode: 'alpha' } };
+              })}/>
+              <span />
+            </label>
+          </div>
+          {props.mask ? (
+            <>
+              <input className="apx-pre4-input" placeholder="Mask source URL or studio://asset/…" value={typeof props.mask.source === 'string' ? props.mask.source : ''} onChange={(event) => updateImageDraft((current) => ({ ...current, mask: { ...current.mask!, source: event.target.value } }))}/>
+              <select className="apx-pre4-input" value={props.mask.mode ?? 'alpha'} onChange={(event) => mutateImage('Mask mode', (current) => ({ ...current, mask: { ...current.mask!, mode: event.target.value as NonNullable<VisualImageNodeProps['mask']>['mode'] } }))}><option value="alpha">alpha</option><option value="luminance">luminance</option><option value="inverse">inverse</option></select>
+            </>
+          ) : null}
+        </div>
+      </>
+    );
+  };
+
+  const renderMediaData = () => {
+    if (!primaryMedia) return renderTransformFields();
+    const props = visualImageProps(primaryMedia);
+    const source = props.source;
+    const sourceString = typeof source === 'string' ? source : '';
+    const sourceAssetId = typeof source === 'string' ? studioAssetIdFromReference(source) : null;
+    const generatedId =
+      typeof source === 'object' &&
+      source &&
+      '$generated' in source
+        ? source.$generated
+        : '';
+    const primaryLayerIndex = layerIds.indexOf(primaryMedia.id);
+    const availableGenerated = layerIds
+      .slice(0, Math.max(0, primaryLayerIndex))
+      .map((id) => project.document.nodes[id])
+      .filter(
+        (node): node is VisualNode =>
+          Boolean(node && (node.kind === 'image' || node.kind === 'shape')),
+      );
+    return (
+      <>
+        {renderMediaHeader()}
+        <div className="apx-pre4-section" data-image-section="source">
+          <div className="apx-pre4-section-title">Source</div>
+          <label className="apx-canvas-field">
+            <span>URL / path / shape source</span>
+            <input
+              className="apx-pre4-input"
+              disabled={primaryMedia.kind === 'shape'}
+              value={sourceString}
+              placeholder="https://… or studio://asset/…"
+              onFocus={beginPropertyEdit}
+              onChange={(event) => updateImageDraft((current) => ({ ...current, source: event.target.value }))}
+              onBlur={() => endPropertyEdit('Image source')}
+            />
+          </label>
+          {primaryMedia.kind === 'image' ? (
+            <>
+              <label className="apx-canvas-field">
+                <span>Replace with Studio asset</span>
+                <select
+                  className="apx-pre4-input"
+                  value={sourceAssetId ?? ''}
+                  onChange={(event) => {
+                    const asset = imageAssets.find((item) => item.id === event.target.value);
+                    if (asset) mutateImage('Replace image asset', (current) => ({ ...current, source: studioAssetReference(asset) }));
+                  }}
+                >
+                  <option value="">Choose image asset…</option>
+                  {imageAssets.map((asset) => <option key={asset.id} value={asset.id}>{asset.name}</option>)}
+                </select>
+              </label>
+              <label className="apx-canvas-field">
+                <span>Generated-buffer source</span>
+                <select
+                  className="apx-pre4-input"
+                  value={generatedId}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    if (value) mutateImage('Generated buffer source', (current) => ({ ...current, source: { $generated: value } }));
+                  }}
+                >
+                  <option value="">None</option>
+                  <option value="document_canvas">Canvas buffer</option>
+                  {availableGenerated.map((node) => <option key={node!.id} value={node!.id}>{node!.name ?? node!.kind}</option>)}
+                </select>
+              </label>
+            </>
+          ) : null}
+        </div>
+        <div className="apx-live-sync-note">
+          <strong>Stable source identity</strong>
+          <span>Studio assets generate as studio://asset/… strings. Generated buffers compile as real earlier output identifiers rather than editor-only placeholders.</span>
+        </div>
+      </>
+    );
+  };
+
+  const renderMediaAdvanced = () => {
+    if (!primaryMedia) return renderTransformFields();
+    return (
+      <>
+        {renderMediaHeader()}
+        <div className="apx-pre4-section" data-image-section="complete-config">
+          <div className="apx-pre4-section-title">Complete ImageProperties / CreateImageOptions</div>
+          <textarea
+            className="apx-canvas-json apx-canvas-json--config"
+            spellCheck={false}
+            value={imageConfigDraft}
+            onChange={(event) => {
+              setImageConfigDraft(event.target.value);
+              setImageConfigError(null);
+            }}
+          />
+          {imageConfigError ? <div className="apx-live-code-error">{imageConfigError}</div> : null}
+          <button
+            className="apx-canvas-apply"
+            type="button"
+            onClick={() => {
+              try {
+                const parsed = JSON.parse(imageConfigDraft);
+                if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Image properties JSON must be an object.');
+                const nextProject = structuredClone(project);
+                const node = nextProject.document.nodes[primaryMedia.id];
+                node.props = imagePropsRecord(parsed as VisualImageNodeProps);
+                nextProject.updatedAt = new Date().toISOString();
+                const validation = validateVisualProject(nextProject);
+                if (!validation.ok) throw new Error(validation.issues[0]?.message ?? 'Invalid image configuration.');
+                history.current.commit(project, nextProject, 'Advanced image config');
+                projectRef.current = nextProject;
+                setProject(nextProject);
+                setHistoryTick((value) => value + 1);
+                setImageConfigError(null);
+                setMessage('Complete image configuration applied');
+              } catch (configError) {
+                setImageConfigError(configError instanceof Error ? configError.message : 'Invalid image configuration JSON.');
+              }
+            }}
+          >
+            Apply complete image config
+          </button>
+          <small className="apx-canvas-hint">
+            Declaration-level escape hatch for gradient fills, clipPath, distortion, meshWarp, advanced effects, mask buffers, stroke/shadow gradients, boxBackground and CreateImageOptions/groupTransform.
+          </small>
+        </div>
+      </>
+    );
+  };
+
+  const renderMediaInspector = () => {
+    if (inspectorTab === 'transform') return renderTransformFields();
+    if (inspectorTab === 'style') return renderMediaStyle();
+    if (inspectorTab === 'effects') return renderMediaEffects();
+    if (inspectorTab === 'data') return renderMediaData();
+    return renderMediaAdvanced();
+  };
+
   const renderInspector = () => {
+    if (primaryMedia) {
+      return renderMediaInspector();
+    }
+
     if (!primary && activeTool === 'canvas') {
       return renderCanvasInspector();
     }
@@ -2214,6 +3069,7 @@ export default function VisualStudioPre4({
           assets={assets}
           onChange={setAssets}
           onInsertReference={(value) => setMessage('Asset reference: ' + value)}
+          onInsertAsset={insertImageAsset}
           onNotice={(_kind, text) => setMessage(text)}
         />
       );
@@ -2335,6 +3191,7 @@ export default function VisualStudioPre4({
               <button
                 key={id}
                 type="button"
+                data-feature-tool={id}
                 data-active={activeTool === id ? 'true' : undefined}
                 onClick={() => {
                   setActiveTool(id);
@@ -2353,38 +3210,65 @@ export default function VisualStudioPre4({
           </div>
         </nav>
 
-        <aside className="apx-pre4-layers">
+        <aside className="apx-pre4-layers" data-context-mode={mediaContextActive ? activeTool : 'layers'}>
           <div className="apx-pre4-panel-head">
             <div>
-              <strong>Layers</strong>
-              <small>{layerIds.length ? layerIds.length + ' layers' : 'Layer structure'}{selected.length ? ' · ' + selected.length + ' selected' : ''}</small>
+              <strong>
+                {activeTool === 'images'
+                  ? 'Images'
+                  : activeTool === 'shapes'
+                    ? 'Shapes'
+                    : activeTool === 'assets'
+                      ? 'Assets'
+                      : 'Layers'}
+              </strong>
+              <small>
+                {mediaContextActive
+                  ? activeTool === 'images'
+                    ? imageAssets.length + ' image assets'
+                    : activeTool === 'shapes'
+                      ? IMAGE_SHAPE_TYPES.length + ' built-in shapes'
+                      : assets.length + ' shared assets'
+                  : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
+                    (selected.length ? ' · ' + selected.length + ' selected' : '')}
+              </small>
             </div>
-            <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
+            {!mediaContextActive ? (
+              <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
+            ) : activeTool === 'images' ? (
+              <button type="button" onClick={() => setDockTab('assets')} title="Open Assets">＋</button>
+            ) : null}
           </div>
-          <div className="apx-pre4-layer-tree">
-            <div className="apx-pre4-root-row">
-              <span>▾</span>
-              <strong>{project.name || 'Landing Page'}</strong>
-            </div>
-            {renderLayerRows(project.document.rootNodeIds)}
-            {!project.document.rootNodeIds.length && (
-              <div className="apx-pre4-empty apx-pre4-empty-layers">
-                <strong>No layers yet</strong>
-                <span>Add a layer to begin composing on the canvas.</span>
-                <button type="button" onClick={addPlaceholder}>Add layer</button>
-              </div>
-            )}
-          </div>
-          {selected.length ? (
-            <div className="apx-pre4-layer-actions">
-              <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))}>Duplicate</button>
-              <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))}>Delete</button>
-              <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
-              <button type="button" onClick={ungroupSelection}>Ungroup</button>
-            </div>
-          ) : null}
-        </aside>
 
+          {mediaContextActive ? (
+            renderMediaContext()
+          ) : (
+            <>
+              <div className="apx-pre4-layer-tree">
+                <div className="apx-pre4-root-row">
+                  <span>▾</span>
+                  <strong>{project.name || 'Landing Page'}</strong>
+                </div>
+                {renderLayerRows(project.document.rootNodeIds)}
+                {!project.document.rootNodeIds.length && (
+                  <div className="apx-pre4-empty apx-pre4-empty-layers">
+                    <strong>No layers yet</strong>
+                    <span>Add a layer to begin composing on the canvas.</span>
+                    <button type="button" onClick={addPlaceholder}>Add layer</button>
+                  </div>
+                )}
+              </div>
+              {selected.length ? (
+                <div className="apx-pre4-layer-actions">
+                  <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))}>Duplicate</button>
+                  <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))}>Delete</button>
+                  <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
+                  <button type="button" onClick={ungroupSelection}>Ungroup</button>
+                </div>
+              ) : null}
+            </>
+          )}
+        </aside>
         <main className="apx-pre4-stage">
           <div className="apx-pre4-stagebar">
             <button className="apx-pre4-device" type="button">
@@ -2431,6 +3315,12 @@ export default function VisualStudioPre4({
             onPointerUp={pointerUp}
             onPointerCancel={pointerUp}
             onWheel={onWheel}
+            onDragOver={(event) => {
+              event.preventDefault();
+              event.dataTransfer.dropEffect = 'copy';
+            }}
+            onDrop={dropImagesOnCanvas}
+            data-image-drop-target
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={() => { pinch.current = null; }}
@@ -2462,6 +3352,16 @@ export default function VisualStudioPre4({
                   transformOrigin: 'top left',
                 }}
               >
+              {artboardPreviewUrl ? (
+                <img
+                  className="apx-pre4-authoritative-frame"
+                  src={artboardPreviewUrl}
+                  alt=""
+                  draggable={false}
+                  data-authoritative-apexify-frame
+                  data-rendering={artboardPreviewBusy ? 'true' : undefined}
+                />
+              ) : null}
               <div className="apx-pre4-artboard-grid" />
 
               {guides.map((guide, index) => (
@@ -2485,6 +3385,7 @@ export default function VisualStudioPre4({
                     key={id}
                     data-visual-node={id}
                     className="apx-pre4-node"
+                    data-kind={node.kind}
                     data-selected={isSelected ? 'true' : undefined}
                     onPointerDown={(event) => beginMove(event, id)}
                     style={{
@@ -2629,7 +3530,12 @@ export default function VisualStudioPre4({
               </div>
               <div className="apx-pre4-assets-grid">
                 {filteredAssets.length ? filteredAssets.slice(0, 9).map((asset) => (
-                  <button key={asset.id} type="button" title={asset.name} onClick={() => setDockTab('assets')}>
+                  <button
+                    key={asset.id}
+                    type="button"
+                    title={asset.mime.startsWith('image/') ? 'Insert ' + asset.name : asset.name}
+                    onClick={() => asset.mime.startsWith('image/') ? insertImageAsset(asset) : setDockTab('assets')}
+                  >
                     {asset.mime.startsWith('image/') ? (
                       <img src={'data:' + asset.mime + ';base64,' + asset.base64} alt="" />
                     ) : (
