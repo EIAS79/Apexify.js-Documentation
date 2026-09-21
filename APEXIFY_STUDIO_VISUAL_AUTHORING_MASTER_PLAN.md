@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3209,8 +3209,8 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 3 | Viewport / layers / transforms / history | PRODUCTION VERIFIED | `372d449e8e37c998faf56eef0f0db8704f648e9d` | Vercel production deployment `dpl_6TEqXQJ9NbH2MYT2fpC1mmgRgNbn` READY for exact merge SHA; live `/studio` Visual-mode smoke passed with Layers, Transform Inspector, History, zoom/fit/reset, Select/Pan, Project menu and viewport visible |
 | PRE-4 | Studio product shell rebuild | MAIN MERGED | `b530d0a8f18290ac3f9081744153c9aae58a9dfe` | Studio Visual push gate `35632663379` PASS; PR gate `35632667933` PASS; build/browser/screenshot proof PASS; production deployment deferred because Vercel quota is rate-limited |
 | 4 | Canvas | MAIN MERGED | `7c33de0eae60a6ed7a12fb41b942610eaf702498` | PR #83; exact-head Studio Visual gate `35654406532` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because Vercel quota is rate-limited |
-| 5 | Images / shapes / assets | NOT STARTED | — | NEXT — extend permanent Images/Shapes/Assets surfaces and linked Code ↔ Visual reconciliation |
-| 6 | Text / fonts | NOT STARTED | — | — |
+| 5 | Images / shapes / assets | MAIN MERGED | `b3aa8683345f48687cddc4e54077bdfd3f13226d` | PR #84; exact-head Studio Visual gate `35657277254` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because no exact merge deployment is available yet |
+| 6 | Text / fonts | NOT STARTED | — | NEXT — activate Text/Fonts authoring and extend linked Code ↔ Visual reconciliation |
 | 7 | Paths / doodle / pixels / detect | NOT STARTED | — | — |
 | 8 | Charts | NOT STARTED | — | — |
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
@@ -3476,6 +3476,73 @@ canonical literal createCanvas() edit
 ```
 
 Production verification remains deferred until Vercel usage is available again.
+
+---
+
+## Phase 5 implementation record — STUDIO-VISUAL-5
+
+> **Status:** MAIN MERGED — PRODUCTION VERIFICATION DEFERRED
+>
+> **Work branch:** `studio-visual/v05-images-shapes-assets`
+>
+> **PR:** #84
+>
+> **Verified PR head:** `d37fa656c7aedbd546af9feb9a881a3a62fc2138`
+>
+> **Green Studio Visual gate:** GitHub Actions `35657277254`
+>
+> **Main integration:** `b3aa8683345f48687cddc4e54077bdfd3f13226d`
+>
+> **Production deployment:** DEFERRED — no READY production deployment exists for the exact Phase 5 merge commit yet; the latest observed READY production deployment is still pre-Phase-4 main.
+
+Completed Phase-5 scope:
+
+- modeled pinned Apexify `ImageProperties`, `ShapeProperties`, `CreateImageOptions` and group-transform contracts;
+- mechanically classified every current image/shape/createImage field into Transform / Style / Effects / Data / Advanced plus an explicit reverse-sync policy;
+- activated permanent **Images**, **Shapes** and **Assets** feature-rail surfaces;
+- contextual left panel now provides URL insertion, image-asset insertion, all built-in Apexify shapes and shared asset access;
+- drag/drop image files on the artboard flow through the shared persistent Studio asset store;
+- Studio image assets retain stable `studio://asset/...` source identity in canonical code;
+- Asset Shelf and compact Assets pane can insert images directly into Visual mode;
+- image replacement from existing Studio assets is available from the **Data** Inspector;
+- generated-buffer source authoring supports the document canvas and only earlier semantic image/shape outputs, preventing forward-reference generation;
+- **Style** Inspector covers image fit/alignment/inherit, shape type/fill/color, radius, stroke and box background;
+- **Transform** retains generic x/y/width/height/rotation/opacity editing and direct-manipulation handles;
+- **Effects** Inspector covers blur, blend mode, filter stack/order/intensity, shadow and mask;
+- **Data** Inspector owns source identity, asset replacement and generated-buffer bindings;
+- **Advanced** exposes a validated declaration-level editor for clipPath, distortion, meshWarp, advanced effects, gradients, masks, stroke/shadow/boxBackground and `CreateImageOptions.groupTransform`;
+- semantic image/shape nodes lower into ordered `createImage()` operations;
+- generated-buffer references emit real earlier result identifiers rather than editor-only placeholders;
+- canonical `createImage()` source safely reconciles back into image/shape Visual nodes without `eval` / `new Function`;
+- existing legacy Visual asset references remain compatible and resolve to their URI during code generation;
+- the artboard displays an authoritative debounced `@apexify/web` render frame beneath selection/transform overlays;
+- real ApexPainter operation-plan execution and generated-code execution produce equivalent Phase-5 shape artifacts;
+- desktop browser proof inserts a built-in Rectangle from the Shapes context, verifies live `createImage()` code, and waits for the authoritative Apexify frame;
+- mobile/desktop shell, modal, Code Studio round-trip and prior phase regressions remain green.
+
+### Phase 5 proof
+
+```text
+Image / Shape / Asset authoring
+→ semantic Visual nodes
+→ ordered Studio operation plan
+→ canonical createImage() calls
+→ real ApexPainter execution
+→ equivalent artifact
+
+Visual edit
+→ linked createImage() source update
+
+canonical literal createImage() edit
+→ safe parser/reconciler
+→ Image / Shape Visual state update
+
+Studio image asset
+→ stable studio://asset/<id> source
+→ browser Preview + generated code
+```
+
+Production verification remains deferred until an exact Phase 5 main deployment is available.
 
 ---
 
