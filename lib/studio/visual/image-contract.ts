@@ -53,6 +53,105 @@ export const IMAGE_BLEND_MODES: readonly VisualBlendMode[] = [
   'hue','saturation','color','luminosity',
 ] as const;
 
+export type ImageAuthoringSurface =
+  | 'Transform'
+  | 'Style'
+  | 'Effects'
+  | 'Data'
+  | 'Advanced';
+
+export type ImageReverseSyncPolicy =
+  | 'canonical-literal'
+  | 'stable-source'
+  | 'generated-buffer';
+
+export const IMAGE_AUTHORING_CLASSIFICATION = {
+  source: { surface: 'Data', reverse: 'stable-source' },
+  x: { surface: 'Transform', reverse: 'canonical-literal' },
+  y: { surface: 'Transform', reverse: 'canonical-literal' },
+  width: { surface: 'Transform', reverse: 'canonical-literal' },
+  height: { surface: 'Transform', reverse: 'canonical-literal' },
+  inherit: { surface: 'Style', reverse: 'canonical-literal' },
+  fit: { surface: 'Style', reverse: 'canonical-literal' },
+  align: { surface: 'Style', reverse: 'canonical-literal' },
+  rotation: { surface: 'Transform', reverse: 'canonical-literal' },
+  opacity: { surface: 'Transform', reverse: 'canonical-literal' },
+  blur: { surface: 'Effects', reverse: 'canonical-literal' },
+  blendMode: { surface: 'Effects', reverse: 'canonical-literal' },
+  borderRadius: { surface: 'Style', reverse: 'canonical-literal' },
+  borderPosition: { surface: 'Advanced', reverse: 'canonical-literal' },
+  filters: { surface: 'Effects', reverse: 'canonical-literal' },
+  filterIntensity: { surface: 'Effects', reverse: 'canonical-literal' },
+  filterOrder: { surface: 'Effects', reverse: 'canonical-literal' },
+  mask: { surface: 'Effects', reverse: 'stable-source' },
+  clipPath: { surface: 'Advanced', reverse: 'canonical-literal' },
+  distortion: { surface: 'Advanced', reverse: 'canonical-literal' },
+  meshWarp: { surface: 'Advanced', reverse: 'canonical-literal' },
+  effects: { surface: 'Advanced', reverse: 'canonical-literal' },
+  shape: { surface: 'Style', reverse: 'canonical-literal' },
+  shadow: { surface: 'Effects', reverse: 'canonical-literal' },
+  stroke: { surface: 'Style', reverse: 'canonical-literal' },
+  boxBackground: { surface: 'Style', reverse: 'canonical-literal' },
+} as const satisfies Record<
+  keyof Omit<VisualImageNodeProps, 'createOptions'>,
+  { surface: ImageAuthoringSurface; reverse: ImageReverseSyncPolicy }
+>;
+
+export const CREATE_IMAGE_OPTIONS_CLASSIFICATION = {
+  isGrouped: { surface: 'Advanced', reverse: 'canonical-literal' },
+  groupTransform: { surface: 'Advanced', reverse: 'canonical-literal' },
+} as const satisfies Record<
+  keyof VisualCreateImageOptions,
+  { surface: ImageAuthoringSurface; reverse: ImageReverseSyncPolicy }
+>;
+
+export const GROUP_TRANSFORM_CLASSIFICATION = {
+  rotation: 'Advanced',
+  translateX: 'Advanced',
+  translateY: 'Advanced',
+  scaleX: 'Advanced',
+  scaleY: 'Advanced',
+  pivotX: 'Advanced',
+  pivotY: 'Advanced',
+  opacity: 'Advanced',
+  blur: 'Advanced',
+  blendMode: 'Advanced',
+  borderRadius: 'Advanced',
+  borderPosition: 'Advanced',
+  filters: 'Advanced',
+  filterIntensity: 'Advanced',
+  filterOrder: 'Advanced',
+  mask: 'Advanced',
+  clipPath: 'Advanced',
+  distortion: 'Advanced',
+  meshWarp: 'Advanced',
+  effects: 'Advanced',
+  shadow: 'Advanced',
+  stroke: 'Advanced',
+  boxBackground: 'Advanced',
+} as const satisfies Record<
+  keyof NonNullable<VisualCreateImageOptions['groupTransform']>,
+  ImageAuthoringSurface
+>;
+
+export const SHAPE_PROPERTIES_CLASSIFICATION = {
+  fill: 'Style',
+  color: 'Style',
+  gradient: 'Advanced',
+  points: 'Advanced',
+  radius: 'Advanced',
+  sides: 'Style',
+  innerRadius: 'Style',
+  outerRadius: 'Style',
+  startAngle: 'Style',
+  endAngle: 'Style',
+  centerX: 'Advanced',
+  centerY: 'Advanced',
+} as const satisfies Record<
+  keyof VisualShapeProperties,
+  ImageAuthoringSurface
+>;
+
 export const IMAGE_FITS = ['fill', 'contain', 'cover'] as const;
 export const IMAGE_ALIGNS = [
   'center','top','bottom','left','right',
