@@ -31,9 +31,10 @@ for (const mode of ['ffmpeg', 'ffprobe'] as const) {
         cwd: root,
         encoding: 'utf8',
         env: {
+          ...process.env,
           STUDIO_MEDIA_CAP_ID: id,
           STUDIO_MEDIA_NODE_PATH: process.execPath,
-        },
+        } as NodeJS.ProcessEnv,
       });
 
       assert.equal(result.status, 0, result.stderr || result.stdout);
