@@ -82,7 +82,7 @@ async function run() {
   const canvasPlan = lowerVisualProject(canvasProject);
   const canvasPreview = await executeStudioOperationPlan(canvasPlan, {
     createCanvas: async (options) => {
-      const canvas = await painter.createCanvas(options);
+      const canvas = await painter.createCanvas(options as Parameters<ApexPainter['createCanvas']>[0]);
       return { buffer: canvas.buffer };
     },
   });
