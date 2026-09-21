@@ -2195,6 +2195,7 @@ export default function VisualStudioPre4({
     activeTool === 'images' ||
     activeTool === 'shapes' ||
     activeTool === 'text' ||
+    activeTool === 'paths' ||
     activeTool === 'assets';
 
   const imageAssets = assets.filter((asset) =>
@@ -2212,6 +2213,176 @@ export default function VisualStudioPre4({
   ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'paths') {
+      const activatePointTool = (
+        action: NonNullable<typeof phase7Action>,
+        label: string,
+      ) => {
+        setPhase7Action(action);
+        setViewportMode('select');
+        setMessage(label + ' · click the artboard');
+      };
+      return (
+        <div className="apx-media-context" data-visual-paths-context>
+          <div className="apx-media-context-copy">
+            <strong>Paths & pixels</strong>
+            <span>Draw native Apexify paths, connectors and doodles, then inspect or mutate the rendered pixels.</span>
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Path tools</strong>
+            {phase7Action ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setPhase7Action(null);
+                  setFreehandDraft([]);
+                  freehandDraftRef.current = [];
+                  setMessage('Path tool action cancelled');
+                }}
+                data-phase7-action-cancel
+              >
+                Cancel action
+              </button>
+            ) : null}
+          </div>
+          <div className="apx-shape-picker" data-path-tool-picker>
+            {(['line', 'polyline', 'bezier', 'path', 'connector'] as const).map((tool) => (
+              <button
+                key={tool}
+                type="button"
+                onClick={() => insertPath(tool)}
+                data-path-insert={tool}
+              >
+                <span className="apx-shape-glyph">⌁</span>
+                <small>{tool}</small>
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                setViewportMode('select');
+                insertPath('freehand');
+              }}
+              data-path-freehand
+              data-active={phase7Action === 'freehand' ? 'true' : undefined}
+            >
+              <span className="apx-shape-glyph">✎</span>
+              <small>freehand</small>
+            </button>
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Pixel operations</strong>
+            <span>destructive</span>
+          </div>
+          <div className="apx-pre4-disabled-grid" data-pixel-filters>
+            {(['grayscale', 'invert', 'sepia', 'brightness', 'contrast', 'saturate'] as const).map((filter) => (
+              <button
+                type="button"
+                key={filter}
+                onClick={() =>
+                  appendPixelOperation(
+                    { type: 'manipulate', filter, intensity: 1 },
+                    filter.charAt(0).toUpperCase() + filter.slice(1) + ' pixels',
+                  )
+                }
+                data-pixel-filter={filter}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Pixel edit</strong>
+            <span>next click</span>
+          </div>
+          <div className="apx-media-url">
+            <input
+              type="color"
+              value={pixelColorDraft}
+              aria-label="Pixel color"
+              onChange={(event) => setPixelColorDraft(event.target.value)}
+              data-pixel-color
+            />
+            <button
+              type="button"
+              data-pixel-set-tool
+              data-active={phase7Action === 'pixel-set' ? 'true' : undefined}
+              onClick={() => activatePointTool('pixel-set', 'Set pixel color')}
+            >
+              Set pixel
+            </button>
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Inspect & detect</strong>
+            <span>structured results</span>
+          </div>
+          <div className="apx-pre4-disabled-grid" data-detection-tools>
+            <button
+              type="button"
+              data-pixel-inspector
+              data-active={phase7Action === 'pixel-probe' ? 'true' : undefined}
+              onClick={() => activatePointTool('pixel-probe', 'Pixel color probe')}
+            >
+              Pixel color
+            </button>
+            <button
+              type="button"
+              data-pixel-data-tool
+              data-active={phase7Action === 'pixel-data' ? 'true' : undefined}
+              onClick={() => activatePointTool('pixel-data', '16×16 pixel sample')}
+            >
+              Pixel data
+            </button>
+            <button
+              type="button"
+              data-detect-path-tool
+              data-active={phase7Action === 'path-detect' ? 'true' : undefined}
+              onClick={() => activatePointTool('path-detect', 'Path hit test')}
+            >
+              Path hit
+            </button>
+            <button
+              type="button"
+              data-detect-region-tool
+              data-active={phase7Action === 'region-detect' ? 'true' : undefined}
+              onClick={() => activatePointTool('region-detect', 'Selected bounds hit test')}
+            >
+              Region hit
+            </button>
+            <button
+              type="button"
+              data-detect-distance-tool
+              data-active={phase7Action === 'region-distance' ? 'true' : undefined}
+              onClick={() => activatePointTool('region-distance', 'Distance to selected bounds')}
+            >
+              Distance
+            </button>
+            <button
+              type="button"
+              data-detect-any-tool
+              data-active={phase7Action === 'any-region' ? 'true' : undefined}
+              onClick={() => activatePointTool('any-region', 'Any visible region hit test')}
+            >
+              Any region
+            </button>
+          </div>
+
+          <div className="apx-live-sync-note">
+            <strong>{phase7Action ? 'Canvas action active' : 'Runtime-backed authoring'}</strong>
+            <span>
+              {phase7Action
+                ? 'The next artboard gesture/click writes a Visual Project operation and regenerates Apexify code.'
+                : 'Paths render through @apexify/web; pixel and detection calls are generated from the same project model.'}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
     if (activeTool === 'text') {
       return (
         <div className="apx-media-context" data-visual-text-context>
@@ -4513,9 +4684,11 @@ export default function VisualStudioPre4({
                     ? 'Shapes'
                     : activeTool === 'text'
                       ? 'Text'
-                      : activeTool === 'assets'
-                        ? 'Assets'
-                        : 'Layers'}
+                      : activeTool === 'paths'
+                        ? 'Paths & pixels'
+                        : activeTool === 'assets'
+                          ? 'Assets'
+                          : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -4525,7 +4698,9 @@ export default function VisualStudioPre4({
                       ? IMAGE_SHAPE_TYPES.length + ' built-in shapes'
                       : activeTool === 'text'
                         ? fontAssets.length + ' uploaded fonts'
-                        : assets.length + ' shared assets'
+                        : activeTool === 'paths'
+                          ? 'Path · doodle · pixels · detection'
+                          : assets.length + ' shared assets'
                   : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
