@@ -7,9 +7,11 @@ const requireFromHere = createRequire(import.meta.url);
 const requireFromPeakEngine = createRequire(path.join(root, '.peak-engine', 'package.json'));
 let ts;
 try {
-  ts = requireFromHere('typescript');
+  const loaded = requireFromHere('typescript');
+  ts = loaded?.default ?? loaded;
 } catch {
-  ts = requireFromPeakEngine('typescript');
+  const loaded = requireFromPeakEngine('typescript');
+  ts = loaded?.default ?? loaded;
 }
 const sourcePath = path.resolve(root, process.env.PEAK_LAB_SOURCE ?? 'scripts/gallery/Apexify-Peak-Lab.ts');
 const inputDir = path.resolve(root, process.env.PEAK_LAB_OUTPUT ?? '.peak-engine/apexify-peak-output/output');
