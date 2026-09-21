@@ -1093,41 +1093,160 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
             ))}
           </div>
 
-          <div className="apx-vw-inspector-body">
+          <div className="apx-vw-inspector-body" data-visual-inspector>
             <div className="apx-vw-inspector-title">
               <AdjustmentsHorizontalIcon className="h-5 w-5" aria-hidden />
               <div>
                 <strong>{inspectorTab}</strong>
-                <small>No layer selected</small>
+                <small>
+                  {primaryNode
+                    ? primaryNode.name ?? primaryNode.kind
+                    : selection.length
+                      ? `${selection.length} layers selected`
+                      : 'No layer selected'}
+                </small>
               </div>
             </div>
 
-            <div className="apx-vw-fieldgroup">
-              <label>Type</label>
-              <div className="apx-vw-field apx-vw-field--disabled">Canvas</div>
-            </div>
-            <div className="apx-vw-fieldgrid">
-              <div>
-                <label>X</label>
-                <div className="apx-vw-field apx-vw-field--disabled">—</div>
-              </div>
-              <div>
-                <label>Y</label>
-                <div className="apx-vw-field apx-vw-field--disabled">—</div>
-              </div>
-              <div>
-                <label>W</label>
-                <div className="apx-vw-field apx-vw-field--disabled">{project.document.width}</div>
-              </div>
-              <div>
-                <label>H</label>
-                <div className="apx-vw-field apx-vw-field--disabled">{project.document.height}</div>
-              </div>
-            </div>
+            {!selection.length ? (
+              <>
+                <div className="apx-vw-fieldgroup">
+                  <label>Document</label>
+                  <div className="apx-vw-field apx-vw-field--disabled">
+                    {project.document.width} × {project.document.height}
+                  </div>
+                </div>
+                <div className="apx-vw-inspector-note">
+                  Select a generic layer to edit transforms. Domain-specific properties arrive in their owning phases.
+                </div>
+              </>
+            ) : null}
 
-            <div className="apx-vw-inspector-note">
-              Inspector controls are intentionally read-only until their corresponding Apexify capability is backed by Visual Project state and code generation.
-            </div>
+            {primaryNode && primaryTransform ? (
+              <>
+                <div className="apx-vw-fieldgroup">
+                  <label>Type</label>
+                  <div className="apx-vw-field apx-vw-field--disabled">{primaryNode.kind}</div>
+                </div>
+
+                {inspectorTab === 'Transform' ? (
+                  <>
+                    <div className="apx-vw-number-grid">
+                      <NumericField
+                        label="X"
+                        value={primaryTransform.x}
+                        onCommit={(value) => commitTransform(primaryNode.id, { x: value })}
+                      />
+                      <NumericField
+                        label="Y"
+                        value={primaryTransform.y}
+                        onCommit={(value) => commitTransform(primaryNode.id, { y: value })}
+                      />
+                      <NumericField
+                        label="W"
+                        value={primaryTransform.width}
+                        min={8}
+                        onCommit={(value) => commitTransform(primaryNode.id, { width: value })}
+                      />
+                      <NumericField
+                        label="H"
+                        value={primaryTransform.height}
+                        min={8}
+                        onCommit={(value) => commitTransform(primaryNode.id, { height: value })}
+                      />
+                      <NumericField
+                        label="Rotation"
+                        value={primaryTransform.rotation}
+                        onCommit={(value) => commitTransform(primaryNode.id, { rotation: value })}
+                      />
+                      <NumericField
+                        label="Opacity"
+                        value={Math.round(primaryTransform.opacity * 100)}
+                        min={0}
+                        max={100}
+                        onCommit={(value) => commitTransform(primaryNode.id, { opacity: value / 100 })}
+                      />
+                    </div>
+
+                    <div className="apx-vw-inspector-actions">
+                      <button
+                        type="button"
+                        data-active={primaryTransform.visible ? 'true' : undefined}
+                        onClick={() =>
+                          commitTransform(primaryNode.id, { visible: !primaryTransform.visible }, primaryTransform.visible ? 'Hide layer' : 'Show layer')
+                        }
+                      >
+                        {primaryTransform.visible ? <EyeIcon className="h-4 w-4" aria-hidden /> : <EyeSlashIcon className="h-4 w-4" aria-hidden />}
+                        {primaryTransform.visible ? 'Visible' : 'Hidden'}
+                      </button>
+                      <button
+                        type="button"
+                        data-active={primaryTransform.locked ? 'true' : undefined}
+                        onClick={() =>
+                          commitTransform(primaryNode.id, { locked: !primaryTransform.locked }, primaryTransform.locked ? 'Unlock layer' : 'Lock layer')
+                        }
+                      >
+                        {primaryTransform.locked ? <LockClosedIcon className="h-4 w-4" aria-hidden /> : <LockOpenIcon className="h-4 w-4" aria-hidden />}
+                        {primaryTransform.locked ? 'Locked' : 'Unlocked'}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="apx-vw-inspector-note">
+                    Phase 3 exposes geometry and editor state only. {inspectorTab} properties remain reserved for later visual domains.
+                  </div>
+                )}
+              </>
+            ) : null}
+
+            {selection.length > 1 ? (
+              <div className="apx-vw-multiselect-tools" data-visual-multiselect-tools>
+                <strong>Align</strong>
+                <div className="apx-vw-align-grid">
+                  <button type="button" onClick={() => commitProject('Align left', (current) => alignSelectedNodes(current, 'left'))}>Left</button>
+                  <button type="button" onClick={() => commitProject('Align center', (current) => alignSelectedNodes(current, 'center-x'))}>Center</button>
+                  <button type="button" onClick={() => commitProject('Align right', (current) => alignSelectedNodes(current, 'right'))}>Right</button>
+                  <button type="button" onClick={() => commitProject('Align top', (current) => alignSelectedNodes(current, 'top'))}>Top</button>
+                  <button type="button" onClick={() => commitProject('Align middle', (current) => alignSelectedNodes(current, 'center-y'))}>Middle</button>
+                  <button type="button" onClick={() => commitProject('Align bottom', (current) => alignSelectedNodes(current, 'bottom'))}>Bottom</button>
+                </div>
+
+                <strong>Distribute</strong>
+                <div className="apx-vw-align-grid apx-vw-align-grid--two">
+                  <button
+                    type="button"
+                    disabled={selection.length < 3}
+                    onClick={() => commitProject('Distribute horizontally', (current) => distributeSelectedNodes(current, 'horizontal'))}
+                  >
+                    Horizontal
+                  </button>
+                  <button
+                    type="button"
+                    disabled={selection.length < 3}
+                    onClick={() => commitProject('Distribute vertically', (current) => distributeSelectedNodes(current, 'vertical'))}
+                  >
+                    Vertical
+                  </button>
+                </div>
+
+                <div className="apx-vw-inspector-actions">
+                  <button
+                    type="button"
+                    onClick={() => commitProject('Show selection', (current) => updateSelectedTransforms(current, () => ({ visible: true })))}
+                  >
+                    <EyeIcon className="h-4 w-4" aria-hidden />
+                    Show
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => commitProject('Unlock selection', (current) => updateSelectedTransforms(current, () => ({ locked: false })))}
+                  >
+                    <LockOpenIcon className="h-4 w-4" aria-hidden />
+                    Unlock
+                  </button>
+                </div>
+              </div>
+            ) : null}
           </div>
         </aside>
 
@@ -1239,19 +1358,37 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
 
               {dockTab === 'History' ? (
                 <div className="apx-vw-history-list">
-                  {history.length ? history.slice(0, 6).map((entry) => (
-                    <div className="apx-vw-history-row" key={entry.id}>
-                      <ClockIcon className="h-4 w-4" aria-hidden />
-                      <strong>{entry.bufferName}</strong>
-                      <span>{entry.ok ? 'success' : 'failed'}</span>
+                  <div className="apx-vw-history-section">
+                    <div className="apx-vw-history-section__title">
+                      <strong>Visual edits</strong>
+                      <span>{editor.history.past.length}</span>
                     </div>
-                  )) : (
-                    <div className="apx-vw-dock-empty">
-                      <ClockIcon className="h-7 w-7" aria-hidden />
-                      <strong>No run history yet</strong>
-                      <span>Code Studio history is shared here.</span>
+                    {editor.history.past.length ? [...editor.history.past].reverse().slice(0, 8).map((entry, index) => (
+                      <div className="apx-vw-history-row" key={`${entry.label}-${index}`}>
+                        <ArrowUturnLeftIcon className="h-4 w-4" aria-hidden />
+                        <strong>{entry.label}</strong>
+                        <span>{index === 0 ? 'current−1' : `−${index + 1}`}</span>
+                      </div>
+                    )) : (
+                      <div className="apx-vw-history-empty">No Visual edits yet.</div>
+                    )}
+                  </div>
+
+                  <div className="apx-vw-history-section">
+                    <div className="apx-vw-history-section__title">
+                      <strong>Code runs</strong>
+                      <span>{history.length}</span>
                     </div>
-                  )}
+                    {history.length ? history.slice(0, 6).map((entry) => (
+                      <div className="apx-vw-history-row" key={entry.id}>
+                        <ClockIcon className="h-4 w-4" aria-hidden />
+                        <strong>{entry.bufferName}</strong>
+                        <span>{entry.ok ? 'success' : 'failed'}</span>
+                      </div>
+                    )) : (
+                      <div className="apx-vw-history-empty">No Code Studio runs yet.</div>
+                    )}
+                  </div>
                 </div>
               ) : null}
             </div>
