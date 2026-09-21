@@ -5,13 +5,11 @@ import { createRequire } from 'node:module';
 const root = process.cwd();
 const requireFromHere = createRequire(import.meta.url);
 const requireFromPeakEngine = createRequire(path.join(root, '.peak-engine', 'package.json'));
-let ts;
+let esbuild;
 try {
-  const loaded = requireFromHere('typescript');
-  ts = loaded?.default ?? loaded;
+  esbuild = requireFromHere('esbuild');
 } catch {
-  const loaded = requireFromPeakEngine('typescript');
-  ts = loaded?.default ?? loaded;
+  esbuild = requireFromPeakEngine('esbuild');
 }
 const sourcePath = path.resolve(root, process.env.PEAK_LAB_SOURCE ?? 'scripts/gallery/Apexify-Peak-Lab.ts');
 const inputDir = path.resolve(root, process.env.PEAK_LAB_OUTPUT ?? '.peak-engine/apexify-peak-output/output');
@@ -167,90 +165,196 @@ function splitSharedHelpers(sharedCode) {
 }
 
 
-const tsPrinter = ts.createPrinter();
-
-function parseDisplaySource(code, fileName = 'peak-gallery.ts') {
-  const file = ts.createSourceFile(fileName, code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-  if (file.parseDiagnostics.length) {
-    const message = file.parseDiagnostics
-      .map((diagnostic) => ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'))
-      .join('; ');
-    throw new Error('Peak Gallery display source is invalid TypeScript: ' + message);
+function stripLeadingComments(value) {
+  let text = value.trimStart();
+  while (true) {
+    if (text.startsWith('//')) {
+      const newline = text.indexOf('\n');
+      text = newline >= 0 ? text.slice(newline + 1).trimStart() : '';
+      continue;
+    }
+    if (text.startsWith('/*')) {
+      const close = text.indexOf('*/');
+      text = close >= 0 ? text.slice(close + 2).trimStart() : '';
+      continue;
+    }
+    return text;
   }
-  return file;
 }
 
-function formatTypeScript(code) {
-  return tsPrinter.printFile(parseDisplaySource(code)).trim();
-}
+function splitTopLevelDeclarations(source) {
+  const declarations = [];
+  let start = 0;
+  let braces = 0;
+  let parens = 0;
+  let brackets = 0;
+  let quote = null;
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
 
-function simplifyRecipeReturnSaves(body) {
-  const wrapped = 'async function __recipe() {\n' + body + '\n}';
-  const file = parseDisplaySource(wrapped, 'recipe-body.ts');
-  const fn = file.statements.find(ts.isFunctionDeclaration);
-  if (!fn || !fn.body) return body;
-
-  const transformer = (context) => {
-    const stripSave = (node) => {
-      if (
-        ts.isAwaitExpression(node) &&
-        ts.isCallExpression(node.expression) &&
-        ts.isIdentifier(node.expression.expression) &&
-        node.expression.expression.text === 'save' &&
-        node.expression.arguments.length >= 2
-      ) {
-        return ts.visitNode(node.expression.arguments[1], stripSave);
-      }
-      return ts.visitEachChild(node, stripSave, context);
-    };
-
-    const visit = (node) => {
-      if (ts.isReturnStatement(node) && node.expression) {
-        return ts.factory.updateReturnStatement(node, ts.visitNode(node.expression, stripSave));
-      }
-      return ts.visitEachChild(node, visit, context);
-    };
-
-    return (node) => ts.visitNode(node, visit);
+  const push = (end) => {
+    const code = source.slice(start, end).trim();
+    if (code) declarations.push({ code, pos: start });
+    start = end;
   };
 
-  const transformed = ts.transform(fn.body, [transformer]);
-  const block = transformed.transformed[0];
-  const result = block.statements
-    .map((statement) => tsPrinter.printNode(ts.EmitHint.Unspecified, statement, file))
-    .join('\n');
-  transformed.dispose();
-  return result;
-}
+  const beginsFunctionLike = () => {
+    const head = stripLeadingComments(source.slice(start)).slice(0, 80);
+    return /^(?:export\s+)?(?:(?:async\s+)?function|class)\b/.test(head);
+  };
 
-function declarationNames(statement) {
-  if (
-    (ts.isFunctionDeclaration(statement) ||
-      ts.isClassDeclaration(statement) ||
-      ts.isInterfaceDeclaration(statement) ||
-      ts.isTypeAliasDeclaration(statement) ||
-      ts.isEnumDeclaration(statement)) &&
-    statement.name
-  ) {
-    return [statement.name.text];
+  for (let i = 0; i < source.length; i++) {
+    const ch = source[i];
+    const next = source[i + 1];
+
+    if (lineComment) {
+      if (ch === '\n') lineComment = false;
+      continue;
+    }
+    if (blockComment) {
+      if (ch === '*' && next === '/') {
+        blockComment = false;
+        i++;
+      }
+      continue;
+    }
+    if (quote) {
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (ch === '\\') {
+        escaped = true;
+        continue;
+      }
+      if (ch === quote) quote = null;
+      continue;
+    }
+
+    if (ch === '/' && next === '/') {
+      lineComment = true;
+      i++;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      blockComment = true;
+      i++;
+      continue;
+    }
+    if (ch === "'" || ch === '"' || ch === '`') {
+      quote = ch;
+      escaped = false;
+      continue;
+    }
+
+    if (ch === '{') braces++;
+    else if (ch === '}') {
+      braces = Math.max(0, braces - 1);
+      if (braces === 0 && parens === 0 && brackets === 0 && beginsFunctionLike()) {
+        push(i + 1);
+      }
+    } else if (ch === '(') parens++;
+    else if (ch === ')') parens = Math.max(0, parens - 1);
+    else if (ch === '[') brackets++;
+    else if (ch === ']') brackets = Math.max(0, brackets - 1);
+    else if (ch === ';' && braces === 0 && parens === 0 && brackets === 0) {
+      push(i + 1);
+    }
   }
 
-  if (ts.isVariableStatement(statement)) {
-    return statement.declarationList.declarations
-      .map((declaration) => ts.isIdentifier(declaration.name) ? declaration.name.text : null)
-      .filter(Boolean);
-  }
-
-  return [];
+  push(source.length);
+  return declarations;
 }
 
-function collectIdentifiers(node, accepted) {
+function declarationName(code) {
+  const text = stripLeadingComments(code);
+  const variable = text.match(/^(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)/);
+  if (variable) return variable[1];
+
+  const callable = text.match(/^(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)/);
+  if (callable) return callable[1];
+
+  const classLike = text.match(/^(?:export\s+)?class\s+([A-Za-z_$][\w$]*)/);
+  return classLike?.[1] ?? null;
+}
+
+function codeForIdentifierScan(source) {
+  let output = '';
+  let quote = null;
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+
+  for (let i = 0; i < source.length; i++) {
+    const ch = source[i];
+    const next = source[i + 1];
+
+    if (lineComment) {
+      if (ch === '\n') {
+        lineComment = false;
+        output += '\n';
+      } else {
+        output += ' ';
+      }
+      continue;
+    }
+    if (blockComment) {
+      if (ch === '*' && next === '/') {
+        output += '  ';
+        blockComment = false;
+        i++;
+      } else {
+        output += ch === '\n' ? '\n' : ' ';
+      }
+      continue;
+    }
+    if (quote) {
+      if (escaped) {
+        escaped = false;
+        output += ' ';
+        continue;
+      }
+      if (ch === '\\') {
+        escaped = true;
+        output += ' ';
+        continue;
+      }
+      if (ch === quote) quote = null;
+      output += ch === '\n' ? '\n' : ' ';
+      continue;
+    }
+
+    if (ch === '/' && next === '/') {
+      lineComment = true;
+      output += '  ';
+      i++;
+      continue;
+    }
+    if (ch === '/' && next === '*') {
+      blockComment = true;
+      output += '  ';
+      i++;
+      continue;
+    }
+    if (ch === "'" || ch === '"' || ch === '`') {
+      quote = ch;
+      output += ' ';
+      continue;
+    }
+
+    output += ch;
+  }
+
+  return output;
+}
+
+function collectIdentifiers(source, accepted) {
   const found = new Set();
-  const visit = (current) => {
-    if (ts.isIdentifier(current) && accepted.has(current.text)) found.add(current.text);
-    ts.forEachChild(current, visit);
-  };
-  visit(node);
+  const scan = codeForIdentifierScan(source);
+  for (const match of scan.matchAll(/[A-Za-z_$][A-Za-z0-9_$]*/g)) {
+    if (accepted.has(match[0])) found.add(match[0]);
+  }
   return found;
 }
 
@@ -261,29 +365,17 @@ function buildHelperIndex(helperSections) {
     helperSections.wav,
     helperSections.motion,
   ].join('\n\n');
-  const file = parseDisplaySource(source, 'peak-helpers.ts');
-  const entries = [];
-  const byName = new Map();
 
-  for (const statement of file.statements) {
-    const names = declarationNames(statement);
-    if (!names.length) continue;
+  const entries = splitTopLevelDeclarations(source)
+    .map((entry) => ({ ...entry, name: declarationName(entry.code), deps: new Set() }))
+    .filter((entry) => entry.name);
 
-    const entry = {
-      names,
-      statement,
-      pos: statement.pos,
-      code: tsPrinter.printNode(ts.EmitHint.Unspecified, statement, file),
-      deps: new Set(),
-    };
-    entries.push(entry);
-    for (const name of names) byName.set(name, entry);
-  }
-
+  const byName = new Map(entries.map((entry) => [entry.name, entry]));
   const accepted = new Set(byName.keys());
+
   for (const entry of entries) {
-    for (const dependency of collectIdentifiers(entry.statement, accepted)) {
-      if (!entry.names.includes(dependency)) entry.deps.add(dependency);
+    for (const dependency of collectIdentifiers(entry.code, accepted)) {
+      if (dependency !== entry.name) entry.deps.add(dependency);
     }
   }
 
@@ -291,17 +383,14 @@ function buildHelperIndex(helperSections) {
 }
 
 function helpersForRecipe(body, helperIndex) {
-  const bodyFile = parseDisplaySource(
-    'async function __recipe() {\n' + body + '\n}',
-    'recipe-deps.ts',
-  );
-  const queue = [...collectIdentifiers(bodyFile, helperIndex.accepted)];
+  const queue = [...collectIdentifiers(body, helperIndex.accepted)];
   const selected = new Set();
 
   while (queue.length) {
     const name = queue.shift();
     const entry = helperIndex.byName.get(name);
     if (!entry || selected.has(entry)) continue;
+
     selected.add(entry);
     for (const dependency of entry.deps) queue.push(dependency);
   }
@@ -310,6 +399,13 @@ function helpersForRecipe(body, helperIndex) {
     .sort((a, b) => a.pos - b.pos)
     .map((entry) => entry.code)
     .join('\n\n');
+}
+
+function simplifyRecipeReturnSaves(body) {
+  return body.replace(
+    /return\s*\[\s*await\s+save\(\s*(['"])[^'"]+\1\s*,\s*([A-Za-z_$][\w$]*)\s*\)\s*\]\s*;/g,
+    'return $2;',
+  );
 }
 
 function importsForStandalone(source) {
@@ -340,41 +436,9 @@ function importsForStandalone(source) {
   return imports.join('\n');
 }
 
-function makeStandaloneRecipeSource(block, id, helperIndex) {
-  const rawBody = extractRecipeRunBody(block, id);
-  const body = simplifyRecipeReturnSaves(rawBody);
-  const helpers = helpersForRecipe(body, helperIndex);
-  const supportAndBody = helpers + '\n\nasync function main() {\n' + body + '\n}';
-  const imports = importsForStandalone(supportAndBody);
-
-  const code =
-    imports +
-    '\n\nconst painter = new ApexPainter();\n\n' +
-    (helpers ? helpers + '\n\n' : '') +
-    'async function main() {\n' +
-    body +
-    '\n}\n\nreturn await main();\n';
-
-  return formatTypeScript(code);
-}
-
-function standalonePagesForRecipe(id, code, maxLines = 180) {
-  const lines = code.trim().split(/\r?\n/);
-  if (lines.length <= maxLines) {
-    return [{ label: 'Recipe ' + id, language: 'ts', code }];
-  }
-
-  const chunks = [];
-  for (let i = 0; i < lines.length; i += maxLines) {
-    chunks.push(lines.slice(i, i + maxLines).join('\n'));
-  }
-  return chunks.map((chunk, index) => ({
-    label: 'Recipe ' + id + ' · ' + (index + 1) + '/' + chunks.length,
-    language: 'ts',
-    code: chunk,
-  }));
-}
-
+function formatStandaloneModule(code, id) {
+  try {
+    return esbuild.transformSync(co®-®éÜj×
 const source = await fs.readFile(sourcePath, 'utf8');
 const sharedMatch = source.match(/import \* as ApexRuntime[\s\S]*?(?=\/\/ ===== EXAMPLE 01-canvas =====)/);
 if (!sharedMatch) throw new Error('Peak Lab shared setup block not found');
