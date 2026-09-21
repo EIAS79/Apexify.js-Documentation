@@ -115,6 +115,117 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       targetNames.set(operation.target, targetName);
       continue;
     }
+
+    if (operation.kind === 'path-draw') {
+      const resourceName = names.allocate(
+        (operation.preferredName || 'path') + 'Path',
+        'path',
+      );
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'pathResult',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${resourceName} = ${painterName}.path2d.create(${emitValue(operation.commands, 2, targetNames)});`,
+      );
+      body.push(
+        `  const ${targetName} = await ${painterName}.path2d.draw(${base}, ${resourceName}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'path-custom') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'connector',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.path2d.custom(${emitValue(operation.options, 2, targetNames)}, ${base});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'pixels-manipulate') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'pixels',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.pixels.manipulate(${base}, ${emitValue(operation.options, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'pixels-set-color') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'pixel',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.pixels.setColor(${base}, ${operation.x}, ${operation.y}, ${emitValue(operation.color, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'pixels-get-color') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'pixelColor');
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.pixels.getColor(${base}, ${operation.x}, ${operation.y});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'pixels-get-data') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'pixelData');
+      const base = emitTargetReference(operation.base, targetNames);
+      const suffix = operation.region ? `, ${emitValue(operation.region, 2, targetNames)}` : '';
+      body.push(
+        `  const ${targetName} = await ${painterName}.pixels.getData(${base}${suffix});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'detect-path') {
+      const resourceName = names.allocate((operation.preferredName || 'hit') + 'Path', 'path');
+      const targetName = names.allocate(operation.preferredName || operation.target, 'pathHit');
+      body.push(
+        `  const ${resourceName} = ${painterName}.path2d.create(${emitValue(operation.commands, 2, targetNames)});`,
+      );
+      body.push(
+        `  const ${targetName} = await ${painterName}.detect.path(${resourceName}, ${operation.x}, ${operation.y}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'detect-region') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'regionHit');
+      body.push(
+        `  const ${targetName} = await ${painterName}.detect.region(${emitValue(operation.region, 2, targetNames)}, ${operation.x}, ${operation.y}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'detect-distance') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'distance');
+      body.push(
+        `  const ${targetName} = await ${painterName}.detect.distance(${emitValue(operation.region, 2, targetNames)}, ${operation.x}, ${operation.y});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
   }
 
   const resultName = targetNames.get(plan.result.target);
