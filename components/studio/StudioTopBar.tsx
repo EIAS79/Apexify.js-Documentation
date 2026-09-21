@@ -184,7 +184,7 @@ function TemplatesMenu({ onLoad }: { onLoad: (t: StudioTemplate) => void }) {
         title="Load template"
       >
         <SparklesIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-        <span className="hidden min-[420px]:inline">Templates</span>
+        <span className="studio-code-toolbar-label hidden min-[420px]:inline">Templates</span>
       </button>
       {open && (
         <div
@@ -280,7 +280,7 @@ export function StudioTopBar(props: TopBarProps) {
 
   return (
     <header
-      className="relative z-40 flex shrink-0 flex-col gap-2 px-3 py-2 sm:px-4 md:flex-row md:items-center md:gap-3"
+      className="studio-code-topbar relative z-40 shrink-0 px-3 py-2 sm:px-4"
       style={{
         backgroundColor: 'color-mix(in srgb, var(--bg-raised) 92%, transparent)',
         backdropFilter: 'blur(16px) saturate(140%)',
@@ -289,8 +289,8 @@ export function StudioTopBar(props: TopBarProps) {
         boxShadow: 'var(--shadow-sm)',
       }}
     >
-      {/* Left — Logo + view controls */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      {/* Workspace — brand, authoring mode, language, viewport */}
+      <div className="studio-code-topbar__workspace">
         <Link
           href="/"
           className="group/logo flex shrink-0 items-center gap-2.5 rounded-lg px-1.5 py-1 transition-colors"
@@ -304,7 +304,7 @@ export function StudioTopBar(props: TopBarProps) {
           >
             <StudioMark />
           </span>
-          <span className="hidden flex-col leading-tight sm:flex">
+          <span className="studio-code-brand-copy hidden flex-col leading-tight sm:flex">
             <span
               className="text-[10px] font-semibold uppercase tracking-[0.28em]"
               style={{ color: 'var(--text-tertiary)' }}
@@ -325,15 +325,15 @@ export function StudioTopBar(props: TopBarProps) {
           <StudioModeSwitch mode={mode} onChange={onModeChange} className="studio-mode-switch--codebar" />
         ) : null}
 
-        <LangPills lang={lang} onChange={onLangChange} />
-        <LayoutPills mode={layout} onChange={onLayoutChange} />
+        <div className="studio-code-topbar__workspace-pills">
+          <LangPills lang={lang} onChange={onLangChange} />
+          <LayoutPills mode={layout} onChange={onLayoutChange} />
+        </div>
       </div>
 
-      <span aria-hidden className="hidden flex-1 md:block" />
-
-      {/* Center — Execution controls */}
+      {/* Execution — runtime, run, auto-run, reset */}
       <div
-        className="studio-run-cluster flex items-center gap-1 rounded-xl p-1"
+        className="studio-code-topbar__execution studio-run-cluster flex items-center gap-1 rounded-xl p-1"
         style={{
           border: '1px solid var(--border-default)',
           backgroundColor: 'color-mix(in srgb, var(--bg-base) 60%, transparent)',
@@ -418,14 +418,13 @@ export function StudioTopBar(props: TopBarProps) {
           title="Reset to starter snippet"
         >
           <ArrowPathIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          <span className="hidden min-[420px]:inline">Reset</span>
+          <span className="studio-code-toolbar-label hidden min-[420px]:inline">Reset</span>
         </button>
       </div>
 
-      <span aria-hidden className="hidden flex-1 md:block" />
-
-      {/* Right — Assets + templates + utils */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Utilities — project resources, commands, appearance */}
+      <div className="studio-code-topbar__utilities">
+        <div className="studio-code-topbar__resources">
         <button
           type="button"
           onClick={onToggleAssets}
@@ -441,7 +440,7 @@ export function StudioTopBar(props: TopBarProps) {
           title="Session media assets"
         >
           <FolderOpenIcon className="h-3.5 w-3.5 shrink-0" aria-hidden />
-          <span className="hidden min-[480px]:inline">Assets</span>
+          <span className="studio-code-toolbar-label hidden min-[480px]:inline">Assets</span>
           {assetCount > 0 ? (
             <span
               className="grid min-w-5 place-items-center rounded-full px-1 text-[10px]"
@@ -453,9 +452,11 @@ export function StudioTopBar(props: TopBarProps) {
         </button>
 
         <TemplatesMenu onLoad={onLoadTemplate} />
+        </div>
 
+        <div className="studio-code-topbar__utility-cluster">
         <div
-          className="flex items-center gap-0.5 rounded-lg p-0.5"
+          className="studio-code-topbar__quick-actions flex items-center gap-0.5 rounded-lg p-0.5"
           style={{ border: '1px solid var(--border-default)', backgroundColor: 'var(--bg-raised)' }}
         >
           <button
@@ -466,7 +467,7 @@ export function StudioTopBar(props: TopBarProps) {
             title="Open command palette (⌘K)"
           >
             <CommandLineIcon className="h-3.5 w-3.5" aria-hidden />
-            <span className="hidden min-[480px]:inline">Cmd</span>
+            <span className="studio-code-toolbar-label hidden min-[480px]:inline">Cmd</span>
           </button>
 
           <button
@@ -502,6 +503,7 @@ export function StudioTopBar(props: TopBarProps) {
         </div>
 
         <ThemeToggle />
+        </div>
       </div>
     </header>
   );
