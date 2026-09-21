@@ -68,6 +68,69 @@ async function verify(width, height) {
     throw new Error('Visual → Code handoff did not open generated Apexify source');
   }
 
+  if (width >= 1000) {
+    // Phase 3: generic editor nodes must be manipulable without domain-specific runtime code.
+    await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
+    await page.waitForSelector('[data-studio-shell][data-studio-mode="visual"]');
+
+    await page.click('[data-visual-add-layer]');
+    await page.waitForSelector('[data-visual-node]');
+    if ((await page.$('[data-visual-node]')).length !== 1) {
+      throw new Error('Phase 3 failed to add the first generic layer');
+    }
+
+    const xField = '[data-visual-number-field="X"]';
+    await page.waitForSelector(xField, { visible: true });
+    await page.click(xField);
+    await page.keyboard.down('Control');
+    await page.keyboard.press('A');
+    await page.keyboard.up('Control');
+    await page.keyboard.type('320');
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(
+      (selector) => document.querySelector(selector)?.value === '320',
+      {},
+      xField,
+    );
+
+    await page.waitForSelector('[data-visual-undo]:not([disabled])');
+    await page.click('[data-visual-undo]');
+    await page.waitForFunction(
+      (selector) => document.querySelector(selector)?.value !== '320',
+      {},
+      xField,
+    );
+    await page.waitForSelector('[data-visual-redo]:not([disabled])');
+    await page.click('[data-visual-redo]');
+    await page.waitForFunction(
+      (selector) => document.querySelector(selector)?.value === '320',
+      {},
+      xField,
+    );
+
+    await page.click('[data-visual-duplicate-layer]');
+    await page.waitForFunction(
+      () => document.querySelectorAll('[data-visual-node]').length === 2,
+    );
+
+    await page.click('[data-visual-add-layer]');
+    await page.waitForFunction(
+      () => document.querySelectorAll('[data-visual-node]').length === 3,
+    );
+
+    const layerRows = await page.$('[data-visual-layer-id]');
+    if (layerRows.length < 3) throw new Error('Phase 3 layer tree did not expose generic layers');
+    await layerRows[0].click();
+    await page.keyboard.down('Control');
+    await layerRows[1].click();
+    await layerRows[2].click();
+    await page.keyboard.up('Control');
+    await page.waitForSelector('[data-visual-multiselect-tools]', { visible: true });
+
+    await page.click('[data-visual-snapping]');
+    await page.click('[data-visual-snapping]');
+  }
+
   if (errors.length) throw new Error('page errors: ' + JSON.stringify(errors));
 
   await page.close();
