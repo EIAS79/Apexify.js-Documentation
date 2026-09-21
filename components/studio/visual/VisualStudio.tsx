@@ -55,8 +55,8 @@ import {
   moveSelectedNodes,
   reorderRootNode,
   selectedNodeIds,
-  setVisualSelection,
   updateNodeTransform,
+  updateSelectedNodeState,
   updateSelectedTransforms,
 } from '@/lib/studio/visual/editor/mutations';
 import {
@@ -430,7 +430,13 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
     }
 
     const additive = event.metaKey || event.ctrlKey || event.shiftKey;
-    if (!selectedNodeIds(current).includes(nodeId)) selectLayer(nodeId, additive);
+    const wasSelected = selectedNodeIds(current).includes(nodeId);
+    if (additive) {
+      selectLayer(nodeId, true);
+      if (wasSelected) return;
+    } else if (!wasSelected) {
+      selectLayer(nodeId, false);
+    }
     const before = editor.beginInteraction('Move layer');
     nodeDragRef.current = {
       nodeId,
@@ -1235,14 +1241,14 @@ export default function VisualStudio({ active, mode, onModeChange }: Props) {
                 <div className="apx-vw-inspector-actions">
                   <button
                     type="button"
-                    onClick={() => commitProject('Show selection', (current) => updateSelectedTransforms(current, () => ({ visible: true })))}
+                    onClick={() => commitProject('Show selection', (current) => updateSelectedNodeState(current, { visible: true }))}
                   >
                     <EyeIcon className="h-4 w-4" aria-hidden />
                     Show
                   </button>
                   <button
                     type="button"
-                    onClick={() => commitProject('Unlock selection', (current) => updateSelectedTransforms(current, () => ({ locked: false })))}
+                    onClick={() => commitProject('Unlock selection', (current) => updateSelectedNodeState(current, { locked: false }))}
                   >
                     <LockOpenIcon className="h-4 w-4" aria-hidden />
                     Unlock
