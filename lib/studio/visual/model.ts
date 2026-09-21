@@ -90,6 +90,43 @@ export type VisualPatternType =
   | 'polka'
   | 'custom';
 
+export type VisualBlendMode =
+  | 'source-over' | 'source-in' | 'source-out' | 'source-atop'
+  | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop'
+  | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay'
+  | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light'
+  | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation'
+  | 'color' | 'luminosity';
+
+export interface VisualImageFilter {
+  type:
+    | 'gaussianBlur'
+    | 'motionBlur'
+    | 'radialBlur'
+    | 'sharpen'
+    | 'noise'
+    | 'grain'
+    | 'edgeDetection'
+    | 'emboss'
+    | 'invert'
+    | 'grayscale'
+    | 'sepia'
+    | 'pixelate'
+    | 'brightness'
+    | 'contrast'
+    | 'saturation'
+    | 'hueShift'
+    | 'posterize';
+  intensity?: number;
+  radius?: number;
+  angle?: number;
+  centerX?: number;
+  centerY?: number;
+  value?: number;
+  levels?: number;
+  size?: number;
+}
+
 export interface VisualPatternOptions {
   type: VisualPatternType;
   color?: string;
@@ -103,7 +140,7 @@ export interface VisualPatternOptions {
   scale?: number;
   offsetX?: number;
   offsetY?: number;
-  blendMode?: string;
+  blendMode?: VisualBlendMode;
   gradient?: VisualGradient;
 }
 
@@ -141,14 +178,14 @@ export type VisualBackgroundLayer =
       opacity?: number;
       fit?: 'fill' | 'contain' | 'cover';
       align?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-      blendMode?: string;
+      blendMode?: VisualBlendMode;
     }
   | {
       type: 'pattern';
       source: string;
       repeat?: 'repeat' | 'repeat-x' | 'repeat-y' | 'no-repeat';
       opacity?: number;
-      blendMode?: string;
+      blendMode?: VisualBlendMode;
     }
   | { type: 'presetPattern'; pattern: VisualPatternOptions; opacity?: number; blendMode?: string }
   | { type: 'noise'; intensity?: number; blendMode?: string };
@@ -209,7 +246,7 @@ export interface VisualCanvasConfig {
   noiseBg?: { intensity?: number };
   transparentBase?: boolean;
   bgLayers?: VisualBackgroundLayer[];
-  blendMode?: string;
+  blendMode?: VisualBlendMode;
   opacity?: number;
   blur?: number;
   rotation?: number;
