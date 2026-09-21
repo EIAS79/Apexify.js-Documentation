@@ -36,7 +36,7 @@ async function verify(width, height) {
   await page.waitForSelector('[data-studio-visual-workspace]');
 
   const visualText = await page.$eval('[data-studio-visual-workspace]', (node) => node.textContent || '');
-  for (const label of ['Assets', 'Output', 'Diagnostics', 'History', 'Visual workspace ready']) {
+  for (const label of ['Assets', 'Output', 'Diagnostics', 'History', 'Editor core ready']) {
     if (!visualText.includes(label)) throw new Error('Visual shell missing ' + label);
   }
 
