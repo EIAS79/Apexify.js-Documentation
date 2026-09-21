@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-4 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 NEXT; STUDIO-VISUAL-4 GATED
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2246,6 +2246,294 @@ feat(studio-visual): complete viewport layers and transform editing
 
 ---
 
+## STUDIO-VISUAL-PRE-4 — Studio product shell rebuild
+
+### Objective
+
+Rebuild the Visual Studio product shell before feature breadth expands further. The approved Apexify Studio Visual Editor reference supplied on 2026-09-21 is the authoritative visual/UX direction for this pre-phase.
+
+The target is not a cosmetic restyle of the current Phase-3 shell. PRE-4 establishes the permanent product architecture that later Canvas, Image, Text, Chart, Path, Component, GIF, Audio and Video phases will plug into.
+
+Phase 4 must not begin until PRE-4 is production verified and the remaining master plan has been re-audited against the finished shell.
+
+### Product-shell target
+
+The Visual Studio shell must converge on this permanent structure:
+
+```text
+Apexify Studio
+├── top application bar
+│   ├── brand + product subtitle
+│   ├── Code / Visual mode switch
+│   ├── Run
+│   ├── Preview
+│   ├── Generate Code
+│   ├── Export
+│   └── account / notification affordances
+├── left feature rail
+│   ├── Canvas
+│   ├── Images
+│   ├── Text
+│   ├── Charts
+│   ├── Shapes
+│   ├── Paths
+│   ├── Layers
+│   ├── Components
+│   ├── Assets
+│   ├── GIF
+│   ├── Audio
+│   └── Video
+├── secondary left context panel
+│   └── semantic Layers tree by default
+├── central viewport / canvas workspace
+│   ├── device / canvas-size selector
+│   ├── zoom controls
+│   ├── select / pan / view controls
+│   └── authoritative artboard
+├── right contextual inspector
+│   ├── Style
+│   ├── Transform
+│   ├── Effects
+│   ├── Data
+│   └── Advanced
+└── bottom dock
+    ├── Preview
+    ├── Generated Code
+    ├── Diagnostics
+    ├── Assets
+    └── History
+```
+
+### Visual direction
+
+The shell must use one coherent Apexify Studio design system matching the approved reference direction:
+
+- deep blue-black / navy application background;
+- layered navy panel surfaces with restrained elevation;
+- electric blue and violet primary accents;
+- subtle gradients and glow only where they improve hierarchy;
+- thin low-contrast borders;
+- consistent rounded controls and panels;
+- compact creator-tool density without cramped controls;
+- stronger typography hierarchy than the Phase-3 prototype shell;
+- explicit hover, active, selected, focus, disabled and drag states;
+- consistent icon sizing and alignment;
+- clear separation between application navigation, authoring tools, viewport and contextual editing;
+- canvas remains the visual center of gravity.
+
+A tokenized Studio theme must own spacing, typography, radii, surfaces, borders, shadows, accent states and control sizing. One-off inline styling is not the long-term shell architecture.
+
+### Required shell deliverables
+
+#### Top application bar
+
+- Apexify Studio brand block;
+- product subtitle;
+- Code / Visual switch retained and visually integrated;
+- Run / Preview / Generate Code / Export action grouping;
+- project state / dirty-state affordance;
+- account/notification positions reserved without requiring authentication work in this phase;
+- responsive overflow behavior with no control collisions.
+
+#### Feature rail
+
+Permanent navigation positions for:
+
+- Canvas;
+- Images;
+- Text;
+- Charts;
+- Shapes;
+- Paths;
+- Layers;
+- Components;
+- Assets;
+- GIF;
+- Audio;
+- Video.
+
+A feature may be visibly present before its owning phase only as navigation architecture. It must not claim working behavior that does not yet exist.
+
+#### Layers / context panel
+
+- polished semantic nested tree;
+- collapse / expand;
+- selected / hover / focus states;
+- visibility and lock affordances;
+- drag reorder affordance;
+- inline rename affordance;
+- add/create affordance;
+- correct nested spacing and connector hierarchy;
+- context-panel architecture reusable by future feature rail sections.
+
+#### Central viewport
+
+- dominant central authoring surface;
+- device/canvas selector region;
+- compact zoom group;
+- select / pan / view-control group;
+- centered artboard with premium grid/stage treatment;
+- Phase-3 selection, transforms, snapping, marquee, pan, zoom and keyboard behavior preserved;
+- no overflow collisions at supported desktop widths.
+
+#### Inspector
+
+Permanent tab architecture:
+
+- Style;
+- Transform;
+- Effects;
+- Data;
+- Advanced.
+
+PRE-4 must establish reusable inspector-section primitives for labels, number fields, text fields, selects, button groups, toggles, sliders, color/fill rows and collapsed groups. Only controls backed by current editor/runtime behavior may be interactive; future-phase controls can occupy structural placeholders but must be clearly non-authoring until implemented.
+
+#### Bottom dock
+
+Replace the Phase-3 history-dominated footer area with a real dock system:
+
+- Preview;
+- Generated Code;
+- Diagnostics;
+- Assets;
+- History.
+
+Requirements:
+
+- active-tab state;
+- collapsible dock;
+- resizable height where practical;
+- generated-code surface wired to the current Visual Project generator;
+- diagnostics/history preserve their current semantic sources;
+- asset surface reuses the shared Studio asset model rather than creating a new store;
+- dock architecture reusable by later media/timeline phases.
+
+### Phase-3 behavior preservation gate
+
+The shell rebuild must not regress any verified Phase-3 editor behavior:
+
+- Code ↔ Visual switching;
+- project identity/session preservation;
+- selection and multi-selection;
+- marquee and overlap cycling;
+- drag, resize and rotate;
+- numeric transforms;
+- snapping / guides;
+- layer hierarchy and reorder;
+- show/hide and lock/unlock;
+- duplicate/delete;
+- copy/cut/paste;
+- group/ungroup;
+- align/distribute;
+- undo/redo;
+- keyboard shortcuts;
+- dirty/clean state;
+- save/load;
+- generated-code handoff.
+
+### Responsive / layout contract
+
+PRE-4 must establish deterministic desktop behavior for the full shell and graceful constrained-width behavior:
+
+- no overlapping toolbar labels;
+- no clipped primary actions at supported desktop widths;
+- side panels can collapse or adapt before the viewport becomes unusable;
+- bottom dock does not permanently consume excessive viewport height;
+- inspector remains readable;
+- horizontal scrolling is not the default shell layout strategy;
+- touch/pointer behavior from Phase 3 remains functional where supported.
+
+### Non-goals
+
+PRE-4 does not complete the authoring implementation for future domains. It must not falsely mark these as feature-complete:
+
+- full Canvas/background authoring;
+- image/shape feature completeness;
+- typography/font completeness;
+- chart authoring;
+- path/doodle/pixel/detection authoring;
+- Components/Templates feature completion;
+- GIF/animation completion;
+- Audio completion;
+- Video completion;
+- final export/project round-trip completion.
+
+Those domains retain their owning phases after PRE-4.
+
+### Engineering architecture
+
+The shell rebuild must prefer composable Studio primitives over another monolithic VisualStudio component. Expected boundaries include equivalents of:
+
+```text
+VisualStudioShell
+├── StudioTopBar
+├── FeatureRail
+├── ContextPanel
+│   └── LayersPanel
+├── ViewportWorkspace
+│   ├── ViewportToolbar
+│   └── ArtboardStage
+├── InspectorPanel
+│   └── InspectorTabs / reusable property sections
+└── StudioBottomDock
+    ├── PreviewDock
+    ├── GeneratedCodeDock
+    ├── DiagnosticsDock
+    ├── AssetsDock
+    └── HistoryDock
+```
+
+Exact file names may differ, but responsibilities must be separated enough that Phases 4+ extend the shell without rebuilding it again.
+
+### Verification
+
+PRE-4 requires:
+
+- typecheck;
+- production build;
+- dedicated Studio Visual contract tests;
+- Phase-3 regression tests unchanged or strengthened;
+- desktop browser smoke;
+- constrained-width/responsive smoke;
+- Code → Visual → Code session-preservation smoke;
+- live production smoke after merge.
+
+### Acceptance criteria
+
+PRE-4 is complete only when all of the following are true:
+
+1. The live Visual Studio clearly matches the approved reference's layout hierarchy and visual direction.
+2. The current prototype-like shell has been replaced rather than merely recolored.
+3. Top bar, feature rail, Layers/context panel, central viewport, Inspector and bottom dock are all first-class permanent surfaces.
+4. The canvas is the dominant visual focus.
+5. The shell uses a consistent tokenized design system.
+6. Phase-3 editing behavior remains operational and covered by regression tests.
+7. Future feature categories have stable UI homes without fake functional claims.
+8. The shell behaves correctly at supported desktop widths and degrades intentionally at constrained widths.
+9. Generated Code, Preview, Diagnostics, Assets and History have permanent dock architecture.
+10. Production smoke confirms the rebuilt shell after merge.
+
+### Mandatory post-PRE-4 roadmap re-audit
+
+After PRE-4 is production verified and before STUDIO-VISUAL-4 begins:
+
+- re-audit Phases 4–18 against the finished shell;
+- map each authoring domain to its permanent feature-rail, context-panel, inspector and dock surfaces;
+- move shared functionality into the earliest correct owning phase;
+- remove duplicated UI work from later phases;
+- add missing functional dependencies discovered by the rebuilt shell;
+- preserve the existing phase numbers unless a materially better execution order requires a deliberate master-plan revision.
+
+This re-audit is a required planning gate, not an optional cleanup.
+
+### Main integration
+
+```text
+feat(studio-visual): rebuild studio product shell before phase 4
+```
+
+---
+
 ## STUDIO-VISUAL-4 — Canvas and background authoring
 
 ### Objective
@@ -2682,7 +2970,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 1 | Dual-mode shell | PRODUCTION VERIFIED | `b7bfd7d70e2bd30a4e6bca63562a4fdc6e6782a7` | Vercel production deployment completed on main (`4d28777edbf140c9afe65e4e874a4b9b38ca5803`); live `/studio` Code → Visual → Code smoke passed with shared Assets/Output/Diagnostics/History and source-session preservation |
 | 2 | Project model / codegen core | MAIN MERGED | `186b87bcabba5316639c5a103c0b12125822a35a` | Manual deployment intentionally not triggered; current project instruction is merge-to-main only |
 | 3 | Viewport / layers / transforms / history | PRODUCTION VERIFIED | `372d449e8e37c998faf56eef0f0db8704f648e9d` | Vercel production deployment `dpl_6TEqXQJ9NbH2MYT2fpC1mmgRgNbn` READY for exact merge SHA; live `/studio` Visual-mode smoke passed with Layers, Transform Inspector, History, zoom/fit/reset, Select/Pan, Project menu and viewport visible |
-| 4 | Canvas | NOT STARTED | — | — |
+| PRE-4 | Studio product shell rebuild | NOT STARTED | — | Required before Phase 4; approved reference-driven layout/theme rebuild + Phase-3 regression + production smoke |\n| 4 | Canvas | GATED | — | Starts only after PRE-4 production verification and roadmap re-audit |
 | 5 | Images / shapes / assets | NOT STARTED | — | — |
 | 6 | Text / fonts | NOT STARTED | — | — |
 | 7 | Paths / doodle / pixels / detect | NOT STARTED | — | — |
