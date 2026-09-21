@@ -16,6 +16,12 @@ import type { StudioVirtualAsset } from '@/lib/studio/runtime/assets';
 
 type PreviewProvenance = 'browser-generated' | 'server-generated' | undefined;
 
+export type StudioCodeHandoff = {
+  id: string;
+  name: string;
+  source: string;
+};
+
 export type StudioSharedSessionValue = {
   assets: StudioVirtualAsset[];
   setAssets: Dispatch<SetStateAction<StudioVirtualAsset[]>>;
@@ -39,6 +45,8 @@ export type StudioSharedSessionValue = {
   setOutputTab: Dispatch<SetStateAction<OutputTab>>;
   history: RunHistoryEntry[];
   setHistory: Dispatch<SetStateAction<RunHistoryEntry[]>>;
+  codeHandoff: StudioCodeHandoff | null;
+  setCodeHandoff: Dispatch<SetStateAction<StudioCodeHandoff | null>>;
 };
 
 const StudioSharedSessionContext = createContext<StudioSharedSessionValue | null>(null);
@@ -55,6 +63,7 @@ export function StudioSharedSessionProvider({ children }: { children: ReactNode 
   const [previewWarnings, setPreviewWarnings] = useState<string[]>([]);
   const [outputTab, setOutputTab] = useState<OutputTab>('preview');
   const [history, setHistory] = useState<RunHistoryEntry[]>([]);
+  const [codeHandoff, setCodeHandoff] = useState<StudioCodeHandoff | null>(null);
 
   const value = useMemo<StudioSharedSessionValue>(() => ({
     assets,
@@ -79,6 +88,8 @@ export function StudioSharedSessionProvider({ children }: { children: ReactNode 
     setOutputTab,
     history,
     setHistory,
+    codeHandoff,
+    setCodeHandoff,
   }), [
     assets,
     assetStorageReady,
@@ -91,6 +102,7 @@ export function StudioSharedSessionProvider({ children }: { children: ReactNode 
     previewWarnings,
     outputTab,
     history,
+    codeHandoff,
   ]);
 
   return (
