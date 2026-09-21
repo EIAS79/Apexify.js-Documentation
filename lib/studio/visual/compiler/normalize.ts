@@ -28,13 +28,32 @@ function normalizeRecord(record: VisualProjectRecord): VisualProjectRecord {
 }
 
 function normalizeNode(node: VisualNode): VisualNode {
+  const transform = node.transform;
   return {
     id: node.id,
     kind: node.kind,
     ...(node.name !== undefined ? { name: node.name } : {}),
     ...(node.parentId !== undefined ? { parentId: node.parentId } : {}),
     ...(node.childIds !== undefined ? { childIds: [...node.childIds] } : {}),
-    ...(node.transform !== undefined ? { transform: { ...node.transform } } : {}),
+    ...(transform !== undefined
+      ? {
+          transform: {
+            ...(transform.x !== undefined ? { x: transform.x } : {}),
+            ...(transform.y !== undefined ? { y: transform.y } : {}),
+            ...(transform.width !== undefined ? { width: transform.width } : {}),
+            ...(transform.height !== undefined ? { height: transform.height } : {}),
+            ...(transform.scaleX !== undefined ? { scaleX: transform.scaleX } : {}),
+            ...(transform.scaleY !== undefined ? { scaleY: transform.scaleY } : {}),
+            ...(transform.rotation !== undefined ? { rotation: transform.rotation } : {}),
+            ...(transform.anchorX !== undefined ? { anchorX: transform.anchorX } : {}),
+            ...(transform.anchorY !== undefined ? { anchorY: transform.anchorY } : {}),
+            ...(transform.opacity !== undefined ? { opacity: transform.opacity } : {}),
+            ...(transform.visible !== undefined ? { visible: transform.visible } : {}),
+            ...(transform.locked !== undefined ? { locked: transform.locked } : {}),
+            ...(transform.zIndex !== undefined ? { zIndex: transform.zIndex } : {}),
+          },
+        }
+      : {}),
     props: stableValue(node.props as VisualValue) as Record<string, VisualValue>,
   };
 }
