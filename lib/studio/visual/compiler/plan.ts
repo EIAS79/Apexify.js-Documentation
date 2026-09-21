@@ -151,7 +151,24 @@ export type StudioInspectionOperation = {
       region: Extract<StudioDetectionOperation, { type: 'detectRegion' }>['region'];
       x: number;
       y: number;
-      options?: { tolerance?: number };
+      options?: {
+        includeStroke?: boolean;
+        strokeWidth?: number;
+        tolerance?: number;
+        fillRule?: 'nonzero' | 'evenodd';
+      };
+    }
+  | {
+      kind: 'detect-any-region';
+      regions: Extract<StudioDetectionOperation, { type: 'detectAnyRegion' }>['regions'];
+      x: number;
+      y: number;
+      options?: {
+        includeStroke?: boolean;
+        strokeWidth?: number;
+        tolerance?: number;
+        fillRule?: 'nonzero' | 'evenodd';
+      };
     }
   | {
       kind: 'detect-distance';
@@ -329,8 +346,6 @@ function pathOperationOptions(node: VisualNode): StudioPathDrawOptions {
       rotate: (props.draw?.transform?.rotate ?? 0) + (transform.rotation ?? 0),
       scaleX: (props.draw?.transform?.scaleX ?? 1) * scaleX,
       scaleY: (props.draw?.transform?.scaleY ?? 1) * scaleY,
-      originX: props.draw?.transform?.originX ?? width / 2,
-      originY: props.draw?.transform?.originY ?? height / 2,
     },
   };
 }
@@ -540,7 +555,30 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         region: inspection.region,
         x: inspection.x,
         y: inspection.y,
-        ...(inspection.tolerance !== undefined ? { options: { tolerance: inspection.tolerance } } : {}),
+        options: {
+          ...(inspection.includeStroke !== undefined ? { includeStroke: inspection.includeStroke } : {}),
+          ...(inspection.strokeWidth !== undefined ? { strokeWidth: inspection.strokeWidth } : {}),
+          ...(inspection.tolerance !== undefined ? { tolerance: inspection.tolerance } : {}),
+          ...(inspection.fillRule ? { fillRule: inspection.fillRule } : {}),
+        },
+      });
+    } else if (inspection.type === 'detectAnyRegion') {
+      operations.push({
+        id: 'inspect_' + record.id,
+        kind: 'detect-any-region',
+        sourceOperationId: record.id,
+        target,
+        preferredName,
+        base,
+        regions: inspection.regions,
+        x: inspection.x,
+        y: inspection.y,
+        options: {
+          ...(inspection.includeStroke !== undefined ? { includeStroke: inspection.includeStroke } : {}),
+          ...(inspection.strokeWidth !== undefined ? { strokeWidth: inspection.strokeWidth } : {}),
+          ...(inspection.tolerance !== undefined ? { tolerance: inspection.tolerance } : {}),
+          ...(inspection.fillRule ? { fillRule: inspection.fillRule } : {}),
+        },
       });
     } else {
       operations.push({
