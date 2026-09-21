@@ -36,11 +36,11 @@ async function verify(width, height) {
   await page.waitForSelector('[data-studio-visual-workspace]');
 
   const visualText = await page.$eval('[data-studio-visual-workspace]', (node) => node.textContent || '');
-  for (const label of ['Assets', 'Output', 'Diagnostics', 'History', 'Visual workspace ready']) {
+  for (const label of ['Apexify Studio', 'Canvas', 'Layers', 'Style', 'Transform', 'Generated Code', 'Assets', 'Output', 'Diagnostics', 'History', 'Visual workspace ready']) {
     if (!visualText.includes(label)) throw new Error('Visual shell missing ' + label);
   }
 
-  const overflow = await page.evaluate(
+  if (width === 1440) {\n    await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });\n  }\n\n  const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
   );
   if (overflow) throw new Error(width + 'x' + height + ' horizontal overflow');
