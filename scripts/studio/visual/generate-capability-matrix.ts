@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -22,10 +23,32 @@ type BaseCapabilityMatrix = {
   capabilityProofs: BaseCapabilityProof[];
 };
 
+type DocsOptionInventory = {
+  schemaVersion: number;
+  total: number;
+  options: Array<{
+    id: string;
+    path: string;
+  }>;
+};
+
+type DocsArtifactIndex = {
+  artifacts: Array<{
+    file: string;
+    sha256: string;
+  }>;
+};
+
 const root = process.cwd();
 const check = process.argv.includes('--check');
 const sourceFile = path.join(root, 'generated', 'studio', 'capability-matrix.json');
+const optionSourceFile = path.join(root, 'generated', 'docs-doc4', 'option-inventory.json');
+const docsIndexFile = path.join(root, 'generated', 'docs-doc4', 'index.json');
 const outFile = path.join(root, 'generated', 'studio', 'visual-capability-matrix.json');
+
+function sha256(value: string): string {
+  return crypto.createHash('sha256').update(value).digest('hex');
+}
 
 function domainFor(capability: string): string | null {
   if (capability === 'ApexPainter.animate') return 'animation';
@@ -186,6 +209,24 @@ function previewRouteFor(
 
 const base = JSON.parse(fs.readFileSync(sourceFile, 'utf8')) as BaseCapabilityMatrix;
 
+if (!fs.existsSync(optionSourceFile)) {
+  throw new Error(
+    'DOC-4 option inventory is missing. Run npm run docs:generate:doc4 before Studio Visual verification.',
+  );
+}
+
+const optionInventoryText = fs.readFileSync(optionSourceFile, 'utf8');
+const optionInventory = JSON.parse(optionInventoryText) as DocsOptionInventory;
+const docsArtifactIndex = JSON.parse(fs.readFileSync(docsIndexFile, 'utf8')) as DocsArtifactIndex;
+const indexedOptionInventory = docsArtifactIndex.artifacts.find(
+  (artifact) => artifact.file === 'option-inventory.json',
+);
+if (!indexedOptionInventory) {
+  throw new Error('DOC-4 index does not declare option-inventory.json.');
+}
+const optionInventorySha256 = sha256(optionInventoryText);
+const optionInventoryCurrent = optionInventorySha256 === indexedOptionInventory.sha256;
+
 type DraftVisualCapabilityRow = Omit<VisualCapabilityRow, 'classification'> & {
   classification: VisualCapabilityClassification | null;
 };
@@ -221,6 +262,56 @@ const rows: DraftVisualCapabilityRow[] = base.capabilityProofs
     };
   })
   .sort((a, b) => a.capability.localeCompare(b.capability));
+
+const rowByCapability = new Map(rows.map((row) => [row.capability, row]));
+
+const classifiedOptions = optionInventory.options.map((option) => {
+  const separator = option.id.lastIndexOf('::');
+  const memberId = separator >= 0 ? option.id.slice(0, separator) : '';
+  const capability = memberId
+    .replace(/^apexify\\.js::/, '')
+    .replace('#', '.');
+  const parent = rowByCapability.get(capability);
+
+  if (!parent) {
+    return {
+      id: option.id,
+      classification: 'not-applicable' as const,
+      domain: 'other-public-api',
+      phaseOwner: 'NOT-STUDIO-SURFACE',
+    };
+  }
+
+  const classification =
+    parent.classification === 'hosted-runtime-exclusion' ||
+    parent.classification === 'not-applicable'
+      ? parent.classification
+      : ('visual-property' as const);
+
+  return {
+    id: option.id,
+    classification,
+    domain: parent.domain,
+    phaseOwner: parent.phaseOwner,
+  };
+});
+
+const unclassifiedOptions = classifiedOptions.filter(
+  (option) => !VISUAL_CAPABILITY_CLASSIFICATIONS.includes(option.classification),
+);
+
+const optionClassificationDigest = sha256(
+  JSON.stringify(
+    classifiedOptions
+      .map((option) => ({
+        id: option.id,
+        classification: option.classification,
+        domain: option.domain,
+        phaseOwner: option.phaseOwner,
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id)),
+  ),
+);
 
 const duplicateCapabilities = rows
   .map((row) => row.capability)
@@ -270,7 +361,7 @@ const artifact = {
   },
 };
 
-if (!artifact.summary.complete) {
+if (!artifact.summary.complete || !artifact.optionCoverage.complete) {
   console.error('[studio-visual] capability matrix incomplete');
   if (!base.implementationComplete) console.error('base Studio capability matrix is incomplete');
   if (unclassifiedCapabilities.length) {
@@ -278,6 +369,28 @@ if (!artifact.summary.complete) {
   }
   if (duplicateCapabilities.length) {
     console.error('duplicate capabilities:', duplicateCapabilities.join(', '));
+  }
+  if (!optionInventoryCurrent) {
+    console.error(
+      'DOC-4 option inventory hash mismatch: expected ' +
+        indexedOptionInventory.sha256 +
+        ', got ' +
+        optionInventorySha256,
+    );
+  }
+  if (optionInventory.total !== optionInventory.options.length) {
+    console.error(
+      'DOC-4 option inventory count mismatch: declared ' +
+        optionInventory.total +
+        ', rows ' +
+        optionInventory.options.length,
+    );
+  }
+  if (unclassifiedOptions.length) {
+    console.error(
+      'unclassified option paths:',
+      unclassifiedOptions.slice(0, 50).map((option) => option.id).join(', '),
+    );
   }
   process.exitCode = 1;
 }
@@ -293,9 +406,21 @@ if (check) {
     console.error('[studio-visual] stale generated/studio/visual-capability-matrix.json');
     process.exit(1);
   }
-  console.log('[studio-visual] CHECK PASS (' + rows.length + ' capabilities, 0 unclassified)');
+  console.log(
+    '[studio-visual] CHECK PASS (' +
+      rows.length +
+      ' capabilities + ' +
+      classifiedOptions.length +
+      ' option paths, 0 unclassified)',
+  );
 } else {
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
   fs.writeFileSync(outFile, expected);
-  console.log('[studio-visual] wrote generated/studio/visual-capability-matrix.json (' + rows.length + ' capabilities)');
+  console.log(
+    '[studio-visual] wrote generated/studio/visual-capability-matrix.json (' +
+      rows.length +
+      ' capabilities + ' +
+      classifiedOptions.length +
+      ' option paths)',
+  );
 }
