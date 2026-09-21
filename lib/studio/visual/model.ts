@@ -306,6 +306,165 @@ export interface VisualImageNodeProps {
   createOptions?: VisualCreateImageOptions;
 }
 
+export type VisualTextAlign =
+  | 'left'
+  | 'center'
+  | 'right'
+  | 'start'
+  | 'end';
+
+export type VisualTextBaseline =
+  | 'alphabetic'
+  | 'bottom'
+  | 'hanging'
+  | 'ideographic'
+  | 'middle'
+  | 'top';
+
+export type VisualCurvedTextLayoutMode =
+  | 'fit'
+  | 'clamp'
+  | 'override';
+
+export type VisualTextLineDecoration =
+  | boolean
+  | {
+      color?: string;
+      gradient?: VisualGradient;
+      width?: number;
+    };
+
+export interface VisualTextDecorations {
+  underline?: VisualTextLineDecoration;
+  overline?: VisualTextLineDecoration;
+  strikethrough?: VisualTextLineDecoration;
+  bold?: boolean;
+  italic?: boolean;
+}
+
+export interface VisualTextHighlight {
+  color?: string;
+  gradient?: VisualGradient;
+  opacity?: number;
+}
+
+export interface VisualTextGlow {
+  color?: string;
+  gradient?: VisualGradient;
+  intensity?: number;
+  opacity?: number;
+}
+
+export interface VisualTextShadow {
+  color?: string;
+  gradient?: VisualGradient;
+  offsetX?: number;
+  offsetY?: number;
+  blur?: number;
+  opacity?: number;
+}
+
+export interface VisualTextStroke {
+  color?: string;
+  width?: number;
+  gradient?: VisualGradient;
+  opacity?: number;
+  style?: 'solid' | 'dashed' | 'dotted' | 'groove' | 'ridge' | 'double';
+}
+
+export interface VisualTextEffects {
+  highlight?: VisualTextHighlight;
+  glow?: VisualTextGlow;
+  shadow?: VisualTextShadow;
+}
+
+export interface VisualTextLayout {
+  lineHeight?: number;
+  letterSpacing?: number;
+  wordSpacing?: number;
+  maxWidth?: number;
+  maxHeight?: number;
+}
+
+export interface VisualTextPlacement {
+  textAlign?: VisualTextAlign;
+  textBaseline?: VisualTextBaseline;
+  rotation?: number;
+}
+
+export interface VisualTextFill {
+  color?: string;
+  gradient?: VisualGradient;
+  opacity?: number;
+}
+
+export interface VisualTextCurve {
+  sweepAngle: number;
+  radius?: number;
+  up?: boolean;
+  layoutMode?: VisualCurvedTextLayoutMode;
+  baselineOffset?: number;
+  startAngleDeg?: number;
+}
+
+export interface VisualTextFont {
+  size?: number;
+  family?: string;
+  name?: string;
+  path?: string;
+}
+
+export interface VisualTextNodeProps {
+  text: string;
+  font?: VisualTextFont;
+  decorations?: VisualTextDecorations;
+  effects?: VisualTextEffects;
+  layout?: VisualTextLayout;
+  placement?: VisualTextPlacement;
+  fill?: VisualTextFill;
+  stroke?: VisualTextStroke;
+  textOnCurve?: VisualTextCurve;
+  includeCharMetrics?: boolean;
+  measurementCanvas?: {
+    width?: number;
+    height?: number;
+  };
+
+  /** Legacy Apexify text aliases retained for exact round-trip compatibility. */
+  fontSize?: number;
+  fontFamily?: string;
+  fontName?: string;
+  fontPath?: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: VisualTextLineDecoration;
+  overline?: VisualTextLineDecoration;
+  strikethrough?: VisualTextLineDecoration;
+  highlight?: VisualTextHighlight;
+  glow?: VisualTextGlow;
+  shadow?: VisualTextShadow;
+  lineHeight?: number;
+  letterSpacing?: number;
+  wordSpacing?: number;
+  maxWidth?: number;
+  maxHeight?: number;
+  textAlign?: VisualTextAlign;
+  textBaseline?: VisualTextBaseline;
+  rotation?: number;
+  color?: string;
+  gradient?: VisualGradient;
+  opacity?: number;
+}
+
+export interface VisualTextMetrics {
+  width: number;
+  height: number;
+  lineHeight: number;
+  lineCount: number;
+  baseline: number;
+  lines: Array<{ text: string; width: number }>;
+}
+
 export interface VisualCanvasConfig {
   x?: number;
   y?: number;
