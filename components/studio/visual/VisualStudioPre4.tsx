@@ -46,7 +46,9 @@ import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
+  isStudioFontAsset,
   studioAssetDataUrl,
+  studioAssetFontFamily,
   studioAssetIdFromReference,
   studioAssetReference,
   totalStudioAssetBytes,
@@ -82,6 +84,7 @@ import type {
   VisualPatternOptions,
   VisualProject,
   VisualShapeType,
+  VisualTextNodeProps,
   VisualTransform,
 } from '@/lib/studio/visual/model';
 import {
@@ -104,6 +107,15 @@ import {
   imagePropsRecord,
   visualImageProps,
 } from '@/lib/studio/visual/image-contract';
+import {
+  TEXT_ALIGNMENTS,
+  TEXT_BASELINES,
+  TEXT_CURVE_MODES,
+  defaultTextNodeProps,
+  measureVisualTextInBrowser,
+  textPropsRecord,
+  visualTextProps,
+} from '@/lib/studio/visual/text-contract';
 import {
   VisualHistory,
   alignNodes,
