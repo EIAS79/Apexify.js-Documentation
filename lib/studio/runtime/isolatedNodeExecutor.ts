@@ -546,6 +546,9 @@ function safeEnvironment(
     env.APEXIFY_FFMPEG_PATH = media.ffmpegProxy;
     env.APEXIFY_FFPROBE_PATH = media.ffprobeProxy;
     env.STUDIO_MEDIA_CAP_ID = media.id;
+    // Vercel's Node executable is not guaranteed to live at /usr/bin/node.
+    // Pass the exact trusted host Node binary into the fixed media proxy.
+    env.STUDIO_MEDIA_NODE_PATH = process.execPath;
   }
 
   return env;
