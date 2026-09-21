@@ -153,6 +153,35 @@ export type VisualBackgroundLayer =
   | { type: 'presetPattern'; pattern: VisualPatternOptions; opacity?: number; blendMode?: string }
   | { type: 'noise'; intensity?: number; blendMode?: string };
 
+export interface VisualImageFilter {
+  type:
+    | 'gaussianBlur'
+    | 'motionBlur'
+    | 'radialBlur'
+    | 'sharpen'
+    | 'noise'
+    | 'grain'
+    | 'edgeDetection'
+    | 'emboss'
+    | 'invert'
+    | 'grayscale'
+    | 'sepia'
+    | 'pixelate'
+    | 'brightness'
+    | 'contrast'
+    | 'saturation'
+    | 'hueShift'
+    | 'posterize';
+  intensity?: number;
+  radius?: number;
+  angle?: number;
+  centerX?: number;
+  centerY?: number;
+  value?: number;
+  levels?: number;
+  size?: number;
+}
+
 export interface VisualCanvasConfig {
   x?: number;
   y?: number;
@@ -161,7 +190,7 @@ export interface VisualCanvasConfig {
     inherit?: boolean;
     fit?: 'fill' | 'contain' | 'cover';
     align?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-    filters?: VisualValue[];
+    filters?: VisualImageFilter[];
     opacity?: number;
   };
   videoBg?: {
