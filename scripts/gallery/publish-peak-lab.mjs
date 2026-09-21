@@ -165,7 +165,7 @@ function splitSharedHelpers(sharedCode) {
 }
 
 
-const tsPrinter = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+const tsPrinter = ts.createPrinter();
 
 function parseDisplaySource(code, fileName = 'peak-gallery.ts') {
   const file = ts.createSourceFile(fileName, code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
@@ -373,15 +373,32 @@ function standalonePagesForRecipe(id, code, maxLines = 180) {
   }));
 }
 
-await fs.rm(publicDir, { recursive: true, force: true });
-await fs.mkdir(publicDir, { recursive: true });
-
 const source = await fs.readFile(sourcePath, 'utf8');
 const sharedMatch = source.match(/import \* as ApexRuntime[\s\S]*?(?=\/\/ ===== EXAMPLE 01-canvas =====)/);
 if (!sharedMatch) throw new Error('Peak Lab shared setup block not found');
 const sharedCode = sharedMatch[0].trim();
 const helperSections = splitSharedHelpers(sharedCode);
 const helperIndex = buildHelperIndex(helperSections);
+
+if (process.env.PEAK_LAB_VALIDATE_CODE === '1') {
+  for (let n = 1; n <= 26; n++) {
+    const id = String(n).padStart(2, '0');
+    const marker = new RegExp(`// ===== EXAMPLE ${id}-[^\\n]+ =====`);
+    const markerMatch = marker.exec(source);
+    if (!markerMatch) throw new Error(`Recipe ${id} marker not found`);
+    const start = markerMatch.index;
+    const tail = source.slice(start + markerMatch[0].length);
+    const next = tail.search(/\/\/ ===== (?:EXAMPLE|OPT-IN)/);
+    const end = next >= 0 ? start + markerMatch[0].length + next : source.length;
+    const block = source.slice(start, end).trim();
+    makeStandaloneRecipeSource(block, id, helperIndex);
+  }
+  console.log('Validated 26 standalone Peak Lab Gallery code recipes.');
+  process.exit(0);
+}
+
+await fs.rm(publicDir, { recursive: true, force: true });
+await fs.mkdir(publicDir, { recursive: true });
 
 // Recipe 25 records per-operation failures so its report remains visible.
 // Gallery publishing is stricter: never publish a source-backed run with
