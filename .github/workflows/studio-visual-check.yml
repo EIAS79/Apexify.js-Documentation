@@ -68,4 +68,15 @@ jobs:
         run: npm run studio:visual:verify
 
       - name: Typecheck
-        run: npm run typecheck
+        run: |
+          set -o pipefail
+          npm run typecheck 2>&1 | tee studio-visual-typecheck.log
+
+      - name: Upload typecheck diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-visual-typecheck-log
+          path: studio-visual-typecheck.log
+          if-no-files-found: ignore
+          retention-days: 1
