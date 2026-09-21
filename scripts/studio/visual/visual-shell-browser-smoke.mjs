@@ -55,12 +55,12 @@ async function verify(width, height) {
   const restored = await page.$eval('.cm-content', (node) => node.textContent || '');
   if (restored !== original) throw new Error('Code Studio session changed after mode round trip');
 
-  // Phase 2: generated Visual code must fork into a new Code Studio buffer.
+  // Phase 2+: generated Visual code must fork into a new Code Studio buffer.
+  // PRE-4 exposes Generate Code as a permanent top-bar action at every supported width.
   await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="visual"]');
-  await page.click('.apx-vw-project-menu > summary');
-  await page.waitForSelector('[data-visual-open-generated-code]:not([disabled])', { visible: true });
-  await page.click('[data-visual-open-generated-code]');
+  await page.waitForSelector('[data-visual-generate-code]:not([disabled])', { visible: true });
+  await page.click('[data-visual-generate-code]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="code"]');
 
   await page.waitForFunction(() => {
