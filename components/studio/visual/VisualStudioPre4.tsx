@@ -64,6 +64,7 @@ import type {
   VisualBackgroundLayer,
   VisualCanvasConfig,
   VisualGradient,
+  VisualImageFilter,
   VisualNode,
   VisualPatternOptions,
   VisualProject,
@@ -190,12 +191,10 @@ function canvasArtboardBackground(canvas: VisualCanvasConfig): string {
   return '#000000';
 }
 
-function parseFilterJson(value: string): VisualCanvasConfig['customBg'] extends infer T
-  ? T extends { filters?: infer F } ? F : never
-  : never {
+function parseFilterJson(value: string): VisualImageFilter[] {
   const parsed = JSON.parse(value);
   if (!Array.isArray(parsed)) throw new Error('Filters JSON must be an array.');
-  return parsed as never;
+  return parsed as VisualImageFilter[];
 }
 
 export default function VisualStudioPre4({
