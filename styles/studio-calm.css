@@ -2331,3 +2331,495 @@
     width:210px;
   }
 }
+
+
+/* ==========================================================================
+   STUDIO-VISUAL-3 — editor core
+   Generic transform editing only; domain authoring remains phase-owned.
+   ========================================================================== */
+
+.apx-vw-layer-count{
+  min-width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  padding:0 .28rem;
+  border-radius:999px;
+  color:#b9c8dd;
+  background:#172b43;
+  font-size:.5rem;
+  font-weight:800;
+}
+
+.apx-vw-layer-row--editable{
+  cursor:pointer;
+  border:1px solid transparent;
+}
+
+.apx-vw-layer-row--editable:hover{
+  background:#102038;
+}
+
+.apx-vw-layer-row--editable[data-selected="true"]{
+  border-color:#315da0;
+  color:white;
+  background:linear-gradient(90deg,rgba(63,113,220,.2),rgba(85,71,208,.08));
+}
+
+.apx-vw-layer-name{
+  min-width:0;
+  flex:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.apx-vw-layer-actions{
+  display:flex;
+  align-items:center;
+  gap:.08rem;
+  opacity:.35;
+  transition:opacity .12s ease;
+}
+
+.apx-vw-layer-row--editable:hover .apx-vw-layer-actions,
+.apx-vw-layer-row--editable[data-selected="true"] .apx-vw-layer-actions{
+  opacity:1;
+}
+
+.apx-vw-layer-actions button{
+  width:24px;
+  height:24px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:5px;
+  color:var(--vw-text-3);
+  background:transparent;
+}
+
+.apx-vw-layer-actions button:hover{
+  color:white;
+  background:#1a3150;
+}
+
+.apx-vw-layer-toolbar{
+  gap:.5rem;
+}
+
+.apx-vw-layer-toolbar__row{
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+}
+
+.apx-vw-layer-toolbar__row button{
+  min-height:30px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding:.35rem .55rem;
+  border:1px solid #28435f;
+  border-radius:7px;
+  color:#c5d5e8;
+  background:#0b1c2e;
+  font-size:.57rem;
+  font-weight:800;
+}
+
+.apx-vw-layer-toolbar__row button:first-child{
+  flex:1;
+}
+
+.apx-vw-layer-toolbar__row button:hover:not(:disabled){
+  color:white;
+  border-color:#426995;
+  background:#113052;
+}
+
+.apx-vw-layer-toolbar__row button:disabled{
+  cursor:not-allowed;
+  opacity:.35;
+}
+
+.apx-vw-history-controls{
+  display:flex;
+  align-items:center;
+  gap:.25rem;
+}
+
+.apx-vw-history-controls button{
+  width:30px;
+  height:30px;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--vw-border);
+  border-radius:7px;
+  color:var(--vw-text-3);
+  background:#0d1b2c;
+}
+
+.apx-vw-history-controls button:hover:not(:disabled){
+  color:white;
+  border-color:#34527a;
+  background:var(--vw-panel-3);
+}
+
+.apx-vw-history-controls button:disabled{
+  opacity:.3;
+  cursor:not-allowed;
+}
+
+.apx-vw-snap-icon{
+  display:block;
+  font-size:1rem;
+  font-weight:900;
+  line-height:1;
+  transform:rotate(-18deg);
+}
+
+.apx-vw-artboard[data-viewport-mode="select"]{
+  cursor:default;
+}
+
+.apx-vw-editor-node{
+  position:absolute;
+  display:grid;
+  place-items:stretch;
+  min-width:8px;
+  min-height:8px;
+  border:1px solid rgba(106,149,209,.72);
+  border-radius:6px;
+  transform-origin:50% 50%;
+  background:
+    linear-gradient(135deg,rgba(65,111,190,.18),rgba(111,76,208,.14)),
+    rgba(13,30,49,.86);
+  box-shadow:0 9px 24px rgba(0,0,0,.18);
+  user-select:none;
+  touch-action:none;
+}
+
+.apx-vw-editor-node:hover{
+  border-color:#78a7e7;
+}
+
+.apx-vw-editor-node[data-selected="true"]{
+  border-color:#6c9dff;
+  box-shadow:
+    0 0 0 1px rgba(108,157,255,.35),
+    0 0 0 3px rgba(108,157,255,.12),
+    0 12px 30px rgba(0,0,0,.24);
+}
+
+.apx-vw-editor-node[data-locked="true"]{
+  border-style:dashed;
+  cursor:not-allowed;
+}
+
+.apx-vw-editor-node__content{
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:.18rem;
+  overflow:hidden;
+  padding:.35rem;
+  color:#dce9fa;
+  text-align:center;
+  pointer-events:none;
+}
+
+.apx-vw-editor-node__content span{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:.62rem;
+  font-weight:850;
+}
+
+.apx-vw-editor-node__content small{
+  color:#7f97b4;
+  font-size:.5rem;
+}
+
+.apx-vw-resize-handle{
+  position:absolute;
+  z-index:5;
+  width:10px;
+  height:10px;
+  padding:0;
+  border:2px solid #dce8ff;
+  border-radius:3px;
+  background:#4f7cff;
+  box-shadow:0 2px 8px rgba(0,0,0,.35);
+  touch-action:none;
+}
+
+.apx-vw-resize-handle--nw{
+  left:-6px;
+  top:-6px;
+  cursor:nwse-resize;
+}
+
+.apx-vw-resize-handle--ne{
+  right:-6px;
+  top:-6px;
+  cursor:nesw-resize;
+}
+
+.apx-vw-resize-handle--se{
+  right:-6px;
+  bottom:-6px;
+  cursor:nwse-resize;
+}
+
+.apx-vw-resize-handle--sw{
+  left:-6px;
+  bottom:-6px;
+  cursor:nesw-resize;
+}
+
+.apx-vw-rotate-handle{
+  position:absolute;
+  left:50%;
+  top:-30px;
+  z-index:6;
+  width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  padding:0;
+  border:1px solid #a9c6ff;
+  border-radius:999px;
+  color:white;
+  background:#315ea8;
+  box-shadow:0 4px 12px rgba(0,0,0,.32);
+  transform:translateX(-50%);
+  cursor:grab;
+  touch-action:none;
+  font-size:.7rem;
+}
+
+.apx-vw-rotate-handle::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:100%;
+  width:1px;
+  height:10px;
+  background:#6c9dff;
+}
+
+.apx-vw-snap-guide{
+  position:absolute;
+  z-index:50;
+  pointer-events:none;
+  background:#56d7ff;
+  box-shadow:0 0 8px rgba(86,215,255,.6);
+}
+
+.apx-vw-snap-guide--x{
+  top:0;
+  bottom:0;
+  width:1px;
+}
+
+.apx-vw-snap-guide--y{
+  left:0;
+  right:0;
+  height:1px;
+}
+
+.apx-vw-snap-guide[data-source="grid"]{
+  opacity:.5;
+}
+
+.apx-vw-snap-guide[data-source="document"]{
+  background:#8a77ff;
+}
+
+.apx-vw-empty-add{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  margin-top:.25rem;
+  padding:.45rem .7rem;
+  border:1px solid #385f93;
+  border-radius:8px;
+  color:white;
+  background:linear-gradient(135deg,#365fc8,#6548da);
+  font-size:.62rem;
+  font-weight:800;
+  box-shadow:0 8px 20px rgba(62,79,202,.18);
+}
+
+.apx-vw-number-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.55rem;
+  margin-top:.75rem;
+}
+
+.apx-vw-number-field{
+  min-width:0;
+  display:grid;
+  gap:.3rem;
+}
+
+.apx-vw-number-field label{
+  color:var(--vw-text-3);
+  font-size:.54rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.apx-vw-number-field input{
+  width:100%;
+  min-width:0;
+  min-height:34px;
+  padding:.4rem .5rem;
+  border:1px solid #1b324c;
+  border-radius:7px;
+  outline:none;
+  color:var(--vw-text-2);
+  background:#091726;
+  font-size:.64rem;
+  font-variant-numeric:tabular-nums;
+}
+
+.apx-vw-number-field input:focus{
+  border-color:#4a72b4;
+  box-shadow:0 0 0 2px rgba(79,124,255,.1);
+}
+
+.apx-vw-inspector-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.45rem;
+  margin-top:.7rem;
+}
+
+.apx-vw-inspector-actions button{
+  min-height:32px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding:.35rem .45rem;
+  border:1px solid #203854;
+  border-radius:7px;
+  color:var(--vw-text-3);
+  background:#0a1828;
+  font-size:.55rem;
+  font-weight:800;
+}
+
+.apx-vw-inspector-actions button[data-active="true"]{
+  color:white;
+  border-color:#3b6299;
+  background:#102747;
+}
+
+.apx-vw-multiselect-tools{
+  display:grid;
+  gap:.55rem;
+}
+
+.apx-vw-multiselect-tools>strong{
+  margin-top:.15rem;
+  color:#aebfd4;
+  font-size:.58rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+.apx-vw-align-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:.35rem;
+}
+
+.apx-vw-align-grid--two{
+  grid-template-columns:1fr 1fr;
+}
+
+.apx-vw-align-grid button{
+  min-height:30px;
+  padding:.3rem;
+  border:1px solid #1d354f;
+  border-radius:6px;
+  color:#9eb0c6;
+  background:#0a1828;
+  font-size:.5rem;
+  font-weight:800;
+}
+
+.apx-vw-align-grid button:hover:not(:disabled){
+  color:white;
+  border-color:#3b6091;
+  background:#10243c;
+}
+
+.apx-vw-align-grid button:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+}
+
+.apx-vw-history-section{
+  display:grid;
+  gap:.25rem;
+  padding:.35rem .55rem .65rem;
+}
+
+.apx-vw-history-section+.apx-vw-history-section{
+  border-top:1px solid #14253a;
+}
+
+.apx-vw-history-section__title{
+  min-height:30px;
+  display:flex;
+  align-items:center;
+  gap:.45rem;
+  color:#aebfd3;
+}
+
+.apx-vw-history-section__title strong{
+  font-size:.58rem;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.apx-vw-history-section__title span{
+  min-width:18px;
+  height:18px;
+  display:grid;
+  place-items:center;
+  border-radius:999px;
+  background:#172a41;
+  font-size:.5rem;
+}
+
+.apx-vw-history-empty{
+  padding:.7rem .45rem;
+  color:var(--vw-text-3);
+  font-size:.58rem;
+}
+
+@media(max-width:760px){
+  .apx-vw-history-controls{
+    display:none;
+  }
+
+  .apx-vw-number-grid{
+    grid-template-columns:1fr;
+  }
+
+  .apx-vw-layer-actions button:nth-child(n+3){
+    display:none;
+  }
+}
