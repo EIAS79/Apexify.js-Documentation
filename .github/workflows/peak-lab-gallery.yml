@@ -47,6 +47,9 @@ jobs:
           cache: npm
           cache-dependency-path: .peak-engine/package-lock.json
 
+      - name: Validate Gallery publisher syntax
+        run: node --check scripts/gallery/publish-peak-lab.mjs
+
       - name: Install FFmpeg
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
