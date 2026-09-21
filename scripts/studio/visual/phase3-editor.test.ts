@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createVisualNode,createVisualProject } from '../../../lib/studio/visual/project';
+import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import { VisualHistory,alignNodes,deleteNodes,duplicateNodes,moveNodes,nodeRect,reorderNode,resizeNode,rotateNode,setNodeLocked,setNodeVisibility,setSelection,snapPosition } from '../../../lib/studio/visual/editor';
 
 function fixture(){
@@ -14,3 +15,5 @@ test('layer reorder duplicate and delete preserve hierarchy lists',()=>{let p=fi
 test('alignment and distribution update only semantic transforms',()=>{let p=fixture();p=alignNodes(p,['node_a','node_b','node_c'],'top');assert.equal(nodeRect(p.document.nodes.node_b).y,20);p=fixture();p=alignNodes(p,['node_a','node_b','node_c'],'distribute-horizontal');const a=nodeRect(p.document.nodes.node_a),b=nodeRect(p.document.nodes.node_b),c=nodeRect(p.document.nodes.node_c);assert.ok(b.x>a.x+a.width);assert.ok(c.x>b.x+b.width)});
 test('snapping targets canvas, objects and grid without persisting guides',()=>{const p=fixture();const snap=snapPosition(p,'node_a',248,119,6);assert.equal(snap.x,250);assert.equal(snap.y,120);assert.ok(snap.guides.length>=1);assert.equal((p.document.nodes.node_a.props as any).guides,undefined)});
 test('bounded command history groups semantic mutations into one undo/redo step',()=>{const p=fixture();const moved=moveNodes(p,['node_a'],100,0);const h=new VisualHistory(2);h.commit(p,moved,'Move');const undone=h.undo(moved);assert.equal(nodeRect(undone!.project.document.nodes.node_a).x,10);const redone=h.redo(undone!.project);assert.equal(nodeRect(redone!.project.document.nodes.node_a).x,110);assert.equal(h.entries[0],'Move')});
+
+test('phase 3 persisted editor state rejects invalid transforms and dangling selection',()=>{const p=fixture();p.document.nodes.node_a.transform!.width=0;p.editor={...p.editor,selectedNodeIds:['missing']};const result=validateVisualProject(p);assert.equal(result.ok,false);assert.ok(result.issues.some(x=>x.code==='invalid-transform'));assert.ok(result.issues.some(x=>x.code==='missing-selection'))});
