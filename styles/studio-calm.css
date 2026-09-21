@@ -1722,3 +1722,287 @@
     margin-left:auto;
   }
 }
+
+
+/* Visual workbench polish — collapsible chrome, functional pan/zoom, asset tools. */
+.apx-visual-workspace[data-layers-collapsed="true"] .apx-vw-layout{
+  grid-template-columns:72px minmax(420px,1fr) 320px;
+  grid-template-areas:
+    "rail stage inspector"
+    "rail dock dock";
+}
+
+.apx-visual-workspace[data-inspector-collapsed="true"] .apx-vw-layout{
+  grid-template-columns:72px 248px minmax(420px,1fr);
+  grid-template-areas:
+    "rail layers stage"
+    "rail dock dock";
+}
+
+.apx-visual-workspace[data-layers-collapsed="true"][data-inspector-collapsed="true"] .apx-vw-layout{
+  grid-template-columns:72px minmax(420px,1fr);
+  grid-template-areas:
+    "rail stage"
+    "rail dock";
+}
+
+.apx-visual-workspace[data-layers-collapsed="true"] .apx-vw-layers,
+.apx-visual-workspace[data-inspector-collapsed="true"] .apx-vw-inspector{
+  display:none;
+}
+
+.apx-visual-workspace[data-dock-collapsed="true"] .apx-vw-layout{
+  grid-template-rows:minmax(0,1fr) 38px;
+}
+
+.apx-visual-workspace[data-dock-collapsed="true"] .apx-vw-dock-content{
+  display:none;
+}
+
+.apx-vw-heading-actions{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:.3rem;
+}
+
+.apx-vw-heading-actions .apx-vw-iconbutton{
+  margin-left:0;
+}
+
+.apx-vw-panel-reveal{
+  min-height:32px;
+  display:inline-flex;
+  align-items:center;
+  gap:.3rem;
+  padding:.35rem .5rem;
+  border:1px solid var(--vw-border);
+  border-radius:7px;
+  color:var(--vw-text-3);
+  background:#0d1b2c;
+}
+
+.apx-vw-panel-reveal:hover{
+  color:white;
+  border-color:#34527a;
+}
+
+.apx-vw-inspector-top{
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  padding:.4rem .55rem;
+  border-bottom:1px solid var(--vw-border-soft);
+  color:var(--vw-text-2);
+  font-size:.63rem;
+  font-weight:800;
+}
+
+.apx-vw-inspector-top .apx-vw-iconbutton{
+  margin-left:auto;
+}
+
+.apx-vw-dock-toggle{
+  margin-left:auto;
+  width:38px;
+  min-width:38px;
+  display:grid!important;
+  place-items:center;
+  padding:0!important;
+  border-left:1px solid var(--vw-border)!important;
+  color:var(--vw-text-3)!important;
+}
+
+.apx-vw-viewport[data-pan-active="true"],
+.apx-vw-artboard[data-viewport-mode="pan"]{
+  cursor:grab;
+}
+
+.apx-vw-viewport:active .apx-vw-artboard[data-viewport-mode="pan"]{
+  cursor:grabbing;
+}
+
+.apx-vw-preview-browser{
+  min-height:100%;
+  display:grid;
+  grid-template-rows:minmax(0,1fr) auto;
+}
+
+.apx-vw-preview-main{
+  min-height:0;
+  display:grid;
+  place-items:center;
+  overflow:auto;
+  padding:.7rem;
+  background:
+    linear-gradient(rgba(52,80,112,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(52,80,112,.08) 1px,transparent 1px),
+    #07111d;
+  background-size:18px 18px;
+}
+
+.apx-vw-preview-main>img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  border:1px solid #203753;
+  border-radius:8px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.apx-vw-preview-strip{
+  display:flex;
+  gap:.45rem;
+  overflow-x:auto;
+  padding:.5rem;
+  border-top:1px solid var(--vw-border-soft);
+  background:#091522;
+}
+
+.apx-vw-preview-strip button{
+  min-width:112px;
+  max-width:140px;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  align-items:center;
+  gap:.45rem;
+  padding:.35rem .45rem;
+  border:1px solid #1c324b;
+  border-radius:7px;
+  color:var(--vw-text-3);
+  background:#0b1928;
+}
+
+.apx-vw-preview-strip button[data-active="true"]{
+  color:white;
+  border-color:#4c73c7;
+  background:#102542;
+}
+
+.apx-vw-preview-strip img{
+  width:34px;
+  height:26px;
+  border-radius:5px;
+  object-fit:cover;
+}
+
+.apx-vw-preview-strip span{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-align:left;
+  font-size:.56rem;
+}
+
+.apx-vw-assets-heading{
+  justify-content:flex-start;
+}
+
+.apx-vw-assets-heading small{
+  display:none;
+}
+
+.apx-vw-assets-upload{
+  margin-left:auto;
+  display:inline-flex;
+  align-items:center;
+  gap:.35rem;
+  min-height:28px;
+  padding:.3rem .5rem;
+  border:1px solid #284563;
+  border-radius:7px;
+  color:#d7e5f7;
+  background:#0d2035;
+  font-size:.55rem;
+  font-weight:800;
+}
+
+.apx-vw-assets-upload:hover{
+  border-color:#3b6590;
+  background:#113052;
+}
+
+.apx-vw-assets-tools{
+  display:grid;
+  gap:.45rem;
+  padding:.5rem .6rem;
+  border-bottom:1px solid #14273b;
+}
+
+.apx-vw-assets-tools input{
+  width:100%;
+  min-height:30px;
+  padding:.35rem .5rem;
+  border:1px solid #1c324b;
+  border-radius:7px;
+  outline:none;
+  color:var(--vw-text-2);
+  background:#081624;
+  font-size:.57rem;
+}
+
+.apx-vw-assets-tools input:focus{
+  border-color:#4772b5;
+  box-shadow:0 0 0 2px rgba(79,124,255,.10);
+}
+
+.apx-vw-assets-filters{
+  display:flex;
+  gap:.25rem;
+  overflow-x:auto;
+}
+
+.apx-vw-assets-filters button{
+  flex:0 0 auto;
+  padding:.28rem .45rem;
+  border:1px solid #1b3149;
+  border-radius:999px;
+  color:var(--vw-text-3);
+  background:#0b1928;
+  font-size:.5rem;
+  font-weight:800;
+  text-transform:capitalize;
+}
+
+.apx-vw-assets-filters button[data-active="true"]{
+  color:white;
+  border-color:#4f6fd0;
+  background:linear-gradient(135deg,#3656c9,#6544d6);
+}
+
+.apx-vw-assets-error{
+  margin:0;
+  color:#ff8aa1;
+  font-size:.53rem;
+  line-height:1.35;
+}
+
+.apx-vw-assets-foot{
+  flex:0 0 auto;
+  min-height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:.3rem .6rem;
+  border-top:1px solid #14273b;
+  color:var(--vw-text-3);
+  font-size:.5rem;
+}
+
+@media(max-width:1180px){
+  .apx-visual-workspace[data-layers-collapsed="true"] .apx-vw-layout,
+  .apx-visual-workspace[data-inspector-collapsed="true"] .apx-vw-layout,
+  .apx-visual-workspace[data-layers-collapsed="true"][data-inspector-collapsed="true"] .apx-vw-layout{
+    grid-template-columns:64px minmax(0,1fr);
+    grid-template-areas:
+      "rail stage"
+      "rail dock";
+  }
+}
+
+@media(max-width:900px){
+  .apx-vw-panel-reveal{
+    display:none;
+  }
+}
