@@ -1,7 +1,10 @@
 import {
   VISUAL_PROJECT_FORMAT,
   VISUAL_PROJECT_SCHEMA_VERSION,
+  type VisualNode,
+  type VisualNodeKind,
   type VisualProject,
+  type VisualValue,
 } from './model';
 import { createVisualId } from './ids';
 
@@ -46,5 +49,18 @@ export function createVisualProject(options: CreateVisualProjectOptions = {}): V
       panX: 0,
       panY: 0,
     },
+  };
+}
+
+export function createVisualNode(
+  kind: VisualNodeKind,
+  props: Record<string, VisualValue> = {},
+  options: { id?: string; name?: string } = {},
+): VisualNode {
+  return {
+    id: options.id ?? createVisualId(kind),
+    kind,
+    ...(options.name ? { name: options.name } : {}),
+    props,
   };
 }
