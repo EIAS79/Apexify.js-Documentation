@@ -44,8 +44,11 @@ jobs:
           node-version: '22'
           cache: npm
 
-      - name: Install
-        run: npm ci
+      - name: Install dependencies without runtime-heavy postinstall
+        run: npm ci --ignore-scripts
+
+      - name: Generate DOC-4 option inventory
+        run: npm run docs:generate:doc4
 
       - name: Regenerate base Studio capability evidence
         run: npm run studio:completeness
