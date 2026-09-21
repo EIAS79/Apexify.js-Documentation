@@ -7,13 +7,8 @@ import {
   FolderOpenIcon,
   PhotoIcon,
 } from '@heroicons/react/24/outline';
-import { useEffect, useState, type ReactNode } from 'react';
-import type { RunHistoryEntry } from '@/lib/studio/studioConfig';
-import {
-  loadPersistedStudioAssets,
-  type StudioVirtualAsset,
-} from '@/lib/studio/runtime/assets';
-import { loadRunHistory } from '@/lib/studio/studioStorage';
+import { type ReactNode } from 'react';
+import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 
 type Props = { active: boolean };
 
@@ -44,29 +39,26 @@ function Panel({
 }
 
 export default function VisualStudio({ active }: Props) {
-  const [assets, setAssets] = useState<StudioVirtualAsset[]>([]);
-  const [history, setHistory] = useState<RunHistoryEntry[]>([]);
+  const {
+    assets,
+    previewArtifacts,
+    activeArtifactId,
+    error,
+    previewWarnings,
+    elapsedMs,
+    history,
+  } = useStudioSharedSession();
 
-  useEffect(() => {
-    if (!active) return;
-    let cancelled = false;
-    setHistory(loadRunHistory());
-    void loadPersistedStudioAssets()
-      .then((next) => {
-        if (!cancelled) setAssets(next);
-      })
-      .catch(() => {
-        if (!cancelled) setAssets([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [active]);
+  const activeArtifact =
+    previewArtifacts.find((artifact) => artifact.id === activeArtifactId) ??
+    previewArtifacts[0] ??
+    null;
 
   return (
     <div
       className="h-full min-h-0 overflow-auto p-2 sm:p-3 lg:p-4"
       data-studio-visual-workspace
+      data-active={active ? 'true' : 'false'}
       style={{ background: 'var(--bg-base)' }}
     >
       <div className="mx-auto grid min-h-full w-full max-w-[1800px] grid-cols-1 gap-3 xl:grid-cols-[minmax(220px,280px)_minmax(0,1fr)_minmax(260px,360px)]">
@@ -127,15 +119,41 @@ export default function VisualStudio({ active }: Props) {
 
         <div className="grid min-h-0 grid-cols-1 gap-3 sm:grid-cols-3 xl:grid-cols-1">
           <Panel title="Output" icon={PhotoIcon}>
-            <p className="p-3 text-xs leading-5" style={{ color: 'var(--text-tertiary)' }}>
-              Shared output surface is reserved for Visual Project preview in Phase 2.
-            </p>
+            <div className="p-3">
+              <p className="text-2xl font-bold">{previewArtifacts.length}</p>
+              <p className="mt-1 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                Shared session artifacts
+              </p>
+              {activeArtifact ? (
+                <p className="mt-3 truncate text-xs font-semibold" title={activeArtifact.name}>
+                  Active · {activeArtifact.name}
+                </p>
+              ) : (
+                <p className="mt-3 text-xs leading-5" style={{ color: 'var(--text-tertiary)' }}>
+                  Visual Project preview begins in Phase 2.
+                </p>
+              )}
+            </div>
           </Panel>
+
           <Panel title="Diagnostics" icon={ExclamationTriangleIcon}>
-            <p className="p-3 text-xs leading-5" style={{ color: 'var(--text-tertiary)' }}>
-              No Visual diagnostics. Code mode execution remains unchanged.
-            </p>
+            <div className="p-3 text-xs leading-5" style={{ color: 'var(--text-tertiary)' }}>
+              {error ? (
+                <p style={{ color: 'var(--danger)' }}>{error}</p>
+              ) : previewWarnings.length ? (
+                <p>
+                  {previewWarnings.length} shared execution notice
+                  {previewWarnings.length === 1 ? '' : 's'}.
+                </p>
+              ) : (
+                <p>
+                  No shared execution diagnostics
+                  {elapsedMs != null ? ' · last run ' + elapsedMs + ' ms' : ''}.
+                </p>
+              )}
+            </div>
           </Panel>
+
           <Panel title="History" icon={ClockIcon}>
             <div className="p-3">
               <p className="text-2xl font-bold">{history.length}</p>
