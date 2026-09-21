@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createVisualProject } from '../../../lib/studio/visual/project';
+import { createVisualNode, createVisualProject } from '../../../lib/studio/visual/project';
 import { normalizeVisualProject } from '../../../lib/studio/visual/compiler/normalize';
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
@@ -22,6 +22,22 @@ test('VisualProject factory creates a versioned single-file project', () => {
   assert.equal(project.codegen.singleFile, true);
   assert.equal(project.codegen.assetBasePath, './assets/');
   assert.deepEqual(project.document.rootNodeIds, []);
+});
+
+test('node factory creates persistent ids and valid references are accepted', () => {
+  const project = createPhase2ProofProject();
+  const asset = { id: 'asset_logo', kind: 'asset', value: { uri: './assets/logo.png' } };
+  project.assets.push(asset);
+  const node = createVisualNode(
+    'image',
+    { source: { $ref: 'asset:asset_logo' } },
+    { id: 'node_logo', name: 'Logo' },
+  );
+  project.document.nodes[node.id] = node;
+  project.document.rootNodeIds.push(node.id);
+  const result = validateVisualProject(project);
+  assert.equal(node.id, 'node_logo');
+  assert.equal(result.ok, true, JSON.stringify(result.issues));
 });
 
 test('normalization is deterministic without changing semantic order', () => {
