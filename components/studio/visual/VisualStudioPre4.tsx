@@ -1001,6 +1001,277 @@ export default function VisualStudioPre4({
     setInlineTextEditId(null);
   };
 
+
+  useEffect(() => {
+    if (!primaryPath) {
+      setPathConfigDraft('{}');
+      setPathConfigError(null);
+      return;
+    }
+    setPathConfigDraft(JSON.stringify(visualPathProps(primaryPath), null, 2));
+    setPathConfigError(null);
+  }, [primaryPath?.id, primaryPath?.props]);
+
+  const mutatePath = (
+    label: string,
+    updater: (props: VisualPathNodeProps) => VisualPathNodeProps,
+  ) => {
+    if (!primaryPath) return;
+    mutate(label, (current) => {
+      const node = current.document.nodes[primaryPath.id];
+      if (!node || (node.kind !== 'path' && node.kind !== 'freehand')) return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryPath.id];
+      nextNode.props = pathPropsRecord(updater(visualPathProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const insertPath = (
+    tool: VisualPathNodeProps['tool'],
+    point?: Point,
+  ) => {
+    if (tool === 'freehand') {
+      setPhase7Action('freehand');
+      setActiveTool('paths');
+      setMessage('Freehand active · drag on the artboard');
+      return;
+    }
+    mutate('Add ' + tool, (current) => {
+      const next = structuredClone(current);
+      const props = defaultPathNodeProps(tool);
+      const node = createVisualNode(
+        'path',
+        pathPropsRecord(props),
+        { name: tool === 'connector' ? 'Connector' : tool.charAt(0).toUpperCase() + tool.slice(1) },
+      );
+      const width = props.viewport.width;
+      const height = props.viewport.height;
+      node.transform = {
+        x: point?.x ?? Math.max(24, (next.document.width - width) / 2),
+        y: point?.y ?? Math.max(24, (next.document.height - height) / 2),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setPhase7Action(null);
+    setActiveTool('paths');
+    setInspectorTab('style');
+    setMessage((tool === 'connector' ? 'Connector' : 'Path') + ' added');
+  };
+
+  const finishFreehand = (points: Point[]) => {
+    if (points.length < 2) return;
+    const sampled = points.length <= 1200
+      ? points
+      : points.filter((_, index) => index % Math.ceil(points.length / 1200) === 0);
+    const minX = Math.min(...sampled.map((point) => point.x));
+    const minY = Math.min(...sampled.map((point) => point.y));
+    const maxX = Math.max(...sampled.map((point) => point.x));
+    const maxY = Math.max(...sampled.map((point) => point.y));
+    const padding = 6;
+    const width = Math.max(12, maxX - minX + padding * 2);
+    const height = Math.max(12, maxY - minY + padding * 2);
+    const commands = sampled.map((point, index) => ({
+      type: index === 0 ? 'moveTo' as const : 'lineTo' as const,
+      x: point.x - minX + padding,
+      y: point.y - minY + padding,
+    }));
+    mutate('Draw freehand', (current) => {
+      const next = structuredClone(current);
+      const props = defaultPathNodeProps('freehand');
+      props.commands = commands;
+      props.viewport = { width, height };
+      const node = createVisualNode(
+        'freehand',
+        pathPropsRecord(props),
+        { name: 'Freehand' },
+      );
+      node.transform = {
+        x: Math.max(0, minX - padding),
+        y: Math.max(0, minY - padding),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setInspectorTab('style');
+    setMessage('Freehand path created');
+  };
+
+  const appendPixelOperation = (value: StudioPixelOperation, name: string) => {
+    mutate(name, (current) => {
+      const next = structuredClone(current);
+      next.operations.push(
+        operationRecord('pixel-operation', value, {
+          id: createVisualId('operation'),
+          name,
+        }),
+      );
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setMessage(name + ' applied');
+  };
+
+  const upsertDetectionOperation = (
+    value: StudioDetectionOperation,
+    name: string,
+  ) => {
+    mutate(name, (current) => {
+      const next = structuredClone(current);
+      const index = next.operations.findIndex(
+        (item) => item.kind === 'detection-operation' && item.name === name,
+      );
+      const id =
+        index >= 0
+          ? next.operations[index].id
+          : createVisualId('operation');
+      const record = operationRecord('detection-operation', value, { id, name });
+      if (index >= 0) next.operations[index] = record;
+      else next.operations.push(record);
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setDockTab('results');
+    setMessage(name + ' queued');
+  };
+
+  const pixelColorFromHex = (value: string) => {
+    const normalized = value.replace('#', '').trim();
+    const expanded =
+      normalized.length === 3
+        ? normalized.split('').map((item) => item + item).join('')
+        : normalized;
+    const parsed = Number.parseInt(expanded, 16);
+    if (!Number.isFinite(parsed) || expanded.length !== 6) {
+      return { r: 255, g: 255, b: 255, a: 255 };
+    }
+    return {
+      r: (parsed >> 16) & 255,
+      g: (parsed >> 8) & 255,
+      b: parsed & 255,
+      a: 255,
+    };
+  };
+
+  const runPhase7PointAction = (point: Point) => {
+    const x = Math.max(0, Math.min(project.document.width - 1, Math.floor(point.x)));
+    const y = Math.max(0, Math.min(project.document.height - 1, Math.floor(point.y)));
+    if (phase7Action === 'pixel-probe') {
+      upsertDetectionOperation({ type: 'pixelColor', x, y, resultName: 'pixelColor' }, 'Pixel probe');
+      return true;
+    }
+    if (phase7Action === 'pixel-data') {
+      const width = Math.max(1, Math.min(16, project.document.width - x));
+      const height = Math.max(1, Math.min(16, project.document.height - y));
+      upsertDetectionOperation(
+        { type: 'pixelData', region: { x, y, width, height }, resultName: 'pixelData' },
+        'Pixel sample',
+      );
+      return true;
+    }
+    if (phase7Action === 'pixel-set') {
+      appendPixelOperation(
+        { type: 'setColor', x, y, color: pixelColorFromHex(pixelColorDraft) },
+        'Set pixel color',
+      );
+      return true;
+    }
+    if (phase7Action === 'path-detect') {
+      if (!primaryPath) {
+        setMessage('Select a path before using path detection');
+        return true;
+      }
+      upsertDetectionOperation(
+        {
+          type: 'detectPath',
+          pathNodeId: primaryPath.id,
+          x,
+          y,
+          includeStroke: true,
+          strokeWidth: visualPathProps(primaryPath).draw?.stroke?.width ?? 4,
+          tolerance: 2,
+          fillRule: visualPathProps(primaryPath).draw?.fill?.rule ?? 'nonzero',
+          resultName: 'pathHit',
+        },
+        'Path hit test',
+      );
+      return true;
+    }
+    if (
+      phase7Action === 'region-detect' ||
+      phase7Action === 'region-distance'
+    ) {
+      if (!primary) {
+        setMessage('Select a layer before using region detection');
+        return true;
+      }
+      const rect = nodeRect(primary);
+      const region = {
+        type: 'rect' as const,
+        x: rect.x,
+        y: rect.y,
+        width: Math.max(1, rect.width),
+        height: Math.max(1, rect.height),
+      };
+      if (phase7Action === 'region-detect') {
+        upsertDetectionOperation(
+          { type: 'detectRegion', region, x, y, tolerance: 2, resultName: 'regionHit' },
+          'Region hit test',
+        );
+      } else {
+        upsertDetectionOperation(
+          { type: 'detectDistance', region, x, y, resultName: 'distance' },
+          'Region distance',
+        );
+      }
+      return true;
+    }
+    if (phase7Action === 'any-region') {
+      const regions = drawableIds
+        .map((id) => nodeRect(project.document.nodes[id]))
+        .filter((rect) => rect.width > 0 && rect.height > 0)
+        .map((rect) => ({
+          type: 'rect' as const,
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+        }));
+      if (!regions.length) {
+        setMessage('Add at least one drawable layer first');
+        return true;
+      }
+      upsertDetectionOperation(
+        { type: 'detectAnyRegion', regions, x, y, tolerance: 1, resultName: 'anyRegionHit' },
+        'Any-region hit test',
+      );
+      return true;
+    }
+    return false;
+  };
+
   const addPlaceholder = () =>
     mutate('Add placeholder', (current) => {
       const next = structuredClone(current);
