@@ -63,6 +63,7 @@ import {
 } from '@/lib/studio/visual/persistence';
 import type {
   VisualBackgroundLayer,
+  VisualBlendMode,
   VisualCanvasConfig,
   VisualGradient,
   VisualImageFilter,
@@ -1935,7 +1936,7 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-section-title">Surface effects</div>
           <div className="apx-pre4-property-grid">
             <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={canvas.blur ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, blur: Math.max(0, Number(event.target.value)) }))} /></label>
-            <label><span>Blend</span><select className="apx-pre4-input" value={canvas.blendMode ?? 'source-over'} onChange={(event) => mutateCanvas('Canvas blend', (current) => ({ ...current, blendMode: event.target.value }))}>{CANVAS_BLEND_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
+            <label><span>Blend</span><select className="apx-pre4-input" value={canvas.blendMode ?? 'source-over'} onChange={(event) => mutateCanvas('Canvas blend', (current) => ({ ...current, blendMode: event.target.value as VisualBlendMode }))}>{CANVAS_BLEND_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
           </div>
         </div>
 
@@ -1978,7 +1979,7 @@ export default function VisualStudioPre4({
                 {layer.type === 'pattern' ? <><input className="apx-pre4-input" placeholder="Pattern image source" value={layer.source} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'pattern' ? { ...current, source: event.target.value } : current)}/><select className="apx-pre4-input" value={layer.repeat ?? 'repeat'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'pattern' ? { ...current, repeat: event.target.value as NonNullable<typeof current.repeat> } : current)}>{['repeat','repeat-x','repeat-y','no-repeat'].map((value) => <option key={value}>{value}</option>)}</select></> : null}
                 {layer.type === 'presetPattern' ? <><select className="apx-pre4-input" value={layer.pattern.type} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'presetPattern' ? { ...current, pattern: { ...current.pattern, type: event.target.value as VisualPatternOptions['type'] } } : current)}>{CANVAS_PATTERN_TYPES.map((value) => <option key={value}>{value}</option>)}</select><div className="apx-canvas-color-row"><input type="color" value={layer.pattern.color ?? '#315078'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'presetPattern' ? { ...current, pattern: { ...current.pattern, color: event.target.value } } : current)}/><input className="apx-pre4-input" value={layer.pattern.color ?? '#315078'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'presetPattern' ? { ...current, pattern: { ...current.pattern, color: event.target.value } } : current)}/></div></> : null}
                 {layer.type === 'noise' ? <label className="apx-canvas-field"><span>Intensity</span><input className="apx-pre4-range" type="range" min={0} max={1} step={0.01} value={layer.intensity ?? 0.04} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'noise' ? { ...current, intensity: Number(event.target.value) } : current)}/></label> : null}
-                {'blendMode' in layer ? <select className="apx-pre4-input" value={layer.blendMode ?? 'source-over'} onChange={(event) => updateBackgroundLayer(index, (current) => ({ ...current, blendMode: event.target.value }))}>{CANVAS_BLEND_MODES.map((value) => <option key={value}>{value}</option>)}</select> : null}
+                {'blendMode' in layer ? <select className="apx-pre4-input" value={layer.blendMode ?? 'source-over'} onChange={(event) => updateBackgroundLayer(index, (current) => ({ ...current, blendMode: event.target.value as VisualBlendMode }))}>{CANVAS_BLEND_MODES.map((value) => <option key={value}>{value}</option>)}</select> : null}
               </div>
             ))}
           </div>
