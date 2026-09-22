@@ -16,6 +16,7 @@ import { executeStudioOperationPlan } from '../../../lib/studio/visual/compiler/
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
+import { deleteNodes } from '../../../lib/studio/visual/editor';
 
 function phase7Project() {
   const project = createVisualProject({
@@ -582,6 +583,211 @@ test('Phase 7 rejects malformed imported operation payloads before lowering', ()
   assert.equal(validation.ok, false);
   assert.ok(
     validation.issues.filter((issue) => issue.code === 'phase7-operation').length >= 4,
+  );
+  assert.throws(() => lowerVisualProject(project));
+});
+
+
+test('Phase 7 refreshed probes are re-appended after later mutations', () => {
+  const shell = fs.readFileSync(
+    'components/studio/visual/VisualStudioPre4.tsx',
+    'utf8',
+  );
+  assert.match(
+    shell,
+    /if \(index >= 0\) next\.operations\.splice\(index, 1\);\s*next\.operations\.push\(record\);/,
+  );
+});
+
+test('Phase 7 deleting a path prunes dependent path probes', () => {
+  const project = createVisualProject({
+    id: 'phase7_delete_probe',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const props = defaultPathNodeProps('path');
+  const node = createVisualNode('path', pathPropsRecord(props), {
+    id: 'path_delete_target',
+    name: 'Delete target',
+  });
+  project.document.nodes[node.id] = node;
+  project.document.rootNodeIds = [node.id];
+  project.operations.push(
+    operationRecord(
+      'detection-operation',
+      {
+        type: 'detectPath',
+        pathNodeId: node.id,
+        x: 20,
+        y: 20,
+        resultName: 'pathHit',
+      },
+      { id: 'probe_delete_target', name: 'Path hit test' },
+    ),
+  );
+
+  const deleted = deleteNodes(project, [node.id]);
+  assert.equal(deleted.document.nodes[node.id], undefined);
+  assert.equal(deleted.operations.length, 0);
+  assert.equal(validateVisualProject(deleted).ok, true);
+});
+
+test('Phase 7 rejects dangling path probes even when loaded externally', () => {
+  const project = createVisualProject({
+    id: 'phase7_dangling_probe',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  project.operations.push(
+    operationRecord(
+      'detection-operation',
+      {
+        type: 'detectPath',
+        pathNodeId: 'path_missing',
+        x: 20,
+        y: 20,
+        resultName: 'pathHit',
+      },
+      { id: 'probe_missing_target', name: 'Path hit test' },
+    ),
+  );
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(
+    validation.issues.some((issue) => issue.code === 'missing-phase7-path'),
+  );
+});
+
+test('Phase 7 reverse-sync derives primitive extents from full geometry', () => {
+  const source = `
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+async function main() {
+  const canvas = await painter.createCanvas({ width: 320, height: 220 });
+  const circlePath = painter.path2d.create([
+    { type: "circle", x: 60, y: 60, radius: 40 }
+  ]);
+  const circle = await painter.path2d.draw(canvas.buffer, circlePath, {
+    stroke: { width: 2 }
+  });
+  return circle;
+}
+
+return await main();
+`;
+  const project = createVisualProject({
+    id: 'phase7_circle_bounds',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const result = reconcileVisualProjectFromCode(project, source);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+  const node = result.project.document.nodes[result.project.document.rootNodeIds[0]];
+  assert.equal(node.transform?.width, 80);
+  assert.equal(node.transform?.height, 80);
+});
+
+test('Phase 7 reverse-sync preserves path transform pivots and probe coordinates', () => {
+  const source = `
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+async function main() {
+  const canvas = await painter.createCanvas({ width: 320, height: 220 });
+  const pivotPath = painter.path2d.create([
+    { type: "circle", x: 60, y: 60, radius: 40 }
+  ]);
+  const painted = await painter.path2d.draw(canvas.buffer, pivotPath, {
+    transform: {
+      translateX: 25,
+      translateY: 15,
+      rotate: 90,
+      scaleX: 1,
+      scaleY: 1,
+      originX: 60,
+      originY: 60
+    },
+    stroke: { width: 3 }
+  });
+  const pivotHit = await painter.detect.path(
+    pivotPath,
+    100,
+    60,
+    { includeStroke: true, strokeWidth: 3 }
+  );
+  return painted;
+}
+
+return await main();
+`;
+  const project = createVisualProject({
+    id: 'phase7_pivot',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const result = reconcileVisualProjectFromCode(project, source);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+
+  const node = result.project.document.nodes[result.project.document.rootNodeIds[0]];
+  const props = visualPathProps(node);
+  assert.equal(props.draw?.transform?.originX, 60);
+  assert.equal(props.draw?.transform?.originY, 60);
+
+  const probe = result.project.operations.find(
+    (record) =>
+      record.kind === 'detection-operation' &&
+      record.value?.type === 'detectPath',
+  );
+  assert.ok(probe);
+  assert.ok(Math.abs(Number(probe?.value?.x) - 60) < 1e-9);
+  assert.ok(Math.abs(Number(probe?.value?.y) - 100) < 1e-9);
+
+  const plan = lowerVisualProject(result.project);
+  const lowered = plan.operations.find((operation) => operation.kind === 'detect-path');
+  assert.ok(lowered && lowered.kind === 'detect-path');
+  if (lowered?.kind === 'detect-path') {
+    assert.ok(Math.abs(lowered.x - 100) < 1e-9);
+    assert.ok(Math.abs(lowered.y - 60) < 1e-9);
+  }
+
+  const regenerated = generateVisualProjectCode(result.project).source;
+  assert.match(regenerated, /originX: 60/);
+  assert.match(regenerated, /originY: 60/);
+});
+
+test('Phase 7 rejects malformed connector endpoint payloads', () => {
+  const project = createVisualProject({
+    id: 'phase7_bad_connector',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const props = defaultPathNodeProps('connector');
+  props.connector = {} as typeof props.connector;
+  const node = createVisualNode('path', pathPropsRecord(props), {
+    id: 'bad_connector',
+    name: 'Bad connector',
+  });
+  project.document.nodes[node.id] = node;
+  project.document.rootNodeIds = [node.id];
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(
+    validation.issues.some(
+      (issue) =>
+        issue.code === 'phase7-path' &&
+        issue.path.endsWith('.props.connector'),
+    ),
   );
   assert.throws(() => lowerVisualProject(project));
 });
