@@ -307,7 +307,7 @@ async function verify(width, height) {
       const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
       if (!raw) return false;
       try {
-        return JSON.parse(raw)?.source?.includes('barType: "stacked"') ?? false;
+        return JSON.parse(raw)?.source?.includes('type: "stacked"') ?? false;
       } catch {
         return false;
       }
