@@ -394,8 +394,8 @@ function pathDetectionPoint(
   const rotation = ((transform.rotate ?? 0) * Math.PI) / 180;
 
   if (transform.originX !== undefined && transform.originY !== undefined) {
-    const dx = point.x - transform.originX;
-    const dy = point.y - transform.originY;
+    const dx = point.x - (transform.translateX ?? 0) - transform.originX;
+    const dy = point.y - (transform.translateY ?? 0) - transform.originY;
     const cos = Math.cos(-rotation);
     const sin = Math.sin(-rotation);
     const rotatedX = dx * cos - dy * sin;
