@@ -242,6 +242,108 @@ async function verify(width, height) {
     });
     await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
 
+    // Phase 8: Charts are native Apexify authoring nodes. Prove insertion,
+    // Data / Style / Advanced edits, canonical chart-buffer composition, and
+    // the composite comparison/combo APIs in the authoritative Web preview.
+    await page.click('[data-feature-tool="charts"]');
+    await page.waitForSelector('[data-visual-charts-context]', { visible: true });
+    await page.click('[data-chart-insert="bar"]');
+    const selectedChartSelector =
+      '[data-visual-node][data-kind="chart"][data-selected="true"]';
+    await page.waitForSelector(selectedChartSelector, { visible: true });
+    await page.waitForFunction(() => {
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return false;
+      try {
+        const saved = JSON.parse(raw);
+        const source = typeof saved?.source === 'string' ? saved.source : '';
+        return source.includes('.createChart(') &&
+          source.includes('.createImage(') &&
+          source.includes('"bar"');
+      } catch {
+        return false;
+      }
+    });
+
+    await page.click('[data-inspector-tab="data"]');
+    await page.waitForSelector('[data-chart-data-table]', { visible: true });
+    const chartValue = '[aria-label="Chart row 0 value"]';
+    await page.click(chartValue);
+    await page.keyboard.down('Control');
+    await page.keyboard.press('A');
+    await page.keyboard.up('Control');
+    await page.keyboard.type('64');
+    await page.waitForFunction(() => {
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return false;
+      try {
+        return JSON.parse(raw)?.source?.includes('value: 64') ?? false;
+      } catch {
+        return false;
+      }
+    });
+
+    await page.click('[data-inspector-tab="style"]');
+    await page.waitForSelector('[data-chart-title]', { visible: true });
+    await page.click('[data-chart-title]');
+    await page.keyboard.down('Control');
+    await page.keyboard.press('A');
+    await page.keyboard.up('Control');
+    await page.keyboard.type('Revenue 2026');
+    await page.waitForFunction(() => {
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return false;
+      try {
+        return JSON.parse(raw)?.source?.includes('Revenue 2026') ?? false;
+      } catch {
+        return false;
+      }
+    });
+
+    await page.click('[data-inspector-tab="advanced"]');
+    await page.waitForSelector('[data-chart-family-options] select', { visible: true });
+    await page.select('[data-chart-family-options] select', 'stacked');
+    await page.waitForFunction(() => {
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return false;
+      try {
+        return JSON.parse(raw)?.source?.includes('barType: "stacked"') ?? false;
+      } catch {
+        return false;
+      }
+    });
+    await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
+
+    await page.click('[data-feature-tool="charts"]');
+    await page.click('[data-chart-insert="comparison"]');
+    await page.waitForFunction(() => {
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return false;
+      try {
+        const source = JSON.parse(raw)?.source || '';
+        return source.includes('.createComparisonChart(') &&
+          source.includes('.createImage(');
+      } catch {
+        return false;
+      }
+    });
+    await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
+
+    await page.click('[data-feature-tool="charts"]');
+    await page.click('[data-chart-insert="combo"]');
+    await page.waitForFunction(() => {
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return false;
+      try {
+        const source = JSON.parse(raw)?.source || '';
+        return source.includes('.createComboChart(') &&
+          source.includes('.createImage(');
+      } catch {
+        return false;
+      }
+    });
+    await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
+
     await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });
   }
 
