@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 IN PROGRESS
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2761,21 +2761,22 @@ feat(studio-visual): complete chart authoring
 
 ### Phase 8 implementation record — STUDIO-VISUAL-8
 
-**Status:** IN PROGRESS — IMPLEMENTATION COMPLETE; TARGETED ACCEPTANCE RUNNING
+**Status:** MAIN MERGED
 
 - documentation branch: `studio-visual/v08-charts`
 - documentation PR: **#88**
-- current implementation head: `4adf2ead785f0b3054eedcb6c7024732c01aa23d`
+- final verified Phase-8 head: `819ff7dfa18dcdd9bca535b0f03fd197c070121b`
+- documentation main integration: `19aad8dfa9e06a22fa2cb7d083a3e8366c7a5b12`
 - Apexify.js runtime PR: **#37**
 - Apexify.js runtime merge: `f57bb82743c8f71bbe7e519d060010f970b06ef9`
-- pinned `@apexify/web` Studio snapshot updated to that exact runtime merge
-- runtime acceptance used for the Phase-8 extension:
+- pinned `@apexify/web` Studio snapshot: exact runtime merge above
+- runtime acceptance for the Phase-8 extension:
   - Apexify CI: **SUCCESS**
   - Phase 14-P Final Acceptance: **SUCCESS**
-- targeted documentation acceptance:
-  - Studio Visual Phase Gate: pending on exact head
-  - Documentation Runtime Build Gate: pending on exact head
-- unrelated DOC-* / POST-DOC-* failures are explicitly outside Phase-8 acceptance and are not being worked in this phase.
+- exact-head documentation acceptance:
+  - Studio Visual Phase Gate: run **35748508943** — **SUCCESS**
+  - Documentation Runtime Build Gate: run **35748508679** — **SUCCESS** on Node 22 / 24 / 26
+- automated Phase-8 review findings were addressed and all five review threads were resolved before merge.
 
 Completed implementation scope:
 
@@ -2785,18 +2786,16 @@ Completed implementation scope:
 - Advanced family controls for bar/horizontal bar, pie/donut, line/scatter, radar, polar area, comparison and combo;
 - complete raw chart option tree editor and explicit option-matrix visibility;
 - semantic chart nodes in the Visual Project;
+- native contract alignment for RadarSeries, standalone bar `type`, donut `donutInnerRadius`, pie/donut `legends.standard`, and comparison family resets;
+- donut lowering through native `createChart('pie', ..., { type: 'donut' })`;
 - lowering to `createChart()`, `createComparisonChart()` and `createComboChart()`;
 - generated chart Buffer reuse through canonical `createImage()` composition;
 - reverse-sync from canonical literal chart code back to the same semantic chart node;
 - `@apexify/web` comparison/combo preview support;
-- Phase-8 source/unit execution proof and browser interaction proof.
+- Phase-8 unit/source execution proof;
+- exact-head TypeScript typecheck, production build and dual-mode browser regression proof.
 
-Remaining before closure:
-
-1. exact-head Studio Visual Phase Gate succeeds;
-2. exact-head Documentation Runtime Build Gate succeeds;
-3. merge PR #88 into `main`;
-4. update this record with exact integration SHA and advance **STUDIO-VISUAL-9** to next.
+**Phase 8 is closed. STUDIO-VISUAL-9 is next.**
 
 ---
 
