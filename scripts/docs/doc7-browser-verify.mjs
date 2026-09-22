@@ -102,6 +102,7 @@ async function auditRoute(page, route, state, routeName) {
 }
 
 const results = [];
+let homepageInteractions = null;
 try {
   for (const state of states) {
     const homePage = await makePage(state);
@@ -147,6 +148,68 @@ try {
     results.push({ name: state.name, home, gallery });
   }
 
+  const homeInteraction = await makePage({ name: 'home-interaction', width: 390, height: 844, theme: 'light' });
+  await homeInteraction.goto(`${base}/`, { waitUntil: 'networkidle2' });
+
+  const menuButton = await homeInteraction.$('button[aria-controls="home-mobile-nav"]');
+  if (!menuButton) throw new Error('homepage mobile menu button missing');
+  const menuInitiallyHidden = await homeInteraction.$eval('#home-mobile-nav', (element) => element.hidden);
+  if (!menuInitiallyHidden) throw new Error('homepage mobile menu is exposed while closed');
+  await menuButton.focus();
+  await homeInteraction.keyboard.press('Enter');
+  await homeInteraction.waitForFunction(() => document.querySelector('#home-mobile-nav')?.hidden === false);
+  await homeInteraction.keyboard.press('Escape');
+  await homeInteraction.waitForFunction(() => document.querySelector('#home-mobile-nav')?.hidden === true);
+  const menuFocusRestored = await homeInteraction.evaluate(() =>
+    document.activeElement === document.querySelector('button[aria-controls="home-mobile-nav"]'),
+  );
+  if (!menuFocusRestored) throw new Error('homepage mobile menu did not restore focus after Escape');
+
+  const ember = await homeInteraction.$('button[aria-label="Ember palette"]');
+  if (!ember) throw new Error('Generative Atelier Ember palette control missing');
+  await ember.click();
+  await homeInteraction.waitForFunction(() =>
+    document.querySelector('button[aria-label="Ember palette"]')?.getAttribute('aria-pressed') === 'true',
+  );
+
+  await homeInteraction.$eval('input[aria-label="Contour density"]', (input) => {
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    if (!setter) throw new Error('native range value setter unavailable');
+    setter.call(input, '48');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await homeInteraction.waitForFunction(() =>
+    document.querySelector('.atelier__density output')?.textContent?.trim() === '48' &&
+      document.querySelector('.atelier__sculpture')?.getAttribute('aria-label')?.includes('48 contours'),
+  );
+
+  const studyBeforeRemix = await homeInteraction.$eval('.atelier__bar > span:last-child', (element) => element.textContent?.trim() || '');
+  await homeInteraction.click('.atelier__remix');
+  await homeInteraction.waitForFunction((before) =>
+    document.querySelector('.atelier__bar > span:last-child')?.textContent?.trim() !== before,
+  {}, studyBeforeRemix);
+
+  await homeInteraction.click('.atelier__play');
+  await homeInteraction.waitForFunction(() =>
+    document.querySelector('.atelier')?.getAttribute('data-playing') === 'true' &&
+      document.querySelector('.atelier__play')?.getAttribute('aria-pressed') === 'true',
+  );
+  await homeInteraction.click('.atelier__play');
+  await homeInteraction.waitForFunction(() =>
+    document.querySelector('.atelier')?.getAttribute('data-playing') === 'false' &&
+      document.querySelector('.atelier__play')?.getAttribute('aria-pressed') === 'false',
+  );
+  await homeInteraction.close();
+
+  homepageInteractions = {
+    mobileMenuEscapeFocus: true,
+    atelierPalette: true,
+    atelierDensity: true,
+    atelierRemix: true,
+    atelierMotionToggle: true,
+  };
+
   const keyboard = await makePage({ name: 'keyboard', width: 1200, height: 900, theme: 'light' });
   await keyboard.goto(`${base}/gallery`, { waitUntil: 'networkidle2' });
   const scopeButtons = await keyboard.$$('section[aria-label="Gallery provenance and runtime filters"] button');
@@ -188,6 +251,7 @@ const evidence = {
   phase: 'DOC-7',
   states: results,
   keyboard: { installCopy: true, runtimeAndEvidenceCombined: true, searchDialog: true, canonicalExampleLinkage: true },
+  homepageInteractions,
   screenshots: states.flatMap((state) => [`${state.name}-home.png`, `${state.name}-gallery.png`]),
   galleryCanonicalExampleLinkage: true,
 };
