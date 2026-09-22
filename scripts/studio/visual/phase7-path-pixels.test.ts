@@ -799,7 +799,7 @@ test('Phase 7 canonical linked-code operations have explicit reverse-sync classi
     new Set(['fully-reversible', 'safely-normalized']),
   );
   assert.equal(
-    Object.values(PHASE7_LINKED_CODE_CLASSIFICATION).includes('code-only'),
+    new Set<string>(Object.values(PHASE7_LINKED_CODE_CLASSIFICATION)).has('code-only'),
     false,
   );
 });
