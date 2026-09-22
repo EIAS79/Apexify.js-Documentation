@@ -17,7 +17,7 @@ export function DocBreadcrumbs({ entry }: { entry: FlatDocEntry | null }) {
     >
       <Link
         href="/"
-        className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 transition-colors"
+        className="inline-flex min-h-6 min-w-6 items-center justify-center gap-1 rounded-md px-1.5 py-1 transition-colors"
         style={{ color: 'var(--text-tertiary)' }}
       >
         <HomeIcon className="h-3 w-3" aria-hidden />
@@ -26,7 +26,7 @@ export function DocBreadcrumbs({ entry }: { entry: FlatDocEntry | null }) {
       <ChevronRightIcon className="h-3 w-3 shrink-0" style={{ color: 'var(--border-strong)' }} aria-hidden />
       <Link
         href="/docs#00-start-here"
-        className="rounded-md px-1.5 py-1 transition-colors"
+        className="inline-flex min-h-6 min-w-6 items-center justify-center rounded-md px-1.5 py-1 transition-colors"
         style={{ color: 'var(--text-tertiary)' }}
       >
         Docs
