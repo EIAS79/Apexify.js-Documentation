@@ -6,6 +6,7 @@ import {
   createVisualProject,
 } from '../../../lib/studio/visual/project';
 import {
+  PHASE7_LINKED_CODE_CLASSIFICATION,
   defaultPathNodeProps,
   operationRecord,
   pathPropsRecord,
@@ -790,6 +791,27 @@ test('Phase 7 rejects malformed connector endpoint payloads', () => {
     ),
   );
   assert.throws(() => lowerVisualProject(project));
+});
+
+test('Phase 7 canonical linked-code operations have explicit reverse-sync classifications', () => {
+  assert.deepEqual(
+    new Set(Object.values(PHASE7_LINKED_CODE_CLASSIFICATION)),
+    new Set(['fully-reversible', 'safely-normalized']),
+  );
+  assert.equal(
+    Object.values(PHASE7_LINKED_CODE_CLASSIFICATION).includes('code-only'),
+    false,
+  );
+});
+
+test('Phase 7 structured results stay in the permanent Diagnostics surface', () => {
+  const shell = fs.readFileSync(
+    'components/studio/visual/VisualStudioPre4.tsx',
+    'utf8',
+  );
+  assert.ok(shell.includes("setDockTab('diagnostics')"));
+  assert.ok(shell.includes('data-phase7-results'));
+  assert.equal(shell.includes("['results', 'Results']"), false);
 });
 
 test('Phase 7 permanent shell exposes direct anchor and bezier control editing', () => {
