@@ -735,21 +735,78 @@ function reconcileTextCall(
 function pathCommandBounds(commands: StudioPathCommand[]) {
   const xs: number[] = [];
   const ys: number[] = [];
-  const push = (key: string, value: unknown) => {
-    if (typeof value !== 'number' || !Number.isFinite(value)) return;
-    if (/^(?:x|x1|x2|cpx|cp1x|cp2x)$/.test(key)) xs.push(value);
-    if (/^(?:y|y1|y2|cpy|cp1y|cp2y)$/.test(key)) ys.push(value);
+  const point = (x: number, y: number) => {
+    if (Number.isFinite(x)) xs.push(x);
+    if (Number.isFinite(y)) ys.push(y);
   };
+  const box = (x: number, y: number, width: number, height: number) => {
+    point(x, y);
+    point(x + width, y + height);
+  };
+
   for (const command of commands) {
-    Object.entries(command).forEach(([key, value]) => {
-      if (key === 'points' && Array.isArray(value)) {
-        value.forEach((point) => {
-          if (typeof point?.x === 'number') xs.push(point.x);
-          if (typeof point?.y === 'number') ys.push(point.y);
-        });
-      } else push(key, value);
-    });
+    switch (command.type) {
+      case 'moveTo':
+      case 'lineTo':
+        point(command.x, command.y);
+        break;
+      case 'arc':
+      case 'circle':
+        point(command.x - command.radius, command.y - command.radius);
+        point(command.x + command.radius, command.y + command.radius);
+        break;
+      case 'arcTo':
+        point(command.x1, command.y1);
+        point(command.x2, command.y2);
+        break;
+      case 'quadraticCurveTo':
+        point(command.cpx, command.cpy);
+        point(command.x, command.y);
+        break;
+      case 'bezierCurveTo':
+        point(command.cp1x, command.cp1y);
+        point(command.cp2x, command.cp2y);
+        point(command.x, command.y);
+        break;
+      case 'rect':
+      case 'roundedRect':
+        box(command.x, command.y, command.width, command.height);
+        break;
+      case 'ellipse': {
+        const rotation = command.rotation ?? 0;
+        const cos = Math.cos(rotation);
+        const sin = Math.sin(rotation);
+        const extentX = Math.sqrt(
+          Math.pow(command.radiusX * cos, 2) +
+          Math.pow(command.radiusY * sin, 2),
+        );
+        const extentY = Math.sqrt(
+          Math.pow(command.radiusX * sin, 2) +
+          Math.pow(command.radiusY * cos, 2),
+        );
+        point(command.x - extentX, command.y - extentY);
+        point(command.x + extentX, command.y + extentY);
+        break;
+      }
+      case 'polygon':
+        command.points.forEach((entry) => point(entry.x, entry.y));
+        break;
+      case 'star':
+        point(command.x - command.outerRadius, command.y - command.outerRadius);
+        point(command.x + command.outerRadius, command.y + command.outerRadius);
+        break;
+      case 'arrow': {
+        const endX = command.x + Math.cos((command.angle * Math.PI) / 180) * command.length;
+        const endY = command.y + Math.sin((command.angle * Math.PI) / 180) * command.length;
+        point(command.x, command.y);
+        point(endX, endY);
+        break;
+      }
+      case 'closePath':
+        break;
+    }
   }
+
   const minX = xs.length ? Math.min(...xs) : 0;
   const minY = ys.length ? Math.min(...ys) : 0;
   const maxX = xs.length ? Math.max(...xs) : minX + 1;
@@ -806,7 +863,21 @@ function reconcilePathDrawCall(
   const transform = isRecord(optionsValue.transform)
     ? optionsValue.transform
     : {};
-  const { transform: _transform, opacity, ...draw } = optionsValue;
+  const { transform: _transform, opacity, ...drawBase } = optionsValue;
+  const retainedTransform = {
+    ...(typeof transform.originX === 'number'
+      ? { originX: transform.originX }
+      : {}),
+    ...(typeof transform.originY === 'number'
+      ? { originY: transform.originY }
+      : {}),
+  };
+  const draw = {
+    ...drawBase,
+    ...(Object.keys(retainedTransform).length
+      ? { transform: retainedTransform }
+      : {}),
+  };
   const existing =
     matched && (matched.kind === 'path' || matched.kind === 'freehand')
       ? matched
@@ -947,22 +1018,42 @@ function pathDocumentPoint(
   if (node.kind !== 'path' && node.kind !== 'freehand') return point;
   const props = visualPathProps(node);
   const transform = node.transform ?? {};
+  const authored = props.draw?.transform ?? {};
   const width = Math.max(1, props.viewport.width);
   const height = Math.max(1, props.viewport.height);
-  const scaleX = ((transform.width ?? width) * (transform.scaleX ?? 1)) / width;
-  const scaleY = ((transform.height ?? height) * (transform.scaleY ?? 1)) / height;
-  const rotation = ((transform.rotation ?? 0) * Math.PI) / 180;
+  const nodeScaleX =
+    ((transform.width ?? width) * (transform.scaleX ?? 1)) / width;
+  const nodeScaleY =
+    ((transform.height ?? height) * (transform.scaleY ?? 1)) / height;
+  const scaleX = (authored.scaleX ?? 1) * nodeScaleX;
+  const scaleY = (authored.scaleY ?? 1) * nodeScaleY;
+  const rotation =
+    (((authored.rotate ?? 0) + (transform.rotation ?? 0)) * Math.PI) / 180;
+  const cos = Math.cos(rotation);
+  const sin = Math.sin(rotation);
+
+  if (authored.originX !== undefined && authored.originY !== undefined) {
+    const dx = (point.x - authored.originX) * scaleX;
+    const dy = (point.y - authored.originY) * scaleY;
+    return {
+      x: authored.originX + dx * cos - dy * sin,
+      y: authored.originY + dx * sin + dy * cos,
+    };
+  }
+
   const scaledX = point.x * scaleX;
   const scaledY = point.y * scaleY;
   return {
     x:
+      (authored.translateX ?? 0) +
       (transform.x ?? 0) +
-      scaledX * Math.cos(rotation) -
-      scaledY * Math.sin(rotation),
+      scaledX * cos -
+      scaledY * sin,
     y:
+      (authored.translateY ?? 0) +
       (transform.y ?? 0) +
-      scaledX * Math.sin(rotation) +
-      scaledY * Math.cos(rotation),
+      scaledX * sin +
+      scaledY * cos,
   };
 }
 
