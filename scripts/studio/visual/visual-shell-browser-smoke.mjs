@@ -175,11 +175,17 @@ async function verify(width, height) {
       { visible: true },
     );
     await page.waitForFunction(() => {
-      const content =
-        document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
-      return content.includes('.path2d.create(') &&
-        content.includes('.path2d.draw(') &&
-        content.includes('lineTo');
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return false;
+      try {
+        const saved = JSON.parse(raw);
+        const content = typeof saved?.source === 'string' ? saved.source : '';
+        return content.includes('.path2d.create(') &&
+          content.includes('.path2d.draw(') &&
+          content.includes('lineTo');
+      } catch {
+        return false;
+      }
     });
     await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
 
