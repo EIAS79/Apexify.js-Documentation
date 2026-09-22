@@ -117,6 +117,17 @@ import {
   visualTextProps,
 } from '@/lib/studio/visual/text-contract';
 import {
+  defaultPathNodeProps,
+  detectionOperation,
+  operationRecord,
+  pathPropsRecord,
+  visualPathProps,
+  type StudioDetectionOperation,
+  type StudioPathCommand,
+  type StudioPixelOperation,
+  type VisualPathNodeProps,
+} from '@/lib/studio/visual/path-pixel-contract';
+import {
   VisualHistory,
   alignNodes,
   copyNodes,
@@ -151,11 +162,23 @@ type Props = {
 
 type Point = { x: number; y: number };
 type SelectionRect = { x: number; y: number; width: number; height: number };
+type PathXKey = 'x' | 'x1' | 'x2' | 'cpx' | 'cp1x' | 'cp2x';
+type PathYKey = 'y' | 'y1' | 'y2' | 'cpy' | 'cp1y' | 'cp2y';
+type PathHandleTarget = {
+  commandIndex: number;
+  pointIndex?: number;
+  xKey: PathXKey;
+  yKey: PathYKey;
+  role: 'anchor' | 'control';
+  label: string;
+};
+type PathHandle = PathHandleTarget & Point;
 type Gesture = {
-  kind: 'move' | 'resize' | 'rotate' | 'pan' | 'marquee';
+  kind: 'move' | 'resize' | 'rotate' | 'pan' | 'marquee' | 'freehand' | 'path-point';
   id?: string;
   ids?: string[];
   handle?: ResizeHandle;
+  pathHandle?: PathHandleTarget;
   startX: number;
   startY: number;
   before: VisualProject;
@@ -203,6 +226,185 @@ function rectsIntersect(a: SelectionRect, b: SelectionRect) {
 
 function distance(a: { clientX: number; clientY: number }, b: { clientX: number; clientY: number }) {
   return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+}
+
+function effectivePathTransform(node: VisualNode, props: VisualPathNodeProps) {
+  const transform = node.transform ?? {};
+  const authored = props.draw?.transform ?? {};
+  const width = Math.max(1, props.viewport.width);
+  const height = Math.max(1, props.viewport.height);
+  const nodeScaleX =
+    ((transform.width ?? width) * (transform.scaleX ?? 1)) / width;
+  const nodeScaleY =
+    ((transform.height ?? height) * (transform.scaleY ?? 1)) / height;
+  return {
+    translateX: (authored.translateX ?? 0) + (transform.x ?? 0),
+    translateY: (authored.translateY ?? 0) + (transform.y ?? 0),
+    rotate: (authored.rotate ?? 0) + (transform.rotation ?? 0),
+    scaleX: (authored.scaleX ?? 1) * nodeScaleX,
+    scaleY: (authored.scaleY ?? 1) * nodeScaleY,
+    originX: authored.originX,
+    originY: authored.originY,
+  };
+}
+
+function pathLocalToDocumentPoint(
+  node: VisualNode,
+  props: VisualPathNodeProps,
+  point: Point,
+): Point {
+  const transform = effectivePathTransform(node, props);
+  const radians = (transform.rotate * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+
+  if (transform.originX !== undefined && transform.originY !== undefined) {
+    const dx = (point.x - transform.originX) * transform.scaleX;
+    const dy = (point.y - transform.originY) * transform.scaleY;
+    return {
+      x: transform.translateX + transform.originX + dx * cos - dy * sin,
+      y: transform.translateY + transform.originY + dx * sin + dy * cos,
+    };
+  }
+
+  const scaledX = point.x * transform.scaleX;
+  const scaledY = point.y * transform.scaleY;
+  return {
+    x: transform.translateX + scaledX * cos - scaledY * sin,
+    y: transform.translateY + scaledX * sin + scaledY * cos,
+  };
+}
+
+function pathDocumentToLocalPoint(
+  node: VisualNode,
+  props: VisualPathNodeProps,
+  point: Point,
+): Point {
+  const transform = effectivePathTransform(node, props);
+  const radians = (-transform.rotate * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const scaleX = transform.scaleX || 1;
+  const scaleY = transform.scaleY || 1;
+
+  if (transform.originX !== undefined && transform.originY !== undefined) {
+    const dx = point.x - transform.translateX - transform.originX;
+    const dy = point.y - transform.translateY - transform.originY;
+    return {
+      x: transform.originX + (dx * cos - dy * sin) / scaleX,
+      y: transform.originY + (dx * sin + dy * cos) / scaleY,
+    };
+  }
+
+  const dx = point.x - transform.translateX;
+  const dy = point.y - transform.translateY;
+  return {
+    x: (dx * cos - dy * sin) / scaleX,
+    y: (dx * sin + dy * cos) / scaleY,
+  };
+}
+
+function editablePathHandles(props: VisualPathNodeProps): PathHandle[] {
+  const handles: PathHandle[] = [];
+  const add = (
+    commandIndex: number,
+    xKey: PathXKey,
+    yKey: PathYKey,
+    x: number,
+    y: number,
+    role: PathHandleTarget['role'],
+    label: string,
+    pointIndex?: number,
+  ) => {
+    handles.push({
+      commandIndex,
+      ...(pointIndex === undefined ? {} : { pointIndex }),
+      xKey,
+      yKey,
+      x,
+      y,
+      role,
+      label,
+    });
+  };
+
+  (props.commands ?? []).forEach((command, commandIndex) => {
+    switch (command.type) {
+      case 'moveTo':
+      case 'lineTo':
+        add(commandIndex, 'x', 'y', command.x, command.y, 'anchor', 'point');
+        break;
+      case 'quadraticCurveTo':
+        add(commandIndex, 'cpx', 'cpy', command.cpx, command.cpy, 'control', 'control');
+        add(commandIndex, 'x', 'y', command.x, command.y, 'anchor', 'point');
+        break;
+      case 'bezierCurveTo':
+        add(commandIndex, 'cp1x', 'cp1y', command.cp1x, command.cp1y, 'control', 'cp1');
+        add(commandIndex, 'cp2x', 'cp2y', command.cp2x, command.cp2y, 'control', 'cp2');
+        add(commandIndex, 'x', 'y', command.x, command.y, 'anchor', 'point');
+        break;
+      case 'arcTo':
+        add(commandIndex, 'x1', 'y1', command.x1, command.y1, 'anchor', 'point1');
+        add(commandIndex, 'x2', 'y2', command.x2, command.y2, 'anchor', 'point2');
+        break;
+      case 'polygon':
+        command.points.forEach((point, pointIndex) =>
+          add(commandIndex, 'x', 'y', point.x, point.y, 'anchor', 'point', pointIndex),
+        );
+        break;
+      case 'arc':
+      case 'rect':
+      case 'ellipse':
+      case 'circle':
+      case 'roundedRect':
+      case 'star':
+      case 'arrow':
+        add(commandIndex, 'x', 'y', command.x, command.y, 'anchor', 'point');
+        break;
+      case 'closePath':
+        break;
+    }
+  });
+
+  return handles;
+}
+
+function roundedPathCoordinate(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
+function movePathHandle(
+  project: VisualProject,
+  nodeId: string,
+  target: PathHandleTarget,
+  localPoint: Point,
+): VisualProject {
+  const sourceNode = project.document.nodes[nodeId];
+  if (!sourceNode || (sourceNode.kind !== 'path' && sourceNode.kind !== 'freehand')) {
+    return project;
+  }
+  const next = structuredClone(project);
+  const node = next.document.nodes[nodeId];
+  const props = visualPathProps(node);
+  const commands = structuredClone(props.commands ?? []);
+  const command = commands[target.commandIndex];
+  if (!command) return project;
+
+  const x = roundedPathCoordinate(localPoint.x);
+  const y = roundedPathCoordinate(localPoint.y);
+  if (target.pointIndex !== undefined && command.type === 'polygon') {
+    const point = command.points[target.pointIndex];
+    if (!point) return project;
+    command.points[target.pointIndex] = { x, y };
+  } else {
+    const draft = command as unknown as Record<string, unknown>;
+    draft[target.xKey] = x;
+    draft[target.yKey] = y;
+  }
+
+  node.props = pathPropsRecord({ ...props, commands: commands as StudioPathCommand[] });
+  next.updatedAt = new Date().toISOString();
+  return next;
 }
 
 function canvasBaseMode(canvas: VisualCanvasConfig): 'default' | 'color' | 'gradient' | 'image' | 'transparent' {
@@ -290,9 +492,17 @@ export default function VisualStudioPre4({
   const [imageConfigError, setImageConfigError] = useState<string | null>(null);
   const [textConfigDraft, setTextConfigDraft] = useState('{}');
   const [textConfigError, setTextConfigError] = useState<string | null>(null);
+  const [pathConfigDraft, setPathConfigDraft] = useState('{}');
+  const [pathConfigError, setPathConfigError] = useState<string | null>(null);
   const [inlineTextEditId, setInlineTextEditId] = useState<string | null>(null);
   const [artboardPreviewUrl, setArtboardPreviewUrl] = useState<string | null>(null);
   const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
+  const [phase7Results, setPhase7Results] = useState<Record<string, unknown>>({});
+  const [phase7Action, setPhase7Action] = useState<
+    'freehand' | 'pixel-probe' | 'pixel-data' | 'pixel-set' | 'path-detect' | 'region-detect' | 'region-distance' | 'any-region' | null
+  >(null);
+  const [pixelColorDraft, setPixelColorDraft] = useState('#ffffff');
+  const [freehandDraft, setFreehandDraft] = useState<Point[]>([]);
 
   const history = useRef(new VisualHistory(100));
   const projectRef = useRef(project);
@@ -312,6 +522,7 @@ export default function VisualStudioPre4({
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
   const artboardPreviewTimerRef = useRef<number>(0);
+  const freehandDraftRef = useRef<Point[]>([]);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
 
@@ -321,6 +532,10 @@ export default function VisualStudioPre4({
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
   const primaryText = primary?.kind === 'text' ? primary : undefined;
+  const primaryPath =
+    primary && (primary.kind === 'path' || primary.kind === 'freehand')
+      ? primary
+      : undefined;
   const textMetrics = useMemo(() => {
     if (!primaryText) return null;
     const props = visualTextProps(primaryText);
@@ -510,7 +725,12 @@ export default function VisualStudioPre4({
             assets,
           );
           if (cancelled) return;
-          if (result.ok) setArtboardPreviewUrl(result.dataUrl);
+          if (result.ok) {
+            setArtboardPreviewUrl(result.dataUrl);
+            setPhase7Results(
+              ((result as typeof result & { results?: Record<string, unknown> }).results ?? {}),
+            );
+          }
         } catch {
           // Keep the last authoritative frame while the next valid frame is built.
         } finally {
@@ -973,6 +1193,277 @@ export default function VisualStudioPre4({
     setInlineTextEditId(null);
   };
 
+
+  useEffect(() => {
+    if (!primaryPath) {
+      setPathConfigDraft('{}');
+      setPathConfigError(null);
+      return;
+    }
+    setPathConfigDraft(JSON.stringify(visualPathProps(primaryPath), null, 2));
+    setPathConfigError(null);
+  }, [primaryPath?.id, primaryPath?.props]);
+
+  const mutatePath = (
+    label: string,
+    updater: (props: VisualPathNodeProps) => VisualPathNodeProps,
+  ) => {
+    if (!primaryPath) return;
+    mutate(label, (current) => {
+      const node = current.document.nodes[primaryPath.id];
+      if (!node || (node.kind !== 'path' && node.kind !== 'freehand')) return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryPath.id];
+      nextNode.props = pathPropsRecord(updater(visualPathProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const insertPath = (
+    tool: VisualPathNodeProps['tool'],
+    point?: Point,
+  ) => {
+    if (tool === 'freehand') {
+      setPhase7Action('freehand');
+      setActiveTool('paths');
+      setMessage('Freehand active · drag on the artboard');
+      return;
+    }
+    mutate('Add ' + tool, (current) => {
+      const next = structuredClone(current);
+      const props = defaultPathNodeProps(tool);
+      const node = createVisualNode(
+        'path',
+        pathPropsRecord(props),
+        { name: tool === 'connector' ? 'Connector' : tool.charAt(0).toUpperCase() + tool.slice(1) },
+      );
+      const width = props.viewport.width;
+      const height = props.viewport.height;
+      node.transform = {
+        x: point?.x ?? Math.max(24, (next.document.width - width) / 2),
+        y: point?.y ?? Math.max(24, (next.document.height - height) / 2),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setPhase7Action(null);
+    setActiveTool('paths');
+    setInspectorTab('style');
+    setMessage((tool === 'connector' ? 'Connector' : 'Path') + ' added');
+  };
+
+  const finishFreehand = (points: Point[]) => {
+    if (points.length < 2) return;
+    const sampled = points.length <= 1200
+      ? points
+      : points.filter((_, index) => index % Math.ceil(points.length / 1200) === 0);
+    const minX = Math.min(...sampled.map((point) => point.x));
+    const minY = Math.min(...sampled.map((point) => point.y));
+    const maxX = Math.max(...sampled.map((point) => point.x));
+    const maxY = Math.max(...sampled.map((point) => point.y));
+    const padding = 6;
+    const width = Math.max(12, maxX - minX + padding * 2);
+    const height = Math.max(12, maxY - minY + padding * 2);
+    const commands = sampled.map((point, index) => ({
+      type: index === 0 ? 'moveTo' as const : 'lineTo' as const,
+      x: point.x - minX + padding,
+      y: point.y - minY + padding,
+    }));
+    mutate('Draw freehand', (current) => {
+      const next = structuredClone(current);
+      const props = defaultPathNodeProps('freehand');
+      props.commands = commands;
+      props.viewport = { width, height };
+      const node = createVisualNode(
+        'freehand',
+        pathPropsRecord(props),
+        { name: 'Freehand' },
+      );
+      node.transform = {
+        x: Math.max(0, minX - padding),
+        y: Math.max(0, minY - padding),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setInspectorTab('style');
+    setMessage('Freehand path created');
+  };
+
+  const appendPixelOperation = (value: StudioPixelOperation, name: string) => {
+    mutate(name, (current) => {
+      const next = structuredClone(current);
+      next.operations.push(
+        operationRecord('pixel-operation', value, {
+          id: createVisualId('operation'),
+          name,
+        }),
+      );
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setMessage(name + ' applied');
+  };
+
+  const upsertDetectionOperation = (
+    value: StudioDetectionOperation,
+    name: string,
+  ) => {
+    mutate(name, (current) => {
+      const next = structuredClone(current);
+      const index = next.operations.findIndex(
+        (item) => item.kind === 'detection-operation' && item.name === name,
+      );
+      const id =
+        index >= 0
+          ? next.operations[index].id
+          : createVisualId('operation');
+      const record = operationRecord('detection-operation', value, { id, name });
+      if (index >= 0) next.operations.splice(index, 1);
+      next.operations.push(record);
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setDockTab('diagnostics');
+    setMessage(name + ' queued');
+  };
+
+  const pixelColorFromHex = (value: string) => {
+    const normalized = value.replace('#', '').trim();
+    const expanded =
+      normalized.length === 3
+        ? normalized.split('').map((item) => item + item).join('')
+        : normalized;
+    const parsed = Number.parseInt(expanded, 16);
+    if (!Number.isFinite(parsed) || expanded.length !== 6) {
+      return { r: 255, g: 255, b: 255, a: 255 };
+    }
+    return {
+      r: (parsed >> 16) & 255,
+      g: (parsed >> 8) & 255,
+      b: parsed & 255,
+      a: 255,
+    };
+  };
+
+  const runPhase7PointAction = (point: Point) => {
+    const x = Math.max(0, Math.min(project.document.width - 1, Math.floor(point.x)));
+    const y = Math.max(0, Math.min(project.document.height - 1, Math.floor(point.y)));
+    if (phase7Action === 'pixel-probe') {
+      upsertDetectionOperation({ type: 'pixelColor', x, y, resultName: 'pixelColor' }, 'Pixel probe');
+      return true;
+    }
+    if (phase7Action === 'pixel-data') {
+      const width = Math.max(1, Math.min(16, project.document.width - x));
+      const height = Math.max(1, Math.min(16, project.document.height - y));
+      upsertDetectionOperation(
+        { type: 'pixelData', region: { x, y, width, height }, resultName: 'pixelData' },
+        'Pixel sample',
+      );
+      return true;
+    }
+    if (phase7Action === 'pixel-set') {
+      appendPixelOperation(
+        { type: 'setColor', x, y, color: pixelColorFromHex(pixelColorDraft) },
+        'Set pixel color',
+      );
+      return true;
+    }
+    if (phase7Action === 'path-detect') {
+      if (!primaryPath) {
+        setMessage('Select a path before using path detection');
+        return true;
+      }
+      upsertDetectionOperation(
+        {
+          type: 'detectPath',
+          pathNodeId: primaryPath.id,
+          x,
+          y,
+          includeStroke: true,
+          strokeWidth: visualPathProps(primaryPath).draw?.stroke?.width ?? 4,
+          tolerance: 2,
+          fillRule: visualPathProps(primaryPath).draw?.fill?.rule ?? 'nonzero',
+          resultName: 'pathHit',
+        },
+        'Path hit test',
+      );
+      return true;
+    }
+    if (
+      phase7Action === 'region-detect' ||
+      phase7Action === 'region-distance'
+    ) {
+      if (!primary) {
+        setMessage('Select a layer before using region detection');
+        return true;
+      }
+      const rect = nodeRect(primary);
+      const region = {
+        type: 'rect' as const,
+        x: rect.x,
+        y: rect.y,
+        width: Math.max(1, rect.width),
+        height: Math.max(1, rect.height),
+      };
+      if (phase7Action === 'region-detect') {
+        upsertDetectionOperation(
+          { type: 'detectRegion', region, x, y, tolerance: 2, resultName: 'regionHit' },
+          'Region hit test',
+        );
+      } else {
+        upsertDetectionOperation(
+          { type: 'detectDistance', region, x, y, resultName: 'distance' },
+          'Region distance',
+        );
+      }
+      return true;
+    }
+    if (phase7Action === 'any-region') {
+      const regions = drawableIds
+        .map((id) => nodeRect(project.document.nodes[id]))
+        .filter((rect) => rect.width > 0 && rect.height > 0)
+        .map((rect) => ({
+          type: 'rect' as const,
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+        }));
+      if (!regions.length) {
+        setMessage('Add at least one drawable layer first');
+        return true;
+      }
+      upsertDetectionOperation(
+        { type: 'detectAnyRegion', regions, x, y, tolerance: 1, resultName: 'anyRegionHit' },
+        'Any-region hit test',
+      );
+      return true;
+    }
+    return false;
+  };
+
   const addPlaceholder = () =>
     mutate('Add placeholder', (current) => {
       const next = structuredClone(current);
@@ -1225,7 +1716,53 @@ export default function VisualStudioPre4({
     return () => window.removeEventListener('keydown', onKey);
   });
 
+  const beginPhase7CanvasAction = (event: ReactPointerEvent) => {
+    if (!phase7Action) return false;
+    const point = documentPoint(event.clientX, event.clientY);
+    if (!point) return false;
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (phase7Action === 'freehand') {
+      freehandDraftRef.current = [point];
+      setFreehandDraft([point]);
+      gesture.current = {
+        kind: 'freehand',
+        startX: event.clientX,
+        startY: event.clientY,
+        before: project,
+        startDocument: point,
+      };
+      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+      return true;
+    }
+
+    runPhase7PointAction(point);
+    return true;
+  };
+
+  const beginPathPointEdit = (
+    event: ReactPointerEvent<SVGCircleElement>,
+    id: string,
+    pathHandle: PathHandleTarget,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const node = project.document.nodes[id];
+    if (!node || node.transform?.locked) return;
+    gesture.current = {
+      kind: 'path-point',
+      id,
+      pathHandle,
+      startX: event.clientX,
+      startY: event.clientY,
+      before: project,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
   const beginMove = (event: ReactPointerEvent, id: string) => {
+    if (beginPhase7CanvasAction(event)) return;
     if (viewportMode !== 'select') return;
     event.stopPropagation();
 
@@ -1293,6 +1830,8 @@ export default function VisualStudioPre4({
   };
 
   const beginViewportGesture = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (beginPhase7CanvasAction(event)) return;
+
     if (viewportMode === 'pan') {
       gesture.current = {
         kind: 'pan',
@@ -1330,6 +1869,49 @@ export default function VisualStudioPre4({
   const pointerMove = (event: ReactPointerEvent) => {
     const currentGesture = gesture.current;
     if (!currentGesture) return;
+
+    if (currentGesture.kind === 'freehand') {
+      const point = documentPoint(event.clientX, event.clientY);
+      if (!point) return;
+      const points = freehandDraftRef.current;
+      const previous = points[points.length - 1];
+      if (!previous || Math.hypot(point.x - previous.x, point.y - previous.y) >= 1.5) {
+        const next = [...points, point];
+        freehandDraftRef.current = next;
+        setFreehandDraft(next);
+      }
+      return;
+    }
+
+    if (
+      currentGesture.kind === 'path-point' &&
+      currentGesture.id &&
+      currentGesture.pathHandle
+    ) {
+      const point = documentPoint(event.clientX, event.clientY);
+      const node = currentGesture.before.document.nodes[currentGesture.id];
+      if (
+        !point ||
+        !node ||
+        (node.kind !== 'path' && node.kind !== 'freehand')
+      ) {
+        return;
+      }
+      const localPoint = pathDocumentToLocalPoint(
+        node,
+        visualPathProps(node),
+        point,
+      );
+      setProject(
+        movePathHandle(
+          currentGesture.before,
+          currentGesture.id,
+          currentGesture.pathHandle,
+          localPoint,
+        ),
+      );
+      return;
+    }
 
     if (currentGesture.kind === 'pan' && currentGesture.originPan) {
       setPan({
@@ -1430,6 +2012,15 @@ export default function VisualStudioPre4({
     const currentGesture = gesture.current;
     if (!currentGesture) return;
 
+    if (currentGesture.kind === 'freehand') {
+      const points = freehandDraftRef.current;
+      freehandDraftRef.current = [];
+      setFreehandDraft([]);
+      gesture.current = null;
+      if (points.length > 1) finishFreehand(points);
+      return;
+    }
+
     if (
       currentGesture.kind !== 'pan' &&
       currentGesture.kind !== 'marquee'
@@ -1439,7 +2030,9 @@ export default function VisualStudioPre4({
           ? 'Move'
           : currentGesture.kind === 'resize'
             ? 'Resize'
-            : 'Rotate';
+            : currentGesture.kind === 'path-point'
+              ? 'Edit path point'
+              : 'Rotate';
       setProject((current) => {
         history.current.commit(currentGesture.before, current, label);
         return current;
@@ -1846,6 +2439,7 @@ export default function VisualStudioPre4({
     activeTool === 'images' ||
     activeTool === 'shapes' ||
     activeTool === 'text' ||
+    activeTool === 'paths' ||
     activeTool === 'assets';
 
   const imageAssets = assets.filter((asset) =>
@@ -1863,6 +2457,176 @@ export default function VisualStudioPre4({
   ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'paths') {
+      const activatePointTool = (
+        action: NonNullable<typeof phase7Action>,
+        label: string,
+      ) => {
+        setPhase7Action(action);
+        setViewportMode('select');
+        setMessage(label + ' · click the artboard');
+      };
+      return (
+        <div className="apx-media-context" data-visual-paths-context>
+          <div className="apx-media-context-copy">
+            <strong>Paths & pixels</strong>
+            <span>Draw native Apexify paths, connectors and doodles, then inspect or mutate the rendered pixels.</span>
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Path tools</strong>
+            {phase7Action ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setPhase7Action(null);
+                  setFreehandDraft([]);
+                  freehandDraftRef.current = [];
+                  setMessage('Path tool action cancelled');
+                }}
+                data-phase7-action-cancel
+              >
+                Cancel action
+              </button>
+            ) : null}
+          </div>
+          <div className="apx-shape-picker" data-path-tool-picker>
+            {(['line', 'polyline', 'bezier', 'path', 'connector'] as const).map((tool) => (
+              <button
+                key={tool}
+                type="button"
+                onClick={() => insertPath(tool)}
+                data-path-insert={tool}
+              >
+                <span className="apx-shape-glyph">⌁</span>
+                <small>{tool}</small>
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                setViewportMode('select');
+                insertPath('freehand');
+              }}
+              data-path-freehand
+              data-active={phase7Action === 'freehand' ? 'true' : undefined}
+            >
+              <span className="apx-shape-glyph">✎</span>
+              <small>freehand</small>
+            </button>
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Pixel operations</strong>
+            <span>destructive</span>
+          </div>
+          <div className="apx-pre4-disabled-grid" data-pixel-filters>
+            {(['grayscale', 'invert', 'sepia', 'brightness', 'contrast', 'saturate'] as const).map((filter) => (
+              <button
+                type="button"
+                key={filter}
+                onClick={() =>
+                  appendPixelOperation(
+                    { type: 'manipulate', filter, intensity: 1 },
+                    filter.charAt(0).toUpperCase() + filter.slice(1) + ' pixels',
+                  )
+                }
+                data-pixel-filter={filter}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Pixel edit</strong>
+            <span>next click</span>
+          </div>
+          <div className="apx-media-url">
+            <input
+              type="color"
+              value={pixelColorDraft}
+              aria-label="Pixel color"
+              onChange={(event) => setPixelColorDraft(event.target.value)}
+              data-pixel-color
+            />
+            <button
+              type="button"
+              data-pixel-set-tool
+              data-active={phase7Action === 'pixel-set' ? 'true' : undefined}
+              onClick={() => activatePointTool('pixel-set', 'Set pixel color')}
+            >
+              Set pixel
+            </button>
+          </div>
+
+          <div className="apx-media-context-heading">
+            <strong>Inspect & detect</strong>
+            <span>structured results</span>
+          </div>
+          <div className="apx-pre4-disabled-grid" data-detection-tools>
+            <button
+              type="button"
+              data-pixel-inspector
+              data-active={phase7Action === 'pixel-probe' ? 'true' : undefined}
+              onClick={() => activatePointTool('pixel-probe', 'Pixel color probe')}
+            >
+              Pixel color
+            </button>
+            <button
+              type="button"
+              data-pixel-data-tool
+              data-active={phase7Action === 'pixel-data' ? 'true' : undefined}
+              onClick={() => activatePointTool('pixel-data', '16×16 pixel sample')}
+            >
+              Pixel data
+            </button>
+            <button
+              type="button"
+              data-detect-path-tool
+              data-active={phase7Action === 'path-detect' ? 'true' : undefined}
+              onClick={() => activatePointTool('path-detect', 'Path hit test')}
+            >
+              Path hit
+            </button>
+            <button
+              type="button"
+              data-detect-region-tool
+              data-active={phase7Action === 'region-detect' ? 'true' : undefined}
+              onClick={() => activatePointTool('region-detect', 'Selected bounds hit test')}
+            >
+              Region hit
+            </button>
+            <button
+              type="button"
+              data-detect-distance-tool
+              data-active={phase7Action === 'region-distance' ? 'true' : undefined}
+              onClick={() => activatePointTool('region-distance', 'Distance to selected bounds')}
+            >
+              Distance
+            </button>
+            <button
+              type="button"
+              data-detect-any-tool
+              data-active={phase7Action === 'any-region' ? 'true' : undefined}
+              onClick={() => activatePointTool('any-region', 'Any visible region hit test')}
+            >
+              Any region
+            </button>
+          </div>
+
+          <div className="apx-live-sync-note">
+            <strong>{phase7Action ? 'Canvas action active' : 'Runtime-backed authoring'}</strong>
+            <span>
+              {phase7Action
+                ? 'The next artboard gesture/click writes a Visual Project operation and regenerates Apexify code.'
+                : 'Paths render through @apexify/web; pixel and detection calls are generated from the same project model.'}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
     if (activeTool === 'text') {
       return (
         <div className="apx-media-context" data-visual-text-context>
@@ -3896,7 +4660,426 @@ export default function VisualStudioPre4({
     return renderTextAdvanced();
   };
 
+
+  const renderPathInspector = () => {
+    if (!primaryPath) return null;
+    const props = visualPathProps(primaryPath);
+    const connector = props.connector
+      ? Array.isArray(props.connector)
+        ? props.connector[0]
+        : props.connector
+      : undefined;
+
+    const patchConnector = (
+      label: string,
+      updater: (value: NonNullable<typeof connector>) => NonNullable<typeof connector>,
+    ) => {
+      if (!connector) return;
+      mutatePath(label, (current) => {
+        const currentValue = Array.isArray(current.connector)
+          ? current.connector[0]
+          : current.connector;
+        if (!currentValue) return current;
+        const updated = updater(currentValue);
+        return {
+          ...current,
+          connector: Array.isArray(current.connector)
+            ? [updated, ...current.connector.slice(1)]
+            : updated,
+        };
+      });
+    };
+
+    if (inspectorTab === 'transform') return renderTransformFields();
+
+    if (inspectorTab === 'style') {
+      return (
+        <>
+          <div className="apx-pre4-inspector-title">
+            <div>
+              <strong>{primaryPath.name ?? 'Path'}</strong>
+              <small>{props.tool} · Apexify Path2D</small>
+            </div>
+            <span className="apx-pre4-type-pill">{primaryPath.kind}</span>
+          </div>
+
+          {props.tool === 'connector' && connector ? (
+            <>
+              <div className="apx-pre4-section" data-connector-style>
+                <div className="apx-pre4-section-title">Connector stroke</div>
+                <label className="apx-pre4-field">
+                  <span>Color</span>
+                  <input
+                    type="color"
+                    value={connector.lineStyle?.color ?? '#7dd3fc'}
+                    onChange={(event) =>
+                      patchConnector('Connector color', (value) => ({
+                        ...value,
+                        lineStyle: {
+                          ...(value.lineStyle ?? {}),
+                          color: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Width</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={connector.lineStyle?.width ?? 4}
+                    onChange={(event) =>
+                      patchConnector('Connector width', (value) => ({
+                        ...value,
+                        lineStyle: {
+                          ...(value.lineStyle ?? {}),
+                          width: Math.max(0, Number(event.target.value) || 0),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Dash</span>
+                  <select
+                    value={
+                      connector.lineStyle?.lineDash?.dashArray?.length
+                        ? connector.lineStyle.lineDash.dashArray.join(',') === '2,5'
+                          ? 'dotted'
+                          : 'dashed'
+                        : 'solid'
+                    }
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      patchConnector('Connector dash', (current) => ({
+                        ...current,
+                        lineStyle: {
+                          ...(current.lineStyle ?? {}),
+                          lineDash: {
+                            dashArray:
+                              value === 'dashed'
+                                ? [10, 6]
+                                : value === 'dotted'
+                                  ? [2, 5]
+                                  : [],
+                            offset: current.lineStyle?.lineDash?.offset ?? 0,
+                          },
+                        },
+                      }));
+                    }}
+                  >
+                    <option value="solid">Solid</option>
+                    <option value="dashed">Dashed</option>
+                    <option value="dotted">Dotted</option>
+                  </select>
+                </label>
+              </div>
+              <div className="apx-pre4-section" data-connector-arrows>
+                <div className="apx-pre4-section-title">Arrows & marker</div>
+                <label className="apx-pre4-check">
+                  <input
+                    type="checkbox"
+                    checked={connector.arrow?.start ?? false}
+                    onChange={(event) =>
+                      patchConnector('Start arrow', (value) => ({
+                        ...value,
+                        arrow: { ...(value.arrow ?? {}), start: event.target.checked },
+                      }))
+                    }
+                  />
+                  <span>Start arrow</span>
+                </label>
+                <label className="apx-pre4-check">
+                  <input
+                    type="checkbox"
+                    checked={connector.arrow?.end ?? false}
+                    onChange={(event) =>
+                      patchConnector('End arrow', (value) => ({
+                        ...value,
+                        arrow: { ...(value.arrow ?? {}), end: event.target.checked },
+                      }))
+                    }
+                  />
+                  <span>End arrow</span>
+                </label>
+                <label className="apx-pre4-check">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(connector.markers?.length)}
+                    onChange={(event) =>
+                      patchConnector('Connector marker', (value) => ({
+                        ...value,
+                        markers: event.target.checked
+                          ? [{ position: 0.5, shape: 'diamond', size: 8, color: '#f8fafc' }]
+                          : [],
+                      }))
+                    }
+                  />
+                  <span>Midpoint marker</span>
+                </label>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="apx-pre4-section" data-path-stroke>
+                <div className="apx-pre4-section-title">Stroke</div>
+                <label className="apx-pre4-field">
+                  <span>Color</span>
+                  <input
+                    type="color"
+                    value={props.draw?.stroke?.color ?? '#7dd3fc'}
+                    onChange={(event) =>
+                      mutatePath('Path stroke color', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          stroke: {
+                            ...(current.draw?.stroke ?? {}),
+                            color: event.target.value,
+                          },
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Width</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={props.draw?.stroke?.width ?? 4}
+                    onChange={(event) =>
+                      mutatePath('Path stroke width', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          stroke: {
+                            ...(current.draw?.stroke ?? {}),
+                            width: Math.max(0, Number(event.target.value) || 0),
+                          },
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Dash</span>
+                  <select
+                    value={props.draw?.stroke?.style ?? 'solid'}
+                    onChange={(event) =>
+                      mutatePath('Path dash style', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          stroke: {
+                            ...(current.draw?.stroke ?? {}),
+                            style: event.target.value as 'solid' | 'dashed' | 'dotted',
+                            dashArray: undefined,
+                          },
+                        },
+                      }))
+                    }
+                  >
+                    <option value="solid">Solid</option>
+                    <option value="dashed">Dashed</option>
+                    <option value="dotted">Dotted</option>
+                  </select>
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Line cap</span>
+                  <select
+                    value={props.draw?.stroke?.lineCap ?? 'round'}
+                    onChange={(event) =>
+                      mutatePath('Path line cap', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          stroke: {
+                            ...(current.draw?.stroke ?? {}),
+                            lineCap: event.target.value as 'butt' | 'round' | 'square',
+                          },
+                        },
+                      }))
+                    }
+                  >
+                    <option value="butt">Butt</option>
+                    <option value="round">Round</option>
+                    <option value="square">Square</option>
+                  </select>
+                </label>
+              </div>
+
+              <div className="apx-pre4-section" data-path-fill>
+                <div className="apx-pre4-section-title">Fill</div>
+                <label className="apx-pre4-field">
+                  <span>Color</span>
+                  <input
+                    type="color"
+                    value={props.draw?.fill?.color ?? '#2563eb'}
+                    onChange={(event) =>
+                      mutatePath('Path fill color', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          fill: {
+                            ...(current.draw?.fill ?? { opacity: 0.18, rule: 'nonzero' }),
+                            color: event.target.value,
+                          },
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Fill rule</span>
+                  <select
+                    value={props.draw?.fill?.rule ?? 'nonzero'}
+                    onChange={(event) =>
+                      mutatePath('Path fill rule', (current) => ({
+                        ...current,
+                        draw: {
+                          ...(current.draw ?? {}),
+                          fill: {
+                            ...(current.draw?.fill ?? { color: '#2563eb', opacity: 0.18 }),
+                            rule: event.target.value as 'nonzero' | 'evenodd',
+                          },
+                        },
+                      }))
+                    }
+                    data-path-fill-rule
+                  >
+                    <option value="nonzero">Nonzero</option>
+                    <option value="evenodd">Even-odd</option>
+                  </select>
+                </label>
+              </div>
+            </>
+          )}
+        </>
+      );
+    }
+
+    if (inspectorTab === 'effects') {
+      if (props.tool === 'connector') {
+        return (
+          <div className="apx-pre4-empty">
+            <strong>Connector effects</strong>
+            <span>Arrow, marker and dash styling are available in Style. Advanced connector semantics remain editable in Data.</span>
+          </div>
+        );
+      }
+      return (
+        <div className="apx-pre4-section" data-path-effects>
+          <div className="apx-pre4-section-title">Shadow</div>
+          <label className="apx-pre4-field">
+            <span>Color</span>
+            <input
+              type="text"
+              value={props.draw?.shadow?.color ?? 'rgba(0,0,0,.45)'}
+              onChange={(event) =>
+                mutatePath('Path shadow color', (current) => ({
+                  ...current,
+                  draw: {
+                    ...(current.draw ?? {}),
+                    shadow: {
+                      ...(current.draw?.shadow ?? {}),
+                      color: event.target.value,
+                    },
+                  },
+                }))
+              }
+            />
+          </label>
+          <label className="apx-pre4-field">
+            <span>Blur</span>
+            <input
+              type="number"
+              min="0"
+              value={props.draw?.shadow?.blur ?? 0}
+              onChange={(event) =>
+                mutatePath('Path shadow blur', (current) => ({
+                  ...current,
+                  draw: {
+                    ...(current.draw ?? {}),
+                    shadow: {
+                      ...(current.draw?.shadow ?? {}),
+                      blur: Math.max(0, Number(event.target.value) || 0),
+                    },
+                  },
+                }))
+              }
+            />
+          </label>
+        </div>
+      );
+    }
+
+    return (
+      <div className="apx-pre4-section" data-path-data>
+        <div className="apx-pre4-section-title">
+          {inspectorTab === 'data' ? 'Path data' : 'Complete Path2D configuration'}
+        </div>
+        <textarea
+          className="apx-canvas-json apx-canvas-json--config"
+          spellCheck={false}
+          value={pathConfigDraft}
+          onChange={(event) => {
+            setPathConfigDraft(event.target.value);
+            setPathConfigError(null);
+          }}
+          data-path-config
+        />
+        {pathConfigError ? <div className="apx-live-code-error">{pathConfigError}</div> : null}
+        <button
+          className="apx-canvas-apply"
+          type="button"
+          data-path-config-apply
+          onClick={() => {
+            try {
+              const parsed = JSON.parse(pathConfigDraft);
+              if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                throw new Error('Path configuration must be an object.');
+              }
+              const nextProject = structuredClone(project);
+              nextProject.document.nodes[primaryPath.id].props =
+                pathPropsRecord(parsed as VisualPathNodeProps);
+              nextProject.updatedAt = new Date().toISOString();
+              const validation = validateVisualProject(nextProject);
+              if (!validation.ok) {
+                throw new Error(validation.issues[0]?.message ?? 'Invalid path configuration.');
+              }
+              history.current.commit(project, nextProject, 'Advanced path config');
+              projectRef.current = nextProject;
+              setProject(nextProject);
+              setHistoryTick((value) => value + 1);
+              setPathConfigError(null);
+              setMessage('Path configuration applied');
+            } catch (configError) {
+              setPathConfigError(
+                configError instanceof Error
+                  ? configError.message
+                  : 'Invalid path configuration JSON.',
+              );
+            }
+          }}
+        >
+          Apply path config
+        </button>
+        <small className="apx-canvas-hint">
+          This is the complete serializable Phase 7 path contract: commands, connector geometry, arrows, markers, dash, fill rule and draw effects.
+        </small>
+      </div>
+    );
+  };
+
   const renderInspector = () => {
+    if (primaryPath) {
+      return renderPathInspector();
+    }
+
     if (primaryText) {
       return renderTextInspector();
     }
@@ -3994,14 +5177,23 @@ export default function VisualStudioPre4({
         ...(error ? [error] : []),
         ...previewWarnings,
       ];
-      return diagnostics.length ? (
-        <div className="apx-pre4-diagnostics">
-          {diagnostics.map((item, index) => <div key={index}>{item}</div>)}
+      const entries = Object.entries(phase7Results);
+      return diagnostics.length || entries.length ? (
+        <div className="apx-pre4-diagnostics" data-phase7-results>
+          {entries.map(([name, value]) => (
+            <div key={'result-' + name} data-phase7-result={name}>
+              <strong>{name}</strong>
+              <pre>{JSON.stringify(value, null, 2)}</pre>
+            </div>
+          ))}
+          {diagnostics.map((item, index) => (
+            <div key={'diagnostic-' + index}>{item}</div>
+          ))}
         </div>
       ) : (
-        <div className="apx-pre4-dock-empty">
+        <div className="apx-pre4-dock-empty" data-phase7-results-empty>
           <strong>No diagnostics</strong>
-          <span>The Visual source, project model and runtime currently agree.</span>
+          <span>The Visual source, structured results, project model and runtime currently agree.</span>
         </div>
       );
     }
@@ -4164,9 +5356,11 @@ export default function VisualStudioPre4({
                     ? 'Shapes'
                     : activeTool === 'text'
                       ? 'Text'
-                      : activeTool === 'assets'
-                        ? 'Assets'
-                        : 'Layers'}
+                      : activeTool === 'paths'
+                        ? 'Paths & pixels'
+                        : activeTool === 'assets'
+                          ? 'Assets'
+                          : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -4176,7 +5370,9 @@ export default function VisualStudioPre4({
                       ? IMAGE_SHAPE_TYPES.length + ' built-in shapes'
                       : activeTool === 'text'
                         ? fontAssets.length + ' uploaded fonts'
-                        : assets.length + ' shared assets'
+                        : activeTool === 'paths'
+                          ? 'Path · doodle · pixels · detection'
+                          : assets.length + ' shared assets'
                   : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
@@ -4314,6 +5510,34 @@ export default function VisualStudioPre4({
               ) : null}
               <div className="apx-pre4-artboard-grid" />
 
+              {freehandDraft.length > 1 ? (
+                <svg
+                  width={project.document.width}
+                  height={project.document.height}
+                  viewBox={'0 0 ' + project.document.width + ' ' + project.document.height}
+                  aria-hidden
+                  data-freehand-draft
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    overflow: 'visible',
+                    pointerEvents: 'none',
+                    zIndex: 9999,
+                  }}
+                >
+                  <polyline
+                    points={freehandDraft.map((point) => point.x + ',' + point.y).join(' ')}
+                    fill="none"
+                    stroke="#7dd3fc"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : null}
+
               {guides.map((guide, index) => (
                 <div
                   key={index}
@@ -4406,6 +5630,65 @@ export default function VisualStudioPre4({
                 );
               })}
 
+              {activeTool === 'paths' &&
+              primaryPath &&
+              selected.includes(primaryPath.id) &&
+              !primaryPath.transform?.locked &&
+              visualPathProps(primaryPath).tool !== 'connector' ? (
+                <svg
+                  width={project.document.width}
+                  height={project.document.height}
+                  viewBox={'0 0 ' + project.document.width + ' ' + project.document.height}
+                  aria-label="Path point editor"
+                  data-path-edit-overlay={primaryPath.id}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    overflow: 'visible',
+                    pointerEvents: 'none',
+                    zIndex: 10000,
+                  }}
+                >
+                  {editablePathHandles(visualPathProps(primaryPath)).map((pathHandle) => {
+                    const point = pathLocalToDocumentPoint(
+                      primaryPath,
+                      visualPathProps(primaryPath),
+                      pathHandle,
+                    );
+                    const handleKey =
+                      pathHandle.commandIndex +
+                      ':' +
+                      pathHandle.label +
+                      (pathHandle.pointIndex === undefined
+                        ? ''
+                        : ':' + pathHandle.pointIndex);
+                    return (
+                      <circle
+                        key={handleKey}
+                        cx={point.x}
+                        cy={point.y}
+                        r={pathHandle.role === 'control' ? 5 : 6}
+                        fill={pathHandle.role === 'control' ? '#f59e0b' : '#38bdf8'}
+                        stroke="#020617"
+                        strokeWidth="2"
+                        pointerEvents="all"
+                        style={{ cursor: 'move' }}
+                        data-path-point-handle={handleKey}
+                        data-path-control-handle={
+                          pathHandle.role === 'control' ? handleKey : undefined
+                        }
+                        data-path-command-index={pathHandle.commandIndex}
+                        onPointerDown={(event) =>
+                          beginPathPointEdit(event, primaryPath.id, pathHandle)
+                        }
+                      />
+                    );
+                  })}
+                </svg>
+              ) : null}
+
               {selectedGroups.map((node) => {
                 const rect = nodeRect(node);
                 return (
@@ -4457,6 +5740,7 @@ export default function VisualStudioPre4({
                   <button
                     key={id}
                     type="button"
+                    data-dock-tab={id}
                     data-active={dockTab === id ? 'true' : undefined}
                     onClick={() => {
                       setDockTab(id);

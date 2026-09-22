@@ -2,6 +2,10 @@ import { validateVisualTextNode } from '../text-contract';
 import { validateVisualImageNode } from '../image-contract';
 import { validateVisualCanvasConfig } from '../canvas-contract';
 import {
+  validatePhase7Node,
+  validatePhase7Operation,
+} from '../path-pixel-contract';
+import {
   VISUAL_PROJECT_FORMAT,
   VISUAL_PROJECT_SCHEMA_VERSION,
   type VisualProject,
@@ -138,12 +142,55 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   validateRecordIds(issues, project.timelines, 'timelines');
   validateRecordIds(issues, project.outputs, 'outputs');
   validateRecordIds(issues, project.operations, 'operations');
+  for (const operation of project.operations) {
+    validatePhase7Operation(operation, issues);
+    if (
+      operation.kind === 'detection-operation' &&
+      operation.value?.type === 'detectPath'
+    ) {
+      const pathNodeId = operation.value.pathNodeId;
+      const node =
+        typeof pathNodeId === 'string'
+          ? project.document.nodes[pathNodeId]
+          : undefined;
+      if (
+        !node ||
+        (node.kind !== 'path' && node.kind !== 'freehand')
+      ) {
+        push(
+          issues,
+          'missing-phase7-path',
+          'operations.' + operation.id + '.value.pathNodeId',
+          'Path detection must reference an existing path/freehand node.',
+        );
+      } else {
+        const props = node.props as Record<string, VisualValue>;
+        if (node.transform?.visible === false) {
+          push(
+            issues,
+            'hidden-phase7-path',
+            'operations.' + operation.id + '.value.pathNodeId',
+            'Path detection cannot reference a hidden path. Show the path or remove the probe.',
+          );
+        }
+        if (!Array.isArray(props.commands) || props.commands.length < 1) {
+          push(
+            issues,
+            'missing-phase7-path',
+            'operations.' + operation.id + '.value.pathNodeId',
+            'Path detection must reference a command-based path, not a connector.',
+          );
+        }
+      }
+    }
+  }
 
   const known = { asset: assets, variable: variables, palette: palettes };
   for (const [id, node] of Object.entries(project.document.nodes)) {
     visitReferences(node.props as VisualValue, `document.nodes.${id}.props`, known, issues);
     validateVisualImageNode(project, node, issues);
     validateVisualTextNode(node, issues);
+    validatePhase7Node(node, issues);
   }
   if (project.document.background !== undefined) {
     visitReferences(project.document.background, 'document.background', known, issues);

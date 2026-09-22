@@ -178,6 +178,17 @@ export function setNodeVisibility(
   if (!node) return project;
   const next = clone(project);
   next.document.nodes[id].transform = { ...node.transform, visible };
+  if (!visible && (node.kind === 'path' || node.kind === 'freehand')) {
+    next.operations = next.operations.filter((record) => {
+      if (
+        record.kind !== 'detection-operation' ||
+        record.value?.type !== 'detectPath'
+      ) {
+        return true;
+      }
+      return record.value.pathNodeId !== id;
+    });
+  }
   return next;
 }
 
@@ -349,6 +360,16 @@ export function deleteNodes(
       (id) => !doomed.has(id),
     ),
   };
+  next.operations = next.operations.filter((record) => {
+    if (
+      record.kind !== 'detection-operation' ||
+      record.value?.type !== 'detectPath'
+    ) {
+      return true;
+    }
+    const pathNodeId = record.value.pathNodeId;
+    return typeof pathNodeId !== 'string' || !doomed.has(pathNodeId);
+  });
   return next;
 }
 

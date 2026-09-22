@@ -14,6 +14,16 @@ import {
 } from '../image-contract';
 import { createVisualId } from '../ids';
 import { textPropsRecord } from '../text-contract';
+import {
+  operationRecord,
+  pathPropsRecord,
+  visualPathProps,
+  type StudioDetectionOperation,
+  type StudioPathCommand,
+  type StudioPathDrawOptions,
+  type StudioPixelOperation,
+  type VisualPathNodeProps,
+} from '../path-pixel-contract';
 import { validateVisualProject } from '../compiler/validate';
 
 export type VisualCodeSyncResult =
@@ -280,17 +290,18 @@ function assignedIdentifierBefore(
 ): string | null {
   const prefix = source.slice(Math.max(0, callIndex - 280), callIndex);
   const match = prefix.match(
-    /const\s+([A-Za-z_$][\w$]*)\s*=\s*await\s+[A-Za-z_$][\w$]*\s*$/,
+    /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:await\s+)?[A-Za-z_$][\w$]*(?:\s*\.\s*[A-Za-z_$][\w$]*)*\s*$/,
   );
   return match?.[1] ?? null;
 }
 
 function extractMethodCalls(
   source: string,
-  method: 'createCanvas' | 'createImage' | 'createText',
+  method: string,
 ): MethodCall[] {
   const calls: MethodCall[] = [];
-  const re = new RegExp('\\.' + method + '\\s*\\(', 'g');
+  const methodPattern = method.split('.').join('\\s*\\.\\s*');
+  const re = new RegExp('\\.\\s*' + methodPattern + '\\s*\\(', 'g');
   let match: RegExpExecArray | null;
 
   while ((match = re.exec(source))) {
@@ -430,7 +441,9 @@ function orderedRenderableNodes(project: VisualProject) {
     if (
       node.kind === 'image' ||
       node.kind === 'shape' ||
-      node.kind === 'text'
+      node.kind === 'text' ||
+      node.kind === 'path' ||
+      node.kind === 'freehand'
     ) {
       out.push(node);
     }
@@ -718,11 +731,583 @@ function reconcileTextCall(
   } satisfies VisualProject['document']['nodes'][string];
 }
 
+
+function pathCommandBounds(commands: StudioPathCommand[]) {
+  const xs: number[] = [];
+  const ys: number[] = [];
+  const point = (x: number, y: number) => {
+    if (Number.isFinite(x)) xs.push(x);
+    if (Number.isFinite(y)) ys.push(y);
+  };
+  const box = (x: number, y: number, width: number, height: number) => {
+    point(x, y);
+    point(x + width, y + height);
+  };
+
+  for (const command of commands) {
+    switch (command.type) {
+      case 'moveTo':
+      case 'lineTo':
+        point(command.x, command.y);
+        break;
+      case 'arc':
+      case 'circle':
+        point(command.x - command.radius, command.y - command.radius);
+        point(command.x + command.radius, command.y + command.radius);
+        break;
+      case 'arcTo':
+        point(command.x1, command.y1);
+        point(command.x2, command.y2);
+        break;
+      case 'quadraticCurveTo':
+        point(command.cpx, command.cpy);
+        point(command.x, command.y);
+        break;
+      case 'bezierCurveTo':
+        point(command.cp1x, command.cp1y);
+        point(command.cp2x, command.cp2y);
+        point(command.x, command.y);
+        break;
+      case 'rect':
+      case 'roundedRect':
+        box(command.x, command.y, command.width, command.height);
+        break;
+      case 'ellipse': {
+        const rotation = command.rotation ?? 0;
+        const cos = Math.cos(rotation);
+        const sin = Math.sin(rotation);
+        const extentX = Math.sqrt(
+          Math.pow(command.radiusX * cos, 2) +
+          Math.pow(command.radiusY * sin, 2),
+        );
+        const extentY = Math.sqrt(
+          Math.pow(command.radiusX * sin, 2) +
+          Math.pow(command.radiusY * cos, 2),
+        );
+        point(command.x - extentX, command.y - extentY);
+        point(command.x + extentX, command.y + extentY);
+        break;
+      }
+      case 'polygon':
+        command.points.forEach((entry) => point(entry.x, entry.y));
+        break;
+      case 'star':
+        point(command.x - command.outerRadius, command.y - command.outerRadius);
+        point(command.x + command.outerRadius, command.y + command.outerRadius);
+        break;
+      case 'arrow': {
+        const endX = command.x + Math.cos((command.angle * Math.PI) / 180) * command.length;
+        const endY = command.y + Math.sin((command.angle * Math.PI) / 180) * command.length;
+        point(command.x, command.y);
+        point(endX, endY);
+        break;
+      }
+      case 'closePath':
+        break;
+    }
+  }
+
+  const minX = xs.length ? Math.min(...xs) : 0;
+  const minY = ys.length ? Math.min(...ys) : 0;
+  const maxX = xs.length ? Math.max(...xs) : minX + 1;
+  const maxY = ys.length ? Math.max(...ys) : minY + 1;
+  return {
+    minX,
+    minY,
+    width: Math.max(1, maxX - minX),
+    height: Math.max(1, maxY - minY),
+  };
+}
+
+function pathResourceDefinitions(source: string) {
+  const resources = new Map<string, StudioPathCommand[]>();
+  for (const call of extractMethodCalls(source, 'path2d.create')) {
+    if (!call.assignedIdentifier || !call.args[0]) continue;
+    const parsed = new LiteralParser(call.args[0]).parse();
+    if (!Array.isArray(parsed)) {
+      throw new Error('path2d.create() commands must be a literal array.');
+    }
+    resources.set(
+      call.assignedIdentifier,
+      parsed as unknown as StudioPathCommand[],
+    );
+  }
+  return resources;
+}
+
+function reconcilePathDrawCall(
+  project: VisualProject,
+  call: MethodCall,
+  index: number,
+  matched: VisualProject['document']['nodes'][string] | undefined,
+  identifiers: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
+  resources: ReadonlyMap<string, StudioPathCommand[]>,
+) {
+  assertCanonicalBase(call.args[0], identifiers, canvasIdentifier);
+  if (!call.args[1]) throw new Error('path2d.draw() requires a path resource.');
+  const resource = new LiteralParser(call.args[1], true).parse();
+  if (!isIdentifierLiteral(resource) || resource.member) {
+    throw new Error('path2d.draw() path must reference path2d.create().');
+  }
+  const commands = resources.get(resource.__identifier);
+  if (!commands) {
+    throw new Error('path2d.draw() references an unknown path resource.');
+  }
+  const optionsValue = call.args[2]
+    ? new LiteralParser(call.args[2]).parse()
+    : {};
+  if (!isRecord(optionsValue)) {
+    throw new Error('path2d.draw() options must be a literal object.');
+  }
+  const transform = isRecord(optionsValue.transform)
+    ? optionsValue.transform
+    : {};
+  const { transform: _transform, opacity, ...drawBase } = optionsValue;
+  const retainedTransform = {
+    ...(typeof transform.originX === 'number'
+      ? { originX: transform.originX }
+      : {}),
+    ...(typeof transform.originY === 'number'
+      ? { originY: transform.originY }
+      : {}),
+  };
+  const draw = {
+    ...drawBase,
+    ...(Object.keys(retainedTransform).length
+      ? { transform: retainedTransform }
+      : {}),
+  };
+  const existing =
+    matched && (matched.kind === 'path' || matched.kind === 'freehand')
+      ? matched
+      : undefined;
+  const existingProps = existing ? visualPathProps(existing) : undefined;
+  const bounds = pathCommandBounds(commands);
+  const viewport = existingProps?.viewport ?? {
+    width: Math.max(1, bounds.width),
+    height: Math.max(1, bounds.height),
+  };
+  const scaleX =
+    typeof transform.scaleX === 'number' ? transform.scaleX : 1;
+  const scaleY =
+    typeof transform.scaleY === 'number' ? transform.scaleY : 1;
+  const id = existing?.id ?? createVisualId('path');
+  return {
+    id,
+    kind: existing?.kind ?? 'path',
+    name: existing?.name ?? 'Path ' + String(index + 1),
+    parentId: existing?.parentId ?? null,
+    childIds: existing?.childIds,
+    transform: {
+      ...(existing?.transform ?? {}),
+      x: typeof transform.translateX === 'number' ? transform.translateX : 0,
+      y: typeof transform.translateY === 'number' ? transform.translateY : 0,
+      width: viewport.width * scaleX,
+      height: viewport.height * scaleY,
+      rotation: typeof transform.rotate === 'number' ? transform.rotate : 0,
+      opacity: typeof opacity === 'number' ? opacity : 1,
+      visible: existing?.transform?.visible ?? true,
+      locked: existing?.transform?.locked ?? false,
+      zIndex: existing?.transform?.zIndex ?? index,
+    },
+    props: pathPropsRecord({
+      tool: existingProps?.tool === 'freehand' ? 'freehand' : existingProps?.tool ?? 'path',
+      viewport,
+      commands,
+      draw: draw as unknown as StudioPathDrawOptions,
+    }),
+  } satisfies VisualProject['document']['nodes'][string];
+}
+
+function reconcileCustomPathCall(
+  project: VisualProject,
+  call: MethodCall,
+  index: number,
+  matched: VisualProject['document']['nodes'][string] | undefined,
+  identifiers: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
+) {
+  if (!call.args[0]) throw new Error('path2d.custom() requires connector options.');
+  assertCanonicalBase(call.args[1], identifiers, canvasIdentifier);
+  const parsed = new LiteralParser(call.args[0]).parse();
+  if (!isRecord(parsed) && !Array.isArray(parsed)) {
+    throw new Error('path2d.custom() options must be a literal object or array.');
+  }
+
+  const items = (Array.isArray(parsed) ? parsed : [parsed]).filter(isRecord);
+  if (
+    !items.length ||
+    items.some(
+      (item) =>
+        !isRecord(item.startCoordinates) ||
+        !isRecord(item.endCoordinates) ||
+        typeof item.startCoordinates.x !== 'number' ||
+        typeof item.startCoordinates.y !== 'number' ||
+        typeof item.endCoordinates.x !== 'number' ||
+        typeof item.endCoordinates.y !== 'number',
+    )
+  ) {
+    throw new Error('path2d.custom() requires finite startCoordinates and endCoordinates.');
+  }
+
+  const points = items.flatMap((item) => [
+    item.startCoordinates as RecordValue,
+    item.endCoordinates as RecordValue,
+  ]);
+  const xs = points.map((point) => Number(point.x));
+  const ys = points.map((point) => Number(point.y));
+  if (![...xs, ...ys].every(Number.isFinite)) {
+    throw new Error('path2d.custom() connector coordinates must be finite.');
+  }
+
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY = Math.max(...ys);
+  const width = Math.max(1, maxX - minX);
+  const height = Math.max(1, maxY - minY);
+  const rebased = items.map((item) => ({
+    ...item,
+    startCoordinates: {
+      ...(item.startCoordinates as RecordValue),
+      x: Number((item.startCoordinates as RecordValue).x) - minX,
+      y: Number((item.startCoordinates as RecordValue).y) - minY,
+    },
+    endCoordinates: {
+      ...(item.endCoordinates as RecordValue),
+      x: Number((item.endCoordinates as RecordValue).x) - minX,
+      y: Number((item.endCoordinates as RecordValue).y) - minY,
+    },
+  }));
+
+  const existing =
+    matched && matched.kind === 'path' ? matched : undefined;
+  const id = existing?.id ?? createVisualId('path');
+  return {
+    id,
+    kind: 'path',
+    name: existing?.name ?? 'Connector ' + String(index + 1),
+    parentId: existing?.parentId ?? null,
+    childIds: existing?.childIds,
+    transform: {
+      ...(existing?.transform ?? {}),
+      x: minX,
+      y: minY,
+      width,
+      height,
+      rotation: 0,
+      opacity: 1,
+      visible: existing?.transform?.visible ?? true,
+      locked: existing?.transform?.locked ?? false,
+      zIndex: existing?.transform?.zIndex ?? index,
+    },
+    props: pathPropsRecord({
+      tool: 'connector',
+      viewport: { width, height },
+      connector: (Array.isArray(parsed) ? rebased : rebased[0]) as unknown as VisualPathNodeProps['connector'],
+      draw: existing ? visualPathProps(existing).draw : undefined,
+    }),
+  } satisfies VisualProject['document']['nodes'][string];
+}
+
+function pathDocumentPoint(
+  node: VisualProject['document']['nodes'][string],
+  point: { x: number; y: number },
+): { x: number; y: number } {
+  if (node.kind !== 'path' && node.kind !== 'freehand') return point;
+  const props = visualPathProps(node);
+  const transform = node.transform ?? {};
+  const authored = props.draw?.transform ?? {};
+  const width = Math.max(1, props.viewport.width);
+  const height = Math.max(1, props.viewport.height);
+  const nodeScaleX =
+    ((transform.width ?? width) * (transform.scaleX ?? 1)) / width;
+  const nodeScaleY =
+    ((transform.height ?? height) * (transform.scaleY ?? 1)) / height;
+  const scaleX = (authored.scaleX ?? 1) * nodeScaleX;
+  const scaleY = (authored.scaleY ?? 1) * nodeScaleY;
+  const rotation =
+    (((authored.rotate ?? 0) + (transform.rotation ?? 0)) * Math.PI) / 180;
+  const cos = Math.cos(rotation);
+  const sin = Math.sin(rotation);
+
+  if (authored.originX !== undefined && authored.originY !== undefined) {
+    const dx = (point.x - authored.originX) * scaleX;
+    const dy = (point.y - authored.originY) * scaleY;
+    return {
+      x:
+        (authored.translateX ?? 0) +
+        (transform.x ?? 0) +
+        authored.originX +
+        dx * cos -
+        dy * sin,
+      y:
+        (authored.translateY ?? 0) +
+        (transform.y ?? 0) +
+        authored.originY +
+        dx * sin +
+        dy * cos,
+    };
+  }
+
+  const scaledX = point.x * scaleX;
+  const scaledY = point.y * scaleY;
+  return {
+    x:
+      (authored.translateX ?? 0) +
+      (transform.x ?? 0) +
+      scaledX * cos -
+      scaledY * sin,
+    y:
+      (authored.translateY ?? 0) +
+      (transform.y ?? 0) +
+      scaledX * sin +
+      scaledY * cos,
+  };
+}
+
+function parseNumberArgument(raw: string | undefined, label: string) {
+  if (!raw) throw new Error(label + ' is required.');
+  const value = new LiteralParser(raw).parse();
+  if (typeof value !== 'number') throw new Error(label + ' must be numeric.');
+  return value;
+}
+
+function expectedPhase7PixelBase(
+  source: string,
+  beforeIndex: number,
+  canvasIdentifier: string | null,
+): IdentifierLiteral {
+  if (!canvasIdentifier) {
+    throw new Error(
+      'Visual pixel reverse sync requires createCanvas() to assign its result to an identifier.',
+    );
+  }
+  let expected: IdentifierLiteral = {
+    __identifier: canvasIdentifier,
+    member: 'buffer',
+  };
+  const mutatingCalls = [
+    ...extractMethodCalls(source, 'createImage'),
+    ...extractMethodCalls(source, 'createText'),
+    ...extractMethodCalls(source, 'path2d.draw'),
+    ...extractMethodCalls(source, 'path2d.custom'),
+    ...extractMethodCalls(source, 'pixels.manipulate'),
+    ...extractMethodCalls(source, 'pixels.setColor'),
+  ].sort((a, b) => a.index - b.index);
+
+  for (const call of mutatingCalls) {
+    if (call.index >= beforeIndex) break;
+    if (!call.assignedIdentifier) {
+      throw new Error(
+        'Visual pixel reverse sync requires every earlier composition mutation to assign its output.',
+      );
+    }
+    expected = { __identifier: call.assignedIdentifier };
+  }
+  return expected;
+}
+
+function assertPhase7PixelBase(
+  raw: string | undefined,
+  source: string,
+  callIndex: number,
+  canvasIdentifier: string | null,
+) {
+  if (!raw) {
+    throw new Error('Pixel operation requires a base buffer/output argument.');
+  }
+  const actual = new LiteralParser(raw, true).parse();
+  if (!isIdentifierLiteral(actual)) {
+    throw new Error(
+      'Visual pixel reverse sync requires the canonical linear buffer/output identifier.',
+    );
+  }
+  const expected = expectedPhase7PixelBase(source, callIndex, canvasIdentifier);
+  if (
+    actual.__identifier !== expected.__identifier ||
+    actual.member !== expected.member
+  ) {
+    const expectedLabel =
+      expected.__identifier + (expected.member ? '.' + expected.member : '');
+    throw new Error(
+      'Visual pixel reverse sync only supports the canonical linear buffer base. Expected “' +
+        expectedLabel +
+        '”.',
+    );
+  }
+}
+
+function reconcilePhase7Operations(
+  project: VisualProject,
+  source: string,
+  resources: ReadonlyMap<string, StudioPathCommand[]>,
+  resourceNodeIds: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
+) {
+  const operations: VisualProject['operations'] = [];
+  const calls = [
+    ...extractMethodCalls(source, 'pixels.manipulate').map((call) => ({ ...call, method: 'pixels.manipulate' as const })),
+    ...extractMethodCalls(source, 'pixels.setColor').map((call) => ({ ...call, method: 'pixels.setColor' as const })),
+    ...extractMethodCalls(source, 'pixels.getColor').map((call) => ({ ...call, method: 'pixels.getColor' as const })),
+    ...extractMethodCalls(source, 'pixels.getData').map((call) => ({ ...call, method: 'pixels.getData' as const })),
+    ...extractMethodCalls(source, 'detect.path').map((call) => ({ ...call, method: 'detect.path' as const })),
+    ...extractMethodCalls(source, 'detect.region').map((call) => ({ ...call, method: 'detect.region' as const })),
+    ...extractMethodCalls(source, 'detect.anyRegion').map((call) => ({ ...call, method: 'detect.anyRegion' as const })),
+    ...extractMethodCalls(source, 'detect.distance').map((call) => ({ ...call, method: 'detect.distance' as const })),
+  ].sort((a, b) => a.index - b.index);
+
+  for (const call of calls) {
+    const id = createVisualId('operation');
+    const name = call.assignedIdentifier ?? call.method;
+    let value: StudioPixelOperation | StudioDetectionOperation;
+    if (
+      call.method === 'pixels.manipulate' ||
+      call.method === 'pixels.setColor' ||
+      call.method === 'pixels.getColor' ||
+      call.method === 'pixels.getData'
+    ) {
+      assertPhase7PixelBase(
+        call.args[0],
+        source,
+        call.index,
+        canvasIdentifier,
+      );
+    }
+    if (call.method === 'pixels.manipulate') {
+      const parsed = call.args[1] ? new LiteralParser(call.args[1]).parse() : null;
+      if (!isRecord(parsed) || typeof parsed.filter !== 'string') {
+        throw new Error('Visual pixels.manipulate() requires a literal built-in filter.');
+      }
+      value = {
+        type: 'manipulate',
+        filter: parsed.filter as Extract<StudioPixelOperation, { type: 'manipulate' }>['filter'],
+        ...(typeof parsed.intensity === 'number' ? { intensity: parsed.intensity } : {}),
+        ...(isRecord(parsed.region)
+          ? { region: parsed.region as unknown as { x: number; y: number; width: number; height: number } }
+          : {}),
+      };
+      operations.push(operationRecord('pixel-operation', value, { id, name }));
+    } else if (call.method === 'pixels.setColor') {
+      const color = call.args[3] ? new LiteralParser(call.args[3]).parse() : null;
+      if (!isRecord(color)) throw new Error('pixels.setColor() color must be a literal object.');
+      value = {
+        type: 'setColor',
+        x: parseNumberArgument(call.args[1], 'pixels.setColor x'),
+        y: parseNumberArgument(call.args[2], 'pixels.setColor y'),
+        color: color as unknown as Extract<StudioPixelOperation, { type: 'setColor' }>['color'],
+      };
+      operations.push(operationRecord('pixel-operation', value, { id, name }));
+    } else if (call.method === 'pixels.getColor') {
+      value = {
+        type: 'pixelColor',
+        x: parseNumberArgument(call.args[1], 'pixels.getColor x'),
+        y: parseNumberArgument(call.args[2], 'pixels.getColor y'),
+        resultName: call.assignedIdentifier ?? 'pixelColor',
+      };
+      operations.push(operationRecord('detection-operation', value, { id, name }));
+    } else if (call.method === 'pixels.getData') {
+      const parsed = call.args[1] ? new LiteralParser(call.args[1]).parse() : null;
+      value = {
+        type: 'pixelData',
+        ...(isRecord(parsed)
+          ? { region: parsed as unknown as { x: number; y: number; width: number; height: number } }
+          : {}),
+        resultName: call.assignedIdentifier ?? 'pixelData',
+      };
+      operations.push(operationRecord('detection-operation', value, { id, name }));
+    } else if (call.method === 'detect.path') {
+      const resource = call.args[0] ? new LiteralParser(call.args[0], true).parse() : null;
+      if (!isIdentifierLiteral(resource) || resource.member) {
+        throw new Error('detect.path() must reference path2d.create().');
+      }
+      const commands = resources.get(resource.__identifier);
+      if (!commands) throw new Error('detect.path() references an unknown path resource.');
+      const pathNodeId = resourceNodeIds.get(resource.__identifier);
+      const pathNode = pathNodeId
+        ? project.document.nodes[pathNodeId]
+        : undefined;
+      if (!pathNode || (pathNode.kind !== 'path' && pathNode.kind !== 'freehand')) {
+        throw new Error('detect.path() must reference a rendered Visual path resource.');
+      }
+      const localPoint = {
+        x: parseNumberArgument(call.args[1], 'detect.path x'),
+        y: parseNumberArgument(call.args[2], 'detect.path y'),
+      };
+      const documentPoint = pathDocumentPoint(pathNode, localPoint);
+      const options = call.args[3] ? new LiteralParser(call.args[3]).parse() : {};
+      value = {
+        type: 'detectPath',
+        pathNodeId: pathNode.id,
+        x: documentPoint.x,
+        y: documentPoint.y,
+        ...(isRecord(options)
+          ? {
+              includeStroke: typeof options.includeStroke === 'boolean' ? options.includeStroke : undefined,
+              strokeWidth: typeof options.strokeWidth === 'number' ? options.strokeWidth : undefined,
+              tolerance: typeof options.tolerance === 'number' ? options.tolerance : undefined,
+              fillRule: options.fillRule === 'evenodd' ? 'evenodd' : options.fillRule === 'nonzero' ? 'nonzero' : undefined,
+            }
+          : {}),
+        resultName: call.assignedIdentifier ?? 'pathHit',
+      };
+      operations.push(operationRecord('detection-operation', value, { id, name }));
+    } else {
+      const first = call.args[0] ? new LiteralParser(call.args[0]).parse() : null;
+      if (!isRecord(first) && !Array.isArray(first)) {
+        throw new Error(call.method + ' region input must be a literal object/array.');
+      }
+      const x = parseNumberArgument(call.args[1], call.method + ' x');
+      const y = parseNumberArgument(call.args[2], call.method + ' y');
+      if (call.method === 'detect.distance') {
+        value = {
+          type: 'detectDistance',
+          region: first as unknown as Extract<StudioDetectionOperation, { type: 'detectDistance' }>['region'],
+          x,
+          y,
+          resultName: call.assignedIdentifier ?? 'distance',
+        };
+      } else {
+        const options = call.args[3] ? new LiteralParser(call.args[3]).parse() : {};
+        const shared = isRecord(options)
+          ? {
+              includeStroke: typeof options.includeStroke === 'boolean' ? options.includeStroke : undefined,
+              strokeWidth: typeof options.strokeWidth === 'number' ? options.strokeWidth : undefined,
+              tolerance: typeof options.tolerance === 'number' ? options.tolerance : undefined,
+              fillRule: options.fillRule === 'evenodd' ? 'evenodd' as const : options.fillRule === 'nonzero' ? 'nonzero' as const : undefined,
+            }
+          : {};
+        value = call.method === 'detect.anyRegion'
+          ? {
+              type: 'detectAnyRegion',
+              regions: first as unknown as Extract<StudioDetectionOperation, { type: 'detectAnyRegion' }>['regions'],
+              x,
+              y,
+              ...shared,
+              resultName: call.assignedIdentifier ?? 'anyRegionHit',
+            }
+          : {
+              type: 'detectRegion',
+              region: first as unknown as Extract<StudioDetectionOperation, { type: 'detectRegion' }>['region'],
+              x,
+              y,
+              ...shared,
+              resultName: call.assignedIdentifier ?? 'regionHit',
+            };
+      }
+      operations.push(operationRecord('detection-operation', value, { id, name }));
+    }
+  }
+  project.operations = operations;
+}
+
 function reconcileRenderableCalls(
   project: VisualProject,
   source: string,
   canvasIdentifier: string | null,
 ) {
+  const resources = pathResourceDefinitions(source);
   const calls = [
     ...extractMethodCalls(source, 'createImage').map((call) => ({
       ...call,
@@ -732,10 +1317,19 @@ function reconcileRenderableCalls(
       ...call,
       method: 'createText' as const,
     })),
+    ...extractMethodCalls(source, 'path2d.draw').map((call) => ({
+      ...call,
+      method: 'path2d.draw' as const,
+    })),
+    ...extractMethodCalls(source, 'path2d.custom').map((call) => ({
+      ...call,
+      method: 'path2d.custom' as const,
+    })),
   ].sort((a, b) => a.index - b.index);
 
   const existing = orderedRenderableNodes(project);
   const identifierToNodeId = new Map<string, string>();
+  const pathResourceToNodeId = new Map<string, string>();
   const touched = new Set<string>();
 
   calls.forEach((call, index) => {
@@ -750,14 +1344,33 @@ function reconcileRenderableCalls(
             identifierToNodeId,
             canvasIdentifier,
           )
-        : reconcileTextCall(
-            project,
-            call,
-            index,
-            matched,
-            identifierToNodeId,
-            canvasIdentifier,
-          );
+        : call.method === 'createText'
+          ? reconcileTextCall(
+              project,
+              call,
+              index,
+              matched,
+              identifierToNodeId,
+              canvasIdentifier,
+            )
+          : call.method === 'path2d.draw'
+            ? reconcilePathDrawCall(
+                project,
+                call,
+                index,
+                matched,
+                identifierToNodeId,
+                canvasIdentifier,
+                resources,
+              )
+            : reconcileCustomPathCall(
+                project,
+                call,
+                index,
+                matched,
+                identifierToNodeId,
+                canvasIdentifier,
+              );
 
     const oldNode = project.document.nodes[node.id];
     if (!oldNode) project.document.rootNodeIds.push(node.id);
@@ -765,6 +1378,12 @@ function reconcileRenderableCalls(
     touched.add(node.id);
     if (call.assignedIdentifier) {
       identifierToNodeId.set(call.assignedIdentifier, node.id);
+    }
+    if (call.method === 'path2d.draw' && call.args[1]) {
+      const resource = new LiteralParser(call.args[1], true).parse();
+      if (isIdentifierLiteral(resource) && !resource.member) {
+        pathResourceToNodeId.set(resource.__identifier, node.id);
+      }
     }
   });
 
@@ -778,6 +1397,8 @@ function reconcileRenderableCalls(
       (id) => Boolean(project.document.nodes[id]),
     ),
   };
+
+  return pathResourceToNodeId;
 }
 
 export function reconcileVisualProjectFromCode(
@@ -823,7 +1444,18 @@ export function reconcileVisualProjectFromCode(
     next.document.canvas =
       Object.keys(canvas).length ? canvas : undefined;
 
-    reconcileRenderableCalls(next, source, canvasCall.identifier);
+    const pathResourceToNodeId = reconcileRenderableCalls(
+      next,
+      source,
+      canvasCall.identifier,
+    );
+    reconcilePhase7Operations(
+      next,
+      source,
+      pathResourceDefinitions(source),
+      pathResourceToNodeId,
+      canvasCall.identifier,
+    );
     next.updatedAt = new Date().toISOString();
 
     const validation = validateVisualProject(next);
@@ -846,6 +1478,7 @@ export function reconcileVisualProjectFromCode(
         canvas: value.document.canvas ?? {},
         roots: value.document.rootNodeIds,
         nodes: value.document.nodes,
+        operations: value.operations,
       });
 
     return {
