@@ -513,7 +513,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
           sourceNodeId: node.id,
           target: chartTarget,
           preferredName: node.name || props.family + 'Chart',
-          family: props.family,
+          family: props.family === 'donut' ? 'pie' : props.family,
           data: props.data ?? [],
           options: props.options,
         });
