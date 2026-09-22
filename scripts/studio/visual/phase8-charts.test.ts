@@ -77,6 +77,30 @@ test('Phase 8 exposes every required chart family and option matrix', () => {
   );
 });
 
+test('Phase 8 native family defaults match Apexify chart contracts', () => {
+  const donut = defaultChartNodeProps('donut');
+  assert.equal(donut.options.type, 'donut');
+  assert.equal(typeof donut.options.donutInnerRadius, 'number');
+  assert.ok(
+    typeof donut.options.legends === 'object' &&
+      donut.options.legends !== null,
+  );
+
+  const bar = defaultChartNodeProps('bar');
+  assert.equal(bar.options.type, 'standard');
+  assert.equal(bar.options.barType, undefined);
+
+  const radar = defaultChartNodeProps('radar');
+  const radarOptions = radar.options.radar as Record<string, unknown>;
+  const categories = radarOptions.categories as unknown[];
+  assert.ok(Array.isArray(categories));
+  assert.ok(categories.length >= 3);
+  const firstSeries = radar.data?.[0] as Record<string, unknown>;
+  assert.ok(Array.isArray(firstSeries.values));
+  assert.equal((firstSeries.values as unknown[]).length, categories.length);
+  assert.equal(firstSeries.data, undefined);
+});
+
 test('Phase 8 validates, lowers and emits every chart family with buffer reuse', () => {
   for (const family of CHART_FAMILIES) {
     const project = projectWithChart(family);
@@ -122,6 +146,19 @@ test('Phase 8 validates, lowers and emits every chart family with buffer reuse',
       assert.match(source, /createComboChart\(/);
     } else {
       assert.match(source, /createChart\(/);
+      if (family === 'donut') {
+        assert.match(source, /createChart\(\s*"pie"/);
+        assert.match(source, /type: "donut"/);
+        assert.match(source, /donutInnerRadius:/);
+      }
+      if (family === 'radar') {
+        assert.match(source, /categories:/);
+        assert.match(source, /values:/);
+      }
+      if (family === 'bar' || family === 'horizontalBar') {
+        assert.match(source, /type: "standard"/);
+        assert.doesNotMatch(source, /barType:/);
+      }
     }
   }
 });
@@ -177,6 +214,32 @@ test('Phase 8 generated chart code round-trips back into the same semantic famil
       1,
     );
   }
+});
+
+test('Phase 8 rejects radar category/value cardinality mismatch', () => {
+  const project = projectWithChart('radar');
+  const node = project.document.nodes.chart_radar;
+  const props = node.props as Record<string, any>;
+  props.data = [
+    {
+      label: 'Broken radar',
+      values: [10, 20, 30],
+    },
+  ];
+  props.options = {
+    ...(props.options as Record<string, unknown>),
+    radar: {
+      ...((props.options as Record<string, any>).radar ?? {}),
+      categories: ['A', 'B', 'C', 'D'],
+    },
+  };
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(
+    validation.issues.some(
+      (issue) => issue.code === 'chart-radar-cardinality',
+    ),
+  );
 });
 
 test('Phase 8 rejects malformed chart data', () => {
