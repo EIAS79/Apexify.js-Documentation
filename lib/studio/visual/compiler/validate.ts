@@ -142,7 +142,40 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   validateRecordIds(issues, project.timelines, 'timelines');
   validateRecordIds(issues, project.outputs, 'outputs');
   validateRecordIds(issues, project.operations, 'operations');
-  for (const operation of project.operations) validatePhase7Operation(operation, issues);
+  for (const operation of project.operations) {
+    validatePhase7Operation(operation, issues);
+    if (
+      operation.kind === 'detection-operation' &&
+      operation.value?.type === 'detectPath'
+    ) {
+      const pathNodeId = operation.value.pathNodeId;
+      const node =
+        typeof pathNodeId === 'string'
+          ? project.document.nodes[pathNodeId]
+          : undefined;
+      if (
+        !node ||
+        (node.kind !== 'path' && node.kind !== 'freehand')
+      ) {
+        push(
+          issues,
+          'missing-phase7-path',
+          'operations.' + operation.id + '.value.pathNodeId',
+          'Path detection must reference an existing path/freehand node.',
+        );
+      } else {
+        const props = node.props as Record<string, VisualValue>;
+        if (!Array.isArray(props.commands) || props.commands.length < 1) {
+          push(
+            issues,
+            'missing-phase7-path',
+            'operations.' + operation.id + '.value.pathNodeId',
+            'Path detection must reference a command-based path, not a connector.',
+          );
+        }
+      }
+    }
+  }
 
   const known = { asset: assets, variable: variables, palette: palettes };
   for (const [id, node] of Object.entries(project.document.nodes)) {
