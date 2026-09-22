@@ -106,6 +106,83 @@ async function verify(width, height) {
     });
     await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
 
+    // Phase 7: Paths, pixels and detection are real authoring surfaces.
+    // The browser must prove semantic insertion, linked canonical facet code,
+    // authoritative @apexify/web rendering, structured results, and pointer
+    // freehand capture on the actual Studio artboard.
+    await page.click('[data-feature-tool="paths"]');
+    await page.waitForSelector('[data-visual-paths-context]', { visible: true });
+    await page.click('[data-path-insert="path"]');
+    const selectedPathSelector =
+      '[data-visual-node][data-kind="path"][data-selected="true"]';
+    await page.waitForSelector(selectedPathSelector, { visible: true });
+    await page.waitForFunction(() => {
+      const content =
+        document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('.path2d.create(') && content.includes('.path2d.draw(');
+    });
+
+    await page.select('[data-path-fill-rule]', 'evenodd');
+    await page.waitForFunction(() => {
+      const content =
+        document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('rule: "evenodd"');
+    });
+    await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
+
+    await page.click('[data-pixel-filter="invert"]');
+    await page.waitForFunction(() => {
+      const content =
+        document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('.pixels.manipulate(') && content.includes('filter: "invert"');
+    });
+
+    await page.click('[data-pixel-inspector]');
+    const artboard = await page.$('[data-artboard-surface]');
+    if (!artboard) throw new Error('Phase 7 artboard missing');
+    const artboardBox = await artboard.boundingBox();
+    if (!artboardBox) throw new Error('Phase 7 artboard bounds unavailable');
+    await page.mouse.click(
+      artboardBox.x + Math.max(12, artboardBox.width * 0.08),
+      artboardBox.y + Math.max(12, artboardBox.height * 0.08),
+    );
+    await page.waitForFunction(() => {
+      const result = document.querySelector('[data-phase7-result="pixelColor"]');
+      return Boolean(result && /"r"|"g"|"b"|"a"/.test(result.textContent || ''));
+    });
+
+    await page.click('[data-path-freehand]');
+    const freehandStart = {
+      x: artboardBox.x + artboardBox.width * 0.58,
+      y: artboardBox.y + artboardBox.height * 0.68,
+    };
+    await page.mouse.move(freehandStart.x, freehandStart.y);
+    await page.mouse.down();
+    for (const [dx, dy] of [
+      [24, -18],
+      [52, 8],
+      [82, -26],
+      [116, 4],
+      [150, -14],
+    ]) {
+      await page.mouse.move(freehandStart.x + dx, freehandStart.y + dy, {
+        steps: 3,
+      });
+    }
+    await page.mouse.up();
+    await page.waitForSelector(
+      '[data-visual-node][data-kind="freehand"][data-selected="true"]',
+      { visible: true },
+    );
+    await page.waitForFunction(() => {
+      const content =
+        document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
+      return content.includes('.path2d.create(') &&
+        content.includes('.path2d.draw(') &&
+        content.includes('lineTo');
+    });
+    await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
+
     await page.screenshot({ path: '/tmp/studio-visual-pre4.png', fullPage: false });
   }
 
