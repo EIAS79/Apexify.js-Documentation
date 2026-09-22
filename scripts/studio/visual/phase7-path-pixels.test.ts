@@ -792,6 +792,24 @@ test('Phase 7 rejects malformed connector endpoint payloads', () => {
   assert.throws(() => lowerVisualProject(project));
 });
 
+test('Phase 7 permanent shell exposes direct anchor and bezier control editing', () => {
+  const shell = fs.readFileSync(
+    'components/studio/visual/VisualStudioPre4.tsx',
+    'utf8',
+  );
+  for (const contract of [
+    "kind: 'path-point'",
+    'pathDocumentToLocalPoint',
+    'pathLocalToDocumentPoint',
+    'data-path-edit-overlay',
+    'data-path-point-handle',
+    'data-path-control-handle',
+    "'Edit path point'",
+  ]) {
+    assert.ok(shell.includes(contract), 'missing direct path editing contract: ' + contract);
+  }
+});
+
 test('Phase 7 permanent shell exposes authoring, pixel tools and structured results', () => {
   const shell = fs.readFileSync(
     'components/studio/visual/VisualStudioPre4.tsx',
