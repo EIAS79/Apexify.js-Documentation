@@ -1074,11 +1074,77 @@ function parseNumberArgument(raw: string | undefined, label: string) {
   return value;
 }
 
+function expectedPhase7PixelBase(
+  source: string,
+  beforeIndex: number,
+  canvasIdentifier: string | null,
+): IdentifierLiteral {
+  if (!canvasIdentifier) {
+    throw new Error(
+      'Visual pixel reverse sync requires createCanvas() to assign its result to an identifier.',
+    );
+  }
+  let expected: IdentifierLiteral = {
+    __identifier: canvasIdentifier,
+    member: 'buffer',
+  };
+  const mutatingCalls = [
+    ...extractMethodCalls(source, 'createImage'),
+    ...extractMethodCalls(source, 'createText'),
+    ...extractMethodCalls(source, 'path2d.draw'),
+    ...extractMethodCalls(source, 'path2d.custom'),
+    ...extractMethodCalls(source, 'pixels.manipulate'),
+    ...extractMethodCalls(source, 'pixels.setColor'),
+  ].sort((a, b) => a.index - b.index);
+
+  for (const call of mutatingCalls) {
+    if (call.index >= beforeIndex) break;
+    if (!call.assignedIdentifier) {
+      throw new Error(
+        'Visual pixel reverse sync requires every earlier composition mutation to assign its output.',
+      );
+    }
+    expected = { __identifier: call.assignedIdentifier };
+  }
+  return expected;
+}
+
+function assertPhase7PixelBase(
+  raw: string | undefined,
+  source: string,
+  callIndex: number,
+  canvasIdentifier: string | null,
+) {
+  if (!raw) {
+    throw new Error('Pixel operation requires a base buffer/output argument.');
+  }
+  const actual = new LiteralParser(raw, true).parse();
+  if (!isIdentifierLiteral(actual)) {
+    throw new Error(
+      'Visual pixel reverse sync requires the canonical linear buffer/output identifier.',
+    );
+  }
+  const expected = expectedPhase7PixelBase(source, callIndex, canvasIdentifier);
+  if (
+    actual.__identifier !== expected.__identifier ||
+    actual.member !== expected.member
+  ) {
+    const expectedLabel =
+      expected.__identifier + (expected.member ? '.' + expected.member : '');
+    throw new Error(
+      'Visual pixel reverse sync only supports the canonical linear buffer base. Expected “' +
+        expectedLabel +
+        '”.',
+    );
+  }
+}
+
 function reconcilePhase7Operations(
   project: VisualProject,
   source: string,
   resources: ReadonlyMap<string, StudioPathCommand[]>,
   resourceNodeIds: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
 ) {
   const operations: VisualProject['operations'] = [];
   const calls = [
@@ -1096,6 +1162,19 @@ function reconcilePhase7Operations(
     const id = createVisualId('operation');
     const name = call.assignedIdentifier ?? call.method;
     let value: StudioPixelOperation | StudioDetectionOperation;
+    if (
+      call.method === 'pixels.manipulate' ||
+      call.method === 'pixels.setColor' ||
+      call.method === 'pixels.getColor' ||
+      call.method === 'pixels.getData'
+    ) {
+      assertPhase7PixelBase(
+        call.args[0],
+        source,
+        call.index,
+        canvasIdentifier,
+      );
+    }
     if (call.method === 'pixels.manipulate') {
       const parsed = call.args[1] ? new LiteralParser(call.args[1]).parse() : null;
       if (!isRecord(parsed) || typeof parsed.filter !== 'string') {
@@ -1375,6 +1454,7 @@ export function reconcileVisualProjectFromCode(
       source,
       pathResourceDefinitions(source),
       pathResourceToNodeId,
+      canvasCall.identifier,
     );
     next.updatedAt = new Date().toISOString();
 
