@@ -206,7 +206,8 @@ async function verify(width, height) {
   // Generate Code now opens an in-place code modal instead of switching modes.
   await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
   await page.waitForSelector('[data-studio-shell][data-studio-mode="visual"]');
-  await page.waitForSelector('[data-visual-live-code]');
+  await page.click('[data-dock-tab="generated"]');
+  await page.waitForSelector('[data-visual-live-code]', { visible: true });
   await page.waitForSelector('[data-visual-generate-code]:not([disabled])', { visible: true });
   await page.click('[data-visual-generate-code]');
   await page.waitForSelector('[data-visual-code-modal]', { visible: true });
