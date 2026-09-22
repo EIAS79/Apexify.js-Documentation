@@ -534,6 +534,7 @@ function validateStandaloneData(
   data: unknown,
   issues: VisualProjectIssue[],
   path: string,
+  options?: Record<string, unknown>,
 ) {
   if (!Array.isArray(data) || data.length === 0) {
     issue(issues, 'chart-data', path + '.data', 'Chart data must be a non-empty array.');
@@ -574,6 +575,20 @@ function validateStandaloneData(
   }
 
   if (family === 'radar') {
+    const radar = record(options?.radar);
+    const categories =
+      radar && Array.isArray(radar.categories) ? radar.categories : [];
+    if (
+      categories.length < 3 ||
+      categories.some((category) => typeof category !== 'string')
+    ) {
+      issue(
+        issues,
+        'chart-radar-categories',
+        path + '.options.radar.categories',
+        'Radar chart requires at least three string categories.',
+      );
+    }
     data.forEach((series, seriesIndex) => {
       const value = record(series);
       if (
@@ -589,6 +604,14 @@ function validateStandaloneData(
           'Radar series requires label and at least three numeric values.',
         );
         return;
+      }
+      if (categories.length && value.values.length !== categories.length) {
+        issue(
+          issues,
+          'chart-radar-cardinality',
+          path + '.data.' + seriesIndex + '.values',
+          'Radar series values must match radar.categories length.',
+        );
       }
       value.values.forEach((point, pointIndex) => {
         if (!finite(point)) {
@@ -638,39 +661,6 @@ export function validateVisualChartNode(
   }
   validateDimensions(issues, options, path + '.props.options');
 
-  if (props.family === 'radar') {
-    const radar = record(options.radar);
-    const categories = radar && Array.isArray(radar.categories) ? radar.categories : [];
-    if (
-      categories.length < 3 ||
-      categories.some((category) => typeof category !== 'string')
-    ) {
-      issue(
-        issues,
-        'chart-radar-categories',
-        path + '.props.options.radar.categories',
-        'Radar chart requires at least three string categories.',
-      );
-    }
-    const radarData = Array.isArray(props.data) ? props.data : [];
-    radarData.forEach((series, index) => {
-      const value = record(series);
-      if (
-        value &&
-        Array.isArray(value.values) &&
-        categories.length &&
-        value.values.length !== categories.length
-      ) {
-        issue(
-          issues,
-          'chart-radar-cardinality',
-          path + '.props.data.' + index + '.values',
-          'Radar series values must match radar.categories length.',
-        );
-      }
-    });
-  }
-
   if (props.family === 'comparison') {
     for (const key of ['chart1', 'chart2'] as const) {
       const chart = record(options[key]);
@@ -678,8 +668,23 @@ export function validateVisualChartNode(
         issue(issues, 'comparison-chart', path + '.props.options.' + key, 'Comparison chart requires a supported chart type.');
         continue;
       }
-      validateStandaloneData(chart.type as VisualStandaloneChartFamily, chart.data, issues, path + '.props.options.' + key);
-      if (!record(chart.options)) issue(issues, 'comparison-options', path + '.props.options.' + key + '.options', 'Comparison sub-chart options must be an object.');
+      const chartOptions = record(chart.options);
+      if (!chartOptions) {
+        issue(
+          issues,
+          'comparison-options',
+          path + '.props.options.' + key + '.options',
+          'Comparison sub-chart options must be an object.',
+        );
+        continue;
+      }
+      validateStandaloneData(
+        chart.type as VisualStandaloneChartFamily,
+        chart.data,
+        issues,
+        path + '.props.options.' + key,
+        chartOptions,
+      );
     }
     return;
   }
@@ -698,7 +703,13 @@ export function validateVisualChartNode(
     return;
   }
 
-  validateStandaloneData(props.family, props.data, issues, path + '.props');
+  validateStandaloneData(
+    props.family,
+    props.data,
+    issues,
+    path + '.props',
+    options,
+  );
 }
 
 export function chartTitle(props: VisualChartNodeProps): string {
