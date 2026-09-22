@@ -79,7 +79,7 @@ export function normalizeVisualProject(project: VisualProject): VisualProject {
     variables: sortRecords(project.variables),
     timelines: sortRecords(project.timelines),
     outputs: sortRecords(project.outputs),
-    operations: sortRecords(project.operations),
+    operations: project.operations.map(normalizeRecord),
     codegen: {
       language: 'typescript',
       singleFile: project.codegen.singleFile,

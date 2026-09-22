@@ -70,6 +70,7 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
   const names = new StableNameRegistry();
   const painterName = names.allocate('painter');
   const targetNames = new Map<string, string>();
+  const pathResourceNames = new Map<string, string>();
 
   const body: string[] = [];
   for (const operation of plan.operations) {
@@ -111,6 +112,129 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       const properties = emitValue(operation.properties, 2, targetNames);
       body.push(
         `  const ${targetName} = await ${painterName}.createText(${properties}, ${base});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'path-draw') {
+      const resourceName = names.allocate(
+        (operation.preferredName || 'path') + 'Path',
+        'path',
+      );
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'pathResult',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${resourceName} = ${painterName}.path2d.create(${emitValue(operation.commands, 2, targetNames)});`,
+      );
+      body.push(
+        `  const ${targetName} = await ${painterName}.path2d.draw(${base}, ${resourceName}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
+      );
+      pathResourceNames.set(operation.sourceNodeId, resourceName);
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'path-custom') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'connector',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.path2d.custom(${emitValue(operation.options, 2, targetNames)}, ${base});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'pixels-manipulate') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'pixels',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.pixels.manipulate(${base}, ${emitValue(operation.options, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'pixels-set-color') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'pixel',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.pixels.setColor(${base}, ${operation.x}, ${operation.y}, ${emitValue(operation.color, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'pixels-get-color') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'pixelColor');
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.pixels.getColor(${base}, ${operation.x}, ${operation.y});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'pixels-get-data') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'pixelData');
+      const base = emitTargetReference(operation.base, targetNames);
+      const suffix = operation.region ? `, ${emitValue(operation.region, 2, targetNames)}` : '';
+      body.push(
+        `  const ${targetName} = await ${painterName}.pixels.getData(${base}${suffix});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'detect-path') {
+      const resourceName = pathResourceNames.get(operation.pathSourceNodeId);
+      if (!resourceName) {
+        throw new Error(
+          `Path detection references node "${operation.pathSourceNodeId}" before its Path2D resource is available.`,
+        );
+      }
+      const targetName = names.allocate(operation.preferredName || operation.target, 'pathHit');
+      body.push(
+        `  const ${targetName} = await ${painterName}.detect.path(${resourceName}, ${operation.x}, ${operation.y}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'detect-region') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'regionHit');
+      body.push(
+        `  const ${targetName} = await ${painterName}.detect.region(${emitValue(operation.region, 2, targetNames)}, ${operation.x}, ${operation.y}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'detect-any-region') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'regionHit');
+      body.push(
+        `  const ${targetName} = await ${painterName}.detect.anyRegion(${emitValue(operation.regions, 2, targetNames)}, ${operation.x}, ${operation.y}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'detect-distance') {
+      const targetName = names.allocate(operation.preferredName || operation.target, 'distance');
+      body.push(
+        `  const ${targetName} = await ${painterName}.detect.distance(${emitValue(operation.region, 2, targetNames)}, ${operation.x}, ${operation.y});`,
       );
       targetNames.set(operation.target, targetName);
       continue;
