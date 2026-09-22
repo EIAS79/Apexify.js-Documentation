@@ -1036,8 +1036,18 @@ function pathDocumentPoint(
     const dx = (point.x - authored.originX) * scaleX;
     const dy = (point.y - authored.originY) * scaleY;
     return {
-      x: authored.originX + dx * cos - dy * sin,
-      y: authored.originY + dx * sin + dy * cos,
+      x:
+        (authored.translateX ?? 0) +
+        (transform.x ?? 0) +
+        authored.originX +
+        dx * cos -
+        dy * sin,
+      y:
+        (authored.translateY ?? 0) +
+        (transform.y ?? 0) +
+        authored.originY +
+        dx * sin +
+        dy * cos,
     };
   }
 
