@@ -469,7 +469,7 @@ export default function VisualStudioPre4({
     'style' | 'transform' | 'effects' | 'data' | 'advanced'
   >('style');
   const [dockTab, setDockTab] = useState<
-    'generated' | 'results' | 'diagnostics' | 'assets' | 'history'
+    'generated' | 'diagnostics' | 'assets' | 'history'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
   const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
@@ -1345,7 +1345,7 @@ export default function VisualStudioPre4({
       next.updatedAt = new Date().toISOString();
       return next;
     });
-    setDockTab('results');
+    setDockTab('diagnostics');
     setMessage(name + ' queued');
   };
 
@@ -2867,7 +2867,6 @@ export default function VisualStudioPre4({
 
   const dockTabs = [
     ['generated', 'Code'],
-    ['results', 'Results'],
     ['diagnostics', 'Diagnostics'],
     ['assets', 'Assets'],
     ['history', 'History'],
@@ -5172,39 +5171,29 @@ export default function VisualStudioPre4({
       );
     }
 
-    if (dockTab === 'results') {
-      const entries = Object.entries(phase7Results);
-      return entries.length ? (
-        <div className="apx-pre4-diagnostics" data-phase7-results>
-          {entries.map(([name, value]) => (
-            <div key={name} data-phase7-result={name}>
-              <strong>{name}</strong>
-              <pre>{JSON.stringify(value, null, 2)}</pre>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="apx-pre4-dock-empty" data-phase7-results-empty>
-          <strong>No structured results yet</strong>
-          <span>Use Pixel color, Pixel data, Path hit, Region hit, Distance or Any region from Paths & pixels.</span>
-        </div>
-      );
-    }
-
     if (dockTab === 'diagnostics') {
       const diagnostics = [
         ...(codeSyncError ? [codeSyncError] : []),
         ...(error ? [error] : []),
         ...previewWarnings,
       ];
-      return diagnostics.length ? (
-        <div className="apx-pre4-diagnostics">
-          {diagnostics.map((item, index) => <div key={index}>{item}</div>)}
+      const entries = Object.entries(phase7Results);
+      return diagnostics.length || entries.length ? (
+        <div className="apx-pre4-diagnostics" data-phase7-results>
+          {entries.map(([name, value]) => (
+            <div key={'result-' + name} data-phase7-result={name}>
+              <strong>{name}</strong>
+              <pre>{JSON.stringify(value, null, 2)}</pre>
+            </div>
+          ))}
+          {diagnostics.map((item, index) => (
+            <div key={'diagnostic-' + index}>{item}</div>
+          ))}
         </div>
       ) : (
-        <div className="apx-pre4-dock-empty">
+        <div className="apx-pre4-dock-empty" data-phase7-results-empty>
           <strong>No diagnostics</strong>
-          <span>The Visual source, project model and runtime currently agree.</span>
+          <span>The Visual source, structured results, project model and runtime currently agree.</span>
         </div>
       );
     }
