@@ -189,6 +189,7 @@
 
 .apx-api-page{
   overflow-wrap:anywhere;
+  overflow-x:clip;
 }
 
 .apx-api-header h1,
