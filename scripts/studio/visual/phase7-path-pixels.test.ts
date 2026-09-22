@@ -324,6 +324,19 @@ test('Phase 7 canonical code reconciles back into paths and structured operation
       'detection-operation',
     ],
   );
+  const reconciledPathHit = result.project.operations.find((record) => {
+    if (record.kind !== 'detection-operation') return false;
+    return record.value?.type === 'detectPath';
+  });
+  assert.ok(reconciledPathHit);
+  assert.ok(Math.abs(Number(reconciledPathHit?.value?.x) - 120) < 1e-9);
+  assert.ok(Math.abs(Number(reconciledPathHit?.value?.y) - 110) < 1e-9);
+
+  const reconciledConnector = nodes[1];
+  assert.equal(visualPathProps(reconciledConnector).tool, 'connector');
+  assert.ok((reconciledConnector.transform?.x ?? 0) > 400);
+  assert.ok((reconciledConnector.transform?.width ?? 0) < 300);
+
   const regenerated = generateVisualProjectCode(result.project).source;
   for (const token of [
     '.path2d.draw(',
@@ -402,6 +415,137 @@ test('Phase 7 executor routes canonical operations through one runtime plan', as
   ]);
 });
 
+test('Phase 7 preserves detection-before-mutation chronology', () => {
+  const project = createVisualProject({
+    id: 'phase7_order',
+    width: 200,
+    height: 120,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  project.operations.push(
+    operationRecord(
+      'detection-operation',
+      { type: 'pixelColor', x: 4, y: 4, resultName: 'beforeEdit' },
+      { id: 'probe_first', name: 'Probe first' },
+    ),
+    operationRecord(
+      'pixel-operation',
+      { type: 'setColor', x: 4, y: 4, color: { r: 255, g: 0, b: 0, a: 255 } },
+      { id: 'edit_after', name: 'Edit after' },
+    ),
+  );
+
+  const plan = lowerVisualProject(project);
+  assert.deepEqual(
+    plan.operations.map((operation) => operation.kind),
+    ['create-canvas', 'pixels-get-color', 'pixels-set-color'],
+  );
+  const probe = plan.operations[1];
+  const edit = plan.operations[2];
+  assert.equal(probe.kind, 'pixels-get-color');
+  assert.equal(edit.kind, 'pixels-set-color');
+  if (probe.kind === 'pixels-get-color' && edit.kind === 'pixels-set-color') {
+    assert.equal(probe.base.$studioTarget, 'canvas');
+    assert.equal(edit.base.$studioTarget, 'canvas');
+  }
+});
+
+test('Phase 7 reverse-sync keeps duplicate path resource identity', () => {
+  const project = createVisualProject({
+    id: 'phase7_identity',
+    width: 500,
+    height: 300,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const props = defaultPathNodeProps('line');
+  const first = createVisualNode('path', pathPropsRecord(props), {
+    id: 'same_path_one',
+    name: 'Same One',
+  });
+  first.transform = { x: 20, y: 40, width: 220, height: 110, rotation: 0, opacity: 1, visible: true };
+  const second = createVisualNode('path', pathPropsRecord(props), {
+    id: 'same_path_two',
+    name: 'Same Two',
+  });
+  second.transform = { x: 250, y: 120, width: 220, height: 110, rotation: 15, opacity: 1, visible: true };
+  project.document.nodes[first.id] = first;
+  project.document.nodes[second.id] = second;
+  project.document.rootNodeIds = [first.id, second.id];
+  project.operations.push(
+    operationRecord(
+      'detection-operation',
+      {
+        type: 'detectPath',
+        pathNodeId: second.id,
+        x: 300,
+        y: 150,
+        includeStroke: true,
+        strokeWidth: 4,
+        resultName: 'secondHit',
+      },
+      { id: 'second_probe', name: 'Second probe' },
+    ),
+  );
+
+  const source = generateVisualProjectCode(project).source;
+  const empty = createVisualProject({
+    id: project.id,
+    width: 500,
+    height: 300,
+    now: project.createdAt,
+  });
+  const result = reconcileVisualProjectFromCode(empty, source);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+
+  const pathIds = result.project.document.rootNodeIds;
+  assert.equal(pathIds.length, 2);
+  const detection = result.project.operations.find(
+    (record) => record.kind === 'detection-operation' && record.value?.type === 'detectPath',
+  );
+  assert.ok(detection);
+  assert.equal(detection?.value?.pathNodeId, pathIds[1]);
+  assert.ok(Math.abs(Number(detection?.value?.x) - 300) < 1e-9);
+  assert.ok(Math.abs(Number(detection?.value?.y) - 150) < 1e-9);
+});
+
+test('Phase 7 accepts a complete single-command path and round-trips it', () => {
+  const project = createVisualProject({
+    id: 'phase7_single',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const props = defaultPathNodeProps('path');
+  props.commands = [{ type: 'circle', x: 60, y: 60, radius: 40 }];
+  props.viewport = { width: 120, height: 120 };
+  const node = createVisualNode('path', pathPropsRecord(props), {
+    id: 'single_circle',
+    name: 'Single Circle',
+  });
+  node.transform = { x: 40, y: 30, width: 120, height: 120, rotation: 0, opacity: 1, visible: true };
+  project.document.nodes[node.id] = node;
+  project.document.rootNodeIds = [node.id];
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, true, JSON.stringify(validation.issues));
+
+  const source = generateVisualProjectCode(project).source;
+  const result = reconcileVisualProjectFromCode(
+    createVisualProject({
+      id: project.id,
+      width: 320,
+      height: 220,
+      now: project.createdAt,
+    }),
+    source,
+  );
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+  const restored = result.project.document.nodes[result.project.document.rootNodeIds[0]];
+  assert.deepEqual(visualPathProps(restored).commands, props.commands);
+});
+
 test('Phase 7 rejects malformed imported operation payloads before lowering', () => {
   const project = createVisualProject({ width: 320, height: 200 });
   project.operations.push({
@@ -412,6 +556,15 @@ test('Phase 7 rejects malformed imported operation payloads before lowering', ()
       x: 2.5,
       y: -1,
       color: { r: 400, g: 0, b: 0 },
+    },
+  });
+  project.operations.push({
+    id: 'bad_region',
+    kind: 'pixel-operation',
+    value: {
+      type: 'manipulate',
+      filter: 'invert',
+      region: { x: 0 },
     },
   });
   project.operations.push({
