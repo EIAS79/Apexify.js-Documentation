@@ -82,6 +82,25 @@ export type VisualPathNodeProps = {
   draw?: StudioPathDrawOptions;
 };
 
+export type Phase7ReverseSyncClassification =
+  | 'fully-reversible'
+  | 'safely-normalized'
+  | 'code-only';
+
+export const PHASE7_LINKED_CODE_CLASSIFICATION = {
+  'path2d.create': 'safely-normalized',
+  'path2d.draw': 'safely-normalized',
+  'path2d.custom': 'safely-normalized',
+  'pixels.manipulate': 'fully-reversible',
+  'pixels.setColor': 'fully-reversible',
+  'pixels.getColor': 'fully-reversible',
+  'pixels.getData': 'fully-reversible',
+  'detect.path': 'fully-reversible',
+  'detect.region': 'fully-reversible',
+  'detect.anyRegion': 'fully-reversible',
+  'detect.distance': 'fully-reversible',
+} as const satisfies Record<string, Phase7ReverseSyncClassification>;
+
 export type StudioPixelOperation =
   | {
       type: 'manipulate';
