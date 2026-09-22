@@ -28,18 +28,20 @@ function SectionIntro({
   eyebrow,
   title,
   body,
+  id,
 }: {
   index: string;
   eyebrow: string;
   title: string;
   body: string;
+  id?: string;
 }) {
   return (
     <header className="apx-section-intro">
       <div className="apx-section-intro__index">{index}</div>
       <div className="apx-section-intro__main">
         <p className="apx-kicker">{eyebrow}</p>
-        <h2 id={eyebrow.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>{title}</h2>
+        <h2 id={id ?? eyebrow.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>{title}</h2>
       </div>
       <p className="apx-section-intro__body">{body}</p>
     </header>
@@ -267,11 +269,12 @@ export function CapabilitySection({ model }: { model: ProductExperienceModel }) 
 
 export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="apx-section apx-section--workflow" aria-labelledby="the-workflow">
+    <section className="apx-section apx-section--workflow" aria-labelledby="render-workflow">
       <div className="apx-home-shell">
         <SectionIntro
           index="02"
           eyebrow="THE WORKFLOW"
+          id="render-workflow"
           title="From what if. To there it is."
           body="Keep the creative decisions. Automate the repetition. A clear path from your first canvas to a repeatable rendering workflow."
         />
@@ -330,11 +333,12 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
         </div>
       </section>
 
-      <section className="apx-section apx-section--showcase apx-section--peak" aria-labelledby="peak-showcase">
+      <section className="apx-section apx-section--showcase apx-section--peak" aria-labelledby="capability-showcase">
         <div className="apx-home-shell">
           <SectionIntro
             index="03"
             eyebrow="PEAK SHOWCASE"
+            id="capability-showcase"
             title="Made of code. Full of character."
             body="Take a moment. Watch typography, imagery, data, and motion come together in two finished films made with Apexify."
           />
@@ -422,11 +426,12 @@ export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
         </div>
       </section>
 
-      <section className="apx-section apx-section--roadmap" aria-labelledby="current-next">
+      <section className="apx-section apx-section--roadmap" aria-labelledby="engine-roadmap">
         <div className="apx-home-shell">
           <SectionIntro
             index="05"
             eyebrow="CURRENT + NEXT"
+            id="engine-roadmap"
             title="Build today. Look further."
             body="Explore the current package, then see what is planned. Roadmap items are a direction of travel, not a promise of availability."
           />
