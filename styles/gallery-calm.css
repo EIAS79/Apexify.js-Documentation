@@ -42,6 +42,7 @@
   --blue-2:var(--gallery-blue-2);
   --mint:var(--gallery-mint);
   --mint-2:#9dd2ca;
+  --on-accent:#0b0f15;
 
   /* Compatibility bridge for existing inspector internals. */
   --bg-base:var(--gallery-bg);
@@ -110,6 +111,7 @@
   --gallery-shadow:0 20px 58px rgba(40,52,70,.14);
   --bg-overlay:rgba(230,235,240,.78);
   --text-inverse:#fff;
+  --on-accent:#fff;
 }
 
 .apx-gallery-root *,
