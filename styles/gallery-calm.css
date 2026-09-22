@@ -58,6 +58,7 @@
   --text-tertiary:var(--gallery-text-3);
   --text-muted:var(--gallery-text-3);
   --text-inverse:#0b0f15;
+  --on-accent:#0b0f15;
   --accent-iris:var(--gallery-blue);
   --accent-iris-soft:var(--gallery-blue-2);
   --accent-magenta:var(--gallery-blue);
@@ -110,6 +111,7 @@
   --gallery-shadow:0 20px 58px rgba(40,52,70,.14);
   --bg-overlay:rgba(230,235,240,.78);
   --text-inverse:#fff;
+  --on-accent:#fff;
 }
 
 .apx-gallery-root *,
@@ -846,6 +848,10 @@
 .apx-gallery-sidebar .apx-gallery-scope__group button small{
   color:var(--gallery-text-3);
   font:700 .54rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+.apx-gallery-sidebar .apx-gallery-scope__group button[data-active] small{
+  color:inherit;
 }
 
 .apx-gallery-scope__note{
