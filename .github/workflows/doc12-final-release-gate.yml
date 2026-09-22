@@ -87,7 +87,15 @@ jobs:
         run: npm run build
 
       - name: Install ephemeral browser audit tooling
-        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3 lighthouse@12.8.2
+        shell: bash
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3 lighthouse@12.8.2
+          # npm's ignore-scripts reification can replace a Git dependency with its
+          # unprepared source checkout. Restore the exact pinned Apexify.js package
+          # with lifecycle scripts enabled before starting the Studio API server.
+          APEXIFY_PIN="$(node -p "require('./package.json').dependencies['apexify.js']")"
+          npm install --no-save --package-lock=false "$APEXIFY_PIN"
+          test -f node_modules/apexify.js/dist/esm/index.js
 
       - name: Resolve system Chrome
         shell: bash
