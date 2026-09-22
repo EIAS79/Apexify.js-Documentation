@@ -178,9 +178,16 @@ async function verify(width, height) {
 
     await page.click('[data-pixel-filter="invert"]');
     await page.waitForFunction(() => {
-      const content =
-        document.querySelector('[data-visual-live-code] .cm-content')?.textContent || '';
-      return content.includes('.pixels.manipulate(') && content.includes('filter: "invert"');
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return false;
+      try {
+        const saved = JSON.parse(raw);
+        const content = typeof saved?.source === 'string' ? saved.source : '';
+        return content.includes('.pixels.manipulate(') &&
+          content.includes('filter: "invert"');
+      } catch {
+        return false;
+      }
     });
 
     await page.click('[data-pixel-inspector]');
