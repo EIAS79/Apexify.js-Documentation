@@ -17,7 +17,10 @@ import { executeStudioOperationPlan } from '../../../lib/studio/visual/compiler/
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
-import { deleteNodes } from '../../../lib/studio/visual/editor';
+import {
+  deleteNodes,
+  setNodeVisibility,
+} from '../../../lib/studio/visual/editor';
 
 function phase7Project() {
   const project = createVisualProject({
@@ -634,6 +637,116 @@ test('Phase 7 deleting a path prunes dependent path probes', () => {
   assert.equal(validateVisualProject(deleted).ok, true);
 });
 
+test('Phase 7 hiding a probed path prunes the dependent probe', () => {
+  const project = createVisualProject({
+    id: 'phase7_hide_probe',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const props = defaultPathNodeProps('path');
+  const node = createVisualNode('path', pathPropsRecord(props), {
+    id: 'path_hide_target',
+    name: 'Hide target',
+  });
+  project.document.nodes[node.id] = node;
+  project.document.rootNodeIds = [node.id];
+  project.operations.push(
+    operationRecord(
+      'detection-operation',
+      {
+        type: 'detectPath',
+        pathNodeId: node.id,
+        x: 20,
+        y: 20,
+        resultName: 'pathHit',
+      },
+      { id: 'probe_hide_target', name: 'Path hit test' },
+    ),
+  );
+
+  const hidden = setNodeVisibility(project, node.id, false);
+  assert.equal(hidden.document.nodes[node.id].transform?.visible, false);
+  assert.equal(hidden.operations.length, 0);
+  assert.equal(validateVisualProject(hidden).ok, true);
+});
+
+test('Phase 7 rejects externally loaded probes that target hidden paths', () => {
+  const project = createVisualProject({
+    id: 'phase7_hidden_probe_external',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const props = defaultPathNodeProps('path');
+  const node = createVisualNode('path', pathPropsRecord(props), {
+    id: 'path_hidden_external',
+    name: 'Hidden target',
+  });
+  node.transform = { ...node.transform, visible: false };
+  project.document.nodes[node.id] = node;
+  project.document.rootNodeIds = [node.id];
+  project.operations.push(
+    operationRecord(
+      'detection-operation',
+      {
+        type: 'detectPath',
+        pathNodeId: node.id,
+        x: 20,
+        y: 20,
+        resultName: 'pathHit',
+      },
+      { id: 'probe_hidden_external', name: 'Path hit test' },
+    ),
+  );
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(
+    validation.issues.some((issue) => issue.code === 'hidden-phase7-path'),
+  );
+  assert.throws(() => lowerVisualProject(project));
+});
+
+test('Phase 7 reverse sync rejects branched pixel buffer bases', () => {
+  const source = `
+import { ApexPainter } from 'apexify.js';
+
+const painter = new ApexPainter();
+
+async function main() {
+  const canvas = await painter.createCanvas({ width: 320, height: 220 });
+  const path = painter.path2d.create([
+    { type: "moveTo", x: 10, y: 20 },
+    { type: "lineTo", x: 120, y: 90 }
+  ]);
+  const painted = await painter.path2d.draw(canvas.buffer, path, {
+    stroke: { color: "#fff", width: 2 }
+  });
+  const badPixel = await painter.pixels.setColor(
+    canvas.buffer,
+    10,
+    10,
+    { r: 255, g: 0, b: 0, a: 255 }
+  );
+  return badPixel;
+}
+
+return await main();
+`;
+  const project = createVisualProject({
+    id: 'phase7_branched_pixel',
+    width: 320,
+    height: 220,
+    now: '2026-09-22T00:00:00.000Z',
+  });
+  const result = reconcileVisualProjectFromCode(project, source);
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.match(result.error, /canonical linear buffer base/i);
+  }
+});
+
 test('Phase 7 rejects dangling path probes even when loaded externally', () => {
   const project = createVisualProject({
     id: 'phase7_dangling_probe',
@@ -749,8 +862,8 @@ return await main();
       record.value?.type === 'detectPath',
   );
   assert.ok(probe);
-  assert.ok(Math.abs(Number(probe?.value?.x) - 60) < 1e-9);
-  assert.ok(Math.abs(Number(probe?.value?.y) - 100) < 1e-9);
+  assert.ok(Math.abs(Number(probe?.value?.x) - 85) < 1e-9);
+  assert.ok(Math.abs(Number(probe?.value?.y) - 115) < 1e-9);
 
   const plan = lowerVisualProject(result.project);
   const lowered = plan.operations.find((operation) => operation.kind === 'detect-path');
