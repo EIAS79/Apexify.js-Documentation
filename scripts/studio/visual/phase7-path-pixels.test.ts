@@ -88,7 +88,7 @@ function phase7Project() {
     y: 90,
     width: 242,
     height: 110,
-    rotation: 0,
+    rotation: 30,
     opacity: 1,
     visible: true,
     locked: false,
@@ -232,6 +232,34 @@ test('Phase 7 validates and lowers paths pixels and detection in semantic order'
   assert.equal(primary.options?.transform?.scaleY, 1.1);
   assert.equal(primary.options?.fill?.rule, 'evenodd');
   assert.equal(primary.options?.stroke?.style, 'dashed');
+
+  const connector = plan.operations[2];
+  assert.equal(connector.kind, 'path-custom');
+  if (connector.kind === 'path-custom') {
+    const options = Array.isArray(connector.options)
+      ? connector.options[0]
+      : connector.options;
+    assert.notEqual(options.startCoordinates.x, 430);
+    assert.notEqual(options.startCoordinates.y, 112);
+    assert.ok(Math.abs(options.startCoordinates.x - 462.71) < 0.02);
+    assert.ok(Math.abs(options.startCoordinates.y - 55.92) < 0.02);
+  }
+
+  const detection = plan.operations.find(
+    (operation) => operation.kind === 'detect-path',
+  );
+  assert.ok(detection && detection.kind === 'detect-path');
+  if (detection?.kind === 'detect-path') {
+    const radians = (12 * Math.PI) / 180;
+    const dx = 120 - 70;
+    const dy = 110 - 80;
+    const expectedX = (dx * Math.cos(-radians) - dy * Math.sin(-radians)) / 1.2;
+    const expectedY = (dx * Math.sin(-radians) + dy * Math.cos(-radians)) / 1.1;
+    assert.ok(Math.abs(detection.x - expectedX) < 1e-9);
+    assert.ok(Math.abs(detection.y - expectedY) < 1e-9);
+    assert.notEqual(detection.x, 120);
+    assert.notEqual(detection.y, 110);
+  }
 });
 
 test('Phase 7 emits canonical user-facing facet code', () => {
@@ -372,6 +400,37 @@ test('Phase 7 executor routes canonical operations through one runtime plan', as
     'detect.anyRegion',
     'detect.distance',
   ]);
+});
+
+test('Phase 7 rejects malformed imported operation payloads before lowering', () => {
+  const project = createVisualProject({ width: 320, height: 200 });
+  project.operations.push({
+    id: 'bad_pixel',
+    kind: 'pixel-operation',
+    value: {
+      type: 'setColor',
+      x: 2.5,
+      y: -1,
+      color: { r: 400, g: 0, b: 0 },
+    },
+  });
+  project.operations.push({
+    id: 'bad_detect',
+    kind: 'detection-operation',
+    value: {
+      type: 'detectDistance',
+      region: { type: 'path', path: [{ type: 'moveTo', x: 0, y: 0 }] },
+      x: Number.NaN,
+      y: 10,
+    },
+  });
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(
+    validation.issues.filter((issue) => issue.code === 'phase7-operation').length >= 4,
+  );
+  assert.throws(() => lowerVisualProject(project));
 });
 
 test('Phase 7 permanent shell exposes authoring, pixel tools and structured results', () => {
