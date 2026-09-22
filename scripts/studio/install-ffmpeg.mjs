@@ -48,6 +48,7 @@ const target = arch() === 'arm64' ? 'arm64' : 'amd64';
 const archiveName = `ffmpeg-${release}-${target}-static.tar.xz`;
 const url = `https://johnvansickle.com/ffmpeg/old-releases/${archiveName}`;
 const archive = join(vendor, archiveName);
+const decompressedArchive = archive.replace(/\.xz$/, '');
 const extractDir = join(vendor, 'extract');
 
 mkdirSync(vendor, { recursive: true });
@@ -95,6 +96,26 @@ function download(source, destination, redirects = 0) {
   });
 }
 
+function extractArchive() {
+  const direct = spawnSync('tar', ['-xJf', archive, '-C', extractDir], { stdio: 'inherit' });
+  if (direct.status === 0) return;
+
+  // Some CI images ship tar without built-in XZ support. Fall back to the
+  // standalone xz utility, then extract the plain tar archive.
+  rmSync(decompressedArchive, { force: true });
+  const xz = spawnSync('xz', ['-dkf', archive], { stdio: 'inherit' });
+  if (xz.status !== 0 || !existsSync(decompressedArchive)) {
+    throw new Error(
+      'Could not decompress the FFmpeg archive. The build image must provide tar -J support or the xz utility.',
+    );
+  }
+
+  const fallback = spawnSync('tar', ['-xf', decompressedArchive, '-C', extractDir], { stdio: 'inherit' });
+  if (fallback.status !== 0) {
+    throw new Error('Could not extract the decompressed FFmpeg tar archive.');
+  }
+}
+
 async function compressBinary(source, destination) {
   await pipeline(
     createReadStream(source),
@@ -107,10 +128,7 @@ console.log(`[studio] installing pinned FFmpeg ${release} (${target}) for Studio
 
 try {
   await download(url, archive);
-  const extracted = spawnSync('tar', ['-xJf', archive, '-C', extractDir], { stdio: 'inherit' });
-  if (extracted.status !== 0) {
-    throw new Error('Could not extract the FFmpeg archive. The build image must provide tar with xz support.');
-  }
+  extractArchive();
 
   const folder = readdirSync(extractDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -132,10 +150,12 @@ try {
   await compressBinary(join(folder, 'ffprobe'), ffprobeGzip);
 
   rmSync(archive, { force: true });
+  rmSync(decompressedArchive, { force: true });
   rmSync(extractDir, { recursive: true, force: true });
   console.log('[studio] installed compressed Studio FFmpeg:', ffmpegGzip);
 } catch (error) {
   rmSync(archive, { force: true });
+  rmSync(decompressedArchive, { force: true });
   rmSync(extractDir, { recursive: true, force: true });
   rmSync(ffmpeg, { force: true });
   rmSync(ffprobe, { force: true });
