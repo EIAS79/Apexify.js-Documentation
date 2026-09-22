@@ -117,6 +117,47 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       continue;
     }
 
+    if (operation.kind === 'create-chart') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'chart',
+      );
+      const chartType = operation.family === 'donut' ? 'pie' : operation.family;
+      const options =
+        operation.family === 'donut'
+          ? { ...operation.options, type: 'donut' }
+          : operation.options;
+      body.push(
+        `  const ${targetName} = await ${painterName}.createChart(${emitString(chartType)}, ${emitValue(operation.data, 2, targetNames)}, ${emitValue(options, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'create-comparison-chart') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'comparisonChart',
+      );
+      body.push(
+        `  const ${targetName} = await ${painterName}.createComparisonChart(${emitValue(operation.options, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'create-combo-chart') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'comboChart',
+      );
+      body.push(
+        `  const ${targetName} = await ${painterName}.createComboChart(${emitValue(operation.options, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
     if (operation.kind === 'path-draw') {
       const resourceName = names.allocate(
         (operation.preferredName || 'path') + 'Path',
