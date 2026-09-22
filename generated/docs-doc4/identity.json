@@ -8,7 +8,7 @@
     "packageJson": "node_modules/apexify.js/package.json"
   },
   "package": {
-    "commit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+    "commit": "f57bb82743c8f71bbe7e519d060010f970b06ef9",
     "name": "apexify.js",
     "packedTreeSha256": "4fce732ffaa3caf1f1b828eb9c16cf8af46e60a5fd371173206c6efc88d1ce7c",
     "version": "6.0.0"

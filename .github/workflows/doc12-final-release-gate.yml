@@ -27,12 +27,12 @@ jobs:
     timeout-minutes: 180
     steps:
       - name: Checkout documentation candidate
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Use Node 24
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
@@ -44,7 +44,7 @@ jobs:
         run: npm ci
 
       - name: Checkout exact Apexify.js candidate
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: EIAS79/Apexify.js
           ref: ${{ inputs.package_ref || 'main' }}
@@ -216,7 +216,7 @@ jobs:
 
       - name: Archive final DOC-12 evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docs-doc12-final-release-evidence
           path: |
