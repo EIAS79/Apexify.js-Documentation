@@ -136,11 +136,11 @@ try {
     const gallery = await auditRoute(galleryPage, '/gallery', state, 'gallery');
     if (!(await galleryPage.$('a[href="#gallery-main"]'))) throw new Error(`${state.name} Gallery skip link missing`);
     if (!(await galleryPage.$('#gallery-main'))) throw new Error(`${state.name} Gallery main landmark target missing`);
-    if (!(await galleryPage.$('section[aria-label="Gallery provenance and runtime filters"]'))) throw new Error(`${state.name} Gallery provenance controls missing`);
+    if (!(await galleryPage.$('section[aria-label="Gallery source trust and runtime"]'))) throw new Error(`${state.name} Gallery provenance controls missing`);
     if (!(await galleryPage.$('button[aria-label="Open search"]'))) throw new Error(`${state.name} Gallery search trigger missing`);
     const galleryText = await galleryPage.evaluate(() => document.body.textContent || '');
     if (galleryText.includes('v5.4.5')) throw new Error(`${state.name} stale Gallery version copy`);
-    if (!galleryText.includes('Verified examples') || !galleryText.includes('Legacy gallery')) throw new Error(`${state.name} Gallery provenance explanation missing`);
+    if (!galleryText.includes('Verified examples') || !galleryText.includes('Curated')) throw new Error(`${state.name} Gallery source-trust explanation missing`);
     await galleryPage.screenshot({ path: path.join(screenshots, `${state.name}-gallery.png`), fullPage: true });
     await galleryPage.close();
 
@@ -149,7 +149,7 @@ try {
 
   const keyboard = await makePage({ name: 'keyboard', width: 1200, height: 900, theme: 'light' });
   await keyboard.goto(`${base}/gallery`, { waitUntil: 'networkidle2' });
-  const scopeButtons = await keyboard.$$('section[aria-label="Gallery provenance and runtime filters"] button');
+  const scopeButtons = await keyboard.$$('section[aria-label="Gallery source trust and runtime"] button');
   let verified = null;
   let node = null;
   for (const button of scopeButtons) {
@@ -163,7 +163,7 @@ try {
   await verified.focus();
   await keyboard.keyboard.press('Enter');
   await keyboard.waitForFunction(() => {
-    const controls = [...document.querySelectorAll('section[aria-label="Gallery provenance and runtime filters"] button')];
+    const controls = [...document.querySelectorAll('section[aria-label="Gallery source trust and runtime"] button')];
     return controls.some((button) => button.textContent?.trim().startsWith('Verified') && button.getAttribute('aria-pressed') === 'true') &&
       controls.some((button) => button.textContent?.trim() === 'Node' && button.getAttribute('aria-pressed') === 'true');
   });
