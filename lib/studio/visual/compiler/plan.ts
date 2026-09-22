@@ -360,18 +360,61 @@ function translatedConnector(
   const scaleY = ((transform.height ?? props.viewport.height) * (transform.scaleY ?? 1)) / Math.max(1, props.viewport.height);
   const tx = transform.x ?? 0;
   const ty = transform.y ?? 0;
+  const rotation = ((transform.rotation ?? 0) * Math.PI) / 180;
+  const centerX = tx + (props.viewport.width * scaleX) / 2;
+  const centerY = ty + (props.viewport.height * scaleY) / 2;
+  const rotate = (point: { x: number; y: number }) => {
+    const x = tx + point.x * scaleX;
+    const y = ty + point.y * scaleY;
+    if (!rotation) return { x, y };
+    const dx = x - centerX;
+    const dy = y - centerY;
+    return {
+      x: centerX + dx * Math.cos(rotation) - dy * Math.sin(rotation),
+      y: centerY + dx * Math.sin(rotation) + dy * Math.cos(rotation),
+    };
+  };
   const convert = (item: StudioConnectorOptions): StudioConnectorOptions => ({
     ...item,
-    startCoordinates: {
-      x: tx + item.startCoordinates.x * scaleX,
-      y: ty + item.startCoordinates.y * scaleY,
-    },
-    endCoordinates: {
-      x: tx + item.endCoordinates.x * scaleX,
-      y: ty + item.endCoordinates.y * scaleY,
-    },
+    startCoordinates: rotate(item.startCoordinates),
+    endCoordinates: rotate(item.endCoordinates),
   });
   return Array.isArray(value) ? value.map(convert) : convert(value);
+}
+
+function pathDetectionPoint(
+  node: VisualNode,
+  point: { x: number; y: number },
+): { x: number; y: number } {
+  const options = pathOperationOptions(node);
+  const transform = options.transform ?? {};
+  const scaleX = transform.scaleX ?? 1;
+  const scaleY = transform.scaleY ?? 1;
+  const rotation = ((transform.rotate ?? 0) * Math.PI) / 180;
+
+  if (transform.originX !== undefined && transform.originY !== undefined) {
+    const dx = point.x - transform.originX;
+    const dy = point.y - transform.originY;
+    const cos = Math.cos(-rotation);
+    const sin = Math.sin(-rotation);
+    const rotatedX = dx * cos - dy * sin;
+    const rotatedY = dx * sin + dy * cos;
+    return {
+      x: transform.originX + rotatedX / (scaleX || 1),
+      y: transform.originY + rotatedY / (scaleY || 1),
+    };
+  }
+
+  const translatedX = point.x - (transform.translateX ?? 0);
+  const translatedY = point.y - (transform.translateY ?? 0);
+  const cos = Math.cos(-rotation);
+  const sin = Math.sin(-rotation);
+  const rotatedX = translatedX * cos - translatedY * sin;
+  const rotatedY = translatedX * sin + translatedY * cos;
+  return {
+    x: rotatedX / (scaleX || 1),
+    y: rotatedY / (scaleY || 1),
+  };
 }
 
 export function lowerVisualProject(project: VisualProject): StudioOperationPlan {
@@ -527,6 +570,10 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
       }
       const path = visualPathProps(node);
       if (!path.commands) throw new Error('Detection requires Path2D commands; custom connectors are not path regions.');
+      const localPoint = pathDetectionPoint(node, {
+        x: inspection.x,
+        y: inspection.y,
+      });
       operations.push({
         id: 'inspect_' + record.id,
         kind: 'detect-path',
@@ -535,8 +582,8 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         preferredName,
         base,
         commands: path.commands,
-        x: inspection.x,
-        y: inspection.y,
+        x: localPoint.x,
+        y: localPoint.y,
         options: {
           ...(inspection.includeStroke !== undefined ? { includeStroke: inspection.includeStroke } : {}),
           ...(inspection.strokeWidth !== undefined ? { strokeWidth: inspection.strokeWidth } : {}),
