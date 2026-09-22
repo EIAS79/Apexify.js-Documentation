@@ -1,10 +1,14 @@
 import {
+  closeSync,
   createReadStream,
   createWriteStream,
   existsSync,
   mkdirSync,
+  openSync,
+  readSync,
   readdirSync,
   rmSync,
+  statSync,
 } from 'node:fs';
 import { get } from 'node:https';
 import { arch, platform } from 'node:os';
@@ -28,6 +32,43 @@ if (
   (existsSync(ffmpeg) && existsSync(ffprobe))
 ) process.exit(0);
 
+function systemFfmpegPair() {
+  const candidates = [
+    ['/usr/bin/ffmpeg', '/usr/bin/ffprobe'],
+    ['/usr/local/bin/ffmpeg', '/usr/local/bin/ffprobe'],
+    ['/opt/homebrew/bin/ffmpeg', '/opt/homebrew/bin/ffprobe'],
+  ];
+
+  for (const [ffmpegPath, ffprobePath] of candidates) {
+    if (existsSync(ffmpegPath) && existsSync(ffprobePath)) {
+      return { ffmpeg: ffmpegPath, ffprobe: ffprobePath };
+    }
+  }
+
+  return null;
+}
+
+const systemPair = systemFfmpegPair();
+if (systemPair) {
+  console.log(`[studio] using system FFmpeg for Studio video: ${systemPair.ffmpeg}`);
+  process.exit(0);
+}
+
+// Documentation CI does not need to vendor a ~40 MB media runtime during every
+// deterministic npm install. A dedicated Studio video workflow exercises the
+// media path. Production/Vercel builds still vendor the pinned runtime when a
+// system FFmpeg pair is unavailable.
+if (
+  process.env.CI === 'true' &&
+  process.env.VERCEL !== '1' &&
+  process.env.STUDIO_FFMPEG_FORCE_BUNDLE !== '1'
+) {
+  console.log(
+    '[studio] skipping optional bundled FFmpeg in non-Vercel CI; set STUDIO_FFMPEG_FORCE_BUNDLE=1 to test bundling.',
+  );
+  process.exit(0);
+}
+
 if (platform() !== 'linux' || !['x64', 'arm64'].includes(arch())) {
   console.log('[studio] bundled FFmpeg is installed only for Linux x64/arm64 builds; system FFmpeg may still be used locally.');
   process.exit(0);
@@ -39,6 +80,7 @@ const archiveName = `ffmpeg-${release}-${target}-static.tar.xz`;
 const url = `https://johnvansickle.com/ffmpeg/old-releases/${archiveName}`;
 const archive = join(vendor, archiveName);
 const extractDir = join(vendor, 'extract');
+const tarArchive = archive.replace(/\.xz$/, '');
 
 mkdirSync(vendor, { recursive: true });
 rmSync(extractDir, { recursive: true, force: true });
@@ -85,6 +127,49 @@ function download(source, destination, redirects = 0) {
   });
 }
 
+function assertXzArchive(file) {
+  const expectedMagic = [0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00];
+  if (!existsSync(file) || statSync(file).size < 1024 * 1024) {
+    throw new Error('Downloaded FFmpeg archive is missing or unexpectedly small.');
+  }
+
+  const fd = openSync(file, 'r');
+  const header = Buffer.alloc(expectedMagic.length);
+  try {
+    const bytesRead = readSync(fd, header, 0, header.length, 0);
+    if (
+      bytesRead !== expectedMagic.length ||
+      expectedMagic.some((byte, index) => header[index] !== byte)
+    ) {
+      throw new Error(
+        'Downloaded FFmpeg payload is not an XZ archive. The upstream mirror likely returned an HTML/error response.',
+      );
+    }
+  } finally {
+    closeSync(fd);
+  }
+}
+
+function extractArchive() {
+  const direct = spawnSync('tar', ['-xJf', archive, '-C', extractDir], { stdio: 'inherit' });
+  if (direct.status === 0) return;
+
+  // Some minimal build images ship tar without built-in XZ support. Fall back
+  // to the standalone xz utility without using a shell pipeline.
+  rmSync(tarArchive, { force: true });
+  const decompressed = spawnSync('xz', ['-dkf', archive], { stdio: 'inherit' });
+  if (decompressed.status !== 0 || !existsSync(tarArchive)) {
+    throw new Error(
+      'Could not decompress the FFmpeg archive. The build image must provide either tar -J support or the xz utility.',
+    );
+  }
+
+  const extracted = spawnSync('tar', ['-xf', tarArchive, '-C', extractDir], { stdio: 'inherit' });
+  if (extracted.status !== 0) {
+    throw new Error('Could not extract the decompressed FFmpeg tar archive.');
+  }
+}
+
 async function compressBinary(source, destination) {
   await pipeline(
     createReadStream(source),
@@ -97,10 +182,8 @@ console.log(`[studio] installing pinned FFmpeg ${release} (${target}) for Studio
 
 try {
   await download(url, archive);
-  const extracted = spawnSync('tar', ['-xJf', archive, '-C', extractDir], { stdio: 'inherit' });
-  if (extracted.status !== 0) {
-    throw new Error('Could not extract the FFmpeg archive. The build image must provide tar with xz support.');
-  }
+  assertXzArchive(archive);
+  extractArchive();
 
   const folder = readdirSync(extractDir, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -122,10 +205,12 @@ try {
   await compressBinary(join(folder, 'ffprobe'), ffprobeGzip);
 
   rmSync(archive, { force: true });
+  rmSync(tarArchive, { force: true });
   rmSync(extractDir, { recursive: true, force: true });
   console.log('[studio] installed compressed Studio FFmpeg:', ffmpegGzip);
 } catch (error) {
   rmSync(archive, { force: true });
+  rmSync(tarArchive, { force: true });
   rmSync(extractDir, { recursive: true, force: true });
   rmSync(ffmpeg, { force: true });
   rmSync(ffprobe, { force: true });
