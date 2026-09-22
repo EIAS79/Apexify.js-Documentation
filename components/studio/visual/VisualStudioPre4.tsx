@@ -1148,8 +1148,8 @@ export default function VisualStudioPre4({
           ? next.operations[index].id
           : createVisualId('operation');
       const record = operationRecord('detection-operation', value, { id, name });
-      if (index >= 0) next.operations[index] = record;
-      else next.operations.push(record);
+      if (index >= 0) next.operations.splice(index, 1);
+      next.operations.push(record);
       next.updatedAt = new Date().toISOString();
       return next;
     });
