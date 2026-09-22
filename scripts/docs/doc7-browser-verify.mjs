@@ -113,11 +113,11 @@ try {
     if (!(await homePage.$('[data-doc7-verified-hero="node.chart.bar"]'))) throw new Error(`${state.name} verified homepage hero missing`);
     if (!(await homePage.$('[data-product-status="CURRENT"]'))) throw new Error(`${state.name} CURRENT status missing`);
     if (!(await homePage.$('[data-product-status="ROADMAP"]'))) throw new Error(`${state.name} ROADMAP status missing`);
-    const curatedCapabilityLinks = (await homePage.$('[aria-labelledby="what-you-can-build"] a[href^="/api-reference/"]')).length;
+    const curatedCapabilityLinks = (await homePage.$$('[aria-labelledby="what-you-can-build"] a[href^="/api-reference/"]')).length;
     if (curatedCapabilityLinks !== 4) throw new Error(`${state.name} curated capability API links ${curatedCapabilityLinks}, expected 4`);
-    const completeCapabilityLinks = (await homePage.$('.apx-roadmap-grid__current a[href^="/api-reference/"]')).length;
+    const completeCapabilityLinks = (await homePage.$$('.apx-roadmap-grid__current a[href^="/api-reference/"]')).length;
     if (completeCapabilityLinks !== 9) throw new Error(`${state.name} complete current capability links ${completeCapabilityLinks}, expected 9`);
-    const workflowApiLinks = (await homePage.$('[aria-labelledby="render-workflow"] a[href^="/api-reference/"]')).length;
+    const workflowApiLinks = (await homePage.$$('[aria-labelledby="render-workflow"] a[href^="/api-reference/"]')).length;
     if (workflowApiLinks < 7) throw new Error(`${state.name} workflow API links incomplete: ${workflowApiLinks}`);
     if (!(await homePage.$('[data-doc7-verified-hero] a[href^="/examples/"]'))) throw new Error(`${state.name} verified example canonical link missing`);
     const copyButton = await homePage.$('button[aria-label="Copy Apexify.js install command"]');
