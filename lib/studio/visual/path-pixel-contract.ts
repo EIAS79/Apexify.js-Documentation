@@ -257,7 +257,22 @@ export function validatePhase7Node(node: VisualNode, issues: VisualProjectIssue[
   if (!['line','polyline','bezier','path','freehand','connector'].includes(props.tool)) fail('document.nodes.'+node.id+'.props.tool','Unsupported path tool.');
   if (!finite(props.viewport?.width) || props.viewport.width <= 0 || !finite(props.viewport?.height) || props.viewport.height <= 0) fail('document.nodes.'+node.id+'.props.viewport','Path viewport must be positive.');
   if (props.tool === 'connector') {
-    if (!props.connector) fail('document.nodes.'+node.id+'.props.connector','Connector options are required.');
+    const connectorItems = Array.isArray(props.connector)
+      ? props.connector
+      : props.connector
+        ? [props.connector]
+        : [];
+    const validConnectorItem = (item: unknown) => {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) return false;
+      const value = item as Record<string, unknown>;
+      return validPoint(value.startCoordinates) && validPoint(value.endCoordinates);
+    };
+    if (!connectorItems.length || !connectorItems.every(validConnectorItem)) {
+      fail(
+        'document.nodes.'+node.id+'.props.connector',
+        'Connector options require finite startCoordinates and endCoordinates.',
+      );
+    }
   } else if (!Array.isArray(props.commands) || props.commands.length < 1) {
     fail('document.nodes.'+node.id+'.props.commands','Path commands must contain at least one command.');
   } else if (!props.commands.every(validPathCommand)) {
