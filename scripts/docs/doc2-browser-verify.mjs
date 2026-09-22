@@ -231,7 +231,7 @@ try {
     if (state.skipLinks !== 1) failures.push(`${state.name}: expected exactly one skip link, got ${state.skipLinks}`);
     if (!state.mainPresent) failures.push(`${state.name}: docs main landmark missing`);
     if (state.customCursorActive) failures.push(`${state.name}: custom cursor active on docs`);
-    if (state.shellSmallTargets.length) failures.push(`${state.name}: ${state.shellSmallTargets.length} shell targets below 44px`);
+    if (state.shellSmallTargets.length) failures.push(`${state.name}: ${state.shellSmallTargets.length} shell targets below 44px ${JSON.stringify(state.shellSmallTargets)}`);
     if (state.duplicateIds.length) failures.push(`${state.name}: duplicate IDs ${JSON.stringify(state.duplicateIds)}`);
     const severe = seriousOrCritical(state.axe);
     if (severe.length) failures.push(`${state.name}: serious/critical axe ${JSON.stringify(severe)}`);
