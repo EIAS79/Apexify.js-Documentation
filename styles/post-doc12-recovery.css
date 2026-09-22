@@ -44,3 +44,17 @@
 
 @media(max-width:47.99rem){.apx-sidebar-node__row{grid-template-columns:2.75rem minmax(0,1fr)}.apx-sidebar-disclosure,.apx-sidebar-disclosure-spacer{width:2.75rem;height:2.75rem}.apx-sidebar-link{min-height:2.75rem}.apx-sidebar-tag{font-size:.54rem}.apx-doc-hero{margin-bottom:var(--apx-space-6);padding-bottom:var(--apx-space-5)}.apx-doc-table :where(th,td){min-width:6.25rem;padding:.46rem .55rem;font-size:.79rem}.apx-doc-table :where(th,td):first-child{min-width:7.5rem}}
 @media(prefers-reduced-motion:reduce){.apx-sidebar-group__chevron,.apx-sidebar-disclosure>span{transition:none}}
+
+/* Preserve the DOC-2 shell target-size invariant after POST-DOC-12 overrides.
+ * Every interactive control measured by the DOC-2 browser contract must keep
+ * at least a 44px hit target in both axes across desktop and responsive shells. */
+.apx-doc-header :where(a, button, input),
+.apx-doc-mobile-bar :where(button),
+.apx-doc-sidebar :where(a, button, input, summary),
+.apx-doc-toc-rail :where(a),
+.apx-breadcrumbs :where(a),
+.apx-pager :where(a) {
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+}
+
