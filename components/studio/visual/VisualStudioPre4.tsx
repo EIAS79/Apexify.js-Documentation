@@ -262,8 +262,8 @@ function pathLocalToDocumentPoint(
     const dx = (point.x - transform.originX) * transform.scaleX;
     const dy = (point.y - transform.originY) * transform.scaleY;
     return {
-      x: transform.originX + dx * cos - dy * sin,
-      y: transform.originY + dx * sin + dy * cos,
+      x: transform.translateX + transform.originX + dx * cos - dy * sin,
+      y: transform.translateY + transform.originY + dx * sin + dy * cos,
     };
   }
 
@@ -288,8 +288,8 @@ function pathDocumentToLocalPoint(
   const scaleY = transform.scaleY || 1;
 
   if (transform.originX !== undefined && transform.originY !== undefined) {
-    const dx = point.x - transform.originX;
-    const dy = point.y - transform.originY;
+    const dx = point.x - transform.translateX - transform.originX;
+    const dy = point.y - transform.translateY - transform.originY;
     return {
       x: transform.originX + (dx * cos - dy * sin) / scaleX,
       y: transform.originY + (dx * sin + dy * cos) / scaleY,
