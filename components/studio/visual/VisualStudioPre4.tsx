@@ -5448,6 +5448,7 @@ export default function VisualStudioPre4({
                   <button
                     key={id}
                     type="button"
+                    data-dock-tab={id}
                     data-active={dockTab === id ? 'true' : undefined}
                     onClick={() => {
                       setDockTab(id);
