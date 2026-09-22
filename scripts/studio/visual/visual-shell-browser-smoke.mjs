@@ -130,6 +130,52 @@ async function verify(width, height) {
     });
     await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
 
+    // Direct path editing must be a real canvas gesture, not an inspector-only
+    // escape hatch. Drag a cubic control point and prove canonical code changes.
+    await page.click('[data-path-insert="bezier"]');
+    await page.waitForSelector('[data-path-control-handle="1:cp1"]', { visible: true });
+    const beforeBezierHandleSource = await page.evaluate(() => {
+      const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+      if (!raw) return '';
+      try {
+        const saved = JSON.parse(raw);
+        return typeof saved?.source === 'string' ? saved.source : '';
+      } catch {
+        return '';
+      }
+    });
+    const bezierControl = await page.$('[data-path-control-handle="1:cp1"]');
+    if (!bezierControl) throw new Error('Phase 7 bezier control handle missing');
+    const bezierControlBox = await bezierControl.boundingBox();
+    if (!bezierControlBox) throw new Error('Phase 7 bezier control handle bounds unavailable');
+    const controlX = bezierControlBox.x + bezierControlBox.width / 2;
+    const controlY = bezierControlBox.y + bezierControlBox.height / 2;
+    await page.mouse.move(controlX, controlY);
+    await page.mouse.down();
+    await page.mouse.move(controlX + 28, controlY - 18, { steps: 4 });
+    await page.mouse.up();
+    await page.waitForFunction(
+      (previousSource) => {
+        const raw = window.localStorage.getItem('apexify-visual-live-code-v1');
+        if (!raw) return false;
+        try {
+          const saved = JSON.parse(raw);
+          const source = typeof saved?.source === 'string' ? saved.source : '';
+          return Boolean(
+            source &&
+            source !== previousSource &&
+            source.includes('bezierCurveTo') &&
+            source.includes('.path2d.draw('),
+          );
+        } catch {
+          return false;
+        }
+      },
+      {},
+      beforeBezierHandleSource,
+    );
+    await page.waitForSelector('[data-authoritative-apexify-frame]', { visible: true });
+
     await page.click('[data-pixel-filter="invert"]');
     await page.waitForFunction(() => {
       const content =
