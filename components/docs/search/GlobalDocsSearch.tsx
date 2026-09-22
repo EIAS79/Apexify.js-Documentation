@@ -216,8 +216,8 @@ export function GlobalDocsSearch({
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={onInputKeyDown}
           placeholder="Search symbols, options, concepts, goals…"
-          className="min-h-11 min-w-0 flex-1 bg-transparent text-sm outline-none"
-          style={{ color: "var(--text-primary)" }}
+          className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+          style={{ color: "var(--text-primary)", minHeight: 44 }}
           role="combobox"
           aria-label={ariaLabel}
           aria-autocomplete="list"
