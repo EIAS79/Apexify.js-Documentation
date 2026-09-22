@@ -47,9 +47,15 @@ async function measure(baseUrl, route) {
   if (route === '/gallery') {
     interactionResponseMs = await page.evaluate(async () => {
       const button = document.querySelector('button[aria-label="Open search"]');
-      if (!(button instanceof HTMLButtonElement)) return null;
+      const input = document.querySelector('input[aria-label="Search Gallery"]');
       const start = performance.now();
-      button.click();
+      if (button instanceof HTMLButtonElement) {
+        button.click();
+      } else if (input instanceof HTMLInputElement) {
+        input.focus();
+      } else {
+        return null;
+      }
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       return performance.now() - start;
     });
@@ -94,7 +100,7 @@ try {
   const evidence = {
     schemaVersion: 1,
     phase: 'DOC-7',
-    methodology: 'Same-runner production servers with cache disabled. LCP/CLS use Chromium PerformanceObserver; transfer/request values use Resource Timing. interactionResponseMs is a two-animation-frame Gallery search-open lab proxy, not INP. loadBlockingMs is long-task blocking above 50 ms, not field TBT/INP.',
+    methodology: 'Same-runner production servers with cache disabled. LCP/CLS use Chromium PerformanceObserver; transfer/request values use Resource Timing. interactionResponseMs is a two-animation-frame Gallery search-activation lab proxy (legacy dialog button or current inline input), not INP. loadBlockingMs is long-task blocking above 50 ms, not field TBT/INP.',
     baselineBuild,
     currentBuild,
     baseline,
