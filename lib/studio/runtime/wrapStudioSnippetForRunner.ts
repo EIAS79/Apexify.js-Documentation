@@ -608,7 +608,12 @@ ${inner}
 
   __studioWrite(__manifestPath, JSON.stringify({ schemaVersion: 1, artifacts: __entries }, null, 2));
 })().catch((err: unknown) => {
-  const msg = err instanceof Error ? err.stack || err.message : String(err);
+  const base = err instanceof Error ? err.stack || err.message : String(err);
+  const stderr =
+    err && typeof err === 'object' && 'stderr' in err && typeof (err as { stderr?: unknown }).stderr === 'string'
+      ? (err as { stderr: string }).stderr.trim()
+      : '';
+  const msg = stderr ? base + '\n\nMedia stderr:\n' + stderr : base;
   try {
     if (process.env.GALLERY_ERR) __studioWrite(process.env.GALLERY_ERR, msg);
   } catch {}
