@@ -258,8 +258,10 @@ export function validatePhase7Node(node: VisualNode, issues: VisualProjectIssue[
   if (!finite(props.viewport?.width) || props.viewport.width <= 0 || !finite(props.viewport?.height) || props.viewport.height <= 0) fail('document.nodes.'+node.id+'.props.viewport','Path viewport must be positive.');
   if (props.tool === 'connector') {
     if (!props.connector) fail('document.nodes.'+node.id+'.props.connector','Connector options are required.');
-  } else if (!Array.isArray(props.commands) || props.commands.length < 2) {
-    fail('document.nodes.'+node.id+'.props.commands','Path commands must contain at least two commands.');
+  } else if (!Array.isArray(props.commands) || props.commands.length < 1) {
+    fail('document.nodes.'+node.id+'.props.commands','Path commands must contain at least one command.');
+  } else if (!props.commands.every(validPathCommand)) {
+    fail('document.nodes.'+node.id+'.props.commands','Path commands contain an unsupported or malformed command.');
   }
   if (props.draw?.stroke?.width !== undefined && (!finite(props.draw.stroke.width) || props.draw.stroke.width < 0)) fail('document.nodes.'+node.id+'.props.draw.stroke.width','Stroke width must be non-negative.');
   if (props.draw?.fill?.rule && !['nonzero','evenodd'].includes(props.draw.fill.rule)) fail('document.nodes.'+node.id+'.props.draw.fill.rule','Fill rule must be nonzero or evenodd.');
@@ -287,6 +289,19 @@ function validPixelRegion(value: unknown): value is { x?: number; y?: number; wi
     (region.y === undefined || (finite(region.y) && Number.isInteger(region.y) && region.y >= 0)) &&
     (region.width === undefined || (finite(region.width) && Number.isInteger(region.width) && region.width >= 1)) &&
     (region.height === undefined || (finite(region.height) && Number.isInteger(region.height) && region.height >= 1))
+  );
+}
+
+function validCompletePixelRegion(value: unknown): boolean {
+  return Boolean(
+    validPixelRegion(value) &&
+    value &&
+    typeof value === 'object' &&
+    !Array.isArray(value) &&
+    finite((value as { x?: unknown }).x) &&
+    finite((value as { y?: unknown }).y) &&
+    finite((value as { width?: unknown }).width) &&
+    finite((value as { height?: unknown }).height),
   );
 }
 
@@ -411,8 +426,8 @@ export function validatePhase7Operation(record: VisualProjectRecord, issues: Vis
       if (value.intensity !== undefined && (!finite(value.intensity) || value.intensity < 0 || value.intensity > 1)) {
         phase7Issue(issues, record, 'intensity', 'Pixel manipulation intensity must be between 0 and 1.');
       }
-      if (value.region !== undefined && !validPixelRegion(value.region)) {
-        phase7Issue(issues, record, 'region', 'Pixel manipulation region is invalid.');
+      if (value.region !== undefined && !validCompletePixelRegion(value.region)) {
+        phase7Issue(issues, record, 'region', 'Pixel manipulation region must include valid x, y, width and height.');
       }
       return;
     }
