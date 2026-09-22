@@ -8,6 +8,7 @@ import {
 import type { ProductExperienceModel, ResolvedCapability } from '@/lib/product/catalog';
 import type { ProductStatus } from '@/lib/product/catalog-data';
 import CopyInstallButton from './CopyInstallButton';
+import GenerativeAtelier from './GenerativeAtelier';
 
 function getCapability(model: ProductExperienceModel, id: string): ResolvedCapability {
   return model.capabilities.find((item) => item.id === id) ?? model.capabilities[0];
@@ -38,30 +39,10 @@ function SectionIntro({
       <div className="apx-section-intro__index">{index}</div>
       <div className="apx-section-intro__main">
         <p className="apx-kicker">{eyebrow}</p>
-        <h2>{title}</h2>
+        <h2 id={eyebrow.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>{title}</h2>
       </div>
       <p className="apx-section-intro__body">{body}</p>
     </header>
-  );
-}
-
-function PosterArtwork() {
-  return (
-    <div className="apx-art apx-art--poster" aria-hidden>
-      <div className="apx-art-poster__top">
-        <span>APX / 06</span>
-        <span>VISUAL SYSTEM</span>
-      </div>
-      <div className="apx-art-poster__orbit" />
-      <div className="apx-art-poster__type">
-        <strong>FORM</strong>
-        <strong>MEETS</strong>
-        <em>logic.</em>
-      </div>
-      <div className="apx-art-poster__footer">
-        <span>TYPE</span><span>LAYOUT</span><span>OUTPUT</span>
-      </div>
-    </div>
   );
 }
 
@@ -137,23 +118,6 @@ function ImageArtwork() {
   );
 }
 
-function AudioArtwork() {
-  return (
-    <div className="apx-art apx-art--audio" aria-hidden>
-      <div className="apx-audio__head"><span>PROCEDURAL AUDIO</span><span>WAV</span></div>
-      <div className="apx-audio__wave">
-        {[18,42,28,61,34,74,48,86,62,39,71,55,26,48,80,63,35,57,43,22,36,65,31,52].map((height, index) => (
-          <i key={index} style={{ height: `${height}%` }} />
-        ))}
-      </div>
-      <div className="apx-audio__sequencer">
-        <span className="is-on" /><span /><span className="is-on" /><span />
-        <span /><span className="is-on" /><span /><span className="is-on" />
-      </div>
-    </div>
-  );
-}
-
 function SyntaxCode() {
   return (
     <pre className="apx-syntax" tabIndex={0} aria-label="TypeScript Apexify.js example">
@@ -210,27 +174,27 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
       <div className="apx-hero__shell">
         <div className="apx-hero__copy">
           <div className="apx-hero__meta">
-            <span className="apx-kicker">PROGRAMMABLE VISUAL ENGINE / NODE</span>
+            <span className="apx-kicker">A TOOLKIT FOR VISUAL THINKERS</span>
             <StatusBadge status="CURRENT" />
             <span className="apx-hero__version">{model.package.name} {model.package.version}</span>
           </div>
 
           <h1>
-            <span>Build visual systems</span>
-            <span className="apx-hero__serif">from code.</span>
+            <span>A little code.</span>
+            <span className="apx-hero__serif">A whole new</span>
+            <span>canvas.</span>
           </h1>
 
           <p className="apx-hero__lede">
-            One TypeScript-first surface for images, typography, scenes, templates, charts,
-            GIF/video workflows, and procedural audio — designed for deterministic server output.
+            Turn your data into something worth looking at. Compose images, shape typography, and build entire visual worlds with a TypeScript-first toolkit for Node.js.
           </p>
 
           <div className="apx-hero__actions">
             <Link href="/docs/getting-started" prefetch={false} className="apx-cta apx-cta--primary">
-              Start building <ArrowRightIcon className="h-4 w-4" />
+              Make your first render <ArrowRightIcon className="h-4 w-4" />
             </Link>
             <Link href="/gallery" prefetch={false} className="apx-cta apx-cta--ghost">
-              Explore verified examples
+              Find your inspiration ↗
             </Link>
           </div>
 
@@ -245,25 +209,12 @@ export function ProductHero({ model }: { model: ProductExperienceModel }) {
           </div>
         </div>
 
-        <div className="apx-hero-gallery" aria-label="Apexify.js capability compositions">
-          <div className="apx-hero-gallery__main">
-            <PosterArtwork />
-            <div className="apx-hero-gallery__caption"><span>01 / TYPOGRAPHY</span><strong>Editorial composition</strong></div>
-          </div>
-          <div className="apx-hero-gallery__side apx-hero-gallery__side--top">
-            <TemplateArtwork />
-            <div className="apx-hero-gallery__caption"><span>02 / TEMPLATE</span><strong>Reusable systems</strong></div>
-          </div>
-          <div className="apx-hero-gallery__side apx-hero-gallery__side--bottom">
-            <MotionArtwork />
-            <div className="apx-hero-gallery__caption"><span>03 / MEDIA</span><strong>Frame workflows</strong></div>
-          </div>
-        </div>
+        <GenerativeAtelier />
       </div>
 
       <div className="apx-capability-queue" aria-label="Current capabilities">
         <div className="apx-capability-queue__track">
-          {[...model.capabilities, ...model.capabilities].map((capability, index) => (
+          {model.capabilities.map((capability, index) => (
             <span key={`${capability.id}-${index}`}>
               {capability.title}
               <i aria-hidden>·</i>
@@ -289,8 +240,8 @@ export function CapabilitySection({ model }: { model: ProductExperienceModel }) 
         <SectionIntro
           index="01"
           eyebrow="WHAT YOU CAN BUILD"
-          title="One engine. Different visual jobs."
-          body="The homepage now separates visual categories instead of repeating the same chart demo. Each composition below represents a different current capability area."
+          title="Your imagination. A larger vocabulary."
+          body="A launch card. A living dataset. A thousand variations on one good idea. Start with a primitive and see where it takes you."
         />
 
         <div className="apx-build-grid">
@@ -316,13 +267,13 @@ export function CapabilitySection({ model }: { model: ProductExperienceModel }) 
 
 export function FeatureTracks({ model }: { model: ProductExperienceModel }) {
   return (
-    <section className="apx-section apx-section--workflow" aria-labelledby="render-workflow">
+    <section className="apx-section apx-section--workflow" aria-labelledby="the-workflow">
       <div className="apx-home-shell">
         <SectionIntro
           index="02"
           eyebrow="THE WORKFLOW"
-          title="A predictable path from input to artifact."
-          body="Apexify keeps the mental model explicit: create the surface, compose the content, structure reusable work, then emit or transform the result."
+          title="From what if. To there it is."
+          body="Keep the creative decisions. Automate the repetition. A clear path from your first canvas to a repeatable rendering workflow."
         />
 
         <div className="apx-workflow">
@@ -354,7 +305,7 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
             <p className="apx-kicker">TYPE-SAFE AUTHORING</p>
             <h2 id="code-to-output">Readable code. Designed output.</h2>
             <p>
-              This example uses the current <code>createCanvas()</code> and <code>createText()</code> API shape documented by Apexify.js. Syntax color is intentional, not a monochrome terminal dump.
+              A blank canvas is an invitation. Add a few lines of TypeScript, choose your words, and write your first image to disk with <code>createCanvas()</code> and <code>createText()</code>.
             </p>
             <Link href={getCapability(model, 'text').apiHref} className="apx-inline-link">
               Explore the text API <ArrowRightIcon className="h-4 w-4" />
@@ -367,25 +318,25 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
               <SyntaxCode />
             </div>
             <div className="apx-preview-panel">
-              <div className="apx-preview-panel__bar"><span>Composition preview</span><span>1200 × 630</span></div>
+              <div className="apx-preview-panel__bar"><span>Art direction study</span><span>1200 × 630</span></div>
               <CompositionPreview />
             </div>
           </div>
 
           <div className="apx-code-section__proof-note">
-            <span>Repository verification remains separate from homepage art direction.</span>
+            <span>The adjacent art study is illustrative; the code creates a text-only PNG.</span>
             <Link href={verified.href}>Open a verified executable example <ArrowRightIcon className="h-3.5 w-3.5" /></Link>
           </div>
         </div>
       </section>
 
-      <section className="apx-section apx-section--showcase apx-section--peak" aria-labelledby="capability-showcase">
+      <section className="apx-section apx-section--showcase apx-section--peak" aria-labelledby="peak-showcase">
         <div className="apx-home-shell">
           <SectionIntro
             index="03"
             eyebrow="PEAK SHOWCASE"
-            title="What Apexify looks like at full stretch."
-            body="Two finished motion pieces sit above the recipe library: no mockups and no source tutorial attached here—just authored output showing the upper creative range of the engine."
+            title="Made of code. Full of character."
+            body="Take a moment. Watch typography, imagery, data, and motion come together in two finished films made with Apexify."
           />
 
           <div className="apx-peak-films">
@@ -427,7 +378,7 @@ export function VerifiedExamples({ model }: { model: ProductExperienceModel }) {
           </div>
 
           <div className="apx-showcase__footer">
-            <p>Below these films, the Gallery exposes the Peak Lab recipe-by-recipe: real output beside the exact source that generated it.</p>
+            <p>Curious how it works? Explore the Peak Lab recipes, with real output and the source behind each piece.</p>
             <Link href="/gallery">Open Peak Lab Gallery <ArrowRightIcon className="h-4 w-4" /></Link>
           </div>
         </div>
@@ -471,13 +422,13 @@ export function RoadmapSection({ model }: { model: ProductExperienceModel }) {
         </div>
       </section>
 
-      <section className="apx-section apx-section--roadmap" aria-labelledby="engine-roadmap">
+      <section className="apx-section apx-section--roadmap" aria-labelledby="current-next">
         <div className="apx-home-shell">
           <SectionIntro
             index="05"
             eyebrow="CURRENT + NEXT"
-            title="Ambitious direction, clearly labeled."
-            body="The shipped Node surface stays visually separate from roadmap work. Future runtimes and advanced engine features remain future until they actually ship."
+            title="Build today. Look further."
+            body="Explore the current package, then see what is planned. Roadmap items are a direction of travel, not a promise of availability."
           />
 
           <div className="apx-roadmap-grid">
@@ -514,7 +465,7 @@ export function EcosystemFooter({ model }: { model: ProductExperienceModel }) {
       <div className="apx-footer__top">
         <div className="apx-footer__statement">
           <p className="apx-kicker">APEXIFY.JS / {model.package.version}</p>
-          <h2>Make the rendering layer <em>yours.</em></h2>
+          <h2>Your next idea<br />deserves a <em>canvas.</em></h2>
           <p>Start with a canvas. Grow into scenes, templates, media, and repeatable visual systems.</p>
           <div>
             <Link href="/docs/getting-started" className="apx-cta apx-cta--footer">Read the docs <ArrowRightIcon className="h-4 w-4" /></Link>

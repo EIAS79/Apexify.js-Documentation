@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Bars3Icon,
   ComputerDesktopIcon,
@@ -32,15 +32,14 @@ function ThemeControl() {
   const { mode, setMode } = useTheme();
 
   return (
-    <div className="apx-home-theme" role="radiogroup" aria-label="Color theme">
+    <div className="apx-home-theme" role="group" aria-label="Color theme">
       {THEMES.map(({ id, label, Icon }) => {
         const active = mode === id;
         return (
           <button
             key={id}
             type="button"
-            role="radio"
-            aria-checked={active}
+            aria-pressed={active}
             aria-label={`${label} theme`}
             title={`${label} theme`}
             onClick={() => setMode(id)}
@@ -57,11 +56,12 @@ function ThemeControl() {
 
 export default function HomeNavbar({ active = 'home' }: { active?: HomeNavSection }) {
   const [open, setOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
+      if (event.key === 'Escape') { setOpen(false); menuButton.current?.focus(); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -109,6 +109,7 @@ export default function HomeNavbar({ active = 'home' }: { active?: HomeNavSectio
 
           <button
             type="button"
+            ref={menuButton}
             className="apx-home-menu md:hidden"
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
@@ -120,7 +121,7 @@ export default function HomeNavbar({ active = 'home' }: { active?: HomeNavSectio
         </div>
       </div>
 
-      <div id="home-mobile-nav" className="apx-home-nav__mobile md:hidden" data-open={open || undefined}>
+      <div hidden={!open} id="home-mobile-nav" className="apx-home-nav__mobile md:hidden" data-open={open || undefined}>
         <nav aria-label="Mobile primary">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setOpen(false)} aria-current={link.key === active ? 'page' : undefined}>

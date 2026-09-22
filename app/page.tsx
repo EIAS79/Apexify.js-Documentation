@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import '@/styles/home-atelier.css';
+import CreativePathways from '@/components/home/CreativePathways';
 import HomeNavbar from '@/components/home/HomeNavbar';
 import HomeAmbientBackground from '@/components/home/HomeAmbientBackground';
 import ScrollTopButton from '@/components/home/ScrollTopButton';
@@ -32,6 +34,7 @@ export default function Home() {
         <CapabilitySection model={model} />
         <FeatureTracks model={model} />
         <VerifiedExamples model={model} />
+        <CreativePathways />
         <RoadmapSection model={model} />
       </main>
       <EcosystemFooter model={model} />

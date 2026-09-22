@@ -15,8 +15,8 @@ A creative coding atelier: warm paper / deep ink, electric chartreuse, oversized
 
 ## Milestones
 1. COMPLETE: inspect source, establish baseline and handoff.
-2. IN PROGRESS: homepage art direction, interactive artwork, purposeful sections and copy.
-3. PENDING: navigation polish, responsive/accessibility behavior, browser verification.
+2. COMPLETE: homepage art direction, interactive artwork, purposeful sections and copy.
+3. IN PROGRESS: navigation polish, responsive/accessibility behavior, browser verification.
 4. PENDING: typecheck/build/relevant integrity checks; final pushed commits and reviewable PR.
 
 ## Verification
@@ -24,3 +24,12 @@ Not yet run. Dependencies installing with lifecycle scripts disabled initially; 
 
 ## Continuation
 Read this file and `git log`, inspect current diff, then resume earliest incomplete milestone. Record exact checks and unresolved limitations here. Do not describe illustrative homepage artwork as actual Apexify runtime output. Do not claim the full DOC-0–12 or engine roadmap was executed as part of this visual redesign.
+
+## Milestone 2 implementation
+- New `GenerativeAtelier` client island: three palettes, bounded contour slider, three forms, opt-in motion; SVG study clearly labeled.
+- New server-rendered `CreativePathways` section connects Studio, Docs, Gallery.
+- Homepage-only atelier stylesheet, responsive paper/ink themes and lime accents.
+- Replaced internal-development copy, repaired section heading references, removed unused artwork components.
+- Mobile nav hidden from keyboard when closed; Escape returns focus. Theme controls use pressed-button semantics. Native cursor on home.
+- Direct git push lacks credentials. Milestones are published using connected GitHub Git Data tools on `design/creative-documentation-experience`. Remote commit hashes differ from local hashes. Initial remote commit: `52616fe`.
+- First typecheck blocked by missing installed Apexify artifacts, not new component errors. Restoring normal install. Browser download being repaired.

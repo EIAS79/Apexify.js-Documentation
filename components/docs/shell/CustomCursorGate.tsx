@@ -13,7 +13,8 @@ export function CustomCursorGate() {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const sync = () => {
       setEnabled(
-        !pathname?.startsWith('/docs') &&
+        pathname !== '/' &&
+          !pathname?.startsWith('/docs') &&
           !pathname?.startsWith('/api-reference') &&
           finePointer.matches &&
           !reducedMotion.matches,
