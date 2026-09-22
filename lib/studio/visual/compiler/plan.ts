@@ -136,6 +136,7 @@ export type StudioInspectionOperation = {
   | { kind: 'pixels-get-data'; region?: { x: number; y: number; width: number; height: number } }
   | {
       kind: 'detect-path';
+      pathSourceNodeId: string;
       commands: StudioPathCommand[];
       x: number;
       y: number;
@@ -503,41 +504,41 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
 
   for (const record of normalized.operations) {
     const pixel = pixelOperation(record);
-    if (!pixel) continue;
-    const target = record.id;
-    if (pixel.type === 'manipulate') {
-      operations.push({
-        id: 'pixel_' + record.id,
-        kind: 'pixels-manipulate',
-        sourceOperationId: record.id,
-        target,
-        preferredName: record.name || 'pixels',
-        base,
-        options: {
-          filter: pixel.filter,
-          ...(pixel.intensity !== undefined ? { intensity: pixel.intensity } : {}),
-          ...(pixel.region ? { region: pixel.region } : {}),
-        },
-      });
-    } else {
-      operations.push({
-        id: 'pixel_' + record.id,
-        kind: 'pixels-set-color',
-        sourceOperationId: record.id,
-        target,
-        preferredName: record.name || 'pixel',
-        base,
-        x: pixel.x,
-        y: pixel.y,
-        color: pixel.color,
-      });
+    if (pixel) {
+      const target = record.id;
+      if (pixel.type === 'manipulate') {
+        operations.push({
+          id: 'pixel_' + record.id,
+          kind: 'pixels-manipulate',
+          sourceOperationId: record.id,
+          target,
+          preferredName: record.name || 'pixels',
+          base,
+          options: {
+            filter: pixel.filter,
+            ...(pixel.intensity !== undefined ? { intensity: pixel.intensity } : {}),
+            ...(pixel.region ? { region: pixel.region } : {}),
+          },
+        });
+      } else {
+        operations.push({
+          id: 'pixel_' + record.id,
+          kind: 'pixels-set-color',
+          sourceOperationId: record.id,
+          target,
+          preferredName: record.name || 'pixel',
+          base,
+          x: pixel.x,
+          y: pixel.y,
+          color: pixel.color,
+        });
+      }
+      base = { $studioTarget: target };
+      lastTarget = target;
+      lastMember = null;
+      continue;
     }
-    base = { $studioTarget: target };
-    lastTarget = target;
-    lastMember = null;
-  }
 
-  for (const record of normalized.operations) {
     const inspection = detectionOperation(record);
     if (!inspection) continue;
     const target = record.id + '_result';
@@ -581,6 +582,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         target,
         preferredName,
         base,
+        pathSourceNodeId: node.id,
         commands: path.commands,
         x: localPoint.x,
         y: localPoint.y,
