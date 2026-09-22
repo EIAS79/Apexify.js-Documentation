@@ -475,7 +475,7 @@ function DataEditor({
                         options: defaults.options,
                       }),
                     );
-                  }
+                  }}
                 >
                   {CHART_FAMILIES.filter(
                     (family) => family !== 'comparison' && family !== 'combo',
