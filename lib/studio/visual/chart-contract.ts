@@ -110,32 +110,43 @@ export const CHART_FAMILY_OPTION_MATRIX: Record<
   readonly string[]
 > = {
   pie: [
-    ...CHART_COMMON_OPTION_PATHS,
+    'dimensions.width',
+    'dimensions.height',
+    'dimensions.padding',
+    'appearance',
     'type',
-    'pie.innerRadius',
-    'pie.startAngle',
-    'pie.endAngle',
-    'pie.padAngle',
-    'pie.sliceStrokeWidth',
-    'pie.sliceStrokeColor',
+    'labels.title',
     'labels.sliceLabels',
     'labels.valueLabels',
+    'labels.showValues',
+    'labels.showLabels',
+    'legends.standard',
+    'legends.connected',
+    'slices.opacity',
+    'slices.shadow',
+    'slices.stroke',
   ],
   donut: [
-    ...CHART_COMMON_OPTION_PATHS,
+    'dimensions.width',
+    'dimensions.height',
+    'dimensions.padding',
+    'appearance',
     'type',
-    'pie.innerRadius',
-    'pie.startAngle',
-    'pie.endAngle',
-    'pie.padAngle',
-    'pie.sliceStrokeWidth',
-    'pie.sliceStrokeColor',
+    'donutInnerRadius',
+    'labels.title',
     'labels.sliceLabels',
     'labels.valueLabels',
+    'labels.showValues',
+    'labels.showLabels',
+    'legends.standard',
+    'legends.connected',
+    'slices.opacity',
+    'slices.shadow',
+    'slices.stroke',
   ],
   bar: [
     ...CHART_COMMON_OPTION_PATHS,
-    'barType',
+    'type',
     'axes.x.label',
     'axes.x.range',
     'axes.x.tickValues',
@@ -148,17 +159,17 @@ export const CHART_FAMILY_OPTION_MATRIX: Record<
     'axes.y.tickCount',
     'axes.y.showTickLabels',
     'axes.y.showTickMarks',
-    'bar.minWidth',
-    'bar.groupSpacing',
-    'bar.opacity',
-    'bar.shadow',
-    'bar.stroke',
+    'bars.minWidth',
+    'bars.groupSpacing',
+    'bars.opacity',
+    'bars.shadow',
+    'bars.stroke',
     'labels.barLabelDefaults',
     'labels.valueLabelDefaults',
   ],
   horizontalBar: [
     ...CHART_COMMON_OPTION_PATHS,
-    'barType',
+    'type',
     'axes.x.label',
     'axes.x.range',
     'axes.x.tickValues',
@@ -167,11 +178,11 @@ export const CHART_FAMILY_OPTION_MATRIX: Record<
     'axes.y.range',
     'axes.y.tickValues',
     'axes.y.tickCount',
-    'bar.minHeight',
-    'bar.groupSpacing',
-    'bar.opacity',
-    'bar.shadow',
-    'bar.stroke',
+    'bars.minHeight',
+    'bars.groupSpacing',
+    'bars.opacity',
+    'bars.shadow',
+    'bars.stroke',
     'labels.barLabelDefaults',
     'labels.valueLabelDefaults',
   ],
@@ -197,14 +208,28 @@ export const CHART_FAMILY_OPTION_MATRIX: Record<
     'errorBars',
   ],
   radar: [
-    ...CHART_COMMON_OPTION_PATHS,
-    'radar.startAngleDeg',
+    'dimensions.width',
+    'dimensions.height',
+    'dimensions.padding',
+    'appearance',
+    'radar.categories',
+    'radar.maxValue',
     'radar.gridLevels',
-    'radar.gridColor',
-    'radar.axisColor',
+    'radar.labelMarginRatio',
+    'radar.fill',
+    'radar.showPoints',
     'radar.pointRadius',
-    'radar.fillOpacity',
-    'labels.pointLabels',
+    'radar.gridColor',
+    'radar.gridWidth',
+    'radar.axisLabelFontSize',
+    'radar.axisLabelColor',
+    'radar.opacity',
+    'labels.title',
+    'legend',
+    'data[].values',
+    'data[].fillOpacity',
+    'data[].lineWidth',
+    'data[].opacity',
   ],
   polarArea: [
     ...CHART_COMMON_OPTION_PATHS,
@@ -271,13 +296,22 @@ const palette = [
   '#60a5fa',
 ];
 
-function standaloneDefaults(family: VisualStandaloneChartFamily): VisualChartNodeProps {
+export function defaultStandaloneChartNodeProps(
+  family: VisualStandaloneChartFamily,
+): VisualChartNodeProps {
   const options: Record<string, VisualValue> = {
     dimensions: { width: 640, height: 400 },
     appearance: { backgroundColor: '#0f172a' },
-    labels: { title: { text: family === 'horizontalBar' ? 'Horizontal bar chart' : family + ' chart', fontSize: 22, color: '#f8fafc' } },
-    legend: { show: true, position: 'bottom', textColor: '#e2e8f0' },
-    grid: { show: true, color: 'rgba(148,163,184,0.18)', width: 1 },
+    labels: {
+      title: {
+        text:
+          family === 'horizontalBar'
+            ? 'Horizontal bar chart'
+            : family + ' chart',
+        fontSize: 22,
+        color: '#f8fafc',
+      },
+    },
   };
 
   if (family === 'pie' || family === 'donut' || family === 'polarArea') {
@@ -286,10 +320,26 @@ function standaloneDefaults(family: VisualStandaloneChartFamily): VisualChartNod
       { label: 'Beta', value: 31, color: palette[1] },
       { label: 'Gamma', value: 27, color: palette[2] },
     ] as unknown as VisualValue[];
-    if (family === 'donut') options.type = 'donut';
+    if (family === 'pie' || family === 'donut') {
+      options.type = family === 'donut' ? 'donut' : 'pie';
+      if (family === 'donut') options.donutInnerRadius = 72;
+      options.legends = {
+        standard: {
+          show: true,
+          position: 'bottom',
+          textColor: '#e2e8f0',
+        },
+      };
+      options.slices = { opacity: 1 };
+    }
     if (family === 'polarArea') {
       options.scale = 'area';
       options.polar = { innerRadiusRatio: 0.12, startAngleDeg: -90 };
+      options.legend = {
+        show: true,
+        position: 'bottom',
+        textColor: '#e2e8f0',
+      };
     }
     return { family, data, options };
   }
@@ -304,11 +354,22 @@ function standaloneDefaults(family: VisualStandaloneChartFamily): VisualChartNod
       ] as unknown as VisualValue[],
       options: {
         ...options,
-        barType: 'standard',
+        type: 'standard',
         axes: {
           x: { label: 'Quarter' },
           y: { label: 'Value', range: { min: 0, max: 70 } },
         },
+        legend: {
+          show: true,
+          position: 'bottom',
+          textColor: '#e2e8f0',
+        },
+        grid: {
+          show: true,
+          color: 'rgba(148,163,184,0.18)',
+          width: 1,
+        },
+        bars: {},
       },
     };
   }
@@ -320,16 +381,23 @@ function standaloneDefaults(family: VisualStandaloneChartFamily): VisualChartNod
         {
           label: 'Current',
           color: palette[0],
-          data: [
-            { label: 'Speed', value: 78 },
-            { label: 'Quality', value: 88 },
-            { label: 'Reach', value: 64 },
-            { label: 'Depth', value: 91 },
-            { label: 'Ease', value: 73 },
-          ],
+          values: [78, 88, 64, 91, 73],
         },
       ] as unknown as VisualValue[],
-      options,
+      options: {
+        ...options,
+        radar: {
+          categories: ['Speed', 'Quality', 'Reach', 'Depth', 'Ease'],
+          gridLevels: 5,
+          fill: true,
+          showPoints: true,
+        },
+        legend: {
+          show: true,
+          position: 'bottom',
+          textColor: '#e2e8f0',
+        },
+      },
     };
   }
 
@@ -356,14 +424,25 @@ function standaloneDefaults(family: VisualStandaloneChartFamily): VisualChartNod
         x: { label: 'X', range: { min: 0, max: 4 } },
         y: { label: 'Y', range: { min: 0, max: 60 } },
       },
+      legend: {
+        show: true,
+        position: 'bottom',
+        textColor: '#e2e8f0',
+      },
+      grid: {
+        show: true,
+        color: 'rgba(148,163,184,0.18)',
+        width: 1,
+      },
+      ...(family === 'line' ? { lines: { opacity: 1 } } : { points: { opacity: 1 } }),
     },
   };
 }
 
 export function defaultChartNodeProps(family: VisualChartFamily = 'bar'): VisualChartNodeProps {
   if (family === 'comparison') {
-    const left = standaloneDefaults('bar');
-    const right = standaloneDefaults('line');
+    const left = defaultStandaloneChartNodeProps('bar');
+    const right = defaultStandaloneChartNodeProps('line');
     return {
       family,
       options: {
@@ -379,8 +458,8 @@ export function defaultChartNodeProps(family: VisualChartFamily = 'bar'): Visual
   }
 
   if (family === 'combo') {
-    const bar = standaloneDefaults('bar');
-    const line = standaloneDefaults('line');
+    const bar = defaultStandaloneChartNodeProps('bar');
+    const line = defaultStandaloneChartNodeProps('line');
     return {
       family,
       options: {
@@ -405,7 +484,7 @@ export function defaultChartNodeProps(family: VisualChartFamily = 'bar'): Visual
     };
   }
 
-  return standaloneDefaults(family);
+  return defaultStandaloneChartNodeProps(family);
 }
 
 export function visualChartProps(node: VisualNode): VisualChartNodeProps {
@@ -494,6 +573,37 @@ function validateStandaloneData(
     return;
   }
 
+  if (family === 'radar') {
+    data.forEach((series, seriesIndex) => {
+      const value = record(series);
+      if (
+        !value ||
+        typeof value.label !== 'string' ||
+        !Array.isArray(value.values) ||
+        value.values.length < 3
+      ) {
+        issue(
+          issues,
+          'chart-radar-series',
+          path + '.data.' + seriesIndex,
+          'Radar series requires label and at least three numeric values.',
+        );
+        return;
+      }
+      value.values.forEach((point, pointIndex) => {
+        if (!finite(point)) {
+          issue(
+            issues,
+            'chart-radar-value',
+            path + '.data.' + seriesIndex + '.values.' + pointIndex,
+            'Radar values must be finite numbers.',
+          );
+        }
+      });
+    });
+    return;
+  }
+
   data.forEach((series, seriesIndex) => {
     const value = record(series);
     if (!value || typeof value.label !== 'string' || !Array.isArray(value.data) || !value.data.length) {
@@ -502,11 +612,7 @@ function validateStandaloneData(
     }
     value.data.forEach((point, pointIndex) => {
       const item = record(point);
-      if (family === 'radar') {
-        if (!item || typeof item.label !== 'string' || !finite(item.value)) {
-          issue(issues, 'chart-radar-point', path + '.data.' + seriesIndex + '.data.' + pointIndex, 'Radar point requires label and finite value.');
-        }
-      } else if (!item || !finite(item.x) || !finite(item.y)) {
+      if (!item || !finite(item.x) || !finite(item.y)) {
         issue(issues, 'chart-point', path + '.data.' + seriesIndex + '.data.' + pointIndex, 'Chart point requires finite x and y values.');
       }
     });
@@ -531,6 +637,39 @@ export function validateVisualChartNode(
     return;
   }
   validateDimensions(issues, options, path + '.props.options');
+
+  if (props.family === 'radar') {
+    const radar = record(options.radar);
+    const categories = radar && Array.isArray(radar.categories) ? radar.categories : [];
+    if (
+      categories.length < 3 ||
+      categories.some((category) => typeof category !== 'string')
+    ) {
+      issue(
+        issues,
+        'chart-radar-categories',
+        path + '.props.options.radar.categories',
+        'Radar chart requires at least three string categories.',
+      );
+    }
+    const radarData = Array.isArray(props.data) ? props.data : [];
+    radarData.forEach((series, index) => {
+      const value = record(series);
+      if (
+        value &&
+        Array.isArray(value.values) &&
+        categories.length &&
+        value.values.length !== categories.length
+      ) {
+        issue(
+          issues,
+          'chart-radar-cardinality',
+          path + '.props.data.' + index + '.values',
+          'Radar series values must match radar.categories length.',
+        );
+      }
+    });
+  }
 
   if (props.family === 'comparison') {
     for (const key of ['chart1', 'chart2'] as const) {
