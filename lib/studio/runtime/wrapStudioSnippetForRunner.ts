@@ -545,7 +545,14 @@ ${inner}
         'result',
       ];
       for (const key of preferred) {
-        if (key in obj) await __collect(obj[key], label + '-' + key);
+        if (!(key in obj)) continue;
+        if (
+          (key === 'files' || key === 'frames' || key === 'buffers') &&
+          !Array.isArray(obj[key])
+        ) {
+          continue;
+        }
+        await __collect(obj[key], label + '-' + key);
       }
 
       if (__entries.length === before) {
