@@ -70,6 +70,7 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
   const names = new StableNameRegistry();
   const painterName = names.allocate('painter');
   const targetNames = new Map<string, string>();
+  const pathResourceNames = new Map<string, string>();
 
   const body: string[] = [];
   for (const operation of plan.operations) {
@@ -132,6 +133,7 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       body.push(
         `  const ${targetName} = await ${painterName}.path2d.draw(${base}, ${resourceName}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
       );
+      pathResourceNames.set(operation.sourceNodeId, resourceName);
       targetNames.set(operation.target, targetName);
       continue;
     }
@@ -197,11 +199,13 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
     }
 
     if (operation.kind === 'detect-path') {
-      const resourceName = names.allocate((operation.preferredName || 'hit') + 'Path', 'path');
+      const resourceName = pathResourceNames.get(operation.pathSourceNodeId);
+      if (!resourceName) {
+        throw new Error(
+          `Path detection references node "${operation.pathSourceNodeId}" before its Path2D resource is available.`,
+        );
+      }
       const targetName = names.allocate(operation.preferredName || operation.target, 'pathHit');
-      body.push(
-        `  const ${resourceName} = ${painterName}.path2d.create(${emitValue(operation.commands, 2, targetNames)});`,
-      );
       body.push(
         `  const ${targetName} = await ${painterName}.detect.path(${resourceName}, ${operation.x}, ${operation.y}, ${emitValue(operation.options ?? {}, 2, targetNames)});`,
       );
