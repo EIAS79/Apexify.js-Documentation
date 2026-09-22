@@ -613,7 +613,7 @@ ${inner}
     err && typeof err === 'object' && 'stderr' in err && typeof (err as { stderr?: unknown }).stderr === 'string'
       ? (err as { stderr: string }).stderr.trim()
       : '';
-  const msg = stderr ? base + '\n\nMedia stderr:\n' + stderr : base;
+  const msg = stderr ? base + '\\n\\nMedia stderr:\\n' + stderr : base;
   try {
     if (process.env.GALLERY_ERR) __studioWrite(process.env.GALLERY_ERR, msg);
   } catch {}
