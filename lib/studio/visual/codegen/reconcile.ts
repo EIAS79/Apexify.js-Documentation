@@ -863,14 +863,53 @@ function reconcileCustomPathCall(
   if (!isRecord(parsed) && !Array.isArray(parsed)) {
     throw new Error('path2d.custom() options must be a literal object or array.');
   }
-  const first = Array.isArray(parsed) ? parsed[0] : parsed;
-  if (!isRecord(first) || !isRecord(first.startCoordinates) || !isRecord(first.endCoordinates)) {
-    throw new Error('path2d.custom() requires startCoordinates and endCoordinates.');
+
+  const items = (Array.isArray(parsed) ? parsed : [parsed]).filter(isRecord);
+  if (
+    !items.length ||
+    items.some(
+      (item) =>
+        !isRecord(item.startCoordinates) ||
+        !isRecord(item.endCoordinates) ||
+        typeof item.startCoordinates.x !== 'number' ||
+        typeof item.startCoordinates.y !== 'number' ||
+        typeof item.endCoordinates.x !== 'number' ||
+        typeof item.endCoordinates.y !== 'number',
+    )
+  ) {
+    throw new Error('path2d.custom() requires finite startCoordinates and endCoordinates.');
   }
-  const sx = Number(first.startCoordinates.x ?? 0);
-  const sy = Number(first.startCoordinates.y ?? 0);
-  const ex = Number(first.endCoordinates.x ?? sx + 1);
-  const ey = Number(first.endCoordinates.y ?? sy + 1);
+
+  const points = items.flatMap((item) => [
+    item.startCoordinates as RecordValue,
+    item.endCoordinates as RecordValue,
+  ]);
+  const xs = points.map((point) => Number(point.x));
+  const ys = points.map((point) => Number(point.y));
+  if (![...xs, ...ys].every(Number.isFinite)) {
+    throw new Error('path2d.custom() connector coordinates must be finite.');
+  }
+
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY = Math.max(...ys);
+  const width = Math.max(1, maxX - minX);
+  const height = Math.max(1, maxY - minY);
+  const rebased = items.map((item) => ({
+    ...item,
+    startCoordinates: {
+      ...(item.startCoordinates as RecordValue),
+      x: Number((item.startCoordinates as RecordValue).x) - minX,
+      y: Number((item.startCoordinates as RecordValue).y) - minY,
+    },
+    endCoordinates: {
+      ...(item.endCoordinates as RecordValue),
+      x: Number((item.endCoordinates as RecordValue).x) - minX,
+      y: Number((item.endCoordinates as RecordValue).y) - minY,
+    },
+  }));
+
   const existing =
     matched && matched.kind === 'path' ? matched : undefined;
   const id = existing?.id ?? createVisualId('path');
@@ -882,10 +921,10 @@ function reconcileCustomPathCall(
     childIds: existing?.childIds,
     transform: {
       ...(existing?.transform ?? {}),
-      x: 0,
-      y: 0,
-      width: Math.max(1, Math.max(sx, ex)),
-      height: Math.max(1, Math.max(sy, ey)),
+      x: minX,
+      y: minY,
+      width,
+      height,
       rotation: 0,
       opacity: 1,
       visible: existing?.transform?.visible ?? true,
@@ -894,14 +933,37 @@ function reconcileCustomPathCall(
     },
     props: pathPropsRecord({
       tool: 'connector',
-      viewport: {
-        width: Math.max(1, Math.max(sx, ex)),
-        height: Math.max(1, Math.max(sy, ey)),
-      },
-      connector: parsed as unknown as VisualPathNodeProps['connector'],
+      viewport: { width, height },
+      connector: (Array.isArray(parsed) ? rebased : rebased[0]) as unknown as VisualPathNodeProps['connector'],
       draw: existing ? visualPathProps(existing).draw : undefined,
     }),
   } satisfies VisualProject['document']['nodes'][string];
+}
+
+function pathDocumentPoint(
+  node: VisualProject['document']['nodes'][string],
+  point: { x: number; y: number },
+): { x: number; y: number } {
+  if (node.kind !== 'path' && node.kind !== 'freehand') return point;
+  const props = visualPathProps(node);
+  const transform = node.transform ?? {};
+  const width = Math.max(1, props.viewport.width);
+  const height = Math.max(1, props.viewport.height);
+  const scaleX = ((transform.width ?? width) * (transform.scaleX ?? 1)) / width;
+  const scaleY = ((transform.height ?? height) * (transform.scaleY ?? 1)) / height;
+  const rotation = ((transform.rotation ?? 0) * Math.PI) / 180;
+  const scaledX = point.x * scaleX;
+  const scaledY = point.y * scaleY;
+  return {
+    x:
+      (transform.x ?? 0) +
+      scaledX * Math.cos(rotation) -
+      scaledY * Math.sin(rotation),
+    y:
+      (transform.y ?? 0) +
+      scaledX * Math.sin(rotation) +
+      scaledY * Math.cos(rotation),
+  };
 }
 
 function parseNumberArgument(raw: string | undefined, label: string) {
@@ -915,6 +977,7 @@ function reconcilePhase7Operations(
   project: VisualProject,
   source: string,
   resources: ReadonlyMap<string, StudioPathCommand[]>,
+  resourceNodeIds: ReadonlyMap<string, string>,
 ) {
   const operations: VisualProject['operations'] = [];
   const calls = [
@@ -981,17 +1044,24 @@ function reconcilePhase7Operations(
       }
       const commands = resources.get(resource.__identifier);
       if (!commands) throw new Error('detect.path() references an unknown path resource.');
-      const pathNode = Object.values(project.document.nodes).find((node) => {
-        if (node.kind !== 'path' && node.kind !== 'freehand') return false;
-        return JSON.stringify(visualPathProps(node).commands ?? []) === JSON.stringify(commands);
-      });
-      if (!pathNode) throw new Error('detect.path() must reference a rendered Visual path.');
+      const pathNodeId = resourceNodeIds.get(resource.__identifier);
+      const pathNode = pathNodeId
+        ? project.document.nodes[pathNodeId]
+        : undefined;
+      if (!pathNode || (pathNode.kind !== 'path' && pathNode.kind !== 'freehand')) {
+        throw new Error('detect.path() must reference a rendered Visual path resource.');
+      }
+      const localPoint = {
+        x: parseNumberArgument(call.args[1], 'detect.path x'),
+        y: parseNumberArgument(call.args[2], 'detect.path y'),
+      };
+      const documentPoint = pathDocumentPoint(pathNode, localPoint);
       const options = call.args[3] ? new LiteralParser(call.args[3]).parse() : {};
       value = {
         type: 'detectPath',
         pathNodeId: pathNode.id,
-        x: parseNumberArgument(call.args[1], 'detect.path x'),
-        y: parseNumberArgument(call.args[2], 'detect.path y'),
+        x: documentPoint.x,
+        y: documentPoint.y,
         ...(isRecord(options)
           ? {
               includeStroke: typeof options.includeStroke === 'boolean' ? options.includeStroke : undefined,
@@ -1079,6 +1149,7 @@ function reconcileRenderableCalls(
 
   const existing = orderedRenderableNodes(project);
   const identifierToNodeId = new Map<string, string>();
+  const pathResourceToNodeId = new Map<string, string>();
   const touched = new Set<string>();
 
   calls.forEach((call, index) => {
@@ -1128,6 +1199,12 @@ function reconcileRenderableCalls(
     if (call.assignedIdentifier) {
       identifierToNodeId.set(call.assignedIdentifier, node.id);
     }
+    if (call.method === 'path2d.draw' && call.args[1]) {
+      const resource = new LiteralParser(call.args[1], true).parse();
+      if (isIdentifierLiteral(resource) && !resource.member) {
+        pathResourceToNodeId.set(resource.__identifier, node.id);
+      }
+    }
   });
 
   for (const node of existing) {
@@ -1140,6 +1217,8 @@ function reconcileRenderableCalls(
       (id) => Boolean(project.document.nodes[id]),
     ),
   };
+
+  return pathResourceToNodeId;
 }
 
 export function reconcileVisualProjectFromCode(
@@ -1185,8 +1264,17 @@ export function reconcileVisualProjectFromCode(
     next.document.canvas =
       Object.keys(canvas).length ? canvas : undefined;
 
-    reconcileRenderableCalls(next, source, canvasCall.identifier);
-    reconcilePhase7Operations(next, source, pathResourceDefinitions(source));
+    const pathResourceToNodeId = reconcileRenderableCalls(
+      next,
+      source,
+      canvasCall.identifier,
+    );
+    reconcilePhase7Operations(
+      next,
+      source,
+      pathResourceDefinitions(source),
+      pathResourceToNodeId,
+    );
     next.updatedAt = new Date().toISOString();
 
     const validation = validateVisualProject(next);
