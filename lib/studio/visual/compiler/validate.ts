@@ -165,6 +165,14 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
         );
       } else {
         const props = node.props as Record<string, VisualValue>;
+        if (node.transform?.visible === false) {
+          push(
+            issues,
+            'hidden-phase7-path',
+            'operations.' + operation.id + '.value.pathNodeId',
+            'Path detection cannot reference a hidden path. Show the path or remove the probe.',
+          );
+        }
         if (!Array.isArray(props.commands) || props.commands.length < 1) {
           push(
             issues,
