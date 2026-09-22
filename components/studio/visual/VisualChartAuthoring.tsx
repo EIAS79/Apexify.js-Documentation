@@ -522,6 +522,11 @@ function StyleEditor({
   const appearance = rec(options.appearance);
   const legend = rec(options.legend);
   const grid = rec(options.grid);
+  const axes = rec(options.axes);
+  const xAxis = rec(axes.x);
+  const yAxis = rec(axes.y);
+  const series = rows(props.data);
+  const firstSeries = rec(series[0]);
 
   return (
     <>
@@ -594,6 +599,101 @@ function StyleEditor({
           />
         </label>
       </div>
+      {['line', 'scatter', 'bar', 'horizontalBar', 'combo'].includes(
+        props.family,
+      ) ? (
+        <div className="apx-pre4-section" data-chart-style-axes>
+          <div className="apx-pre4-section-title">Axes</div>
+          <label className="apx-pre4-field">
+            <span>X title</span>
+            <input
+              value={String(xAxis.label ?? '')}
+              onChange={(event) =>
+                onApply(
+                  withOption(props, 'axes', {
+                    ...axes,
+                    x: { ...xAxis, label: event.target.value },
+                  }),
+                )
+              }
+            />
+          </label>
+          <label className="apx-pre4-field">
+            <span>Y title</span>
+            <input
+              value={String(yAxis.label ?? '')}
+              onChange={(event) =>
+                onApply(
+                  withOption(props, 'axes', {
+                    ...axes,
+                    y: { ...yAxis, label: event.target.value },
+                  }),
+                )
+              }
+            />
+          </label>
+        </div>
+      ) : null}
+
+      {['line', 'scatter', 'radar'].includes(props.family) && series.length ? (
+        <div className="apx-pre4-section" data-chart-series-style>
+          <div className="apx-pre4-section-title">Series presentation</div>
+          <label className="apx-pre4-field">
+            <span>First series color</span>
+            <input
+              type="color"
+              value={
+                typeof firstSeries.color === 'string' &&
+                /^#[0-9a-f]{6}$/i.test(firstSeries.color)
+                  ? firstSeries.color
+                  : COLORS[0]
+              }
+              onChange={(event) => {
+                const next = series.map((item) => ({ ...item }));
+                next[0] = { ...next[0], color: event.target.value };
+                onApply({
+                  ...props,
+                  data: next as unknown as VisualValue[],
+                });
+              }}
+            />
+          </label>
+          {props.family !== 'radar' ? (
+            <label className="apx-pre4-field">
+              <span>Line width</span>
+              <input
+                type="number"
+                min="0.5"
+                step="0.5"
+                value={Number(firstSeries.lineWidth ?? 2.5)}
+                onChange={(event) => {
+                  const next = series.map((item) => ({ ...item }));
+                  next[0] = {
+                    ...next[0],
+                    lineWidth: Number(event.target.value),
+                  };
+                  onApply({
+                    ...props,
+                    data: next as unknown as VisualValue[],
+                  });
+                }}
+              />
+            </label>
+          ) : null}
+        </div>
+      ) : null}
+
+      <JsonEditor
+        label="Labels"
+        testId="labels-style"
+        value={options.labels ?? {}}
+        onApply={(value) => {
+          if (value && typeof value === 'object' && !Array.isArray(value)) {
+            onApply(withOption(props, 'labels', value));
+          }
+        }}
+      />
+
       {props.family !== 'comparison' ? (
         <>
           <div className="apx-pre4-section" data-chart-legend>
@@ -878,6 +978,94 @@ function AdvancedEditor({
               }
             />
           </label>
+        </div>
+      ) : null}
+
+      {props.family === 'radar' ? (
+        <div className="apx-pre4-section" data-chart-family-options>
+          <div className="apx-pre4-section-title">Radar</div>
+          <label className="apx-pre4-field">
+            <span>Grid levels</span>
+            <input
+              type="number"
+              min="1"
+              value={Number(rec(options.radar).gridLevels ?? 5)}
+              onChange={(event) =>
+                onApply(
+                  withOption(props, 'radar', {
+                    ...rec(options.radar),
+                    gridLevels: Number(event.target.value),
+                  }),
+                )
+              }
+            />
+          </label>
+          <label className="apx-pre4-field">
+            <span>Start angle</span>
+            <input
+              type="number"
+              value={Number(rec(options.radar).startAngleDeg ?? -90)}
+              onChange={(event) =>
+                onApply(
+                  withOption(props, 'radar', {
+                    ...rec(options.radar),
+                    startAngleDeg: Number(event.target.value),
+                  }),
+                )
+              }
+            />
+          </label>
+        </div>
+      ) : null}
+
+      {props.family === 'line' || props.family === 'scatter' ? (
+        <div className="apx-pre4-section" data-chart-family-options>
+          <div className="apx-pre4-section-title">
+            {props.family === 'line' ? 'Line' : 'Scatter'}
+          </div>
+          {props.family === 'line' ? (
+            <>
+              <label className="apx-pre4-field">
+                <span>Line style</span>
+                <select
+                  value={String(options.lineStyle ?? 'straight')}
+                  onChange={(event) =>
+                    onApply(withOption(props, 'lineStyle', event.target.value))
+                  }
+                >
+                  <option value="straight">straight</option>
+                  <option value="smooth">smooth</option>
+                  <option value="step">step</option>
+                </select>
+              </label>
+              <label className="apx-pre4-field">
+                <span>Smoothness</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={Number(options.lineSmoothness ?? 0.35)}
+                  onChange={(event) =>
+                    onApply(
+                      withOption(
+                        props,
+                        'lineSmoothness',
+                        Number(event.target.value),
+                      ),
+                    )
+                  }
+                />
+              </label>
+            </>
+          ) : (
+            <JsonEditor
+              label="Marker"
+              testId="scatter-marker"
+              value={options.marker ?? {}}
+              onApply={(value) => onApply(withOption(props, 'marker', value))}
+            />
+          )}
         </div>
       ) : null}
 
