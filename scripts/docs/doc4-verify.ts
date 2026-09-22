@@ -9,7 +9,7 @@ const manifest=read('api-manifest.json') as ApiManifest;
 assert.equal(manifest.schemaVersion,1);
 assert.equal(manifest.package.name,'apexify.js');
 assert.equal(manifest.package.version,'6.0.0');
-assert.equal(manifest.package.commit,'f57bb82743c8f71bbe7e519d060010f970b06ef9');
+assert.equal(manifest.package.commit,'dbed9743353593eafae9a7b1c25312d7170a233b');
 assert.match(manifest.package.packedTreeSha256,/^[a-f0-9]{64}$/);
 assert.match(manifest.package.manifestSha256||'',/^[a-f0-9]{64}$/);
 assert.ok(manifest.entrypoints.some(e=>e.exportPath==='.'));
