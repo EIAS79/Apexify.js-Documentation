@@ -137,7 +137,7 @@ try {
     if (!(await galleryPage.$('a[href="#gallery-main"]'))) throw new Error(`${state.name} Gallery skip link missing`);
     if (!(await galleryPage.$('#gallery-main'))) throw new Error(`${state.name} Gallery main landmark target missing`);
     if (!(await galleryPage.$('section[aria-label="Gallery source trust and runtime"]'))) throw new Error(`${state.name} Gallery provenance controls missing`);
-    if (!(await galleryPage.$('button[aria-label="Open search"]'))) throw new Error(`${state.name} Gallery search trigger missing`);
+    if (!(await galleryPage.$('input[aria-label="Search Gallery"]'))) throw new Error(`${state.name} Gallery search input missing`);
     const galleryText = await galleryPage.evaluate(() => document.body.textContent || '');
     if (galleryText.includes('v5.4.5')) throw new Error(`${state.name} stale Gallery version copy`);
     if (!galleryText.includes('Verified examples') || !galleryText.includes('Curated')) throw new Error(`${state.name} Gallery source-trust explanation missing`);
@@ -168,13 +168,11 @@ try {
       controls.some((button) => button.textContent?.trim() === 'Node' && button.getAttribute('aria-pressed') === 'true');
   });
 
-  const search = await keyboard.$('button[aria-label="Open search"]');
-  await search.focus();
-  await keyboard.keyboard.press('Enter');
-  await keyboard.waitForSelector('[role="dialog"][aria-label="Search gallery"] input');
-  await keyboard.type('[role="dialog"][aria-label="Search gallery"] input', 'chart');
-  await keyboard.keyboard.press('Escape');
-  await keyboard.waitForSelector('[role="dialog"][aria-label="Search gallery"]', { hidden: true });
+  await keyboard.keyboard.press('/');
+  await keyboard.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Search Gallery');
+  await keyboard.type('input[aria-label="Search Gallery"]', 'chart');
+  const searchValue = await keyboard.$eval('input[aria-label="Search Gallery"]', (input) => input.value);
+  if (searchValue !== 'chart') throw new Error(`Gallery keyboard search input failed: ${searchValue}`);
 
   await keyboard.goto(`${base}/gallery`, { waitUntil: 'networkidle2' });
   if (!(await keyboard.$('.apx-gallery-closing__actions a[href="/examples/node.canvas.basic"]'))) throw new Error('Gallery canonical DOC-5 example linkage missing');
