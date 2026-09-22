@@ -28,6 +28,16 @@ if (
   (existsSync(ffmpeg) && existsSync(ffprobe))
 ) process.exit(0);
 
+const systemPairAvailable = [
+  ['/usr/bin/ffmpeg', '/usr/bin/ffprobe'],
+  ['/usr/local/bin/ffmpeg', '/usr/local/bin/ffprobe'],
+].some(([ffmpegPath, ffprobePath]) => existsSync(ffmpegPath) && existsSync(ffprobePath));
+
+if (process.env.CI === 'true' && process.env.VERCEL !== '1' && systemPairAvailable) {
+  console.log('[studio] using system FFmpeg pair for CI Studio verification');
+  process.exit(0);
+}
+
 if (platform() !== 'linux' || !['x64', 'arm64'].includes(arch())) {
   console.log('[studio] bundled FFmpeg is installed only for Linux x64/arm64 builds; system FFmpeg may still be used locally.');
   process.exit(0);
