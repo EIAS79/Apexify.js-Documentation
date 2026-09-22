@@ -90,6 +90,7 @@ import type {
   VisualShapeType,
   VisualTextNodeProps,
   VisualTransform,
+  VisualValue,
 } from '@/lib/studio/visual/model';
 import {
   CANVAS_ALIGNMENTS,
