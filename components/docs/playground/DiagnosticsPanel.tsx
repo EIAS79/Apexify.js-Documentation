@@ -20,7 +20,7 @@ export function DiagnosticsPanel({ diagnostics, onClear }: { diagnostics: Intera
           {diagnostics.map((item) => <li key={item.id} className="px-3 py-3 text-sm">
             <div className="flex items-start gap-2">
               <span className="mt-0.5 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase" style={{ color: severityColor(item.severity), border: '1px solid currentColor' }}>{item.severity}</span>
-              <div className="min-w-0"><p style={{ color: 'var(--text-primary)' }}>{item.message}</p>{item.source || item.line ? <p className="mt-1 text-xs" style={{ color: 'var(--text-tertiary)' }}>{item.source ?? 'source'}{item.line ? `:${item.line}${item.column ? `:${item.column}` : ''}` : ''}</p> : null}{item.help ? <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>{item.help}</p> : null}</div>
+              <div className="min-w-0"><p style={{ color: 'var(--text-primary)' }}>{item.message}</p>{item.source || item.line ? <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>{item.source ?? 'source'}{item.line ? `:${item.line}${item.column ? `:${item.column}` : ''}` : ''}</p> : null}{item.help ? <p className="mt-1 text-xs" style={{ color: 'var(--text-secondary)' }}>{item.help}</p> : null}</div>
             </div>
           </li>)}
         </ul>

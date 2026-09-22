@@ -620,10 +620,15 @@ function executeDeno(
         ? [
             '--cpu=55',
             '--nofile=128',
-            // Deno/V8 plus native Canvas/Sharp/FFmpeg can create dozens of worker threads.
-            // Keep a hard process/thread ceiling without starving runtime startup.
-            '--nproc=256',
-            '--as=2147483648',
+            // Do not apply RLIMIT_NPROC here. Linux counts it per real user,
+            // so unrelated Next/Chrome/runner threads can exhaust the allowance and
+            // make FFmpeg fail with EAGAIN while configuring its filter graph.
+            // Studio still has single-run concurrency, CPU time, file-descriptor,
+            // V8 heap, wall-time and Deno capability limits.
+            // Do not apply RLIMIT_AS to Deno/V8. V8/Oilpan reserve large virtual
+            // address ranges independently of committed memory, so a low address-space
+            // ceiling can abort before user code runs even when the 256 MB V8 heap cap
+            // and the Studio output/time/process limits are respected.
             '--',
             deno,
             ...args,

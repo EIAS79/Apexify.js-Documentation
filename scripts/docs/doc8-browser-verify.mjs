@@ -137,6 +137,10 @@ async function auditRoute({ route, name, width, height, theme = 'light', reduced
     }
   }
 
+  // Keyboard/focus checks above may scroll controls into view. Reset before the
+  // document-wide axe pass so fixed/sticky chrome does not partially cover
+  // otherwise valid off-screen targets and create false target-size failures.
+  await page.evaluate(() => window.scrollTo(0, 0));
   await page.addScriptTag({ content: axeSource });
   const axeViolations = await page.evaluate(async () => {
     const result = await window.axe.run(document, {

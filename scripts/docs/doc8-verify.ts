@@ -130,7 +130,10 @@ requireCheck(
 );
 requireCheck(!isolatedRunner.includes('--allow-run-all'), 'Same-origin execution must not grant unrestricted subprocess access.');
 requireCheck(isolatedRunner.includes("'--allow-ffi="), 'Isolated runner must scope native FFI for the canvas backend.');
-requireCheck(isolatedRunner.includes("'--allow-sys=cpus'"), 'Isolated runner must restrict system access to the native canvas CPU probe.');
+requireCheck(
+  isolatedRunner.includes("'--allow-sys'") && !isolatedRunner.includes("'--allow-all'"),
+  'Isolated runner must grant only Deno system-introspection permission, never unrestricted permissions.',
+);
 requireCheck(isolatedRunner.includes('materializeWorkspaceFiles'), 'Isolated runner must materialize bounded sibling project files.');
 requireCheck(isolatedRunner.includes('rewriteWorkspacePackageImports'), 'Isolated project files must resolve Apexify through the pinned runtime path.');
 requireCheck(isolatedRunner.includes("rmSync(runDir, { recursive: true, force: true })"), 'Isolated runner must clean its disposable workspace.');
@@ -159,7 +162,7 @@ requireCheck(apexifyWebPreview.includes('config.patternBg'), '@apexify/web must 
 requireCheck(apexifyWebPreview.includes("chartType === 'radar'") && apexifyWebPreview.includes("chartType === 'polarArea'"), '@apexify/web must cover all stable createChart() families.');
 requireCheck(apexifyWebIndex.includes('class ApexifyWebRuntime'), '@apexify/web runtime lifecycle class missing.');
 requireCheck(apexifyWebIndex.includes('registerApexifyWebFonts'), '@apexify/web font manager missing.');
-requireCheck(apexifyWebSource.commit === '7f7c9bf1bc742ef851e143142f1fe7b60f2682b2', '@apexify/web source snapshot is not pinned to the approved engine commit.');
+requireCheck(apexifyWebSource.commit === 'f57bb82743c8f71bbe7e519d060010f970b06ef9', '@apexify/web source snapshot is not pinned to the approved engine commit.');
 requireCheck(apexifyWebInstaller.includes('Integrity mismatch for @apexify/web'), '@apexify/web installer must verify source integrity.');
 requireCheck(studioPreviewZoom.includes('requestFullscreen()'), 'Studio preview must expose real fullscreen mode.');
 requireCheck(studioPreviewZoom.includes('cursor-grab') && studioPreviewZoom.includes('scrollLeft'), 'Studio preview must preserve drag-to-pan behavior.');

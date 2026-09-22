@@ -76,7 +76,7 @@ export default function HomeNavbar({ active = 'home' }: { active?: HomeNavSectio
 
         <nav className="apx-home-nav__links" aria-label="Primary">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} aria-current={link.key === active ? 'page' : undefined}>
+            <Link key={link.href} href={link.href} prefetch={false} aria-current={link.key === active ? 'page' : undefined}>
               {link.label}
             </Link>
           ))}
@@ -123,7 +123,7 @@ export default function HomeNavbar({ active = 'home' }: { active?: HomeNavSectio
       <div id="home-mobile-nav" className="apx-home-nav__mobile md:hidden" data-open={open || undefined}>
         <nav aria-label="Mobile primary">
           {NAV_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setOpen(false)} aria-current={link.key === active ? 'page' : undefined}>
+            <Link key={link.href} href={link.href} prefetch={false} onClick={() => setOpen(false)} aria-current={link.key === active ? 'page' : undefined}>
               {link.label}
             </Link>
           ))}
