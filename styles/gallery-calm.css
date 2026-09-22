@@ -850,6 +850,10 @@
   font:700 .54rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 
+.apx-gallery-sidebar .apx-gallery-scope__group button[data-active] small{
+  color:inherit;
+}
+
 .apx-gallery-scope__note{
   margin:0;
   color:var(--gallery-text-3);
