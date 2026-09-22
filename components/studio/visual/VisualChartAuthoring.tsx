@@ -699,7 +699,7 @@ function StyleEditor({
               }}
             />
           </label>
-          {props.family !== 'radar' ? (
+          {props.family === 'line' || props.family === 'radar' ? (
             <label className="apx-pre4-field">
               <span>Line width</span>
               <input
@@ -721,6 +721,48 @@ function StyleEditor({
               />
             </label>
           ) : null}
+          {props.family === 'scatter' ? (
+            <label className="apx-pre4-field">
+              <span>Marker size</span>
+              <input
+                type="number"
+                min="1"
+                value={Number(firstSeries.markerSize ?? 8)}
+                onChange={(event) => {
+                  const next = series.map((item) => ({ ...item }));
+                  next[0] = {
+                    ...next[0],
+                    markerSize: Number(event.target.value),
+                  };
+                  onApply({
+                    ...props,
+                    data: next as unknown as VisualValue[],
+                  });
+                }}
+              />
+            </label>
+          ) : null}
+          <label className="apx-pre4-field">
+            <span>Series opacity</span>
+            <input
+              type="number"
+              min="0"
+              max="1"
+              step="0.05"
+              value={Number(firstSeries.opacity ?? 1)}
+              onChange={(event) => {
+                const next = series.map((item) => ({ ...item }));
+                next[0] = {
+                  ...next[0],
+                  opacity: Number(event.target.value),
+                };
+                onApply({
+                  ...props,
+                  data: next as unknown as VisualValue[],
+                });
+              }}
+            />
+          </label>
         </div>
       ) : null}
 
@@ -918,18 +960,22 @@ function AdvancedEditor({
             </label>
           </div>
           <label className="apx-pre4-field">
-            <span>Y tick count</span>
+            <span>Y tick step</span>
             <input
               type="number"
-              min="2"
-              value={Number(yAxis.tickCount ?? 6)}
+              min="0"
+              step="any"
+              value={Number(rec(yAxis.range).step ?? 10)}
               onChange={(event) =>
                 onApply(
                   withOption(props, 'axes', {
                     ...axes,
                     y: {
                       ...yAxis,
-                      tickCount: Number(event.target.value),
+                      range: {
+                        ...rec(yAxis.range),
+                        step: Number(event.target.value),
+                      },
                     },
                   }),
                 )
