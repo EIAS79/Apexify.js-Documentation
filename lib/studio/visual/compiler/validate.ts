@@ -1,4 +1,5 @@
 import { validateVisualTextNode } from '../text-contract';
+import { validateVisualChartNode } from '../chart-contract';
 import { validateVisualImageNode } from '../image-contract';
 import { validateVisualCanvasConfig } from '../canvas-contract';
 import {
@@ -190,6 +191,7 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
     visitReferences(node.props as VisualValue, `document.nodes.${id}.props`, known, issues);
     validateVisualImageNode(project, node, issues);
     validateVisualTextNode(node, issues);
+    validateVisualChartNode(node, issues);
     validatePhase7Node(node, issues);
   }
   if (project.document.background !== undefined) {
