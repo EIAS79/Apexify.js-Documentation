@@ -187,6 +187,11 @@
   max-width:100%;
 }
 
+.apx-api-root{
+  max-width:100%;
+  overflow-x:clip;
+}
+
 .apx-api-page{
   overflow-wrap:anywhere;
 }
