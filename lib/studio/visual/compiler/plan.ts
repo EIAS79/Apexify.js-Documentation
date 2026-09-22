@@ -5,9 +5,14 @@ import type {
   VisualNode,
   VisualProject,
   VisualTextNodeProps,
+  VisualValue,
 } from '../model';
 import { isGeneratedImageSource, visualImageProps } from '../image-contract';
 import { visualTextProps } from '../text-contract';
+import {
+  visualChartProps,
+  type VisualStandaloneChartFamily,
+} from '../chart-contract';
 import {
   detectionOperation,
   pixelOperation,
@@ -76,6 +81,35 @@ export type StudioCreateTextOperation = {
   preferredName?: string;
   base: StudioTargetReference;
   properties: StudioTextProperties;
+};
+
+export type StudioCreateChartOperation = {
+  id: string;
+  kind: 'create-chart';
+  sourceNodeId: string;
+  target: string;
+  preferredName?: string;
+  family: VisualStandaloneChartFamily;
+  data: VisualValue[];
+  options: Record<string, VisualValue>;
+};
+
+export type StudioCreateComparisonChartOperation = {
+  id: string;
+  kind: 'create-comparison-chart';
+  sourceNodeId: string;
+  target: string;
+  preferredName?: string;
+  options: Record<string, VisualValue>;
+};
+
+export type StudioCreateComboChartOperation = {
+  id: string;
+  kind: 'create-combo-chart';
+  sourceNodeId: string;
+  target: string;
+  preferredName?: string;
+  options: Record<string, VisualValue>;
 };
 
 export type StudioDrawPathOperation = {
@@ -183,6 +217,9 @@ export type StudioOperation =
   | StudioCreateCanvasOperation
   | StudioCreateImageOperation
   | StudioCreateTextOperation
+  | StudioCreateChartOperation
+  | StudioCreateComparisonChartOperation
+  | StudioCreateComboChartOperation
   | StudioDrawPathOperation
   | StudioCustomPathOperation
   | StudioPixelManipulateOperation
@@ -216,6 +253,7 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
       node.kind === 'image' ||
       node.kind === 'shape' ||
       node.kind === 'text' ||
+      node.kind === 'chart' ||
       node.kind === 'path' ||
       node.kind === 'freehand'
     ) {
@@ -224,7 +262,7 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
     }
 
     throw new Error(
-      `STUDIO-VISUAL-7 cannot lower node kind "${node.kind}" yet. It belongs to a later authoring phase.`,
+      `STUDIO-VISUAL-8 cannot lower node kind "${node.kind}" yet. It belongs to a later authoring phase.`,
     );
   };
 
@@ -446,6 +484,74 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
 
   for (const node of orderedAuthoringNodes(normalized)) {
     const target = node.id;
+
+    if (node.kind === 'chart') {
+      const props = visualChartProps(node);
+      const chartTarget = node.id + '_chart_buffer';
+      if (props.family === 'comparison') {
+        operations.push({
+          id: 'chart_' + node.id,
+          kind: 'create-comparison-chart',
+          sourceNodeId: node.id,
+          target: chartTarget,
+          preferredName: node.name || 'comparisonChart',
+          options: props.options,
+        });
+      } else if (props.family === 'combo') {
+        operations.push({
+          id: 'chart_' + node.id,
+          kind: 'create-combo-chart',
+          sourceNodeId: node.id,
+          target: chartTarget,
+          preferredName: node.name || 'comboChart',
+          options: props.options,
+        });
+      } else {
+        operations.push({
+          id: 'chart_' + node.id,
+          kind: 'create-chart',
+          sourceNodeId: node.id,
+          target: chartTarget,
+          preferredName: node.name || props.family + 'Chart',
+          family: props.family === 'donut' ? 'pie' : props.family,
+          data: props.data ?? [],
+          options: props.options,
+        });
+      }
+
+      const dimensions =
+        props.options && typeof props.options.dimensions === 'object' && props.options.dimensions && !Array.isArray(props.options.dimensions)
+          ? props.options.dimensions as Record<string, VisualValue>
+          : {};
+      operations.push({
+        id: 'chart_compose_' + node.id,
+        kind: 'create-image',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || 'chartLayer',
+        base,
+        properties: {
+          source: { $studioTarget: chartTarget },
+          x: node.transform?.x ?? 0,
+          y: node.transform?.y ?? 0,
+          width:
+            node.transform?.width ??
+            (typeof dimensions.width === 'number' ? dimensions.width : 640),
+          height:
+            node.transform?.height ??
+            (typeof dimensions.height === 'number' ? dimensions.height : 400),
+          rotation: node.transform?.rotation ?? 0,
+          opacity: node.transform?.opacity ?? 1,
+          fit: 'fill',
+        },
+      });
+
+      produced.set(node.id, { target: chartTarget, member: null });
+      base = { $studioTarget: target };
+      lastTarget = target;
+      lastMember = null;
+      continue;
+    }
 
     if (node.kind === 'text') {
       operations.push({

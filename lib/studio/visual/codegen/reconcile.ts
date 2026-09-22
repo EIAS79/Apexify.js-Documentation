@@ -15,6 +15,12 @@ import {
 import { createVisualId } from '../ids';
 import { textPropsRecord } from '../text-contract';
 import {
+  STANDALONE_CHART_FAMILIES,
+  chartPropsRecord,
+  type VisualChartFamily,
+  type VisualStandaloneChartFamily,
+} from '../chart-contract';
+import {
   operationRecord,
   pathPropsRecord,
   visualPathProps,
@@ -442,6 +448,7 @@ function orderedRenderableNodes(project: VisualProject) {
       node.kind === 'image' ||
       node.kind === 'shape' ||
       node.kind === 'text' ||
+      node.kind === 'chart' ||
       node.kind === 'path' ||
       node.kind === 'freehand'
     ) {
@@ -731,6 +738,145 @@ function reconcileTextCall(
   } satisfies VisualProject['document']['nodes'][string];
 }
 
+
+
+function parsedImageSourceIdentifier(call: MethodCall): string | null {
+  if (!call.args[0]) return null;
+  const parsed = new LiteralParser(call.args[0], true).parse();
+  if (!isRecord(parsed) || parsed.source === undefined) return null;
+  const source = parsed.source;
+  return isIdentifierLiteral(source) && !source.member
+    ? source.__identifier
+    : null;
+}
+
+type ChartMethod =
+  | 'createChart'
+  | 'createComparisonChart'
+  | 'createComboChart';
+
+function reconcileChartCall(
+  project: VisualProject,
+  chartCall: MethodCall,
+  chartMethod: ChartMethod,
+  composeCall: MethodCall,
+  index: number,
+  matched: VisualProject['document']['nodes'][string] | undefined,
+  identifiers: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
+) {
+  if (!chartCall.assignedIdentifier) {
+    throw new Error(chartMethod + '() must assign its Buffer for Visual chart sync.');
+  }
+  if (!composeCall.args[0]) {
+    throw new Error('Chart composition requires createImage() properties.');
+  }
+  assertCanonicalBase(composeCall.args[1], identifiers, canvasIdentifier);
+
+  const placement = new LiteralParser(composeCall.args[0], true).parse();
+  if (!isRecord(placement)) {
+    throw new Error('Chart createImage() composition properties must be an object literal.');
+  }
+  const source = placement.source;
+  if (
+    !isIdentifierLiteral(source) ||
+    source.member ||
+    source.__identifier !== chartCall.assignedIdentifier
+  ) {
+    throw new Error('Chart composition must use the Buffer returned by its chart call.');
+  }
+
+  let family: VisualChartFamily;
+  let data: VisualValue[] | undefined;
+  let options: Record<string, VisualValue>;
+
+  if (chartMethod === 'createChart') {
+    if (!chartCall.args[0] || !chartCall.args[1]) {
+      throw new Error('createChart() requires chart family and data.');
+    }
+    const familyValue = new LiteralParser(chartCall.args[0]).parse();
+    const dataValue = new LiteralParser(chartCall.args[1]).parse();
+    const optionsValue = chartCall.args[2]
+      ? new LiteralParser(chartCall.args[2]).parse()
+      : {};
+    if (typeof familyValue !== 'string') {
+      throw new Error('createChart() family must be a string literal.');
+    }
+    if (!Array.isArray(dataValue)) {
+      throw new Error('createChart() data must be a literal array.');
+    }
+    if (!isRecord(optionsValue)) {
+      throw new Error('createChart() options must be a literal object.');
+    }
+    if (!STANDALONE_CHART_FAMILIES.includes(familyValue as VisualStandaloneChartFamily)) {
+      throw new Error('Unsupported Visual createChart() family “' + familyValue + '”.');
+    }
+    family =
+      familyValue === 'pie' && optionsValue.type === 'donut'
+        ? 'donut'
+        : familyValue as VisualStandaloneChartFamily;
+    data = dataValue as unknown as VisualValue[];
+    options = optionsValue as unknown as Record<string, VisualValue>;
+  } else {
+    if (!chartCall.args[0]) {
+      throw new Error(chartMethod + '() requires an options object.');
+    }
+    const optionsValue = new LiteralParser(chartCall.args[0]).parse();
+    if (!isRecord(optionsValue)) {
+      throw new Error(chartMethod + '() options must be a literal object.');
+    }
+    family = chartMethod === 'createComparisonChart' ? 'comparison' : 'combo';
+    options = optionsValue as unknown as Record<string, VisualValue>;
+  }
+
+  const existing = matched?.kind === 'chart' ? matched : undefined;
+  const id = existing?.id ?? createVisualId('chart');
+  const dimensions =
+    options.dimensions &&
+    typeof options.dimensions === 'object' &&
+    !Array.isArray(options.dimensions)
+      ? options.dimensions as Record<string, VisualValue>
+      : {};
+  const x = asOptionalNumber(placement.x) ?? existing?.transform?.x ?? 0;
+  const y = asOptionalNumber(placement.y) ?? existing?.transform?.y ?? 0;
+  const width =
+    asOptionalNumber(placement.width) ??
+    (typeof dimensions.width === 'number' ? dimensions.width : 640);
+  const height =
+    asOptionalNumber(placement.height) ??
+    (typeof dimensions.height === 'number' ? dimensions.height : 400);
+
+  return {
+    id,
+    kind: 'chart',
+    name: existing?.name ?? (
+      family === 'comparison'
+        ? 'Comparison chart'
+        : family === 'combo'
+          ? 'Combo chart'
+          : family.charAt(0).toUpperCase() + family.slice(1) + ' chart'
+    ),
+    parentId: existing?.parentId ?? null,
+    childIds: existing?.childIds,
+    transform: {
+      ...(existing?.transform ?? {}),
+      x,
+      y,
+      width,
+      height,
+      rotation: asOptionalNumber(placement.rotation) ?? 0,
+      opacity: asOptionalNumber(placement.opacity) ?? 1,
+      visible: existing?.transform?.visible ?? true,
+      locked: existing?.transform?.locked ?? false,
+      zIndex: existing?.transform?.zIndex ?? index,
+    },
+    props: chartPropsRecord({
+      family,
+      ...(data ? { data } : {}),
+      options,
+    }),
+  } satisfies VisualProject['document']['nodes'][string];
+}
 
 function pathCommandBounds(commands: StudioPathCommand[]) {
   const xs: number[] = [];
@@ -1308,11 +1454,45 @@ function reconcileRenderableCalls(
   canvasIdentifier: string | null,
 ) {
   const resources = pathResourceDefinitions(source);
-  const calls = [
-    ...extractMethodCalls(source, 'createImage').map((call) => ({
+  const chartCalls = [
+    ...extractMethodCalls(source, 'createChart').map((call) => ({
       ...call,
-      method: 'createImage' as const,
+      chartMethod: 'createChart' as const,
     })),
+    ...extractMethodCalls(source, 'createComparisonChart').map((call) => ({
+      ...call,
+      chartMethod: 'createComparisonChart' as const,
+    })),
+    ...extractMethodCalls(source, 'createComboChart').map((call) => ({
+      ...call,
+      chartMethod: 'createComboChart' as const,
+    })),
+  ].sort((a, b) => a.index - b.index);
+
+  const chartByIdentifier = new Map(
+    chartCalls
+      .filter((call) => Boolean(call.assignedIdentifier))
+      .map((call) => [call.assignedIdentifier!, call] as const),
+  );
+  const composedChartIdentifiers = new Set<string>();
+
+  const calls = [
+    ...extractMethodCalls(source, 'createImage').map((call) => {
+      const sourceIdentifier = parsedImageSourceIdentifier(call);
+      const chartCall =
+        sourceIdentifier && !composedChartIdentifiers.has(sourceIdentifier)
+          ? chartByIdentifier.get(sourceIdentifier)
+          : undefined;
+      if (chartCall && sourceIdentifier) {
+        composedChartIdentifiers.add(sourceIdentifier);
+        return {
+          ...call,
+          method: 'chart-compose' as const,
+          chartCall,
+        };
+      }
+      return { ...call, method: 'createImage' as const };
+    }),
     ...extractMethodCalls(source, 'createText').map((call) => ({
       ...call,
       method: 'createText' as const,
@@ -1327,6 +1507,19 @@ function reconcileRenderableCalls(
     })),
   ].sort((a, b) => a.index - b.index);
 
+  for (const chartCall of chartCalls) {
+    if (!chartCall.assignedIdentifier) {
+      throw new Error(chartCall.chartMethod + '() must assign its Buffer for Visual chart sync.');
+    }
+    if (!composedChartIdentifiers.has(chartCall.assignedIdentifier)) {
+      throw new Error(
+        'Visual chart sync requires chart Buffer “' +
+          chartCall.assignedIdentifier +
+          '” to be composed with createImage().',
+      );
+    }
+  }
+
   const existing = orderedRenderableNodes(project);
   const identifierToNodeId = new Map<string, string>();
   const pathResourceToNodeId = new Map<string, string>();
@@ -1335,17 +1528,19 @@ function reconcileRenderableCalls(
   calls.forEach((call, index) => {
     const matched = existing[index];
     const node =
-      call.method === 'createImage'
-        ? reconcileImageCall(
+      call.method === 'chart-compose'
+        ? reconcileChartCall(
             project,
+            call.chartCall,
+            call.chartCall.chartMethod,
             call,
             index,
             matched,
             identifierToNodeId,
             canvasIdentifier,
           )
-        : call.method === 'createText'
-          ? reconcileTextCall(
+        : call.method === 'createImage'
+          ? reconcileImageCall(
               project,
               call,
               index,
@@ -1353,32 +1548,50 @@ function reconcileRenderableCalls(
               identifierToNodeId,
               canvasIdentifier,
             )
-          : call.method === 'path2d.draw'
-            ? reconcilePathDrawCall(
+          : call.method === 'createText'
+            ? reconcileTextCall(
                 project,
                 call,
                 index,
                 matched,
                 identifierToNodeId,
                 canvasIdentifier,
-                resources,
               )
-            : reconcileCustomPathCall(
-                project,
-                call,
-                index,
-                matched,
-                identifierToNodeId,
-                canvasIdentifier,
-              );
+            : call.method === 'path2d.draw'
+              ? reconcilePathDrawCall(
+                  project,
+                  call,
+                  index,
+                  matched,
+                  identifierToNodeId,
+                  canvasIdentifier,
+                  resources,
+                )
+              : reconcileCustomPathCall(
+                  project,
+                  call,
+                  index,
+                  matched,
+                  identifierToNodeId,
+                  canvasIdentifier,
+                );
 
     const oldNode = project.document.nodes[node.id];
     if (!oldNode) project.document.rootNodeIds.push(node.id);
     project.document.nodes[node.id] = node;
     touched.add(node.id);
-    if (call.assignedIdentifier) {
+
+    if (call.method === 'chart-compose') {
+      if (call.chartCall.assignedIdentifier) {
+        identifierToNodeId.set(call.chartCall.assignedIdentifier, node.id);
+      }
+      if (call.assignedIdentifier) {
+        identifierToNodeId.set(call.assignedIdentifier, node.id);
+      }
+    } else if (call.assignedIdentifier) {
       identifierToNodeId.set(call.assignedIdentifier, node.id);
     }
+
     if (call.method === 'path2d.draw' && call.args[1]) {
       const resource = new LiteralParser(call.args[1], true).parse();
       if (isIdentifierLiteral(resource) && !resource.member) {

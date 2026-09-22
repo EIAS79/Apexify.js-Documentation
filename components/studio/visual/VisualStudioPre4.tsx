@@ -41,6 +41,10 @@ import {
   VisualCodeModal,
   VisualPreviewModal,
 } from '@/components/studio/visual/VisualStudioModals';
+import {
+  ChartFamilyPicker,
+  VisualChartInspector,
+} from '@/components/studio/visual/VisualChartAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -86,6 +90,7 @@ import type {
   VisualShapeType,
   VisualTextNodeProps,
   VisualTransform,
+  VisualValue,
 } from '@/lib/studio/visual/model';
 import {
   CANVAS_ALIGNMENTS,
@@ -116,6 +121,13 @@ import {
   textPropsRecord,
   visualTextProps,
 } from '@/lib/studio/visual/text-contract';
+import {
+  defaultChartNodeProps,
+  chartPropsRecord,
+  visualChartProps,
+  type VisualChartFamily,
+  type VisualChartNodeProps,
+} from '@/lib/studio/visual/chart-contract';
 import {
   defaultPathNodeProps,
   detectionOperation,
@@ -536,6 +548,7 @@ export default function VisualStudioPre4({
     primary && (primary.kind === 'path' || primary.kind === 'freehand')
       ? primary
       : undefined;
+  const primaryChart = primary?.kind === 'chart' ? primary : undefined;
   const textMetrics = useMemo(() => {
     if (!primaryText) return null;
     const props = visualTextProps(primaryText);
@@ -979,6 +992,80 @@ export default function VisualStudioPre4({
     setActiveTool('shapes');
     setInspectorTab('style');
     setMessage('Shape added');
+  };
+
+  const mutateChart = (
+    label: string,
+    updater: (props: VisualChartNodeProps) => VisualChartNodeProps,
+  ) => {
+    if (!primaryChart) return;
+    mutate(label, (current) => {
+      const node = current.document.nodes[primaryChart.id];
+      if (!node || node.kind !== 'chart') return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[primaryChart.id];
+      nextNode.props = chartPropsRecord(updater(visualChartProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const insertChart = (family: VisualChartFamily, point?: Point) => {
+    mutate('Add ' + family + ' chart', (current) => {
+      const next = structuredClone(current);
+      const props = defaultChartNodeProps(family);
+      const dimensions =
+        props.options.dimensions &&
+        typeof props.options.dimensions === 'object' &&
+        !Array.isArray(props.options.dimensions)
+          ? props.options.dimensions as Record<string, VisualValue>
+          : {};
+      const width =
+        typeof dimensions.width === 'number'
+          ? Math.min(dimensions.width, Math.max(240, next.document.width * 0.72))
+          : Math.min(640, Math.max(240, next.document.width * 0.72));
+      const height =
+        typeof dimensions.height === 'number'
+          ? Math.min(dimensions.height, Math.max(180, next.document.height * 0.62))
+          : Math.min(400, Math.max(180, next.document.height * 0.62));
+      const node = createVisualNode(
+        'chart',
+        chartPropsRecord(props),
+        {
+          name:
+            family === 'comparison'
+              ? 'Comparison chart'
+              : family === 'combo'
+                ? 'Combo chart'
+                : family.charAt(0).toUpperCase() + family.slice(1) + ' chart',
+        },
+      );
+      node.transform = {
+        x: point?.x ?? Math.max(16, (next.document.width - width) / 2),
+        y: point?.y ?? Math.max(16, (next.document.height - height) / 2),
+        width,
+        height,
+        rotation: 0,
+        opacity: 1,
+        visible: true,
+        locked: false,
+        zIndex: next.document.rootNodeIds.length,
+      };
+      next.document.nodes[node.id] = node;
+      next.document.rootNodeIds.push(node.id);
+      next.editor = { ...next.editor, selectedNodeIds: [node.id] };
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setActiveTool('charts');
+    setInspectorTab('data');
+    setMessage(
+      family === 'comparison'
+        ? 'Comparison chart added'
+        : family === 'combo'
+          ? 'Combo chart added'
+          : family + ' chart added',
+    );
   };
 
   const addImageFiles = async (
@@ -2439,6 +2526,7 @@ export default function VisualStudioPre4({
     activeTool === 'images' ||
     activeTool === 'shapes' ||
     activeTool === 'text' ||
+    activeTool === 'charts' ||
     activeTool === 'paths' ||
     activeTool === 'assets';
 
@@ -2457,6 +2545,10 @@ export default function VisualStudioPre4({
   ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'charts') {
+      return <ChartFamilyPicker onInsert={insertChart} />;
+    }
+
     if (activeTool === 'paths') {
       const activatePointTool = (
         action: NonNullable<typeof phase7Action>,
@@ -5076,6 +5168,17 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
+    if (primaryChart) {
+      if (inspectorTab === 'transform') return renderTransformFields();
+      return (
+        <VisualChartInspector
+          node={primaryChart}
+          tab={inspectorTab}
+          onChange={mutateChart}
+        />
+      );
+    }
+
     if (primaryPath) {
       return renderPathInspector();
     }
