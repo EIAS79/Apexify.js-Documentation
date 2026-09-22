@@ -623,7 +623,10 @@ function executeDeno(
             // Deno/V8 plus native Canvas/Sharp/FFmpeg can create dozens of worker threads.
             // Keep a hard process/thread ceiling without starving runtime startup.
             '--nproc=256',
-            '--as=2147483648',
+            // Do not apply RLIMIT_AS to Deno/V8. V8/Oilpan reserve large virtual
+            // address ranges independently of committed memory, so a low address-space
+            // ceiling can abort before user code runs even when the 256 MB V8 heap cap
+            // and the Studio output/time/process limits are respected.
             '--',
             deno,
             ...args,
