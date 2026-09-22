@@ -27,6 +27,17 @@ export interface StudioOperationRuntime {
     properties: StudioTextProperties,
     canvasBuffer: Uint8Array,
   ): Promise<Uint8Array>;
+  createChart?(
+    family: 'pie' | 'bar' | 'horizontalBar' | 'line' | 'scatter' | 'radar' | 'polarArea',
+    data: unknown[],
+    options: Record<string, unknown>,
+  ): Promise<Uint8Array>;
+  createComparisonChart?(
+    options: Record<string, unknown>,
+  ): Promise<Uint8Array>;
+  createComboChart?(
+    options: Record<string, unknown>,
+  ): Promise<Uint8Array>;
   drawPath?(
     canvasBuffer: Uint8Array,
     commands: StudioPathCommand[],
@@ -161,6 +172,49 @@ export async function executeStudioOperationPlan(
         }
         const value = await runtime.createText(operation.properties, base);
         values.set(operation.target, value);
+        break;
+      }
+      case 'create-chart': {
+        if (!runtime.createChart) {
+          throw new Error('Studio runtime does not implement createChart().');
+        }
+        const family = operation.family === 'donut' ? 'pie' : operation.family;
+        const options =
+          operation.family === 'donut'
+            ? { ...operation.options, type: 'donut' }
+            : operation.options;
+        values.set(
+          operation.target,
+          await runtime.createChart(
+            family,
+            operation.data as unknown[],
+            options as Record<string, unknown>,
+          ),
+        );
+        break;
+      }
+      case 'create-comparison-chart': {
+        if (!runtime.createComparisonChart) {
+          throw new Error('Studio runtime does not implement createComparisonChart().');
+        }
+        values.set(
+          operation.target,
+          await runtime.createComparisonChart(
+            operation.options as Record<string, unknown>,
+          ),
+        );
+        break;
+      }
+      case 'create-combo-chart': {
+        if (!runtime.createComboChart) {
+          throw new Error('Studio runtime does not implement createComboChart().');
+        }
+        values.set(
+          operation.target,
+          await runtime.createComboChart(
+            operation.options as Record<string, unknown>,
+          ),
+        );
         break;
       }
       case 'path-draw': {
