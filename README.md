@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/brand/apexify-banner.png" alt="Apexify.js — Build visual systems from code" width="100%" />
+  <img src="./public/brand/apexify-banner.avif" alt="Apexify.js — Build visual systems from code" width="100%" />
 </p>
 
 # Apexify.js Documentation
@@ -24,9 +24,9 @@ See [DOC0_12_PROGRAM_COMPLETION_STATUS.md](./DOC0_12_PROGRAM_COMPLETION_STATUS.m
 
 The current brand assets live in `public/brand/`:
 
-- `apexify-mark.png` — exact uploaded Apexify mark used for favicons and compact UI placements.
-- `apexify-lockup.png` — exact uploaded Apexify.js horizontal logo/wordmark.
-- `apexify-banner.png` — exact uploaded full repository/documentation banner.
+- `apexify-mark.avif` — exact uploaded Apexify mark used for favicons and compact UI placements.
+- `apexify-lockup.avif` — exact uploaded Apexify.js horizontal logo/wordmark.
+- `apexify-banner.avif` — exact uploaded full repository/documentation banner.
 
 The older SVG and AVIF files remain only as compatibility/fallback assets. The site and README use the original uploaded PNG artwork so the mark, wordmark geometry, and `.js` spacing stay exact.
 
