@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3211,8 +3211,8 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 4 | Canvas | MAIN MERGED | `7c33de0eae60a6ed7a12fb41b942610eaf702498` | PR #83; exact-head Studio Visual gate `35654406532` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because Vercel quota is rate-limited |
 | 5 | Images / shapes / assets | MAIN MERGED | `b3aa8683345f48687cddc4e54077bdfd3f13226d` | PR #84; exact-head Studio Visual gate `35657277254` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; production deployment deferred because no exact merge deployment is available yet |
 | 6 | Text / fonts | MAIN MERGED | `123d0bea6a324acb1a715d45d0f2faa70a500b05` | PR #85; exact-head Studio Visual gate `35662040413` PASS; contracts/typecheck/build/runtime/browser/live-sync proof PASS; Apexify Web text renderer merged as `fb48f08ed8fc3d48628d8a93b15fe5d94b69bfbb`; production verification deferred because no exact Phase-6 main production deployment is available; branch preview `dpl_9vzrordcDAz2wVM7a3no3R872SDq` was intentionally canceled by the Vercel ignored-build-step policy |
-| 7 | Paths / doodle / pixels / detect | NOT STARTED | — | NEXT — activate Paths and implement path/doodle/pixel/detection authoring against the permanent shell |
-| 8 | Charts | NOT STARTED | — | — |
+| 7 | Paths / doodle / pixels / detect | MAIN MERGED | `f331de671c14e8dadc0167fe8c4532c22ba54c8f` | PR #86; exact-head Studio Visual gate `35721981002` PASS; Documentation Runtime Build Gate `35721981107` PASS; typecheck/build/browser/live-sync/reverse-sync proof PASS; direct canvas anchor/Bézier editing PASS; Apexify.js Phase-7 runtime finalized by PR #36 as `45b9381c07b70bb16be456406940858af8ab699a`; production verification deferred because exact feature-merge Vercel status was still pending when closure was recorded |
+| 8 | Charts | NOT STARTED | — | NEXT — activate Charts and implement complete chart authoring against the permanent shell |
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
 | 10 | Image utilities | NOT STARTED | — | — |
 | 11 | GIF / animation | NOT STARTED | — | — |
@@ -3614,6 +3614,82 @@ uploaded font asset
 ```
 
 Production verification remains deferred until Vercel usage is available again.
+
+
+---
+
+## Phase 7 implementation record — STUDIO-VISUAL-7
+
+> **Status:** MAIN MERGED — PRODUCTION VERIFICATION DEFERRED
+>
+> **Work branch:** `studio-visual/v07-path-pixels-detect`
+>
+> **PR:** #86
+>
+> **Verified final implementation head:** `2a7f63f050e58a5f252f086cc6d4e19c4f7f711e`
+>
+> **Green Studio Visual gate:** GitHub Actions `35721981002`
+>
+> **Green Documentation Runtime Build Gate:** GitHub Actions `35721981107`
+>
+> **Main integration:** `f331de671c14e8dadc0167fe8c4532c22ba54c8f`
+>
+> **Apexify.js Phase-7 runtime:** PR #34 merged as `a216c54cd86583ba62c640574bf059e0fdeaff4e`; follow-up PR #35 merged as `c1f96c7d170e51de2b9cd816dc80d2341c01f32e`; final pivot-translation parity PR #36 merged as `45b9381c07b70bb16be456406940858af8ab699a`.
+>
+> **Pinned `@apexify/web` snapshot:** exact runtime commit `45b9381c07b70bb16be456406940858af8ab699a`; `src/studio-preview.ts` blob `308331b6c2b9eb769c9114794824664fe881fa81`.
+>
+> **Production deployment:** DEFERRED — exact feature-merge Vercel status for `f331de671c14e8dadc0167fe8c4532c22ba54c8f` was still pending when this closure record was written, so no production smoke is claimed.
+
+Completed Phase-7 scope:
+
+- activated the permanent **Paths** authoring rail and contextual path/pixel tooling;
+- added line, polyline, cubic Bézier, generic path and connector insertion;
+- added freehand/doodle authoring with pointer capture;
+- added direct editor-only canvas anchor and Bézier control-point handles;
+- added correct local ↔ document coordinate mapping for translation, rotation, scale and pivot/origin transforms;
+- added Path2D command authoring and exact canonical `.path2d.create()` / `.path2d.draw()` code generation;
+- added custom connector generation through `.path2d.custom()`, including arrows, markers, dash, caps, joins and connector transform geometry;
+- added fill, stroke, opacity, fill-rule, shadow and advanced path JSON controls;
+- added pixel manipulation, pixel set, pixel color inspection and pixel-data sampling;
+- added path hit detection, region hit detection, any-region detection and distance detection;
+- routed structured Phase-7 results into the existing **Diagnostics** surface rather than introducing a competing permanent Results dock;
+- added explicit reverse-sync classifications for every canonical Phase-7 path/pixel/detection operation;
+- preserved mixed pixel mutation/detection chronology deterministically;
+- preserved path-resource identity across duplicate path definitions and detection references;
+- preserved primitive path bounds and transform pivots during Code → Visual reconciliation;
+- rejected malformed connector payloads, dangling/hidden path probes and noncanonical branched pixel-buffer bases rather than silently changing semantics;
+- pruned dependent path-detection operations when a target path is deleted or hidden through normal Visual editing;
+- added runtime/browser support for path rendering, custom connectors, pixel operations and structured detection results;
+- aligned native Apexify Path2D and `@apexify/web` transform semantics so `translateX`/`translateY` work together with `originX`/`originY`;
+- pinned the Documentation Studio to the final merged Phase-7 `@apexify/web` snapshot;
+- added desktop/mobile browser proof that inserts a Bézier path, drags a real control point, mutates canonical linked source, executes pixel operations, returns structured results and preserves the authoritative Apexify frame;
+- preserved Code → Visual → Code sync boundaries without `eval` / `new Function`;
+- kept editor-only path handles/guides out of generated code.
+
+### Phase 7 proof
+
+```text
+Path / doodle authoring
+→ semantic Visual path/freehand nodes
+→ ordered Studio operation plan
+→ canonical path2d.create / path2d.draw / path2d.custom
+→ real Apexify runtime + @apexify/web preview
+
+Direct canvas point edit
+→ local path command mutation
+→ one history transaction
+→ linked generated Apexify source update
+→ authoritative preview remains live
+
+Pixel mutation / inspection / detection
+→ ordered Visual operations
+→ canonical pixels.* / detect.* source
+→ structured Diagnostics results
+→ reverse-sync with canonical linear-buffer guarantees
+```
+
+Production verification remains deferred until the exact Phase-7 main feature merge has a confirmed production deployment and live `/studio` smoke.
+
 
 ---
 
