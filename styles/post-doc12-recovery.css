@@ -54,7 +54,7 @@
 .apx-doc-toc-rail :where(a),
 .apx-breadcrumbs :where(a),
 .apx-pager :where(a) {
-  min-inline-size: 2.75rem;
-  min-block-size: 2.75rem;
+  min-inline-size: 44px;
+  min-block-size: 44px;
 }
 
