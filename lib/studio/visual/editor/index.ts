@@ -349,6 +349,16 @@ export function deleteNodes(
       (id) => !doomed.has(id),
     ),
   };
+  next.operations = next.operations.filter((record) => {
+    if (
+      record.kind !== 'detection-operation' ||
+      record.value?.type !== 'detectPath'
+    ) {
+      return true;
+    }
+    const pathNodeId = record.value.pathNodeId;
+    return typeof pathNodeId !== 'string' || !doomed.has(pathNodeId);
+  });
   return next;
 }
 
