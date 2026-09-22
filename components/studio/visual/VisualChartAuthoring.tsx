@@ -5,6 +5,7 @@ import type { VisualNode, VisualValue } from '@/lib/studio/visual/model';
 import {
   CHART_FAMILIES,
   CHART_FAMILY_OPTION_MATRIX,
+  defaultStandaloneChartNodeProps,
   visualChartProps,
   type VisualChartFamily,
   type VisualChartNodeProps,
@@ -72,6 +73,26 @@ function withTitle(
       ...rec(rec(options.labels).title),
       ...patch,
     },
+  });
+}
+
+function withLegend(
+  props: VisualChartNodeProps,
+  patch: R,
+): VisualChartNodeProps {
+  const options = rec(props.options);
+  if (props.family === 'pie' || props.family === 'donut') {
+    return withOption(props, 'legends', {
+      ...rec(options.legends),
+      standard: {
+        ...rec(rec(options.legends).standard),
+        ...patch,
+      },
+    });
+  }
+  return withOption(props, 'legend', {
+    ...rec(options.legend),
+    ...patch,
   });
 }
 
@@ -267,31 +288,36 @@ function SeriesEditor({
   const data = rows(props.data);
   const [active, setActive] = useState(0);
   const index = Math.min(active, Math.max(0, data.length - 1));
+  const radar = props.family === 'radar';
+  const radarOptions = rec(rec(props.options).radar);
+  const radarCategories = Array.isArray(radarOptions.categories)
+    ? radarOptions.categories.map((value: unknown) => String(value))
+    : [];
   const series = data[index] ?? {
     label: 'Series 1',
     color: COLORS[0],
-    data: [],
+    ...(radar ? { values: radarCategories.map(() => 10) } : { data: [] }),
   };
-  const radar = props.family === 'radar';
-  const pointRows = rows(series.data).map((point, pointIndex) =>
-    radar
-      ? {
-          label: point.label ?? 'Axis ' + (pointIndex + 1),
-          value: point.value ?? 0,
-          color: series.color,
-        }
-      : {
-          label: 'P' + (pointIndex + 1),
-          x: point.x ?? pointIndex,
-          y: point.y ?? 0,
-          color: series.color,
-        },
-  );
+  const pointRows = radar
+    ? radarCategories.map((label: string, pointIndex: number) => ({
+        label,
+        value: Number(
+          Array.isArray(series.values) ? series.values[pointIndex] ?? 0 : 0,
+        ),
+        color: series.color,
+      }))
+    : rows(series.data).map((point, pointIndex) => ({
+        label: 'P' + (pointIndex + 1),
+        x: point.x ?? pointIndex,
+        y: point.y ?? 0,
+        color: series.color,
+      }));
 
-  const update = (next: R[]) =>
+  const update = (next: R[], options = props.options) =>
     onApply({
       ...props,
       data: next as unknown as VisualValue[],
+      options,
     });
 
   return (
@@ -354,11 +380,9 @@ function SeriesEditor({
                 {
                   label: 'Series ' + (nextIndex + 1),
                   color: COLORS[nextIndex % COLORS.length],
-                  data: [
-                    radar
-                      ? { label: 'Axis 1', value: 10 }
-                      : { x: 0, y: 10 },
-                  ],
+                  ...(radar
+                    ? { values: radarCategories.map(() => 10) }
+                    : { data: [{ x: 0, y: 10 }] }),
                 },
               ]);
               setActive(nextIndex);
@@ -385,19 +409,26 @@ function SeriesEditor({
           value={pointRows}
           onChange={(nextRows) => {
             const next = data.map((item) => ({ ...item }));
+            if (radar) {
+              next[index] = {
+                ...next[index],
+                values: nextRows.map((row) => Number(row.value ?? 0)),
+              };
+              update(next, {
+                ...rec(props.options),
+                radar: {
+                  ...radarOptions,
+                  categories: nextRows.map((row) => String(row.label ?? '')),
+                },
+              } as Record<string, VisualValue>);
+              return;
+            }
             next[index] = {
               ...next[index],
-              data: nextRows.map((row) =>
-                radar
-                  ? {
-                      label: String(row.label ?? ''),
-                      value: Number(row.value ?? 0),
-                    }
-                  : {
-                      x: Number(row.x ?? 0),
-                      y: Number(row.y ?? 0),
-                    },
-              ),
+              data: nextRows.map((row) => ({
+                x: Number(row.x ?? 0),
+                y: Number(row.y ?? 0),
+              })),
             };
             update(next);
           }}
@@ -430,13 +461,20 @@ function DataEditor({
                 <span>Family</span>
                 <select
                   value={String(chart.type ?? 'bar')}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const family = event.target.value as Exclude<
+                      VisualChartFamily,
+                      'comparison' | 'combo'
+                    >;
+                    const defaults = defaultStandaloneChartNodeProps(family);
                     onApply(
                       withOption(props, key, {
                         ...chart,
-                        type: event.target.value,
+                        type: family,
+                        data: defaults.data ?? [],
+                        options: defaults.options,
                       }),
-                    )
+                    );
                   }
                 >
                   {CHART_FAMILIES.filter(
@@ -520,7 +558,10 @@ function StyleEditor({
   const options = rec(props.options);
   const title = titleOf(props);
   const appearance = rec(options.appearance);
-  const legend = rec(options.legend);
+  const legend =
+    props.family === 'pie' || props.family === 'donut'
+      ? rec(rec(options.legends).standard)
+      : rec(options.legend);
   const grid = rec(options.grid);
   const axes = rec(options.axes);
   const xAxis = rec(axes.x);
@@ -704,8 +745,7 @@ function StyleEditor({
                 checked={legend.show !== false}
                 onChange={(event) =>
                   onApply(
-                    withOption(props, 'legend', {
-                      ...legend,
+                    withLegend(props, {
                       show: event.target.checked,
                     }),
                   )
@@ -719,8 +759,7 @@ function StyleEditor({
                 value={String(legend.position ?? 'bottom')}
                 onChange={(event) =>
                   onApply(
-                    withOption(props, 'legend', {
-                      ...legend,
+                    withLegend(props, {
                       position: event.target.value,
                     }),
                   )
@@ -736,24 +775,28 @@ function StyleEditor({
               </select>
             </label>
           </div>
-          <div className="apx-pre4-section" data-chart-grid>
-            <div className="apx-pre4-section-title">Grid</div>
-            <label className="apx-pre4-check">
-              <input
-                type="checkbox"
-                checked={grid.show !== false}
-                onChange={(event) =>
-                  onApply(
-                    withOption(props, 'grid', {
-                      ...grid,
-                      show: event.target.checked,
-                    }),
-                  )
-                }
-              />
-              <span>Show grid</span>
-            </label>
-          </div>
+          {['bar', 'horizontalBar', 'line', 'scatter', 'combo'].includes(
+            props.family,
+          ) ? (
+            <div className="apx-pre4-section" data-chart-grid>
+              <div className="apx-pre4-section-title">Grid</div>
+              <label className="apx-pre4-check">
+                <input
+                  type="checkbox"
+                  checked={grid.show !== false}
+                  onChange={(event) =>
+                    onApply(
+                      withOption(props, 'grid', {
+                        ...grid,
+                        show: event.target.checked,
+                      }),
+                    )
+                  }
+                />
+                <span>Show grid</span>
+              </label>
+            </div>
+          ) : null}
         </>
       ) : null}
     </>
@@ -780,9 +823,9 @@ function AdvancedEditor({
           <label className="apx-pre4-field">
             <span>Type</span>
             <select
-              value={String(options.barType ?? 'standard')}
+              value={String(options.type ?? 'standard')}
               onChange={(event) =>
-                onApply(withOption(props, 'barType', event.target.value))
+                onApply(withOption(props, 'type', event.target.value))
               }
             >
               {['standard', 'grouped', 'stacked', 'waterfall', 'lollipop'].map(
@@ -962,17 +1005,38 @@ function AdvancedEditor({
       {props.family === 'pie' || props.family === 'donut' ? (
         <div className="apx-pre4-section" data-chart-family-options>
           <div className="apx-pre4-section-title">Pie / donut</div>
+          {props.family === 'donut' ? (
+            <label className="apx-pre4-field">
+              <span>Inner radius</span>
+              <input
+                type="number"
+                min="0"
+                value={Number(options.donutInnerRadius ?? 72)}
+                onChange={(event) =>
+                  onApply(
+                    withOption(
+                      props,
+                      'donutInnerRadius',
+                      Number(event.target.value),
+                    ),
+                  )
+                }
+              />
+            </label>
+          ) : null}
           <label className="apx-pre4-field">
-            <span>Inner radius</span>
+            <span>Slice opacity</span>
             <input
               type="number"
               min="0"
-              value={Number(rec(options.pie).innerRadius ?? (props.family === 'donut' ? 70 : 0))}
+              max="1"
+              step="0.05"
+              value={Number(rec(options.slices).opacity ?? 1)}
               onChange={(event) =>
                 onApply(
-                  withOption(props, 'pie', {
-                    ...rec(options.pie),
-                    innerRadius: Number(event.target.value),
+                  withOption(props, 'slices', {
+                    ...rec(options.slices),
+                    opacity: Number(event.target.value),
                   }),
                 )
               }
@@ -1000,20 +1064,20 @@ function AdvancedEditor({
               }
             />
           </label>
-          <label className="apx-pre4-field">
-            <span>Start angle</span>
+          <label className="apx-pre4-check">
             <input
-              type="number"
-              value={Number(rec(options.radar).startAngleDeg ?? -90)}
+              type="checkbox"
+              checked={rec(options.radar).showPoints === true}
               onChange={(event) =>
                 onApply(
                   withOption(props, 'radar', {
                     ...rec(options.radar),
-                    startAngleDeg: Number(event.target.value),
+                    showPoints: event.target.checked,
                   }),
                 )
               }
             />
+            <span>Show radar points</span>
           </label>
         </div>
       ) : null}
@@ -1023,49 +1087,103 @@ function AdvancedEditor({
           <div className="apx-pre4-section-title">
             {props.family === 'line' ? 'Line' : 'Scatter'}
           </div>
-          {props.family === 'line' ? (
-            <>
-              <label className="apx-pre4-field">
-                <span>Line style</span>
-                <select
-                  value={String(options.lineStyle ?? 'straight')}
-                  onChange={(event) =>
-                    onApply(withOption(props, 'lineStyle', event.target.value))
-                  }
-                >
-                  <option value="straight">straight</option>
-                  <option value="smooth">smooth</option>
-                  <option value="step">step</option>
-                </select>
-              </label>
-              <label className="apx-pre4-field">
-                <span>Smoothness</span>
-                <input
-                  type="number"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value={Number(options.lineSmoothness ?? 0.35)}
-                  onChange={(event) =>
-                    onApply(
-                      withOption(
-                        props,
-                        'lineSmoothness',
-                        Number(event.target.value),
-                      ),
-                    )
-                  }
-                />
-              </label>
-            </>
-          ) : (
-            <JsonEditor
-              label="Marker"
-              testId="scatter-marker"
-              value={options.marker ?? {}}
-              onApply={(value) => onApply(withOption(props, 'marker', value))}
-            />
-          )}
+          {(() => {
+            const series = rows(props.data);
+            const first = rec(series[0]);
+            if (!series.length) return null;
+            if (props.family === 'line') {
+              return (
+                <>
+                  <label className="apx-pre4-field">
+                    <span>Line style</span>
+                    <select
+                      value={String(first.lineStyle ?? 'solid')}
+                      onChange={(event) => {
+                        const next = series.map((item) => ({ ...item }));
+                        next[0] = {
+                          ...next[0],
+                          lineStyle: event.target.value,
+                        };
+                        onApply({
+                          ...props,
+                          data: next as unknown as VisualValue[],
+                        });
+                      }}
+                    >
+                      {['solid','dashed','dotted','dashdot','longdash','shortdash','step','stepline'].map((value) => (
+                        <option key={value} value={value}>{value}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="apx-pre4-field">
+                    <span>Smoothness</span>
+                    <select
+                      value={String(first.smoothness ?? 'bezier')}
+                      onChange={(event) => {
+                        const next = series.map((item) => ({ ...item }));
+                        next[0] = {
+                          ...next[0],
+                          smoothness: event.target.value,
+                        };
+                        onApply({
+                          ...props,
+                          data: next as unknown as VisualValue[],
+                        });
+                      }}
+                    >
+                      <option value="none">none</option>
+                      <option value="bezier">bezier</option>
+                      <option value="spline">spline</option>
+                    </select>
+                  </label>
+                </>
+              );
+            }
+            return (
+              <>
+                <label className="apx-pre4-field">
+                  <span>Marker type</span>
+                  <select
+                    value={String(first.markerType ?? 'circle')}
+                    onChange={(event) => {
+                      const next = series.map((item) => ({ ...item }));
+                      next[0] = {
+                        ...next[0],
+                        markerType: event.target.value,
+                      };
+                      onApply({
+                        ...props,
+                        data: next as unknown as VisualValue[],
+                      });
+                    }}
+                  >
+                    {['circle','square','diamond','cross','none'].map((value) => (
+                      <option key={value} value={value}>{value}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="apx-pre4-field">
+                  <span>Marker size</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={Number(first.markerSize ?? 8)}
+                    onChange={(event) => {
+                      const next = series.map((item) => ({ ...item }));
+                      next[0] = {
+                        ...next[0],
+                        markerSize: Number(event.target.value),
+                      };
+                      onApply({
+                        ...props,
+                        data: next as unknown as VisualValue[],
+                      });
+                    }}
+                  />
+                </label>
+              </>
+            );
+          })()}
         </div>
       ) : null}
 
