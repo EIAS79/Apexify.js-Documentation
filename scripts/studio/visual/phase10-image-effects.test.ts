@@ -21,6 +21,7 @@ import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import {
   generateVisualProjectCode,
+  generateVisualProjectDisplayPreviewCode,
   generateVisualProjectPreviewCode,
 } from '../../../lib/studio/visual/codegen/generator';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
@@ -344,6 +345,39 @@ test('Phase 10 preview analysis keys are namespaced by source layer', () => {
   assert.ok(source.includes('image_phase10_copy:image-analysis-color'));
 });
 
+test('Phase 10 separates unsupported exact exports from browser-safe display previews', () => {
+  const project = phase10Project();
+  const node = project.document.nodes.image_phase10;
+  const props = visualImageProps(node);
+  props.utilityStack = [{
+    id: 'convert-raw-display',
+    type: 'imgConverter',
+    newExtension: 'raw',
+  }];
+  props.utilityAnalyses = [];
+  node.props = imagePropsRecord(props);
+
+  const exactSource = generateVisualProjectPreviewCode(project).source;
+  const displaySource = generateVisualProjectDisplayPreviewCode(project).source;
+
+  assert.ok(exactSource.includes('.image.imgConverter('));
+  assert.ok(exactSource.includes('"raw"'));
+  assert.ok(exactSource.includes('mime: "application/x-raw"'));
+  assert.ok(exactSource.includes('name: "preview.raw"'));
+
+  assert.ok(displaySource.includes('.image.imgConverter('));
+  assert.ok(displaySource.includes('"png"'));
+  assert.ok(displaySource.includes('mime: "image/png"'));
+  assert.ok(displaySource.includes('name: "preview.png"'));
+
+  const recovered = reconcileVisualProjectFromCode(project, displaySource);
+  assert.equal(recovered.ok, true);
+  if (recovered.ok) {
+    const recoveredProps = visualImageProps(recovered.project.document.nodes.image_phase10);
+    assert.deepEqual(recoveredProps.utilityStack, props.utilityStack);
+  }
+});
+
 test('Phase 10 preview preserves advanced image MIME and filename identity', () => {
   const project = phase10Project();
   const node = project.document.nodes.image_phase10;
@@ -448,6 +482,10 @@ test('Phase 10 permanent Images workflow exposes stack, presets, analysis and fu
   assert.match(shell, /await previousPhase10Render/);
   assert.match(shell, /releasePhase10Render\(\)/);
   assert.match(shell, /modalPreviewFileName/);
+  assert.match(shell, /modalPreviewDownloadUrl/);
+  assert.match(shell, /generateVisualProjectDisplayPreviewCode/);
+  assert.match(shell, /browserPreviewable/);
+  assert.match(shell, /downloadDataUrl: exactDataUrl/);
   const wrapper = fs.readFileSync('lib/studio/runtime/wrapStudioSnippetForRunner.ts', 'utf8');
   for (const mime of ['image/avif','image/tiff','image/heif','image/jp2','image/jxl','application/x-raw']) {
     assert.ok(wrapper.includes(mime), mime + ' missing from runner wrapper');
