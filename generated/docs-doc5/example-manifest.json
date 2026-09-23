@@ -3,7 +3,7 @@
   "package": {
     "name": "apexify.js",
     "version": "6.0.0",
-    "commit": "dbed9743353593eafae9a7b1c25312d7170a233b"
+    "commit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1"
   },
   "examples": [
     {
@@ -102,7 +102,7 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "verifiedPackageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
       "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
     },
     {
@@ -201,7 +201,7 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "verifiedPackageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
       "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
     },
     {
@@ -320,7 +320,7 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "verifiedPackageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
       "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
     },
     {
@@ -444,7 +444,7 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "dbed9743353593eafae9a7b1c25312d7170a233b",
+      "verifiedPackageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
       "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
     }
   ]
