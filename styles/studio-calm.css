@@ -6466,3 +6466,307 @@
   .apx-gif-mode-grid{grid-template-columns:1fr;}
   .apx-gif-frame{flex-basis:220px;}
 }
+
+
+/* ==========================================================================
+   STUDIO-VISUAL-12 — Procedural audio authoring
+   ========================================================================== */
+
+.apx-audio-context{
+  gap:.55rem;
+}
+
+.apx-audio-mode-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:.25rem;
+}
+
+.apx-audio-mode-grid button,
+.apx-audio-preset-grid button,
+.apx-audio-preview-actions button,
+.apx-audio-timeline button{
+  min-height:28px;
+  border:1px solid #1d3855;
+  border-radius:6px;
+  color:#859bb4;
+  background:#081725;
+  font-size:.45rem;
+  font-weight:760;
+}
+
+.apx-audio-mode-grid button[data-active="true"],
+.apx-audio-preset-grid button[data-active="true"]{
+  color:#f5f8ff;
+  border-color:#5a78ff;
+  background:linear-gradient(180deg,#17356a,#112a55);
+  box-shadow:0 0 0 1px rgba(95,119,255,.18),0 8px 20px rgba(40,61,170,.18);
+}
+
+.apx-audio-preset-grid{
+  max-height:170px;
+  overflow:auto;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:.25rem;
+  padding-right:.15rem;
+}
+
+.apx-audio-preset-grid button{
+  min-width:0;
+  padding:.34rem .4rem;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-align:left;
+}
+
+.apx-audio-preview-card{
+  display:grid;
+  gap:.45rem;
+  padding:.55rem;
+  border:1px solid #1b3550;
+  border-radius:8px;
+  background:linear-gradient(180deg,#0a1b2b,#071522);
+}
+
+.apx-audio-preview-card>div:first-child{
+  display:grid;
+  gap:.12rem;
+}
+
+.apx-audio-preview-card strong{
+  color:#dce8f5;
+  font-size:.53rem;
+}
+
+.apx-audio-preview-card span,
+.apx-audio-preview-card small{
+  color:#7289a2;
+  font-size:.43rem;
+}
+
+.apx-audio-preview-card audio{
+  width:100%;
+  height:32px;
+}
+
+.apx-audio-waveform{
+  height:58px;
+  display:flex;
+  align-items:center;
+  gap:1px;
+  overflow:hidden;
+  padding:5px;
+  border:1px solid #172e46;
+  border-radius:6px;
+  background:#050f1a;
+}
+
+.apx-audio-waveform i{
+  min-width:1px;
+  flex:1;
+  max-height:100%;
+  border-radius:1px;
+  background:linear-gradient(180deg,#77b8ff,#7657ff);
+  opacity:.88;
+}
+
+.apx-audio-waveform span{
+  width:100%;
+  padding:.35rem;
+  text-align:center;
+  line-height:1.4;
+}
+
+.apx-audio-preview-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.3rem;
+}
+
+.apx-audio-asset-list{
+  display:grid;
+  gap:.3rem;
+}
+
+.apx-audio-asset-list>button{
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr) 20px;
+  align-items:center;
+  gap:.35rem;
+  min-height:40px;
+  padding:.35rem .45rem;
+  border:1px solid #172f49;
+  border-radius:7px;
+  color:#8fa5bd;
+  background:#081724;
+  text-align:left;
+}
+
+.apx-audio-asset-list>button>span:nth-child(2){
+  min-width:0;
+  display:grid;
+  gap:.08rem;
+}
+
+.apx-audio-asset-list strong,
+.apx-audio-asset-list small{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.apx-audio-asset-list strong{font-size:.47rem}
+.apx-audio-asset-list small{color:#647c96;font-size:.4rem}
+
+.apx-audio-timeline{
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:.45rem;
+  padding:.55rem;
+  overflow:hidden;
+}
+
+.apx-audio-timeline-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+}
+
+.apx-audio-timeline-head>span{
+  color:#70859d;
+  font-size:.45rem;
+}
+
+.apx-audio-timeline-head strong{
+  color:#d9e5f3;
+  font-size:.53rem;
+}
+
+.apx-audio-track-list{
+  min-height:0;
+  overflow:auto;
+  display:grid;
+  align-content:start;
+  gap:.3rem;
+}
+
+.apx-audio-track-row{
+  display:grid;
+  grid-template-columns:24px 80px minmax(115px,1fr) 76px auto 26px;
+  gap:.35rem;
+  align-items:end;
+  padding:.4rem;
+  border:1px solid #162d45;
+  border-radius:7px;
+  background:#081624;
+}
+
+.apx-audio-track-row--compose{
+  grid-template-columns:24px 72px minmax(130px,1.3fr) 68px 68px minmax(70px,.8fr) 26px;
+}
+
+.apx-audio-track-index{
+  align-self:center;
+  color:#6f87a1;
+  font-size:.45rem;
+  text-align:center;
+}
+
+.apx-audio-track-row label{
+  display:grid;
+  gap:.15rem;
+  min-width:0;
+}
+
+.apx-audio-track-row label>span{
+  color:#647b95;
+  font-size:.38rem;
+  text-transform:uppercase;
+}
+
+.apx-audio-track-row input,
+.apx-audio-track-row select{
+  width:100%;
+  min-width:0;
+  height:28px;
+  padding:0 .35rem;
+  border:1px solid #203a56;
+  border-radius:5px;
+  color:#c8d6e6;
+  background:#07121e;
+  font-size:.43rem;
+}
+
+.apx-audio-track-source{
+  align-self:center;
+  overflow:hidden;
+  color:#718aa4;
+  font-size:.41rem;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.apx-audio-data-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:.35rem;
+}
+
+.apx-audio-data-stats>div{
+  display:grid;
+  gap:.1rem;
+  padding:.45rem;
+  border:1px solid #1a3149;
+  border-radius:6px;
+  background:#081624;
+}
+
+.apx-audio-data-stats span{
+  color:#637993;
+  font-size:.4rem;
+}
+
+.apx-audio-data-stats strong{
+  color:#cfe0f1;
+  font-size:.58rem;
+}
+
+.apx-vmodal-audio{
+  width:min(620px,80%);
+  display:grid;
+  justify-items:center;
+  gap:.7rem;
+  padding:2rem;
+  border:1px solid #263e59;
+  border-radius:14px;
+  background:linear-gradient(180deg,#0c1b2b,#07131f);
+  box-shadow:0 28px 70px rgba(0,0,0,.35);
+}
+
+.apx-vmodal-audio-mark{
+  width:68px;
+  height:68px;
+  display:grid;
+  place-items:center;
+  border:1px solid #526ff4;
+  border-radius:50%;
+  color:#fff;
+  background:radial-gradient(circle at 35% 25%,#6baeff,#593fd8);
+  font-size:2rem;
+}
+
+.apx-vmodal-audio strong{color:#f4f7fb;font-size:1rem}
+.apx-vmodal-audio span{color:#7890aa;font-size:.65rem}
+.apx-vmodal-audio audio{width:min(520px,100%)}
+
+@media(max-width:1180px){
+  .apx-audio-mode-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .apx-audio-track-row,
+  .apx-audio-track-row--compose{grid-template-columns:24px repeat(2,minmax(90px,1fr)) auto}
+  .apx-audio-track-source{display:none}
+}

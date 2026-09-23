@@ -19,6 +19,10 @@ import {
   defaultPhase11Timeline,
   setPhase11Timeline,
 } from '../../../lib/studio/visual/gif-animation-contract';
+import {
+  defaultPhase12Timeline,
+  setPhase12Timeline,
+} from '../../../lib/studio/visual/audio-authoring-contract';
 
 async function run() {
   const project = createPhase2ProofProject();
@@ -531,6 +535,60 @@ async function run() {
       frames: 2,
       operations: ['animate', 'createGIF'],
       generatedFile: phase11Generated.fileName,
+    }),
+  );
+
+  const phase12Base = createVisualProject({
+    id: 'project_phase12_runtime',
+    name: 'Phase 12 Runtime',
+    width: 64,
+    height: 48,
+    now: '2026-09-23T00:00:00.000Z',
+  });
+  const phase12Timeline = defaultPhase12Timeline();
+  phase12Timeline.mode = 'compose';
+  phase12Timeline.sampleRate = 16000;
+  phase12Timeline.channels = 2;
+  phase12Timeline.masterGain = 0.8;
+  phase12Timeline.seed = 'phase12-linux-smoke';
+  phase12Timeline.compose.clips = [
+    { id: 'clip-runtime-a', at: 0, source: { kind: 'preset', preset: 'beep' }, gain: 0.7, pan: -0.4 },
+    { id: 'clip-runtime-b', at: 0.18, source: { kind: 'preset', preset: 'sparkle' }, gain: 0.55, pan: 0.4, fadeOut: 0.08 },
+  ];
+  const phase12Project = setPhase12Timeline(phase12Base, phase12Timeline);
+  const manualAudio = painter.createAudio.compose({
+    clips: [
+      { at: 0, preset: 'beep', gain: 0.7, pan: -0.4 },
+      { at: 0.18, preset: 'sparkle', gain: 0.55, pan: 0.4, fadeOut: 0.08 },
+    ],
+    sampleRate: 16000,
+    channels: 2,
+    masterGain: 0.8,
+    tail: phase12Timeline.compose.tail,
+    limiter: true,
+    seed: 'phase12-linux-smoke',
+  });
+
+  const phase12Generated = generateVisualProjectCode(phase12Project);
+  const phase12Body = phase12Generated.source
+    .replace(/^\/\* apexify-studio-v12:[^\n]+\*\/\n/, '')
+    .replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
+  const executePhase12Generated = new AsyncFunction('ApexPainter', phase12Body);
+  const phase12GeneratedBuffer = await executePhase12Generated(ApexPainter);
+  assert.ok(phase12GeneratedBuffer instanceof Uint8Array);
+  assert.equal(Buffer.from(phase12GeneratedBuffer).subarray(0, 4).toString('ascii'), 'RIFF');
+  assert.equal(Buffer.from(phase12GeneratedBuffer).subarray(8, 12).toString('ascii'), 'WAVE');
+  assert.equal(digest(phase12GeneratedBuffer), digest(manualAudio));
+
+  console.log(
+    '[studio-visual:phase12] equivalent Linux procedural audio preview/codegen proof passed',
+    JSON.stringify({
+      bytes: phase12GeneratedBuffer.byteLength,
+      sha256: digest(phase12GeneratedBuffer),
+      sampleRate: 16000,
+      channels: 2,
+      operations: ['createAudio.compose'],
+      generatedFile: phase12Generated.fileName,
     }),
   );
 }
