@@ -51,7 +51,7 @@ export function VisualPreviewModal({
   if (!open) return null;
 
   const beginPan = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!previewUrl) return;
+    if (!previewUrl || previewMime.startsWith('audio/')) return;
     drag.current = {
       x: event.clientX,
       y: event.clientY,
@@ -84,14 +84,18 @@ export function VisualPreviewModal({
             <span>{previewMime.startsWith('audio/') ? 'Real Apexify WAV output · native playback' : 'Clean output · drag to pan · zoom freely'}</span>
           </div>
           <div className="apx-vmodal-actions">
-            <button type="button" onClick={() => setZoom((value) => Math.max(.25, value - .1))} title="Zoom out">
-              <MagnifyingGlassMinusIcon />
-            </button>
-            <span className="apx-vmodal-zoom">{Math.round(zoom * 100)}%</span>
-            <button type="button" onClick={() => setZoom((value) => Math.min(4, value + .1))} title="Zoom in">
-              <MagnifyingGlassPlusIcon />
-            </button>
-            <button type="button" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}>Reset</button>
+            {!previewMime.startsWith('audio/') ? (
+              <>
+                <button type="button" onClick={() => setZoom((value) => Math.max(.25, value - .1))} title="Zoom out">
+                  <MagnifyingGlassMinusIcon />
+                </button>
+                <span className="apx-vmodal-zoom">{Math.round(zoom * 100)}%</span>
+                <button type="button" onClick={() => setZoom((value) => Math.min(4, value + .1))} title="Zoom in">
+                  <MagnifyingGlassPlusIcon />
+                </button>
+                <button type="button" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}>Reset</button>
+              </>
+            ) : null}
             <button className="apx-vmodal-primary" type="button" onClick={onDownload} disabled={!previewUrl}>
               <ArrowDownTrayIcon /> Download
             </button>
@@ -101,7 +105,7 @@ export function VisualPreviewModal({
 
         <div className="apx-vmodal-subbar">
           <label>
-            <span>Canvas name</span>
+            <span>{previewMime.startsWith('audio/') ? 'Project name' : 'Canvas name'}</span>
             <input value={name} onChange={(event) => onNameChange(event.target.value)} />
           </label>
         </div>
