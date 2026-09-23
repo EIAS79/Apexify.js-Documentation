@@ -96,6 +96,7 @@ export type StudioImageAnalysisOperation = {
   sourceNodeId: string;
   target: string;
   preferredName?: string;
+  resultName: string;
   method: VisualImageUtilityAnalysis['type'];
   args: unknown[];
 };
@@ -740,6 +741,13 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
   let lastTarget = 'canvas';
   let lastMember: 'buffer' | null = 'buffer';
 
+  const deferredOutputUtilities: Array<{
+    nodeId: string;
+    nodeName: string;
+    utilityIndex: number;
+    utility: Extract<VisualImageUtilityOperation, { type: 'imgConverter' | 'compress' }>;
+  }> = [];
+
   for (const node of orderedAuthoringNodes(normalized)) {
     const target = node.id;
 
@@ -927,6 +935,15 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
 
       for (const [utilityIndex, utility] of (props.utilityStack ?? []).entries()) {
         if (utility.enabled === false) continue;
+        if (utility.type === 'imgConverter' || utility.type === 'compress') {
+          deferredOutputUtilities.push({
+            nodeId: node.id,
+            nodeName: node.name || 'image',
+            utilityIndex,
+            utility,
+          });
+          continue;
+        }
         const utilityTarget = node.id + '__utility_' + utilityIndex;
         operations.push({
           id: 'image_utility_' + node.id + '_' + utility.id,
@@ -948,6 +965,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
           sourceNodeId: node.id,
           target: node.id + '__analysis_' + analysis.id,
           preferredName: (node.name || 'image') + '_' + analysis.type,
+          resultName: analysis.id,
           method: analysis.type,
           args: imageAnalysisArgs(analysis, utilitySource),
         });
@@ -1111,6 +1129,23 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         y: inspection.y,
       });
     }
+  }
+
+  for (const entry of deferredOutputUtilities) {
+    const outputTarget =
+      entry.nodeId + '__output_' + entry.utilityIndex;
+    operations.push({
+      id: 'image_output_' + entry.nodeId + '_' + entry.utility.id,
+      kind: 'image-utility',
+      sourceNodeId: entry.nodeId,
+      target: outputTarget,
+      preferredName: entry.nodeName + '_' + entry.utility.type,
+      method: entry.utility.type,
+      args: imageUtilityArgs(resolved, entry.utility, base, produced),
+    });
+    base = { $studioTarget: outputTarget };
+    lastTarget = outputTarget;
+    lastMember = null;
   }
 
   return {
