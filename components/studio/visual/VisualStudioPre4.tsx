@@ -781,6 +781,7 @@ export default function VisualStudioPre4({
       }
       const artifact =
         result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('image/')) ??
+        result.output.artifacts?.find((item) => item.base64) ??
         (result.output.base64
           ? {
               mime: result.output.mime,
@@ -2397,7 +2398,8 @@ export default function VisualStudioPre4({
       modalPreviewMime === 'image/tiff' ? 'tiff' :
       modalPreviewMime === 'image/heif' ? 'heif' :
       modalPreviewMime === 'image/jp2' ? 'jp2' :
-      modalPreviewMime === 'image/jxl' ? 'jxl' : 'png');
+      modalPreviewMime === 'image/jxl' ? 'jxl' :
+      modalPreviewMime === 'application/x-raw' ? 'raw' : 'png');
     const link = document.createElement('a');
     link.href = modalPreviewUrl;
     link.download = safeVisualDownloadStem(project.name) + '.' + extension;
