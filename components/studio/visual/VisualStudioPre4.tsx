@@ -48,7 +48,7 @@ import {
 import {
   VisualComponentsContext,
   VisualPhase9Inspector,
-} from '@/components/studio/visual/VisualComponentsAuthoring';
+} from '@/components/studio/visual/VisualSceneComponentAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -5218,25 +5218,15 @@ export default function VisualStudioPre4({
         primary.kind === 'component' ||
         primary.kind === 'template-instance')
     ) {
-      if (inspectorTab === 'style' || inspectorTab === 'transform') {
-        return renderTransformFields();
-      }
-      if (inspectorTab === 'data' || inspectorTab === 'advanced') {
-        return (
-          <VisualPhase9Inspector
-            project={project}
-            node={primary}
-            tab={inspectorTab}
-            onMutate={mutate}
-            onMessage={setMessage}
-          />
-        );
-      }
       return (
-        <div className="apx-pre4-empty">
-          <strong>{primary.kind}</strong>
-          <span>Phase 9 semantic nodes use Transform, Data and Advanced authoring surfaces.</span>
-        </div>
+        <VisualPhase9Inspector
+          project={project}
+          node={primary}
+          tab={inspectorTab}
+          onMutate={mutate}
+          onMessage={setMessage}
+          renderTransform={renderTransformFields}
+        />
       );
     }
 
