@@ -49,6 +49,7 @@ import {
   VisualComponentsContext,
   VisualPhase9Inspector,
 } from '@/components/studio/visual/VisualSceneComponentAuthoring';
+import { VisualImageUtilityAuthoring } from '@/components/studio/visual/VisualImageUtilityAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -76,6 +77,9 @@ import {
   generateVisualProjectPreviewCode,
 } from '@/lib/studio/visual/codegen/generator';
 import { hasPhase9Authoring } from '@/lib/studio/visual/phase9-codegen';
+import { hasPhase10Authoring } from '@/lib/studio/visual/phase10-codegen';
+import { createInteractiveSession } from '@/lib/docs/playground/session';
+import { currentNodeServerExecutionAdapter } from '@/lib/docs/playground/serverClientAdapter';
 import { validateVisualProject } from '@/lib/studio/visual/compiler/validate';
 import {
   reconcileVisualProjectFromCode,
@@ -637,6 +641,7 @@ export default function VisualStudioPre4({
   }, [project]);
 
   const phase9Active = useMemo(() => hasPhase9Authoring(project), [project]);
+  const phase10Active = useMemo(() => hasPhase10Authoring(project), [project]);
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
@@ -747,6 +752,61 @@ export default function VisualStudioPre4({
     };
   }, []);
 
+  const renderAuthoritativeVisualSource = async (source: string) => {
+    if (phase10Active) {
+      const result = await currentNodeServerExecutionAdapter.run({
+        session: createInteractiveSession({
+          source,
+          language: 'ts',
+          runtime: 'node',
+          options: { studioAssets: assets },
+          layout: { activePanel: 'editor' },
+        }),
+      });
+      if (result.status !== 'ready' || !result.output) {
+        return {
+          ok: false as const,
+          error: result.diagnostics[0]?.message ?? 'Full Apexify runtime preview is unavailable.',
+        };
+      }
+      const artifact =
+        result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('image/')) ??
+        (result.output.base64
+          ? {
+              mime: result.output.mime,
+              base64: result.output.base64,
+            }
+          : null);
+      if (!artifact?.base64) {
+        return {
+          ok: false as const,
+          error: 'Phase 10 full-runtime execution completed without an image artifact.',
+        };
+      }
+      return {
+        ok: true as const,
+        dataUrl: 'data:' + artifact.mime + ';base64,' + artifact.base64,
+        mime: artifact.mime,
+        warnings: [] as string[],
+        results: {} as Record<string, unknown>,
+      };
+    }
+
+    const runtime =
+      webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
+    await runtime.registerFonts(assets);
+    const result = await runtime.renderStudioSource(source, assets);
+    if (!result.ok) return { ok: false as const, error: result.error };
+    return {
+      ok: true as const,
+      dataUrl: result.dataUrl,
+      mime: result.mime,
+      warnings: result.warnings,
+      results:
+        ((result as typeof result & { results?: Record<string, unknown> }).results ?? {}),
+    };
+  };
+
   useEffect(() => {
     window.clearTimeout(artboardPreviewTimerRef.current);
     if (!active || !previewGenerated.value) return;
@@ -756,20 +816,13 @@ export default function VisualStudioPre4({
       void (async () => {
         setArtboardPreviewBusy(true);
         try {
-          const runtime =
-            artboardRuntimeRef.current ??
-            (artboardRuntimeRef.current = createApexifyWebRuntime());
-          await runtime.registerFonts(assets);
-          const result = await runtime.renderStudioSource(
+          const result = await renderAuthoritativeVisualSource(
             previewGenerated.value!.source,
-            assets,
           );
           if (cancelled) return;
           if (result.ok) {
             setArtboardPreviewUrl(result.dataUrl);
-            setPhase7Results(
-              ((result as typeof result & { results?: Record<string, unknown> }).results ?? {}),
-            );
+            setPhase7Results(result.results);
           }
         } catch {
           // Keep the last authoritative frame while the next valid frame is built.
@@ -783,7 +836,7 @@ export default function VisualStudioPre4({
       cancelled = true;
       window.clearTimeout(artboardPreviewTimerRef.current);
     };
-  }, [active, assets, previewGenerated.value?.source]);
+  }, [active, assets, previewGenerated.value?.source, phase10Active]);
 
   const mutate = (
     label: string,
@@ -2254,7 +2307,7 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = phase9Active
+    const source = phase9Active && !phase10Active
       ? previewGenerated.value?.source
       : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
@@ -2266,10 +2319,7 @@ export default function VisualStudioPre4({
     setModalPreviewLoading(true);
     setModalPreviewError(null);
     try {
-      const runtime =
-        webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
-      await runtime.registerFonts(assets);
-      const result = await runtime.renderStudioSource(source, assets);
+      const result = await renderAuthoritativeVisualSource(source);
       if (!result.ok) {
         setModalPreviewUrl(null);
         setModalPreviewError(result.error);
@@ -3719,7 +3769,7 @@ export default function VisualStudioPre4({
       <div className="apx-pre4-inspector-title">
         <div>
           <strong>{primaryMedia.name ?? primaryMedia.kind}</strong>
-          <small>{primaryMedia.kind === 'shape' ? 'Apexify built-in shape' : 'Apexify image layer'} · Phase 5</small>
+          <small>{primaryMedia.kind === 'shape' ? 'Apexify built-in shape' : 'Apexify image layer'} · Phase 5 + 10</small>
         </div>
         <span className="apx-pre4-type-pill">{primaryMedia.kind}</span>
       </div>
@@ -3991,6 +4041,12 @@ export default function VisualStudioPre4({
           ) : null}
         </div>
 
+        <VisualImageUtilityAuthoring
+          value={props}
+          mode="effects"
+          onChange={(next, label) => mutateImage(label, () => next)}
+        />
+
         <div className="apx-pre4-section" data-image-section="mask">
           <div className="apx-canvas-section-heading">
             <div className="apx-pre4-section-title">Mask</div>
@@ -4106,6 +4162,11 @@ export default function VisualStudioPre4({
     return (
       <>
         {renderMediaHeader()}
+        <VisualImageUtilityAuthoring
+          value={visualImageProps(primaryMedia)}
+          mode="advanced"
+          onChange={(next, label) => mutateImage(label, () => next)}
+        />
         <div className="apx-pre4-section" data-image-section="complete-config">
           <div className="apx-pre4-section-title">Complete ImageProperties / CreateImageOptions</div>
           <textarea
