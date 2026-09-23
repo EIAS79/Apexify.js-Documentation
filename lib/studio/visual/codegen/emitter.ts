@@ -67,6 +67,44 @@ function emitValue(
   throw new Error(`Unsupported code-generation value: ${String(value)}`);
 }
 
+function imageOutputIdentity(plan: StudioOperationPlan): { mime: string; name: string } | null {
+  const output = [...plan.operations].reverse().find(
+    (operation) =>
+      operation.kind === 'image-utility' &&
+      (operation.method === 'imgConverter' || operation.method === 'compress'),
+  );
+  if (!output || output.kind !== 'image-utility') return null;
+
+  let extension = '';
+  if (output.method === 'imgConverter') {
+    extension = typeof output.args[1] === 'string' ? output.args[1].toLowerCase() : '';
+  } else {
+    const options =
+      output.args[1] && typeof output.args[1] === 'object' && !Array.isArray(output.args[1])
+        ? output.args[1] as Record<string, unknown>
+        : {};
+    extension = typeof options.format === 'string' ? options.format.toLowerCase() : 'jpeg';
+  }
+
+  if (extension === 'jpg') extension = 'jpeg';
+  const mimeByExtension: Record<string, string> = {
+    png: 'image/png',
+    jpeg: 'image/jpeg',
+    webp: 'image/webp',
+    tiff: 'image/tiff',
+    gif: 'image/gif',
+    avif: 'image/avif',
+    heif: 'image/heif',
+    raw: 'application/octet-stream',
+    jp2: 'image/jp2',
+    jxl: 'image/jxl',
+  };
+  const mime = mimeByExtension[extension];
+  if (!mime) return null;
+  const fileExtension = extension === 'jpeg' ? 'jpg' : extension;
+  return { mime, name: 'preview.' + fileExtension };
+}
+
 export function emitStudioOperationPlan(
   plan: StudioOperationPlan,
   options: { includeAnalysisResults?: boolean } = {},
@@ -403,12 +441,20 @@ export function emitStudioOperationPlan(
   const resultExpression = plan.result.member
     ? `${resultName}.${plan.result.member}`
     : resultName;
-  if (options.includeAnalysisResults && analysisResultNames.length) {
+  if (options.includeAnalysisResults) {
     const resultEntries = analysisResultNames
       .map((item) => `${emitObjectKey(item.key)}: ${item.name}`)
       .join(', ');
+    const outputIdentity = imageOutputIdentity(plan);
+    const metadataFields = [
+      outputIdentity ? `mime: ${emitString(outputIdentity.mime)}` : '',
+      outputIdentity ? `name: ${emitString(outputIdentity.name)}` : '',
+      analysisResultNames.length
+        ? `studioResultsJson: JSON.stringify({ ${resultEntries} })`
+        : '',
+    ].filter(Boolean);
     body.push(
-      `  return { buffer: ${resultExpression}, studioResultsJson: JSON.stringify({ ${resultEntries} }) };`,
+      `  return { buffer: ${resultExpression}${metadataFields.length ? ', ' + metadataFields.join(', ') : ''} };`,
     );
   } else {
     body.push(`  return ${resultExpression};`);
