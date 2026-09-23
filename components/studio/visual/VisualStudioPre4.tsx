@@ -955,6 +955,7 @@ export default function VisualStudioPre4({
     displayPreviewGenerated.value?.source,
     phase10Active,
     phase11Active,
+    phase12Active,
   ]);
 
   const mutate = (
