@@ -5769,7 +5769,11 @@ export default function VisualStudioPre4({
                 onClick={() => {
                   setActiveTool(id);
                   if (id === 'assets') setDockTab('assets');
-                  if (id === 'gif' || id === 'audio') {
+                  if (id === 'gif') {
+                    setDockTab('timeline');
+                    setDockCollapsed(false);
+                  }
+                  if (id === 'audio') {
                     setDockTab('timeline');
                     setDockCollapsed(false);
                   }
