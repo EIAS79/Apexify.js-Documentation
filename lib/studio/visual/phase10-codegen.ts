@@ -53,6 +53,37 @@ export function generatePhase10NativeSource(project: VisualProject): string {
   return '/* ' + PHASE10_SOURCE_MARKER + semanticPayload(project) + ' */\n' + source;
 }
 
+function browserDisplayPhase10Project(project: VisualProject): VisualProject {
+  const display = structuredClone(project);
+  const unsupported = new Set(['tiff', 'heif', 'raw', 'jp2', 'jxl']);
+  for (const node of Object.values(display.document.nodes)) {
+    if (node.kind !== 'image') continue;
+    const props = node.props as { utilityStack?: Array<Record<string, unknown>> };
+    if (!Array.isArray(props.utilityStack)) continue;
+    props.utilityStack = props.utilityStack.map((operation) => {
+      if (
+        operation.type === 'imgConverter' &&
+        operation.enabled !== false &&
+        typeof operation.newExtension === 'string' &&
+        unsupported.has(operation.newExtension.toLowerCase())
+      ) {
+        return { ...operation, newExtension: 'png' };
+      }
+      return operation;
+    });
+  }
+  return display;
+}
+
+export function generatePhase10DisplayPreviewSource(project: VisualProject): string {
+  const executable = executablePhase10Project(browserDisplayPhase10Project(project));
+  const source = emitStudioOperationPlan(
+    lowerVisualProject(executable),
+    { includeAnalysisResults: true },
+  );
+  return '/* ' + PHASE10_SOURCE_MARKER + semanticPayload(project) + ' */\n' + source;
+}
+
 export function generatePhase10PreviewSource(project: VisualProject): string {
   const executable = executablePhase10Project(project);
   const source = emitStudioOperationPlan(
