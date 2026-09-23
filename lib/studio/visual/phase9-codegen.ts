@@ -56,7 +56,7 @@ function identifier(value: string, fallback: string) {
 }
 
 function semanticPayload(project: VisualProject) {
-  return encodeURIComponent(JSON.stringify(project)).replace(/\\*/g, '%2A');
+  return encodeURIComponent(JSON.stringify(project)).replace(/\*/g, '%2A');
 }
 
 export function phase9ProjectFromSourceMarker(source: string): VisualProject | null {
