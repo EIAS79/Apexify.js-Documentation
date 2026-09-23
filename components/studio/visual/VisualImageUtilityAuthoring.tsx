@@ -11,6 +11,8 @@ import {
   IMAGE_UTILITY_STACK_TYPES,
   defaultImageUtilityAnalysis,
   defaultImageUtilityOperation,
+  normalizeImageUtilityAnalysisDraft,
+  normalizeImageUtilityOperationDraft,
   type ImageUtilityStackType,
 } from '@/lib/studio/visual/image-utility-contract';
 import { createVisualId } from '@/lib/studio/visual/ids';
@@ -98,8 +100,10 @@ function JsonConfig({
         try {
           onApply(JSON.parse(event.currentTarget.value));
           event.currentTarget.setCustomValidity('');
-        } catch {
-          event.currentTarget.setCustomValidity('Invalid JSON');
+        } catch (error) {
+          event.currentTarget.setCustomValidity(
+            error instanceof Error ? error.message : 'Invalid JSON',
+          );
           event.currentTarget.reportValidity();
         }
       }}
@@ -120,8 +124,15 @@ export function VisualImageUtilityAuthoring({ value, mode, onChange }: Props) {
     onChange({ ...value, utilityAnalyses: next }, label);
 
   const addOperation = (type: ImageUtilityStackType) => {
+    const operation = defaultImageUtilityOperation(type, createVisualId('image-op'));
+    if (ADVANCED_TYPES.has(type)) {
+      updateStack([...stack, operation], 'Add ' + stackLabel(type));
+      return;
+    }
+    const firstOutputStage = stack.findIndex((item) => ADVANCED_TYPES.has(item.type));
+    const insertAt = firstOutputStage < 0 ? stack.length : firstOutputStage;
     updateStack(
-      [...stack, defaultImageUtilityOperation(type, createVisualId('image-op'))],
+      [...stack.slice(0, insertAt), operation, ...stack.slice(insertAt)],
       'Add ' + stackLabel(type),
     );
   };
@@ -142,8 +153,16 @@ export function VisualImageUtilityAuthoring({ value, mode, onChange }: Props) {
   };
 
   const moveOperation = (index: number, delta: -1 | 1) => {
-    const nextIndex = index + delta;
-    if (nextIndex < 0 || nextIndex >= stack.length) return;
+    const operation = stack[index];
+    if (!operation) return;
+    const group = ADVANCED_TYPES.has(operation.type) ? ADVANCED_TYPES : EFFECT_TYPES;
+    const visibleIndices = stack
+      .map((item, itemIndex) => group.has(item.type) ? itemIndex : -1)
+      .filter((itemIndex) => itemIndex >= 0);
+    const currentVisibleIndex = visibleIndices.indexOf(index);
+    const targetVisibleIndex = currentVisibleIndex + delta;
+    if (currentVisibleIndex < 0 || targetVisibleIndex < 0 || targetVisibleIndex >= visibleIndices.length) return;
+    const nextIndex = visibleIndices[targetVisibleIndex]!;
     const next = [...stack];
     [next[index], next[nextIndex]] = [next[nextIndex]!, next[index]!];
     updateStack(next, 'Reorder image utilities');
@@ -185,7 +204,12 @@ export function VisualImageUtilityAuthoring({ value, mode, onChange }: Props) {
                 </label>
                 <JsonConfig
                   value={operation}
-                  onApply={(next) => patchOperation(operation.id, next as VisualImageUtilityOperation)}
+                  onApply={(next) =>
+                  patchOperation(
+                    operation.id,
+                    normalizeImageUtilityOperationDraft(operation.type, operation.id, next),
+                  )
+                }
                 />
               </div>
             ) : null,
@@ -226,13 +250,13 @@ export function VisualImageUtilityAuthoring({ value, mode, onChange }: Props) {
               <JsonConfig
                 value={analysis}
                 onApply={(next) => {
-                  const parsed = next as VisualImageUtilityAnalysis;
+                  const parsed = normalizeImageUtilityAnalysisDraft(
+                    analysis.type,
+                    analysis.id,
+                    next,
+                  );
                   updateAnalyses(
-                    analyses.map((item) =>
-                      item.id === analysis.id
-                        ? { ...parsed, id: item.id, type: item.type } as VisualImageUtilityAnalysis
-                        : item,
-                    ),
+                    analyses.map((item) => item.id === analysis.id ? parsed : item),
                     'Edit image analysis',
                   );
                 }}
@@ -340,7 +364,12 @@ export function VisualImageUtilityAuthoring({ value, mode, onChange }: Props) {
               </label>
               <JsonConfig
                 value={operation}
-                onApply={(next) => patchOperation(operation.id, next as VisualImageUtilityOperation)}
+                onApply={(next) =>
+                  patchOperation(
+                    operation.id,
+                    normalizeImageUtilityOperationDraft(operation.type, operation.id, next),
+                  )
+                }
               />
             </div>
           ) : null,
