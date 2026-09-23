@@ -123,7 +123,10 @@ export function emitStudioOperationPlan(
       );
       targetNames.set(operation.target, targetName);
       if (operation.kind === 'image-analysis') {
-        analysisResultNames.push({ key: operation.resultName, name: targetName });
+        analysisResultNames.push({
+          key: operation.sourceNodeId + ':' + operation.resultName,
+          name: targetName,
+        });
       }
       continue;
     }
