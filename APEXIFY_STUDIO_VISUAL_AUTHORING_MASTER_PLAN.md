@@ -2919,9 +2919,11 @@ feat(studio-visual): complete image manipulation stack
 
 - documentation branch: `studio-visual/v10-image-effects`
 - documentation PR: **#102**
-- final implementation head: `67648707b4d7e3cfe21c92efe9e92f0753451671`
-- final push Studio Visual Phase Gate: run **35861808528** — **SUCCESS**
-- final PR Studio Visual Phase Gate: run **35861813563** — **SUCCESS**
+- final implementation head: `826022ea6515b29f4bba94b79411af34918767d5`
+- final push Studio Visual Phase Gate: run **35863786281** — **SUCCESS**
+- final PR Studio Visual Phase Gate: run **35863791672** — **SUCCESS**
+- final Documentation Runtime Build Gate: run **35863791464**, attempt 2 — **SUCCESS** on Node 22 / 24 / 26
+- integration merge commit: `e3074fcce312094da4538ed3c0da200febd2373a`
 - base main commit: `1da10da3ef1380b2e77744139f788c49668a9203`
 - final implementation branch remained **0 behind main** before this record-only commit
 - Apexify.js runtime compatibility PR: **#38**
@@ -2951,8 +2953,8 @@ Completed implementation scope:
 - DOC-5 packed-package provenance regenerated against the exact runtime merge (`artifactSha256` `06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670`);
 - structural JSON draft normalization prevents incomplete operation objects from entering Visual Project state;
 - full-runtime preview analysis results are returned through artifact metadata and surfaced in the shared structured results view;
-- all eight PR review findings across two Codex review rounds were addressed and all review threads resolved;
-- final rereview fixes serialize full-runtime preview requests, preserve AVIF/TIFF/HEIF/RAW/JP2/JXL artifact identity, namespace analysis results by source layer, and validate nested JSON utility entries before commit;
+- all nine PR review findings across three Codex review rounds were addressed and all review threads resolved;
+- final rereview fixes serialize full-runtime preview requests, preserve AVIF/TIFF/HEIF/RAW/JP2/JXL artifact identity, namespace analysis results by source layer, validate nested JSON utility entries before commit, and separate exact non-browser-decodable exports from browser-safe display previews;
 - dedicated Phase-10 regression coverage integrated into `studio:visual:test`.
 
 Intentional public API classifications:
@@ -2960,11 +2962,11 @@ Intentional public API classifications:
 - `ApexPainter.image.removeBackground`: **hosted-runtime-exclusion** because it requires caller-provided external-service credentials;
 - `ApexPainter.image.validHex`: **not-applicable** to visual authoring because it is an introspection/helper function.
 
-Acceptance evidence for final implementation run **35861808528** (mirrored by PR run **35861813563**):
+Acceptance evidence for final implementation run **35863786281** (mirrored by PR run **35863791672**):
 
 - Studio completeness: **PASS**
 - Visual capability / option coverage: **PASS** — 187 capabilities, 17,233 option paths, 0 unclassified
-- Studio Visual tests: **PASS** — 107 / 107
+- Studio Visual tests: **PASS** — 108 / 108
 - real Phase-10 full-runtime preview/codegen equivalence proof: **PASS**
   - artifact bytes: **950**
   - SHA-256: `489d4e4c43fe0e2bfb6ceb89f37a56a55a8bfabdcbaead20b2db2af4366549e2`
@@ -3365,7 +3367,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 7 | Paths / doodle / pixels / detect | MAIN MERGED | `f331de671c14e8dadc0167fe8c4532c22ba54c8f` | PR #86; exact-head Studio Visual gate `35721981002` PASS; Documentation Runtime Build Gate `35721981107` PASS; typecheck/build/browser/live-sync/reverse-sync proof PASS; direct canvas anchor/Bézier editing PASS; Apexify.js Phase-7 runtime finalized by PR #36 as `45b9381c07b70bb16be456406940858af8ab699a`; production verification deferred because exact feature-merge Vercel status was still pending when closure was recorded |
 | 8 | Charts | NOT STARTED | — | NEXT — activate Charts and implement complete chart authoring against the permanent shell |
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
-| 10 | Image utilities | COMPLETE — PR #102 | — | Final Studio Visual gates 35861808528 + 35861813563 SUCCESS; 107/107 tests; full-runtime image utility equivalence proof; 8/8 review threads resolved |
+| 10 | Image utilities | COMPLETE — PR #102 | `e3074fcce312094da4538ed3c0da200febd2373a` | Final Studio Visual gates 35863786281 + 35863791672 SUCCESS; Runtime Build Gate 35863791464 SUCCESS on Node 22/24/26; 108/108 tests; full-runtime image utility equivalence proof; 9/9 review threads resolved |
 | 11 | GIF / animation | NOT STARTED | — | — |
 | 12 | Audio | NOT STARTED | — | — |
 | 13 | Video | NOT STARTED | — | — |
