@@ -12,6 +12,11 @@ import {
   generatePhase10PreviewSource,
   hasPhase10Authoring,
 } from '../phase10-codegen';
+import {
+  generatePhase11NativeSource,
+  generatePhase11PreviewSource,
+  hasPhase11Authoring,
+} from '../phase11-codegen';
 
 export interface GeneratedVisualCode {
   language: 'typescript';
@@ -25,9 +30,11 @@ function safeFileStem(value: string): string {
 }
 
 export function generateVisualProjectCode(project: VisualProject): GeneratedVisualCode {
-  const source = hasPhase10Authoring(project)
-    ? generatePhase10NativeSource(project)
-    : hasPhase9Authoring(project)
+  const source = hasPhase11Authoring(project)
+    ? generatePhase11NativeSource(project)
+    : hasPhase10Authoring(project)
+      ? generatePhase10NativeSource(project)
+      : hasPhase9Authoring(project)
       ? generatePhase9NativeSource(project)
       : emitStudioOperationPlan(lowerVisualProject(project));
   return {
@@ -38,9 +45,11 @@ export function generateVisualProjectCode(project: VisualProject): GeneratedVisu
 }
 
 export function generateVisualProjectPreviewCode(project: VisualProject): GeneratedVisualCode {
-  const source = hasPhase10Authoring(project)
-    ? generatePhase10PreviewSource(project)
-    : hasPhase9Authoring(project)
+  const source = hasPhase11Authoring(project)
+    ? generatePhase11PreviewSource(project)
+    : hasPhase10Authoring(project)
+      ? generatePhase10PreviewSource(project)
+      : hasPhase9Authoring(project)
       ? generatePhase9PreviewSource(project)
       : emitStudioOperationPlan(lowerVisualProject(project));
   return {
@@ -52,9 +61,11 @@ export function generateVisualProjectPreviewCode(project: VisualProject): Genera
 
 
 export function generateVisualProjectDisplayPreviewCode(project: VisualProject): GeneratedVisualCode {
-  const source = hasPhase10Authoring(project)
-    ? generatePhase10DisplayPreviewSource(project)
-    : hasPhase9Authoring(project)
+  const source = hasPhase11Authoring(project)
+    ? generatePhase11PreviewSource(project)
+    : hasPhase10Authoring(project)
+      ? generatePhase10DisplayPreviewSource(project)
+      : hasPhase9Authoring(project)
       ? generatePhase9PreviewSource(project)
       : emitStudioOperationPlan(lowerVisualProject(project));
   return {
