@@ -204,6 +204,137 @@ export function defaultImageUtilityAnalysis(
     : { id, type };
 }
 
+
+function draftRecord(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('Image utility configuration must be a JSON object.');
+  }
+  return value as Record<string, unknown>;
+}
+
+function optionalDraftRecord(value: unknown, label: string): Record<string, unknown> | undefined {
+  if (value === undefined) return undefined;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(label + ' must be a JSON object.');
+  }
+  return value as Record<string, unknown>;
+}
+
+/**
+ * Converts editable JSON into a structurally safe operation before it enters
+ * Visual Project state. Missing required collections/objects inherit the
+ * operation defaults; wrong structural types are rejected at the editor edge.
+ */
+export function normalizeImageUtilityOperationDraft(
+  type: ImageUtilityStackType,
+  id: string,
+  value: unknown,
+): VisualImageUtilityOperation {
+  const raw = draftRecord(value);
+  const base = defaultImageUtilityOperation(type, id) as unknown as Record<string, unknown>;
+  const merged = { ...base, ...raw, id, type } as Record<string, unknown>;
+
+  switch (type) {
+    case 'resize': {
+      const size = optionalDraftRecord(raw.size, 'Resize size');
+      if (size) merged.size = { ...((base.size as Record<string, unknown> | undefined) ?? {}), ...size };
+      break;
+    }
+    case 'cropImage':
+      if (raw.coordinates !== undefined && !Array.isArray(raw.coordinates)) {
+        throw new Error('Crop coordinates must be an array.');
+      }
+      break;
+    case 'effects':
+      if (raw.filters !== undefined && !Array.isArray(raw.filters)) {
+        throw new Error('Effects filters must be an array.');
+      }
+      break;
+    case 'colorsFilter':
+      if (
+        raw.filterColor !== undefined &&
+        typeof raw.filterColor !== 'string' &&
+        (!raw.filterColor || typeof raw.filterColor !== 'object' || Array.isArray(raw.filterColor))
+      ) {
+        throw new Error('Color filter must be a color string or gradient object.');
+      }
+      break;
+    case 'colorsRemover': {
+      const color = optionalDraftRecord(raw.colorToRemove, 'Removed color');
+      if (color) {
+        merged.colorToRemove = {
+          ...((base.colorToRemove as Record<string, unknown> | undefined) ?? {}),
+          ...color,
+        };
+      }
+      break;
+    }
+    case 'blend':
+      if (raw.layers !== undefined && !Array.isArray(raw.layers)) {
+        throw new Error('Blend layers must be an array.');
+      }
+      break;
+    case 'masking': {
+      const options = optionalDraftRecord(raw.options, 'Mask options');
+      if (options) merged.options = { ...((base.options as Record<string, unknown> | undefined) ?? {}), ...options };
+      break;
+    }
+    case 'gradientBlend': {
+      const options = optionalDraftRecord(raw.options, 'Gradient blend options');
+      if (options) {
+        if (options.colors !== undefined && !Array.isArray(options.colors)) {
+          throw new Error('Gradient blend colors must be an array.');
+        }
+        merged.options = { ...((base.options as Record<string, unknown> | undefined) ?? {}), ...options };
+      }
+      break;
+    }
+    case 'stitchImages': {
+      if (raw.images !== undefined && !Array.isArray(raw.images)) {
+        throw new Error('Stitch images must be an array.');
+      }
+      const options = optionalDraftRecord(raw.options, 'Stitch options');
+      if (options) merged.options = { ...((base.options as Record<string, unknown> | undefined) ?? {}), ...options };
+      break;
+    }
+    case 'createCollage': {
+      if (raw.images !== undefined && !Array.isArray(raw.images)) {
+        throw new Error('Collage images must be an array.');
+      }
+      const layout = optionalDraftRecord(raw.layout, 'Collage layout');
+      if (layout) merged.layout = { ...((base.layout as Record<string, unknown> | undefined) ?? {}), ...layout };
+      break;
+    }
+    case 'imgConverter':
+      if (raw.newExtension !== undefined && typeof raw.newExtension !== 'string') {
+        throw new Error('Conversion extension must be a string.');
+      }
+      break;
+    case 'compress': {
+      const options = optionalDraftRecord(raw.options, 'Compression options');
+      if (options) merged.options = { ...((base.options as Record<string, unknown> | undefined) ?? {}), ...options };
+      break;
+    }
+  }
+
+  return merged as unknown as VisualImageUtilityOperation;
+}
+
+export function normalizeImageUtilityAnalysisDraft(
+  type: VisualImageUtilityAnalysis['type'],
+  id: string,
+  value: unknown,
+): VisualImageUtilityAnalysis {
+  const raw = draftRecord(value);
+  const base = defaultImageUtilityAnalysis(type, id) as unknown as Record<string, unknown>;
+  const merged = { ...base, ...raw, id, type } as Record<string, unknown>;
+  if (type === 'extractPalette') {
+    const options = optionalDraftRecord(raw.options, 'Palette analysis options');
+    if (options) merged.options = { ...((base.options as Record<string, unknown> | undefined) ?? {}), ...options };
+  }
+  return merged as unknown as VisualImageUtilityAnalysis;
+}
+
 export function validateVisualImageUtilities(
   project: VisualProject,
   node: VisualNode,
@@ -219,6 +350,18 @@ export function validateVisualImageUtilities(
   const base = 'document.nodes.' + node.id + '.props';
   const ids = new Set<string>();
 
+  if (node.kind === 'shape' && (stack.length || analyses.length)) {
+    issue(
+      issues,
+      'image-utility-shape-source',
+      base,
+      'Full-runtime image utilities require a raster image source; built-in shape tokens are authored with the existing shape controls.',
+    );
+    return;
+  }
+
+  let outputStageStarted = false;
+
   for (const [index, operation] of stack.entries()) {
     const path = base + '.utilityStack[' + index + ']';
     if (!operation.id?.trim()) issue(issues, 'image-utility-id', path + '.id', 'Image utility operation requires a stable id.');
@@ -227,6 +370,16 @@ export function validateVisualImageUtilities(
     if (!IMAGE_UTILITY_STACK_TYPES.includes(operation.type)) {
       issue(issues, 'image-utility-type', path + '.type', 'Unsupported image utility operation.');
       continue;
+    }
+    const outputStage = operation.type === 'imgConverter' || operation.type === 'compress';
+    if (outputStage) outputStageStarted = true;
+    else if (outputStageStarted) {
+      issue(
+        issues,
+        'image-utility-output-order',
+        path,
+        'Conversion/compression are output-stage operations and must remain after raster manipulation operations.',
+      );
     }
     if (operation.enabled === false) continue;
 
