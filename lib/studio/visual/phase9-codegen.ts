@@ -11,7 +11,6 @@ import {
   phase9TemplateSceneDefinition,
   resolvePhase9References,
   type Phase9InstanceProps,
-  type Phase9SceneLayer,
 } from './scene-component-contract';
 import { lowerVisualProject } from './compiler/plan';
 import { emitStudioOperationPlan } from './codegen/emitter';
@@ -164,7 +163,7 @@ function instanceRenderOptions(project: VisualProject, node: VisualNode) {
   };
 }
 
-function instancePlacement(project: VisualProject, node: VisualNode) {
+function instancePlacement(node: VisualNode) {
   return {
     x: node.transform?.x ?? 0,
     y: node.transform?.y ?? 0,
@@ -188,47 +187,6 @@ function definitionIdentifiers(project: VisualProject) {
     map.set(definition.id, name);
   }
   return map;
-}
-
-function topLevelLayerStatements(
-  project: VisualProject,
-  definitionNames: ReadonlyMap<string, string>,
-): string[] {
-  const lines: string[] = [];
-  for (const rootId of project.document.rootNodeIds) {
-    const node = project.document.nodes[rootId];
-    if (!node || node.transform?.visible === false) continue;
-    if (node.kind === 'component' || node.kind === 'template-instance') {
-      const props = node.props as unknown as Phase9InstanceProps;
-      const definitionName = definitionNames.get(props.definitionId);
-      if (!definitionName) throw new Error('Missing definition for Phase 9 instance ' + node.id + '.');
-      const instanceName = identifier(node.name ?? node.id, 'instance') + '_scene';
-      const renderOptions = instanceRenderOptions(project, node);
-      lines.push(
-        'const ' +
-          instanceName +
-          ' = await ' +
-          definitionName +
-          '.toRenderInput(' +
-          emitValue(props.data ?? {}) +
-          (Object.keys(renderOptions).length ? ', ' + emitValue(renderOptions) : '') +
-          ');',
-      );
-      lines.push(
-        'scene.addLayer(' +
-          emitValue({
-            type: 'surface',
-            placement: instancePlacement(project, node),
-          }).replace(/\n\}$/, ',\n  "layers": __LAYERS__\n}') .replace('__LAYERS__', instanceName + '.layers') +
-          ');',
-      );
-      continue;
-    }
-
-    const layers = phase9SceneLayersForNodeIds(project, [rootId]).map(stripSceneMeta);
-    if (layers.length) lines.push('scene.addLayers(' + emitValue(layers) + ');');
-  }
-  return lines;
 }
 
 function emitDynamicSurface(instanceName: string, placement: Record<string, unknown>) {
@@ -307,7 +265,7 @@ export function generatePhase9NativeSource(project: VisualProject): string {
           ');',
       );
       lines.push(
-        emitDynamicSurface(instanceName, instancePlacement(project, node))
+        emitDynamicSurface(instanceName, instancePlacement(node))
           .split('\n')
           .map((line) => '  ' + line)
           .join('\n'),
