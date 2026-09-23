@@ -48,7 +48,7 @@ import {
 import {
   VisualComponentsContext,
   VisualPhase9Inspector,
-} from '@/components/studio/visual/VisualSceneComponentAuthoring';
+} from '@/components/studio/visual/VisualComponentsAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -71,7 +71,11 @@ import {
   createVisualNode,
   createVisualProject,
 } from '@/lib/studio/visual/project';
-import { generateVisualProjectCode } from '@/lib/studio/visual/codegen/generator';
+import {
+  generateVisualProjectCode,
+  generateVisualProjectPreviewCode,
+} from '@/lib/studio/visual/codegen/generator';
+import { hasPhase9Authoring } from '@/lib/studio/visual/phase9-codegen';
 import { validateVisualProject } from '@/lib/studio/visual/compiler/validate';
 import {
   reconcileVisualProjectFromCode,
@@ -620,6 +624,20 @@ export default function VisualStudioPre4({
     }
   }, [project]);
 
+  const previewGenerated = useMemo(() => {
+    try {
+      return { value: generateVisualProjectPreviewCode(project), error: null };
+    } catch (error) {
+      return {
+        value: null,
+        error:
+          error instanceof Error ? error.message : 'Preview code generation unavailable',
+      };
+    }
+  }, [project]);
+
+  const phase9Active = useMemo(() => hasPhase9Authoring(project), [project]);
+
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
     projectRef.current = project;
@@ -731,7 +749,7 @@ export default function VisualStudioPre4({
 
   useEffect(() => {
     window.clearTimeout(artboardPreviewTimerRef.current);
-    if (!active || !generated.value) return;
+    if (!active || !previewGenerated.value) return;
 
     let cancelled = false;
     artboardPreviewTimerRef.current = window.setTimeout(() => {
@@ -743,7 +761,7 @@ export default function VisualStudioPre4({
             (artboardRuntimeRef.current = createApexifyWebRuntime());
           await runtime.registerFonts(assets);
           const result = await runtime.renderStudioSource(
-            generated.value!.source,
+            previewGenerated.value!.source,
             assets,
           );
           if (cancelled) return;
@@ -765,7 +783,7 @@ export default function VisualStudioPre4({
       cancelled = true;
       window.clearTimeout(artboardPreviewTimerRef.current);
     };
-  }, [active, assets, generated.value?.source]);
+  }, [active, assets, previewGenerated.value?.source]);
 
   const mutate = (
     label: string,
@@ -2236,10 +2254,12 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = codeSource || generated.value?.source;
+    const source = phase9Active
+      ? previewGenerated.value?.source
+      : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
     if (!source) {
-      setModalPreviewError(generated.error ?? 'Code unavailable');
+      setModalPreviewError((phase9Active ? previewGenerated.error : generated.error) ?? 'Code unavailable');
       return;
     }
 
@@ -5198,15 +5218,25 @@ export default function VisualStudioPre4({
         primary.kind === 'component' ||
         primary.kind === 'template-instance')
     ) {
+      if (inspectorTab === 'style' || inspectorTab === 'transform') {
+        return renderTransformFields();
+      }
+      if (inspectorTab === 'data' || inspectorTab === 'advanced') {
+        return (
+          <VisualPhase9Inspector
+            project={project}
+            node={primary}
+            tab={inspectorTab}
+            onMutate={mutate}
+            onMessage={setMessage}
+          />
+        );
+      }
       return (
-        <VisualPhase9Inspector
-          project={project}
-          node={primary}
-          tab={inspectorTab}
-          onMutate={mutate}
-          onMessage={setMessage}
-          renderTransform={renderTransformFields}
-        />
+        <div className="apx-pre4-empty">
+          <strong>{primary.kind}</strong>
+          <span>Phase 9 semantic nodes use Transform, Data and Advanced authoring surfaces.</span>
+        </div>
       );
     }
 
