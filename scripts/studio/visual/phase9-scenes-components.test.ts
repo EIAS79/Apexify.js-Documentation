@@ -272,6 +272,7 @@ test('Phase 9 scenes lower nested surfaces to native SceneBuilder layers', () =>
     textPropsRecord(defaultTextNodeProps('Nested scene title')),
     { id: 'scene_nested_title', name: 'Nested title', parentId: surfaceId },
   );
+  title.parentId = surfaceId;
   title.transform = {
     x: 120,
     y: 110,
