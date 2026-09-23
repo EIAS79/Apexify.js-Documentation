@@ -3,7 +3,9 @@ import type {
   VisualCreateImageOptions,
 } from '../model';
 import type {
+  StudioImageAnalysisOperation,
   StudioImageProperties,
+  StudioImageUtilityOperation,
   StudioOperationPlan,
   StudioTargetReference,
   StudioTextProperties,
@@ -27,6 +29,14 @@ export interface StudioOperationRuntime {
     properties: StudioTextProperties,
     canvasBuffer: Uint8Array,
   ): Promise<Uint8Array>;
+  runImageUtility?(
+    method: StudioImageUtilityOperation['method'],
+    args: unknown[],
+  ): Promise<Uint8Array>;
+  runImageAnalysis?(
+    method: StudioImageAnalysisOperation['method'],
+    args: unknown[],
+  ): Promise<unknown>;
   createChart?(
     family: 'pie' | 'bar' | 'horizontalBar' | 'line' | 'scatter' | 'radar' | 'polarArea',
     data: unknown[],
@@ -172,6 +182,25 @@ export async function executeStudioOperationPlan(
         }
         const value = await runtime.createText(operation.properties, base);
         values.set(operation.target, value);
+        break;
+      }
+      case 'image-utility': {
+        if (!runtime.runImageUtility) {
+          throw new Error('Studio runtime does not implement image utility operations.');
+        }
+        const args = resolveOperationValue(operation.args, values) as unknown[];
+        values.set(
+          operation.target,
+          await runtime.runImageUtility(operation.method, args),
+        );
+        break;
+      }
+      case 'image-analysis': {
+        if (!runtime.runImageAnalysis) {
+          throw new Error('Studio runtime does not implement image analysis operations.');
+        }
+        const args = resolveOperationValue(operation.args, values) as unknown[];
+        await runtime.runImageAnalysis(operation.method, args);
         break;
       }
       case 'create-chart': {
