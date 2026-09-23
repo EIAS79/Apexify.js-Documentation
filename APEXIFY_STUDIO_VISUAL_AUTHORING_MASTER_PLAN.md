@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2833,6 +2833,49 @@ Scene/component/template references, overrides and named-asset bindings must use
 ```text
 feat(studio-visual): complete scene component template authoring
 ```
+
+### Phase 9 implementation record — STUDIO-VISUAL-9
+
+**Status:** COMPLETE — integration PR **#101**
+
+- documentation branch: `studio-visual/v09-scenes-components`
+- documentation PR: **#101**
+- green implementation head: `718a409fb02b9705400d14aa70c5e22650cf68a3`
+- dedicated Studio Visual Phase Gate: run **35837846542** — **SUCCESS**
+- base main commit: `bfdf27f02401ea92ce9be8b1a1c9fcd7bae6d9d5`
+- branch divergence at PR open: **33 ahead / 0 behind**
+- verified Apexify runtime API snapshot: `f57bb82743c8f71bbe7e519d060010f970b06ef9`
+
+Completed implementation scope:
+
+- semantic `scene` and `surface` nodes with nested SceneBuilder lowering;
+- permanent Components rail authoring surface and semantic Layers-tree ownership;
+- component/template capture, libraries and reusable instance insertion;
+- template placeholder editor plus instance data bindings;
+- per-definition layer overrides and native before/after insertion schemas;
+- insertion materialization in browser preview;
+- named asset and variable registry integration with stable `$ref` bindings;
+- detach and expand lifecycle actions;
+- Data / Advanced Inspector authoring for Phase-9 semantic nodes;
+- Phase-9 validation for definition integrity, missing definitions, override targets and insertion targets;
+- native SceneBuilder/template code generation aligned with Apexify.js `createScene()`, `createTemplate()`, `TemplateHandle.toRenderInput()` and asset registry contracts;
+- stable semantic source marker for canonical Code → Visual reconstruction without eval;
+- browser-safe preview path that materializes components/templates and flattens scene/surface containers before `@apexify/web` execution;
+- deterministic insertion identities and source serialization;
+- dedicated Phase-9 source/unit regression coverage integrated into `studio:visual:test`.
+
+Acceptance evidence for run **35837846542**:
+
+- Studio completeness: **PASS**
+- Visual capability / option coverage: **PASS** — 187 capabilities, 17,233 option paths, 0 unclassified
+- Studio Visual tests: **PASS** — 92 / 92
+- codegen proof: **PASS**
+- TypeScript typecheck: **PASS**
+- production Next.js build: **PASS**
+- production server start: **PASS**
+- dual-mode browser regression: **PASS**
+
+**Phase 9 is complete. STUDIO-VISUAL-10 is next.**
 
 ---
 
