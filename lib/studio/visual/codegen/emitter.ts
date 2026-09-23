@@ -95,7 +95,7 @@ function imageOutputIdentity(plan: StudioOperationPlan): { mime: string; name: s
     gif: 'image/gif',
     avif: 'image/avif',
     heif: 'image/heif',
-    raw: 'application/octet-stream',
+    raw: 'application/x-raw',
     jp2: 'image/jp2',
     jxl: 'image/jxl',
   };
