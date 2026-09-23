@@ -433,7 +433,7 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
 }
 
 function pathOperationOptions(node: VisualNode): StudioPathDrawOptions {
-  const props = visualPathProps(resolvedNode);
+  const props = visualPathProps(node);
   const transform = node.transform ?? {};
   const width = Math.max(1, props.viewport.width);
   const height = Math.max(1, props.viewport.height);
@@ -489,7 +489,7 @@ function pathDetectionPoint(
   node: VisualNode,
   point: { x: number; y: number },
 ): { x: number; y: number } {
-  const options = pathOperationOptions(resolvedNode);
+  const options = pathOperationOptions(node);
   const transform = options.transform ?? {};
   const scaleX = transform.scaleX ?? 1;
   const scaleY = transform.scaleY ?? 1;
