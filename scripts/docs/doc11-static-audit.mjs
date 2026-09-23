@@ -57,7 +57,17 @@ function walk(dir) {
 }
 walk(path.join(ROOT, 'public'));
 media.sort((a, b) => b.bytes - a.bytes);
-const criticalMedia = media.filter((item) => !item.onDemandOutput);
+
+// Original PNG brand artwork is retained as source/reference material only.
+// Runtime shell surfaces use the optimized AVIF/SVG variants.
+const sourceOnlyBrandMedia = new Set([
+  'public/brand/apexify-banner.png',
+  'public/brand/apexify-mark.png',
+  'public/brand/apexify-lockup.png',
+]);
+const criticalMedia = media.filter(
+  (item) => !item.onDemandOutput && !sourceOnlyBrandMedia.has(item.path),
+);
 const criticalOversized = criticalMedia.filter((item) => item.bytes > 512 * 1024);
 const onDemandOversized = media.filter((item) => item.onDemandOutput && item.bytes > 1024 * 1024);
 assert(criticalOversized.length === 0, `critical/public shell media above 512 KiB: ${criticalOversized.map((item) => `${item.path}:${item.bytes}`).join(', ')}`);
