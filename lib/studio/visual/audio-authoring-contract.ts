@@ -2,8 +2,7 @@ import { createVisualId } from './ids';
 import type {
   VisualProject,
   VisualProjectIssue,
-  VisualProjectRecord,
-  VisualValue,
+  VisualProjectRecord
 } from './model';
 
 export const PHASE12_TIMELINE_KIND = 'audio-authoring-timeline' as const;
@@ -391,18 +390,9 @@ function validateSound(
   validateSeed(issues, sound.seed, path + '.seed');
 }
 
-function validateAsset(project: VisualProject, assetId: string, issues: VisualProjectIssue[], path: string) {
-  const record = project.assets.find((item) => item.id === assetId);
-  if (!record) {
-    push(issues, 'phase12-asset', path, 'Audio clip references an unknown Studio asset.');
-    return;
-  }
-  const mime =
-    record.value && typeof record.value === 'object' && !Array.isArray(record.value)
-      ? (record.value as Record<string, VisualValue>).mime
-      : undefined;
-  if (typeof mime === 'string' && !mime.startsWith('audio/')) {
-    push(issues, 'phase12-asset', path, 'Audio clip asset must use an audio MIME type.');
+function validateAssetId(assetId: string, issues: VisualProjectIssue[], path: string) {
+  if (!/^[A-Za-z0-9._-]{1,160}$/.test(assetId)) {
+    push(issues, 'phase12-asset', path, 'Audio asset id must be a valid Studio virtual-asset identifier.');
   }
 }
 
@@ -482,7 +472,7 @@ export function validatePhase12Project(project: VisualProject): VisualProjectIss
     } else if (clip.source.kind === 'sound') {
       validateSound(clip.source.sound, issues, path + '.source.sound', timeline.sampleRate);
     } else if (clip.source.kind === 'asset') {
-      validateAsset(project, clip.source.assetId, issues, path + '.source.assetId');
+      validateAssetId(clip.source.assetId, issues, path + '.source.assetId');
     }
   });
 
@@ -499,7 +489,7 @@ export function validatePhase12Project(project: VisualProject): VisualProjectIss
     } else if (input.kind === 'sound') {
       validateSound(input.sound, issues, path + '.sound', timeline.sampleRate);
     } else if (input.kind === 'asset') {
-      validateAsset(project, input.assetId, issues, path + '.assetId');
+      validateAssetId(input.assetId, issues, path + '.assetId');
     }
   });
 
