@@ -17,6 +17,11 @@ import {
   generatePhase11PreviewSource,
   hasPhase11Authoring,
 } from '../phase11-codegen';
+import {
+  generatePhase12NativeSource,
+  generatePhase12PreviewSource,
+  hasPhase12Authoring,
+} from '../phase12-codegen';
 
 export interface GeneratedVisualCode {
   language: 'typescript';
@@ -30,7 +35,9 @@ function safeFileStem(value: string): string {
 }
 
 export function generateVisualProjectCode(project: VisualProject): GeneratedVisualCode {
-  const source = hasPhase11Authoring(project)
+  const source = hasPhase12Authoring(project)
+    ? generatePhase12NativeSource(project)
+    : hasPhase11Authoring(project)
     ? generatePhase11NativeSource(project)
     : hasPhase10Authoring(project)
       ? generatePhase10NativeSource(project)
@@ -45,7 +52,9 @@ export function generateVisualProjectCode(project: VisualProject): GeneratedVisu
 }
 
 export function generateVisualProjectPreviewCode(project: VisualProject): GeneratedVisualCode {
-  const source = hasPhase11Authoring(project)
+  const source = hasPhase12Authoring(project)
+    ? generatePhase12PreviewSource(project)
+    : hasPhase11Authoring(project)
     ? generatePhase11PreviewSource(project)
     : hasPhase10Authoring(project)
       ? generatePhase10PreviewSource(project)
@@ -61,7 +70,9 @@ export function generateVisualProjectPreviewCode(project: VisualProject): Genera
 
 
 export function generateVisualProjectDisplayPreviewCode(project: VisualProject): GeneratedVisualCode {
-  const source = hasPhase11Authoring(project)
+  const source = hasPhase12Authoring(project)
+    ? generatePhase12PreviewSource(project)
+    : hasPhase11Authoring(project)
     ? generatePhase11PreviewSource(project)
     : hasPhase10Authoring(project)
       ? generatePhase10DisplayPreviewSource(project)
