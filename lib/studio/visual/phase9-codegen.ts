@@ -3,6 +3,7 @@ import { sanitizeVisualIdPart } from './ids';
 import {
   PHASE9_NAMED_ASSET_KIND,
   PHASE9_VARIABLE_KIND,
+  flattenPhase9PreviewContainers,
   materializePhase9Project,
   phase9Definitions,
   phase9RegistryRecords,
@@ -294,6 +295,8 @@ export function generatePhase9NativeSource(project: VisualProject): string {
 }
 
 export function generatePhase9PreviewSource(project: VisualProject): string {
-  const preview = resolvePhase9References(materializePhase9Project(project));
+  const materialized = materializePhase9Project(project);
+  const flattened = flattenPhase9PreviewContainers(materialized);
+  const preview = resolvePhase9References(flattened);
   return emitStudioOperationPlan(lowerVisualProject(preview));
 }
