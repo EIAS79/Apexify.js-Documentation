@@ -3029,12 +3029,12 @@ feat(studio-visual): complete GIF and animation authoring
 
 - documentation branch: `studio-visual/v11-gif-animation`
 - documentation PR: **#103**
-- green implementation head: `fe5719135b1afbc52edd9982b0d56c169c8831ce`
-- branch Studio Visual Phase Gate: run **35867102998** — **SUCCESS**
-- PR Studio Visual Phase Gate: run **35867538153** — **SUCCESS**
-- Documentation Runtime Build Gate: run **35867538314** — **SUCCESS** on Node 22 / 24 / 26
+- final implementation head: `28e7083194570786964442712b7d140e2e827ed5`
+- final PR Studio Visual Phase Gate: run **35868072554** — **SUCCESS**
+- final Documentation Runtime Build Gate: run **35868072609** — **SUCCESS** on Node 22 / 24 / 26
 - base main commit: `699e8cfc72a3740c607797d85d8b6ee68eefcaa7`
-- branch divergence at PR open: **12 ahead / 0 behind**
+- final branch divergence before merge: **13 ahead / 0 behind**
+- integration merge commit: `3b43fb5c01c8d276df9e41c4f0f5b730eb11d002`
 - pinned Apexify.js runtime: `69d40cf40ba992ad2bdec457c6c7217f5df55cd1`
 - runtime API patch required: **no**
 
@@ -3429,7 +3429,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 8 | Charts | NOT STARTED | — | NEXT — activate Charts and implement complete chart authoring against the permanent shell |
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
 | 10 | Image utilities | COMPLETE — PR #102 | `e3074fcce312094da4538ed3c0da200febd2373a` | Final Studio Visual gates 35863786281 + 35863791672 SUCCESS; Runtime Build Gate 35863791464 SUCCESS on Node 22/24/26; 108/108 tests; full-runtime image utility equivalence proof; 9/9 review threads resolved |
-| 11 | GIF / animation | COMPLETE — PR #103 | — | Studio Visual gates 35867102998 + 35867538153 SUCCESS; Runtime Build Gate 35867538314 SUCCESS Node 22/24/26; 117/117 tests; Linux animate → createGIF proof PASS |
+| 11 | GIF / animation | COMPLETE — PR #103 | `3b43fb5c01c8d276df9e41c4f0f5b730eb11d002` | Final Studio Visual Phase Gate 35868072554 SUCCESS; Runtime Build Gate 35868072609 SUCCESS Node 22/24/26; 117/117 tests; Linux animate → createGIF proof PASS |
 | 12 | Audio | NOT STARTED | — | — |
 | 13 | Video | NOT STARTED | — | — |
 | 14 | Advanced operations | NOT STARTED | — | — |
