@@ -74,6 +74,7 @@ import {
 } from '@/lib/studio/visual/project';
 import {
   generateVisualProjectCode,
+  generateVisualProjectDisplayPreviewCode,
   generateVisualProjectPreviewCode,
 } from '@/lib/studio/visual/codegen/generator';
 import { hasPhase9Authoring } from '@/lib/studio/visual/phase9-codegen';
@@ -504,6 +505,7 @@ export default function VisualStudioPre4({
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [codeModalOpen, setCodeModalOpen] = useState(false);
   const [modalPreviewUrl, setModalPreviewUrl] = useState<string | null>(null);
+  const [modalPreviewDownloadUrl, setModalPreviewDownloadUrl] = useState<string | null>(null);
   const [modalPreviewMime, setModalPreviewMime] = useState('image/png');
   const [modalPreviewFileName, setModalPreviewFileName] = useState('preview.png');
   const [modalPreviewLoading, setModalPreviewLoading] = useState(false);
@@ -642,6 +644,18 @@ export default function VisualStudioPre4({
     }
   }, [project]);
 
+  const displayPreviewGenerated = useMemo(() => {
+    try {
+      return { value: generateVisualProjectDisplayPreviewCode(project), error: null };
+    } catch (error) {
+      return {
+        value: null,
+        error:
+          error instanceof Error ? error.message : 'Display preview code generation unavailable',
+      };
+    }
+  }, [project]);
+
   const phase9Active = useMemo(() => hasPhase9Authoring(project), [project]);
   const phase10Active = useMemo(() => hasPhase10Authoring(project), [project]);
 
@@ -754,7 +768,10 @@ export default function VisualStudioPre4({
     };
   }, []);
 
-  const renderAuthoritativeVisualSource = async (source: string) => {
+  const renderAuthoritativeVisualSource = async (
+    source: string,
+    displaySource = source,
+  ) => {
     if (phase10Active) {
       let releasePhase10Render!: () => void;
       const previousPhase10Render = phase10RenderTailRef.current;
@@ -813,9 +830,48 @@ export default function VisualStudioPre4({
           // Invalid structured-result metadata must never block the image artifact.
         }
       }
+        const exactDataUrl = 'data:' + artifact.mime + ';base64,' + artifact.base64;
+        const browserPreviewable = new Set([
+          'image/png',
+          'image/jpeg',
+          'image/webp',
+          'image/gif',
+          'image/avif',
+        ]);
+        let displayDataUrl = exactDataUrl;
+
+        if (!browserPreviewable.has(artifact.mime) && displaySource !== source) {
+          const displayResult = await currentNodeServerExecutionAdapter.run({
+            session: createInteractiveSession({
+              source: displaySource,
+              language: 'ts',
+              runtime: 'node',
+              options: { studioAssets: assets },
+              layout: { activePanel: 'editor' },
+            }),
+          });
+          if (displayResult.status === 'ready' && displayResult.output) {
+            const displayArtifact =
+              displayResult.output.artifacts?.find(
+                (item) => item.base64 && item.mime.startsWith('image/'),
+              ) ??
+              (displayResult.output.base64
+                ? {
+                    mime: displayResult.output.mime,
+                    base64: displayResult.output.base64,
+                  }
+                : null);
+            if (displayArtifact?.base64) {
+              displayDataUrl =
+                'data:' + displayArtifact.mime + ';base64,' + displayArtifact.base64;
+            }
+          }
+        }
+
         return {
           ok: true as const,
-          dataUrl: 'data:' + artifact.mime + ';base64,' + artifact.base64,
+          dataUrl: displayDataUrl,
+          downloadDataUrl: exactDataUrl,
           mime: artifact.mime,
           fileName: 'name' in artifact && typeof artifact.name === 'string'
             ? artifact.name
@@ -836,6 +892,7 @@ export default function VisualStudioPre4({
     return {
       ok: true as const,
       dataUrl: result.dataUrl,
+      downloadDataUrl: result.dataUrl,
       mime: result.mime,
       fileName: 'preview',
       warnings: result.warnings,
@@ -855,6 +912,7 @@ export default function VisualStudioPre4({
         try {
           const result = await renderAuthoritativeVisualSource(
             previewGenerated.value!.source,
+            displayPreviewGenerated.value?.source ?? previewGenerated.value!.source,
           );
           if (cancelled) return;
           if (result.ok) {
@@ -873,7 +931,13 @@ export default function VisualStudioPre4({
       cancelled = true;
       window.clearTimeout(artboardPreviewTimerRef.current);
     };
-  }, [active, assets, previewGenerated.value?.source, phase10Active]);
+  }, [
+    active,
+    assets,
+    previewGenerated.value?.source,
+    displayPreviewGenerated.value?.source,
+    phase10Active,
+  ]);
 
   const mutate = (
     label: string,
@@ -2356,7 +2420,12 @@ export default function VisualStudioPre4({
     setModalPreviewLoading(true);
     setModalPreviewError(null);
     try {
-      const result = await renderAuthoritativeVisualSource(source);
+      const result = await renderAuthoritativeVisualSource(
+        source,
+        phase10Active
+          ? displayPreviewGenerated.value?.source ?? source
+          : source,
+      );
       if (!result.ok) {
         setModalPreviewUrl(null);
         setModalPreviewError(result.error);
@@ -2364,12 +2433,14 @@ export default function VisualStudioPre4({
         return;
       }
       setModalPreviewUrl(result.dataUrl);
+      setModalPreviewDownloadUrl(result.downloadDataUrl);
       setModalPreviewMime(result.mime);
       setModalPreviewFileName(result.fileName);
       setPhase7Results(result.results);
       setMessage('Preview rendered');
     } catch (error) {
       setModalPreviewUrl(null);
+      setModalPreviewDownloadUrl(null);
       setModalPreviewError(error instanceof Error ? error.message : 'Preview failed');
     } finally {
       setModalPreviewLoading(false);
@@ -2387,7 +2458,8 @@ export default function VisualStudioPre4({
   };
 
   const downloadCanvasPreview = () => {
-    if (!modalPreviewUrl) return;
+    const downloadUrl = modalPreviewDownloadUrl ?? modalPreviewUrl;
+    if (!downloadUrl) return;
     const extensionFromName = modalPreviewFileName.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];
     const extension =
       extensionFromName ??
@@ -2401,7 +2473,7 @@ export default function VisualStudioPre4({
       modalPreviewMime === 'image/jxl' ? 'jxl' :
       modalPreviewMime === 'application/x-raw' ? 'raw' : 'png');
     const link = document.createElement('a');
-    link.href = modalPreviewUrl;
+    link.href = downloadUrl;
     link.download = safeVisualDownloadStem(project.name) + '.' + extension;
     link.click();
   };
