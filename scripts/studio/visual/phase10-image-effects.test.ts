@@ -25,6 +25,7 @@ import {
 } from '../../../lib/studio/visual/codegen/generator';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
 import { planStudioExecution } from '../../../lib/studio/runtime/capabilities';
+import { detectStudioMedia } from '../../../lib/studio/runtime/media';
 
 function phase10Project() {
   const project = createVisualProject({
@@ -298,6 +299,106 @@ test('Phase 10 JSON draft normalization keeps required operation structure safe'
   );
 });
 
+test('Phase 10 nested utility JSON rejects malformed collection entries', () => {
+  assert.throws(
+    () => normalizeImageUtilityOperationDraft('cropImage', 'crop-null', { coordinates: [null] }),
+    /coordinate\[0\].*object/i,
+  );
+  assert.throws(
+    () => normalizeImageUtilityOperationDraft('effects', 'effects-null', { filters: [null] }),
+    /filter\[0\].*object/i,
+  );
+  assert.throws(
+    () => normalizeImageUtilityOperationDraft('blend', 'blend-null', { layers: [null] }),
+    /layer\[0\].*object/i,
+  );
+  assert.throws(
+    () => normalizeImageUtilityOperationDraft('stitchImages', 'stitch-null', { images: [null] }),
+    /stitch image\[0\]/i,
+  );
+  assert.throws(
+    () => normalizeImageUtilityOperationDraft('createCollage', 'collage-null', { images: [null] }),
+    /collage image\[0\].*object/i,
+  );
+  assert.throws(
+    () => normalizeImageUtilityOperationDraft('gradientBlend', 'gradient-null', {
+      options: { colors: [null] },
+    }),
+    /gradient blend colors\[0\].*object/i,
+  );
+});
+
+test('Phase 10 preview analysis keys are namespaced by source layer', () => {
+  const project = phase10Project();
+  const original = project.document.nodes.image_phase10;
+  const duplicate = structuredClone(original);
+  duplicate.id = 'image_phase10_copy';
+  duplicate.name = 'Phase 10 Hero Copy';
+  project.document.nodes[duplicate.id] = duplicate;
+  project.document.rootNodeIds.push(duplicate.id);
+
+  const source = generateVisualProjectPreviewCode(project).source;
+  assert.ok(source.includes('image_phase10:image-analysis-palette'));
+  assert.ok(source.includes('image_phase10_copy:image-analysis-palette'));
+  assert.ok(source.includes('image_phase10:image-analysis-color'));
+  assert.ok(source.includes('image_phase10_copy:image-analysis-color'));
+});
+
+test('Phase 10 preview preserves advanced image MIME and filename identity', () => {
+  const project = phase10Project();
+  const node = project.document.nodes.image_phase10;
+  const props = visualImageProps(node);
+  props.utilityStack = [{
+    id: 'convert-avif',
+    type: 'imgConverter',
+    newExtension: 'avif',
+  }];
+  props.utilityAnalyses = [];
+  node.props = imagePropsRecord(props);
+
+  const source = generateVisualProjectPreviewCode(project).source;
+  assert.ok(source.includes('mime: "image/avif"'));
+  assert.ok(source.includes('name: "preview.avif"'));
+
+  props.utilityStack = [{
+    id: 'convert-raw',
+    type: 'imgConverter',
+    newExtension: 'raw',
+  }];
+  node.props = imagePropsRecord(props);
+  const rawSource = generateVisualProjectPreviewCode(project).source;
+  assert.ok(rawSource.includes('mime: "application/x-raw"'));
+  assert.ok(rawSource.includes('name: "preview.raw"'));
+});
+
+test('Studio media detection recognizes all Phase 10 advanced image encodings', () => {
+  const ftyp = (brand: string) => {
+    const bytes = Buffer.alloc(24);
+    bytes.writeUInt32BE(24, 0);
+    bytes.write('ftyp', 4, 'ascii');
+    bytes.write(brand, 8, 'ascii');
+    return bytes;
+  };
+  assert.deepEqual(detectStudioMedia(ftyp('avif')), { kind: 'image', mime: 'image/avif' });
+  assert.deepEqual(detectStudioMedia(ftyp('heic')), { kind: 'image', mime: 'image/heif' });
+  assert.deepEqual(
+    detectStudioMedia(Buffer.from([0x49,0x49,0x2a,0x00,0,0,0,0])),
+    { kind: 'image', mime: 'image/tiff' },
+  );
+  assert.deepEqual(
+    detectStudioMedia(Buffer.from([0x00,0x00,0x00,0x0c,0x6a,0x50,0x20,0x20,0x0d,0x0a,0x87,0x0a])),
+    { kind: 'image', mime: 'image/jp2' },
+  );
+  assert.deepEqual(
+    detectStudioMedia(Buffer.from([0xff,0x0a,0x00,0x00])),
+    { kind: 'image', mime: 'image/jxl' },
+  );
+  assert.deepEqual(
+    detectStudioMedia(Buffer.from([0x01,0x02,0x03]), 'preview.raw'),
+    { kind: 'binary', mime: 'application/x-raw' },
+  );
+});
+
 test('Phase 10 output-stage operations cannot be followed by raster manipulation', () => {
   const project = phase10Project();
   const node = project.document.nodes.image_phase10;
@@ -343,4 +444,12 @@ test('Phase 10 permanent Images workflow exposes stack, presets, analysis and fu
   assert.match(shell, /primaryMedia\.kind === 'image'/);
   assert.match(shell, /studioResultsJson/);
   assert.match(shell, /setPhase7Results\(result\.results\)/);
+  assert.match(shell, /phase10RenderTailRef/);
+  assert.match(shell, /await previousPhase10Render/);
+  assert.match(shell, /releasePhase10Render\(\)/);
+  assert.match(shell, /modalPreviewFileName/);
+  const wrapper = fs.readFileSync('lib/studio/runtime/wrapStudioSnippetForRunner.ts', 'utf8');
+  for (const mime of ['image/avif','image/tiff','image/heif','image/jp2','image/jxl','application/x-raw']) {
+    assert.ok(wrapper.includes(mime), mime + ' missing from runner wrapper');
+  }
 });
