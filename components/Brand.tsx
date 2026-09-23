@@ -35,7 +35,7 @@ export function BrandIcon({ size, className, decorative = true }: BrandIconProps
   if (size != null) {
     return (
       <Image
-        src="/brand/apexify-mark.png"
+        src="/brand/apexify-mark.avif"
         alt={decorative ? '' : 'Apexify.js'}
         aria-hidden={decorative || undefined}
         width={size}
@@ -48,7 +48,7 @@ export function BrandIcon({ size, className, decorative = true }: BrandIconProps
   }
   return (
     <Image
-      src="/brand/apexify-mark.png"
+      src="/brand/apexify-mark.avif"
       alt={decorative ? '' : 'Apexify.js'}
       aria-hidden={decorative || undefined}
       width={64}
@@ -84,7 +84,7 @@ export function BrandBanner({ className = '', maxWidth = 480 }: BrandBannerProps
       role="img"
     >
       <Image
-        src="/brand/apexify-lockup.png"
+        src="/brand/apexify-lockup.avif"
         alt=""
         aria-hidden
         width={2048}
