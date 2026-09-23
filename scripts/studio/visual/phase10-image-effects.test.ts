@@ -4,6 +4,7 @@ import test from 'node:test';
 import { createVisualNode, createVisualProject } from '../../../lib/studio/visual/project';
 import {
   defaultImageNodeProps,
+  defaultShapeNodeProps,
   imagePropsRecord,
   visualImageProps,
 } from '../../../lib/studio/visual/image-contract';
@@ -13,6 +14,8 @@ import {
   IMAGE_UTILITY_STACK_TYPES,
   defaultImageUtilityAnalysis,
   defaultImageUtilityOperation,
+  normalizeImageUtilityAnalysisDraft,
+  normalizeImageUtilityOperationDraft,
 } from '../../../lib/studio/visual/image-utility-contract';
 import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
@@ -119,7 +122,7 @@ test('Phase 10 classifies every public image utility member', () => {
   assert.equal(IMAGE_UTILITY_API_COVERAGE.validHex.authoring, 'not-applicable');
 });
 
-test('Phase 10 lowers ordered nondestructive operations before final image composition', () => {
+test('Phase 10 lowers raster operations before composition and output utilities after composition', () => {
   const project = phase10Project();
   const validation = validateVisualProject(project);
   assert.equal(validation.ok, true, JSON.stringify(validation.issues));
@@ -132,10 +135,10 @@ test('Phase 10 lowers ordered nondestructive operations before final image compo
       'image-utility',
       'image-utility',
       'image-utility',
-      'image-utility',
       'image-analysis',
       'image-analysis',
       'create-image',
+      'image-utility',
     ],
   );
 
@@ -143,10 +146,19 @@ test('Phase 10 lowers ordered nondestructive operations before final image compo
   assert.deepEqual(utilities.map((operation) => operation.method), [
     'effects','resize','gradientBlend','compress',
   ]);
+  const composed = plan.operations.find(
+    (operation) => operation.kind === 'create-image' && operation.sourceNodeId === 'image_phase10',
+  );
+  assert.equal(composed?.kind, 'create-image');
+  if (composed?.kind === 'create-image') {
+    assert.deepEqual(composed.properties.source, { $studioTarget: 'image_phase10__utility_2' });
+  }
   const final = plan.operations.at(-1);
-  assert.equal(final?.kind, 'create-image');
-  if (final?.kind === 'create-image') {
-    assert.deepEqual(final.properties.source, { $studioTarget: 'image_phase10__utility_3' });
+  assert.equal(final?.kind, 'image-utility');
+  if (final?.kind === 'image-utility') {
+    assert.equal(final.method, 'compress');
+    assert.deepEqual(final.args[0], { $studioTarget: 'image_phase10' });
+    assert.equal(plan.result.target, final.target);
   }
 });
 
@@ -161,8 +173,8 @@ test('Phase 10 emits direct ApexPainter.image calls in stack order and routes fu
   assert.ok(effects >= 0);
   assert.ok(effects < resize);
   assert.ok(resize < gradient);
-  assert.ok(gradient < compress);
-  assert.ok(compress < compose);
+  assert.ok(gradient < compose);
+  assert.ok(compose < compress);
   assert.ok(source.includes('.image.extractPalette('));
   assert.ok(source.includes('.image.colorAnalysis('));
   assert.match(source, /apexify-studio-v10:/);
@@ -192,10 +204,15 @@ test('Phase 10 canonical source round-trips the same ordered semantic stack', ()
   assert.deepEqual(props.utilityAnalyses, visualImageProps(project.document.nodes.image_phase10).utilityAnalyses);
 });
 
-test('Phase 10 preview source preserves full-runtime utilities', () => {
+test('Phase 10 preview source preserves full-runtime utilities and structured analyses', () => {
   const source = generateVisualProjectPreviewCode(phase10Project()).source;
+  const nativeSource = generateVisualProjectCode(phase10Project()).source;
   assert.ok(source.includes('.image.effects('));
   assert.ok(source.includes('.image.compress('));
+  assert.ok(source.includes('studioResultsJson'));
+  assert.ok(source.includes('image-analysis-palette'));
+  assert.ok(source.includes('image-analysis-color'));
+  assert.equal(nativeSource.includes('studioResultsJson'), false);
   assert.equal(planStudioExecution(source).backend, 'full-runtime');
 });
 
@@ -222,6 +239,77 @@ test('Phase 10 rejects invalid stack parameters before lowering', () => {
   assert.equal(validation.ok, false);
   assert.ok(validation.issues.some((item) => item.code === 'image-utility-stitch-grid-overlap'));
   assert.ok(validation.issues.some((item) => item.code === 'image-utility-compress-quality'));
+});
+
+test('Phase 10 rejects raster utility stacks on built-in shape tokens', () => {
+  const project = createVisualProject({
+    id: 'project_phase10_shape_guard',
+    name: 'Phase 10 Shape Guard',
+    width: 320,
+    height: 240,
+    now: '2026-09-23T00:00:00.000Z',
+  });
+  const shape = createVisualNode(
+    'shape',
+    imagePropsRecord({
+      ...defaultShapeNodeProps('rectangle'),
+      utilityStack: [defaultImageUtilityOperation('effects', 'shape-effects')],
+    }),
+    { id: 'shape_phase10_guard', name: 'Shape Guard' },
+  );
+  project.document.nodes[shape.id] = shape;
+  project.document.rootNodeIds = [shape.id];
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((item) => item.code === 'image-utility-shape-source'));
+});
+
+test('Phase 10 JSON draft normalization keeps required operation structure safe', () => {
+  const crop = normalizeImageUtilityOperationDraft('cropImage', 'crop-safe', {});
+  assert.equal(crop.type, 'cropImage');
+  if (crop.type === 'cropImage') {
+    assert.ok(crop.coordinates.length >= 3);
+    assert.equal(crop.crop, 'inner');
+  }
+
+  const gradient = normalizeImageUtilityOperationDraft('gradientBlend', 'gradient-safe', {
+    options: { angle: 45 },
+  });
+  assert.equal(gradient.type, 'gradientBlend');
+  if (gradient.type === 'gradientBlend') {
+    assert.ok(gradient.options.colors.length > 0);
+    assert.equal(gradient.options.angle, 45);
+  }
+
+  const palette = normalizeImageUtilityAnalysisDraft('extractPalette', 'palette-safe', {});
+  assert.equal(palette.type, 'extractPalette');
+  if (palette.type === 'extractPalette') {
+    assert.equal(palette.options?.count, 8);
+  }
+
+  assert.throws(
+    () => normalizeImageUtilityOperationDraft('cropImage', 'crop-bad', { coordinates: {} }),
+    /coordinates must be an array/i,
+  );
+  assert.throws(
+    () => normalizeImageUtilityOperationDraft('gradientBlend', 'gradient-bad', { options: { colors: {} } }),
+    /colors must be an array/i,
+  );
+});
+
+test('Phase 10 output-stage operations cannot be followed by raster manipulation', () => {
+  const project = phase10Project();
+  const node = project.document.nodes.image_phase10;
+  const props = visualImageProps(node);
+  props.utilityStack = [
+    defaultImageUtilityOperation('compress', 'compress-first'),
+    defaultImageUtilityOperation('effects', 'effects-after-output'),
+  ];
+  node.props = imagePropsRecord(props);
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((item) => item.code === 'image-utility-output-order'));
 });
 
 test('Phase 10 defaults cover every stack and analysis operation', () => {
@@ -252,4 +340,7 @@ test('Phase 10 permanent Images workflow exposes stack, presets, analysis and fu
   assert.match(shell, /VisualImageUtilityAuthoring/);
   assert.match(shell, /currentNodeServerExecutionAdapter/);
   assert.match(shell, /phase10Active/);
+  assert.match(shell, /primaryMedia\.kind === 'image'/);
+  assert.match(shell, /studioResultsJson/);
+  assert.match(shell, /setPhase7Results\(result\.results\)/);
 });
