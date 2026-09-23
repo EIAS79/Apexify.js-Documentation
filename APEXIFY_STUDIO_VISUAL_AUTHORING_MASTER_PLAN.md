@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -2913,6 +2913,70 @@ Operation order and parameters must serialize deterministically and reconcile ba
 feat(studio-visual): complete image manipulation stack
 ```
 
+### Phase 10 implementation record — STUDIO-VISUAL-10
+
+**Status:** COMPLETE — integration PR **#102**
+
+- documentation branch: `studio-visual/v10-image-effects`
+- documentation PR: **#102**
+- green implementation head: `4089eac5719a24b8f7248644ad234489bc0d5320`
+- dedicated Studio Visual Phase Gate: run **35855159297** — **SUCCESS**
+- base main commit: `1da10da3ef1380b2e77744139f788c49668a9203`
+- branch divergence at PR open: **34 ahead / 0 behind**
+- Apexify.js runtime compatibility PR: **#38**
+- pinned Apexify.js runtime merge: `69d40cf40ba992ad2bdec457c6c7217f5df55cd1`
+
+Completed implementation scope:
+
+- ordered nondestructive image-utility stack stored directly on semantic image/shape nodes;
+- resize and polygon crop authoring;
+- filter/effect chains;
+- color filters, exact-color removal, palette extraction and color analysis;
+- blend, masking and gradient blending;
+- stitch and collage composition;
+- image conversion and compression;
+- stable per-operation identities, enable/disable and deterministic reordering;
+- Effects Inspector controls plus presets and Advanced output-stage controls;
+- complete public `ApexPainter.image` classification with explicit handling for non-authoring/external-service members;
+- compiler lowering from source → ordered image utilities → analyses → final `createImage()` composition;
+- native generated `painter.image.*` calls using real Apexify APIs;
+- semantic Phase-10 source marker for exact canonical Code → Visual reconstruction;
+- Phase-9 scene/component compatibility through materialization before executable Phase-10 lowering;
+- full-runtime preview routing instead of a shadow/browser imitation for native image utilities;
+- generic Studio operation-plan executor support for `image-utility` and `image-analysis`;
+- direct full-runtime preview/codegen equivalence proof using the real `ApexPainter.image` facet;
+- Apexify.js public Buffer-chaining contract correction so ordered utility outputs can feed later operations without casts or temporary files;
+- package lock, Studio runtime identity, DOC generators and capability evidence repinned to the exact runtime merge;
+- dedicated Phase-10 regression coverage integrated into `studio:visual:test`.
+
+Intentional public API classifications:
+
+- `ApexPainter.image.removeBackground`: **hosted-runtime-exclusion** because it requires caller-provided external-service credentials;
+- `ApexPainter.image.validHex`: **not-applicable** to visual authoring because it is an introspection/helper function.
+
+Acceptance evidence for run **35855159297**:
+
+- Studio completeness: **PASS**
+- Visual capability / option coverage: **PASS** — 187 capabilities, 17,233 option paths, 0 unclassified
+- Studio Visual tests: **PASS** — 100 / 100
+- real Phase-10 full-runtime preview/codegen equivalence proof: **PASS**
+  - artifact bytes: **2,899**
+  - SHA-256: `cdfc170b5f1bd77207a5aa5c1a70b06c22c2aba9d624ff50f70023667e8d7086`
+  - exercised operations: `effects → compress → colorAnalysis`
+- TypeScript typecheck: **PASS**
+- production Next.js build: **PASS**
+- production server start: **PASS**
+- dual-mode browser regression: **PASS**
+
+Runtime compatibility acceptance for Apexify.js PR **#38**:
+
+- Apexify CI: **SUCCESS**
+- Phase 14-P Normalized Performance Gate: **SUCCESS**
+- Phase 14-P Final Acceptance: **SUCCESS**
+- review finding on remaining `colorAnalysis` / `colorsRemover` Buffer types was fixed and the review thread resolved before merge.
+
+**Phase 10 is complete. STUDIO-VISUAL-11 is next.**
+
 ---
 
 ## STUDIO-VISUAL-11 — GIF and animation timeline
@@ -3295,7 +3359,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 7 | Paths / doodle / pixels / detect | MAIN MERGED | `f331de671c14e8dadc0167fe8c4532c22ba54c8f` | PR #86; exact-head Studio Visual gate `35721981002` PASS; Documentation Runtime Build Gate `35721981107` PASS; typecheck/build/browser/live-sync/reverse-sync proof PASS; direct canvas anchor/Bézier editing PASS; Apexify.js Phase-7 runtime finalized by PR #36 as `45b9381c07b70bb16be456406940858af8ab699a`; production verification deferred because exact feature-merge Vercel status was still pending when closure was recorded |
 | 8 | Charts | NOT STARTED | — | NEXT — activate Charts and implement complete chart authoring against the permanent shell |
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
-| 10 | Image utilities | NOT STARTED | — | — |
+| 10 | Image utilities | COMPLETE — PR #102 | — | Studio Visual Phase Gate 35855159297 SUCCESS; 100/100 tests; full-runtime image utility equivalence proof |
 | 11 | GIF / animation | NOT STARTED | — | — |
 | 12 | Audio | NOT STARTED | — | — |
 | 13 | Video | NOT STARTED | — | — |
