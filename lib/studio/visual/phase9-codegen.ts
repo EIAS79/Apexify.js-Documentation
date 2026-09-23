@@ -40,7 +40,7 @@ function emitValue(value: unknown, indent = 0): string {
     const body = entries
       .map(([key, item]) =>
         ' '.repeat(indent + 2) +
-        (/^[A-Za-z_$][\\w$]*$/.test(key) ? key : JSON.stringify(key)) +
+        (/^[A-Za-z_$][\w$]*$/.test(key) ? key : JSON.stringify(key)) +
         ': ' +
         emitValue(item, indent + 2),
       )
@@ -56,7 +56,7 @@ function identifier(value: string, fallback: string) {
 }
 
 function semanticPayload(project: VisualProject) {
-  return encodeURIComponent(JSON.stringify(project));
+  return encodeURIComponent(JSON.stringify(project)).replace(/\\*/g, '%2A');
 }
 
 export function phase9ProjectFromSourceMarker(source: string): VisualProject | null {
