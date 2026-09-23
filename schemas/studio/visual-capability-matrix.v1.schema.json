@@ -192,6 +192,7 @@
         },
         "implementationState": {
           "enum": [
+            "implemented",
             "planned",
             "excluded",
             "not-applicable"
