@@ -140,6 +140,11 @@ function __studioExtensionForMime(mime: string | undefined): string {
   if (normalized === 'image/jpeg') return '.jpg';
   if (normalized === 'image/webp') return '.webp';
   if (normalized === 'image/gif') return '.gif';
+  if (normalized === 'image/avif') return '.avif';
+  if (normalized === 'image/tiff') return '.tiff';
+  if (normalized === 'image/heif') return '.heif';
+  if (normalized === 'image/jp2') return '.jp2';
+  if (normalized === 'image/jxl') return '.jxl';
   if (normalized === 'audio/wav') return '.wav';
   if (normalized === 'audio/mpeg') return '.mp3';
   if (normalized === 'audio/ogg') return '.ogg';
@@ -155,7 +160,37 @@ function __studioDetectBufferMime(buf: Buffer): string | undefined {
   if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
   if (buf.length >= 12 && buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WEBP') return 'image/webp';
   if (buf.length >= 12 && buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WAVE') return 'audio/wav';
-  if (buf.length >= 12 && buf.subarray(4, 8).toString('ascii') === 'ftyp') return 'video/mp4';
+  if (buf.length >= 12 && buf.subarray(4, 8).toString('ascii') === 'ftyp') {
+    const brands = new Set<string>();
+    const boxSize = Math.min(buf.length, buf.readUInt32BE(0) || 64, 96);
+    brands.add(buf.subarray(8, 12).toString('ascii'));
+    for (let offset = 16; offset + 4 <= boxSize; offset += 4) {
+      brands.add(buf.subarray(offset, offset + 4).toString('ascii'));
+    }
+    if (brands.has('avif') || brands.has('avis')) return 'image/avif';
+    if (['heic','heix','hevc','hevx','heim','heis','hevm','hevs','mif1','msf1'].some((brand) => brands.has(brand))) {
+      return 'image/heif';
+    }
+    return 'video/mp4';
+  }
+  if (
+    buf.length >= 4 &&
+    ((buf[0] === 0x49 && buf[1] === 0x49 && buf[2] === 0x2a && buf[3] === 0x00) ||
+      (buf[0] === 0x4d && buf[1] === 0x4d && buf[2] === 0x00 && buf[3] === 0x2a))
+  ) return 'image/tiff';
+  if (
+    buf.length >= 12 &&
+    buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x00 && buf[3] === 0x0c &&
+    buf.subarray(4, 8).toString('ascii') === 'jP  ' &&
+    buf[8] === 0x0d && buf[9] === 0x0a && buf[10] === 0x87 && buf[11] === 0x0a
+  ) return 'image/jp2';
+  if (
+    (buf.length >= 2 && buf[0] === 0xff && buf[1] === 0x0a) ||
+    (buf.length >= 12 &&
+      buf[0] === 0x00 && buf[1] === 0x00 && buf[2] === 0x00 && buf[3] === 0x0c &&
+      buf.subarray(4, 8).toString('ascii') === 'JXL ' &&
+      buf[8] === 0x0d && buf[9] === 0x0a && buf[10] === 0x87 && buf[11] === 0x0a)
+  ) return 'image/jxl';
   if (buf.length >= 4 && buf[0] === 0x1a && buf[1] === 0x45 && buf[2] === 0xdf && buf[3] === 0xa3) return 'video/webm';
   return undefined;
 }
@@ -469,16 +504,24 @@ ${inner}
           if (typeof canvas.height === 'number') (metadata ??= {}).height = canvas.height;
         }
 
+        const declaredMime = typeof obj.mime === 'string' ? obj.mime : undefined;
+        const declaredName = typeof obj.name === 'string' ? obj.name : label;
         if (Buffer.isBuffer(obj.buffer)) {
-          __pushBuffer(obj.buffer, label, metadata);
+          __pushBuffer(obj.buffer, declaredName, metadata, declaredMime);
         } else if (ArrayBuffer.isView(obj.buffer)) {
           __pushBuffer(
             Buffer.from(obj.buffer.buffer, obj.buffer.byteOffset, obj.buffer.byteLength),
-            label,
+            declaredName,
             { ...(metadata ?? {}), viewType: obj.buffer.constructor?.name || 'TypedArray' },
+            declaredMime,
           );
         } else {
-          __pushBuffer(Buffer.from(new Uint8Array(obj.buffer as ArrayBuffer)), label, metadata);
+          __pushBuffer(
+            Buffer.from(new Uint8Array(obj.buffer as ArrayBuffer)),
+            declaredName,
+            metadata,
+            declaredMime,
+          );
         }
         return;
       }
