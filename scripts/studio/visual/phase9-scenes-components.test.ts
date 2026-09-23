@@ -36,9 +36,12 @@ import {
   setPhase9InstanceInsertions,
   setPhase9InstanceOverrides,
 } from '../../../lib/studio/visual/scene-component-contract';
-import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
-import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
+import {
+  generateVisualProjectCode,
+  generateVisualProjectPreviewCode,
+} from '../../../lib/studio/visual/codegen/generator';
+import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
 
 function phase9BaseProject() {
   const project = createVisualProject({
@@ -222,8 +225,16 @@ test('Phase 9 templates expose placeholders data overrides and native insertions
   assert.match(source, /shape_phase9_card/);
   assert.match(source, /inserted_caption/);
 
-  const plan = lowerVisualProject(project);
-  assert.ok(plan.operations.some((operation) => operation.kind === 'render-template'));
+  const preview = generateVisualProjectPreviewCode(project).source;
+  assert.match(preview, /createCanvas\(/);
+  assert.match(preview, /Runtime headline/);
+
+  const reconciled = reconcileVisualProjectFromCode(project, source);
+  assert.equal(reconciled.ok, true);
+  if (reconciled.ok) {
+    assert.deepEqual(reconciled.project.document.nodes, project.document.nodes);
+    assert.deepEqual(reconciled.project.operations, project.operations);
+  }
   assert.equal(validateVisualProject(project).ok, true);
 });
 
@@ -284,14 +295,14 @@ test('Phase 9 scenes lower nested surfaces to native SceneBuilder layers', () =>
   assert.equal(Array.isArray(nestedLayers), true);
   assert.equal(nestedLayers.length, 1);
 
-  const plan = lowerVisualProject(project);
-  assert.ok(plan.operations.some((operation) => operation.kind === 'create-scene'));
-
   const source = generateVisualProjectCode(project).source;
   assert.match(source, /createScene\(/);
   assert.match(source, /\.render\(\{ resolveAssetRefs: true \}\)/);
   assert.match(source, /type: "surface"/);
-  assert.match(source, /scene_nested_title/);
+  assert.match(source, /Nested scene title/);
+  const preview = generateVisualProjectPreviewCode(project).source;
+  assert.match(preview, /createCanvas\(/);
+  assert.match(preview, /Nested scene title/);
   assert.equal(validateVisualProject(project).ok, true);
 });
 
