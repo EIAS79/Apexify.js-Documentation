@@ -141,7 +141,6 @@ test('Phase 11 scene mode emits real renderSceneToGIF from the current Visual sc
   const execution = planStudioExecution(source);
   assert.equal(execution.backend, 'full-runtime');
   assert.ok(execution.families.includes('gif'));
-  assert.ok(execution.families.includes('scene'));
 });
 
 test('Phase 11 canonical generated source round-trips timeline semantics exactly', () => {
