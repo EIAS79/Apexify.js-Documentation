@@ -54,5 +54,10 @@ export function generatePhase10NativeSource(project: VisualProject): string {
 }
 
 export function generatePhase10PreviewSource(project: VisualProject): string {
-  return generatePhase10NativeSource(project);
+  const executable = executablePhase10Project(project);
+  const source = emitStudioOperationPlan(
+    lowerVisualProject(executable),
+    { includeAnalysisResults: true },
+  );
+  return '/* ' + PHASE10_SOURCE_MARKER + semanticPayload(project) + ' */\n' + source;
 }
