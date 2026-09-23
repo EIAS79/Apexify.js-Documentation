@@ -5974,6 +5974,104 @@
 
 
 /* ==========================================================================
+   STUDIO-VISUAL-10 — Image utility / effect stack
+   ========================================================================== */
+
+.apx-image-utility-add-row,
+.apx-image-utility-presets,
+.apx-image-utility-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.3rem;
+}
+
+.apx-image-utility-presets{
+  margin-bottom:.48rem;
+  padding-bottom:.48rem;
+  border-bottom:1px solid #14293d;
+}
+
+.apx-image-utility-add-row{
+  margin:.42rem 0 .56rem;
+}
+
+.apx-image-utility-stack{
+  display:grid;
+  gap:.42rem;
+}
+
+.apx-image-utility-card,
+.apx-image-utility-row{
+  min-width:0;
+  display:grid;
+  gap:.42rem;
+  padding:.5rem;
+  border:1px solid #18324b;
+  border-radius:7px;
+  background:linear-gradient(180deg,#081a2a,#071522);
+}
+
+.apx-image-utility-card[data-image-utility="compress"],
+.apx-pre4-section[data-image-utility="compress"],
+.apx-image-utility-card[data-image-utility="imgConverter"],
+.apx-pre4-section[data-image-utility="imgConverter"]{
+  border-color:#29445d;
+  background:#081725;
+}
+
+.apx-image-utility-card .apx-canvas-section-heading>div:first-child,
+.apx-image-utility-row>div:first-child{
+  min-width:0;
+  display:grid;
+  gap:.08rem;
+}
+
+.apx-image-utility-card strong,
+.apx-image-utility-row strong{
+  color:#d9e5f1;
+  font-size:.55rem;
+  font-weight:720;
+}
+
+.apx-image-utility-card small,
+.apx-image-utility-row small{
+  color:#6f879f;
+  font-size:.42rem;
+}
+
+.apx-image-utility-actions{
+  flex-wrap:nowrap;
+}
+
+.apx-image-utility-actions>button,
+.apx-image-utility-row>button{
+  min-width:24px;
+  min-height:24px;
+  border:1px solid #203a51;
+  border-radius:5px;
+  color:#91a6bc;
+  background:#0a1a29;
+}
+
+.apx-image-utility-actions>button:hover:not(:disabled),
+.apx-image-utility-row>button:hover{
+  color:#eef6ff;
+  border-color:#3e6283;
+  background:#0d2134;
+}
+
+.apx-image-utility-actions>button:disabled{
+  opacity:.3;
+}
+
+.apx-image-utility-card .apx-canvas-json,
+.apx-image-utility-row .apx-canvas-json{
+  min-height:104px;
+  max-height:220px;
+  resize:vertical;
+}
+
+/* ==========================================================================
    STUDIO-VISUAL-6 — Text / Fonts
    ========================================================================== */
 
