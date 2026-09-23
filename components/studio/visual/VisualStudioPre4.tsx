@@ -54,6 +54,11 @@ import {
   VisualGifContext,
   VisualGifTimeline,
 } from '@/components/studio/visual/VisualGifAuthoring';
+import {
+  VisualAudioContext,
+  VisualAudioInspector,
+  VisualAudioTimeline,
+} from '@/components/studio/visual/VisualAudioAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -84,6 +89,7 @@ import {
 import { hasPhase9Authoring } from '@/lib/studio/visual/phase9-codegen';
 import { hasPhase10Authoring } from '@/lib/studio/visual/phase10-codegen';
 import { hasPhase11Authoring } from '@/lib/studio/visual/phase11-codegen';
+import { hasPhase12Authoring } from '@/lib/studio/visual/phase12-codegen';
 import { createInteractiveSession } from '@/lib/docs/playground/session';
 import { currentNodeServerExecutionAdapter } from '@/lib/docs/playground/serverClientAdapter';
 import { validateVisualProject } from '@/lib/studio/visual/compiler/validate';
@@ -664,6 +670,7 @@ export default function VisualStudioPre4({
   const phase9Active = useMemo(() => hasPhase9Authoring(project), [project]);
   const phase10Active = useMemo(() => hasPhase10Authoring(project), [project]);
   const phase11Active = useMemo(() => hasPhase11Authoring(project), [project]);
+  const phase12Active = useMemo(() => hasPhase12Authoring(project), [project]);
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
@@ -778,7 +785,7 @@ export default function VisualStudioPre4({
     source: string,
     displaySource = source,
   ) => {
-    if (phase11Active || phase10Active) {
+    if (phase12Active || phase11Active || phase10Active) {
       let releasePhase10Render!: () => void;
       const previousPhase10Render = phase10RenderTailRef.current;
       phase10RenderTailRef.current = new Promise<void>((resolve) => {
@@ -814,7 +821,7 @@ export default function VisualStudioPre4({
       if (!artifact?.base64) {
         return {
           ok: false as const,
-          error: 'Phase 10 full-runtime execution completed without an image artifact.',
+          error: 'Full Apexify runtime execution completed without a preview artifact.',
         };
       }
       let analysisResults: Record<string, unknown> = {};
@@ -910,6 +917,10 @@ export default function VisualStudioPre4({
   useEffect(() => {
     window.clearTimeout(artboardPreviewTimerRef.current);
     if (!active || !previewGenerated.value) return;
+    if (phase12Active) {
+      setArtboardPreviewUrl(null);
+      return;
+    }
 
     let cancelled = false;
     artboardPreviewTimerRef.current = window.setTimeout(() => {
@@ -2415,7 +2426,7 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = phase11Active || phase10Active || phase9Active
+    const source = phase12Active || phase11Active || phase10Active || phase9Active
       ? previewGenerated.value?.source
       : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
@@ -2429,7 +2440,7 @@ export default function VisualStudioPre4({
     try {
       const result = await renderAuthoritativeVisualSource(
         source,
-        phase10Active && !phase11Active
+        phase10Active && !phase11Active && !phase12Active
           ? displayPreviewGenerated.value?.source ?? source
           : source,
       );
@@ -2735,7 +2746,8 @@ export default function VisualStudioPre4({
     activeTool === 'paths' ||
     activeTool === 'components' ||
     activeTool === 'assets' ||
-    activeTool === 'gif';
+    activeTool === 'gif' ||
+    activeTool === 'audio';
 
   const imageAssets = assets.filter((asset) =>
     asset.mime.startsWith('image/'),
@@ -2752,6 +2764,23 @@ export default function VisualStudioPre4({
   ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'audio') {
+      return (
+        <VisualAudioContext
+          project={project}
+          assets={assets}
+          onMutate={mutate}
+          onOpenTimeline={() => {
+            setDockTab('timeline');
+            setDockCollapsed(false);
+          }}
+          onPreview={() => void renderVisualPreview(true)}
+          previewUrl={modalPreviewMime.startsWith('audio/') ? modalPreviewUrl : null}
+          previewMime={modalPreviewMime}
+        />
+      );
+    }
+
     if (activeTool === 'gif') {
       return (
         <VisualGifContext
@@ -3197,7 +3226,7 @@ export default function VisualStudioPre4({
     ['diagnostics', 'Diagnostics'],
     ['assets', 'Assets'],
     ['history', 'History'],
-    ...((activeTool === 'gif' || phase11Active)
+    ...((activeTool === 'gif' || phase11Active || activeTool === 'audio' || phase12Active)
       ? [['timeline', 'Timeline'] as const]
       : []),
   ] as const;
@@ -5421,6 +5450,18 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
+    if (activeTool === 'audio' || phase12Active) {
+      return (
+        <VisualAudioInspector
+          project={project}
+          assets={assets}
+          onMutate={mutate}
+          inspectorTab={inspectorTab}
+          onMessage={setMessage}
+        />
+      );
+    }
+
     if (
       primary &&
       (primary.kind === 'scene' ||
@@ -5508,6 +5549,15 @@ export default function VisualStudioPre4({
 
   const renderDock = () => {
     if (dockTab === 'timeline') {
+      if (activeTool === 'audio' || phase12Active) {
+        return (
+          <VisualAudioTimeline
+            project={project}
+            assets={assets}
+            onMutate={mutate}
+          />
+        );
+      }
       return (
         <VisualGifTimeline
           project={project}
@@ -5717,7 +5767,7 @@ export default function VisualStudioPre4({
                 onClick={() => {
                   setActiveTool(id);
                   if (id === 'assets') setDockTab('assets');
-                  if (id === 'gif') {
+                  if (id === 'gif' || id === 'audio') {
                     setDockTab('timeline');
                     setDockCollapsed(false);
                   }
@@ -6241,6 +6291,7 @@ export default function VisualStudioPre4({
         name={project.name}
         onNameChange={renameCanvas}
         previewUrl={modalPreviewUrl}
+        previewMime={modalPreviewMime}
         loading={modalPreviewLoading}
         error={modalPreviewError}
         onDownload={downloadCanvasPreview}
