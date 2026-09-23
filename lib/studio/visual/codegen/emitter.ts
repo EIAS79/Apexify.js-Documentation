@@ -67,7 +67,48 @@ function emitValue(
   throw new Error(`Unsupported code-generation value: ${String(value)}`);
 }
 
-export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
+function imageOutputIdentity(plan: StudioOperationPlan): { mime: string; name: string } | null {
+  const output = [...plan.operations].reverse().find(
+    (operation) =>
+      operation.kind === 'image-utility' &&
+      (operation.method === 'imgConverter' || operation.method === 'compress'),
+  );
+  if (!output || output.kind !== 'image-utility') return null;
+
+  let extension = '';
+  if (output.method === 'imgConverter') {
+    extension = typeof output.args[1] === 'string' ? output.args[1].toLowerCase() : '';
+  } else {
+    const options =
+      output.args[1] && typeof output.args[1] === 'object' && !Array.isArray(output.args[1])
+        ? output.args[1] as Record<string, unknown>
+        : {};
+    extension = typeof options.format === 'string' ? options.format.toLowerCase() : 'jpeg';
+  }
+
+  if (extension === 'jpg') extension = 'jpeg';
+  const mimeByExtension: Record<string, string> = {
+    png: 'image/png',
+    jpeg: 'image/jpeg',
+    webp: 'image/webp',
+    tiff: 'image/tiff',
+    gif: 'image/gif',
+    avif: 'image/avif',
+    heif: 'image/heif',
+    raw: 'application/x-raw',
+    jp2: 'image/jp2',
+    jxl: 'image/jxl',
+  };
+  const mime = mimeByExtension[extension];
+  if (!mime) return null;
+  const fileExtension = extension === 'jpeg' ? 'jpg' : extension;
+  return { mime, name: 'preview.' + fileExtension };
+}
+
+export function emitStudioOperationPlan(
+  plan: StudioOperationPlan,
+  options: { includeAnalysisResults?: boolean } = {},
+): string {
   const imports = new ImportRegistry();
   imports.add('apexify.js', 'ApexPainter');
 
@@ -76,6 +117,7 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
   const targetNames = new Map<string, string>();
   const pathResourceNames = new Map<string, string>();
   const templateNames = new Map<string, string>();
+  const analysisResultNames: Array<{ key: string; name: string }> = [];
 
   const body: string[] = [];
   for (const operation of plan.operations) {
@@ -103,6 +145,27 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       body.push(
         `  const ${targetName} = await ${painterName}.createCanvas(${emitValue(operation.options, 2, targetNames)});`,
       );
+      continue;
+    }
+
+    if (operation.kind === 'image-utility' || operation.kind === 'image-analysis') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        operation.kind === 'image-analysis' ? 'imageAnalysis' : 'imageUtility',
+      );
+      const args = operation.args
+        .map((argument) => emitValue(argument, 2, targetNames))
+        .join(', ');
+      body.push(
+        `  const ${targetName} = await ${painterName}.image.${operation.method}(${args});`,
+      );
+      targetNames.set(operation.target, targetName);
+      if (operation.kind === 'image-analysis') {
+        analysisResultNames.push({
+          key: operation.sourceNodeId + ':' + operation.resultName,
+          name: targetName,
+        });
+      }
       continue;
     }
 
@@ -375,11 +438,27 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
     );
   }
   body.push('');
-  body.push(
-    plan.result.member
-      ? `  return ${resultName}.${plan.result.member};`
-      : `  return ${resultName};`,
-  );
+  const resultExpression = plan.result.member
+    ? `${resultName}.${plan.result.member}`
+    : resultName;
+  if (options.includeAnalysisResults) {
+    const resultEntries = analysisResultNames
+      .map((item) => `${emitObjectKey(item.key)}: ${item.name}`)
+      .join(', ');
+    const outputIdentity = imageOutputIdentity(plan);
+    const metadataFields = [
+      outputIdentity ? `mime: ${emitString(outputIdentity.mime)}` : '',
+      outputIdentity ? `name: ${emitString(outputIdentity.name)}` : '',
+      analysisResultNames.length
+        ? `studioResultsJson: JSON.stringify({ ${resultEntries} })`
+        : '',
+    ].filter(Boolean);
+    body.push(
+      `  return { buffer: ${resultExpression}${metadataFields.length ? ', ' + metadataFields.join(', ') : ''} };`,
+    );
+  } else {
+    body.push(`  return ${resultExpression};`);
+  }
 
   return [
     imports.emit(),

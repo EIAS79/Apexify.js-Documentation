@@ -49,6 +49,7 @@ import {
   VisualComponentsContext,
   VisualPhase9Inspector,
 } from '@/components/studio/visual/VisualSceneComponentAuthoring';
+import { VisualImageUtilityAuthoring } from '@/components/studio/visual/VisualImageUtilityAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -73,9 +74,13 @@ import {
 } from '@/lib/studio/visual/project';
 import {
   generateVisualProjectCode,
+  generateVisualProjectDisplayPreviewCode,
   generateVisualProjectPreviewCode,
 } from '@/lib/studio/visual/codegen/generator';
 import { hasPhase9Authoring } from '@/lib/studio/visual/phase9-codegen';
+import { hasPhase10Authoring } from '@/lib/studio/visual/phase10-codegen';
+import { createInteractiveSession } from '@/lib/docs/playground/session';
+import { currentNodeServerExecutionAdapter } from '@/lib/docs/playground/serverClientAdapter';
 import { validateVisualProject } from '@/lib/studio/visual/compiler/validate';
 import {
   reconcileVisualProjectFromCode,
@@ -500,7 +505,9 @@ export default function VisualStudioPre4({
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [codeModalOpen, setCodeModalOpen] = useState(false);
   const [modalPreviewUrl, setModalPreviewUrl] = useState<string | null>(null);
+  const [modalPreviewDownloadUrl, setModalPreviewDownloadUrl] = useState<string | null>(null);
   const [modalPreviewMime, setModalPreviewMime] = useState('image/png');
+  const [modalPreviewFileName, setModalPreviewFileName] = useState('preview.png');
   const [modalPreviewLoading, setModalPreviewLoading] = useState(false);
   const [modalPreviewError, setModalPreviewError] = useState<string | null>(null);
   const [canvasFiltersDraft, setCanvasFiltersDraft] = useState('[]');
@@ -542,6 +549,7 @@ export default function VisualStudioPre4({
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
   const artboardPreviewTimerRef = useRef<number>(0);
+  const phase10RenderTailRef = useRef<Promise<void>>(Promise.resolve());
   const freehandDraftRef = useRef<Point[]>([]);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
@@ -636,7 +644,20 @@ export default function VisualStudioPre4({
     }
   }, [project]);
 
+  const displayPreviewGenerated = useMemo(() => {
+    try {
+      return { value: generateVisualProjectDisplayPreviewCode(project), error: null };
+    } catch (error) {
+      return {
+        value: null,
+        error:
+          error instanceof Error ? error.message : 'Display preview code generation unavailable',
+      };
+    }
+  }, [project]);
+
   const phase9Active = useMemo(() => hasPhase9Authoring(project), [project]);
+  const phase10Active = useMemo(() => hasPhase10Authoring(project), [project]);
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
@@ -747,6 +768,139 @@ export default function VisualStudioPre4({
     };
   }, []);
 
+  const renderAuthoritativeVisualSource = async (
+    source: string,
+    displaySource = source,
+  ) => {
+    if (phase10Active) {
+      let releasePhase10Render!: () => void;
+      const previousPhase10Render = phase10RenderTailRef.current;
+      phase10RenderTailRef.current = new Promise<void>((resolve) => {
+        releasePhase10Render = resolve;
+      });
+      await previousPhase10Render.catch(() => undefined);
+
+      try {
+        const result = await currentNodeServerExecutionAdapter.run({
+        session: createInteractiveSession({
+          source,
+          language: 'ts',
+          runtime: 'node',
+          options: { studioAssets: assets },
+          layout: { activePanel: 'editor' },
+        }),
+      });
+      if (result.status !== 'ready' || !result.output) {
+        return {
+          ok: false as const,
+          error: result.diagnostics[0]?.message ?? 'Full Apexify runtime preview is unavailable.',
+        };
+      }
+      const artifact =
+        result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('image/')) ??
+        result.output.artifacts?.find((item) => item.base64) ??
+        (result.output.base64
+          ? {
+              mime: result.output.mime,
+              base64: result.output.base64,
+            }
+          : null);
+      if (!artifact?.base64) {
+        return {
+          ok: false as const,
+          error: 'Phase 10 full-runtime execution completed without an image artifact.',
+        };
+      }
+      let analysisResults: Record<string, unknown> = {};
+      const metadata =
+        'metadata' in artifact &&
+        artifact.metadata &&
+        typeof artifact.metadata === 'object' &&
+        !Array.isArray(artifact.metadata)
+          ? artifact.metadata
+          : undefined;
+      const rawResults = metadata?.studioResultsJson;
+      if (typeof rawResults === 'string') {
+        try {
+          const parsed = JSON.parse(rawResults) as unknown;
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            analysisResults = parsed as Record<string, unknown>;
+          }
+        } catch {
+          // Invalid structured-result metadata must never block the image artifact.
+        }
+      }
+        const exactDataUrl = 'data:' + artifact.mime + ';base64,' + artifact.base64;
+        const browserPreviewable = new Set([
+          'image/png',
+          'image/jpeg',
+          'image/webp',
+          'image/gif',
+          'image/avif',
+        ]);
+        let displayDataUrl = exactDataUrl;
+
+        if (!browserPreviewable.has(artifact.mime) && displaySource !== source) {
+          const displayResult = await currentNodeServerExecutionAdapter.run({
+            session: createInteractiveSession({
+              source: displaySource,
+              language: 'ts',
+              runtime: 'node',
+              options: { studioAssets: assets },
+              layout: { activePanel: 'editor' },
+            }),
+          });
+          if (displayResult.status === 'ready' && displayResult.output) {
+            const displayArtifact =
+              displayResult.output.artifacts?.find(
+                (item) => item.base64 && item.mime.startsWith('image/'),
+              ) ??
+              (displayResult.output.base64
+                ? {
+                    mime: displayResult.output.mime,
+                    base64: displayResult.output.base64,
+                  }
+                : null);
+            if (displayArtifact?.base64) {
+              displayDataUrl =
+                'data:' + displayArtifact.mime + ';base64,' + displayArtifact.base64;
+            }
+          }
+        }
+
+        return {
+          ok: true as const,
+          dataUrl: displayDataUrl,
+          downloadDataUrl: exactDataUrl,
+          mime: artifact.mime,
+          fileName: 'name' in artifact && typeof artifact.name === 'string'
+            ? artifact.name
+            : 'preview',
+          warnings: [] as string[],
+          results: analysisResults,
+        };
+      } finally {
+        releasePhase10Render();
+      }
+    }
+
+    const runtime =
+      webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
+    await runtime.registerFonts(assets);
+    const result = await runtime.renderStudioSource(source, assets);
+    if (!result.ok) return { ok: false as const, error: result.error };
+    return {
+      ok: true as const,
+      dataUrl: result.dataUrl,
+      downloadDataUrl: result.dataUrl,
+      mime: result.mime,
+      fileName: 'preview',
+      warnings: result.warnings,
+      results:
+        ((result as typeof result & { results?: Record<string, unknown> }).results ?? {}),
+    };
+  };
+
   useEffect(() => {
     window.clearTimeout(artboardPreviewTimerRef.current);
     if (!active || !previewGenerated.value) return;
@@ -756,20 +910,14 @@ export default function VisualStudioPre4({
       void (async () => {
         setArtboardPreviewBusy(true);
         try {
-          const runtime =
-            artboardRuntimeRef.current ??
-            (artboardRuntimeRef.current = createApexifyWebRuntime());
-          await runtime.registerFonts(assets);
-          const result = await runtime.renderStudioSource(
+          const result = await renderAuthoritativeVisualSource(
             previewGenerated.value!.source,
-            assets,
+            displayPreviewGenerated.value?.source ?? previewGenerated.value!.source,
           );
           if (cancelled) return;
           if (result.ok) {
             setArtboardPreviewUrl(result.dataUrl);
-            setPhase7Results(
-              ((result as typeof result & { results?: Record<string, unknown> }).results ?? {}),
-            );
+            setPhase7Results(result.results);
           }
         } catch {
           // Keep the last authoritative frame while the next valid frame is built.
@@ -783,7 +931,13 @@ export default function VisualStudioPre4({
       cancelled = true;
       window.clearTimeout(artboardPreviewTimerRef.current);
     };
-  }, [active, assets, previewGenerated.value?.source]);
+  }, [
+    active,
+    assets,
+    previewGenerated.value?.source,
+    displayPreviewGenerated.value?.source,
+    phase10Active,
+  ]);
 
   const mutate = (
     label: string,
@@ -2254,7 +2408,7 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = phase9Active
+    const source = phase10Active || phase9Active
       ? previewGenerated.value?.source
       : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
@@ -2266,10 +2420,12 @@ export default function VisualStudioPre4({
     setModalPreviewLoading(true);
     setModalPreviewError(null);
     try {
-      const runtime =
-        webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
-      await runtime.registerFonts(assets);
-      const result = await runtime.renderStudioSource(source, assets);
+      const result = await renderAuthoritativeVisualSource(
+        source,
+        phase10Active
+          ? displayPreviewGenerated.value?.source ?? source
+          : source,
+      );
       if (!result.ok) {
         setModalPreviewUrl(null);
         setModalPreviewError(result.error);
@@ -2277,10 +2433,14 @@ export default function VisualStudioPre4({
         return;
       }
       setModalPreviewUrl(result.dataUrl);
+      setModalPreviewDownloadUrl(result.downloadDataUrl);
       setModalPreviewMime(result.mime);
+      setModalPreviewFileName(result.fileName);
+      setPhase7Results(result.results);
       setMessage('Preview rendered');
     } catch (error) {
       setModalPreviewUrl(null);
+      setModalPreviewDownloadUrl(null);
       setModalPreviewError(error instanceof Error ? error.message : 'Preview failed');
     } finally {
       setModalPreviewLoading(false);
@@ -2298,13 +2458,22 @@ export default function VisualStudioPre4({
   };
 
   const downloadCanvasPreview = () => {
-    if (!modalPreviewUrl) return;
+    const downloadUrl = modalPreviewDownloadUrl ?? modalPreviewUrl;
+    if (!downloadUrl) return;
+    const extensionFromName = modalPreviewFileName.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];
     const extension =
-      modalPreviewMime === 'image/jpeg' ? 'jpg' :
+      extensionFromName ??
+      (modalPreviewMime === 'image/jpeg' ? 'jpg' :
       modalPreviewMime === 'image/webp' ? 'webp' :
-      modalPreviewMime === 'image/gif' ? 'gif' : 'png';
+      modalPreviewMime === 'image/gif' ? 'gif' :
+      modalPreviewMime === 'image/avif' ? 'avif' :
+      modalPreviewMime === 'image/tiff' ? 'tiff' :
+      modalPreviewMime === 'image/heif' ? 'heif' :
+      modalPreviewMime === 'image/jp2' ? 'jp2' :
+      modalPreviewMime === 'image/jxl' ? 'jxl' :
+      modalPreviewMime === 'application/x-raw' ? 'raw' : 'png');
     const link = document.createElement('a');
-    link.href = modalPreviewUrl;
+    link.href = downloadUrl;
     link.download = safeVisualDownloadStem(project.name) + '.' + extension;
     link.click();
   };
@@ -3719,7 +3888,7 @@ export default function VisualStudioPre4({
       <div className="apx-pre4-inspector-title">
         <div>
           <strong>{primaryMedia.name ?? primaryMedia.kind}</strong>
-          <small>{primaryMedia.kind === 'shape' ? 'Apexify built-in shape' : 'Apexify image layer'} · Phase 5</small>
+          <small>{primaryMedia.kind === 'shape' ? 'Apexify built-in shape · Phase 5' : 'Apexify image layer · Phase 5 + 10'}</small>
         </div>
         <span className="apx-pre4-type-pill">{primaryMedia.kind}</span>
       </div>
@@ -3991,6 +4160,14 @@ export default function VisualStudioPre4({
           ) : null}
         </div>
 
+        {primaryMedia.kind === 'image' ? (
+          <VisualImageUtilityAuthoring
+            value={props}
+            mode="effects"
+            onChange={(next, label) => mutateImage(label, () => next)}
+          />
+        ) : null}
+
         <div className="apx-pre4-section" data-image-section="mask">
           <div className="apx-canvas-section-heading">
             <div className="apx-pre4-section-title">Mask</div>
@@ -4106,6 +4283,13 @@ export default function VisualStudioPre4({
     return (
       <>
         {renderMediaHeader()}
+        {primaryMedia.kind === 'image' ? (
+          <VisualImageUtilityAuthoring
+            value={visualImageProps(primaryMedia)}
+            mode="advanced"
+            onChange={(next, label) => mutateImage(label, () => next)}
+          />
+        ) : null}
         <div className="apx-pre4-section" data-image-section="complete-config">
           <div className="apx-pre4-section-title">Complete ImageProperties / CreateImageOptions</div>
           <textarea

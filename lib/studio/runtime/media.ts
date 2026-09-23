@@ -197,6 +197,22 @@ export function studioKindFromMime(mime: string): StudioArtifactKind {
   return 'binary';
 }
 
+function isoBmffImageMime(bytes: Uint8Array): string | null {
+  if (bytes.length < 12 || ascii(bytes, 4, 8) !== 'ftyp') return null;
+  const brands = new Set<string>();
+  brands.add(ascii(bytes, 8, 12));
+  const boxSize = u32be(bytes, 0) ?? Math.min(bytes.length, 64);
+  for (let offset = 16; offset + 4 <= Math.min(bytes.length, boxSize, 96); offset += 4) {
+    brands.add(ascii(bytes, offset, offset + 4));
+  }
+  if (brands.has('avif') || brands.has('avis')) return 'image/avif';
+  if (
+    ['heic','heix','hevc','hevx','heim','heis','hevm','hevs','mif1','msf1']
+      .some((brand) => brands.has(brand))
+  ) return 'image/heif';
+  return null;
+}
+
 export function detectStudioMedia(bytes: Uint8Array, name = ''): StudioMediaIdentity {
   if (
     bytes.length >= 8 &&
@@ -221,6 +237,30 @@ export function detectStudioMedia(bytes: Uint8Array, name = ''): StudioMediaIden
     return { kind: 'audio', mime: 'audio/wav' };
   }
 
+  const isoImageMime = isoBmffImageMime(bytes);
+  if (isoImageMime) return { kind: 'image', mime: isoImageMime };
+
+  if (
+    bytes.length >= 4 &&
+    ((bytes[0] === 0x49 && bytes[1] === 0x49 && bytes[2] === 0x2a && bytes[3] === 0x00) ||
+      (bytes[0] === 0x4d && bytes[1] === 0x4d && bytes[2] === 0x00 && bytes[3] === 0x2a))
+  ) return { kind: 'image', mime: 'image/tiff' };
+
+  if (
+    bytes.length >= 12 &&
+    bytes[0] === 0x00 && bytes[1] === 0x00 && bytes[2] === 0x00 && bytes[3] === 0x0c &&
+    ascii(bytes, 4, 8) === 'jP  ' &&
+    bytes[8] === 0x0d && bytes[9] === 0x0a && bytes[10] === 0x87 && bytes[11] === 0x0a
+  ) return { kind: 'image', mime: 'image/jp2' };
+
+  if (
+    (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0x0a) ||
+    (bytes.length >= 12 &&
+      bytes[0] === 0x00 && bytes[1] === 0x00 && bytes[2] === 0x00 && bytes[3] === 0x0c &&
+      ascii(bytes, 4, 8) === 'JXL ' &&
+      bytes[8] === 0x0d && bytes[9] === 0x0a && bytes[10] === 0x87 && bytes[11] === 0x0a)
+  ) return { kind: 'image', mime: 'image/jxl' };
+
   if (bytes.length >= 12 && ascii(bytes, 4, 8) === 'ftyp') return { kind: 'video', mime: 'video/mp4' };
 
   if (
@@ -241,6 +281,12 @@ export function detectStudioMedia(bytes: Uint8Array, name = ''): StudioMediaIden
   if (ext === 'jpg' || ext === 'jpeg') return { kind: 'image', mime: 'image/jpeg' };
   if (ext === 'webp') return { kind: 'image', mime: 'image/webp' };
   if (ext === 'gif') return { kind: 'gif', mime: 'image/gif' };
+  if (ext === 'avif') return { kind: 'image', mime: 'image/avif' };
+  if (ext === 'tif' || ext === 'tiff') return { kind: 'image', mime: 'image/tiff' };
+  if (ext === 'heif' || ext === 'heic') return { kind: 'image', mime: 'image/heif' };
+  if (ext === 'jp2') return { kind: 'image', mime: 'image/jp2' };
+  if (ext === 'jxl') return { kind: 'image', mime: 'image/jxl' };
+  if (ext === 'raw') return { kind: 'binary', mime: 'application/x-raw' };
   if (ext === 'json') return { kind: 'json', mime: 'application/json' };
   if (ext === 'txt' || ext === 'log' || ext === 'md') return { kind: 'text', mime: 'text/plain' };
 

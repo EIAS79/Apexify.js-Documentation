@@ -117,7 +117,7 @@
     "docs:verify:release": "npm run docs:verify:doc12",
     "studio:visual:capabilities": "tsx scripts/studio/visual/generate-capability-matrix.ts",
     "studio:visual:capabilities:check": "tsx scripts/studio/visual/generate-capability-matrix.ts --check",
-    "studio:visual:test": "tsx --test scripts/studio/declaration-parser.test.ts scripts/studio/visual/visual-contract.test.ts scripts/studio/visual/phase1-shell.test.ts scripts/studio/visual/phase2-model-codegen.test.ts scripts/studio/visual/phase3-editor.test.ts scripts/studio/visual/pre4-shell.test.ts scripts/studio/visual/live-sync.test.ts scripts/studio/visual/phase4-canvas.test.ts scripts/studio/visual/phase5-images-shapes.test.ts scripts/studio/visual/phase6-text-fonts.test.ts scripts/studio/visual/phase7-path-pixels.test.ts scripts/studio/visual/phase8-charts.test.ts scripts/studio/visual/phase9-scenes-components.test.ts scripts/studio/media-proxy-contract.test.ts",
+    "studio:visual:test": "tsx --test scripts/studio/declaration-parser.test.ts scripts/studio/visual/visual-contract.test.ts scripts/studio/visual/phase1-shell.test.ts scripts/studio/visual/phase2-model-codegen.test.ts scripts/studio/visual/phase3-editor.test.ts scripts/studio/visual/pre4-shell.test.ts scripts/studio/visual/live-sync.test.ts scripts/studio/visual/phase4-canvas.test.ts scripts/studio/visual/phase5-images-shapes.test.ts scripts/studio/visual/phase6-text-fonts.test.ts scripts/studio/visual/phase7-path-pixels.test.ts scripts/studio/visual/phase8-charts.test.ts scripts/studio/visual/phase9-scenes-components.test.ts scripts/studio/visual/phase10-image-effects.test.ts scripts/studio/media-proxy-contract.test.ts",
     "studio:visual:proof": "tsx scripts/studio/visual/codegen-smoke.ts",
     "studio:visual:verify": "npm run studio:completeness:check && npm run studio:visual:capabilities:check && npm run studio:visual:test && npm run studio:visual:proof"
   },
@@ -128,7 +128,7 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@uiw/react-codemirror": "^4.25.9",
     "@vercel/speed-insights": "^2.0.0",
-    "apexify.js": "github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b",
+    "apexify.js": "github:EIAS79/Apexify.js#69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
     "dejavu-fonts-ttf": "^2.37.3",
     "framer-motion": "^12.38.0",
     "next": "^14.2.0",

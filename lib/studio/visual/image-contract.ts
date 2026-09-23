@@ -11,6 +11,7 @@ import type {
   VisualShapeType,
   VisualValue,
 } from './model';
+import { validateVisualImageUtilities } from './image-utility-contract';
 
 export const IMAGE_SHAPE_TYPES: readonly VisualShapeType[] = [
   'rectangle',
@@ -101,6 +102,8 @@ export const IMAGE_AUTHORING_CLASSIFICATION = {
   shadow: { surface: 'Effects', reverse: 'canonical-literal' },
   stroke: { surface: 'Style', reverse: 'canonical-literal' },
   boxBackground: { surface: 'Style', reverse: 'canonical-literal' },
+  utilityStack: { surface: 'Effects', reverse: 'canonical-literal' },
+  utilityAnalyses: { surface: 'Data', reverse: 'canonical-literal' },
 } as const satisfies Record<
   ImageRuntimePropertyKey,
   { surface: ImageAuthoringSurface; reverse: ImageReverseSyncPolicy }
@@ -413,4 +416,6 @@ export function validateVisualImageNode(
       validateFilter(filter, path + '.props.createOptions.groupTransform.filters[' + index + ']', issues),
     );
   }
+
+  validateVisualImageUtilities(project, node, issues);
 }

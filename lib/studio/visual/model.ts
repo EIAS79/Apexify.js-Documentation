@@ -207,6 +207,155 @@ export type VisualImageSource =
   | VisualReference
   | { $generated: string };
 
+export type VisualImageUtilityInput =
+  | VisualImageSource
+  | { $current: true };
+
+export interface VisualImageUtilityGradient {
+  type?: 'linear' | 'radial' | 'conic';
+  angle?: number;
+  colors: VisualGradientStop[];
+  blendMode?: 'multiply' | 'overlay' | 'screen' | 'darken' | 'lighten' | 'difference';
+  maskSource?: VisualImageUtilityInput;
+}
+
+export type VisualImageUtilityOperation =
+  | {
+      id: string;
+      type: 'resize';
+      enabled?: boolean;
+      size?: { width?: number; height?: number };
+      maintainAspectRatio?: boolean;
+      quality?: number;
+      outputFormat?: 'png' | 'jpeg';
+    }
+  | {
+      id: string;
+      type: 'cropImage';
+      enabled?: boolean;
+      coordinates: Array<{
+        from: { x: number; y: number };
+        to: { x: number; y: number };
+        tension?: number;
+      }>;
+      crop: 'inner' | 'outer';
+      radius?: number | 'circular';
+    }
+  | {
+      id: string;
+      type: 'effects';
+      enabled?: boolean;
+      filters: VisualImageFilter[];
+    }
+  | {
+      id: string;
+      type: 'colorsFilter';
+      enabled?: boolean;
+      filterColor: string | VisualImageUtilityGradient;
+      opacity?: number;
+    }
+  | {
+      id: string;
+      type: 'colorsRemover';
+      enabled?: boolean;
+      colorToRemove: { red: number; green: number; blue: number };
+    }
+  | {
+      id: string;
+      type: 'blend';
+      enabled?: boolean;
+      layers: Array<{
+        source: VisualImageUtilityInput;
+        blendMode: VisualBlendMode;
+        position?: { x: number; y: number };
+        opacity?: number;
+      }>;
+      defaultBlendMode?: VisualBlendMode;
+    }
+  | {
+      id: string;
+      type: 'masking';
+      enabled?: boolean;
+      maskSource: VisualImageUtilityInput;
+      options?: {
+        type?: 'alpha' | 'grayscale' | 'color';
+        threshold?: number;
+        invert?: boolean;
+        colorKey?: string;
+      };
+    }
+  | {
+      id: string;
+      type: 'gradientBlend';
+      enabled?: boolean;
+      options: VisualImageUtilityGradient;
+    }
+  | {
+      id: string;
+      type: 'stitchImages';
+      enabled?: boolean;
+      images: VisualImageUtilityInput[];
+      options?: {
+        direction?: 'horizontal' | 'vertical' | 'grid';
+        overlap?: number;
+        blend?: boolean;
+        spacing?: number;
+      };
+    }
+  | {
+      id: string;
+      type: 'createCollage';
+      enabled?: boolean;
+      images: Array<{
+        source: VisualImageUtilityInput;
+        width?: number;
+        height?: number;
+      }>;
+      layout: {
+        type: 'grid' | 'masonry' | 'carousel';
+        columns?: number;
+        rows?: number;
+        spacing?: number;
+        background?: string;
+        borderRadius?: number;
+      };
+    }
+  | {
+      id: string;
+      type: 'imgConverter';
+      enabled?: boolean;
+      newExtension: 'jpeg' | 'jpg' | 'png' | 'webp' | 'tiff' | 'gif' | 'avif' | 'heif' | 'raw' | 'jp2' | 'jxl';
+    }
+  | {
+      id: string;
+      type: 'compress';
+      enabled?: boolean;
+      options?: {
+        quality?: number;
+        format?: 'jpeg' | 'webp' | 'avif';
+        maxWidth?: number;
+        maxHeight?: number;
+        progressive?: boolean;
+      };
+    };
+
+export type VisualImageUtilityAnalysis =
+  | {
+      id: string;
+      type: 'extractPalette';
+      enabled?: boolean;
+      options?: {
+        count?: number;
+        method?: 'kmeans' | 'median-cut' | 'octree';
+        format?: 'hex' | 'rgb' | 'hsl';
+      };
+    }
+  | {
+      id: string;
+      type: 'colorAnalysis';
+      enabled?: boolean;
+    };
+
 export interface VisualShapeProperties {
   fill?: boolean;
   color?: string;
@@ -303,6 +452,10 @@ export interface VisualImageNodeProps {
   shadow?: VisualShadowOptions;
   stroke?: VisualStrokeOptions;
   boxBackground?: VisualBoxBackground;
+  /** Ordered nondestructive full-runtime image utility stack (STUDIO-VISUAL-10). */
+  utilityStack?: VisualImageUtilityOperation[];
+  /** Structured image analysis operations that do not replace the raster output. */
+  utilityAnalyses?: VisualImageUtilityAnalysis[];
   createOptions?: VisualCreateImageOptions;
 }
 

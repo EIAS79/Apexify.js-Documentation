@@ -4,6 +4,7 @@ import { ApexPainter } from 'apexify.js';
 import { createPhase2ProofProject } from '../../../lib/studio/visual/sample';
 import { createVisualNode, createVisualProject } from '../../../lib/studio/visual/project';
 import {
+  defaultImageNodeProps,
   defaultShapeNodeProps,
   imagePropsRecord,
 } from '../../../lib/studio/visual/image-contract';
@@ -313,6 +314,136 @@ async function run() {
       lines: metrics.lines?.length ?? 0,
       chars: metrics.charWidths?.length ?? 0,
       generatedFile: textGenerated.fileName,
+    }),
+  );
+
+  const phase10Project = createVisualProject({
+    id: 'project_phase10_runtime',
+    name: 'Phase 10 Runtime',
+    width: 360,
+    height: 240,
+    now: '2026-09-23T00:00:00.000Z',
+  });
+  phase10Project.document.canvas = { colorBg: '#07172d' };
+
+  const phase10SourceShape = createVisualNode(
+    'shape',
+    imagePropsRecord({
+      ...defaultShapeNodeProps('rectangle'),
+      shape: {
+        ...defaultShapeNodeProps('rectangle').shape,
+        color: '#6482ff',
+      },
+      borderRadius: 18,
+    }),
+    { id: 'shape_phase10_source', name: 'Phase 10 Source' },
+  );
+  phase10SourceShape.transform = {
+    x: 52,
+    y: 42,
+    width: 150,
+    height: 110,
+    rotation: 0,
+    opacity: 1,
+    visible: true,
+    locked: false,
+  };
+
+  const phase10Image = createVisualNode(
+    'image',
+    imagePropsRecord({
+      ...defaultImageNodeProps(''),
+      source: { $generated: phase10SourceShape.id },
+      utilityStack: [
+        {
+          id: 'runtime-effects',
+          type: 'effects',
+          filters: [
+            { type: 'contrast', value: 1.05 },
+            { type: 'saturation', value: 1.08 },
+          ],
+        },
+        {
+          id: 'runtime-compress',
+          type: 'compress',
+          options: { quality: 88, format: 'webp', maxWidth: 360 },
+        },
+      ],
+      utilityAnalyses: [
+        {
+          id: 'runtime-color-analysis',
+          type: 'colorAnalysis',
+        },
+      ],
+      fit: 'contain',
+    }),
+    { id: 'image_phase10_processed', name: 'Processed Runtime Image' },
+  );
+  phase10Image.transform = {
+    x: 175,
+    y: 72,
+    width: 150,
+    height: 110,
+    rotation: 0,
+    opacity: 1,
+    visible: true,
+    locked: false,
+  };
+  phase10Project.document.nodes[phase10SourceShape.id] = phase10SourceShape;
+  phase10Project.document.nodes[phase10Image.id] = phase10Image;
+  phase10Project.document.rootNodeIds = [phase10SourceShape.id, phase10Image.id];
+
+  const phase10Plan = lowerVisualProject(phase10Project);
+  const imageFacet = painter.image as unknown as Record<
+    string,
+    (...args: unknown[]) => unknown
+  >;
+  const phase10Preview = await executeStudioOperationPlan(phase10Plan, {
+    createCanvas: async (options) => {
+      const canvas = await painter.createCanvas(
+        options as Parameters<ApexPainter['createCanvas']>[0],
+      );
+      return { buffer: canvas.buffer };
+    },
+    createImage: async (properties, base, options) => {
+      return painter.createImage(
+        properties as Parameters<ApexPainter['createImage']>[0],
+        base as Parameters<ApexPainter['createImage']>[1],
+        options as Parameters<ApexPainter['createImage']>[2],
+      );
+    },
+    runImageUtility: async (method, args) => {
+      const value = await imageFacet[method]!(...args);
+      if (!(value instanceof Uint8Array)) {
+        throw new Error('Phase 10 image utility did not return image bytes: ' + method);
+      }
+      return value;
+    },
+    runImageAnalysis: async (method, args) => {
+      return imageFacet[method]!(...args);
+    },
+  });
+
+  const phase10Generated = generateVisualProjectCode(phase10Project);
+  const phase10Body = phase10Generated.source
+    .replace(/^\/\* apexify-studio-v10:[^\n]+\*\/\n/, '')
+    .replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
+  const executePhase10Generated = new AsyncFunction('ApexPainter', phase10Body);
+  const phase10GeneratedBuffer = await executePhase10Generated(ApexPainter);
+  assert.equal(digest(phase10GeneratedBuffer), digest(phase10Preview));
+  assert.ok(phase10Preview.byteLength > 0);
+
+  console.log(
+    '[studio-visual:phase10] equivalent full-runtime image utility preview/codegen proof passed',
+    JSON.stringify({
+      bytes: phase10Preview.byteLength,
+      sha256: digest(phase10Preview),
+      operations: phase10Plan.operations
+        .filter((operation) =>
+          operation.kind === 'image-utility' || operation.kind === 'image-analysis',
+        )
+        .map((operation) => operation.kind + ':' + operation.method),
+      generatedFile: phase10Generated.fileName,
     }),
   );
 }
