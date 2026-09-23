@@ -35,7 +35,7 @@
         "animation"
       ],
       "phaseOwner": "STUDIO-VISUAL-11",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.clear",
@@ -54,7 +54,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.delete",
@@ -73,7 +73,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.has",
@@ -92,7 +92,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.list",
@@ -111,7 +111,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.loadFont",
@@ -130,7 +130,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.loadImage",
@@ -149,7 +149,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.loadPalette",
@@ -168,7 +168,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.loadValue",
@@ -187,7 +187,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.replaceFont",
@@ -206,7 +206,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.replaceImage",
@@ -225,7 +225,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.replacePalette",
@@ -244,7 +244,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.replaceValue",
@@ -263,7 +263,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.resolve",
@@ -282,7 +282,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.unregisterFont",
@@ -301,7 +301,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.unregisterImage",
@@ -320,7 +320,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.assets.unregisterPalette",
@@ -339,7 +339,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.batch",
@@ -396,7 +396,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.components.badge.toLayers",
@@ -415,7 +415,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.components.card.toLayers",
@@ -434,7 +434,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.components.progressBar.toLayers",
@@ -453,7 +453,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.components.watermark.toLayers",
@@ -472,7 +472,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createAudio.compose",
@@ -491,7 +491,7 @@
         "audio"
       ],
       "phaseOwner": "STUDIO-VISUAL-12",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createAudio.custom",
@@ -510,7 +510,7 @@
         "audio"
       ],
       "phaseOwner": "STUDIO-VISUAL-12",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createAudio.listPresets",
@@ -545,7 +545,7 @@
         "audio"
       ],
       "phaseOwner": "STUDIO-VISUAL-12",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createAudio.preset",
@@ -564,7 +564,7 @@
         "audio"
       ],
       "phaseOwner": "STUDIO-VISUAL-12",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createAudio.presetNames",
@@ -615,7 +615,7 @@
         "audio"
       ],
       "phaseOwner": "STUDIO-VISUAL-12",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createAudio.synth",
@@ -634,7 +634,7 @@
         "audio"
       ],
       "phaseOwner": "STUDIO-VISUAL-12",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createCanvas",
@@ -653,7 +653,7 @@
         "web-raster-core"
       ],
       "phaseOwner": "STUDIO-VISUAL-4",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createChart",
@@ -672,7 +672,7 @@
         "charts"
       ],
       "phaseOwner": "STUDIO-VISUAL-8",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createComboChart",
@@ -691,7 +691,7 @@
         "charts"
       ],
       "phaseOwner": "STUDIO-VISUAL-8",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createComparisonChart",
@@ -710,7 +710,7 @@
         "charts"
       ],
       "phaseOwner": "STUDIO-VISUAL-8",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createGIF",
@@ -729,7 +729,7 @@
         "gif"
       ],
       "phaseOwner": "STUDIO-VISUAL-11",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createImage",
@@ -748,7 +748,7 @@
         "web-raster-core"
       ],
       "phaseOwner": "STUDIO-VISUAL-5",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createScene",
@@ -767,7 +767,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createTemplate",
@@ -786,7 +786,7 @@
         "templates"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createText",
@@ -805,7 +805,7 @@
         "web-raster-core"
       ],
       "phaseOwner": "STUDIO-VISUAL-6",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.createVideo",
@@ -843,7 +843,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.detect.distance",
@@ -862,7 +862,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.detect.path",
@@ -881,7 +881,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.detect.region",
@@ -900,7 +900,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.extractAllFrames",
@@ -1033,7 +1033,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.colorAnalysis",
@@ -1052,7 +1052,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.colorsFilter",
@@ -1071,7 +1071,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.colorsRemover",
@@ -1090,7 +1090,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.compress",
@@ -1109,7 +1109,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.createCollage",
@@ -1128,7 +1128,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.cropImage",
@@ -1147,7 +1147,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.effects",
@@ -1166,7 +1166,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.extractPalette",
@@ -1185,7 +1185,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.gradientBlend",
@@ -1204,7 +1204,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.imgConverter",
@@ -1223,7 +1223,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.masking",
@@ -1242,7 +1242,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.removeBackground",
@@ -1261,7 +1261,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.resize",
@@ -1280,7 +1280,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.stitchImages",
@@ -1299,7 +1299,7 @@
         "image-utils"
       ],
       "phaseOwner": "STUDIO-VISUAL-10",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.validHex",
@@ -1334,7 +1334,7 @@
         "measure-and-structured"
       ],
       "phaseOwner": "STUDIO-VISUAL-6",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.outPut",
@@ -1478,7 +1478,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.path2d.custom",
@@ -1497,7 +1497,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.path2d.draw",
@@ -1516,7 +1516,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.pixels.getColor",
@@ -1535,7 +1535,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.pixels.getData",
@@ -1554,7 +1554,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.pixels.manipulate",
@@ -1573,7 +1573,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.pixels.setColor",
@@ -1592,7 +1592,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.pixels.setData",
@@ -1611,7 +1611,7 @@
         "geometry-pixels-detect"
       ],
       "phaseOwner": "STUDIO-VISUAL-7",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.plugins.get",
@@ -1787,7 +1787,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.renderSceneToGIF",
@@ -1806,7 +1806,7 @@
         "gif"
       ],
       "phaseOwner": "STUDIO-VISUAL-11",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.renderSceneToVideoFrames",
@@ -1914,7 +1914,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.video.creator",
@@ -2117,7 +2117,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.addLayers",
@@ -2136,7 +2136,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.clearBackground",
@@ -2155,7 +2155,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.clearLayers",
@@ -2174,7 +2174,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.insertAfter",
@@ -2193,7 +2193,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.insertBefore",
@@ -2212,7 +2212,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.insertLayer",
@@ -2231,7 +2231,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.insertLayers",
@@ -2250,7 +2250,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.moveLayer",
@@ -2269,7 +2269,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.removeLayer",
@@ -2288,7 +2288,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.render",
@@ -2307,7 +2307,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.replaceLayer",
@@ -2326,7 +2326,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.replaceLayers",
@@ -2345,7 +2345,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.setBackground",
@@ -2364,7 +2364,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.toRenderInput",
@@ -2383,7 +2383,7 @@
         "scene-builder"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "TemplateHandle.render",
@@ -2402,7 +2402,7 @@
         "templates"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "TemplateHandle.toRenderInput",
@@ -2421,7 +2421,7 @@
         "templates"
       ],
       "phaseOwner": "STUDIO-VISUAL-9",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoCreator.createVideo",
