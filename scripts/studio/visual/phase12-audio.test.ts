@@ -144,7 +144,7 @@ test('Phase 12 canonical generated source round-trips exact audio semantics', ()
     now: project.createdAt,
   });
   const result = reconcileVisualProjectFromCode(empty, source);
-  assert.equal(result.ok, true);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
   if (!result.ok) return;
   assert.deepEqual(phase12Timeline(result.project), phase12Timeline(project));
   assert.equal(result.changed, true);
@@ -155,6 +155,27 @@ test('Phase 12 preview uses the same native audio runtime path', () => {
   assert.match(source, /apexify-studio-v12:/);
   assert.match(source, /painter\.createAudio\.sequence\(/);
   assert.equal(planStudioExecution(source).backend, 'full-runtime');
+});
+
+
+test('Phase 12 malformed imported timeline fails validation without throwing', () => {
+  const project = createVisualProject({
+    id: 'project_phase12_malformed',
+    name: 'Malformed Phase 12 Audio',
+    width: 320,
+    height: 180,
+    now: '2026-09-23T00:00:00.000Z',
+  });
+  project.timelines.push({
+    id: 'audio-timeline_malformed',
+    kind: 'audio-authoring-timeline',
+    name: 'Broken audio',
+    value: { mode: 'compose' },
+  });
+  assert.doesNotThrow(() => validateVisualProject(project));
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((issue) => issue.code === 'phase12-timeline'));
 });
 
 test('Phase 12 validation rejects unsafe or malformed audio state', () => {
@@ -193,7 +214,8 @@ test('Phase 12 permanent Audio rail, inspector, real waveform/player and Timelin
   assert.ok(shell.includes('<VisualAudioContext'));
   assert.ok(shell.includes('<VisualAudioTimeline'));
   assert.ok(shell.includes('<VisualAudioInspector'));
-  assert.ok(shell.includes("id === 'gif' || id === 'audio'"));
+  assert.ok(shell.includes("if (id === 'gif')"));
+  assert.ok(shell.includes("if (id === 'audio')"));
   assert.ok(shell.includes('phase12Active || phase11Active || phase10Active'));
   assert.ok(modal.includes('data-visual-audio-player'));
 });
