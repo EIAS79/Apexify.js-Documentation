@@ -16,6 +16,7 @@ export type StudioExecutionRoute =
   | 'introspection';
 
 export type VisualCapabilityImplementationState =
+  | 'implemented'
   | 'planned'
   | 'excluded'
   | 'not-applicable';

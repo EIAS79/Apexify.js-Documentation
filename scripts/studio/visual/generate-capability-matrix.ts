@@ -187,6 +187,18 @@ function phaseOwnerFor(domain: string): string {
   return owners[domain] ?? 'UNASSIGNED';
 }
 
+const IMPLEMENTED_PHASE_OWNERS = new Set([
+  'STUDIO-VISUAL-4',
+  'STUDIO-VISUAL-5',
+  'STUDIO-VISUAL-6',
+  'STUDIO-VISUAL-7',
+  'STUDIO-VISUAL-8',
+  'STUDIO-VISUAL-9',
+  'STUDIO-VISUAL-10',
+  'STUDIO-VISUAL-11',
+  'STUDIO-VISUAL-12',
+]);
+
 function projectFieldFor(
   classification: VisualCapabilityClassification,
   domain: string,
@@ -258,7 +270,9 @@ const rows: DraftVisualCapabilityRow[] = base.capabilityProofs
           ? 'excluded'
           : classification === 'not-applicable'
             ? 'not-applicable'
-            : 'planned',
+            : domain && IMPLEMENTED_PHASE_OWNERS.has(phaseOwnerFor(domain))
+              ? 'implemented'
+              : 'planned',
     };
   })
   .sort((a, b) => a.capability.localeCompare(b.capability));
