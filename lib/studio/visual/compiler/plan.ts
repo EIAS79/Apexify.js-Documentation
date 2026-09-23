@@ -24,6 +24,14 @@ import {
 } from '../path-pixel-contract';
 import { normalizeVisualProject } from './normalize';
 import { assertValidVisualProject } from './validate';
+import {
+  phase9Definition,
+  phase9RegistryRecords,
+  phase9SceneDefinition,
+  phase9TemplateSceneDefinition,
+  resolvePhase9References,
+  type Phase9SceneDefinition,
+} from '../scene-component-contract';
 
 export const STUDIO_OPERATION_PLAN_VERSION = 1 as const;
 
@@ -110,6 +118,55 @@ export type StudioCreateComboChartOperation = {
   target: string;
   preferredName?: string;
   options: Record<string, VisualValue>;
+};
+
+export type StudioRegisterAssetOperation = {
+  id: string;
+  kind: 'register-asset';
+  registryKind: 'image' | 'font' | 'palette' | 'value';
+  name: string;
+  value: VisualValue;
+};
+
+export type StudioCreateSceneOperation = {
+  id: string;
+  kind: 'create-scene';
+  sourceNodeId: string;
+  target: string;
+  preferredName?: string;
+  base: StudioTargetReference;
+  definition: Phase9SceneDefinition;
+  placement: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rotation?: number;
+    opacity?: number;
+  };
+};
+
+export type StudioRenderTemplateOperation = {
+  id: string;
+  kind: 'render-template';
+  sourceNodeId: string;
+  target: string;
+  preferredName?: string;
+  base: StudioTargetReference;
+  definitionId: string;
+  definitionName: string;
+  definition: Phase9SceneDefinition;
+  data: Record<string, VisualValue>;
+  overrides: Record<string, Record<string, VisualValue>>;
+  insertions: VisualValue[];
+  placement: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    rotation?: number;
+    opacity?: number;
+  };
 };
 
 export type StudioDrawPathOperation = {
@@ -220,6 +277,9 @@ export type StudioOperation =
   | StudioCreateChartOperation
   | StudioCreateComparisonChartOperation
   | StudioCreateComboChartOperation
+  | StudioRegisterAssetOperation
+  | StudioCreateSceneOperation
+  | StudioRenderTemplateOperation
   | StudioDrawPathOperation
   | StudioCustomPathOperation
   | StudioPixelManipulateOperation
@@ -244,7 +304,7 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
     if (!node) return;
     if (node.transform?.visible === false) return;
 
-    if (node.kind === 'group' || node.kind === 'surface') {
+    if (node.kind === 'group') {
       for (const childId of node.childIds ?? []) visit(childId);
       return;
     }
@@ -255,14 +315,18 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
       node.kind === 'text' ||
       node.kind === 'chart' ||
       node.kind === 'path' ||
-      node.kind === 'freehand'
+      node.kind === 'freehand' ||
+      node.kind === 'scene' ||
+      node.kind === 'surface' ||
+      node.kind === 'component' ||
+      node.kind === 'template-instance'
     ) {
       out.push(node);
       return;
     }
 
     throw new Error(
-      `STUDIO-VISUAL-8 cannot lower node kind "${node.kind}" yet. It belongs to a later authoring phase.`,
+      `STUDIO-VISUAL-9 cannot lower node kind "${node.kind}" yet. It belongs to a later authoring phase.`,
     );
   };
 
@@ -369,7 +433,7 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
 }
 
 function pathOperationOptions(node: VisualNode): StudioPathDrawOptions {
-  const props = visualPathProps(node);
+  const props = visualPathProps(resolvedNode);
   const transform = node.transform ?? {};
   const width = Math.max(1, props.viewport.width);
   const height = Math.max(1, props.viewport.height);
@@ -425,7 +489,7 @@ function pathDetectionPoint(
   node: VisualNode,
   point: { x: number; y: number },
 ): { x: number; y: number } {
-  const options = pathOperationOptions(node);
+  const options = pathOperationOptions(resolvedNode);
   const transform = options.transform ?? {};
   const scaleX = transform.scaleX ?? 1;
   const scaleY = transform.scaleY ?? 1;
@@ -459,8 +523,59 @@ function pathDetectionPoint(
 export function lowerVisualProject(project: VisualProject): StudioOperationPlan {
   const normalized = normalizeVisualProject(project);
   assertValidVisualProject(normalized);
+  const resolved = resolvePhase9References(normalized);
+  const registry = phase9RegistryRecords(normalized);
 
-  const operations: StudioOperation[] = [
+  const operations: StudioOperation[] = [];
+
+  for (const asset of registry.assets) {
+    const name =
+      typeof asset.value?.registryName === 'string'
+        ? asset.value.registryName
+        : (asset.name ?? asset.id).replace(/[^A-Za-z0-9_]/g, '_');
+    const uri = asset.value?.uri;
+    if (typeof uri === 'string' && uri) {
+      operations.push({
+        id: 'asset_' + asset.id,
+        kind: 'register-asset',
+        registryKind: 'image',
+        name,
+        value: uri,
+      });
+    }
+  }
+  for (const variable of registry.variables) {
+    const name =
+      typeof variable.value?.registryName === 'string'
+        ? variable.value.registryName
+        : (variable.name ?? variable.id).replace(/[^A-Za-z0-9_]/g, '_');
+    operations.push({
+      id: 'variable_' + variable.id,
+      kind: 'register-asset',
+      registryKind: 'value',
+      name,
+      value: variable.value?.value ?? null,
+    });
+  }
+  for (const palette of registry.palettes) {
+    const name =
+      typeof palette.value?.registryName === 'string'
+        ? palette.value.registryName
+        : (palette.name ?? palette.id).replace(/[^A-Za-z0-9_]/g, '_');
+    const colors =
+      palette.value?.colors && typeof palette.value.colors === 'object' && !Array.isArray(palette.value.colors)
+        ? palette.value.colors
+        : palette.value ?? {};
+    operations.push({
+      id: 'palette_' + palette.id,
+      kind: 'register-asset',
+      registryKind: 'palette',
+      name,
+      value: colors as VisualValue,
+    });
+  }
+
+  operations.push(
     {
       id: 'document_canvas',
       kind: 'create-canvas',
@@ -472,7 +587,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         ...(normalized.document.canvas ?? {}),
       },
     },
-  ];
+  );
 
   const produced = new Map<string, { target: string; member: 'buffer' | null }>([
     ['document_canvas', { target: 'canvas', member: 'buffer' }],
@@ -485,8 +600,82 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
   for (const node of orderedAuthoringNodes(normalized)) {
     const target = node.id;
 
+    if (node.kind === 'scene' || node.kind === 'surface') {
+      operations.push({
+        id: 'scene_' + node.id,
+        kind: 'create-scene',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || (node.kind === 'surface' ? 'surface' : 'scene'),
+        base,
+        definition: phase9SceneDefinition(normalized, node),
+        placement: {
+          x: node.transform?.x ?? 0,
+          y: node.transform?.y ?? 0,
+          width: Math.max(1, node.transform?.width ?? normalized.document.width),
+          height: Math.max(1, node.transform?.height ?? normalized.document.height),
+          ...(node.transform?.rotation !== undefined ? { rotation: node.transform.rotation } : {}),
+          ...(node.transform?.opacity !== undefined ? { opacity: node.transform.opacity } : {}),
+        },
+      });
+      produced.set(node.id, { target, member: null });
+      base = { $studioTarget: target };
+      lastTarget = target;
+      lastMember = null;
+      continue;
+    }
+
+    if (node.kind === 'component' || node.kind === 'template-instance') {
+      const definitionId =
+        typeof node.props.definitionId === 'string' ? node.props.definitionId : '';
+      const definition = phase9Definition(normalized, definitionId);
+      if (!definition) {
+        throw new Error('Component/template instance "' + node.id + '" references a missing definition.');
+      }
+      const data =
+        node.props.data && typeof node.props.data === 'object' && !Array.isArray(node.props.data)
+          ? node.props.data as Record<string, VisualValue>
+          : {};
+      const overrides =
+        node.props.overrides && typeof node.props.overrides === 'object' && !Array.isArray(node.props.overrides)
+          ? node.props.overrides as Record<string, Record<string, VisualValue>>
+          : {};
+      const insertions = Array.isArray(node.props.insertions)
+        ? node.props.insertions
+        : [];
+      operations.push({
+        id: 'template_' + node.id,
+        kind: 'render-template',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || definition.name,
+        base,
+        definitionId,
+        definitionName: definition.name,
+        definition: phase9TemplateSceneDefinition(normalized, definition),
+        data,
+        overrides,
+        insertions,
+        placement: {
+          x: node.transform?.x ?? 0,
+          y: node.transform?.y ?? 0,
+          width: Math.max(1, node.transform?.width ?? definition.width),
+          height: Math.max(1, node.transform?.height ?? definition.height),
+          ...(node.transform?.rotation !== undefined ? { rotation: node.transform.rotation } : {}),
+          ...(node.transform?.opacity !== undefined ? { opacity: node.transform.opacity } : {}),
+        },
+      });
+      produced.set(node.id, { target, member: null });
+      base = { $studioTarget: target };
+      lastTarget = target;
+      lastMember = null;
+      continue;
+    }
+
+    const resolvedNode = resolved.document.nodes[node.id] ?? node;
+
     if (node.kind === 'chart') {
-      const props = visualChartProps(node);
+      const props = visualChartProps(resolvedNode);
       const chartTarget = node.id + '_chart_buffer';
       if (props.family === 'comparison') {
         operations.push({
@@ -561,7 +750,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         target,
         preferredName: node.name || 'text',
         base,
-        properties: textOperationProperties(node),
+        properties: textOperationProperties(resolvedNode),
       });
     } else if (node.kind === 'path' || node.kind === 'freehand') {
       const props = visualPathProps(node);
@@ -574,7 +763,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
           target,
           preferredName: node.name || 'connector',
           base,
-          options: translatedConnector(node, props.connector),
+          options: translatedConnector(resolvedNode, props.connector),
         });
       } else {
         operations.push({
@@ -585,11 +774,11 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
           preferredName: node.name || (node.kind === 'freehand' ? 'freehand' : 'path'),
           base,
           commands: props.commands ?? [],
-          options: pathOperationOptions(node),
+          options: pathOperationOptions(resolvedNode),
         });
       }
     } else {
-      const props = visualImageProps(node);
+      const props = visualImageProps(resolvedNode);
       operations.push({
         id: 'image_' + node.id,
         kind: 'create-image',
@@ -597,7 +786,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         target,
         preferredName: node.name || (node.kind === 'shape' ? 'shape' : 'image'),
         base,
-        properties: imageOperationProperties(normalized, node, produced),
+        properties: imageOperationProperties(resolved, resolvedNode, produced),
         ...(props.createOptions ? { options: props.createOptions } : {}),
       });
     }
