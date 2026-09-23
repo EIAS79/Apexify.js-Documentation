@@ -163,8 +163,8 @@ test('Phase 10 emits direct ApexPainter.image calls in stack order and routes fu
   assert.ok(resize < gradient);
   assert.ok(gradient < compress);
   assert.ok(compress < compose);
-  assert.match(source, /.image.extractPalette(/);
-  assert.match(source, /.image.colorAnalysis(/);
+  assert.ok(source.includes('.image.extractPalette('));
+  assert.ok(source.includes('.image.colorAnalysis('));
   assert.match(source, /apexify-studio-v10:/);
 
   const execution = planStudioExecution(source);
@@ -194,8 +194,8 @@ test('Phase 10 canonical source round-trips the same ordered semantic stack', ()
 
 test('Phase 10 preview source preserves full-runtime utilities', () => {
   const source = generateVisualProjectPreviewCode(phase10Project()).source;
-  assert.match(source, /.image.effects(/);
-  assert.match(source, /.image.compress(/);
+  assert.ok(source.includes('.image.effects('));
+  assert.ok(source.includes('.image.compress('));
   assert.equal(planStudioExecution(source).backend, 'full-runtime');
 });
 
