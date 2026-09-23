@@ -67,7 +67,10 @@ function emitValue(
   throw new Error(`Unsupported code-generation value: ${String(value)}`);
 }
 
-export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
+export function emitStudioOperationPlan(
+  plan: StudioOperationPlan,
+  options: { includeAnalysisResults?: boolean } = {},
+): string {
   const imports = new ImportRegistry();
   imports.add('apexify.js', 'ApexPainter');
 
@@ -76,6 +79,7 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
   const targetNames = new Map<string, string>();
   const pathResourceNames = new Map<string, string>();
   const templateNames = new Map<string, string>();
+  const analysisResultNames: Array<{ key: string; name: string }> = [];
 
   const body: string[] = [];
   for (const operation of plan.operations) {
@@ -118,6 +122,9 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
         `  const ${targetName} = await ${painterName}.image.${operation.method}(${args});`,
       );
       targetNames.set(operation.target, targetName);
+      if (operation.kind === 'image-analysis') {
+        analysisResultNames.push({ key: operation.resultName, name: targetName });
+      }
       continue;
     }
 
@@ -390,11 +397,19 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
     );
   }
   body.push('');
-  body.push(
-    plan.result.member
-      ? `  return ${resultName}.${plan.result.member};`
-      : `  return ${resultName};`,
-  );
+  const resultExpression = plan.result.member
+    ? `${resultName}.${plan.result.member}`
+    : resultName;
+  if (options.includeAnalysisResults && analysisResultNames.length) {
+    const resultEntries = analysisResultNames
+      .map((item) => `${emitObjectKey(item.key)}: ${item.name}`)
+      .join(', ');
+    body.push(
+      `  return { buffer: ${resultExpression}, studioResultsJson: JSON.stringify({ ${resultEntries} }) };`,
+    );
+  } else {
+    body.push(`  return ${resultExpression};`);
+  }
 
   return [
     imports.emit(),
