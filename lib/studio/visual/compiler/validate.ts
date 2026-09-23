@@ -16,6 +16,11 @@ import {
   type VisualValue,
 } from '../model';
 import { isStableVisualId } from '../ids';
+import {
+  materializePhase9Project,
+  resolvePhase9References,
+  validatePhase9Project,
+} from '../scene-component-contract';
 
 const REF_PATTERN = /^(asset|variable|palette):(.+)$/;
 
@@ -189,13 +194,28 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   const known = { asset: assets, variable: variables, palette: palettes };
   for (const [id, node] of Object.entries(project.document.nodes)) {
     visitReferences(node.props as VisualValue, `document.nodes.${id}.props`, known, issues);
-    validateVisualImageNode(project, node, issues);
-    validateVisualTextNode(node, issues);
-    validateVisualChartNode(node, issues);
-    validatePhase7Node(node, issues);
   }
   if (project.document.background !== undefined) {
     visitReferences(project.document.background, 'document.background', known, issues);
+  }
+
+  issues.push(...validatePhase9Project(project));
+
+  try {
+    const featureProject = resolvePhase9References(materializePhase9Project(project));
+    for (const node of Object.values(featureProject.document.nodes)) {
+      validateVisualImageNode(featureProject, node, issues);
+      validateVisualTextNode(node, issues);
+      validateVisualChartNode(node, issues);
+      validatePhase7Node(node, issues);
+    }
+  } catch (error) {
+    push(
+      issues,
+      'phase9-resolution',
+      'document.nodes',
+      error instanceof Error ? error.message : 'Phase 9 semantic resolution failed.',
+    );
   }
   validateVisualCanvasConfig(project.document.canvas, issues);
 
