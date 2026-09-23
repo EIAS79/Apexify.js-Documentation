@@ -43,9 +43,10 @@ function semanticCompatibilityDiff(expected: any, actual: any, prefix = 'surface
 
     const keyOf = (value: any): string => {
       if (value && typeof value === 'object') {
-        for (const key of ['entrypoint', 'name', 'text']) {
-          if (typeof value[key] === 'string') return `${key}:${value[key]}`;
-        }
+        if (typeof value.entrypoint === 'string') return `entrypoint:${value.entrypoint}`;
+        if (typeof value.name === 'string' && value.name !== '__type') return `name:${value.name}`;
+        if (typeof value.text === 'string') return `text:${value.text}`;
+        if (typeof value.name === 'string') return `name:${value.name}`;
       }
       return `value:${JSON.stringify(stable(value))}`;
     };
