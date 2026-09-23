@@ -505,6 +505,7 @@ export default function VisualStudioPre4({
   const [codeModalOpen, setCodeModalOpen] = useState(false);
   const [modalPreviewUrl, setModalPreviewUrl] = useState<string | null>(null);
   const [modalPreviewMime, setModalPreviewMime] = useState('image/png');
+  const [modalPreviewFileName, setModalPreviewFileName] = useState('preview.png');
   const [modalPreviewLoading, setModalPreviewLoading] = useState(false);
   const [modalPreviewError, setModalPreviewError] = useState<string | null>(null);
   const [canvasFiltersDraft, setCanvasFiltersDraft] = useState('[]');
@@ -546,6 +547,7 @@ export default function VisualStudioPre4({
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
   const artboardPreviewTimerRef = useRef<number>(0);
+  const phase10RenderTailRef = useRef<Promise<void>>(Promise.resolve());
   const freehandDraftRef = useRef<Point[]>([]);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
@@ -754,7 +756,15 @@ export default function VisualStudioPre4({
 
   const renderAuthoritativeVisualSource = async (source: string) => {
     if (phase10Active) {
-      const result = await currentNodeServerExecutionAdapter.run({
+      let releasePhase10Render!: () => void;
+      const previousPhase10Render = phase10RenderTailRef.current;
+      phase10RenderTailRef.current = new Promise<void>((resolve) => {
+        releasePhase10Render = resolve;
+      });
+      await previousPhase10Render.catch(() => undefined);
+
+      try {
+        const result = await currentNodeServerExecutionAdapter.run({
         session: createInteractiveSession({
           source,
           language: 'ts',
@@ -802,13 +812,19 @@ export default function VisualStudioPre4({
           // Invalid structured-result metadata must never block the image artifact.
         }
       }
-      return {
-        ok: true as const,
-        dataUrl: 'data:' + artifact.mime + ';base64,' + artifact.base64,
-        mime: artifact.mime,
-        warnings: [] as string[],
-        results: analysisResults,
-      };
+        return {
+          ok: true as const,
+          dataUrl: 'data:' + artifact.mime + ';base64,' + artifact.base64,
+          mime: artifact.mime,
+          fileName: 'name' in artifact && typeof artifact.name === 'string'
+            ? artifact.name
+            : 'preview',
+          warnings: [] as string[],
+          results: analysisResults,
+        };
+      } finally {
+        releasePhase10Render();
+      }
     }
 
     const runtime =
@@ -820,6 +836,7 @@ export default function VisualStudioPre4({
       ok: true as const,
       dataUrl: result.dataUrl,
       mime: result.mime,
+      fileName: 'preview',
       warnings: result.warnings,
       results:
         ((result as typeof result & { results?: Record<string, unknown> }).results ?? {}),
@@ -2347,6 +2364,7 @@ export default function VisualStudioPre4({
       }
       setModalPreviewUrl(result.dataUrl);
       setModalPreviewMime(result.mime);
+      setModalPreviewFileName(result.fileName);
       setPhase7Results(result.results);
       setMessage('Preview rendered');
     } catch (error) {
@@ -2369,10 +2387,17 @@ export default function VisualStudioPre4({
 
   const downloadCanvasPreview = () => {
     if (!modalPreviewUrl) return;
+    const extensionFromName = modalPreviewFileName.toLowerCase().match(/\.([a-z0-9]+)$/)?.[1];
     const extension =
-      modalPreviewMime === 'image/jpeg' ? 'jpg' :
+      extensionFromName ??
+      (modalPreviewMime === 'image/jpeg' ? 'jpg' :
       modalPreviewMime === 'image/webp' ? 'webp' :
-      modalPreviewMime === 'image/gif' ? 'gif' : 'png';
+      modalPreviewMime === 'image/gif' ? 'gif' :
+      modalPreviewMime === 'image/avif' ? 'avif' :
+      modalPreviewMime === 'image/tiff' ? 'tiff' :
+      modalPreviewMime === 'image/heif' ? 'heif' :
+      modalPreviewMime === 'image/jp2' ? 'jp2' :
+      modalPreviewMime === 'image/jxl' ? 'jxl' : 'png');
     const link = document.createElement('a');
     link.href = modalPreviewUrl;
     link.download = safeVisualDownloadStem(project.name) + '.' + extension;
