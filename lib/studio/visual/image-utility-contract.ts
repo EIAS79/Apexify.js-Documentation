@@ -225,6 +225,39 @@ function optionalDraftRecord(value: unknown, label: string): Record<string, unkn
  * Visual Project state. Missing required collections/objects inherit the
  * operation defaults; wrong structural types are rejected at the editor edge.
  */
+function requiredDraftRecord(value: unknown, label: string): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(label + ' must be a JSON object.');
+  }
+  return value as Record<string, unknown>;
+}
+
+function validateDraftInput(value: unknown, label: string) {
+  if (typeof value === 'string' && value.trim()) return;
+  const record = requiredDraftRecord(value, label);
+  if (record.$current === true) return;
+  if (typeof record.$ref === 'string' && record.$ref.trim()) return;
+  if (typeof record.$generated === 'string' && record.$generated.trim()) return;
+  throw new Error(label + ' must be an image source, $current, $ref, or $generated input.');
+}
+
+function validateDraftPoint(value: unknown, label: string) {
+  const point = requiredDraftRecord(value, label);
+  if (!finite(point.x) || !finite(point.y)) {
+    throw new Error(label + ' must contain finite x and y coordinates.');
+  }
+}
+
+function validateDraftGradientStops(value: unknown, label: string) {
+  if (!Array.isArray(value)) throw new Error(label + ' must be an array.');
+  value.forEach((item, index) => {
+    const stop = requiredDraftRecord(item, label + '[' + index + ']');
+    if (!finite(stop.stop) || typeof stop.color !== 'string' || !stop.color.trim()) {
+      throw new Error(label + '[' + index + '] must contain a finite stop and color string.');
+    }
+  });
+}
+
 export function normalizeImageUtilityOperationDraft(
   type: ImageUtilityStackType,
   id: string,
@@ -241,13 +274,27 @@ export function normalizeImageUtilityOperationDraft(
       break;
     }
     case 'cropImage':
-      if (raw.coordinates !== undefined && !Array.isArray(raw.coordinates)) {
-        throw new Error('Crop coordinates must be an array.');
+      if (raw.coordinates !== undefined) {
+        if (!Array.isArray(raw.coordinates)) throw new Error('Crop coordinates must be an array.');
+        raw.coordinates.forEach((item, index) => {
+          const coordinate = requiredDraftRecord(item, 'Crop coordinate[' + index + ']');
+          validateDraftPoint(coordinate.from, 'Crop coordinate[' + index + '].from');
+          validateDraftPoint(coordinate.to, 'Crop coordinate[' + index + '].to');
+          if (coordinate.tension !== undefined && !finite(coordinate.tension)) {
+            throw new Error('Crop coordinate[' + index + '].tension must be finite.');
+          }
+        });
       }
       break;
     case 'effects':
-      if (raw.filters !== undefined && !Array.isArray(raw.filters)) {
-        throw new Error('Effects filters must be an array.');
+      if (raw.filters !== undefined) {
+        if (!Array.isArray(raw.filters)) throw new Error('Effects filters must be an array.');
+        raw.filters.forEach((item, index) => {
+          const filter = requiredDraftRecord(item, 'Effects filter[' + index + ']');
+          if (typeof filter.type !== 'string' || !filter.type.trim()) {
+            throw new Error('Effects filter[' + index + '] requires a type.');
+          }
+        });
       }
       break;
     case 'colorsFilter':
@@ -257,6 +304,11 @@ export function normalizeImageUtilityOperationDraft(
         (!raw.filterColor || typeof raw.filterColor !== 'object' || Array.isArray(raw.filterColor))
       ) {
         throw new Error('Color filter must be a color string or gradient object.');
+      }
+      if (raw.filterColor && typeof raw.filterColor === 'object' && !Array.isArray(raw.filterColor)) {
+        const gradient = raw.filterColor as Record<string, unknown>;
+        validateDraftGradientStops(gradient.colors, 'Color filter gradient colors');
+        if (gradient.maskSource !== undefined) validateDraftInput(gradient.maskSource, 'Color filter gradient maskSource');
       }
       break;
     case 'colorsRemover': {
@@ -270,11 +322,25 @@ export function normalizeImageUtilityOperationDraft(
       break;
     }
     case 'blend':
-      if (raw.layers !== undefined && !Array.isArray(raw.layers)) {
-        throw new Error('Blend layers must be an array.');
+      if (raw.layers !== undefined) {
+        if (!Array.isArray(raw.layers)) throw new Error('Blend layers must be an array.');
+        raw.layers.forEach((item, index) => {
+          const layer = requiredDraftRecord(item, 'Blend layer[' + index + ']');
+          validateDraftInput(layer.source, 'Blend layer[' + index + '].source');
+          if (typeof layer.blendMode !== 'string' || !layer.blendMode.trim()) {
+            throw new Error('Blend layer[' + index + '] requires a blendMode.');
+          }
+          if (layer.position !== undefined) {
+            const position = requiredDraftRecord(layer.position, 'Blend layer[' + index + '].position');
+            if (!finite(position.x) || !finite(position.y)) {
+              throw new Error('Blend layer[' + index + '].position requires finite x and y.');
+            }
+          }
+        });
       }
       break;
     case 'masking': {
+      if (raw.maskSource !== undefined) validateDraftInput(raw.maskSource, 'Mask source');
       const options = optionalDraftRecord(raw.options, 'Mask options');
       if (options) merged.options = { ...((base.options as Record<string, unknown> | undefined) ?? {}), ...options };
       break;
@@ -282,24 +348,28 @@ export function normalizeImageUtilityOperationDraft(
     case 'gradientBlend': {
       const options = optionalDraftRecord(raw.options, 'Gradient blend options');
       if (options) {
-        if (options.colors !== undefined && !Array.isArray(options.colors)) {
-          throw new Error('Gradient blend colors must be an array.');
-        }
+        if (options.colors !== undefined) validateDraftGradientStops(options.colors, 'Gradient blend colors');
+        if (options.maskSource !== undefined) validateDraftInput(options.maskSource, 'Gradient blend maskSource');
         merged.options = { ...((base.options as Record<string, unknown> | undefined) ?? {}), ...options };
       }
       break;
     }
     case 'stitchImages': {
-      if (raw.images !== undefined && !Array.isArray(raw.images)) {
-        throw new Error('Stitch images must be an array.');
+      if (raw.images !== undefined) {
+        if (!Array.isArray(raw.images)) throw new Error('Stitch images must be an array.');
+        raw.images.forEach((item, index) => validateDraftInput(item, 'Stitch image[' + index + ']'));
       }
       const options = optionalDraftRecord(raw.options, 'Stitch options');
       if (options) merged.options = { ...((base.options as Record<string, unknown> | undefined) ?? {}), ...options };
       break;
     }
     case 'createCollage': {
-      if (raw.images !== undefined && !Array.isArray(raw.images)) {
-        throw new Error('Collage images must be an array.');
+      if (raw.images !== undefined) {
+        if (!Array.isArray(raw.images)) throw new Error('Collage images must be an array.');
+        raw.images.forEach((item, index) => {
+          const entry = requiredDraftRecord(item, 'Collage image[' + index + ']');
+          validateDraftInput(entry.source, 'Collage image[' + index + '].source');
+        });
       }
       const layout = optionalDraftRecord(raw.layout, 'Collage layout');
       if (layout) merged.layout = { ...((base.layout as Record<string, unknown> | undefined) ?? {}), ...layout };
