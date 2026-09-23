@@ -2,7 +2,8 @@ import { createVisualId } from './ids';
 import type {
   VisualProject,
   VisualProjectIssue,
-  VisualProjectRecord
+  VisualProjectRecord,
+  VisualValue,
 } from './model';
 
 export const PHASE12_TIMELINE_KIND = 'audio-authoring-timeline' as const;
