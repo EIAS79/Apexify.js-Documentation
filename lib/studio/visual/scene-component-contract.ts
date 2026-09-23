@@ -1059,6 +1059,26 @@ function sceneLayersForIds(
   return layers;
 }
 
+export function phase9RootSceneDefinition(
+  project: VisualProject,
+): Phase9SceneDefinition {
+  return {
+    width: project.document.width,
+    height: project.document.height,
+    ...(project.document.canvas && Object.keys(project.document.canvas).length
+      ? { background: sceneReferenceToken(project, project.document.canvas as unknown as VisualValue) as Record<string, VisualValue> }
+      : {}),
+    layers: sceneLayersForIds(project, project.document.rootNodeIds, 0, 0, []),
+  };
+}
+
+export function phase9SceneLayersForNodeIds(
+  project: VisualProject,
+  nodeIds: string[],
+): Phase9SceneLayer[] {
+  return sceneLayersForIds(project, nodeIds, 0, 0, []);
+}
+
 export function phase9SceneDefinition(
   project: VisualProject,
   sceneNode: VisualNode,
