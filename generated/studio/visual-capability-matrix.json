@@ -3555,8 +3555,8 @@
   "optionCoverage": {
     "sourceArtifact": "generated/docs-doc4/option-inventory.json",
     "sourceSchemaVersion": 1,
-    "sourceSha256": "bac69c04bdded6301cc7ff0ddba7d577a6d50a5ea21170631e8afc1b87a97a05",
-    "indexedSha256": "bac69c04bdded6301cc7ff0ddba7d577a6d50a5ea21170631e8afc1b87a97a05",
+    "sourceSha256": "09cf2b7cdc861e6e92f8a5eef925c3d344393b139bac10aa27508a325cc04f69",
+    "indexedSha256": "09cf2b7cdc861e6e92f8a5eef925c3d344393b139bac10aa27508a325cc04f69",
     "sourceInventoryCurrent": true,
     "totalOptionPaths": 17233,
     "classifiedOptionPaths": 17233,
