@@ -45,6 +45,10 @@ import {
   ChartFamilyPicker,
   VisualChartInspector,
 } from '@/components/studio/visual/VisualChartAuthoring';
+import {
+  VisualComponentsContext,
+  VisualPhase9Inspector,
+} from '@/components/studio/visual/VisualSceneComponentAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -580,7 +584,12 @@ export default function VisualStudioPre4({
         return Boolean(
           node &&
             node.transform?.visible !== false &&
-            !(node.kind === 'group' && (node.childIds?.length ?? 0) > 0),
+            !(
+              (node.kind === 'group' ||
+                node.kind === 'scene' ||
+                node.kind === 'surface') &&
+              (node.childIds?.length ?? 0) > 0
+            ),
         );
       }),
     [layerIds, project],
@@ -2528,6 +2537,7 @@ export default function VisualStudioPre4({
     activeTool === 'text' ||
     activeTool === 'charts' ||
     activeTool === 'paths' ||
+    activeTool === 'components' ||
     activeTool === 'assets';
 
   const imageAssets = assets.filter((asset) =>
@@ -2545,6 +2555,19 @@ export default function VisualStudioPre4({
   ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'components') {
+      return (
+        <VisualComponentsContext
+          project={project}
+          selectedIds={selected}
+          assets={assets}
+          onMutate={mutate}
+          onMessage={setMessage}
+          onInspectorTab={setInspectorTab}
+        />
+      );
+    }
+
     if (activeTool === 'charts') {
       return <ChartFamilyPicker onInsert={insertChart} />;
     }
@@ -5168,6 +5191,25 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
+    if (
+      primary &&
+      (primary.kind === 'scene' ||
+        primary.kind === 'surface' ||
+        primary.kind === 'component' ||
+        primary.kind === 'template-instance')
+    ) {
+      return (
+        <VisualPhase9Inspector
+          project={project}
+          node={primary}
+          tab={inspectorTab}
+          onMutate={mutate}
+          onMessage={setMessage}
+          renderTransform={renderTransformFields}
+        />
+      );
+    }
+
     if (primaryChart) {
       if (inspectorTab === 'transform') return renderTransformFields();
       return (
@@ -5461,9 +5503,11 @@ export default function VisualStudioPre4({
                       ? 'Text'
                       : activeTool === 'paths'
                         ? 'Paths & pixels'
-                        : activeTool === 'assets'
-                          ? 'Assets'
-                          : 'Layers'}
+                        : activeTool === 'components'
+                          ? 'Components'
+                          : activeTool === 'assets'
+                            ? 'Assets'
+                            : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -5475,7 +5519,9 @@ export default function VisualStudioPre4({
                         ? fontAssets.length + ' uploaded fonts'
                         : activeTool === 'paths'
                           ? 'Path · doodle · pixels · detection'
-                          : assets.length + ' shared assets'
+                          : activeTool === 'components'
+                            ? 'Scenes · surfaces · components · templates'
+                            : assets.length + ' shared assets'
                   : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
