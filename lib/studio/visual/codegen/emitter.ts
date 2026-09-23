@@ -106,6 +106,21 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       continue;
     }
 
+    if (operation.kind === 'image-utility' || operation.kind === 'image-analysis') {
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        operation.kind === 'image-analysis' ? 'imageAnalysis' : 'imageUtility',
+      );
+      const args = operation.args
+        .map((argument) => emitValue(argument, 2, targetNames))
+        .join(', ');
+      body.push(
+        `  const ${targetName} = await ${painterName}.image.${operation.method}(${args});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
     if (operation.kind === 'create-image') {
       const targetName = names.allocate(
         operation.preferredName || operation.target,
