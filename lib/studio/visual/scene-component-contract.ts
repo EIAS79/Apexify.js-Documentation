@@ -43,7 +43,7 @@ export type Phase9InstanceProps = {
   insertions?: Array<{
     targetId: string;
     position: 'before' | 'after';
-    nodeIds: string[];
+    layers: Phase9SceneLayer | Phase9SceneLayer[];
   }>;
 };
 
@@ -533,7 +533,11 @@ export function setPhase9InstanceOverrides(
 export function addPhase9Insertion(
   project: VisualProject,
   instanceId: string,
-  insertion: { targetId: string; position: 'before' | 'after'; nodeIds: string[] },
+  insertion: {
+    targetId: string;
+    position: 'before' | 'after';
+    layers: Phase9SceneLayer | Phase9SceneLayer[];
+  },
 ): VisualProject {
   const next = clone(project);
   const node = next.document.nodes[instanceId];
@@ -544,6 +548,27 @@ export function addPhase9Insertion(
   node.props = {
     ...node.props,
     insertions: [...(props.insertions ?? []), clone(insertion)] as unknown as VisualValue[],
+  };
+  return nowProject(next);
+}
+
+export function setPhase9InstanceInsertions(
+  project: VisualProject,
+  instanceId: string,
+  insertions: Array<{
+    targetId: string;
+    position: 'before' | 'after';
+    layers: Phase9SceneLayer | Phase9SceneLayer[];
+  }>,
+): VisualProject {
+  const next = clone(project);
+  const node = next.document.nodes[instanceId];
+  if (!node || (node.kind !== 'component' && node.kind !== 'template-instance')) {
+    throw new Error('Insertions can only be set on a component/template instance.');
+  }
+  node.props = {
+    ...node.props,
+    insertions: clone(insertions) as unknown as VisualValue[],
   };
   return nowProject(next);
 }
