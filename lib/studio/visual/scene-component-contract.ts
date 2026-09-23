@@ -560,8 +560,11 @@ function setPath(root: Record<string, unknown>, path: string, value: VisualValue
   current[parts[parts.length - 1]!] = value;
 }
 
-function deepMerge<T extends Record<string, unknown>>(base: T, patch: Record<string, VisualValue>): T {
-  const out = clone(base);
+function deepMerge(
+  base: Record<string, unknown>,
+  patch: Record<string, VisualValue>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = clone(base);
   for (const [key, value] of Object.entries(patch)) {
     const before = out[key];
     if (
@@ -573,9 +576,12 @@ function deepMerge<T extends Record<string, unknown>>(base: T, patch: Record<str
       !Array.isArray(value) &&
       !('$ref' in value)
     ) {
-      out[key] = deepMerge(before as Record<string, unknown>, value as Record<string, VisualValue>) as T[Extract<keyof T, string>];
+      out[key] = deepMerge(
+        before as Record<string, unknown>,
+        value as Record<string, VisualValue>,
+      );
     } else {
-      out[key] = clone(value) as T[Extract<keyof T, string>];
+      out[key] = clone(value);
     }
   }
   return out;
