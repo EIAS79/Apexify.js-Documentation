@@ -547,8 +547,11 @@ export function validatePhase12Project(project: VisualProject): VisualProjectIss
     const path = 'timelines.audio.mix.inputs[' + index + ']';
     if (mixIds.has(input.id)) push(issues, 'phase12-mix-id', path + '.id', 'Mix input ids must be unique.');
     mixIds.add(input.id);
-    if (input.kind === 'preset' && !PHASE12_AUDIO_PRESETS.includes(input.preset)) {
-      push(issues, 'phase12-preset', path + '.preset', 'Unknown Apexify audio preset.');
+    if (input.kind === 'preset') {
+      if (!PHASE12_AUDIO_PRESETS.includes(input.preset)) {
+        push(issues, 'phase12-preset', path + '.preset', 'Unknown Apexify audio preset.');
+      }
+      if (input.gain !== undefined) validateRange(issues, input.gain, path + '.gain', 'Mix gain', 0, 4);
     } else if (input.kind === 'sound') {
       validateSound(input.sound, issues, path + '.sound', timeline.sampleRate);
     } else if (input.kind === 'asset') {
