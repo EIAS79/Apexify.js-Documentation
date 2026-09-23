@@ -153,7 +153,9 @@ function instanceRenderOptions(project: VisualProject, node: VisualNode) {
   const insertions = (props.insertions ?? []).map((insertion) => ({
     targetId: insertion.targetId,
     position: insertion.position,
-    layers: phase9SceneLayersForNodeIds(project, insertion.nodeIds).map(stripSceneMeta),
+    layers: Array.isArray(insertion.layers)
+      ? insertion.layers.map(stripSceneMeta)
+      : stripSceneMeta(insertion.layers),
   }));
   return {
     ...(props.overrides && Object.keys(props.overrides).length
