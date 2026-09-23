@@ -49,7 +49,7 @@ function numeric(value: string, fallback: number) {
 }
 
 function audioAssets(assets: StudioVirtualAsset[]) {
-  return assets.filter((asset) => asset.mime.startsWith('audio/'));
+  return assets.filter((asset) => asset.mime === 'audio/wav');
 }
 
 function Waveform({ url }: { url: string | null }) {
@@ -264,7 +264,7 @@ export function VisualAudioContext({
       ) : (
         <div className="apx-media-context-empty">
           <strong>No uploaded audio yet</strong>
-          <span>Use Assets to upload WAV/MP3/OGG. WAV assets can be placed into the procedural composition timeline.</span>
+          <span>Use Assets to upload media. PCM WAV assets can be placed directly into the procedural composition timeline.</span>
         </div>
       )}
     </div>
