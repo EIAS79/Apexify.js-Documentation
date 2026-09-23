@@ -2490,6 +2490,7 @@ export default function VisualStudioPre4({
       modalPreviewMime === 'image/heif' ? 'heif' :
       modalPreviewMime === 'image/jp2' ? 'jp2' :
       modalPreviewMime === 'image/jxl' ? 'jxl' :
+      modalPreviewMime === 'audio/wav' ? 'wav' :
       modalPreviewMime === 'application/x-raw' ? 'raw' : 'png');
     const link = document.createElement('a');
     link.href = downloadUrl;
