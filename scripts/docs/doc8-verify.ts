@@ -191,7 +191,7 @@ requireCheck(
 );
 
 requireCheck(
-  packageJson.dependencies?.['apexify.js'] === 'github:EIAS79/Apexify.js#dbed9743353593eafae9a7b1c25312d7170a233b',
+  packageJson.dependencies?.['apexify.js'] === 'github:EIAS79/Apexify.js#69d40cf40ba992ad2bdec457c6c7217f5df55cd1',
   'Apexify.js package pin changed during DOC-8.',
 );
 
