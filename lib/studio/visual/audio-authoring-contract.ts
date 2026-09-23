@@ -139,7 +139,17 @@ function asTimeline(record: VisualProjectRecord | undefined): Phase12Timeline | 
   if (!record || record.kind !== PHASE12_TIMELINE_KIND) return null;
   if (!record.value || typeof record.value !== 'object' || Array.isArray(record.value)) return null;
   const value = record.value as unknown as Phase12Timeline;
-  return ['preset','synth','sequence','compose','mix'].includes(value.mode) ? value : null;
+  if (!['preset','synth','sequence','compose','mix'].includes(value.mode)) return null;
+  if (!value.preset || typeof value.preset !== 'object') return null;
+  if (!value.synth || typeof value.synth !== 'object' || !Array.isArray(value.synth.layers)) return null;
+  if (!value.sequence || typeof value.sequence !== 'object' || !Array.isArray(value.sequence.events)) return null;
+  if (!value.compose || typeof value.compose !== 'object' || !Array.isArray(value.compose.clips)) return null;
+  if (!value.mix || typeof value.mix !== 'object' || !Array.isArray(value.mix.inputs)) return null;
+  if (value.synth.layers.some((layer) => !layer || typeof layer !== 'object')) return null;
+  if (value.sequence.events.some((event) => !event || typeof event !== 'object')) return null;
+  if (value.compose.clips.some((clip) => !clip || typeof clip !== 'object' || !clip.source || typeof clip.source !== 'object')) return null;
+  if (value.mix.inputs.some((input) => !input || typeof input !== 'object')) return null;
+  return value;
 }
 
 export function phase12Record(project: VisualProject): VisualProjectRecord | undefined {
@@ -233,7 +243,7 @@ export function setPhase12Timeline(
     id: current?.id ?? createVisualId('audio-timeline'),
     kind: PHASE12_TIMELINE_KIND,
     name: current?.name ?? 'Audio composition',
-    value: timeline as unknown as VisualValue,
+    value: timeline as unknown as Record<string, VisualValue>,
   };
   next.timelines = [
     ...next.timelines.filter((item) => item.kind !== PHASE12_TIMELINE_KIND),
@@ -323,6 +333,15 @@ function validateLayer(
   sampleRate: number,
 ) {
   if (!layer.id) push(issues, 'phase12-layer-id', path + '.id', 'Audio layer id is required.');
+  if (layer.waveform !== undefined && !['sine','square','sawtooth','triangle','noise','pink'].includes(layer.waveform)) {
+    push(issues, 'phase12-waveform', path + '.waveform', 'Unknown audio waveform.');
+  }
+  if (layer.frequency !== undefined && (!finite(layer.frequency) || layer.frequency <= 0)) {
+    push(issues, 'phase12-frequency', path + '.frequency', 'Layer frequency must be positive.');
+  }
+  if (layer.frequencyEnd !== undefined && (!finite(layer.frequencyEnd) || layer.frequencyEnd <= 0)) {
+    push(issues, 'phase12-frequency', path + '.frequencyEnd', 'Layer end frequency must be positive.');
+  }
   if (!finite(layer.duration) || layer.duration <= 0) {
     push(issues, 'phase12-duration', path + '.duration', 'Layer duration must be positive.');
   }
@@ -332,6 +351,16 @@ function validateLayer(
   if (layer.gain !== undefined) validateRange(issues, layer.gain, path + '.gain', 'Layer gain', 0, 4);
   if (layer.pan !== undefined) validateRange(issues, layer.pan, path + '.pan', 'Layer pan', -1, 1);
   if (layer.noiseMix !== undefined) validateRange(issues, layer.noiseMix, path + '.noiseMix', 'Noise mix', 0, 1);
+  if (layer.detune !== undefined && !finite(layer.detune)) {
+    push(issues, 'phase12-detune', path + '.detune', 'Layer detune must be finite.');
+  }
+  if (layer.partials !== undefined) {
+    if (!Array.isArray(layer.partials) || layer.partials.length > 4096 || layer.partials.some((partial) =>
+      !Array.isArray(partial) || partial.length !== 2 || !finite(partial[0]) || partial[0] <= 0 || !finite(partial[1]) || partial[1] < 0
+    )) {
+      push(issues, 'phase12-partials', path + '.partials', 'Partials must contain at most 4096 positive [frequencyRatio, gain] pairs.');
+    }
+  }
   if (layer.adsr?.sustain !== undefined) validateRange(issues, layer.adsr.sustain, path + '.adsr.sustain', 'ADSR sustain', 0, 1);
   for (const key of ['attack','decay','release'] as const) {
     const value = layer.adsr?.[key];
@@ -417,6 +446,9 @@ export function validatePhase12Project(project: VisualProject): VisualProjectIss
     push(issues, 'phase12-channels', 'timelines.audio.channels', 'Audio channels must be 1 or 2.');
   }
   validateRange(issues, timeline.masterGain, 'timelines.audio.masterGain', 'Master gain', 0, 4);
+  if (typeof timeline.limiter !== 'boolean') {
+    push(issues, 'phase12-limiter', 'timelines.audio.limiter', 'Limiter must be true or false.');
+  }
   validateSeed(issues, timeline.seed, 'timelines.audio.seed');
   validateSound(timeline.synth, issues, 'timelines.audio.synth', timeline.sampleRate);
 
@@ -428,6 +460,9 @@ export function validatePhase12Project(project: VisualProject): VisualProjectIss
     push(issues, 'phase12-transpose', 'timelines.audio.preset.transpose', 'Preset transpose must be between -96 and 96 semitones.');
   }
 
+  if (!finite(timeline.sequence.tail) || timeline.sequence.tail < 0 || timeline.sequence.tail > 600) {
+    push(issues, 'phase12-tail', 'timelines.audio.sequence.tail', 'Sequence tail must be between 0 and 600 seconds.');
+  }
   if (timeline.sequence.events.length < 1) {
     push(issues, 'phase12-sequence', 'timelines.audio.sequence.events', 'Sequence requires at least one event.');
   }
@@ -452,6 +487,18 @@ export function validatePhase12Project(project: VisualProject): VisualProjectIss
     if (event.gain !== undefined) validateRange(issues, event.gain, path + '.gain', 'Event gain', 0, 4);
   });
 
+  if (timeline.compose.duration !== undefined && (!finite(timeline.compose.duration) || timeline.compose.duration <= 0 || timeline.compose.duration > 600)) {
+    push(issues, 'phase12-duration', 'timelines.audio.compose.duration', 'Composition duration must be positive and no longer than 600 seconds.');
+  }
+  if (!finite(timeline.compose.tail) || timeline.compose.tail < 0 || timeline.compose.tail > 600) {
+    push(issues, 'phase12-tail', 'timelines.audio.compose.tail', 'Composition tail must be between 0 and 600 seconds.');
+  }
+  if (timeline.compose.noiseGateThreshold !== undefined) {
+    validateRange(issues, timeline.compose.noiseGateThreshold, 'timelines.audio.compose.noiseGateThreshold', 'Noise gate threshold', 0, 1);
+  }
+  if (timeline.compose.postHighpassHz !== undefined && (!finite(timeline.compose.postHighpassHz) || timeline.compose.postHighpassHz <= 0 || timeline.compose.postHighpassHz >= timeline.sampleRate / 2)) {
+    push(issues, 'phase12-filter-cutoff', 'timelines.audio.compose.postHighpassHz', 'Post high-pass must be positive and below Nyquist.');
+  }
   if (timeline.compose.clips.length < 1) {
     push(issues, 'phase12-compose', 'timelines.audio.compose.clips', 'Composition requires at least one clip.');
   }
@@ -466,14 +513,29 @@ export function validatePhase12Project(project: VisualProject): VisualProjectIss
     if (clip.duration !== undefined && (!finite(clip.duration) || clip.duration <= 0 || clip.duration > 600)) {
       push(issues, 'phase12-duration', path + '.duration', 'Clip duration must be positive and no longer than 600 seconds.');
     }
+    if (clip.sourceStart !== undefined && (!finite(clip.sourceStart) || clip.sourceStart < 0 || clip.sourceStart > 600)) {
+      push(issues, 'phase12-source-start', path + '.sourceStart', 'Clip sourceStart must be between 0 and 600 seconds.');
+    }
+    for (const key of ['gain','volume'] as const) {
+      const value = clip[key];
+      if (value !== undefined) validateRange(issues, value, path + '.' + key, 'Clip ' + key, 0, 4);
+    }
+    if (clip.speed !== undefined && (!finite(clip.speed) || clip.speed <= 0 || clip.speed > 16)) {
+      push(issues, 'phase12-speed', path + '.speed', 'Clip speed must be positive and at most 16.');
+    }
     if (clip.pan !== undefined) validateRange(issues, clip.pan, path + '.pan', 'Clip pan', -1, 1);
+    if (clip.fadeIn !== undefined && (!finite(clip.fadeIn) || clip.fadeIn < 0)) push(issues, 'phase12-fade', path + '.fadeIn', 'Clip fade-in cannot be negative.');
+    if (clip.fadeOut !== undefined && (!finite(clip.fadeOut) || clip.fadeOut < 0)) push(issues, 'phase12-fade', path + '.fadeOut', 'Clip fade-out cannot be negative.');
     if (clip.noise !== undefined) validateRange(issues, clip.noise, path + '.noise', 'Clip noise', 0, 1);
+    validateSeed(issues, clip.seed, path + '.seed');
     if (clip.source.kind === 'preset' && !PHASE12_AUDIO_PRESETS.includes(clip.source.preset)) {
       push(issues, 'phase12-preset', path + '.source.preset', 'Unknown Apexify audio preset.');
     } else if (clip.source.kind === 'sound') {
       validateSound(clip.source.sound, issues, path + '.source.sound', timeline.sampleRate);
     } else if (clip.source.kind === 'asset') {
       validateAssetId(clip.source.assetId, issues, path + '.source.assetId');
+    } else if (!['preset','sound','asset'].includes((clip.source as { kind?: string }).kind ?? '')) {
+      push(issues, 'phase12-clip-source', path + '.source.kind', 'Unknown composition clip source kind.');
     }
   });
 
@@ -491,6 +553,9 @@ export function validatePhase12Project(project: VisualProject): VisualProjectIss
       validateSound(input.sound, issues, path + '.sound', timeline.sampleRate);
     } else if (input.kind === 'asset') {
       validateAssetId(input.assetId, issues, path + '.assetId');
+      if (input.gain !== undefined) validateRange(issues, input.gain, path + '.gain', 'Mix gain', 0, 4);
+    } else {
+      push(issues, 'phase12-mix-source', path + '.kind', 'Unknown mix input source kind.');
     }
   });
 
