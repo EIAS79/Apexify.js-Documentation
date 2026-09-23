@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { StudioVirtualAsset } from '@/lib/studio/runtime/assets';
-import { studioAssetDataUrl } from '@/lib/studio/runtime/assets';
 import type { VisualProject } from '@/lib/studio/visual/model';
 import {
   PHASE12_AUDIO_PRESETS,
@@ -51,11 +50,6 @@ function numeric(value: string, fallback: number) {
 
 function audioAssets(assets: StudioVirtualAsset[]) {
   return assets.filter((asset) => asset.mime.startsWith('audio/'));
-}
-
-function stripLayerId<T extends { id: string }>(value: T): Omit<T, 'id'> {
-  const { id: _id, ...rest } = value;
-  return rest;
 }
 
 function Waveform({ url }: { url: string | null }) {
