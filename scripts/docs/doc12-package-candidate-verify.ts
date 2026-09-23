@@ -31,29 +31,49 @@ const minimalInstallEnv = (): NodeJS.ProcessEnv => {
 };
 
 
-function semanticDiff(expected: any, actual: any, prefix = 'surface', out: string[] = []): string[] {
+function semanticCompatibilityDiff(expected: any, actual: any, prefix = 'surface', out: string[] = []): string[] {
   if (out.length >= 40) return out;
   if (Object.is(expected, actual)) return out;
+
   if (Array.isArray(expected) || Array.isArray(actual)) {
     if (!Array.isArray(expected) || !Array.isArray(actual)) {
       out.push(`${prefix}: kind differs`);
       return out;
     }
-    if (expected.length !== actual.length) out.push(`${prefix}.length: ${expected.length} -> ${actual.length}`);
-    const limit = Math.min(expected.length, actual.length);
-    for (let i = 0; i < limit && out.length < 40; i += 1) semanticDiff(expected[i], actual[i], `${prefix}[${i}]`, out);
-    return out;
-  }
-  if (expected && actual && typeof expected === 'object' && typeof actual === 'object') {
-    const keys = [...new Set([...Object.keys(expected), ...Object.keys(actual)])].sort();
-    for (const key of keys) {
+
+    const keyOf = (value: any): string => {
+      if (value && typeof value === 'object') {
+        for (const key of ['entrypoint', 'name', 'text']) {
+          if (typeof value[key] === 'string') return `${key}:${value[key]}`;
+        }
+      }
+      return `value:${JSON.stringify(stable(value))}`;
+    };
+
+    const actualByKey = new Map<string, any>();
+    for (const value of actual) actualByKey.set(keyOf(value), value);
+
+    for (const value of expected) {
       if (out.length >= 40) break;
-      if (!(key in expected)) out.push(`${prefix}.${key}: added ${JSON.stringify(actual[key])}`);
-      else if (!(key in actual)) out.push(`${prefix}.${key}: removed ${JSON.stringify(expected[key])}`);
-      else semanticDiff(expected[key], actual[key], `${prefix}.${key}`, out);
+      const key = keyOf(value);
+      if (!actualByKey.has(key)) {
+        out.push(`${prefix}: documented member missing or changed: ${key}`);
+        continue;
+      }
+      semanticCompatibilityDiff(value, actualByKey.get(key), `${prefix}[${key}]`, out);
     }
     return out;
   }
+
+  if (expected && actual && typeof expected === 'object' && typeof actual === 'object') {
+    for (const key of Object.keys(expected).sort()) {
+      if (out.length >= 40) break;
+      if (!(key in actual)) out.push(`${prefix}.${key}: documented field missing`);
+      else semanticCompatibilityDiff(expected[key], actual[key], `${prefix}.${key}`, out);
+    }
+    return out;
+  }
+
   out.push(`${prefix}: ${JSON.stringify(expected)} -> ${JSON.stringify(actual)}`);
   return out;
 }
@@ -342,14 +362,17 @@ try {
   const pinnedSemanticSurface = semanticPublicSurfaceDigest(pinnedRoot, pinnedPkg);
   const exportsMatch = JSON.stringify(stable(candidatePkg.exports ?? {})) === JSON.stringify(stable(pinnedPkg.exports ?? {}));
   const rawDeclarationFilesMatch = candidateDecl.sha256 === pinnedDecl.sha256;
-  // DOC-12 is a public-surface contract, not a byte-for-byte declaration archive
-  // contract. Declaration comments, formatting and non-public implementation detail
-  // may change without invalidating the documented API. Compare the semantic public
-  // graph exposed from package declaration entrypoints instead.
-  const declarationsMatch = candidateSemanticSurface.sha256 === pinnedSemanticSurface.sha256;
+  const semanticPublicSurfaceExactMatch = candidateSemanticSurface.sha256 === pinnedSemanticSurface.sha256;
+  // The documentation snapshot must remain valid against the current candidate.
+  // Additive public API is compatible: it does not invalidate any documented symbol,
+  // member or signature. Removed or changed documented API still fails immediately.
+  const compatibilityDifferences = semanticCompatibilityDiff(
+    pinnedSemanticSurface.surface,
+    candidateSemanticSurface.surface,
+  );
+  const declarationsMatch = compatibilityDifferences.length === 0;
   if (!exportsMatch || !declarationsMatch) {
-    const differences = semanticDiff(pinnedSemanticSurface.surface, candidateSemanticSurface.surface);
-    throw new Error(`current package public surface differs from documented artifact: exportsMatch=${exportsMatch} declarationsMatch=${declarationsMatch} rawDeclarationFilesMatch=${rawDeclarationFilesMatch} candidateReachableDeclarations=${candidateDecl.files.length} documentedReachableDeclarations=${pinnedDecl.files.length} candidateSemanticSha=${candidateSemanticSurface.sha256} documentedSemanticSha=${pinnedSemanticSurface.sha256}\nsemantic differences:\n- ${differences.join('\n- ')}`);
+    throw new Error(`current package public surface breaks the documented artifact: exportsMatch=${exportsMatch} declarationsMatch=${declarationsMatch} rawDeclarationFilesMatch=${rawDeclarationFilesMatch} semanticPublicSurfaceExactMatch=${semanticPublicSurfaceExactMatch} candidateReachableDeclarations=${candidateDecl.files.length} documentedReachableDeclarations=${pinnedDecl.files.length} candidateSemanticSha=${candidateSemanticSurface.sha256} documentedSemanticSha=${pinnedSemanticSurface.sha256}\ncompatibility differences:\n- ${compatibilityDifferences.join('\n- ')}`);
   }
 
   const results: any[] = [];
@@ -382,8 +405,8 @@ try {
     generatedAt:new Date().toISOString(),
     status:'PASS',
     package:{name:candidatePkg.name,version:candidatePkg.version,commit:packageSha,artifactFilename:path.basename(tarball),artifactSha256:hash(fs.readFileSync(tarball))},
-    documentedArtifact:{version:pinnedPkg.version,exportsMatch,declarationsMatch,rawDeclarationFilesMatch,declarationSha256:pinnedDecl.sha256,semanticPublicSurfaceSha256:pinnedSemanticSurface.sha256,declarationEntrypoints:pinnedDecl.entrypoints,declarationFiles:pinnedDecl.files.length},
-    candidatePublicSurface:{exportsMatch,declarationsMatch,rawDeclarationFilesMatch,declarationSha256:candidateDecl.sha256,semanticPublicSurfaceSha256:candidateSemanticSurface.sha256,declarationEntrypoints:candidateDecl.entrypoints,declarationFiles:candidateDecl.files.length},
+    documentedArtifact:{version:pinnedPkg.version,exportsMatch,declarationsMatch,rawDeclarationFilesMatch,semanticPublicSurfaceExactMatch,declarationSha256:pinnedDecl.sha256,semanticPublicSurfaceSha256:pinnedSemanticSurface.sha256,declarationEntrypoints:pinnedDecl.entrypoints,declarationFiles:pinnedDecl.files.length},
+    candidatePublicSurface:{exportsMatch,declarationsMatch,rawDeclarationFilesMatch,semanticPublicSurfaceExactMatch,declarationSha256:candidateDecl.sha256,semanticPublicSurfaceSha256:candidateSemanticSurface.sha256,declarationEntrypoints:candidateDecl.entrypoints,declarationFiles:candidateDecl.files.length},
     examples:{total:results.length,passed:results.length,results},
   };
   fs.writeFileSync(path.join(OUT,'package-candidate.json'), `${JSON.stringify(payload,null,2)}\n`);
