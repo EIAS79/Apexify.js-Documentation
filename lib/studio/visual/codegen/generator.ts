@@ -1,6 +1,11 @@
 import type { VisualProject } from '../model';
 import { lowerVisualProject } from '../compiler/plan';
 import { emitStudioOperationPlan } from './emitter';
+import {
+  generatePhase9NativeSource,
+  generatePhase9PreviewSource,
+  hasPhase9Authoring,
+} from '../phase9-codegen';
 
 export interface GeneratedVisualCode {
   language: 'typescript';
@@ -14,10 +19,23 @@ function safeFileStem(value: string): string {
 }
 
 export function generateVisualProjectCode(project: VisualProject): GeneratedVisualCode {
-  const plan = lowerVisualProject(project);
+  const source = hasPhase9Authoring(project)
+    ? generatePhase9NativeSource(project)
+    : emitStudioOperationPlan(lowerVisualProject(project));
   return {
     language: 'typescript',
     fileName: `${safeFileStem(project.name)}.ts`,
-    source: emitStudioOperationPlan(plan),
+    source,
+  };
+}
+
+export function generateVisualProjectPreviewCode(project: VisualProject): GeneratedVisualCode {
+  const source = hasPhase9Authoring(project)
+    ? generatePhase9PreviewSource(project)
+    : emitStudioOperationPlan(lowerVisualProject(project));
+  return {
+    language: 'typescript',
+    fileName: `${safeFileStem(project.name)}.preview.ts`,
+    source,
   };
 }
