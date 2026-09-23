@@ -31,6 +31,7 @@ import {
   type VisualPathNodeProps,
 } from '../path-pixel-contract';
 import { validateVisualProject } from '../compiler/validate';
+import { phase9ProjectFromSourceMarker } from '../phase9-codegen';
 
 export type VisualCodeSyncResult =
   | { ok: true; project: VisualProject; changed: boolean }
@@ -1618,6 +1619,35 @@ export function reconcileVisualProjectFromCode(
   project: VisualProject,
   source: string,
 ): VisualCodeSyncResult {
+  const phase9Project = phase9ProjectFromSourceMarker(source);
+  if (phase9Project) {
+    const validation = validateVisualProject(phase9Project);
+    if (!validation.ok) {
+      const problem = validation.issues.find((item) => item.severity === 'error');
+      return {
+        ok: false,
+        error: problem?.message ?? 'The Phase 9 source marker contains an invalid Visual Project.',
+      };
+    }
+    const semantic = (value: VisualProject) =>
+      JSON.stringify({
+        width: value.document.width,
+        height: value.document.height,
+        canvas: value.document.canvas ?? {},
+        roots: value.document.rootNodeIds,
+        nodes: value.document.nodes,
+        assets: value.assets,
+        variables: value.variables,
+        palettes: value.palettes,
+        operations: value.operations,
+      });
+    return {
+      ok: true,
+      project: structuredClone(phase9Project),
+      changed: semantic(phase9Project) !== semantic(project),
+    };
+  }
+
   if (!/\bApexPainter\b/.test(source)) {
     return {
       ok: false,
