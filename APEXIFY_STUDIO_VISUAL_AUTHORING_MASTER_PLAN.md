@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 COMPLETE; STUDIO-VISUAL-13 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3082,7 +3082,7 @@ Review note:
 - no unresolved review threads were present;
 - direct runtime/API review was performed against the pinned Apexify.js GIF, animation and scene-GIF contracts before finalization.
 
-**Phase 11 is complete. STUDIO-VISUAL-12 is next.**
+**Phase 11 is complete. STUDIO-VISUAL-12 follows below and is now complete.**
 
 ---
 
@@ -3120,6 +3120,57 @@ Linux audio smoke suite.
 ```text
 feat(studio-visual): complete audio authoring
 ```
+
+### Phase 12 implementation record — STUDIO-VISUAL-12
+
+**Status:** COMPLETE — integration PR **#105**
+
+- documentation branch: `studio-visual/v12-audio`
+- documentation PR: **#105**
+- final implementation head: `3deffc723bd0c3cfdc35c55049b79db487bfdfed`
+- final PR Studio Visual Phase Gate: run **35930842667** — **SUCCESS**
+- final Documentation Runtime Build Gate: run **35930842704** — **SUCCESS**
+- integration merge commit: `1232800509fba731d508efb9ec45482eba5c83f3`
+- pinned Apexify.js runtime: `69d40cf40ba992ad2bdec457c6c7217f5df55cd1`
+- runtime API patch required: **no**
+
+Completed implementation scope:
+
+- permanent **Audio** feature-rail authoring context;
+- complete 39-preset browser backed by the current Apexify preset catalog;
+- custom synth authoring for oscillator/waveform, ADSR, filters, pan, detune, noise, vibrato, tremolo and layered sound options;
+- sequence event authoring with deterministic timing and gain;
+- composition timeline with preset, custom-sound and uploaded WAV Studio Asset sources;
+- mix authoring for presets, synthesized sounds and WAV assets;
+- shared Phase-11 contextual Timeline dock reused rather than replaced;
+- full-runtime `ApexPainter.createAudio` execution for preset, synth, sequence, compose and mix modes;
+- real PCM16 WAV preview with native browser playback;
+- waveform visualization derived from generated WAV PCM bytes rather than decorative placeholder data;
+- WAV-aware preview/download handling;
+- deterministic one-file TypeScript generation;
+- stable `apexify-studio-v12` semantic source marker and exact canonical Code → Visual reconstruction;
+- validation/resource bounds for sample rate, channels, gains, timing, filters, modulation, clip/mix sources and malformed imported state;
+- dedicated Phase-12 regression coverage integrated into `studio:visual:test`;
+- Linux real-runtime procedural-audio equivalence proof integrated into the permanent Studio codegen smoke.
+
+Acceptance evidence:
+
+- Studio completeness: **PASS**
+- Visual capability / option coverage: **PASS** — 187 capabilities, 17,233 option paths, 0 unclassified
+- Studio Visual tests: **PASS** — 128 / 128
+- Linux real-runtime Phase 12 audio proof: **PASS**
+  - artifact bytes: **39,084**
+  - SHA-256: `d52888a8625e9991207327d511dd01a063a9671d4b94f618aa0e1b3397f3b17c`
+  - sample rate: **16,000 Hz**
+  - channels: **2**
+  - exercised operation: `createAudio.compose`
+- TypeScript typecheck: **PASS**
+- production Next.js build: **PASS**
+- production server start: **PASS**
+- dual-mode browser regression: **PASS**
+- Documentation Runtime Build Gate: **PASS**
+
+**Phase 12 is complete. STUDIO-VISUAL-13 is next.**
 
 ---
 
@@ -3430,7 +3481,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
 | 10 | Image utilities | COMPLETE — PR #102 | `e3074fcce312094da4538ed3c0da200febd2373a` | Final Studio Visual gates 35863786281 + 35863791672 SUCCESS; Runtime Build Gate 35863791464 SUCCESS on Node 22/24/26; 108/108 tests; full-runtime image utility equivalence proof; 9/9 review threads resolved |
 | 11 | GIF / animation | COMPLETE — PR #103 | `3b43fb5c01c8d276df9e41c4f0f5b730eb11d002` | Final Studio Visual Phase Gate 35868072554 SUCCESS; Runtime Build Gate 35868072609 SUCCESS Node 22/24/26; 117/117 tests; Linux animate → createGIF proof PASS |
-| 12 | Audio | NOT STARTED | — | — |
+| 12 | Audio | COMPLETE — PR #105 | `1232800509fba731d508efb9ec45482eba5c83f3` | Studio Visual Phase Gate 35930842667 SUCCESS; Runtime Build Gate 35930842704 SUCCESS; 128/128 tests; Linux procedural WAV equivalence proof PASS |
 | 13 | Video | NOT STARTED | — | — |
 | 14 | Advanced operations | NOT STARTED | — | — |
 | 15 | Export / project round trip | NOT STARTED | — | — |
