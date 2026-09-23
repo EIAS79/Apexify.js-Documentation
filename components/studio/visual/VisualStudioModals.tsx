@@ -16,6 +16,7 @@ type PreviewModalProps = {
   name: string;
   onNameChange: (name: string) => void;
   previewUrl: string | null;
+  previewMime?: string;
   loading: boolean;
   error: string | null;
   onDownload: () => void;
@@ -27,6 +28,7 @@ export function VisualPreviewModal({
   name,
   onNameChange,
   previewUrl,
+  previewMime = 'image/png',
   loading,
   error,
   onDownload,
@@ -78,8 +80,8 @@ export function VisualPreviewModal({
       <section className="apx-vmodal apx-vmodal--preview" role="dialog" aria-modal="true" aria-label="Canvas preview" data-visual-preview-modal>
         <header className="apx-vmodal-head">
           <div className="apx-vmodal-title">
-            <strong>Canvas Preview</strong>
-            <span>Clean output · drag to pan · zoom freely</span>
+            <strong>{previewMime.startsWith('audio/') ? 'Audio Preview' : 'Canvas Preview'}</strong>
+            <span>{previewMime.startsWith('audio/') ? 'Real Apexify WAV output · native playback' : 'Clean output · drag to pan · zoom freely'}</span>
           </div>
           <div className="apx-vmodal-actions">
             <button type="button" onClick={() => setZoom((value) => Math.max(.25, value - .1))} title="Zoom out">
@@ -116,6 +118,13 @@ export function VisualPreviewModal({
             <div className="apx-vmodal-state"><strong>Rendering preview…</strong><span>Apexify is generating the current canvas.</span></div>
           ) : error ? (
             <div className="apx-vmodal-state apx-vmodal-state--error"><strong>Preview unavailable</strong><span>{error}</span></div>
+          ) : previewUrl && previewMime.startsWith('audio/') ? (
+            <div className="apx-vmodal-audio">
+              <div className="apx-vmodal-audio-mark">♪</div>
+              <strong>{name || 'Audio preview'}</strong>
+              <span>{previewMime}</span>
+              <audio controls autoPlay preload="metadata" src={previewUrl} data-visual-audio-player />
+            </div>
           ) : previewUrl ? (
             <img
               src={previewUrl}
