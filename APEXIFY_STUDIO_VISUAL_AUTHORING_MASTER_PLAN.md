@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3023,6 +3023,67 @@ Linux GIF smoke test before `main`.
 feat(studio-visual): complete GIF and animation authoring
 ```
 
+### Phase 11 implementation record — STUDIO-VISUAL-11
+
+**Status:** COMPLETE — integration PR **#103**
+
+- documentation branch: `studio-visual/v11-gif-animation`
+- documentation PR: **#103**
+- green implementation head: `fe5719135b1afbc52edd9982b0d56c169c8831ce`
+- branch Studio Visual Phase Gate: run **35867102998** — **SUCCESS**
+- PR Studio Visual Phase Gate: run **35867538153** — **SUCCESS**
+- Documentation Runtime Build Gate: run **35867538314** — **SUCCESS** on Node 22 / 24 / 26
+- base main commit: `699e8cfc72a3740c607797d85d8b6ee68eefcaa7`
+- branch divergence at PR open: **12 ahead / 0 behind**
+- pinned Apexify.js runtime: `69d40cf40ba992ad2bdec457c6c7217f5df55cd1`
+- runtime API patch required: **no**
+
+Completed implementation scope:
+
+- semantic GIF/animation timeline stored in the existing `VisualProject.timelines` model;
+- GIF feature-rail context wired into the permanent Studio shell;
+- contextual Timeline dock that coexists with Code / Diagnostics / Assets / History;
+- shared image Assets reused as frame sources;
+- frame create/edit/reorder/duplicate/delete workflow;
+- deterministic width, height, delay, repeat and quality controls;
+- per-frame duration and repeat with deterministic repeat expansion;
+- native `ApexPainter.createGIF()` generation;
+- native `ApexPainter.animate()` frame rendering followed by `createGIF()` encoding;
+- native `ApexPainter.renderSceneToGIF()` generation for the current composed Visual scene;
+- scene-composed raster timing/repeat controls;
+- full-runtime GIF preview through the existing top Preview modal;
+- generated GIF output remains browser-playable `image/gif` and uses the existing download path;
+- stable `apexify-studio-v11` semantic source marker;
+- exact canonical Code → Visual reconstruction of frame order, timing and timeline options;
+- validation for dimensions, timing, loop count, quality, frame identity/source, and expanded-frame safety limits;
+- Phase 9 scene materialization/reference resolution reused for scene-to-GIF instead of a shadow scene renderer;
+- Phase 11 takes project-output precedence over Phase 10 / Phase 9 generators while preserving their semantic project state in the marker;
+- dedicated Phase 11 regression suite integrated into `studio:visual:test`;
+- Linux real-runtime GIF smoke/equivalence proof added to the permanent Studio codegen smoke.
+
+Acceptance evidence:
+
+- Studio completeness: **PASS**
+- Visual capability / option coverage: **PASS** — 187 capabilities, 17,233 option paths, 0 unclassified
+- Studio Visual tests: **PASS** — 117 / 117
+- Linux real-runtime Phase 11 GIF proof: **PASS**
+  - artifact bytes: **1,791**
+  - SHA-256: `26f6f8559c532fb0f8f28c32ae635e5629a70646562d0992db9f8ae4f7fb693e`
+  - exercised operations: `animate → createGIF`
+- TypeScript typecheck: **PASS**
+- production Next.js build: **PASS**
+- production server start: **PASS**
+- dual-mode browser regression: **PASS**
+- Documentation Runtime Build Gate: **PASS** on Node 22 / 24 / 26
+
+Review note:
+
+- automated Codex PR review was unavailable because the configured review quota was exhausted;
+- no unresolved review threads were present;
+- direct runtime/API review was performed against the pinned Apexify.js GIF, animation and scene-GIF contracts before finalization.
+
+**Phase 11 is complete. STUDIO-VISUAL-12 is next.**
+
 ---
 
 ## STUDIO-VISUAL-12 — Audio authoring
@@ -3368,7 +3429,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 8 | Charts | NOT STARTED | — | NEXT — activate Charts and implement complete chart authoring against the permanent shell |
 | 9 | Scenes / components / templates / assets | NOT STARTED | — | — |
 | 10 | Image utilities | COMPLETE — PR #102 | `e3074fcce312094da4538ed3c0da200febd2373a` | Final Studio Visual gates 35863786281 + 35863791672 SUCCESS; Runtime Build Gate 35863791464 SUCCESS on Node 22/24/26; 108/108 tests; full-runtime image utility equivalence proof; 9/9 review threads resolved |
-| 11 | GIF / animation | NOT STARTED | — | — |
+| 11 | GIF / animation | COMPLETE — PR #103 | — | Studio Visual gates 35867102998 + 35867538153 SUCCESS; Runtime Build Gate 35867538314 SUCCESS Node 22/24/26; 117/117 tests; Linux animate → createGIF proof PASS |
 | 12 | Audio | NOT STARTED | — | — |
 | 13 | Video | NOT STARTED | — | — |
 | 14 | Advanced operations | NOT STARTED | — | — |

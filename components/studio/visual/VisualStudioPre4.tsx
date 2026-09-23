@@ -50,6 +50,10 @@ import {
   VisualPhase9Inspector,
 } from '@/components/studio/visual/VisualSceneComponentAuthoring';
 import { VisualImageUtilityAuthoring } from '@/components/studio/visual/VisualImageUtilityAuthoring';
+import {
+  VisualGifContext,
+  VisualGifTimeline,
+} from '@/components/studio/visual/VisualGifAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -79,6 +83,7 @@ import {
 } from '@/lib/studio/visual/codegen/generator';
 import { hasPhase9Authoring } from '@/lib/studio/visual/phase9-codegen';
 import { hasPhase10Authoring } from '@/lib/studio/visual/phase10-codegen';
+import { hasPhase11Authoring } from '@/lib/studio/visual/phase11-codegen';
 import { createInteractiveSession } from '@/lib/docs/playground/session';
 import { currentNodeServerExecutionAdapter } from '@/lib/docs/playground/serverClientAdapter';
 import { validateVisualProject } from '@/lib/studio/visual/compiler/validate';
@@ -494,7 +499,7 @@ export default function VisualStudioPre4({
     'style' | 'transform' | 'effects' | 'data' | 'advanced'
   >('style');
   const [dockTab, setDockTab] = useState<
-    'generated' | 'diagnostics' | 'assets' | 'history'
+    'generated' | 'diagnostics' | 'assets' | 'history' | 'timeline'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
   const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
@@ -658,6 +663,7 @@ export default function VisualStudioPre4({
 
   const phase9Active = useMemo(() => hasPhase9Authoring(project), [project]);
   const phase10Active = useMemo(() => hasPhase10Authoring(project), [project]);
+  const phase11Active = useMemo(() => hasPhase11Authoring(project), [project]);
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
@@ -772,7 +778,7 @@ export default function VisualStudioPre4({
     source: string,
     displaySource = source,
   ) => {
-    if (phase10Active) {
+    if (phase11Active || phase10Active) {
       let releasePhase10Render!: () => void;
       const previousPhase10Render = phase10RenderTailRef.current;
       phase10RenderTailRef.current = new Promise<void>((resolve) => {
@@ -937,6 +943,7 @@ export default function VisualStudioPre4({
     previewGenerated.value?.source,
     displayPreviewGenerated.value?.source,
     phase10Active,
+    phase11Active,
   ]);
 
   const mutate = (
@@ -2408,7 +2415,7 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = phase10Active || phase9Active
+    const source = phase11Active || phase10Active || phase9Active
       ? previewGenerated.value?.source
       : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
@@ -2422,7 +2429,7 @@ export default function VisualStudioPre4({
     try {
       const result = await renderAuthoritativeVisualSource(
         source,
-        phase10Active
+        phase10Active && !phase11Active
           ? displayPreviewGenerated.value?.source ?? source
           : source,
       );
@@ -2727,7 +2734,8 @@ export default function VisualStudioPre4({
     activeTool === 'charts' ||
     activeTool === 'paths' ||
     activeTool === 'components' ||
-    activeTool === 'assets';
+    activeTool === 'assets' ||
+    activeTool === 'gif';
 
   const imageAssets = assets.filter((asset) =>
     asset.mime.startsWith('image/'),
@@ -2744,6 +2752,21 @@ export default function VisualStudioPre4({
   ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'gif') {
+      return (
+        <VisualGifContext
+          project={project}
+          assets={assets}
+          onMutate={mutate}
+          onOpenTimeline={() => {
+            setDockTab('timeline');
+            setDockCollapsed(false);
+          }}
+          onPreview={() => void renderVisualPreview(true)}
+        />
+      );
+    }
+
     if (activeTool === 'components') {
       return (
         <VisualComponentsContext
@@ -3174,6 +3197,9 @@ export default function VisualStudioPre4({
     ['diagnostics', 'Diagnostics'],
     ['assets', 'Assets'],
     ['history', 'History'],
+    ...((activeTool === 'gif' || phase11Active)
+      ? [['timeline', 'Timeline'] as const]
+      : []),
   ] as const;
 
   const renderTransformFields = () => {
@@ -5481,6 +5507,16 @@ export default function VisualStudioPre4({
   };
 
   const renderDock = () => {
+    if (dockTab === 'timeline') {
+      return (
+        <VisualGifTimeline
+          project={project}
+          assets={assets}
+          onMutate={mutate}
+        />
+      );
+    }
+
     if (dockTab === 'generated') {
       return (
         <div className="apx-live-code-panel" data-visual-live-code>
@@ -5681,6 +5717,10 @@ export default function VisualStudioPre4({
                 onClick={() => {
                   setActiveTool(id);
                   if (id === 'assets') setDockTab('assets');
+                  if (id === 'gif') {
+                    setDockTab('timeline');
+                    setDockCollapsed(false);
+                  }
                   if (id === 'layers') setMessage('Layers panel active');
                 }}
               >
@@ -5711,7 +5751,9 @@ export default function VisualStudioPre4({
                           ? 'Components'
                           : activeTool === 'assets'
                             ? 'Assets'
-                            : 'Layers'}
+                            : activeTool === 'gif'
+                              ? 'GIF & animation'
+                              : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -5725,7 +5767,9 @@ export default function VisualStudioPre4({
                           ? 'Path · doodle · pixels · detection'
                           : activeTool === 'components'
                             ? 'Scenes · surfaces · components · templates'
-                            : assets.length + ' shared assets'
+                            : activeTool === 'gif'
+                              ? 'Frames · timing · GIF output'
+                              : assets.length + ' shared assets'
                   : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>

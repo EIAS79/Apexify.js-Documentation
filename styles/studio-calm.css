@@ -6237,3 +6237,232 @@
 .apx-pre4-layers[data-context-mode="text"] .apx-pre4-panel-head{
   background:#081522;
 }
+
+
+/* ==========================================================================
+   STUDIO-VISUAL-11 — GIF / animation timeline
+   ========================================================================== */
+
+.apx-gif-context{
+  min-width:0;
+}
+
+.apx-gif-mode-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:.35rem;
+}
+
+.apx-gif-mode-grid button{
+  min-height:34px;
+  border:1px solid #1d3850;
+  border-radius:6px;
+  background:#081725;
+  color:#8fa6bc;
+  font-size:.48rem;
+}
+
+.apx-gif-mode-grid button[data-active="true"]{
+  border-color:#4d79a1;
+  background:#0d2438;
+  color:#eef7ff;
+}
+
+.apx-gif-settings{
+  margin-top:.55rem;
+}
+
+.apx-gif-settings label,
+.apx-gif-scene-options label{
+  display:grid;
+  gap:.2rem;
+  color:#7890a7;
+  font-size:.44rem;
+}
+
+.apx-gif-settings input,
+.apx-gif-scene-options input,
+.apx-gif-frame-fields input{
+  width:100%;
+  min-width:0;
+  border:1px solid #1b3349;
+  border-radius:5px;
+  background:#071420;
+  color:#dce9f4;
+  padding:.36rem .42rem;
+  font-size:.48rem;
+}
+
+.apx-gif-scene-options{
+  display:grid;
+  gap:.42rem;
+  margin-top:.5rem;
+  padding:.52rem;
+  border:1px solid #18324a;
+  border-radius:7px;
+  background:#071725;
+}
+
+.apx-gif-scene-options label:first-child{
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+}
+
+.apx-gif-scene-options label:first-child input{
+  width:auto;
+}
+
+.apx-gif-context-actions{
+  display:flex;
+  gap:.4rem;
+  margin-top:.55rem;
+}
+
+.apx-gif-context-actions button{
+  flex:1;
+  min-height:32px;
+}
+
+.apx-gif-timeline{
+  height:100%;
+  min-height:0;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+  overflow:hidden;
+  background:#06121d;
+}
+
+.apx-gif-timeline-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.7rem;
+  padding:.52rem .7rem;
+  border-bottom:1px solid #14293c;
+}
+
+.apx-gif-timeline-head>div{
+  min-width:0;
+  display:grid;
+  gap:.08rem;
+}
+
+.apx-gif-timeline-head strong{
+  color:#e7f0f8;
+  font-size:.58rem;
+}
+
+.apx-gif-timeline-head span{
+  color:#6f879e;
+  font-size:.43rem;
+}
+
+.apx-gif-frame-rail{
+  min-height:0;
+  display:flex;
+  align-items:stretch;
+  gap:.48rem;
+  overflow:auto;
+  padding:.55rem .7rem .7rem;
+}
+
+.apx-gif-frame{
+  flex:0 0 250px;
+  min-width:0;
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr);
+  grid-template-rows:minmax(0,1fr) auto;
+  gap:.42rem;
+  padding:.48rem;
+  border:1px solid #173149;
+  border-radius:8px;
+  background:linear-gradient(180deg,#081a2a,#071522);
+}
+
+.apx-gif-frame-preview{
+  position:relative;
+  width:58px;
+  height:58px;
+  overflow:hidden;
+  border:1px solid #203b54;
+  border-radius:6px;
+  background:#0b1b2b;
+}
+
+.apx-gif-frame-preview img,
+.apx-gif-frame-preview>span{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:grid;
+  place-items:center;
+  color:#7f96aa;
+  font-size:.5rem;
+}
+
+.apx-gif-frame-preview small{
+  position:absolute;
+  right:3px;
+  bottom:3px;
+  min-width:16px;
+  padding:1px 4px;
+  border-radius:4px;
+  background:#02070cdd;
+  color:#d7e5f1;
+  text-align:center;
+  font-size:.39rem;
+}
+
+.apx-gif-frame-fields{
+  min-width:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 62px 48px;
+  gap:.3rem;
+  align-content:start;
+}
+
+.apx-gif-frame-fields>input:first-child{
+  grid-column:1/-1;
+}
+
+.apx-gif-frame-fields label{
+  display:flex;
+  align-items:center;
+  gap:.2rem;
+  color:#6f879d;
+  font-size:.4rem;
+}
+
+.apx-gif-frame-actions{
+  grid-column:1/-1;
+  display:flex;
+  gap:.28rem;
+}
+
+.apx-gif-frame-actions button{
+  min-height:25px;
+  border:1px solid #1c354d;
+  border-radius:5px;
+  background:#0a1a29;
+  color:#8fa5b9;
+  font-size:.42rem;
+}
+
+.apx-gif-empty-rail{
+  width:100%;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  gap:.2rem;
+  color:#758ba0;
+}
+
+.apx-gif-empty-rail strong{
+  color:#c7d5e1;
+}
+
+@media (max-width: 980px){
+  .apx-gif-mode-grid{grid-template-columns:1fr;}
+  .apx-gif-frame{flex-basis:220px;}
+}

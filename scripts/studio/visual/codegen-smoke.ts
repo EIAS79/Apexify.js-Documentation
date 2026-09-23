@@ -15,6 +15,10 @@ import {
 import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { executeStudioOperationPlan } from '../../../lib/studio/visual/compiler/execute';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
+import {
+  defaultPhase11Timeline,
+  setPhase11Timeline,
+} from '../../../lib/studio/visual/gif-animation-contract';
 
 async function run() {
   const project = createPhase2ProofProject();
@@ -444,6 +448,89 @@ async function run() {
         )
         .map((operation) => operation.kind + ':' + operation.method),
       generatedFile: phase10Generated.fileName,
+    }),
+  );
+
+
+  const phase11Base = createVisualProject({
+    id: 'project_phase11_runtime',
+    name: 'Phase 11 Runtime',
+    width: 64,
+    height: 48,
+    now: '2026-09-23T00:00:00.000Z',
+  });
+  const phase11Project = setPhase11Timeline(phase11Base, {
+    ...defaultPhase11Timeline(phase11Base, 'gif-timeline-runtime'),
+    mode: 'animate',
+    width: 64,
+    height: 48,
+    delay: 10,
+    quality: 10,
+    repeat: 0,
+    frames: [
+      {
+        id: 'gif-frame-runtime-a',
+        backgroundColor: '#ff3366',
+        duration: 10,
+        repeat: 1,
+      },
+      {
+        id: 'gif-frame-runtime-b',
+        backgroundColor: '#3366ff',
+        duration: 20,
+        repeat: 1,
+      },
+    ],
+  });
+
+  const manualAnimationFrames = [
+    { backgroundColor: '#ff3366', duration: 10, width: 64, height: 48 },
+    { backgroundColor: '#3366ff', duration: 20, width: 64, height: 48 },
+  ];
+  const manualRendered = await painter.animate(
+    manualAnimationFrames,
+    10,
+    64,
+    48,
+  );
+  assert.ok(manualRendered?.length === 2);
+  const manualGif = await painter.createGIF(
+    manualRendered!.map((buffer, index) => ({
+      buffer,
+      duration: manualAnimationFrames[index]!.duration,
+    })),
+    {
+      outputFormat: 'buffer',
+      width: 64,
+      height: 48,
+      delay: 10,
+      repeat: 0,
+      quality: 10,
+    },
+  );
+  assert.ok(manualGif instanceof Uint8Array);
+
+  const phase11Generated = generateVisualProjectCode(phase11Project);
+  const phase11Body = phase11Generated.source
+    .replace(/^\/\* apexify-studio-v11:[^\n]+\*\/\n/, '')
+    .replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
+  const executePhase11Generated = new AsyncFunction('ApexPainter', phase11Body);
+  const phase11GeneratedBuffer = await executePhase11Generated(ApexPainter);
+  assert.ok(phase11GeneratedBuffer instanceof Uint8Array);
+  assert.equal(
+    Buffer.from(phase11GeneratedBuffer).subarray(0, 3).toString('ascii'),
+    'GIF',
+  );
+  assert.equal(digest(phase11GeneratedBuffer), digest(manualGif as Uint8Array));
+
+  console.log(
+    '[studio-visual:phase11] equivalent Linux GIF animation preview/codegen proof passed',
+    JSON.stringify({
+      bytes: phase11GeneratedBuffer.byteLength,
+      sha256: digest(phase11GeneratedBuffer),
+      frames: 2,
+      operations: ['animate', 'createGIF'],
+      generatedFile: phase11Generated.fileName,
     }),
   );
 }
