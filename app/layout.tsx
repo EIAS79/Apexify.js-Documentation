@@ -15,7 +15,11 @@ export const metadata: Metadata = {
   applicationName: SITE_NAME,
   alternates: { canonical: '/' },
   robots: { index: true, follow: true },
-  icons: { icon: [{ url: "/brand/icon.svg", type: "image/svg+xml" }], apple: [{ url: "/apple-icon.png", type: "image/png" }] },
+  icons: {
+    icon: [{ url: "/brand/apexify-mark.png", type: "image/png" }],
+    shortcut: [{ url: "/brand/apexify-mark.png", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png", type: "image/png" }],
+  },
   openGraph: {
     type: 'website',
     url: SITE_ORIGIN,
