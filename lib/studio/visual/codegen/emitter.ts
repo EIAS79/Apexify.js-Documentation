@@ -9,6 +9,10 @@ function emitString(value: string): string {
   return JSON.stringify(value);
 }
 
+function emitObjectKey(value: string): string {
+  return /^[A-Za-z_$][\w$]*$/.test(value) ? value : emitString(value);
+}
+
 function isTargetReference(value: unknown): value is StudioTargetReference {
   return Boolean(
     value &&
@@ -55,7 +59,7 @@ function emitValue(
     const inner = entries
       .map(
         ([key, item]) =>
-          `${' '.repeat(indent + 2)}${key}: ${emitValue(item, indent + 2, targetNames)}`,
+          `${' '.repeat(indent + 2)}${emitObjectKey(key)}: ${emitValue(item, indent + 2, targetNames)}`,
       )
       .join(',\n');
     return `{\n${inner},\n${' '.repeat(indent)}}`;
@@ -71,9 +75,25 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
   const painterName = names.allocate('painter');
   const targetNames = new Map<string, string>();
   const pathResourceNames = new Map<string, string>();
+  const templateNames = new Map<string, string>();
 
   const body: string[] = [];
   for (const operation of plan.operations) {
+    if (operation.kind === 'register-asset') {
+      const method =
+        operation.registryKind === 'image'
+          ? 'loadImage'
+          : operation.registryKind === 'font'
+            ? 'loadFont'
+            : operation.registryKind === 'palette'
+              ? 'loadPalette'
+              : 'loadValue';
+      body.push(
+        `  ${painterName}.assets.${method}(${emitString(operation.name)}, ${emitValue(operation.value, 2, targetNames)});`,
+      );
+      continue;
+    }
+
     if (operation.kind === 'create-canvas') {
       const targetName = names.allocate(
         operation.preferredName || operation.target,
@@ -153,6 +173,72 @@ export function emitStudioOperationPlan(plan: StudioOperationPlan): string {
       );
       body.push(
         `  const ${targetName} = await ${painterName}.createComboChart(${emitValue(operation.options, 2, targetNames)});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'create-scene') {
+      const builderName = names.allocate(
+        (operation.preferredName || 'scene') + 'Builder',
+        'sceneBuilder',
+      );
+      const bufferName = names.allocate(
+        (operation.preferredName || 'scene') + 'Buffer',
+        'sceneBuffer',
+      );
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'sceneLayer',
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${builderName} = ${painterName}.createScene(${emitValue(operation.definition, 2, targetNames)});`,
+      );
+      body.push(
+        `  const ${bufferName} = await ${builderName}.render({ resolveAssetRefs: true });`,
+      );
+      body.push(
+        `  const ${targetName} = await ${painterName}.createImage(${emitValue({ source: { $studioTarget: operation.target + '__sceneBuffer' }, ...operation.placement }, 2, new Map([...targetNames, [operation.target + '__sceneBuffer', bufferName]]))}, ${base});`,
+      );
+      targetNames.set(operation.target, targetName);
+      continue;
+    }
+
+    if (operation.kind === 'render-template') {
+      let templateName = templateNames.get(operation.definitionId);
+      if (!templateName) {
+        templateName = names.allocate(
+          operation.definitionName + 'Template',
+          'template',
+        );
+        templateNames.set(operation.definitionId, templateName);
+        body.push(
+          `  const ${templateName} = ${painterName}.createTemplate(${emitValue(operation.definition, 2, targetNames)});`,
+        );
+      }
+      const bufferName = names.allocate(
+        (operation.preferredName || 'template') + 'Buffer',
+        'templateBuffer',
+      );
+      const targetName = names.allocate(
+        operation.preferredName || operation.target,
+        'templateLayer',
+      );
+      const renderOptions = {
+        ...(Object.keys(operation.overrides).length
+          ? { overrides: operation.overrides }
+          : {}),
+        ...(operation.insertions.length
+          ? { insertions: operation.insertions }
+          : {}),
+      };
+      body.push(
+        `  const ${bufferName} = await ${templateName}.render(${emitValue(operation.data, 2, targetNames)}${Object.keys(renderOptions).length ? ', ' + emitValue(renderOptions, 2, targetNames) : ''});`,
+      );
+      const base = emitTargetReference(operation.base, targetNames);
+      body.push(
+        `  const ${targetName} = await ${painterName}.createImage(${emitValue({ source: { $studioTarget: operation.target + '__templateBuffer' }, ...operation.placement }, 2, new Map([...targetNames, [operation.target + '__templateBuffer', bufferName]]))}, ${base});`,
       );
       targetNames.set(operation.target, targetName);
       continue;
