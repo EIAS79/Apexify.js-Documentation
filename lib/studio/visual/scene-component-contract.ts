@@ -7,7 +7,7 @@ import type {
   VisualValue,
 } from './model';
 import { createVisualId, sanitizeVisualIdPart } from './ids';
-import { visualImageProps } from './image-contract';
+import { IMAGE_SHAPE_TYPES, visualImageProps } from './image-contract';
 import { visualTextProps } from './text-contract';
 import { visualChartProps } from './chart-contract';
 import { visualPathProps } from './path-pixel-contract';
@@ -612,6 +612,276 @@ function deepMerge(
   return out;
 }
 
+
+function sceneLayerNumber(value: VisualValue | undefined, fallback: number) {
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function sceneLayerRecord(value: VisualValue | undefined): Record<string, VisualValue> {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, VisualValue>
+    : {};
+}
+
+function sceneLayerArray(value: VisualValue | undefined): VisualValue[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function insertionLayerNodes(
+  layers: Phase9SceneLayer[],
+  options: {
+    prefix: string;
+    parentId: string | null;
+    instanceX: number;
+    instanceY: number;
+    scaleX: number;
+    scaleY: number;
+    localBaseX: number;
+    localBaseY: number;
+    viewportWidth: number;
+    viewportHeight: number;
+  },
+): { nodes: Record<string, VisualNode>; rootIds: string[] } {
+  const nodes: Record<string, VisualNode> = {};
+  const rootIds: string[] = [];
+
+  const visit = (
+    layer: Phase9SceneLayer,
+    indexPath: number[],
+    parentId: string | null,
+    localBaseX: number,
+    localBaseY: number,
+  ): string => {
+    const type = typeof layer.type === 'string' ? layer.type : '';
+    const sourceId =
+      typeof layer.id === 'string' && layer.id.trim()
+        ? layer.id
+        : type || 'layer';
+    const id =
+      options.prefix +
+      '__' +
+      indexPath.join('_') +
+      '__' +
+      sanitizeVisualIdPart(sourceId, type || 'layer');
+
+    const baseTransform: VisualTransform = {
+      visible: true,
+      locked: false,
+      opacity: 1,
+      rotation: 0,
+    };
+
+    if (type === 'surface') {
+      const placement = sceneLayerRecord(layer.placement);
+      const localX = sceneLayerNumber(placement.x, 0);
+      const localY = sceneLayerNumber(placement.y, 0);
+      const node: VisualNode = {
+        id,
+        kind: 'surface',
+        name: typeof layer.name === 'string' ? layer.name : 'Inserted surface',
+        parentId,
+        childIds: [],
+        transform: {
+          ...baseTransform,
+          x: options.instanceX + (localBaseX + localX) * options.scaleX,
+          y: options.instanceY + (localBaseY + localY) * options.scaleY,
+          width: Math.max(1, sceneLayerNumber(placement.width, 320) * options.scaleX),
+          height: Math.max(1, sceneLayerNumber(placement.height, 180) * options.scaleY),
+          rotation: sceneLayerNumber(placement.rotation, 0),
+          opacity: sceneLayerNumber(placement.opacity, 1),
+          scaleX: sceneLayerNumber(placement.scaleX, 1),
+          scaleY: sceneLayerNumber(placement.scaleY, 1),
+        },
+        props: {
+          background: sceneLayerRecord(layer.background),
+        },
+      };
+      nodes[id] = node;
+      const children = sceneLayerArray(layer.layers)
+        .filter((item): item is Record<string, VisualValue> =>
+          Boolean(item && typeof item === 'object' && !Array.isArray(item)),
+        )
+        .map((child, childIndex) =>
+          visit(
+            child,
+            [...indexPath, childIndex],
+            id,
+            localBaseX + localX,
+            localBaseY + localY,
+          ),
+        );
+      node.childIds = children;
+      return id;
+    }
+
+    if (type === 'text') {
+      const texts = sceneLayerRecord(layer.texts);
+      const {
+        x,
+        y,
+        maxWidth,
+        maxHeight,
+        rotation,
+        opacity,
+        ...props
+      } = texts;
+      nodes[id] = {
+        id,
+        kind: 'text',
+        name: typeof layer.name === 'string' ? layer.name : 'Inserted text',
+        parentId,
+        transform: {
+          ...baseTransform,
+          x: options.instanceX + (localBaseX + sceneLayerNumber(x, 0)) * options.scaleX,
+          y: options.instanceY + (localBaseY + sceneLayerNumber(y, 0)) * options.scaleY,
+          ...(typeof maxWidth === 'number' ? { width: Math.max(1, maxWidth * options.scaleX) } : {}),
+          ...(typeof maxHeight === 'number' ? { height: Math.max(1, maxHeight * options.scaleY) } : {}),
+          rotation: sceneLayerNumber(rotation, 0),
+          opacity: sceneLayerNumber(opacity, 1),
+        },
+        props,
+      };
+      return id;
+    }
+
+    if (type === 'image') {
+      const images = sceneLayerRecord(layer.images);
+      const {
+        x,
+        y,
+        width,
+        height,
+        rotation,
+        opacity,
+        ...props
+      } = images;
+      const source = props.source;
+      const kind =
+        typeof source === 'string' && IMAGE_SHAPE_TYPES.includes(source as never)
+          ? 'shape'
+          : 'image';
+      nodes[id] = {
+        id,
+        kind,
+        name: typeof layer.name === 'string' ? layer.name : 'Inserted image',
+        parentId,
+        transform: {
+          ...baseTransform,
+          x: options.instanceX + (localBaseX + sceneLayerNumber(x, 0)) * options.scaleX,
+          y: options.instanceY + (localBaseY + sceneLayerNumber(y, 0)) * options.scaleY,
+          ...(typeof width === 'number' ? { width: Math.max(1, width * options.scaleX) } : {}),
+          ...(typeof height === 'number' ? { height: Math.max(1, height * options.scaleY) } : {}),
+          rotation: sceneLayerNumber(rotation, 0),
+          opacity: sceneLayerNumber(opacity, 1),
+        },
+        props,
+      };
+      return id;
+    }
+
+    if (type === 'chart' || type === 'chartComparison' || type === 'chartCombo') {
+      const family =
+        type === 'chartComparison'
+          ? 'comparison'
+          : type === 'chartCombo'
+            ? 'combo'
+            : typeof layer.chartType === 'string'
+              ? layer.chartType
+              : 'bar';
+      nodes[id] = {
+        id,
+        kind: 'chart',
+        name: typeof layer.name === 'string' ? layer.name : 'Inserted chart',
+        parentId,
+        transform: {
+          ...baseTransform,
+          x: options.instanceX + (localBaseX + sceneLayerNumber(layer.x, 0)) * options.scaleX,
+          y: options.instanceY + (localBaseY + sceneLayerNumber(layer.y, 0)) * options.scaleY,
+          width: Math.max(1, sceneLayerNumber(layer.width, 640) * options.scaleX),
+          height: Math.max(1, sceneLayerNumber(layer.height, 400) * options.scaleY),
+          opacity: sceneLayerNumber(layer.opacity, 1),
+        },
+        props: {
+          family,
+          data: sceneLayerArray(layer.data),
+          options: sceneLayerRecord(layer.options),
+        },
+      };
+      return id;
+    }
+
+    if (type === 'path') {
+      nodes[id] = {
+        id,
+        kind: 'path',
+        name: typeof layer.name === 'string' ? layer.name : 'Inserted path',
+        parentId,
+        transform: {
+          ...baseTransform,
+          x: options.instanceX + localBaseX * options.scaleX,
+          y: options.instanceY + localBaseY * options.scaleY,
+          width: Math.max(1, options.viewportWidth * options.scaleX),
+          height: Math.max(1, options.viewportHeight * options.scaleY),
+        },
+        props: {
+          tool: 'path',
+          viewport: {
+            width: options.viewportWidth,
+            height: options.viewportHeight,
+          },
+          commands: sceneLayerArray(layer.path),
+          draw: sceneLayerRecord(layer.options),
+        },
+      };
+      return id;
+    }
+
+    if (type === 'customLines') {
+      nodes[id] = {
+        id,
+        kind: 'path',
+        name: typeof layer.name === 'string' ? layer.name : 'Inserted connector',
+        parentId,
+        transform: {
+          ...baseTransform,
+          x: options.instanceX + localBaseX * options.scaleX,
+          y: options.instanceY + localBaseY * options.scaleY,
+          width: Math.max(1, options.viewportWidth * options.scaleX),
+          height: Math.max(1, options.viewportHeight * options.scaleY),
+        },
+        props: {
+          tool: 'connector',
+          viewport: {
+            width: options.viewportWidth,
+            height: options.viewportHeight,
+          },
+          commands: [],
+          connector: layer.lines ?? {},
+        },
+      };
+      return id;
+    }
+
+    throw new Error(
+      'Unsupported Phase 9 insertion layer type "' + String(type || 'unknown') + '".',
+    );
+  };
+
+  layers.forEach((layer, index) => {
+    rootIds.push(
+      visit(
+        layer,
+        [index],
+        options.parentId,
+        options.localBaseX,
+        options.localBaseY,
+      ),
+    );
+  });
+
+  return { nodes, rootIds };
+}
+
 function materializedDefinitionNodes(
   project: VisualProject,
   instance: VisualNode,
@@ -665,9 +935,51 @@ function materializedDefinitionNodes(
     if (value !== undefined) setPath(remapped[targetId] as unknown as Record<string, unknown>, placeholder.path, value);
   }
 
+  const rootIds = definition.rootNodeIds.map((id) => idMap.get(id)!).filter(Boolean);
+
+  for (const [insertionIndex, insertion] of (props.insertions ?? []).entries()) {
+    const targetId = idMap.get(insertion.targetId);
+    const target = targetId ? remapped[targetId] : undefined;
+    if (!targetId || !target) continue;
+
+    const sourceTarget = definition.nodes[insertion.targetId];
+    const sourceParent = sourceTarget?.parentId
+      ? definition.nodes[sourceTarget.parentId]
+      : undefined;
+    const localBaseX = sourceParent?.transform?.x ?? 0;
+    const localBaseY = sourceParent?.transform?.y ?? 0;
+    const layers = Array.isArray(insertion.layers)
+      ? insertion.layers
+      : [insertion.layers];
+    const materializedInsertion = insertionLayerNodes(layers, {
+      prefix: instance.id + '__insertion_' + insertionIndex,
+      parentId: target.parentId ?? null,
+      instanceX,
+      instanceY,
+      scaleX,
+      scaleY,
+      localBaseX,
+      localBaseY,
+      viewportWidth: definition.width,
+      viewportHeight: definition.height,
+    });
+    Object.assign(remapped, materializedInsertion.nodes);
+
+    const siblings = target.parentId
+      ? remapped[target.parentId]?.childIds
+      : rootIds;
+    if (!siblings) continue;
+    const targetIndex = siblings.indexOf(targetId);
+    const insertionAt =
+      targetIndex < 0
+        ? siblings.length
+        : targetIndex + (insertion.position === 'after' ? 1 : 0);
+    siblings.splice(insertionAt, 0, ...materializedInsertion.rootIds);
+  }
+
   return {
     nodes: remapped,
-    rootIds: definition.rootNodeIds.map((id) => idMap.get(id)!).filter(Boolean),
+    rootIds,
   };
 }
 
@@ -705,6 +1017,50 @@ export function materializePhase9Project(project: VisualProject): VisualProject 
   next.editor = {
     ...next.editor,
     selectedNodeIds: (next.editor?.selectedNodeIds ?? []).filter((id) => Boolean(next.document.nodes[id])),
+  };
+  return next;
+}
+
+export function flattenPhase9PreviewContainers(project: VisualProject): VisualProject {
+  const next = clone(project);
+
+  const flatten = (ids: string[], parentId: string | null): string[] => {
+    const out: string[] = [];
+    for (const id of ids) {
+      const node = next.document.nodes[id];
+      if (!node) continue;
+
+      if (node.kind === 'scene' || node.kind === 'surface') {
+        const promoted = flatten(node.childIds ?? [], parentId);
+        for (const childId of promoted) {
+          if (next.document.nodes[childId]) {
+            next.document.nodes[childId].parentId = parentId;
+          }
+        }
+        delete next.document.nodes[id];
+        out.push(...promoted);
+        continue;
+      }
+
+      if (node.childIds?.length) {
+        node.childIds = flatten(node.childIds, node.id);
+        for (const childId of node.childIds) {
+          if (next.document.nodes[childId]) {
+            next.document.nodes[childId].parentId = node.id;
+          }
+        }
+      }
+      out.push(id);
+    }
+    return out;
+  };
+
+  next.document.rootNodeIds = flatten(next.document.rootNodeIds, null);
+  next.editor = {
+    ...next.editor,
+    selectedNodeIds: (next.editor?.selectedNodeIds ?? []).filter((id) =>
+      Boolean(next.document.nodes[id]),
+    ),
   };
   return next;
 }
