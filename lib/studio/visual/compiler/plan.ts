@@ -6,8 +6,12 @@ import type {
   VisualProject,
   VisualTextNodeProps,
   VisualValue,
+  VisualImageUtilityAnalysis,
+  VisualImageUtilityInput,
+  VisualImageUtilityOperation,
 } from '../model';
 import { isGeneratedImageSource, visualImageProps } from '../image-contract';
+import { isCurrentUtilityInput } from '../image-utility-contract';
 import { visualTextProps } from '../text-contract';
 import {
   visualChartProps,
@@ -74,6 +78,26 @@ export type StudioCreateImageOperation = {
   base: StudioTargetReference;
   properties: StudioImageProperties;
   options?: VisualCreateImageOptions;
+};
+
+export type StudioImageUtilityOperation = {
+  id: string;
+  kind: 'image-utility';
+  sourceNodeId: string;
+  target: string;
+  preferredName?: string;
+  method: VisualImageUtilityOperation['type'];
+  args: unknown[];
+};
+
+export type StudioImageAnalysisOperation = {
+  id: string;
+  kind: 'image-analysis';
+  sourceNodeId: string;
+  target: string;
+  preferredName?: string;
+  method: VisualImageUtilityAnalysis['type'];
+  args: unknown[];
 };
 
 export type StudioTextProperties = VisualTextNodeProps & {
@@ -273,6 +297,8 @@ export type StudioInspectionOperation = {
 export type StudioOperation =
   | StudioCreateCanvasOperation
   | StudioCreateImageOperation
+  | StudioImageUtilityOperation
+  | StudioImageAnalysisOperation
   | StudioCreateTextOperation
   | StudioCreateChartOperation
   | StudioCreateComparisonChartOperation
@@ -326,7 +352,7 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
     }
 
     throw new Error(
-      `STUDIO-VISUAL-9 cannot lower node kind "${node.kind}" yet. It belongs to a later authoring phase.`,
+      `STUDIO-VISUAL-10 cannot lower node kind "${node.kind}" yet. It belongs to a later authoring phase.`,
     );
   };
 
@@ -368,13 +394,130 @@ function resolveImageSource(
   };
 }
 
+
+function resolveImageUtilityInput(
+  project: VisualProject,
+  input: VisualImageUtilityInput,
+  current: string | StudioTargetReference,
+  produced: Map<string, { target: string; member: 'buffer' | null }>,
+): string | StudioTargetReference {
+  if (isCurrentUtilityInput(input)) return current;
+  if (typeof input === 'string') return input;
+  if ('$ref' in input) {
+    const match = String(input.$ref).match(/^asset:(.+)$/);
+    const asset = match ? project.assets.find((item) => item.id === match[1]) : undefined;
+    const uri = asset?.value?.uri;
+    if (typeof uri !== 'string' || !uri.trim()) {
+      throw new Error('Image utility asset reference must resolve to a string uri.');
+    }
+    return uri;
+  }
+  const generated = produced.get(input.$generated);
+  if (!generated) {
+    throw new Error(
+      'Image utility generated source "' + input.$generated + '" must reference an earlier generated node.',
+    );
+  }
+  return {
+    $studioTarget: generated.target,
+    ...(generated.member ? { member: generated.member } : {}),
+  };
+}
+
+function imageUtilityArgs(
+  project: VisualProject,
+  operation: VisualImageUtilityOperation,
+  current: string | StudioTargetReference,
+  produced: Map<string, { target: string; member: 'buffer' | null }>,
+): unknown[] {
+  const resolve = (input: VisualImageUtilityInput) =>
+    resolveImageUtilityInput(project, input, current, produced);
+
+  switch (operation.type) {
+    case 'resize':
+      return [{
+        imagePath: current,
+        ...(operation.size ? { size: operation.size } : {}),
+        ...(operation.maintainAspectRatio !== undefined ? { maintainAspectRatio: operation.maintainAspectRatio } : {}),
+        ...(operation.quality !== undefined ? { quality: operation.quality } : {}),
+        ...(operation.outputFormat ? { outputFormat: operation.outputFormat } : {}),
+      }];
+    case 'cropImage':
+      return [{
+        imageSource: current,
+        coordinates: operation.coordinates,
+        crop: operation.crop,
+        ...(operation.radius !== undefined ? { radius: operation.radius } : {}),
+      }];
+    case 'effects':
+      return [current, operation.filters];
+    case 'colorsFilter':
+      return [current, operation.filterColor, operation.opacity ?? 1];
+    case 'colorsRemover':
+      return [current, operation.colorToRemove];
+    case 'blend':
+      return [
+        operation.layers.map((layer) => ({
+          image: resolve(layer.source),
+          blendMode: layer.blendMode,
+          ...(layer.position ? { position: layer.position } : {}),
+          ...(layer.opacity !== undefined ? { opacity: layer.opacity } : {}),
+        })),
+        current,
+        operation.defaultBlendMode ?? 'source-over',
+      ];
+    case 'masking':
+      return [current, resolve(operation.maskSource), operation.options ?? {}];
+    case 'gradientBlend':
+      return [
+        current,
+        {
+          ...operation.options,
+          ...(operation.options.maskSource
+            ? { maskSource: resolve(operation.options.maskSource) }
+            : {}),
+        },
+      ];
+    case 'stitchImages':
+      return [operation.images.map(resolve), operation.options ?? {}];
+    case 'createCollage':
+      return [
+        operation.images.map((item) => ({
+          source: resolve(item.source),
+          ...(item.width !== undefined ? { width: item.width } : {}),
+          ...(item.height !== undefined ? { height: item.height } : {}),
+        })),
+        operation.layout,
+      ];
+    case 'imgConverter':
+      return [current, operation.newExtension];
+    case 'compress':
+      return [current, operation.options ?? {}];
+  }
+}
+
+function imageAnalysisArgs(
+  analysis: VisualImageUtilityAnalysis,
+  current: string | StudioTargetReference,
+): unknown[] {
+  return analysis.type === 'extractPalette'
+    ? [current, analysis.options ?? {}]
+    : [current];
+}
+
 function imageOperationProperties(
   project: VisualProject,
   node: VisualNode,
   produced: Map<string, { target: string; member: 'buffer' | null }>,
 ): StudioImageProperties {
   const props = visualImageProps(node);
-  const { source: _source, createOptions: _options, ...rest } = props;
+  const {
+    source: _source,
+    createOptions: _options,
+    utilityStack: _utilityStack,
+    utilityAnalyses: _utilityAnalyses,
+    ...rest
+  } = props;
   const transform = node.transform ?? {};
   const width =
     transform.width === undefined
@@ -779,6 +922,37 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
       }
     } else {
       const props = visualImageProps(resolvedNode);
+      const imageProperties = imageOperationProperties(resolved, resolvedNode, produced);
+      let utilitySource = imageProperties.source;
+
+      for (const [utilityIndex, utility] of (props.utilityStack ?? []).entries()) {
+        if (utility.enabled === false) continue;
+        const utilityTarget = node.id + '__utility_' + utilityIndex;
+        operations.push({
+          id: 'image_utility_' + node.id + '_' + utility.id,
+          kind: 'image-utility',
+          sourceNodeId: node.id,
+          target: utilityTarget,
+          preferredName: (node.name || 'image') + '_' + utility.type,
+          method: utility.type,
+          args: imageUtilityArgs(resolved, utility, utilitySource, produced),
+        });
+        utilitySource = { $studioTarget: utilityTarget };
+      }
+
+      for (const analysis of props.utilityAnalyses ?? []) {
+        if (analysis.enabled === false) continue;
+        operations.push({
+          id: 'image_analysis_' + node.id + '_' + analysis.id,
+          kind: 'image-analysis',
+          sourceNodeId: node.id,
+          target: node.id + '__analysis_' + analysis.id,
+          preferredName: (node.name || 'image') + '_' + analysis.type,
+          method: analysis.type,
+          args: imageAnalysisArgs(analysis, utilitySource),
+        });
+      }
+
       operations.push({
         id: 'image_' + node.id,
         kind: 'create-image',
@@ -786,7 +960,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         target,
         preferredName: node.name || (node.kind === 'shape' ? 'shape' : 'image'),
         base,
-        properties: imageOperationProperties(resolved, resolvedNode, produced),
+        properties: { ...imageProperties, source: utilitySource },
         ...(props.createOptions ? { options: props.createOptions } : {}),
       });
     }
