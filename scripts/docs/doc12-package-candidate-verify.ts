@@ -30,6 +30,34 @@ const minimalInstallEnv = (): NodeJS.ProcessEnv => {
   return env;
 };
 
+
+function semanticDiff(expected: any, actual: any, prefix = 'surface', out: string[] = []): string[] {
+  if (out.length >= 40) return out;
+  if (Object.is(expected, actual)) return out;
+  if (Array.isArray(expected) || Array.isArray(actual)) {
+    if (!Array.isArray(expected) || !Array.isArray(actual)) {
+      out.push(`${prefix}: kind differs`);
+      return out;
+    }
+    if (expected.length !== actual.length) out.push(`${prefix}.length: ${expected.length} -> ${actual.length}`);
+    const limit = Math.min(expected.length, actual.length);
+    for (let i = 0; i < limit && out.length < 40; i += 1) semanticDiff(expected[i], actual[i], `${prefix}[${i}]`, out);
+    return out;
+  }
+  if (expected && actual && typeof expected === 'object' && typeof actual === 'object') {
+    const keys = [...new Set([...Object.keys(expected), ...Object.keys(actual)])].sort();
+    for (const key of keys) {
+      if (out.length >= 40) break;
+      if (!(key in expected)) out.push(`${prefix}.${key}: added ${JSON.stringify(actual[key])}`);
+      else if (!(key in actual)) out.push(`${prefix}.${key}: removed ${JSON.stringify(expected[key])}`);
+      else semanticDiff(expected[key], actual[key], `${prefix}.${key}`, out);
+    }
+    return out;
+  }
+  out.push(`${prefix}: ${JSON.stringify(expected)} -> ${JSON.stringify(actual)}`);
+  return out;
+}
+
 function publicTypeEntrypoints(pkg: any): string[] {
   const entries = new Set<string>();
   if (typeof pkg.types === 'string') entries.add(pkg.types);
@@ -319,7 +347,10 @@ try {
   // may change without invalidating the documented API. Compare the semantic public
   // graph exposed from package declaration entrypoints instead.
   const declarationsMatch = candidateSemanticSurface.sha256 === pinnedSemanticSurface.sha256;
-  if (!exportsMatch || !declarationsMatch) throw new Error(`current package public surface differs from documented artifact: exportsMatch=${exportsMatch} declarationsMatch=${declarationsMatch} rawDeclarationFilesMatch=${rawDeclarationFilesMatch} candidateReachableDeclarations=${candidateDecl.files.length} documentedReachableDeclarations=${pinnedDecl.files.length} candidateSemanticSha=${candidateSemanticSurface.sha256} documentedSemanticSha=${pinnedSemanticSurface.sha256}`);
+  if (!exportsMatch || !declarationsMatch) {
+    const differences = semanticDiff(pinnedSemanticSurface.surface, candidateSemanticSurface.surface);
+    throw new Error(`current package public surface differs from documented artifact: exportsMatch=${exportsMatch} declarationsMatch=${declarationsMatch} rawDeclarationFilesMatch=${rawDeclarationFilesMatch} candidateReachableDeclarations=${candidateDecl.files.length} documentedReachableDeclarations=${pinnedDecl.files.length} candidateSemanticSha=${candidateSemanticSurface.sha256} documentedSemanticSha=${pinnedSemanticSurface.sha256}\nsemantic differences:\n- ${differences.join('\n- ')}`);
+  }
 
   const results: any[] = [];
   for (const example of exampleDefinitions) {
