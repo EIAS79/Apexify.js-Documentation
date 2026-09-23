@@ -145,6 +145,7 @@ function __studioExtensionForMime(mime: string | undefined): string {
   if (normalized === 'image/heif') return '.heif';
   if (normalized === 'image/jp2') return '.jp2';
   if (normalized === 'image/jxl') return '.jxl';
+  if (normalized === 'application/x-raw') return '.raw';
   if (normalized === 'audio/wav') return '.wav';
   if (normalized === 'audio/mpeg') return '.mp3';
   if (normalized === 'audio/ogg') return '.ogg';
