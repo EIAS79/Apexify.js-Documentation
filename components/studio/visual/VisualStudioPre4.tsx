@@ -783,12 +783,31 @@ export default function VisualStudioPre4({
           error: 'Phase 10 full-runtime execution completed without an image artifact.',
         };
       }
+      let analysisResults: Record<string, unknown> = {};
+      const metadata =
+        'metadata' in artifact &&
+        artifact.metadata &&
+        typeof artifact.metadata === 'object' &&
+        !Array.isArray(artifact.metadata)
+          ? artifact.metadata
+          : undefined;
+      const rawResults = metadata?.studioResultsJson;
+      if (typeof rawResults === 'string') {
+        try {
+          const parsed = JSON.parse(rawResults) as unknown;
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            analysisResults = parsed as Record<string, unknown>;
+          }
+        } catch {
+          // Invalid structured-result metadata must never block the image artifact.
+        }
+      }
       return {
         ok: true as const,
         dataUrl: 'data:' + artifact.mime + ';base64,' + artifact.base64,
         mime: artifact.mime,
         warnings: [] as string[],
-        results: {} as Record<string, unknown>,
+        results: analysisResults,
       };
     }
 
@@ -2307,7 +2326,7 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = phase9Active && !phase10Active
+    const source = phase10Active || phase9Active
       ? previewGenerated.value?.source
       : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
@@ -2328,6 +2347,7 @@ export default function VisualStudioPre4({
       }
       setModalPreviewUrl(result.dataUrl);
       setModalPreviewMime(result.mime);
+      setPhase7Results(result.results);
       setMessage('Preview rendered');
     } catch (error) {
       setModalPreviewUrl(null);
@@ -3769,7 +3789,7 @@ export default function VisualStudioPre4({
       <div className="apx-pre4-inspector-title">
         <div>
           <strong>{primaryMedia.name ?? primaryMedia.kind}</strong>
-          <small>{primaryMedia.kind === 'shape' ? 'Apexify built-in shape' : 'Apexify image layer'} · Phase 5 + 10</small>
+          <small>{primaryMedia.kind === 'shape' ? 'Apexify built-in shape · Phase 5' : 'Apexify image layer · Phase 5 + 10'}</small>
         </div>
         <span className="apx-pre4-type-pill">{primaryMedia.kind}</span>
       </div>
@@ -4041,11 +4061,13 @@ export default function VisualStudioPre4({
           ) : null}
         </div>
 
-        <VisualImageUtilityAuthoring
-          value={props}
-          mode="effects"
-          onChange={(next, label) => mutateImage(label, () => next)}
-        />
+        {primaryMedia.kind === 'image' ? (
+          <VisualImageUtilityAuthoring
+            value={props}
+            mode="effects"
+            onChange={(next, label) => mutateImage(label, () => next)}
+          />
+        ) : null}
 
         <div className="apx-pre4-section" data-image-section="mask">
           <div className="apx-canvas-section-heading">
@@ -4162,11 +4184,13 @@ export default function VisualStudioPre4({
     return (
       <>
         {renderMediaHeader()}
-        <VisualImageUtilityAuthoring
-          value={visualImageProps(primaryMedia)}
-          mode="advanced"
-          onChange={(next, label) => mutateImage(label, () => next)}
-        />
+        {primaryMedia.kind === 'image' ? (
+          <VisualImageUtilityAuthoring
+            value={visualImageProps(primaryMedia)}
+            mode="advanced"
+            onChange={(next, label) => mutateImage(label, () => next)}
+          />
+        ) : null}
         <div className="apx-pre4-section" data-image-section="complete-config">
           <div className="apx-pre4-section-title">Complete ImageProperties / CreateImageOptions</div>
           <textarea
