@@ -103,7 +103,7 @@
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
       "verifiedPackageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
-      "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
+      "verifiedArtifactSha256": "06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670"
     },
     {
       "id": "node.chart.bar",
@@ -202,7 +202,7 @@
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
       "verifiedPackageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
-      "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
+      "verifiedArtifactSha256": "06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670"
     },
     {
       "id": "node.gif.basic",
@@ -321,7 +321,7 @@
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
       "verifiedPackageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
-      "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
+      "verifiedArtifactSha256": "06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670"
     },
     {
       "id": "node.integration.report",
@@ -445,7 +445,7 @@
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
       "verifiedPackageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
-      "verifiedArtifactSha256": "d4520e1f79b9061b187513929678f737440123b3b8988e6e23b97db12f9a3118"
+      "verifiedArtifactSha256": "06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670"
     }
   ]
 }
