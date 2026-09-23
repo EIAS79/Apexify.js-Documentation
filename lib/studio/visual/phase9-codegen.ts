@@ -40,7 +40,7 @@ function emitValue(value: unknown, indent = 0): string {
     const body = entries
       .map(([key, item]) =>
         ' '.repeat(indent + 2) +
-        JSON.stringify(key) +
+        (/^[A-Za-z_$][\\w$]*$/.test(key) ? key : JSON.stringify(key)) +
         ': ' +
         emitValue(item, indent + 2),
       )
