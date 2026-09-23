@@ -286,7 +286,7 @@ export function detectStudioMedia(bytes: Uint8Array, name = ''): StudioMediaIden
   if (ext === 'heif' || ext === 'heic') return { kind: 'image', mime: 'image/heif' };
   if (ext === 'jp2') return { kind: 'image', mime: 'image/jp2' };
   if (ext === 'jxl') return { kind: 'image', mime: 'image/jxl' };
-  if (ext === 'raw') return { kind: 'binary', mime: 'application/octet-stream' };
+  if (ext === 'raw') return { kind: 'binary', mime: 'application/x-raw' };
   if (ext === 'json') return { kind: 'json', mime: 'application/json' };
   if (ext === 'txt' || ext === 'log' || ext === 'md') return { kind: 'text', mime: 'text/plain' };
 
