@@ -6,6 +6,11 @@ import {
   generatePhase9PreviewSource,
   hasPhase9Authoring,
 } from '../phase9-codegen';
+import {
+  generatePhase10NativeSource,
+  generatePhase10PreviewSource,
+  hasPhase10Authoring,
+} from '../phase10-codegen';
 
 export interface GeneratedVisualCode {
   language: 'typescript';
@@ -19,9 +24,11 @@ function safeFileStem(value: string): string {
 }
 
 export function generateVisualProjectCode(project: VisualProject): GeneratedVisualCode {
-  const source = hasPhase9Authoring(project)
-    ? generatePhase9NativeSource(project)
-    : emitStudioOperationPlan(lowerVisualProject(project));
+  const source = hasPhase10Authoring(project)
+    ? generatePhase10NativeSource(project)
+    : hasPhase9Authoring(project)
+      ? generatePhase9NativeSource(project)
+      : emitStudioOperationPlan(lowerVisualProject(project));
   return {
     language: 'typescript',
     fileName: `${safeFileStem(project.name)}.ts`,
@@ -30,9 +37,11 @@ export function generateVisualProjectCode(project: VisualProject): GeneratedVisu
 }
 
 export function generateVisualProjectPreviewCode(project: VisualProject): GeneratedVisualCode {
-  const source = hasPhase9Authoring(project)
-    ? generatePhase9PreviewSource(project)
-    : emitStudioOperationPlan(lowerVisualProject(project));
+  const source = hasPhase10Authoring(project)
+    ? generatePhase10PreviewSource(project)
+    : hasPhase9Authoring(project)
+      ? generatePhase9PreviewSource(project)
+      : emitStudioOperationPlan(lowerVisualProject(project));
   return {
     language: 'typescript',
     fileName: `${safeFileStem(project.name)}.preview.ts`,
