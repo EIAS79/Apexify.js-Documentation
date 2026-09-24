@@ -1,30 +1,7 @@
 name: DOC-9 full content migration
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'content/docs/**'
-      - 'lib/docs/**'
-      - 'lib/product/catalog-data.ts'
-      - 'scripts/docs/**'
-      - 'generated/docs-doc9/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/doc9.yml'
-  push:
-    branches: [main]
-    paths:
-      - 'content/docs/**'
-      - 'lib/docs/**'
-      - 'lib/product/catalog-data.ts'
-      - 'scripts/docs/**'
-      - 'generated/docs-doc9/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/doc9.yml'
   workflow_dispatch:
-
 permissions:
   contents: read
 
