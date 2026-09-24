@@ -1,12 +1,7 @@
 name: POST-DOC-12 UX Recovery
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [post-doc12-ux-recovery, main]
   workflow_dispatch:
-
 concurrency:
   group: post-doc12-ux-${{ github.ref }}
   cancel-in-progress: true
