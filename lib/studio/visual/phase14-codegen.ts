@@ -62,7 +62,7 @@ function pluginLines(plugin: Phase14PluginConfig, index: number): string[] {
     lines.push(
       '  const ' + variable + ' = {',
       '    name: ' + JSON.stringify(plugin.name) + ',',
-      '    async install(host: ApexPainter) {',
+      '    async install(host) {',
       '      host.plugins.use(' + JSON.stringify(plugin.apiName) + ', ' + emit(plugin.api, 6).replace(/\n/g, '\n      ') + ');',
       '    },',
       '  };',
@@ -74,7 +74,7 @@ function pluginLines(plugin: Phase14PluginConfig, index: number): string[] {
       : '(' + moduleVariable + '.default ?? ' + moduleVariable + ')';
     lines.push(
       '  const ' + moduleVariable + ' = await import(' + JSON.stringify(plugin.module) + ');',
-      '  const ' + variable + ' = ' + exportExpression + ' as { name: string; install(host: ApexPainter): void | Promise<void> };',
+      '  const ' + variable + ' = ' + exportExpression + ';',
     );
   }
 
