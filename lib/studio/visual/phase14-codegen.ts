@@ -236,7 +236,7 @@ function generatedBody(
       '    codeOnlyPreviewSkips: ' + emit(
         skippedCodeOnlyPlugins.map((plugin) => ({
           id: plugin.id,
-          name: 'name' in plugin ? plugin.name : plugin.apiName,
+          name: plugin.name,
           reason: 'Code-only package plugin is emitted for export but not executed by hosted Studio Preview.',
         })),
         4,
