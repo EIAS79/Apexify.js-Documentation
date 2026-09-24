@@ -18,6 +18,8 @@ import {
   ArrowPathIcon,
   ArrowsPointingOutIcon,
   ChartBarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   CircleStackIcon,
   CodeBracketIcon,
   ComputerDesktopIcon,
@@ -6489,7 +6491,32 @@ export default function VisualStudioPre4({
           </div>
         </nav>
 
-        <aside className="apx-pre4-layers" data-context-mode={mediaContextActive ? activeTool : 'layers'}>
+        <button
+          type="button"
+          className="apx-pre4-layers-dock-toggle"
+          data-phase17-layers-toggle
+          data-phase17-collapse-layers={!layersCollapsed ? '' : undefined}
+          data-phase17-show-layers={layersCollapsed ? '' : undefined}
+          data-state={layersCollapsed ? 'collapsed' : 'expanded'}
+          onClick={() => setLayersCollapsed((value) => !value)}
+          aria-controls="apx-pre4-layers-panel"
+          aria-expanded={!layersCollapsed}
+          aria-label={layersCollapsed ? 'Open Layers panel' : 'Collapse Layers panel'}
+          title={layersCollapsed ? 'Open Layers panel' : 'Collapse Layers panel'}
+        >
+          <span className="apx-pre4-layers-dock-grip" aria-hidden="true" />
+          {layersCollapsed ? (
+            <ChevronRightIcon aria-hidden="true" />
+          ) : (
+            <ChevronLeftIcon aria-hidden="true" />
+          )}
+        </button>
+
+        <aside
+          id="apx-pre4-layers-panel"
+          className="apx-pre4-layers"
+          data-context-mode={mediaContextActive ? activeTool : 'layers'}
+        >
           <div
             className="apx-phase17-resizer apx-phase17-resizer--layers"
             role="separator"
@@ -6552,13 +6579,6 @@ export default function VisualStudioPre4({
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
             </div>
-            <button
-              type="button"
-              data-phase17-collapse-layers
-              onClick={() => setLayersCollapsed(true)}
-              title="Collapse Layers panel"
-              aria-label="Collapse Layers panel"
-            >‹</button>
             {!mediaContextActive ? (
               <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
             ) : activeTool === 'images' ? (
@@ -6606,14 +6626,6 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-stagebar">
             <div className="apx-phase17-stage-left">
               <div className="apx-phase17-panel-reveals">
-              {layersCollapsed ? (
-                <button
-                  type="button"
-                  data-phase17-show-layers
-                  onClick={() => setLayersCollapsed(false)}
-                  aria-label="Show Layers panel"
-                >Layers ›</button>
-              ) : null}
               {inspectorCollapsed ? (
                 <button
                   type="button"
