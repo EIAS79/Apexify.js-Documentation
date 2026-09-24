@@ -3528,7 +3528,7 @@ chore(studio-visual): close full feature completeness gate
 
 ### Phase 16 implementation record — STUDIO-VISUAL-16
 
-> **Status:** MAIN MERGED — PRODUCTION RELEASE GATE RUNNING
+> **Status:** COMPLETE — RELEASE GUARD VERIFIED
 >
 > **Work branch:** `studio-visual/v16-feature-completeness`
 >
@@ -3570,9 +3570,17 @@ Source/integration review completed:
 
 Phase-16 verification no longer depends on a GitHub Actions phase gate. The focused completeness/reconciliation release guard is executed by the normal production build, while the broader repository verification commands remain directly runnable from package scripts.
 
-The current Vercel status for the Phase-16 head is an external build-rate-limit failure (`upgradeToPro=build-rate-limit`), not an implementation/compiler/test result. Per the Studio program, Vercel is not used as the iterative Phase-16 verifier.
+Final Phase-16 closure proof was executed as part of the exact Phase-17 candidate production build on verification run `35969583897`. The release guard passed with:
 
-**Closure rule:** mark Phase 16 complete only after a production deployment containing the release guard reaches READY; that build executes the focused Phase-16 completeness and reconciliation gate before Next.js.
+- 187 capabilities;
+- 17,233 option paths;
+- 42 authorable option families;
+- 11 representative proof projects;
+- canonical generated-code reconciliation green across the representative proof set.
+
+The reconciliation defects exposed by the first Vercel release-guard attempt were fixed rather than bypassed: omitted default transform provenance is preserved for image/text/chart/path round trips, and canonical Phase-10 display-preview source is accepted by reconciliation.
+
+**Phase 16 is complete.**
 
 ---
 
@@ -3609,6 +3617,57 @@ Autosave, linked-code state, project state, panel state and asset state must rec
 ```text
 perf(studio-visual): complete editor hardening
 ```
+
+### Phase 17 implementation record — STUDIO-VISUAL-17
+
+> **Status:** COMPLETE — PR #117
+>
+> **Work branch:** `studio-visual/v17-hardening`
+>
+> **Base main commit:** `57d97b9a46c7d24fa240fa15ec7353937711b303`
+>
+> **Final verified product head:** `0ec71cabc7c24ea4a9b1d54fa871978e450048f5`
+>
+> **Final verification run:** `35969583897`
+
+Completed Phase-17 scope:
+
+- semantic-signature render/codegen invalidation so editor-only state does not regenerate canonical source;
+- bounded large-layer rendering with a 2,500-layer interactive ceiling and large-tree containment;
+- bounded asset data-URL LRU caching;
+- large-document CodeMirror mode;
+- bounded linked-code reconciliation and latest-transaction-wins debounce behavior;
+- versioned `apexify-visual-autosave-v2` recovery envelope;
+- coherent recovery of project, linked code, zoom/pan, tool/tab state, panel geometry and asset manifest;
+- safe quarantine of stale linked code and legacy code-only recovery payloads;
+- corrupt-autosave backup/isolation;
+- explicit conflict recovery actions;
+- pointer + keyboard Layers/Inspector/Dock resizing;
+- collapsible Layers/Inspector and persistent Timeline/Dock geometry;
+- modal Tab trapping, Escape closing and synchronous trigger-focus restoration;
+- dedicated Visual Studio crash boundary with retry and recovery-reset actions;
+- accessibility labels for collapsed feature-rail and Canvas controls;
+- responsive browser matrix at 1440×900, 1100×800, 820×1180 and 390×844;
+- 1,000-layer profiling harness and soft performance budget;
+- Phase-17 unit/source-contract tests integrated into `studio:visual:test`;
+- Phase-17 unit/profile verification integrated into the normal production build after the Phase-16 release guard.
+
+Final verification evidence:
+
+- production `npm run build`: PASS;
+- Phase-16 release guard inside that build: PASS;
+- full Visual regression suite: **171 / 171 PASS**;
+- 1,000-layer profile: normalization **17.97 ms**, semantic signature **9.53 ms**, codegen **94.07 ms**, generated source **520,827 bytes**, soft budget **5,000 ms**;
+- desktop accessibility: **0 critical** violations;
+- laptop accessibility: **0 critical** violations;
+- tablet accessibility: **0 critical** violations;
+- mobile accessibility: **0 critical** violations;
+- responsive browser matrix: PASS;
+- stale-code crash recovery, corrupt-autosave isolation, panel keyboard resizing, Timeline expansion and modal focus behavior: PASS.
+
+A temporary branch-only verification workflow was used only to execute the final candidate because Vercel preview frequency was constrained. It is removed before main integration and is not retained as repository CI infrastructure.
+
+**Phase 17 is complete. STUDIO-VISUAL-18 is next.**
 
 ---
 
@@ -3714,8 +3773,8 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 13 | Video | COMPLETE — PR #107 | `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1` | Studio Visual Phase Gate 35937825619 SUCCESS; Runtime Build Gate 35937825649 SUCCESS on Node 22/24/26; 136/136 tests; Linux generated MP4 proof PASS |
 | 14 | Advanced operations | COMPLETE — PR #109 | `008fbf63cb351524f76e3f31d1c9cb94f857c380` | Runtime PR #39 merged as `50f2543482abbd7a9624192a060ec01330370bef`; 13 implemented / 3 excluded / 6 non-authoring capability rows; Actions manual-only by project instruction |
 | 15 | Export / project round trip | COMPLETE — PR #112 | `86ebd0cdc75a33b86afc227bc54d118cf3caadb8` | Direct integration by project instruction; dedicated Phase-15 round-trip/export regression suite added to `studio:visual:test`; obsolete phase-specific Actions removed from the repository during Phase-16 cleanup |
-| 16 | Feature completeness gate | PRODUCTION RELEASE GATE RUNNING | `8ad8d76158ac3e73b48db61b750078afdbfd3757` | PR #113 merged; release guard `7061e6ba` is part of production build; awaiting exact-head Vercel READY proof |
-| 17 | Hardening | NOT STARTED | — | — |
+| 16 | Feature completeness gate | COMPLETE | `8ad8d76158ac3e73b48db61b750078afdbfd3757` | Release guard verified in final Phase-17 candidate run `35969583897`: 187 capabilities, 17,233 option paths, 42 authorable option families, 11 proof projects; canonical reconciliation green |
+| 17 | Hardening | COMPLETE — PR #117 | `0ec71cabc7c24ea4a9b1d54fa871978e450048f5` | Final verification run `35969583897`: production build PASS; 171/171 Visual regressions; 1,000-layer codegen 94.07 ms; desktop/laptop/tablet/mobile browser matrix PASS; 0 critical accessibility violations |
 | 18 | Final release | NOT STARTED | — | — |
 
 ## Phase 1 implementation record — STUDIO-VISUAL-1

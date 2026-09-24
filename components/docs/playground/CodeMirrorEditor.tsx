@@ -73,6 +73,7 @@ export default function CodeMirrorEditor({
 }: CodeMirrorEditorProps) {
   const viewRef = useRef<EditorView | null>(null);
   const lastInsertIdRef = useRef<number | null>(null);
+  const largeDocument = value.length >= 200_000;
 
   const extensions = useMemo(
     () => [
@@ -107,7 +108,7 @@ export default function CodeMirrorEditor({
     <CodeMirror
       value={value}
       height="100%"
-      className={layoutClass}
+      className={layoutClass + (largeDocument ? ' phase17-codemirror-large' : '')}
       theme="dark"
       extensions={extensions}
       onChange={onChange}
@@ -118,7 +119,17 @@ export default function CodeMirrorEditor({
       }}
       readOnly={readOnly}
       editable={!readOnly}
-      basicSetup={{ lineNumbers: true, foldGutter: true }}
+      basicSetup={
+        largeDocument
+          ? {
+              lineNumbers: true,
+              foldGutter: false,
+              highlightActiveLine: false,
+              highlightSelectionMatches: false,
+              autocompletion: false,
+            }
+          : { lineNumbers: true, foldGutter: true }
+      }
       aria-label={ariaLabel}
     />
   );

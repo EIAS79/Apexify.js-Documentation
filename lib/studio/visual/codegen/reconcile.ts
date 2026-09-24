@@ -13,7 +13,7 @@ import {
   visualImageProps,
 } from '../image-contract';
 import { createVisualId } from '../ids';
-import { textPropsRecord } from '../text-contract';
+import { textPropsRecord, visualTextProps } from '../text-contract';
 import {
   STANDALONE_CHART_FAMILIES,
   chartPropsRecord,
@@ -36,6 +36,7 @@ import {
   phase9ProjectFromSourceMarker,
 } from '../phase9-codegen';
 import {
+  generatePhase10DisplayPreviewSource,
   generatePhase10NativeSource,
   phase10ProjectFromSourceMarker,
 } from '../phase10-codegen';
@@ -697,16 +698,57 @@ function reconcileTextCall(
   const placementRecord = isRecord(placement) ? placement : {};
   const fillRecord = isRecord(fill) ? fill : {};
 
+  const id =
+    matched?.kind === 'text'
+      ? matched.id
+      : createVisualId('text');
+  const oldNode = project.document.nodes[id];
+  const oldProps = oldNode?.kind === 'text' ? visualTextProps(oldNode) : undefined;
+  const owns = (value: object | undefined, key: string) =>
+    Boolean(value && Object.prototype.hasOwnProperty.call(value, key));
+
+  // Canonical text code folds transform dimensions/rotation/opacity into
+  // nested createText() options. During reverse sync, preserve where each
+  // value originally lived so a generated-code round trip is byte-stable.
+  const layoutForProps = { ...layoutRecord };
+  const placementForProps = { ...placementRecord };
+  const fillForProps = { ...fillRecord };
+
+  if (
+    oldNode?.transform?.width !== undefined &&
+    !owns(oldProps?.layout, 'maxWidth')
+  ) {
+    delete layoutForProps.maxWidth;
+  }
+  if (
+    oldNode?.transform?.height !== undefined &&
+    !owns(oldProps?.layout, 'maxHeight')
+  ) {
+    delete layoutForProps.maxHeight;
+  }
+  if (
+    oldNode?.transform?.rotation !== undefined &&
+    !owns(oldProps?.placement, 'rotation')
+  ) {
+    delete placementForProps.rotation;
+  }
+  if (
+    oldNode?.transform?.opacity !== undefined &&
+    !owns(oldProps?.fill, 'opacity')
+  ) {
+    delete fillForProps.opacity;
+  }
+
   const props: VisualTextNodeProps = {
     ...(rest as unknown as VisualTextNodeProps),
-    ...(Object.keys(layoutRecord).length
-      ? { layout: layoutRecord as unknown as VisualTextNodeProps['layout'] }
+    ...(Object.keys(layoutForProps).length
+      ? { layout: layoutForProps as unknown as VisualTextNodeProps['layout'] }
       : {}),
-    ...(Object.keys(placementRecord).length
-      ? { placement: placementRecord as unknown as VisualTextNodeProps['placement'] }
+    ...(Object.keys(placementForProps).length
+      ? { placement: placementForProps as unknown as VisualTextNodeProps['placement'] }
       : {}),
-    ...(Object.keys(fillRecord).length
-      ? { fill: fillRecord as unknown as VisualTextNodeProps['fill'] }
+    ...(Object.keys(fillForProps).length
+      ? { fill: fillForProps as unknown as VisualTextNodeProps['fill'] }
       : {}),
     ...(typeof maxWidth === 'number' ? { maxWidth } : {}),
     ...(typeof maxHeight === 'number' ? { maxHeight } : {}),
@@ -739,11 +781,6 @@ function reconcileTextCall(
         ? opacity
         : 1;
 
-  const id =
-    matched?.kind === 'text'
-      ? matched.id
-      : createVisualId('text');
-  const oldNode = project.document.nodes[id];
   const {
     rotation: _oldRotation,
     opacity: _oldOpacity,
@@ -1851,11 +1888,12 @@ export function reconcileVisualProjectFromCode(
         error: problem?.message ?? 'The Phase 10 source marker contains an invalid Visual Project.',
       };
     }
-    const phase10Conflict = markerBackedEditConflict(
-      10,
-      source,
-      generatePhase10NativeSource(phase10Project),
-    );
+    const phase10NativeSource = generatePhase10NativeSource(phase10Project);
+    const phase10DisplaySource = generatePhase10DisplayPreviewSource(phase10Project);
+    const phase10Conflict =
+      source === phase10DisplaySource
+        ? null
+        : markerBackedEditConflict(10, source, phase10NativeSource);
     if (phase10Conflict) return phase10Conflict;
 
     const semantic = (value: VisualProject) =>

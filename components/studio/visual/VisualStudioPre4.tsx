@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type DragEvent as ReactDragEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type TouchEvent as ReactTouchEvent,
   type WheelEvent as ReactWheelEvent,
@@ -75,7 +76,6 @@ import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
   isStudioFontAsset,
-  studioAssetDataUrl,
   studioAssetFontFamily,
   studioAssetIdFromReference,
   studioAssetReference,
@@ -125,6 +125,21 @@ import {
   phase15ExportedCode,
   type Phase15AssetExportStrategy,
 } from '@/lib/studio/visual/export-contract';
+import {
+  PHASE17_AUTOSAVE_STORAGE_KEY,
+  PHASE17_CODE_DEBOUNCE_MS,
+  PHASE17_PERFORMANCE_BUDGETS,
+  PHASE17_PROJECT_AUTOSAVE_MS,
+  Phase17AssetDataUrlCache,
+  Phase17LatestTransaction,
+  createPhase17AutosaveEnvelope,
+  phase17AssetManifestMatches,
+  phase17LargeDocumentMode,
+  phase17LayerTreeMode,
+  recoverPhase17Autosave,
+  visualProjectSemanticSignature,
+  type Phase17AssetManifestEntry,
+} from '@/lib/studio/visual/hardening';
 import type {
   VisualBackgroundLayer,
   VisualBlendMode,
@@ -271,8 +286,7 @@ function clampZoom(value: number) {
 }
 
 function semanticSignature(project: VisualProject) {
-  const { editor: _editor, updatedAt: _updatedAt, ...semantic } = project;
-  return JSON.stringify(semantic);
+  return visualProjectSemanticSignature(project);
 }
 
 function rectsIntersect(a: SelectionRect, b: SelectionRect) {
@@ -505,6 +519,7 @@ export default function VisualStudioPre4({
     setCodeHandoff,
     assets,
     setAssets,
+    assetStorageReady,
     error,
     previewWarnings,
     history: runHistory,
@@ -532,6 +547,11 @@ export default function VisualStudioPre4({
     'generated' | 'diagnostics' | 'assets' | 'history' | 'timeline'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
+  const [layersCollapsed, setLayersCollapsed] = useState(false);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
+  const [layersWidth, setLayersWidth] = useState(274);
+  const [inspectorWidth, setInspectorWidth] = useState(330);
+  const [dockHeight, setDockHeight] = useState(204);
   const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
   const [codeSource, setCodeSource] = useState('');
   const [codeFileName, setCodeFileName] = useState('landing-page.ts');
@@ -584,6 +604,21 @@ export default function VisualStudioPre4({
   const webRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
   const artboardRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
   const codeSaveTimerRef = useRef<number>(0);
+  const phase17AutosaveTimerRef = useRef<number>(0);
+  const phase17PersistSnapshotRef = useRef<() => void>(() => {});
+  const phase17HydratedRef = useRef(false);
+  const phase17CodeBaseSignatureRef = useRef('');
+  const phase17RecoveredAssetManifestRef = useRef<Phase17AssetManifestEntry[] | null>(null);
+  const phase17RecoverySignatureRef = useRef('');
+  const phase17AssetManifestCheckedRef = useRef(false);
+  const phase17CodeTransactionsRef = useRef(new Phase17LatestTransaction());
+  const phase17AssetCacheRef = useRef(new Phase17AssetDataUrlCache());
+  const panelResizeRef = useRef<{
+    kind: 'layers' | 'inspector' | 'dock';
+    start: number;
+    initial: number;
+  } | null>(null);
+  const globalKeyboardHandlerRef = useRef<(event: KeyboardEvent) => void>(() => {});
   const codeAppliedSignatureRef = useRef('');
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
@@ -627,7 +662,11 @@ export default function VisualStudioPre4({
     primaryText?.transform?.scaleY,
     assets,
   ]);
-  const layerIds = useMemo(() => flattenLayerIds(project), [project]);
+  const layerIds = useMemo(
+    () => flattenLayerIds(project),
+    [projectSemanticSignature],
+  );
+  const layerTreeMode = phase17LayerTreeMode(layerIds.length);
   const drawableIds = useMemo(
     () =>
       layerIds.filter((id) => {
@@ -643,7 +682,7 @@ export default function VisualStudioPre4({
             ),
         );
       }),
-    [layerIds, project],
+    [layerIds, projectSemanticSignature],
   );
 
   const assetKind = (mime: string) =>
@@ -669,7 +708,7 @@ export default function VisualStudioPre4({
           error instanceof Error ? error.message : 'Code generation unavailable',
       };
     }
-  }, [project]);
+  }, [projectSemanticSignature]);
 
   const previewGenerated = useMemo(() => {
     try {
@@ -681,7 +720,7 @@ export default function VisualStudioPre4({
           error instanceof Error ? error.message : 'Preview code generation unavailable',
       };
     }
-  }, [project]);
+  }, [projectSemanticSignature]);
 
   const displayPreviewGenerated = useMemo(() => {
     try {
@@ -693,28 +732,128 @@ export default function VisualStudioPre4({
           error instanceof Error ? error.message : 'Display preview code generation unavailable',
       };
     }
-  }, [project]);
+  }, [projectSemanticSignature]);
 
-  const phase9Active = useMemo(() => hasPhase9Authoring(project), [project]);
-  const phase10Active = useMemo(() => hasPhase10Authoring(project), [project]);
-  const phase11Active = useMemo(() => hasPhase11Authoring(project), [project]);
-  const phase12Active = useMemo(() => hasPhase12Authoring(project), [project]);
-  const phase13Active = useMemo(() => hasPhase13Authoring(project), [project]);
-  const phase14Active = useMemo(() => hasPhase14Authoring(project), [project]);
+  const phase9Active = useMemo(() => hasPhase9Authoring(project), [projectSemanticSignature]);
+  const phase10Active = useMemo(() => hasPhase10Authoring(project), [projectSemanticSignature]);
+  const phase11Active = useMemo(() => hasPhase11Authoring(project), [projectSemanticSignature]);
+  const phase12Active = useMemo(() => hasPhase12Authoring(project), [projectSemanticSignature]);
+  const phase13Active = useMemo(() => hasPhase13Authoring(project), [projectSemanticSignature]);
+  const phase14Active = useMemo(() => hasPhase14Authoring(project), [projectSemanticSignature]);
   const canonicalLinkedSource = generated.value?.source ?? codeSource;
   const exportedCodeSource = useMemo(
     () => phase15ExportedCode(project, canonicalLinkedSource, includeCodeProvenance),
-    [project, canonicalLinkedSource, includeCodeProvenance],
+    [projectSemanticSignature, canonicalLinkedSource, includeCodeProvenance],
   );
   const exportCodeQuality = useMemo(
     () => lintGeneratedTypeScript(exportedCodeSource),
     [exportedCodeSource],
   );
+  const largeCodeMode = phase17LargeDocumentMode(codeSource);
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
     projectRef.current = project;
   }, [project, projectSemanticSignature]);
+
+  useEffect(() => {
+    if (phase17HydratedRef.current) return;
+    phase17HydratedRef.current = true;
+
+    let raw: string | null = null;
+    try {
+      raw = window.localStorage.getItem(PHASE17_AUTOSAVE_STORAGE_KEY);
+    } catch {}
+
+    if (!raw) {
+      try {
+        const legacyRaw = window.localStorage.getItem(VISUAL_CODE_STORAGE_KEY);
+        if (legacyRaw) {
+          const legacy = JSON.parse(legacyRaw) as {
+            source?: unknown;
+            fileName?: unknown;
+          };
+          if (typeof legacy.source === 'string' && legacy.source.trim()) {
+            const currentSignature = semanticSignature(projectRef.current);
+            codeHydratedRef.current = true;
+            phase17RecoverySignatureRef.current = currentSignature;
+            phase17CodeBaseSignatureRef.current = 'legacy-code-without-project-snapshot';
+            setCodeSource(legacy.source);
+            if (typeof legacy.fileName === 'string' && legacy.fileName) {
+              setCodeFileName(legacy.fileName);
+            }
+            setDockTab('generated');
+            setDockCollapsed(false);
+            setCodeSyncState('error');
+            setCodeSyncError(
+              'Legacy linked code was recovered without a matching Visual Project snapshot. It was quarantined and will not overwrite Visual state; fork it to Code Studio or restore canonical Visual code.',
+            );
+            setMessage('Legacy linked code recovered safely · Visual overwrite blocked');
+            return;
+          }
+        }
+      } catch {}
+    }
+
+    const recovered = recoverPhase17Autosave(raw);
+    if (recovered.ok) {
+      const { envelope } = recovered;
+      const recoveredSignature = semanticSignature(envelope.project);
+      projectRef.current = envelope.project;
+      cleanSignature.current = recoveredSignature;
+      setProject(envelope.project);
+      setZoom(envelope.ui.zoom);
+      setPan(envelope.ui.pan);
+      setActiveTool(envelope.ui.activeTool);
+      setInspectorTab(envelope.ui.inspectorTab);
+      if (recovered.codeMayApply) {
+        setDockTab(envelope.ui.dockTab);
+        setDockCollapsed(envelope.ui.dockCollapsed);
+      } else {
+        // A quarantined linked-code conflict must be immediately visible.
+        // Do not restore a hidden/non-generated dock and silently bury it.
+        setDockTab('generated');
+        setDockCollapsed(false);
+      }
+      setLayersCollapsed(envelope.ui.layersCollapsed);
+      setInspectorCollapsed(envelope.ui.inspectorCollapsed);
+      setLayersWidth(envelope.ui.layersWidth);
+      setInspectorWidth(envelope.ui.inspectorWidth);
+      setDockHeight(envelope.ui.dockHeight);
+      setCollapsed(new Set(envelope.ui.collapsedLayerIds));
+      didInitialFit.current = true;
+      phase17RecoveredAssetManifestRef.current = envelope.assets;
+      phase17CodeBaseSignatureRef.current = envelope.code.baseProjectSignature;
+      codeHydratedRef.current = true;
+      phase17RecoverySignatureRef.current = recoveredSignature;
+      codeAppliedSignatureRef.current = recoveredSignature;
+      setCodeSource(envelope.code.source);
+      setCodeFileName(envelope.code.fileName || 'visual-project.ts');
+      setCodeSyncState(recovered.codeMayApply ? (envelope.code.syncState ?? 'synced') : 'error');
+      setCodeSyncError(
+        recovered.codeMayApply
+          ? envelope.code.syncError ?? null
+          : 'Recovered code was based on an older Visual Project. Restore canonical Visual code or fork the stale edit to Code Studio.',
+      );
+      setMessage(
+        recovered.warnings.length
+          ? 'Recovered Visual session · ' + recovered.warnings.join(' ')
+          : 'Recovered Visual session',
+      );
+      return;
+    }
+
+    if (raw) {
+      try {
+        window.localStorage.setItem(
+          PHASE17_AUTOSAVE_STORAGE_KEY + '-corrupt-' + Date.now(),
+          raw,
+        );
+        window.localStorage.removeItem(PHASE17_AUTOSAVE_STORAGE_KEY);
+      } catch {}
+      setMessage('Corrupt Visual autosave was isolated; a fresh project was opened.');
+    }
+  }, []);
 
   const persistLiveCode = (source: string, fileName: string) => {
     try {
@@ -725,8 +864,69 @@ export default function VisualStudioPre4({
     } catch {}
   };
 
-  const applyCodeToVisual = (source: string) => {
+  const persistPhase17Snapshot = () => {
+    if (!phase17HydratedRef.current || !codeHydratedRef.current) return;
     const current = projectRef.current;
+    const currentSignature = semanticSignature(current);
+    try {
+      const envelope = createPhase17AutosaveEnvelope({
+        project: current,
+        code: {
+          source: codeSource,
+          fileName: codeFileName,
+          savedAt: Date.now(),
+          baseProjectSignature:
+            phase17CodeBaseSignatureRef.current || currentSignature,
+          syncState: codeSyncState,
+          syncError: codeSyncError,
+        },
+        ui: {
+          zoom,
+          pan,
+          activeTool,
+          inspectorTab,
+          dockTab,
+          dockCollapsed,
+          layersCollapsed,
+          inspectorCollapsed,
+          layersWidth,
+          inspectorWidth,
+          dockHeight,
+          collapsedLayerIds: [...collapsed],
+        },
+        assets,
+      });
+      window.localStorage.setItem(
+        PHASE17_AUTOSAVE_STORAGE_KEY,
+        JSON.stringify(envelope),
+      );
+    } catch (error) {
+      setMessage(
+        'Autosave unavailable · ' +
+          (error instanceof Error ? error.message : 'storage failed'),
+      );
+    }
+  };
+
+  phase17PersistSnapshotRef.current = persistPhase17Snapshot;
+
+  const applyCodeToVisual = (
+    source: string,
+    expectedProjectSignature = phase17CodeBaseSignatureRef.current,
+  ) => {
+    const current = projectRef.current;
+    const currentSignature = semanticSignature(current);
+    if (
+      expectedProjectSignature &&
+      expectedProjectSignature !== currentSignature
+    ) {
+      setCodeSyncState('error');
+      setCodeSyncError(
+        'Linked code is stale because the Visual Project changed after this edit began. Restore canonical Visual code or fork the edit to Code Studio.',
+      );
+      return false;
+    }
+
     const result = reconcileVisualProjectFromCode(current, source);
     if (!result.ok) {
       setCodeSyncState('error');
@@ -736,10 +936,12 @@ export default function VisualStudioPre4({
 
     setCodeSyncError(null);
     setCodeSyncState('synced');
+    const resultSignature = semanticSignature(result.project);
+    phase17CodeBaseSignatureRef.current = resultSignature;
     if (!result.changed) return true;
 
     history.current.commit(current, result.project, 'Code → Visual');
-    codeAppliedSignatureRef.current = semanticSignature(result.project);
+    codeAppliedSignatureRef.current = resultSignature;
     projectRef.current = result.project;
     setProject(result.project);
     setHistoryTick((value) => value + 1);
@@ -749,69 +951,163 @@ export default function VisualStudioPre4({
 
   const saveLiveCode = (source = codeSource, fileName = codeFileName) => {
     window.clearTimeout(codeSaveTimerRef.current);
+    phase17CodeTransactionsRef.current.cancel();
     persistLiveCode(source, fileName);
     const ok = applyCodeToVisual(source);
     if (ok) setMessage('Code autosaved · canvas synced');
   };
 
   const updateLiveCode = (next: string) => {
+    const nextBytes = new TextEncoder().encode(next).byteLength;
+    if (nextBytes > PHASE17_PERFORMANCE_BUDGETS.maxLinkedCodeBytes) {
+      window.clearTimeout(codeSaveTimerRef.current);
+      phase17CodeTransactionsRef.current.cancel();
+      setCodeSource(next);
+      setCodeSyncState('error');
+      setCodeSyncError(
+        'Linked code exceeds the Phase-17 automatic reconciliation budget. Fork it to Code Studio or reduce the document before syncing.',
+      );
+      return;
+    }
+    if (codeSyncState === 'synced' || !phase17CodeBaseSignatureRef.current) {
+      phase17CodeBaseSignatureRef.current = semanticSignature(projectRef.current);
+    }
+    const expectedSignature = phase17CodeBaseSignatureRef.current;
+    const transaction = phase17CodeTransactionsRef.current.begin();
     setCodeSource(next);
     setCodeSyncState('saving');
     setCodeSyncError(null);
     window.clearTimeout(codeSaveTimerRef.current);
     codeSaveTimerRef.current = window.setTimeout(() => {
+      if (!phase17CodeTransactionsRef.current.isCurrent(transaction)) return;
       persistLiveCode(next, codeFileName);
-      applyCodeToVisual(next);
-    }, 320);
+      applyCodeToVisual(next, expectedSignature);
+    }, PHASE17_CODE_DEBOUNCE_MS);
   };
 
   useEffect(() => {
     if (codeHydratedRef.current || !generated.value) return;
     codeHydratedRef.current = true;
-
-    let source = generated.value.source;
-    let fileName = generated.value.fileName;
-    try {
-      const raw = window.localStorage.getItem(VISUAL_CODE_STORAGE_KEY);
-      if (raw) {
-        const stored = JSON.parse(raw) as { source?: string; fileName?: string };
-        if (stored.source) {
-          const reconciled = reconcileVisualProjectFromCode(projectRef.current, stored.source);
-          if (reconciled.ok) {
-            source = stored.source;
-            fileName = stored.fileName || fileName;
-            if (reconciled.changed) {
-              codeAppliedSignatureRef.current = semanticSignature(reconciled.project);
-              projectRef.current = reconciled.project;
-              setProject(reconciled.project);
-            }
-          }
-        }
-      }
-    } catch {}
-
-    setCodeSource(source);
-    setCodeFileName(fileName);
+    phase17CodeBaseSignatureRef.current = projectSemanticSignature;
+    setCodeSource(generated.value.source);
+    setCodeFileName(generated.value.fileName);
     setCodeSyncState('synced');
-  }, [generated.value]);
+    setCodeSyncError(null);
+    persistLiveCode(generated.value.source, generated.value.fileName);
+  }, [generated.value, projectSemanticSignature]);
 
   useEffect(() => {
     if (!codeHydratedRef.current || !generated.value) return;
     const signature = semanticSignature(project);
+    if (phase17RecoverySignatureRef.current) {
+      if (signature !== phase17RecoverySignatureRef.current) return;
+      phase17RecoverySignatureRef.current = '';
+      codeAppliedSignatureRef.current = '';
+      return;
+    }
     if (codeAppliedSignatureRef.current === signature) {
       codeAppliedSignatureRef.current = '';
       return;
     }
+
+    window.clearTimeout(codeSaveTimerRef.current);
+    phase17CodeTransactionsRef.current.cancel();
+    phase17CodeBaseSignatureRef.current = signature;
     setCodeSource(generated.value.source);
     if (!fileNameTouchedRef.current) setCodeFileName(generated.value.fileName);
     setCodeSyncState('synced');
     setCodeSyncError(null);
-    persistLiveCode(generated.value.source, fileNameTouchedRef.current ? codeFileName : generated.value.fileName);
+    persistLiveCode(
+      generated.value.source,
+      fileNameTouchedRef.current ? codeFileName : generated.value.fileName,
+    );
   }, [generated.value?.source, generated.value?.fileName, projectSemanticSignature]);
+
+  useEffect(() => {
+    if (!phase17HydratedRef.current || !codeHydratedRef.current) return;
+    window.clearTimeout(phase17AutosaveTimerRef.current);
+    phase17AutosaveTimerRef.current = window.setTimeout(
+      persistPhase17Snapshot,
+      PHASE17_PROJECT_AUTOSAVE_MS,
+    );
+    return () => window.clearTimeout(phase17AutosaveTimerRef.current);
+  }, [
+    projectSemanticSignature,
+    codeSource,
+    codeFileName,
+    codeSyncState,
+    codeSyncError,
+    zoom,
+    pan.x,
+    pan.y,
+    activeTool,
+    inspectorTab,
+    dockTab,
+    dockCollapsed,
+    layersCollapsed,
+    inspectorCollapsed,
+    layersWidth,
+    inspectorWidth,
+    dockHeight,
+    collapsed,
+    assets,
+  ]);
+
+  useEffect(() => {
+    const flush = () => phase17PersistSnapshotRef.current();
+    window.addEventListener('beforeunload', flush);
+    return () => window.removeEventListener('beforeunload', flush);
+  }, []);
+
+  useEffect(() => {
+    phase17AssetCacheRef.current.prune(assets);
+  }, [assets]);
+
+  useEffect(() => {
+    if (!assetStorageReady || phase17AssetManifestCheckedRef.current) return;
+    const expected = phase17RecoveredAssetManifestRef.current;
+    if (!expected) {
+      phase17AssetManifestCheckedRef.current = true;
+      return;
+    }
+    phase17AssetManifestCheckedRef.current = true;
+    if (!phase17AssetManifestMatches(expected, assets)) {
+      setMessage(
+        'Recovered project references assets that differ from persisted Studio assets. Missing bytes were not fabricated.',
+      );
+    }
+  }, [assetStorageReady, assets]);
+
+  useEffect(() => {
+    const onPointerMove = (event: PointerEvent) => {
+      const resize = panelResizeRef.current;
+      if (!resize) return;
+      if (resize.kind === 'layers') {
+        setLayersWidth(Math.max(190, Math.min(420, resize.initial + event.clientX - resize.start)));
+      } else if (resize.kind === 'inspector') {
+        setInspectorWidth(Math.max(240, Math.min(460, resize.initial - (event.clientX - resize.start))));
+      } else {
+        setDockHeight(Math.max(120, Math.min(480, resize.initial - (event.clientY - resize.start))));
+      }
+    };
+    const onPointerUp = () => {
+      panelResizeRef.current = null;
+      document.body.removeAttribute('data-phase17-resizing');
+    };
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
       window.clearTimeout(codeSaveTimerRef.current);
+      window.clearTimeout(phase17AutosaveTimerRef.current);
+      phase17CodeTransactionsRef.current.cancel();
+      phase17AssetCacheRef.current.clear();
       webRuntimeRef.current?.dispose();
       webRuntimeRef.current = null;
       artboardRuntimeRef.current?.dispose();
@@ -819,6 +1115,44 @@ export default function VisualStudioPre4({
       window.clearTimeout(artboardPreviewTimerRef.current);
     };
   }, []);
+
+  const beginPanelResize = (
+    kind: 'layers' | 'inspector' | 'dock',
+    event: ReactPointerEvent<HTMLElement>,
+  ) => {
+    event.preventDefault();
+    const initial =
+      kind === 'layers'
+        ? layersWidth
+        : kind === 'inspector'
+          ? inspectorWidth
+          : dockHeight;
+    panelResizeRef.current = {
+      kind,
+      start: kind === 'dock' ? event.clientY : event.clientX,
+      initial,
+    };
+    document.body.setAttribute('data-phase17-resizing', kind);
+  };
+
+  const resizePanelByKeyboard = (
+    kind: 'layers' | 'inspector' | 'dock',
+    event: ReactKeyboardEvent<HTMLElement>,
+  ) => {
+    const horizontal = kind !== 'dock';
+    const negativeKey = horizontal ? 'ArrowLeft' : 'ArrowDown';
+    const positiveKey = horizontal ? 'ArrowRight' : 'ArrowUp';
+    if (event.key !== negativeKey && event.key !== positiveKey) return;
+    event.preventDefault();
+    const delta = (event.shiftKey ? 32 : 12) * (event.key === positiveKey ? 1 : -1);
+    if (kind === 'layers') {
+      setLayersWidth((value) => Math.max(190, Math.min(420, value + delta)));
+    } else if (kind === 'inspector') {
+      setInspectorWidth((value) => Math.max(240, Math.min(460, value + delta)));
+    } else {
+      setDockHeight((value) => Math.max(120, Math.min(480, value + delta)));
+    }
+  };
 
   const renderAuthoritativeVisualSource = async (
     source: string,
@@ -1952,8 +2286,7 @@ export default function VisualStudioPre4({
     return true;
   };
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
+  globalKeyboardHandlerRef.current = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (target?.matches('input,textarea,[contenteditable=true]')) return;
 
@@ -2042,11 +2375,14 @@ export default function VisualStudioPre4({
           ),
         );
       }
-    };
 
+  };
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => globalKeyboardHandlerRef.current(event);
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  });
+  }, []);
 
   const beginPhase7CanvasAction = (event: ReactPointerEvent) => {
     if (!phase7Action) return false;
@@ -2478,6 +2814,8 @@ export default function VisualStudioPre4({
     }
     const source = generated.value.source;
     window.clearTimeout(codeSaveTimerRef.current);
+    phase17CodeTransactionsRef.current.cancel();
+    phase17CodeBaseSignatureRef.current = projectSemanticSignature;
     setCodeSource(source);
     if (!fileNameTouchedRef.current) setCodeFileName(generated.value.fileName);
     setCodeSyncState('synced');
@@ -2663,10 +3001,16 @@ export default function VisualStudioPre4({
     mutate('Rename', (current) => renameNode(current, id, value));
   };
 
-  const renderLayerRows = (ids: string[], depth = 0): ReactNode =>
+  const renderLayerRows = (
+    ids: string[],
+    depth = 0,
+    budget = { remaining: PHASE17_PERFORMANCE_BUDGETS.maxInteractiveLayers },
+  ): ReactNode =>
     ids.map((id, index) => {
+      if (budget.remaining <= 0) return null;
       const node = project.document.nodes[id];
       if (!node) return null;
+      budget.remaining -= 1;
       const isSelected = selected.includes(id);
       const hasChildren = (node.childIds?.length ?? 0) > 0;
       const isCollapsed = collapsed.has(id);
@@ -2821,7 +3165,7 @@ export default function VisualStudioPre4({
           </div>
           {hasChildren &&
             !isCollapsed &&
-            renderLayerRows(node.childIds ?? [], depth + 1)}
+            renderLayerRows(node.childIds ?? [], depth + 1, budget)}
         </div>
       );
     });
@@ -3308,7 +3652,7 @@ export default function VisualStudioPre4({
                 onClick={() => insertImageAsset(asset)}
                 data-image-asset-insert={asset.id}
               >
-                <img src={studioAssetDataUrl(asset)} alt="" />
+                <img src={phase17AssetCacheRef.current.get(asset)} alt="" />
                 <span>
                   <strong>{asset.name}</strong>
                   <small>
@@ -3351,7 +3695,7 @@ export default function VisualStudioPre4({
               key={asset.id}
               onClick={() => insertImageAsset(asset)}
             >
-              <img src={studioAssetDataUrl(asset)} alt="" />
+              <img src={phase17AssetCacheRef.current.get(asset)} alt="" />
               <span><strong>{asset.name}</strong><small>Insert image</small></span>
             </button>
           ))}
@@ -3528,6 +3872,7 @@ export default function VisualStudioPre4({
           <label>Canvas name</label>
           <input
             className="apx-pre4-input"
+            aria-label="Canvas name"
             value={project.name}
             onFocus={beginPropertyEdit}
             onChange={(event) => renameCanvas(event.target.value)}
@@ -3539,6 +3884,7 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-section-title">Base background</div>
           <select
             className="apx-pre4-input"
+            aria-label="Canvas base background"
             data-canvas-base-mode
             value={mode}
             onChange={(event) => setCanvasBaseMode(event.target.value as typeof mode)}
@@ -3783,6 +4129,7 @@ export default function VisualStudioPre4({
             <label className="apx-canvas-switch">
               <input
                 type="checkbox"
+                aria-label="Enable canvas stroke"
                 checked={Boolean(canvas.stroke)}
                 onChange={(event) => mutateCanvas('Canvas stroke', (current) => {
                   if (!event.target.checked) {
@@ -3819,6 +4166,7 @@ export default function VisualStudioPre4({
             <label className="apx-canvas-switch">
               <input
                 type="checkbox"
+                aria-label="Enable canvas shadow"
                 checked={Boolean(canvas.shadow)}
                 onChange={(event) => mutateCanvas('Canvas shadow', (current) => {
                   if (!event.target.checked) {
@@ -5783,7 +6131,10 @@ export default function VisualStudioPre4({
               </div>
             </div>
           ) : null}
-          <div className="apx-live-code-editor">
+          <div
+            className="apx-live-code-editor"
+            data-phase17-large-document={largeCodeMode ? 'true' : undefined}
+          >
             <InteractiveCodeEditor
               value={codeSource}
               language="ts"
@@ -5887,6 +6238,10 @@ export default function VisualStudioPre4({
       data-studio-visual-workspace
       data-active={active ? 'true' : 'false'}
       data-active-tool={activeTool}
+      data-phase17-layer-mode={layerTreeMode}
+      data-phase17-large-code={largeCodeMode ? 'true' : undefined}
+      data-phase17-layers-collapsed={layersCollapsed ? 'true' : undefined}
+      data-phase17-inspector-collapsed={inspectorCollapsed ? 'true' : undefined}
     >
       <header className="apx-pre4-topbar">
         <div className="apx-pre4-brand">
@@ -6032,13 +6387,22 @@ export default function VisualStudioPre4({
 
       </header>
 
-      <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '38px' : '204px' } as CSSProperties}>
+      <div
+        className="apx-pre4-layout"
+        style={{
+          '--pre4-dock-size': dockCollapsed ? '38px' : dockHeight + 'px',
+          '--pre4-layers-size': layersWidth + 'px',
+          '--pre4-inspector-size': inspectorWidth + 'px',
+        } as CSSProperties}
+      >
         <nav className="apx-pre4-feature-rail" aria-label="Visual Studio features">
           <div className="apx-pre4-feature-list">
             {featureTools.map(([id, Icon, label]) => (
               <button
                 key={id}
                 type="button"
+                aria-label={label}
+                title={label}
                 data-feature-tool={id}
                 data-active={activeTool === id ? 'true' : undefined}
                 onClick={() => {
@@ -6083,6 +6447,18 @@ export default function VisualStudioPre4({
         </nav>
 
         <aside className="apx-pre4-layers" data-context-mode={mediaContextActive ? activeTool : 'layers'}>
+          <div
+            className="apx-phase17-resizer apx-phase17-resizer--layers"
+            role="separator"
+            aria-label="Resize Layers panel"
+            aria-orientation="vertical"
+            aria-valuemin={190}
+            aria-valuemax={420}
+            aria-valuenow={layersWidth}
+            tabIndex={0}
+            onPointerDown={(event) => beginPanelResize('layers', event)}
+            onKeyDown={(event) => resizePanelByKeyboard('layers', event)}
+          />
           <div className="apx-pre4-panel-head">
             <div>
               <strong>
@@ -6133,6 +6509,13 @@ export default function VisualStudioPre4({
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
             </div>
+            <button
+              type="button"
+              data-phase17-collapse-layers
+              onClick={() => setLayersCollapsed(true)}
+              title="Collapse Layers panel"
+              aria-label="Collapse Layers panel"
+            >‹</button>
             {!mediaContextActive ? (
               <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
             ) : activeTool === 'images' ? (
@@ -6146,12 +6529,17 @@ export default function VisualStudioPre4({
             renderMediaContext()
           ) : (
             <>
-              <div className="apx-pre4-layer-tree">
+              <div className="apx-pre4-layer-tree" data-phase17-layer-tree={layerTreeMode}>
                 <div className="apx-pre4-root-row">
                   <span>▾</span>
                   <strong>{project.name || 'Landing Page'}</strong>
                 </div>
                 {renderLayerRows(project.document.rootNodeIds)}
+                {layerTreeMode === 'over-budget' ? (
+                  <div className="apx-phase17-budget-note" role="status">
+                    Showing the first {PHASE17_PERFORMANCE_BUDGETS.maxInteractiveLayers.toLocaleString()} layers to keep the editor responsive.
+                  </div>
+                ) : null}
                 {!project.document.rootNodeIds.length && (
                   <div className="apx-pre4-empty apx-pre4-empty-layers">
                     <strong>No layers yet</strong>
@@ -6173,11 +6561,31 @@ export default function VisualStudioPre4({
         </aside>
         <main className="apx-pre4-stage">
           <div className="apx-pre4-stagebar">
-            <button className="apx-pre4-device" type="button">
-              <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
-              Desktop ({project.document.width} × {project.document.height})
-              <span>⌄</span>
-            </button>
+            <div className="apx-phase17-stage-left">
+              <div className="apx-phase17-panel-reveals">
+              {layersCollapsed ? (
+                <button
+                  type="button"
+                  data-phase17-show-layers
+                  onClick={() => setLayersCollapsed(false)}
+                  aria-label="Show Layers panel"
+                >Layers ›</button>
+              ) : null}
+              {inspectorCollapsed ? (
+                <button
+                  type="button"
+                  data-phase17-show-inspector
+                  onClick={() => setInspectorCollapsed(false)}
+                  aria-label="Show Inspector panel"
+                >‹ Inspector</button>
+              ) : null}
+            </div>
+              <button className="apx-pre4-device" type="button">
+                <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
+                Desktop ({project.document.width} × {project.document.height})
+                <span>⌄</span>
+              </button>
+            </div>
 
             <div className="apx-pre4-zoom">
               <button type="button" onClick={() => setZoom((value) => clampZoom(value - 10))}>−</button>
@@ -6470,7 +6878,27 @@ export default function VisualStudioPre4({
         </main>
 
         <aside className="apx-pre4-inspector">
+          <div
+            className="apx-phase17-resizer apx-phase17-resizer--inspector"
+            role="separator"
+            aria-label="Resize Inspector panel"
+            aria-orientation="vertical"
+            aria-valuemin={240}
+            aria-valuemax={460}
+            aria-valuenow={inspectorWidth}
+            tabIndex={0}
+            onPointerDown={(event) => beginPanelResize('inspector', event)}
+            onKeyDown={(event) => resizePanelByKeyboard('inspector', event)}
+          />
           <div className="apx-pre4-inspector-tabs">
+            <button
+              className="apx-phase17-inspector-collapse"
+              type="button"
+              data-phase17-collapse-inspector
+              onClick={() => setInspectorCollapsed(true)}
+              aria-label="Collapse Inspector panel"
+              title="Collapse Inspector panel"
+            >›</button>
             {inspectorTabs.map(([id, label]) => (
               <button
                 key={id}
@@ -6489,6 +6917,20 @@ export default function VisualStudioPre4({
         </aside>
 
         <section className="apx-pre4-dock" data-collapsed={dockCollapsed ? 'true' : undefined}>
+          {!dockCollapsed ? (
+            <div
+              className="apx-phase17-resizer apx-phase17-resizer--dock"
+              role="separator"
+              aria-label="Resize bottom dock and Timeline"
+              aria-orientation="horizontal"
+              aria-valuemin={120}
+              aria-valuemax={480}
+              aria-valuenow={dockHeight}
+              tabIndex={0}
+              onPointerDown={(event) => beginPanelResize('dock', event)}
+              onKeyDown={(event) => resizePanelByKeyboard('dock', event)}
+            />
+          ) : null}
           <div className="apx-pre4-dock-main">
             <div className="apx-pre4-dock-tabs">
               <div>

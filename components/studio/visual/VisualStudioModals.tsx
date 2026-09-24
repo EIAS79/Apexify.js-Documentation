@@ -10,6 +10,78 @@ import {
 } from '@heroicons/react/24/outline';
 import { InteractiveCodeEditor } from '@/components/docs/playground/InteractiveCodeEditor';
 
+const MODAL_FOCUSABLE = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
+function useModalFocusTrap(open: boolean, onClose: () => void) {
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (!open) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    restoreFocusRef.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const focusables = () =>
+      Array.from(dialog.querySelectorAll<HTMLElement>(MODAL_FOCUSABLE))
+        .filter((node) => !node.hasAttribute('disabled') && node.offsetParent !== null);
+
+    const initial = focusables()[0] ?? dialog;
+    window.requestAnimationFrame(() => initial.focus());
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const nodes = focusables();
+      if (!nodes.length) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+      const first = nodes[0]!;
+      const last = nodes[nodes.length - 1]!;
+      const active = document.activeElement;
+      if (event.shiftKey && (active === first || !dialog.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = previousOverflow;
+      const restore = restoreFocusRef.current;
+      restoreFocusRef.current = null;
+      if (restore?.isConnected) {
+        restore.focus({ preventScroll: true });
+      }
+    };
+  }, [open]);
+
+  return dialogRef;
+}
+
 type PreviewModalProps = {
   open: boolean;
   onClose: () => void;
@@ -37,16 +109,13 @@ export function VisualPreviewModal({
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const drag = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null);
 
+  const dialogRef = useModalFocusTrap(open, onClose);
+
   useEffect(() => {
     if (!open) return;
     setZoom(1);
     setPan({ x: 0, y: 0 });
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -77,7 +146,7 @@ export function VisualPreviewModal({
     <div className="apx-vmodal-backdrop" role="presentation" onPointerDown={(event) => {
       if (event.target === event.currentTarget) onClose();
     }}>
-      <section className="apx-vmodal apx-vmodal--preview" role="dialog" aria-modal="true" aria-label="Canvas preview" data-visual-preview-modal>
+      <section ref={dialogRef} tabIndex={-1} className="apx-vmodal apx-vmodal--preview" role="dialog" aria-modal="true" aria-label="Canvas preview" data-visual-preview-modal>
         <header className="apx-vmodal-head">
           <div className="apx-vmodal-title">
             <strong>{previewMime.startsWith('audio/') ? 'Audio Preview' : previewMime.startsWith('video/') ? 'Video Preview' : 'Canvas Preview'}</strong>
@@ -178,14 +247,7 @@ export function VisualCodeModal({
   qualityMessage,
   qualityOk,
 }: CodeModalProps) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  const dialogRef = useModalFocusTrap(open, onClose);
 
   if (!open) return null;
 
@@ -193,7 +255,7 @@ export function VisualCodeModal({
     <div className="apx-vmodal-backdrop" role="presentation" onPointerDown={(event) => {
       if (event.target === event.currentTarget) onClose();
     }}>
-      <section className="apx-vmodal apx-vmodal--code" role="dialog" aria-modal="true" aria-label="Generated code preview" data-visual-code-modal>
+      <section ref={dialogRef} tabIndex={-1} className="apx-vmodal apx-vmodal--code" role="dialog" aria-modal="true" aria-label="Generated code preview" data-visual-code-modal>
         <header className="apx-vmodal-head">
           <div className="apx-vmodal-title">
             <strong>Generated Code</strong>
