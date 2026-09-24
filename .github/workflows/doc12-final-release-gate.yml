@@ -1,18 +1,7 @@
 name: DOC-12 Final Documentation Release Gate
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
   workflow_dispatch:
-    inputs:
-      package_ref:
-        description: Exact Apexify.js candidate ref/SHA to validate (defaults to package main)
-        required: false
-        default: main
-        type: string
-
 permissions:
   contents: read
 

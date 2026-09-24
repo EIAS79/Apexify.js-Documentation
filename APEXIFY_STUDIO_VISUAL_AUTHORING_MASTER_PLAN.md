@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 COMPLETE; STUDIO-VISUAL-13 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 COMPLETE; STUDIO-VISUAL-13 COMPLETE; STUDIO-VISUAL-14 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3170,7 +3170,7 @@ Acceptance evidence:
 - dual-mode browser regression: **PASS**
 - Documentation Runtime Build Gate: **PASS**
 
-**Phase 12 is complete. STUDIO-VISUAL-13 is next.**
+**Phase 12 is complete. STUDIO-VISUAL-13 follows below and is now complete.**
 
 ---
 
@@ -3219,6 +3219,59 @@ No Vercel debugging.
 ```text
 feat(studio-visual): complete video timeline authoring
 ```
+
+### Phase 13 implementation record — STUDIO-VISUAL-13
+
+**Status:** COMPLETE — integration PR **#107**
+
+- documentation branch: `studio-visual/v13-video`
+- documentation PR: **#107**
+- base main commit: `8c08f775268192aff8182a8e35aa538f2099f955`
+- final implementation head: `349d334b157a5ddbdfa5efa988112533f7dbf5a7`
+- final branch divergence before merge: **31 ahead / 0 behind**
+- final Studio Visual Phase Gate: run **35937825619** — **SUCCESS**
+- final Documentation Runtime Build Gate: run **35937825649** — **SUCCESS** on Node 22 / 24 / 26
+- integration merge commit: `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1`
+- pinned Apexify.js runtime: `69d40cf40ba992ad2bdec457c6c7217f5df55cd1`
+- runtime API patch required: **no**
+
+Completed implementation scope:
+
+- permanent **Video** feature-rail authoring context integrated into the existing Studio shell;
+- contextual Timeline dock reused from Phases 11–12 rather than replaced;
+- generated-frame video mode with generated solid/text frames and uploaded image assets;
+- native `createVideo({ createFromFrames })` generation with FPS, quality, resolution and MP4/WebM render settings;
+- retained `videoPipeline()` mode for source video, trim, splice/replacement, timed text and audio tracks;
+- uploaded Video, Audio and Image Studio Assets using stable `studio://asset/<id>` identities;
+- text overlays can reference normal Visual text nodes so overlay editing preserves Layers/Inspector ownership;
+- procedural audio presets and uploaded audio tracks on the video timeline;
+- ordered advanced `createVideo()` operation stack covering speed, effects, crop, rotate, color correction, compression, fades, reverse, PiP, watermark, merge, split-screen, segment replacement, loop, stabilization, time-lapse, mute/volume, audio normalization/mixing, LUT, freeze frame, transition and export presets;
+- metadata probing, frame extraction, preview-frame generation, thumbnails, scene detection and audio extraction;
+- native full-runtime MP4/WebM Preview modal and contextual video player;
+- deterministic one-file TypeScript generation through real Apexify video APIs;
+- stable `apexify-studio-v13` semantic source marker and canonical Code → Visual reconciliation;
+- validation/resource guards for sources, FPS/dimensions, timing, tracks, operations, assets and malformed imported state;
+- dedicated Phase-13 regression suite integrated into `studio:visual:test`;
+- mandatory Linux Studio video smoke expanded with generated Visual Video code.
+
+Acceptance evidence:
+
+- Studio completeness: **PASS**
+- Visual capability / option coverage: **PASS** — 187 capabilities, 17,233 option paths, 0 unclassified
+- Studio Visual tests: **PASS** — 136 / 136
+- Linux Studio video smoke: **PASS**
+  - existing full-runtime video smoke artifact: **18,053 bytes**, `video/mp4`
+- Linux generated Phase-13 Visual Video proof: **PASS**
+  - artifact bytes: **2,394**
+  - MIME: `video/mp4`
+  - route: `createVideo.createFromFrames`
+- TypeScript typecheck: **PASS**
+- production Next.js build: **PASS**
+- production server start: **PASS**
+- dual-mode browser regression: **PASS**
+- Documentation Runtime Build Gate: **PASS** on Node 22 / 24 / 26
+
+**Phase 13 is complete. STUDIO-VISUAL-14 is next.**
 
 ---
 
@@ -3482,7 +3535,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 10 | Image utilities | COMPLETE — PR #102 | `e3074fcce312094da4538ed3c0da200febd2373a` | Final Studio Visual gates 35863786281 + 35863791672 SUCCESS; Runtime Build Gate 35863791464 SUCCESS on Node 22/24/26; 108/108 tests; full-runtime image utility equivalence proof; 9/9 review threads resolved |
 | 11 | GIF / animation | COMPLETE — PR #103 | `3b43fb5c01c8d276df9e41c4f0f5b730eb11d002` | Final Studio Visual Phase Gate 35868072554 SUCCESS; Runtime Build Gate 35868072609 SUCCESS Node 22/24/26; 117/117 tests; Linux animate → createGIF proof PASS |
 | 12 | Audio | COMPLETE — PR #105 | `1232800509fba731d508efb9ec45482eba5c83f3` | Studio Visual Phase Gate 35930842667 SUCCESS; Runtime Build Gate 35930842704 SUCCESS; 128/128 tests; Linux procedural WAV equivalence proof PASS |
-| 13 | Video | NOT STARTED | — | — |
+| 13 | Video | COMPLETE — PR #107 | `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1` | Studio Visual Phase Gate 35937825619 SUCCESS; Runtime Build Gate 35937825649 SUCCESS on Node 22/24/26; 136/136 tests; Linux generated MP4 proof PASS |
 | 14 | Advanced operations | NOT STARTED | — | — |
 | 15 | Export / project round trip | NOT STARTED | — | — |
 | 16 | Feature completeness gate | NOT STARTED | — | — |

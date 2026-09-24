@@ -2,12 +2,7 @@
 name: DOC-8 Studio Interactive Foundation
 
 on:
-  push:
-    branches: [doc8-studio-interactive-foundation, main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
 concurrency:
   group: doc8-interactive-${{ github.ref }}
   cancel-in-progress: true

@@ -1,12 +1,7 @@
 name: DOC-4 API Reference Engine
 
 on:
-  push:
-    branches: [doc4-api-reference-engine, main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
 concurrency:
   group: doc4-api-${{ github.ref }}
   cancel-in-progress: true

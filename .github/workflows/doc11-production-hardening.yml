@@ -1,40 +1,7 @@
 name: DOC-11 Production Hardening
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'app/**'
-      - 'components/**'
-      - 'contexts/**'
-      - 'lib/**'
-      - 'styles/**'
-      - 'scripts/docs/**'
-      - 'content/**'
-      - 'public/**'
-      - 'generated/docs-doc*/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/doc11-production-hardening.yml'
-      - 'DOC11_*'
-  push:
-    branches: [main]
-    paths:
-      - 'app/**'
-      - 'components/**'
-      - 'contexts/**'
-      - 'lib/**'
-      - 'styles/**'
-      - 'scripts/docs/**'
-      - 'content/**'
-      - 'public/**'
-      - 'generated/docs-doc*/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/doc11-production-hardening.yml'
-      - 'DOC11_*'
   workflow_dispatch:
-
 permissions:
   contents: read
 

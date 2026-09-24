@@ -2,14 +2,6 @@ name: DOC-0 Documentation Baseline
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - doc0-baseline-audit
-    paths:
-      - 'scripts/doc0-*'
-      - 'package.json'
-      - '.github/workflows/doc0-baseline.yml'
-
 permissions:
   contents: write
 

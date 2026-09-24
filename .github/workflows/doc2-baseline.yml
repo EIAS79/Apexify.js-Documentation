@@ -2,13 +2,6 @@ name: DOC-2 Starting Baseline
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - doc2-design-system-shell
-    paths:
-      - 'scripts/docs/doc2-baseline-browser.mjs'
-      - '.github/workflows/doc2-baseline.yml'
-
 permissions:
   contents: read
 

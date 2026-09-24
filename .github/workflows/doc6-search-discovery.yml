@@ -1,12 +1,7 @@
 name: DOC-6 Search Discovery
 
 on:
-  push:
-    branches: [doc6-search-discovery, main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
 concurrency:
   group: doc6-search-${{ github.ref }}
   cancel-in-progress: true

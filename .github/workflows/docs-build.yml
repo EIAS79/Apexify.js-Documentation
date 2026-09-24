@@ -1,15 +1,7 @@
 name: Documentation Runtime Build Gate
 
 on:
-  push:
-    branches:
-      - main
-      - reengineering/phase-13-authoritative-docs
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
-
 permissions:
   contents: read
 

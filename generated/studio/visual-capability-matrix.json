@@ -824,7 +824,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.detect.anyRegion",
@@ -919,7 +919,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.extractFrameAtTime",
@@ -938,7 +938,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.extractFrameByNumber",
@@ -957,7 +957,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.extractFrames",
@@ -976,7 +976,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.extractMultipleFrames",
@@ -995,7 +995,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.getVideoInfo",
@@ -1014,7 +1014,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.image.blend",
@@ -1825,7 +1825,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.save",
@@ -1949,7 +1949,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.video.extractFrameAtTime",
@@ -1968,7 +1968,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.video.extractFrameByNumber",
@@ -1987,7 +1987,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.video.extractFrames",
@@ -2006,7 +2006,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.video.extractMultipleFrames",
@@ -2025,7 +2025,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.video.getVideoInfo",
@@ -2044,7 +2044,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.video.operations",
@@ -2079,7 +2079,7 @@
         "video-top-level"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.videoPipeline",
@@ -2098,7 +2098,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "SceneBuilder.addLayer",
@@ -2440,7 +2440,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.advanced.applyLUT",
@@ -2459,7 +2459,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.advanced.detectScenes",
@@ -2478,7 +2478,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.advanced.exportPreset",
@@ -2497,7 +2497,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.advanced.freezeFrame",
@@ -2516,7 +2516,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.advanced.loop",
@@ -2535,7 +2535,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.advanced.stabilize",
@@ -2554,7 +2554,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.advanced.transition",
@@ -2573,7 +2573,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.audio.mix",
@@ -2592,7 +2592,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.codec",
@@ -2611,7 +2611,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.create",
@@ -2630,7 +2630,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.describeOperation",
@@ -2665,7 +2665,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.frames.extractAll",
@@ -2684,7 +2684,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.frames.extractInterval",
@@ -2703,7 +2703,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.frames.extractOne",
@@ -2722,7 +2722,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.frames.extractTimes",
@@ -2741,7 +2741,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.frames.preview",
@@ -2760,7 +2760,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.frames.thumbnail",
@@ -2779,7 +2779,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.getInfo",
@@ -2798,7 +2798,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.merge.merge",
@@ -2817,7 +2817,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.merge.splitScreen",
@@ -2836,7 +2836,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.overlays.deprecatedAnimatedText",
@@ -2855,7 +2855,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.overlays.deprecatedText",
@@ -2874,7 +2874,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.overlays.pictureInPicture",
@@ -2893,7 +2893,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.overlays.text",
@@ -2912,7 +2912,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.overlays.watermark",
@@ -2931,7 +2931,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.structure.replaceSegment",
@@ -2950,7 +2950,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.adjustVolume",
@@ -2969,7 +2969,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.colorCorrect",
@@ -2988,7 +2988,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.compress",
@@ -3007,7 +3007,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.convert",
@@ -3026,7 +3026,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.crop",
@@ -3045,7 +3045,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.effects",
@@ -3064,7 +3064,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.extractAudio",
@@ -3083,7 +3083,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.fade",
@@ -3102,7 +3102,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.mute",
@@ -3121,7 +3121,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.normalizeAudio",
@@ -3140,7 +3140,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.removeAudio",
@@ -3159,7 +3159,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.reverse",
@@ -3178,7 +3178,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.rotate",
@@ -3197,7 +3197,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.speed",
@@ -3216,7 +3216,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoOperations.transcode.trim",
@@ -3235,7 +3235,7 @@
         "video-deep-operations"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.audio",
@@ -3254,7 +3254,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.canRedo",
@@ -3305,7 +3305,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.getLayers",
@@ -3340,7 +3340,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.redo",
@@ -3359,7 +3359,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.removeLayer",
@@ -3378,7 +3378,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.render",
@@ -3397,7 +3397,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.source",
@@ -3416,7 +3416,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.splice",
@@ -3435,7 +3435,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.text",
@@ -3454,7 +3454,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.toJSON",
@@ -3489,7 +3489,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "VideoPipeline.undo",
@@ -3508,7 +3508,7 @@
         "video-pipeline"
       ],
       "phaseOwner": "STUDIO-VISUAL-13",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     }
   ],
   "summary": {
