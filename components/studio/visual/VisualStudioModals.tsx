@@ -73,7 +73,9 @@ function useModalFocusTrap(open: boolean, onClose: () => void) {
       document.body.style.overflow = previousOverflow;
       const restore = restoreFocusRef.current;
       restoreFocusRef.current = null;
-      window.requestAnimationFrame(() => restore?.focus());
+      if (restore?.isConnected) {
+        restore.focus({ preventScroll: true });
+      }
     };
   }, [open]);
 
