@@ -128,9 +128,10 @@
     "studio:visual:phase17:profile": "tsx scripts/studio/visual/phase17-performance.ts --check",
     "studio:visual:phase17:browser": "npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3 && node scripts/studio/visual/phase17-browser-smoke.mjs",
     "studio:visual:phase18": "tsx --test scripts/studio/visual/phase18-final-release.test.ts",
-    "studio:visual:phase18:runtime": "npm run studio:visual:proof && npm run studio:smoke:video",
+    "studio:visual:phase18:runtime": "tsx scripts/studio/visual/phase18-runtime-proof.ts && npm run studio:smoke:video",
     "studio:visual:phase18:browser": "npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3 && node scripts/studio/visual/phase18-browser-smoke.mjs",
-    "studio:visual:phase18:full": "npm run studio:visual:phase18 && npm run studio:visual:test && npm run studio:visual:phase18:runtime"
+    "studio:visual:phase18:full": "npm run studio:visual:phase18:fixtures && npm run studio:visual:phase18 && npm run studio:visual:test && npm run studio:visual:phase18:runtime",
+    "studio:visual:phase18:fixtures": "tsx scripts/studio/visual/phase18-generate-fixtures.ts"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
