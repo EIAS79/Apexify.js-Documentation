@@ -62,3 +62,57 @@ test('Phase 16 evidence registry exactly covers every authorable Visual capabili
     assert.ok(row.codegen?.symbol, `${row.capability}: missing generated-code mapping`);
     assert.ok(row.previewRuntimeRoute, `${row.capability}: missing Preview runtime route`);
     assert.ok(row.proofCaseIds.length > 0, `${row.capability}: missing proof case IDs`);
+    assert.ok(evidence.permanentUiLocations.length > 0, `${row.capability}: missing permanent UI home`);
+  }
+});
+
+test('Phase 16 evidence files are repository-backed and proof-project descriptors cover every domain', () => {
+  const proofIds = new Set(PHASE16_PROOF_PROJECT_DESCRIPTORS.map((project) => project.id));
+  const proofDomains = new Set(PHASE16_PROOF_PROJECT_DESCRIPTORS.flatMap((project) => project.domains));
+
+  for (const evidence of PHASE16_DOMAIN_EVIDENCE) {
+    for (const file of [
+      ...evidence.controlEvidenceFiles,
+      ...evidence.codegenEvidenceFiles,
+      ...evidence.previewEvidenceFiles,
+      ...evidence.regressionTestFiles,
+    ]) {
+      const absolute = path.join(root, ...file.split('/'));
+      assert.equal(fs.existsSync(absolute), true, `${evidence.domain}: missing ${file}`);
+      assert.ok(fs.statSync(absolute).size > 0, `${evidence.domain}: empty ${file}`);
+    }
+    for (const proofId of evidence.representativeProofProjectIds) {
+      assert.equal(proofIds.has(proofId), true, `${evidence.domain}: unknown proof ${proofId}`);
+    }
+    assert.equal(proofDomains.has(evidence.domain), true, `${evidence.domain}: not covered by a proof project`);
+  }
+});
+
+test('Phase 16 representative projects produce canonical user code and Preview code', () => {
+  for (const proof of PHASE16_PROOF_PROJECTS) {
+    const project = proof.build();
+    const generated = generateVisualProjectCode(project);
+    const preview = generateVisualProjectPreviewCode(project);
+
+    assert.equal(generated.language, 'typescript', proof.id);
+    assert.equal(preview.language, 'typescript', proof.id);
+    assert.ok(generated.source.trim().length > 0, `${proof.id}: empty generated code`);
+    assert.ok(preview.source.trim().length > 0, `${proof.id}: empty Preview code`);
+    assert.match(generated.source, /apexify\.js/, `${proof.id}: user code must target public Apexify.js`);
+    assert.match(preview.source, /apexify\.js/, `${proof.id}: Preview code must target public Apexify.js`);
+    assert.doesNotMatch(generated.source, /\/api\/gallery\/run|StudioOperationRuntime/, `${proof.id}: Studio harness leaked into user code`);
+  }
+});
+
+test('Phase 16 canonical generated code reconciles back into every representative Visual Project', () => {
+  for (const proof of PHASE16_PROOF_PROJECTS) {
+    const project = proof.build();
+    const canonical = generateVisualProjectCode(project).source;
+    const result = reconcileVisualProjectFromCode(structuredClone(project), canonical);
+    assert.equal(result.ok, true, `${proof.id}: canonical source failed reconciliation${result.ok ? '' : ` — ${result.error}`}`);
+    if (!result.ok) continue;
+
+    const regenerated = generateVisualProjectCode(result.project).source;
+    assert.equal(regenerated, canonical, `${proof.id}: canonical source drifted after reconciliation`);
+  }
+});
