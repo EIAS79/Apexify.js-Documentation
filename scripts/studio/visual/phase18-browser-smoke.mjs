@@ -151,7 +151,7 @@ async function desktopReleaseProof(page) {
     await page.click(selector);
   }
 
-  for (const tab of ['generated','diagnostics','assets','history','timeline']) {
+  for (const tab of ['generated','diagnostics','assets','history']) {
     const selector = '[data-dock-tab="' + tab + '"]';
     await page.waitForSelector(selector);
     await page.click(selector);
@@ -161,6 +161,14 @@ async function desktopReleaseProof(page) {
       tab,
     );
   }
+
+  // Timeline is deliberately contextual: activating GIF/audio/video must expose it.
+  await page.click('[data-feature-tool="gif"]');
+  await page.waitForSelector('[data-dock-tab="timeline"]', { visible: true });
+  await page.waitForFunction(
+    () => document.querySelector('[data-dock-tab="timeline"]')?.getAttribute('data-active') === 'true',
+  );
+  await page.click('[data-feature-tool="canvas"]');
   await page.click('[data-dock-tab="generated"]');
 
   const downloads = fs.mkdtempSync(path.join(os.tmpdir(), 'apexify-phase18-'));
