@@ -339,7 +339,7 @@ export function VisualAdvancedInspector({
           </label>
           <label>
             <span>Batch concurrency</span>
-            <input className="apx-pre4-input" type="number" min={1} max={64} value={value.batch.concurrency} onChange={(event) => mutate('Batch concurrency', (next) => ({ ...next, batch: { ...next.batch, concurrency: Math.max(1, Math.min(64, Number(event.target.value) || 1)) } }))}/>
+            <input className="apx-pre4-input" type="number" min={1} max={4} value={value.batch.concurrency} onChange={(event) => mutate('Batch concurrency', (next) => ({ ...next, batch: { ...next.batch, concurrency: Math.max(1, Math.min(4, Number(event.target.value) || 1)) } }))}/>
           </label>
         </div>
         <label className="apx-canvas-check"><input type="checkbox" checked={value.preResolve} onChange={(event) => mutate('Prepare for render', (next) => ({ ...next, preResolve: event.target.checked }))}/><span>Pre-resolve authored operations with prepareForRender()</span></label>
