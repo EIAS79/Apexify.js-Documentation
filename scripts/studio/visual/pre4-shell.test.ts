@@ -127,7 +127,7 @@ test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
 
   assert.match(shell, /data-studio-visual-workspace/);
   assert.match(shell, /StudioModeSwitch/);
-  assert.match(shell, /StudioAssetShelf/);
+  assert.match(shell, /data-unified-assets-pane/);
   assert.match(shell, /useStudioSharedSession/);
   assert.match(shell, /VisualHistory/);
   assert.match(shell, /snapPosition/);
