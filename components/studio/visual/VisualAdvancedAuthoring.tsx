@@ -137,13 +137,13 @@ export function VisualAdvancedContext({
     }));
   };
 
-  const addPlugin = (kind: 'inline' | 'registry' | 'package' | 'remove') => {
+  const addPlugin = (kind: 'inline' | 'install' | 'registry' | 'package' | 'remove') => {
     const id = createVisualId('advanced-plugin');
     let plugin: Phase14PluginConfig;
-    if (kind === 'inline') {
+    if (kind === 'inline' || kind === 'install') {
       plugin = {
         id,
-        action: 'use',
+        action: kind === 'install' ? 'install' : 'use',
         source: 'inline',
         name: 'studioPlugin' + value.plugins.length,
         apiName: 'studioApi' + value.plugins.length,
@@ -245,7 +245,8 @@ export function VisualAdvancedContext({
           </article>
         ))}
         <div className="apx-advanced-add-row">
-          <button type="button" onClick={() => addPlugin('inline')}>＋ Inline plugin</button>
+          <button type="button" onClick={() => addPlugin('inline')}>＋ Use inline</button>
+          <button type="button" onClick={() => addPlugin('install')}>＋ Install inline</button>
           <button type="button" onClick={() => addPlugin('registry')}>＋ Registry API</button>
           <button type="button" onClick={() => addPlugin('package')}>＋ Package plugin</button>
           <button type="button" onClick={() => addPlugin('remove')}>＋ Remove API</button>
