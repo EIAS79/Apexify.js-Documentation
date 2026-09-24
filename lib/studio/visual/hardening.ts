@@ -7,6 +7,13 @@ export const PHASE17_AUTOSAVE_VERSION = 2 as const;
 export const PHASE17_CODE_DEBOUNCE_MS = 280;
 export const PHASE17_PROJECT_AUTOSAVE_MS = 180;
 
+export const PHASE17_BROWSER_MATRIX = Object.freeze([
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'laptop', width: 1100, height: 800 },
+  { name: 'tablet', width: 820, height: 1180 },
+  { name: 'mobile', width: 390, height: 844 },
+] as const);
+
 export const PHASE17_PERFORMANCE_BUDGETS = Object.freeze({
   maxInteractiveLayers: 2500,
   largeLayerTreeThreshold: 400,
@@ -15,6 +22,8 @@ export const PHASE17_PERFORMANCE_BUDGETS = Object.freeze({
   maxAssetDataUrlCacheEntries: 48,
   codeSyncDebounceMs: PHASE17_CODE_DEBOUNCE_MS,
   autosaveDebounceMs: PHASE17_PROJECT_AUTOSAVE_MS,
+  profileCodegenLayers: 1000,
+  profileSoftCodegenMs: 5000,
 });
 
 export type Phase17DockTab =
