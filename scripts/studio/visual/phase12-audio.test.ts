@@ -216,6 +216,6 @@ test('Phase 12 permanent Audio rail, inspector, real waveform/player and Timelin
   assert.ok(shell.includes('<VisualAudioInspector'));
   assert.ok(shell.includes("if (id === 'gif')"));
   assert.ok(shell.includes("if (id === 'audio')"));
-  assert.ok(shell.includes('phase12Active || phase11Active || phase10Active'));
+  assert.ok(shell.includes('phase13Active || phase12Active || phase11Active || phase10Active'));
   assert.ok(modal.includes('data-visual-audio-player'));
 });

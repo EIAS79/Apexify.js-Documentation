@@ -1,6 +1,12 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { runSameOriginIsolatedStudio } from '../../lib/studio/runtime/isolatedNodeExecutor';
+import { createVisualProject } from '../../lib/studio/visual/project';
+import {
+  defaultPhase13Timeline,
+  setPhase13Timeline,
+} from '../../lib/studio/visual/video-authoring-contract';
+import { generateVisualProjectCode } from '../../lib/studio/visual/codegen/generator';
 
 const source = String.raw`
 import { ApexPainter } from 'apexify.js';
@@ -119,6 +125,58 @@ console.log('\n[studio:smoke:video] PASS');
       bytes: Buffer.byteLength(video.base64, 'base64'),
       path: outPath,
     },
+  }, null, 2));
+
+  const visualProject = createVisualProject({
+    id: 'project_phase13_linux_video_smoke',
+    name: 'Phase 13 Linux Video Smoke',
+    width: 160,
+    height: 90,
+    now: '2026-09-24T00:00:00.000Z',
+  });
+  const videoTimeline = defaultPhase13Timeline();
+  videoTimeline.mode = 'frames';
+  videoTimeline.frames.width = 160;
+  videoTimeline.frames.height = 90;
+  videoTimeline.frames.fps = 2;
+  videoTimeline.frames.quality = 'low';
+  videoTimeline.frames.items = [
+    { id: 'frame-a', source: { kind: 'solid', color: '#0b1020', label: 'APEX' } },
+    { id: 'frame-b', source: { kind: 'solid', color: '#2563eb', label: 'VIDEO' } },
+  ];
+  const generatedProject = setPhase13Timeline(visualProject, videoTimeline);
+  const generated = generateVisualProjectCode(generatedProject);
+  if (!generated.source.includes('apexify-studio-v13:') || !generated.source.includes('createFromFrames')) {
+    throw new Error('Phase 13 generated video source is missing its canonical marker or createFromFrames route.');
+  }
+
+  const generatedRun = await runSameOriginIsolatedStudio(generated.source, [], []);
+  if (generatedRun.status !== 200 || !generatedRun.body.ok) {
+    throw new Error(
+      'Phase 13 generated video runtime failed: ' +
+      (generatedRun.body.error ?? generatedRun.body.stderr ?? 'unknown error'),
+    );
+  }
+  const generatedVideo = (generatedRun.body.outputs ?? []).find(
+    (artifact) => artifact.mime === 'video/mp4' || artifact.kind === 'video',
+  );
+  if (!generatedVideo?.base64) {
+    throw new Error('Phase 13 generated video returned no MP4 artifact.');
+  }
+  const generatedBytes = Buffer.from(generatedVideo.base64, 'base64');
+  if (generatedBytes.length < 12 || generatedBytes.subarray(4, 8).toString('ascii') !== 'ftyp') {
+    throw new Error('Phase 13 generated video artifact is not an ISO-BMFF/MP4 file.');
+  }
+  const generatedPath = path.join(outDir, 'phase13-generated.mp4');
+  writeFileSync(generatedPath, generatedBytes);
+
+  console.log('\n[studio-visual:phase13] Linux generated video codegen/runtime proof passed');
+  console.log(JSON.stringify({
+    bytes: generatedBytes.byteLength,
+    mime: generatedVideo.mime,
+    generatedFile: generated.fileName,
+    path: generatedPath,
+    route: 'createVideo.createFromFrames',
   }, null, 2));
 }
 

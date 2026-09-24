@@ -52,6 +52,11 @@ jobs:
       - name: Install pinned browser runtime snapshot
         run: node scripts/studio/install-apexify-web.mjs
 
+      - name: Install Studio media runtimes
+        run: |
+          node scripts/studio/install-deno.mjs
+          node scripts/studio/install-ffmpeg.mjs
+
       - name: Generate DOC-4 option inventory
         run: npm run docs:generate:doc4
 
@@ -71,6 +76,11 @@ jobs:
 
       - name: Verify Visual Studio contracts
         run: npm run studio:visual:verify
+
+      - name: Phase 13 Linux video smoke
+        env:
+          STUDIO_DISABLE_PRLIMIT: '1'
+        run: npm run studio:smoke:video
 
       - name: Typecheck
         run: |

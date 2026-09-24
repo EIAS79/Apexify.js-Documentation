@@ -51,7 +51,7 @@ export function VisualPreviewModal({
   if (!open) return null;
 
   const beginPan = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!previewUrl || previewMime.startsWith('audio/')) return;
+    if (!previewUrl || previewMime.startsWith('audio/') || previewMime.startsWith('video/')) return;
     drag.current = {
       x: event.clientX,
       y: event.clientY,
@@ -80,11 +80,11 @@ export function VisualPreviewModal({
       <section className="apx-vmodal apx-vmodal--preview" role="dialog" aria-modal="true" aria-label="Canvas preview" data-visual-preview-modal>
         <header className="apx-vmodal-head">
           <div className="apx-vmodal-title">
-            <strong>{previewMime.startsWith('audio/') ? 'Audio Preview' : 'Canvas Preview'}</strong>
-            <span>{previewMime.startsWith('audio/') ? 'Real Apexify WAV output · native playback' : 'Clean output · drag to pan · zoom freely'}</span>
+            <strong>{previewMime.startsWith('audio/') ? 'Audio Preview' : previewMime.startsWith('video/') ? 'Video Preview' : 'Canvas Preview'}</strong>
+            <span>{previewMime.startsWith('audio/') ? 'Real Apexify WAV output · native playback' : previewMime.startsWith('video/') ? 'Real Apexify FFmpeg output · native playback' : 'Clean output · drag to pan · zoom freely'}</span>
           </div>
           <div className="apx-vmodal-actions">
-            {!previewMime.startsWith('audio/') ? (
+            {!previewMime.startsWith('audio/') && !previewMime.startsWith('video/') ? (
               <>
                 <button type="button" onClick={() => setZoom((value) => Math.max(.25, value - .1))} title="Zoom out">
                   <MagnifyingGlassMinusIcon />
@@ -105,7 +105,7 @@ export function VisualPreviewModal({
 
         <div className="apx-vmodal-subbar">
           <label>
-            <span>{previewMime.startsWith('audio/') ? 'Project name' : 'Canvas name'}</span>
+            <span>{previewMime.startsWith('audio/') || previewMime.startsWith('video/') ? 'Project name' : 'Canvas name'}</span>
             <input value={name} onChange={(event) => onNameChange(event.target.value)} />
           </label>
         </div>
@@ -128,6 +128,12 @@ export function VisualPreviewModal({
               <strong>{name || 'Audio preview'}</strong>
               <span>{previewMime}</span>
               <audio controls autoPlay preload="metadata" src={previewUrl} data-visual-audio-player />
+            </div>
+          ) : previewUrl && previewMime.startsWith('video/') ? (
+            <div className="apx-vmodal-video">
+              <strong>{name || 'Video preview'}</strong>
+              <span>{previewMime}</span>
+              <video controls autoPlay playsInline preload="metadata" src={previewUrl} data-visual-video-player />
             </div>
           ) : previewUrl ? (
             <img

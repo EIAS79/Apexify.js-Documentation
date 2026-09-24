@@ -59,6 +59,11 @@ import {
   VisualAudioInspector,
   VisualAudioTimeline,
 } from '@/components/studio/visual/VisualAudioAuthoring';
+import {
+  VisualVideoContext,
+  VisualVideoInspector,
+  VisualVideoTimeline,
+} from '@/components/studio/visual/VisualVideoAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -90,6 +95,7 @@ import { hasPhase9Authoring } from '@/lib/studio/visual/phase9-codegen';
 import { hasPhase10Authoring } from '@/lib/studio/visual/phase10-codegen';
 import { hasPhase11Authoring } from '@/lib/studio/visual/phase11-codegen';
 import { hasPhase12Authoring } from '@/lib/studio/visual/phase12-codegen';
+import { hasPhase13Authoring } from '@/lib/studio/visual/phase13-codegen';
 import { createInteractiveSession } from '@/lib/docs/playground/session';
 import { currentNodeServerExecutionAdapter } from '@/lib/docs/playground/serverClientAdapter';
 import { validateVisualProject } from '@/lib/studio/visual/compiler/validate';
@@ -671,6 +677,7 @@ export default function VisualStudioPre4({
   const phase10Active = useMemo(() => hasPhase10Authoring(project), [project]);
   const phase11Active = useMemo(() => hasPhase11Authoring(project), [project]);
   const phase12Active = useMemo(() => hasPhase12Authoring(project), [project]);
+  const phase13Active = useMemo(() => hasPhase13Authoring(project), [project]);
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
@@ -785,7 +792,7 @@ export default function VisualStudioPre4({
     source: string,
     displaySource = source,
   ) => {
-    if (phase12Active || phase11Active || phase10Active) {
+    if (phase13Active || phase12Active || phase11Active || phase10Active) {
       let releasePhase10Render!: () => void;
       const previousPhase10Render = phase10RenderTailRef.current;
       phase10RenderTailRef.current = new Promise<void>((resolve) => {
@@ -810,7 +817,11 @@ export default function VisualStudioPre4({
         };
       }
       const artifact =
-        result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('image/')) ??
+        (phase13Active
+          ? result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('video/'))
+          : phase12Active
+            ? result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('audio/'))
+            : result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('image/'))) ??
         result.output.artifacts?.find((item) => item.base64) ??
         (result.output.base64
           ? {
@@ -917,7 +928,7 @@ export default function VisualStudioPre4({
   useEffect(() => {
     window.clearTimeout(artboardPreviewTimerRef.current);
     if (!active || !previewGenerated.value) return;
-    if (phase12Active) {
+    if (phase13Active || phase12Active) {
       setArtboardPreviewUrl(null);
       return;
     }
@@ -956,6 +967,7 @@ export default function VisualStudioPre4({
     phase10Active,
     phase11Active,
     phase12Active,
+    phase13Active,
   ]);
 
   const mutate = (
@@ -2427,7 +2439,7 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = phase12Active || phase11Active || phase10Active || phase9Active
+    const source = phase13Active || phase12Active || phase11Active || phase10Active || phase9Active
       ? previewGenerated.value?.source
       : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
@@ -2441,7 +2453,7 @@ export default function VisualStudioPre4({
     try {
       const result = await renderAuthoritativeVisualSource(
         source,
-        phase10Active && !phase11Active && !phase12Active
+        phase10Active && !phase11Active && !phase12Active && !phase13Active
           ? displayPreviewGenerated.value?.source ?? source
           : source,
       );
@@ -2491,6 +2503,8 @@ export default function VisualStudioPre4({
       modalPreviewMime === 'image/jp2' ? 'jp2' :
       modalPreviewMime === 'image/jxl' ? 'jxl' :
       modalPreviewMime === 'audio/wav' ? 'wav' :
+      modalPreviewMime === 'video/mp4' ? 'mp4' :
+      modalPreviewMime === 'video/webm' ? 'webm' :
       modalPreviewMime === 'application/x-raw' ? 'raw' : 'png');
     const link = document.createElement('a');
     link.href = downloadUrl;
@@ -2749,7 +2763,8 @@ export default function VisualStudioPre4({
     activeTool === 'components' ||
     activeTool === 'assets' ||
     activeTool === 'gif' ||
-    activeTool === 'audio';
+    activeTool === 'audio' ||
+    activeTool === 'video';
 
   const imageAssets = assets.filter((asset) =>
     asset.mime.startsWith('image/'),
@@ -2766,6 +2781,23 @@ export default function VisualStudioPre4({
   ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'video') {
+      return (
+        <VisualVideoContext
+          project={project}
+          assets={assets}
+          onMutate={mutate}
+          onOpenTimeline={() => {
+            setDockTab('timeline');
+            setDockCollapsed(false);
+          }}
+          onPreview={() => void renderVisualPreview(true)}
+          previewUrl={modalPreviewMime.startsWith('video/') ? modalPreviewUrl : null}
+          previewMime={modalPreviewMime}
+        />
+      );
+    }
+
     if (activeTool === 'audio') {
       return (
         <VisualAudioContext
@@ -5452,6 +5484,18 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
+    if ((activeTool === 'video' || phase13Active) && !primary) {
+      return (
+        <VisualVideoInspector
+          project={project}
+          assets={assets}
+          onMutate={mutate}
+          inspectorTab={inspectorTab}
+          onMessage={setMessage}
+        />
+      );
+    }
+
     if (activeTool === 'audio' || phase12Active) {
       return (
         <VisualAudioInspector
@@ -5551,6 +5595,15 @@ export default function VisualStudioPre4({
 
   const renderDock = () => {
     if (dockTab === 'timeline') {
+      if (activeTool === 'video' || phase13Active) {
+        return (
+          <VisualVideoTimeline
+            project={project}
+            assets={assets}
+            onMutate={mutate}
+          />
+        );
+      }
       if (activeTool === 'audio' || phase12Active) {
         return (
           <VisualAudioTimeline
@@ -5777,6 +5830,14 @@ export default function VisualStudioPre4({
                     setDockTab('timeline');
                     setDockCollapsed(false);
                   }
+                  if (id === 'video') {
+                    setProject((current) => ({
+                      ...current,
+                      editor: { ...current.editor, selectedNodeIds: [] },
+                    }));
+                    setDockTab('timeline');
+                    setDockCollapsed(false);
+                  }
                   if (id === 'layers') setMessage('Layers panel active');
                 }}
               >
@@ -5809,7 +5870,11 @@ export default function VisualStudioPre4({
                             ? 'Assets'
                             : activeTool === 'gif'
                               ? 'GIF & animation'
-                              : 'Layers'}
+                              : activeTool === 'audio'
+                                ? 'Audio'
+                                : activeTool === 'video'
+                                  ? 'Video'
+                                  : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -5825,7 +5890,11 @@ export default function VisualStudioPre4({
                             ? 'Scenes · surfaces · components · templates'
                             : activeTool === 'gif'
                               ? 'Frames · timing · GIF output'
-                              : assets.length + ' shared assets'
+                              : activeTool === 'audio'
+                                ? 'Presets · synthesis · mix · WAV'
+                                : activeTool === 'video'
+                                  ? 'Clips · operations · FFmpeg output'
+                                  : assets.length + ' shared assets'
                   : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
