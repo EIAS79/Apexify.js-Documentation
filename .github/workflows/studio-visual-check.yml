@@ -78,6 +78,17 @@ jobs:
           if-no-files-found: ignore
           retention-days: 1
 
+      - name: Refresh DOC-5 package proof
+        run: npm run docs:examples:verify
+
+      - name: Upload regenerated DOC-5 proof
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase14-doc5-regenerated
+          path: generated/docs-doc5
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Build Studio candidate
         run: npm run build
 
