@@ -118,6 +118,13 @@ import {
   downloadVisualProject,
   loadVisualProjectFile,
 } from '@/lib/studio/visual/persistence';
+import {
+  createPhase15ProjectExport,
+  lintGeneratedTypeScript,
+  phase15CleanGeneratedSource,
+  phase15ExportedCode,
+  type Phase15AssetExportStrategy,
+} from '@/lib/studio/visual/export-contract';
 import type {
   VisualBackgroundLayer,
   VisualBlendMode,
@@ -532,6 +539,10 @@ export default function VisualStudioPre4({
   const [codeSyncError, setCodeSyncError] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [codeModalOpen, setCodeModalOpen] = useState(false);
+  const [assetExportStrategy, setAssetExportStrategy] = useState<Phase15AssetExportStrategy>('files');
+  const [includeProjectSource, setIncludeProjectSource] = useState(true);
+  const [includePackageScaffold, setIncludePackageScaffold] = useState(true);
+  const [includeCodeProvenance, setIncludeCodeProvenance] = useState(false);
   const [modalPreviewUrl, setModalPreviewUrl] = useState<string | null>(null);
   const [modalPreviewDownloadUrl, setModalPreviewDownloadUrl] = useState<string | null>(null);
   const [modalPreviewMime, setModalPreviewMime] = useState('image/png');
@@ -690,6 +701,15 @@ export default function VisualStudioPre4({
   const phase12Active = useMemo(() => hasPhase12Authoring(project), [project]);
   const phase13Active = useMemo(() => hasPhase13Authoring(project), [project]);
   const phase14Active = useMemo(() => hasPhase14Authoring(project), [project]);
+  const canonicalLinkedSource = generated.value?.source ?? codeSource;
+  const exportedCodeSource = useMemo(
+    () => phase15ExportedCode(project, canonicalLinkedSource, includeCodeProvenance),
+    [project, canonicalLinkedSource, includeCodeProvenance],
+  );
+  const exportCodeQuality = useMemo(
+    () => lintGeneratedTypeScript(exportedCodeSource),
+    [exportedCodeSource],
+  );
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
@@ -2438,7 +2458,7 @@ export default function VisualStudioPre4({
   };
 
   const handoff = () => {
-    const source = codeSource || generated.value?.source;
+    const source = generated.value?.source ?? codeSource;
     if (!source) {
       setMessage(generated.error ?? 'Code unavailable');
       return;
@@ -2446,6 +2466,35 @@ export default function VisualStudioPre4({
     setCodeHandoff({
       id: createVisualId('handoff'),
       name: project.name + ' — Generated',
+      source: phase15ExportedCode(project, source, includeCodeProvenance),
+    });
+    onModeChange('code');
+  };
+
+  const restoreCanonicalCode = () => {
+    if (!generated.value) {
+      setMessage(generated.error ?? 'Canonical Visual code unavailable');
+      return;
+    }
+    const source = generated.value.source;
+    window.clearTimeout(codeSaveTimerRef.current);
+    setCodeSource(source);
+    if (!fileNameTouchedRef.current) setCodeFileName(generated.value.fileName);
+    setCodeSyncState('synced');
+    setCodeSyncError(null);
+    persistLiveCode(source, fileNameTouchedRef.current ? codeFileName : generated.value.fileName);
+    setMessage('Canonical Visual code restored');
+  };
+
+  const forkConflictingCode = () => {
+    const source = phase15CleanGeneratedSource(codeSource || generated.value?.source || '');
+    if (!source.trim()) {
+      setMessage('No edited code is available to fork');
+      return;
+    }
+    setCodeHandoff({
+      id: createVisualId('handoff'),
+      name: project.name + ' — Code fork',
       source,
     });
     onModeChange('code');
@@ -2499,6 +2548,38 @@ export default function VisualStudioPre4({
     link.download = fileName.endsWith('.ts') ? fileName : fileName + '.ts';
     link.click();
     URL.revokeObjectURL(url);
+  };
+
+  const downloadProjectBundle = () => {
+    const source = generated.value?.source;
+    if (!source) {
+      setMessage(generated.error ?? 'Canonical Visual code unavailable');
+      return;
+    }
+    try {
+      const bundle = createPhase15ProjectExport(project, source, assets, {
+        assetStrategy: assetExportStrategy,
+        includeProjectSource,
+        includePackageJson: includePackageScaffold,
+        includeProvenance: includeCodeProvenance,
+      });
+      const bytes = Uint8Array.from(bundle.zip);
+      const blob = new Blob([bytes], { type: 'application/zip' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = bundle.fileName;
+      link.click();
+      URL.revokeObjectURL(url);
+      setMessage(
+        'Project bundle exported · ' +
+          bundle.files.length +
+          ' files' +
+          (bundle.manifest.warnings.length ? ' · ' + bundle.manifest.warnings.length + ' warning(s)' : ''),
+      );
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Project export failed');
+    }
   };
 
   const downloadCanvasPreview = () => {
@@ -5689,7 +5770,18 @@ export default function VisualStudioPre4({
             </div>
           </div>
           {codeSyncError ? (
-            <div className="apx-live-code-error">{codeSyncError}</div>
+            <div className="apx-live-code-error apx-phase15-code-conflict" data-phase15-code-conflict>
+              <strong>Linked-code conflict</strong>
+              <span>{codeSyncError}</span>
+              <div>
+                <button type="button" data-phase15-recover-canonical onClick={restoreCanonicalCode}>
+                  Restore canonical Visual code
+                </button>
+                <button type="button" data-phase15-fork-code onClick={forkConflictingCode}>
+                  Fork edit to Code Studio
+                </button>
+              </div>
+            </div>
           ) : null}
           <div className="apx-live-code-editor">
             <InteractiveCodeEditor
@@ -5844,9 +5936,65 @@ export default function VisualStudioPre4({
             <summary className="apx-pre4-top-button">
               <ArrowDownTrayIcon className="apx-pre4-control-icon" aria-hidden /> Export <span>⌄</span>
             </summary>
-            <div className="apx-vw-project-menu__panel">
-              <button data-visual-project-save onClick={save}>Save project</button>
-              <button data-visual-project-load onClick={() => fileRef.current?.click()}>Load project</button>
+            <div className="apx-vw-project-menu__panel apx-phase15-export-menu" data-phase15-export-menu>
+              <button
+                data-phase15-single-file-export
+                disabled={!generated.value}
+                onClick={() => downloadTextFile(exportedCodeSource, codeFileName)}
+              >
+                Download TypeScript · one file
+              </button>
+              <button
+                data-phase15-project-export
+                disabled={!generated.value}
+                onClick={downloadProjectBundle}
+              >
+                Download project bundle · .zip
+              </button>
+              <label className="apx-phase15-export-field">
+                <span>Assets</span>
+                <select
+                  data-phase15-asset-strategy
+                  value={assetExportStrategy}
+                  onChange={(event) => setAssetExportStrategy(event.target.value as Phase15AssetExportStrategy)}
+                >
+                  <option value="files">Portable files · ./assets/</option>
+                  <option value="manifest">Round-trip manifest</option>
+                  <option value="omit">Omit asset bytes</option>
+                </select>
+              </label>
+              <label className="apx-phase15-export-check">
+                <input
+                  type="checkbox"
+                  checked={includeProjectSource}
+                  onChange={(event) => setIncludeProjectSource(event.target.checked)}
+                />
+                <span>Include .apexstudio.json</span>
+              </label>
+              <label className="apx-phase15-export-check">
+                <input
+                  type="checkbox"
+                  checked={includePackageScaffold}
+                  onChange={(event) => setIncludePackageScaffold(event.target.checked)}
+                />
+                <span>Include package scaffold</span>
+              </label>
+              <label className="apx-phase15-export-check">
+                <input
+                  type="checkbox"
+                  checked={includeCodeProvenance}
+                  onChange={(event) => setIncludeCodeProvenance(event.target.checked)}
+                  data-phase15-provenance-toggle
+                />
+                <span>Generated-code provenance</span>
+              </label>
+              <div className="apx-phase15-quality" data-phase15-code-quality={exportCodeQuality.some((item) => item.severity === 'error') ? 'error' : 'ok'}>
+                {exportCodeQuality.length
+                  ? exportCodeQuality.map((item) => item.message).join(' · ')
+                  : 'Canonical formatting · public Apexify APIs · no Studio runtime internals'}
+              </div>
+              <button data-visual-project-save onClick={save}>Save .apexstudio.json</button>
+              <button data-visual-project-load onClick={() => fileRef.current?.click()}>Load .apexstudio.json</button>
               <button
                 data-visual-open-generated-code
                 onClick={handoff}
@@ -6461,11 +6609,19 @@ export default function VisualStudioPre4({
       <VisualCodeModal
         open={codeModalOpen}
         onClose={() => setCodeModalOpen(false)}
-        source={codeSource || generated.value?.source || ''}
+        source={exportedCodeSource}
         fileName={codeFileName}
         onFileNameChange={updateCodeFileName}
-        onCopy={() => void navigator.clipboard.writeText(codeSource || generated.value?.source || '')}
-        onDownload={() => downloadTextFile(codeSource || generated.value?.source || '', codeFileName)}
+        onCopy={() => void navigator.clipboard.writeText(exportedCodeSource)}
+        onDownload={() => downloadTextFile(exportedCodeSource, codeFileName)}
+        provenanceEnabled={includeCodeProvenance}
+        onProvenanceChange={setIncludeCodeProvenance}
+        qualityMessage={
+          exportCodeQuality.length
+            ? exportCodeQuality.map((item) => item.message).join(' · ')
+            : 'Canonical one-file TypeScript · ready to copy or download'
+        }
+        qualityOk={!exportCodeQuality.some((item) => item.severity === 'error')}
       />
 
       <footer className="apx-pre4-statusbar">

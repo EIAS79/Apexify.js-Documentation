@@ -6879,3 +6879,115 @@
 @media(max-width:1180px){
   .apx-advanced-add-row,.apx-advanced-actions{grid-template-columns:1fr}
 }
+
+
+/* STUDIO-VISUAL-15 — export, linked-code conflict recovery and project bundles */
+.apx-phase15-export-menu{
+  width:min(310px,calc(100vw - 24px));
+  gap:.28rem;
+}
+.apx-phase15-export-field,
+.apx-phase15-export-check{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+  min-height:30px;
+  padding:.28rem .42rem;
+  color:#8fa5bc;
+  font-size:.4rem;
+}
+.apx-phase15-export-field select{
+  min-width:150px;
+  border:1px solid #203b55;
+  border-radius:5px;
+  background:#071522;
+  color:#c7d7e7;
+  padding:.28rem .34rem;
+  font:inherit;
+}
+.apx-phase15-export-check{
+  justify-content:flex-start;
+}
+.apx-phase15-export-check input,
+.apx-phase15-provenance input{
+  accent-color:#4fd1c5;
+}
+.apx-phase15-quality{
+  padding:.34rem .42rem;
+  border:1px solid #1c384f;
+  border-radius:6px;
+  background:#071521;
+  color:#718aa2;
+  font-size:.36rem;
+  line-height:1.45;
+}
+.apx-phase15-quality[data-phase15-code-quality="error"]{
+  border-color:#62313a;
+  color:#e5a0aa;
+  background:#1c0d12;
+}
+.apx-phase15-code-conflict{
+  display:grid;
+  gap:.26rem;
+}
+.apx-phase15-code-conflict strong{
+  color:#f3bbc5;
+  font-size:.42rem;
+}
+.apx-phase15-code-conflict span{
+  color:#bc8290;
+  font-size:.39rem;
+  line-height:1.45;
+}
+.apx-phase15-code-conflict>div{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.28rem;
+}
+.apx-phase15-code-conflict button{
+  border:1px solid #613543;
+  border-radius:5px;
+  background:#1c0d14;
+  color:#e0a4af;
+  padding:.28rem .42rem;
+  font-size:.38rem;
+}
+.apx-phase15-code-subbar{
+  gap:.65rem;
+}
+.apx-phase15-code-subbar>label:first-child{
+  flex:1 1 auto;
+}
+.apx-phase15-provenance{
+  width:auto!important;
+  flex:0 0 auto;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center;
+  gap:.28rem!important;
+}
+.apx-phase15-code-quality{
+  flex:0 0 auto;
+  padding:.18rem .34rem;
+  border:1px solid #20534e;
+  border-radius:999px;
+  background:#09221f;
+  color:#6fd8c8;
+  font-size:.36rem;
+  font-weight:700;
+}
+.apx-phase15-code-quality[data-quality="error"]{
+  border-color:#62313a;
+  background:#1c0d12;
+  color:#e5a0aa;
+}
+@media(max-width:760px){
+  .apx-phase15-code-subbar{
+    flex-wrap:wrap;
+    min-height:70px;
+    height:auto;
+    padding-top:.35rem;
+    padding-bottom:.35rem;
+  }
+}

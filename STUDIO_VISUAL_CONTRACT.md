@@ -196,3 +196,38 @@ Host-filesystem persistence and credentialed third-party transfer must never be 
 Package-backed plugin imports are `code-only`: they are emitted in exported TypeScript but skipped by hosted Studio Preview unless that package is part of the controlled Studio runtime. Inline plugins and registry API configuration remain previewable.
 
 GitHub Actions in this repository are manual-only during active phase implementation. They may be invoked deliberately for a later final verification pass; ordinary pushes, PRs, and merges do not require or trigger them.
+
+## 12. Phase-15 export and round-trip contract
+
+STUDIO-VISUAL-15 hardens the existing Generate Code modal, top Export menu and linked bottom Code editor. It does not add a second permanent export/code dock.
+
+Generated-code contract:
+
+- linked Visual code may carry private semantic markers required for exact reconstruction;
+- normal user-facing Copy/Download/Code Studio handoff strips those opaque markers;
+- exported source is canonically formatted, uses public Apexify APIs, and is checked for Studio-runtime protocol leakage;
+- compact provenance is opt-in and does not appear in normal generated code;
+- single-file TypeScript remains the default.
+
+Project export contract:
+
+- optional project export is a deterministic ZIP bundle;
+- the canonical entry is `src/index.ts`;
+- portable asset export writes stable sanitized files under `./assets/` and rewrites `studio://asset/<id>` references;
+- round-trip-manifest mode may preserve base64 assets and Studio references explicitly for archival/re-import workflows;
+- omit-assets mode is explicit and emits a warning;
+- the bundle may include the existing validated `*.apexstudio.json` project source;
+- the bundle may include `package.json` and `tsconfig.json` scaffolding;
+- `apexify-studio.export.json` records deterministic project/source/file hashes and export warnings;
+- the default generated-code view remains one file; optional project export does not silently change the linked editor into a multi-file editor.
+
+Linked-code round-trip and conflicts:
+
+- parser-backed recognized edits reconcile to Visual state;
+- marker-backed generated domains reconstruct exact canonical state;
+- edits that cannot be safely reversed must return a conflict and must never be silently discarded or applied partially;
+- conflict recovery is explicit: restore canonical Visual code or fork the edited clean source into Code Studio;
+- arbitrary imperative JavaScript remains outside the Code → Visual guarantee.
+
+The Phase-15 gate covers every deterministic authoring generation from Phases 4–14, canonical regeneration stability, project serialization, asset strategies, generated-code syntax, deterministic bundle output, and the conflict/recovery UI contract.
+

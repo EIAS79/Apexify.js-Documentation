@@ -31,12 +31,30 @@ import {
   type VisualPathNodeProps,
 } from '../path-pixel-contract';
 import { validateVisualProject } from '../compiler/validate';
-import { phase9ProjectFromSourceMarker } from '../phase9-codegen';
-import { phase10ProjectFromSourceMarker } from '../phase10-codegen';
-import { phase11ProjectFromSourceMarker } from '../phase11-codegen';
-import { phase12ProjectFromSourceMarker } from '../phase12-codegen';
-import { phase13ProjectFromSourceMarker } from '../phase13-codegen';
-import { phase14ProjectFromSourceMarker } from '../phase14-codegen';
+import {
+  generatePhase9NativeSource,
+  phase9ProjectFromSourceMarker,
+} from '../phase9-codegen';
+import {
+  generatePhase10NativeSource,
+  phase10ProjectFromSourceMarker,
+} from '../phase10-codegen';
+import {
+  generatePhase11NativeSource,
+  phase11ProjectFromSourceMarker,
+} from '../phase11-codegen';
+import {
+  generatePhase12NativeSource,
+  phase12ProjectFromSourceMarker,
+} from '../phase12-codegen';
+import {
+  generatePhase13NativeSource,
+  phase13ProjectFromSourceMarker,
+} from '../phase13-codegen';
+import {
+  generatePhase14NativeSource,
+  phase14ProjectFromSourceMarker,
+} from '../phase14-codegen';
 
 export type VisualCodeSyncResult =
   | { ok: true; project: VisualProject; changed: boolean }
@@ -1620,6 +1638,22 @@ function reconcileRenderableCalls(
   return pathResourceToNodeId;
 }
 
+function markerBackedEditConflict(
+  phase: number,
+  source: string,
+  canonicalSource: string,
+): VisualCodeSyncResult | null {
+  if (source === canonicalSource) return null;
+  return {
+    ok: false,
+    error:
+      'This Phase ' +
+      phase +
+      ' generated-code edit cannot be reversed safely into Visual state. ' +
+      'Restore canonical Visual code or fork the edited source into Code Studio.',
+  };
+}
+
 export function reconcileVisualProjectFromCode(
   project: VisualProject,
   source: string,
@@ -1634,6 +1668,13 @@ export function reconcileVisualProjectFromCode(
         error: problem?.message ?? 'The Phase 14 source marker contains an invalid Visual Project.',
       };
     }
+    const phase14Conflict = markerBackedEditConflict(
+      14,
+      source,
+      generatePhase14NativeSource(phase14Project),
+    );
+    if (phase14Conflict) return phase14Conflict;
+
     const semantic = (value: VisualProject) =>
       JSON.stringify({
         width: value.document.width,
@@ -1665,6 +1706,13 @@ export function reconcileVisualProjectFromCode(
         error: problem?.message ?? 'The Phase 13 source marker contains an invalid Visual Project.',
       };
     }
+    const phase13Conflict = markerBackedEditConflict(
+      13,
+      source,
+      generatePhase13NativeSource(phase13Project),
+    );
+    if (phase13Conflict) return phase13Conflict;
+
     const semantic = (value: VisualProject) =>
       JSON.stringify({
         width: value.document.width,
@@ -1695,6 +1743,13 @@ export function reconcileVisualProjectFromCode(
         error: problem?.message ?? 'The Phase 12 source marker contains an invalid Visual Project.',
       };
     }
+    const phase12Conflict = markerBackedEditConflict(
+      12,
+      source,
+      generatePhase12NativeSource(phase12Project),
+    );
+    if (phase12Conflict) return phase12Conflict;
+
     const semantic = (value: VisualProject) =>
       JSON.stringify({
         width: value.document.width,
@@ -1725,6 +1780,13 @@ export function reconcileVisualProjectFromCode(
         error: problem?.message ?? 'The Phase 11 source marker contains an invalid Visual Project.',
       };
     }
+    const phase11Conflict = markerBackedEditConflict(
+      11,
+      source,
+      generatePhase11NativeSource(phase11Project),
+    );
+    if (phase11Conflict) return phase11Conflict;
+
     const semantic = (value: VisualProject) =>
       JSON.stringify({
         width: value.document.width,
@@ -1755,6 +1817,13 @@ export function reconcileVisualProjectFromCode(
         error: problem?.message ?? 'The Phase 10 source marker contains an invalid Visual Project.',
       };
     }
+    const phase10Conflict = markerBackedEditConflict(
+      10,
+      source,
+      generatePhase10NativeSource(phase10Project),
+    );
+    if (phase10Conflict) return phase10Conflict;
+
     const semantic = (value: VisualProject) =>
       JSON.stringify({
         width: value.document.width,
@@ -1784,6 +1853,13 @@ export function reconcileVisualProjectFromCode(
         error: problem?.message ?? 'The Phase 9 source marker contains an invalid Visual Project.',
       };
     }
+    const phase9Conflict = markerBackedEditConflict(
+      9,
+      source,
+      generatePhase9NativeSource(phase9Project),
+    );
+    if (phase9Conflict) return phase9Conflict;
+
     const semantic = (value: VisualProject) =>
       JSON.stringify({
         width: value.document.width,
