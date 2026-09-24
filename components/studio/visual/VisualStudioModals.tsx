@@ -159,6 +159,10 @@ type CodeModalProps = {
   onFileNameChange: (name: string) => void;
   onCopy: () => void;
   onDownload: () => void;
+  provenanceEnabled: boolean;
+  onProvenanceChange: (enabled: boolean) => void;
+  qualityMessage: string;
+  qualityOk: boolean;
 };
 
 export function VisualCodeModal({
@@ -169,6 +173,10 @@ export function VisualCodeModal({
   onFileNameChange,
   onCopy,
   onDownload,
+  provenanceEnabled,
+  onProvenanceChange,
+  qualityMessage,
+  qualityOk,
 }: CodeModalProps) {
   useEffect(() => {
     if (!open) return;
@@ -200,14 +208,30 @@ export function VisualCodeModal({
           </div>
         </header>
 
-        <div className="apx-vmodal-subbar">
+        <div className="apx-vmodal-subbar apx-phase15-code-subbar">
           <label>
             <span>File name</span>
             <input value={fileName} onChange={(event) => onFileNameChange(event.target.value)} />
           </label>
+          <label className="apx-phase15-provenance">
+            <input
+              type="checkbox"
+              checked={provenanceEnabled}
+              onChange={(event) => onProvenanceChange(event.target.checked)}
+              data-phase15-provenance-toggle
+            />
+            <span>Include provenance</span>
+          </label>
+          <span
+            className="apx-phase15-code-quality"
+            data-quality={qualityOk ? 'ok' : 'error'}
+            title={qualityMessage}
+          >
+            {qualityOk ? 'Canonical export' : 'Export issue'}
+          </span>
         </div>
 
-        <div className="apx-vmodal-code">
+        <div className="apx-vmodal-code" data-phase15-clean-code>
           <InteractiveCodeEditor
             value={source}
             language="ts"
