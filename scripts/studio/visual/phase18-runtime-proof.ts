@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { createCanvas, loadImage } from '@napi-rs/canvas';
 
 import { runSameOriginIsolatedStudio } from '../../../lib/studio/runtime/isolatedNodeExecutor';
 import {
@@ -17,8 +18,29 @@ type Artifact = {
   base64?: string;
 };
 
-function digest(base64: string) {
-  return createHash('sha256').update(Buffer.from(base64, 'base64')).digest('hex');
+function digestBytes(value: Uint8Array | Buffer) {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+async function semanticDigest(mime: string, base64: string) {
+  const bytes = Buffer.from(base64, 'base64');
+  if (mime.startsWith('image/')) {
+    const image = await loadImage(bytes);
+    const canvas = createCanvas(Math.max(1, image.width), Math.max(1, image.height));
+    const context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0);
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    return {
+      kind: 'pixels',
+      width: canvas.width,
+      height: canvas.height,
+      sha256: digestBytes(Buffer.from(pixels.buffer, pixels.byteOffset, pixels.byteLength)),
+    };
+  }
+  return {
+    kind: 'bytes',
+    sha256: digestBytes(bytes),
+  };
 }
 
 async function execute(label: string, source: string) {
@@ -29,16 +51,22 @@ async function execute(label: string, source: string) {
       (result.body.error ?? result.body.stderr ?? JSON.stringify(result.body.runtimeDebug ?? {})),
     );
   }
-  const artifacts = (result.body.outputs ?? [])
-    .filter((item: Artifact) => typeof item.base64 === 'string' && item.base64.length > 0)
-    .map((item: Artifact) => ({
-      mime: item.mime ?? 'application/octet-stream',
-      kind: item.kind ?? 'binary',
-      bytes: Buffer.byteLength(item.base64!, 'base64'),
-      sha256: digest(item.base64!),
-    }));
-  if (!artifacts.length) throw new Error(label + ': runtime returned no artifact bytes');
-  return artifacts;
+  const rawArtifacts = (result.body.outputs ?? [])
+    .filter((item: Artifact) => typeof item.base64 === 'string' && item.base64.length > 0);
+  if (!rawArtifacts.length) throw new Error(label + ': runtime returned no artifact bytes');
+
+  return await Promise.all(
+    rawArtifacts.map(async (item: Artifact) => {
+      const mime = item.mime ?? 'application/octet-stream';
+      const base64 = item.base64!;
+      return {
+        mime,
+        kind: item.kind ?? 'binary',
+        bytes: Buffer.byteLength(base64, 'base64'),
+        semantic: await semanticDigest(mime, base64),
+      };
+    }),
+  );
 }
 
 async function main() {
@@ -59,8 +87,8 @@ async function main() {
     );
   }
 
-  const canonicalComparable = canonicalArtifacts.map(({ mime, sha256 }) => ({ mime, sha256 }));
-  const previewComparable = previewArtifacts.map(({ mime, sha256 }) => ({ mime, sha256 }));
+  const canonicalComparable = canonicalArtifacts.map(({ mime, semantic }) => ({ mime, semantic }));
+  const previewComparable = previewArtifacts.map(({ mime, semantic }) => ({ mime, semantic }));
 
   if (JSON.stringify(canonicalComparable) !== JSON.stringify(previewComparable)) {
     throw new Error(
@@ -79,7 +107,7 @@ async function main() {
     '[studio-visual:phase18-runtime] PASS ' +
       proof.id +
       ' ' +
-      canonicalArtifacts.map((item) => item.mime + ':' + item.bytes).join(','),
+      canonicalArtifacts.map((item) => item.mime + ':' + item.bytes + ':' + item.semantic.kind).join(','),
   );
 }
 
