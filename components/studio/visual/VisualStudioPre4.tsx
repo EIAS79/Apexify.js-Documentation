@@ -659,7 +659,11 @@ export default function VisualStudioPre4({
     primaryText?.transform?.scaleY,
     assets,
   ]);
-  const layerIds = useMemo(() => flattenLayerIds(project), [project]);
+  const layerIds = useMemo(
+    () => flattenLayerIds(project),
+    [projectSemanticSignature],
+  );
+  const layerTreeMode = phase17LayerTreeMode(layerIds.length);
   const drawableIds = useMemo(
     () =>
       layerIds.filter((id) => {
@@ -675,7 +679,7 @@ export default function VisualStudioPre4({
             ),
         );
       }),
-    [layerIds, project],
+    [layerIds, projectSemanticSignature],
   );
 
   const assetKind = (mime: string) =>
@@ -701,7 +705,7 @@ export default function VisualStudioPre4({
           error instanceof Error ? error.message : 'Code generation unavailable',
       };
     }
-  }, [project]);
+  }, [projectSemanticSignature]);
 
   const previewGenerated = useMemo(() => {
     try {
@@ -713,7 +717,7 @@ export default function VisualStudioPre4({
           error instanceof Error ? error.message : 'Preview code generation unavailable',
       };
     }
-  }, [project]);
+  }, [projectSemanticSignature]);
 
   const displayPreviewGenerated = useMemo(() => {
     try {
@@ -725,23 +729,24 @@ export default function VisualStudioPre4({
           error instanceof Error ? error.message : 'Display preview code generation unavailable',
       };
     }
-  }, [project]);
+  }, [projectSemanticSignature]);
 
-  const phase9Active = useMemo(() => hasPhase9Authoring(project), [project]);
-  const phase10Active = useMemo(() => hasPhase10Authoring(project), [project]);
-  const phase11Active = useMemo(() => hasPhase11Authoring(project), [project]);
-  const phase12Active = useMemo(() => hasPhase12Authoring(project), [project]);
-  const phase13Active = useMemo(() => hasPhase13Authoring(project), [project]);
-  const phase14Active = useMemo(() => hasPhase14Authoring(project), [project]);
+  const phase9Active = useMemo(() => hasPhase9Authoring(project), [projectSemanticSignature]);
+  const phase10Active = useMemo(() => hasPhase10Authoring(project), [projectSemanticSignature]);
+  const phase11Active = useMemo(() => hasPhase11Authoring(project), [projectSemanticSignature]);
+  const phase12Active = useMemo(() => hasPhase12Authoring(project), [projectSemanticSignature]);
+  const phase13Active = useMemo(() => hasPhase13Authoring(project), [projectSemanticSignature]);
+  const phase14Active = useMemo(() => hasPhase14Authoring(project), [projectSemanticSignature]);
   const canonicalLinkedSource = generated.value?.source ?? codeSource;
   const exportedCodeSource = useMemo(
     () => phase15ExportedCode(project, canonicalLinkedSource, includeCodeProvenance),
-    [project, canonicalLinkedSource, includeCodeProvenance],
+    [projectSemanticSignature, canonicalLinkedSource, includeCodeProvenance],
   );
   const exportCodeQuality = useMemo(
     () => lintGeneratedTypeScript(exportedCodeSource),
     [exportedCodeSource],
   );
+  const largeCodeMode = phase17LargeDocumentMode(codeSource);
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
