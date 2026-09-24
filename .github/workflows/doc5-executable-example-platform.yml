@@ -1,12 +1,7 @@
 name: DOC-5 Executable Example Platform
 
 on:
-  push:
-    branches: [doc5-executable-example-platform, main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
 concurrency:
   group: doc5-examples-${{ github.ref }}
   cancel-in-progress: true
