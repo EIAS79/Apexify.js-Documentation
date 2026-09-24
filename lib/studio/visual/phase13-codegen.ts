@@ -152,12 +152,14 @@ function generatedBody(timeline:Phase13Timeline):string {
     lines.push(
       '  const result = await painter.createVideo({',
       '    source: frames[0],',
-      '    createFromFrames: '+emitValue({
-        frames:{__frames:true},
-        outputPath:'phase13-video.'+timeline.frames.format,
-        fps:timeline.frames.fps,format:timeline.frames.format,quality:timeline.frames.quality,
-        resolution:{width:timeline.frames.width,height:timeline.frames.height,fit:'contain'},
-      },4).replace(/frames: \{\n\s+__frames: true,\n\s+\}/,'frames').replace(/\n/g,'\n    ')+',',
+      '    createFromFrames: {',
+      '      frames,',
+      '      outputPath: '+JSON.stringify('phase13-video.'+timeline.frames.format)+',',
+      '      fps: '+String(timeline.frames.fps)+',',
+      '      format: '+JSON.stringify(timeline.frames.format)+',',
+      '      quality: '+JSON.stringify(timeline.frames.quality)+',',
+      '      resolution: '+emitValue({ width: timeline.frames.width, height: timeline.frames.height, fit: 'contain' })+',',
+      '    },',
       '  });',
     );
     finalPathLiteral='result.outputPath';
