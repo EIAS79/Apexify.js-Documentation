@@ -3451,6 +3451,8 @@ feat(studio-visual): complete code and project export
 >
 > **Pinned Apexify.js runtime:** `50f2543482abbd7a9624192a060ec01330370bef`
 >
+> **Production release guard:** `7061e6ba07cc7092cd3cfe3ff557debcf6aaca3c` — focused Phase-16 gate is now part of `npm run build`.
+>
 > **Main integration:** `86ebd0cdc75a33b86afc227bc54d118cf3caadb8`
 >
 > **Verification policy:** repository GitHub Actions remain manual-only by project instruction; Phase 15 is integrated directly after source/contract completion review.
@@ -3526,7 +3528,7 @@ chore(studio-visual): close full feature completeness gate
 
 ### Phase 16 implementation record — STUDIO-VISUAL-16
 
-> **Status:** MAIN MERGED — MANUAL GATE VERIFICATION PENDING
+> **Status:** MAIN MERGED — PRODUCTION RELEASE GATE RUNNING
 >
 > **Work branch:** `studio-visual/v16-feature-completeness`
 >
@@ -3570,7 +3572,7 @@ Manual verification remains intentionally pending because repository Actions are
 
 The current Vercel status for the Phase-16 head is an external build-rate-limit failure (`upgradeToPro=build-rate-limit`), not an implementation/compiler/test result. Per the Studio program, Vercel is not used as the iterative Phase-16 verifier.
 
-**Do not claim the Phase-16 gate fully green until the manual Studio Visual Phase Gate has executed successfully on main.**
+**Closure rule:** mark Phase 16 complete only after a production deployment containing the release guard reaches READY; that build executes the focused Phase-16 completeness and reconciliation gate before Next.js.
 
 ---
 
@@ -3712,7 +3714,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 13 | Video | COMPLETE — PR #107 | `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1` | Studio Visual Phase Gate 35937825619 SUCCESS; Runtime Build Gate 35937825649 SUCCESS on Node 22/24/26; 136/136 tests; Linux generated MP4 proof PASS |
 | 14 | Advanced operations | COMPLETE — PR #109 | `008fbf63cb351524f76e3f31d1c9cb94f857c380` | Runtime PR #39 merged as `50f2543482abbd7a9624192a060ec01330370bef`; 13 implemented / 3 excluded / 6 non-authoring capability rows; Actions manual-only by project instruction |
 | 15 | Export / project round trip | COMPLETE — PR #112 | `86ebd0cdc75a33b86afc227bc54d118cf3caadb8` | Direct integration by project instruction; dedicated Phase-15 round-trip/export regression suite added to `studio:visual:test`; all 19 workflows remain manual-only |
-| 16 | Feature completeness gate | MAIN MERGED — MANUAL GATE PENDING | `8ad8d76158ac3e73b48db61b750078afdbfd3757` | PR #113 merged; mechanical Phase-16 verifier/report/proof suite integrated; manual Studio Visual Phase Gate still required; Vercel check is externally blocked by build-rate-limit |
+| 16 | Feature completeness gate | PRODUCTION RELEASE GATE RUNNING | `8ad8d76158ac3e73b48db61b750078afdbfd3757` | PR #113 merged; release guard `7061e6ba` is part of production build; awaiting exact-head Vercel READY proof |
 | 17 | Hardening | NOT STARTED | — | — |
 | 18 | Final release | NOT STARTED | — | — |
 
