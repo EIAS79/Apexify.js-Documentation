@@ -92,15 +92,50 @@ test('Phase 13 operation stack emits advanced createVideo operations in order',(
     {id:'op-reverse',kind:'reverse'},
     {id:'op-compress',kind:'compress',quality:'medium'},
     {id:'op-transition',kind:'transition',type:'fade',duration:.4,secondAssetId:'video_second_1'},
+    {id:'op-watermark',kind:'watermark',assetId:'watermark_1',position:'top-right',opacity:.8},
+    {id:'op-merge',kind:'merge',assetIds:['video_merge_1'],mode:'sequential'},
+    {id:'op-split',kind:'splitScreen',assetIds:['video_split_1'],layout:'side-by-side'},
+    {id:'op-replace',kind:'replaceSegment',replacementAssetId:'video_replace_1',targetStartTime:.5,targetEndTime:1.5,durationPolicy:'fit'},
+    {id:'op-loop',kind:'loop',smooth:true},
+    {id:'op-stabilize',kind:'stabilize',smoothing:8},
+    {id:'op-timelapse',kind:'timeLapse',speed:2},
+    {id:'op-mute',kind:'mute'},
+    {id:'op-volume',kind:'volume',volume:.8},
+    {id:'op-lut',kind:'lut',assetId:'lut_asset_1',intensity:.7},
+    {id:'op-mix-audio',kind:'mixAudio',assetId:'audio_mix_1',startTime:0,volume:.7,keepOriginalAudio:true},
     {id:'op-preset',kind:'exportPreset',preset:'web'},
   ];
   const source=generateVisualProjectCode(setPhase13Timeline(project,timeline)).source;
-  for(const token of ['changeSpeed:','applyEffects:','crop:','rotate:','pictureInPicture:','addFade:','reverse:','compress:','addTransition:','exportPreset:']) {
+  for(const token of [
+    'changeSpeed:','applyEffects:','crop:','rotate:','pictureInPicture:','addFade:','reverse:','compress:',
+    'addTransition:','addWatermark:','merge:','splitScreen:','replaceSegment:','createLoop:','stabilize:',
+    'createTimeLapse:','mute:','adjustVolume:','applyLUT:','mixAudio:','exportPreset:',
+  ]) {
     assert.ok(source.includes(token),token+' missing');
   }
   assert.ok(source.indexOf('changeSpeed:') < source.indexOf('applyEffects:'));
   assert.match(source,/overlayVideo: videoAsset2/);
   assert.match(source,/secondVideo: videoAsset3/);
+  assert.match(source,/lutPath: "studio:\/\/asset\/lut_asset_1"/);
+});
+
+test('Phase 13 inspection tools emit metadata, frames, previews, scenes and audio artifacts',()=>{
+  const project=projectFor('frames');
+  const timeline=phase13Timeline(project)!;
+  timeline.inspect={
+    extractTimes:[0,.25],
+    thumbnails:4,
+    previewFrames:3,
+    probe:true,
+    detectScenes:true,
+    sceneThreshold:.35,
+    extractAudio:true,
+  };
+  const source=generateVisualProjectCode(setPhase13Timeline(project,timeline)).source;
+  for(const token of [
+    'extractMultipleFrames(','generateThumbnail:','generatePreview:','getVideoInfo(','detectScenes:','extractAudio:',
+    'return [result, extractedFrames, thumbnailResult, previewFrames, videoInfo, sceneDetection, extractedAudio]',
+  ]) assert.ok(source.includes(token),token+' missing');
 });
 
 test('Phase 13 canonical source round-trips exact video semantics',()=>{
@@ -161,6 +196,9 @@ test('Phase 13 permanent Video rail, editor, inspector, Timeline and native play
     'data-visual-video-inspector',
     'data-visual-video-timeline',
     'data-video-operation',
+    'data-video-operation-library',
+    'data-video-splice-select',
+    'data-video-inspection-options',
   ]) assert.ok(ui.includes(marker),marker+' missing');
 
   assert.ok(shell.includes("['video', VideoCameraIcon, 'Video']"));
