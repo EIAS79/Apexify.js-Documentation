@@ -30,7 +30,26 @@ try {
   const artifactDir = path.join(temp, 'artifact'); fs.mkdirSync(artifactDir);
   const packageDir = path.join(root, 'node_modules', 'apexify.js');
   if (!fs.existsSync(path.join(packageDir, 'package.json'))) throw new Error('Pinned apexify.js dependency is not installed. Run npm ci first.');
-  const packOut = runOrThrow(npmCmd, ['pack', packageDir, '--ignore-scripts', '--json', '--pack-destination', artifactDir], root, minimalInstallEnv());
+
+  // Git-installed packages may retain source-only lifecycle hooks while npm omits
+  // the corresponding repository scripts from node_modules. Pack an exact runtime
+  // snapshot with only those packaging-time hooks removed so verification never
+  // executes missing source tooling.
+  const packSource = path.join(temp, 'package-source');
+  fs.cpSync(packageDir, packSource, { recursive: true });
+  const packManifestPath = path.join(packSource, 'package.json');
+  const packManifest = JSON.parse(fs.readFileSync(packManifestPath, 'utf8')) as {
+    scripts?: Record<string, string>;
+  };
+  if (packManifest.scripts) {
+    delete packManifest.scripts.prepare;
+    delete packManifest.scripts.prepack;
+    delete packManifest.scripts.postpack;
+    if (!Object.keys(packManifest.scripts).length) delete packManifest.scripts;
+    fs.writeFileSync(packManifestPath, `${JSON.stringify(packManifest, null, 2)}\n`);
+  }
+
+  const packOut = runOrThrow(npmCmd, ['pack', packSource, '--ignore-scripts', '--json', '--pack-destination', artifactDir], root, minimalInstallEnv());
   const pack = JSON.parse(packOut) as Array<{ filename: string }>;
   const artifactFile = path.join(artifactDir, pack[0]?.filename ?? '');
   if (!fs.existsSync(artifactFile)) throw new Error('npm pack did not produce an Apexify.js tarball.');

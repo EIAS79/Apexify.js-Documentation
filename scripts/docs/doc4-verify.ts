@@ -5,11 +5,15 @@ import type { ApiManifest } from '../../lib/api-reference/schema';
 
 const ROOT=process.cwd(), OUT=path.join(ROOT,'generated','docs-doc4');
 const read=(name:string)=>JSON.parse(fs.readFileSync(path.join(OUT,name),'utf8'));
+const docsPackage=JSON.parse(fs.readFileSync(path.join(ROOT,'package.json'),'utf8'));
+const apexifyPin=String(docsPackage.dependencies?.['apexify.js']||'');
+const expectedCommit=apexifyPin.match(/#([a-f0-9]{40})$/i)?.[1]||'';
+assert.ok(expectedCommit,'Apexify package pin must end in a 40-character commit SHA.');
 const manifest=read('api-manifest.json') as ApiManifest;
 assert.equal(manifest.schemaVersion,1);
 assert.equal(manifest.package.name,'apexify.js');
 assert.equal(manifest.package.version,'6.0.0');
-assert.equal(manifest.package.commit,'69d40cf40ba992ad2bdec457c6c7217f5df55cd1');
+assert.equal(manifest.package.commit,expectedCommit);
 assert.match(manifest.package.packedTreeSha256,/^[a-f0-9]{64}$/);
 assert.match(manifest.package.manifestSha256||'',/^[a-f0-9]{64}$/);
 assert.ok(manifest.entrypoints.some(e=>e.exportPath==='.'));

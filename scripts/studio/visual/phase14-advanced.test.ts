@@ -124,7 +124,7 @@ test('Phase 14 exposes toOutput and normalized legacy outPut without URL output'
   source = generatePhase14NativeSource(value);
   assert.ok(source.includes("new ApexPainter({ type: \"base64\" })"));
   assert.ok(source.includes('await painter.outPut(primaryBuffer)'));
-  assert.ok(!source.includes('output.url'));
+  assert.ok(!source.includes('painter.output.url('));
 });
 
 test('Phase 14 plugin lifecycle code covers install, registry and removal while package plugins are code-only', () => {

@@ -5,7 +5,7 @@
   "package": {
     "name": "apexify.js",
     "version": "6.0.0",
-    "commit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1"
+    "commit": "50f2543482abbd7a9624192a060ec01330370bef"
   },
   "phase14pFrozenSha": "5d9b71f185140d6c3477286b8fb111f293e52b48",
   "stableIdPattern": "^node\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
