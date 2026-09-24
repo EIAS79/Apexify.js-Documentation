@@ -3177,20 +3177,44 @@ export default function VisualStudioPre4({
         Boolean(node && node.kind === 'group' && (node.childIds?.length ?? 0) > 0),
     );
 
-  const featureTools = [
-    ['canvas', ComputerDesktopIcon, 'Canvas'],
-    ['images', PhotoIcon, 'Images'],
-    ['text', DocumentTextIcon, 'Text'],
-    ['charts', ChartBarIcon, 'Charts'],
-    ['shapes', Squares2X2Icon, 'Shapes'],
-    ['paths', PencilSquareIcon, 'Paths'],
-    ['layers', RectangleStackIcon, 'Layers'],
-    ['components', CubeIcon, 'Components'],
-    ['assets', CircleStackIcon, 'Assets'],
-    ['gif', FilmIcon, 'GIF'],
-    ['audio', MusicalNoteIcon, 'Audio'],
-    ['video', VideoCameraIcon, 'Video'],
-    ['advanced', WrenchScrewdriverIcon, 'Advanced'],
+  const featureGroups = [
+    {
+      id: 'create',
+      label: 'Create',
+      tools: [
+        ['canvas', ComputerDesktopIcon, 'Canvas'],
+        ['images', PhotoIcon, 'Images'],
+        ['text', DocumentTextIcon, 'Text'],
+        ['shapes', Squares2X2Icon, 'Shapes'],
+        ['paths', PencilSquareIcon, 'Paths'],
+        ['charts', ChartBarIcon, 'Charts'],
+      ],
+    },
+    {
+      id: 'structure',
+      label: 'Structure',
+      tools: [
+        ['layers', RectangleStackIcon, 'Layers'],
+        ['components', CubeIcon, 'Components'],
+        ['assets', CircleStackIcon, 'Assets'],
+      ],
+    },
+    {
+      id: 'media',
+      label: 'Motion & media',
+      tools: [
+        ['gif', FilmIcon, 'GIF'],
+        ['audio', MusicalNoteIcon, 'Audio'],
+        ['video', VideoCameraIcon, 'Video'],
+      ],
+    },
+    {
+      id: 'system',
+      label: 'System',
+      tools: [
+        ['advanced', WrenchScrewdriverIcon, 'Advanced'],
+      ],
+    },
   ] as const;
 
   const mediaContextActive =
@@ -6397,52 +6421,71 @@ export default function VisualStudioPre4({
       >
         <nav className="apx-pre4-feature-rail" aria-label="Visual Studio features">
           <div className="apx-pre4-feature-list">
-            {featureTools.map(([id, Icon, label]) => (
-              <button
-                key={id}
-                type="button"
-                aria-label={label}
-                title={label}
-                data-feature-tool={id}
-                data-active={activeTool === id ? 'true' : undefined}
-                onClick={() => {
-                  setActiveTool(id);
-                  if (id === 'assets') setDockTab('assets');
-                  if (id === 'gif') {
-                    setDockTab('timeline');
-                    setDockCollapsed(false);
-                  }
-                  if (id === 'audio') {
-                    setDockTab('timeline');
-                    setDockCollapsed(false);
-                  }
-                  if (id === 'video') {
-                    setProject((current) => ({
-                      ...current,
-                      editor: { ...current.editor, selectedNodeIds: [] },
-                    }));
-                    setDockTab('timeline');
-                    setDockCollapsed(false);
-                  }
-                  if (id === 'advanced') {
-                    setProject((current) => ({
-                      ...current,
-                      editor: { ...current.editor, selectedNodeIds: [] },
-                    }));
-                    setInspectorTab('advanced');
-                    setMessage('Advanced operations · batch, chain, plugins and output');
-                  }
-                  if (id === 'layers') setMessage('Layers panel active');
-                }}
+            {featureGroups.map((group) => (
+              <section
+                key={group.id}
+                className="apx-pre4-feature-group"
+                data-feature-group={group.id}
+                aria-label={group.label}
               >
-                <span className="apx-pre4-feature-icon"><Icon aria-hidden /></span>
-                <span>{label}</span>
-              </button>
+                <div className="apx-pre4-feature-group-title" aria-hidden="true">
+                  <span>{group.label}</span>
+                </div>
+                <div className="apx-pre4-feature-group-tools">
+                  {group.tools.map(([id, Icon, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      aria-label={label}
+                      title={label}
+                      data-feature-tool={id}
+                      data-active={activeTool === id ? 'true' : undefined}
+                      onClick={() => {
+                        setActiveTool(id);
+                        if (id === 'assets') setDockTab('assets');
+                        if (id === 'gif') {
+                          setDockTab('timeline');
+                          setDockCollapsed(false);
+                        }
+                        if (id === 'audio') {
+                          setDockTab('timeline');
+                          setDockCollapsed(false);
+                        }
+                        if (id === 'video') {
+                          setProject((current) => ({
+                            ...current,
+                            editor: { ...current.editor, selectedNodeIds: [] },
+                          }));
+                          setDockTab('timeline');
+                          setDockCollapsed(false);
+                        }
+                        if (id === 'advanced') {
+                          setProject((current) => ({
+                            ...current,
+                            editor: { ...current.editor, selectedNodeIds: [] },
+                          }));
+                          setInspectorTab('advanced');
+                          setMessage('Advanced operations · batch, chain, plugins and output');
+                        }
+                        if (id === 'layers') setMessage('Layers panel active');
+                      }}
+                    >
+                      <span className="apx-pre4-feature-icon" aria-hidden="true">
+                        <Icon />
+                      </span>
+                      <span className="apx-pre4-feature-label">{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
-          <div className="apx-pre4-feature-card">
-            <strong>Turn ideas into interactive experiences.</strong>
-            <span>Apexify.js ↗</span>
+          <div className="apx-pre4-feature-footer" aria-label="Visual Studio workspace">
+            <span className="apx-pre4-feature-footer-dot" aria-hidden="true" />
+            <span className="apx-pre4-feature-footer-copy">
+              <strong>Visual Studio</strong>
+              <small>Live workspace</small>
+            </span>
           </div>
         </nav>
 

@@ -58,6 +58,26 @@ test('PRE-4 installs the approved permanent product shell architecture', () => {
   assert.match(css, /grid-template-areas:[\s\S]*rail layers stage inspector/);
 });
 
+
+test('PRE-4 groups the Visual Studio feature rail into clear authoring families', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const css = read('styles/studio-calm.css');
+
+  for (const label of ['Create', 'Structure', 'Motion & media', 'System']) {
+    assert.match(shell, new RegExp(label));
+  }
+
+  assert.match(shell, /data-feature-group=\{group\.id\}/);
+  assert.match(shell, /apx-pre4-feature-group-tools/);
+  assert.match(shell, /apx-pre4-feature-label/);
+  assert.match(shell, /Visual Studio workspace/);
+  assert.match(css, /STUDIO LEFT RAIL NAVIGATION REFRESH/);
+  assert.match(css, /--pre4-rail-size:176px/);
+  assert.match(css, /apx-pre4-feature-group-title/);
+  assert.match(css, /button\[data-feature-tool="canvas"\]/);
+  assert.match(css, /button\[data-feature-tool="advanced"\]/);
+});
+
 test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
 
