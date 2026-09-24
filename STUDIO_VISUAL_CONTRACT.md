@@ -142,7 +142,7 @@ edit
 -> runtime/browser smoke where materially needed
 -> fix
 -> repeat
--> optional manual GitHub Actions only at a deliberate final verification point
+-> direct repository verification scripts/build checks
 ```
 
 Vercel is not the iterative debugger.
@@ -195,7 +195,7 @@ Host-filesystem persistence and credentialed third-party transfer must never be 
 
 Package-backed plugin imports are `code-only`: they are emitted in exported TypeScript but skipped by hosted Studio Preview unless that package is part of the controlled Studio runtime. Inline plugins and registry API configuration remain previewable.
 
-GitHub Actions in this repository are manual-only during active phase implementation. They may be invoked deliberately for a later final verification pass; ordinary pushes, PRs, and merges do not require or trigger them.
+Phase-specific verification is kept in repository scripts and build contracts, not persistent GitHub Actions workflows. Historical workflow results may remain documented, but obsolete phase-gate workflow files are removed after they stop serving the product.
 
 ## 12. Phase-15 export and round-trip contract
 
@@ -271,7 +271,7 @@ Reverse-sync evidence follows the shipped contracts:
 
 Representative Phase-16 proof projects must cover every authorable domain and must produce both canonical user-facing Apexify.js code and Preview code. Canonical generated source must reconcile back into its Visual Project without semantic drift.
 
-GitHub Actions remain manual-only. The Studio Visual workflow generates the Phase-16 JSON/Markdown report as a short-lived verification artifact before running the consolidated Visual verification command.
+Phase 16 does not retain a dedicated GitHub Actions phase-gate workflow. The JSON/Markdown report generator and consolidated verification commands remain directly runnable from repository scripts.
 
 For release enforcement, the normal production `npm run build` path must also execute the focused Phase-16 release guard before `next build`. The release guard consists of:
 
@@ -280,4 +280,4 @@ For release enforcement, the normal production `npm run build` path must also ex
 - Phase-16 mechanical completeness check;
 - Phase-16 representative proof/reconciliation test file.
 
-This keeps the Phase-16 feature-completeness invariant continuously enforced by production builds without enabling automatic full GitHub Actions workflows.
+This keeps the Phase-16 feature-completeness invariant enforced by production builds without retaining obsolete phase-specific GitHub Actions workflows.

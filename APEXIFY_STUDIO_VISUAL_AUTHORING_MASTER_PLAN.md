@@ -3455,7 +3455,7 @@ feat(studio-visual): complete code and project export
 >
 > **Main integration:** `86ebd0cdc75a33b86afc227bc54d118cf3caadb8`
 >
-> **Verification policy:** repository GitHub Actions remain manual-only by project instruction; Phase 15 is integrated directly after source/contract completion review.
+> **Verification policy:** obsolete phase-specific GitHub Actions are not retained. Phase verification lives in repository scripts/build contracts; historical workflow runs below remain documentation only.
 
 Completed Phase-15 scope:
 
@@ -3556,7 +3556,7 @@ Implemented Phase-16 scope:
 - canonical generated-code → Visual Project reconciliation regression coverage;
 - deterministic JSON + Markdown completeness report generator;
 - Phase-16 verification integrated into `studio:visual:verify`;
-- manual Studio Visual workflow now generates and uploads the Phase-16 report before the consolidated gate;
+- Phase-16 report generation remains available through repository scripts; no persistent phase-gate GitHub Action is retained;
 - failure-report artifacts are preserved even if the Phase-16 checker finds a completeness violation;
 - Phase-16 mechanical completeness contract added to `STUDIO_VISUAL_CONTRACT.md`.
 
@@ -3568,7 +3568,7 @@ Source/integration review completed:
 - authored Phase-16 TypeScript files passed static syntax validation;
 - no automatic push/PR workflow was enabled.
 
-Manual verification remains intentionally pending because repository Actions are manual-only and the available GitHub connector does not expose workflow dispatch. The required final Phase-16 evidence run is the existing **Studio Visual Phase Gate** workflow on the merged main SHA. That run will execute the consolidated capability checks, Phase-16 report generation, Visual regression suite, runtime proof, Linux video smoke, typecheck, production build and browser regression.
+Phase-16 verification no longer depends on a GitHub Actions phase gate. The focused completeness/reconciliation release guard is executed by the normal production build, while the broader repository verification commands remain directly runnable from package scripts.
 
 The current Vercel status for the Phase-16 head is an external build-rate-limit failure (`upgradeToPro=build-rate-limit`), not an implementation/compiler/test result. Per the Studio program, Vercel is not used as the iterative Phase-16 verifier.
 
@@ -3713,7 +3713,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 12 | Audio | COMPLETE — PR #105 | `1232800509fba731d508efb9ec45482eba5c83f3` | Studio Visual Phase Gate 35930842667 SUCCESS; Runtime Build Gate 35930842704 SUCCESS; 128/128 tests; Linux procedural WAV equivalence proof PASS |
 | 13 | Video | COMPLETE — PR #107 | `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1` | Studio Visual Phase Gate 35937825619 SUCCESS; Runtime Build Gate 35937825649 SUCCESS on Node 22/24/26; 136/136 tests; Linux generated MP4 proof PASS |
 | 14 | Advanced operations | COMPLETE — PR #109 | `008fbf63cb351524f76e3f31d1c9cb94f857c380` | Runtime PR #39 merged as `50f2543482abbd7a9624192a060ec01330370bef`; 13 implemented / 3 excluded / 6 non-authoring capability rows; Actions manual-only by project instruction |
-| 15 | Export / project round trip | COMPLETE — PR #112 | `86ebd0cdc75a33b86afc227bc54d118cf3caadb8` | Direct integration by project instruction; dedicated Phase-15 round-trip/export regression suite added to `studio:visual:test`; all 19 workflows remain manual-only |
+| 15 | Export / project round trip | COMPLETE — PR #112 | `86ebd0cdc75a33b86afc227bc54d118cf3caadb8` | Direct integration by project instruction; dedicated Phase-15 round-trip/export regression suite added to `studio:visual:test`; obsolete phase-specific Actions removed from the repository during Phase-16 cleanup |
 | 16 | Feature completeness gate | PRODUCTION RELEASE GATE RUNNING | `8ad8d76158ac3e73b48db61b750078afdbfd3757` | PR #113 merged; release guard `7061e6ba` is part of production build; awaiting exact-head Vercel READY proof |
 | 17 | Hardening | NOT STARTED | — | — |
 | 18 | Final release | NOT STARTED | — | — |
