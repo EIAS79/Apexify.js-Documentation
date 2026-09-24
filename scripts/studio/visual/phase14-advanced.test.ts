@@ -21,6 +21,7 @@ import {
 } from '../../../lib/studio/visual/phase14-codegen';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
+import { planStudioExecution } from '../../../lib/studio/runtime/capabilities';
 
 function project() {
   return ensurePhase14Authoring(createVisualProject({
@@ -71,6 +72,15 @@ test('Phase 14 generated chain code is deterministic and uses real public Apexif
   assert.ok(!a.includes('painter.save('));
   assert.ok(!a.includes('painter.saveMultiple('));
   assert.ok(!a.includes('painter.output.url('));
+});
+
+test('Phase 14 preview routes Advanced APIs to the authoritative full runtime', () => {
+  const source = generatePhase14NativeSource(project());
+  const execution = planStudioExecution(source);
+  assert.equal(execution.backend, 'full-runtime');
+  assert.ok(execution.families.includes('batch'));
+  assert.ok(execution.families.includes('plugins'));
+  assert.ok(execution.families.includes('output'));
 });
 
 test('Phase 14 batch code emits bounded concurrency and asset-resolution options', () => {
@@ -253,6 +263,7 @@ test('Phase 14 UI occupies Advanced, Diagnostics and Export without creating a p
   assert.ok(shell.includes('<VisualAdvancedInspector'));
   assert.ok(shell.includes('data-advanced-export-settings'));
   assert.ok(shell.includes('data-phase14-results'));
+  assert.ok(shell.includes('phase14Active || phase13Active || phase12Active'));
   assert.ok(!shell.includes('<VisualAdvancedDock'));
 });
 
