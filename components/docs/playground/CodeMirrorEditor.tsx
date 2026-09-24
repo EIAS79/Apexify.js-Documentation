@@ -108,7 +108,7 @@ export default function CodeMirrorEditor({
     <CodeMirror
       value={value}
       height="100%"
-      className={layoutClass}
+      className={layoutClass + (largeDocument ? ' phase17-codemirror-large' : '')}
       theme="dark"
       extensions={extensions}
       onChange={onChange}
@@ -131,7 +131,6 @@ export default function CodeMirrorEditor({
           : { lineNumbers: true, foldGutter: true }
       }
       aria-label={ariaLabel}
-      data-phase17-large-document={largeDocument ? 'true' : undefined}
     />
   );
 }
