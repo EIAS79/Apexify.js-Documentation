@@ -1,42 +1,7 @@
 name: DOC-10 Future Engine Documentation Readiness
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - 'app/%5F_docs-fixtures/**'
-      - 'components/api-reference/**'
-      - 'components/docs/**'
-      - 'fixtures/docs-future/**'
-      - 'lib/api-reference/**'
-      - 'lib/docs/**'
-      - 'lib/examples/**'
-      - 'scripts/docs/**'
-      - 'scripts/studio/install-ffmpeg.mjs'
-      - 'generated/docs-doc10/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/doc10-future-engine-readiness.yml'
-      - 'DOC10_*'
-  push:
-    branches: [main]
-    paths:
-      - 'app/%5F_docs-fixtures/**'
-      - 'components/api-reference/**'
-      - 'components/docs/**'
-      - 'fixtures/docs-future/**'
-      - 'lib/api-reference/**'
-      - 'lib/docs/**'
-      - 'lib/examples/**'
-      - 'scripts/docs/**'
-      - 'scripts/studio/install-ffmpeg.mjs'
-      - 'generated/docs-doc10/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/doc10-future-engine-readiness.yml'
-      - 'DOC10_*'
   workflow_dispatch:
-
 permissions:
   contents: read
 
