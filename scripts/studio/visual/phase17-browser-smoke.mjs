@@ -155,8 +155,11 @@ for (const [name, width, height] of matrix) {
   await page.setViewport({ width, height });
   await page.setCacheEnabled(false);
   await page.evaluateOnNewDocument(() => {
-    localStorage.clear();
-    localStorage.setItem('apexify-theme', 'dark');
+    if (!sessionStorage.getItem('phase17-browser-initialized')) {
+      localStorage.clear();
+      localStorage.setItem('apexify-theme', 'dark');
+      sessionStorage.setItem('phase17-browser-initialized', '1');
+    }
   });
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
