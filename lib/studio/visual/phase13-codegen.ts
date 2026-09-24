@@ -162,7 +162,7 @@ function generatedBody(timeline:Phase13Timeline):string {
       '      frames,',
       '      outputPath: '+JSON.stringify('phase13-video.'+timeline.render.format)+',',
       '      fps: '+String(timeline.frames.fps)+',',
-      '      format: '+JSON.stringify(timeline.frames.format)+',',
+      '      format: '+JSON.stringify(timeline.render.format)+',',
       '      quality: '+JSON.stringify(timeline.frames.quality)+',',
       '      resolution: '+emitValue({ width: timeline.frames.width, height: timeline.frames.height, fit: 'contain' })+',',
       '    },',
