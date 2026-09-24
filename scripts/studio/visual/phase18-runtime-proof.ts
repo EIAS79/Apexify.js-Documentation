@@ -41,9 +41,10 @@ async function execute(label: string, source: string) {
   return artifacts;
 }
 
-const report = [];
+async function main() {
+  const report = [];
 
-for (const proof of PHASE18_PROOF_PROJECTS) {
+  for (const proof of PHASE18_PROOF_PROJECTS) {
   const project = proof.build();
   const canonical = generateVisualProjectCode(project).source;
   const preview = generateVisualProjectPreviewCode(project).source;
@@ -89,4 +90,11 @@ fs.writeFileSync(
   JSON.stringify({ phase: 'STUDIO-VISUAL-18', projects: report }, null, 2) + '\n',
 );
 
-console.log('[studio-visual:phase18-runtime] PASS ' + report.length + ' representative projects');
+  console.log('[studio-visual:phase18-runtime] PASS ' + report.length + ' representative projects');
+}
+
+main().catch((error) => {
+  console.error('[studio-visual:phase18-runtime] FAILED');
+  console.error(error instanceof Error ? error.stack ?? error.message : error);
+  process.exit(1);
+});
