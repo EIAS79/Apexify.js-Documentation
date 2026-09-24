@@ -125,6 +125,21 @@ import {
   phase15ExportedCode,
   type Phase15AssetExportStrategy,
 } from '@/lib/studio/visual/export-contract';
+import {
+  PHASE17_AUTOSAVE_STORAGE_KEY,
+  PHASE17_CODE_DEBOUNCE_MS,
+  PHASE17_PERFORMANCE_BUDGETS,
+  PHASE17_PROJECT_AUTOSAVE_MS,
+  Phase17AssetDataUrlCache,
+  Phase17LatestTransaction,
+  createPhase17AutosaveEnvelope,
+  phase17AssetManifestMatches,
+  phase17LargeDocumentMode,
+  phase17LayerTreeMode,
+  recoverPhase17Autosave,
+  visualProjectSemanticSignature,
+  type Phase17AssetManifestEntry,
+} from '@/lib/studio/visual/hardening';
 import type {
   VisualBackgroundLayer,
   VisualBlendMode,
@@ -271,8 +286,7 @@ function clampZoom(value: number) {
 }
 
 function semanticSignature(project: VisualProject) {
-  const { editor: _editor, updatedAt: _updatedAt, ...semantic } = project;
-  return JSON.stringify(semantic);
+  return visualProjectSemanticSignature(project);
 }
 
 function rectsIntersect(a: SelectionRect, b: SelectionRect) {
@@ -505,6 +519,7 @@ export default function VisualStudioPre4({
     setCodeHandoff,
     assets,
     setAssets,
+    assetStorageReady,
     error,
     previewWarnings,
     history: runHistory,
@@ -532,6 +547,11 @@ export default function VisualStudioPre4({
     'generated' | 'diagnostics' | 'assets' | 'history' | 'timeline'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
+  const [layersCollapsed, setLayersCollapsed] = useState(false);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
+  const [layersWidth, setLayersWidth] = useState(274);
+  const [inspectorWidth, setInspectorWidth] = useState(330);
+  const [dockHeight, setDockHeight] = useState(204);
   const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
   const [codeSource, setCodeSource] = useState('');
   const [codeFileName, setCodeFileName] = useState('landing-page.ts');
@@ -584,6 +604,18 @@ export default function VisualStudioPre4({
   const webRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
   const artboardRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
   const codeSaveTimerRef = useRef<number>(0);
+  const phase17AutosaveTimerRef = useRef<number>(0);
+  const phase17HydratedRef = useRef(false);
+  const phase17CodeBaseSignatureRef = useRef('');
+  const phase17RecoveredAssetManifestRef = useRef<Phase17AssetManifestEntry[] | null>(null);
+  const phase17AssetManifestCheckedRef = useRef(false);
+  const phase17CodeTransactionsRef = useRef(new Phase17LatestTransaction());
+  const phase17AssetCacheRef = useRef(new Phase17AssetDataUrlCache());
+  const panelResizeRef = useRef<{
+    kind: 'layers' | 'inspector' | 'dock';
+    start: number;
+    initial: number;
+  } | null>(null);
   const codeAppliedSignatureRef = useRef('');
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
