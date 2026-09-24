@@ -765,6 +765,34 @@ export default function VisualStudioPre4({
       raw = window.localStorage.getItem(PHASE17_AUTOSAVE_STORAGE_KEY);
     } catch {}
 
+    if (!raw) {
+      try {
+        const legacyRaw = window.localStorage.getItem(VISUAL_CODE_STORAGE_KEY);
+        if (legacyRaw) {
+          const legacy = JSON.parse(legacyRaw) as {
+            source?: unknown;
+            fileName?: unknown;
+          };
+          if (typeof legacy.source === 'string' && legacy.source.trim()) {
+            const currentSignature = semanticSignature(projectRef.current);
+            codeHydratedRef.current = true;
+            phase17RecoverySignatureRef.current = currentSignature;
+            phase17CodeBaseSignatureRef.current = 'legacy-code-without-project-snapshot';
+            setCodeSource(legacy.source);
+            if (typeof legacy.fileName === 'string' && legacy.fileName) {
+              setCodeFileName(legacy.fileName);
+            }
+            setCodeSyncState('error');
+            setCodeSyncError(
+              'Legacy linked code was recovered without a matching Visual Project snapshot. It was quarantined and will not overwrite Visual state; fork it to Code Studio or restore canonical Visual code.',
+            );
+            setMessage('Legacy linked code recovered safely · Visual overwrite blocked');
+            return;
+          }
+        }
+      } catch {}
+    }
+
     const recovered = recoverPhase17Autosave(raw);
     if (recovered.ok) {
       const { envelope } = recovered;
