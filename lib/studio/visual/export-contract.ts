@@ -263,7 +263,7 @@ function replaceStudioAssetRefs(
 ): string {
   let next = source;
   for (const [id, path] of pathsById) {
-    next = next.split('studio://asset/' + id).join('./' + path);
+    next = next.split('studio://asset/' + id).join('../' + path);
   }
   return next;
 }
