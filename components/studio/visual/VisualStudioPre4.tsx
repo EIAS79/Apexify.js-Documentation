@@ -605,6 +605,7 @@ export default function VisualStudioPre4({
   const artboardRuntimeRef = useRef<ApexifyWebRuntime | null>(null);
   const codeSaveTimerRef = useRef<number>(0);
   const phase17AutosaveTimerRef = useRef<number>(0);
+  const phase17PersistSnapshotRef = useRef<() => void>(() => {});
   const phase17HydratedRef = useRef(false);
   const phase17CodeBaseSignatureRef = useRef('');
   const phase17RecoveredAssetManifestRef = useRef<Phase17AssetManifestEntry[] | null>(null);
@@ -870,6 +871,8 @@ export default function VisualStudioPre4({
     }
   };
 
+  phase17PersistSnapshotRef.current = persistPhase17Snapshot;
+
   const applyCodeToVisual = (
     source: string,
     expectedProjectSignature = phase17CodeBaseSignatureRef.current,
@@ -1014,10 +1017,10 @@ export default function VisualStudioPre4({
   ]);
 
   useEffect(() => {
-    const flush = () => persistPhase17Snapshot();
+    const flush = () => phase17PersistSnapshotRef.current();
     window.addEventListener('beforeunload', flush);
     return () => window.removeEventListener('beforeunload', flush);
-  });
+  }, []);
 
   useEffect(() => {
     phase17AssetCacheRef.current.prune(assets);
