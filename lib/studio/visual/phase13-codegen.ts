@@ -80,7 +80,6 @@ function textValue(overlay:Phase13Timeline['pipeline']['text'][number]) {
     font:{family:'Arial',size:overlay.fontSize},
     bold:overlay.bold ?? false,
     fill:{color:overlay.color},
-    ...(overlay.backgroundColor ? {backgroundColor:overlay.backgroundColor}:{}),
   };
 }
 function audioValue(track:Phase13AudioTrack,assets:readonly AssetBinding[]) {
