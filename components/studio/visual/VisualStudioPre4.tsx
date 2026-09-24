@@ -75,7 +75,6 @@ import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
   isStudioFontAsset,
-  studioAssetDataUrl,
   studioAssetFontFamily,
   studioAssetIdFromReference,
   studioAssetReference,
@@ -1055,6 +1054,44 @@ export default function VisualStudioPre4({
       window.clearTimeout(artboardPreviewTimerRef.current);
     };
   }, []);
+
+  const beginPanelResize = (
+    kind: 'layers' | 'inspector' | 'dock',
+    event: ReactPointerEvent<HTMLElement>,
+  ) => {
+    event.preventDefault();
+    const initial =
+      kind === 'layers'
+        ? layersWidth
+        : kind === 'inspector'
+          ? inspectorWidth
+          : dockHeight;
+    panelResizeRef.current = {
+      kind,
+      start: kind === 'dock' ? event.clientY : event.clientX,
+      initial,
+    };
+    document.body.setAttribute('data-phase17-resizing', kind);
+  };
+
+  const resizePanelByKeyboard = (
+    kind: 'layers' | 'inspector' | 'dock',
+    event: React.KeyboardEvent<HTMLElement>,
+  ) => {
+    const horizontal = kind !== 'dock';
+    const negativeKey = horizontal ? 'ArrowLeft' : 'ArrowDown';
+    const positiveKey = horizontal ? 'ArrowRight' : 'ArrowUp';
+    if (event.key !== negativeKey && event.key !== positiveKey) return;
+    event.preventDefault();
+    const delta = (event.shiftKey ? 32 : 12) * (event.key === positiveKey ? 1 : -1);
+    if (kind === 'layers') {
+      setLayersWidth((value) => Math.max(190, Math.min(420, value + delta)));
+    } else if (kind === 'inspector') {
+      setInspectorWidth((value) => Math.max(240, Math.min(460, value + delta)));
+    } else {
+      setDockHeight((value) => Math.max(120, Math.min(480, value + delta)));
+    }
+  };
 
   const renderAuthoritativeVisualSource = async (
     source: string,
@@ -3544,7 +3581,7 @@ export default function VisualStudioPre4({
                 onClick={() => insertImageAsset(asset)}
                 data-image-asset-insert={asset.id}
               >
-                <img src={studioAssetDataUrl(asset)} alt="" />
+                <img src={phase17AssetCacheRef.current.get(asset)} alt="" />
                 <span>
                   <strong>{asset.name}</strong>
                   <small>
@@ -3587,7 +3624,7 @@ export default function VisualStudioPre4({
               key={asset.id}
               onClick={() => insertImageAsset(asset)}
             >
-              <img src={studioAssetDataUrl(asset)} alt="" />
+              <img src={phase17AssetCacheRef.current.get(asset)} alt="" />
               <span><strong>{asset.name}</strong><small>Insert image</small></span>
             </button>
           ))}
