@@ -62,3 +62,48 @@ for (const evidence of PHASE16_DOMAIN_EVIDENCE) {
   for (const relative of evidenceFiles) {
     if (!fs.existsSync(file(relative)) || fs.statSync(file(relative)).size === 0) fail('missing-evidence-file', evidence.domain, relative);
   }
+  if (!evidence.permanentUiLocations.length) fail('missing-ui-home', evidence.domain, 'No permanent UI location.');
+  if (!has(evidence.codegenEvidenceFiles, [/emitStudioOperationPlan/, /NativeSource/, /generateVisualProjectCode/])) fail('missing-codegen-evidence', evidence.domain, evidence.codegenEvidenceFiles.join(', '));
+  if (!has(evidence.previewEvidenceFiles, [/renderVisualPreview/, /PreviewSource/, /generateVisualProjectPreviewCode/])) fail('missing-preview-evidence', evidence.domain, evidence.previewEvidenceFiles.join(', '));
+  if (!has(evidence.regressionTestFiles, [/generateVisualProjectCode/])) fail('missing-codegen-regression', evidence.domain, evidence.regressionTestFiles.join(', '));
+  if (!has(evidence.regressionTestFiles, [/reconcileVisualProjectFromCode/])) fail('missing-reconcile-regression', evidence.domain, evidence.regressionTestFiles.join(', '));
+  for (const projectId of evidence.representativeProofProjectIds) if (!proofIds.has(projectId)) fail('unknown-proof-project', evidence.domain, projectId);
+}
+for (const domain of authorableDomains) {
+  if (!PHASE16_DOMAIN_EVIDENCE_BY_DOMAIN.has(domain)) fail('unmapped-domain', domain, 'No Phase-16 evidence registry entry.');
+  if (!proofDomains.has(domain)) fail('domain-without-proof', domain, 'No representative Phase-16 proof project.');
+}
+for (const evidence of PHASE16_DOMAIN_EVIDENCE) if (!authorableDomains.includes(evidence.domain)) fail('stale-domain', evidence.domain, 'No authorable capability uses this evidence.');
+
+const capabilityCoverage = matrix.rows.map((row) => {
+  const active = isAuthorableVisualCapability(row);
+  const evidence = PHASE16_DOMAIN_EVIDENCE_BY_DOMAIN.get(row.domain);
+  const phase = Number(/STUDIO-VISUAL-(\d+)/.exec(row.phaseOwner)?.[1]);
+  const reverseSync = active ? (phase <= 8 ? 'reversible' : 'normalized') : 'excluded';
+  const issues: string[] = [];
+  if (active) {
+    if (!evidence) issues.push('domain-evidence');
+    if (row.implementationState !== 'implemented') issues.push('implementation');
+    if (!row.editorSection) issues.push('editor-section');
+    if (!row.controlSchemaId) issues.push('control-schema');
+    if (!row.projectModelField) issues.push('project-field');
+    if (!row.codegen?.symbol) issues.push('codegen');
+    if (!row.previewRuntimeRoute) issues.push('preview-route');
+    if (!row.proofCaseIds.length) issues.push('proof-case');
+    if (evidence?.phaseOwner !== row.phaseOwner) issues.push('phase-owner');
+  }
+  for (const issue of issues) fail(`capability-${issue}`, row.capability, `domain=${row.domain}, phase=${row.phaseOwner}`);
+  return { capability: row.capability, domain: row.domain, classification: row.classification, phaseOwner: row.phaseOwner, authorable: active, authoringMode: active ? evidence?.authoringMode ?? null : null, ui: active ? evidence?.permanentUiLocations ?? [] : [], reverseSync, codegen: Boolean(row.codegen), preview: row.previewRuntimeRoute, complete: issues.length === 0 };
+});
+
+const families = new Map<string, { capability: string | null; domain: string; family: string; authoring: string; paths: number }>();
+let authorableOptionPaths = 0;
+for (const option of options.options) {
+  const capability = capabilityFromOptionId(option.id);
+  const row = capability ? rows.get(capability) : undefined;
+  const family = optionFamilyRoot(option.path);
+  const evidence = row ? PHASE16_DOMAIN_EVIDENCE_BY_DOMAIN.get(row.domain) : undefined;
+  const authoring = !row ? 'not-studio-surface' : !isAuthorableVisualCapability(row) ? 'excluded' : evidence?.authoringMode ?? 'missing';
+  const key = `${capability ?? 'unknown'}::${family}::${authoring}`;
+  const current = families.get(key);
+  if (current) current.paths += 1;
