@@ -9,7 +9,11 @@ import { DOC4_METADATA, CURRENT_NODE_RUNTIME } from '../../lib/api-reference/met
 const require=createRequire(import.meta.url);
 const ROOT=process.cwd();
 const OUT=path.join(ROOT,'generated','docs-doc4');
-const COMMIT=process.env.APEXIFY_PACKAGE_COMMIT||'69d40cf40ba992ad2bdec457c6c7217f5df55cd1';
+const DOCS_PACKAGE=JSON.parse(fs.readFileSync(path.join(ROOT,'package.json'),'utf8'));
+const DOCS_APEXIFY_PIN=String(DOCS_PACKAGE.dependencies?.['apexify.js']||'');
+const PIN_COMMIT=DOCS_APEXIFY_PIN.match(/#([a-f0-9]{40})$/i)?.[1]||'';
+const COMMIT=process.env.APEXIFY_PACKAGE_COMMIT||PIN_COMMIT;
+if(!COMMIT)throw new Error('[doc4] unable to derive Apexify.js commit from package.json');
 const BASE=process.env.DOC4_BASE_SHA||'eece2c982c82f013b415cc6b5a822a6b88d27a05';
 const REP='apexify.js::ApexPainter#createImage';
 const POLICY='Generated from packed package declarations/artifacts and explicit metadata. Do not edit directly.';
@@ -24,7 +28,7 @@ const pkgJsonPath=require.resolve('apexify.js/package.json');
 const pkgRoot=path.dirname(pkgJsonPath);
 const pkg=read(pkgJsonPath);
 if(pkg.name!=='apexify.js'||pkg.version!=='6.0.0')throw new Error(`[doc4] wrong package identity ${pkg.name}@${pkg.version}`);
-if(!String(read(path.join(ROOT,'package.json')).dependencies?.['apexify.js']||'').includes(COMMIT))throw new Error(`[doc4] docs package pin does not contain ${COMMIT}`);
+if(!DOCS_APEXIFY_PIN.includes(COMMIT))throw new Error(`[doc4] docs package pin does not contain ${COMMIT}`);
 
 function files(dir:string,out:string[]=[]){for(const e of fs.readdirSync(dir,{withFileTypes:true}).sort((a,b)=>a.name.localeCompare(b.name))){const f=path.join(dir,e.name);if(e.isDirectory()){if(e.name!=='node_modules')files(f,out);}else if(e.isFile())out.push(f);}return out;}
 const tree=crypto.createHash('sha256');for(const f of files(pkgRoot)){const r=norm(path.relative(pkgRoot,f));tree.update(r);tree.update('\0');tree.update(fs.readFileSync(f));tree.update('\0');}const packedTreeSha256=tree.digest('hex');
