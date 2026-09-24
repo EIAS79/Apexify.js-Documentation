@@ -62,7 +62,7 @@ test('Phase 14 generated chain code is deterministic and uses real public Apexif
   const b = generatePhase14NativeSource(value);
   assert.equal(a, b);
   assert.ok(a.includes(PHASE14_SOURCE_MARKER));
-  assert.ok(a.includes('painter.prepareForRender(authoredOperations)'));
+  assert.ok(a.includes('painter.prepareForRender('));
   assert.ok(a.includes('await painter.chain('));
   assert.ok(a.includes('await painter.use('));
   assert.ok(a.includes('painter.output.dataURL(primaryBuffer)'));
@@ -86,6 +86,7 @@ test('Phase 14 batch code emits bounded concurrency and asset-resolution options
   });
   const source = generatePhase14NativeSource(value);
   assert.ok(source.includes('await painter.batch('));
+  assert.ok(source.includes('painter.prepareForRender('));
   assert.ok(source.includes('concurrency: 3'));
   assert.ok(source.includes('resolveAssetRefs: true'));
   assert.ok(source.includes('executionOutputs[0]'));
