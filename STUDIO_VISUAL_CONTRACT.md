@@ -272,3 +272,12 @@ Reverse-sync evidence follows the shipped contracts:
 Representative Phase-16 proof projects must cover every authorable domain and must produce both canonical user-facing Apexify.js code and Preview code. Canonical generated source must reconcile back into its Visual Project without semantic drift.
 
 GitHub Actions remain manual-only. The Studio Visual workflow generates the Phase-16 JSON/Markdown report as a short-lived verification artifact before running the consolidated Visual verification command.
+
+For release enforcement, the normal production `npm run build` path must also execute the focused Phase-16 release guard before `next build`. The release guard consists of:
+
+- base Studio completeness check;
+- Visual capability matrix freshness check;
+- Phase-16 mechanical completeness check;
+- Phase-16 representative proof/reconciliation test file.
+
+This keeps the Phase-16 feature-completeness invariant continuously enforced by production builds without enabling automatic full GitHub Actions workflows.

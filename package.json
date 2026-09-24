@@ -11,7 +11,7 @@
   "scripts": {
     "postinstall": "node scripts/studio/install-apexify-web.mjs && node scripts/studio/install-deno.mjs && node scripts/studio/install-ffmpeg.mjs && npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:generate:doc4 && npm run docs:examples:manifest && npm run docs:search:build",
     "dev": "npm run docs:generate:doc1 && npm run docs:generate:doc2 && npm run docs:generate:doc4 && npm run docs:examples:manifest && npm run docs:search:build && next dev",
-    "build": "node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && node scripts/docs/doc6-ensure-generated.mjs && next build",
+    "build": "node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && node scripts/docs/doc6-ensure-generated.mjs && npm run studio:visual:phase16:release && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
@@ -121,7 +121,8 @@
     "studio:visual:proof": "tsx scripts/studio/visual/codegen-smoke.ts",
     "studio:visual:verify": "npm run studio:completeness:check && npm run studio:visual:capabilities:check && npm run studio:visual:phase16:check && npm run studio:visual:test && npm run studio:visual:proof",
     "studio:visual:phase16": "tsx scripts/studio/visual/phase16-feature-completeness.ts",
-    "studio:visual:phase16:check": "tsx scripts/studio/visual/phase16-feature-completeness.ts --check"
+    "studio:visual:phase16:check": "tsx scripts/studio/visual/phase16-feature-completeness.ts --check",
+    "studio:visual:phase16:release": "npm run studio:completeness:check && npm run studio:visual:capabilities:check && npm run studio:visual:phase16:check && tsx --test scripts/studio/visual/phase16-feature-completeness.test.ts"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
