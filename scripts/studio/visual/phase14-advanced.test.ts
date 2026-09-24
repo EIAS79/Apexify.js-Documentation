@@ -17,6 +17,7 @@ import {
 import {
   PHASE14_SOURCE_MARKER,
   generatePhase14NativeSource,
+  generatePhase14PreviewSource,
   phase14ProjectFromSourceMarker,
 } from '../../../lib/studio/visual/phase14-codegen';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
@@ -173,6 +174,32 @@ test('Phase 14 plugin lifecycle code covers install, registry and removal while 
   assert.ok(source.includes('painter.plugins.remove("oldApi")'));
   assert.ok(source.includes('await import("@scope/apexify-plugin")'));
   assert.ok(source.includes('await painter.use('));
+});
+
+test('Phase 14 hosted preview skips code-only package plugins but exported code retains them', () => {
+  let value = project();
+  const current = phase14AdvancedState(value)!;
+  value = setPhase14AdvancedState(value, {
+    ...current,
+    plugins: [
+      ...current.plugins,
+      {
+        id: 'plugin-code-only-preview',
+        action: 'use',
+        source: 'package',
+        name: 'packagePlugin',
+        module: '@scope/apexify-plugin',
+        exportName: 'plugin',
+        sync: 'code-only',
+      },
+    ],
+  });
+  const exported = generatePhase14NativeSource(value);
+  const preview = generatePhase14PreviewSource(value);
+  assert.ok(exported.includes('await import("@scope/apexify-plugin")'));
+  assert.ok(!preview.includes('await import("@scope/apexify-plugin")'));
+  assert.ok(preview.includes('codeOnlyPreviewSkips'));
+  assert.ok(preview.includes('plugin-code-only-preview'));
 });
 
 test('Phase 14 source marker restores exact Advanced operations and output settings', () => {
