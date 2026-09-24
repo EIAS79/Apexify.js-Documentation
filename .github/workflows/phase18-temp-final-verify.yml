@@ -25,11 +25,14 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Representative generated-code and Preview runtime equivalence
+        run: npm run studio:visual:phase18:runtime
+
       - name: Production build with Phase 16-18 release guards
         run: npm run build
 
-      - name: Final Visual and runtime release proof
-        run: npm run studio:visual:phase18:full
+      - name: Final Visual release proof
+        run: npm run studio:visual:phase18:fixtures && npm run studio:visual:phase18 && npm run studio:visual:test
 
       - name: Browser UI, export, representative Preview and accessibility proof
         run: |
