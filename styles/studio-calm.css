@@ -7807,7 +7807,9 @@ body[data-phase17-resizing="dock"]{
 }
 
 .apx-pre4-workspace[data-phase17-inspector-collapsed="true"] .apx-pre4-inspector-dock-toggle{
-  right:0;
+  /* Keep the whole handle inside the layout's overflow boundary when the
+     Inspector column is gone; its right edge still sits flush with the stage. */
+  right:13px;
   color:#b8d5f5;
   border-color:#315d8c;
   background:
