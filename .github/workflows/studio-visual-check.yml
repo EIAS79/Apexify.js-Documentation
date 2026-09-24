@@ -2,6 +2,9 @@ name: Studio Visual Phase Gate
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - studio-visual/v14-advanced
 permissions:
   contents: read
 
