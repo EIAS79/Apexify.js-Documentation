@@ -30,3 +30,26 @@ jobs:
 
       - name: Full Visual regression suite
         run: npm run studio:visual:test
+
+      - name: Browser matrix and accessibility audit
+        run: |
+          CHROME_PATH="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_PATH" ]; then
+            echo "Chrome/Chromium is required for the Phase-17 browser matrix." >&2
+            exit 1
+          fi
+          npm start > /tmp/apexify-studio-next.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/studio >/dev/null; then
+              break
+            fi
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+              cat /tmp/apexify-studio-next.log
+              exit 1
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:3000/studio >/dev/null
+          CHROME_PATH="$CHROME_PATH" npm run studio:visual:phase17:browser
