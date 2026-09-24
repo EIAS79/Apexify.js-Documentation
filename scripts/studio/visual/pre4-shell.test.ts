@@ -78,6 +78,23 @@ test('PRE-4 groups the Visual Studio feature rail into clear authoring families'
   assert.match(css, /button\[data-feature-tool="advanced"\]/);
 });
 
+
+test('PRE-4 keeps the Layers collapse control anchored to the panel seam', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const css = read('styles/studio-calm.css');
+
+  assert.match(shell, /apx-pre4-layers-dock-toggle/);
+  assert.match(shell, /data-phase17-layers-toggle/);
+  assert.match(shell, /aria-controls="apx-pre4-layers-panel"/);
+  assert.match(shell, /ChevronLeftIcon/);
+  assert.match(shell, /ChevronRightIcon/);
+  assert.doesNotMatch(shell, />Layers ›<\/button>/);
+  assert.match(css, /STUDIO LAYERS DOCK HANDLE/);
+  assert.match(css, /top:calc\(\(100% - var\(--pre4-dock-size\)\)\/2\)/);
+  assert.match(css, /left:calc\(var\(--pre4-rail-size\) \+ var\(--pre4-layers-size,258px\)\)/);
+  assert.match(css, /data-phase17-layers-collapsed="true".*apx-pre4-layers-dock-toggle/s);
+});
+
 test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
 
