@@ -1,5 +1,6 @@
 import type { StudioVirtualAsset } from '../runtime/assets';
 import type { VisualProject } from './model';
+import { normalizeVisualProject } from './compiler/normalize';
 import { parseVisualProject, serializeVisualProject } from './persistence';
 
 export const PHASE17_AUTOSAVE_STORAGE_KEY = 'apexify-visual-autosave-v2';
@@ -152,7 +153,8 @@ function normalizeUi(value: unknown): Phase17RecoveredUiState {
 }
 
 export function visualProjectSemanticSignature(project: VisualProject): string {
-  const { editor: _editor, updatedAt: _updatedAt, ...semantic } = project;
+  const normalized = normalizeVisualProject(project);
+  const { editor: _editor, updatedAt: _updatedAt, ...semantic } = normalized;
   const source = JSON.stringify(semantic);
   let hash = 2166136261;
   for (let index = 0; index < source.length; index += 1) {
