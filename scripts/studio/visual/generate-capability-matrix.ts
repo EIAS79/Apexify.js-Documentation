@@ -198,6 +198,7 @@ const IMPLEMENTED_PHASE_OWNERS = new Set([
   'STUDIO-VISUAL-11',
   'STUDIO-VISUAL-12',
   'STUDIO-VISUAL-13',
+  'STUDIO-VISUAL-14',
 ]);
 
 function projectFieldFor(

@@ -138,12 +138,11 @@ Iteration order:
 
 ```text
 edit
--> unit/static checks
--> browser checks where applicable
--> Linux/Docker smoke where runtime-sensitive
--> GitHub Actions
+-> focused local/static validation
+-> runtime/browser smoke where materially needed
 -> fix
 -> repeat
+-> optional manual GitHub Actions only at a deliberate final verification point
 ```
 
 Vercel is not the iterative debugger.
@@ -160,3 +159,40 @@ STUDIO-VISUAL-0 cannot complete until:
 - all ten Phase-0 open decisions are recorded;
 - branch/CI/Vercel suppression policy is executable;
 - the Visual Phase-0 verification workflow is green.
+
+
+## 11. Phase-14 advanced operations contract
+
+STUDIO-VISUAL-14 activates the existing **Advanced** Inspector, the feature-rail context panel, **Diagnostics**, and the top **Export** workflow. It does not create a competing permanent Operations dock.
+
+Advanced project state is stored in the existing Visual Project `operations` and `outputs` collections.
+
+Every authored advanced operation has one linked-code classification:
+
+- `reversible` — canonical Visual state can be reconstructed exactly from the Phase-14 source marker;
+- `normalized` — source is accepted and normalized to the canonical Visual representation;
+- `code-only` — exported code is preserved, but hosted Studio Preview does not pretend the operation is locally available.
+
+The Phase-14 runtime surfaces are:
+
+- `ApexPainter.batch()`;
+- `ApexPainter.chain()`;
+- `ApexPainter.prepareForRender()`;
+- `ApexPainter.use()`;
+- compatible `painter.plugins` registry/install/remove operations;
+- local output conversion through `painter.output.dataURL/base64/blob/arrayBuffer`;
+- configured output conversion through `toOutput()`;
+- normalized legacy `outPut()` compatibility.
+
+The hosted Studio exclusions remain explicit and non-authorable:
+
+- `ApexPainter.save()`;
+- `ApexPainter.saveMultiple()`;
+- `ApexPainter.createAudio.save()`;
+- `ApexPainter.output.url()`.
+
+Host-filesystem persistence and credentialed third-party transfer must never be represented by fake Visual controls.
+
+Package-backed plugin imports are `code-only`: they are emitted in exported TypeScript but skipped by hosted Studio Preview unless that package is part of the controlled Studio runtime. Inline plugins and registry API configuration remain previewable.
+
+GitHub Actions in this repository are manual-only during active phase implementation. They may be invoked deliberately for a later final verification pass; ordinary pushes, PRs, and merges do not require or trigger them.

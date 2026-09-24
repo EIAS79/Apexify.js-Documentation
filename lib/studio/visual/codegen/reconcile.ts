@@ -36,6 +36,7 @@ import { phase10ProjectFromSourceMarker } from '../phase10-codegen';
 import { phase11ProjectFromSourceMarker } from '../phase11-codegen';
 import { phase12ProjectFromSourceMarker } from '../phase12-codegen';
 import { phase13ProjectFromSourceMarker } from '../phase13-codegen';
+import { phase14ProjectFromSourceMarker } from '../phase14-codegen';
 
 export type VisualCodeSyncResult =
   | { ok: true; project: VisualProject; changed: boolean }
@@ -1623,6 +1624,37 @@ export function reconcileVisualProjectFromCode(
   project: VisualProject,
   source: string,
 ): VisualCodeSyncResult {
+  const phase14Project = phase14ProjectFromSourceMarker(source);
+  if (phase14Project) {
+    const validation = validateVisualProject(phase14Project);
+    if (!validation.ok) {
+      const problem = validation.issues.find((item) => item.severity === 'error');
+      return {
+        ok: false,
+        error: problem?.message ?? 'The Phase 14 source marker contains an invalid Visual Project.',
+      };
+    }
+    const semantic = (value: VisualProject) =>
+      JSON.stringify({
+        width: value.document.width,
+        height: value.document.height,
+        canvas: value.document.canvas ?? {},
+        roots: value.document.rootNodeIds,
+        nodes: value.document.nodes,
+        assets: value.assets,
+        variables: value.variables,
+        palettes: value.palettes,
+        timelines: value.timelines,
+        operations: value.operations,
+        outputs: value.outputs,
+      });
+    return {
+      ok: true,
+      project: structuredClone(phase14Project),
+      changed: semantic(phase14Project) !== semantic(project),
+    };
+  }
+
   const phase13Project = phase13ProjectFromSourceMarker(source);
   if (phase13Project) {
     const validation = validateVisualProject(phase13Project);

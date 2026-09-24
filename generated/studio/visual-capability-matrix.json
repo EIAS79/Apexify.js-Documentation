@@ -3,7 +3,7 @@
   "source": {
     "artifact": "generated/studio/capability-matrix.json",
     "schemaVersion": 2,
-    "packagePin": "github:EIAS79/Apexify.js#69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
+    "packagePin": "github:EIAS79/Apexify.js#50f2543482abbd7a9624192a060ec01330370bef",
     "implementationComplete": true,
     "totalCapabilities": 187
   },
@@ -358,7 +358,7 @@
         "batch-chain"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.chain",
@@ -377,7 +377,7 @@
         "batch-chain"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.components.avatar.toLayers",
@@ -1353,7 +1353,7 @@
         "output-local"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.output.arrayBuffer",
@@ -1372,7 +1372,7 @@
         "output-local"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.output.base64",
@@ -1391,7 +1391,7 @@
         "output-local"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.output.blob",
@@ -1410,7 +1410,7 @@
         "output-local"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.output.dataURL",
@@ -1429,7 +1429,7 @@
         "output-local"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.output.url",
@@ -1662,7 +1662,7 @@
         "plugins"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.plugins.isInstalled",
@@ -1729,7 +1729,7 @@
         "plugins"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.plugins.use",
@@ -1748,7 +1748,7 @@
         "plugins"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.prepareForRender",
@@ -1768,7 +1768,7 @@
         "assets"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.renderScene",
@@ -1876,7 +1876,7 @@
         "output-local"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.use",
@@ -1895,7 +1895,7 @@
         "plugins"
       ],
       "phaseOwner": "STUDIO-VISUAL-14",
-      "implementationState": "planned"
+      "implementationState": "implemented"
     },
     {
       "capability": "ApexPainter.validateSceneRenderInput",

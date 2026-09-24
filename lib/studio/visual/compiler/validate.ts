@@ -24,6 +24,7 @@ import {
 import { validatePhase11Project } from '../gif-animation-contract';
 import { validatePhase12Project } from '../audio-authoring-contract';
 import { validatePhase13Project } from '../video-authoring-contract';
+import { validatePhase14Project } from '../advanced-authoring-contract';
 
 const REF_PATTERN = /^(asset|variable|palette):(.+)$/;
 
@@ -206,6 +207,7 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   issues.push(...validatePhase11Project(project));
   issues.push(...validatePhase12Project(project));
   issues.push(...validatePhase13Project(project));
+  issues.push(...validatePhase14Project(project));
 
   try {
     const featureProject = resolvePhase9References(materializePhase9Project(project));

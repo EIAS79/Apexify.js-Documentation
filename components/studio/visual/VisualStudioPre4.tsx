@@ -33,6 +33,7 @@ import {
   RectangleStackIcon,
   Squares2X2Icon,
   VideoCameraIcon,
+  WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
 import { createApexifyWebRuntime, type ApexifyWebRuntime } from '@apexify/web';
 import { BrandIcon } from '@/components/Brand';
@@ -64,6 +65,10 @@ import {
   VisualVideoInspector,
   VisualVideoTimeline,
 } from '@/components/studio/visual/VisualVideoAuthoring';
+import {
+  VisualAdvancedContext,
+  VisualAdvancedInspector,
+} from '@/components/studio/visual/VisualAdvancedAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
@@ -96,6 +101,12 @@ import { hasPhase10Authoring } from '@/lib/studio/visual/phase10-codegen';
 import { hasPhase11Authoring } from '@/lib/studio/visual/phase11-codegen';
 import { hasPhase12Authoring } from '@/lib/studio/visual/phase12-codegen';
 import { hasPhase13Authoring } from '@/lib/studio/visual/phase13-codegen';
+import { hasPhase14Authoring } from '@/lib/studio/visual/phase14-codegen';
+import {
+  PHASE14_HOSTED_EXCLUSIONS,
+  phase14AdvancedState,
+  phase14OutputSettings,
+} from '@/lib/studio/visual/advanced-authoring-contract';
 import { createInteractiveSession } from '@/lib/docs/playground/session';
 import { currentNodeServerExecutionAdapter } from '@/lib/docs/playground/serverClientAdapter';
 import { validateVisualProject } from '@/lib/studio/visual/compiler/validate';
@@ -678,6 +689,7 @@ export default function VisualStudioPre4({
   const phase11Active = useMemo(() => hasPhase11Authoring(project), [project]);
   const phase12Active = useMemo(() => hasPhase12Authoring(project), [project]);
   const phase13Active = useMemo(() => hasPhase13Authoring(project), [project]);
+  const phase14Active = useMemo(() => hasPhase14Authoring(project), [project]);
 
   useEffect(() => {
     setDirty(projectSemanticSignature !== cleanSignature.current);
@@ -792,7 +804,7 @@ export default function VisualStudioPre4({
     source: string,
     displaySource = source,
   ) => {
-    if (phase13Active || phase12Active || phase11Active || phase10Active) {
+    if (phase14Active || phase13Active || phase12Active || phase11Active || phase10Active) {
       let releasePhase10Render!: () => void;
       const previousPhase10Render = phase10RenderTailRef.current;
       phase10RenderTailRef.current = new Promise<void>((resolve) => {
@@ -968,6 +980,7 @@ export default function VisualStudioPre4({
     phase11Active,
     phase12Active,
     phase13Active,
+    phase14Active,
   ]);
 
   const mutate = (
@@ -2439,7 +2452,7 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = phase13Active || phase12Active || phase11Active || phase10Active || phase9Active
+    const source = phase14Active || phase13Active || phase12Active || phase11Active || phase10Active || phase9Active
       ? previewGenerated.value?.source
       : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
@@ -2752,6 +2765,7 @@ export default function VisualStudioPre4({
     ['gif', FilmIcon, 'GIF'],
     ['audio', MusicalNoteIcon, 'Audio'],
     ['video', VideoCameraIcon, 'Video'],
+    ['advanced', WrenchScrewdriverIcon, 'Advanced'],
   ] as const;
 
   const mediaContextActive =
@@ -2764,7 +2778,8 @@ export default function VisualStudioPre4({
     activeTool === 'assets' ||
     activeTool === 'gif' ||
     activeTool === 'audio' ||
-    activeTool === 'video';
+    activeTool === 'video' ||
+    activeTool === 'advanced';
 
   const imageAssets = assets.filter((asset) =>
     asset.mime.startsWith('image/'),
@@ -2781,6 +2796,23 @@ export default function VisualStudioPre4({
   ];
 
   const renderMediaContext = () => {
+    if (activeTool === 'advanced') {
+      return (
+        <VisualAdvancedContext
+          project={project}
+          onMutate={mutate}
+          onPreview={() => void renderVisualPreview(true)}
+          onInspector={() => {
+            setInspectorTab('advanced');
+            setProject((current) => ({
+              ...current,
+              editor: { ...current.editor, selectedNodeIds: [] },
+            }));
+          }}
+        />
+      );
+    }
+
     if (activeTool === 'video') {
       return (
         <VisualVideoContext
@@ -5484,6 +5516,17 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
+    if (activeTool === 'advanced' && !primary) {
+      return (
+        <VisualAdvancedInspector
+          project={project}
+          onMutate={mutate}
+          inspectorTab={inspectorTab}
+          onMessage={setMessage}
+        />
+      );
+    }
+
     if ((activeTool === 'video' || phase13Active) && !primary) {
       return (
         <VisualVideoInspector
@@ -5668,8 +5711,26 @@ export default function VisualStudioPre4({
         ...previewWarnings,
       ];
       const entries = Object.entries(phase7Results);
-      return diagnostics.length || entries.length ? (
+      const advancedDiagnostics = phase14Active
+        ? {
+            execution: phase14AdvancedState(project)?.execution ?? null,
+            output: phase14OutputSettings(project) ?? null,
+            plugins: phase14AdvancedState(project)?.plugins.map((item) => ({
+              id: item.id,
+              action: item.action,
+              sync: item.sync,
+            })) ?? [],
+            hostedRuntimeExclusions: PHASE14_HOSTED_EXCLUSIONS,
+          }
+        : null;
+      return diagnostics.length || entries.length || advancedDiagnostics ? (
         <div className="apx-pre4-diagnostics" data-phase7-results>
+          {advancedDiagnostics ? (
+            <div data-phase14-results>
+              <strong>Advanced structured result contract</strong>
+              <pre>{JSON.stringify(advancedDiagnostics, null, 2)}</pre>
+            </div>
+          ) : null}
           {entries.map(([name, value]) => (
             <div key={'result-' + name} data-phase7-result={name}>
               <strong>{name}</strong>
@@ -5793,6 +5854,19 @@ export default function VisualStudioPre4({
               >
                 Open in Code Studio
               </button>
+              <button
+                data-advanced-export-settings
+                onClick={() => {
+                  setActiveTool('advanced');
+                  setInspectorTab('advanced');
+                  setProject((current) => ({
+                    ...current,
+                    editor: { ...current.editor, selectedNodeIds: [] },
+                  }));
+                }}
+              >
+                Runtime output · {phase14OutputSettings(project)?.format ?? 'configure'}
+              </button>
             </div>
           </details>
 
@@ -5838,6 +5912,14 @@ export default function VisualStudioPre4({
                     setDockTab('timeline');
                     setDockCollapsed(false);
                   }
+                  if (id === 'advanced') {
+                    setProject((current) => ({
+                      ...current,
+                      editor: { ...current.editor, selectedNodeIds: [] },
+                    }));
+                    setInspectorTab('advanced');
+                    setMessage('Advanced operations · batch, chain, plugins and output');
+                  }
                   if (id === 'layers') setMessage('Layers panel active');
                 }}
               >
@@ -5874,7 +5956,9 @@ export default function VisualStudioPre4({
                                 ? 'Audio'
                                 : activeTool === 'video'
                                   ? 'Video'
-                                  : 'Layers'}
+                                  : activeTool === 'advanced'
+                                    ? 'Advanced'
+                                    : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -5894,7 +5978,9 @@ export default function VisualStudioPre4({
                                 ? 'Presets · synthesis · mix · WAV'
                                 : activeTool === 'video'
                                   ? 'Clips · operations · FFmpeg output'
-                                  : assets.length + ' shared assets'
+                                  : activeTool === 'advanced'
+                                    ? 'Batch · chain · plugins · output'
+                                    : assets.length + ' shared assets'
                   : (layerIds.length ? layerIds.length + ' layers' : 'Layer structure') +
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
