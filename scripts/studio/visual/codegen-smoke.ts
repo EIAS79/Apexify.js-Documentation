@@ -23,6 +23,10 @@ import {
   defaultPhase12Timeline,
   setPhase12Timeline,
 } from '../../../lib/studio/visual/audio-authoring-contract';
+import {
+  ensurePhase14Authoring,
+  setPhase14OutputSettings,
+} from '../../../lib/studio/visual/advanced-authoring-contract';
 
 async function run() {
   const project = createPhase2ProofProject();
@@ -589,6 +593,73 @@ async function run() {
       channels: 2,
       operations: ['createAudio.compose'],
       generatedFile: phase12Generated.fileName,
+    }),
+  );
+
+  let phase14Project = ensurePhase14Authoring(createVisualProject({
+    id: 'project_phase14_runtime',
+    name: 'Phase 14 Runtime',
+    width: 640,
+    height: 360,
+    now: '2026-09-24T00:00:00.000Z',
+  }));
+  phase14Project = setPhase14OutputSettings(phase14Project, {
+    strategy: 'direct',
+    format: 'buffer',
+    fileName: 'phase14-runtime.png',
+    sync: 'reversible',
+  });
+
+  const manualAdvancedPainter = new ApexPainter();
+  await manualAdvancedPainter.use({
+    name: 'studio-metadata',
+    install(host: ApexPainter) {
+      host.plugins.use('studioMetadata', { phase: 14, enabled: true });
+    },
+  });
+  const manualPhase14 = await manualAdvancedPainter.chain([
+    {
+      method: 'createCanvas',
+      args: [{ width: 640, height: 360, colorBg: '#0b1020' }],
+    },
+    {
+      method: 'createText',
+      args: [{
+        text: 'APEXIFY ADVANCED',
+        x: 320,
+        y: 180,
+        font: { family: 'Arial', size: 40 },
+        bold: true,
+        fill: { color: '#f8fafc' },
+        textAlign: 'center',
+        textBaseline: 'middle',
+      }, 'current'],
+    },
+  ], { resolveAssetRefs: true });
+
+  const phase14Generated = generateVisualProjectCode(phase14Project);
+  const phase14Body = phase14Generated.source
+    .replace(/^\/\* apexify-studio-v14:[^\n]+\*\/\n/, '')
+    .replace(/^import \{ ApexPainter \} from 'apexify\.js';\n\n/, '');
+  const Phase14AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as new (
+    ...args: string[]
+  ) => (...values: unknown[]) => Promise<unknown>;
+  const executePhase14Generated = new Phase14AsyncFunction('ApexPainter', phase14Body);
+  const phase14Result = await executePhase14Generated(ApexPainter);
+  assert.ok(Array.isArray(phase14Result));
+  assert.ok(phase14Result[0] instanceof Uint8Array);
+  assert.equal(digest(phase14Result[0] as Uint8Array), digest(manualPhase14));
+  assert.equal((phase14Result.at(-1) as { phase?: number }).phase, 14);
+
+  console.log(
+    '[studio-visual:phase14] equivalent advanced chain/plugin/output codegen proof passed',
+    JSON.stringify({
+      bytes: (phase14Result[0] as Uint8Array).byteLength,
+      sha256: digest(phase14Result[0] as Uint8Array),
+      execution: 'chain',
+      plugin: 'studio-metadata',
+      output: 'buffer',
+      generatedFile: phase14Generated.fileName,
     }),
   );
 }
