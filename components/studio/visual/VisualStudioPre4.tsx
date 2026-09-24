@@ -6401,6 +6401,8 @@ export default function VisualStudioPre4({
               <button
                 key={id}
                 type="button"
+                aria-label={label}
+                title={label}
                 data-feature-tool={id}
                 data-active={activeTool === id ? 'true' : undefined}
                 onClick={() => {
