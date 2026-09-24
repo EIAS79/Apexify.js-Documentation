@@ -1,4 +1,5 @@
 import type { VisualProject } from './model';
+import { visualTextProps } from './text-contract';
 import {
   hasPhase13Authoring,
   phase13Timeline,
@@ -76,7 +77,37 @@ function frameExpression(source:Phase13FrameSource,assets:readonly AssetBinding[
     '  }',
   ];
 }
-function textValue(overlay:Phase13Timeline['pipeline']['text'][number]) {
+function textValue(
+  overlay:Phase13Timeline['pipeline']['text'][number],
+  project: VisualProject,
+) {
+  if (overlay.nodeId) {
+    const node = project.document.nodes[overlay.nodeId];
+    if (node?.kind === 'text') {
+      const props = visualTextProps(node);
+      const transform = node.transform ?? {};
+      return {
+        ...props,
+        x: transform.x ?? 0,
+        y: transform.y ?? 0,
+        layout: {
+          ...(props.layout ?? {}),
+          ...(transform.width !== undefined ? { maxWidth: transform.width * (transform.scaleX ?? 1) } : {}),
+          ...(transform.height !== undefined ? { maxHeight: transform.height * (transform.scaleY ?? 1) } : {}),
+        },
+        placement: {
+          ...(props.placement ?? {}),
+          ...(transform.rotation !== undefined ? { rotation: transform.rotation } : {}),
+        },
+        fill: {
+          ...(props.fill ?? {}),
+          ...(transform.opacity !== undefined ? { opacity: transform.opacity } : {}),
+        },
+        startTime: overlay.startTime,
+        endTime: overlay.endTime,
+      };
+    }
+  }
   return {
     startTime:overlay.startTime,endTime:overlay.endTime,text:overlay.text,
     x:overlay.x,y:overlay.y,
@@ -172,7 +203,7 @@ function inspectionLines(timeline:Phase13Timeline,currentPath:string):string[] {
   return lines;
 }
 
-function generatedBody(timeline:Phase13Timeline):string {
+function generatedBody(project: VisualProject, timeline:Phase13Timeline):string {
   const assets=bindings(timeline);
   const lines:string[]=["import { ApexPainter } from 'apexify.js';"];
   if(assets.length) lines.push("import { readFileSync } from 'node:fs';");
@@ -213,7 +244,7 @@ function generatedBody(timeline:Phase13Timeline):string {
         replacementStartTime:splice.replacementStartTime,replacementDuration:splice.replacementDuration,durationPolicy:splice.durationPolicy,
       },4).replace(/\n/g,'\n  ')+', '+JSON.stringify(splice.id)+');');
     }
-    if(timeline.pipeline.text.length) lines.push('  pipeline.text('+emitValue(timeline.pipeline.text.map(textValue),4).replace(/\n/g,'\n  ')+', \'text\');');
+    if(timeline.pipeline.text.length) lines.push('  pipeline.text('+emitValue(timeline.pipeline.text.map((overlay) => textValue(overlay, project)),4).replace(/\n/g,'\n  ')+', \'text\');');
     if(timeline.pipeline.audio.length) lines.push('  pipeline.audio('+emitAssetAware(timeline.pipeline.audio.map((track)=>audioValue(track,assets)),4).replace(/\n/g,'\n  ')+', '+emitValue({
       keepOriginalAudio:timeline.pipeline.keepOriginalAudio,
       originalVolume:timeline.pipeline.originalVolume,
@@ -253,7 +284,7 @@ export { hasPhase13Authoring };
 export function generatePhase13NativeSource(project:VisualProject):string {
   const timeline=phase13Timeline(project);
   if(!timeline) throw new Error('Phase 13 code generation requires a video timeline.');
-  return '/* '+PHASE13_SOURCE_MARKER+semanticPayload(project)+' */\n'+generatedBody(timeline);
+  return '/* '+PHASE13_SOURCE_MARKER+semanticPayload(project)+' */\n'+generatedBody(project, timeline);
 }
 export function generatePhase13PreviewSource(project:VisualProject):string {
   return generatePhase13NativeSource(project);
