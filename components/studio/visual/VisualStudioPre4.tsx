@@ -782,6 +782,8 @@ export default function VisualStudioPre4({
             if (typeof legacy.fileName === 'string' && legacy.fileName) {
               setCodeFileName(legacy.fileName);
             }
+            setDockTab('generated');
+            setDockCollapsed(false);
             setCodeSyncState('error');
             setCodeSyncError(
               'Legacy linked code was recovered without a matching Visual Project snapshot. It was quarantined and will not overwrite Visual state; fork it to Code Studio or restore canonical Visual code.',
@@ -804,8 +806,15 @@ export default function VisualStudioPre4({
       setPan(envelope.ui.pan);
       setActiveTool(envelope.ui.activeTool);
       setInspectorTab(envelope.ui.inspectorTab);
-      setDockTab(envelope.ui.dockTab);
-      setDockCollapsed(envelope.ui.dockCollapsed);
+      if (recovered.codeMayApply) {
+        setDockTab(envelope.ui.dockTab);
+        setDockCollapsed(envelope.ui.dockCollapsed);
+      } else {
+        // A quarantined linked-code conflict must be immediately visible.
+        // Do not restore a hidden/non-generated dock and silently bury it.
+        setDockTab('generated');
+        setDockCollapsed(false);
+      }
       setLayersCollapsed(envelope.ui.layersCollapsed);
       setInspectorCollapsed(envelope.ui.inspectorCollapsed);
       setLayersWidth(envelope.ui.layersWidth);
