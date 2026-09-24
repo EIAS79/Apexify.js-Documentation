@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 COMPLETE; STUDIO-VISUAL-13 COMPLETE; STUDIO-VISUAL-14 COMPLETE; STUDIO-VISUAL-15 IN PROGRESS
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 COMPLETE; STUDIO-VISUAL-13 COMPLETE; STUDIO-VISUAL-14 COMPLETE; STUDIO-VISUAL-15 COMPLETE; STUDIO-VISUAL-16 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3441,6 +3441,47 @@ must preserve semantic state.
 feat(studio-visual): complete code and project export
 ```
 
+### Completion record
+
+> **Status:** COMPLETE — PR #112
+>
+> **Work branch:** `studio-visual/v15-export-roundtrip`
+>
+> **Base main commit:** `afbdee1e70a1a13d614e5b08a15f0a015b2460ee`
+>
+> **Pinned Apexify.js runtime:** `50f2543482abbd7a9624192a060ec01330370bef`
+>
+> **Verification policy:** repository GitHub Actions remain manual-only by project instruction; Phase 15 is integrated directly after source/contract completion review.
+
+Completed Phase-15 scope:
+
+- one-file TypeScript remains the default user-facing generated-code artifact;
+- normal Copy / Download / Code Studio handoff strips private Studio semantic source markers;
+- runner-only `return await main();` tails are normalized to valid standalone ESM `await main();`;
+- optional compact provenance records generator version, project/schema identity, semantic hash, source hash and pinned Apexify package;
+- deterministic ZIP project export adds `src/index.ts`, optional `*.apexstudio.json`, optional package/TypeScript scaffolding and an export manifest;
+- asset export supports portable files, round-trip manifest preservation, or explicit omission with warnings;
+- portable file export rewrites `studio://asset/<id>` references relative to `src/index.ts` as `../assets/*`;
+- deterministic manifest/file hashing and deterministic stored-ZIP output are defined in the Phase-15 export contract;
+- generated-code quality checks reject Studio runtime protocol leakage, unresolved portable Studio asset references and runner-only return tails;
+- parser-backed reversible linked-code edits remain supported for deterministic Phases 4–8;
+- marker-backed Phases 9–14 accept canonical linked source but reject unsafe body edits instead of silently discarding them;
+- unsupported linked edits expose explicit **Restore canonical Visual code** and **Fork edit to Code Studio** recovery;
+- Phase-15 contract/decision records explicitly preserve the rule that arbitrary JavaScript → Visual reconstruction is out of scope;
+- dedicated Phase-15 regression coverage is integrated into `studio:visual:test` for canonical round-trip behavior through Phases 4–14, asset strategies, deterministic bundles, standalone TypeScript syntax, conflict recovery and permanent-shell UI placement;
+- the existing Generate Code modal and top Export workflow are extended; no competing permanent export/code dock was introduced.
+
+Source-level completion review also corrected:
+- invalid project-bundle relative asset paths;
+- GIF round-trip fixture validity;
+- standalone exported TypeScript runner-tail leakage;
+- browser-safe ZIP Blob construction;
+- audio, video and advanced default fixtures were checked against their current project validators.
+
+No automatic push/PR/merge workflow was enabled or awaited.
+
+**Phase 15 is complete. STUDIO-VISUAL-16 is next.**
+
 ---
 
 ## STUDIO-VISUAL-16 — Full feature completeness gate
@@ -3620,7 +3661,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 12 | Audio | COMPLETE — PR #105 | `1232800509fba731d508efb9ec45482eba5c83f3` | Studio Visual Phase Gate 35930842667 SUCCESS; Runtime Build Gate 35930842704 SUCCESS; 128/128 tests; Linux procedural WAV equivalence proof PASS |
 | 13 | Video | COMPLETE — PR #107 | `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1` | Studio Visual Phase Gate 35937825619 SUCCESS; Runtime Build Gate 35937825649 SUCCESS on Node 22/24/26; 136/136 tests; Linux generated MP4 proof PASS |
 | 14 | Advanced operations | COMPLETE — PR #109 | `008fbf63cb351524f76e3f31d1c9cb94f857c380` | Runtime PR #39 merged as `50f2543482abbd7a9624192a060ec01330370bef`; 13 implemented / 3 excluded / 6 non-authoring capability rows; Actions manual-only by project instruction |
-| 15 | Export / project round trip | NOT STARTED | — | — |
+| 15 | Export / project round trip | COMPLETE — PR #112 | pending merge | Direct integration by project instruction; dedicated Phase-15 round-trip/export regression suite added to `studio:visual:test`; Actions remain manual-only |
 | 16 | Feature completeness gate | NOT STARTED | — | — |
 | 17 | Hardening | NOT STARTED | — | — |
 | 18 | Final release | NOT STARTED | — | — |
