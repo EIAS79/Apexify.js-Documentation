@@ -21,6 +21,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleStackIcon,
+  ClipboardDocumentIcon,
   CodeBracketIcon,
   ComputerDesktopIcon,
   CubeIcon,
@@ -35,6 +36,7 @@ import {
   PlayIcon,
   RectangleStackIcon,
   Squares2X2Icon,
+  TrashIcon,
   VideoCameraIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
@@ -73,7 +75,6 @@ import {
   VisualAdvancedInspector,
 } from '@/components/studio/visual/VisualAdvancedAuthoring';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
-import { StudioAssetShelf } from '@/components/studio/StudioAssetShelf';
 import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
@@ -597,6 +598,7 @@ export default function VisualStudioPre4({
   const gesture = useRef<Gesture | null>(null);
   const clipboard = useRef<VisualClipboard | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const assetInputRef = useRef<HTMLInputElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const artboardRef = useRef<HTMLDivElement>(null);
   const cleanSignature = useRef('');
@@ -809,7 +811,7 @@ export default function VisualStudioPre4({
       setActiveTool(envelope.ui.activeTool);
       setInspectorTab(envelope.ui.inspectorTab);
       if (recovered.codeMayApply) {
-        setDockTab(envelope.ui.dockTab);
+        setDockTab(envelope.ui.dockTab === 'assets' ? 'generated' : envelope.ui.dockTab);
         setDockCollapsed(envelope.ui.dockCollapsed);
       } else {
         // A quarantined linked-code conflict must be immediately visible.
@@ -1700,6 +1702,85 @@ export default function VisualStudioPre4({
           : 'Could not add image asset',
       );
     }
+  };
+
+  const openAssetWorkspace = (
+    filter?: 'image' | 'font' | 'audio' | 'video',
+  ) => {
+    if (filter) setAssetFilter(filter);
+    setDockCollapsed(false);
+  };
+
+  const addStudioAssetFiles = async (files: FileList | File[]) => {
+    const incoming = Array.from(files);
+    if (!incoming.length) return;
+
+    if (assets.length + incoming.length > STUDIO_ASSET_LIMITS.maxCount) {
+      setMessage(
+        'Studio accepts at most ' +
+          STUDIO_ASSET_LIMITS.maxCount +
+          ' assets per session.',
+      );
+      return;
+    }
+
+    try {
+      const created: StudioVirtualAsset[] = [];
+      let total = totalStudioAssetBytes(assets);
+      for (const file of incoming) {
+        const asset = await fileToStudioAsset(file);
+        total += asset.size;
+        if (total > STUDIO_ASSET_LIMITS.maxTotalBytes) {
+          throw new Error('Combined Studio assets exceed the 24 MiB session limit.');
+        }
+        created.push(asset);
+      }
+
+      if (!created.length) return;
+      setAssets([...assets, ...created]);
+      setAssetFilter(assetKind(created[0].mime));
+      setMessage(
+        'Added ' +
+          created.length +
+          ' Studio asset' +
+          (created.length === 1 ? '' : 's'),
+      );
+    } catch (uploadError) {
+      setMessage(
+        uploadError instanceof Error
+          ? uploadError.message
+          : 'Could not add Studio asset',
+      );
+    } finally {
+      if (assetInputRef.current) assetInputRef.current.value = '';
+    }
+  };
+
+  const activateStudioAsset = (asset: StudioVirtualAsset) => {
+    if (asset.mime.startsWith('image/')) {
+      insertImageAsset(asset);
+      return;
+    }
+    if (isStudioFontAsset(asset)) {
+      applyFontAsset(asset);
+      return;
+    }
+    if (asset.mime.startsWith('audio/')) setActiveTool('audio');
+    if (asset.mime.startsWith('video/')) setActiveTool('video');
+    setMessage('Asset ready · ' + studioAssetReference(asset));
+  };
+
+  const copyStudioAssetReference = (asset: StudioVirtualAsset) => {
+    const reference = studioAssetReference(asset);
+    void navigator.clipboard.writeText(reference).then(
+      () => setMessage('Copied ' + reference),
+      () => setMessage('Clipboard access was blocked'),
+    );
+  };
+
+  const removeStudioAsset = (asset: StudioVirtualAsset) => {
+    setAssets(assets.filter((item) => item.id !== asset.id));
+    setMessage('Removed asset · ' + asset.name);
   };
 
   useEffect(() => {
@@ -3523,8 +3604,7 @@ export default function VisualStudioPre4({
             <button
               type="button"
               onClick={() => {
-                setAssetFilter('font');
-                setDockTab('assets');
+                openAssetWorkspace('font');
               }}
             >
               Fonts
@@ -3564,8 +3644,7 @@ export default function VisualStudioPre4({
             <button
               type="button"
               onClick={() => {
-                setAssetFilter('font');
-                setDockTab('assets');
+                openAssetWorkspace('font');
               }}
             >
               Upload
@@ -3667,7 +3746,7 @@ export default function VisualStudioPre4({
 
           <div className="apx-media-context-heading">
             <strong>Image assets</strong>
-            <button type="button" onClick={() => setDockTab('assets')}>Open Assets</button>
+            <button type="button" onClick={() => openAssetWorkspace('image')}>Open Assets</button>
           </div>
           <div className="apx-media-asset-list">
             {imageAssets.length ? imageAssets.map((asset) => (
@@ -3709,7 +3788,7 @@ export default function VisualStudioPre4({
         <button
           className="apx-media-open-assets"
           type="button"
-          onClick={() => setDockTab('assets')}
+          onClick={() => openAssetWorkspace()}
         >
           <CircleStackIcon />
           Manage all assets
@@ -3741,7 +3820,6 @@ export default function VisualStudioPre4({
   const dockTabs = [
     ['generated', 'Code'],
     ['diagnostics', 'Diagnostics'],
-    ['assets', 'Assets'],
     ['history', 'History'],
     ...((activeTool === 'gif' || phase11Active || activeTool === 'audio' || phase12Active)
       ? [['timeline', 'Timeline'] as const]
@@ -6218,19 +6296,6 @@ export default function VisualStudioPre4({
       );
     }
 
-    if (dockTab === 'assets') {
-      return (
-        <StudioAssetShelf
-          assets={assets}
-          onChange={setAssets}
-          onInsertReference={(value) => setMessage('Asset reference: ' + value)}
-          onInsertAsset={insertImageAsset}
-          onInsertFontAsset={applyFontAsset}
-          onNotice={(_kind, text) => setMessage(text)}
-        />
-      );
-    }
-
     return history.current.entries.length || runHistory.length ? (
       <div className="apx-pre4-history">
         {history.current.entries.slice(0, 12).map((label, index) => (
@@ -6444,7 +6509,7 @@ export default function VisualStudioPre4({
                       data-active={activeTool === id ? 'true' : undefined}
                       onClick={() => {
                         setActiveTool(id);
-                        if (id === 'assets') setDockTab('assets');
+                        if (id === 'assets') openAssetWorkspace();
                         if (id === 'gif') {
                           setDockTab('timeline');
                           setDockCollapsed(false);
@@ -6582,7 +6647,7 @@ export default function VisualStudioPre4({
             {!mediaContextActive ? (
               <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
             ) : activeTool === 'images' ? (
-              <button type="button" onClick={() => setDockTab('assets')} title="Open Assets">＋</button>
+              <button type="button" onClick={() => openAssetWorkspace('image')} title="Open Assets">＋</button>
             ) : activeTool === 'text' ? (
               <button type="button" onClick={() => insertText('Text')} title="Add text">＋</button>
             ) : null}
@@ -6626,14 +6691,6 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-stagebar">
             <div className="apx-phase17-stage-left">
               <div className="apx-phase17-panel-reveals">
-              {inspectorCollapsed ? (
-                <button
-                  type="button"
-                  data-phase17-show-inspector
-                  onClick={() => setInspectorCollapsed(false)}
-                  aria-label="Show Inspector panel"
-                >‹ Inspector</button>
-              ) : null}
             </div>
               <button className="apx-pre4-device" type="button">
                 <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
@@ -6932,7 +6989,28 @@ export default function VisualStudioPre4({
           </div>
         </main>
 
-        <aside className="apx-pre4-inspector">
+        <button
+          type="button"
+          className="apx-pre4-inspector-dock-toggle"
+          data-phase17-inspector-toggle
+          data-phase17-collapse-inspector={!inspectorCollapsed ? '' : undefined}
+          data-phase17-show-inspector={inspectorCollapsed ? '' : undefined}
+          data-state={inspectorCollapsed ? 'collapsed' : 'expanded'}
+          onClick={() => setInspectorCollapsed((value) => !value)}
+          aria-controls="apx-pre4-inspector-panel"
+          aria-expanded={!inspectorCollapsed}
+          aria-label={inspectorCollapsed ? 'Open Inspector panel' : 'Collapse Inspector panel'}
+          title={inspectorCollapsed ? 'Open Inspector panel' : 'Collapse Inspector panel'}
+        >
+          <span className="apx-pre4-inspector-dock-grip" aria-hidden="true" />
+          {inspectorCollapsed ? (
+            <ChevronLeftIcon aria-hidden="true" />
+          ) : (
+            <ChevronRightIcon aria-hidden="true" />
+          )}
+        </button>
+
+        <aside id="apx-pre4-inspector-panel" className="apx-pre4-inspector">
           <div
             className="apx-phase17-resizer apx-phase17-resizer--inspector"
             role="separator"
@@ -6946,14 +7024,6 @@ export default function VisualStudioPre4({
             onKeyDown={(event) => resizePanelByKeyboard('inspector', event)}
           />
           <div className="apx-pre4-inspector-tabs">
-            <button
-              className="apx-phase17-inspector-collapse"
-              type="button"
-              data-phase17-collapse-inspector
-              onClick={() => setInspectorCollapsed(true)}
-              aria-label="Collapse Inspector panel"
-              title="Collapse Inspector panel"
-            >›</button>
             {inspectorTabs.map(([id, label]) => (
               <button
                 key={id}
@@ -7020,13 +7090,36 @@ export default function VisualStudioPre4({
           </div>
 
           {!dockCollapsed && (
-            <aside className="apx-pre4-assets-pane">
+            <aside
+              className="apx-pre4-assets-pane"
+              data-unified-assets-pane
+              onDragOver={(event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'copy';
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                void addStudioAssetFiles(event.dataTransfer.files);
+              }}
+            >
+              <input
+                ref={assetInputRef}
+                type="file"
+                hidden
+                multiple
+                accept="image/*,audio/*,video/*,.ttf,.otf,.woff,.woff2"
+                onChange={(event) => {
+                  if (event.target.files) void addStudioAssetFiles(event.target.files);
+                }}
+              />
               <div className="apx-pre4-assets-head">
                 <div>
                   <strong>Assets</strong>
                   <span>{assets.length}</span>
                 </div>
-                <button type="button" onClick={() => setDockTab('assets')}>＋ Upload</button>
+                <button type="button" onClick={() => assetInputRef.current?.click()}>
+                  ＋ Upload
+                </button>
               </div>
               <div className="apx-pre4-asset-tabs" role="tablist" aria-label="Asset categories">
                 {([
@@ -7049,40 +7142,62 @@ export default function VisualStudioPre4({
                 ))}
               </div>
               <div className="apx-pre4-assets-grid">
-                {filteredAssets.length ? filteredAssets.slice(0, 9).map((asset) => (
-                  <button
-                    key={asset.id}
-                    type="button"
-                    title={
-                      asset.mime.startsWith('image/')
-                        ? 'Insert ' + asset.name
-                        : isStudioFontAsset(asset)
-                          ? 'Apply ' + studioAssetFontFamily(asset)
-                          : asset.name
-                    }
-                    onClick={() => {
-                      if (asset.mime.startsWith('image/')) {
-                        insertImageAsset(asset);
-                        return;
+                {filteredAssets.length ? filteredAssets.map((asset) => (
+                  <article key={asset.id} className="apx-pre4-asset-card">
+                    <button
+                      className="apx-pre4-asset-primary"
+                      type="button"
+                      title={
+                        asset.mime.startsWith('image/')
+                          ? 'Insert ' + asset.name
+                          : isStudioFontAsset(asset)
+                            ? 'Apply ' + studioAssetFontFamily(asset)
+                            : 'Use ' + asset.name
                       }
-                      if (isStudioFontAsset(asset)) {
-                        applyFontAsset(asset);
-                        return;
-                      }
-                      setDockTab('assets');
-                    }}
-                  >
-                    {asset.mime.startsWith('image/') ? (
-                      <img src={'data:' + asset.mime + ';base64,' + asset.base64} alt="" />
-                    ) : (
-                      <span>{asset.mime.startsWith('video/') ? '▷' : asset.mime.startsWith('audio/') ? '♪' : assetKind(asset.mime) === 'font' ? 'Aa' : '◆'}</span>
-                    )}
-                    <small>{asset.name}</small>
-                  </button>
+                      onClick={() => activateStudioAsset(asset)}
+                    >
+                      {asset.mime.startsWith('image/') ? (
+                        <img src={'data:' + asset.mime + ';base64,' + asset.base64} alt="" />
+                      ) : (
+                        <span className="apx-pre4-asset-glyph">
+                          {asset.mime.startsWith('video/')
+                            ? '▷'
+                            : asset.mime.startsWith('audio/')
+                              ? '♪'
+                              : assetKind(asset.mime) === 'font'
+                                ? 'Aa'
+                                : '◆'}
+                        </span>
+                      )}
+                      <small title={asset.name}>{asset.name}</small>
+                    </button>
+                    <div className="apx-pre4-asset-actions">
+                      <button
+                        type="button"
+                        onClick={() => copyStudioAssetReference(asset)}
+                        title="Copy Studio asset reference"
+                        aria-label={'Copy reference for ' + asset.name}
+                      >
+                        <ClipboardDocumentIcon aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeStudioAsset(asset)}
+                        title="Remove asset"
+                        aria-label={'Remove ' + asset.name}
+                      >
+                        <TrashIcon aria-hidden="true" />
+                      </button>
+                    </div>
+                  </article>
                 )) : (
-                  <button type="button" onClick={() => setDockTab('assets')} className="apx-pre4-assets-empty">
+                  <button
+                    type="button"
+                    onClick={() => assetInputRef.current?.click()}
+                    className="apx-pre4-assets-empty"
+                  >
                     <span>＋</span>
-                    <small>No {assetFilter} assets</small>
+                    <small>Upload {assetFilter} assets</small>
                   </button>
                 )}
               </div>
@@ -7128,7 +7243,7 @@ export default function VisualStudioPre4({
         </span>
         <span className="apx-pre4-status-message" title={message}>{message}</span>
         <span className="apx-pre4-build-motto">Build something extraordinary. ✦</span>
-        <span className="sr-only">Visual workspace ready · Code · Assets · Diagnostics · History</span>
+        <span className="sr-only">Visual workspace ready · Code · Diagnostics · History · unified Assets pane</span>
       </footer>
     </div>
   );
