@@ -6,6 +6,7 @@ import test from 'node:test';
 import { createVisualProject } from '../../../lib/studio/visual/project';
 import {
   PHASE17_AUTOSAVE_VERSION,
+  PHASE17_BROWSER_MATRIX,
   PHASE17_PERFORMANCE_BUDGETS,
   Phase17AssetDataUrlCache,
   Phase17LatestTransaction,
@@ -182,6 +183,17 @@ test('Phase 17 latest-transaction guard rejects delayed stale reconciliation', (
   assert.equal(transactions.isCurrent(second), true);
   transactions.cancel();
   assert.equal(transactions.isCurrent(second), false);
+});
+
+test('Phase 17 browser matrix covers desktop, laptop, tablet and mobile widths', () => {
+  assert.deepEqual(
+    PHASE17_BROWSER_MATRIX.map((entry) => entry.name),
+    ['desktop', 'laptop', 'tablet', 'mobile'],
+  );
+  assert.deepEqual(
+    PHASE17_BROWSER_MATRIX.map((entry) => entry.width),
+    [1440, 1100, 820, 390],
+  );
 });
 
 test('Phase 17 performance budgets classify large code and layer trees', () => {
