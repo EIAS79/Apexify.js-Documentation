@@ -57,27 +57,31 @@ function pluginLines(plugin: Phase14PluginConfig, index: number): string[] {
     return lines;
   }
 
-  const variable = safeIdentifier(plugin.name, index);
   if (plugin.source === 'inline') {
+    const open = plugin.action === 'install'
+      ? '  await painter.plugins.install({'
+      : '  await painter.use({';
+    const close = plugin.action === 'install' ? '  }, painter);' : '  });';
     lines.push(
-      '  const ' + variable + ' = {',
+      open,
       '    name: ' + JSON.stringify(plugin.name) + ',',
       '    async install(host) {',
       '      host.plugins.use(' + JSON.stringify(plugin.apiName) + ', ' + emit(plugin.api, 6).replace(/\n/g, '\n      ') + ');',
       '    },',
-      '  };',
+      close,
     );
-  } else {
-    const moduleVariable = variable + 'Module';
-    const exportExpression = plugin.exportName
-      ? moduleVariable + '[' + JSON.stringify(plugin.exportName) + ']'
-      : '(' + moduleVariable + '.default ?? ' + moduleVariable + ')';
-    lines.push(
-      '  const ' + moduleVariable + ' = await import(' + JSON.stringify(plugin.module) + ');',
-      '  const ' + variable + ' = ' + exportExpression + ';',
-    );
+    return lines;
   }
 
+  const variable = safeIdentifier(plugin.name, index);
+  const moduleVariable = variable + 'Module';
+  const exportExpression = plugin.exportName
+    ? moduleVariable + '[' + JSON.stringify(plugin.exportName) + ']'
+    : '(' + moduleVariable + '.default ?? ' + moduleVariable + ')';
+  lines.push(
+    '  const ' + moduleVariable + ' = await import(' + JSON.stringify(plugin.module) + ');',
+    '  const ' + variable + ' = ' + exportExpression + ';',
+  );
   if (plugin.action === 'install') {
     lines.push('  await painter.plugins.install(' + variable + ', painter);');
   } else {
@@ -101,12 +105,36 @@ function outputExpression(settings: Phase14OutputSettings): string {
   return 'painter.output.arrayBuffer(primaryBuffer)';
 }
 
-function stripBatch(state: Phase14AdvancedState) {
-  return state.batch.items.map(({ id: _id, sync: _sync, ...item }) => item);
+function batchOperationsExpression(state: Phase14AdvancedState): string {
+  const rows = state.batch.items.map((item) => {
+    const config = emit(item.config, 6).replace(/\n/g, '\n    ');
+    const resolvedConfig = state.preResolve
+      ? 'painter.prepareForRender(' + config + ')'
+      : config;
+    return [
+      '    {',
+      '      type: ' + JSON.stringify(item.type) + ',',
+      '      config: ' + resolvedConfig + ',',
+      '    }',
+    ].join('\n');
+  });
+  return '[\n' + rows.join(',\n') + ',\n  ]';
 }
 
-function stripChain(state: Phase14AdvancedState) {
-  return state.chain.steps.map(({ id: _id, sync: _sync, ...step }) => step);
+function chainOperationsExpression(state: Phase14AdvancedState): string {
+  const rows = state.chain.steps.map((step) => {
+    const args = emit(step.args, 6).replace(/\n/g, '\n    ');
+    const resolvedArgs = state.preResolve
+      ? 'painter.prepareForRender(' + args + ')'
+      : args;
+    return [
+      '    {',
+      '      method: ' + JSON.stringify(step.method) + ',',
+      '      args: ' + resolvedArgs + ',',
+      '    }',
+    ].join('\n');
+  });
+  return '[\n' + rows.join(',\n') + ',\n  ]';
 }
 
 function generatedBody(
@@ -130,44 +158,45 @@ function generatedBody(
   });
   if (state.plugins.length) lines.push('');
 
+  const operationCount = state.execution === 'batch'
+    ? state.batch.items.length
+    : state.chain.steps.length;
+  const syncClasses = state.execution === 'batch'
+    ? state.batch.items.map((item) => item.sync)
+    : state.chain.steps.map((item) => item.sync);
+
+  lines.push(
+    '  const authoredOperationCount = ' + String(operationCount) + ';',
+    '  const authoredSyncClasses = ' + emit(syncClasses) + ';',
+  );
+
   if (state.execution === 'batch') {
-    lines.push('  const authoredOperations = ' + emit(stripBatch(state), 2).replace(/\n/g, '\n  ') + ';');
-    if (state.preResolve) {
-      lines.push('  const executableOperations = painter.prepareForRender(authoredOperations);');
-    } else {
-      lines.push('  const executableOperations = authoredOperations;');
-    }
     lines.push(
-      '  const executionOutputs = await painter.batch(executableOperations, ' +
-        emit({
-          concurrency: state.batch.concurrency,
-          resolveAssetRefs: state.batch.resolveAssetRefs,
-        }) +
-        ');',
+      '  const executionOutputs = await painter.batch(',
+      '  ' + batchOperationsExpression(state).replace(/\n/g, '\n  ') + ',',
+      '  ' + emit({
+        concurrency: state.batch.concurrency,
+        resolveAssetRefs: state.batch.resolveAssetRefs,
+      }).replace(/\n/g, '\n  ') + ',',
+      '  );',
       '  const primaryBuffer = executionOutputs[0];',
       "  if (!primaryBuffer) throw new Error('Phase 14 batch produced no output.');",
     );
   } else {
-    lines.push('  const authoredOperations = ' + emit(stripChain(state), 2).replace(/\n/g, '\n  ') + ';');
-    if (state.preResolve) {
-      lines.push('  const executableOperations = painter.prepareForRender(authoredOperations);');
-    } else {
-      lines.push('  const executableOperations = authoredOperations;');
-    }
     lines.push(
-      '  const primaryBuffer = await painter.chain(executableOperations, ' +
-        emit({ resolveAssetRefs: state.chain.resolveAssetRefs }) +
-        ');',
+      '  const primaryBuffer = await painter.chain(',
+      '  ' + chainOperationsExpression(state).replace(/\n/g, '\n  ') + ',',
+      '  ' + emit({ resolveAssetRefs: state.chain.resolveAssetRefs }).replace(/\n/g, '\n  ') + ',',
+      '  );',
       '  const executionOutputs = [primaryBuffer];',
     );
   }
-
   lines.push(
     '  const finalOutput = ' + outputExpression(output) + ';',
     '  const structuredResult = {',
     '    phase: 14,',
     '    execution: ' + JSON.stringify(state.execution) + ',',
-    '    operationCount: authoredOperations.length,',
+    '    operationCount: authoredOperationCount,',
     '    output: ' + emit({
       strategy: output.strategy,
       format: output.format,
@@ -189,11 +218,7 @@ function generatedBody(
       '    executionSummary: {',
       '      outputs: executionOutputs.length,',
       '      preResolved: ' + String(state.preResolve) + ',',
-      '      syncClasses: authoredOperations.map((_item, index) => ' +
-        (state.execution === 'batch'
-          ? emit(state.batch.items.map((item) => item.sync))
-          : emit(state.chain.steps.map((item) => item.sync))) +
-        '[index]),',
+      '      syncClasses: authoredSyncClasses,',
       '    },',
     );
   }
