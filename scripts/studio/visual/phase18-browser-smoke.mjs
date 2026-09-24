@@ -151,7 +151,7 @@ async function desktopReleaseProof(page) {
     await page.click(selector);
   }
 
-  for (const tab of ['generated','diagnostics','assets','history']) {
+  for (const tab of ['generated','diagnostics','history']) {
     const selector = '[data-dock-tab="' + tab + '"]';
     await page.waitForSelector(selector);
     await page.click(selector);
@@ -160,6 +160,12 @@ async function desktopReleaseProof(page) {
       {},
       tab,
     );
+  }
+
+  // Assets is a single dedicated pane, not a second bottom-dock tab.
+  await page.waitForSelector('[data-unified-assets-pane]', { visible: true });
+  if (await page.$('[data-dock-tab="assets"]')) {
+    throw new Error('Visual Studio exposed the retired duplicate Assets dock tab');
   }
 
   // Timeline is deliberately contextual: activating GIF/audio/video must expose it.
