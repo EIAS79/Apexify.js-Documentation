@@ -616,6 +616,7 @@ export default function VisualStudioPre4({
     start: number;
     initial: number;
   } | null>(null);
+  const globalKeyboardHandlerRef = useRef<(event: KeyboardEvent) => void>(() => {});
   const codeAppliedSignatureRef = useRef('');
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
@@ -2226,8 +2227,7 @@ export default function VisualStudioPre4({
     return true;
   };
 
-  useEffect(() => {
-    const onKey = (event: KeyboardEvent) => {
+  globalKeyboardHandlerRef.current = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (target?.matches('input,textarea,[contenteditable=true]')) return;
 
@@ -2316,11 +2316,14 @@ export default function VisualStudioPre4({
           ),
         );
       }
-    };
 
+  };
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => globalKeyboardHandlerRef.current(event);
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  });
+  }, []);
 
   const beginPhase7CanvasAction = (event: ReactPointerEvent) => {
     if (!phase7Action) return false;
