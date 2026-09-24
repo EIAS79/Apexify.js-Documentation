@@ -1,4 +1,9 @@
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import puppeteer from 'puppeteer-core';
+
+const require = createRequire(import.meta.url);
+const axeSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 
 const base = process.env.STUDIO_VISUAL_BASE_URL || 'http://127.0.0.1:3000';
 const chrome = process.env.CHROME_PATH;
@@ -28,6 +33,36 @@ async function openVisual(page) {
     await page.click('[data-studio-code-panel]:not([hidden]) [data-studio-mode-tab="visual"]');
   }
   await page.waitForSelector('[data-studio-visual-workspace][data-active="true"]');
+}
+
+async function auditAccessibility(page, label) {
+  await page.addScriptTag({ content: axeSource });
+  const report = await page.evaluate(async () => {
+    const root = document.querySelector('[data-studio-visual-workspace]');
+    if (!root || !window.axe) return { critical: [], serious: [] };
+    const result = await window.axe.run(root, {
+      runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] },
+    });
+    const compact = (items) => items.map((item) => ({
+      id: item.id,
+      impact: item.impact,
+      help: item.help,
+      nodes: item.nodes.slice(0, 5).map((node) => node.target),
+    }));
+    return {
+      critical: compact(result.violations.filter((item) => item.impact === 'critical')),
+      serious: compact(result.violations.filter((item) => item.impact === 'serious')),
+    };
+  });
+  if (report.critical.length) {
+    throw new Error(label + ': critical accessibility violations: ' + JSON.stringify(report.critical));
+  }
+  console.log(
+    '[studio-visual:phase17-browser] accessibility ' +
+      label +
+      ' critical=0 serious=' +
+      report.serious.length,
+  );
 }
 
 async function assertNoOverflow(page, label) {
@@ -166,6 +201,7 @@ for (const [name, width, height] of matrix) {
 
   await openVisual(page);
   await assertNoOverflow(page, name);
+  await auditAccessibility(page, name);
 
   if (name === 'desktop') {
     await verifyDesktopHardening(page);
