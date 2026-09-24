@@ -71,6 +71,17 @@ export type Phase13Operation =
   | { id: string; kind: 'transition'; type: 'fade'|'wipe'|'slide'|'zoom'|'rotate'|'dissolve'|'blur'|'circle'|'pixelize'; duration: number; direction?: 'left'|'right'|'up'|'down'|'in'|'out'; secondAssetId?: string }
   | { id: string; kind: 'removeAudio' }
   | { id: string; kind: 'normalizeAudio'; targetLevel?: number; method?: 'peak'|'rms'|'lufs' }
+  | { id: string; kind: 'watermark'; assetId: string; position?: 'top-left'|'top-right'|'bottom-left'|'bottom-right'|'center'; opacity?: number; width?: number; height?: number; startTime?: number; endTime?: number }
+  | { id: string; kind: 'merge'; assetIds: string[]; mode?: 'sequential'|'side-by-side'|'grid'; direction?: 'horizontal'|'vertical' }
+  | { id: string; kind: 'splitScreen'; assetIds: string[]; layout?: 'side-by-side'|'top-bottom'|'grid' }
+  | { id: string; kind: 'replaceSegment'; replacementAssetId: string; targetStartTime: number; targetEndTime: number; durationPolicy?: 'fit'|'trim'|'preserve' }
+  | { id: string; kind: 'loop'; smooth?: boolean }
+  | { id: string; kind: 'stabilize'; smoothing?: number }
+  | { id: string; kind: 'timeLapse'; speed?: number }
+  | { id: string; kind: 'mute'; ranges?: Array<{ start: number; end: number }> }
+  | { id: string; kind: 'volume'; volume: number; ranges?: Array<{ start: number; end: number; volume: number }> }
+  | { id: string; kind: 'lut'; assetId: string; intensity?: number }
+  | { id: string; kind: 'mixAudio'; assetId: string; startTime?: number; volume?: number; keepOriginalAudio?: boolean }
   | { id: string; kind: 'exportPreset'; preset: 'youtube'|'instagram'|'tiktok'|'twitter'|'facebook'|'4k'|'1080p'|'720p'|'mobile'|'web' };
 
 export type Phase13Timeline = {
@@ -101,6 +112,11 @@ export type Phase13Timeline = {
   inspect: {
     extractTimes: number[];
     thumbnails: number;
+    previewFrames: number;
+    probe: boolean;
+    detectScenes: boolean;
+    sceneThreshold: number;
+    extractAudio: boolean;
   };
 };
 
@@ -141,7 +157,15 @@ export function defaultPhase13Timeline(): Phase13Timeline {
     },
     operations: [],
     render: { format: 'mp4', preset: 'preview' },
-    inspect: { extractTimes: [], thumbnails: 0 },
+    inspect: {
+      extractTimes: [],
+      thumbnails: 0,
+      previewFrames: 0,
+      probe: false,
+      detectScenes: false,
+      sceneThreshold: 0.3,
+      extractAudio: false,
+    },
   };
 }
 
@@ -153,6 +177,7 @@ function asTimeline(record: VisualProjectRecord | undefined): Phase13Timeline | 
   if (!value.frames || !Array.isArray(value.frames.items)) return null;
   if (!value.pipeline || !Array.isArray(value.pipeline.splices) || !Array.isArray(value.pipeline.text) || !Array.isArray(value.pipeline.audio)) return null;
   if (!Array.isArray(value.operations) || !value.render || !value.inspect || !Array.isArray(value.inspect.extractTimes)) return null;
+  if (!finite(value.inspect.previewFrames) || typeof value.inspect.probe !== 'boolean' || typeof value.inspect.detectScenes !== 'boolean' || typeof value.inspect.extractAudio !== 'boolean') return null;
   return value;
 }
 
@@ -267,12 +292,33 @@ export function validatePhase13Project(project: VisualProject): VisualProjectIss
     if (op.kind==='crop' && (![op.x,op.y,op.width,op.height].every(finite) || op.width <= 0 || op.height <= 0)) issue(issues,'phase13-crop',path,'Crop requires finite coordinates and positive dimensions.');
     if (op.kind==='pip') asset(op.overlayAssetId,issues,path+'.overlayAssetId');
     if (op.kind==='transition' && op.secondAssetId) asset(op.secondAssetId,issues,path+'.secondAssetId');
+    if (op.kind==='watermark') asset(op.assetId,issues,path+'.assetId');
+    if (op.kind==='merge' || op.kind==='splitScreen') {
+      if (!op.assetIds.length || op.assetIds.length > 32) issue(issues,'phase13-merge',path+'.assetIds','Merge/split-screen requires 1 to 32 additional video assets.');
+      op.assetIds.forEach((id,itemIndex)=>asset(id,issues,path+'.assetIds['+itemIndex+']'));
+    }
+    if (op.kind==='replaceSegment') {
+      asset(op.replacementAssetId,issues,path+'.replacementAssetId');
+      nonNegative(op.targetStartTime,issues,path+'.targetStartTime','Replacement start');
+      nonNegative(op.targetEndTime,issues,path+'.targetEndTime','Replacement end');
+      if (op.targetEndTime <= op.targetStartTime) issue(issues,'phase13-replace',path,'Replacement end must be greater than start.');
+    }
+    if (op.kind==='timeLapse' && op.speed !== undefined && (!finite(op.speed) || op.speed <= 0 || op.speed > 16)) issue(issues,'phase13-speed',path+'.speed','Time-lapse speed must be greater than 0 and at most 16.');
+    if (op.kind==='stabilize' && op.smoothing !== undefined && (!finite(op.smoothing) || op.smoothing < 0)) issue(issues,'phase13-stabilize',path+'.smoothing','Stabilization smoothing cannot be negative.');
+    if (op.kind==='volume' && (!finite(op.volume) || op.volume < 0 || op.volume > 4)) issue(issues,'phase13-volume',path+'.volume','Volume must be between 0 and 4.');
+    if (op.kind==='lut') asset(op.assetId,issues,path+'.assetId');
+    if (op.kind==='mixAudio') {
+      asset(op.assetId,issues,path+'.assetId');
+      if (op.volume !== undefined && (!finite(op.volume) || op.volume < 0 || op.volume > 4)) issue(issues,'phase13-volume',path+'.volume','Mixed audio volume must be between 0 and 4.');
+    }
     if (op.kind==='freeze') { nonNegative(op.time,issues,path+'.time','Freeze time'); if (!finite(op.duration) || op.duration <= 0) issue(issues,'phase13-freeze',path+'.duration','Freeze duration must be positive.'); }
   });
 
   if (!['mp4','webm'].includes(timeline.render.format)) issue(issues,'phase13-format','timelines.video.render.format','Video format must be mp4 or webm.');
   if (!['preview','export'].includes(timeline.render.preset)) issue(issues,'phase13-preset','timelines.video.render.preset','Pipeline render preset must be preview or export.');
   if (!finite(timeline.inspect.thumbnails) || timeline.inspect.thumbnails < 0 || timeline.inspect.thumbnails > 100) issue(issues,'phase13-thumbnails','timelines.video.inspect.thumbnails','Thumbnail count must be between 0 and 100.');
+  if (!finite(timeline.inspect.previewFrames) || timeline.inspect.previewFrames < 0 || timeline.inspect.previewFrames > 100) issue(issues,'phase13-preview','timelines.video.inspect.previewFrames','Preview frame count must be between 0 and 100.');
+  if (!finite(timeline.inspect.sceneThreshold) || timeline.inspect.sceneThreshold < 0 || timeline.inspect.sceneThreshold > 1) issue(issues,'phase13-scenes','timelines.video.inspect.sceneThreshold','Scene detection threshold must be between 0 and 1.');
   timeline.inspect.extractTimes.forEach((time,index)=>nonNegative(time,issues,'timelines.video.inspect.extractTimes['+index+']','Extract time'));
   return issues;
 }
