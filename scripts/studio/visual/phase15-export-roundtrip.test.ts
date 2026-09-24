@@ -362,6 +362,7 @@ test('Phase 15 clean exported TypeScript parses without syntax diagnostics', () 
   for (const [phase, build] of roundTripProjects) {
     const project = build();
     const source = phase15CleanGeneratedSource(generateVisualProjectCode(project).source);
+    assert.doesNotMatch(source, /return await main\(\);/, 'Phase ' + phase + ' retained runner-only return');
     const result = ts.transpileModule(source, {
       compilerOptions: {
         target: ts.ScriptTarget.ES2022,
