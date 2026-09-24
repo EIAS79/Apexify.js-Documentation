@@ -184,44 +184,19 @@ function coreProject(): VisualProject {
   return project;
 }
 
-function sceneProject(): VisualProject {
-  let project = base('phase18-scene', 'Phase 18 Scene', 520, 320);
-
+function namedAssetProject(): VisualProject {
+  let project = base('phase18-named-asset', 'Phase 18 Named Asset', 320, 220);
   const image = createVisualNode(
     'image',
     imagePropsRecord(defaultImageNodeProps(TINY_PNG)),
-    { id: 'phase18_scene_image', name: 'Named Asset Image' },
+    { id: 'phase18_named_image', name: 'Named Asset Image' },
   );
   image.transform = {
-    x: 28, y: 28, width: 96, height: 96,
+    x: 42, y: 36, width: 96, height: 96,
     rotation: 0, opacity: 1, visible: true, locked: false, zIndex: 0,
   };
-
-  const componentText = createVisualNode(
-    'text',
-    textPropsRecord(defaultTextNodeProps('Reusable component')),
-    { id: 'phase18_component_text', name: 'Component Text' },
-  );
-  componentText.transform = {
-    x: 150, y: 38, width: 240, height: 60,
-    rotation: 0, opacity: 1, visible: true, locked: false, zIndex: 1,
-  };
-
-  const templateShape = createVisualNode(
-    'shape',
-    imagePropsRecord(defaultShapeNodeProps('rectangle')),
-    { id: 'phase18_template_shape', name: 'Template Shape' },
-  );
-  templateShape.transform = {
-    x: 150, y: 130, width: 210, height: 90,
-    rotation: 0, opacity: 1, visible: true, locked: false, zIndex: 2,
-  };
-
   project.document.nodes[image.id] = image;
-  project.document.nodes[componentText.id] = componentText;
-  project.document.nodes[templateShape.id] = templateShape;
-  project.document.rootNodeIds = [image.id, componentText.id, templateShape.id];
-
+  project.document.rootNodeIds = [image.id];
   const named = registerPhase9NamedAsset(project, {
     name: 'Release Badge',
     uri: TINY_PNG,
@@ -231,37 +206,88 @@ function sceneProject(): VisualProject {
     kind: 'asset',
     id: named.assetId,
   });
+  return project;
+}
 
-  project = capturePhase9Component(
-    project,
-    [componentText.id],
-    'Release Component',
-  ).project;
+function componentProject(): VisualProject {
+  let project = base('phase18-component', 'Phase 18 Component', 420, 220);
+  const text = createVisualNode(
+    'text',
+    textPropsRecord(defaultTextNodeProps('Reusable component')),
+    { id: 'phase18_component_text', name: 'Component Text' },
+  );
+  text.transform = {
+    x: 70, y: 64, width: 250, height: 60,
+    rotation: 0, opacity: 1, visible: true, locked: false, zIndex: 0,
+  };
+  project.document.nodes[text.id] = text;
+  project.document.rootNodeIds = [text.id];
+  project = capturePhase9Component(project, [text.id], 'Release Component').project;
+  return project;
+}
 
-  project = capturePhase9Template(
-    project,
-    [templateShape.id],
-    'Release Template',
-  ).project;
+function templateProject(): VisualProject {
+  let project = base('phase18-template', 'Phase 18 Template', 420, 260);
+  const shape = createVisualNode(
+    'shape',
+    imagePropsRecord({
+      ...defaultShapeNodeProps('rectangle'),
+      shape: {
+        ...defaultShapeNodeProps('rectangle').shape,
+        color: '#4f7cff',
+      },
+      borderRadius: 16,
+    }),
+    { id: 'phase18_template_shape', name: 'Template Shape' },
+  );
+  shape.transform = {
+    x: 90, y: 80, width: 220, height: 90,
+    rotation: 0, opacity: 1, visible: true, locked: false, zIndex: 0,
+  };
+  project.document.nodes[shape.id] = shape;
+  project.document.rootNodeIds = [shape.id];
+  project = capturePhase9Template(project, [shape.id], 'Release Template').project;
+  return project;
+}
 
+function sceneProject(): VisualProject {
+  let project = base('phase18-scene', 'Phase 18 Scene', 520, 320);
   project = createPhase9Scene(project, {
     name: 'Release Scene',
-    x: 12,
-    y: 230,
-    width: 180,
-    height: 70,
+    x: 30,
+    y: 20,
+    width: 430,
+    height: 250,
   });
   const sceneId = project.editor?.selectedNodeIds?.[0];
   if (!sceneId) throw new Error('Phase 18 scene creation did not select the scene.');
+
   project = createPhase9Surface(project, {
     name: 'Nested Surface',
-    x: 10,
-    y: 10,
-    width: 120,
-    height: 44,
+    x: 80,
+    y: 70,
+    width: 300,
+    height: 150,
     parentId: sceneId,
   });
+  const surfaceId = project.editor?.selectedNodeIds?.[0];
+  if (!surfaceId) throw new Error('Phase 18 surface creation did not select the surface.');
 
+  const text = createVisualNode(
+    'text',
+    textPropsRecord(defaultTextNodeProps('Nested release surface')),
+    { id: 'phase18_scene_text', name: 'Nested Scene Text' },
+  );
+  text.parentId = surfaceId;
+  text.transform = {
+    x: 120, y: 110, width: 240, height: 52,
+    rotation: 0, opacity: 1, visible: true, locked: false, zIndex: 0,
+  };
+  project.document.nodes[text.id] = text;
+  project.document.nodes[surfaceId]!.childIds = [
+    ...(project.document.nodes[surfaceId]!.childIds ?? []),
+    text.id,
+  ];
   return project;
 }
 
@@ -399,8 +425,23 @@ export const PHASE18_PROOF_PROJECTS: readonly Phase18ProofProject[] = [
   },
   {
     id: 'phase18-scene',
-    coverage: ['scene-nested-surface','component','template','named-assets','generated-code-execution'],
+    coverage: ['scene-nested-surface','generated-code-execution'],
     build: sceneProject,
+  },
+  {
+    id: 'phase18-component',
+    coverage: ['component','generated-code-execution'],
+    build: componentProject,
+  },
+  {
+    id: 'phase18-template',
+    coverage: ['template','generated-code-execution'],
+    build: templateProject,
+  },
+  {
+    id: 'phase18-named-asset',
+    coverage: ['named-assets','generated-code-execution'],
+    build: namedAssetProject,
   },
   {
     id: 'phase18-image-effects',
