@@ -3524,6 +3524,54 @@ A capability is not complete merely because a control exists. The matrix must pr
 chore(studio-visual): close full feature completeness gate
 ```
 
+### Phase 16 implementation record — STUDIO-VISUAL-16
+
+> **Status:** MAIN MERGED — MANUAL GATE VERIFICATION PENDING
+>
+> **Work branch:** `studio-visual/v16-feature-completeness`
+>
+> **PR:** #113
+>
+> **Base main commit:** `e303eb6cecc10b3105297928cdd9d0afe0a9f9b5`
+>
+> **Implementation merge:** `8ad8d76158ac3e73b48db61b750078afdbfd3757`
+>
+> **Pinned Apexify.js runtime:** `50f2543482abbd7a9624192a060ec01330370bef`
+
+Implemented Phase-16 scope:
+
+- repository-backed evidence registry for every current authorable Visual Studio domain;
+- mechanical coverage of the existing 187 Studio-relevant public Apexify capabilities;
+- declaration/API-driven DOC-4 option-family verification built on the existing 17,233-option-path inventory;
+- permanent UI-home evidence for every authorable domain;
+- control/Advanced-schema evidence for every authorable capability family;
+- generated-code and Preview-route checks for every authorable capability;
+- explicit reverse-sync policy:
+  - Phases 4–8 parser-backed `reversible`;
+  - Phases 9–13 canonical/normalized semantic reconstruction;
+  - Phase 14 preserves its existing `reversible | normalized | code-only` contract;
+- representative Phase-16 proof projects covering all 20 current authorable domains;
+- canonical generated-code → Visual Project reconciliation regression coverage;
+- deterministic JSON + Markdown completeness report generator;
+- Phase-16 verification integrated into `studio:visual:verify`;
+- manual Studio Visual workflow now generates and uploads the Phase-16 report before the consolidated gate;
+- failure-report artifacts are preserved even if the Phase-16 checker finds a completeness violation;
+- Phase-16 mechanical completeness contract added to `STUDIO_VISUAL_CONTRACT.md`.
+
+Source/integration review completed:
+
+- PR #113 was 0 commits behind `main` before merge;
+- GitHub reported the PR mergeable;
+- no inline review threads or review defects were present;
+- authored Phase-16 TypeScript files passed static syntax validation;
+- no automatic push/PR workflow was enabled.
+
+Manual verification remains intentionally pending because repository Actions are manual-only and the available GitHub connector does not expose workflow dispatch. The required final Phase-16 evidence run is the existing **Studio Visual Phase Gate** workflow on the merged main SHA. That run will execute the consolidated capability checks, Phase-16 report generation, Visual regression suite, runtime proof, Linux video smoke, typecheck, production build and browser regression.
+
+The current Vercel status for the Phase-16 head is an external build-rate-limit failure (`upgradeToPro=build-rate-limit`), not an implementation/compiler/test result. Per the Studio program, Vercel is not used as the iterative Phase-16 verifier.
+
+**Do not claim the Phase-16 gate fully green until the manual Studio Visual Phase Gate has executed successfully on main.**
+
 ---
 
 ## STUDIO-VISUAL-17 — Performance, accessibility, UX and reliability hardening
@@ -3664,7 +3712,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 13 | Video | COMPLETE — PR #107 | `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1` | Studio Visual Phase Gate 35937825619 SUCCESS; Runtime Build Gate 35937825649 SUCCESS on Node 22/24/26; 136/136 tests; Linux generated MP4 proof PASS |
 | 14 | Advanced operations | COMPLETE — PR #109 | `008fbf63cb351524f76e3f31d1c9cb94f857c380` | Runtime PR #39 merged as `50f2543482abbd7a9624192a060ec01330370bef`; 13 implemented / 3 excluded / 6 non-authoring capability rows; Actions manual-only by project instruction |
 | 15 | Export / project round trip | COMPLETE — PR #112 | `86ebd0cdc75a33b86afc227bc54d118cf3caadb8` | Direct integration by project instruction; dedicated Phase-15 round-trip/export regression suite added to `studio:visual:test`; all 19 workflows remain manual-only |
-| 16 | Feature completeness gate | NOT STARTED | — | — |
+| 16 | Feature completeness gate | MAIN MERGED — MANUAL GATE PENDING | `8ad8d76158ac3e73b48db61b750078afdbfd3757` | PR #113 merged; mechanical Phase-16 verifier/report/proof suite integrated; manual Studio Visual Phase Gate still required; Vercel check is externally blocked by build-rate-limit |
 | 17 | Hardening | NOT STARTED | — | — |
 | 18 | Final release | NOT STARTED | — | — |
 
