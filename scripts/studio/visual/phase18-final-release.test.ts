@@ -10,6 +10,7 @@ import {
   PHASE18_REVERSIBLE_PHASES,
 } from '../../../lib/studio/visual/final-release';
 import { PHASE16_PROOF_PROJECTS } from './phase16-proof-projects';
+import { PHASE18_PROOF_PROJECTS } from './phase18-proof-projects';
 import {
   generateVisualProjectCode,
   generateVisualProjectDisplayPreviewCode,
@@ -19,7 +20,7 @@ import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codeg
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import { phase15CleanGeneratedSource } from '../../../lib/studio/visual/export-contract';
 
-const byId = new Map(PHASE16_PROOF_PROJECTS.map((proof) => [proof.id, proof] as const));
+const byId = new Map(PHASE18_PROOF_PROJECTS.map((proof) => [proof.id, proof] as const));
 
 function editReversibleSource(phase: number, source: string): string {
   const candidates: Record<number, Array<[RegExp, string]>> = {
@@ -60,7 +61,7 @@ test('Phase 18 release coverage maps every required category to a real represent
 });
 
 test('Phase 18 representative projects validate and expose canonical, Preview and display-Preview routes', () => {
-  for (const proof of PHASE16_PROOF_PROJECTS) {
+  for (const proof of PHASE18_PROOF_PROJECTS) {
     const project = proof.build();
     const validation = validateVisualProject(project);
     assert.equal(
@@ -85,7 +86,7 @@ test('Phase 18 representative projects validate and expose canonical, Preview an
 });
 
 test('Phase 18 canonical representative source round-trips without semantic or source drift', () => {
-  for (const proof of PHASE16_PROOF_PROJECTS) {
+  for (const proof of PHASE18_PROOF_PROJECTS) {
     const project = proof.build();
     const canonical = generateVisualProjectCode(project).source;
     const reconciled = reconcileVisualProjectFromCode(project, canonical);
