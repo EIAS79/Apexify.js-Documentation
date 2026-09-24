@@ -169,11 +169,27 @@ export function lintGeneratedTypeScript(
       message: 'Generated user code contains Studio runtime protocol internals.',
     });
   }
+  if (/^\s*return\s+await\s+main\(\);\s*$/m.test(source)) {
+    issues.push({
+      severity: 'error',
+      code: 'runner-return',
+      message: 'Generated standalone source still contains the Studio runner return statement.',
+    });
+  }
   return issues;
 }
 
+function standaloneModuleSource(source: string): string {
+  return source.replace(
+    /(^|\n)\s*return\s+await\s+main\(\);\s*(?=\n?$)/u,
+    '$1await main();',
+  );
+}
+
 export function phase15CleanGeneratedSource(source: string): string {
-  return formatGeneratedTypeScript(stripStudioSourceMarkers(source));
+  return formatGeneratedTypeScript(
+    standaloneModuleSource(stripStudioSourceMarkers(source)),
+  );
 }
 
 export function phase15GeneratedCodeProvenance(
