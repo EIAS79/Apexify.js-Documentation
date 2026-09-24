@@ -6515,7 +6515,8 @@ export default function VisualStudioPre4({
         </aside>
         <main className="apx-pre4-stage">
           <div className="apx-pre4-stagebar">
-            <div className="apx-phase17-panel-reveals">
+            <div className="apx-phase17-stage-left">
+              <div className="apx-phase17-panel-reveals">
               {layersCollapsed ? (
                 <button
                   type="button"
@@ -6533,11 +6534,12 @@ export default function VisualStudioPre4({
                 >‹ Inspector</button>
               ) : null}
             </div>
-            <button className="apx-pre4-device" type="button">
-              <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
-              Desktop ({project.document.width} × {project.document.height})
-              <span>⌄</span>
-            </button>
+              <button className="apx-pre4-device" type="button">
+                <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
+                Desktop ({project.document.width} × {project.document.height})
+                <span>⌄</span>
+              </button>
+            </div>
 
             <div className="apx-pre4-zoom">
               <button type="button" onClick={() => setZoom((value) => clampZoom(value - 10))}>−</button>
