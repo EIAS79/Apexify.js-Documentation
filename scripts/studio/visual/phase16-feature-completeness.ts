@@ -107,3 +107,58 @@ for (const option of options.options) {
   const key = `${capability ?? 'unknown'}::${family}::${authoring}`;
   const current = families.get(key);
   if (current) current.paths += 1;
+  else families.set(key, { capability, domain: row?.domain ?? 'not-studio-surface', family, authoring, paths: 1 });
+  if (row && isAuthorableVisualCapability(row)) {
+    authorableOptionPaths += 1;
+    if (!evidence || !row.controlSchemaId) fail('option-family-without-authoring-schema', key, option.path);
+  }
+}
+
+const optionFamilies = [...families.values()].sort((a, b) => `${a.capability}:${a.family}:${a.authoring}`.localeCompare(`${b.capability}:${b.family}:${b.authoring}`));
+const authorableFamilies = optionFamilies.filter((family) => family.authoring === 'visual-controls' || family.authoring === 'advanced-schema');
+const complete = failures.length === 0;
+const report = {
+  schemaVersion: 1,
+  phase: 'STUDIO-VISUAL-16',
+  generatedAtPolicy: 'deterministic-no-wall-clock-field',
+  source: { packagePin: matrix.source.packagePin, capabilityMatrix: 'generated/studio/visual-capability-matrix.json', optionInventory: 'generated/docs-doc4/option-inventory.json' },
+  summary: { complete, capabilities: matrix.rows.length, authorableCapabilities: authorable.length, excludedCapabilities: matrix.rows.length - authorable.length, authorableDomains: authorableDomains.length, optionPaths: options.options.length, authorableOptionPaths, optionFamilies: optionFamilies.length, authorableOptionFamilies: authorableFamilies.length, proofProjects: PHASE16_PROOF_PROJECT_DESCRIPTORS.length, failures: failures.length },
+  domainEvidence: PHASE16_DOMAIN_EVIDENCE,
+  proofProjects: PHASE16_PROOF_PROJECT_DESCRIPTORS,
+  capabilityCoverage,
+  optionFamilies,
+  failures,
+};
+
+const md = [
+  '# STUDIO-VISUAL-16 Feature Completeness Report', '',
+  `- Status: **${complete ? 'PASS' : 'FAIL'}**`,
+  `- Apexify package pin: \`${matrix.source.packagePin ?? 'unknown'}\``,
+  `- Capabilities: **${matrix.rows.length}** (${authorable.length} authorable)`,
+  `- DOC-4 option paths: **${options.options.length}**`,
+  `- Authorable option families: **${authorableFamilies.length}**`,
+  `- Authorable domains: **${authorableDomains.length}**`,
+  `- Representative proof projects: **${PHASE16_PROOF_PROJECT_DESCRIPTORS.length}**`,
+  `- Gate failures: **${failures.length}**`, '',
+  '## Domain coverage', '', '| Domain | Phase | Authoring | UI homes | Proof |', '|---|---|---|---|---|',
+  ...PHASE16_DOMAIN_EVIDENCE.map((entry) => `| ${entry.domain} | ${entry.phaseOwner} | ${entry.authoringMode} | ${entry.permanentUiLocations.join('<br>')} | ${entry.representativeProofProjectIds.join(', ')} |`),
+  '', '## Assertions', '',
+  '- zero unclassified capabilities;', '- codegen + Preview route for every authorable capability;', '- permanent UI home + control/Advanced schema evidence;', '- reverse-sync classification + reconciliation regression evidence;', '- option-family mapping;', '- representative proof project coverage;', '',
+  ...(failures.length ? ['## Failures', '', ...failures.map((failure) => `- **${failure.code}** — \`${failure.subject}\`: ${failure.detail}`), ''] : []),
+].join('\n');
+
+if (check) {
+  if (!complete) {
+    console.error(`[studio-visual:phase16] FAIL (${failures.length} completeness violations)`);
+    failures.slice(0, 100).forEach((failure) => console.error(`- ${failure.code}: ${failure.subject} — ${failure.detail}`));
+    process.exit(1);
+  }
+  console.log(`[studio-visual:phase16] CHECK PASS (${matrix.rows.length} capabilities, ${options.options.length} option paths, ${authorableFamilies.length} authorable option families, ${PHASE16_PROOF_PROJECT_DESCRIPTORS.length} proof projects)`);
+} else {
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
+  fs.writeFileSync(reportMdPath, md);
+  console.log(`[studio-visual:phase16] wrote ${path.relative(root, reportPath)} and ${path.relative(root, reportMdPath)}`);
+  if (!complete) process.exitCode = 1;
+  console.log(`[studio-visual:phase16] ${complete ? 'PASS' : 'FAIL'} (${failures.length} failures)`);
+}
