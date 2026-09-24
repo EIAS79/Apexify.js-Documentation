@@ -38,6 +38,11 @@ export interface Phase17RecoveredUiState {
   inspectorTab: Phase17InspectorTab;
   dockTab: Phase17DockTab;
   dockCollapsed: boolean;
+  layersCollapsed: boolean;
+  inspectorCollapsed: boolean;
+  layersWidth: number;
+  inspectorWidth: number;
+  dockHeight: number;
   collapsedLayerIds: string[];
 }
 
@@ -87,6 +92,11 @@ const DEFAULT_UI: Phase17RecoveredUiState = {
   inspectorTab: 'style',
   dockTab: 'generated',
   dockCollapsed: false,
+  layersCollapsed: false,
+  inspectorCollapsed: false,
+  layersWidth: 274,
+  inspectorWidth: 330,
+  dockHeight: 204,
   collapsedLayerIds: [],
 };
 
@@ -123,6 +133,11 @@ function normalizeUi(value: unknown): Phase17RecoveredUiState {
     inspectorTab: inspector,
     dockTab: dock,
     dockCollapsed: typeof raw.dockCollapsed === 'boolean' ? raw.dockCollapsed : false,
+    layersCollapsed: typeof raw.layersCollapsed === 'boolean' ? raw.layersCollapsed : false,
+    inspectorCollapsed: typeof raw.inspectorCollapsed === 'boolean' ? raw.inspectorCollapsed : false,
+    layersWidth: Math.max(190, Math.min(420, finiteNumber(raw.layersWidth, DEFAULT_UI.layersWidth))),
+    inspectorWidth: Math.max(240, Math.min(460, finiteNumber(raw.inspectorWidth, DEFAULT_UI.inspectorWidth))),
+    dockHeight: Math.max(120, Math.min(480, finiteNumber(raw.dockHeight, DEFAULT_UI.dockHeight))),
     collapsedLayerIds: stringArray(raw.collapsedLayerIds),
   };
 }
