@@ -2592,7 +2592,8 @@
   flex:1 1 auto;
   min-height:0;
   display:grid;
-  grid-template-columns:146px 274px minmax(480px,1fr) 330px;
+  --pre4-rail-size:146px;
+  grid-template-columns:var(--pre4-rail-size) var(--pre4-layers-size,274px) minmax(480px,1fr) var(--pre4-inspector-size,330px);
   grid-template-rows:minmax(0,1fr) var(--pre4-dock-size);
   grid-template-areas:
     "rail layers stage inspector"
@@ -6989,5 +6990,257 @@
     height:auto;
     padding-top:.35rem;
     padding-bottom:.35rem;
+  }
+}
+
+
+/* ==========================================================================
+   STUDIO-VISUAL-17 — performance, accessibility and recovery hardening
+   ========================================================================== */
+
+.apx-pre4-layers,
+.apx-pre4-inspector,
+.apx-pre4-dock{
+  position:relative;
+}
+
+.apx-phase17-resizer{
+  position:absolute;
+  z-index:90;
+  border:0;
+  background:transparent;
+  touch-action:none;
+  outline:none;
+}
+
+.apx-phase17-resizer::after{
+  content:"";
+  position:absolute;
+  border-radius:999px;
+  background:transparent;
+  transition:background-color .12s ease,box-shadow .12s ease;
+}
+
+.apx-phase17-resizer:hover::after,
+.apx-phase17-resizer:focus-visible::after{
+  background:#5d8dff;
+  box-shadow:0 0 0 2px rgba(93,141,255,.18);
+}
+
+.apx-phase17-resizer--layers{
+  top:0;
+  right:-5px;
+  width:10px;
+  height:100%;
+  cursor:col-resize;
+}
+.apx-phase17-resizer--layers::after{
+  top:12px;
+  bottom:12px;
+  left:4px;
+  width:2px;
+}
+
+.apx-phase17-resizer--inspector{
+  top:0;
+  left:-5px;
+  width:10px;
+  height:100%;
+  cursor:col-resize;
+}
+.apx-phase17-resizer--inspector::after{
+  top:12px;
+  bottom:12px;
+  left:4px;
+  width:2px;
+}
+
+.apx-phase17-resizer--dock{
+  top:-5px;
+  left:0;
+  width:100%;
+  height:10px;
+  cursor:row-resize;
+}
+.apx-phase17-resizer--dock::after{
+  top:4px;
+  left:12px;
+  right:12px;
+  height:2px;
+}
+
+body[data-phase17-resizing]{
+  user-select:none;
+}
+body[data-phase17-resizing="layers"],
+body[data-phase17-resizing="inspector"]{
+  cursor:col-resize!important;
+}
+body[data-phase17-resizing="dock"]{
+  cursor:row-resize!important;
+}
+
+.apx-phase17-inspector-collapse{
+  flex:0 0 28px!important;
+  min-width:28px!important;
+  color:#7f94ae!important;
+  border-right:1px solid var(--pre4-line-soft)!important;
+}
+
+.apx-phase17-panel-reveals{
+  min-width:0;
+  display:flex;
+  gap:.28rem;
+}
+.apx-phase17-panel-reveals:empty{
+  display:none;
+}
+.apx-phase17-panel-reveals button{
+  min-height:30px;
+  padding:.3rem .5rem;
+  border:1px solid #284664;
+  border-radius:6px;
+  color:#a9bad0;
+  background:#0b1b2c;
+  font-size:.54rem;
+  font-weight:760;
+}
+
+.apx-phase17-budget-note{
+  margin:.45rem;
+  padding:.5rem .55rem;
+  border:1px solid #725d27;
+  border-radius:6px;
+  color:#d8c184;
+  background:#1d180c;
+  font-size:.48rem;
+  line-height:1.45;
+}
+
+.apx-pre4-layer-tree[data-phase17-layer-tree="large"] .apx-vw-layer-row{
+  content-visibility:auto;
+  contain:layout paint style;
+  contain-intrinsic-size:34px;
+}
+
+.apx-live-code-editor[data-phase17-large-document="true"]{
+  contain:strict;
+}
+.apx-live-code-editor[data-phase17-large-document="true"]::before{
+  content:"Large document mode";
+  position:absolute;
+  right:.55rem;
+  top:.35rem;
+  z-index:4;
+  padding:.18rem .32rem;
+  border:1px solid #29445f;
+  border-radius:999px;
+  color:#7890a9;
+  background:#07131f;
+  font-size:.4rem;
+  pointer-events:none;
+}
+.apx-live-code-editor{
+  position:relative;
+}
+
+.apx-visual-crash-boundary{
+  height:100%;
+  min-height:0;
+  display:grid;
+  place-items:center;
+  padding:1.25rem;
+  color:#eef4fb;
+  background:
+    radial-gradient(circle at 50% 15%,rgba(81,113,255,.12),transparent 34%),
+    #06101a;
+}
+.apx-visual-crash-boundary>div{
+  width:min(620px,100%);
+  display:grid;
+  gap:.65rem;
+  padding:1.1rem;
+  border:1px solid #49334a;
+  border-radius:10px;
+  background:#0b1622;
+  box-shadow:0 18px 50px rgba(0,0,0,.28);
+}
+.apx-visual-crash-boundary strong{font-size:.9rem}
+.apx-visual-crash-boundary span{color:#9dafc3;font-size:.68rem;line-height:1.55}
+.apx-visual-crash-boundary code{
+  overflow:auto;
+  padding:.55rem;
+  border:1px solid #2c3647;
+  border-radius:6px;
+  color:#d8a8b5;
+  background:#080e16;
+  font-size:.58rem;
+}
+.apx-visual-crash-boundary>div>div{display:flex;gap:.45rem;flex-wrap:wrap}
+.apx-visual-crash-boundary button{
+  min-height:34px;
+  padding:.4rem .65rem;
+  border:1px solid #304866;
+  border-radius:6px;
+  color:#dce8f6;
+  background:#102238;
+}
+
+.apx-pre4-stagebar{
+  grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr);
+}
+
+@media(min-width:1021px){
+  .apx-pre4-workspace[data-phase17-layers-collapsed="true"] .apx-pre4-layers{
+    display:none;
+  }
+  .apx-pre4-workspace[data-phase17-inspector-collapsed="true"] .apx-pre4-inspector{
+    display:none;
+  }
+  .apx-pre4-workspace[data-phase17-layers-collapsed="true"] .apx-pre4-layout{
+    grid-template-columns:var(--pre4-rail-size) minmax(480px,1fr) var(--pre4-inspector-size,330px);
+    grid-template-areas:
+      "rail stage inspector"
+      "rail dock dock";
+  }
+  .apx-pre4-workspace[data-phase17-inspector-collapsed="true"] .apx-pre4-layout{
+    grid-template-columns:var(--pre4-rail-size) var(--pre4-layers-size,274px) minmax(480px,1fr);
+    grid-template-areas:
+      "rail layers stage"
+      "rail dock dock";
+  }
+  .apx-pre4-workspace[data-phase17-layers-collapsed="true"][data-phase17-inspector-collapsed="true"] .apx-pre4-layout{
+    grid-template-columns:var(--pre4-rail-size) minmax(480px,1fr);
+    grid-template-areas:
+      "rail stage"
+      "rail dock";
+  }
+}
+
+@media(max-width:1480px) and (min-width:1251px){
+  .apx-pre4-layout{--pre4-rail-size:122px}
+}
+@media(max-width:1250px) and (min-width:1021px){
+  .apx-pre4-layout{--pre4-rail-size:68px}
+}
+@media(max-width:1020px){
+  .apx-phase17-resizer--layers{display:none}
+  .apx-pre4-stagebar{
+    grid-template-columns:auto minmax(0,1fr) auto;
+  }
+}
+@media(max-width:760px){
+  .apx-phase17-resizer--inspector{display:none}
+  .apx-phase17-panel-reveals{display:none}
+  .apx-pre4-stagebar{
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .apx-phase17-resizer::after,
+  .apx-phase17-panel-reveals button,
+  .apx-visual-crash-boundary button{
+    transition:none!important;
   }
 }
