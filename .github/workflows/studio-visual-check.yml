@@ -1,28 +1,7 @@
 name: Studio Visual Phase Gate
 
 on:
-  push:
-    branches:
-      - 'studio-visual/**'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'APEXIFY_STUDIO_VISUAL_AUTHORING_MASTER_PLAN.md'
-      - 'STUDIO_VISUAL_CONTRACT.md'
-      - 'STUDIO_VISUAL_DECISIONS.md'
-      - 'schemas/studio/**'
-      - 'lib/studio/visual/**'
-      - 'components/studio/**'
-      - 'app/studio/**'
-      - 'scripts/studio/visual/**'
-      - 'generated/studio/visual-capability-matrix.json'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'vercel.json'
-      - '.github/workflows/studio-visual-check.yml'
   workflow_dispatch:
-
 permissions:
   contents: read
 
