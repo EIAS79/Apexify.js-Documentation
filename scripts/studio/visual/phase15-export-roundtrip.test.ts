@@ -34,7 +34,11 @@ import {
   defaultChartNodeProps,
 } from '../../../lib/studio/visual/chart-contract';
 import { capturePhase9Component } from '../../../lib/studio/visual/scene-component-contract';
-import { setPhase11Timeline, defaultPhase11Timeline } from '../../../lib/studio/visual/gif-animation-contract';
+import {
+  createPhase11Frame,
+  setPhase11Timeline,
+  defaultPhase11Timeline,
+} from '../../../lib/studio/visual/gif-animation-contract';
 import {
   createPhase12ComposeClip,
   setPhase12Timeline,
@@ -150,7 +154,14 @@ function phase10() {
 
 function phase11() {
   const project = base('phase15-p11', 'Phase 11 round trip');
-  return setPhase11Timeline(project, defaultPhase11Timeline(project, 'phase15-gif'));
+  const timeline = defaultPhase11Timeline(project, 'phase15-gif');
+  timeline.frames = [{
+    ...createPhase11Frame(
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADElEQVR42mP8z8AARQAFAgH9a6YAAAAASUVORK5CYII=',
+    ),
+    id: 'phase15-frame',
+  }];
+  return setPhase11Timeline(project, timeline);
 }
 
 function phase12() {
