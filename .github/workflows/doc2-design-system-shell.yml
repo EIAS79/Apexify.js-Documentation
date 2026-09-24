@@ -1,15 +1,7 @@
 name: DOC-2 Design System and Shell
 
 on:
-  push:
-    branches:
-      - doc2-design-system-shell
-      - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
-
 concurrency:
   group: doc2-shell-${{ github.ref }}
   cancel-in-progress: true
