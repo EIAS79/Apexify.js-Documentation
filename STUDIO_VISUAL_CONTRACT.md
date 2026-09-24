@@ -231,3 +231,44 @@ Linked-code round-trip and conflicts:
 
 The Phase-15 gate covers every deterministic authoring generation from Phases 4–14, canonical regeneration stability, project serialization, asset strategies, generated-code syntax, deterministic bundle output, and the conflict/recovery UI contract.
 
+## 13. Phase-16 mechanical feature-completeness contract
+
+STUDIO-VISUAL-16 closes the gap between a capability being *classified* and being mechanically evidenced as implemented in Visual Studio.
+
+Authoritative Phase-16 evidence:
+
+```text
+lib/studio/visual/feature-completeness.ts
+scripts/studio/visual/phase16-proof-projects.ts
+scripts/studio/visual/phase16-feature-completeness.ts
+scripts/studio/visual/phase16-feature-completeness.test.ts
+generated/studio/phase16-feature-completeness.json
+generated/studio/phase16-feature-completeness.md
+```
+
+The generated report is derived from the current Visual capability matrix plus the declaration-driven DOC-4 option inventory. It may not replace those upstream inventories with a manually maintained list.
+
+The Phase-16 gate fails when any authorable capability lacks:
+
+- an implemented capability state;
+- a permanent product-surface home;
+- a control or Advanced-schema mapping;
+- a Visual Project field;
+- generated-code mapping;
+- a hosted Preview runtime route;
+- proof-case evidence;
+- an owning phase with repository-backed control/codegen/Preview/regression files;
+- reverse-sync classification and reconciliation regression evidence.
+
+Option completeness is evaluated by option family. Every authorable option family must map to either first-class Visual controls or an explicit Advanced schema. Hosted exclusions and non-authoring/introspection rows remain explicit rather than being converted into fake controls.
+
+Reverse-sync evidence follows the shipped contracts:
+
+- parser-backed Phase 4–8 domains are `reversible`;
+- marker/semantic Phase 9–13 domains are canonical/normalized;
+- Phase-14 advanced operations use their existing `reversible | normalized | code-only` contract;
+- hosted exclusions are excluded from authoring and Preview.
+
+Representative Phase-16 proof projects must cover every authorable domain and must produce both canonical user-facing Apexify.js code and Preview code. Canonical generated source must reconcile back into its Visual Project without semantic drift.
+
+GitHub Actions remain manual-only. The Studio Visual workflow generates the Phase-16 JSON/Markdown report as a short-lived verification artifact before running the consolidated Visual verification command.
