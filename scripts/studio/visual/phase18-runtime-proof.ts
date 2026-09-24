@@ -71,45 +71,59 @@ async function execute(label: string, source: string) {
 
 async function main() {
   const report = [];
+  const failures: string[] = [];
 
   for (const proof of PHASE18_PROOF_PROJECTS) {
-  const project = proof.build();
-  const canonical = generateVisualProjectCode(project).source;
-  const preview = generateVisualProjectPreviewCode(project).source;
+    try {
+      const project = proof.build();
+      const canonical = generateVisualProjectCode(project).source;
+      const preview = generateVisualProjectPreviewCode(project).source;
 
-  const canonicalArtifacts = await execute(proof.id + ':generated', canonical);
-  const previewArtifacts = await execute(proof.id + ':preview', preview);
+      const canonicalArtifacts = await execute(proof.id + ':generated', canonical);
+      const previewArtifacts = await execute(proof.id + ':preview', preview);
 
-  if (proof.expectMultipleArtifacts && canonicalArtifacts.length < 2) {
-    throw new Error(
-      proof.id + ': expected multi-artifact generated output, received ' +
-      canonicalArtifacts.length,
-    );
+      if (proof.expectMultipleArtifacts && canonicalArtifacts.length < 2) {
+        throw new Error(
+          proof.id + ': expected multi-artifact generated output, received ' +
+          canonicalArtifacts.length,
+        );
+      }
+
+      const canonicalComparable = canonicalArtifacts.map(({ mime, semantic }) => ({ mime, semantic }));
+      const previewComparable = previewArtifacts.map(({ mime, semantic }) => ({ mime, semantic }));
+
+      if (JSON.stringify(canonicalComparable) !== JSON.stringify(previewComparable)) {
+        throw new Error(
+          proof.id + ': Preview/generated artifact divergence\n' +
+          'generated=' + JSON.stringify(canonicalComparable) + '\n' +
+          'preview=' + JSON.stringify(previewComparable),
+        );
+      }
+
+      report.push({
+        id: proof.id,
+        coverage: proof.coverage,
+        artifacts: canonicalArtifacts,
+      });
+      console.log(
+        '[studio-visual:phase18-runtime] PASS ' +
+          proof.id +
+          ' ' +
+          canonicalArtifacts.map((item) => item.mime + ':' + item.bytes + ':' + item.semantic.kind).join(','),
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      failures.push(message);
+      console.error('[studio-visual:phase18-runtime] FAIL ' + proof.id + '\n' + message);
+    }
   }
 
-  const canonicalComparable = canonicalArtifacts.map(({ mime, semantic }) => ({ mime, semantic }));
-  const previewComparable = previewArtifacts.map(({ mime, semantic }) => ({ mime, semantic }));
-
-  if (JSON.stringify(canonicalComparable) !== JSON.stringify(previewComparable)) {
+  if (failures.length) {
     throw new Error(
-      proof.id + ': Preview/generated artifact divergence\n' +
-      'generated=' + JSON.stringify(canonicalComparable) + '\n' +
-      'preview=' + JSON.stringify(previewComparable),
+      'Phase 18 runtime proof failed for ' + failures.length + ' project(s):\n' +
+      failures.map((message) => '- ' + message).join('\n'),
     );
   }
-
-  report.push({
-    id: proof.id,
-    coverage: proof.coverage,
-    artifacts: canonicalArtifacts,
-  });
-  console.log(
-    '[studio-visual:phase18-runtime] PASS ' +
-      proof.id +
-      ' ' +
-      canonicalArtifacts.map((item) => item.mime + ':' + item.bytes + ':' + item.semantic.kind).join(','),
-  );
-}
 
 const outPath = path.resolve('generated/studio/phase18-runtime-proof.json');
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
