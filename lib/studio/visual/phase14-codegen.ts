@@ -140,6 +140,7 @@ function chainOperationsExpression(state: Phase14AdvancedState): string {
 function generatedBody(
   state: Phase14AdvancedState,
   output: Phase14OutputSettings,
+  preview = false,
 ): string {
   const constructor =
     output.strategy === 'direct'
@@ -153,10 +154,17 @@ function generatedBody(
     'async function main() {',
   ];
 
-  state.plugins.forEach((plugin, index) => {
+  const executablePlugins = preview
+    ? state.plugins.filter((plugin) => plugin.sync !== 'code-only')
+    : state.plugins;
+  const skippedCodeOnlyPlugins = preview
+    ? state.plugins.filter((plugin) => plugin.sync === 'code-only')
+    : [];
+
+  executablePlugins.forEach((plugin, index) => {
     lines.push(...pluginLines(plugin, index));
   });
-  if (state.plugins.length) lines.push('');
+  if (executablePlugins.length) lines.push('');
 
   const operationCount = state.execution === 'batch'
     ? state.batch.items.length
@@ -225,6 +233,14 @@ function generatedBody(
   if (state.results.includeExclusions) {
     lines.push(
       '    hostedRuntimeExclusions: ' + emit(PHASE14_HOSTED_EXCLUSIONS, 4).replace(/\n/g, '\n    ') + ',',
+      '    codeOnlyPreviewSkips: ' + emit(
+        skippedCodeOnlyPlugins.map((plugin) => ({
+          id: plugin.id,
+          name: 'name' in plugin ? plugin.name : plugin.apiName,
+          reason: 'Code-only package plugin is emitted for export but not executed by hosted Studio Preview.',
+        })),
+        4,
+      ).replace(/\n/g, '\n    ') + ',',
     );
   }
   lines.push(
@@ -257,9 +273,15 @@ export function generatePhase14NativeSource(project: VisualProject): string {
     throw new Error('Phase 14 code generation requires Advanced operations and output settings.');
   }
   return '/* ' + PHASE14_SOURCE_MARKER + semanticPayload(project) + ' */\n' +
-    generatedBody(state, output);
+    generatedBody(state, output, false);
 }
 
 export function generatePhase14PreviewSource(project: VisualProject): string {
-  return generatePhase14NativeSource(project);
+  const state = phase14AdvancedState(project);
+  const output = phase14OutputSettings(project);
+  if (!state || !output) {
+    throw new Error('Phase 14 preview generation requires Advanced operations and output settings.');
+  }
+  return '/* ' + PHASE14_SOURCE_MARKER + semanticPayload(project) + ' */\n' +
+    generatedBody(state, output, true);
 }
