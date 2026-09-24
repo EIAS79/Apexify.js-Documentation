@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type DragEvent as ReactDragEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   type TouchEvent as ReactTouchEvent,
   type WheelEvent as ReactWheelEvent,
@@ -1076,7 +1077,7 @@ export default function VisualStudioPre4({
 
   const resizePanelByKeyboard = (
     kind: 'layers' | 'inspector' | 'dock',
-    event: React.KeyboardEvent<HTMLElement>,
+    event: ReactKeyboardEvent<HTMLElement>,
   ) => {
     const horizontal = kind !== 'dock';
     const negativeKey = horizontal ? 'ArrowLeft' : 'ArrowDown';
@@ -2936,10 +2937,16 @@ export default function VisualStudioPre4({
     mutate('Rename', (current) => renameNode(current, id, value));
   };
 
-  const renderLayerRows = (ids: string[], depth = 0): ReactNode =>
+  const renderLayerRows = (
+    ids: string[],
+    depth = 0,
+    budget = { remaining: PHASE17_PERFORMANCE_BUDGETS.maxInteractiveLayers },
+  ): ReactNode =>
     ids.map((id, index) => {
+      if (budget.remaining <= 0) return null;
       const node = project.document.nodes[id];
       if (!node) return null;
+      budget.remaining -= 1;
       const isSelected = selected.includes(id);
       const hasChildren = (node.childIds?.length ?? 0) > 0;
       const isCollapsed = collapsed.has(id);
@@ -3094,7 +3101,7 @@ export default function VisualStudioPre4({
           </div>
           {hasChildren &&
             !isCollapsed &&
-            renderLayerRows(node.childIds ?? [], depth + 1)}
+            renderLayerRows(node.childIds ?? [], depth + 1, budget)}
         </div>
       );
     });
@@ -6056,7 +6063,10 @@ export default function VisualStudioPre4({
               </div>
             </div>
           ) : null}
-          <div className="apx-live-code-editor">
+          <div
+            className="apx-live-code-editor"
+            data-phase17-large-document={largeCodeMode ? 'true' : undefined}
+          >
             <InteractiveCodeEditor
               value={codeSource}
               language="ts"
@@ -6160,6 +6170,10 @@ export default function VisualStudioPre4({
       data-studio-visual-workspace
       data-active={active ? 'true' : 'false'}
       data-active-tool={activeTool}
+      data-phase17-layer-mode={layerTreeMode}
+      data-phase17-large-code={largeCodeMode ? 'true' : undefined}
+      data-phase17-layers-collapsed={layersCollapsed ? 'true' : undefined}
+      data-phase17-inspector-collapsed={inspectorCollapsed ? 'true' : undefined}
     >
       <header className="apx-pre4-topbar">
         <div className="apx-pre4-brand">
@@ -6305,7 +6319,14 @@ export default function VisualStudioPre4({
 
       </header>
 
-      <div className="apx-pre4-layout" style={{ '--pre4-dock-size': dockCollapsed ? '38px' : '204px' } as CSSProperties}>
+      <div
+        className="apx-pre4-layout"
+        style={{
+          '--pre4-dock-size': dockCollapsed ? '38px' : dockHeight + 'px',
+          '--pre4-layers-size': layersWidth + 'px',
+          '--pre4-inspector-size': inspectorWidth + 'px',
+        } as CSSProperties}
+      >
         <nav className="apx-pre4-feature-rail" aria-label="Visual Studio features">
           <div className="apx-pre4-feature-list">
             {featureTools.map(([id, Icon, label]) => (
@@ -6356,6 +6377,18 @@ export default function VisualStudioPre4({
         </nav>
 
         <aside className="apx-pre4-layers" data-context-mode={mediaContextActive ? activeTool : 'layers'}>
+          <div
+            className="apx-phase17-resizer apx-phase17-resizer--layers"
+            role="separator"
+            aria-label="Resize Layers panel"
+            aria-orientation="vertical"
+            aria-valuemin={190}
+            aria-valuemax={420}
+            aria-valuenow={layersWidth}
+            tabIndex={0}
+            onPointerDown={(event) => beginPanelResize('layers', event)}
+            onKeyDown={(event) => resizePanelByKeyboard('layers', event)}
+          />
           <div className="apx-pre4-panel-head">
             <div>
               <strong>
@@ -6406,6 +6439,13 @@ export default function VisualStudioPre4({
                     (selected.length ? ' · ' + selected.length + ' selected' : '')}
               </small>
             </div>
+            <button
+              type="button"
+              data-phase17-collapse-layers
+              onClick={() => setLayersCollapsed(true)}
+              title="Collapse Layers panel"
+              aria-label="Collapse Layers panel"
+            >‹</button>
             {!mediaContextActive ? (
               <button type="button" onClick={addPlaceholder} title="Add layer">＋</button>
             ) : activeTool === 'images' ? (
@@ -6419,12 +6459,17 @@ export default function VisualStudioPre4({
             renderMediaContext()
           ) : (
             <>
-              <div className="apx-pre4-layer-tree">
+              <div className="apx-pre4-layer-tree" data-phase17-layer-tree={layerTreeMode}>
                 <div className="apx-pre4-root-row">
                   <span>▾</span>
                   <strong>{project.name || 'Landing Page'}</strong>
                 </div>
                 {renderLayerRows(project.document.rootNodeIds)}
+                {layerTreeMode === 'over-budget' ? (
+                  <div className="apx-phase17-budget-note" role="status">
+                    Showing the first {PHASE17_PERFORMANCE_BUDGETS.maxInteractiveLayers.toLocaleString()} layers to keep the editor responsive.
+                  </div>
+                ) : null}
                 {!project.document.rootNodeIds.length && (
                   <div className="apx-pre4-empty apx-pre4-empty-layers">
                     <strong>No layers yet</strong>
@@ -6446,6 +6491,24 @@ export default function VisualStudioPre4({
         </aside>
         <main className="apx-pre4-stage">
           <div className="apx-pre4-stagebar">
+            <div className="apx-phase17-panel-reveals">
+              {layersCollapsed ? (
+                <button
+                  type="button"
+                  data-phase17-show-layers
+                  onClick={() => setLayersCollapsed(false)}
+                  aria-label="Show Layers panel"
+                >Layers ›</button>
+              ) : null}
+              {inspectorCollapsed ? (
+                <button
+                  type="button"
+                  data-phase17-show-inspector
+                  onClick={() => setInspectorCollapsed(false)}
+                  aria-label="Show Inspector panel"
+                >‹ Inspector</button>
+              ) : null}
+            </div>
             <button className="apx-pre4-device" type="button">
               <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
               Desktop ({project.document.width} × {project.document.height})
@@ -6743,7 +6806,27 @@ export default function VisualStudioPre4({
         </main>
 
         <aside className="apx-pre4-inspector">
+          <div
+            className="apx-phase17-resizer apx-phase17-resizer--inspector"
+            role="separator"
+            aria-label="Resize Inspector panel"
+            aria-orientation="vertical"
+            aria-valuemin={240}
+            aria-valuemax={460}
+            aria-valuenow={inspectorWidth}
+            tabIndex={0}
+            onPointerDown={(event) => beginPanelResize('inspector', event)}
+            onKeyDown={(event) => resizePanelByKeyboard('inspector', event)}
+          />
           <div className="apx-pre4-inspector-tabs">
+            <button
+              className="apx-phase17-inspector-collapse"
+              type="button"
+              data-phase17-collapse-inspector
+              onClick={() => setInspectorCollapsed(true)}
+              aria-label="Collapse Inspector panel"
+              title="Collapse Inspector panel"
+            >›</button>
             {inspectorTabs.map(([id, label]) => (
               <button
                 key={id}
@@ -6762,6 +6845,20 @@ export default function VisualStudioPre4({
         </aside>
 
         <section className="apx-pre4-dock" data-collapsed={dockCollapsed ? 'true' : undefined}>
+          {!dockCollapsed ? (
+            <div
+              className="apx-phase17-resizer apx-phase17-resizer--dock"
+              role="separator"
+              aria-label="Resize bottom dock and Timeline"
+              aria-orientation="horizontal"
+              aria-valuemin={120}
+              aria-valuemax={480}
+              aria-valuenow={dockHeight}
+              tabIndex={0}
+              onPointerDown={(event) => beginPanelResize('dock', event)}
+              onKeyDown={(event) => resizePanelByKeyboard('dock', event)}
+            />
+          ) : null}
           <div className="apx-pre4-dock-main">
             <div className="apx-pre4-dock-tabs">
               <div>
