@@ -753,6 +753,67 @@ export default function VisualStudioPre4({
     projectRef.current = project;
   }, [project, projectSemanticSignature]);
 
+  useEffect(() => {
+    if (phase17HydratedRef.current) return;
+    phase17HydratedRef.current = true;
+
+    let raw: string | null = null;
+    try {
+      raw = window.localStorage.getItem(PHASE17_AUTOSAVE_STORAGE_KEY);
+    } catch {}
+
+    const recovered = recoverPhase17Autosave(raw);
+    if (recovered.ok) {
+      const { envelope } = recovered;
+      const recoveredSignature = semanticSignature(envelope.project);
+      projectRef.current = envelope.project;
+      cleanSignature.current = recoveredSignature;
+      setProject(envelope.project);
+      setZoom(envelope.ui.zoom);
+      setPan(envelope.ui.pan);
+      setActiveTool(envelope.ui.activeTool);
+      setInspectorTab(envelope.ui.inspectorTab);
+      setDockTab(envelope.ui.dockTab);
+      setDockCollapsed(envelope.ui.dockCollapsed);
+      setLayersCollapsed(envelope.ui.layersCollapsed);
+      setInspectorCollapsed(envelope.ui.inspectorCollapsed);
+      setLayersWidth(envelope.ui.layersWidth);
+      setInspectorWidth(envelope.ui.inspectorWidth);
+      setDockHeight(envelope.ui.dockHeight);
+      setCollapsed(new Set(envelope.ui.collapsedLayerIds));
+      didInitialFit.current = true;
+      phase17RecoveredAssetManifestRef.current = envelope.assets;
+      phase17CodeBaseSignatureRef.current = envelope.code.baseProjectSignature;
+      codeHydratedRef.current = true;
+      codeAppliedSignatureRef.current = recoveredSignature;
+      setCodeSource(envelope.code.source);
+      setCodeFileName(envelope.code.fileName || 'visual-project.ts');
+      setCodeSyncState(recovered.codeMayApply ? (envelope.code.syncState ?? 'synced') : 'error');
+      setCodeSyncError(
+        recovered.codeMayApply
+          ? envelope.code.syncError ?? null
+          : 'Recovered code was based on an older Visual Project. Restore canonical Visual code or fork the stale edit to Code Studio.',
+      );
+      setMessage(
+        recovered.warnings.length
+          ? 'Recovered Visual session · ' + recovered.warnings.join(' ')
+          : 'Recovered Visual session',
+      );
+      return;
+    }
+
+    if (raw) {
+      try {
+        window.localStorage.setItem(
+          PHASE17_AUTOSAVE_STORAGE_KEY + '-corrupt-' + Date.now(),
+          raw,
+        );
+        window.localStorage.removeItem(PHASE17_AUTOSAVE_STORAGE_KEY);
+      } catch {}
+      setMessage('Corrupt Visual autosave was isolated; a fresh project was opened.');
+    }
+  }, []);
+
   const persistLiveCode = (source: string, fileName: string) => {
     try {
       window.localStorage.setItem(
@@ -762,8 +823,67 @@ export default function VisualStudioPre4({
     } catch {}
   };
 
-  const applyCodeToVisual = (source: string) => {
+  const persistPhase17Snapshot = () => {
+    if (!phase17HydratedRef.current || !codeHydratedRef.current) return;
     const current = projectRef.current;
+    const currentSignature = semanticSignature(current);
+    try {
+      const envelope = createPhase17AutosaveEnvelope({
+        project: current,
+        code: {
+          source: codeSource,
+          fileName: codeFileName,
+          savedAt: Date.now(),
+          baseProjectSignature:
+            phase17CodeBaseSignatureRef.current || currentSignature,
+          syncState: codeSyncState,
+          syncError: codeSyncError,
+        },
+        ui: {
+          zoom,
+          pan,
+          activeTool,
+          inspectorTab,
+          dockTab,
+          dockCollapsed,
+          layersCollapsed,
+          inspectorCollapsed,
+          layersWidth,
+          inspectorWidth,
+          dockHeight,
+          collapsedLayerIds: [...collapsed],
+        },
+        assets,
+      });
+      window.localStorage.setItem(
+        PHASE17_AUTOSAVE_STORAGE_KEY,
+        JSON.stringify(envelope),
+      );
+    } catch (error) {
+      setMessage(
+        'Autosave unavailable · ' +
+          (error instanceof Error ? error.message : 'storage failed'),
+      );
+    }
+  };
+
+  const applyCodeToVisual = (
+    source: string,
+    expectedProjectSignature = phase17CodeBaseSignatureRef.current,
+  ) => {
+    const current = projectRef.current;
+    const currentSignature = semanticSignature(current);
+    if (
+      expectedProjectSignature &&
+      expectedProjectSignature !== currentSignature
+    ) {
+      setCodeSyncState('error');
+      setCodeSyncError(
+        'Linked code is stale because the Visual Project changed after this edit began. Restore canonical Visual code or fork the edit to Code Studio.',
+      );
+      return false;
+    }
+
     const result = reconcileVisualProjectFromCode(current, source);
     if (!result.ok) {
       setCodeSyncState('error');
@@ -773,10 +893,12 @@ export default function VisualStudioPre4({
 
     setCodeSyncError(null);
     setCodeSyncState('synced');
+    const resultSignature = semanticSignature(result.project);
+    phase17CodeBaseSignatureRef.current = resultSignature;
     if (!result.changed) return true;
 
     history.current.commit(current, result.project, 'Code → Visual');
-    codeAppliedSignatureRef.current = semanticSignature(result.project);
+    codeAppliedSignatureRef.current = resultSignature;
     projectRef.current = result.project;
     setProject(result.project);
     setHistoryTick((value) => value + 1);
@@ -786,51 +908,39 @@ export default function VisualStudioPre4({
 
   const saveLiveCode = (source = codeSource, fileName = codeFileName) => {
     window.clearTimeout(codeSaveTimerRef.current);
+    phase17CodeTransactionsRef.current.cancel();
     persistLiveCode(source, fileName);
     const ok = applyCodeToVisual(source);
     if (ok) setMessage('Code autosaved · canvas synced');
   };
 
   const updateLiveCode = (next: string) => {
+    if (codeSyncState === 'synced' || !phase17CodeBaseSignatureRef.current) {
+      phase17CodeBaseSignatureRef.current = semanticSignature(projectRef.current);
+    }
+    const expectedSignature = phase17CodeBaseSignatureRef.current;
+    const transaction = phase17CodeTransactionsRef.current.begin();
     setCodeSource(next);
     setCodeSyncState('saving');
     setCodeSyncError(null);
     window.clearTimeout(codeSaveTimerRef.current);
     codeSaveTimerRef.current = window.setTimeout(() => {
+      if (!phase17CodeTransactionsRef.current.isCurrent(transaction)) return;
       persistLiveCode(next, codeFileName);
-      applyCodeToVisual(next);
-    }, 320);
+      applyCodeToVisual(next, expectedSignature);
+    }, PHASE17_CODE_DEBOUNCE_MS);
   };
 
   useEffect(() => {
     if (codeHydratedRef.current || !generated.value) return;
     codeHydratedRef.current = true;
-
-    let source = generated.value.source;
-    let fileName = generated.value.fileName;
-    try {
-      const raw = window.localStorage.getItem(VISUAL_CODE_STORAGE_KEY);
-      if (raw) {
-        const stored = JSON.parse(raw) as { source?: string; fileName?: string };
-        if (stored.source) {
-          const reconciled = reconcileVisualProjectFromCode(projectRef.current, stored.source);
-          if (reconciled.ok) {
-            source = stored.source;
-            fileName = stored.fileName || fileName;
-            if (reconciled.changed) {
-              codeAppliedSignatureRef.current = semanticSignature(reconciled.project);
-              projectRef.current = reconciled.project;
-              setProject(reconciled.project);
-            }
-          }
-        }
-      }
-    } catch {}
-
-    setCodeSource(source);
-    setCodeFileName(fileName);
+    phase17CodeBaseSignatureRef.current = projectSemanticSignature;
+    setCodeSource(generated.value.source);
+    setCodeFileName(generated.value.fileName);
     setCodeSyncState('synced');
-  }, [generated.value]);
+    setCodeSyncError(null);
+    persistLiveCode(generated.value.source, generated.value.fileName);
+  }, [generated.value, projectSemanticSignature]);
 
   useEffect(() => {
     if (!codeHydratedRef.current || !generated.value) return;
@@ -839,16 +949,105 @@ export default function VisualStudioPre4({
       codeAppliedSignatureRef.current = '';
       return;
     }
+
+    window.clearTimeout(codeSaveTimerRef.current);
+    phase17CodeTransactionsRef.current.cancel();
+    phase17CodeBaseSignatureRef.current = signature;
     setCodeSource(generated.value.source);
     if (!fileNameTouchedRef.current) setCodeFileName(generated.value.fileName);
     setCodeSyncState('synced');
     setCodeSyncError(null);
-    persistLiveCode(generated.value.source, fileNameTouchedRef.current ? codeFileName : generated.value.fileName);
+    persistLiveCode(
+      generated.value.source,
+      fileNameTouchedRef.current ? codeFileName : generated.value.fileName,
+    );
   }, [generated.value?.source, generated.value?.fileName, projectSemanticSignature]);
+
+  useEffect(() => {
+    if (!phase17HydratedRef.current || !codeHydratedRef.current) return;
+    window.clearTimeout(phase17AutosaveTimerRef.current);
+    phase17AutosaveTimerRef.current = window.setTimeout(
+      persistPhase17Snapshot,
+      PHASE17_PROJECT_AUTOSAVE_MS,
+    );
+    return () => window.clearTimeout(phase17AutosaveTimerRef.current);
+  }, [
+    projectSemanticSignature,
+    codeSource,
+    codeFileName,
+    codeSyncState,
+    codeSyncError,
+    zoom,
+    pan.x,
+    pan.y,
+    activeTool,
+    inspectorTab,
+    dockTab,
+    dockCollapsed,
+    layersCollapsed,
+    inspectorCollapsed,
+    layersWidth,
+    inspectorWidth,
+    dockHeight,
+    collapsed,
+    assets,
+  ]);
+
+  useEffect(() => {
+    const flush = () => persistPhase17Snapshot();
+    window.addEventListener('beforeunload', flush);
+    return () => window.removeEventListener('beforeunload', flush);
+  });
+
+  useEffect(() => {
+    phase17AssetCacheRef.current.prune(assets);
+  }, [assets]);
+
+  useEffect(() => {
+    if (!assetStorageReady || phase17AssetManifestCheckedRef.current) return;
+    const expected = phase17RecoveredAssetManifestRef.current;
+    if (!expected) {
+      phase17AssetManifestCheckedRef.current = true;
+      return;
+    }
+    phase17AssetManifestCheckedRef.current = true;
+    if (!phase17AssetManifestMatches(expected, assets)) {
+      setMessage(
+        'Recovered project references assets that differ from persisted Studio assets. Missing bytes were not fabricated.',
+      );
+    }
+  }, [assetStorageReady, assets]);
+
+  useEffect(() => {
+    const onPointerMove = (event: PointerEvent) => {
+      const resize = panelResizeRef.current;
+      if (!resize) return;
+      if (resize.kind === 'layers') {
+        setLayersWidth(Math.max(190, Math.min(420, resize.initial + event.clientX - resize.start)));
+      } else if (resize.kind === 'inspector') {
+        setInspectorWidth(Math.max(240, Math.min(460, resize.initial - (event.clientX - resize.start))));
+      } else {
+        setDockHeight(Math.max(120, Math.min(480, resize.initial - (event.clientY - resize.start))));
+      }
+    };
+    const onPointerUp = () => {
+      panelResizeRef.current = null;
+      document.body.removeAttribute('data-phase17-resizing');
+    };
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    return () => {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
       window.clearTimeout(codeSaveTimerRef.current);
+      window.clearTimeout(phase17AutosaveTimerRef.current);
+      phase17CodeTransactionsRef.current.cancel();
+      phase17AssetCacheRef.current.clear();
       webRuntimeRef.current?.dispose();
       webRuntimeRef.current = null;
       artboardRuntimeRef.current?.dispose();
