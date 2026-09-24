@@ -3863,6 +3863,7 @@ export default function VisualStudioPre4({
           <label>Canvas name</label>
           <input
             className="apx-pre4-input"
+            aria-label="Canvas name"
             value={project.name}
             onFocus={beginPropertyEdit}
             onChange={(event) => renameCanvas(event.target.value)}
@@ -3874,6 +3875,7 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-section-title">Base background</div>
           <select
             className="apx-pre4-input"
+            aria-label="Canvas base background"
             data-canvas-base-mode
             value={mode}
             onChange={(event) => setCanvasBaseMode(event.target.value as typeof mode)}
@@ -4118,6 +4120,7 @@ export default function VisualStudioPre4({
             <label className="apx-canvas-switch">
               <input
                 type="checkbox"
+                aria-label="Enable canvas stroke"
                 checked={Boolean(canvas.stroke)}
                 onChange={(event) => mutateCanvas('Canvas stroke', (current) => {
                   if (!event.target.checked) {
@@ -4154,6 +4157,7 @@ export default function VisualStudioPre4({
             <label className="apx-canvas-switch">
               <input
                 type="checkbox"
+                aria-label="Enable canvas shadow"
                 checked={Boolean(canvas.shadow)}
                 onChange={(event) => mutateCanvas('Canvas shadow', (current) => {
                   if (!event.target.checked) {
