@@ -36,6 +36,7 @@ import {
   phase9ProjectFromSourceMarker,
 } from '../phase9-codegen';
 import {
+  generatePhase10DisplayPreviewSource,
   generatePhase10NativeSource,
   phase10ProjectFromSourceMarker,
 } from '../phase10-codegen';
@@ -1887,11 +1888,12 @@ export function reconcileVisualProjectFromCode(
         error: problem?.message ?? 'The Phase 10 source marker contains an invalid Visual Project.',
       };
     }
-    const phase10Conflict = markerBackedEditConflict(
-      10,
-      source,
-      generatePhase10NativeSource(phase10Project),
-    );
+    const phase10NativeSource = generatePhase10NativeSource(phase10Project);
+    const phase10DisplaySource = generatePhase10DisplayPreviewSource(phase10Project);
+    const phase10Conflict =
+      source === phase10DisplaySource
+        ? null
+        : markerBackedEditConflict(10, source, phase10NativeSource);
     if (phase10Conflict) return phase10Conflict;
 
     const semantic = (value: VisualProject) =>
