@@ -4,8 +4,8 @@
     {
       "id": "node.canvas.basic",
       "packageVersion": "6.0.0",
-      "packageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
-      "artifactSha256": "06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670",
+      "packageCommit": "50f2543482abbd7a9624192a060ec01330370bef",
+      "artifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17",
       "sourceHash": "d1603f74395a1b3c07efbf96be39ca6d867413977a29ea556c0bfc1e712649e4",
       "outputs": [
         {
@@ -19,8 +19,8 @@
     {
       "id": "node.chart.bar",
       "packageVersion": "6.0.0",
-      "packageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
-      "artifactSha256": "06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670",
+      "packageCommit": "50f2543482abbd7a9624192a060ec01330370bef",
+      "artifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17",
       "sourceHash": "cd7a888b8b826223996d9aa4d2a7769e6eed61bc8753315d90bd594d838c8baa",
       "outputs": [
         {
@@ -34,8 +34,8 @@
     {
       "id": "node.gif.basic",
       "packageVersion": "6.0.0",
-      "packageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
-      "artifactSha256": "06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670",
+      "packageCommit": "50f2543482abbd7a9624192a060ec01330370bef",
+      "artifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17",
       "sourceHash": "609a9b8654f7cb2e819f8d81bc4801369625e8bdf3f522346bc281602cdcd7a8",
       "outputs": [
         {
@@ -55,8 +55,8 @@
     {
       "id": "node.integration.report",
       "packageVersion": "6.0.0",
-      "packageCommit": "69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
-      "artifactSha256": "06168f409bd303f03442e349c2c50767d133256e7974e7d03e8d54f098628670",
+      "packageCommit": "50f2543482abbd7a9624192a060ec01330370bef",
+      "artifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17",
       "sourceHash": "e319c93d86cacdf025a04d5601b3c523e710962d96d83e8eac564f8b8c97e52b",
       "outputs": [
         {
