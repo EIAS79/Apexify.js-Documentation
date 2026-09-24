@@ -597,6 +597,11 @@ function reconcileImageCall(
       ? matched.id
       : createVisualId(kind);
   const oldNode = project.document.nodes[id];
+  const {
+    rotation: _oldRotation,
+    opacity: _oldOpacity,
+    ...retainedTransform
+  } = oldNode?.transform ?? {};
 
   const {
     source: _source,
@@ -637,13 +642,13 @@ function reconcileImageCall(
     parentId: oldNode?.parentId ?? null,
     childIds: oldNode?.childIds,
     transform: {
-      ...(oldNode?.transform ?? {}),
+      ...retainedTransform,
       x: asOptionalNumber(x) ?? 0,
       y: asOptionalNumber(y) ?? 0,
       ...(typeof width === 'number' ? { width } : {}),
       ...(typeof height === 'number' ? { height } : {}),
-      rotation: asOptionalNumber(rotation) ?? 0,
-      opacity: asOptionalNumber(opacity) ?? 1,
+      ...(typeof rotation === 'number' ? { rotation } : {}),
+      ...(typeof opacity === 'number' ? { opacity } : {}),
       visible: oldNode?.transform?.visible ?? true,
       locked: oldNode?.transform?.locked ?? false,
       zIndex: oldNode?.transform?.zIndex ?? index,
@@ -739,6 +744,11 @@ function reconcileTextCall(
       ? matched.id
       : createVisualId('text');
   const oldNode = project.document.nodes[id];
+  const {
+    rotation: _oldRotation,
+    opacity: _oldOpacity,
+    ...retainedTextTransform
+  } = oldNode?.transform ?? {};
 
   return {
     id,
@@ -747,13 +757,21 @@ function reconcileTextCall(
     parentId: oldNode?.parentId ?? null,
     childIds: oldNode?.childIds,
     transform: {
-      ...(oldNode?.transform ?? {}),
+      ...retainedTextTransform,
       x,
       y,
       ...(width !== undefined ? { width } : {}),
       ...(height !== undefined ? { height } : {}),
-      rotation: resolvedRotation,
-      opacity: resolvedOpacity,
+      ...(
+        typeof placementRecord.rotation === 'number' || typeof rotation === 'number'
+          ? { rotation: resolvedRotation }
+          : {}
+      ),
+      ...(
+        typeof fillRecord.opacity === 'number' || typeof opacity === 'number'
+          ? { opacity: resolvedOpacity }
+          : {}
+      ),
       visible: oldNode?.transform?.visible ?? true,
       locked: oldNode?.transform?.locked ?? false,
       zIndex: oldNode?.transform?.zIndex ?? index,
