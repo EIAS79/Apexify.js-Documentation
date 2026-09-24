@@ -2,6 +2,13 @@
 
 import type { StudioVirtualAsset } from '@/lib/studio/runtime/assets';
 import type { VisualProject } from '@/lib/studio/visual/model';
+import { createVisualNode } from '@/lib/studio/visual/project';
+import { createVisualId } from '@/lib/studio/visual/ids';
+import {
+  defaultTextNodeProps,
+  textPropsRecord,
+  visualTextProps,
+} from '@/lib/studio/visual/text-contract';
 import {
   defaultPhase13Timeline,
   phase13Timeline,
@@ -187,7 +194,61 @@ export function VisualVideoInspector({
       </div>
       <div className="apx-pre4-section">
         <div className="apx-pre4-section-title">Text overlay</div>
-        <button className="apx-canvas-apply" type="button" onClick={()=>mutate('Add video text',(v)=>({...v,pipeline:{...v.pipeline,text:[...v.pipeline.text,{id:'video-text-'+Date.now(),startTime:0,endTime:2,text:'APEXIFY STUDIO',x:Math.round(project.document.width/2),y:Math.max(40,project.document.height-42),fontSize:24,color:'#f8fafc',bold:true}]}}))}>Add timed text</button>
+        <button className="apx-canvas-apply" type="button" onClick={()=>{
+          onMutate('Add video text overlay',(current)=>{
+            const nodeId=createVisualId('video-text');
+            const node=createVisualNode(
+              'text',
+              textPropsRecord({
+                ...defaultTextNodeProps('APEXIFY STUDIO'),
+                font:{family:'Arial',size:24},
+                decorations:{bold:true},
+                placement:{textAlign:'center',textBaseline:'middle',rotation:0},
+                fill:{color:'#f8fafc',opacity:1},
+              }),
+              {id:nodeId,name:'Video text overlay'},
+            );
+            node.transform={
+              x:Math.round(current.document.width/2),
+              y:Math.max(40,current.document.height-42),
+              width:Math.min(420,current.document.width-24),
+              height:48,
+              rotation:0,
+              scaleX:1,
+              scaleY:1,
+              opacity:1,
+              visible:true,
+              locked:false,
+            };
+            const withNode={
+              ...current,
+              document:{
+                ...current.document,
+                nodes:{...current.document.nodes,[nodeId]:node},
+                rootNodeIds:[...current.document.rootNodeIds,nodeId],
+              },
+              editor:{...current.editor,selectedNodeIds:[nodeId]},
+            };
+            return update(withNode,(v)=>({
+              ...v,
+              pipeline:{
+                ...v.pipeline,
+                text:[...v.pipeline.text,{
+                  id:createVisualId('video-text-track'),
+                  nodeId,
+                  startTime:0,
+                  endTime:2,
+                  text:'APEXIFY STUDIO',
+                  x:node.transform?.x??0,
+                  y:node.transform?.y??0,
+                  fontSize:24,
+                  color:'#f8fafc',
+                  bold:true,
+                }],
+              },
+            }));
+          });
+        }}>Add timed text layer</button>
       </div>
     </div>
   );
@@ -236,7 +297,11 @@ export function VisualVideoTimeline({project,assets,onMutate}:SharedProps) {
           <article><strong>Source</strong><span>{timeline.source?.assetId??'Choose a video asset'}</span></article>
           {timeline.pipeline.trim?<article><strong>Trim</strong><span>{timeline.pipeline.trim.startTime}s → {timeline.pipeline.trim.endTime}s</span></article>:null}
           {timeline.pipeline.splices.map((splice)=><article key={splice.id}><strong>Splice</strong><span>{splice.targetStartTime}s → {splice.targetEndTime}s · {splice.replacement.assetId}</span></article>)}
-          {timeline.pipeline.text.map((text)=><article key={text.id}><strong>Text</strong><span>{text.startTime}s → {text.endTime}s · {text.text}</span></article>)}
+          {timeline.pipeline.text.map((text)=>{
+            const linked=text.nodeId?project.document.nodes[text.nodeId]:undefined;
+            const label=linked?.kind==='text'?visualTextProps(linked).text:text.text;
+            return <article key={text.id}><strong>Text</strong><span>{text.startTime}s → {text.endTime}s · {label}</span></article>;
+          })}
           {timeline.pipeline.audio.map((track)=><article key={track.id}><strong>Audio</strong><span>{track.startTime}s · {track.type==='asset'?track.assetId:track.preset}</span></article>)}
         </div>
       ):(
