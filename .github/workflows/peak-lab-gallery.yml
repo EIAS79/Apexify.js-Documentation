@@ -2,20 +2,7 @@ name: Publish Peak Lab Gallery
 # Bootstrap note: touching this workflow intentionally triggers the first main-branch publish.
 
 on:
-  pull_request:
-    paths:
-      - 'scripts/gallery/Apexify-Peak-Lab.ts'
-      - 'scripts/gallery/publish-peak-lab.mjs'
-      - '.github/workflows/peak-lab-gallery.yml'
-      - 'lib/gallery/generatedPeakLabCatalog.ts'
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/gallery/Apexify-Peak-Lab.ts'
-      - 'scripts/gallery/publish-peak-lab.mjs'
-      - '.github/workflows/peak-lab-gallery.yml'
   workflow_dispatch:
-
 permissions:
   contents: write
 
