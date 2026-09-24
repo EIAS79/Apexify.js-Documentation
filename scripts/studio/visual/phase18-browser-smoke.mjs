@@ -8,6 +8,11 @@ const require = createRequire(import.meta.url);
 const axeSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8');
 const base = process.env.STUDIO_VISUAL_BASE_URL || 'http://127.0.0.1:3000';
 const chrome = process.env.CHROME_PATH;
+const fixturePath = path.resolve('generated/studio/phase18-proof-projects.json');
+if (!fs.existsSync(fixturePath)) {
+  throw new Error('[studio-visual:phase18-browser] generate fixtures first');
+}
+const releaseFixtures = JSON.parse(fs.readFileSync(fixturePath, 'utf8')).fixtures ?? [];
 if (!chrome) throw new Error('[studio-visual:phase18-browser] CHROME_PATH required');
 
 const matrix = [
@@ -65,6 +70,60 @@ async function waitForDownload(dir, extension, previous = new Set()) {
     await new Promise((resolve) => setTimeout(resolve, 150));
   }
   throw new Error('Timed out waiting for ' + extension + ' download');
+}
+
+async function representativeProjectProof(page) {
+  for (const fixture of releaseFixtures) {
+    await page.evaluate((envelope) => {
+      sessionStorage.setItem('phase18-browser-fixture', JSON.stringify(envelope));
+    }, fixture.envelope);
+    await page.reload({ waitUntil: 'networkidle2' });
+    await openVisual(page);
+
+    await page.click('[data-dock-tab="generated"]');
+    await page.waitForSelector('[data-visual-live-code]', { visible: true });
+    const syncText = await page.$eval(
+      '[data-visual-live-code] .apx-live-sync-state',
+      (node) => node.textContent || '',
+    );
+    if (!/synced/i.test(syncText)) {
+      throw new Error(fixture.id + ': linked canonical code is not synced');
+    }
+
+    await page.click('[data-visual-generate-code]');
+    await page.waitForSelector('[data-visual-code-modal]', { visible: true });
+    const quality = await page.$eval(
+      '[data-visual-code-modal] .apx-phase15-code-quality',
+      (node) => node.textContent || '',
+    );
+    if (!/Canonical export/i.test(quality)) {
+      throw new Error(fixture.id + ': generated-code modal is not canonical');
+    }
+    await page.click('[data-visual-code-modal-close]');
+    await page.waitForSelector('[data-visual-code-modal]', { hidden: true });
+
+    await page.click('[data-visual-preview-modal-trigger]');
+    await page.waitForSelector('[data-visual-preview-modal]', { visible: true });
+    await page.waitForFunction(() => {
+      const modal = document.querySelector('[data-visual-preview-modal]');
+      return Boolean(modal?.querySelector('img, audio, video')) ||
+        Boolean(modal?.textContent?.includes('Preview unavailable'));
+    }, { timeout: 90000 });
+
+    const previewState = await page.$eval(
+      '[data-visual-preview-modal]',
+      (node) => ({
+        failed: node.textContent?.includes('Preview unavailable') ?? false,
+        media: Boolean(node.querySelector('img, audio, video')),
+      }),
+    );
+    if (previewState.failed || !previewState.media) {
+      throw new Error(fixture.id + ': production Preview path produced no authoritative artifact');
+    }
+    await page.click('[data-visual-preview-modal-close]');
+    await page.waitForSelector('[data-visual-preview-modal]', { hidden: true });
+    console.log('[studio-visual:phase18-browser] representative UI PASS ' + fixture.id);
+  }
 }
 
 async function desktopReleaseProof(page) {
@@ -190,8 +249,16 @@ for (const [name, width, height] of matrix) {
   await page.setViewport({ width, height });
   await page.setCacheEnabled(false);
   await page.evaluateOnNewDocument(() => {
-    localStorage.clear();
-    localStorage.setItem('apexify-theme', 'dark');
+    if (!sessionStorage.getItem('phase18-browser-initialized')) {
+      localStorage.clear();
+      localStorage.setItem('apexify-theme', 'dark');
+      sessionStorage.setItem('phase18-browser-initialized', '1');
+    }
+    const fixture = sessionStorage.getItem('phase18-browser-fixture');
+    if (fixture) {
+      localStorage.setItem('apexify-visual-autosave-v2', fixture);
+      sessionStorage.removeItem('phase18-browser-fixture');
+    }
   });
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
@@ -202,6 +269,7 @@ for (const [name, width, height] of matrix) {
 
   if (name === 'desktop') {
     await desktopReleaseProof(page);
+    await representativeProjectProof(page);
     await noOverflow(page, name + '-post-proof');
   }
 
