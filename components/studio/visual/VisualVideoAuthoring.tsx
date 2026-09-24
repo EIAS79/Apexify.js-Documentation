@@ -43,12 +43,21 @@ export function VisualVideoContext({
   const audioAsset=audios[0];
   const lutAsset=assets.find((asset)=>asset.name.toLowerCase().endsWith('.cube'));
 
-  const activate=(mode:Phase13VideoMode)=>onMutate('Video mode',(current)=>update(current,(value)=>({...value,mode})));
+  const activate=(mode:Phase13VideoMode)=>onMutate('Video mode',(current)=>update(current,(value)=>({
+    ...value,
+    mode,
+    source: mode==='frames' ? value.source : value.source ?? (videos[0] ? {kind:'asset',assetId:videos[0].id} : undefined),
+  })));
   const chooseSource=(assetId:string)=>onMutate('Video source',(current)=>update(current,(value)=>({...value,source:assetId?{kind:'asset',assetId}:undefined})));
   const addFrameAsset=(assetId:string)=>onMutate('Add video frame',(current)=>update(current,(value)=>({
     ...value,mode:'frames',frames:{...value.frames,items:[...value.frames.items,{id:'video-frame-'+(value.frames.items.length+1),source:{kind:'asset',assetId}}]},
   })));
-  const addOperation=(operation:Phase13Operation)=>onMutate('Add video operation',(current)=>update(current,(value)=>({...value,mode:'operations',operations:[...value.operations,operation]})));
+  const addOperation=(operation:Phase13Operation)=>onMutate('Add video operation',(current)=>update(current,(value)=>({
+    ...value,
+    mode:'operations',
+    source:value.source ?? (videos[0] ? {kind:'asset',assetId:videos[0].id} : undefined),
+    operations:[...value.operations,operation],
+  })));
 
   return (
     <div className="apx-media-context apx-video-context" data-visual-video-context>
