@@ -234,6 +234,7 @@ test('Phase 17 shipped UI contains crash isolation, accessible resizing and moda
 
   for (const marker of [
     'PHASE17_AUTOSAVE_STORAGE_KEY',
+    'Legacy linked code was recovered without a matching Visual Project snapshot',
     'beforeunload',
     'phase17CodeTransactionsRef',
     'data-phase17-layer-mode',
