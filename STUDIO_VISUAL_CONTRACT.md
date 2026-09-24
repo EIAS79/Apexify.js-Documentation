@@ -281,3 +281,81 @@ For release enforcement, the normal production `npm run build` path must also ex
 - Phase-16 representative proof/reconciliation test file.
 
 This keeps the Phase-16 feature-completeness invariant enforced by production builds without retaining obsolete phase-specific GitHub Actions workflows.
+
+## 14. Phase-17 hardening and recovery contract
+
+STUDIO-VISUAL-17 makes editor correctness survive scale, refreshes, stale linked-code buffers, malformed recovery state and isolated UI failures.
+
+### Recovery state
+
+The authoritative recovery payload is `apexify-visual-autosave-v2`.
+
+A Phase-17 recovery envelope persists:
+
+- the validated Visual Project snapshot;
+- the linked-code source and filename;
+- the semantic Visual Project signature on which that linked code was based;
+- linked-code sync/error state;
+- zoom, pan, active tool, Inspector tab, dock tab and collapsed state;
+- Layers/Inspector/Dock geometry and collapsed layer IDs;
+- a stable manifest of persisted shared assets.
+
+Asset bytes remain owned by the existing Studio asset persistence layer. The recovery envelope stores only identity/mime/size evidence; missing asset bytes are reported instead of fabricated.
+
+Corrupt autosaves are quarantined under a timestamped backup key and may not crash the Studio. Unsupported or legacy code-only recovery payloads may not overwrite a Visual Project.
+
+### Stale-code rule
+
+A linked-code edit may reconcile into Visual state only when its `baseProjectSignature` still matches the current semantic Visual Project signature.
+
+If Visual state changes while a debounced code reconciliation is pending:
+
+- the older transaction becomes stale;
+- it may not mutate the newer Visual Project;
+- the editor exposes an explicit conflict;
+- the user may restore canonical Visual code or fork the edit to Code Studio.
+
+No stale code buffer may silently overwrite newer Visual state.
+
+### Performance contract
+
+Phase-17 performance budgets are defined in `lib/studio/visual/hardening.ts`.
+
+The hardening layer provides:
+
+- semantic-signature-driven codegen invalidation so selection/editor-only mutations do not regenerate canonical source;
+- bounded linked-code reconciliation;
+- latest-transaction wins semantics;
+- large-CodeMirror mode with expensive editor features reduced;
+- bounded layer-tree rendering and large-tree CSS containment;
+- bounded LRU caching for asset data URLs;
+- a repeatable 1,000-layer profiling harness.
+
+The production build executes the focused Phase-16 gate followed by Phase-17 unit/profile verification before Next.js compilation.
+
+### Accessibility and panel reliability
+
+Preview and generated-code modals must:
+
+- trap Tab / Shift+Tab;
+- close on Escape;
+- lock background scrolling while open;
+- restore focus to the invoking control.
+
+Layers, Inspector and the bottom Dock/Timeline are user-resizable through pointer and keyboard-operable `role="separator"` controls. Their geometry and collapse state recover with the project. Opening GIF/audio/video Timeline authoring must expand the Dock rather than leaving the Timeline inaccessible.
+
+The responsive browser matrix is:
+
+- 1440×900 desktop;
+- 1100×800 laptop;
+- 820×1180 tablet;
+- 390×844 mobile.
+
+No matrix viewport may introduce document-level horizontal overflow.
+
+### Crash isolation
+
+The Visual Studio surface is wrapped in a dedicated error boundary. A Visual-render crash may not take down Code Studio or the documentation shell. The user receives explicit retry and Visual-recovery-reset actions.
+
+Phase-specific GitHub Actions are not part of this contract. Verification remains in repository scripts, the production build contract and deliberate browser smoke execution.
+
