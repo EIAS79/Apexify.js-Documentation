@@ -199,7 +199,9 @@ export function createPhase17AutosaveEnvelope(input: {
 
 function parseV2(raw: Record<string, unknown>): Phase17RecoveryResult {
   try {
-    const project = parseVisualProject(JSON.stringify(raw.project));
+    const projectSource = JSON.stringify(raw.project);
+    if (!projectSource) throw new Error('Autosave is missing its Visual Project snapshot.');
+    const project = parseVisualProject(projectSource);
     const signature = visualProjectSemanticSignature(project);
     const codeRaw = raw.code && typeof raw.code === 'object' && !Array.isArray(raw.code)
       ? raw.code as Record<string, unknown>
