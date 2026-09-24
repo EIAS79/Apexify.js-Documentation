@@ -2,7 +2,7 @@
 
 > **Program ID:** `STUDIO-VISUAL`
 >
-> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 COMPLETE; STUDIO-VISUAL-13 COMPLETE; STUDIO-VISUAL-14 NEXT
+> **Status:** ACTIVE MASTER PLAN — STUDIO-VISUAL-0 PRODUCTION VERIFIED; STUDIO-VISUAL-1 PRODUCTION VERIFIED; STUDIO-VISUAL-2 MAIN MERGED; STUDIO-VISUAL-3 PRODUCTION VERIFIED; STUDIO-VISUAL-PRE-4 MAIN MERGED; STUDIO-VISUAL-4 MAIN MERGED; STUDIO-VISUAL-5 MAIN MERGED; STUDIO-VISUAL-6 MAIN MERGED; STUDIO-VISUAL-7 MAIN MERGED; STUDIO-VISUAL-8 MAIN MERGED; STUDIO-VISUAL-9 COMPLETE; STUDIO-VISUAL-10 COMPLETE; STUDIO-VISUAL-11 COMPLETE; STUDIO-VISUAL-12 COMPLETE; STUDIO-VISUAL-13 COMPLETE; STUDIO-VISUAL-14 COMPLETE; STUDIO-VISUAL-15 NEXT
 >
 > **Product:** Apexify.js Documentation Studio
 >
@@ -3271,7 +3271,7 @@ Acceptance evidence:
 - dual-mode browser regression: **PASS**
 - Documentation Runtime Build Gate: **PASS** on Node 22 / 24 / 26
 
-**Phase 13 is complete. STUDIO-VISUAL-14 is next.**
+**Phase 13 is complete. STUDIO-VISUAL-14 follows below and is now complete.**
 
 ---
 
@@ -3306,6 +3306,69 @@ Every advanced operation is classified as reversible, normalized, or code-only. 
 ```text
 feat(studio-visual): complete advanced operation authoring
 ```
+
+### Phase 14 implementation record — STUDIO-VISUAL-14
+
+**Status:** COMPLETE — implementation PR **#109**
+
+Runtime prerequisite:
+
+- Apexify.js runtime PR: **#39**
+- runtime merge commit: `50f2543482abbd7a9624192a060ec01330370bef`
+- runtime correction: public `ApexPainter.batch()` / `chain()` now forward per-call `concurrency` and `AbortSignal` options instead of silently dropping them.
+
+Documentation / Studio integration:
+
+- documentation branch: `studio-visual/v14-advanced`
+- documentation PR: **#109**
+- implementation head: `26f1913ce37980dd4cf1ba11ad5031144c3843c8`
+- integration merge commit: `008fbf63cb351524f76e3f31d1c9cb94f857c380`
+- pinned Apexify.js runtime: `50f2543482abbd7a9624192a060ec01330370bef`
+- branch divergence before merge: **28 ahead / 0 behind**
+
+Completed implementation scope:
+
+- permanent **Advanced** feature-rail context integrated into the existing PRE-4 shell;
+- Advanced Inspector remains the primary configuration surface — no competing permanent Operations dock was added;
+- visual Batch editor for `canvas`, `image` and `text` operations;
+- Batch concurrency control bounded to the current Apexify runtime limit of **4**;
+- visual Chain editor with ordered methods/arguments and stable operation IDs;
+- canonical advanced-operation classification: **reversible**, **normalized**, or **code-only**;
+- `prepareForRender()` pre-resolution is emitted at operation/config level while preserving valid executable TypeScript;
+- compatible inline `ApexPainter.use()` plugin authoring;
+- direct `painter.plugins.install()`, `.use()` registry API, and `.remove()` authoring;
+- package-backed plugin imports classified **code-only**;
+- exported TypeScript retains code-only package plugins while hosted Studio Preview skips them explicitly rather than pretending they are installed;
+- local output conversion through `painter.output.dataURL/base64/blob/arrayBuffer`;
+- configured output conversion through `toOutput()`;
+- normalized legacy `outPut()` compatibility;
+- output settings integrated into the existing top **Export** menu;
+- structured Advanced execution/plugin/exclusion state surfaced through the existing **Diagnostics** dock;
+- deterministic `apexify-studio-v14` semantic source marker and canonical Code → Visual reconstruction;
+- Visual Project `operations` and `outputs` collections remain the persisted Phase-14 source of truth;
+- explicit hosted-runtime exclusions remain visible and non-authorable:
+  - `ApexPainter.save()`;
+  - `ApexPainter.saveMultiple()`;
+  - `ApexPainter.createAudio.save()`;
+  - `ApexPainter.output.url()`;
+- dedicated Phase-14 regression suite and advanced runtime/codegen equivalence proof were added for the later manual final verification pass;
+- permanent Visual contract updated for Phase-14 reversible/normalized/code-only semantics and manual-only CI policy.
+
+Capability-state evidence after integration:
+
+- Phase-14-owned capabilities: **22**
+- implemented authorable capabilities: **13**
+- explicit hosted-runtime exclusions: **3**
+- non-authoring/introspection capabilities: **6**
+- planned Phase-14 capability rows remaining: **0**
+
+Verification policy for this phase:
+
+- repository GitHub Actions are intentionally **manual-only**;
+- no automatic push/PR/merge gate was required or awaited for this implementation, by project instruction;
+- manual full-suite verification remains available for the later final release/completeness phases.
+
+**Phase 14 is complete. STUDIO-VISUAL-15 is next.**
 
 ---
 
@@ -3536,7 +3599,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 11 | GIF / animation | COMPLETE — PR #103 | `3b43fb5c01c8d276df9e41c4f0f5b730eb11d002` | Final Studio Visual Phase Gate 35868072554 SUCCESS; Runtime Build Gate 35868072609 SUCCESS Node 22/24/26; 117/117 tests; Linux animate → createGIF proof PASS |
 | 12 | Audio | COMPLETE — PR #105 | `1232800509fba731d508efb9ec45482eba5c83f3` | Studio Visual Phase Gate 35930842667 SUCCESS; Runtime Build Gate 35930842704 SUCCESS; 128/128 tests; Linux procedural WAV equivalence proof PASS |
 | 13 | Video | COMPLETE — PR #107 | `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1` | Studio Visual Phase Gate 35937825619 SUCCESS; Runtime Build Gate 35937825649 SUCCESS on Node 22/24/26; 136/136 tests; Linux generated MP4 proof PASS |
-| 14 | Advanced operations | NOT STARTED | — | — |
+| 14 | Advanced operations | COMPLETE — PR #109 | `008fbf63cb351524f76e3f31d1c9cb94f857c380` | Runtime PR #39 merged as `50f2543482abbd7a9624192a060ec01330370bef`; 13 implemented / 3 excluded / 6 non-authoring capability rows; Actions manual-only by project instruction |
 | 15 | Export / project round trip | NOT STARTED | — | — |
 | 16 | Feature completeness gate | NOT STARTED | — | — |
 | 17 | Hardening | NOT STARTED | — | — |
