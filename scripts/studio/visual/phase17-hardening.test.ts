@@ -246,7 +246,7 @@ test('Phase 17 shipped UI contains crash isolation, accessible resizing and moda
     assert.equal(visual.includes(marker), true, 'missing hardening marker: ' + marker);
   }
   assert.match(modals, /useModalFocusTrap/);
-  assert.match(modals, /event\.key === 'Tab'/);
+  assert.match(modals, /event\.key !== 'Tab'/);
   assert.match(modals, /event\.key === 'Escape'/);
   assert.match(modals, /restoreFocusRef/);
   assert.match(boundary, /VisualStudioCrashBoundary/);
