@@ -124,6 +124,13 @@ function operationOptions(op:Phase13Operation,outputPath:string,assets:readonly 
   }
 }
 
+function resultReturnLine(timeline:Phase13Timeline): string {
+  const values = ['result'];
+  if (timeline.inspect.extractTimes.length) values.push('extractedFrames');
+  if (timeline.inspect.thumbnails > 0) values.push('thumbnailResult');
+  return values.length === 1 ? '  return result;' : '  return [' + values.join(', ') + '];';
+}
+
 function inspectionLines(timeline:Phase13Timeline,currentPath:string):string[] {
   const lines:string[]=[];
   if(timeline.inspect.extractTimes.length) {
@@ -153,7 +160,7 @@ function generatedBody(timeline:Phase13Timeline):string {
       '    source: frames[0],',
       '    createFromFrames: {',
       '      frames,',
-      '      outputPath: '+JSON.stringify('phase13-video.'+timeline.frames.format)+',',
+      '      outputPath: '+JSON.stringify('phase13-video.'+timeline.render.format)+',',
       '      fps: '+String(timeline.frames.fps)+',',
       '      format: '+JSON.stringify(timeline.frames.format)+',',
       '      quality: '+JSON.stringify(timeline.frames.quality)+',',
@@ -163,7 +170,7 @@ function generatedBody(timeline:Phase13Timeline):string {
     );
     finalPathLiteral='result.outputPath';
     lines.push(...inspectionLines(timeline,finalPathLiteral));
-    lines.push('  return result;');
+    lines.push(resultReturnLine(timeline));
   } else if(timeline.mode==='pipeline') {
     if(!timeline.source) throw new Error('Phase 13 pipeline mode requires a source asset.');
     const sourceVar=variableFor(timeline.source,assets);
@@ -185,7 +192,7 @@ function generatedBody(timeline:Phase13Timeline):string {
     lines.push('  const result = await pipeline.render({ outputPath: '+finalPathLiteral+', preset: '+JSON.stringify(timeline.render.preset)+' });');
     finalPathLiteral='result.outputPath';
     lines.push(...inspectionLines(timeline,finalPathLiteral));
-    lines.push('  return result;');
+    lines.push(resultReturnLine(timeline));
   } else {
     if(!timeline.source) throw new Error('Phase 13 operations mode requires a source asset.');
     lines.push('  let currentSource = '+variableFor(timeline.source,assets)+';','  let result = { outputPath: '+JSON.stringify('phase13-video.'+timeline.render.format)+' };');
@@ -199,7 +206,7 @@ function generatedBody(timeline:Phase13Timeline):string {
     }
     finalPathLiteral='result.outputPath';
     lines.push(...inspectionLines(timeline,finalPathLiteral));
-    lines.push('  return result;');
+    lines.push(resultReturnLine(timeline));
   }
   lines.push('}','','return await main();','');
   return lines.join('\n');
