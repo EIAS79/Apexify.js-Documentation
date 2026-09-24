@@ -95,6 +95,33 @@ test('PRE-4 keeps the Layers collapse control anchored to the panel seam', () =>
   assert.match(css, /data-phase17-layers-collapsed="true".*apx-pre4-layers-dock-toggle/s);
 });
 
+
+test('PRE-4 mirrors the Inspector seam toggle and exposes one Assets workspace', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const css = read('styles/studio-calm.css');
+
+  assert.match(shell, /apx-pre4-inspector-dock-toggle/);
+  assert.match(shell, /data-phase17-inspector-toggle/);
+  assert.match(shell, /data-phase17-collapse-inspector=\{!inspectorCollapsed/);
+  assert.match(shell, /data-phase17-show-inspector=\{inspectorCollapsed/);
+  assert.match(shell, /aria-controls="apx-pre4-inspector-panel"/);
+  assert.doesNotMatch(shell, /className="apx-phase17-inspector-collapse"/);
+  assert.doesNotMatch(shell, />‹ Inspector<\/button>/);
+
+  const dockTabs = shell.match(/const dockTabs = \[([\s\S]*?)\] as const;/)?.[1] ?? '';
+  assert.doesNotMatch(dockTabs, /'assets'/);
+  assert.doesNotMatch(shell, /StudioAssetShelf/);
+  assert.match(shell, /data-unified-assets-pane/);
+  assert.match(shell, /addStudioAssetFiles/);
+  assert.match(shell, /copyStudioAssetReference/);
+  assert.match(shell, /removeStudioAsset/);
+  assert.match(shell, /accept="image\/\*,audio\/\*,video\/\*,\.ttf,\.otf,\.woff,\.woff2"/);
+
+  assert.match(css, /INSPECTOR SEAM TOGGLE \+ UNIFIED ASSETS WORKSPACE/);
+  assert.match(css, /apx-pre4-inspector-dock-toggle/);
+  assert.match(css, /apx-pre4-asset-card/);
+});
+
 test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
 
