@@ -371,8 +371,8 @@ export function validatePhase14Project(project: VisualProject): VisualProjectIss
     push(issues, 'phase14-pre-resolve', 'operations.advanced.preResolve', 'Pre-resolve must be true or false.');
   }
 
-  if (!Number.isInteger(state.batch.concurrency) || state.batch.concurrency < 1 || state.batch.concurrency > 64) {
-    push(issues, 'phase14-concurrency', 'operations.advanced.batch.concurrency', 'Batch concurrency must be an integer between 1 and 64.');
+  if (!Number.isInteger(state.batch.concurrency) || state.batch.concurrency < 1 || state.batch.concurrency > 4) {
+    push(issues, 'phase14-concurrency', 'operations.advanced.batch.concurrency', 'Batch concurrency must be an integer between 1 and the current runtime limit of 4.');
   }
   if (typeof state.batch.resolveAssetRefs !== 'boolean') {
     push(issues, 'phase14-resolve-assets', 'operations.advanced.batch.resolveAssetRefs', 'Batch resolveAssetRefs must be boolean.');
