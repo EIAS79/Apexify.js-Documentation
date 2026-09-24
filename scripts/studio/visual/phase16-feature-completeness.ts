@@ -69,6 +69,11 @@ for (const evidence of PHASE16_DOMAIN_EVIDENCE) {
   if (!has(evidence.regressionTestFiles, [/reconcileVisualProjectFromCode/])) fail('missing-reconcile-regression', evidence.domain, evidence.regressionTestFiles.join(', '));
   for (const projectId of evidence.representativeProofProjectIds) if (!proofIds.has(projectId)) fail('unknown-proof-project', evidence.domain, projectId);
 }
+const phase14Evidence = PHASE16_DOMAIN_EVIDENCE_BY_DOMAIN.get('batch-chain');
+if (!phase14Evidence || !has(phase14Evidence.controlEvidenceFiles, [/Phase14SyncClass/, /code-only/])) {
+  fail('missing-phase14-sync-contract', 'STUDIO-VISUAL-14', 'Advanced authoring must retain reversible | normalized | code-only semantics.');
+}
+
 for (const domain of authorableDomains) {
   if (!PHASE16_DOMAIN_EVIDENCE_BY_DOMAIN.has(domain)) fail('unmapped-domain', domain, 'No Phase-16 evidence registry entry.');
   if (!proofDomains.has(domain)) fail('domain-without-proof', domain, 'No representative Phase-16 proof project.');
@@ -79,7 +84,7 @@ const capabilityCoverage = matrix.rows.map((row) => {
   const active = isAuthorableVisualCapability(row);
   const evidence = PHASE16_DOMAIN_EVIDENCE_BY_DOMAIN.get(row.domain);
   const phase = Number(/STUDIO-VISUAL-(\d+)/.exec(row.phaseOwner)?.[1]);
-  const reverseSync = active ? (phase <= 8 ? 'reversible' : 'normalized') : 'excluded';
+  const reverseSync = !active ? 'excluded' : phase <= 8 ? 'reversible' : phase <= 13 ? 'normalized' : 'phase14-contract';
   const issues: string[] = [];
   if (active) {
     if (!evidence) issues.push('domain-evidence');
