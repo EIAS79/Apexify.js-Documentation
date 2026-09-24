@@ -6,7 +6,7 @@ if (!branch) {
   process.exit(1);
 }
 
-if (branch.startsWith('studio-visual/') && branch !== 'studio-visual/v17-hardening') {
+if (branch.startsWith('studio-visual/')) {
   console.log('[studio-visual] skipping Vercel deployment for ' + branch);
   process.exit(0);
 }

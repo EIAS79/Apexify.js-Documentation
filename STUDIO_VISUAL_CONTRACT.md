@@ -359,3 +359,16 @@ The Visual Studio surface is wrapped in a dedicated error boundary. A Visual-ren
 
 Phase-specific GitHub Actions are not part of this contract. Verification remains in repository scripts, the production build contract and deliberate browser smoke execution.
 
+Final STUDIO-VISUAL-17 candidate evidence:
+
+- product head `0ec71cabc7c24ea4a9b1d54fa871978e450048f5`;
+- verification run `35969583897`;
+- production build PASS, including the Phase-16 release guard;
+- full Visual regression suite 171/171 PASS;
+- 1,000-layer codegen profile 94.07 ms against a 5,000 ms soft budget;
+- browser matrix PASS at 1440×900, 1100×800, 820×1180 and 390×844;
+- zero critical accessibility violations at every matrix viewport;
+- stale linked-code recovery, corrupt-autosave isolation, modal focus restoration and keyboard panel resizing verified in the browser.
+
+The temporary branch-only verifier used to obtain this evidence is removed before main integration and does not become permanent repository CI.
+
