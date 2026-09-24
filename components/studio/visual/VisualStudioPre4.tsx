@@ -804,7 +804,7 @@ export default function VisualStudioPre4({
     source: string,
     displaySource = source,
   ) => {
-    if (phase13Active || phase12Active || phase11Active || phase10Active) {
+    if (phase14Active || phase13Active || phase12Active || phase11Active || phase10Active) {
       let releasePhase10Render!: () => void;
       const previousPhase10Render = phase10RenderTailRef.current;
       phase10RenderTailRef.current = new Promise<void>((resolve) => {
@@ -980,6 +980,7 @@ export default function VisualStudioPre4({
     phase11Active,
     phase12Active,
     phase13Active,
+    phase14Active,
   ]);
 
   const mutate = (
@@ -2451,7 +2452,7 @@ export default function VisualStudioPre4({
   };
 
   const renderVisualPreview = async (openModal = true) => {
-    const source = phase13Active || phase12Active || phase11Active || phase10Active || phase9Active
+    const source = phase14Active || phase13Active || phase12Active || phase11Active || phase10Active || phase9Active
       ? previewGenerated.value?.source
       : codeSource || generated.value?.source;
     if (openModal) setPreviewModalOpen(true);
