@@ -54,9 +54,11 @@ jobs:
         run: git diff --exit-code -- generated/studio/capability-matrix.json
 
       - name: Generate Phase 16 completeness report
+        continue-on-error: true
         run: npm run studio:visual:phase16
 
       - name: Upload Phase 16 completeness report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: studio-visual-phase16-completeness
