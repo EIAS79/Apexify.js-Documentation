@@ -226,11 +226,11 @@ test('Phase 9 templates expose placeholders data overrides and native insertions
   assert.match(source, /inserted_caption/);
 
   const preview = generateVisualProjectPreviewCode(project).source;
-  assert.match(preview, /createCanvas\(/);
+  assert.equal(preview, source);
+  assert.match(preview, /createTemplate\(/);
+  assert.match(preview, /createScene\(/);
   assert.match(preview, /Runtime headline/);
-  assert.match(preview, /Inserted caption/);
-  assert.doesNotMatch(preview, /createTemplate\(/);
-  assert.doesNotMatch(preview, /createScene\(/);
+  assert.match(preview, /inserted_caption/);
 
   const reconciled = reconcileVisualProjectFromCode(project, source);
   assert.equal(reconciled.ok, true);
@@ -305,9 +305,9 @@ test('Phase 9 scenes lower nested surfaces to native SceneBuilder layers', () =>
   assert.match(source, /type: "surface"/);
   assert.match(source, /Nested scene title/);
   const preview = generateVisualProjectPreviewCode(project).source;
-  assert.match(preview, /createCanvas\(/);
+  assert.equal(preview, source);
+  assert.match(preview, /createScene\(/);
   assert.match(preview, /Nested scene title/);
-  assert.doesNotMatch(preview, /createScene\(/);
   assert.equal(validateVisualProject(project).ok, true);
 });
 
