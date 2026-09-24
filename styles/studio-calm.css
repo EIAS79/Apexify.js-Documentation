@@ -7187,7 +7187,14 @@ body[data-phase17-resizing="dock"]{
 }
 
 .apx-pre4-stagebar{
-  grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr);
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+}
+.apx-phase17-stage-left{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:.35rem;
+  justify-self:start;
 }
 
 @media(min-width:1021px){
@@ -7226,7 +7233,7 @@ body[data-phase17-resizing="dock"]{
 @media(max-width:1020px){
   .apx-phase17-resizer--layers{display:none}
   .apx-pre4-stagebar{
-    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
   }
 }
 @media(max-width:760px){
