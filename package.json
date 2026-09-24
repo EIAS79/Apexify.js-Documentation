@@ -123,8 +123,10 @@
     "studio:visual:phase16": "tsx scripts/studio/visual/phase16-feature-completeness.ts",
     "studio:visual:phase16:check": "tsx scripts/studio/visual/phase16-feature-completeness.ts --check",
     "studio:visual:phase16:release": "npm run studio:completeness:check && npm run studio:visual:capabilities:check && npm run studio:visual:phase16:check && tsx --test scripts/studio/visual/phase16-feature-completeness.test.ts",
-    "studio:visual:phase17": "tsx --test scripts/studio/visual/phase17-hardening.test.ts",
-    "studio:visual:release": "npm run studio:visual:phase16:release && npm run studio:visual:phase17"
+    "studio:visual:phase17": "tsx --test scripts/studio/visual/phase17-hardening.test.ts && npm run studio:visual:phase17:profile",
+    "studio:visual:release": "npm run studio:visual:phase16:release && npm run studio:visual:phase17",
+    "studio:visual:phase17:profile": "tsx scripts/studio/visual/phase17-performance.ts --check",
+    "studio:visual:phase17:browser": "node scripts/studio/visual/phase17-browser-smoke.mjs"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
