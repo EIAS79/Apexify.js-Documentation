@@ -132,7 +132,7 @@ function operationOptions(op:Phase13Operation,outputPath:string,assets:readonly 
     case 'timeLapse': return {createTimeLapse:{speed:op.speed,outputPath}};
     case 'mute': return {mute:{ranges:op.ranges,outputPath}};
     case 'volume': return {adjustVolume:{volume:op.volume,ranges:op.ranges,outputPath}};
-    case 'lut': return {applyLUT:{lutPath:{__assetVariable:variableFor({kind:'asset',assetId:op.assetId},assets)},intensity:op.intensity,outputPath}};
+    case 'lut': return {applyLUT:{lutPath:'studio://asset/'+op.assetId,intensity:op.intensity,outputPath}};
     case 'mixAudio': return {mixAudio:{outputPath,keepOriginalAudio:op.keepOriginalAudio,overlays:[{source:{__assetVariable:variableFor({kind:'asset',assetId:op.assetId},assets)},startTime:op.startTime??0,volume:op.volume}]}};
     case 'exportPreset': return {exportPreset:{preset:op.preset,outputPath}};
   }
