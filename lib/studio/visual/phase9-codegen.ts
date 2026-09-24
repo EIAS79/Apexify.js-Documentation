@@ -3,18 +3,13 @@ import { sanitizeVisualIdPart } from './ids';
 import {
   PHASE9_NAMED_ASSET_KIND,
   PHASE9_VARIABLE_KIND,
-  flattenPhase9PreviewContainers,
-  materializePhase9Project,
   phase9Definitions,
   phase9RegistryRecords,
   phase9RootSceneDefinition,
   phase9SceneLayersForNodeIds,
   phase9TemplateSceneDefinition,
-  resolvePhase9References,
   type Phase9InstanceProps,
 } from './scene-component-contract';
-import { lowerVisualProject } from './compiler/plan';
-import { emitStudioOperationPlan } from './codegen/emitter';
 
 export const PHASE9_SOURCE_MARKER = 'apexify-studio-v9:';
 
@@ -295,8 +290,9 @@ export function generatePhase9NativeSource(project: VisualProject): string {
 }
 
 export function generatePhase9PreviewSource(project: VisualProject): string {
-  const materialized = materializePhase9Project(project);
-  const flattened = flattenPhase9PreviewContainers(materialized);
-  const preview = resolvePhase9References(flattened);
-  return emitStudioOperationPlan(lowerVisualProject(preview));
+  // Phase 18 release invariant: Preview must execute the same public Apexify
+  // SceneBuilder/Template semantics as generated user code. The former
+  // materialize/flatten fallback changed clipping and placement semantics for
+  // nested surfaces, components and templates.
+  return generatePhase9NativeSource(project);
 }
