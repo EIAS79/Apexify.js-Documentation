@@ -608,6 +608,7 @@ export default function VisualStudioPre4({
   const phase17HydratedRef = useRef(false);
   const phase17CodeBaseSignatureRef = useRef('');
   const phase17RecoveredAssetManifestRef = useRef<Phase17AssetManifestEntry[] | null>(null);
+  const phase17RecoverySignatureRef = useRef('');
   const phase17AssetManifestCheckedRef = useRef(false);
   const phase17CodeTransactionsRef = useRef(new Phase17LatestTransaction());
   const phase17AssetCacheRef = useRef(new Phase17AssetDataUrlCache());
@@ -786,6 +787,7 @@ export default function VisualStudioPre4({
       phase17RecoveredAssetManifestRef.current = envelope.assets;
       phase17CodeBaseSignatureRef.current = envelope.code.baseProjectSignature;
       codeHydratedRef.current = true;
+      phase17RecoverySignatureRef.current = recoveredSignature;
       codeAppliedSignatureRef.current = recoveredSignature;
       setCodeSource(envelope.code.source);
       setCodeFileName(envelope.code.fileName || 'visual-project.ts');
@@ -957,6 +959,12 @@ export default function VisualStudioPre4({
   useEffect(() => {
     if (!codeHydratedRef.current || !generated.value) return;
     const signature = semanticSignature(project);
+    if (phase17RecoverySignatureRef.current) {
+      if (signature !== phase17RecoverySignatureRef.current) return;
+      phase17RecoverySignatureRef.current = '';
+      codeAppliedSignatureRef.current = '';
+      return;
+    }
     if (codeAppliedSignatureRef.current === signature) {
       codeAppliedSignatureRef.current = '';
       return;
