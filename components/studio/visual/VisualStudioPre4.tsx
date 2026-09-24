@@ -5484,7 +5484,7 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
-    if (activeTool === 'video' || phase13Active) {
+    if (activeTool === 'video' || (phase13Active && !primary)) {
       return (
         <VisualVideoInspector
           project={project}
