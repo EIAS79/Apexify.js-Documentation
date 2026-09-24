@@ -126,7 +126,7 @@
     "studio:visual:phase17": "tsx --test scripts/studio/visual/phase17-hardening.test.ts && npm run studio:visual:phase17:profile",
     "studio:visual:release": "npm run studio:visual:phase16:release && npm run studio:visual:phase17",
     "studio:visual:phase17:profile": "tsx scripts/studio/visual/phase17-performance.ts --check",
-    "studio:visual:phase17:browser": "npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 && node scripts/studio/visual/phase17-browser-smoke.mjs"
+    "studio:visual:phase17:browser": "npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0 axe-core@4.10.3 && node scripts/studio/visual/phase17-browser-smoke.mjs"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
