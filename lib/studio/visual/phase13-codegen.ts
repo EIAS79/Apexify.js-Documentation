@@ -45,6 +45,9 @@ function collectAssetIds(timeline:Phase13Timeline): string[] {
   timeline.operations.forEach((op)=> {
     if(op.kind==='pip') add(op.overlayAssetId);
     if(op.kind==='transition') add(op.secondAssetId);
+    if(op.kind==='watermark' || op.kind==='lut' || op.kind==='mixAudio') add(op.assetId);
+    if(op.kind==='replaceSegment') add(op.replacementAssetId);
+    if(op.kind==='merge' || op.kind==='splitScreen') op.assetIds.forEach(add);
   });
   return ids;
 }
@@ -120,6 +123,17 @@ function operationOptions(op:Phase13Operation,outputPath:string,assets:readonly 
     case 'transition': return {addTransition:{type:op.type,duration:op.duration,direction:op.direction,secondVideo:op.secondAssetId?{__assetVariable:variableFor({kind:'asset',assetId:op.secondAssetId},assets)}:undefined,outputPath}};
     case 'removeAudio': return {removeAudio:{outputPath}};
     case 'normalizeAudio': return {normalizeAudio:{targetLevel:op.targetLevel,method:op.method,outputPath}};
+    case 'watermark': return {addWatermark:{watermarkPath:{__assetVariable:variableFor({kind:'asset',assetId:op.assetId},assets)},position:op.position,opacity:op.opacity,size:op.width||op.height?{width:op.width,height:op.height}:undefined,startTime:op.startTime,endTime:op.endTime,outputPath}};
+    case 'merge': return {merge:{videos:[{__assetVariable:'currentSource'},...op.assetIds.map((assetId)=>({__assetVariable:variableFor({kind:'asset',assetId},assets)}))],outputPath,mode:op.mode,direction:op.direction}};
+    case 'splitScreen': return {splitScreen:{videos:[{__assetVariable:'currentSource'},...op.assetIds.map((assetId)=>({__assetVariable:variableFor({kind:'asset',assetId},assets)}))],layout:op.layout,outputPath}};
+    case 'replaceSegment': return {replaceSegment:{replacementVideo:{__assetVariable:variableFor({kind:'asset',assetId:op.replacementAssetId},assets)},targetStartTime:op.targetStartTime,targetEndTime:op.targetEndTime,durationPolicy:op.durationPolicy,outputPath}};
+    case 'loop': return {createLoop:{smooth:op.smooth,outputPath}};
+    case 'stabilize': return {stabilize:{smoothing:op.smoothing,outputPath}};
+    case 'timeLapse': return {createTimeLapse:{speed:op.speed,outputPath}};
+    case 'mute': return {mute:{ranges:op.ranges,outputPath}};
+    case 'volume': return {adjustVolume:{volume:op.volume,ranges:op.ranges,outputPath}};
+    case 'lut': return {applyLUT:{lutPath:{__assetVariable:variableFor({kind:'asset',assetId:op.assetId},assets)},intensity:op.intensity,outputPath}};
+    case 'mixAudio': return {mixAudio:{outputPath,keepOriginalAudio:op.keepOriginalAudio,overlays:[{source:{__assetVariable:variableFor({kind:'asset',assetId:op.assetId},assets)},startTime:op.startTime??0,volume:op.volume}]}};
     case 'exportPreset': return {exportPreset:{preset:op.preset,outputPath}};
   }
 }
@@ -128,6 +142,10 @@ function resultReturnLine(timeline:Phase13Timeline): string {
   const values = ['result'];
   if (timeline.inspect.extractTimes.length) values.push('extractedFrames');
   if (timeline.inspect.thumbnails > 0) values.push('thumbnailResult');
+  if (timeline.inspect.previewFrames > 0) values.push('previewFrames');
+  if (timeline.inspect.probe) values.push('videoInfo');
+  if (timeline.inspect.detectScenes) values.push('sceneDetection');
+  if (timeline.inspect.extractAudio) values.push('extractedAudio');
   return values.length === 1 ? '  return result;' : '  return [' + values.join(', ') + '];';
 }
 
@@ -138,6 +156,18 @@ function inspectionLines(timeline:Phase13Timeline,currentPath:string):string[] {
   }
   if(timeline.inspect.thumbnails>0) {
     lines.push('  const thumbnailResult = await painter.createVideo({ source: '+currentPath+', generateThumbnail: '+emitValue({count:timeline.inspect.thumbnails,outputFormat:'png',quality:2})+' });');
+  }
+  if(timeline.inspect.previewFrames>0) {
+    lines.push('  const previewFrames = await painter.createVideo({ source: '+currentPath+', generatePreview: '+emitValue({count:timeline.inspect.previewFrames,outputFormat:'png',quality:2})+' });');
+  }
+  if(timeline.inspect.probe) {
+    lines.push('  const videoInfo = await painter.getVideoInfo('+currentPath+');');
+  }
+  if(timeline.inspect.detectScenes) {
+    lines.push('  const sceneDetection = await painter.createVideo({ source: '+currentPath+', detectScenes: '+emitValue({threshold:timeline.inspect.sceneThreshold})+' });');
+  }
+  if(timeline.inspect.extractAudio) {
+    lines.push('  const extractedAudio = await painter.createVideo({ source: '+currentPath+', extractAudio: '+emitValue({outputPath:'phase13-audio.wav',format:'wav'})+' });');
   }
   return lines;
 }
