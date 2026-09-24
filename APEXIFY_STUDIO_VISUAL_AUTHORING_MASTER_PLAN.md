@@ -3451,6 +3451,8 @@ feat(studio-visual): complete code and project export
 >
 > **Pinned Apexify.js runtime:** `50f2543482abbd7a9624192a060ec01330370bef`
 >
+> **Main integration:** `86ebd0cdc75a33b86afc227bc54d118cf3caadb8`
+>
 > **Verification policy:** repository GitHub Actions remain manual-only by project instruction; Phase 15 is integrated directly after source/contract completion review.
 
 Completed Phase-15 scope:
@@ -3661,7 +3663,7 @@ feat(studio-visual): release visual authoring and preview-to-code
 | 12 | Audio | COMPLETE — PR #105 | `1232800509fba731d508efb9ec45482eba5c83f3` | Studio Visual Phase Gate 35930842667 SUCCESS; Runtime Build Gate 35930842704 SUCCESS; 128/128 tests; Linux procedural WAV equivalence proof PASS |
 | 13 | Video | COMPLETE — PR #107 | `1a2b6a8ac8cf1ae2d1300fa1904b17aee4b48ec1` | Studio Visual Phase Gate 35937825619 SUCCESS; Runtime Build Gate 35937825649 SUCCESS on Node 22/24/26; 136/136 tests; Linux generated MP4 proof PASS |
 | 14 | Advanced operations | COMPLETE — PR #109 | `008fbf63cb351524f76e3f31d1c9cb94f857c380` | Runtime PR #39 merged as `50f2543482abbd7a9624192a060ec01330370bef`; 13 implemented / 3 excluded / 6 non-authoring capability rows; Actions manual-only by project instruction |
-| 15 | Export / project round trip | COMPLETE — PR #112 | pending merge | Direct integration by project instruction; dedicated Phase-15 round-trip/export regression suite added to `studio:visual:test`; Actions remain manual-only |
+| 15 | Export / project round trip | COMPLETE — PR #112 | `86ebd0cdc75a33b86afc227bc54d118cf3caadb8` | Direct integration by project instruction; dedicated Phase-15 round-trip/export regression suite added to `studio:visual:test`; all 19 workflows remain manual-only |
 | 16 | Feature completeness gate | NOT STARTED | — | — |
 | 17 | Hardening | NOT STARTED | — | — |
 | 18 | Final release | NOT STARTED | — | — |
