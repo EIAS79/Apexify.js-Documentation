@@ -160,12 +160,10 @@ async function verifyDesktopHardening(page) {
   );
 
   await page.evaluate(() => {
-    const raw = localStorage.getItem('apexify-visual-autosave-v2');
-    if (!raw) throw new Error('Phase-17 autosave missing before stale-code test');
-    const saved = JSON.parse(raw);
-    saved.code.baseProjectSignature = 'v1-stale-project';
-    saved.code.source = 'const stale = true;';
-    localStorage.setItem('apexify-visual-autosave-v2', JSON.stringify(saved));
+    if (!localStorage.getItem('apexify-visual-autosave-v2')) {
+      throw new Error('Phase-17 autosave missing before stale-code test');
+    }
+    sessionStorage.setItem('phase17-browser-recovery-injection', 'stale-code');
   });
   await page.reload({ waitUntil: 'networkidle2' });
   await page.waitForSelector('[data-phase15-code-conflict]', { visible: true });
@@ -175,7 +173,7 @@ async function verifyDesktopHardening(page) {
   }
 
   await page.evaluate(() => {
-    localStorage.setItem('apexify-visual-autosave-v2', '{corrupt-json');
+    sessionStorage.setItem('phase17-browser-recovery-injection', 'corrupt-autosave');
   });
   await page.reload({ waitUntil: 'networkidle2' });
   await page.waitForSelector('[data-studio-visual-workspace][data-active="true"]');
@@ -194,6 +192,21 @@ for (const [name, width, height] of matrix) {
       localStorage.clear();
       localStorage.setItem('apexify-theme', 'dark');
       sessionStorage.setItem('phase17-browser-initialized', '1');
+    }
+
+    const injection = sessionStorage.getItem('phase17-browser-recovery-injection');
+    if (injection === 'stale-code') {
+      const raw = localStorage.getItem('apexify-visual-autosave-v2');
+      if (raw) {
+        const saved = JSON.parse(raw);
+        saved.code.baseProjectSignature = 'v1-stale-project';
+        saved.code.source = 'const stale = true;';
+        localStorage.setItem('apexify-visual-autosave-v2', JSON.stringify(saved));
+      }
+      sessionStorage.removeItem('phase17-browser-recovery-injection');
+    } else if (injection === 'corrupt-autosave') {
+      localStorage.setItem('apexify-visual-autosave-v2', '{corrupt-json');
+      sessionStorage.removeItem('phase17-browser-recovery-injection');
     }
   });
   const errors = [];
