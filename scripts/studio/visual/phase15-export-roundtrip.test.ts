@@ -35,7 +35,11 @@ import {
 } from '../../../lib/studio/visual/chart-contract';
 import { capturePhase9Component } from '../../../lib/studio/visual/scene-component-contract';
 import { setPhase11Timeline, defaultPhase11Timeline } from '../../../lib/studio/visual/gif-animation-contract';
-import { setPhase12Timeline, defaultPhase12Timeline } from '../../../lib/studio/visual/audio-authoring-contract';
+import {
+  createPhase12ComposeClip,
+  setPhase12Timeline,
+  defaultPhase12Timeline,
+} from '../../../lib/studio/visual/audio-authoring-contract';
 import { setPhase13Timeline, defaultPhase13Timeline } from '../../../lib/studio/visual/video-authoring-contract';
 import { ensurePhase14Authoring } from '../../../lib/studio/visual/advanced-authoring-contract';
 import type { StudioVirtualAsset } from '../../../lib/studio/runtime/assets';
@@ -261,23 +265,18 @@ test('Phase 15 parser-backed edits reconcile while marker-backed unsafe edits be
 });
 
 test('Phase 15 project bundle externalizes assets, includes round-trip source, and is byte deterministic', () => {
-  const project = phase12();
-  const timeline = project.timelines[0];
-  if (timeline) {
-    timeline.value = {
-      ...timeline.value,
-      mode: 'compose',
-      compose: {
-        ...(timeline.value.compose as Record<string, unknown>),
-        clips: [{
-          id: 'phase15-audio-clip',
-          startTime: 0,
-          source: { kind: 'asset', assetId: 'phase15-audio' },
-          gain: 1,
-        }],
-      } as never,
-    };
-  }
+  const timeline = defaultPhase12Timeline();
+  timeline.mode = 'compose';
+  timeline.compose.clips = [{
+    ...createPhase12ComposeClip(0),
+    id: 'phase15-audio-clip',
+    source: { kind: 'asset', assetId: 'phase15-audio' },
+    gain: 1,
+  }];
+  const project = setPhase12Timeline(
+    base('phase15-p12-assets', 'Phase 12 round trip'),
+    timeline,
+  );
   const asset: StudioVirtualAsset = {
     id: 'phase15-audio',
     name: 'Voice Intro.wav',
