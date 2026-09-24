@@ -817,7 +817,11 @@ export default function VisualStudioPre4({
         };
       }
       const artifact =
-        result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('image/')) ??
+        (phase13Active
+          ? result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('video/'))
+          : phase12Active
+            ? result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('audio/'))
+            : result.output.artifacts?.find((item) => item.base64 && item.mime.startsWith('image/'))) ??
         result.output.artifacts?.find((item) => item.base64) ??
         (result.output.base64
           ? {
@@ -924,7 +928,7 @@ export default function VisualStudioPre4({
   useEffect(() => {
     window.clearTimeout(artboardPreviewTimerRef.current);
     if (!active || !previewGenerated.value) return;
-    if (phase12Active) {
+    if (phase13Active || phase12Active) {
       setArtboardPreviewUrl(null);
       return;
     }
@@ -963,6 +967,7 @@ export default function VisualStudioPre4({
     phase10Active,
     phase11Active,
     phase12Active,
+    phase13Active,
   ]);
 
   const mutate = (
