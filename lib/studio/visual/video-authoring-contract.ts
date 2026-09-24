@@ -29,7 +29,6 @@ export type Phase13TextOverlay = {
   y: number;
   fontSize: number;
   color: string;
-  backgroundColor?: string;
   bold?: boolean;
 };
 
