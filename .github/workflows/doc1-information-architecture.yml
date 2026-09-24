@@ -2,29 +2,6 @@ name: DOC-1 Information Architecture
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - doc1-information-architecture
-    paths:
-      - 'app/**'
-      - 'components/**'
-      - 'content/docs/**'
-      - 'lib/**'
-      - 'scripts/docs/**'
-      - 'package.json'
-      - 'DOC1_INFORMATION_ARCHITECTURE_REPORT.md'
-      - '.github/workflows/doc1-information-architecture.yml'
-  pull_request:
-    paths:
-      - 'app/**'
-      - 'components/**'
-      - 'content/docs/**'
-      - 'lib/**'
-      - 'scripts/docs/**'
-      - 'package.json'
-      - 'DOC1_INFORMATION_ARCHITECTURE_REPORT.md'
-      - '.github/workflows/doc1-information-architecture.yml'
-
 permissions:
   contents: write
 
