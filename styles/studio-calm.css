@@ -7124,7 +7124,7 @@ body[data-phase17-resizing="dock"]{
 }
 
 .apx-live-code-editor[data-phase17-large-document="true"]{
-  contain:strict;
+  contain:layout paint style;
 }
 .apx-live-code-editor[data-phase17-large-document="true"]::before{
   content:"Large document mode";
