@@ -3362,13 +3362,33 @@ Capability-state evidence after integration:
 - non-authoring/introspection capabilities: **6**
 - planned Phase-14 capability rows remaining: **0**
 
-Verification policy for this phase:
+Final verification and hardening:
 
-- repository GitHub Actions are intentionally **manual-only**;
-- no automatic push/PR/merge gate was required or awaited for this implementation, by project instruction;
-- manual full-suite verification remains available for the later final release/completeness phases.
+- post-implementation hardening PR: **#111**
+- hardening merge commit: `a9f51b38e28f24a18a93a9764695879d4290c99d`
+- final one-off Studio Visual Phase Gate: run **35951940434** / run number **703** — **SUCCESS**
+- Visual Studio tests: **149 / 149 PASS**
+- Visual capability coverage: **187 capabilities**
+- option-path coverage: **17,233 / 17,233 classified; 0 unclassified**
+- Phase-14 advanced runtime/codegen equivalence proof: **PASS**
+  - artifact bytes: **6,370**
+  - SHA-256: `1a94b773a910cc15f40befd56ca960e3b9cc2aa9191759066e9410728b83f91c`
+  - execution: `chain`
+  - plugin: `studio-metadata`
+  - output: `buffer`
+  - generated file: `phase-14-runtime.ts`
+- Linux Studio video smoke: **PASS** on pinned runtime `50f2543482abbd7a9624192a060ec01330370bef`
+- TypeScript typecheck: **PASS**
+- DOC-5 package verification: **PASS** — 4 / 4 examples typechecked and executed against the packed Apexify.js 6.0.0 runtime
+- verified DOC-5 package artifact SHA-256: `5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17`
+- production Next.js build: **PASS**
+- production server start: **PASS**
+- dual-mode browser regression: **PASS**
+- DOC-4 provenance now derives the current Apexify package commit instead of freezing a historical SHA;
+- DOC-5 packaging verification now strips source-only lifecycle hooks from its temporary installed-package snapshot before `npm pack`, without altering the runtime contents under verification;
+- repository GitHub Actions were restored to **manual-only** after the one-off final verification.
 
-**Phase 14 is complete. STUDIO-VISUAL-15 is next.**
+**Phase 14 is completely closed. STUDIO-VISUAL-15 is next.**
 
 ---
 
