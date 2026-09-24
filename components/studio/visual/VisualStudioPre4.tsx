@@ -916,6 +916,17 @@ export default function VisualStudioPre4({
   };
 
   const updateLiveCode = (next: string) => {
+    const nextBytes = new TextEncoder().encode(next).byteLength;
+    if (nextBytes > PHASE17_PERFORMANCE_BUDGETS.maxLinkedCodeBytes) {
+      window.clearTimeout(codeSaveTimerRef.current);
+      phase17CodeTransactionsRef.current.cancel();
+      setCodeSource(next);
+      setCodeSyncState('error');
+      setCodeSyncError(
+        'Linked code exceeds the Phase-17 automatic reconciliation budget. Fork it to Code Studio or reduce the document before syncing.',
+      );
+      return;
+    }
     if (codeSyncState === 'synced' || !phase17CodeBaseSignatureRef.current) {
       phase17CodeBaseSignatureRef.current = semanticSignature(projectRef.current);
     }
@@ -2755,6 +2766,8 @@ export default function VisualStudioPre4({
     }
     const source = generated.value.source;
     window.clearTimeout(codeSaveTimerRef.current);
+    phase17CodeTransactionsRef.current.cancel();
+    phase17CodeBaseSignatureRef.current = projectSemanticSignature;
     setCodeSource(source);
     if (!fileNameTouchedRef.current) setCodeFileName(generated.value.fileName);
     setCodeSyncState('synced');
