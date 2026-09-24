@@ -22,6 +22,8 @@ const MODAL_FOCUSABLE = [
 function useModalFocusTrap(open: boolean, onClose: () => void) {
   const dialogRef = useRef<HTMLElement | null>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!open) return;
@@ -43,7 +45,7 @@ function useModalFocusTrap(open: boolean, onClose: () => void) {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (event.key !== 'Tab') return;
@@ -73,7 +75,7 @@ function useModalFocusTrap(open: boolean, onClose: () => void) {
       restoreFocusRef.current = null;
       window.requestAnimationFrame(() => restore?.focus());
     };
-  }, [open, onClose]);
+  }, [open]);
 
   return dialogRef;
 }
