@@ -872,6 +872,11 @@ function reconcileChartCall(
   }
 
   const existing = matched?.kind === 'chart' ? matched : undefined;
+  const {
+    rotation: _oldRotation,
+    opacity: _oldOpacity,
+    ...retainedChartTransform
+  } = existing?.transform ?? {};
   const id = existing?.id ?? createVisualId('chart');
   const dimensions =
     options.dimensions &&
@@ -901,13 +906,17 @@ function reconcileChartCall(
     parentId: existing?.parentId ?? null,
     childIds: existing?.childIds,
     transform: {
-      ...(existing?.transform ?? {}),
+      ...retainedChartTransform,
       x,
       y,
       width,
       height,
-      rotation: asOptionalNumber(placement.rotation) ?? 0,
-      opacity: asOptionalNumber(placement.opacity) ?? 1,
+      ...(typeof placement.rotation === 'number'
+        ? { rotation: placement.rotation }
+        : {}),
+      ...(typeof placement.opacity === 'number'
+        ? { opacity: placement.opacity }
+        : {}),
       visible: existing?.transform?.visible ?? true,
       locked: existing?.transform?.locked ?? false,
       zIndex: existing?.transform?.zIndex ?? index,
@@ -1070,6 +1079,11 @@ function reconcilePathDrawCall(
     matched && (matched.kind === 'path' || matched.kind === 'freehand')
       ? matched
       : undefined;
+  const {
+    rotation: _oldRotation,
+    opacity: _oldOpacity,
+    ...retainedPathTransform
+  } = existing?.transform ?? {};
   const existingProps = existing ? visualPathProps(existing) : undefined;
   const bounds = pathCommandBounds(commands);
   const viewport = existingProps?.viewport ?? {
@@ -1088,13 +1102,15 @@ function reconcilePathDrawCall(
     parentId: existing?.parentId ?? null,
     childIds: existing?.childIds,
     transform: {
-      ...(existing?.transform ?? {}),
+      ...retainedPathTransform,
       x: typeof transform.translateX === 'number' ? transform.translateX : 0,
       y: typeof transform.translateY === 'number' ? transform.translateY : 0,
       width: viewport.width * scaleX,
       height: viewport.height * scaleY,
-      rotation: typeof transform.rotate === 'number' ? transform.rotate : 0,
-      opacity: typeof opacity === 'number' ? opacity : 1,
+      ...(typeof transform.rotate === 'number'
+        ? { rotation: transform.rotate }
+        : {}),
+      ...(typeof opacity === 'number' ? { opacity } : {}),
       visible: existing?.transform?.visible ?? true,
       locked: existing?.transform?.locked ?? false,
       zIndex: existing?.transform?.zIndex ?? index,
