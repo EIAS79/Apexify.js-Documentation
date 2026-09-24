@@ -239,7 +239,8 @@ async function desktopReleaseProof(page) {
   await page.click('[data-phase15-single-file-export]');
   await waitForDownload(downloads, '.ts', beforeSingle);
 
-  await page.click(exportDetails + ' > summary');
+  // The export menu remains open after the single-file download; keep it open
+  // and exercise the project bundle action from the same menu state.
   await page.waitForSelector('[data-phase15-project-export]', { visible: true });
   const beforeBundle = new Set(fs.readdirSync(downloads));
   await page.click('[data-phase15-project-export]');
