@@ -319,7 +319,7 @@ test('Phase 15 project bundle externalizes assets, includes round-trip source, a
   assert.ok(sourceFile);
   const exportedSource = Buffer.from(sourceFile!.bytes).toString('utf8');
   assert.doesNotMatch(exportedSource, /studio:\/\/asset\//);
-  assert.match(exportedSource, /\.\/assets\/Voice-Intro\.wav/);
+  assert.match(exportedSource, /\.\.\/assets\/Voice-Intro\.wav/);
   assert.doesNotMatch(exportedSource, /apexify-studio-v12:/);
 
   const pkg = first.files.find((file) => file.path === 'package.json');
