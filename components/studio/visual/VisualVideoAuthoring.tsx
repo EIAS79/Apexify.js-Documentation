@@ -37,6 +37,11 @@ export function VisualVideoContext({
   const timeline=stored??defaultPhase13Timeline();
   const videos=videoAssets(assets);
   const frames=imageAssets(assets);
+  const audios=audioAssets(assets);
+  const secondaryVideo=videos.find((asset)=>asset.id!==timeline.source?.assetId);
+  const watermarkAsset=frames[0];
+  const audioAsset=audios[0];
+  const lutAsset=assets.find((asset)=>asset.name.toLowerCase().endsWith('.cube'));
 
   const activate=(mode:Phase13VideoMode)=>onMutate('Video mode',(current)=>update(current,(value)=>({...value,mode})));
   const chooseSource=(assetId:string)=>onMutate('Video source',(current)=>update(current,(value)=>({...value,source:assetId?{kind:'asset',assetId}:undefined})));
@@ -114,13 +119,32 @@ export function VisualVideoContext({
       )}
 
       <div className="apx-media-context-heading"><strong>Quick operations</strong><span>native createVideo</span></div>
-      <div className="apx-video-operation-grid">
-        <button type="button" onClick={()=>addOperation({id:'video-op-'+Date.now(),kind:'speed',speed:1.25})}>Speed</button>
-        <button type="button" onClick={()=>addOperation({id:'video-op-'+Date.now(),kind:'fade',fadeIn:.35,fadeOut:.35})}>Fades</button>
-        <button type="button" onClick={()=>addOperation({id:'video-op-'+Date.now(),kind:'color',contrast:1.05,saturation:1.05})}>Color</button>
-        <button type="button" onClick={()=>addOperation({id:'video-op-'+Date.now(),kind:'reverse'})}>Reverse</button>
-        <button type="button" onClick={()=>addOperation({id:'video-op-'+Date.now(),kind:'compress',quality:'medium'})}>Compress</button>
-        <button type="button" onClick={()=>addOperation({id:'video-op-'+Date.now(),kind:'exportPreset',preset:'web'})}>Web preset</button>
+      <div className="apx-video-operation-grid" data-video-operation-library>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'speed',speed:1.25})}>Speed</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'effects',filters:[{type:'contrast',value:1.08}]})}>Effects</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'crop',x:0,y:0,width:320,height:180})}>Crop</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'rotate',angle:90})}>Rotate</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'fade',fadeIn:.35,fadeOut:.35})}>Fades</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'color',contrast:1.05,saturation:1.05})}>Color</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'reverse'})}>Reverse</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'compress',quality:'medium'})}>Compress</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'freeze',time:.5,duration:1})}>Freeze</button>
+        <button type="button" disabled={!secondaryVideo} onClick={()=>secondaryVideo&&addOperation({id:createVisualId('video-op'),kind:'pip',overlayAssetId:secondaryVideo.id,position:'bottom-right',width:180,opacity:.9})}>PiP</button>
+        <button type="button" disabled={!secondaryVideo} onClick={()=>secondaryVideo&&addOperation({id:createVisualId('video-op'),kind:'transition',type:'fade',duration:.4,secondAssetId:secondaryVideo.id})}>Transition</button>
+        <button type="button" disabled={!secondaryVideo} onClick={()=>secondaryVideo&&addOperation({id:createVisualId('video-op'),kind:'merge',assetIds:[secondaryVideo.id],mode:'sequential'})}>Merge</button>
+        <button type="button" disabled={!secondaryVideo} onClick={()=>secondaryVideo&&addOperation({id:createVisualId('video-op'),kind:'splitScreen',assetIds:[secondaryVideo.id],layout:'side-by-side'})}>Split screen</button>
+        <button type="button" disabled={!secondaryVideo} onClick={()=>secondaryVideo&&addOperation({id:createVisualId('video-op'),kind:'replaceSegment',replacementAssetId:secondaryVideo.id,targetStartTime:.5,targetEndTime:1.5,durationPolicy:'fit'})}>Replace</button>
+        <button type="button" disabled={!watermarkAsset} onClick={()=>watermarkAsset&&addOperation({id:createVisualId('video-op'),kind:'watermark',assetId:watermarkAsset.id,position:'top-right',opacity:.8,width:120})}>Watermark</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'loop',smooth:true})}>Loop</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'timeLapse',speed:2})}>Time-lapse</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'stabilize',smoothing:8})}>Stabilize</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'removeAudio'})}>Remove audio</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'mute'})}>Mute</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'volume',volume:.8})}>Volume</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'normalizeAudio',method:'lufs',targetLevel:-14})}>Normalize</button>
+        <button type="button" disabled={!audioAsset} onClick={()=>audioAsset&&addOperation({id:createVisualId('video-op'),kind:'mixAudio',assetId:audioAsset.id,startTime:0,volume:.8,keepOriginalAudio:true})}>Mix audio</button>
+        <button type="button" disabled={!lutAsset} onClick={()=>lutAsset&&addOperation({id:createVisualId('video-op'),kind:'lut',assetId:lutAsset.id,intensity:1})}>LUT</button>
+        <button type="button" onClick={()=>addOperation({id:createVisualId('video-op'),kind:'exportPreset',preset:'web'})}>Web preset</button>
       </div>
     </div>
   );
@@ -142,7 +166,14 @@ export function VisualVideoInspector({
           <label><span>Format</span><select className="apx-pre4-input" value={timeline.render.format} onChange={(e)=>mutate('Video format',(v)=>({...v,render:{...v.render,format:e.target.value as 'mp4'|'webm'}}))}><option value="mp4">MP4</option><option value="webm">WebM</option></select></label>
           <label><span>Pipeline preset</span><select className="apx-pre4-input" value={timeline.render.preset} onChange={(e)=>mutate('Video render preset',(v)=>({...v,render:{...v.render,preset:e.target.value as 'preview'|'export'}}))}><option value="preview">Preview</option><option value="export">Export</option></select></label>
           <label><span>Thumbnails</span><input className="apx-pre4-input" type="number" min={0} max={100} value={timeline.inspect.thumbnails} onChange={(e)=>mutate('Video thumbnails',(v)=>({...v,inspect:{...v.inspect,thumbnails:numeric(e.target.value,0)}}))}/></label>
+          <label><span>Preview frames</span><input className="apx-pre4-input" type="number" min={0} max={100} value={timeline.inspect.previewFrames} onChange={(e)=>mutate('Video preview frames',(v)=>({...v,inspect:{...v.inspect,previewFrames:numeric(e.target.value,0)}}))}/></label>
           <label><span>Extract times</span><input className="apx-pre4-input" value={timeline.inspect.extractTimes.join(', ')} onChange={(e)=>mutate('Video extract times',(v)=>({...v,inspect:{...v.inspect,extractTimes:e.target.value.split(',').map((x)=>Number(x.trim())).filter(Number.isFinite)}}))}/></label>
+          <label><span>Scene threshold</span><input className="apx-pre4-input" type="number" min={0} max={1} step={.05} value={timeline.inspect.sceneThreshold} onChange={(e)=>mutate('Video scene threshold',(v)=>({...v,inspect:{...v.inspect,sceneThreshold:numeric(e.target.value,.3)}}))}/></label>
+        </div>
+        <div className="apx-text-toggle-row apx-text-toggle-row--wrap" data-video-inspection-options>
+          <label className="apx-canvas-check"><input type="checkbox" checked={timeline.inspect.probe} onChange={(e)=>mutate('Video metadata probe',(v)=>({...v,inspect:{...v.inspect,probe:e.target.checked}}))}/><span>Probe metadata</span></label>
+          <label className="apx-canvas-check"><input type="checkbox" checked={timeline.inspect.detectScenes} onChange={(e)=>mutate('Video scene detection',(v)=>({...v,inspect:{...v.inspect,detectScenes:e.target.checked}}))}/><span>Detect scenes</span></label>
+          <label className="apx-canvas-check"><input type="checkbox" checked={timeline.inspect.extractAudio} onChange={(e)=>mutate('Video audio extraction',(v)=>({...v,inspect:{...v.inspect,extractAudio:e.target.checked}}))}/><span>Extract WAV</span></label>
         </div>
       </div>
       <div className="apx-pre4-section">
@@ -185,12 +216,29 @@ export function VisualVideoInspector({
         ):null}
       </div>
       <div className="apx-pre4-section">
+        <div className="apx-pre4-section-title">Splice / replacement</div>
+        <select className="apx-pre4-input" value="" onChange={(e)=>{
+          const id=e.target.value;if(!id)return;
+          mutate('Add video splice',(v)=>({...v,pipeline:{...v.pipeline,splices:[...v.pipeline.splices,{
+            id:createVisualId('video-splice'),
+            targetStartTime:.5,
+            targetEndTime:1.5,
+            replacement:{kind:'asset',assetId:id},
+            durationPolicy:'fit',
+          }]}}));
+        }} data-video-splice-select>
+          <option value="">Add replacement video…</option>
+          {videos.filter((asset)=>asset.id!==timeline.source?.assetId).map((asset)=><option key={asset.id} value={asset.id}>{asset.name}</option>)}
+        </select>
+      </div>
+      <div className="apx-pre4-section">
         <div className="apx-pre4-section-title">Audio layer</div>
         <label className="apx-canvas-check"><input type="checkbox" checked={timeline.pipeline.keepOriginalAudio} onChange={(e)=>mutate('Original audio',(v)=>({...v,pipeline:{...v.pipeline,keepOriginalAudio:e.target.checked}}))}/><span>Keep original audio</span></label>
         <select className="apx-pre4-input" value="" onChange={(e)=>{
           const id=e.target.value;if(!id)return;
           mutate('Add video audio',(v)=>({...v,pipeline:{...v.pipeline,audio:[...v.pipeline.audio,{id:'video-audio-'+Date.now(),type:'asset',assetId:id,startTime:0,volume:1}]}}));
         }}><option value="">Add audio asset…</option>{audios.map((asset)=><option key={asset.id} value={asset.id}>{asset.name}</option>)}</select>
+        <button className="apx-canvas-apply" type="button" onClick={()=>mutate('Add procedural video audio',(v)=>({...v,pipeline:{...v.pipeline,audio:[...v.pipeline.audio,{id:createVisualId('video-audio'),type:'preset',preset:'success',startTime:0,gain:.6}]}}))}>Add procedural preset</button>
       </div>
       <div className="apx-pre4-section">
         <div className="apx-pre4-section-title">Text overlay</div>
