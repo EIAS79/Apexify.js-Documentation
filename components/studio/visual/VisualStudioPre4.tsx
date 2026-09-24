@@ -2564,7 +2564,7 @@ export default function VisualStudioPre4({
         includeProvenance: includeCodeProvenance,
       });
       const bytes = Uint8Array.from(bundle.zip);
-      const blob = new Blob([bytes.buffer], { type: 'application/zip' });
+      const blob = new Blob([bytes], { type: 'application/zip' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
