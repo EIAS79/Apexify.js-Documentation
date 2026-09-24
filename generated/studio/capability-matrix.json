@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "packagePin": "github:EIAS79/Apexify.js#69d40cf40ba992ad2bdec457c6c7217f5df55cd1",
+  "packagePin": "github:EIAS79/Apexify.js#50f2543482abbd7a9624192a060ec01330370bef",
   "browserRuntime": {
     "package": "@apexify/web",
     "sourceRepository": "EIAS79/Apexify.js",
