@@ -22,6 +22,7 @@ export type Phase13Splice = {
 
 export type Phase13TextOverlay = {
   id: string;
+  nodeId?: string;
   startTime: number;
   endTime: number;
   text: string;
@@ -272,8 +273,13 @@ export function validatePhase13Project(project: VisualProject): VisualProjectIss
     nonNegative(overlay.startTime,issues,path+'.startTime','Text start');
     nonNegative(overlay.endTime,issues,path+'.endTime','Text end');
     if (overlay.endTime <= overlay.startTime) issue(issues,'phase13-text-time',path,'Text end must be greater than start.');
-    if (!overlay.text.trim()) issue(issues,'phase13-text',path+'.text','Text overlay cannot be empty.');
-    if (!finite(overlay.fontSize) || overlay.fontSize <= 0 || overlay.fontSize > 512) issue(issues,'phase13-font-size',path+'.fontSize','Text font size must be between 1 and 512.');
+    if (overlay.nodeId) {
+      const node = project.document.nodes[overlay.nodeId];
+      if (!node || node.kind !== 'text') issue(issues,'phase13-text-node',path+'.nodeId','Video text overlay nodeId must reference a Visual text node.');
+    } else {
+      if (!overlay.text.trim()) issue(issues,'phase13-text',path+'.text','Text overlay cannot be empty.');
+      if (!finite(overlay.fontSize) || overlay.fontSize <= 0 || overlay.fontSize > 512) issue(issues,'phase13-font-size',path+'.fontSize','Text font size must be between 1 and 512.');
+    }
   });
 
   uniqueIds(timeline.pipeline.audio,issues,'timelines.video.pipeline.audio');
