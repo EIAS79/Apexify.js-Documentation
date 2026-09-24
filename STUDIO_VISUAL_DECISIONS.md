@@ -52,6 +52,21 @@ Thresholds are codegen policy, not saved-schema semantics, and may be tuned with
 
 This prevents plugins from bypassing project validation, code generation, history, or runtime safety.
 
+## SV15-DEC-011 — Linked generated-code reconciliation and conflict recovery
+
+**Decision:** Phase 15 revises **SV0-DEC-008** for the generated subset that Studio can prove reversible. The linked bottom Code surface may reconcile recognized deterministic edits back into the Visual Project. This does not expand the product promise to arbitrary JavaScript → Visual reconstruction.
+
+The compatibility boundary is explicit:
+
+- parser-backed canonical output from Phases 4–8 continues to accept the recognized literal/API subset and updates Visual state;
+- marker-backed semantic output from Phases 9–14 reconstructs the complete saved Visual state exactly when its generated body is canonical;
+- an edit to marker-backed generated code that Studio cannot reverse safely becomes a **linked-code conflict** instead of being silently ignored;
+- a conflict offers two explicit recovery paths: **Restore canonical Visual code** or **Fork edit to Code Studio**;
+- normal Copy/Download/Code Studio handoff strips opaque Studio semantic markers;
+- optional compact provenance metadata may be added to exported code only when the user explicitly enables it.
+
+The Visual Project remains authoritative while the buffer is linked. A fork into Code Studio is independent code and no longer claims live Visual synchronization.
+
 ## Decision status
 
-All ten open questions required by STUDIO-VISUAL-0 have an explicit baseline decision. Later phases may revise a decision only through a new logged decision with migration/compatibility impact.
+All ten Phase-0 questions remain resolved. Phase 15 adds the explicit revision above for generated linked-code behavior; arbitrary JavaScript → Visual remains out of scope. Later phases may revise a decision only through a new logged decision with migration/compatibility impact.
