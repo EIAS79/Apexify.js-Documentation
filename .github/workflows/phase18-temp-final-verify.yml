@@ -1,0 +1,55 @@
+name: Phase 18 Temporary Final Verification
+
+on:
+  push:
+    branches:
+      - studio-visual/v18-final-release
+
+permissions:
+  contents: read
+
+jobs:
+  final-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Production build with Phase 16-18 release guards
+        run: npm run build
+
+      - name: Final Visual and runtime release proof
+        run: npm run studio:visual:phase18:full
+
+      - name: Browser UI, export, representative Preview and accessibility proof
+        run: |
+          CHROME_PATH="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_PATH" ]; then
+            echo "Chrome/Chromium is required." >&2
+            exit 1
+          fi
+          npm start > /tmp/apexify-phase18-next.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:3000/studio >/dev/null; then
+              break
+            fi
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+              cat /tmp/apexify-phase18-next.log
+              exit 1
+            fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:3000/studio >/dev/null
+          CHROME_PATH="$CHROME_PATH" npm run studio:visual:phase18:browser
