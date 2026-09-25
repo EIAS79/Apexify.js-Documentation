@@ -337,6 +337,10 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
           kind: 'image',
           mime: result.mime,
           url: result.dataUrl,
+          metadata: {
+            width: result.width,
+            height: result.height,
+          },
         };
         setPreviewArtifacts([browserArtifact]);
         setActiveArtifactId(browserArtifact.id);

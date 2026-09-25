@@ -162,8 +162,14 @@ requireCheck(apexifyWebPreview.includes('config.patternBg'), '@apexify/web must 
 requireCheck(apexifyWebPreview.includes("chartType === 'radar'") && apexifyWebPreview.includes("chartType === 'polarArea'"), '@apexify/web must cover all stable createChart() families.');
 requireCheck(apexifyWebIndex.includes('class ApexifyWebRuntime'), '@apexify/web runtime lifecycle class missing.');
 requireCheck(apexifyWebIndex.includes('registerApexifyWebFonts'), '@apexify/web font manager missing.');
-requireCheck(apexifyWebSource.commit === 'f57bb82743c8f71bbe7e519d060010f970b06ef9', '@apexify/web source snapshot is not pinned to the approved engine commit.');
+requireCheck(apexifyWebSource.commit === '6b0cdf0b78cc7d4545c95d274ea0fb518583a20e', '@apexify/web source snapshot is not pinned to the approved engine commit.');
 requireCheck(apexifyWebInstaller.includes('Integrity mismatch for @apexify/web'), '@apexify/web installer must verify source integrity.');
+requireCheck(
+  apexifyWebPreview.includes("boolOf(inheritedBackground.inherit, false)") &&
+    apexifyWebPreview.includes('width = bitmap.width') &&
+    apexifyWebPreview.includes('height = bitmap.height'),
+  '@apexify/web must honor customBg.inherit source dimensions instead of falling back to 640x360.',
+);
 requireCheck(studioPreviewZoom.includes('requestFullscreen()'), 'Studio preview must expose real fullscreen mode.');
 requireCheck(studioPreviewZoom.includes('cursor-grab') && studioPreviewZoom.includes('scrollLeft'), 'Studio preview must preserve drag-to-pan behavior.');
 requireCheck(studioPreviewZoom.includes('applyFitToView') && studioPreviewZoom.includes('resetView'), 'Studio preview must preserve fit and reset controls.');
