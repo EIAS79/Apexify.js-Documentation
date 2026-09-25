@@ -16,6 +16,8 @@ import {
 import {
   ArrowDownTrayIcon,
   ArrowPathIcon,
+  ArrowUturnLeftIcon,
+  ArrowUturnRightIcon,
   ArrowsPointingOutIcon,
   ChartBarIcon,
   ChevronLeftIcon,
@@ -542,6 +544,8 @@ export default function VisualStudioPre4({
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameDraft, setRenameDraft] = useState('');
   const [dirty, setDirty] = useState(false);
+  const [autosaveState, setAutosaveState] = useState<'saved' | 'saving' | 'error'>('saved');
+  const [lastAutosavedAt, setLastAutosavedAt] = useState<number | null>(null);
   const [activeTool, setActiveTool] = useState('canvas');
   const [inspectorTab, setInspectorTab] = useState<
     'style' | 'transform' | 'effects' | 'data' | 'advanced'
@@ -802,6 +806,8 @@ export default function VisualStudioPre4({
     const recovered = recoverPhase17Autosave(raw);
     if (recovered.ok) {
       const { envelope } = recovered;
+      setAutosaveState('saved');
+      setLastAutosavedAt(envelope.savedAt);
       const recoveredSignature = semanticSignature(envelope.project);
       projectRef.current = envelope.project;
       cleanSignature.current = recoveredSignature;
@@ -904,7 +910,10 @@ export default function VisualStudioPre4({
         PHASE17_AUTOSAVE_STORAGE_KEY,
         JSON.stringify(envelope),
       );
+      setAutosaveState('saved');
+      setLastAutosavedAt(envelope.savedAt);
     } catch (error) {
+      setAutosaveState('error');
       setMessage(
         'Autosave unavailable · ' +
           (error instanceof Error ? error.message : 'storage failed'),
@@ -942,6 +951,24 @@ export default function VisualStudioPre4({
     setCodeSyncState('synced');
     const resultSignature = semanticSignature(result.project);
     phase17CodeBaseSignatureRef.current = resultSignature;
+
+    const markerBacked =
+      /\/\*\s*apexify-studio-v(?:9|10|11|12|13|14):/.test(source);
+    if (markerBacked) {
+      try {
+        const canonical = generateVisualProjectCode(result.project);
+        setCodeSource(canonical.source);
+        if (!fileNameTouchedRef.current) setCodeFileName(canonical.fileName);
+        persistLiveCode(
+          canonical.source,
+          fileNameTouchedRef.current ? codeFileName : canonical.fileName,
+        );
+      } catch {
+        // The reconciled Visual project remains authoritative. The regular
+        // generated-code effect will repair the linked source if needed.
+      }
+    }
+
     if (!result.changed) return true;
 
     history.current.commit(current, result.project, 'Code → Visual');
@@ -1029,6 +1056,7 @@ export default function VisualStudioPre4({
 
   useEffect(() => {
     if (!phase17HydratedRef.current || !codeHydratedRef.current) return;
+    setAutosaveState('saving');
     window.clearTimeout(phase17AutosaveTimerRef.current);
     phase17AutosaveTimerRef.current = window.setTimeout(
       persistPhase17Snapshot,
@@ -2237,6 +2265,7 @@ export default function VisualStudioPre4({
   const undo = () => {
     const result = history.current.undo(project);
     if (!result) return;
+    projectRef.current = result.project;
     setProject(result.project);
     setMessage('Undo: ' + result.label);
     setHistoryTick((value) => value + 1);
@@ -2245,6 +2274,7 @@ export default function VisualStudioPre4({
   const redo = () => {
     const result = history.current.redo(project);
     if (!result) return;
+    projectRef.current = result.project;
     setProject(result.project);
     setMessage('Redo: ' + result.label);
     setHistoryTick((value) => value + 1);
@@ -6706,6 +6736,28 @@ export default function VisualStudioPre4({
             </div>
 
             <div className="apx-pre4-view-tools">
+              <div className="apx-pre4-history-tools" role="group" aria-label="Canvas history">
+                <button
+                  type="button"
+                  data-visual-undo
+                  onClick={undo}
+                  disabled={!history.current.canUndo}
+                  title="Undo · Ctrl/Cmd+Z"
+                  aria-label="Undo previous canvas change"
+                >
+                  <ArrowUturnLeftIcon className="apx-pre4-toolbar-icon" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  data-visual-redo
+                  onClick={redo}
+                  disabled={!history.current.canRedo}
+                  title="Redo · Ctrl/Cmd+Shift+Z or Ctrl/Cmd+Y"
+                  aria-label="Redo next canvas change"
+                >
+                  <ArrowUturnRightIcon className="apx-pre4-toolbar-icon" aria-hidden />
+                </button>
+              </div>
               <button
                 type="button"
                 data-active={viewportMode === 'pan' ? 'true' : undefined}
@@ -7238,8 +7290,24 @@ export default function VisualStudioPre4({
 
       <footer className="apx-pre4-statusbar">
         <span className="apx-pre4-status-product">Apexify Studio</span>
-        <span className="apx-pre4-save-state" data-dirty={dirty ? 'true' : undefined}>
-          <i /> {dirty ? 'Unsaved changes' : 'All changes saved'}
+        <span
+          className="apx-pre4-save-state"
+          data-state={autosaveState}
+          data-export-dirty={dirty ? 'true' : undefined}
+          title={
+            autosaveState === 'saved' && lastAutosavedAt
+              ? 'Browser autosave completed at ' + new Date(lastAutosavedAt).toLocaleTimeString()
+              : autosaveState === 'error'
+                ? 'Browser autosave failed'
+                : 'Saving Studio session'
+          }
+        >
+          <i />
+          {autosaveState === 'saving'
+            ? 'Autosaving…'
+            : autosaveState === 'error'
+              ? 'Autosave failed'
+              : 'Autosaved'}
         </span>
         <span className="apx-pre4-status-message" title={message}>{message}</span>
         <span className="apx-pre4-build-motto">Build something extraordinary. ✦</span>
