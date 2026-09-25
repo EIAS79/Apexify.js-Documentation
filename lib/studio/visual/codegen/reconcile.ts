@@ -1842,6 +1842,64 @@ function reconcileCoreVisualProjectFromCode(
   }
 }
 
+function markerBackedDocumentDimensions(
+  source: string,
+): { width: number; height: number } | null {
+  const numeric = String.raw`([+-]?(?:\\d+\\.?\\d*|\\.\\d+)(?:e[+-]?\\d+)?)`;
+
+  const createScene = source.match(
+    new RegExp(
+      String.raw`\\.\\s*createScene\\s*\\(\\s*` +
+        numeric +
+        String.raw`\\s*,\\s*` +
+        numeric +
+        String.raw`\\s*\\)`,
+      'i',
+    ),
+  );
+
+  const literalScene = source.match(
+    new RegExp(
+      String.raw`\\bconst\\s+scene\\s*=\\s*\\{\\s*width\\s*:\\s*` +
+        numeric +
+        String.raw`\\s*,\\s*height\\s*:\\s*` +
+        numeric,
+      'i',
+    ),
+  );
+
+  const match = createScene ?? literalScene;
+  if (!match) return null;
+
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  if (
+    !Number.isFinite(width) ||
+    !Number.isFinite(height) ||
+    width < 1 ||
+    height < 1 ||
+    width > 16384 ||
+    height > 16384
+  ) {
+    return null;
+  }
+  return { width: Math.round(width), height: Math.round(height) };
+}
+
+function markerDimensionCandidate(
+  project: VisualProject,
+  source: string,
+): VisualProject | null {
+  const dimensions = markerBackedDocumentDimensions(source);
+  if (!dimensions) return null;
+  const next = structuredClone(project);
+  next.document.width = dimensions.width;
+  next.document.height = dimensions.height;
+  next.updatedAt = new Date().toISOString();
+  const validation = validateVisualProject(next);
+  return validation.ok ? next : null;
+}
+
 function reconcileMarkerBackedProject(
   phase: number,
   currentProject: VisualProject,
@@ -1869,28 +1927,39 @@ function reconcileMarkerBackedProject(
     };
   }
 
-  // Phase 9-14 source contains a project marker for advanced semantics. We
-  // still allow edits to the canonical canvas/core drawing code by applying
-  // the ordinary reverse compiler to the marker project, then regenerating
-  // the advanced source. If the edited body is exactly representable by that
-  // regenerated project, the edit is safe and becomes Visual state.
+  // Phase 9-14 source contains a project marker for advanced semantics.
+  // Accept only edits that can be reproduced exactly from a VisualProject.
+  // The ordinary reverse compiler covers createCanvas-based projects, while
+  // scene-backed generators (including the Phase-11 scene shown in Studio)
+  // expose document dimensions through createScene(width,height) or a
+  // literal `const scene = { width, height, ... }`.
+  const candidates: VisualProject[] = [];
   const coreResult = reconcileCoreVisualProjectFromCode(markerProject, source);
-  if (!coreResult.ok) return coreResult;
+  if (coreResult.ok) candidates.push(coreResult.project);
 
-  const editedBody = stripStudioSourceMarker(source);
-  const regeneratedBodies = regenerateSources(coreResult.project)
-    .map(stripStudioSourceMarker);
-
-  if (!regeneratedBodies.includes(editedBody)) {
-    return markerBackedEditConflict(phase);
+  const dimensionCandidate = markerDimensionCandidate(markerProject, source);
+  if (
+    dimensionCandidate &&
+    !candidates.some(
+      (candidate) => projectSemantic(candidate) === projectSemantic(dimensionCandidate),
+    )
+  ) {
+    candidates.push(dimensionCandidate);
   }
 
-  return {
-    ok: true,
-    project: coreResult.project,
-    changed:
-      projectSemantic(coreResult.project) !== projectSemantic(currentProject),
-  };
+  const editedBody = stripStudioSourceMarker(source);
+  for (const candidate of candidates) {
+    const regeneratedBodies = regenerateSources(candidate).map(stripStudioSourceMarker);
+    if (!regeneratedBodies.includes(editedBody)) continue;
+    return {
+      ok: true,
+      project: candidate,
+      changed: projectSemantic(candidate) !== projectSemantic(currentProject),
+    };
+  }
+
+  if (!candidates.length && !coreResult.ok) return coreResult;
+  return markerBackedEditConflict(phase);
 }
 
 export function reconcileVisualProjectFromCode(
