@@ -45,6 +45,12 @@ import {
   phase11ProjectFromSourceMarker,
 } from '../phase11-codegen';
 import {
+  phase11Timeline,
+  setPhase11Timeline,
+  type Phase11Frame,
+  type Phase11Timeline,
+} from '../gif-animation-contract';
+import {
   generatePhase12NativeSource,
   phase12ProjectFromSourceMarker,
 } from '../phase12-codegen';
@@ -1709,6 +1715,291 @@ function reconcileRenderableCalls(
   return pathResourceToNodeId;
 }
 
+function assignedLiteral(source: string, name: string): Jsonish | null {
+  const match = new RegExp('\\bconst\\s+' + name + '\\s*=\\s*').exec(source);
+  if (!match) return null;
+
+  let start = match.index + match[0].length;
+  while (/\s/.test(source[start] ?? '')) start += 1;
+  const opening = source[start];
+  if (opening !== '{' && opening !== '[') return null;
+
+  const expectedClose = opening === '{' ? '}' : ']';
+  let depth = 0;
+  let quote: string | null = null;
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+
+  for (let index = start; index < source.length; index += 1) {
+    const char = source[index]!;
+    const next = source[index + 1] ?? '';
+
+    if (lineComment) {
+      if (char === '\n') lineComment = false;
+      continue;
+    }
+    if (blockComment) {
+      if (char === '*' && next === '/') {
+        blockComment = false;
+        index += 1;
+      }
+      continue;
+    }
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '/' && next === '/') {
+      lineComment = true;
+      index += 1;
+      continue;
+    }
+    if (char === '/' && next === '*') {
+      blockComment = true;
+      index += 1;
+      continue;
+    }
+    if (char === '"' || char === "'" || char.charCodeAt(0) === 96) {
+      quote = char;
+      continue;
+    }
+
+    if (char === opening) depth += 1;
+    else if (char === expectedClose) {
+      depth -= 1;
+      if (depth === 0) {
+        return new LiteralParser(source.slice(start, index + 1)).parse();
+      }
+    }
+  }
+
+  throw new Error('Unterminated literal assigned to ' + name + '.');
+}
+
+function recordNumber(
+  record: RecordValue,
+  key: string,
+  fallback: number,
+): number {
+  const value = record[key];
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+}
+
+function phase11FrameFromRecord(
+  value: Jsonish,
+  previous: Phase11Frame | undefined,
+  index: number,
+  allowRepeat: boolean,
+): Phase11Frame {
+  if (!isRecord(value)) {
+    throw new Error('GIF frame ' + String(index + 1) + ' must be an object literal.');
+  }
+
+  const buffer =
+    typeof value.buffer === 'string'
+      ? value.buffer
+      : typeof value.source === 'string'
+        ? value.source
+        : undefined;
+  const transformations =
+    isRecord(value.transformations)
+      ? value.transformations as unknown as Phase11Frame['transformations']
+      : undefined;
+
+  return {
+    id: previous?.id ?? createVisualId('gif-frame'),
+    ...(buffer ? { source: buffer } : {}),
+    ...(typeof value.backgroundColor === 'string'
+      ? { backgroundColor: value.backgroundColor }
+      : {}),
+    ...(typeof value.duration === 'number' ? { duration: value.duration } : {}),
+    ...(allowRepeat && typeof value.repeat === 'number'
+      ? { repeat: value.repeat }
+      : { repeat: 1 }),
+    ...(value.dispose === 0 || value.dispose === 1 || value.dispose === 2 || value.dispose === 3
+      ? { dispose: value.dispose }
+      : {}),
+    ...(
+      value.transparentColor === null ||
+      typeof value.transparentColor === 'number' ||
+      typeof value.transparentColor === 'string'
+        ? { transparentColor: value.transparentColor as number | string | null }
+        : {}
+    ),
+    ...(typeof value.blendMode === 'string' ? { blendMode: value.blendMode } : {}),
+    ...(transformations ? { transformations } : {}),
+  };
+}
+
+function phase11FramesFromValue(
+  value: Jsonish | undefined,
+  previous: readonly Phase11Frame[],
+  allowRepeat: boolean,
+): Phase11Frame[] {
+  if (!Array.isArray(value)) {
+    throw new Error('GIF frames must be a literal array for live Visual sync.');
+  }
+  return value.map((item, index) =>
+    phase11FrameFromRecord(item, previous[index], index, allowRepeat),
+  );
+}
+
+function phase11OptionsFromRecord(
+  timeline: Phase11Timeline,
+  value: Jsonish | undefined,
+): Phase11Timeline {
+  if (!isRecord(value)) {
+    throw new Error('GIF options must be an object literal for live Visual sync.');
+  }
+  return {
+    ...timeline,
+    width: Math.round(recordNumber(value, 'width', timeline.width)),
+    height: Math.round(recordNumber(value, 'height', timeline.height)),
+    repeat: Math.round(recordNumber(value, 'repeat', timeline.repeat)),
+    quality: Math.round(recordNumber(value, 'quality', timeline.quality)),
+    delay: recordNumber(value, 'delay', timeline.delay),
+  };
+}
+
+function reconcileEditedPhase11Source(
+  currentProject: VisualProject,
+  markerProject: VisualProject,
+  source: string,
+): VisualCodeSyncResult | null {
+  const currentTimeline = phase11Timeline(markerProject);
+  if (!currentTimeline) return null;
+
+  try {
+    let next = structuredClone(markerProject);
+    let timeline: Phase11Timeline = structuredClone(currentTimeline);
+
+    if (timeline.mode === 'scene-gif') {
+      const sceneValue = assignedLiteral(source, 'scene');
+      if (!isRecord(sceneValue)) {
+        throw new Error('Scene GIF live sync requires the generated scene object.');
+      }
+
+      const renderCall = extractMethodCalls(source, 'renderSceneToGIF')[0];
+      if (!renderCall?.args[1]) {
+        throw new Error('Scene GIF live sync requires renderSceneToGIF() options.');
+      }
+      const renderOptions = new LiteralParser(renderCall.args[1]).parse();
+      if (!isRecord(renderOptions)) {
+        throw new Error('renderSceneToGIF() options must stay as a literal object.');
+      }
+
+      timeline = phase11OptionsFromRecord(timeline, renderOptions.options);
+      timeline.frames = phase11FramesFromValue(
+        renderOptions.gifFrames,
+        currentTimeline.frames,
+        true,
+      );
+      timeline.scene = {
+        ...(timeline.scene ?? {}),
+        ...(typeof renderOptions.prependComposedRaster === 'boolean'
+          ? { prependComposedRaster: renderOptions.prependComposedRaster }
+          : {}),
+        ...(typeof renderOptions.composedFrameDuration === 'number'
+          ? { composedFrameDuration: renderOptions.composedFrameDuration }
+          : {}),
+        ...(typeof renderOptions.composedFrameRepeat === 'number'
+          ? { composedFrameRepeat: renderOptions.composedFrameRepeat }
+          : {}),
+      };
+
+      const sceneWidth = recordNumber(sceneValue, 'width', next.document.width);
+      const sceneHeight = recordNumber(sceneValue, 'height', next.document.height);
+      next.document.width = Math.round(sceneWidth);
+      next.document.height = Math.round(sceneHeight);
+    } else if (timeline.mode === 'animate') {
+      const frameValue = assignedLiteral(source, 'animationFrames');
+      timeline.frames = phase11FramesFromValue(
+        frameValue ?? undefined,
+        currentTimeline.frames,
+        false,
+      );
+
+      const animateCall = extractMethodCalls(source, 'animate')[0];
+      if (!animateCall?.args[1] || !animateCall.args[2] || !animateCall.args[3]) {
+        throw new Error('animate() timing and dimensions must remain literal for live Visual sync.');
+      }
+      const delay = new LiteralParser(animateCall.args[1]).parse();
+      const width = new LiteralParser(animateCall.args[2]).parse();
+      const height = new LiteralParser(animateCall.args[3]).parse();
+      if (
+        typeof delay !== 'number' ||
+        typeof width !== 'number' ||
+        typeof height !== 'number'
+      ) {
+        throw new Error('animate() delay, width and height must be numeric literals.');
+      }
+      timeline.delay = delay;
+      timeline.width = Math.round(width);
+      timeline.height = Math.round(height);
+
+      const gifCall = extractMethodCalls(source, 'createGIF')[0];
+      if (gifCall?.args[1]) {
+        timeline = phase11OptionsFromRecord(
+          timeline,
+          new LiteralParser(gifCall.args[1]).parse(),
+        );
+      }
+      next.document.width = timeline.width;
+      next.document.height = timeline.height;
+    } else {
+      const frameValue = assignedLiteral(source, 'gifFrames');
+      timeline.frames = phase11FramesFromValue(
+        frameValue ?? undefined,
+        currentTimeline.frames,
+        false,
+      );
+
+      const gifCall = extractMethodCalls(source, 'createGIF')[0];
+      if (!gifCall?.args[1]) {
+        throw new Error('createGIF() options must remain literal for live Visual sync.');
+      }
+      timeline = phase11OptionsFromRecord(
+        timeline,
+        new LiteralParser(gifCall.args[1]).parse(),
+      );
+      next.document.width = timeline.width;
+      next.document.height = timeline.height;
+    }
+
+    next = setPhase11Timeline(next, timeline);
+    const validation = validateVisualProject(next);
+    if (!validation.ok) {
+      const problem = validation.issues.find((item) => item.severity === 'error');
+      return {
+        ok: false,
+        error: problem?.message ?? 'Edited GIF code produced an invalid Visual timeline.',
+      };
+    }
+
+    const regenerated = generatePhase11NativeSource(next);
+    if (stripStudioSourceMarker(regenerated) !== stripStudioSourceMarker(source)) {
+      return null;
+    }
+
+    return {
+      ok: true,
+      project: next,
+      changed: projectSemantic(next) !== projectSemantic(currentProject),
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Edited GIF code could not be reconciled into Visual state.',
+    };
+  }
+}
+
 function markerBackedEditConflict(
   phase: number,
 ): VisualCodeSyncResult {
@@ -2004,12 +2295,17 @@ export function reconcileVisualProjectFromCode(
 
   const phase11Project = phase11ProjectFromSourceMarker(source);
   if (phase11Project) {
+    const canonical = generatePhase11NativeSource(phase11Project);
+    if (source !== canonical) {
+      const edited = reconcileEditedPhase11Source(project, phase11Project, source);
+      if (edited) return edited;
+    }
     return reconcileMarkerBackedProject(
       11,
       project,
       phase11Project,
       source,
-      [generatePhase11NativeSource(phase11Project)],
+      [canonical],
       (next) => [generatePhase11NativeSource(next)],
     );
   }
