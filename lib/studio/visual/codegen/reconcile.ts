@@ -1711,251 +1711,61 @@ function reconcileRenderableCalls(
 
 function markerBackedEditConflict(
   phase: number,
-  source: string,
-  canonicalSource: string,
-): VisualCodeSyncResult | null {
-  if (source === canonicalSource) return null;
+): VisualCodeSyncResult {
   return {
     ok: false,
     error:
       'This Phase ' +
       phase +
-      ' generated-code edit cannot be reversed safely into Visual state. ' +
-      'Restore canonical Visual code or fork the edited source into Code Studio.',
+      ' generated-code edit changes code that Visual Studio cannot reverse safely. ' +
+      'Canvas and core visual edits can sync live; advanced runtime edits should be made in their Visual controls or forked to Code Studio.',
   };
 }
 
-export function reconcileVisualProjectFromCode(
+function projectSemantic(value: VisualProject): string {
+  return JSON.stringify({
+    width: value.document.width,
+    height: value.document.height,
+    canvas: value.document.canvas ?? {},
+    roots: value.document.rootNodeIds,
+    nodes: value.document.nodes,
+    assets: value.assets,
+    variables: value.variables,
+    palettes: value.palettes,
+    timelines: value.timelines,
+    operations: value.operations,
+    outputs: value.outputs,
+  });
+}
+
+function coreProjectSemantic(value: VisualProject): string {
+  return JSON.stringify({
+    width: value.document.width,
+    height: value.document.height,
+    canvas: value.document.canvas ?? {},
+    roots: value.document.rootNodeIds,
+    nodes: value.document.nodes,
+    operations: value.operations,
+  });
+}
+
+function stripStudioSourceMarker(source: string): string {
+  return source
+    .replace(
+      /^\s*\/\*\s*apexify-studio-v(?:9|10|11|12|13|14):[^*]+\*\/\s*/,
+      '',
+    )
+    .trim();
+}
+
+function reconcileCoreVisualProjectFromCode(
   project: VisualProject,
   source: string,
 ): VisualCodeSyncResult {
-  const phase14Project = phase14ProjectFromSourceMarker(source);
-  if (phase14Project) {
-    const validation = validateVisualProject(phase14Project);
-    if (!validation.ok) {
-      const problem = validation.issues.find((item) => item.severity === 'error');
-      return {
-        ok: false,
-        error: problem?.message ?? 'The Phase 14 source marker contains an invalid Visual Project.',
-      };
-    }
-    const phase14Conflict = markerBackedEditConflict(
-      14,
-      source,
-      generatePhase14NativeSource(phase14Project),
-    );
-    if (phase14Conflict) return phase14Conflict;
-
-    const semantic = (value: VisualProject) =>
-      JSON.stringify({
-        width: value.document.width,
-        height: value.document.height,
-        canvas: value.document.canvas ?? {},
-        roots: value.document.rootNodeIds,
-        nodes: value.document.nodes,
-        assets: value.assets,
-        variables: value.variables,
-        palettes: value.palettes,
-        timelines: value.timelines,
-        operations: value.operations,
-        outputs: value.outputs,
-      });
-    return {
-      ok: true,
-      project: structuredClone(phase14Project),
-      changed: semantic(phase14Project) !== semantic(project),
-    };
-  }
-
-  const phase13Project = phase13ProjectFromSourceMarker(source);
-  if (phase13Project) {
-    const validation = validateVisualProject(phase13Project);
-    if (!validation.ok) {
-      const problem = validation.issues.find((item) => item.severity === 'error');
-      return {
-        ok: false,
-        error: problem?.message ?? 'The Phase 13 source marker contains an invalid Visual Project.',
-      };
-    }
-    const phase13Conflict = markerBackedEditConflict(
-      13,
-      source,
-      generatePhase13NativeSource(phase13Project),
-    );
-    if (phase13Conflict) return phase13Conflict;
-
-    const semantic = (value: VisualProject) =>
-      JSON.stringify({
-        width: value.document.width,
-        height: value.document.height,
-        canvas: value.document.canvas ?? {},
-        roots: value.document.rootNodeIds,
-        nodes: value.document.nodes,
-        assets: value.assets,
-        variables: value.variables,
-        palettes: value.palettes,
-        timelines: value.timelines,
-        operations: value.operations,
-      });
-    return {
-      ok: true,
-      project: structuredClone(phase13Project),
-      changed: semantic(phase13Project) !== semantic(project),
-    };
-  }
-
-  const phase12Project = phase12ProjectFromSourceMarker(source);
-  if (phase12Project) {
-    const validation = validateVisualProject(phase12Project);
-    if (!validation.ok) {
-      const problem = validation.issues.find((item) => item.severity === 'error');
-      return {
-        ok: false,
-        error: problem?.message ?? 'The Phase 12 source marker contains an invalid Visual Project.',
-      };
-    }
-    const phase12Conflict = markerBackedEditConflict(
-      12,
-      source,
-      generatePhase12NativeSource(phase12Project),
-    );
-    if (phase12Conflict) return phase12Conflict;
-
-    const semantic = (value: VisualProject) =>
-      JSON.stringify({
-        width: value.document.width,
-        height: value.document.height,
-        canvas: value.document.canvas ?? {},
-        roots: value.document.rootNodeIds,
-        nodes: value.document.nodes,
-        assets: value.assets,
-        variables: value.variables,
-        palettes: value.palettes,
-        timelines: value.timelines,
-        operations: value.operations,
-      });
-    return {
-      ok: true,
-      project: structuredClone(phase12Project),
-      changed: semantic(phase12Project) !== semantic(project),
-    };
-  }
-
-  const phase11Project = phase11ProjectFromSourceMarker(source);
-  if (phase11Project) {
-    const validation = validateVisualProject(phase11Project);
-    if (!validation.ok) {
-      const problem = validation.issues.find((item) => item.severity === 'error');
-      return {
-        ok: false,
-        error: problem?.message ?? 'The Phase 11 source marker contains an invalid Visual Project.',
-      };
-    }
-    const phase11Conflict = markerBackedEditConflict(
-      11,
-      source,
-      generatePhase11NativeSource(phase11Project),
-    );
-    if (phase11Conflict) return phase11Conflict;
-
-    const semantic = (value: VisualProject) =>
-      JSON.stringify({
-        width: value.document.width,
-        height: value.document.height,
-        canvas: value.document.canvas ?? {},
-        roots: value.document.rootNodeIds,
-        nodes: value.document.nodes,
-        assets: value.assets,
-        variables: value.variables,
-        palettes: value.palettes,
-        timelines: value.timelines,
-        operations: value.operations,
-      });
-    return {
-      ok: true,
-      project: structuredClone(phase11Project),
-      changed: semantic(phase11Project) !== semantic(project),
-    };
-  }
-
-  const phase10Project = phase10ProjectFromSourceMarker(source);
-  if (phase10Project) {
-    const validation = validateVisualProject(phase10Project);
-    if (!validation.ok) {
-      const problem = validation.issues.find((item) => item.severity === 'error');
-      return {
-        ok: false,
-        error: problem?.message ?? 'The Phase 10 source marker contains an invalid Visual Project.',
-      };
-    }
-    const phase10NativeSource = generatePhase10NativeSource(phase10Project);
-    const phase10DisplaySource = generatePhase10DisplayPreviewSource(phase10Project);
-    const phase10Conflict =
-      source === phase10DisplaySource
-        ? null
-        : markerBackedEditConflict(10, source, phase10NativeSource);
-    if (phase10Conflict) return phase10Conflict;
-
-    const semantic = (value: VisualProject) =>
-      JSON.stringify({
-        width: value.document.width,
-        height: value.document.height,
-        canvas: value.document.canvas ?? {},
-        roots: value.document.rootNodeIds,
-        nodes: value.document.nodes,
-        assets: value.assets,
-        variables: value.variables,
-        palettes: value.palettes,
-        operations: value.operations,
-      });
-    return {
-      ok: true,
-      project: structuredClone(phase10Project),
-      changed: semantic(phase10Project) !== semantic(project),
-    };
-  }
-
-  const phase9Project = phase9ProjectFromSourceMarker(source);
-  if (phase9Project) {
-    const validation = validateVisualProject(phase9Project);
-    if (!validation.ok) {
-      const problem = validation.issues.find((item) => item.severity === 'error');
-      return {
-        ok: false,
-        error: problem?.message ?? 'The Phase 9 source marker contains an invalid Visual Project.',
-      };
-    }
-    const phase9Conflict = markerBackedEditConflict(
-      9,
-      source,
-      generatePhase9NativeSource(phase9Project),
-    );
-    if (phase9Conflict) return phase9Conflict;
-
-    const semantic = (value: VisualProject) =>
-      JSON.stringify({
-        width: value.document.width,
-        height: value.document.height,
-        canvas: value.document.canvas ?? {},
-        roots: value.document.rootNodeIds,
-        nodes: value.document.nodes,
-        assets: value.assets,
-        variables: value.variables,
-        palettes: value.palettes,
-        operations: value.operations,
-      });
-    return {
-      ok: true,
-      project: structuredClone(phase9Project),
-      changed: semantic(phase9Project) !== semantic(project),
-    };
-  }
-
   if (!/\bApexPainter\b/.test(source)) {
     return {
       ok: false,
-      error:
-        'Code must use ApexPainter so Visual Studio can reconcile it.',
+      error: 'Code must use ApexPainter so Visual Studio can reconcile it.',
     };
   }
 
@@ -1978,8 +1788,7 @@ export function reconcileVisualProjectFromCode(
     ) {
       return {
         ok: false,
-        error:
-          'Canvas width and height must be between 1 and 16384.',
+        error: 'Canvas width and height must be between 1 and 16384.',
       };
     }
 
@@ -2017,20 +1826,10 @@ export function reconcileVisualProjectFromCode(
       };
     }
 
-    const semantic = (value: VisualProject) =>
-      JSON.stringify({
-        width: value.document.width,
-        height: value.document.height,
-        canvas: value.document.canvas ?? {},
-        roots: value.document.rootNodeIds,
-        nodes: value.document.nodes,
-        operations: value.operations,
-      });
-
     return {
       ok: true,
       project: next,
-      changed: semantic(next) !== semantic(project),
+      changed: coreProjectSemantic(next) !== coreProjectSemantic(project),
     };
   } catch (error) {
     return {
@@ -2041,6 +1840,142 @@ export function reconcileVisualProjectFromCode(
           : 'Visual code could not be reconciled.',
     };
   }
+}
+
+function reconcileMarkerBackedProject(
+  phase: number,
+  currentProject: VisualProject,
+  markerProject: VisualProject,
+  source: string,
+  canonicalSources: readonly string[],
+  regenerateSources: (project: VisualProject) => readonly string[],
+): VisualCodeSyncResult {
+  const validation = validateVisualProject(markerProject);
+  if (!validation.ok) {
+    const problem = validation.issues.find((item) => item.severity === 'error');
+    return {
+      ok: false,
+      error:
+        problem?.message ??
+        'The Phase ' + phase + ' source marker contains an invalid Visual Project.',
+    };
+  }
+
+  if (canonicalSources.includes(source)) {
+    return {
+      ok: true,
+      project: structuredClone(markerProject),
+      changed: projectSemantic(markerProject) !== projectSemantic(currentProject),
+    };
+  }
+
+  // Phase 9-14 source contains a project marker for advanced semantics. We
+  // still allow edits to the canonical canvas/core drawing code by applying
+  // the ordinary reverse compiler to the marker project, then regenerating
+  // the advanced source. If the edited body is exactly representable by that
+  // regenerated project, the edit is safe and becomes Visual state.
+  const coreResult = reconcileCoreVisualProjectFromCode(markerProject, source);
+  if (!coreResult.ok) return coreResult;
+
+  const editedBody = stripStudioSourceMarker(source);
+  const regeneratedBodies = regenerateSources(coreResult.project)
+    .map(stripStudioSourceMarker);
+
+  if (!regeneratedBodies.includes(editedBody)) {
+    return markerBackedEditConflict(phase);
+  }
+
+  return {
+    ok: true,
+    project: coreResult.project,
+    changed:
+      projectSemantic(coreResult.project) !== projectSemantic(currentProject),
+  };
+}
+
+export function reconcileVisualProjectFromCode(
+  project: VisualProject,
+  source: string,
+): VisualCodeSyncResult {
+  const phase14Project = phase14ProjectFromSourceMarker(source);
+  if (phase14Project) {
+    return reconcileMarkerBackedProject(
+      14,
+      project,
+      phase14Project,
+      source,
+      [generatePhase14NativeSource(phase14Project)],
+      (next) => [generatePhase14NativeSource(next)],
+    );
+  }
+
+  const phase13Project = phase13ProjectFromSourceMarker(source);
+  if (phase13Project) {
+    return reconcileMarkerBackedProject(
+      13,
+      project,
+      phase13Project,
+      source,
+      [generatePhase13NativeSource(phase13Project)],
+      (next) => [generatePhase13NativeSource(next)],
+    );
+  }
+
+  const phase12Project = phase12ProjectFromSourceMarker(source);
+  if (phase12Project) {
+    return reconcileMarkerBackedProject(
+      12,
+      project,
+      phase12Project,
+      source,
+      [generatePhase12NativeSource(phase12Project)],
+      (next) => [generatePhase12NativeSource(next)],
+    );
+  }
+
+  const phase11Project = phase11ProjectFromSourceMarker(source);
+  if (phase11Project) {
+    return reconcileMarkerBackedProject(
+      11,
+      project,
+      phase11Project,
+      source,
+      [generatePhase11NativeSource(phase11Project)],
+      (next) => [generatePhase11NativeSource(next)],
+    );
+  }
+
+  const phase10Project = phase10ProjectFromSourceMarker(source);
+  if (phase10Project) {
+    return reconcileMarkerBackedProject(
+      10,
+      project,
+      phase10Project,
+      source,
+      [
+        generatePhase10NativeSource(phase10Project),
+        generatePhase10DisplayPreviewSource(phase10Project),
+      ],
+      (next) => [
+        generatePhase10NativeSource(next),
+        generatePhase10DisplayPreviewSource(next),
+      ],
+    );
+  }
+
+  const phase9Project = phase9ProjectFromSourceMarker(source);
+  if (phase9Project) {
+    return reconcileMarkerBackedProject(
+      9,
+      project,
+      phase9Project,
+      source,
+      [generatePhase9NativeSource(phase9Project)],
+      (next) => [generatePhase9NativeSource(next)],
+    );
+  }
+
+  return reconcileCoreVisualProjectFromCode(project, source);
 }
 
 export function safeVisualDownloadStem(value: string): string {
