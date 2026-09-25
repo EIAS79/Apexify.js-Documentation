@@ -122,9 +122,12 @@ function generatedBody(project: VisualProject, timeline: Phase11Timeline) {
   } else if (timeline.mode === 'scene-gif') {
     const sceneProject = resolvedSceneProject(project);
     const scene = phase9RootSceneDefinition(sceneProject);
-    const sceneFrames = frames.map((frame) => ({
+    // Scene GIF accepts per-frame repeat natively. Keep the authored repeat
+    // visible in generated code so edits in Live Code can round-trip back to
+    // the Visual timeline without expanding one frame into duplicate rows.
+    const sceneFrames = timeline.frames.map((frame) => ({
       ...gifInputFrame(frame),
-      repeat: 1,
+      repeat: Math.max(1, Math.round(frame.repeat ?? 1)),
     }));
     lines.push(
       '  const scene = ' + emitValue(scene, 2).replace(/\n/g, '\n  ') + ';',
