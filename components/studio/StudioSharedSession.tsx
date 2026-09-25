@@ -95,7 +95,9 @@ export function StudioSharedSessionProvider({ children }: { children: ReactNode 
     if (!assetStorageReady) return;
     window.clearTimeout(assetPersistTimerRef.current);
     assetPersistTimerRef.current = window.setTimeout(() => {
-      void savePersistedStudioAssets(assets);
+      void savePersistedStudioAssets(assets).catch(() => {
+        // Persistence is best-effort; keep the active in-memory Studio session usable.
+      });
     }, 120);
     return () => window.clearTimeout(assetPersistTimerRef.current);
   }, [assetStorageReady, assets]);
