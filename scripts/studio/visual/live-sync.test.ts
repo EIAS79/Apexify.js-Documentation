@@ -9,6 +9,46 @@ import {
   setPhase11Timeline,
 } from '../../../lib/studio/visual/gif-animation-contract';
 
+test('live code reconciler resolves customBg.inherit from Studio asset metadata', () => {
+  const project = createVisualProject({
+    id: 'project_sync_inherit',
+    name: 'Inherited background',
+    width: 1540,
+    height: 900,
+    now: '2026-09-26T00:00:00.000Z',
+  });
+  const source = `
+    import { ApexPainter } from 'apexify.js';
+    const painter = new ApexPainter();
+    const canvas = await painter.createCanvas({
+      customBg: {
+        source: 'studio://asset/hero',
+        inherit: true
+      }
+    });
+    return canvas.buffer;
+  `;
+
+  const result = reconcileVisualProjectFromCode(
+    project,
+    source,
+    (assetSource) =>
+      assetSource === 'studio://asset/hero'
+        ? { width: 2048, height: 682 }
+        : null,
+  );
+
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+  assert.equal(result.project.document.width, 2048);
+  assert.equal(result.project.document.height, 682);
+  assert.equal(result.project.document.canvas?.customBg?.inherit, true);
+  assert.equal(
+    result.project.document.canvas?.customBg?.source,
+    'studio://asset/hero',
+  );
+});
+
 test('live code reconciler applies numeric createCanvas dimensions without evaluation', () => {
   const project = createVisualProject({
     id: 'project_sync',

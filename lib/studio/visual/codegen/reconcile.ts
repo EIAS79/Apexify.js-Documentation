@@ -67,6 +67,10 @@ export type VisualCodeSyncResult =
   | { ok: true; project: VisualProject; changed: boolean }
   | { ok: false; error: string };
 
+export type VisualInheritedCanvasDimensionResolver = (
+  source: string,
+) => { width: number; height: number } | null;
+
 type Jsonish =
   | null
   | boolean
@@ -2052,6 +2056,7 @@ function stripStudioSourceMarker(source: string): string {
 function reconcileCoreVisualProjectFromCode(
   project: VisualProject,
   source: string,
+  resolveInheritedCanvasDimensions?: VisualInheritedCanvasDimensionResolver,
 ): VisualCodeSyncResult {
   if (!/\bApexPainter\b/.test(source)) {
     return {
@@ -2062,13 +2067,29 @@ function reconcileCoreVisualProjectFromCode(
 
   try {
     const canvasCall = parseCanvasOptions(source);
-    const width = canvasCall.options.width;
-    const height = canvasCall.options.height;
+    let width = canvasCall.options.width;
+    let height = canvasCall.options.height;
+
+    const customBg = isRecord(canvasCall.options.customBg)
+      ? canvasCall.options.customBg
+      : null;
+    if (
+      customBg?.inherit === true &&
+      typeof customBg.source === 'string' &&
+      resolveInheritedCanvasDimensions
+    ) {
+      const inherited = resolveInheritedCanvasDimensions(customBg.source);
+      if (inherited) {
+        width = inherited.width;
+        height = inherited.height;
+      }
+    }
+
     if (typeof width !== 'number' || typeof height !== 'number') {
       return {
         ok: false,
         error:
-          'createCanvas width and height must be numeric literals for live Visual sync.',
+          'createCanvas needs numeric width/height, or customBg.inherit with a resolvable image asset, for live Visual sync.',
       };
     }
     if (
@@ -2256,6 +2277,7 @@ function reconcileMarkerBackedProject(
 export function reconcileVisualProjectFromCode(
   project: VisualProject,
   source: string,
+  resolveInheritedCanvasDimensions?: VisualInheritedCanvasDimensionResolver,
 ): VisualCodeSyncResult {
   const phase14Project = phase14ProjectFromSourceMarker(source);
   if (phase14Project) {
@@ -2340,7 +2362,11 @@ export function reconcileVisualProjectFromCode(
     );
   }
 
-  return reconcileCoreVisualProjectFromCode(project, source);
+  return reconcileCoreVisualProjectFromCode(
+    project,
+    source,
+    resolveInheritedCanvasDimensions,
+  );
 }
 
 export function safeVisualDownloadStem(value: string): string {

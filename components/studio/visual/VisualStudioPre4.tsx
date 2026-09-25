@@ -706,6 +706,28 @@ export default function VisualStudioPre4({
 
   const filteredAssets = assets.filter((asset) => assetKind(asset.mime) === assetFilter);
 
+  const resolveInheritedCanvasDimensions = (source: string) => {
+    const assetId = studioAssetIdFromReference(source);
+    if (!assetId) return null;
+    const asset = assets.find((item) => item.id === assetId);
+    const width = asset?.metadata?.width;
+    const height = asset?.metadata?.height;
+    if (
+      typeof width !== 'number' ||
+      typeof height !== 'number' ||
+      !Number.isFinite(width) ||
+      !Number.isFinite(height) ||
+      width < 1 ||
+      height < 1
+    ) {
+      return null;
+    }
+    return {
+      width: Math.round(width),
+      height: Math.round(height),
+    };
+  };
+
   const generated = useMemo(() => {
     try {
       return { value: generateVisualProjectCode(project), error: null };
@@ -830,6 +852,7 @@ export default function VisualStudioPre4({
         const retried = reconcileVisualProjectFromCode(
           recoveredProject,
           recoveredCodeSource,
+          resolveInheritedCanvasDimensions,
         );
         if (retried.ok) {
           recoveredProject = retried.project;
@@ -966,7 +989,11 @@ export default function VisualStudioPre4({
       return false;
     }
 
-    const result = reconcileVisualProjectFromCode(current, source);
+    const result = reconcileVisualProjectFromCode(
+      current,
+      source,
+      resolveInheritedCanvasDimensions,
+    );
     if (!result.ok) {
       setCodeSyncState('error');
       setCodeSyncError(result.error);
@@ -1134,6 +1161,60 @@ export default function VisualStudioPre4({
         'Recovered project references assets that differ from persisted Studio assets. Missing bytes were not fabricated.',
       );
     }
+  }, [assetStorageReady, assets]);
+
+  useEffect(() => {
+    if (!assetStorageReady) return;
+    const current = projectRef.current;
+    const customBg = current.document.canvas?.customBg;
+    if (!customBg?.inherit) return;
+    const dimensions = resolveInheritedCanvasDimensions(customBg.source);
+    if (!dimensions) return;
+    if (
+      current.document.width === dimensions.width &&
+      current.document.height === dimensions.height
+    ) {
+      return;
+    }
+
+    didInitialFit.current = false;
+    setProject((projectState) => {
+      const activeBg = projectState.document.canvas?.customBg;
+      if (!activeBg?.inherit || activeBg.source !== customBg.source) {
+        return projectState;
+      }
+      const next = structuredClone(projectState);
+      next.document.width = dimensions.width;
+      next.document.height = dimensions.height;
+      next.updatedAt = new Date().toISOString();
+      projectRef.current = next;
+      return next;
+    });
+    setMessage(
+      'Canvas inherited source resolution · ' +
+        dimensions.width +
+        ' × ' +
+        dimensions.height,
+    );
+  }, [
+    assetStorageReady,
+    assets,
+    project.document.canvas?.customBg?.source,
+    project.document.canvas?.customBg?.inherit,
+  ]);
+
+  useEffect(() => {
+    if (
+      !assetStorageReady ||
+      codeSyncState !== 'error' ||
+      !codeSource.includes('inherit')
+    ) {
+      return;
+    }
+    applyCodeToVisual(
+      codeSource,
+      semanticSignature(projectRef.current),
+    );
   }, [assetStorageReady, assets]);
 
   useEffect(() => {

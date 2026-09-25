@@ -180,6 +180,21 @@ test('PRE-4 renders the edited lower code source directly for live artboard feed
   assert.match(shell, /\}, 100\);/);
 });
 
+test('PRE-4 keeps inherited image dimensions native in the Visual artboard', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const css = read('styles/studio-calm.css');
+  const reconcile = read('lib/studio/visual/codegen/reconcile.ts');
+
+  assert.match(shell, /resolveInheritedCanvasDimensions/);
+  assert.match(shell, /studioAssetIdFromReference/);
+  assert.match(shell, /Canvas inherited source resolution/);
+  assert.match(shell, /reconcileVisualProjectFromCode\(\s*current,\s*source,\s*resolveInheritedCanvasDimensions/);
+  assert.match(reconcile, /customBg\?\.inherit === true/);
+  assert.match(reconcile, /resolvable image asset/);
+  assert.match(css, /apx-pre4-authoritative-frame[\s\S]*object-fit:contain/);
+});
+
+
 
 
 test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
