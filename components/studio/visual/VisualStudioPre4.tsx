@@ -1351,11 +1351,23 @@ export default function VisualStudioPre4({
 
   useEffect(() => {
     window.clearTimeout(artboardPreviewTimerRef.current);
-    if (!active || !previewGenerated.value) return;
+    if (!active || (!codeSource.trim() && !previewGenerated.value)) return;
     if (phase13Active || phase12Active) {
       setArtboardPreviewUrl(null);
       return;
     }
+
+    // The lower editor is a live rendering source, not merely generated text.
+    // Render edited code directly so valid code changes become visible even
+    // while reverse reconciliation is still deciding whether the Visual model
+    // can represent the same edit.
+    const source = codeSource.trim()
+      ? codeSource
+      : previewGenerated.value!.source;
+    const displaySource =
+      codeSyncState === 'synced'
+        ? displayPreviewGenerated.value?.source ?? source
+        : source;
 
     let cancelled = false;
     artboardPreviewTimerRef.current = window.setTimeout(() => {
@@ -1363,8 +1375,8 @@ export default function VisualStudioPre4({
         setArtboardPreviewBusy(true);
         try {
           const result = await renderAuthoritativeVisualSource(
-            previewGenerated.value!.source,
-            displayPreviewGenerated.value?.source ?? previewGenerated.value!.source,
+            source,
+            displaySource,
           );
           if (cancelled) return;
           if (result.ok) {
@@ -1372,12 +1384,12 @@ export default function VisualStudioPre4({
             setPhase7Results(result.results);
           }
         } catch {
-          // Keep the last authoritative frame while the next valid frame is built.
+          // Keep the last valid frame while the user is between valid edits.
         } finally {
           if (!cancelled) setArtboardPreviewBusy(false);
         }
       })();
-    }, 180);
+    }, 100);
 
     return () => {
       cancelled = true;
@@ -1386,6 +1398,8 @@ export default function VisualStudioPre4({
   }, [
     active,
     assets,
+    codeSource,
+    codeSyncState,
     previewGenerated.value?.source,
     displayPreviewGenerated.value?.source,
     phase10Active,
