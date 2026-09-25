@@ -35,6 +35,19 @@ function createCanvasProject() {
       scale: 1,
       offsetX: 0,
       offsetY: 0,
+      gradient: {
+        type: 'linear',
+        startX: 0,
+        startY: 0,
+        endX: 960,
+        endY: 0,
+        angle: 0,
+        repeat: 'no-repeat',
+        colors: [
+          { stop: 0, color: '#315078' },
+          { stop: 1, color: '#7c3aed' },
+        ],
+      },
     },
     noiseBg: { intensity: 0.03 },
     bgLayers: [
@@ -168,23 +181,47 @@ test('Phase 4 rejects conflicting primary backgrounds and unsafe dynamic canvas 
   assert.equal(dynamic.ok, false);
 });
 
-test('Phase 4 shell exposes Canvas controls in the permanent inspector architecture', () => {
+test('Phase 4 shell exposes the complete createCanvas inspector contract', () => {
   const shell = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
+  const inspector = fs.readFileSync('components/studio/visual/VisualCanvasInspector.tsx', 'utf8');
+
+  assert.match(shell, /VisualCanvasInspector/);
+  assert.doesNotMatch(shell, /renderCanvasStyle/);
+  assert.doesNotMatch(shell, /Apply complete CanvasConfig/);
+
   for (const contract of [
-    'data-canvas-section="background"',
-    'data-canvas-section="appearance"',
-    'data-canvas-section="stroke"',
-    'data-canvas-section="shadow"',
-    'data-canvas-section="pattern"',
-    'data-canvas-section="noise"',
-    'data-canvas-section="background-layers"',
-    'data-canvas-section="complete-config"',
-    'Apply complete CanvasConfig',
+    'data-canvas-inspector-v2',
+    'createCanvas()',
+    'Base surface',
+    'customBg.source',
+    'Inherit source dimensions',
+    'Image filters',
     'Video background',
-    'Background image filters',
-    'Live Code Sync',
+    'Pattern overlay',
+    'Noise overlay',
+    'Background layers',
+    'Internal zoom',
+    'Stroke',
+    'Shadow',
+    'Blend mode',
+    'Border position',
+    'Canvas opacity',
+    'width / height',
+    'transparentBase',
+    'bgLayers',
+    'patternBg',
+    'noiseBg',
+    'videoBg',
+    'customBg',
   ]) {
-    assert.ok(shell.includes(contract), 'missing Canvas UI contract: ' + contract);
+    assert.ok(inspector.includes(contract), 'missing Canvas V2 UI contract: ' + contract);
   }
-  assert.doesNotMatch(shell, /Canvas Output/);
+
+  for (const filterType of [
+    'gaussianBlur','motionBlur','radialBlur','sharpen','noise','grain',
+    'edgeDetection','emboss','invert','grayscale','sepia','pixelate',
+    'brightness','contrast','saturation','hueShift','posterize',
+  ]) {
+    assert.ok(inspector.includes(filterType), 'missing Canvas filter UI: ' + filterType);
+  }
 });

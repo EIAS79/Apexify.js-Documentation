@@ -76,6 +76,9 @@ import {
   VisualAdvancedContext,
   VisualAdvancedInspector,
 } from '@/components/studio/visual/VisualAdvancedAuthoring';
+import {
+  VisualCanvasInspector,
+} from '@/components/studio/visual/VisualCanvasInspector';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import {
   STUDIO_ASSET_LIMITS,
@@ -146,29 +149,15 @@ import {
   type Phase17AssetManifestEntry,
 } from '@/lib/studio/visual/hardening';
 import type {
-  VisualBackgroundLayer,
-  VisualBlendMode,
   VisualCanvasConfig,
-  VisualGradient,
-  VisualImageFilter,
   VisualImageNodeProps,
   VisualNode,
-  VisualPatternOptions,
   VisualProject,
   VisualShapeType,
   VisualTextNodeProps,
   VisualTransform,
   VisualValue,
 } from '@/lib/studio/visual/model';
-import {
-  CANVAS_ALIGNMENTS,
-  CANVAS_BLEND_MODES,
-  CANVAS_FITS,
-  CANVAS_PATTERN_TYPES,
-  defaultBackgroundLayer,
-  defaultCanvasGradient,
-  defaultCanvasPattern,
-} from '@/lib/studio/visual/canvas-contract';
 import {
   IMAGE_ALIGNS,
   IMAGE_BLEND_MODES,
@@ -486,14 +475,6 @@ function movePathHandle(
   return next;
 }
 
-function canvasBaseMode(canvas: VisualCanvasConfig): 'default' | 'color' | 'gradient' | 'image' | 'transparent' {
-  if (canvas.customBg) return 'image';
-  if (canvas.gradientBg) return 'gradient';
-  if (canvas.colorBg !== undefined) return 'color';
-  if (canvas.transparentBase) return 'transparent';
-  return 'default';
-}
-
 function canvasArtboardBackground(canvas: VisualCanvasConfig): string {
   if (canvas.transparentBase) return 'transparent';
   if (canvas.colorBg !== undefined) return canvas.colorBg || '#000000';
@@ -507,12 +488,6 @@ function canvasArtboardBackground(canvas: VisualCanvasConfig): string {
     return 'linear-gradient(' + (gradient.rotate ?? 90) + 'deg, ' + stops + ')';
   }
   return '#000000';
-}
-
-function parseFilterJson(value: string): VisualImageFilter[] {
-  const parsed = JSON.parse(value);
-  if (!Array.isArray(parsed)) throw new Error('Filters JSON must be an array.');
-  return parsed as VisualImageFilter[];
 }
 
 export default function VisualStudioPre4({
@@ -557,7 +532,7 @@ export default function VisualStudioPre4({
   const [layersCollapsed, setLayersCollapsed] = useState(false);
   const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
   const [layersWidth, setLayersWidth] = useState(274);
-  const [inspectorWidth, setInspectorWidth] = useState(330);
+  const [inspectorWidth, setInspectorWidth] = useState(372);
   const [dockHeight, setDockHeight] = useState(204);
   const [assetFilter, setAssetFilter] = useState<'image' | 'font' | 'audio' | 'video'>('image');
   const [codeSource, setCodeSource] = useState('');
@@ -576,10 +551,6 @@ export default function VisualStudioPre4({
   const [modalPreviewFileName, setModalPreviewFileName] = useState('preview.png');
   const [modalPreviewLoading, setModalPreviewLoading] = useState(false);
   const [modalPreviewError, setModalPreviewError] = useState<string | null>(null);
-  const [canvasFiltersDraft, setCanvasFiltersDraft] = useState('[]');
-  const [canvasFiltersError, setCanvasFiltersError] = useState<string | null>(null);
-  const [canvasConfigDraft, setCanvasConfigDraft] = useState('{}');
-  const [canvasConfigError, setCanvasConfigError] = useState<string | null>(null);
   const [imageUrlDraft, setImageUrlDraft] = useState('');
   const [imageConfigDraft, setImageConfigDraft] = useState('{}');
   const [imageConfigError, setImageConfigError] = useState<string | null>(null);
@@ -1224,7 +1195,7 @@ export default function VisualStudioPre4({
       if (resize.kind === 'layers') {
         setLayersWidth(Math.max(190, Math.min(420, resize.initial + event.clientX - resize.start)));
       } else if (resize.kind === 'inspector') {
-        setInspectorWidth(Math.max(240, Math.min(460, resize.initial - (event.clientX - resize.start))));
+        setInspectorWidth(Math.max(300, Math.min(540, resize.initial - (event.clientX - resize.start))));
       } else {
         setDockHeight(Math.max(120, Math.min(480, resize.initial - (event.clientY - resize.start))));
       }
@@ -1526,72 +1497,6 @@ export default function VisualStudioPre4({
         canvas: updater(current.document.canvas ?? {}),
       },
     }));
-
-  const setCanvasBaseMode = (
-    mode: 'default' | 'color' | 'gradient' | 'image' | 'transparent',
-  ) =>
-    mutateCanvas('Canvas background', (current) => {
-      const next = { ...current };
-      delete next.colorBg;
-      delete next.gradientBg;
-      delete next.customBg;
-      next.transparentBase = mode === 'transparent';
-      if (mode === 'color') next.colorBg = '#0b1730';
-      if (mode === 'gradient') next.gradientBg = defaultCanvasGradient();
-      if (mode === 'image') {
-        next.customBg = {
-          source: '',
-          fit: 'cover',
-          align: 'center',
-          opacity: 1,
-          filters: [],
-        };
-      }
-      if (mode === 'default') delete next.transparentBase;
-      return next;
-    });
-
-  const setGradientStop = (
-    index: number,
-    patch: Partial<VisualGradient['colors'][number]>,
-  ) => {
-    updateCanvasDraft((current) => {
-      const gradient = current.gradientBg ?? defaultCanvasGradient();
-      const colors = gradient.colors.map((stop, stopIndex) =>
-        stopIndex === index ? { ...stop, ...patch } : stop,
-      );
-      return { ...current, gradientBg: { ...gradient, colors } as VisualGradient };
-    });
-  };
-
-  const updatePattern = (patch: Partial<VisualPatternOptions>) =>
-    updateCanvasDraft((current) => ({
-      ...current,
-      patternBg: { ...(current.patternBg ?? defaultCanvasPattern()), ...patch },
-    }));
-
-  const updateBackgroundLayer = (
-    index: number,
-    updater: (layer: VisualBackgroundLayer) => VisualBackgroundLayer,
-  ) =>
-    updateCanvasDraft((current) => ({
-      ...current,
-      bgLayers: (current.bgLayers ?? []).map((layer, layerIndex) =>
-        layerIndex === index ? updater(layer) : layer,
-      ),
-    }));
-
-  useEffect(() => {
-    setCanvasFiltersDraft(
-      JSON.stringify(project.document.canvas?.customBg?.filters ?? [], null, 2),
-    );
-    setCanvasFiltersError(null);
-  }, [project.document.canvas?.customBg?.filters]);
-
-  useEffect(() => {
-    setCanvasConfigDraft(JSON.stringify(project.document.canvas ?? {}, null, 2));
-    setCanvasConfigError(null);
-  }, [project.document.canvas]);
 
   const primaryMedia =
     primary && (primary.kind === 'image' || primary.kind === 'shape')
@@ -4144,588 +4049,33 @@ export default function VisualStudioPre4({
     );
   };
 
-  const renderCanvasHeader = () => (
-    <div className="apx-pre4-inspector-title">
-      <div>
-        <strong>{project.name}</strong>
-        <small>Canvas document · Phase 4</small>
-      </div>
-      <span className="apx-pre4-type-pill">canvas</span>
-    </div>
+  const renderCanvasInspector = () => (
+    <VisualCanvasInspector
+      project={project}
+      tab={inspectorTab}
+      assets={assets}
+      onRename={renameCanvas}
+      onBeginEdit={beginPropertyEdit}
+      onEndEdit={endPropertyEdit}
+      onDraft={updateCanvasDraft}
+      onMutate={mutateCanvas}
+      onResizeDraft={(key, value) => {
+        setProject((current) => {
+          const next = {
+            ...current,
+            updatedAt: new Date().toISOString(),
+            document: {
+              ...current.document,
+              [key]: value,
+            },
+          };
+          projectRef.current = next;
+          return next;
+        });
+      }}
+      onMessage={setMessage}
+    />
   );
-
-  const renderCanvasStyle = () => {
-    const canvas = project.document.canvas ?? {};
-    const mode = canvasBaseMode(canvas);
-    const gradient = canvas.gradientBg ?? defaultCanvasGradient();
-    const customBg = canvas.customBg;
-
-    return (
-      <>
-        {renderCanvasHeader()}
-        <div className="apx-pre4-property">
-          <label>Canvas name</label>
-          <input
-            className="apx-pre4-input"
-            aria-label="Canvas name"
-            value={project.name}
-            onFocus={beginPropertyEdit}
-            onChange={(event) => renameCanvas(event.target.value)}
-            onBlur={() => endPropertyEdit('Rename canvas')}
-          />
-        </div>
-
-        <div className="apx-pre4-section" data-canvas-section="background">
-          <div className="apx-pre4-section-title">Base background</div>
-          <select
-            className="apx-pre4-input"
-            aria-label="Canvas base background"
-            data-canvas-base-mode
-            value={mode}
-            onChange={(event) => setCanvasBaseMode(event.target.value as typeof mode)}
-          >
-            <option value="default">Default black</option>
-            <option value="color">Solid color</option>
-            <option value="gradient">Gradient</option>
-            <option value="image">Image / asset</option>
-            <option value="transparent">Transparent</option>
-          </select>
-
-          {mode === 'color' ? (
-            <div className="apx-canvas-color-row">
-              <input
-                aria-label="Canvas background color"
-                type="color"
-                value={canvas.colorBg || '#000000'}
-                onChange={(event) => updateCanvasDraft((current) => ({ ...current, colorBg: event.target.value }))}
-              />
-              <input
-                className="apx-pre4-input"
-                data-canvas-color-text
-                value={canvas.colorBg || '#000000'}
-                onFocus={beginPropertyEdit}
-                onChange={(event) => updateCanvasDraft((current) => ({ ...current, colorBg: event.target.value }))}
-                onBlur={() => endPropertyEdit('Canvas color')}
-              />
-            </div>
-          ) : null}
-
-          {mode === 'gradient' ? (
-            <div className="apx-canvas-stack">
-              <label className="apx-canvas-field">
-                <span>Type</span>
-                <select
-                  className="apx-pre4-input"
-                  value={gradient.type}
-                  onChange={(event) => {
-                    const type = event.target.value as VisualGradient['type'];
-                    mutateCanvas('Gradient type', (current) => ({
-                      ...current,
-                      gradientBg:
-                        type === 'radial'
-                          ? { type, colors: gradient.colors, startX: 0, startY: 0, startRadius: 0, endX: project.document.width / 2, endY: project.document.height / 2, endRadius: Math.max(project.document.width, project.document.height) / 2 }
-                          : type === 'conic'
-                            ? { type, colors: gradient.colors, centerX: project.document.width / 2, centerY: project.document.height / 2, startAngle: 0 }
-                            : { type, colors: gradient.colors, rotate: 90 },
-                    }));
-                  }}
-                >
-                  <option value="linear">Linear</option>
-                  <option value="radial">Radial</option>
-                  <option value="conic">Conic</option>
-                </select>
-              </label>
-              {gradient.type !== 'radial' ? (
-                <label className="apx-canvas-field">
-                  <span>{gradient.type === 'conic' ? 'Start angle' : 'Rotation'}</span>
-                  <input
-                    className="apx-pre4-input"
-                    type="number"
-                    value={gradient.type === 'conic' ? (gradient.startAngle ?? 0) : (gradient.rotate ?? 90)}
-                    onFocus={beginPropertyEdit}
-                    onChange={(event) => updateCanvasDraft((current) => ({
-                      ...current,
-                      gradientBg: {
-                        ...(current.gradientBg ?? gradient),
-                        ...(gradient.type === 'conic'
-                          ? { startAngle: Number(event.target.value) }
-                          : { rotate: Number(event.target.value) }),
-                      } as VisualGradient,
-                    }))}
-                    onBlur={() => endPropertyEdit('Gradient geometry')}
-                  />
-                </label>
-              ) : null}
-              <div className="apx-canvas-gradient-stops">
-                {gradient.colors.map((stop, index) => (
-                  <div key={index}>
-                    <input
-                      aria-label={'Gradient stop ' + (index + 1) + ' color'}
-                      type="color"
-                      value={stop.color}
-                      onChange={(event) => setGradientStop(index, { color: event.target.value })}
-                    />
-                    <input
-                      className="apx-pre4-input"
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={Math.round(stop.stop * 100)}
-                      onChange={(event) => setGradientStop(index, { stop: Math.max(0, Math.min(1, Number(event.target.value) / 100)) })}
-                    />
-                    <button
-                      type="button"
-                      disabled={gradient.colors.length <= 2}
-                      onClick={() => mutateCanvas('Remove gradient stop', (current) => ({
-                        ...current,
-                        gradientBg: {
-                          ...(current.gradientBg ?? gradient),
-                          colors: (current.gradientBg ?? gradient).colors.filter((_, stopIndex) => stopIndex !== index),
-                        } as VisualGradient,
-                      }))}
-                    >×</button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => mutateCanvas('Add gradient stop', (current) => {
-                    const active = current.gradientBg ?? gradient;
-                    return {
-                      ...current,
-                      gradientBg: {
-                        ...active,
-                        colors: [...active.colors, { stop: 1, color: '#ffffff' }].sort((a, b) => a.stop - b.stop),
-                      } as VisualGradient,
-                    };
-                  })}
-                >＋ Add stop</button>
-              </div>
-            </div>
-          ) : null}
-
-          {mode === 'image' && customBg ? (
-            <div className="apx-canvas-stack">
-              <label className="apx-canvas-field">
-                <span>Source</span>
-                <input
-                  className="apx-pre4-input"
-                  placeholder="studio://asset/... or https://..."
-                  value={customBg.source}
-                  onFocus={beginPropertyEdit}
-                  onChange={(event) => updateCanvasDraft((current) => ({
-                    ...current,
-                    customBg: { ...(current.customBg ?? customBg), source: event.target.value },
-                  }))}
-                  onBlur={() => endPropertyEdit('Canvas image source')}
-                />
-              </label>
-              <div className="apx-pre4-property-grid">
-                <label>
-                  <span>Fit</span>
-                  <select
-                    className="apx-pre4-input"
-                    value={customBg.fit ?? 'cover'}
-                    onChange={(event) => mutateCanvas('Background fit', (current) => ({
-                      ...current,
-                      customBg: { ...(current.customBg ?? customBg), fit: event.target.value as 'fill' | 'contain' | 'cover' },
-                    }))}
-                  >
-                    {CANVAS_FITS.map((fit) => <option key={fit} value={fit}>{fit}</option>)}
-                  </select>
-                </label>
-                <label>
-                  <span>Align</span>
-                  <select
-                    className="apx-pre4-input"
-                    value={customBg.align ?? 'center'}
-                    onChange={(event) => mutateCanvas('Background alignment', (current) => ({
-                      ...current,
-                      customBg: { ...(current.customBg ?? customBg), align: event.target.value as NonNullable<VisualCanvasConfig['customBg']>['align'] },
-                    }))}
-                  >
-                    {CANVAS_ALIGNMENTS.map((align) => <option key={align} value={align}>{align}</option>)}
-                  </select>
-                </label>
-              </div>
-              <label className="apx-canvas-check">
-                <input
-                  type="checkbox"
-                  checked={customBg.inherit ?? false}
-                  onChange={(event) => mutateCanvas('Background inherit dimensions', (current) => ({
-                    ...current,
-                    customBg: { ...(current.customBg ?? customBg), inherit: event.target.checked },
-                  }))}
-                />
-                <span>Inherit source dimensions</span>
-              </label>
-              <label className="apx-canvas-field">
-                <span>Image opacity</span>
-                <input
-                  className="apx-pre4-range"
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  value={customBg.opacity ?? 1}
-                  onChange={(event) => updateCanvasDraft((current) => ({
-                    ...current,
-                    customBg: { ...(current.customBg ?? customBg), opacity: Number(event.target.value) },
-                  }))}
-                />
-              </label>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="apx-pre4-section" data-canvas-section="appearance">
-          <div className="apx-pre4-section-title">Appearance</div>
-          <label className="apx-canvas-field">
-            <span>Canvas opacity · {Math.round((canvas.opacity ?? 1) * 100)}%</span>
-            <input
-              className="apx-pre4-range"
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={canvas.opacity ?? 1}
-              onPointerDown={beginPropertyEdit}
-              onChange={(event) => updateCanvasDraft((current) => ({ ...current, opacity: Number(event.target.value) }))}
-              onPointerUp={() => endPropertyEdit('Canvas opacity')}
-            />
-          </label>
-          <div className="apx-pre4-property-grid">
-            <label>
-              <span>Radius</span>
-              <input
-                className="apx-pre4-input"
-                type="number"
-                min={0}
-                disabled={canvas.borderRadius === 'circular'}
-                value={typeof canvas.borderRadius === 'number' ? canvas.borderRadius : 0}
-                onFocus={beginPropertyEdit}
-                onChange={(event) => updateCanvasDraft((current) => ({ ...current, borderRadius: Math.max(0, Number(event.target.value)) }))}
-                onBlur={() => endPropertyEdit('Canvas radius')}
-              />
-            </label>
-            <label className="apx-canvas-check">
-              <input
-                type="checkbox"
-                checked={canvas.borderRadius === 'circular'}
-                onChange={(event) => mutateCanvas('Circular canvas', (current) => ({ ...current, borderRadius: event.target.checked ? 'circular' : 0 }))}
-              />
-              <span>Circular</span>
-            </label>
-          </div>
-        </div>
-
-        <div className="apx-pre4-section" data-canvas-section="stroke">
-          <div className="apx-canvas-section-heading">
-            <div className="apx-pre4-section-title">Stroke</div>
-            <label className="apx-canvas-switch">
-              <input
-                type="checkbox"
-                aria-label="Enable canvas stroke"
-                checked={Boolean(canvas.stroke)}
-                onChange={(event) => mutateCanvas('Canvas stroke', (current) => {
-                  if (!event.target.checked) {
-                    const next = { ...current };
-                    delete next.stroke;
-                    return next;
-                  }
-                  return { ...current, stroke: { color: '#ffffff', width: 1, opacity: 1, style: 'solid' } };
-                })}
-              />
-              <span />
-            </label>
-          </div>
-          {canvas.stroke ? (
-            <>
-              <div className="apx-canvas-color-row">
-                <input type="color" value={canvas.stroke.color ?? '#ffffff'} onChange={(event) => updateCanvasDraft((current) => ({ ...current, stroke: { ...current.stroke, color: event.target.value } }))} />
-                <input className="apx-pre4-input" value={canvas.stroke.color ?? '#ffffff'} onChange={(event) => updateCanvasDraft((current) => ({ ...current, stroke: { ...current.stroke, color: event.target.value } }))} />
-              </div>
-              <div className="apx-pre4-property-grid">
-                <label><span>Width</span><input className="apx-pre4-input" type="number" min={0} value={canvas.stroke.width ?? 1} onChange={(event) => updateCanvasDraft((current) => ({ ...current, stroke: { ...current.stroke, width: Number(event.target.value) } }))} /></label>
-                <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={canvas.stroke.blur ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, stroke: { ...current.stroke, blur: Number(event.target.value) } }))} /></label>
-                <label><span>Position</span><input className="apx-pre4-input" type="number" value={canvas.stroke.position ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, stroke: { ...current.stroke, position: Number(event.target.value) } }))} /></label>
-                <label><span>Style</span><select className="apx-pre4-input" value={canvas.stroke.style ?? 'solid'} onChange={(event) => mutateCanvas('Stroke style', (current) => ({ ...current, stroke: { ...current.stroke, style: event.target.value as NonNullable<VisualCanvasConfig['stroke']>['style'] } }))}>{['solid','dashed','dotted','groove','ridge','double'].map((value) => <option key={value}>{value}</option>)}</select></label>
-              </div>
-              <label className="apx-canvas-field"><span>Stroke opacity</span><input className="apx-pre4-range" type="range" min={0} max={1} step={0.01} value={canvas.stroke.opacity ?? 1} onChange={(event) => updateCanvasDraft((current) => ({ ...current, stroke: { ...current.stroke, opacity: Number(event.target.value) } }))} /></label>
-            </>
-          ) : null}
-        </div>
-
-        <div className="apx-pre4-section" data-canvas-section="shadow">
-          <div className="apx-canvas-section-heading">
-            <div className="apx-pre4-section-title">Shadow</div>
-            <label className="apx-canvas-switch">
-              <input
-                type="checkbox"
-                aria-label="Enable canvas shadow"
-                checked={Boolean(canvas.shadow)}
-                onChange={(event) => mutateCanvas('Canvas shadow', (current) => {
-                  if (!event.target.checked) {
-                    const next = { ...current };
-                    delete next.shadow;
-                    return next;
-                  }
-                  return { ...current, shadow: { color: '#000000', offsetX: 0, offsetY: 12, blur: 28, opacity: 0.35 } };
-                })}
-              />
-              <span />
-            </label>
-          </div>
-          {canvas.shadow ? (
-            <>
-              <div className="apx-canvas-color-row">
-                <input type="color" value={canvas.shadow.color ?? '#000000'} onChange={(event) => updateCanvasDraft((current) => ({ ...current, shadow: { ...current.shadow, color: event.target.value } }))} />
-                <input className="apx-pre4-input" value={canvas.shadow.color ?? '#000000'} onChange={(event) => updateCanvasDraft((current) => ({ ...current, shadow: { ...current.shadow, color: event.target.value } }))} />
-              </div>
-              <div className="apx-pre4-property-grid">
-                <label><span>X</span><input className="apx-pre4-input" type="number" value={canvas.shadow.offsetX ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, shadow: { ...current.shadow, offsetX: Number(event.target.value) } }))} /></label>
-                <label><span>Y</span><input className="apx-pre4-input" type="number" value={canvas.shadow.offsetY ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, shadow: { ...current.shadow, offsetY: Number(event.target.value) } }))} /></label>
-                <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={canvas.shadow.blur ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, shadow: { ...current.shadow, blur: Number(event.target.value) } }))} /></label>
-                <label><span>Opacity</span><input className="apx-pre4-input" type="number" min={0} max={1} step={0.05} value={canvas.shadow.opacity ?? 1} onChange={(event) => updateCanvasDraft((current) => ({ ...current, shadow: { ...current.shadow, opacity: Number(event.target.value) } }))} /></label>
-              </div>
-            </>
-          ) : null}
-        </div>
-      </>
-    );
-  };
-
-  const renderCanvasTransform = () => {
-    const canvas = project.document.canvas ?? {};
-    return (
-      <>
-        {renderCanvasHeader()}
-        <div className="apx-pre4-section">
-          <div className="apx-pre4-section-title">Dimensions</div>
-          <div className="apx-pre4-property-grid">
-            {(['width', 'height'] as const).map((key) => (
-              <label key={key}>
-                <span>{key === 'width' ? 'W' : 'H'}</span>
-                <input
-                  className="apx-pre4-input"
-                  type="number"
-                  min={1}
-                  max={16384}
-                  data-canvas-dimension={key}
-                  value={project.document[key]}
-                  onFocus={beginPropertyEdit}
-                  onChange={(event) => {
-                    const value = Math.max(1, Math.min(16384, Number(event.target.value) || 1));
-                    setProject((current) => ({ ...current, updatedAt: new Date().toISOString(), document: { ...current.document, [key]: value } }));
-                  }}
-                  onBlur={() => endPropertyEdit('Resize canvas')}
-                />
-              </label>
-            ))}
-          </div>
-        </div>
-        <div className="apx-pre4-section">
-          <div className="apx-pre4-section-title">Placement</div>
-          <div className="apx-pre4-property-grid">
-            {(['x','y','rotation'] as const).map((key) => (
-              <label key={key}>
-                <span>{key === 'rotation' ? 'Rot' : key.toUpperCase()}</span>
-                <input className="apx-pre4-input" type="number" value={canvas[key] ?? 0} onFocus={beginPropertyEdit} onChange={(event) => updateCanvasDraft((current) => ({ ...current, [key]: Number(event.target.value) }))} onBlur={() => endPropertyEdit('Canvas ' + key)} />
-              </label>
-            ))}
-          </div>
-        </div>
-        <div className="apx-pre4-section">
-          <div className="apx-pre4-section-title">Internal zoom</div>
-          <div className="apx-pre4-property-grid">
-            <label><span>Scale</span><input className="apx-pre4-input" type="number" min={0.01} step={0.05} value={canvas.zoom?.scale ?? 1} onChange={(event) => updateCanvasDraft((current) => ({ ...current, zoom: { ...current.zoom, scale: Number(event.target.value) } }))} /></label>
-            <label><span>CX</span><input className="apx-pre4-input" type="number" value={canvas.zoom?.centerX ?? project.document.width / 2} onChange={(event) => updateCanvasDraft((current) => ({ ...current, zoom: { ...current.zoom, centerX: Number(event.target.value) } }))} /></label>
-            <label><span>CY</span><input className="apx-pre4-input" type="number" value={canvas.zoom?.centerY ?? project.document.height / 2} onChange={(event) => updateCanvasDraft((current) => ({ ...current, zoom: { ...current.zoom, centerY: Number(event.target.value) } }))} /></label>
-          </div>
-        </div>
-        <div className="apx-live-sync-note"><strong>Live Code Sync</strong><span>Dimensions, placement, rotation and internal zoom generate directly into createCanvas() and reconcile back from canonical code.</span></div>
-      </>
-    );
-  };
-
-  const renderCanvasEffects = () => {
-    const canvas = project.document.canvas ?? {};
-    const pattern = canvas.patternBg ?? defaultCanvasPattern();
-    return (
-      <>
-        {renderCanvasHeader()}
-        <div className="apx-pre4-section">
-          <div className="apx-pre4-section-title">Surface effects</div>
-          <div className="apx-pre4-property-grid">
-            <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={canvas.blur ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, blur: Math.max(0, Number(event.target.value)) }))} /></label>
-            <label><span>Blend</span><select className="apx-pre4-input" value={canvas.blendMode ?? 'source-over'} onChange={(event) => mutateCanvas('Canvas blend', (current) => ({ ...current, blendMode: event.target.value as VisualBlendMode }))}>{CANVAS_BLEND_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
-          </div>
-        </div>
-
-        <div className="apx-pre4-section" data-canvas-section="pattern">
-          <div className="apx-canvas-section-heading"><div className="apx-pre4-section-title">Pattern</div><label className="apx-canvas-switch"><input type="checkbox" checked={Boolean(canvas.patternBg)} onChange={(event) => mutateCanvas('Canvas pattern', (current) => { if (!event.target.checked) { const next = { ...current }; delete next.patternBg; return next; } return { ...current, patternBg: defaultCanvasPattern() }; })}/><span /></label></div>
-          {canvas.patternBg ? (
-            <>
-              <label className="apx-canvas-field"><span>Pattern type</span><select className="apx-pre4-input" value={pattern.type} onChange={(event) => mutateCanvas('Pattern type', (current) => ({ ...current, patternBg: { ...(current.patternBg ?? pattern), type: event.target.value as VisualPatternOptions['type'] } }))}>{CANVAS_PATTERN_TYPES.map((type) => <option key={type}>{type}</option>)}</select></label>
-              <div className="apx-canvas-color-row"><input type="color" value={pattern.color ?? '#315078'} onChange={(event) => updatePattern({ color: event.target.value })}/><input className="apx-pre4-input" value={pattern.color ?? '#315078'} onChange={(event) => updatePattern({ color: event.target.value })}/></div>
-              <div className="apx-canvas-color-row"><input type="color" value={pattern.secondaryColor ?? '#152943'} onChange={(event) => updatePattern({ secondaryColor: event.target.value })}/><input className="apx-pre4-input" value={pattern.secondaryColor ?? '#152943'} onChange={(event) => updatePattern({ secondaryColor: event.target.value })}/></div>
-              <div className="apx-pre4-property-grid">
-                {(['size','spacing','rotation','scale','offsetX','offsetY'] as const).map((key) => <label key={key}><span>{key}</span><input className="apx-pre4-input" type="number" step={key === 'scale' ? 0.1 : 1} value={pattern[key] ?? (key === 'scale' ? 1 : 0)} onChange={(event) => updatePattern({ [key]: Number(event.target.value) })}/></label>)}
-              </div>
-              <label className="apx-canvas-field"><span>Pattern opacity</span><input className="apx-pre4-range" type="range" min={0} max={1} step={0.01} value={pattern.opacity ?? 1} onChange={(event) => updatePattern({ opacity: Number(event.target.value) })}/></label>
-              {pattern.type === 'custom' ? <label className="apx-canvas-field"><span>Custom image</span><input className="apx-pre4-input" value={pattern.customPatternImage ?? ''} onChange={(event) => updatePattern({ customPatternImage: event.target.value })}/></label> : null}
-            </>
-          ) : null}
-        </div>
-
-        <div className="apx-pre4-section" data-canvas-section="noise">
-          <div className="apx-canvas-section-heading"><div className="apx-pre4-section-title">Noise</div><label className="apx-canvas-switch"><input type="checkbox" checked={Boolean(canvas.noiseBg)} onChange={(event) => mutateCanvas('Canvas noise', (current) => { if (!event.target.checked) { const next = { ...current }; delete next.noiseBg; return next; } return { ...current, noiseBg: { intensity: 0.04 } }; })}/><span /></label></div>
-          {canvas.noiseBg ? <label className="apx-canvas-field"><span>Intensity · {Math.round((canvas.noiseBg.intensity ?? 0.04) * 100)}%</span><input className="apx-pre4-range" type="range" min={0} max={1} step={0.01} value={canvas.noiseBg.intensity ?? 0.04} onChange={(event) => updateCanvasDraft((current) => ({ ...current, noiseBg: { intensity: Number(event.target.value) } }))}/></label> : null}
-        </div>
-
-        <div className="apx-pre4-section" data-canvas-section="background-layers">
-          <div className="apx-canvas-section-heading"><div className="apx-pre4-section-title">Background layers</div><button className="apx-canvas-mini-button" type="button" onClick={() => mutateCanvas('Add background layer', (current) => ({ ...current, bgLayers: [...(current.bgLayers ?? []), defaultBackgroundLayer('color')] }))}>＋ Layer</button></div>
-          <div className="apx-canvas-layer-stack">
-            {(canvas.bgLayers ?? []).map((layer, index) => (
-              <div className="apx-canvas-layer-card" key={index}>
-                <div className="apx-canvas-layer-head">
-                  <select className="apx-pre4-input" value={layer.type} onChange={(event) => updateBackgroundLayer(index, () => defaultBackgroundLayer(event.target.value as VisualBackgroundLayer['type']))}>
-                    {['color','gradient','image','pattern','presetPattern','noise'].map((type) => <option key={type}>{type}</option>)}
-                  </select>
-                  <button type="button" onClick={() => mutateCanvas('Remove background layer', (current) => ({ ...current, bgLayers: (current.bgLayers ?? []).filter((_, layerIndex) => layerIndex !== index) }))}>×</button>
-                </div>
-                {'opacity' in layer ? <label className="apx-canvas-field"><span>Opacity</span><input className="apx-pre4-range" type="range" min={0} max={1} step={0.01} value={layer.opacity ?? 1} onChange={(event) => updateBackgroundLayer(index, (current) => ({ ...current, opacity: Number(event.target.value) }))}/></label> : null}
-                {layer.type === 'color' ? <div className="apx-canvas-color-row"><input type="color" value={layer.value} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'color' ? { ...current, value: event.target.value } : current)}/><input className="apx-pre4-input" value={layer.value} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'color' ? { ...current, value: event.target.value } : current)}/></div> : null}
-                {layer.type === 'gradient' ? <div className="apx-canvas-color-row"><input type="color" value={layer.value.colors[0]?.color ?? '#000000'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'gradient' ? { ...current, value: { ...current.value, colors: current.value.colors.map((stop, stopIndex) => stopIndex === 0 ? { ...stop, color: event.target.value } : stop) } as VisualGradient } : current)}/><span>Gradient layer</span></div> : null}
-                {layer.type === 'image' ? <><input className="apx-pre4-input" placeholder="Image source" value={layer.source} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'image' ? { ...current, source: event.target.value } : current)}/><div className="apx-pre4-property-grid"><label><span>Fit</span><select className="apx-pre4-input" value={layer.fit ?? 'cover'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'image' ? { ...current, fit: event.target.value as 'fill' | 'contain' | 'cover' } : current)}>{CANVAS_FITS.map((value) => <option key={value}>{value}</option>)}</select></label><label><span>Align</span><select className="apx-pre4-input" value={layer.align ?? 'center'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'image' ? { ...current, align: event.target.value as NonNullable<typeof current.align> } : current)}>{CANVAS_ALIGNMENTS.map((value) => <option key={value}>{value}</option>)}</select></label></div></> : null}
-                {layer.type === 'pattern' ? <><input className="apx-pre4-input" placeholder="Pattern image source" value={layer.source} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'pattern' ? { ...current, source: event.target.value } : current)}/><select className="apx-pre4-input" value={layer.repeat ?? 'repeat'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'pattern' ? { ...current, repeat: event.target.value as NonNullable<typeof current.repeat> } : current)}>{['repeat','repeat-x','repeat-y','no-repeat'].map((value) => <option key={value}>{value}</option>)}</select></> : null}
-                {layer.type === 'presetPattern' ? <><select className="apx-pre4-input" value={layer.pattern.type} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'presetPattern' ? { ...current, pattern: { ...current.pattern, type: event.target.value as VisualPatternOptions['type'] } } : current)}>{CANVAS_PATTERN_TYPES.map((value) => <option key={value}>{value}</option>)}</select><div className="apx-canvas-color-row"><input type="color" value={layer.pattern.color ?? '#315078'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'presetPattern' ? { ...current, pattern: { ...current.pattern, color: event.target.value } } : current)}/><input className="apx-pre4-input" value={layer.pattern.color ?? '#315078'} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'presetPattern' ? { ...current, pattern: { ...current.pattern, color: event.target.value } } : current)}/></div></> : null}
-                {layer.type === 'noise' ? <label className="apx-canvas-field"><span>Intensity</span><input className="apx-pre4-range" type="range" min={0} max={1} step={0.01} value={layer.intensity ?? 0.04} onChange={(event) => updateBackgroundLayer(index, (current) => current.type === 'noise' ? { ...current, intensity: Number(event.target.value) } : current)}/></label> : null}
-                {'blendMode' in layer ? <select className="apx-pre4-input" value={layer.blendMode ?? 'source-over'} onChange={(event) => updateBackgroundLayer(index, (current) => ({ ...current, blendMode: event.target.value as VisualBlendMode }))}>{CANVAS_BLEND_MODES.map((value) => <option key={value}>{value}</option>)}</select> : null}
-              </div>
-            ))}
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  const renderCanvasAdvanced = () => {
-    const canvas = project.document.canvas ?? {};
-    const customBg = canvas.customBg;
-    return (
-      <>
-        {renderCanvasHeader()}
-        <div className="apx-pre4-section">
-          <div className="apx-pre4-section-title">Clipping / border placement</div>
-          <label className="apx-canvas-field"><span>Border position</span><input className="apx-pre4-input" value={canvas.borderPosition ?? 'all'} onChange={(event) => updateCanvasDraft((current) => ({ ...current, borderPosition: event.target.value }))}/></label>
-        </div>
-
-        {customBg ? (
-          <div className="apx-pre4-section">
-            <div className="apx-pre4-section-title">Background image filters</div>
-            <textarea className="apx-canvas-json" spellCheck={false} value={canvasFiltersDraft} onChange={(event) => { setCanvasFiltersDraft(event.target.value); setCanvasFiltersError(null); }} />
-            {canvasFiltersError ? <div className="apx-live-code-error">{canvasFiltersError}</div> : null}
-            <button className="apx-canvas-apply" type="button" onClick={() => {
-              try {
-                const filters = parseFilterJson(canvasFiltersDraft);
-                mutateCanvas('Background filters', (current) => ({ ...current, customBg: { ...(current.customBg ?? customBg), filters } }));
-                setCanvasFiltersError(null);
-              } catch (error) {
-                setCanvasFiltersError(error instanceof Error ? error.message : 'Invalid filters JSON.');
-              }
-            }}>Apply filter JSON</button>
-            <small className="apx-canvas-hint">Advanced ImageFilter[] stays literal and round-trippable in generated code.</small>
-          </div>
-        ) : null}
-
-        <div className="apx-pre4-section" data-canvas-section="complete-config">
-          <div className="apx-pre4-section-title">Complete CanvasConfig</div>
-          <textarea
-            className="apx-canvas-json apx-canvas-json--config"
-            spellCheck={false}
-            value={canvasConfigDraft}
-            onChange={(event) => {
-              setCanvasConfigDraft(event.target.value);
-              setCanvasConfigError(null);
-            }}
-          />
-          {canvasConfigError ? <div className="apx-live-code-error">{canvasConfigError}</div> : null}
-          <button
-            className="apx-canvas-apply"
-            type="button"
-            onClick={() => {
-              try {
-                const parsed = JSON.parse(canvasConfigDraft);
-                if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-                  throw new Error('CanvasConfig JSON must be an object.');
-                }
-                const nextProject = structuredClone(project);
-                nextProject.document.canvas = parsed as VisualCanvasConfig;
-                nextProject.updatedAt = new Date().toISOString();
-                const validation = validateVisualProject(nextProject);
-                if (!validation.ok) {
-                  throw new Error(validation.issues[0]?.message ?? 'Invalid CanvasConfig.');
-                }
-                history.current.commit(project, nextProject, 'Advanced CanvasConfig');
-                projectRef.current = nextProject;
-                setProject(nextProject);
-                setHistoryTick((value) => value + 1);
-                setCanvasConfigError(null);
-                setMessage('Complete CanvasConfig applied');
-              } catch (error) {
-                setCanvasConfigError(error instanceof Error ? error.message : 'Invalid CanvasConfig JSON.');
-              }
-            }}
-          >
-            Apply complete CanvasConfig
-          </button>
-          <small className="apx-canvas-hint">
-            Exact declaration-level escape hatch for gradient geometry, stroke/shadow gradients,
-            pattern gradient/repeat/blend details, background-layer variants and future-compatible
-            literal CanvasConfig fields. Validated before it reaches the Visual Project.
-          </small>
-        </div>
-
-        <div className="apx-pre4-section">
-          <div className="apx-canvas-section-heading"><div className="apx-pre4-section-title">Video background</div><label className="apx-canvas-switch"><input type="checkbox" checked={Boolean(canvas.videoBg)} onChange={(event) => mutateCanvas('Video background', (current) => { if (!event.target.checked) { const next = { ...current }; delete next.videoBg; return next; } return { ...current, videoBg: { source: '', frame: 0, loop: false, autoplay: false, opacity: 1, format: 'jpg', quality: 90 } }; })}/><span /></label></div>
-          {canvas.videoBg ? (
-            <div className="apx-canvas-stack">
-              <input className="apx-pre4-input" placeholder="Video source" value={canvas.videoBg.source} onChange={(event) => updateCanvasDraft((current) => ({ ...current, videoBg: { ...current.videoBg!, source: event.target.value } }))}/>
-              <div className="apx-pre4-property-grid">
-                <label><span>Frame</span><input className="apx-pre4-input" type="number" min={0} value={canvas.videoBg.frame ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, videoBg: { ...current.videoBg!, frame: Number(event.target.value) } }))}/></label>
-                <label><span>Time</span><input className="apx-pre4-input" type="number" min={0} step={0.1} value={canvas.videoBg.time ?? 0} onChange={(event) => updateCanvasDraft((current) => ({ ...current, videoBg: { ...current.videoBg!, time: Number(event.target.value) } }))}/></label>
-                <label><span>Format</span><select className="apx-pre4-input" value={canvas.videoBg.format ?? 'jpg'} onChange={(event) => mutateCanvas('Video format', (current) => ({ ...current, videoBg: { ...current.videoBg!, format: event.target.value as 'jpg' | 'png' } }))}><option>jpg</option><option>png</option></select></label>
-                <label><span>Quality</span><input className="apx-pre4-input" type="number" min={1} max={100} value={canvas.videoBg.quality ?? 90} onChange={(event) => updateCanvasDraft((current) => ({ ...current, videoBg: { ...current.videoBg!, quality: Number(event.target.value) } }))}/></label>
-              </div>
-              <div className="apx-canvas-check-row"><label className="apx-canvas-check"><input type="checkbox" checked={canvas.videoBg.loop ?? false} onChange={(event) => mutateCanvas('Video loop', (current) => ({ ...current, videoBg: { ...current.videoBg!, loop: event.target.checked } }))}/><span>Loop</span></label><label className="apx-canvas-check"><input type="checkbox" checked={canvas.videoBg.autoplay ?? false} onChange={(event) => mutateCanvas('Video autoplay', (current) => ({ ...current, videoBg: { ...current.videoBg!, autoplay: event.target.checked } }))}/><span>Autoplay</span></label></div>
-              <label className="apx-canvas-field"><span>Opacity</span><input className="apx-pre4-range" type="range" min={0} max={1} step={0.01} value={canvas.videoBg.opacity ?? 1} onChange={(event) => updateCanvasDraft((current) => ({ ...current, videoBg: { ...current.videoBg!, opacity: Number(event.target.value) } }))}/></label>
-              <div className="apx-canvas-runtime-note"><strong>Node renderer capability</strong><span>Video frame extraction is part of Apexify CanvasConfig but is not executed by the current browser Preview runtime. Generated code remains exact and linked.</span></div>
-            </div>
-          ) : null}
-        </div>
-
-        <div className="apx-pre4-section">
-          <div className="apx-pre4-section-title">Stroke / shadow advanced geometry</div>
-          <label className="apx-canvas-field"><span>Stroke border position</span><input className="apx-pre4-input" disabled={!canvas.stroke} value={canvas.stroke?.borderPosition ?? 'all'} onChange={(event) => updateCanvasDraft((current) => ({ ...current, stroke: { ...current.stroke, borderPosition: event.target.value } }))}/></label>
-          <label className="apx-canvas-field"><span>Stroke rounded corners</span><input className="apx-pre4-input" disabled={!canvas.stroke} value={canvas.stroke?.roundedCorners ?? 'all'} onChange={(event) => updateCanvasDraft((current) => ({ ...current, stroke: { ...current.stroke, roundedCorners: event.target.value } }))}/></label>
-          <label className="apx-canvas-field"><span>Shadow rounded corners</span><input className="apx-pre4-input" disabled={!canvas.shadow} value={canvas.shadow?.roundedCorners ?? 'all'} onChange={(event) => updateCanvasDraft((current) => ({ ...current, shadow: { ...current.shadow, roundedCorners: event.target.value } }))}/></label>
-        </div>
-      </>
-    );
-  };
-
-  const renderCanvasInspector = () => {
-    if (inspectorTab === 'style') return renderCanvasStyle();
-    if (inspectorTab === 'transform') return renderCanvasTransform();
-    if (inspectorTab === 'effects') return renderCanvasEffects();
-    if (inspectorTab === 'advanced') return renderCanvasAdvanced();
-    return (
-      <>
-        {renderCanvasHeader()}
-        <div className="apx-pre4-empty"><strong>Canvas data</strong><span>Canvas has no external data binding. Data controls activate for authoring domains that own data.</span></div>
-      </>
-    );
-  };
 
   const renderMediaHeader = () => {
     if (!primaryMedia) return null;
@@ -7239,8 +6589,8 @@ export default function VisualStudioPre4({
             role="separator"
             aria-label="Resize Inspector panel"
             aria-orientation="vertical"
-            aria-valuemin={240}
-            aria-valuemax={460}
+            aria-valuemin={300}
+            aria-valuemax={540}
             aria-valuenow={inspectorWidth}
             tabIndex={0}
             onPointerDown={(event) => beginPanelResize('inspector', event)}

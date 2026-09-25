@@ -127,6 +127,22 @@ export interface VisualImageFilter {
   size?: number;
 }
 
+export interface VisualPatternGradient {
+  type: 'linear' | 'radial' | 'conic';
+  startX?: number;
+  startY?: number;
+  endX?: number;
+  endY?: number;
+  startRadius?: number;
+  endRadius?: number;
+  angle?: number;
+  centerX?: number;
+  centerY?: number;
+  startAngle?: number;
+  repeat?: 'repeat' | 'reflect' | 'no-repeat';
+  colors: VisualGradientStop[];
+}
+
 export interface VisualPatternOptions {
   type: VisualPatternType;
   color?: string;
@@ -141,7 +157,7 @@ export interface VisualPatternOptions {
   offsetX?: number;
   offsetY?: number;
   blendMode?: VisualBlendMode;
-  gradient?: VisualGradient;
+  gradient?: VisualPatternGradient;
 }
 
 export interface VisualStrokeOptions {

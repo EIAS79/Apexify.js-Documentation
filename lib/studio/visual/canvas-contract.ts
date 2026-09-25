@@ -2,6 +2,7 @@ import type {
   VisualBackgroundLayer,
   VisualCanvasConfig,
   VisualGradient,
+  VisualPatternGradient,
   VisualPatternOptions,
   VisualProjectIssue,
 } from './model';
@@ -55,7 +56,7 @@ export function defaultCanvasPattern(): VisualPatternOptions {
 export function defaultBackgroundLayer(type: VisualBackgroundLayer['type']): VisualBackgroundLayer {
   if (type === 'color') return { type, value: '#172554', opacity: 1 };
   if (type === 'gradient') return { type, value: defaultCanvasGradient(), opacity: 1 };
-  if (type === 'image') return { type, source: '', fit: 'cover', align: 'center', opacity: 1 };
+  if (type === 'image') return { type, source: '', fit: 'fill', align: 'center', opacity: 1 };
   if (type === 'pattern') return { type, source: '', repeat: 'repeat', opacity: 1 };
   if (type === 'presetPattern') return { type, pattern: defaultCanvasPattern(), opacity: 1 };
   return { type: 'noise', intensity: 0.04 };
@@ -107,6 +108,38 @@ function validateGradient(
   });
 }
 
+function validatePatternGradient(
+  issues: VisualProjectIssue[],
+  gradient: VisualPatternGradient | undefined,
+  path: string,
+) {
+  if (!gradient) return;
+  if (!['linear', 'radial', 'conic'].includes(gradient.type)) {
+    issue(issues, 'canvas-pattern-gradient-type', path + '.type', 'Unsupported pattern gradient type.');
+  }
+  if (!Array.isArray(gradient.colors) || gradient.colors.length < 2) {
+    issue(issues, 'canvas-pattern-gradient-stops', path + '.colors', 'Pattern gradient requires at least two color stops.');
+    return;
+  }
+  for (const key of [
+    'startX','startY','endX','endY','startRadius','endRadius',
+    'angle','centerX','centerY','startAngle',
+  ] as const) {
+    const value = gradient[key];
+    if (value !== undefined && !finite(value)) {
+      issue(issues, 'canvas-pattern-gradient-number', path + '.' + key, 'Pattern gradient numeric values must be finite.');
+    }
+  }
+  gradient.colors.forEach((stop, index) => {
+    if (!finite(stop.stop) || stop.stop < 0 || stop.stop > 1) {
+      issue(issues, 'canvas-pattern-gradient-stop', path + `.colors[${index}].stop`, 'Pattern gradient stop must be between 0 and 1.');
+    }
+    if (!stop.color?.trim()) {
+      issue(issues, 'canvas-pattern-gradient-color', path + `.colors[${index}].color`, 'Pattern gradient color is required.');
+    }
+  });
+}
+
 function validatePattern(
   issues: VisualProjectIssue[],
   pattern: VisualPatternOptions | undefined,
@@ -126,7 +159,7 @@ function validatePattern(
   if (pattern.type === 'custom' && !pattern.customPatternImage?.trim()) {
     issue(issues, 'canvas-pattern-image', path + '.customPatternImage', 'Custom pattern requires an image source.');
   }
-  validateGradient(issues, pattern.gradient, path + '.gradient');
+  validatePatternGradient(issues, pattern.gradient, path + '.gradient');
 }
 
 export function validateVisualCanvasConfig(
