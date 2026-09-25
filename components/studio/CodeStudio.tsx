@@ -62,7 +62,6 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
   const {
     assets,
     setAssets,
-    assetStorageReady,
     previewArtifacts,
     setPreviewArtifacts,
     activeArtifactId,
