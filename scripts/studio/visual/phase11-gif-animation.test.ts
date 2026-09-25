@@ -143,6 +143,24 @@ test('Phase 11 scene mode emits real renderSceneToGIF from the current Visual sc
   assert.ok(execution.families.includes('gif'));
 });
 
+test('Phase 11 scene GIF source preserves authored per-frame repeat for live editing', () => {
+  let project = phase11Project('scene-gif');
+  const timeline = phase11Timeline(project)!;
+  timeline.frames = [
+    {
+      ...timeline.frames[0]!,
+      repeat: 3,
+    },
+  ];
+  project = setPhase11Timeline(project, timeline);
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /repeat: 3/);
+  const frameOccurrences = source.match(/buffer:/g)?.length ?? 0;
+  assert.equal(frameOccurrences, 1);
+});
+
+
 test('Phase 11 canonical generated source round-trips timeline semantics exactly', () => {
   const project = phase11Project('animate');
   const source = generateVisualProjectCode(project).source;
