@@ -1752,7 +1752,7 @@ function coreProjectSemantic(value: VisualProject): string {
 function stripStudioSourceMarker(source: string): string {
   return source
     .replace(
-      /^\s*\/\*\s*apexify-studio-v(?:9|10|11|12|13|14):[^*]+\*\/\s*/,
+      /\/\*\s*apexify-studio-v(?:9|10|11|12|13|14):[^*]+\*\/\s*/,
       '',
     )
     .trim();
@@ -1845,24 +1845,24 @@ function reconcileCoreVisualProjectFromCode(
 function markerBackedDocumentDimensions(
   source: string,
 ): { width: number; height: number } | null {
-  const numeric = String.raw`([+-]?(?:\\d+\\.?\\d*|\\.\\d+)(?:e[+-]?\\d+)?)`;
+  const numeric = '([+-]?(?:\\d+\\.?\\d*|\\.\\d+)(?:e[+-]?\\d+)?)';
 
   const createScene = source.match(
     new RegExp(
-      String.raw`\\.\\s*createScene\\s*\\(\\s*` +
+      '\\.\\s*createScene\\s*\\(\\s*' +
         numeric +
-        String.raw`\\s*,\\s*` +
+        '\\s*,\\s*' +
         numeric +
-        String.raw`\\s*\\)`,
+        '\\s*\\)',
       'i',
     ),
   );
 
   const literalScene = source.match(
     new RegExp(
-      String.raw`\\bconst\\s+scene\\s*=\\s*\\{\\s*width\\s*:\\s*` +
+      '\\bconst\\s+scene\\s*=\\s*\\{\\s*width\\s*:\\s*' +
         numeric +
-        String.raw`\\s*,\\s*height\\s*:\\s*` +
+        '\\s*,\\s*height\\s*:\\s*' +
         numeric,
       'i',
     ),
