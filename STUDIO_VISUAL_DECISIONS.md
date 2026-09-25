@@ -30,7 +30,7 @@ This avoids noisy generated code while preserving scene semantics when they are 
 
 ## SV0-DEC-006 — Vercel branch suppression
 
-**Decision:** `vercel.json` owns an `ignoreCommand` that executes `scripts/studio/visual/vercel-ignore-build.mjs`. The command exits 0 for `studio-visual/*` branches (skip deployment) and exits 1 for `main`/other branches (continue deployment). Missing branch metadata fails open and continues the build.
+**Decision:** Vercel Git deployments are production-only from `main`. `vercel.json` sets `git.deploymentEnabled` to disable `*` and explicitly enable `main`. Feature branches and pull-request branches therefore do not create Preview deployments or consume build capacity. The previous ignored-build script was removed because an ignored build still creates unnecessary deployment noise before the build is skipped.
 
 ## SV0-DEC-007 — Optional generated-project code splitting
 

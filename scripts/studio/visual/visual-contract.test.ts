@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
@@ -52,17 +51,13 @@ test('phase 0 source-of-truth documents are present', () => {
   assert.match(decisions, /SV0-DEC-010/);
 });
 
-test('Vercel ignore command skips only studio-visual work branches', () => {
-  const script = path.join(root, 'scripts/studio/visual/vercel-ignore-build.mjs');
+test('Vercel Git integration deploys main and suppresses every other branch', () => {
+  const vercel = readJson('vercel.json');
+  const deploymentEnabled =
+    (vercel.git as { deploymentEnabled?: Record<string, boolean> } | undefined)
+      ?.deploymentEnabled;
 
-  const visualBranch = spawnSync(process.execPath, [script, '--branch=studio-visual/v00-contract']);
-  assert.equal(visualBranch.status, 0);
-
-  const mainBranch = spawnSync(process.execPath, [script, '--branch=main']);
-  assert.equal(mainBranch.status, 1);
-
-  const missingBranch = spawnSync(process.execPath, [script], {
-    env: { ...process.env, VERCEL_GIT_COMMIT_REF: '' },
-  });
-  assert.equal(missingBranch.status, 1);
+  assert.equal(deploymentEnabled?.['*'], false);
+  assert.equal(deploymentEnabled?.main, true);
+  assert.equal('ignoreCommand' in vercel, false);
 });

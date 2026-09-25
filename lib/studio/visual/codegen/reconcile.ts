@@ -1851,7 +1851,7 @@ function phase11OptionsFromRecord(
   timeline: Phase11Timeline,
   value: Jsonish | undefined,
 ): Phase11Timeline {
-  if (!isRecord(value)) {
+  if (value === undefined || !isRecord(value)) {
     throw new Error('GIF options must be an object literal for live Visual sync.');
   }
   return {

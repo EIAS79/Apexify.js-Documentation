@@ -46,9 +46,10 @@ test('phase 1 Visual Studio shell contracts remain present as the editor evolves
   assert.doesNotMatch(visual, /createCanvas\(|createImage\(|createText\(|createChart\(/);
 });
 
-test('phase 1 keeps Visual work branches Vercel-suppressed', () => {
-  const vercel = JSON.parse(read('vercel.json')) as { ignoreCommand?: string };
-  assert.match(vercel.ignoreCommand ?? '', /vercel-ignore-build/);
-  const ignore = read('scripts/studio/visual/vercel-ignore-build.mjs');
-  assert.match(ignore, /studio-visual\//);
+test('phase 1 deploys only main through Vercel Git integration', () => {
+  const vercel = JSON.parse(read('vercel.json')) as {
+    git?: { deploymentEnabled?: Record<string, boolean> };
+  };
+  assert.equal(vercel.git?.deploymentEnabled?.['*'], false);
+  assert.equal(vercel.git?.deploymentEnabled?.main, true);
 });
