@@ -8086,6 +8086,18 @@ body[data-phase17-resizing="dock"]{
   background:#102b47;
 }
 
+.apx-pre4-history-tools .apx-pre4-reset-canvas{
+  margin-left:.16rem;
+  color:#a67f87;
+  border-color:#3e2934;
+}
+
+.apx-pre4-history-tools .apx-pre4-reset-canvas:hover{
+  color:#ffd9df;
+  border-color:#7a3f50;
+  background:#321523;
+}
+
 .apx-pre4-save-state[data-state="saving"]{
   color:#b6a16f;
 }

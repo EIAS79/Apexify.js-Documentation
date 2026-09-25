@@ -157,6 +157,31 @@ test('PRE-4 exposes whole-session autosave and visible canvas undo redo controls
   assert.match(css, /data-state="saving"/);
 });
 
+test('PRE-4 provides an undoable full-canvas reset and retries recoverable live code', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const css = read('styles/studio-calm.css');
+
+  assert.match(shell, /data-visual-reset-canvas/);
+  assert.match(shell, /Reset entire canvas/);
+  assert.match(shell, /mutate\('Reset canvas'/);
+  assert.match(shell, /createVisualProject\(\{/);
+  assert.match(shell, /Undo restores the previous canvas/);
+  assert.match(shell, /reconcileVisualProjectFromCode\(\s*recoveredProject/);
+  assert.match(shell, /live code reconciled/);
+  assert.match(css, /apx-pre4-reset-canvas/);
+});
+
+test('PRE-4 renders the edited lower code source directly for live artboard feedback', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+
+  assert.match(shell, /const source = codeSource\.trim\(\)/);
+  assert.match(shell, /renderAuthoritativeVisualSource\(\s*source,\s*displaySource/);
+  assert.match(shell, /codeSyncState === 'synced'/);
+  assert.match(shell, /\}, 100\);/);
+});
+
+
+
 test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
 

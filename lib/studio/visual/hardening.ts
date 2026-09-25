@@ -5,7 +5,7 @@ import { parseVisualProject, serializeVisualProject } from './persistence';
 
 export const PHASE17_AUTOSAVE_STORAGE_KEY = 'apexify-visual-autosave-v2';
 export const PHASE17_AUTOSAVE_VERSION = 2 as const;
-export const PHASE17_CODE_DEBOUNCE_MS = 280;
+export const PHASE17_CODE_DEBOUNCE_MS = 120;
 export const PHASE17_PROJECT_AUTOSAVE_MS = 180;
 
 export const PHASE17_BROWSER_MATRIX = Object.freeze([

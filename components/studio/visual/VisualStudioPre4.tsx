@@ -806,22 +806,56 @@ export default function VisualStudioPre4({
     const recovered = recoverPhase17Autosave(raw);
     if (recovered.ok) {
       const { envelope } = recovered;
+      let recoveredProject = envelope.project;
+      let recoveredCodeSource = envelope.code.source;
+      let recoveredCodeFileName = envelope.code.fileName || 'visual-project.ts';
+      let recoveredSyncState = recovered.codeMayApply
+        ? (envelope.code.syncState ?? 'synced')
+        : 'error';
+      let recoveredSyncError = recovered.codeMayApply
+        ? envelope.code.syncError ?? null
+        : 'Recovered code was based on an older Visual Project. Restore canonical Visual code or fork the stale edit to Code Studio.';
+      let recoveredMessage = recovered.warnings.length
+        ? 'Recovered Visual session · ' + recovered.warnings.join(' ')
+        : 'Recovered Visual session';
+
+      // A previous build may have autosaved a legitimate live-code edit as a
+      // Phase-11 conflict. Re-run reconciliation during recovery so the fix
+      // takes effect immediately instead of forcing the user to discard code.
+      if (
+        recovered.codeMayApply &&
+        recoveredCodeSource &&
+        recoveredSyncState === 'error'
+      ) {
+        const retried = reconcileVisualProjectFromCode(
+          recoveredProject,
+          recoveredCodeSource,
+        );
+        if (retried.ok) {
+          recoveredProject = retried.project;
+          const canonical = generateVisualProjectCode(recoveredProject);
+          recoveredCodeSource = canonical.source;
+          recoveredCodeFileName = canonical.fileName;
+          recoveredSyncState = 'synced';
+          recoveredSyncError = null;
+          recoveredMessage = 'Recovered Visual session · live code reconciled';
+        }
+      }
+
       setAutosaveState('saved');
       setLastAutosavedAt(envelope.savedAt);
-      const recoveredSignature = semanticSignature(envelope.project);
-      projectRef.current = envelope.project;
+      const recoveredSignature = semanticSignature(recoveredProject);
+      projectRef.current = recoveredProject;
       cleanSignature.current = recoveredSignature;
-      setProject(envelope.project);
+      setProject(recoveredProject);
       setZoom(envelope.ui.zoom);
       setPan(envelope.ui.pan);
       setActiveTool(envelope.ui.activeTool);
       setInspectorTab(envelope.ui.inspectorTab);
-      if (recovered.codeMayApply) {
+      if (recoveredSyncState !== 'error') {
         setDockTab(envelope.ui.dockTab === 'assets' ? 'generated' : envelope.ui.dockTab);
         setDockCollapsed(envelope.ui.dockCollapsed);
       } else {
-        // A quarantined linked-code conflict must be immediately visible.
-        // Do not restore a hidden/non-generated dock and silently bury it.
         setDockTab('generated');
         setDockCollapsed(false);
       }
@@ -833,23 +867,15 @@ export default function VisualStudioPre4({
       setCollapsed(new Set(envelope.ui.collapsedLayerIds));
       didInitialFit.current = true;
       phase17RecoveredAssetManifestRef.current = envelope.assets;
-      phase17CodeBaseSignatureRef.current = envelope.code.baseProjectSignature;
+      phase17CodeBaseSignatureRef.current = recoveredSignature;
       codeHydratedRef.current = true;
       phase17RecoverySignatureRef.current = recoveredSignature;
       codeAppliedSignatureRef.current = recoveredSignature;
-      setCodeSource(envelope.code.source);
-      setCodeFileName(envelope.code.fileName || 'visual-project.ts');
-      setCodeSyncState(recovered.codeMayApply ? (envelope.code.syncState ?? 'synced') : 'error');
-      setCodeSyncError(
-        recovered.codeMayApply
-          ? envelope.code.syncError ?? null
-          : 'Recovered code was based on an older Visual Project. Restore canonical Visual code or fork the stale edit to Code Studio.',
-      );
-      setMessage(
-        recovered.warnings.length
-          ? 'Recovered Visual session · ' + recovered.warnings.join(' ')
-          : 'Recovered Visual session',
-      );
+      setCodeSource(recoveredCodeSource);
+      setCodeFileName(recoveredCodeFileName);
+      setCodeSyncState(recoveredSyncState);
+      setCodeSyncError(recoveredSyncError);
+      setMessage(recoveredMessage);
       return;
     }
 
@@ -1325,11 +1351,23 @@ export default function VisualStudioPre4({
 
   useEffect(() => {
     window.clearTimeout(artboardPreviewTimerRef.current);
-    if (!active || !previewGenerated.value) return;
+    if (!active || (!codeSource.trim() && !previewGenerated.value)) return;
     if (phase13Active || phase12Active) {
       setArtboardPreviewUrl(null);
       return;
     }
+
+    // The lower editor is a live rendering source, not merely generated text.
+    // Render edited code directly so valid code changes become visible even
+    // while reverse reconciliation is still deciding whether the Visual model
+    // can represent the same edit.
+    const source = codeSource.trim()
+      ? codeSource
+      : previewGenerated.value!.source;
+    const displaySource =
+      codeSyncState === 'synced'
+        ? displayPreviewGenerated.value?.source ?? source
+        : source;
 
     let cancelled = false;
     artboardPreviewTimerRef.current = window.setTimeout(() => {
@@ -1337,8 +1375,8 @@ export default function VisualStudioPre4({
         setArtboardPreviewBusy(true);
         try {
           const result = await renderAuthoritativeVisualSource(
-            previewGenerated.value!.source,
-            displayPreviewGenerated.value?.source ?? previewGenerated.value!.source,
+            source,
+            displaySource,
           );
           if (cancelled) return;
           if (result.ok) {
@@ -1346,12 +1384,12 @@ export default function VisualStudioPre4({
             setPhase7Results(result.results);
           }
         } catch {
-          // Keep the last authoritative frame while the next valid frame is built.
+          // Keep the last valid frame while the user is between valid edits.
         } finally {
           if (!cancelled) setArtboardPreviewBusy(false);
         }
       })();
-    }, 180);
+    }, 100);
 
     return () => {
       cancelled = true;
@@ -1360,6 +1398,8 @@ export default function VisualStudioPre4({
   }, [
     active,
     assets,
+    codeSource,
+    codeSyncState,
     previewGenerated.value?.source,
     displayPreviewGenerated.value?.source,
     phase10Active,
@@ -2296,6 +2336,46 @@ export default function VisualStudioPre4({
   const resetView = () => {
     setZoom(100);
     setPan({ x: 0, y: 0 });
+  };
+
+  const resetCanvas = () => {
+    if (
+      typeof window !== 'undefined' &&
+      !window.confirm(
+        'Reset the entire canvas? This clears layers, canvas styling, timelines, operations and generated state. You can Undo immediately afterward.',
+      )
+    ) {
+      return;
+    }
+
+    mutate('Reset canvas', (current) => {
+      const next = createVisualProject({
+        id: current.id,
+        name: current.name,
+        width: current.document.width,
+        height: current.document.height,
+        now: current.createdAt,
+      });
+      next.createdAt = current.createdAt;
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+    setGuides([]);
+    setMarquee(null);
+    setCollapsed(new Set());
+    setInlineTextEditId(null);
+    setArtboardPreviewUrl(null);
+    setArtboardPreviewBusy(false);
+    setModalPreviewUrl(null);
+    setModalPreviewDownloadUrl(null);
+    setModalPreviewError(null);
+    setActiveTool('canvas');
+    setInspectorTab('style');
+    setDockTab('generated');
+    setDockCollapsed(false);
+    setCodeSyncError(null);
+    setPhase7Results({});
+    setMessage('Canvas reset · Undo restores the previous canvas');
   };
 
   useEffect(() => {
@@ -6756,6 +6836,16 @@ export default function VisualStudioPre4({
                   aria-label="Redo next canvas change"
                 >
                   <ArrowUturnRightIcon className="apx-pre4-toolbar-icon" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  className="apx-pre4-reset-canvas"
+                  data-visual-reset-canvas
+                  onClick={resetCanvas}
+                  title="Reset entire canvas"
+                  aria-label="Reset entire canvas"
+                >
+                  <TrashIcon className="apx-pre4-toolbar-icon" aria-hidden />
                 </button>
               </div>
               <button

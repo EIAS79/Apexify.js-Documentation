@@ -64,6 +64,63 @@ test('live code reconciler applies canvas edits inside Phase 11 marker-backed so
   assert.equal(result.project.timelines.length, project.timelines.length);
 });
 
+
+test('Phase 11 scene GIF code edits round-trip into canvas dimensions and timeline frames', () => {
+  let project = createVisualProject({
+    id: 'project_sync_phase11_scene',
+    name: 'Scene GIF live sync',
+    width: 320,
+    height: 180,
+    now: '2026-09-25T00:00:00.000Z',
+  });
+  const pixel =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAEAQH/XPq7WQAAAABJRU5ErkJggg==';
+  project = setPhase11Timeline(project, {
+    ...defaultPhase11Timeline(project, 'sync-phase11-scene'),
+    mode: 'scene-gif',
+    frames: [
+      {
+        ...createPhase11Frame(pixel),
+        duration: 100,
+        repeat: 1,
+      },
+    ],
+  });
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /renderSceneToGIF/);
+  assert.match(source, /repeat: 1/);
+
+  const edited = source
+    .replace('width: 320', 'width: 640')
+    .replace('height: 180', 'height: 360')
+    .replace('duration: 100', 'duration: 240')
+    .replace('repeat: 1', 'repeat: 3');
+
+  const result = reconcileVisualProjectFromCode(project, edited);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+
+  assert.equal(result.project.document.width, 640);
+  assert.equal(result.project.document.height, 360);
+  const timelineRecord = result.project.timelines.find(
+    (item) => item.kind === 'gif-animation-timeline',
+  );
+  assert.ok(timelineRecord);
+  const frames = Array.isArray(timelineRecord?.value?.frames)
+    ? timelineRecord.value.frames
+    : [];
+  const first = frames[0] as Record<string, unknown> | undefined;
+  assert.equal(first?.duration, 240);
+  assert.equal(first?.repeat, 3);
+
+  const canonical = generateVisualProjectCode(result.project).source;
+  assert.match(canonical, /width: 640/);
+  assert.match(canonical, /height: 360/);
+  assert.match(canonical, /duration: 240/);
+  assert.match(canonical, /repeat: 3/);
+});
+
 test('marker-backed live sync still rejects unsupported advanced runtime edits', () => {
   let project = createVisualProject({
     id: 'project_sync_phase11_guard',
@@ -80,7 +137,7 @@ test('marker-backed live sync still rejects unsupported advanced runtime edits',
   });
 
   const source = generateVisualProjectCode(project).source;
-  const edited = source.replace('repeat: 0', 'repeat: 3');
+  const edited = source.replace('  return gif;', '  return new Uint8Array();');
   const result = reconcileVisualProjectFromCode(project, edited);
   assert.equal(result.ok, false);
 });
