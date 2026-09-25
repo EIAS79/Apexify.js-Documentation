@@ -122,6 +122,41 @@ test('PRE-4 mirrors the Inspector seam toggle and exposes one Assets workspace',
   assert.match(css, /apx-pre4-asset-card/);
 });
 
+
+
+test('PRE-4 exposes whole-session autosave and visible canvas undo redo controls', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const shared = read('components/studio/StudioSharedSession.tsx');
+  const codeStudio = read('components/studio/CodeStudio.tsx');
+  const studioShell = read('components/studio/StudioShell.tsx');
+  const css = read('styles/studio-calm.css');
+
+  assert.match(shell, /data-visual-undo/);
+  assert.match(shell, /data-visual-redo/);
+  assert.match(shell, /history\.current\.canUndo/);
+  assert.match(shell, /history\.current\.canRedo/);
+  assert.match(shell, /ArrowUturnLeftIcon/);
+  assert.match(shell, /ArrowUturnRightIcon/);
+  assert.match(shell, /Autosaving…/);
+  assert.match(shell, /Autosave failed/);
+  assert.match(shell, /lastAutosavedAt/);
+  assert.match(shell, /persistPhase17Snapshot/);
+  assert.match(shell, /PHASE17_PROJECT_AUTOSAVE_MS/);
+  assert.match(shell, /beforeunload/);
+
+  assert.match(shared, /loadPersistedStudioAssets/);
+  assert.match(shared, /savePersistedStudioAssets/);
+  assert.doesNotMatch(codeStudio, /loadPersistedStudioAssets/);
+  assert.doesNotMatch(codeStudio, /savePersistedStudioAssets/);
+  assert.match(codeStudio, /savePersistedStudio/);
+  assert.match(studioShell, /MODE_STORAGE_KEY/);
+  assert.match(studioShell, /localStorage\.setItem\(MODE_STORAGE_KEY/);
+
+  assert.match(css, /STUDIO SESSION AUTOSAVE \+ CANVAS HISTORY CONTROLS/);
+  assert.match(css, /apx-pre4-history-tools/);
+  assert.match(css, /data-state="saving"/);
+});
+
 test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
 

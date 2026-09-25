@@ -3,7 +3,9 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
   type Dispatch,
   type ReactNode,
@@ -12,7 +14,11 @@ import {
 import type { StudioPreviewArtifact } from '@/components/studio/StudioArtifactPreview';
 import type { OutputTab } from '@/components/studio/StudioOutputPanel';
 import type { RunHistoryEntry } from '@/lib/studio/studioConfig';
-import type { StudioVirtualAsset } from '@/lib/studio/runtime/assets';
+import {
+  loadPersistedStudioAssets,
+  savePersistedStudioAssets,
+  type StudioVirtualAsset,
+} from '@/lib/studio/runtime/assets';
 
 type PreviewProvenance = 'browser-generated' | 'server-generated' | undefined;
 
@@ -64,6 +70,37 @@ export function StudioSharedSessionProvider({ children }: { children: ReactNode 
   const [outputTab, setOutputTab] = useState<OutputTab>('preview');
   const [history, setHistory] = useState<RunHistoryEntry[]>([]);
   const [codeHandoff, setCodeHandoff] = useState<StudioCodeHandoff | null>(null);
+  const assetPersistTimerRef = useRef<number>(0);
+
+  // Shared assets belong to the Studio session, not to Code mode. Hydrate and
+  // persist them here so uploads made in Visual mode survive reloads even when
+  // the Code editor is never opened.
+  useEffect(() => {
+    let cancelled = false;
+    void loadPersistedStudioAssets()
+      .then((stored) => {
+        if (cancelled) return;
+        setAssets(stored);
+        setAssetStorageReady(true);
+      })
+      .catch(() => {
+        if (!cancelled) setAssetStorageReady(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!assetStorageReady) return;
+    window.clearTimeout(assetPersistTimerRef.current);
+    assetPersistTimerRef.current = window.setTimeout(() => {
+      void savePersistedStudioAssets(assets).catch(() => {
+        // Persistence is best-effort; keep the active in-memory Studio session usable.
+      });
+    }, 120);
+    return () => window.clearTimeout(assetPersistTimerRef.current);
+  }, [assetStorageReady, assets]);
 
   const value = useMemo<StudioSharedSessionValue>(() => ({
     assets,

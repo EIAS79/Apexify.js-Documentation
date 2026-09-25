@@ -41,10 +41,6 @@ import {
 import { planStudioExecution } from '@/lib/studio/runtime/capabilities';
 import { studioWorkspaceFileName, type StudioWorkspaceFile } from '@/lib/studio/runtime/workspace';
 import {
-  loadPersistedStudioAssets,
-  savePersistedStudioAssets,
-} from '@/lib/studio/runtime/assets';
-import {
   bootstrapStudio,
   encodeShareLink,
   loadRunHistory,
@@ -66,8 +62,6 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
   const {
     assets,
     setAssets,
-    assetStorageReady,
-    setAssetStorageReady,
     previewArtifacts,
     setPreviewArtifacts,
     activeArtifactId,
@@ -163,30 +157,6 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
       splitRatio,
     });
   }, [hydrated, buffers, activeBufferId, lang, layout, autoRun, splitRatio]);
-
-  useEffect(() => {
-    if (!hydrated || assetStorageReady) return;
-    let cancelled = false;
-    void loadPersistedStudioAssets()
-      .then((stored) => {
-        if (cancelled) return;
-        setAssets(stored);
-        setAssetStorageReady(true);
-      })
-      .catch(() => {
-        if (!cancelled) setAssetStorageReady(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [hydrated, assetStorageReady]);
-
-  useEffect(() => {
-    if (!assetStorageReady) return;
-    void savePersistedStudioAssets(assets).catch(() => {
-      // IndexedDB persistence is best-effort; the in-memory Studio session remains usable.
-    });
-  }, [assetStorageReady, assets]);
 
   useEffect(() => {
     return () => {
