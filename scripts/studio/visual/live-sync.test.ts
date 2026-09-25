@@ -137,7 +137,7 @@ test('marker-backed live sync still rejects unsupported advanced runtime edits',
   });
 
   const source = generateVisualProjectCode(project).source;
-  const edited = source.replace('repeat: 0', 'repeat: 3');
+  const edited = source.replace('  return gif;', '  return new Uint8Array();');
   const result = reconcileVisualProjectFromCode(project, edited);
   assert.equal(result.ok, false);
 });
