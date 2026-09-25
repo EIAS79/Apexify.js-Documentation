@@ -2350,8 +2350,16 @@ export default function VisualStudioPre4({
     setMarquee(null);
     setCollapsed(new Set());
     setInlineTextEditId(null);
+    setArtboardPreviewUrl(null);
+    setArtboardPreviewBusy(false);
+    setModalPreviewUrl(null);
+    setModalPreviewDownloadUrl(null);
+    setModalPreviewError(null);
     setActiveTool('canvas');
     setInspectorTab('style');
+    setDockTab('generated');
+    setDockCollapsed(false);
+    setCodeSyncError(null);
     setPhase7Results({});
     setMessage('Canvas reset · Undo restores the previous canvas');
   };
