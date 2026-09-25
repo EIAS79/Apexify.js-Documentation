@@ -8051,3 +8051,67 @@ body[data-phase17-resizing="dock"]{
     transform:none;
   }
 }
+
+
+/* ==========================================================================
+   STUDIO SESSION AUTOSAVE + CANVAS HISTORY CONTROLS
+   ========================================================================== */
+
+.apx-pre4-history-tools{
+  display:flex;
+  align-items:center;
+  gap:.12rem;
+  margin-right:.18rem;
+  padding-right:.34rem;
+  border-right:1px solid #19324c;
+}
+
+.apx-pre4-view-tools button:disabled{
+  color:#40546b;
+  border-color:#14283d;
+  background:#071421;
+  cursor:not-allowed;
+  opacity:.48;
+}
+
+.apx-pre4-view-tools button:disabled:hover{
+  color:#40546b;
+  border-color:#14283d;
+  background:#071421;
+}
+
+.apx-pre4-history-tools button:not(:disabled):hover{
+  color:#edf6ff;
+  border-color:#3f6fa5;
+  background:#102b47;
+}
+
+.apx-pre4-save-state[data-state="saving"]{
+  color:#b6a16f;
+}
+
+.apx-pre4-save-state[data-state="saving"] i{
+  background:#e5b85f;
+  box-shadow:0 0 9px rgba(229,184,95,.28);
+  animation:apx-pre4-autosave-pulse 1s ease-in-out infinite;
+}
+
+.apx-pre4-save-state[data-state="error"]{
+  color:#cf8391;
+}
+
+.apx-pre4-save-state[data-state="error"] i{
+  background:#f06f87;
+  box-shadow:0 0 9px rgba(240,111,135,.25);
+}
+
+@keyframes apx-pre4-autosave-pulse{
+  0%,100%{opacity:.55;transform:scale(.86)}
+  50%{opacity:1;transform:scale(1)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .apx-pre4-save-state[data-state="saving"] i{
+    animation:none;
+  }
+}
