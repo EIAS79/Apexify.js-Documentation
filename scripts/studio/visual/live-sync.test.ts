@@ -43,6 +43,7 @@ test('live code reconciler applies canvas edits inside Phase 11 marker-backed so
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAEAQH/XPq7WQAAAABJRU5ErkJggg==';
   const timeline = {
     ...defaultPhase11Timeline(project, 'sync-phase11'),
+    mode: 'scene-gif' as const,
     frames: [createPhase11Frame(pixel)],
   };
   project = setPhase11Timeline(project, timeline);
