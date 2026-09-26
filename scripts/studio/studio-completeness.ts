@@ -426,7 +426,7 @@ const artifact = {
   browserRuntime: {
     package: '@apexify/web',
     sourceRepository: 'EIAS79/Apexify.js',
-    sourceCommit: '44e9707c8f4f9944a75756085238444d0f43cf72',
+    sourceCommit: '64a31d53ef2a6d3bb601e6827485c9843b0d734d',
     installation: 'integrity-checked-build-snapshot',
   },
   declaration: path.relative(root, declaration).replaceAll(path.sep, '/'),
