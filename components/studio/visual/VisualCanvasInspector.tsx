@@ -556,7 +556,7 @@ function GradientEditor({
               value={stop.color}
               onChange={(event) => patchStop(index, { color: event.target.value })}
             />
-            <div className="apx-canvas-v2-number">
+            <div className="apx-canvas-v2-number apx-canvas-v2-stop-value">
               <input
                 className="apx-canvas-v2-input"
                 type="number"
@@ -694,7 +694,7 @@ function PatternGradientEditor({
               value={stop.color}
               onChange={(event) => patchStop(index, { color: event.target.value })}
             />
-            <div className="apx-canvas-v2-number">
+            <div className="apx-canvas-v2-number apx-canvas-v2-stop-value">
               <input
                 className="apx-canvas-v2-input"
                 type="number"
@@ -1139,14 +1139,23 @@ function ShadowEditor({
       </div>
       <MultiPositionField
         label="Rounded corners"
-        value={shadow.roundedCorners ?? 'all'}
-        onChange={(roundedCorners) => patch({ roundedCorners })}
+        value={shadow.roundedCorners ?? shadow.borderPosition ?? 'all'}
+        onChange={(roundedCorners) => {
+          const next = { ...shadow, roundedCorners };
+          delete next.borderPosition;
+          onChange(next);
+        }}
       />
-      <MultiPositionField
-        label="Shadow border positions"
-        value={shadow.borderPosition ?? 'all'}
-        onChange={(borderPosition) => patch({ borderPosition })}
-      />
+      {shadow.borderPosition && !shadow.roundedCorners ? (
+        <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
+          <strong>Legacy shadow corner mask</strong>
+          <span>
+            shadow.borderPosition is a deprecated alias for roundedCorners, not
+            a side-selection control. Editing the corner mask migrates it to
+            roundedCorners.
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }
