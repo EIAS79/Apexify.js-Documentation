@@ -26,9 +26,8 @@ function createCanvasProject() {
     zoom: { scale: 1.05, centerX: 480, centerY: 270 },
     patternBg: {
       type: 'grid',
-      color: '#315078',
-      secondaryColor: '#152943',
-      opacity: 0.35,
+      opacity: 1,
+      blendMode: 'source-over',
       size: 1,
       spacing: 28,
       rotation: 0,
@@ -153,6 +152,39 @@ test('Phase 4 generated canvas source round-trips back to equivalent Visual canv
   assert.deepEqual(result.project.document.canvas, project.document.canvas);
 });
 
+test('Phase 4 enforces exclusive pattern paint and source-over defaults', () => {
+  const invalid = createCanvasProject();
+  invalid.document.canvas!.patternBg = {
+    type: 'stripes',
+    color: '#ff0000',
+    secondaryColor: '#ffff00',
+    gradient: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: 960,
+      endY: 0,
+      colors: [
+        { stop: 0, color: '#ff0000' },
+        { stop: 1, color: '#ffff00' },
+      ],
+    },
+  };
+  const validation = validateVisualProject(invalid);
+  assert.equal(validation.ok, false);
+  assert.ok(
+    validation.issues.some(
+      (issue) => issue.code === 'canvas-pattern-paint-exclusive',
+    ),
+  );
+
+  const generated = generateVisualProjectCode(createCanvasProject()).source;
+  assert.ok(generated.includes('blendMode: "source-over"'));
+  assert.ok(generated.includes('gradient:'));
+  assert.ok(!generated.includes('color: "#315078"'));
+  assert.ok(!generated.includes('secondaryColor: "#152943"'));
+});
+
 test('Phase 4 rejects conflicting primary backgrounds and unsafe dynamic canvas expressions', () => {
   const invalid = createCanvasProject();
   invalid.document.canvas = {
@@ -198,6 +230,9 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
     'Image filters',
     'Video background',
     'Pattern overlay',
+    'Pattern paint',
+    'Primary / secondary',
+    'Paint and blend are independent',
     'Noise overlay',
     'Background layers',
     'Internal zoom',

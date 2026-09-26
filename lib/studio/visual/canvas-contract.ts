@@ -46,10 +46,11 @@ export function defaultCanvasPattern(): VisualPatternOptions {
     type: 'grid',
     color: '#315078',
     secondaryColor: '#152943',
-    opacity: 0.42,
+    opacity: 1,
     size: 1,
     spacing: 32,
     rotation: 0,
+    blendMode: 'source-over',
   };
 }
 
@@ -150,6 +151,25 @@ function validatePattern(
     issue(issues, 'canvas-pattern-type', path + '.type', 'Unsupported canvas pattern type.');
   }
   validateOpacity(issues, pattern.opacity, path + '.opacity');
+  if (
+    pattern.blendMode !== undefined &&
+    !CANVAS_BLEND_MODES.includes(
+      pattern.blendMode as (typeof CANVAS_BLEND_MODES)[number],
+    )
+  ) {
+    issue(issues, 'canvas-pattern-blend', path + '.blendMode', 'Unsupported pattern blend mode.');
+  }
+  if (
+    pattern.gradient !== undefined &&
+    (pattern.color !== undefined || pattern.secondaryColor !== undefined)
+  ) {
+    issue(
+      issues,
+      'canvas-pattern-paint-exclusive',
+      path,
+      'Pattern paint must use either gradient or primary/secondary colors, not both.',
+    );
+  }
   for (const key of ['size','spacing','rotation','scale','offsetX','offsetY'] as const) {
     const value = pattern[key];
     if (value !== undefined && !finite(value)) {
@@ -179,6 +199,14 @@ export function validateVisualCanvasConfig(
     issue(issues, 'canvas-blur', p + '.blur', 'Canvas blur cannot be negative.');
   }
   validateOpacity(issues, canvas.opacity, p + '.opacity');
+  if (
+    canvas.blendMode !== undefined &&
+    !CANVAS_BLEND_MODES.includes(
+      canvas.blendMode as (typeof CANVAS_BLEND_MODES)[number],
+    )
+  ) {
+    issue(issues, 'canvas-blend', p + '.blendMode', 'Unsupported canvas blend mode.');
+  }
   if (
     canvas.borderRadius !== undefined &&
     canvas.borderRadius !== 'circular' &&
@@ -219,6 +247,15 @@ export function validateVisualCanvasConfig(
   canvas.bgLayers?.forEach((layer, index) => {
     const path = p + `.bgLayers[${index}]`;
     if ('opacity' in layer) validateOpacity(issues, layer.opacity, path + '.opacity');
+    if (
+      'blendMode' in layer &&
+      layer.blendMode !== undefined &&
+      !CANVAS_BLEND_MODES.includes(
+        layer.blendMode as (typeof CANVAS_BLEND_MODES)[number],
+      )
+    ) {
+      issue(issues, 'canvas-layer-blend', path + '.blendMode', 'Unsupported background-layer blend mode.');
+    }
     if (layer.type === 'gradient') validateGradient(issues, layer.value, path + '.value');
     if (layer.type === 'presetPattern') validatePattern(issues, layer.pattern, path + '.pattern');
     if ((layer.type === 'image' || layer.type === 'pattern') && !layer.source.trim()) {

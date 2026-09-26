@@ -1,6 +1,7 @@
 import type {
   VisualCanvasConfig,
   VisualNode,
+  VisualPatternOptions,
   VisualProject,
   VisualProjectRecord,
   VisualValue,
@@ -40,6 +41,39 @@ function normalizeNode(node: VisualNode): VisualNode {
   };
 }
 
+function normalizePatternPaint(
+  pattern: VisualPatternOptions,
+): VisualPatternOptions {
+  const next: VisualPatternOptions = { ...pattern };
+  if (next.gradient !== undefined) {
+    delete next.color;
+    delete next.secondaryColor;
+  }
+  return next;
+}
+
+function normalizeCanvasConfig(
+  canvas: VisualCanvasConfig,
+): VisualCanvasConfig {
+  const next: VisualCanvasConfig = { ...canvas };
+
+  if (next.patternBg) {
+    next.patternBg = normalizePatternPaint(next.patternBg);
+  }
+
+  if (next.bgLayers) {
+    next.bgLayers = next.bgLayers.map((layer) =>
+      layer.type === 'presetPattern'
+        ? { ...layer, pattern: normalizePatternPaint(layer.pattern) }
+        : { ...layer },
+    );
+  }
+
+  return stableValue(
+    next as unknown as VisualValue,
+  ) as unknown as VisualCanvasConfig;
+}
+
 export function normalizeVisualProject(project: VisualProject): VisualProject {
   const nodeEntries = Object.entries(project.document.nodes)
     .sort(([left], [right]) => left.localeCompare(right))
@@ -66,9 +100,7 @@ export function normalizeVisualProject(project: VisualProject): VisualProject {
         : {}),
       ...(project.document.canvas !== undefined
         ? {
-            canvas: stableValue(
-              project.document.canvas as unknown as VisualValue,
-            ) as unknown as VisualCanvasConfig,
+            canvas: normalizeCanvasConfig(project.document.canvas),
           }
         : {}),
       rootNodeIds: [...project.document.rootNodeIds],

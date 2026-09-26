@@ -169,7 +169,7 @@ requireCheck(
     !apexifyWebPreview.includes('CanvasShadowOverflowComposite'),
   '@apexify/web must clip CanvasConfig shadow rendering to native fixed output dimensions.',
 );
-requireCheck(apexifyWebSource.commit === '64a31d53ef2a6d3bb601e6827485c9843b0d734d', '@apexify/web source snapshot is not pinned to the approved engine commit.');
+requireCheck(apexifyWebSource.commit === '522b8d1094e412d2420f665a2ee5740b8c70db6f', '@apexify/web source snapshot is not pinned to the approved engine commit.');
 requireCheck(apexifyWebInstaller.includes('Integrity mismatch for @apexify/web'), '@apexify/web installer must verify source integrity.');
 requireCheck(
   apexifyWebPreview.includes("boolOf(inheritedBackground.inherit, false)") &&
@@ -191,6 +191,16 @@ requireCheck(
     apexifyWebPreview.includes('const gradientPaint = rawGradient') &&
     apexifyWebPreview.includes('ctx.createImageData(width, height)'),
   '@apexify/web must honor CanvasConfig pattern transforms/gradient paint and deterministic noise.',
+);
+requireCheck(
+  apexifyWebPreview.includes("stringOf(pattern.blendMode, 'source-over')") &&
+    !apexifyWebPreview.includes("stringOf(pattern.blendMode, 'overlay')"),
+  '@apexify/web patternBg must default to source-over so authored colors are preserved.',
+);
+requireCheck(
+  apexifyWebPreview.includes('const secondaryPaint = gradientPaint ?? secondary') &&
+    apexifyWebPreview.includes("row % 2 === 0 ? primaryPaint : secondaryPaint"),
+  '@apexify/web gradient pattern paint must replace standard primary/secondary paint instead of mixing with it.',
 );
 requireCheck(
   apexifyWebPreview.includes('composeCanvasShadowPreview') &&

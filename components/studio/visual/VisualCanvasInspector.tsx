@@ -741,6 +741,47 @@ function PatternEditor({
   const patch = (value: Partial<VisualPatternOptions>) =>
     onChange({ ...pattern, ...value });
 
+  const paintMode = pattern.gradient ? 'gradient' : 'color';
+
+  const setPaintMode = (mode: 'color' | 'gradient') => {
+    if (mode === 'gradient') {
+      const first = pattern.color ?? '#315078';
+      const second = pattern.secondaryColor ?? '#7c3aed';
+      const next: VisualPatternOptions = {
+        ...pattern,
+        gradient: {
+          type: 'linear',
+          startX: 0,
+          startY: 0,
+          endX: 1000,
+          endY: 0,
+          angle: 0,
+          repeat: 'no-repeat',
+          colors: [
+            { stop: 0, color: first },
+            { stop: 1, color: second },
+          ],
+        },
+      };
+      delete next.color;
+      delete next.secondaryColor;
+      onChange(next);
+      return;
+    }
+
+    const first = pattern.gradient?.colors?.[0]?.color ?? '#315078';
+    const last =
+      pattern.gradient?.colors?.[pattern.gradient.colors.length - 1]?.color ??
+      '#152943';
+    const next: VisualPatternOptions = {
+      ...pattern,
+      color: first,
+      secondaryColor: last,
+    };
+    delete next.gradient;
+    onChange(next);
+  };
+
   return (
     <div className="apx-canvas-v2-editor">
       <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
@@ -762,20 +803,52 @@ function PatternEditor({
         />
       </div>
 
-      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
-        <ColorField
-          label="Primary"
-          value={pattern.color ?? '#315078'}
-          fallback="#315078"
-          onChange={(value) => patch({ color: value })}
-        />
-        <ColorField
-          label="Secondary"
-          value={pattern.secondaryColor ?? '#152943'}
-          fallback="#152943"
-          onChange={(value) => patch({ secondaryColor: value })}
-        />
+      <div className="apx-canvas-v2-field">
+        <span>Pattern paint</span>
+        <div className="apx-canvas-v2-segmented apx-canvas-v2-segmented--2">
+          <button
+            type="button"
+            data-active={paintMode === 'color' ? 'true' : undefined}
+            onClick={() => setPaintMode('color')}
+          >
+            Primary / secondary
+          </button>
+          <button
+            type="button"
+            data-active={paintMode === 'gradient' ? 'true' : undefined}
+            onClick={() => setPaintMode('gradient')}
+          >
+            Gradient
+          </button>
+        </div>
       </div>
+
+      {paintMode === 'color' ? (
+        <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
+          <ColorField
+            label="Primary"
+            value={pattern.color ?? '#315078'}
+            fallback="#315078"
+            onChange={(value) => patch({ color: value })}
+          />
+          <ColorField
+            label="Secondary"
+            value={pattern.secondaryColor ?? '#152943'}
+            fallback="#152943"
+            onChange={(value) => patch({ secondaryColor: value })}
+          />
+        </div>
+      ) : pattern.gradient ? (
+        <PatternGradientEditor
+          gradient={pattern.gradient}
+          onChange={(gradient) => {
+            const next: VisualPatternOptions = { ...pattern, gradient };
+            delete next.color;
+            delete next.secondaryColor;
+            onChange(next);
+          }}
+        />
+      ) : null}
 
       <div className="apx-canvas-v2-grid apx-canvas-v2-grid--3">
         <NumberField label="Size" value={pattern.size ?? 1} min={0.01} step={1} onChange={(value) => patch({ size: value })} />
@@ -794,12 +867,21 @@ function PatternEditor({
 
       <SelectField
         label="Pattern blend"
-        value={pattern.blendMode ?? 'overlay'}
+        value={pattern.blendMode ?? 'source-over'}
         options={CANVAS_BLEND_MODES}
         onChange={(value) =>
           patch({ blendMode: value as VisualPatternOptions['blendMode'] })
         }
       />
+
+      <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
+        <strong>Paint and blend are independent</strong>
+        <span>
+          Pattern paint is either primary/secondary colors or one gradient.
+          Blend mode is applied afterward when the finished pattern layer is
+          composited onto the canvas. Source over preserves authored colors.
+        </span>
+      </div>
 
       {pattern.type === 'custom' ? (
         <label className="apx-canvas-v2-field">
@@ -811,42 +893,6 @@ function PatternEditor({
             onChange={(event) => patch({ customPatternImage: event.target.value })}
           />
         </label>
-      ) : null}
-
-      <div className="apx-canvas-v2-inline-toggle">
-        <div>
-          <strong>Gradient paint</strong>
-          <small>PatternOptions.gradient uses the Apexify GradientConfig contract.</small>
-        </div>
-        <Toggle
-          label="Enable pattern gradient"
-          checked={Boolean(pattern.gradient)}
-          onChange={(checked) =>
-            patch({
-              gradient: checked
-                ? {
-                    type: 'linear',
-                    startX: 0,
-                    startY: 0,
-                    endX: 1000,
-                    endY: 0,
-                    angle: 0,
-                    repeat: 'no-repeat',
-                    colors: [
-                      { stop: 0, color: '#315078' },
-                      { stop: 1, color: '#7c3aed' },
-                    ],
-                  }
-                : undefined,
-            })
-          }
-        />
-      </div>
-      {pattern.gradient ? (
-        <PatternGradientEditor
-          gradient={pattern.gradient}
-          onChange={(gradient) => patch({ gradient })}
-        />
       ) : null}
     </div>
   );
