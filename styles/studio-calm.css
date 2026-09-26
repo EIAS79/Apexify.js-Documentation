@@ -9021,3 +9021,52 @@ body[data-phase17-resizing="dock"]{
 .apx-canvas-v2-video-mode strong{color:#c9d8e8;font-size:.45rem}
 .apx-canvas-v2-video-mode small{color:#657d96;font-size:.38rem;line-height:1.4}
 @media(max-width:760px){.apx-canvas-v2-video-modes{grid-template-columns:1fr}}
+
+
+/* Canvas numeric controls: keep suffixes and 3-digit percentages readable. */
+.apx-canvas-v2-number .apx-canvas-v2-input{
+  padding-left:.42rem;
+  padding-right:24px;
+  font-variant-numeric:tabular-nums;
+}
+
+.apx-canvas-v2-number input[type="number"]{
+  appearance:textfield;
+  -moz-appearance:textfield;
+}
+
+.apx-canvas-v2-number input[type="number"]::-webkit-outer-spin-button,
+.apx-canvas-v2-number input[type="number"]::-webkit-inner-spin-button{
+  margin:0;
+  -webkit-appearance:none;
+}
+
+.apx-canvas-v2-stop{
+  grid-template-columns:32px minmax(92px,1fr) minmax(82px,92px) 28px;
+}
+
+.apx-canvas-v2-stop-value{
+  min-width:82px;
+}
+
+.apx-canvas-v2-stop-value .apx-canvas-v2-input{
+  padding-right:22px;
+  text-align:left;
+}
+
+.apx-canvas-v2-stop-value small{
+  right:7px;
+  color:#8198b0;
+  font-weight:750;
+}
+
+.apx-canvas-v2-range-label strong{
+  flex:0 0 auto;
+  min-width:42px;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+
+.apx-canvas-v2-grid--3 .apx-canvas-v2-number{
+  min-width:72px;
+}
