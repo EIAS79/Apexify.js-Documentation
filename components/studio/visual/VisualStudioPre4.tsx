@@ -42,7 +42,11 @@ import {
   VideoCameraIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
-import { createApexifyWebRuntime, type ApexifyWebRuntime } from '@apexify/web';
+import {
+  createApexifyWebRuntime,
+  type ApexifyWebRuntime,
+  type WebStudioPreviewBounds,
+} from '@apexify/web';
 import { BrandIcon } from '@/components/Brand';
 import { InteractiveCodeEditor } from '@/components/docs/playground/InteractiveCodeEditor';
 import {
@@ -567,6 +571,7 @@ export default function VisualStudioPre4({
   const [pathConfigError, setPathConfigError] = useState<string | null>(null);
   const [inlineTextEditId, setInlineTextEditId] = useState<string | null>(null);
   const [artboardPreviewUrl, setArtboardPreviewUrl] = useState<string | null>(null);
+  const [artboardPreviewBounds, setArtboardPreviewBounds] = useState<WebStudioPreviewBounds | null>(null);
   const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
   const [phase7Results, setPhase7Results] = useState<Record<string, unknown>>({});
   const [phase7Action, setPhase7Action] = useState<
@@ -1398,6 +1403,7 @@ export default function VisualStudioPre4({
             : 'preview',
           warnings: [] as string[],
           results: analysisResults,
+          renderBounds: null as WebStudioPreviewBounds | null,
         };
       } finally {
         releasePhase10Render();
@@ -1418,6 +1424,7 @@ export default function VisualStudioPre4({
       warnings: result.warnings,
       results:
         ((result as typeof result & { results?: Record<string, unknown> }).results ?? {}),
+      renderBounds: result.renderBounds,
     };
   };
 
@@ -1426,6 +1433,7 @@ export default function VisualStudioPre4({
     if (!active || (!codeSource.trim() && !previewGenerated.value)) return;
     if (phase13Active || phase12Active) {
       setArtboardPreviewUrl(null);
+      setArtboardPreviewBounds(null);
       return;
     }
 
@@ -1453,6 +1461,7 @@ export default function VisualStudioPre4({
           if (cancelled) return;
           if (result.ok) {
             setArtboardPreviewUrl(result.dataUrl);
+            setArtboardPreviewBounds(result.renderBounds);
             setPhase7Results(result.results);
           }
         } catch {
@@ -2371,6 +2380,7 @@ export default function VisualStudioPre4({
     setCollapsed(new Set());
     setInlineTextEditId(null);
     setArtboardPreviewUrl(null);
+    setArtboardPreviewBounds(null);
     setArtboardPreviewBusy(false);
     setModalPreviewUrl(null);
     setModalPreviewDownloadUrl(null);
@@ -6397,6 +6407,12 @@ export default function VisualStudioPre4({
                   draggable={false}
                   data-authoritative-apexify-frame
                   data-rendering={artboardPreviewBusy ? 'true' : undefined}
+                  style={{
+                    left: artboardPreviewBounds?.x ?? 0,
+                    top: artboardPreviewBounds?.y ?? 0,
+                    width: artboardPreviewBounds?.width ?? project.document.width,
+                    height: artboardPreviewBounds?.height ?? project.document.height,
+                  }}
                 />
               ) : null}
               <div className="apx-pre4-artboard-grid" />
