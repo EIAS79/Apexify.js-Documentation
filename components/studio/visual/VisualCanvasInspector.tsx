@@ -58,6 +58,7 @@ type Props = {
   ) => void;
   onResizeDraft: (key: 'width' | 'height', value: number) => void;
   onMessage: (message: string) => void;
+  onOpenVideoEditor?: (assetId?: string) => void;
 };
 
 type SectionProps = {
@@ -305,6 +306,66 @@ function SelectField({
         ))}
       </select>
     </label>
+  );
+}
+
+function MultiPositionField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const selected = new Set(
+    (value || 'all')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean),
+  );
+  const toggle = (option: string) => {
+    if (option === 'all') {
+      onChange('all');
+      return;
+    }
+    const next = new Set(selected.has('all') ? [] : selected);
+    if (next.has(option)) next.delete(option);
+    else next.add(option);
+    onChange(next.size ? [...next].join(',') : 'all');
+  };
+
+  return (
+    <div className="apx-canvas-v2-field">
+      <span>{label}</span>
+      <div
+        className="apx-canvas-v2-multi"
+        role="group"
+        aria-label={label}
+      >
+        {BORDER_POSITIONS.map((option) => (
+          <button
+            key={option}
+            type="button"
+            data-active={
+              selected.has('all')
+                ? option === 'all'
+                  ? 'true'
+                  : undefined
+                : selected.has(option)
+                  ? 'true'
+                  : undefined
+            }
+            onClick={() => toggle(option)}
+          >
+            {titleCase(option)}
+          </button>
+        ))}
+      </div>
+      <small className="apx-canvas-v2-field-hint">
+        Select multiple positions. “All” resets the selection.
+      </small>
+    </div>
   );
 }
 
@@ -952,10 +1013,9 @@ function StrokeEditor({
             patch({ style: value as VisualStrokeOptions['style'] })
           }
         />
-        <SelectField
-          label="Border position"
+        <MultiPositionField
+          label="Stroke sides"
           value={stroke.borderPosition ?? 'all'}
-          options={BORDER_POSITIONS}
           onChange={(borderPosition) => patch({ borderPosition })}
         />
       </div>
@@ -985,15 +1045,11 @@ function StrokeEditor({
           </span>
         </label>
       </div>
-      <label className="apx-canvas-v2-field">
-        <span>Rounded corners</span>
-        <input
-          className="apx-canvas-v2-input"
-          value={stroke.roundedCorners ?? 'all'}
-          placeholder="all, top-left, top-right..."
-          onChange={(event) => patch({ roundedCorners: event.target.value })}
-        />
-      </label>
+      <MultiPositionField
+        label="Rounded corners"
+        value={stroke.roundedCorners ?? 'all'}
+        onChange={(roundedCorners) => patch({ roundedCorners })}
+      />
     </div>
   );
 }
@@ -1081,24 +1137,16 @@ function ShadowEditor({
           </span>
         </label>
       </div>
-      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
-        <label className="apx-canvas-v2-field">
-          <span>Rounded corners</span>
-          <input
-            className="apx-canvas-v2-input"
-            value={shadow.roundedCorners ?? 'all'}
-            onChange={(event) => patch({ roundedCorners: event.target.value })}
-          />
-        </label>
-        <label className="apx-canvas-v2-field">
-          <span>Border position</span>
-          <input
-            className="apx-canvas-v2-input"
-            value={shadow.borderPosition ?? 'all'}
-            onChange={(event) => patch({ borderPosition: event.target.value })}
-          />
-        </label>
-      </div>
+      <MultiPositionField
+        label="Rounded corners"
+        value={shadow.roundedCorners ?? 'all'}
+        onChange={(roundedCorners) => patch({ roundedCorners })}
+      />
+      <MultiPositionField
+        label="Shadow border positions"
+        value={shadow.borderPosition ?? 'all'}
+        onChange={(borderPosition) => patch({ borderPosition })}
+      />
     </div>
   );
 }
@@ -1395,6 +1443,7 @@ export function VisualCanvasInspector({
   onMutate,
   onResizeDraft,
   onMessage,
+  onOpenVideoEditor,
 }: Props) {
   const canvas = project.document.canvas ?? {};
   const mode = canvasMode(canvas);
@@ -1726,10 +1775,9 @@ export function VisualCanvasInspector({
                 onDraft((current) => ({ ...current, borderRadius }))
               }
             />
-            <SelectField
-              label="Border position"
+            <MultiPositionField
+              label="Rounded positions"
               value={canvas.borderPosition ?? 'all'}
-              options={BORDER_POSITIONS}
               onChange={(borderPosition) =>
                 onMutate('Canvas border position', (current) => ({
                   ...current,
@@ -2179,8 +2227,8 @@ export function VisualCanvasInspector({
       {header}
 
       <Section
-        title="Video background"
-        description="Frame/time extraction through CanvasConfig.videoBg"
+        title="Video frame background"
+        description="Extract one frame from video into createCanvas(); full editing lives in Video Editor"
         icon={FilmIcon}
         defaultOpen={Boolean(video)}
         badge="Node"
@@ -2214,6 +2262,26 @@ export function VisualCanvasInspector({
           />
         }
       >
+        <div className="apx-canvas-v2-video-modes">
+          <div className="apx-canvas-v2-video-mode" data-active="true">
+            <FilmIcon aria-hidden />
+            <span>
+              <strong>Frame background</strong>
+              <small>Use CanvasConfig.videoBg to extract one frame/time as the canvas surface.</small>
+            </span>
+          </div>
+          <button
+            type="button"
+            className="apx-canvas-v2-video-mode apx-canvas-v2-video-mode--button"
+            onClick={() => onOpenVideoEditor?.(selectedVideoAsset?.id)}
+          >
+            <ArrowsPointingOutIcon aria-hidden />
+            <span>
+              <strong>Edit full video</strong>
+              <small>Open the timeline editor for trim, effects, crop, speed, audio, transitions and export.</small>
+            </span>
+          </button>
+        </div>
         {video ? (
           <div className="apx-canvas-v2-editor">
             <label className="apx-canvas-v2-field">
@@ -2339,8 +2407,8 @@ export function VisualCanvasInspector({
                   }
                 />
                 <span>
-                  <strong>Loop</strong>
-                  <small>videoBg.loop</small>
+                  <strong>Loop metadata</strong>
+                  <small>Stored on videoBg; temporal looping belongs in Video Editor.</small>
                 </span>
               </label>
               <label className="apx-canvas-v2-check-card">
@@ -2358,8 +2426,8 @@ export function VisualCanvasInspector({
                   }
                 />
                 <span>
-                  <strong>Autoplay</strong>
-                  <small>videoBg.autoplay</small>
+                  <strong>Autoplay metadata</strong>
+                  <small>Stored on videoBg; playback behavior belongs in Video Editor.</small>
                 </span>
               </label>
             </div>
@@ -2377,10 +2445,9 @@ export function VisualCanvasInspector({
               }
             />
             <div className="apx-canvas-v2-callout apx-canvas-v2-callout--warning">
-              <strong>Runtime capability</strong>
+              <strong>Authoritative frame rendering</strong>
               <span>
-                Video frame extraction is part of Apexify.js CanvasConfig. Browser
-                preview support can differ from the Node/native renderer.
+                videoBg is rendered through the Node/FFmpeg runtime so frame and time extraction match Apexify.js. Use Video Editor when the output is a video rather than a single canvas frame.
               </span>
             </div>
           </div>
