@@ -7,13 +7,13 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, '..', '..');
 const destination = join(root, 'vendor', 'apexify-web');
-const sourceCommit = 'a8bcdcd15a53c170dcea08df95942403ec7b6067';
+const sourceCommit = 'c8f131e210fa7072ba4a91e6331fc9296bbc63e0';
 const base = `https://raw.githubusercontent.com/EIAS79/Apexify.js/${sourceCommit}/packages/web`;
 
 const files = [
   { path: 'package.json', blob: 'ecdde0366bfd302af6c9b08d004788298fe9db93' },
   { path: 'src/index.ts', blob: '88c60bbe95ce5d9818090a10c247f2e8f33ec8bf' },
-  { path: 'src/studio-preview.ts', blob: 'bf32b249b86eff29e18d1ae7e2b867fdc803644f' },
+  { path: 'src/studio-preview.ts', blob: 'df1511d654f19076a6f3dd734085315c75742b50' },
   { path: 'src/safe-preview-expression.ts', blob: 'cc7501d395eb8ce20707177c86e5f236c88f0e8b' },
 ];
 

@@ -334,7 +334,7 @@ Delivered:
 
 - a real first-party `@apexify/web` package source now exists under `packages/web` in the Apexify.js repository;
 - the package has zero runtime npm dependencies and does not import Node/native Apexify runtime code;
-- Studio pins the browser package to Apexify.js commit `a8bcdcd15a53c170dcea08df95942403ec7b6067`;
+- Studio pins the browser package to Apexify.js commit `c8f131e210fa7072ba4a91e6331fc9296bbc63e0`;
 - `scripts/studio/install-apexify-web.mjs` downloads only the required package files and verifies their exact Git blob SHA-1 identities before installation;
 - the generated package snapshot lives under `vendor/apexify-web/` and is excluded from source control;
 - TypeScript and webpack resolve the package through the real `@apexify/web` package identity;
