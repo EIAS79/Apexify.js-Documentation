@@ -187,8 +187,12 @@ requireCheck(
   '@apexify/web must honor CanvasConfig pattern transforms/gradient paint and deterministic noise.',
 );
 requireCheck(
-  apexifyWebPreview.includes("ctx.globalCompositeOperation = 'destination-over'"),
-  '@apexify/web canvas shadow must composite behind source pixels rather than tinting the canvas surface.',
+  apexifyWebPreview.includes('composeCanvasShadowPreview') &&
+    apexifyWebPreview.includes('output.width = width') &&
+    apexifyWebPreview.includes('output.height = height') &&
+    apexifyWebPreview.includes('return { canvas: output, offsetX: 0, offsetY: 0 }') &&
+    !apexifyWebPreview.includes('composeCanvasShadowOverflowPreview'),
+  '@apexify/web canvas shadow preview must keep native fixed output bounds and never expand for shadow overflow.',
 );
 requireCheck(
   apexifyWebPreview.includes("const layer = document.createElement('canvas')") &&
