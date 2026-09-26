@@ -162,7 +162,8 @@ requireCheck(apexifyWebPreview.includes('config.patternBg'), '@apexify/web must 
 requireCheck(apexifyWebPreview.includes("chartType === 'radar'") && apexifyWebPreview.includes("chartType === 'polarArea'"), '@apexify/web must cover all stable createChart() families.');
 requireCheck(apexifyWebIndex.includes('class ApexifyWebRuntime'), '@apexify/web runtime lifecycle class missing.');
 requireCheck(apexifyWebIndex.includes('registerApexifyWebFonts'), '@apexify/web font manager missing.');
-requireCheck(apexifyWebSource.commit === 'c8f131e210fa7072ba4a91e6331fc9296bbc63e0', '@apexify/web source snapshot is not pinned to the approved engine commit.');
+requireCheck(apexifyWebPreview.includes('CanvasShadowOverflowComposite') && apexifyWebPreview.includes('renderBounds: {'), '@apexify/web must preserve root shadow overflow without changing logical canvas dimensions.');
+requireCheck(apexifyWebSource.commit === '44e9707c8f4f9944a75756085238444d0f43cf72', '@apexify/web source snapshot is not pinned to the approved engine commit.');
 requireCheck(apexifyWebInstaller.includes('Integrity mismatch for @apexify/web'), '@apexify/web installer must verify source integrity.');
 requireCheck(
   apexifyWebPreview.includes("boolOf(inheritedBackground.inherit, false)") &&
