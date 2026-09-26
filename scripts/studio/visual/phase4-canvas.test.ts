@@ -217,6 +217,19 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
     assert.ok(inspector.includes(contract), 'missing Canvas V2 UI contract: ' + contract);
   }
 
+  for (const runtimeContract of [
+    'MultiPositionField',
+    'Stroke sides',
+    'Rounded positions',
+    'Edit full video',
+    'Frame background',
+  ]) {
+    assert.ok(inspector.includes(runtimeContract), 'missing Canvas interaction contract: ' + runtimeContract);
+  }
+  assert.match(shell, /canvasNeedsNodeRuntime/);
+  assert.match(shell, /phase13Timeline/);
+  assert.match(shell, /setPhase13Timeline/);
+
   for (const filterType of [
     'gaussianBlur','motionBlur','radialBlur','sharpen','noise','grain',
     'edgeDetection','emboss','invert','grayscale','sepia','pixelate',

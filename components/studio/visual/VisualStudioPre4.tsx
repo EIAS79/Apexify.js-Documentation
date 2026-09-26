@@ -109,6 +109,11 @@ import { hasPhase10Authoring } from '@/lib/studio/visual/phase10-codegen';
 import { hasPhase11Authoring } from '@/lib/studio/visual/phase11-codegen';
 import { hasPhase12Authoring } from '@/lib/studio/visual/phase12-codegen';
 import { hasPhase13Authoring } from '@/lib/studio/visual/phase13-codegen';
+import {
+  defaultPhase13Timeline,
+  phase13Timeline,
+  setPhase13Timeline,
+} from '@/lib/studio/visual/video-authoring-contract';
 import { hasPhase14Authoring } from '@/lib/studio/visual/phase14-codegen';
 import {
   PHASE14_HOSTED_EXCLUSIONS,
@@ -1260,7 +1265,7 @@ export default function VisualStudioPre4({
     if (kind === 'layers') {
       setLayersWidth((value) => Math.max(190, Math.min(420, value + delta)));
     } else if (kind === 'inspector') {
-      setInspectorWidth((value) => Math.max(240, Math.min(460, value + delta)));
+      setInspectorWidth((value) => Math.max(300, Math.min(540, value + delta)));
     } else {
       setDockHeight((value) => Math.max(120, Math.min(480, value + delta)));
     }
@@ -1270,7 +1275,20 @@ export default function VisualStudioPre4({
     source: string,
     displaySource = source,
   ) => {
-    if (phase14Active || phase13Active || phase12Active || phase11Active || phase10Active) {
+    const activeCanvasConfig = projectRef.current.document.canvas ?? {};
+    const canvasNeedsNodeRuntime =
+      Boolean(activeCanvasConfig.videoBg) ||
+      Boolean(activeCanvasConfig.customBg?.filters?.length) ||
+      /\bvideoBg\s*:/.test(source);
+
+    if (
+      phase14Active ||
+      phase13Active ||
+      phase12Active ||
+      phase11Active ||
+      phase10Active ||
+      canvasNeedsNodeRuntime
+    ) {
       let releasePhase10Render!: () => void;
       const previousPhase10Render = phase10RenderTailRef.current;
       phase10RenderTailRef.current = new Promise<void>((resolve) => {
@@ -4076,6 +4094,28 @@ export default function VisualStudioPre4({
         });
       }}
       onMessage={setMessage}
+      onOpenVideoEditor={(assetId) => {
+        if (assetId) {
+          mutate('Open video in editor', (current) => {
+            const timeline =
+              phase13Timeline(current) ?? defaultPhase13Timeline();
+            return setPhase13Timeline(current, {
+              ...timeline,
+              mode: 'pipeline',
+              source: { kind: 'asset', assetId },
+            });
+          });
+        }
+        setActiveTool('video');
+        setDockTab('timeline');
+        setDockCollapsed(false);
+        setInspectorTab('style');
+        setMessage(
+          assetId
+            ? 'Video Editor opened with the selected source'
+            : 'Video Editor opened',
+        );
+      }}
     />
   );
 

@@ -162,13 +162,28 @@ requireCheck(apexifyWebPreview.includes('config.patternBg'), '@apexify/web must 
 requireCheck(apexifyWebPreview.includes("chartType === 'radar'") && apexifyWebPreview.includes("chartType === 'polarArea'"), '@apexify/web must cover all stable createChart() families.');
 requireCheck(apexifyWebIndex.includes('class ApexifyWebRuntime'), '@apexify/web runtime lifecycle class missing.');
 requireCheck(apexifyWebIndex.includes('registerApexifyWebFonts'), '@apexify/web font manager missing.');
-requireCheck(apexifyWebSource.commit === '6b0cdf0b78cc7d4545c95d274ea0fb518583a20e', '@apexify/web source snapshot is not pinned to the approved engine commit.');
+requireCheck(apexifyWebSource.commit === 'bfbbf1329affc7f1bdc6c45ed948749f988e7814', '@apexify/web source snapshot is not pinned to the approved engine commit.');
 requireCheck(apexifyWebInstaller.includes('Integrity mismatch for @apexify/web'), '@apexify/web installer must verify source integrity.');
 requireCheck(
   apexifyWebPreview.includes("boolOf(inheritedBackground.inherit, false)") &&
     apexifyWebPreview.includes('width = bitmap.width') &&
     apexifyWebPreview.includes('height = bitmap.height'),
   '@apexify/web must honor customBg.inherit source dimensions instead of falling back to 640x360.',
+);
+requireCheck(
+  apexifyWebPreview.includes('applyCanvasRotationPreview') &&
+    apexifyWebPreview.includes('applyCanvasZoomPreview') &&
+    apexifyWebPreview.includes('canvasCornerRadii') &&
+    apexifyWebPreview.includes("style === 'dashed'") &&
+    apexifyWebPreview.includes("style === 'double'"),
+  '@apexify/web must honor CanvasConfig placement, zoom, selective corners and stroke styles.',
+);
+requireCheck(
+  apexifyWebPreview.includes('const scale = Math.max(0.01, numberOf(pattern.scale, 1))') &&
+    apexifyWebPreview.includes('const offsetX = numberOf(pattern.offsetX, 0)') &&
+    apexifyWebPreview.includes('const gradientPaint = rawGradient') &&
+    apexifyWebPreview.includes('ctx.createImageData(width, height)'),
+  '@apexify/web must honor CanvasConfig pattern transforms/gradient paint and deterministic noise.',
 );
 requireCheck(studioPreviewZoom.includes('requestFullscreen()'), 'Studio preview must expose real fullscreen mode.');
 requireCheck(studioPreviewZoom.includes('cursor-grab') && studioPreviewZoom.includes('scrollLeft'), 'Studio preview must preserve drag-to-pan behavior.');
