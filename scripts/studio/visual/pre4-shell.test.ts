@@ -180,6 +180,19 @@ test('PRE-4 renders the edited lower code source directly for live artboard feed
   assert.match(shell, /\}, 100\);/);
 });
 
+test('PRE-4 does not duplicate the canvas CSS background behind authoritative Apexify output', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+
+  assert.match(
+    shell,
+    /background:\s*artboardPreviewUrl\s*\?\s*'transparent'\s*:\s*canvasArtboardBackground/,
+  );
+  assert.match(
+    shell,
+    /opacity:\s*artboardPreviewUrl\s*\?\s*1\s*:\s*project\.document\.canvas\?\.opacity/,
+  );
+});
+
 test('PRE-4 keeps inherited image dimensions native in the Visual artboard', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
   const css = read('styles/studio-calm.css');
