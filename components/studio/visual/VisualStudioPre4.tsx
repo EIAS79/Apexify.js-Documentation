@@ -149,7 +149,9 @@ import {
   type Phase17AssetManifestEntry,
 } from '@/lib/studio/visual/hardening';
 import type {
+  VisualBlendMode,
   VisualCanvasConfig,
+  VisualImageFilter,
   VisualImageNodeProps,
   VisualNode,
   VisualProject,
