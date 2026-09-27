@@ -1283,6 +1283,56 @@ export default function VisualStudioPre4({
     displaySource = source,
   ) => {
     const activeCanvasConfig = projectRef.current.document.canvas ?? {};
+
+    const validateVirtualCanvasSource = (
+      value: string | undefined,
+      expectedPrefix: 'image/' | 'video/',
+      label: string,
+    ) => {
+      const sourceValue = value?.trim() ?? '';
+      if (!sourceValue) return null;
+      const id = studioAssetIdFromReference(sourceValue);
+      if (!id) return null;
+      const asset = assets.find((item) => item.id === id);
+      if (!asset) {
+        return label + ' references a Studio asset that is not loaded in this session.';
+      }
+      if (!asset.mime.startsWith(expectedPrefix)) {
+        return (
+          label +
+          ' expects ' +
+          expectedPrefix.slice(0, -1) +
+          ' media, but ' +
+          asset.name +
+          ' is ' +
+          asset.mime +
+          '.'
+        );
+      }
+      if (!asset.base64) {
+        return label + ' references ' + asset.name + ', but its bytes are unavailable.';
+      }
+      return null;
+    };
+
+    const customBgSourceError = validateVirtualCanvasSource(
+      activeCanvasConfig.customBg?.source,
+      'image/',
+      'customBg.source',
+    );
+    if (customBgSourceError) {
+      return { ok: false as const, error: customBgSourceError };
+    }
+
+    const videoBgSourceError = validateVirtualCanvasSource(
+      activeCanvasConfig.videoBg?.source,
+      'video/',
+      'videoBg.source',
+    );
+    if (videoBgSourceError) {
+      return { ok: false as const, error: videoBgSourceError };
+    }
+
     const canvasNeedsNodeRuntime =
       Boolean(activeCanvasConfig.videoBg) ||
       Boolean(activeCanvasConfig.customBg?.filters?.length) ||
@@ -1422,6 +1472,22 @@ export default function VisualStudioPre4({
     // look like unsupported local sources, producing a transparent canvas.
     const result = await runtime.renderStudioSource(source, assets);
     if (!result.ok) return { ok: false as const, error: result.error };
+
+    // A configured background must never silently degrade to a transparent
+    // canvas. The web runtime reports decode/missing-source problems as
+    // warnings so other layers can still render; for the primary background,
+    // surface that warning as a render failure instead.
+    if (activeCanvasConfig.customBg?.source) {
+      const backgroundWarning = result.warnings.find(
+        (warning) =>
+          warning.startsWith('customBg:') ||
+          warning.startsWith('customBg inherit:'),
+      );
+      if (backgroundWarning) {
+        return { ok: false as const, error: backgroundWarning };
+      }
+    }
+
     return {
       ok: true as const,
       dataUrl: result.dataUrl,
