@@ -1564,6 +1564,7 @@ export function VisualCanvasInspector({
       delete next.colorBg;
       delete next.gradientBg;
       delete next.customBg;
+      delete next.videoBg;
       delete next.transparentBase;
       if (nextMode === 'color') next.colorBg = '#0b1730';
       if (nextMode === 'gradient') next.gradientBg = defaultCanvasGradient();
@@ -1712,13 +1713,17 @@ export function VisualCanvasInspector({
                   placeholder="studio://asset/... or URL"
                   onFocus={onBeginEdit}
                   onChange={(event) =>
-                    onDraft((current) => ({
-                      ...current,
-                      customBg: {
-                        ...(current.customBg ?? customBg),
-                        source: event.target.value,
-                      },
-                    }))
+                    onDraft((current) => {
+                      const next = {
+                        ...current,
+                        customBg: {
+                          ...(current.customBg ?? customBg),
+                          source: event.target.value,
+                        },
+                      };
+                      delete next.videoBg;
+                      return next;
+                    })
                   }
                   onBlur={() => onEndEdit('Canvas image source')}
                 />
@@ -1734,13 +1739,17 @@ export function VisualCanvasInspector({
                       (item) => item.id === event.target.value,
                     );
                     if (!asset) return;
-                    onMutate('Canvas background asset', (current) => ({
-                      ...current,
-                      customBg: {
-                        ...(current.customBg ?? customBg),
-                        source: studioAssetReference(asset),
-                      },
-                    }));
+                    onMutate('Canvas background asset', (current) => {
+                      const next = {
+                        ...current,
+                        customBg: {
+                          ...(current.customBg ?? customBg),
+                          source: studioAssetReference(asset),
+                        },
+                      };
+                      delete next.videoBg;
+                      return next;
+                    });
                     onMessage('Canvas background · ' + asset.name);
                   }}
                 >
