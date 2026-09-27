@@ -1568,6 +1568,26 @@ export default function VisualStudioPre4({
         'const painter = new ApexPainter();',
         '',
         'async function main() {',
+        '  const info = await painter.createVideo({ source: ' +
+          JSON.stringify(source) +
+          ', getInfo: true });',
+        '  const duration = Number(info?.duration);',
+        '  const fps = Number(info?.fps);',
+        "  if (!Number.isFinite(duration) || duration <= 0) throw new Error('Could not determine video duration before extraction.');",
+        request.mode === 'time'
+          ? '  if (' +
+            JSON.stringify(position) +
+            " >= duration) throw new Error('Requested time ' + " +
+            JSON.stringify(position) +
+            " + 's is outside this video (duration: ' + duration.toFixed(3) + 's).');"
+          : '  const maxFrame = Number.isFinite(fps) && fps > 0 ? Math.max(1, Math.ceil(duration * fps)) : null;',
+        request.mode === 'frame'
+          ? '  if (maxFrame !== null && ' +
+            JSON.stringify(position) +
+            " > maxFrame) throw new Error('Requested frame ' + " +
+            JSON.stringify(position) +
+            " + ' is outside this video (approximately ' + maxFrame + ' frames at ' + fps.toFixed(3) + ' fps).');"
+          : '',
         '  return painter.' +
           method +
           '(' +
@@ -1580,7 +1600,7 @@ export default function VisualStudioPre4({
           JSON.stringify(request.quality) +
           ');',
         '}',
-      ].join('\n');
+      ].filter(Boolean).join('\n');
 
       const result = await currentNodeServerExecutionAdapter.run({
         session: createInteractiveSession({
@@ -1684,21 +1704,16 @@ export default function VisualStudioPre4({
         mime: artifact.mime,
         size,
         base64: normalizedBase64,
-        metadata:
-          artifact.metadata &&
-          (typeof artifact.metadata.width === 'number' ||
-            typeof artifact.metadata.height === 'number')
-            ? {
-                width:
-                  typeof artifact.metadata.width === 'number'
-                    ? artifact.metadata.width
-                    : undefined,
-                height:
-                  typeof artifact.metadata.height === 'number'
-                    ? artifact.metadata.height
-                    : undefined,
-              }
-            : undefined,
+        metadata: {
+          width:
+            typeof artifact.metadata?.width === 'number'
+              ? artifact.metadata.width
+              : sourceAsset?.metadata?.width,
+          height:
+            typeof artifact.metadata?.height === 'number'
+              ? artifact.metadata.height
+              : sourceAsset?.metadata?.height,
+        },
       };
 
       const nextAssets = replaceableAsset
