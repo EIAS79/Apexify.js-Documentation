@@ -1521,7 +1521,8 @@ export function VisualCanvasInspector({
     legacyVideoBg?.time !== undefined && legacyVideoBg.frame === undefined ? 'time' : 'frame',
   );
   const [frameExtractionSource, setFrameExtractionSource] = useState(
-    legacyVideoBg?.source ?? '',
+    legacyVideoBg?.source ??
+      (videoAssets[0] ? studioAssetReference(videoAssets[0]) : ''),
   );
   const [frameExtractionFrame, setFrameExtractionFrame] = useState(
     Math.max(1, Math.round(legacyVideoBg?.frame ?? 1)),
@@ -1535,10 +1536,8 @@ export function VisualCanvasInspector({
   const [frameExtractionQuality, setFrameExtractionQuality] = useState(
     clamp(Math.round(legacyVideoBg?.quality ?? 2), 1, 31),
   );
-  const defaultVideoSource = videoAssets[0] ? studioAssetReference(videoAssets[0]) : '';
-  const effectiveFrameExtractionSource = frameExtractionSource || defaultVideoSource;
   const selectedVideoAsset = videoAssets.find(
-    (asset) => studioAssetReference(asset) === effectiveFrameExtractionSource,
+    (asset) => studioAssetReference(asset) === frameExtractionSource,
   );
   const customBg = canvas.customBg;
   const inheritedAsset = customBg
@@ -2322,7 +2321,12 @@ export function VisualCanvasInspector({
           <Toggle
             label="Enable video frame extraction"
             checked={frameExtractionEnabled}
-            onChange={setFrameExtractionEnabled}
+            onChange={(checked) => {
+              setFrameExtractionEnabled(checked);
+              if (checked && !frameExtractionSource && videoAssets[0]) {
+                setFrameExtractionSource(studioAssetReference(videoAssets[0]));
+              }
+            }}
           />
         }
       >
@@ -2341,7 +2345,7 @@ export function VisualCanvasInspector({
               <span>Video source</span>
               <input
                 className="apx-canvas-v2-input"
-                value={effectiveFrameExtractionSource}
+                value={frameExtractionSource}
                 placeholder="studio://asset/... or file/URL"
                 onChange={(event) => setFrameExtractionSource(event.target.value)}
               />
@@ -2430,11 +2434,11 @@ export function VisualCanvasInspector({
               type="button"
               disabled={
                 videoFrameExtracting ||
-                !effectiveFrameExtractionSource.trim()
+                !frameExtractionSource.trim()
               }
               onClick={() => {
                 void onExtractVideoFrame({
-                  source: effectiveFrameExtractionSource.trim(),
+                  source: frameExtractionSource.trim(),
                   mode: frameExtractionMode,
                   frame: frameExtractionFrame,
                   time: frameExtractionTime,
