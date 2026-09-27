@@ -127,12 +127,25 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
     try {
       data = (await response.json()) as typeof data;
     } catch {
+      const referencedBytes = referencedStudioAssets.reduce(
+        (sum, asset) => sum + Math.max(0, asset.size || 0),
+        0,
+      );
+      const requestTooLarge = response.status === 413;
       return {
         status: 'error',
         diagnostics: [{
-          id: 'invalid-runner-response',
+          id: requestTooLarge ? 'runner-request-too-large' : 'invalid-runner-response',
           severity: 'error',
-          message: `Execution failed (HTTP ${response.status}) because the response was not JSON.`,
+          message: requestTooLarge
+            ? referencedBytes > 0
+              ? `The Studio runtime request was rejected as too large before execution (HTTP 413). Referenced assets total ${(referencedBytes / (1024 * 1024)).toFixed(2)} MiB. Remove/reduce the referenced media or use a smaller asset before retrying.`
+              : 'The Studio runtime request was rejected as too large before execution (HTTP 413).'
+            : `Execution failed (HTTP ${response.status}) because the response was not JSON.`,
+          code: requestTooLarge ? 'HTTP_413' : `HTTP_${response.status}`,
+          help: requestTooLarge
+            ? 'Studio now excludes unrelated shelf assets automatically; this message means the source itself still references enough payload to exceed the deployment request limit.'
+            : 'Retry the execution. If the problem persists, inspect the runtime response and deployment logs.',
         }],
         elapsedMs: Math.round(performance.now() - started),
       };
