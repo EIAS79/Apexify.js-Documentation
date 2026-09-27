@@ -1481,7 +1481,8 @@ function BackgroundLayersEditor({
 
 function canvasMode(
   canvas: VisualCanvasConfig,
-): 'default' | 'color' | 'gradient' | 'image' | 'transparent' {
+): 'default' | 'color' | 'gradient' | 'image' | 'video' | 'transparent' {
+  if (canvas.videoBg) return 'video';
   if (canvas.customBg) return 'image';
   if (canvas.gradientBg) return 'gradient';
   if (canvas.colorBg !== undefined) return 'color';
@@ -1494,6 +1495,7 @@ function baseModeLabel(mode: ReturnType<typeof canvasMode>) {
   if (mode === 'color') return 'Solid color';
   if (mode === 'gradient') return 'Gradient';
   if (mode === 'image') return 'Image';
+  if (mode === 'video') return 'Video frame';
   return 'Transparent';
 }
 
@@ -1577,6 +1579,15 @@ export function VisualCanvasInspector({
           filters: [],
         };
       }
+      if (nextMode === 'video') {
+        next.videoBg = {
+          source: videoAssets[0] ? studioAssetReference(videoAssets[0]) : '',
+          time: 0,
+          format: 'jpg',
+          quality: 2,
+          opacity: 1,
+        };
+      }
       if (nextMode === 'transparent') next.transparentBase = true;
       return next;
     });
@@ -1652,12 +1663,13 @@ export function VisualCanvasInspector({
           icon={SwatchIcon}
           badge={baseModeLabel(mode)}
         >
-          <div className="apx-canvas-v2-segmented apx-canvas-v2-segmented--5">
+          <div className="apx-canvas-v2-segmented apx-canvas-v2-segmented--6">
             {([
               ['default', 'Default'],
               ['color', 'Color'],
               ['gradient', 'Gradient'],
               ['image', 'Image'],
+              ['video', 'Video'],
               ['transparent', 'Clear'],
             ] as const).map(([id, label]) => (
               <button
@@ -1847,6 +1859,139 @@ export function VisualCanvasInspector({
                   }))
                 }
               />
+            </div>
+          ) : null}
+
+          {mode === 'video' && canvas.videoBg ? (
+            <div className="apx-canvas-v2-editor" data-canvas-video-background>
+              <label className="apx-canvas-v2-field">
+                <span>videoBg.source</span>
+                <input
+                  className="apx-canvas-v2-input"
+                  value={canvas.videoBg.source}
+                  placeholder="studio://asset/... or video source"
+                  onFocus={onBeginEdit}
+                  onChange={(event) =>
+                    onDraft((current) => ({
+                      ...current,
+                      videoBg: {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        source: event.target.value,
+                      },
+                    }))
+                  }
+                  onBlur={() => onEndEdit('Canvas video source')}
+                />
+              </label>
+
+              <label className="apx-canvas-v2-field">
+                <span>Choose video asset</span>
+                <select
+                  className="apx-canvas-v2-input"
+                  value={
+                    videoAssets.find(
+                      (asset) =>
+                        studioAssetReference(asset) === canvas.videoBg?.source,
+                    )?.id ?? ''
+                  }
+                  onChange={(event) => {
+                    const asset = videoAssets.find(
+                      (item) => item.id === event.target.value,
+                    );
+                    if (!asset) return;
+                    onMutate('Canvas video background asset', (current) => ({
+                      ...current,
+                      videoBg: {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        source: studioAssetReference(asset),
+                      },
+                    }));
+                    onMessage('Canvas video background · ' + asset.name);
+                  }}
+                >
+                  <option value="">Custom source</option>
+                  {videoAssets.map((asset) => (
+                    <option key={asset.id} value={asset.id}>
+                      {asset.name}
+                      {asset.metadata?.duration
+                        ? ' · ' + asset.metadata.duration.toFixed(2) + 's'
+                        : ''}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="apx-canvas-v2-grid apx-canvas-v2-grid--3">
+                <NumberField
+                  label="Time"
+                  value={canvas.videoBg.time ?? 0}
+                  min={0}
+                  step={0.1}
+                  suffix="s"
+                  onChange={(time) =>
+                    onMutate('Video background time', (current) => {
+                      const videoBg = {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        time: Math.max(0, time),
+                      };
+                      delete videoBg.frame;
+                      return { ...current, videoBg };
+                    })
+                  }
+                />
+                <SelectField
+                  label="Format"
+                  value={canvas.videoBg.format ?? 'jpg'}
+                  options={['jpg', 'png']}
+                  onChange={(value) =>
+                    onMutate('Video background format', (current) => ({
+                      ...current,
+                      videoBg: {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        format: value as 'jpg' | 'png',
+                      },
+                    }))
+                  }
+                />
+                <NumberField
+                  label="Quality"
+                  value={canvas.videoBg.quality ?? 2}
+                  min={1}
+                  max={31}
+                  step={1}
+                  onChange={(quality) =>
+                    onMutate('Video background quality', (current) => ({
+                      ...current,
+                      videoBg: {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        quality: clamp(Math.round(quality), 1, 31),
+                      },
+                    }))
+                  }
+                />
+              </div>
+
+              <RangeField
+                label="Video opacity"
+                value={canvas.videoBg.opacity ?? 1}
+                onChange={(opacity) =>
+                  onDraft((current) => ({
+                    ...current,
+                    videoBg: {
+                      ...(current.videoBg ?? canvas.videoBg!),
+                      opacity,
+                    },
+                  }))
+                }
+              />
+
+              <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
+                <strong>FFmpeg-backed frame background</strong>
+                <span>
+                  Uploaded Studio videos use their virtual asset reference and route through
+                  the full runtime. Image backgrounds stay on the browser renderer.
+                </span>
+              </div>
             </div>
           ) : null}
         </Section>
