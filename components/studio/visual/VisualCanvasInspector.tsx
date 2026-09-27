@@ -1539,6 +1539,18 @@ export function VisualCanvasInspector({
   const selectedVideoAsset = videoAssets.find(
     (asset) => studioAssetReference(asset) === frameExtractionSource,
   );
+  const selectedVideoDuration =
+    typeof selectedVideoAsset?.metadata?.duration === 'number' &&
+    Number.isFinite(selectedVideoAsset.metadata.duration) &&
+    selectedVideoAsset.metadata.duration > 0
+      ? selectedVideoAsset.metadata.duration
+      : null;
+  const extractionPositionError =
+    frameExtractionMode === 'time' &&
+    selectedVideoDuration !== null &&
+    frameExtractionTime >= selectedVideoDuration
+      ? `Time must be below ${selectedVideoDuration.toFixed(3)}s for this video.`
+      : null;
   const customBg = canvas.customBg;
   const inheritedAsset = customBg
     ? imageAssets.find(
@@ -2434,7 +2446,8 @@ export function VisualCanvasInspector({
               type="button"
               disabled={
                 videoFrameExtracting ||
-                !frameExtractionSource.trim()
+                !frameExtractionSource.trim() ||
+                Boolean(extractionPositionError)
               }
               onClick={() => {
                 void onExtractVideoFrame({
@@ -2451,9 +2464,16 @@ export function VisualCanvasInspector({
               {videoFrameExtracting ? 'Extracting…' : 'Extract'}
             </button>
 
-            <small className="apx-canvas-v2-field-hint">
-              Frame extraction is 1-based. Time extraction starts at 0 seconds.
-              JPEG/PNG quality follows Apexify's 1–31 FFmpeg contract.
+            <small
+              className="apx-canvas-v2-field-hint"
+              data-invalid={extractionPositionError ? 'true' : undefined}
+            >
+              {extractionPositionError ??
+                `Frame extraction is 1-based. Time extraction starts at 0 seconds.${
+                  selectedVideoDuration !== null
+                    ? ` Selected video duration: ${selectedVideoDuration.toFixed(3)}s.`
+                    : ''
+                } JPEG/PNG quality follows Apexify's 1–31 FFmpeg contract.`}
             </small>
           </div>
         ) : (
