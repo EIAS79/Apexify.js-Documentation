@@ -270,6 +270,13 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.match(inspector, /max=\{31\}/);
   assert.match(shell, /extractFrameByNumber/);
   assert.match(shell, /extractFrameAtTime/);
+  assert.match(shell, /getInfo: true/);
+  assert.match(shell, /Requested time/);
+  assert.match(shell, /Requested frame/);
+  assert.match(shell, /sourceAsset\?\.metadata\?\.width/);
+  assert.match(shell, /sourceAsset\?\.metadata\?\.height/);
+  assert.match(inspector, /selectedVideoDuration/);
+  assert.match(inspector, /extractionPositionError/);
   assert.match(shell, /delete next\.videoBg/);
   assert.match(shell, /customBg = \{/);
   assert.match(shell, /filters: previousCustomBg\?\.filters \?\? \[\]/);
