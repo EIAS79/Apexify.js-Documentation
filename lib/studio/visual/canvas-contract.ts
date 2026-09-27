@@ -215,9 +215,20 @@ export function validateVisualCanvasConfig(
     issue(issues, 'canvas-radius', p + '.borderRadius', 'Canvas radius must be non-negative or circular.');
   }
 
-  const baseCount = [canvas.colorBg, canvas.gradientBg, canvas.customBg].filter((value) => value !== undefined).length;
+  const baseCount = [
+    canvas.colorBg,
+    canvas.gradientBg,
+    canvas.customBg,
+    canvas.videoBg,
+    canvas.transparentBase === true ? true : undefined,
+  ].filter((value) => value !== undefined).length;
   if (baseCount > 1) {
-    issue(issues, 'canvas-base-background', p, 'Only one of colorBg, gradientBg or customBg may be active.');
+    issue(
+      issues,
+      'canvas-base-background',
+      p,
+      'Only one primary canvas background may be active: colorBg, gradientBg, customBg, videoBg, or transparentBase.',
+    );
   }
 
   validateGradient(issues, canvas.gradientBg, p + '.gradientBg');
