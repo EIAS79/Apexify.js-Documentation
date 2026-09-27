@@ -76,6 +76,21 @@ export function studioAssetDataUrl(asset: Pick<StudioVirtualAsset, 'mime' | 'bas
   return `data:${asset.mime || 'application/octet-stream'};base64,${asset.base64}`;
 }
 
+/**
+ * Return only virtual assets that are actually referenced by executable Studio
+ * source. Server-backed runs must not upload the entire shared asset shelf:
+ * unrelated media can easily exceed platform request-body limits and cause a
+ * proxy-level HTTP 413 before the Studio runner receives the request.
+ */
+export function studioAssetsReferencedBySources(
+  assets: readonly StudioVirtualAsset[],
+  sources: readonly string[],
+): StudioVirtualAsset[] {
+  if (!assets.length || !sources.length) return [];
+  const haystack = sources.join('\n');
+  return assets.filter((asset) => haystack.includes(studioAssetReference(asset)));
+}
+
 function bytesToBase64(bytes: Uint8Array): string {
   const CHUNK = 0x8000;
   let binary = '';
