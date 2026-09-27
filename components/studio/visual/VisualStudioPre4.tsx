@@ -1415,7 +1415,17 @@ export default function VisualStudioPre4({
     const runtime =
       webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
     await runtime.registerFonts(assets);
-    const result = await runtime.renderStudioSource(source, assets);
+
+    // Browser-direct Apexify cannot dereference Studio's virtual URI scheme.
+    // Rewrite only known uploaded asset references to their exact data URLs
+    // before execution. Keep the canonical/generated source unchanged.
+    const browserSource = assets.reduce((currentSource, asset) => {
+      const reference = studioAssetReference(asset);
+      if (!currentSource.includes(reference)) return currentSource;
+      return currentSource.split(reference).join(studioAssetDataUrl(asset));
+    }, source);
+
+    const result = await runtime.renderStudioSource(browserSource, assets);
     if (!result.ok) return { ok: false as const, error: result.error };
     return {
       ok: true as const,
