@@ -213,6 +213,37 @@ test('Phase 4 rejects conflicting primary backgrounds and unsafe dynamic canvas 
   assert.equal(dynamic.ok, false);
 });
 
+test('Phase 4 treats videoBg as an exclusive primary background', () => {
+  const invalid = createVisualProject({
+    width: 640,
+    height: 360,
+    now: '2026-09-28T00:00:00.000Z',
+  });
+  invalid.document.canvas = {
+    customBg: {
+      source: 'studio://asset/image-one',
+      fit: 'fill',
+      align: 'center',
+      opacity: 1,
+    },
+    videoBg: {
+      source: 'studio://asset/video-one',
+      time: 0,
+      format: 'jpg',
+      quality: 2,
+      opacity: 1,
+    },
+  };
+
+  const validation = validateVisualProject(invalid);
+  assert.equal(validation.ok, false);
+  assert.ok(
+    validation.issues.some(
+      (issue) => issue.code === 'canvas-base-background',
+    ),
+  );
+});
+
 test('Phase 4 shell exposes the complete createCanvas inspector contract', () => {
   const shell = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
   const inspector = fs.readFileSync('components/studio/visual/VisualCanvasInspector.tsx', 'utf8');
@@ -278,6 +309,11 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.match(inspector, /selectedVideoDuration/);
   assert.match(inspector, /extractionPositionError/);
   assert.match(shell, /delete next\.videoBg/);
+  assert.match(inspector, /delete next\.videoBg/);
+  assert.match(shell, /validateVirtualCanvasSource/);
+  assert.match(shell, /customBg\.source/);
+  assert.match(shell, /videoBg\.source/);
+  assert.match(shell, /backgroundWarning/);
   assert.match(shell, /customBg = \{/);
   assert.match(shell, /filters: previousCustomBg\?\.filters \?\? \[\]/);
   assert.match(shell, /setInspectorTab\('effects'\)/);
