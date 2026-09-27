@@ -257,6 +257,8 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
     'createCanvas()',
     'Base surface',
     'customBg.source',
+    'videoBg.source',
+    'Video opacity',
     'Inherit source dimensions',
     'Image filters',
     'Video frame extraction',
@@ -310,6 +312,8 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.match(inspector, /extractionPositionError/);
   assert.match(shell, /delete next\.videoBg/);
   assert.match(inspector, /delete next\.videoBg/);
+  assert.match(inspector, /data-canvas-video-background/);
+  assert.match(inspector, /apx-canvas-v2-segmented--6/);
   assert.match(shell, /validateVirtualCanvasSource/);
   assert.match(shell, /customBg\.source/);
   assert.match(shell, /videoBg\.source/);
