@@ -228,7 +228,7 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
     'customBg.source',
     'Inherit source dimensions',
     'Image filters',
-    'Video background',
+    'Video frame extraction',
     'Pattern overlay',
     'Pattern paint',
     'Primary / secondary',
@@ -256,11 +256,24 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
     'MultiPositionField',
     'Stroke sides',
     'Rounded positions',
-    'Edit full video',
-    'Frame background',
+    'By frame',
+    'By time',
+    'data-canvas-video-extract',
+    'Video → still image → customBg',
   ]) {
     assert.ok(inspector.includes(runtimeContract), 'missing Canvas interaction contract: ' + runtimeContract);
   }
+  assert.doesNotMatch(inspector, /Edit full video/);
+  assert.doesNotMatch(inspector, /Loop metadata/);
+  assert.doesNotMatch(inspector, /Autoplay metadata/);
+  assert.match(inspector, /frameExtractionMode === 'frame'/);
+  assert.match(inspector, /max=\{31\}/);
+  assert.match(shell, /extractFrameByNumber/);
+  assert.match(shell, /extractFrameAtTime/);
+  assert.match(shell, /delete next\.videoBg/);
+  assert.match(shell, /customBg = \{/);
+  assert.match(shell, /filters: previousCustomBg\?\.filters \?\? \[\]/);
+  assert.match(shell, /setInspectorTab\('effects'\)/);
   assert.match(shell, /canvasNeedsNodeRuntime/);
   assert.match(shell, /phase13Timeline/);
   assert.match(shell, /setPhase13Timeline/);

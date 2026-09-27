@@ -82,6 +82,7 @@ import {
 } from '@/components/studio/visual/VisualAdvancedAuthoring';
 import {
   VisualCanvasInspector,
+  type CanvasVideoFrameExtractionRequest,
 } from '@/components/studio/visual/VisualCanvasInspector';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import {
@@ -573,6 +574,7 @@ export default function VisualStudioPre4({
   const [artboardPreviewUrl, setArtboardPreviewUrl] = useState<string | null>(null);
   const [artboardPreviewBounds, setArtboardPreviewBounds] = useState<WebStudioPreviewBounds | null>(null);
   const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
+  const [canvasFrameExtracting, setCanvasFrameExtracting] = useState(false);
   const [phase7Results, setPhase7Results] = useState<Record<string, unknown>>({});
   const [phase7Action, setPhase7Action] = useState<
     'freehand' | 'pixel-probe' | 'pixel-data' | 'pixel-set' | 'path-detect' | 'region-detect' | 'region-distance' | 'any-region' | null
@@ -1526,6 +1528,218 @@ export default function VisualStudioPre4({
         canvas: updater(current.document.canvas ?? {}),
       },
     }));
+
+  const extractCanvasVideoFrame = async (
+    request: CanvasVideoFrameExtractionRequest,
+  ) => {
+    if (canvasFrameExtracting) return;
+
+    const source = request.source.trim();
+    if (!source) {
+      setMessage('Choose a video source before extracting a frame');
+      return;
+    }
+    if (request.mode === 'frame' && (!Number.isInteger(request.frame) || request.frame < 1)) {
+      setMessage('Frame number must be an integer starting at 1');
+      return;
+    }
+    if (request.mode === 'time' && (!Number.isFinite(request.time) || request.time < 0)) {
+      setMessage('Time must be a non-negative number');
+      return;
+    }
+    if (!Number.isInteger(request.quality) || request.quality < 1 || request.quality > 31) {
+      setMessage('Frame quality must be an integer from 1 to 31');
+      return;
+    }
+
+    setCanvasFrameExtracting(true);
+    setMessage('Extracting video frame…');
+
+    try {
+      const method =
+        request.mode === 'frame'
+          ? 'extractFrameByNumber'
+          : 'extractFrameAtTime';
+      const position =
+        request.mode === 'frame' ? request.frame : request.time;
+      const extractionSource = [
+        "import { ApexPainter } from 'apexify.js';",
+        '',
+        'const painter = new ApexPainter();',
+        '',
+        'async function main() {',
+        '  return painter.' +
+          method +
+          '(' +
+          JSON.stringify(source) +
+          ', ' +
+          JSON.stringify(position) +
+          ', ' +
+          JSON.stringify(request.format) +
+          ', ' +
+          JSON.stringify(request.quality) +
+          ');',
+        '}',
+      ].join('\n');
+
+      const result = await currentNodeServerExecutionAdapter.run({
+        session: createInteractiveSession({
+          source: extractionSource,
+          language: 'ts',
+          runtime: 'node',
+          options: { studioAssets: assets },
+          layout: { activePanel: 'editor' },
+        }),
+      });
+
+      if (result.status !== 'ready' || !result.output) {
+        throw new Error(
+          result.diagnostics[0]?.message ??
+            'Apexify/FFmpeg frame extraction is unavailable.',
+        );
+      }
+
+      const artifact =
+        result.output.artifacts?.find(
+          (item) => item.base64 && item.mime.startsWith('image/'),
+        ) ??
+        (result.output.base64
+          ? {
+              id: 'extracted-frame',
+              name: 'extracted-frame.' + request.format,
+              kind: 'image' as const,
+              mime:
+                request.format === 'png' ? 'image/png' : 'image/jpeg',
+              base64: result.output.base64,
+              metadata: undefined,
+            }
+          : null);
+
+      if (!artifact?.base64 || !artifact.mime.startsWith('image/')) {
+        throw new Error('Frame extraction completed without an image artifact.');
+      }
+
+      const normalizedBase64 = artifact.base64.replace(/\s+/g, '');
+      const padding = normalizedBase64.endsWith('==')
+        ? 2
+        : normalizedBase64.endsWith('=')
+          ? 1
+          : 0;
+      const size = Math.max(
+        0,
+        Math.floor((normalizedBase64.length * 3) / 4) - padding,
+      );
+      if (!size) throw new Error('Extracted frame is empty.');
+      if (size > STUDIO_ASSET_LIMITS.maxBytesPerAsset) {
+        throw new Error('Extracted frame exceeds the 8 MiB Studio asset limit.');
+      }
+
+      const currentCanvas = projectRef.current.document.canvas ?? {};
+      const currentBackgroundId = currentCanvas.customBg?.source
+        ? studioAssetIdFromReference(currentCanvas.customBg.source)
+        : null;
+      const replaceableAsset = currentBackgroundId
+        ? assets.find(
+            (item) =>
+              item.id === currentBackgroundId &&
+              item.name.startsWith('Canvas frame · '),
+          )
+        : undefined;
+
+      if (!replaceableAsset && assets.length >= STUDIO_ASSET_LIMITS.maxCount) {
+        throw new Error(
+          'Studio asset limit reached. Remove an asset before extracting another frame.',
+        );
+      }
+
+      const nextTotalBytes =
+        totalStudioAssetBytes(assets) -
+        (replaceableAsset?.size ?? 0) +
+        size;
+      if (nextTotalBytes > STUDIO_ASSET_LIMITS.maxTotalBytes) {
+        throw new Error(
+          'Extracted frame would exceed the 24 MiB Studio session asset limit.',
+        );
+      }
+
+      const sourceAssetId = studioAssetIdFromReference(source);
+      const sourceAsset = sourceAssetId
+        ? assets.find((item) => item.id === sourceAssetId)
+        : undefined;
+      const sourceName =
+        sourceAsset?.name.replace(/\.[^.]+$/, '') || 'video';
+      const positionLabel =
+        request.mode === 'frame'
+          ? 'frame-' + request.frame
+          : 'time-' + String(request.time).replace(/\./g, '_') + 's';
+      const extractedAsset: StudioVirtualAsset = {
+        id: replaceableAsset?.id ?? createVisualId('canvas-frame'),
+        name:
+          'Canvas frame · ' +
+          sourceName +
+          ' · ' +
+          positionLabel +
+          '.' +
+          request.format,
+        mime: artifact.mime,
+        size,
+        base64: normalizedBase64,
+        metadata:
+          artifact.metadata &&
+          (typeof artifact.metadata.width === 'number' ||
+            typeof artifact.metadata.height === 'number')
+            ? {
+                width:
+                  typeof artifact.metadata.width === 'number'
+                    ? artifact.metadata.width
+                    : undefined,
+                height:
+                  typeof artifact.metadata.height === 'number'
+                    ? artifact.metadata.height
+                    : undefined,
+              }
+            : undefined,
+      };
+
+      const nextAssets = replaceableAsset
+        ? assets.map((item) =>
+            item.id === replaceableAsset.id ? extractedAsset : item,
+          )
+        : [...assets, extractedAsset];
+      setAssets(nextAssets);
+
+      mutateCanvas('Extract video frame background', (current) => {
+        const previousCustomBg = current.customBg;
+        const next = { ...current };
+        delete next.videoBg;
+        delete next.colorBg;
+        delete next.gradientBg;
+        delete next.transparentBase;
+        next.customBg = {
+          source: studioAssetReference(extractedAsset),
+          inherit: previousCustomBg?.inherit ?? false,
+          fit: previousCustomBg?.fit ?? 'fill',
+          align: previousCustomBg?.align ?? 'center',
+          opacity: previousCustomBg?.opacity ?? 1,
+          filters: previousCustomBg?.filters ?? [],
+        };
+        return next;
+      });
+
+      setAssetFilter('image');
+      setActiveTool('canvas');
+      setInspectorTab('effects');
+      setMessage(
+        'Frame extracted · image background ready · filters enabled',
+      );
+    } catch (error) {
+      setMessage(
+        error instanceof Error ? error.message : 'Video frame extraction failed',
+      );
+    } finally {
+      setCanvasFrameExtracting(false);
+    }
+  };
 
   const primaryMedia =
     primary && (primary.kind === 'image' || primary.kind === 'shape')
@@ -4104,28 +4318,8 @@ export default function VisualStudioPre4({
         });
       }}
       onMessage={setMessage}
-      onOpenVideoEditor={(assetId) => {
-        if (assetId) {
-          mutate('Open video in editor', (current) => {
-            const timeline =
-              phase13Timeline(current) ?? defaultPhase13Timeline();
-            return setPhase13Timeline(current, {
-              ...timeline,
-              mode: 'pipeline',
-              source: { kind: 'asset', assetId },
-            });
-          });
-        }
-        setActiveTool('video');
-        setDockTab('timeline');
-        setDockCollapsed(false);
-        setInspectorTab('style');
-        setMessage(
-          assetId
-            ? 'Video Editor opened with the selected source'
-            : 'Video Editor opened',
-        );
-      }}
+      onExtractVideoFrame={extractCanvasVideoFrame}
+      videoFrameExtracting={canvasFrameExtracting}
     />
   );
 

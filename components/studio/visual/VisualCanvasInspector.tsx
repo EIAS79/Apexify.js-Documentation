@@ -44,6 +44,15 @@ export type VisualCanvasInspectorTab =
   | 'data'
   | 'advanced';
 
+export type CanvasVideoFrameExtractionRequest = {
+  source: string;
+  mode: 'frame' | 'time';
+  frame: number;
+  time: number;
+  format: 'jpg' | 'png';
+  quality: number;
+};
+
 type Props = {
   project: VisualProject;
   tab: VisualCanvasInspectorTab;
@@ -58,7 +67,8 @@ type Props = {
   ) => void;
   onResizeDraft: (key: 'width' | 'height', value: number) => void;
   onMessage: (message: string) => void;
-  onOpenVideoEditor?: (assetId?: string) => void;
+  onExtractVideoFrame: (request: CanvasVideoFrameExtractionRequest) => Promise<void>;
+  videoFrameExtracting: boolean;
 };
 
 type SectionProps = {
@@ -1498,12 +1508,38 @@ export function VisualCanvasInspector({
   onMutate,
   onResizeDraft,
   onMessage,
-  onOpenVideoEditor,
+  onExtractVideoFrame,
+  videoFrameExtracting,
 }: Props) {
   const canvas = project.document.canvas ?? {};
   const mode = canvasMode(canvas);
   const imageAssets = assets.filter((asset) => asset.mime.startsWith('image/'));
   const videoAssets = assets.filter((asset) => asset.mime.startsWith('video/'));
+  const legacyVideoBg = canvas.videoBg;
+  const [frameExtractionEnabled, setFrameExtractionEnabled] = useState(Boolean(legacyVideoBg));
+  const [frameExtractionMode, setFrameExtractionMode] = useState<'frame' | 'time'>(
+    legacyVideoBg?.time !== undefined && legacyVideoBg.frame === undefined ? 'time' : 'frame',
+  );
+  const [frameExtractionSource, setFrameExtractionSource] = useState(
+    legacyVideoBg?.source ?? '',
+  );
+  const [frameExtractionFrame, setFrameExtractionFrame] = useState(
+    Math.max(1, Math.round(legacyVideoBg?.frame ?? 1)),
+  );
+  const [frameExtractionTime, setFrameExtractionTime] = useState(
+    Math.max(0, legacyVideoBg?.time ?? 0),
+  );
+  const [frameExtractionFormat, setFrameExtractionFormat] = useState<'jpg' | 'png'>(
+    legacyVideoBg?.format ?? 'jpg',
+  );
+  const [frameExtractionQuality, setFrameExtractionQuality] = useState(
+    clamp(Math.round(legacyVideoBg?.quality ?? 2), 1, 31),
+  );
+  const defaultVideoSource = videoAssets[0] ? studioAssetReference(videoAssets[0]) : '';
+  const effectiveFrameExtractionSource = frameExtractionSource || defaultVideoSource;
+  const selectedVideoAsset = videoAssets.find(
+    (asset) => studioAssetReference(asset) === effectiveFrameExtractionSource,
+  );
   const customBg = canvas.customBg;
   const inheritedAsset = customBg
     ? imageAssets.find(
@@ -2272,107 +2308,53 @@ export function VisualCanvasInspector({
     );
   }
 
-  const video = canvas.videoBg;
-  const selectedVideoAsset = video
-    ? videoAssets.find((asset) => studioAssetReference(asset) === video.source)
-    : undefined;
-
   return (
     <div className="apx-canvas-v2" data-canvas-inspector-v2 data-canvas-tab="advanced">
       {header}
 
       <Section
-        title="Video frame background"
-        description="Extract one frame from video into createCanvas(); full editing lives in Video Editor"
+        title="Video frame extraction"
+        description="Extract one still frame, then use it as the normal image background"
         icon={FilmIcon}
-        defaultOpen={Boolean(video)}
-        badge="Node"
+        defaultOpen={frameExtractionEnabled}
+        badge="Node / FFmpeg"
         action={
           <Toggle
-            label="Enable video background"
-            checked={Boolean(video)}
-            onChange={(checked) =>
-              onMutate('Video background', (current) => {
-                if (!checked) {
-                  const next = { ...current };
-                  delete next.videoBg;
-                  return next;
-                }
-                return {
-                  ...current,
-                  videoBg: {
-                    source: videoAssets[0]
-                      ? studioAssetReference(videoAssets[0])
-                      : '',
-                    frame: 0,
-                    loop: false,
-                    autoplay: false,
-                    opacity: 1,
-                    format: 'jpg',
-                    quality: 2,
-                  },
-                };
-              })
-            }
+            label="Enable video frame extraction"
+            checked={frameExtractionEnabled}
+            onChange={setFrameExtractionEnabled}
           />
         }
       >
-        <div className="apx-canvas-v2-video-modes">
-          <div className="apx-canvas-v2-video-mode" data-active="true">
-            <FilmIcon aria-hidden />
-            <span>
-              <strong>Frame background</strong>
-              <small>Use CanvasConfig.videoBg to extract one frame/time as the canvas surface.</small>
-            </span>
-          </div>
-          <button
-            type="button"
-            className="apx-canvas-v2-video-mode apx-canvas-v2-video-mode--button"
-            onClick={() => onOpenVideoEditor?.(selectedVideoAsset?.id)}
-          >
-            <ArrowsPointingOutIcon aria-hidden />
-            <span>
-              <strong>Edit full video</strong>
-              <small>Open the timeline editor for trim, effects, crop, speed, audio, transitions and export.</small>
-            </span>
-          </button>
-        </div>
-        {video ? (
+        {frameExtractionEnabled ? (
           <div className="apx-canvas-v2-editor">
+            <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
+              <strong>Video → still image → customBg</strong>
+              <span>
+                Extraction is a one-shot tool. The resulting frame is saved as a Studio image
+                asset and becomes customBg.source, so normal image background filters and
+                effects apply immediately.
+              </span>
+            </div>
+
             <label className="apx-canvas-v2-field">
-              <span>videoBg.source</span>
+              <span>Video source</span>
               <input
                 className="apx-canvas-v2-input"
-                value={video.source}
+                value={effectiveFrameExtractionSource}
                 placeholder="studio://asset/... or file/URL"
-                onChange={(event) =>
-                  onDraft((current) => ({
-                    ...current,
-                    videoBg: {
-                      ...current.videoBg!,
-                      source: event.target.value,
-                    },
-                  }))
-                }
+                onChange={(event) => setFrameExtractionSource(event.target.value)}
               />
             </label>
+
             <label className="apx-canvas-v2-field">
               <span>Choose video asset</span>
               <select
                 className="apx-canvas-v2-input"
                 value={selectedVideoAsset?.id ?? ''}
                 onChange={(event) => {
-                  const asset = videoAssets.find(
-                    (item) => item.id === event.target.value,
-                  );
-                  if (!asset) return;
-                  onMutate('Video background asset', (current) => ({
-                    ...current,
-                    videoBg: {
-                      ...current.videoBg!,
-                      source: studioAssetReference(asset),
-                    },
-                  }));
+                  const asset = videoAssets.find((item) => item.id === event.target.value);
+                  setFrameExtractionSource(asset ? studioAssetReference(asset) : '');
                 }}
               >
                 <option value="">Custom source</option>
@@ -2383,132 +2365,96 @@ export function VisualCanvasInspector({
                 ))}
               </select>
             </label>
-            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
+
+            <div className="apx-canvas-v2-segmented apx-canvas-v2-segmented--2">
+              <button
+                type="button"
+                data-active={frameExtractionMode === 'frame' ? 'true' : undefined}
+                onClick={() => setFrameExtractionMode('frame')}
+              >
+                By frame
+              </button>
+              <button
+                type="button"
+                data-active={frameExtractionMode === 'time' ? 'true' : undefined}
+                onClick={() => setFrameExtractionMode('time')}
+              >
+                By time
+              </button>
+            </div>
+
+            {frameExtractionMode === 'frame' ? (
               <NumberField
                 label="Frame"
-                value={video.frame ?? 0}
-                min={0}
+                value={frameExtractionFrame}
+                min={1}
                 step={1}
                 onChange={(frame) =>
-                  onDraft((current) => ({
-                    ...current,
-                    videoBg: {
-                      ...current.videoBg!,
-                      frame: Math.max(0, Math.round(frame)),
-                    },
-                  }))
+                  setFrameExtractionFrame(Math.max(1, Math.round(frame)))
                 }
               />
+            ) : (
               <NumberField
                 label="Time"
-                value={video.time ?? 0}
+                value={frameExtractionTime}
                 min={0}
                 step={0.1}
-                onChange={(time) =>
-                  onDraft((current) => ({
-                    ...current,
-                    videoBg: {
-                      ...current.videoBg!,
-                      time: Math.max(0, time),
-                    },
-                  }))
-                }
+                onChange={(time) => setFrameExtractionTime(Math.max(0, time))}
                 suffix="s"
               />
+            )}
+
+            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
               <SelectField
                 label="Format"
-                value={video.format ?? 'jpg'}
+                value={frameExtractionFormat}
                 options={['jpg', 'png']}
                 onChange={(value) =>
-                  onMutate('Video frame format', (current) => ({
-                    ...current,
-                    videoBg: {
-                      ...current.videoBg!,
-                      format: value as 'jpg' | 'png',
-                    },
-                  }))
+                  setFrameExtractionFormat(value as 'jpg' | 'png')
                 }
               />
               <NumberField
                 label="Quality"
-                value={video.quality ?? 2}
+                value={frameExtractionQuality}
                 min={1}
-                max={100}
+                max={31}
                 step={1}
                 onChange={(quality) =>
-                  onDraft((current) => ({
-                    ...current,
-                    videoBg: {
-                      ...current.videoBg!,
-                      quality: clamp(Math.round(quality), 1, 100),
-                    },
-                  }))
+                  setFrameExtractionQuality(clamp(Math.round(quality), 1, 31))
                 }
               />
             </div>
-            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
-              <label className="apx-canvas-v2-check-card">
-                <input
-                  type="checkbox"
-                  checked={video.loop ?? false}
-                  onChange={(event) =>
-                    onMutate('Video loop', (current) => ({
-                      ...current,
-                      videoBg: {
-                        ...current.videoBg!,
-                        loop: event.target.checked,
-                      },
-                    }))
-                  }
-                />
-                <span>
-                  <strong>Loop metadata</strong>
-                  <small>Stored on videoBg; temporal looping belongs in Video Editor.</small>
-                </span>
-              </label>
-              <label className="apx-canvas-v2-check-card">
-                <input
-                  type="checkbox"
-                  checked={video.autoplay ?? false}
-                  onChange={(event) =>
-                    onMutate('Video autoplay', (current) => ({
-                      ...current,
-                      videoBg: {
-                        ...current.videoBg!,
-                        autoplay: event.target.checked,
-                      },
-                    }))
-                  }
-                />
-                <span>
-                  <strong>Autoplay metadata</strong>
-                  <small>Stored on videoBg; playback behavior belongs in Video Editor.</small>
-                </span>
-              </label>
-            </div>
-            <RangeField
-              label="Video opacity"
-              value={video.opacity ?? 1}
-              onChange={(opacity) =>
-                onDraft((current) => ({
-                  ...current,
-                  videoBg: {
-                    ...current.videoBg!,
-                    opacity,
-                  },
-                }))
+
+            <button
+              className="apx-canvas-apply"
+              type="button"
+              disabled={
+                videoFrameExtracting ||
+                !effectiveFrameExtractionSource.trim()
               }
-            />
-            <div className="apx-canvas-v2-callout apx-canvas-v2-callout--warning">
-              <strong>Authoritative frame rendering</strong>
-              <span>
-                videoBg is rendered through the Node/FFmpeg runtime so frame and time extraction match Apexify.js. Use Video Editor when the output is a video rather than a single canvas frame.
-              </span>
-            </div>
+              onClick={() => {
+                void onExtractVideoFrame({
+                  source: effectiveFrameExtractionSource.trim(),
+                  mode: frameExtractionMode,
+                  frame: frameExtractionFrame,
+                  time: frameExtractionTime,
+                  format: frameExtractionFormat,
+                  quality: frameExtractionQuality,
+                });
+              }}
+              data-canvas-video-extract
+            >
+              {videoFrameExtracting ? 'Extracting…' : 'Extract'}
+            </button>
+
+            <small className="apx-canvas-v2-field-hint">
+              Frame extraction is 1-based. Time extraction starts at 0 seconds.
+              JPEG/PNG quality follows Apexify's 1–31 FFmpeg contract.
+            </small>
           </div>
         ) : (
           <div className="apx-canvas-v2-empty-mini">
-            Enable video background to expose all videoBg options.
+            Enable frame extraction to choose a video and create a still image background.
           </div>
         )}
       </Section>
@@ -2548,8 +2494,8 @@ export function VisualCanvasInspector({
           <span>
             Style owns base paint, opacity, clipping, stroke and shadow. Transform
             owns size, position, rotation and internal zoom. Effects owns filters,
-            patterns, noise and stacked backgrounds. Advanced owns videoBg and API
-            capability notes.
+            patterns, noise and stacked backgrounds. Advanced exposes one-shot video
+            frame extraction while retaining videoBg in API coverage for compatibility.
           </span>
         </div>
       </Section>
