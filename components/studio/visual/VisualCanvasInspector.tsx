@@ -2682,7 +2682,7 @@ export function VisualCanvasInspector({
                     delete nextVideoBg.time;
                     return nextVideoBg;
                   });
-                }
+                }}
               />
             ) : (
               <NumberField
@@ -2715,7 +2715,7 @@ export function VisualCanvasInspector({
                     ...videoBg,
                     format,
                   }));
-                }
+                }}
               />
               <NumberField
                 label="Quality"
@@ -2730,7 +2730,7 @@ export function VisualCanvasInspector({
                     ...videoBg,
                     quality: nextQuality,
                   }));
-                }
+                }}
               />
             </div>
 
