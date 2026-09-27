@@ -90,6 +90,7 @@ import {
   fileToStudioAsset,
   isStudioFontAsset,
   studioAssetFontFamily,
+  studioAssetDataUrl,
   studioAssetIdFromReference,
   studioAssetReference,
   totalStudioAssetBytes,
