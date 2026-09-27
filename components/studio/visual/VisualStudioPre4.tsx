@@ -89,6 +89,7 @@ import {
   STUDIO_ASSET_LIMITS,
   fileToStudioAsset,
   isStudioFontAsset,
+  studioAssetDataUrl,
   studioAssetFontFamily,
   studioAssetIdFromReference,
   studioAssetReference,
@@ -1570,6 +1571,7 @@ export default function VisualStudioPre4({
     setProject((current) => {
       const next = mutation(current);
       history.current.commit(current, next, label);
+      projectRef.current = next;
       setHistoryTick((value) => value + 1);
       return next;
     });
@@ -1577,14 +1579,18 @@ export default function VisualStudioPre4({
   const updateCanvasDraft = (
     updater: (canvas: VisualCanvasConfig) => VisualCanvasConfig,
   ) => {
-    setProject((current) => ({
-      ...current,
-      updatedAt: new Date().toISOString(),
-      document: {
-        ...current.document,
-        canvas: updater(current.document.canvas ?? {}),
-      },
-    }));
+    setProject((current) => {
+      const next = {
+        ...current,
+        updatedAt: new Date().toISOString(),
+        document: {
+          ...current.document,
+          canvas: updater(current.document.canvas ?? {}),
+        },
+      };
+      projectRef.current = next;
+      return next;
+    });
   };
 
   const mutateCanvas = (
@@ -1793,6 +1799,12 @@ export default function VisualStudioPre4({
           )
         : [...assets, extractedAsset];
       setAssets(nextAssets);
+
+      // Show the extracted frame immediately. The canonical project mutation
+      // below then regenerates createCanvas({ customBg }) and the normal
+      // authoritative renderer takes over on the next render cycle.
+      setArtboardPreviewUrl(studioAssetDataUrl(extractedAsset));
+      setArtboardPreviewBounds(null);
 
       mutateCanvas('Extract video frame background', (current) => {
         const previousCustomBg = current.customBg;

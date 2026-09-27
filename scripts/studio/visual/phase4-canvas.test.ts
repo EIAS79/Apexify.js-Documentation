@@ -244,6 +244,68 @@ test('Phase 4 treats videoBg as an exclusive primary background', () => {
   );
 });
 
+test('Phase 4 generated code replaces the primary background instead of accumulating stale modes', () => {
+  const project = createVisualProject({
+    width: 800,
+    height: 450,
+    now: '2026-09-28T00:00:00.000Z',
+  });
+  const generated = () => generateVisualProjectCode(project).source;
+
+  project.document.canvas = {
+    customBg: {
+      source: 'studio://asset/image-one',
+      fit: 'cover',
+      align: 'center',
+      opacity: 1,
+    },
+  };
+  assert.match(generated(), /customBg:/);
+  assert.doesNotMatch(generated(), /videoBg:|gradientBg:|colorBg:/);
+
+  project.document.canvas = {
+    gradientBg: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: 800,
+      endY: 0,
+      colors: [
+        { stop: 0, color: '#000000' },
+        { stop: 1, color: '#ffffff' },
+      ],
+    },
+  };
+  assert.match(generated(), /gradientBg:/);
+  assert.doesNotMatch(generated(), /customBg:|videoBg:|colorBg:/);
+
+  project.document.canvas = { colorBg: '#123456' };
+  assert.match(generated(), /colorBg: "#123456"/);
+  assert.doesNotMatch(generated(), /customBg:|videoBg:|gradientBg:/);
+
+  project.document.canvas = {
+    videoBg: {
+      source: 'studio://asset/video-one',
+      frame: 13,
+      format: 'jpg',
+      quality: 2,
+      opacity: 1,
+    },
+  };
+  const videoSource = generated();
+  assert.match(videoSource, /videoBg:/);
+  assert.match(videoSource, /studio:\/\/asset\/video-one/);
+  assert.match(videoSource, /frame: 13/);
+  assert.doesNotMatch(videoSource, /customBg:|gradientBg:|colorBg:/);
+
+  project.document.canvas = {};
+  const defaultSource = generated();
+  assert.doesNotMatch(
+    defaultSource,
+    /customBg:|videoBg:|gradientBg:|colorBg:|transparentBase:/,
+  );
+});
+
 test('Phase 4 shell exposes the complete createCanvas inspector contract', () => {
   const shell = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
   const inspector = fs.readFileSync('components/studio/visual/VisualCanvasInspector.tsx', 'utf8');
@@ -314,6 +376,12 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.match(inspector, /delete next\.videoBg/);
   assert.match(inspector, /data-canvas-video-background/);
   assert.match(inspector, /apx-canvas-v2-segmented--6/);
+  assert.match(inspector, /const frameExtractionEnabled = Boolean\(legacyVideoBg\)/);
+  assert.match(inspector, /mutateExtractionVideoBg/);
+  assert.match(inspector, /Video background frame mode/);
+  assert.match(inspector, /Video background time mode/);
+  assert.match(shell, /setArtboardPreviewUrl\(studioAssetDataUrl\(extractedAsset\)\)/);
+  assert.match(shell, /projectRef\.current = next/);
   assert.match(shell, /validateVirtualCanvasSource/);
   assert.match(shell, /customBg\.source/);
   assert.match(shell, /videoBg\.source/);

@@ -180,12 +180,12 @@ test('PRE-4 renders the edited lower code source directly for live artboard feed
   assert.match(shell, /\}, 100\);/);
 });
 
-test('PRE-4 preserves Studio virtual asset refs for the browser canvas runtime', () => {
+test('PRE-4 preserves Studio virtual asset refs while allowing direct extracted-frame display', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
 
   assert.match(shell, /renderStudioSource\(source, assets\)/);
-  assert.doesNotMatch(shell, /studioAssetDataUrl/);
   assert.doesNotMatch(shell, /split\(reference\)\.join/);
+  assert.match(shell, /setArtboardPreviewUrl\(studioAssetDataUrl\(extractedAsset\)\)/);
 });
 
 test('PRE-4 does not duplicate the canvas CSS background behind authoritative Apexify output', () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   AdjustmentsHorizontalIcon,
   ArrowsPointingOutIcon,
@@ -1518,7 +1518,7 @@ export function VisualCanvasInspector({
   const imageAssets = assets.filter((asset) => asset.mime.startsWith('image/'));
   const videoAssets = assets.filter((asset) => asset.mime.startsWith('video/'));
   const legacyVideoBg = canvas.videoBg;
-  const [frameExtractionEnabled, setFrameExtractionEnabled] = useState(Boolean(legacyVideoBg));
+  const frameExtractionEnabled = Boolean(legacyVideoBg);
   const [frameExtractionMode, setFrameExtractionMode] = useState<'frame' | 'time'>(
     legacyVideoBg?.time !== undefined && legacyVideoBg.frame === undefined ? 'time' : 'frame',
   );
@@ -1559,6 +1559,59 @@ export function VisualCanvasInspector({
         (asset) => studioAssetReference(asset) === customBg.source,
       )
     : undefined;
+
+  useEffect(() => {
+    if (!legacyVideoBg) return;
+    setFrameExtractionSource(legacyVideoBg.source);
+    const byTime =
+      legacyVideoBg.time !== undefined && legacyVideoBg.frame === undefined;
+    setFrameExtractionMode(byTime ? 'time' : 'frame');
+    if (byTime) {
+      setFrameExtractionTime(Math.max(0, legacyVideoBg.time ?? 0));
+    } else {
+      setFrameExtractionFrame(
+        Math.max(1, Math.round(legacyVideoBg.frame ?? 1)),
+      );
+    }
+    setFrameExtractionFormat(legacyVideoBg.format ?? 'jpg');
+    setFrameExtractionQuality(
+      clamp(Math.round(legacyVideoBg.quality ?? 2), 1, 31),
+    );
+  }, [
+    legacyVideoBg?.source,
+    legacyVideoBg?.frame,
+    legacyVideoBg?.time,
+    legacyVideoBg?.format,
+    legacyVideoBg?.quality,
+  ]);
+
+  const mutateExtractionVideoBg = (
+    label: string,
+    updater: (
+      videoBg: NonNullable<VisualCanvasConfig['videoBg']>,
+    ) => NonNullable<VisualCanvasConfig['videoBg']>,
+  ) =>
+    onMutate(label, (current) => {
+      const next = { ...current };
+      delete next.colorBg;
+      delete next.gradientBg;
+      delete next.customBg;
+      delete next.transparentBase;
+      const currentVideoBg: NonNullable<VisualCanvasConfig['videoBg']> =
+        next.videoBg ?? {
+          source:
+            frameExtractionSource.trim() ||
+            (videoAssets[0] ? studioAssetReference(videoAssets[0]) : ''),
+          ...(frameExtractionMode === 'time'
+            ? { time: frameExtractionTime }
+            : { frame: frameExtractionFrame }),
+          format: frameExtractionFormat,
+          quality: frameExtractionQuality,
+          opacity: 1,
+        };
+      next.videoBg = updater(currentVideoBg);
+      return next;
+    });
 
   const setBaseMode = (nextMode: ReturnType<typeof canvasMode>) =>
     onMutate('Canvas background', (current) => {
@@ -2488,10 +2541,40 @@ export function VisualCanvasInspector({
             label="Enable video frame extraction"
             checked={frameExtractionEnabled}
             onChange={(checked) => {
-              setFrameExtractionEnabled(checked);
-              if (checked && !frameExtractionSource && videoAssets[0]) {
-                setFrameExtractionSource(studioAssetReference(videoAssets[0]));
+              if (!checked) {
+                onMutate('Disable video background', (current) => {
+                  const next = { ...current };
+                  delete next.videoBg;
+                  return next;
+                });
+                return;
               }
+
+              const nextSource =
+                frameExtractionSource.trim() ||
+                (videoAssets[0] ? studioAssetReference(videoAssets[0]) : '');
+              if (!nextSource) {
+                onMessage('Choose or upload a video source first');
+                return;
+              }
+              setFrameExtractionSource(nextSource);
+              mutateExtractionVideoBg('Enable video background', (videoBg) => {
+                const nextVideoBg = {
+                  ...videoBg,
+                  source: nextSource,
+                  format: frameExtractionFormat,
+                  quality: frameExtractionQuality,
+                  opacity: videoBg.opacity ?? 1,
+                };
+                if (frameExtractionMode === 'time') {
+                  nextVideoBg.time = frameExtractionTime;
+                  delete nextVideoBg.frame;
+                } else {
+                  nextVideoBg.frame = frameExtractionFrame;
+                  delete nextVideoBg.time;
+                }
+                return nextVideoBg;
+              });
             }}
           />
         }
@@ -2513,7 +2596,14 @@ export function VisualCanvasInspector({
                 className="apx-canvas-v2-input"
                 value={frameExtractionSource}
                 placeholder="studio://asset/... or file/URL"
-                onChange={(event) => setFrameExtractionSource(event.target.value)}
+                onChange={(event) => {
+                  const nextSource = event.target.value;
+                  setFrameExtractionSource(nextSource);
+                  mutateExtractionVideoBg('Video background source', (videoBg) => ({
+                    ...videoBg,
+                    source: nextSource,
+                  }));
+                }}
               />
             </label>
 
@@ -2524,7 +2614,12 @@ export function VisualCanvasInspector({
                 value={selectedVideoAsset?.id ?? ''}
                 onChange={(event) => {
                   const asset = videoAssets.find((item) => item.id === event.target.value);
-                  setFrameExtractionSource(asset ? studioAssetReference(asset) : '');
+                  const nextSource = asset ? studioAssetReference(asset) : '';
+                  setFrameExtractionSource(nextSource);
+                  mutateExtractionVideoBg('Video background asset', (videoBg) => ({
+                    ...videoBg,
+                    source: nextSource,
+                  }));
                 }}
               >
                 <option value="">Custom source</option>
@@ -2540,14 +2635,34 @@ export function VisualCanvasInspector({
               <button
                 type="button"
                 data-active={frameExtractionMode === 'frame' ? 'true' : undefined}
-                onClick={() => setFrameExtractionMode('frame')}
+                onClick={() => {
+                  setFrameExtractionMode('frame');
+                  mutateExtractionVideoBg('Video background frame mode', (videoBg) => {
+                    const nextVideoBg = {
+                      ...videoBg,
+                      frame: frameExtractionFrame,
+                    };
+                    delete nextVideoBg.time;
+                    return nextVideoBg;
+                  });
+                }}
               >
                 By frame
               </button>
               <button
                 type="button"
                 data-active={frameExtractionMode === 'time' ? 'true' : undefined}
-                onClick={() => setFrameExtractionMode('time')}
+                onClick={() => {
+                  setFrameExtractionMode('time');
+                  mutateExtractionVideoBg('Video background time mode', (videoBg) => {
+                    const nextVideoBg = {
+                      ...videoBg,
+                      time: frameExtractionTime,
+                    };
+                    delete nextVideoBg.frame;
+                    return nextVideoBg;
+                  });
+                }}
               >
                 By time
               </button>
@@ -2559,8 +2674,14 @@ export function VisualCanvasInspector({
                 value={frameExtractionFrame}
                 min={1}
                 step={1}
-                onChange={(frame) =>
-                  setFrameExtractionFrame(Math.max(1, Math.round(frame)))
+                onChange={(frame) => {
+                  const nextFrame = Math.max(1, Math.round(frame));
+                  setFrameExtractionFrame(nextFrame);
+                  mutateExtractionVideoBg('Video background frame', (videoBg) => {
+                    const nextVideoBg = { ...videoBg, frame: nextFrame };
+                    delete nextVideoBg.time;
+                    return nextVideoBg;
+                  });
                 }
               />
             ) : (
@@ -2569,7 +2690,15 @@ export function VisualCanvasInspector({
                 value={frameExtractionTime}
                 min={0}
                 step={0.1}
-                onChange={(time) => setFrameExtractionTime(Math.max(0, time))}
+                onChange={(time) => {
+                  const nextTime = Math.max(0, time);
+                  setFrameExtractionTime(nextTime);
+                  mutateExtractionVideoBg('Video background time', (videoBg) => {
+                    const nextVideoBg = { ...videoBg, time: nextTime };
+                    delete nextVideoBg.frame;
+                    return nextVideoBg;
+                  });
+                }}
                 suffix="s"
               />
             )}
@@ -2579,8 +2708,13 @@ export function VisualCanvasInspector({
                 label="Format"
                 value={frameExtractionFormat}
                 options={['jpg', 'png']}
-                onChange={(value) =>
-                  setFrameExtractionFormat(value as 'jpg' | 'png')
+                onChange={(value) => {
+                  const format = value as 'jpg' | 'png';
+                  setFrameExtractionFormat(format);
+                  mutateExtractionVideoBg('Video background format', (videoBg) => ({
+                    ...videoBg,
+                    format,
+                  }));
                 }
               />
               <NumberField
@@ -2589,8 +2723,13 @@ export function VisualCanvasInspector({
                 min={1}
                 max={31}
                 step={1}
-                onChange={(quality) =>
-                  setFrameExtractionQuality(clamp(Math.round(quality), 1, 31))
+                onChange={(quality) => {
+                  const nextQuality = clamp(Math.round(quality), 1, 31);
+                  setFrameExtractionQuality(nextQuality);
+                  mutateExtractionVideoBg('Video background quality', (videoBg) => ({
+                    ...videoBg,
+                    quality: nextQuality,
+                  }));
                 }
               />
             </div>
