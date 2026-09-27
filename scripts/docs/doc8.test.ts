@@ -11,6 +11,7 @@ import {
   serializeInteractiveSession,
 } from '../../lib/docs/playground/session';
 import { planStudioExecution } from '../../lib/studio/runtime/capabilities';
+import { studioAssetsReferencedBySources } from '../../lib/studio/runtime/assets';
 import {
   studioWorkspaceFileName,
   validateStudioWorkspaceFiles,
@@ -71,6 +72,26 @@ test('resource limits preserve bounded current runner ceilings', () => {
   assert.equal(DOC8_RESOURCE_LIMITS.processBufferBytes, 20 * 1024 * 1024);
   assert.equal(DOC8_RESOURCE_LIMITS.maxOutputs, 24);
   assert.ok(DOC8_RESOURCE_LIMITS.shareStateBytes < DOC8_RESOURCE_LIMITS.sourceChars);
+});
+
+test('server-backed Studio execution uploads only assets referenced by executable sources', () => {
+  const assets = [
+    { id: 'hero', name: 'hero.png', mime: 'image/png', size: 3, base64: 'AAAA' },
+    { id: 'video', name: 'clip.mp4', mime: 'video/mp4', size: 3, base64: 'AAAA' },
+    { id: 'unused', name: 'unused.png', mime: 'image/png', size: 3, base64: 'AAAA' },
+  ];
+
+  assert.deepEqual(
+    studioAssetsReferencedBySources(
+      assets,
+      [
+        "const hero = 'studio://asset/hero';",
+        "export const clip = 'studio://asset/video';",
+      ],
+    ).map((asset) => asset.id),
+    ['hero', 'video'],
+  );
+  assert.deepEqual(studioAssetsReferencedBySources(assets, ['return 42;']), []);
 });
 
 test('Studio planner keeps https URLs intact while detecting later full-runtime APIs', () => {
