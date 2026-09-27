@@ -8544,6 +8544,9 @@ body[data-phase17-resizing="dock"]{
 .apx-canvas-v2-segmented--5{
   grid-template-columns:repeat(5,minmax(0,1fr));
 }
+.apx-canvas-v2-segmented--6{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+}
 
 .apx-canvas-v2-segmented button{
   min-width:0;
@@ -8929,7 +8932,8 @@ body[data-phase17-resizing="dock"]{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
-  .apx-canvas-v2-segmented--5{
+  .apx-canvas-v2-segmented--5,
+  .apx-canvas-v2-segmented--6{
     grid-template-columns:repeat(3,minmax(0,1fr));
   }
 }
