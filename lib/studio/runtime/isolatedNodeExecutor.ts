@@ -89,7 +89,7 @@ type StudioRuntimeDebug = {
   };
 };
 
-const APEXIFY_PIN = 'github:EIAS79/Apexify.js#6d24d0509aed9a583395a1196f35859f131a6829';
+const APEXIFY_PIN = 'github:EIAS79/Apexify.js#35a99d97f3979080095f434c2f0e9dbe58feca4e';
 const MEDIA_CAPABILITY_DIR = join(tmpdir(), 'apexify-studio-media-caps');
 
 type StudioMediaCapability = {
