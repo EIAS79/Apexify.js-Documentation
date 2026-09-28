@@ -27,21 +27,21 @@ legacyHashes: ["01-canvas-size-and-coordinates"]
 `width` and `height` define output pixel dimensions when supplied. `x` and `y` are coordinate offsets used by rotation/layout math and normally remain zero for simple banners.
 </Callout>
 
-<AvailabilityMatrix rows={[{"surface":"width","available":true,"notes":"Explicit output width in pixels"},{"surface":"height","available":true,"notes":"Explicit output height in pixels"},{"surface":"x","available":true,"notes":"Coordinate offset; normally zero"},{"surface":"y","available":true,"notes":"Coordinate offset; normally zero"},{"surface":"customBg.inherit","available":true,"notes":"May derive missing dimensions from the loaded image"},{"surface":"videoBg sizing","available":true,"notes":"May derive missing dimensions from an extracted frame"}]} />
+<AvailabilityMatrix rows={[{"surface":"width","available":true,"notes":"Explicit output width in pixels"},{"surface":"height","available":true,"notes":"Explicit output height in pixels"},{"surface":"x","available":true,"notes":"Coordinate offset; normally zero"},{"surface":"y","available":true,"notes":"Coordinate offset; normally zero"},{"surface":"customBg.inherit","available":true,"notes":"May derive missing dimensions from the loaded image"},{"surface":"videoBg.inherit","available":true,"notes":"When true, adopts dimensions from the extracted still frame"}]} />
 
 ## Width and height
 <BeforeAfter before="Omit dimensions and rely on the 500 × 500 fallback." after="Set explicit dimensions when output size is part of the contract." beforeLabel="Implicit sizing" afterLabel="Production sizing" />
 <CodeBlockV2 language="typescript" code="await painter.createCanvas({ width: 1920, height: 1080, colorBg: '#000000' });" studio={true} />
 
-<CodeGroup ariaLabel="Canvas sizing configuration fragments" items={[{"label":"Explicit dimensions","language":"typescript","content":"{ width: 1920, height: 1080 }"},{"label":"Inherited image sizing","language":"typescript","content":"{ customBg: { source: imageSource, inherit: true } }"}]} />
+<CodeGroup ariaLabel="Canvas sizing configuration fragments" items={[{"label":"Explicit dimensions","language":"typescript","content":"{ width: 1920, height: 1080 }"},{"label":"Inherited image sizing","language":"typescript","content":"{ customBg: { source: imageSource, inherit: true } }"},{"label":"Inherited video-frame sizing","language":"typescript","content":"{ videoBg: { source: videoSource, frame: 1, inherit: true } }"}]} />
 
 The grouped fragments above compare sizing policy only; they are not separate executable examples. The canonical runnable source remains the stable DOC-5 example linked from the canvas overview.
 
-If both dimensions remain unset after inherited image/video sizing opportunities, the creator defaults to **500 × 500**.
+If both dimensions remain unset and neither image background opts into **`inherit: true`**, the creator defaults to **500 × 500**.
 
 <Details summary="When can another source determine size?" open={false}>
 - `customBg.inherit: true` can take width and height from the loaded image.
-- `videoBg` can supply missing dimensions after a successful frame extraction.
+- `videoBg.inherit: true` extracts the selected still frame once and adopts that frame's width and height.
 </Details>
 
 ## Coordinates

@@ -86,6 +86,38 @@ function validateOpacity(
   }
 }
 
+function validateImageBackgroundOptions(
+  issues: VisualProjectIssue[],
+  background: {
+    inherit?: unknown;
+    fit?: unknown;
+    align?: unknown;
+    filters?: unknown;
+    opacity?: unknown;
+  },
+  path: string,
+) {
+  validateOpacity(issues, background.opacity, path + '.opacity');
+  if (background.inherit !== undefined && typeof background.inherit !== 'boolean') {
+    issue(issues, 'canvas-background-inherit', path + '.inherit', 'Background inherit must be boolean.');
+  }
+  if (
+    background.fit !== undefined &&
+    !CANVAS_FITS.includes(background.fit as (typeof CANVAS_FITS)[number])
+  ) {
+    issue(issues, 'canvas-background-fit', path + '.fit', 'Unsupported background fit mode.');
+  }
+  if (
+    background.align !== undefined &&
+    !CANVAS_ALIGNMENTS.includes(background.align as (typeof CANVAS_ALIGNMENTS)[number])
+  ) {
+    issue(issues, 'canvas-background-align', path + '.align', 'Unsupported background alignment.');
+  }
+  if (background.filters !== undefined && !Array.isArray(background.filters)) {
+    issue(issues, 'canvas-background-filters', path + '.filters', 'Background filters must be an array.');
+  }
+}
+
 function validateGradient(
   issues: VisualProjectIssue[],
   gradient: VisualGradient | undefined,
@@ -241,17 +273,32 @@ export function validateVisualCanvasConfig(
 
   if (canvas.customBg) {
     if (!canvas.customBg.source.trim()) issue(issues, 'canvas-custom-bg-source', p + '.customBg.source', 'Background image source is required.');
-    validateOpacity(issues, canvas.customBg.opacity, p + '.customBg.opacity');
+    validateImageBackgroundOptions(issues, canvas.customBg, p + '.customBg');
   }
 
   if (canvas.videoBg) {
     if (!canvas.videoBg.source.trim()) issue(issues, 'canvas-video-bg-source', p + '.videoBg.source', 'Video source is required.');
-    validateOpacity(issues, canvas.videoBg.opacity, p + '.videoBg.opacity');
-    if (canvas.videoBg.frame !== undefined && (!finite(canvas.videoBg.frame) || canvas.videoBg.frame < 0)) {
-      issue(issues, 'canvas-video-frame', p + '.videoBg.frame', 'Video frame must be non-negative.');
+    validateImageBackgroundOptions(issues, canvas.videoBg, p + '.videoBg');
+    if (canvas.videoBg.frame !== undefined && canvas.videoBg.time !== undefined) {
+      issue(issues, 'canvas-video-selector', p + '.videoBg', 'Video background must specify frame or time, not both.');
+    }
+    if (
+      canvas.videoBg.frame !== undefined &&
+      (!finite(canvas.videoBg.frame) || !Number.isInteger(canvas.videoBg.frame) || canvas.videoBg.frame < 1)
+    ) {
+      issue(issues, 'canvas-video-frame', p + '.videoBg.frame', 'Video frame must be a 1-based positive integer.');
     }
     if (canvas.videoBg.time !== undefined && (!finite(canvas.videoBg.time) || canvas.videoBg.time < 0)) {
       issue(issues, 'canvas-video-time', p + '.videoBg.time', 'Video time must be non-negative.');
+    }
+    if (canvas.videoBg.format !== undefined && !['jpg', 'png'].includes(canvas.videoBg.format)) {
+      issue(issues, 'canvas-video-format', p + '.videoBg.format', 'Video frame format must be jpg or png.');
+    }
+    if (
+      canvas.videoBg.quality !== undefined &&
+      (!finite(canvas.videoBg.quality) || !Number.isInteger(canvas.videoBg.quality) || canvas.videoBg.quality < 1 || canvas.videoBg.quality > 31)
+    ) {
+      issue(issues, 'canvas-video-quality', p + '.videoBg.quality', 'Video frame quality must be an integer from 1 through 31.');
     }
   }
 

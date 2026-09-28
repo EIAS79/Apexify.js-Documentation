@@ -388,6 +388,14 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.doesNotMatch(inspector, /Autoplay metadata/);
   assert.match(inspector, /frameExtractionMode === 'frame'/);
   assert.match(inspector, /max=\{31\}/);
+  assert.match(
+    fs.readFileSync('lib/studio/visual/model.ts', 'utf8'),
+    /VisualCanvasImageBackgroundOptions[\s\S]*inherit\?: boolean[\s\S]*fit\?:[\s\S]*align\?:[\s\S]*filters\?: VisualImageFilter\[\]/,
+  );
+  assert.match(
+    fs.readFileSync('lib/studio/visual/canvas-contract.ts', 'utf8'),
+    /Video background must specify frame or time, not both/,
+  );
   assert.match(shell, /extractFrameByNumber/);
   assert.match(shell, /extractFrameAtTime/);
   assert.match(shell, /getInfo: true/);

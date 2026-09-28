@@ -634,24 +634,30 @@ export interface VisualTextMetrics {
   lines: Array<{ text: string; width: number }>;
 }
 
+export interface VisualCanvasImageBackgroundOptions {
+  inherit?: boolean;
+  fit?: 'fill' | 'contain' | 'cover';
+  align?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  filters?: VisualImageFilter[];
+  opacity?: number;
+}
+
 export interface VisualCanvasConfig {
   x?: number;
   y?: number;
-  customBg?: {
+  customBg?: VisualCanvasImageBackgroundOptions & {
     source: string;
-    inherit?: boolean;
-    fit?: 'fill' | 'contain' | 'cover';
-    align?: 'center' | 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-    filters?: VisualImageFilter[];
-    opacity?: number;
   };
-  videoBg?: {
+  videoBg?: VisualCanvasImageBackgroundOptions & {
     source: string;
+    /** 1-based frame selector; mutually exclusive with time. */
     frame?: number;
+    /** Timestamp in seconds; mutually exclusive with frame. */
     time?: number;
+    /** @deprecated videoBg renders one extracted still frame. */
     loop?: boolean;
+    /** @deprecated videoBg renders one extracted still frame. */
     autoplay?: boolean;
-    opacity?: number;
     format?: 'jpg' | 'png';
     quality?: number;
   };

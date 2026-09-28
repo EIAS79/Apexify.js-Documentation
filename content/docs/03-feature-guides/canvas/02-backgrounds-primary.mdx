@@ -4,13 +4,9 @@
 
 ## The rule
 
-Among **`colorBg`**, **`gradientBg`**, and **`customBg`**, you may set **only one** per call.
+Among **`colorBg`**, **`gradientBg`**, **`customBg`**, **`videoBg`**, and **`transparentBase: true`**, activate **only one primary background** per call.
 
-**`videoBg`** is separate: if present, it becomes the **primary** raster background **before** custom/gradient/color branches.
-
-If you combine **`colorBg`** + **`gradientBg`** (etc.), **`createCanvas`** throws:
-
-`only one of colorBg, gradientBg, or customBg can be used`.
+If multiple primary backgrounds are configured, **`createCanvas`** rejects the configuration before painting.
 
 ---
 
@@ -79,15 +75,21 @@ await painter.createCanvas({
 
 ## Option D — Video frame (`videoBg`)
 
-Requires **FFmpeg**. One frame fills the background.
+Requires **FFmpeg**. Apexify extracts one still frame **once**, then renders that still through the same image-background placement/filter pipeline as **`customBg`**.
 
 | Field | Purpose |
 |-------|---------|
 | **`source`** | Path, URL, or **`Buffer`** |
-| **`time`** | Seconds (**overrides** **`frame`** if set) |
-| **`frame`** | Frame index |
-| **`format`**, **`quality`** | **`jpg`** \| **`png`**, JPEG quality **1–31** (lower = better) |
-| **`opacity`** | Alpha when drawing |
+| **`frame`** | **1-based** frame number; mutually exclusive with **`time`** |
+| **`time`** | Timestamp in seconds; mutually exclusive with **`frame`** |
+| **`format`**, **`quality`** | **`jpg`** \| **`png`**, FFmpeg image quality **1–31** |
+| **`inherit`** | **`true`** → use extracted-frame width/height for the canvas |
+| **`fit`** | **`fill`** \| **`contain`** \| **`cover`** |
+| **`align`** | Placement for **`contain`** / **`cover`** |
+| **`filters`** | Same **`ImageFilter[]`** pipeline as **`customBg`** |
+| **`opacity`** | Still-image alpha, multiplied by canvas opacity |
+
+If neither **`frame`** nor **`time`** is supplied, Apexify selects frame **1**. Legacy **`loop`** and **`autoplay`** fields are deprecated because **`videoBg`** is a still-frame background, not video playback.
 
 ```typescript
 await painter.createCanvas({
@@ -96,6 +98,9 @@ await painter.createCanvas({
   videoBg: {
     source: './clip.mp4',
     time: 1.0,
+    fit: 'cover',
+    align: 'center',
+    filters: [{ type: 'contrast', value: 12 }],
     format: 'jpg',
     quality: 2,
   },
