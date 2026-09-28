@@ -3,7 +3,7 @@ import type { ExampleDefinition } from './schema';
 export const DOC5_PACKAGE = {
   name: 'apexify.js',
   version: '6.0.0',
-  commit: '50f2543482abbd7a9624192a060ec01330370bef',
+  commit: '35a99d97f3979080095f434c2f0e9dbe58feca4e',
 } as const;
 
 export const exampleDefinitions = [
