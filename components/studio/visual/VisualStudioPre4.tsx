@@ -2105,7 +2105,11 @@ export default function VisualStudioPre4({
         if (!runtimeArtifact?.base64 || !runtimeArtifact.mime.startsWith('image/')) {
           throw new Error('Frame extraction completed without an image artifact.');
         }
-        artifact = runtimeArtifact;
+        artifact = {
+          base64: runtimeArtifact.base64,
+          mime: runtimeArtifact.mime,
+          metadata: runtimeArtifact.metadata,
+        };
       }
 
       const normalizedBase64 = artifact.base64.replace(/\s+/g, '');
