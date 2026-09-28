@@ -140,7 +140,7 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@uiw/react-codemirror": "^4.25.9",
     "@vercel/speed-insights": "^2.0.0",
-    "apexify.js": "github:EIAS79/Apexify.js#50f2543482abbd7a9624192a060ec01330370bef",
+    "apexify.js": "github:EIAS79/Apexify.js#6d24d0509aed9a583395a1196f35859f131a6829",
     "dejavu-fonts-ttf": "^2.37.3",
     "framer-motion": "^12.38.0",
     "next": "^14.2.0",
