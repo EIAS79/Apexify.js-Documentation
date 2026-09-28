@@ -6,7 +6,6 @@ import {
   ArrowsPointingOutIcon,
   CircleStackIcon,
   CodeBracketIcon,
-  FilmIcon,
   PaintBrushIcon,
   PlusIcon,
   SparklesIcon,
@@ -1518,7 +1517,6 @@ export function VisualCanvasInspector({
   const imageAssets = assets.filter((asset) => asset.mime.startsWith('image/'));
   const videoAssets = assets.filter((asset) => asset.mime.startsWith('video/'));
   const legacyVideoBg = canvas.videoBg;
-  const frameExtractionEnabled = Boolean(legacyVideoBg);
   const [frameExtractionMode, setFrameExtractionMode] = useState<'frame' | 'time'>(
     legacyVideoBg?.time !== undefined && legacyVideoBg.frame === undefined ? 'time' : 'frame',
   );
@@ -1538,26 +1536,37 @@ export function VisualCanvasInspector({
   const [frameExtractionQuality, setFrameExtractionQuality] = useState(
     clamp(Math.round(legacyVideoBg?.quality ?? 2), 1, 31),
   );
-  const selectedVideoAsset = videoAssets.find(
-    (asset) => studioAssetReference(asset) === frameExtractionSource,
-  );
   const configuredVideoAsset = legacyVideoBg
     ? videoAssets.find(
         (asset) => studioAssetReference(asset) === legacyVideoBg.source,
       )
     : undefined;
-  const selectedVideoDuration =
-    typeof selectedVideoAsset?.metadata?.duration === 'number' &&
-    Number.isFinite(selectedVideoAsset.metadata.duration) &&
-    selectedVideoAsset.metadata.duration > 0
-      ? selectedVideoAsset.metadata.duration
+  const configuredVideoDuration =
+    typeof configuredVideoAsset?.metadata?.duration === 'number' &&
+    Number.isFinite(configuredVideoAsset.metadata.duration) &&
+    configuredVideoAsset.metadata.duration > 0
+      ? configuredVideoAsset.metadata.duration
       : null;
-  const extractionPositionError =
+  const configuredVideoFps =
+    typeof configuredVideoAsset?.metadata?.fps === 'number' &&
+    Number.isFinite(configuredVideoAsset.metadata.fps) &&
+    configuredVideoAsset.metadata.fps > 0
+      ? configuredVideoAsset.metadata.fps
+      : null;
+  const maxConfiguredVideoFrame =
+    configuredVideoDuration !== null && configuredVideoFps !== null
+      ? Math.max(1, Math.ceil(configuredVideoDuration * configuredVideoFps))
+      : null;
+  const videoPositionError =
     frameExtractionMode === 'time' &&
-    selectedVideoDuration !== null &&
-    frameExtractionTime >= selectedVideoDuration
-      ? `Time must be below ${selectedVideoDuration.toFixed(3)}s for this video.`
-      : null;
+    configuredVideoDuration !== null &&
+    frameExtractionTime >= configuredVideoDuration
+      ? `Time must be below ${configuredVideoDuration.toFixed(3)}s for this video.`
+      : frameExtractionMode === 'frame' &&
+          maxConfiguredVideoFrame !== null &&
+          frameExtractionFrame > maxConfiguredVideoFrame
+        ? `Frame must be between 1 and ${maxConfiguredVideoFrame} for this video.`
+        : null;
   const customBg = canvas.customBg;
   const inheritedAsset = customBg
     ? imageAssets.find(
@@ -1589,34 +1598,6 @@ export function VisualCanvasInspector({
     legacyVideoBg?.format,
     legacyVideoBg?.quality,
   ]);
-
-  const mutateExtractionVideoBg = (
-    label: string,
-    updater: (
-      videoBg: NonNullable<VisualCanvasConfig['videoBg']>,
-    ) => NonNullable<VisualCanvasConfig['videoBg']>,
-  ) =>
-    onMutate(label, (current) => {
-      const next = { ...current };
-      delete next.colorBg;
-      delete next.gradientBg;
-      delete next.customBg;
-      delete next.transparentBase;
-      const currentVideoBg: NonNullable<VisualCanvasConfig['videoBg']> =
-        next.videoBg ?? {
-          source:
-            frameExtractionSource.trim() ||
-            (videoAssets[0] ? studioAssetReference(videoAssets[0]) : ''),
-          ...(frameExtractionMode === 'time'
-            ? { time: frameExtractionTime }
-            : { frame: frameExtractionFrame }),
-          format: frameExtractionFormat,
-          quality: frameExtractionQuality,
-          opacity: 1,
-        };
-      next.videoBg = updater(currentVideoBg);
-      return next;
-    });
 
   const setBaseMode = (nextMode: ReturnType<typeof canvasMode>) =>
     onMutate('Canvas background', (current) => {
@@ -2176,6 +2157,40 @@ export function VisualCanvasInspector({
                 }
               />
 
+              <button
+                className="apx-canvas-apply"
+                type="button"
+                disabled={
+                  videoFrameExtracting ||
+                  !canvas.videoBg.source.trim() ||
+                  Boolean(videoPositionError)
+                }
+                onClick={() => {
+                  void onExtractVideoFrame({
+                    source: canvas.videoBg!.source.trim(),
+                    mode: frameExtractionMode,
+                    frame: frameExtractionFrame,
+                    time: frameExtractionTime,
+                    format: canvas.videoBg!.format ?? frameExtractionFormat,
+                    quality: canvas.videoBg!.quality ?? frameExtractionQuality,
+                  });
+                }}
+                data-canvas-video-extract
+              >
+                {videoFrameExtracting ? 'Extracting…' : 'Extract selected frame'}
+              </button>
+
+              <small
+                className="apx-canvas-v2-field-hint"
+                data-invalid={videoPositionError ? 'true' : undefined}
+              >
+                {videoPositionError ??
+                  ('Freeze the selected still frame into customBg.' +
+                    (configuredVideoDuration !== null
+                      ? ' Video duration: ' + configuredVideoDuration.toFixed(3) + 's.'
+                      : ''))}
+              </small>
+
               <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
                 <strong>Image-style controls for one extracted still frame</strong>
                 <span>
@@ -2693,252 +2708,6 @@ export function VisualCanvasInspector({
       {header}
 
       <Section
-        title="Video background & frame extraction"
-        description="Author videoBg directly or convert its selected still frame into customBg"
-        icon={FilmIcon}
-        defaultOpen={frameExtractionEnabled}
-        badge="videoBg parity"
-        action={
-          <Toggle
-            label="Enable video frame extraction"
-            checked={frameExtractionEnabled}
-            onChange={(checked) => {
-              if (!checked) {
-                onMutate('Disable video background', (current) => {
-                  const next = { ...current };
-                  delete next.videoBg;
-                  return next;
-                });
-                return;
-              }
-
-              const nextSource =
-                frameExtractionSource.trim() ||
-                (videoAssets[0] ? studioAssetReference(videoAssets[0]) : '');
-              if (!nextSource) {
-                onMessage('Choose or upload a video source first');
-                return;
-              }
-              setFrameExtractionSource(nextSource);
-              mutateExtractionVideoBg('Enable video background', (videoBg) => {
-                const nextVideoBg = {
-                  ...videoBg,
-                  source: nextSource,
-                  format: frameExtractionFormat,
-                  quality: frameExtractionQuality,
-                  opacity: videoBg.opacity ?? 1,
-                };
-                if (frameExtractionMode === 'time') {
-                  nextVideoBg.time = frameExtractionTime;
-                  delete nextVideoBg.frame;
-                } else {
-                  nextVideoBg.frame = frameExtractionFrame;
-                  delete nextVideoBg.time;
-                }
-                return nextVideoBg;
-              });
-            }}
-          />
-        }
-      >
-        {frameExtractionEnabled ? (
-          <div className="apx-canvas-v2-editor">
-            <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
-              <strong>videoBg stays editable · Extract is optional</strong>
-              <span>
-                videoBg itself now supports inherit, fit, align, filters and opacity.
-                Extract only when you want to freeze the selected still frame into a Studio
-                image asset and switch the canvas to customBg.
-              </span>
-            </div>
-
-            <label className="apx-canvas-v2-field">
-              <span>Video source</span>
-              <input
-                className="apx-canvas-v2-input"
-                value={frameExtractionSource}
-                placeholder="studio://asset/... or file/URL"
-                onChange={(event) => {
-                  const nextSource = event.target.value;
-                  setFrameExtractionSource(nextSource);
-                  mutateExtractionVideoBg('Video background source', (videoBg) => ({
-                    ...videoBg,
-                    source: nextSource,
-                  }));
-                }}
-              />
-            </label>
-
-            <label className="apx-canvas-v2-field">
-              <span>Choose video asset</span>
-              <select
-                className="apx-canvas-v2-input"
-                value={selectedVideoAsset?.id ?? ''}
-                onChange={(event) => {
-                  const asset = videoAssets.find((item) => item.id === event.target.value);
-                  const nextSource = asset ? studioAssetReference(asset) : '';
-                  setFrameExtractionSource(nextSource);
-                  mutateExtractionVideoBg('Video background asset', (videoBg) => ({
-                    ...videoBg,
-                    source: nextSource,
-                  }));
-                }}
-              >
-                <option value="">Custom source</option>
-                {videoAssets.map((asset) => (
-                  <option key={asset.id} value={asset.id}>
-                    {asset.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <div className="apx-canvas-v2-segmented apx-canvas-v2-segmented--2">
-              <button
-                type="button"
-                data-active={frameExtractionMode === 'frame' ? 'true' : undefined}
-                onClick={() => {
-                  setFrameExtractionMode('frame');
-                  mutateExtractionVideoBg('Video background frame mode', (videoBg) => {
-                    const nextVideoBg = {
-                      ...videoBg,
-                      frame: frameExtractionFrame,
-                    };
-                    delete nextVideoBg.time;
-                    return nextVideoBg;
-                  });
-                }}
-              >
-                By frame
-              </button>
-              <button
-                type="button"
-                data-active={frameExtractionMode === 'time' ? 'true' : undefined}
-                onClick={() => {
-                  setFrameExtractionMode('time');
-                  mutateExtractionVideoBg('Video background time mode', (videoBg) => {
-                    const nextVideoBg = {
-                      ...videoBg,
-                      time: frameExtractionTime,
-                    };
-                    delete nextVideoBg.frame;
-                    return nextVideoBg;
-                  });
-                }}
-              >
-                By time
-              </button>
-            </div>
-
-            {frameExtractionMode === 'frame' ? (
-              <NumberField
-                label="Frame"
-                value={frameExtractionFrame}
-                min={1}
-                step={1}
-                onChange={(frame) => {
-                  const nextFrame = Math.max(1, Math.round(frame));
-                  setFrameExtractionFrame(nextFrame);
-                  mutateExtractionVideoBg('Video background frame', (videoBg) => {
-                    const nextVideoBg = { ...videoBg, frame: nextFrame };
-                    delete nextVideoBg.time;
-                    return nextVideoBg;
-                  });
-                }}
-              />
-            ) : (
-              <NumberField
-                label="Time"
-                value={frameExtractionTime}
-                min={0}
-                step={0.1}
-                onChange={(time) => {
-                  const nextTime = Math.max(0, time);
-                  setFrameExtractionTime(nextTime);
-                  mutateExtractionVideoBg('Video background time', (videoBg) => {
-                    const nextVideoBg = { ...videoBg, time: nextTime };
-                    delete nextVideoBg.frame;
-                    return nextVideoBg;
-                  });
-                }}
-                suffix="s"
-              />
-            )}
-
-            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
-              <SelectField
-                label="Format"
-                value={frameExtractionFormat}
-                options={['jpg', 'png']}
-                onChange={(value) => {
-                  const format = value as 'jpg' | 'png';
-                  setFrameExtractionFormat(format);
-                  mutateExtractionVideoBg('Video background format', (videoBg) => ({
-                    ...videoBg,
-                    format,
-                  }));
-                }}
-              />
-              <NumberField
-                label="Quality"
-                value={frameExtractionQuality}
-                min={1}
-                max={31}
-                step={1}
-                onChange={(quality) => {
-                  const nextQuality = clamp(Math.round(quality), 1, 31);
-                  setFrameExtractionQuality(nextQuality);
-                  mutateExtractionVideoBg('Video background quality', (videoBg) => ({
-                    ...videoBg,
-                    quality: nextQuality,
-                  }));
-                }}
-              />
-            </div>
-
-            <button
-              className="apx-canvas-apply"
-              type="button"
-              disabled={
-                videoFrameExtracting ||
-                !frameExtractionSource.trim() ||
-                Boolean(extractionPositionError)
-              }
-              onClick={() => {
-                void onExtractVideoFrame({
-                  source: frameExtractionSource.trim(),
-                  mode: frameExtractionMode,
-                  frame: frameExtractionFrame,
-                  time: frameExtractionTime,
-                  format: frameExtractionFormat,
-                  quality: frameExtractionQuality,
-                });
-              }}
-              data-canvas-video-extract
-            >
-              {videoFrameExtracting ? 'Extracting…' : 'Extract'}
-            </button>
-
-            <small
-              className="apx-canvas-v2-field-hint"
-              data-invalid={extractionPositionError ? 'true' : undefined}
-            >
-              {extractionPositionError ??
-                `Frame extraction is 1-based. Time extraction starts at 0 seconds.${
-                  selectedVideoDuration !== null
-                    ? ` Selected video duration: ${selectedVideoDuration.toFixed(3)}s.`
-                    : ''
-                } JPEG/PNG quality follows Apexify's 1–31 FFmpeg contract.`}
-            </small>
-          </div>
-        ) : (
-          <div className="apx-canvas-v2-empty-mini">
-            Enable frame extraction to choose a video and create a still image background.
-          </div>
-        )}
-      </Section>
-
-      <Section
         title="API coverage"
         description="The Visual inspector maps the complete current createCanvas contract"
         icon={CodeBracketIcon}
@@ -2971,10 +2740,10 @@ export function VisualCanvasInspector({
         <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
           <strong>Where everything lives</strong>
           <span>
-            Style owns base paint, opacity, clipping, stroke and shadow. Transform
-            owns size, position, rotation and internal zoom. Effects owns filters,
-            patterns, noise and stacked backgrounds. Advanced exposes one-shot video
-            frame extraction while retaining videoBg in API coverage for compatibility.
+            Style owns every primary background, including videoBg selection, frame/time
+            targeting and still-frame extraction. Transform owns size, position, rotation
+            and internal zoom. Effects owns filters, patterns, noise and stacked backgrounds.
+            Advanced is intentionally non-duplicative and keeps contract coverage only.
           </span>
         </div>
       </Section>

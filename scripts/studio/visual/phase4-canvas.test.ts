@@ -326,9 +326,14 @@ test('Phase 4 uses modern async feedback and reset confirmation UI', () => {
   assert.match(shell, /role="alertdialog"/);
   assert.match(shell, /apx-pre4-toast/);
   assert.match(shell, /data-render-progress/);
+  assert.match(shell, /'loading'/);
+  assert.match(shell, /File too large/);
+  assert.match(shell, /Uploading asset/);
+  assert.match(shell, /Asset uploaded/);
   assert.match(css, /\.apx-pre4-confirm-dialog/);
   assert.match(css, /\.apx-pre4-render-progress/);
   assert.match(css, /\.apx-pre4-toast/);
+  assert.match(css, /data-kind="loading"/);
 });
 
 test('Phase 4 videoBg exposes current image-style background parity in Visual Studio', () => {
@@ -346,6 +351,15 @@ test('Phase 4 videoBg exposes current image-style background parity in Visual St
   assert.match(shell, /activeVideoBg\.align \?\? 'center'/);
   assert.match(shell, /activeVideoBg\.filters \?\? \[\]/);
   assert.match(shell, /videoBg\?\.filters \?\? previousCustomBg\?\.filters/);
+});
+
+test('Phase 4 keeps video authoring and extraction in one Style surface', () => {
+  const inspector = fs.readFileSync('components/studio/visual/VisualCanvasInspector.tsx', 'utf8');
+
+  assert.equal((inspector.match(/data-canvas-video-extract/g) ?? []).length, 1);
+  assert.match(inspector, /Extract selected frame/);
+  assert.doesNotMatch(inspector, /title="Video background & frame extraction"/);
+  assert.match(inspector, /Advanced is intentionally non-duplicative/);
 });
 
 test('Phase 4 codegen retains the latest videoBg image-style options', () => {
@@ -398,7 +412,7 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
     'Video opacity',
     'Inherit source dimensions',
     'Image filters',
-    'Video frame extraction',
+    'Extract selected frame',
     'Pattern overlay',
     'Pattern paint',
     'Primary / secondary',
@@ -429,7 +443,7 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
     'By frame',
     'By time',
     'data-canvas-video-extract',
-    'Video → still image → customBg',
+    'Extract selected frame',
   ]) {
     assert.ok(inspector.includes(runtimeContract), 'missing Canvas interaction contract: ' + runtimeContract);
   }
@@ -453,16 +467,18 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.match(shell, /Requested frame/);
   assert.match(shell, /sourceAsset\?\.metadata\?\.width/);
   assert.match(shell, /sourceAsset\?\.metadata\?\.height/);
-  assert.match(inspector, /selectedVideoDuration/);
-  assert.match(inspector, /extractionPositionError/);
+  assert.match(inspector, /configuredVideoDuration/);
+  assert.match(inspector, /videoPositionError/);
   assert.match(shell, /delete next\.videoBg/);
   assert.match(inspector, /delete next\.videoBg/);
   assert.match(inspector, /data-canvas-video-background/);
   assert.match(inspector, /apx-canvas-v2-segmented--6/);
-  assert.match(inspector, /const frameExtractionEnabled = Boolean\(legacyVideoBg\)/);
-  assert.match(inspector, /mutateExtractionVideoBg/);
-  assert.match(inspector, /Video background frame mode/);
-  assert.match(inspector, /Video background time mode/);
+  assert.doesNotMatch(inspector, /const frameExtractionEnabled = Boolean\(legacyVideoBg\)/);
+  assert.doesNotMatch(inspector, /mutateExtractionVideoBg/);
+  assert.doesNotMatch(inspector, /title="Video background & frame extraction"/);
+  assert.match(inspector, /Video background frame selector/);
+  assert.match(inspector, /Video background time selector/);
+  assert.match(inspector, /Advanced is intentionally non-duplicative/);
   assert.match(shell, /setArtboardPreviewUrl\(studioAssetDataUrl\(extractedAsset\)\)/);
   assert.match(shell, /projectRef\.current = next/);
   assert.match(shell, /validateVirtualCanvasSource/);
@@ -470,7 +486,7 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.match(shell, /videoBg\.source/);
   assert.match(shell, /backgroundWarning/);
   assert.match(shell, /customBg = \{/);
-  assert.match(shell, /filters: previousCustomBg\?\.filters \?\? \[\]/);
+  assert.match(shell, /videoBg\?\.filters \?\? previousCustomBg\?\.filters \?\? \[\]/);
   assert.match(shell, /setInspectorTab\('effects'\)/);
   assert.match(shell, /canvasNeedsNodeRuntime/);
   assert.match(shell, /phase13Timeline/);

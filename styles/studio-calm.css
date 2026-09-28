@@ -9177,6 +9177,7 @@ body[data-phase17-resizing="dock"]{
   animation:apx-pre4-toast-in .18s ease-out;
 }
 
+.apx-pre4-toast[data-kind="loading"]{border-color:rgba(76,166,255,.58)}
 .apx-pre4-toast[data-kind="success"]{border-color:rgba(84,212,155,.5)}
 .apx-pre4-toast[data-kind="warning"]{border-color:rgba(229,184,95,.58)}
 .apx-pre4-toast[data-kind="error"]{border-color:rgba(240,111,135,.62)}
@@ -9189,6 +9190,15 @@ body[data-phase17-resizing="dock"]{
   border-radius:10px;
   color:#75b9ff;
   background:rgba(72,153,237,.12);
+}
+
+.apx-pre4-toast[data-kind="loading"] .apx-pre4-toast-icon{
+  color:#72baff;
+  background:rgba(76,166,255,.12);
+}
+
+.apx-pre4-toast[data-kind="loading"] .apx-pre4-toast-icon>svg{
+  animation:apx-pre4-render-spin .9s linear infinite;
 }
 
 .apx-pre4-toast[data-kind="success"] .apx-pre4-toast-icon{
@@ -9360,7 +9370,8 @@ body[data-phase17-resizing="dock"]{
 @media(prefers-reduced-motion:reduce){
   .apx-pre4-render-progress>svg,
   .apx-pre4-render-progress>i>b,
-  .apx-pre4-toast{
+  .apx-pre4-toast,
+  .apx-pre4-toast[data-kind="loading"] .apx-pre4-toast-icon>svg{
     animation:none;
   }
 }

@@ -507,7 +507,7 @@ function canvasArtboardBackground(canvas: VisualCanvasConfig): string {
   return '#000000';
 }
 
-type VisualNoticeKind = 'info' | 'success' | 'warning' | 'error';
+type VisualNoticeKind = 'info' | 'success' | 'warning' | 'error' | 'loading';
 type VisualNotice = {
   id: number;
   kind: VisualNoticeKind;
@@ -851,14 +851,17 @@ export default function VisualStudioPre4({
     kind: VisualNoticeKind,
     title: string,
     text?: string,
-    timeoutMs = kind === 'error' ? 6500 : 3600,
+    timeoutMs = kind === 'loading' ? 0 : kind === 'error' ? 6500 : 4200,
   ) => {
     window.clearTimeout(visualNoticeTimerRef.current);
     setVisualNotice({ id: Date.now(), kind, title, text });
-    visualNoticeTimerRef.current = window.setTimeout(
-      () => setVisualNotice(null),
-      timeoutMs,
-    );
+    visualNoticeTimerRef.current = 0;
+    if (timeoutMs > 0) {
+      visualNoticeTimerRef.current = window.setTimeout(
+        () => setVisualNotice(null),
+        timeoutMs,
+      );
+    }
   };
 
   const projectSemanticSignature = useMemo(() => semanticSignature(project), [project]);
@@ -1187,10 +1190,14 @@ export default function VisualStudioPre4({
       setAutosaveState('saved');
       setLastAutosavedAt(envelope.savedAt);
     } catch (error) {
+      const autosaveError =
+        error instanceof Error ? error.message : 'Browser storage failed.';
       setAutosaveState('error');
-      setMessage(
-        'Autosave unavailable · ' +
-          (error instanceof Error ? error.message : 'storage failed'),
+      setMessage('Autosave unavailable · ' + autosaveError);
+      flashVisualNotice(
+        'error',
+        'Autosave failed',
+        autosaveError + ' Your current in-memory canvas is still open.',
       );
     }
   };
@@ -1994,10 +2001,18 @@ export default function VisualStudioPre4({
     }
 
     setCanvasFrameExtracting(true);
+    const extractionStatus = sourceAsset
+      ? 'Decoding the uploaded video locally in your browser.'
+      : 'Using the full Apexify runtime for this external video source.';
     setMessage(
       sourceAsset
         ? 'Extracting selected frame locally…'
         : 'Extracting selected frame with the full runtime…',
+    );
+    flashVisualNotice(
+      'loading',
+      'Extracting video frame',
+      extractionStatus,
     );
 
     try {
@@ -2429,13 +2444,32 @@ export default function VisualStudioPre4({
       (file.type || '').startsWith('image/'),
     );
     if (!incoming.length) {
-      setMessage('Drop an image file onto the canvas');
+      const text = 'Drop or choose an image file such as PNG, JPG, WebP, GIF or SVG.';
+      setMessage(text);
+      flashVisualNotice('warning', 'Image file required', text);
       return;
     }
     if (assets.length + incoming.length > STUDIO_ASSET_LIMITS.maxCount) {
-      setMessage('Studio asset count limit reached');
+      const text =
+        'Studio accepts at most ' +
+        STUDIO_ASSET_LIMITS.maxCount +
+        ' assets per session. Remove an unused asset and retry.';
+      setMessage(text);
+      flashVisualNotice('error', 'Asset limit reached', text);
       return;
     }
+
+    const incomingBytes = incoming.reduce((sum, file) => sum + file.size, 0);
+    flashVisualNotice(
+      'loading',
+      incoming.length === 1 ? 'Uploading image' : 'Uploading images',
+      incoming.length +
+        ' file' +
+        (incoming.length === 1 ? '' : 's') +
+        ' · ' +
+        (incomingBytes / (1024 * 1024)).toFixed(2) +
+        ' MiB',
+    );
 
     try {
       const created: StudioVirtualAsset[] = [];
@@ -2449,7 +2483,9 @@ export default function VisualStudioPre4({
         }
         created.push(asset);
       }
-      if (!created.length) return;
+      if (!created.length) {
+        throw new Error('No supported image assets were created from the selected files.');
+      }
       setAssets([...assets, ...created]);
       created.forEach((asset, index) =>
         insertImageAsset(
@@ -2459,18 +2495,29 @@ export default function VisualStudioPre4({
             : undefined,
         ),
       );
-      setMessage(
+      const text =
         'Added ' +
-          created.length +
-          ' image asset' +
-          (created.length === 1 ? '' : 's'),
+        created.length +
+        ' image asset' +
+        (created.length === 1 ? '' : 's');
+      setMessage(text);
+      flashVisualNotice(
+        'success',
+        created.length === 1 ? 'Image added' : 'Images added',
+        text + ' and placed on the canvas.',
       );
     } catch (uploadError) {
-      setMessage(
+      const text =
         uploadError instanceof Error
           ? uploadError.message
-          : 'Could not add image asset',
-      );
+          : 'Could not add image asset';
+      const title = /exceeds.*MiB|too large/i.test(text)
+        ? 'File too large'
+        : /limit/i.test(text)
+          ? 'Asset storage limit'
+          : 'Image upload failed';
+      setMessage(text);
+      flashVisualNotice('error', title, text);
     }
   };
 
@@ -2486,13 +2533,27 @@ export default function VisualStudioPre4({
     if (!incoming.length) return;
 
     if (assets.length + incoming.length > STUDIO_ASSET_LIMITS.maxCount) {
-      setMessage(
+      const text =
         'Studio accepts at most ' +
-          STUDIO_ASSET_LIMITS.maxCount +
-          ' assets per session.',
-      );
+        STUDIO_ASSET_LIMITS.maxCount +
+        ' assets per session. Remove an unused asset and retry.';
+      setMessage(text);
+      flashVisualNotice('error', 'Asset limit reached', text);
+      if (assetInputRef.current) assetInputRef.current.value = '';
       return;
     }
+
+    const incomingBytes = incoming.reduce((sum, file) => sum + file.size, 0);
+    flashVisualNotice(
+      'loading',
+      incoming.length === 1 ? 'Uploading asset' : 'Uploading assets',
+      incoming.length +
+        ' file' +
+        (incoming.length === 1 ? '' : 's') +
+        ' · ' +
+        (incomingBytes / (1024 * 1024)).toFixed(2) +
+        ' MiB · validating media and metadata',
+    );
 
     try {
       const created: StudioVirtualAsset[] = [];
@@ -2506,21 +2567,34 @@ export default function VisualStudioPre4({
         created.push(asset);
       }
 
-      if (!created.length) return;
+      if (!created.length) {
+        throw new Error('No supported Studio assets were created from the selected files.');
+      }
       setAssets([...assets, ...created]);
       setAssetFilter(assetKind(created[0].mime));
-      setMessage(
+      const text =
         'Added ' +
-          created.length +
-          ' Studio asset' +
-          (created.length === 1 ? '' : 's'),
+        created.length +
+        ' Studio asset' +
+        (created.length === 1 ? '' : 's');
+      setMessage(text);
+      flashVisualNotice(
+        'success',
+        created.length === 1 ? 'Asset uploaded' : 'Assets uploaded',
+        text + ' successfully.',
       );
     } catch (uploadError) {
-      setMessage(
+      const text =
         uploadError instanceof Error
           ? uploadError.message
-          : 'Could not add Studio asset',
-      );
+          : 'Could not add Studio asset';
+      const title = /exceeds.*MiB|too large/i.test(text)
+        ? 'File too large'
+        : /limit/i.test(text)
+          ? 'Asset storage limit'
+          : 'Upload failed';
+      setMessage(text);
+      flashVisualNotice('error', title, text);
     } finally {
       if (assetInputRef.current) assetInputRef.current.value = '';
     }
@@ -7609,7 +7683,9 @@ export default function VisualStudioPre4({
           aria-live={visualNotice.kind === 'error' ? 'assertive' : 'polite'}
         >
           <span className="apx-pre4-toast-icon" aria-hidden>
-            {visualNotice.kind === 'success' ? (
+            {visualNotice.kind === 'loading' ? (
+              <ArrowPathIcon />
+            ) : visualNotice.kind === 'success' ? (
               <CheckCircleIcon />
             ) : visualNotice.kind === 'error' || visualNotice.kind === 'warning' ? (
               <ExclamationTriangleIcon />
