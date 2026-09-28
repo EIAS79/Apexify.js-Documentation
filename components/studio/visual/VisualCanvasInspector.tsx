@@ -938,7 +938,7 @@ function FilterEditor({
       <div className="apx-canvas-v2-subhead">
         <div>
           <strong>Image filters</strong>
-          <small>Applied to customBg before it reaches the canvas.</small>
+          <small>Applied to the active image-style background before it reaches the canvas.</small>
         </div>
         <button
           type="button"
@@ -1541,6 +1541,11 @@ export function VisualCanvasInspector({
   const selectedVideoAsset = videoAssets.find(
     (asset) => studioAssetReference(asset) === frameExtractionSource,
   );
+  const configuredVideoAsset = legacyVideoBg
+    ? videoAssets.find(
+        (asset) => studioAssetReference(asset) === legacyVideoBg.source,
+      )
+    : undefined;
   const selectedVideoDuration =
     typeof selectedVideoAsset?.metadata?.duration === 'number' &&
     Number.isFinite(selectedVideoAsset.metadata.duration) &&
@@ -1916,7 +1921,11 @@ export function VisualCanvasInspector({
           ) : null}
 
           {mode === 'video' && canvas.videoBg ? (
-            <div className="apx-canvas-v2-editor" data-canvas-video-background>
+            <div
+              className="apx-canvas-v2-editor"
+              data-canvas-video-background
+              data-canvas-video-image-parity
+            >
               <label className="apx-canvas-v2-field">
                 <span>videoBg.source</span>
                 <input
@@ -1924,15 +1933,17 @@ export function VisualCanvasInspector({
                   value={canvas.videoBg.source}
                   placeholder="studio://asset/... or video source"
                   onFocus={onBeginEdit}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const nextSource = event.target.value;
+                    setFrameExtractionSource(nextSource);
                     onDraft((current) => ({
                       ...current,
                       videoBg: {
                         ...(current.videoBg ?? canvas.videoBg!),
-                        source: event.target.value,
+                        source: nextSource,
                       },
-                    }))
-                  }
+                    }));
+                  }}
                   onBlur={() => onEndEdit('Canvas video source')}
                 />
               </label>
@@ -1941,22 +1952,19 @@ export function VisualCanvasInspector({
                 <span>Choose video asset</span>
                 <select
                   className="apx-canvas-v2-input"
-                  value={
-                    videoAssets.find(
-                      (asset) =>
-                        studioAssetReference(asset) === canvas.videoBg?.source,
-                    )?.id ?? ''
-                  }
+                  value={configuredVideoAsset?.id ?? ''}
                   onChange={(event) => {
                     const asset = videoAssets.find(
                       (item) => item.id === event.target.value,
                     );
                     if (!asset) return;
+                    const nextSource = studioAssetReference(asset);
+                    setFrameExtractionSource(nextSource);
                     onMutate('Canvas video background asset', (current) => ({
                       ...current,
                       videoBg: {
                         ...(current.videoBg ?? canvas.videoBg!),
-                        source: studioAssetReference(asset),
+                        source: nextSource,
                       },
                     }));
                     onMessage('Canvas video background · ' + asset.name);
@@ -1974,37 +1982,99 @@ export function VisualCanvasInspector({
                 </select>
               </label>
 
-              <div className="apx-canvas-v2-grid apx-canvas-v2-grid--3">
-                <NumberField
-                  label="Time"
-                  value={canvas.videoBg.time ?? 0}
-                  min={0}
-                  step={0.1}
-                  suffix="s"
-                  onChange={(time) =>
-                    onMutate('Video background time', (current) => {
+              <div className="apx-canvas-v2-segmented apx-canvas-v2-segmented--2">
+                <button
+                  type="button"
+                  data-active={frameExtractionMode === 'frame' ? 'true' : undefined}
+                  onClick={() => {
+                    setFrameExtractionMode('frame');
+                    onMutate('Video background frame selector', (current) => {
                       const videoBg = {
                         ...(current.videoBg ?? canvas.videoBg!),
-                        time: Math.max(0, time),
+                        frame: Math.max(1, Math.round(frameExtractionFrame)),
+                      };
+                      delete videoBg.time;
+                      return { ...current, videoBg };
+                    });
+                  }}
+                >
+                  By frame
+                </button>
+                <button
+                  type="button"
+                  data-active={frameExtractionMode === 'time' ? 'true' : undefined}
+                  onClick={() => {
+                    setFrameExtractionMode('time');
+                    onMutate('Video background time selector', (current) => {
+                      const videoBg = {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        time: Math.max(0, frameExtractionTime),
                       };
                       delete videoBg.frame;
                       return { ...current, videoBg };
-                    })
-                  }
-                />
+                    });
+                  }}
+                >
+                  By time
+                </button>
+              </div>
+
+              <div className="apx-canvas-v2-grid apx-canvas-v2-grid--3">
+                {frameExtractionMode === 'frame' ? (
+                  <NumberField
+                    label="Frame"
+                    value={frameExtractionFrame}
+                    min={1}
+                    step={1}
+                    onChange={(frame) => {
+                      const nextFrame = Math.max(1, Math.round(frame));
+                      setFrameExtractionFrame(nextFrame);
+                      onMutate('Video background frame', (current) => {
+                        const videoBg = {
+                          ...(current.videoBg ?? canvas.videoBg!),
+                          frame: nextFrame,
+                        };
+                        delete videoBg.time;
+                        return { ...current, videoBg };
+                      });
+                    }}
+                  />
+                ) : (
+                  <NumberField
+                    label="Time"
+                    value={frameExtractionTime}
+                    min={0}
+                    step={0.1}
+                    suffix="s"
+                    onChange={(time) => {
+                      const nextTime = Math.max(0, time);
+                      setFrameExtractionTime(nextTime);
+                      onMutate('Video background time', (current) => {
+                        const videoBg = {
+                          ...(current.videoBg ?? canvas.videoBg!),
+                          time: nextTime,
+                        };
+                        delete videoBg.frame;
+                        return { ...current, videoBg };
+                      });
+                    }}
+                  />
+                )}
                 <SelectField
                   label="Format"
                   value={canvas.videoBg.format ?? 'jpg'}
                   options={['jpg', 'png']}
-                  onChange={(value) =>
+                  onChange={(value) => {
+                    const format = value as 'jpg' | 'png';
+                    setFrameExtractionFormat(format);
                     onMutate('Video background format', (current) => ({
                       ...current,
                       videoBg: {
                         ...(current.videoBg ?? canvas.videoBg!),
-                        format: value as 'jpg' | 'png',
+                        format,
                       },
-                    }))
-                  }
+                    }));
+                  }}
                 />
                 <NumberField
                   label="Quality"
@@ -2012,17 +2082,85 @@ export function VisualCanvasInspector({
                   min={1}
                   max={31}
                   step={1}
-                  onChange={(quality) =>
+                  onChange={(quality) => {
+                    const nextQuality = clamp(Math.round(quality), 1, 31);
+                    setFrameExtractionQuality(nextQuality);
                     onMutate('Video background quality', (current) => ({
                       ...current,
                       videoBg: {
                         ...(current.videoBg ?? canvas.videoBg!),
-                        quality: clamp(Math.round(quality), 1, 31),
+                        quality: nextQuality,
+                      },
+                    }));
+                  }}
+                />
+              </div>
+
+              <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
+                <SelectField
+                  label="Fit"
+                  value={canvas.videoBg.fit ?? 'fill'}
+                  options={CANVAS_FITS}
+                  disabled={Boolean(canvas.videoBg.inherit)}
+                  onChange={(value) =>
+                    onMutate('Video background fit', (current) => ({
+                      ...current,
+                      videoBg: {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        fit: value as NonNullable<
+                          NonNullable<VisualCanvasConfig['videoBg']>['fit']
+                        >,
+                      },
+                    }))
+                  }
+                />
+                <SelectField
+                  label="Align"
+                  value={canvas.videoBg.align ?? 'center'}
+                  options={CANVAS_ALIGNMENTS}
+                  disabled={Boolean(canvas.videoBg.inherit)}
+                  onChange={(value) =>
+                    onMutate('Video background alignment', (current) => ({
+                      ...current,
+                      videoBg: {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        align: value as NonNullable<
+                          NonNullable<VisualCanvasConfig['videoBg']>['align']
+                        >,
                       },
                     }))
                   }
                 />
               </div>
+
+              <label className="apx-canvas-v2-check-card">
+                <input
+                  type="checkbox"
+                  checked={canvas.videoBg.inherit ?? false}
+                  onChange={(event) =>
+                    onMutate('Video background inherit dimensions', (current) => ({
+                      ...current,
+                      videoBg: {
+                        ...(current.videoBg ?? canvas.videoBg!),
+                        inherit: event.target.checked,
+                      },
+                    }))
+                  }
+                />
+                <span>
+                  <strong>Inherit extracted-frame dimensions</strong>
+                  <small>
+                    Use the selected frame's native resolution. Fit and alignment are bypassed.
+                  </small>
+                </span>
+                {configuredVideoAsset?.metadata?.width &&
+                configuredVideoAsset.metadata.height ? (
+                  <em>
+                    {configuredVideoAsset.metadata.width} ×{' '}
+                    {configuredVideoAsset.metadata.height}
+                  </em>
+                ) : null}
+              </label>
 
               <RangeField
                 label="Video opacity"
@@ -2039,10 +2177,11 @@ export function VisualCanvasInspector({
               />
 
               <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
-                <strong>FFmpeg-backed frame background</strong>
+                <strong>Image-style controls for one extracted still frame</strong>
                 <span>
-                  Uploaded Studio videos use their virtual asset reference and route through
-                  the full runtime. Image backgrounds stay on the browser renderer.
+                  videoBg now shares customBg's inherit, fit, align, filters and opacity
+                  pipeline. Frame is 1-based, frame/time are mutually exclusive, and
+                  filters are edited in Effects.
                 </span>
               </div>
             </div>
@@ -2478,11 +2617,19 @@ export function VisualCanvasInspector({
         </Section>
 
         <Section
-          title="Background image filters"
-          description="Complete ImageFilter[] controls for customBg"
+          title="Background media filters"
+          description="Shared ImageFilter[] controls for customBg and videoBg"
           icon={AdjustmentsHorizontalIcon}
-          defaultOpen={Boolean(customBg?.filters?.length)}
-          badge={customBg ? String(customBg.filters?.length ?? 0) : 'Image only'}
+          defaultOpen={Boolean(
+            customBg?.filters?.length || legacyVideoBg?.filters?.length,
+          )}
+          badge={
+            customBg
+              ? String(customBg.filters?.length ?? 0)
+              : legacyVideoBg
+                ? String(legacyVideoBg.filters?.length ?? 0)
+                : 'Image / video'
+          }
         >
           {customBg ? (
             <FilterEditor
@@ -2497,10 +2644,25 @@ export function VisualCanvasInspector({
                 }))
               }
             />
+          ) : legacyVideoBg ? (
+            <FilterEditor
+              filters={legacyVideoBg.filters ?? []}
+              onChange={(filters) =>
+                onDraft((current) => ({
+                  ...current,
+                  videoBg: {
+                    ...(current.videoBg ?? legacyVideoBg),
+                    filters,
+                  },
+                }))
+              }
+            />
           ) : (
             <div className="apx-canvas-v2-callout">
-              <strong>Choose Image as the base surface first</strong>
-              <span>customBg.filters belongs to the image background API.</span>
+              <strong>Choose Image or Video as the base surface first</strong>
+              <span>
+                customBg.filters and videoBg.filters use the same Apexify image-filter pipeline.
+              </span>
             </div>
           )}
         </Section>
@@ -2531,11 +2693,11 @@ export function VisualCanvasInspector({
       {header}
 
       <Section
-        title="Video frame extraction"
-        description="Extract one still frame, then use it as the normal image background"
+        title="Video background & frame extraction"
+        description="Author videoBg directly or convert its selected still frame into customBg"
         icon={FilmIcon}
         defaultOpen={frameExtractionEnabled}
-        badge="Node / FFmpeg"
+        badge="videoBg parity"
         action={
           <Toggle
             label="Enable video frame extraction"
@@ -2582,11 +2744,11 @@ export function VisualCanvasInspector({
         {frameExtractionEnabled ? (
           <div className="apx-canvas-v2-editor">
             <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info">
-              <strong>Video → still image → customBg</strong>
+              <strong>videoBg stays editable · Extract is optional</strong>
               <span>
-                Extraction is a one-shot tool. The resulting frame is saved as a Studio image
-                asset and becomes customBg.source, so normal image background filters and
-                effects apply immediately.
+                videoBg itself now supports inherit, fit, align, filters and opacity.
+                Extract only when you want to freeze the selected still frame into a Studio
+                image asset and switch the canvas to customBg.
               </span>
             </div>
 

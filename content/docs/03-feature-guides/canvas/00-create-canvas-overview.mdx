@@ -66,16 +66,16 @@ The returned `canvas` value is the configuration reference used by the creator. 
 
 ## Defaults and validation
 
-<FeatureMatrix rows={[{"feature":"width / height","status":"Defaults to 500 × 500","note":"Prefer explicit production dimensions unless another configured source determines size"},{"feature":"primary fill","status":"Mutually exclusive","note":"Use at most one of colorBg, gradientBg, or customBg"},{"feature":"opacity","status":"0 through 1","note":"Values outside the range are invalid"},{"feature":"zoom.scale","status":"Greater than 0","note":"Required when zoom is configured"},{"feature":"bgLayers","status":"Validated per entry","note":"Supports configured color, gradient, image, pattern, preset-pattern, and noise layers"}]} />
+<FeatureMatrix rows={[{"feature":"width / height","status":"Defaults to 500 × 500","note":"Prefer explicit production dimensions unless customBg.inherit or videoBg.inherit determines size"},{"feature":"primary background","status":"Mutually exclusive","note":"Use at most one of colorBg, gradientBg, customBg, videoBg, or transparentBase: true"},{"feature":"videoBg still-frame controls","status":"Image-style parity","note":"Supports inherit, fit, align, filters, opacity, 1-based frame or time, jpg/png and FFmpeg quality 1–31"},{"feature":"opacity","status":"0 through 1","note":"Values outside the range are invalid"},{"feature":"zoom.scale","status":"Greater than 0","note":"Required when zoom is configured"},{"feature":"bgLayers","status":"Validated per entry","note":"Supports configured color, gradient, image, pattern, preset-pattern, and noise layers"}]} />
 
-<DecisionGuide items={[{"when":"you need a predictable banner or card size","use":"explicit width and height","because":"the output dimensions remain independent of source-asset dimensions"},{"when":"the background image should determine canvas size","use":"customBg.inherit","because":"the loaded image can supply effective dimensions"},{"when":"you need layered composition","use":"bgLayers","because":"layers make paint order explicit instead of overloading the primary fill"}]} />
+<DecisionGuide items={[{"when":"you need a predictable banner or card size","use":"explicit width and height","because":"the output dimensions remain independent of source-asset dimensions"},{"when":"an image should determine canvas size","use":"customBg.inherit","because":"the loaded image supplies effective dimensions"},{"when":"a selected video frame should determine canvas size","use":"videoBg.inherit","because":"the extracted still frame supplies effective dimensions and then uses the same fit/align/filter/opacity pipeline as customBg"},{"when":"you need layered composition","use":"bgLayers","because":"layers make paint order explicit instead of overloading the primary fill"}]} />
 
 ## Paint architecture
 
 <ArchitectureDiagram diagram="CanvasConfig → validation → surface allocation → backgrounds/layers → clip and transforms → shadow/stroke → PNG buffer" caption="High-level createCanvas pipeline" />
 
 <Details summary="Primary fill rule">
-Use only one primary fill among `colorBg`, `gradientBg`, and `customBg`. Additional layering concerns belong in the dedicated background-layer options.
+Use only one primary background among `colorBg`, `gradientBg`, `customBg`, `videoBg`, and `transparentBase: true`. `videoBg` extracts one still frame and then shares the same image-style `inherit` / `fit` / `align` / `filters` / `opacity` behavior as `customBg`. Additional layering concerns belong in the dedicated background-layer options.
 </Details>
 
 ## Verified executable example

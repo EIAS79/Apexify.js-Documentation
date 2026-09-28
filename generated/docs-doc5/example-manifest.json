@@ -3,7 +3,7 @@
   "package": {
     "name": "apexify.js",
     "version": "6.0.0",
-    "commit": "35a99d97f3979080095f434c2f0e9dbe58feca4e"
+    "commit": "a68053f87c0e69f077c4e1a58561511fe3aed68a"
   },
   "examples": [
     {
@@ -102,7 +102,7 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "35a99d97f3979080095f434c2f0e9dbe58feca4e",
+      "verifiedPackageCommit": "a68053f87c0e69f077c4e1a58561511fe3aed68a",
       "verifiedArtifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17"
     },
     {
@@ -201,7 +201,7 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "35a99d97f3979080095f434c2f0e9dbe58feca4e",
+      "verifiedPackageCommit": "a68053f87c0e69f077c4e1a58561511fe3aed68a",
       "verifiedArtifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17"
     },
     {
@@ -320,7 +320,7 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "35a99d97f3979080095f434c2f0e9dbe58feca4e",
+      "verifiedPackageCommit": "a68053f87c0e69f077c4e1a58561511fe3aed68a",
       "verifiedArtifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17"
     },
     {
@@ -444,7 +444,7 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "35a99d97f3979080095f434c2f0e9dbe58feca4e",
+      "verifiedPackageCommit": "a68053f87c0e69f077c4e1a58561511fe3aed68a",
       "verifiedArtifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17"
     }
   ]

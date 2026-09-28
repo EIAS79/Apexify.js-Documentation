@@ -1391,9 +1391,15 @@ export default function VisualStudioPre4({
   useEffect(() => {
     if (!assetStorageReady) return;
     const current = projectRef.current;
-    const customBg = current.document.canvas?.customBg;
-    if (!customBg?.inherit) return;
-    const dimensions = resolveInheritedCanvasDimensions(customBg.source);
+    const canvas = current.document.canvas;
+    const inheritedBg =
+      canvas?.customBg?.inherit
+        ? canvas.customBg
+        : canvas?.videoBg?.inherit
+          ? canvas.videoBg
+          : null;
+    if (!inheritedBg) return;
+    const dimensions = resolveInheritedCanvasDimensions(inheritedBg.source);
     if (!dimensions) return;
     if (
       current.document.width === dimensions.width &&
@@ -1404,8 +1410,14 @@ export default function VisualStudioPre4({
 
     didInitialFit.current = false;
     setProject((projectState) => {
-      const activeBg = projectState.document.canvas?.customBg;
-      if (!activeBg?.inherit || activeBg.source !== customBg.source) {
+      const activeCanvas = projectState.document.canvas;
+      const activeBg =
+        activeCanvas?.customBg?.inherit
+          ? activeCanvas.customBg
+          : activeCanvas?.videoBg?.inherit
+            ? activeCanvas.videoBg
+            : null;
+      if (!activeBg || activeBg.source !== inheritedBg.source) {
         return projectState;
       }
       const next = structuredClone(projectState);
@@ -1426,6 +1438,8 @@ export default function VisualStudioPre4({
     assets,
     project.document.canvas?.customBg?.source,
     project.document.canvas?.customBg?.inherit,
+    project.document.canvas?.videoBg?.source,
+    project.document.canvas?.videoBg?.inherit,
   ]);
 
   useEffect(() => {
@@ -1626,10 +1640,16 @@ export default function VisualStudioPre4({
       delete previewCanvas.videoBg;
       previewCanvas.customBg = {
         source: studioAssetReference(previewAsset),
-        fit: 'fill',
-        align: 'center',
+        inherit: activeVideoBg.inherit,
+        fit: activeVideoBg.fit ?? 'fill',
+        align: activeVideoBg.align ?? 'center',
+        filters: activeVideoBg.filters ?? [],
         opacity: activeVideoBg.opacity ?? 1,
       };
+      if (activeVideoBg.inherit) {
+        previewProject.document.width = localFrame.width;
+        previewProject.document.height = localFrame.height;
+      }
       previewProject.document.canvas = previewCanvas;
       const previewSource =
         generateVisualProjectDisplayPreviewCode(previewProject).source;
@@ -2143,6 +2163,7 @@ export default function VisualStudioPre4({
       setArtboardPreviewBounds(null);
 
       mutateCanvas('Extract video frame background', (current) => {
+        const videoBg = current.videoBg;
         const previousCustomBg = current.customBg;
         const next = { ...current };
         delete next.videoBg;
@@ -2151,10 +2172,11 @@ export default function VisualStudioPre4({
         delete next.transparentBase;
         next.customBg = {
           source: studioAssetReference(extractedAsset),
-          fit: previousCustomBg?.fit ?? 'fill',
-          align: previousCustomBg?.align ?? 'center',
-          opacity: previousCustomBg?.opacity ?? 1,
-          filters: previousCustomBg?.filters ?? [],
+          inherit: videoBg?.inherit ?? previousCustomBg?.inherit,
+          fit: videoBg?.fit ?? previousCustomBg?.fit ?? 'fill',
+          align: videoBg?.align ?? previousCustomBg?.align ?? 'center',
+          opacity: videoBg?.opacity ?? previousCustomBg?.opacity ?? 1,
+          filters: videoBg?.filters ?? previousCustomBg?.filters ?? [],
         };
         return next;
       });

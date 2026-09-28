@@ -331,6 +331,56 @@ test('Phase 4 uses modern async feedback and reset confirmation UI', () => {
   assert.match(css, /\.apx-pre4-toast/);
 });
 
+test('Phase 4 videoBg exposes current image-style background parity in Visual Studio', () => {
+  const inspector = fs.readFileSync('components/studio/visual/VisualCanvasInspector.tsx', 'utf8');
+  const shell = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
+
+  assert.match(inspector, /data-canvas-video-image-parity/);
+  assert.match(inspector, /Video background inherit dimensions/);
+  assert.match(inspector, /Video background fit/);
+  assert.match(inspector, /Video background alignment/);
+  assert.match(inspector, /Background media filters/);
+  assert.match(inspector, /legacyVideoBg\.filters/);
+  assert.match(shell, /activeVideoBg\.inherit/);
+  assert.match(shell, /activeVideoBg\.fit \?\? 'fill'/);
+  assert.match(shell, /activeVideoBg\.align \?\? 'center'/);
+  assert.match(shell, /activeVideoBg\.filters \?\? \[\]/);
+  assert.match(shell, /videoBg\?\.filters \?\? previousCustomBg\?\.filters/);
+});
+
+test('Phase 4 codegen retains the latest videoBg image-style options', () => {
+  const project = createVisualProject({
+    width: 800,
+    height: 450,
+    now: '2026-09-28T00:00:00.000Z',
+  });
+  project.document.canvas = {
+    videoBg: {
+      source: 'studio://asset/video-parity',
+      frame: 10,
+      inherit: true,
+      fit: 'contain',
+      align: 'bottom-right',
+      filters: [{ type: 'grayscale', intensity: 1 }],
+      opacity: 0.6,
+      format: 'png',
+      quality: 2,
+    },
+  };
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /videoBg:/);
+  assert.match(source, /frame: 10/);
+  assert.match(source, /inherit: true/);
+  assert.match(source, /fit: "contain"/);
+  assert.match(source, /align: "bottom-right"/);
+  assert.match(source, /filters:/);
+  assert.match(source, /type: "grayscale"/);
+  assert.match(source, /opacity: 0\.6/);
+  assert.match(source, /format: "png"/);
+  assert.match(source, /quality: 2/);
+});
+
 test('Phase 4 shell exposes the complete createCanvas inspector contract', () => {
   const shell = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
   const inspector = fs.readFileSync('components/studio/visual/VisualCanvasInspector.tsx', 'utf8');
