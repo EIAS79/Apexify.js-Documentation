@@ -20,6 +20,7 @@ import {
   ArrowUturnRightIcon,
   ArrowsPointingOutIcon,
   ChartBarIcon,
+  CheckCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CircleStackIcon,
@@ -29,8 +30,10 @@ import {
   CubeIcon,
   CursorArrowRaysIcon,
   DocumentTextIcon,
+  ExclamationTriangleIcon,
   FilmIcon,
   HandRaisedIcon,
+  InformationCircleIcon,
   MagnifyingGlassIcon,
   MusicalNoteIcon,
   PencilSquareIcon,
@@ -41,6 +44,7 @@ import {
   TrashIcon,
   VideoCameraIcon,
   WrenchScrewdriverIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 import {
   createApexifyWebRuntime,
@@ -503,6 +507,223 @@ function canvasArtboardBackground(canvas: VisualCanvasConfig): string {
   return '#000000';
 }
 
+type VisualNoticeKind = 'info' | 'success' | 'warning' | 'error';
+type VisualNotice = {
+  id: number;
+  kind: VisualNoticeKind;
+  title: string;
+  text?: string;
+} | null;
+
+type BrowserVideoFrame = {
+  base64: string;
+  mime: 'image/jpeg' | 'image/png';
+  width: number;
+  height: number;
+  duration: number;
+  fps: number;
+  time: number;
+};
+
+type FrameCallbackMetadataLike = { mediaTime: number };
+type FrameCapableVideo = HTMLVideoElement & {
+  requestVideoFrameCallback?: (
+    callback: (now: number, metadata: FrameCallbackMetadataLike) => void,
+  ) => number;
+};
+
+function waitForMediaEvent(
+  media: HTMLMediaElement,
+  eventName: 'loadedmetadata' | 'seeked' | 'loadeddata',
+  timeoutMs = 8000,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => {
+      cleanup();
+      reject(new Error('Video decoding timed out while waiting for ' + eventName + '.'));
+    }, timeoutMs);
+    const cleanup = () => {
+      window.clearTimeout(timer);
+      media.removeEventListener(eventName, onReady);
+      media.removeEventListener('error', onError);
+    };
+    const onReady = () => {
+      cleanup();
+      resolve();
+    };
+    const onError = () => {
+      cleanup();
+      reject(new Error('The browser could not decode this video asset.'));
+    };
+    media.addEventListener(eventName, onReady, { once: true });
+    media.addEventListener('error', onError, { once: true });
+  });
+}
+
+async function estimateBrowserVideoFps(video: HTMLVideoElement): Promise<number> {
+  const frameVideo = video as FrameCapableVideo;
+  if (!frameVideo.requestVideoFrameCallback) return 30;
+
+  const mediaTimes: number[] = [];
+  video.muted = true;
+  video.playsInline = true;
+  video.currentTime = 0;
+  try {
+    await waitForMediaEvent(video, 'seeked', 3500);
+  } catch {
+    // Some browsers do not emit seeked when currentTime is already zero.
+  }
+
+  return new Promise<number>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      video.pause();
+      const deltas = mediaTimes
+        .slice(1)
+        .map((value, index) => value - mediaTimes[index]!)
+        .filter((value) => Number.isFinite(value) && value > 0.001 && value < 0.2)
+        .sort((a, b) => a - b);
+      const median = deltas.length ? deltas[Math.floor(deltas.length / 2)]! : 0;
+      const fps = median > 0 ? 1 / median : 30;
+      resolve(Math.max(1, Math.min(240, Math.round(fps * 1000) / 1000)));
+    };
+    const timer = window.setTimeout(finish, 1100);
+    const sample = (_now: number, metadata: FrameCallbackMetadataLike) => {
+      mediaTimes.push(metadata.mediaTime);
+      if (mediaTimes.length >= 10) {
+        window.clearTimeout(timer);
+        finish();
+        return;
+      }
+      frameVideo.requestVideoFrameCallback?.(sample);
+    };
+    void video.play().then(
+      () => frameVideo.requestVideoFrameCallback?.(sample),
+      () => {
+        window.clearTimeout(timer);
+        finish();
+      },
+    );
+  });
+}
+
+function browserCanvasBlob(
+  canvas: HTMLCanvasElement,
+  format: 'jpg' | 'png',
+  quality: number,
+): Promise<Blob> {
+  const mime = format === 'png' ? 'image/png' : 'image/jpeg';
+  const jpegQuality =
+    format === 'jpg'
+      ? Math.max(0.12, Math.min(1, 1 - ((quality - 1) / 30) * 0.88))
+      : undefined;
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => blob ? resolve(blob) : reject(new Error('Could not encode the extracted video frame.')),
+      mime,
+      jpegQuality,
+    );
+  });
+}
+
+function bytesAsBase64(bytes: Uint8Array): string {
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    const chunk = bytes.subarray(offset, Math.min(bytes.length, offset + chunkSize));
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
+async function extractStudioVideoFrameInBrowser(
+  asset: StudioVirtualAsset,
+  request: CanvasVideoFrameExtractionRequest,
+  fpsHint?: number,
+): Promise<BrowserVideoFrame> {
+  if (!asset.mime.startsWith('video/')) {
+    throw new Error(asset.name + ' is not a video asset.');
+  }
+
+  const video = document.createElement('video');
+  video.preload = 'auto';
+  video.muted = true;
+  video.playsInline = true;
+  video.src = studioAssetDataUrl(asset);
+
+  try {
+    await waitForMediaEvent(video, 'loadedmetadata', 9000);
+    const duration = Number.isFinite(video.duration) ? video.duration : asset.metadata?.duration ?? 0;
+    if (!Number.isFinite(duration) || duration <= 0) {
+      throw new Error('Could not determine the uploaded video duration.');
+    }
+
+    let fps =
+      typeof fpsHint === 'number' && Number.isFinite(fpsHint) && fpsHint > 0
+        ? fpsHint
+        : typeof asset.metadata?.fps === 'number' &&
+            Number.isFinite(asset.metadata.fps) &&
+            asset.metadata.fps > 0
+          ? asset.metadata.fps
+          : 0;
+
+    if (request.mode === 'frame' && fps <= 0) {
+      fps = await estimateBrowserVideoFps(video);
+    }
+    if (fps <= 0) fps = 30;
+
+    const targetTime =
+      request.mode === 'time'
+        ? request.time
+        : (Math.max(1, Math.round(request.frame)) - 1) / fps;
+
+    if (targetTime < 0 || targetTime >= duration) {
+      throw new Error(
+        request.mode === 'frame'
+          ? 'Requested frame ' + request.frame + ' is outside this video.'
+          : 'Requested time ' + request.time + 's is outside this video.',
+      );
+    }
+
+    video.pause();
+    const safeTime = Math.min(targetTime, Math.max(0, duration - 0.001));
+    const seekPromise = waitForMediaEvent(video, 'seeked', 9000);
+    video.currentTime = safeTime;
+    await seekPromise;
+
+    const width = video.videoWidth || asset.metadata?.width || 0;
+    const height = video.videoHeight || asset.metadata?.height || 0;
+    if (width < 1 || height < 1) {
+      throw new Error('The browser decoded the video but did not expose frame dimensions.');
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(width);
+    canvas.height = Math.round(height);
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Canvas 2D is unavailable for local frame extraction.');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const blob = await browserCanvasBlob(canvas, request.format, request.quality);
+    const base64 = bytesAsBase64(new Uint8Array(await blob.arrayBuffer()));
+    return {
+      base64,
+      mime: request.format === 'png' ? 'image/png' : 'image/jpeg',
+      width: canvas.width,
+      height: canvas.height,
+      duration,
+      fps,
+      time: safeTime,
+    };
+  } finally {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+  }
+}
+
 export default function VisualStudioPre4({
   active,
   mode,
@@ -576,6 +797,8 @@ export default function VisualStudioPre4({
   const [artboardPreviewBounds, setArtboardPreviewBounds] = useState<WebStudioPreviewBounds | null>(null);
   const [artboardPreviewBusy, setArtboardPreviewBusy] = useState(false);
   const [canvasFrameExtracting, setCanvasFrameExtracting] = useState(false);
+  const [visualNotice, setVisualNotice] = useState<VisualNotice>(null);
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [phase7Results, setPhase7Results] = useState<Record<string, unknown>>({});
   const [phase7Action, setPhase7Action] = useState<
     'freehand' | 'pixel-probe' | 'pixel-data' | 'pixel-set' | 'path-detect' | 'region-detect' | 'region-distance' | 'any-region' | null
@@ -617,10 +840,26 @@ export default function VisualStudioPre4({
   const codeHydratedRef = useRef(false);
   const fileNameTouchedRef = useRef(false);
   const artboardPreviewTimerRef = useRef<number>(0);
+  const visualNoticeTimerRef = useRef<number>(0);
+  const browserVideoFpsCacheRef = useRef(new Map<string, number>());
   const phase10RenderTailRef = useRef<Promise<void>>(Promise.resolve());
   const freehandDraftRef = useRef<Point[]>([]);
 
   if (!cleanSignature.current) cleanSignature.current = semanticSignature(project);
+
+  const flashVisualNotice = (
+    kind: VisualNoticeKind,
+    title: string,
+    text?: string,
+    timeoutMs = kind === 'error' ? 6500 : 3600,
+  ) => {
+    window.clearTimeout(visualNoticeTimerRef.current);
+    setVisualNotice({ id: Date.now(), kind, title, text });
+    visualNoticeTimerRef.current = window.setTimeout(
+      () => setVisualNotice(null),
+      timeoutMs,
+    );
+  };
 
   const projectSemanticSignature = useMemo(() => semanticSignature(project), [project]);
   const selected = project.editor?.selectedNodeIds ?? [];
@@ -1238,6 +1477,8 @@ export default function VisualStudioPre4({
       artboardRuntimeRef.current?.dispose();
       artboardRuntimeRef.current = null;
       window.clearTimeout(artboardPreviewTimerRef.current);
+      window.clearTimeout(visualNoticeTimerRef.current);
+      browserVideoFpsCacheRef.current.clear();
     };
   }, []);
 
@@ -1332,6 +1573,88 @@ export default function VisualStudioPre4({
     );
     if (videoBgSourceError) {
       return { ok: false as const, error: videoBgSourceError };
+    }
+
+    const activeVideoBg = activeCanvasConfig.videoBg;
+    const activeVideoAssetId = activeVideoBg
+      ? studioAssetIdFromReference(activeVideoBg.source)
+      : null;
+    const activeVideoAsset = activeVideoAssetId
+      ? assets.find((asset) => asset.id === activeVideoAssetId)
+      : undefined;
+    const canRenderLocalVideoBg =
+      codeSyncState === 'synced' &&
+      Boolean(activeVideoBg && activeVideoAsset?.mime.startsWith('video/')) &&
+      !phase10Active &&
+      !phase11Active &&
+      !phase12Active &&
+      !phase13Active &&
+      !phase14Active;
+
+    if (canRenderLocalVideoBg && activeVideoBg && activeVideoAsset) {
+      const frameRequest: CanvasVideoFrameExtractionRequest = {
+        source: activeVideoBg.source,
+        mode:
+          activeVideoBg.time !== undefined && activeVideoBg.frame === undefined
+            ? 'time'
+            : 'frame',
+        frame: Math.max(1, Math.round(activeVideoBg.frame ?? 1)),
+        time: Math.max(0, activeVideoBg.time ?? 0),
+        format: activeVideoBg.format ?? 'jpg',
+        quality: Math.max(1, Math.min(31, Math.round(activeVideoBg.quality ?? 2))),
+      };
+      const localFrame = await extractStudioVideoFrameInBrowser(
+        activeVideoAsset,
+        frameRequest,
+        browserVideoFpsCacheRef.current.get(activeVideoAsset.id),
+      );
+      browserVideoFpsCacheRef.current.set(activeVideoAsset.id, localFrame.fps);
+
+      const previewAsset: StudioVirtualAsset = {
+        id: '__visual-video-preview-' + activeVideoAsset.id,
+        name: 'video-background-preview.' + frameRequest.format,
+        mime: localFrame.mime,
+        size: Math.max(0, Math.floor((localFrame.base64.length * 3) / 4)),
+        base64: localFrame.base64,
+        metadata: {
+          width: localFrame.width,
+          height: localFrame.height,
+        },
+      };
+      const previewProject = structuredClone(projectRef.current);
+      const previewCanvas = { ...(previewProject.document.canvas ?? {}) };
+      delete previewCanvas.videoBg;
+      previewCanvas.customBg = {
+        source: studioAssetReference(previewAsset),
+        fit: 'fill',
+        align: 'center',
+        opacity: activeVideoBg.opacity ?? 1,
+      };
+      previewProject.document.canvas = previewCanvas;
+      const previewSource =
+        generateVisualProjectDisplayPreviewCode(previewProject).source;
+      const previewAssets = [...assets, previewAsset];
+      const runtime =
+        webRuntimeRef.current ?? (webRuntimeRef.current = createApexifyWebRuntime());
+      await runtime.registerFonts(previewAssets);
+      const localResult = await runtime.renderStudioSource(
+        previewSource,
+        previewAssets,
+      );
+      if (!localResult.ok) {
+        return { ok: false as const, error: localResult.error };
+      }
+      return {
+        ok: true as const,
+        dataUrl: localResult.dataUrl,
+        downloadDataUrl: localResult.dataUrl,
+        mime: localResult.mime,
+        fileName: 'video-background-preview.' + frameRequest.format,
+        warnings: localResult.warnings,
+        results:
+          ((localResult as typeof localResult & { results?: Record<string, unknown> }).results ?? {}),
+        renderBounds: localResult.renderBounds,
+      };
     }
 
     const canvasNeedsNodeRuntime =
@@ -1537,8 +1860,15 @@ export default function VisualStudioPre4({
             setArtboardPreviewUrl(result.dataUrl);
             setArtboardPreviewBounds(result.renderBounds);
             setPhase7Results(result.results);
+          } else {
+            setMessage(result.error);
+            flashVisualNotice('error', 'Preview could not render', result.error);
           }
-        } catch {
+        } catch (error) {
+          const text =
+            error instanceof Error ? error.message : 'The canvas preview failed.';
+          setMessage(text);
+          flashVisualNotice('error', 'Preview could not render', text);
           // Keep the last valid frame while the user is between valid edits.
         } finally {
           if (!cancelled) setArtboardPreviewBusy(false);
@@ -1612,108 +1942,150 @@ export default function VisualStudioPre4({
     if (canvasFrameExtracting) return;
 
     const source = request.source.trim();
+    const warn = (title: string, text: string) => {
+      setMessage(text);
+      flashVisualNotice('warning', title, text);
+    };
+
     if (!source) {
-      setMessage('Choose a video source before extracting a frame');
+      warn('Video source required', 'Choose a video source before extracting a frame.');
       return;
     }
     if (request.mode === 'frame' && (!Number.isInteger(request.frame) || request.frame < 1)) {
-      setMessage('Frame number must be an integer starting at 1');
+      warn('Invalid frame', 'Frame number must be an integer starting at 1.');
       return;
     }
     if (request.mode === 'time' && (!Number.isFinite(request.time) || request.time < 0)) {
-      setMessage('Time must be a non-negative number');
+      warn('Invalid time', 'Time must be a non-negative number.');
       return;
     }
     if (!Number.isInteger(request.quality) || request.quality < 1 || request.quality > 31) {
-      setMessage('Frame quality must be an integer from 1 to 31');
+      warn('Invalid quality', 'Frame quality must be an integer from 1 to 31.');
+      return;
+    }
+
+    const sourceAssetId = studioAssetIdFromReference(source);
+    const sourceAsset = sourceAssetId
+      ? assets.find((asset) => asset.id === sourceAssetId)
+      : undefined;
+    if (sourceAsset && !sourceAsset.mime.startsWith('video/')) {
+      warn('Wrong asset type', sourceAsset.name + ' is not a video asset.');
       return;
     }
 
     setCanvasFrameExtracting(true);
-    setMessage('Extracting video frame…');
+    setMessage(
+      sourceAsset
+        ? 'Extracting selected frame locally…'
+        : 'Extracting selected frame with the full runtime…',
+    );
 
     try {
-      const method =
-        request.mode === 'frame'
-          ? 'extractFrameByNumber'
-          : 'extractFrameAtTime';
-      const position =
-        request.mode === 'frame' ? request.frame : request.time;
-      const extractionSource = [
-        "import { ApexPainter } from 'apexify.js';",
-        '',
-        'const painter = new ApexPainter();',
-        '',
-        'async function main() {',
-        '  const info = await painter.createVideo({ source: ' +
-          JSON.stringify(source) +
-          ', getInfo: true });',
-        '  const duration = Number(info?.duration);',
-        '  const fps = Number(info?.fps);',
-        "  if (!Number.isFinite(duration) || duration <= 0) throw new Error('Could not determine video duration before extraction.');",
-        request.mode === 'time'
-          ? '  if (' +
-            JSON.stringify(position) +
-            " >= duration) throw new Error('Requested time ' + " +
-            JSON.stringify(position) +
-            " + 's is outside this video (duration: ' + duration.toFixed(3) + 's).');"
-          : '  const maxFrame = Number.isFinite(fps) && fps > 0 ? Math.max(1, Math.ceil(duration * fps)) : null;',
-        request.mode === 'frame'
-          ? '  if (maxFrame !== null && ' +
-            JSON.stringify(position) +
-            " > maxFrame) throw new Error('Requested frame ' + " +
-            JSON.stringify(position) +
-            " + ' is outside this video (approximately ' + maxFrame + ' frames at ' + fps.toFixed(3) + ' fps).');"
-          : '',
-        '  return painter.' +
-          method +
-          '(' +
-          JSON.stringify(source) +
-          ', ' +
-          JSON.stringify(position) +
-          ', ' +
-          JSON.stringify(request.format) +
-          ', ' +
-          JSON.stringify(request.quality) +
-          ');',
-        '}',
-      ].filter(Boolean).join('\n');
+      let artifact: {
+        base64: string;
+        mime: string;
+        metadata?: Record<string, unknown>;
+      };
 
-      const result = await currentNodeServerExecutionAdapter.run({
-        session: createInteractiveSession({
-          source: extractionSource,
-          language: 'ts',
-          runtime: 'node',
-          options: { studioAssets: assets },
-          layout: { activePanel: 'editor' },
-        }),
-      });
-
-      if (result.status !== 'ready' || !result.output) {
-        throw new Error(
-          result.diagnostics[0]?.message ??
-            'Apexify/FFmpeg frame extraction is unavailable.',
+      if (sourceAsset) {
+        const localFrame = await extractStudioVideoFrameInBrowser(
+          sourceAsset,
+          request,
+          browserVideoFpsCacheRef.current.get(sourceAsset.id),
         );
-      }
+        browserVideoFpsCacheRef.current.set(sourceAsset.id, localFrame.fps);
+        artifact = {
+          base64: localFrame.base64,
+          mime: localFrame.mime,
+          metadata: {
+            width: localFrame.width,
+            height: localFrame.height,
+            duration: localFrame.duration,
+            fps: localFrame.fps,
+            extractedTime: localFrame.time,
+          },
+        };
+      } else {
+        const method =
+          request.mode === 'frame'
+            ? 'extractFrameByNumber'
+            : 'extractFrameAtTime';
+        const position =
+          request.mode === 'frame' ? request.frame : request.time;
+        const extractionSource = [
+          "import { ApexPainter } from 'apexify.js';",
+          '',
+          'const painter = new ApexPainter();',
+          '',
+          'async function main() {',
+          '  const info = await painter.createVideo({ source: ' +
+            JSON.stringify(source) +
+            ', getInfo: true });',
+          '  const duration = Number(info?.duration);',
+          '  const fps = Number(info?.fps);',
+          "  if (!Number.isFinite(duration) || duration <= 0) throw new Error('Could not determine video duration before extraction.');",
+          request.mode === 'time'
+            ? '  if (' +
+              JSON.stringify(position) +
+              " >= duration) throw new Error('Requested time ' + " +
+              JSON.stringify(position) +
+              " + 's is outside this video (duration: ' + duration.toFixed(3) + 's).');"
+            : '  const maxFrame = Number.isFinite(fps) && fps > 0 ? Math.max(1, Math.ceil(duration * fps)) : null;',
+          request.mode === 'frame'
+            ? '  if (maxFrame !== null && ' +
+              JSON.stringify(position) +
+              " > maxFrame) throw new Error('Requested frame ' + " +
+              JSON.stringify(position) +
+              " + ' is outside this video (approximately ' + maxFrame + ' frames at ' + fps.toFixed(3) + ' fps).');"
+            : '',
+          '  return painter.' +
+            method +
+            '(' +
+            JSON.stringify(source) +
+            ', ' +
+            JSON.stringify(position) +
+            ', ' +
+            JSON.stringify(request.format) +
+            ', ' +
+            JSON.stringify(request.quality) +
+            ');',
+          '}',
+        ].filter(Boolean).join('\n');
 
-      const artifact =
-        result.output.artifacts?.find(
-          (item) => item.base64 && item.mime.startsWith('image/'),
-        ) ??
-        (result.output.base64
-          ? {
-              id: 'extracted-frame',
-              name: 'extracted-frame.' + request.format,
-              kind: 'image' as const,
-              mime:
-                request.format === 'png' ? 'image/png' : 'image/jpeg',
-              base64: result.output.base64,
-              metadata: undefined,
-            }
-          : null);
+        const result = await currentNodeServerExecutionAdapter.run({
+          session: createInteractiveSession({
+            source: extractionSource,
+            language: 'ts',
+            runtime: 'node',
+            options: { studioAssets: assets },
+            layout: { activePanel: 'editor' },
+          }),
+        });
 
-      if (!artifact?.base64 || !artifact.mime.startsWith('image/')) {
-        throw new Error('Frame extraction completed without an image artifact.');
+        if (result.status !== 'ready' || !result.output) {
+          throw new Error(
+            result.diagnostics[0]?.message ??
+              'Apexify/FFmpeg frame extraction is unavailable.',
+          );
+        }
+
+        const runtimeArtifact =
+          result.output.artifacts?.find(
+            (item) => item.base64 && item.mime.startsWith('image/'),
+          ) ??
+          (result.output.base64
+            ? {
+                base64: result.output.base64,
+                mime:
+                  result.output.mime ||
+                  (request.format === 'png' ? 'image/png' : 'image/jpeg'),
+                metadata: undefined,
+              }
+            : null);
+        if (!runtimeArtifact?.base64 || !runtimeArtifact.mime.startsWith('image/')) {
+          throw new Error('Frame extraction completed without an image artifact.');
+        }
+        artifact = runtimeArtifact;
       }
 
       const normalizedBase64 = artifact.base64.replace(/\s+/g, '');
@@ -1726,83 +2098,47 @@ export default function VisualStudioPre4({
         0,
         Math.floor((normalizedBase64.length * 3) / 4) - padding,
       );
-      if (!size) throw new Error('Extracted frame is empty.');
-      if (size > STUDIO_ASSET_LIMITS.maxBytesPerAsset) {
-        throw new Error('Extracted frame exceeds the 8 MiB Studio asset limit.');
-      }
-
-      const currentCanvas = projectRef.current.document.canvas ?? {};
-      const currentBackgroundId = currentCanvas.customBg?.source
-        ? studioAssetIdFromReference(currentCanvas.customBg.source)
-        : null;
-      const replaceableAsset = currentBackgroundId
-        ? assets.find(
-            (item) =>
-              item.id === currentBackgroundId &&
-              item.name.startsWith('Canvas frame · '),
-          )
-        : undefined;
-
-      if (!replaceableAsset && assets.length >= STUDIO_ASSET_LIMITS.maxCount) {
-        throw new Error(
-          'Studio asset limit reached. Remove an asset before extracting another frame.',
-        );
-      }
-
-      const nextTotalBytes =
-        totalStudioAssetBytes(assets) -
-        (replaceableAsset?.size ?? 0) +
-        size;
-      if (nextTotalBytes > STUDIO_ASSET_LIMITS.maxTotalBytes) {
-        throw new Error(
-          'Extracted frame would exceed the 24 MiB Studio session asset limit.',
-        );
-      }
-
-      const sourceAssetId = studioAssetIdFromReference(source);
-      const sourceAsset = sourceAssetId
-        ? assets.find((item) => item.id === sourceAssetId)
-        : undefined;
-      const sourceName =
-        sourceAsset?.name.replace(/\.[^.]+$/, '') || 'video';
-      const positionLabel =
-        request.mode === 'frame'
-          ? 'frame-' + request.frame
-          : 'time-' + String(request.time).replace(/\./g, '_') + 's';
+      const width =
+        typeof artifact.metadata?.width === 'number'
+          ? artifact.metadata.width
+          : sourceAsset?.metadata?.width;
+      const height =
+        typeof artifact.metadata?.height === 'number'
+          ? artifact.metadata.height
+          : sourceAsset?.metadata?.height;
       const extractedAsset: StudioVirtualAsset = {
-        id: replaceableAsset?.id ?? createVisualId('canvas-frame'),
+        id: createVisualId('asset'),
         name:
-          'Canvas frame · ' +
-          sourceName +
-          ' · ' +
-          positionLabel +
+          (sourceAsset?.name.replace(/\.[^.]+$/, '') || 'video') +
+          '-' +
+          (request.mode === 'frame'
+            ? 'frame-' + request.frame
+            : 'time-' + String(request.time).replace(/\./g, '_')) +
           '.' +
           request.format,
         mime: artifact.mime,
         size,
         base64: normalizedBase64,
         metadata: {
-          width:
-            typeof artifact.metadata?.width === 'number'
-              ? artifact.metadata.width
-              : sourceAsset?.metadata?.width,
-          height:
-            typeof artifact.metadata?.height === 'number'
-              ? artifact.metadata.height
-              : sourceAsset?.metadata?.height,
+          width,
+          height,
         },
       };
 
-      const nextAssets = replaceableAsset
-        ? assets.map((item) =>
-            item.id === replaceableAsset.id ? extractedAsset : item,
-          )
-        : [...assets, extractedAsset];
-      setAssets(nextAssets);
+      const withoutExisting = assets.filter((asset) => asset.id !== extractedAsset.id);
+      const nextAssets = [...withoutExisting, extractedAsset];
+      if (nextAssets.length > STUDIO_ASSET_LIMITS.maxCount) {
+        throw new Error(
+          'The extracted frame would exceed the Studio asset count limit. Remove an unused asset first.',
+        );
+      }
+      if (totalStudioAssetBytes(nextAssets) > STUDIO_ASSET_LIMITS.maxTotalBytes) {
+        throw new Error(
+          'The extracted frame would exceed the Studio asset storage limit. Remove an unused asset first.',
+        );
+      }
 
-      // Show the extracted frame immediately. The canonical project mutation
-      // below then regenerates createCanvas({ customBg }) and the normal
-      // authoritative renderer takes over on the next render cycle.
+      setAssets(nextAssets);
       setArtboardPreviewUrl(studioAssetDataUrl(extractedAsset));
       setArtboardPreviewBounds(null);
 
@@ -1815,7 +2151,6 @@ export default function VisualStudioPre4({
         delete next.transparentBase;
         next.customBg = {
           source: studioAssetReference(extractedAsset),
-          inherit: previousCustomBg?.inherit ?? false,
           fit: previousCustomBg?.fit ?? 'fill',
           align: previousCustomBg?.align ?? 'center',
           opacity: previousCustomBg?.opacity ?? 1,
@@ -1827,13 +2162,27 @@ export default function VisualStudioPre4({
       setAssetFilter('image');
       setActiveTool('canvas');
       setInspectorTab('effects');
-      setMessage(
-        'Frame extracted · image background ready · filters enabled',
+      const successText =
+        'Frame extracted locally · saved as ' +
+        extractedAsset.name +
+        ' · customBg ready';
+      setMessage(successText);
+      flashVisualNotice(
+        'success',
+        'Video frame extracted',
+        'The selected frame is now the canvas custom background.',
       );
     } catch (error) {
-      setMessage(
-        error instanceof Error ? error.message : 'Video frame extraction failed',
-      );
+      const raw =
+        error instanceof Error ? error.message : 'Video frame extraction failed.';
+      const text =
+        /413|too large|request.*large/i.test(raw)
+          ? 'This media is too large for the hosted runtime request. Uploaded Studio videos now extract locally in your browser; reselect the uploaded video asset instead of an external server-only source.'
+          : /429|runtime is busy|full runtime is busy/i.test(raw)
+            ? 'The full runtime stayed busy after automatic retries. Wait for the active render to finish and retry.'
+            : raw;
+      setMessage(text);
+      flashVisualNotice('error', 'Frame extraction failed', text);
     } finally {
       setCanvasFrameExtracting(false);
     }
@@ -2666,15 +3015,7 @@ export default function VisualStudioPre4({
   };
 
   const resetCanvas = () => {
-    if (
-      typeof window !== 'undefined' &&
-      !window.confirm(
-        'Reset the entire canvas? This clears layers, canvas styling, timelines, operations and generated state. You can Undo immediately afterward.',
-      )
-    ) {
-      return;
-    }
-
+    setResetConfirmOpen(false);
     mutate('Reset canvas', (current) => {
       const next = createVisualProject({
         id: current.id,
@@ -2704,7 +3045,27 @@ export default function VisualStudioPre4({
     setCodeSyncError(null);
     setPhase7Results({});
     setMessage('Canvas reset · Undo restores the previous canvas');
+    flashVisualNotice(
+      'success',
+      'Canvas reset',
+      'The previous canvas is still available through Undo.',
+    );
   };
+
+  const requestCanvasReset = () => {
+    setResetConfirmOpen(true);
+  };
+
+  useEffect(() => {
+    if (!resetConfirmOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setResetConfirmOpen(false);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [resetConfirmOpen]);
 
   useEffect(() => {
     if (!active || didInitialFit.current) return;
@@ -6616,7 +6977,7 @@ export default function VisualStudioPre4({
                   type="button"
                   className="apx-pre4-reset-canvas"
                   data-visual-reset-canvas
-                  onClick={resetCanvas}
+                  onClick={requestCanvasReset}
                   title="Reset entire canvas"
                   aria-label="Reset entire canvas"
                 >
@@ -6719,6 +7080,32 @@ export default function VisualStudioPre4({
                 />
               ) : null}
               <div className="apx-pre4-artboard-grid" />
+
+              {artboardPreviewBusy || canvasFrameExtracting ? (
+                <div
+                  className="apx-pre4-render-progress"
+                  data-render-progress
+                  role="status"
+                  aria-live="polite"
+                >
+                  <ArrowPathIcon aria-hidden />
+                  <span>
+                    <strong>
+                      {canvasFrameExtracting
+                        ? 'Extracting selected frame'
+                        : project.document.canvas?.videoBg
+                          ? 'Decoding video frame'
+                          : 'Rendering preview'}
+                    </strong>
+                    <small>
+                      {project.document.canvas?.videoBg
+                        ? 'Local Studio video stays in your browser; no large runtime upload.'
+                        : 'Apexify is preparing the latest canvas.'}
+                    </small>
+                  </span>
+                  <i aria-hidden><b /></i>
+                </div>
+              ) : null}
 
               {freehandDraft.length > 1 ? (
                 <svg
@@ -7139,6 +7526,85 @@ export default function VisualStudioPre4({
           )}
         </section>
       </div>
+
+      {resetConfirmOpen ? (
+        <div
+          className="apx-pre4-confirm-backdrop"
+          role="presentation"
+          onMouseDown={() => setResetConfirmOpen(false)}
+        >
+          <section
+            className="apx-pre4-confirm-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="apx-reset-canvas-title"
+            aria-describedby="apx-reset-canvas-description"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="apx-pre4-confirm-icon" aria-hidden>
+              <TrashIcon />
+            </div>
+            <div className="apx-pre4-confirm-copy">
+              <span className="apx-pre4-confirm-eyebrow">Destructive action</span>
+              <h2 id="apx-reset-canvas-title">Reset this canvas?</h2>
+              <p id="apx-reset-canvas-description">
+                Layers, backgrounds, timelines, operations and generated visual state
+                will be cleared. You can restore the previous canvas with Undo.
+              </p>
+            </div>
+            <div className="apx-pre4-confirm-actions">
+              <button
+                type="button"
+                className="apx-pre4-confirm-cancel"
+                onClick={() => setResetConfirmOpen(false)}
+              >
+                Keep canvas
+              </button>
+              <button
+                type="button"
+                className="apx-pre4-confirm-danger"
+                onClick={resetCanvas}
+                autoFocus
+              >
+                <TrashIcon aria-hidden />
+                Reset canvas
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {visualNotice ? (
+        <aside
+          key={visualNotice.id}
+          className="apx-pre4-toast"
+          data-kind={visualNotice.kind}
+          role={visualNotice.kind === 'error' ? 'alert' : 'status'}
+          aria-live={visualNotice.kind === 'error' ? 'assertive' : 'polite'}
+        >
+          <span className="apx-pre4-toast-icon" aria-hidden>
+            {visualNotice.kind === 'success' ? (
+              <CheckCircleIcon />
+            ) : visualNotice.kind === 'error' || visualNotice.kind === 'warning' ? (
+              <ExclamationTriangleIcon />
+            ) : (
+              <InformationCircleIcon />
+            )}
+          </span>
+          <span className="apx-pre4-toast-copy">
+            <strong>{visualNotice.title}</strong>
+            {visualNotice.text ? <small>{visualNotice.text}</small> : null}
+          </span>
+          <button
+            type="button"
+            className="apx-pre4-toast-close"
+            onClick={() => setVisualNotice(null)}
+            aria-label="Dismiss notification"
+          >
+            <XMarkIcon aria-hidden />
+          </button>
+        </aside>
+      ) : null}
 
       <VisualPreviewModal
         open={previewModalOpen}

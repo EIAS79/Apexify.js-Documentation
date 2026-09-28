@@ -306,6 +306,31 @@ test('Phase 4 generated code replaces the primary background instead of accumula
   );
 });
 
+test('Phase 4 keeps uploaded video background preview/extraction in the browser', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const assets = read('lib/studio/runtime/assets.ts');
+
+  assert.match(shell, /extractStudioVideoFrameInBrowser/);
+  assert.match(shell, /canRenderLocalVideoBg/);
+  assert.match(shell, /Local Studio video stays in your browser/);
+  assert.match(shell, /browserVideoFpsCacheRef/);
+  assert.match(shell, /setArtboardPreviewUrl\(studioAssetDataUrl\(extractedAsset\)\)/);
+  assert.match(assets, /fps\?: number/);
+});
+
+test('Phase 4 uses modern async feedback and reset confirmation UI', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+  const css = read('styles/studio-calm.css');
+
+  assert.doesNotMatch(shell, /window\.confirm\(/);
+  assert.match(shell, /role="alertdialog"/);
+  assert.match(shell, /apx-pre4-toast/);
+  assert.match(shell, /data-render-progress/);
+  assert.match(css, /\.apx-pre4-confirm-dialog/);
+  assert.match(css, /\.apx-pre4-render-progress/);
+  assert.match(css, /\.apx-pre4-toast/);
+});
+
 test('Phase 4 shell exposes the complete createCanvas inspector contract', () => {
   const shell = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
   const inspector = fs.readFileSync('components/studio/visual/VisualCanvasInspector.tsx', 'utf8');

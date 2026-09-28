@@ -2,6 +2,7 @@ export type StudioAssetMetadata = {
   width?: number;
   height?: number;
   duration?: number;
+  fps?: number;
 };
 
 export type StudioVirtualAsset = {
@@ -256,6 +257,7 @@ function validPersistedAssets(value: unknown): StudioVirtualAsset[] {
               width: typeof item.metadata.width === 'number' ? item.metadata.width : undefined,
               height: typeof item.metadata.height === 'number' ? item.metadata.height : undefined,
               duration: typeof item.metadata.duration === 'number' ? item.metadata.duration : undefined,
+              fps: typeof item.metadata.fps === 'number' ? item.metadata.fps : undefined,
             }
           : undefined,
     });

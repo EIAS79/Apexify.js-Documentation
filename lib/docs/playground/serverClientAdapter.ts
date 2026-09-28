@@ -34,6 +34,43 @@ export async function getServerExecutionAvailability(signal?: AbortSignal): Prom
   };
 }
 
+const STUDIO_BUSY_RETRY_DELAYS_MS = [450, 900, 1500] as const;
+
+function waitForRetry(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(signal.reason ?? new DOMException('Aborted', 'AbortError'));
+      return;
+    }
+    const timer = window.setTimeout(resolve, ms);
+    const onAbort = () => {
+      window.clearTimeout(timer);
+      reject(signal?.reason ?? new DOMException('Aborted', 'AbortError'));
+    };
+    signal?.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+async function fetchStudioRunner(
+  body: string,
+  signal?: AbortSignal,
+): Promise<Response> {
+  let response: Response | null = null;
+  for (let attempt = 0; attempt <= STUDIO_BUSY_RETRY_DELAYS_MS.length; attempt += 1) {
+    response = await fetch(ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body,
+      signal,
+    });
+    if (response.status !== 429 || attempt === STUDIO_BUSY_RETRY_DELAYS_MS.length) {
+      return response;
+    }
+    await waitForRetry(STUDIO_BUSY_RETRY_DELAYS_MS[attempt]!, signal);
+  }
+  return response!;
+}
+
 function diagnosticFromFailure(data: {
   error?: string;
   stderr?: string;
@@ -67,7 +104,11 @@ function diagnosticFromFailure(data: {
     code: typeof data.exitCode === 'number' ? `EXIT_${data.exitCode}` : `HTTP_${status}`,
     help: status === 503
       ? 'This source requires the built-in full Apexify runtime, but the same-origin isolation runtime is unavailable on this deployment.'
-      : 'Fix the source or return a previewable Apexify artifact from main() before retrying.',
+      : status === 429
+        ? 'Studio automatically retried the busy runtime. Wait for the active render to finish, then retry if this message remains.'
+        : status === 408
+          ? 'The full runtime reached its execution ceiling. Prefer Studio-local frame extraction for uploaded video backgrounds.'
+          : 'Fix the source or return a previewable Apexify artifact from main() before retrying.',
   };
 }
 
@@ -99,18 +140,14 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
       [session.source, ...studioFiles.map((file) => file.source)],
     );
 
-    const response = await fetch(ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        code: session.source,
-        lang: session.language,
-        context: 'studio',
-        assets: referencedStudioAssets,
-        files: studioFiles,
-      }),
-      signal,
+    const requestBody = JSON.stringify({
+      code: session.source,
+      lang: session.language,
+      context: 'studio',
+      assets: referencedStudioAssets,
+      files: studioFiles,
     });
+    const response = await fetchStudioRunner(requestBody, signal);
 
     let data: {
       ok?: boolean;

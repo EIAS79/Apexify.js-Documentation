@@ -180,6 +180,14 @@ test('PRE-4 renders the edited lower code source directly for live artboard feed
   assert.match(shell, /\}, 100\);/);
 });
 
+test('PRE-4 retries transient full-runtime busy responses', () => {
+  const adapter = read('lib/docs/playground/serverClientAdapter.ts');
+
+  assert.match(adapter, /STUDIO_BUSY_RETRY_DELAYS_MS/);
+  assert.match(adapter, /response\.status !== 429/);
+  assert.match(adapter, /fetchStudioRunner\(requestBody, signal\)/);
+});
+
 test('PRE-4 preserves Studio virtual asset refs while allowing direct extracted-frame display', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
 
