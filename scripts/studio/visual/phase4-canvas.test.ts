@@ -306,6 +306,16 @@ test('Phase 4 generated code replaces the primary background instead of accumula
   );
 });
 
+test('Phase 4 resets circular clipping when inherited media becomes non-square', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+
+  assert.match(shell, /resetsCircularClip/);
+  assert.match(shell, /borderRadius === 'circular'/);
+  assert.match(shell, /dimensions\.width !== dimensions\.height/);
+  assert.match(shell, /next\.document\.canvas\.borderRadius = 0/);
+  assert.match(shell, /Circular clipping reset/);
+});
+
 test('Phase 4 keeps uploaded video background preview/extraction in the browser', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
   const assets = read('lib/studio/runtime/assets.ts');

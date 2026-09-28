@@ -1416,6 +1416,9 @@ export default function VisualStudioPre4({
     }
 
     didInitialFit.current = false;
+    const resetsCircularClip =
+      current.document.canvas?.borderRadius === 'circular' &&
+      dimensions.width !== dimensions.height;
     setProject((projectState) => {
       const activeCanvas = projectState.document.canvas;
       const activeBg =
@@ -1430,16 +1433,33 @@ export default function VisualStudioPre4({
       const next = structuredClone(projectState);
       next.document.width = dimensions.width;
       next.document.height = dimensions.height;
+      if (
+        resetsCircularClip &&
+        next.document.canvas?.borderRadius === 'circular'
+      ) {
+        next.document.canvas.borderRadius = 0;
+      }
       next.updatedAt = new Date().toISOString();
       projectRef.current = next;
       return next;
     });
-    setMessage(
+    const inheritedMessage =
       'Canvas inherited source resolution · ' +
-        dimensions.width +
-        ' × ' +
-        dimensions.height,
+      dimensions.width +
+      ' × ' +
+      dimensions.height;
+    setMessage(
+      resetsCircularClip
+        ? inheritedMessage + ' · circular clipping reset for non-square media'
+        : inheritedMessage,
     );
+    if (resetsCircularClip) {
+      flashVisualNotice(
+        'info',
+        'Circular clipping reset',
+        'The inherited media is not square, so Studio removed the circular canvas clip to keep the full frame visible.',
+      );
+    }
   }, [
     assetStorageReady,
     assets,
