@@ -5,7 +5,12 @@ import type {
   VisualPatternGradient,
   VisualPatternOptions,
   VisualProjectIssue,
+  VisualImageFilter,
 } from './model';
+import {
+  IMAGE_FILTER_TYPES,
+  imageFilterFieldSpecs,
+} from './image-contract';
 
 export const CANVAS_BLEND_MODES = [
   'source-over','source-in','source-out','source-atop',
@@ -96,6 +101,8 @@ function validateImageBackgroundOptions(
     opacity?: unknown;
   },
   path: string,
+  width: number,
+  height: number,
 ) {
   validateOpacity(issues, background.opacity, path + '.opacity');
   if (background.inherit !== undefined && typeof background.inherit !== 'boolean') {
@@ -115,7 +122,52 @@ function validateImageBackgroundOptions(
   }
   if (background.filters !== undefined && !Array.isArray(background.filters)) {
     issue(issues, 'canvas-background-filters', path + '.filters', 'Background filters must be an array.');
+    return;
   }
+  if (!Array.isArray(background.filters)) return;
+
+  background.filters.forEach((rawFilter, index) => {
+    const filterPath = path + '.filters[' + index + ']';
+    if (!rawFilter || typeof rawFilter !== 'object' || Array.isArray(rawFilter)) {
+      issue(issues, 'canvas-background-filter-object', filterPath, 'Background filter must be an object.');
+      return;
+    }
+    const filter = rawFilter as Record<string, unknown>;
+    const type = filter.type as VisualImageFilter['type'];
+    if (!IMAGE_FILTER_TYPES.includes(type)) {
+      issue(issues, 'canvas-background-filter-type', filterPath + '.type', 'Unsupported image filter type.');
+      return;
+    }
+    const specs = imageFilterFieldSpecs(type, width, height);
+    for (const field of specs) {
+      const current = filter[field.key];
+      if (current === undefined) continue;
+      if (
+        !finite(current) ||
+        current < field.min ||
+        current > field.max ||
+        (field.integer && !Number.isInteger(current))
+      ) {
+        issue(
+          issues,
+          'canvas-background-filter-range',
+          filterPath + '.' + field.key,
+          field.label + ' must be ' + field.help + '.',
+        );
+      }
+    }
+    const allowed = new Set<string>(['type', ...specs.map((field) => field.key)]);
+    for (const key of ['intensity','radius','angle','centerX','centerY','value','levels','size']) {
+      if (filter[key] !== undefined && !allowed.has(key)) {
+        issue(
+          issues,
+          'canvas-background-filter-parameter',
+          filterPath + '.' + key,
+          type + ' does not use the ' + key + ' parameter.',
+        );
+      }
+    }
+  });
 }
 
 function validateGradient(
@@ -217,6 +269,8 @@ function validatePattern(
 export function validateVisualCanvasConfig(
   canvas: VisualCanvasConfig | undefined,
   issues: VisualProjectIssue[],
+  width = 4096,
+  height = 4096,
 ) {
   if (!canvas) return;
   const p = 'document.canvas';
@@ -273,12 +327,12 @@ export function validateVisualCanvasConfig(
 
   if (canvas.customBg) {
     if (!canvas.customBg.source.trim()) issue(issues, 'canvas-custom-bg-source', p + '.customBg.source', 'Background image source is required.');
-    validateImageBackgroundOptions(issues, canvas.customBg, p + '.customBg');
+    validateImageBackgroundOptions(issues, canvas.customBg, p + '.customBg', width, height);
   }
 
   if (canvas.videoBg) {
     if (!canvas.videoBg.source.trim()) issue(issues, 'canvas-video-bg-source', p + '.videoBg.source', 'Video source is required.');
-    validateImageBackgroundOptions(issues, canvas.videoBg, p + '.videoBg');
+    validateImageBackgroundOptions(issues, canvas.videoBg, p + '.videoBg', width, height);
     if (canvas.videoBg.frame !== undefined && canvas.videoBg.time !== undefined) {
       issue(issues, 'canvas-video-selector', p + '.videoBg', 'Video background must specify frame or time, not both.');
     }

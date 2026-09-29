@@ -10,7 +10,7 @@ The **`filters`** field is a **stack** of **`ImageFilter`** objects. Filters are
 | Field | Type | Default | Role |
 |-------|------|---------|------|
 | **`filterOrder`** | **`'pre' \| 'post'`** | **`'post'`** | **Pre** draws the fitted image to a temp surface, filters it, then pastes it (skips mask, distortion, mesh warp, **post** filters, **effects**, and **stroke** — see [Paint order](/docs#09-create-image-paint-order)). **Post** filters the pixels already painted **inside the clip**. |
-| **`filterIntensity`** | **`number`** | **`1`** | Multiplier applied to each filter’s **`intensity`**, **`value`**, and **`radius`** when building the adjusted stack. |
+| **`filterIntensity`** | **`number >= 0`** | **`1`** | Multiplier applied to current typed **`intensity`** / **`value`** fields. Studio validates the resulting effective values against each filter’s runtime range. |
 
 ```typescript
 await painter.createImage(
@@ -22,8 +22,8 @@ await painter.createImage(
     height: 480,
     fit: 'cover',
     filters: [
-      { type: 'gaussianBlur', intensity: 0.15 },
-      { type: 'brightness', value: 0.08 },
+      { type: 'gaussianBlur', intensity: 4 },
+      { type: 'brightness', value: 12 },
     ],
     filterIntensity: 1.2,
     filterOrder: 'post',
@@ -36,46 +36,38 @@ await painter.createImage(
 
 ## Filter catalogue (`ImageFilter.type`)
 
-Unless noted, omit **`intensity`** / **`value`** or use **`0`** where the implementation skips work.
+The runtime validates these ranges before rendering. Visual Studio uses the same contract for input minimums, maximums, steps, defaults, and semantic validation.
 
-### Blur & sharpen
+| `type` | Runtime parameter(s) | Accepted range | Notes |
+|---|---|---|---|
+| **`gaussianBlur`** | **`intensity`** | **0–100** | Blur radius/strength in pixels. |
+| **`motionBlur`** | **`intensity`**, **`angle`** | **0–101**, **−3600°–3600°** | Directional blur. |
+| **`radialBlur`** | **`intensity`**, **`centerX`**, **`centerY`** | **0–50**, **0–width**, **0–height** | Centre coordinates are pixels. |
+| **`sharpen`** | **`intensity`** | **0–10** | Sharpening strength. |
+| **`noise`** | **`intensity`** | **0–1** | Deterministic noise. |
+| **`grain`** | **`intensity`** | **0–1** | Deterministic monochrome grain. |
+| **`edgeDetection`** | **`intensity`** | **0–10** | Edge-emphasis strength. |
+| **`emboss`** | **`intensity`** | **0–10** | Emboss strength. |
+| **`invert`** | none | **on/off** | Presence of `{ type: 'invert' }` means enabled. |
+| **`grayscale`** | none | **on/off** | Presence of `{ type: 'grayscale' }` means enabled. |
+| **`sepia`** | none | **on/off** | Presence of `{ type: 'sepia' }` means enabled. |
+| **`pixelate`** | **`size`** | integer **1–max(width,height)** | Pixel block size. |
+| **`brightness`** | **`value`** | **−100–100** | Percentage-style brightness adjustment. |
+| **`contrast`** | **`value`** | **−100–100** | Percentage-style contrast adjustment. |
+| **`saturation`** | **`value`** | **−100–100** | Percentage-style saturation adjustment. |
+| **`hueShift`** | **`value`** | **−3600°–3600°** | Hue rotation; rendering wraps the angle modulo 360°. |
+| **`posterize`** | **`levels`** | integer **2–256** | Number of color levels. |
 
-| `type` | Main fields | Behaviour |
-|--------|-------------|-----------|
-| **`gaussianBlur`** | **`intensity`** | Gaussian blur strength |
-| **`motionBlur`** | **`intensity`**, **`angle`** (deg, default **`0`**) | Directional blur |
-| **`radialBlur`** | **`intensity`**, **`centerX`**, **`centerY`** | Spin blur around centre (defaults to bitmap centre in pixel space) |
-| **`sharpen`** | **`intensity`** | Sharpening |
+> **Parameterless filters are boolean by presence.** `invert`, `grayscale`, and `sepia` do not accept an `intensity`, `value`, `radius`, or other numeric field. Visual Studio exposes them as **On/Off** controls.
 
-### Colour & tone
-
-| `type` | Main fields | Behaviour |
-|--------|-------------|-----------|
-| **`brightness`** | **`value`** | Positive / negative adjustment |
-| **`contrast`** | **`value`** | Contrast adjustment |
-| **`saturation`** | **`value`** | Saturation adjustment |
-| **`hueShift`** | **`value`** | Hue rotation |
-| **`grayscale`** | — | Forces a **pixel-based** filter path if mixed with others |
-| **`sepia`** | — | Sepia tone |
-| **`invert`** | — | Colour inversion |
-| **`posterize`** | **`levels`** (default **`4`**) | Posterisation |
-
-### Stylisation
-
-| `type` | Main fields | Behaviour |
-|--------|-------------|-----------|
-| **`pixelate`** | **`size`** (default **`10`**) | Mosaic blocks |
-| **`noise`** | **`intensity`** (**`0…1`** clamped) | Noise overlay |
-| **`grain`** | **`intensity`** (**`0…1`** clamped) | Film-like grain |
-| **`edgeDetection`** | **`intensity`** | Edge emphasising |
-| **`emboss`** | **`intensity`** | Emboss |
+The typed stack does **not** use `radius` for Gaussian/motion/radial blur, `size` for grain, or `angle` for emboss. Those stale/extra parameters are rejected by Studio semantic validation.
 
 ---
 
 ## Combining filters
 
 - Order matters: filters run **first → last** as listed.
-- **`grayscale`** triggers an alternate pixel pipeline for the whole stack (still synchronous from your **`await createImage`** perspective).
+- Filters run through the shared RGBA raster pipeline; channel-changing filters such as **`grayscale`** are normalized back to RGBA before compositing.
 - Prefer **`filterOrder: 'post'`** when you need **`stroke`**, **`effects`**, **`mask`**, or **`distortion`** in the same layer — **`pre`** exits before those stages.
 
 ---

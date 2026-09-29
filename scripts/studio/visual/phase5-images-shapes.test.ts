@@ -7,6 +7,9 @@ import {
 } from '../../../lib/studio/visual/project';
 import {
   defaultImageNodeProps,
+  defaultVisualImageFilter,
+  imageFilterFieldSpecs,
+  clampVisualImageFilterValue,
   CREATE_IMAGE_OPTIONS_CLASSIFICATION,
   GROUP_TRANSFORM_CLASSIFICATION,
   IMAGE_AUTHORING_CLASSIFICATION,
@@ -231,6 +234,76 @@ test('Phase 5 validation rejects invalid source and generated-buffer forward ref
   const missing = validateVisualProject(project);
   assert.equal(missing.ok, false);
   assert.ok(missing.issues.some((issue) => issue.code === 'image-generated-source'));
+});
+
+test('Phase 5 image filter helpers expose exact runtime contracts', () => {
+  assert.deepEqual(imageFilterFieldSpecs('invert', 640, 480), []);
+  assert.deepEqual(defaultVisualImageFilter('grayscale', 640, 480), {
+    type: 'grayscale',
+  });
+
+  const hue = imageFilterFieldSpecs('hueShift', 640, 480)[0]!;
+  assert.equal(hue.min, -3600);
+  assert.equal(hue.max, 3600);
+  assert.equal(clampVisualImageFilterValue('hueShift', 'value', 5000, 640, 480), 3600);
+
+  const posterize = imageFilterFieldSpecs('posterize', 640, 480)[0]!;
+  assert.equal(posterize.integer, true);
+  assert.equal(clampVisualImageFilterValue('posterize', 'levels', 2.6, 640, 480), 3);
+
+  const radial = imageFilterFieldSpecs('radialBlur', 640, 480);
+  assert.equal(radial.find((field) => field.key === 'centerX')?.max, 640);
+  assert.equal(radial.find((field) => field.key === 'centerY')?.max, 480);
+});
+
+test('Phase 5 rejects invalid filter ranges and stale parameters', () => {
+  const project = phase5Project();
+  const image = project.document.nodes.image_hero!;
+  const props = visualImageProps(image);
+
+  props.filters = [{ type: 'noise', intensity: 1.01 }];
+  let validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((issue) => issue.code === 'image-filter-range'));
+
+  props.filters = [{ type: 'posterize', levels: 3.5 }];
+  validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((issue) => issue.code === 'image-filter-range'));
+
+  props.filters = [{ type: 'sepia', value: 1 }];
+  validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((issue) => issue.code === 'image-filter-parameter'));
+
+  props.filters = [{ type: 'radialBlur', intensity: 8, centerX: 421, centerY: 130 }];
+  validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((issue) => issue.code === 'image-filter-range'));
+
+  props.filters = [{ type: 'brightness', value: 60 }];
+  props.filterIntensity = 2;
+  validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(
+    validation.issues.some(
+      (issue) => issue.code === 'image-filter-effective-range',
+    ),
+  );
+});
+
+test('Phase 5 permanent image inspector uses strict per-filter fields', () => {
+  const shell = fs.readFileSync(
+    'components/studio/visual/VisualStudioPre4.tsx',
+    'utf8',
+  );
+
+  assert.match(shell, /data-image-filter-contract="strict"/);
+  assert.match(shell, /IMAGE_FILTER_PARAMETERLESS_TYPES/);
+  assert.match(shell, /data-filter-boolean/);
+  assert.match(shell, /Allowed: \{field\.help\}/);
+  assert.match(shell, /clampVisualImageFilterValue/);
+  assert.match(shell, /Global multiplier/);
 });
 
 test('Phase 5 permanent shell exposes image shape asset workflows and authoritative artboard', () => {

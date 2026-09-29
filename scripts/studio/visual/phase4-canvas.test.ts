@@ -385,7 +385,7 @@ test('Phase 4 codegen retains the latest videoBg image-style options', () => {
       inherit: true,
       fit: 'contain',
       align: 'bottom-right',
-      filters: [{ type: 'grayscale', intensity: 1 }],
+      filters: [{ type: 'grayscale' }],
       opacity: 0.6,
       format: 'png',
       quality: 2,
@@ -403,6 +403,64 @@ test('Phase 4 codegen retains the latest videoBg image-style options', () => {
   assert.match(source, /opacity: 0\.6/);
   assert.match(source, /format: "png"/);
   assert.match(source, /quality: 2/);
+});
+
+test('Phase 4 validates exact canvas background ImageFilter contracts', () => {
+  const valid = createVisualProject({
+    width: 800,
+    height: 450,
+    now: '2026-09-29T00:00:00.000Z',
+  });
+  valid.document.canvas = {
+    customBg: {
+      source: 'studio://asset/image-filter-proof',
+      filters: [
+        { type: 'hueShift', value: 3600 },
+        { type: 'posterize', levels: 2 },
+        { type: 'invert' },
+        { type: 'radialBlur', intensity: 8, centerX: 800, centerY: 450 },
+      ],
+    },
+  };
+  assert.equal(validateVisualProject(valid).ok, true);
+
+  const outOfRange = structuredClone(valid);
+  outOfRange.document.canvas!.customBg!.filters = [
+    { type: 'hueShift', value: 3601 },
+    { type: 'posterize', levels: 2.5 },
+    { type: 'radialBlur', intensity: 8, centerX: 801, centerY: 225 },
+  ];
+  const invalidRanges = validateVisualProject(outOfRange);
+  assert.equal(invalidRanges.ok, false);
+  assert.ok(
+    invalidRanges.issues.some((issue) => issue.code === 'canvas-background-filter-range'),
+  );
+
+  const invalidParameter = structuredClone(valid);
+  invalidParameter.document.canvas!.customBg!.filters = [
+    { type: 'grayscale', intensity: 1 },
+  ];
+  const invalidFields = validateVisualProject(invalidParameter);
+  assert.equal(invalidFields.ok, false);
+  assert.ok(
+    invalidFields.issues.some(
+      (issue) => issue.code === 'canvas-background-filter-parameter',
+    ),
+  );
+});
+
+test('Phase 4 filter editor exposes runtime ranges and boolean filters', () => {
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualCanvasInspector.tsx',
+    'utf8',
+  );
+
+  assert.match(inspector, /data-image-filter-contract="strict"/);
+  assert.match(inspector, /IMAGE_FILTER_PARAMETERLESS_TYPES/);
+  assert.match(inspector, /data-filter-boolean/);
+  assert.match(inspector, /Allowed: \{field\.help\}/);
+  assert.match(inspector, /clampVisualImageFilterValue/);
+  assert.doesNotMatch(inspector, /FILTER_FIELDS/);
 });
 
 test('Phase 4 shell exposes the complete createCanvas inspector contract', () => {

@@ -225,7 +225,12 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
       error instanceof Error ? error.message : 'Phase 9 semantic resolution failed.',
     );
   }
-  validateVisualCanvasConfig(project.document.canvas, issues);
+  validateVisualCanvasConfig(
+    project.document.canvas,
+    issues,
+    project.document.width,
+    project.document.height,
+  );
 
   if (project.codegen.language !== 'typescript') push(issues, 'codegen-language', 'codegen.language', 'Only TypeScript code generation is supported in v1.');
   if (project.codegen.assetBasePath !== './assets/') push(issues, 'asset-base-path', 'codegen.assetBasePath', 'Visual Project v1 uses ./assets/.');

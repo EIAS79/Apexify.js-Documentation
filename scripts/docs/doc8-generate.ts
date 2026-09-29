@@ -18,7 +18,7 @@ const artifacts: Record<string, unknown> = {
     studioBrowserRuntime: {
       package: '@apexify/web',
       sourceRepository: 'EIAS79/Apexify.js',
-      sourceCommit: '2c2cca07e86af613da3a6eeb4a7420a540d7ce6c',
+      sourceCommit: 'fcfdfebad875c599f0ccbdb3f1ad675afe992476',
       integration: 'integrity-checked-build-snapshot',
     },
     representativeInteractiveSurface: {

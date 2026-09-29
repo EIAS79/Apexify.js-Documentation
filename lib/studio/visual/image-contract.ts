@@ -46,6 +46,184 @@ export const IMAGE_FILTER_TYPES: readonly VisualImageFilter['type'][] = [
   'posterize',
 ] as const;
 
+export type ImageFilterNumericKey =
+  | 'intensity'
+  | 'angle'
+  | 'centerX'
+  | 'centerY'
+  | 'value'
+  | 'levels'
+  | 'size';
+
+export type ImageFilterFieldSpec = {
+  key: ImageFilterNumericKey;
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  defaultValue: number;
+  suffix?: string;
+  integer?: boolean;
+  help: string;
+};
+
+type ImageFilterStaticFieldSpec = Omit<ImageFilterFieldSpec, 'max' | 'defaultValue'> & {
+  max: number | 'width' | 'height' | 'maxDimension';
+  defaultValue: number | 'halfWidth' | 'halfHeight';
+};
+
+export const IMAGE_FILTER_PARAMETERLESS_TYPES = [
+  'invert',
+  'grayscale',
+  'sepia',
+] as const satisfies readonly VisualImageFilter['type'][];
+
+const IMAGE_FILTER_FIELD_SPECS: Record<
+  VisualImageFilter['type'],
+  readonly ImageFilterStaticFieldSpec[]
+> = {
+  gaussianBlur: [
+    { key: 'intensity', label: 'Blur radius', min: 0, max: 100, step: 0.5, defaultValue: 4, suffix: 'px', help: '0–100 px' },
+  ],
+  motionBlur: [
+    { key: 'intensity', label: 'Strength', min: 0, max: 101, step: 1, defaultValue: 9, help: '0–101' },
+    { key: 'angle', label: 'Angle', min: -3600, max: 3600, step: 1, defaultValue: 0, suffix: '°', help: '−3600° to 3600°' },
+  ],
+  radialBlur: [
+    { key: 'intensity', label: 'Strength', min: 0, max: 50, step: 0.5, defaultValue: 8, help: '0–50' },
+    { key: 'centerX', label: 'Center X', min: 0, max: 'width', step: 1, defaultValue: 'halfWidth', suffix: 'px', help: '0 to canvas width' },
+    { key: 'centerY', label: 'Center Y', min: 0, max: 'height', step: 1, defaultValue: 'halfHeight', suffix: 'px', help: '0 to canvas height' },
+  ],
+  sharpen: [
+    { key: 'intensity', label: 'Strength', min: 0, max: 10, step: 0.1, defaultValue: 1, help: '0–10' },
+  ],
+  noise: [
+    { key: 'intensity', label: 'Intensity', min: 0, max: 1, step: 0.01, defaultValue: 0.1, help: '0–1' },
+  ],
+  grain: [
+    { key: 'intensity', label: 'Intensity', min: 0, max: 1, step: 0.01, defaultValue: 0.1, help: '0–1' },
+  ],
+  edgeDetection: [
+    { key: 'intensity', label: 'Strength', min: 0, max: 10, step: 0.1, defaultValue: 1, help: '0–10' },
+  ],
+  emboss: [
+    { key: 'intensity', label: 'Strength', min: 0, max: 10, step: 0.1, defaultValue: 1, help: '0–10' },
+  ],
+  invert: [],
+  grayscale: [],
+  sepia: [],
+  pixelate: [
+    { key: 'size', label: 'Block size', min: 1, max: 'maxDimension', step: 1, defaultValue: 8, suffix: 'px', integer: true, help: 'integer 1 to the larger canvas dimension' },
+  ],
+  brightness: [
+    { key: 'value', label: 'Brightness', min: -100, max: 100, step: 1, defaultValue: 10, suffix: '%', help: '−100% to 100%' },
+  ],
+  contrast: [
+    { key: 'value', label: 'Contrast', min: -100, max: 100, step: 1, defaultValue: 10, suffix: '%', help: '−100% to 100%' },
+  ],
+  saturation: [
+    { key: 'value', label: 'Saturation', min: -100, max: 100, step: 1, defaultValue: 10, suffix: '%', help: '−100% to 100%' },
+  ],
+  hueShift: [
+    { key: 'value', label: 'Hue shift', min: -3600, max: 3600, step: 1, defaultValue: 30, suffix: '°', help: '−3600° to 3600°' },
+  ],
+  posterize: [
+    { key: 'levels', label: 'Levels', min: 2, max: 256, step: 1, defaultValue: 6, integer: true, help: 'integer 2–256' },
+  ],
+};
+
+export function imageFilterFieldSpecs(
+  type: VisualImageFilter['type'],
+  width: number,
+  height: number,
+): readonly ImageFilterFieldSpec[] {
+  const safeWidth = Math.max(1, Number.isFinite(width) ? width : 1);
+  const safeHeight = Math.max(1, Number.isFinite(height) ? height : 1);
+  return IMAGE_FILTER_FIELD_SPECS[type].map((field) => ({
+    ...field,
+    max:
+      field.max === 'width'
+        ? safeWidth
+        : field.max === 'height'
+          ? safeHeight
+          : field.max === 'maxDimension'
+            ? Math.max(safeWidth, safeHeight)
+            : field.max,
+    defaultValue:
+      field.defaultValue === 'halfWidth'
+        ? safeWidth / 2
+        : field.defaultValue === 'halfHeight'
+          ? safeHeight / 2
+          : field.defaultValue,
+  }));
+}
+
+export function defaultVisualImageFilter(
+  type: VisualImageFilter['type'],
+  width = 100,
+  height = 100,
+): VisualImageFilter {
+  const filter: VisualImageFilter = { type };
+  for (const field of imageFilterFieldSpecs(type, width, height)) {
+    (filter as unknown as Record<string, number | string>)[field.key] = field.defaultValue;
+  }
+  return filter;
+}
+
+export function clampVisualImageFilterValue(
+  type: VisualImageFilter['type'],
+  key: ImageFilterNumericKey,
+  value: number,
+  width: number,
+  height: number,
+): number {
+  const field = imageFilterFieldSpecs(type, width, height).find((item) => item.key === key);
+  if (!field) return value;
+  const finiteValue = Number.isFinite(value) ? value : field.defaultValue;
+  const bounded = Math.max(field.min, Math.min(field.max, finiteValue));
+  return field.integer ? Math.round(bounded) : bounded;
+}
+
+function validateTypedFilterFields(
+  item: Record<string, unknown>,
+  type: VisualImageFilter['type'],
+  path: string,
+  issues: VisualProjectIssue[],
+  width: number,
+  height: number,
+) {
+  const specs = imageFilterFieldSpecs(type, width, height);
+  for (const field of specs) {
+    const current = item[field.key];
+    if (current === undefined) continue;
+    if (
+      !finite(current) ||
+      current < field.min ||
+      current > field.max ||
+      (field.integer && !Number.isInteger(current))
+    ) {
+      issue(
+        issues,
+        'image-filter-range',
+        path + '.' + field.key,
+        field.label + ' must be ' + field.help + '.',
+      );
+    }
+  }
+
+  const allowed = new Set<string>(['type', ...specs.map((field) => field.key)]);
+  for (const key of ['intensity','radius','angle','centerX','centerY','value','levels','size']) {
+    if (item[key] !== undefined && !allowed.has(key)) {
+      issue(
+        issues,
+        'image-filter-parameter',
+        path + '.' + key,
+        type + ' does not use the ' + key + ' parameter.',
+      );
+    }
+  }
+}
+
 export const IMAGE_BLEND_MODES: readonly VisualBlendMode[] = [
   'source-over','source-in','source-out','source-atop',
   'destination-over','destination-in','destination-out','destination-atop',
@@ -281,17 +459,22 @@ function validateFilter(
   value: unknown,
   path: string,
   issues: VisualProjectIssue[],
+  width = 4096,
+  height = 4096,
 ) {
   const item = record(value);
   if (!item || !IMAGE_FILTER_TYPES.includes(item.type as VisualImageFilter['type'])) {
     issue(issues, 'image-filter-type', path + '.type', 'Unsupported image filter type.');
     return;
   }
-  for (const key of ['intensity','radius','angle','centerX','centerY','value','levels','size']) {
-    if (item[key] !== undefined && !finite(item[key])) {
-      issue(issues, 'image-filter-number', path + '.' + key, 'Image filter values must be finite numbers.');
-    }
-  }
+  validateTypedFilterFields(
+    item,
+    item.type as VisualImageFilter['type'],
+    path,
+    issues,
+    width,
+    height,
+  );
 }
 
 function validateStrokeShadowLike(
@@ -351,14 +534,60 @@ export function validateVisualImageNode(
   ) {
     issue(issues, 'image-radius', path + '.props.borderRadius', 'Image radius must be non-negative or circular.');
   }
-  if (props.filterIntensity !== undefined && !finite(props.filterIntensity)) {
-    issue(issues, 'image-filter-intensity', path + '.props.filterIntensity', 'Filter intensity must be finite.');
+  if (
+    props.filterIntensity !== undefined &&
+    (!finite(props.filterIntensity) || props.filterIntensity < 0)
+  ) {
+    issue(
+      issues,
+      'image-filter-intensity',
+      path + '.props.filterIntensity',
+      'Filter intensity multiplier must be a non-negative finite number.',
+    );
   }
   if (props.filterOrder !== undefined && props.filterOrder !== 'pre' && props.filterOrder !== 'post') {
     issue(issues, 'image-filter-order', path + '.props.filterOrder', 'Filter order must be pre or post.');
   }
+
+  const filterMultiplier =
+    props.filterIntensity === undefined ? 1 : props.filterIntensity;
+  if (finite(filterMultiplier) && filterMultiplier >= 0) {
+    props.filters?.forEach((filter, index) => {
+      const specs = imageFilterFieldSpecs(
+        filter.type,
+        node.transform?.width ?? project.document.width,
+        node.transform?.height ?? project.document.height,
+      );
+      for (const field of specs) {
+        if (field.key !== 'intensity' && field.key !== 'value') continue;
+        const current = filter[field.key];
+        if (typeof current !== 'number' || !Number.isFinite(current)) continue;
+        const effective = current * filterMultiplier;
+        if (effective < field.min || effective > field.max) {
+          issue(
+            issues,
+            'image-filter-effective-range',
+            path + '.props.filters[' + index + '].' + field.key,
+            field.label +
+              ' becomes ' +
+              effective +
+              ' after filterIntensity and must stay ' +
+              field.help +
+              '.',
+          );
+        }
+      }
+    });
+  }
+
   props.filters?.forEach((filter, index) =>
-    validateFilter(filter, path + '.props.filters[' + index + ']', issues),
+    validateFilter(
+      filter,
+      path + '.props.filters[' + index + ']',
+      issues,
+      node.transform?.width ?? project.document.width,
+      node.transform?.height ?? project.document.height,
+    ),
   );
 
   if (props.mask) validateSource(project, props.mask.source, path + '.props.mask.source', issues);

@@ -22,7 +22,13 @@ import {
   defaultCanvasGradient,
   defaultCanvasPattern,
 } from '@/lib/studio/visual/canvas-contract';
-import { IMAGE_FILTER_TYPES } from '@/lib/studio/visual/image-contract';
+import {
+  IMAGE_FILTER_TYPES,
+  IMAGE_FILTER_PARAMETERLESS_TYPES,
+  clampVisualImageFilterValue,
+  defaultVisualImageFilter,
+  imageFilterFieldSpecs,
+} from '@/lib/studio/visual/image-contract';
 import { studioAssetReference, type StudioVirtualAsset } from '@/lib/studio/runtime/assets';
 import type {
   VisualBackgroundLayer,
@@ -80,16 +86,6 @@ type SectionProps = {
   badge?: string;
 };
 
-type NumericKey =
-  | 'intensity'
-  | 'radius'
-  | 'angle'
-  | 'centerX'
-  | 'centerY'
-  | 'value'
-  | 'levels'
-  | 'size';
-
 const BORDER_POSITIONS = [
   'all',
   'top',
@@ -105,26 +101,6 @@ const BORDER_POSITIONS = [
 const REPEAT_MODES = ['repeat', 'repeat-x', 'repeat-y', 'no-repeat'] as const;
 const GRADIENT_REPEATS = ['no-repeat', 'repeat', 'reflect'] as const;
 const STROKE_STYLES = ['solid', 'dashed', 'dotted', 'groove', 'ridge', 'double'] as const;
-
-const FILTER_FIELDS: Record<VisualImageFilter['type'], NumericKey[]> = {
-  gaussianBlur: ['radius', 'intensity'],
-  motionBlur: ['radius', 'angle', 'intensity'],
-  radialBlur: ['radius', 'centerX', 'centerY', 'intensity'],
-  sharpen: ['intensity'],
-  noise: ['intensity'],
-  grain: ['intensity', 'size'],
-  edgeDetection: ['intensity'],
-  emboss: ['intensity', 'angle'],
-  invert: ['intensity'],
-  grayscale: ['intensity'],
-  sepia: ['intensity'],
-  pixelate: ['size'],
-  brightness: ['value'],
-  contrast: ['value'],
-  saturation: ['value'],
-  hueShift: ['value'],
-  posterize: ['levels'],
-};
 
 function safeColor(value: string | undefined, fallback: string) {
   return /^#[0-9a-f]{6}$/i.test(value ?? '') ? value! : fallback;
@@ -907,95 +883,147 @@ function PatternEditor({
   );
 }
 
-function defaultFilter(type: VisualImageFilter['type']): VisualImageFilter {
-  if (type === 'pixelate') return { type, size: 8 };
-  if (type === 'posterize') return { type, levels: 6 };
-  if (['brightness', 'contrast', 'saturation'].includes(type)) {
-    return { type, value: 1 };
-  }
-  if (type === 'hueShift') return { type, value: 0 };
-  if (type === 'gaussianBlur') return { type, radius: 4 };
-  if (type === 'motionBlur') return { type, radius: 8, angle: 0 };
-  if (type === 'radialBlur') {
-    return { type, radius: 8, centerX: 0.5, centerY: 0.5 };
-  }
-  return { type, intensity: 1 };
-}
-
 function FilterEditor({
   filters,
   onChange,
+  width,
+  height,
 }: {
   filters: VisualImageFilter[];
   onChange: (filters: VisualImageFilter[]) => void;
+  width: number;
+  height: number;
 }) {
   const update = (index: number, next: VisualImageFilter) =>
     onChange(filters.map((filter, filterIndex) => (filterIndex === index ? next : filter)));
+  const remove = (index: number) =>
+    onChange(filters.filter((_, filterIndex) => filterIndex !== index));
 
   return (
-    <div className="apx-canvas-v2-filter-stack">
+    <div className="apx-canvas-v2-filter-stack" data-image-filter-contract="strict">
       <div className="apx-canvas-v2-subhead">
         <div>
           <strong>Image filters</strong>
-          <small>Applied to the active image-style background before it reaches the canvas.</small>
+          <small>
+            Exact Apexify filter parameters and runtime-supported ranges.
+          </small>
         </div>
         <button
           type="button"
-          onClick={() => onChange([...filters, defaultFilter('brightness')])}
+          onClick={() =>
+            onChange([
+              ...filters,
+              defaultVisualImageFilter('brightness', width, height),
+            ])
+          }
         >
           <PlusIcon aria-hidden /> Filter
         </button>
       </div>
 
       {filters.length ? (
-        filters.map((filter, index) => (
-          <div className="apx-canvas-v2-filter-card" key={index}>
-            <div className="apx-canvas-v2-card-head">
-              <select
-                className="apx-canvas-v2-input"
-                value={filter.type}
-                onChange={(event) =>
-                  update(
-                    index,
-                    defaultFilter(event.target.value as VisualImageFilter['type']),
-                  )
-                }
-              >
-                {IMAGE_FILTER_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {titleCase(type)}
-                  </option>
-                ))}
-              </select>
-              <button
-                className="apx-canvas-v2-icon-button"
-                type="button"
-                onClick={() =>
-                  onChange(filters.filter((_, filterIndex) => filterIndex !== index))
-                }
-                aria-label="Remove filter"
-              >
-                <TrashIcon aria-hidden />
-              </button>
-            </div>
-            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
-              {FILTER_FIELDS[filter.type].map((key) => (
-                <NumberField
-                  key={key}
-                  label={titleCase(key)}
-                  value={filter[key] ?? 0}
-                  step={key === 'centerX' || key === 'centerY' ? 0.1 : 1}
-                  onChange={(value) =>
-                    update(index, { ...filter, [key]: value })
+        filters.map((filter, index) => {
+          const fields = imageFilterFieldSpecs(filter.type, width, height);
+          const parameterless = IMAGE_FILTER_PARAMETERLESS_TYPES.includes(
+            filter.type as (typeof IMAGE_FILTER_PARAMETERLESS_TYPES)[number],
+          );
+
+          return (
+            <div className="apx-canvas-v2-filter-card" key={index}>
+              <div className="apx-canvas-v2-card-head">
+                <select
+                  className="apx-canvas-v2-input"
+                  value={filter.type}
+                  onChange={(event) =>
+                    update(
+                      index,
+                      defaultVisualImageFilter(
+                        event.target.value as VisualImageFilter['type'],
+                        width,
+                        height,
+                      ),
+                    )
                   }
-                />
-              ))}
+                >
+                  {IMAGE_FILTER_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {titleCase(type)}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="apx-canvas-v2-icon-button"
+                  type="button"
+                  onClick={() => remove(index)}
+                  aria-label="Remove filter"
+                >
+                  <TrashIcon aria-hidden />
+                </button>
+              </div>
+
+              {parameterless ? (
+                <label className="apx-canvas-v2-check-card" data-filter-boolean>
+                  <input
+                    type="checkbox"
+                    checked
+                    onChange={(event) => {
+                      if (!event.target.checked) remove(index);
+                    }}
+                  />
+                  <span>
+                    <strong>{titleCase(filter.type)} is on</strong>
+                    <small>
+                      This filter has no numeric parameter. Its presence means enabled.
+                    </small>
+                  </span>
+                  <em>ON</em>
+                </label>
+              ) : (
+                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
+                  {fields.map((field) => {
+                    const current = filter[field.key];
+                    return (
+                      <label className="apx-canvas-v2-field" key={field.key}>
+                        <span>{field.label}</span>
+                        <div className="apx-canvas-v2-number">
+                          <input
+                            className="apx-canvas-v2-input"
+                            type="number"
+                            min={field.min}
+                            max={field.max}
+                            step={field.step}
+                            value={
+                              typeof current === 'number' && Number.isFinite(current)
+                                ? current
+                                : field.defaultValue
+                            }
+                            onChange={(event) => {
+                              const value = clampVisualImageFilterValue(
+                                filter.type,
+                                field.key,
+                                Number(event.target.value),
+                                width,
+                                height,
+                              );
+                              update(index, { ...filter, [field.key]: value });
+                            }}
+                          />
+                          {field.suffix ? <small>{field.suffix}</small> : null}
+                        </div>
+                        <small className="apx-canvas-v2-field-hint">
+                          Allowed: {field.help}
+                        </small>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
-        ))
+          );
+        })
       ) : (
         <div className="apx-canvas-v2-empty-mini">
-          No filters. The image is rendered without filter processing.
+          No filters. The background is rendered without image filtering.
         </div>
       )}
     </div>
@@ -2649,6 +2677,8 @@ export function VisualCanvasInspector({
           {customBg ? (
             <FilterEditor
               filters={customBg.filters ?? []}
+              width={project.document.width}
+              height={project.document.height}
               onChange={(filters) =>
                 onDraft((current) => ({
                   ...current,
@@ -2662,6 +2692,8 @@ export function VisualCanvasInspector({
           ) : legacyVideoBg ? (
             <FilterEditor
               filters={legacyVideoBg.filters ?? []}
+              width={project.document.width}
+              height={project.document.height}
               onChange={(filters) =>
                 onDraft((current) => ({
                   ...current,

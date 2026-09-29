@@ -169,12 +169,21 @@ requireCheck(
     !apexifyWebPreview.includes('CanvasShadowOverflowComposite'),
   '@apexify/web must clip CanvasConfig shadow rendering to native fixed output dimensions.',
 );
-requireCheck(apexifyWebSource.commit === '2c2cca07e86af613da3a6eeb4a7420a540d7ce6c', '@apexify/web source snapshot is not pinned to the approved engine commit.');
+requireCheck(apexifyWebSource.commit === 'fcfdfebad875c599f0ccbdb3f1ad675afe992476', '@apexify/web source snapshot is not pinned to the approved engine commit.');
 requireCheck(apexifyWebInstaller.includes('Integrity mismatch for @apexify/web'), '@apexify/web installer must verify source integrity.');
 requireCheck(
   apexifyWebPreview.includes("radiusValue === 'circular'") &&
     apexifyWebPreview.includes('ctx.scale(width / 2, height / 2)'),
   '@apexify/web must render circular CanvasConfig clipping as a full-bounds circle/ellipse.',
+);
+requireCheck(
+  apexifyWebPreview.includes('PREVIEW_IMAGE_FILTER_TYPES') &&
+    apexifyWebPreview.includes('drawBitmapFittedWithFilters') &&
+    apexifyWebPreview.includes('customBg.filters') &&
+    apexifyWebPreview.includes("case 'hueShift'") &&
+    apexifyWebPreview.includes("case 'posterize'") &&
+    apexifyWebPreview.includes("case 'invert'"),
+  '@apexify/web must render the typed ImageFilter[] stack in Studio preview.',
 );
 requireCheck(
   apexifyWebPreview.includes("boolOf(inheritedBackground.inherit, false)") &&

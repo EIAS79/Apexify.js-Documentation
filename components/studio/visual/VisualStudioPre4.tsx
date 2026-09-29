@@ -179,7 +179,11 @@ import {
   IMAGE_ALIGNS,
   IMAGE_BLEND_MODES,
   IMAGE_FILTER_TYPES,
+  IMAGE_FILTER_PARAMETERLESS_TYPES,
   IMAGE_FITS,
+  clampVisualImageFilterValue,
+  defaultVisualImageFilter,
+  imageFilterFieldSpecs,
   IMAGE_SHAPE_TYPES,
   defaultImageNodeProps,
   defaultShapeNodeProps,
@@ -5101,31 +5105,161 @@ export default function VisualStudioPre4({
           </div>
         </div>
 
-        <div className="apx-pre4-section" data-image-section="filters">
+        <div className="apx-pre4-section" data-image-section="filters" data-image-filter-contract="strict">
           <div className="apx-canvas-section-heading">
-            <div className="apx-pre4-section-title">Filters</div>
-            <button className="apx-canvas-mini-button" type="button" onClick={() => mutateImage('Add image filter', (current) => ({ ...current, filters: [...(current.filters ?? []), { type: 'brightness', value: 1 }] }))}>＋ Filter</button>
+            <div>
+              <div className="apx-pre4-section-title">Filters</div>
+              <small className="apx-canvas-v2-field-hint">
+                Exact Apexify filter parameters and runtime ranges are enforced.
+              </small>
+            </div>
+            <button
+              className="apx-canvas-mini-button"
+              type="button"
+              onClick={() => {
+                const filterWidth = primaryMedia.transform?.width ?? project.document.width;
+                const filterHeight = primaryMedia.transform?.height ?? project.document.height;
+                mutateImage('Add image filter', (current) => ({
+                  ...current,
+                  filters: [
+                    ...(current.filters ?? []),
+                    defaultVisualImageFilter('brightness', filterWidth, filterHeight),
+                  ],
+                }));
+              }}
+            >
+              ＋ Filter
+            </button>
           </div>
           <div className="apx-image-filter-stack">
-            {(props.filters ?? []).map((filter, index) => (
-              <div key={index} className="apx-image-filter-row">
-                <select className="apx-pre4-input" value={filter.type} onChange={(event) => updateImageDraft((current) => ({
+            {(props.filters ?? []).map((filter, index) => {
+              const filterWidth = primaryMedia.transform?.width ?? project.document.width;
+              const filterHeight = primaryMedia.transform?.height ?? project.document.height;
+              const fields = imageFilterFieldSpecs(filter.type, filterWidth, filterHeight);
+              const parameterless = IMAGE_FILTER_PARAMETERLESS_TYPES.includes(
+                filter.type as (typeof IMAGE_FILTER_PARAMETERLESS_TYPES)[number],
+              );
+              const removeFilter = () =>
+                mutateImage('Remove image filter', (current) => ({
                   ...current,
-                  filters: (current.filters ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, type: event.target.value as VisualImageFilter['type'] } : item),
-                }))}>
-                  {IMAGE_FILTER_TYPES.map((type) => <option key={type}>{type}</option>)}
-                </select>
-                <input className="apx-pre4-input" type="number" step={0.1} value={filter.value ?? filter.intensity ?? 1} onChange={(event) => updateImageDraft((current) => ({
-                  ...current,
-                  filters: (current.filters ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, value: Number(event.target.value) } : item),
-                }))}/>
-                <button type="button" onClick={() => mutateImage('Remove image filter', (current) => ({ ...current, filters: (current.filters ?? []).filter((_, itemIndex) => itemIndex !== index) }))}>×</button>
-              </div>
-            ))}
+                  filters: (current.filters ?? []).filter((_, itemIndex) => itemIndex !== index),
+                }));
+
+              return (
+                <div key={index} className="apx-image-filter-row" data-filter-type={filter.type}>
+                  <select
+                    className="apx-pre4-input"
+                    value={filter.type}
+                    onChange={(event) =>
+                      updateImageDraft((current) => ({
+                        ...current,
+                        filters: (current.filters ?? []).map((item, itemIndex) =>
+                          itemIndex === index
+                            ? defaultVisualImageFilter(
+                                event.target.value as VisualImageFilter['type'],
+                                filterWidth,
+                                filterHeight,
+                              )
+                            : item,
+                        ),
+                      }))
+                    }
+                  >
+                    {IMAGE_FILTER_TYPES.map((type) => <option key={type}>{type}</option>)}
+                  </select>
+
+                  {parameterless ? (
+                    <label className="apx-canvas-v2-check-card" data-filter-boolean>
+                      <input
+                        type="checkbox"
+                        checked
+                        onChange={(event) => {
+                          if (!event.target.checked) removeFilter();
+                        }}
+                      />
+                      <span>
+                        <strong>On</strong>
+                        <small>No numeric value. Presence means enabled.</small>
+                      </span>
+                    </label>
+                  ) : (
+                    <div className="apx-pre4-property-grid">
+                      {fields.map((field) => {
+                        const current = filter[field.key];
+                        return (
+                          <label key={field.key}>
+                            <span>{field.label}</span>
+                            <div className="apx-canvas-v2-number">
+                              <input
+                                className="apx-pre4-input"
+                                type="number"
+                                min={field.min}
+                                max={field.max}
+                                step={field.step}
+                                value={
+                                  typeof current === 'number' && Number.isFinite(current)
+                                    ? current
+                                    : field.defaultValue
+                                }
+                                onChange={(event) => {
+                                  const value = clampVisualImageFilterValue(
+                                    filter.type,
+                                    field.key,
+                                    Number(event.target.value),
+                                    filterWidth,
+                                    filterHeight,
+                                  );
+                                  updateImageDraft((draft) => ({
+                                    ...draft,
+                                    filters: (draft.filters ?? []).map((item, itemIndex) =>
+                                      itemIndex === index ? { ...item, [field.key]: value } : item,
+                                    ),
+                                  }));
+                                }}
+                              />
+                              {field.suffix ? <small>{field.suffix}</small> : null}
+                            </div>
+                            <small className="apx-canvas-v2-field-hint">
+                              Allowed: {field.help}
+                            </small>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <button type="button" onClick={removeFilter} aria-label="Remove image filter">×</button>
+                </div>
+              );
+            })}
           </div>
           <div className="apx-pre4-property-grid">
-            <label><span>Intensity</span><input className="apx-pre4-input" type="number" step={0.1} value={props.filterIntensity ?? 1} onChange={(event) => updateImageDraft((current) => ({ ...current, filterIntensity: Number(event.target.value) }))}/></label>
-            <label><span>Order</span><select className="apx-pre4-input" value={props.filterOrder ?? 'post'} onChange={(event) => mutateImage('Filter order', (current) => ({ ...current, filterOrder: event.target.value as 'pre' | 'post' }))}><option value="pre">pre</option><option value="post">post</option></select></label>
+            <label>
+              <span>Global multiplier</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={0}
+                step={0.1}
+                value={props.filterIntensity ?? 1}
+                onChange={(event) =>
+                  updateImageDraft((current) => ({
+                    ...current,
+                    filterIntensity: Math.max(0, Number(event.target.value) || 0),
+                  }))
+                }
+              />
+              <small className="apx-canvas-v2-field-hint">
+                Applies to supported intensity/value fields. Semantic validation blocks effective values outside each filter’s range.
+              </small>
+            </label>
+            <label>
+              <span>Order</span>
+              <select className="apx-pre4-input" value={props.filterOrder ?? 'post'} onChange={(event) => mutateImage('Filter order', (current) => ({ ...current, filterOrder: event.target.value as 'pre' | 'post' }))}>
+                <option value="pre">pre</option>
+                <option value="post">post</option>
+              </select>
+            </label>
           </div>
         </div>
 

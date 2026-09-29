@@ -326,7 +326,7 @@ test('Phase 15 project bundle externalizes assets, includes round-trip source, a
   assert.ok(pkg);
   assert.match(
     Buffer.from(pkg!.bytes).toString('utf8'),
-    /github:EIAS79\/Apexify\.js#2c2cca07e86af613da3a6eeb4a7420a540d7ce6c/,
+    /github:EIAS79\/Apexify\.js#fcfdfebad875c599f0ccbdb3f1ad675afe992476/,
   );
   assert.equal(first.manifest.semanticHash, phase15SemanticHash(project));
   assert.equal(first.manifest.sourceHash, phase15TextHash(exportedSource));
