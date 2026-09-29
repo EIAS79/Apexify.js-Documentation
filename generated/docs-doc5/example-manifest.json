@@ -3,7 +3,7 @@
   "package": {
     "name": "apexify.js",
     "version": "6.0.0",
-    "commit": "5e0f5534762af7d9d358e83d774a38f931f720e0"
+    "commit": "db96446ef51ede70febb03892d86b599483a4302"
   },
   "examples": [
     {
@@ -102,8 +102,8 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "5e0f5534762af7d9d358e83d774a38f931f720e0",
-      "verifiedArtifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17"
+      "verifiedPackageCommit": "db96446ef51ede70febb03892d86b599483a4302",
+      "verifiedArtifactSha256": "826cb1ecf4e66c31ea00b435fe540ca73c736e8da08ae538bb36f78249a915ee"
     },
     {
       "id": "node.chart.bar",
@@ -201,8 +201,8 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "5e0f5534762af7d9d358e83d774a38f931f720e0",
-      "verifiedArtifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17"
+      "verifiedPackageCommit": "db96446ef51ede70febb03892d86b599483a4302",
+      "verifiedArtifactSha256": "826cb1ecf4e66c31ea00b435fe540ca73c736e8da08ae538bb36f78249a915ee"
     },
     {
       "id": "node.gif.basic",
@@ -320,8 +320,8 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "5e0f5534762af7d9d358e83d774a38f931f720e0",
-      "verifiedArtifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17"
+      "verifiedPackageCommit": "db96446ef51ede70febb03892d86b599483a4302",
+      "verifiedArtifactSha256": "826cb1ecf4e66c31ea00b435fe540ca73c736e8da08ae538bb36f78249a915ee"
     },
     {
       "id": "node.integration.report",
@@ -444,8 +444,8 @@
       ],
       "verificationStatus": "verified",
       "verifiedPackageVersion": "6.0.0",
-      "verifiedPackageCommit": "5e0f5534762af7d9d358e83d774a38f931f720e0",
-      "verifiedArtifactSha256": "5feb9d16b603d733d08426d28ddd4113faefe5e73e75a40e1dd6a211e0423c17"
+      "verifiedPackageCommit": "db96446ef51ede70febb03892d86b599483a4302",
+      "verifiedArtifactSha256": "826cb1ecf4e66c31ea00b435fe540ca73c736e8da08ae538bb36f78249a915ee"
     }
   ]
 }
