@@ -31,6 +31,7 @@ jobs:
         run: |
           node <<'NODE'
           const puppeteer = require('puppeteer-core');
+          (async () => {
           const studioUrl = process.env.STUDIO_URL;
           const sourceUrl = 'https://apexifyjs.vercel.app/example-outputs/node.canvas.basic/canvas-basic.png';
 
@@ -136,5 +137,6 @@ jobs:
           }
 
           console.log('LIVE_BROWSER_FILTER_ACCEPTANCE=' + JSON.stringify(results, null, 2));
-          if (failed) process.exit(1);
+          if (failed) process.exitCode = 1;
+          })().catch((error) => { console.error(error); process.exit(1); });
           NODE
