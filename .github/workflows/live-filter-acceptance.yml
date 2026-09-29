@@ -1,0 +1,117 @@
+name: Live filter acceptance
+on:
+  push:
+    branches:
+      - debug/studio-build-module
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Exercise production Studio runner
+        env:
+          STUDIO_RUN_URL: https://apexifyjs.vercel.app/api/gallery/run
+        run: |
+          node <<'NODE'
+          const endpoint = process.env.STUDIO_RUN_URL;
+          const image = 'https://apexifyjs.vercel.app/example-outputs/node.canvas.basic/canvas-basic.png';
+          const video = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+
+          function imageCode(filters) {
+            return `import { ApexPainter } from 'apexify.js';
+          async function main(): Promise<unknown> {
+            const painter = new ApexPainter();
+            const canvas = await painter.createCanvas({
+              width: 640,
+              height: 360,
+              customBg: {
+                source: '${image}',
+                fit: 'cover',
+                align: 'center',
+                filters: ${JSON.stringify(filters)}
+              }
+            });
+            return canvas.buffer;
+          }`;
+          }
+
+          const tests = [
+            ['grayscale', imageCode([{type:'grayscale'}]), 'success'],
+            ['edge-detection', imageCode([{type:'edgeDetection'}]), 'success'],
+            ['grayscale-stack', imageCode([{type:'grayscale'},{type:'contrast',value:12}]), 'success'],
+            ['edge-stack', imageCode([{type:'edgeDetection'},{type:'invert'}]), 'success'],
+            ['pixelate-full', imageCode([{type:'pixelate',size:12}]), 'success'],
+            ['pixelate-region', imageCode([{type:'pixelate',size:12,x:120,y:80,width:240,height:160}]), 'success'],
+            ['pixelate-edge-valid', imageCode([{type:'pixelate',size:12,x:600,y:320,width:40,height:40}]), 'success'],
+            ['pixelate-edge-invalid', imageCode([{type:'pixelate',size:12,x:600,y:320,width:80,height:80}]), 'validation'],
+            ['video-frame-grayscale', `import { ApexPainter } from 'apexify.js';
+          async function main(): Promise<unknown> {
+            const painter = new ApexPainter();
+            const canvas = await painter.createCanvas({
+              width: 640,
+              height: 360,
+              videoBg: {
+                source: '${video}',
+                time: 1,
+                fit: 'cover',
+                align: 'center',
+                filters: [{ type: 'grayscale' }],
+                format: 'jpg',
+                quality: 2
+              }
+            });
+            return canvas.buffer;
+          }`, 'success'],
+          ];
+
+          const results = [];
+          let failed = false;
+          for (const [name, code, expected] of tests) {
+            const started = Date.now();
+            let response, data;
+            try {
+              response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {'content-type':'application/json'},
+                body: JSON.stringify({code,lang:'ts',context:'studio',files:[]}),
+              });
+              const raw = await response.text();
+              try { data = JSON.parse(raw); } catch { data = {ok:false,error:'non-json: '+raw.slice(0,500)}; }
+            } catch (error) {
+              data = {ok:false,error:String(error)};
+              response = {status:0};
+            }
+
+            const error = String(data?.error || '');
+            const oldCrash = /Filter stack changed raster geometry unexpectedly|\b\d+×\d+×1\b/i.test(error);
+            const outputs = Array.isArray(data?.outputs) ? data.outputs : [];
+            const imageOut = outputs.some(o => o?.mime === 'image/png' || o?.mime === 'image/jpeg');
+
+            let pass;
+            if (expected === 'success') {
+              pass = Boolean(response.ok && data?.ok && imageOut && !oldCrash);
+            } else {
+              pass = Boolean(!data?.ok && !oldCrash && /region|range|bounds|exceed|width|height|pixelate/i.test(error));
+            }
+            if (!pass) failed = true;
+            results.push({
+              name,
+              expected,
+              pass,
+              http: response.status,
+              ok: Boolean(data?.ok),
+              runtime: data?.runtime ?? null,
+              elapsedMs: data?.elapsedMs ?? Date.now()-started,
+              mimes: outputs.map(o=>o?.mime).filter(Boolean),
+              error: error || null,
+              oldRasterGeometryCrash: oldCrash,
+            });
+          }
+
+          console.log('LIVE_FILTER_ACCEPTANCE=' + JSON.stringify(results, null, 2));
+          if (failed) process.exit(1);
+          NODE
