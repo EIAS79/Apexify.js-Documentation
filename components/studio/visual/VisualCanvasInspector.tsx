@@ -2261,8 +2261,8 @@ export function VisualCanvasInspector({
               }
             />
             <span>
-              <strong>Circular canvas</strong>
-              <small>Use min(width, height) / 2 as the clipping radius.</small>
+              <strong>Circular / oval canvas</strong>
+              <small>Fits the full canvas bounds: a square becomes a circle; a rectangular canvas becomes an ellipse.</small>
             </span>
           </label>
         </Section>

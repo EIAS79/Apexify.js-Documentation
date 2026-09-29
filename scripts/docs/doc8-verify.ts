@@ -169,8 +169,13 @@ requireCheck(
     !apexifyWebPreview.includes('CanvasShadowOverflowComposite'),
   '@apexify/web must clip CanvasConfig shadow rendering to native fixed output dimensions.',
 );
-requireCheck(apexifyWebSource.commit === '522b8d1094e412d2420f665a2ee5740b8c70db6f', '@apexify/web source snapshot is not pinned to the approved engine commit.');
+requireCheck(apexifyWebSource.commit === '2c2cca07e86af613da3a6eeb4a7420a540d7ce6c', '@apexify/web source snapshot is not pinned to the approved engine commit.');
 requireCheck(apexifyWebInstaller.includes('Integrity mismatch for @apexify/web'), '@apexify/web installer must verify source integrity.');
+requireCheck(
+  apexifyWebPreview.includes("radiusValue === 'circular'") &&
+    apexifyWebPreview.includes('ctx.scale(width / 2, height / 2)'),
+  '@apexify/web must render circular CanvasConfig clipping as a full-bounds circle/ellipse.',
+);
 requireCheck(
   apexifyWebPreview.includes("boolOf(inheritedBackground.inherit, false)") &&
     apexifyWebPreview.includes('width = bitmap.width') &&
