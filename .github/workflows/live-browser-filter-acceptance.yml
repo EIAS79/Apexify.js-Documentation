@@ -141,15 +141,16 @@ jobs:
                 }
               }
               const oldCrash = /Filter stack changed raster geometry unexpectedly|\b\d+[×x]\d+[×x]1\b/i.test((diagnostic || '') + '\n' + consoleErrors.join('\n') + '\n' + pageErrors.join('\n'));
+              const imageRendered = Boolean(await page.$('[data-doc8-primitive="preview"] img'));
               let pass;
               if (expected === 'success') {
-                pass = target === 'browser' && status === 'ready' && previewText.includes('@apexify/web output') && !oldCrash;
+                pass = target === 'browser' && status === 'ready' && imageRendered && previewText.includes('@apexify/web output') && previewText.includes('640×360') && !oldCrash;
               } else {
-                pass = target === 'browser' && status === 'error' && !oldCrash && /region|range|bounds|exceed|width|height|pixelate/i.test(diagnostic || '');
+                pass = target === 'browser' && (status === 'error' || status === 'terminal-error') && !oldCrash && /region|range|bounds|exceed|width|height|pixelate/i.test(diagnostic || '');
               }
               if (!pass) failed = true;
               results.push({
-                name, expected, pass, target, status,
+                name, expected, pass, target, status, imageRendered,
                 previewLabel: previewText.trim().slice(0,160),
                 diagnostic: diagnostic?.trim().slice(0,1200) || null,
                 consoleErrors: consoleErrors.slice(0,6),
