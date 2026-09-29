@@ -181,9 +181,9 @@ import {
   IMAGE_FILTER_TYPES,
   IMAGE_FILTER_PARAMETERLESS_TYPES,
   IMAGE_FITS,
-  clampVisualImageFilterValue,
   defaultVisualImageFilter,
   imageFilterFieldSpecs,
+  updateVisualImageFilterValue,
   IMAGE_SHAPE_TYPES,
   defaultImageNodeProps,
   defaultShapeNodeProps,
@@ -5135,7 +5135,12 @@ export default function VisualStudioPre4({
             {(props.filters ?? []).map((filter, index) => {
               const filterWidth = primaryMedia.transform?.width ?? project.document.width;
               const filterHeight = primaryMedia.transform?.height ?? project.document.height;
-              const fields = imageFilterFieldSpecs(filter.type, filterWidth, filterHeight);
+              const fields = imageFilterFieldSpecs(
+                filter.type,
+                filterWidth,
+                filterHeight,
+                filter,
+              );
               const parameterless = IMAGE_FILTER_PARAMETERLESS_TYPES.includes(
                 filter.type as (typeof IMAGE_FILTER_PARAMETERLESS_TYPES)[number],
               );
@@ -5202,8 +5207,8 @@ export default function VisualStudioPre4({
                                     : field.defaultValue
                                 }
                                 onChange={(event) => {
-                                  const value = clampVisualImageFilterValue(
-                                    filter.type,
+                                  const nextFilter = updateVisualImageFilterValue(
+                                    filter,
                                     field.key,
                                     Number(event.target.value),
                                     filterWidth,
@@ -5212,7 +5217,7 @@ export default function VisualStudioPre4({
                                   updateImageDraft((draft) => ({
                                     ...draft,
                                     filters: (draft.filters ?? []).map((item, itemIndex) =>
-                                      itemIndex === index ? { ...item, [field.key]: value } : item,
+                                      itemIndex === index ? nextFilter : item,
                                     ),
                                   }));
                                 }}

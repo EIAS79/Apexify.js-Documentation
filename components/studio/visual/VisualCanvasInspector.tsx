@@ -25,9 +25,9 @@ import {
 import {
   IMAGE_FILTER_TYPES,
   IMAGE_FILTER_PARAMETERLESS_TYPES,
-  clampVisualImageFilterValue,
   defaultVisualImageFilter,
   imageFilterFieldSpecs,
+  updateVisualImageFilterValue,
 } from '@/lib/studio/visual/image-contract';
 import { studioAssetReference, type StudioVirtualAsset } from '@/lib/studio/runtime/assets';
 import type {
@@ -923,7 +923,7 @@ function FilterEditor({
 
       {filters.length ? (
         filters.map((filter, index) => {
-          const fields = imageFilterFieldSpecs(filter.type, width, height);
+          const fields = imageFilterFieldSpecs(filter.type, width, height, filter);
           const parameterless = IMAGE_FILTER_PARAMETERLESS_TYPES.includes(
             filter.type as (typeof IMAGE_FILTER_PARAMETERLESS_TYPES)[number],
           );
@@ -998,14 +998,16 @@ function FilterEditor({
                                 : field.defaultValue
                             }
                             onChange={(event) => {
-                              const value = clampVisualImageFilterValue(
-                                filter.type,
-                                field.key,
-                                Number(event.target.value),
-                                width,
-                                height,
+                              update(
+                                index,
+                                updateVisualImageFilterValue(
+                                  filter,
+                                  field.key,
+                                  Number(event.target.value),
+                                  width,
+                                  height,
+                                ),
                               );
-                              update(index, { ...filter, [field.key]: value });
                             }}
                           />
                           {field.suffix ? <small>{field.suffix}</small> : null}

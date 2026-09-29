@@ -138,7 +138,12 @@ function validateImageBackgroundOptions(
       issue(issues, 'canvas-background-filter-type', filterPath + '.type', 'Unsupported image filter type.');
       return;
     }
-    const specs = imageFilterFieldSpecs(type, width, height);
+    const specs = imageFilterFieldSpecs(
+      type,
+      width,
+      height,
+      filter as unknown as VisualImageFilter,
+    );
     for (const field of specs) {
       const current = filter[field.key];
       if (current === undefined) continue;
@@ -157,7 +162,7 @@ function validateImageBackgroundOptions(
       }
     }
     const allowed = new Set<string>(['type', ...specs.map((field) => field.key)]);
-    for (const key of ['intensity','radius','angle','centerX','centerY','value','levels','size']) {
+    for (const key of ['intensity','radius','angle','centerX','centerY','value','levels','size','x','y','width','height']) {
       if (filter[key] !== undefined && !allowed.has(key)) {
         issue(
           issues,

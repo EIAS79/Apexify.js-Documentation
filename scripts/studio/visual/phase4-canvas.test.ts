@@ -447,6 +447,18 @@ test('Phase 4 validates exact canvas background ImageFilter contracts', () => {
       (issue) => issue.code === 'canvas-background-filter-parameter',
     ),
   );
+
+  const pixelateRegion = structuredClone(valid);
+  pixelateRegion.document.canvas!.customBg!.filters = [
+    { type: 'pixelate', size: 12, x: 700, y: 0, width: 200, height: 200 },
+  ];
+  const invalidRegion = validateVisualProject(pixelateRegion);
+  assert.equal(invalidRegion.ok, false);
+  assert.ok(
+    invalidRegion.issues.some(
+      (issue) => issue.code === 'canvas-background-filter-range',
+    ),
+  );
 });
 
 test('Phase 4 filter editor exposes runtime ranges and boolean filters', () => {

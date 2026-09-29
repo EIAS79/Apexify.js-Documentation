@@ -53,7 +53,11 @@ export type ImageFilterNumericKey =
   | 'centerY'
   | 'value'
   | 'levels'
-  | 'size';
+  | 'size'
+  | 'x'
+  | 'y'
+  | 'width'
+  | 'height';
 
 export type ImageFilterFieldSpec = {
   key: ImageFilterNumericKey;
@@ -68,8 +72,19 @@ export type ImageFilterFieldSpec = {
 };
 
 type ImageFilterStaticFieldSpec = Omit<ImageFilterFieldSpec, 'max' | 'defaultValue'> & {
-  max: number | 'width' | 'height' | 'maxDimension';
-  defaultValue: number | 'halfWidth' | 'halfHeight';
+  max:
+    | number
+    | 'width'
+    | 'height'
+    | 'maxDimension'
+    | 'widthMinusOne'
+    | 'heightMinusOne';
+  defaultValue:
+    | number
+    | 'halfWidth'
+    | 'halfHeight'
+    | 'fullWidth'
+    | 'fullHeight';
 };
 
 export const IMAGE_FILTER_PARAMETERLESS_TYPES = [
@@ -114,6 +129,10 @@ const IMAGE_FILTER_FIELD_SPECS: Record<
   sepia: [],
   pixelate: [
     { key: 'size', label: 'Block size', min: 1, max: 'maxDimension', step: 1, defaultValue: 8, suffix: 'px', integer: true, help: 'integer 1 to the larger canvas dimension' },
+    { key: 'x', label: 'Region X', min: 0, max: 'widthMinusOne', step: 1, defaultValue: 0, suffix: 'px', integer: true, help: 'integer 0 to width − 1' },
+    { key: 'y', label: 'Region Y', min: 0, max: 'heightMinusOne', step: 1, defaultValue: 0, suffix: 'px', integer: true, help: 'integer 0 to height − 1' },
+    { key: 'width', label: 'Region width', min: 1, max: 'width', step: 1, defaultValue: 'fullWidth', suffix: 'px', integer: true, help: 'integer 1 to remaining width' },
+    { key: 'height', label: 'Region height', min: 1, max: 'height', step: 1, defaultValue: 'fullHeight', suffix: 'px', integer: true, help: 'integer 1 to remaining height' },
   ],
   brightness: [
     { key: 'value', label: 'Brightness', min: -100, max: 100, step: 1, defaultValue: 10, suffix: '%', help: '−100% to 100%' },
@@ -136,26 +155,54 @@ export function imageFilterFieldSpecs(
   type: VisualImageFilter['type'],
   width: number,
   height: number,
+  filter?: VisualImageFilter,
 ): readonly ImageFilterFieldSpec[] {
-  const safeWidth = Math.max(1, Number.isFinite(width) ? width : 1);
-  const safeHeight = Math.max(1, Number.isFinite(height) ? height : 1);
-  return IMAGE_FILTER_FIELD_SPECS[type].map((field) => ({
-    ...field,
-    max:
+  const safeWidth = Math.max(1, Number.isFinite(width) ? Math.floor(width) : 1);
+  const safeHeight = Math.max(1, Number.isFinite(height) ? Math.floor(height) : 1);
+  const startX =
+    type === 'pixelate' && typeof filter?.x === 'number' && Number.isFinite(filter.x)
+      ? Math.max(0, Math.min(safeWidth - 1, Math.floor(filter.x)))
+      : 0;
+  const startY =
+    type === 'pixelate' && typeof filter?.y === 'number' && Number.isFinite(filter.y)
+      ? Math.max(0, Math.min(safeHeight - 1, Math.floor(filter.y)))
+      : 0;
+
+  return IMAGE_FILTER_FIELD_SPECS[type].map((field) => {
+    let max =
       field.max === 'width'
         ? safeWidth
         : field.max === 'height'
           ? safeHeight
           : field.max === 'maxDimension'
             ? Math.max(safeWidth, safeHeight)
-            : field.max,
-    defaultValue:
+            : field.max === 'widthMinusOne'
+              ? Math.max(0, safeWidth - 1)
+              : field.max === 'heightMinusOne'
+                ? Math.max(0, safeHeight - 1)
+                : field.max;
+    let defaultValue =
       field.defaultValue === 'halfWidth'
         ? safeWidth / 2
         : field.defaultValue === 'halfHeight'
           ? safeHeight / 2
-          : field.defaultValue,
-  }));
+          : field.defaultValue === 'fullWidth'
+            ? safeWidth
+            : field.defaultValue === 'fullHeight'
+              ? safeHeight
+              : field.defaultValue;
+
+    if (type === 'pixelate' && field.key === 'width') {
+      max = Math.max(1, safeWidth - startX);
+      defaultValue = max;
+    }
+    if (type === 'pixelate' && field.key === 'height') {
+      max = Math.max(1, safeHeight - startY);
+      defaultValue = max;
+    }
+
+    return { ...field, max, defaultValue };
+  });
 }
 
 export function defaultVisualImageFilter(
@@ -176,12 +223,68 @@ export function clampVisualImageFilterValue(
   value: number,
   width: number,
   height: number,
+  filter?: VisualImageFilter,
 ): number {
-  const field = imageFilterFieldSpecs(type, width, height).find((item) => item.key === key);
+  const field = imageFilterFieldSpecs(type, width, height, filter).find(
+    (item) => item.key === key,
+  );
   if (!field) return value;
   const finiteValue = Number.isFinite(value) ? value : field.defaultValue;
   const bounded = Math.max(field.min, Math.min(field.max, finiteValue));
   return field.integer ? Math.round(bounded) : bounded;
+}
+
+export function updateVisualImageFilterValue(
+  filter: VisualImageFilter,
+  key: ImageFilterNumericKey,
+  value: number,
+  width: number,
+  height: number,
+): VisualImageFilter {
+  const next: VisualImageFilter = {
+    ...filter,
+    [key]: clampVisualImageFilterValue(
+      filter.type,
+      key,
+      value,
+      width,
+      height,
+      filter,
+    ),
+  };
+
+  if (next.type === 'pixelate') {
+    if (key === 'x' || key === 'width') {
+      const currentWidth =
+        typeof next.width === 'number'
+          ? next.width
+          : Math.max(1, width - (next.x ?? 0));
+      next.width = clampVisualImageFilterValue(
+        'pixelate',
+        'width',
+        currentWidth,
+        width,
+        height,
+        next,
+      );
+    }
+    if (key === 'y' || key === 'height') {
+      const currentHeight =
+        typeof next.height === 'number'
+          ? next.height
+          : Math.max(1, height - (next.y ?? 0));
+      next.height = clampVisualImageFilterValue(
+        'pixelate',
+        'height',
+        currentHeight,
+        width,
+        height,
+        next,
+      );
+    }
+  }
+
+  return next;
 }
 
 function validateTypedFilterFields(
@@ -192,7 +295,12 @@ function validateTypedFilterFields(
   width: number,
   height: number,
 ) {
-  const specs = imageFilterFieldSpecs(type, width, height);
+  const specs = imageFilterFieldSpecs(
+    type,
+    width,
+    height,
+    item as unknown as VisualImageFilter,
+  );
   for (const field of specs) {
     const current = item[field.key];
     if (current === undefined) continue;
@@ -212,7 +320,7 @@ function validateTypedFilterFields(
   }
 
   const allowed = new Set<string>(['type', ...specs.map((field) => field.key)]);
-  for (const key of ['intensity','radius','angle','centerX','centerY','value','levels','size']) {
+  for (const key of ['intensity','radius','angle','centerX','centerY','value','levels','size','x','y','width','height']) {
     if (item[key] !== undefined && !allowed.has(key)) {
       issue(
         issues,

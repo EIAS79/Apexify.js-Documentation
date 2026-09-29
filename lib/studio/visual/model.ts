@@ -125,6 +125,11 @@ export interface VisualImageFilter {
   value?: number;
   levels?: number;
   size?: number;
+  /** Optional pixelate region; omitted values target the whole filtered surface. */
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
 }
 
 export interface VisualPatternGradient {

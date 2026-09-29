@@ -3,7 +3,7 @@
   "source": {
     "artifact": "generated/studio/capability-matrix.json",
     "schemaVersion": 2,
-    "packagePin": "github:EIAS79/Apexify.js#fcfdfebad875c599f0ccbdb3f1ad675afe992476",
+    "packagePin": "github:EIAS79/Apexify.js#5e0f5534762af7d9d358e83d774a38f931f720e0",
     "implementationComplete": true,
     "totalCapabilities": 187
   },

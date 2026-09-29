@@ -10,6 +10,7 @@ import {
   defaultVisualImageFilter,
   imageFilterFieldSpecs,
   clampVisualImageFilterValue,
+  updateVisualImageFilterValue,
   CREATE_IMAGE_OPTIONS_CLASSIFICATION,
   GROUP_TRANSFORM_CLASSIFICATION,
   IMAGE_AUTHORING_CLASSIFICATION,
@@ -254,6 +255,21 @@ test('Phase 5 image filter helpers expose exact runtime contracts', () => {
   const radial = imageFilterFieldSpecs('radialBlur', 640, 480);
   assert.equal(radial.find((field) => field.key === 'centerX')?.max, 640);
   assert.equal(radial.find((field) => field.key === 'centerY')?.max, 480);
+
+  const pixelate = defaultVisualImageFilter('pixelate', 640, 480);
+  assert.deepEqual(pixelate, {
+    type: 'pixelate',
+    size: 8,
+    x: 0,
+    y: 0,
+    width: 640,
+    height: 480,
+  });
+  const shifted = updateVisualImageFilterValue(pixelate, 'x', 100, 640, 480);
+  assert.equal(shifted.x, 100);
+  assert.equal(shifted.width, 540);
+  const pixelFields = imageFilterFieldSpecs('pixelate', 640, 480, shifted);
+  assert.equal(pixelFields.find((field) => field.key === 'width')?.max, 540);
 });
 
 test('Phase 5 rejects invalid filter ranges and stale parameters', () => {
@@ -290,6 +306,20 @@ test('Phase 5 rejects invalid filter ranges and stale parameters', () => {
       (issue) => issue.code === 'image-filter-effective-range',
     ),
   );
+
+  props.filterIntensity = 1;
+  props.filters = [
+    { type: 'pixelate', size: 8, x: 400, y: 0, width: 40, height: 100 },
+  ];
+  validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((issue) => issue.code === 'image-filter-range'));
+
+  props.filters = [
+    { type: 'pixelate', size: 8, x: 20, y: 20, width: 200, height: 100 },
+  ];
+  validation = validateVisualProject(project);
+  assert.equal(validation.ok, true, JSON.stringify(validation.issues));
 });
 
 test('Phase 5 permanent image inspector uses strict per-filter fields', () => {
@@ -297,13 +327,20 @@ test('Phase 5 permanent image inspector uses strict per-filter fields', () => {
     'components/studio/visual/VisualStudioPre4.tsx',
     'utf8',
   );
+  const contract = fs.readFileSync(
+    'lib/studio/visual/image-contract.ts',
+    'utf8',
+  );
 
   assert.match(shell, /data-image-filter-contract="strict"/);
   assert.match(shell, /IMAGE_FILTER_PARAMETERLESS_TYPES/);
   assert.match(shell, /data-filter-boolean/);
   assert.match(shell, /Allowed: \{field\.help\}/);
-  assert.match(shell, /clampVisualImageFilterValue/);
+  assert.match(shell, /updateVisualImageFilterValue/);
   assert.match(shell, /Global multiplier/);
+  assert.match(contract, /Region X/);
+  assert.match(contract, /Region width/);
+  assert.match(contract, /widthMinusOne/);
 });
 
 test('Phase 5 permanent shell exposes image shape asset workflows and authoritative artboard', () => {

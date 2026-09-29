@@ -1,7 +1,7 @@
 # Professional image filters (`ImageFilter[]`) {#05-create-image-filters}
 
 
-The **`filters`** field is a **stack** of **`ImageFilter`** objects. Filters are applied with **Sharp** (and a pixel path when **`grayscale`** is included). They operate on **bitmap** layers only (not on pure shape vector fills in the same way — shape layers apply filters on the **clipped rectangular** region before the shape is drawn).
+The **`filters`** field is a **stack** of **`ImageFilter`** objects. Filters use the shared Sharp/Canvas RGBA pipeline, with channel-changing operations normalized back to RGBA before compositing. They operate on **bitmap** layers only (not on pure shape vector fills in the same way — shape layers apply filters on the **clipped rectangular** region before the shape is drawn).
 
 ---
 
@@ -51,7 +51,7 @@ The runtime validates these ranges before rendering. Visual Studio uses the same
 | **`invert`** | none | **on/off** | Presence of `{ type: 'invert' }` means enabled. |
 | **`grayscale`** | none | **on/off** | Presence of `{ type: 'grayscale' }` means enabled. |
 | **`sepia`** | none | **on/off** | Presence of `{ type: 'sepia' }` means enabled. |
-| **`pixelate`** | **`size`** | integer **1–max(width,height)** | Pixel block size. |
+| **`pixelate`** | **`size`**, optional **`x`**, **`y`**, **`width`**, **`height`** | size: integer **1–max(width,height)**; region must stay inside the filtered surface | Pixelates the whole image by default, or only the selected rectangular region when region fields are provided. |
 | **`brightness`** | **`value`** | **−100–100** | Percentage-style brightness adjustment. |
 | **`contrast`** | **`value`** | **−100–100** | Percentage-style contrast adjustment. |
 | **`saturation`** | **`value`** | **−100–100** | Percentage-style saturation adjustment. |
@@ -59,6 +59,14 @@ The runtime validates these ranges before rendering. Visual Studio uses the same
 | **`posterize`** | **`levels`** | integer **2–256** | Number of color levels. |
 
 > **Parameterless filters are boolean by presence.** `invert`, `grayscale`, and `sepia` do not accept an `intensity`, `value`, `radius`, or other numeric field. Visual Studio exposes them as **On/Off** controls.
+
+### Pixelate a selected region
+
+```typescript
+{ type: 'pixelate', size: 16, x: 120, y: 80, width: 320, height: 180 }
+```
+
+`x` / `y` are the top-left pixel of the region. `width` / `height` default to the remaining surface size. Studio dynamically tightens the width/height maximum when X or Y changes, so the region cannot extend beyond the image/canvas bounds.
 
 The typed stack does **not** use `radius` for Gaussian/motion/radial blur, `size` for grain, or `angle` for emboss. Those stale/extra parameters are rejected by Studio semantic validation.
 
