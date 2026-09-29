@@ -1,0 +1,140 @@
+name: Live browser filter acceptance
+on:
+  push:
+    branches:
+      - debug/studio-build-module
+
+jobs:
+  browser-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Prepare Puppeteer
+        run: |
+          mkdir -p /tmp/apexify-browser-acceptance
+          cd /tmp/apexify-browser-acceptance
+          npm init -y >/dev/null 2>&1
+          npm install --no-audit --no-fund puppeteer-core@24.25.0 >/dev/null 2>&1
+          CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME" ]; then
+            echo "No Chrome/Chromium found on runner" >&2
+            exit 1
+          fi
+          echo "CHROME_PATH=$CHROME" >> "$GITHUB_ENV"
+      - name: Exercise live @apexify/web Studio preview
+        env:
+          NODE_PATH: /tmp/apexify-browser-acceptance/node_modules
+          STUDIO_URL: https://apexifyjs.vercel.app/studio
+        run: |
+          node <<'NODE'
+          const puppeteer = require('puppeteer-core');
+          const studioUrl = process.env.STUDIO_URL;
+          const sourceUrl = 'https://apexifyjs.vercel.app/example-outputs/node.canvas.basic/canvas-basic.png';
+
+          function codeFor(filters) {
+            return `import { ApexPainter } from 'apexify.js';
+          async function main(): Promise<unknown> {
+            const painter = new ApexPainter();
+            const canvas = await painter.createCanvas({
+              width: 640,
+              height: 360,
+              customBg: {
+                source: '${sourceUrl}',
+                fit: 'cover',
+                align: 'center',
+                filters: ${JSON.stringify(filters)}
+              }
+            });
+            return canvas.buffer;
+          }`;
+          }
+
+          const tests = [
+            ['grayscale', codeFor([{type:'grayscale'}]), 'success'],
+            ['edge-detection', codeFor([{type:'edgeDetection'}]), 'success'],
+            ['grayscale-stack', codeFor([{type:'grayscale'},{type:'contrast',value:12}]), 'success'],
+            ['edge-stack', codeFor([{type:'edgeDetection'},{type:'invert'}]), 'success'],
+            ['pixelate-full', codeFor([{type:'pixelate',size:12}]), 'success'],
+            ['pixelate-region', codeFor([{type:'pixelate',size:12,x:120,y:80,width:240,height:160}]), 'success'],
+            ['pixelate-edge-valid', codeFor([{type:'pixelate',size:12,x:600,y:320,width:40,height:40}]), 'success'],
+            ['pixelate-edge-invalid', codeFor([{type:'pixelate',size:12,x:600,y:320,width:80,height:80}]), 'validation'],
+          ];
+
+          const browser = await puppeteer.launch({
+            executablePath: process.env.CHROME_PATH,
+            headless: 'new',
+            args: ['--no-sandbox','--disable-dev-shm-usage'],
+          });
+
+          const results = [];
+          let failed = false;
+          try {
+            for (const [name, code, expected] of tests) {
+              const page = await browser.newPage();
+              const consoleErrors = [];
+              const pageErrors = [];
+              page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+              page.on('pageerror', err => pageErrors.push(err.message));
+
+              await page.goto(studioUrl, {waitUntil:'domcontentloaded', timeout:30000});
+              await page.evaluate((code) => {
+                localStorage.clear();
+                localStorage.setItem('apexify-studio-v2', JSON.stringify({
+                  buffers: [{id:'acceptance', name:'acceptance.ts', ts:code, js:code}],
+                  activeBufferId:'acceptance',
+                  lang:'ts',
+                  layout:'split',
+                  autoRun:false,
+                  splitRatio:0.5,
+                }));
+              }, code);
+              await page.reload({waitUntil:'networkidle2', timeout:30000});
+
+              await page.waitForSelector('.apx-studio-root', {timeout:15000});
+              const target = await page.$eval('.apx-studio-root', el => el.getAttribute('data-execution-target'));
+
+              await page.waitForFunction(() => {
+                const p = document.querySelector('[data-doc8-primitive="preview"]');
+                const status = p?.getAttribute('data-preview-status');
+                return status === 'ready' || status === 'error';
+              }, {timeout:30000});
+
+              let status = await page.$eval('[data-doc8-primitive="preview"]', el => el.getAttribute('data-preview-status'));
+              let previewText = await page.$eval('[data-doc8-primitive="preview"]', el => el.textContent || '');
+              let diagnostic = null;
+              if (status === 'error') {
+                await page.evaluate(() => {
+                  const btn = [...document.querySelectorAll('button')].find(b => b.textContent?.trim().startsWith('Diagnostics'));
+                  if (btn instanceof HTMLButtonElement) btn.click();
+                });
+                await page.waitForSelector('.studio-diagnostics', {timeout:5000});
+                diagnostic = await page.$eval('.studio-diagnostics', el => el.textContent || '');
+              }
+              const oldCrash = /Filter stack changed raster geometry unexpectedly|\b\d+[×x]\d+[×x]1\b/i.test((diagnostic || '') + '\n' + consoleErrors.join('\n') + '\n' + pageErrors.join('\n'));
+              let pass;
+              if (expected === 'success') {
+                pass = target === 'browser' && status === 'ready' && previewText.includes('@apexify/web output') && !oldCrash;
+              } else {
+                pass = target === 'browser' && status === 'error' && !oldCrash && /region|range|bounds|exceed|width|height|pixelate/i.test(diagnostic || '');
+              }
+              if (!pass) failed = true;
+              results.push({
+                name, expected, pass, target, status,
+                previewLabel: previewText.trim().slice(0,160),
+                diagnostic: diagnostic?.trim().slice(0,1200) || null,
+                consoleErrors: consoleErrors.slice(0,6),
+                pageErrors: pageErrors.slice(0,6),
+                oldRasterGeometryCrash: oldCrash,
+              });
+              await page.close();
+            }
+          } finally {
+            await browser.close();
+          }
+
+          console.log('LIVE_BROWSER_FILTER_ACCEPTANCE=' + JSON.stringify(results, null, 2));
+          if (failed) process.exit(1);
+          NODE
