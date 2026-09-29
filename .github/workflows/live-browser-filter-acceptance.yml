@@ -97,22 +97,41 @@ jobs:
               await page.waitForSelector('.apx-studio-root', {timeout:15000});
               const target = await page.$eval('.apx-studio-root', el => el.getAttribute('data-execution-target'));
 
-              await page.waitForFunction(() => {
-                const p = document.querySelector('[data-doc8-primitive="preview"]');
-                const status = p?.getAttribute('data-preview-status');
-                return status === 'ready' || status === 'error';
-              }, {timeout:30000});
+              await page.evaluate(() => {
+                const btn = [...document.querySelectorAll('button')].find(
+                  b => b.textContent?.trim() === 'Run'
+                );
+                if (btn instanceof HTMLButtonElement) btn.click();
+              });
 
-              let status = await page.$eval('[data-doc8-primitive="preview"]', el => el.getAttribute('data-preview-status'));
-              let previewText = await page.$eval('[data-doc8-primitive="preview"]', el => el.textContent || '');
+              try {
+                await page.waitForFunction(() => {
+                  const p = document.querySelector('[data-doc8-primitive="preview"]');
+                  const status = p?.getAttribute('data-preview-status');
+                  const diagnostics = document.querySelector('.studio-diagnostics');
+                  return status === 'ready' || status === 'error' || Boolean(diagnostics);
+                }, {timeout:20000});
+              } catch {}
+
+              const preview = await page.$('[data-doc8-primitive="preview"]');
+              let status = preview
+                ? await page.$eval('[data-doc8-primitive="preview"]', el => el.getAttribute('data-preview-status'))
+                : 'terminal-error';
+              let previewText = preview
+                ? await page.$eval('[data-doc8-primitive="preview"]', el => el.textContent || '')
+                : '';
               let diagnostic = null;
-              if (status === 'error') {
-                await page.evaluate(() => {
-                  const btn = [...document.querySelectorAll('button')].find(b => b.textContent?.trim().startsWith('Diagnostics'));
-                  if (btn instanceof HTMLButtonElement) btn.click();
-                });
-                await page.waitForSelector('.studio-diagnostics', {timeout:5000});
-                diagnostic = await page.$eval('.studio-diagnostics', el => el.textContent || '');
+              if (status !== 'ready') {
+                if (!(await page.$('.studio-diagnostics'))) {
+                  await page.evaluate(() => {
+                    const btn = [...document.querySelectorAll('button')].find(b => b.textContent?.trim().startsWith('Diagnostics'));
+                    if (btn instanceof HTMLButtonElement) btn.click();
+                  });
+                  try { await page.waitForSelector('.studio-diagnostics', {timeout:5000}); } catch {}
+                }
+                if (await page.$('.studio-diagnostics')) {
+                  diagnostic = await page.$eval('.studio-diagnostics', el => el.textContent || '');
+                }
               }
               const oldCrash = /Filter stack changed raster geometry unexpectedly|\b\d+[×x]\d+[×x]1\b/i.test((diagnostic || '') + '\n' + consoleErrors.join('\n') + '\n' + pageErrors.join('\n'));
               let pass;
