@@ -18,8 +18,20 @@ jobs:
         run: |
           node <<'NODE'
           const endpoint = process.env.STUDIO_RUN_URL;
-          const image = 'https://apexifyjs.vercel.app/example-outputs/node.canvas.basic/canvas-basic.png';
-          const video = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+          const imageUrl = 'https://apexifyjs.vercel.app/example-outputs/node.canvas.basic/canvas-basic.png';
+          const videoUrl = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+
+          async function fetchAsset(id, name, mime, url) {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`asset fetch ${url} -> HTTP ${response.status}`);
+            const bytes = Buffer.from(await response.arrayBuffer());
+            if (!bytes.length) throw new Error(`asset fetch ${url} returned empty data`);
+            if (bytes.length > 8 * 1024 * 1024) throw new Error(`asset ${name} exceeds Studio 8MiB limit: ${bytes.length}`);
+            return { id, name, mime, size: bytes.length, base64: bytes.toString('base64') };
+          }
+
+          const imageAsset = await fetchAsset('filter-proof-image', 'filter-proof.png', 'image/png', imageUrl);
+          const videoAsset = await fetchAsset('filter-proof-video', 'filter-proof.mp4', 'video/mp4', videoUrl);
 
           function imageCode(filters) {
             return `import { ApexPainter } from 'apexify.js';
@@ -29,7 +41,7 @@ jobs:
               width: 640,
               height: 360,
               customBg: {
-                source: '${image}',
+                source: 'studio://asset/filter-proof-image',
                 fit: 'cover',
                 align: 'center',
                 filters: ${JSON.stringify(filters)}
@@ -40,14 +52,14 @@ jobs:
           }
 
           const tests = [
-            ['grayscale', imageCode([{type:'grayscale'}]), 'success'],
-            ['edge-detection', imageCode([{type:'edgeDetection'}]), 'success'],
-            ['grayscale-stack', imageCode([{type:'grayscale'},{type:'contrast',value:12}]), 'success'],
-            ['edge-stack', imageCode([{type:'edgeDetection'},{type:'invert'}]), 'success'],
-            ['pixelate-full', imageCode([{type:'pixelate',size:12}]), 'success'],
-            ['pixelate-region', imageCode([{type:'pixelate',size:12,x:120,y:80,width:240,height:160}]), 'success'],
-            ['pixelate-edge-valid', imageCode([{type:'pixelate',size:12,x:600,y:320,width:40,height:40}]), 'success'],
-            ['pixelate-edge-invalid', imageCode([{type:'pixelate',size:12,x:600,y:320,width:80,height:80}]), 'validation'],
+            ['grayscale', imageCode([{type:'grayscale'}]), 'success', [imageAsset]],
+            ['edge-detection', imageCode([{type:'edgeDetection'}]), 'success', [imageAsset]],
+            ['grayscale-stack', imageCode([{type:'grayscale'},{type:'contrast',value:12}]), 'success', [imageAsset]],
+            ['edge-stack', imageCode([{type:'edgeDetection'},{type:'invert'}]), 'success', [imageAsset]],
+            ['pixelate-full', imageCode([{type:'pixelate',size:12}]), 'success', [imageAsset]],
+            ['pixelate-region', imageCode([{type:'pixelate',size:12,x:120,y:80,width:240,height:160}]), 'success', [imageAsset]],
+            ['pixelate-edge-valid', imageCode([{type:'pixelate',size:12,x:600,y:320,width:40,height:40}]), 'success', [imageAsset]],
+            ['pixelate-edge-invalid', imageCode([{type:'pixelate',size:12,x:600,y:320,width:80,height:80}]), 'validation', [imageAsset]],
             ['video-frame-grayscale', `import { ApexPainter } from 'apexify.js';
           async function main(): Promise<unknown> {
             const painter = new ApexPainter();
@@ -55,7 +67,7 @@ jobs:
               width: 640,
               height: 360,
               videoBg: {
-                source: '${video}',
+                source: 'studio://asset/filter-proof-video',
                 time: 1,
                 fit: 'cover',
                 align: 'center',
@@ -65,29 +77,29 @@ jobs:
               }
             });
             return canvas.buffer;
-          }`, 'success'],
+          }`, 'success', [videoAsset]],
           ];
 
           const results = [];
           let failed = false;
-          for (const [name, code, expected] of tests) {
+          for (const [name, code, expected, assets] of tests) {
             const started = Date.now();
             let response, data;
             try {
               response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {'content-type':'application/json'},
-                body: JSON.stringify({code,lang:'ts',context:'studio',files:[]}),
+                body: JSON.stringify({code,lang:'ts',context:'studio',assets,files:[]}),
               });
               const raw = await response.text();
               try { data = JSON.parse(raw); } catch { data = {ok:false,error:'non-json: '+raw.slice(0,500)}; }
             } catch (error) {
               data = {ok:false,error:String(error)};
-              response = {status:0};
+              response = {status:0, ok:false};
             }
 
             const error = String(data?.error || '');
-            const oldCrash = /Filter stack changed raster geometry unexpectedly|\b\d+×\d+×1\b/i.test(error);
+            const oldCrash = /Filter stack changed raster geometry unexpectedly|\b\d+[×x]\d+[×x]1\b/i.test(error);
             const outputs = Array.isArray(data?.outputs) ? data.outputs : [];
             const imageOut = outputs.some(o => o?.mime === 'image/png' || o?.mime === 'image/jpeg');
 
@@ -112,6 +124,7 @@ jobs:
             });
           }
 
+          console.log('ASSET_BYTES=' + JSON.stringify({image:imageAsset.size, video:videoAsset.size}));
           console.log('LIVE_FILTER_ACCEPTANCE=' + JSON.stringify(results, null, 2));
           if (failed) process.exit(1);
           NODE
