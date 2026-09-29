@@ -106,10 +106,17 @@ jobs:
 
               try {
                 await page.waitForFunction(() => {
+                  const body = document.body.textContent || '';
                   const p = document.querySelector('[data-doc8-primitive="preview"]');
                   const status = p?.getAttribute('data-preview-status');
-                  const diagnostics = document.querySelector('.studio-diagnostics');
-                  return status === 'ready' || status === 'error' || Boolean(diagnostics);
+                  const diagnostics = document.querySelector('.studio-diagnostics')?.textContent || '';
+                  const settled = !body.includes('Rendering…');
+                  return settled && (
+                    status === 'ready' ||
+                    status === 'error' ||
+                    diagnostics.includes('Fix the source') ||
+                    diagnostics.includes('Image filter')
+                  );
                 }, {timeout:20000});
               } catch {}
 
