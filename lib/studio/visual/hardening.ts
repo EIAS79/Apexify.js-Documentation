@@ -312,7 +312,7 @@ export class Phase17AssetDataUrlCache {
   private readonly values = new Map<string, string>();
 
   constructor(
-    private readonly maxEntries = PHASE17_PERFORMANCE_BUDGETS.maxAssetDataUrlCacheEntries,
+    private readonly maxEntries: number = PHASE17_PERFORMANCE_BUDGETS.maxAssetDataUrlCacheEntries,
   ) {}
 
   get(asset: Pick<StudioVirtualAsset, 'id' | 'mime' | 'size' | 'base64'>): string {
