@@ -7,6 +7,10 @@ import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
 
+function read(path: string) {
+  return fs.readFileSync(path, 'utf8');
+}
+
 function createCanvasProject() {
   const project = createVisualProject({
     id: 'project_canvas_phase4',
