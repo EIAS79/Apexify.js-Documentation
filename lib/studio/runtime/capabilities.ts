@@ -337,6 +337,16 @@ export function planStudioExecution(source: string): StudioExecutionPlan {
     reasons.push(reason + ' requires the full Apexify runtime in the current @apexify/web/full-runtime split.');
   }
 
+  const advancedCreateImageLiteral =
+    /\b(?:distortion|meshWarp|mask|clipPath|effects|filterOrder|filterIntensity|groupTransform|boxBackground|shadow|stroke)\s*:/;
+  if (/\.\s*createImage\s*\(/.test(scanned) && advancedCreateImageLiteral.test(scanned)) {
+    needsFullRuntime = true;
+    addFamily(families, 'image');
+    reasons.push(
+      'Advanced createImage() deformation/effect properties require the full Apexify runtime for native parity.',
+    );
+  }
+
   const generatedReuse = browserGeneratedMediaReuse(scanned);
   if (generatedReuse.length) {
     needsFullRuntime = true;
