@@ -19,7 +19,7 @@ import { createVisualId } from '@/lib/studio/visual/ids';
 
 type Props = {
   value: VisualImageNodeProps;
-  mode: 'effects' | 'advanced';
+  mode: 'effects' | 'data' | 'advanced';
   onChange: (next: VisualImageNodeProps, label: string) => void;
 };
 
@@ -168,6 +168,60 @@ export function VisualImageUtilityAuthoring({ value, mode, onChange }: Props) {
     updateStack(next, 'Reorder image utilities');
   };
 
+  if (mode === 'data') {
+    return (
+      <div className="apx-pre4-section" data-phase10-analysis>
+        <div className="apx-canvas-section-heading">
+          <div>
+            <div className="apx-pre4-section-title">Image analysis</div>
+            <small>Palette extraction and color analysis return structured data without replacing the raster.</small>
+          </div>
+        </div>
+        <div className="apx-image-utility-add-row">
+          {IMAGE_UTILITY_ANALYSIS_TYPES.map((type) => (
+            <button
+              key={type}
+              type="button"
+              className="apx-canvas-mini-button"
+              onClick={() =>
+                updateAnalyses(
+                  [...analyses, defaultImageUtilityAnalysis(type, createVisualId('image-analysis'))],
+                  'Add image analysis',
+                )
+              }
+            >
+              + {analysisLabel(type)}
+            </button>
+          ))}
+        </div>
+        {analyses.map((analysis) => (
+          <div className="apx-image-utility-row" data-image-analysis={analysis.type} key={analysis.id}>
+            <div>
+              <strong>{analysisLabel(analysis.type)}</strong>
+              <small>{analysis.enabled === false ? 'disabled' : 'full-runtime'}</small>
+            </div>
+            <button type="button" onClick={() => updateAnalyses(analyses.filter((item) => item.id !== analysis.id), 'Remove image analysis')}>×</button>
+            <JsonConfig
+              value={analysis}
+              onApply={(next) => {
+                const parsed = normalizeImageUtilityAnalysisDraft(
+                  analysis.type,
+                  analysis.id,
+                  next,
+                );
+                updateAnalyses(
+                  analyses.map((item) => item.id === analysis.id ? parsed : item),
+                  'Edit image analysis',
+                );
+              }}
+            />
+          </div>
+        ))}
+        {!analyses.length ? <div className="apx-canvas-v2-empty-mini">No image analysis operations yet.</div> : null}
+      </div>
+    );
+  }
+
   if (mode === 'advanced') {
     return (
       <>
@@ -214,55 +268,6 @@ export function VisualImageUtilityAuthoring({ value, mode, onChange }: Props) {
               </div>
             ) : null,
           )}
-        </div>
-
-        <div className="apx-pre4-section" data-phase10-analysis>
-          <div className="apx-canvas-section-heading">
-            <div>
-              <div className="apx-pre4-section-title">Image analysis</div>
-              <small>Structured results; does not replace the raster output.</small>
-            </div>
-          </div>
-          <div className="apx-image-utility-add-row">
-            {IMAGE_UTILITY_ANALYSIS_TYPES.map((type) => (
-              <button
-                key={type}
-                type="button"
-                className="apx-canvas-mini-button"
-                onClick={() =>
-                  updateAnalyses(
-                    [...analyses, defaultImageUtilityAnalysis(type, createVisualId('image-analysis'))],
-                    'Add image analysis',
-                  )
-                }
-              >
-                + {analysisLabel(type)}
-              </button>
-            ))}
-          </div>
-          {analyses.map((analysis) => (
-            <div className="apx-image-utility-row" data-image-analysis={analysis.type} key={analysis.id}>
-              <div>
-                <strong>{analysisLabel(analysis.type)}</strong>
-                <small>{analysis.enabled === false ? 'disabled' : 'full-runtime'}</small>
-              </div>
-              <button type="button" onClick={() => updateAnalyses(analyses.filter((item) => item.id !== analysis.id), 'Remove image analysis')}>×</button>
-              <JsonConfig
-                value={analysis}
-                onApply={(next) => {
-                  const parsed = normalizeImageUtilityAnalysisDraft(
-                    analysis.type,
-                    analysis.id,
-                    next,
-                  );
-                  updateAnalyses(
-                    analyses.map((item) => item.id === analysis.id ? parsed : item),
-                    'Edit image analysis',
-                  );
-                }}
-              />
-            </div>
-          ))}
         </div>
 
         <div className="apx-live-sync-note" data-phase10-api-coverage>
