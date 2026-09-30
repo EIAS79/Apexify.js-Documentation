@@ -1,0 +1,20 @@
+name: Image Inspector V2 verify
+on:
+  push:
+    branches:
+      - feat/image-inspector-v2
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx tsx --test scripts/studio/visual/phase5-images-shapes.test.ts scripts/studio/visual/phase10-image-effects.test.ts
+      - run: npm run build
