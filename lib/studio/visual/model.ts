@@ -397,16 +397,43 @@ export interface VisualImageMask {
   mode?: 'alpha' | 'luminance' | 'inverse';
 }
 
+export type VisualImageInterpolationMode = 'nearest' | 'bilinear' | 'bicubic';
+export type VisualImageEdgeMode = 'transparent' | 'clamp' | 'wrap' | 'mirror';
+export type VisualImageWarpFalloff = 'linear' | 'smooth' | 'gaussian';
+
+export interface VisualImageWarpControlPoint {
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  radius?: number;
+  strength?: number;
+  falloff?: VisualImageWarpFalloff;
+}
+
 export interface VisualImageDistortion {
-  type: 'perspective' | 'warp' | 'bulge' | 'pinch';
+  type: 'perspective' | 'warp' | 'bulge' | 'pinch' | 'twirl' | 'wave';
   points?: Array<{ x: number; y: number }>;
+  controlPoints?: VisualImageWarpControlPoint[];
   intensity?: number;
+  centerX?: number;
+  centerY?: number;
+  radius?: number;
+  angle?: number;
+  amplitudeX?: number;
+  amplitudeY?: number;
+  wavelengthX?: number;
+  wavelengthY?: number;
+  phaseX?: number;
+  phaseY?: number;
+  interpolation?: VisualImageInterpolationMode;
+  edgeMode?: VisualImageEdgeMode;
 }
 
 export interface VisualImageMeshWarp {
   gridX?: number;
   gridY?: number;
   controlPoints?: Array<Array<{ x: number; y: number }>>;
+  interpolation?: VisualImageInterpolationMode;
+  edgeMode?: VisualImageEdgeMode;
 }
 
 export interface VisualImageEffects {
