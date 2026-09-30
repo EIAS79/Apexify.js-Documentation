@@ -28,6 +28,7 @@ import {
   defaultVisualImageFilter,
   imageFilterFieldSpecs,
   updateVisualImageFilterValue,
+  type ImageFilterFieldSpec,
 } from '@/lib/studio/visual/image-contract';
 import { studioAssetReference, type StudioVirtualAsset } from '@/lib/studio/runtime/assets';
 import type {
@@ -883,6 +884,42 @@ function PatternEditor({
   );
 }
 
+function FilterNumberField({
+  filter,
+  field,
+  onChange,
+}: {
+  filter: VisualImageFilter;
+  field: ImageFilterFieldSpec;
+  onChange: (value: number) => void;
+}) {
+  const current = filter[field.key];
+  return (
+    <label className="apx-canvas-v2-field">
+      <span>{field.label}</span>
+      <div className="apx-canvas-v2-number">
+        <input
+          className="apx-canvas-v2-input"
+          type="number"
+          min={field.min}
+          max={field.max}
+          step={field.step}
+          value={
+            typeof current === 'number' && Number.isFinite(current)
+              ? current
+              : field.defaultValue
+          }
+          onChange={(event) => onChange(Number(event.target.value))}
+        />
+        {field.suffix ? <small>{field.suffix}</small> : null}
+      </div>
+      <small className="apx-canvas-v2-field-hint">
+        Allowed: {field.help}
+      </small>
+    </label>
+  );
+}
+
 function FilterEditor({
   filters,
   onChange,
@@ -927,6 +964,29 @@ function FilterEditor({
           const parameterless = IMAGE_FILTER_PARAMETERLESS_TYPES.includes(
             filter.type as (typeof IMAGE_FILTER_PARAMETERLESS_TYPES)[number],
           );
+          const pixelateSizeField =
+            filter.type === 'pixelate'
+              ? fields.find((field) => field.key === 'size')
+              : undefined;
+          const pixelateRegionFields =
+            filter.type === 'pixelate'
+              ? fields.filter((field) =>
+                  ['x', 'y', 'width', 'height'].includes(field.key),
+                )
+              : [];
+
+          const updateField = (field: ImageFilterFieldSpec, value: number) => {
+            update(
+              index,
+              updateVisualImageFilterValue(
+                filter,
+                field.key,
+                value,
+                width,
+                height,
+              ),
+            );
+          };
 
           return (
             <div className="apx-canvas-v2-filter-card" key={index}>
@@ -978,46 +1038,67 @@ function FilterEditor({
                   </span>
                   <em>ON</em>
                 </label>
+              ) : filter.type === 'pixelate' ? (
+                <>
+                  {pixelateSizeField ? (
+                    <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
+                      <FilterNumberField
+                        filter={filter}
+                        field={pixelateSizeField}
+                        onChange={(value) => updateField(pixelateSizeField, value)}
+                      />
+                    </div>
+                  ) : null}
+
+                  <div
+                    className="apx-canvas-v2-editor apx-canvas-v2-editor--nested"
+                    data-pixelate-region-controls
+                  >
+                    <div className="apx-canvas-v2-subhead">
+                      <div>
+                        <strong>Pixelate region</strong>
+                        <small>
+                          Position the rectangular pixelated area with X/Y, then set its width and height.
+                        </small>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update(index, {
+                            ...filter,
+                            x: 0,
+                            y: 0,
+                            width,
+                            height,
+                          })
+                        }
+                      >
+                        Full image
+                      </button>
+                    </div>
+
+                    <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
+                      {pixelateRegionFields.map((field) => (
+                        <FilterNumberField
+                          key={field.key}
+                          filter={filter}
+                          field={field}
+                          onChange={(value) => updateField(field, value)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
               ) : (
                 <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
-                  {fields.map((field) => {
-                    const current = filter[field.key];
-                    return (
-                      <label className="apx-canvas-v2-field" key={field.key}>
-                        <span>{field.label}</span>
-                        <div className="apx-canvas-v2-number">
-                          <input
-                            className="apx-canvas-v2-input"
-                            type="number"
-                            min={field.min}
-                            max={field.max}
-                            step={field.step}
-                            value={
-                              typeof current === 'number' && Number.isFinite(current)
-                                ? current
-                                : field.defaultValue
-                            }
-                            onChange={(event) => {
-                              update(
-                                index,
-                                updateVisualImageFilterValue(
-                                  filter,
-                                  field.key,
-                                  Number(event.target.value),
-                                  width,
-                                  height,
-                                ),
-                              );
-                            }}
-                          />
-                          {field.suffix ? <small>{field.suffix}</small> : null}
-                        </div>
-                        <small className="apx-canvas-v2-field-hint">
-                          Allowed: {field.help}
-                        </small>
-                      </label>
-                    );
-                  })}
+                  {fields.map((field) => (
+                    <FilterNumberField
+                      key={field.key}
+                      filter={filter}
+                      field={field}
+                      onChange={(value) => updateField(field, value)}
+                    />
+                  ))}
                 </div>
               )}
             </div>

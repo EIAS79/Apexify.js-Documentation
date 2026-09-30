@@ -472,6 +472,10 @@ test('Phase 4 filter editor exposes runtime ranges and boolean filters', () => {
   assert.match(inspector, /data-filter-boolean/);
   assert.match(inspector, /Allowed: \{field\.help\}/);
   assert.match(inspector, /clampVisualImageFilterValue/);
+  assert.match(inspector, /data-pixelate-region-controls/);
+  assert.match(inspector, /Pixelate region/);
+  assert.match(inspector, /\['x', 'y', 'width', 'height'\]/);
+  assert.match(inspector, /Full image/);
   assert.doesNotMatch(inspector, /FILTER_FIELDS/);
 });
 
