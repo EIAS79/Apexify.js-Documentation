@@ -88,6 +88,7 @@ import {
   VisualCanvasInspector,
   type CanvasVideoFrameExtractionRequest,
 } from '@/components/studio/visual/VisualCanvasInspector';
+import { VisualImageInspector } from '@/components/studio/visual/VisualImageInspector';
 import { useStudioSharedSession } from '@/components/studio/StudioSharedSession';
 import {
   STUDIO_ASSET_LIMITS,
@@ -4610,73 +4611,54 @@ export default function VisualStudioPre4({
 
     if (activeTool === 'images') {
       return (
-        <div className="apx-media-context" data-visual-images-context>
+        <div className="apx-media-context apx-image-layer-context" data-visual-images-context data-image-left-rail="layers-only">
           <div className="apx-media-context-copy">
-            <strong>Images</strong>
-            <span>Use a Studio asset, an HTTP(S) URL, or drop an image directly on the canvas.</span>
+            <strong>Image layers</strong>
+            <span>Selection, stacking, grouping, duplication and deletion live here. Image creation and properties live in the right inspector.</span>
           </div>
 
-          <div className="apx-media-url">
-            <input
-              className="apx-pre4-input"
-              value={imageUrlDraft}
-              placeholder="https://example.com/image.png"
-              onChange={(event) => setImageUrlDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && imageUrlDraft.trim()) {
-                  insertImageSource(imageUrlDraft.trim(), 'Remote image');
-                  setImageUrlDraft('');
-                }
-              }}
-            />
+          <div className="apx-pre4-layer-tree apx-image-layer-tree" data-phase17-layer-tree={layerTreeMode}>
+            <div className="apx-pre4-root-row">
+              <span>▾</span>
+              <strong>{project.name || 'Composition'}</strong>
+            </div>
+            {renderLayerRows(project.document.rootNodeIds)}
+            {!project.document.rootNodeIds.length ? (
+              <div className="apx-pre4-empty apx-pre4-empty-layers">
+                <strong>No layers yet</strong>
+                <span>Use Source & upload in the right inspector to add an image.</span>
+              </div>
+            ) : null}
+          </div>
+
+          <div className="apx-image-layer-actions" data-image-layer-actions>
             <button
               type="button"
-              disabled={!imageUrlDraft.trim()}
-              onClick={() => {
-                insertImageSource(imageUrlDraft.trim(), 'Remote image');
-                setImageUrlDraft('');
-              }}
-              data-image-url-insert
+              disabled={!selected.length}
+              onClick={() => mutate('Duplicate', (current) =>
+                duplicateNodes(current, selected, () => createVisualId('node')),
+              )}
             >
-              Add
+              Duplicate
+            </button>
+            <button
+              type="button"
+              disabled={!selected.length}
+              onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))}
+            >
+              Delete
+            </button>
+            <button type="button" disabled={selected.length < 2} onClick={groupSelection}>
+              Group
+            </button>
+            <button type="button" disabled={!selectedGroups.length} onClick={ungroupSelection}>
+              Ungroup
             </button>
           </div>
 
-          <div className="apx-media-drop-hint">
-            <ArrowDownTrayIcon />
-            <span>Drop PNG, JPG, WebP, GIF or SVG directly onto the artboard.</span>
-          </div>
-
-          <div className="apx-media-context-heading">
-            <strong>Image assets</strong>
-            <button type="button" onClick={() => openAssetWorkspace('image')}>Open Assets</button>
-          </div>
-          <div className="apx-media-asset-list">
-            {imageAssets.length ? imageAssets.map((asset) => (
-              <button
-                type="button"
-                key={asset.id}
-                title={'Insert ' + asset.name}
-                onClick={() => insertImageAsset(asset)}
-                data-image-asset-insert={asset.id}
-              >
-                <img src={phase17AssetCacheRef.current.get(asset)} alt="" />
-                <span>
-                  <strong>{asset.name}</strong>
-                  <small>
-                    {asset.metadata?.width && asset.metadata?.height
-                      ? asset.metadata.width + '×' + asset.metadata.height
-                      : asset.mime}
-                  </small>
-                </span>
-              </button>
-            )) : (
-              <div className="apx-media-context-empty">
-                <PhotoIcon />
-                <strong>No image assets yet</strong>
-                <span>Open Assets below to upload an image, or drop one on the artboard.</span>
-              </div>
-            )}
+          <div className="apx-live-sync-note">
+            <strong>Image rail = structure only</strong>
+            <span>Upload, URL, assets, fit, masks, filters, warps, effects and group rendering controls are intentionally kept out of this rail.</span>
           </div>
         </div>
       );
@@ -6607,8 +6589,29 @@ export default function VisualStudioPre4({
       return renderTextInspector();
     }
 
-    if (primaryMedia) {
-      return renderMediaInspector();
+    if (primaryMedia || (!primary && activeTool === 'images')) {
+      return (
+        <VisualImageInspector
+          project={project}
+          node={primaryMedia}
+          tab={inspectorTab}
+          assets={assets}
+          renderTransform={renderTransformFields}
+          onMutate={mutateImage}
+          onRename={(name) => {
+            if (!primaryMedia) return;
+            mutate('Rename media', (current) =>
+              renameNode(current, primaryMedia.id, name),
+            );
+          }}
+          onInsertUrl={(url) => insertImageSource(url, 'Remote image')}
+          onInsertAsset={(asset) => insertImageAsset(asset)}
+          onUploadFiles={(files) => {
+            void addImageFiles(files);
+          }}
+          onOpenAssets={() => openAssetWorkspace('image')}
+        />
+      );
     }
 
     if (!primary && activeTool === 'canvas') {
