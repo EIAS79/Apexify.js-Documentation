@@ -1322,6 +1322,30 @@ for (const requirement of deepInventoryRequirements) {
   }
 }
 
+const sourceMappingRequirements = [
+  { symbol: 'ApexPainter.createCanvas', validationFile: 'lib-next/canvas/canvas-validation.ts' },
+  { symbol: 'ApexPainter.createImage', validationFile: 'lib-next/image/image-validation.ts' },
+  { symbol: 'ApexPainter.createText', validationFile: 'lib-next/text/text-validation.ts' },
+  { symbol: 'ApexPainter.measureText', validationFile: 'lib-next/text/text-validation.ts' },
+] as const;
+const sourceMappingFailures: string[] = [];
+for (const requirement of sourceMappingRequirements) {
+  const surface = surfaces.find((item) => item.publicSymbol === requirement.symbol);
+  if (!surface) {
+    sourceMappingFailures.push(requirement.symbol + ': public surface not found');
+    continue;
+  }
+  if (!surface.validationFiles.includes(requirement.validationFile)) {
+    sourceMappingFailures.push(
+      requirement.symbol + ': call graph did not reach ' + requirement.validationFile +
+      ' (reached: ' + surface.validationFiles.join(', ') + ')',
+    );
+  }
+  if (surface.implementationFiles.length < 2) {
+    sourceMappingFailures.push(requirement.symbol + ': implementation call graph is unexpectedly shallow');
+  }
+}
+
 const runtimeSurfaceSymbols = new Set(surfaces.map((surface) => surface.publicSymbol));
 const runtimeSourceCorpus = [...sourceText.values()].join('\n');
 const reconciliationLegacy = legacyRows.map((row) => {
@@ -1498,6 +1522,13 @@ if (deepTypeFailures.length) {
     message: deepTypeFailures.join(' | '),
   });
 }
+if (sourceMappingFailures.length) {
+  drift.push({
+    code: 'PARITY-SOURCE-MAPPING',
+    severity: 'error',
+    message: sourceMappingFailures.join(' | '),
+  });
+}
 drift.push({
   code: 'PARITY-SURFACE-RECONCILIATION',
   severity: reconciliationCounts.runtimeOnly || reconciliationCounts.legacyNotCurrentPublicSurface || reconciliationCounts.removedFromCurrentRuntime ? 'warning' : 'info',
@@ -1560,6 +1591,7 @@ const gapSummary: GapSummary = {
     zeroSilentPublicSurfaceOmissions: omissions.length === 0,
     deepRecursiveTypeResolution: deepTypeFailures.length === 0,
     surfaceReconciliationComplete,
+    sourceMappingVerified: sourceMappingFailures.length === 0,
     noBootstrapFullClaims: statusCounts.FULL === 0,
     everyRecordHasStatus: [...surfaces, ...records].every((item) => PARITY_STATUSES.includes(item.status)),
     baselineComplete: false,
@@ -1589,6 +1621,7 @@ const sourceMapArtifact = {
         source: surface.source,
         implementationFiles: surface.implementationFiles,
         validationFiles: surface.validationFiles,
+        sourceEvidence: surface.sourceEvidence,
       },
     ]),
   ),
