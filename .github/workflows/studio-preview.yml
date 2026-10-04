@@ -1,0 +1,36 @@
+name: Studio Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: 'Studio/parity branch or commit to publish to the controlled Vercel preview'
+        required: true
+        default: 'studio-parity-1-canvas'
+        type: string
+
+concurrency:
+  group: studio-preview-publish
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - name: Checkout requested checkpoint
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref }}
+          fetch-depth: 1
+
+      - name: Publish checkpoint to studio-preview
+        run: |
+          source_sha="$(git rev-parse HEAD)"
+          echo "Publishing ${{ inputs.source_ref }} @ $source_sha to studio-preview"
+          git push origin HEAD:refs/heads/studio-preview --force
+          echo "Vercel Git integration will build only this explicit checkpoint."
