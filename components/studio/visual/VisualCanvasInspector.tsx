@@ -2011,7 +2011,7 @@ export function VisualCanvasInspector({
                   <label className="apx-canvas-v2-check-card">
                     <input
                       type="checkbox"
-                      checked={canvas.videoBg.loop ?? false}
+                      checked={legacyVideoBg?.loop ?? false}
                       onChange={(event) =>
                         onMutate('Legacy video background loop flag', (current) => ({
                           ...current,
@@ -2030,7 +2030,7 @@ export function VisualCanvasInspector({
                   <label className="apx-canvas-v2-check-card">
                     <input
                       type="checkbox"
-                      checked={canvas.videoBg.autoplay ?? false}
+                      checked={legacyVideoBg?.autoplay ?? false}
                       onChange={(event) =>
                         onMutate('Legacy video background autoplay flag', (current) => ({
                           ...current,
