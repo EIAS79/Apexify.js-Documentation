@@ -619,6 +619,7 @@ function makeParityRecord(args: {
   unionVariant?: string | null;
   sourceFiles: string[];
   implementationFiles: string[];
+  sourceEvidence: SourceEvidence;
   symbol?: ts.Symbol;
   status: ParityStatus;
   notes?: string[];
@@ -626,13 +627,14 @@ function makeParityRecord(args: {
   const leaf = normalizeToken(args.optionPath);
   const acceptedValues = literalValues(args.type);
   const deprecation = jsDocDeprecation(args.symbol);
-  const validationFiles = validationFilesFor(leaf);
+  const validationFiles = leafValidationFiles(args.sourceEvidence);
+  const runtimeDefault = leafDefaultFromEvidence(args.sourceEvidence, leaf);
   const evidence = legacyEvidence(args.publicSymbol, leaf);
   const hasLeafEvidence = Boolean(evidence.legacyOptionInventoryMatches?.length);
   let recordStatus = args.status;
   if (recordStatus === 'PARTIAL' && !hasLeafEvidence) recordStatus = 'UNKNOWN';
   const notes = [...(args.notes ?? [])];
-  if (!validationFiles.length) notes.push('VALIDATION_AUDIT_PENDING');
+  if (!validationFiles.length) notes.push('VALIDATION_SOURCE_NOT_REACHED_FROM_PUBLIC_CALL_GRAPH');
   if (!hasLeafEvidence && evidence.capabilityRowFound) notes.push('CAPABILITY_EVIDENCE_ONLY_LEAF_UNPROVEN');
   if (!evidence.capabilityRowFound) notes.push('LEGACY_CAPABILITY_ROW_ABSENT');
 
@@ -653,12 +655,12 @@ function makeParityRecord(args: {
     sourceFiles: [...new Set(args.sourceFiles)].sort(),
     implementationFiles: [...new Set(args.implementationFiles)].sort(),
     validationFiles,
-    runtimeDefault: null,
+    runtimeDefault,
     acceptedValues,
-    constraints: [],
+    constraints: [...new Set(args.sourceEvidence.errors.map((item) => item.errorClass))],
     deprecation,
     runtimeInteractions: [],
-    resourceLimits: [],
+    resourceLimits: [...new Set(args.sourceEvidence.resourceLimits.map((item) => item.limit))],
     runtimeSupport: {
       node: 'supported',
       browser: 'unknown',
@@ -700,6 +702,7 @@ function walkType(args: {
   symbol?: ts.Symbol;
   sourceFiles: string[];
   implementationFiles: string[];
+  sourceEvidence: SourceEvidence;
   status: ParityStatus;
   records: RuntimeParityRecord[];
   ancestry: Set<string>;
@@ -780,7 +783,7 @@ function walkType(args: {
 
   if (type.isUnion()) {
     const values = literalValues(type);
-    if (values.length === type.types.length) {
+    if (type.types.every((part) => isBuiltinLeaf(part, checker.typeToString(part)))) {
       args.records.push(makeParityRecord({ ...args, type }));
       return;
     }
@@ -895,7 +898,9 @@ function addSurface(args: {
   const legacy = legacyByCapability.get(args.publicSymbol);
   const status = args.status ?? capabilityStatus(args.publicSymbol);
   const source = sourceLocation(args.declaration);
-  const implementationFiles = implementationFilesFor(args.member, source.file);
+  const sourceEvidence = sourceEvidenceForDeclaration(args.declaration);
+  const implementationFiles = filesFromLocations(sourceEvidence.implementation);
+  const validationFiles = filesFromLocations(sourceEvidence.validation);
   const inputRecords: RuntimeParityRecord[] = [];
   const outputRecords: RuntimeParityRecord[] = [];
   const signatureText = checker.signatureToString(
@@ -918,6 +923,7 @@ function addSurface(args: {
       symbol: parameter,
       sourceFiles,
       implementationFiles,
+      sourceEvidence,
       status,
       records: inputRecords,
       ancestry: new Set(),
@@ -934,6 +940,7 @@ function addSurface(args: {
     parentType: null,
     sourceFiles: declarationFilesOfSymbol(returnType.aliasSymbol ?? returnType.getSymbol()),
     implementationFiles,
+    sourceEvidence,
     status,
     records: outputRecords,
     ancestry: new Set(),
@@ -967,7 +974,8 @@ function addSurface(args: {
     signature: signatureText,
     source,
     implementationFiles,
-    validationFiles: validationFilesFor(args.member),
+    validationFiles,
+    sourceEvidence,
     inputRecordCount: inputRecords.length,
     outputRecordCount: outputRecords.length,
     legacyStudio: legacyEvidence(args.publicSymbol),
@@ -993,7 +1001,9 @@ function addPropertySurface(args: {
   const legacy = legacyByCapability.get(args.publicSymbol);
   const status = args.status ?? capabilityStatus(args.publicSymbol);
   const source = sourceLocation(args.declaration);
-  const implementationFiles = implementationFilesFor(args.member, source.file);
+  const sourceEvidence = sourceEvidenceForDeclaration(args.declaration);
+  const implementationFiles = filesFromLocations(sourceEvidence.implementation);
+  const validationFiles = filesFromLocations(sourceEvidence.validation);
   const outputRecords: RuntimeParityRecord[] = [];
 
   walkType({
@@ -1004,6 +1014,7 @@ function addPropertySurface(args: {
     parentType: null,
     sourceFiles: declarationFilesOfSymbol(args.type.aliasSymbol ?? args.type.getSymbol()),
     implementationFiles,
+    sourceEvidence,
     status,
     records: outputRecords,
     ancestry: new Set(),
@@ -1020,7 +1031,8 @@ function addPropertySurface(args: {
     signature: checker.typeToString(args.type, args.declaration, ts.TypeFormatFlags.NoTruncation),
     source,
     implementationFiles,
-    validationFiles: validationFilesFor(args.member),
+    validationFiles,
+    sourceEvidence,
     inputRecordCount: 0,
     outputRecordCount: outputRecords.length,
     legacyStudio: legacyEvidence(args.publicSymbol),
