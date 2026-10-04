@@ -4,18 +4,7 @@ on:
   push:
     branches:
       - 'studio-parity-*'
-    paths:
-      - 'app/studio/**'
-      - 'app/api/gallery/run/**'
-      - 'components/studio/**'
-      - 'lib/studio/**'
-      - 'scripts/studio/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tsconfig.json'
-      - 'vercel.json'
-      - '.github/workflows/studio-fast.yml'
-  pull_request:
+      - 'studio-visual/**'
     paths:
       - 'app/studio/**'
       - 'app/api/gallery/run/**'
@@ -30,7 +19,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: studio-fast-${{ github.event.pull_request.number || github.ref }}
+  group: studio-fast-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -58,6 +47,6 @@ jobs:
 
       - name: Run affected Studio validation
         env:
-          STUDIO_CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
-          STUDIO_CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          STUDIO_CI_BASE_SHA: ${{ github.event.before }}
+          STUDIO_CI_HEAD_SHA: ${{ github.sha }}
         run: npm run studio:ci:fast
