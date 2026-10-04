@@ -569,22 +569,25 @@ function walkType(args: {
 
     for (const part of type.types) {
       const variantText = checker.typeToString(part, undefined, ts.TypeFormatFlags.NoTruncation);
-      args.records.push(makeParityRecord({
-        ...args,
-        type: part,
-        unionVariant: variantText,
-        notes: ['discriminated/structural union variant inventory marker'],
-      }));
-      if (!isBuiltinLeaf(part)) {
-        walkType({
+      if (isBuiltinLeaf(part)) {
+        args.records.push(makeParityRecord({
           ...args,
           type: part,
-          parentType: typeText,
           unionVariant: variantText,
-          depth: args.depth + 1,
-          ancestry: nextAncestry,
-        });
+          notes: ['discrete union variant'],
+        }));
+        continue;
       }
+      // Structural variants are represented by their variant-tagged recursive leaves.
+      // This avoids storing both a giant object-union marker and the same semantic tree.
+      walkType({
+        ...args,
+        type: part,
+        parentType: typeText,
+        unionVariant: variantText,
+        depth: args.depth + 1,
+        ancestry: nextAncestry,
+      });
     }
     return;
   }
