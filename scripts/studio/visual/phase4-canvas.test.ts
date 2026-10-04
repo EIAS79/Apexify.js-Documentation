@@ -918,3 +918,54 @@ test('STUDIO-PARITY-1 does not reject stroke/shadow numeric ranges accepted by t
     assert.equal(validation.ok, true, JSON.stringify(validation.issues));
   }
 });
+
+
+test('STUDIO-PARITY-1 owns createCanvas painterOpts.resolveAssetRefs end to end', () => {
+  const project = createVisualProject({
+    width: 320,
+    height: 180,
+    now: '2026-10-05T00:00:00.000Z',
+  });
+  project.document.canvas = { colorBg: '#123456' };
+  project.document.canvasPainterOpts = { resolveAssetRefs: true };
+
+  const plan = lowerVisualProject(project);
+  const canvasOperation = plan.operations.find(
+    (operation) => operation.kind === 'create-canvas',
+  );
+  assert.ok(canvasOperation && canvasOperation.kind === 'create-canvas');
+  if (!canvasOperation || canvasOperation.kind !== 'create-canvas') return;
+  assert.deepEqual(canvasOperation.painterOpts, { resolveAssetRefs: true });
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /createCanvas\([\s\S]*resolveAssetRefs: true/);
+
+  const empty = createVisualProject({
+    width: 10,
+    height: 10,
+    now: project.createdAt,
+  });
+  const reconciled = reconcileVisualProjectFromCode(empty, source);
+  assert.equal(reconciled.ok, true);
+  if (!reconciled.ok) return;
+  assert.deepEqual(reconciled.project.document.canvasPainterOpts, {
+    resolveAssetRefs: true,
+  });
+  assert.equal(
+    generateVisualProjectCode(reconciled.project).source,
+    source,
+  );
+
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualCanvasInspector.tsx',
+    'utf8',
+  );
+  const shell = fs.readFileSync(
+    'components/studio/visual/VisualStudioPre4.tsx',
+    'utf8',
+  );
+  assert.match(inspector, /data-canvas-resolve-asset-refs/);
+  assert.match(inspector, /painterOpts\.resolveAssetRefs/);
+  assert.match(shell, /Canvas asset reference resolution/);
+  assert.match(shell, /canvasPainterOpts:/);
+});
