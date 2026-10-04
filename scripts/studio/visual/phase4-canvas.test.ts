@@ -572,7 +572,7 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.doesNotMatch(inspector, /title="Video background & frame extraction"/);
   assert.match(inspector, /Video background frame selector/);
   assert.match(inspector, /Video background time selector/);
-  assert.match(inspector, /Advanced is intentionally non-duplicative/);
+  assert.match(inspector, /painterOpts\.resolveAssetRefs runtime switch/);
   assert.match(shell, /setArtboardPreviewUrl\(studioAssetDataUrl\(extractedAsset\)\)/);
   assert.match(shell, /projectRef\.current = next/);
   assert.match(shell, /validateVirtualCanvasSource/);
