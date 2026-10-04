@@ -78,7 +78,6 @@ export type RuntimeParityRecord = {
   sourceFiles: string[];
   implementationFiles: string[];
   validationFiles: string[];
-  sourceEvidence: SourceEvidence;
   runtimeDefault: unknown | null;
   acceptedValues: Array<string | number | boolean | null>;
   constraints: string[];
