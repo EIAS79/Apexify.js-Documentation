@@ -586,12 +586,21 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   assert.match(shell, /phase13Timeline/);
   assert.match(shell, /setPhase13Timeline/);
 
+  assert.match(inspector, /IMAGE_FILTER_TYPES/);
+  const imageContract = fs.readFileSync(
+    'lib/studio/visual/image-contract.ts',
+    'utf8',
+  );
   for (const filterType of [
     'gaussianBlur','motionBlur','radialBlur','sharpen','noise','grain',
     'edgeDetection','emboss','invert','grayscale','sepia','pixelate',
     'brightness','contrast','saturation','hueShift','posterize',
   ]) {
-    assert.ok(inspector.includes(filterType), 'missing Canvas filter UI: ' + filterType);
+    assert.ok(
+      imageContract.includes(filterType),
+      'missing canonical image filter type used by Canvas: ' + filterType,
+    );
+  }
   }
 });
 
