@@ -103,6 +103,15 @@ export function normalizeVisualProject(project: VisualProject): VisualProject {
             canvas: normalizeCanvasConfig(project.document.canvas),
           }
         : {}),
+      ...(project.document.canvasPainterOpts !== undefined
+        ? {
+            canvasPainterOpts: {
+              ...(project.document.canvasPainterOpts.resolveAssetRefs !== undefined
+                ? { resolveAssetRefs: project.document.canvasPainterOpts.resolveAssetRefs }
+                : {}),
+            },
+          }
+        : {}),
       rootNodeIds: [...project.document.rootNodeIds],
       nodes: Object.fromEntries(nodeEntries),
     },
