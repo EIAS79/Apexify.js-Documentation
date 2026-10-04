@@ -223,7 +223,7 @@ const parsedRuntimeConfig = ts.parseJsonConfigFileContent(
   runtimeTsconfig,
 );
 const runtimeFiles = parsedRuntimeConfig.fileNames
-  .filter((file) => file.startsWith(sourceRoot) && /\\.ts$/.test(file) && !/\\.d\\.ts$/.test(file))
+  .filter((file) => file.startsWith(sourceRoot) && /\.ts$/.test(file) && !/\.d\.ts$/.test(file))
   .sort();
 if (!runtimeFiles.length) {
   throw new Error('[studio-parity] pinned runtime tsconfig resolved zero lib-next TypeScript files.');
@@ -273,7 +273,7 @@ const runtimeDiagnostics = ts.getPreEmitDiagnostics(program)
   .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
 const unresolvedInternalDiagnostics = runtimeDiagnostics.filter((diagnostic) => {
   const text = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-  return /Cannot find module ['"]\\.{1,2}\\//i.test(text);
+  return /Cannot find module ['"]\.{1,2}\//i.test(text);
 });
 if (unresolvedInternalDiagnostics.length) {
   const preview = unresolvedInternalDiagnostics.slice(0, 12).map((diagnostic) => {
