@@ -89,7 +89,7 @@ async function proveFixture(
 
   const preview = await executeStudioOperationPlan(lowerVisualProject(project), {
     createCanvas: async (options) => {
-      const result = await painter.createCanvas(options as Record<string, unknown>);
+      const result = await painter.createCanvas(options as unknown as Record<string, unknown>);
       return { buffer: result.buffer };
     },
   });
@@ -114,8 +114,11 @@ async function proveFixture(
     source,
     inheritedDimensions,
   );
-  assert.equal(reconciled.ok, true, name + ': generated source must reverse-sync');
-  if (!reconciled.ok) throw new Error(reconciled.error);
+  if (!reconciled.ok) {
+    throw new Error(
+      name + ': generated source must reverse-sync: ' + reconciled.error,
+    );
+  }
 
   assert.deepEqual(
     semanticCanvas(reconciled.project),
@@ -351,8 +354,9 @@ const omitted = reconcileVisualProjectFromCode(
     return canvas.buffer;
   `,
 );
-assert.equal(omitted.ok, true);
-if (!omitted.ok) throw new Error(omitted.error);
+if (!omitted.ok) {
+  throw new Error('Omitted-dimension reconciliation failed: ' + omitted.error);
+}
 assert.equal(omitted.project.document.width, 500);
 assert.equal(omitted.project.document.height, 500);
 
