@@ -116,6 +116,22 @@ function walk(dir: string): string[] {
   return out;
 }
 
+function fsKey(file: string): string {
+  const normalized = path.resolve(file).replaceAll(path.sep, '/');
+  return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
+}
+
+const runtimeRootKey = fsKey(runtimeRoot);
+const sourceRootKey = fsKey(sourceRoot);
+
+function isRuntimePath(file: string): boolean {
+  return fsKey(file) === runtimeRootKey || fsKey(file).startsWith(runtimeRootKey + '/');
+}
+
+function isRuntimeSourcePath(file: string): boolean {
+  return fsKey(file) === sourceRootKey || fsKey(file).startsWith(sourceRootKey + '/');
+}
+
 function relRuntime(file: string): string {
   return path.relative(runtimeRoot, file).replaceAll(path.sep, '/');
 }
@@ -223,7 +239,7 @@ const parsedRuntimeConfig = ts.parseJsonConfigFileContent(
   runtimeTsconfig,
 );
 const runtimeFiles = parsedRuntimeConfig.fileNames
-  .filter((file) => file.startsWith(sourceRoot) && /\.ts$/.test(file) && !/\.d\.ts$/.test(file))
+  .filter((file) => isRuntimeSourcePath(file) && /\.ts$/.test(file) && !/\.d\.ts$/.test(file))
   .sort();
 if (!runtimeFiles.length) {
   throw new Error('[studio-parity] pinned runtime tsconfig resolved zero lib-next TypeScript files.');
@@ -269,7 +285,7 @@ const program = ts.createProgram({
 const checker = program.getTypeChecker();
 
 const runtimeDiagnostics = ts.getPreEmitDiagnostics(program)
-  .filter((diagnostic) => diagnostic.file?.fileName.startsWith(sourceRoot))
+  .filter((diagnostic) => diagnostic.file ? isRuntimeSourcePath(diagnostic.file.fileName) : false)
   .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
 const unresolvedInternalDiagnostics = runtimeDiagnostics.filter((diagnostic) => {
   const text = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
@@ -289,7 +305,7 @@ if (unresolvedInternalDiagnostics.length) {
 
 const classDeclarations = new Map<string, ts.ClassDeclaration>();
 for (const sourceFile of program.getSourceFiles()) {
-  if (!sourceFile.fileName.startsWith(sourceRoot)) continue;
+  if (!isRuntimeSourcePath(sourceFile.fileName)) continue;
   ts.forEachChild(sourceFile, function visit(node) {
     if (ts.isClassDeclaration(node) && node.name) classDeclarations.set(node.name.text, node);
     ts.forEachChild(node, visit);
@@ -336,7 +352,7 @@ function declarationFilesOfSymbol(symbol: ts.Symbol | undefined): string[] {
   return [...new Set(
     (symbol.declarations ?? [])
       .map((decl) => decl.getSourceFile().fileName)
-      .filter((file) => file.startsWith(runtimeRoot))
+      .filter((file) => isRuntimePath(file))
       .map(relRuntime),
   )].sort();
 }
@@ -537,7 +553,7 @@ function isRuntimeClassType(type: ts.Type): boolean {
   return Boolean(
     symbol?.declarations?.some(
       (decl) =>
-        decl.getSourceFile().fileName.startsWith(runtimeRoot) &&
+        isRuntimePath(decl.getSourceFile().fileName) &&
         ts.isClassDeclaration(decl),
     ),
   );
@@ -902,7 +918,7 @@ function publicCallSignatures(type: ts.Type): ts.Signature[] {
 
 function typeBelongsToRuntime(type: ts.Type): boolean {
   const symbol = type.aliasSymbol ?? type.getSymbol();
-  return Boolean(symbol?.declarations?.some((decl) => decl.getSourceFile().fileName.startsWith(runtimeRoot)));
+  return Boolean(symbol?.declarations?.some((decl) => isRuntimePath(decl.getSourceFile().fileName)));
 }
 
 function enumerateFacetType(
@@ -1042,7 +1058,7 @@ function enumerateClass(className: string, prefix = className): void {
     const symbol = prefix + '.' + prop.getName();
     if (surfaceBuilds.has(symbol)) continue;
     const decl = prop.valueDeclaration ?? prop.declarations?.[0];
-    if (!decl || !decl.getSourceFile().fileName.startsWith(runtimeRoot)) continue;
+    if (!decl || !isRuntimePath(decl.getSourceFile().fileName)) continue;
     const propType = checker.getTypeOfSymbolAtLocation(prop, decl);
     const calls = propType.getCallSignatures();
     if (calls.length) {
