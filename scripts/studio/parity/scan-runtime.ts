@@ -208,6 +208,10 @@ const installedPinCommit = /#([0-9a-f]{40})\b/i.exec(installedPin ?? '')?.[1] ??
 const runtimePackage = readJson<{ version?: string }>(path.join(runtimeRoot, 'package.json'), {});
 const runtimeFiles = walk(sourceRoot).sort();
 const sourceText = new Map(runtimeFiles.map((file) => [file, fs.readFileSync(file, 'utf8')]));
+const sourceTextLower = new Map([...sourceText].map(([file, value]) => [file, value.toLowerCase()]));
+const validationCandidateFiles = runtimeFiles.filter((file) =>
+  /validat|limit|policy|config|runtime/i.test(relRuntime(file)),
+);
 
 const compilerOptions: ts.CompilerOptions = {
   // Match Apexify.js' own source compiler mode. NodeNext rejects the runtime's
@@ -355,9 +359,8 @@ function unwrapPromise(type: ts.Type): ts.Type {
 function validationFilesFor(leaf: string): string[] {
   if (!leaf || leaf.length < 2) return [];
   const lower = leaf.toLowerCase();
-  return runtimeFiles
-    .filter((file) => /validat|limit|policy|config|runtime/i.test(relRuntime(file)))
-    .filter((file) => sourceText.get(file)?.toLowerCase().includes(lower))
+  return validationCandidateFiles
+    .filter((file) => sourceTextLower.get(file)?.includes(lower))
     .slice(0, 12)
     .map(relRuntime);
 }
@@ -559,6 +562,15 @@ function walkType(args: {
         });
       }
     }
+    return;
+  }
+
+  if (!typeBelongsToRuntime(type)) {
+    args.records.push(makeParityRecord({
+      ...args,
+      type,
+      notes: ['external/platform type boundary retained as an opaque parity leaf'],
+    }));
     return;
   }
 
