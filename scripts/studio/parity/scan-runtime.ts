@@ -637,6 +637,19 @@ function capabilityStatus(symbol: string): ParityStatus {
   return legacyStatus(legacyByCapability.get(symbol));
 }
 
+function mergeUniqueRecords(
+  target: RuntimeParityRecord[],
+  incoming: RuntimeParityRecord[],
+): void {
+  const ids = new Set(target.map((record) => record.id));
+  for (const record of incoming) {
+    if (!ids.has(record.id)) {
+      target.push(record);
+      ids.add(record.id);
+    }
+  }
+}
+
 function addSurface(args: {
   owner: string;
   publicSymbol: string;
@@ -646,7 +659,6 @@ function addSurface(args: {
   signature: ts.Signature;
   status?: ParityStatus;
 }): void {
-  if (surfaceBuilds.has(args.publicSymbol)) return;
   const legacy = legacyByCapability.get(args.publicSymbol);
   const status = args.status ?? capabilityStatus(args.publicSymbol);
   const source = sourceLocation(args.declaration);
@@ -687,13 +699,30 @@ function addSurface(args: {
     direction: 'output',
     type: returnType,
     parentType: null,
-    sourceFiles: declarationFilesOfSymbol(returnType.getSymbol()),
+    sourceFiles: declarationFilesOfSymbol(returnType.aliasSymbol ?? returnType.getSymbol()),
     implementationFiles,
     status,
     records: outputRecords,
     ancestry: new Set(),
     depth: 0,
   });
+
+  const existing = surfaceBuilds.get(args.publicSymbol);
+  if (existing) {
+    mergeUniqueRecords(existing.inputRecords, inputRecords);
+    mergeUniqueRecords(existing.outputRecords, outputRecords);
+    existing.record.inputRecordCount = existing.inputRecords.length;
+    existing.record.outputRecordCount = existing.outputRecords.length;
+    const signatures = new Set(existing.record.signature.split('\nOVERLOAD: '));
+    if (!signatures.has(signatureText)) {
+      existing.record.signature += '\nOVERLOAD: ' + signatureText;
+    }
+    for (const file of implementationFiles) {
+      if (!existing.record.implementationFiles.includes(file)) existing.record.implementationFiles.push(file);
+    }
+    existing.record.implementationFiles.sort();
+    return;
+  }
 
   const record: PublicSurfaceRecord = {
     id: stableId(args.publicSymbol),
@@ -716,6 +745,59 @@ function addSurface(args: {
   };
 
   surfaceBuilds.set(args.publicSymbol, { record, inputRecords, outputRecords });
+}
+
+function addPropertySurface(args: {
+  owner: string;
+  publicSymbol: string;
+  member: string;
+  kind: 'property' | 'getter';
+  declaration: ts.Declaration;
+  type: ts.Type;
+  status?: ParityStatus;
+}): void {
+  if (surfaceBuilds.has(args.publicSymbol)) return;
+  const legacy = legacyByCapability.get(args.publicSymbol);
+  const status = args.status ?? capabilityStatus(args.publicSymbol);
+  const source = sourceLocation(args.declaration);
+  const implementationFiles = implementationFilesFor(args.member, source.file);
+  const outputRecords: RuntimeParityRecord[] = [];
+
+  walkType({
+    publicSymbol: args.publicSymbol,
+    optionPath: args.publicSymbol + '.value',
+    direction: 'output',
+    type: args.type,
+    parentType: null,
+    sourceFiles: declarationFilesOfSymbol(args.type.aliasSymbol ?? args.type.getSymbol()),
+    implementationFiles,
+    status,
+    records: outputRecords,
+    ancestry: new Set(),
+    depth: 0,
+  });
+
+  const record: PublicSurfaceRecord = {
+    id: stableId(args.publicSymbol),
+    publicSymbol: args.publicSymbol,
+    owner: args.owner,
+    member: args.member,
+    kind: args.kind,
+    domain: domainFor(args.publicSymbol, legacy),
+    signature: checker.typeToString(args.type, args.declaration, ts.TypeFormatFlags.NoTruncation),
+    source,
+    implementationFiles,
+    validationFiles: validationFilesFor(args.member),
+    inputRecordCount: 0,
+    outputRecordCount: outputRecords.length,
+    legacyStudio: legacyEvidence(args.publicSymbol),
+    status,
+    notes: legacy
+      ? ['legacy Studio row imported as evidence only; old implementation/classification does not satisfy FULL']
+      : ['public property/getter has no matching legacy Studio capability row'],
+  };
+
+  surfaceBuilds.set(args.publicSymbol, { record, inputRecords: [], outputRecords });
 }
 
 function publicCallSignatures(type: ts.Type): ts.Signature[] {
@@ -759,6 +841,15 @@ function enumerateFacetType(
       }
       continue;
     }
+
+    addPropertySurface({
+      owner,
+      publicSymbol: symbol,
+      member: prop.getName(),
+      kind: 'property',
+      declaration: decl,
+      type: propType,
+    });
 
     if (
       depth < MAX_FACET_DEPTH &&
@@ -804,22 +895,18 @@ function enumerateClass(className: string, prefix = className): void {
     }
 
     if (ts.isGetAccessorDeclaration(member)) {
-      const signature = checker.getSignatureFromDeclaration(member);
       const memberType = checker.getTypeAtLocation(member);
-      if (signature) {
-        const fakeCall = memberType.getCallSignatures()[0];
-        if (fakeCall) {
-          addSurface({
-            owner: className,
-            publicSymbol: prefix + '.' + memberName,
-            member: memberName,
-            kind: 'getter',
-            declaration: member,
-            signature: fakeCall,
-          });
-        }
+      addPropertySurface({
+        owner: className,
+        publicSymbol: prefix + '.' + memberName,
+        member: memberName,
+        kind: 'getter',
+        declaration: member,
+        type: memberType,
+      });
+      if (typeBelongsToRuntime(memberType)) {
+        enumerateFacetType(className, prefix + '.' + memberName, memberType, 0);
       }
-      if (typeBelongsToRuntime(memberType)) enumerateFacetType(className, prefix + '.' + memberName, memberType, 0);
       continue;
     }
 
@@ -837,8 +924,18 @@ function enumerateClass(className: string, prefix = className): void {
             signature,
           });
         }
-      } else if (typeBelongsToRuntime(memberType)) {
-        enumerateFacetType(className, prefix + '.' + memberName, memberType, 0);
+      } else {
+        addPropertySurface({
+          owner: className,
+          publicSymbol: prefix + '.' + memberName,
+          member: memberName,
+          kind: 'property',
+          declaration: member,
+          type: memberType,
+        });
+        if (typeBelongsToRuntime(memberType)) {
+          enumerateFacetType(className, prefix + '.' + memberName, memberType, 0);
+        }
       }
     }
   }
