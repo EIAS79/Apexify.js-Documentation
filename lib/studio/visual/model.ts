@@ -647,6 +647,10 @@ export interface VisualCanvasImageBackgroundOptions {
   opacity?: number;
 }
 
+export interface VisualPainterAssetRefsOptions {
+  resolveAssetRefs?: boolean;
+}
+
 export interface VisualCanvasConfig {
   x?: number;
   y?: number;
@@ -715,6 +719,8 @@ export interface VisualDocument {
   pixelRatioPolicy?: 'auto' | 'fixed' | 'capped-auto';
   background?: VisualValue;
   canvas?: VisualCanvasConfig;
+  /** Trailing createCanvas() painter options; kept separate from CanvasConfig. */
+  canvasPainterOpts?: VisualPainterAssetRefsOptions;
   rootNodeIds: string[];
   nodes: Record<string, VisualNode>;
 }
