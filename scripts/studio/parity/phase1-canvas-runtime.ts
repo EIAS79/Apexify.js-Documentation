@@ -4,13 +4,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-import { createVisualProject } from '../../..//lib/studio/visual/project';
-import { lowerVisualProject } from '../../..//lib/studio/visual/compiler/plan';
-import { executeStudioOperationPlan } from '../../..//lib/studio/visual/compiler/execute';
-import { validateVisualProject } from '../../..//lib/studio/visual/compiler/validate';
-import { generateVisualProjectCode } from '../../..//lib/studio/visual/codegen/generator';
-import { reconcileVisualProjectFromCode } from '../../..//lib/studio/visual/codegen/reconcile';
-import type { VisualCanvasConfig, VisualProject } from '../../..//lib/studio/visual/model';
+import { createVisualProject } from '../../../lib/studio/visual/project';
+import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
+import { executeStudioOperationPlan } from '../../../lib/studio/visual/compiler/execute';
+import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
+import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
+import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
+import type { VisualCanvasConfig, VisualProject } from '../../../lib/studio/visual/model';
 
 const root = process.cwd();
 const runtimeRoot = path.resolve(
@@ -40,6 +40,7 @@ if (!fs.existsSync(runtimeEntry)) {
   );
 }
 
+async function main() {
 const runtime = (await import(pathToFileURL(runtimeEntry).href)) as {
   ApexPainter: new () => {
     createCanvas(options: Record<string, unknown>): Promise<{ buffer: Uint8Array }>;
@@ -415,3 +416,12 @@ console.log(
 if (edgeResults.some((item) => item.studioAccepts !== item.runtimeAccepts)) {
   process.exitCode = 2;
 }
+
+
+}
+
+main().catch((error) => {
+  console.error('[studio-parity-1] canvas runtime proof failed');
+  console.error(error);
+  process.exitCode = 1;
+});
