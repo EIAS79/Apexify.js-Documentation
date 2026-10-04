@@ -46,10 +46,11 @@ test('phase 1 Visual Studio shell contracts remain present as the editor evolves
   assert.doesNotMatch(visual, /createCanvas\(|createImage\(|createText\(|createChart\(/);
 });
 
-test('phase 1 deploys only main through Vercel Git integration', () => {
+test('phase 1 deploys only main and the controlled studio-preview branch through Vercel Git integration', () => {
   const vercel = JSON.parse(read('vercel.json')) as {
     git?: { deploymentEnabled?: Record<string, boolean> };
   };
   assert.equal(vercel.git?.deploymentEnabled?.['*'], false);
   assert.equal(vercel.git?.deploymentEnabled?.main, true);
+  assert.equal(vercel.git?.deploymentEnabled?.['studio-preview'], true);
 });
