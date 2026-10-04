@@ -125,6 +125,13 @@ jobs:
           if git diff --cached --quiet; then
             echo "Phase-1 Canvas evidence already committed."
           else
+            remote_sha="$(git ls-remote origin refs/heads/studio-parity-1-canvas | cut -f1)"
+            local_sha="$(git rev-parse HEAD)"
+            if [ -n "$remote_sha" ] && [ "$remote_sha" != "$local_sha" ]; then
+              echo "studio-parity-1-canvas advanced during this run; skipping a stale evidence push."
+              echo "The newer branch push will regenerate and verify the deterministic evidence."
+              exit 0
+            fi
             git commit -m "chore(studio-parity-1): commit Canvas completion evidence [skip ci]"
             git push origin HEAD:studio-parity-1-canvas
           fi
