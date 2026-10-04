@@ -1,0 +1,8 @@
+{
+  "repository": "EIAS79/Apexify.js",
+  "commit": "a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a",
+  "sourceRoot": "lib-next",
+  "program": "STUDIO-PARITY",
+  "phase": "STUDIO-PARITY-0",
+  "policy": "Exact runtime source identity for recursive parity inventory. Update only with an explicit parity rebase."
+}
