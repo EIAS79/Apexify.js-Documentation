@@ -210,9 +210,13 @@ const runtimeFiles = walk(sourceRoot).sort();
 const sourceText = new Map(runtimeFiles.map((file) => [file, fs.readFileSync(file, 'utf8')]));
 
 const compilerOptions: ts.CompilerOptions = {
-  target: ts.ScriptTarget.ESNext,
-  module: ts.ModuleKind.NodeNext,
-  moduleResolution: ts.ModuleResolutionKind.NodeNext,
+  // Match Apexify.js' own source compiler mode. NodeNext rejects the runtime's
+  // extensionless ESM source imports and turns imported option types into unresolved
+  // error types, which would make a recursive parity inventory silently shallow.
+  target: ts.ScriptTarget.ES2022,
+  module: ts.ModuleKind.ESNext,
+  moduleResolution: ts.ModuleResolutionKind.Bundler,
+  esModuleInterop: true,
   skipLibCheck: true,
   strict: false,
   allowJs: false,
@@ -221,6 +225,25 @@ const compilerOptions: ts.CompilerOptions = {
 };
 const program = ts.createProgram(runtimeFiles, compilerOptions);
 const checker = program.getTypeChecker();
+
+const runtimeDiagnostics = ts.getPreEmitDiagnostics(program)
+  .filter((diagnostic) => diagnostic.file?.fileName.startsWith(sourceRoot))
+  .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
+const unresolvedDiagnostics = runtimeDiagnostics.filter((diagnostic) => {
+  const text = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+  return /Cannot find module|Cannot find name|Could not find a declaration file/i.test(text);
+});
+if (unresolvedDiagnostics.length) {
+  const preview = unresolvedDiagnostics.slice(0, 12).map((diagnostic) => {
+    const file = diagnostic.file ? relRuntime(diagnostic.file.fileName) : '<unknown>';
+    const text = ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ');
+    return file + ': ' + text;
+  });
+  throw new Error(
+    '[studio-parity] runtime type graph has unresolved compiler references; refusing a shallow inventory:\n' +
+      preview.join('\n'),
+  );
+}
 
 const classDeclarations = new Map<string, ts.ClassDeclaration>();
 for (const sourceFile of program.getSourceFiles()) {
