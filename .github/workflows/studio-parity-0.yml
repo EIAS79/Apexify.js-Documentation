@@ -1,0 +1,97 @@
+name: Studio Parity 0 — Runtime Inventory
+
+on:
+  push:
+    branches:
+      - studio-parity-0
+    paths:
+      - 'scripts/studio/parity/**'
+      - 'generated/studio/runtime-parity/**'
+      - 'package.json'
+      - '.github/workflows/studio-parity-0.yml'
+  pull_request:
+    paths:
+      - 'scripts/studio/parity/**'
+      - 'generated/studio/runtime-parity/**'
+      - 'package.json'
+      - '.github/workflows/studio-parity-0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  runtime-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APEXIFY_RUNTIME_ROOT: ${{ github.workspace }}/runtime-source
+      APEXIFY_RUNTIME_COMMIT: a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a
+
+    steps:
+      - name: Checkout Studio documentation repository
+        uses: actions/checkout@v4
+        with:
+          path: studio
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Checkout pinned Apexify.js runtime source
+        uses: actions/checkout@v4
+        with:
+          repository: EIAS79/Apexify.js
+          ref: a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a
+          path: runtime-source
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+
+      - name: Install Studio tooling without postinstall downloads
+        working-directory: studio
+        run: npm ci --ignore-scripts
+
+      - name: Install pinned Apexify runtime dependencies for type resolution
+        working-directory: runtime-source
+        run: npm ci --ignore-scripts
+
+      - name: Generate recursive runtime parity baseline
+        working-directory: studio
+        run: npm run studio:parity:scan
+
+      - name: Verify baseline invariants
+        working-directory: studio
+        run: |
+          npm run studio:parity:check
+          npm run studio:parity:test
+          npm run studio:parity:typecheck
+
+      - name: Commit deterministic Phase-0 baseline
+        if: >-
+          (github.event_name == 'push' && github.ref == 'refs/heads/studio-parity-0') ||
+          (github.event_name == 'pull_request' &&
+           github.event.pull_request.head.repo.full_name == github.repository &&
+           github.head_ref == 'studio-parity-0')
+        working-directory: studio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add generated/studio/runtime-parity/
+          if git diff --cached --quiet; then
+            echo "Generated parity baseline already committed."
+          else
+            git commit -m "chore(studio-parity): commit generated phase-0 baseline [skip ci]"
+            git push origin HEAD:studio-parity-0
+          fi
+
+      - name: Upload parity baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-parity-0-runtime-baseline
+          path: studio/generated/studio/runtime-parity/
+          if-no-files-found: error
+          retention-days: 14
