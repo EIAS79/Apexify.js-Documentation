@@ -245,8 +245,9 @@ function sourceLocation(node: ts.Node): SourceLocation {
   };
 }
 
-function hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {
-  return Boolean(node.modifiers?.some((modifier) => modifier.kind === kind));
+function hasModifier(node: ts.Node, kind: ts.ModifierSyntaxKind): boolean {
+  if (!ts.canHaveModifiers(node)) return false;
+  return Boolean(ts.getModifiers(node)?.some((modifier) => modifier.kind === kind));
 }
 
 function isPublicMember(node: ts.ClassElement): boolean {
@@ -316,10 +317,8 @@ function isBuiltinLeaf(type: ts.Type, text = checker.typeToString(type)): boolea
 }
 
 function arrayElement(type: ts.Type): ts.Type | null {
-  if (!checker.isArrayType(type) && !checker.isTupleType(type)) return null;
+  if (!checker.isArrayType(type)) return null;
   const args = checker.getTypeArguments(type as ts.TypeReference);
-  if (!args.length) return null;
-  if (checker.isTupleType(type)) return checker.getUnionType(args, ts.UnionReduction.None);
   return args[0] ?? null;
 }
 
@@ -481,6 +480,24 @@ function walkType(args: {
     return;
   }
 
+  if (checker.isTupleType(type)) {
+    const tupleItems = checker.getTypeArguments(type as ts.TypeReference);
+    if (!tupleItems.length) {
+      args.records.push(makeParityRecord({ ...args, type }));
+      return;
+    }
+    tupleItems.forEach((tupleType, index) => {
+      walkType({
+        ...args,
+        optionPath: args.optionPath + '[' + index + ']',
+        type: tupleType,
+        parentType: typeText,
+        depth: args.depth + 1,
+      });
+    });
+    return;
+  }
+
   const element = arrayElement(type);
   if (element) {
     walkType({
@@ -547,7 +564,7 @@ function walkType(args: {
       args.records.push(makeParityRecord({
         ...args,
         optionPath: args.optionPath + '.' + prop.getName(),
-        type: checker.getTypeOfSymbol(prop),
+        type: checker.getDeclaredTypeOfSymbol(prop),
         symbol: prop,
         parentType: typeText,
         notes: ['symbol has no source declaration; manual source mapping required'],
