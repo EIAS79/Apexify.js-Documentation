@@ -55,7 +55,7 @@ test('runtime/package source drift is explicit instead of hidden', () => {
 });
 
 test('generated index and all required baseline artifacts exist', () => {
-  for (const name of ['index.json', 'public-surface.json', 'runtime-source-map.json', 'surface-reconciliation.json', 'gap-summary.json', 'BASELINE.md']) {
+  for (const name of ['index.json', 'public-surface.json', 'runtime-source-map.json', 'surface-reconciliation.json', 'gap-summary.json', 'BASELINE.md', 'PHASE-0-COMPLETION.md']) {
     assert.equal(fs.existsSync(path.join(dir, name)), true, name + ' should exist');
   }
 });
