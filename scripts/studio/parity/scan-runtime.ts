@@ -353,7 +353,7 @@ function declarationFilesOfSymbol(symbol: ts.Symbol | undefined): string[] {
   return [...new Set(
     (symbol.declarations ?? [])
       .map((decl) => decl.getSourceFile().fileName)
-      .filter((file) => isRuntimePath(file))
+      .filter((file) => isRuntimeSourcePath(file))
       .map(relRuntime),
   )].sort();
 }
@@ -432,7 +432,7 @@ function resolvedSymbolAt(node: ts.Node): ts.Symbol | undefined {
   return symbol;
 }
 
-function expressionLiteralValue(node: ts.Expression): unknown | null {
+function expressionLiteralValue(node: ts.Expression): unknown | undefined {
   if (ts.isStringLiteralLike(node)) return node.text;
   if (ts.isNumericLiteral(node)) return Number(node.text);
   if (node.kind === ts.SyntaxKind.TrueKeyword) return true;
@@ -442,7 +442,15 @@ function expressionLiteralValue(node: ts.Expression): unknown | null {
     const value = Number(node.operand.text);
     return node.operator === ts.SyntaxKind.MinusToken ? -value : value;
   }
-  return null;
+  return undefined;
+}
+
+function isFallbackTarget(node: ts.Expression): boolean {
+  return (
+    ts.isIdentifier(node) ||
+    ts.isPropertyAccessExpression(node) ||
+    ts.isElementAccessExpression(node)
+  );
 }
 
 function sourceEvidenceForDeclaration(root: ts.Declaration): SourceEvidence {
@@ -463,7 +471,7 @@ function sourceEvidenceForDeclaration(root: ts.Declaration): SourceEvidence {
   while (queued.length) {
     const current = queued.shift()!;
     const sf = current.declaration.getSourceFile();
-    if (!isRuntimePath(sf.fileName)) continue;
+    if (!isRuntimeSourcePath(sf.fileName)) continue;
     const key = sf.fileName + ':' + current.declaration.pos + ':' + current.declaration.end;
     if (visited.has(key)) continue;
     visited.add(key);
@@ -475,7 +483,7 @@ function sourceEvidenceForDeclaration(root: ts.Declaration): SourceEvidence {
         const targetNode = ts.isPropertyAccessExpression(expression) ? expression.name : expression;
         const symbol = resolvedSymbolAt(targetNode);
         const name = symbol?.getName() ?? targetNode.getText(sf);
-        const declarations = (symbol?.declarations ?? []).filter((decl) => isRuntimePath(decl.getSourceFile().fileName));
+        const declarations = (symbol?.declarations ?? []).filter((decl) => isRuntimeSourcePath(decl.getSourceFile().fileName));
 
         if (/^(?:validate|assert|check|ensure)/i.test(name)) {
           for (const decl of declarations.length ? declarations : [current.declaration]) remember(validation, decl);
@@ -500,24 +508,31 @@ function sourceEvidenceForDeclaration(root: ts.Declaration): SourceEvidence {
       if (
         ts.isBinaryExpression(node) &&
         (node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken ||
-          node.operatorToken.kind === ts.SyntaxKind.BarBarToken)
+          node.operatorToken.kind === ts.SyntaxKind.BarBarToken) &&
+        isFallbackTarget(node.left)
       ) {
-        const loc = sourceLocation(node);
-        defaults.push({
-          ...loc,
-          expression: node.getText(sf).slice(0, 240),
-          value: expressionLiteralValue(node.right),
-        });
+        const value = expressionLiteralValue(node.right);
+        if (value !== undefined) {
+          const loc = sourceLocation(node);
+          defaults.push({
+            ...loc,
+            expression: node.getText(sf).slice(0, 240),
+            value,
+          });
+        }
       } else if (
         (ts.isParameter(node) || ts.isBindingElement(node) || ts.isPropertyDeclaration(node)) &&
         node.initializer
       ) {
-        const loc = sourceLocation(node);
-        defaults.push({
-          ...loc,
-          expression: node.getText(sf).slice(0, 240),
-          value: expressionLiteralValue(node.initializer),
-        });
+        const value = expressionLiteralValue(node.initializer);
+        if (value !== undefined) {
+          const loc = sourceLocation(node);
+          defaults.push({
+            ...loc,
+            expression: node.getText(sf).slice(0, 240),
+            value,
+          });
+        }
       }
 
       ts.forEachChild(node, visit);
@@ -676,7 +691,7 @@ function isRuntimeClassType(type: ts.Type): boolean {
   return Boolean(
     symbol?.declarations?.some(
       (decl) =>
-        isRuntimePath(decl.getSourceFile().fileName) &&
+        isRuntimeSourcePath(decl.getSourceFile().fileName) &&
         ts.isClassDeclaration(decl),
     ),
   );
@@ -1051,7 +1066,7 @@ function publicCallSignatures(type: ts.Type): readonly ts.Signature[] {
 
 function typeBelongsToRuntime(type: ts.Type): boolean {
   const symbol = type.aliasSymbol ?? type.getSymbol();
-  return Boolean(symbol?.declarations?.some((decl) => isRuntimePath(decl.getSourceFile().fileName)));
+  return Boolean(symbol?.declarations?.some((decl) => isRuntimeSourcePath(decl.getSourceFile().fileName)));
 }
 
 function enumerateFacetType(
@@ -1219,7 +1234,7 @@ function enumerateClass(className: string, prefix = className): void {
     const symbol = prefix + '.' + prop.getName();
     if (surfaceBuilds.has(symbol)) continue;
     const decl = prop.valueDeclaration ?? prop.declarations?.[0];
-    if (!decl || !isRuntimePath(decl.getSourceFile().fileName) || !isPublicDeclaration(decl)) continue;
+    if (!decl || !isRuntimeSourcePath(decl.getSourceFile().fileName) || !isPublicDeclaration(decl)) continue;
     const propType = checker.getTypeOfSymbolAtLocation(prop, decl);
     const calls = propType.getCallSignatures();
     if (calls.length) {
