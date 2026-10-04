@@ -18,6 +18,7 @@ import {
   CANVAS_BLEND_MODES,
   CANVAS_FITS,
   CANVAS_PATTERN_TYPES,
+  CANVAS_RUNTIME_LIMITS,
   defaultBackgroundLayer,
   defaultCanvasGradient,
   defaultCanvasPattern,
@@ -1343,6 +1344,24 @@ function BackgroundLayersEditor({
       ),
     );
 
+  const move = (index: number, delta: -1 | 1) => {
+    const target = index + delta;
+    if (target < 0 || target >= layers.length) return;
+    const next = [...layers];
+    [next[index], next[target]] = [next[target]!, next[index]!];
+    onChange(next);
+  };
+
+  const duplicate = (index: number) => {
+    if (layers.length >= CANVAS_RUNTIME_LIMITS.maxBackgroundLayers) return;
+    const copy = structuredClone(layers[index]!);
+    onChange([
+      ...layers.slice(0, index + 1),
+      copy,
+      ...layers.slice(index + 1),
+    ]);
+  };
+
   return (
     <div className="apx-canvas-v2-layer-stack">
       <div className="apx-canvas-v2-subhead">
@@ -1354,6 +1373,7 @@ function BackgroundLayersEditor({
           className="apx-canvas-v2-add-select"
           value=""
           aria-label="Add background layer"
+          disabled={layers.length >= CANVAS_RUNTIME_LIMITS.maxBackgroundLayers}
           onChange={(event) => {
             if (!event.target.value) return;
             onChange([
@@ -1364,7 +1384,11 @@ function BackgroundLayersEditor({
             ]);
           }}
         >
-          <option value="">＋ Layer</option>
+          <option value="">
+            {layers.length >= CANVAS_RUNTIME_LIMITS.maxBackgroundLayers
+              ? 'Layer limit reached'
+              : '＋ Layer'}
+          </option>
           <option value="color">Color</option>
           <option value="gradient">Gradient</option>
           <option value="image">Image</option>
@@ -1372,6 +1396,9 @@ function BackgroundLayersEditor({
           <option value="presetPattern">Preset pattern</option>
           <option value="noise">Noise</option>
         </select>
+        <small className="apx-canvas-v2-field-hint">
+          {layers.length} / {CANVAS_RUNTIME_LIMITS.maxBackgroundLayers} runtime layers
+        </small>
       </div>
 
       {layers.length ? (
@@ -1387,6 +1414,42 @@ function BackgroundLayersEditor({
                     ? Math.round((layer.intensity ?? 0.04) * 100) + '% noise'
                     : ''}
               </small>
+              <button
+                className="apx-canvas-v2-icon-button"
+                type="button"
+                aria-label="Move background layer down"
+                disabled={index === 0}
+                onClick={(event) => {
+                  event.preventDefault();
+                  move(index, -1);
+                }}
+              >
+                ↓
+              </button>
+              <button
+                className="apx-canvas-v2-icon-button"
+                type="button"
+                aria-label="Move background layer up"
+                disabled={index === layers.length - 1}
+                onClick={(event) => {
+                  event.preventDefault();
+                  move(index, 1);
+                }}
+              >
+                ↑
+              </button>
+              <button
+                className="apx-canvas-v2-icon-button"
+                type="button"
+                aria-label="Duplicate background layer"
+                disabled={layers.length >= CANVAS_RUNTIME_LIMITS.maxBackgroundLayers}
+                onClick={(event) => {
+                  event.preventDefault();
+                  duplicate(index);
+                }}
+              >
+                ⧉
+              </button>
               <button
                 className="apx-canvas-v2-icon-button"
                 type="button"
@@ -1929,6 +1992,55 @@ export function VisualCanvasInspector({
                   ))}
                 </select>
               </label>
+
+              <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info" data-canvas-video-compatibility>
+                <strong>Deprecated compatibility flags</strong>
+                <span>
+                  Apexify.js still accepts videoBg.loop and videoBg.autoplay for compatibility,
+                  but a canvas video background is one extracted still frame, so both flags have
+                  no rendering effect. Studio preserves and round-trips them explicitly.
+                </span>
+                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
+                  <label className="apx-canvas-v2-check-card">
+                    <input
+                      type="checkbox"
+                      checked={canvas.videoBg.loop ?? false}
+                      onChange={(event) =>
+                        onMutate('Legacy video background loop flag', (current) => ({
+                          ...current,
+                          videoBg: {
+                            ...(current.videoBg ?? canvas.videoBg!),
+                            loop: event.target.checked,
+                          },
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>loop</strong>
+                      <small>Deprecated · accepted by runtime · no effect on the extracted still frame.</small>
+                    </span>
+                  </label>
+                  <label className="apx-canvas-v2-check-card">
+                    <input
+                      type="checkbox"
+                      checked={canvas.videoBg.autoplay ?? false}
+                      onChange={(event) =>
+                        onMutate('Legacy video background autoplay flag', (current) => ({
+                          ...current,
+                          videoBg: {
+                            ...(current.videoBg ?? canvas.videoBg!),
+                            autoplay: event.target.checked,
+                          },
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>autoplay</strong>
+                      <small>Deprecated · accepted by runtime · no effect on the extracted still frame.</small>
+                    </span>
+                  </label>
+                </div>
+              </div>
 
               <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
                 <SelectField
