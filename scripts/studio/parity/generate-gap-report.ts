@@ -134,7 +134,7 @@ lines.push(
 const rendered = lines.join('\n');
 
 const declaredTests = fs.existsSync(parityTestFile)
-  ? (fs.readFileSync(parityTestFile, 'utf8').match(/\\btest\\s*\\(/g) ?? []).length
+  ? (fs.readFileSync(parityTestFile, 'utf8').match(/\btest\s*\(/g) ?? []).length
   : 0;
 const completionStatus = summary.gates.baselineComplete ? 'COMPLETE' : 'BLOCKED';
 const completionLines: string[] = [
