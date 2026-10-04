@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   runtime-inventory:
@@ -66,6 +66,20 @@ jobs:
           npm run studio:parity:check
           npm run studio:parity:test
           npm run studio:parity:typecheck
+
+      - name: Commit deterministic Phase-0 baseline
+        if: github.event_name == 'push' && github.ref == 'refs/heads/studio-parity-0'
+        working-directory: studio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add generated/studio/runtime-parity/
+          if git diff --cached --quiet; then
+            echo "Generated parity baseline already committed."
+          else
+            git commit -m "chore(studio-parity): commit generated phase-0 baseline [skip ci]"
+            git push origin HEAD:studio-parity-0
+          fi
 
       - name: Upload parity baseline
         if: always()
