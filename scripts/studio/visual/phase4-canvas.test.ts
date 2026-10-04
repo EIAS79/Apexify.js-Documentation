@@ -531,7 +531,7 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   for (const runtimeContract of [
     'MultiPositionField',
     'Stroke sides',
-    'Rounded positions',
+    'Border position / rounded mask',
     'By frame',
     'By time',
     'data-canvas-video-extract',
