@@ -663,7 +663,7 @@ function reconcileImageCall(
   const props: VisualImageNodeProps = {
     ...(rest as unknown as Omit<
       VisualImageNodeProps,
-      'source' | 'createOptions'
+      'source' | 'createOptions' | 'painterOpts'
     >),
     source: sourceValue,
   };
@@ -675,6 +675,36 @@ function reconcileImageCall(
     }
     props.createOptions =
       options as unknown as VisualCreateImageOptions;
+  }
+
+  if (call.args[3]) {
+    const painterOpts = new LiteralParser(call.args[3]).parse();
+    if (!isRecord(painterOpts)) {
+      throw new Error('createImage() painterOpts must be an object literal.');
+    }
+    for (const key of Object.keys(painterOpts)) {
+      if (key !== 'resolveAssetRefs') {
+        throw new Error(
+          'createImage() painterOpts.' + key + ' is not part of the current public runtime contract.',
+        );
+      }
+    }
+    if (
+      painterOpts.resolveAssetRefs !== undefined &&
+      typeof painterOpts.resolveAssetRefs !== 'boolean'
+    ) {
+      throw new Error(
+        'createImage() painterOpts.resolveAssetRefs must be a boolean literal.',
+      );
+    }
+    props.painterOpts = {
+      ...(painterOpts.resolveAssetRefs !== undefined
+        ? { resolveAssetRefs: painterOpts.resolveAssetRefs }
+        : {}),
+    };
+  }
+  if (call.args.length > 4) {
+    throw new Error('createImage() accepts at most images, canvasBuffer, options, and painterOpts.');
   }
 
   const node = {
