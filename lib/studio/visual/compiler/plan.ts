@@ -61,7 +61,7 @@ export type StudioCreateCanvasOperation = {
 
 export type StudioImageProperties = Omit<
   VisualImageNodeProps,
-  'source' | 'createOptions'
+  'source' | 'createOptions' | 'painterOpts'
 > & {
   source: string | StudioTargetReference;
   x: number;
@@ -81,6 +81,9 @@ export type StudioCreateImageOperation = {
   base: StudioTargetReference;
   properties: StudioImageProperties;
   options?: VisualCreateImageOptions;
+  painterOpts?: {
+    resolveAssetRefs?: boolean;
+  };
 };
 
 export type StudioImageUtilityOperation = {
@@ -518,6 +521,7 @@ function imageOperationProperties(
   const {
     source: _source,
     createOptions: _options,
+    painterOpts: _painterOpts,
     utilityStack: _utilityStack,
     utilityAnalyses: _utilityAnalyses,
     ...rest
@@ -986,6 +990,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         base,
         properties: { ...imageProperties, source: utilitySource },
         ...(props.createOptions ? { options: props.createOptions } : {}),
+        ...(props.painterOpts ? { painterOpts: props.painterOpts } : {}),
       });
     }
 
