@@ -43,7 +43,13 @@ if (!fs.existsSync(runtimeEntry)) {
 async function main() {
 const runtime = (await import(pathToFileURL(runtimeEntry).href)) as {
   ApexPainter: new () => {
-    createCanvas(options: Record<string, unknown>): Promise<{ buffer: Uint8Array }>;
+    assets: {
+      loadValue(name: string, value: unknown): unknown;
+    };
+    createCanvas(
+      options: Record<string, unknown>,
+      painterOpts?: { resolveAssetRefs?: boolean },
+    ): Promise<{ buffer: Uint8Array }>;
   };
 };
 const { ApexPainter } = runtime;
@@ -56,6 +62,7 @@ function semanticCanvas(project: VisualProject) {
     width: project.document.width,
     height: project.document.height,
     canvas: project.document.canvas ?? {},
+    canvasPainterOpts: project.document.canvasPainterOpts ?? {},
   };
 }
 
@@ -88,8 +95,11 @@ async function proveFixture(
   assert.equal(validation.ok, true, name + ': ' + JSON.stringify(validation.issues));
 
   const preview = await executeStudioOperationPlan(lowerVisualProject(project), {
-    createCanvas: async (options) => {
-      const result = await painter.createCanvas(options as unknown as Record<string, unknown>);
+    createCanvas: async (options, painterOpts) => {
+      const result = await painter.createCanvas(
+        options as unknown as Record<string, unknown>,
+        painterOpts,
+      );
       return { buffer: result.buffer };
     },
   });
@@ -327,6 +337,16 @@ const fixtures: Array<{
     inherited: (source) =>
       source === sourceDataUrl ? { width: 24, height: 16 } : null,
   },
+  {
+    name: 'painter-options-resolve-asset-refs',
+    project: (() => {
+      const project = canvasProject('Canvas Painter Options', 96, 64, {
+        colorBg: '#1d4ed8',
+      });
+      project.document.canvasPainterOpts = { resolveAssetRefs: true };
+      return project;
+    })(),
+  },
 ];
 
 const proofs = [];
@@ -340,6 +360,23 @@ for (const fixture of fixtures) {
     ),
   );
 }
+
+const assetPainter = new ApexPainter();
+assetPainter.assets.loadValue('parity1CanvasColor', '#6d28d9');
+const resolvedAssetCanvas = await assetPainter.createCanvas(
+  { width: 72, height: 48, colorBg: '$parity1CanvasColor' },
+  { resolveAssetRefs: true },
+);
+const directAssetCanvas = await assetPainter.createCanvas({
+  width: 72,
+  height: 48,
+  colorBg: '#6d28d9',
+});
+assert.equal(
+  digest(resolvedAssetCanvas.buffer),
+  digest(directAssetCanvas.buffer),
+  'resolveAssetRefs=true must resolve named Canvas values through painter.assets',
+);
 
 const omitted = reconcileVisualProjectFromCode(
   createVisualProject({
