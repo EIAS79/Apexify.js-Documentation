@@ -63,8 +63,10 @@ if (!codeFiles.length) {
   process.exit(0);
 }
 
-run('npm', ['run', 'typecheck']);
-
+// Do not run the repository-wide TypeScript build here. The root typecheck depends
+// on generated Apexify packages installed by the intentionally heavyweight
+// postinstall chain (web snapshot, Deno, FFmpeg, docs generation). That belongs
+// to Vercel checkpoint builds and phase certification, not per-commit feedback.
 const tests = new Set();
 const add = (...names) => names.forEach((name) => tests.add(name));
 
