@@ -128,9 +128,20 @@ export type GapSummary = {
     outputRecords: number;
     unionVariants: number;
     status: Record<ParityStatus, number>;
+    surfaceStatus: Record<ParityStatus, number>;
+    recordStatus: Record<ParityStatus, number>;
     legacyCapabilities: number;
     legacyOptionPaths: number;
     legacyUnclassifiedOptionPaths: number;
+  };
+  evidence: {
+    surfacesWithImplementationGraph: number;
+    surfacesWithValidationGraph: number;
+    surfacesWithLiteralDefaults: number;
+    surfacesWithResourceLimits: number;
+    surfacesWithStructuredErrors: number;
+    recordsWithResolvedRuntimeDefault: number;
+    recordsWithResourceLimits: number;
   };
   drift: Array<{
     code: string;
