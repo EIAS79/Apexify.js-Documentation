@@ -138,7 +138,8 @@
     "studio:parity:check": "tsx scripts/studio/parity/scan-runtime.ts --check && tsx scripts/studio/parity/generate-gap-report.ts --check && tsx scripts/studio/parity/compare-studio.ts",
     "studio:parity:test": "tsx --test scripts/studio/parity/parity-baseline.test.ts",
     "studio:parity:domain": "tsx scripts/studio/parity/verify-domain.ts",
-    "studio:parity:all": "npm run studio:parity:scan && tsx scripts/studio/parity/compare-studio.ts && npm run studio:parity:test"
+    "studio:parity:all": "npm run studio:parity:scan && tsx scripts/studio/parity/compare-studio.ts && npm run studio:parity:test && npm run studio:parity:typecheck",
+    "studio:parity:typecheck": "tsc -p scripts/studio/parity/tsconfig.json --noEmit"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
