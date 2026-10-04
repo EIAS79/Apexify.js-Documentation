@@ -894,3 +894,27 @@ test('STUDIO-PARITY-1 displays runtime pattern blend fallbacks without forcing m
   assert.match(generated, /patternBg:/);
   assert.doesNotMatch(generated, /blendMode:/);
 });
+
+
+test('STUDIO-PARITY-1 does not reject stroke/shadow numeric ranges accepted by the pinned runtime', () => {
+  const cases = [
+    { stroke: { color: '#ffffff', width: -1 } },
+    { stroke: { color: '#ffffff', opacity: 2 } },
+    { shadow: { color: '#000000', blur: -1 } },
+    { shadow: { color: '#000000', opacity: 2 } },
+  ];
+
+  for (const canvas of cases) {
+    const project = createVisualProject({
+      width: 64,
+      height: 64,
+      now: '2026-10-04T00:00:00.000Z',
+    });
+    project.document.canvas = {
+      colorBg: '#112233',
+      ...canvas,
+    };
+    const validation = validateVisualProject(project);
+    assert.equal(validation.ok, true, JSON.stringify(validation.issues));
+  }
+});
