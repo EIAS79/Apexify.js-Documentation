@@ -145,7 +145,7 @@ edit
 -> direct repository verification scripts/build checks
 ```
 
-Vercel is not the iterative debugger.
+Vercel is not the per-commit iterative debugger. Ordinary Studio/parity branches remain deployment-suppressed. A single explicit `studio-preview` branch may be advanced manually at meaningful checkpoints for deployed `/studio` smoke testing without enabling automatic preview builds for every work branch.
 
 ## 10. Phase-0 gate
 
