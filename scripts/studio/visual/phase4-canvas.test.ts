@@ -601,7 +601,6 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
       'missing canonical image filter type used by Canvas: ' + filterType,
     );
   }
-  }
 });
 
 
