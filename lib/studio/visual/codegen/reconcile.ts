@@ -2073,23 +2073,38 @@ function reconcileCoreVisualProjectFromCode(
     const customBg = isRecord(canvasCall.options.customBg)
       ? canvasCall.options.customBg
       : null;
+    const videoBg = isRecord(canvasCall.options.videoBg)
+      ? canvasCall.options.videoBg
+      : null;
+    const inheritedBackground =
+      customBg?.inherit === true
+        ? customBg
+        : videoBg?.inherit === true
+          ? videoBg
+          : null;
+
     if (
-      customBg?.inherit === true &&
-      typeof customBg.source === 'string' &&
+      inheritedBackground &&
+      typeof inheritedBackground.source === 'string' &&
       resolveInheritedCanvasDimensions
     ) {
-      const inherited = resolveInheritedCanvasDimensions(customBg.source);
+      const inherited = resolveInheritedCanvasDimensions(inheritedBackground.source);
       if (inherited) {
         width = inherited.width;
         height = inherited.height;
       }
     }
 
+    // Apexify.js createCanvas() independently defaults omitted dimensions to 500.
+    // Preserve that public runtime behavior when reconciling canonical literal code.
+    if (width === undefined) width = 500;
+    if (height === undefined) height = 500;
+
     if (typeof width !== 'number' || typeof height !== 'number') {
       return {
         ok: false,
         error:
-          'createCanvas needs numeric width/height, or customBg.inherit with a resolvable image asset, for live Visual sync.',
+          'createCanvas width/height must be numeric literals, omitted for the runtime 500px defaults, or inherited from a resolvable customBg/videoBg source.',
       };
     }
     if (
