@@ -377,7 +377,7 @@ test('Phase 4 keeps video authoring and extraction in one Style surface', () => 
   assert.equal((inspector.match(/data-canvas-video-extract/g) ?? []).length, 1);
   assert.match(inspector, /Extract selected frame/);
   assert.doesNotMatch(inspector, /title="Video background & frame extraction"/);
-  assert.match(inspector, /Advanced is intentionally non-duplicative/);
+  assert.match(inspector, /painterOpts\.resolveAssetRefs runtime switch/);
 });
 
 test('Phase 4 codegen retains the latest videoBg image-style options', () => {
