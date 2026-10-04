@@ -144,7 +144,8 @@
     "studio:parity:canvas:runtime": "tsx scripts/studio/parity/phase1-canvas-runtime.ts",
     "studio:parity:canvas:all": "npm run studio:parity:canvas:test && npm run studio:parity:canvas:runtime && npm run studio:parity:canvas:ledger && npm run studio:parity:canvas:ledger:check && npm run studio:parity:typecheck",
     "studio:parity:canvas:ledger": "tsx scripts/studio/parity/finalize-canvas.ts",
-    "studio:parity:canvas:ledger:check": "tsx scripts/studio/parity/finalize-canvas.ts --check"
+    "studio:parity:canvas:ledger:check": "tsx scripts/studio/parity/finalize-canvas.ts --check",
+    "studio:ci:fast": "node scripts/studio/ci/fast-affected.mjs"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
