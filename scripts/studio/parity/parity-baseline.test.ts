@@ -30,6 +30,7 @@ test('baseline inventories public surfaces and recursive runtime records', () =>
   assert.equal(summary.gates.zeroSilentPublicSurfaceOmissions, true);
   assert.equal(summary.gates.deepRecursiveTypeResolution, true);
   assert.equal(summary.gates.surfaceReconciliationComplete, true);
+  assert.equal(summary.gates.sourceMappingVerified, true);
 });
 
 test('legacy classification can never become FULL during phase 0', () => {
@@ -187,5 +188,35 @@ test('surface reconciliation explains the old 187-row gap without dropping legac
 
   for (const item of reconciliation.runtimeOnly) {
     assert.ok(item.reason.length > 0, item.runtimeSymbol + ' must have an explicit reconciliation reason');
+  }
+});
+
+
+test('core authoring surfaces use call-graph-backed validation mappings', () => {
+  const publicSurface = read<{
+    surfaces: Array<{
+      publicSymbol: string;
+      implementationFiles: string[];
+      validationFiles: string[];
+      sourceEvidence: {
+        implementation: Array<{ file: string }>;
+        validation: Array<{ file: string }>;
+      };
+    }>;
+  }>('public-surface.json');
+
+  const expected = new Map([
+    ['ApexPainter.createCanvas', 'lib-next/canvas/canvas-validation.ts'],
+    ['ApexPainter.createImage', 'lib-next/image/image-validation.ts'],
+    ['ApexPainter.createText', 'lib-next/text/text-validation.ts'],
+    ['ApexPainter.measureText', 'lib-next/text/text-validation.ts'],
+  ]);
+
+  for (const [symbol, validator] of expected) {
+    const surface = publicSurface.surfaces.find((item) => item.publicSymbol === symbol);
+    assert.ok(surface, symbol + ' must exist');
+    assert.ok((surface?.implementationFiles.length ?? 0) >= 2, symbol + ' must have a real implementation call graph');
+    assert.ok(surface?.validationFiles.includes(validator), symbol + ' must reach ' + validator);
+    assert.ok(surface?.sourceEvidence.validation.some((item) => item.file === validator), symbol + ' must store validator source evidence');
   }
 });
