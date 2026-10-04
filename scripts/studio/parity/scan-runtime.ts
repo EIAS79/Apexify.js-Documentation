@@ -1056,7 +1056,9 @@ const gapSummary: GapSummary = {
   },
   studio: {
     repository: DOCS_REPOSITORY,
-    commit: process.env.GITHUB_SHA ?? null,
+    // Generated parity evidence must be identical on push, PR merge refs, and local runs.
+    // The Studio branch/head SHA belongs in the phase report, not in deterministic artifacts.
+    commit: null,
     installedApexifyPin: installedPin,
     installedPinCommit,
     runtimePinMatchesInstalledPackage: installedPinCommit === pin.commit,
