@@ -138,6 +138,8 @@ export type GapSummary = {
     runtimeSourceReadable: boolean;
     apexPainterFound: boolean;
     zeroSilentPublicSurfaceOmissions: boolean;
+    deepRecursiveTypeResolution: boolean;
+    surfaceReconciliationComplete: boolean;
     noBootstrapFullClaims: boolean;
     everyRecordHasStatus: boolean;
     baselineComplete: boolean;
