@@ -6,8 +6,14 @@ on:
       - studio-parity-1-canvas
     paths:
       - 'components/studio/visual/VisualCanvasInspector.tsx'
+      - 'components/studio/visual/VisualStudioPre4.tsx'
+      - 'lib/studio/visual/model.ts'
       - 'lib/studio/visual/canvas-contract.ts'
+      - 'lib/studio/visual/compiler/normalize.ts'
+      - 'lib/studio/visual/compiler/plan.ts'
+      - 'lib/studio/visual/compiler/execute.ts'
       - 'lib/studio/visual/compiler/validate.ts'
+      - 'lib/studio/visual/codegen/emitter.ts'
       - 'lib/studio/visual/codegen/reconcile.ts'
       - 'scripts/studio/visual/phase4-canvas.test.ts'
       - 'scripts/studio/parity/**'
@@ -16,8 +22,14 @@ on:
   pull_request:
     paths:
       - 'components/studio/visual/VisualCanvasInspector.tsx'
+      - 'components/studio/visual/VisualStudioPre4.tsx'
+      - 'lib/studio/visual/model.ts'
       - 'lib/studio/visual/canvas-contract.ts'
+      - 'lib/studio/visual/compiler/normalize.ts'
+      - 'lib/studio/visual/compiler/plan.ts'
+      - 'lib/studio/visual/compiler/execute.ts'
       - 'lib/studio/visual/compiler/validate.ts'
+      - 'lib/studio/visual/codegen/emitter.ts'
       - 'lib/studio/visual/codegen/reconcile.ts'
       - 'scripts/studio/visual/phase4-canvas.test.ts'
       - 'scripts/studio/parity/**'
@@ -26,12 +38,12 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   canvas-parity:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     env:
       APEXIFY_RUNTIME_ROOT: ${{ github.workspace }}/runtime-source
       APEXIFY_RUNTIME_COMMIT: a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a
@@ -41,6 +53,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: studio
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
 
       - name: Checkout pinned Apexify.js runtime source
         uses: actions/checkout@v4
@@ -72,6 +86,45 @@ jobs:
         working-directory: studio
         run: npm run studio:parity:canvas:runtime
 
+      - name: Generate recursive Canvas evidence closure
+        working-directory: studio
+        run: |
+          npm run studio:parity:canvas:ledger
+          npm run studio:parity:canvas:ledger:check
+
       - name: Typecheck parity tooling
         working-directory: studio
         run: npm run studio:parity:typecheck
+
+      - name: Upload Phase-1 Canvas evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-parity-1-canvas-evidence
+          path: |
+            studio/generated/studio/runtime-parity/phases/phase-1-canvas.json
+            studio/generated/studio/runtime-parity/phases/PHASE-1-COMPLETION.md
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Commit deterministic Phase-1 evidence
+        if: >-
+          success() &&
+          (
+            (github.event_name == 'push' && github.ref == 'refs/heads/studio-parity-1-canvas') ||
+            (github.event_name == 'pull_request' &&
+             github.event.pull_request.head.repo.full_name == github.repository &&
+             github.head_ref == 'studio-parity-1-canvas')
+          )
+        working-directory: studio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add generated/studio/runtime-parity/phases/phase-1-canvas.json
+          git add generated/studio/runtime-parity/phases/PHASE-1-COMPLETION.md
+          if git diff --cached --quiet; then
+            echo "Phase-1 Canvas evidence already committed."
+          else
+            git commit -m "chore(studio-parity-1): commit Canvas completion evidence [skip ci]"
+            git push origin HEAD:studio-parity-1-canvas
+          fi
