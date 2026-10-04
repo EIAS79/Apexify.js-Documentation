@@ -1,25 +1,9 @@
 name: Studio Parity 1 — Canvas
 
 on:
-  push:
-    branches:
-      - studio-parity-1-canvas
-    paths:
-      - 'components/studio/visual/VisualCanvasInspector.tsx'
-      - 'components/studio/visual/VisualStudioPre4.tsx'
-      - 'lib/studio/visual/model.ts'
-      - 'lib/studio/visual/canvas-contract.ts'
-      - 'lib/studio/visual/compiler/normalize.ts'
-      - 'lib/studio/visual/compiler/plan.ts'
-      - 'lib/studio/visual/compiler/execute.ts'
-      - 'lib/studio/visual/compiler/validate.ts'
-      - 'lib/studio/visual/codegen/emitter.ts'
-      - 'lib/studio/visual/codegen/reconcile.ts'
-      - 'scripts/studio/visual/phase4-canvas.test.ts'
-      - 'scripts/studio/parity/**'
-      - 'package.json'
-      - '.github/workflows/studio-parity-1-canvas.yml'
   pull_request:
+    types:
+      - ready_for_review
     paths:
       - 'components/studio/visual/VisualCanvasInspector.tsx'
       - 'components/studio/visual/VisualStudioPre4.tsx'
@@ -37,6 +21,9 @@ on:
       - '.github/workflows/studio-parity-1-canvas.yml'
   workflow_dispatch:
 
+concurrency:
+  group: studio-parity-1-cert-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: write
 
@@ -110,12 +97,9 @@ jobs:
       - name: Commit deterministic Phase-1 evidence
         if: >-
           success() &&
-          (
-            (github.event_name == 'push' && github.ref == 'refs/heads/studio-parity-1-canvas') ||
-            (github.event_name == 'pull_request' &&
-             github.event.pull_request.head.repo.full_name == github.repository &&
-             github.head_ref == 'studio-parity-1-canvas')
-          )
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          github.head_ref == 'studio-parity-1-canvas'
         working-directory: studio
         run: |
           git config user.name "github-actions[bot]"
