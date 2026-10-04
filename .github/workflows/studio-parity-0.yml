@@ -52,6 +52,10 @@ jobs:
         working-directory: studio
         run: npm ci --ignore-scripts
 
+      - name: Install pinned Apexify runtime dependencies for type resolution
+        working-directory: runtime-source
+        run: npm ci --ignore-scripts
+
       - name: Generate recursive runtime parity baseline
         working-directory: studio
         run: npm run studio:parity:scan
