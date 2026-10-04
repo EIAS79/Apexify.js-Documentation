@@ -1003,7 +1003,7 @@ enumerateClass('ApexPainter');
 
 // These returned/public builder types are part of Studio's authorable surface even when users reach them
 // through ApexPainter methods instead of root package exports.
-for (const rootClass of ['SceneBuilder', 'TemplateHandle', 'VideoPipeline', 'VideoOperations']) {
+for (const rootClass of ['SceneBuilder', 'TemplateHandle', 'VideoPipeline']) {
   if (classDeclarations.has(rootClass)) enumerateClass(rootClass);
 }
 
