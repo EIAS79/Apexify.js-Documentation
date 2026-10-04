@@ -65,6 +65,7 @@ jobs:
         run: |
           npm run studio:parity:check
           npm run studio:parity:test
+          npm run typecheck
 
       - name: Upload parity baseline
         uses: actions/upload-artifact@v4
