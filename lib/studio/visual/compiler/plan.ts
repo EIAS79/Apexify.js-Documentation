@@ -54,6 +54,9 @@ export type StudioCreateCanvasOperation = {
     width: number;
     height: number;
   } & VisualCanvasConfig;
+  painterOpts?: {
+    resolveAssetRefs?: boolean;
+  };
 };
 
 export type StudioImageProperties = Omit<
@@ -730,6 +733,9 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         height: normalized.document.height,
         ...(normalized.document.canvas ?? {}),
       },
+      ...(normalized.document.canvasPainterOpts !== undefined
+        ? { painterOpts: normalized.document.canvasPainterOpts }
+        : {}),
     },
   );
 
