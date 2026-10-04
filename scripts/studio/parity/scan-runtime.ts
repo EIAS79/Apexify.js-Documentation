@@ -912,7 +912,7 @@ function addPropertySurface(args: {
   surfaceBuilds.set(args.publicSymbol, { record, inputRecords: [], outputRecords });
 }
 
-function publicCallSignatures(type: ts.Type): ts.Signature[] {
+function publicCallSignatures(type: ts.Type): readonly ts.Signature[] {
   return type.getCallSignatures();
 }
 
