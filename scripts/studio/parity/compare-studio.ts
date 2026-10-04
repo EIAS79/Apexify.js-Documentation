@@ -14,6 +14,8 @@ const failures: string[] = [];
 
 if (summary.phase !== 'STUDIO-PARITY-0') failures.push('unexpected phase: ' + summary.phase);
 if (!summary.gates.baselineComplete) failures.push('scanner baseline gates are not complete');
+if (!summary.gates.deepRecursiveTypeResolution) failures.push('deep recursive type resolution gate failed');
+if (!summary.gates.surfaceReconciliationComplete) failures.push('legacy/runtime surface reconciliation is incomplete');
 if (summary.counts.publicSurfaces <= 0) failures.push('no public runtime surfaces were inventoried');
 if (summary.counts.recursiveRecords <= 0) failures.push('no recursive input/output records were inventoried');
 if (summary.counts.status.FULL !== 0) {
