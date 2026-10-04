@@ -25,6 +25,7 @@ type LegacyCapabilityRow = {
   codegen?: { symbol?: string };
   proofCaseIds?: string[];
   implementationState?: string;
+  sourceRoute?: string;
 };
 
 type LegacyMatrix = {
@@ -206,7 +207,27 @@ const installedPin = docsPackage.dependencies?.['apexify.js'] ?? null;
 const installedPinCommit = /#([0-9a-f]{40})\b/i.exec(installedPin ?? '')?.[1] ?? null;
 
 const runtimePackage = readJson<{ version?: string }>(path.join(runtimeRoot, 'package.json'), {});
-const runtimeFiles = walk(sourceRoot).sort();
+const runtimeTsconfig = path.join(runtimeRoot, 'tsconfig.json');
+const runtimeConfigRead = ts.readConfigFile(runtimeTsconfig, ts.sys.readFile);
+if (runtimeConfigRead.error) {
+  throw new Error(
+    '[studio-parity] failed to read pinned runtime tsconfig: ' +
+      ts.flattenDiagnosticMessageText(runtimeConfigRead.error.messageText, ' '),
+  );
+}
+const parsedRuntimeConfig = ts.parseJsonConfigFileContent(
+  runtimeConfigRead.config,
+  ts.sys,
+  runtimeRoot,
+  { noEmit: true, skipLibCheck: true, noUnusedLocals: false, noUnusedParameters: false },
+  runtimeTsconfig,
+);
+const runtimeFiles = parsedRuntimeConfig.fileNames
+  .filter((file) => file.startsWith(sourceRoot) && /\\.ts$/.test(file) && !/\\.d\\.ts$/.test(file))
+  .sort();
+if (!runtimeFiles.length) {
+  throw new Error('[studio-parity] pinned runtime tsconfig resolved zero lib-next TypeScript files.');
+}
 const sourceText = new Map(runtimeFiles.map((file) => [file, fs.readFileSync(file, 'utf8')]));
 const sourceTextLower = new Map([...sourceText].map(([file, value]) => [file, value.toLowerCase()]));
 const validationCandidateFiles = runtimeFiles.filter((file) =>
@@ -214,37 +235,54 @@ const validationCandidateFiles = runtimeFiles.filter((file) =>
 );
 
 const compilerOptions: ts.CompilerOptions = {
-  // Match Apexify.js' own source compiler mode. NodeNext rejects the runtime's
-  // extensionless ESM source imports and turns imported option types into unresolved
-  // error types, which would make a recursive parity inventory silently shallow.
-  target: ts.ScriptTarget.ES2022,
-  module: ts.ModuleKind.ESNext,
-  moduleResolution: ts.ModuleResolutionKind.Bundler,
-  esModuleInterop: true,
-  skipLibCheck: true,
-  strict: false,
-  allowJs: false,
-  types: ['node'],
+  ...parsedRuntimeConfig.options,
   noEmit: true,
+  skipLibCheck: true,
+  noUnusedLocals: false,
+  noUnusedParameters: false,
+  typeRoots: [
+    path.join(ROOT, 'node_modules', '@types'),
+    ...(parsedRuntimeConfig.options.typeRoots ?? []),
+  ],
 };
-const program = ts.createProgram(runtimeFiles, compilerOptions);
+const compilerHost = ts.createCompilerHost(compilerOptions, true);
+compilerHost.resolveModuleNames = (moduleNames, containingFile) =>
+  moduleNames.map((moduleName) => {
+    const primary = ts.resolveModuleName(moduleName, containingFile, compilerOptions, ts.sys).resolvedModule;
+    if (primary) return primary;
+    if (moduleName.startsWith('.') || path.isAbsolute(moduleName)) return undefined;
+    // CI checks out Apexify.js beside the Studio repo. Runtime package dependencies are
+    // installed in Studio for the scanner, so bare external modules get one deterministic
+    // fallback lookup from the Studio root. Internal relative imports never use this fallback.
+    return ts.resolveModuleName(
+      moduleName,
+      path.join(ROOT, '__studio_parity_module_resolution__.ts'),
+      compilerOptions,
+      ts.sys,
+    ).resolvedModule;
+  });
+const program = ts.createProgram({
+  rootNames: runtimeFiles,
+  options: compilerOptions,
+  host: compilerHost,
+});
 const checker = program.getTypeChecker();
 
 const runtimeDiagnostics = ts.getPreEmitDiagnostics(program)
   .filter((diagnostic) => diagnostic.file?.fileName.startsWith(sourceRoot))
   .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error);
-const unresolvedDiagnostics = runtimeDiagnostics.filter((diagnostic) => {
+const unresolvedInternalDiagnostics = runtimeDiagnostics.filter((diagnostic) => {
   const text = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-  return /Cannot find module|Cannot find name|Could not find a declaration file/i.test(text);
+  return /Cannot find module ['"]\\.{1,2}\\//i.test(text);
 });
-if (unresolvedDiagnostics.length) {
-  const preview = unresolvedDiagnostics.slice(0, 12).map((diagnostic) => {
+if (unresolvedInternalDiagnostics.length) {
+  const preview = unresolvedInternalDiagnostics.slice(0, 12).map((diagnostic) => {
     const file = diagnostic.file ? relRuntime(diagnostic.file.fileName) : '<unknown>';
     const text = ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ');
     return file + ': ' + text;
   });
   throw new Error(
-    '[studio-parity] runtime type graph has unresolved compiler references; refusing a shallow inventory:\n' +
+    '[studio-parity] internal runtime imports are unresolved; refusing a shallow inventory:\n' +
       preview.join('\n'),
   );
 }
@@ -279,6 +317,18 @@ function hasModifier(node: ts.Node, kind: ts.ModifierSyntaxKind): boolean {
 
 function isPublicMember(node: ts.ClassElement): boolean {
   return !hasModifier(node, ts.SyntaxKind.PrivateKeyword) && !hasModifier(node, ts.SyntaxKind.ProtectedKeyword);
+}
+
+function isPublicDeclaration(node: ts.Declaration): boolean {
+  if (
+    ts.isMethodDeclaration(node) ||
+    ts.isPropertyDeclaration(node) ||
+    ts.isGetAccessorDeclaration(node) ||
+    ts.isSetAccessorDeclaration(node)
+  ) {
+    return isPublicMember(node);
+  }
+  return true;
 }
 
 function declarationFilesOfSymbol(symbol: ts.Symbol | undefined): string[] {
@@ -869,7 +919,7 @@ function enumerateFacetType(
 
   for (const prop of checker.getPropertiesOfType(type)) {
     const decl = prop.valueDeclaration ?? prop.declarations?.[0];
-    if (!decl) continue;
+    if (!decl || !isPublicDeclaration(decl)) continue;
     const propType = checker.getTypeOfSymbolAtLocation(prop, decl);
     const symbol = prefix + '.' + prop.getName();
     const calls = publicCallSignatures(propType);
@@ -1014,7 +1064,7 @@ enumerateClass('ApexPainter');
 
 // These returned/public builder types are part of Studio's authorable surface even when users reach them
 // through ApexPainter methods instead of root package exports.
-for (const rootClass of ['SceneBuilder', 'TemplateHandle', 'VideoPipeline']) {
+for (const rootClass of ['SceneBuilder', 'TemplateHandle', 'VideoPipeline', 'VideoOperations', 'VideoCreator']) {
   if (classDeclarations.has(rootClass)) enumerateClass(rootClass);
 }
 
@@ -1034,6 +1084,197 @@ const records = [...surfaceBuilds.values()]
     a.direction.localeCompare(b.direction) ||
     (a.unionVariant ?? '').localeCompare(b.unionVariant ?? ''),
   );
+
+type DeepInventoryRequirement = {
+  symbol: string;
+  minInputRecords: number;
+  requiredPathFragments: string[];
+};
+
+const deepInventoryRequirements: DeepInventoryRequirement[] = [
+  {
+    symbol: 'ApexPainter.createCanvas',
+    minInputRecords: 50,
+    requiredPathFragments: [
+      '.canvas.customBg.filters',
+      '.canvas.videoBg',
+      '.canvas.bgLayers',
+      '.canvas.zoom.scale',
+      '.canvas.stroke',
+      '.canvas.shadow',
+    ],
+  },
+  {
+    symbol: 'ApexPainter.createImage',
+    minInputRecords: 60,
+    requiredPathFragments: [
+      '.images',
+      '.distortion',
+      '.meshWarp',
+      '.effects',
+      '.filters',
+      '.groupTransform',
+    ],
+  },
+  {
+    symbol: 'ApexPainter.createText',
+    minInputRecords: 25,
+    requiredPathFragments: [
+      '.textArray',
+      '.font',
+      '.shadow',
+    ],
+  },
+];
+
+const deepTypeFailures: string[] = [];
+for (const requirement of deepInventoryRequirements) {
+  const input = records.filter(
+    (record) => record.publicSymbol === requirement.symbol && record.direction === 'input',
+  );
+  if (input.length < requirement.minInputRecords) {
+    deepTypeFailures.push(
+      requirement.symbol + ': expected at least ' + requirement.minInputRecords +
+        ' recursive input records, found ' + input.length,
+    );
+  }
+  for (const fragment of requirement.requiredPathFragments) {
+    if (!input.some((record) => record.optionPath.includes(fragment))) {
+      deepTypeFailures.push(requirement.symbol + ': missing recursive path fragment ' + fragment);
+    }
+  }
+}
+
+const runtimeSurfaceSymbols = new Set(surfaces.map((surface) => surface.publicSymbol));
+const runtimeSourceCorpus = [...sourceText.values()].join('\n');
+const reconciliationLegacy = legacyRows.map((row) => {
+  if (runtimeSurfaceSymbols.has(row.capability)) {
+    return {
+      capability: row.capability,
+      result: 'exact-current-runtime-surface',
+      runtimeSymbol: row.capability,
+      reason: 'Exact public symbol exists in the pinned runtime inventory.',
+    };
+  }
+
+  const codegenSymbol = row.codegen?.symbol;
+  if (codegenSymbol && runtimeSurfaceSymbols.has(codegenSymbol)) {
+    return {
+      capability: row.capability,
+      result: 'legacy-alias-to-current-runtime-surface',
+      runtimeSymbol: codegenSymbol,
+      reason: 'Legacy capability maps to its recorded codegen symbol, which exists in the pinned runtime.',
+    };
+  }
+
+  if (row.classification === 'hosted-runtime-exclusion') {
+    return {
+      capability: row.capability,
+      result: 'intentional-hosted-exclusion',
+      runtimeSymbol: null,
+      reason: 'Legacy matrix explicitly classifies this capability as a hosted-runtime exclusion.',
+    };
+  }
+
+  if (row.classification === 'not-applicable' || row.sourceRoute === 'introspection') {
+    return {
+      capability: row.capability,
+      result: 'legacy-introspection-or-nonauthorable',
+      runtimeSymbol: null,
+      reason: 'Legacy matrix explicitly classifies this row as introspection/not-applicable rather than an authorable runtime operation.',
+    };
+  }
+
+  const leaf = row.capability.split('.').at(-1) ?? row.capability;
+  const suffixMatches = surfaces
+    .filter((surface) => surface.publicSymbol.endsWith('.' + leaf))
+    .map((surface) => surface.publicSymbol)
+    .slice(0, 12);
+  if (suffixMatches.length) {
+    return {
+      capability: row.capability,
+      result: 'public-name-drift-or-reachable-alias',
+      runtimeSymbol: suffixMatches[0] ?? null,
+      candidates: suffixMatches,
+      reason: 'The legacy leaf still exists on the pinned public runtime, but under a different reachable symbol path.',
+    };
+  }
+
+  if (!runtimeSourceCorpus.includes(leaf)) {
+    return {
+      capability: row.capability,
+      result: 'removed-from-current-runtime',
+      runtimeSymbol: null,
+      reason: 'The legacy capability leaf is absent from the pinned runtime source corpus.',
+    };
+  }
+
+  return {
+    capability: row.capability,
+    result: 'legacy-row-not-current-public-surface',
+    runtimeSymbol: null,
+    reason: 'The capability leaf exists somewhere in implementation source but is not exposed by the pinned public/reachable runtime surface scanner.',
+  };
+});
+
+const exactLegacyCapabilities = new Set(
+  reconciliationLegacy
+    .filter((item) => item.result === 'exact-current-runtime-surface')
+    .map((item) => item.capability),
+);
+const aliasRuntimeSymbols = new Set(
+  reconciliationLegacy
+    .map((item) => item.runtimeSymbol)
+    .filter((item): item is string => Boolean(item)),
+);
+const reconciliationRuntimeOnly = surfaces
+  .filter(
+    (surface) =>
+      !exactLegacyCapabilities.has(surface.publicSymbol) &&
+      !aliasRuntimeSymbols.has(surface.publicSymbol),
+  )
+  .map((surface) => ({
+    runtimeSymbol: surface.publicSymbol,
+    kind: surface.kind,
+    domain: surface.domain,
+    result:
+      surface.kind === 'property' || surface.kind === 'getter'
+        ? 'current-runtime-property-not-modeled-as-legacy-capability'
+        : 'current-runtime-surface-missing-from-legacy-matrix',
+    reason:
+      surface.kind === 'property' || surface.kind === 'getter'
+        ? 'Pinned runtime exposes this readable property/getter; the old capability matrix did not model it as an executable capability row.'
+        : 'Pinned runtime exposes this callable surface, but the old capability matrix contains no exact or codegen-alias row for it.',
+  }));
+
+const reconciliationCounts = {
+  legacyRows: legacyRows.length,
+  runtimeSurfaces: surfaces.length,
+  exactMatches: reconciliationLegacy.filter((item) => item.result === 'exact-current-runtime-surface').length,
+  aliasMatches: reconciliationLegacy.filter((item) => item.result === 'legacy-alias-to-current-runtime-surface').length,
+  intentionalHostedExclusions: reconciliationLegacy.filter((item) => item.result === 'intentional-hosted-exclusion').length,
+  introspectionOrNonauthorable: reconciliationLegacy.filter((item) => item.result === 'legacy-introspection-or-nonauthorable').length,
+  publicNameDriftOrReachableAlias: reconciliationLegacy.filter((item) => item.result === 'public-name-drift-or-reachable-alias').length,
+  removedFromCurrentRuntime: reconciliationLegacy.filter((item) => item.result === 'removed-from-current-runtime').length,
+  legacyNotCurrentPublicSurface: reconciliationLegacy.filter((item) => item.result === 'legacy-row-not-current-public-surface').length,
+  runtimeOnly: reconciliationRuntimeOnly.length,
+};
+const surfaceReconciliationComplete =
+  reconciliationLegacy.length === legacyRows.length &&
+  reconciliationRuntimeOnly.every((item) => item.reason.length > 0) &&
+  reconciliationLegacy.every((item) => item.reason.length > 0);
+const surfaceReconciliationArtifact = {
+  schemaVersion: 1,
+  phase: PHASE,
+  runtime: {
+    repository: pin.repository,
+    commit: pin.commit,
+  },
+  policy: 'Every old-matrix/runtime-surface discrepancy receives a source-backed category; no count difference is treated as completeness evidence.',
+  summary: reconciliationCounts,
+  legacy: reconciliationLegacy,
+  runtimeOnly: reconciliationRuntimeOnly,
+};
 
 const statusCounts = Object.fromEntries(PARITY_STATUSES.map((status) => [status, 0])) as Record<ParityStatus, number>;
 for (const surface of surfaces) statusCounts[surface.status] += 1;
@@ -1073,6 +1314,25 @@ if ((legacyMatrix.source?.packagePin ?? null) !== installedPin) {
     message: 'Legacy visual capability matrix package pin does not match package.json dependency pin.',
   });
 }
+if (deepTypeFailures.length) {
+  drift.push({
+    code: 'PARITY-DEEP-TYPE-RESOLUTION',
+    severity: 'error',
+    message: deepTypeFailures.join(' | '),
+  });
+}
+drift.push({
+  code: 'PARITY-SURFACE-RECONCILIATION',
+  severity: reconciliationCounts.runtimeOnly || reconciliationCounts.legacyNotCurrentPublicSurface || reconciliationCounts.removedFromCurrentRuntime ? 'warning' : 'info',
+  message:
+    'Legacy/runtime surface audit: ' +
+    reconciliationCounts.exactMatches + ' exact, ' +
+    reconciliationCounts.aliasMatches + ' alias, ' +
+    reconciliationCounts.publicNameDriftOrReachableAlias + ' name-drift, ' +
+    reconciliationCounts.removedFromCurrentRuntime + ' removed, ' +
+    reconciliationCounts.legacyNotCurrentPublicSurface + ' legacy non-public, ' +
+    reconciliationCounts.runtimeOnly + ' runtime-only.',
+});
 drift.push({
   code: 'PARITY-LEGACY-COMPLETE-NOT-PROOF',
   severity: 'warning',
@@ -1121,6 +1381,8 @@ const gapSummary: GapSummary = {
     runtimeSourceReadable: fs.existsSync(sourceRoot),
     apexPainterFound: classDeclarations.has('ApexPainter'),
     zeroSilentPublicSurfaceOmissions: omissions.length === 0,
+    deepRecursiveTypeResolution: deepTypeFailures.length === 0,
+    surfaceReconciliationComplete,
     noBootstrapFullClaims: statusCounts.FULL === 0,
     everyRecordHasStatus: [...surfaces, ...records].every((item) => PARITY_STATUSES.includes(item.status)),
     baselineComplete: false,
@@ -1190,6 +1452,7 @@ function json(value: unknown): string {
 const outputs = new Map<string, string>();
 outputs.set(path.join(outDir, 'public-surface.json'), json(publicSurfaceArtifact));
 outputs.set(path.join(outDir, 'runtime-source-map.json'), json(sourceMapArtifact));
+outputs.set(path.join(outDir, 'surface-reconciliation.json'), json(surfaceReconciliationArtifact));
 outputs.set(path.join(outDir, 'gap-summary.json'), json(gapSummary));
 for (const [domain, artifact] of domainArtifacts) {
   outputs.set(path.join(outDir, 'domains', domain + '.json'), json(artifact));
