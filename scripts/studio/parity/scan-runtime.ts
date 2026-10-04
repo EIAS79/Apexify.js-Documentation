@@ -471,6 +471,17 @@ function makeParityRecord(args: {
   };
 }
 
+function semanticTypeKey(type: ts.Type, typeText: string): string {
+  const symbol = type.aliasSymbol ?? type.getSymbol();
+  const declaration = symbol?.declarations?.[0];
+  if (symbol && declaration) {
+    const file = declaration.getSourceFile().fileName;
+    const location = declaration.getStart(declaration.getSourceFile());
+    return 'symbol:' + symbol.getName() + '@' + file + ':' + location;
+  }
+  return 'type:' + typeText;
+}
+
 function walkType(args: {
   publicSymbol: string;
   optionPath: string;
@@ -482,14 +493,13 @@ function walkType(args: {
   implementationFiles: string[];
   status: ParityStatus;
   records: RuntimeParityRecord[];
-  ancestry: Set<number>;
+  ancestry: Set<string>;
   depth: number;
   unionVariant?: string | null;
 }): void {
   let type = args.type;
   if (args.direction === 'output') type = unwrapPromise(type);
 
-  const typeId = Number((type as unknown as { id?: number }).id ?? -1);
   if (args.depth > MAX_TYPE_DEPTH) {
     args.records.push(makeParityRecord({
       ...args,
@@ -506,6 +516,18 @@ function walkType(args: {
     return;
   }
 
+  const semanticKey = semanticTypeKey(type, typeText);
+  if (args.ancestry.has(semanticKey)) {
+    args.records.push(makeParityRecord({
+      ...args,
+      type,
+      notes: ['recursive semantic type reference recorded without repeated expansion'],
+    }));
+    return;
+  }
+  const nextAncestry = new Set(args.ancestry);
+  nextAncestry.add(semanticKey);
+
   if (checker.isTupleType(type)) {
     const tupleItems = checker.getTypeArguments(type as ts.TypeReference);
     if (!tupleItems.length) {
@@ -519,6 +541,7 @@ function walkType(args: {
         type: tupleType,
         parentType: typeText,
         depth: args.depth + 1,
+        ancestry: nextAncestry,
       });
     });
     return;
@@ -532,6 +555,7 @@ function walkType(args: {
       type: element,
       parentType: typeText,
       depth: args.depth + 1,
+      ancestry: nextAncestry,
     });
     return;
   }
@@ -551,14 +575,14 @@ function walkType(args: {
         unionVariant: variantText,
         notes: ['discriminated/structural union variant inventory marker'],
       }));
-      if (!isBuiltinLeaf(part) && !args.ancestry.has(Number((part as unknown as { id?: number }).id ?? -2))) {
+      if (!isBuiltinLeaf(part)) {
         walkType({
           ...args,
           type: part,
           parentType: typeText,
           unionVariant: variantText,
           depth: args.depth + 1,
-          ancestry: new Set(args.ancestry),
+          ancestry: nextAncestry,
         });
       }
     }
@@ -573,18 +597,6 @@ function walkType(args: {
     }));
     return;
   }
-
-  if (typeId >= 0 && args.ancestry.has(typeId)) {
-    args.records.push(makeParityRecord({
-      ...args,
-      type,
-      notes: ['recursive type reference detected; recursion recorded without infinite expansion'],
-    }));
-    return;
-  }
-
-  const nextAncestry = new Set(args.ancestry);
-  if (typeId >= 0) nextAncestry.add(typeId);
 
   const properties = checker.getPropertiesOfType(type);
   const indexInfos = checker.getIndexInfosOfType(type);
