@@ -124,6 +124,18 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
     );
   }
   if (
+    project.document.canvasPainterOpts?.resolveAssetRefs !== undefined &&
+    typeof project.document.canvasPainterOpts.resolveAssetRefs !== 'boolean'
+  ) {
+    push(
+      issues,
+      'canvas-painter-opts-resolve-asset-refs',
+      'document.canvasPainterOpts.resolveAssetRefs',
+      'createCanvas painterOpts.resolveAssetRefs must be boolean when provided.',
+    );
+  }
+
+  if (
     Number.isFinite(project.document.width) &&
     Number.isFinite(project.document.height) &&
     project.document.width * project.document.height >
