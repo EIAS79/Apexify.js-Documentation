@@ -664,21 +664,27 @@ export function validateVisualCanvasConfig(
   }
 
   if (canvas.stroke) {
-    validateOpacity(issues, canvas.stroke.opacity, p + '.stroke.opacity');
-    if (canvas.stroke.width !== undefined && (!finite(canvas.stroke.width) || canvas.stroke.width < 0)) {
-      issue(issues, 'canvas-stroke-width', p + '.stroke.width', 'Stroke width cannot be negative.');
-    }
+    // Apexify.js validates StrokeOptions with assertFiniteNumericLeaves only.
+    // Do not impose Studio-only ranges that the pinned runtime accepts.
+    validateFiniteFields(
+      issues,
+      canvas.stroke as unknown as Record<string, unknown>,
+      ['width','position','blur','opacity','borderRadius'],
+      p + '.stroke',
+    );
     validateGradient(issues, canvas.stroke.gradient, p + '.stroke.gradient');
   }
 
   if (canvas.shadow) {
-    validateOpacity(issues, canvas.shadow.opacity, p + '.shadow.opacity');
-    for (const key of ['offsetX','offsetY','blur'] as const) {
-      const value = canvas.shadow[key];
-      if (value !== undefined && (!finite(value) || (key === 'blur' && value < 0))) {
-        issue(issues, 'canvas-shadow-number', p + '.shadow.' + key, 'Shadow values must be finite and blur cannot be negative.');
-      }
-    }
+    // ShadowOptions follows the same runtime rule: numeric leaves must be
+    // finite, but negative blur / opacity outside 0..1 are not rejected by
+    // validateCanvasConfig in the pinned runtime.
+    validateFiniteFields(
+      issues,
+      canvas.shadow as unknown as Record<string, unknown>,
+      ['offsetX','offsetY','blur','opacity','borderRadius'],
+      p + '.shadow',
+    );
     validateGradient(issues, canvas.shadow.gradient, p + '.shadow.gradient');
   }
 }
