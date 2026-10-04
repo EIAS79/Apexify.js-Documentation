@@ -1,7 +1,10 @@
 import { validateVisualTextNode } from '../text-contract';
 import { validateVisualChartNode } from '../chart-contract';
 import { validateVisualImageNode } from '../image-contract';
-import { validateVisualCanvasConfig } from '../canvas-contract';
+import {
+  CANVAS_RUNTIME_LIMITS,
+  validateVisualCanvasConfig,
+} from '../canvas-contract';
 import {
   validatePhase7Node,
   validatePhase7Operation,
@@ -90,8 +93,51 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
   if (project.schemaVersion !== VISUAL_PROJECT_SCHEMA_VERSION) push(issues, 'schema-version', 'schemaVersion', 'Unsupported Visual Project schema version.');
   if (!isStableVisualId(project.id)) push(issues, 'invalid-id', 'id', 'Project id is invalid.');
   if (!project.name.trim()) push(issues, 'name', 'name', 'Project name must not be empty.');
-  if (!Number.isFinite(project.document.width) || project.document.width <= 0) push(issues, 'document-width', 'document.width', 'Document width must be positive.');
-  if (!Number.isFinite(project.document.height) || project.document.height <= 0) push(issues, 'document-height', 'document.height', 'Document height must be positive.');
+  if (
+    !Number.isFinite(project.document.width) ||
+    !Number.isInteger(project.document.width) ||
+    project.document.width <= 0 ||
+    project.document.width > CANVAS_RUNTIME_LIMITS.maxCanvasDimension
+  ) {
+    push(
+      issues,
+      'document-width',
+      'document.width',
+      'Document width must be an integer from 1 through ' +
+        String(CANVAS_RUNTIME_LIMITS.maxCanvasDimension) +
+        '.',
+    );
+  }
+  if (
+    !Number.isFinite(project.document.height) ||
+    !Number.isInteger(project.document.height) ||
+    project.document.height <= 0 ||
+    project.document.height > CANVAS_RUNTIME_LIMITS.maxCanvasDimension
+  ) {
+    push(
+      issues,
+      'document-height',
+      'document.height',
+      'Document height must be an integer from 1 through ' +
+        String(CANVAS_RUNTIME_LIMITS.maxCanvasDimension) +
+        '.',
+    );
+  }
+  if (
+    Number.isFinite(project.document.width) &&
+    Number.isFinite(project.document.height) &&
+    project.document.width * project.document.height >
+      CANVAS_RUNTIME_LIMITS.maxTotalPixels
+  ) {
+    push(
+      issues,
+      'document-pixel-limit',
+      'document',
+      'Document dimensions exceed the Apexify runtime total-pixel limit of ' +
+        String(CANVAS_RUNTIME_LIMITS.maxTotalPixels) +
+        '.',
+    );
+  }
 
   const nodeIds = new Set(Object.keys(project.document.nodes));
   for (const [key, node] of Object.entries(project.document.nodes)) {
