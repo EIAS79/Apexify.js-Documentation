@@ -36,6 +36,14 @@ test('legacy classification can never become FULL during phase 0', () => {
   assert.equal(summary.gates.noBootstrapFullClaims, true);
 });
 
+test('unproven capability-level evidence remains UNKNOWN at leaf level', () => {
+  const summary = read<GapSummary>('gap-summary.json');
+  assert.ok(
+    summary.counts.status.UNKNOWN > 0,
+    'Phase 0 must not infer leaf parity from capability-level classification',
+  );
+});
+
 test('runtime/package source drift is explicit instead of hidden', () => {
   const summary = read<GapSummary>('gap-summary.json');
   if (!summary.studio.runtimePinMatchesInstalledPackage) {
