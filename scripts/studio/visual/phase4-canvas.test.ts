@@ -848,3 +848,33 @@ test('STUDIO-PARITY-1 canvas inspector exposes ordered layer editing and runtime
   assert.match(inspector, /data-canvas-video-compatibility/);
   assert.match(inspector, /Studio preserves and round-trips them explicitly/);
 });
+
+
+test('STUDIO-PARITY-1 displays runtime pattern blend fallbacks without forcing model values', () => {
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualCanvasInspector.tsx',
+    'utf8',
+  );
+
+  assert.match(inspector, /effectiveBlendMode = 'overlay'/);
+  assert.match(inspector, /pattern\.blendMode \?\? effectiveBlendMode \?\? 'overlay'/);
+  assert.match(inspector, /effectiveBlendMode=\{layer\.blendMode \?\? 'source-over'\}/);
+  assert.match(inspector, /Apexify defaults it to overlay/);
+
+  const project = createVisualProject({
+    width: 320,
+    height: 180,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  project.document.canvas = {
+    patternBg: {
+      type: 'dots',
+      color: '#ffffff',
+      size: 4,
+      spacing: 8,
+    },
+  };
+  const generated = generateVisualProjectCode(project).source;
+  assert.match(generated, /patternBg:/);
+  assert.doesNotMatch(generated, /blendMode:/);
+});
