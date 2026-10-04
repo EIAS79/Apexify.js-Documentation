@@ -415,6 +415,14 @@ function studioFields(publicSymbol: string, leaf: string) {
   };
 }
 
+function displayType(type: ts.Type): string {
+  const symbol = type.aliasSymbol ?? type.getSymbol();
+  const name = symbol?.getName();
+  if (name && !/^__/.test(name)) return name;
+  const text = checker.typeToString(type, undefined, ts.TypeFormatFlags.None);
+  return text.length <= 512 ? text : text.slice(0, 509) + '...';
+}
+
 function makeParityRecord(args: {
   publicSymbol: string;
   optionPath: string;
@@ -450,7 +458,7 @@ function makeParityRecord(args: {
     optionPath: args.optionPath,
     direction: args.direction,
     parentType: args.parentType,
-    leafType: checker.typeToString(args.type, undefined, ts.TypeFormatFlags.NoTruncation),
+    leafType: displayType(args.type),
     unionVariant: args.unionVariant ?? null,
     sourceFiles: [...new Set(args.sourceFiles)].sort(),
     implementationFiles: [...new Set(args.implementationFiles)].sort(),
@@ -559,7 +567,7 @@ function walkType(args: {
         ...args,
         optionPath: args.optionPath + '[' + index + ']',
         type: tupleType,
-        parentType: typeText,
+        parentType: displayType(type),
         depth: args.depth + 1,
         ancestry: nextAncestry,
       });
@@ -573,7 +581,7 @@ function walkType(args: {
       ...args,
       optionPath: args.optionPath + '[]',
       type: element,
-      parentType: typeText,
+      parentType: displayType(type),
       depth: args.depth + 1,
       ancestry: nextAncestry,
     });
@@ -588,7 +596,7 @@ function walkType(args: {
     }
 
     for (const part of type.types) {
-      const variantText = checker.typeToString(part, undefined, ts.TypeFormatFlags.NoTruncation);
+      const variantText = displayType(part);
       if (isBuiltinLeaf(part)) {
         args.records.push(makeParityRecord({
           ...args,
@@ -603,7 +611,7 @@ function walkType(args: {
       walkType({
         ...args,
         type: part,
-        parentType: typeText,
+        parentType: displayType(type),
         unionVariant: variantText,
         depth: args.depth + 1,
         ancestry: nextAncestry,
@@ -636,7 +644,7 @@ function walkType(args: {
         optionPath: args.optionPath + '.' + prop.getName(),
         type: checker.getDeclaredTypeOfSymbol(prop),
         symbol: prop,
-        parentType: typeText,
+        parentType: displayType(type),
         notes: ['symbol has no source declaration; manual source mapping required'],
       }));
       continue;
@@ -649,7 +657,7 @@ function walkType(args: {
       optionPath: args.optionPath + '.' + prop.getName(),
       type: propType,
       symbol: prop,
-      parentType: typeText,
+      parentType: displayType(type),
       sourceFiles,
       ancestry: nextAncestry,
       depth: args.depth + 1,
@@ -661,7 +669,7 @@ function walkType(args: {
       ...args,
       optionPath: args.optionPath + '[*]',
       type: info.type,
-      parentType: typeText,
+      parentType: displayType(type),
       ancestry: nextAncestry,
       depth: args.depth + 1,
     });
