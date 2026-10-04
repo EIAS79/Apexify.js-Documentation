@@ -28,6 +28,8 @@ test('baseline inventories public surfaces and recursive runtime records', () =>
   assert.ok(summary.counts.outputRecords > 0);
   assert.equal(summary.gates.apexPainterFound, true);
   assert.equal(summary.gates.zeroSilentPublicSurfaceOmissions, true);
+  assert.equal(summary.gates.deepRecursiveTypeResolution, true);
+  assert.equal(summary.gates.surfaceReconciliationComplete, true);
 });
 
 test('legacy classification can never become FULL during phase 0', () => {
@@ -52,7 +54,7 @@ test('runtime/package source drift is explicit instead of hidden', () => {
 });
 
 test('generated index and all required baseline artifacts exist', () => {
-  for (const name of ['index.json', 'public-surface.json', 'runtime-source-map.json', 'gap-summary.json', 'BASELINE.md']) {
+  for (const name of ['index.json', 'public-surface.json', 'runtime-source-map.json', 'surface-reconciliation.json', 'gap-summary.json', 'BASELINE.md']) {
     assert.equal(fs.existsSync(path.join(dir, name)), true, name + ' should exist');
   }
 });
