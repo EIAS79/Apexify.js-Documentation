@@ -390,6 +390,7 @@ export const IMAGE_AUTHORING_CLASSIFICATION = {
   boxBackground: { surface: 'Style', reverse: 'canonical-literal' },
   utilityStack: { surface: 'Effects', reverse: 'canonical-literal' },
   utilityAnalyses: { surface: 'Data', reverse: 'canonical-literal' },
+  painterOpts: { surface: 'Advanced', reverse: 'canonical-literal' },
 } as const satisfies Record<
   ImageRuntimePropertyKey,
   { surface: ImageAuthoringSurface; reverse: ImageReverseSyncPolicy }
@@ -616,6 +617,18 @@ export function validateVisualImageNode(
   const props = visualImageProps(node);
 
   validateSource(project, props.source, path + '.props.source', issues);
+
+  if (
+    props.painterOpts?.resolveAssetRefs !== undefined &&
+    typeof props.painterOpts.resolveAssetRefs !== 'boolean'
+  ) {
+    issue(
+      issues,
+      'image-painter-opts-resolve-asset-refs',
+      path + '.props.painterOpts.resolveAssetRefs',
+      'createImage painterOpts.resolveAssetRefs must be boolean when provided.',
+    );
+  }
 
   if (node.kind === 'shape') {
     if (typeof props.source !== 'string' || !IMAGE_SHAPE_TYPES.includes(props.source as VisualShapeType)) {
