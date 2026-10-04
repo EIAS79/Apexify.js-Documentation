@@ -721,9 +721,11 @@ function PatternGradientEditor({
 function PatternEditor({
   pattern,
   onChange,
+  effectiveBlendMode = 'overlay',
 }: {
   pattern: VisualPatternOptions;
   onChange: (pattern: VisualPatternOptions) => void;
+  effectiveBlendMode?: VisualPatternOptions['blendMode'];
 }) {
   const patch = (value: Partial<VisualPatternOptions>) =>
     onChange({ ...pattern, ...value });
@@ -854,7 +856,7 @@ function PatternEditor({
 
       <SelectField
         label="Pattern blend"
-        value={pattern.blendMode ?? 'source-over'}
+        value={pattern.blendMode ?? effectiveBlendMode ?? 'overlay'}
         options={CANVAS_BLEND_MODES}
         onChange={(value) =>
           patch({ blendMode: value as VisualPatternOptions['blendMode'] })
@@ -866,7 +868,9 @@ function PatternEditor({
         <span>
           Pattern paint is either primary/secondary colors or one gradient.
           Blend mode is applied afterward when the finished pattern layer is
-          composited onto the canvas. Source over preserves authored colors.
+          composited onto the canvas. When patternBg.blendMode is omitted,
+          Apexify defaults it to overlay; preset-pattern background layers
+          inherit their layer composite instead.
         </span>
       </div>
 
@@ -1595,6 +1599,7 @@ function BackgroundLayersEditor({
               {layer.type === 'presetPattern' ? (
                 <PatternEditor
                   pattern={layer.pattern}
+                  effectiveBlendMode={layer.blendMode ?? 'source-over'}
                   onChange={(pattern) =>
                     update(index, (current) =>
                       current.type === 'presetPattern'
