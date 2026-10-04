@@ -926,8 +926,9 @@ function enumerateFacetType(
   prefix: string,
   type: ts.Type,
   depth: number,
+  maxDepth: number,
 ): void {
-  if (depth > MAX_FACET_DEPTH) return;
+  if (depth > maxDepth) return;
   const typeText = checker.typeToString(type, undefined, ts.TypeFormatFlags.NoTruncation);
   const key = prefix + '|' + typeText;
   if (seenFacetObjects.has(key)) return;
@@ -964,14 +965,29 @@ function enumerateFacetType(
     });
 
     if (
-      depth < MAX_FACET_DEPTH &&
+      depth < maxDepth &&
       typeBelongsToRuntime(propType) &&
       !isBuiltinLeaf(propType) &&
       !checker.isArrayType(propType)
     ) {
-      enumerateFacetType(owner, symbol, propType, depth + 1);
+      enumerateFacetType(owner, symbol, propType, depth + 1, maxDepth);
     }
   }
+}
+
+function facetDepthFor(owner: string, memberName: string): number {
+  if (owner === 'ApexPainter') {
+    // ApexPainter's public facets are one semantic API boundary. Components need
+    // one nested level (components.badge.toLayers); VideoStack's creator/operations
+    // are inventoried as properties here and as canonical standalone classes below.
+    return memberName === 'components' ? 1 : 0;
+  }
+  if (owner === 'VideoOperations') {
+    // VideoOperations exposes domain service objects (advanced/audio/frames/etc.).
+    // Traverse exactly one service boundary, never their internal runtime wiring.
+    return 0;
+  }
+  return 0;
 }
 
 function enumerateClass(className: string, prefix = className): void {
@@ -1017,7 +1033,13 @@ function enumerateClass(className: string, prefix = className): void {
         type: memberType,
       });
       if (typeBelongsToRuntime(memberType)) {
-        enumerateFacetType(className, prefix + '.' + memberName, memberType, 0);
+        enumerateFacetType(
+          className,
+          prefix + '.' + memberName,
+          memberType,
+          0,
+          facetDepthFor(className, memberName),
+        );
       }
       continue;
     }
@@ -1046,7 +1068,13 @@ function enumerateClass(className: string, prefix = className): void {
           type: memberType,
         });
         if (typeBelongsToRuntime(memberType)) {
-          enumerateFacetType(className, prefix + '.' + memberName, memberType, 0);
+          enumerateFacetType(
+          className,
+          prefix + '.' + memberName,
+          memberType,
+          0,
+          facetDepthFor(className, memberName),
+        );
         }
       }
     }
@@ -1058,7 +1086,7 @@ function enumerateClass(className: string, prefix = className): void {
     const symbol = prefix + '.' + prop.getName();
     if (surfaceBuilds.has(symbol)) continue;
     const decl = prop.valueDeclaration ?? prop.declarations?.[0];
-    if (!decl || !isRuntimePath(decl.getSourceFile().fileName)) continue;
+    if (!decl || !isRuntimePath(decl.getSourceFile().fileName) || !isPublicDeclaration(decl)) continue;
     const propType = checker.getTypeOfSymbolAtLocation(prop, decl);
     const calls = propType.getCallSignatures();
     if (calls.length) {
