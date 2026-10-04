@@ -31,6 +31,17 @@ export const CANVAS_ALIGNMENTS = [
 ] as const;
 
 export const CANVAS_FITS = ['fill','contain','cover'] as const;
+export const CANVAS_PATTERN_REPEATS = ['repeat','repeat-x','repeat-y','no-repeat'] as const;
+export const CANVAS_GRADIENT_REPEATS = ['repeat','reflect','no-repeat'] as const;
+
+/** Pinned Apexify.js v6 default runtime limits used by STUDIO-PARITY-1. */
+export const CANVAS_RUNTIME_LIMITS = {
+  maxCanvasDimension: 16_384,
+  maxTotalPixels: 67_108_864,
+  maxCollectionItems: 2_048,
+  maxBackgroundLayers: 128,
+  maxFiltersPerOperation: 64,
+} as const;
 
 export function defaultCanvasGradient(): VisualGradient {
   return {
@@ -91,6 +102,48 @@ function validateOpacity(
   }
 }
 
+function validateString(
+  issues: VisualProjectIssue[],
+  value: unknown,
+  path: string,
+  maxLength: number,
+) {
+  if (
+    typeof value !== 'string' ||
+    !value.trim() ||
+    value.includes('\0') ||
+    value.length > maxLength
+  ) {
+    issue(
+      issues,
+      'canvas-string',
+      path,
+      'Value must be a non-empty string without NUL bytes and at most ' +
+        String(maxLength) +
+        ' characters.',
+    );
+  }
+}
+
+function validateFiniteFields(
+  issues: VisualProjectIssue[],
+  value: Record<string, unknown>,
+  keys: readonly string[],
+  path: string,
+) {
+  for (const key of keys) {
+    const current = value[key];
+    if (current !== undefined && !finite(current)) {
+      issue(
+        issues,
+        'canvas-number',
+        path + '.' + key,
+        'Numeric values must be finite.',
+      );
+    }
+  }
+}
+
 function validateImageBackgroundOptions(
   issues: VisualProjectIssue[],
   background: {
@@ -125,6 +178,16 @@ function validateImageBackgroundOptions(
     return;
   }
   if (!Array.isArray(background.filters)) return;
+  if (background.filters.length > CANVAS_RUNTIME_LIMITS.maxFiltersPerOperation) {
+    issue(
+      issues,
+      'canvas-background-filter-limit',
+      path + '.filters',
+      'Background filters exceed the Apexify runtime limit of ' +
+        String(CANVAS_RUNTIME_LIMITS.maxFiltersPerOperation) +
+        '.',
+    );
+  }
 
   background.filters.forEach((rawFilter, index) => {
     const filterPath = path + '.filters[' + index + ']';
@@ -184,18 +247,105 @@ function validateGradient(
   if (!['linear','radial','conic'].includes(gradient.type)) {
     issue(issues, 'canvas-gradient-type', path + '.type', 'Unsupported gradient type.');
   }
+
+  validateFiniteFields(
+    issues,
+    gradient as unknown as Record<string, unknown>,
+    [
+      'startX','startY','endX','endY','startRadius','endRadius',
+      'centerX','centerY','startAngle','rotate','pivotX','pivotY',
+    ],
+    path,
+  );
+
   if (!Array.isArray(gradient.colors) || gradient.colors.length < 2) {
     issue(issues, 'canvas-gradient-stops', path + '.colors', 'Gradient requires at least two color stops.');
     return;
   }
+  if (gradient.colors.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(
+      issues,
+      'canvas-gradient-stop-limit',
+      path + '.colors',
+      'Gradient stops exceed the Apexify runtime collection limit of ' +
+        String(CANVAS_RUNTIME_LIMITS.maxCollectionItems) +
+        '.',
+    );
+  }
+
+  let previousStop = -Infinity;
   gradient.colors.forEach((stop, index) => {
     if (!finite(stop.stop) || stop.stop < 0 || stop.stop > 1) {
       issue(issues, 'canvas-gradient-stop', path + `.colors[${index}].stop`, 'Gradient stop must be between 0 and 1.');
     }
-    if (!stop.color?.trim()) {
-      issue(issues, 'canvas-gradient-color', path + `.colors[${index}].color`, 'Gradient color is required.');
+    if (finite(stop.stop) && stop.stop < previousStop) {
+      issue(
+        issues,
+        'canvas-gradient-stop-order',
+        path + `.colors[${index}].stop`,
+        'Gradient stops must be ordered by non-decreasing stop; duplicate stops are allowed.',
+      );
+    }
+    if (finite(stop.stop)) previousStop = stop.stop;
+    if (typeof stop.color !== 'string' || !stop.color.trim() || stop.color.includes('\0') || stop.color.length > 256) {
+      issue(issues, 'canvas-gradient-color', path + `.colors[${index}].color`, 'Gradient color must be a non-empty string of at most 256 characters.');
     }
   });
+
+  if (gradient.type === 'linear' || gradient.type === 'radial') {
+    if (
+      gradient.repeat !== undefined &&
+      !CANVAS_GRADIENT_REPEATS.includes(
+        gradient.repeat as (typeof CANVAS_GRADIENT_REPEATS)[number],
+      )
+    ) {
+      issue(issues, 'canvas-gradient-repeat', path + '.repeat', 'Unsupported gradient repeat mode.');
+    }
+  }
+
+  if (
+    gradient.type === 'linear' &&
+    gradient.startX !== undefined &&
+    gradient.startY !== undefined &&
+    gradient.endX !== undefined &&
+    gradient.endY !== undefined &&
+    gradient.startX === gradient.endX &&
+    gradient.startY === gradient.endY
+  ) {
+    issue(
+      issues,
+      'canvas-gradient-geometry',
+      path,
+      'Linear gradient start and end points must not be identical.',
+    );
+  }
+
+  if (gradient.type === 'radial') {
+    if (gradient.startRadius !== undefined && gradient.startRadius < 0) {
+      issue(issues, 'canvas-gradient-radius', path + '.startRadius', 'Radial start radius must be non-negative.');
+    }
+    if (gradient.endRadius !== undefined && gradient.endRadius < 0) {
+      issue(issues, 'canvas-gradient-radius', path + '.endRadius', 'Radial end radius must be non-negative.');
+    }
+    if (
+      gradient.startX !== undefined &&
+      gradient.startY !== undefined &&
+      gradient.startRadius !== undefined &&
+      gradient.endX !== undefined &&
+      gradient.endY !== undefined &&
+      gradient.endRadius !== undefined &&
+      gradient.startX === gradient.endX &&
+      gradient.startY === gradient.endY &&
+      gradient.startRadius === gradient.endRadius
+    ) {
+      issue(
+        issues,
+        'canvas-gradient-geometry',
+        path,
+        'Radial gradient start and end circles must not be identical.',
+      );
+    }
+  }
 }
 
 function validatePatternGradient(
@@ -207,27 +357,87 @@ function validatePatternGradient(
   if (!['linear', 'radial', 'conic'].includes(gradient.type)) {
     issue(issues, 'canvas-pattern-gradient-type', path + '.type', 'Unsupported pattern gradient type.');
   }
+  validateFiniteFields(
+    issues,
+    gradient as unknown as Record<string, unknown>,
+    [
+      'startX','startY','endX','endY','startRadius','endRadius',
+      'angle','centerX','centerY','startAngle',
+    ],
+    path,
+  );
   if (!Array.isArray(gradient.colors) || gradient.colors.length < 2) {
     issue(issues, 'canvas-pattern-gradient-stops', path + '.colors', 'Pattern gradient requires at least two color stops.');
     return;
   }
-  for (const key of [
-    'startX','startY','endX','endY','startRadius','endRadius',
-    'angle','centerX','centerY','startAngle',
-  ] as const) {
-    const value = gradient[key];
-    if (value !== undefined && !finite(value)) {
-      issue(issues, 'canvas-pattern-gradient-number', path + '.' + key, 'Pattern gradient numeric values must be finite.');
-    }
+  if (gradient.colors.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(
+      issues,
+      'canvas-pattern-gradient-stop-limit',
+      path + '.colors',
+      'Pattern gradient stops exceed the Apexify runtime collection limit.',
+    );
   }
+  if (
+    gradient.repeat !== undefined &&
+    !CANVAS_GRADIENT_REPEATS.includes(
+      gradient.repeat as (typeof CANVAS_GRADIENT_REPEATS)[number],
+    )
+  ) {
+    issue(issues, 'canvas-pattern-gradient-repeat', path + '.repeat', 'Unsupported pattern gradient repeat mode.');
+  }
+
+  let previousStop = -Infinity;
   gradient.colors.forEach((stop, index) => {
     if (!finite(stop.stop) || stop.stop < 0 || stop.stop > 1) {
       issue(issues, 'canvas-pattern-gradient-stop', path + `.colors[${index}].stop`, 'Pattern gradient stop must be between 0 and 1.');
     }
-    if (!stop.color?.trim()) {
-      issue(issues, 'canvas-pattern-gradient-color', path + `.colors[${index}].color`, 'Pattern gradient color is required.');
+    if (finite(stop.stop) && stop.stop < previousStop) {
+      issue(
+        issues,
+        'canvas-pattern-gradient-stop-order',
+        path + `.colors[${index}].stop`,
+        'Pattern gradient stops must be ordered by non-decreasing stop.',
+      );
+    }
+    if (finite(stop.stop)) previousStop = stop.stop;
+    if (typeof stop.color !== 'string' || !stop.color.trim() || stop.color.includes('\0') || stop.color.length > 256) {
+      issue(issues, 'canvas-pattern-gradient-color', path + `.colors[${index}].color`, 'Pattern gradient color must be a non-empty string of at most 256 characters.');
     }
   });
+
+  if (
+    gradient.type === 'linear' &&
+    gradient.startX !== undefined &&
+    gradient.startY !== undefined &&
+    gradient.endX !== undefined &&
+    gradient.endY !== undefined &&
+    gradient.startX === gradient.endX &&
+    gradient.startY === gradient.endY
+  ) {
+    issue(issues, 'canvas-pattern-gradient-geometry', path, 'Linear gradient start and end points must not be identical.');
+  }
+  if (gradient.type === 'radial') {
+    if (gradient.startRadius !== undefined && gradient.startRadius < 0) {
+      issue(issues, 'canvas-pattern-gradient-radius', path + '.startRadius', 'Radial start radius must be non-negative.');
+    }
+    if (gradient.endRadius !== undefined && gradient.endRadius < 0) {
+      issue(issues, 'canvas-pattern-gradient-radius', path + '.endRadius', 'Radial end radius must be non-negative.');
+    }
+    if (
+      gradient.startX !== undefined &&
+      gradient.startY !== undefined &&
+      gradient.startRadius !== undefined &&
+      gradient.endX !== undefined &&
+      gradient.endY !== undefined &&
+      gradient.endRadius !== undefined &&
+      gradient.startX === gradient.endX &&
+      gradient.startY === gradient.endY &&
+      gradient.startRadius === gradient.endRadius
+    ) {
+      issue(issues, 'canvas-pattern-gradient-geometry', path, 'Radial gradient start and end circles must not be identical.');
+    }
+  }
 }
 
 function validatePattern(
@@ -265,8 +475,27 @@ function validatePattern(
       issue(issues, 'canvas-pattern-number', path + '.' + key, 'Pattern numeric values must be finite.');
     }
   }
-  if (pattern.type === 'custom' && !pattern.customPatternImage?.trim()) {
-    issue(issues, 'canvas-pattern-image', path + '.customPatternImage', 'Custom pattern requires an image source.');
+  if (pattern.size !== undefined && pattern.size <= 0) {
+    issue(issues, 'canvas-pattern-size', path + '.size', 'Pattern size must be greater than 0.');
+  }
+  if (pattern.spacing !== undefined && pattern.spacing < 0) {
+    issue(issues, 'canvas-pattern-spacing', path + '.spacing', 'Pattern spacing must be at least 0.');
+  }
+  if (pattern.scale !== undefined && pattern.scale <= 0) {
+    issue(issues, 'canvas-pattern-scale', path + '.scale', 'Pattern scale must be greater than 0.');
+  }
+  if (
+    pattern.repeat !== undefined &&
+    !CANVAS_PATTERN_REPEATS.includes(
+      pattern.repeat as (typeof CANVAS_PATTERN_REPEATS)[number],
+    )
+  ) {
+    issue(issues, 'canvas-pattern-repeat', path + '.repeat', 'Unsupported pattern repeat mode.');
+  }
+  if (pattern.color !== undefined) validateString(issues, pattern.color, path + '.color', 512);
+  if (pattern.secondaryColor !== undefined) validateString(issues, pattern.secondaryColor, path + '.secondaryColor', 512);
+  if (pattern.type === 'custom') {
+    validateString(issues, pattern.customPatternImage, path + '.customPatternImage', 16_384);
   }
   validatePatternGradient(issues, pattern.gradient, path + '.gradient');
 }
@@ -331,12 +560,12 @@ export function validateVisualCanvasConfig(
   }
 
   if (canvas.customBg) {
-    if (!canvas.customBg.source.trim()) issue(issues, 'canvas-custom-bg-source', p + '.customBg.source', 'Background image source is required.');
+    validateString(issues, canvas.customBg.source, p + '.customBg.source', 16_384);
     validateImageBackgroundOptions(issues, canvas.customBg, p + '.customBg', width, height);
   }
 
   if (canvas.videoBg) {
-    if (!canvas.videoBg.source.trim()) issue(issues, 'canvas-video-bg-source', p + '.videoBg.source', 'Video source is required.');
+    validateString(issues, canvas.videoBg.source, p + '.videoBg.source', 16_384);
     validateImageBackgroundOptions(issues, canvas.videoBg, p + '.videoBg', width, height);
     if (canvas.videoBg.frame !== undefined && canvas.videoBg.time !== undefined) {
       issue(issues, 'canvas-video-selector', p + '.videoBg', 'Video background must specify frame or time, not both.');
@@ -361,6 +590,17 @@ export function validateVisualCanvasConfig(
     }
   }
 
+  if ((canvas.bgLayers?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxBackgroundLayers) {
+    issue(
+      issues,
+      'canvas-layer-limit',
+      p + '.bgLayers',
+      'Background layers exceed the Apexify runtime limit of ' +
+        String(CANVAS_RUNTIME_LIMITS.maxBackgroundLayers) +
+        '.',
+    );
+  }
+
   canvas.bgLayers?.forEach((layer, index) => {
     const path = p + `.bgLayers[${index}]`;
     if ('opacity' in layer) validateOpacity(issues, layer.opacity, path + '.opacity');
@@ -373,10 +613,38 @@ export function validateVisualCanvasConfig(
     ) {
       issue(issues, 'canvas-layer-blend', path + '.blendMode', 'Unsupported background-layer blend mode.');
     }
+    if (layer.type === 'color') {
+      validateString(issues, layer.value, path + '.value', 512);
+    }
     if (layer.type === 'gradient') validateGradient(issues, layer.value, path + '.value');
     if (layer.type === 'presetPattern') validatePattern(issues, layer.pattern, path + '.pattern');
-    if ((layer.type === 'image' || layer.type === 'pattern') && !layer.source.trim()) {
-      issue(issues, 'canvas-layer-source', path + '.source', 'Background layer source is required.');
+    if (layer.type === 'image' || layer.type === 'pattern') {
+      validateString(issues, layer.source, path + '.source', 16_384);
+    }
+    if (layer.type === 'image') {
+      if (
+        layer.fit !== undefined &&
+        !CANVAS_FITS.includes(layer.fit as (typeof CANVAS_FITS)[number])
+      ) {
+        issue(issues, 'canvas-layer-fit', path + '.fit', 'Unsupported background-layer fit mode.');
+      }
+      if (
+        layer.align !== undefined &&
+        !CANVAS_ALIGNMENTS.includes(
+          layer.align as (typeof CANVAS_ALIGNMENTS)[number],
+        )
+      ) {
+        issue(issues, 'canvas-layer-align', path + '.align', 'Unsupported background-layer alignment.');
+      }
+    }
+    if (
+      layer.type === 'pattern' &&
+      layer.repeat !== undefined &&
+      !CANVAS_PATTERN_REPEATS.includes(
+        layer.repeat as (typeof CANVAS_PATTERN_REPEATS)[number],
+      )
+    ) {
+      issue(issues, 'canvas-layer-repeat', path + '.repeat', 'Unsupported background-layer repeat mode.');
     }
     if (layer.type === 'noise' && layer.intensity !== undefined &&
         (!finite(layer.intensity) || layer.intensity < 0 || layer.intensity > 1)) {
@@ -396,21 +664,27 @@ export function validateVisualCanvasConfig(
   }
 
   if (canvas.stroke) {
-    validateOpacity(issues, canvas.stroke.opacity, p + '.stroke.opacity');
-    if (canvas.stroke.width !== undefined && (!finite(canvas.stroke.width) || canvas.stroke.width < 0)) {
-      issue(issues, 'canvas-stroke-width', p + '.stroke.width', 'Stroke width cannot be negative.');
-    }
+    // Apexify.js validates StrokeOptions with assertFiniteNumericLeaves only.
+    // Do not impose Studio-only ranges that the pinned runtime accepts.
+    validateFiniteFields(
+      issues,
+      canvas.stroke as unknown as Record<string, unknown>,
+      ['width','position','blur','opacity','borderRadius'],
+      p + '.stroke',
+    );
     validateGradient(issues, canvas.stroke.gradient, p + '.stroke.gradient');
   }
 
   if (canvas.shadow) {
-    validateOpacity(issues, canvas.shadow.opacity, p + '.shadow.opacity');
-    for (const key of ['offsetX','offsetY','blur'] as const) {
-      const value = canvas.shadow[key];
-      if (value !== undefined && (!finite(value) || (key === 'blur' && value < 0))) {
-        issue(issues, 'canvas-shadow-number', p + '.shadow.' + key, 'Shadow values must be finite and blur cannot be negative.');
-      }
-    }
+    // ShadowOptions follows the same runtime rule: numeric leaves must be
+    // finite, but negative blur / opacity outside 0..1 are not rejected by
+    // validateCanvasConfig in the pinned runtime.
+    validateFiniteFields(
+      issues,
+      canvas.shadow as unknown as Record<string, unknown>,
+      ['offsetX','offsetY','blur','opacity','borderRadius'],
+      p + '.shadow',
+    );
     validateGradient(issues, canvas.shadow.gradient, p + '.shadow.gradient');
   }
 }

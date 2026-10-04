@@ -18,6 +18,7 @@ import {
   CANVAS_BLEND_MODES,
   CANVAS_FITS,
   CANVAS_PATTERN_TYPES,
+  CANVAS_RUNTIME_LIMITS,
   defaultBackgroundLayer,
   defaultCanvasGradient,
   defaultCanvasPattern,
@@ -72,6 +73,7 @@ type Props = {
     updater: (canvas: VisualCanvasConfig) => VisualCanvasConfig,
   ) => void;
   onResizeDraft: (key: 'width' | 'height', value: number) => void;
+  onResolveAssetRefsChange: (checked: boolean) => void;
   onMessage: (message: string) => void;
   onExtractVideoFrame: (request: CanvasVideoFrameExtractionRequest) => Promise<void>;
   videoFrameExtracting: boolean;
@@ -720,9 +722,11 @@ function PatternGradientEditor({
 function PatternEditor({
   pattern,
   onChange,
+  effectiveBlendMode = 'overlay',
 }: {
   pattern: VisualPatternOptions;
   onChange: (pattern: VisualPatternOptions) => void;
+  effectiveBlendMode?: VisualPatternOptions['blendMode'];
 }) {
   const patch = (value: Partial<VisualPatternOptions>) =>
     onChange({ ...pattern, ...value });
@@ -853,7 +857,7 @@ function PatternEditor({
 
       <SelectField
         label="Pattern blend"
-        value={pattern.blendMode ?? 'source-over'}
+        value={pattern.blendMode ?? effectiveBlendMode ?? 'overlay'}
         options={CANVAS_BLEND_MODES}
         onChange={(value) =>
           patch({ blendMode: value as VisualPatternOptions['blendMode'] })
@@ -865,7 +869,9 @@ function PatternEditor({
         <span>
           Pattern paint is either primary/secondary colors or one gradient.
           Blend mode is applied afterward when the finished pattern layer is
-          composited onto the canvas. Source over preserves authored colors.
+          composited onto the canvas. When patternBg.blendMode is omitted,
+          Apexify defaults it to overlay; preset-pattern background layers
+          inherit their layer composite instead.
         </span>
       </div>
 
@@ -1343,6 +1349,24 @@ function BackgroundLayersEditor({
       ),
     );
 
+  const move = (index: number, delta: -1 | 1) => {
+    const target = index + delta;
+    if (target < 0 || target >= layers.length) return;
+    const next = [...layers];
+    [next[index], next[target]] = [next[target]!, next[index]!];
+    onChange(next);
+  };
+
+  const duplicate = (index: number) => {
+    if (layers.length >= CANVAS_RUNTIME_LIMITS.maxBackgroundLayers) return;
+    const copy = structuredClone(layers[index]!);
+    onChange([
+      ...layers.slice(0, index + 1),
+      copy,
+      ...layers.slice(index + 1),
+    ]);
+  };
+
   return (
     <div className="apx-canvas-v2-layer-stack">
       <div className="apx-canvas-v2-subhead">
@@ -1354,6 +1378,7 @@ function BackgroundLayersEditor({
           className="apx-canvas-v2-add-select"
           value=""
           aria-label="Add background layer"
+          disabled={layers.length >= CANVAS_RUNTIME_LIMITS.maxBackgroundLayers}
           onChange={(event) => {
             if (!event.target.value) return;
             onChange([
@@ -1364,7 +1389,11 @@ function BackgroundLayersEditor({
             ]);
           }}
         >
-          <option value="">＋ Layer</option>
+          <option value="">
+            {layers.length >= CANVAS_RUNTIME_LIMITS.maxBackgroundLayers
+              ? 'Layer limit reached'
+              : '＋ Layer'}
+          </option>
           <option value="color">Color</option>
           <option value="gradient">Gradient</option>
           <option value="image">Image</option>
@@ -1372,6 +1401,9 @@ function BackgroundLayersEditor({
           <option value="presetPattern">Preset pattern</option>
           <option value="noise">Noise</option>
         </select>
+        <small className="apx-canvas-v2-field-hint">
+          {layers.length} / {CANVAS_RUNTIME_LIMITS.maxBackgroundLayers} runtime layers
+        </small>
       </div>
 
       {layers.length ? (
@@ -1387,6 +1419,42 @@ function BackgroundLayersEditor({
                     ? Math.round((layer.intensity ?? 0.04) * 100) + '% noise'
                     : ''}
               </small>
+              <button
+                className="apx-canvas-v2-icon-button"
+                type="button"
+                aria-label="Move background layer down"
+                disabled={index === 0}
+                onClick={(event) => {
+                  event.preventDefault();
+                  move(index, -1);
+                }}
+              >
+                ↓
+              </button>
+              <button
+                className="apx-canvas-v2-icon-button"
+                type="button"
+                aria-label="Move background layer up"
+                disabled={index === layers.length - 1}
+                onClick={(event) => {
+                  event.preventDefault();
+                  move(index, 1);
+                }}
+              >
+                ↑
+              </button>
+              <button
+                className="apx-canvas-v2-icon-button"
+                type="button"
+                aria-label="Duplicate background layer"
+                disabled={layers.length >= CANVAS_RUNTIME_LIMITS.maxBackgroundLayers}
+                onClick={(event) => {
+                  event.preventDefault();
+                  duplicate(index);
+                }}
+              >
+                ⧉
+              </button>
               <button
                 className="apx-canvas-v2-icon-button"
                 type="button"
@@ -1532,6 +1600,7 @@ function BackgroundLayersEditor({
               {layer.type === 'presetPattern' ? (
                 <PatternEditor
                   pattern={layer.pattern}
+                  effectiveBlendMode={layer.blendMode ?? 'source-over'}
                   onChange={(pattern) =>
                     update(index, (current) =>
                       current.type === 'presetPattern'
@@ -1619,6 +1688,7 @@ export function VisualCanvasInspector({
   onDraft,
   onMutate,
   onResizeDraft,
+  onResolveAssetRefsChange,
   onMessage,
   onExtractVideoFrame,
   videoFrameExtracting,
@@ -1929,6 +1999,55 @@ export function VisualCanvasInspector({
                   ))}
                 </select>
               </label>
+
+              <div className="apx-canvas-v2-callout apx-canvas-v2-callout--info" data-canvas-video-compatibility>
+                <strong>Deprecated compatibility flags</strong>
+                <span>
+                  Apexify.js still accepts videoBg.loop and videoBg.autoplay for compatibility,
+                  but a canvas video background is one extracted still frame, so both flags have
+                  no rendering effect. Studio preserves and round-trips them explicitly.
+                </span>
+                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
+                  <label className="apx-canvas-v2-check-card">
+                    <input
+                      type="checkbox"
+                      checked={legacyVideoBg?.loop ?? false}
+                      onChange={(event) =>
+                        onMutate('Legacy video background loop flag', (current) => ({
+                          ...current,
+                          videoBg: {
+                            ...(current.videoBg ?? canvas.videoBg!),
+                            loop: event.target.checked,
+                          },
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>loop</strong>
+                      <small>Deprecated · accepted by runtime · no effect on the extracted still frame.</small>
+                    </span>
+                  </label>
+                  <label className="apx-canvas-v2-check-card">
+                    <input
+                      type="checkbox"
+                      checked={legacyVideoBg?.autoplay ?? false}
+                      onChange={(event) =>
+                        onMutate('Legacy video background autoplay flag', (current) => ({
+                          ...current,
+                          videoBg: {
+                            ...(current.videoBg ?? canvas.videoBg!),
+                            autoplay: event.target.checked,
+                          },
+                        }))
+                      }
+                    />
+                    <span>
+                      <strong>autoplay</strong>
+                      <small>Deprecated · accepted by runtime · no effect on the extracted still frame.</small>
+                    </span>
+                  </label>
+                </div>
+              </div>
 
               <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2">
                 <SelectField
@@ -2350,7 +2469,7 @@ export function VisualCanvasInspector({
               }
             />
             <MultiPositionField
-              label="Rounded positions"
+              label="Border position / rounded mask"
               value={canvas.borderPosition ?? 'all'}
               onChange={(borderPosition) =>
                 onMutate('Canvas border position', (current) => ({
@@ -2823,6 +2942,28 @@ export function VisualCanvasInspector({
       {header}
 
       <Section
+        title="Runtime asset references"
+        description="Trailing createCanvas painterOpts"
+        icon={CodeBracketIcon}
+        defaultOpen={Boolean(project.document.canvasPainterOpts?.resolveAssetRefs)}
+      >
+        <label className="apx-canvas-check" data-canvas-resolve-asset-refs>
+          <input
+            type="checkbox"
+            checked={project.document.canvasPainterOpts?.resolveAssetRefs ?? false}
+            onChange={(event) => onResolveAssetRefsChange(event.target.checked)}
+          />
+          <span>
+            <strong>Resolve named Apexify asset references</strong>
+            <small>
+              Emits createCanvas(config, &#123; resolveAssetRefs: true &#125;).
+              The public runtime default is false.
+            </small>
+          </span>
+        </label>
+      </Section>
+
+      <Section
         title="API coverage"
         description="The Visual inspector maps the complete current createCanvas contract"
         icon={CodeBracketIcon}
@@ -2848,6 +2989,7 @@ export function VisualCanvasInspector({
             'zoom',
             'stroke',
             'shadow',
+            'painterOpts.resolveAssetRefs',
           ].map((item) => (
             <span key={item}>✓ {item}</span>
           ))}
@@ -2858,7 +3000,8 @@ export function VisualCanvasInspector({
             Style owns every primary background, including videoBg selection, frame/time
             targeting and still-frame extraction. Transform owns size, position, rotation
             and internal zoom. Effects owns filters, patterns, noise and stacked backgrounds.
-            Advanced is intentionally non-duplicative and keeps contract coverage only.
+            Advanced keeps contract coverage plus the separate trailing
+            painterOpts.resolveAssetRefs runtime switch.
           </span>
         </div>
       </Section>

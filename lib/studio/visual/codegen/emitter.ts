@@ -142,8 +142,11 @@ export function emitStudioOperationPlan(
         'canvas',
       );
       targetNames.set(operation.target, targetName);
+      const painterOpts = operation.painterOpts
+        ? `, ${emitValue(operation.painterOpts, 2, targetNames)}`
+        : '';
       body.push(
-        `  const ${targetName} = await ${painterName}.createCanvas(${emitValue(operation.options, 2, targetNames)});`,
+        `  const ${targetName} = await ${painterName}.createCanvas(${emitValue(operation.options, 2, targetNames)}${painterOpts});`,
       );
       continue;
     }

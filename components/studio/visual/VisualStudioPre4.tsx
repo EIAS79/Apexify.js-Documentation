@@ -4880,6 +4880,18 @@ export default function VisualStudioPre4({
           return next;
         });
       }}
+      onResolveAssetRefsChange={(checked) =>
+        mutate('Canvas asset reference resolution', (current) => ({
+          ...current,
+          updatedAt: new Date().toISOString(),
+          document: {
+            ...current.document,
+            canvasPainterOpts: checked
+              ? { resolveAssetRefs: true }
+              : undefined,
+          },
+        }))
+      }
       onMessage={setMessage}
       onExtractVideoFrame={extractCanvasVideoFrame}
       videoFrameExtracting={canvasFrameExtracting}

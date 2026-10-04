@@ -437,6 +437,7 @@ function extractMethodCalls(
 
 function parseCanvasOptions(source: string): {
   options: RecordValue;
+  painterOpts?: { resolveAssetRefs?: boolean };
   identifier: string | null;
 } {
   const call = extractMethodCalls(source, 'createCanvas')[0];
@@ -458,7 +459,41 @@ function parseCanvasOptions(source: string): {
       );
     }
   }
-  return { options: parsed, identifier: call.assignedIdentifier };
+  if (call.args.length > 2) {
+    throw new Error('createCanvas() Visual sync supports exactly config plus optional painterOpts.');
+  }
+
+  let painterOpts: { resolveAssetRefs?: boolean } | undefined;
+  if (call.args[1]) {
+    const parsedPainterOpts = new LiteralParser(call.args[1]).parse();
+    if (!isRecord(parsedPainterOpts)) {
+      throw new Error('createCanvas painterOpts must be an object literal for live Visual sync.');
+    }
+    for (const key of Object.keys(parsedPainterOpts)) {
+      if (key !== 'resolveAssetRefs') {
+        throw new Error(
+          'createCanvas painterOpts.' + key + ' is not owned by the current public runtime contract.',
+        );
+      }
+    }
+    if (
+      parsedPainterOpts.resolveAssetRefs !== undefined &&
+      typeof parsedPainterOpts.resolveAssetRefs !== 'boolean'
+    ) {
+      throw new Error('createCanvas painterOpts.resolveAssetRefs must be a boolean literal.');
+    }
+    painterOpts = {
+      ...(parsedPainterOpts.resolveAssetRefs !== undefined
+        ? { resolveAssetRefs: parsedPainterOpts.resolveAssetRefs }
+        : {}),
+    };
+  }
+
+  return {
+    options: parsed,
+    ...(painterOpts ? { painterOpts } : {}),
+    identifier: call.assignedIdentifier,
+  };
 }
 
 function serializeCanvasConfig(value: RecordValue): VisualCanvasConfig {
@@ -2022,6 +2057,7 @@ function projectSemantic(value: VisualProject): string {
     width: value.document.width,
     height: value.document.height,
     canvas: value.document.canvas ?? {},
+    canvasPainterOpts: value.document.canvasPainterOpts ?? {},
     roots: value.document.rootNodeIds,
     nodes: value.document.nodes,
     assets: value.assets,
@@ -2038,6 +2074,7 @@ function coreProjectSemantic(value: VisualProject): string {
     width: value.document.width,
     height: value.document.height,
     canvas: value.document.canvas ?? {},
+    canvasPainterOpts: value.document.canvasPainterOpts ?? {},
     roots: value.document.rootNodeIds,
     nodes: value.document.nodes,
     operations: value.operations,
@@ -2073,23 +2110,38 @@ function reconcileCoreVisualProjectFromCode(
     const customBg = isRecord(canvasCall.options.customBg)
       ? canvasCall.options.customBg
       : null;
+    const videoBg = isRecord(canvasCall.options.videoBg)
+      ? canvasCall.options.videoBg
+      : null;
+    const inheritedBackground =
+      customBg?.inherit === true
+        ? customBg
+        : videoBg?.inherit === true
+          ? videoBg
+          : null;
+
     if (
-      customBg?.inherit === true &&
-      typeof customBg.source === 'string' &&
+      inheritedBackground &&
+      typeof inheritedBackground.source === 'string' &&
       resolveInheritedCanvasDimensions
     ) {
-      const inherited = resolveInheritedCanvasDimensions(customBg.source);
+      const inherited = resolveInheritedCanvasDimensions(inheritedBackground.source);
       if (inherited) {
         width = inherited.width;
         height = inherited.height;
       }
     }
 
+    // Apexify.js createCanvas() independently defaults omitted dimensions to 500.
+    // Preserve that public runtime behavior when reconciling canonical literal code.
+    if (width === undefined) width = 500;
+    if (height === undefined) height = 500;
+
     if (typeof width !== 'number' || typeof height !== 'number') {
       return {
         ok: false,
         error:
-          'createCanvas needs numeric width/height, or customBg.inherit with a resolvable image asset, for live Visual sync.',
+          'createCanvas width/height must be numeric literals, omitted for the runtime 500px defaults, or inherited from a resolvable customBg/videoBg source.',
       };
     }
     if (
@@ -2110,6 +2162,10 @@ function reconcileCoreVisualProjectFromCode(
     const canvas = serializeCanvasConfig(canvasCall.options);
     next.document.canvas =
       Object.keys(canvas).length ? canvas : undefined;
+    next.document.canvasPainterOpts =
+      canvasCall.painterOpts && Object.keys(canvasCall.painterOpts).length
+        ? canvasCall.painterOpts
+        : undefined;
 
     const pathResourceToNodeId = reconcileRenderableCalls(
       next,

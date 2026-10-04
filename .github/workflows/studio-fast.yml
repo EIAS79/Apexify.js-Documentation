@@ -1,0 +1,52 @@
+name: Studio Fast
+
+on:
+  push:
+    branches:
+      - 'studio-parity-*'
+      - 'studio-visual/**'
+    paths:
+      - 'app/studio/**'
+      - 'app/api/gallery/run/**'
+      - 'components/studio/**'
+      - 'lib/studio/**'
+      - 'scripts/studio/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'vercel.json'
+      - '.github/workflows/studio-fast.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: studio-fast-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  affected:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout current Studio tree
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 20
+
+      - name: Setup Node matching Vercel
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --prefer-offline --no-audit --no-fund
+
+      - name: Run affected Studio validation
+        env:
+          STUDIO_CI_BASE_SHA: ${{ github.event.before }}
+          STUDIO_CI_HEAD_SHA: ${{ github.sha }}
+        run: npm run studio:ci:fast

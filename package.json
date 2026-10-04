@@ -139,7 +139,13 @@
     "studio:parity:test": "tsx --test scripts/studio/parity/parity-baseline.test.ts",
     "studio:parity:domain": "tsx scripts/studio/parity/verify-domain.ts",
     "studio:parity:all": "npm run studio:parity:scan && tsx scripts/studio/parity/compare-studio.ts && npm run studio:parity:test && npm run studio:parity:typecheck",
-    "studio:parity:typecheck": "tsc -p scripts/studio/parity/tsconfig.json --noEmit"
+    "studio:parity:typecheck": "tsc -p scripts/studio/parity/tsconfig.json --noEmit",
+    "studio:parity:canvas:test": "tsx --test scripts/studio/visual/phase4-canvas.test.ts",
+    "studio:parity:canvas:runtime": "tsx scripts/studio/parity/phase1-canvas-runtime.ts",
+    "studio:parity:canvas:all": "npm run studio:parity:canvas:test && npm run studio:parity:canvas:runtime && npm run studio:parity:canvas:ledger && npm run studio:parity:canvas:ledger:check && npm run studio:parity:typecheck",
+    "studio:parity:canvas:ledger": "tsx scripts/studio/parity/finalize-canvas.ts",
+    "studio:parity:canvas:ledger:check": "tsx scripts/studio/parity/finalize-canvas.ts --check",
+    "studio:ci:fast": "node scripts/studio/ci/fast-affected.mjs"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",

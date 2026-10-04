@@ -14,7 +14,7 @@
 >
 > **Core objective:** extend Studio from **Code → Preview** into a true visual authoring environment where users can construct Apexify compositions visually and generate clean, idiomatic Apexify.js code from the composition.
 >
-> **Execution policy:** implementation is performed phase-by-phase outside `main`; each phase is locally/CI verified before one phase-completion merge/commit reaches `main`. Vercel must never be used as the iterative debugger.
+> **Execution policy:** implementation is performed phase-by-phase outside `main`; every ordinary commit gets fast affected validation, while full certification is reserved for phase gates. Vercel is not a per-commit debugger; the explicit `studio-preview` branch may be advanced manually at meaningful checkpoints for deployed Studio smoke testing.
 
 ---
 
@@ -2041,13 +2041,21 @@ edit
 → repeat
 ```
 
-Do not deploy Vercel for iterative debugging.
+Do not deploy every work commit to Vercel. Use fast affected validation during iteration. When deployed browser verification is materially useful, advance the explicit `studio-preview` branch once at a meaningful checkpoint and test that deployment.
 
 ## 41.3 Vercel preview suppression
 
-Before implementation begins, ensure `studio-visual/*` work branches do not consume unnecessary Vercel preview builds.
+Ordinary `studio-visual/*` and `studio-parity-*` work branches must not consume Vercel preview builds.
 
-If the project currently auto-builds every Git branch, add/configure an ignored-build rule for Visual Studio work branches.
+The deployment allowlist is intentionally narrow:
+
+```text
+main            -> production integration
+studio-preview  -> manual checkpoint preview only
+everything else -> suppressed
+```
+
+`studio-preview` is advanced explicitly only when a real deployed `/studio` check is useful. It is not updated after each code commit.
 
 Production branch remains `main`.
 

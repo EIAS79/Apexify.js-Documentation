@@ -9,14 +9,11 @@ on:
       - 'generated/studio/runtime-parity/**'
       - 'package.json'
       - '.github/workflows/studio-parity-0.yml'
-  pull_request:
-    paths:
-      - 'scripts/studio/parity/**'
-      - 'generated/studio/runtime-parity/**'
-      - 'package.json'
-      - '.github/workflows/studio-parity-0.yml'
   workflow_dispatch:
 
+concurrency:
+  group: studio-parity-0-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: write
 
@@ -71,10 +68,8 @@ jobs:
 
       - name: Commit deterministic Phase-0 baseline
         if: >-
-          (github.event_name == 'push' && github.ref == 'refs/heads/studio-parity-0') ||
-          (github.event_name == 'pull_request' &&
-           github.event.pull_request.head.repo.full_name == github.repository &&
-           github.head_ref == 'studio-parity-0')
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/studio-parity-0'
         working-directory: studio
         run: |
           git config user.name "github-actions[bot]"

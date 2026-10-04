@@ -19,6 +19,7 @@ import type {
 export interface StudioOperationRuntime {
   createCanvas(
     options: { width: number; height: number } & VisualCanvasConfig,
+    painterOpts?: { resolveAssetRefs?: boolean },
   ): Promise<{ buffer: Uint8Array }>;
   createImage?(
     properties: Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array },
@@ -152,7 +153,10 @@ export async function executeStudioOperationPlan(
   for (const operation of plan.operations) {
     switch (operation.kind) {
       case 'create-canvas': {
-        const value = await runtime.createCanvas(operation.options);
+        const value = await runtime.createCanvas(
+          operation.options,
+          operation.painterOpts,
+        );
         values.set(operation.target, value);
         break;
       }
