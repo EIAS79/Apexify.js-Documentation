@@ -51,7 +51,7 @@ test('phase 0 source-of-truth documents are present', () => {
   assert.match(decisions, /SV0-DEC-010/);
 });
 
-test('Vercel Git integration deploys main and suppresses every other branch', () => {
+test('Vercel Git integration deploys main plus one explicit Studio preview branch and suppresses everything else', () => {
   const vercel = readJson('vercel.json');
   const deploymentEnabled =
     (vercel.git as { deploymentEnabled?: Record<string, boolean> } | undefined)
@@ -59,5 +59,6 @@ test('Vercel Git integration deploys main and suppresses every other branch', ()
 
   assert.equal(deploymentEnabled?.['*'], false);
   assert.equal(deploymentEnabled?.main, true);
+  assert.equal(deploymentEnabled?.['studio-preview'], true);
   assert.equal('ignoreCommand' in vercel, false);
 });
