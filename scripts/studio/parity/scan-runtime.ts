@@ -440,11 +440,14 @@ function makeParityRecord(args: {
   const acceptedValues = literalValues(args.type);
   const deprecation = jsDocDeprecation(args.symbol);
   const validationFiles = validationFilesFor(leaf);
+  const evidence = legacyEvidence(args.publicSymbol, leaf);
+  const hasLeafEvidence = Boolean(evidence.legacyOptionInventoryMatches?.length);
+  let recordStatus = args.status;
+  if (recordStatus === 'PARTIAL' && !hasLeafEvidence) recordStatus = 'UNKNOWN';
   const notes = [...(args.notes ?? [])];
-  if (!validationFiles.length) notes.push('validation/default/resource semantics still require implementation-source audit');
-  if (!legacyEvidence(args.publicSymbol, leaf).legacyOptionInventoryMatches?.length) {
-    notes.push('no exact legacy option-path evidence promoted from the old classification matrix');
-  }
+  if (!validationFiles.length) notes.push('VALIDATION_AUDIT_PENDING');
+  if (!hasLeafEvidence && evidence.capabilityRowFound) notes.push('CAPABILITY_EVIDENCE_ONLY_LEAF_UNPROVEN');
+  if (!evidence.capabilityRowFound) notes.push('LEGACY_CAPABILITY_ROW_ABSENT');
 
   return {
     id: stableId([
@@ -474,7 +477,7 @@ function makeParityRecord(args: {
       browser: 'unknown',
     },
     studio: studioFields(args.publicSymbol, leaf),
-    status: deprecation && args.status === 'PARTIAL' ? 'DEPRECATED-COMPAT' : args.status,
+    status: deprecation && recordStatus === 'PARTIAL' ? 'DEPRECATED-COMPAT' : recordStatus,
     notes,
   };
 }
@@ -523,7 +526,7 @@ function walkType(args: {
     args.records.push(makeParityRecord({
       ...args,
       type,
-      notes: ['scanner maximum recursive depth reached; explicit manual audit required'],
+      notes: ['MAX_RECURSIVE_DEPTH_MANUAL_AUDIT'],
       status: 'BLOCKED',
     }));
     return;
@@ -539,7 +542,7 @@ function walkType(args: {
     args.records.push(makeParityRecord({
       ...args,
       type,
-      notes: ['runtime class/handle boundary; public members are inventoried as separate surfaces'],
+      notes: ['RUNTIME_HANDLE_MEMBERS_SCANNED_SEPARATELY'],
     }));
     return;
   }
@@ -549,7 +552,7 @@ function walkType(args: {
     args.records.push(makeParityRecord({
       ...args,
       type,
-      notes: ['recursive semantic type reference recorded without repeated expansion'],
+      notes: ['RECURSIVE_TYPE_REFERENCE'],
     }));
     return;
   }
@@ -602,7 +605,7 @@ function walkType(args: {
           ...args,
           type: part,
           unionVariant: variantText,
-          notes: ['discrete union variant'],
+          notes: ['DISCRETE_UNION_VARIANT'],
         }));
         continue;
       }
@@ -624,7 +627,7 @@ function walkType(args: {
     args.records.push(makeParityRecord({
       ...args,
       type,
-      notes: ['external/platform type boundary retained as an opaque parity leaf'],
+      notes: ['EXTERNAL_PLATFORM_TYPE_BOUNDARY'],
     }));
     return;
   }
@@ -645,7 +648,7 @@ function walkType(args: {
         type: checker.getDeclaredTypeOfSymbol(prop),
         symbol: prop,
         parentType: displayType(type),
-        notes: ['symbol has no source declaration; manual source mapping required'],
+        notes: ['SOURCE_DECLARATION_MANUAL_AUDIT'],
       }));
       continue;
     }
