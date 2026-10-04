@@ -6,6 +6,7 @@ const root = process.cwd();
 const check = process.argv.includes('--check');
 const dir = path.join(root, 'generated', 'studio', 'runtime-parity');
 const summaryFile = path.join(dir, 'gap-summary.json');
+const reconciliationFile = path.join(dir, 'surface-reconciliation.json');
 const outFile = path.join(dir, 'BASELINE.md');
 
 if (!fs.existsSync(summaryFile)) {
@@ -13,6 +14,13 @@ if (!fs.existsSync(summaryFile)) {
 }
 
 const summary = JSON.parse(fs.readFileSync(summaryFile, 'utf8')) as GapSummary;
+const reconciliation = fs.existsSync(reconciliationFile)
+  ? JSON.parse(fs.readFileSync(reconciliationFile, 'utf8')) as {
+      summary: Record<string, number>;
+      legacy: Array<{ capability: string; result: string; runtimeSymbol: string | null; reason: string }>;
+      runtimeOnly: Array<{ runtimeSymbol: string; result: string; reason: string }>;
+    }
+  : null;
 const statusOrder: ParityStatus[] = [
   'FULL',
   'PARTIAL',
@@ -69,6 +77,29 @@ if (summary.drift.length) {
   }
 } else {
   lines.push('- No source-identity drift recorded.');
+}
+
+if (reconciliation) {
+  const r = reconciliation.summary;
+  lines.push(
+    '',
+    '## Public-surface reconciliation',
+    '',
+    '| Measure | Count |',
+    '|---|---:|',
+    '| Legacy capability rows | ' + (r.legacyRows ?? 0) + ' |',
+    '| Current runtime surfaces | ' + (r.runtimeSurfaces ?? 0) + ' |',
+    '| Exact matches | ' + (r.exactMatches ?? 0) + ' |',
+    '| Codegen aliases | ' + (r.aliasMatches ?? 0) + ' |',
+    '| Public-name drift / reachable aliases | ' + (r.publicNameDriftOrReachableAlias ?? 0) + ' |',
+    '| Intentional hosted exclusions | ' + (r.intentionalHostedExclusions ?? 0) + ' |',
+    '| Introspection / non-authorable legacy rows | ' + (r.introspectionOrNonauthorable ?? 0) + ' |',
+    '| Removed from current runtime | ' + (r.removedFromCurrentRuntime ?? 0) + ' |',
+    '| Legacy rows not on current public surface | ' + (r.legacyNotCurrentPublicSurface ?? 0) + ' |',
+    '| Current runtime surfaces missing from legacy matrix | ' + (r.runtimeOnly ?? 0) + ' |',
+    '',
+    'Every non-exact row is retained in `surface-reconciliation.json` with an explicit reason and, where discoverable, a current runtime candidate.',
+  );
 }
 
 lines.push('', '## Domains', '', '| Domain | Surfaces | Records | Status summary |', '|---|---:|---:|---|');
