@@ -471,6 +471,17 @@ function makeParityRecord(args: {
   };
 }
 
+function isRuntimeClassType(type: ts.Type): boolean {
+  const symbol = type.aliasSymbol ?? type.getSymbol();
+  return Boolean(
+    symbol?.declarations?.some(
+      (decl) =>
+        decl.getSourceFile().fileName.startsWith(runtimeRoot) &&
+        ts.isClassDeclaration(decl),
+    ),
+  );
+}
+
 function semanticTypeKey(type: ts.Type, typeText: string): string {
   const symbol = type.aliasSymbol ?? type.getSymbol();
   const declaration = symbol?.declarations?.[0];
@@ -513,6 +524,15 @@ function walkType(args: {
   const typeText = checker.typeToString(type, undefined, ts.TypeFormatFlags.NoTruncation);
   if (isBuiltinLeaf(type, typeText)) {
     args.records.push(makeParityRecord({ ...args, type }));
+    return;
+  }
+
+  if (isRuntimeClassType(type)) {
+    args.records.push(makeParityRecord({
+      ...args,
+      type,
+      notes: ['runtime class/handle boundary; public members are inventoried as separate surfaces'],
+    }));
     return;
   }
 
