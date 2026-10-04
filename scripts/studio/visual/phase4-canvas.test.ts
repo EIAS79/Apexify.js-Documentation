@@ -532,8 +532,10 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
     assert.ok(inspector.includes(runtimeContract), 'missing Canvas interaction contract: ' + runtimeContract);
   }
   assert.doesNotMatch(inspector, /Edit full video/);
-  assert.doesNotMatch(inspector, /Loop metadata/);
-  assert.doesNotMatch(inspector, /Autoplay metadata/);
+  assert.match(inspector, /data-canvas-video-compatibility/);
+  assert.match(inspector, /Deprecated compatibility flags/);
+  assert.match(inspector, /Legacy video background loop flag/);
+  assert.match(inspector, /Legacy video background autoplay flag/);
   assert.match(inspector, /frameExtractionMode === 'frame'/);
   assert.match(inspector, /max=\{31\}/);
   assert.match(
@@ -583,4 +585,266 @@ test('Phase 4 shell exposes the complete createCanvas inspector contract', () =>
   ]) {
     assert.ok(inspector.includes(filterType), 'missing Canvas filter UI: ' + filterType);
   }
+});
+
+
+test('STUDIO-PARITY-1 mirrors pinned canvas dimension and collection limits', () => {
+  const oversized = createVisualProject({
+    width: 16_384,
+    height: 4_097,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  const pixelLimit = validateVisualProject(oversized);
+  assert.equal(pixelLimit.ok, false);
+  assert.ok(pixelLimit.issues.some((issue) => issue.code === 'document-pixel-limit'));
+
+  const nonInteger = createVisualProject({
+    width: 640,
+    height: 480,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  nonInteger.document.width = 640.5;
+  const invalidInteger = validateVisualProject(nonInteger);
+  assert.equal(invalidInteger.ok, false);
+  assert.ok(invalidInteger.issues.some((issue) => issue.code === 'document-width'));
+
+  const layers = createVisualProject({
+    width: 640,
+    height: 480,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  layers.document.canvas = {
+    bgLayers: Array.from({ length: 129 }, () => ({
+      type: 'color' as const,
+      value: '#000000',
+    })),
+  };
+  const layerLimit = validateVisualProject(layers);
+  assert.equal(layerLimit.ok, false);
+  assert.ok(layerLimit.issues.some((issue) => issue.code === 'canvas-layer-limit'));
+
+  const filters = createVisualProject({
+    width: 640,
+    height: 480,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  filters.document.canvas = {
+    customBg: {
+      source: 'studio://asset/filter-limit',
+      filters: Array.from({ length: 65 }, () => ({ type: 'grayscale' as const })),
+    },
+  };
+  const filterLimit = validateVisualProject(filters);
+  assert.equal(filterLimit.ok, false);
+  assert.ok(
+    filterLimit.issues.some(
+      (issue) => issue.code === 'canvas-background-filter-limit',
+    ),
+  );
+});
+
+test('STUDIO-PARITY-1 mirrors runtime gradient and pattern validation semantics', () => {
+  const project = createVisualProject({
+    width: 640,
+    height: 480,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  project.document.canvas = {
+    gradientBg: {
+      type: 'linear',
+      startX: 0,
+      startY: 0,
+      endX: 0,
+      endY: 0,
+      colors: [
+        { stop: 0.8, color: '#ffffff' },
+        { stop: 0.2, color: '#000000' },
+      ],
+    },
+    patternBg: {
+      type: 'grid',
+      size: 0,
+      scale: 0,
+      spacing: -1,
+      repeat: 'repeat',
+      color: '#ffffff',
+    },
+  };
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  for (const code of [
+    'canvas-gradient-stop-order',
+    'canvas-gradient-geometry',
+    'canvas-pattern-size',
+    'canvas-pattern-scale',
+    'canvas-pattern-spacing',
+  ]) {
+    assert.ok(validation.issues.some((issue) => issue.code === code), code);
+  }
+
+  const radial = structuredClone(project);
+  radial.document.canvas = {
+    gradientBg: {
+      type: 'radial',
+      startX: 10,
+      startY: 10,
+      startRadius: -1,
+      endX: 10,
+      endY: 10,
+      endRadius: -1,
+      colors: [
+        { stop: 0, color: '#000000' },
+        { stop: 1, color: '#ffffff' },
+      ],
+    },
+  };
+  const radialValidation = validateVisualProject(radial);
+  assert.equal(radialValidation.ok, false);
+  assert.ok(
+    radialValidation.issues.some(
+      (issue) => issue.code === 'canvas-gradient-radius',
+    ),
+  );
+});
+
+test('STUDIO-PARITY-1 validates background-layer variant contracts', () => {
+  const project = createVisualProject({
+    width: 640,
+    height: 480,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  project.document.canvas = {
+    bgLayers: [
+      {
+        type: 'image',
+        source: 'studio://asset/image',
+        fit: 'fill',
+        align: 'center',
+      },
+      {
+        type: 'pattern',
+        source: 'studio://asset/pattern',
+        repeat: 'repeat',
+      },
+    ],
+  };
+
+  (project.document.canvas.bgLayers![0] as unknown as { fit: string }).fit = 'stretch';
+  (project.document.canvas.bgLayers![0] as unknown as { align: string }).align = 'middle';
+  (project.document.canvas.bgLayers![1] as unknown as { repeat: string }).repeat = 'mirror';
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, false);
+  assert.ok(validation.issues.some((issue) => issue.code === 'canvas-layer-fit'));
+  assert.ok(validation.issues.some((issue) => issue.code === 'canvas-layer-align'));
+  assert.ok(validation.issues.some((issue) => issue.code === 'canvas-layer-repeat'));
+});
+
+test('STUDIO-PARITY-1 reconciles Apexify omitted dimensions to the runtime 500px defaults', () => {
+  const base = createVisualProject({
+    width: 320,
+    height: 180,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  const result = reconcileVisualProjectFromCode(
+    base,
+    `
+      import { ApexPainter } from 'apexify.js';
+      const painter = new ApexPainter();
+      const canvas = await painter.createCanvas({ colorBg: '#123456' });
+      return canvas.buffer;
+    `,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.project.document.width, 500);
+  assert.equal(result.project.document.height, 500);
+  assert.equal(result.project.document.canvas?.colorBg, '#123456');
+
+  const canonical = generateVisualProjectCode(result.project).source;
+  assert.match(canonical, /width: 500/);
+  assert.match(canonical, /height: 500/);
+});
+
+test('STUDIO-PARITY-1 reconciles videoBg.inherit through the same source-dimension resolver', () => {
+  const base = createVisualProject({
+    width: 320,
+    height: 180,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  const source = `
+    import { ApexPainter } from 'apexify.js';
+    const painter = new ApexPainter();
+    const canvas = await painter.createCanvas({
+      videoBg: {
+        source: 'studio://asset/video-inherit',
+        inherit: true,
+        frame: 1,
+        format: 'jpg',
+        quality: 2
+      }
+    });
+    return canvas.buffer;
+  `;
+  const result = reconcileVisualProjectFromCode(
+    base,
+    source,
+    (asset) =>
+      asset === 'studio://asset/video-inherit'
+        ? { width: 1920, height: 1080 }
+        : null,
+  );
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.project.document.width, 1920);
+  assert.equal(result.project.document.height, 1080);
+  assert.equal(result.project.document.canvas?.videoBg?.inherit, true);
+});
+
+test('STUDIO-PARITY-1 preserves deprecated video compatibility flags through code round-trip', () => {
+  const project = createVisualProject({
+    width: 640,
+    height: 360,
+    now: '2026-10-04T00:00:00.000Z',
+  });
+  project.document.canvas = {
+    videoBg: {
+      source: 'studio://asset/video-legacy',
+      frame: 1,
+      format: 'jpg',
+      quality: 2,
+      loop: true,
+      autoplay: false,
+    },
+  };
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /loop: true/);
+  assert.match(source, /autoplay: false/);
+
+  const empty = createVisualProject({
+    width: 10,
+    height: 10,
+    now: project.createdAt,
+  });
+  const result = reconcileVisualProjectFromCode(empty, source);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  assert.equal(result.project.document.canvas?.videoBg?.loop, true);
+  assert.equal(result.project.document.canvas?.videoBg?.autoplay, false);
+});
+
+test('STUDIO-PARITY-1 canvas inspector exposes ordered layer editing and runtime limits', () => {
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualCanvasInspector.tsx',
+    'utf8',
+  );
+
+  assert.match(inspector, /Move background layer down/);
+  assert.match(inspector, /Move background layer up/);
+  assert.match(inspector, /Duplicate background layer/);
+  assert.match(inspector, /CANVAS_RUNTIME_LIMITS\.maxBackgroundLayers/);
+  assert.match(inspector, /data-canvas-video-compatibility/);
+  assert.match(inspector, /Studio preserves and round-trips them explicitly/);
 });
