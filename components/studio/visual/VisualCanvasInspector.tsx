@@ -2467,7 +2467,7 @@ export function VisualCanvasInspector({
               }
             />
             <MultiPositionField
-              label="Rounded positions"
+              label="Border position / rounded mask"
               value={canvas.borderPosition ?? 'all'}
               onChange={(borderPosition) =>
                 onMutate('Canvas border position', (current) => ({
