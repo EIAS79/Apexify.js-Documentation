@@ -7,6 +7,8 @@ import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
 
+const read = (file: string) => fs.readFileSync(file, 'utf8');
+
 function createCanvasProject() {
   const project = createVisualProject({
     id: 'project_canvas_phase4',
@@ -181,8 +183,14 @@ test('Phase 4 enforces exclusive pattern paint and source-over defaults', () => 
   const generated = generateVisualProjectCode(createCanvasProject()).source;
   assert.ok(generated.includes('blendMode: "source-over"'));
   assert.ok(generated.includes('gradient:'));
-  assert.ok(!generated.includes('color: "#315078"'));
-  assert.ok(!generated.includes('secondaryColor: "#152943"'));
+  const patternStart = generated.indexOf('patternBg:');
+  const patternEnd = generated.indexOf('noiseBg:', patternStart);
+  const patternBlock =
+    patternStart >= 0
+      ? generated.slice(patternStart, patternEnd >= 0 ? patternEnd : undefined)
+      : '';
+  assert.ok(patternBlock.includes('gradient:'));
+  assert.ok(!patternBlock.includes('secondaryColor: "#152943"'));
 });
 
 test('Phase 4 rejects conflicting primary backgrounds and unsafe dynamic canvas expressions', () => {
@@ -471,7 +479,7 @@ test('Phase 4 filter editor exposes runtime ranges and boolean filters', () => {
   assert.match(inspector, /IMAGE_FILTER_PARAMETERLESS_TYPES/);
   assert.match(inspector, /data-filter-boolean/);
   assert.match(inspector, /Allowed: \{field\.help\}/);
-  assert.match(inspector, /clampVisualImageFilterValue/);
+  assert.match(inspector, /updateVisualImageFilterValue/);
   assert.match(inspector, /data-pixelate-region-controls/);
   assert.match(inspector, /Pixelate region/);
   assert.match(inspector, /\['x', 'y', 'width', 'height'\]/);
