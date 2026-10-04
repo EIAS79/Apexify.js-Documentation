@@ -48,3 +48,50 @@ test('generated index and all required baseline artifacts exist', () => {
     assert.equal(fs.existsSync(path.join(dir, name)), true, name + ' should exist');
   }
 });
+
+test('createCanvas is recursively expanded into real CanvasConfig leaves', () => {
+  const canvas = JSON.parse(
+    fs.readFileSync(path.join(dir, 'domains', 'canvas.json'), 'utf8'),
+  ) as {
+    surfaces: Array<{ publicSymbol: string; inputRecordCount: number }>;
+    records: Array<{ publicSymbol: string; optionPath: string }>;
+  };
+
+  const surface = canvas.surfaces.find((item) => item.publicSymbol === 'ApexPainter.createCanvas');
+  assert.ok(surface, 'ApexPainter.createCanvas must be inventoried');
+  assert.ok(
+    (surface?.inputRecordCount ?? 0) >= 40,
+    'createCanvas must expand recursively; shallow signature-only inventory is invalid',
+  );
+
+  const paths = canvas.records
+    .filter((item) => item.publicSymbol === 'ApexPainter.createCanvas')
+    .map((item) => item.optionPath);
+
+  const requiredSuffixes = [
+    '.canvas.width',
+    '.canvas.height',
+    '.canvas.customBg.source',
+    '.canvas.customBg.filters[]',
+    '.canvas.videoBg.frame',
+    '.canvas.videoBg.time',
+    '.canvas.bgLayers[]',
+    '.canvas.zoom.scale',
+  ];
+
+  for (const suffix of requiredSuffixes) {
+    assert.ok(
+      paths.some((item) => item.includes(suffix)),
+      'missing recursively expanded CanvasConfig path containing ' + suffix,
+    );
+  }
+
+  assert.ok(
+    paths.some((item) => item.includes('.canvas.stroke.')),
+    'stroke nested fields must be expanded',
+  );
+  assert.ok(
+    paths.some((item) => item.includes('.canvas.shadow.')),
+    'shadow nested fields must be expanded',
+  );
+});
