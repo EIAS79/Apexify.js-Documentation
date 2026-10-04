@@ -12,6 +12,7 @@ import {
   type RuntimeParityRecord,
   type RuntimeSourcePin,
   type SourceLocation,
+  type SourceEvidence,
 } from './model';
 
 type LegacyCapabilityRow = {
@@ -422,24 +423,144 @@ function unwrapPromise(type: ts.Type): ts.Type {
   return args[0] ?? type;
 }
 
-function validationFilesFor(leaf: string): string[] {
-  if (!leaf || leaf.length < 2) return [];
-  const lower = leaf.toLowerCase();
-  return validationCandidateFiles
-    .filter((file) => sourceTextLower.get(file)?.includes(lower))
-    .slice(0, 12)
-    .map(relRuntime);
+function resolvedSymbolAt(node: ts.Node): ts.Symbol | undefined {
+  let symbol = checker.getSymbolAtLocation(node);
+  if (!symbol) return undefined;
+  if (symbol.flags & ts.SymbolFlags.Alias) {
+    try { symbol = checker.getAliasedSymbol(symbol); } catch { /* keep original */ }
+  }
+  return symbol;
 }
 
-function implementationFilesFor(member: string, primary: string): string[] {
-  const results = new Set<string>([primary]);
-  if (member.length >= 3) {
-    for (const file of runtimeFiles) {
-      if (results.size >= 12) break;
-      if (sourceText.get(file)?.includes(member)) results.add(relRuntime(file));
-    }
+function expressionLiteralValue(node: ts.Expression): unknown | null {
+  if (ts.isStringLiteralLike(node)) return node.text;
+  if (ts.isNumericLiteral(node)) return Number(node.text);
+  if (node.kind === ts.SyntaxKind.TrueKeyword) return true;
+  if (node.kind === ts.SyntaxKind.FalseKeyword) return false;
+  if (node.kind === ts.SyntaxKind.NullKeyword) return null;
+  if (ts.isPrefixUnaryExpression(node) && ts.isNumericLiteral(node.operand)) {
+    const value = Number(node.operand.text);
+    return node.operator === ts.SyntaxKind.MinusToken ? -value : value;
   }
-  return [...results].sort();
+  return null;
+}
+
+function sourceEvidenceForDeclaration(root: ts.Declaration): SourceEvidence {
+  const implementation = new Map<string, SourceLocation>();
+  const validation = new Map<string, SourceLocation>();
+  const defaults: SourceEvidence['defaults'] = [];
+  const resourceLimits: SourceEvidence['resourceLimits'] = [];
+  const errors: SourceEvidence['errors'] = [];
+  const queued: Array<{ declaration: ts.Declaration; depth: number }> = [{ declaration: root, depth: 0 }];
+  const visited = new Set<string>();
+
+  const remember = (map: Map<string, SourceLocation>, node: ts.Node): void => {
+    const location = sourceLocation(node);
+    const key = location.file + ':' + String(location.line ?? 0) + ':' + String(location.character ?? 0);
+    map.set(key, location);
+  };
+
+  while (queued.length) {
+    const current = queued.shift()!;
+    const sf = current.declaration.getSourceFile();
+    if (!isRuntimePath(sf.fileName)) continue;
+    const key = sf.fileName + ':' + current.declaration.pos + ':' + current.declaration.end;
+    if (visited.has(key)) continue;
+    visited.add(key);
+    remember(implementation, current.declaration);
+
+    const visit = (node: ts.Node): void => {
+      if (ts.isCallExpression(node) || ts.isNewExpression(node)) {
+        const expression = node.expression;
+        const targetNode = ts.isPropertyAccessExpression(expression) ? expression.name : expression;
+        const symbol = resolvedSymbolAt(targetNode);
+        const name = symbol?.getName() ?? targetNode.getText(sf);
+        const declarations = (symbol?.declarations ?? []).filter((decl) => isRuntimePath(decl.getSourceFile().fileName));
+
+        if (/^(?:validate|assert|check|ensure)/i.test(name)) {
+          for (const decl of declarations.length ? declarations : [current.declaration]) remember(validation, decl);
+        }
+        if (/^assertWithinLimit$/i.test(name) && node.arguments?.length) {
+          const first = node.arguments[0];
+          if (first && ts.isStringLiteralLike(first)) {
+            const loc = sourceLocation(node);
+            resourceLimits.push({ ...loc, limit: first.text });
+          }
+        }
+        if (/Apexify\w*Error$/.test(name)) {
+          const loc = sourceLocation(node);
+          errors.push({ ...loc, errorClass: name });
+        }
+
+        if (current.depth < 5) {
+          for (const decl of declarations) queued.push({ declaration: decl, depth: current.depth + 1 });
+        }
+      }
+
+      if (
+        ts.isBinaryExpression(node) &&
+        (node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken ||
+          node.operatorToken.kind === ts.SyntaxKind.BarBarToken)
+      ) {
+        const loc = sourceLocation(node);
+        defaults.push({
+          ...loc,
+          expression: node.getText(sf).slice(0, 240),
+          value: expressionLiteralValue(node.right),
+        });
+      } else if (
+        (ts.isParameter(node) || ts.isBindingElement(node) || ts.isPropertyDeclaration(node)) &&
+        node.initializer
+      ) {
+        const loc = sourceLocation(node);
+        defaults.push({
+          ...loc,
+          expression: node.getText(sf).slice(0, 240),
+          value: expressionLiteralValue(node.initializer),
+        });
+      }
+
+      ts.forEachChild(node, visit);
+    };
+    visit(current.declaration);
+  }
+
+  const dedupeDefaults = new Map(defaults.map((item) => [
+    item.file + ':' + item.line + ':' + item.character + ':' + item.expression,
+    item,
+  ]));
+  const dedupeLimits = new Map(resourceLimits.map((item) => [
+    item.file + ':' + item.line + ':' + item.character + ':' + item.limit,
+    item,
+  ]));
+  const dedupeErrors = new Map(errors.map((item) => [
+    item.file + ':' + item.line + ':' + item.character + ':' + item.errorClass,
+    item,
+  ]));
+
+  return {
+    implementation: [...implementation.values()].sort((a, b) => a.file.localeCompare(b.file) || (a.line ?? 0) - (b.line ?? 0)),
+    validation: [...validation.values()].sort((a, b) => a.file.localeCompare(b.file) || (a.line ?? 0) - (b.line ?? 0)),
+    defaults: [...dedupeDefaults.values()],
+    resourceLimits: [...dedupeLimits.values()],
+    errors: [...dedupeErrors.values()],
+  };
+}
+
+function filesFromLocations(locations: SourceLocation[]): string[] {
+  return [...new Set(locations.map((location) => location.file))].sort();
+}
+
+function leafDefaultFromEvidence(evidence: SourceEvidence, leaf: string): unknown | null {
+  if (!leaf) return null;
+  const lower = leaf.toLowerCase();
+  const matches = evidence.defaults.filter((item) => item.expression.toLowerCase().includes(lower));
+  const values = [...new Map(matches.map((item) => [JSON.stringify(item.value), item.value])).values()];
+  return values.length === 1 ? values[0] : null;
+}
+
+function leafValidationFiles(evidence: SourceEvidence): string[] {
+  return filesFromLocations(evidence.validation);
 }
 
 function legacyEvidence(publicSymbol: string, leaf?: string): LegacyStudioEvidence {
