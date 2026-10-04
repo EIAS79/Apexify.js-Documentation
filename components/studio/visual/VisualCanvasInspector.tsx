@@ -73,6 +73,7 @@ type Props = {
     updater: (canvas: VisualCanvasConfig) => VisualCanvasConfig,
   ) => void;
   onResizeDraft: (key: 'width' | 'height', value: number) => void;
+  onResolveAssetRefsChange: (checked: boolean) => void;
   onMessage: (message: string) => void;
   onExtractVideoFrame: (request: CanvasVideoFrameExtractionRequest) => Promise<void>;
   videoFrameExtracting: boolean;
@@ -1687,6 +1688,7 @@ export function VisualCanvasInspector({
   onDraft,
   onMutate,
   onResizeDraft,
+  onResolveAssetRefsChange,
   onMessage,
   onExtractVideoFrame,
   videoFrameExtracting,
@@ -2940,6 +2942,28 @@ export function VisualCanvasInspector({
       {header}
 
       <Section
+        title="Runtime asset references"
+        description="Trailing createCanvas painterOpts"
+        icon={CodeBracketIcon}
+        defaultOpen={Boolean(project.document.canvasPainterOpts?.resolveAssetRefs)}
+      >
+        <label className="apx-canvas-check" data-canvas-resolve-asset-refs>
+          <input
+            type="checkbox"
+            checked={project.document.canvasPainterOpts?.resolveAssetRefs ?? false}
+            onChange={(event) => onResolveAssetRefsChange(event.target.checked)}
+          />
+          <span>
+            <strong>Resolve named Apexify asset references</strong>
+            <small>
+              Emits createCanvas(config, &#123; resolveAssetRefs: true &#125;).
+              The public runtime default is false.
+            </small>
+          </span>
+        </label>
+      </Section>
+
+      <Section
         title="API coverage"
         description="The Visual inspector maps the complete current createCanvas contract"
         icon={CodeBracketIcon}
@@ -2965,6 +2989,7 @@ export function VisualCanvasInspector({
             'zoom',
             'stroke',
             'shadow',
+            'painterOpts.resolveAssetRefs',
           ].map((item) => (
             <span key={item}>✓ {item}</span>
           ))}
@@ -2975,7 +3000,8 @@ export function VisualCanvasInspector({
             Style owns every primary background, including videoBg selection, frame/time
             targeting and still-frame extraction. Transform owns size, position, rotation
             and internal zoom. Effects owns filters, patterns, noise and stacked backgrounds.
-            Advanced is intentionally non-duplicative and keeps contract coverage only.
+            Advanced keeps contract coverage plus the separate trailing
+            painterOpts.resolveAssetRefs runtime switch.
           </span>
         </div>
       </Section>
