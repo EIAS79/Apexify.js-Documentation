@@ -1493,8 +1493,26 @@ const surfaceReconciliationArtifact = {
 };
 
 const statusCounts = Object.fromEntries(PARITY_STATUSES.map((status) => [status, 0])) as Record<ParityStatus, number>;
-for (const surface of surfaces) statusCounts[surface.status] += 1;
-for (const record of records) statusCounts[record.status] += 1;
+const surfaceStatusCounts = Object.fromEntries(PARITY_STATUSES.map((status) => [status, 0])) as Record<ParityStatus, number>;
+const recordStatusCounts = Object.fromEntries(PARITY_STATUSES.map((status) => [status, 0])) as Record<ParityStatus, number>;
+for (const surface of surfaces) {
+  statusCounts[surface.status] += 1;
+  surfaceStatusCounts[surface.status] += 1;
+}
+for (const record of records) {
+  statusCounts[record.status] += 1;
+  recordStatusCounts[record.status] += 1;
+}
+
+const evidenceCounts = {
+  surfacesWithImplementationGraph: surfaces.filter((surface) => surface.implementationFiles.length > 1).length,
+  surfacesWithValidationGraph: surfaces.filter((surface) => surface.validationFiles.length > 0).length,
+  surfacesWithLiteralDefaults: surfaces.filter((surface) => surface.sourceEvidence.defaults.length > 0).length,
+  surfacesWithResourceLimits: surfaces.filter((surface) => surface.sourceEvidence.resourceLimits.length > 0).length,
+  surfacesWithStructuredErrors: surfaces.filter((surface) => surface.sourceEvidence.errors.length > 0).length,
+  recordsWithResolvedRuntimeDefault: records.filter((record) => record.runtimeDefault !== null).length,
+  recordsWithResourceLimits: records.filter((record) => record.resourceLimits.length > 0).length,
+};
 
 const domains: GapSummary['domains'] = {};
 for (const domain of DOMAIN_ORDER) {
@@ -1587,6 +1605,8 @@ const gapSummary: GapSummary = {
     outputRecords: records.filter((record) => record.direction === 'output').length,
     unionVariants: records.filter((record) => record.unionVariant !== null).length,
     status: statusCounts,
+    surfaceStatus: surfaceStatusCounts,
+    recordStatus: recordStatusCounts,
     legacyCapabilities: legacyRows.length,
     legacyOptionPaths:
       legacyMatrix.optionCoverage?.totalOptionPaths ??
@@ -1597,6 +1617,7 @@ const gapSummary: GapSummary = {
       legacyMatrix.summary?.unclassifiedOptionPaths ??
       0,
   },
+  evidence: evidenceCounts,
   drift,
   domains,
   gates: {
@@ -1671,7 +1692,7 @@ for (const [domain, summary] of Object.entries(domains)) {
 }
 
 function json(value: unknown): string {
-  return JSON.stringify(value, null, 2) + '\n';
+  return JSON.stringify(value) + '\n';
 }
 
 const outputs = new Map<string, string>();
