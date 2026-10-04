@@ -27,6 +27,14 @@ export type SourceLocation = {
   character?: number;
 };
 
+export type SourceEvidence = {
+  implementation: SourceLocation[];
+  validation: SourceLocation[];
+  defaults: Array<SourceLocation & { expression: string; value: unknown | null }>;
+  resourceLimits: Array<SourceLocation & { limit: string }>;
+  errors: Array<SourceLocation & { errorClass: string }>;
+};
+
 export type LegacyStudioEvidence = {
   capabilityRowFound: boolean;
   capabilityClassification?: string;
@@ -51,6 +59,7 @@ export type PublicSurfaceRecord = {
   source: SourceLocation;
   implementationFiles: string[];
   validationFiles: string[];
+  sourceEvidence: SourceEvidence;
   inputRecordCount: number;
   outputRecordCount: number;
   legacyStudio: LegacyStudioEvidence;
@@ -69,6 +78,7 @@ export type RuntimeParityRecord = {
   sourceFiles: string[];
   implementationFiles: string[];
   validationFiles: string[];
+  sourceEvidence: SourceEvidence;
   runtimeDefault: unknown | null;
   acceptedValues: Array<string | number | boolean | null>;
   constraints: string[];
@@ -140,6 +150,7 @@ export type GapSummary = {
     zeroSilentPublicSurfaceOmissions: boolean;
     deepRecursiveTypeResolution: boolean;
     surfaceReconciliationComplete: boolean;
+    sourceMappingVerified: boolean;
     noBootstrapFullClaims: boolean;
     everyRecordHasStatus: boolean;
     baselineComplete: boolean;
