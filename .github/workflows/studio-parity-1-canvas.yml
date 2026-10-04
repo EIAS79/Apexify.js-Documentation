@@ -1,0 +1,77 @@
+name: Studio Parity 1 — Canvas
+
+on:
+  push:
+    branches:
+      - studio-parity-1-canvas
+    paths:
+      - 'components/studio/visual/VisualCanvasInspector.tsx'
+      - 'lib/studio/visual/canvas-contract.ts'
+      - 'lib/studio/visual/compiler/validate.ts'
+      - 'lib/studio/visual/codegen/reconcile.ts'
+      - 'scripts/studio/visual/phase4-canvas.test.ts'
+      - 'scripts/studio/parity/**'
+      - 'package.json'
+      - '.github/workflows/studio-parity-1-canvas.yml'
+  pull_request:
+    paths:
+      - 'components/studio/visual/VisualCanvasInspector.tsx'
+      - 'lib/studio/visual/canvas-contract.ts'
+      - 'lib/studio/visual/compiler/validate.ts'
+      - 'lib/studio/visual/codegen/reconcile.ts'
+      - 'scripts/studio/visual/phase4-canvas.test.ts'
+      - 'scripts/studio/parity/**'
+      - 'package.json'
+      - '.github/workflows/studio-parity-1-canvas.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canvas-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      APEXIFY_RUNTIME_ROOT: ${{ github.workspace }}/runtime-source
+      APEXIFY_RUNTIME_COMMIT: a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a
+
+    steps:
+      - name: Checkout Studio documentation repository
+        uses: actions/checkout@v4
+        with:
+          path: studio
+
+      - name: Checkout pinned Apexify.js runtime source
+        uses: actions/checkout@v4
+        with:
+          repository: EIAS79/Apexify.js
+          ref: a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a
+          path: runtime-source
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+
+      - name: Install Studio tooling
+        working-directory: studio
+        run: npm ci --ignore-scripts
+
+      - name: Install pinned runtime dependencies
+        working-directory: runtime-source
+        run: npm ci --ignore-scripts
+
+      - name: Run Canvas parity regression tests
+        working-directory: studio
+        run: npm run studio:parity:canvas:test
+
+      - name: Prove preview/codegen against pinned runtime
+        working-directory: studio
+        run: npm run studio:parity:canvas:runtime
+
+      - name: Typecheck parity tooling
+        working-directory: studio
+        run: npm run studio:parity:typecheck
