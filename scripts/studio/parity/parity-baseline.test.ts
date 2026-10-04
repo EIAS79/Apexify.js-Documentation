@@ -105,3 +105,87 @@ test('createCanvas is recursively expanded into real CanvasConfig leaves', () =>
     'shadow nested fields must be expanded',
   );
 });
+
+
+test('createImage and createText recursively expose nested authoring contracts', () => {
+  const image = read<{
+    records: Array<{ publicSymbol: string; optionPath: string }>;
+  }>('domains/image.json');
+  const text = read<{
+    records: Array<{ publicSymbol: string; optionPath: string }>;
+  }>('domains/text.json');
+
+  const imagePaths = image.records
+    .filter((item) => item.publicSymbol === 'ApexPainter.createImage')
+    .map((item) => item.optionPath);
+  const textPaths = text.records
+    .filter((item) => item.publicSymbol === 'ApexPainter.createText')
+    .map((item) => item.optionPath);
+
+  for (const fragment of [
+    '.images.distortion.controlPoints[].from.x',
+    '.images.distortion.wavelengthX',
+    '.images.distortion.edgeMode',
+    '.images.meshWarp.gridX',
+    '.images.meshWarp.interpolation',
+    '.options.groupTransform',
+  ]) {
+    assert.ok(
+      imagePaths.some((item) => item.includes(fragment)),
+      'missing recursively expanded createImage path containing ' + fragment,
+    );
+  }
+
+  for (const fragment of [
+    '.textArray.decorations.underline',
+    '.textArray.decorations.strikethrough',
+    '.textArray.effects.shadow',
+    '.textArray.font',
+  ]) {
+    assert.ok(
+      textPaths.some((item) => item.includes(fragment)),
+      'missing recursively expanded createText path containing ' + fragment,
+    );
+  }
+});
+
+test('surface reconciliation explains the old 187-row gap without dropping legacy capabilities', () => {
+  const reconciliation = read<{
+    summary: {
+      legacyRows: number;
+      runtimeSurfaces: number;
+      exactMatches: number;
+      aliasMatches: number;
+      publicNameDriftOrReachableAlias: number;
+      removedFromCurrentRuntime: number;
+      legacyNotCurrentPublicSurface: number;
+      runtimeOnly: number;
+    };
+    runtimeOnly: Array<{ runtimeSymbol: string; result: string; reason: string }>;
+  }>('surface-reconciliation.json');
+
+  assert.equal(reconciliation.summary.legacyRows, 187);
+  assert.equal(reconciliation.summary.exactMatches, 187);
+  assert.equal(reconciliation.summary.aliasMatches, 0);
+  assert.equal(reconciliation.summary.publicNameDriftOrReachableAlias, 0);
+  assert.equal(reconciliation.summary.removedFromCurrentRuntime, 0);
+  assert.equal(reconciliation.summary.legacyNotCurrentPublicSurface, 0);
+  assert.equal(reconciliation.summary.runtimeSurfaces, 226);
+  assert.equal(reconciliation.summary.runtimeOnly, 39);
+
+  const runtimeOnly = new Set(reconciliation.runtimeOnly.map((item) => item.runtimeSymbol));
+  for (const symbol of [
+    'VideoPipeline.fromJSON',
+    'VideoOperations.runtime.outputArgs',
+    'VideoOperations.runtime.probeFile',
+    'VideoOperations.runtime.resolve',
+    'VideoOperations.runtime.runFfmpeg',
+    'VideoOperations.runtime.withWorkspace',
+  ]) {
+    assert.ok(runtimeOnly.has(symbol), 'expected newly exposed runtime surface: ' + symbol);
+  }
+
+  for (const item of reconciliation.runtimeOnly) {
+    assert.ok(item.reason.length > 0, item.runtimeSymbol + ' must have an explicit reconciliation reason');
+  }
+});
