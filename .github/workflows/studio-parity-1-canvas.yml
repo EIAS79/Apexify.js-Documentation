@@ -1,24 +1,6 @@
 name: Studio Parity 1 — Canvas
 
 on:
-  pull_request:
-    types:
-      - ready_for_review
-    paths:
-      - 'components/studio/visual/VisualCanvasInspector.tsx'
-      - 'components/studio/visual/VisualStudioPre4.tsx'
-      - 'lib/studio/visual/model.ts'
-      - 'lib/studio/visual/canvas-contract.ts'
-      - 'lib/studio/visual/compiler/normalize.ts'
-      - 'lib/studio/visual/compiler/plan.ts'
-      - 'lib/studio/visual/compiler/execute.ts'
-      - 'lib/studio/visual/compiler/validate.ts'
-      - 'lib/studio/visual/codegen/emitter.ts'
-      - 'lib/studio/visual/codegen/reconcile.ts'
-      - 'scripts/studio/visual/phase4-canvas.test.ts'
-      - 'scripts/studio/parity/**'
-      - 'package.json'
-      - '.github/workflows/studio-parity-1-canvas.yml'
   workflow_dispatch:
 
 concurrency:
