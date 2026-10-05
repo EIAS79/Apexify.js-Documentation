@@ -650,7 +650,7 @@ function parseCreateImageCallOptions(
             maskSource,
             identifiers,
             canvasIdentifier,
-          ),
+          ) as unknown as Jsonish,
         };
       }
     }
@@ -753,7 +753,7 @@ function imageNodeFromParsed(
         rest.mask.source,
         identifierToNodeId,
         canvasIdentifier,
-      ),
+      ) as unknown as Jsonish,
     };
   }
 
