@@ -265,6 +265,9 @@ function GradientEditor({
         ＋ Stop
       </button>
       <div className="apx-pre4-property-grid">
+        <NumericField label="Rotate °" value={value.rotate} onChange={(rotate) => set({ rotate })} />
+        <NumericField label="Pivot X" value={value.pivotX} onChange={(pivotX) => set({ pivotX })} />
+        <NumericField label="Pivot Y" value={value.pivotY} onChange={(pivotY) => set({ pivotY })} />
         {value.type === 'linear' ? (
           <>
             <NumericField label="Start X" value={value.startX} onChange={(startX) => set({ startX })} />
@@ -374,6 +377,31 @@ function StrokeEditor({
         <NumericField label="Position" value={value.position} onChange={(position) => onChange({ ...value, position })} />
         <NumericField label="Blur" value={value.blur} onChange={(blur) => onChange({ ...value, blur })} />
         <NumericField label="Opacity" value={value.opacity} step={0.01} onChange={(opacity) => onChange({ ...value, opacity })} />
+        <NumericField
+          label="Border radius"
+          value={typeof value.borderRadius === 'number' ? value.borderRadius : undefined}
+          min={0}
+          onChange={(borderRadius) => onChange({ ...value, borderRadius })}
+        />
+        <label className="apx-canvas-check">
+          <input
+            type="checkbox"
+            checked={value.borderRadius === 'circular'}
+            onChange={(event) =>
+              onChange({ ...value, borderRadius: event.target.checked ? 'circular' : 0 })
+            }
+          />
+          <span>Circular radius</span>
+        </label>
+        <label>
+          <span>Border position</span>
+          <input
+            className="apx-pre4-input"
+            value={value.borderPosition ?? ''}
+            placeholder="all / top / left…"
+            onChange={(event) => onChange({ ...value, borderPosition: event.target.value })}
+          />
+        </label>
         <label>
           <span>Style</span>
           <select
@@ -394,6 +422,37 @@ function StrokeEditor({
           />
         </label>
       </div>
+      <label className="apx-canvas-check">
+        <input
+          type="checkbox"
+          checked={Boolean(value.gradient)}
+          onChange={(event) =>
+            onChange({
+              ...value,
+              gradient: event.target.checked
+                ? {
+                    type: 'linear',
+                    startX: 0,
+                    startY: 0,
+                    endX: 100,
+                    endY: 0,
+                    colors: [
+                      { stop: 0, color: value.color ?? '#ffffff' },
+                      { stop: 1, color: '#6f86ff' },
+                    ],
+                  }
+                : undefined,
+            })
+          }
+        />
+        <span>Gradient stroke</span>
+      </label>
+      {value.gradient ? (
+        <GradientEditor
+          value={value.gradient}
+          onChange={(gradient) => onChange({ ...value, gradient })}
+        />
+      ) : null}
     </div>
   );
 }
@@ -424,6 +483,31 @@ function ShadowEditor({
         <NumericField label="Offset Y" value={value.offsetY} onChange={(offsetY) => onChange({ ...value, offsetY })} />
         <NumericField label="Blur" value={value.blur} onChange={(blur) => onChange({ ...value, blur })} />
         <NumericField label="Opacity" value={value.opacity} step={0.01} onChange={(opacity) => onChange({ ...value, opacity })} />
+        <NumericField
+          label="Border radius"
+          value={typeof value.borderRadius === 'number' ? value.borderRadius : undefined}
+          min={0}
+          onChange={(borderRadius) => onChange({ ...value, borderRadius })}
+        />
+        <label className="apx-canvas-check">
+          <input
+            type="checkbox"
+            checked={value.borderRadius === 'circular'}
+            onChange={(event) =>
+              onChange({ ...value, borderRadius: event.target.checked ? 'circular' : 0 })
+            }
+          />
+          <span>Circular radius</span>
+        </label>
+        <label>
+          <span>Border position</span>
+          <input
+            className="apx-pre4-input"
+            value={value.borderPosition ?? ''}
+            placeholder="all / top / left…"
+            onChange={(event) => onChange({ ...value, borderPosition: event.target.value })}
+          />
+        </label>
         <label>
           <span>Rounded corners</span>
           <input
@@ -434,6 +518,37 @@ function ShadowEditor({
           />
         </label>
       </div>
+      <label className="apx-canvas-check">
+        <input
+          type="checkbox"
+          checked={Boolean(value.gradient)}
+          onChange={(event) =>
+            onChange({
+              ...value,
+              gradient: event.target.checked
+                ? {
+                    type: 'linear',
+                    startX: 0,
+                    startY: 0,
+                    endX: 100,
+                    endY: 0,
+                    colors: [
+                      { stop: 0, color: value.color ?? '#000000' },
+                      { stop: 1, color: '#334155' },
+                    ],
+                  }
+                : undefined,
+            })
+          }
+        />
+        <span>Gradient shadow</span>
+      </label>
+      {value.gradient ? (
+        <GradientEditor
+          value={value.gradient}
+          onChange={(gradient) => onChange({ ...value, gradient })}
+        />
+      ) : null}
     </div>
   );
 }
