@@ -410,3 +410,20 @@ test('Phase 5 classifies every pinned image, shape and createImage option into t
     assert.ok(['canonical-literal','stable-source','generated-buffer'].includes(entry.reverse));
   }
 });
+
+
+test('Phase 5 createImage inspector follows the modern createCanvas visual grammar', () => {
+  const inspector = fs.readFileSync('components/studio/visual/VisualImageInspector.tsx', 'utf8');
+  const css = fs.readFileSync('styles/studio-calm.css', 'utf8');
+
+  assert.match(inspector, /apx-canvas-v2-header apx-image-v2-header/);
+  assert.match(inspector, /apx-canvas-v2-section apx-image-v2-section/);
+  assert.match(inspector, /Placement & size/);
+  assert.match(inspector, /apx-image-v2-transform-shell/);
+  assert.doesNotMatch(
+    inspector,
+    /className="apx-pre4-inspector-title" data-image-v2-inspector/,
+  );
+  assert.match(css, /STUDIO-PARITY-2 UI POLISH/);
+  assert.match(css, /apx-image-v2-section/);
+});
