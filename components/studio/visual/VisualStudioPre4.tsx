@@ -66,7 +66,10 @@ import {
   VisualPhase9Inspector,
 } from '@/components/studio/visual/VisualSceneComponentAuthoring';
 import { VisualImageUtilityAuthoring } from '@/components/studio/visual/VisualImageUtilityAuthoring';
-import { VisualImageInspector } from '@/components/studio/visual/VisualImageInspector';
+import {
+  VisualImageBatchInspector,
+  VisualImageInspector,
+} from '@/components/studio/visual/VisualImageInspector';
 import {
   VisualGifContext,
   VisualGifTimeline,
@@ -190,6 +193,7 @@ import {
   defaultShapeNodeProps,
   imageBatchGroupPropsRecord,
   imagePropsRecord,
+  visualImageBatchGroupProps,
   visualImageProps,
 } from '@/lib/studio/visual/image-contract';
 import {
@@ -2240,6 +2244,11 @@ export default function VisualStudioPre4({
       ? primary
       : undefined;
 
+  const primaryImageBatch =
+    primary?.kind === 'group' && visualImageBatchGroupProps(primary)
+      ? primary
+      : undefined;
+
   const updateImageDraft = (
     updater: (props: VisualImageNodeProps) => VisualImageNodeProps,
   ) => {
@@ -2266,6 +2275,25 @@ export default function VisualStudioPre4({
       const next = structuredClone(current);
       const nextNode = next.document.nodes[primaryMedia.id];
       nextNode.props = imagePropsRecord(updater(visualImageProps(nextNode)));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
+  const mutateImageBatch = (
+    label: string,
+    updater: (
+      value: NonNullable<ReturnType<typeof visualImageBatchGroupProps>>,
+    ) => NonNullable<ReturnType<typeof visualImageBatchGroupProps>>,
+  ) => {
+    if (!primaryImageBatch) return;
+    mutate(label, (current) => {
+      const next = structuredClone(current);
+      const group = next.document.nodes[primaryImageBatch.id];
+      if (!group) return current;
+      const value = visualImageBatchGroupProps(group);
+      if (!value) return current;
+      group.props = imageBatchGroupPropsRecord(updater(value));
       next.updatedAt = new Date().toISOString();
       return next;
     });
@@ -6625,6 +6653,22 @@ export default function VisualStudioPre4({
           onMutate={mutate}
           inspectorTab={inspectorTab}
           onMessage={setMessage}
+        />
+      );
+    }
+
+    if (primaryImageBatch) {
+      return (
+        <VisualImageBatchInspector
+          project={project}
+          node={primaryImageBatch}
+          tab={inspectorTab}
+          onChange={mutateImageBatch}
+          onRename={(name) =>
+            mutate('Rename image group', (current) =>
+              renameNode(current, primaryImageBatch.id, name),
+            )
+          }
         />
       );
     }
