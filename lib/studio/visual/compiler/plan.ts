@@ -842,6 +842,105 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
       continue;
     }
 
+    if (node.kind === 'group' && isImageBatchGroup(node)) {
+      const batch = visualImageBatchGroupProps(node);
+      if (!batch) {
+        throw new Error('Image batch group is missing its runtime createImage contract.');
+      }
+      const children = (node.childIds ?? []).map((childId) => {
+        const child = normalized.document.nodes[childId];
+        if (!child || (child.kind !== 'image' && child.kind !== 'shape')) {
+          throw new Error(
+            'Image batch group "' + node.id + '" may contain only image/shape children.',
+          );
+        }
+        return child;
+      });
+      if (children.length < 2) {
+        throw new Error('Image batch group requires at least two image/shape children.');
+      }
+
+      const properties: StudioImageProperties[] = [];
+      for (const child of children) {
+        const resolvedChild = resolved.document.nodes[child.id] ?? child;
+        const childProps = visualImageProps(resolvedChild);
+        if (childProps.createOptions || childProps.painterOpts) {
+          throw new Error(
+            'Image batch child "' +
+              child.id +
+              '" still owns call-level createImage options. Move them to the image group.',
+          );
+        }
+        const imageProperties = imageOperationProperties(
+          resolved,
+          resolvedChild,
+          produced,
+        );
+        let utilitySource = imageProperties.source;
+
+        for (const [utilityIndex, utility] of (childProps.utilityStack ?? []).entries()) {
+          if (utility.enabled === false) continue;
+          if (utility.type === 'imgConverter' || utility.type === 'compress') {
+            deferredOutputUtilities.push({
+              nodeId: child.id,
+              nodeName: child.name || 'image',
+              utilityIndex,
+              utility,
+            });
+            continue;
+          }
+          const utilityTarget = child.id + '__utility_' + utilityIndex;
+          operations.push({
+            id: 'image_utility_' + child.id + '_' + utility.id,
+            kind: 'image-utility',
+            sourceNodeId: child.id,
+            target: utilityTarget,
+            preferredName: (child.name || 'image') + '_' + utility.type,
+            method: utility.type,
+            args: imageUtilityArgs(resolved, utility, utilitySource, produced),
+          });
+          utilitySource = { $studioTarget: utilityTarget };
+        }
+
+        for (const analysis of childProps.utilityAnalyses ?? []) {
+          if (analysis.enabled === false) continue;
+          operations.push({
+            id: 'image_analysis_' + child.id + '_' + analysis.id,
+            kind: 'image-analysis',
+            sourceNodeId: child.id,
+            target: child.id + '__analysis_' + analysis.id,
+            preferredName: (child.name || 'image') + '_' + analysis.type,
+            resultName: analysis.id,
+            method: analysis.type,
+            args: imageAnalysisArgs(analysis, utilitySource),
+          });
+        }
+
+        properties.push({ ...imageProperties, source: utilitySource });
+      }
+
+      operations.push({
+        id: 'image_batch_' + node.id,
+        kind: 'create-image',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || 'imageGroup',
+        base,
+        properties,
+        options: {
+          ...batch.createOptions,
+          isGrouped: true,
+        },
+        ...(batch.painterOpts ? { painterOpts: batch.painterOpts } : {}),
+      });
+
+      produced.set(node.id, { target, member: null });
+      base = { $studioTarget: target };
+      lastTarget = target;
+      lastMember = null;
+      continue;
+    }
+
     const resolvedNode = resolved.document.nodes[node.id] ?? node;
 
     if (node.kind === 'chart') {
