@@ -546,7 +546,9 @@ export function defaultShapeProperties(type: VisualShapeType): VisualShapeProper
 export function defaultImageNodeProps(source = ''): VisualImageNodeProps {
   return {
     source,
-    fit: 'cover',
+    // Studio transform dimensions are explicit by default. "fill" guarantees
+    // width and height resize independently instead of preserving source ratio.
+    fit: 'fill',
     align: 'center',
     blur: 0,
     blendMode: 'source-over',
