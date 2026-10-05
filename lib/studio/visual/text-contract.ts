@@ -1,9 +1,14 @@
 import type {
+  VisualNode,
+  VisualProject,
   VisualProjectIssue,
+  VisualTextBatchGroupProps,
   VisualTextLineDecoration,
   VisualTextMetrics,
   VisualTextNodeProps,
+  VisualValue,
 } from './model';
+import { CANVAS_RUNTIME_LIMITS } from './canvas-contract';
 
 export const TEXT_ALIGNMENTS = ['left','center','right','start','end'] as const;
 export const TEXT_BASELINES = ['alphabetic','bottom','hanging','ideographic','middle','top'] as const;
@@ -34,6 +39,7 @@ export const TEXT_AUTHORING_CLASSIFICATION = {
   textOnCurve: { surface: 'Effects', reverse: 'canonical-literal' },
   includeCharMetrics: { surface: 'Metrics', reverse: 'canonical-literal' },
   measurementCanvas: { surface: 'Metrics', reverse: 'canonical-literal' },
+  painterOpts: { surface: 'Data', reverse: 'canonical-literal' },
 
   fontSize: { surface: 'Advanced', reverse: 'legacy-normalized' },
   fontFamily: { surface: 'Advanced', reverse: 'legacy-normalized' },
@@ -92,6 +98,30 @@ export function defaultTextNodeProps(text = 'Text'): VisualTextNodeProps {
   };
 }
 
+export function textBatchGroupPropsRecord(
+  value: VisualTextBatchGroupProps,
+): Record<string, VisualValue> {
+  return structuredClone(value) as unknown as Record<string, VisualValue>;
+}
+
+export function visualTextBatchGroupProps(
+  node: VisualNode,
+): VisualTextBatchGroupProps | null {
+  if (node.kind !== 'group') return null;
+  const raw = node.props as unknown as Partial<VisualTextBatchGroupProps>;
+  if (raw.textBatch !== true) return null;
+  return {
+    textBatch: true,
+    ...(raw.painterOpts
+      ? { painterOpts: structuredClone(raw.painterOpts) }
+      : {}),
+  };
+}
+
+export function isTextBatchGroup(node: VisualNode): boolean {
+  return visualTextBatchGroupProps(node) !== null;
+}
+
 export function visualTextProps(
   node: { props: Record<string, unknown> },
 ): VisualTextNodeProps {
@@ -100,8 +130,8 @@ export function visualTextProps(
 
 export function textPropsRecord(
   props: VisualTextNodeProps,
-): Record<string, import('./model').VisualValue> {
-  return props as unknown as Record<string, import('./model').VisualValue>;
+): Record<string, VisualValue> {
+  return props as unknown as Record<string, VisualValue>;
 }
 
 function push(
@@ -239,6 +269,95 @@ export function validateVisualTextNode(
         push(issues, 'text-measurement-canvas', path + '.measurementCanvas.' + key, 'Measurement canvas dimensions must be positive integers.');
       }
     }
+    const width = props.measurementCanvas.width ?? 1;
+    const height = props.measurementCanvas.height ?? 1;
+    if (
+      width > CANVAS_RUNTIME_LIMITS.maxCanvasDimension ||
+      height > CANVAS_RUNTIME_LIMITS.maxCanvasDimension ||
+      width * height > CANVAS_RUNTIME_LIMITS.maxTotalPixels
+    ) {
+      push(
+        issues,
+        'text-measurement-canvas-limit',
+        path + '.measurementCanvas',
+        'Measurement canvas exceeds the pinned runtime canvas resource limits.',
+      );
+    }
+  }
+
+  if (
+    props.painterOpts?.resolveAssetRefs !== undefined &&
+    typeof props.painterOpts.resolveAssetRefs !== 'boolean'
+  ) {
+    push(
+      issues,
+      'text-painter-asset-refs',
+      path + '.painterOpts.resolveAssetRefs',
+      'resolveAssetRefs must be a boolean.',
+    );
+  }
+}
+
+export function validateVisualTextBatchGroup(
+  project: VisualProject,
+  node: VisualNode,
+  issues: VisualProjectIssue[],
+) {
+  const batch = visualTextBatchGroupProps(node);
+  if (!batch) return;
+
+  const path = 'document.nodes.' + node.id;
+  const children = node.childIds ?? [];
+  if (children.length < 2) {
+    push(
+      issues,
+      'text-batch-size',
+      path + '.childIds',
+      'A createText TextProperties[] batch requires at least two text children.',
+    );
+  }
+  if (children.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    push(
+      issues,
+      'text-batch-limit',
+      path + '.childIds',
+      'Text batch exceeds the pinned runtime maxCollectionItems limit.',
+    );
+  }
+
+  let totalLength = 0;
+  for (const childId of children) {
+    const child = project.document.nodes[childId];
+    if (!child || child.kind !== 'text') {
+      push(
+        issues,
+        'text-batch-child',
+        path + '.childIds',
+        'Text batches may contain only text children.',
+      );
+      continue;
+    }
+    totalLength += visualTextProps(child).text.length;
+  }
+  if (totalLength > 1_000_000) {
+    push(
+      issues,
+      'text-batch-length',
+      path + '.childIds',
+      'Text batch exceeds the pinned runtime maxTextLength limit.',
+    );
+  }
+
+  if (
+    batch.painterOpts?.resolveAssetRefs !== undefined &&
+    typeof batch.painterOpts.resolveAssetRefs !== 'boolean'
+  ) {
+    push(
+      issues,
+      'text-batch-painter-asset-refs',
+      path + '.props.painterOpts.resolveAssetRefs',
+      'resolveAssetRefs must be a boolean.',
+    );
   }
 }
 
@@ -287,23 +406,102 @@ export function measureVisualTextInBrowser(
     'Arial';
   const bold = props.decorations?.bold ?? props.bold ?? false;
   const italic = props.decorations?.italic ?? props.italic ?? false;
-  const lineHeight = props.layout?.lineHeight ?? props.lineHeight ?? 1.2;
+  const lineHeightMultiplier = props.layout?.lineHeight ?? props.lineHeight ?? 1.4;
   const maxWidth = props.layout?.maxWidth ?? props.maxWidth;
 
-  ctx.font = `${italic ? 'italic ' : ''}${bold ? '700 ' : ''}${size}px "${family}"`;
+  ctx.font = `${italic ? 'italic ' : ''}${bold ? 'bold ' : ''}${size}px "${family}"`;
+  if ('letterSpacing' in ctx) {
+    ctx.letterSpacing = String(props.layout?.letterSpacing ?? props.letterSpacing ?? 0) + 'px';
+  }
+  if ('wordSpacing' in ctx) {
+    ctx.wordSpacing = String(props.layout?.wordSpacing ?? props.wordSpacing ?? 0) + 'px';
+  }
+
   const lines = browserWrappedLines(ctx, props.text, maxWidth);
-  const measured = lines.map((line) => ({
-    text: line,
-    width: ctx.measureText(line).width,
-  }));
-  const width = measured.reduce((max, line) => Math.max(max, line.width), 0);
-  const pxLineHeight = lineHeight <= 4 ? size * lineHeight : lineHeight;
-  return {
+  const pxLineHeight = lineHeightMultiplier * size;
+  const native = lines.map((line) => ctx.measureText(line));
+  const widths = native.map((metric) => metric.width);
+  const width = widths.reduce((max, value) => Math.max(max, value), 0);
+  const first = native[0] ?? ctx.measureText('');
+  const ascent = first.actualBoundingBoxAscent || size * 0.8;
+  const descent = first.actualBoundingBoxDescent || size * 0.2;
+  const metricBase = {
+    width: first.width,
+    actualBoundingBoxAscent: first.actualBoundingBoxAscent,
+    actualBoundingBoxDescent: first.actualBoundingBoxDescent,
+    actualBoundingBoxLeft: first.actualBoundingBoxLeft,
+    actualBoundingBoxRight: first.actualBoundingBoxRight,
+    fontBoundingBoxAscent:
+      ('fontBoundingBoxAscent' in first
+        ? Number(first.fontBoundingBoxAscent)
+        : ascent),
+    fontBoundingBoxDescent:
+      ('fontBoundingBoxDescent' in first
+        ? Number(first.fontBoundingBoxDescent)
+        : descent),
+    height: ascent + descent,
+    lineHeight: pxLineHeight,
+    baseline: ascent,
+    top: -ascent,
+    bottom: descent,
+    centerX: first.width / 2,
+    centerY: (descent - ascent) / 2,
+  };
+
+  const result: VisualTextMetrics = {
+    ...metricBase,
     width,
     height: Math.max(1, lines.length) * pxLineHeight,
-    lineHeight: pxLineHeight,
+    totalHeight: Math.max(1, lines.length) * pxLineHeight,
     lineCount: Math.max(1, lines.length),
-    baseline: size * .8,
-    lines: measured,
+    lines: lines.map((line, index) => {
+      const metric = native[index] ?? ctx.measureText(line);
+      const lineAscent = metric.actualBoundingBoxAscent || size * 0.8;
+      const lineDescent = metric.actualBoundingBoxDescent || size * 0.2;
+      return {
+        text: line,
+        width: metric.width,
+        height: lineAscent + lineDescent,
+        metrics: {
+          width: metric.width,
+          actualBoundingBoxAscent: metric.actualBoundingBoxAscent,
+          actualBoundingBoxDescent: metric.actualBoundingBoxDescent,
+          actualBoundingBoxLeft: metric.actualBoundingBoxLeft,
+          actualBoundingBoxRight: metric.actualBoundingBoxRight,
+          fontBoundingBoxAscent:
+            ('fontBoundingBoxAscent' in metric
+              ? Number(metric.fontBoundingBoxAscent)
+              : lineAscent),
+          fontBoundingBoxDescent:
+            ('fontBoundingBoxDescent' in metric
+              ? Number(metric.fontBoundingBoxDescent)
+              : lineDescent),
+          height: lineAscent + lineDescent,
+          lineHeight: pxLineHeight,
+          baseline: lineAscent,
+          top: -lineAscent,
+          bottom: lineDescent,
+          centerX: metric.width / 2,
+          centerY: (lineDescent - lineAscent) / 2,
+        },
+      };
+    }),
+    centerX: width / 2,
+    centerY: (Math.max(1, lines.length) * pxLineHeight) / 2,
   };
+
+  if (props.includeCharMetrics) {
+    const units = Array.from(props.text);
+    let currentX = 0;
+    result.charWidths = [];
+    result.charPositions = [];
+    for (const unit of units) {
+      const charWidth = ctx.measureText(unit).width;
+      result.charWidths.push(charWidth);
+      result.charPositions.push({ x: currentX, width: charWidth });
+      currentX += charWidth;
+    }
+  }
+
+  return result;
 }
