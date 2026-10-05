@@ -29,6 +29,7 @@ import type {
   VisualImageDistortion,
   VisualImageFilter,
   VisualImageGroupTransform,
+  VisualImageMask,
   VisualImageMeshWarp,
   VisualImageNodeProps,
   VisualNode,
@@ -645,6 +646,113 @@ function FilterEditor({
   );
 }
 
+function MaskEditor({
+  value,
+  imageAssets,
+  generatedNodes,
+  onChange,
+}: {
+  value: VisualImageMask;
+  imageAssets: readonly StudioVirtualAsset[];
+  generatedNodes: readonly VisualNode[];
+  onChange: (value: VisualImageMask) => void;
+}) {
+  const sourceString = typeof value.source === 'string' ? value.source : '';
+  const sourceAssetId =
+    typeof value.source === 'string'
+      ? studioAssetIdFromReference(value.source)
+      : null;
+  const generatedId =
+    typeof value.source === 'object' &&
+    value.source &&
+    '$generated' in value.source
+      ? value.source.$generated
+      : '';
+
+  return (
+    <div className="apx-image-v2-nested" data-image-v2-mask-source>
+      <label>
+        <span>Mask source</span>
+        <input
+          className="apx-pre4-input"
+          value={sourceString}
+          placeholder="URL / path / studio://asset/…"
+          onChange={(event) =>
+            onChange({ ...value, source: event.target.value })
+          }
+        />
+      </label>
+      <div className="apx-pre4-property-grid">
+        <label>
+          <span>Studio asset</span>
+          <select
+            className="apx-pre4-input"
+            value={sourceAssetId ?? ''}
+            onChange={(event) => {
+              const asset = imageAssets.find(
+                (item) => item.id === event.target.value,
+              );
+              if (asset) {
+                onChange({
+                  ...value,
+                  source: studioAssetReference(asset),
+                });
+              }
+            }}
+          >
+            <option value="">Choose asset…</option>
+            {imageAssets.map((asset) => (
+              <option key={asset.id} value={asset.id}>
+                {asset.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Generated buffer</span>
+          <select
+            className="apx-pre4-input"
+            value={generatedId}
+            onChange={(event) => {
+              if (event.target.value) {
+                onChange({
+                  ...value,
+                  source: { $generated: event.target.value },
+                });
+              }
+            }}
+          >
+            <option value="">None</option>
+            <option value="document_canvas">Canvas buffer</option>
+            {generatedNodes.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name ?? item.kind}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Mode</span>
+          <select
+            className="apx-pre4-input"
+            value={value.mode ?? 'alpha'}
+            onChange={(event) =>
+              onChange({
+                ...value,
+                mode: event.target.value as VisualImageMask['mode'],
+              })
+            }
+          >
+            {MASK_MODES.map((mode) => (
+              <option key={mode}>{mode}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+    </div>
+  );
+}
+
 function DistortionEditor({
   value,
   onChange,
@@ -892,11 +1000,15 @@ function GroupTransformEditor({
   value,
   width,
   height,
+  imageAssets,
+  generatedNodes,
   onChange,
 }: {
   value: VisualImageGroupTransform;
   width: number;
   height: number;
+  imageAssets: readonly StudioVirtualAsset[];
+  generatedNodes: readonly VisualNode[];
   onChange: (value: VisualImageGroupTransform) => void;
 }) {
   const set = (patch: Partial<VisualImageGroupTransform>) =>
@@ -1013,39 +1125,12 @@ function GroupTransformEditor({
           <span>Mask grouped result</span>
         </label>
         {value.mask ? (
-          <div className="apx-pre4-property-grid">
-            <label>
-              <span>Mask source</span>
-              <input
-                className="apx-pre4-input"
-                value={typeof value.mask.source === 'string' ? value.mask.source : ''}
-                onChange={(event) =>
-                  set({ mask: { ...value.mask!, source: event.target.value } })
-                }
-              />
-            </label>
-            <label>
-              <span>Mask mode</span>
-              <select
-                className="apx-pre4-input"
-                value={value.mask.mode ?? 'alpha'}
-                onChange={(event) =>
-                  set({
-                    mask: {
-                      ...value.mask!,
-                      mode: event.target.value as NonNullable<
-                        VisualImageGroupTransform['mask']
-                      >['mode'],
-                    },
-                  })
-                }
-              >
-                {MASK_MODES.map((mode) => (
-                  <option key={mode}>{mode}</option>
-                ))}
-              </select>
-            </label>
-          </div>
+          <MaskEditor
+            value={value.mask}
+            imageAssets={imageAssets}
+            generatedNodes={generatedNodes}
+            onChange={(mask) => set({ mask })}
+          />
         ) : null}
         <label className="apx-canvas-check">
           <input
@@ -1329,12 +1414,16 @@ export function VisualImageBatchInspector({
   project,
   node,
   tab,
+  imageAssets,
+  generatedNodes,
   onChange,
   onRename,
 }: {
   project: VisualProject;
   node: VisualNode;
   tab: InspectorTab;
+  imageAssets: readonly StudioVirtualAsset[];
+  generatedNodes: readonly VisualNode[];
   onChange: (
     label: string,
     updater: (current: VisualImageBatchGroupProps) => VisualImageBatchGroupProps,
@@ -1454,6 +1543,8 @@ export function VisualImageBatchInspector({
         value={groupTransform}
         width={width}
         height={height}
+        imageAssets={imageAssets}
+        generatedNodes={generatedNodes}
         onChange={(next) =>
           setBatch('Image group transform', (current) => ({
             ...current,
@@ -1823,18 +1914,12 @@ export function VisualImageInspector({
             <span>Enable mask</span>
           </label>
           {props.mask ? (
-            <div className="apx-pre4-property-grid">
-              <label>
-                <span>Mask source</span>
-                <input className="apx-pre4-input" value={typeof props.mask.source === 'string' ? props.mask.source : ''} onChange={(event) => patch('Mask source', { mask: { ...props.mask!, source: event.target.value } })} />
-              </label>
-              <label>
-                <span>Mode</span>
-                <select className="apx-pre4-input" value={props.mask.mode ?? 'alpha'} onChange={(event) => patch('Mask mode', { mask: { ...props.mask!, mode: event.target.value as NonNullable<VisualImageNodeProps['mask']>['mode'] } })}>
-                  {MASK_MODES.map((mode) => <option key={mode}>{mode}</option>)}
-                </select>
-              </label>
-            </div>
+            <MaskEditor
+              value={props.mask}
+              imageAssets={imageAssets}
+              generatedNodes={generatedNodes}
+              onChange={(mask) => patch('Image mask', { mask })}
+            />
           ) : null}
         </Section>
 
@@ -1961,6 +2046,10 @@ export function VisualImageInspector({
         {options.groupTransform ? (
           <GroupTransformEditor
             value={group}
+            width={width}
+            height={height}
+            imageAssets={imageAssets}
+            generatedNodes={generatedNodes}
             onChange={(groupTransform) =>
               patch('Image group transform', {
                 createOptions: { ...options, groupTransform },
