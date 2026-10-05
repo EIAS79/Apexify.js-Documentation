@@ -9,6 +9,8 @@ import type {
 } from '../model';
 import {
   IMAGE_SHAPE_TYPES,
+  imageBatchGroupPropsRecord,
+  isImageBatchGroup,
   imagePropsRecord,
   visualImageProps,
 } from '../image-contract';
@@ -510,7 +512,15 @@ function orderedRenderableNodes(project: VisualProject) {
   const visit = (id: string) => {
     const node = project.document.nodes[id];
     if (!node) return;
-    if (node.kind === 'group' || node.kind === 'surface') {
+    if (node.kind === 'group') {
+      if (isImageBatchGroup(node)) {
+        out.push(node);
+        return;
+      }
+      for (const childId of node.childIds ?? []) visit(childId);
+      return;
+    }
+    if (node.kind === 'surface') {
       for (const childId of node.childIds ?? []) visit(childId);
       return;
     }
@@ -532,6 +542,11 @@ function orderedRenderableNodes(project: VisualProject) {
 function removeVisualNode(project: VisualProject, id: string) {
   const node = project.document.nodes[id];
   if (!node) return;
+  if (node.kind === 'group') {
+    for (const childId of [...(node.childIds ?? [])]) {
+      removeVisualNode(project, childId);
+    }
+  }
   if (node.parentId) {
     const parent = project.document.nodes[node.parentId];
     if (parent) {
