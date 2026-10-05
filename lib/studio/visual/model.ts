@@ -479,6 +479,16 @@ export interface VisualCreateImageOptions {
   groupTransform?: VisualImageGroupTransform;
 }
 
+/**
+ * Editor grouping that maps to one runtime createImage(ImageProperties[]) call.
+ * Mixed/non-image groups keep the generic editor grouping semantics.
+ */
+export interface VisualImageBatchGroupProps {
+  imageBatch: true;
+  createOptions: VisualCreateImageOptions;
+  painterOpts?: VisualPainterAssetRefsOptions;
+}
+
 export interface VisualImageNodeProps {
   source: VisualImageSource;
   inherit?: boolean;
