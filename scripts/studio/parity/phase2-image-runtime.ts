@@ -25,6 +25,7 @@ import type {
   VisualProject,
 } from '../../../lib/studio/visual/model';
 
+async function main() {
 const root = process.cwd();
 const runtimeRoot = path.resolve(
   process.env.APEXIFY_RUNTIME_ROOT ?? path.join(root, '..', 'Apexify.js'),
@@ -484,3 +485,9 @@ console.log(
     2,
   ),
 );
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
