@@ -1,6 +1,17 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import {
+  AdjustmentsHorizontalIcon,
+  ArrowsPointingOutIcon,
+  CircleStackIcon,
+  PaintBrushIcon,
+  PhotoIcon,
+  SparklesIcon,
+  Squares2X2Icon,
+  SwatchIcon,
+  WrenchScrewdriverIcon,
+} from '@heroicons/react/24/outline';
 
 import { VisualImageUtilityAuthoring } from '@/components/studio/visual/VisualImageUtilityAuthoring';
 import {
@@ -69,29 +80,119 @@ function numberValue(value: unknown, fallback = 0): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
 }
 
+function sectionIcon(attr: string) {
+  if (attr.includes('source') || attr.includes('asset') || attr.includes('identity')) return PhotoIcon;
+  if (attr.includes('layout') || attr.includes('transform') || attr.includes('mesh')) return ArrowsPointingOutIcon;
+  if (attr.includes('stroke') || attr.includes('shape') || attr.includes('background')) return PaintBrushIcon;
+  if (attr.includes('filter') || attr.includes('effect') || attr.includes('distortion')) return SparklesIcon;
+  if (attr.includes('mask') || attr.includes('clip')) return Squares2X2Icon;
+  if (attr.includes('option') || attr.includes('advanced') || attr.includes('utility')) return WrenchScrewdriverIcon;
+  if (attr.includes('batch')) return CircleStackIcon;
+  if (attr.includes('appearance')) return SwatchIcon;
+  return AdjustmentsHorizontalIcon;
+}
+
 function Section({
   title,
   description,
   children,
   attr,
+  action,
+  defaultOpen = true,
 }: {
   title: string;
   description?: string;
   children: ReactNode;
   attr: string;
+  action?: ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const Icon = sectionIcon(attr);
+  return (
+    <details
+      className="apx-canvas-v2-section apx-image-v2-section"
+      data-image-v2-section={attr}
+      open={open}
+      onToggle={(event) => setOpen(event.currentTarget.open)}
+    >
+      <summary>
+        <span className="apx-canvas-v2-section-icon"><Icon aria-hidden /></span>
+        <span className="apx-canvas-v2-section-copy">
+          <strong>{title}</strong>
+          {description ? <small>{description}</small> : null}
+        </span>
+        {action ? (
+          <span
+            className="apx-canvas-v2-section-action"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {action}
+          </span>
+        ) : null}
+        <span className="apx-canvas-v2-chevron">⌄</span>
+      </summary>
+      <div className="apx-canvas-v2-section-body">{children}</div>
+    </details>
+  );
+}
+
+function Toggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
 }) {
   return (
-    <section className="apx-pre4-section" data-image-v2-section={attr}>
-      <div className="apx-canvas-section-heading">
-        <div>
-          <div className="apx-pre4-section-title">{title}</div>
-          {description ? (
-            <small className="apx-canvas-v2-field-hint">{description}</small>
-          ) : null}
-        </div>
+    <label className="apx-canvas-v2-toggle" title={label}>
+      <input
+        type="checkbox"
+        aria-label={label}
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <span />
+    </label>
+  );
+}
+
+function MultiPositionField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const positions = ['all','top','left','right','bottom','top-left','top-right','bottom-left','bottom-right'] as const;
+  const selected = new Set((value || 'all').split(',').map((item) => item.trim()).filter(Boolean));
+  const toggle = (option: string) => {
+    if (option === 'all') return onChange('all');
+    const next = new Set(selected.has('all') ? [] : selected);
+    if (next.has(option)) next.delete(option);
+    else next.add(option);
+    onChange(next.size ? [...next].join(',') : 'all');
+  };
+  return (
+    <div className="apx-canvas-v2-field">
+      <span>{label}</span>
+      <div className="apx-canvas-v2-multi" role="group" aria-label={label}>
+        {positions.map((option) => (
+          <button
+            key={option}
+            type="button"
+            data-active={selected.has('all') ? (option === 'all' ? 'true' : undefined) : (selected.has(option) ? 'true' : undefined)}
+            onClick={() => toggle(option)}
+          >
+            {option.replace('-', ' ')}
+          </button>
+        ))}
       </div>
-      {children}
-    </section>
+    </div>
   );
 }
 
@@ -114,7 +215,7 @@ function NumericField({
     <label>
       <span>{label}</span>
       <input
-        className="apx-pre4-input"
+        className="apx-canvas-v2-input apx-pre4-input"
         type="number"
         value={value ?? ''}
         step={step}
@@ -137,11 +238,11 @@ function GradientEditor({
     onChange({ ...value, ...patch } as VisualGradient);
   return (
     <div className="apx-image-v2-nested" data-image-gradient-editor>
-      <div className="apx-pre4-property-grid">
+      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
         <label>
           <span>Gradient</span>
           <select
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={value.type}
             onChange={(event) => {
               const type = event.target.value as VisualGradient['type'];
@@ -185,7 +286,7 @@ function GradientEditor({
           <label>
             <span>Repeat</span>
             <select
-              className="apx-pre4-input"
+              className="apx-canvas-v2-input apx-pre4-input"
               value={value.repeat ?? 'no-repeat'}
               onChange={(event) => set({ repeat: event.target.value })}
             >
@@ -210,7 +311,7 @@ function GradientEditor({
               }}
             />
             <input
-              className="apx-pre4-input"
+              className="apx-canvas-v2-input apx-pre4-input"
               value={stop.color}
               onChange={(event) => {
                 const colors = value.colors.map((item, itemIndex) =>
@@ -220,7 +321,7 @@ function GradientEditor({
               }}
             />
             <input
-              className="apx-pre4-input"
+              className="apx-canvas-v2-input apx-pre4-input"
               type="number"
               min={0}
               max={1}
@@ -265,7 +366,7 @@ function GradientEditor({
       >
         ＋ Stop
       </button>
-      <div className="apx-pre4-property-grid">
+      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
         <NumericField label="Rotate °" value={value.rotate} onChange={(rotate) => set({ rotate })} />
         <NumericField label="Pivot X" value={value.pivotX} onChange={(pivotX) => set({ pivotX })} />
         <NumericField label="Pivot Y" value={value.pivotY} onChange={(pivotY) => set({ pivotY })} />
@@ -323,7 +424,7 @@ function PointListEditor({
         </button>
       </div>
       {points.map((point, index) => (
-        <div className="apx-pre4-property-grid" key={index}>
+        <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid" key={index}>
           <NumericField
             label={'X ' + (index + 1)}
             value={point.x}
@@ -361,19 +462,19 @@ function StrokeEditor({
 }) {
   return (
     <div className="apx-image-v2-nested">
-      <div className="apx-canvas-color-row">
+      <div className="apx-canvas-v2-color apx-canvas-color-row">
         <input
           type="color"
           value={value.color?.startsWith('#') ? value.color : '#ffffff'}
           onChange={(event) => onChange({ ...value, color: event.target.value })}
         />
         <input
-          className="apx-pre4-input"
+          className="apx-canvas-v2-input apx-pre4-input"
           value={value.color ?? '#ffffff'}
           onChange={(event) => onChange({ ...value, color: event.target.value })}
         />
       </div>
-      <div className="apx-pre4-property-grid">
+      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
         <NumericField label="Width" value={value.width} onChange={(width) => onChange({ ...value, width })} />
         <NumericField label="Position" value={value.position} onChange={(position) => onChange({ ...value, position })} />
         <NumericField label="Blur" value={value.blur} onChange={(blur) => onChange({ ...value, blur })} />
@@ -384,7 +485,7 @@ function StrokeEditor({
           min={0}
           onChange={(borderRadius) => onChange({ ...value, borderRadius })}
         />
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={value.borderRadius === 'circular'}
@@ -397,7 +498,7 @@ function StrokeEditor({
         <label>
           <span>Border position</span>
           <input
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={value.borderPosition ?? ''}
             placeholder="all / top / left…"
             onChange={(event) => onChange({ ...value, borderPosition: event.target.value })}
@@ -406,7 +507,7 @@ function StrokeEditor({
         <label>
           <span>Style</span>
           <select
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={value.style ?? 'solid'}
             onChange={(event) => onChange({ ...value, style: event.target.value as VisualStrokeOptions['style'] })}
           >
@@ -416,14 +517,14 @@ function StrokeEditor({
         <label>
           <span>Rounded corners</span>
           <input
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={value.roundedCorners ?? ''}
             placeholder="all / top / left…"
             onChange={(event) => onChange({ ...value, roundedCorners: event.target.value })}
           />
         </label>
       </div>
-      <label className="apx-canvas-check">
+      <label className="apx-image-v2-check apx-canvas-check">
         <input
           type="checkbox"
           checked={Boolean(value.gradient)}
@@ -467,19 +568,19 @@ function ShadowEditor({
 }) {
   return (
     <div className="apx-image-v2-nested">
-      <div className="apx-canvas-color-row">
+      <div className="apx-canvas-v2-color apx-canvas-color-row">
         <input
           type="color"
           value={value.color?.startsWith('#') ? value.color : '#000000'}
           onChange={(event) => onChange({ ...value, color: event.target.value })}
         />
         <input
-          className="apx-pre4-input"
+          className="apx-canvas-v2-input apx-pre4-input"
           value={value.color ?? '#000000'}
           onChange={(event) => onChange({ ...value, color: event.target.value })}
         />
       </div>
-      <div className="apx-pre4-property-grid">
+      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
         <NumericField label="Offset X" value={value.offsetX} onChange={(offsetX) => onChange({ ...value, offsetX })} />
         <NumericField label="Offset Y" value={value.offsetY} onChange={(offsetY) => onChange({ ...value, offsetY })} />
         <NumericField label="Blur" value={value.blur} onChange={(blur) => onChange({ ...value, blur })} />
@@ -490,7 +591,7 @@ function ShadowEditor({
           min={0}
           onChange={(borderRadius) => onChange({ ...value, borderRadius })}
         />
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={value.borderRadius === 'circular'}
@@ -503,7 +604,7 @@ function ShadowEditor({
         <label>
           <span>Border position</span>
           <input
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={value.borderPosition ?? ''}
             placeholder="all / top / left…"
             onChange={(event) => onChange({ ...value, borderPosition: event.target.value })}
@@ -512,14 +613,14 @@ function ShadowEditor({
         <label>
           <span>Rounded corners</span>
           <input
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={value.roundedCorners ?? ''}
             placeholder="all / top / left…"
             onChange={(event) => onChange({ ...value, roundedCorners: event.target.value })}
           />
         </label>
       </div>
-      <label className="apx-canvas-check">
+      <label className="apx-image-v2-check apx-canvas-check">
         <input
           type="checkbox"
           checked={Boolean(value.gradient)}
@@ -588,7 +689,7 @@ function FilterEditor({
           return (
             <div className="apx-image-filter-row" key={index} data-filter-type={filter.type}>
               <select
-                className="apx-pre4-input"
+                className="apx-canvas-v2-input apx-pre4-input"
                 value={filter.type}
                 onChange={(event) =>
                   onChange(
@@ -607,7 +708,7 @@ function FilterEditor({
                 {IMAGE_FILTER_TYPES.map((type) => <option key={type}>{type}</option>)}
               </select>
               {!parameterless ? (
-                <div className="apx-pre4-property-grid">
+                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
                   {fields.map((field) => (
                     <NumericField
                       key={field.key}
@@ -674,7 +775,7 @@ function MaskEditor({
       <label>
         <span>Mask source</span>
         <input
-          className="apx-pre4-input"
+          className="apx-canvas-v2-input apx-pre4-input"
           value={sourceString}
           placeholder="URL / path / studio://asset/…"
           onChange={(event) =>
@@ -682,11 +783,11 @@ function MaskEditor({
           }
         />
       </label>
-      <div className="apx-pre4-property-grid">
+      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
         <label>
           <span>Studio asset</span>
           <select
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={sourceAssetId ?? ''}
             onChange={(event) => {
               const asset = imageAssets.find(
@@ -711,7 +812,7 @@ function MaskEditor({
         <label>
           <span>Generated buffer</span>
           <select
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={generatedId}
             onChange={(event) => {
               if (event.target.value) {
@@ -734,7 +835,7 @@ function MaskEditor({
         <label>
           <span>Mode</span>
           <select
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={value.mode ?? 'alpha'}
             onChange={(event) =>
               onChange({
@@ -763,11 +864,11 @@ function DistortionEditor({
   const set = (patch: Partial<VisualImageDistortion>) => onChange({ ...value, ...patch });
   return (
     <div className="apx-image-v2-nested" data-image-v2-distortion>
-      <div className="apx-pre4-property-grid">
+      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
         <label>
           <span>Type</span>
           <select
-            className="apx-pre4-input"
+            className="apx-canvas-v2-input apx-pre4-input"
             value={value.type}
             onChange={(event) => {
               const type = event.target.value as VisualImageDistortion['type'];
@@ -782,13 +883,13 @@ function DistortionEditor({
         </label>
         <label>
           <span>Interpolation</span>
-          <select className="apx-pre4-input" value={value.interpolation ?? 'bilinear'} onChange={(event) => set({ interpolation: event.target.value as VisualImageDistortion['interpolation'] })}>
+          <select className="apx-canvas-v2-input apx-pre4-input" value={value.interpolation ?? 'bilinear'} onChange={(event) => set({ interpolation: event.target.value as VisualImageDistortion['interpolation'] })}>
             {INTERPOLATIONS.map((item) => <option key={item}>{item}</option>)}
           </select>
         </label>
         <label>
           <span>Edge mode</span>
-          <select className="apx-pre4-input" value={value.edgeMode ?? 'transparent'} onChange={(event) => set({ edgeMode: event.target.value as VisualImageDistortion['edgeMode'] })}>
+          <select className="apx-canvas-v2-input apx-pre4-input" value={value.edgeMode ?? 'transparent'} onChange={(event) => set({ edgeMode: event.target.value as VisualImageDistortion['edgeMode'] })}>
             {EDGE_MODES.map((item) => <option key={item}>{item}</option>)}
           </select>
         </label>
@@ -835,7 +936,7 @@ function DistortionEditor({
           </div>
           {(value.controlPoints ?? []).map((handle, index) => (
             <div className="apx-image-filter-row" key={index}>
-              <div className="apx-pre4-property-grid">
+              <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
                 <NumericField label="From X" value={handle.from.x} onChange={(x) => set({ controlPoints: (value.controlPoints ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, from: { ...item.from, x } } : item) })} />
                 <NumericField label="From Y" value={handle.from.y} onChange={(y) => set({ controlPoints: (value.controlPoints ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, from: { ...item.from, y } } : item) })} />
                 <NumericField label="To X" value={handle.to.x} onChange={(x) => set({ controlPoints: (value.controlPoints ?? []).map((item, itemIndex) => itemIndex === index ? { ...item, to: { ...item.to, x } } : item) })} />
@@ -845,7 +946,7 @@ function DistortionEditor({
                 <label>
                   <span>Falloff</span>
                   <select
-                    className="apx-pre4-input"
+                    className="apx-canvas-v2-input apx-pre4-input"
                     value={handle.falloff ?? 'smooth'}
                     onChange={(event) =>
                       set({
@@ -882,19 +983,19 @@ function DistortionEditor({
       ) : null}
 
       {value.type === 'warp' && !value.points && !value.controlPoints ? (
-        <div className="apx-pre4-property-grid">
+        <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
           <button className="apx-canvas-mini-button" type="button" onClick={() => set({ points: [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 100 }, { x: 0, y: 100 }] })}>4-point quad</button>
           <button className="apx-canvas-mini-button" type="button" onClick={() => set({ controlPoints: [{ from: { x: 50, y: 50 }, to: { x: 60, y: 50 }, radius: 25, strength: 1, falloff: 'smooth' }] })}>Liquify handles</button>
         </div>
       ) : null}
 
       {value.type === 'twirl' ? (
-        <div className="apx-pre4-property-grid">
+        <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
           <NumericField label="Angle °" value={value.angle} onChange={(angle) => set({ angle })} />
         </div>
       ) : null}
       {value.type === 'wave' ? (
-        <div className="apx-pre4-property-grid">
+        <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
           <NumericField label="Amplitude X" value={value.amplitudeX} onChange={(amplitudeX) => set({ amplitudeX })} />
           <NumericField label="Amplitude Y" value={value.amplitudeY} onChange={(amplitudeY) => set({ amplitudeY })} />
           <NumericField label="Wavelength X" value={value.wavelengthX} min={0.0001} onChange={(wavelengthX) => set({ wavelengthX })} />
@@ -936,18 +1037,18 @@ function MeshWarpEditor({
   const set = (patch: Partial<VisualImageMeshWarp>) => onChange({ ...value, ...patch });
   return (
     <div className="apx-image-v2-nested" data-image-v2-mesh-warp>
-      <div className="apx-pre4-property-grid">
+      <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
         <NumericField label="Grid X" value={value.gridX} min={1} step={1} onChange={(gridX) => set({ gridX: Math.max(1, Math.round(gridX)) })} />
         <NumericField label="Grid Y" value={value.gridY} min={1} step={1} onChange={(gridY) => set({ gridY: Math.max(1, Math.round(gridY)) })} />
         <label>
           <span>Interpolation</span>
-          <select className="apx-pre4-input" value={value.interpolation ?? 'bilinear'} onChange={(event) => set({ interpolation: event.target.value as VisualImageMeshWarp['interpolation'] })}>
+          <select className="apx-canvas-v2-input apx-pre4-input" value={value.interpolation ?? 'bilinear'} onChange={(event) => set({ interpolation: event.target.value as VisualImageMeshWarp['interpolation'] })}>
             {INTERPOLATIONS.map((item) => <option key={item}>{item}</option>)}
           </select>
         </label>
         <label>
           <span>Edge mode</span>
-          <select className="apx-pre4-input" value={value.edgeMode ?? 'transparent'} onChange={(event) => set({ edgeMode: event.target.value as VisualImageMeshWarp['edgeMode'] })}>
+          <select className="apx-canvas-v2-input apx-pre4-input" value={value.edgeMode ?? 'transparent'} onChange={(event) => set({ edgeMode: event.target.value as VisualImageMeshWarp['edgeMode'] })}>
             {EDGE_MODES.map((item) => <option key={item}>{item}</option>)}
           </select>
         </label>
@@ -960,7 +1061,7 @@ function MeshWarpEditor({
           <div className="apx-image-filter-row" key={y}>
             <strong>Row {y + 1}</strong>
             {row.map((point, x) => (
-              <div className="apx-pre4-property-grid" key={x}>
+              <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid" key={x}>
                 <NumericField
                   label={'X ' + (x + 1)}
                   value={point.x}
@@ -1021,7 +1122,7 @@ function GroupTransformEditor({
         description="Applied once to the temporary grouped ImageProperties[] surface."
         attr="group-transform-geometry"
       >
-        <div className="apx-pre4-property-grid">
+        <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
           {([
             ['Rotation', 'rotation'],
             ['Translate X', 'translateX'],
@@ -1045,7 +1146,7 @@ function GroupTransformEditor({
           <label>
             <span>Blend</span>
             <select
-              className="apx-pre4-input"
+              className="apx-canvas-v2-input apx-pre4-input"
               value={value.blendMode ?? 'source-over'}
               onChange={(event) =>
                 set({ blendMode: event.target.value as VisualBlendMode })
@@ -1059,7 +1160,7 @@ function GroupTransformEditor({
           <label>
             <span>Border radius</span>
             <input
-              className="apx-pre4-input"
+              className="apx-canvas-v2-input apx-pre4-input"
               value={value.borderRadius ?? ''}
               placeholder="number or circular"
               onChange={(event) => {
@@ -1078,7 +1179,7 @@ function GroupTransformEditor({
           <label>
             <span>Border position</span>
             <input
-              className="apx-pre4-input"
+              className="apx-canvas-v2-input apx-pre4-input"
               value={value.borderPosition ?? ''}
               placeholder="all / top / left…"
               onChange={(event) => set({ borderPosition: event.target.value })}
@@ -1087,7 +1188,7 @@ function GroupTransformEditor({
           <label>
             <span>Filter order</span>
             <select
-              className="apx-pre4-input"
+              className="apx-canvas-v2-input apx-pre4-input"
               value={value.filterOrder ?? 'post'}
               onChange={(event) =>
                 set({ filterOrder: event.target.value as 'pre' | 'post' })
@@ -1110,7 +1211,7 @@ function GroupTransformEditor({
       </Section>
 
       <Section title="Group mask & clip" attr="group-mask-clip">
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={Boolean(value.mask)}
@@ -1132,7 +1233,7 @@ function GroupTransformEditor({
             onChange={(mask) => set({ mask })}
           />
         ) : null}
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={Boolean(value.clipPath)}
@@ -1162,7 +1263,7 @@ function GroupTransformEditor({
       </Section>
 
       <Section title="Group distortion" attr="group-distortion">
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={Boolean(value.distortion)}
@@ -1190,7 +1291,7 @@ function GroupTransformEditor({
       </Section>
 
       <Section title="Group mesh warp" attr="group-mesh-warp">
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={Boolean(value.meshWarp)}
@@ -1224,7 +1325,7 @@ function GroupTransformEditor({
           const current = value.effects?.[key];
           return (
             <div className="apx-image-v2-nested" key={key}>
-              <label className="apx-canvas-check">
+              <label className="apx-image-v2-check apx-canvas-check">
                 <input
                   type="checkbox"
                   checked={Boolean(current)}
@@ -1240,7 +1341,7 @@ function GroupTransformEditor({
                 <span>{key}</span>
               </label>
               {current ? (
-                <div className="apx-pre4-property-grid">
+                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
                   {Object.entries(current).map(([field, fieldValue]) => (
                     <NumericField
                       key={field}
@@ -1265,7 +1366,7 @@ function GroupTransformEditor({
       </Section>
 
       <Section title="Group stroke" attr="group-stroke">
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={Boolean(value.stroke)}
@@ -1288,7 +1389,7 @@ function GroupTransformEditor({
       </Section>
 
       <Section title="Group shadow" attr="group-shadow">
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={Boolean(value.shadow)}
@@ -1317,7 +1418,7 @@ function GroupTransformEditor({
       </Section>
 
       <Section title="Group box background" attr="group-box-background">
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={Boolean(value.boxBackground)}
@@ -1333,7 +1434,7 @@ function GroupTransformEditor({
         </label>
         {value.boxBackground ? (
           <>
-            <div className="apx-canvas-color-row">
+            <div className="apx-canvas-v2-color apx-canvas-color-row">
               <input
                 type="color"
                 value={
@@ -1351,7 +1452,7 @@ function GroupTransformEditor({
                 }
               />
               <input
-                className="apx-pre4-input"
+                className="apx-canvas-v2-input apx-pre4-input"
                 value={value.boxBackground.color ?? ''}
                 onChange={(event) =>
                   set({
@@ -1363,7 +1464,7 @@ function GroupTransformEditor({
                 }
               />
             </div>
-            <label className="apx-canvas-check">
+            <label className="apx-image-v2-check apx-canvas-check">
               <input
                 type="checkbox"
                 checked={Boolean(value.boxBackground.gradient)}
@@ -1446,14 +1547,16 @@ export function VisualImageBatchInspector({
   ) => onChange(label, updater);
 
   const header = (
-    <div className="apx-pre4-inspector-title" data-image-v2-batch-inspector>
+    <div className="apx-canvas-v2-header apx-image-v2-header" data-image-v2-batch-inspector>
+      <div className="apx-canvas-v2-api-icon"><Squares2X2Icon aria-hidden /></div>
       <div>
-        <strong>{node.name ?? 'Image group'}</strong>
-        <small>
-          createImage(ImageProperties[]) · {node.childIds?.length ?? 0} layers
-        </small>
+        <strong>createImage([...])</strong>
+        <span>{node.name ?? 'Image group'} · {node.childIds?.length ?? 0} layers</span>
       </div>
-      <span className="apx-pre4-type-pill">image batch</span>
+      <div className="apx-canvas-v2-api-status">
+        <strong>{Math.round(width)} × {Math.round(height)}</strong>
+        <span>Image batch</span>
+      </div>
     </div>
   );
 
@@ -1462,10 +1565,10 @@ export function VisualImageBatchInspector({
       <>
         {header}
         <Section title="Batch identity" attr="batch-identity">
-          <label className="apx-canvas-field">
+          <label className="apx-canvas-v2-field apx-canvas-field">
             <span>Name</span>
             <input
-              className="apx-pre4-input"
+              className="apx-canvas-v2-input apx-pre4-input"
               value={node.name ?? ''}
               onChange={(event) => onRename(event.target.value)}
             />
@@ -1479,7 +1582,7 @@ export function VisualImageBatchInspector({
           </div>
         </Section>
         <Section title="Runtime asset references" attr="batch-painter-options">
-          <label className="apx-canvas-check">
+          <label className="apx-image-v2-check apx-canvas-check">
             <input
               type="checkbox"
               checked={batch.painterOpts?.resolveAssetRefs ?? false}
@@ -1508,7 +1611,7 @@ export function VisualImageBatchInspector({
           description="This group is the actual ImageProperties[] call boundary."
           attr="batch-call-options"
         >
-          <label className="apx-canvas-check">
+          <label className="apx-image-v2-check apx-canvas-check">
             <input
               type="checkbox"
               checked={batch.createOptions.isGrouped ?? false}
@@ -1602,14 +1705,18 @@ export function VisualImageInspector({
     });
 
   const header = (
-    <div className="apx-pre4-inspector-title" data-image-v2-inspector>
-      <div>
-        <strong>{node.name ?? (isShape ? 'Shape' : 'Image')}</strong>
-        <small>
-          createImage · {isShape ? 'built-in shape source' : 'image source'} · runtime parity rebuild
-        </small>
+    <div className="apx-canvas-v2-header apx-image-v2-header" data-image-v2-inspector>
+      <div className="apx-canvas-v2-api-icon">
+        {isShape ? <Squares2X2Icon aria-hidden /> : <PhotoIcon aria-hidden />}
       </div>
-      <span className="apx-pre4-type-pill">{node.kind}</span>
+      <div>
+        <strong>createImage()</strong>
+        <span>{node.name ?? (isShape ? 'Shape' : 'Image')} · ApexPainter · ImageProperties</span>
+      </div>
+      <div className="apx-canvas-v2-api-status">
+        <strong>{Math.round(width)} × {Math.round(height)}</strong>
+        <span>{isShape ? 'Shape source' : 'Image source'}</span>
+      </div>
     </div>
   );
 
@@ -1617,28 +1724,36 @@ export function VisualImageInspector({
     return (
       <>
         {header}
-        {renderTransform()}
+        <Section
+          title="Placement & size"
+          description="Position, dimensions, rotation, alignment and opacity."
+          attr="transform"
+        >
+          <div className="apx-image-v2-transform-shell">
+            {renderTransform()}
+          </div>
+        </Section>
         {!isShape ? (
           <Section
             title="Image layout"
             description="Fit and alignment are ImageProperties fields; transform dimensions remain the layer box."
             attr="layout"
           >
-            <div className="apx-pre4-property-grid">
+            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
               <label>
                 <span>Fit</span>
-                <select className="apx-pre4-input" value={props.fit ?? 'fill'} onChange={(event) => patch('Image fit', { fit: event.target.value as VisualImageNodeProps['fit'] })}>
+                <select className="apx-canvas-v2-input apx-pre4-input" value={props.fit ?? 'fill'} onChange={(event) => patch('Image fit', { fit: event.target.value as VisualImageNodeProps['fit'] })}>
                   {IMAGE_FITS.map((value) => <option key={value}>{value}</option>)}
                 </select>
               </label>
               <label>
                 <span>Align</span>
-                <select className="apx-pre4-input" value={props.align ?? 'center'} onChange={(event) => patch('Image align', { align: event.target.value as VisualImageNodeProps['align'] })}>
+                <select className="apx-canvas-v2-input apx-pre4-input" value={props.align ?? 'center'} onChange={(event) => patch('Image align', { align: event.target.value as VisualImageNodeProps['align'] })}>
                   {IMAGE_ALIGNS.map((value) => <option key={value}>{value}</option>)}
                 </select>
               </label>
             </div>
-            <label className="apx-canvas-check">
+            <label className="apx-image-v2-check apx-canvas-check">
               <input type="checkbox" checked={props.inherit ?? false} onChange={(event) => patch('Image inherit', { inherit: event.target.checked })} />
               <span>Use source dimensions when width/height are omitted</span>
             </label>
@@ -1653,11 +1768,11 @@ export function VisualImageInspector({
       <>
         {header}
         <Section title="Source" description="One stable source identity; no duplicate source controls elsewhere." attr="source">
-          <label className="apx-canvas-field">
+          <label className="apx-canvas-v2-field apx-canvas-field">
             <span>{isShape ? 'Built-in shape' : 'URL / path / asset reference'}</span>
             {isShape ? (
               <select
-                className="apx-pre4-input"
+                className="apx-canvas-v2-input apx-pre4-input"
                 value={typeof props.source === 'string' ? props.source : 'rectangle'}
                 onChange={(event) => {
                   const source = event.target.value as VisualShapeType;
@@ -1672,7 +1787,7 @@ export function VisualImageInspector({
               </select>
             ) : (
               <input
-                className="apx-pre4-input"
+                className="apx-canvas-v2-input apx-pre4-input"
                 value={sourceString}
                 placeholder="https://… / ./asset.png / studio://asset/…"
                 onChange={(event) => patch('Image source', { source: event.target.value })}
@@ -1681,10 +1796,10 @@ export function VisualImageInspector({
           </label>
           {!isShape ? (
             <>
-              <label className="apx-canvas-field">
+              <label className="apx-canvas-v2-field apx-canvas-field">
                 <span>Studio asset</span>
                 <select
-                  className="apx-pre4-input"
+                  className="apx-canvas-v2-input apx-pre4-input"
                   value={sourceAssetId ?? ''}
                   onChange={(event) => {
                     const asset = imageAssets.find((item) => item.id === event.target.value);
@@ -1695,10 +1810,10 @@ export function VisualImageInspector({
                   {imageAssets.map((asset) => <option key={asset.id} value={asset.id}>{asset.name}</option>)}
                 </select>
               </label>
-              <label className="apx-canvas-field">
+              <label className="apx-canvas-v2-field apx-canvas-field">
                 <span>Generated buffer</span>
                 <select
-                  className="apx-pre4-input"
+                  className="apx-canvas-v2-input apx-pre4-input"
                   value={generatedId}
                   onChange={(event) => {
                     if (event.target.value) patch('Generated image source', { source: { $generated: event.target.value } });
@@ -1714,7 +1829,7 @@ export function VisualImageInspector({
         </Section>
 
         <Section title="Runtime asset references" description="Fourth createImage() argument. Default is off." attr="painter-opts">
-          <label className="apx-canvas-check" data-image-v2-resolve-asset-refs>
+          <label className="apx-image-v2-check apx-canvas-check" data-image-v2-resolve-asset-refs>
             <input
               type="checkbox"
               checked={props.painterOpts?.resolveAssetRefs ?? false}
@@ -1729,9 +1844,9 @@ export function VisualImageInspector({
         </Section>
 
         <Section title="Layer identity" attr="identity">
-          <label className="apx-canvas-field">
+          <label className="apx-canvas-v2-field apx-canvas-field">
             <span>Name</span>
-            <input className="apx-pre4-input" value={node.name ?? ''} onChange={(event) => onRename(event.target.value)} />
+            <input className="apx-canvas-v2-input apx-pre4-input" value={node.name ?? ''} onChange={(event) => onRename(event.target.value)} />
           </label>
         </Section>
       </>
@@ -1745,7 +1860,7 @@ export function VisualImageInspector({
         {header}
         {isShape ? (
           <Section title="Shape geometry" description="Native createImage ShapeProperties; no editor-only shape model." attr="shape">
-            <label className="apx-canvas-check">
+            <label className="apx-image-v2-check apx-canvas-check">
               <input
                 type="checkbox"
                 checked={shape.fill ?? true}
@@ -1753,11 +1868,11 @@ export function VisualImageInspector({
               />
               <span>Fill shape</span>
             </label>
-            <div className="apx-canvas-color-row">
+            <div className="apx-canvas-v2-color apx-canvas-color-row">
               <input type="color" value={shape.color?.startsWith('#') ? shape.color : '#6f86ff'} onChange={(event) => patch('Shape color', { shape: { ...shape, color: event.target.value } })} />
-              <input className="apx-pre4-input" value={shape.color ?? '#6f86ff'} onChange={(event) => patch('Shape color', { shape: { ...shape, color: event.target.value } })} />
+              <input className="apx-canvas-v2-input apx-pre4-input" value={shape.color ?? '#6f86ff'} onChange={(event) => patch('Shape color', { shape: { ...shape, color: event.target.value } })} />
             </div>
-            <div className="apx-pre4-property-grid">
+            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
               <NumericField label="Radius" value={shape.radius} min={0.0001} onChange={(radius) => patch('Shape radius', { shape: { ...shape, radius } })} />
               <NumericField label="Sides" value={shape.sides} min={3} step={1} onChange={(sides) => patch('Shape sides', { shape: { ...shape, sides: Math.round(sides) } })} />
               <NumericField label="Inner radius" value={shape.innerRadius} min={0} onChange={(innerRadius) => patch('Shape inner radius', { shape: { ...shape, innerRadius } })} />
@@ -1768,7 +1883,7 @@ export function VisualImageInspector({
               <NumericField label="Center Y" value={shape.centerY} onChange={(centerY) => patch('Shape center Y', { shape: { ...shape, centerY } })} />
             </div>
             <PointListEditor title="Custom points" points={shape.points ?? []} onChange={(points) => patch('Shape points', { shape: { ...shape, points } })} />
-            <label className="apx-canvas-check">
+            <label className="apx-image-v2-check apx-canvas-check">
               <input
                 type="checkbox"
                 checked={Boolean(shape.gradient)}
@@ -1797,52 +1912,69 @@ export function VisualImageInspector({
         ) : null}
 
         <Section title="Appearance" attr="appearance">
-          <div className="apx-pre4-property-grid">
+          <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
             <NumericField label="Blur" value={props.blur} min={0} onChange={(blur) => patch('Image blur', { blur })} />
             <NumericField label="Border radius" value={typeof props.borderRadius === 'number' ? props.borderRadius : undefined} min={0} onChange={(borderRadius) => patch('Image radius', { borderRadius })} />
             <label>
               <span>Blend mode</span>
-              <select className="apx-pre4-input" value={props.blendMode ?? 'source-over'} onChange={(event) => patch('Image blend', { blendMode: event.target.value as VisualBlendMode })}>
+              <select className="apx-canvas-v2-input apx-pre4-input" value={props.blendMode ?? 'source-over'} onChange={(event) => patch('Image blend', { blendMode: event.target.value as VisualBlendMode })}>
                 {IMAGE_BLEND_MODES.map((mode) => <option key={mode}>{mode}</option>)}
               </select>
             </label>
-            <label>
-              <span>Border position</span>
-              <input className="apx-pre4-input" value={props.borderPosition ?? ''} placeholder="all / top / left…" onChange={(event) => patch('Image border position', { borderPosition: event.target.value })} />
-            </label>
+            <MultiPositionField
+              label="Border position"
+              value={props.borderPosition ?? 'all'}
+              onChange={(borderPosition) => patch('Image border position', { borderPosition })}
+            />
           </div>
-          <label className="apx-canvas-check">
+          <label className="apx-image-v2-check apx-canvas-check">
             <input type="checkbox" checked={props.borderRadius === 'circular'} onChange={(event) => patch('Circular image', { borderRadius: event.target.checked ? 'circular' : 0 })} />
             <span>Circular border radius</span>
           </label>
         </Section>
 
-        <Section title="Stroke" attr="stroke">
-          <label className="apx-canvas-check">
-            <input
-              type="checkbox"
+        <Section
+          title="Stroke"
+          description="Outline paint, style and corner geometry"
+          attr="stroke"
+          defaultOpen={Boolean(props.stroke)}
+          action={
+            <Toggle
+              label="Enable image stroke"
               checked={Boolean(props.stroke)}
-              onChange={(event) => setOptional('Image stroke', 'stroke', event.target.checked, { color: '#ffffff', width: 2, style: 'solid' })}
+              onChange={(checked) => setOptional('Image stroke', 'stroke', checked, { color: '#ffffff', width: 2, style: 'solid' })}
             />
-            <span>Enable stroke</span>
-          </label>
-          {props.stroke ? <StrokeEditor value={props.stroke} onChange={(stroke) => patch('Image stroke', { stroke })} /> : null}
+          }
+        >
+          {props.stroke ? (
+            <StrokeEditor value={props.stroke} onChange={(stroke) => patch('Image stroke', { stroke })} />
+          ) : (
+            <div className="apx-canvas-v2-empty-mini">Enable stroke to edit StrokeOptions.</div>
+          )}
         </Section>
 
-        <Section title="Shadow" attr="shadow">
-          <label className="apx-canvas-check">
-            <input
-              type="checkbox"
+        <Section
+          title="Shadow"
+          description="Shadow paint and geometry"
+          attr="shadow"
+          defaultOpen={Boolean(props.shadow)}
+          action={
+            <Toggle
+              label="Enable image shadow"
               checked={Boolean(props.shadow)}
-              onChange={(event) => setOptional('Image shadow', 'shadow', event.target.checked, { color: '#000000', offsetX: 0, offsetY: 8, blur: 16, opacity: 0.35 })}
+              onChange={(checked) => setOptional('Image shadow', 'shadow', checked, { color: '#000000', offsetX: 0, offsetY: 8, blur: 16, opacity: 0.35 })}
             />
-            <span>Enable shadow</span>
-          </label>
-          {props.shadow ? <ShadowEditor value={props.shadow} onChange={(shadow) => patch('Image shadow', { shadow })} /> : null}
+          }
+        >
+          {props.shadow ? (
+            <ShadowEditor value={props.shadow} onChange={(shadow) => patch('Image shadow', { shadow })} />
+          ) : (
+            <div className="apx-canvas-v2-empty-mini">Enable shadow to edit ShadowOptions.</div>
+          )}
         </Section>
 
         <Section title="Box background" attr="box-background">
-          <label className="apx-canvas-check">
+          <label className="apx-image-v2-check apx-canvas-check">
             <input
               type="checkbox"
               checked={Boolean(props.boxBackground)}
@@ -1852,11 +1984,11 @@ export function VisualImageInspector({
           </label>
           {props.boxBackground ? (
             <>
-              <div className="apx-canvas-color-row">
+              <div className="apx-canvas-v2-color apx-canvas-color-row">
                 <input type="color" value={props.boxBackground.color?.startsWith('#') ? props.boxBackground.color : '#0b1730'} onChange={(event) => patch('Box background color', { boxBackground: { ...props.boxBackground, color: event.target.value } })} />
-                <input className="apx-pre4-input" value={props.boxBackground.color ?? ''} onChange={(event) => patch('Box background color', { boxBackground: { ...props.boxBackground, color: event.target.value } })} />
+                <input className="apx-canvas-v2-input apx-pre4-input" value={props.boxBackground.color ?? ''} onChange={(event) => patch('Box background color', { boxBackground: { ...props.boxBackground, color: event.target.value } })} />
               </div>
-              <label className="apx-canvas-check">
+              <label className="apx-image-v2-check apx-canvas-check">
                 <input
                   type="checkbox"
                   checked={Boolean(props.boxBackground.gradient)}
@@ -1895,11 +2027,11 @@ export function VisualImageInspector({
       <>
         {header}
         <Section title="Filters" description="Typed createImage filters, in authored order." attr="filters">
-          <div className="apx-pre4-property-grid">
+          <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
             <NumericField label="Filter intensity" value={props.filterIntensity} min={0} step={0.1} onChange={(filterIntensity) => patch('Filter intensity', { filterIntensity })} />
             <label>
               <span>Filter order</span>
-              <select className="apx-pre4-input" value={props.filterOrder ?? 'post'} onChange={(event) => patch('Filter order', { filterOrder: event.target.value as 'pre' | 'post' })}>
+              <select className="apx-canvas-v2-input apx-pre4-input" value={props.filterOrder ?? 'post'} onChange={(event) => patch('Filter order', { filterOrder: event.target.value as 'pre' | 'post' })}>
                 <option value="pre">pre</option>
                 <option value="post">post</option>
               </select>
@@ -1909,7 +2041,7 @@ export function VisualImageInspector({
         </Section>
 
         <Section title="Mask" attr="mask">
-          <label className="apx-canvas-check">
+          <label className="apx-image-v2-check apx-canvas-check">
             <input type="checkbox" checked={Boolean(props.mask)} onChange={(event) => setOptional('Image mask', 'mask', event.target.checked, { source: '', mode: 'alpha' })} />
             <span>Enable mask</span>
           </label>
@@ -1924,7 +2056,7 @@ export function VisualImageInspector({
         </Section>
 
         <Section title="Clip path" description="Polygon coordinates are runtime canvas coordinates; minimum 3 points." attr="clip-path">
-          <label className="apx-canvas-check">
+          <label className="apx-image-v2-check apx-canvas-check">
             <input type="checkbox" checked={Boolean(props.clipPath)} onChange={(event) => setOptional('Image clip path', 'clipPath', event.target.checked, [{ x: 0, y: 0 }, { x: width, y: 0 }, { x: width, y: height }, { x: 0, y: height }])} />
             <span>Enable polygon clip</span>
           </label>
@@ -1932,7 +2064,7 @@ export function VisualImageInspector({
         </Section>
 
         <Section title="Distortion" description="Perspective, free warp, bulge/pinch, twirl and wave use the real runtime model." attr="distortion">
-          <label className="apx-canvas-check">
+          <label className="apx-image-v2-check apx-canvas-check">
             <input type="checkbox" checked={Boolean(props.distortion)} onChange={(event) => setOptional('Image distortion', 'distortion', event.target.checked, { type: 'bulge', intensity: 0.25, interpolation: 'bilinear', edgeMode: 'transparent' })} />
             <span>Enable distortion</span>
           </label>
@@ -1940,7 +2072,7 @@ export function VisualImageInspector({
         </Section>
 
         <Section title="Mesh warp" description="Modern (grid+1) vertices and legacy grid anchors are both runtime-valid." attr="mesh-warp">
-          <label className="apx-canvas-check">
+          <label className="apx-image-v2-check apx-canvas-check">
             <input type="checkbox" checked={Boolean(props.meshWarp)} onChange={(event) => setOptional('Image mesh warp', 'meshWarp', event.target.checked, defaultMesh(width, height))} />
             <span>Enable mesh warp</span>
           </label>
@@ -1957,7 +2089,7 @@ export function VisualImageInspector({
             const current = props.effects?.[key];
             return (
               <div className="apx-image-v2-nested" key={key}>
-                <label className="apx-canvas-check">
+                <label className="apx-image-v2-check apx-canvas-check">
                   <input
                     type="checkbox"
                     checked={Boolean(current)}
@@ -1973,7 +2105,7 @@ export function VisualImageInspector({
                   <span>{key}</span>
                 </label>
                 {current ? (
-                  <div className="apx-pre4-property-grid">
+                  <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
                     {Object.entries(current).map(([field, fieldValue]) => (
                       <NumericField
                         key={field}
@@ -2014,7 +2146,7 @@ export function VisualImageInspector({
     <>
       {header}
       <Section title="CreateImage options" description="Third argument to createImage(). Group transforms become meaningful for true ImageProperties[] batches." attr="create-options">
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={options.isGrouped ?? false}
@@ -2026,7 +2158,7 @@ export function VisualImageInspector({
           />
           <span>isGrouped</span>
         </label>
-        <label className="apx-canvas-check">
+        <label className="apx-image-v2-check apx-canvas-check">
           <input
             type="checkbox"
             checked={Boolean(options.groupTransform)}
