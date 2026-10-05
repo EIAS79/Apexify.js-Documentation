@@ -292,3 +292,21 @@ test('live Studio UX moves Preview and Generate Code into modals and keeps the d
   assert.match(modals, /Canvas name/);
   assert.match(modals, /File name/);
 });
+
+
+test('PRE-4 keeps Layers as an explicit top drawer and Canvas always owns the right inspector', () => {
+  const shell = read('components/studio/visual/VisualStudioPre4.tsx');
+
+  assert.match(shell, /data-top-layers-toggle/);
+  assert.match(shell, /setLeftPanelMode\('layers'\)/);
+  assert.match(shell, /leftPanelMode === 'context'/);
+  assert.doesNotMatch(shell, /\['layers', RectangleStackIcon, 'Layers'\]/);
+  assert.match(
+    shell,
+    /if \(activeTool === 'canvas'\) \{[\s\S]*?return renderCanvasInspector\(\);/,
+  );
+  assert.match(
+    shell,
+    /if \(id === 'canvas'\) \{[\s\S]*?selectedNodeIds: \[\][\s\S]*?setLayersCollapsed\(true\)/,
+  );
+});
