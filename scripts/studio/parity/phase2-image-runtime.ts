@@ -104,6 +104,19 @@ async function executeGenerated(project: VisualProject): Promise<Uint8Array> {
   return run(ApexPainter);
 }
 
+function runtimeRelevantTransform(
+  transform: VisualNode['transform'],
+) {
+  if (!transform) return undefined;
+  const {
+    zIndex: _zIndex,
+    visible: _visible,
+    locked: _locked,
+    ...runtimeRelevant
+  } = transform;
+  return runtimeRelevant;
+}
+
 function semanticImageProject(project: VisualProject) {
   const roots = project.document.rootNodeIds.map((id) => {
     const node = project.document.nodes[id]!;
@@ -116,7 +129,7 @@ function semanticImageProject(project: VisualProject) {
           const child = project.document.nodes[childId]!;
           return {
             kind: child.kind,
-            transform: child.transform,
+            transform: runtimeRelevantTransform(child.transform),
             props: child.props,
           };
         }),
@@ -124,7 +137,7 @@ function semanticImageProject(project: VisualProject) {
     }
     return {
       kind: node.kind,
-      transform: node.transform,
+      transform: runtimeRelevantTransform(node.transform),
       props: node.props,
     };
   });
