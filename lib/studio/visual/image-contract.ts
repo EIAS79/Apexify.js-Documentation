@@ -1,6 +1,8 @@
 import type {
   VisualBlendMode,
   VisualCreateImageOptions,
+  VisualGradient,
+  VisualImageBatchGroupProps,
   VisualImageFilter,
   VisualImageNodeProps,
   VisualImageSource,
@@ -12,6 +14,7 @@ import type {
   VisualValue,
 } from './model';
 import { validateVisualImageUtilities } from './image-utility-contract';
+import { CANVAS_RUNTIME_LIMITS } from './canvas-contract';
 
 export const IMAGE_SHAPE_TYPES: readonly VisualShapeType[] = [
   'rectangle',
@@ -611,6 +614,318 @@ function validateFilter(
   );
 }
 
+function validateFiniteNumericLeaves(
+  value: unknown,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      issue(issues, 'image-numeric-leaf', path, 'Numeric values must be finite.');
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) =>
+      validateFiniteNumericLeaves(item, path + '[' + index + ']', issues),
+    );
+    return;
+  }
+  const object = record(value);
+  if (!object) return;
+  for (const [key, child] of Object.entries(object)) {
+    validateFiniteNumericLeaves(child, path + '.' + key, issues);
+  }
+}
+
+function validateGradientValue(
+  gradient: VisualGradient | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!gradient) return;
+  validateFiniteNumericLeaves(gradient, path, issues);
+  if (!['linear','radial','conic'].includes(gradient.type)) {
+    issue(issues, 'image-gradient-type', path + '.type', 'Unsupported gradient type.');
+  }
+  if (!Array.isArray(gradient.colors) || gradient.colors.length < 2) {
+    issue(issues, 'image-gradient-colors', path + '.colors', 'Gradient requires at least two color stops.');
+    return;
+  }
+  if (gradient.colors.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-gradient-limit', path + '.colors', 'Gradient exceeds the runtime collection limit.');
+  }
+  let previous = -Infinity;
+  gradient.colors.forEach((stop, index) => {
+    if (!finite(stop.stop) || stop.stop < 0 || stop.stop > 1) {
+      issue(issues, 'image-gradient-stop', path + '.colors[' + index + '].stop', 'Gradient stop must be between 0 and 1.');
+    }
+    if (finite(stop.stop) && stop.stop < previous) {
+      issue(issues, 'image-gradient-order', path + '.colors[' + index + '].stop', 'Gradient stops must be non-decreasing.');
+    }
+    if (finite(stop.stop)) previous = stop.stop;
+    if (
+      typeof stop.color !== 'string' ||
+      !stop.color.trim() ||
+      stop.color.includes('\0') ||
+      stop.color.length > 256
+    ) {
+      issue(issues, 'image-gradient-color', path + '.colors[' + index + '].color', 'Gradient color must be a non-empty string of at most 256 characters.');
+    }
+  });
+  if (
+    (gradient.type === 'linear' || gradient.type === 'radial') &&
+    gradient.repeat !== undefined &&
+    !['repeat','reflect','no-repeat'].includes(gradient.repeat)
+  ) {
+    issue(issues, 'image-gradient-repeat', path + '.repeat', 'Unsupported gradient repeat mode.');
+  }
+  if (
+    gradient.type === 'linear' &&
+    gradient.startX !== undefined &&
+    gradient.startY !== undefined &&
+    gradient.endX !== undefined &&
+    gradient.endY !== undefined &&
+    gradient.startX === gradient.endX &&
+    gradient.startY === gradient.endY
+  ) {
+    issue(issues, 'image-gradient-geometry', path, 'Linear gradient start and end points must not be identical.');
+  }
+  if (gradient.type === 'radial') {
+    if (gradient.startRadius !== undefined && gradient.startRadius < 0) {
+      issue(issues, 'image-gradient-radius', path + '.startRadius', 'Radial start radius must be non-negative.');
+    }
+    if (gradient.endRadius !== undefined && gradient.endRadius < 0) {
+      issue(issues, 'image-gradient-radius', path + '.endRadius', 'Radial end radius must be non-negative.');
+    }
+    if (
+      gradient.startX !== undefined &&
+      gradient.startY !== undefined &&
+      gradient.startRadius !== undefined &&
+      gradient.endX !== undefined &&
+      gradient.endY !== undefined &&
+      gradient.endRadius !== undefined &&
+      gradient.startX === gradient.endX &&
+      gradient.startY === gradient.endY &&
+      gradient.startRadius === gradient.endRadius
+    ) {
+      issue(issues, 'image-gradient-geometry', path, 'Radial gradient start and end circles must not be identical.');
+    }
+  }
+}
+
+function validateMaskValue(
+  project: VisualProject,
+  mask: VisualImageNodeProps['mask'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!mask) return;
+  validateSource(project, mask.source, path + '.source', issues);
+  if (
+    mask.mode !== undefined &&
+    !['alpha','luminance','inverse'].includes(mask.mode)
+  ) {
+    issue(issues, 'image-mask-mode', path + '.mode', 'Unsupported image mask mode.');
+  }
+}
+
+function validateClipPathValue(
+  points: Array<{ x: number; y: number }> | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!points) return;
+  if (points.length < 3) {
+    issue(issues, 'image-clip-min', path, 'Clip path requires at least three points.');
+  }
+  if (points.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-clip-limit', path, 'Clip path exceeds the runtime collection limit.');
+  }
+  points.forEach((point, index) => {
+    if (!finite(point.x) || !finite(point.y)) {
+      issue(issues, 'image-clip-point', path + '[' + index + ']', 'Clip-path points must be finite.');
+    }
+  });
+}
+
+function validateImageDistortionValue(
+  distortion: VisualImageNodeProps['distortion'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!distortion) return;
+  if (!['perspective','warp','bulge','pinch','twirl','wave'].includes(distortion.type)) {
+    issue(issues, 'image-distortion-type', path + '.type', 'Unsupported distortion type.');
+  }
+  if (
+    distortion.interpolation !== undefined &&
+    !['nearest','bilinear','bicubic'].includes(distortion.interpolation)
+  ) {
+    issue(issues, 'image-distortion-interpolation', path + '.interpolation', 'Unsupported distortion interpolation.');
+  }
+  if (
+    distortion.edgeMode !== undefined &&
+    !['transparent','clamp','wrap','mirror'].includes(distortion.edgeMode)
+  ) {
+    issue(issues, 'image-distortion-edge-mode', path + '.edgeMode', 'Unsupported distortion edge mode.');
+  }
+  validateFiniteNumericLeaves(distortion, path, issues);
+  if (distortion.radius !== undefined && distortion.radius <= 0) {
+    issue(issues, 'image-distortion-radius', path + '.radius', 'Distortion radius must be greater than 0.');
+  }
+  if (distortion.wavelengthX !== undefined && distortion.wavelengthX <= 0) {
+    issue(issues, 'image-distortion-wavelength', path + '.wavelengthX', 'Wave wavelength X must be greater than 0.');
+  }
+  if (distortion.wavelengthY !== undefined && distortion.wavelengthY <= 0) {
+    issue(issues, 'image-distortion-wavelength', path + '.wavelengthY', 'Wave wavelength Y must be greater than 0.');
+  }
+  if ((distortion.points?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-distortion-point-limit', path + '.points', 'Distortion points exceed the runtime collection limit.');
+  }
+  if ((distortion.controlPoints?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-distortion-control-limit', path + '.controlPoints', 'Warp handles exceed the runtime collection limit.');
+  }
+
+  const points = distortion.points;
+  const handles = distortion.controlPoints;
+  points?.forEach((point, index) => {
+    if (!finite(point.x) || !finite(point.y)) {
+      issue(issues, 'image-distortion-point', path + '.points[' + index + ']', 'Distortion point coordinates must be finite.');
+    }
+  });
+  handles?.forEach((handle, index) => {
+    const handlePath = path + '.controlPoints[' + index + ']';
+    if (
+      !finite(handle.from.x) ||
+      !finite(handle.from.y) ||
+      !finite(handle.to.x) ||
+      !finite(handle.to.y)
+    ) {
+      issue(issues, 'image-distortion-control-point', handlePath, 'Warp control-point coordinates must be finite.');
+    }
+    if (handle.radius !== undefined && (!finite(handle.radius) || handle.radius <= 0)) {
+      issue(issues, 'image-distortion-control-radius', handlePath + '.radius', 'Warp control radius must be greater than 0.');
+    }
+    if (
+      handle.falloff !== undefined &&
+      !['linear','smooth','gaussian'].includes(handle.falloff)
+    ) {
+      issue(issues, 'image-distortion-control-falloff', handlePath + '.falloff', 'Unsupported warp falloff.');
+    }
+  });
+
+  if (distortion.type === 'perspective') {
+    if (points?.length !== 4) {
+      issue(issues, 'image-distortion-perspective-points', path + '.points', 'Perspective requires exactly four destination corners.');
+    }
+    if (handles !== undefined) {
+      issue(issues, 'image-distortion-perspective-handles', path + '.controlPoints', 'Perspective does not accept controlPoints.');
+    }
+  } else if (distortion.type === 'warp') {
+    const hasPoints = points !== undefined;
+    const hasHandles = handles !== undefined;
+    if (hasPoints === hasHandles) {
+      issue(issues, 'image-distortion-warp-mode', path, 'Warp requires exactly one of four points or controlPoints.');
+    }
+    if (hasPoints && points?.length !== 4) {
+      issue(issues, 'image-distortion-warp-points', path + '.points', 'Quad warp requires exactly four points.');
+    }
+  } else {
+    if (points !== undefined) {
+      issue(issues, 'image-distortion-points-unsupported', path + '.points', 'Points are only supported by perspective and warp.');
+    }
+    if (handles !== undefined) {
+      issue(issues, 'image-distortion-handles-unsupported', path + '.controlPoints', 'Control points are only supported by warp.');
+    }
+  }
+}
+
+function validateImageMeshWarpValue(
+  mesh: VisualImageNodeProps['meshWarp'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!mesh) return;
+  for (const key of ['gridX','gridY'] as const) {
+    const value = mesh[key];
+    if (
+      value !== undefined &&
+      (!finite(value) || value < 1 || !Number.isInteger(value))
+    ) {
+      issue(issues, 'image-mesh-grid', path + '.' + key, 'Mesh grid values must be positive integers.');
+    }
+  }
+  if (
+    mesh.interpolation !== undefined &&
+    !['nearest','bilinear','bicubic'].includes(mesh.interpolation)
+  ) {
+    issue(issues, 'image-mesh-interpolation', path + '.interpolation', 'Unsupported mesh interpolation.');
+  }
+  if (
+    mesh.edgeMode !== undefined &&
+    !['transparent','clamp','wrap','mirror'].includes(mesh.edgeMode)
+  ) {
+    issue(issues, 'image-mesh-edge-mode', path + '.edgeMode', 'Unsupported mesh edge mode.');
+  }
+  const rows = mesh.controlPoints?.length ?? 0;
+  const columns = mesh.controlPoints?.[0]?.length ?? 0;
+  if (!rows || !columns) {
+    issue(issues, 'image-mesh-control-points', path + '.controlPoints', 'Mesh controlPoints are required and rows cannot be empty.');
+    return;
+  }
+  if (rows > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-mesh-limit', path + '.controlPoints', 'Mesh rows exceed the runtime collection limit.');
+  }
+  let total = 0;
+  mesh.controlPoints?.forEach((row, rowIndex) => {
+    total += row.length;
+    if (!row.length || row.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+      issue(issues, 'image-mesh-row-limit', path + '.controlPoints[' + rowIndex + ']', 'Mesh row size is outside the runtime collection limit.');
+    }
+    if (row.length !== columns) {
+      issue(issues, 'image-mesh-rectangular', path + '.controlPoints[' + rowIndex + ']', 'Mesh controlPoints must form a rectangular grid.');
+    }
+    row.forEach((point, columnIndex) => {
+      if (!finite(point.x) || !finite(point.y)) {
+        issue(issues, 'image-mesh-point', path + '.controlPoints[' + rowIndex + '][' + columnIndex + ']', 'Mesh point coordinates must be finite.');
+      }
+    });
+  });
+  if (total > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-mesh-total-limit', path + '.controlPoints', 'Mesh points exceed the runtime collection limit.');
+  }
+  const gridX = mesh.gridX ?? Math.max(1, columns - 1);
+  const gridY = mesh.gridY ?? Math.max(1, rows - 1);
+  if (gridX * gridY > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-mesh-cell-limit', path, 'Mesh cell count exceeds the runtime collection limit.');
+  }
+  const modern = rows === gridY + 1 && columns === gridX + 1;
+  const legacy = rows === gridY && columns === gridX;
+  if (!modern && !legacy) {
+    issue(issues, 'image-mesh-dimensions', path + '.controlPoints', 'Mesh controlPoints must be gridY+1 × gridX+1 vertices or the legacy gridY × gridX anchor grid.');
+  }
+}
+
+function validateImageEffectsValue(
+  effects: VisualImageNodeProps['effects'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!effects) return;
+  validateFiniteNumericLeaves(effects, path, issues);
+}
+
+function validateBoxBackgroundValue(
+  value: VisualImageNodeProps['boxBackground'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!value) return;
+  // The current runtime only enforces finite numeric leaves for this public shape.
+  validateFiniteNumericLeaves(value, path, issues);
+}
+
 function validateStrokeShadowLike(
   value: unknown,
   path: string,
@@ -622,15 +937,9 @@ function validateStrokeShadowLike(
     issue(issues, 'image-effect-object', path, 'Effect configuration must be an object.');
     return;
   }
-  for (const key of ['width','position','blur','opacity','offsetX','offsetY']) {
-    if (object[key] !== undefined && !finite(object[key])) {
-      issue(issues, 'image-effect-number', path + '.' + key, 'Effect values must be finite numbers.');
-    }
-  }
-  if (finite(object.opacity) && (object.opacity < 0 || object.opacity > 1)) {
-    issue(issues, 'image-effect-opacity', path + '.opacity', 'Effect opacity must be between 0 and 1.');
-  }
+  validateFiniteNumericLeaves(object, path, issues);
 }
+
 
 export function validateVisualImageBatchGroup(
   project: VisualProject,
@@ -721,6 +1030,28 @@ export function validateVisualImageNode(
 
   validateSource(project, props.source, path + '.props.source', issues);
 
+  const width = node.transform?.width;
+  const height = node.transform?.height;
+  if (
+    width !== undefined &&
+    (width <= 0 || width > CANVAS_RUNTIME_LIMITS.maxCanvasDimension)
+  ) {
+    issue(issues, 'image-width', path + '.transform.width', 'Image width must be within the pinned runtime canvas-dimension limit.');
+  }
+  if (
+    height !== undefined &&
+    (height <= 0 || height > CANVAS_RUNTIME_LIMITS.maxCanvasDimension)
+  ) {
+    issue(issues, 'image-height', path + '.transform.height', 'Image height must be within the pinned runtime canvas-dimension limit.');
+  }
+  if (
+    width !== undefined &&
+    height !== undefined &&
+    width * height > CANVAS_RUNTIME_LIMITS.maxTotalPixels
+  ) {
+    issue(issues, 'image-pixel-limit', path + '.transform', 'Image dimensions exceed the pinned runtime total-pixel limit.');
+  }
+
   if (
     props.painterOpts?.resolveAssetRefs !== undefined &&
     typeof props.painterOpts.resolveAssetRefs !== 'boolean'
@@ -804,6 +1135,9 @@ export function validateVisualImageNode(
     });
   }
 
+  if ((props.filters?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxFiltersPerOperation) {
+    issue(issues, 'image-filter-limit', path + '.props.filters', 'Image filters exceed the runtime filter limit.');
+  }
   props.filters?.forEach((filter, index) =>
     validateFilter(
       filter,
@@ -814,164 +1148,28 @@ export function validateVisualImageNode(
     ),
   );
 
-  if (props.mask) validateSource(project, props.mask.source, path + '.props.mask.source', issues);
+  validateMaskValue(project, props.mask, path + '.props.mask', issues);
+  validateClipPathValue(props.clipPath, path + '.props.clipPath', issues);
 
-  props.clipPath?.forEach((point, index) => {
-    if (!finite(point.x) || !finite(point.y)) {
-      issue(issues, 'image-clip-point', path + '.props.clipPath[' + index + ']', 'Clip-path points must be finite.');
-    }
-  });
+  validateImageDistortionValue(
+    props.distortion,
+    path + '.props.distortion',
+    issues,
+  );
+  validateImageMeshWarpValue(
+    props.meshWarp,
+    path + '.props.meshWarp',
+    issues,
+  );
 
-  if (props.distortion) {
-    const distortion = props.distortion;
-    if (!['perspective','warp','bulge','pinch','twirl','wave'].includes(distortion.type)) {
-      issue(issues, 'image-distortion-type', path + '.props.distortion.type', 'Unsupported distortion type.');
-    }
-    if (
-      distortion.interpolation !== undefined &&
-      !['nearest','bilinear','bicubic'].includes(distortion.interpolation)
-    ) {
-      issue(issues, 'image-distortion-interpolation', path + '.props.distortion.interpolation', 'Unsupported distortion interpolation.');
-    }
-    if (
-      distortion.edgeMode !== undefined &&
-      !['transparent','clamp','wrap','mirror'].includes(distortion.edgeMode)
-    ) {
-      issue(issues, 'image-distortion-edge-mode', path + '.props.distortion.edgeMode', 'Unsupported distortion edge mode.');
-    }
-    for (const key of [
-      'intensity','centerX','centerY','radius','angle','amplitudeX','amplitudeY',
-      'wavelengthX','wavelengthY','phaseX','phaseY',
-    ] as const) {
-      const value = distortion[key];
-      if (value !== undefined && !finite(value)) {
-        issue(issues, 'image-distortion-number', path + '.props.distortion.' + key, 'Distortion numeric values must be finite.');
-      }
-    }
-    if (distortion.radius !== undefined && distortion.radius <= 0) {
-      issue(issues, 'image-distortion-radius', path + '.props.distortion.radius', 'Distortion radius must be greater than 0.');
-    }
-    if (distortion.wavelengthX !== undefined && distortion.wavelengthX <= 0) {
-      issue(issues, 'image-distortion-wavelength', path + '.props.distortion.wavelengthX', 'Wave wavelength X must be greater than 0.');
-    }
-    if (distortion.wavelengthY !== undefined && distortion.wavelengthY <= 0) {
-      issue(issues, 'image-distortion-wavelength', path + '.props.distortion.wavelengthY', 'Wave wavelength Y must be greater than 0.');
-    }
-
-    const points = distortion.points;
-    const handles = distortion.controlPoints;
-    points?.forEach((point, index) => {
-      if (!finite(point.x) || !finite(point.y)) {
-        issue(issues, 'image-distortion-point', path + '.props.distortion.points[' + index + ']', 'Distortion point coordinates must be finite.');
-      }
-    });
-    handles?.forEach((handle, index) => {
-      const handlePath = path + '.props.distortion.controlPoints[' + index + ']';
-      if (
-        !finite(handle.from.x) ||
-        !finite(handle.from.y) ||
-        !finite(handle.to.x) ||
-        !finite(handle.to.y)
-      ) {
-        issue(issues, 'image-distortion-control-point', handlePath, 'Warp control-point coordinates must be finite.');
-      }
-      if (handle.radius !== undefined && (!finite(handle.radius) || handle.radius <= 0)) {
-        issue(issues, 'image-distortion-control-radius', handlePath + '.radius', 'Warp control radius must be greater than 0.');
-      }
-      if (handle.strength !== undefined && !finite(handle.strength)) {
-        issue(issues, 'image-distortion-control-strength', handlePath + '.strength', 'Warp control strength must be finite.');
-      }
-      if (handle.falloff !== undefined && !['linear','smooth','gaussian'].includes(handle.falloff)) {
-        issue(issues, 'image-distortion-control-falloff', handlePath + '.falloff', 'Unsupported warp falloff.');
-      }
-    });
-
-    if (distortion.type === 'perspective') {
-      if (points?.length !== 4) {
-        issue(issues, 'image-distortion-perspective-points', path + '.props.distortion.points', 'Perspective requires exactly four destination corners.');
-      }
-      if (handles !== undefined) {
-        issue(issues, 'image-distortion-perspective-handles', path + '.props.distortion.controlPoints', 'Perspective does not accept controlPoints.');
-      }
-    } else if (distortion.type === 'warp') {
-      const hasPoints = points !== undefined;
-      const hasHandles = handles !== undefined;
-      if (hasPoints === hasHandles) {
-        issue(issues, 'image-distortion-warp-mode', path + '.props.distortion', 'Warp requires exactly one of four points or controlPoints.');
-      }
-      if (hasPoints && points?.length !== 4) {
-        issue(issues, 'image-distortion-warp-points', path + '.props.distortion.points', 'Quad warp requires exactly four points.');
-      }
-    } else {
-      if (points !== undefined) {
-        issue(issues, 'image-distortion-points-unsupported', path + '.props.distortion.points', 'Points are only supported by perspective and warp.');
-      }
-      if (handles !== undefined) {
-        issue(issues, 'image-distortion-handles-unsupported', path + '.props.distortion.controlPoints', 'Control points are only supported by warp.');
-      }
-    }
-  }
-
-  if (props.meshWarp) {
-    const mesh = props.meshWarp;
-    for (const key of ['gridX','gridY'] as const) {
-      const value = mesh[key];
-      if (
-        value !== undefined &&
-        (!finite(value) || value < 1 || !Number.isInteger(value))
-      ) {
-        issue(issues, 'image-mesh-grid', path + '.props.meshWarp.' + key, 'Mesh grid values must be positive integers.');
-      }
-    }
-    if (
-      mesh.interpolation !== undefined &&
-      !['nearest','bilinear','bicubic'].includes(mesh.interpolation)
-    ) {
-      issue(issues, 'image-mesh-interpolation', path + '.props.meshWarp.interpolation', 'Unsupported mesh interpolation.');
-    }
-    if (
-      mesh.edgeMode !== undefined &&
-      !['transparent','clamp','wrap','mirror'].includes(mesh.edgeMode)
-    ) {
-      issue(issues, 'image-mesh-edge-mode', path + '.props.meshWarp.edgeMode', 'Unsupported mesh edge mode.');
-    }
-    const rows = mesh.controlPoints?.length ?? 0;
-    const columns = mesh.controlPoints?.[0]?.length ?? 0;
-    if (!rows || !columns) {
-      issue(issues, 'image-mesh-control-points', path + '.props.meshWarp.controlPoints', 'Mesh controlPoints are required and rows cannot be empty.');
-    } else {
-      mesh.controlPoints?.forEach((row, rowIndex) => {
-        if (row.length !== columns) {
-          issue(issues, 'image-mesh-rectangular', path + '.props.meshWarp.controlPoints[' + rowIndex + ']', 'Mesh controlPoints must form a rectangular grid.');
-        }
-        row.forEach((point, columnIndex) => {
-          if (!finite(point.x) || !finite(point.y)) {
-            issue(
-              issues,
-              'image-mesh-point',
-              path + '.props.meshWarp.controlPoints[' + rowIndex + '][' + columnIndex + ']',
-              'Mesh point coordinates must be finite.',
-            );
-          }
-        });
-      });
-      const gridX = mesh.gridX ?? Math.max(1, columns - 1);
-      const gridY = mesh.gridY ?? Math.max(1, rows - 1);
-      const modern = rows === gridY + 1 && columns === gridX + 1;
-      const legacy = rows === gridY && columns === gridX;
-      if (!modern && !legacy) {
-        issue(
-          issues,
-          'image-mesh-dimensions',
-          path + '.props.meshWarp.controlPoints',
-          'Mesh controlPoints must be gridY+1 × gridX+1 vertices or the legacy gridY × gridX anchor grid.',
-        );
-      }
-    }
-  }
-
+  validateImageEffectsValue(props.effects, path + '.props.effects', issues);
   validateStrokeShadowLike(props.stroke, path + '.props.stroke', issues);
   validateStrokeShadowLike(props.shadow, path + '.props.shadow', issues);
+  validateBoxBackgroundValue(
+    props.boxBackground,
+    path + '.props.boxBackground',
+    issues,
+  );
 
   if (props.shape) {
     for (const key of ['radius','sides','innerRadius','outerRadius','startAngle','endAngle','centerX','centerY'] as const) {
@@ -980,11 +1178,50 @@ export function validateVisualImageNode(
         issue(issues, 'shape-number', path + '.props.shape.' + key, 'Shape numeric values must be finite.');
       }
     }
+    if (props.shape.radius !== undefined && props.shape.radius <= 0) {
+      issue(issues, 'shape-radius', path + '.props.shape.radius', 'Shape radius must be greater than 0.');
+    }
+    if (
+      props.shape.innerRadius !== undefined &&
+      props.shape.innerRadius < 0
+    ) {
+      issue(issues, 'shape-inner-radius', path + '.props.shape.innerRadius', 'Shape inner radius must be non-negative.');
+    }
+    if (
+      props.shape.outerRadius !== undefined &&
+      props.shape.outerRadius <= 0
+    ) {
+      issue(issues, 'shape-outer-radius', path + '.props.shape.outerRadius', 'Shape outer radius must be greater than 0.');
+    }
+    if (
+      props.shape.sides !== undefined &&
+      (!Number.isInteger(props.shape.sides) || props.shape.sides < 3)
+    ) {
+      issue(issues, 'shape-sides', path + '.props.shape.sides', 'Shape sides must be an integer of at least 3.');
+    }
+    if (
+      props.shape.sides !== undefined &&
+      props.shape.sides > CANVAS_RUNTIME_LIMITS.maxCollectionItems
+    ) {
+      issue(issues, 'shape-sides-limit', path + '.props.shape.sides', 'Shape sides exceed the runtime collection limit.');
+    }
+    if (
+      props.shape.points !== undefined &&
+      (props.shape.points.length < 1 ||
+        props.shape.points.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems)
+    ) {
+      issue(issues, 'shape-points-limit', path + '.props.shape.points', 'Shape points must contain 1..' + String(CANVAS_RUNTIME_LIMITS.maxCollectionItems) + ' points.');
+    }
     props.shape.points?.forEach((point, index) => {
       if (!finite(point.x) || !finite(point.y)) {
         issue(issues, 'shape-point', path + '.props.shape.points[' + index + ']', 'Shape points must be finite.');
       }
     });
+    validateGradientValue(
+      props.shape.gradient,
+      path + '.props.shape.gradient',
+      issues,
+    );
   }
 
   if (props.createOptions?.groupTransform) {
