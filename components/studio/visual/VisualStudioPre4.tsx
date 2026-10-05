@@ -188,6 +188,7 @@ import {
   IMAGE_SHAPE_TYPES,
   defaultImageNodeProps,
   defaultShapeNodeProps,
+  imageBatchGroupPropsRecord,
   imagePropsRecord,
   visualImageProps,
 } from '@/lib/studio/visual/image-contract';
@@ -3231,10 +3232,40 @@ export default function VisualStudioPre4({
 
   const groupSelection = () => {
     if (selected.length < 2) return;
-    mutate('Group', (current) =>
-      groupNodes(current, selected, createVisualId('group')),
+    const groupId = createVisualId('group');
+    mutate('Group', (current) => {
+      const imageOnly = selected.every((id) => {
+        const node = current.document.nodes[id];
+        return node?.kind === 'image' || node?.kind === 'shape';
+      });
+      const next = groupNodes(current, selected, groupId);
+      if (imageOnly && next !== current) {
+        const group = next.document.nodes[groupId];
+        if (group) {
+          group.name = 'Image group';
+          group.props = imageBatchGroupPropsRecord({
+            imageBatch: true,
+            createOptions: {
+              isGrouped: true,
+              groupTransform: {
+                scaleX: 1,
+                scaleY: 1,
+                opacity: 1,
+              },
+            },
+          });
+        }
+      }
+      return next;
+    });
+    setMessage(
+      selected.every((id) => {
+        const node = project.document.nodes[id];
+        return node?.kind === 'image' || node?.kind === 'shape';
+      })
+        ? 'Grouped as one createImage batch'
+        : 'Grouped selection',
     );
-    setMessage('Grouped selection');
   };
 
   const ungroupSelection = () => {
