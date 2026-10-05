@@ -232,7 +232,8 @@ test('STUDIO-PARITY-2 owns createImage painterOpts through plan code and reverse
   const reconciled = reconcileVisualProjectFromCode(empty, source);
   assert.equal(reconciled.ok, true);
   if (!reconciled.ok) return;
-  const restored = reconciled.project.document.nodes.image_refs;
+  const restoredId = reconciled.project.document.rootNodeIds[0]!;
+  const restored = reconciled.project.document.nodes[restoredId];
   assert.ok(restored);
   assert.deepEqual(visualImageProps(restored).painterOpts, {
     resolveAssetRefs: true,
