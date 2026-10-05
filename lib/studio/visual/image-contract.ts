@@ -476,6 +476,36 @@ function record(value: unknown): Record<string, unknown> | null {
     : null;
 }
 
+export function imageBatchGroupPropsRecord(
+  value: VisualImageBatchGroupProps,
+): Record<string, VisualValue> {
+  return structuredClone(value) as unknown as Record<string, VisualValue>;
+}
+
+export function visualImageBatchGroupProps(
+  node: VisualNode,
+): VisualImageBatchGroupProps | null {
+  if (node.kind !== 'group') return null;
+  const raw = node.props as unknown as Partial<VisualImageBatchGroupProps>;
+  if (raw.imageBatch !== true) return null;
+  return {
+    imageBatch: true,
+    createOptions: {
+      isGrouped: true,
+      ...(raw.createOptions?.groupTransform
+        ? { groupTransform: structuredClone(raw.createOptions.groupTransform) }
+        : {}),
+    },
+    ...(raw.painterOpts
+      ? { painterOpts: structuredClone(raw.painterOpts) }
+      : {}),
+  };
+}
+
+export function isImageBatchGroup(node: VisualNode): boolean {
+  return visualImageBatchGroupProps(node) !== null;
+}
+
 export function visualImageProps(node: VisualNode): VisualImageNodeProps {
   return node.props as unknown as VisualImageNodeProps;
 }
