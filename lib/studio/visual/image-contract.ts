@@ -941,6 +941,64 @@ function validateStrokeShadowLike(
 }
 
 
+function validateStandaloneGroupTransform(
+  project: VisualProject,
+  group: NonNullable<VisualCreateImageOptions['groupTransform']>,
+  path: string,
+  width: number,
+  height: number,
+  issues: VisualProjectIssue[],
+) {
+  validateFiniteNumericLeaves(group, path, issues);
+
+  if (group.scaleX !== undefined && group.scaleX <= 0) {
+    issue(issues, 'image-group-scale', path + '.scaleX', 'Group scaleX must be greater than 0.');
+  }
+  if (group.scaleY !== undefined && group.scaleY <= 0) {
+    issue(issues, 'image-group-scale', path + '.scaleY', 'Group scaleY must be greater than 0.');
+  }
+  if (group.opacity !== undefined && (group.opacity < 0 || group.opacity > 1)) {
+    issue(issues, 'image-group-opacity', path + '.opacity', 'Group opacity must be between 0 and 1.');
+  }
+  if (group.blur !== undefined && group.blur < 0) {
+    issue(issues, 'image-group-blur', path + '.blur', 'Group blur must be non-negative.');
+  }
+  if (group.filterIntensity !== undefined && group.filterIntensity < 0) {
+    issue(issues, 'image-group-filter-intensity', path + '.filterIntensity', 'Group filter intensity must be non-negative.');
+  }
+  if (group.blendMode !== undefined && !IMAGE_BLEND_MODES.includes(group.blendMode)) {
+    issue(issues, 'image-group-blend', path + '.blendMode', 'Unsupported group blend mode.');
+  }
+  if (
+    group.borderRadius !== undefined &&
+    group.borderRadius !== 'circular' &&
+    (!finite(group.borderRadius) || group.borderRadius < 0)
+  ) {
+    issue(issues, 'image-group-radius', path + '.borderRadius', 'Group border radius must be non-negative or circular.');
+  }
+  if (
+    group.filterOrder !== undefined &&
+    group.filterOrder !== 'pre' &&
+    group.filterOrder !== 'post'
+  ) {
+    issue(issues, 'image-group-filter-order', path + '.filterOrder', 'Group filter order must be pre or post.');
+  }
+  if ((group.filters?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxFiltersPerOperation) {
+    issue(issues, 'image-group-filter-limit', path + '.filters', 'Group filters exceed the runtime filter limit.');
+  }
+  group.filters?.forEach((filter, index) =>
+    validateFilter(filter, path + '.filters[' + index + ']', issues, width, height),
+  );
+  validateMaskValue(project, group.mask, path + '.mask', issues);
+  validateClipPathValue(group.clipPath, path + '.clipPath', issues);
+  validateImageDistortionValue(group.distortion, path + '.distortion', issues);
+  validateImageMeshWarpValue(group.meshWarp, path + '.meshWarp', issues);
+  validateImageEffectsValue(group.effects, path + '.effects', issues);
+  validateStrokeShadowLike(group.stroke, path + '.stroke', issues);
+  validateStrokeShadowLike(group.shadow, path + '.shadow', issues);
+  validateBoxBackgroundValue(group.boxBackground, path + '.boxBackground', issues);
+}
+
 export function validateVisualImageBatchGroup(
   project: VisualProject,
   node: VisualNode,
@@ -1400,15 +1458,13 @@ export function validateVisualImageNode(
   }
 
   if (props.createOptions?.groupTransform) {
-    const group = props.createOptions.groupTransform;
-    for (const key of ['rotation','translateX','translateY','scaleX','scaleY','pivotX','pivotY','opacity','blur','filterIntensity'] as const) {
-      const value = group[key];
-      if (value !== undefined && !finite(value)) {
-        issue(issues, 'image-group-number', path + '.props.createOptions.groupTransform.' + key, 'Group transform values must be finite.');
-      }
-    }
-    group.filters?.forEach((filter, index) =>
-      validateFilter(filter, path + '.props.createOptions.groupTransform.filters[' + index + ']', issues),
+    validateStandaloneGroupTransform(
+      project,
+      props.createOptions.groupTransform,
+      path + '.props.createOptions.groupTransform',
+      node.transform?.width ?? project.document.width,
+      node.transform?.height ?? project.document.height,
+      issues,
     );
   }
 
