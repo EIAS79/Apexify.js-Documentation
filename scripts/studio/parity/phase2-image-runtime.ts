@@ -216,8 +216,11 @@ async function proveProject(
 
   const source = generateVisualProjectCode(project).source;
   const reconciled = reconcileVisualProjectFromCode(baseProject(name), source);
-  assert.equal(reconciled.ok, true, name + ': canonical source must reverse-sync');
-  if (!reconciled.ok) throw new Error(reconciled.error);
+  if (!reconciled.ok) {
+    throw new Error(
+      name + ': canonical source must reverse-sync: ' + reconciled.error,
+    );
+  }
 
   assert.deepEqual(
     semanticImageProject(reconciled.project),
@@ -385,9 +388,19 @@ const fixtures: Array<{ name: string; project: VisualProject }> = [];
   const first = makeImage('image_batch_a', sourceDataUrl, {
     filters: [{ type: 'grayscale' }],
   }, 20, 30, 110, 80);
-  const second = makeImage('image_batch_b', sourceDataUrl, {
+  const second = makeImage(
+    'image_batch_b',
+    sourceDataUrl,
+    {},
+    145,
+    58,
+    110,
+    80,
+  );
+  second.transform = {
+    ...second.transform,
     opacity: 0.85,
-  }, 145, 58, 110, 80);
+  };
   project.document.nodes[first.id] = first;
   project.document.nodes[second.id] = second;
   project.document.rootNodeIds = [first.id, second.id];
