@@ -3242,6 +3242,19 @@ export default function VisualStudioPre4({
       if (imageOnly && next !== current) {
         const group = next.document.nodes[groupId];
         if (group) {
+          let resolveAssetRefs = false;
+          for (const childId of group.childIds ?? []) {
+            const child = next.document.nodes[childId];
+            if (!child || (child.kind !== 'image' && child.kind !== 'shape')) continue;
+            const childProps = visualImageProps(child);
+            resolveAssetRefs ||= childProps.painterOpts?.resolveAssetRefs === true;
+            const {
+              createOptions: _createOptions,
+              painterOpts: _painterOpts,
+              ...rest
+            } = childProps;
+            child.props = imagePropsRecord(rest as VisualImageNodeProps);
+          }
           group.name = 'Image group';
           group.props = imageBatchGroupPropsRecord({
             imageBatch: true,
@@ -3253,6 +3266,9 @@ export default function VisualStudioPre4({
                 opacity: 1,
               },
             },
+            ...(resolveAssetRefs
+              ? { painterOpts: { resolveAssetRefs: true } }
+              : {}),
           });
         }
       }
