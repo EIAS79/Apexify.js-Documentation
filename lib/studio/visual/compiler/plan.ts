@@ -927,10 +927,9 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         preferredName: node.name || 'imageGroup',
         base,
         properties,
-        options: {
-          ...batch.createOptions,
-          isGrouped: true,
-        },
+        ...(Object.keys(batch.createOptions).length
+          ? { options: batch.createOptions }
+          : {}),
         ...(batch.painterOpts ? { painterOpts: batch.painterOpts } : {}),
       });
 
