@@ -773,7 +773,8 @@ export default function VisualStudioPre4({
     'generated' | 'diagnostics' | 'assets' | 'history' | 'timeline'
   >('generated');
   const [dockCollapsed, setDockCollapsed] = useState(false);
-  const [layersCollapsed, setLayersCollapsed] = useState(false);
+  const [layersCollapsed, setLayersCollapsed] = useState(true);
+  const [leftPanelMode, setLeftPanelMode] = useState<'layers' | 'context'>('layers');
   const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
   const [layersWidth, setLayersWidth] = useState(274);
   const [inspectorWidth, setInspectorWidth] = useState(372);
@@ -4256,7 +4257,6 @@ export default function VisualStudioPre4({
       id: 'structure',
       label: 'Structure',
       tools: [
-        ['layers', RectangleStackIcon, 'Layers'],
         ['components', CubeIcon, 'Components'],
         ['assets', CircleStackIcon, 'Assets'],
       ],
@@ -4280,17 +4280,18 @@ export default function VisualStudioPre4({
   ] as const;
 
   const mediaContextActive =
-    activeTool === 'images' ||
-    activeTool === 'shapes' ||
-    activeTool === 'text' ||
-    activeTool === 'charts' ||
-    activeTool === 'paths' ||
-    activeTool === 'components' ||
-    activeTool === 'assets' ||
-    activeTool === 'gif' ||
-    activeTool === 'audio' ||
-    activeTool === 'video' ||
-    activeTool === 'advanced';
+    leftPanelMode === 'context' &&
+    (activeTool === 'images' ||
+      activeTool === 'shapes' ||
+      activeTool === 'text' ||
+      activeTool === 'charts' ||
+      activeTool === 'paths' ||
+      activeTool === 'components' ||
+      activeTool === 'assets' ||
+      activeTool === 'gif' ||
+      activeTool === 'audio' ||
+      activeTool === 'video' ||
+      activeTool === 'advanced');
 
   const imageAssets = assets.filter((asset) =>
     asset.mime.startsWith('image/'),
@@ -6031,6 +6032,10 @@ export default function VisualStudioPre4({
   };
 
   const renderInspector = () => {
+    if (activeTool === 'canvas') {
+      return renderCanvasInspector();
+    }
+
     if (activeTool === 'advanced' && !primary) {
       return (
         <VisualAdvancedInspector
@@ -6171,10 +6176,6 @@ export default function VisualStudioPre4({
           renderTransform={renderTransformFields}
         />
       );
-    }
-
-    if (!primary && activeTool === 'canvas') {
-      return renderCanvasInspector();
     }
 
     if ((inspectorTab === 'style' || inspectorTab === 'transform') && !primary) {
@@ -6556,6 +6557,19 @@ export default function VisualStudioPre4({
                       data-active={activeTool === id ? 'true' : undefined}
                       onClick={() => {
                         setActiveTool(id);
+                        if (id === 'canvas') {
+                          setLeftPanelMode('layers');
+                          setLayersCollapsed(true);
+                          setInspectorTab('style');
+                          setProject((current) => ({
+                            ...current,
+                            editor: { ...current.editor, selectedNodeIds: [] },
+                          }));
+                          setMessage('Canvas inspector active');
+                          return;
+                        }
+                        setLeftPanelMode('context');
+                        setLayersCollapsed(false);
                         if (id === 'assets') openAssetWorkspace();
                         if (id === 'gif') {
                           setDockTab('timeline');
@@ -6581,7 +6595,6 @@ export default function VisualStudioPre4({
                           setInspectorTab('advanced');
                           setMessage('Advanced operations · batch, chain, plugins and output');
                         }
-                        if (id === 'layers') setMessage('Layers panel active');
                       }}
                     >
                       <span className="apx-pre4-feature-icon" aria-hidden="true">
@@ -6738,7 +6751,27 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-stagebar">
             <div className="apx-phase17-stage-left">
               <div className="apx-phase17-panel-reveals">
-            </div>
+                <button
+                  type="button"
+                  className="apx-pre4-stage-panel-button"
+                  data-top-layers-toggle
+                  data-active={!layersCollapsed && leftPanelMode === 'layers' ? 'true' : undefined}
+                  aria-pressed={!layersCollapsed && leftPanelMode === 'layers'}
+                  onClick={() => {
+                    if (!layersCollapsed && leftPanelMode === 'layers') {
+                      setLayersCollapsed(true);
+                      return;
+                    }
+                    setLeftPanelMode('layers');
+                    setLayersCollapsed(false);
+                    setMessage('Layers panel active');
+                  }}
+                  title={layersCollapsed || leftPanelMode !== 'layers' ? 'Open Layers' : 'Close Layers'}
+                >
+                  <RectangleStackIcon className="apx-pre4-toolbar-icon" aria-hidden />
+                  <span>Layers</span>
+                </button>
+              </div>
               <button className="apx-pre4-device" type="button">
                 <ComputerDesktopIcon className="apx-pre4-control-icon" aria-hidden />
                 Desktop ({project.document.width} × {project.document.height})
