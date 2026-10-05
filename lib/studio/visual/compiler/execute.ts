@@ -22,9 +22,12 @@ export interface StudioOperationRuntime {
     painterOpts?: { resolveAssetRefs?: boolean },
   ): Promise<{ buffer: Uint8Array }>;
   createImage?(
-    properties: Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array },
+    properties:
+      | (Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array })
+      | Array<Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array }>,
     canvasBuffer: Uint8Array,
     options?: VisualCreateImageOptions,
+    painterOpts?: { resolveAssetRefs?: boolean },
   ): Promise<Uint8Array>;
   createText?(
     properties: StudioTextProperties,
