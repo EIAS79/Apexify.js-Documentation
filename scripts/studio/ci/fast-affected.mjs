@@ -82,7 +82,7 @@ if (sharedVisual) {
     if (/VisualCanvasInspector|canvas-contract|phase4-canvas/.test(file)) {
       add('scripts/studio/visual/phase4-canvas.test.ts');
     }
-    if (/image-contract|phase5-images-shapes|phase10-image-effects|VisualImage/.test(file)) {
+    if (/image-contract|phase2-image-rebuild|phase5-images-shapes|phase10-image-effects|VisualImage/.test(file)) {
       add(
         'scripts/studio/visual/phase5-images-shapes.test.ts',
         'scripts/studio/visual/phase10-image-effects.test.ts',
