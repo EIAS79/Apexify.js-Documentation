@@ -624,21 +624,71 @@ function assertCanonicalBase(
   }
 }
 
-function reconcileImageCall(
+function parseCreateImageCallOptions(call: MethodCall): {
+  options?: VisualCreateImageOptions;
+  painterOpts?: { resolveAssetRefs?: boolean };
+} {
+  let options: VisualCreateImageOptions | undefined;
+  if (call.args[2]) {
+    const parsedOptions = new LiteralParser(call.args[2]).parse();
+    if (!isRecord(parsedOptions)) {
+      throw new Error('createImage() options must be an object literal.');
+    }
+    options = parsedOptions as unknown as VisualCreateImageOptions;
+  }
+
+  let painterOpts: { resolveAssetRefs?: boolean } | undefined;
+  if (call.args[3]) {
+    const parsedPainterOpts = new LiteralParser(call.args[3]).parse();
+    if (!isRecord(parsedPainterOpts)) {
+      throw new Error('createImage() painterOpts must be an object literal.');
+    }
+    for (const key of Object.keys(parsedPainterOpts)) {
+      if (key !== 'resolveAssetRefs') {
+        throw new Error(
+          'createImage() painterOpts.' +
+            key +
+            ' is not part of the current public runtime contract.',
+        );
+      }
+    }
+    if (
+      parsedPainterOpts.resolveAssetRefs !== undefined &&
+      typeof parsedPainterOpts.resolveAssetRefs !== 'boolean'
+    ) {
+      throw new Error(
+        'createImage() painterOpts.resolveAssetRefs must be a boolean literal.',
+      );
+    }
+    painterOpts = {
+      ...(parsedPainterOpts.resolveAssetRefs !== undefined
+        ? { resolveAssetRefs: parsedPainterOpts.resolveAssetRefs }
+        : {}),
+    };
+  }
+
+  if (call.args.length > 4) {
+    throw new Error(
+      'createImage() accepts at most images, canvasBuffer, options, and painterOpts.',
+    );
+  }
+  return {
+    ...(options ? { options } : {}),
+    ...(painterOpts ? { painterOpts } : {}),
+  };
+}
+
+function imageNodeFromParsed(
   project: VisualProject,
-  call: MethodCall,
+  parsed: RecordValue,
   index: number,
   matched: VisualProject['document']['nodes'][string] | undefined,
   identifierToNodeId: Map<string, string>,
   canvasIdentifier: string | null,
+  parentId: string | null,
+  callOptions?: VisualCreateImageOptions,
+  painterOpts?: { resolveAssetRefs?: boolean },
 ) {
-  if (!call.args[0]) throw new Error('createImage() requires image properties.');
-  assertCanonicalBase(call.args[1], identifierToNodeId, canvasIdentifier);
-
-  const parsed = new LiteralParser(call.args[0], true).parse();
-  if (!isRecord(parsed)) {
-    throw new Error('createImage() properties must be an object literal.');
-  }
   if (parsed.source === undefined) {
     throw new Error('createImage() properties require source.');
   }
@@ -681,48 +731,11 @@ function reconcileImageCall(
       'source' | 'createOptions' | 'painterOpts'
     >),
     source: sourceValue,
+    ...(callOptions ? { createOptions: callOptions } : {}),
+    ...(painterOpts ? { painterOpts } : {}),
   };
 
-  if (call.args[2]) {
-    const options = new LiteralParser(call.args[2]).parse();
-    if (!isRecord(options)) {
-      throw new Error('createImage() options must be an object literal.');
-    }
-    props.createOptions =
-      options as unknown as VisualCreateImageOptions;
-  }
-
-  if (call.args[3]) {
-    const painterOpts = new LiteralParser(call.args[3]).parse();
-    if (!isRecord(painterOpts)) {
-      throw new Error('createImage() painterOpts must be an object literal.');
-    }
-    for (const key of Object.keys(painterOpts)) {
-      if (key !== 'resolveAssetRefs') {
-        throw new Error(
-          'createImage() painterOpts.' + key + ' is not part of the current public runtime contract.',
-        );
-      }
-    }
-    if (
-      painterOpts.resolveAssetRefs !== undefined &&
-      typeof painterOpts.resolveAssetRefs !== 'boolean'
-    ) {
-      throw new Error(
-        'createImage() painterOpts.resolveAssetRefs must be a boolean literal.',
-      );
-    }
-    props.painterOpts = {
-      ...(painterOpts.resolveAssetRefs !== undefined
-        ? { resolveAssetRefs: painterOpts.resolveAssetRefs }
-        : {}),
-    };
-  }
-  if (call.args.length > 4) {
-    throw new Error('createImage() accepts at most images, canvasBuffer, options, and painterOpts.');
-  }
-
-  const node = {
+  return {
     id,
     kind,
     name:
@@ -730,7 +743,7 @@ function reconcileImageCall(
       (shape
         ? 'Shape ' + String(index + 1)
         : 'Image ' + String(index + 1)),
-    parentId: oldNode?.parentId ?? null,
+    parentId,
     childIds: oldNode?.childIds,
     transform: {
       ...retainedTransform,
@@ -746,8 +759,140 @@ function reconcileImageCall(
     },
     props: imagePropsRecord(props),
   } satisfies VisualProject['document']['nodes'][string];
+}
 
-  return node;
+function reconcileImageCall(
+  project: VisualProject,
+  call: MethodCall,
+  index: number,
+  matched: VisualProject['document']['nodes'][string] | undefined,
+  identifierToNodeId: Map<string, string>,
+  canvasIdentifier: string | null,
+) {
+  if (!call.args[0]) throw new Error('createImage() requires image properties.');
+  assertCanonicalBase(call.args[1], identifierToNodeId, canvasIdentifier);
+
+  const parsed = new LiteralParser(call.args[0], true).parse();
+  const { options, painterOpts } = parseCreateImageCallOptions(call);
+
+  if (Array.isArray(parsed)) {
+    if (!parsed.length) {
+      throw new Error('createImage() image array cannot be empty.');
+    }
+    if (parsed.length === 1) {
+      const only = parsed[0];
+      if (!isRecord(only)) {
+        throw new Error('createImage() image array items must be object literals.');
+      }
+      return imageNodeFromParsed(
+        project,
+        only,
+        index,
+        matched,
+        identifierToNodeId,
+        canvasIdentifier,
+        matched?.parentId ?? null,
+        options,
+        painterOpts,
+      );
+    }
+
+    const existingGroup =
+      matched?.kind === 'group' && isImageBatchGroup(matched)
+        ? matched
+        : undefined;
+    const groupId = existingGroup?.id ?? createVisualId('group');
+    const oldChildren = existingGroup?.childIds ?? [];
+    const childIds: string[] = [];
+    const children: Array<VisualProject['document']['nodes'][string]> = [];
+
+    parsed.forEach((item, itemIndex) => {
+      if (!isRecord(item)) {
+        throw new Error(
+          'createImage() image array item ' +
+            String(itemIndex + 1) +
+            ' must be an object literal.',
+        );
+      }
+      const oldChild = oldChildren[itemIndex]
+        ? project.document.nodes[oldChildren[itemIndex]!]
+        : undefined;
+      const child = imageNodeFromParsed(
+        project,
+        item,
+        itemIndex,
+        oldChild,
+        identifierToNodeId,
+        canvasIdentifier,
+        groupId,
+      );
+      project.document.nodes[child.id] = child;
+      childIds.push(child.id);
+      children.push(child);
+    });
+
+    for (const oldChildId of oldChildren.slice(childIds.length)) {
+      removeVisualNode(project, oldChildId);
+    }
+
+    const xValues = children.map((child) => child.transform?.x ?? 0);
+    const yValues = children.map((child) => child.transform?.y ?? 0);
+    const rightValues = children.map(
+      (child) =>
+        (child.transform?.x ?? 0) +
+        (child.transform?.width ?? 100) * (child.transform?.scaleX ?? 1),
+    );
+    const bottomValues = children.map(
+      (child) =>
+        (child.transform?.y ?? 0) +
+        (child.transform?.height ?? 100) * (child.transform?.scaleY ?? 1),
+    );
+    const minX = Math.min(...xValues);
+    const minY = Math.min(...yValues);
+    const maxX = Math.max(...rightValues);
+    const maxY = Math.max(...bottomValues);
+
+    return {
+      id: groupId,
+      kind: 'group',
+      name: existingGroup?.name ?? 'Image group ' + String(index + 1),
+      parentId: existingGroup?.parentId ?? null,
+      childIds,
+      transform: {
+        ...(existingGroup?.transform ?? {}),
+        x: minX,
+        y: minY,
+        width: Math.max(1, maxX - minX),
+        height: Math.max(1, maxY - minY),
+        visible: existingGroup?.transform?.visible ?? true,
+        locked: existingGroup?.transform?.locked ?? false,
+        zIndex: existingGroup?.transform?.zIndex ?? index,
+      },
+      props: imageBatchGroupPropsRecord({
+        imageBatch: true,
+        createOptions: options ?? {},
+        ...(painterOpts ? { painterOpts } : {}),
+      }),
+    } satisfies VisualProject['document']['nodes'][string];
+  }
+
+  if (!isRecord(parsed)) {
+    throw new Error(
+      'createImage() properties must be an object literal or array of object literals.',
+    );
+  }
+
+  return imageNodeFromParsed(
+    project,
+    parsed,
+    index,
+    matched,
+    identifierToNodeId,
+    canvasIdentifier,
+    matched?.parentId ?? null,
+    options,
+    painterOpts,
+  );
 }
 
 function reconcileTextCall(
