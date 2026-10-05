@@ -10,7 +10,12 @@ import type {
   VisualImageUtilityInput,
   VisualImageUtilityOperation,
 } from '../model';
-import { isGeneratedImageSource, visualImageProps } from '../image-contract';
+import {
+  isGeneratedImageSource,
+  isImageBatchGroup,
+  visualImageBatchGroupProps,
+  visualImageProps,
+} from '../image-contract';
 import { isCurrentUtilityInput } from '../image-utility-contract';
 import { visualTextProps } from '../text-contract';
 import {
@@ -79,7 +84,7 @@ export type StudioCreateImageOperation = {
   target: string;
   preferredName?: string;
   base: StudioTargetReference;
-  properties: StudioImageProperties;
+  properties: StudioImageProperties | StudioImageProperties[];
   options?: VisualCreateImageOptions;
   painterOpts?: {
     resolveAssetRefs?: boolean;
@@ -338,6 +343,10 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
     if (node.transform?.visible === false) return;
 
     if (node.kind === 'group') {
+      if (isImageBatchGroup(node)) {
+        out.push(node);
+        return;
+      }
       for (const childId of node.childIds ?? []) visit(childId);
       return;
     }
