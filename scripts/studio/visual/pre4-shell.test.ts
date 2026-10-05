@@ -220,7 +220,7 @@ test('PRE-4 keeps inherited image dimensions native in the Visual artboard', () 
   assert.match(shell, /reconcileVisualProjectFromCode\(\s*current,\s*source,\s*resolveInheritedCanvasDimensions/);
   assert.match(reconcile, /customBg\?\.inherit === true/);
   assert.match(reconcile, /inherited from a resolvable customBg\/videoBg source/);
-  assert.match(css, /apx-pre4-authoritative-frame[\s\S]*object-fit:contain/);
+  assert.match(css, /apx-pre4-authoritative-frame[\s\S]*object-fit:fill/);
 });
 
 
