@@ -6067,11 +6067,29 @@ export default function VisualStudioPre4({
     }
 
     if (primaryImageBatch) {
+      const batchIndex = layerIds.indexOf(primaryImageBatch.id);
+      const generatedNodes = layerIds
+        .slice(0, Math.max(0, batchIndex))
+        .map((id) => project.document.nodes[id])
+        .filter(
+          (node): node is VisualNode =>
+            Boolean(
+              node &&
+                (node.kind === 'image' ||
+                  node.kind === 'shape' ||
+                  node.kind === 'text' ||
+                  node.kind === 'chart' ||
+                  node.kind === 'scene' ||
+                  node.kind === 'surface'),
+            ),
+        );
       return (
         <VisualImageBatchInspector
           project={project}
           node={primaryImageBatch}
           tab={inspectorTab}
+          imageAssets={imageAssets}
+          generatedNodes={generatedNodes}
           onChange={mutateImageBatch}
           onRename={(name) =>
             mutate('Rename image group', (current) =>
