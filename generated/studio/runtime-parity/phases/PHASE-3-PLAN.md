@@ -23,7 +23,7 @@ Current Phase-0 state:
 ### createText
 - [ ] single `TextProperties` and `TextProperties[]` semantics
 - [ ] `canvasBuffer` ownership and chaining semantics
-- [ ] fourth-argument `painterOpts.resolveAssetRefs`
+- [ ] third-argument `painterOpts.resolveAssetRefs`
 - [ ] text/content source forms
 - [ ] nested `font` object: family, name/path identity, size, weight, style and runtime font resolution
 - [ ] uploaded Studio font identity and generated canonical source
@@ -41,7 +41,7 @@ Current Phase-0 state:
 
 ### measureText
 - [ ] complete recursive `textProps` input parity
-- [ ] fourth-argument/runtime asset reference semantics where public
+- [ ] second-argument `painterOpts.resolveAssetRefs` semantics
 - [ ] all 31 output records modeled and classified explicitly
 - [ ] measurement result schema exposed truthfully where visually useful
 - [ ] createText/measureText shared text-property semantics stay structurally aligned
