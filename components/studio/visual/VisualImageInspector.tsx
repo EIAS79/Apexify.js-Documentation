@@ -24,7 +24,6 @@ import {
   IMAGE_BLEND_MODES,
   IMAGE_FILTER_PARAMETERLESS_TYPES,
   IMAGE_FILTER_TYPES,
-  IMAGE_FITS,
   IMAGE_SHAPE_TYPES,
   defaultShapeNodeProps,
   defaultVisualImageFilter,
@@ -178,9 +177,9 @@ function MultiPositionField({
     onChange(next.size ? [...next].join(',') : 'all');
   };
   return (
-    <div className="apx-canvas-v2-field">
+    <div className="apx-canvas-v2-field apx-image-v2-multi-field">
       <span>{label}</span>
-      <div className="apx-canvas-v2-multi" role="group" aria-label={label}>
+      <div className="apx-canvas-v2-multi apx-image-v2-multi" role="group" aria-label={label}>
         {positions.map((option) => (
           <button
             key={option}
@@ -475,10 +474,10 @@ function StrokeEditor({
         />
       </div>
       <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
-        <NumericField label="Width" value={value.width} onChange={(width) => onChange({ ...value, width })} />
-        <NumericField label="Position" value={value.position} onChange={(position) => onChange({ ...value, position })} />
-        <NumericField label="Blur" value={value.blur} onChange={(blur) => onChange({ ...value, blur })} />
-        <NumericField label="Opacity" value={value.opacity} step={0.01} onChange={(opacity) => onChange({ ...value, opacity })} />
+        <NumericField label="Width" value={value.width ?? 1} min={0} onChange={(width) => onChange({ ...value, width })} />
+        <NumericField label="Position" value={value.position ?? 0} onChange={(position) => onChange({ ...value, position })} />
+        <NumericField label="Blur" value={value.blur ?? 0} min={0} onChange={(blur) => onChange({ ...value, blur })} />
+        <NumericField label="Opacity" value={value.opacity ?? 1} min={0} max={1} step={0.01} onChange={(opacity) => onChange({ ...value, opacity })} />
         <NumericField
           label="Border radius"
           value={typeof value.borderRadius === 'number' ? value.borderRadius : undefined}
@@ -495,15 +494,11 @@ function StrokeEditor({
           />
           <span>Circular radius</span>
         </label>
-        <label>
-          <span>Border position</span>
-          <input
-            className="apx-canvas-v2-input apx-pre4-input"
-            value={value.borderPosition ?? ''}
-            placeholder="all / top / left…"
-            onChange={(event) => onChange({ ...value, borderPosition: event.target.value })}
-          />
-        </label>
+        <MultiPositionField
+          label="Sides"
+          value={value.borderPosition ?? 'all'}
+          onChange={(borderPosition) => onChange({ ...value, borderPosition })}
+        />
         <label>
           <span>Style</span>
           <select
@@ -514,15 +509,11 @@ function StrokeEditor({
             {STROKE_STYLES.map((style) => <option key={style}>{style}</option>)}
           </select>
         </label>
-        <label>
-          <span>Rounded corners</span>
-          <input
-            className="apx-canvas-v2-input apx-pre4-input"
-            value={value.roundedCorners ?? ''}
-            placeholder="all / top / left…"
-            onChange={(event) => onChange({ ...value, roundedCorners: event.target.value })}
-          />
-        </label>
+        <MultiPositionField
+          label="Rounded corners"
+          value={value.roundedCorners ?? 'all'}
+          onChange={(roundedCorners) => onChange({ ...value, roundedCorners })}
+        />
       </div>
       <label className="apx-image-v2-check apx-canvas-check">
         <input
@@ -581,10 +572,10 @@ function ShadowEditor({
         />
       </div>
       <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
-        <NumericField label="Offset X" value={value.offsetX} onChange={(offsetX) => onChange({ ...value, offsetX })} />
-        <NumericField label="Offset Y" value={value.offsetY} onChange={(offsetY) => onChange({ ...value, offsetY })} />
-        <NumericField label="Blur" value={value.blur} onChange={(blur) => onChange({ ...value, blur })} />
-        <NumericField label="Opacity" value={value.opacity} step={0.01} onChange={(opacity) => onChange({ ...value, opacity })} />
+        <NumericField label="Offset X" value={value.offsetX ?? 0} onChange={(offsetX) => onChange({ ...value, offsetX })} />
+        <NumericField label="Offset Y" value={value.offsetY ?? 8} onChange={(offsetY) => onChange({ ...value, offsetY })} />
+        <NumericField label="Blur" value={value.blur ?? 16} min={0} onChange={(blur) => onChange({ ...value, blur })} />
+        <NumericField label="Opacity" value={value.opacity ?? 0.35} min={0} max={1} step={0.01} onChange={(opacity) => onChange({ ...value, opacity })} />
         <NumericField
           label="Border radius"
           value={typeof value.borderRadius === 'number' ? value.borderRadius : undefined}
@@ -601,24 +592,16 @@ function ShadowEditor({
           />
           <span>Circular radius</span>
         </label>
-        <label>
-          <span>Border position</span>
-          <input
-            className="apx-canvas-v2-input apx-pre4-input"
-            value={value.borderPosition ?? ''}
-            placeholder="all / top / left…"
-            onChange={(event) => onChange({ ...value, borderPosition: event.target.value })}
-          />
-        </label>
-        <label>
-          <span>Rounded corners</span>
-          <input
-            className="apx-canvas-v2-input apx-pre4-input"
-            value={value.roundedCorners ?? ''}
-            placeholder="all / top / left…"
-            onChange={(event) => onChange({ ...value, roundedCorners: event.target.value })}
-          />
-        </label>
+        <MultiPositionField
+          label="Sides"
+          value={value.borderPosition ?? 'all'}
+          onChange={(borderPosition) => onChange({ ...value, borderPosition })}
+        />
+        <MultiPositionField
+          label="Rounded corners"
+          value={value.roundedCorners ?? 'all'}
+          onChange={(roundedCorners) => onChange({ ...value, roundedCorners })}
+        />
       </div>
       <label className="apx-image-v2-check apx-canvas-check">
         <input
@@ -1735,27 +1718,39 @@ export function VisualImageInspector({
         </Section>
         {!isShape ? (
           <Section
-            title="Image layout"
-            description="Fit and alignment are ImageProperties fields; transform dimensions remain the layer box."
+            title="Resize behavior"
+            description="Choose whether W/H are exact or whether the source aspect ratio is preserved."
             attr="layout"
           >
-            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
-              <label>
-                <span>Fit</span>
-                <select className="apx-canvas-v2-input apx-pre4-input" value={props.fit ?? 'fill'} onChange={(event) => patch('Image fit', { fit: event.target.value as VisualImageNodeProps['fit'] })}>
-                  {IMAGE_FITS.map((value) => <option key={value}>{value}</option>)}
-                </select>
-              </label>
-              <label>
-                <span>Align</span>
-                <select className="apx-canvas-v2-input apx-pre4-input" value={props.align ?? 'center'} onChange={(event) => patch('Image align', { align: event.target.value as VisualImageNodeProps['align'] })}>
-                  {IMAGE_ALIGNS.map((value) => <option key={value}>{value}</option>)}
-                </select>
-              </label>
+            <div className="apx-image-v2-fit-switch" role="group" aria-label="Image resize behavior">
+              {([
+                ['fill', 'Free resize', 'Exact width and height'],
+                ['contain', 'Contain', 'Keep ratio inside the box'],
+                ['cover', 'Cover', 'Keep ratio and fill the box'],
+              ] as const).map(([value, label, hint]) => (
+                <button
+                  key={value}
+                  type="button"
+                  data-active={(props.fit ?? 'fill') === value ? 'true' : undefined}
+                  onClick={() => patch('Image fit', { fit: value })}
+                >
+                  <strong>{label}</strong>
+                  <small>{hint}</small>
+                </button>
+              ))}
             </div>
+            <div className="apx-image-v2-resize-note">
+              Manual W/H edits automatically switch to <strong>Free resize</strong>, so changing width never changes height unless you explicitly choose Contain/Cover.
+            </div>
+            <label className="apx-canvas-v2-field">
+              <span>Alignment inside resize box</span>
+              <select className="apx-canvas-v2-input apx-pre4-input" value={props.align ?? 'center'} onChange={(event) => patch('Image align', { align: event.target.value as VisualImageNodeProps['align'] })}>
+                {IMAGE_ALIGNS.map((value) => <option key={value}>{value}</option>)}
+              </select>
+            </label>
             <label className="apx-image-v2-check apx-canvas-check">
               <input type="checkbox" checked={props.inherit ?? false} onChange={(event) => patch('Image inherit', { inherit: event.target.checked })} />
-              <span>Use source dimensions when width/height are omitted</span>
+              <span>Use source dimensions only when W/H are omitted</span>
             </label>
           </Section>
         ) : null}
@@ -1911,10 +1906,14 @@ export function VisualImageInspector({
           </Section>
         ) : null}
 
-        <Section title="Appearance" attr="appearance">
+        <Section
+          title="Appearance"
+          description="Compositing, blur and corner geometry."
+          attr="appearance"
+        >
           <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
-            <NumericField label="Blur" value={props.blur} min={0} onChange={(blur) => patch('Image blur', { blur })} />
-            <NumericField label="Border radius" value={typeof props.borderRadius === 'number' ? props.borderRadius : undefined} min={0} onChange={(borderRadius) => patch('Image radius', { borderRadius })} />
+            <NumericField label="Blur" value={props.blur ?? 0} min={0} onChange={(blur) => patch('Image blur', { blur })} />
+            <NumericField label="Border radius" value={typeof props.borderRadius === 'number' ? props.borderRadius : 0} min={0} onChange={(borderRadius) => patch('Image radius', { borderRadius })} />
             <label>
               <span>Blend mode</span>
               <select className="apx-canvas-v2-input apx-pre4-input" value={props.blendMode ?? 'source-over'} onChange={(event) => patch('Image blend', { blendMode: event.target.value as VisualBlendMode })}>
@@ -1927,10 +1926,17 @@ export function VisualImageInspector({
               onChange={(borderPosition) => patch('Image border position', { borderPosition })}
             />
           </div>
-          <label className="apx-image-v2-check apx-canvas-check">
-            <input type="checkbox" checked={props.borderRadius === 'circular'} onChange={(event) => patch('Circular image', { borderRadius: event.target.checked ? 'circular' : 0 })} />
-            <span>Circular border radius</span>
-          </label>
+          <div className="apx-image-v2-toggle-row">
+            <span>
+              <strong>Circular / oval crop</strong>
+              <small>Use the image box as a circular or elliptical clip.</small>
+            </span>
+            <Toggle
+              label="Circular image"
+              checked={props.borderRadius === 'circular'}
+              onChange={(checked) => patch('Circular image', { borderRadius: checked ? 'circular' : 0 })}
+            />
+          </div>
         </Section>
 
         <Section
@@ -1973,15 +1979,19 @@ export function VisualImageInspector({
           )}
         </Section>
 
-        <Section title="Box background" attr="box-background">
-          <label className="apx-image-v2-check apx-canvas-check">
-            <input
-              type="checkbox"
+        <Section
+          title="Box background"
+          description="Optional paint layer behind the image bounds."
+          attr="box-background"
+          defaultOpen={Boolean(props.boxBackground)}
+          action={
+            <Toggle
+              label="Enable image box background"
               checked={Boolean(props.boxBackground)}
-              onChange={(event) => setOptional('Image box background', 'boxBackground', event.target.checked, { color: '#0b1730' })}
+              onChange={(checked) => setOptional('Image box background', 'boxBackground', checked, { color: '#0b1730' })}
             />
-            <span>Paint box background before image/shape</span>
-          </label>
+          }
+        >
           {props.boxBackground ? (
             <>
               <div className="apx-canvas-v2-color apx-canvas-color-row">
@@ -2016,7 +2026,9 @@ export function VisualImageInspector({
                 <GradientEditor value={props.boxBackground.gradient} onChange={(gradient) => patch('Box background gradient', { boxBackground: { ...props.boxBackground, gradient } })} />
               ) : null}
             </>
-          ) : null}
+          ) : (
+            <div className="apx-canvas-v2-empty-mini">Enable background to paint behind the image box.</div>
+          )}
         </Section>
       </>
     );
