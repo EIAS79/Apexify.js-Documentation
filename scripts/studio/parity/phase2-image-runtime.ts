@@ -25,6 +25,7 @@ import type {
   VisualProject,
 } from '../../../lib/studio/visual/model';
 
+// Keep runtime execution inside async main so tsx can run this proof under the repo's CommonJS package mode.
 async function main() {
 const root = process.cwd();
 const runtimeRoot = path.resolve(
