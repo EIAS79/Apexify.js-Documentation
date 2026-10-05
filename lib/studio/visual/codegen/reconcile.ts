@@ -629,8 +629,9 @@ function parseCreateImageCallOptions(call: MethodCall): {
   painterOpts?: { resolveAssetRefs?: boolean };
 } {
   let options: VisualCreateImageOptions | undefined;
-  if (call.args[2]) {
-    const parsedOptions = new LiteralParser(call.args[2]).parse();
+  const rawOptions = call.args[2]?.trim();
+  if (rawOptions && rawOptions !== 'undefined') {
+    const parsedOptions = new LiteralParser(rawOptions).parse();
     if (!isRecord(parsedOptions)) {
       throw new Error('createImage() options must be an object literal.');
     }
@@ -855,7 +856,10 @@ function reconcileImageCall(
     return {
       id: groupId,
       kind: 'group',
-      name: existingGroup?.name ?? 'Image group ' + String(index + 1),
+      name:
+        existingGroup?.name ??
+        call.assignedIdentifier ??
+        'Image group ' + String(index + 1),
       parentId: existingGroup?.parentId ?? null,
       childIds,
       transform: {
