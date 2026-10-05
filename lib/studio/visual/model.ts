@@ -627,6 +627,16 @@ export interface VisualTextFont {
   path?: string;
 }
 
+/**
+ * Editor grouping that maps to one runtime createText(TextProperties[]) call.
+ * Mixed/non-text groups keep the generic editor grouping semantics.
+ */
+export interface VisualTextBatchGroupProps {
+  textBatch: true;
+  /** Third createText() argument. Runtime default is resolveAssetRefs=false. */
+  painterOpts?: VisualPainterAssetRefsOptions;
+}
+
 export interface VisualTextNodeProps {
   text: string;
   font?: VisualTextFont;
@@ -642,6 +652,8 @@ export interface VisualTextNodeProps {
     width?: number;
     height?: number;
   };
+  /** Third createText() argument / second measureText() argument. */
+  painterOpts?: VisualPainterAssetRefsOptions;
 
   /** Legacy Apexify text aliases retained for exact round-trip compatibility. */
   fontSize?: number;
@@ -671,11 +683,37 @@ export interface VisualTextNodeProps {
 
 export interface VisualTextMetrics {
   width: number;
+  actualBoundingBoxAscent: number;
+  actualBoundingBoxDescent: number;
+  actualBoundingBoxLeft: number;
+  actualBoundingBoxRight: number;
+  fontBoundingBoxAscent: number;
+  fontBoundingBoxDescent: number;
+  alphabeticBaseline?: number;
+  emHeightAscent?: number;
+  emHeightDescent?: number;
+  hangingBaseline?: number;
+  ideographicBaseline?: number;
   height: number;
   lineHeight: number;
-  lineCount: number;
   baseline: number;
-  lines: Array<{ text: string; width: number }>;
+  top: number;
+  bottom: number;
+  centerX: number;
+  centerY: number;
+  lines?: Array<{
+    text: string;
+    width: number;
+    height: number;
+    metrics: Omit<
+      VisualTextMetrics,
+      'lines' | 'totalHeight' | 'lineCount' | 'charWidths' | 'charPositions'
+    >;
+  }>;
+  totalHeight?: number;
+  lineCount?: number;
+  charWidths?: number[];
+  charPositions?: Array<{ x: number; width: number }>;
 }
 
 export interface VisualCanvasImageBackgroundOptions {
