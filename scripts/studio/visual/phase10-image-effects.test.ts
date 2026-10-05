@@ -462,6 +462,10 @@ test('Phase 10 defaults cover every stack and analysis operation', () => {
 test('Phase 10 permanent Images workflow exposes stack, presets, analysis and full-runtime routing', () => {
   const ui = fs.readFileSync('components/studio/visual/VisualImageUtilityAuthoring.tsx', 'utf8');
   const shell = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualImageInspector.tsx',
+    'utf8',
+  );
   for (const contract of [
     'data-phase10-image-stack',
     'data-phase10-presets',
@@ -472,10 +476,11 @@ test('Phase 10 permanent Images workflow exposes stack, presets, analysis and fu
   ]) {
     assert.match(ui, new RegExp(contract));
   }
-  assert.match(shell, /VisualImageUtilityAuthoring/);
+  assert.match(inspector, /VisualImageUtilityAuthoring/);
+  assert.match(inspector, /Image utility pipeline/);
+  assert.match(shell, /VisualImageInspector/);
   assert.match(shell, /currentNodeServerExecutionAdapter/);
   assert.match(shell, /phase10Active/);
-  assert.match(shell, /primaryMedia\.kind === 'image'/);
   assert.match(shell, /studioResultsJson/);
   assert.match(shell, /setPhase7Results\(result\.results\)/);
   assert.match(shell, /phase10RenderTailRef/);

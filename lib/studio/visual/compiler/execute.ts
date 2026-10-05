@@ -22,9 +22,12 @@ export interface StudioOperationRuntime {
     painterOpts?: { resolveAssetRefs?: boolean },
   ): Promise<{ buffer: Uint8Array }>;
   createImage?(
-    properties: Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array },
+    properties:
+      | (Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array })
+      | Array<Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array }>,
     canvasBuffer: Uint8Array,
     options?: VisualCreateImageOptions,
+    painterOpts?: { resolveAssetRefs?: boolean },
   ): Promise<Uint8Array>;
   createText?(
     properties: StudioTextProperties,
@@ -164,9 +167,9 @@ export async function executeStudioOperationPlan(
         const properties = resolveOperationValue(
           operation.properties,
           values,
-        ) as Omit<StudioImageProperties, 'source'> & {
-          source: string | Uint8Array;
-        };
+        ) as
+          | (Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array })
+          | Array<Omit<StudioImageProperties, 'source'> & { source: string | Uint8Array }>;
         const base = targetValue(operation.base, values);
         if (!runtime.createImage) {
           throw new Error('Studio runtime does not implement createImage().');
@@ -175,6 +178,7 @@ export async function executeStudioOperationPlan(
           properties,
           base,
           operation.options,
+          operation.painterOpts,
         );
         values.set(operation.target, value);
         break;

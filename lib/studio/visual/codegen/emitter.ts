@@ -181,9 +181,14 @@ export function emitStudioOperationPlan(
       const properties = emitValue(operation.properties, 2, targetNames);
       const options = operation.options
         ? `, ${emitValue(operation.options, 2, targetNames)}`
+        : operation.painterOpts
+          ? ', undefined'
+          : '';
+      const painterOpts = operation.painterOpts
+        ? `, ${emitValue(operation.painterOpts, 2, targetNames)}`
         : '';
       body.push(
-        `  const ${targetName} = await ${painterName}.createImage(${properties}, ${base}${options});`,
+        `  const ${targetName} = await ${painterName}.createImage(${properties}, ${base}${options}${painterOpts});`,
       );
       targetNames.set(operation.target, targetName);
       continue;

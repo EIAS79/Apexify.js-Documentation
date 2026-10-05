@@ -397,16 +397,43 @@ export interface VisualImageMask {
   mode?: 'alpha' | 'luminance' | 'inverse';
 }
 
+export type VisualImageInterpolationMode = 'nearest' | 'bilinear' | 'bicubic';
+export type VisualImageEdgeMode = 'transparent' | 'clamp' | 'wrap' | 'mirror';
+export type VisualImageWarpFalloff = 'linear' | 'smooth' | 'gaussian';
+
+export interface VisualImageWarpControlPoint {
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  radius?: number;
+  strength?: number;
+  falloff?: VisualImageWarpFalloff;
+}
+
 export interface VisualImageDistortion {
-  type: 'perspective' | 'warp' | 'bulge' | 'pinch';
+  type: 'perspective' | 'warp' | 'bulge' | 'pinch' | 'twirl' | 'wave';
   points?: Array<{ x: number; y: number }>;
+  controlPoints?: VisualImageWarpControlPoint[];
   intensity?: number;
+  centerX?: number;
+  centerY?: number;
+  radius?: number;
+  angle?: number;
+  amplitudeX?: number;
+  amplitudeY?: number;
+  wavelengthX?: number;
+  wavelengthY?: number;
+  phaseX?: number;
+  phaseY?: number;
+  interpolation?: VisualImageInterpolationMode;
+  edgeMode?: VisualImageEdgeMode;
 }
 
 export interface VisualImageMeshWarp {
   gridX?: number;
   gridY?: number;
   controlPoints?: Array<Array<{ x: number; y: number }>>;
+  interpolation?: VisualImageInterpolationMode;
+  edgeMode?: VisualImageEdgeMode;
 }
 
 export interface VisualImageEffects {
@@ -452,6 +479,16 @@ export interface VisualCreateImageOptions {
   groupTransform?: VisualImageGroupTransform;
 }
 
+/**
+ * Editor grouping that maps to one runtime createImage(ImageProperties[]) call.
+ * Mixed/non-image groups keep the generic editor grouping semantics.
+ */
+export interface VisualImageBatchGroupProps {
+  imageBatch: true;
+  createOptions: VisualCreateImageOptions;
+  painterOpts?: VisualPainterAssetRefsOptions;
+}
+
 export interface VisualImageNodeProps {
   source: VisualImageSource;
   inherit?: boolean;
@@ -478,6 +515,8 @@ export interface VisualImageNodeProps {
   /** Structured image analysis operations that do not replace the raster output. */
   utilityAnalyses?: VisualImageUtilityAnalysis[];
   createOptions?: VisualCreateImageOptions;
+  /** Fourth createImage() argument. Runtime default is resolveAssetRefs=false. */
+  painterOpts?: VisualPainterAssetRefsOptions;
 }
 
 export type VisualTextAlign =

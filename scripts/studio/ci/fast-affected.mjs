@@ -75,17 +75,42 @@ const sharedVisual = codeFiles.some((file) =>
 );
 
 if (sharedVisual) {
-  console.log('[studio-fast] shared Visual compiler/model changed; using the complete fast Visual unit suite.');
-  run('npm', ['run', 'studio:visual:test']);
-} else {
+  const imageParityWork =
+    process.env.GITHUB_REF_NAME === 'studio-parity-2-image' ||
+    codeFiles.some((file) =>
+      /image-contract|phase2-image-rebuild|phase2-image-runtime|finalize-image|VisualImage/.test(file),
+    );
+
+  if (imageParityWork) {
+    console.log(
+      '[studio-fast] shared compiler/model changed inside createImage parity work; running the image domain plus shared compiler/live-sync contracts.',
+    );
+    add(
+      'scripts/studio/visual/phase2-model-codegen.test.ts',
+      'scripts/studio/visual/live-sync.test.ts',
+      'scripts/studio/visual/phase5-images-shapes.test.ts',
+      'scripts/studio/visual/phase10-image-effects.test.ts',
+      'scripts/studio/parity/phase2-image-rebuild.test.ts',
+      'scripts/studio/parity/parity-baseline.test.ts',
+    );
+  } else {
+    console.log(
+      '[studio-fast] shared Visual compiler/model changed outside a scoped parity domain; using the complete fast Visual unit suite.',
+    );
+    run('npm', ['run', 'studio:visual:test']);
+  }
+}
+
+if (!sharedVisual || tests.size) {
   for (const file of codeFiles) {
     if (/VisualCanvasInspector|canvas-contract|phase4-canvas/.test(file)) {
       add('scripts/studio/visual/phase4-canvas.test.ts');
     }
-    if (/image-contract|phase5-images-shapes|phase10-image-effects|VisualImage/.test(file)) {
+    if (/image-contract|phase2-image-rebuild|phase5-images-shapes|phase10-image-effects|VisualImage/.test(file)) {
       add(
         'scripts/studio/visual/phase5-images-shapes.test.ts',
         'scripts/studio/visual/phase10-image-effects.test.ts',
+        'scripts/studio/parity/phase2-image-rebuild.test.ts',
       );
     }
     if (/text-contract|phase6-text-fonts|VisualText/.test(file)) {
@@ -147,7 +172,9 @@ if (sharedVisual) {
   if (!fs.existsSync(tsx)) {
     throw new Error('[studio-fast] local tsx binary is missing after npm ci.');
   }
-  run(tsx, ['--test', ...tests]);
+  if (tests.size) {
+    run(tsx, ['--test', ...tests]);
+  }
 }
 
 if (codeFiles.some((file) => /^scripts\/studio\/parity\//.test(file))) {

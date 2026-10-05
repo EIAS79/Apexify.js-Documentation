@@ -145,7 +145,12 @@
     "studio:parity:canvas:all": "npm run studio:parity:canvas:test && npm run studio:parity:canvas:runtime && npm run studio:parity:canvas:ledger && npm run studio:parity:canvas:ledger:check && npm run studio:parity:typecheck",
     "studio:parity:canvas:ledger": "tsx scripts/studio/parity/finalize-canvas.ts",
     "studio:parity:canvas:ledger:check": "tsx scripts/studio/parity/finalize-canvas.ts --check",
-    "studio:ci:fast": "node scripts/studio/ci/fast-affected.mjs"
+    "studio:ci:fast": "node scripts/studio/ci/fast-affected.mjs",
+    "studio:parity:image:test": "tsx --test scripts/studio/parity/phase2-image-rebuild.test.ts scripts/studio/visual/phase5-images-shapes.test.ts scripts/studio/visual/phase10-image-effects.test.ts",
+    "studio:parity:image:runtime": "tsx scripts/studio/parity/phase2-image-runtime.ts",
+    "studio:parity:image:ledger": "tsx scripts/studio/parity/finalize-image.ts",
+    "studio:parity:image:ledger:check": "tsx scripts/studio/parity/finalize-image.ts --check",
+    "studio:parity:image:all": "npm run studio:parity:image:test && npm run studio:parity:image:runtime && npm run studio:parity:image:ledger && npm run studio:parity:image:ledger:check && npm run studio:parity:typecheck"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",

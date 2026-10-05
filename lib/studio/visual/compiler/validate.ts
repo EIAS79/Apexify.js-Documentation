@@ -1,6 +1,9 @@
 import { validateVisualTextNode } from '../text-contract';
 import { validateVisualChartNode } from '../chart-contract';
-import { validateVisualImageNode } from '../image-contract';
+import {
+  validateVisualImageBatchGroup,
+  validateVisualImageNode,
+} from '../image-contract';
 import {
   CANVAS_RUNTIME_LIMITS,
   validateVisualCanvasConfig,
@@ -271,6 +274,7 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
     const featureProject = resolvePhase9References(materializePhase9Project(project));
     for (const node of Object.values(featureProject.document.nodes)) {
       validateVisualImageNode(featureProject, node, issues);
+      validateVisualImageBatchGroup(featureProject, node, issues);
       validateVisualTextNode(node, issues);
       validateVisualChartNode(node, issues);
       validatePhase7Node(node, issues);

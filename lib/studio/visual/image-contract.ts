@@ -1,6 +1,8 @@
 import type {
   VisualBlendMode,
   VisualCreateImageOptions,
+  VisualGradient,
+  VisualImageBatchGroupProps,
   VisualImageFilter,
   VisualImageNodeProps,
   VisualImageSource,
@@ -12,6 +14,7 @@ import type {
   VisualValue,
 } from './model';
 import { validateVisualImageUtilities } from './image-utility-contract';
+import { CANVAS_RUNTIME_LIMITS } from './canvas-contract';
 
 export const IMAGE_SHAPE_TYPES: readonly VisualShapeType[] = [
   'rectangle',
@@ -390,6 +393,7 @@ export const IMAGE_AUTHORING_CLASSIFICATION = {
   boxBackground: { surface: 'Style', reverse: 'canonical-literal' },
   utilityStack: { surface: 'Effects', reverse: 'canonical-literal' },
   utilityAnalyses: { surface: 'Data', reverse: 'canonical-literal' },
+  painterOpts: { surface: 'Advanced', reverse: 'canonical-literal' },
 } as const satisfies Record<
   ImageRuntimePropertyKey,
   { surface: ImageAuthoringSurface; reverse: ImageReverseSyncPolicy }
@@ -473,6 +477,31 @@ function record(value: unknown): Record<string, unknown> | null {
   return value && typeof value === 'object' && !Array.isArray(value)
     ? value as Record<string, unknown>
     : null;
+}
+
+export function imageBatchGroupPropsRecord(
+  value: VisualImageBatchGroupProps,
+): Record<string, VisualValue> {
+  return structuredClone(value) as unknown as Record<string, VisualValue>;
+}
+
+export function visualImageBatchGroupProps(
+  node: VisualNode,
+): VisualImageBatchGroupProps | null {
+  if (node.kind !== 'group') return null;
+  const raw = node.props as unknown as Partial<VisualImageBatchGroupProps>;
+  if (raw.imageBatch !== true) return null;
+  return {
+    imageBatch: true,
+    createOptions: structuredClone(raw.createOptions ?? {}),
+    ...(raw.painterOpts
+      ? { painterOpts: structuredClone(raw.painterOpts) }
+      : {}),
+  };
+}
+
+export function isImageBatchGroup(node: VisualNode): boolean {
+  return visualImageBatchGroupProps(node) !== null;
 }
 
 export function visualImageProps(node: VisualNode): VisualImageNodeProps {
@@ -585,6 +614,318 @@ function validateFilter(
   );
 }
 
+function validateFiniteNumericLeaves(
+  value: unknown,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      issue(issues, 'image-numeric-leaf', path, 'Numeric values must be finite.');
+    }
+    return;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) =>
+      validateFiniteNumericLeaves(item, path + '[' + index + ']', issues),
+    );
+    return;
+  }
+  const object = record(value);
+  if (!object) return;
+  for (const [key, child] of Object.entries(object)) {
+    validateFiniteNumericLeaves(child, path + '.' + key, issues);
+  }
+}
+
+function validateGradientValue(
+  gradient: VisualGradient | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!gradient) return;
+  validateFiniteNumericLeaves(gradient, path, issues);
+  if (!['linear','radial','conic'].includes(gradient.type)) {
+    issue(issues, 'image-gradient-type', path + '.type', 'Unsupported gradient type.');
+  }
+  if (!Array.isArray(gradient.colors) || gradient.colors.length < 2) {
+    issue(issues, 'image-gradient-colors', path + '.colors', 'Gradient requires at least two color stops.');
+    return;
+  }
+  if (gradient.colors.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-gradient-limit', path + '.colors', 'Gradient exceeds the runtime collection limit.');
+  }
+  let previous = -Infinity;
+  gradient.colors.forEach((stop, index) => {
+    if (!finite(stop.stop) || stop.stop < 0 || stop.stop > 1) {
+      issue(issues, 'image-gradient-stop', path + '.colors[' + index + '].stop', 'Gradient stop must be between 0 and 1.');
+    }
+    if (finite(stop.stop) && stop.stop < previous) {
+      issue(issues, 'image-gradient-order', path + '.colors[' + index + '].stop', 'Gradient stops must be non-decreasing.');
+    }
+    if (finite(stop.stop)) previous = stop.stop;
+    if (
+      typeof stop.color !== 'string' ||
+      !stop.color.trim() ||
+      stop.color.includes('\0') ||
+      stop.color.length > 256
+    ) {
+      issue(issues, 'image-gradient-color', path + '.colors[' + index + '].color', 'Gradient color must be a non-empty string of at most 256 characters.');
+    }
+  });
+  if (
+    (gradient.type === 'linear' || gradient.type === 'radial') &&
+    gradient.repeat !== undefined &&
+    !['repeat','reflect','no-repeat'].includes(gradient.repeat)
+  ) {
+    issue(issues, 'image-gradient-repeat', path + '.repeat', 'Unsupported gradient repeat mode.');
+  }
+  if (
+    gradient.type === 'linear' &&
+    gradient.startX !== undefined &&
+    gradient.startY !== undefined &&
+    gradient.endX !== undefined &&
+    gradient.endY !== undefined &&
+    gradient.startX === gradient.endX &&
+    gradient.startY === gradient.endY
+  ) {
+    issue(issues, 'image-gradient-geometry', path, 'Linear gradient start and end points must not be identical.');
+  }
+  if (gradient.type === 'radial') {
+    if (gradient.startRadius !== undefined && gradient.startRadius < 0) {
+      issue(issues, 'image-gradient-radius', path + '.startRadius', 'Radial start radius must be non-negative.');
+    }
+    if (gradient.endRadius !== undefined && gradient.endRadius < 0) {
+      issue(issues, 'image-gradient-radius', path + '.endRadius', 'Radial end radius must be non-negative.');
+    }
+    if (
+      gradient.startX !== undefined &&
+      gradient.startY !== undefined &&
+      gradient.startRadius !== undefined &&
+      gradient.endX !== undefined &&
+      gradient.endY !== undefined &&
+      gradient.endRadius !== undefined &&
+      gradient.startX === gradient.endX &&
+      gradient.startY === gradient.endY &&
+      gradient.startRadius === gradient.endRadius
+    ) {
+      issue(issues, 'image-gradient-geometry', path, 'Radial gradient start and end circles must not be identical.');
+    }
+  }
+}
+
+function validateMaskValue(
+  project: VisualProject,
+  mask: VisualImageNodeProps['mask'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!mask) return;
+  validateSource(project, mask.source, path + '.source', issues);
+  if (
+    mask.mode !== undefined &&
+    !['alpha','luminance','inverse'].includes(mask.mode)
+  ) {
+    issue(issues, 'image-mask-mode', path + '.mode', 'Unsupported image mask mode.');
+  }
+}
+
+function validateClipPathValue(
+  points: Array<{ x: number; y: number }> | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!points) return;
+  if (points.length < 3) {
+    issue(issues, 'image-clip-min', path, 'Clip path requires at least three points.');
+  }
+  if (points.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-clip-limit', path, 'Clip path exceeds the runtime collection limit.');
+  }
+  points.forEach((point, index) => {
+    if (!finite(point.x) || !finite(point.y)) {
+      issue(issues, 'image-clip-point', path + '[' + index + ']', 'Clip-path points must be finite.');
+    }
+  });
+}
+
+function validateImageDistortionValue(
+  distortion: VisualImageNodeProps['distortion'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!distortion) return;
+  if (!['perspective','warp','bulge','pinch','twirl','wave'].includes(distortion.type)) {
+    issue(issues, 'image-distortion-type', path + '.type', 'Unsupported distortion type.');
+  }
+  if (
+    distortion.interpolation !== undefined &&
+    !['nearest','bilinear','bicubic'].includes(distortion.interpolation)
+  ) {
+    issue(issues, 'image-distortion-interpolation', path + '.interpolation', 'Unsupported distortion interpolation.');
+  }
+  if (
+    distortion.edgeMode !== undefined &&
+    !['transparent','clamp','wrap','mirror'].includes(distortion.edgeMode)
+  ) {
+    issue(issues, 'image-distortion-edge-mode', path + '.edgeMode', 'Unsupported distortion edge mode.');
+  }
+  validateFiniteNumericLeaves(distortion, path, issues);
+  if (distortion.radius !== undefined && distortion.radius <= 0) {
+    issue(issues, 'image-distortion-radius', path + '.radius', 'Distortion radius must be greater than 0.');
+  }
+  if (distortion.wavelengthX !== undefined && distortion.wavelengthX <= 0) {
+    issue(issues, 'image-distortion-wavelength', path + '.wavelengthX', 'Wave wavelength X must be greater than 0.');
+  }
+  if (distortion.wavelengthY !== undefined && distortion.wavelengthY <= 0) {
+    issue(issues, 'image-distortion-wavelength', path + '.wavelengthY', 'Wave wavelength Y must be greater than 0.');
+  }
+  if ((distortion.points?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-distortion-point-limit', path + '.points', 'Distortion points exceed the runtime collection limit.');
+  }
+  if ((distortion.controlPoints?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-distortion-control-limit', path + '.controlPoints', 'Warp handles exceed the runtime collection limit.');
+  }
+
+  const points = distortion.points;
+  const handles = distortion.controlPoints;
+  points?.forEach((point, index) => {
+    if (!finite(point.x) || !finite(point.y)) {
+      issue(issues, 'image-distortion-point', path + '.points[' + index + ']', 'Distortion point coordinates must be finite.');
+    }
+  });
+  handles?.forEach((handle, index) => {
+    const handlePath = path + '.controlPoints[' + index + ']';
+    if (
+      !finite(handle.from.x) ||
+      !finite(handle.from.y) ||
+      !finite(handle.to.x) ||
+      !finite(handle.to.y)
+    ) {
+      issue(issues, 'image-distortion-control-point', handlePath, 'Warp control-point coordinates must be finite.');
+    }
+    if (handle.radius !== undefined && (!finite(handle.radius) || handle.radius <= 0)) {
+      issue(issues, 'image-distortion-control-radius', handlePath + '.radius', 'Warp control radius must be greater than 0.');
+    }
+    if (
+      handle.falloff !== undefined &&
+      !['linear','smooth','gaussian'].includes(handle.falloff)
+    ) {
+      issue(issues, 'image-distortion-control-falloff', handlePath + '.falloff', 'Unsupported warp falloff.');
+    }
+  });
+
+  if (distortion.type === 'perspective') {
+    if (points?.length !== 4) {
+      issue(issues, 'image-distortion-perspective-points', path + '.points', 'Perspective requires exactly four destination corners.');
+    }
+    if (handles !== undefined) {
+      issue(issues, 'image-distortion-perspective-handles', path + '.controlPoints', 'Perspective does not accept controlPoints.');
+    }
+  } else if (distortion.type === 'warp') {
+    const hasPoints = points !== undefined;
+    const hasHandles = handles !== undefined;
+    if (hasPoints === hasHandles) {
+      issue(issues, 'image-distortion-warp-mode', path, 'Warp requires exactly one of four points or controlPoints.');
+    }
+    if (hasPoints && points?.length !== 4) {
+      issue(issues, 'image-distortion-warp-points', path + '.points', 'Quad warp requires exactly four points.');
+    }
+  } else {
+    if (points !== undefined) {
+      issue(issues, 'image-distortion-points-unsupported', path + '.points', 'Points are only supported by perspective and warp.');
+    }
+    if (handles !== undefined) {
+      issue(issues, 'image-distortion-handles-unsupported', path + '.controlPoints', 'Control points are only supported by warp.');
+    }
+  }
+}
+
+function validateImageMeshWarpValue(
+  mesh: VisualImageNodeProps['meshWarp'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!mesh) return;
+  for (const key of ['gridX','gridY'] as const) {
+    const value = mesh[key];
+    if (
+      value !== undefined &&
+      (!finite(value) || value < 1 || !Number.isInteger(value))
+    ) {
+      issue(issues, 'image-mesh-grid', path + '.' + key, 'Mesh grid values must be positive integers.');
+    }
+  }
+  if (
+    mesh.interpolation !== undefined &&
+    !['nearest','bilinear','bicubic'].includes(mesh.interpolation)
+  ) {
+    issue(issues, 'image-mesh-interpolation', path + '.interpolation', 'Unsupported mesh interpolation.');
+  }
+  if (
+    mesh.edgeMode !== undefined &&
+    !['transparent','clamp','wrap','mirror'].includes(mesh.edgeMode)
+  ) {
+    issue(issues, 'image-mesh-edge-mode', path + '.edgeMode', 'Unsupported mesh edge mode.');
+  }
+  const rows = mesh.controlPoints?.length ?? 0;
+  const columns = mesh.controlPoints?.[0]?.length ?? 0;
+  if (!rows || !columns) {
+    issue(issues, 'image-mesh-control-points', path + '.controlPoints', 'Mesh controlPoints are required and rows cannot be empty.');
+    return;
+  }
+  if (rows > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-mesh-limit', path + '.controlPoints', 'Mesh rows exceed the runtime collection limit.');
+  }
+  let total = 0;
+  mesh.controlPoints?.forEach((row, rowIndex) => {
+    total += row.length;
+    if (!row.length || row.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+      issue(issues, 'image-mesh-row-limit', path + '.controlPoints[' + rowIndex + ']', 'Mesh row size is outside the runtime collection limit.');
+    }
+    if (row.length !== columns) {
+      issue(issues, 'image-mesh-rectangular', path + '.controlPoints[' + rowIndex + ']', 'Mesh controlPoints must form a rectangular grid.');
+    }
+    row.forEach((point, columnIndex) => {
+      if (!finite(point.x) || !finite(point.y)) {
+        issue(issues, 'image-mesh-point', path + '.controlPoints[' + rowIndex + '][' + columnIndex + ']', 'Mesh point coordinates must be finite.');
+      }
+    });
+  });
+  if (total > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-mesh-total-limit', path + '.controlPoints', 'Mesh points exceed the runtime collection limit.');
+  }
+  const gridX = mesh.gridX ?? Math.max(1, columns - 1);
+  const gridY = mesh.gridY ?? Math.max(1, rows - 1);
+  if (gridX * gridY > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(issues, 'image-mesh-cell-limit', path, 'Mesh cell count exceeds the runtime collection limit.');
+  }
+  const modern = rows === gridY + 1 && columns === gridX + 1;
+  const legacy = rows === gridY && columns === gridX;
+  if (!modern && !legacy) {
+    issue(issues, 'image-mesh-dimensions', path + '.controlPoints', 'Mesh controlPoints must be gridY+1 × gridX+1 vertices or the legacy gridY × gridX anchor grid.');
+  }
+}
+
+function validateImageEffectsValue(
+  effects: VisualImageNodeProps['effects'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!effects) return;
+  validateFiniteNumericLeaves(effects, path, issues);
+}
+
+function validateBoxBackgroundValue(
+  value: VisualImageNodeProps['boxBackground'] | undefined,
+  path: string,
+  issues: VisualProjectIssue[],
+) {
+  if (!value) return;
+  // The current runtime only enforces finite numeric leaves for this public shape.
+  validateFiniteNumericLeaves(value, path, issues);
+}
+
 function validateStrokeShadowLike(
   value: unknown,
   path: string,
@@ -596,13 +937,318 @@ function validateStrokeShadowLike(
     issue(issues, 'image-effect-object', path, 'Effect configuration must be an object.');
     return;
   }
-  for (const key of ['width','position','blur','opacity','offsetX','offsetY']) {
-    if (object[key] !== undefined && !finite(object[key])) {
-      issue(issues, 'image-effect-number', path + '.' + key, 'Effect values must be finite numbers.');
+  validateFiniteNumericLeaves(object, path, issues);
+}
+
+
+function validateStandaloneGroupTransform(
+  project: VisualProject,
+  group: NonNullable<VisualCreateImageOptions['groupTransform']>,
+  path: string,
+  width: number,
+  height: number,
+  issues: VisualProjectIssue[],
+) {
+  validateFiniteNumericLeaves(group, path, issues);
+
+  if (group.scaleX !== undefined && group.scaleX <= 0) {
+    issue(issues, 'image-group-scale', path + '.scaleX', 'Group scaleX must be greater than 0.');
+  }
+  if (group.scaleY !== undefined && group.scaleY <= 0) {
+    issue(issues, 'image-group-scale', path + '.scaleY', 'Group scaleY must be greater than 0.');
+  }
+  if (group.opacity !== undefined && (group.opacity < 0 || group.opacity > 1)) {
+    issue(issues, 'image-group-opacity', path + '.opacity', 'Group opacity must be between 0 and 1.');
+  }
+  if (group.blur !== undefined && group.blur < 0) {
+    issue(issues, 'image-group-blur', path + '.blur', 'Group blur must be non-negative.');
+  }
+  if (group.filterIntensity !== undefined && group.filterIntensity < 0) {
+    issue(issues, 'image-group-filter-intensity', path + '.filterIntensity', 'Group filter intensity must be non-negative.');
+  }
+  if (group.blendMode !== undefined && !IMAGE_BLEND_MODES.includes(group.blendMode)) {
+    issue(issues, 'image-group-blend', path + '.blendMode', 'Unsupported group blend mode.');
+  }
+  if (
+    group.borderRadius !== undefined &&
+    group.borderRadius !== 'circular' &&
+    (!finite(group.borderRadius) || group.borderRadius < 0)
+  ) {
+    issue(issues, 'image-group-radius', path + '.borderRadius', 'Group border radius must be non-negative or circular.');
+  }
+  if (
+    group.filterOrder !== undefined &&
+    group.filterOrder !== 'pre' &&
+    group.filterOrder !== 'post'
+  ) {
+    issue(issues, 'image-group-filter-order', path + '.filterOrder', 'Group filter order must be pre or post.');
+  }
+  if ((group.filters?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxFiltersPerOperation) {
+    issue(issues, 'image-group-filter-limit', path + '.filters', 'Group filters exceed the runtime filter limit.');
+  }
+  group.filters?.forEach((filter, index) =>
+    validateFilter(filter, path + '.filters[' + index + ']', issues, width, height),
+  );
+  validateMaskValue(project, group.mask, path + '.mask', issues);
+  validateClipPathValue(group.clipPath, path + '.clipPath', issues);
+  validateImageDistortionValue(group.distortion, path + '.distortion', issues);
+  validateImageMeshWarpValue(group.meshWarp, path + '.meshWarp', issues);
+  validateImageEffectsValue(group.effects, path + '.effects', issues);
+  validateStrokeShadowLike(group.stroke, path + '.stroke', issues);
+  validateStrokeShadowLike(group.shadow, path + '.shadow', issues);
+  validateBoxBackgroundValue(group.boxBackground, path + '.boxBackground', issues);
+}
+
+export function validateVisualImageBatchGroup(
+  project: VisualProject,
+  node: VisualNode,
+  issues: VisualProjectIssue[],
+) {
+  const batch = visualImageBatchGroupProps(node);
+  if (!batch) return;
+
+  const path = 'document.nodes.' + node.id;
+  const children = node.childIds ?? [];
+  const childNodes: VisualNode[] = [];
+
+  if (children.length < 2) {
+    issue(
+      issues,
+      'image-batch-size',
+      path + '.childIds',
+      'A createImage ImageProperties[] batch requires at least two image/shape children.',
+    );
+  }
+  if (children.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(
+      issues,
+      'image-batch-limit',
+      path + '.childIds',
+      'Image batch exceeds the runtime collection limit.',
+    );
+  }
+
+  for (const childId of children) {
+    const child = project.document.nodes[childId];
+    if (!child || (child.kind !== 'image' && child.kind !== 'shape')) {
+      issue(
+        issues,
+        'image-batch-child',
+        path + '.childIds',
+        'Image batch groups may contain only image/shape children.',
+      );
+      continue;
+    }
+    childNodes.push(child);
+
+    const childProps = visualImageProps(child);
+    if (childProps.createOptions || childProps.painterOpts) {
+      issue(
+        issues,
+        'image-batch-child-call-options',
+        'document.nodes.' + child.id + '.props',
+        'Call-level createImage options belong to the image batch group, not an individual batch child.',
+      );
     }
   }
-  if (finite(object.opacity) && (object.opacity < 0 || object.opacity > 1)) {
-    issue(issues, 'image-effect-opacity', path + '.opacity', 'Effect opacity must be between 0 and 1.');
+
+  if (
+    batch.createOptions.isGrouped !== undefined &&
+    typeof batch.createOptions.isGrouped !== 'boolean'
+  ) {
+    issue(
+      issues,
+      'image-batch-is-grouped',
+      path + '.props.createOptions.isGrouped',
+      'createImage options.isGrouped must be boolean.',
+    );
+  }
+  if (
+    batch.painterOpts?.resolveAssetRefs !== undefined &&
+    typeof batch.painterOpts.resolveAssetRefs !== 'boolean'
+  ) {
+    issue(
+      issues,
+      'image-batch-painter-opts',
+      path + '.props.painterOpts.resolveAssetRefs',
+      'Image batch painterOpts.resolveAssetRefs must be boolean.',
+    );
+  }
+
+  const group = batch.createOptions.groupTransform;
+  if (!group) return;
+
+  const groupPath = path + '.props.createOptions.groupTransform';
+  validateFiniteNumericLeaves(group, groupPath, issues);
+
+  if (group.scaleX !== undefined && group.scaleX <= 0) {
+    issue(
+      issues,
+      'image-group-scale',
+      groupPath + '.scaleX',
+      'Group scaleX must be greater than 0.',
+    );
+  }
+  if (group.scaleY !== undefined && group.scaleY <= 0) {
+    issue(
+      issues,
+      'image-group-scale',
+      groupPath + '.scaleY',
+      'Group scaleY must be greater than 0.',
+    );
+  }
+  if (
+    group.opacity !== undefined &&
+    (group.opacity < 0 || group.opacity > 1)
+  ) {
+    issue(
+      issues,
+      'image-group-opacity',
+      groupPath + '.opacity',
+      'Group opacity must be between 0 and 1.',
+    );
+  }
+  if (group.blur !== undefined && group.blur < 0) {
+    issue(
+      issues,
+      'image-group-blur',
+      groupPath + '.blur',
+      'Group blur must be non-negative.',
+    );
+  }
+  if (
+    group.filterIntensity !== undefined &&
+    group.filterIntensity < 0
+  ) {
+    issue(
+      issues,
+      'image-group-filter-intensity',
+      groupPath + '.filterIntensity',
+      'Group filter intensity must be non-negative.',
+    );
+  }
+  if (
+    group.blendMode !== undefined &&
+    !IMAGE_BLEND_MODES.includes(group.blendMode)
+  ) {
+    issue(
+      issues,
+      'image-group-blend',
+      groupPath + '.blendMode',
+      'Unsupported group blend mode.',
+    );
+  }
+  if (
+    group.borderRadius !== undefined &&
+    group.borderRadius !== 'circular' &&
+    (!finite(group.borderRadius) || group.borderRadius < 0)
+  ) {
+    issue(
+      issues,
+      'image-group-radius',
+      groupPath + '.borderRadius',
+      'Group border radius must be non-negative or circular.',
+    );
+  }
+  if (
+    group.filterOrder !== undefined &&
+    group.filterOrder !== 'pre' &&
+    group.filterOrder !== 'post'
+  ) {
+    issue(
+      issues,
+      'image-group-filter-order',
+      groupPath + '.filterOrder',
+      'Group filter order must be pre or post.',
+    );
+  }
+
+  if (
+    (group.filters?.length ?? 0) >
+    CANVAS_RUNTIME_LIMITS.maxFiltersPerOperation
+  ) {
+    issue(
+      issues,
+      'image-group-filter-limit',
+      groupPath + '.filters',
+      'Group filters exceed the runtime filter limit.',
+    );
+  }
+  group.filters?.forEach((filter, index) =>
+    validateFilter(
+      filter,
+      groupPath + '.filters[' + index + ']',
+      issues,
+      node.transform?.width ?? project.document.width,
+      node.transform?.height ?? project.document.height,
+    ),
+  );
+
+  validateMaskValue(project, group.mask, groupPath + '.mask', issues);
+  validateClipPathValue(group.clipPath, groupPath + '.clipPath', issues);
+  validateImageDistortionValue(
+    group.distortion,
+    groupPath + '.distortion',
+    issues,
+  );
+  validateImageMeshWarpValue(
+    group.meshWarp,
+    groupPath + '.meshWarp',
+    issues,
+  );
+  validateImageEffectsValue(group.effects, groupPath + '.effects', issues);
+  validateStrokeShadowLike(group.stroke, groupPath + '.stroke', issues);
+  validateStrokeShadowLike(group.shadow, groupPath + '.shadow', issues);
+  validateBoxBackgroundValue(
+    group.boxBackground,
+    groupPath + '.boxBackground',
+    issues,
+  );
+
+  // When the runtime creates the temporary grouped surface, its dimensions
+  // must obey the same resource budget as any other canvas allocation.
+  if (
+    batch.createOptions.isGrouped &&
+    childNodes.length > 1
+  ) {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const child of childNodes) {
+      const x = child.transform?.x ?? 0;
+      const y = child.transform?.y ?? 0;
+      const width = child.transform?.width ?? 100;
+      const height = child.transform?.height ?? 100;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x + width);
+      maxY = Math.max(maxY, y + height);
+    }
+    const groupWidth = Math.max(1, maxX - minX);
+    const groupHeight = Math.max(1, maxY - minY);
+    if (
+      groupWidth > CANVAS_RUNTIME_LIMITS.maxCanvasDimension ||
+      groupHeight > CANVAS_RUNTIME_LIMITS.maxCanvasDimension
+    ) {
+      issue(
+        issues,
+        'image-group-dimension-limit',
+        groupPath,
+        'Grouped image surface exceeds the pinned runtime dimension limit.',
+      );
+    }
+    if (
+      groupWidth * groupHeight >
+      CANVAS_RUNTIME_LIMITS.maxTotalPixels
+    ) {
+      issue(
+        issues,
+        'image-group-pixel-limit',
+        groupPath,
+        'Grouped image surface exceeds the pinned runtime total-pixel limit.',
+      );
+    }
   }
 }
 
@@ -616,6 +1262,40 @@ export function validateVisualImageNode(
   const props = visualImageProps(node);
 
   validateSource(project, props.source, path + '.props.source', issues);
+
+  const width = node.transform?.width;
+  const height = node.transform?.height;
+  if (
+    width !== undefined &&
+    (width <= 0 || width > CANVAS_RUNTIME_LIMITS.maxCanvasDimension)
+  ) {
+    issue(issues, 'image-width', path + '.transform.width', 'Image width must be within the pinned runtime canvas-dimension limit.');
+  }
+  if (
+    height !== undefined &&
+    (height <= 0 || height > CANVAS_RUNTIME_LIMITS.maxCanvasDimension)
+  ) {
+    issue(issues, 'image-height', path + '.transform.height', 'Image height must be within the pinned runtime canvas-dimension limit.');
+  }
+  if (
+    width !== undefined &&
+    height !== undefined &&
+    width * height > CANVAS_RUNTIME_LIMITS.maxTotalPixels
+  ) {
+    issue(issues, 'image-pixel-limit', path + '.transform', 'Image dimensions exceed the pinned runtime total-pixel limit.');
+  }
+
+  if (
+    props.painterOpts?.resolveAssetRefs !== undefined &&
+    typeof props.painterOpts.resolveAssetRefs !== 'boolean'
+  ) {
+    issue(
+      issues,
+      'image-painter-opts-resolve-asset-refs',
+      path + '.props.painterOpts.resolveAssetRefs',
+      'createImage painterOpts.resolveAssetRefs must be boolean when provided.',
+    );
+  }
 
   if (node.kind === 'shape') {
     if (typeof props.source !== 'string' || !IMAGE_SHAPE_TYPES.includes(props.source as VisualShapeType)) {
@@ -688,6 +1368,9 @@ export function validateVisualImageNode(
     });
   }
 
+  if ((props.filters?.length ?? 0) > CANVAS_RUNTIME_LIMITS.maxFiltersPerOperation) {
+    issue(issues, 'image-filter-limit', path + '.props.filters', 'Image filters exceed the runtime filter limit.');
+  }
   props.filters?.forEach((filter, index) =>
     validateFilter(
       filter,
@@ -698,34 +1381,28 @@ export function validateVisualImageNode(
     ),
   );
 
-  if (props.mask) validateSource(project, props.mask.source, path + '.props.mask.source', issues);
+  validateMaskValue(project, props.mask, path + '.props.mask', issues);
+  validateClipPathValue(props.clipPath, path + '.props.clipPath', issues);
 
-  props.clipPath?.forEach((point, index) => {
-    if (!finite(point.x) || !finite(point.y)) {
-      issue(issues, 'image-clip-point', path + '.props.clipPath[' + index + ']', 'Clip-path points must be finite.');
-    }
-  });
+  validateImageDistortionValue(
+    props.distortion,
+    path + '.props.distortion',
+    issues,
+  );
+  validateImageMeshWarpValue(
+    props.meshWarp,
+    path + '.props.meshWarp',
+    issues,
+  );
 
-  if (props.distortion) {
-    if (!['perspective','warp','bulge','pinch'].includes(props.distortion.type)) {
-      issue(issues, 'image-distortion', path + '.props.distortion.type', 'Unsupported distortion type.');
-    }
-    if (props.distortion.intensity !== undefined && !finite(props.distortion.intensity)) {
-      issue(issues, 'image-distortion-intensity', path + '.props.distortion.intensity', 'Distortion intensity must be finite.');
-    }
-  }
-
-  if (props.meshWarp) {
-    for (const key of ['gridX','gridY'] as const) {
-      const value = props.meshWarp[key];
-      if (value !== undefined && (!finite(value) || value < 1)) {
-        issue(issues, 'image-mesh-grid', path + '.props.meshWarp.' + key, 'Mesh grid values must be positive.');
-      }
-    }
-  }
-
+  validateImageEffectsValue(props.effects, path + '.props.effects', issues);
   validateStrokeShadowLike(props.stroke, path + '.props.stroke', issues);
   validateStrokeShadowLike(props.shadow, path + '.props.shadow', issues);
+  validateBoxBackgroundValue(
+    props.boxBackground,
+    path + '.props.boxBackground',
+    issues,
+  );
 
   if (props.shape) {
     for (const key of ['radius','sides','innerRadius','outerRadius','startAngle','endAngle','centerX','centerY'] as const) {
@@ -734,23 +1411,60 @@ export function validateVisualImageNode(
         issue(issues, 'shape-number', path + '.props.shape.' + key, 'Shape numeric values must be finite.');
       }
     }
+    if (props.shape.radius !== undefined && props.shape.radius <= 0) {
+      issue(issues, 'shape-radius', path + '.props.shape.radius', 'Shape radius must be greater than 0.');
+    }
+    if (
+      props.shape.innerRadius !== undefined &&
+      props.shape.innerRadius < 0
+    ) {
+      issue(issues, 'shape-inner-radius', path + '.props.shape.innerRadius', 'Shape inner radius must be non-negative.');
+    }
+    if (
+      props.shape.outerRadius !== undefined &&
+      props.shape.outerRadius <= 0
+    ) {
+      issue(issues, 'shape-outer-radius', path + '.props.shape.outerRadius', 'Shape outer radius must be greater than 0.');
+    }
+    if (
+      props.shape.sides !== undefined &&
+      (!Number.isInteger(props.shape.sides) || props.shape.sides < 3)
+    ) {
+      issue(issues, 'shape-sides', path + '.props.shape.sides', 'Shape sides must be an integer of at least 3.');
+    }
+    if (
+      props.shape.sides !== undefined &&
+      props.shape.sides > CANVAS_RUNTIME_LIMITS.maxCollectionItems
+    ) {
+      issue(issues, 'shape-sides-limit', path + '.props.shape.sides', 'Shape sides exceed the runtime collection limit.');
+    }
+    if (
+      props.shape.points !== undefined &&
+      (props.shape.points.length < 1 ||
+        props.shape.points.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems)
+    ) {
+      issue(issues, 'shape-points-limit', path + '.props.shape.points', 'Shape points must contain 1..' + String(CANVAS_RUNTIME_LIMITS.maxCollectionItems) + ' points.');
+    }
     props.shape.points?.forEach((point, index) => {
       if (!finite(point.x) || !finite(point.y)) {
         issue(issues, 'shape-point', path + '.props.shape.points[' + index + ']', 'Shape points must be finite.');
       }
     });
+    validateGradientValue(
+      props.shape.gradient,
+      path + '.props.shape.gradient',
+      issues,
+    );
   }
 
   if (props.createOptions?.groupTransform) {
-    const group = props.createOptions.groupTransform;
-    for (const key of ['rotation','translateX','translateY','scaleX','scaleY','pivotX','pivotY','opacity','blur','filterIntensity'] as const) {
-      const value = group[key];
-      if (value !== undefined && !finite(value)) {
-        issue(issues, 'image-group-number', path + '.props.createOptions.groupTransform.' + key, 'Group transform values must be finite.');
-      }
-    }
-    group.filters?.forEach((filter, index) =>
-      validateFilter(filter, path + '.props.createOptions.groupTransform.filters[' + index + ']', issues),
+    validateStandaloneGroupTransform(
+      project,
+      props.createOptions.groupTransform,
+      path + '.props.createOptions.groupTransform',
+      node.transform?.width ?? project.document.width,
+      node.transform?.height ?? project.document.height,
+      issues,
     );
   }
 

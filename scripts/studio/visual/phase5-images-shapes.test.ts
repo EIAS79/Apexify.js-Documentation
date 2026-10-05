@@ -322,9 +322,9 @@ test('Phase 5 rejects invalid filter ranges and stale parameters', () => {
   assert.equal(validation.ok, true, JSON.stringify(validation.issues));
 });
 
-test('Phase 5 permanent image inspector uses strict per-filter fields', () => {
-  const shell = fs.readFileSync(
-    'components/studio/visual/VisualStudioPre4.tsx',
+test('Phase 5 permanent image inspector uses strict typed per-filter fields', () => {
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualImageInspector.tsx',
     'utf8',
   );
   const contract = fs.readFileSync(
@@ -332,38 +332,54 @@ test('Phase 5 permanent image inspector uses strict per-filter fields', () => {
     'utf8',
   );
 
-  assert.match(shell, /data-image-filter-contract="strict"/);
-  assert.match(shell, /IMAGE_FILTER_PARAMETERLESS_TYPES/);
-  assert.match(shell, /data-filter-boolean/);
-  assert.match(shell, /Allowed: \{field\.help\}/);
-  assert.match(shell, /updateVisualImageFilterValue/);
-  assert.match(shell, /Global multiplier/);
+  assert.match(inspector, /data-image-v2-filter-stack/);
+  assert.match(inspector, /IMAGE_FILTER_PARAMETERLESS_TYPES/);
+  assert.match(inspector, /imageFilterFieldSpecs/);
+  assert.match(inspector, /updateVisualImageFilterValue/);
+  assert.match(inspector, /Filter intensity/);
+  assert.match(inspector, /Filter order/);
   assert.match(contract, /Region X/);
   assert.match(contract, /Region width/);
   assert.match(contract, /widthMinusOne/);
 });
 
-test('Phase 5 permanent shell exposes image shape asset workflows and authoritative artboard', () => {
+test('Phase 5 permanent shell and rebuilt inspector expose image shape asset workflows and authoritative artboard', () => {
   const shell = fs.readFileSync(
     'components/studio/visual/VisualStudioPre4.tsx',
     'utf8',
   );
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualImageInspector.tsx',
+    'utf8',
+  );
+
   for (const contract of [
     'data-visual-images-context',
     'data-visual-shapes-context',
     'data-visual-assets-context',
     'data-image-drop-target',
     'data-authoritative-apexify-frame',
-    'data-image-section="appearance"',
-    'data-image-section="stroke"',
-    'data-image-section="filters"',
-    'data-image-section="mask"',
-    'data-image-section="source"',
-    'data-image-section="complete-config"',
-    'Generated-buffer source',
-    'Replace with Studio asset',
+    'VisualImageInspector',
+    'VisualImageBatchInspector',
   ]) {
-    assert.ok(shell.includes(contract), 'missing Phase 5 UI contract: ' + contract);
+    assert.ok(shell.includes(contract), 'missing shell image contract: ' + contract);
+  }
+
+  for (const contract of [
+    'attr="appearance"',
+    'attr="stroke"',
+    'attr="filters"',
+    'attr="mask"',
+    'attr="source"',
+    'Generated buffer',
+    'Studio asset',
+    'data-image-v2-resolve-asset-refs',
+    'data-image-v2-no-json-primary',
+  ]) {
+    assert.ok(
+      inspector.includes(contract),
+      'missing rebuilt image inspector contract: ' + contract,
+    );
   }
 });
 
@@ -372,7 +388,7 @@ test('Phase 5 classifies every pinned image, shape and createImage option into t
   assert.deepEqual(Object.keys(IMAGE_AUTHORING_CLASSIFICATION).sort(), [
     'align','blendMode','blur','borderPosition','borderRadius','boxBackground',
     'clipPath','distortion','effects','filterIntensity','filterOrder','filters',
-    'fit','height','inherit','mask','meshWarp','opacity','rotation','shadow',
+    'fit','height','inherit','mask','meshWarp','opacity','painterOpts','rotation','shadow',
     'shape','source','stroke','utilityAnalyses','utilityStack','width','x','y',
   ].sort());
   assert.deepEqual(Object.keys(CREATE_IMAGE_OPTIONS_CLASSIFICATION).sort(), [
