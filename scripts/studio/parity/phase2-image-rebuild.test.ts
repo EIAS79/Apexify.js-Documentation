@@ -358,3 +358,47 @@ test('STUDIO-PARITY-2 rebuilt inspector owns selected image authoring without ra
   const imageContext = shell.slice(imagesStart, assetsStart > imagesStart ? assetsStart : undefined);
   assert.doesNotMatch(imageContext, /distortion|meshWarp|filterIntensity|groupTransform/);
 });
+
+
+test('STUDIO-PARITY-2 preserves image-array batching without forcing isGrouped', () => {
+  let project = baseProject();
+  const first = imageNode('image_seq_a', 'https://example.com/a.png', 10, 20);
+  const second = imageNode('image_seq_b', 'https://example.com/b.png', 220, 20);
+  project.document.nodes[first.id] = first;
+  project.document.nodes[second.id] = second;
+  project.document.rootNodeIds = [first.id, second.id];
+  project = groupNodes(
+    project,
+    [first.id, second.id],
+    'group_seq',
+    'Sequential image batch',
+  );
+  project.document.nodes.group_seq.props = imageBatchGroupPropsRecord({
+    imageBatch: true,
+    createOptions: {},
+  });
+
+  const plan = lowerVisualProject(project);
+  const imageOps = plan.operations.filter((item) => item.kind === 'create-image');
+  assert.equal(imageOps.length, 1);
+  const operation = imageOps[0]!;
+  assert.equal(operation.kind, 'create-image');
+  if (operation.kind !== 'create-image') return;
+  assert.ok(Array.isArray(operation.properties));
+  assert.equal(operation.options, undefined);
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /createImage\(\s*\[/);
+  assert.doesNotMatch(source, /isGrouped:/);
+
+  const reconciled = reconcileVisualProjectFromCode(baseProject(), source);
+  assert.equal(reconciled.ok, true);
+  if (!reconciled.ok) return;
+  const root =
+    reconciled.project.document.nodes[
+      reconciled.project.document.rootNodeIds[0]!
+    ];
+  const batch = visualImageBatchGroupProps(root);
+  assert.ok(batch);
+  assert.equal(batch?.createOptions.isGrouped, undefined);
+});
