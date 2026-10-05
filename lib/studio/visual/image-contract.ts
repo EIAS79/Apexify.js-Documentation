@@ -490,12 +490,7 @@ export function visualImageBatchGroupProps(
   if (raw.imageBatch !== true) return null;
   return {
     imageBatch: true,
-    createOptions: {
-      isGrouped: true,
-      ...(raw.createOptions?.groupTransform
-        ? { groupTransform: structuredClone(raw.createOptions.groupTransform) }
-        : {}),
-    },
+    createOptions: structuredClone(raw.createOptions ?? {}),
     ...(raw.painterOpts
       ? { painterOpts: structuredClone(raw.painterOpts) }
       : {}),
