@@ -66,6 +66,7 @@ import {
   VisualPhase9Inspector,
 } from '@/components/studio/visual/VisualSceneComponentAuthoring';
 import { VisualImageUtilityAuthoring } from '@/components/studio/visual/VisualImageUtilityAuthoring';
+import { VisualImageInspector } from '@/components/studio/visual/VisualImageInspector';
 import {
   VisualGifContext,
   VisualGifTimeline,
@@ -6620,7 +6621,38 @@ export default function VisualStudioPre4({
     }
 
     if (primaryMedia) {
-      return renderMediaInspector();
+      const primaryIndex = layerIds.indexOf(primaryMedia.id);
+      const generatedNodes = layerIds
+        .slice(0, Math.max(0, primaryIndex))
+        .map((id) => project.document.nodes[id])
+        .filter(
+          (node): node is VisualNode =>
+            Boolean(
+              node &&
+                (node.kind === 'image' ||
+                  node.kind === 'shape' ||
+                  node.kind === 'text' ||
+                  node.kind === 'chart' ||
+                  node.kind === 'scene' ||
+                  node.kind === 'surface'),
+            ),
+        );
+      return (
+        <VisualImageInspector
+          project={project}
+          node={primaryMedia}
+          tab={inspectorTab}
+          imageAssets={imageAssets}
+          generatedNodes={generatedNodes}
+          onChange={mutateImage}
+          onRename={(name) =>
+            mutate('Rename image layer', (current) =>
+              renameNode(current, primaryMedia.id, name),
+            )
+          }
+          renderTransform={renderTransformFields}
+        />
+      );
     }
 
     if (!primary && activeTool === 'canvas') {
