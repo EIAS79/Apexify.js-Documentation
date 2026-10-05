@@ -948,17 +948,41 @@ export function validateVisualImageBatchGroup(
 ) {
   const batch = visualImageBatchGroupProps(node);
   if (!batch) return;
+
   const path = 'document.nodes.' + node.id;
   const children = node.childIds ?? [];
+  const childNodes: VisualNode[] = [];
+
   if (children.length < 2) {
-    issue(issues, 'image-batch-size', path + '.childIds', 'A createImage batch group requires at least two image/shape children.');
+    issue(
+      issues,
+      'image-batch-size',
+      path + '.childIds',
+      'A createImage ImageProperties[] batch requires at least two image/shape children.',
+    );
   }
+  if (children.length > CANVAS_RUNTIME_LIMITS.maxCollectionItems) {
+    issue(
+      issues,
+      'image-batch-limit',
+      path + '.childIds',
+      'Image batch exceeds the runtime collection limit.',
+    );
+  }
+
   for (const childId of children) {
     const child = project.document.nodes[childId];
     if (!child || (child.kind !== 'image' && child.kind !== 'shape')) {
-      issue(issues, 'image-batch-child', path + '.childIds', 'Image batch groups may contain only image/shape children.');
+      issue(
+        issues,
+        'image-batch-child',
+        path + '.childIds',
+        'Image batch groups may contain only image/shape children.',
+      );
       continue;
     }
+    childNodes.push(child);
+
     const childProps = visualImageProps(child);
     if (childProps.createOptions || childProps.painterOpts) {
       issue(
@@ -970,6 +994,17 @@ export function validateVisualImageBatchGroup(
     }
   }
 
+  if (
+    batch.createOptions.isGrouped !== undefined &&
+    typeof batch.createOptions.isGrouped !== 'boolean'
+  ) {
+    issue(
+      issues,
+      'image-batch-is-grouped',
+      path + '.props.createOptions.isGrouped',
+      'createImage options.isGrouped must be boolean.',
+    );
+  }
   if (
     batch.painterOpts?.resolveAssetRefs !== undefined &&
     typeof batch.painterOpts.resolveAssetRefs !== 'boolean'
@@ -984,39 +1019,179 @@ export function validateVisualImageBatchGroup(
 
   const group = batch.createOptions.groupTransform;
   if (!group) return;
-  for (const key of [
-    'rotation','translateX','translateY','scaleX','scaleY','pivotX','pivotY',
-    'opacity','blur','filterIntensity',
-  ] as const) {
-    const value = group[key];
-    if (value !== undefined && !finite(value)) {
-      issue(issues, 'image-group-number', path + '.props.createOptions.groupTransform.' + key, 'Group transform numeric values must be finite.');
-    }
-  }
+
+  const groupPath = path + '.props.createOptions.groupTransform';
+  validateFiniteNumericLeaves(group, groupPath, issues);
+
   if (group.scaleX !== undefined && group.scaleX <= 0) {
-    issue(issues, 'image-group-scale', path + '.props.createOptions.groupTransform.scaleX', 'Group scaleX must be greater than 0.');
+    issue(
+      issues,
+      'image-group-scale',
+      groupPath + '.scaleX',
+      'Group scaleX must be greater than 0.',
+    );
   }
   if (group.scaleY !== undefined && group.scaleY <= 0) {
-    issue(issues, 'image-group-scale', path + '.props.createOptions.groupTransform.scaleY', 'Group scaleY must be greater than 0.');
+    issue(
+      issues,
+      'image-group-scale',
+      groupPath + '.scaleY',
+      'Group scaleY must be greater than 0.',
+    );
   }
-  if (group.opacity !== undefined && (group.opacity < 0 || group.opacity > 1)) {
-    issue(issues, 'image-group-opacity', path + '.props.createOptions.groupTransform.opacity', 'Group opacity must be between 0 and 1.');
+  if (
+    group.opacity !== undefined &&
+    (group.opacity < 0 || group.opacity > 1)
+  ) {
+    issue(
+      issues,
+      'image-group-opacity',
+      groupPath + '.opacity',
+      'Group opacity must be between 0 and 1.',
+    );
   }
   if (group.blur !== undefined && group.blur < 0) {
-    issue(issues, 'image-group-blur', path + '.props.createOptions.groupTransform.blur', 'Group blur must be non-negative.');
+    issue(
+      issues,
+      'image-group-blur',
+      groupPath + '.blur',
+      'Group blur must be non-negative.',
+    );
   }
-  if (group.filterIntensity !== undefined && group.filterIntensity < 0) {
-    issue(issues, 'image-group-filter-intensity', path + '.props.createOptions.groupTransform.filterIntensity', 'Group filter intensity must be non-negative.');
+  if (
+    group.filterIntensity !== undefined &&
+    group.filterIntensity < 0
+  ) {
+    issue(
+      issues,
+      'image-group-filter-intensity',
+      groupPath + '.filterIntensity',
+      'Group filter intensity must be non-negative.',
+    );
+  }
+  if (
+    group.blendMode !== undefined &&
+    !IMAGE_BLEND_MODES.includes(group.blendMode)
+  ) {
+    issue(
+      issues,
+      'image-group-blend',
+      groupPath + '.blendMode',
+      'Unsupported group blend mode.',
+    );
+  }
+  if (
+    group.borderRadius !== undefined &&
+    group.borderRadius !== 'circular' &&
+    (!finite(group.borderRadius) || group.borderRadius < 0)
+  ) {
+    issue(
+      issues,
+      'image-group-radius',
+      groupPath + '.borderRadius',
+      'Group border radius must be non-negative or circular.',
+    );
+  }
+  if (
+    group.filterOrder !== undefined &&
+    group.filterOrder !== 'pre' &&
+    group.filterOrder !== 'post'
+  ) {
+    issue(
+      issues,
+      'image-group-filter-order',
+      groupPath + '.filterOrder',
+      'Group filter order must be pre or post.',
+    );
+  }
+
+  if (
+    (group.filters?.length ?? 0) >
+    CANVAS_RUNTIME_LIMITS.maxFiltersPerOperation
+  ) {
+    issue(
+      issues,
+      'image-group-filter-limit',
+      groupPath + '.filters',
+      'Group filters exceed the runtime filter limit.',
+    );
   }
   group.filters?.forEach((filter, index) =>
     validateFilter(
       filter,
-      path + '.props.createOptions.groupTransform.filters[' + index + ']',
+      groupPath + '.filters[' + index + ']',
       issues,
       node.transform?.width ?? project.document.width,
       node.transform?.height ?? project.document.height,
     ),
   );
+
+  validateMaskValue(project, group.mask, groupPath + '.mask', issues);
+  validateClipPathValue(group.clipPath, groupPath + '.clipPath', issues);
+  validateImageDistortionValue(
+    group.distortion,
+    groupPath + '.distortion',
+    issues,
+  );
+  validateImageMeshWarpValue(
+    group.meshWarp,
+    groupPath + '.meshWarp',
+    issues,
+  );
+  validateImageEffectsValue(group.effects, groupPath + '.effects', issues);
+  validateStrokeShadowLike(group.stroke, groupPath + '.stroke', issues);
+  validateStrokeShadowLike(group.shadow, groupPath + '.shadow', issues);
+  validateBoxBackgroundValue(
+    group.boxBackground,
+    groupPath + '.boxBackground',
+    issues,
+  );
+
+  // When the runtime creates the temporary grouped surface, its dimensions
+  // must obey the same resource budget as any other canvas allocation.
+  if (
+    batch.createOptions.isGrouped &&
+    childNodes.length > 1
+  ) {
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const child of childNodes) {
+      const x = child.transform?.x ?? 0;
+      const y = child.transform?.y ?? 0;
+      const width = child.transform?.width ?? 100;
+      const height = child.transform?.height ?? 100;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x + width);
+      maxY = Math.max(maxY, y + height);
+    }
+    const groupWidth = Math.max(1, maxX - minX);
+    const groupHeight = Math.max(1, maxY - minY);
+    if (
+      groupWidth > CANVAS_RUNTIME_LIMITS.maxCanvasDimension ||
+      groupHeight > CANVAS_RUNTIME_LIMITS.maxCanvasDimension
+    ) {
+      issue(
+        issues,
+        'image-group-dimension-limit',
+        groupPath,
+        'Grouped image surface exceeds the pinned runtime dimension limit.',
+      );
+    }
+    if (
+      groupWidth * groupHeight >
+      CANVAS_RUNTIME_LIMITS.maxTotalPixels
+    ) {
+      issue(
+        issues,
+        'image-group-pixel-limit',
+        groupPath,
+        'Grouped image surface exceeds the pinned runtime total-pixel limit.',
+      );
+    }
+  }
 }
 
 export function validateVisualImageNode(
