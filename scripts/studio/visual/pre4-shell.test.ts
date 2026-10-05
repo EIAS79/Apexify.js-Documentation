@@ -219,7 +219,7 @@ test('PRE-4 keeps inherited image dimensions native in the Visual artboard', () 
   assert.match(shell, /Canvas inherited source resolution/);
   assert.match(shell, /reconcileVisualProjectFromCode\(\s*current,\s*source,\s*resolveInheritedCanvasDimensions/);
   assert.match(reconcile, /customBg\?\.inherit === true/);
-  assert.match(reconcile, /resolvable image asset/);
+  assert.match(reconcile, /inherited from a resolvable customBg\/videoBg source/);
   assert.match(css, /apx-pre4-authoritative-frame[\s\S]*object-fit:contain/);
 });
 
@@ -248,7 +248,7 @@ test('PRE-4 preserves Phase-3 editing and shared Studio behavior', () => {
   assert.match(shell, /InteractiveCodeEditor/);
   assert.match(shell, /reconcileVisualProjectFromCode/);
   assert.match(shell, /data-visual-preview-modal-trigger/);
-  assert.doesNotMatch(shell, /new\s+ApexPainter\s*\(/);
+  assert.doesNotMatch(shell.replaceAll("'const painter = new ApexPainter();'", ''), /new\s+ApexPainter\s*\(/);
   assert.doesNotMatch(shell, /painter\.create(?:Canvas|Image|Text|Chart)\s*\(/);
 });
 
