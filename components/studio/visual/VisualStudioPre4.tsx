@@ -3816,7 +3816,35 @@ export default function VisualStudioPre4({
           key === 'y' ? value - rect.y : 0,
         );
       }
-      return patchNodeTransform(current, primary.id, { [key]: value });
+      const resized = patchNodeTransform(current, primary.id, { [key]: value });
+
+      // Width/height fields in Studio are explicit transforms. If an image was
+      // previously using contain/cover, the runtime preserves source aspect and
+      // can visually change the other axis. Manual dimension edits must instead
+      // mean exactly W × H, so switch the image to free/stretch sizing.
+      if (
+        currentNode.kind === 'image' &&
+        (key === 'width' || key === 'height')
+      ) {
+        const resizedNode = resized.document.nodes[primary.id];
+        if (!resizedNode) return resized;
+        const image = visualImageProps(resizedNode);
+        return {
+          ...resized,
+          document: {
+            ...resized.document,
+            nodes: {
+              ...resized.document.nodes,
+              [primary.id]: {
+                ...resizedNode,
+                props: imagePropsRecord({ ...image, fit: 'fill' }),
+              },
+            },
+          },
+        };
+      }
+
+      return resized;
     });
   };
 
