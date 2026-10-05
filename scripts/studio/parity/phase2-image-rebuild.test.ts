@@ -506,3 +506,80 @@ test('STUDIO-PARITY-2 resolves generated mask buffers and preserves stroke shado
     source,
   );
 });
+
+
+test('STUDIO-PARITY-2 resolves generated buffers inside groupTransform masks', () => {
+  let project = baseProject();
+  const maskSource = imageNode(
+    'batch_mask_source',
+    'https://example.com/mask.png',
+    0,
+    0,
+  );
+  const first = imageNode(
+    'batch_mask_a',
+    'https://example.com/a.png',
+    80,
+    40,
+  );
+  const second = imageNode(
+    'batch_mask_b',
+    'https://example.com/b.png',
+    280,
+    40,
+  );
+  project.document.nodes[maskSource.id] = maskSource;
+  project.document.nodes[first.id] = first;
+  project.document.nodes[second.id] = second;
+  project.document.rootNodeIds = [maskSource.id, first.id, second.id];
+
+  project = groupNodes(
+    project,
+    [first.id, second.id],
+    'batch_mask_group',
+    'Masked image batch',
+  );
+  project.document.nodes.batch_mask_group.props =
+    imageBatchGroupPropsRecord({
+      imageBatch: true,
+      createOptions: {
+        isGrouped: true,
+        groupTransform: {
+          scaleX: 1,
+          scaleY: 1,
+          opacity: 1,
+          mask: {
+            source: { $generated: maskSource.id },
+            mode: 'alpha',
+          },
+        },
+      },
+    });
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, true, JSON.stringify(validation.issues));
+
+  const plan = lowerVisualProject(project);
+  const imageOps = plan.operations.filter(
+    (operation) => operation.kind === 'create-image',
+  );
+  assert.equal(imageOps.length, 2);
+  const batch = imageOps[1]!;
+  assert.equal(batch.kind, 'create-image');
+  if (batch.kind !== 'create-image') return;
+  assert.deepEqual(
+    batch.options?.groupTransform?.mask?.source,
+    { $studioTarget: imageOps[0]!.target },
+  );
+
+  const source = generateVisualProjectCode(project).source;
+  assert.doesNotMatch(source, /\$generated/);
+
+  const reconciled = reconcileVisualProjectFromCode(baseProject(), source);
+  assert.equal(reconciled.ok, true);
+  if (!reconciled.ok) return;
+  assert.equal(
+    generateVisualProjectCode(reconciled.project).source,
+    source,
+  );
+});
