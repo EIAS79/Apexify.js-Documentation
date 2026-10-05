@@ -708,6 +708,7 @@ function imageNodeFromParsed(
   parentId: string | null,
   callOptions?: VisualCreateImageOptions,
   painterOpts?: { resolveAssetRefs?: boolean },
+  preferredName?: string,
 ) {
   if (parsed.source === undefined) {
     throw new Error('createImage() properties require source.');
@@ -771,6 +772,7 @@ function imageNodeFromParsed(
     kind,
     name:
       oldNode?.name ??
+      preferredName ??
       (shape
         ? 'Shape ' + String(index + 1)
         : 'Image ' + String(index + 1)),
@@ -829,6 +831,7 @@ function reconcileImageCall(
         matched?.parentId ?? null,
         options,
         painterOpts,
+        call.assignedIdentifier ?? undefined,
       );
     }
 
@@ -930,6 +933,7 @@ function reconcileImageCall(
     matched?.parentId ?? null,
     options,
     painterOpts,
+    call.assignedIdentifier ?? undefined,
   );
 }
 
