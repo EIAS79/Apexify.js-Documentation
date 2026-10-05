@@ -372,7 +372,7 @@ test('Phase 5 classifies every pinned image, shape and createImage option into t
   assert.deepEqual(Object.keys(IMAGE_AUTHORING_CLASSIFICATION).sort(), [
     'align','blendMode','blur','borderPosition','borderRadius','boxBackground',
     'clipPath','distortion','effects','filterIntensity','filterOrder','filters',
-    'fit','height','inherit','mask','meshWarp','opacity','rotation','shadow',
+    'fit','height','inherit','mask','meshWarp','opacity','painterOpts','rotation','shadow',
     'shape','source','stroke','utilityAnalyses','utilityStack','width','x','y',
   ].sort());
   assert.deepEqual(Object.keys(CREATE_IMAGE_OPTIONS_CLASSIFICATION).sort(), [
