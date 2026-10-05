@@ -404,3 +404,105 @@ test('STUDIO-PARITY-2 preserves image-array batching without forcing isGrouped',
   assert.ok(batch);
   assert.equal(batch?.createOptions.isGrouped, undefined);
 });
+
+
+test('STUDIO-PARITY-2 resolves generated mask buffers and preserves stroke shadow gradient transforms', () => {
+  const project = baseProject();
+  const maskSource = imageNode(
+    'mask_source',
+    'https://example.com/mask.png',
+    0,
+    0,
+  );
+  const target = imageNode(
+    'masked_target',
+    'https://example.com/target.png',
+    220,
+    40,
+  );
+  target.props = imagePropsRecord({
+    ...visualImageProps(target),
+    mask: {
+      source: { $generated: maskSource.id },
+      mode: 'luminance',
+    },
+    stroke: {
+      width: 3,
+      borderRadius: 8,
+      borderPosition: 'all',
+      roundedCorners: 'all',
+      gradient: {
+        type: 'linear',
+        startX: 0,
+        startY: 0,
+        endX: 180,
+        endY: 0,
+        rotate: 12,
+        pivotX: 90,
+        pivotY: 60,
+        colors: [
+          { stop: 0, color: '#ffffff' },
+          { stop: 1, color: '#2563eb' },
+        ],
+      },
+    },
+    shadow: {
+      offsetX: 4,
+      offsetY: 6,
+      blur: 8,
+      borderRadius: 8,
+      borderPosition: 'all',
+      roundedCorners: 'all',
+      gradient: {
+        type: 'radial',
+        startX: 90,
+        startY: 60,
+        startRadius: 0,
+        endX: 90,
+        endY: 60,
+        endRadius: 80,
+        rotate: 5,
+        pivotX: 90,
+        pivotY: 60,
+        colors: [
+          { stop: 0, color: '#000000' },
+          { stop: 1, color: '#475569' },
+        ],
+      },
+    },
+  });
+
+  project.document.nodes[maskSource.id] = maskSource;
+  project.document.nodes[target.id] = target;
+  project.document.rootNodeIds = [maskSource.id, target.id];
+
+  const validation = validateVisualProject(project);
+  assert.equal(validation.ok, true, JSON.stringify(validation.issues));
+
+  const plan = lowerVisualProject(project);
+  const imageOps = plan.operations.filter(
+    (operation) => operation.kind === 'create-image',
+  );
+  assert.equal(imageOps.length, 2);
+  const second = imageOps[1]!;
+  assert.equal(second.kind, 'create-image');
+  if (second.kind !== 'create-image' || Array.isArray(second.properties)) return;
+  assert.deepEqual(
+    (second.properties.mask as { source: unknown }).source,
+    { $studioTarget: imageOps[0]!.target },
+  );
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /mask:/);
+  assert.match(source, /rotate: 12/);
+  assert.match(source, /pivotX: 90/);
+  assert.doesNotMatch(source, /\$generated/);
+
+  const reconciled = reconcileVisualProjectFromCode(baseProject(), source);
+  assert.equal(reconciled.ok, true);
+  if (!reconciled.ok) return;
+  assert.equal(
+    generateVisualProjectCode(reconciled.project).source,
+    source,
+  );
+});
