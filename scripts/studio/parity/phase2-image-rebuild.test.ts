@@ -17,6 +17,7 @@ import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { validateVisualProject } from '../../../lib/studio/visual/compiler/validate';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
+import type { VisualNode } from '../../../lib/studio/visual/model';
 
 function baseProject() {
   return createVisualProject({
