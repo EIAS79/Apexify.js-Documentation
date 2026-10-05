@@ -1,0 +1,119 @@
+name: Studio Parity 2 — createImage
+
+on:
+  pull_request:
+    types:
+      - ready_for_review
+    paths:
+      - 'components/studio/visual/VisualImageInspector.tsx'
+      - 'components/studio/visual/VisualStudioPre4.tsx'
+      - 'lib/studio/visual/model.ts'
+      - 'lib/studio/visual/image-contract.ts'
+      - 'lib/studio/visual/compiler/**'
+      - 'lib/studio/visual/codegen/**'
+      - 'scripts/studio/parity/phase2-image-*.ts'
+      - 'scripts/studio/parity/finalize-image.ts'
+      - 'scripts/studio/visual/phase5-images-shapes.test.ts'
+      - 'scripts/studio/visual/phase10-image-effects.test.ts'
+      - 'package.json'
+      - '.github/workflows/studio-parity-2-image.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: studio-parity-2-cert-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  image-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      APEXIFY_RUNTIME_ROOT: ${{ github.workspace }}/runtime-source
+      APEXIFY_RUNTIME_COMMIT: a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a
+
+    steps:
+      - name: Checkout Studio documentation repository
+        uses: actions/checkout@v4
+        with:
+          path: studio
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Checkout pinned Apexify.js runtime source
+        uses: actions/checkout@v4
+        with:
+          repository: EIAS79/Apexify.js
+          ref: a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a
+          path: runtime-source
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: studio/package-lock.json
+
+      - name: Install Studio tooling
+        working-directory: studio
+        run: npm ci --ignore-scripts --prefer-offline --no-audit --no-fund
+
+      - name: Install pinned runtime dependencies
+        working-directory: runtime-source
+        run: npm ci --ignore-scripts --prefer-offline --no-audit --no-fund
+
+      - name: Run createImage parity regression tests
+        working-directory: studio
+        run: npm run studio:parity:image:test
+
+      - name: Prove preview and codegen against pinned createImage runtime
+        working-directory: studio
+        run: npm run studio:parity:image:runtime
+
+      - name: Generate recursive createImage evidence closure
+        working-directory: studio
+        run: |
+          npm run studio:parity:image:ledger
+          npm run studio:parity:image:ledger:check
+
+      - name: Typecheck parity tooling
+        working-directory: studio
+        run: npm run studio:parity:typecheck
+
+      - name: Upload Phase-2 image evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: studio-parity-2-image-evidence
+          path: |
+            studio/generated/studio/runtime-parity/phases/phase-2-image.json
+            studio/generated/studio/runtime-parity/phases/PHASE-2-COMPLETION.md
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Commit deterministic Phase-2 evidence
+        if: >-
+          success() &&
+          github.event_name == 'pull_request' &&
+          github.event.pull_request.head.repo.full_name == github.repository &&
+          github.head_ref == 'studio-parity-2-image'
+        working-directory: studio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add generated/studio/runtime-parity/phases/phase-2-image.json
+          git add generated/studio/runtime-parity/phases/PHASE-2-COMPLETION.md
+          if git diff --cached --quiet; then
+            echo "Phase-2 image evidence already committed."
+          else
+            remote_sha="$(git ls-remote origin refs/heads/studio-parity-2-image | cut -f1)"
+            local_sha="$(git rev-parse HEAD)"
+            if [ -n "$remote_sha" ] && [ "$remote_sha" != "$local_sha" ]; then
+              echo "studio-parity-2-image advanced during this run; skipping stale evidence push."
+              exit 0
+            fi
+            git commit -m "chore(studio-parity-2): commit createImage completion evidence [skip ci]"
+            git push origin HEAD:studio-parity-2-image
+          fi
