@@ -86,6 +86,7 @@ if (sharedVisual) {
       add(
         'scripts/studio/visual/phase5-images-shapes.test.ts',
         'scripts/studio/visual/phase10-image-effects.test.ts',
+        'scripts/studio/parity/phase2-image-rebuild.test.ts',
       );
     }
     if (/text-contract|phase6-text-fonts|VisualText/.test(file)) {
