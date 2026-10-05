@@ -321,7 +321,7 @@ test('STUDIO-PARITY-2 canonical image arrays reverse-sync back into one image gr
   assert.equal(batch?.createOptions.isGrouped, true);
   assert.equal(restoredGroup.childIds?.length, 2);
   for (const childId of restoredGroup.childIds ?? []) {
-    const child = reconciled.project.document.nodes[childId];
+    const child: VisualNode = reconciled.project.document.nodes[childId]!;
     assert.ok(child?.kind === 'image' || child?.kind === 'shape');
     assert.equal(child.parentId, restoredGroup.id);
   }
