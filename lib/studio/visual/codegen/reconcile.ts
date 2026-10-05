@@ -624,18 +624,37 @@ function assertCanonicalBase(
   }
 }
 
-function parseCreateImageCallOptions(call: MethodCall): {
+function parseCreateImageCallOptions(
+  call: MethodCall,
+  identifiers: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
+): {
   options?: VisualCreateImageOptions;
   painterOpts?: { resolveAssetRefs?: boolean };
 } {
   let options: VisualCreateImageOptions | undefined;
   const rawOptions = call.args[2]?.trim();
   if (rawOptions && rawOptions !== 'undefined') {
-    const parsedOptions = new LiteralParser(rawOptions).parse();
+    const parsedOptions = new LiteralParser(rawOptions, true).parse();
     if (!isRecord(parsedOptions)) {
       throw new Error('createImage() options must be an object literal.');
     }
-    options = parsedOptions as unknown as VisualCreateImageOptions;
+    const normalizedOptions = parsedOptions as RecordValue;
+    const groupTransform = normalizedOptions.groupTransform;
+    if (isRecord(groupTransform) && isRecord(groupTransform.mask)) {
+      const maskSource = groupTransform.mask.source;
+      if (maskSource !== undefined) {
+        groupTransform.mask = {
+          ...groupTransform.mask,
+          source: imageSourceFromParsed(
+            maskSource,
+            identifiers,
+            canvasIdentifier,
+          ),
+        };
+      }
+    }
+    options = normalizedOptions as unknown as VisualCreateImageOptions;
   }
 
   let painterOpts: { resolveAssetRefs?: boolean } | undefined;
@@ -726,6 +745,17 @@ function imageNodeFromParsed(
     ...rest
   } = parsed;
 
+  if (isRecord(rest.mask) && rest.mask.source !== undefined) {
+    rest.mask = {
+      ...rest.mask,
+      source: imageSourceFromParsed(
+        rest.mask.source,
+        identifierToNodeId,
+        canvasIdentifier,
+      ),
+    };
+  }
+
   const props: VisualImageNodeProps = {
     ...(rest as unknown as Omit<
       VisualImageNodeProps,
@@ -774,7 +804,11 @@ function reconcileImageCall(
   assertCanonicalBase(call.args[1], identifierToNodeId, canvasIdentifier);
 
   const parsed = new LiteralParser(call.args[0], true).parse();
-  const { options, painterOpts } = parseCreateImageCallOptions(call);
+  const { options, painterOpts } = parseCreateImageCallOptions(
+    call,
+    identifierToNodeId,
+    canvasIdentifier,
+  );
 
   if (Array.isArray(parsed)) {
     if (!parsed.length) {
