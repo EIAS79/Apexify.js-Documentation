@@ -62,6 +62,7 @@ type Props = {
     updater: (current: VisualImageNodeProps) => VisualImageNodeProps,
   ) => void;
   onRename: (name: string) => void;
+  onInheritChange: (enabled: boolean) => void;
   renderTransform: () => ReactNode;
 };
 
@@ -1654,6 +1655,7 @@ export function VisualImageInspector({
   generatedNodes,
   onChange,
   onRename,
+  onInheritChange,
   renderTransform,
 }: Props) {
   const props = visualImageProps(node);
@@ -1748,10 +1750,17 @@ export function VisualImageInspector({
                 {IMAGE_ALIGNS.map((value) => <option key={value}>{value}</option>)}
               </select>
             </label>
-            <label className="apx-image-v2-check apx-canvas-check">
-              <input type="checkbox" checked={props.inherit ?? false} onChange={(event) => patch('Image inherit', { inherit: event.target.checked })} />
-              <span>Use source dimensions only when W/H are omitted</span>
-            </label>
+            <div className="apx-image-v2-toggle-row">
+              <span>
+                <strong>Inherit source size</strong>
+                <small>Use the image's intrinsic pixel dimensions and sync W/H immediately.</small>
+              </span>
+              <Toggle
+                label="Inherit source dimensions"
+                checked={props.inherit ?? false}
+                onChange={onInheritChange}
+              />
+            </div>
           </Section>
         ) : null}
       </>
