@@ -18,7 +18,11 @@ import {
   visualImageProps,
 } from '../image-contract';
 import { isCurrentUtilityInput } from '../image-utility-contract';
-import { visualTextProps } from '../text-contract';
+import {
+  isTextBatchGroup,
+  visualTextBatchGroupProps,
+  visualTextProps,
+} from '../text-contract';
 import {
   visualChartProps,
   type VisualStandaloneChartFamily,
@@ -125,7 +129,11 @@ export type StudioCreateTextOperation = {
   target: string;
   preferredName?: string;
   base: StudioTargetReference;
-  properties: StudioTextProperties;
+  properties: StudioTextProperties | StudioTextProperties[];
+  /** Third createText() argument from the pinned runtime contract. */
+  painterOpts?: {
+    resolveAssetRefs?: boolean;
+  };
 };
 
 export type StudioCreateChartOperation = {
@@ -344,7 +352,7 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
     if (node.transform?.visible === false) return;
 
     if (node.kind === 'group') {
-      if (isImageBatchGroup(node)) {
+      if (isImageBatchGroup(node) || isTextBatchGroup(node)) {
         out.push(node);
         return;
       }
@@ -616,7 +624,10 @@ function imageOperationProperties(
 }
 
 function textOperationProperties(node: VisualNode): StudioTextProperties {
-  const props = visualTextProps(node);
+  const {
+    painterOpts: _painterOpts,
+    ...props
+  } = visualTextProps(node);
   const transform = node.transform ?? {};
   const layout = {
     ...(props.layout ?? {}),
@@ -1004,6 +1015,54 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
       continue;
     }
 
+    if (node.kind === 'group' && isTextBatchGroup(node)) {
+      const batch = visualTextBatchGroupProps(node);
+      if (!batch) {
+        throw new Error('Text batch group is missing its runtime createText contract.');
+      }
+      const children = (node.childIds ?? []).map((childId) => {
+        const child = normalized.document.nodes[childId];
+        if (!child || child.kind !== 'text') {
+          throw new Error(
+            'Text batch group "' + node.id + '" may contain only text children.',
+          );
+        }
+        return child;
+      });
+      if (children.length < 2) {
+        throw new Error('Text batch group requires at least two text children.');
+      }
+
+      const properties = children.map((child) => {
+        const resolvedChild = resolved.document.nodes[child.id] ?? child;
+        if (visualTextProps(resolvedChild).painterOpts) {
+          throw new Error(
+            'Text batch child "' +
+              child.id +
+              '" still owns call-level createText painterOpts. Move them to the text group.',
+          );
+        }
+        return textOperationProperties(resolvedChild);
+      });
+
+      operations.push({
+        id: 'text_batch_' + node.id,
+        kind: 'create-text',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || 'textGroup',
+        base,
+        properties,
+        ...(batch.painterOpts ? { painterOpts: batch.painterOpts } : {}),
+      });
+
+      produced.set(node.id, { target, member: null });
+      base = { $studioTarget: target };
+      lastTarget = target;
+      lastMember = null;
+      continue;
+    }
+
     const resolvedNode = resolved.document.nodes[node.id] ?? node;
 
     if (node.kind === 'chart') {
@@ -1083,6 +1142,9 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         preferredName: node.name || 'text',
         base,
         properties: textOperationProperties(resolvedNode),
+        ...(visualTextProps(resolvedNode).painterOpts
+          ? { painterOpts: visualTextProps(resolvedNode).painterOpts }
+          : {}),
       });
     } else if (node.kind === 'path' || node.kind === 'freehand') {
       const props = visualPathProps(node);

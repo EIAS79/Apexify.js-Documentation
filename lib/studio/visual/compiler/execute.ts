@@ -30,8 +30,9 @@ export interface StudioOperationRuntime {
     painterOpts?: { resolveAssetRefs?: boolean },
   ): Promise<Uint8Array>;
   createText?(
-    properties: StudioTextProperties,
+    properties: StudioTextProperties | StudioTextProperties[],
     canvasBuffer: Uint8Array,
+    painterOpts?: { resolveAssetRefs?: boolean },
   ): Promise<Uint8Array>;
   runImageUtility?(
     method: StudioImageUtilityOperation['method'],
@@ -188,7 +189,11 @@ export async function executeStudioOperationPlan(
         if (!runtime.createText) {
           throw new Error('Studio runtime does not implement createText().');
         }
-        const value = await runtime.createText(operation.properties, base);
+        const value = await runtime.createText(
+          operation.properties,
+          base,
+          operation.painterOpts,
+        );
         values.set(operation.target, value);
         break;
       }

@@ -202,7 +202,9 @@ import {
   TEXT_CURVE_MODES,
   defaultTextNodeProps,
   measureVisualTextInBrowser,
+  textBatchGroupPropsRecord,
   textPropsRecord,
+  visualTextBatchGroupProps,
   visualTextProps,
 } from '@/lib/studio/visual/text-contract';
 import {
@@ -3389,6 +3391,10 @@ export default function VisualStudioPre4({
         const node = current.document.nodes[id];
         return node?.kind === 'image' || node?.kind === 'shape';
       });
+      const textOnly = selected.every((id) => {
+        const node = current.document.nodes[id];
+        return node?.kind === 'text';
+      });
       const next = groupNodes(current, selected, groupId);
       if (imageOnly && next !== current) {
         const group = next.document.nodes[groupId];
@@ -3422,16 +3428,43 @@ export default function VisualStudioPre4({
               : {}),
           });
         }
+      } else if (textOnly && next !== current) {
+        const group = next.document.nodes[groupId];
+        if (group) {
+          let resolveAssetRefs = false;
+          for (const childId of group.childIds ?? []) {
+            const child = next.document.nodes[childId];
+            if (!child || child.kind !== 'text') continue;
+            const childProps = visualTextProps(child);
+            resolveAssetRefs ||= childProps.painterOpts?.resolveAssetRefs === true;
+            const { painterOpts: _painterOpts, ...rest } = childProps;
+            child.props = textPropsRecord(rest as VisualTextNodeProps);
+          }
+          group.name = 'Text group';
+          group.props = textBatchGroupPropsRecord({
+            textBatch: true,
+            ...(resolveAssetRefs
+              ? { painterOpts: { resolveAssetRefs: true } }
+              : {}),
+          });
+        }
       }
       return next;
     });
+    const imageOnly = selected.every((id) => {
+      const node = project.document.nodes[id];
+      return node?.kind === 'image' || node?.kind === 'shape';
+    });
+    const textOnly = selected.every((id) => {
+      const node = project.document.nodes[id];
+      return node?.kind === 'text';
+    });
     setMessage(
-      selected.every((id) => {
-        const node = project.document.nodes[id];
-        return node?.kind === 'image' || node?.kind === 'shape';
-      })
+      imageOnly
         ? 'Grouped as one createImage batch'
-        : 'Grouped selection',
+        : textOnly
+          ? 'Grouped as one createText batch'
+          : 'Grouped selection',
     );
   };
 
