@@ -2150,13 +2150,13 @@ export function VisualImageInspector({
           })}
         </Section>
 
-        <Section title="Image utility pipeline" description="Separate painter.image.* APIs, shown here after createImage effects to avoid mixing the two contracts." attr="utility-stack">
-          <VisualImageUtilityAuthoring
-            value={props}
-            mode="effects"
-            onChange={(next, label) => onChange(label, () => next)}
-          />
-        </Section>
+        <VisualImageUtilityAuthoring
+          value={props}
+          mode="effects"
+          width={width}
+          height={height}
+          onChange={(next, label) => onChange(label, () => next)}
+        />
       </>
     );
   }
