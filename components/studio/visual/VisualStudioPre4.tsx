@@ -2250,6 +2250,128 @@ export default function VisualStudioPre4({
       ? primary
       : undefined;
 
+  const resolveVisualImageIntrinsicDimensions = async (
+    node: VisualNode,
+  ): Promise<{ width: number; height: number } | null> => {
+    const image = visualImageProps(node);
+    const source = image.source;
+    const normalize = (width: unknown, height: unknown) => {
+      if (
+        typeof width !== 'number' ||
+        typeof height !== 'number' ||
+        !Number.isFinite(width) ||
+        !Number.isFinite(height) ||
+        width < 1 ||
+        height < 1
+      ) {
+        return null;
+      }
+      return {
+        width: Math.max(1, Math.round(width)),
+        height: Math.max(1, Math.round(height)),
+      };
+    };
+
+    if (typeof source === 'object' && source && '$generated' in source) {
+      if (source.$generated === 'document_canvas') {
+        return normalize(project.document.width, project.document.height);
+      }
+      const generatedNode = project.document.nodes[source.$generated];
+      if (generatedNode) {
+        const rect = nodeRect(generatedNode);
+        return normalize(rect.width, rect.height);
+      }
+      return null;
+    }
+
+    if (typeof source !== 'string' || !source.trim()) return null;
+
+    const assetId = studioAssetIdFromReference(source);
+    const asset = assetId ? assets.find((item) => item.id === assetId) : undefined;
+    const assetDimensions = normalize(
+      asset?.metadata?.width,
+      asset?.metadata?.height,
+    );
+    if (assetDimensions) return assetDimensions;
+
+    let browserSource = source.trim();
+    if (asset) browserSource = studioAssetDataUrl(asset);
+    if (/^studio:\/\//i.test(browserSource)) return null;
+
+    return new Promise((resolve) => {
+      const imageElement = new window.Image();
+      let settled = false;
+      const finish = (value: { width: number; height: number } | null) => {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeout);
+        resolve(value);
+      };
+      const timeout = window.setTimeout(() => finish(null), 5000);
+      imageElement.onload = () =>
+        finish(
+          normalize(
+            imageElement.naturalWidth || imageElement.width,
+            imageElement.naturalHeight || imageElement.height,
+          ),
+        );
+      imageElement.onerror = () => finish(null);
+      imageElement.src = browserSource;
+    });
+  };
+
+  const setPrimaryImageInherit = async (enabled: boolean) => {
+    if (!primaryMedia || primaryMedia.kind !== 'image') return;
+    const targetId = primaryMedia.id;
+
+    if (!enabled) {
+      mutate('Disable image source-size inheritance', (current) => {
+        const node = current.document.nodes[targetId];
+        if (!node || node.kind !== 'image') return current;
+        const next = structuredClone(current);
+        const nextNode = next.document.nodes[targetId];
+        nextNode.props = imagePropsRecord({
+          ...visualImageProps(nextNode),
+          inherit: false,
+        });
+        next.updatedAt = new Date().toISOString();
+        return next;
+      });
+      setMessage('Image source-size inheritance disabled');
+      return;
+    }
+
+    const dimensions = await resolveVisualImageIntrinsicDimensions(primaryMedia);
+    mutate('Inherit image source dimensions', (current) => {
+      const node = current.document.nodes[targetId];
+      if (!node || node.kind !== 'image') return current;
+      const next = structuredClone(current);
+      const nextNode = next.document.nodes[targetId];
+      nextNode.props = imagePropsRecord({
+        ...visualImageProps(nextNode),
+        inherit: true,
+        fit: 'fill',
+      });
+      if (dimensions) {
+        nextNode.transform = {
+          ...(nextNode.transform ?? {}),
+          width: dimensions.width,
+          height: dimensions.height,
+          scaleX: 1,
+          scaleY: 1,
+        };
+      }
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+
+    setMessage(
+      dimensions
+        ? 'Inherited source size · ' + dimensions.width + ' × ' + dimensions.height
+        : 'Inherit enabled, but Studio could not resolve this source size in the browser',
+    );
+  };
+
   const updateImageDraft = (
     updater: (props: VisualImageNodeProps) => VisualImageNodeProps,
   ) => {
@@ -6201,6 +6323,9 @@ export default function VisualStudioPre4({
               renameNode(current, primaryMedia.id, name),
             )
           }
+          onInheritChange={(enabled) => {
+            void setPrimaryImageInherit(enabled);
+          }}
           renderTransform={renderTransformFields}
         />
       );
