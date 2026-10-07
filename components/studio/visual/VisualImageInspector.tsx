@@ -2332,19 +2332,13 @@ export function VisualImageInspector({
         </div>
       </Section>
 
-      <Section
-        title="Advanced image utilities"
-        description="Typed painter.image.* output and analysis operations."
-        attr="advanced-utilities"
-      >
-        <VisualImageUtilityAuthoring
-          value={props}
-          mode="advanced"
-          width={width}
-          height={height}
-          onChange={(next, label) => onChange(label, () => next)}
-        />
-      </Section>
+      <VisualImageUtilityAuthoring
+        value={props}
+        mode="advanced"
+        width={width}
+        height={height}
+        onChange={(next, label) => onChange(label, () => next)}
+      />
     </>
   );
 }
