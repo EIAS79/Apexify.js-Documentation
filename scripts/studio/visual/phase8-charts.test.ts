@@ -131,6 +131,8 @@ test('Phase 8 validates, lowers and emits every chart family with buffer reuse',
     );
     assert.ok(compose && compose.kind === 'create-image');
     if (!compose || compose.kind !== 'create-image') continue;
+    assert.equal(Array.isArray(compose.properties), false);
+    if (Array.isArray(compose.properties)) continue;
     assert.equal(typeof compose.properties.source, 'object');
     assert.equal(
       (compose.properties.source as { $studioTarget: string }).$studioTarget,
@@ -178,6 +180,8 @@ test('Phase 8 executes chart buffers before document composition', async () => {
       return buffer(2);
     },
     async createImage(properties, base) {
+      assert.equal(Array.isArray(properties), false);
+      if (Array.isArray(properties)) throw new Error('Expected one chart image property record.');
       calls.push('image:' + String(properties.source instanceof Uint8Array));
       assert.deepEqual(Array.from(base), [1]);
       assert.ok(properties.source instanceof Uint8Array);
