@@ -470,7 +470,7 @@ test('Phase 10 permanent Images workflow exposes stack, presets, analysis and fu
     'data-phase10-image-stack',
     'data-phase10-presets',
     'data-phase10-analysis',
-    'data-phase10-api-coverage',
+    'data-phase10-output',
     'removeBackground',
     'validHex',
   ]) {
