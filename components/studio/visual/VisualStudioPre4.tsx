@@ -877,6 +877,23 @@ export default function VisualStudioPre4({
 
   const projectSemanticSignature = useMemo(() => semanticSignature(project), [project]);
   const selected = project.editor?.selectedNodeIds ?? [];
+  const selectedParentId = selected.length
+    ? project.document.nodes[selected[0]]?.parentId ?? null
+    : null;
+  const canGroupSelection =
+    selected.length >= 2 &&
+    selected.every((id) => {
+      const node = project.document.nodes[id];
+      return Boolean(node) && (node?.parentId ?? null) === selectedParentId;
+    });
+  const canUngroupSelection = selected.some((id) => {
+    const node = project.document.nodes[id];
+    return Boolean(
+      node &&
+        node.kind === 'group' &&
+        (node.childIds?.length ?? 0) > 0,
+    );
+  });
   const primary = selected.length
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
@@ -3382,7 +3399,10 @@ export default function VisualStudioPre4({
   };
 
   const groupSelection = () => {
-    if (selected.length < 2) return;
+    if (!canGroupSelection) {
+      setMessage('Select at least two sibling layers before grouping.');
+      return;
+    }
     const groupId = createVisualId('group');
     mutate('Group', (current) => {
       const imageOnly = selected.every((id) => {
@@ -3406,7 +3426,7 @@ export default function VisualStudioPre4({
             } = childProps;
             child.props = imagePropsRecord(rest as VisualImageNodeProps);
           }
-          group.name = 'Image group';
+          group.name = 'Image batch (' + (group.childIds?.length ?? 0) + ')';
           group.props = imageBatchGroupPropsRecord({
             imageBatch: true,
             createOptions: {
@@ -3425,20 +3445,37 @@ export default function VisualStudioPre4({
       }
       return next;
     });
+    setCollapsed((current) => {
+      const next = new Set(current);
+      next.add(groupId);
+      return next;
+    });
     setMessage(
       selected.every((id) => {
         const node = project.document.nodes[id];
         return node?.kind === 'image' || node?.kind === 'shape';
       })
-        ? 'Grouped as one createImage batch'
+        ? 'Created one createImage([...]) batch'
         : 'Grouped selection',
     );
   };
 
   const ungroupSelection = () => {
-    if (!selected.length) return;
+    if (!canUngroupSelection) {
+      setMessage('Select a parent group to ungroup it.');
+      return;
+    }
+    const expandedChildren = selected.flatMap(
+      (id) => project.document.nodes[id]?.childIds ?? [],
+    );
     mutate('Ungroup', (current) => ungroupNodes(current, selected));
-    setMessage('Ungrouped selection');
+    setCollapsed((current) => {
+      const next = new Set(current);
+      selected.forEach((id) => next.delete(id));
+      expandedChildren.forEach((id) => next.delete(id));
+      return next;
+    });
+    setMessage('Ungrouped selected group');
   };
 
   const movePrimaryInStack = (
@@ -4235,6 +4272,8 @@ export default function VisualStudioPre4({
         <div key={id}>
           <div
             className="apx-vw-layer-row"
+            data-kind={node.kind}
+            data-has-children={hasChildren ? 'true' : undefined}
             data-active={isSelected ? 'true' : undefined}
             draggable
             onDragStart={(event) => {
@@ -4270,7 +4309,7 @@ export default function VisualStudioPre4({
               )
             }
             style={{
-              paddingLeft: 6 + depth * 14,
+              paddingLeft: 6 + Math.min(depth, 4) * 10,
               background: isSelected ? '#17345a' : undefined,
             }}
           >
@@ -4336,16 +4375,12 @@ export default function VisualStudioPre4({
               />
             ) : (
               <span
-                title="Double-click to rename"
+                className="apx-pre4-layer-name"
+                title={(node.name ?? node.kind) + ' · double-click to rename'}
                 onDoubleClick={(event) => {
                   event.stopPropagation();
                   setRenamingId(id);
                   setRenameDraft(node.name ?? node.kind);
-                }}
-                style={{
-                  flex: 1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
                 }}
               >
                 {node.name ?? node.kind}
@@ -6810,27 +6845,29 @@ export default function VisualStudioPre4({
           <div className="apx-pre4-panel-head">
             <div>
               <strong>
-                {activeTool === 'images'
-                  ? 'Images'
-                  : activeTool === 'shapes'
-                    ? 'Shapes'
-                    : activeTool === 'text'
-                      ? 'Text'
-                      : activeTool === 'paths'
-                        ? 'Paths & pixels'
-                        : activeTool === 'components'
-                          ? 'Components'
-                          : activeTool === 'assets'
-                            ? 'Assets'
-                            : activeTool === 'gif'
-                              ? 'GIF & animation'
-                              : activeTool === 'audio'
-                                ? 'Audio'
-                                : activeTool === 'video'
-                                  ? 'Video'
-                                  : activeTool === 'advanced'
-                                    ? 'Advanced'
-                                    : 'Layers'}
+                {!mediaContextActive
+                  ? 'Layers'
+                  : activeTool === 'images'
+                    ? 'Images'
+                    : activeTool === 'shapes'
+                      ? 'Shapes'
+                      : activeTool === 'text'
+                        ? 'Text'
+                        : activeTool === 'paths'
+                          ? 'Paths & pixels'
+                          : activeTool === 'components'
+                            ? 'Components'
+                            : activeTool === 'assets'
+                              ? 'Assets'
+                              : activeTool === 'gif'
+                                ? 'GIF & animation'
+                                : activeTool === 'audio'
+                                  ? 'Audio'
+                                  : activeTool === 'video'
+                                    ? 'Video'
+                                    : activeTool === 'advanced'
+                                      ? 'Advanced'
+                                      : 'Layers'}
               </strong>
               <small>
                 {mediaContextActive
@@ -6893,8 +6930,22 @@ export default function VisualStudioPre4({
                 <div className="apx-pre4-layer-actions">
                   <button type="button" onClick={() => mutate('Duplicate', (current) => duplicateNodes(current, selected, () => createVisualId('node')))}>Duplicate</button>
                   <button type="button" onClick={() => mutate('Delete', (current) => deleteNodes(current, selected))}>Delete</button>
-                  <button type="button" onClick={groupSelection} disabled={selected.length < 2}>Group</button>
-                  <button type="button" onClick={ungroupSelection}>Ungroup</button>
+                  <button
+                    type="button"
+                    onClick={groupSelection}
+                    disabled={!canGroupSelection}
+                    title={canGroupSelection ? 'Group selected sibling layers' : 'Select 2+ sibling layers'}
+                  >
+                    Group
+                  </button>
+                  <button
+                    type="button"
+                    onClick={ungroupSelection}
+                    disabled={!canUngroupSelection}
+                    title={canUngroupSelection ? 'Ungroup selected parent group' : 'Select a group layer'}
+                  >
+                    Ungroup
+                  </button>
                 </div>
               ) : null}
             </>
