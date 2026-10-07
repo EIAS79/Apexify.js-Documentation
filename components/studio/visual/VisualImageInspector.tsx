@@ -3,6 +3,8 @@
 import { useState, type ReactNode } from 'react';
 import {
   AdjustmentsHorizontalIcon,
+  ArrowDownIcon,
+  ArrowUpIcon,
   ArrowsPointingOutIcon,
   CircleStackIcon,
   PaintBrushIcon,
@@ -650,6 +652,14 @@ function FilterEditor({
   height: number;
   onChange: (filters: VisualImageFilter[]) => void;
 }) {
+  const moveFilter = (index: number, delta: -1 | 1) => {
+    const target = index + delta;
+    if (target < 0 || target >= filters.length) return;
+    const next = [...filters];
+    [next[index], next[target]] = [next[target]!, next[index]!];
+    onChange(next);
+  };
+
   return (
     <div className="apx-image-filter-editor" data-image-v2-filter-stack>
       <div className="apx-image-filter-editor-head">
@@ -658,7 +668,7 @@ function FilterEditor({
           <small>{filters.length} {filters.length === 1 ? 'filter' : 'filters'}</small>
         </span>
         <button
-          className="apx-canvas-mini-button"
+          className="apx-image-filter-add"
           type="button"
           onClick={() =>
             onChange([
@@ -667,20 +677,28 @@ function FilterEditor({
             ])
           }
         >
-          + Filter
+          <span aria-hidden>＋</span>
+          Add filter
         </button>
       </div>
+
       <div className="apx-image-filter-stack">
         {filters.length === 0 ? (
           <div className="apx-image-filter-empty">
-            No filters. Add one to start the ordered runtime stack.
+            <SparklesIcon aria-hidden />
+            <span>
+              <strong>No filters yet</strong>
+              <small>Add a filter to build the ordered runtime stack.</small>
+            </span>
           </div>
         ) : null}
+
         {filters.map((filter, index) => {
           const fields = imageFilterFieldSpecs(filter.type, width, height, filter);
           const parameterless = IMAGE_FILTER_PARAMETERLESS_TYPES.includes(
             filter.type as (typeof IMAGE_FILTER_PARAMETERLESS_TYPES)[number],
           );
+
           return (
             <div
               className="apx-image-filter-card"
@@ -689,30 +707,56 @@ function FilterEditor({
             >
               <div className="apx-image-filter-card-head">
                 <span className="apx-image-filter-index">{index + 1}</span>
-                <select
-                  className="apx-canvas-v2-input apx-pre4-input"
-                  aria-label={'Filter ' + (index + 1) + ' type'}
-                  value={filter.type}
-                  onChange={(event) =>
-                    onChange(
-                      filters.map((item, itemIndex) =>
-                        itemIndex === index
-                          ? defaultVisualImageFilter(
-                              event.target.value as VisualImageFilter['type'],
-                              width,
-                              height,
-                            )
-                          : item,
-                      ),
-                    )
-                  }
-                >
-                  {IMAGE_FILTER_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {type.replace(/([a-z])([A-Z])/g, '$1 $2')}
-                    </option>
-                  ))}
-                </select>
+
+                <label className="apx-image-filter-type">
+                  <span>Filter</span>
+                  <select
+                    className="apx-canvas-v2-input apx-pre4-input"
+                    aria-label={'Filter ' + (index + 1) + ' type'}
+                    value={filter.type}
+                    onChange={(event) =>
+                      onChange(
+                        filters.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? defaultVisualImageFilter(
+                                event.target.value as VisualImageFilter['type'],
+                                width,
+                                height,
+                              )
+                            : item,
+                        ),
+                      )
+                    }
+                  >
+                    {IMAGE_FILTER_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {type.replace(/([a-z])([A-Z])/g, '$1 $2')}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="apx-image-filter-order" aria-label={'Reorder filter ' + (index + 1)}>
+                  <button
+                    type="button"
+                    title="Move filter earlier"
+                    aria-label="Move filter earlier"
+                    disabled={index === 0}
+                    onClick={() => moveFilter(index, -1)}
+                  >
+                    <ArrowUpIcon aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    title="Move filter later"
+                    aria-label="Move filter later"
+                    disabled={index === filters.length - 1}
+                    onClick={() => moveFilter(index, 1)}
+                  >
+                    <ArrowDownIcon aria-hidden />
+                  </button>
+                </div>
+
                 <button
                   className="apx-image-filter-remove"
                   type="button"
@@ -725,8 +769,12 @@ function FilterEditor({
                   ×
                 </button>
               </div>
+
               {!parameterless ? (
-                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid apx-image-filter-fields">
+                <div
+                  className="apx-image-filter-fields apx-pre4-property-grid"
+                  data-field-count={fields.length}
+                >
                   {fields.map((field) => (
                     <NumericField
                       key={field.key}
@@ -755,7 +803,7 @@ function FilterEditor({
                 </div>
               ) : (
                 <small className="apx-image-filter-presence">
-                  Enabled by presence · no parameters.
+                  This filter has no additional parameters.
                 </small>
               )}
             </div>
@@ -765,6 +813,7 @@ function FilterEditor({
     </div>
   );
 }
+
 function MaskEditor({
   value,
   imageAssets,
@@ -2199,17 +2248,71 @@ export function VisualImageInspector({
       <>
         {header}
         <Section title="Filters" description="Typed createImage filters, in authored order." attr="filters">
-          <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
-            <NumericField label="Filter intensity" value={props.filterIntensity} min={0} step={0.1} onChange={(filterIntensity) => patch('Filter intensity', { filterIntensity })} />
-            <label>
-              <span>Filter order</span>
-              <select className="apx-canvas-v2-input apx-pre4-input" value={props.filterOrder ?? 'post'} onChange={(event) => patch('Filter order', { filterOrder: event.target.value as 'pre' | 'post' })}>
-                <option value="pre">pre</option>
-                <option value="post">post</option>
-              </select>
-            </label>
+          <div className="apx-image-filter-masterbar">
+            <div className="apx-image-filter-intensity">
+              <div className="apx-image-filter-master-label">
+                <span>Intensity</span>
+                <small>Global filter strength</small>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={4}
+                step={0.1}
+                value={props.filterIntensity ?? 1}
+                aria-label="Filter intensity"
+                onChange={(event) =>
+                  patch('Filter intensity', {
+                    filterIntensity: Number(event.target.value),
+                  })
+                }
+              />
+              <input
+                className="apx-image-filter-intensity-number"
+                type="number"
+                min={0}
+                max={4}
+                step={0.1}
+                value={props.filterIntensity ?? 1}
+                aria-label="Filter intensity value"
+                onChange={(event) =>
+                  patch('Filter intensity', {
+                    filterIntensity: Number(event.target.value),
+                  })
+                }
+              />
+            </div>
+
+            <div className="apx-image-filter-order-mode">
+              <div className="apx-image-filter-master-label">
+                <span>Apply filters</span>
+                <small>Relative to distortion / warp</small>
+              </div>
+              <div className="apx-image-filter-segmented" role="group" aria-label="Filter order">
+                <button
+                  type="button"
+                  data-active={(props.filterOrder ?? 'post') === 'pre' ? 'true' : undefined}
+                  onClick={() => patch('Filter order', { filterOrder: 'pre' })}
+                >
+                  Before
+                </button>
+                <button
+                  type="button"
+                  data-active={(props.filterOrder ?? 'post') === 'post' ? 'true' : undefined}
+                  onClick={() => patch('Filter order', { filterOrder: 'post' })}
+                >
+                  After
+                </button>
+              </div>
+            </div>
           </div>
-          <FilterEditor filters={props.filters ?? []} width={width} height={height} onChange={(filters) => patch('Image filters', { filters })} />
+
+          <FilterEditor
+            filters={props.filters ?? []}
+            width={width}
+            height={height}
+            onChange={(filters) => patch('Image filters', { filters })}
+          />
         </Section>
 
         <Section title="Mask" attr="mask">
