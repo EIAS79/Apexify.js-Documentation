@@ -1021,6 +1021,37 @@ export default function VisualStudioPre4({
   }, [projectSemanticSignature]);
 
   const phase9Active = useMemo(() => hasPhase9Authoring(project), [projectSemanticSignature]);
+  const imageNativeRuntimeActive = useMemo(
+    () =>
+      Object.values(project.document.nodes).some((node) => {
+        if (node.kind === 'group') {
+          const batch = visualImageBatchGroupProps(node);
+          return Boolean(
+            batch?.createOptions.isGrouped === true &&
+              batch.createOptions.groupTransform,
+          );
+        }
+        if (node.kind !== 'image' && node.kind !== 'shape') return false;
+        const image = visualImageProps(node);
+        const complexStroke = Boolean(image.stroke);
+        const complexShadow = Boolean(image.shadow);
+        return Boolean(
+          image.blur ||
+            image.borderPosition ||
+            image.boxBackground ||
+            image.mask ||
+            image.clipPath?.length ||
+            image.distortion ||
+            image.meshWarp ||
+            image.effects ||
+            complexStroke ||
+            complexShadow ||
+            (image.filterIntensity !== undefined && image.filterIntensity !== 1) ||
+            (image.filterOrder !== undefined && image.filterOrder !== 'post')
+        );
+      }),
+    [projectSemanticSignature],
+  );
   const phase10Active = useMemo(() => hasPhase10Authoring(project), [projectSemanticSignature]);
   const phase11Active = useMemo(() => hasPhase11Authoring(project), [projectSemanticSignature]);
   const phase12Active = useMemo(() => hasPhase12Authoring(project), [projectSemanticSignature]);
@@ -1723,6 +1754,7 @@ export default function VisualStudioPre4({
       phase12Active ||
       phase11Active ||
       phase10Active ||
+      imageNativeRuntimeActive ||
       canvasNeedsNodeRuntime
     ) {
       let releasePhase10Render!: () => void;
@@ -1943,6 +1975,7 @@ export default function VisualStudioPre4({
     previewGenerated.value?.source,
     displayPreviewGenerated.value?.source,
     phase10Active,
+    imageNativeRuntimeActive,
     phase11Active,
     phase12Active,
     phase13Active,
