@@ -1024,6 +1024,7 @@ export function VisualImageUtilityAuthoring({
       <div
         className="apx-advanced-image-tools apx-advanced-image-tools--workspace"
         data-phase10-advanced
+        data-image-v2-no-json-primary
       >
         <div className="apx-advanced-workspace-head">
           <div>
