@@ -2311,4 +2311,6 @@ export function VisualImageInspector({
           onChange={(next, label) => onChange(label, () => next)}
         />
       </Section>
-    </>}
+    </>
+  );
+}
