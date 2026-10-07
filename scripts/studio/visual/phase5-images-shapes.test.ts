@@ -108,6 +108,8 @@ test('Phase 5 lowers image and shape nodes in semantic layer order', () => {
   const shape = plan.operations[1];
   assert.equal(shape.kind, 'create-image');
   if (shape.kind !== 'create-image') return;
+  assert.equal(Array.isArray(shape.properties), false);
+  if (Array.isArray(shape.properties)) return;
   assert.equal(shape.properties.source, 'star');
   assert.equal(shape.properties.x, 90);
   assert.equal(shape.properties.width, 180);
@@ -116,6 +118,8 @@ test('Phase 5 lowers image and shape nodes in semantic layer order', () => {
   const image = plan.operations[2];
   assert.equal(image.kind, 'create-image');
   if (image.kind !== 'create-image') return;
+  assert.equal(Array.isArray(image.properties), false);
+  if (Array.isArray(image.properties)) return;
   assert.equal(image.properties.source, 'https://example.com/hero.png');
   assert.equal(image.properties.fit, 'cover');
   assert.equal(image.properties.borderRadius, 22);
