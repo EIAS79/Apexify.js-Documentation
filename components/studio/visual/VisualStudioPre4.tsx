@@ -4314,18 +4314,29 @@ export default function VisualStudioPre4({
             }}
           >
             <button
-              title={hasChildren ? 'Collapse / expand' : 'Leaf layer'}
-              disabled={!hasChildren}
+              title={
+                hasChildren
+                  ? 'Collapse / expand group'
+                  : isSelected
+                    ? 'Remove from multi-selection'
+                    : 'Add to multi-selection'
+              }
+              data-layer-multiselect={!hasChildren ? 'true' : undefined}
+              data-selected={!hasChildren && isSelected ? 'true' : undefined}
               onClick={(event) => {
                 event.stopPropagation();
-                setCollapsed((current) => {
-                  const next = new Set(current);
-                  next.has(id) ? next.delete(id) : next.add(id);
-                  return next;
-                });
+                if (hasChildren) {
+                  setCollapsed((current) => {
+                    const next = new Set(current);
+                    next.has(id) ? next.delete(id) : next.add(id);
+                    return next;
+                  });
+                  return;
+                }
+                setProject((current) => toggleSelection(current, id));
               }}
             >
-              {hasChildren ? (isCollapsed ? '▸' : '▾') : '·'}
+              {hasChildren ? (isCollapsed ? '▸' : '▾') : isSelected ? '✓' : '+'}
             </button>
             <button
               title="Visibility"
