@@ -9454,8 +9454,8 @@ body[data-phase17-resizing="dock"]{
   background:#0c2943;
 }
 .apx-image-v2-section .apx-canvas-v2-section-body{
-  gap:.65rem;
-  padding:.72rem;
+  gap:.58rem;
+  padding:.62rem;
 }
 
 .apx-image-v2-section .apx-pre4-property-grid{
@@ -9464,22 +9464,34 @@ body[data-phase17-resizing="dock"]{
 .apx-image-v2-section .apx-pre4-property-grid>label{
   min-width:0;
   display:grid;
-  gap:.28rem;
+  grid-template-columns:minmax(0,1fr);
+  grid-auto-flow:row;
+  align-items:stretch;
+  gap:.38rem;
 }
 .apx-image-v2-section .apx-pre4-property-grid>label>span,
 .apx-image-v2-section .apx-canvas-v2-field>span{
-  color:#7898b8;
-  font-size:.44rem;
-  font-weight:760;
-  letter-spacing:.025em;
+  display:block;
+  min-width:0;
+  padding:0 .12rem;
+  margin:0;
+  color:#82a0bd;
+  font-size:.40rem;
+  font-weight:720;
+  line-height:1.3;
+  letter-spacing:.02em;
+  text-transform:none;
 }
 .apx-image-v2-section .apx-canvas-v2-input{
-  min-height:38px;
+  height:32px;
+  min-height:32px;
+  padding:0 .58rem;
   border-color:#24527b;
-  border-radius:8px;
+  border-radius:7px;
   color:#edf6ff;
   background:#0b2c49;
-  font-size:.62rem;
+  font-size:.52rem;
+  line-height:1;
 }
 .apx-image-v2-section .apx-canvas-v2-input:hover{
   border-color:#3877ab;
@@ -9491,11 +9503,11 @@ body[data-phase17-resizing="dock"]{
 }
 
 .apx-image-v2-check{
-  min-height:44px;
+  min-height:38px;
   display:flex!important;
   align-items:center;
   gap:.52rem;
-  padding:.48rem .55rem;
+  padding:.40rem .52rem;
   border:1px solid #193d5b;
   border-radius:8px;
   color:#9eb8d2;
@@ -9514,7 +9526,7 @@ body[data-phase17-resizing="dock"]{
 }
 .apx-image-v2-check>span{
   color:#a9c2dc;
-  font-size:.48rem;
+  font-size:.44rem;
   font-weight:650;
   line-height:1.35;
 }
@@ -9624,15 +9636,21 @@ body[data-phase17-resizing="dock"]{
 }
 .apx-image-v2-transform-shell .apx-pre4-property-grid label{
   display:grid;
-  gap:.28rem;
+  grid-template-columns:minmax(0,1fr);
+  grid-auto-flow:row;
+  align-items:stretch;
+  gap:.38rem;
 }
 .apx-image-v2-transform-shell .apx-pre4-input{
-  min-height:38px;
+  height:32px;
+  min-height:32px;
+  padding:0 .58rem;
   border:1px solid #24527b;
-  border-radius:8px;
+  border-radius:7px;
   color:#edf6ff;
   background:#0b2c49;
-  font-size:.62rem;
+  font-size:.52rem;
+  line-height:1;
 }
 .apx-image-v2-transform-shell .apx-pre4-input:focus{
   outline:none;
