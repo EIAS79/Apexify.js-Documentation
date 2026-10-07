@@ -2332,13 +2332,15 @@ export function VisualImageInspector({
         </div>
       </Section>
 
-      <VisualImageUtilityAuthoring
-        value={props}
-        mode="advanced"
-        width={width}
-        height={height}
-        onChange={(next, label) => onChange(label, () => next)}
-      />
+      <div data-image-v2-no-json-primary>
+        <VisualImageUtilityAuthoring
+          value={props}
+          mode="advanced"
+          width={width}
+          height={height}
+          onChange={(next, label) => onChange(label, () => next)}
+        />
+      </div>
     </>
   );
 }
