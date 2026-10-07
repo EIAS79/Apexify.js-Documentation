@@ -810,6 +810,88 @@ function OperationEditor({
     );
   }
 
+  if (operation.type === 'imgConverter') {
+    return (
+      <div className="apx-effects-editor-grid">
+        <SelectControl
+          label="Output format"
+          value={operation.newExtension}
+          options={['jpeg', 'jpg', 'png', 'webp', 'tiff', 'gif', 'avif', 'heif', 'raw', 'jp2', 'jxl']}
+          onChange={(newExtension) =>
+            onChange({
+              ...operation,
+              newExtension: newExtension as typeof operation.newExtension,
+            })
+          }
+        />
+      </div>
+    );
+  }
+
+  if (operation.type === 'compress') {
+    const options = operation.options ?? {};
+    return (
+      <div className="apx-effects-editor-grid">
+        <SelectControl
+          label="Format"
+          value={options.format ?? 'jpeg'}
+          options={['jpeg', 'webp', 'avif']}
+          onChange={(format) =>
+            onChange({
+              ...operation,
+              options: {
+                ...options,
+                format: format as 'jpeg' | 'webp' | 'avif',
+              },
+            })
+          }
+        />
+        <SliderControl
+          label="Quality"
+          value={options.quality ?? 80}
+          min={1}
+          max={100}
+          step={1}
+          suffix="%"
+          onChange={(quality) =>
+            onChange({ ...operation, options: { ...options, quality } })
+          }
+        />
+        <NumberControl
+          label="Max width"
+          value={options.maxWidth}
+          min={1}
+          suffix="px"
+          onChange={(maxWidth) =>
+            onChange({ ...operation, options: { ...options, maxWidth } })
+          }
+        />
+        <NumberControl
+          label="Max height"
+          value={options.maxHeight}
+          min={1}
+          suffix="px"
+          onChange={(maxHeight) =>
+            onChange({ ...operation, options: { ...options, maxHeight } })
+          }
+        />
+        <div className="apx-effects-inline-toggle">
+          <span>
+            <strong>Progressive</strong>
+            <small>Use progressive encoding when the selected format supports it.</small>
+          </span>
+          <StackToggle
+            label="Progressive compression"
+            checked={options.progressive ?? false}
+            onChange={(progressive) =>
+              onChange({ ...operation, options: { ...options, progressive } })
+            }
+          />
+        </div>
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -829,6 +911,9 @@ export function VisualImageUtilityAuthoring({
     stack.find((operation) => EFFECT_TYPES.has(operation.type))?.id ?? null,
   );
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [analysisExpandedId, setAnalysisExpandedId] = useState<string | null>(
+    analyses[0]?.id ?? null,
+  );
 
   const updateStack = (next: VisualImageUtilityOperation[], label: string) =>
     onChange({ ...value, utilityStack: next }, label);
@@ -840,6 +925,7 @@ export function VisualImageUtilityAuthoring({
     const operation = defaultImageUtilityOperation(type, createVisualId('image-op'));
     if (ADVANCED_TYPES.has(type)) {
       updateStack([...stack, operation], 'Add ' + stackLabel(type));
+      setExpandedId(operation.id);
       return;
     }
     const firstOutputStage = stack.findIndex((item) => ADVANCED_TYPES.has(item.type));
@@ -913,111 +999,346 @@ export function VisualImageUtilityAuthoring({
   };
 
   if (mode === 'advanced') {
+    const advancedStack = stack
+      .map((operation, index) => ({ operation, index }))
+      .filter(({ operation }) => ADVANCED_TYPES.has(operation.type));
+
     return (
-      <>
-        <div className="apx-pre4-section" data-phase10-advanced>
-          <div className="apx-pre4-section-title">Output-stage image utilities</div>
-          <div className="apx-image-utility-add-row">
+      <div className="apx-advanced-image-tools" data-phase10-advanced>
+        <section className="apx-advanced-collection">
+          <div className="apx-advanced-collection-head">
+            <div>
+              <strong>Output utilities</strong>
+              <small>Run after raster authoring; order is preserved.</small>
+            </div>
+            <span>{advancedStack.length}</span>
+          </div>
+          <div className="apx-advanced-add-row">
             {[...ADVANCED_TYPES].map((type) => (
-              <button key={type} type="button" className="apx-canvas-mini-button" onClick={() => addOperation(type)}>
+              <button key={type} type="button" onClick={() => addOperation(type)}>
                 + {stackLabel(type)}
               </button>
             ))}
           </div>
-          {stack.map((operation, index) =>
-            ADVANCED_TYPES.has(operation.type) ? (
-              <div className="apx-pre4-section" data-image-utility={operation.type} key={operation.id}>
-                <div className="apx-canvas-section-heading">
-                  <div>
-                    <strong>{index + 1}. {stackLabel(operation.type)}</strong>
-                    <small>{operationDetail(operation)}</small>
-                  </div>
-                  <div className="apx-image-utility-actions">
-                    <button type="button" onClick={() => moveOperation(index, -1)} disabled={index === 0}>↑</button>
-                    <button type="button" onClick={() => moveOperation(index, 1)} disabled={index === stack.length - 1}>↓</button>
-                    <button type="button" onClick={() => updateStack(stack.filter((item) => item.id !== operation.id), 'Remove image utility')}>×</button>
-                  </div>
-                </div>
-                <label className="apx-canvas-check">
-                  <input
-                    type="checkbox"
-                    checked={operation.enabled !== false}
-                    onChange={(event) => patchOperation(operation.id, { ...operation, enabled: event.target.checked }, 'Toggle image utility')}
-                  />
-                  <span>Enabled</span>
-                </label>
-                <JsonConfig
-                  value={operation}
-                  onApply={(next) =>
-                    patchOperation(
-                      operation.id,
-                      normalizeImageUtilityOperationDraft(operation.type, operation.id, next),
-                    )
-                  }
-                />
+          <div className="apx-advanced-card-list">
+            {advancedStack.length === 0 ? (
+              <div className="apx-advanced-empty">
+                No output utility steps. Add conversion or compression only when needed.
               </div>
-            ) : null,
-          )}
-        </div>
-
-        <div className="apx-pre4-section" data-phase10-analysis>
-          <div className="apx-canvas-section-heading">
-            <div>
-              <div className="apx-pre4-section-title">Image analysis</div>
-              <small>Structured results; does not replace the raster output.</small>
-            </div>
+            ) : null}
+            {advancedStack.map(({ operation, index }, visibleIndex) => {
+              const expanded = expandedId === operation.id;
+              return (
+                <article
+                  className="apx-advanced-card"
+                  key={operation.id}
+                  data-image-utility={operation.type}
+                  data-expanded={expanded ? 'true' : undefined}
+                >
+                  <div className="apx-advanced-card-head">
+                    <span className="apx-advanced-order">{visibleIndex + 1}</span>
+                    <button
+                      type="button"
+                      className="apx-advanced-card-title"
+                      onClick={() => setExpandedId(expanded ? null : operation.id)}
+                    >
+                      <strong>{stackLabel(operation.type)}</strong>
+                      <small>{operationDetail(operation)}</small>
+                    </button>
+                    <StackToggle
+                      label={'Enable ' + stackLabel(operation.type)}
+                      checked={operation.enabled !== false}
+                      onChange={(enabled) =>
+                        patchOperation(
+                          operation.id,
+                          { ...operation, enabled },
+                          'Toggle image utility',
+                        )
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="apx-effects-icon-button"
+                      title="Duplicate"
+                      onClick={() => duplicateOperation(index)}
+                    >
+                      <DocumentDuplicateIcon aria-hidden />
+                    </button>
+                    <button
+                      type="button"
+                      className="apx-effects-icon-button apx-effects-icon-button--danger"
+                      title="Delete"
+                      onClick={() =>
+                        updateStack(
+                          stack.filter((item) => item.id !== operation.id),
+                          'Remove image utility',
+                        )
+                      }
+                    >
+                      <TrashIcon aria-hidden />
+                    </button>
+                    <button
+                      type="button"
+                      className="apx-effects-icon-button"
+                      title={expanded ? 'Collapse' : 'Expand'}
+                      onClick={() => setExpandedId(expanded ? null : operation.id)}
+                    >
+                      {expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
+                    </button>
+                  </div>
+                  {expanded ? (
+                    <div className="apx-advanced-card-body">
+                      <OperationEditor
+                        operation={operation}
+                        width={width}
+                        height={height}
+                        onChange={(replacement, label) =>
+                          patchOperation(operation.id, replacement, label)
+                        }
+                      />
+                      <details className="apx-effects-contract-details">
+                        <summary>Advanced contract</summary>
+                        <div>
+                          <div className="apx-effects-reorder-fallback">
+                            <button
+                              type="button"
+                              onClick={() => moveOperation(index, -1)}
+                              disabled={visibleIndex === 0}
+                            >
+                              Move up
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveOperation(index, 1)}
+                              disabled={visibleIndex === advancedStack.length - 1}
+                            >
+                              Move down
+                            </button>
+                          </div>
+                          <JsonConfig
+                            value={operation}
+                            onApply={(next) =>
+                              patchOperation(
+                                operation.id,
+                                normalizeImageUtilityOperationDraft(
+                                  operation.type,
+                                  operation.id,
+                                  next,
+                                ),
+                              )
+                            }
+                          />
+                        </div>
+                      </details>
+                    </div>
+                  ) : null}
+                </article>
+              );
+            })}
           </div>
-          <div className="apx-image-utility-add-row">
+        </section>
+
+        <section className="apx-advanced-collection" data-phase10-analysis>
+          <div className="apx-advanced-collection-head">
+            <div>
+              <strong>Image analysis</strong>
+              <small>Structured results; raster output remains unchanged.</small>
+            </div>
+            <span>{analyses.length}</span>
+          </div>
+          <div className="apx-advanced-add-row">
             {IMAGE_UTILITY_ANALYSIS_TYPES.map((type) => (
               <button
                 key={type}
                 type="button"
-                className="apx-canvas-mini-button"
-                onClick={() =>
-                  updateAnalyses(
-                    [...analyses, defaultImageUtilityAnalysis(type, createVisualId('image-analysis'))],
-                    'Add image analysis',
-                  )
-                }
+                onClick={() => {
+                  const analysis = defaultImageUtilityAnalysis(
+                    type,
+                    createVisualId('image-analysis'),
+                  );
+                  updateAnalyses([...analyses, analysis], 'Add image analysis');
+                  setAnalysisExpandedId(analysis.id);
+                }}
               >
                 + {analysisLabel(type)}
               </button>
             ))}
           </div>
-          {analyses.map((analysis) => (
-            <div className="apx-image-utility-row" data-image-analysis={analysis.type} key={analysis.id}>
-              <div>
-                <strong>{analysisLabel(analysis.type)}</strong>
-                <small>{analysis.enabled === false ? 'disabled' : 'full-runtime'}</small>
-              </div>
-              <button type="button" onClick={() => updateAnalyses(analyses.filter((item) => item.id !== analysis.id), 'Remove image analysis')}>×</button>
-              <JsonConfig
-                value={analysis}
-                onApply={(next) => {
-                  const parsed = normalizeImageUtilityAnalysisDraft(
-                    analysis.type,
-                    analysis.id,
-                    next,
-                  );
-                  updateAnalyses(
-                    analyses.map((item) => item.id === analysis.id ? parsed : item),
-                    'Edit image analysis',
-                  );
-                }}
-              />
-            </div>
-          ))}
-        </div>
+          <div className="apx-advanced-card-list">
+            {analyses.length === 0 ? (
+              <div className="apx-advanced-empty">No analysis jobs.</div>
+            ) : null}
+            {analyses.map((analysis, index) => {
+              const expanded = analysisExpandedId === analysis.id;
+              return (
+                <article
+                  className="apx-advanced-card"
+                  data-image-analysis={analysis.type}
+                  key={analysis.id}
+                >
+                  <div className="apx-advanced-card-head apx-advanced-card-head--analysis">
+                    <span className="apx-advanced-order">{index + 1}</span>
+                    <button
+                      type="button"
+                      className="apx-advanced-card-title"
+                      onClick={() =>
+                        setAnalysisExpandedId(expanded ? null : analysis.id)
+                      }
+                    >
+                      <strong>{analysisLabel(analysis.type)}</strong>
+                      <small>{analysis.enabled === false ? 'Bypassed' : 'Active'}</small>
+                    </button>
+                    <StackToggle
+                      label={'Enable ' + analysisLabel(analysis.type)}
+                      checked={analysis.enabled !== false}
+                      onChange={(enabled) =>
+                        updateAnalyses(
+                          analyses.map((item) =>
+                            item.id === analysis.id ? { ...item, enabled } : item,
+                          ),
+                          'Toggle image analysis',
+                        )
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="apx-effects-icon-button apx-effects-icon-button--danger"
+                      title="Delete"
+                      onClick={() =>
+                        updateAnalyses(
+                          analyses.filter((item) => item.id !== analysis.id),
+                          'Remove image analysis',
+                        )
+                      }
+                    >
+                      <TrashIcon aria-hidden />
+                    </button>
+                    <button
+                      type="button"
+                      className="apx-effects-icon-button"
+                      title={expanded ? 'Collapse' : 'Expand'}
+                      onClick={() =>
+                        setAnalysisExpandedId(expanded ? null : analysis.id)
+                      }
+                    >
+                      {expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
+                    </button>
+                  </div>
+                  {expanded ? (
+                    <div className="apx-advanced-card-body">
+                      {analysis.type === 'extractPalette' ? (
+                        <div className="apx-effects-editor-grid">
+                          <NumberControl
+                            label="Colors"
+                            value={analysis.options?.count ?? 8}
+                            min={1}
+                            max={64}
+                            onChange={(count) =>
+                              updateAnalyses(
+                                analyses.map((item) =>
+                                  item.id === analysis.id &&
+                                  item.type === 'extractPalette'
+                                    ? {
+                                        ...item,
+                                        options: { ...item.options, count },
+                                      }
+                                    : item,
+                                ),
+                                'Edit palette analysis',
+                              )
+                            }
+                          />
+                          <SelectControl
+                            label="Method"
+                            value={analysis.options?.method ?? 'kmeans'}
+                            options={['kmeans', 'median-cut', 'octree']}
+                            onChange={(method) =>
+                              updateAnalyses(
+                                analyses.map((item) =>
+                                  item.id === analysis.id &&
+                                  item.type === 'extractPalette'
+                                    ? {
+                                        ...item,
+                                        options: {
+                                          ...item.options,
+                                          method: method as
+                                            | 'kmeans'
+                                            | 'median-cut'
+                                            | 'octree',
+                                        },
+                                      }
+                                    : item,
+                                ),
+                                'Edit palette analysis',
+                              )
+                            }
+                          />
+                          <SelectControl
+                            label="Format"
+                            value={analysis.options?.format ?? 'hex'}
+                            options={['hex', 'rgb', 'hsl']}
+                            onChange={(format) =>
+                              updateAnalyses(
+                                analyses.map((item) =>
+                                  item.id === analysis.id &&
+                                  item.type === 'extractPalette'
+                                    ? {
+                                        ...item,
+                                        options: {
+                                          ...item.options,
+                                          format: format as 'hex' | 'rgb' | 'hsl',
+                                        },
+                                      }
+                                    : item,
+                                ),
+                                'Edit palette analysis',
+                              )
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <div className="apx-advanced-empty">
+                          Color analysis has no authoring parameters.
+                        </div>
+                      )}
+                      <details className="apx-effects-contract-details">
+                        <summary>Advanced contract</summary>
+                        <div>
+                          <JsonConfig
+                            value={analysis}
+                            onApply={(next) => {
+                              const parsed = normalizeImageUtilityAnalysisDraft(
+                                analysis.type,
+                                analysis.id,
+                                next,
+                              );
+                              updateAnalyses(
+                                analyses.map((item) =>
+                                  item.id === analysis.id ? parsed : item,
+                                ),
+                                'Edit image analysis',
+                              );
+                            }}
+                          />
+                        </div>
+                      </details>
+                    </div>
+                  ) : null}
+                </article>
+              );
+            })}
+          </div>
+        </section>
 
-        <div className="apx-live-sync-note" data-phase10-api-coverage>
-          <strong>Phase 10 API coverage</strong>
+        <div className="apx-live-sync-note apx-advanced-coverage-note" data-phase10-api-coverage>
+          <strong>Runtime API coverage</strong>
           <span>
-            All {Object.keys(IMAGE_UTILITY_API_COVERAGE).length} public image utility members are classified.
-            removeBackground is intentionally excluded from hosted authoring because it requires external credentials;
-            validHex is a non-authoring helper.
+            All {Object.keys(IMAGE_UTILITY_API_COVERAGE).length} public image utility
+            members are classified. removeBackground stays excluded from hosted
+            authoring because it requires external credentials; validHex is a helper.
           </span>
         </div>
-      </>
+      </div>
     );
   }
 
