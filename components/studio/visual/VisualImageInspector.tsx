@@ -651,48 +651,82 @@ function FilterEditor({
   onChange: (filters: VisualImageFilter[]) => void;
 }) {
   return (
-    <div data-image-v2-filter-stack>
-      <div className="apx-canvas-section-heading">
-        <span />
+    <div className="apx-image-filter-editor" data-image-v2-filter-stack>
+      <div className="apx-image-filter-editor-head">
+        <span>
+          <strong>Filter stack</strong>
+          <small>{filters.length} {filters.length === 1 ? 'filter' : 'filters'}</small>
+        </span>
         <button
           className="apx-canvas-mini-button"
           type="button"
           onClick={() =>
-            onChange([...filters, defaultVisualImageFilter('brightness', width, height)])
+            onChange([
+              ...filters,
+              defaultVisualImageFilter('brightness', width, height),
+            ])
           }
         >
-          ＋ Filter
+          + Filter
         </button>
       </div>
       <div className="apx-image-filter-stack">
+        {filters.length === 0 ? (
+          <div className="apx-image-filter-empty">
+            No filters. Add one to start the ordered runtime stack.
+          </div>
+        ) : null}
         {filters.map((filter, index) => {
           const fields = imageFilterFieldSpecs(filter.type, width, height, filter);
           const parameterless = IMAGE_FILTER_PARAMETERLESS_TYPES.includes(
             filter.type as (typeof IMAGE_FILTER_PARAMETERLESS_TYPES)[number],
           );
           return (
-            <div className="apx-image-filter-row" key={index} data-filter-type={filter.type}>
-              <select
-                className="apx-canvas-v2-input apx-pre4-input"
-                value={filter.type}
-                onChange={(event) =>
-                  onChange(
-                    filters.map((item, itemIndex) =>
-                      itemIndex === index
-                        ? defaultVisualImageFilter(
-                            event.target.value as VisualImageFilter['type'],
-                            width,
-                            height,
-                          )
-                        : item,
-                    ),
-                  )
-                }
-              >
-                {IMAGE_FILTER_TYPES.map((type) => <option key={type}>{type}</option>)}
-              </select>
+            <div
+              className="apx-image-filter-card"
+              key={index}
+              data-filter-type={filter.type}
+            >
+              <div className="apx-image-filter-card-head">
+                <span className="apx-image-filter-index">{index + 1}</span>
+                <select
+                  className="apx-canvas-v2-input apx-pre4-input"
+                  aria-label={'Filter ' + (index + 1) + ' type'}
+                  value={filter.type}
+                  onChange={(event) =>
+                    onChange(
+                      filters.map((item, itemIndex) =>
+                        itemIndex === index
+                          ? defaultVisualImageFilter(
+                              event.target.value as VisualImageFilter['type'],
+                              width,
+                              height,
+                            )
+                          : item,
+                      ),
+                    )
+                  }
+                >
+                  {IMAGE_FILTER_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type.replace(/([a-z])([A-Z])/g, '$1 $2')}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="apx-image-filter-remove"
+                  type="button"
+                  title="Remove filter"
+                  aria-label={'Remove filter ' + (index + 1)}
+                  onClick={() =>
+                    onChange(filters.filter((_, itemIndex) => itemIndex !== index))
+                  }
+                >
+                  ×
+                </button>
+              </div>
               {!parameterless ? (
-                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
+                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid apx-image-filter-fields">
                   {fields.map((field) => (
                     <NumericField
                       key={field.key}
@@ -705,7 +739,13 @@ function FilterEditor({
                         onChange(
                           filters.map((item, itemIndex) =>
                             itemIndex === index
-                              ? updateVisualImageFilterValue(item, field.key, value, width, height)
+                              ? updateVisualImageFilterValue(
+                                  item,
+                                  field.key,
+                                  value,
+                                  width,
+                                  height,
+                                )
                               : item,
                           ),
                         )
@@ -714,15 +754,10 @@ function FilterEditor({
                   ))}
                 </div>
               ) : (
-                <small className="apx-canvas-v2-field-hint">Presence means enabled.</small>
+                <small className="apx-image-filter-presence">
+                  Enabled by presence · no parameters.
+                </small>
               )}
-              <button
-                className="apx-canvas-mini-button"
-                type="button"
-                onClick={() => onChange(filters.filter((_, itemIndex) => itemIndex !== index))}
-              >
-                Remove
-              </button>
             </div>
           );
         })}
@@ -730,7 +765,6 @@ function FilterEditor({
     </div>
   );
 }
-
 function MaskEditor({
   value,
   imageAssets,
