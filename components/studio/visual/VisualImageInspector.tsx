@@ -1087,6 +1087,7 @@ function GroupTransformEditor({
   height,
   imageAssets,
   generatedNodes,
+  scope = 'all',
   onChange,
 }: {
   value: VisualImageGroupTransform;
@@ -1094,403 +1095,478 @@ function GroupTransformEditor({
   height: number;
   imageAssets: readonly StudioVirtualAsset[];
   generatedNodes: readonly VisualNode[];
+  scope?: 'all' | 'transform' | 'style' | 'effects';
   onChange: (value: VisualImageGroupTransform) => void;
 }) {
   const set = (patch: Partial<VisualImageGroupTransform>) =>
     onChange({ ...value, ...patch });
+  const showTransform = scope === 'all' || scope === 'transform';
+  const showStyle = scope === 'all' || scope === 'style';
+  const showEffects = scope === 'all' || scope === 'effects';
 
   return (
-    <div className="apx-image-v2-nested" data-image-v2-group-transform>
-      <Section
-        title="Group transform"
-        description="Applied once to the temporary grouped ImageProperties[] surface."
-        attr="group-transform-geometry"
-      >
-        <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
-          {([
-            ['Rotation', 'rotation'],
-            ['Translate X', 'translateX'],
-            ['Translate Y', 'translateY'],
-            ['Scale X', 'scaleX'],
-            ['Scale Y', 'scaleY'],
-            ['Pivot X', 'pivotX'],
-            ['Pivot Y', 'pivotY'],
-            ['Opacity', 'opacity'],
-            ['Blur', 'blur'],
-            ['Filter intensity', 'filterIntensity'],
-          ] as const).map(([label, key]) => (
-            <NumericField
-              key={key}
-              label={label}
-              value={value[key] as number | undefined}
-              step={key.includes('scale') || key === 'opacity' ? 0.01 : 1}
-              onChange={(nextValue) => set({ [key]: nextValue })}
-            />
-          ))}
-          <label>
-            <span>Blend</span>
-            <select
-              className="apx-canvas-v2-input apx-pre4-input"
-              value={value.blendMode ?? 'source-over'}
-              onChange={(event) =>
-                set({ blendMode: event.target.value as VisualBlendMode })
-              }
-            >
-              {IMAGE_BLEND_MODES.map((mode) => (
-                <option key={mode}>{mode}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            <span>Border radius</span>
-            <input
-              className="apx-canvas-v2-input apx-pre4-input"
-              value={value.borderRadius ?? ''}
-              placeholder="number or circular"
-              onChange={(event) => {
-                const raw = event.target.value.trim();
-                set({
-                  borderRadius:
-                    raw === 'circular'
-                      ? 'circular'
-                      : raw
-                        ? Number(raw)
-                        : undefined,
-                });
-              }}
-            />
-          </label>
-          <label>
-            <span>Border position</span>
-            <input
-              className="apx-canvas-v2-input apx-pre4-input"
-              value={value.borderPosition ?? ''}
-              placeholder="all / top / left…"
-              onChange={(event) => set({ borderPosition: event.target.value })}
-            />
-          </label>
-          <label>
-            <span>Filter order</span>
-            <select
-              className="apx-canvas-v2-input apx-pre4-input"
-              value={value.filterOrder ?? 'post'}
-              onChange={(event) =>
-                set({ filterOrder: event.target.value as 'pre' | 'post' })
-              }
-            >
-              <option value="pre">pre</option>
-              <option value="post">post</option>
-            </select>
-          </label>
-        </div>
-      </Section>
+    <div className="apx-image-group-editor" data-image-v2-group-transform data-scope={scope}>
+      {showTransform ? (
+        <Section
+          title="Group transform"
+          description="Applied once to the temporary grouped ImageProperties[] surface."
+          attr="group-transform-geometry"
+        >
+          <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
+            {([
+              ['Rotation', 'rotation'],
+              ['Translate X', 'translateX'],
+              ['Translate Y', 'translateY'],
+              ['Scale X', 'scaleX'],
+              ['Scale Y', 'scaleY'],
+              ['Pivot X', 'pivotX'],
+              ['Pivot Y', 'pivotY'],
+            ] as const).map(([label, key]) => (
+              <NumericField
+                key={key}
+                label={label}
+                value={value[key] as number | undefined}
+                step={key.includes('scale') ? 0.01 : 1}
+                onChange={(nextValue) => set({ [key]: nextValue })}
+              />
+            ))}
+          </div>
+        </Section>
+      ) : null}
 
-      <Section title="Group filters" attr="group-filters">
-        <FilterEditor
-          filters={value.filters ?? []}
-          width={width}
-          height={height}
-          onChange={(filters) => set({ filters })}
-        />
-      </Section>
-
-      <Section title="Group mask & clip" attr="group-mask-clip">
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={Boolean(value.mask)}
-            onChange={(event) =>
-              set({
-                mask: event.target.checked
-                  ? { source: '', mode: 'alpha' }
-                  : undefined,
-              })
-            }
-          />
-          <span>Mask grouped result</span>
-        </label>
-        {value.mask ? (
-          <MaskEditor
-            value={value.mask}
-            imageAssets={imageAssets}
-            generatedNodes={generatedNodes}
-            onChange={(mask) => set({ mask })}
-          />
-        ) : null}
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={Boolean(value.clipPath)}
-            onChange={(event) =>
-              set({
-                clipPath: event.target.checked
-                  ? [
-                      { x: 0, y: 0 },
-                      { x: width, y: 0 },
-                      { x: width, y: height },
-                      { x: 0, y: height },
-                    ]
-                  : undefined,
-              })
-            }
-          />
-          <span>Clip grouped result</span>
-        </label>
-        {value.clipPath ? (
-          <PointListEditor
-            title="Group clip vertices"
-            points={value.clipPath}
-            minPoints={3}
-            onChange={(clipPath) => set({ clipPath })}
-          />
-        ) : null}
-      </Section>
-
-      <Section title="Group distortion" attr="group-distortion">
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={Boolean(value.distortion)}
-            onChange={(event) =>
-              set({
-                distortion: event.target.checked
-                  ? {
-                      type: 'bulge',
-                      intensity: 0.2,
-                      interpolation: 'bilinear',
-                      edgeMode: 'transparent',
-                    }
-                  : undefined,
-              })
-            }
-          />
-          <span>Distort grouped result</span>
-        </label>
-        {value.distortion ? (
-          <DistortionEditor
-            value={value.distortion}
-            onChange={(distortion) => set({ distortion })}
-          />
-        ) : null}
-      </Section>
-
-      <Section title="Group mesh warp" attr="group-mesh-warp">
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={Boolean(value.meshWarp)}
-            onChange={(event) =>
-              set({
-                meshWarp: event.target.checked
-                  ? defaultMesh(width, height)
-                  : undefined,
-              })
-            }
-          />
-          <span>Warp grouped result</span>
-        </label>
-        {value.meshWarp ? (
-          <MeshWarpEditor
-            value={value.meshWarp}
-            width={width}
-            height={height}
-            onChange={(meshWarp) => set({ meshWarp })}
-          />
-        ) : null}
-      </Section>
-
-      <Section title="Group raster effects" attr="group-raster-effects">
-        {([
-          ['vignette', { intensity: 0.5, size: 0.6 }],
-          ['lensFlare', { x: width / 2, y: height / 2, intensity: 0.5 }],
-          ['chromaticAberration', { intensity: 0.2 }],
-          ['filmGrain', { intensity: 0.15 }],
-        ] as const).map(([key, defaults]) => {
-          const current = value.effects?.[key];
-          return (
-            <div className="apx-image-v2-nested" key={key}>
-              <label className="apx-image-v2-check apx-canvas-check">
-                <input
-                  type="checkbox"
-                  checked={Boolean(current)}
+      {showStyle ? (
+        <>
+          <Section
+            title="Group appearance"
+            description="Opacity, blur, compositing and clipping geometry."
+            attr="group-appearance"
+          >
+            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
+              <NumericField
+                label="Opacity"
+                value={value.opacity ?? 1}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(opacity) => set({ opacity })}
+              />
+              <NumericField
+                label="Blur"
+                value={value.blur ?? 0}
+                min={0}
+                step={0.5}
+                onChange={(blur) => set({ blur })}
+              />
+              <label>
+                <span>Blend mode</span>
+                <select
+                  className="apx-canvas-v2-input apx-pre4-input"
+                  value={value.blendMode ?? 'source-over'}
                   onChange={(event) =>
-                    set({
-                      effects: {
-                        ...(value.effects ?? {}),
-                        [key]: event.target.checked ? defaults : undefined,
-                      },
-                    })
+                    set({ blendMode: event.target.value as VisualBlendMode })
                   }
-                />
-                <span>{key}</span>
+                >
+                  {IMAGE_BLEND_MODES.map((mode) => (
+                    <option key={mode}>{mode}</option>
+                  ))}
+                </select>
               </label>
-              {current ? (
-                <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
-                  {Object.entries(current).map(([field, fieldValue]) => (
-                    <NumericField
-                      key={field}
-                      label={field}
-                      value={numberValue(fieldValue)}
-                      step={0.01}
-                      onChange={(nextValue) =>
+              <label>
+                <span>Border radius</span>
+                <input
+                  className="apx-canvas-v2-input apx-pre4-input"
+                  value={value.borderRadius ?? ''}
+                  placeholder="0 or circular"
+                  onChange={(event) => {
+                    const raw = event.target.value.trim();
+                    set({
+                      borderRadius:
+                        raw === 'circular'
+                          ? 'circular'
+                          : raw
+                            ? Number(raw)
+                            : undefined,
+                    });
+                  }}
+                />
+              </label>
+            </div>
+            <MultiPositionField
+              label="Border position"
+              value={value.borderPosition ?? 'all'}
+              onChange={(borderPosition) => set({ borderPosition })}
+            />
+          </Section>
+
+          <Section title="Group stroke" attr="group-stroke" defaultOpen={Boolean(value.stroke)}>
+            <div className="apx-image-v2-toggle-row">
+              <span>
+                <strong>Stroke grouped result</strong>
+                <small>Outline the final temporary group surface.</small>
+              </span>
+              <Toggle
+                label="Stroke grouped result"
+                checked={Boolean(value.stroke)}
+                onChange={(checked) =>
+                  set({
+                    stroke: checked
+                      ? { color: '#ffffff', width: 2, style: 'solid' }
+                      : undefined,
+                  })
+                }
+              />
+            </div>
+            {value.stroke ? (
+              <StrokeEditor value={value.stroke} onChange={(stroke) => set({ stroke })} />
+            ) : null}
+          </Section>
+
+          <Section title="Group shadow" attr="group-shadow" defaultOpen={Boolean(value.shadow)}>
+            <div className="apx-image-v2-toggle-row">
+              <span>
+                <strong>Shadow grouped result</strong>
+                <small>Paint one shadow around the processed group.</small>
+              </span>
+              <Toggle
+                label="Shadow grouped result"
+                checked={Boolean(value.shadow)}
+                onChange={(checked) =>
+                  set({
+                    shadow: checked
+                      ? {
+                          color: '#000000',
+                          offsetX: 0,
+                          offsetY: 8,
+                          blur: 16,
+                          opacity: 0.35,
+                        }
+                      : undefined,
+                  })
+                }
+              />
+            </div>
+            {value.shadow ? (
+              <ShadowEditor value={value.shadow} onChange={(shadow) => set({ shadow })} />
+            ) : null}
+          </Section>
+
+          <Section
+            title="Group background"
+            attr="group-box-background"
+            defaultOpen={Boolean(value.boxBackground)}
+          >
+            <div className="apx-image-v2-toggle-row">
+              <span>
+                <strong>Paint group background</strong>
+                <small>Paint behind all batch children before raster processing.</small>
+              </span>
+              <Toggle
+                label="Paint group background"
+                checked={Boolean(value.boxBackground)}
+                onChange={(checked) =>
+                  set({
+                    boxBackground: checked ? { color: '#0b1730' } : undefined,
+                  })
+                }
+              />
+            </div>
+            {value.boxBackground ? (
+              <>
+                <div className="apx-canvas-v2-color apx-canvas-color-row">
+                  <input
+                    type="color"
+                    value={
+                      value.boxBackground.color?.startsWith('#')
+                        ? value.boxBackground.color
+                        : '#0b1730'
+                    }
+                    onChange={(event) =>
+                      set({
+                        boxBackground: {
+                          ...value.boxBackground!,
+                          color: event.target.value,
+                        },
+                      })
+                    }
+                  />
+                  <input
+                    className="apx-canvas-v2-input apx-pre4-input"
+                    value={value.boxBackground.color ?? ''}
+                    onChange={(event) =>
+                      set({
+                        boxBackground: {
+                          ...value.boxBackground!,
+                          color: event.target.value,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                <div className="apx-image-v2-toggle-row">
+                  <span>
+                    <strong>Gradient background</strong>
+                    <small>Replace the flat group background with a gradient.</small>
+                  </span>
+                  <Toggle
+                    label="Gradient group background"
+                    checked={Boolean(value.boxBackground.gradient)}
+                    onChange={(checked) =>
+                      set({
+                        boxBackground: {
+                          ...value.boxBackground!,
+                          gradient: checked
+                            ? {
+                                type: 'linear',
+                                startX: 0,
+                                startY: 0,
+                                endX: width,
+                                endY: 0,
+                                colors: [
+                                  { stop: 0, color: '#0b1730' },
+                                  { stop: 1, color: '#334155' },
+                                ],
+                              }
+                            : undefined,
+                        },
+                      })
+                    }
+                  />
+                </div>
+                {value.boxBackground.gradient ? (
+                  <GradientEditor
+                    value={value.boxBackground.gradient}
+                    onChange={(gradient) =>
+                      set({
+                        boxBackground: {
+                          ...value.boxBackground!,
+                          gradient,
+                        },
+                      })
+                    }
+                  />
+                ) : null}
+              </>
+            ) : null}
+          </Section>
+        </>
+      ) : null}
+
+      {showEffects ? (
+        <>
+          <Section
+            title="Group filters"
+            description={(value.filters?.length ?? 0) + ' filters on the grouped surface'}
+            attr="group-filters"
+          >
+            <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
+              <NumericField
+                label="Filter intensity"
+                value={value.filterIntensity ?? 1}
+                min={0}
+                step={0.05}
+                onChange={(filterIntensity) => set({ filterIntensity })}
+              />
+              <label>
+                <span>Filter order</span>
+                <select
+                  className="apx-canvas-v2-input apx-pre4-input"
+                  value={value.filterOrder ?? 'post'}
+                  onChange={(event) =>
+                    set({ filterOrder: event.target.value as 'pre' | 'post' })
+                  }
+                >
+                  <option value="pre">Before warp</option>
+                  <option value="post">After warp</option>
+                </select>
+              </label>
+            </div>
+            <FilterEditor
+              filters={value.filters ?? []}
+              width={width}
+              height={height}
+              onChange={(filters) => set({ filters })}
+            />
+          </Section>
+
+          <Section
+            title="Group mask & clip"
+            attr="group-mask-clip"
+            defaultOpen={Boolean(value.mask || value.clipPath)}
+          >
+            <div className="apx-image-v2-toggle-row">
+              <span>
+                <strong>Mask grouped result</strong>
+                <small>Mask the final grouped raster, not each child separately.</small>
+              </span>
+              <Toggle
+                label="Mask grouped result"
+                checked={Boolean(value.mask)}
+                onChange={(checked) =>
+                  set({ mask: checked ? { source: '', mode: 'alpha' } : undefined })
+                }
+              />
+            </div>
+            {value.mask ? (
+              <MaskEditor
+                value={value.mask}
+                imageAssets={imageAssets}
+                generatedNodes={generatedNodes}
+                onChange={(mask) => set({ mask })}
+              />
+            ) : null}
+            <div className="apx-image-v2-toggle-row">
+              <span>
+                <strong>Clip grouped result</strong>
+                <small>Clip the temporary group surface with a polygon.</small>
+              </span>
+              <Toggle
+                label="Clip grouped result"
+                checked={Boolean(value.clipPath)}
+                onChange={(checked) =>
+                  set({
+                    clipPath: checked
+                      ? [
+                          { x: 0, y: 0 },
+                          { x: width, y: 0 },
+                          { x: width, y: height },
+                          { x: 0, y: height },
+                        ]
+                      : undefined,
+                  })
+                }
+              />
+            </div>
+            {value.clipPath ? (
+              <PointListEditor
+                title="Group clip vertices"
+                points={value.clipPath}
+                minPoints={3}
+                onChange={(clipPath) => set({ clipPath })}
+              />
+            ) : null}
+          </Section>
+
+          <Section
+            title="Group distortion"
+            attr="group-distortion"
+            defaultOpen={Boolean(value.distortion)}
+          >
+            <div className="apx-image-v2-toggle-row">
+              <span>
+                <strong>Distort grouped result</strong>
+                <small>Apply one runtime distortion after children are composited.</small>
+              </span>
+              <Toggle
+                label="Distort grouped result"
+                checked={Boolean(value.distortion)}
+                onChange={(checked) =>
+                  set({
+                    distortion: checked
+                      ? {
+                          type: 'bulge',
+                          intensity: 0.2,
+                          interpolation: 'bilinear',
+                          edgeMode: 'transparent',
+                        }
+                      : undefined,
+                  })
+                }
+              />
+            </div>
+            {value.distortion ? (
+              <DistortionEditor
+                value={value.distortion}
+                onChange={(distortion) => set({ distortion })}
+              />
+            ) : null}
+          </Section>
+
+          <Section
+            title="Group mesh warp"
+            attr="group-mesh-warp"
+            defaultOpen={Boolean(value.meshWarp)}
+          >
+            <div className="apx-image-v2-toggle-row">
+              <span>
+                <strong>Warp grouped result</strong>
+                <small>Deform the composed group through the runtime mesh.</small>
+              </span>
+              <Toggle
+                label="Warp grouped result"
+                checked={Boolean(value.meshWarp)}
+                onChange={(checked) =>
+                  set({ meshWarp: checked ? defaultMesh(width, height) : undefined })
+                }
+              />
+            </div>
+            {value.meshWarp ? (
+              <MeshWarpEditor
+                value={value.meshWarp}
+                width={width}
+                height={height}
+                onChange={(meshWarp) => set({ meshWarp })}
+              />
+            ) : null}
+          </Section>
+
+          <Section
+            title="Group raster effects"
+            description="Vignette, lens flare, chromatic aberration and film grain."
+            attr="group-raster-effects"
+          >
+            {([
+              ['vignette', 'Vignette', { intensity: 0.5, size: 0.6 }],
+              ['lensFlare', 'Lens flare', { x: width / 2, y: height / 2, intensity: 0.5 }],
+              ['chromaticAberration', 'Chromatic aberration', { intensity: 0.2 }],
+              ['filmGrain', 'Film grain', { intensity: 0.15 }],
+            ] as const).map(([key, label, defaults]) => {
+              const current = value.effects?.[key];
+              return (
+                <div className="apx-image-v2-nested" key={key}>
+                  <div className="apx-image-v2-toggle-row">
+                    <span>
+                      <strong>{label}</strong>
+                      <small>{current ? 'Active on grouped surface' : 'Off'}</small>
+                    </span>
+                    <Toggle
+                      label={'Enable ' + label}
+                      checked={Boolean(current)}
+                      onChange={(checked) =>
                         set({
                           effects: {
                             ...(value.effects ?? {}),
-                            [key]: { ...current, [field]: nextValue },
+                            [key]: checked ? defaults : undefined,
                           },
                         })
                       }
                     />
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </Section>
-
-      <Section title="Group stroke" attr="group-stroke">
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={Boolean(value.stroke)}
-            onChange={(event) =>
-              set({
-                stroke: event.target.checked
-                  ? { color: '#ffffff', width: 2, style: 'solid' }
-                  : undefined,
-              })
-            }
-          />
-          <span>Stroke grouped result</span>
-        </label>
-        {value.stroke ? (
-          <StrokeEditor
-            value={value.stroke}
-            onChange={(stroke) => set({ stroke })}
-          />
-        ) : null}
-      </Section>
-
-      <Section title="Group shadow" attr="group-shadow">
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={Boolean(value.shadow)}
-            onChange={(event) =>
-              set({
-                shadow: event.target.checked
-                  ? {
-                      color: '#000000',
-                      offsetX: 0,
-                      offsetY: 8,
-                      blur: 16,
-                      opacity: 0.35,
-                    }
-                  : undefined,
-              })
-            }
-          />
-          <span>Shadow grouped result</span>
-        </label>
-        {value.shadow ? (
-          <ShadowEditor
-            value={value.shadow}
-            onChange={(shadow) => set({ shadow })}
-          />
-        ) : null}
-      </Section>
-
-      <Section title="Group box background" attr="group-box-background">
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={Boolean(value.boxBackground)}
-            onChange={(event) =>
-              set({
-                boxBackground: event.target.checked
-                  ? { color: '#0b1730' }
-                  : undefined,
-              })
-            }
-          />
-          <span>Paint group background</span>
-        </label>
-        {value.boxBackground ? (
-          <>
-            <div className="apx-canvas-v2-color apx-canvas-color-row">
-              <input
-                type="color"
-                value={
-                  value.boxBackground.color?.startsWith('#')
-                    ? value.boxBackground.color
-                    : '#0b1730'
-                }
-                onChange={(event) =>
-                  set({
-                    boxBackground: {
-                      ...value.boxBackground!,
-                      color: event.target.value,
-                    },
-                  })
-                }
-              />
-              <input
-                className="apx-canvas-v2-input apx-pre4-input"
-                value={value.boxBackground.color ?? ''}
-                onChange={(event) =>
-                  set({
-                    boxBackground: {
-                      ...value.boxBackground!,
-                      color: event.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
-            <label className="apx-image-v2-check apx-canvas-check">
-              <input
-                type="checkbox"
-                checked={Boolean(value.boxBackground.gradient)}
-                onChange={(event) =>
-                  set({
-                    boxBackground: {
-                      ...value.boxBackground!,
-                      gradient: event.target.checked
-                        ? {
-                            type: 'linear',
-                            startX: 0,
-                            startY: 0,
-                            endX: width,
-                            endY: 0,
-                            colors: [
-                              { stop: 0, color: '#0b1730' },
-                              { stop: 1, color: '#334155' },
-                            ],
+                  </div>
+                  {current ? (
+                    <div className="apx-canvas-v2-grid apx-canvas-v2-grid--2 apx-pre4-property-grid">
+                      {Object.entries(current).map(([field, fieldValue]) => (
+                        <NumericField
+                          key={field}
+                          label={field.replace(/([a-z])([A-Z])/g, '$1 $2')}
+                          value={numberValue(fieldValue)}
+                          step={field === 'x' || field === 'y' ? 1 : 0.01}
+                          onChange={(nextValue) =>
+                            set({
+                              effects: {
+                                ...(value.effects ?? {}),
+                                [key]: { ...current, [field]: nextValue },
+                              },
+                            })
                           }
-                        : undefined,
-                    },
-                  })
-                }
-              />
-              <span>Gradient background</span>
-            </label>
-            {value.boxBackground.gradient ? (
-              <GradientEditor
-                value={value.boxBackground.gradient}
-                onChange={(gradient) =>
-                  set({
-                    boxBackground: {
-                      ...value.boxBackground!,
-                      gradient,
-                    },
-                  })
-                }
-              />
-            ) : null}
-          </>
-        ) : null}
-      </Section>
+                        />
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </Section>
+        </>
+      ) : null}
     </div>
   );
 }
@@ -1517,6 +1593,9 @@ export function VisualImageBatchInspector({
 }) {
   const batch = visualImageBatchGroupProps(node);
   if (!batch) return null;
+  const groupedSurface =
+    batch.createOptions.isGrouped === true &&
+    Boolean(batch.createOptions.groupTransform);
   const groupTransform = batch.createOptions.groupTransform ?? {
     scaleX: 1,
     scaleY: 1,
@@ -1530,16 +1609,46 @@ export function VisualImageBatchInspector({
     updater: (current: VisualImageBatchGroupProps) => VisualImageBatchGroupProps,
   ) => onChange(label, updater);
 
+  const setGroupedSurface = (enabled: boolean) =>
+    setBatch('Image batch grouped surface', (current) => ({
+      ...current,
+      createOptions: enabled
+        ? {
+            ...current.createOptions,
+            isGrouped: true,
+            groupTransform: current.createOptions.groupTransform ?? {
+              scaleX: 1,
+              scaleY: 1,
+              opacity: 1,
+            },
+          }
+        : {
+            ...current.createOptions,
+            isGrouped: false,
+            groupTransform: undefined,
+          },
+    }));
+
+  const updateGroupTransform = (next: VisualImageGroupTransform) =>
+    setBatch('Image group transform', (current) => ({
+      ...current,
+      createOptions: {
+        ...current.createOptions,
+        isGrouped: true,
+        groupTransform: next,
+      },
+    }));
+
   const header = (
     <div className="apx-canvas-v2-header apx-image-v2-header" data-image-v2-batch-inspector>
       <div className="apx-canvas-v2-api-icon"><Squares2X2Icon aria-hidden /></div>
       <div>
         <strong>createImage([...])</strong>
-        <span>{node.name ?? 'Image group'} · {node.childIds?.length ?? 0} layers</span>
+        <span>{node.name ?? 'Image batch'} · {node.childIds?.length ?? 0} image/shape layers</span>
       </div>
       <div className="apx-canvas-v2-api-status">
         <strong>{Math.round(width)} × {Math.round(height)}</strong>
-        <span>Image batch</span>
+        <span>{groupedSurface ? 'Grouped surface' : 'Array batch'}</span>
       </div>
     </div>
   );
@@ -1557,30 +1666,28 @@ export function VisualImageBatchInspector({
               onChange={(event) => onRename(event.target.value)}
             />
           </label>
-          <div className="apx-live-sync-note">
-            <strong>One runtime call</strong>
-            <span>
-              Children remain editable image/shape layers, but codegen emits one
-              createImage([...]) call in child order.
-            </span>
+          <div className="apx-image-batch-summary">
+            <strong>{node.childIds?.length ?? 0} children · one createImage([...]) call</strong>
+            <span>Child order in Layers is the runtime array order. Reorder the child layers to change render order.</span>
           </div>
         </Section>
         <Section title="Runtime asset references" attr="batch-painter-options">
-          <label className="apx-image-v2-check apx-canvas-check">
-            <input
-              type="checkbox"
+          <div className="apx-image-v2-toggle-row">
+            <span>
+              <strong>Resolve asset references</strong>
+              <small>Resolve $name / $value.path for every batch child and nested option.</small>
+            </span>
+            <Toggle
+              label="Resolve image batch asset references"
               checked={batch.painterOpts?.resolveAssetRefs ?? false}
-              onChange={(event) =>
+              onChange={(checked) =>
                 setBatch('Image group asset resolution', (current) => ({
                   ...current,
-                  painterOpts: event.target.checked
-                    ? { resolveAssetRefs: true }
-                    : undefined,
+                  painterOpts: checked ? { resolveAssetRefs: true } : undefined,
                 }))
               }
             />
-            <span>Resolve $name / $value.path for every batch child and option</span>
-          </label>
+          </div>
         </Section>
       </>
     );
@@ -1591,37 +1698,55 @@ export function VisualImageBatchInspector({
       <>
         {header}
         <Section
-          title="CreateImage batch options"
-          description="This group is the actual ImageProperties[] call boundary."
+          title="Batch rendering"
+          description="Matches Apexify.js CreateImageOptions exactly."
           attr="batch-call-options"
         >
-          <label className="apx-image-v2-check apx-canvas-check">
-            <input
-              type="checkbox"
-              checked={batch.createOptions.isGrouped ?? false}
-              onChange={(event) =>
-                setBatch('Image batch grouped surface', (current) => ({
-                  ...current,
-                  createOptions: {
-                    ...current.createOptions,
-                    isGrouped: event.target.checked,
-                  },
-                }))
-              }
+          <div className="apx-image-v2-toggle-row">
+            <span>
+              <strong>Grouped surface processing</strong>
+              <small>
+                Enables isGrouped and GroupTransformOptions together. Apexify only
+                executes the group pipeline when the array has 2+ items and both are present.
+              </small>
+            </span>
+            <Toggle
+              label="Grouped surface processing"
+              checked={groupedSurface}
+              onChange={setGroupedSurface}
             />
-            <span>isGrouped temporary surface</span>
-          </label>
+          </div>
+          <div className="apx-image-batch-runtime-note" data-image-batch-runtime-contract>
+            <strong>{groupedSurface ? 'Grouped runtime path active' : 'Sequential array rendering'}</strong>
+            <span>
+              {groupedSurface
+                ? 'Children render to a temporary surface first; the shared transform/effects are applied once.'
+                : 'The batch remains one createImage([...]) call, but children are painted sequentially without a temporary grouped surface.'}
+            </span>
+          </div>
         </Section>
-        <div className="apx-live-sync-note" data-image-v2-no-json-primary>
-          <strong>Typed batch authoring</strong>
+      </>
+    );
+  }
+
+  if (!groupedSurface) {
+    return (
+      <>
+        {header}
+        <div className="apx-image-batch-disabled-state">
+          <Squares2X2Icon aria-hidden />
+          <strong>Grouped surface processing is off</strong>
           <span>
-            No raw JSON escape hatch is required for CreateImageOptions or
-            GroupTransformOptions.
+            This is still a real createImage([...]) batch. Turn on Grouped surface
+            processing in Advanced to edit shared {tab} controls.
           </span>
         </div>
       </>
     );
   }
+
+  const scope: 'transform' | 'style' | 'effects' =
+    tab === 'transform' ? 'transform' : tab === 'effects' ? 'effects' : 'style';
 
   return (
     <>
@@ -1632,16 +1757,8 @@ export function VisualImageBatchInspector({
         height={height}
         imageAssets={imageAssets}
         generatedNodes={generatedNodes}
-        onChange={(next) =>
-          setBatch('Image group transform', (current) => ({
-            ...current,
-            createOptions: {
-              ...current.createOptions,
-              isGrouped: true,
-              groupTransform: next,
-            },
-          }))
-        }
+        scope={scope}
+        onChange={updateGroupTransform}
       />
     </>
   );
@@ -2161,71 +2278,37 @@ export function VisualImageInspector({
     );
   }
 
-  const options = props.createOptions ?? {};
-  const group = options.groupTransform ?? {};
   return (
     <>
       {header}
-      <Section title="CreateImage options" description="Third argument to createImage(). Group transforms become meaningful for true ImageProperties[] batches." attr="create-options">
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={options.isGrouped ?? false}
-            onChange={(event) =>
-              patch('Image grouped rendering', {
-                createOptions: { ...options, isGrouped: event.target.checked },
-              })
-            }
-          />
-          <span>isGrouped</span>
-        </label>
-        <label className="apx-image-v2-check apx-canvas-check">
-          <input
-            type="checkbox"
-            checked={Boolean(options.groupTransform)}
-            onChange={(event) =>
-              patch('Image group transform', {
-                createOptions: {
-                  ...options,
-                  groupTransform: event.target.checked
-                    ? { scaleX: 1, scaleY: 1, opacity: 1 }
-                    : undefined,
-                },
-              })
-            }
-          />
-          <span>Group transform</span>
-        </label>
-        {options.groupTransform ? (
-          <GroupTransformEditor
-            value={group}
-            width={width}
-            height={height}
-            imageAssets={imageAssets}
-            generatedNodes={generatedNodes}
-            onChange={(groupTransform) =>
-              patch('Image group transform', {
-                createOptions: { ...options, groupTransform },
-              })
-            }
-          />
-        ) : null}
+      <Section
+        title="Batch rendering"
+        description="CreateImageOptions apply to ImageProperties[] batches, not a single image."
+        attr="create-options"
+        defaultOpen={false}
+      >
+        <div className="apx-image-batch-disabled-state" data-image-single-batch-warning>
+          <Squares2X2Icon aria-hidden />
+          <strong>Group options require an image batch</strong>
+          <span>
+            Apexify.js only runs isGrouped + GroupTransformOptions when createImage()
+            receives an array with at least two items. Select 2+ image/shape layers in
+            Layers and press Group to create the real createImage([...]) boundary.
+          </span>
+        </div>
       </Section>
 
-      <Section title="Advanced image utility APIs" description="Nondestructive painter.image.* stack; not part of ImageProperties." attr="advanced-utilities">
+      <Section
+        title="Advanced image utilities"
+        description="Typed painter.image.* output and analysis operations."
+        attr="advanced-utilities"
+      >
         <VisualImageUtilityAuthoring
           value={props}
           mode="advanced"
+          width={width}
+          height={height}
           onChange={(next, label) => onChange(label, () => next)}
         />
       </Section>
-
-      <div className="apx-live-sync-note" data-image-v2-no-json-primary>
-        <strong>No raw JSON escape hatch required</strong>
-        <span>
-          Public createImage options are authored through typed controls. JSON is no longer the primary route to missing runtime fields.
-        </span>
-      </div>
-    </>
-  );
-}
+    </>}
