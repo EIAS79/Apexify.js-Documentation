@@ -477,11 +477,13 @@ test('Phase 10 permanent Images workflow exposes stack, presets, analysis and fu
     assert.match(ui, new RegExp(contract));
   }
   assert.match(inspector, /VisualImageUtilityAuthoring/);
-  assert.match(inspector, /Advanced image utilities/);
   assert.match(inspector, /data-image-single-batch-warning/);
   assert.match(inspector, /Grouped surface processing/);
-  assert.match(ui, /apx-advanced-collection/);
-  assert.match(ui, /Advanced contract/);
+  assert.match(ui, /Advanced image tools/);
+  assert.match(ui, /apx-advanced-capability-grid/);
+  assert.match(ui, /Output pipeline/);
+  assert.match(ui, /Analysis jobs/);
+  assert.match(ui, /Developer JSON/);
   assert.match(shell, /VisualImageInspector/);
   assert.match(shell, /currentNodeServerExecutionAdapter/);
   assert.match(shell, /phase10Active/);
