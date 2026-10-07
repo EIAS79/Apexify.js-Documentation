@@ -146,6 +146,8 @@ function operationIcon(type: ImageUtilityStackType): ReactNode {
     case 'gradientBlend': return <SparklesIcon className={className} aria-hidden />;
     case 'stitchImages':
     case 'createCollage': return <Squares2X2Icon className={className} aria-hidden />;
+    case 'imgConverter': return <SwatchIcon className={className} aria-hidden />;
+    case 'compress': return <RectangleStackIcon className={className} aria-hidden />;
     default: return <AdjustmentsHorizontalIcon className={className} aria-hidden />;
   }
 }
@@ -1002,28 +1004,160 @@ export function VisualImageUtilityAuthoring({
     const advancedStack = stack
       .map((operation, index) => ({ operation, index }))
       .filter(({ operation }) => ADVANCED_TYPES.has(operation.type));
+    const enabledOutputCount = advancedStack.filter(
+      ({ operation }) => operation.enabled !== false,
+    ).length;
+    const enabledAnalysisCount = analyses.filter(
+      (analysis) => analysis.enabled !== false,
+    ).length;
+
+    const addAnalysis = (type: VisualImageUtilityAnalysis['type']) => {
+      const analysis = defaultImageUtilityAnalysis(
+        type,
+        createVisualId('image-analysis'),
+      );
+      updateAnalyses([...analyses, analysis], 'Add image analysis');
+      setAnalysisExpandedId(analysis.id);
+    };
 
     return (
-      <div className="apx-advanced-image-tools" data-phase10-advanced>
-        <section className="apx-advanced-collection">
-          <div className="apx-advanced-collection-head">
+      <div
+        className="apx-advanced-image-tools apx-advanced-image-tools--workspace"
+        data-phase10-advanced
+      >
+        <div className="apx-advanced-workspace-head">
+          <div>
+            <strong>Advanced image tools</strong>
+            <span>
+              Output processing and structured analysis from the real painter.image API.
+            </span>
+          </div>
+          <div className="apx-advanced-workspace-stats" aria-label="Advanced image tool status">
+            <span><b>{enabledOutputCount}</b> output</span>
+            <span><b>{enabledAnalysisCount}</b> analysis</span>
+          </div>
+        </div>
+
+        <section className="apx-advanced-tool-library" aria-label="Advanced image capabilities">
+          <div className="apx-advanced-library-head">
             <div>
-              <strong>Output utilities</strong>
-              <small>Run after raster authoring; order is preserved.</small>
+              <strong>Toolbox</strong>
+              <small>Add another step at any time. Repeated steps remain independent.</small>
+            </div>
+          </div>
+
+          <div className="apx-advanced-capability-grid">
+            <button
+              type="button"
+              className="apx-advanced-capability"
+              data-accent="blue"
+              onClick={() => addOperation('imgConverter')}
+            >
+              <span className="apx-advanced-capability-icon">
+                {operationIcon('imgConverter')}
+              </span>
+              <span className="apx-advanced-capability-copy">
+                <strong>Convert format</strong>
+                <small>Re-encode the current raster into a selected output format.</small>
+              </span>
+              <span className="apx-advanced-capability-action">+ Add</span>
+              <span className="apx-advanced-capability-chips">
+                <i>PNG</i><i>JPEG</i><i>WebP</i><i>AVIF</i><i>+7</i>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="apx-advanced-capability"
+              data-accent="cyan"
+              onClick={() => addOperation('compress')}
+            >
+              <span className="apx-advanced-capability-icon">
+                {operationIcon('compress')}
+              </span>
+              <span className="apx-advanced-capability-copy">
+                <strong>Compress</strong>
+                <small>Control output format, quality, maximum size and progressive encoding.</small>
+              </span>
+              <span className="apx-advanced-capability-action">+ Add</span>
+              <span className="apx-advanced-capability-chips">
+                <i>Quality</i><i>Max W/H</i><i>Progressive</i>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="apx-advanced-capability"
+              data-accent="violet"
+              onClick={() => addAnalysis('extractPalette')}
+            >
+              <span className="apx-advanced-capability-icon">
+                <SwatchIcon className="apx-effects-icon-svg" aria-hidden />
+              </span>
+              <span className="apx-advanced-capability-copy">
+                <strong>Extract palette</strong>
+                <small>Return dominant colors with their percentage contribution.</small>
+              </span>
+              <span className="apx-advanced-capability-action">+ Add</span>
+              <span className="apx-advanced-capability-chips">
+                <i>1–64 colors</i><i>K-means</i><i>Median cut</i><i>Octree</i>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="apx-advanced-capability"
+              data-accent="orange"
+              onClick={() => addAnalysis('colorAnalysis')}
+            >
+              <span className="apx-advanced-capability-icon">
+                <AdjustmentsHorizontalIcon className="apx-effects-icon-svg" aria-hidden />
+              </span>
+              <span className="apx-advanced-capability-copy">
+                <strong>Color analysis</strong>
+                <small>Return structured color and frequency pairs without replacing the raster.</small>
+              </span>
+              <span className="apx-advanced-capability-action">+ Add</span>
+              <span className="apx-advanced-capability-chips">
+                <i>Color</i><i>Frequency</i><i>Structured result</i>
+              </span>
+            </button>
+          </div>
+
+          <details className="apx-advanced-external-capability">
+            <summary>
+              <span>
+                <strong>External / helper API</strong>
+                <small>Capabilities that are not normal hosted authoring steps.</small>
+              </span>
+              <ChevronDownIcon aria-hidden />
+            </summary>
+            <div>
+              <span>
+                <b>removeBackground()</b>
+                <small>Available in Apexify.js, but it requires a caller-supplied external API key.</small>
+              </span>
+              <span>
+                <b>validHex()</b>
+                <small>Runtime helper only; it validates a color string and does not create image output.</small>
+              </span>
+            </div>
+          </details>
+        </section>
+
+        <section className="apx-advanced-active-section" data-phase10-output>
+          <div className="apx-advanced-active-head">
+            <div>
+              <strong>Output pipeline</strong>
+              <small>Executed in authored order after the image editing stack.</small>
             </div>
             <span>{advancedStack.length}</span>
           </div>
-          <div className="apx-advanced-add-row">
-            {[...ADVANCED_TYPES].map((type) => (
-              <button key={type} type="button" onClick={() => addOperation(type)}>
-                + {stackLabel(type)}
-              </button>
-            ))}
-          </div>
+
           <div className="apx-advanced-card-list">
             {advancedStack.length === 0 ? (
               <div className="apx-advanced-empty">
-                No output utility steps. Add conversion or compression only when needed.
+                No output steps yet. Choose Convert format or Compress from the toolbox.
               </div>
             ) : null}
             {advancedStack.map(({ operation, index }, visibleIndex) => {
@@ -1037,6 +1171,12 @@ export function VisualImageUtilityAuthoring({
                 >
                   <div className="apx-advanced-card-head">
                     <span className="apx-advanced-order">{visibleIndex + 1}</span>
+                    <span
+                      className="apx-advanced-card-icon"
+                      data-accent={operationAccent(operation.type)}
+                    >
+                      {operationIcon(operation.type)}
+                    </span>
                     <button
                       type="button"
                       className="apx-advanced-card-title"
@@ -1086,6 +1226,7 @@ export function VisualImageUtilityAuthoring({
                       {expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
                     </button>
                   </div>
+
                   {expanded ? (
                     <div className="apx-advanced-card-body">
                       <OperationEditor
@@ -1096,25 +1237,25 @@ export function VisualImageUtilityAuthoring({
                           patchOperation(operation.id, replacement, label)
                         }
                       />
-                      <details className="apx-effects-contract-details">
-                        <summary>Advanced contract</summary>
+                      <div className="apx-advanced-order-controls">
+                        <button
+                          type="button"
+                          onClick={() => moveOperation(index, -1)}
+                          disabled={visibleIndex === 0}
+                        >
+                          ↑ Earlier
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveOperation(index, 1)}
+                          disabled={visibleIndex === advancedStack.length - 1}
+                        >
+                          ↓ Later
+                        </button>
+                      </div>
+                      <details className="apx-effects-contract-details apx-effects-contract-details--developer">
+                        <summary>Developer JSON</summary>
                         <div>
-                          <div className="apx-effects-reorder-fallback">
-                            <button
-                              type="button"
-                              onClick={() => moveOperation(index, -1)}
-                              disabled={visibleIndex === 0}
-                            >
-                              Move up
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => moveOperation(index, 1)}
-                              disabled={visibleIndex === advancedStack.length - 1}
-                            >
-                              Move down
-                            </button>
-                          </div>
                           <JsonConfig
                             value={operation}
                             onApply={(next) =>
@@ -1138,46 +1279,41 @@ export function VisualImageUtilityAuthoring({
           </div>
         </section>
 
-        <section className="apx-advanced-collection" data-phase10-analysis>
-          <div className="apx-advanced-collection-head">
+        <section className="apx-advanced-active-section" data-phase10-analysis>
+          <div className="apx-advanced-active-head">
             <div>
-              <strong>Image analysis</strong>
-              <small>Structured results; raster output remains unchanged.</small>
+              <strong>Analysis jobs</strong>
+              <small>Return structured data while preserving the current image output.</small>
             </div>
             <span>{analyses.length}</span>
           </div>
-          <div className="apx-advanced-add-row">
-            {IMAGE_UTILITY_ANALYSIS_TYPES.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => {
-                  const analysis = defaultImageUtilityAnalysis(
-                    type,
-                    createVisualId('image-analysis'),
-                  );
-                  updateAnalyses([...analyses, analysis], 'Add image analysis');
-                  setAnalysisExpandedId(analysis.id);
-                }}
-              >
-                + {analysisLabel(type)}
-              </button>
-            ))}
-          </div>
+
           <div className="apx-advanced-card-list">
             {analyses.length === 0 ? (
-              <div className="apx-advanced-empty">No analysis jobs.</div>
+              <div className="apx-advanced-empty">
+                No analysis jobs yet. Add Palette or Color analysis from the toolbox.
+              </div>
             ) : null}
             {analyses.map((analysis, index) => {
               const expanded = analysisExpandedId === analysis.id;
+              const palette = analysis.type === 'extractPalette';
               return (
                 <article
                   className="apx-advanced-card"
                   data-image-analysis={analysis.type}
+                  data-expanded={expanded ? 'true' : undefined}
                   key={analysis.id}
                 >
                   <div className="apx-advanced-card-head apx-advanced-card-head--analysis">
                     <span className="apx-advanced-order">{index + 1}</span>
+                    <span
+                      className="apx-advanced-card-icon"
+                      data-accent={palette ? 'violet' : 'orange'}
+                    >
+                      {palette
+                        ? <SwatchIcon className="apx-effects-icon-svg" aria-hidden />
+                        : <AdjustmentsHorizontalIcon className="apx-effects-icon-svg" aria-hidden />}
+                    </span>
                     <button
                       type="button"
                       className="apx-advanced-card-title"
@@ -1186,7 +1322,15 @@ export function VisualImageUtilityAuthoring({
                       }
                     >
                       <strong>{analysisLabel(analysis.type)}</strong>
-                      <small>{analysis.enabled === false ? 'Bypassed' : 'Active'}</small>
+                      <small>
+                        {analysis.enabled === false
+                          ? 'Bypassed'
+                          : palette
+                            ? (analysis.options?.count ?? 8) + ' colors · ' +
+                              (analysis.options?.method ?? 'kmeans') + ' · ' +
+                              (analysis.options?.format ?? 'hex')
+                            : 'color + frequency[]'}
+                      </small>
                     </button>
                     <StackToggle
                       label={'Enable ' + analysisLabel(analysis.type)}
@@ -1224,6 +1368,7 @@ export function VisualImageUtilityAuthoring({
                       {expanded ? <ChevronUpIcon aria-hidden /> : <ChevronDownIcon aria-hidden />}
                     </button>
                   </div>
+
                   {expanded ? (
                     <div className="apx-advanced-card-body">
                       {analysis.type === 'extractPalette' ? (
@@ -1238,10 +1383,7 @@ export function VisualImageUtilityAuthoring({
                                 analyses.map((item) =>
                                   item.id === analysis.id &&
                                   item.type === 'extractPalette'
-                                    ? {
-                                        ...item,
-                                        options: { ...item.options, count },
-                                      }
+                                    ? { ...item, options: { ...item.options, count } }
                                     : item,
                                 ),
                                 'Edit palette analysis',
@@ -1297,12 +1439,16 @@ export function VisualImageUtilityAuthoring({
                           />
                         </div>
                       ) : (
-                        <div className="apx-advanced-empty">
-                          Color analysis has no authoring parameters.
+                        <div className="apx-advanced-result-contract">
+                          <strong>Result</strong>
+                          <span>
+                            Apexify.js returns an array of {'{ color, frequency }'} records.
+                            There are no authoring parameters for this operation.
+                          </span>
                         </div>
                       )}
-                      <details className="apx-effects-contract-details">
-                        <summary>Advanced contract</summary>
+                      <details className="apx-effects-contract-details apx-effects-contract-details--developer">
+                        <summary>Developer JSON</summary>
                         <div>
                           <JsonConfig
                             value={analysis}
@@ -1329,15 +1475,6 @@ export function VisualImageUtilityAuthoring({
             })}
           </div>
         </section>
-
-        <div className="apx-live-sync-note apx-advanced-coverage-note" data-phase10-api-coverage>
-          <strong>Runtime API coverage</strong>
-          <span>
-            All {Object.keys(IMAGE_UTILITY_API_COVERAGE).length} public image utility
-            members are classified. removeBackground stays excluded from hosted
-            authoring because it requires external credentials; validHex is a helper.
-          </span>
-        </div>
       </div>
     );
   }
