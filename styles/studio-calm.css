@@ -10834,3 +10834,22 @@ body[data-phase17-resizing="dock"]{
   }
 }
 
+.apx-pre4-layers .apx-vw-layer-row>button[data-layer-multiselect="true"]{
+  border:1px solid #24445f;
+  border-radius:5px;
+  color:#68849e;
+  background:#081927;
+  font-size:.48rem;
+  font-weight:800;
+}
+.apx-pre4-layers .apx-vw-layer-row>button[data-layer-multiselect="true"]:hover{
+  color:#dcecff;
+  border-color:#4a70ab;
+  background:#102a44;
+}
+.apx-pre4-layers .apx-vw-layer-row>button[data-layer-multiselect="true"][data-selected="true"]{
+  color:#fff;
+  border-color:#667cff;
+  background:linear-gradient(135deg,#245bbb,#4938df);
+}
+
