@@ -153,7 +153,10 @@ test('Phase 10 lowers raster operations before composition and output utilities 
   );
   assert.equal(composed?.kind, 'create-image');
   if (composed?.kind === 'create-image') {
-    assert.deepEqual(composed.properties.source, { $studioTarget: 'image_phase10__utility_2' });
+    assert.equal(Array.isArray(composed.properties), false);
+    if (!Array.isArray(composed.properties)) {
+      assert.deepEqual(composed.properties.source, { $studioTarget: 'image_phase10__utility_2' });
+    }
   }
   const final = plan.operations.at(-1);
   assert.equal(final?.kind, 'image-utility');
