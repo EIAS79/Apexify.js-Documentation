@@ -35,6 +35,102 @@ export async function getServerExecutionAvailability(signal?: AbortSignal): Prom
 }
 
 const STUDIO_BUSY_RETRY_DELAYS_MS = [450, 900, 1500] as const;
+const HOSTED_STUDIO_PREVIEW_ASSET_BUDGET = 2.5 * 1024 * 1024;
+
+function studioAssetBytes(assets: readonly StudioVirtualAsset[]) {
+  return assets.reduce((sum, asset) => sum + Math.max(0, asset.size || 0), 0);
+}
+
+function studioBase64Bytes(base64: string) {
+  const normalized = base64.replace(/\s+/g, '');
+  const padding = normalized.endsWith('==') ? 2 : normalized.endsWith('=') ? 1 : 0;
+  return Math.max(0, Math.floor((normalized.length * 3) / 4) - padding);
+}
+
+function studioAssetBlob(asset: StudioVirtualAsset) {
+  const binary = atob(asset.base64.replace(/\s+/g, ''));
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return new Blob([bytes], { type: asset.mime || 'application/octet-stream' });
+}
+
+async function compactStudioPreviewImage(
+  asset: StudioVirtualAsset,
+  maxDimension: number,
+  quality: number,
+): Promise<StudioVirtualAsset> {
+  if (
+    typeof document === 'undefined' ||
+    typeof createImageBitmap === 'undefined' ||
+    !/^image\/(?:png|jpe?g|webp)$/i.test(asset.mime) ||
+    asset.size < 160 * 1024
+  ) {
+    return asset;
+  }
+
+  try {
+    const bitmap = await createImageBitmap(studioAssetBlob(asset));
+    try {
+      const scale = Math.min(
+        1,
+        maxDimension / Math.max(1, bitmap.width, bitmap.height),
+      );
+      const width = Math.max(1, Math.round(bitmap.width * scale));
+      const height = Math.max(1, Math.round(bitmap.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext('2d', { alpha: true });
+      if (!context) return asset;
+      context.drawImage(bitmap, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL('image/webp', quality);
+      const comma = dataUrl.indexOf(',');
+      if (comma < 0) return asset;
+      const base64 = dataUrl.slice(comma + 1);
+      const size = studioBase64Bytes(base64);
+      if (size >= asset.size) return asset;
+      return {
+        ...asset,
+        name: asset.name.replace(/\.[^.]+$/, '') + '.webp',
+        mime: 'image/webp',
+        size,
+        base64,
+        metadata: {
+          ...(asset.metadata ?? {}),
+          width,
+          height,
+        },
+      };
+    } finally {
+      bitmap.close();
+    }
+  } catch {
+    return asset;
+  }
+}
+
+async function prepareHostedStudioPreviewAssets(
+  assets: readonly StudioVirtualAsset[],
+): Promise<StudioVirtualAsset[]> {
+  if (
+    typeof window === 'undefined' ||
+    studioAssetBytes(assets) <= HOSTED_STUDIO_PREVIEW_ASSET_BUDGET
+  ) {
+    return [...assets];
+  }
+
+  let prepared = await Promise.all(
+    assets.map((asset) => compactStudioPreviewImage(asset, 1400, 0.76)),
+  );
+  if (studioAssetBytes(prepared) > HOSTED_STUDIO_PREVIEW_ASSET_BUDGET) {
+    prepared = await Promise.all(
+      prepared.map((asset) => compactStudioPreviewImage(asset, 960, 0.62)),
+    );
+  }
+  return prepared;
+}
 
 function waitForRetry(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -139,12 +235,15 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
       studioAssets,
       [session.source, ...studioFiles.map((file) => file.source)],
     );
+    const hostedPreviewAssets = await prepareHostedStudioPreviewAssets(
+      referencedStudioAssets,
+    );
 
     const requestBody = JSON.stringify({
       code: session.source,
       lang: session.language,
       context: 'studio',
-      assets: referencedStudioAssets,
+      assets: hostedPreviewAssets,
       files: studioFiles,
     });
     const response = await fetchStudioRunner(requestBody, signal);
@@ -164,10 +263,8 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
     try {
       data = (await response.json()) as typeof data;
     } catch {
-      const referencedBytes = referencedStudioAssets.reduce(
-        (sum, asset) => sum + Math.max(0, asset.size || 0),
-        0,
-      );
+      const referencedBytes = studioAssetBytes(referencedStudioAssets);
+      const transmittedBytes = studioAssetBytes(hostedPreviewAssets);
       const requestTooLarge = response.status === 413;
       return {
         status: 'error',
@@ -176,12 +273,12 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
           severity: 'error',
           message: requestTooLarge
             ? referencedBytes > 0
-              ? `The Studio runtime request was rejected as too large before execution (HTTP 413). Referenced assets total ${(referencedBytes / (1024 * 1024)).toFixed(2)} MiB. Remove/reduce the referenced media or use a smaller asset before retrying.`
+              ? `The Studio runtime request was rejected as too large before execution (HTTP 413). Original referenced assets total ${(referencedBytes / (1024 * 1024)).toFixed(2)} MiB; the preview proxy transmitted ${(transmittedBytes / (1024 * 1024)).toFixed(2)} MiB. Reduce the source media if the deployment still rejects the preview request.`
               : 'The Studio runtime request was rejected as too large before execution (HTTP 413).'
             : `Execution failed (HTTP ${response.status}) because the response was not JSON.`,
           code: requestTooLarge ? 'HTTP_413' : `HTTP_${response.status}`,
           help: requestTooLarge
-            ? 'Studio now excludes unrelated shelf assets automatically; this message means the source itself still references enough payload to exceed the deployment request limit.'
+            ? 'Studio excludes unrelated shelf assets and automatically sends downscaled WebP proxies for large static image previews. Generated code and exported project assets still use the originals.'
             : 'Retry the execution. If the problem persists, inspect the runtime response and deployment logs.',
         }],
         elapsedMs: Math.round(performance.now() - started),

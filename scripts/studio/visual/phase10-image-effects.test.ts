@@ -153,7 +153,10 @@ test('Phase 10 lowers raster operations before composition and output utilities 
   );
   assert.equal(composed?.kind, 'create-image');
   if (composed?.kind === 'create-image') {
-    assert.deepEqual(composed.properties.source, { $studioTarget: 'image_phase10__utility_2' });
+    assert.equal(Array.isArray(composed.properties), false);
+    if (!Array.isArray(composed.properties)) {
+      assert.deepEqual(composed.properties.source, { $studioTarget: 'image_phase10__utility_2' });
+    }
   }
   const final = plan.operations.at(-1);
   assert.equal(final?.kind, 'image-utility');
@@ -470,14 +473,20 @@ test('Phase 10 permanent Images workflow exposes stack, presets, analysis and fu
     'data-phase10-image-stack',
     'data-phase10-presets',
     'data-phase10-analysis',
-    'data-phase10-api-coverage',
+    'data-phase10-output',
     'removeBackground',
     'validHex',
   ]) {
     assert.match(ui, new RegExp(contract));
   }
   assert.match(inspector, /VisualImageUtilityAuthoring/);
-  assert.match(inspector, /Image utility pipeline/);
+  assert.match(inspector, /data-image-single-batch-warning/);
+  assert.match(inspector, /Grouped surface processing/);
+  assert.match(ui, /Advanced image tools/);
+  assert.match(ui, /apx-advanced-capability-grid/);
+  assert.match(ui, /Output pipeline/);
+  assert.match(ui, /Analysis jobs/);
+  assert.match(ui, /Developer JSON/);
   assert.match(shell, /VisualImageInspector/);
   assert.match(shell, /currentNodeServerExecutionAdapter/);
   assert.match(shell, /phase10Active/);

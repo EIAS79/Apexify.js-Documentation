@@ -352,7 +352,9 @@ test('STUDIO-PARITY-2 rebuilt inspector owns selected image authoring without ra
   assert.match(inspector, /Liquify handles/);
   assert.match(inspector, /data-image-v2-mesh-warp/);
   assert.match(inspector, /data-image-v2-resolve-asset-refs/);
-  assert.match(inspector, /No raw JSON escape hatch required/);
+  assert.match(inspector, /data-image-single-batch-warning/);
+  assert.match(inspector, /Grouped surface processing/);
+  assert.match(inspector, /Sequential array rendering/);
   assert.doesNotMatch(inspector, /Complete ImageProperties \/ CreateImageOptions/);
 
   const imagesStart = shell.indexOf("if (activeTool === 'images')");
