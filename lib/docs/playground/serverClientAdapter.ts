@@ -35,7 +35,7 @@ export async function getServerExecutionAvailability(signal?: AbortSignal): Prom
 }
 
 const STUDIO_BUSY_RETRY_DELAYS_MS = [450, 900, 1500] as const;
-const HOSTED_STUDIO_PREVIEW_ASSET_BUDGET = 2.5 * 1024 * 1024;
+const HOSTED_STUDIO_PREVIEW_TRANSPORT_BUDGET = 2.1 * 1024 * 1024;
 
 function studioAssetBytes(assets: readonly StudioVirtualAsset[]) {
   return assets.reduce((sum, asset) => sum + Math.max(0, asset.size || 0), 0);
@@ -60,12 +60,13 @@ async function compactStudioPreviewImage(
   asset: StudioVirtualAsset,
   maxDimension: number,
   quality: number,
+  minBytes = 0,
 ): Promise<StudioVirtualAsset> {
   if (
     typeof document === 'undefined' ||
     typeof createImageBitmap === 'undefined' ||
     !/^image\/(?:png|jpe?g|webp)$/i.test(asset.mime) ||
-    asset.size < 160 * 1024
+    asset.size < minBytes
   ) {
     return asset;
   }
@@ -111,24 +112,54 @@ async function compactStudioPreviewImage(
   }
 }
 
+function studioAssetTransportBytes(assets: readonly StudioVirtualAsset[]) {
+  return assets.reduce(
+    (sum, asset) => sum + asset.base64.replace(/\s+/g, '').length,
+    0,
+  );
+}
+
 async function prepareHostedStudioPreviewAssets(
   assets: readonly StudioVirtualAsset[],
 ): Promise<StudioVirtualAsset[]> {
+  if (typeof window === 'undefined') return [...assets];
+
+  let prepared = [...assets];
   if (
-    typeof window === 'undefined' ||
-    studioAssetBytes(assets) <= HOSTED_STUDIO_PREVIEW_ASSET_BUDGET
+    studioAssetTransportBytes(prepared) <=
+    HOSTED_STUDIO_PREVIEW_TRANSPORT_BUDGET
   ) {
-    return [...assets];
+    return prepared;
   }
 
-  let prepared = await Promise.all(
-    assets.map((asset) => compactStudioPreviewImage(asset, 1400, 0.76)),
-  );
-  if (studioAssetBytes(prepared) > HOSTED_STUDIO_PREVIEW_ASSET_BUDGET) {
+  const passes = [
+    { maxDimension: 1280, quality: 0.68, minBytes: 64 * 1024 },
+    { maxDimension: 960, quality: 0.56, minBytes: 32 * 1024 },
+    { maxDimension: 720, quality: 0.48, minBytes: 0 },
+    { maxDimension: 560, quality: 0.42, minBytes: 0 },
+    { maxDimension: 420, quality: 0.36, minBytes: 0 },
+    { maxDimension: 320, quality: 0.3, minBytes: 0 },
+  ] as const;
+
+  for (const pass of passes) {
     prepared = await Promise.all(
-      prepared.map((asset) => compactStudioPreviewImage(asset, 960, 0.62)),
+      prepared.map((asset) =>
+        compactStudioPreviewImage(
+          asset,
+          pass.maxDimension,
+          pass.quality,
+          pass.minBytes,
+        ),
+      ),
     );
+    if (
+      studioAssetTransportBytes(prepared) <=
+      HOSTED_STUDIO_PREVIEW_TRANSPORT_BUDGET
+    ) {
+      break;
+    }
   }
+
   return prepared;
 }
 
@@ -265,6 +296,7 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
     } catch {
       const referencedBytes = studioAssetBytes(referencedStudioAssets);
       const transmittedBytes = studioAssetBytes(hostedPreviewAssets);
+      const transportBytes = studioAssetTransportBytes(hostedPreviewAssets);
       const requestTooLarge = response.status === 413;
       return {
         status: 'error',
@@ -273,12 +305,12 @@ export const currentNodeServerExecutionAdapter: ExecutionAdapter = {
           severity: 'error',
           message: requestTooLarge
             ? referencedBytes > 0
-              ? `The Studio runtime request was rejected as too large before execution (HTTP 413). Original referenced assets total ${(referencedBytes / (1024 * 1024)).toFixed(2)} MiB; the preview proxy transmitted ${(transmittedBytes / (1024 * 1024)).toFixed(2)} MiB. Reduce the source media if the deployment still rejects the preview request.`
+              ? `The Studio runtime request was rejected as too large before execution (HTTP 413). Original referenced assets total ${(referencedBytes / (1024 * 1024)).toFixed(2)} MiB; the compact preview payload is ${(transportBytes / (1024 * 1024)).toFixed(2)} MiB encoded (${(transmittedBytes / (1024 * 1024)).toFixed(2)} MiB decoded). Studio already applied the most aggressive safe preview proxy.`
               : 'The Studio runtime request was rejected as too large before execution (HTTP 413).'
             : `Execution failed (HTTP ${response.status}) because the response was not JSON.`,
           code: requestTooLarge ? 'HTTP_413' : `HTTP_${response.status}`,
           help: requestTooLarge
-            ? 'Studio excludes unrelated shelf assets and automatically sends downscaled WebP proxies for large static image previews. Generated code and exported project assets still use the originals.'
+            ? 'Studio excludes unrelated shelf assets and repeatedly compacts referenced static images into preview-only WebP proxies until the hosted request fits the safe transport budget. Generated code and exported project assets still use the originals.'
             : 'Retry the execution. If the problem persists, inspect the runtime response and deployment logs.',
         }],
         elapsedMs: Math.round(performance.now() - started),
