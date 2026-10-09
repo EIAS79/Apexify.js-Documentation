@@ -2481,6 +2481,25 @@ export default function VisualStudioPre4({
     });
   };
 
+  const mutateTextBatch = (
+    label: string,
+    updater: (
+      value: NonNullable<ReturnType<typeof visualTextBatchGroupProps>>,
+    ) => NonNullable<ReturnType<typeof visualTextBatchGroupProps>>,
+  ) => {
+    if (!primaryTextBatch) return;
+    mutate(label, (current) => {
+      const next = structuredClone(current);
+      const group = next.document.nodes[primaryTextBatch.id];
+      if (!group) return current;
+      const value = visualTextBatchGroupProps(group);
+      if (!value) return current;
+      group.props = textBatchGroupPropsRecord(updater(value));
+      next.updatedAt = new Date().toISOString();
+      return next;
+    });
+  };
+
   const insertImageSource = (
     source: string,
     name = 'Image',
@@ -2903,6 +2922,7 @@ export default function VisualStudioPre4({
           name: family,
           path: studioAssetReference(fontAsset),
         };
+        props.painterOpts = { resolveAssetRefs: true };
       } else if (fontFamily) {
         props.font = {
           ...(props.font ?? {}),
@@ -2957,6 +2977,10 @@ export default function VisualStudioPre4({
         family,
         name: family,
         path: studioAssetReference(asset),
+      },
+      painterOpts: {
+        ...(current.painterOpts ?? {}),
+        resolveAssetRefs: true,
       },
     }));
     setAssetFilter('font');
