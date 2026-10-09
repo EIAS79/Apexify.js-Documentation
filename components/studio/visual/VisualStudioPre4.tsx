@@ -2910,10 +2910,35 @@ export default function VisualStudioPre4({
     point?: Point,
     fontAsset?: StudioVirtualAsset,
     fontFamily?: string,
+    preset?: Partial<VisualTextNodeProps>,
   ) => {
     mutate('Add text', (current) => {
       const next = structuredClone(current);
-      const props = defaultTextNodeProps(value);
+      const baseProps = defaultTextNodeProps(value);
+      const props: VisualTextNodeProps = {
+        ...baseProps,
+        ...(preset ?? {}),
+        font: {
+          ...(baseProps.font ?? {}),
+          ...(preset?.font ?? {}),
+        },
+        layout: {
+          ...(baseProps.layout ?? {}),
+          ...(preset?.layout ?? {}),
+        },
+        placement: {
+          ...(baseProps.placement ?? {}),
+          ...(preset?.placement ?? {}),
+        },
+        fill: {
+          ...(baseProps.fill ?? {}),
+          ...(preset?.fill ?? {}),
+        },
+        decorations: {
+          ...(baseProps.decorations ?? {}),
+          ...(preset?.decorations ?? {}),
+        },
+      };
       if (fontAsset && isStudioFontAsset(fontAsset)) {
         const family = studioAssetFontFamily(fontAsset);
         props.font = {
@@ -2937,7 +2962,7 @@ export default function VisualStudioPre4({
       );
       const width = props.layout?.maxWidth ?? 360;
       const fontSize = props.font?.size ?? 48;
-      const height = Math.max(64, fontSize * (props.layout?.lineHeight ?? 1.2) * 2);
+      const height = Math.max(48, fontSize * (props.layout?.lineHeight ?? 1.4) * 2);
       node.transform = {
         x: point?.x ?? Math.max(32, (next.document.width - width) / 2),
         y: point?.y ?? Math.max(32, (next.document.height - height) / 2),
