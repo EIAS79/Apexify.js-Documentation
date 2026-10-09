@@ -599,10 +599,52 @@ export interface VisualTextLayout {
   maxHeight?: number;
 }
 
+export interface VisualTextPerspective {
+  points: [
+    { x: number; y: number },
+    { x: number; y: number },
+    { x: number; y: number },
+    { x: number; y: number },
+  ];
+  interpolation?: 'nearest' | 'bilinear' | 'bicubic';
+  edgeMode?: 'transparent' | 'clamp' | 'wrap' | 'mirror';
+}
+
 export interface VisualTextPlacement {
   textAlign?: VisualTextAlign;
   textBaseline?: VisualTextBaseline;
   rotation?: number;
+  scaleX?: number;
+  scaleY?: number;
+  skewX?: number;
+  skewY?: number;
+  perspective?: VisualTextPerspective;
+}
+
+export interface VisualTextGroupTransform {
+  rotation?: number;
+  translateX?: number;
+  translateY?: number;
+  scaleX?: number;
+  scaleY?: number;
+  skewX?: number;
+  skewY?: number;
+  pivotX?: number;
+  pivotY?: number;
+  opacity?: number;
+  blendMode?: VisualBlendMode;
+  perspective?: VisualTextPerspective;
+}
+
+export interface VisualCreateTextOptions {
+  isGrouped?: boolean;
+  groupTransform?: VisualTextGroupTransform;
+}
+
+export interface VisualTextBatchGroupProps {
+  textBatch: true;
+  createOptions: VisualCreateTextOptions;
+  painterOpts?: VisualPainterAssetRefsOptions;
 }
 
 export interface VisualTextFill {
@@ -625,6 +667,8 @@ export interface VisualTextFont {
   family?: string;
   name?: string;
   path?: string;
+  weight?: number | 'normal' | 'bold' | 'bolder' | 'lighter';
+  style?: 'normal' | 'italic' | 'oblique';
 }
 
 export interface VisualTextNodeProps {
@@ -642,6 +686,8 @@ export interface VisualTextNodeProps {
     width?: number;
     height?: number;
   };
+  createOptions?: VisualCreateTextOptions;
+  painterOpts?: VisualPainterAssetRefsOptions;
 
   /** Legacy Apexify text aliases retained for exact round-trip compatibility. */
   fontSize?: number;
@@ -664,6 +710,10 @@ export interface VisualTextNodeProps {
   textAlign?: VisualTextAlign;
   textBaseline?: VisualTextBaseline;
   rotation?: number;
+  scaleX?: number;
+  scaleY?: number;
+  skewX?: number;
+  skewY?: number;
   color?: string;
   gradient?: VisualGradient;
   opacity?: number;
