@@ -1,6 +1,7 @@
 import type {
   VisualCanvasConfig,
   VisualCreateImageOptions,
+  VisualCreateTextOptions,
   VisualImageNodeProps,
   VisualImageSource,
   VisualProject,
@@ -15,7 +16,12 @@ import {
   visualImageProps,
 } from '../image-contract';
 import { createVisualId } from '../ids';
-import { textPropsRecord, visualTextProps } from '../text-contract';
+import {
+  isTextBatchGroup,
+  textBatchGroupPropsRecord,
+  textPropsRecord,
+  visualTextProps,
+} from '../text-contract';
 import {
   STANDALONE_CHART_FAMILIES,
   chartPropsRecord,
@@ -937,20 +943,83 @@ function reconcileImageCall(
   );
 }
 
-function reconcileTextCall(
-  project: VisualProject,
+function parseCreateTextCallOptions(
   call: MethodCall,
+): {
+  options?: VisualCreateTextOptions;
+  painterOpts?: { resolveAssetRefs?: boolean };
+} {
+  let options: VisualCreateTextOptions | undefined;
+  let painterOpts: { resolveAssetRefs?: boolean } | undefined;
+
+  const thirdRaw = call.args[2]?.trim();
+  if (thirdRaw && thirdRaw !== 'undefined') {
+    const parsedThird = new LiteralParser(thirdRaw, true).parse();
+    if (!isRecord(parsedThird)) {
+      throw new Error('createText() third argument must be an object literal.');
+    }
+    const isOptions =
+      Object.prototype.hasOwnProperty.call(parsedThird, 'isGrouped') ||
+      Object.prototype.hasOwnProperty.call(parsedThird, 'groupTransform');
+    if (isOptions) {
+      options = parsedThird as unknown as VisualCreateTextOptions;
+    } else {
+      for (const key of Object.keys(parsedThird)) {
+        if (key !== 'resolveAssetRefs') {
+          throw new Error(
+            'createText() painter options only support resolveAssetRefs.',
+          );
+        }
+      }
+      painterOpts = parsedThird as unknown as { resolveAssetRefs?: boolean };
+    }
+  }
+
+  const fourthRaw = call.args[3]?.trim();
+  if (fourthRaw) {
+    const parsedFourth = new LiteralParser(fourthRaw, true).parse();
+    if (!isRecord(parsedFourth)) {
+      throw new Error('createText() painterOpts must be an object literal.');
+    }
+    for (const key of Object.keys(parsedFourth)) {
+      if (key !== 'resolveAssetRefs') {
+        throw new Error(
+          'createText() painterOpts.' +
+            key +
+            ' is not part of the current public runtime contract.',
+        );
+      }
+    }
+    painterOpts = parsedFourth as unknown as { resolveAssetRefs?: boolean };
+  }
+
+  if (
+    painterOpts?.resolveAssetRefs !== undefined &&
+    typeof painterOpts.resolveAssetRefs !== 'boolean'
+  ) {
+    throw new Error('createText() painterOpts.resolveAssetRefs must be boolean.');
+  }
+  if (call.args.length > 4) {
+    throw new Error(
+      'createText() accepts at most text, canvasBuffer, options, and painterOpts.',
+    );
+  }
+  return {
+    ...(options ? { options } : {}),
+    ...(painterOpts ? { painterOpts } : {}),
+  };
+}
+
+function textNodeFromParsed(
+  project: VisualProject,
+  parsed: RecordValue,
   index: number,
   matched: VisualProject['document']['nodes'][string] | undefined,
-  identifiers: ReadonlyMap<string, string>,
-  canvasIdentifier: string | null,
+  parentId: string | null,
+  callOptions?: VisualCreateTextOptions,
+  painterOpts?: { resolveAssetRefs?: boolean },
+  preferredName?: string,
 ) {
-  if (!call.args[0]) throw new Error('createText() requires text properties.');
-  assertCanonicalBase(call.args[1], identifiers, canvasIdentifier);
-  const parsed = new LiteralParser(call.args[0]).parse();
-  if (!isRecord(parsed)) {
-    throw new Error('createText() properties must be an object literal.');
-  }
   if (typeof parsed.text !== 'string' || !parsed.text.length) {
     throw new Error('createText() properties require non-empty text.');
   }
@@ -984,9 +1053,6 @@ function reconcileTextCall(
   const owns = (value: object | undefined, key: string) =>
     Boolean(value && Object.prototype.hasOwnProperty.call(value, key));
 
-  // Canonical text code folds transform dimensions/rotation/opacity into
-  // nested createText() options. During reverse sync, preserve where each
-  // value originally lived so a generated-code round trip is byte-stable.
   const layoutForProps = { ...layoutRecord };
   const placementForProps = { ...placementRecord };
   const fillForProps = { ...fillRecord };
@@ -1031,6 +1097,8 @@ function reconcileTextCall(
     ...(typeof maxHeight === 'number' ? { maxHeight } : {}),
     ...(typeof rotation === 'number' ? { rotation } : {}),
     ...(typeof opacity === 'number' ? { opacity } : {}),
+    ...(callOptions ? { createOptions: callOptions } : {}),
+    ...(painterOpts ? { painterOpts } : {}),
   };
 
   const width =
@@ -1067,8 +1135,8 @@ function reconcileTextCall(
   return {
     id,
     kind: 'text',
-    name: oldNode?.name ?? 'Text ' + String(index + 1),
-    parentId: oldNode?.parentId ?? null,
+    name: oldNode?.name ?? preferredName ?? 'Text ' + String(index + 1),
+    parentId,
     childIds: oldNode?.childIds,
     transform: {
       ...retainedTextTransform,
@@ -1094,7 +1162,133 @@ function reconcileTextCall(
   } satisfies VisualProject['document']['nodes'][string];
 }
 
+function reconcileTextCall(
+  project: VisualProject,
+  call: MethodCall,
+  index: number,
+  matched: VisualProject['document']['nodes'][string] | undefined,
+  identifiers: ReadonlyMap<string, string>,
+  canvasIdentifier: string | null,
+) {
+  if (!call.args[0]) throw new Error('createText() requires text properties.');
+  assertCanonicalBase(call.args[1], identifiers, canvasIdentifier);
+  const parsed = new LiteralParser(call.args[0], true).parse();
+  const { options, painterOpts } = parseCreateTextCallOptions(call);
 
+  if (Array.isArray(parsed)) {
+    if (!parsed.length) {
+      throw new Error('createText() text array cannot be empty.');
+    }
+    if (parsed.length === 1) {
+      const only = parsed[0];
+      if (!isRecord(only)) {
+        throw new Error('createText() text array items must be object literals.');
+      }
+      return textNodeFromParsed(
+        project,
+        only,
+        index,
+        matched,
+        matched?.parentId ?? null,
+        options,
+        painterOpts,
+        call.assignedIdentifier ?? undefined,
+      );
+    }
+
+    const existingGroup =
+      matched?.kind === 'group' && isTextBatchGroup(matched)
+        ? matched
+        : undefined;
+    const groupId = existingGroup?.id ?? createVisualId('group');
+    const oldChildren = existingGroup?.childIds ?? [];
+    const childIds: string[] = [];
+    const children: Array<VisualProject['document']['nodes'][string]> = [];
+
+    parsed.forEach((item, itemIndex) => {
+      if (!isRecord(item)) {
+        throw new Error(
+          'createText() text array item ' +
+            String(itemIndex + 1) +
+            ' must be an object literal.',
+        );
+      }
+      const oldChild = oldChildren[itemIndex]
+        ? project.document.nodes[oldChildren[itemIndex]!]
+        : undefined;
+      const child = textNodeFromParsed(
+        project,
+        item,
+        itemIndex,
+        oldChild,
+        groupId,
+      );
+      project.document.nodes[child.id] = child;
+      childIds.push(child.id);
+      children.push(child);
+    });
+
+    for (const oldChildId of oldChildren.slice(childIds.length)) {
+      removeVisualNode(project, oldChildId);
+    }
+
+    const xValues = children.map((child) => child.transform?.x ?? 0);
+    const yValues = children.map((child) => child.transform?.y ?? 0);
+    const rightValues = children.map(
+      (child) =>
+        (child.transform?.x ?? 0) +
+        (child.transform?.width ?? 1),
+    );
+    const bottomValues = children.map(
+      (child) =>
+        (child.transform?.y ?? 0) +
+        (child.transform?.height ?? 1),
+    );
+
+    return {
+      id: groupId,
+      kind: 'group',
+      name:
+        existingGroup?.name ??
+        call.assignedIdentifier ??
+        'Text batch ' + String(index + 1),
+      parentId: existingGroup?.parentId ?? matched?.parentId ?? null,
+      childIds,
+      transform: {
+        ...(existingGroup?.transform ?? {}),
+        x: Math.min(...xValues),
+        y: Math.min(...yValues),
+        width: Math.max(...rightValues) - Math.min(...xValues),
+        height: Math.max(...bottomValues) - Math.min(...yValues),
+        visible: existingGroup?.transform?.visible ?? true,
+        locked: existingGroup?.transform?.locked ?? false,
+        zIndex: existingGroup?.transform?.zIndex ?? index,
+      },
+      props: textBatchGroupPropsRecord({
+        textBatch: true,
+        createOptions: options ?? {},
+        ...(painterOpts ? { painterOpts } : {}),
+      }),
+    } satisfies VisualProject['document']['nodes'][string];
+  }
+
+  if (!isRecord(parsed)) {
+    throw new Error(
+      'createText() properties must be an object literal or array of object literals.',
+    );
+  }
+
+  return textNodeFromParsed(
+    project,
+    parsed,
+    index,
+    matched,
+    matched?.parentId ?? null,
+    options,
+    painterOpts,
+    call.assignedIdentifier ?? undefined,
+  );
+}
 
 function parsedImageSourceIdentifier(call: MethodCall): string | null {
   if (!call.args[0]) return null;
