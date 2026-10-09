@@ -130,6 +130,90 @@ export function isTextBatchGroup(node: VisualNode): boolean {
   return visualTextBatchGroupProps(node) !== null;
 }
 
+export function validateVisualTextBatchGroup(
+  project: { document: { nodes: Record<string, VisualNode> } },
+  node: VisualNode,
+  issues: VisualProjectIssue[],
+) {
+  const batch = visualTextBatchGroupProps(node);
+  if (!batch) return;
+  const path = 'document.nodes.' + node.id;
+  const children = node.childIds ?? [];
+  if (children.length < 2) {
+    push(
+      issues,
+      'text-batch-size',
+      path + '.childIds',
+      'A createText TextProperties[] batch requires at least two text children.',
+    );
+  }
+  for (const childId of children) {
+    const child = project.document.nodes[childId];
+    if (!child || child.kind !== 'text') {
+      push(
+        issues,
+        'text-batch-child',
+        path + '.childIds',
+        'Text batch groups may contain only text children.',
+      );
+      continue;
+    }
+    const childProps = visualTextProps(child);
+    if (childProps.createOptions || childProps.painterOpts) {
+      push(
+        issues,
+        'text-batch-child-call-options',
+        'document.nodes.' + child.id + '.props',
+        'Call-level createText options belong to the text batch group, not an individual batch child.',
+      );
+    }
+  }
+  if (
+    batch.createOptions.isGrouped !== undefined &&
+    typeof batch.createOptions.isGrouped !== 'boolean'
+  ) {
+    push(
+      issues,
+      'text-batch-is-grouped',
+      path + '.props.createOptions.isGrouped',
+      'createText options.isGrouped must be boolean.',
+    );
+  }
+  if (
+    batch.painterOpts?.resolveAssetRefs !== undefined &&
+    typeof batch.painterOpts.resolveAssetRefs !== 'boolean'
+  ) {
+    push(
+      issues,
+      'text-batch-painter-opts',
+      path + '.props.painterOpts.resolveAssetRefs',
+      'Text batch painterOpts.resolveAssetRefs must be boolean.',
+    );
+  }
+  const group = batch.createOptions.groupTransform;
+  if (group) {
+    for (const key of ['rotation','translateX','translateY','scaleX','scaleY','pivotX','pivotY'] as const) {
+      const value = group[key];
+      if (value !== undefined && !finite(value)) {
+        push(
+          issues,
+          'text-batch-group-transform',
+          path + '.props.createOptions.groupTransform.' + key,
+          'Text group transform values must be finite.',
+        );
+      }
+    }
+    validateSkew(issues, group.skewX, path + '.props.createOptions.groupTransform.skewX');
+    validateSkew(issues, group.skewY, path + '.props.createOptions.groupTransform.skewY');
+    opacity(issues, group.opacity, path + '.props.createOptions.groupTransform.opacity');
+    validatePerspective(
+      issues,
+      group.perspective,
+      path + '.props.createOptions.groupTransform.perspective',
+    );
+  }
+}
+
 export function textPropsRecord(
   props: VisualTextNodeProps,
 ): Record<string, import('./model').VisualValue> {
