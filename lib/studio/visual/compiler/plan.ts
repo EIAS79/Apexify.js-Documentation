@@ -1,6 +1,7 @@
 import type {
   VisualCanvasConfig,
   VisualCreateImageOptions,
+  VisualCreateTextOptions,
   VisualImageNodeProps,
   VisualImageSource,
   VisualNode,
@@ -18,7 +19,11 @@ import {
   visualImageProps,
 } from '../image-contract';
 import { isCurrentUtilityInput } from '../image-utility-contract';
-import { visualTextProps } from '../text-contract';
+import {
+  isTextBatchGroup,
+  visualTextBatchGroupProps,
+  visualTextProps,
+} from '../text-contract';
 import {
   visualChartProps,
   type VisualStandaloneChartFamily,
@@ -113,7 +118,10 @@ export type StudioImageAnalysisOperation = {
   args: unknown[];
 };
 
-export type StudioTextProperties = VisualTextNodeProps & {
+export type StudioTextProperties = Omit<
+  VisualTextNodeProps,
+  'createOptions' | 'painterOpts'
+> & {
   x: number;
   y: number;
 };
@@ -125,7 +133,11 @@ export type StudioCreateTextOperation = {
   target: string;
   preferredName?: string;
   base: StudioTargetReference;
-  properties: StudioTextProperties;
+  properties: StudioTextProperties | StudioTextProperties[];
+  options?: VisualCreateTextOptions;
+  painterOpts?: {
+    resolveAssetRefs?: boolean;
+  };
 };
 
 export type StudioCreateChartOperation = {
@@ -344,7 +356,7 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
     if (node.transform?.visible === false) return;
 
     if (node.kind === 'group') {
-      if (isImageBatchGroup(node)) {
+      if (isImageBatchGroup(node) || isTextBatchGroup(node)) {
         out.push(node);
         return;
       }
@@ -617,31 +629,38 @@ function imageOperationProperties(
 
 function textOperationProperties(node: VisualNode): StudioTextProperties {
   const props = visualTextProps(node);
+  const {
+    createOptions: _createOptions,
+    painterOpts: _painterOpts,
+    ...textProps
+  } = props;
   const transform = node.transform ?? {};
   const layout = {
-    ...(props.layout ?? {}),
-    ...(transform.width !== undefined
-      ? { maxWidth: transform.width * (transform.scaleX ?? 1) }
-      : {}),
-    ...(transform.height !== undefined
-      ? { maxHeight: transform.height * (transform.scaleY ?? 1) }
-      : {}),
+    ...(textProps.layout ?? {}),
+    ...(transform.width !== undefined ? { maxWidth: transform.width } : {}),
+    ...(transform.height !== undefined ? { maxHeight: transform.height } : {}),
   };
   const placement = {
-    ...(props.placement ?? {}),
+    ...(textProps.placement ?? {}),
     ...(transform.rotation !== undefined
       ? { rotation: transform.rotation }
       : {}),
+    ...(transform.scaleX !== undefined
+      ? { scaleX: (textProps.placement?.scaleX ?? textProps.scaleX ?? 1) * transform.scaleX }
+      : {}),
+    ...(transform.scaleY !== undefined
+      ? { scaleY: (textProps.placement?.scaleY ?? textProps.scaleY ?? 1) * transform.scaleY }
+      : {}),
   };
   const fill = {
-    ...(props.fill ?? {}),
+    ...(textProps.fill ?? {}),
     ...(transform.opacity !== undefined
       ? { opacity: transform.opacity }
       : {}),
   };
 
   return {
-    ...props,
+    ...textProps,
     x: transform.x ?? 0,
     y: transform.y ?? 0,
     ...(Object.keys(layout).length ? { layout } : {}),
@@ -1004,6 +1023,57 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
       continue;
     }
 
+    if (node.kind === 'group' && isTextBatchGroup(node)) {
+      const batch = visualTextBatchGroupProps(node);
+      if (!batch) {
+        throw new Error('Text batch group is missing its runtime createText contract.');
+      }
+      const children = (node.childIds ?? []).map((childId) => {
+        const child = normalized.document.nodes[childId];
+        if (!child || child.kind !== 'text') {
+          throw new Error(
+            'Text batch group "' + node.id + '" may contain only text children.',
+          );
+        }
+        return child;
+      });
+      if (children.length < 2) {
+        throw new Error('Text batch group requires at least two text children.');
+      }
+      const properties = children.map((child) => {
+        const resolvedChild = resolved.document.nodes[child.id] ?? child;
+        const childProps = visualTextProps(resolvedChild);
+        if (childProps.createOptions || childProps.painterOpts) {
+          throw new Error(
+            'Text batch child "' +
+              child.id +
+              '" still owns call-level createText options. Move them to the text group.',
+          );
+        }
+        return textOperationProperties(resolvedChild);
+      });
+
+      operations.push({
+        id: 'text_batch_' + node.id,
+        kind: 'create-text',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || 'textGroup',
+        base,
+        properties,
+        ...(Object.keys(batch.createOptions).length
+          ? { options: batch.createOptions }
+          : {}),
+        ...(batch.painterOpts ? { painterOpts: batch.painterOpts } : {}),
+      });
+
+      produced.set(node.id, { target, member: null });
+      base = { $studioTarget: target };
+      lastTarget = target;
+      lastMember = null;
+      continue;
+    }
+
     const resolvedNode = resolved.document.nodes[node.id] ?? node;
 
     if (node.kind === 'chart') {
@@ -1075,6 +1145,7 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
     }
 
     if (node.kind === 'text') {
+      const textProps = visualTextProps(resolvedNode);
       operations.push({
         id: 'text_' + node.id,
         kind: 'create-text',
@@ -1083,6 +1154,8 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         preferredName: node.name || 'text',
         base,
         properties: textOperationProperties(resolvedNode),
+        ...(textProps.createOptions ? { options: textProps.createOptions } : {}),
+        ...(textProps.painterOpts ? { painterOpts: textProps.painterOpts } : {}),
       });
     } else if (node.kind === 'path' || node.kind === 'freehand') {
       const props = visualPathProps(node);
