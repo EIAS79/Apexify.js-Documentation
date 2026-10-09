@@ -3451,6 +3451,10 @@ export default function VisualStudioPre4({
         const node = current.document.nodes[id];
         return node?.kind === 'image' || node?.kind === 'shape';
       });
+      const textOnly = selected.every((id) => {
+        const node = current.document.nodes[id];
+        return node?.kind === 'text';
+      });
       const next = groupNodes(current, selected, groupId);
       if (imageOnly && next !== current) {
         const group = next.document.nodes[groupId];
@@ -3484,6 +3488,40 @@ export default function VisualStudioPre4({
               : {}),
           });
         }
+      } else if (textOnly && next !== current) {
+        const group = next.document.nodes[groupId];
+        if (group) {
+          let resolveAssetRefs = false;
+          for (const childId of group.childIds ?? []) {
+            const child = next.document.nodes[childId];
+            if (!child || child.kind !== 'text') continue;
+            const childProps = visualTextProps(child);
+            resolveAssetRefs ||=
+              childProps.painterOpts?.resolveAssetRefs === true ||
+              Boolean(childProps.font?.path?.startsWith('studio://asset/'));
+            const {
+              createOptions: _createOptions,
+              painterOpts: _painterOpts,
+              ...rest
+            } = childProps;
+            child.props = textPropsRecord(rest as VisualTextNodeProps);
+          }
+          group.name = 'Text batch (' + (group.childIds?.length ?? 0) + ')';
+          group.props = textBatchGroupPropsRecord({
+            textBatch: true,
+            createOptions: {
+              isGrouped: true,
+              groupTransform: {
+                scaleX: 1,
+                scaleY: 1,
+                opacity: 1,
+              },
+            },
+            ...(resolveAssetRefs
+              ? { painterOpts: { resolveAssetRefs: true } }
+              : {}),
+          });
+        }
       }
       return next;
     });
@@ -3498,7 +3536,9 @@ export default function VisualStudioPre4({
         return node?.kind === 'image' || node?.kind === 'shape';
       })
         ? 'Created one createImage([...]) batch'
-        : 'Grouped selection',
+        : selected.every((id) => project.document.nodes[id]?.kind === 'text')
+          ? 'Created one createText([...]) batch'
+          : 'Grouped selection',
     );
   };
 
