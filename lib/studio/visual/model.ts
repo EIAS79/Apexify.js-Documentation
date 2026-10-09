@@ -696,6 +696,8 @@ export interface VisualTextNodeProps {
   fontPath?: string;
   bold?: boolean;
   italic?: boolean;
+  isBold?: boolean;
+  outlined?: boolean;
   underline?: VisualTextLineDecoration;
   overline?: VisualTextLineDecoration;
   strikethrough?: VisualTextLineDecoration;
