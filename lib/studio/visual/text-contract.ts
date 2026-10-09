@@ -46,6 +46,8 @@ export const TEXT_AUTHORING_CLASSIFICATION = {
   fontPath: { surface: 'Advanced', reverse: 'legacy-normalized' },
   bold: { surface: 'Advanced', reverse: 'legacy-normalized' },
   italic: { surface: 'Advanced', reverse: 'legacy-normalized' },
+  isBold: { surface: 'Advanced', reverse: 'legacy-normalized' },
+  outlined: { surface: 'Advanced', reverse: 'legacy-normalized' },
   underline: { surface: 'Advanced', reverse: 'legacy-normalized' },
   overline: { surface: 'Advanced', reverse: 'legacy-normalized' },
   strikethrough: { surface: 'Advanced', reverse: 'legacy-normalized' },
