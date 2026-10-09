@@ -1,4 +1,7 @@
-import { validateVisualTextNode } from '../text-contract';
+import {
+  validateVisualTextBatchGroup,
+  validateVisualTextNode,
+} from '../text-contract';
 import { validateVisualChartNode } from '../chart-contract';
 import {
   validateVisualImageBatchGroup,
