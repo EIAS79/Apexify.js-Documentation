@@ -67,6 +67,7 @@ import {
 } from '@/components/studio/visual/VisualSceneComponentAuthoring';
 import { VisualImageUtilityAuthoring } from '@/components/studio/visual/VisualImageUtilityAuthoring';
 import {
+  GradientEditor,
   VisualImageBatchInspector,
   VisualImageInspector,
 } from '@/components/studio/visual/VisualImageInspector';
@@ -171,6 +172,7 @@ import type {
   VisualBlendMode,
   VisualCanvasConfig,
   VisualImageFilter,
+  VisualGradient,
   VisualImageNodeProps,
   VisualNode,
   VisualProject,
@@ -201,8 +203,11 @@ import {
   TEXT_BASELINES,
   TEXT_CURVE_MODES,
   defaultTextNodeProps,
+  isTextBatchGroup,
   measureVisualTextInBrowser,
+  textBatchGroupPropsRecord,
   textPropsRecord,
+  visualTextBatchGroupProps,
   visualTextProps,
 } from '@/lib/studio/visual/text-contract';
 import {
@@ -898,6 +903,10 @@ export default function VisualStudioPre4({
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
   const primaryText = primary?.kind === 'text' ? primary : undefined;
+  const primaryTextBatch =
+    primary?.kind === 'group' && isTextBatchGroup(primary)
+      ? primary
+      : undefined;
   const primaryPath =
     primary && (primary.kind === 'path' || primary.kind === 'freehand')
       ? primary
