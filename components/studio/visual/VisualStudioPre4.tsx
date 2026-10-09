@@ -5283,16 +5283,279 @@ export default function VisualStudioPre4({
   // of UI/runtime truth.
 
 
+  const defaultTextGradient = (
+    startColor = '#f4f7fb',
+    endColor = '#6f86ff',
+  ): VisualGradient => ({
+    type: 'linear',
+    startX: 0,
+    startY: 0,
+    endX: Math.max(100, primaryText?.transform?.width ?? 360),
+    endY: 0,
+    colors: [
+      { stop: 0, color: startColor },
+      { stop: 1, color: endColor },
+    ],
+  });
+
   const renderTextHeader = () => {
     if (!primaryText) return null;
+    const props = visualTextProps(primaryText);
     return (
-      <div className="apx-pre4-inspector-title">
+      <div className="apx-text-v3-header" data-text-v3-header>
+        <span className="apx-text-v3-header-icon">
+          <DocumentTextIcon aria-hidden />
+        </span>
         <div>
           <strong>{primaryText.name ?? 'Text'}</strong>
-          <small>Apexify text layer · Phase 6</small>
+          <small>
+            createText() · {(props.font?.family ?? props.fontFamily ?? 'Arial')} ·{' '}
+            {Math.round(props.font?.size ?? props.fontSize ?? 16)}px
+          </small>
         </div>
-        <span className="apx-pre4-type-pill">text</span>
+        <span className="apx-text-v3-api-pill">TextProperties</span>
       </div>
+    );
+  };
+
+  const renderTextTransform = () => {
+    if (!primaryText) return renderTransformFields();
+    const props = visualTextProps(primaryText);
+    const placement = props.placement ?? {};
+    const x = primaryText.transform?.x ?? 0;
+    const y = primaryText.transform?.y ?? 0;
+    const width = Math.max(
+      1,
+      primaryText.transform?.width ?? props.layout?.maxWidth ?? props.maxWidth ?? 360,
+    );
+    const height = Math.max(
+      1,
+      primaryText.transform?.height ?? props.layout?.maxHeight ?? props.maxHeight ?? 120,
+    );
+    const perspective = placement.perspective;
+
+    const setPlacement = (
+      label: string,
+      patch: Partial<NonNullable<VisualTextNodeProps['placement']>>,
+    ) =>
+      mutateText(label, (current) => ({
+        ...current,
+        placement: { ...(current.placement ?? {}), ...patch },
+      }));
+
+    return (
+      <>
+        {renderTextHeader()}
+        <section className="apx-text-v3-card" data-text-section="position">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Position & transform</strong>
+              <small>Canvas placement plus Apexify text affine transforms.</small>
+            </div>
+          </div>
+          <div className="apx-text-v3-grid apx-text-v3-grid--3">
+            {([
+              ['X', 'x', x],
+              ['Y', 'y', y],
+              ['Rotation', 'rotation', primaryText.transform?.rotation ?? placement.rotation ?? props.rotation ?? 0],
+            ] as const).map(([label, key, value]) => (
+              <label key={key}>
+                <span>{label}</span>
+                <input
+                  className="apx-pre4-input"
+                  type="number"
+                  step={key === 'rotation' ? 1 : 0.5}
+                  value={value}
+                  onFocus={beginPropertyEdit}
+                  onChange={(event) =>
+                    updateTransformDraft(
+                      key as 'x' | 'y' | 'rotation',
+                      Number(event.target.value),
+                    )
+                  }
+                  onBlur={() => endPropertyEdit('Text ' + label.toLowerCase())}
+                />
+              </label>
+            ))}
+          </div>
+
+          <div className="apx-text-v3-grid apx-text-v3-grid--2">
+            <label>
+              <span>Scale X</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                step={0.05}
+                value={placement.scaleX ?? props.scaleX ?? 1}
+                onChange={(event) =>
+                  setPlacement('Text scale X', { scaleX: Number(event.target.value) })
+                }
+              />
+            </label>
+            <label>
+              <span>Scale Y</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                step={0.05}
+                value={placement.scaleY ?? props.scaleY ?? 1}
+                onChange={(event) =>
+                  setPlacement('Text scale Y', { scaleY: Number(event.target.value) })
+                }
+              />
+            </label>
+            <label>
+              <span>Skew X °</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={-89.99}
+                max={89.99}
+                step={0.5}
+                value={placement.skewX ?? props.skewX ?? 0}
+                onChange={(event) =>
+                  setPlacement('Text skew X', { skewX: Number(event.target.value) })
+                }
+              />
+            </label>
+            <label>
+              <span>Skew Y °</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={-89.99}
+                max={89.99}
+                step={0.5}
+                value={placement.skewY ?? props.skewY ?? 0}
+                onChange={(event) =>
+                  setPlacement('Text skew Y', { skewY: Number(event.target.value) })
+                }
+              />
+            </label>
+          </div>
+        </section>
+
+        <section className="apx-text-v3-card" data-text-section="perspective">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Perspective</strong>
+              <small>Four-corner raster warp after text layout and effects.</small>
+            </div>
+            <label className="apx-canvas-switch">
+              <input
+                type="checkbox"
+                checked={Boolean(perspective)}
+                onChange={(event) =>
+                  setPlacement('Text perspective', {
+                    perspective: event.target.checked
+                      ? {
+                          points: [
+                            { x, y },
+                            { x: x + width, y },
+                            { x: x + width, y: y + height },
+                            { x, y: y + height },
+                          ],
+                          interpolation: 'bilinear',
+                          edgeMode: 'transparent',
+                        }
+                      : undefined,
+                  })
+                }
+              />
+              <span />
+            </label>
+          </div>
+          {perspective ? (
+            <>
+              <div className="apx-text-v3-grid apx-text-v3-grid--2">
+                <label>
+                  <span>Interpolation</span>
+                  <select
+                    className="apx-pre4-input"
+                    value={perspective.interpolation ?? 'bilinear'}
+                    onChange={(event) =>
+                      setPlacement('Text perspective interpolation', {
+                        perspective: {
+                          ...perspective,
+                          interpolation: event.target.value as NonNullable<
+                            NonNullable<VisualTextNodeProps['placement']>['perspective']
+                          >['interpolation'],
+                        },
+                      })
+                    }
+                  >
+                    {['nearest', 'bilinear', 'bicubic'].map((value) => (
+                      <option key={value}>{value}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Edge mode</span>
+                  <select
+                    className="apx-pre4-input"
+                    value={perspective.edgeMode ?? 'transparent'}
+                    onChange={(event) =>
+                      setPlacement('Text perspective edge mode', {
+                        perspective: {
+                          ...perspective,
+                          edgeMode: event.target.value as NonNullable<
+                            NonNullable<VisualTextNodeProps['placement']>['perspective']
+                          >['edgeMode'],
+                        },
+                      })
+                    }
+                  >
+                    {['transparent', 'clamp', 'wrap', 'mirror'].map((value) => (
+                      <option key={value}>{value}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="apx-text-perspective-points">
+                {perspective.points.map((point, index) => (
+                  <div key={index}>
+                    <span>{['TL', 'TR', 'BR', 'BL'][index]}</span>
+                    <input
+                      className="apx-pre4-input"
+                      type="number"
+                      value={point.x}
+                      aria-label={'Perspective point ' + (index + 1) + ' X'}
+                      onChange={(event) => {
+                        const points = perspective.points.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? { ...item, x: Number(event.target.value) }
+                            : item,
+                        ) as typeof perspective.points;
+                        setPlacement('Text perspective point', {
+                          perspective: { ...perspective, points },
+                        });
+                      }}
+                    />
+                    <input
+                      className="apx-pre4-input"
+                      type="number"
+                      value={point.y}
+                      aria-label={'Perspective point ' + (index + 1) + ' Y'}
+                      onChange={(event) => {
+                        const points = perspective.points.map((item, itemIndex) =>
+                          itemIndex === index
+                            ? { ...item, y: Number(event.target.value) }
+                            : item,
+                        ) as typeof perspective.points;
+                        setPlacement('Text perspective point', {
+                          perspective: { ...perspective, points },
+                        });
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="apx-text-v3-empty">Perspective is off. Text remains on the normal affine path.</div>
+          )}
+        </section>
+      </>
     );
   };
 
@@ -5305,25 +5568,49 @@ export default function VisualStudioPre4({
     const layout = props.layout ?? {};
     const placement = props.placement ?? {};
     const fontAssetId = font.path ? studioAssetIdFromReference(font.path) : null;
+    const fillGradient = fill.gradient ?? props.gradient;
+
+    const setDecoration = (
+      key: 'underline' | 'overline' | 'strikethrough',
+      value: NonNullable<VisualTextNodeProps['decorations']>['underline'],
+    ) =>
+      mutateText('Text ' + key, (current) => ({
+        ...current,
+        decorations: { ...(current.decorations ?? {}), [key]: value },
+      }));
 
     return (
       <>
         {renderTextHeader()}
-        <div className="apx-pre4-section" data-text-section="content">
-          <div className="apx-pre4-section-title">Content</div>
+
+        <section className="apx-text-v3-card apx-text-v3-card--content" data-text-section="content">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Content</strong>
+              <small>{props.text.length} characters</small>
+            </div>
+          </div>
           <textarea
-            className="apx-text-content"
+            className="apx-text-content apx-text-content--v3"
             value={props.text}
             onFocus={beginPropertyEdit}
-            onChange={(event) => updateTextDraft((current) => ({ ...current, text: event.target.value }))}
+            onChange={(event) =>
+              updateTextDraft((current) => ({ ...current, text: event.target.value }))
+            }
             onBlur={() => endPropertyEdit('Edit text')}
             data-text-content-editor
           />
-        </div>
+        </section>
 
-        <div className="apx-pre4-section" data-text-section="typography">
-          <div className="apx-pre4-section-title">Typography</div>
-          <label className="apx-canvas-field">
+        <section className="apx-text-v3-card" data-text-section="typography">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Typography</strong>
+              <small>Font identity, weight, style and spacing.</small>
+            </div>
+          </div>
+
+          <label className="apx-text-v3-field">
             <span>Font family</span>
             <select
               className="apx-pre4-input"
@@ -5358,166 +5645,235 @@ export default function VisualStudioPre4({
             </select>
           </label>
 
-          <div className="apx-pre4-property-grid">
+          <div className="apx-text-v3-grid apx-text-v3-grid--3">
             <label>
               <span>Size</span>
               <input
                 className="apx-pre4-input"
                 type="number"
-                min={1}
+                min={0.01}
                 value={font.size ?? props.fontSize ?? 16}
-                onFocus={beginPropertyEdit}
-                onChange={(event) => updateTextDraft((current) => ({
-                  ...current,
-                  font: { ...(current.font ?? {}), size: Math.max(1, Number(event.target.value)) },
-                }))}
-                onBlur={() => endPropertyEdit('Font size')}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    font: {
+                      ...(current.font ?? {}),
+                      size: Math.max(0.01, Number(event.target.value)),
+                    },
+                  }))
+                }
               />
             </label>
+            <label>
+              <span>Weight</span>
+              <select
+                className="apx-pre4-input"
+                value={String(font.weight ?? 'normal')}
+                onChange={(event) => {
+                  const raw = event.target.value;
+                  const weight = /^\d+$/.test(raw) ? Number(raw) : raw;
+                  mutateText('Font weight', (current) => ({
+                    ...current,
+                    font: {
+                      ...(current.font ?? {}),
+                      weight: weight as NonNullable<VisualTextNodeProps['font']>['weight'],
+                    },
+                  }));
+                }}
+              >
+                {['normal', 'bold', 'bolder', 'lighter', '100', '200', '300', '400', '500', '600', '700', '800', '900'].map((value) => (
+                  <option key={value} value={value}>{value}</option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Font style</span>
+              <select
+                className="apx-pre4-input"
+                value={font.style ?? 'normal'}
+                onChange={(event) =>
+                  mutateText('Font style', (current) => ({
+                    ...current,
+                    font: {
+                      ...(current.font ?? {}),
+                      style: event.target.value as NonNullable<
+                        VisualTextNodeProps['font']
+                      >['style'],
+                    },
+                  }))
+                }
+              >
+                {['normal', 'italic', 'oblique'].map((value) => (
+                  <option key={value}>{value}</option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="apx-text-v3-grid apx-text-v3-grid--3">
             <label>
               <span>Line height</span>
               <input
                 className="apx-pre4-input"
                 type="number"
-                min={0.1}
-                step={0.1}
+                min={0.01}
+                step={0.05}
                 value={layout.lineHeight ?? props.lineHeight ?? 1.4}
-                onFocus={beginPropertyEdit}
-                onChange={(event) => updateTextDraft((current) => ({
-                  ...current,
-                  layout: { ...(current.layout ?? {}), lineHeight: Number(event.target.value) },
-                }))}
-                onBlur={() => endPropertyEdit('Line height')}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    layout: {
+                      ...(current.layout ?? {}),
+                      lineHeight: Number(event.target.value),
+                    },
+                  }))
+                }
               />
             </label>
-          </div>
-
-          <div className="apx-text-toggle-row">
-            <label className="apx-canvas-check">
-              <input
-                type="checkbox"
-                checked={decorations.bold ?? props.bold ?? false}
-                onChange={(event) => mutateText('Bold', (current) => ({
-                  ...current,
-                  decorations: { ...(current.decorations ?? {}), bold: event.target.checked },
-                }))}
-              />
-              <span>Bold</span>
-            </label>
-            <label className="apx-canvas-check">
-              <input
-                type="checkbox"
-                checked={decorations.italic ?? props.italic ?? false}
-                onChange={(event) => mutateText('Italic', (current) => ({
-                  ...current,
-                  decorations: { ...(current.decorations ?? {}), italic: event.target.checked },
-                }))}
-              />
-              <span>Italic</span>
-            </label>
-          </div>
-
-          <div className="apx-pre4-property-grid">
             <label>
-              <span>Letter</span>
+              <span>Letter spacing</span>
               <input
                 className="apx-pre4-input"
                 type="number"
                 step={0.25}
                 value={layout.letterSpacing ?? props.letterSpacing ?? 0}
-                onChange={(event) => updateTextDraft((current) => ({
-                  ...current,
-                  layout: { ...(current.layout ?? {}), letterSpacing: Number(event.target.value) },
-                }))}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    layout: {
+                      ...(current.layout ?? {}),
+                      letterSpacing: Number(event.target.value),
+                    },
+                  }))
+                }
               />
             </label>
             <label>
-              <span>Word</span>
+              <span>Word spacing</span>
               <input
                 className="apx-pre4-input"
                 type="number"
                 step={0.25}
                 value={layout.wordSpacing ?? props.wordSpacing ?? 0}
-                onChange={(event) => updateTextDraft((current) => ({
-                  ...current,
-                  layout: { ...(current.layout ?? {}), wordSpacing: Number(event.target.value) },
-                }))}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    layout: {
+                      ...(current.layout ?? {}),
+                      wordSpacing: Number(event.target.value),
+                    },
+                  }))
+                }
               />
             </label>
           </div>
-        </div>
+        </section>
 
-        <div className="apx-pre4-section" data-text-section="fill">
-          <div className="apx-pre4-section-title">Fill & placement</div>
-          <div className="apx-canvas-color-row">
-            <input
-              type="color"
-              value={fill.color ?? props.color ?? '#f4f7fb'}
-              onChange={(event) => updateTextDraft((current) => ({
-                ...current,
-                fill: { ...(current.fill ?? {}), color: event.target.value },
-              }))}
-            />
-            <input
-              className="apx-pre4-input"
-              value={fill.color ?? props.color ?? '#f4f7fb'}
-              onChange={(event) => updateTextDraft((current) => ({
-                ...current,
-                fill: { ...(current.fill ?? {}), color: event.target.value },
-              }))}
-            />
-          </div>
-          <div className="apx-pre4-property-grid">
-            <label>
-              <span>Align</span>
-              <select
-                className="apx-pre4-input"
-                value={placement.textAlign ?? props.textAlign ?? 'left'}
-                onChange={(event) => mutateText('Text align', (current) => ({
-                  ...current,
-                  placement: {
-                    ...(current.placement ?? {}),
-                    textAlign: event.target.value as NonNullable<VisualTextNodeProps['placement']>['textAlign'],
-                  },
-                }))}
+        <section className="apx-text-v3-card" data-text-section="fill">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Fill</strong>
+              <small>Solid or full Apexify gradient paint.</small>
+            </div>
+            <div className="apx-text-v3-segmented">
+              <button
+                type="button"
+                data-active={!fillGradient ? 'true' : undefined}
+                onClick={() =>
+                  mutateText('Solid text fill', (current) => ({
+                    ...current,
+                    fill: { ...(current.fill ?? {}), gradient: undefined },
+                  }))
+                }
               >
-                {TEXT_ALIGNMENTS.map((value) => <option key={value}>{value}</option>)}
-              </select>
-            </label>
-            <label>
-              <span>Baseline</span>
-              <select
-                className="apx-pre4-input"
-                value={placement.textBaseline ?? props.textBaseline ?? 'top'}
-                onChange={(event) => mutateText('Text baseline', (current) => ({
-                  ...current,
-                  placement: {
-                    ...(current.placement ?? {}),
-                    textBaseline: event.target.value as NonNullable<VisualTextNodeProps['placement']>['textBaseline'],
-                  },
-                }))}
+                Solid
+              </button>
+              <button
+                type="button"
+                data-active={fillGradient ? 'true' : undefined}
+                onClick={() =>
+                  mutateText('Gradient text fill', (current) => ({
+                    ...current,
+                    fill: {
+                      ...(current.fill ?? {}),
+                      gradient:
+                        current.fill?.gradient ??
+                        current.gradient ??
+                        defaultTextGradient(current.fill?.color ?? current.color ?? '#f4f7fb'),
+                    },
+                  }))
+                }
               >
-                {TEXT_BASELINES.map((value) => <option key={value}>{value}</option>)}
-              </select>
-            </label>
+                Gradient
+              </button>
+            </div>
           </div>
-          <label className="apx-canvas-field">
-            <span>Opacity · {Math.round((primaryText.transform?.opacity ?? fill.opacity ?? props.opacity ?? 1) * 100)}%</span>
+
+          {!fillGradient ? (
+            <div className="apx-canvas-color-row apx-text-v3-color-row">
+              <input
+                type="color"
+                value={fill.color ?? props.color ?? '#f4f7fb'}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    fill: { ...(current.fill ?? {}), color: event.target.value },
+                  }))
+                }
+              />
+              <input
+                className="apx-pre4-input"
+                value={fill.color ?? props.color ?? '#f4f7fb'}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    fill: { ...(current.fill ?? {}), color: event.target.value },
+                  }))
+                }
+              />
+            </div>
+          ) : (
+            <GradientEditor
+              value={fillGradient}
+              onChange={(gradient) =>
+                mutateText('Text fill gradient', (current) => ({
+                  ...current,
+                  fill: { ...(current.fill ?? {}), gradient },
+                }))
+              }
+            />
+          )}
+
+          <div className="apx-text-v3-slider-row">
+            <span>Opacity</span>
             <input
-              className="apx-pre4-range"
               type="range"
               min={0}
               max={1}
               step={0.01}
               value={primaryText.transform?.opacity ?? fill.opacity ?? props.opacity ?? 1}
-              onChange={(event) => updateTransformDraft('opacity', Number(event.target.value))}
+              onChange={(event) =>
+                updateTransformDraft('opacity', Number(event.target.value))
+              }
             />
-          </label>
-        </div>
+            <strong>
+              {Math.round(
+                (primaryText.transform?.opacity ?? fill.opacity ?? props.opacity ?? 1) *
+                  100,
+              )}
+              %
+            </strong>
+          </div>
+        </section>
 
-        <div className="apx-pre4-section" data-text-section="wrapping">
-          <div className="apx-pre4-section-title">Wrapping & layout</div>
-          <div className="apx-pre4-property-grid">
+        <section className="apx-text-v3-card" data-text-section="wrapping">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Layout & alignment</strong>
+              <small>Wrapping bounds and Canvas text anchor semantics.</small>
+            </div>
+          </div>
+          <div className="apx-text-v3-grid apx-text-v3-grid--2">
             <label>
               <span>Max width</span>
               <input
@@ -5525,9 +5881,9 @@ export default function VisualStudioPre4({
                 type="number"
                 min={1}
                 value={primaryText.transform?.width ?? layout.maxWidth ?? props.maxWidth ?? 360}
-                onFocus={beginPropertyEdit}
-                onChange={(event) => updateTransformDraft('width', Number(event.target.value))}
-                onBlur={() => endPropertyEdit('Text max width')}
+                onChange={(event) =>
+                  updateTransformDraft('width', Number(event.target.value))
+                }
               />
             </label>
             <label>
@@ -5537,90 +5893,257 @@ export default function VisualStudioPre4({
                 type="number"
                 min={1}
                 value={primaryText.transform?.height ?? layout.maxHeight ?? props.maxHeight ?? 120}
-                onFocus={beginPropertyEdit}
-                onChange={(event) => updateTransformDraft('height', Number(event.target.value))}
-                onBlur={() => endPropertyEdit('Text max height')}
+                onChange={(event) =>
+                  updateTransformDraft('height', Number(event.target.value))
+                }
               />
             </label>
+            <label>
+              <span>Align</span>
+              <select
+                className="apx-pre4-input"
+                value={placement.textAlign ?? props.textAlign ?? 'left'}
+                onChange={(event) =>
+                  mutateText('Text align', (current) => ({
+                    ...current,
+                    placement: {
+                      ...(current.placement ?? {}),
+                      textAlign: event.target.value as NonNullable<
+                        VisualTextNodeProps['placement']
+                      >['textAlign'],
+                    },
+                  }))
+                }
+              >
+                {TEXT_ALIGNMENTS.map((value) => <option key={value}>{value}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Baseline</span>
+              <select
+                className="apx-pre4-input"
+                value={placement.textBaseline ?? props.textBaseline ?? 'top'}
+                onChange={(event) =>
+                  mutateText('Text baseline', (current) => ({
+                    ...current,
+                    placement: {
+                      ...(current.placement ?? {}),
+                      textBaseline: event.target.value as NonNullable<
+                        VisualTextNodeProps['placement']
+                      >['textBaseline'],
+                    },
+                  }))
+                }
+              >
+                {TEXT_BASELINES.map((value) => <option key={value}>{value}</option>)}
+              </select>
+            </label>
           </div>
-        </div>
+        </section>
 
-        <div className="apx-pre4-section" data-text-section="decorations">
-          <div className="apx-pre4-section-title">Decorations</div>
-          <div className="apx-text-toggle-row apx-text-toggle-row--wrap">
-            {(['underline','overline','strikethrough'] as const).map((key) => (
-              <label className="apx-canvas-check" key={key}>
-                <input
-                  type="checkbox"
-                  checked={Boolean(decorations[key] ?? props[key])}
-                  onChange={(event) => mutateText('Text decoration', (current) => ({
+        <section className="apx-text-v3-card" data-text-section="decorations">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Decorations</strong>
+              <small>Independent underline, overline and strike paint.</small>
+            </div>
+          </div>
+          <div className="apx-text-decoration-stack">
+            {(['underline', 'overline', 'strikethrough'] as const).map((key) => {
+              const current = decorations[key] ?? props[key];
+              const styled =
+                current && typeof current === 'object'
+                  ? current
+                  : null;
+              return (
+                <div className="apx-text-decoration-card" key={key}>
+                  <div className="apx-text-decoration-head">
+                    <span>{key}</span>
+                    <label className="apx-canvas-switch">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(current)}
+                        onChange={(event) =>
+                          setDecoration(
+                            key,
+                            event.target.checked
+                              ? {
+                                  color: fill.color ?? props.color ?? '#f4f7fb',
+                                  width: 1,
+                                }
+                              : false,
+                          )
+                        }
+                      />
+                      <span />
+                    </label>
+                  </div>
+                  {styled ? (
+                    <>
+                      <div className="apx-text-v3-grid apx-text-v3-grid--2">
+                        <label>
+                          <span>Color</span>
+                          <input
+                            className="apx-pre4-input"
+                            value={styled.color ?? fill.color ?? '#f4f7fb'}
+                            onChange={(event) =>
+                              setDecoration(key, {
+                                ...styled,
+                                color: event.target.value,
+                              })
+                            }
+                          />
+                        </label>
+                        <label>
+                          <span>Width</span>
+                          <input
+                            className="apx-pre4-input"
+                            type="number"
+                            min={0}
+                            step={0.5}
+                            value={styled.width ?? 1}
+                            onChange={(event) =>
+                              setDecoration(key, {
+                                ...styled,
+                                width: Number(event.target.value),
+                              })
+                            }
+                          />
+                        </label>
+                      </div>
+                      <label className="apx-text-v3-check-row">
+                        <input
+                          type="checkbox"
+                          checked={Boolean(styled.gradient)}
+                          onChange={(event) =>
+                            setDecoration(key, {
+                              ...styled,
+                              gradient: event.target.checked
+                                ? defaultTextGradient(styled.color ?? '#f4f7fb')
+                                : undefined,
+                            })
+                          }
+                        />
+                        <span>Gradient decoration</span>
+                      </label>
+                      {styled.gradient ? (
+                        <GradientEditor
+                          value={styled.gradient}
+                          onChange={(gradient) =>
+                            setDecoration(key, { ...styled, gradient })
+                          }
+                        />
+                      ) : null}
+                    </>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="apx-text-v3-flag-row">
+            <label className="apx-text-v3-check-row">
+              <input
+                type="checkbox"
+                checked={decorations.bold ?? props.bold ?? false}
+                onChange={(event) =>
+                  mutateText('Bold flag', (current) => ({
                     ...current,
                     decorations: {
                       ...(current.decorations ?? {}),
-                      [key]: event.target.checked,
+                      bold: event.target.checked,
                     },
-                  }))}
-                />
-                <span>{key}</span>
-              </label>
-            ))}
+                  }))
+                }
+              />
+              <span>Bold decoration flag</span>
+            </label>
+            <label className="apx-text-v3-check-row">
+              <input
+                type="checkbox"
+                checked={decorations.italic ?? props.italic ?? false}
+                onChange={(event) =>
+                  mutateText('Italic flag', (current) => ({
+                    ...current,
+                    decorations: {
+                      ...(current.decorations ?? {}),
+                      italic: event.target.checked,
+                    },
+                  }))
+                }
+              />
+              <span>Italic decoration flag</span>
+            </label>
           </div>
-        </div>
+        </section>
 
-        <div className="apx-pre4-section" data-text-section="stroke">
-          <div className="apx-canvas-section-heading">
-            <div className="apx-pre4-section-title">Stroke</div>
+        <section className="apx-text-v3-card" data-text-section="stroke">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Stroke</strong>
+              <small>Glyph outline paint, opacity and line style.</small>
+            </div>
             <label className="apx-canvas-switch">
               <input
                 type="checkbox"
                 checked={Boolean(props.stroke)}
-                onChange={(event) => mutateText('Text stroke', (current) => {
-                  if (!event.target.checked) {
-                    const next = { ...current };
-                    delete next.stroke;
-                    return next;
-                  }
-                  return {
+                onChange={(event) =>
+                  mutateText('Text stroke', (current) => ({
                     ...current,
-                    stroke: { color: '#ffffff', width: 1, opacity: 1, style: 'solid' },
-                  };
-                })}
+                    stroke: event.target.checked
+                      ? {
+                          color: '#ffffff',
+                          width: 1,
+                          opacity: 1,
+                          style: 'solid',
+                        }
+                      : undefined,
+                  }))
+                }
               />
               <span />
             </label>
           </div>
           {props.stroke ? (
             <>
-              <div className="apx-canvas-color-row">
-                <input
-                  type="color"
-                  value={props.stroke.color ?? '#ffffff'}
-                  onChange={(event) => updateTextDraft((current) => ({
-                    ...current,
-                    stroke: { ...(current.stroke ?? {}), color: event.target.value },
-                  }))}
-                />
-                <input
-                  className="apx-pre4-input"
-                  value={props.stroke.color ?? '#ffffff'}
-                  onChange={(event) => updateTextDraft((current) => ({
-                    ...current,
-                    stroke: { ...(current.stroke ?? {}), color: event.target.value },
-                  }))}
-                />
-              </div>
-              <div className="apx-pre4-property-grid">
+              <div className="apx-text-v3-grid apx-text-v3-grid--3">
                 <label>
                   <span>Width</span>
                   <input
                     className="apx-pre4-input"
                     type="number"
                     min={0}
+                    step={0.5}
                     value={props.stroke.width ?? 1}
-                    onChange={(event) => updateTextDraft((current) => ({
-                      ...current,
-                      stroke: { ...(current.stroke ?? {}), width: Number(event.target.value) },
-                    }))}
+                    onChange={(event) =>
+                      updateTextDraft((current) => ({
+                        ...current,
+                        stroke: {
+                          ...(current.stroke ?? {}),
+                          width: Number(event.target.value),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Opacity</span>
+                  <input
+                    className="apx-pre4-input"
+                    type="number"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={props.stroke.opacity ?? 1}
+                    onChange={(event) =>
+                      updateTextDraft((current) => ({
+                        ...current,
+                        stroke: {
+                          ...(current.stroke ?? {}),
+                          opacity: Number(event.target.value),
+                        },
+                      }))
+                    }
                   />
                 </label>
                 <label>
@@ -5628,21 +6151,87 @@ export default function VisualStudioPre4({
                   <select
                     className="apx-pre4-input"
                     value={props.stroke.style ?? 'solid'}
-                    onChange={(event) => mutateText('Text stroke style', (current) => ({
-                      ...current,
-                      stroke: {
-                        ...(current.stroke ?? {}),
-                        style: event.target.value as NonNullable<VisualTextNodeProps['stroke']>['style'],
-                      },
-                    }))}
+                    onChange={(event) =>
+                      mutateText('Text stroke style', (current) => ({
+                        ...current,
+                        stroke: {
+                          ...(current.stroke ?? {}),
+                          style: event.target.value as NonNullable<
+                            VisualTextNodeProps['stroke']
+                          >['style'],
+                        },
+                      }))
+                    }
                   >
-                    {['solid','dashed','dotted','groove','ridge','double'].map((value) => <option key={value}>{value}</option>)}
+                    {['solid','dashed','dotted','groove','ridge','double'].map((value) => (
+                      <option key={value}>{value}</option>
+                    ))}
                   </select>
                 </label>
               </div>
+              <label className="apx-text-v3-check-row">
+                <input
+                  type="checkbox"
+                  checked={Boolean(props.stroke.gradient)}
+                  onChange={(event) =>
+                    mutateText('Text stroke gradient', (current) => ({
+                      ...current,
+                      stroke: {
+                        ...(current.stroke ?? {}),
+                        gradient: event.target.checked
+                          ? defaultTextGradient(current.stroke?.color ?? '#ffffff')
+                          : undefined,
+                      },
+                    }))
+                  }
+                />
+                <span>Use gradient stroke</span>
+              </label>
+              {props.stroke.gradient ? (
+                <GradientEditor
+                  value={props.stroke.gradient}
+                  onChange={(gradient) =>
+                    mutateText('Text stroke gradient', (current) => ({
+                      ...current,
+                      stroke: { ...(current.stroke ?? {}), gradient },
+                    }))
+                  }
+                />
+              ) : (
+                <div className="apx-canvas-color-row apx-text-v3-color-row">
+                  <input
+                    type="color"
+                    value={props.stroke.color ?? '#ffffff'}
+                    onChange={(event) =>
+                      updateTextDraft((current) => ({
+                        ...current,
+                        stroke: {
+                          ...(current.stroke ?? {}),
+                          color: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                  <input
+                    className="apx-pre4-input"
+                    value={props.stroke.color ?? '#ffffff'}
+                    onChange={(event) =>
+                      updateTextDraft((current) => ({
+                        ...current,
+                        stroke: {
+                          ...(current.stroke ?? {}),
+                          color: event.target.value,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+              )}
             </>
-          ) : null}
-        </div>
+          ) : (
+            <div className="apx-text-v3-empty">Stroke is disabled.</div>
+          )}
+        </section>
       </>
     );
   };
@@ -5652,127 +6241,418 @@ export default function VisualStudioPre4({
     const props = visualTextProps(primaryText);
     const effects = props.effects ?? {};
     const curve = props.textOnCurve;
+
     return (
       <>
         {renderTextHeader()}
-        {(['shadow','glow','highlight'] as const).map((kind) => {
+        <div className="apx-text-effects-order">
+          <span>Runtime paint order</span>
+          <strong>Highlight → Glow → Shadow → Stroke → Fill → Decorations</strong>
+        </div>
+
+        {(['highlight', 'glow', 'shadow'] as const).map((kind) => {
           const current = effects[kind];
+          const fallback =
+            kind === 'shadow'
+              ? '#000000'
+              : kind === 'highlight'
+                ? '#ffff00'
+                : '#ffffff';
           return (
-            <div className="apx-pre4-section" data-text-effect={kind} key={kind}>
-              <div className="apx-canvas-section-heading">
-                <div className="apx-pre4-section-title">{kind}</div>
+            <section className="apx-text-v3-card" data-text-effect={kind} key={kind}>
+              <div className="apx-text-v3-card-head">
+                <div>
+                  <strong>{kind[0].toUpperCase() + kind.slice(1)}</strong>
+                  <small>
+                    {kind === 'shadow'
+                      ? 'Offset shadow with blur and paint.'
+                      : kind === 'glow'
+                        ? 'Outer halo intensity and opacity.'
+                        : 'Flat highlight painted behind the glyphs.'}
+                  </small>
+                </div>
                 <label className="apx-canvas-switch">
                   <input
                     type="checkbox"
                     checked={Boolean(current)}
-                    onChange={(event) => mutateText('Text ' + kind, (value) => {
-                      const nextEffects = { ...(value.effects ?? {}) };
-                      if (!event.target.checked) {
-                        delete nextEffects[kind];
-                      } else if (kind === 'shadow') {
-                        nextEffects.shadow = { color: '#000000', offsetX: 0, offsetY: 8, blur: 18, opacity: .4 };
-                      } else if (kind === 'glow') {
-                        nextEffects.glow = { color: '#6f86ff', intensity: 12, opacity: .75 };
-                      } else {
-                        nextEffects.highlight = { color: '#1d4ed8', opacity: .35 };
-                      }
-                      return { ...value, effects: nextEffects };
-                    })}
+                    onChange={(event) =>
+                      mutateText('Text ' + kind, (value) => {
+                        const nextEffects = { ...(value.effects ?? {}) };
+                        if (!event.target.checked) {
+                          delete nextEffects[kind];
+                        } else if (kind === 'shadow') {
+                          nextEffects.shadow = {
+                            color: '#000000',
+                            offsetX: 2,
+                            offsetY: 2,
+                            blur: 4,
+                            opacity: 1,
+                          };
+                        } else if (kind === 'glow') {
+                          nextEffects.glow = {
+                            color: '#ffffff',
+                            intensity: 10,
+                            opacity: 0.8,
+                          };
+                        } else {
+                          nextEffects.highlight = {
+                            color: '#ffff00',
+                            opacity: 0.3,
+                          };
+                        }
+                        return { ...value, effects: nextEffects };
+                      })
+                    }
                   />
                   <span />
                 </label>
               </div>
+
               {current ? (
                 <>
-                  <div className="apx-canvas-color-row">
-                    <input
-                      type="color"
-                      value={current.color ?? (kind === 'shadow' ? '#000000' : '#6f86ff')}
-                      onChange={(event) => updateTextDraft((value) => ({
-                        ...value,
-                        effects: {
-                          ...(value.effects ?? {}),
-                          [kind]: { ...(value.effects?.[kind] ?? {}), color: event.target.value },
-                        },
-                      }))}
-                    />
-                    <input
-                      className="apx-pre4-input"
-                      value={current.color ?? (kind === 'shadow' ? '#000000' : '#6f86ff')}
-                      onChange={(event) => updateTextDraft((value) => ({
-                        ...value,
-                        effects: {
-                          ...(value.effects ?? {}),
-                          [kind]: { ...(value.effects?.[kind] ?? {}), color: event.target.value },
-                        },
-                      }))}
-                    />
+                  <div className="apx-text-v3-grid apx-text-v3-grid--2">
+                    {kind === 'shadow' ? (
+                      <>
+                        <label>
+                          <span>Offset X</span>
+                          <input
+                            className="apx-pre4-input"
+                            type="number"
+                            value={effects.shadow?.offsetX ?? 2}
+                            onChange={(event) =>
+                              updateTextDraft((value) => ({
+                                ...value,
+                                effects: {
+                                  ...(value.effects ?? {}),
+                                  shadow: {
+                                    ...(value.effects?.shadow ?? {}),
+                                    offsetX: Number(event.target.value),
+                                  },
+                                },
+                              }))
+                            }
+                          />
+                        </label>
+                        <label>
+                          <span>Offset Y</span>
+                          <input
+                            className="apx-pre4-input"
+                            type="number"
+                            value={effects.shadow?.offsetY ?? 2}
+                            onChange={(event) =>
+                              updateTextDraft((value) => ({
+                                ...value,
+                                effects: {
+                                  ...(value.effects ?? {}),
+                                  shadow: {
+                                    ...(value.effects?.shadow ?? {}),
+                                    offsetY: Number(event.target.value),
+                                  },
+                                },
+                              }))
+                            }
+                          />
+                        </label>
+                        <label>
+                          <span>Blur</span>
+                          <input
+                            className="apx-pre4-input"
+                            type="number"
+                            min={0}
+                            value={effects.shadow?.blur ?? 4}
+                            onChange={(event) =>
+                              updateTextDraft((value) => ({
+                                ...value,
+                                effects: {
+                                  ...(value.effects ?? {}),
+                                  shadow: {
+                                    ...(value.effects?.shadow ?? {}),
+                                    blur: Number(event.target.value),
+                                  },
+                                },
+                              }))
+                            }
+                          />
+                        </label>
+                      </>
+                    ) : kind === 'glow' ? (
+                      <label>
+                        <span>Intensity</span>
+                        <input
+                          className="apx-pre4-input"
+                          type="number"
+                          min={0}
+                          value={effects.glow?.intensity ?? 10}
+                          onChange={(event) =>
+                            updateTextDraft((value) => ({
+                              ...value,
+                              effects: {
+                                ...(value.effects ?? {}),
+                                glow: {
+                                  ...(value.effects?.glow ?? {}),
+                                  intensity: Number(event.target.value),
+                                },
+                              },
+                            }))
+                          }
+                        />
+                      </label>
+                    ) : null}
+                    <label>
+                      <span>Opacity</span>
+                      <input
+                        className="apx-pre4-input"
+                        type="number"
+                        min={0}
+                        max={1}
+                        step={0.05}
+                        value={current.opacity ?? (kind === 'highlight' ? 0.3 : kind === 'glow' ? 0.8 : 1)}
+                        onChange={(event) =>
+                          mutateText('Text ' + kind + ' opacity', (value) => ({
+                            ...value,
+                            effects: {
+                              ...(value.effects ?? {}),
+                              [kind]: {
+                                ...(value.effects?.[kind] ?? {}),
+                                opacity: Number(event.target.value),
+                              },
+                            },
+                          }))
+                        }
+                      />
+                    </label>
                   </div>
-                  {kind === 'shadow' ? (
-                    <div className="apx-pre4-property-grid">
-                      <label><span>X</span><input className="apx-pre4-input" type="number" value={effects.shadow?.offsetX ?? 0} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), shadow: { ...(value.effects?.shadow ?? {}), offsetX: Number(event.target.value) } } }))}/></label>
-                      <label><span>Y</span><input className="apx-pre4-input" type="number" value={effects.shadow?.offsetY ?? 8} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), shadow: { ...(value.effects?.shadow ?? {}), offsetY: Number(event.target.value) } } }))}/></label>
-                      <label><span>Blur</span><input className="apx-pre4-input" type="number" min={0} value={effects.shadow?.blur ?? 18} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), shadow: { ...(value.effects?.shadow ?? {}), blur: Number(event.target.value) } } }))}/></label>
-                      <label><span>Opacity</span><input className="apx-pre4-input" type="number" min={0} max={1} step={.05} value={effects.shadow?.opacity ?? .4} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), shadow: { ...(value.effects?.shadow ?? {}), opacity: Number(event.target.value) } } }))}/></label>
-                    </div>
-                  ) : kind === 'glow' ? (
-                    <div className="apx-pre4-property-grid">
-                      <label><span>Intensity</span><input className="apx-pre4-input" type="number" min={0} value={effects.glow?.intensity ?? 12} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), glow: { ...(value.effects?.glow ?? {}), intensity: Number(event.target.value) } } }))}/></label>
-                      <label><span>Opacity</span><input className="apx-pre4-input" type="number" min={0} max={1} step={.05} value={effects.glow?.opacity ?? .75} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), glow: { ...(value.effects?.glow ?? {}), opacity: Number(event.target.value) } } }))}/></label>
-                    </div>
+
+                  <label className="apx-text-v3-check-row">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(current.gradient)}
+                      onChange={(event) =>
+                        mutateText('Text ' + kind + ' gradient', (value) => ({
+                          ...value,
+                          effects: {
+                            ...(value.effects ?? {}),
+                            [kind]: {
+                              ...(value.effects?.[kind] ?? {}),
+                              gradient: event.target.checked
+                                ? defaultTextGradient(current.color ?? fallback)
+                                : undefined,
+                            },
+                          },
+                        }))
+                      }
+                    />
+                    <span>Use gradient paint</span>
+                  </label>
+
+                  {current.gradient ? (
+                    <GradientEditor
+                      value={current.gradient}
+                      onChange={(gradient) =>
+                        mutateText('Text ' + kind + ' gradient', (value) => ({
+                          ...value,
+                          effects: {
+                            ...(value.effects ?? {}),
+                            [kind]: {
+                              ...(value.effects?.[kind] ?? {}),
+                              gradient,
+                            },
+                          },
+                        }))
+                      }
+                    />
                   ) : (
-                    <label className="apx-canvas-field"><span>Opacity</span><input className="apx-pre4-range" type="range" min={0} max={1} step={.01} value={effects.highlight?.opacity ?? .35} onChange={(event) => updateTextDraft((value) => ({ ...value, effects: { ...(value.effects ?? {}), highlight: { ...(value.effects?.highlight ?? {}), opacity: Number(event.target.value) } } }))}/></label>
+                    <div className="apx-canvas-color-row apx-text-v3-color-row">
+                      <input
+                        type="color"
+                        value={current.color ?? fallback}
+                        onChange={(event) =>
+                          mutateText('Text ' + kind + ' color', (value) => ({
+                            ...value,
+                            effects: {
+                              ...(value.effects ?? {}),
+                              [kind]: {
+                                ...(value.effects?.[kind] ?? {}),
+                                color: event.target.value,
+                              },
+                            },
+                          }))
+                        }
+                      />
+                      <input
+                        className="apx-pre4-input"
+                        value={current.color ?? fallback}
+                        onChange={(event) =>
+                          mutateText('Text ' + kind + ' color', (value) => ({
+                            ...value,
+                            effects: {
+                              ...(value.effects ?? {}),
+                              [kind]: {
+                                ...(value.effects?.[kind] ?? {}),
+                                color: event.target.value,
+                              },
+                            },
+                          }))
+                        }
+                      />
+                    </div>
                   )}
                 </>
-              ) : null}
-            </div>
+              ) : (
+                <div className="apx-text-v3-empty">{kind} is disabled.</div>
+              )}
+            </section>
           );
         })}
 
-        <div className="apx-pre4-section" data-text-section="curve">
-          <div className="apx-canvas-section-heading">
-            <div className="apx-pre4-section-title">Text on curve</div>
+        <section className="apx-text-v3-card" data-text-section="curve">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Text on curve</strong>
+              <small>Grapheme-aware circular arc layout.</small>
+            </div>
             <label className="apx-canvas-switch">
               <input
                 type="checkbox"
                 checked={Boolean(curve)}
-                onChange={(event) => mutateText('Text on curve', (current) => {
-                  if (!event.target.checked) {
-                    const next = { ...current };
-                    delete next.textOnCurve;
-                    return next;
-                  }
-                  return {
+                onChange={(event) =>
+                  mutateText('Text on curve', (current) => ({
                     ...current,
-                    textOnCurve: {
-                      sweepAngle: 180,
-                      radius: 180,
-                      up: true,
-                      layoutMode: 'clamp',
-                      baselineOffset: 0,
-                      startAngleDeg: 0,
-                    },
-                  };
-                })}
+                    textOnCurve: event.target.checked
+                      ? {
+                          sweepAngle: 180,
+                          radius: 180,
+                          up: true,
+                          layoutMode: 'clamp',
+                          baselineOffset: 0,
+                          startAngleDeg: 0,
+                        }
+                      : undefined,
+                  }))
+                }
               />
               <span />
             </label>
           </div>
           {curve ? (
             <>
-              <div className="apx-pre4-property-grid">
-                <label><span>Sweep</span><input className="apx-pre4-input" type="number" min={1} max={360} value={curve.sweepAngle} onChange={(event) => updateTextDraft((current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, sweepAngle: Number(event.target.value) } }))}/></label>
-                <label><span>Radius</span><input className="apx-pre4-input" type="number" min={1} value={curve.radius ?? 180} onChange={(event) => updateTextDraft((current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, radius: Number(event.target.value) } }))}/></label>
-                <label><span>Offset</span><input className="apx-pre4-input" type="number" value={curve.baselineOffset ?? 0} onChange={(event) => updateTextDraft((current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, baselineOffset: Number(event.target.value) } }))}/></label>
-                <label><span>Start °</span><input className="apx-pre4-input" type="number" value={curve.startAngleDeg ?? 0} onChange={(event) => updateTextDraft((current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, startAngleDeg: Number(event.target.value) } }))}/></label>
-              </div>
-              <div className="apx-pre4-property-grid">
-                <label><span>Mode</span><select className="apx-pre4-input" value={curve.layoutMode ?? 'clamp'} onChange={(event) => mutateText('Curve layout', (current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, layoutMode: event.target.value as NonNullable<VisualTextNodeProps['textOnCurve']>['layoutMode'] } }))}>{TEXT_CURVE_MODES.map((value) => <option key={value}>{value}</option>)}</select></label>
-                <label className="apx-canvas-check"><input type="checkbox" checked={curve.up ?? true} onChange={(event) => mutateText('Curve direction', (current) => ({ ...current, textOnCurve: { ...current.textOnCurve!, up: event.target.checked } }))}/><span>Curve up</span></label>
+              <div className="apx-text-v3-grid apx-text-v3-grid--3">
+                <label>
+                  <span>Sweep °</span>
+                  <input
+                    className="apx-pre4-input"
+                    type="number"
+                    min={0.01}
+                    max={359.99}
+                    step={1}
+                    value={curve.sweepAngle}
+                    onChange={(event) =>
+                      updateTextDraft((current) => ({
+                        ...current,
+                        textOnCurve: {
+                          ...current.textOnCurve!,
+                          sweepAngle: Number(event.target.value),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Radius</span>
+                  <input
+                    className="apx-pre4-input"
+                    type="number"
+                    min={0.01}
+                    value={curve.radius ?? 180}
+                    onChange={(event) =>
+                      updateTextDraft((current) => ({
+                        ...current,
+                        textOnCurve: {
+                          ...current.textOnCurve!,
+                          radius: Number(event.target.value),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Mode</span>
+                  <select
+                    className="apx-pre4-input"
+                    value={curve.layoutMode ?? 'clamp'}
+                    onChange={(event) =>
+                      mutateText('Curve layout', (current) => ({
+                        ...current,
+                        textOnCurve: {
+                          ...current.textOnCurve!,
+                          layoutMode: event.target.value as NonNullable<
+                            VisualTextNodeProps['textOnCurve']
+                          >['layoutMode'],
+                        },
+                      }))
+                    }
+                  >
+                    {TEXT_CURVE_MODES.map((value) => (
+                      <option key={value}>{value}</option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Baseline offset</span>
+                  <input
+                    className="apx-pre4-input"
+                    type="number"
+                    value={curve.baselineOffset ?? 0}
+                    onChange={(event) =>
+                      updateTextDraft((current) => ({
+                        ...current,
+                        textOnCurve: {
+                          ...current.textOnCurve!,
+                          baselineOffset: Number(event.target.value),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  <span>Start angle °</span>
+                  <input
+                    className="apx-pre4-input"
+                    type="number"
+                    value={curve.startAngleDeg ?? 0}
+                    onChange={(event) =>
+                      updateTextDraft((current) => ({
+                        ...current,
+                        textOnCurve: {
+                          ...current.textOnCurve!,
+                          startAngleDeg: Number(event.target.value),
+                        },
+                      }))
+                    }
+                  />
+                </label>
+                <label className="apx-text-v3-check-row apx-text-v3-check-row--boxed">
+                  <input
+                    type="checkbox"
+                    checked={curve.up ?? true}
+                    onChange={(event) =>
+                      mutateText('Curve direction', (current) => ({
+                        ...current,
+                        textOnCurve: {
+                          ...current.textOnCurve!,
+                          up: event.target.checked,
+                        },
+                      }))
+                    }
+                  />
+                  <span>Curve upward</span>
+                </label>
               </div>
             </>
-          ) : null}
-        </div>
+          ) : (
+            <div className="apx-text-v3-empty">Text remains on a straight baseline.</div>
+          )}
+        </section>
       </>
     );
   };
@@ -5785,46 +6665,101 @@ export default function VisualStudioPre4({
     return (
       <>
         {renderTextHeader()}
-        <div className="apx-pre4-section" data-text-section="font-registry">
-          <div className="apx-pre4-section-title">Font registry</div>
-          <label className="apx-canvas-field">
-            <span>Registered family</span>
-            <input className="apx-pre4-input" value={font.name ?? font.family ?? 'Arial'} onChange={(event) => updateTextDraft((current) => ({ ...current, font: { ...(current.font ?? {}), name: event.target.value, family: event.target.value } }))}/>
-          </label>
-          <label className="apx-canvas-field">
-            <span>Uploaded font asset</span>
-            <select
+        <section className="apx-text-v3-card" data-text-section="font-registry">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Font source</strong>
+              <small>System family or stable Studio asset identity.</small>
+            </div>
+          </div>
+          <div className="apx-text-v3-grid apx-text-v3-grid--2">
+            <label>
+              <span>Registered family</span>
+              <input
+                className="apx-pre4-input"
+                value={font.name ?? font.family ?? 'Arial'}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    font: {
+                      ...(current.font ?? {}),
+                      name: event.target.value,
+                      family: event.target.value,
+                    },
+                  }))
+                }
+              />
+            </label>
+            <label>
+              <span>Uploaded asset</span>
+              <select
+                className="apx-pre4-input"
+                value={fontAssetId ?? ''}
+                onChange={(event) => {
+                  const asset = fontAssets.find(
+                    (item) => item.id === event.target.value,
+                  );
+                  if (asset) applyFontAsset(asset);
+                  else
+                    mutateText('Detach font asset', (current) => ({
+                      ...current,
+                      font: { ...(current.font ?? {}), path: undefined },
+                    }));
+                }}
+                data-text-font-asset-select
+              >
+                <option value="">System font</option>
+                {fontAssets.map((asset) => (
+                  <option key={asset.id} value={asset.id}>
+                    {asset.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <label className="apx-text-v3-field">
+            <span>Font path / asset reference</span>
+            <input
               className="apx-pre4-input"
-              value={fontAssetId ?? ''}
-              onChange={(event) => {
-                const asset = fontAssets.find((item) => item.id === event.target.value);
-                if (asset) applyFontAsset(asset);
-                else mutateText('Detach font asset', (current) => ({
+              value={font.path ?? ''}
+              placeholder="studio://asset/… or ./assets/font.ttf"
+              onChange={(event) =>
+                updateTextDraft((current) => ({
                   ...current,
-                  font: { ...(current.font ?? {}), path: undefined },
-                }));
-              }}
-              data-text-font-asset-select
-            >
-              <option value="">None / system font</option>
-              {fontAssets.map((asset) => (
-                <option key={asset.id} value={asset.id}>{asset.name}</option>
-              ))}
-            </select>
+                  font: {
+                    ...(current.font ?? {}),
+                    path: event.target.value || undefined,
+                  },
+                }))
+              }
+            />
           </label>
-          <label className="apx-canvas-field">
-            <span>Font path</span>
-            <input className="apx-pre4-input" value={font.path ?? ''} placeholder="./assets/font.ttf" onChange={(event) => updateTextDraft((current) => ({ ...current, font: { ...(current.font ?? {}), path: event.target.value || undefined } }))}/>
+          <label className="apx-text-v3-check-row apx-text-v3-check-row--boxed">
+            <input
+              type="checkbox"
+              checked={props.painterOpts?.resolveAssetRefs ?? Boolean(fontAssetId)}
+              onChange={(event) =>
+                mutateText('Text asset reference resolution', (current) => ({
+                  ...current,
+                  painterOpts: event.target.checked
+                    ? { ...(current.painterOpts ?? {}), resolveAssetRefs: true }
+                    : undefined,
+                }))
+              }
+            />
+            <span>Resolve Apexify asset references at runtime</span>
           </label>
-          <small className="apx-canvas-hint">
-            Uploaded fonts use stable studio://asset/… identity in Studio. Phase 15 owns exported asset-path rewriting.
-          </small>
-        </div>
+        </section>
 
-        <div className="apx-pre4-section" data-text-section="metrics">
-          <div className="apx-pre4-section-title">Text metrics</div>
+        <section className="apx-text-v3-card" data-text-section="metrics">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>Measurement</strong>
+              <small>Live canvas metrics plus Apexify measurement options.</small>
+            </div>
+          </div>
           {textMetrics ? (
-            <div className="apx-text-metrics-grid">
+            <div className="apx-text-metrics-grid apx-text-metrics-grid--v3">
               <div><span>Width</span><strong>{textMetrics.width.toFixed(1)} px</strong></div>
               <div><span>Height</span><strong>{textMetrics.height.toFixed(1)} px</strong></div>
               <div><span>Lines</span><strong>{textMetrics.lineCount}</strong></div>
@@ -5832,92 +6767,545 @@ export default function VisualStudioPre4({
               <div><span>Line height</span><strong>{textMetrics.lineHeight.toFixed(1)} px</strong></div>
             </div>
           ) : (
-            <div className="apx-pre4-empty"><strong>Metrics unavailable</strong><span>The browser canvas measurement context is unavailable.</span></div>
+            <div className="apx-text-v3-empty">
+              Browser text measurement is unavailable in this environment.
+            </div>
           )}
-          <label className="apx-canvas-check">
+          <label className="apx-text-v3-check-row apx-text-v3-check-row--boxed">
             <input
               type="checkbox"
               checked={props.includeCharMetrics ?? false}
-              onChange={(event) => mutateText('Character metrics', (current) => ({ ...current, includeCharMetrics: event.target.checked }))}
+              onChange={(event) =>
+                mutateText('Character metrics', (current) => ({
+                  ...current,
+                  includeCharMetrics: event.target.checked,
+                }))
+              }
             />
-            <span>Include per-character metrics in Apexify measurement</span>
+            <span>Include per-character metrics</span>
           </label>
-          <div className="apx-pre4-property-grid">
-            <label><span>Measure W</span><input className="apx-pre4-input" type="number" min={1} value={props.measurementCanvas?.width ?? 1200} onChange={(event) => updateTextDraft((current) => ({ ...current, measurementCanvas: { ...(current.measurementCanvas ?? {}), width: Number(event.target.value) } }))}/></label>
-            <label><span>Measure H</span><input className="apx-pre4-input" type="number" min={1} value={props.measurementCanvas?.height ?? 600} onChange={(event) => updateTextDraft((current) => ({ ...current, measurementCanvas: { ...(current.measurementCanvas ?? {}), height: Number(event.target.value) } }))}/></label>
+          <div className="apx-text-v3-grid apx-text-v3-grid--2">
+            <label>
+              <span>Measurement width</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={1}
+                step={1}
+                value={props.measurementCanvas?.width ?? 1200}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    measurementCanvas: {
+                      ...(current.measurementCanvas ?? {}),
+                      width: Math.max(1, Math.round(Number(event.target.value))),
+                    },
+                  }))
+                }
+              />
+            </label>
+            <label>
+              <span>Measurement height</span>
+              <input
+                className="apx-pre4-input"
+                type="number"
+                min={1}
+                step={1}
+                value={props.measurementCanvas?.height ?? 600}
+                onChange={(event) =>
+                  updateTextDraft((current) => ({
+                    ...current,
+                    measurementCanvas: {
+                      ...(current.measurementCanvas ?? {}),
+                      height: Math.max(1, Math.round(Number(event.target.value))),
+                    },
+                  }))
+                }
+              />
+            </label>
           </div>
-        </div>
+        </section>
       </>
     );
   };
 
+  const renderTextGroupTransformControls = (
+    value: NonNullable<NonNullable<VisualTextNodeProps['createOptions']>['groupTransform']>,
+    onPatch: (
+      patch: Partial<
+        NonNullable<NonNullable<VisualTextNodeProps['createOptions']>['groupTransform']>
+      >,
+    ) => void,
+    bounds: { x: number; y: number; width: number; height: number },
+  ) => (
+    <>
+      <div className="apx-text-v3-grid apx-text-v3-grid--3">
+        {([
+          ['Rotation', 'rotation', 0],
+          ['Translate X', 'translateX', 0],
+          ['Translate Y', 'translateY', 0],
+          ['Scale X', 'scaleX', 1],
+          ['Scale Y', 'scaleY', 1],
+          ['Skew X', 'skewX', 0],
+          ['Skew Y', 'skewY', 0],
+          ['Pivot X', 'pivotX', bounds.x + bounds.width / 2],
+          ['Pivot Y', 'pivotY', bounds.y + bounds.height / 2],
+        ] as const).map(([label, key, fallback]) => (
+          <label key={key}>
+            <span>{label}</span>
+            <input
+              className="apx-pre4-input"
+              type="number"
+              step={key.startsWith('scale') ? 0.05 : 0.5}
+              min={key.startsWith('skew') ? -89.99 : undefined}
+              max={key.startsWith('skew') ? 89.99 : undefined}
+              value={value[key] ?? fallback}
+              onChange={(event) =>
+                onPatch({ [key]: Number(event.target.value) })
+              }
+            />
+          </label>
+        ))}
+      </div>
+      <div className="apx-text-v3-grid apx-text-v3-grid--2">
+        <label>
+          <span>Opacity</span>
+          <input
+            className="apx-pre4-input"
+            type="number"
+            min={0}
+            max={1}
+            step={0.05}
+            value={value.opacity ?? 1}
+            onChange={(event) => onPatch({ opacity: Number(event.target.value) })}
+          />
+        </label>
+        <label>
+          <span>Blend mode</span>
+          <select
+            className="apx-pre4-input"
+            value={value.blendMode ?? 'source-over'}
+            onChange={(event) =>
+              onPatch({ blendMode: event.target.value as VisualBlendMode })
+            }
+          >
+            {IMAGE_BLEND_MODES.map((mode) => (
+              <option key={mode}>{mode}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div className="apx-text-v3-check-row apx-text-v3-check-row--boxed">
+        <input
+          type="checkbox"
+          checked={Boolean(value.perspective)}
+          onChange={(event) =>
+            onPatch({
+              perspective: event.target.checked
+                ? {
+                    points: [
+                      { x: bounds.x, y: bounds.y },
+                      { x: bounds.x + bounds.width, y: bounds.y },
+                      {
+                        x: bounds.x + bounds.width,
+                        y: bounds.y + bounds.height,
+                      },
+                      { x: bounds.x, y: bounds.y + bounds.height },
+                    ],
+                    interpolation: 'bilinear',
+                    edgeMode: 'transparent',
+                  }
+                : undefined,
+            })
+          }
+        />
+        <span>Perspective-warp grouped result</span>
+      </div>
+      {value.perspective ? (
+        <>
+          <div className="apx-text-v3-grid apx-text-v3-grid--2">
+            <label>
+              <span>Interpolation</span>
+              <select
+                className="apx-pre4-input"
+                value={value.perspective.interpolation ?? 'bilinear'}
+                onChange={(event) =>
+                  onPatch({
+                    perspective: {
+                      ...value.perspective!,
+                      interpolation: event.target.value as 'nearest' | 'bilinear' | 'bicubic',
+                    },
+                  })
+                }
+              >
+                {['nearest','bilinear','bicubic'].map((item) => <option key={item}>{item}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Edge mode</span>
+              <select
+                className="apx-pre4-input"
+                value={value.perspective.edgeMode ?? 'transparent'}
+                onChange={(event) =>
+                  onPatch({
+                    perspective: {
+                      ...value.perspective!,
+                      edgeMode: event.target.value as 'transparent' | 'clamp' | 'wrap' | 'mirror',
+                    },
+                  })
+                }
+              >
+                {['transparent','clamp','wrap','mirror'].map((item) => <option key={item}>{item}</option>)}
+              </select>
+            </label>
+          </div>
+          <div className="apx-text-perspective-points">
+            {value.perspective.points.map((point, index) => (
+              <div key={index}>
+                <span>{['TL','TR','BR','BL'][index]}</span>
+                <input
+                  className="apx-pre4-input"
+                  type="number"
+                  value={point.x}
+                  onChange={(event) => {
+                    const points = value.perspective!.points.map((item, itemIndex) =>
+                      itemIndex === index
+                        ? { ...item, x: Number(event.target.value) }
+                        : item,
+                    ) as typeof value.perspective.points;
+                    onPatch({
+                      perspective: { ...value.perspective!, points },
+                    });
+                  }}
+                />
+                <input
+                  className="apx-pre4-input"
+                  type="number"
+                  value={point.y}
+                  onChange={(event) => {
+                    const points = value.perspective!.points.map((item, itemIndex) =>
+                      itemIndex === index
+                        ? { ...item, y: Number(event.target.value) }
+                        : item,
+                    ) as typeof value.perspective.points;
+                    onPatch({
+                      perspective: { ...value.perspective!, points },
+                    });
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </>
+      ) : null}
+    </>
+  );
+
   const renderTextAdvanced = () => {
     if (!primaryText) return renderTransformFields();
+    const props = visualTextProps(primaryText);
+    const createOptions = props.createOptions ?? {};
+    const bounds = {
+      x: primaryText.transform?.x ?? 0,
+      y: primaryText.transform?.y ?? 0,
+      width: Math.max(1, primaryText.transform?.width ?? 360),
+      height: Math.max(1, primaryText.transform?.height ?? 120),
+    };
+    const grouped =
+      createOptions.isGrouped === true || Boolean(createOptions.groupTransform);
+    const groupTransform = createOptions.groupTransform ?? {
+      scaleX: 1,
+      scaleY: 1,
+      opacity: 1,
+    };
+
+    const patchOptions = (
+      patch: Partial<NonNullable<VisualTextNodeProps['createOptions']>>,
+    ) =>
+      mutateText('createText options', (current) => ({
+        ...current,
+        createOptions: { ...(current.createOptions ?? {}), ...patch },
+      }));
+
     return (
       <>
         {renderTextHeader()}
-        <div className="apx-pre4-section" data-text-section="complete-config">
-          <div className="apx-pre4-section-title">Complete TextProperties</div>
-          <textarea
-            className="apx-canvas-json apx-canvas-json--config"
-            spellCheck={false}
-            value={textConfigDraft}
-            onChange={(event) => {
-              setTextConfigDraft(event.target.value);
-              setTextConfigError(null);
-            }}
-          />
-          {textConfigError ? <div className="apx-live-code-error">{textConfigError}</div> : null}
-          <button
-            className="apx-canvas-apply"
-            type="button"
-            onClick={() => {
-              try {
-                const parsed = JSON.parse(textConfigDraft);
-                if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-                  throw new Error('Text properties JSON must be an object.');
-                }
-                const nextProject = structuredClone(project);
-                nextProject.document.nodes[primaryText.id].props =
-                  textPropsRecord(parsed as VisualTextNodeProps);
-                nextProject.updatedAt = new Date().toISOString();
-                const validation = validateVisualProject(nextProject);
-                if (!validation.ok) {
-                  throw new Error(validation.issues[0]?.message ?? 'Invalid text configuration.');
-                }
-                history.current.commit(project, nextProject, 'Advanced text config');
-                projectRef.current = nextProject;
-                setProject(nextProject);
-                setHistoryTick((value) => value + 1);
-                setTextConfigError(null);
-                setMessage('Complete text configuration applied');
-              } catch (configError) {
-                setTextConfigError(
-                  configError instanceof Error
-                    ? configError.message
-                    : 'Invalid text configuration JSON.',
-                );
+        <section className="apx-text-v3-card" data-text-section="call-options">
+          <div className="apx-text-v3-card-head">
+            <div>
+              <strong>createText() call</strong>
+              <small>Runtime grouping and painter asset-resolution options.</small>
+            </div>
+          </div>
+          <label className="apx-text-v3-check-row apx-text-v3-check-row--boxed">
+            <input
+              type="checkbox"
+              checked={grouped}
+              onChange={(event) =>
+                patchOptions(
+                  event.target.checked
+                    ? {
+                        isGrouped: true,
+                        groupTransform: {
+                          scaleX: 1,
+                          scaleY: 1,
+                          opacity: 1,
+                        },
+                      }
+                    : { isGrouped: false, groupTransform: undefined },
+                )
               }
-            }}
-          >
-            Apply complete text config
-          </button>
-          <small className="apx-canvas-hint">
-            Covers declaration-level gradients, styled line decorations, legacy aliases and every pinned TextProperties field while the normal Inspector stays calm.
-          </small>
+            />
+            <span>Use temporary grouped render surface</span>
+          </label>
+          <label className="apx-text-v3-check-row apx-text-v3-check-row--boxed">
+            <input
+              type="checkbox"
+              checked={props.painterOpts?.resolveAssetRefs ?? false}
+              onChange={(event) =>
+                mutateText('Text painter options', (current) => ({
+                  ...current,
+                  painterOpts: event.target.checked
+                    ? { resolveAssetRefs: true }
+                    : undefined,
+                }))
+              }
+            />
+            <span>Resolve font / asset references</span>
+          </label>
+        </section>
+
+        {grouped ? (
+          <section className="apx-text-v3-card" data-text-section="group-transform">
+            <div className="apx-text-v3-card-head">
+              <div>
+                <strong>Group transform</strong>
+                <small>Applied after the text is rendered to its temporary surface.</small>
+              </div>
+            </div>
+            {renderTextGroupTransformControls(
+              groupTransform,
+              (patch) =>
+                patchOptions({
+                  isGrouped: true,
+                  groupTransform: { ...groupTransform, ...patch },
+                }),
+              bounds,
+            )}
+          </section>
+        ) : null}
+
+        <details className="apx-text-v3-developer">
+          <summary>Developer / compatibility JSON</summary>
+          <div>
+            <textarea
+              className="apx-canvas-json apx-canvas-json--config"
+              spellCheck={false}
+              value={textConfigDraft}
+              onChange={(event) => {
+                setTextConfigDraft(event.target.value);
+                setTextConfigError(null);
+              }}
+              data-text-section="complete-config"
+            />
+            {textConfigError ? (
+              <div className="apx-live-code-error">{textConfigError}</div>
+            ) : null}
+            <button
+              className="apx-canvas-apply"
+              type="button"
+              onClick={() => {
+                try {
+                  const parsed = JSON.parse(textConfigDraft);
+                  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                    throw new Error('Text properties JSON must be an object.');
+                  }
+                  const nextProject = structuredClone(project);
+                  nextProject.document.nodes[primaryText.id].props =
+                    textPropsRecord(parsed as VisualTextNodeProps);
+                  nextProject.updatedAt = new Date().toISOString();
+                  const validation = validateVisualProject(nextProject);
+                  if (!validation.ok) {
+                    throw new Error(
+                      validation.issues[0]?.message ??
+                        'Invalid text configuration.',
+                    );
+                  }
+                  history.current.commit(
+                    project,
+                    nextProject,
+                    'Advanced text config',
+                  );
+                  projectRef.current = nextProject;
+                  setProject(nextProject);
+                  setHistoryTick((value) => value + 1);
+                  setTextConfigError(null);
+                  setMessage('Text compatibility configuration applied');
+                } catch (configError) {
+                  setTextConfigError(
+                    configError instanceof Error
+                      ? configError.message
+                      : 'Invalid text configuration JSON.',
+                  );
+                }
+              }}
+            >
+              Apply developer JSON
+            </button>
+            <small>
+              Nested runtime groups are authoritative. Legacy flat aliases remain
+              available only for exact compatibility and reverse sync.
+            </small>
+          </div>
+        </details>
+      </>
+    );
+  };
+
+  const renderTextBatchInspector = () => {
+    if (!primaryTextBatch) return null;
+    const batch = visualTextBatchGroupProps(primaryTextBatch);
+    if (!batch) return null;
+    const grouped =
+      batch.createOptions.isGrouped === true ||
+      Boolean(batch.createOptions.groupTransform);
+    const groupTransform = batch.createOptions.groupTransform ?? {
+      scaleX: 1,
+      scaleY: 1,
+      opacity: 1,
+    };
+    const bounds = {
+      x: primaryTextBatch.transform?.x ?? 0,
+      y: primaryTextBatch.transform?.y ?? 0,
+      width: Math.max(1, primaryTextBatch.transform?.width ?? 360),
+      height: Math.max(1, primaryTextBatch.transform?.height ?? 120),
+    };
+
+    const patchBatchOptions = (
+      patch: Partial<typeof batch.createOptions>,
+    ) =>
+      mutateTextBatch('Text batch options', (current) => ({
+        ...current,
+        createOptions: { ...current.createOptions, ...patch },
+      }));
+
+    return (
+      <>
+        <div className="apx-text-v3-header" data-text-v3-batch-header>
+          <span className="apx-text-v3-header-icon">
+            <Squares2X2Icon aria-hidden />
+          </span>
+          <div>
+            <strong>{primaryTextBatch.name ?? 'Text batch'}</strong>
+            <small>
+              createText([...]) · {primaryTextBatch.childIds?.length ?? 0} text layers
+            </small>
+          </div>
+          <span className="apx-text-v3-api-pill">TextProperties[]</span>
         </div>
+
+        {inspectorTab === 'advanced' ? (
+          <section className="apx-text-v3-card" data-text-section="batch-options">
+            <div className="apx-text-v3-card-head">
+              <div>
+                <strong>Batch rendering</strong>
+                <small>One canonical createText([...]) call.</small>
+              </div>
+            </div>
+            <label className="apx-text-v3-check-row apx-text-v3-check-row--boxed">
+              <input
+                type="checkbox"
+                checked={grouped}
+                onChange={(event) =>
+                  patchBatchOptions(
+                    event.target.checked
+                      ? {
+                          isGrouped: true,
+                          groupTransform: {
+                            scaleX: 1,
+                            scaleY: 1,
+                            opacity: 1,
+                          },
+                        }
+                      : { isGrouped: false, groupTransform: undefined },
+                  )
+                }
+              />
+              <span>Process batch on one temporary grouped surface</span>
+            </label>
+            <label className="apx-text-v3-check-row apx-text-v3-check-row--boxed">
+              <input
+                type="checkbox"
+                checked={batch.painterOpts?.resolveAssetRefs ?? false}
+                onChange={(event) =>
+                  mutateTextBatch('Text batch painter options', (current) => ({
+                    ...current,
+                    painterOpts: event.target.checked
+                      ? { resolveAssetRefs: true }
+                      : undefined,
+                  }))
+                }
+              />
+              <span>Resolve font / asset references</span>
+            </label>
+          </section>
+        ) : inspectorTab === 'data' ? (
+          <section className="apx-text-v3-card" data-text-section="batch-data">
+            <div className="apx-text-v3-card-head">
+              <div>
+                <strong>Batch order</strong>
+                <small>Layer order is the TextProperties[] runtime order.</small>
+              </div>
+            </div>
+            <div className="apx-text-batch-list">
+              {(primaryTextBatch.childIds ?? []).map((id, index) => {
+                const child = project.document.nodes[id];
+                return (
+                  <div key={id}>
+                    <span>{index + 1}</span>
+                    <strong>{child?.name ?? 'Text ' + (index + 1)}</strong>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        ) : grouped ? (
+          <section className="apx-text-v3-card" data-text-section="batch-group-transform">
+            <div className="apx-text-v3-card-head">
+              <div>
+                <strong>Grouped result</strong>
+                <small>
+                  Shared transform after all text children are rasterized together.
+                </small>
+              </div>
+            </div>
+            {renderTextGroupTransformControls(
+              groupTransform,
+              (patch) =>
+                patchBatchOptions({
+                  isGrouped: true,
+                  groupTransform: { ...groupTransform, ...patch },
+                }),
+              bounds,
+            )}
+          </section>
+        ) : (
+          <div className="apx-text-v3-empty apx-text-v3-empty--standalone">
+            Grouped processing is off. The batch still emits one createText([...])
+            call and paints its text records in array order.
+          </div>
+        )}
       </>
     );
   };
 
   const renderTextInspector = () => {
-    if (inspectorTab === 'transform') return renderTransformFields();
+    if (inspectorTab === 'transform') return renderTextTransform();
     if (inspectorTab === 'style') return renderTextStyle();
     if (inspectorTab === 'effects') return renderTextEffects();
     if (inspectorTab === 'data') return renderTextData();
     return renderTextAdvanced();
   };
-
 
   const renderPathInspector = () => {
     if (!primaryPath) return null;
