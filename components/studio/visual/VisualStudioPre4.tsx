@@ -4889,100 +4889,203 @@ export default function VisualStudioPre4({
     }
 
     if (activeTool === 'text') {
+      const textPresets = [
+        {
+          id: 'heading',
+          label: 'Heading',
+          sample: 'Add a heading',
+          size: 56,
+          weight: 700,
+          lineHeight: 1.1,
+        },
+        {
+          id: 'subheading',
+          label: 'Subheading',
+          sample: 'Add a subheading',
+          size: 32,
+          weight: 600,
+          lineHeight: 1.2,
+        },
+        {
+          id: 'body',
+          label: 'Body',
+          sample: 'Add body text',
+          size: 18,
+          weight: 400,
+          lineHeight: 1.4,
+        },
+        {
+          id: 'caption',
+          label: 'Caption',
+          sample: 'Add caption',
+          size: 13,
+          weight: 400,
+          lineHeight: 1.35,
+        },
+      ] as const;
+
       return (
-        <div className="apx-media-context" data-visual-text-context>
-          <div className="apx-media-context-copy">
-            <strong>Text</strong>
-            <span>Insert editable Apexify text, then style typography, wrapping, effects and curves from the Inspector.</span>
-          </div>
-
-          <button
-            type="button"
-            className="apx-media-open-assets"
-            data-text-insert
-            onClick={() => insertText('Text')}
-          >
-            <DocumentTextIcon />
-            Add text layer
-          </button>
-
-          <div className="apx-media-context-heading">
-            <strong>Font families</strong>
+        <div className="apx-media-context apx-text-left-v3" data-visual-text-context>
+          <div className="apx-text-left-head">
+            <div>
+              <strong>Text</strong>
+              <span>Typography, effects, curves and runtime-accurate createText().</span>
+            </div>
             <button
               type="button"
-              onClick={() => {
-                openAssetWorkspace('font');
-              }}
+              title="Add text"
+              data-text-insert
+              onClick={() => insertText('Text')}
             >
-              Fonts
+              ＋
             </button>
           </div>
 
-          <div className="apx-text-font-list">
-            {systemFontFamilies.map((family) => (
-              <button
-                type="button"
-                key={family}
-                onClick={() => {
-                  if (!primaryText) {
-                    insertText('Text', undefined, undefined, family);
-                    return;
-                  }
-                  mutateText('Font family', (current) => ({
-                    ...current,
-                    font: {
-                      ...(current.font ?? {}),
-                      family,
-                      name: family,
-                      path: undefined,
-                    },
-                  }));
-                }}
-                data-text-font-family={family}
-              >
-                <strong style={{ fontFamily: family }}>{family}</strong>
-                <small>System font</small>
-              </button>
-            ))}
-          </div>
-
-          <div className="apx-media-context-heading">
-            <strong>Uploaded fonts</strong>
-            <button
-              type="button"
-              onClick={() => {
-                openAssetWorkspace('font');
-              }}
-            >
-              Upload
-            </button>
-          </div>
-          <div className="apx-text-font-list">
-            {fontAssets.length ? fontAssets.map((asset) => {
-              const family = studioAssetFontFamily(asset);
-              return (
+          <div className="apx-text-left-section">
+            <div className="apx-text-left-section-head">
+              <strong>Quick text</strong>
+              <small>Insert preset</small>
+            </div>
+            <div className="apx-text-preset-grid">
+              {textPresets.map((preset) => (
                 <button
                   type="button"
-                  key={asset.id}
-                  onClick={() => applyFontAsset(asset)}
-                  data-font-asset-apply={asset.id}
+                  key={preset.id}
+                  data-text-preset={preset.id}
+                  onClick={() =>
+                    insertText(
+                      preset.sample,
+                      undefined,
+                      undefined,
+                      undefined,
+                      {
+                        font: {
+                          size: preset.size,
+                          family: 'Arial',
+                          weight: preset.weight,
+                          style: 'normal',
+                        },
+                        layout: {
+                          lineHeight: preset.lineHeight,
+                          letterSpacing: 0,
+                          wordSpacing: 0,
+                          maxWidth: preset.id === 'body' ? 420 : 520,
+                        },
+                      },
+                    )
+                  }
                 >
-                  <strong style={{ fontFamily: family }}>{family}</strong>
-                  <small>{asset.name}</small>
+                  <strong
+                    style={{
+                      fontSize:
+                        preset.id === 'heading'
+                          ? 18
+                          : preset.id === 'subheading'
+                            ? 15
+                            : preset.id === 'body'
+                              ? 12
+                              : 10,
+                      fontWeight: preset.weight,
+                    }}
+                  >
+                    Aa
+                  </strong>
+                  <span>
+                    <b>{preset.label}</b>
+                    <small>{preset.size}px</small>
+                  </span>
                 </button>
-              );
-            }) : (
-              <div className="apx-media-context-empty">
-                <DocumentTextIcon />
-                <strong>No uploaded fonts yet</strong>
-                <span>Open Fonts in Assets to add TTF, OTF, WOFF or WOFF2 files.</span>
+              ))}
+            </div>
+          </div>
+
+          <div className="apx-text-left-section">
+            <div className="apx-text-left-section-head">
+              <strong>System fonts</strong>
+              <button type="button" onClick={() => openAssetWorkspace('font')}>
+                Fonts
+              </button>
+            </div>
+            <div className="apx-text-font-chips">
+              {systemFontFamilies.map((family) => (
+                <button
+                  type="button"
+                  key={family}
+                  onClick={() => {
+                    if (!primaryText) {
+                      insertText('Text', undefined, undefined, family);
+                      return;
+                    }
+                    mutateText('Font family', (current) => ({
+                      ...current,
+                      font: {
+                        ...(current.font ?? {}),
+                        family,
+                        name: family,
+                        path: undefined,
+                      },
+                    }));
+                  }}
+                  data-text-font-family={family}
+                  title={family}
+                >
+                  <span style={{ fontFamily: family }}>Ag</span>
+                  <small>{family}</small>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="apx-text-left-section">
+            <div className="apx-text-left-section-head">
+              <strong>Uploaded fonts</strong>
+              <button type="button" onClick={() => openAssetWorkspace('font')}>
+                Upload
+              </button>
+            </div>
+            {fontAssets.length ? (
+              <div className="apx-text-uploaded-list">
+                {fontAssets.map((asset) => {
+                  const family = studioAssetFontFamily(asset);
+                  return (
+                    <button
+                      type="button"
+                      key={asset.id}
+                      onClick={() => applyFontAsset(asset)}
+                      data-font-asset-apply={asset.id}
+                    >
+                      <span className="apx-text-uploaded-preview" style={{ fontFamily: family }}>
+                        Ag
+                      </span>
+                      <span>
+                        <strong>{family}</strong>
+                        <small>{asset.name}</small>
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
+            ) : (
+              <button
+                type="button"
+                className="apx-text-upload-empty"
+                onClick={() => openAssetWorkspace('font')}
+              >
+                <DocumentTextIcon />
+                <span>
+                  <strong>Upload a font</strong>
+                  <small>TTF · OTF · WOFF · WOFF2</small>
+                </span>
+              </button>
             )}
           </div>
 
-          <div className="apx-live-sync-note">
-            <strong>Direct editing</strong>
-            <span>Double-click a text layer on the canvas to edit its content in place.</span>
+          <div className="apx-text-left-tip">
+            <PencilSquareIcon aria-hidden />
+            <span>
+              <strong>Direct edit</strong>
+              <small>Double-click text on the artboard to edit in place.</small>
+            </span>
           </div>
         </div>
       );
