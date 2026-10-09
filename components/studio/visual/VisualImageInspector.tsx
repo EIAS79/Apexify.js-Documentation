@@ -229,7 +229,7 @@ function NumericField({
   );
 }
 
-function GradientEditor({
+export function GradientEditor({
   value,
   onChange,
 }: {
