@@ -1,8 +1,11 @@
 import type {
   VisualProjectIssue,
+  VisualTextBatchGroupProps,
   VisualTextLineDecoration,
   VisualTextMetrics,
   VisualTextNodeProps,
+  VisualNode,
+  VisualValue,
 } from './model';
 
 export const TEXT_ALIGNMENTS = ['left','center','right','start','end'] as const;
@@ -34,6 +37,8 @@ export const TEXT_AUTHORING_CLASSIFICATION = {
   textOnCurve: { surface: 'Effects', reverse: 'canonical-literal' },
   includeCharMetrics: { surface: 'Metrics', reverse: 'canonical-literal' },
   measurementCanvas: { surface: 'Metrics', reverse: 'canonical-literal' },
+  createOptions: { surface: 'Advanced', reverse: 'canonical-literal' },
+  painterOpts: { surface: 'Advanced', reverse: 'canonical-literal' },
 
   fontSize: { surface: 'Advanced', reverse: 'legacy-normalized' },
   fontFamily: { surface: 'Advanced', reverse: 'legacy-normalized' },
@@ -55,6 +60,10 @@ export const TEXT_AUTHORING_CLASSIFICATION = {
   textAlign: { surface: 'Advanced', reverse: 'legacy-normalized' },
   textBaseline: { surface: 'Advanced', reverse: 'legacy-normalized' },
   rotation: { surface: 'Advanced', reverse: 'legacy-normalized' },
+  scaleX: { surface: 'Advanced', reverse: 'legacy-normalized' },
+  scaleY: { surface: 'Advanced', reverse: 'legacy-normalized' },
+  skewX: { surface: 'Advanced', reverse: 'legacy-normalized' },
+  skewY: { surface: 'Advanced', reverse: 'legacy-normalized' },
   color: { surface: 'Advanced', reverse: 'legacy-normalized' },
   gradient: { surface: 'Advanced', reverse: 'legacy-normalized' },
   opacity: { surface: 'Advanced', reverse: 'legacy-normalized' },
@@ -98,6 +107,29 @@ export function visualTextProps(
   return node.props as unknown as VisualTextNodeProps;
 }
 
+export function textBatchGroupPropsRecord(
+  value: VisualTextBatchGroupProps,
+): Record<string, VisualValue> {
+  return structuredClone(value) as unknown as Record<string, VisualValue>;
+}
+
+export function visualTextBatchGroupProps(
+  node: VisualNode,
+): VisualTextBatchGroupProps | null {
+  if (node.kind !== 'group') return null;
+  const raw = node.props as unknown as Partial<VisualTextBatchGroupProps>;
+  if (raw.textBatch !== true) return null;
+  return {
+    textBatch: true,
+    createOptions: structuredClone(raw.createOptions ?? {}),
+    ...(raw.painterOpts ? { painterOpts: structuredClone(raw.painterOpts) } : {}),
+  };
+}
+
+export function isTextBatchGroup(node: VisualNode): boolean {
+  return visualTextBatchGroupProps(node) !== null;
+}
+
 export function textPropsRecord(
   props: VisualTextNodeProps,
 ): Record<string, import('./model').VisualValue> {
@@ -115,6 +147,40 @@ function push(
 
 function finite(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value);
+}
+
+function validatePerspective(
+  issues: VisualProjectIssue[],
+  value: NonNullable<VisualTextNodeProps['placement']>['perspective'] | undefined,
+  path: string,
+) {
+  if (!value) return;
+  if (!Array.isArray(value.points) || value.points.length !== 4) {
+    push(issues, 'text-perspective-points', path + '.points', 'Perspective requires exactly four destination corners.');
+    return;
+  }
+  value.points.forEach((point, index) => {
+    if (!finite(point.x) || !finite(point.y)) {
+      push(issues, 'text-perspective-point', path + '.points.' + index, 'Perspective coordinates must be finite.');
+    }
+  });
+  if (value.interpolation !== undefined && !['nearest', 'bilinear', 'bicubic'].includes(value.interpolation)) {
+    push(issues, 'text-perspective-interpolation', path + '.interpolation', 'Unsupported perspective interpolation.');
+  }
+  if (value.edgeMode !== undefined && !['transparent', 'clamp', 'wrap', 'mirror'].includes(value.edgeMode)) {
+    push(issues, 'text-perspective-edge', path + '.edgeMode', 'Unsupported perspective edge mode.');
+  }
+}
+
+function validateSkew(
+  issues: VisualProjectIssue[],
+  value: unknown,
+  path: string,
+) {
+  if (value === undefined) return;
+  if (!finite(value) || Math.abs(value) >= 90) {
+    push(issues, 'text-skew', path, 'Text skew must be finite and strictly between -90 and 90 degrees.');
+  }
 }
 
 function opacity(
@@ -153,6 +219,19 @@ export function validateVisualTextNode(
   const size = props.font?.size ?? props.fontSize;
   if (size !== undefined && (!finite(size) || size <= 0)) {
     push(issues, 'text-font-size', path + '.font.size', 'Font size must be positive.');
+  }
+  const weight = props.font?.weight;
+  if (
+    weight !== undefined &&
+    !(
+      (typeof weight === 'number' && Number.isInteger(weight) && weight >= 100 && weight <= 900) ||
+      (typeof weight === 'string' && ['normal', 'bold', 'bolder', 'lighter'].includes(weight))
+    )
+  ) {
+    push(issues, 'text-font-weight', path + '.font.weight', 'Font weight must be 100–900 or normal/bold/bolder/lighter.');
+  }
+  if (props.font?.style !== undefined && !['normal', 'italic', 'oblique'].includes(props.font.style)) {
+    push(issues, 'text-font-style', path + '.font.style', 'Unsupported font style.');
   }
 
   const layout = props.layout ?? {};
@@ -195,6 +274,17 @@ export function validateVisualTextNode(
   if (rotation !== undefined && !finite(rotation)) {
     push(issues, 'text-rotation', path + '.placement.rotation', 'Text rotation must be finite.');
   }
+  const scaleX = placement.scaleX ?? props.scaleX;
+  const scaleY = placement.scaleY ?? props.scaleY;
+  if (scaleX !== undefined && !finite(scaleX)) {
+    push(issues, 'text-scale', path + '.placement.scaleX', 'Text scale X must be finite.');
+  }
+  if (scaleY !== undefined && !finite(scaleY)) {
+    push(issues, 'text-scale', path + '.placement.scaleY', 'Text scale Y must be finite.');
+  }
+  validateSkew(issues, placement.skewX ?? props.skewX, path + '.placement.skewX');
+  validateSkew(issues, placement.skewY ?? props.skewY, path + '.placement.skewY');
+  validatePerspective(issues, placement.perspective, path + '.placement.perspective');
 
   opacity(issues, props.fill?.opacity ?? props.opacity, path + '.fill.opacity');
   opacity(issues, props.effects?.shadow?.opacity ?? props.shadow?.opacity, path + '.effects.shadow.opacity');
@@ -218,8 +308,8 @@ export function validateVisualTextNode(
   lineDecoration(issues, dec.strikethrough ?? props.strikethrough, path + '.decorations.strikethrough');
 
   if (props.textOnCurve) {
-    if (!finite(props.textOnCurve.sweepAngle) || props.textOnCurve.sweepAngle <= 0 || props.textOnCurve.sweepAngle > 360) {
-      push(issues, 'text-curve-sweep', path + '.textOnCurve.sweepAngle', 'Curve sweep must be > 0 and <= 360.');
+    if (!finite(props.textOnCurve.sweepAngle) || props.textOnCurve.sweepAngle <= 0 || props.textOnCurve.sweepAngle >= 360) {
+      push(issues, 'text-curve-sweep', path + '.textOnCurve.sweepAngle', 'Curve sweep must be > 0 and < 360.');
     }
     if (props.textOnCurve.radius !== undefined && (!finite(props.textOnCurve.radius) || props.textOnCurve.radius <= 0)) {
       push(issues, 'text-curve-radius', path + '.textOnCurve.radius', 'Curve radius must be positive.');
@@ -239,6 +329,26 @@ export function validateVisualTextNode(
         push(issues, 'text-measurement-canvas', path + '.measurementCanvas.' + key, 'Measurement canvas dimensions must be positive integers.');
       }
     }
+  }
+
+  if (props.painterOpts?.resolveAssetRefs !== undefined && typeof props.painterOpts.resolveAssetRefs !== 'boolean') {
+    push(issues, 'text-painter-opts', path + '.painterOpts.resolveAssetRefs', 'resolveAssetRefs must be boolean.');
+  }
+  if (props.createOptions?.isGrouped !== undefined && typeof props.createOptions.isGrouped !== 'boolean') {
+    push(issues, 'text-create-options', path + '.createOptions.isGrouped', 'createText options.isGrouped must be boolean.');
+  }
+  const group = props.createOptions?.groupTransform;
+  if (group) {
+    for (const key of ['rotation','translateX','translateY','scaleX','scaleY','pivotX','pivotY'] as const) {
+      const value = group[key];
+      if (value !== undefined && !finite(value)) {
+        push(issues, 'text-group-transform', path + '.createOptions.groupTransform.' + key, 'Group transform values must be finite.');
+      }
+    }
+    validateSkew(issues, group.skewX, path + '.createOptions.groupTransform.skewX');
+    validateSkew(issues, group.skewY, path + '.createOptions.groupTransform.skewY');
+    opacity(issues, group.opacity, path + '.createOptions.groupTransform.opacity');
+    validatePerspective(issues, group.perspective, path + '.createOptions.groupTransform.perspective');
   }
 }
 
