@@ -7761,6 +7761,10 @@ export default function VisualStudioPre4({
       );
     }
 
+    if (primaryTextBatch) {
+      return renderTextBatchInspector();
+    }
+
     if (primaryImageBatch) {
       const batchIndex = layerIds.indexOf(primaryImageBatch.id);
       const generatedNodes = layerIds
