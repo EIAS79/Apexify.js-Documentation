@@ -201,8 +201,11 @@ export function emitStudioOperationPlan(
       );
       const base = emitTargetReference(operation.base, targetNames);
       const properties = emitValue(operation.properties, 2, targetNames);
+      const painterOpts = operation.painterOpts
+        ? `, ${emitValue(operation.painterOpts, 2, targetNames)}`
+        : '';
       body.push(
-        `  const ${targetName} = await ${painterName}.createText(${properties}, ${base});`,
+        `  const ${targetName} = await ${painterName}.createText(${properties}, ${base}${painterOpts});`,
       );
       targetNames.set(operation.target, targetName);
       continue;

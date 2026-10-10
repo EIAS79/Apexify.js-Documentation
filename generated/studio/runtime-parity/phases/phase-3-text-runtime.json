@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "phase": "STUDIO-PARITY-3",
+  "packageDependency": "github:EIAS79/Apexify.js#db96446ef51ede70febb03892d86b599483a4302",
+  "packageVersion": "6.0.0",
+  "packageCommit": "db96446ef51ede70febb03892d86b599483a4302",
+  "inventoryRuntimeCommit": "a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a",
+  "proofs": {
+    "projectProofs": [
+      {
+        "name": "single-modern-text",
+        "bytes": 52409,
+        "sha256": "960ad2c4bc5d995b8dc00e49b44d5f574239ec2ce2a82d5f9d73e394f7d84f12"
+      },
+      {
+        "name": "text-array",
+        "bytes": 5741,
+        "sha256": "097326071ca7992c862e67df1476ddb1dad6e3cf8c0ba1f777efc3c1d81e0aba"
+      },
+      {
+        "name": "curved-text",
+        "bytes": 6361,
+        "sha256": "34eda5f56d5a90918ef74cc1b1f0af449e9ce50fcb36c24fca0ac7143a52c9ad"
+      }
+    ],
+    "measureText": {
+      "width": 186.36000061035156,
+      "height": 166.4,
+      "lineCount": 4,
+      "lineCountObserved": 4,
+      "charMetrics": 34,
+      "painterOptsResolveAssetRefs": true
+    },
+    "createTextPainterOpts": {
+      "resolveAssetRefs": true,
+      "bytes": 7891,
+      "sha256": "0586d731d5a451d614b265c237d96bd40e54692261fd7dd8c60e04d3c3623d7f"
+    }
+  }
+}
