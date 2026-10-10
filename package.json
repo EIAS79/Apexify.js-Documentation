@@ -150,7 +150,12 @@
     "studio:parity:image:runtime": "tsx scripts/studio/parity/phase2-image-runtime.ts",
     "studio:parity:image:ledger": "tsx scripts/studio/parity/finalize-image.ts",
     "studio:parity:image:ledger:check": "tsx scripts/studio/parity/finalize-image.ts --check",
-    "studio:parity:image:all": "npm run studio:parity:image:test && npm run studio:parity:image:runtime && npm run studio:parity:image:ledger && npm run studio:parity:image:ledger:check && npm run studio:parity:typecheck"
+    "studio:parity:image:all": "npm run studio:parity:image:test && npm run studio:parity:image:runtime && npm run studio:parity:image:ledger && npm run studio:parity:image:ledger:check && npm run studio:parity:typecheck",
+    "studio:parity:text:test": "tsx --test scripts/studio/visual/phase6-text-fonts.test.ts",
+    "studio:parity:text:runtime": "tsx scripts/studio/parity/phase3-text-runtime.ts",
+    "studio:parity:text:ledger": "tsx scripts/studio/parity/finalize-text.ts",
+    "studio:parity:text:ledger:check": "tsx scripts/studio/parity/finalize-text.ts --check",
+    "studio:parity:text:all": "npm run studio:parity:text:test && npm run studio:parity:text:runtime && npm run studio:parity:text:ledger && npm run studio:parity:text:ledger:check && npm run studio:parity:typecheck"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",

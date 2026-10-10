@@ -8,7 +8,9 @@ import {
 import {
   TEXT_AUTHORING_CLASSIFICATION,
   defaultTextNodeProps,
+  textBatchGroupPropsRecord,
   textPropsRecord,
+  visualTextBatchGroupProps,
   visualTextProps,
 } from '../../../lib/studio/visual/text-contract';
 import {
@@ -134,6 +136,8 @@ test('Phase 6 lowers text after earlier visual output and preserves modern typog
   const text = plan.operations[2];
   assert.equal(text.kind, 'create-text');
   if (text.kind !== 'create-text') return;
+  assert.equal(Array.isArray(text.properties), false);
+  if (Array.isArray(text.properties)) return;
   assert.equal(text.base.$studioTarget, 'shape_panel');
   assert.equal(text.properties.text, 'Apexify Studio\nText from code.');
   assert.equal(text.properties.x, 160);
@@ -279,12 +283,12 @@ test('Phase 6 validates text bounds curve and metrics options', () => {
 
 test('Phase 6 classifies every pinned TextProperties field', () => {
   assert.deepEqual(Object.keys(TEXT_AUTHORING_CLASSIFICATION).sort(), [
-    'bold','color','decorations','effects','fill','font','fontFamily','fontName',
-    'fontPath','fontSize','glow','gradient','highlight','includeCharMetrics',
-    'italic','layout','letterSpacing','lineHeight','maxHeight','maxWidth',
-    'measurementCanvas','opacity','overline','placement','rotation','shadow',
-    'strikethrough','stroke','text','textAlign','textBaseline','textOnCurve',
-    'underline','wordSpacing',
+    'bold','color','decorations','effects','fill','font',
+    'fontFamily','fontName','fontPath','fontSize','glow','gradient','highlight',
+    'includeCharMetrics','italic','layout','letterSpacing','lineHeight',
+    'maxHeight','maxWidth','measurementCanvas','opacity','overline','painterOpts',
+    'placement','rotation','shadow','strikethrough','stroke','text','textAlign',
+    'textBaseline','textOnCurve','underline','wordSpacing',
   ].sort());
 
   for (const entry of Object.values(TEXT_AUTHORING_CLASSIFICATION)) {
@@ -297,26 +301,170 @@ test('Phase 6 classifies every pinned TextProperties field', () => {
   }
 });
 
-test('Phase 6 permanent shell exposes text fonts metrics and direct editing', () => {
+test('Phase 6 permanent shell exposes the dedicated text authoring workflow', () => {
   const shell = fs.readFileSync(
     'components/studio/visual/VisualStudioPre4.tsx',
     'utf8',
   );
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualTextInspector.tsx',
+    'utf8',
+  );
+
   for (const contract of [
     'data-visual-text-context',
     'data-text-insert',
-    'data-text-content-editor',
-    'data-text-font-select',
-    'data-text-font-asset-select',
-    'data-text-section="typography"',
-    'data-text-section="wrapping"',
-    'data-text-section="metrics"',
-    'data-text-section="curve"',
-    'data-text-section="complete-config"',
     'data-inline-text-editor',
-    'measureVisualTextInBrowser',
-    'onInsertFontAsset={applyFontAsset}',
+    '<VisualTextInspector',
+    '<VisualTextBatchInspector',
   ]) {
-    assert.ok(shell.includes(contract), 'missing Phase 6 UI contract: ' + contract);
+    assert.ok(shell.includes(contract), 'missing Phase 6 shell contract: ' + contract);
   }
+
+  for (const contract of [
+    'data-text-content-editor',
+    'data-text-gradient-editor',
+    'measureVisualTextInBrowser',
+    'Typography',
+    'Layout',
+    'Text on curve',
+    'Runtime contract',
+    'Legacy TextProperties aliases',
+    'createText(textPropertiesOrArray, canvasBuffer, painterOpts?)',
+    'Resolve asset references',
+    'No hidden group transform options',
+    'createText([...])',
+  ]) {
+    assert.ok(inspector.includes(contract), 'missing rebuilt text inspector contract: ' + contract);
+  }
+
+  for (const forbidden of [
+    'CreateTextOptions',
+    'Text group transform',
+    'Perspective text',
+  ]) {
+    assert.equal(
+      inspector.includes(forbidden),
+      false,
+      'unsupported pinned createText surface leaked into Studio: ' + forbidden,
+    );
+  }
+});
+
+
+test('Phase 6 lowers a text batch to one two-argument createText array call', () => {
+  const project = createVisualProject({
+    id: 'project_phase6_batch',
+    width: 640,
+    height: 360,
+    now: '2026-09-21T00:00:00.000Z',
+  });
+
+  const group = createVisualNode(
+    'group',
+    textBatchGroupPropsRecord({ textBatch: true }),
+    { id: 'text_batch', name: 'Text batch (2)' },
+  );
+  const first = createVisualNode(
+    'text',
+    textPropsRecord(defaultTextNodeProps('First')),
+    { id: 'text_first', name: 'First' },
+  );
+  const second = createVisualNode(
+    'text',
+    textPropsRecord({
+      ...defaultTextNodeProps('Second'),
+      decorations: { bold: true, italic: true },
+      fill: { color: '#22d3ee', opacity: 0.8 },
+    }),
+    { id: 'text_second', name: 'Second' },
+  );
+  first.parentId = group.id;
+  second.parentId = group.id;
+  first.transform = { x: 30, y: 40, width: 220, height: 80 };
+  second.transform = { x: 60, y: 120, width: 260, height: 90 };
+  group.childIds = [first.id, second.id];
+
+  project.document.nodes[group.id] = group;
+  project.document.nodes[first.id] = first;
+  project.document.nodes[second.id] = second;
+  project.document.rootNodeIds = [group.id];
+
+  const plan = lowerVisualProject(project);
+  const textOps = plan.operations.filter((operation) => operation.kind === 'create-text');
+  assert.equal(textOps.length, 1);
+  const operation = textOps[0];
+  assert.equal(operation.kind, 'create-text');
+  if (operation.kind !== 'create-text') return;
+  assert.equal(Array.isArray(operation.properties), true);
+  if (!Array.isArray(operation.properties)) return;
+  assert.equal(operation.properties.length, 2);
+  assert.equal(operation.properties[0]?.text, 'First');
+  assert.equal(operation.properties[1]?.text, 'Second');
+  assert.equal('options' in operation, false);
+  assert.equal('painterOpts' in operation, false);
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /\.createText\(\s*\[/);
+  assert.doesNotMatch(source, /createText\([\s\S]*isGrouped/);
+  assert.doesNotMatch(source, /createText\([\s\S]*resolveAssetRefs/);
+
+  const empty = createVisualProject({
+    id: project.id,
+    width: 640,
+    height: 360,
+    now: project.createdAt,
+  });
+  const result = reconcileVisualProjectFromCode(empty, source);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const root = result.project.document.nodes[result.project.document.rootNodeIds[0]];
+  assert.equal(root.kind, 'group');
+  assert.equal(visualTextBatchGroupProps(root)?.textBatch, true);
+  assert.equal(root.childIds?.length, 2);
+  assert.equal(
+    root.childIds?.map((id) => visualTextProps(result.project.document.nodes[id]).text).join('|'),
+    'First|Second',
+  );
+});
+
+test('Phase 6 reverse sync owns the public createText painterOpts argument', () => {
+  const project = createVisualProject({
+    id: 'project_phase6_painter_opts',
+    width: 320,
+    height: 200,
+    now: '2026-09-21T00:00:00.000Z',
+  });
+  const source = [
+    "import { ApexPainter } from 'apexify.js';",
+    "const painter = new ApexPainter();",
+    "const canvas = await painter.createCanvas({ width: 320, height: 200 });",
+    "const text = await painter.createText({ text: 'Refs', x: 10, y: 20 }, canvas.buffer, { resolveAssetRefs: true });",
+  ].join('\n');
+  const result = reconcileVisualProjectFromCode(project, source);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+  const node = result.project.document.nodes[result.project.document.rootNodeIds[0]!];
+  assert.deepEqual(visualTextProps(node).painterOpts, { resolveAssetRefs: true });
+  const regenerated = generateVisualProjectCode(result.project).source;
+  assert.match(regenerated, /createText\([\s\S]*resolveAssetRefs: true/);
+});
+
+test('Phase 6 reverse sync rejects non-public createText options', () => {
+  const project = createVisualProject({
+    id: 'project_phase6_invalid_call',
+    width: 320,
+    height: 200,
+    now: '2026-09-21T00:00:00.000Z',
+  });
+  const source = [
+    "import { ApexPainter } from 'apexify.js';",
+    "const painter = new ApexPainter();",
+    "const canvas = await painter.createCanvas({ width: 320, height: 200 });",
+    "const text = await painter.createText({ text: 'Wrong', x: 10, y: 20 }, canvas.buffer, { isGrouped: true });",
+  ].join('\n');
+  const result = reconcileVisualProjectFromCode(project, source);
+  assert.equal(result.ok, false);
+  if (result.ok) return;
+  assert.match(result.error, /painterOpts\.isGrouped.*not part of the public runtime contract/i);
 });
