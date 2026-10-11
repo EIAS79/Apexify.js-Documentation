@@ -1,4 +1,7 @@
-import { validateVisualTextNode } from '../text-contract';
+import {
+  validateVisualTextBatchGroup,
+  validateVisualTextNode,
+} from '../text-contract';
 import { validateVisualChartNode } from '../chart-contract';
 import {
   validateVisualImageBatchGroup,
@@ -275,6 +278,7 @@ export function validateVisualProject(project: VisualProject): VisualProjectVali
     for (const node of Object.values(featureProject.document.nodes)) {
       validateVisualImageNode(featureProject, node, issues);
       validateVisualImageBatchGroup(featureProject, node, issues);
+      validateVisualTextBatchGroup(featureProject, node, issues);
       validateVisualTextNode(node, issues);
       validateVisualChartNode(node, issues);
       validatePhase7Node(node, issues);

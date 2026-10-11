@@ -4,8 +4,8 @@
     {
       "id": "node.canvas.basic",
       "packageVersion": "6.0.0",
-      "packageCommit": "db96446ef51ede70febb03892d86b599483a4302",
-      "artifactSha256": "826cb1ecf4e66c31ea00b435fe540ca73c736e8da08ae538bb36f78249a915ee",
+      "packageCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+      "artifactSha256": "4b8266b7d3c8bdb44de453057d9083f7dfbacef1e05d21e65a683f041329db8b",
       "sourceHash": "d1603f74395a1b3c07efbf96be39ca6d867413977a29ea556c0bfc1e712649e4",
       "outputs": [
         {
@@ -19,14 +19,14 @@
     {
       "id": "node.chart.bar",
       "packageVersion": "6.0.0",
-      "packageCommit": "db96446ef51ede70febb03892d86b599483a4302",
-      "artifactSha256": "826cb1ecf4e66c31ea00b435fe540ca73c736e8da08ae538bb36f78249a915ee",
+      "packageCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+      "artifactSha256": "4b8266b7d3c8bdb44de453057d9083f7dfbacef1e05d21e65a683f041329db8b",
       "sourceHash": "cd7a888b8b826223996d9aa4d2a7769e6eed61bc8753315d90bd594d838c8baa",
       "outputs": [
         {
           "path": "chart-bar.png",
-          "sha256": "ba1967af820c753a58ddfc46f6c99ea5c357441f8e49b5aa38acc303f698abcb",
-          "bytes": 10001,
+          "sha256": "fb6735577a19144b9b86ab182600620dbf8593f89d7d3af07dbb7c616aa20314",
+          "bytes": 9381,
           "verificationMode": "metadata"
         }
       ]
@@ -34,8 +34,8 @@
     {
       "id": "node.gif.basic",
       "packageVersion": "6.0.0",
-      "packageCommit": "db96446ef51ede70febb03892d86b599483a4302",
-      "artifactSha256": "826cb1ecf4e66c31ea00b435fe540ca73c736e8da08ae538bb36f78249a915ee",
+      "packageCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+      "artifactSha256": "4b8266b7d3c8bdb44de453057d9083f7dfbacef1e05d21e65a683f041329db8b",
       "sourceHash": "609a9b8654f7cb2e819f8d81bc4801369625e8bdf3f522346bc281602cdcd7a8",
       "outputs": [
         {
@@ -55,14 +55,14 @@
     {
       "id": "node.integration.report",
       "packageVersion": "6.0.0",
-      "packageCommit": "db96446ef51ede70febb03892d86b599483a4302",
-      "artifactSha256": "826cb1ecf4e66c31ea00b435fe540ca73c736e8da08ae538bb36f78249a915ee",
+      "packageCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+      "artifactSha256": "4b8266b7d3c8bdb44de453057d9083f7dfbacef1e05d21e65a683f041329db8b",
       "sourceHash": "e319c93d86cacdf025a04d5601b3c523e710962d96d83e8eac564f8b8c97e52b",
       "outputs": [
         {
           "path": "report.png",
-          "sha256": "b3827602fe4f2325311efb9bc5855fc96c16c4e7b84b87c88fb4450104699e44",
-          "bytes": 10720,
+          "sha256": "7373a3146f45dee52ed53d389c206c4c25db30472e1fea0d9120ff41b889daee",
+          "bytes": 9826,
           "verificationMode": "metadata"
         },
         {

@@ -9,7 +9,10 @@ const repoRoot = process.cwd();
 const capabilityDir = join(tmpdir(), 'apexify-studio-media-caps');
 
 for (const mode of ['ffmpeg', 'ffprobe'] as const) {
-  test(`${mode} proxy honors STUDIO_MEDIA_NODE_PATH`, () => {
+  test(
+    `${mode} proxy honors STUDIO_MEDIA_NODE_PATH`,
+    { skip: process.platform === 'win32' ? 'POSIX executable proxy contract (covered in Linux CI)' : false },
+    () => {
     const root = mkdtempSync(join(tmpdir(), 'apexify-media-proxy-test-'));
     const fakeBinary = join(root, 'fake-media');
     const id = '11111111-2222-4333-8444-555555555555';

@@ -6,6 +6,7 @@ import type {
   VisualNode,
   VisualProject,
   VisualTextNodeProps,
+  VisualCreateTextOptions,
   VisualValue,
   VisualImageUtilityAnalysis,
   VisualImageUtilityInput,
@@ -18,7 +19,11 @@ import {
   visualImageProps,
 } from '../image-contract';
 import { isCurrentUtilityInput } from '../image-utility-contract';
-import { visualTextProps } from '../text-contract';
+import {
+  isTextBatchGroup,
+  visualTextBatchGroupProps,
+  visualTextProps,
+} from '../text-contract';
 import {
   visualChartProps,
   type VisualStandaloneChartFamily,
@@ -125,7 +130,9 @@ export type StudioCreateTextOperation = {
   target: string;
   preferredName?: string;
   base: StudioTargetReference;
-  properties: StudioTextProperties;
+  properties: StudioTextProperties | StudioTextProperties[];
+  options?: VisualCreateTextOptions;
+  painterOpts?: { resolveAssetRefs?: boolean };
 };
 
 export type StudioCreateChartOperation = {
@@ -344,7 +351,7 @@ function orderedAuthoringNodes(project: VisualProject): VisualNode[] {
     if (node.transform?.visible === false) return;
 
     if (node.kind === 'group') {
-      if (isImageBatchGroup(node)) {
+      if (isImageBatchGroup(node) || isTextBatchGroup(node)) {
         out.push(node);
         return;
       }
@@ -616,27 +623,76 @@ function imageOperationProperties(
 }
 
 function textOperationProperties(node: VisualNode): StudioTextProperties {
-  const props = visualTextProps(node);
+  // Strip stale Studio-only text keys so generated code stays inside the
+  // pinned Apexify.js TextProperties contract.
+  const raw = structuredClone(visualTextProps(node)) as VisualTextNodeProps &
+    Record<string, unknown>;
+  for (const key of [
+    'createOptions',
+    'painterOpts',
+  ]) delete raw[key];
+  const props = raw as VisualTextNodeProps;
   const transform = node.transform ?? {};
   const layout = {
-    ...(props.layout ?? {}),
-    ...(transform.width !== undefined
-      ? { maxWidth: transform.width * (transform.scaleX ?? 1) }
+    ...(props.layout?.lineHeight !== undefined
+      ? { lineHeight: props.layout.lineHeight }
       : {}),
-    ...(transform.height !== undefined
-      ? { maxHeight: transform.height * (transform.scaleY ?? 1) }
+    ...(props.layout?.letterSpacing !== undefined
+      ? { letterSpacing: props.layout.letterSpacing }
+      : {}),
+    ...(props.layout?.wordSpacing !== undefined
+      ? { wordSpacing: props.layout.wordSpacing }
+      : {}),
+    ...((transform.width !== undefined || props.layout?.maxWidth !== undefined)
+      ? {
+          maxWidth:
+            transform.width !== undefined
+              ? transform.width * (transform.scaleX ?? 1)
+              : props.layout?.maxWidth,
+        }
+      : {}),
+    ...((transform.height !== undefined || props.layout?.maxHeight !== undefined)
+      ? {
+          maxHeight:
+            transform.height !== undefined
+              ? transform.height * (transform.scaleY ?? 1)
+              : props.layout?.maxHeight,
+        }
       : {}),
   };
   const placement = {
-    ...(props.placement ?? {}),
-    ...(transform.rotation !== undefined
-      ? { rotation: transform.rotation }
+    ...(props.placement?.scaleX !== undefined ? { scaleX: props.placement.scaleX } : {}),
+    ...(props.placement?.scaleY !== undefined ? { scaleY: props.placement.scaleY } : {}),
+    ...(props.placement?.skewX !== undefined ? { skewX: props.placement.skewX } : {}),
+    ...(props.placement?.skewY !== undefined ? { skewY: props.placement.skewY } : {}),
+    ...(props.placement?.perspective !== undefined ? { perspective: props.placement.perspective } : {}),
+    ...(props.placement?.textAlign !== undefined
+      ? { textAlign: props.placement.textAlign }
+      : {}),
+    ...(props.placement?.textBaseline !== undefined
+      ? { textBaseline: props.placement.textBaseline }
+      : {}),
+    ...((transform.rotation !== undefined || props.placement?.rotation !== undefined)
+      ? {
+          rotation:
+            transform.rotation !== undefined
+              ? transform.rotation
+              : props.placement?.rotation,
+        }
       : {}),
   };
   const fill = {
-    ...(props.fill ?? {}),
-    ...(transform.opacity !== undefined
-      ? { opacity: transform.opacity }
+    ...(props.fill?.color !== undefined ? { color: props.fill.color } : {}),
+    ...(props.fill?.gradient !== undefined
+      ? { gradient: props.fill.gradient }
+      : {}),
+    ...((transform.opacity !== undefined || props.fill?.opacity !== undefined)
+      ? {
+          opacity:
+            transform.opacity !== undefined
+              ? transform.opacity
+              : props.fill?.opacity,
+        }
       : {}),
   };
 
@@ -1004,6 +1060,47 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
       continue;
     }
 
+    if (node.kind === 'group' && isTextBatchGroup(node)) {
+      const batch = visualTextBatchGroupProps(node);
+      if (!batch) {
+        throw new Error('Text batch group is missing its runtime createText contract.');
+      }
+      const children = (node.childIds ?? []).map((childId) => {
+        const child = normalized.document.nodes[childId];
+        if (!child || child.kind !== 'text') {
+          throw new Error(
+            'Text batch group "' + node.id + '" may contain only text children.',
+          );
+        }
+        return child;
+      });
+      if (children.length < 2) {
+        throw new Error('Text batch group requires at least two text children.');
+      }
+      const properties = children.map((child) => {
+        const resolvedChild = resolved.document.nodes[child.id] ?? child;
+        return textOperationProperties(resolvedChild);
+      });
+
+      operations.push({
+        id: 'text_batch_' + node.id,
+        kind: 'create-text',
+        sourceNodeId: node.id,
+        target,
+        preferredName: node.name || 'textGroup',
+        base,
+        properties,
+        ...(batch.createOptions ? { options: batch.createOptions } : {}),
+        ...(batch.painterOpts ? { painterOpts: batch.painterOpts } : {}),
+      });
+
+      produced.set(node.id, { target, member: null });
+      base = { $studioTarget: target };
+      lastTarget = target;
+      lastMember = null;
+      continue;
+    }
+
     const resolvedNode = resolved.document.nodes[node.id] ?? node;
 
     if (node.kind === 'chart') {
@@ -1083,6 +1180,10 @@ export function lowerVisualProject(project: VisualProject): StudioOperationPlan 
         preferredName: node.name || 'text',
         base,
         properties: textOperationProperties(resolvedNode),
+        ...(visualTextProps(resolvedNode).createOptions
+          ? { options: visualTextProps(resolvedNode).createOptions }
+          : {}),
+        ...(visualTextProps(resolvedNode).painterOpts ? { painterOpts: visualTextProps(resolvedNode).painterOpts } : {}),
       });
     } else if (node.kind === 'path' || node.kind === 'freehand') {
       const props = visualPathProps(node);

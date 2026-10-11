@@ -8,7 +8,9 @@ import {
 import {
   TEXT_AUTHORING_CLASSIFICATION,
   defaultTextNodeProps,
+  textBatchGroupPropsRecord,
   textPropsRecord,
+  visualTextBatchGroupProps,
   visualTextProps,
 } from '../../../lib/studio/visual/text-contract';
 import {
@@ -134,6 +136,8 @@ test('Phase 6 lowers text after earlier visual output and preserves modern typog
   const text = plan.operations[2];
   assert.equal(text.kind, 'create-text');
   if (text.kind !== 'create-text') return;
+  assert.equal(Array.isArray(text.properties), false);
+  if (Array.isArray(text.properties)) return;
   assert.equal(text.base.$studioTarget, 'shape_panel');
   assert.equal(text.properties.text, 'Apexify Studio\nText from code.');
   assert.equal(text.properties.x, 160);
@@ -279,12 +283,13 @@ test('Phase 6 validates text bounds curve and metrics options', () => {
 
 test('Phase 6 classifies every pinned TextProperties field', () => {
   assert.deepEqual(Object.keys(TEXT_AUTHORING_CLASSIFICATION).sort(), [
-    'bold','color','decorations','effects','fill','font','fontFamily','fontName',
-    'fontPath','fontSize','glow','gradient','highlight','includeCharMetrics',
-    'italic','layout','letterSpacing','lineHeight','maxHeight','maxWidth',
-    'measurementCanvas','opacity','overline','placement','rotation','shadow',
-    'strikethrough','stroke','text','textAlign','textBaseline','textOnCurve',
-    'underline','wordSpacing',
+    'bold','color','decorations','effects','fill','font',
+    'fontFamily','fontName','fontPath','fontSize','glow','gradient','highlight',
+    'includeCharMetrics','italic','layout','letterSpacing','lineHeight',
+    'createOptions','isBold','outlined','scaleX','scaleY','skewX','skewY',
+    'maxHeight','maxWidth','measurementCanvas','opacity','overline','painterOpts',
+    'placement','rotation','shadow','strikethrough','stroke','text','textAlign',
+    'textBaseline','textOnCurve','underline','wordSpacing',
   ].sort());
 
   for (const entry of Object.values(TEXT_AUTHORING_CLASSIFICATION)) {
@@ -297,26 +302,239 @@ test('Phase 6 classifies every pinned TextProperties field', () => {
   }
 });
 
-test('Phase 6 permanent shell exposes text fonts metrics and direct editing', () => {
+test('Phase 6 permanent shell exposes the dedicated text authoring workflow', () => {
   const shell = fs.readFileSync(
     'components/studio/visual/VisualStudioPre4.tsx',
     'utf8',
   );
+  const inspector = fs.readFileSync(
+    'components/studio/visual/VisualTextInspector.tsx',
+    'utf8',
+  );
+
   for (const contract of [
     'data-visual-text-context',
     'data-text-insert',
-    'data-text-content-editor',
-    'data-text-font-select',
-    'data-text-font-asset-select',
-    'data-text-section="typography"',
-    'data-text-section="wrapping"',
-    'data-text-section="metrics"',
-    'data-text-section="curve"',
-    'data-text-section="complete-config"',
     'data-inline-text-editor',
-    'measureVisualTextInBrowser',
-    'onInsertFontAsset={applyFontAsset}',
+    '<VisualTextInspector',
+    '<VisualTextBatchInspector',
   ]) {
-    assert.ok(shell.includes(contract), 'missing Phase 6 UI contract: ' + contract);
+    assert.ok(shell.includes(contract), 'missing Phase 6 shell contract: ' + contract);
+  }
+
+  for (const contract of [
+    'data-text-content-editor',
+    'data-text-gradient-editor',
+    'measureVisualTextInBrowser',
+    'Typography',
+    'Layout',
+    'Text on curve',
+    'Runtime contract',
+    'Legacy TextProperties aliases',
+    'createText(textPropertiesOrArray, canvasBuffer, createTextOptions?, painterOpts?)',
+    'CreateTextOptions',
+    'Two transformation scopes',
+    'Resolve asset references',
+    'createText([...])',
+  ]) {
+    assert.ok(inspector.includes(contract), 'missing rebuilt text inspector contract: ' + contract);
+  }
+
+  const advanced = fs.readFileSync('components/studio/visual/VisualTextAdvancedEditors.tsx','utf8');
+  for(const required of ['Group perspective','Isolated grouped rendering','Translate X','Blend mode','nearest','bicubic']){
+    assert.ok(advanced.includes(required),'missing advanced text control: '+required);
+  }
+});
+
+
+test('Phase 6 lowers a text batch to one two-argument createText array call', () => {
+  const project = createVisualProject({
+    id: 'project_phase6_batch',
+    width: 640,
+    height: 360,
+    now: '2026-09-21T00:00:00.000Z',
+  });
+
+  const group = createVisualNode(
+    'group',
+    textBatchGroupPropsRecord({ textBatch: true }),
+    { id: 'text_batch', name: 'Text batch (2)' },
+  );
+  const first = createVisualNode(
+    'text',
+    textPropsRecord(defaultTextNodeProps('First')),
+    { id: 'text_first', name: 'First' },
+  );
+  const second = createVisualNode(
+    'text',
+    textPropsRecord({
+      ...defaultTextNodeProps('Second'),
+      decorations: { bold: true, italic: true },
+      fill: { color: '#22d3ee', opacity: 0.8 },
+    }),
+    { id: 'text_second', name: 'Second' },
+  );
+  first.parentId = group.id;
+  second.parentId = group.id;
+  first.transform = { x: 30, y: 40, width: 220, height: 80 };
+  second.transform = { x: 60, y: 120, width: 260, height: 90 };
+  group.childIds = [first.id, second.id];
+
+  project.document.nodes[group.id] = group;
+  project.document.nodes[first.id] = first;
+  project.document.nodes[second.id] = second;
+  project.document.rootNodeIds = [group.id];
+
+  const plan = lowerVisualProject(project);
+  const textOps = plan.operations.filter((operation) => operation.kind === 'create-text');
+  assert.equal(textOps.length, 1);
+  const operation = textOps[0];
+  assert.equal(operation.kind, 'create-text');
+  if (operation.kind !== 'create-text') return;
+  assert.equal(Array.isArray(operation.properties), true);
+  if (!Array.isArray(operation.properties)) return;
+  assert.equal(operation.properties.length, 2);
+  assert.equal(operation.properties[0]?.text, 'First');
+  assert.equal(operation.properties[1]?.text, 'Second');
+  assert.equal('options' in operation, false);
+  assert.equal('painterOpts' in operation, false);
+
+  const source = generateVisualProjectCode(project).source;
+  assert.match(source, /\.createText\(\s*\[/);
+  assert.doesNotMatch(source, /createText\([\s\S]*isGrouped/);
+  assert.doesNotMatch(source, /createText\([\s\S]*resolveAssetRefs/);
+
+  const empty = createVisualProject({
+    id: project.id,
+    width: 640,
+    height: 360,
+    now: project.createdAt,
+  });
+  const result = reconcileVisualProjectFromCode(empty, source);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const root = result.project.document.nodes[result.project.document.rootNodeIds[0]];
+  assert.equal(root.kind, 'group');
+  assert.equal(visualTextBatchGroupProps(root)?.textBatch, true);
+  assert.equal(root.childIds?.length, 2);
+  assert.equal(
+    root.childIds?.map((id) => visualTextProps(result.project.document.nodes[id]).text).join('|'),
+    'First|Second',
+  );
+});
+
+test('Phase 6 reverse sync owns the public createText painterOpts argument', () => {
+  const project = createVisualProject({
+    id: 'project_phase6_painter_opts',
+    width: 320,
+    height: 200,
+    now: '2026-09-21T00:00:00.000Z',
+  });
+  const source = [
+    "import { ApexPainter } from 'apexify.js';",
+    "const painter = new ApexPainter();",
+    "const canvas = await painter.createCanvas({ width: 320, height: 200 });",
+    "const text = await painter.createText({ text: 'Refs', x: 10, y: 20 }, canvas.buffer, { resolveAssetRefs: true });",
+  ].join('\n');
+  const result = reconcileVisualProjectFromCode(project, source);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+  const node = result.project.document.nodes[result.project.document.rootNodeIds[0]!];
+  assert.deepEqual(visualTextProps(node).painterOpts, { resolveAssetRefs: true });
+  const regenerated = generateVisualProjectCode(result.project).source;
+  assert.match(regenerated, /createText\([\s\S]*resolveAssetRefs: true/);
+});
+
+test('Phase 6 reverse sync accepts public grouped createText options', () => {
+  const project = createVisualProject({
+    id: 'project_phase6_invalid_call',
+    width: 320,
+    height: 200,
+    now: '2026-09-21T00:00:00.000Z',
+  });
+  const source = [
+    "import { ApexPainter } from 'apexify.js';",
+    "const painter = new ApexPainter();",
+    "const canvas = await painter.createCanvas({ width: 320, height: 200 });",
+    "const text = await painter.createText({ text: 'Wrong', x: 10, y: 20 }, canvas.buffer, { isGrouped: true });",
+  ].join('\n');
+  const result = reconcileVisualProjectFromCode(project, source);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
+  if (!result.ok) return;
+  const node = result.project.document.nodes[result.project.document.rootNodeIds[0]!];
+  assert.equal(visualTextProps(node).createOptions?.isGrouped, true);
+  assert.match(generateVisualProjectCode(result.project).source, /isGrouped: true/);
+});
+
+
+test('Phase 3 advanced createText exposes grouped options, per-text perspective and four-argument round trip', () => {
+  const project = createVisualProject({
+    id:'text_advanced_test',name:'Advanced',width:640,height:420,now:'2026-10-11T00:00:00.000Z'
+  });
+  const pointQuad: [{x:number;y:number},{x:number;y:number},{x:number;y:number},{x:number;y:number}] = [
+    {x:45,y:40},{x:440,y:52},{x:420,y:255},{x:55,y:245}
+  ];
+  const one=createVisualNode('text',textPropsRecord({
+    text:'Advanced',font:{size:32,weight:700,style:'oblique'},
+    placement:{scaleX:1.2,scaleY:.9,skewX:9,skewY:-3,perspective:{points:pointQuad,interpolation:'bicubic',edgeMode:'mirror'}},
+    fill:{gradient:{type:'radial',startX:0,startY:0,endX:200,endY:100,startRadius:0,endRadius:150,repeat:'reflect',colors:[{stop:0,color:'#ffffff'},{stop:1,color:'#3300aa'}]}},
+    stroke:{color:'#000000',style:'double',width:2},isBold:true,outlined:true,
+  }),{id:'text_a'});
+  const two=createVisualNode('text',textPropsRecord({
+    text:'Grouped',font:{size:42,weight:'bolder'},effects:{glow:{intensity:8,opacity:.4}},textOnCurve:{sweepAngle:120,layoutMode:'fit'}
+  }),{id:'text_b'});
+  one.parentId='text_group';two.parentId='text_group';
+  const group=createVisualNode('group',textBatchGroupPropsRecord({textBatch:true,
+    createOptions:{isGrouped:true,groupTransform:{translateX:12,translateY:4,rotation:8,scaleX:1.1,scaleY:.8,skewX:4,skewY:-2,pivotX:200,pivotY:150,opacity:.7,blendMode:'screen',perspective:{points:pointQuad,interpolation:'nearest',edgeMode:'clamp'}}},
+    painterOpts:{resolveAssetRefs:true}
+  }),{id:'text_group'});
+  group.childIds=[one.id,two.id];
+  project.document.nodes[one.id]=one;project.document.nodes[two.id]=two;project.document.nodes[group.id]=group;
+  project.document.rootNodeIds=[group.id];
+  const validation=validateVisualProject(project);
+  assert.equal(validation.ok,true,JSON.stringify(validation.issues));
+  const plan=lowerVisualProject(project);
+  const operation=plan.operations.find(x=>x.kind==='create-text');
+  assert.ok(operation && operation.kind==='create-text');
+  if(!operation||operation.kind!=='create-text')return;
+  assert.equal(operation.options?.groupTransform?.blendMode,'screen');
+  assert.equal(operation.painterOpts?.resolveAssetRefs,true);
+  assert.equal(Array.isArray(operation.properties),true);
+  if(!Array.isArray(operation.properties))return;
+  assert.equal(operation.properties[0]?.font?.weight,700);
+  assert.equal(operation.properties[0]?.placement?.perspective?.edgeMode,'mirror');
+  assert.equal(operation.properties[0]?.isBold,true);
+  assert.equal(operation.properties[0]?.outlined,true);
+  const source=generateVisualProjectCode(project).source;
+  assert.match(source,/groupTransform:/);
+  assert.match(source,/painterOpts|resolveAssetRefs: true/);
+  assert.match(source,/blendMode: "screen"/);
+  assert.match(source,/interpolation: "bicubic"/);
+  const rebuilt=reconcileVisualProjectFromCode(project,source);
+  assert.equal(rebuilt.ok,true,rebuilt.ok?undefined:rebuilt.error);
+  if(!rebuilt.ok)return;
+  const nextGroup=rebuilt.project.document.nodes[rebuilt.project.document.rootNodeIds[0]!];
+  assert.equal(visualTextBatchGroupProps(nextGroup)?.createOptions?.groupTransform?.opacity,.7);
+  assert.equal(generateVisualProjectCode(rebuilt.project).source,source);
+});
+
+test('Phase 3 advanced invalid font, perspective, skew and group transform fail validation',()=>{
+  const project=createVisualProject({id:'text_advanced_bad',width:600,height:400,now:'2026-10-11T00:00:00.000Z'});
+  const text=createVisualNode('text',textPropsRecord({
+    text:'Unsafe',font:{size:24,weight:950,style:'normal'},
+    placement:{skewX:90,perspective:{points:[{x:0,y:0}] as never,interpolation:'none' as never,edgeMode:'bad' as never}}
+  }),{id:'bad_text'});
+  const sibling=createVisualNode('text',textPropsRecord({text:'Sibling'}),{id:'sibling'});
+  text.parentId='bad_group';sibling.parentId='bad_group';
+  const group=createVisualNode('group',textBatchGroupPropsRecord({
+    textBatch:true,createOptions:{isGrouped:true,groupTransform:{skewY:-90,opacity:3,blendMode:'unknown' as never}}
+  }),{id:'bad_group'});
+  group.childIds=[text.id,sibling.id];
+  project.document.nodes[text.id]=text;project.document.nodes[sibling.id]=sibling;project.document.nodes[group.id]=group;
+  project.document.rootNodeIds=[group.id];
+  const {issues,ok}=validateVisualProject(project);
+  assert.equal(ok,false);
+  for(const code of ['text-font-weight','text-perspective-points','text-perspective-interpolation','text-perspective-edge','text-skew-range','text-group-blend-mode']){
+    assert.ok(issues.some(issue=>issue.code===code),'missing safety gate '+code);
   }
 });

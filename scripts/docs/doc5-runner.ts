@@ -14,7 +14,12 @@ const nodeCmd = process.execPath;
 const runtimeOnly = process.argv.includes('--runtime-only');
 
 function runOrThrow(command: string, args: string[], cwd: string, env: NodeJS.ProcessEnv = process.env) {
-  const result = spawnSync(command, args, { cwd, env, encoding:'utf8', maxBuffer: 8 * 1024 * 1024, timeout: 120_000 });
+  // Node 24 on Windows does not reliably spawn .cmd shims directly. Run npm's JavaScript CLI instead.
+  const npmCli = path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js');
+  const needsNpmShim = process.platform === 'win32' && command === npmCmd;
+  const executable = needsNpmShim ? nodeCmd : command;
+  const argv = needsNpmShim ? [npmCli, ...args] : args;
+  const result = spawnSync(executable, argv, { cwd, env, encoding:'utf8', maxBuffer: 8 * 1024 * 1024, timeout: 120_000 });
   if (result.error || result.status !== 0) throw new Error(`${command} ${args.join(' ')} failed\n${result.stdout ?? ''}\n${result.stderr ?? ''}`);
   return result.stdout;
 }

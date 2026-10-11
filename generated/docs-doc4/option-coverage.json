@@ -1,11 +1,11 @@
 {
-  "defaultsCovered": 3220,
-  "descriptionsCovered": 17233,
-  "documented": 17233,
+  "defaultsCovered": 3482,
+  "descriptionsCovered": 19066,
+  "documented": 19066,
   "missing": [],
-  "nestedPaths": 16891,
-  "runtimeMetadataCovered": 17233,
+  "nestedPaths": 18665,
+  "runtimeMetadataCovered": 19066,
   "schemaVersion": 1,
-  "total": 17233,
-  "typesCovered": 17233
+  "total": 19066,
+  "typesCovered": 19066
 }

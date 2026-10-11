@@ -2,47 +2,47 @@
   "artifacts": [
     {
       "file": "api-coverage.json",
-      "sha256": "968fcf3482ed14dfe0b0f345891eb53b04294ab4ba153b2c61660259b47f4891"
+      "sha256": "e4466aafdea433bfd20a450555241e1725fcaa48c8039d9184598b06c1d97263"
     },
     {
       "file": "api-manifest.json",
-      "sha256": "8880d430e5105d7a5bc70c27c318d78a8404abba12786a18dd5becc92f23a471"
+      "sha256": "d440525a39c71eeac5d9d7565a2751823ae6bed6de84e761d079e0ac9523f41d"
     },
     {
       "file": "api-search-index.json",
-      "sha256": "faf1b1a9af9a22aef0718ca9a83da3caea88ce5cd5966b7990bb6fbf91410bf6"
+      "sha256": "c0ed24d87ade853599749d6332c866e23bc2996ab4e68c683e9a150eaab3f2e7"
     },
     {
       "file": "export-inventory.json",
-      "sha256": "15198772c766f73c4269ad7c3fe228f22ea8bab391f58315538368ca06ac8cf7"
+      "sha256": "42badba2092ee3816d1f65345da07aedf74c05a3c6f696e979611a23e5dbf3a0"
     },
     {
       "file": "identity.json",
-      "sha256": "e7fb4cf4f916b47c7080b848cd3502e6fa060adb30665152dcc7a242d1bcadc2"
+      "sha256": "4a4c0120a18096e30b51d3d597800d1723f9019ef6de0245c41b8337a160cc32"
     },
     {
       "file": "option-coverage.json",
-      "sha256": "6be2c26fb989a2855112ddaec80be8d424f8779a0c15a684369a2fedd7314d26"
+      "sha256": "615d4093a102e50d0314c471fe0747f46aeef6ee67299fd1dee3ccae80549087"
     },
     {
       "file": "option-inventory.json",
-      "sha256": "bac69c04bdded6301cc7ff0ddba7d577a6d50a5ea21170631e8afc1b87a97a05"
+      "sha256": "40abd73029d4d9c2c811d6b30ed3172a421e98a2f0b91c82f834ba6e858bf603"
     },
     {
       "file": "representative-api.json",
-      "sha256": "e220742ac0e6633b4532e750c9694cb16d74a1c0f1ca90f7b180938c7d961773"
+      "sha256": "400da1c1fc087e821e426af05df0bd592e82b27219090304357a5cd626c01206"
     },
     {
       "file": "signature-verification.json",
-      "sha256": "e7fa938b0af1b2d13bf1127b1c009d60192bd11a34d8612f9b3e60195607b81d"
+      "sha256": "f50268956d57ebe99e372600b185d12119d739515084423003f82acae27edf5b"
     },
     {
       "file": "source-link-verification.json",
-      "sha256": "71232a471137b177c2978c74be8f455aced39a43dff2ab83d4460ba28a1f04f6"
+      "sha256": "8849d488676394e017ffdd0b13a0e1c83361261dd887015b1c2c4c73990ec980"
     },
     {
       "file": "type-graph.json",
-      "sha256": "9af3f59534ec93a453c4585b61fddf13e639ec710eb102faadb0479566e21f2b"
+      "sha256": "ff437ac214fc2addf4d9cbc59608756e97d5a0585c58de8b08f6d523c8fc18c7"
     }
   ],
   "phase": "DOC-4",

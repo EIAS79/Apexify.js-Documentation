@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "phase": "STUDIO-PARITY-3",
+  "packageDependency": "github:EIAS79/Apexify.js#379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "packageVersion": "6.0.0",
+  "packageCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "inventoryRuntimeCommit": "a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a",
+  "proofs": {
+    "projectProofs": [
+      {
+        "name": "single-modern-text",
+        "bytes": 51481,
+        "sha256": "c47c294b3f66595c0d93eadcce63614f0e531d60a7183427fae0a578a0d99784"
+      },
+      {
+        "name": "text-array",
+        "bytes": 5741,
+        "sha256": "097326071ca7992c862e67df1476ddb1dad6e3cf8c0ba1f777efc3c1d81e0aba"
+      },
+      {
+        "name": "curved-text",
+        "bytes": 6361,
+        "sha256": "34eda5f56d5a90918ef74cc1b1f0af449e9ce50fcb36c24fca0ac7143a52c9ad"
+      },
+      {
+        "name": "advanced-perspective-font",
+        "bytes": 40081,
+        "sha256": "3713088a00d7020dcb20e4cbe55806a060e81441b7a5fb49b44d7d6b34301619"
+      },
+      {
+        "name": "grouped-transform-and-asset-opts",
+        "bytes": 28374,
+        "sha256": "6ccda35c7cd9984bdf589b92f9dce343cb575e04c216fd3599a11d35a5750c68"
+      }
+    ],
+    "measureText": {
+      "width": 186.36000061035156,
+      "height": 166.4,
+      "lineCount": 4,
+      "lineCountObserved": 4,
+      "charMetrics": 34,
+      "painterOptsResolveAssetRefs": true
+    },
+    "createTextPainterOpts": {
+      "resolveAssetRefs": true,
+      "bytes": 7891,
+      "sha256": "0586d731d5a451d614b265c237d96bd40e54692261fd7dd8c60e04d3c3623d7f"
+    }
+  }
+}

@@ -25,12 +25,12 @@
       "executed": true,
       "exitCode": 0,
       "timedOut": false,
-      "stdoutSha256": "dda7dd1cbd86dd58a326a7c2c011a9380b5321b283aeb4c51b5d5f9c56b2992d",
+      "stdoutSha256": "b8e64e8d81d0925edc5b57889f59b7ec0bec74c6e831657e2016527340a17415",
       "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "outputs": [
         {
           "path": "chart-bar.png",
-          "sha256": "ba1967af820c753a58ddfc46f6c99ea5c357441f8e49b5aa38acc303f698abcb",
+          "sha256": "fb6735577a19144b9b86ab182600620dbf8593f89d7d3af07dbb7c616aa20314",
           "verificationMode": "metadata"
         }
       ]
@@ -69,7 +69,7 @@
       "outputs": [
         {
           "path": "report.png",
-          "sha256": "b3827602fe4f2325311efb9bc5855fc96c16c4e7b84b87c88fb4450104699e44",
+          "sha256": "7373a3146f45dee52ed53d389c206c4c25db30472e1fea0d9120ff41b889daee",
           "verificationMode": "metadata"
         },
         {

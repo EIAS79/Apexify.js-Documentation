@@ -599,10 +599,42 @@ export interface VisualTextLayout {
   maxHeight?: number;
 }
 
+export interface VisualTextPerspective {
+  /** Corner-pin order: top-left, top-right, bottom-right, bottom-left. */
+  points: [
+    { x: number; y: number }, { x: number; y: number },
+    { x: number; y: number }, { x: number; y: number }
+  ];
+  interpolation?: 'nearest' | 'bilinear' | 'bicubic';
+  edgeMode?: 'transparent' | 'clamp' | 'wrap' | 'mirror';
+}
 export interface VisualTextPlacement {
   textAlign?: VisualTextAlign;
   textBaseline?: VisualTextBaseline;
   rotation?: number;
+  scaleX?: number;
+  scaleY?: number;
+  skewX?: number;
+  skewY?: number;
+  perspective?: VisualTextPerspective;
+}
+export interface VisualTextGroupTransform {
+  rotation?: number;
+  translateX?: number;
+  translateY?: number;
+  scaleX?: number;
+  scaleY?: number;
+  skewX?: number;
+  skewY?: number;
+  pivotX?: number;
+  pivotY?: number;
+  opacity?: number;
+  blendMode?: GlobalCompositeOperation;
+  perspective?: VisualTextPerspective;
+}
+export interface VisualCreateTextOptions {
+  isGrouped?: boolean;
+  groupTransform?: VisualTextGroupTransform;
 }
 
 export interface VisualTextFill {
@@ -625,6 +657,18 @@ export interface VisualTextFont {
   family?: string;
   name?: string;
   path?: string;
+  weight?: number | 'normal' | 'bold' | 'bolder' | 'lighter';
+  style?: 'normal' | 'italic' | 'oblique';
+}
+
+/**
+ * Editor grouping that maps to one runtime createText(TextProperties[]) call.
+ * The current runtime supports optional isolated group rendering and call-level transforms.
+ */
+export interface VisualTextBatchGroupProps {
+  textBatch: true;
+  createOptions?: VisualCreateTextOptions;
+  painterOpts?: VisualPainterAssetRefsOptions;
 }
 
 export interface VisualTextNodeProps {
@@ -642,8 +686,12 @@ export interface VisualTextNodeProps {
     width?: number;
     height?: number;
   };
+  /** Optional call-level CreateTextOptions, including single-text grouping. */
+  createOptions?: VisualCreateTextOptions;
+  /** Optional painter reference resolution. */
+  painterOpts?: VisualPainterAssetRefsOptions;
 
-  /** Legacy Apexify text aliases retained for exact round-trip compatibility. */
+  /** Legacy TextProperties aliases retained for exact round-trip compatibility. */
   fontSize?: number;
   fontFamily?: string;
   fontName?: string;
@@ -664,6 +712,12 @@ export interface VisualTextNodeProps {
   textAlign?: VisualTextAlign;
   textBaseline?: VisualTextBaseline;
   rotation?: number;
+  scaleX?: number;
+  scaleY?: number;
+  skewX?: number;
+  skewY?: number;
+  isBold?: boolean;
+  outlined?: boolean;
   color?: string;
   gradient?: VisualGradient;
   opacity?: number;
@@ -671,11 +725,37 @@ export interface VisualTextNodeProps {
 
 export interface VisualTextMetrics {
   width: number;
+  actualBoundingBoxAscent: number;
+  actualBoundingBoxDescent: number;
+  actualBoundingBoxLeft: number;
+  actualBoundingBoxRight: number;
+  fontBoundingBoxAscent: number;
+  fontBoundingBoxDescent: number;
+  alphabeticBaseline?: number;
+  emHeightAscent?: number;
+  emHeightDescent?: number;
+  hangingBaseline?: number;
+  ideographicBaseline?: number;
   height: number;
   lineHeight: number;
-  lineCount: number;
   baseline: number;
-  lines: Array<{ text: string; width: number }>;
+  top: number;
+  bottom: number;
+  centerX: number;
+  centerY: number;
+  lines?: Array<{
+    text: string;
+    width: number;
+    height: number;
+    metrics: Omit<
+      VisualTextMetrics,
+      'lines' | 'totalHeight' | 'lineCount' | 'charWidths' | 'charPositions'
+    >;
+  }>;
+  totalHeight?: number;
+  lineCount?: number;
+  charWidths?: number[];
+  charPositions?: Array<{ x: number; width: number }>;
 }
 
 export interface VisualCanvasImageBackgroundOptions {

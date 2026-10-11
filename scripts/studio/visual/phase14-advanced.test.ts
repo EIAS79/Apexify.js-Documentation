@@ -297,7 +297,7 @@ test('Phase 14 UI occupies Advanced, Diagnostics and Export without creating a p
 test('Phase 14 documentation runtime pin includes the batch facade fix', () => {
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const executor = fs.readFileSync('lib/studio/runtime/isolatedNodeExecutor.ts', 'utf8');
-  const pin = 'db96446ef51ede70febb03892d86b599483a4302';
+  const pin = '379a5248f09ed39c1b1734fe104b6bd73a77857f';
   assert.equal(pkg.dependencies['apexify.js'], 'github:EIAS79/Apexify.js#' + pin);
   assert.ok(executor.includes('github:EIAS79/Apexify.js#' + pin));
 });

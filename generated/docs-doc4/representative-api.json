@@ -60,12 +60,39 @@
       ]
     },
     {
+      "path": "images.distortion.controlPoints.falloff",
+      "values": [
+        "linear",
+        "smooth",
+        "gaussian"
+      ]
+    },
+    {
+      "path": "images.distortion.edgeMode",
+      "values": [
+        "transparent",
+        "clamp",
+        "wrap",
+        "mirror"
+      ]
+    },
+    {
+      "path": "images.distortion.interpolation",
+      "values": [
+        "nearest",
+        "bilinear",
+        "bicubic"
+      ]
+    },
+    {
       "path": "images.distortion.type",
       "values": [
         "perspective",
         "warp",
         "bulge",
-        "pinch"
+        "pinch",
+        "twirl",
+        "wave"
       ]
     },
     {
@@ -118,6 +145,23 @@
         "alpha",
         "luminance",
         "inverse"
+      ]
+    },
+    {
+      "path": "images.meshWarp.edgeMode",
+      "values": [
+        "transparent",
+        "clamp",
+        "wrap",
+        "mirror"
+      ]
+    },
+    {
+      "path": "images.meshWarp.interpolation",
+      "values": [
+        "nearest",
+        "bilinear",
+        "bicubic"
       ]
     },
     {
@@ -539,6 +583,20 @@
       ]
     },
     {
+      "path": "canvasBuffer.canvas.videoBg.align",
+      "values": [
+        "center",
+        "top",
+        "bottom",
+        "left",
+        "right",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right"
+      ]
+    },
+    {
       "path": "canvasBuffer.canvas.videoBg.autoplay",
       "values": [
         false,
@@ -546,10 +604,47 @@
       ]
     },
     {
+      "path": "canvasBuffer.canvas.videoBg.filters.type",
+      "values": [
+        "saturation",
+        "gaussianBlur",
+        "motionBlur",
+        "radialBlur",
+        "sharpen",
+        "noise",
+        "grain",
+        "edgeDetection",
+        "emboss",
+        "invert",
+        "grayscale",
+        "sepia",
+        "pixelate",
+        "brightness",
+        "contrast",
+        "hueShift",
+        "posterize"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.videoBg.fit",
+      "values": [
+        "fill",
+        "contain",
+        "cover"
+      ]
+    },
+    {
       "path": "canvasBuffer.canvas.videoBg.format",
       "values": [
         "jpg",
         "png"
+      ]
+    },
+    {
+      "path": "canvasBuffer.canvas.videoBg.inherit",
+      "values": [
+        false,
+        true
       ]
     },
     {
@@ -605,12 +700,39 @@
       ]
     },
     {
+      "path": "options.groupTransform.distortion.controlPoints.falloff",
+      "values": [
+        "linear",
+        "smooth",
+        "gaussian"
+      ]
+    },
+    {
+      "path": "options.groupTransform.distortion.edgeMode",
+      "values": [
+        "transparent",
+        "clamp",
+        "wrap",
+        "mirror"
+      ]
+    },
+    {
+      "path": "options.groupTransform.distortion.interpolation",
+      "values": [
+        "nearest",
+        "bilinear",
+        "bicubic"
+      ]
+    },
+    {
       "path": "options.groupTransform.distortion.type",
       "values": [
         "perspective",
         "warp",
         "bulge",
-        "pinch"
+        "pinch",
+        "twirl",
+        "wave"
       ]
     },
     {
@@ -648,6 +770,23 @@
         "alpha",
         "luminance",
         "inverse"
+      ]
+    },
+    {
+      "path": "options.groupTransform.meshWarp.edgeMode",
+      "values": [
+        "transparent",
+        "clamp",
+        "wrap",
+        "mirror"
+      ]
+    },
+    {
+      "path": "options.groupTransform.meshWarp.interpolation",
+      "values": [
+        "nearest",
+        "bilinear",
+        "bicubic"
       ]
     },
     {
@@ -823,7 +962,7 @@
       "value": 128
     }
   ],
-  "optionCount": 483,
+  "optionCount": 560,
   "optionPaths": [
     "canvasBuffer.buffer",
     "canvasBuffer.canvas",
@@ -878,12 +1017,16 @@
     "canvasBuffer.canvas.customBg.filters.angle",
     "canvasBuffer.canvas.customBg.filters.centerX",
     "canvasBuffer.canvas.customBg.filters.centerY",
+    "canvasBuffer.canvas.customBg.filters.height",
     "canvasBuffer.canvas.customBg.filters.intensity",
     "canvasBuffer.canvas.customBg.filters.levels",
     "canvasBuffer.canvas.customBg.filters.radius",
     "canvasBuffer.canvas.customBg.filters.size",
     "canvasBuffer.canvas.customBg.filters.type",
     "canvasBuffer.canvas.customBg.filters.value",
+    "canvasBuffer.canvas.customBg.filters.width",
+    "canvasBuffer.canvas.customBg.filters.x",
+    "canvasBuffer.canvas.customBg.filters.y",
     "canvasBuffer.canvas.customBg.fit",
     "canvasBuffer.canvas.customBg.inherit",
     "canvasBuffer.canvas.customBg.opacity",
@@ -998,9 +1141,26 @@
     "canvasBuffer.canvas.stroke.width",
     "canvasBuffer.canvas.transparentBase",
     "canvasBuffer.canvas.videoBg",
+    "canvasBuffer.canvas.videoBg.align",
     "canvasBuffer.canvas.videoBg.autoplay",
+    "canvasBuffer.canvas.videoBg.filters",
+    "canvasBuffer.canvas.videoBg.filters.angle",
+    "canvasBuffer.canvas.videoBg.filters.centerX",
+    "canvasBuffer.canvas.videoBg.filters.centerY",
+    "canvasBuffer.canvas.videoBg.filters.height",
+    "canvasBuffer.canvas.videoBg.filters.intensity",
+    "canvasBuffer.canvas.videoBg.filters.levels",
+    "canvasBuffer.canvas.videoBg.filters.radius",
+    "canvasBuffer.canvas.videoBg.filters.size",
+    "canvasBuffer.canvas.videoBg.filters.type",
+    "canvasBuffer.canvas.videoBg.filters.value",
+    "canvasBuffer.canvas.videoBg.filters.width",
+    "canvasBuffer.canvas.videoBg.filters.x",
+    "canvasBuffer.canvas.videoBg.filters.y",
+    "canvasBuffer.canvas.videoBg.fit",
     "canvasBuffer.canvas.videoBg.format",
     "canvasBuffer.canvas.videoBg.frame",
+    "canvasBuffer.canvas.videoBg.inherit",
     "canvasBuffer.canvas.videoBg.loop",
     "canvasBuffer.canvas.videoBg.opacity",
     "canvasBuffer.canvas.videoBg.quality",
@@ -1042,11 +1202,33 @@
     "images.clipPath.x",
     "images.clipPath.y",
     "images.distortion",
+    "images.distortion.amplitudeX",
+    "images.distortion.amplitudeY",
+    "images.distortion.angle",
+    "images.distortion.centerX",
+    "images.distortion.centerY",
+    "images.distortion.controlPoints",
+    "images.distortion.controlPoints.falloff",
+    "images.distortion.controlPoints.from",
+    "images.distortion.controlPoints.from.x",
+    "images.distortion.controlPoints.from.y",
+    "images.distortion.controlPoints.radius",
+    "images.distortion.controlPoints.strength",
+    "images.distortion.controlPoints.to",
+    "images.distortion.controlPoints.to.x",
+    "images.distortion.controlPoints.to.y",
+    "images.distortion.edgeMode",
     "images.distortion.intensity",
+    "images.distortion.interpolation",
+    "images.distortion.phaseX",
+    "images.distortion.phaseY",
     "images.distortion.points",
     "images.distortion.points.x",
     "images.distortion.points.y",
+    "images.distortion.radius",
     "images.distortion.type",
+    "images.distortion.wavelengthX",
+    "images.distortion.wavelengthY",
     "images.effects",
     "images.effects.chromaticAberration",
     "images.effects.chromaticAberration.intensity",
@@ -1065,12 +1247,16 @@
     "images.filters.angle",
     "images.filters.centerX",
     "images.filters.centerY",
+    "images.filters.height",
     "images.filters.intensity",
     "images.filters.levels",
     "images.filters.radius",
     "images.filters.size",
     "images.filters.type",
     "images.filters.value",
+    "images.filters.width",
+    "images.filters.x",
+    "images.filters.y",
     "images.fit",
     "images.height",
     "images.inherit",
@@ -1081,8 +1267,10 @@
     "images.meshWarp.controlPoints",
     "images.meshWarp.controlPoints.x",
     "images.meshWarp.controlPoints.y",
+    "images.meshWarp.edgeMode",
     "images.meshWarp.gridX",
     "images.meshWarp.gridY",
+    "images.meshWarp.interpolation",
     "images.opacity",
     "images.rotation",
     "images.shadow",
@@ -1205,11 +1393,33 @@
     "options.groupTransform.clipPath.x",
     "options.groupTransform.clipPath.y",
     "options.groupTransform.distortion",
+    "options.groupTransform.distortion.amplitudeX",
+    "options.groupTransform.distortion.amplitudeY",
+    "options.groupTransform.distortion.angle",
+    "options.groupTransform.distortion.centerX",
+    "options.groupTransform.distortion.centerY",
+    "options.groupTransform.distortion.controlPoints",
+    "options.groupTransform.distortion.controlPoints.falloff",
+    "options.groupTransform.distortion.controlPoints.from",
+    "options.groupTransform.distortion.controlPoints.from.x",
+    "options.groupTransform.distortion.controlPoints.from.y",
+    "options.groupTransform.distortion.controlPoints.radius",
+    "options.groupTransform.distortion.controlPoints.strength",
+    "options.groupTransform.distortion.controlPoints.to",
+    "options.groupTransform.distortion.controlPoints.to.x",
+    "options.groupTransform.distortion.controlPoints.to.y",
+    "options.groupTransform.distortion.edgeMode",
     "options.groupTransform.distortion.intensity",
+    "options.groupTransform.distortion.interpolation",
+    "options.groupTransform.distortion.phaseX",
+    "options.groupTransform.distortion.phaseY",
     "options.groupTransform.distortion.points",
     "options.groupTransform.distortion.points.x",
     "options.groupTransform.distortion.points.y",
+    "options.groupTransform.distortion.radius",
     "options.groupTransform.distortion.type",
+    "options.groupTransform.distortion.wavelengthX",
+    "options.groupTransform.distortion.wavelengthY",
     "options.groupTransform.effects",
     "options.groupTransform.effects.chromaticAberration",
     "options.groupTransform.effects.chromaticAberration.intensity",
@@ -1228,12 +1438,16 @@
     "options.groupTransform.filters.angle",
     "options.groupTransform.filters.centerX",
     "options.groupTransform.filters.centerY",
+    "options.groupTransform.filters.height",
     "options.groupTransform.filters.intensity",
     "options.groupTransform.filters.levels",
     "options.groupTransform.filters.radius",
     "options.groupTransform.filters.size",
     "options.groupTransform.filters.type",
     "options.groupTransform.filters.value",
+    "options.groupTransform.filters.width",
+    "options.groupTransform.filters.x",
+    "options.groupTransform.filters.y",
     "options.groupTransform.mask",
     "options.groupTransform.mask.mode",
     "options.groupTransform.mask.source",
@@ -1241,8 +1455,10 @@
     "options.groupTransform.meshWarp.controlPoints",
     "options.groupTransform.meshWarp.controlPoints.x",
     "options.groupTransform.meshWarp.controlPoints.y",
+    "options.groupTransform.meshWarp.edgeMode",
     "options.groupTransform.meshWarp.gridX",
     "options.groupTransform.meshWarp.gridY",
+    "options.groupTransform.meshWarp.interpolation",
     "options.groupTransform.opacity",
     "options.groupTransform.pivotX",
     "options.groupTransform.pivotY",
@@ -1509,8 +1725,103 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-amplitudex",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.amplitudeX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-amplitudey",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.amplitudeY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-angle",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.angle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-falloff",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.falloff",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-from",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.from",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-from-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.from.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-from-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.from.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.radius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-strength",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.strength",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-to",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.to",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-to-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.to.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-controlpoints-to-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.controlPoints.to.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-edgemode",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.edgeMode",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-intensity",
       "id": "search:apexify.js::ApexPainter#createImage::images.distortion.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-interpolation",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.interpolation",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-phasex",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.phaseX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-phasey",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.phaseY",
       "kind": "api-option"
     },
     {
@@ -1529,8 +1840,23 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.radius",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-type",
       "id": "search:apexify.js::ApexPainter#createImage::images.distortion.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-wavelengthx",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.wavelengthX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-distortion-wavelengthy",
+      "id": "search:apexify.js::ApexPainter#createImage::images.distortion.wavelengthY",
       "kind": "api-option"
     },
     {
@@ -1624,6 +1950,11 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-height",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.height",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-intensity",
       "id": "search:apexify.js::ApexPainter#createImage::images.filters.intensity",
       "kind": "api-option"
@@ -1651,6 +1982,21 @@
     {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-value",
       "id": "search:apexify.js::ApexPainter#createImage::images.filters.value",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-width",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-x",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-filters-y",
+      "id": "search:apexify.js::ApexPainter#createImage::images.filters.y",
       "kind": "api-option"
     },
     {
@@ -1704,6 +2050,11 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-edgemode",
+      "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.edgeMode",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-gridx",
       "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.gridX",
       "kind": "api-option"
@@ -1711,6 +2062,11 @@
     {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-gridy",
       "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.gridY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-images-meshwarp-interpolation",
+      "id": "search:apexify.js::ApexPainter#createImage::images.meshWarp.interpolation",
       "kind": "api-option"
     },
     {
@@ -2444,6 +2800,11 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-height",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.height",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-intensity",
       "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.intensity",
       "kind": "api-option"
@@ -2471,6 +2832,21 @@
     {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-value",
       "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.value",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-width",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-x",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-custombg-filters-y",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.customBg.filters.y",
       "kind": "api-option"
     },
     {
@@ -3044,8 +3420,88 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-align",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.align",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-autoplay",
       "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.autoplay",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-angle",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.angle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-height",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.height",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-intensity",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-levels",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.levels",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.radius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-size",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.size",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-type",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-value",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.value",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-width",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-x",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-filters-y",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.filters.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-fit",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.fit",
       "kind": "api-option"
     },
     {
@@ -3056,6 +3512,11 @@
     {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-frame",
       "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.frame",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-canvasbuffer-canvas-videobg-inherit",
+      "id": "search:apexify.js::ApexPainter#createImage::canvasBuffer.canvas.videoBg.inherit",
       "kind": "api-option"
     },
     {
@@ -3264,8 +3725,103 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-amplitudex",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.amplitudeX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-amplitudey",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.amplitudeY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-angle",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.angle",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-centerx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.centerX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-centery",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.centerY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-falloff",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.falloff",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-from",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.from",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-from-x",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.from.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-from-y",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.from.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.radius",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-strength",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.strength",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-to",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.to",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-to-x",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.to.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-controlpoints-to-y",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.controlPoints.to.y",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-edgemode",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.edgeMode",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-intensity",
       "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.intensity",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-interpolation",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.interpolation",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-phasex",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.phaseX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-phasey",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.phaseY",
       "kind": "api-option"
     },
     {
@@ -3284,8 +3840,23 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-radius",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.radius",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-type",
       "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.type",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-wavelengthx",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.wavelengthX",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-distortion-wavelengthy",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.distortion.wavelengthY",
       "kind": "api-option"
     },
     {
@@ -3379,6 +3950,11 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-height",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.height",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-intensity",
       "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.intensity",
       "kind": "api-option"
@@ -3406,6 +3982,21 @@
     {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-value",
       "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.value",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-width",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.width",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-x",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.x",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-filters-y",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.filters.y",
       "kind": "api-option"
     },
     {
@@ -3444,6 +4035,11 @@
       "kind": "api-option"
     },
     {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-edgemode",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.edgeMode",
+      "kind": "api-option"
+    },
+    {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-gridx",
       "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.gridX",
       "kind": "api-option"
@@ -3451,6 +4047,11 @@
     {
       "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-gridy",
       "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.gridY",
+      "kind": "api-option"
+    },
+    {
+      "href": "/api-reference/apexify.js/ApexPainter/createImage#option-options-grouptransform-meshwarp-interpolation",
+      "id": "search:apexify.js::ApexPainter#createImage::options.groupTransform.meshWarp.interpolation",
       "kind": "api-option"
     },
     {
@@ -3797,10 +4398,10 @@
   "signature": "(images: ImageProperties | ImageProperties[], canvasBuffer: CanvasResults | Buffer, options?: CreateImageOptions, painterOpts?: PainterAssetRefsOptions) => Promise<Buffer>",
   "source": {
     "declarationPath": "dist/declarations/apex-painter/main.d.ts",
-    "href": "https://github.com/EIAS79/Apexify.js/blob/dbed9743353593eafae9a7b1c25312d7170a233b/lib-next/apex-painter/main.ts",
+    "href": "https://github.com/EIAS79/Apexify.js/blob/379a5248f09ed39c1b1734fe104b6bd73a77857f/lib-next/apex-painter/main.ts",
     "sourcePath": "lib-next/apex-painter/main.ts"
   },
-  "sourceLink": "https://github.com/EIAS79/Apexify.js/blob/dbed9743353593eafae9a7b1c25312d7170a233b/lib-next/apex-painter/main.ts",
+  "sourceLink": "https://github.com/EIAS79/Apexify.js/blob/379a5248f09ed39c1b1734fe104b6bd73a77857f/lib-next/apex-painter/main.ts",
   "stability": "CURRENT",
   "symbol": "createImage"
 }
