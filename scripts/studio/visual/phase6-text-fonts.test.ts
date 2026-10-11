@@ -287,7 +287,7 @@ test('Phase 6 classifies every pinned TextProperties field', () => {
     'fontFamily','fontName','fontPath','fontSize','glow','gradient','highlight',
     'includeCharMetrics','italic','layout','letterSpacing','lineHeight',
     'createOptions','isBold','outlined','scaleX','scaleY','skewX','skewY',
-    'maxHeight','maxWidth','measurementCanvas','opacity','overline','painterOpts',
+    'maxHeight','maxWidth','measurementCanvas','opacity','overline','painterOpts','studioFrameFit',
     'placement','rotation','shadow','strikethrough','stroke','text','textAlign',
     'textBaseline','textOnCurve','underline','wordSpacing',
   ].sort());

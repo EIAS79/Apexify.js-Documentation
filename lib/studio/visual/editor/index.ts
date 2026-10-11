@@ -1,4 +1,4 @@
-import type { VisualNode, VisualProject, VisualTransform } from '../model';
+import type { VisualNode, VisualProject, VisualTransform, VisualTextNodeProps } from '../model';
 
 export type AlignMode =
   | 'left'
@@ -67,6 +67,21 @@ export function patchNodeTransform(
     ...next.document.nodes[id].transform,
     ...patch,
   };
+  if (node.kind === 'text' && (patch.width !== undefined || patch.height !== undefined)) {
+    const edited = next.document.nodes[id];
+    const text = edited.props as unknown as VisualTextNodeProps;
+    // Resizing any text layer opts it into WYSIWYG fitted layout.
+    // Keep persisted legacy layout bounds synchronized with the blue frame.
+    edited.props = {
+      ...text,
+      studioFrameFit: true,
+      layout: {
+        ...text.layout,
+        maxWidth: edited.transform?.width ?? text.layout?.maxWidth,
+        maxHeight: edited.transform?.height ?? text.layout?.maxHeight,
+      },
+    } as unknown as typeof edited.props;
+  }
   return next;
 }
 

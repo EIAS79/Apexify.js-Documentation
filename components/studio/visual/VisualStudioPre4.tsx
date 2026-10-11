@@ -905,6 +905,21 @@ export default function VisualStudioPre4({
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
   const primaryText = primary?.kind === 'text' ? primary : undefined;
+  // Upgrade pre-fit saved Studio text when it is selected. This does not
+  // change imported raw createText code until the user enters visual editing.
+  useEffect(() => {
+    if (!primaryText || visualTextProps(primaryText).studioFrameFit !== undefined) return;
+    setProject(current => {
+      const selectedText = current.document.nodes[primaryText.id];
+      if (!selectedText || selectedText.kind !== 'text') return current;
+      if (visualTextProps(selectedText).studioFrameFit !== undefined) return current;
+      const upgraded = structuredClone(current);
+      upgraded.document.nodes[primaryText.id].props = textPropsRecord({
+        ...visualTextProps(selectedText), studioFrameFit: true,
+      });
+      return upgraded;
+    });
+  }, [primaryText?.id, primaryText?.props]);
   const primaryPath =
     primary && (primary.kind === 'path' || primary.kind === 'freehand')
       ? primary
@@ -2864,7 +2879,7 @@ export default function VisualStudioPre4({
       if (!node || node.kind !== 'text') return current;
       const next = structuredClone(current);
       const nextNode = next.document.nodes[primaryText.id];
-      nextNode.props = textPropsRecord(updater(visualTextProps(nextNode)));
+      nextNode.props = textPropsRecord({ ...updater(visualTextProps(nextNode)), studioFrameFit: true });
       next.updatedAt = new Date().toISOString();
       return next;
     });
@@ -2880,7 +2895,7 @@ export default function VisualStudioPre4({
       if (!node || node.kind !== 'text') return current;
       const next = structuredClone(current);
       const nextNode = next.document.nodes[primaryText.id];
-      nextNode.props = textPropsRecord(updater(visualTextProps(nextNode)));
+      nextNode.props = textPropsRecord({ ...updater(visualTextProps(nextNode)), studioFrameFit: true });
       next.updatedAt = new Date().toISOString();
       return next;
     });
@@ -2901,6 +2916,7 @@ export default function VisualStudioPre4({
     mutate('Add text', (current) => {
       const next = structuredClone(current);
       const props = defaultTextNodeProps(value);
+      props.studioFrameFit = true;
       if (fontAsset && isStudioFontAsset(fontAsset)) {
         const family = studioAssetFontFamily(fontAsset);
         props.font = {

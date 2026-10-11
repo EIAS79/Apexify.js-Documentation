@@ -33,6 +33,7 @@ export type TextReverseSyncPolicy =
 
 export const TEXT_AUTHORING_CLASSIFICATION = {
   text: { surface: 'Style', reverse: 'canonical-literal' },
+  studioFrameFit: { surface: 'Style', reverse: 'legacy-normalized' },
   font: { surface: 'Style', reverse: 'font-asset' },
   decorations: { surface: 'Style', reverse: 'canonical-literal' },
   effects: { surface: 'Effects', reverse: 'canonical-literal' },
@@ -366,6 +367,7 @@ export function validateVisualTextNode(
   optionalFinite(issues, node.transform?.x, 'document.nodes.' + node.id + '.transform.x');
   optionalFinite(issues, node.transform?.y, 'document.nodes.' + node.id + '.transform.y');
 
+  optionalBoolean(issues, props.studioFrameFit, path + '.studioFrameFit');
   validateCreateTextOptions(issues,props.createOptions,path+'.createOptions');
   const font = props.font ?? {};
   for (const [key, value] of [

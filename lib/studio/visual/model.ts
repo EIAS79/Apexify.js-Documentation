@@ -673,6 +673,8 @@ export interface VisualTextBatchGroupProps {
 
 export interface VisualTextNodeProps {
   text: string;
+  /** Studio-only: fit glyphs to the editable rectangle; not part of Apexify.js TextProperties. */
+  studioFrameFit?: boolean;
   font?: VisualTextFont;
   decorations?: VisualTextDecorations;
   effects?: VisualTextEffects;

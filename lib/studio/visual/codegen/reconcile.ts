@@ -22,6 +22,7 @@ import {
   textPropsRecord,
   visualTextProps,
 } from '../text-contract';
+import { fitVisualTextToBox, textBoxAnchorOffset } from '../text-box-fit';
 import {
   STANDALONE_CHART_FAMILIES,
   chartPropsRecord,
@@ -1090,6 +1091,43 @@ function textNodeFromParsed(
         ? opacity
         : 1;
 
+  const preserveVisualBox = oldProps?.studioFrameFit === true &&
+    width !== undefined && height !== undefined;
+  let originX = x;
+  let originY = y;
+  if (preserveVisualBox) {
+    const renderSize = props.font?.size ?? props.fontSize ?? 16;
+    const anchor = textBoxAnchorOffset(props.placement, width, renderSize);
+    originX = x - anchor.x;
+    originY = y - anchor.y;
+    props.studioFrameFit = true;
+    if (
+      oldNode?.transform?.width !== undefined &&
+      oldNode.transform.height !== undefined &&
+      oldProps.text === props.text
+    ) {
+      const originalFit = fitVisualTextToBox(
+        oldProps, oldNode.transform.width, oldNode.transform.height,
+      );
+      const same = (a: number | undefined, b: number) =>
+        typeof a === 'number' && Math.abs(a - b) < 0.002;
+      if (originalFit.scale < 1 && same(props.font?.size, originalFit.fontSize)) {
+        if (oldProps.font === undefined) delete props.font;
+        else props.font = { ...props.font, size: oldProps.font.size };
+        if (props.layout) {
+          const currentLayout = { ...props.layout };
+          if (same(currentLayout.letterSpacing, originalFit.letterSpacing)) {
+            currentLayout.letterSpacing = oldProps.layout?.letterSpacing;
+          }
+          if (same(currentLayout.wordSpacing, originalFit.wordSpacing)) {
+            currentLayout.wordSpacing = oldProps.layout?.wordSpacing;
+          }
+          props.layout = currentLayout;
+        }
+      }
+    }
+  }
+
   const {
     rotation: _oldRotation,
     opacity: _oldOpacity,
@@ -1104,8 +1142,8 @@ function textNodeFromParsed(
     childIds: oldNode?.childIds,
     transform: {
       ...retainedTextTransform,
-      x,
-      y,
+      x: originX,
+      y: originY,
       ...(width !== undefined ? { width } : {}),
       ...(height !== undefined ? { height } : {}),
       ...(

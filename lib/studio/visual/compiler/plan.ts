@@ -24,6 +24,7 @@ import {
   visualTextBatchGroupProps,
   visualTextProps,
 } from '../text-contract';
+import { fitVisualTextToBox, textBoxAnchorOffset } from '../text-box-fit';
 import {
   visualChartProps,
   type VisualStandaloneChartFamily,
@@ -627,7 +628,9 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
   // pinned Apexify.js TextProperties contract.
   const raw = structuredClone(visualTextProps(node)) as VisualTextNodeProps &
     Record<string, unknown>;
+  const studioFrameFit = raw.studioFrameFit === true;
   for (const key of [
+    'studioFrameFit',
     'createOptions',
     'painterOpts',
   ]) delete raw[key];
@@ -636,29 +639,32 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
   if (raw.text === '') raw.text = ' ';
   const props = raw as VisualTextNodeProps;
   const transform = node.transform ?? {};
+  const ownsFrame = studioFrameFit && Number.isFinite(transform.width) && Number.isFinite(transform.height);
+  const frameWidth = Math.max(1, transform.width ?? props.layout?.maxWidth ?? 360);
+  const frameHeight = Math.max(1, transform.height ?? props.layout?.maxHeight ?? 100);
+  const fit = ownsFrame && !props.textOnCurve && !props.placement?.perspective
+    ? fitVisualTextToBox(props, frameWidth, frameHeight)
+    : null;
   const layout = {
     ...(props.layout?.lineHeight !== undefined
       ? { lineHeight: props.layout.lineHeight }
       : {}),
-    ...(props.layout?.letterSpacing !== undefined
-      ? { letterSpacing: props.layout.letterSpacing }
+    ...((fit?.letterSpacing !== undefined || props.layout?.letterSpacing !== undefined)
+      ? { letterSpacing: fit?.letterSpacing ?? props.layout?.letterSpacing }
       : {}),
-    ...(props.layout?.wordSpacing !== undefined
-      ? { wordSpacing: props.layout.wordSpacing }
+    ...((fit?.wordSpacing !== undefined || props.layout?.wordSpacing !== undefined)
+      ? { wordSpacing: fit?.wordSpacing ?? props.layout?.wordSpacing }
       : {}),
-    ...((transform.width !== undefined || props.layout?.maxWidth !== undefined)
-      ? {
-          maxWidth:
-            transform.width !== undefined
-              ? transform.width * (transform.scaleX ?? 1)
-              : props.layout?.maxWidth,
-        }
-      : {}),
-    // The selection frame is not a runtime clipping bound.
-    // Allow long/multiline text to grow unless the user sets maxHeight.
-    ...(props.layout?.maxHeight !== undefined
-      ? { maxHeight: props.layout.maxHeight }
-      : {}),
+    // Fit-enabled layers are bounded by the blue rectangle. Imported raw
+    // code remains byte-compatible with the source TextProperties contract.
+    ...(ownsFrame ? { maxWidth: frameWidth, maxHeight: frameHeight } : {
+      ...((transform.width !== undefined || props.layout?.maxWidth !== undefined)
+        ? { maxWidth: transform.width !== undefined
+          ? transform.width * (transform.scaleX ?? 1)
+          : props.layout?.maxWidth }
+        : {}),
+      ...(props.layout?.maxHeight !== undefined ? {maxHeight: props.layout.maxHeight}: {}),
+    }),
   };
   const placement = {
     ...(props.placement?.scaleX !== undefined ? { scaleX: props.placement.scaleX } : {}),
@@ -696,10 +702,16 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
       : {}),
   };
 
+  const renderSize = fit?.fontSize ?? props.font?.size ?? props.fontSize ?? 16;
+  const boxAnchor = textBoxAnchorOffset(props.placement, frameWidth, renderSize);
+
   return {
     ...props,
-    x: transform.x ?? 0,
-    y: transform.y ?? 0,
+    // The runtime draws at a text anchor, not at a bounding-box origin.
+    // Align that anchor with the left/top of the blue selection rectangle.
+    x: (transform.x ?? 0) + (ownsFrame ? boxAnchor.x : 0),
+    y: (transform.y ?? 0) + (ownsFrame ? boxAnchor.y : 0),
+    ...(fit && fit.scale < 1 ? { font: { ...props.font, size: fit.fontSize } } : {}),
     ...(Object.keys(layout).length ? { layout } : {}),
     ...(Object.keys(placement).length ? { placement } : {}),
     ...(Object.keys(fill).length ? { fill } : {}),

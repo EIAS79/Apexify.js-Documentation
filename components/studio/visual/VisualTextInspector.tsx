@@ -27,6 +27,7 @@ import {
   visualTextProps,
 } from '@/lib/studio/visual/text-contract';
 import { TextCallOptionsEditor, TextPerspectiveEditor } from './VisualTextAdvancedEditors';
+import { fitVisualTextToBox } from '@/lib/studio/visual/text-box-fit';
 import type {
   VisualGradient,
   VisualNode,
@@ -174,17 +175,48 @@ function NumberField({
   suffix?: string;
   onChange: (value: number) => void;
 }) {
+  const display = (num: number | undefined) =>
+    num !== undefined && Number.isFinite(num)
+      ? String(Math.round(num * 100) / 100)
+      : '';
+  // Do not update the model while a number is half-typed: typing "260"
+  // must never clamp the initial "2" or turn it into "860".
+  const [draft, setDraft] = useState(() => display(value));
+  const [editing, setEditing] = useState(false);
+  useEffect(() => {
+    if (!editing) setDraft(display(value));
+  }, [editing, value]);
+  const commit = () => {
+    setEditing(false);
+    if (!draft.trim()) {
+      setDraft(display(value));
+      return;
+    }
+    const parsed = Number(draft);
+    if (!Number.isFinite(parsed)) {
+      setDraft(display(value));
+      return;
+    }
+    const next = Math.min(max ?? Infinity, Math.max(min ?? -Infinity, parsed));
+    setDraft(display(next));
+    if (next !== value) onChange(next);
+  };
   return (
     <label className="apx-text-v3-field">
       <span>{label}</span>
       <span className="apx-text-v3-number">
         <input
           type="number"
-          value={value ?? ''}
+          value={editing ? draft : display(value)}
           step={step}
           min={min}
           max={max}
-          onChange={(event) => onChange(Number(event.target.value))}
+          onFocus={() => {setDraft(display(value)); setEditing(true);}}
+          onChange={(event) => setDraft(event.target.value)}
+          onBlur={commit}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') event.currentTarget.blur();
+          }}
         />
         {suffix ? <em>{suffix}</em> : null}
       </span>
@@ -728,44 +760,7 @@ export function VisualTextInspector({
           <TextPerspectiveEditor label="Text perspective" value={placement.perspective}
             onChange={(perspective) => patch('Text perspective', current => ({...current,placement:{...current.placement,perspective}}))}/>
         </Section>
-        <Section
-          title="Wrapping box"
-          description="Studio width/height lower to layout.maxWidth/maxHeight."
-          attr="layout-transform"
-        >
-          <div className="apx-text-v3-grid apx-text-v3-grid--2">
-            <NumberField
-              label="Max width"
-              value={width}
-              min={1}
-              suffix="px"
-              onChange={(nextWidth) =>
-                onTransform('Text max width', (current) => ({
-                  ...current,
-                  width: nextWidth,
-                  scaleX: 1,
-                }))
-              }
-            />
-            <NumberField
-              label="Max height"
-              value={height}
-              min={1}
-              suffix="px"
-              onChange={(nextHeight) =>
-                onTransform('Text max height', (current) => ({
-                  ...current,
-                  height: nextHeight,
-                  scaleY: 1,
-                }))
-              }
-            />
-          </div>
-          <div className="apx-text-v3-note">
-            <strong>Runtime semantics</strong>
-            <span>These are wrapping bounds, not geometric glyph scaling.</span>
-          </div>
-        </Section>
+        <div className="apx-text-v3-note" data-text-resize-hint>Resize the blue text box using its handles, or enter exact box dimensions in Style → Layout.</div>
 
         <Section
           title="Alignment"
@@ -808,6 +803,7 @@ export function VisualTextInspector({
   }
 
   if (tab === 'style') {
+    const fit = fitVisualTextToBox(props, width, height);
     return (
       <>
         {header}
@@ -1006,28 +1002,30 @@ export function VisualTextInspector({
             />
             <NumberField
               label="Max width"
-              value={layout.maxWidth ?? props.maxWidth ?? transform.width}
+              value={width}
               min={1}
               suffix="px"
               onChange={(maxWidth) =>
-                patch('Text max width', (current) => ({
-                  ...current,
-                  layout: { ...(current.layout ?? {}), maxWidth },
-                }))
+                onTransform('Text box width', (current) => ({ ...current, width: Math.max(8, maxWidth), scaleX: 1 }))
               }
             />
             <NumberField
               label="Max height"
-              value={layout.maxHeight ?? props.maxHeight ?? transform.height}
+              value={height}
               min={1}
               suffix="px"
               onChange={(maxHeight) =>
-                patch('Text max height', (current) => ({
-                  ...current,
-                  layout: { ...(current.layout ?? {}), maxHeight },
-                }))
+                onTransform('Text box height', (current) => ({ ...current, height: Math.max(8, maxHeight), scaleY: 1 }))
               }
             />
+          </div>
+          <div className="apx-text-v3-note" data-text-box-fit-status>
+            <strong>Linked to the blue text box: {Math.round(width * 100) / 100} × {Math.round(height * 100) / 100} px</strong>
+            <span>{props.textOnCurve || placement.perspective
+              ? 'Warped/curved text uses its own geometry; resize to update wrapping bounds.'
+              : 'Auto-fit · ' + fit.lineCount + ' lines · rendered font ' + Math.round(fit.fontSize * 100) / 100 + 'px · line spacing ' + Math.round(fit.fontSize * fit.lineHeight * 100) / 100 + 'px.'}
+              {fit.fullyFits ? '' : ' This box is too small for the complete text at the minimum size.'}
+            </span>
           </div>
         </Section>
 
