@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   AdjustmentsHorizontalIcon,
   ChartBarIcon,
@@ -98,6 +98,12 @@ function Section({
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  // A quick-style toggle can enable an effect after the tab has mounted.
+  // Open its advanced editor when it becomes active, without reopening
+  // sections the user subsequently closes manually.
+  useEffect(() => {
+    if (defaultOpen) setOpen(true);
+  }, [defaultOpen]);
   const Icon = sectionIcon(attr);
   return (
     <details
@@ -430,14 +436,7 @@ function GradientEditor({
 }
 
 function PaintEditor({
-  name,
-  color,
-  opacity,
-  gradient,
-  fallback,
-  onColor,
-  onOpacity,
-  onGradient,
+  name, color, opacity, gradient, fallback, onColor, onOpacity, onGradient,
 }: {
   name: string;
   color: string | undefined;
@@ -449,23 +448,21 @@ function PaintEditor({
   onGradient: (gradient: VisualGradient | undefined) => void;
 }) {
   return (
-    <div className="apx-text-v3-paint">
-      <div className="apx-text-v3-grid apx-text-v3-grid--2">
+    <div className="apx-text-v3-paint" data-text-paint={name.toLowerCase()} data-text-paint-mode={gradient ? 'gradient' : 'solid'}>
+      <div className="apx-text-v3-paint-modes" role="group" aria-label={name + ' paint mode'}>
+        <button type="button" data-text-paint-solid={name.toLowerCase()} aria-pressed={!gradient}
+          data-active={!gradient ? 'true' : undefined}
+          onClick={() => { if (gradient) onGradient(undefined); }}>Solid</button>
+        <button type="button" data-text-paint-gradient={name.toLowerCase()} aria-pressed={Boolean(gradient)}
+          data-active={gradient ? 'true' : undefined}
+          onClick={() => { if (!gradient) onGradient(defaultGradient()); }}>Gradient</button>
+      </div>
+      {!gradient ? (
         <ColorField label="Color" value={color} fallback={fallback} onChange={onColor} />
-        <NumberField label="Opacity" value={opacity ?? 1} min={0} max={1} step={0.01} onChange={onOpacity} />
-      </div>
-      <div className="apx-text-v3-toggle-row apx-text-v3-toggle-row--compact">
-        <span>
-          <strong>{name} gradient</strong>
-          <small>Use the shared Apexify gradient contract.</small>
-        </span>
-        <Toggle
-          label={name + ' gradient'}
-          checked={Boolean(gradient)}
-          onChange={(checked) => onGradient(checked ? defaultGradient() : undefined)}
-        />
-      </div>
-      {gradient ? <GradientEditor value={gradient} onChange={onGradient} /> : null}
+      ) : (
+        <GradientEditor value={gradient} onChange={onGradient} />
+      )}
+      <NumberField label="Opacity" value={opacity ?? 1} min={0} max={1} step={0.01} onChange={onOpacity} />
     </div>
   );
 }
@@ -503,12 +500,12 @@ function DecorationEditor({
       {active ? (
         <>
           <div className="apx-text-v3-grid apx-text-v3-grid--2">
-            <ColorField
+            {!styled.gradient ? <ColorField
               label="Color"
               value={styled.color}
               fallback={DEFAULT_FILL}
-              onChange={(color) => onChange({ ...styled, color })}
-            />
+              onChange={(color) => onChange({ ...styled, color, gradient: undefined })}
+            /> : null}
             <NumberField
               label="Width"
               value={styled.width ?? 1}
@@ -527,6 +524,7 @@ function DecorationEditor({
                 onChange({
                   ...styled,
                   gradient: checked ? defaultGradient() : undefined,
+                  color: checked ? undefined : (styled.color ?? DEFAULT_FILL),
                 })
               }
             />
@@ -534,7 +532,7 @@ function DecorationEditor({
           {styled.gradient ? (
             <GradientEditor
               value={styled.gradient}
-              onChange={(gradient) => onChange({ ...styled, gradient })}
+              onChange={(gradient) => onChange({ ...styled, gradient, color: gradient ? undefined : (styled.color ?? DEFAULT_FILL) })}
             />
           ) : null}
         </>
@@ -579,9 +577,19 @@ function MetricsPanel({ props }: { props: VisualTextNodeProps }) {
     ['Lines', metrics.lineCount ?? metrics.lines?.length ?? 1],
     ['Ascent', metrics.actualBoundingBoxAscent],
     ['Descent', metrics.actualBoundingBoxDescent],
+    ['Font box ascent', metrics.fontBoundingBoxAscent],
+    ['Font box descent', metrics.fontBoundingBoxDescent],
+    ['Alphabetic baseline', metrics.alphabeticBaseline],
+    ['Em ascent', metrics.emHeightAscent],
+    ['Em descent', metrics.emHeightDescent],
+    ['Hanging baseline', metrics.hangingBaseline],
+    ['Ideographic baseline', metrics.ideographicBaseline],
     ['Left', metrics.actualBoundingBoxLeft],
     ['Right', metrics.actualBoundingBoxRight],
     ['Baseline', metrics.baseline],
+    ['Top', metrics.top],
+    ['Bottom', metrics.bottom],
+    ['Total height', metrics.totalHeight],
     ['Center X', metrics.centerX],
     ['Center Y', metrics.centerY],
   ] as const;
@@ -604,14 +612,38 @@ function MetricsPanel({ props }: { props: VisualTextNodeProps }) {
       {metrics.lines?.length ? (
         <div className="apx-text-v3-lines">
           <strong>Measured lines</strong>
-          {metrics.lines.map((line, index) => (
+          {metrics.lines.slice(0, 100).map((line, index) => (
             <div key={index}>
               <span>{index + 1}</span>
               <code>{line.text || '∅'}</code>
-              <em>{line.width.toFixed(1)}px</em>
+              <em>{line.width.toFixed(1)} × {line.height.toFixed(1)}px</em>
             </div>
           ))}
+          {metrics.lines.length > 100 ? <small>Showing the first 100 lines; runtime results retain all lines.</small> : null}
         </div>
+      ) : null}
+      {metrics.lines?.length ? (
+        <details className="apx-text-v3-metric-details" data-text-line-metrics>
+          <summary>Per-line complete metrics ({metrics.lines.length})</summary>
+          <pre>{JSON.stringify(metrics.lines.slice(0, 100), null, 2)}</pre>
+          {metrics.lines.length > 100 ? <small>Showing the first 100 line-metric records for inspector performance.</small> : null}
+        </details>
+      ) : null}
+      {props.includeCharMetrics && metrics.charWidths ? (
+        <details className="apx-text-v3-metric-details" data-text-char-metrics>
+          <summary>Grapheme/character metrics ({metrics.charWidths.length})</summary>
+          <div className="apx-text-v3-metric-grid">
+            <div><span>Widths</span><strong>{metrics.charWidths.length}</strong></div>
+            <div><span>Positions</span><strong>{metrics.charPositions?.length ?? 0}</strong></div>
+          </div>
+          <pre>{JSON.stringify({
+            charWidths: metrics.charWidths.slice(0, 256),
+            charPositions: metrics.charPositions?.slice(0, 256),
+            displayed: Math.min(metrics.charWidths.length, 256),
+            total: metrics.charWidths.length,
+          }, null, 2)}</pre>
+          {metrics.charWidths.length > 256 ? <small>Showing the first 256 entries to keep the inspector responsive. The runtime measurement result retains all entries.</small> : null}
+        </details>
       ) : null}
     </>
   );
@@ -814,46 +846,94 @@ export function VisualTextInspector({
               }
             />
           </div>
-          <div className="apx-text-v3-inline-toggles">
-            <button
-              type="button"
-              data-active={(decorations.bold ?? props.bold) ? 'true' : undefined}
-              onClick={() =>
-                patch('Text bold', (current) => ({
-                  ...current,
-                  decorations: {
-                    ...(current.decorations ?? {}),
-                    bold: !(current.decorations?.bold ?? current.bold ?? false),
-                  },
-                }))
-              }
-            >
-              <strong>B</strong> Bold
-            </button>
-            <button
-              type="button"
-              data-active={(decorations.italic ?? props.italic) ? 'true' : undefined}
-              onClick={() =>
-                patch('Text italic', (current) => ({
-                  ...current,
-                  decorations: {
-                    ...(current.decorations ?? {}),
-                    italic: !(current.decorations?.italic ?? current.italic ?? false),
-                  },
-                }))
-              }
-            >
-              <em>I</em> Italic
-            </button>
+          <div className="apx-text-v3-quick-styles" role="group" aria-label="Text formatting">
+            {([
+              ['bold', 'B', 'Bold', (font.weight !== undefined
+                ? (typeof font.weight === 'number' ? font.weight >= 600 : ['bold', 'bolder'].includes(font.weight))
+                : Boolean(decorations.bold ?? props.bold ?? props.isBold))],
+              ['italic', 'I', 'Italic', (font.style !== undefined
+                ? font.style === 'italic' : Boolean(decorations.italic ?? props.italic))],
+              ['oblique', '/', 'Oblique', font.style === 'oblique'],
+              ['underline', 'U', 'Underline', Boolean(decorations.underline ?? props.underline)],
+              ['overline', 'O', 'Overline', Boolean(decorations.overline ?? props.overline)],
+              ['strike', 'S', 'Strike', Boolean(decorations.strikethrough ?? props.strikethrough)],
+              ['outline', '▢', 'Outline', Boolean(props.stroke)],
+              ['glow', '✦', 'Glow', Boolean(props.effects?.glow ?? props.glow)],
+              ['shadow', '◩', 'Shadow', Boolean(props.effects?.shadow ?? props.shadow)],
+            ] as const).map(([kind,glyph,label,selected]) => (
+              <button
+                key={kind}
+                type="button"
+                data-text-style={kind}
+                aria-label={label}
+                aria-pressed={selected}
+                data-active={selected ? 'true' : undefined}
+                title={label}
+                onClick={() => patch('Text style ' + label, (current) => {
+                  if (kind === 'bold') return {
+                    ...current,
+                    font: {...current.font, weight: selected ? 'normal' : 'bold'},
+                    decorations: {...current.decorations, bold: undefined},
+                    bold: undefined, isBold: undefined,
+                  };
+                  if (kind === 'italic' || kind === 'oblique') return {
+                    ...current,
+                    font: {...current.font, style: selected ? 'normal' : kind},
+                    decorations: {...current.decorations, italic: undefined},
+                    italic: undefined,
+                  };
+                  const decorationKey = kind === 'strike' ? 'strikethrough' : kind;
+                  if (kind === 'underline' || kind === 'overline' || kind === 'strike') {
+                    return {...current, decorations: {...current.decorations,
+                      [decorationKey]: selected ? undefined : {color: '#f4f7fb', width: 1},
+                    }, [decorationKey]: undefined };
+                  }
+                  if (kind === 'outline') return {
+                    ...current,
+                    stroke: selected ? undefined : {color:'#0b1730',width:1,style:'solid',opacity:1},
+                  };
+                  if (kind === 'glow' || kind === 'shadow') return {
+                    ...current,
+                    effects: {...current.effects, [kind]: selected ? undefined
+                      : kind === 'glow' ? {color:'#ffffff',intensity:8,opacity:.75}
+                      : {color:'#000000',blur:5,offsetX:2,offsetY:3,opacity:.8}},
+                    [kind]: undefined,
+                  };
+                  return current;
+                })}
+              >
+                <strong>{glyph}</strong>
+                <span>{label}</span>
+              </button>
+            ))}
           </div>
+          <details className="apx-text-v3-weight-details" data-text-advanced-weight>
+            <summary>Fine typography · weight and slant</summary>
+            <div className="apx-text-v3-grid apx-text-v3-grid--2">
+              <SelectField
+                label="Font weight"
+                value={String(font.weight ?? ((decorations.bold ?? props.bold ?? props.isBold) ? 'bold' : 'normal'))}
+                options={['normal','bold','bolder','lighter','100','200','300','400','500','600','700','800','900']}
+                onChange={(value) => patch('Font weight', current => ({
+                  ...current,
+                  font: {...current.font, weight: /^[0-9]+$/.test(value) ? Number(value) : value as 'normal'|'bold'|'bolder'|'lighter'},
+                  decorations: {...current.decorations, bold: undefined},
+                  bold: undefined, isBold: undefined,
+                }))}
+              />
+              <SelectField
+                label="Font slant"
+                value={font.style ?? ((decorations.italic ?? props.italic) ? 'italic' : 'normal')}
+                options={['normal','italic','oblique']}
+                onChange={(style) => patch('Font slant', current => ({
+                  ...current, font: {...current.font, style: style as 'normal'|'italic'|'oblique'},
+                  decorations: {...current.decorations, italic: undefined}, italic: undefined,
+                }))}
+              />
+            </div>
+          </details>
         </Section>
 
-        <Section title="Font weight and style" description="Explicit font properties override legacy bold and italic flags." attr="font-advanced">
-          <div className="apx-text-v3-grid apx-text-v3-grid--2">
-            <label className="apx-text-v3-field"><span>Font weight (100–900 or named)</span><input className="apx-text-v3-input" value={font.weight ?? ''} placeholder="normal, bold, or 700" onChange={(event) => {const raw=event.target.value.trim();const weight=raw ? (/^[0-9]+$/.test(raw) ? Number(raw) : raw as NonNullable<typeof font.weight>) : undefined;patch('Font weight',current=>({...current,font:{...current.font,weight}}));}} /></label>
-            <SelectField label="Font style" value={font.style ?? 'normal'} options={['normal','italic','oblique']} onChange={(style) => patch('Font style',current=>({...current,font:{...current.font,style:style as NonNullable<typeof font.style>}}))} />
-          </div>
-        </Section>
         <Section title="Fill" description="Solid or gradient glyph fill." attr="fill">
           <PaintEditor
             name="Fill"
@@ -864,7 +944,7 @@ export function VisualTextInspector({
             onColor={(color) =>
               patch('Text fill color', (current) => ({
                 ...current,
-                fill: { ...(current.fill ?? {}), color },
+                fill: { ...(current.fill ?? {}), color, gradient: undefined },
               }))
             }
             onOpacity={(opacity) =>
@@ -876,7 +956,7 @@ export function VisualTextInspector({
             onGradient={(gradient) =>
               patch('Text fill gradient', (current) => ({
                 ...current,
-                fill: { ...(current.fill ?? {}), gradient },
+                fill: { ...(current.fill ?? {}), gradient, color: gradient ? undefined : (current.fill?.color ?? '#f4f7fb') },
               }))
             }
           />
@@ -974,17 +1054,17 @@ export function VisualTextInspector({
           {props.stroke ? (
             <>
               <div className="apx-text-v3-grid apx-text-v3-grid--2">
-                <ColorField
+                {!props.stroke.gradient ? <ColorField
                   label="Color"
                   value={props.stroke.color}
                   fallback="#000000"
                   onChange={(color) =>
                     patch('Text stroke color', (current) => ({
                       ...current,
-                      stroke: { ...current.stroke!, color },
+                      stroke: { ...current.stroke!, color, gradient: undefined },
                     }))
                   }
-                />
+                /> : null}
                 <NumberField
                   label="Width"
                   value={props.stroke.width ?? 1}
@@ -1037,6 +1117,7 @@ export function VisualTextInspector({
                       stroke: {
                         ...current.stroke!,
                         gradient: checked ? defaultGradient() : undefined,
+                        color: checked ? undefined : (current.stroke?.color ?? '#000000'),
                       },
                     }))
                   }
@@ -1048,7 +1129,7 @@ export function VisualTextInspector({
                   onChange={(gradient) =>
                     patch('Text stroke gradient', (current) => ({
                       ...current,
-                      stroke: { ...current.stroke!, gradient },
+                      stroke: { ...current.stroke!, gradient, color: gradient ? undefined : (current.stroke?.color ?? '#000000') },
                     }))
                   }
                 />
@@ -1146,7 +1227,7 @@ export function VisualTextInspector({
                   ...current,
                   effects: {
                     ...(current.effects ?? {}),
-                    highlight: { ...(current.effects?.highlight ?? highlight), color },
+                    highlight: { ...(current.effects?.highlight ?? highlight), color, gradient: undefined },
                   },
                 }))
               }
@@ -1164,7 +1245,7 @@ export function VisualTextInspector({
                   ...current,
                   effects: {
                     ...(current.effects ?? {}),
-                    highlight: { ...(current.effects?.highlight ?? highlight), gradient },
+                    highlight: { ...(current.effects?.highlight ?? highlight), gradient, color: gradient ? undefined : (current.effects?.highlight?.color ?? "#ffff00") },
                   },
                 }))
               }
@@ -1210,7 +1291,7 @@ export function VisualTextInspector({
                     ...current,
                     effects: {
                       ...(current.effects ?? {}),
-                      glow: { ...(current.effects?.glow ?? glow), color },
+                      glow: { ...(current.effects?.glow ?? glow), color, gradient: undefined },
                     },
                   }))
                 }
@@ -1228,7 +1309,7 @@ export function VisualTextInspector({
                     ...current,
                     effects: {
                       ...(current.effects ?? {}),
-                      glow: { ...(current.effects?.glow ?? glow), gradient },
+                      glow: { ...(current.effects?.glow ?? glow), gradient, color: gradient ? undefined : (current.effects?.glow?.color ?? "#ffffff") },
                     },
                   }))
                 }
@@ -1296,7 +1377,7 @@ export function VisualTextInspector({
                     ...current,
                     effects: {
                       ...(current.effects ?? {}),
-                      shadow: { ...(current.effects?.shadow ?? shadow), color },
+                      shadow: { ...(current.effects?.shadow ?? shadow), color, gradient: undefined },
                     },
                   }))
                 }
@@ -1314,7 +1395,7 @@ export function VisualTextInspector({
                     ...current,
                     effects: {
                       ...(current.effects ?? {}),
-                      shadow: { ...(current.effects?.shadow ?? shadow), gradient },
+                      shadow: { ...(current.effects?.shadow ?? shadow), gradient, color: gradient ? undefined : (current.effects?.shadow?.color ?? "#000000") },
                     },
                   }))
                 }

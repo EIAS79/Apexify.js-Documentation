@@ -772,6 +772,7 @@ export default function VisualStudioPre4({
   const [autosaveState, setAutosaveState] = useState<'saved' | 'saving' | 'error'>('saved');
   const [lastAutosavedAt, setLastAutosavedAt] = useState<number | null>(null);
   const [activeTool, setActiveTool] = useState('canvas');
+  const [selectedTextPreset, setSelectedTextPreset] = useState<'default' | 'heading' | 'subheading' | 'body' | 'caption'>('default');
   const [inspectorTab, setInspectorTab] = useState<
     'style' | 'transform' | 'effects' | 'data' | 'advanced'
   >('style');
@@ -1652,7 +1653,8 @@ export default function VisualStudioPre4({
       !phase11Active &&
       !phase12Active &&
       !phase13Active &&
-      !phase14Active;
+      !phase14Active &&
+      !phase9Active;
 
     if (canRenderLocalVideoBg && activeVideoBg && activeVideoAsset) {
       const frameRequest: CanvasVideoFrameExtractionRequest = {
@@ -1732,6 +1734,7 @@ export default function VisualStudioPre4({
       /\bvideoBg\s*:/.test(source);
 
     if (
+      phase9Active ||
       phase14Active ||
       phase13Active ||
       phase12Active ||
@@ -4842,120 +4845,41 @@ export default function VisualStudioPre4({
 
     if (activeTool === 'text') {
       const textPresets = [
-        { id: 'heading', label: 'Heading', sample: 'Heading', size: 72, bold: true, maxWidth: 720 },
-        { id: 'subheading', label: 'Subheading', sample: 'Subheading', size: 40, bold: true, maxWidth: 640 },
-        { id: 'body', label: 'Body', sample: 'Body text', size: 24, bold: false, maxWidth: 520 },
-        { id: 'caption', label: 'Caption', sample: 'Caption', size: 16, bold: false, maxWidth: 420 },
+        { id: 'default', label: 'Regular · 48px', size: 48, bold: false, maxWidth: 420 },
+        { id: 'heading', label: 'Heading · 72px', size: 72, bold: true, maxWidth: 720 },
+        { id: 'subheading', label: 'Subheading · 40px', size: 40, bold: true, maxWidth: 640 },
+        { id: 'body', label: 'Body · 24px', size: 24, bold: false, maxWidth: 520 },
+        { id: 'caption', label: 'Caption · 16px', size: 16, bold: false, maxWidth: 420 },
       ] as const;
+      const chosen = textPresets.find(p => p.id === selectedTextPreset) ?? textPresets[0];
       return (
-        <div className="apx-media-context apx-text-v3-library" data-visual-text-context>
+        <div className="apx-media-context apx-text-v3-library apx-text-library-compact" data-visual-text-context>
           <div className="apx-media-context-copy">
             <strong>Text</strong>
-            <span>
-              Insert text and choose its starting typography here. Edit the selected
-              layer only from the right Inspector.
-            </span>
+            <span>Create one text layer, then edit its content, formatting and effects in the inspector.</span>
           </div>
-
-          <button
-            type="button"
-            className="apx-media-open-assets"
+          <label className="apx-text-v3-field">
+            <span>New layer style</span>
+            <select className="apx-text-v3-select" data-text-preset-picker
+              value={selectedTextPreset}
+              onChange={event => setSelectedTextPreset(event.target.value as typeof selectedTextPreset)}>
+              {textPresets.map(preset => <option key={preset.id} value={preset.id}>{preset.label}</option>)}
+            </select>
+          </label>
+          <button type="button" className="apx-media-open-assets"
             data-text-insert
-            onClick={() => insertText('Text')}
-          >
+            onClick={() => insertText(
+              'Text', undefined, undefined, undefined,
+              {size: chosen.size, bold: chosen.bold, maxWidth: chosen.maxWidth},
+            )}>
             <DocumentTextIcon />
-            Add text layer
+            Add text
           </button>
-
-          <div className="apx-media-context-heading">
-            <strong>Text presets</strong>
-            <span>Insert</span>
-          </div>
-          <div className="apx-text-v3-preset-grid">
-            {textPresets.map((preset) => (
-              <button
-                type="button"
-                key={preset.id}
-                data-text-preset={preset.id}
-                onClick={() =>
-                  insertText(
-                    preset.sample,
-                    undefined,
-                    undefined,
-                    undefined,
-                    {
-                      size: preset.size,
-                      bold: preset.bold,
-                      maxWidth: preset.maxWidth,
-                    },
-                  )
-                }
-              >
-                <strong style={{ fontSize: Math.min(20, Math.max(11, preset.size / 3)) }}>
-                  {preset.label}
-                </strong>
-                <small>{preset.size}px · {preset.bold ? 'bold' : 'regular'}</small>
-              </button>
-            ))}
-          </div>
-
-          <div className="apx-media-context-heading">
-            <strong>System fonts</strong>
-            <button type="button" onClick={() => openAssetWorkspace('font')}>
-              Fonts
+          <div className="apx-text-library-footer">
+            <span>{fontAssets.length} uploaded font{fontAssets.length === 1 ? '' : 's'} · Choose fonts in the inspector</span>
+            <button type="button" onClick={() => openAssetWorkspace('font')} data-text-manage-fonts>
+              Manage fonts
             </button>
-          </div>
-          <div className="apx-text-font-list apx-text-v3-font-list">
-            {systemFontFamilies.map((family) => (
-              <button
-                type="button"
-                key={family}
-                onClick={() => insertText('Text', undefined, undefined, family)}
-                data-text-font-family={family}
-                title={'Insert text using ' + family}
-              >
-                <strong style={{ fontFamily: family }}>{family}</strong>
-                <small>Insert with system font</small>
-              </button>
-            ))}
-          </div>
-
-          <div className="apx-media-context-heading">
-            <strong>Uploaded fonts</strong>
-            <button type="button" onClick={() => openAssetWorkspace('font')}>
-              Upload
-            </button>
-          </div>
-          <div className="apx-text-font-list apx-text-v3-font-list">
-            {fontAssets.length ? fontAssets.map((asset) => {
-              const family = studioAssetFontFamily(asset);
-              return (
-                <button
-                  type="button"
-                  key={asset.id}
-                  onClick={() => insertText('Text', undefined, asset)}
-                  data-font-asset-insert={asset.id}
-                  title={'Insert text using ' + family}
-                >
-                  <strong style={{ fontFamily: family }}>{family}</strong>
-                  <small>{asset.name}</small>
-                </button>
-              );
-            }) : (
-              <div className="apx-media-context-empty">
-                <DocumentTextIcon />
-                <strong>No uploaded fonts</strong>
-                <span>Use Fonts in Assets to add TTF, OTF, WOFF or WOFF2.</span>
-              </div>
-            )}
-          </div>
-
-          <div className="apx-live-sync-note">
-            <strong>Insertion / library only</strong>
-            <span>
-              Choosing a preset or font creates a new text layer. It never silently
-              changes the currently selected text.
-            </span>
           </div>
         </div>
       );

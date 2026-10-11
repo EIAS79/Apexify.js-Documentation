@@ -74,6 +74,9 @@ async function assertNoOverflow(page, label) {
 
 async function verifyDesktopHardening(page) {
   const layerSeparator = '[aria-label="Resize Layers panel"]';
+  // PRE-4 now uses the visible Layers control in the top bar.
+  const layersOpen = await page.$eval('[data-top-layers-toggle]', (node) => node.getAttribute('data-active') === 'true');
+  if (!layersOpen) await page.click('[data-top-layers-toggle]');
   await page.waitForSelector(layerSeparator, { visible: true });
   const beforeLayers = Number(
     await page.$eval(layerSeparator, (node) => node.getAttribute('aria-valuenow')),
@@ -85,9 +88,9 @@ async function verifyDesktopHardening(page) {
   );
   if (!(afterLayers > beforeLayers)) throw new Error('Layers separator keyboard resize failed');
 
-  await page.click('[data-phase17-collapse-layers]');
+  await page.click('[data-top-layers-toggle]');
   await page.waitForSelector('[data-studio-visual-workspace][data-phase17-layers-collapsed="true"]');
-  await page.click('[data-phase17-show-layers]');
+  await page.click('[data-top-layers-toggle]');
   await page.waitForFunction(
     () => !document.querySelector('[data-studio-visual-workspace]')?.hasAttribute('data-phase17-layers-collapsed'),
   );
@@ -134,8 +137,9 @@ async function verifyDesktopHardening(page) {
   if (!restored) throw new Error('Modal focus was not restored to the trigger');
 
   await page.click('[data-feature-tool="canvas"]');
-  await page.select('[data-canvas-base-mode]', 'color');
-  await page.click('[data-canvas-color-text]');
+  await page.click('button[data-inspector-tab="style"]');
+  await page.click('.apx-canvas-v2-segmented--6 button:nth-child(2)');
+  await page.click('input[aria-label="colorBg"]');
   await page.keyboard.down('Control');
   await page.keyboard.press('A');
   await page.keyboard.up('Control');
@@ -156,7 +160,7 @@ async function verifyDesktopHardening(page) {
   await page.reload({ waitUntil: 'networkidle2' });
   await page.waitForSelector('[data-studio-visual-workspace][data-active="true"]');
   await page.waitForFunction(
-    () => document.querySelector('[data-canvas-color-text]')?.value === '#234567',
+    () => document.querySelector('input[aria-label="colorBg"]')?.value === '#234567',
   );
 
   await page.evaluate(() => {

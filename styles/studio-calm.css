@@ -12373,3 +12373,144 @@ body[data-phase17-resizing="dock"]{
   border-color:#6078ff;
   background:#143761;
 }
+
+/* STUDIO-PARITY-3: bound expanded measureText detail to the inspector width. */
+.apx-text-v3-metric-details {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid #173b56;
+  border-radius: 7px;
+  background: #071a2a;
+  padding: 8px;
+}
+.apx-text-v3-metric-details > summary {
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b9d1e7;
+}
+.apx-text-v3-metric-details > pre {
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  max-height: 260px;
+  overflow: auto;
+  margin: 8px 0 0;
+  white-space: pre;
+  color: #b7cede;
+  font-size: 10px;
+  line-height: 1.45;
+}
+.apx-text-v3-metric-details > small {
+  display: block;
+  margin-top: 6px;
+  color: #7895ae;
+  font-size: 10px;
+}
+
+/* Phase 3 Text polish — compact insertion and unambiguous controls */
+.apx-text-library-compact {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding-bottom: 10px;
+}
+.apx-text-library-compact .apx-media-context-copy span {
+  line-height: 1.5;
+}
+.apx-text-library-compact [data-text-insert] {
+  min-height: 42px;
+  font-weight: 700;
+}
+.apx-text-library-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-top: 1px solid #20415d;
+}
+.apx-text-library-footer span {
+  flex: 1;
+  min-width: 125px;
+  font-size: 11px;
+  color: #90abc4;
+}
+.apx-text-library-footer button {
+  border: 1px solid #365774;
+  border-radius: 7px;
+  background: #0b2b49;
+  color: #b9d8fa;
+  padding: 7px 9px;
+  font-weight: 600;
+  font-size: 11px;
+  cursor: pointer;
+}
+.apx-text-v3-quick-styles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 6px;
+  margin-top: 9px;
+}
+.apx-text-v3-quick-styles button {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  min-height: 35px;
+  border: 1px solid #285474;
+  border-radius: 7px;
+  background: #09243b;
+  color: #9db8d2;
+  font-size: 11px;
+  cursor: pointer;
+}
+.apx-text-v3-quick-styles button strong {
+  font-size: 13px;
+  color: inherit;
+  font-weight: 800;
+}
+.apx-text-v3-quick-styles button[data-active="true"],
+.apx-text-v3-paint-modes button[data-active="true"] {
+  background: linear-gradient(135deg,#245ac1,#4536b6);
+  border-color: #7195ff;
+  color: #fff;
+}
+.apx-text-v3-quick-styles button:focus-visible,
+.apx-text-v3-paint-modes button:focus-visible,
+.apx-text-library-footer button:focus-visible {
+  outline: 2px solid #9bccff;
+  outline-offset: 2px;
+}
+.apx-text-v3-weight-details {
+  margin-top: 8px;
+  min-width: 0;
+}
+.apx-text-v3-weight-details > summary {
+  cursor: pointer;
+  padding: 7px 0;
+  color: #9db8d2;
+  font-size: 11px;
+}
+.apx-text-v3-weight-details > div {
+  margin-top: 7px;
+}
+.apx-text-v3-paint-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+.apx-text-v3-paint-modes button {
+  min-height: 32px;
+  border: 1px solid #315b7b;
+  border-radius: 7px;
+  color: #9db8d2;
+  background: #0a2943;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+}

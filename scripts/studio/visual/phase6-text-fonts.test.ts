@@ -538,3 +538,173 @@ test('Phase 3 advanced invalid font, perspective, skew and group transform fail 
     assert.ok(issues.some(issue=>issue.code===code),'missing safety gate '+code);
   }
 });
+test('Phase 3 MD reference enumerates the full createText control family', () => {
+  const inspector = fs.readFileSync('components/studio/visual/VisualTextInspector.tsx', 'utf8');
+  const advanced = fs.readFileSync('components/studio/visual/VisualTextAdvancedEditors.tsx', 'utf8');
+  for (const [name, sample] of [
+    ['font aliases / upload', 'Font registry'],
+    ['font weight / style', 'data-text-advanced-weight'],
+    ['solid, linear, radial and conic fills', "['linear', 'radial', 'conic']"],
+    ['gradient rotation', 'label="Rotate"'],
+    ['gradient pivots', 'label="Pivot X"'],
+    ['gradient repeat', "['no-repeat', 'repeat', 'reflect']"],
+    ['styled decorations', 'Styled line decoration'],
+    ['highlight', 'title="Highlight"'],
+    ['glow', 'title="Glow"'],
+    ['shadow', 'title="Shadow"'],
+    ['stroke and gradient', 'Stroke gradient'],
+    ['text layout', 'title="Layout"'],
+    ['alignment', 'title="Alignment"'],
+    ['baseline', 'label="Baseline"'],
+    ['circular curved text', 'title="Text on curve"'],
+    ['text measurement', 'title="measureText()"'],
+    ['per-text scale and skew', 'data-text-perspective'],
+    ['legacy compatibility', 'title="Legacy flags"'],
+    ['grouped rendering', 'title="CreateTextOptions"'],
+  ] as const) {
+    assert.ok((inspector + advanced).includes(sample), 'Missing MD createText inspector cohort: ' + name);
+  }
+  for (const [name, sample] of [
+    ['group pivot', "'pivotX'"],
+    ['group translation', "'translateX'"],
+    ['group scaling', "'scaleX'"],
+    ['group skew', "'skewX'"],
+    ['group opacity', "'opacity'"],
+    ['group blend modes', 'TEXT_BLEND_MODES'],
+    ['group perspective', 'Group perspective'],
+    ['corner order', 'Top left'],
+    ['perspective interpolation', "'bicubic'"],
+    ['perspective edge mode', "'mirror'"],
+  ] as const) {
+    assert.ok(advanced.includes(sample), 'Missing MD createText group control: ' + name);
+  }
+});
+
+test('Phase 3 MD createText option variants preserve compilation, code and reverse-sync', () => {
+  const { TEXT_BLEND_MODES } = require('../../../lib/studio/visual/text-contract') as typeof import('../../../lib/studio/visual/text-contract');
+  const quad = [
+    {x:20,y:20},{x:350,y:25},{x:340,y:190},{x:30,y:185}
+  ] as const;
+  const gradientStops = [{stop:0,color:'#112233'},{stop:1,color:'#ddeeff'}];
+  const linear = {type:'linear' as const,startX:0,startY:0,endX:300,endY:80,rotate:20,pivotX:100,pivotY:50,repeat:'reflect' as const,colors:gradientStops};
+  const radial = {type:'radial' as const,startX:30,startY:20,startRadius:5,endX:200,endY:140,endRadius:120,rotate:12,pivotX:60,pivotY:45,repeat:'repeat' as const,colors:gradientStops};
+  const conic = {type:'conic' as const,centerX:140,centerY:65,startAngle:20,rotate:5,pivotX:50,pivotY:70,colors:gradientStops};
+  const variants: Array<[string, import('../../../lib/studio/visual/model').VisualTextNodeProps]> = [
+    ['font numeric weight and oblique', {text:'Alpha',font:{size:33,family:'Arial',weight:700,style:'oblique'}}],
+    ...(['normal','bold','bolder','lighter'] as const).map(weight=>['named font weight '+weight,{text:'Alpha',font:{size:24,weight}}] as [string,import('../../../lib/studio/visual/model').VisualTextNodeProps]),
+    ...(['normal','italic','oblique'] as const).map(style=>['font style '+style,{text:'Alpha',font:{size:25,style}}] as [string,import('../../../lib/studio/visual/model').VisualTextNodeProps]),
+    ['font registration metadata', {text:'Alpha',font:{size:25,name:'RegisteredFont',path:'/fixtures/registered.ttf',family:'RegisteredFont'}}],
+    ['solid fill and opacity', {text:'Alpha',fill:{color:'#ffffff',opacity:0.4}}],
+    ['linear gradient geometry rotation pivots and repeat', {text:'Alpha',fill:{gradient:linear}}],
+    ['radial gradient geometry radius pivots and repeat', {text:'Alpha',fill:{gradient:radial}}],
+    ['conic gradient center angle rotation and pivots', {text:'Alpha',fill:{gradient:conic}}],
+    ['underline styled gradient', {text:'Alpha',decorations:{underline:{color:'#aabbcc',width:2,gradient:linear}}}],
+    ['overline styled gradient', {text:'Alpha',decorations:{overline:{color:'#aabbcc',width:1,gradient:radial}}}],
+    ['strikethrough styled gradient', {text:'Alpha',decorations:{strikethrough:{color:'#aabbcc',width:1,gradient:conic}}}],
+    ['bold italic decoration flags', {text:'Alpha',decorations:{bold:true,italic:true}}],
+    ['highlight', {text:'Alpha',effects:{highlight:{color:'#0000ff',opacity:.3,gradient:linear}}}],
+    ['glow', {text:'Alpha',effects:{glow:{color:'#112233',intensity:7,opacity:.7,gradient:radial}}}],
+    ['shadow', {text:'Alpha',effects:{shadow:{color:'#112233',offsetX:4,offsetY:-2,blur:8,opacity:.55,gradient:conic}}}],
+    ...(['solid','dashed','dotted','groove','ridge','double'] as const).map(style=>['stroke '+style,{text:'Alpha',stroke:{style,color:'#101010',width:2,opacity:.65,gradient:linear}}] as [string,import('../../../lib/studio/visual/model').VisualTextNodeProps]),
+    ['layout wrapping spacing', {text:'Longwordwithoutbreak unicode 👩‍💻\nsecond line',layout:{lineHeight:1.5,letterSpacing:2,wordSpacing:3,maxWidth:210,maxHeight:175}}],
+    ...(['left','center','right','start','end'] as const).map(textAlign=>['align '+textAlign,{text:'Alpha',placement:{textAlign}}] as [string,import('../../../lib/studio/visual/model').VisualTextNodeProps]),
+    ...(['top','middle','alphabetic','bottom','hanging','ideographic'] as const).map(textBaseline=>['baseline '+textBaseline,{text:'Alpha',placement:{textBaseline}}] as [string,import('../../../lib/studio/visual/model').VisualTextNodeProps]),
+    ['rotation scaling and skew both axes', {text:'Alpha',placement:{rotation:25,scaleX:1.25,scaleY:.8,skewX:9,skewY:-6}}],
+    ...(['nearest','bilinear','bicubic'] as const).flatMap(interpolation=>(['transparent','clamp','wrap','mirror'] as const).map(edgeMode=>['text perspective '+interpolation+' '+edgeMode,{text:'Alpha',placement:{perspective:{points:quad.map(p=>({...p})) as never,interpolation,edgeMode}}}] as [string,import('../../../lib/studio/visual/model').VisualTextNodeProps])),
+    ...(['fit','clamp','override'] as const).map(layoutMode=>['curve '+layoutMode,{text:'Curved\nlongwordwithoutbreak 👩‍💻',textOnCurve:{sweepAngle:200,radius:120,up:true,layoutMode,baselineOffset:3,startAngleDeg:15},layout:{maxWidth:190,lineHeight:1.2}}] as [string,import('../../../lib/studio/visual/model').VisualTextNodeProps]),
+    ['single isolated group', {text:'Alpha',createOptions:{isGrouped:true,groupTransform:{rotation:8,translateX:5,translateY:6,scaleX:1.1,scaleY:.9,skewX:3,skewY:-3,pivotX:110,pivotY:90,opacity:.8,blendMode:'screen',perspective:{points:quad.map(p=>({...p})) as never,interpolation:'bicubic',edgeMode:'clamp'}}}}],
+    ['asset resolution', {text:'Alpha',painterOpts:{resolveAssetRefs:true}}],
+    ['legacy isBold and outlined', {text:'Alpha',isBold:true,outlined:true}],
+    ['measurement / characters', {text:'Alpha 👨‍👩‍👧‍👦',includeCharMetrics:true,measurementCanvas:{width:480,height:300}}],
+  ];
+  for (let i=0;i<variants.length;i++) {
+    const [label,props]=variants[i];
+    const project=createVisualProject({id:'md_create_text_'+i,name:label,width:640,height:420,now:'2026-10-11T00:00:00.000Z'});
+    const node=createVisualNode('text',textPropsRecord(props),{id:'text_md_'+i,name:label});
+    project.document.nodes[node.id]=node;project.document.rootNodeIds=[node.id];
+    const check=validateVisualProject(project);
+    assert.equal(check.ok,true,label+': '+JSON.stringify(check.issues));
+    const operations=lowerVisualProject(project).operations;
+    const lowered = operations.find(op=>op.kind==='create-text');
+    assert.ok(lowered && lowered.kind==='create-text',label+' missing create-text operation');
+    if(lowered && lowered.kind==='create-text' && !Array.isArray(lowered.properties)) {
+      for(const [key,value] of Object.entries(props)){
+        if(key==='painterOpts'){
+          assert.deepEqual(lowered.painterOpts,value,label+' lost painterOpts');
+        }else if(key==='createOptions'){
+          assert.deepEqual(lowered.options,value,label+' lost CreateTextOptions');
+        }else{
+          assert.deepEqual((lowered.properties as unknown as Record<string,unknown>)[key],value,label+' lost '+key);
+        }
+      }
+    }
+    const code=generateVisualProjectCode(project).source;
+    const synced=reconcileVisualProjectFromCode(project,code);
+    assert.equal(synced.ok,true,label+': '+(synced.ok?'':synced.error));
+    if(synced.ok)assert.equal(generateVisualProjectCode(synced.project).source,code,label+': unstable Visual -> Code -> Visual');
+  }
+  assert.ok(variants.length>=55,'MD option matrix coverage unexpectedly shrank');
+  for (const blendMode of TEXT_BLEND_MODES) {
+    const p=createVisualProject({id:'blend_'+blendMode,name:'blend',width:640,height:420,now:'2026-10-11T00:00:00.000Z'});
+    const a=createVisualNode('text',textPropsRecord({text:'A'}),{id:'a'});
+    const b=createVisualNode('text',textPropsRecord({text:'B'}),{id:'b'});
+    const g=createVisualNode('group',textBatchGroupPropsRecord({textBatch:true,createOptions:{isGrouped:true,groupTransform:{blendMode,opacity:.6}}}),{id:'g'});
+    a.parentId='g';b.parentId='g';g.childIds=['a','b'];p.document.nodes.a=a;p.document.nodes.b=b;p.document.nodes.g=g;p.document.rootNodeIds=['g'];
+    const v=validateVisualProject(p);
+    assert.equal(v.ok,true,blendMode+': '+JSON.stringify(v.issues));
+    const ops=lowerVisualProject(p).operations;
+    const op=ops.find(x=>x.kind==='create-text');
+    assert.ok(op&&op.kind==='create-text',blendMode+' operation missing');
+    if(op&&op.kind==='create-text')assert.equal(op.options?.groupTransform?.blendMode,blendMode);
+    const source=generateVisualProjectCode(p).source;
+    const synced=reconcileVisualProjectFromCode(p,source);
+    assert.equal(synced.ok,true,blendMode+': '+(synced.ok?'':synced.error));
+    if(synced.ok)assert.equal(generateVisualProjectCode(synced.project).source,source,blendMode+': unstable round-trip');
+  }
+});
+
+test('Text content can grow beyond its initial selection frame unless explicitly height-limited', () => {
+  const project = phase6Project();
+  const textNode = Object.values(project.document.nodes).find(node => node.kind === 'text');
+  assert.ok(textNode);
+  textNode.transform = {...textNode.transform, height: 72};
+  const props = visualTextProps(textNode);
+  textNode.props = textPropsRecord({...props, layout:{...props.layout,maxHeight:undefined}, text:'One long line that should wrap.\nTwo lines.\nThree lines.\nFour lines.\nFive lines.'});
+  const first=lowerVisualProject(project).operations.find(x=>x.kind==='create-text');
+  assert.ok(first && first.kind==='create-text');
+  assert.equal(first.properties && !Array.isArray(first.properties) ? first.properties.layout?.maxHeight : undefined,undefined,'Implicit editor frame clipped multiline text');
+  textNode.props=textPropsRecord({...visualTextProps(textNode),layout:{...visualTextProps(textNode).layout,maxHeight:240}});
+  const bounded=lowerVisualProject(project).operations.find(x=>x.kind==='create-text');
+  assert.ok(bounded && bounded.kind==='create-text');
+  assert.equal(bounded.properties && !Array.isArray(bounded.properties) ? bounded.properties.layout?.maxHeight : undefined,240,'User-defined text height bound was ignored');
+});
+
+test('Text UI has a single insert action, constrained weight options and exclusive paint mode controls',()=>{
+  const shell=fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx','utf8');
+  const inspector=fs.readFileSync('components/studio/visual/VisualTextInspector.tsx','utf8');
+  const textLibrary=shell.slice(shell.indexOf("if (activeTool === 'text') {"),shell.indexOf("if (activeTool === 'shapes') {"));
+  assert.equal((textLibrary.match(/data-text-insert/g)||[]).length,1);
+  assert.match(textLibrary,/data-text-preset-picker/);
+  assert.doesNotMatch(textLibrary,/data-font-asset-insert|data-text-font-family/);
+  assert.match(inspector,/data-text-style=\{kind\}/);
+  assert.match(inspector,/data-text-advanced-weight/);
+  assert.match(inspector,/options=\{\['normal','bold','bolder','lighter','100'/);
+  assert.match(inspector,/data-text-paint-mode=\{gradient \? 'gradient' : 'solid'\}/);
+  assert.match(inspector,/!gradient \? \(/);
+  assert.match(inspector,/!props\.stroke\.gradient \?/);
+  assert.match(inspector,/!styled\.gradient \?/);
+});
+
+test('Clearing text content during editing never invalidates the whole Visual project', () => {
+  const project=phase6Project();
+  const text=Object.values(project.document.nodes).find(node=>node.kind==='text');
+  assert.ok(text);
+  text.props=textPropsRecord({...visualTextProps(text),text:''});
+  const check=validateVisualProject(project);
+  assert.equal(check.ok,true,JSON.stringify(check.issues));
+  const op=lowerVisualProject(project).operations.find(x=>x.kind==='create-text');
+  assert.ok(op&&op.kind==='create-text');
+  if(!op||op.kind!=='create-text'||Array.isArray(op.properties)) return;
+  assert.equal(op.properties.text,' ');
+  assert.equal(visualTextProps(text).text,'','Authoring value must remain empty');
+});

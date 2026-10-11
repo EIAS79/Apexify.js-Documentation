@@ -631,6 +631,9 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
     'createOptions',
     'painterOpts',
   ]) delete raw[key];
+  // A cleared text editor must not break the entire live artboard.
+  // Preserve the empty authoring value; emit a harmless whitespace glyph.
+  if (raw.text === '') raw.text = ' ';
   const props = raw as VisualTextNodeProps;
   const transform = node.transform ?? {};
   const layout = {
@@ -651,13 +654,10 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
               : props.layout?.maxWidth,
         }
       : {}),
-    ...((transform.height !== undefined || props.layout?.maxHeight !== undefined)
-      ? {
-          maxHeight:
-            transform.height !== undefined
-              ? transform.height * (transform.scaleY ?? 1)
-              : props.layout?.maxHeight,
-        }
+    // The selection frame is not a runtime clipping bound.
+    // Allow long/multiline text to grow unless the user sets maxHeight.
+    ...(props.layout?.maxHeight !== undefined
+      ? { maxHeight: props.layout.maxHeight }
       : {}),
   };
   const placement = {

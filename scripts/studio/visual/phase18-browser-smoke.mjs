@@ -61,15 +61,30 @@ async function audit(page, name) {
   if (violations.length) throw new Error(name + ': critical accessibility violations ' + JSON.stringify(violations));
 }
 
-async function waitForDownload(dir, extension, previous = new Set()) {
-  const deadline = Date.now() + 10000;
+function downloadSnapshot(dir) {
+  return new Map(fs.readdirSync(dir).map((name) => {
+    const stat = fs.statSync(path.join(dir, name));
+    return [name, { size: stat.size, modified: stat.mtimeMs }];
+  }));
+}
+
+async function waitForDownload(dir, extension, previous = new Map()) {
+  const deadline = Date.now() + 15000;
   while (Date.now() < deadline) {
     const files = fs.readdirSync(dir).filter((name) => !name.endsWith('.crdownload'));
-    const match = files.find((name) => name.endsWith(extension) && !previous.has(name));
+    const match = files.find((name) => {
+      if (!name.endsWith(extension)) return false;
+      const before = previous.get(name);
+      if (!before) return true;
+      const current = fs.statSync(path.join(dir, name));
+      return current.size !== before.size || current.mtimeMs > before.modified + 1;
+    });
     if (match) return match;
     await new Promise((resolve) => setTimeout(resolve, 150));
   }
-  throw new Error('Timed out waiting for ' + extension + ' download');
+  throw new Error('Timed out waiting for ' + extension + ' download. Before=' +
+    JSON.stringify([...previous.entries()]) + ' After=' +
+    JSON.stringify([...downloadSnapshot(dir).entries()]));
 }
 
 async function representativeProjectProof(page) {
@@ -115,10 +130,11 @@ async function representativeProjectProof(page) {
       (node) => ({
         failed: node.textContent?.includes('Preview unavailable') ?? false,
         media: Boolean(node.querySelector('img, audio, video')),
+        detail: (node.textContent || '').slice(0, 1300),
       }),
     );
     if (previewState.failed || !previewState.media) {
-      throw new Error(fixture.id + ': production Preview path produced no authoritative artifact');
+      throw new Error(fixture.id + ': production Preview path produced no authoritative artifact: ' + JSON.stringify(previewState));
     }
     await page.click('[data-visual-preview-modal-close]');
     await page.waitForSelector('[data-visual-preview-modal]', { hidden: true });
@@ -206,11 +222,11 @@ async function desktopReleaseProof(page) {
   const zoomAfter = await page.$eval('[data-visual-preview-modal] .apx-vmodal-zoom', (node) => node.textContent);
   if (zoomBefore === zoomAfter) throw new Error('Preview modal zoom control did not update');
 
-  const beforePreviewDownload = new Set(fs.readdirSync(downloads));
+  const beforePreviewDownload = downloadSnapshot(downloads);
   await page.click('[data-visual-preview-modal] .apx-vmodal-primary');
   await waitForDownload(downloads, '.png', beforePreviewDownload).catch(async () => {
     // Advanced formats are valid; require any completed Preview download if not PNG.
-    const deadline = Date.now() + 10000;
+    const deadline = Date.now() + 15000;
     while (Date.now() < deadline) {
       const files = fs.readdirSync(downloads).filter((name) => !name.endsWith('.crdownload'));
       if (files.some((name) => !beforePreviewDownload.has(name))) return;
@@ -232,7 +248,7 @@ async function desktopReleaseProof(page) {
   await page.keyboard.press('A');
   await page.keyboard.up('Control');
   await page.keyboard.type('phase18-release.ts');
-  const beforeCodeDownload = new Set(fs.readdirSync(downloads));
+  const beforeCodeDownload = downloadSnapshot(downloads);
   await page.click('[data-visual-code-modal] .apx-vmodal-primary');
   await waitForDownload(downloads, '.ts', beforeCodeDownload);
   await page.click('[data-visual-code-modal-close]');
@@ -241,14 +257,14 @@ async function desktopReleaseProof(page) {
   const exportDetails = 'details.apx-pre4-export';
   await page.click(exportDetails + ' > summary');
   await page.waitForSelector('[data-phase15-single-file-export]', { visible: true });
-  const beforeSingle = new Set(fs.readdirSync(downloads));
+  const beforeSingle = downloadSnapshot(downloads);
   await page.click('[data-phase15-single-file-export]');
   await waitForDownload(downloads, '.ts', beforeSingle);
 
   // The export menu remains open after the single-file download; keep it open
   // and exercise the project bundle action from the same menu state.
   await page.waitForSelector('[data-phase15-project-export]', { visible: true });
-  const beforeBundle = new Set(fs.readdirSync(downloads));
+  const beforeBundle = downloadSnapshot(downloads);
   await page.click('[data-phase15-project-export]');
   await waitForDownload(downloads, '.zip', beforeBundle);
 

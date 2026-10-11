@@ -355,8 +355,10 @@ export function validateVisualTextNode(
   const props = visualTextProps(node);
   const path = 'document.nodes.' + node.id + '.props';
 
-  if (typeof props.text !== 'string' || !props.text.length) {
-    push(issues, 'text-content', path + '.text', 'Text must be a non-empty string.');
+  // An empty layer is a valid transient editing state. The compiler renders
+  // a transparent-width whitespace sentinel rather than failing the canvas.
+  if (typeof props.text !== 'string') {
+    push(issues, 'text-content', path + '.text', 'Text must be a string.');
   } else if (props.text.length > 1_000_000) {
     push(issues, 'text-length', path + '.text', 'Text exceeds the runtime text-length limit.');
   }
@@ -758,8 +760,9 @@ export function measureVisualTextInBrowser(
     props.font?.family ??
     props.fontFamily ??
     'Arial';
-  const weight = (props.decorations?.bold ?? props.bold) ? 'bold' : 'normal';
-  const style = (props.decorations?.italic ?? props.italic) ? 'italic' : 'normal';
+  // Mirror runtime typography precedence in this explicitly approximate browser view.
+  const weight = props.font?.weight ?? ((props.decorations?.bold ?? props.bold ?? props.isBold) ? 'bold' : 'normal');
+  const style = props.font?.style ?? ((props.decorations?.italic ?? props.italic) ? 'italic' : 'normal');
   const lineHeightMultiplier = props.layout?.lineHeight ?? props.lineHeight ?? 1.4;
   const maxWidth = props.layout?.maxWidth ?? props.maxWidth;
 

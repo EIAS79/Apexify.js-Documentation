@@ -404,3 +404,14 @@ test('Phase 9 permanent UI owns Components, placeholders, refs and lifecycle act
     assert.ok(ui.includes(marker), 'missing Phase 9 UI marker ' + marker);
   }
 });
+
+test('Phase 9 Studio Preview routes scenes to the authoritative Node renderer', () => {
+  const shell = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
+  const start = shell.indexOf('const renderAuthoritativeVisualSource = async');
+  const end = shell.indexOf('  useEffect(() => {', start);
+  assert.ok(start >= 0 && end > start, 'Studio preview router missing');
+  const router = shell.slice(start, end);
+  assert.match(router, /if\s*\(\s*phase9Active\s*\|\|\s*phase14Active/);
+  assert.match(router, /currentNodeServerExecutionAdapter\.run/);
+  assert.match(router, /!phase14Active\s*&&\s*!phase9Active/);
+});
