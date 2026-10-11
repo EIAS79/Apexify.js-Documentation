@@ -2,10 +2,10 @@ import type { VisualTextNodeProps } from './model';
 import { measureVisualTextInBrowser } from './text-contract';
 
 /**
- * The visual bounding rectangle is the authoritative wrap/fit box.
- * Apexify's public createText() wraps at maxWidth and truncates at maxHeight;
- * it does not automatically shrink content. Studio computes render-only fitted
- * typography, leaving the user's requested font and spacing untouched.
+ * The visual rectangle controls text wrapping and clipping boundaries.
+ * Font size, line height and spacing are ALWAYS user-authoritative.
+ * Width changes wrap lines, never glyph size; overflow is reported,
+ * never silently corrected by shrinking typography.
  */
 export type VisualTextBoxFit = {
   width: number;
@@ -118,50 +118,27 @@ export function fitVisualTextToBox(
 ): VisualTextBoxFit {
   const width = Math.max(1, rawWidth);
   const height = Math.max(1, rawHeight);
-  const preferredSize = Math.max(0.1, props.font?.size ?? props.fontSize ?? 16);
-  const leading = Math.max(0.01, props.layout?.lineHeight ?? props.lineHeight ?? 1.4);
-  const preferredLetterSpacing = props.layout?.letterSpacing ?? props.letterSpacing ?? 0;
-  const preferredWordSpacing = props.layout?.wordSpacing ?? props.wordSpacing ?? 0;
-
+  const fontSize = Math.max(0.1, props.font?.size ?? props.fontSize ?? 16);
+  const lineHeight = Math.max(0.01, props.layout?.lineHeight ?? props.lineHeight ?? 1.4);
+  const letterSpacing = props.layout?.letterSpacing ?? props.letterSpacing ?? 0;
+  const wordSpacing = props.layout?.wordSpacing ?? props.wordSpacing ?? 0;
   const key = JSON.stringify([
     props.text, props.font, props.decorations?.bold, props.decorations?.italic,
     props.isBold, props.textOnCurve, props.placement?.textAlign,
-    width, height, leading, preferredLetterSpacing, preferredWordSpacing,
+    width, height, lineHeight, letterSpacing, wordSpacing,
     typeof document !== 'undefined',
   ]);
   const cached = fitCache.get(key);
   if (cached) return cached;
-
-  // Leave at least one logical pixel between the final line and the box edge.
-  const safeHeight = Math.max(0.5, height - 2);
-  const safeWidth = Math.max(0.5, width - 2);
-  const measure = (scale: number) => {
-    const size = preferredSize * scale;
-    const letterSpacing = preferredLetterSpacing * scale;
-    const wordSpacing = preferredWordSpacing * scale;
-    const sample = lineMetrics(props, width, size, letterSpacing, wordSpacing, leading);
-    // Glyphs can extend beyond a small requested line-height multiplier.
-    const contentHeight = Math.max(1, sample.count) * size * Math.max(1, leading);
-    return {
-      width, height, fontSize: size, lineHeight: leading, letterSpacing,
-      wordSpacing, lineCount: Math.max(1, sample.count), contentHeight,
-      measuredWidth: sample.maxWidth, scale,
-      fullyFits: contentHeight <= safeHeight && sample.maxWidth <= safeWidth,
-    };
+  const sample = lineMetrics(props, width, fontSize, letterSpacing, wordSpacing, lineHeight);
+  const lineCount = Math.max(1, sample.count);
+  const contentHeight = lineCount * fontSize * Math.max(1, lineHeight);
+  const result: VisualTextBoxFit = {
+    width, height, fontSize, lineHeight, letterSpacing, wordSpacing,
+    lineCount, contentHeight, measuredWidth: sample.maxWidth,
+    scale: 1,
+    fullyFits: contentHeight <= height && sample.maxWidth <= width,
   };
-  let result = measure(1);
-  if (!result.fullyFits) {
-    let lower = 0;
-    let upper = 1;
-    for (let index = 0; index < 13; index++) {
-      const middle = (lower + upper) / 2;
-      const trial = measure(middle);
-      if (trial.fullyFits) { lower = middle; result = trial; }
-      else upper = middle;
-    }
-    // Round down, never up, to retain a margin after serialization.
-    result = measure(Math.max(0.0001, Math.floor(lower * 10000) / 10000));
-  }
   if (fitCache.size >= CACHE_LIMIT) fitCache.clear();
   fitCache.set(key, result);
   return result;

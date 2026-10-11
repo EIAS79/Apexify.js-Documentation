@@ -960,7 +960,7 @@ export function VisualTextInspector({
 
         <Section
           title="Layout"
-          description="Line rhythm, spacing and wrap limits."
+          description="Width changes wrapping, height limits visible lines; font size stays independent."
           attr="layout"
         >
           <div className="apx-text-v3-grid apx-text-v3-grid--2">
@@ -1021,11 +1021,24 @@ export function VisualTextInspector({
           </div>
           <div className="apx-text-v3-note" data-text-box-fit-status>
             <strong>Linked to the blue text box: {Math.round(width * 100) / 100} × {Math.round(height * 100) / 100} px</strong>
-            <span>{props.textOnCurve || placement.perspective
-              ? 'Warped/curved text uses its own geometry; resize to update wrapping bounds.'
-              : 'Auto-fit · ' + fit.lineCount + ' lines · rendered font ' + Math.round(fit.fontSize * 100) / 100 + 'px · line spacing ' + Math.round(fit.fontSize * fit.lineHeight * 100) / 100 + 'px.'}
-              {fit.fullyFits ? '' : ' This box is too small for the complete text at the minimum size.'}
+            <span data-text-overflow={fit.fullyFits ? undefined : 'true'}>
+              {props.textOnCurve || placement.perspective
+                ? 'Curved or perspective text has its own warp geometry.'
+                : 'Wrap only · ' + fit.lineCount + ' lines · font ' + Math.round(fit.fontSize * 100) / 100
+                  + 'px (fixed) · line spacing ' + Math.round(fit.fontSize * fit.lineHeight * 100) / 100 + 'px.'}
+              {!fit.fullyFits
+                ? ' Content may be clipped: approximately ' + Math.ceil(fit.contentHeight)
+                  + 'px is needed. Increase box height, or explicitly reduce font size/spacing.'
+                : ''}
             </span>
+            {!fit.fullyFits && !props.textOnCurve && !placement.perspective ? (
+              <button type="button" data-text-expand-height
+                onClick={() => onTransform('Expand text box height', current => ({
+                  ...current, height: Math.ceil(fit.contentHeight + 4),
+                }))}>
+                Expand box to fit text
+              </button>
+            ) : null}
           </div>
         </Section>
 

@@ -24,7 +24,7 @@ import {
   visualTextBatchGroupProps,
   visualTextProps,
 } from '../text-contract';
-import { fitVisualTextToBox, textBoxAnchorOffset } from '../text-box-fit';
+import { textBoxAnchorOffset } from '../text-box-fit';
 import {
   visualChartProps,
   type VisualStandaloneChartFamily,
@@ -642,18 +642,15 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
   const ownsFrame = studioFrameFit && Number.isFinite(transform.width) && Number.isFinite(transform.height);
   const frameWidth = Math.max(1, transform.width ?? props.layout?.maxWidth ?? 360);
   const frameHeight = Math.max(1, transform.height ?? props.layout?.maxHeight ?? 100);
-  const fit = ownsFrame && !props.textOnCurve && !props.placement?.perspective
-    ? fitVisualTextToBox(props, frameWidth, frameHeight)
-    : null;
   const layout = {
     ...(props.layout?.lineHeight !== undefined
       ? { lineHeight: props.layout.lineHeight }
       : {}),
-    ...((fit?.letterSpacing !== undefined || props.layout?.letterSpacing !== undefined)
-      ? { letterSpacing: fit?.letterSpacing ?? props.layout?.letterSpacing }
+    ...(props.layout?.letterSpacing !== undefined
+      ? { letterSpacing: props.layout.letterSpacing }
       : {}),
-    ...((fit?.wordSpacing !== undefined || props.layout?.wordSpacing !== undefined)
-      ? { wordSpacing: fit?.wordSpacing ?? props.layout?.wordSpacing }
+    ...(props.layout?.wordSpacing !== undefined
+      ? { wordSpacing: props.layout.wordSpacing }
       : {}),
     // Fit-enabled layers are bounded by the blue rectangle. Imported raw
     // code remains byte-compatible with the source TextProperties contract.
@@ -702,7 +699,7 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
       : {}),
   };
 
-  const renderSize = fit?.fontSize ?? props.font?.size ?? props.fontSize ?? 16;
+  const renderSize = props.font?.size ?? props.fontSize ?? 16;
   const boxAnchor = textBoxAnchorOffset(props.placement, frameWidth, renderSize);
 
   return {
@@ -711,7 +708,6 @@ function textOperationProperties(node: VisualNode): StudioTextProperties {
     // Align that anchor with the left/top of the blue selection rectangle.
     x: (transform.x ?? 0) + (ownsFrame ? boxAnchor.x : 0),
     y: (transform.y ?? 0) + (ownsFrame ? boxAnchor.y : 0),
-    ...(fit && fit.scale < 1 ? { font: { ...props.font, size: fit.fontSize } } : {}),
     ...(Object.keys(layout).length ? { layout } : {}),
     ...(Object.keys(placement).length ? { placement } : {}),
     ...(Object.keys(fill).length ? { fill } : {}),

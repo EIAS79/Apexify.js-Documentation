@@ -4,7 +4,7 @@ import test from 'node:test';
 
 import { createVisualProject, createVisualNode } from '../../../lib/studio/visual/project';
 import { defaultTextNodeProps, textPropsRecord, visualTextProps } from '../../../lib/studio/visual/text-contract';
-import { resizeNode, patchNodeTransform } from '../../../lib/studio/visual/editor';
+import { resizeNode, patchNodeTransform, moveNodes } from '../../../lib/studio/visual/editor';
 import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { fitVisualTextToBox } from '../../../lib/studio/visual/text-box-fit';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
@@ -49,17 +49,19 @@ test('Blue selection frame overrides stale maxWidth and maxHeight in emitted cre
   const props = lowered(p);
   assert.equal(props.layout?.maxWidth, 320);
   assert.equal(props.layout?.maxHeight, 170);
-  assert.ok((props.font?.size ?? 0) < 48, 'Long, widely spaced content needs to shrink');
+  assert.equal(props.font?.size, 48, 'Wrap width must not change user-selected font size');
   assert.ok((props.y ?? 0) >= 41, 'First baseline must remain inside box top');
   assert.ok((props.x ?? 0) >= 55 && (props.x ?? 0) <= 375, 'Text anchor must remain inside box horizontally');
   assert.equal('studioFrameFit' in props, false, 'Editor-only field leaked into createText API');
   const fit = fitVisualTextToBox(visualTextProps(p.document.nodes.text_box), 320, 170);
-  assert.ok(fit.fullyFits, JSON.stringify(fit));
-  assert.ok(fit.measuredWidth <= 320);
-  assert.ok(fit.contentHeight <= 170);
+  assert.equal(fit.scale, 1);
+  assert.equal(fit.fontSize, 48);
+  assert.equal(fit.letterSpacing, 20.5);
+  assert.ok(!fit.fullyFits, 'Overflow should be reported rather than shrinking text');
+  assert.ok(fit.contentHeight > 170);
 });
 
-test('Resizing the blue box changes emitted wrap width, height, reflow and font fit together', () => {
+test('Resizing the blue box changes wrap width and height without resizing glyphs', () => {
   const before = textBoxProject(160, 160);
   const first = lowered(before);
   const enlarged = resizeNode(before, 'text_box', 'e', 320, 0);
@@ -70,18 +72,24 @@ test('Resizing the blue box changes emitted wrap width, height, reflow and font 
   const second = lowered(enlarged);
   assert.equal(second.layout?.maxWidth, 480);
   assert.equal(second.layout?.maxHeight, 160);
-  assert.ok((second.font?.size ?? 48) >= (first.font?.size ?? 48),
-    'Expanding horizontally should restore size, not shrink it');
+  assert.equal(first.font?.size, 48);
+  assert.equal(second.font?.size, 48);
+  assert.equal(second.layout?.letterSpacing, 20.5);
+  const originalMetrics = fitVisualTextToBox(visualTextProps(before.document.nodes.text_box),160,160);
+  const widerMetrics = fitVisualTextToBox(text,480,160);
+  assert.ok(widerMetrics.lineCount <= originalMetrics.lineCount, 'Wider box should reduce wrapping');
   const thin = resizeNode(enlarged, 'text_box', 's', 0, -85);
   assert.equal(thin.document.nodes.text_box.transform?.height, 75);
   assert.equal(visualTextProps(thin.document.nodes.text_box).layout?.maxHeight, 75);
   const third = lowered(thin);
   assert.equal(third.layout?.maxHeight, 75);
-  assert.ok((third.font?.size ?? 48) < (second.font?.size ?? 48),
-    'Reducing container height must reduce the effective line spacing/font size');
+  assert.equal(third.font?.size, 48, 'Reducing height must not override the user font size');
+  assert.equal(third.layout?.lineHeight, 1.21);
   const fitted = fitVisualTextToBox(visualTextProps(thin.document.nodes.text_box),480,75);
-  assert.ok(fitted.fullyFits, 'Content overflowed after height resize');
-  assert.ok(fitted.contentHeight <= 75);
+  assert.equal(fitted.fontSize, 48);
+  assert.equal(fitted.scale, 1);
+  assert.ok(!fitted.fullyFits, 'Height overflow should remain explicit');
+  assert.ok(fitted.contentHeight > 75);
 });
 
 test('Numeric text-box properties update the same transform used by pointer handles', () => {
@@ -117,6 +125,9 @@ test('Visual text box uses one set of authoritative dimension inputs in inspecto
  assert.match(layout,/onTransform\('Text box width'/);
  assert.match(layout,/onTransform\('Text box height'/);
  assert.match(layout,/data-text-box-fit-status/);
+ assert.match(layout,/data-text-overflow/);
+ assert.match(layout,/data-text-expand-height/);
+ assert.doesNotMatch(layout,/Auto-fit/);
  assert.match(source,/Math.round\(num \* 100\) \/ 100/);
 });
 
@@ -135,5 +146,56 @@ test('Fitted blue-box text remains stable after Visual -> Code -> Visual sync',(
  assert.equal(restored.layout?.wordSpacing,before.layout?.wordSpacing,'Preferred word spacing lost during Code sync');
  assert.deepEqual(reconciled.project.document.nodes.text_box.transform,project.document.nodes.text_box.transform);
  const wider=resizeNode(reconciled.project,'text_box','e',280,0);
- assert.ok((lowered(wider).font?.size??0) >= (lowered(project).font?.size??0),'Code sync broke dynamic resize');
+ assert.equal(lowered(wider).font?.size, 48, 'Code sync must preserve the user font size');
+});
+
+test('Explicit font size remains authoritative at every wrap width and after height resize',()=>{
+  const p=textBoxProject(200,130);
+  for(const width of [80,200,400,740]){
+    const q=patchNodeTransform(p,'text_box',{width});
+    const properties=lowered(q);
+    assert.equal(properties.font?.size,48);
+    assert.equal(properties.layout?.letterSpacing,20.5);
+    assert.equal(properties.layout?.wordSpacing,14);
+    assert.equal(properties.layout?.maxWidth,width);
+    const props=visualTextProps(q.document.nodes.text_box);
+    assert.equal(fitVisualTextToBox(props,width,130).fontSize,48);
+  }
+  const text=visualTextProps(p.document.nodes.text_box);
+  p.document.nodes.text_box.props=textPropsRecord({...text,font:{...text.font,size:102.1}});
+  assert.equal(lowered(p).font?.size,102.1,'Changing Font Size must change emitted createText font size');
+  assert.equal(lowered(p).layout?.maxWidth,200,'Changing Font Size must not affect wrap width');
+  assert.equal(fitVisualTextToBox(visualTextProps(p.document.nodes.text_box),200,130).fontSize,102.1);
+});
+
+test('Text movement, resizing and numeric dimensions are constrained to the canvas',()=>{
+  const p=textBoxProject(160,160);
+  const nearEdge=patchNodeTransform(p,'text_box',{x:9999,y:-900,width:1200,height:800});
+  const rect=nearEdge.document.nodes.text_box.transform!;
+  assert.equal(rect.width,820);
+  assert.equal(rect.height,520);
+  assert.equal(rect.x,0);
+  assert.equal(rect.y,0);
+  assert.equal(visualTextProps(nearEdge.document.nodes.text_box).layout?.maxWidth,820);
+  const moved=moveNodes(p,['text_box'],1200,-600);
+  const movedRect=moved.document.nodes.text_box.transform!;
+  assert.equal(movedRect.x,820-160);
+  assert.equal(movedRect.y,0);
+  const expanded=resizeNode(p,'text_box','e',2000,0);
+  assert.equal(expanded.document.nodes.text_box.transform?.width,820);
+  assert.equal(expanded.document.nodes.text_box.transform?.x,0);
+  const outside=patchNodeTransform(p,'text_box',{y:-30,x:-55});
+  assert.equal(outside.document.nodes.text_box.transform?.x,0);
+  assert.equal(outside.document.nodes.text_box.transform?.y,0);
+});
+
+test('Font size, canvas bounds and overflow are visible without auto-font shrink in Studio inspector',()=>{
+  const shell=fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx','utf8');
+  const compiler=fs.readFileSync('lib/studio/visual/compiler/plan.ts','utf8');
+  const editor=fs.readFileSync('lib/studio/visual/editor/index.ts','utf8');
+  assert.match(shell,/const outOfCanvas =/);
+  assert.match(shell,/canvasWidth - width/);
+  assert.match(editor,/transform\.x = Math\.min/);
+  assert.doesNotMatch(compiler,/fit\.scale\s*<\s*1/);
+  assert.doesNotMatch(compiler,/font:\s*\{\s*\.\.\.props\.font,\s*size:\s*fit\.fontSize/);
 });
