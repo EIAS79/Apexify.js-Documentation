@@ -63,23 +63,10 @@ export function patchNodeTransform(
   const node = project.document.nodes[id];
   if (!node || node.transform?.locked) return project;
   const next = clone(project);
-  const transform = {
+  next.document.nodes[id].transform = {
     ...next.document.nodes[id].transform,
     ...patch,
   };
-  if (node.kind === 'text') {
-    // The blue text rectangle is constrained to the document, not the
-    // zoomed viewport. Applies to numeric edits, dragging and resize handles.
-    const canvasWidth = Math.max(1, project.document.width);
-    const canvasHeight = Math.max(1, project.document.height);
-    const minWidth = Math.min(8, canvasWidth);
-    const minHeight = Math.min(8, canvasHeight);
-    transform.width = Math.min(canvasWidth, Math.max(minWidth, n(transform.width, DEFAULT_NODE_SIZE.width)));
-    transform.height = Math.min(canvasHeight, Math.max(minHeight, n(transform.height, DEFAULT_NODE_SIZE.height)));
-    transform.x = Math.min(Math.max(0, n(transform.x, 0)), Math.max(0, canvasWidth - transform.width));
-    transform.y = Math.min(Math.max(0, n(transform.y, 0)), Math.max(0, canvasHeight - transform.height));
-  }
-  next.document.nodes[id].transform = transform;
   if (node.kind === 'text' && (patch.width !== undefined || patch.height !== undefined)) {
     const edited = next.document.nodes[id];
     const text = edited.props as unknown as VisualTextNodeProps;

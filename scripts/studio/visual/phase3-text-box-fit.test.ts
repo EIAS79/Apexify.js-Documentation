@@ -168,34 +168,37 @@ test('Explicit font size remains authoritative at every wrap width and after hei
   assert.equal(fitVisualTextToBox(visualTextProps(p.document.nodes.text_box),200,130).fontSize,102.1);
 });
 
-test('Text movement, resizing and numeric dimensions are constrained to the canvas',()=>{
+test('Text rectangles can intentionally extend beyond the canvas',()=>{
   const p=textBoxProject(160,160);
   const nearEdge=patchNodeTransform(p,'text_box',{x:9999,y:-900,width:1200,height:800});
   const rect=nearEdge.document.nodes.text_box.transform!;
-  assert.equal(rect.width,820);
-  assert.equal(rect.height,520);
-  assert.equal(rect.x,0);
-  assert.equal(rect.y,0);
-  assert.equal(visualTextProps(nearEdge.document.nodes.text_box).layout?.maxWidth,820);
+  assert.equal(rect.width,1200);
+  assert.equal(rect.height,800);
+  assert.equal(rect.x,9999);
+  assert.equal(rect.y,-900);
+  assert.equal(visualTextProps(nearEdge.document.nodes.text_box).layout?.maxWidth,1200);
   const moved=moveNodes(p,['text_box'],1200,-600);
   const movedRect=moved.document.nodes.text_box.transform!;
-  assert.equal(movedRect.x,820-160);
-  assert.equal(movedRect.y,0);
+  assert.equal(movedRect.x,55+1200);
+  assert.equal(movedRect.y,41-600);
   const expanded=resizeNode(p,'text_box','e',2000,0);
-  assert.equal(expanded.document.nodes.text_box.transform?.width,820);
-  assert.equal(expanded.document.nodes.text_box.transform?.x,0);
+  assert.equal(expanded.document.nodes.text_box.transform?.width,2160);
+  assert.equal(expanded.document.nodes.text_box.transform?.x,55);
   const outside=patchNodeTransform(p,'text_box',{y:-30,x:-55});
-  assert.equal(outside.document.nodes.text_box.transform?.x,0);
-  assert.equal(outside.document.nodes.text_box.transform?.y,0);
+  assert.equal(outside.document.nodes.text_box.transform?.x,-55);
+  assert.equal(outside.document.nodes.text_box.transform?.y,-30);
 });
 
-test('Font size, canvas bounds and overflow are visible without auto-font shrink in Studio inspector',()=>{
+test('Font size, floating text selection outline and overflow remain independent',()=>{
   const shell=fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx','utf8');
   const compiler=fs.readFileSync('lib/studio/visual/compiler/plan.ts','utf8');
   const editor=fs.readFileSync('lib/studio/visual/editor/index.ts','utf8');
-  assert.match(shell,/const outOfCanvas =/);
-  assert.match(shell,/canvasWidth - width/);
-  assert.match(editor,/transform\.x = Math\.min/);
+  assert.doesNotMatch(shell,/const outOfCanvas =/);
+  assert.doesNotMatch(shell,/Math\.min\(Math\.max\(0, point\?\.x/);
+  assert.doesNotMatch(editor,/canvasWidth - transform\.width/);
+  assert.match(shell,/isSelected && node\.kind === 'text'/);
+  assert.match(shell,/100_000/);
+  assert.match(shell,/: node\.transform\?\.zIndex \?\? 0/);
   assert.doesNotMatch(compiler,/fit\.scale\s*<\s*1/);
   assert.doesNotMatch(compiler,/font:\s*\{\s*\.\.\.props\.font,\s*size:\s*fit\.fontSize/);
 });

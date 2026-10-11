@@ -905,30 +905,21 @@ export default function VisualStudioPre4({
     ? project.document.nodes[selected[selected.length - 1]]
     : undefined;
   const primaryText = primary?.kind === 'text' ? primary : undefined;
-  // Old saved text may contain negative coordinates or dimensions larger
-  // than the canvas. Normalize on selection, without changing imported
-  // createText code until the text actually enters visual editing.
+  // Upgrade pre-fit saved Studio text when it is selected. This does not
+  // restrict the text box to the artboard; off-canvas authoring is allowed.
   useEffect(() => {
-    if (!primaryText) return;
-    const box = nodeRect(primaryText);
-    const outOfCanvas = box.x < 0 || box.y < 0
-      || box.width > project.document.width || box.height > project.document.height
-      || box.x + box.width > project.document.width
-      || box.y + box.height > project.document.height;
-    if (visualTextProps(primaryText).studioFrameFit !== undefined && !outOfCanvas) return;
+    if (!primaryText || visualTextProps(primaryText).studioFrameFit !== undefined) return;
     setProject(current => {
       const selectedText = current.document.nodes[primaryText.id];
       if (!selectedText || selectedText.kind !== 'text') return current;
-      const rect = nodeRect(selectedText);
-      const needsBounds = rect.x < 0 || rect.y < 0
-        || rect.width > current.document.width || rect.height > current.document.height
-        || rect.x + rect.width > current.document.width
-        || rect.y + rect.height > current.document.height;
-      if (!needsBounds && visualTextProps(selectedText).studioFrameFit !== undefined) return current;
-      return patchNodeTransform(current, primaryText.id, { width: rect.width, height: rect.height });
+      if (visualTextProps(selectedText).studioFrameFit !== undefined) return current;
+      const upgraded = structuredClone(current);
+      upgraded.document.nodes[primaryText.id].props = textPropsRecord({
+        ...visualTextProps(selectedText), studioFrameFit: true,
+      });
+      return upgraded;
     });
-  }, [primaryText?.id, primaryText?.props, primaryText?.transform,
-      project.document.width, project.document.height]);
+  }, [primaryText?.id, primaryText?.props]);
   const primaryPath =
     primary && (primary.kind === 'path' || primary.kind === 'freehand')
       ? primary
@@ -2958,23 +2949,17 @@ export default function VisualStudioPre4({
           };
         }
       }
-      const canvasWidth = Math.max(1, next.document.width);
-      const canvasHeight = Math.max(1, next.document.height);
-      const width = Math.min(canvasWidth, Math.max(1, props.layout?.maxWidth ?? 360));
-      const fontSize = props.font?.size ?? 48;
-      const height = Math.min(canvasHeight,
-        Math.max(1, fontSize * (props.layout?.lineHeight ?? 1.2) * 2, 64));
-      props.layout = { ...props.layout, maxWidth: width, maxHeight: height };
       const node = createVisualNode(
         'text',
         textPropsRecord(props),
         { name: value.length > 24 ? value.slice(0, 24) + '…' : value },
       );
-      const centeredX = Math.max(0, (canvasWidth - width) / 2);
-      const centeredY = Math.max(0, (canvasHeight - height) / 2);
+      const width = props.layout?.maxWidth ?? 360;
+      const fontSize = props.font?.size ?? 48;
+      const height = Math.max(64, fontSize * (props.layout?.lineHeight ?? 1.2) * 2);
       node.transform = {
-        x: Math.min(Math.max(0, point?.x ?? centeredX), canvasWidth - width),
-        y: Math.min(Math.max(0, point?.y ?? centeredY), canvasHeight - height),
+        x: point?.x ?? Math.max(32, (next.document.width - width) / 2),
+        y: point?.y ?? Math.max(32, (next.document.height - height) / 2),
         width,
         height,
         rotation: 0,
@@ -6690,7 +6675,13 @@ export default function VisualStudioPre4({
                       height: rect.height,
                       transform: 'rotate(' + (node.transform?.rotation ?? 0) + 'deg)',
                       opacity: node.transform?.opacity ?? 1,
-                      zIndex: node.transform?.zIndex ?? 0,
+                      // This DIV is editor chrome only: the actual Apexify layer
+                      // order is baked into the raster frame. A selected text
+                      // rectangle must float above that frame and other layer
+                      // hitboxes, regardless of its render-layer zIndex.
+                      zIndex: isSelected && node.kind === 'text'
+                        ? 100_000
+                        : node.transform?.zIndex ?? 0,
                     }}
                   >
                     {node.kind === 'text' && inlineTextEditId === id ? (

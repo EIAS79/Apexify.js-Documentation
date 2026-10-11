@@ -15,9 +15,15 @@ async function getBox(){
   const rect=node?.getBoundingClientRect();
   const board=document.querySelector('[data-artboard-surface]');
   const bounds=board?.getBoundingClientRect();
+  const preview=document.querySelector('[data-authoritative-apexify-frame]');
+  const textZ=node?Number.parseInt(getComputedStyle(node).zIndex,10):null;
+  const previewZ=preview?Number.parseInt(getComputedStyle(preview).zIndex,10):null;
+  const otherLayers=[...document.querySelectorAll('.apx-pre4-node')]
+    .filter(item=>item!==node).map(item=>Number.parseInt(getComputedStyle(item).zIndex,10)||0);
+  const borderHit=rect && document.elementFromPoint(rect.x+1.25,rect.y+Math.min(20,rect.height/2))?.closest('[data-visual-node]')===node;
   return {width:width?Number(width.value):null,height:height?Number(height.value):null,fontSize:font?Number(font.value):null,fit,overflow:Boolean(document.querySelector('[data-text-overflow="true"]')),
     boardWidth:board ? (Number.parseFloat(board.style.width) || board.clientWidth) : null,rect:rect&&{x:rect.x,y:rect.y,width:rect.width,height:rect.height},
-    board:bounds&&{x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height}};
+    board:bounds&&{x:bounds.x,y:bounds.y,width:bounds.width,height:bounds.height},textZ,previewZ,maxOtherLayerZ:Math.max(0,...otherLayers),borderHit};
 
  });
 }
@@ -43,6 +49,9 @@ try{
  await page.waitForSelector('[data-text-box-fit-status]');
  const original=await getBox();
  check(original.width>100 && original.height>40,'Initial size missing '+JSON.stringify(original));
+ check(original.textZ>original.previewZ,'Text selection border is stacked behind Apexify preview image');
+ check(original.textZ>original.maxOtherLayerZ,'Selected text outline is behind another image or layer overlay');
+ check(original.borderHit,'Text selection outline is not the hit-test top layer');
  console.log('INITIAL_BOX',JSON.stringify(original));
  const east=await page.$('.apx-pre4-node[data-kind="text"] [aria-label="Resize e"]');
  check(east,'East resize handle missing');
@@ -104,7 +113,8 @@ try{
  check(resizedFont.width===260,'Changing font size modified max width');
  check(resizedFont.fit?.includes('font 102.1px'),'Font size is not authoritative in the inspector');
  check(resizedFont.overflow,'Large font in a small box must show an explicit overflow warning');
- // Oversized requested box widths must stop at canvas bounds.
+ // Text boxes are allowed to extend beyond canvas bounds; only the
+ // selection chrome must render above the artboard and image overlay.
  const widthSelector='[data-text-v3-section="layout"] .apx-text-v3-field:nth-child(4) input';
  const again=await page.$(widthSelector);
  await again.click({clickCount:3});
@@ -114,26 +124,25 @@ try{
  await again.type('5000');
  await again.press('Tab');
  await new Promise(r=>setTimeout(r,450));
- const constrained=await getBox();
- console.log('CANVAS_WIDTH_LIMIT',JSON.stringify(constrained));
- check(constrained.width<=constrained.boardWidth+0.02,'Text rectangle exceeds canvas width');
- check(constrained.fontSize===102.1,'Bounding a large rectangle resized glyphs');
- const withinCanvas=box=>box.rect && box.board
-   && box.rect.x>=box.board.x-1.5
-   && box.rect.y>=box.board.y-1.5
-   && box.rect.x+box.rect.width<=box.board.x+box.board.width+1.5
-   && box.rect.y+box.rect.height<=box.board.y+box.board.height+1.5;
- check(withinCanvas(constrained),'Text selection rectangle is outside the canvas');
- // Drag far outside the canvas; text must remain constrained to the artboard.
- const rect=constrained.rect;
+ const oversized=await getBox();
+ console.log('CANVAS_OVERFLOW_ALLOWED',JSON.stringify(oversized));
+ check(oversized.width===5000,'Max width must not be clamped to canvas');
+ check(oversized.rect.width>oversized.board.width,'Text selection rectangle was visually clamped');
+ check(oversized.fontSize===102.1,'Editing box width changed glyph size');
+ check(oversized.textZ>oversized.previewZ && oversized.textZ>oversized.maxOtherLayerZ,
+   'Selected text should remain above preview and other overlay layers');
+ // Drag beyond the artboard and preserve the off-canvas authoring position.
+ const rect=oversized.rect;
  await page.mouse.move(rect.x+Math.min(rect.width/2,70),rect.y+Math.min(rect.height/2,22));
  await page.mouse.down();
  await page.mouse.move(rect.x-1100,rect.y-900,{steps:8});
  await page.mouse.up();
  await new Promise(r=>setTimeout(r,450));
  const moved=await getBox();
- console.log('CANVAS_POSITION_LIMIT',JSON.stringify(moved));
- check(withinCanvas(moved),'Dragging text outside artboard was not clamped');
+ console.log('OFF_CANVAS_POSITION_ALLOWED',JSON.stringify(moved));
+ check(moved.rect.x<moved.board.x || moved.rect.y<moved.board.y,
+   'Text was incorrectly clamped inside the artboard');
+ check(moved.textZ>moved.previewZ,'Off-canvas text selection border fell behind the frame');
  if(errors.length)throw Error('Browser errors '+JSON.stringify(errors));
  console.log('TEXT_BOX_BROWSER_RESIZE_PASS');
 }finally{await browser.close()}
