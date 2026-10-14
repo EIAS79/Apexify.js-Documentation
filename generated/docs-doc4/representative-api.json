@@ -4398,10 +4398,10 @@
   "signature": "(images: ImageProperties | ImageProperties[], canvasBuffer: CanvasResults | Buffer, options?: CreateImageOptions, painterOpts?: PainterAssetRefsOptions) => Promise<Buffer>",
   "source": {
     "declarationPath": "dist/declarations/apex-painter/main.d.ts",
-    "href": "https://github.com/EIAS79/Apexify.js/blob/379a5248f09ed39c1b1734fe104b6bd73a77857f/lib-next/apex-painter/main.ts",
+    "href": "https://github.com/EIAS79/Apexify.js/blob/432c7a8e0a54a53bbdc6812174a554208efe42bf/lib-next/apex-painter/main.ts",
     "sourcePath": "lib-next/apex-painter/main.ts"
   },
-  "sourceLink": "https://github.com/EIAS79/Apexify.js/blob/379a5248f09ed39c1b1734fe104b6bd73a77857f/lib-next/apex-painter/main.ts",
+  "sourceLink": "https://github.com/EIAS79/Apexify.js/blob/432c7a8e0a54a53bbdc6812174a554208efe42bf/lib-next/apex-painter/main.ts",
   "stability": "CURRENT",
   "symbol": "createImage"
 }
