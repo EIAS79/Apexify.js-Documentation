@@ -128,7 +128,8 @@ test('Visual text box uses one set of authoritative dimension inputs in inspecto
  assert.match(layout,/data-text-overflow/);
  assert.match(layout,/data-text-expand-height/);
  assert.doesNotMatch(layout,/Auto-fit/);
- assert.match(source,/Math.round\(num \* 100\) \/ 100/);
+ assert.doesNotMatch(source,/Math.round\(num \* 100\) \/ 100/);
+ assert.match(source,/Number.isFinite\(num\) \? String\(num\)/);
 });
 
 test('Fitted blue-box text remains stable after Visual -> Code -> Visual sync',()=>{
@@ -201,4 +202,77 @@ test('Font size, floating text selection outline and overflow remain independent
   assert.match(shell,/: node\.transform\?\.zIndex \?\? 0/);
   assert.doesNotMatch(compiler,/fit\.scale\s*<\s*1/);
   assert.doesNotMatch(compiler,/font:\s*\{\s*\.\.\.props\.font,\s*size:\s*fit\.fontSize/);
+});
+
+test('Selection and typography edits preserve imported text frame semantics', () => {
+  const p = textBoxProject(300, 150);
+  const original = visualTextProps(p.document.nodes.text_box);
+  p.document.nodes.text_box.props = textPropsRecord({
+    ...original, studioFrameFit: undefined, font: { ...original.font, size: 102.125 },
+  });
+  const before = JSON.stringify(p);
+  const operation = lowered(p);
+  assert.equal(operation.font?.size, 102.125);
+  assert.equal(operation.layout?.maxHeight, 134.39999999999998);
+  assert.equal(operation.y, 41, 'Raw imported text should not acquire fitted frame baselines');
+  assert.equal(JSON.stringify(p), before, 'Compiling or inspecting text must not mutate the project');
+
+  const editor = fs.readFileSync('components/studio/visual/VisualStudioPre4.tsx', 'utf8');
+  assert.doesNotMatch(editor, /Upgrade pre-fit saved Studio text when it is selected/);
+  assert.match(editor, /nextNode\.props = textPropsRecord\(updater\(visualTextProps\(nextNode\)\)\)/);
+  assert.doesNotMatch(editor, /nextNode\.props = textPropsRecord\(\{ \.\.\.updater\(visualTextProps\(nextNode\)\), studioFrameFit: true \}\)/);
+});
+
+test('Fractional text font size and box dimensions survive code generation', () => {
+  const p = textBoxProject(300, 150);
+  const original = visualTextProps(p.document.nodes.text_box);
+  p.document.nodes.text_box.props = textPropsRecord({
+    ...original, font: { ...original.font, size: 102.125 },
+  });
+  const resized = patchNodeTransform(p, 'text_box', { width: 377.555, height: 134.375 });
+  const props = lowered(resized);
+  assert.equal(props.font?.size, 102.125);
+  assert.equal(props.layout?.maxWidth, 377.555);
+  assert.equal(props.layout?.maxHeight, 134.375);
+});
+
+test('Font download completion invalidates cached browser wrap measurements', () => {
+  const previousDocument = globalThis.document;
+  const callbacks = new Map<string, () => void>();
+  let glyphWidth = 7;
+  const fonts = {
+    status: 'loaded',
+    addEventListener(event: string, callback: () => void) { callbacks.set(event, callback); },
+    removeEventListener(event: string) { callbacks.delete(event); },
+  };
+  const fakeCanvasContext = {
+    font: '',
+    measureText(text: string) {
+      return {
+        width: Array.from(text).length * glyphWidth,
+        actualBoundingBoxAscent: 10,
+        actualBoundingBoxDescent: 3,
+        actualBoundingBoxLeft: 0,
+        actualBoundingBoxRight: Array.from(text).length * glyphWidth,
+      };
+    },
+  };
+  globalThis.document = {
+    fonts,
+    createElement: () => ({ width: 1, height: 1, getContext: () => fakeCanvasContext }),
+  } as unknown as Document;
+  try {
+    const props = defaultTextNodeProps('font change');
+    props.font = { size: 24, family: 'Custom Loaded Later' };
+    const first = fitVisualTextToBox(props, 500, 100);
+    glyphWidth = 14;
+    const stillCached = fitVisualTextToBox(props, 500, 100);
+    assert.equal(stillCached.measuredWidth, first.measuredWidth);
+    assert.ok(callbacks.has('loadingdone'));
+    callbacks.get('loadingdone')?.();
+    const refreshed = fitVisualTextToBox(props, 500, 100);
+    assert.ok(refreshed.measuredWidth > first.measuredWidth, 'Must measure newly available font glyphs');
+  } finally {
+    globalThis.document = previousDocument;
+  }
 });

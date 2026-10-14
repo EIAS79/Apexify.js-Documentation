@@ -24,6 +24,27 @@ export type VisualTextBoxFit = {
 const fitCache = new Map<string, VisualTextBoxFit>();
 const CACHE_LIMIT = 160;
 
+// Canvas text metrics can change after an uploaded or web font finishes
+// loading. Invalidate measurements rather than retaining fallback glyph
+// widths indefinitely for an otherwise identical text/box cache key.
+let observedFonts: FontFaceSet | undefined;
+const invalidateFontMeasurements = () => fitCache.clear();
+
+function fontLoading(): boolean {
+  if (typeof document === 'undefined' || !document.fonts) return false;
+  const fonts = document.fonts;
+  if (observedFonts !== fonts) {
+    observedFonts?.removeEventListener('loadingdone', invalidateFontMeasurements);
+    observedFonts?.removeEventListener('loadingerror', invalidateFontMeasurements);
+    fonts.addEventListener('loadingdone', invalidateFontMeasurements);
+    fonts.addEventListener('loadingerror', invalidateFontMeasurements);
+    observedFonts = fonts;
+    invalidateFontMeasurements();
+  }
+  return fonts.status === 'loading';
+}
+
+
 function lineMetrics(
   props: VisualTextNodeProps,
   width: number,
@@ -128,7 +149,9 @@ export function fitVisualTextToBox(
     width, height, lineHeight, letterSpacing, wordSpacing,
     typeof document !== 'undefined',
   ]);
-  const cached = fitCache.get(key);
+  // Never reuse or persist fallback metrics while font downloads are pending.
+  const loading = fontLoading();
+  const cached = loading ? undefined : fitCache.get(key);
   if (cached) return cached;
   const sample = lineMetrics(props, width, fontSize, letterSpacing, wordSpacing, lineHeight);
   const lineCount = Math.max(1, sample.count);
@@ -139,7 +162,9 @@ export function fitVisualTextToBox(
     scale: 1,
     fullyFits: contentHeight <= height && sample.maxWidth <= width,
   };
-  if (fitCache.size >= CACHE_LIMIT) fitCache.clear();
-  fitCache.set(key, result);
+  if (!loading && !fontLoading()) {
+    if (fitCache.size >= CACHE_LIMIT) fitCache.clear();
+    fitCache.set(key, result);
+  }
   return result;
 }
