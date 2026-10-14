@@ -54,7 +54,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: EIAS79/Apexify.js
-          ref: 379a5248f09ed39c1b1734fe104b6bd73a77857f
+          ref: 432c7a8e0a54a53bbdc6812174a554208efe42bf
           path: .studio-runtime-types
           persist-credentials: false
 
