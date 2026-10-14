@@ -175,10 +175,10 @@ function NumberField({
   suffix?: string;
   onChange: (value: number) => void;
 }) {
+  // Use the actual model value: rounding to two decimals silently mutates
+  // precise font sizes and transforms when a focused field is committed.
   const display = (num: number | undefined) =>
-    num !== undefined && Number.isFinite(num)
-      ? String(Math.round(num * 100) / 100)
-      : '';
+    num !== undefined && Number.isFinite(num) ? String(num) : '';
   // Do not update the model while a number is half-typed: typing "260"
   // must never clamp the initial "2" or turn it into "860".
   const [draft, setDraft] = useState(() => display(value));
@@ -597,8 +597,31 @@ function Header({
   );
 }
 
+// FontFaceSet completion does not change text props, so React needs a
+// separate invalidation signal to refresh displayed geometry and metrics.
+function useTextFontRevision(): number {
+  const [revision, setRevision] = useState(0);
+  useEffect(() => {
+    if (typeof document === 'undefined' || !document.fonts) return;
+    let mounted = true;
+    const refresh = () => {
+      if (mounted) setRevision((value) => value + 1);
+    };
+    document.fonts.addEventListener('loadingdone', refresh);
+    document.fonts.addEventListener('loadingerror', refresh);
+    void document.fonts.ready.then(refresh).catch(() => {});
+    return () => {
+      mounted = false;
+      document.fonts.removeEventListener('loadingdone', refresh);
+      document.fonts.removeEventListener('loadingerror', refresh);
+    };
+  }, []);
+  return revision;
+}
+
 function MetricsPanel({ props }: { props: VisualTextNodeProps }) {
-  const metrics = useMemo(() => measureVisualTextInBrowser(props), [props]);
+  const fontRevision = useTextFontRevision();
+  const metrics = useMemo(() => measureVisualTextInBrowser(props), [props, fontRevision]);
   if (!metrics) {
     return <div className="apx-text-v3-empty">Browser measurement is unavailable.</div>;
   }
@@ -690,6 +713,8 @@ export function VisualTextInspector({
   onTransform,
   onRename,
 }: TextInspectorProps) {
+  // Repaint the overflow/fit display when a custom font finishes loading.
+  useTextFontRevision();
   if (node.kind !== 'text') return null;
   const props = visualTextProps(node);
   const transform = node.transform ?? {};
