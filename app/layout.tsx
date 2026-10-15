@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   robots: { index: true, follow: true },
   icons: {
-    icon: [{ url: "/brand/apexify-mark.png", type: "image/png" }],
-    shortcut: [{ url: "/brand/apexify-mark.png", type: "image/png" }],
+    icon: [{ url: "/brand/apexify-favicon-v2.png", type: "image/png" }],
+    shortcut: [{ url: "/brand/apexify-favicon-v2.png", type: "image/png" }],
     apple: [{ url: "/apple-icon.png", type: "image/png" }],
   },
   openGraph: {
@@ -26,11 +26,13 @@ export const metadata: Metadata = {
     siteName: 'Apexify.js Documentation',
     title: 'Apexify.js - Advanced Canvas Rendering Library',
     description: SITE_DESCRIPTION,
+    images: [{ url: '/brand/apexify-social-v2.jpg', width: 1200, height: 630, alt: 'Apexify.js — Every frame. Yours to create.' }],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'Apexify.js - Advanced Canvas Rendering Library',
     description: SITE_DESCRIPTION,
+    images: ['/brand/apexify-social-v2.jpg'],
   },
 };
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} /></head><body><ThemeProvider><SidebarProvider>{children}</SidebarProvider><CustomCursorGate /></ThemeProvider>{process.env.VERCEL ? <SpeedInsights /> : null}</body></html>; }

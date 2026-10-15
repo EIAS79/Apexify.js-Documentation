@@ -1,20 +1,14 @@
 'use client';
 
 /**
- * Brand assets — single source of truth for the Apexify.js logo + wordmark.
+ * Canonical Apexify.js brand assets, aligned with the Frame homepage.
  *
- * Two pieces:
- *   - <BrandIcon />   the exact uploaded square Apexify mark.
- *   - <BrandBanner /> the exact uploaded horizontal Apexify.js lockup.
+ * - apexify-lockup-v2.avif: transparent horizontal wordmark
+ * - apexify-icon-v2.avif: full-size rounded-square icon
+ * - apexify-favicon-v2.png: compact browser-tab favicon
+ * - apexify-npm-banner-v2.jpg: package and README banner
  *
- * Canonical source artwork:
- *   - /public/brand/apexify-mark.png
- *   - /public/brand/apexify-lockup.png
- *   - /public/brand/apexify-banner.png
- *   - /app/apple-icon.png
- *
- * These PNG files are the original uploaded assets; do not rebuild the
- * wordmark from browser text or SVG primitives.
+ * Logo geometry is preserved from the approved raster artwork.
  */
 
 import Image from 'next/image';
@@ -35,7 +29,7 @@ export function BrandIcon({ size, className, decorative = true }: BrandIconProps
   if (size != null) {
     return (
       <Image
-        src="/brand/apexify-mark.avif"
+        src="/brand/apexify-icon-v2.avif"
         alt={decorative ? '' : 'Apexify.js'}
         aria-hidden={decorative || undefined}
         width={size}
@@ -48,7 +42,7 @@ export function BrandIcon({ size, className, decorative = true }: BrandIconProps
   }
   return (
     <Image
-      src="/brand/apexify-mark.avif"
+      src="/brand/apexify-icon-v2.avif"
       alt={decorative ? '' : 'Apexify.js'}
       aria-hidden={decorative || undefined}
       width={64}
@@ -84,7 +78,7 @@ export function BrandBanner({ className = '', maxWidth = 480 }: BrandBannerProps
       role="img"
     >
       <Image
-        src="/brand/apexify-lockup.avif"
+        src="/brand/apexify-lockup-v2.avif"
         alt=""
         aria-hidden
         width={2048}

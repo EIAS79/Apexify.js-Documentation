@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/brand/apexify-banner.png" alt="Apexify.js — Build visual systems from code" width="100%" />
+  <img src="./public/brand/apexify-npm-banner-v2.jpg" alt="Apexify.js — Build visual systems from code" width="100%" />
 </p>
 
 # Apexify.js Documentation
@@ -24,11 +24,15 @@ See [DOC0_12_PROGRAM_COMPLETION_STATUS.md](./DOC0_12_PROGRAM_COMPLETION_STATUS.m
 
 The current brand assets live in `public/brand/`:
 
-- `apexify-mark.png` — exact uploaded Apexify mark used for favicons and compact UI placements.
-- `apexify-lockup.png` — exact uploaded Apexify.js horizontal logo/wordmark.
-- `apexify-banner.png` — exact uploaded full repository/documentation banner.
+- `apexify-lockup-v2.avif` — approved transparent logo + wordmark (homepage, docs, and Studio).
+- `apexify-icon-v2.avif` — approved app/brand icon for reusable UI components.
+- `apexify-favicon-v2.png` — simplified browser-tab favicon.
+- `apexify-npm-banner-v2.jpg` — cinematic README and npm banner.
+- `apexify-banner-v2.avif` — optimized wide banner.
+- `apexify-social-v2.jpg` — 1200 × 630 social-sharing image.
+- `app/apple-icon.png` — Apple touch icon matching the new mark.
 
-The older SVG and AVIF files remain only as compatibility/fallback assets. The site and README use the original uploaded PNG artwork so the mark, wordmark geometry, and `.js` spacing stay exact.
+Previous brand media remains in Git history and existing files as a fallback. New UI surfaces use the v2 assets to prevent stale cached logos.
 
 ## Development
 
