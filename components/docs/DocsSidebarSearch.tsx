@@ -1,5 +1,6 @@
 "use client";
 
+import type { SearchFilters } from "@/lib/search/schema";
 import { InlineSearch } from "@/components/docs/search/InlineSearch";
 
 /**
@@ -14,6 +15,6 @@ export const DOC4_SEARCH_COMPATIBILITY = {
   legacyResultAttribute: 'data-search-href={result.href}',
 } as const;
 
-export function DocsSidebarSearch({ inputId = "docs-sidebar-search-input" }: { inputId?: string }) {
-  return <InlineSearch inputId={inputId} ariaLabel="Search documentation, API reference, and examples" />;
+export function DocsSidebarSearch({ inputId = "docs-sidebar-search-input", scope }: { inputId?: string; scope?: SearchFilters }) {
+  return <InlineSearch inputId={inputId} ariaLabel={scope?.package ? `Search ${scope.package} documentation and API` : "Search documentation, API reference, and examples"} scope={scope} />;
 }

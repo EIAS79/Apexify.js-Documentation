@@ -16,7 +16,7 @@ export function DocsShell({ groups, headings, activePath, children }: {
   return (
     <div className="apx-doc-shell" data-doc2-shell>
       <main id="docs-content" tabIndex={-1} className="apx-doc-main lg:col-start-2 lg:row-start-1">
-        <div className="apx-doc-mobile-bar" aria-label="Mobile documentation controls">
+        <div className="apx-doc-mobile-bar frame-doc-article-tools" aria-label="Documentation controls">
           <MobileDocsNavigationDrawer groups={groups} activePath={activePath} />
           {headings.length ? (
             <AccessibleDrawer
@@ -35,7 +35,7 @@ export function DocsShell({ groups, headings, activePath, children }: {
       <aside className="apx-doc-sidebar lg:col-start-1 lg:row-start-1" aria-label="Documentation sidebar">
         <DocsSidebarV2 groups={groups} activePath={activePath} searchInputId="docs-sidebar-search-input" />
       </aside>
-      <aside className="apx-doc-toc-rail lg:col-start-3 lg:row-start-1" aria-label="On this page rail">
+      <aside className="apx-doc-toc-rail frame-doc-legacy-toc lg:col-start-3 lg:row-start-1" aria-label="On this page rail">
         <OnThisPageV2 headings={headings} id="docs-toc-rail" />
       </aside>
     </div>

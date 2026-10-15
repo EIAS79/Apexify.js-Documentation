@@ -63,8 +63,8 @@ export default function CanvasDocumentationPage() {
       <DocsBreadcrumbsV2 breadcrumbs={breadcrumbs} />
       <article className="apx-doc-prose" data-doc-article data-doc-slug={page.slug} data-doc-source={page.sourcePath}>
         <DocsPageHero page={page} headingId={leadingHeading?.id} />
-        <RouteDocsMarkdown content={withoutLeadingTitle(page.body)} />
         <CanvasInteractiveExample />
+        <RouteDocsMarkdown content={withoutLeadingTitle(page.body)} />
         <RelatedContent sourceId={page.id} preferredKinds={['doc', 'changelog']} title="Related guides and reference" />
       </article>
       <DocsPagerV2 pager={pager} />

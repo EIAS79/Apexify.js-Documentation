@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { Bars3Icon } from '@heroicons/react/24/outline';
-import ThemeToggle from '@/components/ThemeToggle';
-import { apexifyVersionLabel } from '@/lib/apexify-version';
+import { DocsFrameThemeToggle } from './DocsFrame';
 import { AccessibleDrawer } from './AccessibleDrawer';
 import { DocsSearchTrigger } from './DocsSearchTrigger';
 
@@ -17,30 +16,13 @@ function docsHeaderPrefetch(href: string): false | undefined {
   return href.startsWith('/docs') ? undefined : false;
 }
 
-function ApexMark() {
-  return (
-    <svg viewBox="0 0 64 64" aria-hidden className="h-full w-full">
-      <rect x="5" y="5" width="54" height="54" rx="8" fill="currentColor" opacity="0.06" />
-      <rect x="5.5" y="5.5" width="53" height="53" rx="7.5" fill="none" stroke="currentColor" opacity="0.22" />
-      <path d="M18 48 31 17h4l12 31h-6l-3-8H27l-3 8h-6Zm11-13h7l-3.4-9L29 35Z" fill="currentColor" />
-      <path d="M47 16H37v3h7v8h3V16ZM17 49h10v-3h-7v-8h-3v11Z" fill="var(--apx-color-accent)" />
-      <circle cx="48" cy="41" r="4" fill="var(--apx-color-accent-warm)" />
-    </svg>
-  );
-}
-
 export function DocsHeader() {
-  const version = apexifyVersionLabel();
 
   return (
     <header className="apx-doc-header" data-doc2-header>
       <div className="apx-doc-header__inner">
         <Link href="/" prefetch={false} className="apx-doc-brand" aria-label="Apexify.js home">
-          <span className="apx-doc-brand__icon" aria-hidden><ApexMark /></span>
-          <span className="apx-doc-brand__text">
-            <span className="apx-doc-brand__word">Apexify<span>.js</span></span>
-            <span className="apx-doc-brand__section">Docs</span>
-          </span>
+          <img src="/brand/apexify-lockup-v2.avif" width={174} height={58} alt="Apexify.js" className="frame-doc-logo" />
         </Link>
 
         <nav className="apx-doc-primary-nav" aria-label="Primary">
@@ -57,12 +39,8 @@ export function DocsHeader() {
         </nav>
 
         <div className="apx-doc-header__actions">
-          <span className="apx-version-badge">
-            <span className="sr-only">Apexify.js version </span>
-            {version}
-          </span>
           <DocsSearchTrigger />
-          <div className="apx-doc-theme"><ThemeToggle /></div>
+          <div className="apx-doc-theme"><DocsFrameThemeToggle /></div>
 
           <a
             href="https://github.com/EIAS79/Apexify.js"

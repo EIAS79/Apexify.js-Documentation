@@ -215,7 +215,7 @@ export function GlobalDocsSearch({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={onInputKeyDown}
-          placeholder="Search symbols, options, concepts, goals…"
+          placeholder={fixedFilters.package ? "Search this package…" : "Search all documentation…"}
           className="min-w-0 flex-1 bg-transparent text-sm outline-none"
           style={{ color: "var(--text-primary)", minHeight: 44 }}
           role="combobox"
