@@ -40,7 +40,7 @@ export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
   if (!activated) {
     return (
       <section
-        className="my-6 overflow-hidden rounded-2xl border"
+        className="frame-doc-example-intro my-6 overflow-hidden rounded-2xl border"
         style={{ borderColor: 'var(--border-default)', background: 'var(--bg-raised)', boxShadow: 'var(--shadow-sm)' }}
         data-post-doc12-workbench="collapsed"
       >
@@ -48,8 +48,8 @@ export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.16em]" style={{ color: 'color-mix(in srgb,var(--accent-magenta) 75%,var(--text-primary))' }}>Interactive example</p>
             <h3 className="mt-1 text-lg font-bold" style={{ color: 'var(--text-primary)' }}>{props.title}</h3>
-            <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>Open the verified source and output side by side. The editor is deferred until requested; this documentation surface does not pretend to run Node code in the browser.</p>
-            <button type="button" onClick={() => setActivated(true)} className="mt-4 min-h-11 rounded-lg px-4 text-sm font-bold" style={{ background:'var(--gradient-sunset)', color:'white', boxShadow:'var(--shadow-sm)' }}>Show code &amp; preview</button>
+            <p className="mt-2 max-w-xl text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>Explore the verified source beside its rendered output. Edit the example, copy the code, or open it in Studio. Node examples show the verified output rather than a live browser render.</p>
+            <button type="button" onClick={() => setActivated(true)} className="mt-4 min-h-11 rounded-lg px-4 text-sm font-bold" style={{ background:'var(--apx-color-accent)', color:'var(--apx-text-inverse)', boxShadow:'var(--shadow-sm)' }}>Show code &amp; preview</button>
           </div>
           {props.previewUrl ? (
             <div className="grid min-h-[150px] place-items-center rounded-xl border p-3" style={{ borderColor:'var(--border-subtle)', background:'var(--bg-sunken)' }}>
@@ -65,7 +65,7 @@ export function CanvasPlaygroundLoader(props: CanvasPlaygroundProps) {
   if (failed) {
     return (
       <section className="my-5 rounded-xl p-4 text-sm" style={{ border:'1px solid var(--border-default)', background:'var(--bg-raised)' }} data-doc8-playground-loader="error" role="status">
-        The interactive workbench could not be loaded. The verified documentation content remains available above.
+        The interactive workbench could not be loaded. The verified documentation content remains available below.
       </section>
     );
   }

@@ -1,3 +1,37 @@
+# Frame documentation design QA
+
+Status: passed for the implemented documentation layout.
+
+## Scope and comparison
+
+Implements the accepted Chapter Atlas / Build Desk hybrid: a wide reading area, charcoal/lime palette, compact lilac sculpture, chapter links and source/output views. Compared the reference and browser implementation side by side in [comparison](docs/design/frame-docs/comparison.jpg). Captures: [overview](docs/design/frame-docs/overview.jpg), [workbench](docs/design/frame-docs/workbench.jpg).
+
+Intentional differences: existing verified titles and article content remain authoritative; the sculpture is smaller to preserve reading space; the editor loads on request. Node output stays explicitly labelled as verified output, not live browser execution.
+
+## Verification
+
+- Production build passed, including type checking and 481 generated pages.
+- Three recursive-navigation tests passed: deep trails, package isolation with retained structural ancestors, and deriving selector entries from actual linked documentation.
+- Desktop browser: no page overflow (1353px client and scroll widths); all images loaded; active Canvas branch expanded, could be collapsed and reopened; active leaf contrast corrected.
+- Scoped createCanvas search returned 30 results including API members, headings and guides. Global search remains available in the header.
+- Canvas workbench loaded on request with Both selected and source/output visible.
+- Dark/light theme switched correctly; light logo contrast corrected.
+- On-this-page drawer opened; selecting the overview navigated to its existing canonical anchor and closed the dialog.
+- Mobile 390x844 CSS viewport: responsive header, article and horizontal chapters rendered; navigation drawer opened with the recursive Canvas branch and scoped search. This is a browser viewport check, not a physical-device test.
+- Motion is limited to short entrance/disclosure transitions and disabled by reduced-motion CSS.
+
+## Package architecture
+
+Package choices come from the documentation manifest. Core, web, React, Next and other architecture targets without documentation are identified as planned, not fabricated destinations. Scope filtering supports recursive branches and preserves ancestors while excluding unrelated package links. Existing routes, heading IDs and backend search contracts remain intact.
+
+## Environment
+
+The latest main-branch branding commit was integrated before publication; the docs header now uses its canonical v2 logo. The captured layout predates that asset-only substitution.
+
+Local generated manifests, dependencies and temporary preview helpers are excluded from the commit. Existing Browserslist notices are non-blocking. The API extraction setup notes from the homepage audit below still apply.
+
+---
+
 # Frame homepage design QA
 
 Status: passed for the implemented homepage. Production deployment is not part of this change.

@@ -1,8 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { DocsSidebarSearch } from '@/components/docs/DocsSidebarSearch';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { DOCUMENTATION_PACKAGES } from '@/lib/docs/schema';
+import { findNavigationTrail, navigationPackages, scopeNavigation } from '@/lib/docs/sidebar-view';
 import { StabilityBadge } from '@/components/docs/status/DocsBadges';
 import type {
   DocumentationNavigationGroup,
@@ -89,6 +92,7 @@ function NavigationItems({
   depth,
   expanded,
   toggle,
+  idPrefix,
 }: {
   items: DocumentationNavigationItem[];
   activePath: string;
@@ -96,6 +100,7 @@ function NavigationItems({
   depth: number;
   expanded: Set<string>;
   toggle: (key: string) => void;
+  idPrefix: string;
 }) {
   return (
     <ul className="apx-sidebar-items" data-depth={depth}>
@@ -104,7 +109,7 @@ function NavigationItems({
         const hasChildren = Boolean(item.children?.length);
         const key = branchKey(groupId, item.id);
         const isOpen = hasChildren && expanded.has(key);
-        const controlsId = `docs-nav-${key.replace(/[^a-zA-Z0-9_-]+/g, '-')}`;
+        const controlsId = `docs-nav-${idPrefix}-${key.replace(/[^a-zA-Z0-9_-]+/g, '-')}`;
 
         return (
           <li key={item.id} className="apx-sidebar-node" data-open={isOpen || undefined} data-active={active || undefined}>
@@ -118,7 +123,7 @@ function NavigationItems({
                   aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${item.title}`}
                   onClick={() => toggle(key)}
                 >
-                  <span aria-hidden>›</span>
+                  <ChevronRightIcon aria-hidden className="h-3.5 w-3.5" />
                 </button>
               ) : <span className="apx-sidebar-disclosure-spacer" aria-hidden />}
 
@@ -156,6 +161,7 @@ function NavigationItems({
                   depth={depth + 1}
                   expanded={expanded}
                   toggle={toggle}
+                  idPrefix={idPrefix}
                 />
               </div>
             ) : null}
@@ -177,6 +183,14 @@ export function DocsSidebarV2({
   includeSearch?: boolean;
   searchInputId?: string;
 }) {
+  const idPrefix = useId().replace(/:/g, '');
+  const trail = useMemo(() => findNavigationTrail(groups, activePath), [groups, activePath]);
+  const activePackage = trail.at(-1)?.package ?? '';
+  const [packageName, setPackageName] = useState<string>(activePackage);
+  const choices = useMemo(() => navigationPackages(groups), [groups]);
+  const visibleGroups = useMemo(() => scopeNavigation(groups, packageName), [groups, packageName]);
+  const plannedPackages = DOCUMENTATION_PACKAGES.filter(name => !choices.some(choice => choice.name === name));
+  useEffect(() => { setPackageName(activePackage); }, [activePath, activePackage]);
   const validKeys = useMemo(() => validBranchKeys(groups), [groups]);
   const activeKeys = useMemo(() => initialExpanded(groups, activePath), [groups, activePath]);
   const [expanded, setExpanded] = useState<Set<string>>(() => activeKeys);
@@ -218,30 +232,27 @@ export function DocsSidebarV2({
       const next = new Set(current);
       if (next.has(key)) next.delete(key);
       else next.add(key);
-      activeKeys.forEach((activeKey) => next.add(activeKey));
       return next;
     });
   };
 
   return (
     <div className="apx-sidebar-panel" data-doc2-sidebar data-post-doc12-tree>
-      <div className="apx-sidebar-panel__head">
-        <div>
-          <span>DOCS INDEX</span>
-          <strong>Browse by engine</strong>
-        </div>
-        <small>runtime → section → feature</small>
+      <div className="frame-doc-scope">
+        <label htmlFor={`${idPrefix}-package`}>Engine / package</label>
+        <select id={`${idPrefix}-package`} aria-label="Documentation engine or package" value={packageName} onChange={event => setPackageName(event.target.value)}>
+          <option value="">All engines &amp; packages</option>
+          {choices.map(choice => <option key={choice.name} value={choice.name}>{choice.runtimes.join(' / ')} · {choice.name}</option>)}
+        </select>
+        <p>{packageName === 'apexify.js' ? '6.0 docs · Staged source' : packageName ? 'Package documentation' : 'Browse every documented package'}</p>
       </div>
-      {includeSearch ? (
-        <div className="apx-sidebar-search">
-          <DocsSidebarSearch inputId={searchInputId} />
-        </div>
-      ) : null}
+      {includeSearch ? <div className="apx-sidebar-search"><DocsSidebarSearch key={packageName} inputId={searchInputId} scope={packageName ? { package: packageName } : undefined} /></div> : null}
+      {trail.length > 1 && <p className="frame-doc-location" aria-label="Current documentation location">{trail.slice(0, -1).map(item => item.title).join(' / ')}</p>}
       <nav aria-label="Documentation">
-        {groups.map((group) => {
+        {visibleGroups.map((group) => {
           const key = branchKey(group.id);
           const isOpen = expanded.has(key);
-          const controlsId = `docs-group-${group.id}`;
+          const controlsId = `docs-group-${idPrefix}-${group.id}`;
           return (
             <section className="apx-sidebar-group" key={group.id} data-open={isOpen || undefined}>
               <button
@@ -252,7 +263,7 @@ export function DocsSidebarV2({
                 onClick={() => toggle(key)}
               >
                 <span>{group.label}</span>
-                <span className="apx-sidebar-group__chevron" aria-hidden>›</span>
+                <ChevronRightIcon className="apx-sidebar-group__chevron h-3.5 w-3.5" aria-hidden />
               </button>
               <div id={controlsId} hidden={!isOpen}>
                 <NavigationItems
@@ -262,12 +273,17 @@ export function DocsSidebarV2({
                   depth={0}
                   expanded={expanded}
                   toggle={toggle}
+                  idPrefix={idPrefix}
                 />
               </div>
             </section>
           );
         })}
       </nav>
+      <div className="frame-doc-scope-footer">
+        <button type="button" onClick={() => setPackageName('')}>Browse all packages</button>
+        {plannedPackages.length > 0 && <details><summary>Planned packages <span>ROADMAP</span></summary><p>Architecture targets, not published API guides. Packages appear in the selector when documentation is available.</p><ul>{plannedPackages.map(name => <li key={name}><code>{name}</code></li>)}</ul></details>}
+      </div>
     </div>
   );
 }
