@@ -318,12 +318,12 @@ test('opaque Studio canvas renders without a fake translucent grid overlay', () 
   // The authoritative Apexify.js frame must remain the displayed artwork.
   // A grid painted above it incorrectly makes an opaque colorBg appear translucent.
   assert.match(shell, /data-authoritative-apexify-frame/);
-  assert.match(shell, /background:\\s*artboardPreviewUrl\\s*\\?\\s*'transparent'/);
-  assert.match(shell, /canvasArtboardBackground\\(project\\.document\\.canvas/);
+  assert.match(shell, /background:\s*artboardPreviewUrl\s*\?\s*'transparent'/);
+  assert.match(shell, /canvasArtboardBackground\(project\.document\.canvas/);
   assert.doesNotMatch(shell, /apx-pre4-artboard-grid/);
-  assert.doesNotMatch(css, /\\.apx-pre4-artboard-grid/);
+  assert.doesNotMatch(css, /\.apx-pre4-artboard-grid/);
 
   // The editing grid remains a viewport background, behind the artwork.
-  assert.match(css, /\\.apx-pre4-viewport\\{/);
+  assert.match(css, /\.apx-pre4-viewport\{/);
   assert.match(css, /background-size:auto,32px 32px,32px 32px,auto/);
 });
