@@ -187,6 +187,11 @@ export function emitStudioOperationPlan(
       const painterOpts = operation.painterOpts
         ? `, ${emitValue(operation.painterOpts, 2, targetNames)}`
         : '';
+      const ids = (operation as typeof operation & { autoBatchNodeIds?: string[] }).autoBatchNodeIds;
+      if (ids?.length) {
+        body.push('  // Apexify.js v6: ordered ' + (operation.kind === 'create-image' ? 'image' : 'text') + ' layers');
+        body.push('  /* apexify-v6:auto-batch:' + encodeURIComponent(JSON.stringify(ids)) + ' */');
+      }
       body.push(
         `  const ${targetName} = await ${painterName}.createImage(${properties}, ${base}${options}${painterOpts});`,
       );
@@ -207,6 +212,11 @@ export function emitStudioOperationPlan(
       const painterOpts = operation.painterOpts
         ? `, ${emitValue(operation.painterOpts, 2, targetNames)}`
         : '';
+      const ids = (operation as typeof operation & { autoBatchNodeIds?: string[] }).autoBatchNodeIds;
+      if (ids?.length) {
+        body.push('  // Apexify.js v6: ordered ' + (operation.kind === 'create-image' ? 'image' : 'text') + ' layers');
+        body.push('  /* apexify-v6:auto-batch:' + encodeURIComponent(JSON.stringify(ids)) + ' */');
+      }
       body.push(
         `  const ${targetName} = await ${painterName}.createText(${properties}, ${base}${textOptions}${painterOpts});`,
       );

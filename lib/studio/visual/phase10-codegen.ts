@@ -1,6 +1,7 @@
 import type { VisualProject } from './model';
 import { emitStudioOperationPlan } from './codegen/emitter';
 import { lowerVisualProject } from './compiler/plan';
+import { optimizeApexifyV6Plan } from './codegen/apexify-v6-optimizer';
 import {
   flattenPhase9PreviewContainers,
   materializePhase9Project,
@@ -49,7 +50,7 @@ function executablePhase10Project(project: VisualProject): VisualProject {
 
 export function generatePhase10NativeSource(project: VisualProject): string {
   const executable = executablePhase10Project(project);
-  const source = emitStudioOperationPlan(lowerVisualProject(executable));
+  const source = emitStudioOperationPlan(optimizeApexifyV6Plan(lowerVisualProject(executable)));
   return '/* ' + PHASE10_SOURCE_MARKER + semanticPayload(project) + ' */\n' + source;
 }
 

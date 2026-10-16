@@ -2026,6 +2026,32 @@ function reconcilePhase7Operations(
   project.operations = operations;
 }
 
+
+/**
+ * Generated v6 array calls carry an opaque mapping to their original authoring
+ * nodes. Arrays remain editable, but a code-to-visual round trip must not
+ * transform independent layers into an explicit grouped node.
+ */
+function apexifyV6AutoBatches(source: string): ReadonlyMap<string, string[]> {
+  const batches = new Map<string, string[]>();
+  const regex = /\/\* apexify-v6:auto-batch:([^*]+) \*\/\s*const\s+([A-Za-z_$][\w$]*)\s*=\s*await\s+[A-Za-z_$][\w$]*\.create(?:Image|Text)\s*\(/g;
+  for (const match of source.matchAll(regex)) {
+    let ids: unknown;
+    try {
+      ids = JSON.parse(decodeURIComponent(match[1]!));
+    } catch {
+      throw new Error('Invalid v6 auto-batch layer identity marker.');
+    }
+    if (!Array.isArray(ids) || ids.length < 2 || ids.length > 32 ||
+        !ids.every((id) => typeof id === 'string' && id.length > 0) ||
+        new Set(ids).size !== ids.length) {
+      throw new Error('Invalid v6 auto-batch node list.');
+    }
+    batches.set(match[2]!, ids as string[]);
+  }
+  return batches;
+}
+
 function reconcileRenderableCalls(
   project: VisualProject,
   source: string,
@@ -2099,12 +2125,34 @@ function reconcileRenderableCalls(
   }
 
   const existing = orderedRenderableNodes(project);
+  const autoBatches = apexifyV6AutoBatches(source);
   const identifierToNodeId = new Map<string, string>();
   const pathResourceToNodeId = new Map<string, string>();
   const touched = new Set<string>();
+  let existingCursor = 0;
 
   calls.forEach((call, index) => {
-    const matched = existing[index];
+    const ids = call.assignedIdentifier ? autoBatches.get(call.assignedIdentifier) : undefined;
+    let matched = existing[existingCursor];
+    const originalParents = ids?.map((id) => project.document.nodes[id]?.parentId ?? null);
+    if (ids) {
+      if ((call.method !== 'createImage' && call.method !== 'createText') ||
+          !ids.every((id, position) => existing[existingCursor + position]?.id === id)) {
+        throw new Error('The v6 optimized layer array no longer matches the authoring layer order. Restore the generated code before editing the batch structure.');
+      }
+      matched = {
+        id: '__apexify_v6_auto_' + String(index),
+        kind: 'group',
+        name: 'Runtime optimized layers',
+        parentId: null,
+        childIds: ids,
+        transform: { x: 0, y: 0, width: 1, height: 1, visible: true, locked: false, zIndex: index },
+        props: call.method === 'createImage'
+          ? imageBatchGroupPropsRecord({ imageBatch: true, createOptions: {} })
+          : textBatchGroupPropsRecord({ textBatch: true }),
+      };
+    }
+    existingCursor += ids?.length ?? 1;
     const node =
       call.method === 'chart-compose'
         ? reconcileChartCall(
@@ -2154,10 +2202,23 @@ function reconcileRenderableCalls(
                   canvasIdentifier,
                 );
 
-    const oldNode = project.document.nodes[node.id];
-    if (!oldNode) project.document.rootNodeIds.push(node.id);
-    project.document.nodes[node.id] = node;
-    touched.add(node.id);
+    if (ids) {
+      if (node.kind !== 'group' || node.childIds?.length !== ids.length ||
+          node.childIds.some((childId, position) => childId !== ids[position])) {
+        throw new Error('Changing the number or type of elements in an optimized array requires editing the elements on the canvas.');
+      }
+      for (const [position, childId] of ids.entries()) {
+        const child = project.document.nodes[childId];
+        if (!child) throw new Error('Generated v6 batch lost an authored layer.');
+        child.parentId = originalParents?.[position] ?? null;
+        touched.add(childId);
+      }
+    } else {
+      const oldNode = project.document.nodes[node.id];
+      if (!oldNode) project.document.rootNodeIds.push(node.id);
+      project.document.nodes[node.id] = node;
+      touched.add(node.id);
+    }
 
     if (call.method === 'chart-compose') {
       if (call.chartCall.assignedIdentifier) {
@@ -2167,7 +2228,7 @@ function reconcileRenderableCalls(
         identifierToNodeId.set(call.assignedIdentifier, node.id);
       }
     } else if (call.assignedIdentifier) {
-      identifierToNodeId.set(call.assignedIdentifier, node.id);
+      identifierToNodeId.set(call.assignedIdentifier, ids ? ids[ids.length - 1]! : node.id);
     }
 
     if (call.method === 'path2d.draw' && call.args[1]) {
