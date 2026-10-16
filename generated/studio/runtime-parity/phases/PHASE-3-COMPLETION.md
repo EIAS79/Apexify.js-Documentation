@@ -2,7 +2,7 @@
 
 Phase-0 inventory runtime: EIAS79/Apexify.js@a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a
 
-Executed Studio package pin: EIAS79/Apexify.js@379a5248f09ed39c1b1734fe104b6bd73a77857f (6.0.0)
+Executed Studio package pin: EIAS79/Apexify.js@432c7a8e0a54a53bbdc6812174a554208efe42bf (6.0.0)
 
 The Phase-3 runtime proof executes the upgraded Apexify.js package. Phase-0 historical inventory predates advanced createText CreateTextOptions; its 1,861 record classifications must not be interpreted as per-leaf certification of the expanded public API.
 

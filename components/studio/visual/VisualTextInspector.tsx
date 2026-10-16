@@ -525,7 +525,7 @@ function DecorationEditor({
           label={label}
           checked={active}
           onChange={(checked) =>
-            onChange(checked ? { color: DEFAULT_FILL, width: 1 } : undefined)
+            onChange(checked ? { color: DEFAULT_FILL, width: 1 } : false)
           }
         />
       </div>
@@ -906,7 +906,7 @@ export function VisualTextInspector({
                   const decorationKey = kind === 'strike' ? 'strikethrough' : kind;
                   if (kind === 'underline' || kind === 'overline' || kind === 'strike') {
                     return {...current, decorations: {...current.decorations,
-                      [decorationKey]: selected ? undefined : {color: '#f4f7fb', width: 1},
+                      [decorationKey]: selected ? false : {color: current.fill?.color ?? current.color ?? DEFAULT_FILL, width: 1},
                     }, [decorationKey]: undefined };
                   }
                   if (kind === 'outline') return {

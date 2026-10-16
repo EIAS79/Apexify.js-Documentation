@@ -721,28 +721,67 @@ function browserWrappedLines(
 }
 
 function browserResolveCurve(
-  width: number,
+  ctx: CanvasRenderingContext2D,
+  lines: readonly string[],
   props: VisualTextNodeProps,
-): { width: number; extraHeight: number } | null {
+  fontSize: number,
+  lineHeight: number,
+): { width: number; height: number } | null {
   const curve = props.textOnCurve;
-  if (!curve || curve.sweepAngle <= 0 || curve.sweepAngle >= 360) return null;
-  const thetaUser = (curve.sweepAngle * Math.PI) / 180;
-  const fitRadius = thetaUser > 0 ? width / thetaUser : width;
-  const mode = curve.layoutMode ?? 'clamp';
-  let radius = fitRadius;
-  let theta = thetaUser;
-  if (mode === 'fit') {
-    radius = fitRadius;
-  } else if (mode === 'override') {
-    radius = curve.radius ?? fitRadius;
-    const minTheta = radius > 0 ? width / radius : thetaUser;
-    theta = Math.max(thetaUser, minTheta);
-  } else {
-    radius = curve.radius != null ? Math.max(curve.radius, fitRadius) : fitRadius;
+  if (!curve || !(curve.sweepAngle > 0 && curve.sweepAngle < 360)) return null;
+  let left = Infinity, right = -Infinity, top = Infinity, bottom = -Infinity;
+  for (const [lineIndex, line] of lines.entries()) {
+    if (!line) continue;
+    const Segmenter = (Intl as typeof Intl & {
+      Segmenter?: new (
+        locales?: string, options?: { granularity?: 'grapheme' },
+      ) => { segment(value: string): Iterable<{ segment: string }> };
+    }).Segmenter;
+    const units = Segmenter
+      ? Array.from(new Segmenter(undefined, { granularity: 'grapheme' }).segment(line), item => item.segment)
+      : Array.from(line);
+    if (!units.length) continue;
+    const widths: number[] = [];
+    let cumulative = '';
+    for (const unit of units) { cumulative += unit; widths.push(ctx.measureText(cumulative).width); }
+    const textWidth = Math.max(ctx.measureText(line).width, widths[widths.length - 1] ?? 0, 1e-6);
+    const userSweep = curve.sweepAngle * Math.PI / 180;
+    const fitRadius = textWidth / userSweep;
+    const mode = curve.layoutMode ?? 'clamp';
+    const radius = mode === 'fit' ? fitRadius
+      : mode === 'override' ? (curve.radius ?? fitRadius)
+      : Math.max(curve.radius ?? fitRadius, fitRadius);
+    const sweep = mode === 'override' ? Math.max(userSweep, textWidth / radius) : userSweep;
+    const up = curve.up !== false;
+    const start = (curve.startAngleDeg ?? 0) * Math.PI / 180;
+    const cosStart = Math.cos(start), sinStart = Math.sin(start);
+    const centerY = up ? radius : -radius;
+    const drawRadius = radius + (curve.baselineOffset ?? 0);
+    let previous = 0;
+    for (let index = 0; index < units.length; index++) {
+      const center = (previous + widths[index]!) / 2;
+      previous = widths[index]!;
+      const fraction = center / textWidth;
+      const baseAngle = up ? -Math.PI / 2 - sweep / 2 + fraction * sweep
+        : Math.PI / 2 + sweep / 2 - fraction * sweep;
+      const dx = drawRadius * Math.cos(baseAngle);
+      const dy = centerY + drawRadius * Math.sin(baseAngle);
+      const x = dx * cosStart - dy * sinStart;
+      const y = lineIndex * lineHeight + dx * sinStart + dy * cosStart;
+      const rotation = up ? baseAngle + start + Math.PI / 2
+        : Math.atan2(-Math.cos(baseAngle + start), Math.sin(baseAngle + start));
+      const m = ctx.measureText(units[index]!);
+      const halfWidth = Math.max(0, m.width / 2);
+      const halfHeight = Math.max(fontSize / 2,
+        (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) / 2);
+      const c = Math.abs(Math.cos(rotation)), s = Math.abs(Math.sin(rotation));
+      const rx = halfWidth * c + halfHeight * s;
+      const ry = halfWidth * s + halfHeight * c;
+      left = Math.min(left, x - rx); right = Math.max(right, x + rx);
+      top = Math.min(top, y - ry); bottom = Math.max(bottom, y + ry);
+    }
   }
-  const chord = 2 * radius * Math.sin(theta / 2);
-  const sagitta = radius * (1 - Math.cos(theta / 2));
-  return { width: chord, extraHeight: sagitta };
+  return Number.isFinite(left) ? { width: right - left, height: bottom - top } : null;
 }
 
 export function measureVisualTextInBrowser(
@@ -870,11 +909,11 @@ export function measureVisualTextInBrowser(
   };
 
 
-  if (props.textOnCurve && result.lineCount === 1) {
-    const curved = browserResolveCurve(measuredWidth, props);
+  if (props.textOnCurve) {
+    const curved = browserResolveCurve(ctx, lines, props, size, pxLineHeight);
     if (curved) {
       result.width = curved.width;
-      result.height = metricBase.height + curved.extraHeight;
+      result.height = curved.height;
       result.totalHeight = result.height;
       result.centerX = result.width / 2;
       result.centerY = result.height / 2;

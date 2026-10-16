@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "phase": "STUDIO-PARITY-3",
-  "packageDependency": "github:EIAS79/Apexify.js#379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "packageDependency": "github:EIAS79/Apexify.js#432c7a8e0a54a53bbdc6812174a554208efe42bf",
   "packageVersion": "6.0.0",
-  "packageCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "packageCommit": "432c7a8e0a54a53bbdc6812174a554208efe42bf",
   "inventoryRuntimeCommit": "a62a68d0582e08c603d2eb8cd5f4f806cd0fe92a",
   "proofs": {
     "projectProofs": [
@@ -19,8 +19,8 @@
       },
       {
         "name": "curved-text",
-        "bytes": 6361,
-        "sha256": "34eda5f56d5a90918ef74cc1b1f0af449e9ce50fcb36c24fca0ac7143a52c9ad"
+        "bytes": 7054,
+        "sha256": "1704879f9da9e1a8c812a6df6a5ba388dc83856f218b4191d4904645317fde14"
       },
       {
         "name": "advanced-perspective-font",

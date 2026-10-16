@@ -28,7 +28,7 @@ const packageJson = JSON.parse(
   fs.readFileSync(path.join(root, 'package.json'), 'utf8'),
 ) as { dependencies?: Record<string, string> };
 const dependency = packageJson.dependencies?.['apexify.js'] ?? '';
-const expectedPackageCommit = '379a5248f09ed39c1b1734fe104b6bd73a77857f';
+const expectedPackageCommit = '432c7a8e0a54a53bbdc6812174a554208efe42bf';
 assert.match(
   dependency,
   new RegExp(expectedPackageCommit + '$'),

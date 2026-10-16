@@ -8,9 +8,9 @@
     "packageJson": "node_modules/apexify.js/package.json"
   },
   "package": {
-    "commit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+    "commit": "432c7a8e0a54a53bbdc6812174a554208efe42bf",
     "name": "apexify.js",
-    "packedTreeSha256": "08767d40c1968ebddb526842291547ecce390932b3055afa98e4d5a6d83a8021",
+    "packedTreeSha256": "f953c06ec5abf538a42ccde601adf7d71853ab97e07fd9c7be80f4316ed846b9",
     "version": "6.0.0"
   },
   "policy": "Generated from packed package declarations/artifacts and explicit metadata. Do not edit directly.",
