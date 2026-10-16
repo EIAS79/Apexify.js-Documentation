@@ -69,7 +69,7 @@ test('v6 image batches reconcile without converting authored nodes to a group', 
   const project = projectOf(['image', 'image']);
   const canonical = generateVisualProjectCode(project).source;
   const restored = reconcileVisualProjectFromCode(project, canonical);
-  assert.equal(restored.ok, true, restored.error);
+  assert.equal(restored.ok, true, restored.ok ? undefined : restored.error);
   if (!restored.ok) return;
   assert.deepEqual(restored.project.document.rootNodeIds, project.document.rootNodeIds);
   assert.ok(project.document.rootNodeIds.every((id) => restored.project.document.nodes[id]?.kind === 'image'));
@@ -83,7 +83,7 @@ test('v6 optimized image code stays editable without changing layer identities',
   const edited = code.replace('assets/image_0.png', 'assets/replaced.png');
   assert.notEqual(edited, code);
   const result = reconcileVisualProjectFromCode(project, edited);
-  assert.equal(result.ok, true, result.error);
+  assert.equal(result.ok, true, result.ok ? undefined : result.error);
   if (!result.ok) return;
   assert.deepEqual(result.project.document.rootNodeIds, project.document.rootNodeIds);
   assert.equal(
@@ -101,7 +101,7 @@ test('v6 optimized text array preserves individually editable text nodes', () =>
   assert.match(code, /createText\(\s*\[/);
   const edited = code.replace('Label 0', 'Edited label');
   const rebuilt = reconcileVisualProjectFromCode(project, edited);
-  assert.equal(rebuilt.ok, true, rebuilt.error);
+  assert.equal(rebuilt.ok, true, rebuilt.ok ? undefined : rebuilt.error);
   if (!rebuilt.ok) return;
   assert.deepEqual(rebuilt.project.document.rootNodeIds, project.document.rootNodeIds);
   assert.equal(rebuilt.project.document.nodes.text_0?.kind, 'text');
@@ -144,5 +144,5 @@ test('v6 code source is stable and defensive about structural array edits', () =
   const noMetadata = reconcileVisualProjectFromCode(project, edited);
   // Removing the authoring identity marker explicitly opts into a native
   // createImage() group, rather than silently doing so during autosync.
-  assert.equal(noMetadata.ok, true, noMetadata.error);
+  assert.equal(noMetadata.ok, true, noMetadata.ok ? undefined : noMetadata.error);
 });
