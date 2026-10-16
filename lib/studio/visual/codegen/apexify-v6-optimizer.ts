@@ -1,6 +1,8 @@
 import type {
   StudioCreateImageOperation,
   StudioCreateTextOperation,
+  StudioImageProperties,
+  StudioTextProperties,
   StudioOperation,
   StudioOperationPlan,
   StudioTargetReference,
@@ -73,9 +75,8 @@ function mergeLayers(layers: LayerOperation[]): ApexifyV6AutoBatch {
     return {
       ...(last as StudioCreateImageOperation),
       base: first.base,
-      properties: layers.flatMap((layer) =>
-        (layer as StudioCreateImageOperation).properties as
-          StudioCreateImageOperation['properties'][],
+      properties: layers.map((layer) =>
+        (layer as StudioCreateImageOperation).properties as StudioImageProperties,
       ),
       autoBatchNodeIds,
     };
@@ -83,9 +84,8 @@ function mergeLayers(layers: LayerOperation[]): ApexifyV6AutoBatch {
   return {
     ...(last as StudioCreateTextOperation),
     base: first.base,
-    properties: layers.flatMap((layer) =>
-      (layer as StudioCreateTextOperation).properties as
-        StudioCreateTextOperation['properties'][],
+    properties: layers.map((layer) =>
+      (layer as StudioCreateTextOperation).properties as StudioTextProperties,
     ),
     autoBatchNodeIds,
   };
