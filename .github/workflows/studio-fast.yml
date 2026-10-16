@@ -5,6 +5,7 @@ on:
     branches:
       - 'studio-parity-*'
       - 'studio-visual/**'
+      - 'refactor/studio-*'
     paths:
       - 'app/studio/**'
       - 'app/api/gallery/run/**'
@@ -14,7 +15,23 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'tsconfig.json'
+      - 'styles/studio-calm.css'
+      - 'styles/studio-calm/**'
       - 'vercel.json'
+      - '.github/workflows/studio-fast.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'app/studio/**'
+      - 'components/studio/**'
+      - 'lib/studio/**'
+      - 'scripts/studio/**'
+      - 'styles/studio-calm.css'
+      - 'styles/studio-calm/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
       - '.github/workflows/studio-fast.yml'
   workflow_dispatch:
 
@@ -70,6 +87,6 @@ jobs:
 
       - name: Run affected Studio validation
         env:
-          STUDIO_CI_BASE_SHA: ${{ github.event.before }}
-          STUDIO_CI_HEAD_SHA: ${{ github.sha }}
+          STUDIO_CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          STUDIO_CI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: npm run studio:ci:fast

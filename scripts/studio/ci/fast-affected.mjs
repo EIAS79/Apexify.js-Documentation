@@ -55,7 +55,7 @@ const files = changedFiles();
 console.log('[studio-fast] changed files:', files.length ? '\n' + files.map((f) => '  - ' + f).join('\n') : ' none');
 
 const codeFiles = files.filter((file) =>
-  /^(?:app\/studio\/|app\/api\/gallery\/run\/|components\/studio\/|lib\/studio\/|scripts\/studio\/|package(?:-lock)?\.json$|tsconfig\.json$|vercel\.json$|\.github\/workflows\/studio-)/.test(file),
+  /^(?:styles\/studio-calm(?:\.css|\/)|app\/studio\/|app\/api\/gallery\/run\/|components\/studio\/|lib\/studio\/|scripts\/studio\/|package(?:-lock)?\.json$|tsconfig\.json$|vercel\.json$|\.github\/workflows\/studio-)/.test(file),
 );
 
 if (!codeFiles.length) {
@@ -103,6 +103,9 @@ if (sharedVisual) {
 
 if (!sharedVisual || tests.size) {
   for (const file of codeFiles) {
+    if (/^styles\/studio-calm(?:\.css|\/)/.test(file)) {
+      add('scripts/studio/visual/pre4-shell.test.ts', 'scripts/studio/visual/phase4-canvas.test.ts', 'scripts/studio/visual/phase5-images-shapes.test.ts', 'scripts/studio/visual/phase17-hardening.test.ts');
+    }
     if (/VisualCanvasInspector|canvas-contract|phase4-canvas/.test(file)) {
       add('scripts/studio/visual/phase4-canvas.test.ts');
     }
