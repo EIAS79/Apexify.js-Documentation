@@ -1,0 +1,30 @@
+name: Gallery asset integrity
+
+on:
+  pull_request:
+    paths:
+      - 'app/gallery/**'
+      - 'lib/gallery/motion-field/**'
+      - 'public/gallery/motion-field/**'
+      - 'scripts/gallery/motion-field/**'
+      - '.github/workflows/gallery-asset-integrity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  artifact-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Ensure FFprobe available
+        run: command -v ffprobe || (sudo apt-get update -qq && sudo apt-get install -y ffmpeg)
+      - name: Validate source, still, motion and WebP assets
+        env:
+          GALLERY_QA_REQUIRE_FFPROBE: '1'
+        run: node scripts/gallery/motion-field/verify-published.mjs
