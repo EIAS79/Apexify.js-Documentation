@@ -50,7 +50,7 @@ function executablePhase10Project(project: VisualProject): VisualProject {
 
 export function generatePhase10NativeSource(project: VisualProject): string {
   const executable = executablePhase10Project(project);
-  const source = emitStudioOperationPlan(optimizeApexifyV6Plan(lowerVisualProject(executable)));
+  const source = emitStudioOperationPlan(optimizeApexifyV6Plan(lowerVisualProject(executable)), { readableSections: true });
   return '/* ' + PHASE10_SOURCE_MARKER + semanticPayload(project) + ' */\n' + source;
 }
 

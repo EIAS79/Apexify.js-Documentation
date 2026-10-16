@@ -58,7 +58,7 @@ export function generateVisualProjectCode(project: VisualProject): GeneratedVisu
       ? generatePhase10NativeSource(project)
       : hasPhase9Authoring(project)
       ? generatePhase9NativeSource(project)
-      : emitStudioOperationPlan(optimizeApexifyV6Plan(lowerVisualProject(project)));
+      : emitStudioOperationPlan(optimizeApexifyV6Plan(lowerVisualProject(project)), { readableSections: true });
   return {
     language: 'typescript',
     fileName: `${safeFileStem(project.name)}.ts`,
