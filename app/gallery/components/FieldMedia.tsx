@@ -18,6 +18,12 @@ export function FieldPlayer({ item, motion, onInspect }: { item: FieldEntry; mot
   const [visible, setVisible] = useState(true);
   const [foreground, setForeground] = useState(true);
   const [requested, setRequested] = useState(true);
+  const [manualPlay, setManualPlay] = useState(false);
+  const updateDuration = (node: HTMLVideoElement) => {
+    const candidate = Number.isFinite(node.duration) && node.duration > 0 ? node.duration :
+      node.seekable.length ? node.seekable.end(node.seekable.length - 1) : 0;
+    if (Number.isFinite(candidate) && candidate > 0) setDuration(candidate);
+  };
   useEffect(() => {
     const update = () => setForeground(!document.hidden);
     update(); document.addEventListener('visibilitychange', update);
@@ -28,22 +34,22 @@ export function FieldPlayer({ item, motion, onInspect }: { item: FieldEntry; mot
   useEffect(() => {
     const node = video.current;
     if (!node) return;
-    if (Number.isFinite(node.duration)) setDuration(node.duration);
-    if (motion && requested && visible && foreground) void node.play().catch(() => setPlaying(false));
+    updateDuration(node);
+    if ((motion || manualPlay) && requested && visible && foreground) void node.play().catch(() => setPlaying(false));
     else node.pause();
-  }, [motion, requested, visible, foreground, item.id]);
+  }, [motion, manualPlay, requested, visible, foreground, item.id]);
   return <div className="field-player" ref={surface}>
     <div className="field-player-art">
       {item.media === 'video' ? <video ref={video} src={item.thumbnail} poster={item.poster} muted playsInline loop preload="metadata"
-        onDurationChange={event => { if (Number.isFinite(event.currentTarget.duration)) setDuration(event.currentTarget.duration); }} onLoadedMetadata={event => setDuration(event.currentTarget.duration)} onTimeUpdate={event => setPosition(event.currentTarget.currentTime)}
+        onDurationChange={event => updateDuration(event.currentTarget)} onLoadedMetadata={event => updateDuration(event.currentTarget)} onTimeUpdate={event => { setPosition(event.currentTarget.currentTime); updateDuration(event.currentTarget); }}
         onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onError={() => setError(true)} aria-label={`${item.title} rendered preview`} />
         : item.media === 'gif' ? <img src={motion ? item.thumbnail : (item.poster ?? item.thumbnail)} alt={item.title} width={1200} height={675} /> : <FieldThumbnail item={item} eager />}
     </div>
     <div className="field-player-controls">
       {item.media === 'video' && !error ? <>
-        <button className="field-icon" disabled={!motion} aria-label={playing ? 'Pause preview' : 'Play preview'} onClick={() => setRequested(!playing)}>{playing ? <PauseIcon /> : <PlayIcon />}</button>
-        <input aria-label="Preview position" type="range" min={0} max={duration || 4} step={.05} value={position} onChange={event => { const value = Number(event.target.value); if (video.current) video.current.currentTime = value; setPosition(value); }} />
-        <span className="field-mono">{time(position)} / {time(duration)}</span>
+        <button className="field-icon" aria-label={playing ? 'Pause preview' : 'Play preview'} onClick={() => { setManualPlay(true); setRequested(!playing); }}>{playing ? <PauseIcon /> : <PlayIcon />}</button>
+        <input aria-label="Preview position" type="range" min={0} max={duration > 0 ? duration : 1} disabled={duration <= 0} step={.05} value={Math.min(position, duration > 0 ? duration : 1)} onChange={event => { const value = Number(event.target.value); if (video.current) video.current.currentTime = value; setPosition(value); }} />
+        <span className="field-mono">{duration > 0 ? `${time(position)} / ${time(duration)}` : 'Loading duration…'}</span>
       </> : <span className="field-mono">{error ? 'Preview unavailable. Open the example to view its source.' : 'RENDERED CANVAS / PNG'}</span>}
       <button className="field-icon" aria-label={`Inspect ${item.title}`} onClick={onInspect}><ArrowsPointingOutIcon /></button>
     </div>
