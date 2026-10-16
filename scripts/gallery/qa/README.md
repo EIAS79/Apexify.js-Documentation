@@ -131,3 +131,26 @@ Support branch: support/gallery-resume-qa-20261016 (draft PR).
 All support changes are under scripts/gallery/qa.
 Work can cherry-pick them later without replacing its CSS, components,
 templates or generated artwork.
+
+
+## Optional live browser smoke
+
+This check requires a served local/preview site and the same puppeteer-core
+tool used by existing documentation browser suites. Set CHROME_PATH to an
+installed Chromium/Chrome executable and GALLERY_QA_URL to the site origin.
+
+    CHROME_PATH=/path/to/chrome GALLERY_QA_URL=http://127.0.0.1:3000 \
+      node scripts/gallery/qa/browser-smoke.mjs
+
+Optional output variables: GALLERY_QA_REPORT=/tmp/gallery-browser.json and
+GALLERY_QA_SCREENSHOT_DIR=/tmp/gallery-browser-shots.
+
+The script probes the existing .apx-gallery-card-based UI. If Work replaces
+those structural classnames, update selectors to the actual implemented
+gallery before running. It checks desktop/tablet/mobile/narrow viewports,
+inspector open/Escape/viewport bounds, source text presence where available,
+real modal-video loadedmetadata/duration/dimensions, and page errors.
+
+It does not replace axe, full interaction coverage, Studio transfer tests, or
+a video seek/play test. The relevant additional checks remain in the table
+above. A passing smoke test is not permission to merge without those gates.
