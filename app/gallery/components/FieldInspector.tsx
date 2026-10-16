@@ -65,17 +65,18 @@ export default function FieldInspector({ item, motion, onClose }: { item: FieldE
         <div className="field-inspector-preview"><FieldPlayer key={`${item.id}-${output}`} item={display} motion={motion} onInspect={() => setView('source')} />
           {!!data?.outputs?.length && <label className="field-output-select">Output<select value={output} onChange={event => setOutput(Number(event.target.value))}>{data.outputs.map((asset, i) => <option key={asset.src} value={i}>{asset.label}</option>)}</select></label>}
           <p>{item.description}</p>
-          <div className="field-proof"><span className="field-dot" />{item.kind === 'template' ? 'PNG rendered from this exact source · 1200 × 675' : item.sourceLabel}</div>
+          <div className="field-proof"><span className="field-dot" />{item.source ? 'Source-backed Apexify rendering · 1200 × 675' : item.sourceLabel}</div>
           {item.output && <a className="field-text-link" href={item.output} download>Download original PNG <ArrowDownTrayIcon /></a>}
-          {item.kind === 'template' && item.media === 'video' && <p className="field-note">The loop uses 48 calls to render(phase), encoded with FFmpeg. Run the file for the still image; the browser plays a rendered video.</p>}
+          {item.source && item.kind === 'template' && item.media === 'video' && <p className="field-note">The loop uses 48 calls to render(phase), encoded with FFmpeg. Run the file for the still image; the browser plays a rendered video.</p>}
           {item.docs && <a className="field-text-link" href={item.docs}>Read the related documentation <ArrowUpRightIcon /></a>}
         </div>
         <div className="field-inspector-code">
           <div className="field-segment" aria-label="Example view"><button aria-pressed={view === 'guide'} onClick={() => setView('guide')}>Walkthrough</button><button aria-pressed={view === 'source'} onClick={() => setView('source')}>Full source</button></div>
           {view === 'guide' ? <div className="field-guide">
-            <h3>{item.kind === 'template' ? 'From a blank canvas to this.' : 'Go from output to implementation.'}</h3>
+            <h3>{item.source ? 'From a blank canvas to this.' : 'Understand the rendering recipe.'}</h3>
             {item.steps ? <ol>{item.steps.map((step, index) => <li key={step.title}><span>{String(index + 1).padStart(2, '0')}</span><div><h4>{step.title}</h4><p>{step.detail}</p></div></li>)}</ol>
               : <p>This existing {item.kind === 'showcase' ? 'showcase is presented as a finished film. It does not include a runnable source recipe.' : 'example includes its published source. Open Full source to inspect the implementation and its dependencies.'}</p>}
+            {!item.source && data?.sourceHref && <p className="field-note">This advanced recipe is source-backed, but may rely on the original Peak Lab project setup. Review the complete canonical source and required assets before executing locally.</p>}
             {item.source && <div className="field-setup"><h4>Run it locally</h4><p>Use Node.js 22+ and Git. In a new folder, install the exact runtime and fonts used for this output:</p><pre tabIndex={0}>{INSTALL}</pre><button className="field-text-link" onClick={() => copyText(INSTALL, 'Install command')}>Copy install command <ClipboardDocumentIcon /></button><p>Download the source into that folder, then run:</p><pre tabIndex={0}>node {item.id}.mjs</pre><p>Your PNG appears beside the script. No image assets or API keys are needed.</p>{item.media === 'video' && <><p>To reproduce the four-second loop, install FFmpeg on your PATH and run:</p><pre tabIndex={0}>node {item.id}.mjs --animate</pre><p>This renders all 48 frames before encoding an MP4. The extra bottom pixel is padding for video compatibility.</p></>}</div>}
             <button className="field-primary" onClick={() => setView('source')}>Read the full source <ArrowUpRightIcon /></button>
           </div> : <div className="field-source">
