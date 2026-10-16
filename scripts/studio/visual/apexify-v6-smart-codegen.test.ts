@@ -7,6 +7,7 @@ import { lowerVisualProject } from '../../../lib/studio/visual/compiler/plan';
 import { optimizeApexifyV6Plan } from '../../../lib/studio/visual/codegen/apexify-v6-optimizer';
 import { generateVisualProjectCode } from '../../../lib/studio/visual/codegen/generator';
 import { reconcileVisualProjectFromCode } from '../../../lib/studio/visual/codegen/reconcile';
+import { phase15CleanGeneratedSource } from '../../../lib/studio/visual/export-contract';
 
 function projectOf(types: Array<'image' | 'text'>) {
   const project = createVisualProject({
@@ -145,4 +146,12 @@ test('v6 code source is stable and defensive about structural array edits', () =
   // Removing the authoring identity marker explicitly opts into a native
   // createImage() group, rather than silently doing so during autosync.
   assert.equal(noMetadata.ok, true, noMetadata.ok ? undefined : noMetadata.error);
+});
+
+test('standalone v6 export strips Studio identity metadata but retains native arrays', () => {
+  const code = generateVisualProjectCode(projectOf(['image', 'image'])).source;
+  const exported = phase15CleanGeneratedSource(code);
+  assert.doesNotMatch(exported, /apexify-v6:auto-batch/);
+  assert.match(exported, /createImage\(\s*\[/);
+  assert.match(exported, /\/\/ Image layers \(stacking order preserved\)/);
 });
