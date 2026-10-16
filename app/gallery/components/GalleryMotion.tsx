@@ -43,6 +43,18 @@ export default function GalleryMotion({ entries }: { entries: FieldEntry[] }) {
     reduce.addEventListener('change', change);
     return () => reduce.removeEventListener('change', change);
   }, []);
+  // Deep-link the four first-class Gallery sections without confusing item hash links.
+  useEffect(() => {
+    const readSection = () => {
+      const view = new URLSearchParams(window.location.search).get('view');
+      if (view === 'use-cases' || view === 'explore' || view === 'templates' || view === 'examples') {
+        setSection(view);
+      }
+    };
+    readSection();
+    window.addEventListener('popstate', readSection);
+    return () => window.removeEventListener('popstate', readSection);
+  }, []);
   useEffect(() => { setLimit(16); }, [section, lens, query]);
   useEffect(() => {
     const read = () => {
@@ -77,7 +89,12 @@ export default function GalleryMotion({ entries }: { entries: FieldEntry[] }) {
     window.history.replaceState(null, '', `${location.pathname}${location.search}#${encodeURIComponent(`${item.id}+${item.primary}`)}`);
   }
   function close() { setInspecting(null); window.history.replaceState(null, '', `${location.pathname}${location.search}`); }
-  function switchSection(next: GallerySection) { setSection(next); setLens('all'); setQuery(''); setSelected(entries[0]?.id); }
+  function switchSection(next: GallerySection) {
+    setSection(next); setLens('all'); setQuery(''); setSelected(entries[0]?.id);
+    const url = new URL(window.location.href);
+    url.searchParams.set('view', next);
+    window.history.pushState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  }
   function toggleMotion() { setMotion(current => { try { localStorage.setItem('apexify.gallery.motion', current ? 'off' : 'on'); } catch {} return !current; }); }
   function toggleTheme() { setLight(current => { try { localStorage.setItem('apexify.gallery.theme', current ? 'dark' : 'light'); } catch {} return !current; }); }
   return <div className="motion-field" data-theme={light ? 'light' : 'dark'} data-motion={motion ? 'on' : 'off'}>
