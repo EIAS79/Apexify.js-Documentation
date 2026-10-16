@@ -24,12 +24,16 @@ async function visit(view) {
   const pageErrors = [];
   page.on('pageerror', err => pageErrors.push(err.message));
   try {
+    // Next production responds 304 across sequential independent browser pages
+    // with reused cache validators. Disable cache, then assert rendered DOM.
+    await page.setCacheEnabled(false);
+    await page.setExtraHTTPHeaders({ 'Cache-Control': 'no-cache' });
     await page.setViewport({ width: view.width, height: view.height });
     if (view.reduced) {
       await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     }
     let res = await page.goto(base + '/gallery', { waitUntil: 'networkidle2', timeout: 90000 });
-    if (res?.status() !== 200) throw new Error('Gallery HTTP ' + res?.status());
+    if (res?.status() !== 200 && res?.status() !== 304) throw new Error('Gallery HTTP ' + res?.status());
     await page.waitForSelector('.motion-field .field-stage');
     const title = await page.$eval('.field-intro h1', el => el.textContent?.trim());
     if (!title?.toLowerCase().includes('explore')) throw new Error('Selected Gallery concept missing');
@@ -90,7 +94,7 @@ async function visit(view) {
 
     // API uses the same Frame theme provider as the updated Docs.
     res = await page.goto(base + '/api-reference', { waitUntil: 'networkidle2', timeout: 90000 });
-    if (res?.status() !== 200) throw new Error('API HTTP ' + res?.status());
+    if (res?.status() !== 200 && res?.status() !== 304) throw new Error('API HTTP ' + res?.status());
     await page.waitForSelector('.apx-api-root .apx-doc-root[data-frame-theme]');
     await page.waitForSelector('input[aria-label="Search API exports"]');
     const cardsBefore = await page.$$eval('.apx-api-explorer .apx-api-reference-card', nodes => nodes.length);
