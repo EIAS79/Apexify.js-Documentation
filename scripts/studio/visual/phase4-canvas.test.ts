@@ -1,3 +1,4 @@
+import { readStudioCss } from './studio-css-source';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
@@ -338,7 +339,7 @@ test('Phase 4 keeps uploaded video background preview/extraction in the browser'
 
 test('Phase 4 uses modern async feedback and reset confirmation UI', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
 
   assert.doesNotMatch(shell, /window\.confirm\(/);
   assert.match(shell, /role="alertdialog"/);

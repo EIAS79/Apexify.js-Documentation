@@ -1,3 +1,4 @@
+import { readStudioCss } from './studio-css-source';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import test from 'node:test';
@@ -418,7 +419,7 @@ test('Phase 5 classifies every pinned image, shape and createImage option into t
 
 test('Phase 5 createImage inspector follows the modern createCanvas visual grammar', () => {
   const inspector = fs.readFileSync('components/studio/visual/VisualImageInspector.tsx', 'utf8');
-  const css = fs.readFileSync('styles/studio-calm.css', 'utf8');
+  const css = readStudioCss();
 
   assert.match(inspector, /apx-canvas-v2-header apx-image-v2-header/);
   assert.match(inspector, /apx-canvas-v2-section apx-image-v2-section/);
