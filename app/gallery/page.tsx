@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import '@/styles/gallery-calm.css';
-import GalleryClient from './components/GalleryClient';
+import '@/styles/gallery-motion.css';
+import GalleryMotion from './components/GalleryMotion';
+import { getFieldEntries } from '@/lib/gallery/motion-field/server';
 import { absoluteSiteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: 'Gallery | Apexify.js',
-  description: 'Browse Apexify.js visual output across composition, image, typography, data, motion, surface, and advanced rendering studies.',
+  description: 'Explore Apexify.js use cases, reusable canvas templates, rendered motion studies, and source-backed code examples.',
   alternates: { canonical: absoluteSiteUrl('/gallery') },
   openGraph: {
     type: 'website',
@@ -20,5 +21,5 @@ export const metadata: Metadata = {
  * during HMR (`Cannot find module './276.js'`) even when webpack `splitChunks` is disabled.
  */
 export default function GalleryPage() {
-  return <GalleryClient />;
+  return <GalleryMotion entries={getFieldEntries()} />;
 }

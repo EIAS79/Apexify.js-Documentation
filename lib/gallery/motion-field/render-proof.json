@@ -1,0 +1,67 @@
+{
+  "package": "github:EIAS79/Apexify.js#379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "fonts": "dejavu-fonts-ttf@2.37.3",
+  "recipes": [
+    {
+      "id": "orbit-study",
+      "source": "/gallery/motion-field/source/orbit-study.mjs",
+      "sourceSHA256": "4853a9a71b6dfa45390d9c81bfdb9bbf49307ccea6550f77abe23de4e35de126",
+      "output": "/gallery/motion-field/orbit-study.png",
+      "outputSHA256": "52c0533212291720068bc07287b677637ba29a0d49aabc6c847f1596114acc35",
+      "width": 1200,
+      "height": 675,
+      "animation": {
+        "frames": 48,
+        "fps": 12,
+        "seconds": 4,
+        "source": "render(index / 48)",
+        "encoder": "FFmpeg libx264",
+        "videoSHA256": "85fffa295c7f48e393925d8b78026b863ac043e6fb06dcb9e31c4ecefd793aa1"
+      }
+    },
+    {
+      "id": "signal-flow",
+      "source": "/gallery/motion-field/source/signal-flow.mjs",
+      "sourceSHA256": "86551f3a378487db70a43161acfe4067f649c408d12e5ca77dee4bbb98688f6e",
+      "output": "/gallery/motion-field/signal-flow.png",
+      "outputSHA256": "3e48d745312285a5f774b7cedbae1f6aa468cb960cfc1a9d2153a6c9d5d91cb0",
+      "width": 1200,
+      "height": 675,
+      "animation": {
+        "frames": 48,
+        "fps": 12,
+        "seconds": 4,
+        "source": "render(index / 48)",
+        "encoder": "FFmpeg libx264",
+        "videoSHA256": "ab2091ce4a177d43f82b87e224a1899c8b31b4c32ac53f02ea06eb3cb8927d3f"
+      }
+    },
+    {
+      "id": "launch-card",
+      "source": "/gallery/motion-field/source/launch-card.mjs",
+      "sourceSHA256": "6b31f19641b3090c854d1535e1f721ea93da69c7a36393e16f76f5117a7be823",
+      "output": "/gallery/motion-field/launch-card.png",
+      "outputSHA256": "0e6835f3ec7e7b028258adb2fbea41b38287a7f14a21e171996789b17e90f64e",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "id": "data-pulse",
+      "source": "/gallery/motion-field/source/data-pulse.mjs",
+      "sourceSHA256": "1de703683a77a3b1d230d0dc978ec183e4a5648a8b473ab08ad110a65617b3a7",
+      "output": "/gallery/motion-field/data-pulse.png",
+      "outputSHA256": "7adf70fa8e09f8ed068586caf8c2934b42431f4b23004476334dd16ffebcaea1",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "id": "prism-type",
+      "source": "/gallery/motion-field/source/prism-type.mjs",
+      "sourceSHA256": "c5289433d7e593f365094dd490bf16c9f86c2b363234710971e44fd3a4c4b8cb",
+      "output": "/gallery/motion-field/prism-type.png",
+      "outputSHA256": "d9fe8cf4f32ba8b5ec64ccdb7fa72b19ffd4434fbd29f6639d88595f52a48497",
+      "width": 1200,
+      "height": 675
+    }
+  ]
+}
