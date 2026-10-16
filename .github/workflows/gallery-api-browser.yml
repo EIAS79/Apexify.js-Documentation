@@ -1,0 +1,61 @@
+name: Gallery and API browser acceptance
+
+on:
+  pull_request:
+    paths:
+      - 'app/gallery/**'
+      - 'app/api-reference/**'
+      - 'components/api-reference/**'
+      - 'components/docs/shell/DocsHeader.tsx'
+      - 'lib/gallery/motion-field/**'
+      - 'styles/gallery-motion.css'
+      - 'styles/docs-api-frame.css'
+      - 'scripts/gallery/motion-field/browser-production-smoke.mjs'
+      - '.github/workflows/gallery-api-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install exact project dependencies and generate documentation
+        run: npm ci --no-audit --no-fund
+      - name: Install browser test driver only
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0
+      - name: Build production Next site
+        run: npm run build
+      - name: Boot local production server
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/apexify-gallery-server.log 2>&1 &
+          echo $! > /tmp/apexify-gallery-server.pid
+          for i in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3000/gallery >/dev/null 2>&1; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/apexify-gallery-server.log
+          exit 1
+      - name: Gallery/API desktop mobile and reduced-motion verification
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+          APEXIFY_SMOKE_URL: http://127.0.0.1:3000
+          APEXIFY_SMOKE_SCREENSHOTS: /tmp/apexify-gallery-screenshots
+        run: node scripts/gallery/motion-field/browser-production-smoke.mjs
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gallery-api-browser-screenshots
+          path: /tmp/apexify-gallery-screenshots
+          if-no-files-found: ignore
+      - name: Server log on failure
+        if: failure()
+        run: cat /tmp/apexify-gallery-server.log || true
