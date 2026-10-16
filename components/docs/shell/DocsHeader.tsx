@@ -16,7 +16,7 @@ function docsHeaderPrefetch(href: string): false | undefined {
   return href.startsWith('/docs') ? undefined : false;
 }
 
-export function DocsHeader() {
+export function DocsHeader({ active = 'Docs' }: { active?: 'Docs' | 'API' }) {
 
   return (
     <header className="apx-doc-header" data-doc2-header>
@@ -31,7 +31,7 @@ export function DocsHeader() {
               key={link.href}
               href={link.href}
               prefetch={docsHeaderPrefetch(link.href)}
-              aria-current={link.label === 'Docs' ? 'page' : undefined}
+              aria-current={link.label === active ? 'page' : undefined}
             >
               {link.label}
             </Link>
@@ -68,7 +68,7 @@ export function DocsHeader() {
                     key={link.href}
                     href={link.href}
                     prefetch={docsHeaderPrefetch(link.href)}
-                    aria-current={link.label === 'Docs' ? 'page' : undefined}
+                    aria-current={link.label === active ? 'page' : undefined}
                   >
                     {link.label}
                   </Link>
