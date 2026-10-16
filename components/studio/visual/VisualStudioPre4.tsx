@@ -6137,8 +6137,6 @@ export default function VisualStudioPre4({
                   }}
                 />
               ) : null}
-              <div className="apx-pre4-artboard-grid" />
-
               {artboardPreviewBusy || canvasFrameExtracting ? (
                 <div
                   className="apx-pre4-render-progress"

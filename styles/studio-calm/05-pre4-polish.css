@@ -471,14 +471,6 @@
     0 24px 60px rgba(0,0,0,.31);
 }
 
-.apx-pre4-artboard-grid{
-  opacity:.44;
-  background:
-    linear-gradient(rgba(52,91,132,.11) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(52,91,132,.11) 1px,transparent 1px);
-  background-size:48px 48px;
-}
-
 /* --------------------------------------------------------------------------
    6. Inspector
    -------------------------------------------------------------------------- */

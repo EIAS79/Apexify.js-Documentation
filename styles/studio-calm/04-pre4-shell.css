@@ -613,17 +613,6 @@
     0 26px 70px rgba(0,0,0,.36);
 }
 
-.apx-pre4-artboard-grid{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:.6;
-  background:
-    linear-gradient(rgba(49,101,165,.14) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(49,101,165,.14) 1px,transparent 1px);
-  background-size:48px 48px;
-}
-
 .apx-pre4-node{
   position:absolute;
   box-sizing:border-box;
