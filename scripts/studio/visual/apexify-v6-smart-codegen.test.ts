@@ -121,7 +121,8 @@ test('v6 optimizer preserves generated-buffer dependencies and explicit call opt
   const project = projectOf(['image', 'image']);
   const second = project.document.nodes.image_1!;
   second.props = imagePropsRecord({
-    ...defaultImageNodeProps({ $generated: 'image_0' }),
+    ...defaultImageNodeProps(''),
+    source: { $generated: 'image_0' },
   });
   const dependencyPlan = optimizeApexifyV6Plan(lowerVisualProject(project));
   assert.equal(dependencyPlan.operations.filter((op) => op.kind === 'create-image').length, 2);
