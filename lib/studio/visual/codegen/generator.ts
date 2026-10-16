@@ -1,6 +1,7 @@
 import type { VisualProject } from '../model';
 import { lowerVisualProject } from '../compiler/plan';
 import { emitStudioOperationPlan } from './emitter';
+import { optimizeApexifyV6Plan } from './apexify-v6-optimizer';
 import {
   generatePhase9NativeSource,
   generatePhase9PreviewSource,
@@ -57,7 +58,7 @@ export function generateVisualProjectCode(project: VisualProject): GeneratedVisu
       ? generatePhase10NativeSource(project)
       : hasPhase9Authoring(project)
       ? generatePhase9NativeSource(project)
-      : emitStudioOperationPlan(lowerVisualProject(project));
+      : emitStudioOperationPlan(optimizeApexifyV6Plan(lowerVisualProject(project)), { readableSections: true });
   return {
     language: 'typescript',
     fileName: `${safeFileStem(project.name)}.ts`,

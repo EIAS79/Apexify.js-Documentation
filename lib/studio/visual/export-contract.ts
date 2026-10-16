@@ -96,7 +96,8 @@ export function phase15SemanticHash(project: VisualProject): string {
 export function stripStudioSourceMarkers(source: string): string {
   return source
     .replace(/^\/\*\s*apexify-studio-v(?:9|10|11|12|13|14):[^*]+\*\/\s*/u, '')
-    .replace(/^\/\*\s*apexify-studio provenance:[^*]+\*\/\s*/u, '');
+    .replace(/^\/\*\s*apexify-studio provenance:[^*]+\*\/\s*/u, '')
+    .replace(/^\s*\/\* apexify-v6:auto-batch:[^*]+ \*\/\s*$/gm, '');
 }
 
 export function formatGeneratedTypeScript(source: string): string {

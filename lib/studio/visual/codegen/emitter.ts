@@ -105,9 +105,28 @@ function imageOutputIdentity(plan: StudioOperationPlan): { mime: string; name: s
   return { mime, name: 'preview.' + fileExtension };
 }
 
+function studioCodeSection(kind: StudioOperationPlan['operations'][number]['kind']): string {
+  switch (kind) {
+    case 'register-asset': return 'Assets and reusable values';
+    case 'create-canvas': return 'Canvas setup';
+    case 'create-image': return 'Image layers (stacking order preserved)';
+    case 'create-text': return 'Text layers (stacking order preserved)';
+    case 'image-utility': return 'Image preprocessing';
+    case 'image-analysis': return 'Image analysis';
+    case 'create-scene':
+    case 'render-template': return 'Scenes and components';
+    case 'create-chart':
+    case 'create-comparison-chart':
+    case 'create-combo-chart': return 'Charts and data';
+    case 'path-draw':
+    case 'path-custom': return 'Vector paths';
+    default: return 'Pixels and inspection';
+  }
+}
+
 export function emitStudioOperationPlan(
   plan: StudioOperationPlan,
-  options: { includeAnalysisResults?: boolean } = {},
+  options: { includeAnalysisResults?: boolean; readableSections?: boolean } = {},
 ): string {
   const imports = new ImportRegistry();
   imports.add('apexify.js', 'ApexPainter');
@@ -120,7 +139,15 @@ export function emitStudioOperationPlan(
   const analysisResultNames: Array<{ key: string; name: string }> = [];
 
   const body: string[] = [];
+  let currentSection = '';
   for (const operation of plan.operations) {
+    if (options.readableSections) {
+      const section = studioCodeSection(operation.kind);
+      if (section !== currentSection) {
+        body.push('', '  // ' + section);
+        currentSection = section;
+      }
+    }
     if (operation.kind === 'register-asset') {
       const method =
         operation.registryKind === 'image'
@@ -187,6 +214,11 @@ export function emitStudioOperationPlan(
       const painterOpts = operation.painterOpts
         ? `, ${emitValue(operation.painterOpts, 2, targetNames)}`
         : '';
+      const ids = (operation as typeof operation & { autoBatchNodeIds?: string[] }).autoBatchNodeIds;
+      if (ids?.length) {
+        body.push('  // Apexify.js v6: ordered image layers');
+        body.push('  /* apexify-v6:auto-batch:' + encodeURIComponent(JSON.stringify(ids)) + ' */');
+      }
       body.push(
         `  const ${targetName} = await ${painterName}.createImage(${properties}, ${base}${options}${painterOpts});`,
       );
@@ -207,6 +239,11 @@ export function emitStudioOperationPlan(
       const painterOpts = operation.painterOpts
         ? `, ${emitValue(operation.painterOpts, 2, targetNames)}`
         : '';
+      const ids = (operation as typeof operation & { autoBatchNodeIds?: string[] }).autoBatchNodeIds;
+      if (ids?.length) {
+        body.push('  // Apexify.js v6: ordered text layers');
+        body.push('  /* apexify-v6:auto-batch:' + encodeURIComponent(JSON.stringify(ids)) + ' */');
+      }
       body.push(
         `  const ${targetName} = await ${painterName}.createText(${properties}, ${base}${textOptions}${painterOpts});`,
       );
@@ -452,6 +489,7 @@ export function emitStudioOperationPlan(
     );
   }
   body.push('');
+  if (options.readableSections) body.push('  // Final output');
   const resultExpression = plan.result.member
     ? `${resultName}.${plan.result.member}`
     : resultName;
