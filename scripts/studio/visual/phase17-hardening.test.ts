@@ -1,3 +1,4 @@
+import { readStudioCss } from './studio-css-source';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -230,7 +231,7 @@ test('Phase 17 shipped UI contains crash isolation, accessible resizing and moda
     path.join(root, 'components/docs/playground/CodeMirrorEditor.tsx'),
     'utf8',
   );
-  const css = fs.readFileSync(path.join(root, 'styles/studio-calm.css'), 'utf8');
+  const css = readStudioCss();
 
   for (const marker of [
     'PHASE17_AUTOSAVE_STORAGE_KEY',

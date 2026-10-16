@@ -1,3 +1,4 @@
+import { readStudioCss } from './studio-css-source';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -10,7 +11,7 @@ test('PRE-4 installs the approved permanent product shell architecture', () => {
   const entry = read('components/studio/visual/VisualStudio.tsx');
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
   const modals = read('components/studio/visual/VisualStudioModals.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
 
   assert.match(entry, /VisualStudioPre4/);
   assert.match(shell, /Apexify Studio/);
@@ -61,7 +62,7 @@ test('PRE-4 installs the approved permanent product shell architecture', () => {
 
 test('PRE-4 groups the Visual Studio feature rail into clear authoring families', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
 
   for (const label of ['Create', 'Structure', 'Motion & media', 'System']) {
     assert.match(shell, new RegExp(label));
@@ -81,7 +82,7 @@ test('PRE-4 groups the Visual Studio feature rail into clear authoring families'
 
 test('PRE-4 keeps the Layers collapse control anchored to the panel seam', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
 
   assert.match(shell, /apx-pre4-layers-dock-toggle/);
   assert.match(shell, /data-phase17-layers-toggle/);
@@ -98,7 +99,7 @@ test('PRE-4 keeps the Layers collapse control anchored to the panel seam', () =>
 
 test('PRE-4 mirrors the Inspector seam toggle and exposes one Assets workspace', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
 
   assert.match(shell, /apx-pre4-inspector-dock-toggle/);
   assert.match(shell, /data-phase17-inspector-toggle/);
@@ -129,7 +130,7 @@ test('PRE-4 exposes whole-session autosave and visible canvas undo redo controls
   const shared = read('components/studio/StudioSharedSession.tsx');
   const codeStudio = read('components/studio/CodeStudio.tsx');
   const studioShell = read('components/studio/StudioShell.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
 
   assert.match(shell, /data-visual-undo/);
   assert.match(shell, /data-visual-redo/);
@@ -159,7 +160,7 @@ test('PRE-4 exposes whole-session autosave and visible canvas undo redo controls
 
 test('PRE-4 provides an undoable full-canvas reset and retries recoverable live code', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
 
   assert.match(shell, /data-visual-reset-canvas/);
   assert.match(shell, /Reset entire canvas/);
@@ -211,7 +212,7 @@ test('PRE-4 does not duplicate the canvas CSS background behind authoritative Ap
 
 test('PRE-4 keeps inherited image dimensions native in the Visual artboard', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
   const reconcile = read('lib/studio/visual/codegen/reconcile.ts');
 
   assert.match(shell, /resolveInheritedCanvasDimensions/);
@@ -264,7 +265,7 @@ test('PRE-4 future feature surfaces do not pretend to be authoring-complete', ()
 
 test('PRE-4 polish keeps the shell calm and removes nonessential top-right chrome', () => {
   const shell = read('components/studio/visual/VisualStudioPre4.tsx');
-  const css = read('styles/studio-calm.css');
+  const css = readStudioCss();
 
   assert.doesNotMatch(shell, /className="apx-pre4-top-utility"/);
   assert.doesNotMatch(shell, /title="Notifications"/);
