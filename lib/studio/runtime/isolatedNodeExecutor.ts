@@ -920,7 +920,21 @@ export async function runSameOriginIsolatedStudio(
       throw new Error('Studio execution produced an invalid artifact manifest.');
     }
     if (manifest.artifacts.length === 0) {
-      throw new Error('Studio execution returned no artifacts.');
+      // This is a validly executed program with no return value, not a Deno
+      // sandbox failure. Avoid surfacing infrastructure diagnostics for user
+      // source mistakes, and preserve the actionable public API contract.
+      const batchHint = /\b(?:const|let)\s*\[\s*badge\s*,\s*label\s*\]\s*=\s*await\s+\w+\.batch\s*\(/.test(code)
+        ? ' For this batch example, add "return [badge, label];" at the end of main().'
+        : '';
+      return {
+        status: 422,
+        body: {
+          ok: false,
+          error: 'main() finished without a previewable result. Return the generated Apexify Buffer or array of buffers from main().' + batchHint,
+          elapsedMs,
+          exitCode: result.exitCode ?? 0,
+        },
+      };
     }
     if (manifest.artifacts.length > DOC8_RESOURCE_LIMITS.maxOutputs) {
       throw new Error('Studio output count exceeds the configured limit.');
