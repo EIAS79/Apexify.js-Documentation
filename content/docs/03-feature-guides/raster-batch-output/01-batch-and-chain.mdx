@@ -31,29 +31,35 @@ await painter.batch(
 | **`text`** | Uses the same temporary-canvas pattern with `createText(config, baseCanvas)`. |
 
 ```typescript
-const controller = new AbortController();
+import { ApexPainter } from 'apexify.js';
 
-const [badge, label] = await painter.batch(
-  [
-    { type: 'canvas', config: { width: 120, height: 40, colorBg: '#0f172a' } },
+// Studio invokes main() and previews both returned buffers.
+async function main(): Promise<Buffer[]> {
+  const painter = new ApexPainter();
+  const controller = new AbortController();
+  
+  const [badge, label] = await painter.batch(
+    [
+      { type: 'canvas', config: { width: 120, height: 40, colorBg: '#0f172a' } },
+      {
+        type: 'text',
+        config: [{ text: 'Hi', x: 12, y: 26, font: { size: 18, family: 'Arial' } }],
+      },
+    ],
     {
-      type: 'text',
-      config: [{ text: 'Hi', x: 12, y: 26, font: { size: 18, family: 'Arial' } }],
-    },
-  ],
-  {
-    resolveAssetRefs: true,
-    concurrency: 2,
-    signal: controller.signal,
-  }
-);
-
-// Studio previews the values returned by main(). For a standalone
-// documentation snippet, return these same buffers from its entrypoint.
-return [badge, label];
+      resolveAssetRefs: true,
+      concurrency: 2,
+      signal: controller.signal,
+    }
+  );
+  
+  // Studio previews the values returned by main(). For a standalone
+  // documentation snippet, return these same buffers from its entrypoint.
+  return [badge, label];
+}
 ```
 
-**Studio:** When transferring the batch example into Studio, keep the final `return [badge, label]` inside `async function main()`. Otherwise the batch runs but Studio has no preview artifact. For a standalone Node script without a `main()` wrapper, use the two buffers in your own output pipeline instead of the illustrative return statement.
+**Studio:** This example is a complete `main()` function, and Studio invokes it automatically. The final `return [badge, label]` is required to preview both buffers. To use the example in a standalone Node program, invoke `main()` from your own entrypoint.
 
 ### Failure semantics
 
