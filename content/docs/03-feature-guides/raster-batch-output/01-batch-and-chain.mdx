@@ -35,7 +35,7 @@ const controller = new AbortController();
 
 const [badge, label] = await painter.batch(
   [
-    { type: 'canvas', config: { width: 120, height: 40, color: '#0f172a' } },
+    { type: 'canvas', config: { width: 120, height: 40, colorBg: '#0f172a' } },
     {
       type: 'text',
       config: [{ text: 'Hi', x: 12, y: 26, font: { size: 18, family: 'Arial' } }],
@@ -47,7 +47,13 @@ const [badge, label] = await painter.batch(
     signal: controller.signal,
   }
 );
+
+// Studio previews the values returned by main(). For a standalone
+// documentation snippet, return these same buffers from its entrypoint.
+return [badge, label];
 ```
+
+**Studio:** When transferring the batch example into Studio, keep the final `return [badge, label]` inside `async function main()`. Otherwise the batch runs but Studio has no preview artifact. For a standalone Node script without a `main()` wrapper, use the two buffers in your own output pipeline instead of the illustrative return statement.
 
 ### Failure semantics
 
