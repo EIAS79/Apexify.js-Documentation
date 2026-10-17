@@ -923,8 +923,8 @@ export async function runSameOriginIsolatedStudio(
       // This is a validly executed program with no return value, not a Deno
       // sandbox failure. Avoid surfacing infrastructure diagnostics for user
       // source mistakes, and preserve the actionable public API contract.
-      const batchHint = /\\b(?:const|let)\\s*\\[\\s*badge\\s*,\\s*label\\s*\\]\\s*=\\s*await\\s+\\w+\\.batch\\s*\\(/.test(code)
-        ? ' For this batch example, add \`return [badge, label];\` at the end of main().'
+      const batchHint = /\b(?:const|let)\s*\[\s*badge\s*,\s*label\s*\]\s*=\s*await\s+\w+\.batch\s*\(/.test(code)
+        ? ' For this batch example, add "return [badge, label];" at the end of main().'
         : '';
       return {
         status: 422,
