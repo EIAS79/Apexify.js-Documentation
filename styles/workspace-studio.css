@@ -156,3 +156,135 @@
 @media (prefers-reduced-motion: reduce) {
   .ws01 *, .ws01 *::before, .ws01 *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+
+/* WS-01 adaptive completion: retain the real editor commands while avoiding a
+   second brand and mode switch inside each compatibility editor. */
+.ws01 .apx-pre4-topbar .apx-pre4-brand,
+.ws01 .apx-pre4-topbar .studio-mode-switch,
+.ws01 .studio-code-topbar__workspace > a[aria-label="Apexify.js — home"],
+.ws01 .studio-code-topbar__workspace > .studio-mode-switch,
+.ws01 .studio-code-topbar__workspace > span[aria-hidden] { display: none !important; }
+.ws01 .apx-pre4-topbar { gap: 8px; justify-content: flex-end; }
+.ws01 .studio-code-topbar__workspace { min-width: 0; }
+.ws01 .ws01-pane .apx-pre4-workspace,
+.ws01 .ws01-pane .apx-studio-root { width:100%; max-width:100%; min-height:0; min-width:0; }
+.ws01 .ws01-pane .apx-pre4-layout { min-height:0; min-width:0; }
+.ws01 .ws01-pane .apx-pre4-stage,
+.ws01 .ws01-pane .apx-pre4-inspector,
+.ws01 .ws01-pane .apx-pre4-layers { min-width:0; min-height:0; }
+.ws01 .ws01-pane .studio-output-panel,
+.ws01 .ws01-pane .apx-live-code-panel { min-height:0; max-width:100%; }
+.ws01 .ws01-pane pre, .ws01 .ws01-pane code { overflow-wrap:anywhere; }
+.ws01 .ws01-pane[hidden] { display:none!important; }
+
+/* Resizable side panels and context panes */
+.ws01 .ws01-drawer { position:relative; flex-basis:var(--ws01-drawer-width,260px); width:var(--ws01-drawer-width,260px); }
+.ws01 .ws01-inspector {
+  position:relative; flex:0 0 var(--ws01-inspector-width,300px);
+  width:var(--ws01-inspector-width,300px);
+  background:var(--ws-surface); border-left:1px solid var(--ws-edge);
+  min-height:0; min-width:0; display:flex; flex-direction:column; z-index:6;
+}
+.ws01 .ws01-resizer { position:absolute; z-index:15; background:transparent; touch-action:none; }
+.ws01 .ws01-resizer:focus-visible { outline:2px solid var(--ws-lime); outline-offset:-2px; background:color-mix(in srgb,var(--ws-lime) 20%,transparent); }
+.ws01 .ws01-resizer--drawer { top:0; bottom:0; right:0; width:8px; cursor:col-resize; }
+.ws01 .ws01-resizer--inspector { top:0; bottom:0; left:0; width:8px; cursor:col-resize; }
+.ws01 .ws01-resizer--dock { top:0; left:0; right:0; height:8px; cursor:row-resize; }
+.ws01 .ws01-panel-actions { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+.ws01 .ws01-panel-actions button,
+.ws01 .ws01-theme-toggle {
+  color:var(--ws-muted); border:1px solid var(--ws-edge);
+  border-radius:6px; background:var(--ws-raised);
+  font-size:11px; font-weight:650; min-height:36px; padding:5px 11px;
+}
+.ws01 .ws01-panel-actions button.is-open,
+.ws01 .ws01-panel-actions button:hover { color:var(--ws-lime); border-color:var(--ws-lime); }
+.ws01 .ws01-theme-toggle { font-size:18px; width:35px; padding:3px; flex-shrink:0; }
+.ws01 .ws01-dock {
+  position:relative; flex:0 0 min(var(--ws01-dock-height,210px), 55%);
+  height:min(var(--ws01-dock-height,210px), 55%); min-height:0;
+  background:var(--ws-surface); border-top:1px solid var(--ws-edge);
+  display:flex; flex-direction:column; overflow:hidden;
+}
+.ws01 .ws01-dock-tabs {
+  display:flex; align-items:center; gap:5px; padding:10px 11px 6px; flex-shrink:0;
+  border-bottom:1px solid var(--ws-edge); overflow-x:auto; scrollbar-width:thin;
+}
+.ws01 .ws01-dock-tabs button:not(.ws01-dismiss) {
+  flex-shrink:0; color:var(--ws-muted); background:transparent;
+  border:1px solid transparent; border-radius:6px; padding:6px 10px; font-size:11px;
+}
+.ws01 .ws01-dock-tabs button[aria-pressed="true"] {
+  color:var(--ws-lime); background:var(--ws-raised); border-color:var(--ws-edge);
+}
+.ws01 .ws01-dock-tabs .ws01-dismiss { margin-left:auto; }
+.ws01 .ws01-dock-body {
+  min-width:0; min-height:0; flex:1; overflow:auto; padding:12px 17px;
+  color:var(--ws-muted); font-size:12px; line-height:1.6;
+}
+.ws01 .ws01-dock-body p { margin:0 0 9px; }
+.ws01 .ws01-dock-body ul { padding-left:16px; margin:0; }
+.ws01 .ws01-dock-body li { overflow-wrap:anywhere; padding:4px 0; }
+.ws01 .ws01-dock-body li.is-current { color:var(--ws-lime); }
+.ws01 .ws01-error { color:#ffb9a5!important; overflow-wrap:anywhere; }
+.ws01 .ws01-facts { display:grid; gap:0; margin:8px 0; }
+.ws01 .ws01-facts > div { padding:11px 0; border-bottom:1px solid var(--ws-edge); min-width:0; }
+.ws01 .ws01-facts dt { font-size:10px; color:var(--ws-subtle); text-transform:uppercase; letter-spacing:.09em; }
+.ws01 .ws01-facts dd { font-size:13px; font-weight:650; margin:3px 0 0; overflow-wrap:anywhere; }
+
+/* Keep the shell readable with a restrained light theme; editor-internal
+   compatibility styling remains deliberately owned by the legacy engines. */
+.ws01[data-ws01-theme="light"] {
+  --ws-bg:#f4f6ef; --ws-surface:#fffef9; --ws-raised:#e9ede2;
+  --ws-edge:#c7d0bf; --ws-text:#1b2619; --ws-muted:#435342;
+  --ws-subtle:#50624c; --ws-lime:#42651a; color-scheme:light;
+}
+.ws01[data-ws01-theme="light"] .ws01-header,
+.ws01[data-ws01-theme="light"] .ws01-status { background:#eaf0e4; }
+.ws01[data-ws01-theme="light"] .ws01-rail { background:#edf2e8; }
+.ws01[data-ws01-theme="light"] .ws01-modes { background:#dbe7d4; }
+.ws01[data-ws01-theme="light"] .ws01-modes button.is-active { background:#375b1b; color:#fff; }
+.ws01[data-ws01-theme="light"] .ws01-rail-item.is-active { color:#234713; background:#d8eabc; }
+.ws01[data-ws01-theme="light"] .ws01-preview-label { color:#375b1b; border-color:#7a956a; }
+.ws01[data-ws01-theme="light"] .ws01-dock-body li.is-current { color:#315a14; }
+.ws01[data-ws01-theme="light"] .ws01-error { color:#a02d18!important; }
+
+/* Narrow viewports get actual overlays and stable focus-size, not squeezed
+   floating columns. Each overlay has an internal scroll region. */
+@media (max-width: 1210px) {
+  .ws01 .ws01-header .ws01-site-nav { gap:10px; }
+  .ws01 .ws01-compat-tag { display:none; }
+}
+@media (max-width: 1019px) {
+  .ws01 .ws01-drawer {
+    position:absolute; left:65px; top:0; bottom:0; z-index:11;
+    flex-basis:auto; width:min(var(--ws01-drawer-width,260px), calc(100vw - 65px));
+    box-shadow:16px 0 44px #0008;
+  }
+  .ws01 .ws01-inspector {
+    position:absolute; right:0; top:0; bottom:0; z-index:12; flex-basis:auto;
+    width:min(var(--ws01-inspector-width,300px),calc(100vw - 65px));
+    box-shadow:-16px 0 44px #0008;
+  }
+  .ws01 .ws01-inspector-shade { left:65px; z-index:10; }
+}
+@media (max-width: 760px) {
+  .ws01 .ws01-drawer { left:55px; width:min(var(--ws01-drawer-width,260px), calc(100vw - 55px)); }
+  .ws01 .ws01-inspector { width:min(var(--ws01-inspector-width,300px),calc(100vw - 55px)); }
+  .ws01 .ws01-inspector-shade { left:55px; }
+  .ws01 .ws01-panel-actions button { padding:4px 7px; min-height:34px; font-size:10px; }
+  .ws01 .ws01-toolbar { overflow:visible; }
+  .ws01 .ws01-modes { min-width:0; }
+  .ws01 .ws01-theme-toggle { width:32px; min-height:32px; }
+}
+@media (max-width: 420px) {
+  .ws01 .ws01-header { gap:4px; }
+  .ws01 .ws01-panel-actions { gap:3px; }
+  .ws01 .ws01-panel-actions button { padding:4px 5px; }
+  .ws01 .ws01-modes button { padding-inline:8px; }
+  .ws01 .ws01-dock-tabs { padding-left:5px; }
+}
+@media (max-height: 530px) {
+  .ws01 .ws01-dock { flex-basis:min(var(--ws01-dock-height,210px),40%); height:min(var(--ws01-dock-height,210px),40%); }
+}
