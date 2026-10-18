@@ -67,7 +67,7 @@ jobs:
       # Build declarations from the exact runtime SHA instead of silently
       # skipping the parity typecheck or accepting unresolved public types.
       - name: Checkout pinned runtime types source
-        if: startsWith(github.ref_name, 'studio-parity-')
+        if: startsWith(github.ref_name, 'studio-parity-') || startsWith(github.head_ref, 'audit/ws00-')
         uses: actions/checkout@v4
         with:
           repository: EIAS79/Apexify.js
@@ -76,7 +76,7 @@ jobs:
           persist-credentials: false
 
       - name: Prepare runtime declarations for parity typecheck
-        if: startsWith(github.ref_name, 'studio-parity-')
+        if: startsWith(github.ref_name, 'studio-parity-') || startsWith(github.head_ref, 'audit/ws00-')
         working-directory: .studio-runtime-types
         run: |
           npm ci --ignore-scripts --prefer-offline --no-audit --no-fund
