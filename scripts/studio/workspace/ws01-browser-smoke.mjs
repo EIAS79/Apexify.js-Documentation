@@ -37,12 +37,43 @@ try {
       await page.waitForFunction(() => !document.querySelector('.ws01-drawer'));
       await page.click('.ws01-modes button:nth-child(2)');
       await page.waitForFunction(() => document.querySelector('[data-ws01-current-mode]')?.getAttribute('data-ws01-current-mode') === 'code');
-      await page.click('button[aria-label="Assets"]');
+      await page.click('button[aria-label="Use light theme"]');
+      const lightTheme = await page.$eval('[data-workspace-studio]', el => el.getAttribute('data-ws01-theme'));
+      if (lightTheme !== 'light') failures.push('Light theme toggle did not update shell tokens');
+      await page.click('button[aria-label="Use dark theme"]');
+      await page.click('button[aria-controls="ws01-inspector"]');
+      await page.waitForSelector('.ws01-inspector .ws01-facts');
+      const propertyMetrics = await page.$eval('.ws01-inspector', el => ({scrollHeight:el.scrollHeight,clientHeight:el.clientHeight}));
+      if (propertyMetrics.clientHeight < 120) failures.push('Inspector too short to use');
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.querySelector('.ws01-inspector'));
+      await page.click('button[aria-controls="ws01-dock"]');
+      await page.waitForSelector('.ws01-dock .ws01-dock-body');
+      await page.click('.ws01-dock-tabs button:nth-child(2)');
+      await page.waitForFunction(() => document.querySelector('.ws01-dock-tabs button:nth-child(2)')?.getAttribute('aria-pressed') === 'true');
+      await page.keyboard.press('Escape');
+      await page.waitForFunction(() => !document.querySelector('.ws01-dock'));
+            await page.click('button[aria-label="Assets"]');
       await page.waitForSelector('.ws01-drawer');
       await page.click('button[aria-label="Close panel"]');
       await page.waitForFunction(() => !document.querySelector('.ws01-drawer'));
       const overflow = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth));
       if (overflow > 1) failures.push('Document horizontal overflow ' + overflow);
+      const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('apexify-workspace-layout-ws01-v1') || '{}'));
+      if (persisted.theme !== 'dark') failures.push('Layout/theme preference did not persist');
+      if (width >= 1020) {
+        await page.click('button[aria-label="Templates"]');
+        const resizer = await page.$('.ws01-resizer--drawer');
+        if (!resizer) failures.push('Accessible desktop resizer missing');
+        else {
+          await resizer.focus();
+          const initial = await page.$eval('.ws01-resizer--drawer', el => Number(el.getAttribute('aria-valuenow')));
+          await page.keyboard.press('ArrowRight');
+          const resized = await page.$eval('.ws01-resizer--drawer', el => Number(el.getAttribute('aria-valuenow')));
+          if (resized <= initial) failures.push('Keyboard resize did not change drawer width');
+        }
+        await page.keyboard.press('Escape');
+      }
       if (errors.length) failures.push('Browser JS errors: ' + errors.join(' | '));
       await page.screenshot({ path: path.join(output, name + '.png'), fullPage: true });
       results.push({ name, width, height, status: failures.length ? 'FAIL' : 'PASS', failures, overflow });
