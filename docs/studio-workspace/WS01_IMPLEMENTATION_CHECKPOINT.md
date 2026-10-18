@@ -38,3 +38,19 @@
 5. Browser-verify responsive visual quality, keyboard-only and WCAG AA, real assets/source/preview, and migration failure cases.
 
 WS-01 stays IN PROGRESS until the UI works as a cohesive application, not merely a shell around preserved editors.
+
+
+## WS-01 closeout (2026-10-18) — adaptive shell foundation
+
+**Phase gate disposition: PASS for the isolated responsive shell**, not a certification that WS-02..WS-10 integrated feature work is complete. See [WS-01 final browser run](https://github.com/EIAS79/Apexify.js-Documentation/actions/runs/39115054137).
+
+- All eight tested 320/390/768/820/1024/1280/1440/1920 CSS-pixel screens pass production build, real Code/Visual mount, panel close, honest disabled Graph state, keyboard resize, real session inspector/output dock, palette switch, 0 document-level horizontal overflow.
+- Captured **both initial Visual and Code** screenshots at all eight sizes and reviewed representative desktop/mobile images. Blank Visual canvas now contains a no-fake-art onboarding overlay; compact Code defaults to editor-only without changing persisted legacy layout.
+- Collapsible left drawer, right inspector and bottom results/diagnostics/history dock have independently scrollable contents, pointer + arrow-key resizers, Escape dismiss, mobile focus containment, focus return and safe per-Workspace layout preferences.
+- Legacy Visual internal layer/inspector/dock controls remain working but default to canvas-first collapsed controls in the new Workspace only. Duplicate embedded logo/mode tabs are hidden only inside the new route.
+- Docs/Gallery charcoal/lime and restrained lavender/teal applied via **route-scoped** variables; dark/light shell themes supported, reduced-motion CSS present.
+- Existing /studio, /studio/legacy/code and /studio/legacy/visual remain unchanged. New /studio/workspace remains opt-in via APEX_WORKSPACE_STUDIO_PREVIEW=1, no production cutover.
+
+**Explicit future integration ownership**: WorkspaceProject and true shared file/model authority WS-02/03; editable Visual inspectors WS-04; Code editor project integration WS-05; actual Graph compiler WS-06; project/templates/assets integration WS-07; media, timeline and durable queues WS-08/09; exhaustive runtime parity WS-10; full WCAG/performance/stress and 200%/400% zoom certification WS-11. These are **not** included in the WS-01 phase acceptance.
+
+The acceptance review verified the eight automated viewports, keyboard/panel behavior and screenshots. This does not claim all actual device classes, screen readers or high-zoom accessibility are fully certified.
