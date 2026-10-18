@@ -857,6 +857,15 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
     return () => window.removeEventListener('keydown', onKey);
   }, [runCode, newBuffer, closeBuffer, activeBuffer, copyShareLink, downloadOutput]);
 
+  // Explicit WS-01 bridge: the new Studio header triggers the existing verified
+  // execution function. The bridge is active only in the focused embedded editor.
+  useEffect(() => {
+    if (!workspaceCompact) return;
+    const handleRun = () => { void runCode(); };
+    window.addEventListener('apexify-workspace-run', handleRun);
+    return () => window.removeEventListener('apexify-workspace-run', handleRun);
+  }, [workspaceCompact, runCode]);
+
   /* ---------- derived display values ---------- */
 
   const lineCount = activeCode ? activeCode.split('\n').length : 0;
