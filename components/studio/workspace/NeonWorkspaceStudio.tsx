@@ -190,7 +190,7 @@ function WorkspaceBody() {
         <div className="nw-explorer-search"><MagnifyingGlassIcon/><span>{drawer==='files'?'Search files…':'Search '+drawer+'…'}</span></div>
         <div className="nw-explorer-content">
           {drawer==='files'&&<><div className="nw-folder"><ChevronDownIcon/><FolderIcon/> src</div>
-            {buffers.length?buffers.map((b,i)=><button className={'nw-file '+(i===0?'selected':'')} key={b.id} onClick={()=>{changeMode('code');if(mobile)setDrawerOpen(false)}}><DocumentTextIcon/>{b.name}</button>):
+            {buffers.length?buffers.map((b,i)=><button className={'nw-file '+(i===0?'selected':'')} key={b.id} onClick={()=>{changeMode('code');window.dispatchEvent(new CustomEvent('apexify-workspace-select-buffer',{detail:{id:b.id}}));if(mobile)setDrawerOpen(false)}}><DocumentTextIcon/>{b.name}</button>):
               <button className="nw-file selected" onClick={()=>changeMode('code')}><DocumentTextIcon/> index.ts</button>}
             {['canvas','nodes','assets','styles','public'].map(p=><div className="nw-folder nested" key={p}><ChevronRightIcon/><FolderIcon/>{p}</div>)}
             <p className="nw-help">The current Code buffers are real. Project filesystem migration follows in WS-02/05.</p>
