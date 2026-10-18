@@ -26,6 +26,9 @@ try {
       if (![200,304].includes(response?.status())) throw new Error('preview HTTP ' + response?.status());
       await page.waitForSelector('[data-workspace-studio]', { timeout: 90000 });
       await page.waitForSelector('[data-studio-visual-workspace][data-active="true"]', { timeout: 60000 });
+      const visualDockDefault = await page.$eval('.apx-pre4-dock', element => element.getAttribute('data-collapsed'));
+      if (visualDockDefault !== 'true') failures.push('Workspace Visual dock must start collapsed');
+      await page.screenshot({ path: path.join(output, name + '-visual.png'), fullPage: true });
       const disabledGraph = await page.$eval('.ws01-modes button[aria-label="Graph not yet available"]', b => b.disabled);
       if (!disabledGraph) failures.push('Graph feature falsely enabled');
       const before = await page.$eval('.ws01-main', e => e.clientWidth);
@@ -37,6 +40,13 @@ try {
       await page.waitForFunction(() => !document.querySelector('.ws01-drawer'));
       await page.click('.ws01-modes button:nth-child(2)');
       await page.waitForFunction(() => document.querySelector('[data-ws01-current-mode]')?.getAttribute('data-ws01-current-mode') === 'code');
+      if (width < 760) {
+        const visibleOutput = await page.evaluate(() => [...document.querySelectorAll('.studio-output-panel')].some(node => {
+          const rect = node.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        }));
+        if (visibleOutput) failures.push('Compact Code Studio must focus source unless Preview is explicitly selected');
+      }
       await page.click('button[aria-label="Use light theme"]');
       const lightTheme = await page.$eval('[data-workspace-studio]', el => el.getAttribute('data-ws01-theme'));
       if (lightTheme !== 'light') failures.push('Light theme toggle did not update shell tokens');
