@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from 'react';
 import CodeStudio from '@/components/studio/CodeStudio';
 import type { StudioMode } from '@/components/studio/StudioModeSwitch';
 import { StudioSharedSessionProvider, useStudioSharedSession } from '@/components/studio/StudioSharedSession';
@@ -15,6 +15,10 @@ const VisualStudio = dynamic(() => import('@/components/studio/visual/VisualStud
 });
 
 type Drawer = 'files' | 'templates' | 'assets' | 'projects' | null;
+type DockTab = 'results' | 'diagnostics' | 'history';
+type ResizeTarget = 'drawer' | 'inspector' | 'dock';
+const LAYOUT_KEY = 'apexify-workspace-layout-ws01-v1';
+const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 const NAV: Array<{ id: Exclude<Drawer, null>; text: string; icon: string }> = [
   { id: 'projects', text: 'Projects', icon: '▣' },
   { id: 'files', text: 'Code files', icon: '▤' },
@@ -29,7 +33,18 @@ function StudioWorkspaceContent() {
   const [drawer, setDrawer] = useState<Drawer>(null);
   const [buffers, setBuffers] = useState<StudioBuffer[]>([]);
   const [activeId, setActiveId] = useState<string | undefined>();
-  const { assets, assetStorageReady, setCodeHandoff } = useStudioSharedSession();
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [dockOpen, setDockOpen] = useState(false);
+  const [dockTab, setDockTab] = useState<DockTab>('results');
+  const [drawerWidth, setDrawerWidth] = useState(260);
+  const [inspectorWidth, setInspectorWidth] = useState(300);
+  const [dockHeight, setDockHeight] = useState(210);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [layoutHydrated, setLayoutHydrated] = useState(false);
+  const [mobile, setMobile] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const { assets, assetStorageReady, setCodeHandoff, previewArtifacts, activeArtifactId,
+    error, previewWarnings, history, elapsedMs, previewProvenance } = useStudioSharedSession();
 
   const refreshFiles = useCallback(() => {
     const state = loadPersistedStudio();
@@ -40,12 +55,68 @@ function StudioWorkspaceContent() {
   useEffect(() => { refreshFiles(); }, [refreshFiles]);
 
   useEffect(() => {
+    const measure = () => setMobile(window.innerWidth < 1020);
+    measure();
+    window.addEventListener('resize', measure);
+    try {
+      const value = JSON.parse(window.localStorage.getItem(LAYOUT_KEY) || '{}');
+      if (Number.isFinite(value.drawerWidth)) setDrawerWidth(clamp(value.drawerWidth, 230, 340));
+      if (Number.isFinite(value.inspectorWidth)) setInspectorWidth(clamp(value.inspectorWidth, 260, 390));
+      if (Number.isFinite(value.dockHeight)) setDockHeight(clamp(value.dockHeight, 150, 350));
+      if (value.theme === 'light' || value.theme === 'dark') setTheme(value.theme);
+    } catch { /* Preferences may be corrupt/blocked; the editor still works. */ }
+    setLayoutHydrated(true);
+    return () => window.removeEventListener('resize', measure);
+  }, []);
+
+  useEffect(() => {
+    if (!layoutHydrated) return;
+    try {
+      window.localStorage.setItem(LAYOUT_KEY, JSON.stringify({
+        drawerWidth, inspectorWidth, dockHeight, theme,
+      }));
+    } catch { /* Storage is optional for layout preferences only. */ }
+  }, [layoutHydrated, drawerWidth, inspectorWidth, dockHeight, theme]);
+
+  const closePanels = () => {
+    setDrawer(null); setInspectorOpen(false); setDockOpen(false);
+    triggerRef.current?.focus();
+  };
+  const beginResize = (target: ResizeTarget, event: ReactPointerEvent<HTMLDivElement>) => {
+    if (mobile && target !== 'dock') return;
+    event.preventDefault();
+    const startX = event.clientX, startY = event.clientY;
+    const startSize = target === 'drawer' ? drawerWidth : target === 'inspector' ? inspectorWidth : dockHeight;
+    const move = (next: PointerEvent) => {
+      if (target === 'drawer') setDrawerWidth(clamp(startSize + next.clientX - startX, 230, 340));
+      else if (target === 'inspector') setInspectorWidth(clamp(startSize + startX - next.clientX, 260, 390));
+      else setDockHeight(clamp(startSize + startY - next.clientY, 150, 350));
+    };
+    const stop = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', stop);
+      window.removeEventListener('pointercancel', stop);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', stop, { once: true });
+    window.addEventListener('pointercancel', stop, { once: true });
+  };
+  const resizeByKeys = (target: ResizeTarget, event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(event.key)) return;
+    event.preventDefault();
+    const delta = event.shiftKey ? 24 : 8;
+    if (target === 'drawer') setDrawerWidth(size => event.key === 'Home' ? 230 : event.key === 'End' ? 340 : clamp(size + (event.key === 'ArrowRight' ? delta : -delta), 230, 340));
+    if (target === 'inspector') setInspectorWidth(size => event.key === 'Home' ? 260 : event.key === 'End' ? 390 : clamp(size + (event.key === 'ArrowLeft' ? delta : -delta), 260, 390));
+    if (target === 'dock') setDockHeight(size => event.key === 'Home' ? 150 : event.key === 'End' ? 350 : clamp(size + (event.key === 'ArrowDown' ? delta : -delta), 150, 350));
+  };
+
+  useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && drawer !== null) setDrawer(null);
+      if (event.key === 'Escape' && (drawer !== null || inspectorOpen || dockOpen)) closePanels();
     };
     window.addEventListener('keydown', onEscape);
     return () => window.removeEventListener('keydown', onEscape);
-  }, [drawer]);
+  }, [drawer, inspectorOpen, dockOpen]);
 
   const chooseMode = (next: StudioMode) => {
     setMode(next);
@@ -54,7 +125,7 @@ function StudioWorkspaceContent() {
   };
 
   const toggleDrawer = (next: Exclude<Drawer, null>) => {
-    if (drawer === next) { setDrawer(null); return; }
+    if (drawer === next) { setDrawer(null); triggerRef.current?.focus(); return; }
     if (next === 'files') refreshFiles();
     setDrawer(next);
   };
@@ -76,7 +147,7 @@ function StudioWorkspaceContent() {
     drawer === 'assets' ? 'Session assets' : 'Existing projects';
 
   return (
-    <div className="ws01" data-workspace-studio data-workspace-stage="ws01-compatibility">
+    <div className="ws01" data-workspace-studio data-workspace-stage="ws01-adaptive" data-ws01-theme={theme}>
       <header className="ws01-header">
         <div className="ws01-brand" aria-label="Apexify.js Workspace Studio">
           <span className="ws01-prism" aria-hidden="true">A</span>
@@ -84,7 +155,8 @@ function StudioWorkspaceContent() {
           <span className="ws01-brand-divide" aria-hidden="true">/</span>
           <strong>Studio</strong>
         </div>
-        <span className="ws01-preview-label">WS-01 Preview</span>
+        <span className="ws01-preview-label">Workspace preview</span>
+        <button type="button" className="ws01-theme-toggle" aria-label={theme === 'dark' ? 'Use light theme' : 'Use dark theme'} onClick={() => setTheme(next => next === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? '☼' : '☾'}</button>
         <nav className="ws01-site-nav" aria-label="Website">
           <Link href="/">Home</Link>
           <Link href="/docs/getting-started">Docs</Link>
@@ -101,7 +173,7 @@ function StudioWorkspaceContent() {
               aria-label={item.text} title={item.text}
               aria-pressed={drawer === item.id}
               className={drawer === item.id ? 'ws01-rail-item is-active' : 'ws01-rail-item'}
-              onClick={() => toggleDrawer(item.id)}
+              onClick={(event) => { triggerRef.current = event.currentTarget; toggleDrawer(item.id); }}
             >
               <span className="ws01-rail-icon" aria-hidden="true">{item.icon}</span>
               <span className="ws01-rail-label">{item.text}</span>
