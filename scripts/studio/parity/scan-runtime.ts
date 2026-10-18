@@ -470,6 +470,20 @@ function sourceEvidenceForDeclaration(root: ts.Declaration): SourceEvidence {
   const resourceLimits: SourceEvidence['resourceLimits'] = [];
   const errors: SourceEvidence['errors'] = [];
   const queued: Array<{ declaration: ts.Declaration; depth: number }> = [{ declaration: root, depth: 0 }];
+  // Overload signatures have no method body. A public overload must be traced
+  // through its concrete sibling implementation, otherwise validators reached
+  // by the actual runtime method (notably createText) falsely disappear.
+  if (
+    ts.isMethodDeclaration(root) && !root.body && root.parent &&
+    (ts.isClassDeclaration(root.parent) || ts.isClassExpression(root.parent))
+  ) {
+    const name = root.name.getText(root.getSourceFile());
+    const implementation = root.parent.members.find((member): member is ts.MethodDeclaration =>
+      ts.isMethodDeclaration(member) && Boolean(member.body) &&
+      member.name.getText(member.getSourceFile()) === name,
+    );
+    if (implementation) queued.push({ declaration: implementation, depth: 0 });
+  }
   const visited = new Set<string>();
 
   const remember = (map: Map<string, SourceLocation>, node: ts.Node): void => {
