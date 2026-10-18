@@ -146,7 +146,7 @@ Gate: stable release, migration confidence and documented maintenance/engine dri
 
 | Phase | Status at plan creation | Evidence required |
 |---|---|---|
-| WS-00 | TO DO (initial source audit drafted, not full scan) | runtime pin and recursive report |
+| WS-00 | IN PROGRESS — pinned recursive inventory passed (226 public surfaces / 71,086 records); runtime and migration verification ongoing | current-pin proof and migration acceptance |
 | WS-01 | TO DO | browser-responsive shell proof |
 | WS-02 | TO DO | project schema, migration fixture suite |
 | WS-03 | TO DO | sandbox and artifact equivalence |
