@@ -69,7 +69,14 @@ function arg(name: string): string | null {
 }
 
 const CHECK = process.argv.includes('--check');
-const pinPath = path.join(ROOT, 'scripts', 'studio', 'parity', 'runtime-source.json');
+// Default remains the immutable historical STUDIO-PARITY-0 inventory pin.
+// A separate --pin-file and --out pair allow WS-00 audits without mutating archives.
+const pinPath = path.resolve(arg('pin-file') ?? path.join(ROOT, 'scripts', 'studio', 'parity', 'runtime-source.json'));
+const historicalPinPath = path.join(ROOT, 'scripts', 'studio', 'parity', 'runtime-source.json');
+const usesAlternatePin = path.resolve(pinPath) !== path.resolve(historicalPinPath);
+if (usesAlternatePin && !arg('out')) {
+  throw new Error('[studio-parity] alternate --pin-file requires a separate --out directory to preserve historical parity results.');
+}
 const pin = JSON.parse(fs.readFileSync(pinPath, 'utf8')) as RuntimeSourcePin;
 const runtimeRoot = path.resolve(
   arg('runtime-root') ?? process.env.APEXIFY_RUNTIME_ROOT ?? path.join(ROOT, '..', 'Apexify.js'),
@@ -80,6 +87,9 @@ const requestedCommit = (
 const outDir = path.resolve(
   arg('out') ?? path.join(ROOT, 'generated', 'studio', 'runtime-parity'),
 );
+if (usesAlternatePin && outDir === path.join(ROOT, 'generated', 'studio', 'runtime-parity')) {
+  throw new Error('[studio-parity] WS-00 scans may not overwrite the historical runtime-parity directory.');
+}
 
 if (requestedCommit !== pin.commit) {
   throw new Error(
