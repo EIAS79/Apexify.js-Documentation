@@ -1,6 +1,9 @@
 # Apexify Studio — Full Execution System Plan
 
-> Status: ACTIVE — implementation started
+> Status: SUPERSEDED / HISTORICAL (2026-10-18) — do not execute this as the controlling roadmap. See `docs/studio-workspace/WORKSPACE_STUDIO_MASTER_PLAN.md`.
+> Legacy Code runtime/execution and the restricted Deno backend are preserved as engineering contracts and migration sources, not deprecated APIs.
+>
+> Historical status before supersession: ACTIVE — implementation started
 >
 > Current checkpoint:
 > - [x] STUDIO-0 contract / capability planner

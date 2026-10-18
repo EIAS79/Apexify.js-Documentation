@@ -4,7 +4,9 @@
 >
 > Phase: `STUDIO-VISUAL-0`
 >
-> Status: ACTIVE — contract baseline
+> Status: LEGACY MIGRATION REFERENCE (2026-10-18) — superseded as a product roadmap by `docs/studio-workspace/WORKSPACE_STUDIO_MASTER_PLAN.md`. The technical guarantees (valid code generation, migrations, no fake controls, isolation) remain mandatory until the new contract replaces them with tested equivalents.
+>
+> Historical status: ACTIVE — contract baseline
 >
 > Source of truth: `APEXIFY_STUDIO_VISUAL_AUTHORING_MASTER_PLAN.md`
 
