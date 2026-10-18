@@ -17,7 +17,6 @@ const NAV_LINKS = [
   { href: '/docs/getting-started', label: 'Docs', key: 'docs' },
   { href: '/api-reference', label: 'API', key: 'api' },
   { href: '/gallery', label: 'Gallery', key: 'gallery' },
-  { href: '/studio', label: 'Studio', key: 'studio' },
 ] as const;
 
 export type HomeNavSection = (typeof NAV_LINKS)[number]['key'];
