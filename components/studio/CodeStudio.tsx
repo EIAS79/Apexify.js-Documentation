@@ -51,12 +51,16 @@ import {
 
 type Toast = { kind: 'info' | 'success' | 'warning'; text: string } | null;
 
-export default function CodeStudio({ embedded = false, mode = 'code', onModeChange }: { embedded?: boolean; mode?: StudioMode; onModeChange?: (mode: StudioMode) => void }) {
+export default function CodeStudio({ embedded = false, mode = 'code', onModeChange, workspaceCompact = false }: { embedded?: boolean; mode?: StudioMode; onModeChange?: (mode: StudioMode) => void; workspaceCompact?: boolean }) {
   const [hydrated, setHydrated] = useState(false);
   const [buffers, setBuffers] = useState<StudioBuffer[]>([]);
   const [activeBufferId, setActiveBufferId] = useState<string>('');
   const [lang, setLang] = useState<StudioLang>('ts');
   const [layout, setLayout] = useState<LayoutMode>('split');
+  // Temporary focused layout on small Workspace viewports. Never overwrite
+  // the user's persisted legacy Code Studio layout preference to obtain it.
+  const [compactLayout, setCompactLayout] = useState<LayoutMode>('code');
+  const effectiveLayout: LayoutMode = workspaceCompact ? compactLayout : layout;
   const [autoRun, setAutoRun] = useState(false);
   const [splitRatio, setSplitRatio] = useState(0.5);
   const {
@@ -857,9 +861,9 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
 
   const lineCount = activeCode ? activeCode.split('\n').length : 0;
   const charCount = activeCode ? new Blob([activeCode]).size : 0;
-  const showCode = layout !== 'media';
-  const showPreview = layout !== 'code';
-  const splitEnabled = layout === 'split';
+  const showCode = effectiveLayout !== 'media';
+  const showPreview = effectiveLayout !== 'code';
+  const splitEnabled = effectiveLayout === 'split';
 
   const codeSection = activeBuffer ? (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -955,8 +959,8 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
       <StudioTopBar
         mode={mode}
         onModeChange={onModeChange}
-        layout={layout}
-        onLayoutChange={setLayout}
+        layout={effectiveLayout}
+        onLayoutChange={workspaceCompact ? setCompactLayout : setLayout}
         lang={lang}
         onLangChange={setLang}
         running={running}
