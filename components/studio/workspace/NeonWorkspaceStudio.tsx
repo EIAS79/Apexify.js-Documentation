@@ -92,7 +92,13 @@ function WorkspaceBody() {
   },[]);
   useEffect(()=>{
     const onResize=()=>setMobile(window.innerWidth<1050);
-    onResize();window.addEventListener('resize',onResize);refreshFiles();
+    onResize();
+    // Overlays must not cover mode controls on first load at tablet widths.
+    // Users can reopen them deliberately after choosing the working pane.
+    if(window.innerWidth<1161)setInspectorOpen(false);
+    if(window.innerWidth<961)setDrawerOpen(false);
+    if(window.innerWidth<761)setDockOpen(false);
+    window.addEventListener('resize',onResize);refreshFiles();
     try {
       const x=JSON.parse(localStorage.getItem('apexify-studio-neon-ui-v1')||'{}');
       if(x.layout==='full'||x.layout==='code'||x.layout==='graph')setLayout(x.layout);
