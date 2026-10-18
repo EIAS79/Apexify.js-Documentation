@@ -55,6 +55,14 @@ That option is expected to FAIL until the new current-pin scan is actually gener
 - Reconciliation: 187 existing legacy capability rows exactly matched, 39 runtime-only surfaces without a legacy capability row. The historical legacy matrix pin still differs and requires separate classification; do not promote those 39 to fully supported Visual/Graph controls without tests.
 - Evidence artifact is available under the workflow run above. This establishes an inventory baseline, not runtime-execution, browser, or migration completeness.
 
+## Isolated runtime proof (GitHub Actions)
+
+- [Verified pinned-runtime proof](https://github.com/EIAS79/Apexify.js-Documentation/actions/runs/39098829350) passed on CI with production-style installed dependencies and isolated runner.
+- All **11 Phase-18 representative Visual projects** rendered successfully; generated source and preview execution were compared using image-pixel or binary semantic digests.
+- Covered PNG, WebP, GIF, WAV, MP4, scenes, components, templates, named assets, effects, advanced chain, advanced batch (two PNG outputs).
+- Existing pinned text/measure runtime proof passed in the same workflow. This is strong representative evidence, not complete 71,086-option behavioral parity.
+- Remaining: browser performance/accessibility baseline, migration fixture review, and branch-by-branch reconciliation of open Studio PRs. No stage should call unsupported Graph controls or claim full runtime coverage from this proof alone.
+
 ## WS-00 remaining execution (ordered)
 
 1. Clean-install pinned full runtime, verify installed metadata/declaration artifacts actually resolve to 379a5248…; separately validate @apexify/web snapshot.
