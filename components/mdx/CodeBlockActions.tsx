@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowUpRightIcon, CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline';
 
 export type StudioHandoffPayload = {
   name: string;
@@ -13,8 +12,6 @@ export type StudioHandoffPayload = {
 
 export function CodeBlockActions({
   code,
-  studioPayload,
-  storageKey,
 }: {
   code: string;
   studioPayload: StudioHandoffPayload | null;
@@ -32,30 +29,8 @@ export function CodeBlockActions({
     }
   };
 
-  const persistStudioHandoff = () => {
-    if (!studioPayload) return;
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify(studioPayload));
-    } catch {
-      // Studio remains directly navigable when storage is unavailable.
-    }
-  };
-
   return (
     <div className="apx-code-actions">
-      {studioPayload ? (
-        <Link
-          href="/studio"
-          prefetch={false}
-          onClick={persistStudioHandoff}
-          className="apx-code-action apx-code-action--studio"
-          title="Open this snippet in Studio"
-        >
-          Studio
-          <ArrowUpRightIcon className="h-3.5 w-3.5" aria-hidden />
-        </Link>
-      ) : null}
-
       <button
         type="button"
         onClick={copy}
