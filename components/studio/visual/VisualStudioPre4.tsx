@@ -263,6 +263,7 @@ type Props = {
   active: boolean;
   mode: StudioMode;
   onModeChange: (mode: StudioMode) => void;
+  workspaceShell?: boolean;
 };
 
 type Gesture = {
@@ -314,6 +315,7 @@ export default function VisualStudioPre4({
   active,
   mode,
   onModeChange,
+  workspaceShell = false,
 }: Props) {
   const {
     setCodeHandoff,
@@ -349,10 +351,10 @@ export default function VisualStudioPre4({
   const [dockTab, setDockTab] = useState<
     'generated' | 'diagnostics' | 'assets' | 'history' | 'timeline'
   >('generated');
-  const [dockCollapsed, setDockCollapsed] = useState(false);
+  const [dockCollapsed, setDockCollapsed] = useState(workspaceShell);
   const [layersCollapsed, setLayersCollapsed] = useState(true);
   const [leftPanelMode, setLeftPanelMode] = useState<'layers' | 'context'>('layers');
-  const [inspectorCollapsed, setInspectorCollapsed] = useState(false);
+  const [inspectorCollapsed, setInspectorCollapsed] = useState(workspaceShell);
   const [layersWidth, setLayersWidth] = useState(274);
   const [inspectorWidth, setInspectorWidth] = useState(372);
   const [dockHeight, setDockHeight] = useState(204);
