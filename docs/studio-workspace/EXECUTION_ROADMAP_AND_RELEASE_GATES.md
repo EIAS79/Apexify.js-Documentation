@@ -1,7 +1,7 @@
 # Workspace Studio — A-to-Z Execution Roadmap and Release Gates
 
 > Program: WORKSPACE-STUDIO (WS) · Execution controller after 2026-10-18
-> State: PLANNING, awaiting review and approval of architecture and UI.
+> State: EXECUTING. WS-01 neon visual redesign reopened after the user rejected the previous green shell; do not promote it as complete.
 > Branch strategy: a separate feature branch/PR for each phase, rebased against current main after securing original work. Do not merge the planning PR merely to trigger unfinished UX.
 > Historical Studio roadmaps are marked SUPERSEDED; their technical contracts/tests remain inputs.
 
@@ -147,7 +147,7 @@ Gate: stable release, migration confidence and documented maintenance/engine dri
 | Phase | Status at plan creation | Evidence required |
 |---|---|---|
 | WS-00 | IN PROGRESS — pinned recursive inventory passed (226 public surfaces / 71,086 records); runtime and migration verification ongoing | current-pin proof and migration acceptance |
-| WS-01 | COMPLETE — gated adaptive shell, eight-width CI + inspected Code/Visual screenshots, responsive resizing/keyboard/focus/theme, default-collapsed Visual controls; integration semantics reserved for WS-02..10 | [WS-01 checkpoint](./WS01_IMPLEMENTATION_CHECKPOINT.md) |
+| WS-01 | **REOPENED — reference-neon UI implementation in PR #156; previous olive shell rejected; screenshot fidelity and a11y gate pending** | [Approved neon UI contract](./WS01_APPROVED_NEON_UI_REFERENCE.md) and full browser/visual proof |
 | WS-02 | TO DO | project schema, migration fixture suite |
 | WS-03 | TO DO | sandbox and artifact equivalence |
 | WS-04 | TO DO | Visual integration and codegen tests |
