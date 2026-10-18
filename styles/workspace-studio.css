@@ -306,3 +306,63 @@
   .ws01 .ws01-panel-actions button { font-size:10px; padding-inline:5px; }
   .ws01 .ws01-status { min-height:25px; padding-block:3px; }
 }
+
+
+/* Scoped compatibility palette. The legacy rendering/editor DOM is retained,
+   but the WORKSPACE route inherits the Docs/Gallery charcoal and lime system.
+   No color token is changed on /studio or either legacy route. */
+.ws01 .apx-studio-root {
+  --studio-bg:#111210;
+  --studio-bg-2:#171b15;
+  --studio-panel:#1d211a;
+  --studio-panel-2:#262b20;
+  --studio-panel-3:#2b3025;
+  --studio-line:#363d30;
+  --studio-line-soft:#2a3126;
+  --studio-text:#f3f4ec;
+  --studio-text-2:#c3cbbb;
+  --studio-text-3:#9ca993;
+  --studio-blue:#d5ff5f;
+  --studio-blue-2:#e6ffac;
+  --studio-mint:#8bcfc7;
+  --studio-mint-2:#b4e9df;
+  --studio-lavender:#c1a4ee;
+  --studio-action:#d5ff5f;
+  --studio-action-ink:#151a0f;
+  --gradient-twilight:linear-gradient(145deg,#111210,#1b2118);
+  --ring:#d5ff5f;
+}
+.ws01 .apx-pre4-workspace {
+  --pre4-bg:#111210;
+  --pre4-bg-deep:#10140f;
+  --pre4-surface:#1b1d18;
+  --pre4-surface-2:#22271e;
+  --pre4-surface-3:#292f24;
+  --pre4-surface-4:#313b2a;
+  --pre4-line:#343d30;
+  --pre4-line-soft:#283226;
+  --pre4-text:#f3f4ec;
+  --pre4-text-2:#bcc8b7;
+  --pre4-text-3:#9baa94;
+  --pre4-blue:#c1a4ee;
+  --pre4-blue-bright:#d5ff5f;
+  --pre4-violet:#a98be7;
+  --pre4-violet-2:#c1a4ee;
+  --pre4-green:#9ad7ba;
+  background:var(--pre4-bg);
+}
+.ws01 .apx-pre4-topbar { display:flex; align-items:center; justify-content:flex-end; gap:8px; min-width:0; padding-inline:12px; background:#1b1d18; }
+.ws01 .apx-pre4-top-actions { flex-wrap:wrap; justify-content:flex-end; }
+.ws01 .apx-pre4-primary { color:#10140e; border-color:#b5db3e; background:#d5ff5f; box-shadow:none; }
+.ws01 .apx-pre4-primary:hover:not(:disabled) { color:#10140e; border-color:#d5ff5f; background:#e8ffad; }
+.ws01 .apx-pre4-top-button:not(.apx-pre4-primary) { background:#252a22; border-color:#3c4734; color:#d9e3d3; }
+.ws01 .apx-pre4-top-button:hover:not(:disabled) { background:#303b28; border-color:#7b9451; }
+.ws01 .apx-pre4-feature-rail { background:#191e17; }
+.ws01 .apx-pre4-layout { background:#131710; }
+.ws01 .apx-pre4-inspector { background:#1c2219; }
+.ws01 .apx-pre4-dock { background:#171e15; }
+.ws01 .studio-code-topbar { background:#1b1d18!important; box-shadow:none!important; }
+.ws01 .apx-studio-root main>div { background:#1b211a!important; }
+.ws01 .studio-output-panel { background:#171c16; }
+.ws01 .apx-studio-root .gallery-snippet-editor-root { background:#111811; }
+.ws01 .apx-studio-root .gallery-snippet-editor-root .cm-editor { background:#101711; }
