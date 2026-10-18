@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import {
   ArrowDownTrayIcon, ArrowTopRightOnSquareIcon, Bars3Icon, CheckCircleIcon,
   ChevronDownIcon, ChevronRightIcon, CloudArrowUpIcon, CodeBracketIcon,
@@ -76,7 +76,7 @@ function WorkspaceBody() {
   const [dockHeight,setDockHeight]=useState(182);
   const [mobile,setMobile]=useState(false);
   const [visualMounted,setVisualMounted]=useState(false);
-  const [activeSource,setActiveSource]=useState(true);
+  const activeSource = true;
   const [preferencesLoaded,setPreferencesLoaded]=useState(false);
   const session=useStudioSharedSession();
   const {assets,assetStorageReady,previewArtifacts,activeArtifactId,setActiveArtifactId,
@@ -121,7 +121,7 @@ function WorkspaceBody() {
     if(next==='visual')setVisualMounted(true);
     if(next==='graph')setLayout('graph');
     else if(layout==='graph')setLayout('full');
-    if(next==='code')setActiveSource(true);
+    // Source editor remains mounted to preserve its working buffers.
   };
   const changeLayout=(next:Layout)=>{
     setLayout(next);
@@ -149,7 +149,7 @@ function WorkspaceBody() {
     if(!artifact?.url)return;
     const anchor=document.createElement('a');anchor.href=artifact.url;anchor.download=artifact.name||'apexify';anchor.click();
   };
-  const beginResize=(type:'left'|'right'|'dock',e:React.PointerEvent<HTMLDivElement>)=>{
+  const beginResize=(type:'left'|'right'|'dock',e:ReactPointerEvent<HTMLDivElement>)=>{
     e.preventDefault();const startX=e.clientX,startY=e.clientY;
     const old=type==='left'?leftWidth:type==='right'?rightWidth:dockHeight;
     const move=(p:PointerEvent)=>{
@@ -220,7 +220,7 @@ function WorkspaceBody() {
               <select aria-label="Preview zoom" value={zoom} onChange={e=>setZoom(Number(e.target.value))}><option value={40}>40%</option><option value={62}>62%</option><option value={85}>85%</option><option value={100}>100%</option></select>
               <button className="nw-plain" disabled={!artifact?.url} title="Open generated result" onClick={()=>{if(artifact?.url)window.open(artifact.url,'_blank','noopener,noreferrer')}}><ArrowTopRightOnSquareIcon/></button>
             </div>
-            <div className="nw-preview-content" data-example-artwork={!artifact}>
+            <div className="nw-preview-content" data-example-artwork={!artifact?'true':undefined}>
               {artifact?<StudioArtifactPreview artifact={artifact} artifacts={previewArtifacts} onArtifactSelect={setActiveArtifactId}/>:
                 <><img src={ART} alt="Gallery example of an Apexify.js spectrum composition"/><div className="nw-reference-label">GALLERY EXAMPLE · NOT A GENERATED RUN</div></>}
             </div>
