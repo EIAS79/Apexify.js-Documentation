@@ -288,3 +288,21 @@
 @media (max-height: 530px) {
   .ws01 .ws01-dock { flex-basis:min(var(--ws01-dock-height,210px),40%); height:min(var(--ws01-dock-height,210px),40%); }
 }
+
+
+/* Device review: on very narrow screens retain two real editor modes and
+   session actions without clipping the primary controls. Graph is labeled as
+   planned in the status and in wider-size mode menus. */
+@media (max-width: 600px) {
+  .ws01 .ws01-modes button:disabled { display:none; }
+  .ws01 .ws01-brand { gap:5px; }
+  .ws01 .ws01-toolbar { justify-content:space-between; }
+}
+@media (max-width: 420px) {
+  .ws01 .ws01-mobile-panel { display:none; }
+  .ws01 .ws01-back { font-size:0; padding:6px; }
+  .ws01 .ws01-back::after { content:"Legacy ↗"; font-size:10px; }
+  .ws01 .ws01-modes button { padding-inline:9px; }
+  .ws01 .ws01-panel-actions button { font-size:10px; padding-inline:5px; }
+  .ws01 .ws01-status { min-height:25px; padding-block:3px; }
+}
