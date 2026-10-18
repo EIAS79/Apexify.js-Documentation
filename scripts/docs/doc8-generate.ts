@@ -36,12 +36,7 @@ const artifacts: Record<string, unknown> = {
       { name: 'execution', path: 'lib/docs/playground/serverClientAdapter.ts' },
     ],
     consumers: {
-      studio: [
-        'components/studio/CodeStudio.tsx',
-        'components/studio/StudioOutputPanel.tsx',
-        'components/studio/StudioResizableSplit.tsx',
-        'lib/studio/studioStorage.ts',
-      ],
+      studio: [],
       documentation: [
         'components/docs/playground/VerifiedExamplePlayground.tsx',
         'components/examples/CodePreview.tsx',
@@ -82,7 +77,7 @@ const artifacts: Record<string, unknown> = {
     ordinaryDocsMustNotMountEditor: true,
     homepageMustNotMountEditor: true,
     galleryClosedStateMustNotMountEditor: true,
-    interactiveRoutes: ['/studio', '/docs/node/canvas'],
+    interactiveRoutes: ['/docs/node/canvas'],
   },
 };
 
