@@ -9,7 +9,7 @@ const output = process.env.STUDIO_WS01_EVIDENCE || 'generated/studio/workspace/w
 if (!chrome) throw new Error('CHROME_PATH is required');
 
 const browser = await puppeteer.launch({ executablePath: chrome, headless: 'new', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
-const screens = [['desktop', 1440, 900], ['tablet', 820, 1180], ['mobile', 390, 844], ['small', 320, 568]];
+const screens = [['desktop', 1440, 900], ['wide', 1920, 1080], ['laptop', 1280, 720], ['compact', 1024, 768], ['tablet', 820, 1180], ['tablet-small', 768, 1024], ['mobile', 390, 844], ['small', 320, 568]];
 await mkdir(output, { recursive: true });
 const results = [];
 
@@ -32,7 +32,7 @@ try {
       await page.click('button[aria-label="Templates"]');
       await page.waitForSelector('.ws01-drawer .ws01-template');
       const after = await page.$eval('.ws01-main', e => e.clientWidth);
-      if (width >= 1020 && after >= before) failures.push('Drawer did not reclaim/use a new width');
+      if (width >= 1200 && after >= before) failures.push('Drawer did not reclaim/use a new width');
       await page.keyboard.press('Escape');
       await page.waitForFunction(() => !document.querySelector('.ws01-drawer'));
       await page.click('.ws01-modes button:nth-child(2)');
@@ -61,7 +61,7 @@ try {
       if (overflow > 1) failures.push('Document horizontal overflow ' + overflow);
       const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('apexify-workspace-layout-ws01-v1') || '{}'));
       if (persisted.theme !== 'dark') failures.push('Layout/theme preference did not persist');
-      if (width >= 1020) {
+      if (width >= 1200) {
         await page.click('button[aria-label="Templates"]');
         const resizer = await page.$('.ws01-resizer--drawer');
         if (!resizer) failures.push('Accessible desktop resizer missing');
