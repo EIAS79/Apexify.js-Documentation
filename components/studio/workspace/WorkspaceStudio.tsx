@@ -57,7 +57,7 @@ function StudioWorkspaceContent() {
   useEffect(() => { refreshFiles(); }, [refreshFiles]);
 
   useEffect(() => {
-    const measure = () => setMobile(window.innerWidth < 1020);
+    const measure = () => setMobile(window.innerWidth < 1200);
     measure();
     window.addEventListener('resize', measure);
     try {
