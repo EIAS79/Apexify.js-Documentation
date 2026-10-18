@@ -1,0 +1,47 @@
+name: Workspace Studio WS-00 Runtime Proof
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/workspace-studio-ws00-runtime.yml'
+      - 'scripts/studio/workspace/**'
+      - 'docs/studio-workspace/WS00_*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-runtime-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install pinned package, browser preview snapshot, Deno and FFmpeg
+        run: npm ci --no-audit --no-fund
+      - name: Assert installed Node runtime works and resolves expected pin
+        run: |
+          node scripts/studio/workspace/ws00-pin-audit.mjs
+          node -e "const p=require('./node_modules/apexify.js/package.json');const root=require('./package.json');if(p.version!=='6.0.0'||!root.dependencies['apexify.js'].endsWith('379a5248f09ed39c1b1734fe104b6bd73a77857f'))process.exit(1);console.log('Installed Apexify.js',p.version,'with immutable GitHub SHA',root.dependencies['apexify.js']);"
+      - name: Run real isolated output equivalence across representative Visual projects
+        env:
+          NODE_ENV: test
+        run: npx --no-install tsx scripts/studio/visual/phase18-runtime-proof.ts
+      - name: Run existing text and font runtime parity proof
+        env:
+          NODE_ENV: test
+        run: npx --no-install tsx scripts/studio/parity/phase3-text-runtime.ts
+      - name: Upload execution evidence if produced
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-studio-ws00-runtime-artifact-evidence
+          path: |
+            generated/studio/phase18-runtime-proof.json
+            generated/studio/runtime-parity/phases/phase-3-text-runtime.json
+          if-no-files-found: warn
+          retention-days: 30
