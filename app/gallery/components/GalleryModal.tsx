@@ -284,39 +284,6 @@ export default function GalleryModal({
     });
   };
 
-  const openInStudio = () => {
-    if (!hasCode) return;
-    try {
-      /**
-       * Send the user's edits for the language they're actively viewing,
-       * and keep the original for the other language. If they never typed,
-       * `editedCode` still equals the original `codeText` so this is a no-op.
-       * Studio picks this payload up on mount, opens it as a new tab, and
-       * clears the slot.
-       */
-      const liveCode = editedCode || codeText;
-      const projectCode = pagedCode?.length
-        ? pagedCode
-            .filter((page) => page.language === codeLang)
-            .map((page, index) => {
-              const absoluteIndex = pagedCode.indexOf(page);
-              return absoluteIndex === codePageIndex ? liveCode : page.code;
-            })
-            .join('\n\n')
-        : liveCode;
-      const payload = {
-        name: item.title || 'Gallery snippet',
-        ts: codeLang === 'ts' ? projectCode : item.code?.ts ?? '',
-        js: codeLang === 'js' ? projectCode : item.code?.js ?? '',
-        lang: codeLang,
-      };
-      localStorage.setItem(STUDIO_INCOMING_SNIPPET_KEY, JSON.stringify(payload));
-    } catch {
-      /* localStorage may be blocked — silently continue */
-    }
-    router.push('/studio');
-  };
-
   const showCode = hasCode && layoutMode !== 'media';
   const showMedia = layoutMode !== 'code';
   const previewSrc = executionEligible && executionDataUrl ? executionDataUrl : activeOutput.src;
