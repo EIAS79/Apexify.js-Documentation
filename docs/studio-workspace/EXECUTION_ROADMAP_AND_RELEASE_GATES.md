@@ -147,7 +147,7 @@ Gate: stable release, migration confidence and documented maintenance/engine dri
 | Phase | Status at plan creation | Evidence required |
 |---|---|---|
 | WS-00 | IN PROGRESS — pinned recursive inventory passed (226 public surfaces / 71,086 records); runtime and migration verification ongoing | current-pin proof and migration acceptance |
-| WS-01 | TO DO | browser-responsive shell proof |
+| WS-01 | IN PROGRESS — flag-gated compatibility shell, four-width automated browser PASS; full authoring extraction and visual/a11y signoff pending | responsive workspace shell + real integrated editor controls |
 | WS-02 | TO DO | project schema, migration fixture suite |
 | WS-03 | TO DO | sandbox and artifact equivalence |
 | WS-04 | TO DO | Visual integration and codegen tests |
