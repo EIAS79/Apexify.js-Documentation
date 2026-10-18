@@ -69,7 +69,14 @@ function arg(name: string): string | null {
 }
 
 const CHECK = process.argv.includes('--check');
-const pinPath = path.join(ROOT, 'scripts', 'studio', 'parity', 'runtime-source.json');
+// Default remains the immutable historical STUDIO-PARITY-0 inventory pin.
+// A separate --pin-file and --out pair allow WS-00 audits without mutating archives.
+const pinPath = path.resolve(arg('pin-file') ?? path.join(ROOT, 'scripts', 'studio', 'parity', 'runtime-source.json'));
+const historicalPinPath = path.join(ROOT, 'scripts', 'studio', 'parity', 'runtime-source.json');
+const usesAlternatePin = path.resolve(pinPath) !== path.resolve(historicalPinPath);
+if (usesAlternatePin && !arg('out')) {
+  throw new Error('[studio-parity] alternate --pin-file requires a separate --out directory to preserve historical parity results.');
+}
 const pin = JSON.parse(fs.readFileSync(pinPath, 'utf8')) as RuntimeSourcePin;
 const runtimeRoot = path.resolve(
   arg('runtime-root') ?? process.env.APEXIFY_RUNTIME_ROOT ?? path.join(ROOT, '..', 'Apexify.js'),
@@ -80,6 +87,9 @@ const requestedCommit = (
 const outDir = path.resolve(
   arg('out') ?? path.join(ROOT, 'generated', 'studio', 'runtime-parity'),
 );
+if (usesAlternatePin && outDir === path.join(ROOT, 'generated', 'studio', 'runtime-parity')) {
+  throw new Error('[studio-parity] WS-00 scans may not overwrite the historical runtime-parity directory.');
+}
 
 if (requestedCommit !== pin.commit) {
   throw new Error(
@@ -460,6 +470,20 @@ function sourceEvidenceForDeclaration(root: ts.Declaration): SourceEvidence {
   const resourceLimits: SourceEvidence['resourceLimits'] = [];
   const errors: SourceEvidence['errors'] = [];
   const queued: Array<{ declaration: ts.Declaration; depth: number }> = [{ declaration: root, depth: 0 }];
+  // Overload signatures have no method body. A public overload must be traced
+  // through its concrete sibling implementation, otherwise validators reached
+  // by the actual runtime method (notably createText) falsely disappear.
+  if (
+    ts.isMethodDeclaration(root) && !root.body && root.parent &&
+    (ts.isClassDeclaration(root.parent) || ts.isClassExpression(root.parent))
+  ) {
+    const name = root.name.getText(root.getSourceFile());
+    const implementation = root.parent.members.find((member): member is ts.MethodDeclaration =>
+      ts.isMethodDeclaration(member) && Boolean(member.body) &&
+      member.name.getText(member.getSourceFile()) === name,
+    );
+    if (implementation) queued.push({ declaration: implementation, depth: 0 });
+  }
   const visited = new Set<string>();
 
   const remember = (map: Map<string, SourceLocation>, node: ts.Node): void => {
@@ -1750,5 +1774,6 @@ console.log(
 
 if (!gapSummary.gates.baselineComplete) {
   console.error('[studio-parity] baseline gates failed:', gapSummary.gates, omissions);
+  if (sourceMappingFailures.length) console.error('[studio-parity] source-mapping discrepancies:', sourceMappingFailures);
   process.exitCode = 1;
 }
