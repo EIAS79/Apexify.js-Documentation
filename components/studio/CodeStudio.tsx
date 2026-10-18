@@ -866,6 +866,20 @@ export default function CodeStudio({ embedded = false, mode = 'code', onModeChan
     return () => window.removeEventListener('apexify-workspace-run', handleRun);
   }, [workspaceCompact, runCode]);
 
+  // Sidebar bridge: select an existing persisted buffer without pretending that
+  // virtual project folders are a full filesystem (WS-02/WS-05).
+  useEffect(() => {
+    if (!workspaceCompact) return;
+    const handleSelect = (event: Event) => {
+      const id = (event as CustomEvent<{ id?: string }>).detail?.id;
+      if (!id || !buffers.some(buffer => buffer.id === id)) return;
+      setActiveBufferId(id);
+      setOutputTab('preview');
+    };
+    window.addEventListener('apexify-workspace-select-buffer', handleSelect);
+    return () => window.removeEventListener('apexify-workspace-select-buffer', handleSelect);
+  }, [workspaceCompact, buffers, setOutputTab]);
+
   /* ---------- derived display values ---------- */
 
   const lineCount = activeCode ? activeCode.split('\n').length : 0;
