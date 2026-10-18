@@ -47,6 +47,14 @@ The default checker verifies declared package, lockfile, executor and separate w
 
 That option is expected to FAIL until the new current-pin scan is actually generated and verified. Do not make it green by falsifying report commit metadata.
 
+## Reproducible current-pin scan result (GitHub Actions)
+
+- [WS-00 inventory job](https://github.com/EIAS79/Apexify.js-Documentation/actions/runs/39098698799) completed successfully against engine 379a5248f09ed39c1b1734fe104b6bd73a77857f.
+- **226** enumerated public surfaces and **71,086** recursive records; zero scanner omissions; all source-inventory baseline gates passed.
+- The real overloaded createText method needed scanner traversal into its implementation body to recover the text-validation call graph. This is a scanner fix, not a claim to have changed engine rendering semantics.
+- Reconciliation: 187 existing legacy capability rows exactly matched, 39 runtime-only surfaces without a legacy capability row. The historical legacy matrix pin still differs and requires separate classification; do not promote those 39 to fully supported Visual/Graph controls without tests.
+- Evidence artifact is available under the workflow run above. This establishes an inventory baseline, not runtime-execution, browser, or migration completeness.
+
 ## WS-00 remaining execution (ordered)
 
 1. Clean-install pinned full runtime, verify installed metadata/declaration artifacts actually resolve to 379a5248…; separately validate @apexify/web snapshot.
