@@ -263,3 +263,19 @@
 @media(prefers-reduced-motion:reduce){
  .nw *, .nw *::before, .nw *::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
+
+/* High-resolution approved-reference composition. This is an explicitly
+   labeled design example until the real Apexify renderer returns an artifact. */
+.nw-reference-composition{height:100%;width:100%;min-height:0;min-width:0;position:relative;
+ display:grid;place-items:center;overflow:hidden;isolation:isolate;background:#06112c}
+.nw-reference-composition::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+ background:radial-gradient(ellipse at center,#070b2499 0%,transparent 53%),linear-gradient(90deg,#0309235c,transparent 35%,#13072b38)}
+.nw-reference-composition>img{height:100%;width:100%;object-fit:cover;object-position:center;filter:saturate(1.25) contrast(1.08)}
+.nw-reference-copy{position:absolute;z-index:2;left:7%;right:7%;top:50%;transform:translateY(-50%);text-align:center;
+ color:#fff;text-shadow:0 4px 22px #040826}
+.nw-reference-copy strong{font-size:clamp(27px,3.4vw,65px);font-weight:900;letter-spacing:-.07em;
+ line-height:1;white-space:nowrap;display:block}
+.nw-reference-copy strong span{color:#ffe938;text-shadow:0 0 18px #f6d9384d}
+.nw-reference-copy p{font-size:clamp(10px,1.1vw,16px);font-weight:500;letter-spacing:.025em;margin:14px auto 0;color:#eff5ff}
+.nw-reference-composition .nw-reference-label{z-index:4;left:11px;bottom:10px;right:auto}
+@media(max-width:760px){.nw-reference-copy strong{font-size:clamp(23px,7vw,44px)}.nw-reference-copy p{font-size:11px}}
