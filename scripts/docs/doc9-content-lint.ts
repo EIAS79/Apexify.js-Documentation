@@ -16,7 +16,7 @@ const apiRoutes = new Set<string>([
   ...apiManifest.symbols.flatMap((symbol: any) => symbol.members.map((member: any) => member.href)),
 ]);
 const exampleRoutes = new Set<string>(exampleManifest.examples.map((example: any) => example.canonicalRoute));
-const siteRoutes = new Set<string>(['/', '/gallery', '/studio', ...apiRoutes, ...exampleRoutes]);
+const siteRoutes = new Set<string>(['/', '/gallery', ...apiRoutes, ...exampleRoutes]);
 
 type Finding = { source: string; rule: string; detail: string };
 const errors: Finding[] = [];
