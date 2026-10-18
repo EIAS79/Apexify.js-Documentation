@@ -1,101 +1,70 @@
 #!/usr/bin/env node
+// WS-01 locked neon reference — structural and real-workspace regression suite.
+// The reference screenshot is 1672×941; no fake output or queue progress allowed.
 import puppeteer from 'puppeteer-core';
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-const chrome = process.env.CHROME_PATH;
-const base = process.env.STUDIO_WS01_BASE_URL || 'http://127.0.0.1:3000';
-const output = process.env.STUDIO_WS01_EVIDENCE || 'generated/studio/workspace/ws01-browser';
-if (!chrome) throw new Error('CHROME_PATH is required');
-
-const browser = await puppeteer.launch({ executablePath: chrome, headless: 'new', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
-const screens = [['desktop', 1440, 900], ['wide', 1920, 1080], ['laptop', 1280, 720], ['compact', 1024, 768], ['tablet', 820, 1180], ['tablet-small', 768, 1024], ['mobile', 390, 844], ['small', 320, 568]];
-await mkdir(output, { recursive: true });
-const results = [];
-
-try {
-  for (const [name, width, height] of screens) {
-    const page = await browser.newPage();
-    const failures = [];
-    const errors = [];
-    page.on('pageerror', error => errors.push(error.message));
-    try {
-      await page.setCacheEnabled(false);
-      await page.setViewport({ width, height, isMobile: width < 600, hasTouch: width < 600 });
-      const response = await page.goto(base + '/studio/workspace', { waitUntil: 'domcontentloaded', timeout: 90000 });
-      if (![200,304].includes(response?.status())) throw new Error('preview HTTP ' + response?.status());
-      await page.waitForSelector('[data-workspace-studio]', { timeout: 90000 });
-      await page.waitForSelector('[data-studio-visual-workspace][data-active="true"]', { timeout: 60000 });
-      await page.waitForSelector('.ws01-canvas-onboarding', { timeout: 30000 });
-      const visualDockDefault = await page.$eval('.apx-pre4-dock', element => element.getAttribute('data-collapsed'));
-      if (visualDockDefault !== 'true') failures.push('Workspace Visual dock must start collapsed');
-      await page.screenshot({ path: path.join(output, name + '-visual.png'), fullPage: true });
-      const disabledGraph = await page.$eval('.ws01-modes button[aria-label="Graph not yet available"]', b => b.disabled);
-      if (!disabledGraph) failures.push('Graph feature falsely enabled');
-      const before = await page.$eval('.ws01-main', e => e.clientWidth);
-      await page.click('button[aria-label="Templates"]');
-      await page.waitForSelector('.ws01-drawer .ws01-template');
-      const after = await page.$eval('.ws01-main', e => e.clientWidth);
-      if (width >= 1200 && after >= before) failures.push('Drawer did not reclaim/use a new width');
-      await page.keyboard.press('Escape');
-      await page.waitForFunction(() => !document.querySelector('.ws01-drawer'));
-      await page.click('.ws01-modes button:nth-child(2)');
-      await page.waitForFunction(() => document.querySelector('[data-ws01-current-mode]')?.getAttribute('data-ws01-current-mode') === 'code');
-      if (width < 760) {
-        const visibleOutput = await page.evaluate(() => [...document.querySelectorAll('.studio-output-panel')].some(node => {
-          const rect = node.getBoundingClientRect();
-          return rect.width > 0 && rect.height > 0;
+const chrome=process.env.CHROME_PATH;
+const base=process.env.STUDIO_WS01_BASE_URL || 'http://127.0.0.1:3000';
+const output=process.env.STUDIO_WS01_EVIDENCE || 'generated/studio/workspace/ws01-browser';
+if(!chrome)throw Error('CHROME_PATH required');
+const browsers=[['reference',1672,941],['wide',1920,1080],['desktop',1440,900],['laptop',1280,720],['compact',1024,768],['tablet',820,1180],['mobile',390,844],['small',320,568]];
+await mkdir(output,{recursive:true});
+const browser=await puppeteer.launch({executablePath:chrome,headless:'new',args:['--no-sandbox','--disable-dev-shm-usage']});
+const report=[];
+try{
+  for(const [name,width,height] of browsers){
+    const page=await browser.newPage();
+    const issues=[];
+    page.on('pageerror',e=>issues.push('JS: '+e.message));
+    try{
+      await page.setViewport({width,height,deviceScaleFactor:1,isMobile:width<600,hasTouch:width<600});
+      const response=await page.goto(base+'/studio/workspace',{waitUntil:'domcontentloaded',timeout:90000});
+      if(response?.status()!==200)throw Error('HTTP '+response?.status());
+      await page.waitForSelector('.nw[data-workspace-stage="ws01-neon-approved"]',{timeout:90000});
+      await page.waitForSelector('.nw-code .apx-studio-root',{timeout:75000});
+      const baseline=await page.evaluate(()=>{
+        const shell=document.querySelector('.nw');
+        const selectors=['.nw-header','.nw-rail','.nw-explorer','.nw-main','.nw-modebar','.nw-editor','.nw-preview','.nw-inspector','.nw-dock'];
+        const regions=Object.fromEntries(selectors.map(s=>{
+          const e=document.querySelector(s);const r=e?.getBoundingClientRect();
+          return [s,r?{x:r.x,y:r.y,width:r.width,height:r.height}:null];
         }));
-        if (visibleOutput) failures.push('Compact Code Studio must focus source unless Preview is explicitly selected');
-      }
-      await page.click('button[aria-label="Use light theme"]');
-      const lightTheme = await page.$eval('[data-workspace-studio]', el => el.getAttribute('data-ws01-theme'));
-      if (lightTheme !== 'light') failures.push('Light theme toggle did not update shell tokens');
-      await page.click('button[aria-label="Use dark theme"]');
-      await page.click('button[aria-controls="ws01-inspector"]');
-      await page.waitForSelector('.ws01-inspector .ws01-facts');
-      const propertyMetrics = await page.$eval('.ws01-inspector', el => ({scrollHeight:el.scrollHeight,clientHeight:el.clientHeight}));
-      if (propertyMetrics.clientHeight < 120) failures.push('Inspector too short to use');
-      await page.keyboard.press('Escape');
-      await page.waitForFunction(() => !document.querySelector('.ws01-inspector'));
-      await page.click('button[aria-controls="ws01-dock"]');
-      await page.waitForSelector('.ws01-dock .ws01-dock-body');
-      await page.click('.ws01-dock-tabs button:nth-child(2)');
-      await page.waitForFunction(() => document.querySelector('.ws01-dock-tabs button:nth-child(2)')?.getAttribute('aria-pressed') === 'true');
-      await page.keyboard.press('Escape');
-      await page.waitForFunction(() => !document.querySelector('.ws01-dock'));
-            await page.click('button[aria-label="Assets"]');
-      await page.waitForSelector('.ws01-drawer');
-      await page.click('button[aria-label="Close panel"]');
-      await page.waitForFunction(() => !document.querySelector('.ws01-drawer'));
-      const overflow = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth));
-      if (overflow > 1) failures.push('Document horizontal overflow ' + overflow);
-      const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('apexify-workspace-layout-ws01-v1') || '{}'));
-      if (persisted.theme !== 'dark') failures.push('Layout/theme preference did not persist');
-      if (width >= 1200) {
-        await page.click('button[aria-label="Templates"]');
-        const resizer = await page.$('.ws01-resizer--drawer');
-        if (!resizer) failures.push('Accessible desktop resizer missing');
-        else {
-          await resizer.focus();
-          const initial = await page.$eval('.ws01-resizer--drawer', el => Number(el.getAttribute('aria-valuenow')));
-          await page.keyboard.press('ArrowRight');
-          const resized = await page.$eval('.ws01-resizer--drawer', el => Number(el.getAttribute('aria-valuenow')));
-          if (resized <= initial) failures.push('Keyboard resize did not change drawer width');
-        }
-        await page.keyboard.press('Escape');
-      }
-      if (errors.length) failures.push('Browser JS errors: ' + errors.join(' | '));
-      await page.screenshot({ path: path.join(output, name + '.png'), fullPage: true });
-      results.push({ name, width, height, status: failures.length ? 'FAIL' : 'PASS', failures, overflow });
-    } catch (error) {
-      failures.push(error instanceof Error ? error.message : String(error));
-      results.push({ name, width, height, status: 'FAIL', failures });
-      try { await page.screenshot({ path: path.join(output, name + '-failure.png') }); } catch {}
-    } finally { await page.close(); }
+        const rootStyle=getComputedStyle(shell);
+        const overflow=Math.max(0,document.documentElement.scrollWidth-document.documentElement.clientWidth);
+        return {regions,overflow,background:rootStyle.backgroundColor,accent:rootStyle.getPropertyValue('--nw-cyan').trim(),
+          noGeneratedOutput:document.querySelector('.nw-preview-content')?.hasAttribute('data-example-artwork'),
+          sampleLabel:document.querySelector('.nw-reference-label')?.textContent||'',
+        };
+      });
+      if(baseline.accent!=='#20c8ff')issues.push('Neon cyan token missing');
+      if(baseline.overflow>1)issues.push('Document horizontal overflow '+baseline.overflow);
+      if(!baseline.regions['.nw-main'] || !baseline.regions['.nw-editor'])issues.push('Editor shell missing');
+      if(width>=1161&&(!baseline.regions['.nw-inspector']||baseline.regions['.nw-inspector'].width<260))issues.push('Desktop inspector not docked');
+      if(width>=961&&(!baseline.regions['.nw-explorer']||baseline.regions['.nw-explorer'].width<170))issues.push('Desktop file browser missing');
+      if(width>=761&&!baseline.regions['.nw-dock'])issues.push('Desktop output dock missing');
+      if(baseline.noGeneratedOutput&&!baseline.sampleLabel.includes('NOT A GENERATED RUN'))issues.push('Example artwork lacks truthful label');
+      await page.screenshot({path:path.join(output,name+'-full.png'),fullPage:true});
+      await page.click('.nw-modes button:nth-child(3)');
+      await page.waitForSelector('.nw-graph .nw-node',{timeout:25000});
+      if(await page.$eval('.nw-graph .nw-node',node=>getComputedStyle(node).visibility==='hidden'))issues.push('Graph overview hidden');
+      await page.click('.nw-modes button:nth-child(1)');
+      await page.waitForSelector('.nw-code .apx-studio-root');
+      await page.click('.nw-modes-preview > button:nth-child(1)').catch(()=>{});
+      await page.click('.nw-modes button:nth-child(1)');
+      const toggle=await page.$('button[aria-label="Toggle sidebar"]');
+      if(toggle){await toggle.click();await toggle.click();}
+      const runButton=await page.$('.nw-preview .nw-run');
+      if(!runButton && width>760)issues.push('Run button absent from desktop');
+      report.push({name,width,height,status:issues.length?'FAIL':'PASS',issues,baseline});
+    }catch(error){
+      issues.push(error instanceof Error?error.message:String(error));
+      try{await page.screenshot({path:path.join(output,name+'-error.png')});}catch{}
+      report.push({name,width,height,status:'FAIL',issues});
+    }finally{await page.close();}
   }
-} finally { await browser.close(); }
-
-await writeFile(path.join(output, 'report.json'), JSON.stringify({ phase: 'WS-01', route: '/studio/workspace', stage: 'compatibility-shell-only', results }, null, 2) + '\n');
-console.log(JSON.stringify(results, null, 2));
-if (results.some(result => result.status === 'FAIL')) process.exitCode = 1;
+}finally{await browser.close();}
+await writeFile(path.join(output,'report.json'),JSON.stringify({phase:'WS-01',ui:'reference-neon',report},null,2)+'\n');
+console.log(JSON.stringify(report.map(x=>({name:x.name,status:x.status,issues:x.issues})),null,2));
+if(report.some(x=>x.status==='FAIL'))process.exitCode=1;
