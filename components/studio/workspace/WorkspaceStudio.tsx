@@ -290,7 +290,7 @@ function StudioWorkspaceContent() {
 
           <div className="ws01-authoring" data-ws01-current-mode={mode}>
             <section className="ws01-pane" hidden={mode !== 'code'} aria-label="Code editor workspace">
-              {codeVisited && <CodeStudio embedded mode={mode} onModeChange={chooseMode} />}
+              {codeVisited && <CodeStudio embedded mode={mode} onModeChange={chooseMode} workspaceCompact={mobile && typeof window !== 'undefined' && window.innerWidth < 760} />}
             </section>
             {visualVisited && (
               <section className="ws01-pane" hidden={mode !== 'visual'} aria-label="Visual editor workspace">
