@@ -12,7 +12,7 @@ const SECTIONS = [
   { id: 'examples', label: 'Examples', detail: 'Source-backed recipes', Icon: CodeBracketIcon },
 ] as const;
 const FILTERS = [['all', 'All'], ['image', 'Images'], ['typography', 'Typography'], ['data', 'Data'], ['motion', 'Motion'], ['composition', 'Composition'], ['surface', 'Surfaces'], ['advanced', 'Advanced']] as const;
-const NAV = [['/', 'Home'], ['/docs/getting-started', 'Docs'], ['/api-reference', 'API'], ['/gallery', 'Gallery'], ['/studio', 'Studio']];
+const NAV = [['/', 'Home'], ['/docs/getting-started', 'Docs'], ['/api-reference', 'API'], ['/gallery', 'Gallery']];
 
 export default function GalleryMotion({ entries }: { entries: FieldEntry[] }) {
   const [section, setSection] = useState<GallerySection>('explore');
