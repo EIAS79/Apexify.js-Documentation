@@ -193,12 +193,12 @@ function StudioWorkspaceContent() {
           <>
             <button
               className="ws01-mobile-shade" type="button" aria-label="Close navigation"
-              onClick={() => setDrawer(null)}
+              onClick={() => { setDrawer(null); triggerRef.current?.focus(); }}
             />
-            <aside className="ws01-drawer" aria-label={drawerTitle}>
+            <aside className="ws01-drawer" aria-label={drawerTitle} style={{ "--ws01-drawer-width": drawerWidth + "px" } as CSSProperties}>
               <div className="ws01-drawer-title">
                 <h2>{drawerTitle}</h2>
-                <button type="button" aria-label="Close panel" className="ws01-dismiss" onClick={() => setDrawer(null)}>×</button>
+                <button type="button" aria-label="Close panel" className="ws01-dismiss" onClick={() => { setDrawer(null); triggerRef.current?.focus(); }}>×</button>
               </div>
               {drawer === 'files' && (
                 <div className="ws01-drawer-body">
@@ -244,6 +244,9 @@ function StudioWorkspaceContent() {
                   <Link className="ws01-entry" href="/studio/legacy/visual">Open legacy Visual project ↗</Link>
                 </div>
               )}
+              {!mobile && <div className="ws01-resizer ws01-resizer--drawer" role="separator" aria-label="Resize navigation drawer"
+                aria-orientation="vertical" aria-valuemin={230} aria-valuemax={340} aria-valuenow={drawerWidth} tabIndex={0}
+                onPointerDown={event => beginResize('drawer', event)} onKeyDown={event => resizeByKeys('drawer', event)} />}
             </aside>
           </>
         ) : null}
@@ -255,8 +258,13 @@ function StudioWorkspaceContent() {
               <button type="button" className={mode === 'code' ? 'is-active' : ''} aria-pressed={mode === 'code'} onClick={() => chooseMode('code')}>Code</button>
               <button type="button" disabled title="Graph authoring is planned for WS-06 and is not implemented" aria-label="Graph not yet available">Graph · Later</button>
             </div>
-            <span className="ws01-compat-tag">Using existing verified Studio editors</span>
-            <button className="ws01-mobile-panel" type="button" aria-label="Open Files panel" onClick={() => toggleDrawer('files')}>☰</button>
+            <div className="ws01-panel-actions">
+              <button type="button" aria-expanded={inspectorOpen} aria-controls="ws01-inspector"
+                className={inspectorOpen ? 'is-open' : ''} onClick={event => { triggerRef.current = event.currentTarget; setInspectorOpen(open => !open); }}>Properties</button>
+              <button type="button" aria-expanded={dockOpen} aria-controls="ws01-dock"
+                className={dockOpen ? 'is-open' : ''} onClick={event => { triggerRef.current = event.currentTarget; setDockOpen(open => !open); }}>Outputs {previewArtifacts.length ? '(' + previewArtifacts.length + ')' : ''}</button>
+            </div>
+            <button className="ws01-mobile-panel" type="button" aria-label="Open Files panel" onClick={event => { triggerRef.current = event.currentTarget; toggleDrawer('files'); }}>☰</button>
           </div>
 
           <div className="ws01-authoring" data-ws01-current-mode={mode}>
@@ -270,11 +278,49 @@ function StudioWorkspaceContent() {
             )}
           </div>
 
+          {dockOpen && <section id="ws01-dock" className="ws01-dock" aria-label="Actual session outputs" style={{ "--ws01-dock-height": dockHeight + "px" } as CSSProperties}>
+            <div className="ws01-resizer ws01-resizer--dock" role="separator" aria-label="Resize output dock" aria-orientation="horizontal"
+              aria-valuemin={150} aria-valuemax={350} aria-valuenow={dockHeight} tabIndex={0}
+              onPointerDown={event => beginResize('dock', event)} onKeyDown={event => resizeByKeys('dock', event)} />
+            <div className="ws01-dock-tabs" role="group" aria-label="Output and diagnostics tabs">
+              {(['results','diagnostics','history'] as const).map(tab => <button type="button" key={tab} aria-pressed={dockTab === tab} onClick={() => setDockTab(tab)}>{tab === 'results' ? 'Results' : tab === 'diagnostics' ? 'Diagnostics' : 'Run history'}</button>)}
+              <button className="ws01-dismiss" type="button" aria-label="Close output dock" onClick={() => { setDockOpen(false); triggerRef.current?.focus(); }}>×</button>
+            </div>
+            <div className="ws01-dock-body">
+              {dockTab === 'results' && (previewArtifacts.length ? <ul>{previewArtifacts.map((artifact,index) => <li key={artifact.id} className={activeArtifactId === artifact.id ? 'is-current' : ''}>Artifact {index + 1}: {artifact.id}</li>)}</ul> : <p>No artifacts in this session. Run code or render a Visual composition first.</p>)}
+              {dockTab === 'diagnostics' && (error || previewWarnings.length ? <div role="status">{error && <p className="ws01-error">{error}</p>}{previewWarnings.map((warning,index) => <p key={index}>{warning}</p>)}</div> : <p>No current diagnostics.</p>)}
+              {dockTab === 'history' && (history.length ? <ul>{history.slice(0,20).map(entry => <li key={entry.id}>{entry.bufferName} — {entry.ok ? 'Succeeded' : 'Failed'} — {new Date(entry.ts).toLocaleString()}</li>)}</ul> : <p>No execution history in this session.</p>)}
+            </div>
+          </section>}
           <div className="ws01-status">
             <span><i aria-hidden="true"/> Workspace UI foundation</span>
-            <span>Code & Visual are real legacy-compatible engines; unified projects, Graph and Queue are still in development.</span>
+            <span>Real editor engines · {previewArtifacts.length} outputs · {elapsedMs == null ? 'No run timing' : elapsedMs + ' ms'} · {previewProvenance || 'Not executed'} · Graph / queue remain planned.</span>
           </div>
         </main>
+        {inspectorOpen && <>
+          {mobile && <button type="button" className="ws01-mobile-shade ws01-inspector-shade" aria-label="Close properties panel"
+            onClick={() => { setInspectorOpen(false); triggerRef.current?.focus(); }} />}
+          <aside className="ws01-inspector" id="ws01-inspector" aria-label="Session properties"
+            style={{ "--ws01-inspector-width": inspectorWidth + "px" } as CSSProperties}>
+            {!mobile && <div className="ws01-resizer ws01-resizer--inspector" role="separator" aria-label="Resize properties panel"
+              aria-orientation="vertical" aria-valuemin={260} aria-valuemax={390} aria-valuenow={inspectorWidth} tabIndex={0}
+              onPointerDown={event => beginResize('inspector', event)} onKeyDown={event => resizeByKeys('inspector', event)} />}
+            <div className="ws01-drawer-title"><h2>Session properties</h2>
+              <button type="button" className="ws01-dismiss" aria-label="Close properties panel"
+                onClick={() => { setInspectorOpen(false); triggerRef.current?.focus(); }}>×</button></div>
+            <div className="ws01-drawer-body">
+              <p>Live session information. Selected object properties are available in the existing Visual inspector.</p>
+              <dl className="ws01-facts">
+                <div><dt>Editor</dt><dd>{mode === 'code' ? 'Code' : 'Visual'}</dd></div>
+                <div><dt>Assets</dt><dd>{assets.length}</dd></div>
+                <div><dt>Outputs</dt><dd>{previewArtifacts.length}</dd></div>
+                <div><dt>Runtime</dt><dd>{previewProvenance || 'Not run'}</dd></div>
+                <div><dt>Elapsed</dt><dd>{elapsedMs == null ? '—' : elapsedMs + ' ms'}</dd></div>
+              </dl>
+              {error && <p className="ws01-error" role="status">{error}</p>}
+            </div>
+          </aside>
+        </>}
       </div>
     </div>
   );
