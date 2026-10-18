@@ -1,0 +1,61 @@
+name: Workspace Studio WS-00 Current Runtime Inventory
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/studio/parity/scan-runtime.ts'
+      - 'scripts/studio/workspace/runtime-source.ws00.json'
+      - '.github/workflows/workspace-studio-ws00-inventory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-recursive-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout documentation revision
+        uses: actions/checkout@v4
+        with:
+          path: documentation
+      - name: Checkout exact runtime revision without modifying its main branch
+        uses: actions/checkout@v4
+        with:
+          repository: EIAS79/Apexify.js
+          ref: 379a5248f09ed39c1b1734fe104b6bd73a77857f
+          path: engine
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: documentation/package-lock.json
+      - name: Install dependencies without executing binary downloads or generation
+        working-directory: documentation
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check runtime source identity and historical separation
+        run: |
+          ACTUAL=$(git -C engine rev-parse HEAD)
+          test "$ACTUAL" = "379a5248f09ed39c1b1734fe104b6bd73a77857f"
+          test "$(node -p "require('./documentation/package.json').dependencies['apexify.js']")" = "github:EIAS79/Apexify.js#$ACTUAL"
+          test "$(node -p "require('./documentation/scripts/studio/workspace/runtime-source.ws00.json').commit")" = "$ACTUAL"
+      - name: Generate isolated current-pin recursive inventory
+        working-directory: documentation
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: |
+          npx --no-install tsx scripts/studio/parity/scan-runtime.ts \
+            --pin-file=scripts/studio/workspace/runtime-source.ws00.json \
+            --runtime-root=../engine \
+            --out=generated/studio/workspace/ws00-current-runtime
+          node -e 'const fs=require("fs");const s=JSON.parse(fs.readFileSync("generated/studio/workspace/ws00-current-runtime/gap-summary.json"));if(s.runtime.commit!=="379a5248f09ed39c1b1734fe104b6bd73a77857f"||!s.studio.runtimePinMatchesInstalledPackage)process.exit(1);console.log(JSON.stringify({sha:s.runtime.commit,surfaces:s.counts.publicSurfaces,records:s.counts.recursiveRecords,drift:s.drift,gates:s.gates},null,2))'
+      - name: Upload truthful source and gap evidence for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-studio-ws00-current-runtime-inventory
+          path: documentation/generated/studio/workspace/ws00-current-runtime/
+          if-no-files-found: warn
+          retention-days: 30
