@@ -1,8 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
-import { STUDIO_INCOMING_SNIPPET_KEY } from '@/lib/studio/studioConfig';
 import { XMarkIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, CheckIcon, ArrowUpRightIcon } from '@heroicons/react/24/outline';
 import type { FieldEntry } from '@/lib/gallery/motion-field/catalog';
 import { FieldPlayer } from './FieldMedia';
@@ -12,7 +10,6 @@ type SourceData = { pages: Page[]; outputs?: { src: string; label: string; media
 const INSTALL = 'npm install github:EIAS79/Apexify.js#379a5248f09ed39c1b1734fe104b6bd73a77857f dejavu-fonts-ttf@2.37.3';
 
 export default function FieldInspector({ item, motion, onClose }: { item: FieldEntry; motion: boolean; onClose: () => void }) {
-  const router = useRouter();
   const dialog = useRef<HTMLDialogElement>(null);
   const [data, setData] = useState<SourceData | null>(null);
   const [error, setError] = useState('');
@@ -49,15 +46,6 @@ export default function FieldInspector({ item, motion, onClose }: { item: FieldE
     try { await navigator.clipboard.writeText(value); setCopy(`${label} copied.`); }
     catch { setCopy('Clipboard unavailable. Select the text or download the source.'); }
   }
-  function openStudio() {
-    if (!active || !data?.studio) return;
-    const lang = active.language === 'ts' ? 'ts' : 'js';
-    const code = data.pages.filter(entry => entry.language === active.language).map(entry => entry.code).join('\n\n');
-    try {
-      localStorage.setItem(STUDIO_INCOMING_SNIPPET_KEY, JSON.stringify({ name: item.title, lang, ts: lang === 'ts' ? code : '', js: lang === 'js' ? code : '' }));
-      router.push('/studio');
-    } catch { setCopy('Studio transfer unavailable. Copy the source instead.'); }
-  }
   return <dialog ref={dialog} className="field-dialog" aria-labelledby="field-inspector-title" onCancel={event => { event.preventDefault(); onClose(); }} onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
     <div className="field-dialog-inner">
       <header className="field-dialog-header"><div><p className="field-eyebrow">{item.kind} / {item.sourceLabel}</p><h2 id="field-inspector-title">{item.title}</h2></div><button className="field-icon" autoFocus aria-label="Close example" onClick={onClose}><XMarkIcon /></button></header>
@@ -86,7 +74,7 @@ export default function FieldInspector({ item, motion, onClose }: { item: FieldE
             {active && <><div className="field-source-toolbar"><label>Source file<select value={page} onChange={event => setPage(Number(event.target.value))}>{data?.pages.map((entry, i) => <option key={i} value={i}>{entry.label}</option>)}</select></label><button className="field-icon" aria-label="Copy source code" onClick={() => copyText(active.code, 'Source')}>{copy === 'Source copied.' ? <CheckIcon /> : <ClipboardDocumentIcon />}</button></div><FieldCode code={active.code} language={active.language} /></>}
             {data?.sourceHref && <a className="field-text-link" href={data.sourceHref} target="_blank" rel="noreferrer">Canonical recipe source <ArrowUpRightIcon /></a>}
           </div>}
-          <div className="field-source-footer">{data?.studio && active && <button className="field-primary" onClick={openStudio}>Open in Studio <ArrowUpRightIcon /></button>}{item.source && <a className="field-primary" href={item.source} download={`${item.id}.mjs`}>Download source <ArrowDownTrayIcon /></a>}<span role="status">{copy}</span></div>
+          <div className="field-source-footer">{item.source && <a className="field-primary" href={item.source} download={`${item.id}.mjs`}>Download source <ArrowDownTrayIcon /></a>}<span role="status">{copy}</span></div>
         </div>
       </div>
     </div>
