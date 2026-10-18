@@ -294,7 +294,7 @@ function StudioWorkspaceContent() {
             </section>
             {visualVisited && (
               <section className="ws01-pane" hidden={mode !== 'visual'} aria-label="Visual editor workspace">
-                <VisualStudio active={mode === 'visual'} mode={mode} onModeChange={chooseMode} />
+                <VisualStudio active={mode === 'visual'} mode={mode} onModeChange={chooseMode} workspaceShell />
               </section>
             )}
           </div>
