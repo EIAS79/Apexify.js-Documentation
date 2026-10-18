@@ -26,6 +26,7 @@ try {
       if (![200,304].includes(response?.status())) throw new Error('preview HTTP ' + response?.status());
       await page.waitForSelector('[data-workspace-studio]', { timeout: 90000 });
       await page.waitForSelector('[data-studio-visual-workspace][data-active="true"]', { timeout: 60000 });
+      await page.waitForSelector('.ws01-canvas-onboarding', { timeout: 30000 });
       const visualDockDefault = await page.$eval('.apx-pre4-dock', element => element.getAttribute('data-collapsed'));
       if (visualDockDefault !== 'true') failures.push('Workspace Visual dock must start collapsed');
       await page.screenshot({ path: path.join(output, name + '-visual.png'), fullPage: true });
