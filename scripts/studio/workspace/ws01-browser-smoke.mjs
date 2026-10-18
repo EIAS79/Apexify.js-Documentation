@@ -51,15 +51,15 @@ try{
       if(await page.$eval('.nw-graph .nw-node',node=>getComputedStyle(node).visibility==='hidden'))issues.push('Graph overview hidden');
       await page.click('.nw-modes button:nth-child(1)');
       await page.waitForSelector('.nw-code .apx-studio-root');
-      await page.click('.nw-modes-preview > button:nth-child(1)').catch(()=>{});
+      if(width>=761)await page.click('.nw-modes-preview > button:nth-child(1)');
       await page.click('.nw-modes button:nth-child(1)');
       const toggle=await page.$('button[aria-label="Toggle sidebar"]');
-      if(toggle){await toggle.click();await toggle.click();}
+      if(toggle && width<=760){await toggle.click();await toggle.click();}
       const runButton=await page.$('.nw-preview .nw-run');
       if(!runButton && width>760)issues.push('Run button absent from desktop');
       report.push({name,width,height,status:issues.length?'FAIL':'PASS',issues,baseline});
     }catch(error){
-      issues.push(error instanceof Error?error.message:String(error));
+      issues.push(error instanceof Error?(error.stack||error.message):String(error));
       try{await page.screenshot({path:path.join(output,name+'-error.png')});}catch{}
       report.push({name,width,height,status:'FAIL',issues});
     }finally{await page.close();}
