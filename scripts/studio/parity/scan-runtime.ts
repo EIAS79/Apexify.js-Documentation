@@ -1760,5 +1760,6 @@ console.log(
 
 if (!gapSummary.gates.baselineComplete) {
   console.error('[studio-parity] baseline gates failed:', gapSummary.gates, omissions);
+  if (sourceMappingFailures.length) console.error('[studio-parity] source-mapping discrepancies:', sourceMappingFailures);
   process.exitCode = 1;
 }
