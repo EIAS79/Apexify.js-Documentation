@@ -131,7 +131,7 @@
   .ws01-compat-tag { display: none; }
   .ws01-site-nav { gap: 12px; }
 }
-@media (max-width: 1019px) {
+@media (max-width: 1199px) {
   .ws01-drawer { position: absolute; left: 65px; top: 0; bottom: 0; width: min(295px, calc(100vw - 65px)); box-shadow: 16px 0 45px #0009; }
   .ws01-mobile-shade { position: absolute; display: block; inset: 0 0 0 65px; z-index: 5; border: 0; background: #0009; }
 }
@@ -256,7 +256,7 @@
   .ws01 .ws01-header .ws01-site-nav { gap:10px; }
   .ws01 .ws01-compat-tag { display:none; }
 }
-@media (max-width: 1019px) {
+@media (max-width: 1199px) {
   .ws01 .ws01-drawer {
     position:absolute; left:65px; top:0; bottom:0; z-index:11;
     flex-basis:auto; width:min(var(--ws01-drawer-width,260px), calc(100vw - 65px));
