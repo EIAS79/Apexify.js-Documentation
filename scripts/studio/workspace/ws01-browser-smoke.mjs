@@ -51,7 +51,13 @@ try{
       if(await page.$eval('.nw-graph .nw-node',node=>getComputedStyle(node).visibility==='hidden'))issues.push('Graph overview hidden');
       await page.click('.nw-modes button:nth-child(1)');
       await page.waitForSelector('.nw-code .apx-studio-root');
-      if(width>=761)await page.click('.nw-modes-preview > button:nth-child(1)');
+      if(width>=761){
+        await page.click('.nw-modes-preview > button:nth-child(1)');
+        const focusHidesPreview=await page.$eval('.nw-workarea', element => !element.querySelector('.nw-preview'));
+        if(!focusHidesPreview)issues.push('Code Focus did not hide preview');
+        await page.click('.nw-modes-preview > button:nth-child(3)');
+        await page.waitForSelector('.nw-preview .nw-run');
+      }
       await page.click('.nw-modes button:nth-child(1)');
       const toggle=await page.$('button[aria-label="Toggle sidebar"]');
       if(toggle && width<=760){await toggle.click();await toggle.click();}
