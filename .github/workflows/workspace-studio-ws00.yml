@@ -1,0 +1,32 @@
+name: Workspace Studio WS-00 Pin Audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/studio/workspace/ws00-pin-audit.mjs'
+      - 'scripts/studio/workspace/ws00-pin-audit.test.mjs'
+      - 'docs/studio-workspace/WS00_EXECUTION_BASELINE_2026-10-18.md'
+      - '.github/workflows/workspace-studio-ws00.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'lib/studio/runtime/isolatedNodeExecutor.ts'
+      - 'scripts/studio/install-apexify-web.mjs'
+      - 'scripts/studio/parity/runtime-source.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Regressions (no dependency installation)
+        run: node --test scripts/studio/workspace/ws00-pin-audit.test.mjs
+      - name: Assert declared package/runtime pins agree, report historical parity separately
+        run: node scripts/studio/workspace/ws00-pin-audit.mjs
