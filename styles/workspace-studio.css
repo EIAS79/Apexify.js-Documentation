@@ -366,3 +366,28 @@
 .ws01 .studio-output-panel { background:#171c16; }
 .ws01 .apx-studio-root .gallery-snippet-editor-root { background:#111811; }
 .ws01 .apx-studio-root .gallery-snippet-editor-root .cm-editor { background:#101711; }
+
+
+/* Real empty state: no generated artwork, no fake sample. Positioned in the
+   artboard viewport independent of the document zoom and disabled for legacy. */
+.ws01 .ws01-canvas-onboarding {
+  position:absolute;
+  z-index:6;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(310px,calc(100% - 30px));
+  pointer-events:none;
+  padding:18px 20px;
+  display:grid;
+  gap:7px;
+  text-align:center;
+  border:1px solid #4b5940;
+  border-radius:10px;
+  color:#f3f4ec;
+  background:rgba(28,34,25,.94);
+  box-shadow:0 12px 40px #0008;
+  font-family:inherit;
+}
+.ws01 .ws01-canvas-onboarding strong { font-weight:760; font-size:clamp(14px,2vw,19px); letter-spacing:-.02em; color:#d5ff5f; }
+.ws01 .ws01-canvas-onboarding span { font-size:11px; line-height:1.6; color:#cbd5c1; }
