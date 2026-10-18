@@ -1,0 +1,55 @@
+name: Workspace Studio WS-00 Legacy Browser Baseline
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/studio/workspace/ws00-legacy-browser-baseline.mjs'
+      - 'docs/studio-workspace/WS00_LEGACY_DATA_INVENTORY.md'
+      - '.github/workflows/workspace-studio-ws00-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  legacy-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install pinned runtime and generated documents
+        run: npm ci --no-audit --no-fund
+      - name: Install pinned Chromium browser driver
+        run: npm install --no-save --package-lock=false --ignore-scripts puppeteer-core@24.16.0
+      - name: Build production-like Studio
+        run: npm run build
+      - name: Start local production server
+        run: |
+          npm run start -- --hostname 127.0.0.1 > /tmp/apexify-ws00-server.log 2>&1 &
+          for attempt in $(seq 1 90); do
+            if curl -fsS http://127.0.0.1:3000/studio >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          tail -120 /tmp/apexify-ws00-server.log
+          exit 1
+      - name: Observe all legacy routes across five responsive widths
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+          STUDIO_WS00_BASE_URL: http://127.0.0.1:3000
+          STUDIO_WS00_OUTPUT: generated/studio/workspace/ws00-browser
+        run: node scripts/studio/workspace/ws00-legacy-browser-baseline.mjs
+      - name: Upload screenshots and baseline report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workspace-studio-ws00-legacy-browser-evidence
+          path: generated/studio/workspace/ws00-browser/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Inspect failed server log
+        if: failure()
+        run: tail -250 /tmp/apexify-ws00-server.log || true
