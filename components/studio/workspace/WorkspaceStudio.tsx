@@ -43,6 +43,8 @@ function StudioWorkspaceContent() {
   const [layoutHydrated, setLayoutHydrated] = useState(false);
   const [mobile, setMobile] = useState(false);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const drawerRef = useRef<HTMLElement | null>(null);
+  const inspectorRef = useRef<HTMLElement | null>(null);
   const { assets, assetStorageReady, setCodeHandoff, previewArtifacts, activeArtifactId,
     error, previewWarnings, history, elapsedMs, previewProvenance } = useStudioSharedSession();
 
@@ -77,6 +79,13 @@ function StudioWorkspaceContent() {
       }));
     } catch { /* Storage is optional for layout preferences only. */ }
   }, [layoutHydrated, drawerWidth, inspectorWidth, dockHeight, theme]);
+
+  useEffect(() => {
+    if (!mobile) return;
+    const panel = inspectorOpen ? inspectorRef.current : drawer ? drawerRef.current : null;
+    const firstClose = panel?.querySelector<HTMLButtonElement>('.ws01-dismiss');
+    firstClose?.focus();
+  }, [mobile, drawer, inspectorOpen]);
 
   const closePanels = () => {
     setDrawer(null); setInspectorOpen(false); setDockOpen(false);
@@ -113,10 +122,22 @@ function StudioWorkspaceContent() {
   useEffect(() => {
     const onEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && (drawer !== null || inspectorOpen || dockOpen)) closePanels();
+      if (event.key === 'Tab' && mobile) {
+        const panel = inspectorOpen ? inspectorRef.current : drawer ? drawerRef.current : null;
+        if (!panel) return;
+        const all = [...panel.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),[tabindex="0"]')]
+          .filter(element => element.getBoundingClientRect().width > 0);
+        if (!all.length) return;
+        if (event.shiftKey && document.activeElement === all[0]) {
+          event.preventDefault(); all[all.length - 1].focus();
+        } else if (!event.shiftKey && document.activeElement === all[all.length - 1]) {
+          event.preventDefault(); all[0].focus();
+        }
+      }
     };
     window.addEventListener('keydown', onEscape);
     return () => window.removeEventListener('keydown', onEscape);
-  }, [drawer, inspectorOpen, dockOpen]);
+  }, [drawer, inspectorOpen, dockOpen, mobile]);
 
   const chooseMode = (next: StudioMode) => {
     setMode(next);
@@ -195,7 +216,7 @@ function StudioWorkspaceContent() {
               className="ws01-mobile-shade" type="button" aria-label="Close navigation"
               onClick={() => { setDrawer(null); triggerRef.current?.focus(); }}
             />
-            <aside className="ws01-drawer" aria-label={drawerTitle} style={{ "--ws01-drawer-width": drawerWidth + "px" } as CSSProperties}>
+            <aside ref={drawerRef} className="ws01-drawer" role={mobile ? 'dialog' : undefined} aria-modal={mobile ? 'true' : undefined} aria-label={drawerTitle} style={{ "--ws01-drawer-width": drawerWidth + "px" } as CSSProperties}>
               <div className="ws01-drawer-title">
                 <h2>{drawerTitle}</h2>
                 <button type="button" aria-label="Close panel" className="ws01-dismiss" onClick={() => { setDrawer(null); triggerRef.current?.focus(); }}>×</button>
@@ -204,13 +225,13 @@ function StudioWorkspaceContent() {
                 <div className="ws01-drawer-body">
                   <p>Code Studio buffers saved in this browser. Opening a file is managed by the existing Code editor until WS-05.</p>
                   {buffers.length ? buffers.map(buffer => (
-                    <button key={buffer.id} type="button" className="ws01-entry"
-                      onClick={() => { chooseMode('code'); setDrawer(null); }}>
+                    <div key={buffer.id} className="ws01-entry">
                       <span aria-hidden="true">⌘</span>
                       <span>{buffer.name}</span>
                       {buffer.id === activeId && <small>Active</small>}
-                    </button>
+                    </div>
                   )) : <p className="ws01-empty">No Code Studio buffers found. Use Code mode to create one.</p>}
+                  <button type="button" className="ws01-entry" onClick={() => { chooseMode('code'); setDrawer(null); }}>Open Code editor ↗</button>
                 </div>
               )}
               {drawer === 'templates' && (
@@ -300,7 +321,7 @@ function StudioWorkspaceContent() {
         {inspectorOpen && <>
           {mobile && <button type="button" className="ws01-mobile-shade ws01-inspector-shade" aria-label="Close properties panel"
             onClick={() => { setInspectorOpen(false); triggerRef.current?.focus(); }} />}
-          <aside className="ws01-inspector" id="ws01-inspector" aria-label="Session properties"
+          <aside ref={inspectorRef} className="ws01-inspector" id="ws01-inspector" role={mobile ? 'dialog' : undefined} aria-modal={mobile ? 'true' : undefined} aria-label="Session properties"
             style={{ "--ws01-inspector-width": inspectorWidth + "px" } as CSSProperties}>
             {!mobile && <div className="ws01-resizer ws01-resizer--inspector" role="separator" aria-label="Resize properties panel"
               aria-orientation="vertical" aria-valuemin={260} aria-valuemax={390} aria-valuenow={inspectorWidth} tabIndex={0}
