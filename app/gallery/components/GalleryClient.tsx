@@ -5,7 +5,6 @@ import Link from 'next/link';
 import {
   ArrowRightIcon,
   BookOpenIcon,
-  CodeBracketIcon,
 } from '@heroicons/react/24/outline';
 import HomeNavbar from '@/components/home/HomeNavbar';
 import HomeAmbientBackground from '@/components/home/HomeAmbientBackground';
@@ -348,10 +347,6 @@ function GalleryClosing() {
           <Link href="/examples/node.canvas.basic">
             <BookOpenIcon className="h-4 w-4" />
             Verified examples
-          </Link>
-          <Link href="/studio">
-            <CodeBracketIcon className="h-4 w-4" />
-            Open Studio
           </Link>
           <Link href="/docs/getting-started">
             Read documentation
