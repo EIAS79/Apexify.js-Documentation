@@ -19,8 +19,8 @@ import { loadPersistedStudio } from '@/lib/studio/studioStorage';
 const VisualStudio = dynamic(() => import('@/components/studio/visual/VisualStudio'), {
   ssr: false, loading: () => <p className="nw-message" role="status">Loading the real Visual editor…</p>,
 });
-const ART = '/gallery/motion-field/showcase-apexify-spectrum.webp';
-const OTHER = '/gallery/motion-field/showcase-orbit-breaker.webp';
+const ART = '/home/frame/hero.webp';
+const OTHER = '/gallery/motion-field/orbit-study.webp';
 const LAUNCH = '/gallery/motion-field/launch-card.webp';
 type Mode = 'code' | 'visual' | 'graph';
 type Drawer = 'files' | 'templates' | 'assets' | 'projects';
@@ -228,7 +228,14 @@ function WorkspaceBody() {
             </div>
             <div className="nw-preview-content" data-example-artwork={!artifact?'true':undefined}>
               {artifact?<StudioArtifactPreview artifact={artifact} artifacts={previewArtifacts} onArtifactSelect={setActiveArtifactId}/>:
-                <><img src={ART} alt="Gallery example of an Apexify.js spectrum composition"/><div className="nw-reference-label">GALLERY EXAMPLE · NOT A GENERATED RUN</div></>}
+                <div className="nw-reference-composition">
+                  <img src={ART} alt="Apexify abstract hero artwork preview" />
+                  <div className="nw-reference-copy">
+                    <strong>Apexify<span>.js</span></strong>
+                    <p>Programmatic media for the web</p>
+                  </div>
+                  <div className="nw-reference-label">DESIGN PREVIEW · NOT A GENERATED RUN</div>
+                </div>}
             </div>
             <div className="nw-preview-footer"><span>{artifact?'Output '+(previewArtifacts.indexOf(artifact)+1)+'/'+previewArtifacts.length:'Gallery example'}</span><span>{artifact?.mime||viewport.width+' × '+viewport.height}</span><button type="button" disabled={!artifact?.url} onClick={download}><ArrowDownTrayIcon/>Download</button></div>
           </section>}
