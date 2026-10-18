@@ -6086,6 +6086,12 @@ export default function VisualStudioPre4({
             onTouchEnd={() => { pinch.current = null; }}
             style={{ touchAction: 'none' }}
           >
+            {workspaceShell && Object.keys(project.document.nodes).length === 0 && (
+              <div className="ws01-canvas-onboarding" aria-label="Start a Visual composition">
+                <strong>Your canvas is ready.</strong>
+                <span>Select Text, Shapes or Images on the left to create your first layer. The preview renders through Apexify.js.</span>
+              </div>
+            )}
             <div
               className="apx-pre4-artboard-frame"
               style={{
