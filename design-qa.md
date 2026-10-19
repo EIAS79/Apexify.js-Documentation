@@ -1,3 +1,54 @@
+# Independent workspace design QA — 2026-10-19
+
+Final result: passed
+
+Scope: the implemented desktop workspace foundation and its supported composition flows. This is a faithful reconstruction of the supplied direction, not a pixel-identical copy or a complete implementation of every illustrated media/editor feature.
+
+## Visual truth and normalization
+
+- Source: `docs/design/workspace/reference.png`, user-supplied 1536×1024 image.
+- Browser route: `http://terminal.local:4173/workspace`.
+- Final implementation: `docs/design/workspace/desktop.jpg`, 1363×936 pixels; CSS viewport 1363×936; devicePixelRatio 1.
+- Source density is unspecified. For comparison it was proportionally resized to 1363×909, then aligned at the top with the 1363×936 implementation. The extra 27 px of implementation height is a viewport difference, not a spacing defect. The browser API did not expose viewport resizing. These comparisons cannot establish pixel identity.
+- State: dark interface, reference preset, default panel layout, Terminal closed but recoverable, Canvas properties, completed real PNG job, no selected layer or open menu, no account controls.
+- Full comparison: `docs/design/workspace/comparison.jpg`.
+- Focused comparisons: `docs/design/workspace/header-canvas.jpg` and `docs/design/workspace/editors-output.jpg`. These compare actual source and browser pixels together, including typography, header mark, tools, dense editors, inspector, and output controls.
+
+## Findings and iteration history
+
+Iteration 1 (`docs/design/workspace/iteration-1.jpg`) found two actionable P2 differences: hero typography sat too low and the tools list hid project actions below the fold. The preset title was moved from y=240 to y=180, enlarged to 100 px, and the supporting text/CTA were raised accordingly. Tool row padding was reduced from 10 to 5 px, with smaller group/search gaps. Final captures show the corrected hero and visible Open project, Files, and Settings actions.
+
+Earlier implementation checks also corrected clipped graph output by starting at 65% zoom, exposed close/maximize controls on the canvas and properties panel, matched rounded CTA stroke to fill, and made Fit canvas calculate its actual fit. A 390×844 CSS iframe check found that hiding the mobile Render text removed its accessible name; `aria-label="Render"` resolves it. Those corrections are present in the final browser state.
+
+No actionable P0/P1/P2 visual finding remains within the reviewed foundation scope. Expected differences and residual coverage are explicit below.
+
+## Required fidelity surfaces
+
+- **Typography:** Arial/Helvetica UI typography and monospace CodeMirror retain the compact hierarchy. Real Apexify output uses DejaVu Sans for reproducibility. The raster mock's exact typeface is unavailable; its hero hierarchy, white/yellow treatment, and approximate scale are recreated. Actual code is valid v6 source and is longer than the illustrative mock.
+- **Spacing/layout:** tools left, visual above code/graph, properties right, queue/preview/export below. The split system uses contained rectangular windows so closing panels genuinely reclaims space; the mock's output graph overhangs another region. Inspector fills its available column rather than floating above unused space. Graph scrolls for additional real layers. These are expected working-layout differences. All persistent desktop controls stay inside the viewport; measured document width is 1363 px.
+- **Colors/tokens:** navy canvas/panels, cyan separators and selection, violet graph controls, yellow active navigation and brand suffix match the supplied direction. The implementation keeps restrained glows around controls so text remains legible; the raster mock has stronger atmospheric glow.
+- **Image quality/assets:** generated crystal-lake art and transparent faceted A mark preserve subject, palette, and composition. Artwork is 1600×900 WebP; logo is a downsampled 96×96 transparent WebP. These are recreated assets, not exact extracted source pixels. Heroicons provide actual interface icons. Graph connections are exact canvas geometry for the model, not a raster imitation.
+- **Copy/content:** Workspace replaces Studio and the navigation route is `/workspace`. No login/profile/dashboard. Inspector describes the actual image background and Node renderer instead of displaying unsupported toggles. Queue content reflects real jobs rather than simulated progress/MP4 timelines. Pending advanced tools show explicit status dialogs. Terminal is labelled as a workspace command console.
+
+## Behavior and engineering checks
+
+- Closing Code expanded Graph from approximately 399 to 855 CSS px. Reopening restored both panels. All nine panels could be closed and restored through the permanent controls.
+- Keyboard resizing expanded Code from 450.125 to 467.109 CSS px. Terminal commands produced real composition information. Panel state, composition, and code drafts live outside window mounts.
+- Canonical code data edits applied to the composition; inspector text edits appeared in generated code. Unsupported program edits showed the explicit synchronization boundary and remained unsynchronized when Code reopened.
+- Live and queued output came from Apexify v6. The seven contract/runtime tests passed; generated public-v6 source produced byte-identical output to the server renderer.
+- A browser PNG export completed; downloaded bytes were PNG, 1280×720, 1,526,662 bytes. Source-download completion remained unverified after incomplete cloud-browser downloads; program runtime parity was independently tested.
+- New-route isolated type checking passed. Isolated Next production build passed, including type validation and route tracing. Full repository validation remains blocked by pre-existing Studio/vendor and old documentation-test type errors; old code was left untouched.
+- Final application console check filtered to `terminal.local` returned no errors/warnings. Earlier unsupported-code errors were expected user-facing validation. Historical extension metadata errors belong to the browser extension, not the page.
+- Responsive panel switching and mobile Render accessibility were checked in a 390×844 CSS iframe. A mobile screenshot attempt timed out; no physical-device or full mobile visual acceptance is claimed.
+
+## Remaining work and polish
+
+Dedicated media/path/component editors, arbitrary program execution, arbitrary graph authoring, and expanded preset content remain outside this foundation. Root-layout/global-style integration in the complete documentation app, production deployment, full keyboard/screen-reader auditing, and physical mobile tests remain pending. P3 refinement: a closer licensed font/asset match could reduce differences from the raster reference. These limitations do not change the reviewed desktop layout's result.
+
+Implementation checklist: corrected P2 findings; repeated combined visual comparison; verified core interactions and PNG output; documented pending adapters and integration coverage. Preserve the earlier unrelated design reports below.
+
+---
+
 # Frame documentation design QA
 
 Status: passed for the implemented documentation layout.
