@@ -849,7 +849,9 @@ export default function WorkspaceApp() {
       <header className="aw-topbar">
         <a className="aw-brand" href="/" aria-label="Apexify.js home">
           <BrandBanner className="aw-brand-lockup" maxWidth={150} />
-          <span className="aw-brand-icon"><BrandIcon /></span>
+          <span className="aw-brand-icon">
+            <BrandIcon />
+          </span>
         </a>
         <nav className="aw-topnav" aria-label="Main navigation">
           <a href="/">Home</a>

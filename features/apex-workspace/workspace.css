@@ -732,8 +732,8 @@
   touch-action: none;
 }
 .aw-selection:hover {
-  border-color: color-mix(in srgb, var(--aw-line) 50%, transparent) !important;
-  background: color-mix(in srgb, var(--aw-soft) 3%, transparent) !important;
+  border-color: color-mix(in srgb, var(--aw-accent) 50%, transparent) !important;
+  background: color-mix(in srgb, var(--aw-accent) 3%, transparent) !important;
 }
 .aw-selection.selected {
   border-color: var(--aw-accent) !important;
@@ -873,7 +873,7 @@
   justify-content: space-between;
   gap: 10px;
   min-width: 0;
-  color: var(--aw-accent);
+  color: var(--aw-text-secondary);
   font-size: 11px;
   margin: 10px 0;
 }
@@ -2083,18 +2083,6 @@
   }
 }
 @media (max-width: 420px) {
-  .aw-brand {
-    width: 36px;
-    flex-basis: 36px;
-  }
-  .aw-brand .aw-brand-lockup {
-    display: none;
-  }
-  .aw-brand .aw-brand-icon {
-    display: block;
-    width: 36px;
-    height: 36px;
-  }
   .aw-topbar {
     gap: 5px;
   }
