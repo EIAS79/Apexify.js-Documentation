@@ -42,3 +42,12 @@ The input files were supplied separately by the owner. [SOURCE_INPUTS.json](SOUR
 12. **Scope/priority does not waive quality.** P0 means highest roadmap focus. It does not bypass security/data-loss gates, authorize unrelated infrastructure spending or justify destructive changes to existing work.
 
 Record unresolved conflicts as task blockers/ADRs with an owner, actual runtime evidence and a concrete decision. Never hide them by weakening validation or changing support labels.
+
+
+## Owner-supplied function references and media-editor clarification
+
+The 2026-10-19 clarification adds fourteen source-audit documents covering canvas/image/shared styles/text/scenes/templates/GIF/animate/audio/video/paths/connectors plus index and method map. See [FUNCTION_REFERENCE_MAPPING.md](FUNCTION_REFERENCE_MAPPING.md) for each input, task binding and caveat, and SOURCE_INPUTS.json for all 31 input hashes.
+
+The owner requires real editing in Visual, Code and Graph and a timeline-oriented workflow for GIF, animation, video and audio. [MEDIA_TIMELINE_AND_AUTHORING_SPEC.md](MEDIA_TIMELINE_AND_AUTHORING_SPEC.md) defines editable frame collections, doodles/styles, multitrack clips/keyframes, precise audio time/sample behavior, shared selection/scope, source/export fidelity and AC01–AC12. This extends the original plan's broad timeline descriptions into mandatory workflows, adding 40 tasks and G14/G15 while keeping the approved layout and standalone/no-login boundaries.
+
+The newly supplied audit SHA `cbeea053c2a973d4e867f8ca96e79546060dd62d` differs from the actual pinned runtime `379a5248f09ed39c1b1734fe104b6bd73a77857f`. This plan does not update the pin or certify the audit as runtime proof. A06/A07 must reconcile behavior first. Reported ignored connector shadows, degenerate two-point smoothing/bezier, angle units, animate return modes, videoBg still behavior, audio speed/pitch and video dispatch semantics are explicit verification targets, not assumed newly fixed features.

@@ -34,6 +34,14 @@ PARTIAL means a real subset exists. NOT_STARTED means no dedicated merged author
 | CAP-26 | Security/operations | PARTIAL: whitelist/body/origin/per-process caps | Threat model, sandbox, distributed admission, resource/cost/privacy controls and hosted proof | U, Y |
 | CAP-27 | Quality evidence | PARTIAL: seven tests, isolated type/build and selected browser checks | Recursive parity, full-root CI, all-browser/a11y/device, adversarial/load/soak and release evidence | A, W, Z |
 | CAP-28 | Presets/examples/catalogue | PARTIAL: one reference composition | Practical verified examples spanning domains, editable public code, output/artwork/font licenses and drift tests | K, X |
+| CAP-29 | Editable frame collections | NOT_STARTED | Create/import/capture/extract, order/duplicate/holds, independent frame content and linked/override semantics, sequence manifests and timing | C, L, O, P |
+| CAP-30 | Freehand doodles and authored lines | NOT_STARTED | Pointer/brush/stroke/eraser/point tools; serializable paths and proper connector API/units/gaps; frame-local editing | F, I, N |
+| CAP-31 | Shared Style manager | NOT_STARTED: basic per-layer styling exists | Named color/gradient/pattern/text/stroke/effect styles, copy/link/local overrides, selected scope and correct cross-renderer translation | G, H, K |
+| CAP-32 | Integrated multitrack media editor | NOT_STARTED | Dockable Timeline/Media Bin, clip/track/keyframe/frame/waveform editing, unified clock, Visual/Code/Graph parity and mixed-media exports | D, M, N, O, Q, R, S |
+
+## Mandatory media authoring contract
+
+The [shared media/timeline specification](MEDIA_TIMELINE_AND_AUTHORING_SPEC.md) defines the actual editor requirements and AC01–AC12. The [function-reference map](FUNCTION_REFERENCE_MAPPING.md) binds all supplied audits, current pin differences and source-level caveats. A settings modal, generated code alone, derived graph or sample GIF is insufficient for CAP-29–CAP-32.
 
 ## Recursive ledger contract
 
@@ -55,3 +63,4 @@ Every collection supports applicable create/edit/remove/reorder. A field stored 
 ## Future-engine dependencies
 
 Portable core/IR/compiler/ARS, retained web rendering, framework adapters, Apex Style/layout, unified animation, advanced scheduling/typography/vector/color, cache/stream/acceleration, SDK, diagnostics/intelligence/AI and distributed rendering remain upstream capability tracks. Link each required adapter to its actual implemented API/version and tests. Do not invent unpublished imports or equate an existing preview adapter with the planned retained engine. Optional HDR/WebGPU/native/distributed/AI work needs explicit scope, compatibility, privacy and evidence decisions.
+
