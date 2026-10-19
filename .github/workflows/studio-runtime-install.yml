@@ -1,0 +1,31 @@
+name: Studio runtime installation
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/studio/install-ffmpeg.mjs'
+      - 'scripts/studio/download-runtime.mjs'
+      - 'scripts/studio/ffmpeg-runtime.json'
+      - 'scripts/studio/runtime-download.test.mjs'
+      - 'scripts/studio/ffmpeg-runtime-smoke.mjs'
+      - '.github/workflows/studio-runtime-install.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test download failures and staged installation
+        run: node --test scripts/studio/runtime-download.test.mjs
+      - name: Install and exercise the pinned bundled media pair
+        run: node scripts/studio/ffmpeg-runtime-smoke.mjs

@@ -1,0 +1,30 @@
+{
+  "version": "6.1",
+  "release": "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/tag/v6.1",
+  "targets": {
+    "x64": {
+      "ffmpeg": {
+        "url": "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffmpeg-6.1-linux-64.zip",
+        "bytes": 29170850,
+        "sha256": "8bb4a27f5fd02f3dd9a5e75c9eddf6ace1d50a08929ee0d20bbf17eb467fb711"
+      },
+      "ffprobe": {
+        "url": "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffprobe-6.1-linux-64.zip",
+        "bytes": 29099372,
+        "sha256": "cb690c360042b51d9e901db2b0185c585330c1067b5c5edf0b6a5e26e0375e2a"
+      }
+    },
+    "arm64": {
+      "ffmpeg": {
+        "url": "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffmpeg-6.1-linux-arm-64.zip",
+        "bytes": 25285360,
+        "sha256": "0e3a60df317df0bbfbe25e8b777864b5407d166e5b5ac692fb1e477568a4c886"
+      },
+      "ffprobe": {
+        "url": "https://github.com/ffbinaries/ffbinaries-prebuilt/releases/download/v6.1/ffprobe-6.1-linux-arm-64.zip",
+        "bytes": 25220724,
+        "sha256": "c99358a90d93ada454e2f4dd26cd25718d36b4032b0ad5539425eac6e66349d8"
+      }
+    }
+  }
+}
