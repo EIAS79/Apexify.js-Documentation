@@ -6,11 +6,14 @@
 
 This repository powers the Apexify.js documentation website and developer portal.
 
+> **P0 — Highest product priority: complete the standalone `/workspace` for production.** The UI/foundation is merged; full acceptance remains open. Start with [WORKSPACE_PRODUCTION_PRIORITY.md](./WORKSPACE_PRODUCTION_PRIORITY.md) and the [A–Z master plan](./docs/workspace/PRODUCTION_MASTER_PLAN.md).
+
 - **Website:** https://apexifyjs.vercel.app
 - **Package repository:** https://github.com/EIAS79/Apexify.js
 - **Documentation:** https://apexifyjs.vercel.app/docs/getting-started
 - **API reference:** https://apexifyjs.vercel.app/api-reference
 - **Gallery:** https://apexifyjs.vercel.app/gallery
+- **Workspace:** https://apexifyjs.vercel.app/workspace
 - **Studio:** https://apexifyjs.vercel.app/studio
 
 
@@ -48,3 +51,4 @@ npm run verify
 ```
 
 The site is built with Next.js and the documentation system is validated against the pinned Apexify.js package artifact.
+
