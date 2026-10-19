@@ -85,6 +85,134 @@
       "filename": "APEXIFY_STUDIO_DEEP_RUNTIME_PARITY_MASTER_PLAN-1-.md",
       "sha256": "4d2cff8ed1b0e46c695b36fd8a07ec9ec7bca8e814eb5ba1ac08cf5af5a88bb6",
       "uploadedFilename": "APEXIFY_STUDIO_DEEP_RUNTIME_PARITY_MASTER_PLAN (1).md"
+    },
+    {
+      "filename": "00_INDEX(2).md",
+      "uploadedFilename": "00_INDEX(2).md",
+      "canonicalReferenceName": "00_INDEX.md",
+      "sha256": "bb33bba24fd103c2638ddc2d1e6174a8d569f53ae5056c8fdffd8a054fa4f2e6",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "00_METHOD_MAP(2).md",
+      "uploadedFilename": "00_METHOD_MAP(2).md",
+      "canonicalReferenceName": "00_METHOD_MAP.md",
+      "sha256": "dc4e777c73f74fd0e194384d3f7ea495b0c500d847ce73dd85521607e558c4d9",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "01_createCanvas(2).md",
+      "uploadedFilename": "01_createCanvas(2).md",
+      "canonicalReferenceName": "01_createCanvas.md",
+      "sha256": "f8281edeafb3c68ba8764739b95e7975d549bd8977f4cca595f41b6109da2e24",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "02_createImage(2).md",
+      "uploadedFilename": "02_createImage(2).md",
+      "canonicalReferenceName": "02_createImage.md",
+      "sha256": "b9ec3359e3cb9ac69307a21fadbdebf743a1a2ecae45fd12812ac867919daa2a",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "03_shared_styles_gradients_patterns(2).md",
+      "uploadedFilename": "03_shared_styles_gradients_patterns(2).md",
+      "canonicalReferenceName": "03_shared_styles_gradients_patterns.md",
+      "sha256": "da86daf35cd4c198eef81146c7cbac50b6a59dd7321a355973a2a9ac7741d844",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "04_createText(2).md",
+      "uploadedFilename": "04_createText(2).md",
+      "canonicalReferenceName": "04_createText.md",
+      "sha256": "e3ef9efaadbd953c390e19d6deffca8fdf8ba520a85ec9e92ab1cebb0a252219",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "15_scenes_scene_builder(2).md",
+      "uploadedFilename": "15_scenes_scene_builder(2).md",
+      "canonicalReferenceName": "15_scenes_scene_builder.md",
+      "sha256": "b56ebfeb307e9379fdae08217012e38870d6981005dcc12d511b0db038cb1393",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "16_templates(2).md",
+      "uploadedFilename": "16_templates(2).md",
+      "canonicalReferenceName": "16_templates.md",
+      "sha256": "47c270b4d787e8a7cb08cd487d90ce6615e8b1fbd1ebff45aad31b7c0afc85ba",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "19_createGIF(2).md",
+      "uploadedFilename": "19_createGIF(2).md",
+      "canonicalReferenceName": "19_createGIF.md",
+      "sha256": "f5a7822cf5b911da0346d04f60421103df5c795e6afeae81701376d35e0db28a",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "20_animate(2).md",
+      "uploadedFilename": "20_animate(2).md",
+      "canonicalReferenceName": "20_animate.md",
+      "sha256": "2bc1178ddecf4b98bd589d9cae769eb0021bc7e37f643b072ae9a388140d0560",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "21_audio_synthesis(2).md",
+      "uploadedFilename": "21_audio_synthesis(2).md",
+      "canonicalReferenceName": "21_audio_synthesis.md",
+      "sha256": "a1c0add163e7a48abd9f56e45d39877f24e6def36ac686327b7b5edce8911e95",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "22_video_create_and_operations(2).md",
+      "uploadedFilename": "22_video_create_and_operations(2).md",
+      "canonicalReferenceName": "22_video_create_and_operations.md",
+      "sha256": "6787f727f95ab3e3fd05213ec235437ec77c0714220cd91bf06f91684b1e3693",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "35_createPath2D_drawPath(2).md",
+      "uploadedFilename": "35_createPath2D_drawPath(2).md",
+      "canonicalReferenceName": "35_createPath2D_drawPath.md",
+      "sha256": "8475031be81505acd13f8a80f949514900fe60a3efe7915181332ca66b5df32b",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
+    },
+    {
+      "filename": "36_customLineDrawing(2).md",
+      "uploadedFilename": "36_customLineDrawing(2).md",
+      "canonicalReferenceName": "36_customLineDrawing.md",
+      "sha256": "8d7d4be3b261d8a26565722692f0c263a70c9b06247d1307560b06a2c6f583bc",
+      "kind": "v6-function-reference",
+      "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+      "evidenceClass": "STATIC_AUDIT_NOT_RUNTIME_ACCEPTANCE"
     }
-  ]
+  ],
+  "revision": "2026-10-19-media-authoring-clarification",
+  "inputCount": 31
 }

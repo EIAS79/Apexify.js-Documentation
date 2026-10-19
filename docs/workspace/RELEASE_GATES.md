@@ -18,6 +18,8 @@
 | G11 Hosted operations | Deployment SHA/runtime identity, native/binary integrity, real deployed smoke and rollback | Target host actually runs representative jobs; monitor/cost/retention/cleanup/rollback work |
 | G12 Docs/handoff | Help, matrix, ADRs, ownership, runbooks and limitations | Released claims match behavior; users/maintainers can reproduce, diagnose and recover |
 | G13 Final acceptance | Immutable reviewed gate/evidence index, report and post-promotion smoke | Every mandatory gate passes on the exact promoted candidate; no release-blocking defect |
+| G14 Shared editor and frame/media workflows | AC01–AC12 across actual Visual/Code/Graph/Timeline/Frame Collection workflows | Independent frame edits/link scope, doodles/styles, precise clip/keyframe/audio timing, three-view parity, closed-panel recovery and real original-quality exports all pass |
+| G15 Supplied function/API fidelity | All 14 audit mappings reconciled with exact runtime pin; units/default/return/dispatch/callback and reported-gap tests | No audit-only option, wrong root method, implicit callback execution or unimplemented connector/media behavior claimed FULL; missing reference domains audited upstream |
 
 All mandatory gates block production acceptance. A limitation requires an explicit product/scope decision and updated user-visible claims. Renaming a security/data-loss defect experimental is not a waiver. Deferring an existing v6 gap does not satisfy full-v6 coverage.
 
@@ -63,3 +65,12 @@ Go only when every mandatory gate passes, the deployed artifact matches the test
 No-go if any required evidence is missing/failed, the candidate changed after tests, custom code escapes, recovery loses work, output/downloads are unverified, costs/resources are unbounded or unsupported capability rows are claimed FULL.
 
 The owner approves scope and release acceptance; P0 priority never bypasses technical gates or authorizes unlimited spending.
+
+
+## Additional mandatory acceptance contract
+
+G14 covers all twelve cases in [MEDIA_TIMELINE_AND_AUTHORING_SPEC.md](MEDIA_TIMELINE_AND_AUTHORING_SPEC.md). Include fractional fps and variable source PTS, GIF quantization, sample-accurate audio/resampling, independent versus linked frame scope, seek cancellation/stale-response suppression, proxy/original quality, frame collection manifests and edit/reload/undo across all views.
+
+G15 uses [FUNCTION_REFERENCE_MAPPING.md](FUNCTION_REFERENCE_MAPPING.md). The supplied audits are static and use a different runtime SHA from the site's package pin; reconcile and execute targeted tests rather than treating audit headings as successful execution. Public API signatures and native callback boundaries remain authoritative.
+
+Both gates begin NOT_RUN. This documentation change does not implement or pass them.

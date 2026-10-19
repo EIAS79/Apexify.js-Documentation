@@ -34,7 +34,13 @@
     "U01",
     "U02",
     "U03",
-    "W01"
+    "W01",
+    "A06",
+    "A07",
+    "B06",
+    "B07",
+    "C06",
+    "C07"
   ],
   "workstreams": [
     {
@@ -85,6 +91,29 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "A06",
+          "title": "Register the 14 supplied v6 function references with content hashes, static-audit status and baseline cbeea053; reconcile them against the actual installed 379a5248 runtime before certifying fields.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "A01",
+            "A02"
+          ]
+        },
+        {
+          "id": "A07",
+          "title": "Complete missing method-map domains from upstream source and reproduce reported semantics/gaps: videoBg still extraction, animate return/modes, GIF timing, audio rate/pitch, video dispatch, path units and connector limitations.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "A06"
+          ]
         }
       ]
     },
@@ -138,6 +167,30 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "B06",
+          "title": "Approve one shared media-editor architecture: reusable Timeline and Frame Collection/Media Bin windows, central transport/timebase, typed frame/clip/audio model and Visual/Code/Graph synchronization.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "A06",
+            "B03"
+          ]
+        },
+        {
+          "id": "B07",
+          "title": "Assign each new timeline/drawing/style helper to application or reusable Apexify engine ownership. Version upstream additions explicitly and generate only real public API calls or declared helper code.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "B06",
+            "B05"
+          ]
         }
       ]
     },
@@ -192,6 +245,30 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "C06",
+          "title": "Define rational project/source timebases, integer timestamps/sample mappings, nominal/variable fps, half-open clip ranges, holds, deterministic seek/sample and quantization policies.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "B06",
+            "C01"
+          ]
+        },
+        {
+          "id": "C07",
+          "title": "Define first-class frame collections, independent snapshots/linked instances/local overrides, clips/tracks/keyframes/strokes/styles and explicit frame/clip/source/range editing scope.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "C06",
+            "C03"
+          ]
         }
       ]
     },
@@ -246,6 +323,30 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "D06",
+          "title": "Add independently dockable Timeline and Frame Collection/Media Bin windows while preserving the approved static layout and permanent recovery controls. New media windows reclaim/release space like existing panels.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "D01",
+            "B06"
+          ]
+        },
+        {
+          "id": "D07",
+          "title": "Preserve playhead, frame/clip selection, timeline zoom/scroll/range, waveform/inspector context and transport state outside panel mounts; retain accessible playback actions with Timeline hidden.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "D02",
+            "C06"
+          ]
         }
       ]
     },
@@ -300,6 +401,18 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "E06",
+          "title": "Design and verify familiar nonlinear media-editing interactions for mouse/touch/keyboard, precise numeric alternatives and narrow screens; maintain the existing visual language without claiming all CapCut features.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "E03",
+            "D06"
+          ]
         }
       ]
     },
@@ -355,6 +468,18 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "F06",
+          "title": "Make the normal canvas edit the explicit selected composition/frame/clip at the playhead. Show edit scope and transform target, and prevent edits from leaking to unlinked frames or unrelated clips.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "F02",
+            "C07"
+          ]
         }
       ]
     },
@@ -410,6 +535,18 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "G06",
+          "title": "Support styled timed text/captions and frame-local typography through the shared inspector, timeline and code/graph mappings; preserve nested/legacy precedence and actual text metrics.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "G01",
+            "C07"
+          ]
         }
       ]
     },
@@ -465,6 +602,18 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "H06",
+          "title": "Expose object/frame/clip/range-scoped filter/style/effect stacks with actual pre/post order, grouping/masks/warp and supported keyframing; preview and exports must respect identical scope.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "H03",
+            "C07"
+          ]
         }
       ]
     },
@@ -520,6 +669,30 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "I06",
+          "title": "Implement freehand doodle tools with captured points, deterministic smoothing/optional pressure conversion, brush style, stroke/point editing, nondestructive or explicit object erasing and one-command undo per gesture.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "I01",
+            "C07"
+          ]
+        },
+        {
+          "id": "I07",
+          "title": "Respect actual path2d.create/draw/custom APIs, native-object serialization limits and mixed angle units. Reproduce connector bezier/shadow/marker/singleLine caveats and fix upstream or expose truthful boundaries.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "A07",
+            "I01"
+          ]
         }
       ]
     },
@@ -633,6 +806,30 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "K06",
+          "title": "Add a shared Style manager for colors, gradient stops/handles, patterns, typography, strokes/shadows and effect stacks with explicit reference/copy/local-override behavior and renderer-specific type translation.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "K03",
+            "C07"
+          ]
+        },
+        {
+          "id": "K07",
+          "title": "Reuse scenes/templates/components inside editable frame collections and clips with clear linked-source versus make-unique/local-override behavior; do not pretend raster imports regain editable original layers.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "K01",
+            "C07"
+          ]
         }
       ]
     },
@@ -687,6 +884,30 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "L06",
+          "title": "Build frame-collection create/import/capture/video-extract, natural ordering, duplicate/insert/delete/reorder/range selection, per-frame holds/provenance and bounded lazy thumbnails.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "L01",
+            "C06"
+          ]
+        },
+        {
+          "id": "L07",
+          "title": "Track originals/proxies/waveforms/thumbnails and source timestamps by stable hashes; support range extraction and relinking without confusing proxy frame indices with original PTS.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "L06",
+            "C06"
+          ]
         }
       ]
     },
@@ -743,6 +964,31 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "M06",
+          "title": "Prove editable frame/clip/stroke/style/timing/keyframe mappings across Visual, supported Code and Graph. Emit runnable public APIs and declared helpers/assets; never generate fictional timeline functions.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "M01",
+            "C07",
+            "B07"
+          ]
+        },
+        {
+          "id": "M07",
+          "title": "Represent callback-only/native operations as safe declarative equivalents or preserved opaque isolated code. Verify media return shapes, overloads/defaults and source pin rather than trusting audit tables alone.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "M04",
+            "A07"
+          ]
         }
       ]
     },
@@ -798,6 +1044,30 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "N06",
+          "title": "Add typed temporal graph nodes/ports for frame collections, scene/time samples, clips, property curves, audio events/mix and encode sinks, with explicit duration/unit/dependency semantics.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "N01",
+            "C06"
+          ]
+        },
+        {
+          "id": "N07",
+          "title": "Synchronize graph timing/order/effect edits with the same timeline and selected-frame scope; separate computation wires from artwork connectors and reject invalid temporal cycles/port combinations.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "N03",
+            "C07"
+          ]
         }
       ]
     },
@@ -854,6 +1124,55 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "O06",
+          "title": "Implement shared multitrack clip editing: insert/move/duplicate/delete, trim/split/ripple/gaps/snapping, source offsets, linked AV and validated speed/reverse/overlap semantics.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "C06",
+            "D06",
+            "L06"
+          ]
+        },
+        {
+          "id": "O07",
+          "title": "Implement independent per-frame content/exposure editing with filmstrip/frame stepping/onion skin and explicit linked-instance/unlink/override behavior; preserve original editable sources when baking animation to frames.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "C07",
+            "O06"
+          ]
+        },
+        {
+          "id": "O08",
+          "title": "Unify transport, playhead, work range/loop and keyframe/property curves across frame/GIF, animation, video and audio workflows; audio remains precise time/sample based, not video-frame quantized.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "O01",
+            "O06"
+          ]
+        },
+        {
+          "id": "O09",
+          "title": "Define deterministic fractional-fps/variable-source-PTS mapping, random-access seek, stale-result suppression, GIF timing quantization and audio/video drift policy through one canonical clock.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "C06",
+            "O06"
+          ]
         }
       ]
     },
@@ -910,6 +1229,19 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "P06",
+          "title": "Render editable frame collections and sampled animation into true GIFs with per-frame holds/order/disposal/alpha/overlays, normal-vs-generated mode exclusivity, effective 10ms timing and decoded artifact tests.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "P02",
+            "L06",
+            "O07"
+          ]
         }
       ]
     },
@@ -966,6 +1298,30 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "Q06",
+          "title": "Implement audio-only and mixed-media track/event/waveform authoring with native sample offsets, real decoded waveform, layered synth/presets/envelopes and clip trim/split/gain/fade/pan/mix.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "Q01",
+            "C06"
+          ]
+        },
+        {
+          "id": "Q07",
+          "title": "Expose truthful rate/speed versus pitch behavior for synth and WAV sources; explicitly decode unsupported import containers, preserve seeds/resampling and verify final mixed audio/video sync.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "Q04",
+            "Q06"
+          ]
         }
       ]
     },
@@ -1024,6 +1380,31 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "R06",
+          "title": "Integrate video tracks, frame collections, timed titles/doodles, range effects/transitions and audio tracks through actual ordered videoPipeline/verified operation compilation, not arbitrary dispatch-field composition.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "R02",
+            "O06",
+            "M06"
+          ]
+        },
+        {
+          "id": "R07",
+          "title": "Extract/capture/select source video frames with exact PTS/provenance, frame-accurate trim semantics and VFR/proxy mapping; treat canvas videoBg as one still frame.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "R01",
+            "L06"
+          ]
         }
       ]
     },
@@ -1079,6 +1460,18 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "S06",
+          "title": "Export current frame/selected range/full sequence/GIF/audio/video plus portable image-sequence manifests/source/projects; keep original-quality export distinct from lower-resolution playback proxies.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "S04",
+            "L06"
+          ]
         }
       ]
     },
@@ -1134,6 +1527,19 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "T06",
+          "title": "Make media commands/history/recovery preserve frame link/unlink/override relationships, strokes/styles/clips/keyframes, rational time maps and closed/reopened media-panel context.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "T02",
+            "C07",
+            "D07"
+          ]
         }
       ]
     },
@@ -1188,6 +1594,18 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "U06",
+          "title": "Bound frame collections, source decode, extraction/proxy/seek/encode work and waveform/cache/process/temp costs; test cancellation/abandoned work and treat callbacks as isolated programs.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "U02",
+            "C06"
+          ]
         }
       ]
     },
@@ -1242,6 +1660,19 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "V06",
+          "title": "Measure random-access seek/preview latency and AV drift under bounded frame/waveform caches; invalidate stale jobs and ensure final export uses originals rather than proxy quality.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "V01",
+            "L07",
+            "O09"
+          ]
         }
       ]
     },
@@ -1297,6 +1728,41 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "W06",
+          "title": "Execute AC01–AC12 in the media-authoring specification: image/style/doodle, frame-local edits, NLE video, audio-only, three-view sync, panel/reload recovery and real portable outputs.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "W03",
+            "I06",
+            "O07",
+            "M06",
+            "N06",
+            "P06",
+            "Q06",
+            "R06",
+            "S06",
+            "T06",
+            "V06"
+          ]
+        },
+        {
+          "id": "W07",
+          "title": "Add supplied-reference coverage and API/pin reconciliation checks, media/time/unit/return/dispatch/callback regression tests and known connector-gap reproductions; no audit-only field can be certified FULL.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "W02",
+            "A07",
+            "I07",
+            "M07"
+          ]
         }
       ]
     },
@@ -1352,6 +1818,19 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "X06",
+          "title": "Document workspace media modes, frame-versus-sample time, edit scope/linkage, style overrides, proxy quality, rate/pitch and actual library/callback limitations without claiming a complete CapCut clone.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "X03",
+            "M06",
+            "Q07"
+          ]
         }
       ]
     },
@@ -1407,6 +1886,19 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "Y06",
+          "title": "Prove deployed image/frame/GIF/animation/audio/video edit-to-export flows, mixed-track sync, original/proxy mapping and cancellation/resource cleanup using the exact release candidate.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "Y05",
+            "W06",
+            "U06"
+          ]
         }
       ]
     },
@@ -1484,6 +1976,20 @@
           "owner": null,
           "evidence": [],
           "blockers": []
+        },
+        {
+          "id": "Z06",
+          "title": "Require the media-authoring contract, AC01–AC12, supplied-function coverage and new G14/G15 gates before accepting frame/media/three-view production completeness.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": [],
+          "dependsOn": [
+            "Z02",
+            "W06",
+            "W07",
+            "Y06"
+          ]
         }
       ]
     }
@@ -1571,6 +2077,90 @@
       "id": "G13",
       "status": "NOT_RUN",
       "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G14",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G15",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    }
+  ],
+  "revision": "2026-10-19-media-authoring-clarification",
+  "mediaAuthoringSpec": "docs/workspace/MEDIA_TIMELINE_AND_AUTHORING_SPEC.md",
+  "functionReferenceMap": "docs/workspace/FUNCTION_REFERENCE_MAPPING.md",
+  "referenceRuntimeIdentity": {
+    "auditCommit": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+    "documentationRuntimePin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+    "pinChangedByThisPlan": false,
+    "reconciliationStatus": "NOT_STARTED",
+    "suppliedFunctionDocuments": 14
+  },
+  "mediaAcceptanceCases": [
+    {
+      "id": "AC01",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC02",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC03",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC04",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC05",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC06",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC07",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC08",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC09",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC10",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC11",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "AC12",
+      "status": "NOT_RUN",
       "evidence": []
     }
   ]

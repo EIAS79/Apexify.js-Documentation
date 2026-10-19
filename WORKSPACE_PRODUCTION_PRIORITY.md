@@ -6,7 +6,7 @@ The independent `/workspace` UI and working foundation are merged through [PR #1
 
 Start with:
 
-1. [A–Z production master plan](docs/workspace/PRODUCTION_MASTER_PLAN.md): 26 workstreams, 130 tasks, dependencies and acceptance criteria.
+1. [A–Z production master plan](docs/workspace/PRODUCTION_MASTER_PLAN.md): 26 workstreams, 170 tasks, dependencies and acceptance criteria.
 2. [Capability and gap matrix](docs/workspace/CAPABILITY_MATRIX.md): current support versus required coverage.
 3. [Release gates](docs/workspace/RELEASE_GATES.md): required evidence before production acceptance.
 4. [Task board](docs/workspace/TASKS.json): machine-readable delivery status.
@@ -23,3 +23,8 @@ Execution requirements:
 - Update task/capability status and actual evidence together. Do not mark the workspace production-ready until mandatory release gates pass.
 
 Unfinished advanced work is safely preserved on [codex/workspace-advanced-wip-20261019](https://github.com/EIAS79/Apexify.js-Documentation/tree/codex/workspace-advanced-wip-20261019). It is unvalidated reference code requiring selective review, correction and tests.
+
+
+## Required authoring scope clarification
+
+The [shared media/timeline contract](docs/workspace/MEDIA_TIMELINE_AND_AUTHORING_SPEC.md) is mandatory P0 scope: editable images/text/filters/layers/styles/templates; freehand doodles/lines; independent frame collections; a familiar multitrack timeline for GIF/animation/video/audio; and synchronized Visual, Code and Graph. Audio is time/sample-based. Follow the [function-reference mapping](docs/workspace/FUNCTION_REFERENCE_MAPPING.md), preserve real API boundaries and pass AC01–AC12 plus G14/G15. The program now contains 170 tasks, 32 capability rows and 16 release gates.
