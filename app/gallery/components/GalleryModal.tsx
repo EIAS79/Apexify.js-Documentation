@@ -406,27 +406,6 @@ export default function GalleryModal({
                   </a>
                 ) : null}
                 <button
-                    type="button"
-                    onClick={openInStudio}
-                    className="hidden sm:inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-[12px] font-semibold border transition-colors"
-                    style={{
-                      backgroundColor: 'var(--bg-sunken)',
-                      borderColor: 'var(--border-default)',
-                      color: 'var(--text-primary)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--accent-iris)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border-default)';
-                    }}
-                    title="Send this snippet to the Studio"
-                  >
-                    <RocketLaunchIcon className="h-3.5 w-3.5" style={{ color: 'var(--accent-iris)' }} />
-                    Open in Studio
-                  </button>
-                )}
-                <button
                   type="button"
                   onClick={shareLink}
                   className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-[12px] font-semibold border transition-colors"
