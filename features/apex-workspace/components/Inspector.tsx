@@ -1,4 +1,6 @@
 "use client";
+import AdvancedLayerEditor from "./AdvancedLayerEditor";
+import { PRESETS } from "../presets";
 import { useState } from "react";
 import {
   ChevronDownIcon,
@@ -37,7 +39,7 @@ export default function Inspector({
   onSelect: (id: string | null) => void;
   onRemove: (id: string) => void;
   onReorder: (id: string, delta: number) => void;
-  onPreset: () => void;
+  onPreset: (id: string) => void;
   onUpload: (source: string, name: string) => void;
   onError: (message: string) => void;
   tab: string;
@@ -64,16 +66,9 @@ export default function Inspector({
       <div className="aw-inspector-scroll">
         {tab === "Presets" ? (
           <div className="aw-preset-grid">
-            <button className="aw-template-card" onClick={onPreset}>
-              <img
-                src="/workspace/assets/crystal-lake.webp"
-                alt="Crystal lake composition preset"
-              />
-              <strong>Crystal Lake</strong>
-              <span>Editable text · image · shapes</span>
-            </button>
+            {PRESETS.map(p=><button key={p.id} className="aw-template-card" onClick={()=>onPreset(p.id)}><div className="aw-preset-art" style={{background:`linear-gradient(130deg,#071020,${p.color})`}}>{p.name}</div><strong>{p.name}</strong><span>{p.description}</span></button>)}
             <p className="aw-muted">
-              Loads the reference composition into the current project. Undo
+              Loads an editable composition into the current project. Undo
               restores your previous composition.
             </p>
           </div>
@@ -298,7 +293,7 @@ export default function Inspector({
                     onChange={(opacity) => onLayer(layer.id, { opacity })}
                   />
                 </div>
-                {layer.kind === "text" ? (
+                {layer.kind === "path" || layer.kind === "component" ? <AdvancedLayerEditor layer={layer} onChange={patch=>onLayer(layer.id,patch)} onError={onError}/> : layer.kind === "text" ? (
                   <>
                     <div className="aw-section-heading">
                       <strong>Text style</strong>

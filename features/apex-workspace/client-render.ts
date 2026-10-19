@@ -41,3 +41,9 @@ export async function requestWorkspaceRender(
   }
   throw new Error("The renderer is busy. Try again shortly.");
 }
+
+export async function requestWorkspaceMedia(document:WorkspaceDocument,kind:string,signal:AbortSignal):Promise<Blob>{
+  const response=await fetch("/api/workspace/media",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({document,settings:document.media??(await import("./media-model")).defaultMedia(document),kind}),signal});
+  if(!response.ok){const result=await response.json();throw new Error(result.error??"Media render failed.");}
+  return response.blob();
+}

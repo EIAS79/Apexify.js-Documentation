@@ -31,8 +31,11 @@ import {
   type WorkspaceDocument,
   type WorkspaceLayer,
 } from "./model";
+import MediaEditor from "./components/MediaEditor";
+import { defaultMedia } from "./media-model";
+import { createPreset } from "./presets";
 import { generateSource, parseSource } from "./codegen";
-import { requestWorkspaceRender } from "./client-render";
+import { requestWorkspaceRender, requestWorkspaceMedia } from "./client-render";
 import {
   DockLayout,
   DEFAULT_DOCK,
@@ -91,41 +94,6 @@ const icons = {
   preview: PhotoIcon,
   output: ArrowDownTrayIcon,
   terminal: CommandLineIcon,
-};
-const capabilityNotes: Record<
-  string,
-  { title: string; description: string; api: string }
-> = {
-  path: {
-    title: "Paths",
-    description:
-      "Apexify v6 provides path2d drawing and custom connectors. A dedicated path authoring tool is a later workspace module.",
-    api: "painter.path2d",
-  },
-  component: {
-    title: "Components",
-    description:
-      "The v6 badge, progressBar, avatar, card, and watermark factories produce SceneLayer arrays. Their dedicated workspace inspectors are not wired yet.",
-    api: "painter.components",
-  },
-  gif: {
-    title: "GIF workflows",
-    description:
-      "Apexify supports generated frames and AsyncIterable GIF input. This workspace currently exports static compositions; a timeline and GIF job adapter are still required.",
-    api: "painter.createGIF() / painter.animate()",
-  },
-  audio: {
-    title: "Procedural audio",
-    description:
-      "Apexify supports synthesis, presets, sequences, and WAV output. The workspace audio graph and waveform editor are not wired yet.",
-    api: "painter.createAudio",
-  },
-  video: {
-    title: "Video workflows",
-    description:
-      "Apexify supports FFmpeg video creation and pipelines. A dedicated isolated media execution adapter is required before enabling video jobs here.",
-    api: "painter.createVideo() / painter.videoPipeline()",
-  },
 };
 
 export default function WorkspaceApp() {
@@ -433,7 +401,7 @@ export default function WorkspaceApp() {
         ALL_PANELS.find((p) => p !== id && visible[p]) ?? "visual",
       );
   }
-  function enqueue() {
+  function enqueue(kind: "image" | "gif" | "audio" | "video" | "code" = "image") {
     if (sourceDirtyRef.current) {
       error("Apply or discard Code edits before rendering.");
       return;
@@ -448,7 +416,8 @@ export default function WorkspaceApp() {
       ...old,
       {
         id: workspaceId(),
-        name: document.name || "Untitled",
+        name: `${document.name || "Untitled"}${kind!=="image" ? ` · ${kind}` : ""}`,
+        kind,
         document: structuredClone(document),
         state: "queued",
       },
@@ -516,10 +485,7 @@ export default function WorkspaceApp() {
     log(`Rendering ${job.name} with Apexify.js v6…`);
     void (async () => {
       try {
-        const blob = await requestWorkspaceRender(
-          job.document,
-          controller.signal,
-        );
+        const blob = job.kind && job.kind!=="image" ? await requestWorkspaceMedia(job.document,job.kind,controller.signal) : await requestWorkspaceRender(job.document,controller.signal);
         if (!alive.current || controller.signal.aborted) return;
         const url = URL.createObjectURL(blob);
         allUrls.current.add(url);
@@ -527,7 +493,7 @@ export default function WorkspaceApp() {
         setJobs((old) =>
           old.map((j) =>
             j.id === job.id
-              ? { ...j, state: "completed", url, bytes: blob.size, duration }
+              ? { ...j, state: "completed", mime: blob.type, url, bytes: blob.size, duration }
               : j,
           ),
         );
@@ -576,7 +542,7 @@ export default function WorkspaceApp() {
     if (tool === "canvas") {
       select(null);
       openPanel("visual");
-    } else if (tool === "text" || tool === "shape" || tool === "chart")
+    } else if (tool === "text" || tool === "shape" || tool === "chart" || tool === "path" || tool === "component")
       add(tool);
     else if (tool === "image") {
       openPanel("inspector");
@@ -589,7 +555,7 @@ export default function WorkspaceApp() {
       setInspectorTab("Properties");
     } else if (tool === "files") openPanel("output");
     else if (tool === "settings") setPanelMenu(true);
-    else if (capabilityNotes[tool]) setDialog(tool);
+    else if (["gif", "audio", "video"].includes(tool)) setDialog(tool);
   }
   function terminalCommand(raw: string) {
     const command = raw.trim().toLowerCase();
@@ -742,7 +708,7 @@ export default function WorkspaceApp() {
             onMove={(id, x, y) => updateLayer(id, { x, y })}
             zoom={zoom}
             setZoom={setZoom}
-            onRender={enqueue}
+            onRender={() => enqueue()}
             hand={hand}
             setHand={setHand}
           />
@@ -763,6 +729,8 @@ export default function WorkspaceApp() {
                 {
                   ...document,
                   layers: document.layers.filter((l) => l.id !== id),
+                  ...(document.media?.layerId===id ? {media:{...document.media,layerId:""}} : {}),
+                  ...(document.graph ? {graph:{edges:document.graph.edges.filter(e=>e.from!==id&&e.to!==id)}} : {}),
                 },
                 "delete",
               );
@@ -778,8 +746,8 @@ export default function WorkspaceApp() {
               [layers[index], layers[target]] = [layers[target], layers[index]];
               commit({ ...document, layers }, "reorder");
             }}
-            onPreset={() => {
-              commit(createHeroDocument(), "preset");
+            onPreset={(id) => {
+              commit(createPreset(id), "preset");
               setSelected(null);
             }}
             onUpload={(source, name) => add("image", source, name)}
@@ -806,7 +774,10 @@ export default function WorkspaceApp() {
             selected={selected}
             onSelect={select}
             preview={preview}
-            onRender={enqueue}
+            onRender={() => enqueue()}
+            onAdd={add}
+            onDocument={next=>commit(next,"graph")}
+            onError={error}
           />
         ) : id === "queue" ? (
           <Queue
@@ -815,13 +786,14 @@ export default function WorkspaceApp() {
             onSelect={(url) =>
               setSelectedJobId(jobs.find((job) => job.url === url)?.id ?? null)
             }
-            onRender={enqueue}
+            onRender={() => enqueue()}
           />
         ) : id === "preview" ? (
           <Preview
             preview={selectedOutput?.url ?? preview}
             name={selectedOutput?.name ?? document.name}
             rendering={!selectedOutput && rendering}
+            mime={selectedOutput?.mime}
             onCurrent={
               selectedOutput ? () => setSelectedJobId(null) : undefined
             }
@@ -830,6 +802,7 @@ export default function WorkspaceApp() {
           <ExportPanel
             preview={selectedOutput?.url ?? preview}
             document={selectedOutput?.document ?? document}
+            mime={selectedOutput?.mime}
             onSource={downloadSource}
             onProject={downloadProject}
             onError={error}
@@ -927,7 +900,7 @@ export default function WorkspaceApp() {
           <button
             className="aw-button aw-render-button"
             aria-label="Render"
-            onClick={enqueue}
+            onClick={() => enqueue()}
           >
             <PlayIcon />
             <span>Render</span>
@@ -1060,7 +1033,7 @@ export default function WorkspaceApp() {
                   label: `Open ${PANEL_TITLES[id]}`,
                   action: () => openPanel(id),
                 })),
-                { label: "Render composition", action: enqueue },
+                { label: "Render composition", action: () => enqueue() },
                 { label: "Reset layout", action: resetLayout },
                 { label: "Download project", action: downloadProject },
                 { label: "Download source", action: downloadSource },
@@ -1084,31 +1057,8 @@ export default function WorkspaceApp() {
           </section>
         </div>
       ) : null}
-      {dialog && capabilityNotes[dialog] ? (
-        <div className="aw-modal-backdrop" onClick={() => setDialog(null)}>
-          <section
-            className="aw-capability-dialog"
-            role="dialog"
-            aria-modal="true"
-            aria-label={capabilityNotes[dialog].title}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <IconButton
-              label="Close feature details"
-              onClick={() => setDialog(null)}
-            >
-              <XMarkIcon />
-            </IconButton>
-            <span className="aw-eyebrow">APEXIFY CAPABILITY</span>
-            <h2>{capabilityNotes[dialog].title}</h2>
-            <p>{capabilityNotes[dialog].description}</p>
-            <code>{capabilityNotes[dialog].api}</code>
-            <a className="aw-button" href="/api-reference">
-              Read the API reference
-            </a>
-          </section>
-        </div>
-      ) : null}
+      {dialog && ["gif","audio","video"].includes(dialog) ? <div className="aw-modal-backdrop" onClick={()=>setDialog(null)}><section className="aw-media-dialog" role="dialog" aria-modal="true" aria-label={`${dialog} editor`} onClick={e=>e.stopPropagation()}><IconButton label="Close media editor" onClick={()=>setDialog(null)}><XMarkIcon/></IconButton><MediaEditor kind={dialog as "gif"|"audio"|"video"} document={document} onSettings={media=>commit({...document,media},"media")} onRender={()=>{enqueue(dialog as "gif"|"audio"|"video");setDialog(null);}} onError={error}/></section></div> : null}
+
     </main>
   );
 }

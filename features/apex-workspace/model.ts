@@ -1,3 +1,4 @@
+import { validateMedia, type MediaSettings } from "./media-model";
 /** Workspace-owned authoring model. No dependency on the legacy Studio. */
 export type PanelId =
   | "tools"
@@ -50,6 +51,8 @@ export type WorkspaceLayer = LayerBase &
         strokeWidth: number;
       }
     | { kind: "image"; source: string }
+    | { kind: "path"; points: { x: number; y: number }[]; closed: boolean; color: string; strokeColor: string; strokeWidth: number }
+    | { kind: "component"; component: "badge" | "progressBar" | "card" | "watermark" | "avatar"; text: string; body: string; value: number; color: string; background: string; source: string }
     | {
         kind: "chart";
         chartType: "bar" | "pie";
@@ -60,6 +63,7 @@ export type WorkspaceLayer = LayerBase &
   );
 export interface WorkspaceDocument {
   schemaVersion: 1;
+  media?: MediaSettings;
   name: string;
   width: number;
   height: number;
@@ -72,6 +76,7 @@ export interface WorkspaceDocument {
     transparent: boolean;
   };
   layers: WorkspaceLayer[];
+  graph?: { edges: { from: string; to: string }[] };
 }
 const base = (
   id: string,
@@ -172,6 +177,8 @@ export function newLayer(
     kind === "text" ? 90 : 180,
   );
   switch (kind) {
+    case "path": return { ...common, kind, points: [{x:0,y:80},{x:30,y:10},{x:65,y:60},{x:100,y:0}], closed: false, color: "#6739e8", strokeColor: "#40d9ff", strokeWidth: 5 };
+    case "component": return { ...common, kind, component: "card", width: 400, height: 240, text: "Create something great", body: "Reusable Apexify component", value: 65, color: "#eaff00", background: "#101e35", source: "/workspace/assets/crystal-lake.webp" };
     case "text":
       return {
         ...common,
@@ -298,6 +305,14 @@ export function validateDocument(value: unknown): WorkspaceDocument {
         strokeWidth: num(l.strokeWidth, "Stroke", 0, 30),
       };
     }
+    if (l.kind === "path") {
+      if (!Array.isArray(l.points) || l.points.length < 2 || l.points.length > 128) throw new Error("Paths require 2–128 points.");
+      return { ...common, kind: "path", points: l.points.map(v => {const p = record(v);return { x: num(p.x,"Point X",-100,200), y: num(p.y,"Point Y",-100,200) };}), closed: bool(l.closed), color: color(l.color), strokeColor: color(l.strokeColor), strokeWidth: num(l.strokeWidth,"Stroke width",0,30) };
+    }
+    if (l.kind === "component") {
+      if (!["badge","progressBar","card","watermark","avatar"].includes(String(l.component))) throw new Error("Unknown component.");
+      return { ...common, kind: "component", component: l.component as "card", text: str(l.text,"Component text",200), body: str(l.body,"Component body",1000), value: num(l.value,"Progress",0,100), color: color(l.color), background: color(l.background), source: imageSource(l.source) };
+    }
     if (l.kind === "image")
       return { ...common, kind: "image", source: imageSource(l.source) };
     if (l.kind === "chart") {
@@ -326,7 +341,21 @@ export function validateDocument(value: unknown): WorkspaceDocument {
     }
     throw new Error("Unsupported layer type.");
   });
-  return {
+  let graph: WorkspaceDocument["graph"];
+  if (d.graph !== undefined) {
+    const g = record(d.graph);
+    if (!Array.isArray(g.edges) || g.edges.length > 256) throw new Error("Graph supports at most 256 connections.");
+    const keys = new Set<string>();
+    graph = { edges: g.edges.map(raw => {
+      const e=record(raw); const from=str(e.from,"Source ID",100), to=str(e.to,"Target ID",100);
+      const key = JSON.stringify([from,to]);
+      if (!ids.has(from)||!ids.has(to)||from===to||keys.has(key)) throw new Error("Graph connections require two distinct existing nodes and no duplicates.");
+      keys.add(key); return {from,to};
+    }) };
+    orderedLayers({layers,graph});
+  }
+  const result: WorkspaceDocument = {
+    ...(graph ? {graph} : {}),
     schemaVersion: 1,
     name: str(d.name, "Project name"),
     width: num(d.width, "Canvas width", 64, 2048),
@@ -341,4 +370,18 @@ export function validateDocument(value: unknown): WorkspaceDocument {
     },
     layers,
   };
+  if(d.media !== undefined) result.media = validateMedia(d.media,result);
+  return result;
+}
+
+/** Stable topological paint order. Edges express execution dependencies; every node paints once. */
+export function orderedLayers(document: Pick<WorkspaceDocument,"layers"|"graph">): WorkspaceLayer[] {
+  const pending = new Set(document.layers.map(l=>l.id));
+  const result: WorkspaceLayer[] = [];
+  while (pending.size) {
+    const next = document.layers.find(l => pending.has(l.id) && !(document.graph?.edges ?? []).some(e=>e.to===l.id && pending.has(e.from)));
+    if (!next) throw new Error("Graph connections contain a cycle.");
+    pending.delete(next.id); result.push(next);
+  }
+  return result;
 }

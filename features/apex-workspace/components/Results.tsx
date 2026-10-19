@@ -1,4 +1,5 @@
 "use client";
+import { Waveform } from "./MediaEditor";
 import { useState } from "react";
 import {
   ArrowDownTrayIcon,
@@ -12,6 +13,9 @@ import type { WorkspaceDocument } from "../model";
 import { Field, IconButton } from "./ui";
 export interface RenderJob {
   id: string;
+  kind?: "image"|"gif"|"audio"|"video"|"code";
+  source?: string;
+  mime?: string;
   name: string;
   state: "queued" | "running" | "completed" | "failed" | "cancelled";
   document: WorkspaceDocument;
@@ -68,7 +72,7 @@ export function Queue({
               onClick={() => job.url && onSelect(job.url)}
               disabled={!job.url}
             >
-              {job.url ? (
+              {job.url && (!job.mime || job.mime.startsWith("image/")) ? (
                 <img src={job.url} alt={`Open ${job.name} output`} />
               ) : (
                 <PhotoIcon />
@@ -77,7 +81,7 @@ export function Queue({
             <div className="aw-job-name">
               <strong>{job.name}</strong>
               <span>
-                {job.document.width} × {job.document.height} · PNG
+                {job.document.width} × {job.document.height} · {(job.mime?.split("/")[1]??"PNG").toUpperCase()}
                 {job.bytes ? ` · ${(job.bytes / 1024).toFixed(0)} KB` : ""}
               </span>
               {job.error ? <span className="aw-error">{job.error}</span> : null}
@@ -114,16 +118,18 @@ export function Preview({
   name,
   rendering,
   onCurrent,
+  mime="image/png",
 }: {
   preview: string | null;
   name: string;
   rendering: boolean;
   onCurrent?: () => void;
+  mime?: string;
 }) {
   return (
     <div className="aw-preview">
       {preview ? (
-        <img src={preview} alt={`${name} output preview`} />
+        mime.startsWith("audio/") ? <div className="aw-audio-preview"><Waveform url={preview}/><audio controls src={preview}/></div> : mime.startsWith("video/") ? <video controls src={preview} aria-label={`${name} output preview`}/> : <img src={preview} alt={`${name} output preview`} />
       ) : (
         <div className="aw-empty">
           <PhotoIcon />
@@ -135,7 +141,7 @@ export function Preview({
           ? "Updating preview…"
           : onCurrent
             ? `${name} · queued output`
-            : "Current render · PNG"}
+            : `Current render · ${mime.split("/")[1].toUpperCase()}`}
       </span>
       {onCurrent ? (
         <button className="aw-text-button" onClick={onCurrent}>
@@ -151,12 +157,14 @@ export function ExportPanel({
   onSource,
   onProject,
   onError,
+  mime="image/png",
 }: {
   preview: string | null;
   document: WorkspaceDocument;
   onSource: () => void;
   onProject: () => void;
   onError: (message: string) => void;
+  mime?: string;
 }) {
   const [format, setFormat] = useState("png");
   const [quality, setQuality] = useState(0.92);
@@ -165,6 +173,7 @@ export function ExportPanel({
     if (!preview) return;
     setBusy(true);
     try {
+      if(mime!=="image/png") {const blob=await (await fetch(preview)).blob();downloadFile(blob,`apexify-output.${mime==="audio/wav"?"wav":mime.split("/")[1]}`);return;}
       const image = new Image();
       image.src = preview;
       await image.decode();
@@ -201,7 +210,7 @@ export function ExportPanel({
   }
   return (
     <div className="aw-export">
-      <Field label="Format">
+      {mime!=="image/png" ? <p className="aw-value">{mime.toUpperCase()} · original encoded output</p> : <><Field label="Format">
         <select value={format} onChange={(e) => setFormat(e.target.value)}>
           <option value="png">PNG</option>
           <option value="webp">WebP</option>
@@ -223,6 +232,7 @@ export function ExportPanel({
       ) : (
         <p className="aw-muted">Lossless · original resolution</p>
       )}
+      </>}
       <div className="aw-export-actions">
         <button
           className="aw-button aw-primary"
