@@ -518,12 +518,12 @@ export function EcosystemFooter({ model }: { model: ProductExperienceModel }) {
           <p>Start with a canvas. Grow into scenes, templates, media, and repeatable visual systems.</p>
           <div>
             <Link href="/docs/getting-started" className="apx-cta apx-cta--footer">Read the docs <ArrowRightIcon className="h-4 w-4" /></Link>
-            <Link href="/studio" className="apx-footer__studio">Open Studio</Link>
+            
           </div>
         </div>
 
         <div className="apx-footer__nav">
-          <div><span>BUILD</span><Link href="/docs/getting-started">Getting started</Link><Link href="/api-reference">API reference</Link><Link href="/studio">Studio</Link></div>
+          <div><span>BUILD</span><Link href="/docs/getting-started">Getting started</Link><Link href="/api-reference">API reference</Link></div>
           <div><span>EXPLORE</span><Link href="/gallery">Gallery</Link><Link href={model.heroExample.href}>Verified example</Link><a href="https://github.com/EIAS79/Apexify.js" target="_blank" rel="noreferrer">GitHub</a></div>
           <div><span>PACKAGE</span><a href="https://www.npmjs.com/package/apexify.js" target="_blank" rel="noreferrer">npm</a><span className="apx-footer__meta">v{model.package.version}</span><span className="apx-footer__meta">{model.package.commit.slice(0, 8)}</span></div>
         </div>

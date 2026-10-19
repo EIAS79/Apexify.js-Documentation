@@ -1,8 +1,0 @@
-{
-  "repository": "EIAS79/Apexify.js",
-  "commit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
-  "sourceRoot": "lib-next",
-  "program": "STUDIO-PARITY",
-  "phase": "STUDIO-PARITY-0",
-  "policy": "WS-00 current installed source identity; separate generated output, do not overwrite STUDIO-PARITY-0 historical artifacts."
-}

@@ -7,7 +7,6 @@ import { DiagnosticsPanel } from './DiagnosticsPanel';
 import { InteractiveWorkspace } from './InteractiveWorkspace';
 import { InteractiveErrorBoundary } from './InteractiveErrorBoundary';
 import { createInteractiveSession, resetInteractiveSession } from '@/lib/docs/playground/session';
-import { encodeShareLink } from '@/lib/studio/studioStorage';
 
 type WorkbenchMode = 'ts' | 'preview' | 'both';
 
@@ -45,7 +44,7 @@ export function ExampleWorkbench({
       severity: 'info' as const,
       message: 'Preview is DOC-5 verified output. Editing source here does not execute code or alter verification evidence.',
       source: sourceHash,
-      help: 'Open the current session in Studio when trusted-local execution is intentionally enabled.',
+      help: 'Copy this source and run it in a local Apexify.js project.',
     }],
     [sourceHash],
   );
@@ -60,11 +59,6 @@ export function ExampleWorkbench({
       setCopied(false);
     }
   };
-  const openInStudio = () => {
-    const encoded = encodeShareLink({ name: title, ts: session.source, js: '', lang: 'ts' });
-    window.location.assign(`/studio#snippet=${encodeURIComponent(encoded)}`);
-  };
-
   const editor = (
     <InteractiveErrorBoundary label="Editor">
       <InteractiveCodeEditor
@@ -105,7 +99,6 @@ export function ExampleWorkbench({
       <div className="flex flex-wrap items-center gap-2 border-b px-4 py-2.5 sm:px-5" style={{ borderColor: 'var(--border-subtle)' }}>
         <button type="button" onClick={() => void copySource()} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--border-default)', background:'var(--bg-raised)' }}>{copied?'Copied':'Copy code'}</button>
         <button type="button" onClick={reset} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--border-default)', background:'var(--bg-raised)' }}>Reset</button>
-        <button type="button" data-post-doc12-action="open-in-studio" onClick={openInStudio} className="min-h-10 rounded-lg border px-3 text-xs font-bold" style={{ borderColor:'var(--accent-iris)', background:'color-mix(in srgb,var(--accent-iris) 10%,var(--bg-raised))', color:'var(--text-primary)' }}>Open in Studio</button>
         <span className="ml-auto text-[10px] font-semibold" style={{ color:'var(--text-tertiary)' }}>Verified preview · local edits are not executed</span>
       </div>
 

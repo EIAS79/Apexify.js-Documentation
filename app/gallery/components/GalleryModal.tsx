@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
@@ -17,13 +16,11 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ShareIcon,
-  RocketLaunchIcon,
 } from '@heroicons/react/24/outline';
 import { GallerySnippetEditor } from './GallerySnippetEditor';
 import { CATEGORY_CONFIG } from './galleryConfig';
 import { galleryTrustLabel, type GalleryItem, primaryBadgeCategory } from './galleryHelpers';
 import { inferMediaKind, buildGalleryHash } from '@/lib/gallery/core/galleryDocLink';
-import { STUDIO_INCOMING_SNIPPET_KEY } from '@/lib/studio/studioConfig';
 import GalleryZoomablePreview from './GalleryZoomablePreview';
 
 type ModalLayoutMode = 'code' | 'split' | 'media';
@@ -89,7 +86,6 @@ export default function GalleryModal({
   onPrev: () => void;
   onNext: () => void;
 }) {
-  const router = useRouter();
   const cfg = CATEGORY_CONFIG[primaryBadgeCategory(item)];
   const Icon = cfg.icon;
   const pagedCode = item.codePages?.length ? item.codePages : null;
@@ -107,7 +103,6 @@ export default function GalleryModal({
   const requiresStudioExecution = /\b(?:createAudio|createVideo|videoPipeline)\b/.test(gallerySource);
   const effectiveExecutionMode =
     item.executionMode ?? (requiresStudioExecution ? 'studio' : 'gallery');
-  const studioEligible = hasCode && effectiveExecutionMode !== 'none';
 
   const [layoutMode, setLayoutMode] = useState<ModalLayoutMode>(hasCode ? 'split' : 'media');
   const [codeLang, setCodeLang] = useState<'ts' | 'js'>(hasTs ? 'ts' : 'js');
@@ -284,39 +279,6 @@ export default function GalleryModal({
     });
   };
 
-  const openInStudio = () => {
-    if (!hasCode) return;
-    try {
-      /**
-       * Send the user's edits for the language they're actively viewing,
-       * and keep the original for the other language. If they never typed,
-       * `editedCode` still equals the original `codeText` so this is a no-op.
-       * Studio picks this payload up on mount, opens it as a new tab, and
-       * clears the slot.
-       */
-      const liveCode = editedCode || codeText;
-      const projectCode = pagedCode?.length
-        ? pagedCode
-            .filter((page) => page.language === codeLang)
-            .map((page, index) => {
-              const absoluteIndex = pagedCode.indexOf(page);
-              return absoluteIndex === codePageIndex ? liveCode : page.code;
-            })
-            .join('\n\n')
-        : liveCode;
-      const payload = {
-        name: item.title || 'Gallery snippet',
-        ts: codeLang === 'ts' ? projectCode : item.code?.ts ?? '',
-        js: codeLang === 'js' ? projectCode : item.code?.js ?? '',
-        lang: codeLang,
-      };
-      localStorage.setItem(STUDIO_INCOMING_SNIPPET_KEY, JSON.stringify(payload));
-    } catch {
-      /* localStorage may be blocked — silently continue */
-    }
-    router.push('/studio');
-  };
-
   const showCode = hasCode && layoutMode !== 'media';
   const showMedia = layoutMode !== 'code';
   const previewSrc = executionEligible && executionDataUrl ? executionDataUrl : activeOutput.src;
@@ -443,28 +405,6 @@ export default function GalleryModal({
                     Full source
                   </a>
                 ) : null}
-                {studioEligible && (
-                  <button
-                    type="button"
-                    onClick={openInStudio}
-                    className="hidden sm:inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg text-[12px] font-semibold border transition-colors"
-                    style={{
-                      backgroundColor: 'var(--bg-sunken)',
-                      borderColor: 'var(--border-default)',
-                      color: 'var(--text-primary)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--accent-iris)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border-default)';
-                    }}
-                    title="Send this snippet to the Studio"
-                  >
-                    <RocketLaunchIcon className="h-3.5 w-3.5" style={{ color: 'var(--accent-iris)' }} />
-                    Open in Studio
-                  </button>
-                )}
                 <button
                   type="button"
                   onClick={shareLink}

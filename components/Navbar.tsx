@@ -10,7 +10,6 @@ import { BrandIcon } from './Brand';
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/gallery', label: 'Gallery' },
-  { href: '/studio', label: 'Studio' },
   { href: '/docs#00-start-here', label: 'Docs' },
 ] as const;
 

@@ -4,7 +4,7 @@ import { getApiManifest } from '@/lib/api-reference/manifest';
 import { exampleManifest } from '@/lib/examples/manifest';
 import { absoluteSiteUrl } from '@/lib/site';
 
-const STATIC_ROUTES = ['/', '/api-reference', '/gallery', '/studio'] as const;
+const STATIC_ROUTES = ['/', '/api-reference', '/gallery'] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const docs = loadDocumentationPages()

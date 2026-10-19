@@ -9,7 +9,6 @@ const NAV_LINKS = [
   { href: '/docs/getting-started', label: 'Docs' },
   { href: '/api-reference', label: 'API' },
   { href: '/gallery', label: 'Gallery' },
-  { href: '/studio', label: 'Studio' },
 ] as const;
 
 function docsHeaderPrefetch(href: string): false | undefined {
