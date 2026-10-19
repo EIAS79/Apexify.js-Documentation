@@ -1,0 +1,1577 @@
+{
+  "schemaVersion": 1,
+  "program": "AWP",
+  "projectPriority": "P0",
+  "priorityMeaning": "Highest product-roadmap delivery priority, not incident severity.",
+  "date": "2026-10-19",
+  "timezone": "Europe/Warsaw",
+  "productionAcceptance": "NOT_ACCEPTED",
+  "foundation": {
+    "status": "MERGED",
+    "pr": 158,
+    "mergeCommit": "a008940b57730c93893afd8dd1a473b02f0a75a5",
+    "runtimePin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+    "verifiedBaselineTests": 7,
+    "isolatedTypecheck": "PASS",
+    "fullProductionAcceptance": false
+  },
+  "wipBackup": {
+    "branch": "codex/workspace-advanced-wip-20261019",
+    "commit": "209194cbe5d5b857c3aa7476127470cd5fae35bb",
+    "status": "UNVALIDATED_DO_NOT_MERGE_BLINDLY"
+  },
+  "nextTaskIds": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "B01",
+    "B02",
+    "B03",
+    "B04",
+    "B05",
+    "U01",
+    "U02",
+    "U03",
+    "W01"
+  ],
+  "workstreams": [
+    {
+      "id": "A",
+      "title": "Authority, inventory and truthful baseline",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [],
+      "deliverable": "Reproducible runtime-backed inventory and whole-app baseline.",
+      "acceptance": "Every authorable public runtime path has a disposition; another engineer can recreate the baseline from pinned inputs.",
+      "tasks": [
+        {
+          "id": "A01",
+          "title": "Record documentation SHA, runtime source SHA, installed artifact hash, Node/toolchain and deployment identity. Distinguish Git source, installed artifact and npm release tags.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "A02",
+          "title": "Recursively inventory every public v6 method/facet and nested object, union variant, array item, default, alias, deprecated option, callback, output mode, error and resource limit; verify runtime behavior against declarations.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "A03",
+          "title": "Reproduce whole-app typecheck/build/browser behavior on the base commit and workspace commit. Retain logs and minimal reproductions distinguishing existing failures from new-route failures.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "A04",
+          "title": "Create a machine-readable capability ledger linking each runtime path to source evidence, model/control/graph/code mappings, execution backends, persistence, tests, owner and support status.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "A05",
+          "title": "Review the preserved WIP branch file by file. Record usable code, defects and rejected approaches; port only reviewed pieces with their own evidence, rather than blindly cherry-picking the branch.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "title": "Architecture, ownership and runtime boundaries",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A"
+      ],
+      "deliverable": "Approved ADRs and independently testable workspace adapters.",
+      "acceptance": "Browser code has no Node-native/Studio dependency; editor-specific behavior and engine behavior have clear owners.",
+      "tasks": [
+        {
+          "id": "B01",
+          "title": "Define shell/domain/compiler/browser-runtime/Node-runtime/execution/job/assets/persistence interfaces. Split the large WorkspaceApp component along real responsibilities without fragmenting trivial utilities.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "B02",
+          "title": "Choose adapters from actual supported runtime contracts. Document browser capability negotiation and explicit fallbacks; do not assume a preview package implements the future retained renderer.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "B03",
+          "title": "Approve ADRs for canonical schema, reversible source grammar, graph semantics, custom-code isolation, media hosting/durability, asset storage and resource/cost budgets.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "B04",
+          "title": "Enforce dependency direction and import boundaries. New workspace modules must not import legacy Studio components, state, styles, execution adapters or generated completeness ledgers.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "B05",
+          "title": "Separate application work from upstream portable-core/IR/browser/animation/package work. Record exact upstream capability/version blockers and removal criteria for temporary adapters.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "title": "Canonical project schema, validation and transactions",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A",
+        "B"
+      ],
+      "deliverable": "Versioned portable project format with migrations and atomic commands.",
+      "acceptance": "Valid projects round-trip without semantic loss; rejected imports leave the last valid revision intact.",
+      "tasks": [
+        {
+          "id": "C01",
+          "title": "Define stable IDs and serializable types for documents, scenes, layers, groups/surfaces, layout, assets, graph, animation/media tracks, bindings, source mappings and export settings.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "C02",
+          "title": "Implement whitelist validation for schema versions, finite values, unions, mutually exclusive options, references, graph cycles and aggregate resource budgets. Project data must never evaluate code.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "C03",
+          "title": "Add validated atomic commands/transactions, revisions, deterministic serialization and semantic identities. Separate authoring state, view state and derived execution artifacts.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "C04",
+          "title": "Migrate foundation schema version 1 without dropping values. Preserve newer/opaque values safely or reject with an exportable recovery path; test corrupt, truncated and incompatible inputs.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "C05",
+          "title": "Define portable project/asset manifests, supported forward/backward compatibility, dangling-reference repair and transaction behavior for code/graph/visual edits.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "title": "Docking, window lifecycle and layout",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B",
+        "C"
+      ],
+      "deliverable": "Reliable desktop, tablet and narrow-screen panel behavior.",
+      "acceptance": "Closing/restoring any panel preserves its content and jobs; all panel combinations remain recoverable.",
+      "tasks": [
+        {
+          "id": "D01",
+          "title": "Complete close/reopen/maximize/restore for all nine panels and both sidebars. Hidden split branches release space and remaining windows expand without inaccessible gaps.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "D02",
+          "title": "Move editor selection/scroll, graph viewport/selection, terminal draft/history, inspector state, media controls and preview playback outside panel mounts. Test state across repeated closure/remount.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "D03",
+          "title": "Implement pointer/touch/keyboard resizing with minimum sizes, accessible separators, clamped persisted weights, focus restoration and predictable maximize/restore behavior.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "D04",
+          "title": "Add approved layout presets and configurable panel docking/movement if retained in the product contract. Recover meaningful layouts after viewport/orientation/window-size changes.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "D05",
+          "title": "Test every panel hidden, focused-panel closure, rendering during closure/resize, corrupted layout storage, multi-tab layouts and reset. Permanent Panels and restore actions always remain available.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "title": "Visual fidelity, responsive UX and accessibility",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B",
+        "D"
+      ],
+      "deliverable": "Consistent, inclusive production UI that preserves the approved reference.",
+      "acceptance": "No inaccessible core workflow, clipped critical action or unrecoverable window; applicable WCAG 2.2 AA criteria pass.",
+      "tasks": [
+        {
+          "id": "E01",
+          "title": "Extract scoped dark/neon tokens for surfaces, cyan/violet/yellow accents, typography, spacing, borders and motion. Preserve the accepted layout and remove root-style/custom-cursor conflicts.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "E02",
+          "title": "Finish empty/loading/error/disabled/selected/busy/success states, validation messages, tooltips, overflow, long labels, dense toolbars and discoverable advanced controls.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "E03",
+          "title": "Define and test desktop/tablet/mobile behavior at 1920x1080, 1440x900, 1024x768, 768x1024, 390x844 and 360x800, including zoom, orientation and actual touch/device use.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "E04",
+          "title": "Audit landmarks, names/roles, focus order, dialogs/menus, shortcuts, resize controls and keyboard/screen-reader alternatives for canvas and graph content.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "E05",
+          "title": "Meet applicable WCAG 2.2 AA contrast, visible focus, target-size, zoom/reflow and reduced-motion requirements. Retain reference comparisons plus manual and automated accessibility findings.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "F",
+      "title": "Canvas, transforms and layout tools",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "D",
+        "L"
+      ],
+      "deliverable": "Complete canvas authoring and predictable spatial editing.",
+      "acceptance": "Editing coordinates/transforms match exported results; pan/zoom never mutates document geometry or resolution.",
+      "tasks": [
+        {
+          "id": "F01",
+          "title": "Cover CanvasConfig recursively: dimensions, positions, transparency, colors/gradients, patterns, background sources/layers, fit/alignment, renderer options, defaults and limits.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "F02",
+          "title": "Implement selection/multi-select/marquee, resize/rotate handles, transform origins, snapping/guides/grids/rulers, coordinate readout, zoom-to-fit and pan with keyboard equivalents.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "F03",
+          "title": "Add align/distribute, stack order, locking, visibility, duplicate, grouping and supported surface/layout editing with logical-coordinate and DPR correctness.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "F04",
+          "title": "Handle negative/off-canvas positions, rotated bounds, aspect constraints, extreme sizes and numeric-field limits. Group continuous drag/resize into one history command.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "F05",
+          "title": "Prove each option/transform combination across controls, model, code, graph, runtime and persistence; make validation and unsupported backend behavior explicit.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "G",
+      "title": "Text, fonts and measurement",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "F",
+        "L"
+      ],
+      "deliverable": "Faithful text authoring and reproducible font/measurement behavior.",
+      "acceptance": "Supported typography survives round trips; missing fonts/shaping produce actionable diagnostics.",
+      "tasks": [
+        {
+          "id": "G01",
+          "title": "Cover createText and measureText recursively: font/loading/family/size/weight/style, fill/stroke, placement/baseline/alignment, spacing, wrapping, bounds and measurement results.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "G02",
+          "title": "Add direct text editing, supported rich/multi-run content, max-width/overflow and auto-fit controls, shadows/effects and structured style editors without silent content loss.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "G03",
+          "title": "Test multiline, punctuation, combining marks, emoji, CJK, Arabic/RTL and mixed-direction text using actual runtime shaping capabilities and declared limitations.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "G04",
+          "title": "Make font resolution reproducible in browser/export: uploaded/embedded/referenced fonts, licensing metadata, fallback warnings, loading, cancellation and resource cleanup.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "G05",
+          "title": "Compare metrics and generated-source results over sizes, rotation, opacity, wrapping and missing fonts; document real backend metric differences rather than assuming identical glyph pixels.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "H",
+      "title": "Images, shapes and effect stacks",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "F",
+        "L"
+      ],
+      "deliverable": "Deep image/shape controls and nondestructive effects.",
+      "acceptance": "Controls alter actual output; alpha, effect ordering and source data survive serialization and failure handling.",
+      "tasks": [
+        {
+          "id": "H01",
+          "title": "Cover all createImage source/shape variants, placement, crop/fit/alignment, borders/radii, stroke/fill, opacity, transforms, compositing and nested option interactions.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "H02",
+          "title": "Expose every pinned public image utility: resize/crop/convert/compress, filters/effects, masks/blend, palette, collage/stitch and other discovered methods with valid structured controls.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "H03",
+          "title": "Implement ordered editable/reorderable/bypassable effect stacks, alpha/color policies, incompatible-combination validation and meaningful export-conversion warnings.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "H04",
+          "title": "Decode uploaded assets under byte/pixel/frame limits, retain originals and support replace/relink. Remote and SVG sources require explicit policy; never allow implicit arbitrary filesystem/network access.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "H05",
+          "title": "Validate defaults/unions/arrays/interactions and generated-source parity, including transparent inputs, EXIF orientation, high-resolution sources, masks and malformed files.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "I",
+      "title": "Paths, vectors, pixels and hit detection",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "F",
+        "H"
+      ],
+      "deliverable": "Precise path tools, bounded pixel operations and honest selection semantics.",
+      "acceptance": "Edited geometry/detectors match runtime behavior and remain editable after save/code/graph round trips.",
+      "tasks": [
+        {
+          "id": "I01",
+          "title": "Cover every PathCommand variant, custom connectors, fill/stroke, dashes/caps/joins, gradients, shadows and transforms; represent the full supported command union.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "I02",
+          "title": "Build point/control-handle editing, add/remove/reorder/open/close, bezier/primitive tools, coordinate fields and keyboard equivalents with atomic history.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "I03",
+          "title": "Expose pixel read/write/manipulate operations through bounded region editors, actual data previews, explicit costs and nondestructive recovery where applicable.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "I04",
+          "title": "Connect runtime hit tests to transforms, clipping and visibility. Distinguish exact path/region detection from a bounding-box selection approximation.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "I05",
+          "title": "Add only runtime-supported SVG/vector import/export subsets, sanitize active content/external refs, and register future vector-engine requirements separately.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "J",
+      "title": "Charts, data and interactions",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "F",
+        "G",
+        "L"
+      ],
+      "deliverable": "All pinned chart families and their complete authoring/data contracts.",
+      "acceptance": "Every current chart family has audited editing, real output and accurate browser/static-export differences.",
+      "tasks": [
+        {
+          "id": "J01",
+          "title": "Inventory bar, horizontal bar, line, pie, scatter, radar, polar area, comparison and combo APIs with every series/data union, dimensions, axes, labels, legends and styling option.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "J02",
+          "title": "Create bounded data/series editors with insert/edit/delete/reorder, labels/colors, scales/ranges/ticks/formatting, validation and local CSV/JSON import.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "J03",
+          "title": "Implement supported transitions, tooltips, legends, selection and data updates. Identify browser-only interaction separately from static export behavior.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "J04",
+          "title": "Compile charts and bindings to valid public APIs with source maps; handle zero/negative/null/empty and large bounded data according to actual runtime contracts.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "J05",
+          "title": "Prove results/updates/accessibility summaries, source equivalence and persistence across all chart families and meaningful option interactions.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "K",
+      "title": "Scenes, components, templates and layout",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "F",
+        "G",
+        "H",
+        "L"
+      ],
+      "deliverable": "Reusable nested composition and a verified preset/example catalogue.",
+      "acceptance": "Instances preserve bindings/identity and every shipped example executes against the pinned runtime.",
+      "tasks": [
+        {
+          "id": "K01",
+          "title": "Expose SceneBuilder/renderScene with scene hierarchy, all layer variants, surfaces/backgrounds/order/bounds/options, immutable snapshots and public builder operations.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "K02",
+          "title": "Add complete badge/progressBar/avatar/card/watermark editors with defaults, nested options, geometry constraints and preserved component identity.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "K03",
+          "title": "Implement immutable template definitions/instances, placeholders, typed bindings, visibility, overrides, insertions and named refs; diagnose missing/cyclic/mistyped inputs.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "K04",
+          "title": "Provide runtime-supported flex/grid/layout authoring and constraints. Negotiate future Apex Style/compiler capabilities rather than assuming arbitrary CSS compatibility.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "K05",
+          "title": "Ship practical editable presets/examples across all supported domains with real public-v6 code/output, asset/font attribution, customization tests and runtime drift checks.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "L",
+      "title": "Assets, fonts, references and files",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "U"
+      ],
+      "deliverable": "Workspace-owned file/asset registry and portable inputs.",
+      "acceptance": "Projects run outside the website with all declared inputs; broken/deleted assets cannot silently corrupt dependents.",
+      "tasks": [
+        {
+          "id": "L01",
+          "title": "Build upload/import/replace/relink/delete around stable IDs, content hashes, metadata, usage/dependency references, thumbnails and safe garbage collection.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "L02",
+          "title": "Handle image/font/GIF/audio/video/source inputs with MIME/signature validation, byte/dimension/duration quotas, progress, cancellation and actionable decode errors.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "L03",
+          "title": "Resolve named assets/values/palettes, escaped dollar refs and templates consistently with runtime defaults; provide dependency inspection and broken-reference repair.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "L04",
+          "title": "Export a portable bundle containing project, artwork/fonts, source, runtime/dependency metadata and usage instructions. Remove undeclared website-relative artwork dependencies.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "L05",
+          "title": "Define transactional IndexedDB/blob storage, quotas, cache lifetime, cross-tab ownership, import atomicity and account-free offline/local workflows where supported.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "M",
+      "title": "Code editing, reverse synchronization and execution",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B",
+        "C",
+        "L",
+        "U"
+      ],
+      "deliverable": "Usable code-first programming and explicit reversible/opaque source boundaries.",
+      "acceptance": "Generated programs agree with visual execution; custom programs run only in approved isolation and unsupported edits are preserved.",
+      "tasks": [
+        {
+          "id": "M01",
+          "title": "Specify and implement an AST-based reversible source subset with source spans/comments/stable IDs, diagnostics and exact unsupported-range reporting.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "M02",
+          "title": "Connect Visual/Graph-to-Code and supported Code-to-Visual/Graph through validated transactions; preserve opaque programs and drafts, and explicitly resolve destructive overwrites.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "M03",
+          "title": "Provide JS/TS editing, pinned API types/completion, formatting/diagnostics, files/imports, source-linked errors and runnable project/source downloads with assets.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "M04",
+          "title": "Implement the approved isolated custom-code environment with virtual files, bounded logs/artifacts, import/network/filesystem policies, hard deadlines/cancellation and CPU/memory/process limits.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "M05",
+          "title": "Test loops, async programs, supported imports, syntax/type/runtime failures, hangs/escapes, reload/panel closure and unsupported reverse-sync. Keep freeform programs distinct from declarative rendering.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "N",
+      "title": "Editable typed graph and compilation",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B",
+        "C",
+        "M"
+      ],
+      "deliverable": "Meaningful node programming that drives actual execution.",
+      "acceptance": "Reconnect/create operations change the compiled render; paint order/branches are specified and tested.",
+      "tasks": [
+        {
+          "id": "N01",
+          "title": "Define semantic node/port types for inputs, canvas, text/image/path/chart/component/surface, transforms/effects, media, outputs and runtime-only capabilities.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "N02",
+          "title": "Implement create/delete/duplicate/connect/disconnect, movement/grouping/selection, pan/zoom/fit, keyboard operation, port validation and saved graph positions.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "N03",
+          "title": "Validate cycles, dangling refs, incompatible ports, missing inputs and aggregate costs; compile deterministic dependencies, explicit paint order, branches/composites and source maps.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "N04",
+          "title": "Connect graph edits to shared project/code and real runtime execution. Preserve unsupported custom source as opaque nodes/boundaries rather than inventing editable semantics.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "N05",
+          "title": "Test branches/composites, shared subgraphs, ordering, disconnected nodes, re-execution/cancellation and persistence; add accessible outline and inspectable runtime diagnostics.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "O",
+      "title": "Unified animation and timeline",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B",
+        "C",
+        "N",
+        "V"
+      ],
+      "deliverable": "Shared live/export animation evaluator and timeline editing.",
+      "acceptance": "Seeking a time reproduces export semantics; final states survive interruption and reduced-motion policies.",
+      "tasks": [
+        {
+          "id": "O01",
+          "title": "Align duration/delay, from/to, property keyframes, easing, repeats/direction, transition modes, callbacks and interruption with the first-party animation contract.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "O02",
+          "title": "Build tracks/clips/keyframes, play/pause/stop/seek, timeline zoom/snapping/ranges, playhead time, layer visibility and animation inspectors.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "O03",
+          "title": "Use one evaluator for browser playback and deterministic server sampling; support applicable number/color/angle/transform/gradient/path interpolation with explicit discrete fallbacks.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "O04",
+          "title": "Handle supported enter/leave/show/hide/update/active/resize/layout transitions, reduced motion, hidden tabs and frame coalescing without dropping final updates.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "O05",
+          "title": "Prove fixed-time samples, easing endpoints, loops/reversal/interruption, rapid edits/resource disposal and preview-vs-GIF/video sampled results.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "P",
+      "title": "GIF authoring and encoding",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "O",
+        "L",
+        "S",
+        "U"
+      ],
+      "deliverable": "Actual editable GIF workflows under resource policy.",
+      "acceptance": "Decoded GIF frames/metadata reflect timeline edits with bounded encoding memory and real lifecycle events.",
+      "tasks": [
+        {
+          "id": "P01",
+          "title": "Cover createGIF/animate/scene-to-GIF input modes and options: dimensions, delays/durations, loops, disposal, transparency, quantization, overlays and generated/streaming frames.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "P02",
+          "title": "Support composition sampling and imported frame sequences with insert/edit/remove/reorder, previews and explicit GIF timing-rounding diagnostics.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "P03",
+          "title": "Integrate encoding with bounded jobs, progress/cancel/deadline/retention and supported streaming; avoid unbounded in-memory frame arrays.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "P04",
+          "title": "Validate decoded frame count/dimensions/timing/loop/disposal/transparency and selected-frame semantics; test corrupt inputs, cancellation and memory cleanup.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "P05",
+          "title": "Download playable GIFs and portable sources, persist settings/history and show actual encoded metadata/size and runtime limits.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "Q",
+      "title": "Audio synthesis, sequencing and mixing",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "L",
+        "S",
+        "U"
+      ],
+      "deliverable": "Real procedural audio authoring, playback and waveform tools.",
+      "acceptance": "Output samples/headers/timing match controls and the waveform comes from rendered audio rather than a decorative graphic.",
+      "tasks": [
+        {
+          "id": "Q01",
+          "title": "Cover synth/preset/sequence/mix/compose and every public processing API, including layers/events/partials, waveform/frequency, ADSR, modulation/filter, pan, sample/channels and deterministic seeds.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Q02",
+          "title": "Create waveform/clip/sequence editors with playback/scrub/zoom, event timing, gain/fades, mute/solo and preset customization; derive waveforms from decoded output.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Q03",
+          "title": "Enforce duration/sample/event/byte budgets and browser autoplay rules; release AudioContexts, buffers, URLs and workers on cancellation/replacement.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Q04",
+          "title": "Integrate audio tracks into media exports with declared mixing/resampling/timing behavior, sync metadata, deterministic seeds and saved project settings.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Q05",
+          "title": "Check WAV headers, channels/sample count/rate/duration, clipping/gain, seeded determinism, sequence timing and cancellation with appropriate numerical tolerances.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "R",
+      "title": "Video editing, encoding and pipeline",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "O",
+        "Q",
+        "L",
+        "S",
+        "U",
+        "Y"
+      ],
+      "deliverable": "Deployed, bounded FFmpeg-backed video workflows.",
+      "acceptance": "Actual hosted jobs produce valid probed/decoded video and terminate/clean resources reliably on failure.",
+      "tasks": [
+        {
+          "id": "R01",
+          "title": "Inventory all createVideo/videoPipeline/probe/extract/scene-to-video operations: frame creation, convert/trim, geometry/effects, text/watermarks, audio, merge/splice, speed/fades and advanced variants.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "R02",
+          "title": "Build clip/track/timeline/operation editors with actual probe data/thumbnails, trim ranges, overlays/sync and output container/codec/quality/fps/resolution validation.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "R03",
+          "title": "Package and integrity-check compatible FFmpeg/ffprobe binaries and licensing metadata; choose serverless vs workers using measured timeout/memory/disk/payload constraints.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "R04",
+          "title": "Connect progress/cancellation/deadlines to actual process events, terminate process trees, isolate temporary files/protocols/paths and reclaim abandoned runs.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "R05",
+          "title": "Use ffprobe/decoded samples to check codec/container/fps/resolution/duration/timestamps/overlays/audio/sync; test unavailable codecs, corrupt media, full disk and abrupt termination.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "S",
+      "title": "Jobs, terminal, preview and exports",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B",
+        "C",
+        "U"
+      ],
+      "deliverable": "Coherent real execution/artifact lifecycle across every view.",
+      "acceptance": "Queued snapshots are immutable; historical artifacts stay tied to their revision; cancellation/retry cannot report false completion.",
+      "tasks": [
+        {
+          "id": "S01",
+          "title": "Define queued/admitted/running/cancelling/cancelled/completed/failed/expired states, immutable input snapshots, source revisions, job IDs and timestamped provenance.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "S02",
+          "title": "Implement bounded admission/concurrency/fairness/backpressure, idempotent submit/retry and cancellation races; add durable workers/storage only when workload needs them and distinguish local from distributed quotas.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "S03",
+          "title": "Separate live composition, selected historical job and custom-code output. Preview image/GIF/audio/video/text with actual metadata, playback/error states and stale-revision indicators.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "S04",
+          "title": "Export every applicable output mode and portable project/source bundle with actual MIME/signatures, names/codec/quality/color/alpha semantics and completed browser-download checks.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "S05",
+          "title": "Expand the documented command registry with help/history/completion, actual logs/errors/job IDs and cancellation; preserve console state across closure without implying a host OS shell.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "T",
+      "title": "Persistence, history and recovery",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "C",
+        "L",
+        "S"
+      ],
+      "deliverable": "Account-free durable local editing and explicit failure recovery.",
+      "acceptance": "Close/reload/crash/quota cases preserve the last committed work and visibly report save failures.",
+      "tasks": [
+        {
+          "id": "T01",
+          "title": "Use transactional IndexedDB/blob project/asset storage and separate small layout preferences; implement autosave revisions and visible saved/unsaved/error state.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "T02",
+          "title": "Implement bounded command-based undo/redo across visual/code/graph/assets/media, gesture coalescing, transactional redo and measured history memory.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "T03",
+          "title": "Recover interrupted saves/crashes/reloads/offline edits/source drafts; detect cross-tab revision conflicts and never silently overwrite newer work.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "T04",
+          "title": "Test schema upgrade/downgrade, corrupt/truncated data, quota/storage exhaustion, deleted assets and interrupted import/export using safe backups.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "T05",
+          "title": "Define artifact retention, safe resource reclamation, portable backups, explicit reset/delete, recovery export and user-facing storage/privacy controls.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "U",
+      "title": "Security, isolation, privacy and abuse controls",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A",
+        "B"
+      ],
+      "deliverable": "Reviewed trust model and enforceable account-free execution/resource policy.",
+      "acceptance": "Malicious concurrent work cannot escape isolation, expose private inputs/secrets or evade cross-instance admission.",
+      "tasks": [
+        {
+          "id": "U01",
+          "title": "Threat-model public unauthenticated rendering, uploads/fonts/SVG/media, projects/source, plugins/dependencies, job submission and artifact access; identify every trust boundary.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "U02",
+          "title": "Enforce signatures and bytes/pixels/frames/items/graph-depth/operations/audio-video-duration/memory/CPU/disk/process/log/concurrency limits before expensive execution.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "U03",
+          "title": "Choose and test isolation outside the application server for custom code: deny host secrets/environment and arbitrary filesystem/network/process access; constrain imports and virtual inputs/outputs with hard termination.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "U04",
+          "title": "Add account-free cross-instance admission/rate/cost limits, origin/CORS/CSRF policy, anonymous job ownership, unpredictable artifact access and expiry; login remains out of scope.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "U05",
+          "title": "Test traversal, SSRF/redirects, decompression bombs, active SVG, pollution, sandbox escapes/runaway loops, cancellation races and stale/private artifact access; define patch/dependency-review procedures.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "V",
+      "title": "Retained rendering, performance and resource lifecycle",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "B",
+        "C"
+      ],
+      "deliverable": "Measured local interactivity with bounded resources.",
+      "acceptance": "Supported edits render directly in-browser with measured latency/frame budgets and no unbounded resource growth.",
+      "tasks": [
+        {
+          "id": "V01",
+          "title": "Integrate the retained browser renderer when its contract is ready: persistent decoded resources, dirty-node invalidation, coalescing, DPR/resize and direct presentation. Track server-PNG preview as temporary fallback.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "V02",
+          "title": "Negotiate Worker/OffscreenCanvas/browser capabilities with tested fallback and cleanup ownership for ImageBitmap/VideoFrame/audio/URLs/resources on cancel/remount/dispose.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "V03",
+          "title": "Benchmark named static/interactive/media workloads and ratify device/host-specific latency/frame-time/memory/cache/bundle/export budgets before performance acceptance.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "V04",
+          "title": "Add content-addressed caches, bounded image/font/decode caches, incremental compilation and streaming/backpressure; measure cache behavior and prohibit unbounded frame retention.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "V05",
+          "title": "Run repeated edit/resize/play/render/cancel/close soak tests plus hidden-tab/offline/low-memory scenarios; profile long tasks/leaks and preserve final updates.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "W",
+      "title": "Testing, parity and acceptance evidence",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A",
+        "B",
+        "C"
+      ],
+      "deliverable": "Workspace-owned CI proving complete user-to-runtime flows.",
+      "acceptance": "Mandatory capability rows have executable evidence; mocks, inventory counts or green comments do not substitute for real output.",
+      "tasks": [
+        {
+          "id": "W01",
+          "title": "Implement schema/transaction/property/contract suites for compilers, graph order/types, keyframes, migrations, history, quotas and state machines.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "W02",
+          "title": "Differentially execute visual/graph compilation and generated public-v6 programs; compare browser/Node semantics using explicit font/codec/image/numeric tolerances.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "W03",
+          "title": "Automate Chromium/Firefox/WebKit core flows, completed downloads, visual regressions/accessibility; supplement with manual keyboard/screen-reader and real touch/device checks.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "W04",
+          "title": "Test real API origin/validation/size/rate/admission, sandbox execution, malformed imports, timeout/cancel/retry races, persistence faults and cleanup under concurrent load.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "W05",
+          "title": "Add inventory-drift/import-boundary/bundle-purity/full-root-build/domain-regression/performance/release-evidence gates with exact commands, fixtures, SHAs, environments and artifacts.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "X",
+      "title": "Diagnostics, documentation and maintenance",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A",
+        "B",
+        "S"
+      ],
+      "deliverable": "Actionable errors, privacy-conscious observability and reliable help/runbooks.",
+      "acceptance": "Users can recover failures and maintainers can trace jobs without exposing private source/media/secrets.",
+      "tasks": [
+        {
+          "id": "X01",
+          "title": "Standardize stable error codes with source/node/layer/job IDs, validation/capability/execution/infrastructure classification, user context and recovery/retry guidance.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "X02",
+          "title": "Add redacted metrics/traces for admission, queue, render, resource limits, cancel/timeout, asset decode, persistence and export failures; do not log private content by default.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "X03",
+          "title": "Publish accurate feature help, shortcuts, synchronization boundaries, local storage/backups, export/runtime requirements and declared backend differences.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "X04",
+          "title": "Provide contributor ownership maps, adapter contracts, architecture ADRs, pin-upgrade/drift procedures, dependency/license inventory and migration/deprecation policy.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "X05",
+          "title": "Keep deterministic diagnostics and optional future intelligence/AI separate from rendering; require explicit capability/privacy decisions for provider integration or data egress.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "Y",
+      "title": "Full-app integration, deployment and operations",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A",
+        "B",
+        "U"
+      ],
+      "deliverable": "Reproducible hosted integration with monitoring and rollback.",
+      "acceptance": "The actual target deployment runs representative jobs under measured host limits and can recover/roll back.",
+      "tasks": [
+        {
+          "id": "Y01",
+          "title": "Test the real app root layout/providers/global CSS/cursor/middleware/headers/routing, direct /workspace entry and other affected routes; do not rely on an isolated fixture.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Y02",
+          "title": "Verify native/module/artwork/font/binary tracing, architecture/libc, compressed payload size, cold start, Node compatibility and CPU/memory/timeout/temp-disk limits.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Y03",
+          "title": "Separate preview/staging/production config; establish secrets/CSP/runtime and binary integrity plus approved isolated-code/media infrastructure without credentials in generated programs.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Y04",
+          "title": "Add capability/readiness probes, deploy-time real smoke jobs, monitors/alerts, retention/orphan cleanup, cost ceilings and tested rollback/recovery procedures.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Y05",
+          "title": "Run deployed create/edit/sync/graph/render/media/download/save/reopen and cross-origin failure flows; record exact source/runtime/deployment identities, URLs and supported devices/browsers.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "id": "Z",
+      "title": "Release acceptance, priority and future handoff",
+      "priority": "P0",
+      "status": "NOT_STARTED",
+      "dependsOn": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "T",
+        "U",
+        "V",
+        "W",
+        "X",
+        "Y"
+      ],
+      "deliverable": "Reviewed production acceptance and maintainable release ownership.",
+      "acceptance": "Every mandatory gate passes on the exact promoted candidate, with no unresolved security/data-loss/release-blocking defect.",
+      "tasks": [
+        {
+          "id": "Z01",
+          "title": "Reconcile every task/capability against intended production scope. Fix current v6 gaps or explicitly revise claims; mandatory partial/experimental rows cannot be counted FULL.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Z02",
+          "title": "Run all release gates on the exact candidate: full-app, parity, UI/browser/download, accessibility, security/isolation, performance/load/soak, deployed jobs and rollback.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Z03",
+          "title": "Publish an immutable release report with source/runtime/native identities, environments, evidence/artifacts, approved differences, residual risks and operational owners.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Z04",
+          "title": "Promote only the accepted candidate, run post-release smoke, observe error/cost/performance budgets and rehearse rollback using a preserved previous release.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        },
+        {
+          "id": "Z05",
+          "title": "Transfer maintenance ownership and track future-engine follow-ups with exact capability/version prerequisites. Keep the P0 program open until production acceptance is recorded.",
+          "status": "NOT_STARTED",
+          "owner": null,
+          "evidence": [],
+          "blockers": []
+        }
+      ]
+    }
+  ],
+  "releaseGates": [
+    {
+      "id": "G00",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G01",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G02",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G03",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G04",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G05",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G06",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G07",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G08",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G09",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G10",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G11",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G12",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    },
+    {
+      "id": "G13",
+      "status": "NOT_RUN",
+      "mandatory": true,
+      "evidence": []
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "purpose": "Provenance of owner-supplied planning inputs; future-engine targets are not claims of current runtime support.",
+  "inputs": [
+    {
+      "filename": "10_MASTER_EXECUTION_PROMPT_PHASES_15_43.md",
+      "sha256": "b95a4690db397ab020032304dbff76316e42c4ce1d555778941983315997e405",
+      "uploadedFilename": "10_MASTER_EXECUTION_PROMPT_PHASES_15_43.md"
+    },
+    {
+      "filename": "13_BROWSER_REALTIME_RENDERER_SPEC.md",
+      "sha256": "a951b0121f79ba179e216d17fd58d4139b942d3dfe66fc1dcb44a90d42948d1d",
+      "uploadedFilename": "13_BROWSER_REALTIME_RENDERER_SPEC.md"
+    },
+    {
+      "filename": "02_PHASES_20_25_WEB_REALTIME_ANIMATION.md",
+      "sha256": "635de0692b3447abd20a9af8ca6eeff256de63872f62c0233cb75f628e5552a6",
+      "uploadedFilename": "02_PHASES_20_25_WEB_REALTIME_ANIMATION.md"
+    },
+    {
+      "filename": "04_PHASES_32_36_PERFORMANCE_NATIVE_EXTENSIBILITY.md",
+      "sha256": "7fac6eeba69089a6735858e6fa2c3c3fae0ede47242ef80b9579a2d92a4b6a53",
+      "uploadedFilename": "04_PHASES_32_36_PERFORMANCE_NATIVE_EXTENSIBILITY.md"
+    },
+    {
+      "filename": "08_FEATURE_COMPLETENESS_MATRIX.md",
+      "sha256": "6da51a9de6c4ac657d12d7f7534383d1755e6fe1774a1d0cd21191982bb5d01f",
+      "uploadedFilename": "08_FEATURE_COMPLETENESS_MATRIX.md"
+    },
+    {
+      "filename": "09_MIGRATION_RELEASE_SEQUENCE.md",
+      "sha256": "00fcbf538a43e285c5f8b37f0cc03e99a96d03cfb445afae3b7778ca15e3c3b6",
+      "uploadedFilename": "09_MIGRATION_RELEASE_SEQUENCE.md"
+    },
+    {
+      "filename": "14_APEX_INTELLIGENCE_AND_AI_SPEC.md",
+      "sha256": "115f508aab843006ba26175b42d4074623dad232b1b1d2dbea2445ecff5740bf",
+      "uploadedFilename": "14_APEX_INTELLIGENCE_AND_AI_SPEC.md"
+    },
+    {
+      "filename": "00_MASTER_PLAN_AND_EXECUTION_ORDER.md",
+      "sha256": "ef0cbc245939a4a0aef98edf8b25ed88a92675d0bb6f0b5d69268297a0466fb8",
+      "uploadedFilename": "00_MASTER_PLAN_AND_EXECUTION_ORDER.md"
+    },
+    {
+      "filename": "03_PHASES_26_31_RENDERING_DEPTH.md",
+      "sha256": "6a07712d4babb3f7f617db9e89bdedd0b6a28b96686b2bdcc0ec59a80766df3e",
+      "uploadedFilename": "03_PHASES_26_31_RENDERING_DEPTH.md"
+    },
+    {
+      "filename": "12_PACKAGE_AND_PURITY_ARCHITECTURE_SPEC.md",
+      "sha256": "5734dce2d49b27a75277c5a6380e4385d87e9fb33e98c95bf82613184c77f9b5",
+      "uploadedFilename": "12_PACKAGE_AND_PURITY_ARCHITECTURE_SPEC.md"
+    },
+    {
+      "filename": "01_PHASES_15_19_FOUNDATION.md",
+      "sha256": "92dc4fa0a078f2d198c495d994a7e81bad46ddb5ae567880878b107367a1cd4a",
+      "uploadedFilename": "01_PHASES_15_19_FOUNDATION.md"
+    },
+    {
+      "filename": "07_ENGINE_CONTRACTS_AND_STANDARDS.md",
+      "sha256": "0c97a904fd96467ae5eadbc803e5062ed386fdab5cd7227c85dc296b82bd60e1",
+      "uploadedFilename": "07_ENGINE_CONTRACTS_AND_STANDARDS.md"
+    },
+    {
+      "filename": "11_ANIMATION_AND_INTERACTION_SYSTEM_SPEC.md",
+      "sha256": "d167ec24f4213bed0cb57f1019fbd9d46e27cfa1e6a7aa1668b48c8be940f12e",
+      "uploadedFilename": "11_ANIMATION_AND_INTERACTION_SYSTEM_SPEC.md"
+    },
+    {
+      "filename": "05_PHASES_37_40_INTELLIGENCE_DEVTOOLS.md",
+      "sha256": "25a32580d5dfe4286a6d5da0dfe0dce9b8bdb5f23b3e00db7de9570074929360",
+      "uploadedFilename": "05_PHASES_37_40_INTELLIGENCE_DEVTOOLS.md"
+    },
+    {
+      "filename": "APEXIFY_ADVANCED_ENGINE_MASTER_PLAN_PHASES_15_43.md",
+      "sha256": "93d148b0b24e964e7adbfe45b31743ec314b9d06151daea5e1e67aea5a6dee0e",
+      "uploadedFilename": "APEXIFY_ADVANCED_ENGINE_MASTER_PLAN_PHASES_15_43.md"
+    },
+    {
+      "filename": "06_PHASES_41_43_DISTRIBUTED_RELIABILITY_FINAL.md",
+      "sha256": "3e6d954ab161a1d874b2f6b2c15cb369d013466dd308ee8d5c11075ca7c10e4b",
+      "uploadedFilename": "06_PHASES_41_43_DISTRIBUTED_RELIABILITY_FINAL.md"
+    },
+    {
+      "filename": "APEXIFY_STUDIO_DEEP_RUNTIME_PARITY_MASTER_PLAN-1-.md",
+      "sha256": "4d2cff8ed1b0e46c695b36fd8a07ec9ec7bca8e814eb5ba1ac08cf5af5a88bb6",
+      "uploadedFilename": "APEXIFY_STUDIO_DEEP_RUNTIME_PARITY_MASTER_PLAN (1).md"
+    }
+  ]
+}

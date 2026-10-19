@@ -1,5 +1,7 @@
 # Independent Apexify workspace
 
+> **P0 production program:** the foundation is merged; production completion remains open. Follow the [A–Z master plan](../../docs/workspace/PRODUCTION_MASTER_PLAN.md), [capability matrix](../../docs/workspace/CAPABILITY_MATRIX.md) and [release gates](../../docs/workspace/RELEASE_GATES.md).
+
 The new App Router page is `/workspace`. Its files live in `app/workspace`, `app/api/workspace`, `features/apex-workspace`, and `public/workspace`. It imports no Studio components, state, styles, routes, execution adapters, or `@apexify/web` package. It has no authentication, profile, dashboard, or account requirement.
 
 ## Current behavior
@@ -42,3 +44,4 @@ An isolated Next 14 production fixture containing these exact new routes/compone
 Browser checks covered rendering, canonical code edits, visual-to-code updates, unsupported code rejection, panel close/reopen, all-panels-closed recovery, keyboard resizing, terminal commands, and a completed 1280×720 PNG download. Source download completion could not be verified in the cloud browser. A 390×844 iframe CSS viewport verified responsive panel switching and mobile accessible labels; physical mobile testing is pending.
 
 See the workspace entry in the root `design-qa.md` and `docs/design/workspace` for reference comparisons and browser evidence. Generated crystal artwork and the transparent header mark are implementation assets inspired by the supplied image.
+
