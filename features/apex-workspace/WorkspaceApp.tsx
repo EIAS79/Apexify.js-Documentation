@@ -53,6 +53,7 @@ import {
   type RenderJob,
   type LogEntry,
 } from "./components/Results";
+import { BrandBanner, BrandIcon } from "../../components/Brand";
 import "./workspace.css";
 
 let idCounter = 0;
@@ -846,10 +847,10 @@ export default function WorkspaceApp() {
       aria-label="Apexify creative workspace"
     >
       <header className="aw-topbar">
-        <a className="aw-brand" href="/" aria-label="Apexify home">
-          <img src="/workspace/assets/apex-mark.webp" alt="" />
-          <span>
-            Apexify<span className="aw-brand-js">.js</span>
+        <a className="aw-brand" href="/" aria-label="Apexify.js home">
+          <BrandBanner className="aw-brand-lockup" maxWidth={150} />
+          <span className="aw-brand-icon">
+            <BrandIcon />
           </span>
         </a>
         <nav className="aw-topnav" aria-label="Main navigation">
@@ -977,7 +978,7 @@ export default function WorkspaceApp() {
           />
         ) : (
           <div className="aw-empty-workspace">
-            <CubeTransparentIcon />
+            <BrandIcon size={48} />
             <h1>Your space. Your workflow.</h1>
             <p>Open a panel to keep creating.</p>
             <button className="aw-button aw-primary" onClick={resetLayout}>

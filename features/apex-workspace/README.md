@@ -4,6 +4,10 @@
 
 The new App Router page is `/workspace`. Its files live in `app/workspace`, `app/api/workspace`, `features/apex-workspace`, and `public/workspace`. It imports no Studio components, state, styles, routes, execution adapters, or `@apexify/web` package. It has no authentication, profile, dashboard, or account requirement.
 
+## Branding
+
+Workspace chrome uses the Frame homepage and gallery palette: charcoal surfaces, off-white text, lime accents, and lilac secondary controls. It reuses `components/Brand.tsx` for the exact canonical wordmark on desktop, icon on compact screens and in the empty workspace, and inherits the site favicon. UI colors are scoped CSS tokens; document artwork and authored colors remain independent.
+
 ## Current behavior
 
 - Nine independent panels: tools, visual canvas, properties, code, graph, terminal, render queue, preview, and output/export. Close, reopen, maximize, reset, and resize them. Hidden branches disappear from the split tree and adjacent windows reclaim the space. The header can restore panels even when every panel is closed.
@@ -43,5 +47,5 @@ An isolated Next 14 production fixture containing these exact new routes/compone
 
 Browser checks covered rendering, canonical code edits, visual-to-code updates, unsupported code rejection, panel close/reopen, all-panels-closed recovery, keyboard resizing, terminal commands, and a completed 1280×720 PNG download. Source download completion could not be verified in the cloud browser. A 390×844 iframe CSS viewport verified responsive panel switching and mobile accessible labels; physical mobile testing is pending.
 
-See the workspace entry in the root `design-qa.md` and `docs/design/workspace` for reference comparisons and browser evidence. Generated crystal artwork and the transparent header mark are implementation assets inspired by the supplied image.
+See the workspace entry in the root `design-qa.md` and `docs/design/workspace` for reference comparisons and browser evidence. Generated crystal artwork is an implementation asset inspired by the supplied image. The header now uses the canonical site branding.
 

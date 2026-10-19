@@ -57,23 +57,28 @@ export default function Graph({
       ctx.bezierCurveTo(x1 + 45, y1, x2 - 45, y2, x2, y2);
       ctx.stroke();
     };
+    const theme = getComputedStyle(canvas.current!);
+    const edge = theme.getPropertyValue("--aw-muted").trim();
+    const hiddenEdge = theme.getPropertyValue("--aw-line").trim();
+    const compositeEdge = theme.getPropertyValue("--aw-lilac").trim();
+    const outputEdge = theme.getPropertyValue("--aw-accent").trim();
     document.layers.forEach((l, i) => {
       link(
         115,
         height / 2,
         170,
         i * 64 + 54,
-        l.visible ? "#7eacd1" : "#27374b",
+        l.visible ? edge : hiddenEdge,
       );
       link(
         300,
         i * 64 + 54,
         368,
         height / 2,
-        l.visible ? "#8ed7ca" : "#27374b",
+        l.visible ? compositeEdge : hiddenEdge,
       );
     });
-    link(468, height / 2, 522, height / 2, "#55ffbf");
+    link(468, height / 2, 522, height / 2, outputEdge);
   }, [document.layers, height]);
   return (
     <div className="aw-graph">
