@@ -1,169 +1,118 @@
+import { createHash } from 'node:crypto';
 import {
-  createReadStream,
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  rmSync,
+  chmodSync, closeSync, createReadStream, createWriteStream, existsSync,
+  mkdirSync, mkdtempSync, openSync, readFileSync, readSync, renameSync, rmSync, writeFileSync,
 } from 'node:fs';
-import { get } from 'node:https';
 import { arch, platform } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { createGzip } from 'node:zlib';
 import { pipeline } from 'node:stream/promises';
+import { downloadVerified } from './download-runtime.mjs';
 
-const here = dirname(fileURLToPath(import.meta.url));
-const root = resolve(here, '..', '..');
-const vendor = join(root, 'vendor', 'studio-ffmpeg');
-const executableSuffix = platform() === 'win32' ? '.exe' : '';
-const ffmpeg = join(vendor, 'ffmpeg' + executableSuffix);
-const ffprobe = join(vendor, 'ffprobe' + executableSuffix);
-const ffmpegGzip = ffmpeg + '.gz';
-const ffprobeGzip = ffprobe + '.gz';
+export const runtime = JSON.parse(readFileSync(new URL('./ffmpeg-runtime.json', import.meta.url), 'utf8'));
+const components = ['ffmpeg', 'ffprobe'];
 
-if (
-  (existsSync(ffmpegGzip) && existsSync(ffprobeGzip)) ||
-  (existsSync(ffmpeg) && existsSync(ffprobe))
-) process.exit(0);
-
-const systemPairAvailable = [
-  ['/usr/bin/ffmpeg', '/usr/bin/ffprobe'],
-  ['/usr/local/bin/ffmpeg', '/usr/local/bin/ffprobe'],
-].some(([ffmpegPath, ffprobePath]) => existsSync(ffmpegPath) && existsSync(ffprobePath));
-
-if (process.env.CI === 'true' && process.env.VERCEL !== '1' && systemPairAvailable) {
-  console.log('[studio] using system FFmpeg pair for CI Studio verification');
-  process.exit(0);
+async function digest(path) {
+  const hash = createHash('sha256');
+  for await (const chunk of createReadStream(path)) hash.update(chunk);
+  return hash.digest('hex');
 }
 
-if (platform() !== 'linux' || !['x64', 'arm64'].includes(arch())) {
-  console.log('[studio] bundled FFmpeg is installed only for Linux x64/arm64 builds; system FFmpeg may still be used locally.');
-  process.exit(0);
+export function verifyElf(path, architecture) {
+  const fd = openSync(path, 'r');
+  const header = Buffer.alloc(20);
+  try {
+    if (readSync(fd, header, 0, header.length, 0) !== header.length ||
+        header.subarray(0, 4).toString('hex') !== '7f454c46' ||
+        header[4] !== 2 || header[5] !== 1 ||
+        header.readUInt16LE(18) !== ({ x64: 62, arm64: 183 })[architecture]) {
+      throw new Error(`FFmpeg runtime is not a Linux ${architecture} ELF executable.`);
+    }
+  } finally { closeSync(fd); }
 }
 
-const release = '6.0.1';
-const target = arch() === 'arm64' ? 'arm64' : 'amd64';
-const archiveName = `ffmpeg-${release}-${target}-static.tar.xz`;
-const url = `https://johnvansickle.com/ffmpeg/old-releases/${archiveName}`;
-const archive = join(vendor, archiveName);
-const decompressedArchive = archive.replace(/\.xz$/, '');
-const extractDir = join(vendor, 'extract');
+async function cachedPairValid(vendor, architecture) {
+  try {
+    const installed = JSON.parse(readFileSync(join(vendor, 'runtime.json'), 'utf8'));
+    if (installed.version !== runtime.version || installed.architecture !== architecture) return false;
+    for (const name of components) {
+      if (installed[name]?.archiveSha256 !== runtime.targets[architecture][name].sha256 ||
+          installed[name]?.gzipSha256 !== await digest(join(vendor, name + '.gz'))) return false;
+    }
+    // Raw binaries take precedence at runtime; they must not bypass the verified pair.
+    return components.every((name) => !existsSync(join(vendor, name)));
+  } catch { return false; }
+}
 
-mkdirSync(vendor, { recursive: true });
-rmSync(extractDir, { recursive: true, force: true });
-mkdirSync(extractDir, { recursive: true });
-
-function download(source, destination, redirects = 0) {
-  return new Promise((resolvePromise, reject) => {
-    const request = get(source, { headers: { 'User-Agent': 'Apexify-Studio-Build' } }, (response) => {
-      if (
-        response.statusCode &&
-        [301, 302, 303, 307, 308].includes(response.statusCode) &&
-        response.headers.location
-      ) {
-        response.resume();
-        if (redirects >= 5) {
-          reject(new Error('FFmpeg download redirect limit exceeded.'));
-          return;
+/** Stage and validate both executables before replacing the deployable directory. */
+export async function installFFmpeg({ vendor, architecture = arch(), download = downloadVerified }) {
+  if (!runtime.targets[architecture]) throw new Error(`Unsupported FFmpeg architecture: ${architecture}`);
+  if (await cachedPairValid(vendor, architecture)) {
+    console.log(`[studio] verified cached FFmpeg ${runtime.version} (${architecture})`);
+    return;
+  }
+  mkdirSync(dirname(vendor), { recursive: true });
+  const stage = mkdtempSync(join(dirname(vendor), '.studio-ffmpeg-'));
+  const installed = { version: runtime.version, architecture };
+  try {
+    for (const name of components) {
+      const artifact = runtime.targets[architecture][name];
+      const archive = join(stage, name + '.zip');
+      const binary = join(stage, name);
+      await download(artifact, archive);
+      const fd = openSync(binary, 'w', 0o700);
+      let extracted;
+      try {
+        // Extract only the expected entry, never archive-controlled filesystem paths.
+        extracted = spawnSync('unzip', ['-p', archive, name], {
+          stdio: ['ignore', fd, 'pipe'], timeout: 30_000, maxBuffer: 1024 * 1024,
+        });
+      } finally { closeSync(fd); }
+      if (extracted.status !== 0) throw new Error(`Could not extract ${name}: ${extracted.error?.message || extracted.stderr}`);
+      verifyElf(binary, architecture);
+      chmodSync(binary, 0o755);
+      if (architecture === arch()) {
+        const check = spawnSync(binary, ['-version'], { encoding: 'utf8', timeout: 10_000 });
+        if (check.status !== 0 || !check.stdout?.startsWith(`${name} version ${runtime.version}-static `)) {
+          throw new Error(`Downloaded ${name} failed its version/execution check.`);
         }
-        download(new URL(response.headers.location, source).toString(), destination, redirects + 1)
-          .then(resolvePromise, reject);
-        return;
       }
+      const compressed = binary + '.gz';
+      await pipeline(createReadStream(binary), createGzip({ level: 9 }), createWriteStream(compressed, { mode: 0o600 }));
+      installed[name] = { archiveSha256: artifact.sha256, gzipSha256: await digest(compressed) };
+      rmSync(archive);
+      rmSync(binary);
+    }
+    writeFileSync(join(stage, 'runtime.json'), JSON.stringify(installed, null, 2) + '\n', { mode: 0o600 });
+    rmSync(vendor, { recursive: true, force: true });
+    renameSync(stage, vendor);
+    console.log(`[studio] installed verified compressed FFmpeg ${runtime.version} (${architecture})`);
+  } finally {
+    rmSync(stage, { recursive: true, force: true });
+  }
+}
 
-      if (response.statusCode !== 200) {
-        response.resume();
-        reject(new Error(`FFmpeg download failed with HTTP ${response.statusCode}`));
-        return;
-      }
+async function main() {
+  if (platform() !== 'linux' || !runtime.targets[arch()]) {
+    console.log('[studio] bundled FFmpeg is installed only for Linux x64/arm64 builds; system FFmpeg may still be used locally.');
+    return;
+  }
+  const systemPairAvailable = ['/usr/bin', '/usr/local/bin'].some((directory) =>
+    components.every((name) => existsSync(join(directory, name))));
+  if (process.env.CI === 'true' && process.env.VERCEL !== '1' && systemPairAvailable) {
+    console.log('[studio] using system FFmpeg pair for CI Studio verification');
+    return;
+  }
+  const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
+  console.log(`[studio] installing pinned FFmpeg ${runtime.version} (${arch()}) from GitHub release assets`);
+  await installFFmpeg({ vendor: join(root, 'vendor', 'studio-ffmpeg') });
+}
 
-      const chunks = [];
-      response.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
-      response.on('end', async () => {
-        try {
-          const { writeFile } = await import('node:fs/promises');
-          await writeFile(destination, Buffer.concat(chunks));
-          resolvePromise();
-        } catch (error) {
-          reject(error);
-        }
-      });
-      response.on('error', reject);
-    });
-    request.on('error', reject);
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error('[studio] failed to install the Studio FFmpeg runtime:', error.message);
+    process.exitCode = 1;
   });
-}
-
-function extractArchive() {
-  const direct = spawnSync('tar', ['-xJf', archive, '-C', extractDir], { stdio: 'inherit' });
-  if (direct.status === 0) return;
-
-  // Some CI images ship tar without built-in XZ support. Fall back to the
-  // standalone xz utility, then extract the plain tar archive.
-  rmSync(decompressedArchive, { force: true });
-  const xz = spawnSync('xz', ['-dkf', archive], { stdio: 'inherit' });
-  if (xz.status !== 0 || !existsSync(decompressedArchive)) {
-    throw new Error(
-      'Could not decompress the FFmpeg archive. The build image must provide tar -J support or the xz utility.',
-    );
-  }
-
-  const fallback = spawnSync('tar', ['-xf', decompressedArchive, '-C', extractDir], { stdio: 'inherit' });
-  if (fallback.status !== 0) {
-    throw new Error('Could not extract the decompressed FFmpeg tar archive.');
-  }
-}
-
-async function compressBinary(source, destination) {
-  await pipeline(
-    createReadStream(source),
-    createGzip({ level: 9 }),
-    createWriteStream(destination, { mode: 0o600 }),
-  );
-}
-
-console.log(`[studio] installing pinned FFmpeg ${release} (${target}) for Studio video`);
-
-try {
-  await download(url, archive);
-  extractArchive();
-
-  const folder = readdirSync(extractDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => join(extractDir, entry.name))
-    .find(
-      (candidate) =>
-        existsSync(join(candidate, 'ffmpeg')) &&
-        existsSync(join(candidate, 'ffprobe')),
-    );
-
-  if (!folder) throw new Error('FFmpeg archive did not contain ffmpeg/ffprobe.');
-
-  rmSync(ffmpeg, { force: true });
-  rmSync(ffprobe, { force: true });
-  rmSync(ffmpegGzip, { force: true });
-  rmSync(ffprobeGzip, { force: true });
-
-  await compressBinary(join(folder, 'ffmpeg'), ffmpegGzip);
-  await compressBinary(join(folder, 'ffprobe'), ffprobeGzip);
-
-  rmSync(archive, { force: true });
-  rmSync(decompressedArchive, { force: true });
-  rmSync(extractDir, { recursive: true, force: true });
-  console.log('[studio] installed compressed Studio FFmpeg:', ffmpegGzip);
-} catch (error) {
-  rmSync(archive, { force: true });
-  rmSync(decompressedArchive, { force: true });
-  rmSync(extractDir, { recursive: true, force: true });
-  rmSync(ffmpeg, { force: true });
-  rmSync(ffprobe, { force: true });
-  rmSync(ffmpegGzip, { force: true });
-  rmSync(ffprobeGzip, { force: true });
-  console.error(
-    '[studio] failed to install the Studio FFmpeg runtime:',
-    error instanceof Error ? error.message : String(error),
-  );
-  process.exitCode = 1;
 }

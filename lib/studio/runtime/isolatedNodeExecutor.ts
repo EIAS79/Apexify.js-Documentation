@@ -1,3 +1,4 @@
+import ffmpegRuntime from '../../../scripts/studio/ffmpeg-runtime.json';
 import { randomUUID } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import {
@@ -227,7 +228,7 @@ function mediaBinaryPair(): { ffmpeg: string; ffprobe: string } | null {
   }
 
   if (existsSync(rawFfmpeg + '.gz') && existsSync(rawFfprobe + '.gz')) {
-    const cache = join(runtimeCacheRoot(), 'ffmpeg-6.0.1-' + process.arch);
+    const cache = join(runtimeCacheRoot(), 'ffmpeg-' + ffmpegRuntime.version + '-' + process.arch);
     return {
       ffmpeg: hydrateCompressedBinary(rawFfmpeg + '.gz', join(cache, 'ffmpeg' + suffix)),
       ffprobe: hydrateCompressedBinary(rawFfprobe + '.gz', join(cache, 'ffprobe' + suffix)),
