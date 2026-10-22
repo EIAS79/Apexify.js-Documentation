@@ -1,0 +1,724 @@
+{
+  "snapshot": "cbeea053c2a973d4e867f8ca96e79546060dd62d",
+  "document_count": 35,
+  "documents": [
+    {
+      "path": "01_createCanvas.md",
+      "api": "ApexPainter.createCanvas(config, painterOpts?)",
+      "source_files": [
+        "lib-next/apex-painter/main.ts",
+        "lib-next/apex-painter/creates/canvas-create.ts",
+        "lib-next/canvas/canvas-creator.ts",
+        "lib-next/canvas/canvas-validation.ts",
+        "lib-next/types/canvas.ts",
+        "lib-next/types/common.ts",
+        "lib-next/types/pattern.ts",
+        "lib-next/types/gradient.ts"
+      ],
+      "type_sections": [
+        "CanvasConfig",
+        "CanvasImageBackgroundOptions",
+        "CanvasCustomBackground",
+        "CanvasVideoBackground",
+        "BackgroundLayer variants",
+        "CanvasResults",
+        "PainterAssetRefsOptions"
+      ]
+    },
+    {
+      "path": "02_createImage.md",
+      "api": "ApexPainter.createImage(images, canvasBuffer, options?, painterOpts?)",
+      "source_files": [
+        "lib-next/apex-painter/main.ts",
+        "lib-next/apex-painter/creates/image-text-create.ts",
+        "lib-next/image/image-creator.ts",
+        "lib-next/image/image-validation.ts",
+        "lib-next/image/image-raster-pipeline.ts",
+        "lib-next/image/image-warp.ts",
+        "lib-next/types/image.ts",
+        "lib-next/types/common.ts"
+      ],
+      "type_sections": [
+        "ImageProperties",
+        "ShapeType",
+        "ShapeProperties",
+        "ImageFilter",
+        "ImageDistortionOptions",
+        "ImageInterpolationMode",
+        "ImageEdgeMode",
+        "ImageWarpFalloff",
+        "ImageWarpControlPoint",
+        "ImageMeshWarpOptions",
+        "GroupTransformOptions",
+        "CreateImageOptions",
+        "PainterAssetRefsOptions"
+      ]
+    },
+    {
+      "path": "03_shared_styles_gradients_patterns.md",
+      "api": "CanvasConfig / ImageProperties / TextProperties shared types",
+      "source_files": [
+        "lib-next/types/common.ts",
+        "lib-next/types/gradient.ts",
+        "lib-next/types/pattern.ts",
+        "lib-next/render/gradient-fill.ts",
+        "lib-next/canvas/pattern-renderer.ts"
+      ],
+      "type_sections": [
+        "OutputFormat",
+        "FitMode",
+        "AlignMode",
+        "borderPosition",
+        "StrokeOptions",
+        "ShadowOptions",
+        "BoxBackground",
+        "gradient (linear)",
+        "gradient (radial)",
+        "gradient (conic)",
+        "GradientStop",
+        "PatternOptions",
+        "GradientConfig",
+        "RenderPatternStackOptions"
+      ]
+    },
+    {
+      "path": "04_createText.md",
+      "api": "ApexPainter.createText(text, canvasBuffer, options?, painterOpts?) / measureText(text)",
+      "source_files": [
+        "lib-next/types/text.ts",
+        "lib-next/apex-painter/main.ts",
+        "lib-next/text/text-creator.ts",
+        "lib-next/text/text-style.ts",
+        "lib-next/text/text-layout.ts",
+        "lib-next/text/enhanced-text-renderer.ts",
+        "lib-next/text/text-curved.ts",
+        "lib-next/text/text-validation.ts"
+      ],
+      "type_sections": [
+        "TextProperties",
+        "font nested",
+        "TextDecorations",
+        "TextLineDecoration",
+        "TextEffects",
+        "TextHighlightStyle",
+        "TextGlowStyle",
+        "TextShadowStyle",
+        "TextStrokeStyle",
+        "TextLayout",
+        "TextPlacement",
+        "TextPerspectiveOptions",
+        "TextFill",
+        "TextCurveConfig",
+        "TextGroupTransformOptions",
+        "CreateTextOptions",
+        "TextFontWeight",
+        "TextFontStyle",
+        "TextAlignMode",
+        "TextBaselineMode",
+        "CurvedTextLayoutMode",
+        "CircularArcLayoutOptions",
+        "GlyphArcPlacement",
+        "TextObject (deprecated)",
+        "TextMetrics"
+      ]
+    },
+    {
+      "path": "05_chart_shared.md",
+      "api": "painter.createChart / createComparisonChart / createComboChart",
+      "source_files": [
+        "lib-next/types/chart-common.ts",
+        "lib-next/types/chart-pie.ts",
+        "lib-next/chart/chart-creator.ts",
+        "lib-next/chart/chart-validation.ts"
+      ],
+      "type_sections": [
+        "ChartType",
+        "ChartAppearanceExtended",
+        "EnhancedTextStyle",
+        "LegendEntry",
+        "LegendPlacement",
+        "StandardLegendConfig",
+        "ConnectedLegendConfig",
+        "ChartDimensions common pattern"
+      ]
+    },
+    {
+      "path": "06_chart_pie_donut.md",
+      "api": "painter.createChart(\"pie\", slices, options?)",
+      "source_files": [
+        "lib-next/types/chart-pie.ts",
+        "lib-next/chart/impl/piechart.ts",
+        "lib-next/chart/chart-creator.ts"
+      ],
+      "type_sections": [
+        "PieSlice",
+        "PieChartOptions"
+      ]
+    },
+    {
+      "path": "07_chart_bar.md",
+      "api": "painter.createChart(\"bar\", data, options?)",
+      "source_files": [
+        "lib-next/chart/impl/barchart.ts",
+        "lib-next/chart/chart-creator.ts",
+        "lib-next/chart/chart-validation.ts"
+      ],
+      "type_sections": [
+        "BarChartType",
+        "BarChartData",
+        "BarSegment",
+        "AxisConfig",
+        "BarChartOptions",
+        "Legend (BarChartOptions.legend)"
+      ]
+    },
+    {
+      "path": "08_chart_horizontal_bar.md",
+      "api": "painter.createChart(\"horizontalBar\", data, options?)",
+      "source_files": [
+        "lib-next/chart/impl/horizontalbarchart.ts",
+        "lib-next/chart/chart-creator.ts"
+      ],
+      "type_sections": [
+        "HorizontalBarChartType",
+        "HorizontalBarSegment",
+        "HorizontalBarChartData",
+        "HorizontalAxisConfig",
+        "HorizontalBarChartOptions",
+        "Legend (HorizontalBarChartOptions.legend)"
+      ]
+    },
+    {
+      "path": "09_chart_line.md",
+      "api": "painter.createChart(\"line\", series, options?)",
+      "source_files": [
+        "lib-next/chart/impl/linechart.ts",
+        "lib-next/chart/chart-creator.ts"
+      ],
+      "type_sections": [
+        "LineStyle",
+        "MarkerType",
+        "LineDataPoint",
+        "ErrorBarConfig",
+        "AreaConfig",
+        "LineSeries",
+        "AxisConfig",
+        "LineChartOptions",
+        "Legend (LineChartOptions.legend)"
+      ]
+    },
+    {
+      "path": "10_chart_scatter.md",
+      "api": "painter.createChart(\"scatter\", series, options?)",
+      "source_files": [
+        "lib-next/chart/impl/scatterchart.ts",
+        "lib-next/chart/chart-creator.ts",
+        "lib-next/chart/impl/linechart.ts"
+      ],
+      "type_sections": [
+        "ScatterPoint",
+        "ScatterMarkerType",
+        "ScatterSeries",
+        "ScatterCorrelationConfig",
+        "ScatterChartOptions",
+        "Legend (ScatterChartOptions.legend)",
+        "AxisConfig (imported line chart)"
+      ]
+    },
+    {
+      "path": "11_chart_radar.md",
+      "api": "painter.createChart(\"radar\", series, options?)",
+      "source_files": [
+        "lib-next/chart/impl/radarchart.ts",
+        "lib-next/chart/chart-creator.ts"
+      ],
+      "type_sections": [
+        "RadarSeries",
+        "RadarChartOptions",
+        "Legend (RadarChartOptions.legend)"
+      ]
+    },
+    {
+      "path": "12_chart_polar_area.md",
+      "api": "painter.createChart(\"polarArea\", slices, options?)",
+      "source_files": [
+        "lib-next/chart/impl/polarareachart.ts",
+        "lib-next/chart/chart-creator.ts"
+      ],
+      "type_sections": [
+        "PolarAreaSlice",
+        "PolarAreaChartOptions",
+        "Legend (PolarAreaChartOptions.legend)"
+      ]
+    },
+    {
+      "path": "13_chart_combo.md",
+      "api": "painter.createComboChart(options, painterOpts?)",
+      "source_files": [
+        "lib-next/chart/impl/combochart.ts",
+        "lib-next/chart/chart-creator.ts"
+      ],
+      "type_sections": [
+        "ComboLineSeries",
+        "ComboChartOpacity",
+        "ComboChartOptions",
+        "Legend (ComboChartOptions.legend)",
+        "Underlying bar and line types"
+      ]
+    },
+    {
+      "path": "14_chart_comparison.md",
+      "api": "painter.createComparisonChart(options, painterOpts?)",
+      "source_files": [
+        "lib-next/chart/impl/comparisonchart.ts",
+        "lib-next/chart/chart-creator.ts"
+      ],
+      "type_sections": [
+        "ComparisonLayout",
+        "ComparisonChartType",
+        "ComparisonChartConfig",
+        "ComparisonChartOptions"
+      ]
+    },
+    {
+      "path": "15_scenes_scene_builder.md",
+      "api": "painter.createScene / renderScene / validateSceneRenderInput / renderSceneToGIF / renderSceneToVideoFrames",
+      "source_files": [
+        "lib-next/types/scene.ts",
+        "lib-next/scene/scene-builder.ts",
+        "lib-next/scene/scene-creator.ts",
+        "lib-next/scene/scene-validation.ts",
+        "lib-next/scene/gif-scene.ts",
+        "lib-next/scene/render-scene-to-video.ts",
+        "lib-next/apex-painter/main.ts"
+      ],
+      "type_sections": [
+        "SceneRenderInput",
+        "SceneLayer image",
+        "SceneLayer text",
+        "SceneLayer path",
+        "SceneLayer imageBuffer",
+        "SceneLayer chart",
+        "SceneLayer chartComparison",
+        "SceneLayer chartCombo",
+        "SceneLayer customLines",
+        "SceneLayer surface",
+        "SceneSurfacePlacement",
+        "SceneRenderOptions",
+        "SceneBuilder public API",
+        "renderSceneToGIF input",
+        "renderSceneToVideoFrames input"
+      ]
+    },
+    {
+      "path": "16_templates.md",
+      "api": "painter.createTemplate(definition, options?)",
+      "source_files": [
+        "lib-next/types/template.ts",
+        "lib-next/template/template-handle.ts",
+        "lib-next/template/resolve-template.ts",
+        "lib-next/template/placeholders.ts",
+        "lib-next/scene/scene-validation.ts"
+      ],
+      "type_sections": [
+        "TemplateData",
+        "TemplateSceneDefinition",
+        "TemplateLayerInput",
+        "TemplateOptions",
+        "TemplateRenderOptions",
+        "TemplateLayerInsertion",
+        "TemplateHandle public API",
+        "TemplateRenderHost",
+        "PlaceholderResolveContext"
+      ]
+    },
+    {
+      "path": "17_components.md",
+      "api": "painter.components.badge/progressBar/avatar/card/watermark.toLayers()",
+      "source_files": [
+        "lib-next/types/components.ts",
+        "lib-next/components/painter-components.ts",
+        "lib-next/components/badge.ts",
+        "lib-next/components/progress-bar.ts",
+        "lib-next/components/avatar.ts",
+        "lib-next/components/card.ts",
+        "lib-next/components/watermark.ts"
+      ],
+      "type_sections": [
+        "BadgeToLayersOptions",
+        "ProgressBarToLayersOptions",
+        "AvatarToLayersOptions",
+        "CardToLayersOptions",
+        "WatermarkToLayersOptions",
+        "Component factory API"
+      ]
+    },
+    {
+      "path": "18_assets_references.md",
+      "api": "painter.assets / painter.prepareForRender(value)",
+      "source_files": [
+        "lib-next/assets/asset-manager.ts",
+        "lib-next/assets/asset-strings.ts",
+        "lib-next/assets/resolve-scene-assets.ts",
+        "lib-next/types/assets.ts",
+        "lib-next/types/painter-resolve.ts",
+        "lib-next/apex-painter/main.ts"
+      ],
+      "type_sections": [
+        "AssetScalar",
+        "AssetValue",
+        "AssetKind",
+        "AssetRegistrationInfo",
+        "PainterAssetRefsOptions",
+        "AssetManager API (read implementation)",
+        "prepareForRender<T>"
+      ]
+    },
+    {
+      "path": "19_createGIF.md",
+      "api": "painter.createGIF(gifFrames?, options, painterOpts?)",
+      "source_files": [
+        "lib-next/types/gif.ts",
+        "lib-next/gif/gif-creator.ts",
+        "lib-next/gif/gif-validation.ts"
+      ],
+      "type_sections": [
+        "GIFOutputFormat",
+        "GIFFrameSource",
+        "GIFDisposalMethod",
+        "GIFInputFrame",
+        "GIFEncodedFrame",
+        "GIFOptions",
+        "GIFWatermarkSpec",
+        "GIFTextOverlaySpec",
+        "GIFAttachment",
+        "GIFResults"
+      ]
+    },
+    {
+      "path": "20_animate.md",
+      "api": "painter.animate(frames, defaultDuration, defaultWidth?, defaultHeight?, options?, painterOpts?)",
+      "source_files": [
+        "lib-next/types/gif.ts",
+        "lib-next/gif/animate-frames.ts",
+        "lib-next/gif/gif-creator.ts"
+      ],
+      "type_sections": [
+        "Frame",
+        "AnimateOptions",
+        "Arguments and returns"
+      ]
+    },
+    {
+      "path": "21_audio_synthesis.md",
+      "api": "painter.createAudio.*",
+      "source_files": [
+        "lib-next/types/audio-synth.ts",
+        "lib-next/types/painter-facets.ts",
+        "lib-next/audio-synth/engine.ts",
+        "lib-next/audio-synth/synthesizer.ts",
+        "lib-next/audio-synth/presets.ts",
+        "lib-next/audio-synth/audio-validation.ts",
+        "lib-next/audio-synth/compose.ts",
+        "lib-next/audio-synth/wav-encode.ts"
+      ],
+      "type_sections": [
+        "PainterCreateAudio methods",
+        "AudioSeed / Waveform / FilterType",
+        "AdsrEnvelope",
+        "VibratoOptions",
+        "TremoloOptions",
+        "FilterOptions",
+        "SynthLayer",
+        "SynthSoundOptions",
+        "SynthLayerOverride",
+        "SynthClipQuality",
+        "SynthPresetOverrides",
+        "SynthSequenceEvent",
+        "SynthSequenceOptions",
+        "SynthComposeClip",
+        "SynthComposeOptions",
+        "SynthMixInput",
+        "SynthMixOptions",
+        "SynthPresetInfo",
+        "SynthPresetName"
+      ]
+    },
+    {
+      "path": "22_video_create_and_operations.md",
+      "api": "painter.createVideo(options) / painter.video.operations / getVideoInfo / extract*",
+      "source_files": [
+        "lib-next/video/video-options.ts",
+        "lib-next/types/video.ts",
+        "lib-next/video/video-stack.ts",
+        "lib-next/video/video-operations.ts",
+        "lib-next/video/video-creator.ts",
+        "lib-next/video/video-validation.ts",
+        "lib-next/video/process-runner.ts"
+      ],
+      "type_sections": [
+        "VideoSource / format / quality / fit",
+        "VideoOperationControls",
+        "VideoCreationOptions core",
+        "VideoGrid (inline option shape)",
+        "MixAudioOverlayClip",
+        "MixAudioOperation",
+        "ExtractFramesOptions",
+        "VideoProbeMetadata",
+        "VideoProbeStream",
+        "Public video helper methods"
+      ]
+    },
+    {
+      "path": "23_video_pipeline.md",
+      "api": "painter.videoPipeline(source?, layers?)",
+      "source_files": [
+        "lib-next/types/video-pipeline.ts",
+        "lib-next/video/video-pipeline-builder.ts",
+        "lib-next/video/video-pipeline-render.ts",
+        "lib-next/video/video-validation.ts",
+        "lib-next/video/video-phase8-validation.ts"
+      ],
+      "type_sections": [
+        "VideoPipelineLayerBase",
+        "VideoPipelineSourceLayer",
+        "VideoPipelineTrimLayer",
+        "VideoPipelineSpliceLayer",
+        "VideoPipelineTextLayer",
+        "VideoPipelineAudioLayer",
+        "Audio track type=file",
+        "Audio track type=preset",
+        "Audio track type=synth",
+        "Audio track type=sequence",
+        "Audio track type=wav",
+        "VideoPipelineSnapshot",
+        "VideoPipelineRenderOptions",
+        "VideoPipelineRenderResult",
+        "VideoPipeline class methods"
+      ]
+    },
+    {
+      "path": "24_video_text_overlays.md",
+      "api": "VideoCreationOptions.addTextOverlay / VideoPipelineTextLayer.overlays",
+      "source_files": [
+        "lib-next/types/video-text.ts",
+        "lib-next/video/render-video-text-layer.ts",
+        "lib-next/video/video-text-overlay-apply.ts",
+        "lib-next/video/video-text-overlay-filters.ts"
+      ],
+      "type_sections": [
+        "VideoTextTransitionPreset",
+        "VideoTextTransition",
+        "VideoTextOverlayClip",
+        "VideoTextOverlayOperation",
+        "VideoTextOverlayStyle"
+      ]
+    },
+    {
+      "path": "25_image_utils.md",
+      "api": "painter.image.*",
+      "source_files": [
+        "lib-next/types/painter-image.ts",
+        "lib-next/types/batch.ts",
+        "lib-next/types/image.ts",
+        "lib-next/types/video.ts",
+        "lib-next/image/painter-image-utils.ts",
+        "lib-next/output/compression.ts",
+        "lib-next/output/stitch.ts"
+      ],
+      "type_sections": [
+        "PainterImageUtils methods",
+        "StitchOptions",
+        "CollageLayout",
+        "CompressionOptions",
+        "PaletteOptions",
+        "ResizeOptions",
+        "MaskOptions",
+        "BlendOptions",
+        "ImageBlendLayer",
+        "cropOptions",
+        "cropCoordinate",
+        "colorsRemover color"
+      ]
+    },
+    {
+      "path": "26_path2d.md",
+      "api": "painter.path2d.create / draw / custom",
+      "source_files": [
+        "lib-next/types/pathCommands.ts",
+        "lib-next/types/path2d-draw.ts",
+        "lib-next/types/path.ts",
+        "lib-next/types/painter-facets.ts",
+        "lib-next/path/path2d-creator.ts",
+        "lib-next/path/custom-lines.ts"
+      ],
+      "type_sections": [
+        "PathCommand variants",
+        "Path2DDrawOptions",
+        "CustomOptions",
+        "Path2D facet API"
+      ]
+    },
+    {
+      "path": "27_pixels.md",
+      "api": "painter.pixels.getData / setData / manipulate / getColor / setColor",
+      "source_files": [
+        "lib-next/types/pixels.ts",
+        "lib-next/types/painter-facets.ts",
+        "lib-next/pixels/pixel-data-creator.ts"
+      ],
+      "type_sections": [
+        "PixelData",
+        "PixelManipulationOptions",
+        "PainterPixels methods"
+      ]
+    },
+    {
+      "path": "28_hit_detection.md",
+      "api": "painter.detect.path / region / anyRegion / distance",
+      "source_files": [
+        "lib-next/types/hit-detection.ts",
+        "lib-next/types/painter-facets.ts",
+        "lib-next/pixels/hit-detection-creator.ts"
+      ],
+      "type_sections": [
+        "RegionType",
+        "RectRegion",
+        "CircleRegion",
+        "EllipseRegion",
+        "PolygonRegion",
+        "PathRegion",
+        "CustomRegion",
+        "HitDetectionOptions",
+        "HitDetectionResult",
+        "PainterHitDetect methods"
+      ]
+    },
+    {
+      "path": "29_batch_chain.md",
+      "api": "painter.batch(operations, opts?) / painter.chain(operations, opts?)",
+      "source_files": [
+        "lib-next/types/batch.ts",
+        "lib-next/batch/batch-operations.ts",
+        "lib-next/apex-painter/creates/batch-create.ts"
+      ],
+      "type_sections": [
+        "BatchOperation",
+        "ChainOperation",
+        "BatchChainAssetOpts",
+        "Batch execution",
+        "Chain execution"
+      ]
+    },
+    {
+      "path": "30_output_and_save.md",
+      "api": "painter.toOutput / outPut / save / saveMultiple / output.*",
+      "source_files": [
+        "lib-next/types/output.ts",
+        "lib-next/types/common.ts",
+        "lib-next/types/painter-facets.ts",
+        "lib-next/output/save-buffer.ts",
+        "lib-next/output/buffer-encoding.ts",
+        "lib-next/output/output-validation.ts",
+        "lib-next/output/upload-imgur.ts",
+        "lib-next/apex-painter/creates/output-save.ts"
+      ],
+      "type_sections": [
+        "OutputFormat",
+        "SaveOptions",
+        "SaveResult",
+        "PainterOutput methods",
+        "PainterImgurCredentials",
+        "Painter direct output methods"
+      ]
+    },
+    {
+      "path": "31_plugins.md",
+      "api": "painter.use(plugin) / painter.plugins.*",
+      "source_files": [
+        "lib-next/types/plugins.ts",
+        "lib-next/plugins/plugin-host.ts",
+        "lib-next/apex-painter/main.ts"
+      ],
+      "type_sections": [
+        "ApexifyPlugin<T>",
+        "PluginHost API",
+        "ApexPainter.use"
+      ]
+    },
+    {
+      "path": "32_browser_web_preview.md",
+      "api": "createApexifyWebRuntime / renderApexifyWebPreview / registerApexifyWebFonts / getApexifyWebCapabilities",
+      "source_files": [
+        "packages/web/package.json",
+        "packages/web/src/index.ts",
+        "packages/web/src/studio-preview.ts",
+        "packages/web/src/safe-preview-expression.ts",
+        "packages/web/README.md"
+      ],
+      "type_sections": [
+        "ApexifyWebCapabilities",
+        "ApexifyWebFontRegistration",
+        "WebVirtualAsset",
+        "WebStudioPreviewBounds",
+        "WebStudioPreviewResult success",
+        "WebStudioPreviewResult failure",
+        "Supported preview methods",
+        "Explicitly unsupported by preview",
+        "Web runtime methods",
+        "Web preview limits (implementation constants)"
+      ]
+    },
+    {
+      "path": "33_runtime_security_limits.md",
+      "api": "configureApexifyRuntime / resetApexifyRuntimeConfig / getDefaultApexifyRuntimeConfig",
+      "source_files": [
+        "lib-next/runtime/config.ts",
+        "lib-next/runtime/limits.ts",
+        "lib-next/runtime/errors.ts",
+        "lib-next/media/source.ts",
+        "lib-next/media/network-policy.ts",
+        "lib-next/media/remote-fetch.ts",
+        "lib-next/media/cache.ts",
+        "docs/remaining-work.md"
+      ],
+      "type_sections": [
+        "RenderLimits (all default numbers)",
+        "NetworkRuntimeConfig defaults",
+        "CacheRuntimeConfig defaults",
+        "FfmpegRuntimeConfig defaults",
+        "TempRuntimeConfig defaults",
+        "DiagnosticsEvent",
+        "DiagnosticsRuntimeConfig",
+        "ApexifyRuntimeConfig",
+        "ApexifyRuntimeConfigInput",
+        "Exported error types",
+        "Public runtime helpers"
+      ]
+    },
+    {
+      "path": "34_video_stack_low_level.md",
+      "api": "painter.video.operations.*",
+      "source_files": [
+        "lib-next/video/video-stack.ts",
+        "lib-next/video/video-operations.ts",
+        "lib-next/video/operations/transcode.ts",
+        "lib-next/video/operations/merge.ts",
+        "lib-next/video/operations/frames.ts",
+        "lib-next/video/operations/overlays.ts",
+        "lib-next/video/operations/audio.ts",
+        "lib-next/video/operations/structure.ts",
+        "lib-next/video/operations/advanced.ts"
+      ],
+      "type_sections": [
+        "VideoStack",
+        "VideoOperations methods",
+        "TranscodeOperations methods",
+        "Merge / Overlay / Audio / Structure methods",
+        "FrameOperations methods",
+        "AdvancedVideoOperations methods",
+        "VideoRunControls"
+      ]
+    }
+  ]
+}
