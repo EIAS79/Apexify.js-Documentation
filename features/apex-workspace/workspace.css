@@ -2581,3 +2581,32 @@
   border-radius:8px!important;padding:7px 10px!important;color:#e7f5ff!important;
 }
 .aw-graph-flow .react-flow__attribution {display:none}
+
+
+/* Canvas Studio responsiveness is based on the dock width, not the browser viewport. */
+.aw-inspector {container-type:inline-size}
+.aw-inspector .aw-property-tabs {grid-template-columns:repeat(3,minmax(0,1fr))!important}
+@container (min-width:640px) {
+  .aw-property-tabs {grid-template-columns:repeat(6,minmax(0,1fr))!important}
+}
+@container (max-width:310px) {
+  .aw-property-tabs {grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+/* Graph actions stay visible in compact docks instead of consuming multiple rows. */
+.aw-graph-toolbar-modern {
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;
+  gap:7px!important;align-items:center!important;min-height:49px!important;
+  padding:7px 10px!important;
+}
+.aw-graph-toolbar-modern .aw-graph-heading {min-width:0;overflow:hidden}
+.aw-graph-toolbar-modern .aw-graph-heading strong {font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aw-graph-toolbar-modern .aw-graph-heading span {display:none}
+.aw-graph-toolbar-modern .aw-graph-inputs {order:unset!important;min-width:0}
+.aw-graph-toolbar-modern .aw-graph-inputs>summary {font-size:10px;min-height:32px;padding:5px 9px;white-space:nowrap}
+.aw-graph-toolbar-modern .aw-run-graph {order:unset!important;margin:0!important;min-height:32px!important;padding:6px 10px!important;font-size:10px!important}
+.aw-graph-flow {height:clamp(300px,53vh,620px)}
+.aw-flow-hint {padding:5px 8px;top:8px;left:10px;max-width:calc(100% - 20px);font-size:9px}
+@container (max-width:370px) {
+ .aw-graph-toolbar-modern {grid-template-columns:minmax(0,1fr) auto!important}
+ .aw-graph-toolbar-modern .aw-graph-heading {grid-column:1/-1}
+}
