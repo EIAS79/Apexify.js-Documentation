@@ -53,6 +53,12 @@ export default function Inspector({
 }) {
   const layer = document.layers.find((l) => l.id === selected);
   const bg = document.background;
+  const context = layer?.kind ?? "canvas";
+  const categoryGroups: Record<string, string[][]> = {"canvas":[["setup","Setup","Project dimensions"],["background","Background","Color and artwork"],["styling","Styling","Gradients, patterns and paint"],["effects","Effects","Strokes and shadows"],["advanced","Advanced","Assets, filters and renderer"],["layers","Layers","Ordered composition"]],"text":[["content","Content","Write and edit text"],["typography","Typography","Type styles and layout"],["effects","Effects","Native text groups"],["transform","Transform","Position, size and rotation"],["advanced","Advanced","Array items and measurements"],["layers","Layers","Composition order"]],"image":[["source","Source","Verified assets"],["transform","Transform","Position, size and rotation"],["styling","Styling","Fit, shape and paint"],["effects","Effects","Filters and photography"],["advanced","Advanced","Clipping and warping"],["group","Groups","Image grouping"],["layers","Layers","Composition order"]],"shape":[["styling","Styling","Fill, border and paint"],["transform","Transform","Position, size and rotation"],["effects","Effects","Filters and shadow"],["advanced","Advanced","Clipping and mesh"],["group","Groups","Shape grouping"],["layers","Layers","Composition order"]],"chart":[["data","Data","Chart series and values"],["transform","Transform","Position and dimensions"],["layers","Layers","Composition order"]]};
+  const [sectionByContext, setSectionByContext] = useState<Record<string, string>>({});
+  const categorySections = categoryGroups[context] ?? categoryGroups.canvas;
+  const activeSection = sectionByContext[context] ?? categorySections[0][0];
+  const sectionDescription = categorySections.find(([id]) => id === activeSection)?.[2] ?? "";
   const [showLayers, setShowLayers] = useState(true);
   const background = (patch: Partial<WorkspaceDocument["background"]>) =>
     onDocument({ background: { ...bg, ...patch } });
@@ -69,6 +75,14 @@ export default function Inspector({
           </button>
         ))}
       </div>
+      {tab === "Properties" && <div className="aw-property-nav">
+        <div className="aw-property-context"><div><span className="aw-property-eyebrow">Editing {context}</span><strong>{layer?.name ?? document.name}</strong></div><span className="aw-property-count">{categorySections.length} sections</span></div>
+        <nav role="tablist" className="aw-property-tabs" aria-label={context + " property categories"}>
+          {categorySections.map(([id,label]) => <button key={id} role="tab" type="button" aria-selected={id === activeSection} className={id === activeSection ? "selected" : ""}
+            onClick={() => setSectionByContext(previous => ({ ...previous, [context]: id }))}>{label}</button>)}
+        </nav>
+        <p className="aw-property-description">{sectionDescription}</p>
+      </div>}
       <div className="aw-inspector-scroll">
         {tab === "Presets" ? (
           <div className="aw-preset-grid">
@@ -130,6 +144,7 @@ export default function Inspector({
             </div>
             {!layer ? (
               <>
+                {activeSection === "setup" && <>
                 <div className="aw-field-row">
                   <NumberField
                     label="Width"
@@ -158,6 +173,8 @@ export default function Inspector({
                     }
                   />
                 </Field>
+                </>}
+                {activeSection === "background" && <>
                 <div className="aw-section-heading">
                   <strong>Background</strong>
                 </div>
@@ -242,13 +259,16 @@ export default function Inspector({
                     }
                   />
                 </Field>
-                <CanvasOptionsEditor value={document.canvasExtras} canvasWidth={document.width} canvasHeight={document.height} assets={document.assets??[]} onAsset={onCanvasAsset} onError={onError} onChange={(canvasExtras)=>onDocument({canvasExtras})} />
+                </>}
+                {["styling","effects","advanced","layers"].includes(activeSection) && <CanvasOptionsEditor focus={activeSection as "styling"|"effects"|"advanced"|"layers"} value={document.canvasExtras} canvasWidth={document.width} canvasHeight={document.height} assets={document.assets??[]} onAsset={onCanvasAsset} onError={onError} onChange={(canvasExtras)=>onDocument({canvasExtras})} />}
+                {activeSection === "advanced" && <>
                 <Field label="Renderer">
                   <span className="aw-value">Apexify.js · Node v6</span>
                 </Field>
                 <Field label="Pixel ratio">
                   <span className="aw-value">1× · Native output</span>
                 </Field>
+                </>}
               </>
             ) : (
               <>
@@ -260,6 +280,7 @@ export default function Inspector({
                     }
                   />
                 </Field>
+                {activeSection === "transform" && <>
                 <div className="aw-section-heading">
                   <strong>Transform</strong>
                 </div>
@@ -308,8 +329,10 @@ export default function Inspector({
                     onChange={(opacity) => onLayer(layer.id, { opacity })}
                   />
                 </div>
+                </>}
                 {layer.kind === "text" ? (
                   <>
+                {activeSection === "content" && <>
                     <div className="aw-section-heading">
                       <strong>Text style</strong>
                     </div>
@@ -324,6 +347,8 @@ export default function Inspector({
                         }
                       />
                     </Field>
+                </>}
+                {activeSection === "typography" && <>
                     <div className="aw-field-row">
                       <NumberField
                         label="Font size"
@@ -356,12 +381,14 @@ export default function Inspector({
                         }
                       />
                     </Field>
-                    <TextOptionsEditor layer={layer}
+                </>}
+                    {["typography","effects","advanced"].includes(activeSection) && <TextOptionsEditor focus={activeSection as "typography"|"effects"|"advanced"} layer={layer}
                       onChange={textSettings=>onLayer(layer.id,{textSettings})}
-                      onBounds={(width,height)=>onLayer(layer.id,{width,height})}/>
+                      onBounds={(width,height)=>onLayer(layer.id,{width,height})}/>}
                   </>
                 ) : layer.kind === "shape" ? (
                   <>
+                {activeSection === "styling" && <>
                     <div className="aw-section-heading">
                       <strong>Shape style</strong>
                     </div>
@@ -411,9 +438,11 @@ export default function Inspector({
                         }
                       />
                     </Field>
+                </>}
                   </>
                 ) : layer.kind === "chart" ? (
                   <>
+                {activeSection === "data" && <>
                     <Field label="Chart type">
                       <select
                         value={layer.chartType}
@@ -441,8 +470,10 @@ export default function Inspector({
                         }
                       />
                     ))}
+                </>}
                   </>
                 ) : (
+                {activeSection === "source" && <>
                   <UploadImage
                     onUpload={(source,_name,asset)=>onDocument({
                       assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
@@ -451,9 +482,10 @@ export default function Inspector({
                   >
                     Replace image
                   </UploadImage>
+                </>}
                 )}
-                {(layer.kind==='image'||layer.kind==='shape')&&<section aria-label="Image authoring inspector">
-                  {layer.kind==='image'&&<>
+                {(layer.kind==='image'||layer.kind==='shape') && ['source','styling','effects','advanced','group'].includes(activeSection) && <section aria-label="Image authoring inspector">
+                  {layer.kind==='image' && activeSection==='source' && <>
                     <Field label="Verified source">
                       <select aria-label="Image layer source" value={layer.source}
                         onChange={e=>onLayer(layer.id,{source:e.target.value})}>
@@ -468,13 +500,14 @@ export default function Inspector({
                             layers:document.layers.map(l=>l.id===layer.id?{...l,source:asset.id}:l) as WorkspaceLayer[]});
                         }catch(err){onError(err instanceof Error?err.message:'Image import failed')}}}/></Field>
                   </>}
-                  <ImageOptionsEditor options={layer.imageOptions??{}} width={layer.width} height={layer.height} isShape={layer.kind==='shape'} shapeType={layer.kind==='shape'?layer.shape:undefined}
+                  {['styling','effects','advanced'].includes(activeSection) && <ImageOptionsEditor focus={activeSection as 'styling'|'effects'|'advanced'} options={layer.imageOptions??{}} width={layer.width} height={layer.height} isShape={layer.kind==='shape'} shapeType={layer.kind==='shape'?layer.shape:undefined}
                     assets={document.assets??[]} onError={onError}
                     onChange={imageOptions=>onLayer(layer.id,{imageOptions})}
                     onAsset={asset=>onDocument({
                       assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
                       layers:document.layers.map(l=>l.id===layer.id?{...l,imageOptions:{...layer.imageOptions,mask:{...layer.imageOptions?.mask,source:asset.id}}}:l) as WorkspaceLayer[]
-                    })}/>
+                    })}/>}
+                  {activeSection==='group' && <>
                   <div className="aw-section-heading"><strong>Image grouping</strong></div>
                   <Field label="Image group">
                     <select aria-label="Image group selection" value={layer.imageGroupId??''}
@@ -508,7 +541,9 @@ export default function Inspector({
                       })}>Delete group and release members</button>
                     </details>
                   })()}
+                  </>}
                 </section>}
+                {activeSection === "layers" && <>
                 <div className="aw-layer-commands">
                   <IconButton
                     label="Move layer backward"
@@ -529,8 +564,10 @@ export default function Inspector({
                     <TrashIcon />
                   </IconButton>
                 </div>
+                </>}
               </>
             )}
+                {activeSection === "layers" && <>
             <button
               className="aw-inspector-section-toggle"
               onClick={() => setShowLayers(!showLayers)}
@@ -560,14 +597,15 @@ export default function Inspector({
                 ))}
               </div>
             ) : null}
-            <details className="aw-runtime-info">
+                </>}
+            {activeSection === "advanced" && <details className="aw-runtime-info">
               <summary>Rendering details</summary>
               <p>
                 Preview and export use the installed Apexify.js v6 Node
                 renderer. Visual, code, and graph share the same versioned
                 composition.
               </p>
-            </details>
+            </details>}
           </>
         )}
       </div>
