@@ -130,8 +130,8 @@ function TextField({spec,value,label,onChange,depth=0}:{
     </span>
   </label>;
 }
-export default function TextOptionsEditor({layer,onChange,onBounds,compact=false}:{
-  layer:TextLayer;onChange:(settings:TextSettings)=>void;onBounds?:(width:number,height:number)=>void;compact?:boolean;
+export default function TextOptionsEditor({layer,onChange,onBounds,compact=false,focus="all"}:{
+  layer:TextLayer;onChange:(settings:TextSettings)=>void;onBounds?:(width:number,height:number)=>void;compact?:boolean;focus?:"all"|"typography"|"effects"|"advanced";
 }){
   const [error,setError]=useState("");
   const [measureError,setMeasureError]=useState("");
@@ -167,13 +167,14 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
     }catch(e){if(revision===measurementRevision.current)setMeasureError(e instanceof Error?e.message:"Measurement failed");}
     finally{if(revision===measurementRevision.current)setBusy(false);}
   }
-  return <section className={"aw-text-editor"+(compact?" aw-text-editor-compact":"")} aria-label="Advanced typography editor">
+  return <section className={"aw-text-editor"+(compact?" aw-text-editor-compact":"")} data-text-focus={focus} aria-label="Advanced typography editor">
     <div className="aw-section-heading"><strong>Native Apexify.js typography</strong></div>
     <p className="aw-value">Nested v6 API. Optional fields default to the pinned engine. Font paths are disabled for security. Browser font fallback is not a pixel parity guarantee.</p>
-    <TextField spec={textPropertiesSpec} value={settings.properties} label="Text properties" onChange={v=>edit("properties",v)}/>
-    <TextField spec={{kind:"array",max:32,item:textRunSpec}} value={settings.items} label="Text array items" onChange={v=>edit("items",v)}/>
-    <TextField spec={textGroupSpec} value={settings.group} label="Grouped text options" onChange={v=>edit("group",v)}/>
+    {(focus === "all" || focus === "typography") && <TextField spec={textPropertiesSpec} value={settings.properties} label="Text properties" onChange={v=>edit("properties",v)}/>}
+    {(focus === "all" || focus === "advanced") && <TextField spec={{kind:"array",max:32,item:textRunSpec}} value={settings.items} label="Text array items" onChange={v=>edit("items",v)}/>}
+    {(focus === "all" || focus === "effects") && <TextField spec={textGroupSpec} value={settings.group} label="Grouped text options" onChange={v=>edit("group",v)}/>}
     {error?<p role="alert" className="aw-error">{error}</p>:null}
+    {(focus === "all" || focus === "advanced") && <>
     <div className="aw-section-heading"><strong>Native text measurements</strong></div>
     <button type="button" className="aw-text-button" onClick={()=>void measure()} disabled={busy}>
       {busy?"Measuring…":"Measure with painter.measureText"}
@@ -197,5 +198,6 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
       </details>:null}
       <details><summary>Complete native TextMetrics result</summary><pre>{JSON.stringify(metrics,null,2)}</pre></details>
     </div>:null}
+    </>}
   </section>;
 }
