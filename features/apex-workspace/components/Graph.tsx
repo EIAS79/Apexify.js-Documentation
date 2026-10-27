@@ -142,6 +142,7 @@ export default function Graph({
         onSelect={onSelect}
         onConnect={(source,target)=>applyConnection('connect',source,target)}
         onDisconnect={target=>applyConnection('disconnect',undefined,target)}/>
+      {wiringError?<p role="alert" className="aw-graph-wiring-error">{wiringError}</p>:null}
       <details className="aw-graph-wiring" aria-label="Typed canvas graph wiring">
         <summary>Connect / disconnect typed node ports</summary>
         <p className="aw-muted">Graph ports are derived from the saved canvas and SHA-256 assets; connections update the same project as Visual and Code.</p>
