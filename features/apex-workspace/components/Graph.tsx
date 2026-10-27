@@ -152,7 +152,13 @@ export default function Graph({
             <PlusIcon />
           </IconButton>
         </div>
-        <label className="aw-value">Canvas input
+        <details className="aw-graph-inputs">
+
+          <summary>Inputs & assets</summary>
+
+          <div className="aw-graph-input-grid">
+
+          <label className="aw-value">Canvas input
           <select aria-label="Canvas graph background gradient" value={document.canvasExtras?.gradientBg?.type??'none'}
             onChange={event=>{
               const type=event.target.value as 'none'|'linear'|'radial'|'conic';
@@ -193,7 +199,8 @@ export default function Graph({
             </option>)}
           </select>
         </label>
-        <button className="aw-button aw-run-graph" onClick={onRender}>
+        </div></details>
+         <button className="aw-button aw-run-graph" onClick={onRender}>
           <PlayIcon />
           Run Graph
         </button>
@@ -363,7 +370,7 @@ export default function Graph({
         const layer=document.layers.find(l=>l.id===selected);
         if(!layer||(layer.kind!=='image'&&layer.kind!=='shape'))return null;
         const imageGroup=(document.imageGroups??[]).find(g=>g.id===layer.imageGroupId);
-        return <details className="aw-graph-semantic-properties" open aria-label="Selected image graph node properties">
+        return <details className="aw-graph-semantic-properties" aria-label="Selected image graph node properties">
         <summary>Selected createImage node · {layer.name}</summary>
         {layer.kind==='image'&&<label className="aw-value">Image source connection
           <select aria-label="Graph image layer asset" value={layer.source}
