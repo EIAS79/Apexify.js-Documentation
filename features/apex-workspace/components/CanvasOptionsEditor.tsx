@@ -50,7 +50,7 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
   }
   return <section className="aw-canvas-advanced" data-canvas-focus={focus} aria-label="Advanced canvas authoring">
     <div className="aw-section-heading"><strong>Canvas Settings · Apexify.js v6</strong></div>
-    <p className="aw-muted">All supported edits update the same native-rendered canvas, generated Code and saved project. Select a section to navigate its actual controls.</p>
+    {focus==="all"?<p className="aw-muted">Canvas options use the same validated Apexify.js v6 model, generated Code and project state.</p>:null}
     <nav className="aw-canvas-jump" aria-label="Canvas settings sections">
       {([['fundamentals','Fundamentals'],['gradients','Gradients'],['patterns','Patterns'],
          ['layers','Layers'],['effects','Effects'],['images','Images']] as const).map(([id,label])=>
