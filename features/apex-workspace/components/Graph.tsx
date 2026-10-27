@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   PlayIcon,
   MinusIcon,
@@ -93,7 +93,25 @@ export default function Graph({
   }
   const canvas = useRef<HTMLCanvasElement>(null);
   const [zoom, setZoom] = useState(65);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const manualZoomRef = useRef(false);
   const height = Math.max(180, document.layers.length * 64 + 40);
+  const fitGraph = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const availableWidth = Math.max(240, viewport.clientWidth - 32);
+    const availableHeight = Math.max(170, viewport.clientHeight - 24);
+    const fit = Math.round(Math.min(availableWidth / 650, availableHeight / height) * 100);
+    setZoom(Math.max(55, Math.min(180, fit)));
+  }, [height]);
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => { if (!manualZoomRef.current) fitGraph(); });
+    observer.observe(viewport);
+    fitGraph();
+    return () => observer.disconnect();
+  }, [fitGraph]);
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");
     if (!ctx) return;
@@ -140,19 +158,27 @@ export default function Graph({
         <div className="aw-zoom">
           <IconButton
             label="Zoom graph out"
-            onClick={() => setZoom(Math.max(40, zoom - 20))}
+            onClick={() => { manualZoomRef.current = true; setZoom(Math.max(40, zoom - 20)); }}
           >
             <MinusIcon />
           </IconButton>
           <span>{zoom}%</span>
           <IconButton
             label="Zoom graph in"
-            onClick={() => setZoom(Math.min(160, zoom + 20))}
+            onClick={() => { manualZoomRef.current = true; setZoom(Math.min(180, zoom + 20)); }}
           >
             <PlusIcon />
           </IconButton>
         </div>
-        <label className="aw-value">Canvas input
+        <button type="button" className="aw-graph-fit" aria-label="Fit graph to view"
+          onClick={() => { manualZoomRef.current = false; fitGraph(); }}>Fit view</button>
+        <details className="aw-graph-inputs">
+
+          <summary>Inputs & assets</summary>
+
+          <div className="aw-graph-input-grid">
+
+          <label className="aw-value">Canvas input
           <select aria-label="Canvas graph background gradient" value={document.canvasExtras?.gradientBg?.type??'none'}
             onChange={event=>{
               const type=event.target.value as 'none'|'linear'|'radial'|'conic';
@@ -193,7 +219,8 @@ export default function Graph({
             </option>)}
           </select>
         </label>
-        <button className="aw-button aw-run-graph" onClick={onRender}>
+        </div></details>
+         <button className="aw-button aw-run-graph" onClick={onRender}>
           <PlayIcon />
           Run Graph
         </button>
@@ -363,7 +390,7 @@ export default function Graph({
         const layer=document.layers.find(l=>l.id===selected);
         if(!layer||(layer.kind!=='image'&&layer.kind!=='shape'))return null;
         const imageGroup=(document.imageGroups??[]).find(g=>g.id===layer.imageGroupId);
-        return <details className="aw-graph-semantic-properties" open aria-label="Selected image graph node properties">
+        return <details className="aw-graph-semantic-properties" aria-label="Selected image graph node properties">
         <summary>Selected createImage node · {layer.name}</summary>
         {layer.kind==='image'&&<label className="aw-value">Image source connection
           <select aria-label="Graph image layer asset" value={layer.source}
@@ -392,7 +419,7 @@ export default function Graph({
           onChange={transform=>onDocument({...document,imageGroups:(document.imageGroups??[]).map(g=>g.id===imageGroup.id?{...g,transform}:g)})}/>}
         </details>;
       })()}
-      <div className="aw-graph-scroll">
+      <div className="aw-graph-scroll" ref={viewportRef}>
         <div
           style={{ width: (650 * zoom) / 100, height: (height * zoom) / 100 }}
         >

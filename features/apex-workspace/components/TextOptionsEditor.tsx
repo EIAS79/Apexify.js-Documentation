@@ -7,6 +7,26 @@ import {
 } from "../domain/text";
 
 type TextLayer=Extract<WorkspaceLayer,{kind:"text"}>;
+const readableTextLabel = (raw: string) => {
+  const aliases: Record<string, string> = {
+    includeCharMetrics: "Character-level metrics",
+    textOnCurve: "Text along a curve",
+    isGrouped: "Enable grouping",
+    textAlign: "Text alignment",
+    lineHeight: "Line height",
+    letterSpacing: "Letter spacing",
+    wordSpacing: "Word spacing",
+    fontSize: "Font size",
+    fontWeight: "Font weight",
+    startAngle: "Start angle",
+    fontFamily: "Font family",
+  };
+  if (aliases[raw]) return aliases[raw];
+  const normalized = raw.replace(/([a-z\d])([A-Z])/g, "$1 $2")
+    .replace(/[_-]/g, " ").replace(/\[(\d+)\]/g, " · $1")
+    .replace(/\s+/g, " ").trim();
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+};
 const object=(spec:TextSpec):Record<string,TextSpec>=>spec.kind==="object"?spec.fields:{};
 const values=(value:unknown):Record<string,unknown>=>value&&typeof value==="object"&&!Array.isArray(value)?value as Record<string,unknown>:{};
 const gradientDefault=()=>({type:"linear",colors:[{stop:0,color:"#ffffff"},{stop:1,color:"#111111"}]});
@@ -42,7 +62,7 @@ function TextField({spec,value,label,onChange,depth=0}:{
     const data=values(value);
     return <div className="aw-text-nested" data-text-path={label}>
       <div className="aw-section-heading">
-        <strong>{label}</strong>
+        <strong>{readableTextLabel(label)}</strong>
         {shown?<button className="aw-text-button" type="button" onClick={()=>onChange(undefined)}>Remove</button>:
           <button className="aw-text-button" type="button" onClick={()=>onChange(initial(spec,label))}>Enable</button>}
       </div>
@@ -66,7 +86,7 @@ function TextField({spec,value,label,onChange,depth=0}:{
   if(spec.kind==="array"){
     const entries=Array.isArray(value)?value:[];
     return <div className="aw-text-nested" data-text-path={label}>
-      <div className="aw-section-heading"><strong>{label} ({entries.length})</strong>
+      <div className="aw-section-heading"><strong>{readableTextLabel(label)} ({entries.length})</strong>
         {shown?<button type="button" className="aw-text-button" onClick={()=>onChange(undefined)}>Remove</button>:null}
         <button type="button" className="aw-text-button" disabled={entries.length>=spec.max}
           onClick={()=>{
@@ -78,7 +98,7 @@ function TextField({spec,value,label,onChange,depth=0}:{
           }}>Add item</button>
       </div>
       {entries.map((entry,index)=><div key={index} className="aw-text-array-entry">
-        <div className="aw-field-row"><span>{label} #{index+1}</span>
+        <div className="aw-field-row"><span>{readableTextLabel(label)} #{index+1}</span>
           <button type="button" className="aw-text-button" aria-label={label+" move item up "+index}
             disabled={index===0} onClick={()=>onChange(reorder(entries,label,index,index-1))}>↑</button>
           <button type="button" className="aw-text-button" aria-label={label+" move item down "+index}
@@ -94,16 +114,16 @@ function TextField({spec,value,label,onChange,depth=0}:{
   if(spec.kind==="decoration"){
     const mode=value===undefined?"unset":value===false?"off":value===true?"on":"styled";
     return <div className="aw-text-nested">
-      <label className="aw-field">{label}<select aria-label={"Text "+label} value={mode} onChange={e=>onChange(
+      <label className="aw-field">{readableTextLabel(label)}<select aria-label={"Text "+label} value={mode} onChange={e=>onChange(
         e.target.value==="unset"?undefined:e.target.value==="off"?false:e.target.value==="on"?true:{color:"#ffffff"}
       )}>{["unset","off","on","styled"].map(x=><option key={x} value={x}>{x}</option>)}</select></label>
       {mode==="styled"?<TextField spec={decorationSpec} value={value} label={label+" style"} depth={depth+1} onChange={onChange}/>:null}
     </div>;
   }
-  if(!shown)return <div className="aw-field-row aw-text-optional"><span>{label}</span>
+  if(!shown)return <div className="aw-field-row aw-text-optional"><span>{readableTextLabel(label)}</span>
     <button type="button" className="aw-text-button" onClick={()=>onChange(initial(spec,label))}>Add</button>
   </div>;
-  return <label className="aw-field aw-text-leaf"><span>{label}</span>
+  return <label className="aw-field aw-text-leaf"><span>{readableTextLabel(label)}</span>
     <span className="aw-field-row">
     {spec.kind==="boolean"?<input type="checkbox" aria-label={"Text "+label} checked={value===true} onChange={e=>onChange(e.target.checked)}/>:
       spec.kind==="font-weight"?<span className="aw-field-row">
@@ -130,8 +150,8 @@ function TextField({spec,value,label,onChange,depth=0}:{
     </span>
   </label>;
 }
-export default function TextOptionsEditor({layer,onChange,onBounds,compact=false}:{
-  layer:TextLayer;onChange:(settings:TextSettings)=>void;onBounds?:(width:number,height:number)=>void;compact?:boolean;
+export default function TextOptionsEditor({layer,onChange,onBounds,compact=false,focus="all"}:{
+  layer:TextLayer;onChange:(settings:TextSettings)=>void;onBounds?:(width:number,height:number)=>void;compact?:boolean;focus?:"all"|"typography"|"effects"|"advanced";
 }){
   const [error,setError]=useState("");
   const [measureError,setMeasureError]=useState("");
@@ -167,13 +187,14 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
     }catch(e){if(revision===measurementRevision.current)setMeasureError(e instanceof Error?e.message:"Measurement failed");}
     finally{if(revision===measurementRevision.current)setBusy(false);}
   }
-  return <section className={"aw-text-editor"+(compact?" aw-text-editor-compact":"")} aria-label="Advanced typography editor">
+  return <section className={"aw-text-editor"+(compact?" aw-text-editor-compact":"")} data-text-focus={focus} aria-label="Advanced typography editor">
     <div className="aw-section-heading"><strong>Native Apexify.js typography</strong></div>
     <p className="aw-value">Nested v6 API. Optional fields default to the pinned engine. Font paths are disabled for security. Browser font fallback is not a pixel parity guarantee.</p>
-    <TextField spec={textPropertiesSpec} value={settings.properties} label="Text properties" onChange={v=>edit("properties",v)}/>
-    <TextField spec={{kind:"array",max:32,item:textRunSpec}} value={settings.items} label="Text array items" onChange={v=>edit("items",v)}/>
-    <TextField spec={textGroupSpec} value={settings.group} label="Grouped text options" onChange={v=>edit("group",v)}/>
+    {(focus === "all" || focus === "typography") && <TextField spec={textPropertiesSpec} value={settings.properties} label="Text properties" onChange={v=>edit("properties",v)}/>}
+    {(focus === "all" || focus === "advanced") && <TextField spec={{kind:"array",max:32,item:textRunSpec}} value={settings.items} label="Text array items" onChange={v=>edit("items",v)}/>}
+    {(focus === "all" || focus === "effects") && <TextField spec={textGroupSpec} value={settings.group} label="Grouped text options" onChange={v=>edit("group",v)}/>}
     {error?<p role="alert" className="aw-error">{error}</p>:null}
+    {(focus === "all" || focus === "advanced") && <>
     <div className="aw-section-heading"><strong>Native text measurements</strong></div>
     <button type="button" className="aw-text-button" onClick={()=>void measure()} disabled={busy}>
       {busy?"Measuring…":"Measure with painter.measureText"}
@@ -197,5 +218,6 @@ export default function TextOptionsEditor({layer,onChange,onBounds,compact=false
       </details>:null}
       <details><summary>Complete native TextMetrics result</summary><pre>{JSON.stringify(metrics,null,2)}</pre></details>
     </div>:null}
+    </>}
   </section>;
 }

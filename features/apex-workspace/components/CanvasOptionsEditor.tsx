@@ -8,7 +8,7 @@ import {StrokeControls,ShadowControls} from "./CanvasEffectsEditor";
 import {CanvasFiltersEditor} from './CanvasFiltersEditor';
 const starterGradient=(type:GradientKind):CanvasGradient=>({type,colors:[{stop:0,color:'#221160'},{stop:1,color:'#006ca8'}]});
 const starterPattern:CanvasPattern={type:'grid',color:'#56dbf9',secondaryColor:'#131b30',size:24,spacing:24,opacity:0.4};
-export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onError,canvasWidth=500,canvasHeight=500}:{value?:CanvasExtras;onChange:(options:CanvasExtras)=>void;canvasWidth?:number;canvasHeight?:number;
+export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onError,canvasWidth=500,canvasHeight=500,focus='all'}:{value?:CanvasExtras;focus?:'all'|'styling'|'effects'|'advanced'|'layers';onChange:(options:CanvasExtras)=>void;canvasWidth?:number;canvasHeight?:number;
   assets:readonly WorkspaceImageAsset[];onAsset:(record:WorkspaceImageAsset,placement:'custom'|'layer'|'pattern')=>void;
   onError:(message:string)=>void;}){
   const options=value??{};
@@ -48,7 +48,7 @@ export default function CanvasOptionsEditor({value,onChange,assets,onAsset,onErr
     });
     update({bgLayers:tagged});
   }
-  return <section className="aw-canvas-advanced" aria-label="Advanced canvas authoring">
+  return <section className="aw-canvas-advanced" data-canvas-focus={focus} aria-label="Advanced canvas authoring">
     <div className="aw-section-heading"><strong>Canvas Settings · Apexify.js v6</strong></div>
     <p className="aw-muted">All supported edits update the same native-rendered canvas, generated Code and saved project. Select a section to navigate its actual controls.</p>
     <nav className="aw-canvas-jump" aria-label="Canvas settings sections">
