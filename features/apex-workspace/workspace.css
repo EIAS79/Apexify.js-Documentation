@@ -2645,3 +2645,18 @@
 
 /* Typed connection failures are visible without expanding technical wiring. */
 .aw-graph-wiring-error {margin:8px 13px!important;padding:10px 12px;border:1px solid #b4675c;border-radius:8px;background:#38201f;color:#ffd3c8;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+
+/* Final Canvas polish: stable header alignment and contained toggle tracks. */
+.aw-property-context {display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:10px!important}
+.aw-property-context>div {display:flex!important;flex-direction:column!important;gap:4px!important;min-width:0!important;flex:1 1 auto!important}
+.aw-property-context>div>strong {display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.aw-property-count {flex:0 0 auto!important;align-self:flex-start!important;white-space:nowrap!important}
+.aw-canvas-advanced .aw-canvas-properties>.aw-field:has(input[type=checkbox]) {
+  display:grid!important;grid-template-columns:minmax(0,1fr) 38px!important;
+  align-items:center!important;gap:10px!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  margin:8px 0!important;padding:0!important;box-sizing:border-box!important;
+}
+.aw-canvas-advanced .aw-canvas-properties>.aw-field:has(input[type=checkbox])>input[type=checkbox] {
+  justify-self:end!important;margin:0!important;min-width:38px!important;
+}
