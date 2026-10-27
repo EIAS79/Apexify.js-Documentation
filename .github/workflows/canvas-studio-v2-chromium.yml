@@ -28,6 +28,15 @@ jobs:
           cache: npm
       - name: Install pinned Apexify and Studio dependencies
         run: npm ci --no-audit --no-fund
+      - name: Verify native Canvas v6 option semantics, graph edits and code parity
+        run: |
+          node --import tsx --test --test-concurrency=2 \
+            tests/workspace/canvas-pinned.test.ts \
+            tests/workspace/canvas-graph-wiring-s11.test.ts \
+            tests/workspace/canvas-paint-graph-s12.test.ts \
+            tests/workspace/canvas-effects-enums-s13.test.ts \
+            tests/workspace/canvas-nested-families-s15.test.ts \
+            tests/workspace/canvas-union-certification-s13.test.ts
       - uses: browser-actions/setup-chrome@v1
         id: chrome
         with:
