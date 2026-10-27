@@ -1,0 +1,158 @@
+
+> apexify.js-documentation@1.0.0 build
+> node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && node scripts/docs/doc6-ensure-generated.mjs && next build
+
+[doc4-ensure] generated API runtime data present
+[doc5-ensure] generated example manifest present
+[doc6-ensure] generated search artifacts present
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/482) ...
+
+<--- Last few GCs --->
+
+[16048:0000020BFFEF1000]     6431 ms: Mark-Compact 301.5 (334.7) -> 297.9 (365.5) MB, pooled: 0 MB, 20.32 / 0.00 ms  (+ 35.7 ms in 314 steps since start of marking, biggest step 3.6 ms, walltime since start of marking 342 ms) (average mu = 0.991, current [16048:0000020BFFEF1000]     6899 ms: Scavenge (interleaved) 329.9 (365.5) -> 330.0 (365.5) MB, pooled: 1 MB, 44.66 / 0.00 ms  (average mu = 0.991, current mu = 0.988) allocation failure; 
+
+FATAL ERROR: Committing semi space failed. Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+
+<--- Last few GCs --->
+
+[28876:0000013FD345F000]     5996 ms: Scavenge 40.3 (58.2) -> 29.9 (61.2) MB, pooled: 0 MB, 9.20 / 0.02 ms  (average mu = 0.996, current mu = 0.996) allocation failure; 
+[28876:0000013FD345F000]     6518 ms: Scavenge 46.2 (66.3) -> 37.7 (68.0) MB, pooled: 0 MB, 8.29 / 0.01 ms  (average mu = 0.996, current mu = 0.996) task; 
+[28876:0000013FD345F000]     6909 ms: Scavenge 53.2 (71.0) -> 40.7 (72.5) MB, pooled: 4 MB, 6.25 / 0.01 ms  (average mu = 0.996, current mu = 0.996) task; 
+
+FATAL ERROR: Zone Allocation failed - process out of memory
+----- Native stack trace -----
+
+
+<--- Last few GCs --->
+
+[28876:0000013FD345F000]     5996 ms: Scavenge 40.3 (58.2) -> 29.9 (61.2) MB, pooled: 0 MB, 9.20 / 0.02 ms  (average mu = 0.996, current mu = 0.996) allocation failure; 
+[28876:0000013FD345F000]     6518 ms: Scavenge 46.2 (66.3) -> 37.7 (68.0) MB, pooled: 0 MB, 8.29 / 0.01 ms  (average mu = 0.996, current mu = 0.996) task; 
+[28876:0000013FD345F000]     6909 ms: Scavenge 53.2 (71.0) -> 40.7 (72.5) MB, pooled: 4 MB, 6.25 / 0.01 ms  (average mu = 0.996, current mu = 0.996) task; 
+
+FATAL ERROR: Zone Allocation failed - process out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6271590C6 
+ 1: 00007FF6271590C6 
+ 2: 00007FF627159604 
+ 2: 00007FF627159604 
+ 3: 00007FF625D63617 
+ 3: 00007FF625D63617 
+ 4: 00007FF6256DB506 
+ 4: 00007FF6256DB506 
+ 5: 00007FF6254F7A27 
+ 5: 00007FF6254F77D3 
+ 6: 00007FF6254FFD1E 
+ 6: 00007FF6254FFD1E 
+ 7: 00007FF6254FFA93 
+ 7: 00007FF625502A8E 
+ 8: 00007FF625562407 
+ 8: 00007FF6255AC9F2 
+ 9: 00007FF625562D23 
+ 9: 00007FF6255AB7CD 
+10: 00007FF6255618BE 
+10: 00007FF6255A957A 
+11: 00007FF62555F1F3 
+11: 00007FF625CD72CF 
+12: 00007FF62555DEA3 
+12: 00007FF6255AB05B 
+13: 00007FF62555DC8B 
+13: 00007FF626562CEF 
+14: 00007FF625534A88 
+14: 00007FF627099BDB 
+15: 00007FF6255ACAC6 
+15: 00007FF625DB8A26 
+16: 00007FF6255AB7CD 
+16: 00007FF62749F483 
+17: 00007FF6255A957A 
+17: 00007FF803A6DDA7 
+18: 00007FF625CD72CF 
+18: 00007FF804B9EE4C 
+19: 00007FF6255AB05B 
+20: 00007FF626562CEF 
+21: 00007FF627099BDB 
+22: 00007FF625DB8A26 
+23: 00007FF62749F483 
+24: 00007FF803A6DDA7 
+25: 00007FF804B9EE4C 
+
+<--- Last few GCs --->
+
+[32732:00000111A4F60000]     2425 ms: Scavenge (interleaved) 320.7 (354.1) -> 320.7 (433.9) MB, pooled: 0 MB, 17.47 / 0.00 ms  (average mu = 0.988, current mu = 0.988) allocation failure; 
+[32732:00000111A4F60000]     6732 ms: Scavenge 364.8 (441.5) -> 339.4 (455.1) MB, pooled: 0 MB, 39.92 / 0.08 ms  (average mu = 0.988, current mu = 0.988) task; 
+
+FATAL ERROR: MarkCompactCollector: young object promotion failed Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6271590C6 
+ 2: 00007FF627159604 
+ 3: 00007FF625D63617 
+ 4: 00007FF625B63E57 
+ 5: 00007FF625B4354E 
+ 6: 00007FF625B38C0D 
+ 7: 00007FF625B388BC 
+ 8: 00007FF625B38501 
+ 9: 00007FF625B4A9F8 
+10: 00007FF626562CEF 
+11: 00007FF627099BDB 
+12: 00007FF625DB8A26 
+13: 00007FF62749F483 
+14: 00007FF803A6DDA7 
+15: 00007FF804B9EE4C 
+ 1: 00007FF6271590C6 
+ 2: 00007FF627159604 
+ 3: 00007FF625D63617 
+ 4: 00007FF625B63E57 
+ 5: 00007FF625AFC44B 
+ 6: 00007FF625AD3E7E 
+ 7: 00007FF625B668F2 
+ 8: 00007FF625B658A7 
+ 9: 00007FF625B767E2 
+10: 00007FF625B7630B 
+11: 00007FF627483BAD 
+12: 00007FF625B61920 
+13: 00007FF625B7C24E 
+14: 00007FF625B87FD8 
+15: 00007FF625BA31E4 
+16: 00007FF625BA30BC 
+17: 00007FF625A3EB2E 
+18: 00007FF625A41EAF 
+19: 00007FF625A41E70 
+20: 00007FF625A430A5 
+21: 00007FF625A41F01 
+22: 00007FF625A41E70 
+23: 00007FF625A42E29 
+24: 00007FF625A41F01 
+25: 00007FF625A430A5 
+26: 00007FF625A41F01 
+27: 00007FF625A430A5 
+28: 00007FF625A41F01 
+29: 00007FF625A430A5 
+30: 00007FF625A41F01 
+31: 00007FF625A42E29 
+32: 00007FF625A41F01 
+33: 00007FF625A42E29 
+34: 00007FF625A41F01 
+35: 00007FF625A430A5 
+36: 00007FF625A41F01 
+37: 00007FF625A430A5 
+38: 00007FF625A41F01 
+39: 00007FF625A3E725 
+40: 00007FF625A3E40D 
+41: 00007FF625D19C52 
+42: 0000020BB9A3753A 
+ ⨯ Next.js build worker exited with code: 134 and signal: null

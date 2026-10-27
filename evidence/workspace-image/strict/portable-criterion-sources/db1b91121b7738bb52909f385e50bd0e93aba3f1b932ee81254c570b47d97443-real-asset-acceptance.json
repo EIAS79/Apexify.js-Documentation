@@ -1,0 +1,154 @@
+{
+  "passed": true,
+  "steps": [
+    {
+      "step": "initial native preview",
+      "diagnostics": {
+        "rendering": "Apexify.js v6 · Node render5 layers",
+        "preview": {
+          "src": "blob:http://127.0.0.1:38497/026c1ab5-af71-4d21-8d75-a6c3016c3138",
+          "width": 1280,
+          "complete": true
+        },
+        "alerts": [],
+        "imageRows": [],
+        "selectedSource": null
+      }
+    },
+    {
+      "step": "Assets tab opened using visible UI",
+      "diagnostics": {
+        "rendering": "Apexify.js v6 · Node render5 layers",
+        "preview": {
+          "src": "blob:http://127.0.0.1:38497/026c1ab5-af71-4d21-8d75-a6c3016c3138",
+          "width": 1280,
+          "complete": true
+        },
+        "alerts": [],
+        "imageRows": [],
+        "selectedSource": null
+      }
+    },
+    {
+      "step": "real file-picker upload added and selected Image Inspector",
+      "diagnostics": {
+        "rendering": "Apexify.js v6 · Node render6 layers",
+        "preview": {
+          "src": "blob:http://127.0.0.1:38497/026c1ab5-af71-4d21-8d75-a6c3016c3138",
+          "width": 1280,
+          "complete": true
+        },
+        "alerts": [],
+        "imageRows": [],
+        "selectedSource": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b"
+      }
+    },
+    {
+      "step": "SHA-256 image and inspector",
+      "asset": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b"
+    },
+    {
+      "step": "native preview after real upload",
+      "diagnostics": {
+        "rendering": "Apexify.js v6 · Node render6 layers",
+        "preview": {
+          "src": "blob:http://127.0.0.1:38497/026c1ab5-af71-4d21-8d75-a6c3016c3138",
+          "width": 1280,
+          "complete": true
+        },
+        "alerts": [],
+        "imageRows": [],
+        "selectedSource": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b"
+      }
+    },
+    {
+      "step": "native mask enabled",
+      "diagnostics": {
+        "rendering": "Apexify.js v6 · Node render6 layers",
+        "preview": {
+          "src": "blob:http://127.0.0.1:38497/187686ff-1600-44c6-af15-fec79ed290cc",
+          "width": 1280,
+          "complete": true
+        },
+        "alerts": [],
+        "imageRows": [],
+        "selectedSource": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b"
+      }
+    },
+    {
+      "step": "IndexedDB reload/preview/mask",
+      "diagnostics": {
+        "rendering": "Apexify.js v6 · Node render6 layers",
+        "preview": {
+          "src": "blob:http://127.0.0.1:38497/e54e5723-7c2c-45b0-b68b-8f285be819fb",
+          "width": 1280,
+          "complete": true
+        },
+        "alerts": [],
+        "imageRows": [],
+        "selectedSource": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b"
+      },
+      "maskEnabled": true
+    },
+    {
+      "step": "real Graph Image fit keyboard edit synchronizes Inspector and native render",
+      "from": "cover",
+      "to": "contain",
+      "inspectorMatch": true,
+      "width": 1280
+    },
+    {
+      "step": "Graph edit Undo + Redo",
+      "undo": true,
+      "redo": true,
+      "restored": "contain"
+    },
+    {
+      "step": "Graph edit committed to IndexedDB before reload",
+      "fit": "contain",
+      "committed": true
+    },
+    {
+      "step": "Graph edit persisted in IndexedDB",
+      "fit": "contain",
+      "width": 1280
+    },
+    {
+      "step": "real Save project JSON export with SHA-256 asset, mask and Graph fit",
+      "file": "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\chromium-production\\downloads\\Hero-composition.apexify.json",
+      "bytes": 3235,
+      "verifiedAsset": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b",
+      "fit": "contain"
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\chromium-production\\00-real-assets-tab.png",
+      "bytes": 723033
+    },
+    {
+      "path": "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\chromium-production\\01-upload-native-preview.png",
+      "bytes": 647443
+    },
+    {
+      "path": "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\chromium-production\\02-mask-native-preview.png",
+      "bytes": 586587
+    },
+    {
+      "path": "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\chromium-production\\03-reloaded-native-preview.png",
+      "bytes": 586063
+    },
+    {
+      "path": "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\chromium-production\\04-graph-control-native.png",
+      "bytes": 585305
+    },
+    {
+      "path": "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\chromium-production\\05-graph-edit-reloaded.png",
+      "bytes": 625571
+    }
+  ],
+  "failures": [],
+  "origin": "http://127.0.0.1:38497/workspace",
+  "fixture": "C:/Users/khali/Documents/Apexify-IMG01-recovery/IMG01-upload-fixture.png",
+  "chrome": "http://127.0.0.1:38542"
+}

@@ -1,0 +1,34 @@
+{
+  "begin": 0,
+  "limit": 2,
+  "results": [
+    {
+      "id": "LIFE-0001",
+      "api": "createText.TextProperties.font.size",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 32,
+          "current": 32
+        },
+        "stored": 32,
+        "reloaded": 32,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0002",
+      "api": "createText.TextProperties.font.family",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "DejaVu Sans",
+          "current": "DejaVu Sans"
+        },
+        "stored": "DejaVu Sans",
+        "reloaded": "DejaVu Sans",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "steps": [
+    {
+      "name": "Picker diagnostic",
+      "value": {
+        "changes": [
+          {
+            "event": "change",
+            "count": 1,
+            "file": {
+              "name": "IMG01-upload-fixture.png",
+              "size": 270,
+              "type": "image/png"
+            }
+          }
+        ],
+        "body": " source\nCreateImage · native v6 controls\nPlacement, fit & compositing\nUse intrinsic dimensions\nImage fit\nfill\ncontain\ncover\nImage alignment\ncenter\ntop\nbottom\nleft\nright\ntop-left\ntop-right\nbottom-left\nbottom-right\nBlur\nComposite / blend mode\nsource-over\nsource-in\nsource-out\nsource-atop\ndestination-over\ndestination-in\ndestination-out\ndestination-atop\nlighter\ncopy\nxor\nmultiply\nscreen\noverlay\ndarken\nlighten\ncolor-dodge\ncolor-burn\nhard-light\nsoft-light\ndifference\nexclusion\nhue\nsaturation\ncolor\nluminosity\nCircular border radius\nBorder radius\nBorder position\nall\ntop\nbottom\nleft\nright\ntop-left\ntop-right\nbottom-left\nbottom-right\nStroke, shadow & background paint\nFilters · ordered native pipeline\nImage masks & polygon clipping\nDistortion & mesh warping\nPhotographic effects\nImage grouping\nImage group\nUngrouped\n+ Create group for selected image\nLayers\n7\nIMG01-upload-fixture.png\nIMG01-upload-fixture.png\nButton label\nCall to action\nDescription\nBrand accent\nApexify\nRendering details\nRender Queue\n1\nHero composition\n1280 × 720 · PNG · 1119 KB\nCompleted\n1.65 s\nPreview\nRender to preview\nUpdating preview…\nOutput & Export\nFormat\nPNG\nWebP\nJPEG\n\nLossless · original resolution\n\nDownload\nLocal workspace\nHero composition\nTerminal\nSave project\nApexify.js v6",
+        "selection": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b"
+      }
+    },
+    {
+      "name": "SHA-256 verified image upload",
+      "source": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b",
+      "valid": true
+    },
+    {
+      "name": "Native preview",
+      "width": 1280
+    },
+    {
+      "name": "Mask and native preview",
+      "masked": true,
+      "width": 1280
+    },
+    {
+      "name": "Reloaded IndexedDB verified asset",
+      "value": {
+        "source": "asset:9d0228de772ae5eab70e2c22a772c034081424e31db159363cfea2268ec5b29b",
+        "mask": true,
+        "preview": 1280
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "06-verified-image-import.png",
+      "bytes": 586065
+    },
+    {
+      "file": "07-verified-mask-editor.png",
+      "bytes": 586066
+    },
+    {
+      "file": "08-verified-image-reloaded.png",
+      "bytes": 585810
+    }
+  ],
+  "passed": true
+}

@@ -1,0 +1,23 @@
+
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 4 errors:
+D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-final-four-code.test.ts:45:29: ERROR: Top-level await is currently not supported with the "cjs" output format
+D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-final-four-code.test.ts:45:50: ERROR: Top-level await is currently not supported with the "cjs" output format
+D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-final-four-code.test.ts:46:20: ERROR: Top-level await is currently not supported with the "cjs" output format
+D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-final-four-code.test.ts:47:18: ERROR: Top-level await is currently not supported with the "cjs" output format
+    at failureErrorWithLog (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\esbuild\lib\main.js:1748:15)
+    at D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\esbuild\lib\main.js:1017:50
+    at responseCallbacks.<computed> (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\esbuild\lib\main.js:884:9)
+    at handleIncomingPacket (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\esbuild\lib\main.js:939:12)
+    at Socket.readFromStdout (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\esbuild\lib\main.js:862:7)
+    at Socket.emit (node:events:514:28)
+    at addChunk (node:internal/streams/readable:568:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:519:3)
+    at Readable.push (node:internal/streams/readable:399:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v24.21.0

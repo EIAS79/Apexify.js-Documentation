@@ -1,0 +1,31 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {readdir,readFile} from 'node:fs/promises';
+import {existsSync} from 'node:fs';
+import {join} from 'node:path';
+import {validateDocument} from '../../features/apex-workspace/model';
+import {generateSource,parseSource} from '../../features/apex-workspace/codegen';
+import {projectCanvasGraph} from '../../features/apex-workspace/canvas-graph';
+const exportedProjectFolder=process.env.IMG01_PROJECT_DOWNLOADS||'D:/ApexifyWorkspaceParallel/IMG01CertEvidence/chromium-production/downloads';
+test('IMG01 exported real Chromium project JSON validates on import with immutable SHA-256 asset, mask, Graph option, canonical Code',{skip:existsSync(exportedProjectFolder)?false:'Requires a real production-browser downloaded project JSON'},async()=>{
+ const folder=exportedProjectFolder;
+ const names=(await readdir(folder)).filter(x=>x.endsWith('.apexify.json'));
+ assert.equal(names.length,1,'Expected exactly one real UI downloaded project');
+ const bytes=await readFile(join(folder,names[0])),data=JSON.parse(bytes.toString('utf8'));
+ const reimport=validateDocument(data);
+ const image=reimport.layers.find(x=>x.kind==='image'&&x.name==='IMG01-upload-fixture.png');
+ assert.ok(image&&image.kind==='image');
+ const source=image.source;assert.match(source,/^asset:[a-f0-9]{64}$/);
+ const asset=reimport.assets?.find(x=>x.id===source);
+ assert.ok(asset);
+ const raw=Buffer.from(asset.dataUri.split(',')[1],'base64');
+ assert.equal(createHash('sha256').update(raw).digest('hex'),asset.sha256);
+ assert.equal(image.imageOptions?.mask?.source,source);
+ assert.equal(image.imageOptions?.fit,'contain');
+ assert.deepEqual(parseSource(generateSource(reimport)),reimport);
+ assert.throws(()=>parseSource(generateSource(reimport)+'\nprocess.exit();'),/cannot be reconciled/,'Executable edits outside canonical Code must fail closed');
+ const graph=projectCanvasGraph(reimport);
+ assert.ok(graph.nodes.some(n=>n.id.includes(image.id)));
+ // This checks import validation + canonical source/Graph recovery, not an unseen UI import button.
+});

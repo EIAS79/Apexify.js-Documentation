@@ -1,0 +1,23 @@
+✔ schema validates every nested editable type and persists Unicode safely (6.2617ms)
+✔ text option allowlist rejects unsafe paths, invalid unions and malformed arrays (1.7922ms)
+✔ gradient variants, curve and grouped perspective are canonical API objects (0.483ms)
+✔ real v6 native rendering and measurement produce a changed PNG (71.7227ms)
+✔ generated source executes actual pinned ApexPainter createText (585.5384ms)
+✔ native grouped array overload draws additional texts and group transform (16.5365ms)
+✔ native curved, perspective and gradient text exercise public options (52.8437ms)
+✔ CSS color forms supported by pinned native backend remain authorable without accepting arbitrary strings (0.6947ms)
+✔ pinned font union: integer 100..900 or named; nonempty explicit family/name (30.2551ms)
+✔ curve requires native sweep 0 < angle < 360 and mandatory value (2.2946ms)
+✔ native integer measurement canvas and canonical nested precedence (1.2966ms)
+✔ mixed native canvas+image+grouped text: code/visual roundtrip, ordered runs, PNG delta, metrics (1139.4539ms)
+✔ bounded stream cancels before buffering an oversized body without Content-Length (18.7913ms)
+✔ two-slot cap rejects a third request and aborted readers release both slots (27.5337ms)
+✔ valid JSON, multi-run measurement, malformed JSON and forbidden origins (5.2395ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2676.4372

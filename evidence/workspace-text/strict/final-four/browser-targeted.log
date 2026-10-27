@@ -1,0 +1,4 @@
+LAYER_PROBE {"layer":"text","graph":true,"path":"Advanced typography editor"}
+FONT_BROWSER_PATH_PASS createText.TextProperties.font.family {"arialDigest":"e1bf59a1834fb873175de3c022317a47986220742e17491ce3936d75c7a42939","courierDigest":"fc2bdb90b5e1fdd82162175e0b759428fdcd844f29d32aab09f9d80b35e92595","ui":true,"history":true,"imported":"Courier New"}
+FONT_BROWSER_PATH_FAIL createText.TextProperties.font.name Error: No project JSON export for name
+FONT_BROWSER_FINAL {"pass":1,"fail":1,"output":"D:\\ApexifyWorkspaceParallel\\text-strict-20261023\\evidence\\workspace-text\\strict\\final-four\\font-browser-targeted.json"}

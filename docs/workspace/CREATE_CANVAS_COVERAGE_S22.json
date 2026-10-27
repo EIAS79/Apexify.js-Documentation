@@ -1,0 +1,73 @@
+{
+  "campaign": "S22_CREATE_CANVAS_NATIVE_COMPLETENESS_EXACT_GITHUB_PIN",
+  "engineCommit": "b6ca97cfc675b16a52c2c7b5d0ff881b87b911be",
+  "totalPaths": 208,
+  "strictSummary": {
+    "FULL": 179,
+    "PARTIAL_CERTIFICATION": 2,
+    "BLOCKED_UPSTREAM": 0,
+    "BLOCKED_SECURITY": 26,
+    "NOT_APPLICABLE": 1
+  },
+  "previousFull": 170,
+  "newFull": 179,
+  "fullPromotions": [
+    "canvas.gradientBg.startAngle",
+    "canvas.patternBg.gradient.startAngle",
+    "canvas.bgLayers.pattern.gradient.startAngle",
+    "canvas.shadow.gradient.startAngle",
+    "canvas.stroke.gradient.startAngle",
+    "canvas.patternBg.gradient.angle",
+    "canvas.bgLayers.pattern.gradient.angle",
+    "canvas.shadow.gradient.repeat",
+    "canvas.customBg.filters.radius"
+  ],
+  "notFullyCertified": [
+    "canvas.blendMode",
+    "canvas.shadow.borderPosition"
+  ],
+  "securityBlocked": [
+    "canvas.videoBg",
+    "canvas.videoBg.align",
+    "canvas.videoBg.autoplay",
+    "canvas.videoBg.filters",
+    "canvas.videoBg.filters.angle",
+    "canvas.videoBg.filters.centerX",
+    "canvas.videoBg.filters.centerY",
+    "canvas.videoBg.filters.height",
+    "canvas.videoBg.filters.intensity",
+    "canvas.videoBg.filters.levels",
+    "canvas.videoBg.filters.radius",
+    "canvas.videoBg.filters.size",
+    "canvas.videoBg.filters.type",
+    "canvas.videoBg.filters.value",
+    "canvas.videoBg.filters.width",
+    "canvas.videoBg.filters.x",
+    "canvas.videoBg.filters.y",
+    "canvas.videoBg.fit",
+    "canvas.videoBg.format",
+    "canvas.videoBg.frame",
+    "canvas.videoBg.inherit",
+    "canvas.videoBg.loop",
+    "canvas.videoBg.opacity",
+    "canvas.videoBg.quality",
+    "canvas.videoBg.source",
+    "canvas.videoBg.time"
+  ],
+  "notApplicable": [
+    "painterOpts.resolveAssetRefs"
+  ],
+  "browserVerified": [
+    "canvas.bgLayers.pattern.gradient.angle",
+    "canvas.bgLayers.pattern.gradient.startAngle",
+    "canvas.customBg.filters.radius",
+    "canvas.gradientBg.startAngle",
+    "canvas.patternBg.gradient.angle",
+    "canvas.patternBg.gradient.startAngle",
+    "canvas.shadow.gradient.repeat",
+    "canvas.shadow.gradient.startAngle",
+    "canvas.stroke.gradient.startAngle"
+  ],
+  "ledger": "docs/workspace/CREATE_CANVAS_STRICT_CERTIFICATION_S22.json",
+  "releaseGate": "Verify exact GitHub installation, full serial Workspace suite, production build and source controls before deploying."
+}

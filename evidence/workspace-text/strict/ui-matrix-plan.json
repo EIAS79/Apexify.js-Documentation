@@ -1,0 +1,7021 @@
+[
+  {
+    "i": 0,
+    "api": "createText.TextProperties.font.size",
+    "model": "layers[].textSettings.properties.font.size",
+    "root": "properties",
+    "tokens": [
+      "font",
+      "size"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 512
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 1,
+    "api": "createText.TextProperties.font.family",
+    "model": "layers[].textSettings.properties.font.family",
+    "root": "properties",
+    "tokens": [
+      "font",
+      "family"
+    ],
+    "spec": {
+      "kind": "string",
+      "default": ""
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 2,
+    "api": "createText.TextProperties.font.name",
+    "model": "layers[].textSettings.properties.font.name",
+    "root": "properties",
+    "tokens": [
+      "font",
+      "name"
+    ],
+    "spec": {
+      "kind": "string",
+      "default": ""
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 3,
+    "api": "createText.TextProperties.font.weight",
+    "model": "layers[].textSettings.properties.font.weight",
+    "root": "properties",
+    "tokens": [
+      "font",
+      "weight"
+    ],
+    "spec": {
+      "kind": "font-weight"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 4,
+    "api": "createText.TextProperties.font.style",
+    "model": "layers[].textSettings.properties.font.style",
+    "root": "properties",
+    "tokens": [
+      "font",
+      "style"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "normal",
+        "italic",
+        "oblique"
+      ],
+      "default": "normal"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 5,
+    "api": "createText.TextProperties.decorations.bold",
+    "model": "layers[].textSettings.properties.decorations.bold",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "bold"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 6,
+    "api": "createText.TextProperties.decorations.italic",
+    "model": "layers[].textSettings.properties.decorations.italic",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "italic"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 7,
+    "api": "createText.TextProperties.decorations.underline (boolean)",
+    "model": "layers[].textSettings.properties.decorations.underline",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline"
+    ],
+    "spec": {
+      "kind": "boolean"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 8,
+    "api": "createText.TextProperties.decorations.underline (styled).color",
+    "model": "layers[].textSettings.properties.decorations.underline.color",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 9,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.type",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.type",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 10,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.startX",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.startX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 11,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.startY",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.startY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 12,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.endX",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.endX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 13,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.endY",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.endY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 14,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.startRadius",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.startRadius",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 15,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.endRadius",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.endRadius",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 16,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.centerX",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.centerX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 17,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.centerY",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.centerY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 18,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.startAngle",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.startAngle",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 19,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.rotate",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.rotate",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 20,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.pivotX",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.pivotX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 21,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.pivotY",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.pivotY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 22,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.repeat",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.repeat",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 23,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.colors[].stop",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.colors[].stop",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 24,
+    "api": "createText.TextProperties.decorations.underline (styled).gradient.colors[].color",
+    "model": "layers[].textSettings.properties.decorations.underline.gradient.colors[].color",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 25,
+    "api": "createText.TextProperties.decorations.underline (styled).width",
+    "model": "layers[].textSettings.properties.decorations.underline.width",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "underline",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 26,
+    "api": "createText.TextProperties.decorations.overline (boolean)",
+    "model": "layers[].textSettings.properties.decorations.overline",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline"
+    ],
+    "spec": {
+      "kind": "boolean"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 27,
+    "api": "createText.TextProperties.decorations.overline (styled).color",
+    "model": "layers[].textSettings.properties.decorations.overline.color",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 28,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.type",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.type",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 29,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.startX",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.startX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 30,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.startY",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.startY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 31,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.endX",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.endX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 32,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.endY",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.endY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 33,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.startRadius",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.startRadius",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 34,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.endRadius",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.endRadius",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 35,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.centerX",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.centerX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 36,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.centerY",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.centerY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 37,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.startAngle",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.startAngle",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 38,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.rotate",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.rotate",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 39,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.pivotX",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.pivotX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 40,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.pivotY",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.pivotY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 41,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.repeat",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.repeat",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 42,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.colors[].stop",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.colors[].stop",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 43,
+    "api": "createText.TextProperties.decorations.overline (styled).gradient.colors[].color",
+    "model": "layers[].textSettings.properties.decorations.overline.gradient.colors[].color",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 44,
+    "api": "createText.TextProperties.decorations.overline (styled).width",
+    "model": "layers[].textSettings.properties.decorations.overline.width",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "overline",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 45,
+    "api": "createText.TextProperties.decorations.strikethrough (boolean)",
+    "model": "layers[].textSettings.properties.decorations.strikethrough",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough"
+    ],
+    "spec": {
+      "kind": "boolean"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 46,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).color",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.color",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 47,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.type",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.type",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 48,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.startX",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.startX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 49,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.startY",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.startY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 50,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.endX",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.endX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 51,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.endY",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.endY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 52,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.startRadius",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.startRadius",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 53,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.endRadius",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.endRadius",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 54,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.centerX",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.centerX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 55,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.centerY",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.centerY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 56,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.startAngle",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.startAngle",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 57,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.rotate",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.rotate",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 58,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.pivotX",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.pivotX",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 59,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.pivotY",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.pivotY",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 60,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.repeat",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.repeat",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 61,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.colors[].stop",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.colors[].stop",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 62,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).gradient.colors[].color",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.gradient.colors[].color",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 63,
+    "api": "createText.TextProperties.decorations.strikethrough (styled).width",
+    "model": "layers[].textSettings.properties.decorations.strikethrough.width",
+    "root": "properties",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 64,
+    "api": "createText.TextProperties.effects.highlight.color",
+    "model": "layers[].textSettings.properties.effects.highlight.color",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 65,
+    "api": "createText.TextProperties.effects.highlight.gradient.type",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.type",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 66,
+    "api": "createText.TextProperties.effects.highlight.gradient.startX",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.startX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 67,
+    "api": "createText.TextProperties.effects.highlight.gradient.startY",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.startY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 68,
+    "api": "createText.TextProperties.effects.highlight.gradient.endX",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.endX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 69,
+    "api": "createText.TextProperties.effects.highlight.gradient.endY",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.endY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 70,
+    "api": "createText.TextProperties.effects.highlight.gradient.startRadius",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.startRadius",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 71,
+    "api": "createText.TextProperties.effects.highlight.gradient.endRadius",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.endRadius",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 72,
+    "api": "createText.TextProperties.effects.highlight.gradient.centerX",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.centerX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 73,
+    "api": "createText.TextProperties.effects.highlight.gradient.centerY",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.centerY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 74,
+    "api": "createText.TextProperties.effects.highlight.gradient.startAngle",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.startAngle",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 75,
+    "api": "createText.TextProperties.effects.highlight.gradient.rotate",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.rotate",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 76,
+    "api": "createText.TextProperties.effects.highlight.gradient.pivotX",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.pivotX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 77,
+    "api": "createText.TextProperties.effects.highlight.gradient.pivotY",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.pivotY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 78,
+    "api": "createText.TextProperties.effects.highlight.gradient.repeat",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.repeat",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 79,
+    "api": "createText.TextProperties.effects.highlight.gradient.colors[].stop",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.colors[].stop",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 80,
+    "api": "createText.TextProperties.effects.highlight.gradient.colors[].color",
+    "model": "layers[].textSettings.properties.effects.highlight.gradient.colors[].color",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 81,
+    "api": "createText.TextProperties.effects.highlight.opacity",
+    "model": "layers[].textSettings.properties.effects.highlight.opacity",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "highlight",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1,
+      "default": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 82,
+    "api": "createText.TextProperties.effects.glow.color",
+    "model": "layers[].textSettings.properties.effects.glow.color",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 83,
+    "api": "createText.TextProperties.effects.glow.gradient.type",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.type",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 84,
+    "api": "createText.TextProperties.effects.glow.gradient.startX",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.startX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 85,
+    "api": "createText.TextProperties.effects.glow.gradient.startY",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.startY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 86,
+    "api": "createText.TextProperties.effects.glow.gradient.endX",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.endX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 87,
+    "api": "createText.TextProperties.effects.glow.gradient.endY",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.endY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 88,
+    "api": "createText.TextProperties.effects.glow.gradient.startRadius",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.startRadius",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 89,
+    "api": "createText.TextProperties.effects.glow.gradient.endRadius",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.endRadius",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 90,
+    "api": "createText.TextProperties.effects.glow.gradient.centerX",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.centerX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 91,
+    "api": "createText.TextProperties.effects.glow.gradient.centerY",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.centerY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 92,
+    "api": "createText.TextProperties.effects.glow.gradient.startAngle",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.startAngle",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 93,
+    "api": "createText.TextProperties.effects.glow.gradient.rotate",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.rotate",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 94,
+    "api": "createText.TextProperties.effects.glow.gradient.pivotX",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.pivotX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 95,
+    "api": "createText.TextProperties.effects.glow.gradient.pivotY",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.pivotY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 96,
+    "api": "createText.TextProperties.effects.glow.gradient.repeat",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.repeat",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 97,
+    "api": "createText.TextProperties.effects.glow.gradient.colors[].stop",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.colors[].stop",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 98,
+    "api": "createText.TextProperties.effects.glow.gradient.colors[].color",
+    "model": "layers[].textSettings.properties.effects.glow.gradient.colors[].color",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 99,
+    "api": "createText.TextProperties.effects.glow.intensity",
+    "model": "layers[].textSettings.properties.effects.glow.intensity",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "intensity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 100,
+    "api": "createText.TextProperties.effects.glow.opacity",
+    "model": "layers[].textSettings.properties.effects.glow.opacity",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "glow",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 101,
+    "api": "createText.TextProperties.effects.shadow.color",
+    "model": "layers[].textSettings.properties.effects.shadow.color",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 102,
+    "api": "createText.TextProperties.effects.shadow.gradient.type",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.type",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 103,
+    "api": "createText.TextProperties.effects.shadow.gradient.startX",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.startX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 104,
+    "api": "createText.TextProperties.effects.shadow.gradient.startY",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.startY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 105,
+    "api": "createText.TextProperties.effects.shadow.gradient.endX",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.endX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 106,
+    "api": "createText.TextProperties.effects.shadow.gradient.endY",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.endY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 107,
+    "api": "createText.TextProperties.effects.shadow.gradient.startRadius",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.startRadius",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 108,
+    "api": "createText.TextProperties.effects.shadow.gradient.endRadius",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.endRadius",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 109,
+    "api": "createText.TextProperties.effects.shadow.gradient.centerX",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.centerX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 110,
+    "api": "createText.TextProperties.effects.shadow.gradient.centerY",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.centerY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 111,
+    "api": "createText.TextProperties.effects.shadow.gradient.startAngle",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.startAngle",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 112,
+    "api": "createText.TextProperties.effects.shadow.gradient.rotate",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.rotate",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 113,
+    "api": "createText.TextProperties.effects.shadow.gradient.pivotX",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.pivotX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 114,
+    "api": "createText.TextProperties.effects.shadow.gradient.pivotY",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.pivotY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 115,
+    "api": "createText.TextProperties.effects.shadow.gradient.repeat",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.repeat",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 116,
+    "api": "createText.TextProperties.effects.shadow.gradient.colors[].stop",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.colors[].stop",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 117,
+    "api": "createText.TextProperties.effects.shadow.gradient.colors[].color",
+    "model": "layers[].textSettings.properties.effects.shadow.gradient.colors[].color",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 118,
+    "api": "createText.TextProperties.effects.shadow.offsetX",
+    "model": "layers[].textSettings.properties.effects.shadow.offsetX",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "offsetX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -2048,
+      "max": 2048
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 119,
+    "api": "createText.TextProperties.effects.shadow.offsetY",
+    "model": "layers[].textSettings.properties.effects.shadow.offsetY",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "offsetY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -2048,
+      "max": 2048
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 120,
+    "api": "createText.TextProperties.effects.shadow.blur",
+    "model": "layers[].textSettings.properties.effects.shadow.blur",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "blur"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 512
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 121,
+    "api": "createText.TextProperties.effects.shadow.opacity",
+    "model": "layers[].textSettings.properties.effects.shadow.opacity",
+    "root": "properties",
+    "tokens": [
+      "effects",
+      "shadow",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 122,
+    "api": "createText.TextProperties.layout.lineHeight",
+    "model": "layers[].textSettings.properties.layout.lineHeight",
+    "root": "properties",
+    "tokens": [
+      "layout",
+      "lineHeight"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0.01,
+      "max": 1000
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 123,
+    "api": "createText.TextProperties.layout.letterSpacing",
+    "model": "layers[].textSettings.properties.layout.letterSpacing",
+    "root": "properties",
+    "tokens": [
+      "layout",
+      "letterSpacing"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -200,
+      "max": 200
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 124,
+    "api": "createText.TextProperties.layout.wordSpacing",
+    "model": "layers[].textSettings.properties.layout.wordSpacing",
+    "root": "properties",
+    "tokens": [
+      "layout",
+      "wordSpacing"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -200,
+      "max": 200
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 125,
+    "api": "createText.TextProperties.layout.maxWidth",
+    "model": "layers[].textSettings.properties.layout.maxWidth",
+    "root": "properties",
+    "tokens": [
+      "layout",
+      "maxWidth"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 126,
+    "api": "createText.TextProperties.layout.maxHeight",
+    "model": "layers[].textSettings.properties.layout.maxHeight",
+    "root": "properties",
+    "tokens": [
+      "layout",
+      "maxHeight"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 127,
+    "api": "createText.TextProperties.placement.textAlign",
+    "model": "layers[].textSettings.properties.placement.textAlign",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "textAlign"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "left",
+        "center",
+        "right",
+        "start",
+        "end"
+      ],
+      "default": "left"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 128,
+    "api": "createText.TextProperties.placement.textBaseline",
+    "model": "layers[].textSettings.properties.placement.textBaseline",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "textBaseline"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "alphabetic",
+        "bottom",
+        "hanging",
+        "ideographic",
+        "middle",
+        "top"
+      ],
+      "default": "alphabetic"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 129,
+    "api": "createText.TextProperties.placement.rotation",
+    "model": "layers[].textSettings.properties.placement.rotation",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "rotation"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 130,
+    "api": "createText.TextProperties.placement.scaleX",
+    "model": "layers[].textSettings.properties.placement.scaleX",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "scaleX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -100,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 131,
+    "api": "createText.TextProperties.placement.scaleY",
+    "model": "layers[].textSettings.properties.placement.scaleY",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "scaleY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -100,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 132,
+    "api": "createText.TextProperties.placement.skewX",
+    "model": "layers[].textSettings.properties.placement.skewX",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "skewX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -89.9,
+      "max": 89.9
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 133,
+    "api": "createText.TextProperties.placement.skewY",
+    "model": "layers[].textSettings.properties.placement.skewY",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "skewY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -89.9,
+      "max": 89.9
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 134,
+    "api": "createText.TextProperties.placement.perspective.points[].x",
+    "model": "layers[].textSettings.properties.placement.perspective.points[].x",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "perspective",
+      "points[]",
+      "x"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 135,
+    "api": "createText.TextProperties.placement.perspective.points[].y",
+    "model": "layers[].textSettings.properties.placement.perspective.points[].y",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "perspective",
+      "points[]",
+      "y"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 136,
+    "api": "createText.TextProperties.placement.perspective.interpolation",
+    "model": "layers[].textSettings.properties.placement.perspective.interpolation",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "perspective",
+      "interpolation"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "nearest",
+        "bilinear",
+        "bicubic"
+      ],
+      "default": "nearest"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 137,
+    "api": "createText.TextProperties.placement.perspective.edgeMode",
+    "model": "layers[].textSettings.properties.placement.perspective.edgeMode",
+    "root": "properties",
+    "tokens": [
+      "placement",
+      "perspective",
+      "edgeMode"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "transparent",
+        "clamp",
+        "wrap",
+        "mirror"
+      ],
+      "default": "transparent"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 138,
+    "api": "createText.TextProperties.fill.color",
+    "model": "layers[].textSettings.properties.fill.color",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 139,
+    "api": "createText.TextProperties.fill.gradient.type",
+    "model": "layers[].textSettings.properties.fill.gradient.type",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 140,
+    "api": "createText.TextProperties.fill.gradient.startX",
+    "model": "layers[].textSettings.properties.fill.gradient.startX",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 141,
+    "api": "createText.TextProperties.fill.gradient.startY",
+    "model": "layers[].textSettings.properties.fill.gradient.startY",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 142,
+    "api": "createText.TextProperties.fill.gradient.endX",
+    "model": "layers[].textSettings.properties.fill.gradient.endX",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 143,
+    "api": "createText.TextProperties.fill.gradient.endY",
+    "model": "layers[].textSettings.properties.fill.gradient.endY",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 144,
+    "api": "createText.TextProperties.fill.gradient.startRadius",
+    "model": "layers[].textSettings.properties.fill.gradient.startRadius",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 145,
+    "api": "createText.TextProperties.fill.gradient.endRadius",
+    "model": "layers[].textSettings.properties.fill.gradient.endRadius",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 146,
+    "api": "createText.TextProperties.fill.gradient.centerX",
+    "model": "layers[].textSettings.properties.fill.gradient.centerX",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 147,
+    "api": "createText.TextProperties.fill.gradient.centerY",
+    "model": "layers[].textSettings.properties.fill.gradient.centerY",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 148,
+    "api": "createText.TextProperties.fill.gradient.startAngle",
+    "model": "layers[].textSettings.properties.fill.gradient.startAngle",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 149,
+    "api": "createText.TextProperties.fill.gradient.rotate",
+    "model": "layers[].textSettings.properties.fill.gradient.rotate",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 150,
+    "api": "createText.TextProperties.fill.gradient.pivotX",
+    "model": "layers[].textSettings.properties.fill.gradient.pivotX",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 151,
+    "api": "createText.TextProperties.fill.gradient.pivotY",
+    "model": "layers[].textSettings.properties.fill.gradient.pivotY",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 152,
+    "api": "createText.TextProperties.fill.gradient.repeat",
+    "model": "layers[].textSettings.properties.fill.gradient.repeat",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 153,
+    "api": "createText.TextProperties.fill.gradient.colors[].stop",
+    "model": "layers[].textSettings.properties.fill.gradient.colors[].stop",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 154,
+    "api": "createText.TextProperties.fill.gradient.colors[].color",
+    "model": "layers[].textSettings.properties.fill.gradient.colors[].color",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 155,
+    "api": "createText.TextProperties.fill.opacity",
+    "model": "layers[].textSettings.properties.fill.opacity",
+    "root": "properties",
+    "tokens": [
+      "fill",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1,
+      "default": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 156,
+    "api": "createText.TextProperties.stroke.color",
+    "model": "layers[].textSettings.properties.stroke.color",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 157,
+    "api": "createText.TextProperties.stroke.width",
+    "model": "layers[].textSettings.properties.stroke.width",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 158,
+    "api": "createText.TextProperties.stroke.gradient.type",
+    "model": "layers[].textSettings.properties.stroke.gradient.type",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 159,
+    "api": "createText.TextProperties.stroke.gradient.startX",
+    "model": "layers[].textSettings.properties.stroke.gradient.startX",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 160,
+    "api": "createText.TextProperties.stroke.gradient.startY",
+    "model": "layers[].textSettings.properties.stroke.gradient.startY",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 161,
+    "api": "createText.TextProperties.stroke.gradient.endX",
+    "model": "layers[].textSettings.properties.stroke.gradient.endX",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 162,
+    "api": "createText.TextProperties.stroke.gradient.endY",
+    "model": "layers[].textSettings.properties.stroke.gradient.endY",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 163,
+    "api": "createText.TextProperties.stroke.gradient.startRadius",
+    "model": "layers[].textSettings.properties.stroke.gradient.startRadius",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 164,
+    "api": "createText.TextProperties.stroke.gradient.endRadius",
+    "model": "layers[].textSettings.properties.stroke.gradient.endRadius",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 165,
+    "api": "createText.TextProperties.stroke.gradient.centerX",
+    "model": "layers[].textSettings.properties.stroke.gradient.centerX",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 166,
+    "api": "createText.TextProperties.stroke.gradient.centerY",
+    "model": "layers[].textSettings.properties.stroke.gradient.centerY",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 167,
+    "api": "createText.TextProperties.stroke.gradient.startAngle",
+    "model": "layers[].textSettings.properties.stroke.gradient.startAngle",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 168,
+    "api": "createText.TextProperties.stroke.gradient.rotate",
+    "model": "layers[].textSettings.properties.stroke.gradient.rotate",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 169,
+    "api": "createText.TextProperties.stroke.gradient.pivotX",
+    "model": "layers[].textSettings.properties.stroke.gradient.pivotX",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 170,
+    "api": "createText.TextProperties.stroke.gradient.pivotY",
+    "model": "layers[].textSettings.properties.stroke.gradient.pivotY",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 171,
+    "api": "createText.TextProperties.stroke.gradient.repeat",
+    "model": "layers[].textSettings.properties.stroke.gradient.repeat",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 172,
+    "api": "createText.TextProperties.stroke.gradient.colors[].stop",
+    "model": "layers[].textSettings.properties.stroke.gradient.colors[].stop",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 173,
+    "api": "createText.TextProperties.stroke.gradient.colors[].color",
+    "model": "layers[].textSettings.properties.stroke.gradient.colors[].color",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 174,
+    "api": "createText.TextProperties.stroke.opacity",
+    "model": "layers[].textSettings.properties.stroke.opacity",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 175,
+    "api": "createText.TextProperties.stroke.style",
+    "model": "layers[].textSettings.properties.stroke.style",
+    "root": "properties",
+    "tokens": [
+      "stroke",
+      "style"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "solid",
+        "dashed",
+        "dotted",
+        "groove",
+        "ridge",
+        "double"
+      ],
+      "default": "solid"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 176,
+    "api": "createText.TextProperties.textOnCurve.sweepAngle",
+    "model": "layers[].textSettings.properties.textOnCurve.sweepAngle",
+    "root": "properties",
+    "tokens": [
+      "textOnCurve",
+      "sweepAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 360
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 177,
+    "api": "createText.TextProperties.textOnCurve.radius",
+    "model": "layers[].textSettings.properties.textOnCurve.radius",
+    "root": "properties",
+    "tokens": [
+      "textOnCurve",
+      "radius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 5e-324,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 178,
+    "api": "createText.TextProperties.textOnCurve.up",
+    "model": "layers[].textSettings.properties.textOnCurve.up",
+    "root": "properties",
+    "tokens": [
+      "textOnCurve",
+      "up"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 179,
+    "api": "createText.TextProperties.textOnCurve.layoutMode",
+    "model": "layers[].textSettings.properties.textOnCurve.layoutMode",
+    "root": "properties",
+    "tokens": [
+      "textOnCurve",
+      "layoutMode"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "clamp",
+        "fit",
+        "override"
+      ],
+      "default": "clamp"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 180,
+    "api": "createText.TextProperties.textOnCurve.baselineOffset",
+    "model": "layers[].textSettings.properties.textOnCurve.baselineOffset",
+    "root": "properties",
+    "tokens": [
+      "textOnCurve",
+      "baselineOffset"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -2048,
+      "max": 2048
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 181,
+    "api": "createText.TextProperties.textOnCurve.startAngleDeg",
+    "model": "layers[].textSettings.properties.textOnCurve.startAngleDeg",
+    "root": "properties",
+    "tokens": [
+      "textOnCurve",
+      "startAngleDeg"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 182,
+    "api": "createText.TextProperties.includeCharMetrics",
+    "model": "layers[].textSettings.properties.includeCharMetrics",
+    "root": "properties",
+    "tokens": [
+      "includeCharMetrics"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 183,
+    "api": "createText.TextProperties.measurementCanvas.width",
+    "model": "layers[].textSettings.properties.measurementCanvas.width",
+    "root": "properties",
+    "tokens": [
+      "measurementCanvas",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 184,
+    "api": "createText.TextProperties.measurementCanvas.height",
+    "model": "layers[].textSettings.properties.measurementCanvas.height",
+    "root": "properties",
+    "tokens": [
+      "measurementCanvas",
+      "height"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 185,
+    "api": "createText.TextProperties[].text",
+    "model": "layers[].textSettings.items[].text",
+    "root": "items",
+    "tokens": [
+      "text"
+    ],
+    "spec": {
+      "kind": "string",
+      "default": ""
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 186,
+    "api": "createText.TextProperties[].x",
+    "model": "layers[].textSettings.items[].x",
+    "root": "items",
+    "tokens": [
+      "x"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 187,
+    "api": "createText.TextProperties[].y",
+    "model": "layers[].textSettings.items[].y",
+    "root": "items",
+    "tokens": [
+      "y"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 188,
+    "api": "createText.TextProperties[].font.size",
+    "model": "layers[].textSettings.items[].font.size",
+    "root": "items",
+    "tokens": [
+      "font",
+      "size"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 512
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 189,
+    "api": "createText.TextProperties[].font.family",
+    "model": "layers[].textSettings.items[].font.family",
+    "root": "items",
+    "tokens": [
+      "font",
+      "family"
+    ],
+    "spec": {
+      "kind": "string",
+      "default": ""
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 190,
+    "api": "createText.TextProperties[].font.name",
+    "model": "layers[].textSettings.items[].font.name",
+    "root": "items",
+    "tokens": [
+      "font",
+      "name"
+    ],
+    "spec": {
+      "kind": "string",
+      "default": ""
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 191,
+    "api": "createText.TextProperties[].font.weight",
+    "model": "layers[].textSettings.items[].font.weight",
+    "root": "items",
+    "tokens": [
+      "font",
+      "weight"
+    ],
+    "spec": {
+      "kind": "font-weight"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 192,
+    "api": "createText.TextProperties[].font.style",
+    "model": "layers[].textSettings.items[].font.style",
+    "root": "items",
+    "tokens": [
+      "font",
+      "style"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "normal",
+        "italic",
+        "oblique"
+      ],
+      "default": "normal"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 193,
+    "api": "createText.TextProperties[].decorations.bold",
+    "model": "layers[].textSettings.items[].decorations.bold",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "bold"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 194,
+    "api": "createText.TextProperties[].decorations.italic",
+    "model": "layers[].textSettings.items[].decorations.italic",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "italic"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 195,
+    "api": "createText.TextProperties[].decorations.underline (boolean)",
+    "model": "layers[].textSettings.items[].decorations.underline",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline"
+    ],
+    "spec": {
+      "kind": "boolean"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 196,
+    "api": "createText.TextProperties[].decorations.underline (styled).color",
+    "model": "layers[].textSettings.items[].decorations.underline.color",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 197,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.type",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.type",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 198,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.startX",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.startX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 199,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.startY",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.startY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 200,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.endX",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.endX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 201,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.endY",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.endY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 202,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.startRadius",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.startRadius",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 203,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.endRadius",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.endRadius",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 204,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.centerX",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.centerX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 205,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.centerY",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.centerY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 206,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.startAngle",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.startAngle",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 207,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.rotate",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.rotate",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 208,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.pivotX",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.pivotX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 209,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.pivotY",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.pivotY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 210,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.repeat",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.repeat",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 211,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.colors[].stop",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.colors[].stop",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 212,
+    "api": "createText.TextProperties[].decorations.underline (styled).gradient.colors[].color",
+    "model": "layers[].textSettings.items[].decorations.underline.gradient.colors[].color",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 213,
+    "api": "createText.TextProperties[].decorations.underline (styled).width",
+    "model": "layers[].textSettings.items[].decorations.underline.width",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "underline",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 214,
+    "api": "createText.TextProperties[].decorations.overline (boolean)",
+    "model": "layers[].textSettings.items[].decorations.overline",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline"
+    ],
+    "spec": {
+      "kind": "boolean"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 215,
+    "api": "createText.TextProperties[].decorations.overline (styled).color",
+    "model": "layers[].textSettings.items[].decorations.overline.color",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 216,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.type",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.type",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 217,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.startX",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.startX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 218,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.startY",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.startY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 219,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.endX",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.endX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 220,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.endY",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.endY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 221,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.startRadius",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.startRadius",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 222,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.endRadius",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.endRadius",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 223,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.centerX",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.centerX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 224,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.centerY",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.centerY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 225,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.startAngle",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.startAngle",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 226,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.rotate",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.rotate",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 227,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.pivotX",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.pivotX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 228,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.pivotY",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.pivotY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 229,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.repeat",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.repeat",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 230,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.colors[].stop",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.colors[].stop",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 231,
+    "api": "createText.TextProperties[].decorations.overline (styled).gradient.colors[].color",
+    "model": "layers[].textSettings.items[].decorations.overline.gradient.colors[].color",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 232,
+    "api": "createText.TextProperties[].decorations.overline (styled).width",
+    "model": "layers[].textSettings.items[].decorations.overline.width",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "overline",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 233,
+    "api": "createText.TextProperties[].decorations.strikethrough (boolean)",
+    "model": "layers[].textSettings.items[].decorations.strikethrough",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough"
+    ],
+    "spec": {
+      "kind": "boolean"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 234,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).color",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.color",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 235,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.type",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.type",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 236,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.startX",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.startX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 237,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.startY",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.startY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 238,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.endX",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.endX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 239,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.endY",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.endY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 240,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.startRadius",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.startRadius",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 241,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.endRadius",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.endRadius",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 242,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.centerX",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.centerX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 243,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.centerY",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.centerY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 244,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.startAngle",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.startAngle",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 245,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.rotate",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.rotate",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 246,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.pivotX",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.pivotX",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 247,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.pivotY",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.pivotY",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 248,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.repeat",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.repeat",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 249,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.colors[].stop",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.colors[].stop",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 250,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).gradient.colors[].color",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.gradient.colors[].color",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 251,
+    "api": "createText.TextProperties[].decorations.strikethrough (styled).width",
+    "model": "layers[].textSettings.items[].decorations.strikethrough.width",
+    "root": "items",
+    "tokens": [
+      "decorations",
+      "strikethrough",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 252,
+    "api": "createText.TextProperties[].effects.highlight.color",
+    "model": "layers[].textSettings.items[].effects.highlight.color",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 253,
+    "api": "createText.TextProperties[].effects.highlight.gradient.type",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.type",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 254,
+    "api": "createText.TextProperties[].effects.highlight.gradient.startX",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.startX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 255,
+    "api": "createText.TextProperties[].effects.highlight.gradient.startY",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.startY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 256,
+    "api": "createText.TextProperties[].effects.highlight.gradient.endX",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.endX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 257,
+    "api": "createText.TextProperties[].effects.highlight.gradient.endY",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.endY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 258,
+    "api": "createText.TextProperties[].effects.highlight.gradient.startRadius",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.startRadius",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 259,
+    "api": "createText.TextProperties[].effects.highlight.gradient.endRadius",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.endRadius",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 260,
+    "api": "createText.TextProperties[].effects.highlight.gradient.centerX",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.centerX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 261,
+    "api": "createText.TextProperties[].effects.highlight.gradient.centerY",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.centerY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 262,
+    "api": "createText.TextProperties[].effects.highlight.gradient.startAngle",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.startAngle",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 263,
+    "api": "createText.TextProperties[].effects.highlight.gradient.rotate",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.rotate",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 264,
+    "api": "createText.TextProperties[].effects.highlight.gradient.pivotX",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.pivotX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 265,
+    "api": "createText.TextProperties[].effects.highlight.gradient.pivotY",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.pivotY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 266,
+    "api": "createText.TextProperties[].effects.highlight.gradient.repeat",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.repeat",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 267,
+    "api": "createText.TextProperties[].effects.highlight.gradient.colors[].stop",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.colors[].stop",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 268,
+    "api": "createText.TextProperties[].effects.highlight.gradient.colors[].color",
+    "model": "layers[].textSettings.items[].effects.highlight.gradient.colors[].color",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 269,
+    "api": "createText.TextProperties[].effects.highlight.opacity",
+    "model": "layers[].textSettings.items[].effects.highlight.opacity",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "highlight",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1,
+      "default": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 270,
+    "api": "createText.TextProperties[].effects.glow.color",
+    "model": "layers[].textSettings.items[].effects.glow.color",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 271,
+    "api": "createText.TextProperties[].effects.glow.gradient.type",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.type",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 272,
+    "api": "createText.TextProperties[].effects.glow.gradient.startX",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.startX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 273,
+    "api": "createText.TextProperties[].effects.glow.gradient.startY",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.startY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 274,
+    "api": "createText.TextProperties[].effects.glow.gradient.endX",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.endX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 275,
+    "api": "createText.TextProperties[].effects.glow.gradient.endY",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.endY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 276,
+    "api": "createText.TextProperties[].effects.glow.gradient.startRadius",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.startRadius",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 277,
+    "api": "createText.TextProperties[].effects.glow.gradient.endRadius",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.endRadius",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 278,
+    "api": "createText.TextProperties[].effects.glow.gradient.centerX",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.centerX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 279,
+    "api": "createText.TextProperties[].effects.glow.gradient.centerY",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.centerY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 280,
+    "api": "createText.TextProperties[].effects.glow.gradient.startAngle",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.startAngle",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 281,
+    "api": "createText.TextProperties[].effects.glow.gradient.rotate",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.rotate",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 282,
+    "api": "createText.TextProperties[].effects.glow.gradient.pivotX",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.pivotX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 283,
+    "api": "createText.TextProperties[].effects.glow.gradient.pivotY",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.pivotY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 284,
+    "api": "createText.TextProperties[].effects.glow.gradient.repeat",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.repeat",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 285,
+    "api": "createText.TextProperties[].effects.glow.gradient.colors[].stop",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.colors[].stop",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 286,
+    "api": "createText.TextProperties[].effects.glow.gradient.colors[].color",
+    "model": "layers[].textSettings.items[].effects.glow.gradient.colors[].color",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 287,
+    "api": "createText.TextProperties[].effects.glow.intensity",
+    "model": "layers[].textSettings.items[].effects.glow.intensity",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "intensity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 288,
+    "api": "createText.TextProperties[].effects.glow.opacity",
+    "model": "layers[].textSettings.items[].effects.glow.opacity",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "glow",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 289,
+    "api": "createText.TextProperties[].effects.shadow.color",
+    "model": "layers[].textSettings.items[].effects.shadow.color",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 290,
+    "api": "createText.TextProperties[].effects.shadow.gradient.type",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.type",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 291,
+    "api": "createText.TextProperties[].effects.shadow.gradient.startX",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.startX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 292,
+    "api": "createText.TextProperties[].effects.shadow.gradient.startY",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.startY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 293,
+    "api": "createText.TextProperties[].effects.shadow.gradient.endX",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.endX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 294,
+    "api": "createText.TextProperties[].effects.shadow.gradient.endY",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.endY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 295,
+    "api": "createText.TextProperties[].effects.shadow.gradient.startRadius",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.startRadius",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 296,
+    "api": "createText.TextProperties[].effects.shadow.gradient.endRadius",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.endRadius",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 297,
+    "api": "createText.TextProperties[].effects.shadow.gradient.centerX",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.centerX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 298,
+    "api": "createText.TextProperties[].effects.shadow.gradient.centerY",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.centerY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 299,
+    "api": "createText.TextProperties[].effects.shadow.gradient.startAngle",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.startAngle",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 300,
+    "api": "createText.TextProperties[].effects.shadow.gradient.rotate",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.rotate",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 301,
+    "api": "createText.TextProperties[].effects.shadow.gradient.pivotX",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.pivotX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 302,
+    "api": "createText.TextProperties[].effects.shadow.gradient.pivotY",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.pivotY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 303,
+    "api": "createText.TextProperties[].effects.shadow.gradient.repeat",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.repeat",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 304,
+    "api": "createText.TextProperties[].effects.shadow.gradient.colors[].stop",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.colors[].stop",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 305,
+    "api": "createText.TextProperties[].effects.shadow.gradient.colors[].color",
+    "model": "layers[].textSettings.items[].effects.shadow.gradient.colors[].color",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 306,
+    "api": "createText.TextProperties[].effects.shadow.offsetX",
+    "model": "layers[].textSettings.items[].effects.shadow.offsetX",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "offsetX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -2048,
+      "max": 2048
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 307,
+    "api": "createText.TextProperties[].effects.shadow.offsetY",
+    "model": "layers[].textSettings.items[].effects.shadow.offsetY",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "offsetY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -2048,
+      "max": 2048
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 308,
+    "api": "createText.TextProperties[].effects.shadow.blur",
+    "model": "layers[].textSettings.items[].effects.shadow.blur",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "blur"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 512
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 309,
+    "api": "createText.TextProperties[].effects.shadow.opacity",
+    "model": "layers[].textSettings.items[].effects.shadow.opacity",
+    "root": "items",
+    "tokens": [
+      "effects",
+      "shadow",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 310,
+    "api": "createText.TextProperties[].layout.lineHeight",
+    "model": "layers[].textSettings.items[].layout.lineHeight",
+    "root": "items",
+    "tokens": [
+      "layout",
+      "lineHeight"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0.01,
+      "max": 1000
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 311,
+    "api": "createText.TextProperties[].layout.letterSpacing",
+    "model": "layers[].textSettings.items[].layout.letterSpacing",
+    "root": "items",
+    "tokens": [
+      "layout",
+      "letterSpacing"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -200,
+      "max": 200
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 312,
+    "api": "createText.TextProperties[].layout.wordSpacing",
+    "model": "layers[].textSettings.items[].layout.wordSpacing",
+    "root": "items",
+    "tokens": [
+      "layout",
+      "wordSpacing"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -200,
+      "max": 200
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 313,
+    "api": "createText.TextProperties[].layout.maxWidth",
+    "model": "layers[].textSettings.items[].layout.maxWidth",
+    "root": "items",
+    "tokens": [
+      "layout",
+      "maxWidth"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 314,
+    "api": "createText.TextProperties[].layout.maxHeight",
+    "model": "layers[].textSettings.items[].layout.maxHeight",
+    "root": "items",
+    "tokens": [
+      "layout",
+      "maxHeight"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 315,
+    "api": "createText.TextProperties[].placement.textAlign",
+    "model": "layers[].textSettings.items[].placement.textAlign",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "textAlign"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "left",
+        "center",
+        "right",
+        "start",
+        "end"
+      ],
+      "default": "left"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 316,
+    "api": "createText.TextProperties[].placement.textBaseline",
+    "model": "layers[].textSettings.items[].placement.textBaseline",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "textBaseline"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "alphabetic",
+        "bottom",
+        "hanging",
+        "ideographic",
+        "middle",
+        "top"
+      ],
+      "default": "alphabetic"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 317,
+    "api": "createText.TextProperties[].placement.rotation",
+    "model": "layers[].textSettings.items[].placement.rotation",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "rotation"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 318,
+    "api": "createText.TextProperties[].placement.scaleX",
+    "model": "layers[].textSettings.items[].placement.scaleX",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "scaleX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -100,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 319,
+    "api": "createText.TextProperties[].placement.scaleY",
+    "model": "layers[].textSettings.items[].placement.scaleY",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "scaleY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -100,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 320,
+    "api": "createText.TextProperties[].placement.skewX",
+    "model": "layers[].textSettings.items[].placement.skewX",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "skewX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -89.9,
+      "max": 89.9
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 321,
+    "api": "createText.TextProperties[].placement.skewY",
+    "model": "layers[].textSettings.items[].placement.skewY",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "skewY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -89.9,
+      "max": 89.9
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 322,
+    "api": "createText.TextProperties[].placement.perspective.points[].x",
+    "model": "layers[].textSettings.items[].placement.perspective.points[].x",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "perspective",
+      "points[]",
+      "x"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 323,
+    "api": "createText.TextProperties[].placement.perspective.points[].y",
+    "model": "layers[].textSettings.items[].placement.perspective.points[].y",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "perspective",
+      "points[]",
+      "y"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 324,
+    "api": "createText.TextProperties[].placement.perspective.interpolation",
+    "model": "layers[].textSettings.items[].placement.perspective.interpolation",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "perspective",
+      "interpolation"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "nearest",
+        "bilinear",
+        "bicubic"
+      ],
+      "default": "nearest"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 325,
+    "api": "createText.TextProperties[].placement.perspective.edgeMode",
+    "model": "layers[].textSettings.items[].placement.perspective.edgeMode",
+    "root": "items",
+    "tokens": [
+      "placement",
+      "perspective",
+      "edgeMode"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "transparent",
+        "clamp",
+        "wrap",
+        "mirror"
+      ],
+      "default": "transparent"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 326,
+    "api": "createText.TextProperties[].fill.color",
+    "model": "layers[].textSettings.items[].fill.color",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 327,
+    "api": "createText.TextProperties[].fill.gradient.type",
+    "model": "layers[].textSettings.items[].fill.gradient.type",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 328,
+    "api": "createText.TextProperties[].fill.gradient.startX",
+    "model": "layers[].textSettings.items[].fill.gradient.startX",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 329,
+    "api": "createText.TextProperties[].fill.gradient.startY",
+    "model": "layers[].textSettings.items[].fill.gradient.startY",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 330,
+    "api": "createText.TextProperties[].fill.gradient.endX",
+    "model": "layers[].textSettings.items[].fill.gradient.endX",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 331,
+    "api": "createText.TextProperties[].fill.gradient.endY",
+    "model": "layers[].textSettings.items[].fill.gradient.endY",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 332,
+    "api": "createText.TextProperties[].fill.gradient.startRadius",
+    "model": "layers[].textSettings.items[].fill.gradient.startRadius",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 333,
+    "api": "createText.TextProperties[].fill.gradient.endRadius",
+    "model": "layers[].textSettings.items[].fill.gradient.endRadius",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 334,
+    "api": "createText.TextProperties[].fill.gradient.centerX",
+    "model": "layers[].textSettings.items[].fill.gradient.centerX",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 335,
+    "api": "createText.TextProperties[].fill.gradient.centerY",
+    "model": "layers[].textSettings.items[].fill.gradient.centerY",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 336,
+    "api": "createText.TextProperties[].fill.gradient.startAngle",
+    "model": "layers[].textSettings.items[].fill.gradient.startAngle",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 337,
+    "api": "createText.TextProperties[].fill.gradient.rotate",
+    "model": "layers[].textSettings.items[].fill.gradient.rotate",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 338,
+    "api": "createText.TextProperties[].fill.gradient.pivotX",
+    "model": "layers[].textSettings.items[].fill.gradient.pivotX",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 339,
+    "api": "createText.TextProperties[].fill.gradient.pivotY",
+    "model": "layers[].textSettings.items[].fill.gradient.pivotY",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 340,
+    "api": "createText.TextProperties[].fill.gradient.repeat",
+    "model": "layers[].textSettings.items[].fill.gradient.repeat",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 341,
+    "api": "createText.TextProperties[].fill.gradient.colors[].stop",
+    "model": "layers[].textSettings.items[].fill.gradient.colors[].stop",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 342,
+    "api": "createText.TextProperties[].fill.gradient.colors[].color",
+    "model": "layers[].textSettings.items[].fill.gradient.colors[].color",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 343,
+    "api": "createText.TextProperties[].fill.opacity",
+    "model": "layers[].textSettings.items[].fill.opacity",
+    "root": "items",
+    "tokens": [
+      "fill",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1,
+      "default": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 344,
+    "api": "createText.TextProperties[].stroke.color",
+    "model": "layers[].textSettings.items[].stroke.color",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 345,
+    "api": "createText.TextProperties[].stroke.width",
+    "model": "layers[].textSettings.items[].stroke.width",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 346,
+    "api": "createText.TextProperties[].stroke.gradient.type",
+    "model": "layers[].textSettings.items[].stroke.gradient.type",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "type"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "linear",
+        "radial",
+        "conic"
+      ],
+      "default": "linear"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 347,
+    "api": "createText.TextProperties[].stroke.gradient.startX",
+    "model": "layers[].textSettings.items[].stroke.gradient.startX",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "startX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 348,
+    "api": "createText.TextProperties[].stroke.gradient.startY",
+    "model": "layers[].textSettings.items[].stroke.gradient.startY",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "startY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 349,
+    "api": "createText.TextProperties[].stroke.gradient.endX",
+    "model": "layers[].textSettings.items[].stroke.gradient.endX",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "endX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 350,
+    "api": "createText.TextProperties[].stroke.gradient.endY",
+    "model": "layers[].textSettings.items[].stroke.gradient.endY",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "endY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 351,
+    "api": "createText.TextProperties[].stroke.gradient.startRadius",
+    "model": "layers[].textSettings.items[].stroke.gradient.startRadius",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "startRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 352,
+    "api": "createText.TextProperties[].stroke.gradient.endRadius",
+    "model": "layers[].textSettings.items[].stroke.gradient.endRadius",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "endRadius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 353,
+    "api": "createText.TextProperties[].stroke.gradient.centerX",
+    "model": "layers[].textSettings.items[].stroke.gradient.centerX",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "centerX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 354,
+    "api": "createText.TextProperties[].stroke.gradient.centerY",
+    "model": "layers[].textSettings.items[].stroke.gradient.centerY",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "centerY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 355,
+    "api": "createText.TextProperties[].stroke.gradient.startAngle",
+    "model": "layers[].textSettings.items[].stroke.gradient.startAngle",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "startAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 356,
+    "api": "createText.TextProperties[].stroke.gradient.rotate",
+    "model": "layers[].textSettings.items[].stroke.gradient.rotate",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "rotate"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 357,
+    "api": "createText.TextProperties[].stroke.gradient.pivotX",
+    "model": "layers[].textSettings.items[].stroke.gradient.pivotX",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 358,
+    "api": "createText.TextProperties[].stroke.gradient.pivotY",
+    "model": "layers[].textSettings.items[].stroke.gradient.pivotY",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 359,
+    "api": "createText.TextProperties[].stroke.gradient.repeat",
+    "model": "layers[].textSettings.items[].stroke.gradient.repeat",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "repeat"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "no-repeat",
+        "repeat",
+        "reflect"
+      ],
+      "default": "no-repeat"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 360,
+    "api": "createText.TextProperties[].stroke.gradient.colors[].stop",
+    "model": "layers[].textSettings.items[].stroke.gradient.colors[].stop",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "colors[]",
+      "stop"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 361,
+    "api": "createText.TextProperties[].stroke.gradient.colors[].color",
+    "model": "layers[].textSettings.items[].stroke.gradient.colors[].color",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "gradient",
+      "colors[]",
+      "color"
+    ],
+    "spec": {
+      "kind": "color",
+      "default": "#ffffff"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 362,
+    "api": "createText.TextProperties[].stroke.opacity",
+    "model": "layers[].textSettings.items[].stroke.opacity",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 363,
+    "api": "createText.TextProperties[].stroke.style",
+    "model": "layers[].textSettings.items[].stroke.style",
+    "root": "items",
+    "tokens": [
+      "stroke",
+      "style"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "solid",
+        "dashed",
+        "dotted",
+        "groove",
+        "ridge",
+        "double"
+      ],
+      "default": "solid"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 364,
+    "api": "createText.TextProperties[].textOnCurve.sweepAngle",
+    "model": "layers[].textSettings.items[].textOnCurve.sweepAngle",
+    "root": "items",
+    "tokens": [
+      "textOnCurve",
+      "sweepAngle"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 360
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 365,
+    "api": "createText.TextProperties[].textOnCurve.radius",
+    "model": "layers[].textSettings.items[].textOnCurve.radius",
+    "root": "items",
+    "tokens": [
+      "textOnCurve",
+      "radius"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 5e-324,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 366,
+    "api": "createText.TextProperties[].textOnCurve.up",
+    "model": "layers[].textSettings.items[].textOnCurve.up",
+    "root": "items",
+    "tokens": [
+      "textOnCurve",
+      "up"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 367,
+    "api": "createText.TextProperties[].textOnCurve.layoutMode",
+    "model": "layers[].textSettings.items[].textOnCurve.layoutMode",
+    "root": "items",
+    "tokens": [
+      "textOnCurve",
+      "layoutMode"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "clamp",
+        "fit",
+        "override"
+      ],
+      "default": "clamp"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 368,
+    "api": "createText.TextProperties[].textOnCurve.baselineOffset",
+    "model": "layers[].textSettings.items[].textOnCurve.baselineOffset",
+    "root": "items",
+    "tokens": [
+      "textOnCurve",
+      "baselineOffset"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -2048,
+      "max": 2048
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 369,
+    "api": "createText.TextProperties[].textOnCurve.startAngleDeg",
+    "model": "layers[].textSettings.items[].textOnCurve.startAngleDeg",
+    "root": "items",
+    "tokens": [
+      "textOnCurve",
+      "startAngleDeg"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 370,
+    "api": "createText.TextProperties[].includeCharMetrics",
+    "model": "layers[].textSettings.items[].includeCharMetrics",
+    "root": "items",
+    "tokens": [
+      "includeCharMetrics"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 371,
+    "api": "createText.TextProperties[].measurementCanvas.width",
+    "model": "layers[].textSettings.items[].measurementCanvas.width",
+    "root": "items",
+    "tokens": [
+      "measurementCanvas",
+      "width"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 372,
+    "api": "createText.TextProperties[].measurementCanvas.height",
+    "model": "layers[].textSettings.items[].measurementCanvas.height",
+    "root": "items",
+    "tokens": [
+      "measurementCanvas",
+      "height"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 1,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 373,
+    "api": "createText.CreateTextOptions.isGrouped",
+    "model": "layers[].textSettings.group.isGrouped",
+    "root": "group",
+    "tokens": [
+      "isGrouped"
+    ],
+    "spec": {
+      "kind": "boolean",
+      "default": false
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 374,
+    "api": "createText.CreateTextOptions.groupTransform.rotation",
+    "model": "layers[].textSettings.group.groupTransform.rotation",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "rotation"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -3600,
+      "max": 3600
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 375,
+    "api": "createText.CreateTextOptions.groupTransform.translateX",
+    "model": "layers[].textSettings.group.groupTransform.translateX",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "translateX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 376,
+    "api": "createText.CreateTextOptions.groupTransform.translateY",
+    "model": "layers[].textSettings.group.groupTransform.translateY",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "translateY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 377,
+    "api": "createText.CreateTextOptions.groupTransform.scaleX",
+    "model": "layers[].textSettings.group.groupTransform.scaleX",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "scaleX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -100,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 378,
+    "api": "createText.CreateTextOptions.groupTransform.scaleY",
+    "model": "layers[].textSettings.group.groupTransform.scaleY",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "scaleY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -100,
+      "max": 100
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 379,
+    "api": "createText.CreateTextOptions.groupTransform.skewX",
+    "model": "layers[].textSettings.group.groupTransform.skewX",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "skewX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -89.9,
+      "max": 89.9
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 380,
+    "api": "createText.CreateTextOptions.groupTransform.skewY",
+    "model": "layers[].textSettings.group.groupTransform.skewY",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "skewY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -89.9,
+      "max": 89.9
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 381,
+    "api": "createText.CreateTextOptions.groupTransform.pivotX",
+    "model": "layers[].textSettings.group.groupTransform.pivotX",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "pivotX"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 382,
+    "api": "createText.CreateTextOptions.groupTransform.pivotY",
+    "model": "layers[].textSettings.group.groupTransform.pivotY",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "pivotY"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 383,
+    "api": "createText.CreateTextOptions.groupTransform.opacity",
+    "model": "layers[].textSettings.group.groupTransform.opacity",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "opacity"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": 0,
+      "max": 1
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 384,
+    "api": "createText.CreateTextOptions.groupTransform.blendMode",
+    "model": "layers[].textSettings.group.groupTransform.blendMode",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "blendMode"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "source-over",
+        "multiply",
+        "screen",
+        "overlay",
+        "darken",
+        "lighten",
+        "color-dodge",
+        "color-burn",
+        "hard-light",
+        "soft-light",
+        "difference",
+        "exclusion",
+        "hue",
+        "saturation",
+        "color",
+        "luminosity",
+        "destination-over",
+        "source-atop",
+        "destination-atop",
+        "source-in",
+        "destination-in",
+        "source-out",
+        "destination-out",
+        "destination-over",
+        "xor",
+        "copy",
+        "lighter"
+      ],
+      "default": "source-over"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 385,
+    "api": "createText.CreateTextOptions.groupTransform.perspective.points[].x",
+    "model": "layers[].textSettings.group.groupTransform.perspective.points[].x",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "perspective",
+      "points[]",
+      "x"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 386,
+    "api": "createText.CreateTextOptions.groupTransform.perspective.points[].y",
+    "model": "layers[].textSettings.group.groupTransform.perspective.points[].y",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "perspective",
+      "points[]",
+      "y"
+    ],
+    "spec": {
+      "kind": "number",
+      "min": -8192,
+      "max": 8192
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 387,
+    "api": "createText.CreateTextOptions.groupTransform.perspective.interpolation",
+    "model": "layers[].textSettings.group.groupTransform.perspective.interpolation",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "perspective",
+      "interpolation"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "nearest",
+        "bilinear",
+        "bicubic"
+      ],
+      "default": "nearest"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 388,
+    "api": "createText.CreateTextOptions.groupTransform.perspective.edgeMode",
+    "model": "layers[].textSettings.group.groupTransform.perspective.edgeMode",
+    "root": "group",
+    "tokens": [
+      "groupTransform",
+      "perspective",
+      "edgeMode"
+    ],
+    "spec": {
+      "kind": "enum",
+      "choices": [
+        "transparent",
+        "clamp",
+        "wrap",
+        "mirror"
+      ],
+      "default": "transparent"
+    },
+    "expectedControl": "DYNAMIC_TEXT_EDITOR"
+  },
+  {
+    "i": 389,
+    "api": "createText.TextProperties.text",
+    "model": "layers[].text",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 390,
+    "api": "createText.TextProperties.x",
+    "model": "layers[].x",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 391,
+    "api": "createText.TextProperties.y",
+    "model": "layers[].y",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 392,
+    "api": "createText.TextProperties/font.size baseline",
+    "model": "layers[].fontSize",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 393,
+    "api": "createText.TextProperties/font.weight baseline",
+    "model": "layers[].weight",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 394,
+    "api": "createText.TextProperties/fill.color baseline",
+    "model": "layers[].color",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 395,
+    "api": "createText.TextProperties/fill.opacity baseline",
+    "model": "layers[].opacity",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 396,
+    "api": "createText.TextProperties/placement.rotation baseline",
+    "model": "layers[].rotation",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 397,
+    "api": "text selection bounds.width",
+    "model": "layers[].width",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  },
+  {
+    "i": 398,
+    "api": "text selection bounds.height",
+    "model": "layers[].height",
+    "root": "baseline",
+    "tokens": [],
+    "spec": null,
+    "expectedControl": "INSPECTOR_BASELINE"
+  }
+]

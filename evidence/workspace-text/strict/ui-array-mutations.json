@@ -1,0 +1,28 @@
+{
+  "checks": [
+    {
+      "id": "UI-ARRAY-RUN-001",
+      "initial": 1,
+      "inserted": 2,
+      "reordered": true,
+      "removed": true,
+      "previous": [
+        "Browser path value",
+        "Additional text",
+        "Run uniquely modified"
+      ],
+      "moved": [
+        "Browser path value",
+        "Run uniquely modified",
+        "Additional text"
+      ]
+    },
+    {
+      "id": "UI-ARRAY-GRADIENT-001",
+      "starting": 2,
+      "inserted": 1,
+      "reordered": true,
+      "removed": true
+    }
+  ]
+}

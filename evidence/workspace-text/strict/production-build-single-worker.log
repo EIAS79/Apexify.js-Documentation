@@ -1,0 +1,49 @@
+
+> apexify.js-documentation@1.0.0 build
+> node scripts/docs/doc4-ensure-generated.mjs && node scripts/docs/doc5-ensure-generated.mjs && node scripts/docs/doc6-ensure-generated.mjs && next build
+
+[doc4-ensure] generated API runtime data present
+[doc5-ensure] generated example manifest present
+[doc6-ensure] generated search artifacts present
+  ▲ Next.js 14.2.35
+  - Experiments (use with caution):
+    · cpus
+
+   Creating an optimized production build ...
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+<--- Last few GCs --->
+
+[2084:0000023553C00000]     2038 ms: Scavenge (interleaved) 124.8 (190.4) -> 88.2 (197.9) MB, pooled: 0 MB, 16.01 / 0.25 ms  (average mu = 0.989, current mu = 0.989) allocation failure; 
+[2084:0000023553C00000]     3188 ms: Scavenge (interleaved) 135.0 (200.5) -> 110.7 (220.5) MB, pooled: 0 MB, 33.92 / 0.25 ms  (average mu = 0.989, current mu = 0.989) allocation failure; 
+
+FATAL ERROR: Zone Allocation failed - process out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6271590C6 node::SetAbortHandler+54
+ 2: 00007FF627159604 node::OnFatalError+1284
+ 3: 00007FF625D63617 v8::Function::NewInstance+423
+ 4: 00007FF6256DB506 v8::SnapshotCreator::GetIsolate+57750
+ 5: 00007FF626C1DA4D v8::platform::DelayedTaskQueue::Terminate+4498637
+ 6: 00007FF626C1CFA0 v8::platform::DelayedTaskQueue::Terminate+4495904
+ 7: 00007FF62679DB7E v8::Extension::auto_enable+479678
+ 8: 00007FF626780A50 v8::Extension::auto_enable+360592
+ 9: 00007FF626777321 v8::Extension::auto_enable+321889
+10: 00007FF6267766B3 v8::Extension::auto_enable+318707
+11: 00007FF625CD72CF X509_STORE_CTX_set_verify+200623
+12: 00007FF625C9C31D v8::internal::OptimizingCompileInputQueue::Prioritize+1773
+13: 00007FF625C9C015 v8::internal::OptimizingCompileInputQueue::Prioritize+997
+14: 00007FF626562CEF v8::platform::DefaultJobHandle::UpdatePriority+591
+15: 00007FF627099BDB node::GetNodeReport+93979
+16: 00007FF625DB8A26 uv_thread_detach+150
+17: 00007FF62749F483 node::AsyncResource::CallbackScope::CallbackScope+2237395
+18: 00007FF803A6DDA7 BaseThreadInitThunk+23
+19: 00007FF804B9EE4C RtlUserThreadStart+44
+Next.js build worker exited with code: 134 and signal: null

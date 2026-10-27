@@ -1,0 +1,529 @@
+{
+  "schemaVersion": 1,
+  "enginePin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "records": [
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.repeat",
+      "path": "images.boxBackground.gradient.repeat",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:boxBackground:none",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:boxBackground:repeat",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:boxBackground:reflect"
+      ],
+      "results": [
+        {
+          "id": "gradientRepeat:boxBackground:none",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:boxBackground:repeat",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        },
+        {
+          "id": "gradientRepeat:boxBackground:reflect",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "DISCRIMINANT: repeat/reflect linear/radial only; pinned raster behavior varies with context/geometry"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.boxBackground.gradient.startAngle",
+      "path": "images.boxBackground.gradient.startAngle",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:boxBackground:zero",
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:boxBackground:180"
+      ],
+      "results": [
+        {
+          "id": "conicAngle:boxBackground:zero",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "conicAngle:boxBackground:180",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "PINNED RASTER: conic angle zero/180 did not change pixels in concrete native fixtures; omit fake working control"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.filters.radius",
+      "path": "images.filters.radius",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#filter:gaussianBlur",
+        "IMG01-STRICT-NATIVE-BATCH#filter:motionBlur",
+        "IMG01-STRICT-NATIVE-BATCH#filter:radialBlur"
+      ],
+      "results": [
+        {
+          "id": "filter:gaussianBlur",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "filter:motionBlur",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "filter:radialBlur",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        }
+      ],
+      "note": "DISCRIMINANT: radius valid for only three blur families; flattened inventory field must not appear on unrelated filters"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.borderPosition",
+      "path": "images.shadow.borderPosition",
+      "status": "BLOCKED",
+      "upstreamStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#shadow:image:borderPosition:all",
+        "IMG01-STRICT-NATIVE-BATCH#shadow:image:borderPosition:top-left"
+      ],
+      "results": [
+        {
+          "id": "shadow:image:borderPosition:all",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "shadow:image:borderPosition:top-left",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        }
+      ],
+      "note": "UPSTREAM: image-specific and group-specific comparative native fixtures are recorded; not certified in all contexts, group side/corner comparisons proved identical"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.repeat",
+      "path": "images.shadow.gradient.repeat",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:shadow:none",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:shadow:repeat",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:shadow:reflect"
+      ],
+      "results": [
+        {
+          "id": "gradientRepeat:shadow:none",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:shadow:repeat",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:shadow:reflect",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        }
+      ],
+      "note": "DISCRIMINANT: repeat/reflect linear/radial only; pinned raster behavior varies with context/geometry"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.startAngle",
+      "path": "images.shadow.gradient.startAngle",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:shadow:zero",
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:shadow:180"
+      ],
+      "results": [
+        {
+          "id": "conicAngle:shadow:zero",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "conicAngle:shadow:180",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "PINNED RASTER: conic angle zero/180 did not change pixels in concrete native fixtures; omit fake working control"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.roundedCorners",
+      "path": "images.shadow.roundedCorners",
+      "status": "BLOCKED",
+      "upstreamStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#shadow:image:roundedCorners:all",
+        "IMG01-STRICT-NATIVE-BATCH#shadow:image:roundedCorners:top-left"
+      ],
+      "results": [
+        {
+          "id": "shadow:image:roundedCorners:all",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "shadow:image:roundedCorners:top-left",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        }
+      ],
+      "note": "UPSTREAM: image-specific and group-specific comparative native fixtures are recorded; not certified in all contexts, group side/corner comparisons proved identical"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.repeat",
+      "path": "images.shape.gradient.repeat",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:shape:none",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:shape:repeat",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:shape:reflect"
+      ],
+      "results": [
+        {
+          "id": "gradientRepeat:shape:none",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:shape:repeat",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:shape:reflect",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        }
+      ],
+      "note": "DISCRIMINANT: repeat/reflect linear/radial only; pinned raster behavior varies with context/geometry"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.shape.gradient.startAngle",
+      "path": "images.shape.gradient.startAngle",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:shape:zero",
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:shape:180"
+      ],
+      "results": [
+        {
+          "id": "conicAngle:shape:zero",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "conicAngle:shape:180",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "PINNED RASTER: conic angle zero/180 did not change pixels in concrete native fixtures; omit fake working control"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.repeat",
+      "path": "images.stroke.gradient.repeat",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:stroke:none",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:stroke:repeat",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:stroke:reflect"
+      ],
+      "results": [
+        {
+          "id": "gradientRepeat:stroke:none",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:stroke:repeat",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:stroke:reflect",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        }
+      ],
+      "note": "DISCRIMINANT: repeat/reflect linear/radial only; pinned raster behavior varies with context/geometry"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::images.stroke.gradient.startAngle",
+      "path": "images.stroke.gradient.startAngle",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:stroke:zero",
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:stroke:180"
+      ],
+      "results": [
+        {
+          "id": "conicAngle:stroke:zero",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "conicAngle:stroke:180",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "PINNED RASTER: conic angle zero/180 did not change pixels in concrete native fixtures; omit fake working control"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.repeat",
+      "path": "options.groupTransform.boxBackground.gradient.repeat",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.boxBackground:none",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.boxBackground:repeat",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.boxBackground:reflect"
+      ],
+      "results": [
+        {
+          "id": "gradientRepeat:groupTransform.boxBackground:none",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:groupTransform.boxBackground:repeat",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        },
+        {
+          "id": "gradientRepeat:groupTransform.boxBackground:reflect",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "DISCRIMINANT: repeat/reflect linear/radial only; pinned raster behavior varies with context/geometry"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.boxBackground.gradient.startAngle",
+      "path": "options.groupTransform.boxBackground.gradient.startAngle",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:groupTransform.boxBackground:zero",
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:groupTransform.boxBackground:180"
+      ],
+      "results": [
+        {
+          "id": "conicAngle:groupTransform.boxBackground:zero",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "conicAngle:groupTransform.boxBackground:180",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "PINNED RASTER: conic angle zero/180 did not change pixels in concrete native fixtures; omit fake working control"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.filters.radius",
+      "path": "options.groupTransform.filters.radius",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#filter:gaussianBlur",
+        "IMG01-STRICT-NATIVE-BATCH#filter:motionBlur",
+        "IMG01-STRICT-NATIVE-BATCH#filter:radialBlur"
+      ],
+      "results": [
+        {
+          "id": "filter:gaussianBlur",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "filter:motionBlur",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "filter:radialBlur",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        }
+      ],
+      "note": "DISCRIMINANT: radius valid for only three blur families; flattened inventory field must not appear on unrelated filters"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.borderPosition",
+      "path": "options.groupTransform.shadow.borderPosition",
+      "status": "BLOCKED",
+      "upstreamStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#shadow:group:borderPosition:all",
+        "IMG01-STRICT-NATIVE-BATCH#shadow:group:borderPosition:top-left"
+      ],
+      "results": [
+        {
+          "id": "shadow:group:borderPosition:all",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "shadow:group:borderPosition:top-left",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "UPSTREAM: image-specific and group-specific comparative native fixtures are recorded; not certified in all contexts, group side/corner comparisons proved identical"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.repeat",
+      "path": "options.groupTransform.shadow.gradient.repeat",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.shadow:none",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.shadow:repeat",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.shadow:reflect"
+      ],
+      "results": [
+        {
+          "id": "gradientRepeat:groupTransform.shadow:none",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:groupTransform.shadow:repeat",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        },
+        {
+          "id": "gradientRepeat:groupTransform.shadow:reflect",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "DISCRIMINANT: repeat/reflect linear/radial only; pinned raster behavior varies with context/geometry"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.gradient.startAngle",
+      "path": "options.groupTransform.shadow.gradient.startAngle",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:groupTransform.shadow:zero",
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:groupTransform.shadow:180"
+      ],
+      "results": [
+        {
+          "id": "conicAngle:groupTransform.shadow:zero",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "conicAngle:groupTransform.shadow:180",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "PINNED RASTER: conic angle zero/180 did not change pixels in concrete native fixtures; omit fake working control"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.shadow.roundedCorners",
+      "path": "options.groupTransform.shadow.roundedCorners",
+      "status": "BLOCKED",
+      "upstreamStatus": "WORKSPACE_BLOCKED_UPSTREAM",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#shadow:group:roundedCorners:all",
+        "IMG01-STRICT-NATIVE-BATCH#shadow:group:roundedCorners:top-left"
+      ],
+      "results": [
+        {
+          "id": "shadow:group:roundedCorners:all",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "shadow:group:roundedCorners:top-left",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "UPSTREAM: image-specific and group-specific comparative native fixtures are recorded; not certified in all contexts, group side/corner comparisons proved identical"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.repeat",
+      "path": "options.groupTransform.stroke.gradient.repeat",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.stroke:none",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.stroke:repeat",
+        "IMG01-STRICT-NATIVE-BATCH#gradientRepeat:groupTransform.stroke:reflect"
+      ],
+      "results": [
+        {
+          "id": "gradientRepeat:groupTransform.stroke:none",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "gradientRepeat:groupTransform.stroke:repeat",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        },
+        {
+          "id": "gradientRepeat:groupTransform.stroke:reflect",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "DISCRIMINANT: repeat/reflect linear/radial only; pinned raster behavior varies with context/geometry"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.stroke.gradient.startAngle",
+      "path": "options.groupTransform.stroke.gradient.startAngle",
+      "status": "PARTIAL",
+      "upstreamStatus": "WORKSPACE_PARTIAL",
+      "proofIds": [
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:groupTransform.stroke:zero",
+        "IMG01-STRICT-NATIVE-BATCH#conicAngle:groupTransform.stroke:180"
+      ],
+      "results": [
+        {
+          "id": "conicAngle:groupTransform.stroke:zero",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": true
+        },
+        {
+          "id": "conicAngle:groupTransform.stroke:180",
+          "status": "EXECUTED",
+          "pixelChangedFromComparison": false
+        }
+      ],
+      "note": "PINNED RASTER: conic angle zero/180 did not change pixels in concrete native fixtures; omit fake working control"
+    },
+    {
+      "id": "apexify.js::ApexPainter#createImage::painterOpts.resolveAssetRefs",
+      "path": "painterOpts.resolveAssetRefs",
+      "status": "BLOCKED",
+      "upstreamStatus": "WORKSPACE_BLOCKED_SECURITY",
+      "proofIds": [],
+      "results": [],
+      "note": "SECURITY: public boolean painter-level opt-in is deliberately not exposed to user-defined source resolution; SHA-256 verified local sources only"
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "engineCandidateCommit": "9fe8b95f372efdadcd5ebdab1e9f6333413187c6",
+  "originalS18Pin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "strictStatusChanges": [
+    {
+      "path": "canvas.patternBg.repeat",
+      "status": "FULL",
+      "reason": "strict evidence accepted"
+    },
+    {
+      "path": "canvas.bgLayers.pattern.repeat",
+      "status": "FULL",
+      "reason": "strict evidence accepted"
+    },
+    {
+      "path": "canvas.shadow.borderRadius",
+      "status": "FULL",
+      "reason": "strict evidence accepted"
+    },
+    {
+      "path": "canvas.shadow.borderPosition",
+      "status": "PARTIAL_CERTIFICATION",
+      "reason": "deprecated compatibility alias"
+    }
+  ],
+  "originalAcceptedStrictFull": 167,
+  "candidateStrictFull": 170,
+  "fullRegressionFiles": 52,
+  "fullRegressionNote": "50 unaffected files passed; two original pinned-no-op fixtures failed as expected after approved behavior change, migrated S9 7/7 and S10 3/3 re-ran PASS; preserve both original failed logs",
+  "pathRecords": {
+    "canvas.patternBg.repeat": {
+      "path": "canvas.patternBg.repeat",
+      "inspector": {
+        "revision": 2,
+        "before": null,
+        "after": "4d4427ae2aab778e78287f238b98898569347979fcc238d4917257ce722f5dae",
+        "changed": true
+      },
+      "graph": {
+        "revision": 3,
+        "before": "4d4427ae2aab778e78287f238b98898569347979fcc238d4917257ce722f5dae",
+        "after": "b46a04bc1b2d612161042c1a011d0d78adff68c230793940f08e40697bd95ddd",
+        "changed": true
+      },
+      "undoRedo": true,
+      "export": 6374,
+      "persistedAfterReload": true
+    },
+    "canvas.bgLayers.pattern.repeat": {
+      "path": "canvas.bgLayers.pattern.repeat",
+      "inspector": {
+        "revision": 7,
+        "before": null,
+        "after": "36768b5fc33f1419b22dd140bc0c6e699d5e53688f57f67fda5f4dc26add0ebd",
+        "changed": true
+      },
+      "graph": {
+        "revision": 8,
+        "before": "36768b5fc33f1419b22dd140bc0c6e699d5e53688f57f67fda5f4dc26add0ebd",
+        "after": "91f03d8de5367edd3633655d1990893bd4cbd3726ba278eadd536bef0d36b6c1",
+        "changed": true
+      },
+      "stableNodeId": "layer:a97f9727-bc25-4658-9c9f-79db7b491ed2",
+      "undoRedo": true,
+      "export": 6570,
+      "persistedAfterReload": true
+    },
+    "canvas.shadow.borderRadius": {
+      "path": "canvas.shadow.borderRadius",
+      "inspector": {
+        "revision": 13,
+        "before": null,
+        "after": "4909c4fdac70463c66734bf2474f52853e5995bcde4a6a30b52201f0708a8dc4",
+        "changed": true
+      },
+      "graph": {
+        "revision": 14,
+        "before": "4909c4fdac70463c66734bf2474f52853e5995bcde4a6a30b52201f0708a8dc4",
+        "after": "c28f5a173edc4ced6b4e9247ab0f010e3fe45fec272625c68823cb8051f34072",
+        "changed": true
+      },
+      "undoRedo": true,
+      "export": 6327,
+      "persistedAfterReload": true
+    },
+    "canvas.shadow.borderPosition": {
+      "path": "canvas.shadow.borderPosition",
+      "inspector": {
+        "revision": 18,
+        "before": null,
+        "after": "55d5242c6ebdedeaab9e8d6c84001c2c538616582ab8e919afe057099ed990a3",
+        "changed": true
+      },
+      "graph": {
+        "revision": 19,
+        "before": "55d5242c6ebdedeaab9e8d6c84001c2c538616582ab8e919afe057099ed990a3",
+        "after": "116d8075dc9d7fed3b3c8993a85d1882fbfd49bf1cb8cac5dbfdf6d08ff9f01f",
+        "changed": true
+      },
+      "undoRedo": true,
+      "export": 6357,
+      "persistedAfterReload": true
+    }
+  },
+  "evidence": {
+    "S21-EXACT-FOUR-NATIVE-CODE-GRAPH": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_4_NATIVE_CODE_CHECKPOINT.json",
+      "sha256": "019f6fe097d28800cffc517331502db8f77f4dc02cf9dc06b84b625473a7cc73"
+    },
+    "S21-EXACT-FOUR-CHROMIUM": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_BROWSER\\S21_FOUR_CHROMIUM_REPORT.json",
+      "sha256": "eacf032d61244b6fa8d969455ef646298a228a13aff0735c474cf710c404ce38"
+    },
+    "S21-EXPORTED-PUBLIC-CODE-PARITY": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_BROWSER_EXPORTED_CODE_NATIVE_PARITY.txt",
+      "sha256": "7f2a85f8c4537c2853aad05ee6dda2a52905f75d269937a9bf532af464b653fb"
+    },
+    "S21-FOUR-BOUNDARIES": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_FOUR_BOUNDARIES_FIRST.txt",
+      "sha256": "957751c9ae5f3abf7a93c2ecf271104bb1606f8bbf84d5be48573abe696c993b"
+    },
+    "S21-REAL-BROWSER-RECOVERY-IMPORT": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_BROWSER\\S21_REAL_CHROMIUM_PROJECT_IMPORT_REPORT.json",
+      "sha256": "feee09ba195fc56d492339d575d4383834dfe43a505f1f0f252b6d80997c6cce"
+    },
+    "S21-CHART-IMAGE-TEXT": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_INSTALLED_ENGINE_CHART_IMAGE_TEXT.txt",
+      "sha256": "1a996939168bdb84e2f47c44fbe9a5716d283351bdb9f0c166e9d50dc15d5898"
+    },
+    "S21-ALL-WORKSPACE-52-FILES": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_SERIALLY_ISOLATED_ALL_52_WORKSPACE.json",
+      "sha256": "a069ee623ef5a25c67cedae6a3dc3692c471d6af9a95c2689af63ce69df29e56"
+    },
+    "S21-S18-43-NATIVE-RECHECK": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_S18_43_NATIVE_RECHECK\\S18_43_NATIVE_CODE_CHECKPOINT.json",
+      "sha256": "9656de39cc15b1bb1ea2f7751f895c54a67f8f8ac4817fc5b77bef7b63959428"
+    },
+    "S21-ALL-52-FILES-CURRENT-ASSERTIONS": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_CONSOLIDATED_52FILE_REGRESSION.json",
+      "sha256": "56269aced45b917cf2ec9a9bccd513e44ec8855fad3816de27f35e24572794dd"
+    },
+    "S21-S9-APPROVED-SEMANTIC-RETEST": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_S9_APPROVED_SEMANTIC_RETEST.txt",
+      "sha256": "8ea6f875e75448867f0122b2e6bccff25a7a8b44dc7f682859df36efffd4a2e5"
+    },
+    "S21-S10-APPROVED-SEMANTIC-RETEST": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_S10_APPROVED_SEMANTIC_RETEST.txt",
+      "sha256": "6172ac074fe7e628c3c3428d1f4e76819b2e137c20f432db8bfea71f616ea062"
+    },
+    "S21-REAL-PRODUCTION-BUILD": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_CANDIDATE_PRODUCTION_BUILD.txt",
+      "sha256": "ae242bc75b99ad02d1c90ca25f0577dba9e2fb74f880020963fdc158a22f903d"
+    },
+    "S21-ENGINE-LOCK-SRI": {
+      "path": "D:\\ApexifyWorkspaceIntegration\\audit\\S21_S20_CONTROLLED_INTEGRATION\\S21_ENGINE_PACKAGE_PIN_AND_WEB_VERIFICATION.txt",
+      "sha256": "7ca72ae835bfc9ac1243e3859cf10490e89a733d77d870e888d1bd13e8858350"
+    }
+  },
+  "videoDecodingApproved": false,
+  "productionEngineRepinned": false,
+  "pushedOrMergedOrDeployed": false
+}

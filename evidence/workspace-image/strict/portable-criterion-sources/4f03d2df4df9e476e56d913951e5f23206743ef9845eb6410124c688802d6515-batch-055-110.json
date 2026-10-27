@@ -1,0 +1,2449 @@
+{
+  "schemaVersion": 1,
+  "pin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "start": 55,
+  "end": 110,
+  "results": [
+    {
+      "index": 55,
+      "path": "images.effects.chromaticAberration",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.chromaticAberration",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-55",
+        "IMG01-E-INSPECTOR-55",
+        "IMG01-E-HISTORY-55",
+        "IMG01-E-GRAPH-55",
+        "IMG01-E-PERSIST-55",
+        "IMG01-E-EXPORT-55"
+      ],
+      "issues": [],
+      "control": "Enable chromaticAberration",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "disabled": false,
+        "value": "on",
+        "checked": true,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": {
+        "intensity": 0.65
+      },
+      "graphAfter": {
+        "intensity": 0.4
+      },
+      "elapsedMs": 3810
+    },
+    {
+      "index": 56,
+      "path": "images.effects.chromaticAberration.intensity",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.chromaticAberration.intensity",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-56",
+        "IMG01-E-INSPECTOR-56",
+        "IMG01-E-HISTORY-56",
+        "IMG01-E-GRAPH-56",
+        "IMG01-E-PERSIST-56",
+        "IMG01-E-EXPORT-56"
+      ],
+      "issues": [],
+      "control": "chromaticAberration intensity",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "0.65",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "5",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 0.65,
+      "after": 0.75,
+      "graphAfter": 0.85,
+      "elapsedMs": 3745
+    },
+    {
+      "index": 57,
+      "path": "images.effects.filmGrain",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.filmGrain",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-57",
+        "IMG01-E-INSPECTOR-57",
+        "IMG01-E-HISTORY-57",
+        "IMG01-E-GRAPH-57",
+        "IMG01-E-PERSIST-57",
+        "IMG01-E-EXPORT-57"
+      ],
+      "issues": [],
+      "control": "Enable filmGrain",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "disabled": false,
+        "value": "on",
+        "checked": true,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": {
+        "intensity": 0.65
+      },
+      "graphAfter": {
+        "intensity": 0.4
+      },
+      "elapsedMs": 3516
+    },
+    {
+      "index": 58,
+      "path": "images.effects.filmGrain.intensity",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.filmGrain.intensity",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-58",
+        "IMG01-E-INSPECTOR-58",
+        "IMG01-E-HISTORY-58",
+        "IMG01-E-GRAPH-58",
+        "IMG01-E-PERSIST-58",
+        "IMG01-E-EXPORT-58"
+      ],
+      "issues": [],
+      "control": "filmGrain intensity",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "0.65",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "5",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 0.65,
+      "after": 0.75,
+      "graphAfter": 0.85,
+      "elapsedMs": 3656
+    },
+    {
+      "index": 59,
+      "path": "images.effects.lensFlare",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.lensFlare",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-59",
+        "IMG01-E-INSPECTOR-59",
+        "IMG01-E-HISTORY-59",
+        "IMG01-E-GRAPH-59",
+        "IMG01-E-PERSIST-59",
+        "IMG01-E-EXPORT-59"
+      ],
+      "issues": [],
+      "control": "Enable lensFlare",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "disabled": false,
+        "value": "on",
+        "checked": true,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": {
+        "x": 25,
+        "y": 20,
+        "intensity": 0.7
+      },
+      "graphAfter": {
+        "x": 59,
+        "y": 47.5,
+        "intensity": 0.4
+      },
+      "elapsedMs": 3730
+    },
+    {
+      "index": 60,
+      "path": "images.effects.lensFlare.intensity",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.lensFlare.intensity",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-60",
+        "IMG01-E-INSPECTOR-60",
+        "IMG01-E-HISTORY-60",
+        "IMG01-E-GRAPH-60",
+        "IMG01-E-PERSIST-60",
+        "IMG01-E-EXPORT-60",
+        "IMG01-E-CHROMIUM-SHOT-60"
+      ],
+      "issues": [],
+      "control": "lensFlare intensity",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "0.7",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "5",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 0.7,
+      "after": 0.7999999999999999,
+      "graphAfter": 0.8999999999999999,
+      "browserScreenshot": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\strict-lifecycle-browser\\screenshots\\IMG01-060.png",
+      "elapsedMs": 4131
+    },
+    {
+      "index": 61,
+      "path": "images.effects.lensFlare.x",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.lensFlare.x",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-61",
+        "IMG01-E-INSPECTOR-61",
+        "IMG01-E-HISTORY-61",
+        "IMG01-E-GRAPH-61",
+        "IMG01-E-PERSIST-61",
+        "IMG01-E-EXPORT-61"
+      ],
+      "issues": [],
+      "control": "lensFlare x",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "25",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "4096",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 25,
+      "after": 25.1,
+      "graphAfter": 25.200000000000003,
+      "elapsedMs": 3745
+    },
+    {
+      "index": 62,
+      "path": "images.effects.lensFlare.y",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.lensFlare.y",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-62",
+        "IMG01-E-INSPECTOR-62",
+        "IMG01-E-HISTORY-62",
+        "IMG01-E-GRAPH-62",
+        "IMG01-E-PERSIST-62",
+        "IMG01-E-EXPORT-62"
+      ],
+      "issues": [],
+      "control": "lensFlare y",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "20",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "4096",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 20,
+      "after": 20.1,
+      "graphAfter": 20.200000000000003,
+      "elapsedMs": 3886
+    },
+    {
+      "index": 63,
+      "path": "images.effects.vignette",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.vignette",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-63",
+        "IMG01-E-INSPECTOR-63",
+        "IMG01-E-HISTORY-63",
+        "IMG01-E-GRAPH-63",
+        "IMG01-E-PERSIST-63",
+        "IMG01-E-EXPORT-63"
+      ],
+      "issues": [],
+      "control": "Enable vignette",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "disabled": false,
+        "value": "on",
+        "checked": true,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": {
+        "intensity": 0.6,
+        "size": 0.5
+      },
+      "graphAfter": {
+        "intensity": 0.4,
+        "size": 0.6
+      },
+      "elapsedMs": 3782
+    },
+    {
+      "index": 64,
+      "path": "images.effects.vignette.intensity",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.vignette.intensity",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-64",
+        "IMG01-E-INSPECTOR-64",
+        "IMG01-E-HISTORY-64",
+        "IMG01-E-GRAPH-64",
+        "IMG01-E-PERSIST-64",
+        "IMG01-E-EXPORT-64"
+      ],
+      "issues": [],
+      "control": "vignette intensity",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "0.6",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "5",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 0.6,
+      "after": 0.7,
+      "graphAfter": 0.7999999999999999,
+      "elapsedMs": 3763
+    },
+    {
+      "index": 65,
+      "path": "images.effects.vignette.size",
+      "id": "apexify.js::ApexPainter#createImage::images.effects.vignette.size",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-65",
+        "IMG01-E-INSPECTOR-65",
+        "IMG01-E-HISTORY-65",
+        "IMG01-E-GRAPH-65",
+        "IMG01-E-PERSIST-65",
+        "IMG01-E-EXPORT-65"
+      ],
+      "issues": [],
+      "control": "vignette size",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "0.5",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "4096",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 0.5,
+      "after": 0.6,
+      "graphAfter": 0.7,
+      "elapsedMs": 3504
+    },
+    {
+      "index": 66,
+      "path": "images.filterIntensity",
+      "id": "apexify.js::ApexPainter#createImage::images.filterIntensity",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-66",
+        "IMG01-E-INSPECTOR-66",
+        "IMG01-E-HISTORY-66",
+        "IMG01-E-GRAPH-66",
+        "IMG01-E-PERSIST-66",
+        "IMG01-E-EXPORT-66"
+      ],
+      "issues": [],
+      "control": "Filter intensity",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "1.4",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "50",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 1.4,
+      "after": 1.5,
+      "graphAfter": 1.6,
+      "elapsedMs": 3804
+    },
+    {
+      "index": 67,
+      "path": "images.filterOrder",
+      "id": "apexify.js::ApexPainter#createImage::images.filterOrder",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-67",
+        "IMG01-E-INSPECTOR-67",
+        "IMG01-E-HISTORY-67",
+        "IMG01-E-GRAPH-67",
+        "IMG01-E-PERSIST-67",
+        "IMG01-E-EXPORT-67"
+      ],
+      "issues": [],
+      "control": "Filter ordering",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "post",
+        "options": [
+          "pre",
+          "post"
+        ],
+        "visible": true
+      },
+      "before": "post",
+      "after": "pre",
+      "graphAfter": "post",
+      "elapsedMs": 4006
+    },
+    {
+      "index": 68,
+      "path": "images.filters",
+      "id": "apexify.js::ApexPainter#createImage::images.filters",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-68",
+        "IMG01-E-INSPECTOR-68",
+        "IMG01-E-HISTORY-68",
+        "IMG01-E-GRAPH-68",
+        "IMG01-E-PERSIST-68",
+        "IMG01-E-EXPORT-68"
+      ],
+      "issues": [],
+      "control": "Filter 1 type",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "gaussianBlur",
+        "options": [
+          "gaussianBlur",
+          "motionBlur",
+          "radialBlur",
+          "sharpen",
+          "noise",
+          "grain",
+          "edgeDetection",
+          "emboss",
+          "invert",
+          "grayscale",
+          "sepia",
+          "pixelate",
+          "brightness",
+          "contrast",
+          "saturation",
+          "hueShift",
+          "posterize"
+        ],
+        "visible": true
+      },
+      "before": [
+        {
+          "type": "gaussianBlur",
+          "radius": 3,
+          "intensity": 1
+        }
+      ],
+      "after": [
+        {
+          "type": "motionBlur",
+          "intensity": 1,
+          "radius": 1,
+          "angle": 1
+        }
+      ],
+      "graphAfter": [
+        {
+          "type": "radialBlur",
+          "intensity": 1,
+          "radius": 1,
+          "centerX": 1,
+          "centerY": 1
+        }
+      ],
+      "elapsedMs": 3860
+    },
+    {
+      "index": 69,
+      "path": "images.filters.angle",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.angle",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-69",
+        "IMG01-E-INSPECTOR-69",
+        "IMG01-E-HISTORY-69",
+        "IMG01-E-GRAPH-69",
+        "IMG01-E-PERSIST-69",
+        "IMG01-E-EXPORT-69"
+      ],
+      "issues": [],
+      "control": "motionBlur angle",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "65",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 65,
+      "after": 65.1,
+      "graphAfter": 65.19999999999999,
+      "elapsedMs": 3550
+    },
+    {
+      "index": 70,
+      "path": "images.filters.centerX",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.centerX",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-70",
+        "IMG01-E-INSPECTOR-70",
+        "IMG01-E-HISTORY-70",
+        "IMG01-E-GRAPH-70",
+        "IMG01-E-PERSIST-70",
+        "IMG01-E-EXPORT-70",
+        "IMG01-E-CHROMIUM-SHOT-70"
+      ],
+      "issues": [],
+      "control": "radialBlur centerX",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "21",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 21,
+      "after": 21.1,
+      "graphAfter": 21.200000000000003,
+      "browserScreenshot": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\strict-lifecycle-browser\\screenshots\\IMG01-070.png",
+      "elapsedMs": 3809
+    },
+    {
+      "index": 71,
+      "path": "images.filters.centerY",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.centerY",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-71",
+        "IMG01-E-INSPECTOR-71",
+        "IMG01-E-HISTORY-71",
+        "IMG01-E-GRAPH-71",
+        "IMG01-E-PERSIST-71",
+        "IMG01-E-EXPORT-71"
+      ],
+      "issues": [],
+      "control": "radialBlur centerY",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "18",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 18,
+      "after": 18.1,
+      "graphAfter": 18.200000000000003,
+      "elapsedMs": 3502
+    },
+    {
+      "index": 72,
+      "path": "images.filters.height",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.height",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-72",
+        "IMG01-E-INSPECTOR-72",
+        "IMG01-E-HISTORY-72",
+        "IMG01-E-GRAPH-72"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:187:3"
+      ],
+      "control": "pixelate height",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "31",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 31,
+      "after": 31.1,
+      "graphAfter": 31.200000000000003,
+      "elapsedMs": 72895
+    },
+    {
+      "index": 73,
+      "path": "images.filters.intensity",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.intensity",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-73",
+        "IMG01-E-INSPECTOR-73",
+        "IMG01-E-HISTORY-73",
+        "IMG01-E-GRAPH-73",
+        "IMG01-E-PERSIST-73",
+        "IMG01-E-EXPORT-73"
+      ],
+      "issues": [],
+      "control": "gaussianBlur intensity",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "1.5",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 1.5,
+      "after": 1.6,
+      "graphAfter": 1.7000000000000002,
+      "elapsedMs": 3926
+    },
+    {
+      "index": 74,
+      "path": "images.filters.levels",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.levels",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-74",
+        "IMG01-E-INSPECTOR-74",
+        "IMG01-E-HISTORY-74",
+        "IMG01-E-GRAPH-74",
+        "IMG01-E-PERSIST-74",
+        "IMG01-E-EXPORT-74"
+      ],
+      "issues": [],
+      "control": "posterize levels",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "3",
+        "checked": false,
+        "options": null,
+        "min": "2",
+        "max": "64",
+        "step": "1",
+        "visible": true
+      },
+      "before": 3,
+      "after": 4,
+      "graphAfter": 5,
+      "elapsedMs": 3983
+    },
+    {
+      "index": 75,
+      "path": "images.filters.size",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.size",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-75",
+        "IMG01-E-INSPECTOR-75",
+        "IMG01-E-HISTORY-75",
+        "IMG01-E-GRAPH-75",
+        "IMG01-E-PERSIST-75",
+        "IMG01-E-EXPORT-75"
+      ],
+      "issues": [],
+      "control": "pixelate size",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "7",
+        "checked": false,
+        "options": null,
+        "min": "1",
+        "max": "256",
+        "step": "1",
+        "visible": true
+      },
+      "before": 7,
+      "after": 8,
+      "graphAfter": 9,
+      "elapsedMs": 3920
+    },
+    {
+      "index": 76,
+      "path": "images.filters.type",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.type",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-76",
+        "IMG01-E-INSPECTOR-76",
+        "IMG01-E-HISTORY-76",
+        "IMG01-E-GRAPH-76",
+        "IMG01-E-PERSIST-76",
+        "IMG01-E-EXPORT-76"
+      ],
+      "issues": [],
+      "control": "Filter 1 type",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "sepia",
+        "options": [
+          "gaussianBlur",
+          "motionBlur",
+          "radialBlur",
+          "sharpen",
+          "noise",
+          "grain",
+          "edgeDetection",
+          "emboss",
+          "invert",
+          "grayscale",
+          "sepia",
+          "pixelate",
+          "brightness",
+          "contrast",
+          "saturation",
+          "hueShift",
+          "posterize"
+        ],
+        "visible": true
+      },
+      "before": "sepia",
+      "after": "pixelate",
+      "graphAfter": "brightness",
+      "elapsedMs": 3622
+    },
+    {
+      "index": 77,
+      "path": "images.filters.value",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.value",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-77",
+        "IMG01-E-INSPECTOR-77",
+        "IMG01-E-HISTORY-77",
+        "IMG01-E-GRAPH-77",
+        "IMG01-E-PERSIST-77",
+        "IMG01-E-EXPORT-77"
+      ],
+      "issues": [],
+      "control": "brightness value",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "1.7",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 1.7,
+      "after": 1.8,
+      "graphAfter": 1.9000000000000001,
+      "elapsedMs": 4087
+    },
+    {
+      "index": 78,
+      "path": "images.filters.width",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.width",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-78",
+        "IMG01-E-INSPECTOR-78",
+        "IMG01-E-HISTORY-78",
+        "IMG01-E-GRAPH-78"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:187:3"
+      ],
+      "control": "pixelate width",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "33",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 33,
+      "after": 33.1,
+      "graphAfter": 33.2,
+      "elapsedMs": 72880
+    },
+    {
+      "index": 79,
+      "path": "images.filters.x",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.x",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": false,
+      "graphNotApplicable": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-79",
+        "IMG01-E-INSPECTOR-79"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:168:31"
+      ],
+      "control": "pixelate x",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "2",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 2,
+      "after": 2.1,
+      "elapsedMs": 19478
+    },
+    {
+      "index": 80,
+      "path": "images.filters.y",
+      "id": "apexify.js::ApexPainter#createImage::images.filters.y",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": false,
+      "graphNotApplicable": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-80",
+        "IMG01-E-INSPECTOR-80"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:168:31"
+      ],
+      "control": "pixelate y",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "3",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "0.1",
+        "visible": true
+      },
+      "before": 3,
+      "after": 3.1,
+      "elapsedMs": 19452
+    },
+    {
+      "index": 81,
+      "path": "images.fit",
+      "id": "apexify.js::ApexPainter#createImage::images.fit",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-81",
+        "IMG01-E-INSPECTOR-81",
+        "IMG01-E-HISTORY-81",
+        "IMG01-E-GRAPH-81",
+        "IMG01-E-PERSIST-81",
+        "IMG01-E-EXPORT-81"
+      ],
+      "issues": [],
+      "control": "Image fit",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "contain",
+        "options": [
+          "fill",
+          "contain",
+          "cover"
+        ],
+        "visible": true
+      },
+      "before": "contain",
+      "after": "cover",
+      "graphAfter": "contain",
+      "elapsedMs": 3698
+    },
+    {
+      "index": 82,
+      "path": "images.height",
+      "id": "apexify.js::ApexPainter#createImage::images.height",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": false,
+      "graphNotApplicable": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-82",
+        "IMG01-E-INSPECTOR-82",
+        "IMG01-E-HISTORY-82",
+        "IMG01-E-GRAPH-NA-82",
+        "IMG01-E-PERSIST-82",
+        "IMG01-E-EXPORT-82"
+      ],
+      "issues": [],
+      "control": "Height",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "120",
+        "checked": false,
+        "options": null,
+        "min": "1",
+        "max": "2048",
+        "step": "1",
+        "visible": true
+      },
+      "before": 120,
+      "after": 121,
+      "graphNAReason": "Graph has no typed geometry/source scalar control for this external layer property; Inspector is the authoring surface",
+      "elapsedMs": 3161
+    },
+    {
+      "index": 83,
+      "path": "images.inherit",
+      "id": "apexify.js::ApexPainter#createImage::images.inherit",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": false,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-83",
+        "IMG01-E-INSPECTOR-83",
+        "IMG01-E-HISTORY-83"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:178:15"
+      ],
+      "control": "Use intrinsic dimensions",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "disabled": false,
+        "value": "on",
+        "checked": false,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": false,
+      "after": true,
+      "elapsedMs": 14344
+    },
+    {
+      "index": 84,
+      "path": "images.mask",
+      "id": "apexify.js::ApexPainter#createImage::images.mask",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-84",
+        "IMG01-E-INSPECTOR-84",
+        "IMG01-E-HISTORY-84",
+        "IMG01-E-GRAPH-84",
+        "IMG01-E-PERSIST-84",
+        "IMG01-E-EXPORT-84"
+      ],
+      "issues": [],
+      "control": "Enable image mask",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "disabled": false,
+        "value": "on",
+        "checked": true,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": {
+        "source": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+        "mode": "alpha"
+      },
+      "graphAfter": {
+        "source": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+        "mode": "alpha"
+      },
+      "elapsedMs": 3633
+    },
+    {
+      "index": 85,
+      "path": "images.mask.mode",
+      "id": "apexify.js::ApexPainter#createImage::images.mask.mode",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-85",
+        "IMG01-E-INSPECTOR-85",
+        "IMG01-E-HISTORY-85",
+        "IMG01-E-GRAPH-85",
+        "IMG01-E-PERSIST-85",
+        "IMG01-E-EXPORT-85"
+      ],
+      "issues": [],
+      "control": "Mask mode",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "inverse",
+        "options": [
+          "alpha",
+          "luminance",
+          "inverse"
+        ],
+        "visible": true
+      },
+      "before": "inverse",
+      "after": "luminance",
+      "graphAfter": "inverse",
+      "elapsedMs": 3814
+    },
+    {
+      "index": 86,
+      "path": "images.mask.source",
+      "id": "apexify.js::ApexPainter#createImage::images.mask.source",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "graphNotApplicable": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-86"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:166:18"
+      ],
+      "control": "Mask SHA-256 source",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+        "options": [
+          "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650"
+        ],
+        "visible": true
+      },
+      "elapsedMs": 18188
+    },
+    {
+      "index": 87,
+      "path": "images.meshWarp",
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-87",
+        "IMG01-E-INSPECTOR-87",
+        "IMG01-E-HISTORY-87",
+        "IMG01-E-GRAPH-87",
+        "IMG01-E-PERSIST-87",
+        "IMG01-E-EXPORT-87"
+      ],
+      "issues": [],
+      "control": "Enable mesh warp",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "disabled": false,
+        "value": "on",
+        "checked": true,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": {
+        "gridX": 1,
+        "gridY": 1,
+        "controlPoints": [
+          [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 44,
+              "y": 2
+            }
+          ],
+          [
+            {
+              "x": 1,
+              "y": 40
+            },
+            {
+              "x": 42,
+              "y": 39
+            }
+          ]
+        ],
+        "interpolation": "bilinear",
+        "edgeMode": "clamp"
+      },
+      "graphAfter": {
+        "gridX": 2,
+        "gridY": 2,
+        "controlPoints": [
+          [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 59,
+              "y": 0
+            },
+            {
+              "x": 118,
+              "y": 0
+            }
+          ],
+          [
+            {
+              "x": 0,
+              "y": 47.5
+            },
+            {
+              "x": 59,
+              "y": 47.5
+            },
+            {
+              "x": 118,
+              "y": 47.5
+            }
+          ],
+          [
+            {
+              "x": 0,
+              "y": 95
+            },
+            {
+              "x": 59,
+              "y": 95
+            },
+            {
+              "x": 118,
+              "y": 95
+            }
+          ]
+        ]
+      },
+      "elapsedMs": 3922
+    },
+    {
+      "index": 88,
+      "path": "images.meshWarp.controlPoints",
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-88",
+        "IMG01-E-INSPECTOR-88",
+        "IMG01-E-HISTORY-88",
+        "IMG01-E-GRAPH-88",
+        "IMG01-E-PERSIST-88",
+        "IMG01-E-EXPORT-88"
+      ],
+      "issues": [],
+      "control": "Vertex 1 X",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "42",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "1",
+        "visible": true
+      },
+      "before": [
+        [
+          {
+            "x": 2,
+            "y": 1
+          },
+          {
+            "x": 42,
+            "y": 3
+          }
+        ],
+        [
+          {
+            "x": 1,
+            "y": 39
+          },
+          {
+            "x": 43,
+            "y": 36
+          }
+        ]
+      ],
+      "after": [
+        [
+          {
+            "x": 2,
+            "y": 1
+          },
+          {
+            "x": 43,
+            "y": 3
+          }
+        ],
+        [
+          {
+            "x": 1,
+            "y": 39
+          },
+          {
+            "x": 43,
+            "y": 36
+          }
+        ]
+      ],
+      "graphAfter": [
+        [
+          {
+            "x": 2,
+            "y": 1
+          },
+          {
+            "x": 44,
+            "y": 3
+          }
+        ],
+        [
+          {
+            "x": 1,
+            "y": 39
+          },
+          {
+            "x": 43,
+            "y": 36
+          }
+        ]
+      ],
+      "elapsedMs": 3737
+    },
+    {
+      "index": 89,
+      "path": "images.meshWarp.controlPoints.x",
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints.x",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "graphNotApplicable": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-89"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:166:18"
+      ],
+      "control": "Vertex 1 X",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "42",
+        "checked": false,
+        "options": null,
+        "min": "-2048",
+        "max": "2048",
+        "step": "1",
+        "visible": true
+      },
+      "elapsedMs": 18190
+    },
+    {
+      "index": 90,
+      "path": "images.meshWarp.controlPoints.y",
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.controlPoints.y",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "graphNotApplicable": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-90"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:166:18"
+      ],
+      "control": "Y",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "48",
+        "checked": false,
+        "options": null,
+        "min": "-4096",
+        "max": "4096",
+        "step": "1",
+        "visible": true
+      },
+      "elapsedMs": 18130
+    },
+    {
+      "index": 91,
+      "path": "images.meshWarp.edgeMode",
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.edgeMode",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-91",
+        "IMG01-E-INSPECTOR-91",
+        "IMG01-E-HISTORY-91",
+        "IMG01-E-GRAPH-91",
+        "IMG01-E-PERSIST-91",
+        "IMG01-E-EXPORT-91"
+      ],
+      "issues": [],
+      "control": "Mesh edge mode",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "mirror",
+        "options": [
+          "transparent",
+          "clamp",
+          "wrap",
+          "mirror"
+        ],
+        "visible": true
+      },
+      "before": "mirror",
+      "after": "wrap",
+      "graphAfter": "mirror",
+      "elapsedMs": 3956
+    },
+    {
+      "index": 92,
+      "path": "images.meshWarp.gridX",
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.gridX",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-92",
+        "IMG01-E-INSPECTOR-92",
+        "IMG01-E-HISTORY-92",
+        "IMG01-E-GRAPH-92",
+        "IMG01-E-PERSIST-92",
+        "IMG01-E-EXPORT-92"
+      ],
+      "issues": [],
+      "control": "gridX",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "1",
+        "checked": false,
+        "options": null,
+        "min": "1",
+        "max": "8",
+        "step": "1",
+        "visible": true
+      },
+      "before": 1,
+      "after": 2,
+      "graphAfter": 3,
+      "elapsedMs": 3785
+    },
+    {
+      "index": 93,
+      "path": "images.meshWarp.gridY",
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.gridY",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-93",
+        "IMG01-E-INSPECTOR-93",
+        "IMG01-E-HISTORY-93",
+        "IMG01-E-GRAPH-93",
+        "IMG01-E-PERSIST-93",
+        "IMG01-E-EXPORT-93"
+      ],
+      "issues": [],
+      "control": "gridY",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "1",
+        "checked": false,
+        "options": null,
+        "min": "1",
+        "max": "8",
+        "step": "1",
+        "visible": true
+      },
+      "before": 1,
+      "after": 2,
+      "graphAfter": 3,
+      "elapsedMs": 3731
+    },
+    {
+      "index": 94,
+      "path": "images.meshWarp.interpolation",
+      "id": "apexify.js::ApexPainter#createImage::images.meshWarp.interpolation",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-94",
+        "IMG01-E-INSPECTOR-94",
+        "IMG01-E-HISTORY-94",
+        "IMG01-E-GRAPH-94",
+        "IMG01-E-PERSIST-94",
+        "IMG01-E-EXPORT-94"
+      ],
+      "issues": [],
+      "control": "Mesh interpolation",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "nearest",
+        "options": [
+          "nearest",
+          "bilinear",
+          "bicubic"
+        ],
+        "visible": true
+      },
+      "before": "nearest",
+      "after": "bilinear",
+      "graphAfter": "bicubic",
+      "elapsedMs": 3564
+    },
+    {
+      "index": 95,
+      "path": "images.opacity",
+      "id": "apexify.js::ApexPainter#createImage::images.opacity",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": false,
+      "graphNotApplicable": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-95",
+        "IMG01-E-INSPECTOR-95",
+        "IMG01-E-HISTORY-95",
+        "IMG01-E-GRAPH-NA-95",
+        "IMG01-E-PERSIST-95",
+        "IMG01-E-EXPORT-95"
+      ],
+      "issues": [],
+      "control": "Opacity",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "0.7",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "1",
+        "step": "0.05",
+        "visible": true
+      },
+      "before": 0.7,
+      "after": 0.7999999999999999,
+      "graphNAReason": "Graph has no typed geometry/source scalar control for this external layer property; Inspector is the authoring surface",
+      "elapsedMs": 3141
+    },
+    {
+      "index": 96,
+      "path": "images.rotation",
+      "id": "apexify.js::ApexPainter#createImage::images.rotation",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": false,
+      "graphNotApplicable": true,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-96",
+        "IMG01-E-INSPECTOR-96",
+        "IMG01-E-HISTORY-96",
+        "IMG01-E-GRAPH-NA-96",
+        "IMG01-E-PERSIST-96",
+        "IMG01-E-EXPORT-96"
+      ],
+      "issues": [],
+      "control": "Rotation",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "25",
+        "checked": false,
+        "options": null,
+        "min": "-360",
+        "max": "360",
+        "step": "1",
+        "visible": true
+      },
+      "before": 25,
+      "after": 26,
+      "graphNAReason": "Graph has no typed geometry/source scalar control for this external layer property; Inspector is the authoring surface",
+      "elapsedMs": 3279
+    },
+    {
+      "index": 97,
+      "path": "images.shadow",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-97",
+        "IMG01-E-INSPECTOR-97",
+        "IMG01-E-HISTORY-97",
+        "IMG01-E-GRAPH-97",
+        "IMG01-E-PERSIST-97",
+        "IMG01-E-EXPORT-97"
+      ],
+      "issues": [],
+      "control": "Image shadow enabled",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "checkbox",
+        "disabled": false,
+        "value": "on",
+        "checked": true,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": {
+        "color": "#f36a4d",
+        "offsetX": 7,
+        "offsetY": 4,
+        "blur": 5,
+        "opacity": 0.85
+      },
+      "graphAfter": {
+        "color": "#e0a4ff",
+        "offsetX": 6,
+        "offsetY": 6,
+        "blur": 8,
+        "opacity": 1
+      },
+      "elapsedMs": 3662
+    },
+    {
+      "index": 98,
+      "path": "images.shadow.blur",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.blur",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-98",
+        "IMG01-E-INSPECTOR-98",
+        "IMG01-E-HISTORY-98",
+        "IMG01-E-GRAPH-98",
+        "IMG01-E-PERSIST-98",
+        "IMG01-E-EXPORT-98"
+      ],
+      "issues": [],
+      "control": "Image shadow blur",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "4",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "100",
+        "step": "1",
+        "visible": true
+      },
+      "before": 4,
+      "after": 5,
+      "graphAfter": 6,
+      "elapsedMs": 3977
+    },
+    {
+      "index": 99,
+      "path": "images.shadow.borderRadius",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.borderRadius",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": false,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-99",
+        "IMG01-E-INSPECTOR-99",
+        "IMG01-E-HISTORY-99"
+      ],
+      "issues": [
+        "Error: Timeout \n    at until (D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:43:197)\n    at async D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:178:15"
+      ],
+      "control": "Image shadow radius mode",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "numeric",
+        "options": [
+          "numeric",
+          "circular"
+        ],
+        "visible": true
+      },
+      "before": 9,
+      "after": "circular",
+      "elapsedMs": 14402
+    },
+    {
+      "index": 100,
+      "path": "images.shadow.color",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.color",
+      "sourceFixtureValid": true,
+      "inspector": false,
+      "graph": false,
+      "graphNotApplicable": false,
+      "undoRedo": false,
+      "indexedDB": false,
+      "projectExport": false,
+      "nativePreview": false,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-100"
+      ],
+      "issues": [
+        "Error: Inspector edit cannot operate mapped control: Native HTML color picker requires separate verified OS-picker interaction\n    at D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\image_reconstructed_checkout\\tests\\workspace\\browser-img01-full-path-campaign.cjs:160:24"
+      ],
+      "control": "Image shadow color",
+      "elapsedMs": 907
+    },
+    {
+      "index": 101,
+      "path": "images.shadow.gradient",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-101",
+        "IMG01-E-INSPECTOR-101",
+        "IMG01-E-HISTORY-101",
+        "IMG01-E-GRAPH-101",
+        "IMG01-E-PERSIST-101",
+        "IMG01-E-EXPORT-101"
+      ],
+      "issues": [],
+      "control": "Image shadow gradient properties",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "linear",
+        "options": [
+          "linear",
+          "radial",
+          "conic"
+        ],
+        "visible": true
+      },
+      "before": {
+        "type": "linear",
+        "colors": [
+          {
+            "stop": 0,
+            "color": "#fa355b"
+          },
+          {
+            "stop": 1,
+            "color": "#17d6c4"
+          }
+        ],
+        "startX": 0,
+        "startY": 0,
+        "endX": 39,
+        "endY": 38
+      },
+      "after": {
+        "type": "radial",
+        "colors": [
+          {
+            "stop": 0,
+            "color": "#fa355b"
+          },
+          {
+            "stop": 1,
+            "color": "#17d6c4"
+          }
+        ]
+      },
+      "graphAfter": {
+        "type": "conic",
+        "colors": [
+          {
+            "stop": 0,
+            "color": "#fa355b"
+          },
+          {
+            "stop": 1,
+            "color": "#17d6c4"
+          }
+        ]
+      },
+      "elapsedMs": 3774
+    },
+    {
+      "index": 102,
+      "path": "images.shadow.gradient.colors",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.colors",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-102",
+        "IMG01-E-INSPECTOR-102",
+        "IMG01-E-HISTORY-102",
+        "IMG01-E-GRAPH-102",
+        "IMG01-E-PERSIST-102",
+        "IMG01-E-EXPORT-102"
+      ],
+      "issues": [],
+      "control": "Image shadow stops",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "0",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "1",
+        "step": "0.01",
+        "visible": true
+      },
+      "before": [
+        {
+          "stop": 0,
+          "color": "#ffee00"
+        },
+        {
+          "stop": 1,
+          "color": "#113bee"
+        }
+      ],
+      "after": [
+        {
+          "stop": 0.1,
+          "color": "#ffee00"
+        },
+        {
+          "stop": 1,
+          "color": "#113bee"
+        }
+      ],
+      "graphAfter": [
+        {
+          "stop": 0.2,
+          "color": "#ffee00"
+        },
+        {
+          "stop": 1,
+          "color": "#113bee"
+        }
+      ],
+      "elapsedMs": 3903
+    },
+    {
+      "index": 103,
+      "path": "images.shadow.gradient.colors.color",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.colors.color",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-103",
+        "IMG01-E-INSPECTOR-103",
+        "IMG01-E-HISTORY-103",
+        "IMG01-E-GRAPH-103",
+        "IMG01-E-PERSIST-103",
+        "IMG01-E-EXPORT-103"
+      ],
+      "issues": [],
+      "control": "Image shadow stop hex 1",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "text",
+        "disabled": false,
+        "value": "#fe9214",
+        "checked": false,
+        "options": null,
+        "min": "",
+        "max": "",
+        "step": "",
+        "visible": true
+      },
+      "before": "#fe9214",
+      "after": "#ad71f3",
+      "graphAfter": "#bd29a1",
+      "elapsedMs": 4074
+    },
+    {
+      "index": 104,
+      "path": "images.shadow.gradient.colors.stop",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.colors.stop",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-104",
+        "IMG01-E-INSPECTOR-104",
+        "IMG01-E-HISTORY-104",
+        "IMG01-E-GRAPH-104",
+        "IMG01-E-PERSIST-104",
+        "IMG01-E-EXPORT-104"
+      ],
+      "issues": [],
+      "control": "Image shadow stop 1",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "0.15",
+        "checked": false,
+        "options": null,
+        "min": "0",
+        "max": "1",
+        "step": "0.01",
+        "visible": true
+      },
+      "before": 0.15,
+      "after": 0.25,
+      "graphAfter": 0.35,
+      "elapsedMs": 4085
+    },
+    {
+      "index": 105,
+      "path": "images.shadow.gradient.endX",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.endX",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-105",
+        "IMG01-E-INSPECTOR-105",
+        "IMG01-E-HISTORY-105",
+        "IMG01-E-GRAPH-105",
+        "IMG01-E-PERSIST-105",
+        "IMG01-E-EXPORT-105"
+      ],
+      "issues": [],
+      "control": "Image shadow end X",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "32",
+        "checked": false,
+        "options": null,
+        "min": "-8192",
+        "max": "8192",
+        "step": "1",
+        "visible": true
+      },
+      "before": 32,
+      "after": 33,
+      "graphAfter": 34,
+      "elapsedMs": 3816
+    },
+    {
+      "index": 106,
+      "path": "images.shadow.gradient.endY",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.endY",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-106",
+        "IMG01-E-INSPECTOR-106",
+        "IMG01-E-HISTORY-106",
+        "IMG01-E-GRAPH-106",
+        "IMG01-E-PERSIST-106",
+        "IMG01-E-EXPORT-106"
+      ],
+      "issues": [],
+      "control": "Image shadow end Y",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "37",
+        "checked": false,
+        "options": null,
+        "min": "-8192",
+        "max": "8192",
+        "step": "1",
+        "visible": true
+      },
+      "before": 37,
+      "after": 38,
+      "graphAfter": 39,
+      "elapsedMs": 4106
+    },
+    {
+      "index": 107,
+      "path": "images.shadow.gradient.pivotX",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.pivotX",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-107",
+        "IMG01-E-INSPECTOR-107",
+        "IMG01-E-HISTORY-107",
+        "IMG01-E-GRAPH-107",
+        "IMG01-E-PERSIST-107",
+        "IMG01-E-EXPORT-107"
+      ],
+      "issues": [],
+      "control": "Image shadow pivot X",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "24",
+        "checked": false,
+        "options": null,
+        "min": "-8192",
+        "max": "8192",
+        "step": "1",
+        "visible": true
+      },
+      "before": 24,
+      "after": 25,
+      "graphAfter": 26,
+      "elapsedMs": 3765
+    },
+    {
+      "index": 108,
+      "path": "images.shadow.gradient.pivotY",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.pivotY",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-108",
+        "IMG01-E-INSPECTOR-108",
+        "IMG01-E-HISTORY-108",
+        "IMG01-E-GRAPH-108",
+        "IMG01-E-PERSIST-108",
+        "IMG01-E-EXPORT-108"
+      ],
+      "issues": [],
+      "control": "Image shadow pivot Y",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "22",
+        "checked": false,
+        "options": null,
+        "min": "-8192",
+        "max": "8192",
+        "step": "1",
+        "visible": true
+      },
+      "before": 22,
+      "after": 23,
+      "graphAfter": 24,
+      "elapsedMs": 3704
+    },
+    {
+      "index": 109,
+      "path": "images.shadow.gradient.rotate",
+      "id": "apexify.js::ApexPainter#createImage::images.shadow.gradient.rotate",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-109",
+        "IMG01-E-INSPECTOR-109",
+        "IMG01-E-HISTORY-109",
+        "IMG01-E-GRAPH-109",
+        "IMG01-E-PERSIST-109",
+        "IMG01-E-EXPORT-109"
+      ],
+      "issues": [],
+      "control": "Image shadow rotation",
+      "controlInfo": {
+        "tag": "INPUT",
+        "type": "number",
+        "disabled": false,
+        "value": "35",
+        "checked": false,
+        "options": null,
+        "min": "-360",
+        "max": "360",
+        "step": "1",
+        "visible": true
+      },
+      "before": 35,
+      "after": 36,
+      "graphAfter": 37,
+      "elapsedMs": 3702
+    }
+  ]
+}

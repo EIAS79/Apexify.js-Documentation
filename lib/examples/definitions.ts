@@ -3,14 +3,14 @@ import type { ExampleDefinition } from './schema';
 export const DOC5_PACKAGE = {
   name: 'apexify.js',
   version: '6.0.0',
-  commit: '379a5248f09ed39c1b1734fe104b6bd73a77857f',
+  commit: 'b6ca97cfc675b16a52c2c7b5d0ff881b87b911be',
 } as const;
 
 export const exampleDefinitions = [
   {
     id: 'node.canvas.basic',
     title: 'Create a deterministic canvas',
-    summary: 'Render a fixed 320×180 server-side PNG using the public ApexPainter canvas API.',
+    summary: 'Render a fixed 320Ã—180 server-side PNG using the public ApexPainter canvas API.',
     runtime: 'node',
     difficulty: 'minimal',
     packages: ['apexify.js'],
@@ -38,7 +38,7 @@ export const exampleDefinitions = [
   {
     id: 'node.chart.bar',
     title: 'Render a bar chart',
-    summary: 'Render a practical bar chart as a verified 480×320 PNG through ApexPainter.createChart().',
+    summary: 'Render a practical bar chart as a verified 480Ã—320 PNG through ApexPainter.createChart().',
     runtime: 'node',
     difficulty: 'practical',
     packages: ['apexify.js'],
@@ -119,7 +119,7 @@ export const exampleDefinitions = [
       importantOptions: ['bar chart data', 'dimensions'],
       whyOptions: ['Data lives in a separate typed module to prove multi-file fixture copying.', 'The PNG uses metadata verification while the JSON summary uses exact semantic verification.'],
       variants: ['Replace the report data module with application data while retaining the same rendering boundary.'],
-      performanceNote: 'The fixture creates one 640×360 chart and one tiny JSON file; no remote resources are loaded.',
+      performanceNote: 'The fixture creates one 640Ã—360 chart and one tiny JSON file; no remote resources are loaded.',
       errorNote: 'Type errors in the imported data module fail before execution; output contract mismatches fail after execution.',
       nextStep: 'Link the same stable example identity from feature guides and API reference metadata.',
     },

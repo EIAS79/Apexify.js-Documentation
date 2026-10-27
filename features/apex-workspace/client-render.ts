@@ -1,4 +1,5 @@
 import type { WorkspaceDocument } from "./model";
+import {selectRenderAssets} from './render-assets';
 function waitForCapacity(ms: number, signal: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal.aborted) {
@@ -25,7 +26,7 @@ export async function requestWorkspaceRender(
     const response = await fetch("/api/workspace/render", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(document),
+      body: JSON.stringify(selectRenderAssets(document)),
       signal,
     });
     if (response.status === 429 && attempt < 2) {

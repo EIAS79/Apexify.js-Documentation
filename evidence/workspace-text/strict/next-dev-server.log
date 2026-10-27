@@ -1,0 +1,39 @@
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:39508
+
+ ✓ Starting...
+ ✓ Ready in 2.9s
+ ○ Compiling /middleware ...
+ ✓ Compiled /middleware in 1296ms (72 modules)
+ ○ Compiling /api/workspace/text-metrics ...
+ ✓ Compiled /api/workspace/text-metrics in 810ms (62 modules)
+ POST /api/workspace/text-metrics 200 in 2895ms
+ POST /api/workspace/text-metrics 400 in 29ms
+ POST /api/workspace/text-metrics 403 in 32ms
+ POST /api/workspace/text-metrics 413 in 29ms
+ POST /api/workspace/text-metrics 400 in 30ms
+ POST /api/workspace/text-metrics 400 in 30ms
+ POST /api/workspace/text-metrics 403 in 27ms
+ POST /api/workspace/text-metrics 200 in 30ms
+ ✓ Compiled /api/workspace/render in 210ms (71 modules)
+ POST /api/workspace/render 200 in 505ms
+ ○ Compiling /workspace ...
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ ✓ Compiled /workspace in 15.4s (866 modules)
+ GET /workspace 200 in 16298ms
+ ✓ Compiled in 1453ms (386 modules)
+ GET /workspace 200 in 98ms
+ GET /workspace 200 in 167ms
+ ⚠ Cross origin request detected from 127.0.0.1 to /_next/* resource. In a future major version of Next.js, you will need to explicitly configure "allowedDevOrigins" in next.config to allow this.
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+ POST /api/workspace/render 200 in 2865ms
+ POST /api/workspace/render 200 in 2140ms
+ POST /api/workspace/render 200 in 593ms
+ POST /api/workspace/text-metrics 200 in 48ms
+ POST /api/workspace/render 200 in 596ms
+ POST /api/workspace/render 200 in 1747ms
+ GET /workspace 200 in 193ms
+ POST /api/workspace/render 200 in 2430ms
+ POST /api/workspace/render 200 in 2421ms

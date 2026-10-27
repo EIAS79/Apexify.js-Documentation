@@ -1,0 +1,10 @@
+LAYER_PROBE {"layer":"text","graph":true,"path":"Advanced typography editor"}
+BATCH_PROGRESS 160 10 pass 10 fail 0
+BATCH_PROGRESS 160 20 pass 20 fail 0
+BATCH_PROGRESS 160 30 pass 29 fail 1
+BATCH_PROGRESS 160 40 pass 39 fail 1
+BATCH_PROGRESS 160 50 pass 49 fail 1
+BATCH_PROGRESS 160 60 pass 59 fail 1
+BATCH_PROGRESS 160 70 pass 69 fail 1
+BATCH_PROGRESS 160 80 pass 79 fail 1
+UI_MATRIX_RESULT D:\ApexifyWorkspaceParallel\text-strict-20261023\evidence\workspace-text\strict\ui-matrix-160-240.json {"pass":79,"fail":1,"skips":0,"failures":[{"id":"UI-0186","api":"createText.TextProperties[].text","status":"FAIL","error":"Error: UNDO_MISMATCH expected=\"Browser path value\" got=undefined"}]}

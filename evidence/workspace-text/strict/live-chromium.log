@@ -1,0 +1,3 @@
+BROWSER_FAIL Error: Timed out waiting for: !!document.querySelector('.aw-text-editor'); last=false
+    at until (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-browser.cjs:36:9)
+    at async run (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-browser.cjs:85:3)

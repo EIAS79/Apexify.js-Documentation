@@ -1,0 +1,186 @@
+{
+  "start": 389,
+  "count": 10,
+  "results": [
+    {
+      "id": "UI-0390",
+      "api": "createText.TextProperties.text",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": "Inspector baseline text",
+          "current": "Inspector baseline text"
+        },
+        "second": {
+          "value": "Graph baseline text",
+          "current": "Graph baseline text"
+        },
+        "undo": "Inspector baseline text",
+        "redo": "Graph baseline text",
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0391",
+      "api": "createText.TextProperties.x",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": 55,
+          "current": 55
+        },
+        "second": {
+          "value": 70,
+          "current": 70
+        },
+        "undo": 55,
+        "redo": 70,
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0392",
+      "api": "createText.TextProperties.y",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": 55,
+          "current": 55
+        },
+        "second": {
+          "value": 70,
+          "current": 70
+        },
+        "undo": 55,
+        "redo": 70,
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0393",
+      "api": "createText.TextProperties/font.size baseline",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": 29,
+          "current": 29
+        },
+        "second": {
+          "value": 34,
+          "current": 34
+        },
+        "undo": 29,
+        "redo": 34,
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0394",
+      "api": "createText.TextProperties/font.weight baseline",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": 600,
+          "current": 600
+        },
+        "second": {
+          "value": 700,
+          "current": 700
+        },
+        "undo": 600,
+        "redo": 700,
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0395",
+      "api": "createText.TextProperties/fill.color baseline",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "second": {
+          "value": "#aa33ff",
+          "current": "#aa33ff"
+        },
+        "undo": "#ff8800",
+        "redo": "#aa33ff",
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0396",
+      "api": "createText.TextProperties/fill.opacity baseline",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": 0.8,
+          "current": 0.8
+        },
+        "second": {
+          "value": 0.6,
+          "current": 0.6
+        },
+        "undo": 0.8,
+        "redo": 0.6,
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0397",
+      "api": "createText.TextProperties/placement.rotation baseline",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": 13,
+          "current": 13
+        },
+        "second": {
+          "value": 22,
+          "current": 22
+        },
+        "undo": 13,
+        "redo": 22,
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0398",
+      "api": "text selection bounds.width",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": 185,
+          "current": 185
+        },
+        "second": {
+          "value": 210,
+          "current": 210
+        },
+        "undo": 185,
+        "redo": 210,
+        "graphApplicable": false
+      }
+    },
+    {
+      "id": "UI-0399",
+      "api": "text selection bounds.height",
+      "status": "INSPECTOR_HISTORY_PASS",
+      "evidence": {
+        "inspector": {
+          "value": 185,
+          "current": 185
+        },
+        "second": {
+          "value": 210,
+          "current": 210
+        },
+        "undo": 185,
+        "redo": 210,
+        "graphApplicable": false
+      }
+    }
+  ]
+}

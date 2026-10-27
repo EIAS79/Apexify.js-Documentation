@@ -1,0 +1,8 @@
+LAYER_PROBE {"layer":"text","graph":true,"path":"Advanced typography editor"}
+BATCH_PROGRESS 320 10 pass 10 fail 0
+BATCH_PROGRESS 320 20 pass 20 fail 0
+BATCH_PROGRESS 320 30 pass 30 fail 0
+BATCH_PROGRESS 320 40 pass 40 fail 0
+BATCH_PROGRESS 320 50 pass 50 fail 0
+BATCH_PROGRESS 320 60 pass 60 fail 0
+UI_MATRIX_RESULT D:\ApexifyWorkspaceParallel\text-strict-20261023\evidence\workspace-text\strict\ui-matrix-320-399.json {"pass":69,"fail":0,"skips":10,"failures":[]}

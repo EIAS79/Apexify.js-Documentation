@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "origin": "http://127.0.0.1:38497/workspace",
+  "steps": [
+    {
+      "step": "warp quad mode",
+      "value": {
+        "mode": "quad",
+        "quad": true
+      }
+    },
+    {
+      "step": "warp handles mode",
+      "value": {
+        "mode": "handles",
+        "handles": true,
+        "quad": false
+      }
+    },
+    {
+      "step": "render preview",
+      "value": {
+        "width": 0,
+        "error": null
+      }
+    },
+    {
+      "step": "history",
+      "undo": true,
+      "redo": true
+    },
+    {
+      "step": "warp quad restored",
+      "value": {
+        "quad": true,
+        "handles": false
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "strict-warp-handles",
+      "size": 165742
+    },
+    {
+      "name": "strict-warp-quad",
+      "size": 168133
+    }
+  ]
+}

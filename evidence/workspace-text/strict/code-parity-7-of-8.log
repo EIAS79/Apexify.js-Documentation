@@ -1,0 +1,39 @@
+
+<--- Last few GCs --->
+
+[12896:000002883D1E5000]      546 ms: Scavenge (interleaved) 20.8 (30.2) -> 18.8 (33.2) MB, pooled: 6 MB, 5.15 / 0.00 ms  (average mu = 0.991, current mu = 0.991) allocation failure; 
+
+FATAL ERROR: Committing semi space failed. Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 00007FF6271590C6 
+ 2: 00007FF627159604 
+ 3: 00007FF625D63617 
+ 4: 00007FF625B63E57 
+ 5: 00007FF625AFC44B 
+ 6: 00007FF625AD3E7E 
+ 7: 00007FF625B668F2 
+ 8: 00007FF625B658A7 
+ 9: 00007FF625B767E2 
+10: 00007FF625B7630B 
+11: 00007FF627483BAD 
+12: 00007FF625B61920 
+13: 00007FF625B7C17A 
+14: 00007FF625B88616 
+15: 00007FF625759277 
+16: 00000288758F75FA 
+✖ tests\workspace\text-strict-native.test.ts (696.1155ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 711.8729
+
+✖ failing tests:
+
+test at tests\workspace\text-strict-native.test.ts:1:1
+✖ tests\workspace\text-strict-native.test.ts (696.1155ms)
+  'test failed'

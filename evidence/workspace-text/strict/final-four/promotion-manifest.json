@@ -1,0 +1,48 @@
+{
+  "baseCommit": "39f2f9772a5dca36ed392c44566a40421a4c978b",
+  "baselineLedgerSha256": "d68473dc0656eb7b59107ed24a82a665373286a855e73d37d0f225eeb00304ba",
+  "ledgerSha256": "342e7c54e2425ba24e4bd365d6f99a6db2445a3088bad3090cc0b276fd5359ef",
+  "counts": {
+    "FULL": 440,
+    "PARTIAL": 2,
+    "BLOCKED": 1,
+    "EXCLUDED": 1
+  },
+  "promoted": [
+    {
+      "id": "TEXT01-STRICT-0002",
+      "api": "createText.TextProperties.font.family",
+      "ui": "UI-FOUR-FONT-FAMILY-001",
+      "native": "NATIVE-FOUR-FONT-FAMILY-REGISTERED",
+      "code": "NATIVE-FOUR-FONT-FAMILY-CODE",
+      "ariaWidth": 859.1900024414062,
+      "courierWidth": 936.1500244140625
+    },
+    {
+      "id": "TEXT01-STRICT-0003",
+      "api": "createText.TextProperties.font.name",
+      "ui": "UI-FOUR-FONT-NAME-001",
+      "native": "NATIVE-FOUR-FONT-NAME-REGISTERED",
+      "code": "NATIVE-FOUR-FONT-NAME-CODE",
+      "ariaWidth": 859.1900024414062,
+      "courierWidth": 936.1500244140625
+    }
+  ],
+  "optional": [
+    {
+      "id": "TEXT01-STRICT-0410",
+      "api": "measureText.TextMetrics.hangingBaseline",
+      "classification": "PARTIAL",
+      "sourceEvidence": "ENGINE-OPTIONAL-BASELINE-HANGINGBASELINE",
+      "observation": null
+    },
+    {
+      "id": "TEXT01-STRICT-0411",
+      "api": "measureText.TextMetrics.ideographicBaseline",
+      "classification": "PARTIAL",
+      "sourceEvidence": "ENGINE-OPTIONAL-BASELINE-IDEOGRAPHICBASELINE",
+      "observation": null
+    }
+  ],
+  "originalInventorySha256": "85e806402af2ae72184c460866e785fba5a04c275bfe0f5f09daac9cdceeaec7"
+}

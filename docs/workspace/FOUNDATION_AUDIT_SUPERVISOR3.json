@@ -1,0 +1,648 @@
+{
+  "schemaVersion": 1,
+  "tool": "workspace-foundation-audit",
+  "evidenceClass": "STATIC_BASELINE_NOT_RUNTIME_PARITY",
+  "inspectedAtUtc": "2026-10-19T09:38:01.914Z",
+  "repository": {
+    "gitHead": null,
+    "gitBranch": null,
+    "workingTreeClean": false
+  },
+  "node": {
+    "version": "v24.21.0",
+    "typescriptVersion": "5.9.3"
+  },
+  "engine": {
+    "manifestDependency": "github:EIAS79/Apexify.js#379a5248f09ed39c1b1734fe104b6bd73a77857f",
+    "manifestSha": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+    "lockRootDependency": "github:EIAS79/Apexify.js#379a5248f09ed39c1b1734fe104b6bd73a77857f",
+    "lockRootSha": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+    "lockPackageResolved": "git+ssh://git@github.com/EIAS79/Apexify.js.git#379a5248f09ed39c1b1734fe104b6bd73a77857f",
+    "lockPackageIntegrity": "sha512-lh7kDhty57V3ThTibuCq2iXjv381wROrK0hemZhCSH4nM5ZBTZ51SHs1gpGCudMbp/aEC2EU8doPZEVVX17J+Q==",
+    "installed": {
+      "name": "apexify.js",
+      "version": "6.0.0",
+      "entrypoint": {
+        "path": "node_modules/apexify.js/dist/cjs/index.cjs",
+        "sha256": "29603032292ec0aabbed579f6af04a14a4ca1f5c2bacdb22d977ad00af4bc759",
+        "bytes": 1140178
+      }
+    },
+    "sourceCommitEqualsInstalledArtifact": "UNVERIFIED",
+    "identityFindings": []
+  },
+  "workspace": {
+    "scannedFiles": 18,
+    "browserReachable": [
+      "features/apex-workspace/WorkspaceApp.tsx",
+      "features/apex-workspace/client-render.ts",
+      "features/apex-workspace/codegen.ts",
+      "features/apex-workspace/components/CodeEditor.tsx",
+      "features/apex-workspace/components/DockLayout.tsx",
+      "features/apex-workspace/components/Graph.tsx",
+      "features/apex-workspace/components/Inspector.tsx",
+      "features/apex-workspace/components/Results.tsx",
+      "features/apex-workspace/components/Tools.tsx",
+      "features/apex-workspace/components/VisualCanvas.tsx",
+      "features/apex-workspace/components/ui.tsx",
+      "features/apex-workspace/model.ts"
+    ],
+    "staticUsedMethods": [
+      {
+        "file": "features/apex-workspace/server/render.ts",
+        "method": "createCanvas",
+        "line": 52,
+        "evidence": "static-call-only"
+      },
+      {
+        "file": "features/apex-workspace/server/render.ts",
+        "method": "createImage",
+        "line": 55,
+        "evidence": "static-call-only"
+      },
+      {
+        "file": "features/apex-workspace/server/render.ts",
+        "method": "createText",
+        "line": 69,
+        "evidence": "static-call-only"
+      },
+      {
+        "file": "features/apex-workspace/server/render.ts",
+        "method": "createChart",
+        "line": 85,
+        "evidence": "static-call-only"
+      },
+      {
+        "file": "features/apex-workspace/server/render.ts",
+        "method": "createImage",
+        "line": 95,
+        "evidence": "static-call-only"
+      },
+      {
+        "file": "features/apex-workspace/server/render.ts",
+        "method": "createImage",
+        "line": 129,
+        "evidence": "static-call-only"
+      }
+    ],
+    "capabilityInventory": [
+      {
+        "candidate": "ApexPainter.createCanvas",
+        "evidence": "STATIC_CALLSITE_ONLY",
+        "sourceCalls": [
+          {
+            "file": "features/apex-workspace/server/render.ts",
+            "method": "createCanvas",
+            "line": 52,
+            "evidence": "static-call-only",
+            "sourceSha256": "450d30c929d02750cb42f132eb8e963c0e8d59cdfeeb645fa9e9896e3d1e3b9a"
+          }
+        ],
+        "runtimeExport": "NOT_VERIFIED",
+        "nestedOptions": "NOT_INVENTORIED",
+        "defaults": "NOT_VERIFIED",
+        "modelMapping": "NOT_RECONCILED",
+        "visualMapping": "NOT_RECONCILED",
+        "graphMapping": "NOT_RECONCILED",
+        "codegenMapping": "NOT_RECONCILED",
+        "exportEquivalence": "NOT_TESTED",
+        "status": "UNVERIFIED"
+      },
+      {
+        "candidate": "ApexPainter.createChart",
+        "evidence": "STATIC_CALLSITE_ONLY",
+        "sourceCalls": [
+          {
+            "file": "features/apex-workspace/server/render.ts",
+            "method": "createChart",
+            "line": 85,
+            "evidence": "static-call-only",
+            "sourceSha256": "450d30c929d02750cb42f132eb8e963c0e8d59cdfeeb645fa9e9896e3d1e3b9a"
+          }
+        ],
+        "runtimeExport": "NOT_VERIFIED",
+        "nestedOptions": "NOT_INVENTORIED",
+        "defaults": "NOT_VERIFIED",
+        "modelMapping": "NOT_RECONCILED",
+        "visualMapping": "NOT_RECONCILED",
+        "graphMapping": "NOT_RECONCILED",
+        "codegenMapping": "NOT_RECONCILED",
+        "exportEquivalence": "NOT_TESTED",
+        "status": "UNVERIFIED"
+      },
+      {
+        "candidate": "ApexPainter.createImage",
+        "evidence": "STATIC_CALLSITE_ONLY",
+        "sourceCalls": [
+          {
+            "file": "features/apex-workspace/server/render.ts",
+            "method": "createImage",
+            "line": 55,
+            "evidence": "static-call-only",
+            "sourceSha256": "450d30c929d02750cb42f132eb8e963c0e8d59cdfeeb645fa9e9896e3d1e3b9a"
+          },
+          {
+            "file": "features/apex-workspace/server/render.ts",
+            "method": "createImage",
+            "line": 95,
+            "evidence": "static-call-only",
+            "sourceSha256": "450d30c929d02750cb42f132eb8e963c0e8d59cdfeeb645fa9e9896e3d1e3b9a"
+          },
+          {
+            "file": "features/apex-workspace/server/render.ts",
+            "method": "createImage",
+            "line": 129,
+            "evidence": "static-call-only",
+            "sourceSha256": "450d30c929d02750cb42f132eb8e963c0e8d59cdfeeb645fa9e9896e3d1e3b9a"
+          }
+        ],
+        "runtimeExport": "NOT_VERIFIED",
+        "nestedOptions": "NOT_INVENTORIED",
+        "defaults": "NOT_VERIFIED",
+        "modelMapping": "NOT_RECONCILED",
+        "visualMapping": "NOT_RECONCILED",
+        "graphMapping": "NOT_RECONCILED",
+        "codegenMapping": "NOT_RECONCILED",
+        "exportEquivalence": "NOT_TESTED",
+        "status": "UNVERIFIED"
+      },
+      {
+        "candidate": "ApexPainter.createText",
+        "evidence": "STATIC_CALLSITE_ONLY",
+        "sourceCalls": [
+          {
+            "file": "features/apex-workspace/server/render.ts",
+            "method": "createText",
+            "line": 69,
+            "evidence": "static-call-only",
+            "sourceSha256": "450d30c929d02750cb42f132eb8e963c0e8d59cdfeeb645fa9e9896e3d1e3b9a"
+          }
+        ],
+        "runtimeExport": "NOT_VERIFIED",
+        "nestedOptions": "NOT_INVENTORIED",
+        "defaults": "NOT_VERIFIED",
+        "modelMapping": "NOT_RECONCILED",
+        "visualMapping": "NOT_RECONCILED",
+        "graphMapping": "NOT_RECONCILED",
+        "codegenMapping": "NOT_RECONCILED",
+        "exportEquivalence": "NOT_TESTED",
+        "status": "UNVERIFIED"
+      }
+    ],
+    "files": [
+      {
+        "path": "app/api/workspace/render/route.ts",
+        "sha256": "99c5d6e2d256b12c851d015eb210abb557a2453c7c260fbd03ffc2864f95258c",
+        "bytes": 2999,
+        "kind": "server",
+        "imports": [
+          {
+            "specifier": "next/server",
+            "line": 1,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@/features/apex-workspace/server/render",
+            "line": 2,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "app/workspace/page.tsx",
+        "sha256": "3731bcdd5437464b5ce4e690970863e72a52e2f91ee03f0dc37b15cc3618e56a",
+        "bytes": 411,
+        "kind": "shared",
+        "imports": [
+          {
+            "specifier": "next",
+            "line": 1,
+            "typeOnly": true
+          },
+          {
+            "specifier": "@/features/apex-workspace/WorkspaceApp",
+            "line": 2,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/WorkspaceApp.tsx",
+        "sha256": "bd19dd7972d461d400f9c037fc6cc4317fc3d2b57c0ce56de12225f4047b74cb",
+        "bytes": 36124,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "react",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@heroicons/react/24/outline",
+            "line": 3,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./model",
+            "line": 23,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./codegen",
+            "line": 34,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./client-render",
+            "line": 35,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./components/DockLayout",
+            "line": 36,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./components/ui",
+            "line": 41,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./components/Tools",
+            "line": 42,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./components/Inspector",
+            "line": 43,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./components/VisualCanvas",
+            "line": 44,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./components/Graph",
+            "line": 45,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./components/CodeEditor",
+            "line": 46,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./components/Results",
+            "line": 47,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./workspace.css",
+            "line": 56,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/client-render.ts",
+        "sha256": "52e0580d7be55f3aa8a26542b5532de5f5f3b63ccd5c1b66327c75e34d5647f0",
+        "bytes": 1351,
+        "kind": "shared",
+        "imports": [
+          {
+            "specifier": "./model",
+            "line": 1,
+            "typeOnly": true
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/codegen.ts",
+        "sha256": "2a7ae635f07dc5117919c6453ad5fa055f0735ed81bf690aa8ae3bbafc175af7",
+        "bytes": 3891,
+        "kind": "shared",
+        "imports": [
+          {
+            "specifier": "./model",
+            "line": 1,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/components/CodeEditor.tsx",
+        "sha256": "fa19c2bcd8a42afecedebdc6872da65c3bdaa79ba5c475cbc1fc6af2988b077c",
+        "bytes": 2032,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "next/dynamic",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@codemirror/lang-javascript",
+            "line": 3,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@heroicons/react/24/outline",
+            "line": 4,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@uiw/react-codemirror",
+            "line": 5,
+            "typeOnly": false,
+            "dynamic": true,
+            "unresolvedExpression": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/components/DockLayout.tsx",
+        "sha256": "de26092f92cbbf9d6c0db0280ba72a3928b5aef8e2b649bf06cd132821e78222",
+        "bytes": 5873,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "react",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "../model",
+            "line": 9,
+            "typeOnly": true
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/components/Graph.tsx",
+        "sha256": "d13978431da3572c763ea5e826b6db093f0c22e1f795c937033d3cbc3f471957",
+        "bytes": 5228,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "react",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@heroicons/react/24/outline",
+            "line": 3,
+            "typeOnly": false
+          },
+          {
+            "specifier": "../model",
+            "line": 13,
+            "typeOnly": true
+          },
+          {
+            "specifier": "./ui",
+            "line": 14,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/components/Inspector.tsx",
+        "sha256": "b70b46723dd0c6e3017d58e9e1f6a8d684fd82b93e19074bbe4500a47aeb775b",
+        "bytes": 18238,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "react",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@heroicons/react/24/outline",
+            "line": 3,
+            "typeOnly": false
+          },
+          {
+            "specifier": "../model",
+            "line": 16,
+            "typeOnly": true
+          },
+          {
+            "specifier": "./ui",
+            "line": 17,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./Tools",
+            "line": 18,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/components/Results.tsx",
+        "sha256": "6d3a84f8991991fea13419d94af01974b37b67c3d3c1f5a806fff521aea5155d",
+        "bytes": 8135,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "react",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@heroicons/react/24/outline",
+            "line": 3,
+            "typeOnly": false
+          },
+          {
+            "specifier": "../model",
+            "line": 11,
+            "typeOnly": true
+          },
+          {
+            "specifier": "./ui",
+            "line": 12,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/components/Tools.tsx",
+        "sha256": "30e74f0098e24357ec5ce677abc726435b259866c1b581877254951308b8e786",
+        "bytes": 6386,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "react",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@heroicons/react/24/outline",
+            "line": 3,
+            "typeOnly": false
+          },
+          {
+            "specifier": "../model",
+            "line": 23,
+            "typeOnly": true
+          },
+          {
+            "specifier": "./ui",
+            "line": 24,
+            "typeOnly": true
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/components/VisualCanvas.tsx",
+        "sha256": "f80aac29d7ced16503c641218bdd800657d9ba3026a7bbd91a9f58dd99bf9f51",
+        "bytes": 8703,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "react",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "@heroicons/react/24/outline",
+            "line": 3,
+            "typeOnly": false
+          },
+          {
+            "specifier": "../model",
+            "line": 12,
+            "typeOnly": true
+          },
+          {
+            "specifier": "./ui",
+            "line": 13,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/components/ui.tsx",
+        "sha256": "868055d656deb93a87e5d5e8a3e876ec194137af4f830204c4d837bf436466b3",
+        "bytes": 2565,
+        "kind": "client",
+        "imports": [
+          {
+            "specifier": "@heroicons/react/24/outline",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "react",
+            "line": 3,
+            "typeOnly": true
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/domain/commands.ts",
+        "sha256": "778a66ce90d89aff308bad03b0fe2a82cf7c3368969c416a684745f81c969c83",
+        "bytes": 7804,
+        "kind": "shared",
+        "imports": [
+          {
+            "specifier": "./project",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./time",
+            "line": 3,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/domain/project.ts",
+        "sha256": "06621c6b91a00012eed633f51530a5e0c8137e879f81e441afc513a74847cf6e",
+        "bytes": 17750,
+        "kind": "shared",
+        "imports": [
+          {
+            "specifier": "../model",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "./time",
+            "line": 3,
+            "typeOnly": false
+          }
+        ]
+      },
+      {
+        "path": "features/apex-workspace/domain/time.ts",
+        "sha256": "91cb9ada3627e5eaac55ea6d859f4b3b3a48810e02cd26516695c175d8c1af19",
+        "bytes": 8436,
+        "kind": "shared",
+        "imports": []
+      },
+      {
+        "path": "features/apex-workspace/model.ts",
+        "sha256": "d01ed2db92bce19caf27536a36fc6dca6ca51dbb37cb0f984ef6753c9d19d6c5",
+        "bytes": 9279,
+        "kind": "shared",
+        "imports": []
+      },
+      {
+        "path": "features/apex-workspace/server/render.ts",
+        "sha256": "450d30c929d02750cb42f132eb8e963c0e8d59cdfeeb645fa9e9896e3d1e3b9a",
+        "bytes": 4072,
+        "kind": "server",
+        "imports": [
+          {
+            "specifier": "server-only",
+            "line": 1,
+            "typeOnly": false
+          },
+          {
+            "specifier": "node:path",
+            "line": 2,
+            "typeOnly": false
+          },
+          {
+            "specifier": "node:fs/promises",
+            "line": 3,
+            "typeOnly": false
+          },
+          {
+            "specifier": "apexify.js",
+            "line": 4,
+            "typeOnly": false
+          },
+          {
+            "specifier": "../model",
+            "line": 9,
+            "typeOnly": false
+          }
+        ]
+      }
+    ],
+    "importBoundaryViolations": [],
+    "unresolvedImports": [],
+    "unscannedExternalPackages": [
+      "@codemirror/lang-javascript",
+      "@heroicons/react/24/outline",
+      "@uiw/react-codemirror",
+      "next/dynamic",
+      "react"
+    ]
+  },
+  "diagnostics": [],
+  "gates": {
+    "identity": "PASS_MANIFEST_AND_LOCK_ONLY",
+    "installedArtifact": "HASH_RECORDED_NOT_SOURCE_PROVEN",
+    "staticImportBoundaries": "PASS_STATIC_SCOPE_ONLY",
+    "recursiveApiParity": "NOT_RUN",
+    "runtimeTests": "NOT_RUN",
+    "browserTests": "NOT_RUN",
+    "productionRelease": "NOT_RUN"
+  }
+}

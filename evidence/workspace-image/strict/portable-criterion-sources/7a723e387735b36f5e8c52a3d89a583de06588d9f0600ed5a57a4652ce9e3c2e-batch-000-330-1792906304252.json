@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "pin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "start": 0,
+  "end": 330,
+  "runId": "1792906304252",
+  "results": [
+    {
+      "index": 86,
+      "path": "images.mask.source",
+      "id": "apexify.js::ApexPainter#createImage::images.mask.source",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "projectImported": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-86",
+        "IMG01-E-REAL-ASSET-PICKER-86",
+        "IMG01-E-INSPECTOR-86",
+        "IMG01-E-HISTORY-86",
+        "IMG01-E-GRAPH-86",
+        "IMG01-E-INSPECTOR-REAPPLY-86",
+        "IMG01-E-PERSIST-86",
+        "IMG01-E-EXPORT-86",
+        "IMG01-E-IMPORT-DIVERGENCE-86",
+        "IMG01-E-IMPORT-86"
+      ],
+      "issues": [],
+      "control": "Mask SHA-256 source",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+        "options": [
+          "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+          "asset:45f0129457bf2cf6d2c94b6e0a29484b87b22b88add82851e3126ea0f5f67879"
+        ],
+        "visible": true
+      },
+      "before": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+      "after": "asset:45f0129457bf2cf6d2c94b6e0a29484b87b22b88add82851e3126ea0f5f67879",
+      "graphAfter": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+      "finalInspectorReapplied": true,
+      "projectFile": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\strict-lifecycle-browser\\project-exports\\IMG01-CERT-86.apexify.json",
+      "projectSHA256": "0f82cc71b429217ca016e1b15cd07c4a3a776fbcb4a90e1a6c13fcf4602ce46a",
+      "preImportDivergence": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+      "elapsedMs": 9300
+    },
+    {
+      "index": 263,
+      "path": "options.groupTransform.mask.source",
+      "id": "apexify.js::ApexPainter#createImage::options.groupTransform.mask.source",
+      "sourceFixtureValid": true,
+      "inspector": true,
+      "graph": true,
+      "graphNotApplicable": false,
+      "undoRedo": true,
+      "indexedDB": true,
+      "projectExport": true,
+      "projectImported": true,
+      "nativePreview": true,
+      "codeApplied": true,
+      "proofIds": [
+        "IMG01-E-CODE-APPLY-263",
+        "IMG01-E-REAL-ASSET-PICKER-263",
+        "IMG01-E-INSPECTOR-263",
+        "IMG01-E-HISTORY-263",
+        "IMG01-E-GRAPH-263",
+        "IMG01-E-INSPECTOR-REAPPLY-263",
+        "IMG01-E-PERSIST-263",
+        "IMG01-E-EXPORT-263",
+        "IMG01-E-IMPORT-DIVERGENCE-263",
+        "IMG01-E-IMPORT-263"
+      ],
+      "issues": [],
+      "control": "Group mask SHA-256 source",
+      "controlInfo": {
+        "tag": "SELECT",
+        "type": "select-one",
+        "disabled": false,
+        "value": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+        "options": [
+          "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+          "asset:45f0129457bf2cf6d2c94b6e0a29484b87b22b88add82851e3126ea0f5f67879"
+        ],
+        "visible": true
+      },
+      "before": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+      "after": "asset:45f0129457bf2cf6d2c94b6e0a29484b87b22b88add82851e3126ea0f5f67879",
+      "graphAfter": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+      "finalInspectorReapplied": true,
+      "projectFile": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\strict-lifecycle-browser\\project-exports\\IMG01-CERT-263.apexify.json",
+      "projectSHA256": "c20aa21d31145f892360fd1e312a58d1aca1c37a1618420bef90167e25da0603",
+      "preImportDivergence": "asset:d1491a4deb4416c21f44654513466f7e017aef7ac94d1dde7fc80b0515b18650",
+      "elapsedMs": 9625
+    }
+  ]
+}

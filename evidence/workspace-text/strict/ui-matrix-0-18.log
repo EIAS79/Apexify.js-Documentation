@@ -1,0 +1,4 @@
+UI_MATRIX_FATAL Error: TIMEOUT document.readyState==='complete'&&document.querySelector('button[aria-label="Select Apexify"]') LAST "Error: Object reference chain is too long"
+    at wait (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-ui-matrix.cjs:17:182)
+    at async open (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-ui-matrix.cjs:25:2)
+    at async run (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-ui-matrix.cjs:151:2)

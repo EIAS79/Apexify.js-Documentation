@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "program": "AWP",
+  "generatedFor": "Supervisor Directive #2",
+  "sourceRevision": "cec6e9d0931f2e5a88a10d016603f2b85e88f113",
+  "sourceEvidence": "Actual local AST audit plus inspected source paths; these are usage candidates, not confirmed public exports",
+  "runtimePinDeclaration": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "installedArtifactVerified": false,
+  "scannedWorkspaceFiles": 15,
+  "browserReachableFiles": 12,
+  "staticBoundaryDirectViolations": 0,
+  "staticBoundariesProveBundlePurity": false,
+  "recursiveOptionInventory": "NOT_STARTED",
+  "counts": {
+    "candidateMethods": 4,
+    "declaredApiDomainsVerified": 0,
+    "fullCapabilities": 0
+  },
+  "entries": [
+    {
+      "id": "apexify.js:ApexPainter.createCanvas",
+      "apiClassification": "STATIC_CALLSITE_CANDIDATE",
+      "engineRuntimeResult": "NOT_EXECUTED_IN_THIS_INVENTORY",
+      "declaredDependencyCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+      "runtimeSourceRevision": "NOT_RECONCILED",
+      "callSites": [
+        {
+          "file": "features/apex-workspace/server/render.ts",
+          "fileSha256": "51e1a211549858b881ba3ff4eaa8a18ed742ff6f11d0255a8e52228326a54a73",
+          "line": 52
+        }
+      ],
+      "workspaceModelPaths": [
+        "width",
+        "height",
+        "background"
+      ],
+      "modelEvidenceFile": "features/apex-workspace/model.ts",
+      "modelEvidenceSha256": "9c748c5af71dd56a4ab05698018df0516993fd69204891be906fca55678282ce",
+      "codegen": "features/apex-workspace/codegen.ts",
+      "codegenSha256": "e0c26fc43a171acf181d4b289eacec818dd5e2525ac834344930b3e47100bb8e",
+      "graph": "DERIVED_LAYER_DIAGRAM_ONLY",
+      "visualEditor": "BASIC_CONTROLS_ONLY",
+      "optionTree": "NOT_RECURSIVELY_INVENTORIED",
+      "runtimeValidationDefaults": "NOT_VERIFIED",
+      "rendererParity": "NOT_PROVEN",
+      "undoPersistence": "FOUNDATION_ONLY_NOT_DOMAIN_PROVEN",
+      "requiredTests": [
+        "pinned-package API test",
+        "generated program parity",
+        "visual/code/graph mutation roundtrip",
+        "invalid option and resource-limit fixtures"
+      ],
+      "supportStatus": "PARTIAL"
+    },
+    {
+      "id": "apexify.js:ApexPainter.createImage",
+      "apiClassification": "STATIC_CALLSITE_CANDIDATE",
+      "engineRuntimeResult": "NOT_EXECUTED_IN_THIS_INVENTORY",
+      "declaredDependencyCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+      "runtimeSourceRevision": "NOT_RECONCILED",
+      "callSites": [
+        {
+          "file": "features/apex-workspace/server/render.ts",
+          "fileSha256": "51e1a211549858b881ba3ff4eaa8a18ed742ff6f11d0255a8e52228326a54a73",
+          "line": 55
+        },
+        {
+          "file": "features/apex-workspace/server/render.ts",
+          "fileSha256": "51e1a211549858b881ba3ff4eaa8a18ed742ff6f11d0255a8e52228326a54a73",
+          "line": 95
+        },
+        {
+          "file": "features/apex-workspace/server/render.ts",
+          "fileSha256": "51e1a211549858b881ba3ff4eaa8a18ed742ff6f11d0255a8e52228326a54a73",
+          "line": 129
+        }
+      ],
+      "workspaceModelPaths": [
+        "layers[kind=image]",
+        "layers[kind=shape]",
+        "layers[kind=chart]"
+      ],
+      "modelEvidenceFile": "features/apex-workspace/model.ts",
+      "modelEvidenceSha256": "9c748c5af71dd56a4ab05698018df0516993fd69204891be906fca55678282ce",
+      "codegen": "features/apex-workspace/codegen.ts",
+      "codegenSha256": "e0c26fc43a171acf181d4b289eacec818dd5e2525ac834344930b3e47100bb8e",
+      "graph": "DERIVED_LAYER_DIAGRAM_ONLY",
+      "visualEditor": "BASIC_CONTROLS_ONLY",
+      "optionTree": "NOT_RECURSIVELY_INVENTORIED",
+      "runtimeValidationDefaults": "NOT_VERIFIED",
+      "rendererParity": "NOT_PROVEN",
+      "undoPersistence": "FOUNDATION_ONLY_NOT_DOMAIN_PROVEN",
+      "requiredTests": [
+        "pinned-package API test",
+        "generated program parity",
+        "visual/code/graph mutation roundtrip",
+        "invalid option and resource-limit fixtures"
+      ],
+      "supportStatus": "PARTIAL"
+    },
+    {
+      "id": "apexify.js:ApexPainter.createText",
+      "apiClassification": "STATIC_CALLSITE_CANDIDATE",
+      "engineRuntimeResult": "NOT_EXECUTED_IN_THIS_INVENTORY",
+      "declaredDependencyCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+      "runtimeSourceRevision": "NOT_RECONCILED",
+      "callSites": [
+        {
+          "file": "features/apex-workspace/server/render.ts",
+          "fileSha256": "51e1a211549858b881ba3ff4eaa8a18ed742ff6f11d0255a8e52228326a54a73",
+          "line": 69
+        }
+      ],
+      "workspaceModelPaths": [
+        "layers[kind=text]"
+      ],
+      "modelEvidenceFile": "features/apex-workspace/model.ts",
+      "modelEvidenceSha256": "9c748c5af71dd56a4ab05698018df0516993fd69204891be906fca55678282ce",
+      "codegen": "features/apex-workspace/codegen.ts",
+      "codegenSha256": "e0c26fc43a171acf181d4b289eacec818dd5e2525ac834344930b3e47100bb8e",
+      "graph": "DERIVED_LAYER_DIAGRAM_ONLY",
+      "visualEditor": "BASIC_CONTROLS_ONLY",
+      "optionTree": "NOT_RECURSIVELY_INVENTORIED",
+      "runtimeValidationDefaults": "NOT_VERIFIED",
+      "rendererParity": "NOT_PROVEN",
+      "undoPersistence": "FOUNDATION_ONLY_NOT_DOMAIN_PROVEN",
+      "requiredTests": [
+        "pinned-package API test",
+        "generated program parity",
+        "visual/code/graph mutation roundtrip",
+        "invalid option and resource-limit fixtures"
+      ],
+      "supportStatus": "PARTIAL"
+    },
+    {
+      "id": "apexify.js:ApexPainter.createChart",
+      "apiClassification": "STATIC_CALLSITE_CANDIDATE",
+      "engineRuntimeResult": "NOT_EXECUTED_IN_THIS_INVENTORY",
+      "declaredDependencyCommit": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+      "runtimeSourceRevision": "NOT_RECONCILED",
+      "callSites": [
+        {
+          "file": "features/apex-workspace/server/render.ts",
+          "fileSha256": "51e1a211549858b881ba3ff4eaa8a18ed742ff6f11d0255a8e52228326a54a73",
+          "line": 85
+        }
+      ],
+      "workspaceModelPaths": [
+        "layers[kind=chart]"
+      ],
+      "modelEvidenceFile": "features/apex-workspace/model.ts",
+      "modelEvidenceSha256": "9c748c5af71dd56a4ab05698018df0516993fd69204891be906fca55678282ce",
+      "codegen": "features/apex-workspace/codegen.ts",
+      "codegenSha256": "e0c26fc43a171acf181d4b289eacec818dd5e2525ac834344930b3e47100bb8e",
+      "graph": "DERIVED_LAYER_DIAGRAM_ONLY",
+      "visualEditor": "BASIC_CONTROLS_ONLY",
+      "optionTree": "NOT_RECURSIVELY_INVENTORIED",
+      "runtimeValidationDefaults": "NOT_VERIFIED",
+      "rendererParity": "NOT_PROVEN",
+      "undoPersistence": "FOUNDATION_ONLY_NOT_DOMAIN_PROVEN",
+      "requiredTests": [
+        "pinned-package API test",
+        "generated program parity",
+        "visual/code/graph mutation roundtrip",
+        "invalid option and resource-limit fixtures"
+      ],
+      "supportStatus": "PARTIAL"
+    }
+  ],
+  "unaddressedMandatoryDomains": [
+    "paths",
+    "gradients-and-patterns",
+    "advanced-text",
+    "templates",
+    "scenes",
+    "animations",
+    "gif",
+    "audio",
+    "video",
+    "timeline",
+    "frame-collection"
+  ],
+  "evidenceCaveat": "No entry may be relabeled FULL without executed pin-matched engine, model/codegen/graph/visual parity, export/recovery and resource tests."
+}

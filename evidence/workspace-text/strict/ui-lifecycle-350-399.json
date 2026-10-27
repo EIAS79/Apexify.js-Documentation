@@ -1,0 +1,572 @@
+{
+  "begin": 350,
+  "limit": 49,
+  "results": [
+    {
+      "id": "LIFE-0351",
+      "api": "createText.TextProperties[].stroke.gradient.endY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0352",
+      "api": "createText.TextProperties[].stroke.gradient.startRadius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0353",
+      "api": "createText.TextProperties[].stroke.gradient.endRadius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0354",
+      "api": "createText.TextProperties[].stroke.gradient.centerX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0355",
+      "api": "createText.TextProperties[].stroke.gradient.centerY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0356",
+      "api": "createText.TextProperties[].stroke.gradient.startAngle",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0357",
+      "api": "createText.TextProperties[].stroke.gradient.rotate",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0358",
+      "api": "createText.TextProperties[].stroke.gradient.pivotX",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0359",
+      "api": "createText.TextProperties[].stroke.gradient.pivotY",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0360",
+      "api": "createText.TextProperties[].stroke.gradient.repeat",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "repeat",
+          "current": "repeat"
+        },
+        "stored": "repeat",
+        "reloaded": "repeat",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0361",
+      "api": "createText.TextProperties[].stroke.gradient.colors[].stop",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 0.15,
+          "current": 0.15
+        },
+        "stored": 0.15,
+        "reloaded": 0.15,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0362",
+      "api": "createText.TextProperties[].stroke.gradient.colors[].color",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "stored": "#ff8800",
+        "reloaded": "#ff8800",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0363",
+      "api": "createText.TextProperties[].stroke.opacity",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 0.7,
+          "current": 0.7
+        },
+        "stored": 0.7,
+        "reloaded": 0.7,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0364",
+      "api": "createText.TextProperties[].stroke.style",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "dashed",
+          "current": "dashed"
+        },
+        "stored": "dashed",
+        "reloaded": "dashed",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0365",
+      "api": "createText.TextProperties[].textOnCurve.sweepAngle",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 120,
+          "current": 120
+        },
+        "stored": 120,
+        "reloaded": 120,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0366",
+      "api": "createText.TextProperties[].textOnCurve.radius",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 80,
+          "current": 80
+        },
+        "stored": 80,
+        "reloaded": 80,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0367",
+      "api": "createText.TextProperties[].textOnCurve.up",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": true,
+          "current": true
+        },
+        "stored": true,
+        "reloaded": true,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0368",
+      "api": "createText.TextProperties[].textOnCurve.layoutMode",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "fit",
+          "current": "fit"
+        },
+        "stored": "fit",
+        "reloaded": "fit",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0369",
+      "api": "createText.TextProperties[].textOnCurve.baselineOffset",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0370",
+      "api": "createText.TextProperties[].textOnCurve.startAngleDeg",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 5,
+          "current": 5
+        },
+        "stored": 5,
+        "reloaded": 5,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0371",
+      "api": "createText.TextProperties[].includeCharMetrics",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": true,
+          "current": true
+        },
+        "stored": true,
+        "reloaded": true,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0372",
+      "api": "createText.TextProperties[].measurementCanvas.width",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 128,
+          "current": 128
+        },
+        "stored": 128,
+        "reloaded": 128,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0373",
+      "api": "createText.TextProperties[].measurementCanvas.height",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 128,
+          "current": 128
+        },
+        "stored": 128,
+        "reloaded": 128,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0374",
+      "api": "createText.CreateTextOptions.isGrouped",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": false,
+          "current": false
+        },
+        "stored": false,
+        "reloaded": false,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0375",
+      "api": "createText.CreateTextOptions.groupTransform.rotation",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:rotation@createText.CreateTextOptions.groupTransform.rotation\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:363"
+    },
+    {
+      "id": "LIFE-0376",
+      "api": "createText.CreateTextOptions.groupTransform.translateX",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:translateX@createText.CreateTextOptions.groupTransform.translateX\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:369"
+    },
+    {
+      "id": "LIFE-0377",
+      "api": "createText.CreateTextOptions.groupTransform.translateY",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:translateY@createText.CreateTextOptions.groupTransform.translateY\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:369"
+    },
+    {
+      "id": "LIFE-0378",
+      "api": "createText.CreateTextOptions.groupTransform.scaleX",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:scaleX@createText.CreateTextOptions.groupTransform.scaleX\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:355"
+    },
+    {
+      "id": "LIFE-0379",
+      "api": "createText.CreateTextOptions.groupTransform.scaleY",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:scaleY@createText.CreateTextOptions.groupTransform.scaleY\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:355"
+    },
+    {
+      "id": "LIFE-0380",
+      "api": "createText.CreateTextOptions.groupTransform.skewX",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:skewX@createText.CreateTextOptions.groupTransform.skewX\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:354"
+    },
+    {
+      "id": "LIFE-0381",
+      "api": "createText.CreateTextOptions.groupTransform.skewY",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:skewY@createText.CreateTextOptions.groupTransform.skewY\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:354"
+    },
+    {
+      "id": "LIFE-0382",
+      "api": "createText.CreateTextOptions.groupTransform.pivotX",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:pivotX@createText.CreateTextOptions.groupTransform.pivotX\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:357"
+    },
+    {
+      "id": "LIFE-0383",
+      "api": "createText.CreateTextOptions.groupTransform.pivotY",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:pivotY@createText.CreateTextOptions.groupTransform.pivotY\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:357"
+    },
+    {
+      "id": "LIFE-0384",
+      "api": "createText.CreateTextOptions.groupTransform.opacity",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:opacity@createText.CreateTextOptions.groupTransform.opacity\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:353"
+    },
+    {
+      "id": "LIFE-0385",
+      "api": "createText.CreateTextOptions.groupTransform.blendMode",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: LEAF_MISSING:blendMode@createText.CreateTextOptions.groupTransform.blendMode\n    at Object.edit (<anonymous>:89:18)\n    at async <anonymous>:1:712"
+    },
+    {
+      "id": "LIFE-0386",
+      "api": "createText.CreateTextOptions.groupTransform.perspective.points[].x",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: NESTED_MISSING:perspective@createText.CreateTextOptions.groupTransform.perspective.points[].x\n    at Object.go (<anonymous>:54:19)\n    at async Object.edit (<anonymous>:80:20)\n    at async <anonymous>:1:409"
+    },
+    {
+      "id": "LIFE-0387",
+      "api": "createText.CreateTextOptions.groupTransform.perspective.points[].y",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: NESTED_MISSING:perspective@createText.CreateTextOptions.groupTransform.perspective.points[].y\n    at Object.go (<anonymous>:54:19)\n    at async Object.edit (<anonymous>:80:20)\n    at async <anonymous>:1:409"
+    },
+    {
+      "id": "LIFE-0388",
+      "api": "createText.CreateTextOptions.groupTransform.perspective.interpolation",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: NESTED_MISSING:perspective@createText.CreateTextOptions.groupTransform.perspective.interpolation\n    at Object.go (<anonymous>:54:19)\n    at async Object.edit (<anonymous>:80:20)\n    at async <anonymous>:1:454"
+    },
+    {
+      "id": "LIFE-0389",
+      "api": "createText.CreateTextOptions.groupTransform.perspective.edgeMode",
+      "status": "FAIL",
+      "error": "Error: CHROME Error: NESTED_MISSING:perspective@createText.CreateTextOptions.groupTransform.perspective.edgeMode\n    at Object.go (<anonymous>:54:19)\n    at async Object.edit (<anonymous>:80:20)\n    at async <anonymous>:1:450"
+    },
+    {
+      "id": "LIFE-0390",
+      "api": "createText.TextProperties.text",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "Inspector baseline text",
+          "current": "Inspector baseline text"
+        },
+        "stored": "Inspector baseline text",
+        "reloaded": "Inspector baseline text",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0391",
+      "api": "createText.TextProperties.x",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 55,
+          "current": 55
+        },
+        "stored": 55,
+        "reloaded": 55,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0392",
+      "api": "createText.TextProperties.y",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 55,
+          "current": 55
+        },
+        "stored": 55,
+        "reloaded": 55,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0393",
+      "api": "createText.TextProperties/font.size baseline",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 29,
+          "current": 29
+        },
+        "stored": 29,
+        "reloaded": 29,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0394",
+      "api": "createText.TextProperties/font.weight baseline",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 600,
+          "current": 600
+        },
+        "stored": 600,
+        "reloaded": 600,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0395",
+      "api": "createText.TextProperties/fill.color baseline",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": "#ff8800",
+          "current": "#ff8800"
+        },
+        "stored": "#ff8800",
+        "reloaded": "#ff8800",
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0396",
+      "api": "createText.TextProperties/fill.opacity baseline",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 0.8,
+          "current": 0.8
+        },
+        "stored": 0.8,
+        "reloaded": 0.8,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0397",
+      "api": "createText.TextProperties/placement.rotation baseline",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 13,
+          "current": 13
+        },
+        "stored": 13,
+        "reloaded": 13,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0398",
+      "api": "text selection bounds.width",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 185,
+          "current": 185
+        },
+        "stored": 185,
+        "reloaded": 185,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    },
+    {
+      "id": "LIFE-0399",
+      "api": "text selection bounds.height",
+      "status": "PERSIST_RELOAD_PASS",
+      "evidence": {
+        "edit": {
+          "value": 185,
+          "current": 185
+        },
+        "stored": 185,
+        "reloaded": 185,
+        "indexedDB": "apexify-workspace-immutable-assets-v1/projects/active-project"
+      }
+    }
+  ]
+}

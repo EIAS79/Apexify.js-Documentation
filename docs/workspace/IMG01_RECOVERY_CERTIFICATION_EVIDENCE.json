@@ -1,0 +1,50 @@
+{
+  "sourceAcceptedCommit": "c6d7690238dcc0b3844ac804a6e2fedb80372c23",
+  "sourceReconstructedCheckpoint": "53ec5f37e4a02fdbbc623f168a8840d3f63bb771",
+  "recoveredHistoryIdentical": false,
+  "pinnedEngine": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "totalSourceInventory": 560,
+  "imagePaths": 350,
+  "painterSecurityPath": 1,
+  "canvasOwnedExcluded": 209,
+  "readyPaths": 330,
+  "strictTotals": {
+    "FULL": 0,
+    "PARTIAL": 346,
+    "BLOCKED": 5
+  },
+  "readyNativeSemanticGraphCodeParity": 330,
+  "staticInspectorControlSurfacesMapped": 321,
+  "externalInspectorControlPathsNotCoveredBySSR": 9,
+  "unchangedStageCRasterRetested": 34,
+  "nativePixelDifferenceOnDiscriminatingCases": 31,
+  "nativePixelIdenticalInDiscriminatingCases": [
+    "images.borderPosition",
+    "images.inherit",
+    "options.groupTransform.borderPosition"
+  ],
+  "productionChromiumGradient": {
+    "pass": true,
+    "steps": 6,
+    "screenshots": 4,
+    "downloadedCodeSha256": "306F9C6661D7E7FC961F1F0852B2654BBED7F2C3C7279BEDF7E6796A4BA6C2E0",
+    "executedPngSha256": "355A58073C721221884330056A44A38E1A97BCBEA4EC518537B47980E9E0AD6B"
+  },
+  "productionChromiumStageC": {
+    "pass": true,
+    "steps": 12,
+    "screenshots": 6
+  },
+  "fullWorkspaceRegression": {
+    "totalTests": 387,
+    "passed": 385,
+    "failed": 1,
+    "skipped": 1,
+    "preexistingFail": "contracts.test.ts expected /outside composition/ vs fail-closed parser message"
+  },
+  "productionBuild": {
+    "pass": true,
+    "pages": 482
+  },
+  "fullCertificationGate": "OPEN (0 FULL): per-leaf functional UI/Graph/browser/invalid-input lifecycle incomplete"
+}

@@ -1,0 +1,62 @@
+﻿[
+    {
+        "file":  "canvas-assets.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-assets.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "canvas-authoring.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-authoring.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "canvas-blend-code-s13.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-blend-code-s13.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "canvas-blend-modes-s13.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-blend-modes-s13.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "canvas-code-parity-matrix-s12.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-code-parity-matrix-s12.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "canvas-effects-enums-s13.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-effects-enums-s13.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "canvas-gradient-repeat-s13.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-gradient-repeat-s13.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "canvas-graph-wiring-s11.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-graph-wiring-s11.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "canvas-union-certification-s13.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-canvas-union-certification-s13.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "contracts.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-contracts.test.ts.log",
+        "exit":  1
+    },
+    {
+        "file":  "domain.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-domain.test.ts.log",
+        "exit":  0
+    },
+    {
+        "file":  "frame-budget.test.ts",
+        "log":  "D:\\ApexifyWorkspaceParallel\\IMG01CertEvidence\\workspace-serial-frame-budget.test.ts.log",
+        "exit":  0
+    }
+]

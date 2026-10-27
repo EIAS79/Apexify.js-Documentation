@@ -1,0 +1,4 @@
+LAYER_PROBE {"layer":"text","graph":true,"path":"Advanced typography editor"}
+FONT_BROWSER_PATH_PASS createText.TextProperties.font.family {"arialDigest":"4b6b4b178ecd5e23576d4b70ff83c52bd08bde4b883ba614dbc2cdd7d780e901","courierDigest":"fc2bdb90b5e1fdd82162175e0b759428fdcd844f29d32aab09f9d80b35e92595","ui":true,"history":true,"imported":"Courier New"}
+FONT_BROWSER_PATH_PASS createText.TextProperties.font.name {"arialDigest":"4b6b4b178ecd5e23576d4b70ff83c52bd08bde4b883ba614dbc2cdd7d780e901","courierDigest":"fc2bdb90b5e1fdd82162175e0b759428fdcd844f29d32aab09f9d80b35e92595","ui":true,"history":true,"imported":"Courier New"}
+FONT_BROWSER_FINAL {"pass":2,"fail":0,"output":"D:\\ApexifyWorkspaceParallel\\text-strict-20261023\\evidence\\workspace-text\\strict\\final-four\\font-browser-targeted.json"}

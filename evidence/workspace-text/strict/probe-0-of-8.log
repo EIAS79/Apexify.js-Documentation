@@ -1,0 +1,492 @@
+✔ TEXT01-PATH 1/389 createText.TextProperties.font.size seed (145.1069ms)
+✖ TEXT01-PATH 9/389 createText.TextProperties.decorations.underline (styled).color seed (1.4045ms)
+✖ TEXT01-PATH 17/389 createText.TextProperties.decorations.underline (styled).gradient.centerX seed (1.0687ms)
+✖ TEXT01-PATH 25/389 createText.TextProperties.decorations.underline (styled).gradient.colors[].color seed (0.7674ms)
+✖ TEXT01-PATH 33/389 createText.TextProperties.decorations.overline (styled).gradient.endY seed (0.577ms)
+✖ TEXT01-PATH 41/389 createText.TextProperties.decorations.overline (styled).gradient.pivotY seed (0.6148ms)
+✖ TEXT01-PATH 49/389 createText.TextProperties.decorations.strikethrough (styled).gradient.startX seed (0.5849ms)
+✖ TEXT01-PATH 57/389 createText.TextProperties.decorations.strikethrough (styled).gradient.startAngle seed (0.5442ms)
+✔ TEXT01-PATH 65/389 createText.TextProperties.effects.highlight.color seed (68.2127ms)
+✖ TEXT01-PATH 73/389 createText.TextProperties.effects.highlight.gradient.centerX seed (3.4529ms)
+✔ TEXT01-PATH 81/389 createText.TextProperties.effects.highlight.gradient.colors[].color seed (44.3926ms)
+✖ TEXT01-PATH 89/389 createText.TextProperties.effects.glow.gradient.startRadius seed (1.4644ms)
+✔ TEXT01-PATH 97/389 createText.TextProperties.effects.glow.gradient.repeat no-repeat (55.5292ms)
+✔ TEXT01-PATH 97/389 createText.TextProperties.effects.glow.gradient.repeat repeat (53.8323ms)
+✔ TEXT01-PATH 97/389 createText.TextProperties.effects.glow.gradient.repeat reflect (67.8273ms)
+✔ TEXT01-PATH 105/389 createText.TextProperties.effects.shadow.gradient.startY seed (50.2808ms)
+✔ TEXT01-PATH 113/389 createText.TextProperties.effects.shadow.gradient.rotate seed (47.2346ms)
+✔ TEXT01-PATH 121/389 createText.TextProperties.effects.shadow.blur seed (45.359ms)
+✔ TEXT01-PATH 129/389 createText.TextProperties.placement.textBaseline alphabetic (38.8855ms)
+✔ TEXT01-PATH 129/389 createText.TextProperties.placement.textBaseline bottom (39.816ms)
+✔ TEXT01-PATH 129/389 createText.TextProperties.placement.textBaseline hanging (35.8757ms)
+✔ TEXT01-PATH 129/389 createText.TextProperties.placement.textBaseline ideographic (36.2817ms)
+✔ TEXT01-PATH 129/389 createText.TextProperties.placement.textBaseline middle (32.9233ms)
+✔ TEXT01-PATH 129/389 createText.TextProperties.placement.textBaseline top (32.5071ms)
+✔ TEXT01-PATH 137/389 createText.TextProperties.placement.perspective.interpolation nearest (48.8536ms)
+✔ TEXT01-PATH 137/389 createText.TextProperties.placement.perspective.interpolation bilinear (53.4307ms)
+✔ TEXT01-PATH 137/389 createText.TextProperties.placement.perspective.interpolation bicubic (91.9555ms)
+✖ TEXT01-PATH 145/389 createText.TextProperties.fill.gradient.startRadius seed (0.9172ms)
+✔ TEXT01-PATH 153/389 createText.TextProperties.fill.gradient.repeat no-repeat (29.0513ms)
+✔ TEXT01-PATH 153/389 createText.TextProperties.fill.gradient.repeat repeat (29.8413ms)
+✔ TEXT01-PATH 153/389 createText.TextProperties.fill.gradient.repeat reflect (33.2422ms)
+✔ TEXT01-PATH 161/389 createText.TextProperties.stroke.gradient.startY seed (35.2789ms)
+✔ TEXT01-PATH 169/389 createText.TextProperties.stroke.gradient.rotate seed (32.0303ms)
+✔ TEXT01-PATH 177/389 createText.TextProperties.textOnCurve.sweepAngle seed (35.6668ms)
+✔ TEXT01-PATH 185/389 createText.TextProperties.measurementCanvas.height seed (31.6621ms)
+✔ TEXT01-PATH 193/389 createText.TextProperties[].font.style normal (35.1409ms)
+✔ TEXT01-PATH 193/389 createText.TextProperties[].font.style italic (32.8223ms)
+✔ TEXT01-PATH 193/389 createText.TextProperties[].font.style oblique (33.3747ms)
+✖ TEXT01-PATH 201/389 createText.TextProperties[].decorations.underline (styled).gradient.endX seed (0.7231ms)
+✖ TEXT01-PATH 209/389 createText.TextProperties[].decorations.underline (styled).gradient.pivotX seed (0.5464ms)
+✖ TEXT01-PATH 217/389 createText.TextProperties[].decorations.overline (styled).gradient.type linear (0.5028ms)
+✖ TEXT01-PATH 217/389 createText.TextProperties[].decorations.overline (styled).gradient.type radial (0.4101ms)
+✖ TEXT01-PATH 217/389 createText.TextProperties[].decorations.overline (styled).gradient.type conic (0.3881ms)
+✖ TEXT01-PATH 225/389 createText.TextProperties[].decorations.overline (styled).gradient.centerY seed (0.4824ms)
+✖ TEXT01-PATH 233/389 createText.TextProperties[].decorations.overline (styled).width seed (0.5124ms)
+✖ TEXT01-PATH 241/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.startRadius seed (0.6625ms)
+✖ TEXT01-PATH 249/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.repeat no-repeat (1.6011ms)
+✖ TEXT01-PATH 249/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.repeat repeat (0.4972ms)
+✖ TEXT01-PATH 249/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.repeat reflect (0.4108ms)
+✔ TEXT01-PATH 257/389 createText.TextProperties[].effects.highlight.gradient.endX seed (34.6036ms)
+✔ TEXT01-PATH 265/389 createText.TextProperties[].effects.highlight.gradient.pivotX seed (32.4857ms)
+✔ TEXT01-PATH 273/389 createText.TextProperties[].effects.glow.gradient.startX seed (34.1966ms)
+✖ TEXT01-PATH 281/389 createText.TextProperties[].effects.glow.gradient.startAngle seed (1.0155ms)
+✔ TEXT01-PATH 289/389 createText.TextProperties[].effects.glow.opacity seed (33.3798ms)
+✖ TEXT01-PATH 297/389 createText.TextProperties[].effects.shadow.gradient.endRadius seed (0.8993ms)
+✖ TEXT01-PATH 305/389 createText.TextProperties[].effects.shadow.gradient.colors[].stop seed (0.6187ms)
+✔ TEXT01-PATH 313/389 createText.TextProperties[].layout.wordSpacing seed (50.8636ms)
+✔ TEXT01-PATH 321/389 createText.TextProperties[].placement.skewX seed (34.3497ms)
+✔ TEXT01-PATH 329/389 createText.TextProperties[].fill.gradient.startX seed (33.4829ms)
+✖ TEXT01-PATH 337/389 createText.TextProperties[].fill.gradient.startAngle seed (0.9259ms)
+✔ TEXT01-PATH 345/389 createText.TextProperties[].stroke.color seed (38.41ms)
+✖ TEXT01-PATH 353/389 createText.TextProperties[].stroke.gradient.endRadius seed (1.1317ms)
+✖ TEXT01-PATH 361/389 createText.TextProperties[].stroke.gradient.colors[].stop seed (0.979ms)
+✔ TEXT01-PATH 369/389 createText.TextProperties[].textOnCurve.baselineOffset seed (39.2325ms)
+✔ TEXT01-PATH 377/389 createText.CreateTextOptions.groupTransform.translateY seed (37.755ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode source-over (43.1015ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode multiply (30.7695ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode screen (36.9157ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode overlay (38.8959ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode darken (31.9032ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode lighten (41.1755ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode color-dodge (34.6235ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode color-burn (31.9669ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode hard-light (36.3419ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode soft-light (33.458ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode difference (33.5951ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode exclusion (33.4927ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode hue (36.2931ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode saturation (44.7276ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode color (35.6715ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode luminosity (34.1913ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode destination-over (41.2069ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode source-atop (35.6426ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode destination-atop (40.9989ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode source-in (36.1724ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode destination-in (34.4407ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode source-out (32.1399ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode destination-out (37.5215ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode xor (36.2759ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode copy (34.9028ms)
+✔ TEXT01-PATH 385/389 createText.CreateTextOptions.groupTransform.blendMode lighter (52.4206ms)
+✖ TEXT01 strict validator/native boundary parity (3.4311ms)
+✔ TEXT01 deprecated alias precedence (175.2834ms)
+✔ TEXT01 baseline createText.TextProperties.text (42.262ms)
+✔ TEXT01 baseline createText.TextProperties.x (31.4261ms)
+✔ TEXT01 baseline createText.TextProperties.y (32.6782ms)
+✔ TEXT01 baseline createText.TextProperties/font.size baseline (32.514ms)
+✔ TEXT01 baseline createText.TextProperties/font.weight baseline (29.8266ms)
+✔ TEXT01 baseline createText.TextProperties/fill.color baseline (32.1275ms)
+✔ TEXT01 baseline createText.TextProperties/fill.opacity baseline (30.145ms)
+✔ TEXT01 baseline createText.TextProperties/placement.rotation baseline (31.7416ms)
+✔ TEXT01 baseline text selection bounds.width (28.8947ms)
+✔ TEXT01 baseline text selection bounds.height (31.308ms)
+✔ TEXT01 43 native measurement results (13.2761ms)
+ℹ tests 104
+ℹ suites 0
+ℹ pass 76
+ℹ fail 28
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5413.5418
+
+✖ failing tests:
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 9/389 createText.TextProperties.decorations.underline (styled).color seed (1.4045ms)
+  TypeError: Cannot create property 'color' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:59:24)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:85:30)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 17/389 createText.TextProperties.decorations.underline (styled).gradient.centerX seed (1.0687ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:85:30)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 25/389 createText.TextProperties.decorations.underline (styled).gradient.colors[].color seed (0.7674ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:85:30)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 33/389 createText.TextProperties.decorations.overline (styled).gradient.endY seed (0.577ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:85:30)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 41/389 createText.TextProperties.decorations.overline (styled).gradient.pivotY seed (0.6148ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:85:30)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 49/389 createText.TextProperties.decorations.strikethrough (styled).gradient.startX seed (0.5849ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:85:30)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 57/389 createText.TextProperties.decorations.strikethrough (styled).gradient.startAngle seed (0.5442ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:85:30)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 73/389 createText.TextProperties.effects.highlight.gradient.centerX seed (3.4529ms)
+  Error: text.properties.effects.highlight.gradient.centerX is invalid for linear gradient
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:119:69)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at validateTextSettings (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:134:55)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:86:17)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 89/389 createText.TextProperties.effects.glow.gradient.startRadius seed (1.4644ms)
+  Error: text.properties.effects.glow.gradient.startRadius is invalid for linear gradient
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:119:69)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at validateTextSettings (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:134:55)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:86:17)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 145/389 createText.TextProperties.fill.gradient.startRadius seed (0.9172ms)
+  Error: text.properties.fill.gradient.startRadius is invalid for linear gradient
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:119:69)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at validateTextSettings (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:134:55)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:86:17)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 201/389 createText.TextProperties[].decorations.underline (styled).gradient.endX seed (0.7231ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 209/389 createText.TextProperties[].decorations.underline (styled).gradient.pivotX seed (0.5464ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 217/389 createText.TextProperties[].decorations.overline (styled).gradient.type linear (0.5028ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 217/389 createText.TextProperties[].decorations.overline (styled).gradient.type radial (0.4101ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 217/389 createText.TextProperties[].decorations.overline (styled).gradient.type conic (0.3881ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 225/389 createText.TextProperties[].decorations.overline (styled).gradient.centerY seed (0.4824ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 233/389 createText.TextProperties[].decorations.overline (styled).width seed (0.5124ms)
+  TypeError: Cannot create property 'width' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:59:24)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 241/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.startRadius seed (0.6625ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 249/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.repeat no-repeat (1.6011ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 249/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.repeat repeat (0.4972ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 249/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.repeat reflect (0.4108ms)
+  TypeError: Cannot create property 'gradient' on boolean 'true'
+      at setAt (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:60:42)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:84:67)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 281/389 createText.TextProperties[].effects.glow.gradient.startAngle seed (1.0155ms)
+  Error: text.items[0].effects.glow.gradient.startAngle is invalid for linear gradient
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:119:69)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:33)
+      at Array.map (<anonymous>)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:18)
+      at validateTextSettings (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:135:45)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:86:17)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 297/389 createText.TextProperties[].effects.shadow.gradient.endRadius seed (0.8993ms)
+  Error: text.items[0].effects.shadow.gradient.endRadius is invalid for linear gradient
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:119:69)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:33)
+      at Array.map (<anonymous>)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:18)
+      at validateTextSettings (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:135:45)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:86:17)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 305/389 createText.TextProperties[].effects.shadow.gradient.colors[].stop seed (0.6187ms)
+  Error: text.items[0].effects.shadow.gradient.colors[0].stop must be 0..1
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:97:95)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:33)
+      at Array.map (<anonymous>)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:18)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:33)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 337/389 createText.TextProperties[].fill.gradient.startAngle seed (0.9259ms)
+  Error: text.items[0].fill.gradient.startAngle is invalid for linear gradient
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:119:69)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:33)
+      at Array.map (<anonymous>)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:18)
+      at validateTextSettings (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:135:45)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:86:17)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 353/389 createText.TextProperties[].stroke.gradient.endRadius seed (1.1317ms)
+  Error: text.items[0].stroke.gradient.endRadius is invalid for linear gradient
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:119:69)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:33)
+      at Array.map (<anonymous>)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:18)
+      at validateTextSettings (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:135:45)
+      at make (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:86:17)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:119:13)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+
+test at tests\workspace\text-strict-native.test.ts:2:8042
+✖ TEXT01-PATH 361/389 createText.TextProperties[].stroke.gradient.colors[].stop seed (0.979ms)
+  Error: text.items[0].stroke.gradient.colors[0].stop must be 0..1
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:97:95)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:33)
+      at Array.map (<anonymous>)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:18)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at valid (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:112:58)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\features\apex-workspace\domain\text.ts:105:33)
+      at Array.map (<anonymous>)
+
+test at tests\workspace\text-strict-native.test.ts:2:9069
+✖ TEXT01 strict validator/native boundary parity (3.4311ms)
+  Error [ApexifyInputError]: text.font.weight must be >= 100.
+      at assertFiniteNumber (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\apexify.js\dist\cjs\index.cjs:1857:11)
+      at validateTextProperties (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\apexify.js\dist\cjs\index.cjs:5005:7)
+      at ImageTextCreate.measureText (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\apexify.js\dist\cjs\index.cjs:24716:5)
+      at ApexPainter.measureText (D:\ApexifyWorkspaceParallel\text-acceptance-20261022\node_modules\apexify.js\dist\cjs\index.cjs:27002:33)
+      at <anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:143:64)
+      at waitForActual (node:assert:632:21)
+      at strict.rejects (node:assert:769:31)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:143:50)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25) {
+    code: 'APEXIFY_INPUT',
+    details: undefined,
+    [cause]: undefined
+  }

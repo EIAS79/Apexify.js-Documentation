@@ -1,0 +1,18 @@
+✔ TEXT01 final four targeted: all 440 other records and original identity/order preserved (39.0563ms)
+✔ TEXT01 target promotion SHA and security exclusions unchanged (12.5167ms)
+✔ TEXT01 pinned canonical inventory path/ordering completeness (10.2832ms)
+✔ TEXT01 every FULL authoring path has traceable native, Code, control, lifecycle, output and project proof (11.3254ms)
+✔ TEXT01 measurement outputs and deliberate exclusions (0.7139ms)
+✔ TEXT01 corrected ledger SHA-256, exact inventory and immutable classification checksum (13.0559ms)
+✔ TEXT01 FULL certification gate and browser state must never contradict proof (12.6738ms)
+✔ TEXT01 two font promotions are backed by real glyph and metric differences, native/generated pixel parity and actual browser transactions (5.7263ms)
+✔ TEXT01 optional baseline native absences follow pinned TypeScript and finite-number forwarding contract (3.1487ms)
+✔ TEXT01 every cited browser file exists and retains recorded SHA-256 (278.5562ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 716.3068

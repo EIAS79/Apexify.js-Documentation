@@ -1,0 +1,16 @@
+{
+  "previousLedgerSha256": "d68473dc0656eb7b59107ed24a82a665373286a855e73d37d0f225eeb00304ba",
+  "correctedLedgerSha256": "d68473dc0656eb7b59107ed24a82a665373286a855e73d37d0f225eeb00304ba",
+  "originalInventorySha256": "85e806402af2ae72184c460866e785fba5a04c275bfe0f5f09daac9cdceeaec7",
+  "recordCount": 444,
+  "full": 438,
+  "fullAuthoring": 397,
+  "fullMeasurement": 41,
+  "graphVerified": 387,
+  "baselineInspectorOnly": 10,
+  "partial": 4,
+  "blocked": 1,
+  "excluded": 1,
+  "unchangedClassifications": true,
+  "unchangedIdentities": true
+}

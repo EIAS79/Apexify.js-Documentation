@@ -1,0 +1,223 @@
+{
+  "engine": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "fontSources": [
+    {
+      "name": "Arial",
+      "file": "C:/Windows/Fonts/arial.ttf",
+      "registered": "TEXT01_Registered_Arial",
+      "fileExists": true,
+      "sourceSha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "registeredResult": {}
+    },
+    {
+      "name": "Courier New",
+      "file": "C:/Windows/Fonts/cour.ttf",
+      "registered": "TEXT01_Registered_Courier",
+      "fileExists": true,
+      "sourceSha256": "e4a66a0259718d0c8f4b6e14319b4803ced45afbddf3abba8b8c3e2006856206",
+      "registeredResult": {}
+    }
+  ],
+  "cases": [
+    {
+      "kind": "family",
+      "label": "system Arial",
+      "font": {
+        "size": 52,
+        "family": "Arial"
+      },
+      "width": 835.1500244140625,
+      "height": 72.8,
+      "fontBoundingBoxAscent": 47.07421875,
+      "fontBoundingBoxDescent": 11.01953125,
+      "pngSha256": "6ba806f34efb7f6d27cde446c8551d235baec3421d330905df023bdd468fa791",
+      "pixelsSha256": "253485b21a0dcd2a59383da50a0f1956d1ffafb50094d7f21b703233cf50c3cb"
+    },
+    {
+      "kind": "family",
+      "label": "system Courier New",
+      "font": {
+        "size": 52,
+        "family": "Courier New"
+      },
+      "width": 936.1500244140625,
+      "height": 72.8,
+      "fontBoundingBoxAscent": 43.291015625,
+      "fontBoundingBoxDescent": 15.615234375,
+      "pngSha256": "69430be149e7657616083d2520cf8b46cd471019c1264ca111a3989209bef4b6",
+      "pixelsSha256": "46a1ba270b14b20c39a1bf18a65c396a360bc55e475f43c58abcaddf1db98eaf"
+    },
+    {
+      "kind": "name",
+      "label": "name Arial overrides family Courier",
+      "font": {
+        "size": 52,
+        "family": "Courier New",
+        "name": "Arial"
+      },
+      "width": 835.1500244140625,
+      "height": 72.8,
+      "fontBoundingBoxAscent": 47.07421875,
+      "fontBoundingBoxDescent": 11.01953125,
+      "pngSha256": "6ba806f34efb7f6d27cde446c8551d235baec3421d330905df023bdd468fa791",
+      "pixelsSha256": "253485b21a0dcd2a59383da50a0f1956d1ffafb50094d7f21b703233cf50c3cb"
+    },
+    {
+      "kind": "name",
+      "label": "name Courier overrides family Arial",
+      "font": {
+        "size": 52,
+        "family": "Arial",
+        "name": "Courier New"
+      },
+      "width": 936.1500244140625,
+      "height": 72.8,
+      "fontBoundingBoxAscent": 43.291015625,
+      "fontBoundingBoxDescent": 15.615234375,
+      "pngSha256": "69430be149e7657616083d2520cf8b46cd471019c1264ca111a3989209bef4b6",
+      "pixelsSha256": "46a1ba270b14b20c39a1bf18a65c396a360bc55e475f43c58abcaddf1db98eaf"
+    },
+    {
+      "kind": "family",
+      "label": "registered Arial",
+      "font": {
+        "size": 52,
+        "family": "TEXT01_Registered_Arial"
+      },
+      "width": 835.1500244140625,
+      "height": 72.8,
+      "fontBoundingBoxAscent": 47.07421875,
+      "fontBoundingBoxDescent": 11.01953125,
+      "pngSha256": "6ba806f34efb7f6d27cde446c8551d235baec3421d330905df023bdd468fa791",
+      "pixelsSha256": "253485b21a0dcd2a59383da50a0f1956d1ffafb50094d7f21b703233cf50c3cb"
+    },
+    {
+      "kind": "family",
+      "label": "registered Courier",
+      "font": {
+        "size": 52,
+        "family": "TEXT01_Registered_Courier"
+      },
+      "width": 936.1500244140625,
+      "height": 72.8,
+      "fontBoundingBoxAscent": 43.291015625,
+      "fontBoundingBoxDescent": 15.615234375,
+      "pngSha256": "69430be149e7657616083d2520cf8b46cd471019c1264ca111a3989209bef4b6",
+      "pixelsSha256": "46a1ba270b14b20c39a1bf18a65c396a360bc55e475f43c58abcaddf1db98eaf"
+    },
+    {
+      "kind": "name",
+      "label": "registered name Arial",
+      "font": {
+        "size": 52,
+        "name": "TEXT01_Registered_Arial",
+        "family": "TEXT01_Registered_Courier"
+      },
+      "width": 835.1500244140625,
+      "height": 72.8,
+      "fontBoundingBoxAscent": 47.07421875,
+      "fontBoundingBoxDescent": 11.01953125,
+      "pngSha256": "6ba806f34efb7f6d27cde446c8551d235baec3421d330905df023bdd468fa791",
+      "pixelsSha256": "253485b21a0dcd2a59383da50a0f1956d1ffafb50094d7f21b703233cf50c3cb"
+    },
+    {
+      "kind": "name",
+      "label": "registered name Courier",
+      "font": {
+        "size": 52,
+        "name": "TEXT01_Registered_Courier",
+        "family": "TEXT01_Registered_Arial"
+      },
+      "width": 936.1500244140625,
+      "height": 72.8,
+      "fontBoundingBoxAscent": 43.291015625,
+      "fontBoundingBoxDescent": 15.615234375,
+      "pngSha256": "69430be149e7657616083d2520cf8b46cd471019c1264ca111a3989209bef4b6",
+      "pixelsSha256": "46a1ba270b14b20c39a1bf18a65c396a360bc55e475f43c58abcaddf1db98eaf"
+    }
+  ],
+  "comparisons": [
+    {
+      "a": "system Arial",
+      "b": "system Courier New",
+      "renderPixelsDiffer": true,
+      "measuredWidthDiffer": true,
+      "widths": [
+        835.1500244140625,
+        936.1500244140625
+      ]
+    },
+    {
+      "a": "name Arial overrides family Courier",
+      "b": "name Courier overrides family Arial",
+      "renderPixelsDiffer": true,
+      "measuredWidthDiffer": true,
+      "widths": [
+        835.1500244140625,
+        936.1500244140625
+      ]
+    },
+    {
+      "a": "registered Arial",
+      "b": "registered Courier",
+      "renderPixelsDiffer": true,
+      "measuredWidthDiffer": true,
+      "widths": [
+        835.1500244140625,
+        936.1500244140625
+      ]
+    },
+    {
+      "a": "registered name Arial",
+      "b": "registered name Courier",
+      "renderPixelsDiffer": true,
+      "measuredWidthDiffer": true,
+      "widths": [
+        835.1500244140625,
+        936.1500244140625
+      ]
+    },
+    {
+      "a": "system Arial",
+      "b": "name Arial overrides family Courier",
+      "renderPixelsDiffer": false,
+      "measuredWidthDiffer": false,
+      "widths": [
+        835.1500244140625,
+        835.1500244140625
+      ]
+    },
+    {
+      "a": "system Courier New",
+      "b": "name Courier overrides family Arial",
+      "renderPixelsDiffer": false,
+      "measuredWidthDiffer": false,
+      "widths": [
+        936.1500244140625,
+        936.1500244140625
+      ]
+    }
+  ],
+  "underlyingCanvasOptionalMetrics": {
+    "hangingBaseline": {
+      "present": false,
+      "value": null
+    },
+    "ideographicBaseline": {
+      "present": false,
+      "value": null
+    },
+    "alphabeticBaseline": {
+      "present": true,
+      "value": 47.07421875
+    },
+    "emHeightAscent": {
+      "present": true,
+      "value": 47.07421875
+    },
+    "emHeightDescent": {
+      "present": true,
+      "value": 11.01953125
+    }
+  }
+}

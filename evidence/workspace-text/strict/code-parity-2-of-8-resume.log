@@ -1,0 +1,103 @@
+✔ TEXT01-PATH 3/389 createText.TextProperties.font.name seed (642.8991ms)
+✔ TEXT01-PATH 11/389 createText.TextProperties.decorations.underline (styled).gradient.startX seed (563.5153ms)
+✔ TEXT01-PATH 19/389 createText.TextProperties.decorations.underline (styled).gradient.startAngle seed (560.2237ms)
+✔ TEXT01-PATH 27/389 createText.TextProperties.decorations.overline (boolean) true (594.7508ms)
+✔ TEXT01-PATH 27/389 createText.TextProperties.decorations.overline (boolean) false (603.2274ms)
+✔ TEXT01-PATH 35/389 createText.TextProperties.decorations.overline (styled).gradient.endRadius seed (749.5147ms)
+✔ TEXT01-PATH 43/389 createText.TextProperties.decorations.overline (styled).gradient.colors[].stop seed (679.7252ms)
+✔ TEXT01-PATH 51/389 createText.TextProperties.decorations.strikethrough (styled).gradient.endX seed (617.3131ms)
+✔ TEXT01-PATH 59/389 createText.TextProperties.decorations.strikethrough (styled).gradient.pivotX seed (586.6709ms)
+✔ TEXT01-PATH 67/389 createText.TextProperties.effects.highlight.gradient.startX seed (634.4435ms)
+✔ TEXT01-PATH 75/389 createText.TextProperties.effects.highlight.gradient.startAngle seed (639.9505ms)
+✔ TEXT01-PATH 83/389 createText.TextProperties.effects.glow.color seed (637.6793ms)
+✔ TEXT01-PATH 91/389 createText.TextProperties.effects.glow.gradient.centerX seed (624.5064ms)
+✔ TEXT01-PATH 99/389 createText.TextProperties.effects.glow.gradient.colors[].color seed (608.3351ms)
+✔ TEXT01-PATH 107/389 createText.TextProperties.effects.shadow.gradient.endY seed (650.7473ms)
+✔ TEXT01-PATH 115/389 createText.TextProperties.effects.shadow.gradient.pivotY seed (587.6238ms)
+✔ TEXT01-PATH 123/389 createText.TextProperties.layout.lineHeight seed (610.2384ms)
+✔ TEXT01-PATH 131/389 createText.TextProperties.placement.scaleX seed (670.9862ms)
+✔ TEXT01-PATH 139/389 createText.TextProperties.fill.color seed (783.3747ms)
+✔ TEXT01-PATH 147/389 createText.TextProperties.fill.gradient.centerX seed (1191.3533ms)
+✔ TEXT01-PATH 155/389 createText.TextProperties.fill.gradient.colors[].color seed (1367.4518ms)
+✔ TEXT01-PATH 163/389 createText.TextProperties.stroke.gradient.endY seed (1168.4284ms)
+✔ TEXT01-PATH 171/389 createText.TextProperties.stroke.gradient.pivotY seed (954.2125ms)
+✔ TEXT01-PATH 179/389 createText.TextProperties.textOnCurve.up true (1124.0522ms)
+✔ TEXT01-PATH 179/389 createText.TextProperties.textOnCurve.up false (1021.9218ms)
+✔ TEXT01-PATH 187/389 createText.TextProperties[].x seed (1241.5908ms)
+✔ TEXT01-PATH 195/389 createText.TextProperties[].decorations.italic true (992.1327ms)
+✔ TEXT01-PATH 195/389 createText.TextProperties[].decorations.italic false (1280.0856ms)
+✔ TEXT01-PATH 203/389 createText.TextProperties[].decorations.underline (styled).gradient.startRadius seed (1160.8251ms)
+✔ TEXT01-PATH 211/389 createText.TextProperties[].decorations.underline (styled).gradient.repeat no-repeat (1115.0252ms)
+✔ TEXT01-PATH 211/389 createText.TextProperties[].decorations.underline (styled).gradient.repeat repeat (1082.7751ms)
+✔ TEXT01-PATH 211/389 createText.TextProperties[].decorations.underline (styled).gradient.repeat reflect (991.7906ms)
+✔ TEXT01-PATH 219/389 createText.TextProperties[].decorations.overline (styled).gradient.startY seed (1345.2111ms)
+✔ TEXT01-PATH 227/389 createText.TextProperties[].decorations.overline (styled).gradient.rotate seed (829.0963ms)
+✔ TEXT01-PATH 235/389 createText.TextProperties[].decorations.strikethrough (styled).color seed (722.4244ms)
+✔ TEXT01-PATH 243/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.centerX seed (750.3571ms)
+✔ TEXT01-PATH 251/389 createText.TextProperties[].decorations.strikethrough (styled).gradient.colors[].color seed (827.2653ms)
+✔ TEXT01-PATH 259/389 createText.TextProperties[].effects.highlight.gradient.startRadius seed (865.0448ms)
+✔ TEXT01-PATH 267/389 createText.TextProperties[].effects.highlight.gradient.repeat no-repeat (833.2383ms)
+✔ TEXT01-PATH 267/389 createText.TextProperties[].effects.highlight.gradient.repeat repeat (859.5972ms)
+✖ TEXT01-PATH 267/389 createText.TextProperties[].effects.highlight.gradient.repeat reflect (16767.3925ms)
+✔ TEXT01-PATH 275/389 createText.TextProperties[].effects.glow.gradient.endX seed (995.8284ms)
+✔ TEXT01-PATH 283/389 createText.TextProperties[].effects.glow.gradient.pivotX seed (932.586ms)
+✔ TEXT01-PATH 291/389 createText.TextProperties[].effects.shadow.gradient.type linear (945.9209ms)
+✔ TEXT01-PATH 291/389 createText.TextProperties[].effects.shadow.gradient.type radial (1221.9641ms)
+✔ TEXT01-PATH 291/389 createText.TextProperties[].effects.shadow.gradient.type conic (1172.7105ms)
+✔ TEXT01-PATH 299/389 createText.TextProperties[].effects.shadow.gradient.centerY seed (1031.0546ms)
+✔ TEXT01-PATH 307/389 createText.TextProperties[].effects.shadow.offsetX seed (894.3562ms)
+✔ TEXT01-PATH 315/389 createText.TextProperties[].layout.maxHeight seed (905.7292ms)
+✔ TEXT01-PATH 323/389 createText.TextProperties[].placement.perspective.points[].x seed (868.6419ms)
+✔ TEXT01-PATH 331/389 createText.TextProperties[].fill.gradient.endX seed (652.756ms)
+✔ TEXT01-PATH 339/389 createText.TextProperties[].fill.gradient.pivotX seed (879.1557ms)
+✔ TEXT01-PATH 347/389 createText.TextProperties[].stroke.gradient.type linear (1029.5418ms)
+✔ TEXT01-PATH 347/389 createText.TextProperties[].stroke.gradient.type radial (705.5873ms)
+✔ TEXT01-PATH 347/389 createText.TextProperties[].stroke.gradient.type conic (595.527ms)
+✔ TEXT01-PATH 355/389 createText.TextProperties[].stroke.gradient.centerY seed (625.4101ms)
+✔ TEXT01-PATH 363/389 createText.TextProperties[].stroke.opacity seed (625.1386ms)
+✔ TEXT01-PATH 371/389 createText.TextProperties[].includeCharMetrics true (616.9255ms)
+✔ TEXT01-PATH 371/389 createText.TextProperties[].includeCharMetrics false (609.0544ms)
+✔ TEXT01-PATH 379/389 createText.CreateTextOptions.groupTransform.scaleY seed (628.506ms)
+✔ TEXT01-PATH 387/389 createText.CreateTextOptions.groupTransform.perspective.points[].y seed (749.5727ms)
+✔ TEXT01 strict validator/native boundary parity (7.8352ms)
+✔ TEXT01 deprecated alias precedence (29.6847ms)
+✔ TEXT01 baseline createText.TextProperties.text (927.5652ms)
+✔ TEXT01 baseline createText.TextProperties.x (1050.6872ms)
+✔ TEXT01 baseline createText.TextProperties.y (997.964ms)
+✔ TEXT01 baseline createText.TextProperties/font.size baseline (1045.7191ms)
+✔ TEXT01 baseline createText.TextProperties/font.weight baseline (1355.214ms)
+✔ TEXT01 baseline createText.TextProperties/fill.color baseline (1368.8894ms)
+✔ TEXT01 baseline createText.TextProperties/fill.opacity baseline (1056.9159ms)
+✔ TEXT01 baseline createText.TextProperties/placement.rotation baseline (1140.3812ms)
+✔ TEXT01 baseline text selection bounds.width (1330.9145ms)
+✔ TEXT01 baseline text selection bounds.height (1011.4677ms)
+✔ TEXT01 43 native measurement results (19.714ms)
+ℹ tests 74
+ℹ suites 0
+ℹ pass 73
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 80372.7473
+
+✖ failing tests:
+
+test at tests\workspace\text-strict-native.test.ts:2:8359
+✖ TEXT01-PATH 267/389 createText.TextProperties[].effects.highlight.gradient.repeat reflect (16767.3925ms)
+  Error: Command failed: C:\Program Files\nodejs\node.exe D:\ApexifyWorkspaceParallel\text-strict-20261023\_text01_generated_33716_m71of1o59d.mjs
+      at genericNodeError (node:internal/errors:986:15)
+      at wrappedFn (node:internal/errors:540:14)
+      at checkExecSyncError (node:child_process:942:11)
+      at execFileSync (node:child_process:978:15)
+      at generated (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:106:3)
+      at TestContext.<anonymous> (D:\ApexifyWorkspaceParallel\text-strict-20261023\tests\workspace\text-strict-native.test.ts:126:32)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    status: 3221226505,
+    signal: null,
+    output: [ null, <Buffer >, <Buffer > ],
+    pid: 35140,
+    stdout: <Buffer >,
+    stderr: <Buffer >
+  }

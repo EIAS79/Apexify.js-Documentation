@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "enginePin": "379a5248f09ed39c1b1734fe104b6bd73a77857f",
+  "steps": [
+    {
+      "step": "loaded native preview",
+      "width": 1280
+    },
+    {
+      "step": "real Shape gradient toggle excludes native-inert solid color",
+      "sourceHasShapeGradient": false,
+      "width": 1280
+    },
+    {
+      "step": "real box gradient toggling excludes native-inert solid color",
+      "width": 1280
+    },
+    {
+      "step": "native Image gradient edits reflected in real downloaded executable canonical source",
+      "file": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\browser-gradient-proof-final\\downloads\\main.ts",
+      "bytes": 8387
+    },
+    {
+      "step": "real box returns to valid solid paint"
+    },
+    {
+      "step": "live CodeMirror source remains synchronized with Visual after UI edit",
+      "synced": true
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\browser-gradient-proof-final\\01-shape-solid.png",
+      "bytes": 638930
+    },
+    {
+      "file": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\browser-gradient-proof-final\\02-shape-gradient.png",
+      "bytes": 624973
+    },
+    {
+      "file": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\browser-gradient-proof-final\\03-box-gradient.png",
+      "bytes": 624186
+    },
+    {
+      "file": "D:\\ApexifyWorkspaceParallel\\IMG01_RECOVERY_20261025\\browser-gradient-proof-final\\04-box-back-to-solid.png",
+      "bytes": 623613
+    }
+  ],
+  "error": null
+}

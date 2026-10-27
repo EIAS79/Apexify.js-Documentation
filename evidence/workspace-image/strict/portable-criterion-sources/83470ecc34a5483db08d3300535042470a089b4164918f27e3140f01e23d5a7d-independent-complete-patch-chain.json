@@ -1,0 +1,18 @@
+[
+  {
+    "start": "independent_patch_chain_original-baseline-for-verification",
+    "patchesApplied": 3,
+    "failure": null,
+    "stageCBlobMatches": 8,
+    "stageCBlobTotal": 8,
+    "mismatchPaths": []
+  },
+  {
+    "start": "independent_patch_chain_img01-full-source",
+    "patchesApplied": 3,
+    "failure": null,
+    "stageCBlobMatches": 8,
+    "stageCBlobTotal": 8,
+    "mismatchPaths": []
+  }
+]

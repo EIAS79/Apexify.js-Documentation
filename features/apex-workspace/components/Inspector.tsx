@@ -14,12 +14,19 @@ import {
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import type { WorkspaceDocument, WorkspaceLayer } from "../model";
+import TextOptionsEditor from './TextOptionsEditor';
 import { Field, NumberField, IconButton } from "./ui";
 import { UploadImage, type LayerPatch } from "./Tools";
+import CanvasOptionsEditor from "./CanvasOptionsEditor";
+import type {WorkspaceImageAsset} from '../asset-store';
+import {importImageAsset,resolveImageReference} from '../asset-store';
+import {IMAGE_SHAPES} from '../image-options';
+import ImageOptionsEditor,{GroupTransformEditor} from './ImageOptionsEditor';
 export default function Inspector({
   document,
   selected,
   onDocument,
+  onCanvasAsset,
   onLayer,
   onSelect,
   onRemove,
@@ -33,12 +40,13 @@ export default function Inspector({
   document: WorkspaceDocument;
   selected: string | null;
   onDocument: (patch: Partial<WorkspaceDocument>) => void;
+  onCanvasAsset: (asset:WorkspaceImageAsset,placement:'custom'|'layer'|'pattern')=>void;
   onLayer: (id: string, patch: LayerPatch) => void;
   onSelect: (id: string | null) => void;
   onRemove: (id: string) => void;
   onReorder: (id: string, delta: number) => void;
   onPreset: () => void;
-  onUpload: (source: string, name: string) => void;
+  onUpload: (source: string, name: string, asset: WorkspaceImageAsset) => void;
   onError: (message: string) => void;
   tab: string;
   setTab: (tab: string) => void;
@@ -82,12 +90,12 @@ export default function Inspector({
             <UploadImage onUpload={onUpload} onError={onError} />
             <img
               className="aw-asset-image"
-              src={bg.image}
+              src={bg.image.startsWith('asset:')?resolveImageReference(bg.image,document.assets??[]):bg.image}
               alt="Current background asset"
             />
             <strong>Background artwork</strong>
             <p className="aw-muted">
-              PNG, JPEG, WebP · up to 4 MB. Uploaded assets travel with your
+              PNG, JPEG, WebP · up to 2 MB, verified by SHA-256. Uploaded assets travel with your
               project JSON.
             </p>
             {document.layers
@@ -210,9 +218,10 @@ export default function Inspector({
                   </>
                 ) : (
                   <div className="aw-background-image">
-                    <img src={bg.image} alt="Canvas background" />
+                    <img src={bg.image.startsWith('asset:')?resolveImageReference(bg.image,document.assets??[]):bg.image} alt="Canvas background" />
                     <UploadImage
-                      onUpload={(source) => background({ image: source })}
+                      onUpload={(source,_name,asset)=>onDocument({background:{...bg,image:source},
+                        assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset]})}
                       onError={onError}
                     >
                       Replace background
@@ -233,6 +242,7 @@ export default function Inspector({
                     }
                   />
                 </Field>
+                <CanvasOptionsEditor value={document.canvasExtras} canvasWidth={document.width} canvasHeight={document.height} assets={document.assets??[]} onAsset={onCanvasAsset} onError={onError} onChange={(canvasExtras)=>onDocument({canvasExtras})} />
                 <Field label="Renderer">
                   <span className="aw-value">Apexify.js · Node v6</span>
                 </Field>
@@ -346,6 +356,9 @@ export default function Inspector({
                         }
                       />
                     </Field>
+                    <TextOptionsEditor layer={layer}
+                      onChange={textSettings=>onLayer(layer.id,{textSettings})}
+                      onBounds={(width,height)=>onLayer(layer.id,{width,height})}/>
                   </>
                 ) : layer.kind === "shape" ? (
                   <>
@@ -361,6 +374,7 @@ export default function Inspector({
                       >
                         <option value="rectangle">Rectangle</option>
                         <option value="circle">Circle</option>
+                        {IMAGE_SHAPES.filter(k=>k!=='rectangle'&&k!=='circle').map(kind=><option key={kind} value={kind}>{kind}</option>)}
                       </select>
                     </Field>
                     <Field label="Fill">
@@ -430,12 +444,71 @@ export default function Inspector({
                   </>
                 ) : (
                   <UploadImage
-                    onUpload={(source) => onLayer(layer.id, { source })}
+                    onUpload={(source,_name,asset)=>onDocument({
+                      assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
+                      layers:document.layers.map(l=>l.id===layer.id?{...l,source}:l)})}
                     onError={onError}
                   >
                     Replace image
                   </UploadImage>
                 )}
+                {(layer.kind==='image'||layer.kind==='shape')&&<section aria-label="Image authoring inspector">
+                  {layer.kind==='image'&&<>
+                    <Field label="Verified source">
+                      <select aria-label="Image layer source" value={layer.source}
+                        onChange={e=>onLayer(layer.id,{source:e.target.value})}>
+                        <option value="/workspace/assets/crystal-lake.webp">Bundled lake artwork</option>
+                        {(document.assets??[]).map(asset=><option key={asset.id} value={asset.id}>SHA-256 {asset.sha256.slice(0,12)} · {asset.width} × {asset.height}</option>)}
+                      </select>
+                    </Field>
+                    <Field label="Upload verified image source"><input type="file" aria-label="Upload verified image source" accept="image/png,image/jpeg,image/webp"
+                      onChange={async e=>{const input=e.currentTarget,file=input.files?.[0];input.value='';if(!file)return;
+                        try{const asset=await importImageAsset(file);
+                          onDocument({assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
+                            layers:document.layers.map(l=>l.id===layer.id?{...l,source:asset.id}:l) as WorkspaceLayer[]});
+                        }catch(err){onError(err instanceof Error?err.message:'Image import failed')}}}/></Field>
+                  </>}
+                  <ImageOptionsEditor options={layer.imageOptions??{}} width={layer.width} height={layer.height} isShape={layer.kind==='shape'} shapeType={layer.kind==='shape'?layer.shape:undefined}
+                    assets={document.assets??[]} onError={onError}
+                    onChange={imageOptions=>onLayer(layer.id,{imageOptions})}
+                    onAsset={asset=>onDocument({
+                      assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
+                      layers:document.layers.map(l=>l.id===layer.id?{...l,imageOptions:{...layer.imageOptions,mask:{...layer.imageOptions?.mask,source:asset.id}}}:l) as WorkspaceLayer[]
+                    })}/>
+                  <div className="aw-section-heading"><strong>Image grouping</strong></div>
+                  <Field label="Image group">
+                    <select aria-label="Image group selection" value={layer.imageGroupId??''}
+                      onChange={e=>onLayer(layer.id,{imageGroupId:e.target.value||undefined})}>
+                      <option value="">Ungrouped</option>
+                      {(document.imageGroups??[]).map(g=><option value={g.id} key={g.id}>{g.name}</option>)}
+                    </select>
+                  </Field>
+                  <button type="button" className="aw-text-button" onClick={()=>{
+                    const id='group:'+crypto.randomUUID();
+                    onDocument({imageGroups:[...(document.imageGroups??[]),{id,name:'Image group '+((document.imageGroups?.length??0)+1),transform:{}}],
+                      layers:document.layers.map(l=>l.id===layer.id?{...l,imageGroupId:id}:l)});
+                  }}>+ Create group for selected image</button>
+                  {layer.imageGroupId&&(()=>{
+                    const group=(document.imageGroups??[]).find(g=>g.id===layer.imageGroupId);
+                    if(!group)return null;
+                    return <details open><summary>Group: {group.name}</summary>
+                      <Field label="Group name"><input aria-label="Image group name" value={group.name} onChange={e=>onDocument({
+                        imageGroups:(document.imageGroups??[]).map(g=>g.id===group.id?{...g,name:e.target.value}:g)
+                      })}/></Field>
+                      <GroupTransformEditor value={group.transform} assets={document.assets??[]} width={document.width} height={document.height}
+                        onError={onError}
+                        onAsset={asset=>onDocument({
+                          assets:document.assets?.some(a=>a.id===asset.id)?document.assets:[...(document.assets??[]),asset],
+                          imageGroups:(document.imageGroups??[]).map(g=>g.id===group.id?{...g,transform:{...g.transform,mask:{...g.transform.mask,source:asset.id}}}:g)
+                        })}
+                        onChange={transform=>onDocument({imageGroups:(document.imageGroups??[]).map(g=>g.id===group.id?{...g,transform}:g)})}/>
+                      <button type="button" onClick={()=>onDocument({
+                        imageGroups:(document.imageGroups??[]).filter(g=>g.id!==group.id),
+                        layers:document.layers.map(l=>l.imageGroupId===group.id?{...l,imageGroupId:undefined}:l)
+                      })}>Delete group and release members</button>
+                    </details>
+                  })()}
+                </section>}
                 <div className="aw-layer-commands">
                   <IconButton
                     label="Move layer backward"

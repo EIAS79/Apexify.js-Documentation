@@ -1,0 +1,18 @@
+{
+  "steps": [],
+  "screenshots": [],
+  "passed": false,
+  "error": "Error: Timeout !!document.querySelector('.aw-assets input[type=file]')\n    at until (C:\\Users\\khali\\Documents\\Apexify-IMG01-recovery\\img01-strict-chromium\\strict-chromium-asset-acceptance.cjs:14:145)\n    at async C:\\Users\\khali\\Documents\\Apexify-IMG01-recovery\\img01-strict-chromium\\strict-chromium-asset-acceptance.cjs:24:3",
+  "diagnostic": {
+    "inspector": "PropertiesPresetsAssetsCanvasWidthHeightProject nameBackgroundColorGradientImageReplace backgroundCanvas SettingsTransparent baseCanvas Settings · Apexify.js v6All supported edits update the same native-rendered canvas, generated Code and saved project. Select a section to navigate its actual controls.FundamentalsGradientsPatternsLayersEffectsImagesFundamentalsGeometry · opacity · zoom · cornersCanvas fundamentals · geometryCanvas XCanvas YOpacityBlurRotationZoom scaleBorder radiusCanvas border positionalltopbottomleftrighttop-lefttop-rightbottom-leftbottom-rightCanvas radius modeNumericCircularZoom center XZoom center YZoom centers default to the canvas midpoint; changing the center affects painted pixels only when zoom scale differs from 1.GradientsLinear · radial · conic · stops · pivotsGradient background · native v6Gradient variantDefault backgroundLinearRadialConicPatterns13 types ",
+    "toasts": [],
+    "source": null,
+    "layerNames": [
+      "Button label",
+      "",
+      "Call to action",
+      "",
+      "Description"
+    ]
+  }
+}
