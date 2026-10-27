@@ -8,7 +8,7 @@ const {chromium}=require(path.join(process.env.TEMP,'apexify-s4-browser-test-onl
 const sharp=require(path.join(process.env.S6_PROJECT_ROOT||process.env.S5_PROJECT_ROOT,'node_modules','sharp'));
 const url=process.env.S6_BROWSER_URL||'http://127.0.0.1:38473/workspace';
 const out=process.env.S6_EVIDENCE_DIR||'D:/ApexifySupervisor5LocalBuildArtifacts';
-const selector='.aw-graph-node.aw-node-output img';
+const selector='.aw-flow-card-preview';
 const visual='.aw-render-image';
 async function fixture(rgb) {
   const png=await sharp({create:{width:24,height:16,channels:4,background:{...rgb,alpha:1}}}).png().toBuffer();
@@ -48,7 +48,7 @@ async function run() {
       window.__s6.created.push({url:value,bytes:blob.size,mime:blob.type});return value;};
     URL.revokeObjectURL=function(src){window.__s6.revoked.push(src);return oldRevoke.call(URL,src)};
     const observer=new MutationObserver(()=>{
-      for(const el of document.querySelectorAll('.aw-render-image,.aw-node-output img')){
+      for(const el of document.querySelectorAll('.aw-render-image,.aw-flow-card-preview, .aw-node-output img')){
         const src=el.getAttribute('src');const last=window.__s6.previewChanges.at(-1);
         if(src && (last?.src!==src || last?.kind!==el.className)){
           window.__s6.previewChanges.push({kind:String(el.className),src});

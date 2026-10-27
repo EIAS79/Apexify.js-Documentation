@@ -53,6 +53,16 @@ export default function Inspector({
 }) {
   const layer = document.layers.find((l) => l.id === selected);
   const bg = document.background;
+  const canvasCategories = [
+    ["setup","Setup","Canvas dimensions and project"],
+    ["background","Background","Base color and artwork"],
+    ["styling","Styling","Geometry, gradients and patterns"],
+    ["effects","Effects","Native strokes and shadows"],
+    ["advanced","Advanced","Verified assets and filters"],
+    ["layers","Layers","Ordered background composition"],
+  ] as const;
+  const [canvasCategory,setCanvasCategory] = useState<typeof canvasCategories[number][0]>("setup");
+  const currentCanvasCategory = canvasCategories.find(([id]) => id === canvasCategory)!;
   const [showLayers, setShowLayers] = useState(true);
   const background = (patch: Partial<WorkspaceDocument["background"]>) =>
     onDocument({ background: { ...bg, ...patch } });
@@ -69,7 +79,34 @@ export default function Inspector({
           </button>
         ))}
       </div>
-      <div className="aw-inspector-scroll">
+      {tab === "Properties" && !layer && (
+        <div className="aw-property-nav" aria-label="Canvas properties navigation">
+          <div className="aw-property-context">
+            <div><span className="aw-property-eyebrow">Editing canvas</span><strong>{document.name}</strong></div>
+            <span className="aw-property-count">6 sections</span>
+          </div>
+          <nav role="tablist" className="aw-property-tabs" aria-label="Canvas property categories">
+            {canvasCategories.map(([id,label],index) => (
+              <button key={id} id={"aw-canvas-tab-"+id} type="button" role="tab"
+                aria-selected={id===canvasCategory} aria-controls="aw-canvas-category-panel"
+                tabIndex={id===canvasCategory?0:-1}
+                className={id===canvasCategory?"selected":""}
+                onClick={()=>setCanvasCategory(id)}
+                onKeyDown={event=>{
+                  if(event.key!=="ArrowRight" && event.key!=="ArrowLeft" && event.key!=="Home" && event.key!=="End")return;
+                  event.preventDefault();
+                  const next=event.key==="Home"?0:event.key==="End"?canvasCategories.length-1:
+                    (index+(event.key==="ArrowRight"?1:-1)+canvasCategories.length)%canvasCategories.length;
+                  setCanvasCategory(canvasCategories[next][0]);
+                  const tabs=event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+                  tabs?.[next]?.focus();
+                }}>{label}</button>
+            ))}
+          </nav>
+          <p className="aw-property-description">{currentCanvasCategory[2]}</p>
+        </div>
+      )}
+      <div className={"aw-inspector-scroll" + (tab === "Properties" && !layer ? " aw-inspector-canvas-scroll" : "")}>
         {tab === "Presets" ? (
           <div className="aw-preset-grid">
             <button className="aw-template-card" onClick={onPreset}>
@@ -129,7 +166,8 @@ export default function Inspector({
               ) : null}
             </div>
             {!layer ? (
-              <>
+              <div id="aw-canvas-category-panel" role="tabpanel" aria-labelledby={"aw-canvas-tab-"+canvasCategory}>
+                {canvasCategory==="setup" && <>
                 <div className="aw-field-row">
                   <NumberField
                     label="Width"
@@ -158,6 +196,8 @@ export default function Inspector({
                     }
                   />
                 </Field>
+                </>}
+                {canvasCategory==="background" && <>
                 <div className="aw-section-heading">
                   <strong>Background</strong>
                 </div>
@@ -242,14 +282,22 @@ export default function Inspector({
                     }
                   />
                 </Field>
-                <CanvasOptionsEditor value={document.canvasExtras} canvasWidth={document.width} canvasHeight={document.height} assets={document.assets??[]} onAsset={onCanvasAsset} onError={onError} onChange={(canvasExtras)=>onDocument({canvasExtras})} />
+                </>}
+                {["styling","effects","advanced","layers"].includes(canvasCategory) && (
+                  <CanvasOptionsEditor focus={canvasCategory as "styling"|"effects"|"advanced"|"layers"}
+                    value={document.canvasExtras} canvasWidth={document.width} canvasHeight={document.height}
+                    assets={document.assets??[]} onAsset={onCanvasAsset} onError={onError}
+                    onChange={canvasExtras=>onDocument({canvasExtras})} />
+                )}
+                {canvasCategory==="advanced" && <>
                 <Field label="Renderer">
                   <span className="aw-value">Apexify.js · Node v6</span>
                 </Field>
                 <Field label="Pixel ratio">
                   <span className="aw-value">1× · Native output</span>
                 </Field>
-              </>
+                </>}
+              </div>
             ) : (
               <>
                 <Field label="Name">
@@ -531,6 +579,7 @@ export default function Inspector({
                 </div>
               </>
             )}
+            {(layer || canvasCategory==="layers") && <>
             <button
               className="aw-inspector-section-toggle"
               onClick={() => setShowLayers(!showLayers)}
@@ -560,14 +609,15 @@ export default function Inspector({
                 ))}
               </div>
             ) : null}
-            <details className="aw-runtime-info">
+            </>}
+            {(layer || canvasCategory==="advanced") && <details className="aw-runtime-info">
               <summary>Rendering details</summary>
               <p>
                 Preview and export use the installed Apexify.js v6 Node
                 renderer. Visual, code, and graph share the same versioned
                 composition.
               </p>
-            </details>
+            </details>}
           </>
         )}
       </div>

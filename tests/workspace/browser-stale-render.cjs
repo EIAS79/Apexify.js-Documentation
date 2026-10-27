@@ -35,7 +35,7 @@ async function main(){
  });
  async function latestPixel(){
   return page.evaluate(async()=>{
-   const g=document.querySelector('.aw-node-output img'),v=document.querySelector('.aw-visual .aw-render-image');
+   const g=document.querySelector('.aw-flow-card-preview, .aw-node-output img'),v=document.querySelector('.aw-visual .aw-render-image');
    if(!g||!v||!g.complete||!v.complete||!g.naturalWidth||g.currentSrc!==v.currentSrc)return null;
    await Promise.all([g.decode(),v.decode()]);
    const cv=document.createElement('canvas');cv.width=g.naturalWidth;cv.height=g.naturalHeight;
@@ -46,14 +46,14 @@ async function main(){
  try{
   await page.goto(url,{waitUntil:'domcontentloaded',timeout:60000});
   await page.locator('.aw-app[aria-busy="false"]').waitFor({state:'visible',timeout:30000});
-  await page.waitForFunction(()=>{const g=document.querySelector('.aw-node-output img'),v=document.querySelector('.aw-visual .aw-render-image');return g?.complete&&v?.complete&&g.naturalWidth===1280&&g.currentSrc===v.currentSrc;},null,{timeout:24000});
+  await page.waitForFunction(()=>{const g=document.querySelector('.aw-flow-card-preview, .aw-node-output img'),v=document.querySelector('.aw-visual .aw-render-image');return g?.complete&&v?.complete&&g.naturalWidth===1280&&g.currentSrc===v.currentSrc;},null,{timeout:24000});
   const previous=await latestPixel();
   assert.ok(previous?.src,'require a previously displayed object URL to test cleanup');
   await page.getByLabel('Canvas pattern type').selectOption('waves');
   await Promise.race([before.promise,new Promise((_,reject)=>setTimeout(()=>reject(Error('old render did not start')),18000))]);
   await page.getByLabel('Canvas pattern type').selectOption('diamonds');
   await page.waitForFunction(previous=>{
-    const g=document.querySelector('.aw-node-output img'),v=document.querySelector('.aw-visual .aw-render-image');
+    const g=document.querySelector('.aw-flow-card-preview, .aw-node-output img'),v=document.querySelector('.aw-visual .aw-render-image');
     return g?.complete&&v?.complete&&g.naturalWidth===1280&&g.currentSrc===v.currentSrc&&g.currentSrc!==previous;
   },previous?.src??null,{timeout:24000});
   const winner=await latestPixel();

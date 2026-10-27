@@ -30,7 +30,7 @@ async function run(){
  }
  async function pixel(kind='graph'){
   return page.evaluate(async kind=>{
-   const img=document.querySelector(kind==='graph'?'.aw-node-output img':'.aw-visual .aw-render-image');
+   const img=document.querySelector(kind==='graph'?'.aw-flow-card-preview, .aw-node-output img':'.aw-visual .aw-render-image');
    if(!img||!img.complete||!img.naturalWidth)return null;
    await img.decode();const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
    const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
@@ -41,7 +41,7 @@ async function run(){
  }
  async function waitPreview(change,description){
   await page.waitForFunction(old=>{
-   const graph=document.querySelector('.aw-node-output img'),visual=document.querySelector('.aw-visual .aw-render-image');
+   const graph=document.querySelector('.aw-flow-card-preview, .aw-node-output img'),visual=document.querySelector('.aw-visual .aw-render-image');
    return !!graph&&!!visual&&graph.complete&&visual.complete&&graph.naturalWidth===1280&&visual.naturalWidth===1280&&
      graph.currentSrc===visual.currentSrc&&(!old||graph.currentSrc!==old);
   },change,{timeout:24000});

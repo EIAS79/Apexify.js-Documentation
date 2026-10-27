@@ -11,7 +11,7 @@ const db=await new Promise((yes,no)=>{const q=indexedDB.open('apexify-workspace-
 try{const tx=db.transaction('projects','readonly'),q=tx.objectStore('projects').get('active-project');return await new Promise((yes,no)=>{q.onsuccess=()=>yes(q.result);q.onerror=()=>no(q.error)});}
 finally{db.close()}
 })}
-async function painted(){return page.evaluate(async()=>{const a=document.querySelector('.aw-node-output img'),i=document.querySelector('.aw-visual .aw-render-image');
+async function painted(){return page.evaluate(async()=>{const a=document.querySelector('.aw-flow-card-preview, .aw-node-output img'),i=document.querySelector('.aw-visual .aw-render-image');
 if(!i?.complete||!i.naturalWidth||!a?.complete||!a.naturalWidth||i.currentSrc!==a.currentSrc)return null;
 const c=document.createElement('canvas');c.width=i.naturalWidth;c.height=i.naturalHeight;c.getContext('2d').drawImage(i,0,0);
 const pixels=c.getContext('2d').getImageData(0,0,c.width,c.height).data;

@@ -1,0 +1,72 @@
+name: Canvas Studio v2 browser proof
+on:
+  push:
+    branches:
+      - feat/canvas-studio-production-20261027
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canvas-studio-browser-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  canvas-studio-browser:
+    name: Six Canvas tabs + typed graph in Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Install pinned Apexify and Studio dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Verify native Canvas v6 option semantics, graph edits and code parity
+        run: |
+          node --import tsx --test --test-concurrency=2 \
+            tests/workspace/canvas-pinned.test.ts \
+            tests/workspace/canvas-graph-wiring-s11.test.ts \
+            tests/workspace/canvas-paint-graph-s12.test.ts \
+            tests/workspace/canvas-effects-enums-s13.test.ts \
+            tests/workspace/canvas-nested-families-s15.test.ts \
+            tests/workspace/canvas-union-certification-s13.test.ts
+      - uses: browser-actions/setup-chrome@v1
+        id: chrome
+        with:
+          chrome-version: stable
+      - name: Start local Studio (no Vercel SSO)
+        shell: bash
+        run: |
+          ./node_modules/.bin/next dev --hostname 127.0.0.1 --port 38485 > /tmp/apexify-canvas-studio.log 2>&1 &
+          echo $! > /tmp/apexify-canvas-studio.pid
+          for attempt in $(seq 1 150); do
+            if curl --silent --fail --output /dev/null http://127.0.0.1:38485/workspace; then
+              echo "Workspace route is responding"
+              exit 0
+            fi
+            sleep 2
+          done
+          tail -100 /tmp/apexify-canvas-studio.log
+          exit 1
+      - name: Verify Canvas UX, controls and graph in real Chromium
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+          APEXIFY_QA_URL: http://127.0.0.1:38485
+        run: node tests/workspace/canvas-studio-v2-cdp.cjs
+      - name: Upload screenshots and proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: canvas-studio-v2-chromium
+          path: test-results/canvas-studio-v2/
+          if-no-files-found: ignore
+      - name: Surface Studio server errors
+        if: failure()
+        run: tail -150 /tmp/apexify-canvas-studio.log || true

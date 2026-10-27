@@ -2249,3 +2249,414 @@
 .aw-text-metrics {display:grid;gap:4px;font-size:12px;font-variant-numeric:tabular-nums}
 .aw-text-metrics pre {white-space:pre-wrap;overflow-wrap:anywhere;max-height:160px;overflow:auto;font-size:10px}
 .aw-text-editor-compact {margin:10px;padding:10px;border:1px solid rgba(130,150,190,.3);border-radius:8px}
+
+
+/* Focused Canvas authoring categories; full state remains in the canonical CanvasExtras model. */
+.aw-canvas-advanced[data-canvas-focus] .aw-canvas-jump {display:none}
+.aw-canvas-advanced[data-canvas-focus="styling"] > .aw-canvas-section:not(#aw-canvas-fundamentals):not(#aw-canvas-gradients):not(#aw-canvas-patterns),
+.aw-canvas-advanced[data-canvas-focus="effects"] > .aw-canvas-section:not(#aw-canvas-effects),
+.aw-canvas-advanced[data-canvas-focus="advanced"] > .aw-canvas-section:not(#aw-canvas-images),
+.aw-canvas-advanced[data-canvas-focus="layers"] > .aw-canvas-section:not(#aw-canvas-layers) {display:none}
+.aw-canvas-advanced[data-canvas-focus="styling"] > button:last-of-type,
+.aw-canvas-advanced[data-canvas-focus="effects"] > button:last-of-type,
+.aw-canvas-advanced[data-canvas-focus="layers"] > button:last-of-type {display:none}
+/* The advanced technical inputs open as a palette; the node stage gets the primary space. */
+.aw-graph-toolbar {position:relative;z-index:4;height:auto;min-height:46px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:7px 11px;background:#0b1a2d;border-bottom:1px solid #28425b}
+.aw-graph-inputs {position:relative;flex:0 0 auto}
+.aw-graph-inputs>summary {list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:34px;padding:7px 12px;border:1px solid #335674;border-radius:8px;background:#132840;color:#d3e7fa;font-size:11px;font-weight:650}
+.aw-graph-inputs>summary:after {content:"⌄";margin-left:8px;color:#76c8ef}
+.aw-graph-inputs>summary::-webkit-details-marker {display:none}
+.aw-graph-inputs[open]>summary {border-color:#5c99c9;background:#1b3e63}
+.aw-graph-inputs>summary:focus-visible {outline:2px solid #89d3ff;outline-offset:2px}
+.aw-graph-input-grid {position:absolute;right:0;top:calc(100% + 8px);z-index:12;width:min(420px,calc(100vw - 50px));max-height:min(65vh,520px);overflow:auto;display:grid;grid-template-columns:1fr;gap:11px;padding:16px;background:#0d1d31;border:1px solid #395b7b;border-radius:12px;box-shadow:0 16px 36px #0009}
+.aw-graph-input-grid .aw-value {font-size:11px;color:#c5d9ef;display:flex;flex-direction:column;gap:5px}
+.aw-graph-input-grid select {max-width:100%;width:100%;min-height:34px;border-radius:7px}
+
+/* Canvas Studio UI v2 — responsive professional controls and node graph.
+   Presentation only; the existing CanvasExtras and typed graph edit contracts remain authoritative. */
+.aw-app {
+  --aw-ui-surface:#0b1a2a;
+  --aw-ui-raised:#10233a;
+  --aw-ui-stroke:#29435c;
+  --aw-ui-accent:#61c8fa;
+  --aw-ui-focus:#a5e9ff;
+}
+.aw-property-nav {
+  padding:16px 16px 14px;
+  background:linear-gradient(155deg,#0e243d 0%,#091b31 100%);
+  border-bottom:1px solid #28445e;
+}
+.aw-property-context {align-items:flex-start;margin-bottom:14px}
+.aw-property-eyebrow {font-size:10px;letter-spacing:.11em;color:#90c9ed}
+.aw-property-context strong {font-size:15px;line-height:1.4;letter-spacing:-.015em}
+.aw-property-count {font-size:10px;border-radius:6px;background:#123552;color:#bee5ff;border:1px solid #315e81}
+.aw-property-tabs {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:3px;
+  padding:4px;
+  border:1px solid #294963;
+  border-radius:10px;
+  background:#07182b;
+}
+.aw-property-tabs button {
+  min-width:0!important;min-height:38px;
+  padding:8px 6px!important;
+  border:1px solid transparent!important;
+  border-radius:7px!important;
+  background:transparent!important;
+  color:#abc5df!important;
+  font-size:11px!important;
+  font-weight:650!important;
+  box-shadow:none!important;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.aw-property-tabs button:hover {background:#1b3550!important;color:#f1f7ff!important}
+.aw-property-tabs button.selected,.aw-property-tabs button[aria-selected="true"] {
+  color:#f8fcff!important;
+  background:#1b4469!important;
+  border-color:#3a83b5!important;
+  box-shadow:inset 0 1px 0 #8ce4ff22!important;
+}
+.aw-property-description {font-size:11px;line-height:1.5;margin:12px 2px 0;color:#a5bed6}
+@media(min-width:700px) {
+  .aw-property-tabs {grid-template-columns:repeat(6,minmax(0,1fr))}
+}
+@media(max-width:350px) {
+  .aw-property-nav {padding:12px 10px}
+  .aw-property-tabs {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+.aw-inspector-canvas-scroll {min-width:0;padding:16px!important}
+.aw-inspector-canvas-scroll > .aw-field-row {
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;align-items:stretch;
+}
+.aw-inspector-canvas-scroll > .aw-field-row > .aw-field {
+  display:flex;flex-direction:column;align-items:stretch;gap:6px;
+  margin:0;min-width:0;
+}
+.aw-inspector-canvas-scroll > .aw-field-row > .aw-field > span:first-child,
+.aw-inspector-canvas-scroll > .aw-field > span:first-child {
+  flex:none;max-width:100%;line-height:1.3;color:#acc8e3;font-size:11px;
+}
+.aw-inspector-canvas-scroll > .aw-field-row > .aw-field > input,
+.aw-inspector-canvas-scroll > .aw-field-row > .aw-field > select {width:100%!important;min-width:0}
+.aw-inspector-canvas-scroll > .aw-field:not(.aw-canvas-advanced .aw-field) {
+  display:flex;flex-direction:column;align-items:stretch;gap:7px;min-width:0;
+}
+.aw-inspector-canvas-scroll > .aw-field > input:not([type=checkbox]) {width:100%!important}
+.aw-inspector-canvas-scroll .aw-section-heading {margin:10px 0 15px;font-size:12px}
+.aw-inspector-canvas-scroll .aw-section-heading strong {font-size:12px}
+
+/* Canvas authoring section cards and nested forms. */
+.aw-canvas-advanced {min-width:0;display:grid;gap:13px}
+.aw-canvas-advanced > .aw-section-heading:first-child {display:none}
+.aw-canvas-advanced > .aw-muted {margin:0 0 3px;font-size:11px;line-height:1.6;color:#93afcc}
+.aw-canvas-section,.aw-canvas-section[open] {
+  min-width:0;margin:0;
+  padding:0 0 14px;
+  border:1px solid #2a4760;border-radius:12px;
+  background:linear-gradient(180deg,#0c2238,#0a1c30);
+  overflow:visible;
+}
+.aw-canvas-section > summary {
+  min-height:49px;
+  padding:13px 15px;
+  font-size:12px;
+  color:#edf5ff;
+  border-radius:12px 12px 0 0;
+}
+.aw-canvas-section > summary strong {font-size:12px;font-weight:720}
+.aw-canvas-section > summary span {font-size:10px;color:#96b8d2;max-width:50%;white-space:normal}
+.aw-canvas-section[open] > summary {
+  border-bottom:1px solid #28445d;
+  margin-bottom:10px;
+  background:#112941;
+}
+.aw-canvas-section > .aw-section-heading {
+  margin:8px 14px 10px!important;
+  border:0!important;
+  padding:0!important;
+  color:#9fbfd9;
+  font-size:11px;
+}
+.aw-canvas-section > .aw-field-row,.aw-canvas-section > .aw-field,
+.aw-canvas-section > .aw-canvas-properties,.aw-canvas-section > .aw-muted {
+  margin-left:14px!important;margin-right:14px!important;
+}
+.aw-canvas-advanced .aw-field-row,
+.aw-graph-semantic-properties .aw-field-row {
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))!important;
+  align-items:start!important;
+  gap:12px!important;
+  min-width:0;
+  margin-top:12px;
+}
+.aw-canvas-advanced .aw-field-row > .aw-field,
+.aw-graph-semantic-properties .aw-field-row > .aw-field,
+.aw-canvas-advanced .aw-field-row > .aw-value,
+.aw-graph-semantic-properties .aw-field-row > .aw-value,
+.aw-canvas-advanced .aw-canvas-properties .aw-field {
+  flex:none!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start;
+  gap:7px!important;
+  min-width:0!important;max-width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  font-size:11px!important;
+  line-height:1.45;
+  color:#acc9e1;
+}
+.aw-canvas-advanced .aw-field-row > .aw-field > span:first-child,
+.aw-graph-semantic-properties .aw-field-row > .aw-field > span:first-child,
+.aw-canvas-advanced .aw-canvas-properties .aw-field > span:first-child {
+  flex:none!important;
+  width:100%;min-width:0!important;
+  font-size:11px!important;
+  line-height:1.45;
+  color:#bcd2e5;
+  overflow-wrap:normal!important;
+  word-break:normal;
+}
+.aw-canvas-advanced .aw-field-row input:not([type=checkbox]),
+.aw-canvas-advanced .aw-field-row select,
+.aw-graph-semantic-properties .aw-field-row input:not([type=checkbox]),
+.aw-graph-semantic-properties .aw-field-row select,
+.aw-canvas-advanced .aw-field > input:not([type=checkbox]),
+.aw-canvas-advanced .aw-field > select {
+  display:block!important;width:100%!important;min-width:0!important;
+  max-width:100%!important;height:39px!important;
+  padding:8px 11px!important;
+  border:1px solid #345875!important;border-radius:8px!important;
+  background:#081b30!important;color:#eaf5ff!important;
+  font-size:12px!important;
+  font-variant-numeric:tabular-nums;
+}
+.aw-canvas-advanced input:focus-visible,.aw-canvas-advanced select:focus-visible,
+.aw-graph-semantic-properties input:focus-visible,.aw-graph-semantic-properties select:focus-visible {
+  outline:2px solid #8bdbff!important;outline-offset:1px;
+}
+.aw-canvas-advanced .aw-canvas-note,.aw-graph-semantic-properties .aw-canvas-note {
+  display:block!important;
+  width:100%!important;
+  max-width:75ch!important;
+  line-height:1.55!important;
+  margin:7px 0 3px!important;
+  color:#d3b17f!important;
+  font-size:11px!important;
+  white-space:normal!important;
+  overflow-wrap:break-word!important;
+}
+.aw-canvas-section .aw-canvas-properties,.aw-graph-semantic-properties .aw-canvas-properties {
+  padding:16px!important;
+  border:1px solid #2b4d66!important;
+  border-radius:10px!important;
+  background:#091b2d;
+  min-width:0;
+}
+.aw-canvas-properties legend {
+  padding:0 7px!important;
+  color:#d6edfc!important;
+  font-size:12px!important;
+  font-weight:720!important;
+}
+.aw-canvas-advanced .aw-field-row > .aw-canvas-properties {grid-column:1/-1}
+.aw-canvas-advanced .aw-field:not(.aw-field-row .aw-field) {max-width:100%;min-width:0}
+.aw-canvas-advanced .aw-field:not(.aw-field-row .aw-field) > span:first-child {white-space:normal}
+.aw-canvas-section .aw-field:has(input[type=checkbox]),
+.aw-graph-semantic-properties .aw-field:has(input[type=checkbox]) {
+  display:flex!important;flex-direction:row!important;
+  align-items:center!important;justify-content:space-between!important;
+  gap:12px!important;
+}
+.aw-canvas-advanced input[type=checkbox],.aw-graph-semantic-properties input[type=checkbox] {
+  appearance:none!important;flex:none;
+  width:38px!important;height:22px!important;min-height:22px!important;
+  padding:0!important;margin:0!important;
+  border:1px solid #446780!important;border-radius:999px!important;
+  background:#1b3450!important;position:relative;cursor:pointer;
+}
+.aw-canvas-advanced input[type=checkbox]::before,.aw-graph-semantic-properties input[type=checkbox]::before {
+  content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;
+  border-radius:100%;background:#cdd9e4;transition:transform .16s ease;
+}
+.aw-canvas-advanced input[type=checkbox]:checked,.aw-graph-semantic-properties input[type=checkbox]:checked {background:#087caf!important;border-color:#3dd2fe!important}
+.aw-canvas-advanced input[type=checkbox]:checked::before,.aw-graph-semantic-properties input[type=checkbox]:checked::before {background:white;transform:translateX(16px)}
+.aw-canvas-advanced input[type=color],.aw-graph-semantic-properties input[type=color] {cursor:pointer;padding:5px!important}
+.aw-canvas-advanced input[type=file] {
+  min-height:44px;height:auto!important;padding:7px!important;
+  font-size:11px!important;color:#b4cbdf!important;
+}
+.aw-canvas-advanced input[type=file]::file-selector-button {
+  border:1px solid #35749a;background:#164466;border-radius:7px;
+  padding:7px 12px;margin-right:12px;color:#e4f5ff;cursor:pointer;
+}
+.aw-canvas-advanced .aw-canvas-section button:not([disabled]):hover {filter:brightness(1.14)}
+.aw-canvas-advanced .aw-canvas-properties > .aw-field-row button {min-height:32px;padding:6px 10px!important}
+.aw-canvas-section > .aw-field-row:empty {display:none!important}
+@media(max-width:600px) {
+ .aw-canvas-advanced .aw-field-row,.aw-graph-semantic-properties .aw-field-row {grid-template-columns:minmax(0,1fr)!important}
+ .aw-canvas-section > summary span {max-width:44%}
+}
+
+/* Interactive XYFlow graph takes precedence over technical form controls. */
+.aw-graph {overflow:auto;min-height:0;background:#071523}
+.aw-graph-toolbar-modern {position:sticky;top:0;z-index:10;gap:12px;min-height:54px;padding:9px 16px;background:#0b2036}
+.aw-graph-heading {display:flex;flex-direction:column;gap:2px;min-width:0;margin-right:auto}
+.aw-graph-heading strong {font-size:13px;color:#f1f7ff;letter-spacing:-.01em}
+.aw-graph-heading span {font-size:10px;color:#8db9da}
+.aw-graph-toolbar-modern .aw-run-graph {order:4;margin-left:0}
+.aw-graph-flow {position:relative;flex:0 0 auto;height:clamp(330px,56vh,650px);width:100%;min-width:0;overflow:hidden;background:#071523;border-bottom:1px solid #284861}
+.aw-graph-flow .react-flow {width:100%;height:100%}
+.aw-flow-hint {
+  position:absolute;z-index:5;left:14px;top:12px;pointer-events:none;
+  padding:7px 11px;background:#0b2035e8;border:1px solid #254763;border-radius:8px;
+  color:#b0cbe3;font-size:10px;
+}
+.aw-flow-count {position:absolute;z-index:5;bottom:14px;left:58px;pointer-events:none;color:#86aeca;font-size:10px;background:#0b2035cf;padding:6px 8px;border-radius:5px}
+.aw-flow-card {
+  position:relative;width:238px;min-height:118px;
+  border:1px solid #3a5b7a;border-radius:13px;
+  background:linear-gradient(150deg,#16314e,#0a2137);
+  box-shadow:0 10px 28px #0008, inset 0 1px 0 #d0eeff12;
+  color:#e6f4ff;
+  overflow:visible;
+}
+.aw-flow-card.is-selected {border-color:#70dafa;box-shadow:0 0 0 2px #5bdaff55,0 10px 28px #0008}
+.aw-flow-card.is-dimmed {opacity:.55}
+.aw-flow-kind-canvas {border-color:#34b9df}
+.aw-flow-kind-output {border-color:#48cba3}
+.aw-flow-kind-gradient,.aw-flow-kind-pattern {border-color:#cd85dd}
+.aw-flow-kind-effect {border-color:#e7a96b}
+.aw-flow-card-header {display:flex;align-items:center;gap:8px;padding:12px 12px 7px;min-width:0}
+.aw-flow-card-icon {display:grid;place-items:center;flex:none;width:25px;height:25px;border:1px solid #456c87;border-radius:7px;background:#183b58;color:#75d8ff;font-size:14px}
+.aw-flow-card-title {min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;font-weight:750}
+.aw-flow-kind-label {text-transform:uppercase;letter-spacing:.055em;color:#91b5cf;font-size:9px}
+.aw-flow-card-detail {margin:0 12px 8px;color:#9ebcd4;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aw-flow-card-preview {display:block;width:calc(100% - 24px);max-height:85px;object-fit:contain;margin:4px 12px 10px;border:1px solid #28445d;border-radius:6px}
+.aw-flow-ports {display:flex;gap:6px;justify-content:space-between;padding:4px 9px 11px;min-height:28px}
+.aw-flow-port-column {display:grid;align-content:start;gap:7px;min-width:0}
+.aw-flow-port-outputs {text-align:right}
+.aw-flow-port {font-size:10px;color:#c7deee;line-height:20px;min-height:20px;white-space:nowrap}
+.aw-flow-port-out {text-align:right}
+.aw-flow-card .react-flow__handle {
+  width:11px;height:11px;border:2px solid #072036;box-shadow:0 0 0 2px #ffffff30;
+  transition:transform .12s;
+}
+.aw-flow-card .react-flow__handle:hover {transform:scale(1.25)}
+.aw-graph-flow .react-flow__node {width:238px}
+.aw-graph-flow .react-flow__controls {overflow:hidden;border:1px solid #315776;border-radius:10px;box-shadow:0 10px 28px #0008;background:#102b45}
+.aw-graph-flow .react-flow__controls button {width:30px;height:30px;background:#102b45;color:#c4e2f7;border-bottom:1px solid #244660}
+.aw-graph-flow .react-flow__controls button svg {fill:currentColor;max-width:14px;max-height:14px}
+.aw-graph-flow .react-flow__minimap {border:1px solid #305571;border-radius:10px;overflow:hidden;background:#0c253c}
+.aw-graph-flow .react-flow__edge-path {stroke-linecap:round}
+.aw-graph-flow .react-flow__connection-path {stroke:#80dcff;stroke-width:2}
+.aw-graph-wiring,.aw-graph-semantic-properties {margin:10px 14px!important;border:1px solid #2a4760;border-radius:10px;background:#091d30;min-width:0}
+.aw-graph-wiring > summary,.aw-graph-semantic-properties > summary {min-height:44px;display:flex;align-items:center;cursor:pointer;background:#112a42;border-radius:10px;padding:10px 14px;font-size:12px;color:#dceeff}
+.aw-graph-wiring > :not(summary),.aw-graph-semantic-properties > :not(summary) {margin-left:14px;margin-right:14px}
+.aw-graph-connections {display:grid;gap:8px;margin:13px 0;max-height:220px;overflow:auto;font-size:11px;overflow-wrap:anywhere}
+.aw-graph-connections > div {padding:9px;border:1px solid #294862;border-radius:6px;background:#0b2640}
+.aw-graph-caption {white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:10px;padding:10px 16px}
+@media(prefers-reduced-motion:reduce) {
+  .aw-canvas-advanced input[type=checkbox]::before,.aw-flow-card .react-flow__handle {transition:none}
+}
+
+/* Canvas-specific direct fields use the same ergonomic stack as grouped fields. */
+.aw-inspector-canvas-scroll .aw-canvas-section>.aw-field:not(:has(input[type=checkbox])),
+.aw-inspector-canvas-scroll .aw-canvas-properties>.aw-field:not(:has(input[type=checkbox])) {
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:8px!important;min-width:0!important;margin-top:10px!important;margin-bottom:12px!important;
+}
+.aw-inspector-canvas-scroll .aw-canvas-section>.aw-field:not(:has(input[type=checkbox]))>input,
+.aw-inspector-canvas-scroll .aw-canvas-section>.aw-field:not(:has(input[type=checkbox]))>select,
+.aw-inspector-canvas-scroll .aw-canvas-properties>.aw-field:not(:has(input[type=checkbox]))>input,
+.aw-inspector-canvas-scroll .aw-canvas-properties>.aw-field:not(:has(input[type=checkbox]))>select {
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  min-height:39px!important;background:#0a2035!important;border:1px solid #345e7c!important;
+  border-radius:8px!important;padding:7px 10px!important;color:#e7f5ff!important;
+}
+.aw-graph-flow .react-flow__attribution {display:none}
+
+
+/* Canvas Studio responsiveness is based on the dock width, not the browser viewport. */
+.aw-inspector {container-type:inline-size}
+.aw-inspector .aw-property-tabs {grid-template-columns:repeat(3,minmax(0,1fr))!important}
+@container (min-width:640px) {
+  .aw-property-tabs {grid-template-columns:repeat(6,minmax(0,1fr))!important}
+}
+@container (max-width:310px) {
+  .aw-property-tabs {grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+/* Graph actions stay visible in compact docks instead of consuming multiple rows. */
+.aw-graph-toolbar-modern {
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;
+  gap:7px!important;align-items:center!important;min-height:49px!important;
+  padding:7px 10px!important;
+}
+.aw-graph-toolbar-modern .aw-graph-heading {min-width:0;overflow:hidden}
+.aw-graph-toolbar-modern .aw-graph-heading strong {font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aw-graph-toolbar-modern .aw-graph-heading span {display:none}
+.aw-graph-toolbar-modern .aw-graph-inputs {order:unset!important;min-width:0}
+.aw-graph-toolbar-modern .aw-graph-inputs>summary {font-size:10px;min-height:32px;padding:5px 9px;white-space:nowrap}
+.aw-graph-toolbar-modern .aw-run-graph {order:unset!important;margin:0!important;min-height:32px!important;padding:6px 10px!important;font-size:10px!important}
+.aw-graph-flow {height:clamp(300px,53vh,620px)}
+.aw-flow-hint {padding:5px 8px;top:8px;left:10px;max-width:calc(100% - 20px);font-size:9px}
+@container (max-width:370px) {
+ .aw-graph-toolbar-modern {grid-template-columns:minmax(0,1fr) auto!important}
+ .aw-graph-toolbar-modern .aw-graph-heading {grid-column:1/-1}
+}
+
+
+/* The Canvas tabpanel is a wrapper: style fields inside it, not only scroll direct children. */
+.aw-property-context>div {display:flex;flex-direction:column;gap:4px;min-width:0}
+.aw-property-context strong {display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.aw-property-count {flex:none;align-self:flex-start;white-space:nowrap}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel {display:block;min-width:0}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row {
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px;margin:13px 0;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row>.aw-field {
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important;
+ min-width:0;margin:0!important;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row>.aw-field>span:first-child {flex:none;width:100%;font-size:11px;line-height:1.4}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row>.aw-field>input:not([type=checkbox]),
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row>.aw-field>select {
+ width:100%!important;min-width:0!important;height:39px!important;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field:not(:has(input[type=checkbox])) {
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important;min-width:0;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field:not(:has(input[type=checkbox]))>input,
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field:not(:has(input[type=checkbox]))>select {
+ width:100%!important;min-width:0!important;height:39px!important;
+}
+.aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field:has(input[type=checkbox]) {
+ display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;
+}
+@container (max-width:310px) {
+ .aw-inspector-canvas-scroll #aw-canvas-category-panel>.aw-field-row {grid-template-columns:minmax(0,1fr)}
+}
+
+/* Typed connection failures are visible without expanding technical wiring. */
+.aw-graph-wiring-error {margin:8px 13px!important;padding:10px 12px;border:1px solid #b4675c;border-radius:8px;background:#38201f;color:#ffd3c8;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+
+/* Final Canvas polish: stable header alignment and contained toggle tracks. */
+.aw-property-context {display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:10px!important}
+.aw-property-context>div {display:flex!important;flex-direction:column!important;gap:4px!important;min-width:0!important;flex:1 1 auto!important}
+.aw-property-context>div>strong {display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.aw-property-count {flex:0 0 auto!important;align-self:flex-start!important;white-space:nowrap!important}
+.aw-canvas-advanced .aw-canvas-properties>.aw-field:has(input[type=checkbox]) {
+  display:grid!important;grid-template-columns:minmax(0,1fr) 38px!important;
+  align-items:center!important;gap:10px!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  margin:8px 0!important;padding:0!important;box-sizing:border-box!important;
+}
+.aw-canvas-advanced .aw-canvas-properties>.aw-field:has(input[type=checkbox])>input[type=checkbox] {
+  justify-self:end!important;margin:0!important;min-width:38px!important;
+}
