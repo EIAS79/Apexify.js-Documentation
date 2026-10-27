@@ -125,7 +125,7 @@ export default function CanvasGraphFlow({graph,document,selected,preview,onSelec
     return !!source&&!!target&&source.type===target.type&&source.nodeId!==target.nodeId;
   };
   return <div className="aw-graph-flow" role="region" aria-label="Interactive canvas node graph">
-    <div className="aw-flow-hint">Drag the canvas to pan · scroll to zoom · connect matching colored ports · select a node to inspect</div>
+    <div className="aw-flow-hint">Drag to pan · Scroll to zoom · Connect matching ports</div>
     <ReactFlow<StudioNode,Edge>
       nodes={nodes} edges={generated.edges} nodeTypes={nodeTypes}
       onNodesChange={onNodesChange}
@@ -141,7 +141,7 @@ export default function CanvasGraphFlow({graph,document,selected,preview,onSelec
       isValidConnection={isValidConnection}
       onEdgeDoubleClick={(_event,edge)=>{if(edge.targetHandle)onDisconnect(edge.targetHandle);}}
       nodesConnectable edgesFocusable panOnDrag zoomOnScroll zoomOnPinch
-      fitView fitViewOptions={{padding:.22,maxZoom:1.1}} minZoom={.15} maxZoom={2}
+      defaultViewport={{x:-430,y:15,zoom:.8}} minZoom={.25} maxZoom={2}
       colorMode="dark" proOptions={{hideAttribution:true}}
     >
       <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#264158"/>
